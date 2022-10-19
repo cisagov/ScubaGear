@@ -1,0 +1,34 @@
+name: Run PS Linter
+on: 
+  push:
+    paths:
+      - "**.ps1"
+      - "**.psm1"
+  pull_request:
+    types: [opened, reopened]
+    branches:
+      - "main"
+    paths:
+      - "**.ps1"
+      - "**.psm1"
+  workflow_dispatch:
+
+jobs:
+  lint:
+    name: Run PS Linter
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
+    steps:
+    - uses: actions/checkout@v2
+    - name: lint
+      uses: docker://devblackops/github-action-psscriptanalyzer:2.4.0
+      with:
+        repoToken: ${{ secrets.GITHUB_TOKEN }}
+        settingsPath: PSScriptAnalyzerSettings.psd1
+        failOnErrors: true
+        failOnWarnings: true
+        failOnInfos: true
+        sendComment: true

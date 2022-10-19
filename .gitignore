@@ -1,0 +1,17 @@
+# dependencies
+
+# testing
+
+# production
+
+# msc
+*.xml
+*.cer
+/M365/*.xml
+/PowerShell/output
+/PowerShell/example
+/PowerShell/M365Baseline*
+/output
+/example
+/M365Baseline*
+/Reports*
