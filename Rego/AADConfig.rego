@@ -566,7 +566,6 @@ tests[{
     "RequirementMet" : count(Policies2_13) > 0
 }] {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
-    RoleNames := concat(", ", { Role.DisplayName | Role = input.privileged_roles[_] })
 }
 #--
 
