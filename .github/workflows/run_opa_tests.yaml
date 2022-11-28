@@ -1,5 +1,5 @@
-name: Run OPA Tests  
-on: 
+name: Run OPA Tests
+on:
   # Run tests on each commit, newly opened/reopened PR, and
   # PR review submission (e.g. approval)
   push:
@@ -13,20 +13,21 @@ on:
       - "**.rego"
   pull_request_review:
     types: [submitted]
-    branches:
-      - "main"
 
 jobs:
   Run-OPA-Tests:
     runs-on: ubuntu-latest
     steps:
     - name: Check out repository code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: Setup OPA
-      uses: open-policy-agent/setup-opa@v1
+      uses: open-policy-agent/setup-opa@v2
       with:
         version: latest
 
-    - name: Run OPA Tests 
+    - name: Run OPA Check
+      run: opa check --strict Rego Testing
+
+    - name: Run OPA Tests
       run: opa test Rego/*.rego Testing/**/*.rego -v
