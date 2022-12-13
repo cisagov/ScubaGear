@@ -19,6 +19,14 @@ function Export-AADProvider {
         # - 2.17 first part
         $AllPolicies = Get-MgIdentityConditionalAccessPolicy -ErrorAction Stop | ConvertTo-Json -Depth 10
 
+        # Set to empty array if returned value is null
+        if ($null -eq $AllPolicies) {
+            # Empty arrays are mangled into $null,
+            # However, you can preserve an array on
+            # return by prepending it with the array construction operator ","
+            $AllPolicies = ,@() | ConvertTo-Json
+        }
+
         # Get a list of the tenant's provisioned service plans - used to see if the tenant has AAD premium p2 license required for some checks
         # The Rego looks at the service_plans in the JSON
         $ServicePlans = (Get-MgSubscribedSku).ServicePlans | Where-Object -Property ProvisioningStatus -eq -Value "Success" -ErrorAction Stop
