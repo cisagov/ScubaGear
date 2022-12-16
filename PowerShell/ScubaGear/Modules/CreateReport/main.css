@@ -18,6 +18,22 @@ h3 {
     color: #005288;
 }
 
+h4 {
+    text-align: center;
+    justify-content: start;
+    font-size: 10px;
+    font-family: Arial, Helvetica, sans-serif;
+    color: #ee4e04;
+    margin-left:20%;
+    margin-right: 20%;
+    margin-bottom:5px;
+}
+
+
+.links {
+    display: flex;
+}
+
 header {
     width: 1000px;
     margin: auto;
@@ -28,17 +44,22 @@ header {
     align-items: end;
     padding: 5px;
 }
+
 header h3 {
-    width: 150px;
-    text-align: right;
+    padding: 10px;
+    text-align: center;
     border-bottom: 5px solid rgba(0, 0, 0, 0);
     color: #005288;
+    display: table-cell;
+    vertical-align: bottom;
 }
+
 header a {
     text-decoration: none;
 }
+
 header h3:hover {
-    border-bottom: 5px solid #005288;                
+    border-bottom: 5px solid #005288;   
 }
 
 td {

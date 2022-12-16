@@ -9,14 +9,18 @@
         <main>
             <header>
                 <a href=""><img src="./IndividualReports/cisa_logo.png" alt="Return to the report summary"></a>
-                <a href="https://github.com/cisagov" target="_blank"><h3>Secure Configuration Baselines</h3></a>
+                <div class="links">
+                    <a href="https://www.cisa.gov/scuba" target="_blank"><h3 style="width: 210px;">Secure Cloud Business Applications (SCuBA)</h3></a>
+                    <div style="width:10px;"></div>
+                    <a href="https://github.com/cisagov/ScubaGear/tree/main/baselines" target="_blank"><h3 style="width: 100px;">Baseline Documents</h3></a>
+                </div>
             </header>
             <h1>SCuBA M365 Security Baseline Conformance Reports</h1>
-            <h2> {TENANT_NAME} tenant</h2>
+            {TENANT_DETAILS}
+            <br> <br/>
             {TABLES}
             <footer>
-                Report generated with <a href="https://www.cisa.gov/">CISA's</a> ScubaGear tool {MODULE_VERSION}. 
-                {REPORT_TIME}
+                Report generated with <a class="individual_reports" href="https://github.com/cisagov/ScubaGear">CISA's ScubaGear</a> tool {MODULE_VERSION}
             </footer>
         </main>
    </body>

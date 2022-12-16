@@ -1,0 +1,2465 @@
+[
+    {
+        "ActualValue":  false,
+        "Commandlet":  "Get-MgPolicyAdminConsentRequestPolicy",
+        "Control":  "AAD 2.7",
+        "Criticality":  "Shall",
+        "ReportDetails":  "Requirement not met",
+        "Requirement":  "An admin consent workflow SHALL be configured",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  true,
+        "Commandlet":  "Get-MgPolicyAuthorizationPolicy",
+        "Control":  "AAD 2.6",
+        "Criticality":  "Shall",
+        "ReportDetails":  "Requirement not met",
+        "Requirement":  "Only administrators SHALL be allowed to register third-party applications",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  "",
+        "Commandlet":  "Get-MgDirectoryRoleMember",
+        "Control":  "AAD 2.12",
+        "Criticality":  "Shall",
+        "ReportDetails":  "0 admin(s) that are not cloud-only found",
+        "Requirement":  "Users that need to be assigned to highly privileged Azure AD roles SHALL be provisioned cloud-only accounts that are separate from the on-premises directory or other federated identity providers",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  "Role ID : 10dae51f-b6af-4016-8d66-8c2a99b929b3",
+        "Commandlet":  "Get-MgPolicyAuthorizationPolicy",
+        "Control":  "AAD 2.18",
+        "Criticality":  "Should",
+        "ReportDetails":  "Permission level set to \"Limited access\"",
+        "Requirement":  "Guest users SHOULD have limited access to Azure AD directory objects",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  "[ManagePermissionGrantsForSelf.microsoft-user-default-legacy]",
+        "Commandlet":  "Get-MgPolicyAuthorizationPolicy",
+        "Control":  "AAD 2.7",
+        "Criticality":  "Shall",
+        "ReportDetails":  "Requirement not met",
+        "Requirement":  "Only administrators SHALL be allowed to consent to third-party applications",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  "everyone",
+        "Commandlet":  "Get-MgPolicyAuthorizationPolicy",
+        "Control":  "AAD 2.18",
+        "Criticality":  "Should",
+        "ReportDetails":  "Requirement not met",
+        "Requirement":  "Only users with the Guest Inviter role SHOULD be able to invite guest users",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  "",
+        "Control":  "AAD 2.18",
+        "Criticality":  "Should/Not-Implemented",
+        "ReportDetails":  "Currently cannot be checked automatically. See Azure Active Directory Secure Configuration Baseline policy 2.18 for instructions on manual check",
+        "Requirement":  "Guest invites SHOULD only be allowed to specific external domains that have been authorized by the agency for legitimate business purposes",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  "",
+        "Control":  "AAD 2.2",
+        "Criticality":  "Should/Not-Implemented",
+        "ReportDetails":  "Currently cannot be checked automatically. See Azure Active Directory Secure Configuration Baseline policy 2.2 for instructions on manual check",
+        "Requirement":  "A notification SHOULD be sent to the administrator when high-risk users are detected",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  "",
+        "Control":  "AAD 2.4",
+        "Criticality":  "Shall/Not-Implemented",
+        "ReportDetails":  "Currently cannot be checked automatically. See Azure Active Directory Secure Configuration Baseline policy 2.4 for instructions on manual check",
+        "Requirement":  "If phishing-resistant MFA cannot be used, an MFA method from the list [see AAD baseline 2.4] SHALL be used in the interim",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  "",
+        "Control":  "AAD 2.4",
+        "Criticality":  "Shall/Not-Implemented",
+        "ReportDetails":  "Currently cannot be checked automatically. See Azure Active Directory Secure Configuration Baseline policy 2.4 for instructions on manual check",
+        "Requirement":  "Phishing-resistant MFA SHALL be used for all users",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  "",
+        "Control":  "AAD 2.4",
+        "Criticality":  "Shall/Not-Implemented",
+        "ReportDetails":  "Currently cannot be checked automatically. See Azure Active Directory Secure Configuration Baseline policy 2.4 for instructions on manual check",
+        "Requirement":  "SMS or Voice as the MFA method SHALL NOT be used",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  "",
+        "Control":  "AAD 2.5",
+        "Criticality":  "Shall/Not-Implemented",
+        "ReportDetails":  "Currently cannot be checked automatically. See Azure Active Directory Secure Configuration Baseline policy 2.5 for instructions on manual check",
+        "Requirement":  "The following critical logs SHALL be sent at a minimum: AuditLogs, SignInLogs, RiskyUsers, UserRiskEvents, NonInteractiveUserSignInLogs, ServicePrincipalSignInLogs, ADFSSignInLogs, RiskyServicePrincipals, ServicePrincipalRiskEvents",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  "",
+        "Control":  "AAD 2.5",
+        "Criticality":  "Shall/Not-Implemented",
+        "ReportDetails":  "Currently cannot be checked automatically. See Azure Active Directory Secure Configuration Baseline policy 2.5 for instructions on manual check",
+        "Requirement":  "The logs SHALL be sent to the agency\u0027s SOC for monitoring",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  "",
+        "Control":  "AAD 2.8",
+        "Criticality":  "Shall/Not-Implemented",
+        "ReportDetails":  "Currently cannot be checked automatically. See Azure Active Directory Secure Configuration Baseline policy 2.8 for instructions on manual check",
+        "Requirement":  "User passwords SHALL NOT expire",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  "Get-MgIdentityConditionalAccessPolicy",
+        "Control":  "AAD 2.1",
+        "Criticality":  "Shall",
+        "ReportDetails":  "0 conditional access policy(s) found that meet(s) all requirements",
+        "Requirement":  "Legacy authentication SHALL be blocked",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  "Get-MgIdentityConditionalAccessPolicy",
+        "Control":  "AAD 2.10",
+        "Criticality":  "Shall",
+        "ReportDetails":  "0 conditional access policy(s) found that meet(s) all requirements",
+        "Requirement":  "Browser sessions SHALL not be persistent",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  "Get-MgIdentityConditionalAccessPolicy",
+        "Control":  "AAD 2.13",
+        "Criticality":  "Shall",
+        "ReportDetails":  "0 conditional access policy(s) found that meet(s) all requirements",
+        "Requirement":  "MFA SHALL be required for user access to highly privileged roles",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  "Get-MgIdentityConditionalAccessPolicy",
+        "Control":  "AAD 2.17",
+        "Criticality":  "Should",
+        "ReportDetails":  "0 conditional access policy(s) found that meet(s) all requirements",
+        "Requirement":  "Managed devices SHOULD be required for authentication",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  "Get-MgIdentityConditionalAccessPolicy",
+        "Control":  "AAD 2.2",
+        "Criticality":  "Shall",
+        "ReportDetails":  "0 conditional access policy(s) found that meet(s) all requirements",
+        "Requirement":  "Users detected as high risk SHALL be blocked",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  "Get-MgIdentityConditionalAccessPolicy",
+        "Control":  "AAD 2.3",
+        "Criticality":  "Shall",
+        "ReportDetails":  "0 conditional access policy(s) found that meet(s) all requirements",
+        "Requirement":  "Sign-ins detected as high risk SHALL be blocked",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  "Get-MgIdentityConditionalAccessPolicy",
+        "Control":  "AAD 2.4",
+        "Criticality":  "Shall",
+        "ReportDetails":  "0 conditional access policy(s) found that meet(s) all requirements",
+        "Requirement":  "MFA SHALL be required for all users",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  "Get-MgIdentityConditionalAccessPolicy",
+        "Control":  "AAD 2.9",
+        "Criticality":  "Shall",
+        "ReportDetails":  "0 conditional access policy(s) found that meet(s) all requirements",
+        "Requirement":  "Sign-in frequency SHALL be configured to 12 hours",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+                            "Application Administrator",
+                            "Cloud Application Administrator",
+                            "Exchange Administrator",
+                            "Global Administrator",
+                            "Hybrid Identity Administrator",
+                            "Privileged Role Administrator",
+                            "SharePoint Administrator",
+                            "User Administrator"
+                        ],
+        "Commandlet":  "Get-MgRoleManagementDirectoryRoleAssignmentScheduleInstance",
+        "Control":  "AAD 2.14",
+        "Criticality":  "Shall",
+        "ReportDetails":  "8 role(s) configured to allow permanent active assignment or expiration period too long:\u003cbr/\u003eApplication Administrator, Cloud Application Administrator, Exchange Administrator, Global Administrator, Hybrid Identity Administrator, Privileged Role Administrator, SharePoint Administrator, User Administrator",
+        "Requirement":  "Permanent active role assignments SHALL NOT be allowed for highly privileged roles. Active assignments SHALL have an expiration period.",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+                            "Application Administrator",
+                            "Cloud Application Administrator",
+                            "Exchange Administrator",
+                            "Global Administrator",
+                            "Hybrid Identity Administrator",
+                            "Privileged Role Administrator",
+                            "SharePoint Administrator",
+                            "User Administrator"
+                        ],
+        "Commandlet":  "Get-MgRoleManagementDirectoryRoleAssignmentScheduleInstance",
+        "Control":  "AAD 2.15",
+        "Criticality":  "Should",
+        "ReportDetails":  "8 role(s) that do not require approval to activate found:\u003cbr/\u003eApplication Administrator, Cloud Application Administrator, Exchange Administrator, Global Administrator, Hybrid Identity Administrator, Privileged Role Administrator, SharePoint Administrator, User Administrator",
+        "Requirement":  "Activation of highly privileged roles SHOULD require approval",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+                            "Application Administrator",
+                            "Cloud Application Administrator",
+                            "Exchange Administrator",
+                            "Global Administrator",
+                            "Hybrid Identity Administrator",
+                            "Privileged Role Administrator",
+                            "SharePoint Administrator",
+                            "User Administrator"
+                        ],
+        "Commandlet":  "Get-MgRoleManagementDirectoryRoleAssignmentScheduleInstance",
+        "Control":  "AAD 2.16",
+        "Criticality":  "Shall",
+        "ReportDetails":  "8 role(s) without notification e-mail configured for role assignments found:\u003cbr/\u003eApplication Administrator, Cloud Application Administrator, Exchange Administrator, Global Administrator, Hybrid Identity Administrator, Privileged Role Administrator, SharePoint Administrator, User Administrator",
+        "Requirement":  "Eligible and Active highly privileged role assignments SHALL trigger an alert",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+                            "Application Administrator",
+                            "Cloud Application Administrator",
+                            "Exchange Administrator",
+                            "Global Administrator",
+                            "Hybrid Identity Administrator",
+                            "Privileged Role Administrator",
+                            "SharePoint Administrator",
+                            "User Administrator"
+                        ],
+        "Commandlet":  "Get-MgRoleManagementDirectoryRoleAssignmentScheduleInstance",
+        "Control":  "AAD 2.16",
+        "Criticality":  "Shall",
+        "ReportDetails":  "Requirement not met",
+        "Requirement":  "User activation of the Global Administrator role SHALL trigger an alert",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+                            "Application Administrator",
+                            "Cloud Application Administrator",
+                            "Exchange Administrator",
+                            "Hybrid Identity Administrator",
+                            "Privileged Role Administrator",
+                            "SharePoint Administrator",
+                            "User Administrator"
+                        ],
+        "Commandlet":  "Get-MgRoleManagementDirectoryRoleAssignmentScheduleInstance",
+        "Control":  "AAD 2.16",
+        "Criticality":  "Should",
+        "ReportDetails":  "7 role(s) without notification e-mail configured for role activations found:\u003cbr/\u003eApplication Administrator, Cloud Application Administrator, Exchange Administrator, Hybrid Identity Administrator, Privileged Role Administrator, SharePoint Administrator, User Administrator",
+        "Requirement":  "User activation of other highly privileged roles SHOULD trigger an alert",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+                            "FNU LNU"
+                        ],
+        "Commandlet":  "Get-MgDirectoryRoleMember",
+        "Control":  "AAD 2.11",
+        "Criticality":  "Shall",
+        "ReportDetails":  "1 global admin(s) found:\u003cbr/\u003eFNU LNU",
+        "Requirement":  "A minimum of two users and a maximum of four users SHALL be provisioned with the Global Administrator role",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+                            "Global Administrator"
+                        ],
+        "Commandlet":  "Get-MgRoleManagementDirectoryRoleAssignmentScheduleInstance",
+        "Control":  "AAD 2.14",
+        "Criticality":  "Shall",
+        "ReportDetails":  "1 role(s) assigned to users outside of PIM:\u003cbr/\u003eGlobal Administrator",
+        "Requirement":  "Provisioning of users to highly privileged roles SHALL NOT occur outside of a PAM system, such as the Azure AD PIM service, because this bypasses the controls the PAM system provides",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  false,
+        "Commandlet":  [
+                           "Get-AntiPhishPolicy"
+                       ],
+        "Control":  "Defender 2.5",
+        "Criticality":  "Shall",
+        "ReportDetails":  "Requirement not met",
+        "Requirement":  "All safety tips SHALL be enabled: domain impersonation default policy",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  false,
+        "Commandlet":  [
+                           "Get-AntiPhishPolicy"
+                       ],
+        "Control":  "Defender 2.5",
+        "Criticality":  "Shall",
+        "ReportDetails":  "Requirement not met",
+        "Requirement":  "All safety tips SHALL be enabled: first contact default policy",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  false,
+        "Commandlet":  [
+                           "Get-AntiPhishPolicy"
+                       ],
+        "Control":  "Defender 2.5",
+        "Criticality":  "Shall",
+        "ReportDetails":  "Requirement not met",
+        "Requirement":  "All safety tips SHALL be enabled: user impersonation default policy",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  false,
+        "Commandlet":  [
+                           "Get-AntiPhishPolicy"
+                       ],
+        "Control":  "Defender 2.5",
+        "Criticality":  "Shall",
+        "ReportDetails":  "Requirement not met",
+        "Requirement":  "All safety tips SHALL be enabled: user impersonation unusual characters default policy",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  true,
+        "Commandlet":  [
+                           "Get-AntiPhishPolicy"
+                       ],
+        "Control":  "Defender 2.5",
+        "Criticality":  "Shall",
+        "ReportDetails":  "Requirement met",
+        "Requirement":  "All safety tips SHALL be enabled: \"?\" for unauthenticated senders for spoof default policy",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  true,
+        "Commandlet":  [
+                           "Get-AntiPhishPolicy"
+                       ],
+        "Control":  "Defender 2.5",
+        "Criticality":  "Shall",
+        "ReportDetails":  "Requirement met",
+        "Requirement":  "All safety tips SHALL be enabled: \"via\" tag default policy",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  true,
+        "Commandlet":  [
+                           "Get-HostedContentFilterPolicy"
+                       ],
+        "Control":  "Defender 2.6",
+        "Criticality":  "Shall",
+        "ReportDetails":  "Requirement met",
+        "Requirement":  "Zero-hour auto purge (ZAP) SHALL be enabled for phishing: default policy",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  true,
+        "Commandlet":  [
+                           "Get-HostedContentFilterPolicy"
+                       ],
+        "Control":  "Defender 2.6",
+        "Criticality":  "Shall",
+        "ReportDetails":  "Requirement met",
+        "Requirement":  "Zero-hour auto purge (ZAP) SHALL be enabled for spam messages: default policy",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  true,
+        "Commandlet":  [
+                           "Get-HostedContentFilterPolicy"
+                       ],
+        "Control":  "Defender 2.6",
+        "Criticality":  "Shall",
+        "ReportDetails":  "Requirement met",
+        "Requirement":  "Zero-hour auto purge (ZAP) SHALL be enabled: default policy",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  true,
+        "Commandlet":  [
+                           "Get-HostedContentFilterPolicy"
+                       ],
+        "Control":  "Defender 2.6",
+        "Criticality":  "Should",
+        "ReportDetails":  "Requirement met",
+        "Requirement":  "Spam safety tips SHOULD be turned on: default policy",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  7,
+        "Commandlet":  [
+                           "Get-HostedContentFilterPolicy"
+                       ],
+        "Control":  "Defender 2.6",
+        "Criticality":  "Should",
+        "ReportDetails":  "Requirement not met",
+        "Requirement":  "The bulk complaint level (BCL) threshold SHOULD be set to six or lower: default policy",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  15,
+        "Commandlet":  [
+                           "Get-HostedContentFilterPolicy"
+                       ],
+        "Control":  "Defender 2.6",
+        "Criticality":  "Should",
+        "ReportDetails":  "Requirement not met",
+        "Requirement":  "Spam in quarantine SHOULD be retained for at least 30 days: default policy",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  "MoveToJmf",
+        "Commandlet":  [
+                           "Get-AntiPhishPolicy"
+                       ],
+        "Control":  "Defender 2.5",
+        "Criticality":  "Shall",
+        "ReportDetails":  "Requirement not met",
+        "Requirement":  "Mail classified as spoofed SHALL be quarantined: default policy",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  "MoveToJmf",
+        "Commandlet":  [
+                           "Get-HostedContentFilterPolicy"
+                       ],
+        "Control":  "Defender 2.6",
+        "Criticality":  "Shall",
+        "ReportDetails":  "Requirement met",
+        "Requirement":  "High confidence spam SHALL be moved to either the junk email folder or the quarantine folder: default policy",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  "MoveToJmf",
+        "Commandlet":  [
+                           "Get-HostedContentFilterPolicy"
+                       ],
+        "Control":  "Defender 2.6",
+        "Criticality":  "Shall",
+        "ReportDetails":  "Requirement met",
+        "Requirement":  "Spam SHALL be moved to either the junk email folder or the quarantine folder: default policy",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  "MoveToJmf",
+        "Commandlet":  [
+                           "Get-HostedContentFilterPolicy"
+                       ],
+        "Control":  "Defender 2.6",
+        "Criticality":  "Shall",
+        "ReportDetails":  "Requirement not met",
+        "Requirement":  "Phishing SHALL be quarantined: default policy",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  "MoveToJmf",
+        "Commandlet":  [
+                           "Get-HostedContentFilterPolicy"
+                       ],
+        "Control":  "Defender 2.6",
+        "Criticality":  "Should",
+        "ReportDetails":  "Requirement met",
+        "Requirement":  "Bulk email SHOULD be moved to either the junk email folder or the quarantine folder: default policy",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  "NoAction",
+        "Commandlet":  [
+                           "Get-AntiPhishPolicy"
+                       ],
+        "Control":  "Defender 2.5",
+        "Criticality":  "Shall",
+        "ReportDetails":  "Requirement not met",
+        "Requirement":  "Message action SHALL be set to quarantine if the message is detected as impersonated: domains default policy",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  "NoAction",
+        "Commandlet":  [
+                           "Get-AntiPhishPolicy"
+                       ],
+        "Control":  "Defender 2.5",
+        "Criticality":  "Shall",
+        "ReportDetails":  "Requirement not met",
+        "Requirement":  "Message action SHALL be set to quarantine if the message is detected as impersonated: mailbox default policy",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  "NoAction",
+        "Commandlet":  [
+                           "Get-AntiPhishPolicy"
+                       ],
+        "Control":  "Defender 2.5",
+        "Criticality":  "Shall",
+        "ReportDetails":  "Requirement not met",
+        "Requirement":  "Message action SHALL be set to quarantine if the message is detected as impersonated: users default policy",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  "Quarantine",
+        "Commandlet":  [
+                           "Get-HostedContentFilterPolicy"
+                       ],
+        "Control":  "Defender 2.6",
+        "Criticality":  "Shall",
+        "ReportDetails":  "Requirement met",
+        "Requirement":  "High confidence phishing SHALL be quarantined: default policy",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+
+                       ],
+        "Control":  "Defender 2.10",
+        "Criticality":  "Shall/Not-Implemented",
+        "ReportDetails":  "Currently cannot be checked automatically. See Defender Secure Configuration Baseline policy 2.10 for instructions on manual check",
+        "Requirement":  "Advanced audit SHALL be enabled",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+
+                       ],
+        "Control":  "Defender 2.10",
+        "Criticality":  "Shall/Not-Implemented",
+        "ReportDetails":  "Currently cannot be checked automatically. See Defender Secure Configuration Baseline policy 2.10 for instructions on manual check",
+        "Requirement":  "Audit logs SHALL be maintained for at least the minimum duration dictated by OMB M-21-31",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+
+                       ],
+        "Control":  "Defender 2.2",
+        "Criticality":  "Should/Not-Implemented",
+        "ReportDetails":  "Currently cannot be checked automatically. See Defender Secure Configuration Baseline policy 2.2 for instructions on manual check",
+        "Requirement":  "A list of apps that are not allowed to access files protected by DLP policy SHOULD be defined",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+
+                       ],
+        "Control":  "Defender 2.2",
+        "Criticality":  "Should/Not-Implemented",
+        "ReportDetails":  "Currently cannot be checked automatically. See Defender Secure Configuration Baseline policy 2.2 for instructions on manual check",
+        "Requirement":  "A list of browsers that are not allowed to access files protected by DLP policy SHOULD be defined",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+
+                       ],
+        "Control":  "Defender 2.9",
+        "Criticality":  "Should/Not-Implemented",
+        "ReportDetails":  "Currently cannot be checked automatically. See Defender Secure Configuration Baseline policy 2.9 for instructions on manual check",
+        "Requirement":  "The alerts SHOULD be sent to a monitored address or incorporated into a SIEM",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-AdminAuditLogConfig"
+                       ],
+        "Control":  "Defender 2.10",
+        "Criticality":  "Shall",
+        "ReportDetails":  "Requirement not met",
+        "Requirement":  "Unified audit logging SHALL be enabled",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-AntiPhishPolicy"
+                       ],
+        "Control":  "Defender 2.5",
+        "Criticality":  "Should",
+        "ReportDetails":  "No users are included for targeted user protection.",
+        "Requirement":  "User impersonation protection SHOULD be enabled for key agency leaders",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-AntiPhishPolicy"
+                       ],
+        "Control":  "Defender 2.5",
+        "Criticality":  "Should",
+        "ReportDetails":  "Requirement met",
+        "Requirement":  "All safety tips SHOULD be enabled: \"?\" for unauthenticated senders for spoof non-default policies",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-AntiPhishPolicy"
+                       ],
+        "Control":  "Defender 2.5",
+        "Criticality":  "Should",
+        "ReportDetails":  "Requirement met",
+        "Requirement":  "All safety tips SHOULD be enabled: \"via\" tag non-default policies",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-AntiPhishPolicy"
+                       ],
+        "Control":  "Defender 2.5",
+        "Criticality":  "Should",
+        "ReportDetails":  "Requirement met",
+        "Requirement":  "All safety tips SHOULD be enabled: domain impersonation non-default policies",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-AntiPhishPolicy"
+                       ],
+        "Control":  "Defender 2.5",
+        "Criticality":  "Should",
+        "ReportDetails":  "Requirement met",
+        "Requirement":  "All safety tips SHOULD be enabled: first contact non-default policies",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-AntiPhishPolicy"
+                       ],
+        "Control":  "Defender 2.5",
+        "Criticality":  "Should",
+        "ReportDetails":  "Requirement met",
+        "Requirement":  "All safety tips SHOULD be enabled: user impersonation non-default policies",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-AntiPhishPolicy"
+                       ],
+        "Control":  "Defender 2.5",
+        "Criticality":  "Should",
+        "ReportDetails":  "Requirement met",
+        "Requirement":  "All safety tips SHOULD be enabled: user impersonation unusual characters non-default policies",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-AntiPhishPolicy"
+                       ],
+        "Control":  "Defender 2.5",
+        "Criticality":  "Should",
+        "ReportDetails":  "Requirement met",
+        "Requirement":  "Mail classified as spoofed SHOULD be quarantined: non-default policies",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-AntiPhishPolicy"
+                       ],
+        "Control":  "Defender 2.5",
+        "Criticality":  "Should",
+        "ReportDetails":  "Requirement met",
+        "Requirement":  "Message action SHOULD be set to quarantine if the message is detected as impersonated: domains non-default policies",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-AntiPhishPolicy"
+                       ],
+        "Control":  "Defender 2.5",
+        "Criticality":  "Should",
+        "ReportDetails":  "Requirement met",
+        "Requirement":  "Message action SHOULD be set to quarantine if the message is detected as impersonated: mailbox non-default policies",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-AntiPhishPolicy"
+                       ],
+        "Control":  "Defender 2.5",
+        "Criticality":  "Should",
+        "ReportDetails":  "Requirement met",
+        "Requirement":  "Message action SHOULD be set to quarantine if the message is detected as impersonated: users non-default policies",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-AntiPhishPolicy"
+                       ],
+        "Control":  "Defender 2.5",
+        "Criticality":  "Should",
+        "ReportDetails":  "Requirement not met",
+        "Requirement":  "Domain impersonation protection SHOULD be enabled for domains owned by the agency",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-AntiPhishPolicy"
+                       ],
+        "Control":  "Defender 2.5",
+        "Criticality":  "Should",
+        "ReportDetails":  "Requirement not met",
+        "Requirement":  "Intelligence for impersonation protection SHALL be enabled",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-AntiPhishPolicy"
+                       ],
+        "Control":  "Defender 2.5",
+        "Criticality":  "Should",
+        "ReportDetails":  "The Custom Domains protection policies: Enabled, EnableTargetedDomainsProtection, and TargetedDomainsToProtect are not set correctly",
+        "Requirement":  "Domain impersonation protection SHOULD be added for frequent partners",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-AtpPolicyForO365"
+                       ],
+        "Control":  "Defender 2.8",
+        "Criticality":  "Should",
+        "ReportDetails":  "Requirement not met",
+        "Requirement":  "Safe attachments SHOULD be enabled for SharePoint, OneDrive, and Microsoft Teams",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-DLPCompliancePolicy"
+                       ],
+        "Control":  "Defender 2.2",
+        "Criticality":  "Should",
+        "ReportDetails":  "No policy found that applies to OneDrive.",
+        "Requirement":  "The custom policy SHOULD be applied in OneDrive",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-DlpComplianceRule"
+                       ],
+        "Control":  "Defender 2.2",
+        "Criticality":  "Shall",
+        "ReportDetails":  "No matching rule found for U.S. Individual Taxpayer Identification Number (ITIN)",
+        "Requirement":  "A custom policy SHALL be configured to protect PII and sensitive information, as defined by the agency: U.S. Individual Taxpayer Identification Number (ITIN)",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-DlpComplianceRule"
+                       ],
+        "Control":  "Defender 2.2",
+        "Criticality":  "Shall",
+        "ReportDetails":  "No matching rule found for U.S. Social Security Number (SSN)",
+        "Requirement":  "A custom policy SHALL be configured to protect PII and sensitive information, as defined by the agency: U.S. Social Security Number (SSN)",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-EOPProtectionPolicyRule"
+                       ],
+        "Control":  "Defender 2.1",
+        "Criticality":  "Should",
+        "ReportDetails":  "Requirement met",
+        "Requirement":  "Standard Preset security profiles SHOULD NOT be used",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-EOPProtectionPolicyRule"
+                       ],
+        "Control":  "Defender 2.1",
+        "Criticality":  "Should",
+        "ReportDetails":  "Requirement met",
+        "Requirement":  "Strict Preset security profiles SHOULD NOT be used",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-HostedContentFilterPolicy"
+                       ],
+        "Control":  "Defender 2.6",
+        "Criticality":  "Shall",
+        "ReportDetails":  "Requirement met",
+        "Requirement":  "Allowed senders MAY be added but allowed domains SHALL NOT be added: default policy",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-HostedContentFilterPolicy"
+                       ],
+        "Control":  "Defender 2.6",
+        "Criticality":  "Should",
+        "ReportDetails":  "Requirement met",
+        "Requirement":  "Allowed senders MAY be added but allowed domains SHOULD NOT be added: non-default",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-HostedContentFilterPolicy"
+                       ],
+        "Control":  "Defender 2.6",
+        "Criticality":  "Should",
+        "ReportDetails":  "Requirement met",
+        "Requirement":  "Bulk email SHOULD be moved to either the junk email folder or the quarantine folder: non-default policies",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-HostedContentFilterPolicy"
+                       ],
+        "Control":  "Defender 2.6",
+        "Criticality":  "Should",
+        "ReportDetails":  "Requirement met",
+        "Requirement":  "High confidence phishing SHOULD be quarantined: non-default policies",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-HostedContentFilterPolicy"
+                       ],
+        "Control":  "Defender 2.6",
+        "Criticality":  "Should",
+        "ReportDetails":  "Requirement met",
+        "Requirement":  "High confidence spam SHOULD be moved to either the junk email folder or the quarantine folder: non-default policies",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-HostedContentFilterPolicy"
+                       ],
+        "Control":  "Defender 2.6",
+        "Criticality":  "Should",
+        "ReportDetails":  "Requirement met",
+        "Requirement":  "Phishing SHOULD be quarantined: non-default policies",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-HostedContentFilterPolicy"
+                       ],
+        "Control":  "Defender 2.6",
+        "Criticality":  "Should",
+        "ReportDetails":  "Requirement met",
+        "Requirement":  "Spam SHOULD be moved to either the junk email folder or the quarantine folder: non-default policies",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-HostedContentFilterPolicy"
+                       ],
+        "Control":  "Defender 2.6",
+        "Criticality":  "Should",
+        "ReportDetails":  "Requirement met",
+        "Requirement":  "Spam in quarantine SHOULD be retained for at least 30 days: non-default policies",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-HostedContentFilterPolicy"
+                       ],
+        "Control":  "Defender 2.6",
+        "Criticality":  "Should",
+        "ReportDetails":  "Requirement met",
+        "Requirement":  "Spam safety tips SHOULD be turned on: non-default policies",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-HostedContentFilterPolicy"
+                       ],
+        "Control":  "Defender 2.6",
+        "Criticality":  "Should",
+        "ReportDetails":  "Requirement met",
+        "Requirement":  "The bulk complaint level (BCL) threshold SHOULD be set to six or lower: non-default policies",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-HostedContentFilterPolicy"
+                       ],
+        "Control":  "Defender 2.6",
+        "Criticality":  "Should",
+        "ReportDetails":  "Requirement met",
+        "Requirement":  "Zero-hour auto purge (ZAP) SHOULD be enabled for Spam: non-default",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-HostedContentFilterPolicy"
+                       ],
+        "Control":  "Defender 2.6",
+        "Criticality":  "Should",
+        "ReportDetails":  "Requirement met",
+        "Requirement":  "Zero-hour auto purge (ZAP) SHOULD be enabled for phishing: non-default",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-HostedContentFilterPolicy"
+                       ],
+        "Control":  "Defender 2.6",
+        "Criticality":  "Should",
+        "ReportDetails":  "Requirement met",
+        "Requirement":  "Zero-hour auto purge (ZAP) SHOULD be enabled: non-default",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-MalwareFilterPolicy"
+                       ],
+        "Control":  "Defender 2.3",
+        "Criticality":  "Should",
+        "ReportDetails":  "No malware policies found that block .cmd files.",
+        "Requirement":  "Disallowed file types SHALL be determined and set. At a minimum, click-to-run files SHOULD be blocked: cmd files",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-MalwareFilterPolicy"
+                       ],
+        "Control":  "Defender 2.3",
+        "Criticality":  "Should",
+        "ReportDetails":  "No malware policies found that block .exe files.",
+        "Requirement":  "Disallowed file types SHALL be determined and set. At a minimum, click-to-run files SHOULD be blocked: exe files",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-MalwareFilterPolicy"
+                       ],
+        "Control":  "Defender 2.3",
+        "Criticality":  "Should",
+        "ReportDetails":  "No malware policies found that block .vbe files.",
+        "Requirement":  "Disallowed file types SHALL be determined and set. At a minimum, click-to-run files SHOULD be blocked: vbe files",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-MalwareFilterPolicy"
+                       ],
+        "Control":  "Defender 2.4",
+        "Criticality":  "Should",
+        "ReportDetails":  "Requirement met",
+        "Requirement":  "Zero-hour Auto Purge (ZAP) for malware SHOULD be enabled in the default anti-malware policy and in all existing custom policies",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-SafeAttachmentPolicy",
+                           "Get-SafeAttachmentRule",
+                           "Get-AcceptedDomain"
+                       ],
+        "Control":  "Defender 2.8",
+        "Criticality":  "Shall",
+        "ReportDetails":  "No enabled policy found with action set to block that apply to all domains",
+        "Requirement":  "The action for malware in email attachments SHALL be set to block",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-SafeAttachmentPolicy",
+                           "Get-SafeAttachmentRule",
+                           "Get-AcceptedDomain"
+                       ],
+        "Control":  "Defender 2.8",
+        "Criticality":  "Should",
+        "ReportDetails":  "No enabled policy found with action set to block and at least one contact specified",
+        "Requirement":  "Redirect emails with detected attachments to an agency-specified email SHOULD be enabled",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-SafeAttachmentRule",
+                           "Get-AcceptedDomain"
+                       ],
+        "Control":  "Defender 2.8",
+        "Criticality":  "Shall",
+        "ReportDetails":  "No policy found that applies to all domains: tqhjy.onmicrosoft.com",
+        "Requirement":  "At least one Safe Attachments Policy SHALL include all agency domains-and by extension-all users",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-SafeLinksPolicy",
+                           "Get-SafeLinksRule"
+                       ],
+        "Control":  "Defender 2.7",
+        "Criticality":  "Shall",
+        "ReportDetails":  "Requirement not met",
+        "Requirement":  "Internal agency email messages SHALL have safe links enabled",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-SafeLinksPolicy",
+                           "Get-SafeLinksRule"
+                       ],
+        "Control":  "Defender 2.7",
+        "Criticality":  "Shall",
+        "ReportDetails":  "Requirement not met",
+        "Requirement":  "Malicious link click checking SHALL be enabled with Microsoft Teams",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-SafeLinksPolicy",
+                           "Get-SafeLinksRule"
+                       ],
+        "Control":  "Defender 2.7",
+        "Criticality":  "Shall",
+        "ReportDetails":  "Requirement not met",
+        "Requirement":  "Real-time suspicious URL and file-link scanning SHALL be enabled",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-SafeLinksPolicy",
+                           "Get-SafeLinksRule"
+                       ],
+        "Control":  "Defender 2.7",
+        "Criticality":  "Shall",
+        "ReportDetails":  "Requirement not met",
+        "Requirement":  "Safe Links in Office 365 apps SHALL be turned on",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-SafeLinksPolicy",
+                           "Get-SafeLinksRule"
+                       ],
+        "Control":  "Defender 2.7",
+        "Criticality":  "Shall",
+        "ReportDetails":  "Requirement not met",
+        "Requirement":  "URL rewriting and malicious link click checking SHALL be enabled",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-SafeLinksPolicy",
+                           "Get-SafeLinksRule"
+                       ],
+        "Control":  "Defender 2.7",
+        "Criticality":  "Shall",
+        "ReportDetails":  "Requirement not met",
+        "Requirement":  "URLs SHALL be scanned completely before message delivery",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-SafeLinksPolicy",
+                           "Get-SafeLinksRule"
+                       ],
+        "Control":  "Defender 2.7",
+        "Criticality":  "Shall",
+        "ReportDetails":  "Requirement not met",
+        "Requirement":  "User click tracking SHALL be enabled",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-SafeLinksPolicy",
+                           "Get-SafeLinksRule"
+                       ],
+        "Control":  "Defender 2.7",
+        "Criticality":  "Shall",
+        "ReportDetails":  "Requirement not met",
+        "Requirement":  "Users SHALL NOT be enabled to click through to the original URL",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-SafeLinksRule",
+                           "Get-AcceptedDomain"
+                       ],
+        "Control":  "Defender 2.7",
+        "Criticality":  "Shall",
+        "ReportDetails":  "No policy found that applies to all domains: tqhjy.onmicrosoft.com",
+        "Requirement":  "The Safe Links Policy SHALL include all agency domains-and by extension-all users",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+                            "Default"
+                        ],
+        "Commandlet":  [
+                           "Get-MalwareFilterPolicy"
+                       ],
+        "Control":  "Defender 2.3",
+        "Criticality":  "Shall",
+        "ReportDetails":  "1 malware policy(ies) found that do(es) not have the common attachments filter enabled: Default",
+        "Requirement":  "The common attachments filter SHALL be enabled in the default anti-malware policy and in all existing policies",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+                            "Default Teams DLP policy rule"
+                        ],
+        "Commandlet":  [
+                           "Get-DlpComplianceRule"
+                       ],
+        "Control":  "Defender 2.2",
+        "Criticality":  "Should",
+        "ReportDetails":  "1 rule(s) found that do(es) not notify at least one user: Default Teams DLP policy rule",
+        "Requirement":  "Notifications to inform users and help educate them on the proper use of sensitive information SHOULD be enabled",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+                            "Default Teams DLP policy rule",
+                            "Items containing 1-9 credit card numbers shared externally",
+                            "Items with 10 or more credit card numbers shared externally"
+                        ],
+        "Commandlet":  [
+                           "Get-DlpComplianceRule"
+                       ],
+        "Control":  "Defender 2.2",
+        "Criticality":  "Shall",
+        "ReportDetails":  "Requirement met",
+        "Requirement":  "A custom policy SHALL be configured to protect PII and sensitive information, as defined by the agency: Credit Card Number",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+                            "Default Teams DLP policy rule",
+                            "Items containing 1-9 credit card numbers shared externally",
+                            "Items with 10 or more credit card numbers shared externally"
+                        ],
+        "Commandlet":  [
+                           "Get-DlpComplianceRule"
+                       ],
+        "Control":  "Defender 2.2",
+        "Criticality":  "Should",
+        "ReportDetails":  "3 rule(s) found that do(es) not block access: Default Teams DLP policy rule, Items containing 1-9 credit card numbers shared externally, Items with 10 or more credit card numbers shared externally",
+        "Requirement":  "The action for the DLP policy SHOULD be set to block sharing sensitive information with everyone when DLP conditions are met",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+                            "Malware campaign detected after delivery",
+                            "Unusual increase in email reported as phish"
+                        ],
+        "Commandlet":  [
+                           "Get-ProtectionAlert"
+                       ],
+        "Control":  "Defender 2.9",
+        "Criticality":  "Shall",
+        "ReportDetails":  "2 disabled required alert(s) found: Malware campaign detected after delivery, Unusual increase in email reported as phish",
+        "Requirement":  "At a minimum, the alerts required by the Exchange Online Minimum Viable Secure Configuration Baseline SHALL be enabled",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+                            {
+                                "Locations":  [
+                                                  "All"
+                                              ],
+                                "Name":  "Default Office 365 DLP policy",
+                                "Workload":  "Exchange, SharePoint, OneDriveForBusiness"
+                            }
+                        ],
+        "Commandlet":  [
+                           "Get-DLPCompliancePolicy"
+                       ],
+        "Control":  "Defender 2.2",
+        "Criticality":  "Should",
+        "ReportDetails":  "Requirement met",
+        "Requirement":  "The custom policy SHOULD be applied in Exchange",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+                            {
+                                "Locations":  [
+                                                  "All"
+                                              ],
+                                "Name":  "Default Office 365 DLP policy",
+                                "Workload":  "Exchange, SharePoint, OneDriveForBusiness"
+                            }
+                        ],
+        "Commandlet":  [
+                           "Get-DLPCompliancePolicy"
+                       ],
+        "Control":  "Defender 2.2",
+        "Criticality":  "Should",
+        "ReportDetails":  "Requirement met",
+        "Requirement":  "The custom policy SHOULD be applied in SharePoint",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+                            {
+                                "Locations":  [
+                                                  "All"
+                                              ],
+                                "Name":  "Default policy for Teams",
+                                "Workload":  "Exchange, SharePoint, OneDriveForBusiness, Teams"
+                            }
+                        ],
+        "Commandlet":  [
+                           "Get-DLPCompliancePolicy"
+                       ],
+        "Control":  "Defender 2.2",
+        "Criticality":  "Should",
+        "ReportDetails":  "Requirement met",
+        "Requirement":  "The custom policy SHOULD be applied in Teams",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  false,
+        "Commandlet":  "Get-HostedConnectionFilterPolicy",
+        "Control":  "EXO 2.12",
+        "Criticality":  "Should",
+        "ReportDetails":  "Requirement met",
+        "Requirement":  "Safe lists SHOULD NOT be enabled",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  false,
+        "Commandlet":  "Get-OrganizationConfig",
+        "Control":  "EXO 2.13",
+        "Criticality":  "Shall",
+        "ReportDetails":  "Requirement met",
+        "Requirement":  "Mailbox auditing SHALL be enabled",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  true,
+        "Commandlet":  "Get-TransportConfig",
+        "Control":  "EXO 2.5",
+        "Criticality":  "Shall",
+        "ReportDetails":  "Requirement met",
+        "Requirement":  "SMTP AUTH SHALL be disabled in Exchange Online",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  "",
+        "Control":  "EXO 2.10",
+        "Criticality":  "Shall/3rd Party",
+        "ReportDetails":  "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
+        "Requirement":  "Emails SHALL be scanned for malware",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  "",
+        "Control":  "EXO 2.10",
+        "Criticality":  "Shall/3rd Party",
+        "ReportDetails":  "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
+        "Requirement":  "Emails identified as containing malware SHALL be quarantined or dropped",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  "",
+        "Control":  "EXO 2.10",
+        "Criticality":  "Should/3rd Party",
+        "ReportDetails":  "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
+        "Requirement":  "Email scanning SHOULD be capable of reviewing emails after delivery",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  "",
+        "Control":  "EXO 2.11",
+        "Criticality":  "Should/3rd Party",
+        "ReportDetails":  "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
+        "Requirement":  "Impersonation protection checks SHOULD be used",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  "",
+        "Control":  "EXO 2.11",
+        "Criticality":  "Should/3rd Party",
+        "ReportDetails":  "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
+        "Requirement":  "The phishing protection solution SHOULD include an AI-based phishing detection tool comparable to EOP Mailbox Intelligence",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  "",
+        "Control":  "EXO 2.11",
+        "Criticality":  "Should/3rd Party",
+        "ReportDetails":  "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
+        "Requirement":  "User warnings, comparable to the user safety tips included with EOP, SHOULD be displayed",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  "",
+        "Control":  "EXO 2.14",
+        "Criticality":  "Shall/3rd Party",
+        "ReportDetails":  "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
+        "Requirement":  "A spam filter SHALL be enabled. The filtering solution selected SHOULD offer services comparable to the native spam filtering offered by Microsoft",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  "",
+        "Control":  "EXO 2.14",
+        "Criticality":  "Shall/3rd Party",
+        "ReportDetails":  "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
+        "Requirement":  "Allowed senders MAY be added, but allowed domains SHALL NOT be added",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  "",
+        "Control":  "EXO 2.14",
+        "Criticality":  "Shall/3rd Party",
+        "ReportDetails":  "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
+        "Requirement":  "Spam and high confidence spam SHALL be moved to either the junk email folder or the quarantine folder",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  "",
+        "Control":  "EXO 2.15",
+        "Criticality":  "Should/3rd Party",
+        "ReportDetails":  "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
+        "Requirement":  "Direct download links SHOULD be scanned for malware",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  "",
+        "Control":  "EXO 2.15",
+        "Criticality":  "Should/3rd Party",
+        "ReportDetails":  "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
+        "Requirement":  "URL comparison with a block-list SHOULD be enabled",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  "",
+        "Control":  "EXO 2.15",
+        "Criticality":  "Should/3rd Party",
+        "ReportDetails":  "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
+        "Requirement":  "User click tracking SHOULD be enabled",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  "",
+        "Control":  "EXO 2.16",
+        "Criticality":  "Shall/3rd Party",
+        "ReportDetails":  "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
+        "Requirement":  "At a minimum, the following alerts SHALL be enabled...[see Exchange Online secure baseline for list]",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  "",
+        "Control":  "EXO 2.16",
+        "Criticality":  "Should/3rd Party",
+        "ReportDetails":  "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
+        "Requirement":  "The alerts SHOULD be sent to a monitored address or incorporated into a SIEM",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  "",
+        "Control":  "EXO 2.17",
+        "Criticality":  "Shall/3rd Party",
+        "ReportDetails":  "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
+        "Requirement":  "Advanced audit SHALL be enabled",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  "",
+        "Control":  "EXO 2.17",
+        "Criticality":  "Shall/3rd Party",
+        "ReportDetails":  "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
+        "Requirement":  "Audit logs SHALL be maintained for at least the minimum duration dictated by OMB M-21-31",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  "",
+        "Control":  "EXO 2.17",
+        "Criticality":  "Shall/3rd Party",
+        "ReportDetails":  "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
+        "Requirement":  "Unified audit logging SHALL be enabled",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  "",
+        "Control":  "EXO 2.2",
+        "Criticality":  "Shall/Not-Implemented",
+        "ReportDetails":  "Currently cannot be checked automatically. See Exchange Online Secure Configuration Baseline policy 2.# for instructions on manual check",
+        "Requirement":  "A list of approved IP addresses for sending mail SHALL be maintained",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  "",
+        "Control":  "EXO 2.8",
+        "Criticality":  "Shall/3rd Party",
+        "ReportDetails":  "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
+        "Requirement":  "A DLP solution SHALL be used. The selected DLP solution SHOULD offer services comparable to the native DLP solution offered by Microsoft",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  "",
+        "Control":  "EXO 2.8",
+        "Criticality":  "Shall/3rd Party",
+        "ReportDetails":  "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
+        "Requirement":  "The DLP solution SHALL protect PII and sensitive information, as defined by the agency. At a minimum, the sharing of credit card numbers, Taxpayer Identification Numbers (TIN), and Social Security Numbers (SSN) via email SHALL be restricted",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  "",
+        "Control":  "EXO 2.9",
+        "Criticality":  "Shall/3rd Party",
+        "ReportDetails":  "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
+        "Requirement":  "Disallowed file types SHALL be determined and set. At a minimum, click-to-run files SHOULD be blocked (e.g., .exe, .cmd, and .vbe)",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  "",
+        "Control":  "EXO 2.9",
+        "Criticality":  "Shall/3rd Party",
+        "ReportDetails":  "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
+        "Requirement":  "Emails SHALL be filtered by the file types of included attachments. The selected filtering solution SHOULD offer services comparable to Microsoft Defender\u0027s Common Attachment Filter",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  "",
+        "Control":  "EXO 2.9",
+        "Criticality":  "Should/3rd Party",
+        "ReportDetails":  "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
+        "Requirement":  "The attachment filter SHOULD attempt to determine the true file type and assess the file extension",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  "Get-HostedConnectionFilterPolicy",
+        "Control":  "EXO 2.12",
+        "Criticality":  "Should",
+        "ReportDetails":  "Requirement met",
+        "Requirement":  "IP allow lists SHOULD NOT be created",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  "Get-TransportRule",
+        "Control":  "EXO 2.7",
+        "Criticality":  "Shall",
+        "ReportDetails":  "No transport rule found with that applies to emails received from outside the organization",
+        "Requirement":  "External sender warnings SHALL be implemented",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+                            "Anonymous:CalendarSharingFreeBusyReviewer",
+                            "*:CalendarSharingFreeBusySimple"
+                        ],
+        "Commandlet":  "Get-SharingPolicy",
+        "Control":  "EXO 2.6",
+        "Criticality":  "Shall",
+        "ReportDetails":  "Requirement met",
+        "Requirement":  "Calendar details SHALL NOT be shared with all domains, although they MAY be shared with specific domains",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+                            "Anonymous:CalendarSharingFreeBusyReviewer",
+                            "*:CalendarSharingFreeBusySimple"
+                        ],
+        "Commandlet":  "Get-SharingPolicy",
+        "Control":  "EXO 2.6",
+        "Criticality":  "Shall",
+        "ReportDetails":  "Requirement met",
+        "Requirement":  "Contact folders SHALL NOT be shared with all domains, although they MAY be shared with specific domains",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+                            [
+                                {
+                                    "domain":  "tqhjy.onmicrosoft.com",
+                                    "rdata":  ""
+                                }
+                            ],
+                            [
+
+                            ]
+                        ],
+        "Commandlet":  "Get-DkimSigningConfig, Resolve-DnsName",
+        "Control":  "EXO 2.3",
+        "Criticality":  "Should",
+        "ReportDetails":  "Requirement met",
+        "Requirement":  "DKIM SHOULD be enabled for any custom domain",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+                            {
+                                "domain":  "tqhjy.onmicrosoft.com",
+                                "rdata":  ""
+                            }
+                        ],
+        "Commandlet":  "Resolve-DnsName",
+        "Control":  "EXO 2.4",
+        "Criticality":  "Shall",
+        "ReportDetails":  "1 of 1 agency domain(s) found in violation: tqhjy.onmicrosoft.com",
+        "Requirement":  "A DMARC policy SHALL be published for every second-level domain",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+                            {
+                                "domain":  "tqhjy.onmicrosoft.com",
+                                "rdata":  ""
+                            }
+                        ],
+        "Commandlet":  "Resolve-DnsName",
+        "Control":  "EXO 2.4",
+        "Criticality":  "Shall",
+        "ReportDetails":  "1 of 1 agency domain(s) found in violation: tqhjy.onmicrosoft.com",
+        "Requirement":  "An agency point of contact SHOULD be included for aggregate and/or failure reports",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+                            {
+                                "domain":  "tqhjy.onmicrosoft.com",
+                                "rdata":  ""
+                            }
+                        ],
+        "Commandlet":  "Resolve-DnsName",
+        "Control":  "EXO 2.4",
+        "Criticality":  "Shall",
+        "ReportDetails":  "1 of 1 agency domain(s) found in violation: tqhjy.onmicrosoft.com",
+        "Requirement":  "The DMARC message rejection option SHALL be \"p=reject\"",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+                            {
+                                "domain":  "tqhjy.onmicrosoft.com",
+                                "rdata":  ""
+                            }
+                        ],
+        "Commandlet":  "Resolve-DnsName",
+        "Control":  "EXO 2.4",
+        "Criticality":  "Shall",
+        "ReportDetails":  "1 of 1 agency domain(s) found in violation: tqhjy.onmicrosoft.com",
+        "Requirement":  "The DMARC point of contact for aggregate reports SHALL include reports@dmarc.cyber.dhs.gov",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  "Resolve-DnsName",
+        "Control":  "EXO 2.2",
+        "Criticality":  "Shall",
+        "ReportDetails":  "Requirement met",
+        "Requirement":  "An SPF policy(s) that designates only these addresses as approved senders SHALL be published",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+                            "*"
+                        ],
+        "Commandlet":  "Get-RemoteDomain",
+        "Control":  "EXO 2.1",
+        "Criticality":  "Shall",
+        "ReportDetails":  "1 remote domain(s) that allows automatic forwarding: *",
+        "Requirement":  "Automatic forwarding to external domains SHALL be disabled",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+
+                       ],
+        "Control":  "OneDrive 2.6",
+        "Criticality":  "Shall/Not-Implemented",
+        "ReportDetails":  "Currently cannot be checked automatically. See Onedrive Secure Configuration Baseline policy 2.6 for instructions on manual check",
+        "Requirement":  "OneDrive Client Sync SHALL be restricted to the local domain",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+
+                       ],
+        "Control":  "OneDrive 2.7",
+        "Criticality":  "Shall/Not-Implemented",
+        "ReportDetails":  "Currently cannot be checked automatically. See Onedrive Secure Configuration Baseline policy 2.7 for instructions on manual check",
+        "Requirement":  "Legacy Authentication SHALL be blocked",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-SPOTenant"
+                       ],
+        "Control":  "OneDrive 2.1",
+        "Criticality":  "Should",
+        "ReportDetails":  "Requirement not met",
+        "Requirement":  "Anyone links SHOULD be disabled",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-SPOTenant"
+                       ],
+        "Control":  "OneDrive 2.2",
+        "Criticality":  "Should",
+        "ReportDetails":  "Requirement not met",
+        "Requirement":  "An expiration date SHOULD be set for Anyone links",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-SPOTenant"
+                       ],
+        "Control":  "OneDrive 2.2",
+        "Criticality":  "Should",
+        "ReportDetails":  "Requirement not met",
+        "Requirement":  "Expiration date SHOULD be set to thirty days",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-SPOTenant"
+                       ],
+        "Control":  "OneDrive 2.3",
+        "Criticality":  "Should",
+        "ReportDetails":  "Requirement not met",
+        "Requirement":  "Anyone link permissions SHOULD be limited to View",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-SPOTenant"
+                       ],
+        "Control":  "OneDrive 2.4",
+        "Criticality":  "Shall",
+        "ReportDetails":  "Requirement not met",
+        "Requirement":  "OneDrive Client for Windows SHALL be restricted to agency-Defined Domain(s)",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+                            {
+                                "AllowedDomainList":  [
+
+                                                      ],
+                                "BlockMacSync":  false,
+                                "DisableReportProblemDialog":  false,
+                                "ExcludedFileExtensions":  [
+                                                               ""
+                                                           ],
+                                "OptOutOfGrooveBlock":  false,
+                                "OptOutOfGrooveSoftBlock":  false,
+                                "TenantRestrictionEnabled":  false
+                            }
+                        ],
+        "Commandlet":  [
+                           "Get-SPOTenantSyncClientRestriction"
+                       ],
+        "Control":  "OneDrive 2.5",
+        "Criticality":  "Shall",
+        "ReportDetails":  "Requirement met",
+        "Requirement":  "OneDrive Client Sync SHALL only be allowed only within the local domain",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+
+                       ],
+        "Control":  "Sharepoint 2.3",
+        "Criticality":  "Should/Not-Implemented",
+        "ReportDetails":  "Currently cannot be checked automatically. See Sharepoint Secure Configuration Baseline policy 2.3 for instructions on manual check",
+        "Requirement":  "Sharing settings for specific SharePoint sites SHOULD align to their sensitivity level",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+
+                       ],
+        "Control":  "Sharepoint 2.5",
+        "Criticality":  "Shall/Not-Implemented",
+        "ReportDetails":  "Currently cannot be checked automatically. See Sharepoint Secure Configuration Baseline policy 2.5 for instructions on manual check",
+        "Requirement":  "Users SHALL be prevented from running custom scripts on personal sites (OneDrive)",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-SPOTenant"
+                       ],
+        "Control":  "Sharepoint 2.1",
+        "Criticality":  "Shall",
+        "ReportDetails":  "Requirement not met",
+        "Requirement":  "File and folder links default sharing setting SHALL be set to \"Specific People (Only the People the User Specifies)\"",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-SPOTenant"
+                       ],
+        "Control":  "Sharepoint 2.2",
+        "Criticality":  "Should",
+        "ReportDetails":  "Requirement not met",
+        "Requirement":  "External sharing SHOULD be limited to approved domains and security groups per interagency collaboration needs",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-SPOTenant"
+                       ],
+        "Control":  "Sharepoint 2.4",
+        "Criticality":  "Should",
+        "ReportDetails":  "Requirement not met",
+        "Requirement":  "Expiration timers SHOULD be set to 30 days",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-SPOTenant"
+                       ],
+        "Control":  "Sharepoint 2.4",
+        "Criticality":  "Should",
+        "ReportDetails":  "Requirement not met",
+        "Requirement":  "Expiration timers for \u0027guest access to a site or OneDrive\u0027 and \u0027people who use a verification code\u0027 SHOULD be set",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+                            {
+                                "AllowDownloadingNonWebViewableFiles":  false,
+                                "AllowEditing":  true,
+                                "AllowSelfServiceUpgrade":  true,
+                                "AnonymousLinkExpirationInDays":  0,
+                                "AuthenticationContextName":  null,
+                                "BlockDownloadLinksFileType":  1,
+                                "BlockDownloadPolicy":  false,
+                                "CommentsOnSitePagesDisabled":  false,
+                                "CompatibilityLevel":  15,
+                                "ConditionalAccessPolicy":  0,
+                                "DefaultLinkPermission":  0,
+                                "DefaultLinkToExistingAccess":  false,
+                                "DefaultShareLinkRole":  0,
+                                "DefaultShareLinkScope":  0,
+                                "DefaultSharingLinkType":  0,
+                                "DenyAddAndCustomizePages":  2,
+                                "DisableAppViews":  2,
+                                "DisableCompanyWideSharingLinks":  2,
+                                "DisableFlows":  2,
+                                "DisableSharingForNonOwnersStatus":  null,
+                                "ExcludeBlockDownloadPolicySiteOwners":  false,
+                                "ExcludedBlockDownloadGroupIds":  [
+
+                                                                  ],
+                                "ExternalUserExpirationInDays":  0,
+                                "GroupId":  "00000000-0000-0000-0000-000000000000",
+                                "HubSiteId":  "00000000-0000-0000-0000-000000000000",
+                                "InformationBarriersMode":  "",
+                                "InformationSegment":  [
+
+                                                       ],
+                                "IsHubSite":  false,
+                                "IsTeamsChannelConnected":  false,
+                                "IsTeamsConnected":  false,
+                                "LastContentModifiedDate":  "/Date(1669883125563)/",
+                                "LimitedAccessFileType":  1,
+                                "LocaleId":  1033,
+                                "LockIssue":  null,
+                                "LockState":  "Unlock",
+                                "LoopDefaultSharingLinkRole":  0,
+                                "LoopDefaultSharingLinkScope":  -1,
+                                "LoopOverrideSharingCapability":  false,
+                                "LoopSharingCapability":  2,
+                                "MediaTranscription":  0,
+                                "OverrideBlockUserInfoVisibility":  0,
+                                "OverrideSharingCapability":  false,
+                                "OverrideTenantAnonymousLinkExpirationPolicy":  false,
+                                "OverrideTenantExternalUserExpirationPolicy":  false,
+                                "Owner":  "efb52a3c-c813-4e58-855e-63e4bfb5a20e",
+                                "PWAEnabled":  1,
+                                "ReadOnlyForUnmanagedDevices":  false,
+                                "RelatedGroupId":  "00000000-0000-0000-0000-000000000000",
+                                "RequestFilesLinkEnabled":  true,
+                                "RequestFilesLinkExpirationInDays":  -1,
+                                "ResourceQuota":  300,
+                                "ResourceQuotaWarningLevel":  255,
+                                "ResourceUsageAverage":  0,
+                                "ResourceUsageCurrent":  0,
+                                "RestrictedAccessControl":  false,
+                                "RestrictedToGeo":  3,
+                                "SandboxedCodeActivationCapability":  2,
+                                "SensitivityLabel":  null,
+                                "SharingAllowedDomainList":  "",
+                                "SharingBlockedDomainList":  "",
+                                "SharingCapability":  2,
+                                "SharingDomainRestrictionMode":  0,
+                                "SharingLockDownCanBeCleared":  true,
+                                "SharingLockDownEnabled":  false,
+                                "ShowPeoplePickerSuggestionsForGuestUsers":  false,
+                                "SiteDefinedSharingCapability":  2,
+                                "SocialBarOnSitePagesDisabled":  false,
+                                "Status":  "Active",
+                                "StorageQuota":  26214400,
+                                "StorageQuotaType":  null,
+                                "StorageQuotaWarningLevel":  25574400,
+                                "StorageUsageCurrent":  1,
+                                "TeamsChannelType":  0,
+                                "Template":  "SITEPAGEPUBLISHING#0",
+                                "Title":  "Communication site",
+                                "Url":  "https://tqhjy.sharepoint.com/",
+                                "WebsCount":  1
+                            }
+                        ],
+        "Commandlet":  [
+                           "Get-SPOSite"
+                       ],
+        "Control":  "Sharepoint 2.5",
+        "Criticality":  "Shall",
+        "ReportDetails":  "Requirement met",
+        "Requirement":  "Users SHALL be prevented from running custom scripts on self-service created sites",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  true,
+        "Commandlet":  [
+                           "Get-CsTeamsMeetingPolicy"
+                       ],
+        "Control":  "Teams 2.9",
+        "Criticality":  "Should",
+        "ReportDetails":  "Requirement not met",
+        "Requirement":  "Cloud video recording SHOULD be disabled in the global (org-wide default) meeting policy",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  "AlwaysEnabled",
+        "Commandlet":  [
+                           "Get-CsTeamsMeetingPolicy"
+                       ],
+        "Control":  "Teams 2.10",
+        "Criticality":  "Should",
+        "ReportDetails":  "Requirement not met",
+        "Requirement":  "Record an event SHOULD be set to Organizer can record",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  "EveryoneInCompany",
+        "Commandlet":  [
+                           "Get-CsTeamsMeetingPolicy"
+                       ],
+        "Control":  "Teams 2.3",
+        "Criticality":  "Should",
+        "ReportDetails":  "Requirement met",
+        "Requirement":  "Internal users SHOULD be admitted automatically",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+
+                       ],
+        "Control":  "Teams 2.11",
+        "Criticality":  "Shall/3rd Party",
+        "ReportDetails":  "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
+        "Requirement":  "A DLP solution SHALL be enabled",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+
+                       ],
+        "Control":  "Teams 2.11",
+        "Criticality":  "Shall/3rd Party",
+        "ReportDetails":  "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
+        "Requirement":  "The DLP solution SHALL protect Personally Identifiable Information (PII) and sensitive information, as defined by the agency. At a minimum, the sharing of credit card numbers, taxpayer Identification Numbers (TIN), and Social Security Numbers (SSN) via email SHALL be restricted",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+
+                       ],
+        "Control":  "Teams 2.11",
+        "Criticality":  "Should/3rd Party",
+        "ReportDetails":  "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
+        "Requirement":  "Agencies SHOULD use either the native DLP solution offered by Microsoft or a DLP solution that offers comparable services",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+
+                       ],
+        "Control":  "Teams 2.12",
+        "Criticality":  "Should/3rd Party",
+        "ReportDetails":  "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
+        "Requirement":  "Attachments included with Teams messages SHOULD be scanned for malware",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+
+                       ],
+        "Control":  "Teams 2.12",
+        "Criticality":  "Should/3rd Party",
+        "ReportDetails":  "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
+        "Requirement":  "Users SHOULD be prevented from opening or downloading files detected as malware",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+
+                       ],
+        "Control":  "Teams 2.13",
+        "Criticality":  "Should/3rd Party",
+        "ReportDetails":  "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
+        "Requirement":  "Direct download links SHOULD be scanned for malware",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+
+                       ],
+        "Control":  "Teams 2.13",
+        "Criticality":  "Should/3rd Party",
+        "ReportDetails":  "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
+        "Requirement":  "URL comparison with a block-list SHOULD be enabled",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+
+                       ],
+        "Control":  "Teams 2.13",
+        "Criticality":  "Should/3rd Party",
+        "ReportDetails":  "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
+        "Requirement":  "User click tracking SHOULD be enabled",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+
+                       ],
+        "Control":  "Teams 2.8",
+        "Criticality":  "Shall/3rd Party",
+        "ReportDetails":  "Cannot be checked automatically. See Microsoft Teams Secure Configuration Baseline policy 2.8 for instructions on manual check",
+        "Requirement":  "Agencies SHALL establish policy dictating the app review and approval process to be used by the agency",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+                            "EveryoneInCompany",
+                            false
+                        ],
+        "Commandlet":  [
+                           "Get-CsTeamsMeetingPolicy"
+                       ],
+        "Control":  "Teams 2.3",
+        "Criticality":  "Should",
+        "ReportDetails":  "Requirement met",
+        "Requirement":  "Anonymous users, including dial-in users, SHOULD NOT be admitted automatically",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+                            [
+                                "Global"
+                            ],
+                            "MicrosoftCommunicationsOnline/NOAM-ED6-A5"
+                        ],
+        "Commandlet":  [
+                           "Get-CsTeamsClientConfiguration"
+                       ],
+        "Control":  "Teams 2.7",
+        "Criticality":  "Shall",
+        "ReportDetails":  "1 Requirement not met: Email integration is enabled across domain: Global",
+        "Requirement":  "Teams email integration SHALL be disabled",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-CsTeamsAppPermissionPolicy"
+                       ],
+        "Control":  "Teams 2.8",
+        "Criticality":  "Should",
+        "ReportDetails":  "Requirement met",
+        "Requirement":  "Agencies SHOULD allow all apps published by Microsoft, but MAY block specific Microsoft apps as needed",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-CsTeamsMeetingPolicy"
+                       ],
+        "Control":  "Teams 2.1",
+        "Criticality":  "Should",
+        "ReportDetails":  "Requirement met",
+        "Requirement":  "External participants SHOULD NOT be enabled to request control of shared desktops or windows in the Global (Org-wide default) meeting policy or in custom meeting policies if any exist",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-CsTeamsMeetingPolicy"
+                       ],
+        "Control":  "Teams 2.2",
+        "Criticality":  "Shall",
+        "ReportDetails":  "Requirement met",
+        "Requirement":  "Anonymous users SHALL NOT be enabled to start meetings in the Global (Org-wide default) meeting policy or in custom meeting policies if any exist",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-CsTeamsMeetingPolicy"
+                       ],
+        "Control":  "Teams 2.4",
+        "Criticality":  "Should",
+        "ReportDetails":  "Requirement met",
+        "Requirement":  "Anonymous users SHOULD be enabled to join meetings",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-CsTeamsMeetingPolicy"
+                       ],
+        "Control":  "Teams 2.9",
+        "Criticality":  "Should",
+        "ReportDetails":  "Requirement met",
+        "Requirement":  "For all meeting polices that allow cloud recording, recordings SHOULD be stored inside the country of that agencyGÇÖs tenant",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-CsTenantFederationConfiguration"
+                       ],
+        "Control":  "Teams 2.4",
+        "Criticality":  "Shall",
+        "ReportDetails":  "Requirement met",
+        "Requirement":  "External access SHALL only be enabled on a per-domain basis",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-CsTenantFederationConfiguration"
+                       ],
+        "Control":  "Teams 2.5",
+        "Criticality":  "Shall",
+        "ReportDetails":  "Requirement met",
+        "Requirement":  "Unmanaged users SHALL NOT be enabled to initiate contact with internal users",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-CsTenantFederationConfiguration"
+                       ],
+        "Control":  "Teams 2.5",
+        "Criticality":  "Should",
+        "ReportDetails":  "Requirement met",
+        "Requirement":  "Internal users SHOULD NOT be enabled to initiate contact with unmanaged users",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-CsTenantFederationConfiguration"
+                       ],
+        "Control":  "Teams 2.6",
+        "Criticality":  "Shall",
+        "ReportDetails":  "Requirement met",
+        "Requirement":  "Contact with Skype users SHALL be blocked",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+                            "Global"
+                        ],
+        "Commandlet":  [
+                           "Get-CsTeamsAppPermissionPolicy"
+                       ],
+        "Control":  "Teams 2.8",
+        "Criticality":  "Should",
+        "ReportDetails":  "1 meeting policy(ies) found that allow custom apps by default: Global",
+        "Requirement":  "Agencies SHOULD NOT allow installation of all custom apps, but MAY allow specific apps as needed",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+                            "Global"
+                        ],
+        "Commandlet":  [
+                           "Get-CsTeamsAppPermissionPolicy"
+                       ],
+        "Control":  "Teams 2.8",
+        "Criticality":  "Should",
+        "ReportDetails":  "1 meeting policy(ies) found that allow third-party apps by default: Global",
+        "Requirement":  "Agencies SHOULD NOT allow installation of all third-party apps, but MAY allow specific apps as needed",
+        "RequirementMet":  false
+    }
+]

@@ -41,7 +41,16 @@ a.individual_reports:active {
     text-decoration: none;
 } 
 
+table.tenantdata tr:first-child {
+    color: black;
+}
+
 .failure { background-color: #deb8b8; }
 .warning { background-color: #fff7d6; }
 .pass { background-color: #d5ebd5; }
 .manual { background-color: #ebebf2; }
+
+.error {
+    background-color: #deb8b8; 
+    color: #d10000;
+}
