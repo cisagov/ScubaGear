@@ -8,7 +8,7 @@ function Export-PowerPlatformProvider {
     Internal
     #>
 
-    # Note importing the module might have to be done for every provider as
+    # Manually importing the module name here to bypass cmdlet name conflicts
     # There are conflicting PowerShell Cmdlet names in EXO and Power Platform
     Import-Module Microsoft.PowerApps.Administration.PowerShell -DisableNameChecking
 
@@ -62,9 +62,51 @@ function Get-PowerPlatformTenantDetail {
     .Functionality
     Internal
     #>
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory = $true)]
+        [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $false)]
+        [string]
+        $M365Environment
+    )
     Import-Module Microsoft.PowerApps.Administration.PowerShell -DisableNameChecking
-    $TenantDetails = Get-TenantDetailsFromGraph
-    $TenantInfo = @{"DisplayName"=$TenantDetails.DisplayName;}
-    $TenantInfo = $TenantInfo | ConvertTo-Json -Depth 4
-    $TenantInfo
+
+    try {
+        $PowerTenantDetails = Get-TenantDetailsFromGraph -ErrorAction "Stop"
+
+        $Domains = $PowerTenantDetails.Domains
+        $TenantDomain = "PowerPlatform: Domain Unretrievable"
+        $TLD = ".com"
+        if (($M365Environment -eq "gcchigh") -or ($M365Environment -eq "dod")) {
+            $TLD = ".us"
+        }
+        foreach ($Domain in $Domains) {
+            $Name = $Domain.Name
+            $IsInitial = $Domain.initial
+            $DomainChecker = $Name.EndsWith(".onmicrosoft$($TLD)") -and !$Name.EndsWith(".mail.onmicrosoft$($TLD)") -and $IsInitial
+            if ($DomainChecker){
+                $TenantDomain = $Name
+            }
+        }
+
+        $PowerTenantInfo = @{
+            "DisplayName" = $PowerTenantDetails.DisplayName;
+            "DomainName" = $TenantDomain;
+            "TenantId" = $PowerTenantDetails.TenantId
+            "PowerPlatformAdditionalData" = $PowerTenantDetails;
+        }
+        $PowerTenantInfo = ConvertTo-Json @($PowerTenantInfo) -Depth 4
+        $PowerTenantInfo
+    }
+    catch {
+        Write-Warning "Error retrieving Tenant details using Get-PowerPlatformTenantDetail $($_)"
+        $PowerTenantInfo = @{
+            "DisplayName" = "Error retrieving Display name";
+            "DomainName" = "Error retrieving Domain name";
+            "TenantId" = "Error retrieving Tenant ID";
+            "PowerPlatformAdditionalData" = "Error retrieving additional data";
+        }
+        $PowerTenantInfo = ConvertTo-Json @($PowerTenantInfo) -Depth 4
+        $PowerTenantInfo
+    }
 }

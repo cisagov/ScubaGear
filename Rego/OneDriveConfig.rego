@@ -13,17 +13,22 @@ ReportDetailsBoolean(Status) = "Requirement not met" if {Status == false}
 #
 # Baseline 2.1: Policy 1
 #--
+AnyoneLinksPolicy[Policy]{
+    Policy := input.SPO_tenant_info[_]
+    Policy.OneDriveLoopSharingCapability == 1
+}
+
 tests[{
     "Requirement" : "Anyone links SHOULD be disabled",
     "Control" : "OneDrive 2.1",
     "Criticality" : "Should",
-    "Commandlet" : "Get-SPOTenant",
-    "ActualValue" : TenantInfo.OneDriveLoopSharingCapability,
+    "Commandlet" : ["Get-SPOTenant"],
+    "ActualValue" : Policies,
     "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
-    TenantInfo := input.SPO_tenant_info
-    Status := TenantInfo.OneDriveLoopSharingCapability == 1
+    Policies := AnyoneLinksPolicy
+    Status := count(Policies) == 1
 }
 #--
 
@@ -35,34 +40,44 @@ tests[{
 #
 # Baseline 2.2: Policy 1
 #--
+RequiredExpirationDatePolicy[Policy]{
+    Policy := input.SPO_tenant_info[_]
+    Policy.ExternalUserExpirationRequired == true
+}
+
 tests[{
     "Requirement" : "An expiration date SHOULD be set for Anyone links",
     "Control" : "OneDrive 2.2",
     "Criticality" : "Should",
-    "Commandlet" : "Get-SPOTenant",
-    "ActualValue" : TenantInfo.ExternalUserExpirationRequired,
+    "Commandlet" : ["Get-SPOTenant"],
+    "ActualValue" : Policies,
     "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
-    TenantInfo := input.SPO_tenant_info
-    Status := TenantInfo.ExternalUserExpirationRequired== true
+    Policies := RequiredExpirationDatePolicy
+    Status := count(Policies) == 1
 }
 #--
 
 #
 # Baseline 2.2: Policy 2
 #--
+ExpirationDatePolicy[Policy]{
+    Policy := input.SPO_tenant_info[_]
+    Policy.ExternalUserExpireInDays == 30
+}
+
 tests[{
     "Requirement" : "Expiration date SHOULD be set to thirty days",
     "Control" : "OneDrive 2.2",
     "Criticality" : "Should",
-    "Commandlet" : "Get-SPOTenant",
-    "ActualValue" : TenantInfo.ExternalUserExpireInDays,
+    "Commandlet" : ["Get-SPOTenant"],
+    "ActualValue" : Policies,
     "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
-    TenantInfo := input.SPO_tenant_info
-    Status := TenantInfo.ExternalUserExpireInDays == 30
+    Policies := ExpirationDatePolicy
+    Status := count(Policies) == 1
 }
 #--
 
@@ -74,17 +89,22 @@ tests[{
 #
 # Baseline 2.3: Policy 1
 #--
+DefaultLinkPermissionPolicy[Policy]{
+    Policy := input.SPO_tenant_info[_]
+    Policy.DefaultLinkPermission == 1
+}
+
 tests[{
     "Requirement" : "Anyone link permissions SHOULD be limited to View",
     "Control" : "OneDrive 2.3",
     "Criticality" : "Should",
-    "Commandlet" : "Get-SPOTenant",
-    "ActualValue" : TenantInfo.DefaultLinkPermission,
+    "Commandlet" : ["Get-SPOTenant"],
+    "ActualValue" : Policies,
     "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
-    TenantInfo := input.SPO_tenant_info
-    Status := TenantInfo.DefaultLinkPermission == 1
+    Policies := DefaultLinkPermissionPolicy
+    Status := count(Policies) == 1
 }
 #--
 
@@ -96,18 +116,22 @@ tests[{
 #
 # Baseline 2.4: Policy 1
 #--
+DefinedDomainsPolicy[Policy]{
+    Policy := input.Tenant_sync_info[_]
+    count(Policy.AllowedDomainList) > 0
+}
+
 tests[{
     "Requirement" : "OneDrive Client for Windows SHALL be restricted to agency-Defined Domain(s)",
     "Control" : "OneDrive 2.4",
     "Criticality" : "Shall",
-    "Commandlet" : "Get-SPOTenant",
-    "ActualValue" : ["Domain GUID: ", Domain],
+    "Commandlet" : ["Get-SPOTenant"],
+    "ActualValue" : Policies,
     "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
-    TenantSyncInfo := input.Tenant_sync_info
-    Domain := input.Expected_results.Owner
-    Status := Domain in TenantSyncInfo.AllowedDomainList
+    Policies := DefinedDomainsPolicy
+    Status := count(Policies) == 1
 }
 #--
 
@@ -119,17 +143,22 @@ tests[{
 #
 # Baseline 2.5: Policy 1
 #--
+ClientSyncPolicy[Policy]{
+    Policy := input.Tenant_sync_info[_]
+    Policy.BlockMacSync == false
+}
+
 tests[{
     "Requirement" : "OneDrive Client Sync SHALL only be allowed only within the local domain",
     "Control" : "OneDrive 2.5",
     "Criticality" : "Shall",
-    "Commandlet" : "Get-SPOTenant",
-    "ActualValue" : TenantSyncInfo.BlockMacSync,
+    "Commandlet" : ["Get-SPOTenantSyncClientRestriction"],
+    "ActualValue" : Policies,
     "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
-    TenantSyncInfo := input.Tenant_sync_info
-    Status := TenantSyncInfo.BlockMacSync == false
+    Policies := ClientSyncPolicy
+    Status := count(Policies) == 1
 }
 #--
 
@@ -146,7 +175,7 @@ tests[{
     "Requirement" : "OneDrive Client Sync SHALL be restricted to the local domain",
     "Control" : "OneDrive 2.6",
     "Criticality" : "Shall/Not-Implemented",
-    "Commandlet" : "",
+    "Commandlet" : [],
     "ActualValue" : [],
     "ReportDetails" : "Currently cannot be checked automatically. See Onedrive Secure Configuration Baseline policy 2.6 for instructions on manual check",
     "RequirementMet" : false
@@ -168,7 +197,7 @@ tests[{
     "Requirement" : "Legacy Authentication SHALL be blocked",
     "Control" : "OneDrive 2.7",
     "Criticality" : "Shall/Not-Implemented",
-    "Commandlet" : "",
+    "Commandlet" : [],
     "ActualValue" : [],
     "ReportDetails" : "Currently cannot be checked automatically. See Onedrive Secure Configuration Baseline policy 2.7 for instructions on manual check",
     "RequirementMet" : false

@@ -17,50 +17,77 @@ function New-Report {
     [string]
     $FullName,
 
-     # The location to save the html report in. Defaults to current directory.
+     # The location to save the html report in.
     [Parameter(Mandatory=$true)]
+    [ValidateScript({Test-Path -PathType Container $_})]
     [string]
     $IndividualReportPath,
 
-    # The location to save the html report in. Defaults to current directory.
+    # The location to save the html report in.
+    [Parameter(Mandatory=$true)]
+    [ValidateScript({Test-Path -PathType Container $_})]
+    [string]
+    $OutPath,
+
     [Parameter(Mandatory=$true)]
     [string]
-    $OutPath
+    $OutProviderFileName,
+
+    [Parameter(Mandatory=$true)]
+    [string]
+    $OutRegoFileName
 )
 
 $FileName = Join-Path -Path $PSScriptRoot -ChildPath "BaselineTitles.json"
 $AllTitles =  Get-Content $FileName | ConvertFrom-Json
 $Titles = $AllTitles.$BaselineName
 
-$FileName = Join-Path -Path $OutPath -ChildPath "TestResults.json"
-$TestResults =  Get-Content $FileName | ConvertFrom-Json
-
-$FileName = Join-Path -Path $OutPath -ChildPath "ProviderSettingsExport.json"
+$FileName = Join-Path -Path $OutPath -ChildPath "$($OutProviderFileName).json"
 $SettingsExport =  Get-Content $FileName | ConvertFrom-Json
+
+$FileName = Join-Path -Path $OutPath -ChildPath "$($OutRegoFileName).json"
+$TestResults =  Get-Content $FileName | ConvertFrom-Json
 
 $Fragments = @()
 
 $MetaData += [pscustomobject]@{
-    "Tenant Name"= $SettingsExport.tenant_details.DisplayName;
-    "Report Date"=$SettingsExport.date;
-    "Baseline Version"=$SettingsExport.baseline_version;
-    "Module Version"=$SettingsExport.module_version
+    "Tenant Display Name" = $SettingsExport.tenant_details.DisplayName;
+    "Report Date" = $SettingsExport.date;
+    "Baseline Version" = $SettingsExport.baseline_version;
+    "Module Version" = $SettingsExport.module_version
 }
 
-$Fragments += $MetaData | ConvertTo-HTML -Fragment
-
+$MetaDataTable = $MetaData | ConvertTo-HTML -Fragment
+$MetaDataTable = $MetaDataTable -replace '^(.*?)<table>','<table style = "text-align:center;">'
+$Fragments += $MetaDataTable
 $ReportSummary = @{
     "Warnings" = 0;
     "Failures" = 0;
     "Passes" = 0;
     "Manual" = 0;
+    "Errors" = 0;
     "Date" = $SettingsExport.date;
 }
 
-ForEach ($Title in $Titles) {
+foreach ($Title in $Titles) {
     $Fragment = @()
-    ForEach ($test in $TestResults | Where-Object -Property Control -eq $Title.Number) {
-        if ($test.RequirementMet) {
+    foreach ($test in $TestResults | Where-Object -Property Control -eq $Title.Number) {
+        $MissingCommands = @()
+
+        if ($SettingsExport."$($BaselineName)_successful_commands" -or $SettingsExport."$($BaselineName)_unsuccessful_commands") {
+            # If neither of these keys are present, it means the provider for that baseline
+            # hasn't been updated to the updated error handling method. This check
+            # here ensures backwards compatibility until all providers are udpated.
+            $MissingCommands = $test.Commandlet | Where-Object {$SettingsExport."$($BaselineName)_successful_commands" -notcontains $_}
+        }
+
+        if ($MissingCommands.Count -gt 0) {
+            $Result = "Error"
+            $ReportSummary.Errors += 1
+            $MissingString = $MissingCommands -Join ", "
+            $test.ReportDetails = "This test depends on the following command(s) which did not execute successfully: $($MissingString). See terminal output for more details."
+        }
+        elseif ($test.RequirementMet) {
             $Result = "Pass"
             $ReportSummary.Passes += 1
         }
@@ -90,11 +117,21 @@ ForEach ($Title in $Titles) {
 }
 
 $Title = "$($FullName) Baseline Report"
+$AADWarning = "<p> Note: Conditional Access Policy exclusions and additional policy conditions
+may limit a policy's scope more narrowly than desired. Recommend reviewing matching policies
+against the baseline statement to ensure a match between intent and implementation. </p>"
+$NoWarning = "<p><br/></p>"
 Add-Type -AssemblyName System.Web
 
 $ReporterPath = $PSScriptRoot
 $ReportHTML = Get-Content $(Join-Path -Path $ReporterPath -ChildPath "ReportTemplate.html")
 $ReportHTML = $ReportHTML.Replace("{TITLE}", $Title)
+if ($BaselineName -eq "aad") {
+    $ReportHTML = $ReportHTML.Replace("{AADWARNING}", $AADWarning)
+}
+else {
+    $ReportHTML = $ReportHTML.Replace("{AADWARNING}", $NoWarning)
+}
 
 $MainCSS = Get-Content $(Join-Path -Path $ReporterPath -ChildPath "main.css")
 $ReportHTML = $ReportHTML.Replace("{MAIN_CSS}", "<style>$($MainCSS)</style>")

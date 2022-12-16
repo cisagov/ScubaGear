@@ -16,6 +16,11 @@ function colorRows() {
         else if (rows[i].children[2].innerHTML.includes("3rd Party")) {
             rows[i].style.background = "#ebebf2";
         }
+        else if (rows[i].children[1].innerHTML.includes("Error")) {
+            rows[i].style.background = "#deb8b8";
+            rows[i].querySelectorAll('td')[1].style.borderColor = "black";
+            rows[i].querySelectorAll('td')[1].style.color = "#d10000";
+        }
     }
 }
 

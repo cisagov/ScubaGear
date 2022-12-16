@@ -78,6 +78,7 @@ function Export-AADProvider {
 
     $json
 }
+
 function Get-AADTenantDetail {
     <#
     .Description
@@ -85,10 +86,32 @@ function Get-AADTenantDetail {
     .Functionality
     Internal
     #>
-    $TenantInfo = @{}
-    $TenantInfo.DisplayName = $(Get-MgOrganization).DisplayName
-    $TenantInfo = $TenantInfo | ConvertTo-Json -Depth 4
-    $TenantInfo
+    try {
+        $OrgInfo = Get-MgOrganization -ErrorAction "Stop"
+        $InitialDomain = $OrgInfo.VerifiedDomains | Where-Object {$_.isInitial}
+        if (-not $InitialDomain) {
+            $InitialDomain = "AAD: Domain Unretrievable"
+        }
+        $AADTenantInfo = @{
+            "DisplayName" = $OrgInfo.DisplayName;
+            "DomainName" = $InitialDomain.Name;
+            "TenantId" = $OrgInfo.Id
+            "AADAdditionalData" = $OrgInfo;
+        }
+        $AADTenantInfo = ConvertTo-Json @($AADTenantInfo) -Depth 4
+        $AADTenantInfo
+    }
+    catch {
+        Write-Warning "Error retrieving Tenant details using Get-AADTenantDetail $($_)"
+        $AADTenantInfo = @{
+            "DisplayName" = "Error retrieving Display name";
+            "DomainName" = "Error retrieving Domain name";
+            "TenantId" = "Error retrieving Tenant ID";
+            "AADAdditionalData" = "Error retrieving additional data";
+        }
+        $AADTenantInfo = ConvertTo-Json @($AADTenantInfo) -Depth 4
+        $AADTenantInfo
+    }
 }
 
 function Get-PrivilegedUser {
