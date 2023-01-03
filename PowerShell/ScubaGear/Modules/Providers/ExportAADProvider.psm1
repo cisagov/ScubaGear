@@ -91,10 +91,22 @@ function Get-AADTenantDetail {
     #>
     $TenantInfo = @{}
     try {
-        $TenantInfo.DisplayName = $(Get-MgOrganization).DisplayName
+        $OrgInfo = Get-MgOrganization -ErrorAction "Stop"
+        $InitialDomain = $OrgInfo.VerifiedDomains | Where-Object {$_.isInitial}
+        if (-not $InitialDomain) {
+            $InitialDomain = "AAD: Domain Unretrievable"
+        }
+        $TenantInfo.DisplayName = $OrgInfo.DisplayName
+        $TenantInfo.DomainName = $InitialDomain.name
+        $TenantInfo.TenantId = $OrgInfo.Id
+        $TenantInfo.AADAdditionalData = $OrgInfo
     }
     catch {
-        $TenantInfo.DisplayName = "*ERROR*"
+        $TenantInfo.DisplayName = "*Get-AADTenantDetail ERROR*"
+        $TenantInfo.DisplayName = "*Get-AADTenantDetail ERROR*"
+        $TenantInfo.DomainName = "*Get-AADTenantDetail ERROR*"
+        $TenantInfo.TenantId = "*Get-AADTenantDetail ERROR*"
+        $TenantInfo.AADAdditionalData = "*Get-AADTenantDetail ERROR*"
     }
     $TenantInfo = $TenantInfo | ConvertTo-Json -Depth 4
     $TenantInfo
