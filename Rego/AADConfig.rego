@@ -211,10 +211,10 @@ tests[{
     "Criticality" : "Shall",
     "Commandlet" : "Get-MgIdentityConditionalAccessPolicy",
     "ActualValue" : Policies2_4_1,
-    "ReportDetails" : ReportFullDetailsArray(Policies2_4_1, DescriptionString),
+    "ReportDetails" : ReportDetailsArray(Policies2_4_1, DescriptionString),
     "RequirementMet" : count(Policies2_4_1) > 0
 }]{
-    DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
+    DescriptionString := "conditional access policy(s) found that meet(s) all requirements.<br/>Note: Policy exclusions and additional policy conditions may still limit a policy's scope more narrowly than desired.  Recommend reviewing matching policies against the baseline statement to ensure a match between intent and implementation."
     true
 }
 #--
@@ -317,6 +317,18 @@ tests[{
 # Baseline 2.6 #
 ################
 
+AuthPoliciesBad_2_6[Policy.Id] {
+    Policy = input.authorization_policies[_]
+    Policy.DefaultUserRolePermissions.AllowedToCreateApps == true
+}
+
+AllAuthPoliciesAllowedCreate[{
+    "DefaultUser_AllowedToCreateApps" : Policy.DefaultUserRolePermissions.AllowedToCreateApps,
+    "PolicyId" : Policy.Id
+}] {
+    Policy := input.authorization_policies[_]
+}
+
 #
 # Baseline 2.6: Policy 1
 #--
@@ -325,12 +337,13 @@ tests[{
     "Control" : "AAD 2.6",
     "Criticality" : "Shall",
     "Commandlet" : "Get-MgPolicyAuthorizationPolicy",
-    "ActualValue" : AllowedCreate,
-    "ReportDetails" : ReportDetailsBoolean(Status),
+    "ActualValue" : {"all_allowed_create_values": AllAuthPoliciesAllowedCreate},
+    "ReportDetails" : ReportFullDetailsArray(BadPolicies, DescriptionString),
     "RequirementMet" : Status
 }] {
-    AllowedCreate := input.authorization_policies.DefaultUserRolePermissions.AllowedToCreateApps
-    Status := AllowedCreate == false
+    BadPolicies := AuthPoliciesBad_2_6
+    Status := count(BadPolicies) == 0
+    DescriptionString := "authorization policies found that allow non-admin users to register third-party applications"
 }
 #--
 
@@ -342,35 +355,60 @@ tests[{
 #
 # Baseline 2.7: Policy 1
 #--
+BadDefaultGrantPolicies[Policy.Id] {
+    Policy = input.authorization_policies[_]
+    count(Policy.PermissionGrantPolicyIdsAssignedToDefaultUserRole) != 0
+}
+
+AllDefaultGrantPolicies[{
+    "DefaultUser_DefaultGrantPolicy" : Policy.PermissionGrantPolicyIdsAssignedToDefaultUserRole,
+    "PolicyId" : Policy.Id
+}] {
+    Policy := input.authorization_policies[_]
+}
+
 tests[{
     "Requirement" : "Only administrators SHALL be allowed to consent to third-party applications",
     "Control" : "AAD 2.7",
     "Criticality" : "Shall",
     "Commandlet" : "Get-MgPolicyAuthorizationPolicy",
-    "ActualValue" : ListValues,
-    "ReportDetails" : ReportDetailsBoolean(Status),
+    "ActualValue" : {"all_grant_policy_values": AllDefaultGrantPolicies},
+    "ReportDetails" : ReportFullDetailsArray(BadPolicies, DescriptionString),
     "RequirementMet" : Status
 }] {
-    UserRolePermissionGrantList := input.authorization_policies.PermissionGrantPolicyIdsAssignedToDefaultUserRole
-    ListValues := concat("", ["[", concat(",", UserRolePermissionGrantList), "]"])
-    Status := count(UserRolePermissionGrantList) == 0
+    BadPolicies := BadDefaultGrantPolicies
+    Status := count(BadPolicies) == 0
+    DescriptionString := "authorization policies found that allow non-admin users to consent to third-party applications"
 }
 #--
 
 #
 # Baseline 2.7: Policy 2
 #--
+BadConsentPolicies[Policy.Id] {
+    Policy := input.admin_consent_policies[_]
+    Policy.IsEnabled == false
+}
+
+AllConsentPolicies[{
+    "PolicyId" : Policy.Id,
+    "IsEnabled" : Policy.IsEnabled
+}] {
+    Policy := input.admin_consent_policies[_]
+}
+
+
 tests[{
     "Requirement" : "An admin consent workflow SHALL be configured",
     "Control" : "AAD 2.7",
     "Criticality" : "Shall",
     "Commandlet" : "Get-MgPolicyAdminConsentRequestPolicy",
-    "ActualValue" : Enabled,
+    "ActualValue" : {"all_consent_policies": AllConsentPolicies},
     "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
-    Enabled := input.admin_consent_policies.IsEnabled
-    Status := Enabled == true
+    BadPolicies := BadConsentPolicies
+    Status := count(BadPolicies) == 0
 }
 #--
 
@@ -826,17 +864,35 @@ tests[{
 #
 # Baseline 2.18: Policy 1
 #--
+
+AuthPoliciesBadAllowInvites[Policy.Id] {
+    Policy = input.authorization_policies[_]
+    Policy.AllowInvitesFrom != "adminsAndGuestInviters"
+}
+
+AllowInvitesByPolicy[concat("", ["\"", Policy.AllowInvitesFrom, "\"", " (", Policy.Id, ")"])] {
+    Policy := input.authorization_policies[_]
+}
+
+AllAuthPoliciesAllowInvites[{
+    "AllowInvitesFromValue" : Policy.AllowInvitesFrom,
+    "PolicyId" : Policy.Id
+}] {
+    Policy := input.authorization_policies[_]
+}
+
 tests[{
     "Requirement" : "Only users with the Guest Inviter role SHOULD be able to invite guest users",
     "Control" : "AAD 2.18",
     "Criticality" : "Should",
     "Commandlet" : "Get-MgPolicyAuthorizationPolicy",
-    "ActualValue" : AllowedCreate,
-    "ReportDetails" : ReportDetailsBoolean(Status),
+    "ActualValue" : {"all_allow_invite_values": AllAuthPoliciesAllowInvites},
+    "ReportDetails" : ReportDetail,
     "RequirementMet" : Status
 }] {
-    AllowedCreate := input.authorization_policies.AllowInvitesFrom
-    Status := AllowedCreate == "adminsAndGuestInviters"
+    BadPolicies := AuthPoliciesBadAllowInvites
+    Status := count(BadPolicies) == 0
+    ReportDetail := concat("", ["Permission level set to ", concat(", ", AllowInvitesByPolicy)])
 }
 #--
 
@@ -860,24 +916,44 @@ tests[{
 #
 # Baseline 2.18: Policy 3
 #--
+# must hardcode the ID. See
+# https://docs.microsoft.com/en-us/azure/active-directory/enterprise-users/users-restrict-guest-permissions
 LevelAsString(Id) := "Restricted access" if {Id == "2af84b1e-32c8-42b7-82bc-daa82404023b"}
 LevelAsString(Id) := "Limited access" if {Id == "10dae51f-b6af-4016-8d66-8c2a99b929b3"}
 LevelAsString(Id) := "Same as member users" if {Id == "a0b1b346-4d3e-4e8b-98f8-753987be4970"}
 LevelAsString(Id) := "Unknown" if {not Id in ["2af84b1e-32c8-42b7-82bc-daa82404023b", "10dae51f-b6af-4016-8d66-8c2a99b929b3", "a0b1b346-4d3e-4e8b-98f8-753987be4970"]}
 
-# must hardcode the ID. See
-# https://docs.microsoft.com/en-us/azure/active-directory/enterprise-users/users-restrict-guest-permissions
+AuthPoliciesBadRoleId[Policy.Id] {
+    Policy = input.authorization_policies[_]
+    not Policy.GuestUserRoleId in ["10dae51f-b6af-4016-8d66-8c2a99b929b3", "2af84b1e-32c8-42b7-82bc-daa82404023b"]
+}
+
+AllAuthPoliciesRoleIds[{
+    "GuestUserRoleIdString" : Level,
+    "GuestUserRoleId" : Policy.GuestUserRoleId,
+    "Id" : Policy.Id
+}] {
+    Policy = input.authorization_policies[_]
+    Level := LevelAsString(Policy.GuestUserRoleId)
+}
+
+RoleIdByPolicy[concat("", ["\"", Level, "\"", " (", Policy.Id, ")"])] {
+    Policy := input.authorization_policies[_]
+    Level := LevelAsString(Policy.GuestUserRoleId)
+}
+
+
 tests[{
     "Requirement" : "Guest users SHOULD have limited access to Azure AD directory objects",
     "Control" : "AAD 2.18",
     "Criticality" : "Should",
     "Commandlet" : "Get-MgPolicyAuthorizationPolicy",
-    "ActualValue" : concat(" : ", ["Role ID", ExtractedRoleId ]),
+    "ActualValue" : {"all_roleid_values" : AllAuthPoliciesRoleIds},
     "ReportDetails" : ReportDetail,
     "RequirementMet" : Status
 }] {
-    ExtractedRoleId := input.authorization_policies.GuestUserRoleId
-    ReportDetail := concat("", ["Permission level set to \"", LevelAsString(ExtractedRoleId), "\""])
-    Status := ExtractedRoleId in ["10dae51f-b6af-4016-8d66-8c2a99b929b3", "2af84b1e-32c8-42b7-82bc-daa82404023b"]
+    BadPolicies := AuthPoliciesBadRoleId
+    Status := count(BadPolicies) == 0
+    ReportDetail := concat("", ["Permission level set to ", concat(", ", RoleIdByPolicy)])
 }
 #--
