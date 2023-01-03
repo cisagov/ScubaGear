@@ -211,10 +211,10 @@ tests[{
     "Criticality" : "Shall",
     "Commandlet" : "Get-MgIdentityConditionalAccessPolicy",
     "ActualValue" : Policies2_4_1,
-    "ReportDetails" : ReportDetailsArray(Policies2_4_1, DescriptionString),
+    "ReportDetails" : ReportFullDetailsArray(Policies2_4_1, DescriptionString),
     "RequirementMet" : count(Policies2_4_1) > 0
 }]{
-    DescriptionString := "conditional access policy(s) found that meet(s) all requirements.<br/>Note: Policy exclusions and additional policy conditions may still limit a policy's scope more narrowly than desired.  Recommend reviewing matching policies against the baseline statement to ensure a match between intent and implementation."
+    DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
     true
 }
 #--
