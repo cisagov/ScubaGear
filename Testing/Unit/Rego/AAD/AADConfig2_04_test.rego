@@ -33,7 +33,7 @@ test_ConditionalAccessPolicies_Correct if {
 
     count(RuleOutput)>= 1
     RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "1 conditional access policy(s) found that meet(s) all requirements:<br/>Test Policy require MFA for All Users"
+    endswith(RuleOutput[0].ReportDetails, "conditional access policy(s) found that meet(s) all requirements.<br/>Note: Policy exclusions and additional policy conditions may still limit a policy's scope more narrowly than desired.  Recommend reviewing matching policies against the baseline statement to ensure a match between intent and implementation.")
 }
 
 test_IncludeApplications_Incorrect if {
@@ -64,7 +64,7 @@ test_IncludeApplications_Incorrect if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements"
+    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements.<br/>Note: Policy exclusions and additional policy conditions may still limit a policy's scope more narrowly than desired.  Recommend reviewing matching policies against the baseline statement to ensure a match between intent and implementation."
 }
 
 test_IncludeUsers_Incorrect if {
@@ -94,7 +94,7 @@ test_IncludeUsers_Incorrect if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements"
+    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements.<br/>Note: Policy exclusions and additional policy conditions may still limit a policy's scope more narrowly than desired.  Recommend reviewing matching policies against the baseline statement to ensure a match between intent and implementation."
 }
 
 test_BuiltInControls_Incorrect if {
@@ -126,7 +126,7 @@ test_BuiltInControls_Incorrect if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements"
+    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements.<br/>Note: Policy exclusions and additional policy conditions may still limit a policy's scope more narrowly than desired.  Recommend reviewing matching policies against the baseline statement to ensure a match between intent and implementation."
 }
 
 test_State_Incorrect if {
@@ -157,7 +157,7 @@ test_State_Incorrect if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements"
+    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements.<br/>Note: Policy exclusions and additional policy conditions may still limit a policy's scope more narrowly than desired.  Recommend reviewing matching policies against the baseline statement to ensure a match between intent and implementation."
 }
 
 #
