@@ -97,7 +97,7 @@ tests[{
     "Requirement" : "Legacy authentication SHALL be blocked",
     "Control" : "AAD 2.1",
     "Criticality" : "Shall",
-    "Commandlet" : "Get-MgIdentityConditionalAccessPolicy",
+    "Commandlet" : ["Get-MgIdentityConditionalAccessPolicy"],
     "ActualValue" : Policies2_1,
     "ReportDetails" : ReportFullDetailsArray(Policies2_1, DescriptionString),
     "RequirementMet" : count(Policies2_1) > 0
@@ -129,7 +129,7 @@ tests[{
     "Requirement" : "Users detected as high risk SHALL be blocked",
     "Control" : "AAD 2.2",
     "Criticality" : "Shall",
-    "Commandlet" : "Get-MgIdentityConditionalAccessPolicy",
+    "Commandlet" : ["Get-MgIdentityConditionalAccessPolicy"],
     "ActualValue" : Policies2_2,
     "ReportDetails" : ReportDetailsArrayLicenseWarning(Policies2_2, DescriptionString),
     "RequirementMet" : Status
@@ -147,7 +147,7 @@ tests[{
     "Requirement" : "A notification SHOULD be sent to the administrator when high-risk users are detected",
     "Control" : "AAD 2.2",
     "Criticality" : "Should/Not-Implemented",
-    "Commandlet" : "",
+    "Commandlet" : [],
     "ActualValue" : [],
     "ReportDetails" : "Currently cannot be checked automatically. See Azure Active Directory Secure Configuration Baseline policy 2.2 for instructions on manual check",
     "RequirementMet" : false
@@ -178,7 +178,7 @@ tests[{
     "Requirement" : "Sign-ins detected as high risk SHALL be blocked",
     "Control" : "AAD 2.3",
     "Criticality" : "Shall",
-    "Commandlet" : "Get-MgIdentityConditionalAccessPolicy",
+    "Commandlet" : ["Get-MgIdentityConditionalAccessPolicy"],
     "ActualValue" : Policies2_3,
     "ReportDetails" : ReportDetailsArrayLicenseWarning(Policies2_3, DescriptionString),
     "RequirementMet" : Status
@@ -209,7 +209,7 @@ tests[{
     "Requirement" : "MFA SHALL be required for all users",
     "Control" : "AAD 2.4",
     "Criticality" : "Shall",
-    "Commandlet" : "Get-MgIdentityConditionalAccessPolicy",
+    "Commandlet" : ["Get-MgIdentityConditionalAccessPolicy"],
     "ActualValue" : Policies2_4_1,
     "ReportDetails" : ReportFullDetailsArray(Policies2_4_1, DescriptionString),
     "RequirementMet" : count(Policies2_4_1) > 0
@@ -228,7 +228,7 @@ tests[{
     "Requirement" : "Phishing-resistant MFA SHALL be used for all users",
     "Control" : "AAD 2.4",
     "Criticality" : "Shall/Not-Implemented",
-    "Commandlet" : "",
+    "Commandlet" : [],
     "ActualValue" : [],
     "ReportDetails" : "Currently cannot be checked automatically. See Azure Active Directory Secure Configuration Baseline policy 2.4 for instructions on manual check",
     "RequirementMet" : false
@@ -246,7 +246,7 @@ tests[{
     "Requirement" : "If phishing-resistant MFA cannot be used, an MFA method from the list [see AAD baseline 2.4] SHALL be used in the interim",
     "Control" : "AAD 2.4",
     "Criticality" : "Shall/Not-Implemented",
-    "Commandlet" : "",
+    "Commandlet" : [],
     "ActualValue" : [],
     "ReportDetails" : "Currently cannot be checked automatically. See Azure Active Directory Secure Configuration Baseline policy 2.4 for instructions on manual check",
     "RequirementMet" : false
@@ -264,7 +264,7 @@ tests[{
     "Requirement" : "SMS or Voice as the MFA method SHALL NOT be used",
     "Control" : "AAD 2.4",
     "Criticality" : "Shall/Not-Implemented",
-    "Commandlet" : "",
+    "Commandlet" : [],
     "ActualValue" : [],
     "ReportDetails" : "Currently cannot be checked automatically. See Azure Active Directory Secure Configuration Baseline policy 2.4 for instructions on manual check",
     "RequirementMet" : false
@@ -286,7 +286,7 @@ tests[{
     "Requirement" : "The following critical logs SHALL be sent at a minimum: AuditLogs, SignInLogs, RiskyUsers, UserRiskEvents, NonInteractiveUserSignInLogs, ServicePrincipalSignInLogs, ADFSSignInLogs, RiskyServicePrincipals, ServicePrincipalRiskEvents",
     "Control" : "AAD 2.5",
     "Criticality" : "Shall/Not-Implemented",
-    "Commandlet" : "",
+    "Commandlet" : [],
     "ActualValue" : [],
     "ReportDetails" : "Currently cannot be checked automatically. See Azure Active Directory Secure Configuration Baseline policy 2.5 for instructions on manual check",
     "RequirementMet" : false
@@ -303,7 +303,7 @@ tests[{
     "Requirement" : "The logs SHALL be sent to the agency's SOC for monitoring",
     "Control" : "AAD 2.5",
     "Criticality" : "Shall/Not-Implemented",
-    "Commandlet" : "",
+    "Commandlet" : [],
     "ActualValue" : [],
     "ReportDetails" : "Currently cannot be checked automatically. See Azure Active Directory Secure Configuration Baseline policy 2.5 for instructions on manual check",
     "RequirementMet" : false
@@ -336,7 +336,7 @@ tests[{
     "Requirement" : "Only administrators SHALL be allowed to register third-party applications",
     "Control" : "AAD 2.6",
     "Criticality" : "Shall",
-    "Commandlet" : "Get-MgPolicyAuthorizationPolicy",
+    "Commandlet" : ["Get-MgPolicyAuthorizationPolicy"],
     "ActualValue" : {"all_allowed_create_values": AllAuthPoliciesAllowedCreate},
     "ReportDetails" : ReportFullDetailsArray(BadPolicies, DescriptionString),
     "RequirementMet" : Status
@@ -371,7 +371,7 @@ tests[{
     "Requirement" : "Only administrators SHALL be allowed to consent to third-party applications",
     "Control" : "AAD 2.7",
     "Criticality" : "Shall",
-    "Commandlet" : "Get-MgPolicyAuthorizationPolicy",
+    "Commandlet" : ["Get-MgPolicyAuthorizationPolicy"],
     "ActualValue" : {"all_grant_policy_values": AllDefaultGrantPolicies},
     "ReportDetails" : ReportFullDetailsArray(BadPolicies, DescriptionString),
     "RequirementMet" : Status
@@ -402,7 +402,7 @@ tests[{
     "Requirement" : "An admin consent workflow SHALL be configured",
     "Control" : "AAD 2.7",
     "Criticality" : "Shall",
-    "Commandlet" : "Get-MgPolicyAdminConsentRequestPolicy",
+    "Commandlet" : ["Get-MgPolicyAdminConsentRequestPolicy"],
     "ActualValue" : {"all_consent_policies": AllConsentPolicies},
     "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
@@ -419,7 +419,7 @@ tests[{
     "Requirement" : "Group owners SHALL NOT be allowed to consent to third-party applications",
     "Control" : "AAD 2.7",
     "Criticality" : "Shall",
-    "Commandlet" : "Get-MgDirectorySetting",
+    "Commandlet" : ["Get-MgDirectorySetting"],
     "ActualValue" : Setting.Value,
     "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
@@ -443,7 +443,7 @@ tests[{
     "Requirement" : "User passwords SHALL NOT expire",
     "Control" : "AAD 2.8",
     "Criticality" : "Shall/Not-Implemented",
-    "Commandlet" : "",
+    "Commandlet" : [],
     "ActualValue" : [],
     "ReportDetails" : "Currently cannot be checked automatically. See Azure Active Directory Secure Configuration Baseline policy 2.8 for instructions on manual check",
     "RequirementMet" : false
@@ -475,7 +475,7 @@ tests[{
     "Requirement" : "Sign-in frequency SHALL be configured to 12 hours",
     "Control" : "AAD 2.9",
     "Criticality" : "Shall",
-    "Commandlet" : "Get-MgIdentityConditionalAccessPolicy",
+    "Commandlet" : ["Get-MgIdentityConditionalAccessPolicy"],
     "ActualValue" : Policies2_9,
     "ReportDetails" : ReportFullDetailsArray(Policies2_9, DescriptionString),
     "RequirementMet" : count(Policies2_9) > 0
@@ -507,7 +507,7 @@ tests[{
     "Requirement" : "Browser sessions SHALL not be persistent",
     "Control" : "AAD 2.10",
     "Criticality" : "Shall",
-    "Commandlet" : "Get-MgIdentityConditionalAccessPolicy",
+    "Commandlet" : ["Get-MgIdentityConditionalAccessPolicy"],
     "ActualValue" : Policies2_10,
     "ReportDetails" : ReportFullDetailsArray(Policies2_10, DescriptionString),
     "RequirementMet" : count(Policies2_10) > 0
@@ -535,7 +535,7 @@ tests[{
     "Requirement" : "A minimum of two users and a maximum of four users SHALL be provisioned with the Global Administrator role",
     "Control" : "AAD 2.11",
     "Criticality" : "Shall",
-    "Commandlet" : "Get-MgDirectoryRoleMember",
+    "Commandlet" : ["Get-MgSubscribedSku", "Get-PrivilegedUser"],
     "ActualValue" : GlobalAdmins,
     "ReportDetails" : ReportFullDetailsArray(GlobalAdmins, DescriptionString),
     "RequirementMet" : Status
@@ -564,7 +564,7 @@ tests[{
     "Requirement" : "Users that need to be assigned to highly privileged Azure AD roles SHALL be provisioned cloud-only accounts that are separate from the on-premises directory or other federated identity providers",
     "Control" : "AAD 2.12",
     "Criticality" : "Shall",
-    "Commandlet" : "Get-MgDirectoryRoleMember",
+    "Commandlet" : ["Get-MgSubscribedSku", "Get-PrivilegedUser"],
     "ActualValue" : AdminNames,
     "ReportDetails" : ReportFullDetailsArray(FederatedAdmins, DescriptionString),
     "RequirementMet" : Status
@@ -598,7 +598,7 @@ tests[{
     "Requirement" : "MFA SHALL be required for user access to highly privileged roles",
     "Control" : "AAD 2.13",
     "Criticality" : "Shall",
-    "Commandlet" : "Get-MgIdentityConditionalAccessPolicy",
+    "Commandlet" : ["Get-MgSubscribedSku", "Get-PrivilegedRole", "Get-MgIdentityConditionalAccessPolicy"],
     "ActualValue" : Policies2_13,
     "ReportDetails" : ReportFullDetailsArray(Policies2_13, DescriptionString),
     "RequirementMet" : count(Policies2_13) > 0
@@ -665,7 +665,7 @@ tests[{
     "Requirement" : "Permanent active role assignments SHALL NOT be allowed for highly privileged roles. Active assignments SHALL have an expiration period.",
     "Control" : "AAD 2.14",
     "Criticality" : "Shall",
-    "Commandlet" : "Get-MgRoleManagementDirectoryRoleAssignmentScheduleInstance",
+    "Commandlet" : ["Get-MgSubscribedSku", "Get-PrivilegedRole"],
     "ActualValue" : RolesWithoutLimitedExpirationPeriod,
     "ReportDetails" : ReportDetailsArrayLicenseWarning(RolesWithoutLimitedExpirationPeriod, DescriptionString),
     "RequirementMet" : Status
@@ -690,7 +690,7 @@ tests[{
     "Requirement" : "Provisioning of users to highly privileged roles SHALL NOT occur outside of a PAM system, such as the Azure AD PIM service, because this bypasses the controls the PAM system provides",
     "Control" : "AAD 2.14",
     "Criticality" : "Shall",
-    "Commandlet" : "Get-MgRoleManagementDirectoryRoleAssignmentScheduleInstance",
+    "Commandlet" : ["Get-MgSubscribedSku", "Get-PrivilegedRole"],
     "ActualValue" : RolesAssignedOutsidePim,
     "ReportDetails" : ReportDetailsArrayLicenseWarning(RolesAssignedOutsidePim, DescriptionString),
     "RequirementMet" : Status
@@ -722,7 +722,7 @@ tests[{
     "Requirement" : "Activation of highly privileged roles SHOULD require approval",
     "Control" : "AAD 2.15",
     "Criticality" : "Should",
-    "Commandlet" : "Get-MgRoleManagementDirectoryRoleAssignmentScheduleInstance",
+    "Commandlet" : ["Get-MgSubscribedSku", "Get-PrivilegedRole"],
     "ActualValue" : RolesWithoutApprovalRequired,
     "ReportDetails" : ReportDetailsArrayLicenseWarning(RolesWithoutApprovalRequired, DescriptionString),
     "RequirementMet" : Status
@@ -763,7 +763,7 @@ tests[{
     "Requirement" : "Eligible and Active highly privileged role assignments SHALL trigger an alert",
     "Control" : "AAD 2.16",
     "Criticality" : "Shall",
-    "Commandlet" : "Get-MgRoleManagementDirectoryRoleAssignmentScheduleInstance",
+    "Commandlet" : ["Get-MgSubscribedSku", "Get-PrivilegedRole"],
     "ActualValue" : RolesWithoutAssignmentAlerts,
     "ReportDetails" : ReportDetailsArrayLicenseWarning(RolesWithoutAssignmentAlerts, DescriptionString),
     "RequirementMet" : Status
@@ -792,7 +792,7 @@ tests[{
     "Requirement" : "User activation of the Global Administrator role SHALL trigger an alert",
     "Control" : "AAD 2.16",
     "Criticality" : "Shall",
-    "Commandlet" : "Get-MgRoleManagementDirectoryRoleAssignmentScheduleInstance",
+    "Commandlet" : ["Get-MgSubscribedSku", "Get-PrivilegedRole"],
     "ActualValue" : AdminsWithoutActivationAlert,
     "ReportDetails" : ReportDetailsBooleanLicenseWarning(Status),
     "RequirementMet" : Status
@@ -810,7 +810,7 @@ tests[{
     "Requirement" : "User activation of other highly privileged roles SHOULD trigger an alert",
     "Control" : "AAD 2.16",
     "Criticality" : "Should",
-    "Commandlet" : "Get-MgRoleManagementDirectoryRoleAssignmentScheduleInstance",
+    "Commandlet" : ["Get-MgSubscribedSku", "Get-PrivilegedRole"],
     "ActualValue" : NonGlobalAdminsWithoutActivationAlert,
     "ReportDetails" : ReportDetailsArrayLicenseWarning(NonGlobalAdminsWithoutActivationAlert, DescriptionString),
     "RequirementMet" : Status
@@ -846,7 +846,7 @@ tests[{
     "Requirement" : "Managed devices SHOULD be required for authentication",
     "Control" : "AAD 2.17",
     "Criticality" : "Should",
-    "Commandlet" : "Get-MgIdentityConditionalAccessPolicy",
+    "Commandlet" : ["Get-MgIdentityConditionalAccessPolicy"],
     "ActualValue" : Policies2_17,
     "ReportDetails" : ReportFullDetailsArray(Policies2_17, DescriptionString),
     "RequirementMet" : count(Policies2_17) > 0
@@ -885,7 +885,7 @@ tests[{
     "Requirement" : "Only users with the Guest Inviter role SHOULD be able to invite guest users",
     "Control" : "AAD 2.18",
     "Criticality" : "Should",
-    "Commandlet" : "Get-MgPolicyAuthorizationPolicy",
+    "Commandlet" : ["Get-MgPolicyAuthorizationPolicy"],
     "ActualValue" : {"all_allow_invite_values": AllAuthPoliciesAllowInvites},
     "ReportDetails" : ReportDetail,
     "RequirementMet" : Status
@@ -904,7 +904,7 @@ tests[{
     "Requirement" : "Guest invites SHOULD only be allowed to specific external domains that have been authorized by the agency for legitimate business purposes",
     "Control" : "AAD 2.18",
     "Criticality" : "Should/Not-Implemented",
-    "Commandlet" : "",
+    "Commandlet" : [],
     "ActualValue" : [],
     "ReportDetails" : "Currently cannot be checked automatically. See Azure Active Directory Secure Configuration Baseline policy 2.18 for instructions on manual check",
     "RequirementMet" : false
@@ -947,7 +947,7 @@ tests[{
     "Requirement" : "Guest users SHOULD have limited access to Azure AD directory objects",
     "Control" : "AAD 2.18",
     "Criticality" : "Should",
-    "Commandlet" : "Get-MgPolicyAuthorizationPolicy",
+    "Commandlet" : ["Get-MgPolicyAuthorizationPolicy"],
     "ActualValue" : {"all_roleid_values" : AllAuthPoliciesRoleIds},
     "ReportDetails" : ReportDetail,
     "RequirementMet" : Status

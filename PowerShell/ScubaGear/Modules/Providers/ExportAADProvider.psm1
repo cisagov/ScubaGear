@@ -63,6 +63,9 @@ function Export-AADProvider {
     # 2.7 Policy Bullet 2]
     $AdminConsentReqPolicies = ConvertTo-Json @($Tracker.TryCommand("Get-MgPolicyAdminConsentRequestPolicy"))
 
+    $SuccessfulCommands = ConvertTo-Json @($Tracker.GetSuccessfulCommands())
+    $UnSuccessfulCommands = ConvertTo-Json @($Tracker.GetUnSuccessfulCommands())
+
     # Note the spacing and the last comma in the json is important
     $json = @"
     "conditional_access_policies": $AllPolicies,
@@ -72,6 +75,8 @@ function Export-AADProvider {
     "privileged_roles": $PrivilegedRoles,
     "service_plans": $ServicePlans,
     "directory_settings": $DirectorySettings,
+    "aad_successful_commands": $SuccessfulCommands,
+    "aad_unsuccessful_commands": $UnSuccessfulCommands,
 "@
 
     # We need to remove the backslash characters from the
