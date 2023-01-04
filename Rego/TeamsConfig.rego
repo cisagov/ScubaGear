@@ -550,7 +550,7 @@ tests[{
 	"Requirement" : "Record an event SHOULD be set to Organizer can record",
 	"Control" : "Teams 2.10",
 	"Criticality" : "Should",
-	"Commandlet" : ["Get-CsTeamsMeetingPolicy"],
+	"Commandlet" : ["Get-CsTeamsMeetingBroadcastPolicy"],
 	"ActualValue" : Policy.BroadcastRecordingMode,
 	"ReportDetails" : ReportDetailsBoolean(Status),
 	"RequirementMet" : Status
@@ -567,7 +567,7 @@ tests[{
 	"Requirement" : "Record an event SHOULD be set to Organizer can record",
 	"Control" : "Teams 2.10",
 	"Criticality" : "Should",
-	"Commandlet" : ["Get-CsTeamsMeetingPolicy"],
+	"Commandlet" : ["Get-CsTeamsMeetingBroadcastPolicy"],
 	"ActualValue" : "PowerShell Error",
 	"ReportDetails" : "PowerShell Error",
 	"RequirementMet" : false
