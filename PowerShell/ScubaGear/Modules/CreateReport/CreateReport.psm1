@@ -11,7 +11,7 @@ function Get-CapTable {
         "otherExternalUser" = "Other external users"}
 
     $Table = @()
-    
+
     foreach ($Cap in $Caps) {
 
         $IncludedUsers = @()
@@ -37,7 +37,7 @@ function Get-CapTable {
             elseif ($SpecificRoles.Length -gt 1) {
                 $IncludedUsers += "$($SpecificRoles.Length) specific roles"
             }
-            
+
             $SpecificGroups = @($Cap.Conditions.Users.IncludeGroups | Where-Object {$_ -ne "All"})
             if ($SpecificGroups.Length -eq 1) {
                 $IncludedUsers += "$($SpecificGroups.Length) specific group"
@@ -52,7 +52,7 @@ function Get-CapTable {
             }
         }
         $IncludedUsers = $IncludedUsers -Join ", "
-        
+
         $CapDetails = [pscustomobject]@{
             "Name" = $Cap.DisplayName;
             "Users included" = $IncludedUsers -Join ", ";
