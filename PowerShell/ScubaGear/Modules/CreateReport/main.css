@@ -100,7 +100,16 @@ img {
     width: 100px;
 }
 
-.caps {
-    margin-top: 10px;
-    padding-left: 10px;
+#caps {
+    width: 1000px;
+    margin: auto;
+    margin-top: 50px;
 }
+
+#caps h2 {
+    margin-top: 10px;
+}
+
+#caps tr:nth-child(even){
+    background-color: #e0e0e0;
+  }
