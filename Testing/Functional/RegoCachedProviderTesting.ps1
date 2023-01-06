@@ -55,8 +55,7 @@ $RunCachedParams = @{
     'Quiet' = $Quiet;
 }
 
-$Root = @((Get-ChildItem -Recurse -Filter CISA-SCuBA-M365-SCB -Directory -ErrorAction SilentlyContinue -Path $Home).FullName)
-Set-Location $Root[0]
+Set-Location $(Split-Path -Path $pwd)
 $ManifestPath = Join-Path -Path "./PowerShell" -ChildPath "ScubaGear"
 Remove-Module "ScubaGear" -ErrorAction "SilentlyContinue" # For dev work
 #######
