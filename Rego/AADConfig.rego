@@ -98,6 +98,11 @@ Policies2_1[Cap.DisplayName] {
     Cap := input.conditional_access_policies[_]
     # Filter: only include policies that meet all the requirements
     "All" in Cap.Conditions.Users.IncludeUsers
+    "All" in Cap.Conditions.Users.IncludeGroups
+    "All" in Cap.Conditions.Users.IncludeRoles
+    count(Cap.Conditions.Users.ExcludeUsers) == 0
+    count(Cap.Conditions.Users.ExcludeGroups) == 0
+    count(Cap.Conditions.Users.ExcludeRoles) == 0
     "All" in Cap.Conditions.Applications.IncludeApplications
     "other" in Cap.Conditions.ClientAppTypes
     "exchangeActiveSync" in Cap.Conditions.ClientAppTypes
@@ -131,6 +136,11 @@ Policies2_2[Cap.DisplayName] {
     Cap := input.conditional_access_policies[_]
     # Filter: only include policies that meet all the requirements
     "All" in Cap.Conditions.Users.IncludeUsers
+    "All" in Cap.Conditions.Users.IncludeGroups
+    "All" in Cap.Conditions.Users.IncludeRoles
+    count(Cap.Conditions.Users.ExcludeUsers) == 0
+    count(Cap.Conditions.Users.ExcludeGroups) == 0
+    count(Cap.Conditions.Users.ExcludeRoles) == 0
     "All" in Cap.Conditions.Applications.IncludeApplications
     "high" in Cap.Conditions.UserRiskLevels
     "block" in Cap.GrantControls.BuiltInControls
@@ -180,6 +190,11 @@ Policies2_3[Cap.DisplayName] {
     Cap := input.conditional_access_policies[_]
     # Filter: only include policies that meet all the requirements
     "All" in Cap.Conditions.Users.IncludeUsers
+    "All" in Cap.Conditions.Users.IncludeGroups
+    "All" in Cap.Conditions.Users.IncludeRoles
+    count(Cap.Conditions.Users.ExcludeUsers) == 0
+    count(Cap.Conditions.Users.ExcludeGroups) == 0
+    count(Cap.Conditions.Users.ExcludeRoles) == 0
     "All" in Cap.Conditions.Applications.IncludeApplications
     "high" in Cap.Conditions.SignInRiskLevels
     "block" in Cap.GrantControls.BuiltInControls
@@ -212,6 +227,11 @@ Policies2_4_1[Cap.DisplayName] {
     Cap := input.conditional_access_policies[_]
     # Filter: only include policies that meet all the requirements
     "All" in Cap.Conditions.Users.IncludeUsers
+    "All" in Cap.Conditions.Users.IncludeGroups
+    "All" in Cap.Conditions.Users.IncludeRoles
+    count(Cap.Conditions.Users.ExcludeUsers) == 0
+    count(Cap.Conditions.Users.ExcludeGroups) == 0
+    count(Cap.Conditions.Users.ExcludeRoles) == 0
     "All" in Cap.Conditions.Applications.IncludeApplications
     "mfa" in Cap.GrantControls.BuiltInControls
     Cap.State == "enabled"
@@ -503,6 +523,11 @@ Policies2_9[Cap.DisplayName] {
     Cap := input.conditional_access_policies[_]
     # Filter: only include policies that meet all the requirements
     "All" in Cap.Conditions.Users.IncludeUsers
+    "All" in Cap.Conditions.Users.IncludeGroups
+    "All" in Cap.Conditions.Users.IncludeRoles
+    count(Cap.Conditions.Users.ExcludeUsers) == 0
+    count(Cap.Conditions.Users.ExcludeGroups) == 0
+    count(Cap.Conditions.Users.ExcludeRoles) == 0
     "All" in Cap.Conditions.Applications.IncludeApplications
     Cap.SessionControls.SignInFrequency.IsEnabled == true
     Cap.SessionControls.SignInFrequency.Type == "hours"
@@ -536,6 +561,11 @@ Policies2_10[Cap.DisplayName] {
     Cap := input.conditional_access_policies[_]
     # Filter: only include policies that meet all the requirements
     "All" in Cap.Conditions.Users.IncludeUsers
+    "All" in Cap.Conditions.Users.IncludeGroups
+    "All" in Cap.Conditions.Users.IncludeRoles
+    count(Cap.Conditions.Users.ExcludeUsers) == 0
+    count(Cap.Conditions.Users.ExcludeGroups) == 0
+    count(Cap.Conditions.Users.ExcludeRoles) == 0
     "All" in Cap.Conditions.Applications.IncludeApplications
     Cap.SessionControls.PersistentBrowser.IsEnabled == true
     Cap.SessionControls.PersistentBrowser.Mode == "never"
