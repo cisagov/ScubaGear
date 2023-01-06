@@ -6,7 +6,6 @@
         This script executes prexisting provider exports against the Rego code and compares output against saved runs for
         regression testing.
 
-    .NOTES
         To run the test on the Rego test results, the user MUST have a folder called BasicRegressionTests saved somewhere in
         their home directory (e.g., Downloads, Documents, Desktop). The BasicRegressionTests folder holds sub folders for each
         provider that is being regression tested based on the product name designation used in ScubaGear.  These include aad,
