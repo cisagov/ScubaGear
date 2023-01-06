@@ -6,6 +6,19 @@
         This script executes prexisting provider exports against the Rego code and compares output against saved runs for
         regression testing.
 
+    .NOTES
+        To run the test on the Rego test results, The user MUST have a folder called BasicRegressionTests saved somewhere in
+        their home directory (ex. Downloads, Documents, Desktop). The BasicRegressionTests folder holds sub folders for each
+        providor that is being regression tested: teams, exo, defender, aad, powerplatform, sharepoint, onedrive. Each subfolder
+        contains a pair of files, the golden copies of the provider JSON and test results JSON. These files MUST be generated
+        using the main branch. For each file pair they must be renamed with the following naming convention:
+            - SettingsExport.json renamed to <Provider>ProviderExport-<tennant>-<mmddyyyy>
+            - TestResults.json renamed to <Provider>TestResults-<tennant>-<mmddyyyy>
+
+        EXAMPLE
+            - AADProviderExport-y2zj1-01052023
+            - AADTestResults-y2zj1-01052023
+
     .OUTPUTS
         Text output that indicates how many tests were consistent or different from the saved test results.
 
