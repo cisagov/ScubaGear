@@ -147,7 +147,7 @@ function Get-Applications {
         if ($Cap.Conditions.Applications.IncludeApplications.Length -gt 0) {
             # For "Select what this policy applies to", "Cloud Apps" was  selected
             $Actions += "Policy applies to: apps.<br>"
-            # Included apps: 
+            # Included apps:
             if ($Cap.Conditions.Applications.IncludeApplications -Contains "All") {
                 $Actions += "Apps included: All"
             }
