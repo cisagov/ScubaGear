@@ -39,7 +39,7 @@ ReportDetailsString(Status, String) = Detail if {
 # Baseline 2.1: Policy 1
 #--
 tests[{
-    "Requirement" : "The ability to create additional environments SHALL be restricted to admins",
+    "Requirement" : "The ability to create production and sandbox environments SHALL be restricted to admins",
     "Control" : "Power Platform 2.1",
     "Criticality" : "Shall",
     "Commandlet" : "Get-TenantSettings",
@@ -49,6 +49,23 @@ tests[{
 }] {
     EnvironmentCreation := input.environment_creation
     Status := EnvironmentCreation.disableEnvironmentCreationByNonAdminUsers == true
+}
+#--
+
+#
+# Baseline 2.1: Policy 2
+#--
+tests[{
+    "Requirement" : "The ability to create trial environments SHALL be restricted to admins",
+    "Control" : "Power Platform 2.1",
+    "Criticality" : "Shall",
+    "Commandlet" : "Get-TenantSettings",
+    "ActualValue" : EnvironmentCreation.disableTrialEnvironmentCreationByNonAdminUsers,
+    "ReportDetails" : ReportDetailsBoolean(Status),
+    "RequirementMet" : Status
+}] {
+    EnvironmentCreation := input.environment_creation
+    Status := EnvironmentCreation.disableTrialEnvironmentCreationByNonAdminUsers == true
 }
 #--
 
