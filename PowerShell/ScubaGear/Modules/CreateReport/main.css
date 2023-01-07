@@ -112,4 +112,10 @@ img {
 
 #caps tr:nth-child(even){
     background-color: #e0e0e0;
-  }
+}
+
+#caps ul {
+    padding: 0;
+    padding-left: 2px;
+    list-style-position: inside;
+}

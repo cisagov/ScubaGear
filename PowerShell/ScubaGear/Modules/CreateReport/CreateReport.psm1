@@ -13,6 +13,20 @@ $StateStrings = @{"enabled" = "On";
 
 $ActionStrings = @{"urn:user:registersecurityinfo" = "Register security info";
     "urn:user:registerdevice" = "Register or join devices"}
+
+$ClientAppStrings = @{"exchangeActiveSync" = "Exchange ActiveSync Clients";
+    "browser" = "Browser";
+    "mobileAppsAndDesktopClients" = "Mobile apps and desktop clients";
+    "other" = "Other clients";
+    "all" = "all"}
+
+$GrantControlStrings = @{"mfa" = "multifactor authentication";
+    "compliantDevice" = "device to be marked compliant";
+    "domainJoinedDevice" = "Hybrid Azure AD joined device";
+    "approvedApplication" = "approved client app";
+    "compliantApplication" = "app protection policy";
+    "passwordChange" = "password change"}
+
 function Get-IncludedUsers {
     <#
     .Description
@@ -143,10 +157,10 @@ function Get-Applications {
         $Cap
     )
     process {
-        $Actions = ""
+        $Actions = @()
         if ($Cap.Conditions.Applications.IncludeApplications.Length -gt 0) {
             # For "Select what this policy applies to", "Cloud Apps" was  selected
-            $Actions += "Policy applies to: apps.<br>"
+            $Actions += "Policy applies to: apps"
             # Included apps:
             if ($Cap.Conditions.Applications.IncludeApplications -Contains "All") {
                 $Actions += "Apps included: All"
@@ -163,18 +177,18 @@ function Get-Applications {
 
             # Excluded apps: # TODO FILTERs
             if ($Cap.Conditions.Applications.ExcludeApplications.Length -eq 0) {
-                $Actions += "<br>Apps excluded: None"
+                $Actions += "Apps excluded: None"
             }
             elseif ($Cap.Conditions.Applications.ExcludeApplications.Length -eq 1) {
-                $Actions += "<br>Apps excluded: 1 specific app"
+                $Actions += "Apps excluded: 1 specific app"
             }
             else {
-                $Actions += "<br>Apps excluded: $($Cap.Conditions.Applications.ExcludeApplications.Length) specific apps"
+                $Actions += "Apps excluded: $($Cap.Conditions.Applications.ExcludeApplications.Length) specific apps"
             }
         }
         elseif ($Cap.Conditions.Applications.IncludeUserActions.Length -gt 0) {
             # For "Select what this policy applies to", "User actions" was selected
-            $Actions += "Policy applies to: actions.<br>"
+            $Actions += "Policy applies to: actions"
             $Actions += "User action: $($ActionStrings[$Cap.Conditions.Applications.IncludeUserActions[0]])"
             # While "IncludeUserActions" is a list, the GUI doesn't actually let you select more than one
             # item at a time, hence "IncludeUserActions[0]" above
@@ -190,8 +204,122 @@ function Get-Applications {
                 $Actions += "Policy applies to: $($AuthContexts.Length) authentication contexts"
             }
         }
+        $Actions = @($Actions | ForEach-Object {"<li>$_</li>"})
+        "<ul>$($Actions -Join '')</ul>"
+    }
+}
 
-        $Actions
+function Get-Conditions {
+    <#
+    .Description
+    Parses the provider output to generate a list of conditions for a given conditional access policy (Cap).
+    .Functionality
+    Internal
+    #>
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory=$true)]
+        [System.Object]
+        $Cap
+    )
+    process {
+        $Conditions = @()
+        # User risk
+        if ($Cap.Conditions.UserRiskLevels.Length -gt 0) {
+            $Conditions += "User risk levels: $($Cap.Conditions.UserRiskLevels -Join ', ')"
+        }
+        # Sign-in risk
+        if ($Cap.Conditions.SignInRiskLevels.Length -gt 0) {
+            $Conditions += "Sign-in risk levels: $($Cap.Conditions.SignInRiskLevels -Join ', ')"
+        }
+        # Device platforms
+        if ($null -ne $Cap.Conditions.Platforms.IncludePlatforms) {
+            $Conditions += "Device platforms included: $($Cap.Conditions.Platforms.IncludePlatforms -Join ', ')"
+            if ($Cap.Conditions.Platforms.ExcludePlatforms.Length -eq 0) {
+                $Conditions += "Device platforms excluded: none"
+            }
+            else {
+                $Conditions += "Device platforms excluded: $($Cap.Conditions.Platforms.ExcludePlatforms -Join ', ')"
+            }
+        }
+        # Locations
+        if ($null -ne $Cap.Conditions.Locations.IncludeLocations) {
+            if ($Cap.Conditions.Locations.IncludeLocations -Contains "All") {
+                $Conditions += "Locations included: all locations"
+            }
+            elseif ($Cap.Conditions.Locations.IncludeLocations -Contains "AllTrusted") {
+                $Conditions += "Locations included: all trusted locations"
+            }
+            elseif ($Cap.Conditions.Locations.IncludeLocations.Length -eq 1) {
+                $Conditions += "Locations included: 1 specific location"
+            }
+            else {
+                $Conditions += "Locations included: $($Cap.Conditions.Locations.IncludeLocations.Length) specific locations"
+            }
+
+            if ($Cap.Conditions.Locations.ExcludeLocations -Contains "AllTrusted") {
+                $Conditions += "Locations excluded: all trusted locations"
+            }
+            elseif ($Cap.Conditions.Locations.ExcludeLocations.Length -eq 0) {
+                $Conditions += "Locations excluded: none"
+            }         
+            elseif ($Cap.Conditions.Locations.ExcludeLocations.Length -eq 1) {
+                $Conditions += "Locations excluded: 1 specific location"
+            }
+            else {
+                $Conditions += "Locations excluded: $($Cap.Conditions.Locations.ExcludeLocations.Length) specific locations"
+            }
+        }
+        # Client Apps
+        $ClientApps += @($Cap.Conditions.ClientAppTypes | ForEach-Object {$ClientAppStrings[$_]})
+        $Conditions += "Client apps included: $($ClientApps -Join ', ')"
+        # Filter for devices
+        if ($null -ne $Cap.Conditions.Devices.DeviceFilter.Mode) {
+            if ($null -ne $Cap.Conditions.Devices.DeviceFilter.Mode -eq "include") {
+                $Conditions += "Custom device filter in include mode active"
+            }
+            else {
+                $Conditions += "Custom device filter in exclude mode active"
+            }
+        }
+
+        $Conditions = @($Conditions | ForEach-Object {"<li>$_</li>"})
+        "<ul>$($Conditions -Join '')</ul>"
+    }
+}
+
+function Get-AccessControls {
+    <#
+    .Description
+    Parses the provider output to generate a list of access controls for a given conditional access policy (Cap).
+    .Functionality
+    Internal
+    #>
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory=$true)]
+        [System.Object]
+        $Cap
+    )
+    process {
+        $AccessControls = ""
+        if ($null -ne $Cap.GrantControls.BuiltInControls) {
+            if ($Cap.GrantControls.BuiltInControls -Contains "block") {
+                $AccessControls = "Block access"
+            }
+            else {
+                $GrantControls = @($Cap.GrantControls.BuiltInControls | ForEach-Object {$GrantControlStrings[$_]})
+                if ($null -ne $Cap.GrantControls.AuthenticationStrength.DisplayName) {
+                    $GrantControls += "authentication strength ($($Cap.GrantControls.AuthenticationStrength.DisplayName))"
+                }
+                
+                $AccessControls = "Allow access but require $($GrantControls -Join ', ')"
+                if ($GrantControls.Length -gt 1) {
+                    $AccessControls = $AccessControls.Insert($AccessControls.LastIndexOf(',')+1, " $($Cap.GrantControls.Operator)")
+                }
+            }
+        }
+        $AccessControls
     }
 }
 
@@ -206,13 +334,16 @@ function Get-CapTable {
         $UsersIncluded = $(Get-IncludedUsers -Cap $Cap) -Join ", "
         $UsersExcluded = $(Get-ExcludedUsers -Cap $Cap) -Join ", "
         $Apps = Get-Applications -Cap $Cap
+        $Conditions = Get-Conditions -Cap $Cap
+        $AccessControls = Get-AccessControls -Cap $Cap
         $CapDetails = [pscustomobject]@{
             "Name" = $Cap.DisplayName;
-            "Users" = "Users included: $($UsersIncluded)<br>Users excluded: $($UsersExcluded)";
-            "Apps/Actions" = $Apps;
             "State" = $StateStrings[$Cap.State];
-            "Conditions" = "TODO";
-            "Access Controls" = "TODO";
+            "Users" = "<ul><li>Users included: $($UsersIncluded)</li><li>Users excluded: $($UsersExcluded)</li></ul>";
+            "Apps/Actions" = $Apps;
+            "Conditions" = $Conditions;
+            "Access Controls" = $AccessControls;
+            "Session Controls" = "TODO";
         }
 
         $Table += $CapDetails
