@@ -262,7 +262,7 @@ function Get-Conditions {
             }
             elseif ($Cap.Conditions.Locations.ExcludeLocations.Length -eq 0) {
                 $Conditions += "Locations excluded: none"
-            }      
+            }
             elseif ($Cap.Conditions.Locations.ExcludeLocations.Length -eq 1) {
                 $Conditions += "Locations excluded: 1 specific location"
             }
