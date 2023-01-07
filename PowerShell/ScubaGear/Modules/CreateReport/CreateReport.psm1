@@ -262,7 +262,7 @@ function Get-Conditions {
             }
             elseif ($Cap.Conditions.Locations.ExcludeLocations.Length -eq 0) {
                 $Conditions += "Locations excluded: none"
-            }         
+            }      
             elseif ($Cap.Conditions.Locations.ExcludeLocations.Length -eq 1) {
                 $Conditions += "Locations excluded: 1 specific location"
             }
@@ -312,12 +312,16 @@ function Get-AccessControls {
                 if ($null -ne $Cap.GrantControls.AuthenticationStrength.DisplayName) {
                     $GrantControls += "authentication strength ($($Cap.GrantControls.AuthenticationStrength.DisplayName))"
                 }
-                
+
                 $AccessControls = "Allow access but require $($GrantControls -Join ', ')"
                 if ($GrantControls.Length -gt 1) {
                     $AccessControls = $AccessControls.Insert($AccessControls.LastIndexOf(',')+1, " $($Cap.GrantControls.Operator)")
                 }
             }
+        }
+
+        if ($AccessControls -eq "") {
+            $AccessControls = "None"
         }
         $AccessControls
     }
@@ -342,7 +346,7 @@ function Get-CapTable {
             "Users" = "<ul><li>Users included: $($UsersIncluded)</li><li>Users excluded: $($UsersExcluded)</li></ul>";
             "Apps/Actions" = $Apps;
             "Conditions" = $Conditions;
-            "Access Controls" = $AccessControls;
+            "Block/Grant Access" = $AccessControls;
             "Session Controls" = "TODO";
         }
 
