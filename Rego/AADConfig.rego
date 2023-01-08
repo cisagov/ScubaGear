@@ -658,6 +658,11 @@ Policies2_13[Cap.DisplayName] {
     MissingRoles := PrivRolesSet - CondIncludedRolesSet
     # Filter: only include policies that meet all the requirements
     count(MissingRoles) == 0
+    CondExcludedRolesSet := { Y | Y = Cap.Conditions.Users.ExcludeRoles[_] }
+    #make sure excluded roles do not contain any of the privileged roles (if it does, that means you are excluding it which is not what the policy says)
+    MatchingExcludeRoles := PrivRolesSet & CondExcludedRolesSet
+    #only succeeds if there is no intersection, i.e., excluded roles are none of the privileged roles
+    count(MatchingExcludeRoles) == 0
     "All" in Cap.Conditions.Applications.IncludeApplications
     "mfa" in Cap.GrantControls.BuiltInControls
     Cap.State == "enabled"

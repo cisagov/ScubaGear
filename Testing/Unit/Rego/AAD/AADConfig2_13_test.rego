@@ -17,7 +17,8 @@ test_ConditionalAccessPolicies_Correct if {
                         "IncludeApplications": ["All"]
                     },
                     "Users": {
-                        "IncludeRoles": ["Role1", "Role2" ]
+                        "IncludeRoles": ["Role1", "Role2" ],
+                        "ExcludeRoles": []
                     }
                 },
                 "GrantControls": {
@@ -58,7 +59,8 @@ test_IncludeApplications_Incorrect if {
                         "IncludeApplications": [""]
                     },
                     "Users": {
-                        "IncludeRoles": ["Role1", "Role2" ]
+                        "IncludeRoles": ["Role1", "Role2" ],
+                        "ExcludeRoles": []
                     }
                 },
                 "GrantControls": {
@@ -99,7 +101,8 @@ test_BuiltInControls_Incorrect if {
                         "IncludeApplications": ["All"]
                     },
                     "Users": {
-                        "IncludeRoles": ["Role1", "Role2" ]
+                        "IncludeRoles": ["Role1", "Role2" ],
+                        "ExcludeRoles": []
                     }
                 },
                 "GrantControls": {
@@ -140,7 +143,8 @@ test_State_Incorrect if {
                         "IncludeApplications": ["All"]
                     },
                     "Users": {
-                        "IncludeRoles": ["Role1", "Role2" ]
+                        "IncludeRoles": ["Role1", "Role2" ],
+                        "ExcludeRoles": []
                     }
                 },
                 "GrantControls": {
@@ -181,7 +185,8 @@ test_IncludeRoles_Incorrect_V1 if {
                         "IncludeApplications": ["All"]
                     },
                     "Users": {
-                        "IncludeRoles": ["Role1"]
+                        "IncludeRoles": ["Role1"],
+                        "ExcludeRoles": []
                     }
                 },
                 "GrantControls": {
@@ -222,7 +227,46 @@ test_IncludeRoles_Incorrect_V2 if {
                         "IncludeApplications": ["All"]
                     },
                     "Users": {
-                        "IncludeRoles": ["Role2" ]
+                        "IncludeRoles": ["Role2"],
+                        "ExcludeRoles": []
+                    }
+                },
+                "GrantControls": {
+                    "BuiltInControls": ["mfa"]
+                },
+                "State": "enabled",
+                "DisplayName": {"MFA required for all highly Privileged Roles Policy"}
+            }
+        ],
+        "privileged_roles": [
+            {
+                "RoleTemplateId": "Role1",
+                "DisplayName": "Global Administrator"
+            }
+        ]
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements"
+}
+
+test_ExcludeRoles_Incorrect if {
+    ControlNumber := "AAD 2.13"
+    Requirement := "MFA SHALL be required for user access to highly privileged roles"
+
+    Output := tests with input as {
+        "conditional_access_policies": [
+            {
+                "Conditions": {
+                    "Applications": {
+                        "IncludeApplications": ["All"]
+                    },
+                    "Users": {
+                        "IncludeRoles": ["Role1", "Role2"],
+                        "ExcludeRoles": ["Role1"]
                     }
                 },
                 "GrantControls": {
