@@ -17,7 +17,12 @@ test_ConditionalAccessPolicies_Correct if {
                         "IncludeApplications": ["All"]
                     },
                     "Users": {
-                        "IncludeUsers": ["All"]
+                        "IncludeUsers": ["All"],
+                        "ExcludeUsers": [],
+                        "IncludeGroups": ["All"],
+                        "ExcludeGroups": [],
+                        "IncludeRoles": ["All"],
+                        "ExcludeRoles": []
                     }
                 },
                 "GrantControls": {
@@ -48,7 +53,12 @@ test_IncludeApplications_Incorrect if {
                         "IncludeApplications": ["Office365"]
                     },
                     "Users": {
-                        "IncludeUsers": ["All"]
+                        "IncludeUsers": ["All"],
+                        "ExcludeUsers": [],
+                        "IncludeGroups": ["All"],
+                        "ExcludeGroups": [],
+                        "IncludeRoles": ["All"],
+                        "ExcludeRoles": []
                     }
                 },
                 "GrantControls": {
@@ -78,7 +88,192 @@ test_IncludeUsers_Incorrect if {
                         "IncludeApplications": ["All"]
                     },
                     "Users": {
-                        "IncludeUsers": ["8bc7c6ee-39a2-42a5-a31b-f77fb51db652"]
+                        "IncludeUsers": ["8bc7c6ee-39a2-42a5-a31b-f77fb51db652"],
+                        "ExcludeUsers": [],
+                        "IncludeGroups": ["All"],
+                        "ExcludeGroups": [],
+                        "IncludeRoles": ["All"],
+                        "ExcludeRoles": []
+                    }
+                },
+                "GrantControls": {
+                    "BuiltInControls": ["mfa"]
+                },
+                "State": "enabled",
+                "DisplayName": "Test Policy require MFA for All Apps, but not All Users"
+            }
+        ]
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements"
+}
+
+test_ExcludeUsers_Incorrect if {
+    ControlNumber := "AAD 2.4"
+    Requirement := "MFA SHALL be required for all users"
+
+    Output := tests with input as {
+        "conditional_access_policies": [
+            {
+                "Conditions": {
+                    "Applications": {
+                        "IncludeApplications": ["All"]
+                    },
+                    "Users": {
+                        "IncludeUsers": ["All"],
+                        "ExcludeUsers": ["8bc7c6ee-39a2-42a5-a31b-f77fb51db652"],
+                        "IncludeGroups": ["All"],
+                        "ExcludeGroups": [],
+                        "IncludeRoles": ["All"],
+                        "ExcludeRoles": []
+                    }
+                },
+                "GrantControls": {
+                    "BuiltInControls": ["mfa"]
+                },
+                "State": "enabled",
+                "DisplayName": "Test Policy require MFA for All Apps, but not All Users"
+            }
+        ]
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements"
+}
+
+test_IncludeGroups_Incorrect if {
+    ControlNumber := "AAD 2.4"
+    Requirement := "MFA SHALL be required for all users"
+
+    Output := tests with input as {
+        "conditional_access_policies": [
+            {
+                "Conditions": {
+                    "Applications": {
+                        "IncludeApplications": ["All"]
+                    },
+                    "Users": {
+                        "IncludeUsers": ["All"],
+                        "ExcludeUsers": [],
+                        "IncludeGroups": ["8bc7c6ee-39a2-42a5-a31b-f77fb51db652"],
+                        "ExcludeGroups": [],
+                        "IncludeRoles": ["All"],
+                        "ExcludeRoles":[]
+                    }
+                },
+                "GrantControls": {
+                    "BuiltInControls": ["mfa"]
+                },
+                "State": "enabled",
+                "DisplayName": "Test Policy require MFA for All Apps, but not All Users"
+            }
+        ]
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements"
+}
+
+test_ExcludeGroups_Incorrect if {
+    ControlNumber := "AAD 2.4"
+    Requirement := "MFA SHALL be required for all users"
+
+    Output := tests with input as {
+        "conditional_access_policies": [
+            {
+                "Conditions": {
+                    "Applications": {
+                        "IncludeApplications": ["All"]
+                    },
+                    "Users": {
+                        "IncludeUsers": ["All"],
+                        "ExcludeUsers": [],
+                        "IncludeGroups": ["All"],
+                        "ExcludeGroups": ["8bc7c6ee-39a2-42a5-a31b-f77fb51db652"],
+                        "IncludeRoles": ["All"],
+                        "ExcludeRoles": []
+                    }
+                },
+                "GrantControls": {
+                    "BuiltInControls": ["mfa"]
+                },
+                "State": "enabled",
+                "DisplayName": "Test Policy require MFA for All Apps, but not All Users"
+            }
+        ]
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements"
+}
+
+test_IncludeRoles_Incorrect if {
+    ControlNumber := "AAD 2.4"
+    Requirement := "MFA SHALL be required for all users"
+
+    Output := tests with input as {
+        "conditional_access_policies": [
+            {
+                "Conditions": {
+                    "Applications": {
+                        "IncludeApplications": ["All"]
+                    },
+                    "Users": {
+                        "IncludeUsers": ["All"],
+                        "ExcludeUsers": [],
+                        "IncludeGroups": ["All"],
+                        "ExcludeGroups": [],
+                        "IncludeRoles": ["8bc7c6ee-39a2-42a5-a31b-f77fb51db652"],
+                        "ExcludeRoles": []
+                    }
+                },
+                "GrantControls": {
+                    "BuiltInControls": ["mfa"]
+                },
+                "State": "enabled",
+                "DisplayName": "Test Policy require MFA for All Apps, but not All Users"
+            }
+        ]
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements"
+}
+
+test_ExcludeRoles_Incorrect if {
+    ControlNumber := "AAD 2.4"
+    Requirement := "MFA SHALL be required for all users"
+
+    Output := tests with input as {
+        "conditional_access_policies": [
+            {
+                "Conditions": {
+                    "Applications": {
+                        "IncludeApplications": ["All"]
+                    },
+                    "Users": {
+                        "IncludeUsers": ["All"],
+                        "ExcludeUsers": [],
+                        "IncludeGroups": ["All"],
+                        "ExcludeGroups": [],
+                        "IncludeRoles": ["All"],
+                        "ExcludeRoles": ["8bc7c6ee-39a2-42a5-a31b-f77fb51db652"]
                     }
                 },
                 "GrantControls": {
@@ -110,7 +305,12 @@ test_BuiltInControls_Incorrect if {
                         "IncludeApplications": ["All"]
                     },
                     "Users": {
-                        "IncludeUsers": ["All"]
+                        "IncludeUsers": ["All"],
+                        "ExcludeUsers": [],
+                        "IncludeGroups": ["All"],
+                        "ExcludeGroups": [],
+                        "IncludeRoles": ["All"],
+                        "ExcludeRoles": []
                     }
                 },
                 "GrantControls": {
@@ -141,7 +341,12 @@ test_State_Incorrect if {
                         "IncludeApplications": ["All"]
                     },
                     "Users": {
-                        "IncludeUsers": ["All"]
+                        "IncludeUsers": ["All"],
+                        "ExcludeUsers": [],
+                        "IncludeGroups": ["All"],
+                        "ExcludeGroups": [],
+                        "IncludeRoles": ["All"],
+                        "ExcludeRoles": []
                     }
                 },
                 "GrantControls": {
