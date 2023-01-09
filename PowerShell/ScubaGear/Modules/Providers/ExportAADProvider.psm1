@@ -43,6 +43,11 @@ function Export-AADProvider {
     # like it does arrays (just observe the difference in output between
     # "@{} | ConvertTo-Json" and
     # "@() | ConvertTo-Json" )
+    $PrivilegedUsers = if ($null -eq $PrivilegedUsers) {"{}"} else {$PrivilegedUsers}
+    # While ConvertTo-Json won't mess up a dict as described in the above comment, 
+    # on error, $TryCommand returns an empty list, not a dictionary. The if/else 
+    # above corrects the $null ConvertTo-Json would return in that case to an empty
+    # dictionary
 
     # 2.13 support for role ID and display name mapping
     # 2.14 - 2.16 Azure AD PIM role settings
