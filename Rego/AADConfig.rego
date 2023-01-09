@@ -415,18 +415,45 @@ tests[{
 #
 # Baseline 2.7: Policy 3
 #--
+AllConsentSettings[{
+    "SettingsGroup": SettingGroup.DisplayName,
+    "Name": Setting.Name,
+    "Value": Setting.Value
+}] {
+    SettingGroup := input.directory_settings[_]
+    Setting := SettingGroup.Values[_]
+    Setting.Name == "EnableGroupSpecificConsent"
+}
+
+GoodConsentSettings[{
+    "SettingsGroup": Setting.SettingsGroup,
+    "Name": Setting.Name,
+    "Value": Setting.Value
+}] {
+    Setting := AllConsentSettings[_]
+    Setting.Value == "false"
+}
+
+BadConsentSettings[{
+    "SettingsGroup": Setting.SettingsGroup,
+    "Name": Setting.Name,
+    "Value": Setting.Value
+}] {
+    Setting := AllConsentSettings[_]
+    Setting.Value == "true"
+}
+
 tests[{
     "Requirement" : "Group owners SHALL NOT be allowed to consent to third-party applications",
     "Control" : "AAD 2.7",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-MgDirectorySetting"],
-    "ActualValue" : Setting.Value,
+    "ActualValue" : AllConsentSettings,
     "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
-    Setting := input.directory_settings[_].Values[_]
-    Setting.Name == "EnableGroupSpecificConsent"
-    Status := Setting.Value == "false"
+    Conditions := [count(BadConsentSettings) == 0, count(GoodConsentSettings) > 0]
+    Status := count([Condition | Condition = Conditions[_]; Condition == false]) == 0
 }
 #--
 
