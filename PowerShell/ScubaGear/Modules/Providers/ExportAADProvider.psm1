@@ -44,8 +44,8 @@ function Export-AADProvider {
     # "@{} | ConvertTo-Json" and
     # "@() | ConvertTo-Json" )
     $PrivilegedUsers = if ($null -eq $PrivilegedUsers) {"{}"} else {$PrivilegedUsers}
-    # While ConvertTo-Json won't mess up a dict as described in the above comment, 
-    # on error, $TryCommand returns an empty list, not a dictionary. The if/else 
+    # While ConvertTo-Json won't mess up a dict as described in the above comment,
+    # on error, $TryCommand returns an empty list, not a dictionary. The if/else
     # above corrects the $null ConvertTo-Json would return in that case to an empty
     # dictionary
 
