@@ -23,7 +23,7 @@ function Export-AADProvider {
 
     # Get a list of the tenant's provisioned service plans - used to see if the tenant has AAD premium p2 license required for some checks
     # The Rego looks at the service_plans in the JSON
-    $ServicePlans = $Tracker.TryCommand("Get-MgSubscribedSku", @{"fakeparm"="hi"}).ServicePlans | Where-Object -Property ProvisioningStatus -eq -Value "Success"
+    $ServicePlans = $Tracker.TryCommand("Get-MgSubscribedSku").ServicePlans | Where-Object -Property ProvisioningStatus -eq -Value "Success"
 
     if ($ServicePlans) {
         # The RequiredServicePlan variable is used so that PIM Cmdlets are only executed if the tenant has the premium license
