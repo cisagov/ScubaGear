@@ -123,6 +123,7 @@ test_Value_Correct if {
     Output := tests with input as {
         "directory_settings": [
             {
+                "DisplayName" : "Setting display name",
                 "Values" : [
                     {
                         "Name" : "EnableGroupSpecificConsent",
@@ -147,6 +148,7 @@ test_Value_Incorrect if {
     Output := tests with input as {
         "directory_settings": [
             {
+                "DisplayName" : "Setting display name",
                 "Values" : [
                     {
                         "Name" : "EnableGroupSpecificConsent",
