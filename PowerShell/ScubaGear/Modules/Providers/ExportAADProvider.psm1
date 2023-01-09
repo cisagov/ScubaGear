@@ -23,41 +23,51 @@ function Export-AADProvider {
 
     # Get a list of the tenant's provisioned service plans - used to see if the tenant has AAD premium p2 license required for some checks
     # The Rego looks at the service_plans in the JSON
-    $ServicePlans = $Tracker.TryCommand("Get-MgSubscribedSku").ServicePlans | Where-Object -Property ProvisioningStatus -eq -Value "Success" -ErrorAction Stop
-    # The RequiredServicePlan variable is used so that PIM Cmdlets are only executed if the tenant has the premium license
-    $RequiredServicePlan = $ServicePlans | Where-Object -Property ServicePlanName -eq -Value "AAD_PREMIUM_P2"
+    $ServicePlans = $Tracker.TryCommand("Get-MgSubscribedSku", @{"fakeparm"="hi"}).ServicePlans | Where-Object -Property ProvisioningStatus -eq -Value "Success"
+
+    if ($ServicePlans) {
+        # The RequiredServicePlan variable is used so that PIM Cmdlets are only executed if the tenant has the premium license
+        $RequiredServicePlan = $ServicePlans | Where-Object -Property ServicePlanName -eq -Value "AAD_PREMIUM_P2"
+
+        # A list of privileged users and their role assignments is used for 2.11 and 2.12
+        # If the tenant has the premium license then we want to process PIM Eligible role assignments - otherwise we don't to avoid an error
+        if ($RequiredServicePlan) {
+            $PrivilegedUsers = $Tracker.TryCommand("Get-PrivilegedUser", @{"TenantHasPremiumLicense"=$true})
+        }
+        else{
+            $PrivilegedUsers = $Tracker.TryCommand("Get-PrivilegedUser")
+        }
+        $PrivilegedUsers = $PrivilegedUsers | ConvertTo-Json
+        # The above Converto-Json call doesn't need to have the input wrapped in an
+        # array (e.g, "ConvertTo-Json (@PrivilegedUsers)") because $PrivilegedUsers is
+        # a dictionary, not an array, and ConvertTo-Json doesn't mess up dictionaries
+        # like it does arrays (just observe the difference in output between
+        # "@{} | ConvertTo-Json" and
+        # "@() | ConvertTo-Json" )
+        $PrivilegedUsers = if ($null -eq $PrivilegedUsers) {"{}"} else {$PrivilegedUsers}
+        # While ConvertTo-Json won't mess up a dict as described in the above comment,
+        # on error, $TryCommand returns an empty list, not a dictionary. The if/else
+        # above corrects the $null ConvertTo-Json would return in that case to an empty
+        # dictionary
+
+        # 2.13 support for role ID and display name mapping
+        # 2.14 - 2.16 Azure AD PIM role settings
+        if ($RequiredServicePlan){
+            $PrivilegedRoles = $Tracker.TryCommand("Get-PrivilegedRole", @{"TenantHasPremiumLicense"=$true})
+        }
+        else {
+            $PrivilegedRoles = $Tracker.TryCommand("Get-PrivilegedRole")
+        }
+        $PrivilegedRoles = ConvertTo-Json -Depth 10 @($PrivilegedRoles) # Depth required to get policy rule object details
+    }
+    else {
+        Write-Warning "Omitting calls to Get-PrivilegedRole and Get-PrivilegedUser."
+        $PrivilegedUsers = ConvertTo-Json @()
+        $PrivilegedRoles = ConvertTo-Json @()
+        $Tracker.AddUnSuccessfulCommand("Get-PrivilegedRole")
+        $Tracker.AddUnSuccessfulCommand("Get-PrivilegedUser")
+    }
     $ServicePlans = ConvertTo-Json -Depth 3 @($ServicePlans)
-
-    # A list of privileged users and their role assignments is used for 2.11 and 2.12
-    # If the tenant has the premium license then we want to process PIM Eligible role assignments - otherwise we don't to avoid an error
-    if ($RequiredServicePlan) {
-        $PrivilegedUsers = $Tracker.TryCommand("Get-PrivilegedUser", @{"TenantHasPremiumLicense"=$true})
-    }
-    else{
-        $PrivilegedUsers = $Tracker.TryCommand("Get-PrivilegedUser")
-    }
-    $PrivilegedUsers = $PrivilegedUsers | ConvertTo-Json
-    # The above Converto-Json call doesn't need to have the input wrapped in an
-    # array (e.g, "ConvertTo-Json (@PrivilegedUsers)") because $PrivilegedUsers is
-    # a dictionary, not an array, and ConvertTo-Json doesn't mess up dictionaries
-    # like it does arrays (just observe the difference in output between
-    # "@{} | ConvertTo-Json" and
-    # "@() | ConvertTo-Json" )
-    $PrivilegedUsers = if ($null -eq $PrivilegedUsers) {"{}"} else {$PrivilegedUsers}
-    # While ConvertTo-Json won't mess up a dict as described in the above comment,
-    # on error, $TryCommand returns an empty list, not a dictionary. The if/else
-    # above corrects the $null ConvertTo-Json would return in that case to an empty
-    # dictionary
-
-    # 2.13 support for role ID and display name mapping
-    # 2.14 - 2.16 Azure AD PIM role settings
-    if ($RequiredServicePlan){
-        $PrivilegedRoles = $Tracker.TryCommand("Get-PrivilegedRole", @{"TenantHasPremiumLicense"=$true})
-    }
-    else{
-        $PrivilegedRoles = $Tracker.TryCommand("Get-PrivilegedRole")
-    }
-    $PrivilegedRoles = ConvertTo-Json -Depth 10 @($PrivilegedRoles) # Depth required to get policy rule object details
 
     # 2.6, 2.7, & 2.18 1st/3rd Policy Bullets
     $AuthZPolicies = ConvertTo-Json @($Tracker.TryCommand("Get-MgPolicyAuthorizationPolicy"))
