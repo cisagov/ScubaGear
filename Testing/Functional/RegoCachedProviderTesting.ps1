@@ -55,7 +55,21 @@ $RunCachedParams = @{
     'Quiet' = $Quiet;
 }
 
-Set-Location $(Split-Path -Path $pwd)
+function Get-Root {
+    param (
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [String]$location
+    )
+
+    if($(Split-Path -Path $location | Split-Path -Leaf) -eq 'ScubaGear') {
+        return Split-Path -Path $location
+    }
+
+    return Get-Root $(Split-Path -Path $location)
+}
+
+Set-Location $(Get-Root $pwd)
 $ManifestPath = Join-Path -Path "./PowerShell" -ChildPath "ScubaGear"
 Remove-Module "ScubaGear" -ErrorAction "SilentlyContinue" # For dev work
 #######
