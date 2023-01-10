@@ -25,11 +25,9 @@ function Export-PowerPlatformProvider {
     }
 
     # 2.1
-    # old $EnvironmentCreation = Get-TenantSettings | ConvertTo-Json
     $EnvironmentCreation = ConvertTo-Json @($Tracker.TryCommand("Get-TenantSettings"))
 
     # 2.2
-    # $EnvironmentList = Get-AdminPowerAppEnvironment | ConvertTo-Json
     $EnvironmentList = ConvertTo-Json @($Tracker.TryCommand("Get-AdminPowerAppEnvironment"))
 
     # Sanity check
@@ -37,14 +35,11 @@ function Export-PowerPlatformProvider {
         $EnvironmentList = @()
         $Tracker.AddUnSuccessfulCommand("Get-AdminPowerAppEnvironment")
     }
-    # $DLPPolicy = Get-DlpPolicy
     $DLPPolicies = ConvertTo-Json -Depth 7 @($Tracker.TryCommand("Get-DlpPolicy"))
-    #$DLPPolicies = ConvertTo-Json -Depth 7 $DLPPolicy
 
     # 2.3
-
-    $TenantIsolation = ConvertTo-Json @()
     # has to be tested manually because of http 403 errors
+    $TenantIsolation = ConvertTo-Json @()
     try {
         $TenantIso = Get-PowerAppTenantIsolationPolicy -TenantID $TenantID -ErrorAction "Stop"
         if ($TenantIso.StatusCode) {
