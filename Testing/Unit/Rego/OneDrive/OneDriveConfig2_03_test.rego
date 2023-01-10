@@ -12,7 +12,7 @@ test_DefaultLinkPermission_Correct if {
     Output := tests with input as {
         "SPO_tenant_info": [
             {
-                "DefaultLinkPermission" : 1
+                "DefaultLinkPermission" : 1,
                 "OneDriveSharingCapability":  1
             }
         ]
