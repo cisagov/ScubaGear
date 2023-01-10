@@ -92,6 +92,7 @@ tests[{
 DefaultLinkPermissionPolicy[Policy]{
     Policy := input.SPO_tenant_info[_]
     Policy.DefaultLinkPermission == 1
+    Policy.OneDriveSharingCapability == 1
 }
 
 tests[{
