@@ -69,7 +69,7 @@ function Get-Root {
     return Get-Root $(Split-Path -Path $location)
 }
 
-Set-Location $(Get-Root $pwd)
+Set-Location $(Get-Root  $PSScriptRoot)
 $ManifestPath = Join-Path -Path "./PowerShell" -ChildPath "ScubaGear"
 Remove-Module "ScubaGear" -ErrorAction "SilentlyContinue" # For dev work
 #######
