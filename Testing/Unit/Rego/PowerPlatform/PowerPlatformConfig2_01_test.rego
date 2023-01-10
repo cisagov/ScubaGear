@@ -10,9 +10,10 @@ test_disableProductionEnvironmentCreationByNonAdminUsers_Correct if {
     Requirement := "The ability to create production and sandbox environments SHALL be restricted to admins"
 
     Output := tests with input as {
-        "environment_creation": {
+
+        "environment_creation": [{
             "disableEnvironmentCreationByNonAdminUsers" : true
-        }
+        }]
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
@@ -27,9 +28,9 @@ test_disableProductionEnvironmentCreationByNonAdminUsers_Incorrect if {
     Requirement := "The ability to create production and sandbox environments SHALL be restricted to admins"
 
     Output := tests with input as {
-        "environment_creation": {
+        "environment_creation": [{
             "disableEnvironmentCreationByNonAdminUsers" : false
-        }
+        }]
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]

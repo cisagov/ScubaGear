@@ -10,11 +10,11 @@ test_isDisabled_Correct if {
     Requirement := "Power Platform tenant isolation SHALL be enabled"
 
     Output := tests with input as {
-        "tenant_isolation": {
+        "tenant_isolation": [{
             "properties" : {
                 "isDisabled" : false
             } 
-        }
+        }]
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
@@ -29,11 +29,11 @@ test_isDisabled_Incorrect if {
     Requirement := "Power Platform tenant isolation SHALL be enabled"
 
     Output := tests with input as {
-        "tenant_isolation": {
+        "tenant_isolation": [{
             "properties" : {
                 "isDisabled" : true
             } 
-        }
+        }]
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]

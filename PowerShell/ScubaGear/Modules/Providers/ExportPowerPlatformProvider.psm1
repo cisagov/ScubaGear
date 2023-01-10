@@ -8,33 +8,63 @@ function Export-PowerPlatformProvider {
     Internal
     #>
 
+    $HelperFolderPath = Join-Path -Path $PSScriptRoot -ChildPath "ProviderHelpers"
+    Import-Module (Join-Path -Path $HelperFolderPath -ChildPath "CommandTracker.psm1")
+    $Tracker = Get-CommandTracker
+
     # Manually importing the module name here to bypass cmdlet name conflicts
     # There are conflicting PowerShell Cmdlet names in EXO and Power Platform
     Import-Module Microsoft.PowerApps.Administration.PowerShell -DisableNameChecking
 
-    $TenantDetails = Get-TenantDetailsFromGraph
-    $TenantID = $TenantDetails.TenantId
+    $TenantDetails = $Tracker.TryCommand("Get-TenantDetailsFromGraph")
+    if ($TenantDetails.Count -gt 0) {
+        $TenantID = $TenantDetails.TenantId
+    }
+    else {
+        $TenantID = ""
+    }
 
     # 2.1
-    $EnvironmentCreation = Get-TenantSettings | ConvertTo-Json
+    # old $EnvironmentCreation = Get-TenantSettings | ConvertTo-Json
+    $EnvironmentCreation = ConvertTo-Json @($Tracker.TryCommand("Get-TenantSettings"))
 
     # 2.2
-    $EnvironmentList = Get-AdminPowerAppEnvironment | ConvertTo-Json
-    $DLPPolicy = Get-DlpPolicy
-    $DLPPolicies = ConvertTo-Json -Depth 7 $DLPPolicy
+    # $EnvironmentList = Get-AdminPowerAppEnvironment | ConvertTo-Json
+    $EnvironmentList = ConvertTo-Json @($Tracker.TryCommand("Get-AdminPowerAppEnvironment"))
 
-    if (!$EnvironmentList) {
-        $EnvironmentList = '"error"'
+    # Sanity check
+    if (-not $EnvironmentList) {
+        $EnvironmentList = @()
+        $Tracker.AddUnSuccessfulCommand("Get-AdminPowerAppEnvironment")
     }
-
-    if (!$DLPPolicies) {
-        $DLPPolicies = '"error"'
-    }
+    # $DLPPolicy = Get-DlpPolicy
+    $DLPPolicies = ConvertTo-Json -Depth 7 @($Tracker.TryCommand("Get-DlpPolicy"))
+    #$DLPPolicies = ConvertTo-Json -Depth 7 $DLPPolicy
 
     # 2.3
-    $TenantIsolation = Get-PowerAppTenantIsolationPolicy -TenantID $TenantID | ConvertTo-Json
 
-    # 2.4 no UI for enabling content security according to doc
+    $TenantIsolation = ConvertTo-Json @()
+    # has to be tested manually because of http 403 errors
+    try {
+        $TenantIso = Get-PowerAppTenantIsolationPolicy -TenantID $TenantID -ErrorAction "Stop"
+        if ($TenantIso.StatusCode) {
+            $Tracker.AddUnSuccessfulCommand("Get-PowerAppTenantIsolationPolicy")
+            throw "HTTP ERROR"
+        }
+        else {
+            $Tracker.AddSuccessfulCommand("Get-PowerAppTenantIsolationPolicy")
+            $TenantIsolation = ConvertTo-Json @($TenantIso)
+        }
+    }
+    catch {
+        Write-Warning "Error running Get-PowerAppTenantIsolationPolicy. You do not have the proper permissions (Gloabal Admin nor Power Platfrom Adminstrator) or lack a Power Platform for Office 365 license."
+    }
+
+    # 2.4 currently has no corresponding PowerShell Cmdlet
+
+    $PowerPlatformSuccessfulCommands = ConvertTo-Json @($Tracker.GetSuccessfulCommands())
+    $PowerPlatformUnSuccessfulCommands = ConvertTo-Json @($Tracker.GetUnSuccessfulCommands())
+
     # tenant_id added for testing purposes
     # Note the spacing and the last comma in the json is important
     $json = @"
@@ -44,6 +74,8 @@ function Export-PowerPlatformProvider {
     "dlp_policies": $DLPPolicies,
     "tenant_isolation": $TenantIsolation,
     "environment_list": $EnvironmentList,
+    "powerplatform_successful_commands": $PowerPlatformSuccessfulCommands,
+    "powerplatform_unsuccessful_commands": $PowerPlatformUnSuccessfulCommands,
 "@
 
     # We need to remove the backslash characters from the
@@ -51,7 +83,6 @@ function Export-PowerPlatformProvider {
     $json = $json.replace("\`"", "'")
     $json = $json.replace("\", "")
     $json = $json -replace "[^\x00-\x7f]","" # remove all characters that are not utf-8
-    # https://stackoverflow.com/questions/64093078/how-to-find-unicode-characters-that-are-not-utf8-in-vs-code
     $json
 }
 

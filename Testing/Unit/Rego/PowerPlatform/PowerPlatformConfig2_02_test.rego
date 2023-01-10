@@ -11,14 +11,14 @@ test_name_Correct if {
 
     Output := tests with input as {
         "tenant_id": "Test Id",
-        "dlp_policies": {
+        "dlp_policies": [{
             "value":  [{
                 "displayName":  "Block Third-Party Connectors",
                 "environments":  [{
                     "name":  "Default-Test Id"
                 }]
             }]
-        }
+        }]
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
@@ -34,14 +34,14 @@ test_name_Incorrect if {
 
     Output := tests with input as {
         "tenant_id": "Test Id",
-        "dlp_policies": {
+        "dlp_policies": [{
             "value":  [{
                 "displayName":  "Block Third-Party Connectors",
                 "environments":  [{
                     "name":  "NotDefault-Test Id"
                 }]
             }]
-        }
+        }]
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
@@ -59,14 +59,14 @@ test_environment_list_Correct if {
     Requirement := "Non-default environments SHOULD have at least one DLP policy that affects them"
 
     Output := tests with input as {
-        "dlp_policies": {
+        "dlp_policies": [{
             "value":  [{
                 "displayName":  "Block Third-Party Connectors",
                 "environments":  [{
                     "name":  "Default-Test Id"
                 }]
             }]
-        },
+        }],
         "environment_list": [{
             "EnvironmentName":  "Default-Test Id"
         }]
@@ -84,14 +84,14 @@ test_environment_list_Incorrect if {
     Requirement := "Non-default environments SHOULD have at least one DLP policy that affects them"
 
     Output := tests with input as {
-        "dlp_policies": {
+        "dlp_policies": [{
             "value":  [{
                 "displayName":  "Block Third-Party Connectors",
                 "environments":  [{
                     "name":  "Default-Test Id"
                 }]
             }]
-        },
+        }],
         "environment_list": [{
             "EnvironmentName":  "Default-Test Id"
 
@@ -118,7 +118,7 @@ test_classification_Correct_V1 if {
 
     Output := tests with input as {
         "tenant_id": "Test Id",
-        "dlp_policies": {
+        "dlp_policies": [{
             "value":  [{
                 "connectorGroups":  [{
                     "classification":  "Confidential",
@@ -130,7 +130,7 @@ test_classification_Correct_V1 if {
                     "name":  "Default-Test Id"
                 }]
             }]
-        }
+        }]
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
@@ -146,7 +146,7 @@ test_classification_Correct_V2 if {
 
     Output := tests with input as {
         "tenant_id": "Test Id",
-        "dlp_policies": {
+        "dlp_policies": [{
             "value":  [{
                 "connectorGroups":  [{
                     "classification":  "General",
@@ -158,7 +158,7 @@ test_classification_Correct_V2 if {
                     "name":  "Default-Test Id"
                 }]
             }]
-        }
+        }]
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
@@ -174,7 +174,7 @@ test_connectorGroups_Correct if {
 
     Output := tests with input as {
         "tenant_id": "Test Id",
-        "dlp_policies": {
+        "dlp_policies": [{
             "value":  [{
                 "connectorGroups":  [{
                     "classification":  "Confidential",
@@ -192,7 +192,7 @@ test_connectorGroups_Correct if {
                     "name":  "Default-Test Id"
                 }]
             }]
-        }
+        }]
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
@@ -208,7 +208,7 @@ test_classification_Incorrect_V1 if {
 
     Output := tests with input as {
         "tenant_id": "Test Id",
-        "dlp_policies": {
+        "dlp_policies": [{
             "value":  [{
                 "connectorGroups":  [{
                     "classification":  "Confidential",
@@ -220,7 +220,7 @@ test_classification_Incorrect_V1 if {
                     "name":  "Default-Test Id"
                 }]
             }]
-        }
+        }]
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
@@ -236,7 +236,7 @@ test_classification_Incorrect_V2 if {
 
     Output := tests with input as {
         "tenant_id": "Test Id",
-        "dlp_policies": {
+        "dlp_policies": [{
             "value":  [{
                 "connectorGroups":  [{
                     "classification":  "General",
@@ -248,7 +248,7 @@ test_classification_Incorrect_V2 if {
                     "name":  "Default-Test Id"
                 }]
             }]
-        }
+        }]
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
@@ -264,7 +264,7 @@ test_connectorGroups_Incorrect if {
 
     Output := tests with input as {
         "tenant_id": "Test Id",
-        "dlp_policies": {
+        "dlp_policies": [{
             "value":  [{
                 "connectorGroups":  [{
                     "classification":  "Confidential",
@@ -282,7 +282,7 @@ test_connectorGroups_Incorrect if {
                     "name":  "Default-Test Id"
                 }]
             }]
-        }
+        }]
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]

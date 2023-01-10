@@ -42,12 +42,12 @@ tests[{
     "Requirement" : "The ability to create production and sandbox environments SHALL be restricted to admins",
     "Control" : "Power Platform 2.1",
     "Criticality" : "Shall",
-    "Commandlet" : "Get-TenantSettings",
+    "Commandlet" : ["Get-TenantSettings"],
     "ActualValue" : EnvironmentCreation.disableEnvironmentCreationByNonAdminUsers,
     "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
-    EnvironmentCreation := input.environment_creation
+    EnvironmentCreation := input.environment_creation[_]
     Status := EnvironmentCreation.disableEnvironmentCreationByNonAdminUsers == true
 }
 #--
@@ -79,11 +79,10 @@ tests[{
 #--
 DefaultEnvPolicies[{"PolicyName" : Policy.displayName}]{
     TenantId := input.tenant_id
-    DlpPolicies := input.dlp_policies
+    DlpPolicies := input.dlp_policies[_]
     Policy := DlpPolicies.value[_]
     Env := Policy.environments[_]
     Env.name == concat("-", ["Default", TenantId])
-
 }
 
 # Note: there is only one default environment per tenant and it cannot be deleted or backed up
@@ -91,7 +90,7 @@ tests[{
     "Requirement" : "A DLP policy SHALL be created to restrict connector access in the default Power Platform environment",
     "Control" : "Power Platform 2.2",
     "Criticality" : "Shall",
-    "Commandlet" : "Get-DlpPolicy",
+    "Commandlet" : ["Get-DlpPolicy"],
     "ActualValue" : DefaultEnvPolicies,
     "ReportDetails" : ReportDetailsString(Status, ErrorMessage),
     "RequirementMet" : Status
@@ -112,7 +111,7 @@ AllEnvironments [{ "EnvName" : EnvName }] {
 
 # gets the list of all environments with policies applied to them
 EnvWithPolicies [{"EnvName" : PolicyEnvName }] {
-    DlpPolicies := input.dlp_policies
+    DlpPolicies := input.dlp_policies[_]
     Policy := DlpPolicies.value[_]
     Env := Policy.environments[_]
     PolicyEnvName := Env.name
@@ -130,7 +129,7 @@ tests[{
     "Requirement" : "Non-default environments SHOULD have at least one DLP policy that affects them",
     "Control" : "Power Platform 2.2",
     "Criticality" : "Should",
-    "Commandlet" : "Get-DlpPolicy",
+    "Commandlet" : ["Get-DlpPolicy"],
     "ActualValue" : EnvWithoutPolicies,
     "ReportDetails" : ReportDetailsArray(Status, EnvWithoutPolicies, ErrorMessage),
     "RequirementMet" : Status
@@ -147,7 +146,7 @@ tests[{
 # general and confidential groups refer to business and non-business
 ConnectorSet[Connector.id] {
     TenantId := input.tenant_id
-    DlpPolicies := input.dlp_policies
+    DlpPolicies := input.dlp_policies[_]
     Policy := DlpPolicies.value[_]
     Env := Policy.environments[_]
     Group := Policy.connectorGroups[_]
@@ -188,10 +187,10 @@ AllowedInBaseline := {
 }
 
 tests[{
-    "Requirement" : "All connectors except those listed...[see Power Platform secure baseline for list]...SHOULD be added to the Blocked category in the default environment policy",
+    "Requirement" : "All connectors except those listed...[see Power Platform secure configuration baseline for list]...SHOULD be added to the Blocked category in the default environment policy",
     "Control" : "Power Platform 2.2",
     "Criticality" : "Should",
-    "Commandlet" : "Get-DlpPolicy",
+    "Commandlet" : ["Get-DlpPolicy"],
     "ActualValue" : RogueConnectors,
     "ReportDetails" : ReportDetailsArray(Status, RogueConnectors, ErrorMessage),
     "RequirementMet" : Status
@@ -214,13 +213,46 @@ tests[{
     "Requirement" : "Power Platform tenant isolation SHALL be enabled",
     "Control" : "Power Platform 2.3",
     "Criticality" : "Shall",
-    "Commandlet" : "Get-PowerAppTenantIsolationPolicy",
+    "Commandlet" : ["Get-PowerAppTenantIsolationPolicy"],
     "ActualValue" : TenantIsolation.properties.isDisabled,
     "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
-    TenantIsolation := input.tenant_isolation
+    TenantIsolation := input.tenant_isolation[_]
     Status := TenantIsolation.properties.isDisabled == false
+}
+#--
+
+#
+# Baseline 2.3: Policy 1
+#--
+tests[{
+    "Requirement" : "Power Platform tenant isolation SHALL be enabled",
+    "Control" : "Power Platform 2.3",
+    "Criticality" : "Shall",
+    "Commandlet" : ["Get-PowerAppTenantIsolationPolicy"],
+    "ActualValue" : TenantIsolation.properties.isDisabled,
+    "ReportDetails" : ReportDetailsBoolean(Status),
+    "RequirementMet" : Status
+}] {
+    TenantIsolation := input.tenant_isolation[_]
+    Status := TenantIsolation.properties.isDisabled == false
+}
+#--
+
+#
+# Baseline 2.3: Policy 1 Fail
+#--
+tests[{
+    "Requirement" : "Power Platform tenant isolation SHALL be enabled",
+    "Control" : "Power Platform 2.3",
+    "Criticality" : "Shall",
+    "Commandlet" : ["Get-PowerAppTenantIsolationPolicy"],
+    "ActualValue" : "PowerShell Error",
+    "ReportDetails" : "PowerShell Error",
+    "RequirementMet" : false
+}] {
+    count(input.tenant_isolation) <= 0
 }
 #--
 
@@ -232,7 +264,7 @@ tests[{
     "Requirement" : "An inbound/outbound connection allowlist SHOULD be configured",
     "Control" : "Power Platform 2.3",
     "Criticality" : "Should/Not-Implemented",
-    "Commandlet" : "",
+    "Commandlet" : [],
     "ActualValue" : [],
     "ReportDetails" : "Currently cannot be checked automatically. See Power Platform Secure Configuration Baseline policy 2.3 for instructions on manual check",
     "RequirementMet" : false
@@ -254,7 +286,7 @@ tests[{
     "Requirement" : "Content security policies for model-driven Power Apps SHALL be enabled",
     "Control" : "Power Platform 2.4",
     "Criticality" : "Shall/Not-Implemented",
-    "Commandlet" : "",
+    "Commandlet" : [],
     "ActualValue" : [],
     "ReportDetails" : "Currently cannot be checked automatically. See Power Platform Secure Configuration Baseline policy 2.4 for instructions on manual check",
     "RequirementMet" : false
