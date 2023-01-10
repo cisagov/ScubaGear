@@ -62,7 +62,7 @@ function Get-Root {
         [String]$location
     )
 
-    if($(Split-Path -Path $location | Split-Path -Leaf) -eq 'ScubaGear') {
+    if($(Split-Path -Path $location | Split-Path -Leaf) -contains 'ScubaGear') {
         return Split-Path -Path $location
     }
 
