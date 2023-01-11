@@ -7,7 +7,7 @@ import future.keywords
 #--
 test_DefaultLinkPermission_Correct if {
     ControlNumber := "OneDrive 2.3"
-    Requirement := "Anyone link permissions SHOULD be limited to View"
+    Requirement := "Anyone file and folder permissions SHOULD be limited to View"
 
     Output := tests with input as {
         "SPO_tenant_info": [
@@ -27,7 +27,7 @@ test_DefaultLinkPermission_Correct if {
 
 test_DefaultLinkPermission_Incorrect if {
     ControlNumber := "OneDrive 2.3"
-    Requirement := "Anyone link permissions SHOULD be limited to View"
+    Requirement := "Anyone file and folder permissions SHOULD be limited to View"
 
     Output := tests with input as {
         "SPO_tenant_info": [
@@ -47,7 +47,7 @@ test_DefaultLinkPermission_Incorrect if {
 
 test_DefaultLinkPermission_Incorrect_V2 if {
     ControlNumber := "OneDrive 2.3"
-    Requirement := "Anyone link permissions SHOULD be limited to View"
+    Requirement := "Anyone file and folder permissions SHOULD be limited to View"
 
     Output := tests with input as {
         "SPO_tenant_info": [
@@ -67,7 +67,7 @@ test_DefaultLinkPermission_Incorrect_V2 if {
 
 test_DefaultLinkPermission_Incorrect_V3 if {
     ControlNumber := "OneDrive 2.3"
-    Requirement := "Anyone link permissions SHOULD be limited to View"
+    Requirement := "Anyone file and folder permissions SHOULD be limited to View"
 
     Output := tests with input as {
         "SPO_tenant_info": [
