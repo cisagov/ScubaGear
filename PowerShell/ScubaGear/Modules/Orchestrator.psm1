@@ -317,7 +317,7 @@ function Invoke-ProviderList {
                     $RetVal = Export-DefenderProvider -M365Environment $M365Environment  | Select-Object -Last 1
                 }
                 "powerplatform" {
-                    $RetVal = Export-PowerPlatformProvider | Select-Object -Last 1
+                    $RetVal = Export-PowerPlatformProvider -M365Environment $M365Environment | Select-Object -Last 1
                 }
                 "onedrive" {
                     $RetVal = Export-OneDriveProvider -M365Environment $M365Environment | Select-Object -Last 1
