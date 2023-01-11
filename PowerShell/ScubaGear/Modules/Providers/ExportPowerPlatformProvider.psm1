@@ -35,7 +35,23 @@ function Export-PowerPlatformProvider {
         $EnvironmentList = @()
         $Tracker.AddUnSuccessfulCommand("Get-AdminPowerAppEnvironment")
     }
-    $DLPPolicies = ConvertTo-Json -Depth 7 @($Tracker.TryCommand("Get-DlpPolicy"))
+
+    # has to be tested manually because of http 403 errors
+    $DLPPolicies = ConvertTo-Json @()
+    try {
+        $DLPPolicies = Get-DlpPolicy -ErrorAction "Stop"
+        if ($DLPPolicies.StatusCode) {
+            $Tracker.AddUnSuccessfulCommand("Get-DlpPolicy")
+            throw "HTTP ERROR"
+        }
+        else {
+            $DLPPolicies = ConvertTo-Json -Depth 7 @($DLPPolicies)
+            $Tracker.AddSuccessfulCommand("Get-DlpPolicy")
+        }
+    }
+    catch {
+        Write-Warning "Error running Get-DlpPolicy. $($_). If HTTP ERROR is thrown then this is because you do not have the proper permissions (Global Admin nor Power Platform Administrator with Power Apps for Office 365 License)"
+    }
 
     # 2.3
     # has to be tested manually because of http 403 errors
@@ -52,7 +68,7 @@ function Export-PowerPlatformProvider {
         }
     }
     catch {
-        Write-Warning "Error running Get-PowerAppTenantIsolationPolicy. You do not have the proper permissions (Gloabal Admin nor Power Platfrom Adminstrator) or lack a Power Platform for Office 365 license."
+        Write-Warning "Error running Get-PowerAppTenantIsolationPolicy. $($_). If HTTP ERROR is thrown then this is because you do not have the proper permissions (Global Admin nor Power Platform Administrator with Power Apps for Office 365 License)"
     }
 
     # 2.4 currently has no corresponding PowerShell Cmdlet

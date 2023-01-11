@@ -52,8 +52,23 @@ tests[{
 }
 #--
 
+# Baseline 2.1: Policy 1 PoSh Error
+#--
+tests[{
+    "Requirement" : "The ability to create additional environments SHALL be restricted to admins",
+    "Control" : "Power Platform 2.1",
+    "Criticality" : "Shall",
+    "Commandlet" : ["Get-TenantSettings"],
+    "ActualValue" : "PowerShell Error",
+    "ReportDetails" : "PowerShell Error",
+    "RequirementMet" : false
+}] {
+    count(input.environment_creation) <= 0
+}
+#--
+
 #
-# Baseline 2.1: Policy 2
+# Baseline 2.1: Policy 2 
 #--
 tests[{
     "Requirement" : "The ability to create trial environments SHALL be restricted to admins",
@@ -64,8 +79,24 @@ tests[{
     "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
-    EnvironmentCreation := input.environment_creation
+    EnvironmentCreation := input.environment_creation[_]
     Status := EnvironmentCreation.disableTrialEnvironmentCreationByNonAdminUsers == true
+}
+#--
+
+#
+# Baseline 2.1: Policy 2 PoSh Error
+#--
+tests[{
+    "Requirement" : "The ability to create trial environments SHALL be restricted to admins",
+    "Control" : "Power Platform 2.1",
+    "Criticality" : "Shall",
+    "Commandlet" : ["Get-TenantSettings"],
+    "ActualValue" : "PowerShell Error",
+    "ReportDetails" : "PowerShell Error",
+    "RequirementMet" : false
+}] {
+    count(input.environment_creation) <= 0
 }
 #--
 
@@ -241,7 +272,7 @@ tests[{
 #--
 
 #
-# Baseline 2.3: Policy 1 Fail
+# Baseline 2.3: Policy 1 PoSh Error
 #--
 tests[{
     "Requirement" : "Power Platform tenant isolation SHALL be enabled",
