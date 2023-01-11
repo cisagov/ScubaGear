@@ -42,7 +42,7 @@ function Export-PowerPlatformProvider {
         $DLPPolicies = Get-DlpPolicy -ErrorAction "Stop"
         if ($DLPPolicies.StatusCode) {
             $Tracker.AddUnSuccessfulCommand("Get-DlpPolicy")
-            throw "HTTP ERROR"
+            throw "$($DLPPolicies.Message) HTTP ERROR"
         }
         else {
             $DLPPolicies = ConvertTo-Json -Depth 7 @($DLPPolicies)
@@ -50,7 +50,7 @@ function Export-PowerPlatformProvider {
         }
     }
     catch {
-        Write-Warning "Error running Get-DlpPolicy. $($_). If HTTP ERROR is thrown then this is because you do not have the proper permissions (Global Admin nor Power Platform Administrator with Power Apps for Office 365 License)"
+        Write-Warning "Error running Get-DlpPolicy: () $($_). <= If HTTP ERROR is thrown then this is because you do not have the proper permissions. Necessary roles: Power Platform Administrator with a Power Apps License or Global Admininstrator"
     }
 
     # 2.3
@@ -60,7 +60,7 @@ function Export-PowerPlatformProvider {
         $TenantIso = Get-PowerAppTenantIsolationPolicy -TenantID $TenantID -ErrorAction "Stop"
         if ($TenantIso.StatusCode) {
             $Tracker.AddUnSuccessfulCommand("Get-PowerAppTenantIsolationPolicy")
-            throw "HTTP ERROR"
+            throw "$($TenantIso.Message) HTTP ERROR"
         }
         else {
             $Tracker.AddSuccessfulCommand("Get-PowerAppTenantIsolationPolicy")
@@ -68,7 +68,7 @@ function Export-PowerPlatformProvider {
         }
     }
     catch {
-        Write-Warning "Error running Get-PowerAppTenantIsolationPolicy. $($_). If HTTP ERROR is thrown then this is because you do not have the proper permissions (Global Admin nor Power Platform Administrator with Power Apps for Office 365 License)"
+        Write-Warning "Error running Get-PowerAppTenantIsolationPolicy: $($_). <= If HTTP ERROR is thrown then this is because you do not have the proper permissions. Necessary roles: Power Platform Administrator with a Power Apps License or Global Admininstrator"
     }
 
     # 2.4 currently has no corresponding PowerShell Cmdlet
@@ -79,7 +79,6 @@ function Export-PowerPlatformProvider {
     # tenant_id added for testing purposes
     # Note the spacing and the last comma in the json is important
     $json = @"
-
     "tenant_id": "$TenantID",
     "environment_creation": $EnvironmentCreation,
     "dlp_policies": $DLPPolicies,
