@@ -8,57 +8,78 @@ function Export-AADProvider {
     Internal
     #>
 
-    try {
-        # The below cmdlet covers the following baselines
-        # - 2.1
-        # - 2.2
-        # - 2.3 First Policy bullet
-        # - 2.4 First Policy bullet
-        # - 2.9
-        # - 2.10
-        # - 2.17 first part
-        $AllPolicies = Get-MgIdentityConditionalAccessPolicy -ErrorAction Stop | ConvertTo-Json -Depth 10
+    Import-Module $PSScriptRoot/ProviderHelpers/CommandTracker.psm1
+    $Tracker = Get-CommandTracker
 
-        # Get a list of the tenant's provisioned service plans - used to see if the tenant has AAD premium p2 license required for some checks
-        # The Rego looks at the service_plans in the JSON
-        $ServicePlans = (Get-MgSubscribedSku).ServicePlans | Where-Object -Property ProvisioningStatus -eq -Value "Success" -ErrorAction Stop
+    # The below cmdlet covers the following baselines
+    # - 2.1
+    # - 2.2
+    # - 2.3 First Policy bullet
+    # - 2.4 First Policy bullet
+    # - 2.9
+    # - 2.10
+    # - 2.17 first part
+    $AllPolicies = ConvertTo-Json -Depth 10 @($Tracker.TryCommand("Get-MgIdentityConditionalAccessPolicy"))
+
+    # Get a list of the tenant's provisioned service plans - used to see if the tenant has AAD premium p2 license required for some checks
+    # The Rego looks at the service_plans in the JSON
+    $ServicePlans = $Tracker.TryCommand("Get-MgSubscribedSku").ServicePlans | Where-Object -Property ProvisioningStatus -eq -Value "Success"
+
+    if ($ServicePlans) {
         # The RequiredServicePlan variable is used so that PIM Cmdlets are only executed if the tenant has the premium license
         $RequiredServicePlan = $ServicePlans | Where-Object -Property ServicePlanName -eq -Value "AAD_PREMIUM_P2"
-        $ServicePlans = $ServicePlans | ConvertTo-Json -Depth 3
 
         # A list of privileged users and their role assignments is used for 2.11 and 2.12
         # If the tenant has the premium license then we want to process PIM Eligible role assignments - otherwise we don't to avoid an error
         if ($RequiredServicePlan) {
-            $PrivilegedUsers = Get-PrivilegedUser -TenantHasPremiumLicense
+            $PrivilegedUsers = $Tracker.TryCommand("Get-PrivilegedUser", @{"TenantHasPremiumLicense"=$true})
         }
         else{
-            $PrivilegedUsers = Get-PrivilegedUser
+            $PrivilegedUsers = $Tracker.TryCommand("Get-PrivilegedUser")
         }
         $PrivilegedUsers = $PrivilegedUsers | ConvertTo-Json
+        # The above Converto-Json call doesn't need to have the input wrapped in an
+        # array (e.g, "ConvertTo-Json (@PrivilegedUsers)") because $PrivilegedUsers is
+        # a dictionary, not an array, and ConvertTo-Json doesn't mess up dictionaries
+        # like it does arrays (just observe the difference in output between
+        # "@{} | ConvertTo-Json" and
+        # "@() | ConvertTo-Json" )
+        $PrivilegedUsers = if ($null -eq $PrivilegedUsers) {"{}"} else {$PrivilegedUsers}
+        # While ConvertTo-Json won't mess up a dict as described in the above comment,
+        # on error, $TryCommand returns an empty list, not a dictionary. The if/else
+        # above corrects the $null ConvertTo-Json would return in that case to an empty
+        # dictionary
 
         # 2.13 support for role ID and display name mapping
         # 2.14 - 2.16 Azure AD PIM role settings
         if ($RequiredServicePlan){
-            $PrivilegedRoles = Get-PrivilegedRole -TenantHasPremiumLicense
+            $PrivilegedRoles = $Tracker.TryCommand("Get-PrivilegedRole", @{"TenantHasPremiumLicense"=$true})
         }
-        else{
-            $PrivilegedRoles = Get-PrivilegedRole
+        else {
+            $PrivilegedRoles = $Tracker.TryCommand("Get-PrivilegedRole")
         }
-        $PrivilegedRoles = $PrivilegedRoles | ConvertTo-Json -Depth 10 # Depth required to get policy rule object details
-
-        # 2.6 & 2.18 1st/3rd Policy Bullets
-        $AuthZPolicies = Get-MgPolicyAuthorizationPolicy -ErrorAction Stop | ConvertTo-Json
-
-        # 2.7 third bullet
-        $DirectorySettings = ConvertTo-Json -Depth 10 @(Get-MgDirectorySetting) -ErrorAction Stop
-
-        # 2.7 Policy Bullet 2]
-        $AdminConsentReqPolicies = Get-MgPolicyAdminConsentRequestPolicy -ErrorAction Stop | ConvertTo-Json
+        $PrivilegedRoles = ConvertTo-Json -Depth 10 @($PrivilegedRoles) # Depth required to get policy rule object details
     }
-    catch {
-        Write-Error "Check the second error message below and if it appears to be related to permissions, your user account must have a minimum of Global Reader role to run this script. You must also get an administrator to consent to the required MS Graph Powershell application permissions. View the README file for detailed instructions and then try again."
-        Throw $_
+    else {
+        Write-Warning "Omitting calls to Get-PrivilegedRole and Get-PrivilegedUser."
+        $PrivilegedUsers = ConvertTo-Json @()
+        $PrivilegedRoles = ConvertTo-Json @()
+        $Tracker.AddUnSuccessfulCommand("Get-PrivilegedRole")
+        $Tracker.AddUnSuccessfulCommand("Get-PrivilegedUser")
     }
+    $ServicePlans = ConvertTo-Json -Depth 3 @($ServicePlans)
+
+    # 2.6, 2.7, & 2.18 1st/3rd Policy Bullets
+    $AuthZPolicies = ConvertTo-Json @($Tracker.TryCommand("Get-MgPolicyAuthorizationPolicy"))
+
+    # 2.7 third bullet
+    $DirectorySettings = ConvertTo-Json -Depth 10 @($Tracker.TryCommand("Get-MgDirectorySetting"))
+
+    # 2.7 Policy Bullet 2]
+    $AdminConsentReqPolicies = ConvertTo-Json @($Tracker.TryCommand("Get-MgPolicyAdminConsentRequestPolicy"))
+
+    $SuccessfulCommands = ConvertTo-Json @($Tracker.GetSuccessfulCommands())
+    $UnSuccessfulCommands = ConvertTo-Json @($Tracker.GetUnSuccessfulCommands())
 
     # Note the spacing and the last comma in the json is important
     $json = @"
@@ -69,6 +90,8 @@ function Export-AADProvider {
     "privileged_roles": $PrivilegedRoles,
     "service_plans": $ServicePlans,
     "directory_settings": $DirectorySettings,
+    "aad_successful_commands": $SuccessfulCommands,
+    "aad_unsuccessful_commands": $UnSuccessfulCommands,
 "@
 
     # We need to remove the backslash characters from the
@@ -86,32 +109,27 @@ function Get-AADTenantDetail {
     .Functionality
     Internal
     #>
+    $TenantInfo = @{}
     try {
         $OrgInfo = Get-MgOrganization -ErrorAction "Stop"
         $InitialDomain = $OrgInfo.VerifiedDomains | Where-Object {$_.isInitial}
         if (-not $InitialDomain) {
             $InitialDomain = "AAD: Domain Unretrievable"
         }
-        $AADTenantInfo = @{
-            "DisplayName" = $OrgInfo.DisplayName;
-            "DomainName" = $InitialDomain.Name;
-            "TenantId" = $OrgInfo.Id
-            "AADAdditionalData" = $OrgInfo;
-        }
-        $AADTenantInfo = ConvertTo-Json @($AADTenantInfo) -Depth 4
-        $AADTenantInfo
+        $TenantInfo.DisplayName = $OrgInfo.DisplayName
+        $TenantInfo.DomainName = $InitialDomain.name
+        $TenantInfo.TenantId = $OrgInfo.Id
+        $TenantInfo.AADAdditionalData = $OrgInfo
     }
     catch {
-        Write-Warning "Error retrieving Tenant details using Get-AADTenantDetail $($_)"
-        $AADTenantInfo = @{
-            "DisplayName" = "Error retrieving Display name";
-            "DomainName" = "Error retrieving Domain name";
-            "TenantId" = "Error retrieving Tenant ID";
-            "AADAdditionalData" = "Error retrieving additional data";
-        }
-        $AADTenantInfo = ConvertTo-Json @($AADTenantInfo) -Depth 4
-        $AADTenantInfo
+        $TenantInfo.DisplayName = "*Get-AADTenantDetail ERROR*"
+        $TenantInfo.DisplayName = "*Get-AADTenantDetail ERROR*"
+        $TenantInfo.DomainName = "*Get-AADTenantDetail ERROR*"
+        $TenantInfo.TenantId = "*Get-AADTenantDetail ERROR*"
+        $TenantInfo.AADAdditionalData = "*Get-AADTenantDetail ERROR*"
     }
+    $TenantInfo = $TenantInfo | ConvertTo-Json -Depth 4
+    $TenantInfo
 }
 
 function Get-PrivilegedUser {
