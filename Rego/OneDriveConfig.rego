@@ -90,35 +90,35 @@ tests[{
 # Baseline 2.3: Policy 1
 #--
 ReportDetails2_3(Policy) = Description if {
-    Policy.DeafultSharingLinkType == 1
+    Policy.DefaultSharingLinkType != 3
     Policy.FileAnonymousLinkType == 1
     Policy.FolderAnonymousLinkType == 1
 	Description := "Requirement met"
 }
 
 ReportDetails2_3(Policy) = Description if {
-    Policy.DeafultSharingLinkType == 1
+    Policy.DefaultSharingLinkType != 3
     Policy.FileAnonymousLinkType == 2
     Policy.FolderAnonymousLinkType == 2
 	Description := "Requirement not met: both files and folders are not limited to view for Anyone"
 }
 
 ReportDetails2_3(Policy) = Description if {
-    Policy.DeafultSharingLinkType == 1
+    Policy.DefaultSharingLinkType != 3
     Policy.FileAnonymousLinkType == 1
     Policy.FolderAnonymousLinkType == 2
 	Description := "Requirement not met: folders are not limited to view for Anyone"
 }
 
 ReportDetails2_3(Policy) = Description if {
-    Policy.DeafultSharingLinkType == 1
+    Policy.DefaultSharingLinkType != 3
     Policy.FileAnonymousLinkType == 2
     Policy.FolderAnonymousLinkType == 1
 	Description := "Requirement not met: files are not limited to view for Anyone"
 }
 
 ReportDetails2_3(Policy) = Description if {
-    Policy.DeafultSharingLinkType == 2
+    Policy.DefaultSharingLinkType == 3
 	Description := "Requirement not met: link permission is not limited to view"
 }
 
@@ -127,12 +127,12 @@ tests[{
     "Control" : "OneDrive 2.3",
     "Criticality" : "Should",
     "Commandlet" : ["Get-SPOTenant"],
-    "ActualValue" : [Policy.DeafultSharingLinkType, Policy.FileAnonymousLinkType, Policy.FolderAnonymousLinkType],
+    "ActualValue" : [Policy.DefaultSharingLinkType, Policy.FileAnonymousLinkType, Policy.FolderAnonymousLinkType],
     "ReportDetails" : ReportDetails2_3(Policy),
     "RequirementMet" : Status
 }] {
     Policy := input.SPO_tenant_info[_]
-	Conditions := [Policy.DeafultSharingLinkType == 1, Policy.FileAnonymousLinkType == 1, Policy.FolderAnonymousLinkType == 1]
+	Conditions := [Policy.DefaultSharingLinkType != 3, Policy.FileAnonymousLinkType == 1, Policy.FolderAnonymousLinkType == 1]
     Status := count([Condition | Condition = Conditions[_]; Condition == false]) == 0
 }
 #--
