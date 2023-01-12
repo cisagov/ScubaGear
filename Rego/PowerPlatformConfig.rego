@@ -74,7 +74,7 @@ tests[{
     "Requirement" : "The ability to create trial environments SHALL be restricted to admins",
     "Control" : "Power Platform 2.1",
     "Criticality" : "Shall",
-    "Commandlet" : "Get-TenantSettings",
+    "Commandlet" : ["Get-TenantSettings"],
     "ActualValue" : EnvironmentCreation.disableTrialEnvironmentCreationByNonAdminUsers,
     "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
