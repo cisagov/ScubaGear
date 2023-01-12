@@ -117,6 +117,11 @@ ReportDetails2_3(Policy) = Description if {
 	Description := "Requirement not met: files are not limited to view for Anyone"
 }
 
+ReportDetails2_3(Policy) = Description if {
+    Policy.DefaultLinkPermission == 2
+	Description := "Requirement not met: link permission is not limited to view"
+}
+
 tests[{
     "Requirement" : "Anyone link permissions SHOULD be limited to View",
     "Control" : "OneDrive 2.3",
