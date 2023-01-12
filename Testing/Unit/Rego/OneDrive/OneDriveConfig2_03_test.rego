@@ -12,7 +12,7 @@ test_DefaultLinkPermission_Correct if {
     Output := tests with input as {
         "SPO_tenant_info": [
             {
-                "DefaultLinkPermission" : 1,
+                "DeafultSharingLinkType" : 1,
                 "FileAnonymousLinkType" : 1,
                 "FolderAnonymousLinkType" : 1
             }
@@ -33,7 +33,7 @@ test_DefaultLinkPermission_Incorrect if {
     Output := tests with input as {
         "SPO_tenant_info": [
             {
-                "DefaultLinkPermission" : 1,
+                "DeafultSharingLinkType" : 1,
                 "FileAnonymousLinkType" : 2,
                 "FolderAnonymousLinkType" : 2
             }
@@ -54,7 +54,7 @@ test_DefaultLinkPermission_Incorrect_V2 if {
     Output := tests with input as {
         "SPO_tenant_info": [
             {
-                "DefaultLinkPermission" : 1,
+                "DeafultSharingLinkType" : 1,
                 "FileAnonymousLinkType" : 2,
                 "FolderAnonymousLinkType" : 1
             }
@@ -75,7 +75,7 @@ test_DefaultLinkPermission_Incorrect_V3 if {
     Output := tests with input as {
         "SPO_tenant_info": [
             {
-                "DefaultLinkPermission" : 1,
+                "DeafultSharingLinkType" : 1,
                 "FileAnonymousLinkType" : 1,
                 "FolderAnonymousLinkType" : 2
             }
@@ -96,7 +96,7 @@ test_DefaultLinkPermission_Incorrect_V4 if {
     Output := tests with input as {
         "SPO_tenant_info": [
             {
-                "DefaultLinkPermission" : 2,
+                "DeafultSharingLinkType" : 2,
                 "FileAnonymousLinkType" : 1,
                 "FolderAnonymousLinkType" : 1
             }
