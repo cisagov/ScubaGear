@@ -90,40 +90,44 @@ tests[{
 # Baseline 2.3: Policy 1
 #--
 ReportDetails2_3(Policy) = Description if {
+    Policy.DefaultLinkPermission == 1
     Policy.FileAnonymousLinkType == 1
     Policy.FolderAnonymousLinkType == 1
 	Description := "Requirement met"
 }
 
 ReportDetails2_3(Policy) = Description if {
+    Policy.DefaultLinkPermission == 1
     Policy.FileAnonymousLinkType == 2
     Policy.FolderAnonymousLinkType == 2
-	Description := "Requirement not met: both file and folder are not limited to view for Anyone"
+	Description := "Requirement not met: both files and folders are not limited to view for Anyone"
 }
 
 ReportDetails2_3(Policy) = Description if {
+    Policy.DefaultLinkPermission == 1
     Policy.FileAnonymousLinkType == 1
     Policy.FolderAnonymousLinkType == 2
-	Description := "Requirement not met: folder are not limited to view for Anyone"
+	Description := "Requirement not met: folders are not limited to view for Anyone"
 }
 
 ReportDetails2_3(Policy) = Description if {
+    Policy.DefaultLinkPermission == 1
     Policy.FileAnonymousLinkType == 2
     Policy.FolderAnonymousLinkType == 1
 	Description := "Requirement not met: files are not limited to view for Anyone"
 }
 
 tests[{
-    "Requirement" : "Anyone file and folder permissions SHOULD be limited to View",
+    "Requirement" : "Anyone link permissions SHOULD be limited to View",
     "Control" : "OneDrive 2.3",
     "Criticality" : "Should",
     "Commandlet" : ["Get-SPOTenant"],
-    "ActualValue" : [Policy.FileAnonymousLinkType, Policy.FolderAnonymousLinkType],
+    "ActualValue" : [Policy.DefaultLinkPermission, Policy.FileAnonymousLinkType, Policy.FolderAnonymousLinkType],
     "ReportDetails" : ReportDetails2_3(Policy),
     "RequirementMet" : Status
 }] {
     Policy := input.SPO_tenant_info[_]
-	Conditions := [Policy.FileAnonymousLinkType == 1, Policy.FolderAnonymousLinkType == 1]
+	Conditions := [Policy.DefaultLinkPermission == 1, Policy.FileAnonymousLinkType == 1, Policy.FolderAnonymousLinkType == 1]
     Status := count([Condition | Condition = Conditions[_]; Condition == false]) == 0
 }
 #--
