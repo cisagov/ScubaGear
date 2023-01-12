@@ -107,5 +107,5 @@ test_DefaultLinkPermission_Incorrect_V4 if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement not met: link permission is not limited to view"
+    RuleOutput[0].ReportDetails == "Requirement not met: default link sharing type is set to Anyone with link"
 }
