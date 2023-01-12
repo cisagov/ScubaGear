@@ -55,7 +55,7 @@ tests[{
 # Baseline 2.1: Policy 1 PoSh Error
 #--
 tests[{
-    "Requirement" : "The ability to create additional environments SHALL be restricted to admins",
+    "Requirement" : "The ability to create production and sandbox environments SHALL be restricted to admins",
     "Control" : "Power Platform 2.1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-TenantSettings"],
@@ -165,8 +165,43 @@ tests[{
     "ReportDetails" : ReportDetailsArray(Status, EnvWithoutPolicies, ErrorMessage),
     "RequirementMet" : Status
 }] {
+    DLPPolicies = input.dlp_policies[_]
+    count(DLPPolicies.value) > 0
     ErrorMessage := "Subsequent environments without DLP policies:"
     Status := count(EnvWithoutPolicies) == 0
+}
+#--
+
+#
+# Baseline 2.2: Policy 2 No DLP Policies found
+#--
+tests[{
+    "Requirement" : "Non-default environments SHOULD have at least one DLP policy that affects them",
+    "Control" : "Power Platform 2.2",
+    "Criticality" : "Should",
+    "Commandlet" : ["Get-DlpPolicy"],
+    "ActualValue" : "No DLP Policies found",
+    "ReportDetails" : "No DLP Policies found",
+    "RequirementMet" : false
+}] {
+    DLPPolicies = input.dlp_policies[_]
+    count(DLPPolicies.value) <= 0
+}
+#--
+
+#
+# Baseline 2.2: Policy 2 PoSh Error
+#--
+tests[{
+    "Requirement" : "Non-default environments SHOULD have at least one DLP policy that affects them",
+    "Control" : "Power Platform 2.2",
+    "Criticality" : "Should",
+    "Commandlet" : ["Get-DlpPolicy"],
+    "ActualValue" : "PowerShell Error",
+    "ReportDetails" : "PowerShell Error",
+    "RequirementMet" : false
+}] {
+    count(input.dlp_policies) <= 0
 }
 #--
 
@@ -226,9 +261,44 @@ tests[{
     "ReportDetails" : ReportDetailsArray(Status, RogueConnectors, ErrorMessage),
     "RequirementMet" : Status
 }] {
+    DLPPolicies = input.dlp_policies[_]
+    count(DLPPolicies.value) > 0
     ErrorMessage := "Connectors are allowed that should be blocked:"
     RogueConnectors := (ConnectorSet - AllowedInBaseline)
     Status := count(RogueConnectors) == 0
+}
+#--
+
+#
+# Baseline 2.2: Policy 3 Error No DLP policies Found
+#--
+tests[{
+    "Requirement" : "All connectors except those listed...[see Power Platform secure configuration baseline for list]...SHOULD be added to the Blocked category in the default environment policy",
+    "Control" : "Power Platform 2.2",
+    "Criticality" : "Should",
+    "Commandlet" : ["Get-DlpPolicy"],
+    "ActualValue" : "No DLP Policies found",
+    "ReportDetails" : "No DLP Policies found",
+    "RequirementMet" : false
+}] {
+    DLPPolicies = input.dlp_policies[_]
+    count(DLPPolicies.value) <= 0
+}
+#--
+
+#
+# Baseline 2.2: Policy 3 PoSh Error
+#--
+tests[{
+    "Requirement" : "All connectors except those listed...[see Power Platform secure configuration baseline for list]...SHOULD be added to the Blocked category in the default environment policy",
+    "Control" : "Power Platform 2.2",
+    "Criticality" : "Should",
+    "Commandlet" : ["Get-DlpPolicy"],
+    "ActualValue" : "PowerShell error",
+    "ReportDetails" : "PowerShell error",
+    "RequirementMet" : false
+}] {
+    count(input.dlp_policies) <= 0
 }
 #--
 

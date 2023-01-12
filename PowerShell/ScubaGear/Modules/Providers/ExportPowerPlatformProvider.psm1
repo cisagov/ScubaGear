@@ -22,7 +22,7 @@ function Export-PowerPlatformProvider {
     # Manually importing the module name here to bypass cmdlet name conflicts
     # There are conflicting PowerShell Cmdlet names in EXO and Power Platform
     Import-Module Microsoft.PowerApps.Administration.PowerShell -DisableNameChecking
-    
+
 
     $TenantDetails = $Tracker.TryCommand("Get-TenantDetailsFromGraph")
     if ($TenantDetails.Count -gt 0) {
@@ -54,7 +54,7 @@ function Export-PowerPlatformProvider {
     }
     catch {
         $EnvCheckWarning = @"
-    Power Platform Provider Warning: $($_). Unable to check if M365Environment is set correctly in the Power Platform Provider. This MAY impact the output of the Power Platform Baseline report. 
+    Power Platform Provider Warning: $($_). Unable to check if M365Environment is set correctly in the Power Platform Provider. This MAY impact the output of the Power Platform Baseline report.
     See the 'Running the Script Behind Some Proxies' in the README.md for a possible solution to this warning.
 "@
         Write-Warning $EnvCheckWarning
@@ -100,7 +100,7 @@ function Export-PowerPlatformProvider {
             $EnvErrorMessage = @"
 "Power Platform Provider ERROR: The M365Environment parameter value is not set correctly which SHALL cause the Power Platform report to display incorrect values.
             ---------------------------------------
-            M365Environment Parameter value: $($M365Environment) 
+            M365Environment Parameter value: $($M365Environment)
             Your tenant's OpenId-Configuration: tenant_region_scope: $($RegionScope), tenant_region_sub_scope: $($RegionSubScope)
 "@
             if (-not ($CheckRScope -and $CheckRSubScope)) {
@@ -111,14 +111,14 @@ function Export-PowerPlatformProvider {
     catch {
 
         $FullEnvErrorMessage = @"
-$($_) 
+$($_)
         ---------------------------------------
         Rerun ScubaGear with the correct M365Environment parameter value
         by looking at your tenant's OpenId-Configuration displayed above and
         contrast it with the mapped values in the table below
         M365Enviroment => OpenId-Configuration
         ---------------------------------------
-        commercial: tenant_region_scope:NA, tenant_region_sub_scope: 
+        commercial: tenant_region_scope:NA, tenant_region_sub_scope:
         gcc: tenant_region_scope:NA, tenant_region_sub_scope: GCC
         gcchigh : tenant_region_scope:USGov, tenant_region_sub_scope: DODCON
         dod: tenant_region_scope:USGov, tenant_region_sub_scope: DOD
@@ -135,9 +135,9 @@ $($_)
     # 2.2
     $EnvironmentList = ConvertTo-Json @($Tracker.TryCommand("Get-AdminPowerAppEnvironment"))
 
-    # Sanity check
+    # Check for null return
     if (-not $EnvironmentList) {
-        $EnvironmentList = @()
+        $EnvironmentList = ConvertTo-Json @()
         $Tracker.AddUnSuccessfulCommand("Get-AdminPowerAppEnvironment")
     }
 
@@ -147,7 +147,10 @@ $($_)
         $DLPPolicies = Get-DlpPolicy -ErrorAction "Stop"
         if ($DLPPolicies.StatusCode) {
             $Tracker.AddUnSuccessfulCommand("Get-DlpPolicy")
-            throw "$($DLPPolicies.Message) HTTP ERROR"
+            $StatusCode = $DLPPolicies.StatusCode
+            $Message = $DLPPolicies.Message
+            $DLPPolicies = ConvertTo-Json @()
+            throw "$($Message) HTTP $($StatusCode) ERROR"
         }
         else {
             $DLPPolicies = ConvertTo-Json -Depth 7 @($DLPPolicies)
@@ -155,7 +158,7 @@ $($_)
         }
     }
     catch {
-        Write-Warning "Error running Get-DlpPolicy: () $($_). <= If HTTP ERROR is thrown then this is because you do not have the proper permissions. Necessary roles: Power Platform Administrator with a Power Apps License or Global Admininstrator"
+        Write-Warning "Error running Get-DlpPolicy: $($_). <= If a HTTP 403 ERROR is thrown then this is because you do not have the proper permissions. Necessary roles for running ScubaGear with Power Platform: Power Platform Administrator with a Power Apps License or Global Admininstrator"
     }
 
     # 2.3
@@ -165,7 +168,10 @@ $($_)
         $TenantIso = Get-PowerAppTenantIsolationPolicy -TenantID $TenantID -ErrorAction "Stop"
         if ($TenantIso.StatusCode) {
             $Tracker.AddUnSuccessfulCommand("Get-PowerAppTenantIsolationPolicy")
-            throw "$($TenantIso.Message) HTTP ERROR"
+            $TenantIsolation = ConvertTo-Json @()
+            $StatusCode = $DLPPolicies.StatusCode
+            $Message = $DLPPolicies.Message
+            throw "$($Message) HTTP $($StatusCode) ERROR"
         }
         else {
             $Tracker.AddSuccessfulCommand("Get-PowerAppTenantIsolationPolicy")
@@ -173,7 +179,7 @@ $($_)
         }
     }
     catch {
-        Write-Warning "Error running Get-PowerAppTenantIsolationPolicy: $($_). <= If HTTP ERROR is thrown then this is because you do not have the proper permissions. Necessary roles: Power Platform Administrator with a Power Apps License or Global Admininstrator"
+        Write-Warning "Error running Get-PowerAppTenantIsolationPolicy: $($_). <= If a HTTP 403 ERROR is thrown then this is because you do not have the proper permissions. Necessary roles for running ScubaGear with Power Platform: Power Platform Administrator with a Power Apps License or Global Admininstrator"
     }
 
     # 2.4 currently has no corresponding PowerShell Cmdlet
