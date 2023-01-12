@@ -119,7 +119,7 @@ ReportDetails2_3(Policy) = Description if {
 
 ReportDetails2_3(Policy) = Description if {
     Policy.DefaultSharingLinkType == 3
-	Description := "Requirement not met: link permission is not limited to view"
+	Description := "Requirement not met: default link sharing type is set to Anyone with link"
 }
 
 tests[{
