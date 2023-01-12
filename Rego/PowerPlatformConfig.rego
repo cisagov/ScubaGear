@@ -325,23 +325,6 @@ tests[{
 #--
 
 #
-# Baseline 2.3: Policy 1
-#--
-tests[{
-    "Requirement" : "Power Platform tenant isolation SHALL be enabled",
-    "Control" : "Power Platform 2.3",
-    "Criticality" : "Shall",
-    "Commandlet" : ["Get-PowerAppTenantIsolationPolicy"],
-    "ActualValue" : TenantIsolation.properties.isDisabled,
-    "ReportDetails" : ReportDetailsBoolean(Status),
-    "RequirementMet" : Status
-}] {
-    TenantIsolation := input.tenant_isolation[_]
-    Status := TenantIsolation.properties.isDisabled == false
-}
-#--
-
-#
 # Baseline 2.3: Policy 1 PoSh Error
 #--
 tests[{
