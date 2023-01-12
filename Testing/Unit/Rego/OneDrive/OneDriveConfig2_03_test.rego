@@ -7,11 +7,12 @@ import future.keywords
 #--
 test_DefaultLinkPermission_Correct if {
     ControlNumber := "OneDrive 2.3"
-    Requirement := "Anyone file and folder permissions SHOULD be limited to View"
+    Requirement := "Anyone link permissions SHOULD be limited to View"
 
     Output := tests with input as {
         "SPO_tenant_info": [
             {
+                "DefaultLinkPermission" : 1,
                 "FileAnonymousLinkType" : 1,
                 "FolderAnonymousLinkType" : 1
             }
@@ -27,11 +28,12 @@ test_DefaultLinkPermission_Correct if {
 
 test_DefaultLinkPermission_Incorrect if {
     ControlNumber := "OneDrive 2.3"
-    Requirement := "Anyone file and folder permissions SHOULD be limited to View"
+    Requirement := "Anyone link permissions SHOULD be limited to View"
 
     Output := tests with input as {
         "SPO_tenant_info": [
             {
+                "DefaultLinkPermission" : 1,
                 "FileAnonymousLinkType" : 2,
                 "FolderAnonymousLinkType" : 2
             }
@@ -42,16 +44,17 @@ test_DefaultLinkPermission_Incorrect if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement not met: both file and folder are not limited to view for Anyone"
+    RuleOutput[0].ReportDetails == "Requirement not met: both files and folders are not limited to view for Anyone"
 }
 
 test_DefaultLinkPermission_Incorrect_V2 if {
     ControlNumber := "OneDrive 2.3"
-    Requirement := "Anyone file and folder permissions SHOULD be limited to View"
+    Requirement := "Anyone link permissions SHOULD be limited to View"
 
     Output := tests with input as {
         "SPO_tenant_info": [
             {
+                "DefaultLinkPermission" : 1,
                 "FileAnonymousLinkType" : 2,
                 "FolderAnonymousLinkType" : 1
             }
@@ -67,11 +70,12 @@ test_DefaultLinkPermission_Incorrect_V2 if {
 
 test_DefaultLinkPermission_Incorrect_V3 if {
     ControlNumber := "OneDrive 2.3"
-    Requirement := "Anyone file and folder permissions SHOULD be limited to View"
+    Requirement := "Anyone link permissions SHOULD be limited to View"
 
     Output := tests with input as {
         "SPO_tenant_info": [
             {
+                "DefaultLinkPermission" : 1,
                 "FileAnonymousLinkType" : 1,
                 "FolderAnonymousLinkType" : 2
             }
@@ -82,5 +86,5 @@ test_DefaultLinkPermission_Incorrect_V3 if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement not met: folder are not limited to view for Anyone"
+    RuleOutput[0].ReportDetails == "Requirement not met: folders are not limited to view for Anyone"
 }
