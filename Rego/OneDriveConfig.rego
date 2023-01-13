@@ -89,9 +89,37 @@ tests[{
 #
 # Baseline 2.3: Policy 1
 #--
-DefaultLinkPermissionPolicy[Policy]{
-    Policy := input.SPO_tenant_info[_]
-    Policy.DefaultLinkPermission == 1
+ReportDetails2_3(Policy) = Description if {
+    Policy.DefaultSharingLinkType != 3
+    Policy.FileAnonymousLinkType == 1
+    Policy.FolderAnonymousLinkType == 1
+	Description := "Requirement met"
+}
+
+ReportDetails2_3(Policy) = Description if {
+    Policy.DefaultSharingLinkType != 3
+    Policy.FileAnonymousLinkType == 2
+    Policy.FolderAnonymousLinkType == 2
+	Description := "Requirement not met: both files and folders are not limited to view for Anyone"
+}
+
+ReportDetails2_3(Policy) = Description if {
+    Policy.DefaultSharingLinkType != 3
+    Policy.FileAnonymousLinkType == 1
+    Policy.FolderAnonymousLinkType == 2
+	Description := "Requirement not met: folders are not limited to view for Anyone"
+}
+
+ReportDetails2_3(Policy) = Description if {
+    Policy.DefaultSharingLinkType != 3
+    Policy.FileAnonymousLinkType == 2
+    Policy.FolderAnonymousLinkType == 1
+	Description := "Requirement not met: files are not limited to view for Anyone"
+}
+
+ReportDetails2_3(Policy) = Description if {
+    Policy.DefaultSharingLinkType == 3
+	Description := "Requirement not met: default link sharing type is set to Anyone with link"
 }
 
 tests[{
@@ -99,12 +127,13 @@ tests[{
     "Control" : "OneDrive 2.3",
     "Criticality" : "Should",
     "Commandlet" : ["Get-SPOTenant"],
-    "ActualValue" : Policies,
-    "ReportDetails" : ReportDetailsBoolean(Status),
+    "ActualValue" : [Policy.DefaultSharingLinkType, Policy.FileAnonymousLinkType, Policy.FolderAnonymousLinkType],
+    "ReportDetails" : ReportDetails2_3(Policy),
     "RequirementMet" : Status
 }] {
-    Policies := DefaultLinkPermissionPolicy
-    Status := count(Policies) == 1
+    Policy := input.SPO_tenant_info[_]
+	Conditions := [Policy.DefaultSharingLinkType != 3, Policy.FileAnonymousLinkType == 1, Policy.FolderAnonymousLinkType == 1]
+    Status := count([Condition | Condition = Conditions[_]; Condition == false]) == 0
 }
 #--
 
