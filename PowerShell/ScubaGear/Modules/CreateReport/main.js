@@ -24,6 +24,21 @@ function colorRows() {
     }
 }
 
+function collapseCAPTable() {
+    capTable = document.querySelector('#caps table');
+    if (capTable == null) {
+        /*  The CAP table is only displayed for the AAD baseline, but
+            this JS applies to all baselines. capTable will be null
+            for all other baselines */
+        return;
+    }
+    let rows = capTable.rows;
+    for (let i = 0; i < rows.length; i++) {
+        console.log(rows[i]);
+    }
+}
+
 window.addEventListener('DOMContentLoaded', (event) => {
     colorRows();
+    collapseCAPTable();
 });
