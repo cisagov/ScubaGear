@@ -27,6 +27,10 @@ $GrantControlStrings = @{"mfa" = "multifactor authentication";
     "compliantApplication" = "app protection policy";
     "passwordChange" = "password change"}
 
+$CondAccessAppControlStrings = @{"monitorOnly" = "Monitor only";
+    "blockDownloads" = "Block downloads";
+    "mcasConfigured" = "Use custom policy"}
+
 function Get-IncludedUsers {
     <#
     .Description
@@ -327,6 +331,56 @@ function Get-AccessControls {
     }
 }
 
+function Get-SessionControls {
+    <#
+    .Description
+    Parses the provider output to generate a list of session controls for a given conditional access policy (Cap).
+    .Functionality
+    Internal
+    #>
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory=$true)]
+        [System.Object]
+        $Cap
+    )
+    process {
+        $SessionControls = @()
+        if ($Cap.SessionControls.ApplicationEnforcedRestrictions.IsEnabled) {
+            $SessionControls += "Use app enforced restrictions"
+        }
+        if ($Cap.SessionControls.CloudAppSecurity.IsEnabled) {
+            $Mode = $CondAccessAppControlStrings[$Cap.SessionControls.CloudAppSecurity.CloudAppSecurityType]
+            $SessionControls += "Use Conditional Access App Control ($($Mode))"
+        }
+        if ($Cap.SessionControls.SignInFrequency.IsEnabled) {
+            if ($Cap.SessionControls.SignInFrequency.FrequencyInterval -eq "everyTime") {
+                $SessionControls += "Sign-in frequency (every time)"
+            }
+            else {
+                $Value = $Cap.SessionControls.SignInFrequency.Value
+                $Unit = $Cap.SessionControls.SignInFrequency.Type
+                $SessionControls += "Sign-in frequency (every $($Value) $($Unit))"
+            }
+        }
+        if ($Cap.SessionControls.PersistentBrowser.IsEnabled) {
+            $Mode = $Cap.SessionControls.PersistentBrowser.Mode
+            $SessionControls += "Persistent browser session ($($Mode) persistent)"
+        }
+        if ($Cap.SessionControls.ContinuousAccessEvaluation.Mode -eq "disabled") {
+            $SessionControls += "Customize continuous access evaluation"
+        }
+        if ($Cap.SessionControls.DisableResilienceDefaults) {
+            $SessionControls += "Disable resilience defaults"
+        }
+        if ($SessionControls.Length -eq 0) {
+            $SessionControls += "None"
+        }
+        $SessionControls = @($SessionControls | ForEach-Object {"<li>$_</li>"})
+        "<ul>$($SessionControls -Join '')</ul>"
+    }
+}
+
 function Get-CapTable {
     $FileName = Join-Path -Path $OutPath -ChildPath "$($OutProviderFileName).json"
     $SettingsExport =  Get-Content $FileName | ConvertFrom-Json
@@ -340,6 +394,7 @@ function Get-CapTable {
         $Apps = Get-Applications -Cap $Cap
         $Conditions = Get-Conditions -Cap $Cap
         $AccessControls = Get-AccessControls -Cap $Cap
+        $SessionControls = Get-SessionControls -Cap $Cap
         $CapDetails = [pscustomobject]@{
             "Name" = $Cap.DisplayName;
             "State" = $StateStrings[$Cap.State];
@@ -347,7 +402,7 @@ function Get-CapTable {
             "Apps/Actions" = $Apps;
             "Conditions" = $Conditions;
             "Block/Grant Access" = $AccessControls;
-            "Session Controls" = "TODO";
+            "Session Controls" = $SessionControls;
         }
 
         $Table += $CapDetails
