@@ -206,7 +206,7 @@ Policies2_4_1[Cap.DisplayName] {
 }
 
 tests[{
-    "Requirement" : "MFA SHALL be required for all users",
+    "Requirement" : "Phishing-Resistant MFA SHALL be required for all users",
     "Control" : "AAD 2.4",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-MgIdentityConditionalAccessPolicy"],
