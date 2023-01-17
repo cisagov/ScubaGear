@@ -11,14 +11,14 @@ test_name_Correct if {
 
     Output := tests with input as {
         "tenant_id": "Test Id",
-        "dlp_policies": {
+        "dlp_policies": [{
             "value":  [{
                 "displayName":  "Block Third-Party Connectors",
                 "environments":  [{
                     "name":  "Default-Test Id"
                 }]
             }]
-        }
+        }]
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
@@ -34,14 +34,14 @@ test_name_Incorrect if {
 
     Output := tests with input as {
         "tenant_id": "Test Id",
-        "dlp_policies": {
+        "dlp_policies": [{
             "value":  [{
                 "displayName":  "Block Third-Party Connectors",
                 "environments":  [{
                     "name":  "NotDefault-Test Id"
                 }]
             }]
-        }
+        }]
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
@@ -59,14 +59,14 @@ test_environment_list_Correct if {
     Requirement := "Non-default environments SHOULD have at least one DLP policy that affects them"
 
     Output := tests with input as {
-        "dlp_policies": {
+        "dlp_policies": [{
             "value":  [{
                 "displayName":  "Block Third-Party Connectors",
                 "environments":  [{
                     "name":  "Default-Test Id"
                 }]
             }]
-        },
+        }],
         "environment_list": [{
             "EnvironmentName":  "Default-Test Id"
         }]
@@ -84,14 +84,14 @@ test_environment_list_Incorrect if {
     Requirement := "Non-default environments SHOULD have at least one DLP policy that affects them"
 
     Output := tests with input as {
-        "dlp_policies": {
+        "dlp_policies": [{
             "value":  [{
                 "displayName":  "Block Third-Party Connectors",
                 "environments":  [{
                     "name":  "Default-Test Id"
                 }]
             }]
-        },
+        }],
         "environment_list": [{
             "EnvironmentName":  "Default-Test Id"
 
@@ -114,11 +114,11 @@ test_environment_list_Incorrect if {
 #--
 test_classification_Correct_V1 if {
     ControlNumber := "Power Platform 2.2"
-    Requirement := "All connectors except those listed...[see Power Platform secure baseline for list]...SHOULD be added to the Blocked category in the default environment policy"
+    Requirement := "All connectors except those listed...[see Power Platform secure configuration baseline for list]...SHOULD be added to the Blocked category in the default environment policy"
 
     Output := tests with input as {
         "tenant_id": "Test Id",
-        "dlp_policies": {
+        "dlp_policies": [{
             "value":  [{
                 "connectorGroups":  [{
                     "classification":  "Confidential",
@@ -130,7 +130,7 @@ test_classification_Correct_V1 if {
                     "name":  "Default-Test Id"
                 }]
             }]
-        }
+        }]
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
@@ -142,11 +142,11 @@ test_classification_Correct_V1 if {
 
 test_classification_Correct_V2 if {
     ControlNumber := "Power Platform 2.2"
-    Requirement := "All connectors except those listed...[see Power Platform secure baseline for list]...SHOULD be added to the Blocked category in the default environment policy"
+    Requirement := "All connectors except those listed...[see Power Platform secure configuration baseline for list]...SHOULD be added to the Blocked category in the default environment policy"
 
     Output := tests with input as {
         "tenant_id": "Test Id",
-        "dlp_policies": {
+        "dlp_policies": [{
             "value":  [{
                 "connectorGroups":  [{
                     "classification":  "General",
@@ -158,7 +158,7 @@ test_classification_Correct_V2 if {
                     "name":  "Default-Test Id"
                 }]
             }]
-        }
+        }]
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
@@ -170,11 +170,11 @@ test_classification_Correct_V2 if {
 
 test_connectorGroups_Correct if {
     ControlNumber := "Power Platform 2.2"
-    Requirement := "All connectors except those listed...[see Power Platform secure baseline for list]...SHOULD be added to the Blocked category in the default environment policy"
+    Requirement := "All connectors except those listed...[see Power Platform secure configuration baseline for list]...SHOULD be added to the Blocked category in the default environment policy"
 
     Output := tests with input as {
         "tenant_id": "Test Id",
-        "dlp_policies": {
+        "dlp_policies": [{
             "value":  [{
                 "connectorGroups":  [{
                     "classification":  "Confidential",
@@ -192,7 +192,7 @@ test_connectorGroups_Correct if {
                     "name":  "Default-Test Id"
                 }]
             }]
-        }
+        }]
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
@@ -204,11 +204,11 @@ test_connectorGroups_Correct if {
 
 test_classification_Incorrect_V1 if {
     ControlNumber := "Power Platform 2.2"
-    Requirement := "All connectors except those listed...[see Power Platform secure baseline for list]...SHOULD be added to the Blocked category in the default environment policy"
+    Requirement := "All connectors except those listed...[see Power Platform secure configuration baseline for list]...SHOULD be added to the Blocked category in the default environment policy"
 
     Output := tests with input as {
         "tenant_id": "Test Id",
-        "dlp_policies": {
+        "dlp_policies": [{
             "value":  [{
                 "connectorGroups":  [{
                     "classification":  "Confidential",
@@ -220,7 +220,7 @@ test_classification_Incorrect_V1 if {
                     "name":  "Default-Test Id"
                 }]
             }]
-        }
+        }]
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
@@ -232,11 +232,11 @@ test_classification_Incorrect_V1 if {
 
 test_classification_Incorrect_V2 if {
     ControlNumber := "Power Platform 2.2"
-    Requirement := "All connectors except those listed...[see Power Platform secure baseline for list]...SHOULD be added to the Blocked category in the default environment policy"
+    Requirement := "All connectors except those listed...[see Power Platform secure configuration baseline for list]...SHOULD be added to the Blocked category in the default environment policy"
 
     Output := tests with input as {
         "tenant_id": "Test Id",
-        "dlp_policies": {
+        "dlp_policies": [{
             "value":  [{
                 "connectorGroups":  [{
                     "classification":  "General",
@@ -248,7 +248,7 @@ test_classification_Incorrect_V2 if {
                     "name":  "Default-Test Id"
                 }]
             }]
-        }
+        }]
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
@@ -260,11 +260,11 @@ test_classification_Incorrect_V2 if {
 
 test_connectorGroups_Incorrect if {
     ControlNumber := "Power Platform 2.2"
-    Requirement := "All connectors except those listed...[see Power Platform secure baseline for list]...SHOULD be added to the Blocked category in the default environment policy"
+    Requirement := "All connectors except those listed...[see Power Platform secure configuration baseline for list]...SHOULD be added to the Blocked category in the default environment policy"
 
     Output := tests with input as {
         "tenant_id": "Test Id",
-        "dlp_policies": {
+        "dlp_policies": [{
             "value":  [{
                 "connectorGroups":  [{
                     "classification":  "Confidential",
@@ -282,7 +282,7 @@ test_connectorGroups_Incorrect if {
                     "name":  "Default-Test Id"
                 }]
             }]
-        }
+        }]
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
