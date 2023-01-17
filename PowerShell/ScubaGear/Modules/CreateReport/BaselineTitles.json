@@ -46,7 +46,7 @@
             {"Number" : "AAD 2.1", "Title" : "Legacy Authentication SHALL be Blocked" },
             {"Number" : "AAD 2.2", "Title" : "High Risk Users SHALL be Blocked"},
             {"Number" : "AAD 2.3", "Title" : "High Risk Sign-ins SHALL be Blocked"},
-            {"Number" : "AAD 2.4", "Title" : "Multifactor Authentication SHALL be required for all users & Phishing-Resistant Authentication SHOULD be used"},
+            {"Number" : "AAD 2.4", "Title" : "Phishing-Resistant Multifactor Authentication SHALL be required for all users"},
             {"Number" : "AAD 2.5", "Title": "Azure AD logs SHALL be collected"},
             {"Number" : "AAD 2.6", "Title": "Only administrators SHALL be allowed to register third-party applications"},
             {"Number" : "AAD 2.7", "Title": "Non-admin users SHALL be prevented from providing consent to third-party applications"},
