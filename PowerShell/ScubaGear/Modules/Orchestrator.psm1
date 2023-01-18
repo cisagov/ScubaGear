@@ -552,6 +552,12 @@ function Invoke-ReportCreation {
         $Logo = Join-Path -Path $ReporterPath -ChildPath "cisa_logo.png"
         Copy-Item -Path $Logo -Destination $IndividualReportPath -Force
 
+        $AngleRightIcon = Join-Path -Path $ReporterPath -ChildPath "angle-right-solid.svg"
+        Copy-Item -Path $AngleRightIcon -Destination $IndividualReportPath -Force
+
+        $AngleDownIcon = Join-Path -Path $ReporterPath -ChildPath "angle-down-solid.svg"
+        Copy-Item -Path $AngleDownIcon -Destination $IndividualReportPath -Force
+
         foreach ($Product in $ProductNames) {
             $BaselineName = $ArgToProd[$Product]
             $N += 1

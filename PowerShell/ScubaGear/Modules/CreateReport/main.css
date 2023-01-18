@@ -111,11 +111,44 @@ img {
 }
 
 #caps tr:nth-child(even){
-    background-color: #e0e0e0;
+    background-color: #efecec;
+}
+
+#caps tr:hover{
+    background-color: #d0d6f1;
 }
 
 #caps ul {
     padding: 0;
     padding-left: 2px;
     list-style-position: inside;
+}
+
+#caps img:hover {
+    cursor: pointer;
+}
+
+#caps td:nth-child(1), #caps th:nth-child(1) {
+    border-right: none;
+}
+
+#caps td:nth-child(2), #caps th:nth-child(2) {
+    border-left: none;
+}
+
+#caps span {
+    cursor: pointer;
+    color: #005288;
+    text-decoration:underline;
+}
+
+#caps .button {
+    margin-bottom: 10px;
+    display: block;
+}
+
+.buttons {
+    display: flex;
+    width: 200px;
+    justify-content: space-between;
 }
