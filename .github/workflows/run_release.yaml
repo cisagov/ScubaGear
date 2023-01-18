@@ -1,0 +1,59 @@
+on: 
+  workflow_dispatch:
+    inputs:
+      releaseName:
+        description: "Release Name"
+        required: true
+        type: string
+      version:
+        description: "Release Version"
+        required: true
+        type: string
+
+name: Build and Sign Release
+
+
+jobs:
+  build-and-deploy:
+    runs-on: windows-latest
+    env:
+      CODESIGN_PW: ${{ secrets.CODESIGN_PW }}
+      CODESIGN_BASE64: ${{ secrets.CODESIGN_BASE64 }}
+    permissions:
+      contents: write
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        path: repo
+    - name: Sign Scripts
+      shell: pwsh
+      run: |
+        $ErrorActionPreference = "Stop"
+        $PSDefaultParameterValues['*:ErrorAction']='Stop'
+        Set-StrictMode -Version Latest
+
+        New-Item -ItemType directory -Path certificate
+        Set-Content -Path certificate\cert.txt -Value $env:CODESIGN_BASE64
+        certutil -decode certificate\cert.txt certificate\cert.pfx
+
+        Get-ChildItem -Recurse -Path repo -Include **.ps1,**.psm1 | ForEach-Object {
+          $path = $_.FullName
+          & 'C:/Program Files (x86)/Windows Kits/10/bin/10.0.22621.0/x86/signtool.exe' sign /tr "http://timestamp.sectigo.com/rfc3161" /fd SHA256 /p $env:CODESIGN_PW /f certificate\cert.pfx /td SHA256 $path
+        }
+
+        Remove-Item -Recurse -Force certificate
+        Remove-Item -Recurse -Force repo -Include .git*
+
+        Compress-Archive -Path repo -DestinationPath release.zip
+    - name: release
+      uses: softprops/action-gh-release@v1
+      id: create_release
+      with:
+        draft: true
+        prerelease: false
+        name: ${{ inputs.releaseName }}
+        tag_name: ${{ inputs.version }}
+        files: release.zip
+        generate_release_notes: true
+        fail_on_unmatched_files: true
