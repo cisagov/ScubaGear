@@ -118,7 +118,7 @@ function New-Report {
     }
 
     $Title = "$($FullName) Baseline Report"
-    $AADWarning = "<p> Note: Conditional Access Policy exclusions and additional policy conditions
+    $AADWarning = "<p> Note: Conditional Access (CA) Policy exclusions and additional policy conditions
     may limit a policy's scope more narrowly than desired. Recommend reviewing matching policies
     against the baseline statement to ensure a match between intent and implementation. </p>"
     $NoWarning = "<p><br/></p>"
