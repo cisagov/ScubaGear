@@ -40,6 +40,45 @@ tests[{
 #
 # Baseline 2.2: Policy 1
 #--
+ReportDetails2_2(Policy) = Description if {
+    Policy.OneDriveLoopSharingCapability == 1
+    Description := "Requirement met: AnyOne Link is disabled"
+}
+
+ReportDetails2_2(Policy) = Description if {
+    Policy.OneDriveLoopSharingCapability != 1
+    Policy.RequireAnonymousLinksExpireInDays != -1
+    Description := "Requirement met"
+}
+
+ReportDetails2_2(Policy) = Description if {
+    Policy.OneDriveLoopSharingCapability != 1
+    Policy.RequireAnonymousLinksExpireInDays == -1
+    Description := "Requirement not met"
+}
+
+tests[{
+    "Requirement" : "An expiration date SHOULD be set for Anyone links",
+    "Control" : "OneDrive 2.2",
+    "Criticality" : "Should",
+    "Commandlet" : ["Get-SPOTenant"],
+    "ActualValue" : [Policy.OneDriveLoopSharingCapability, Policy.RequireAnonymousLinksExpireInDays],
+    "ReportDetails" : ReportDetails2_2(Policy),
+    "RequirementMet" : Status
+}] {
+    Policy := input.SPO_tenant_info[_]
+    Conditions1 := [Policy.OneDriveLoopSharingCapability ==1]
+    Case1 := count([Condition | Condition = Conditions1[_]; Condition == false]) == 0
+	Conditions2 := [Policy.OneDriveLoopSharingCapability != 1, Policy.RequireAnonymousLinksExpireInDays != -1]
+    Case2 := count([Condition | Condition = Conditions2[_]; Condition == false]) == 0
+    Conditions := [Case1, Case2]
+    Status := count([Condition | Condition = Conditions[_]; Condition == true]) > 0
+}
+#--
+
+#
+# Baseline 2.2: Policy 2
+#--
 #Automatically met if policy 2 is met, Suggested for additional check for baseline. Will use this as a place holder. 
 ReportDetails2_2(Policy) = Description if {
     Policy.OneDriveLoopSharingCapability == 1
@@ -48,36 +87,33 @@ ReportDetails2_2(Policy) = Description if {
 
 ReportDetails2_2(Policy) = Description if {
     Policy.OneDriveLoopSharingCapability != 1
-    Policy.RequireAnonymousLinksExpireInDays == 30
-    Policy.OneDriveRequestFilesLinkExpirationInDays == 30
+    Policy.OneDriveRequestFilesLinkExpirationInDays <= 30
     Description := "Requirement met"
 }
 
 ReportDetails2_2(Policy) = Description if {
     Policy.OneDriveLoopSharingCapability != 1
-    Policy.RequireAnonymousLinksExpireInDays != 30
-    Policy.OneDriveRequestFilesLinkExpirationInDays != 30
+    Policy.OneDriveRequestFilesLinkExpirationInDays > 30
     Description := "Requirement not met"
 }
 
 tests[{
-    "Requirement" : "An 30 days expiration date SHOULD be set for Anyone links",
+    "Requirement" : "Expiration date SHOULD be set to thirty days",
     "Control" : "OneDrive 2.2",
     "Criticality" : "Should",
     "Commandlet" : ["Get-SPOTenant"],
-    "ActualValue" : [Policy.OneDriveLoopSharingCapability, Policy.RequireAnonymousLinksExpireInDays, Policy.OneDriveRequestFilesLinkExpirationInDays],
+    "ActualValue" : [Policy.OneDriveLoopSharingCapability, Policy.OneDriveRequestFilesLinkExpirationInDays],
     "ReportDetails" : ReportDetails2_2(Policy),
     "RequirementMet" : Status
 }] {
     Policy := input.SPO_tenant_info[_]
     Conditions1 := [Policy.OneDriveLoopSharingCapability ==1]
     Case1 := count([Condition | Condition = Conditions1[_]; Condition == false]) == 0
-	Conditions2 := [Policy.OneDriveLoopSharingCapability != 1, Policy.RequireAnonymousLinksExpireInDays == 30, Policy.OneDriveRequestFilesLinkExpirationInDays == 30]
+	Conditions2 := [Policy.OneDriveLoopSharingCapability != 1, Policy.OneDriveRequestFilesLinkExpirationInDays <= 30]
     Case2 := count([Condition | Condition = Conditions2[_]; Condition == false]) == 0
     Conditions := [Case1, Case2]
     Status := count([Condition | Condition = Conditions[_]; Condition == true]) > 0
 }
-#--
 
 
 ################
