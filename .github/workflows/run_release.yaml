@@ -1,4 +1,6 @@
 on: 
+  # temporary to get to register.
+  pull_request:
   workflow_dispatch:
     inputs:
       releaseName:
