@@ -720,6 +720,12 @@ test_BlockAccess_Correct if {
                 ],
 	            "NotifyUserType":  "NotSet"
             }
+        ],
+        "dlp_compliance_policies": [
+            {
+                "Name": "Default Office 365 DLP policy",
+                "Mode": "Enable"
+            }
         ]
     }
 
@@ -730,7 +736,7 @@ test_BlockAccess_Correct if {
     RuleOutput[0].ReportDetails == "Requirement met"
 }
 
-test_BlockAccess_Incorrect if {
+test_BlockAccess_IncorrectV1 if {
     ControlNumber := "Defender 2.2"
     Requirement := "The action for the DLP policy SHOULD be set to block sharing sensitive information with everyone when DLP conditions are met"
 
@@ -752,6 +758,12 @@ test_BlockAccess_Incorrect if {
                 ],
 	            "NotifyUserType":  "NotSet"
             }
+        ],
+        "dlp_compliance_policies": [
+            {
+                "Name": "Default Office 365 DLP policy",
+                "Mode": "Enable"
+            }
         ]
     }
 
@@ -759,7 +771,45 @@ test_BlockAccess_Incorrect if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "1 rule(s) found that do(es) not block access: Baseline Rule"
+    RuleOutput[0].ReportDetails == "1 rule(s) found that do(es) not block access or associated policy not set to enforce block action: Baseline Rule"
+}
+
+test_BlockAccess_IncorrectV2 if {
+    ControlNumber := "Defender 2.2"
+    Requirement := "The action for the DLP policy SHOULD be set to block sharing sensitive information with everyone when DLP conditions are met"
+
+    Output := tests with input as {
+        "dlp_compliance_rules": [
+            {
+                "ContentContainsSensitiveInformation":  [
+                    {"name":  "U.S. Individual Taxpayer Identification Number (ITIN)"}
+                ],
+                "Name":  "Baseline Rule",
+	            "Disabled" : false,
+                "ParentPolicyName":  "Default Office 365 DLP policy",
+	            "BlockAccess":  true,
+                "BlockAccessScope":  "All",
+	            "NotifyUser":  [
+                    "SiteAdmin",
+                    "LastModifier",
+                    "Owner"
+                ],
+	            "NotifyUserType":  "NotSet"
+            }
+        ],
+        "dlp_compliance_policies": [
+            {
+                "Name": "Default Office 365 DLP policy",
+                "Mode": "TestWithNotifications"
+            }
+        ]
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "1 rule(s) found that do(es) not block access or associated policy not set to enforce block action: Baseline Rule"
 }
 
 #

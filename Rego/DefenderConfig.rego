@@ -155,7 +155,7 @@ ITINRules[Rule.Name] {
     "U.S. Individual Taxpayer Identification Number (ITIN)" in Rule.ContentNames
 }
 
-CardRules[ Rule.Name] {
+CardRules[Rule.Name] {
     Rule := SensitiveRules[_]
     "Credit Card Number" in Rule.ContentNames
 }
@@ -321,6 +321,16 @@ SensitiveRulesNotBlocking[Rule.Name] {
     not Rule.BlockAccess
 }
 
+# Covers rules set to block, but inside policies set to
+# "TestWithNotifications" that won't enforce the block
+SensitiveRulesNotBlocking[Rule.Name] {
+    Rule := SensitiveRules[_]
+    Policy := input.dlp_compliance_policies[_]
+    Rule.ParentPolicyName == Policy.Name
+    Rule.BlockAccess
+    Policy.Mode != "Enable"
+}
+
 tests[{
     "Requirement" : "The action for the DLP policy SHOULD be set to block sharing sensitive information with everyone when DLP conditions are met",
     "Control" : "Defender 2.2",
@@ -331,7 +341,7 @@ tests[{
     "RequirementMet" : Status
 }] {
     Rules := SensitiveRulesNotBlocking
-    ErrorMessage := "rule(s) found that do(es) not block access:"
+    ErrorMessage := "rule(s) found that do(es) not block access or associated policy not set to enforce block action:"
 	Status := count(Rules) == 0
 }
 #--
