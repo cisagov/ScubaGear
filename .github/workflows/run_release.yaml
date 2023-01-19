@@ -43,7 +43,7 @@ jobs:
         }
 
         Remove-Item -Recurse -Force certificate
-        Remove-Item -Recurse -Force repo -Include .git*
+        Remove-Item -Recurse -Force repo\* -Include .git*
 
         Compress-Archive -Path repo -DestinationPath release.zip
     - name: release
