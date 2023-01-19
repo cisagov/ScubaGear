@@ -40,9 +40,24 @@ tests[{
 #
 # Baseline 2.2: Policy 1
 #--
-RequiredExpirationDatePolicy[Policy]{
-    Policy := input.SPO_tenant_info[_]
-    Policy.ExternalUserExpirationRequired == true
+#Automatically met if policy 2 is met, Suggested for additional check for baseline. Will use this as a place holder. 
+ReportDetails2_2(Policy) = Description if {
+    Policy.OneDriveLoopSharingCapability == 1
+    Description := "Requirement met: AnyOne Link is disabled"
+}
+
+ReportDetails2_2(Policy) = Description if {
+    Policy.OneDriveLoopSharingCapability != 1
+    Policy.RequireAnonymousLinksExpireInDays == 30
+    Policy.OneDriveRequestFilesLinkExpirationInDays == 30
+    Description := "Requirement met"
+}
+
+ReportDetails2_2(Policy) = Description if {
+    Policy.OneDriveLoopSharingCapability != 1
+    Policy.RequireAnonymousLinksExpireInDays != 30
+    Policy.OneDriveRequestFilesLinkExpirationInDays != 30
+    Description := "Requirement not met"
 }
 
 tests[{
@@ -50,34 +65,17 @@ tests[{
     "Control" : "OneDrive 2.2",
     "Criticality" : "Should",
     "Commandlet" : ["Get-SPOTenant"],
-    "ActualValue" : Policies,
-    "ReportDetails" : ReportDetailsBoolean(Status),
+    "ActualValue" : [Policy.OneDriveLoopSharingCapability, Policy.RequireAnonymousLinksExpireInDays, Policy.OneDriveRequestFilesLinkExpirationInDays],
+    "ReportDetails" : ReportDetails2_2(Policy),
     "RequirementMet" : Status
 }] {
-    Policies := RequiredExpirationDatePolicy
-    Status := count(Policies) == 1
-}
-#--
-
-#
-# Baseline 2.2: Policy 2
-#--
-ExpirationDatePolicy[Policy]{
     Policy := input.SPO_tenant_info[_]
-    Policy.ExternalUserExpireInDays == 30
-}
-
-tests[{
-    "Requirement" : "Expiration date SHOULD be set to thirty days",
-    "Control" : "OneDrive 2.2",
-    "Criticality" : "Should",
-    "Commandlet" : ["Get-SPOTenant"],
-    "ActualValue" : Policies,
-    "ReportDetails" : ReportDetailsBoolean(Status),
-    "RequirementMet" : Status
-}] {
-    Policies := ExpirationDatePolicy
-    Status := count(Policies) == 1
+    Conditions1 := [Policy.OneDriveLoopSharingCapability ==1]
+    Case1 := count([Condition | Condition = Conditions1[_]; Condition == false]) == 0
+	Conditions2 := [Policy.OneDriveLoopSharingCapability != 1, Policy.RequireAnonymousLinksExpireInDays == 30, Policy.OneDriveRequestFilesLinkExpirationInDays == 30]
+    Case2 := count([Condition | Condition = Conditions2[_]; Condition == false]) == 0
+    Conditions := [Case1, Case2]
+    Status := count([Condition | Condition = Conditions[_]; Condition == true]) > 0
 }
 #--
 
@@ -90,6 +88,12 @@ tests[{
 # Baseline 2.3: Policy 1
 #--
 ReportDetails2_3(Policy) = Description if {
+    Policy.OneDriveLoopSharingCapability == 1
+    Description := "Requirement met: AnyOne Link is disabled"
+}
+
+ReportDetails2_3(Policy) = Description if {
+    Policy.OneDriveLoopSharingCapability != 1
     Policy.DefaultSharingLinkType != 3
     Policy.FileAnonymousLinkType == 1
     Policy.FolderAnonymousLinkType == 1
@@ -97,6 +101,7 @@ ReportDetails2_3(Policy) = Description if {
 }
 
 ReportDetails2_3(Policy) = Description if {
+    Policy.OneDriveLoopSharingCapability != 1
     Policy.DefaultSharingLinkType != 3
     Policy.FileAnonymousLinkType == 2
     Policy.FolderAnonymousLinkType == 2
@@ -104,6 +109,7 @@ ReportDetails2_3(Policy) = Description if {
 }
 
 ReportDetails2_3(Policy) = Description if {
+    Policy.OneDriveLoopSharingCapability != 1
     Policy.DefaultSharingLinkType != 3
     Policy.FileAnonymousLinkType == 1
     Policy.FolderAnonymousLinkType == 2
@@ -111,6 +117,7 @@ ReportDetails2_3(Policy) = Description if {
 }
 
 ReportDetails2_3(Policy) = Description if {
+    Policy.OneDriveLoopSharingCapability != 1
     Policy.DefaultSharingLinkType != 3
     Policy.FileAnonymousLinkType == 2
     Policy.FolderAnonymousLinkType == 1
@@ -118,6 +125,7 @@ ReportDetails2_3(Policy) = Description if {
 }
 
 ReportDetails2_3(Policy) = Description if {
+    Policy.OneDriveLoopSharingCapability != 1
     Policy.DefaultSharingLinkType == 3
 	Description := "Requirement not met: default link sharing type is set to Anyone with link"
 }
@@ -127,13 +135,17 @@ tests[{
     "Control" : "OneDrive 2.3",
     "Criticality" : "Should",
     "Commandlet" : ["Get-SPOTenant"],
-    "ActualValue" : [Policy.DefaultSharingLinkType, Policy.FileAnonymousLinkType, Policy.FolderAnonymousLinkType],
+    "ActualValue" : [Policy.OneDriveLoopSharingCapability, Policy.DefaultSharingLinkType, Policy.FileAnonymousLinkType, Policy.FolderAnonymousLinkType],
     "ReportDetails" : ReportDetails2_3(Policy),
     "RequirementMet" : Status
 }] {
     Policy := input.SPO_tenant_info[_]
-	Conditions := [Policy.DefaultSharingLinkType != 3, Policy.FileAnonymousLinkType == 1, Policy.FolderAnonymousLinkType == 1]
-    Status := count([Condition | Condition = Conditions[_]; Condition == false]) == 0
+        Conditions1 := [Policy.OneDriveLoopSharingCapability ==1]
+        Case1 := count([Condition | Condition = Conditions1[_]; Condition == false]) == 0
+	    Conditions2 := [Policy.OneDriveLoopSharingCapability != 1, Policy.DefaultSharingLinkType != 3, Policy.FileAnonymousLinkType == 1, Policy.FolderAnonymousLinkType == 1]
+        Case2 := count([Condition | Condition = Conditions2[_]; Condition == false]) == 0
+        Conditions := [Case1, Case2]
+    Status := count([Condition | Condition = Conditions[_]; Condition == true]) > 0
 }
 #--
 
