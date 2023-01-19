@@ -7,7 +7,7 @@ import future.keywords
 #--
 test_ExternalUserExpirationRequired_Correct_V1 if {
     ControlNumber := "OneDrive 2.2"
-    Requirement := "An expiration date SHOULD be set for Anyone links"
+    Requirement := "An 30 days expiration date SHOULD be set for Anyone links"
 
     Output := tests with input as {
         "SPO_tenant_info": [
@@ -28,7 +28,7 @@ test_ExternalUserExpirationRequired_Correct_V1 if {
 
 test_ExternalUserExpirationRequired_Correct_V2 if {
     ControlNumber := "OneDrive 2.2"
-    Requirement := "An expiration date SHOULD be set for Anyone links"
+    Requirement := "An 30 days expiration date SHOULD be set for Anyone links"
 
     Output := tests with input as {
         "SPO_tenant_info": [
@@ -49,7 +49,7 @@ test_ExternalUserExpirationRequired_Correct_V2 if {
 
 test_ExternalUserExpirationRequired_CorrectV_3 if {
     ControlNumber := "OneDrive 2.2"
-    Requirement := "An expiration date SHOULD be set for Anyone links"
+    Requirement := "An 30 days expiration date SHOULD be set for Anyone links"
 
     Output := tests with input as {
         "SPO_tenant_info": [
@@ -70,7 +70,7 @@ test_ExternalUserExpirationRequired_CorrectV_3 if {
 
 test_ExternalUserExpirationRequired_Incorrect if {
     ControlNumber := "OneDrive 2.2"
-    Requirement := "An expiration date SHOULD be set for Anyone links"
+    Requirement := "An 30 days expiration date SHOULD be set for Anyone links"
 
     Output := tests with input as {
         "SPO_tenant_info": [
