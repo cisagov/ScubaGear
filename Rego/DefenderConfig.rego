@@ -139,6 +139,10 @@ SensitiveRules[{
                     "U.S. Individual Taxpayer Identification Number (ITIN)" in ContentNames,
                     "Credit Card Number" in ContentNames]
     count([Condition | Condition = Conditions[_]; Condition == true]) > 0
+
+    Policy := input.dlp_compliance_policies[_]
+    Rules.ParentPolicyName == Policy.Name
+    Policy.Enabled == true
 }
 
 #
@@ -319,16 +323,19 @@ tests[{
 SensitiveRulesNotBlocking[Rule.Name] {
     Rule := SensitiveRules[_]
     not Rule.BlockAccess
+    Policy := input.dlp_compliance_policies[_]
+    Rule.ParentPolicyName == Policy.Name
+    Policy.Mode == "Enable"
 }
 
 # Covers rules set to block, but inside policies set to
-# "TestWithNotifications" that won't enforce the block
+# "TestWithNotifications" or "TestWithoutNotifications" that won't enforce the block
 SensitiveRulesNotBlocking[Rule.Name] {
     Rule := SensitiveRules[_]
     Policy := input.dlp_compliance_policies[_]
     Rule.ParentPolicyName == Policy.Name
     Rule.BlockAccess
-    Policy.Mode != "Enable"
+    startswith(Policy.Mode, "TestWith") == true
 }
 
 tests[{
