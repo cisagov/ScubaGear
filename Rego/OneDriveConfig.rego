@@ -61,7 +61,7 @@ ReportDetails2_2(Policy) = Description if {
 }
 
 tests[{
-    "Requirement" : "An expiration date SHOULD be set for Anyone links",
+    "Requirement" : "An 30 days expiration date SHOULD be set for Anyone links",
     "Control" : "OneDrive 2.2",
     "Criticality" : "Should",
     "Commandlet" : ["Get-SPOTenant"],
