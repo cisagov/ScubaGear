@@ -1,5 +1,4 @@
 on: 
-  # temporary to get to register.
   workflow_dispatch:
     inputs:
       releaseName:
