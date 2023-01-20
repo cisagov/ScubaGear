@@ -45,7 +45,7 @@ jobs:
         $cert = Get-PfxCertificate -FilePath certificate\cert.pfx -Password (ConvertTo-SecureString -String $env:CODESIGN_PW -Force -AsPlainText)
 
         # Import Intermediate so it can be resolved
-        #Import-Certificate -FilePath certificate\int.cer 
+        Import-Certificate -FilePath certificate\int.cer -CertStoreLocation cert:\CurrentUser\My
 
         Get-ChildItem -Recurse -Path repo -Include **.ps1,**.psm1 | ForEach-Object {
           $path = $_.FullName
