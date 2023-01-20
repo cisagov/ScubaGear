@@ -43,8 +43,7 @@ jobs:
 
         Get-ChildItem -Recurse -Path repo -Include **.ps1,**.psm1 | ForEach-Object {
           $path = $_.FullName
-          & 'C:/Program Files (x86)/Windows Kits/10/bin/10.0.22621.0/x86/signtool.exe' sign /tr "http://timestamp.sectigo.com/rfc3161" /fd SHA256 /p $env:CODESIGN_PW /f certificate\cert.pfx /td SHA256 /ac certificate\int.cer /r "DigiCert Trusted Root G5" $path
-
+          & 'C:/Program Files (x86)/Windows Kits/10/bin/10.0.22621.0/x86/signtool.exe' sign /tr "http://timestamp.sectigo.com/rfc3161" /fd SHA256 /p $env:CODESIGN_PW /f certificate\cert.pfx /td SHA256 /ac certificate\int.cer /r "DigiCert Trusted Root G4" $path
         }
 
         Remove-Item -Recurse -Force certificate
