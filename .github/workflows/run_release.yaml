@@ -41,15 +41,10 @@ jobs:
         Set-Content -Path certificate\int.txt -Value $env:CODESIGN_INT
         certutil -decode certificate\int.txt certificate\int.cer
 
-        # Load CA and Key
-        $cert = Get-PfxCertificate -FilePath certificate\cert.pfx -Password (ConvertTo-SecureString -String $env:CODESIGN_PW -Force -AsPlainText)
-
-        # Import Intermediate so it can be resolved
-        Import-Certificate -FilePath certificate\int.cer -CertStoreLocation cert:\CurrentUser\My
-
         Get-ChildItem -Recurse -Path repo -Include **.ps1,**.psm1 | ForEach-Object {
           $path = $_.FullName
-          Set-AuthenticodeSignature -Certificate $cert -FilePath $path -TimestampServer "http://timestamp.sectigo.com/" -IncludeChain NotRoot
+          & 'C:/Program Files (x86)/Windows Kits/10/bin/10.0.22621.0/x86/signtool.exe' sign /tr "http://timestamp.sectigo.com/rfc3161" /fd SHA256 /p $env:CODESIGN_PW /f certificate\cert.pfx /td SHA256 /ac certificate\int.cer $path
+
         }
 
         Remove-Item -Recurse -Force certificate
