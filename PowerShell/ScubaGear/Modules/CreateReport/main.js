@@ -105,7 +105,7 @@ function fillTruncatedCell(td, i, j) {
     if (capColNames[j] == "") {
         content = ""
     }
-    else if (caps[i][capColNames[j]].constructor === Array) {
+    else if (caps[i][capColNames[j]].constructor === Array && caps[i][capColNames[j]].length > 1) {
         content = caps[i][capColNames[j]][0];
         truncated = true;
     }
@@ -184,7 +184,7 @@ function expandCAPRow(evt) {
             img.addEventListener("click", hideCAPRow);
             tr.querySelectorAll('td')[1].appendChild(img);
         }
-        else if (caps[i][capColNames[j]].constructor === Array) {
+        else if (caps[i][capColNames[j]].constructor === Array && caps[i][capColNames[j]].length > 1) {
             let ul = document.createElement("ul");
             for (let k = 0; k < caps[i][capColNames[j]].length; k++) {
                 let li = document.createElement("li");
