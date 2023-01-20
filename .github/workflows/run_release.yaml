@@ -50,6 +50,12 @@ jobs:
         Remove-Item -Recurse -Force repo -Include .git*
 
         Compress-Archive -Path repo\* -DestinationPath release.zip
+
+        # Verify certs
+        Get-ChildItem -Recurse -Path repo -Include **.ps1,**.psm1 | ForEach-Object {
+          $path = $_.FullName
+          & 'C:/Program Files (x86)/Windows Kits/10/bin/10.0.22621.0/x86/signtool.exe' verify /pa /v $path
+        }
     - name: release
       uses: softprops/action-gh-release@v1
       id: create_release
