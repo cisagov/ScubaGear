@@ -37,7 +37,7 @@ jobs:
         Set-Content -Path certificate\cert.txt -Value $env:CODESIGN_PFX
         certutil -decode certificate\cert.txt certificate\cert.pfx
 
-        $cert = Get-PfxCertificate -FilePath certificate\cert.pfx -Password (ConvertTo-SecureString -String $env:WINDOWS_PFX_PASSWORD -Force -AsPlainText)
+        $cert = Get-PfxCertificate -FilePath certificate\cert.pfx -Password (ConvertTo-SecureString -String $env:CODESIGN_PW -Force -AsPlainText)
 
         Get-ChildItem -Recurse -Path repo -Include **.ps1,**.psm1 | ForEach-Object {
           $path = $_.FullName
