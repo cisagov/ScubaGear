@@ -19,7 +19,6 @@ jobs:
     env:
       CODESIGN_PW: ${{ secrets.CODESIGN_PW }}
       CODESIGN_PFX: ${{ secrets.CODESIGN_PFX }}
-      CODESIGN_INT: ${{ secrets.CODESIGN_INT }}
     permissions:
       contents: write
     steps:
@@ -38,12 +37,11 @@ jobs:
         Set-Content -Path certificate\cert.txt -Value $env:CODESIGN_PFX
         certutil -decode certificate\cert.txt certificate\cert.pfx
 
-        Set-Content -Path certificate\int.txt -Value $env:CODESIGN_INT
-        certutil -decode certificate\int.txt certificate\int.cer
+        $cert = Get-PfxCertificate -FilePath certificate\cert.pfx -Password (ConvertTo-SecureString -String $env:WINDOWS_PFX_PASSWORD -Force -AsPlainText)
 
         Get-ChildItem -Recurse -Path repo -Include **.ps1,**.psm1 | ForEach-Object {
           $path = $_.FullName
-          & 'C:/Program Files (x86)/Windows Kits/10/bin/10.0.22621.0/x86/signtool.exe' sign /tr "http://timestamp.sectigo.com/rfc3161" /fd SHA256 /p $env:CODESIGN_PW /f certificate\cert.pfx /td SHA256 /ac certificate\int.cer /r "DigiCert Trusted Root G4" $path
+          Set-AuthenticodeSignature -Certificate $cert -FilePath $path -TimestampServer "http://timestamp.sectigo.com/" -IncludeChain NotRoot
         }
 
         Remove-Item -Recurse -Force certificate
