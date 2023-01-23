@@ -316,7 +316,6 @@ tests[{
 ################
 # Baseline 2.7 #
 ################
-
 #
 # Baseline 2.7: Policy 1
 #--
@@ -331,7 +330,8 @@ tests[{
 }] {
     Rules := input.transport_rule
     ErrorMessage := "No transport rule found with that applies to emails received from outside the organization"
-    Conditions := [IsCorrectScope | IsCorrectScope = Rules[_].FromScope == "NotInOrganization"]
+    EnabledRules := [rule | rule = Rules[_]; rule.State == "Enabled"]
+    Conditions := [IsCorrectScope | IsCorrectScope = EnabledRules[_].FromScope == "NotInOrganization"]
     Status := count([Condition | Condition = Conditions[_]; Condition == true]) > 0
 }
 #--
