@@ -7,7 +7,7 @@ import future.keywords
 #--
 test_ConditionalAccessPolicies_Correct if {
     ControlNumber := "AAD 2.4"
-    Requirement := "MFA SHALL be required for all users"
+    Requirement := "MFA SHALL be required for all users "
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -38,7 +38,7 @@ test_ConditionalAccessPolicies_Correct if {
 
 test_IncludeApplications_Incorrect if {
     ControlNumber := "AAD 2.4"
-    Requirement := "Phishing-Resistant MFA SHALL be required for all users"
+    Requirement := "MFA SHALL be required for all users "
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -69,7 +69,7 @@ test_IncludeApplications_Incorrect if {
 
 test_IncludeUsers_Incorrect if {
     ControlNumber := "AAD 2.4"
-    Requirement := "MFA SHALL be required for all users"
+    Requirement := "MFA SHALL be required for all users "
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -100,7 +100,7 @@ test_IncludeUsers_Incorrect if {
 
 test_BuiltInControls_Incorrect if {
     ControlNumber := "AAD 2.4"
-    Requirement := "MFA SHALL be required for all users"
+    Requirement := "MFA SHALL be required for all users "
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -131,7 +131,7 @@ test_BuiltInControls_Incorrect if {
 
 test_State_Incorrect if {
     ControlNumber := "AAD 2.4"
-    Requirement := "MFA SHALL be required for all users"
+    Requirement := "MFA SHALL be required for all users "
 
     Output := tests with input as {
         "conditional_access_policies": [
