@@ -2,6 +2,7 @@ BeforeAll {
     $ClassPath = "$($PSScriptRoot)/../../../PowerShell/ScubaGear/Modules/Providers/ProviderHelpers/"
     Import-Module $ClassPath/AADConditionalAccessHelper.psm1
     $CapHelper = Get-CapTracker
+    $CapHelper | Out-Null # Pointless line that makes the PS linter happy
 }
 
 Describe "GetIncludedUsers" {
@@ -40,7 +41,7 @@ Describe "GetIncludedUsers" {
         $UsersIncluded = $($CapHelper.GetIncludedUsers($Cap)) -Join ", "
         $UsersIncluded | Should -Be "1 specific role"
 	}
-    
+
     It "handles including multiple roles" {
         $Cap = Get-Content "CapSnippets/Users_sample07.json" | ConvertFrom-Json
         $UsersIncluded = $($CapHelper.GetIncludedUsers($Cap)) -Join ", "
@@ -214,7 +215,7 @@ Describe "GetConditions" {
         $Conditions[0] | Should -Be "Device platforms included: android"
         $Conditions[1] | Should -Be "Device platforms excluded: iOS, macOS, linux"
     }
-    
+
     It "handles including all locations" {
         $Cap = Get-Content "CapSnippets/Conditions_sample05.json" | ConvertFrom-Json
         $Conditions = $($CapHelper.GetConditions($Cap))
