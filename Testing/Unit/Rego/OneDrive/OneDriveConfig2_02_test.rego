@@ -177,7 +177,7 @@ test_ExternalUserExpireInDays_Incorrect if {
                 "OneDriveLoopSharingCapability" : 2,
                 "OneDriveRequestFilesLinkExpirationInDays" : 31    
             }
-        ]        
+        ]
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
