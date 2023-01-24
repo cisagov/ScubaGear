@@ -292,15 +292,118 @@ Describe "GetConditions" {
 }
 
 Describe "GetAccessControls" {
+    It "handles blocking access" {
+        $Cap = Get-Content "CapSnippets/AccessControl_sample01.json" | ConvertFrom-Json
+        $Controls = $($CapHelper.GetAccessControls($Cap))
+        $Controls | Should -Be "Block access"
+    }
 
+    It "handles requiring single control" {
+        $Cap = Get-Content "CapSnippets/AccessControl_sample02.json" | ConvertFrom-Json
+        $Controls = $($CapHelper.GetAccessControls($Cap))
+        $Controls | Should -Be "Allow access but require multifactor authentication"
+    }
+
+    It "handles requiring multiple controls in AND mode" {
+        $Cap = Get-Content "CapSnippets/AccessControl_sample03.json" | ConvertFrom-Json
+        $Controls = $($CapHelper.GetAccessControls($Cap))
+        $Controls | Should -Be "Allow access but require multifactor authentication, device to be marked compliant, Hybrid Azure AD joined device, approved client app, app protection policy, AND password change"
+    }
+
+    It "handles requiring multiple controls in OR mode" {
+        $Cap = Get-Content "CapSnippets/AccessControl_sample04.json" | ConvertFrom-Json
+        $Controls = $($CapHelper.GetAccessControls($Cap))
+        $Controls | Should -Be "Allow access but require multifactor authentication, device to be marked compliant, Hybrid Azure AD joined device, approved client app, app protection policy, OR password change"
+    }
+
+    It "handles using authentication strength (phishing resistant MFA)" {
+        $Cap = Get-Content "CapSnippets/AccessControl_sample05.json" | ConvertFrom-Json
+        $Controls = $($CapHelper.GetAccessControls($Cap))
+        $Controls | Should -Be "Allow access but require authentication strength (Phishing resistant MFA)"
+    }
+
+    It "handles using both authentication strength and a traditional control" {
+        $Cap = Get-Content "CapSnippets/AccessControl_sample06.json" | ConvertFrom-Json
+        $Controls = $($CapHelper.GetAccessControls($Cap))
+        $Controls | Should -Be "Allow access but require password change, AND authentication strength (Multi-factor authentication)"
+    }
+
+    It "handles using no access controls" {
+        $Cap = Get-Content "CapSnippets/AccessControl_sample07.json" | ConvertFrom-Json
+        $Controls = $($CapHelper.GetAccessControls($Cap))
+        $Controls | Should -Be "None"
+    }
 }
 
 Describe "GetSessionControls" {
+    It "handles using no session controls" {
+        $Cap = Get-Content "CapSnippets/SessionControl_sample01.json" | ConvertFrom-Json
+        $Controls = $($CapHelper.GetSessionControls($Cap))
+        $Controls | Should -Be "None"
+    }
 
-}
+    It "handles using app enforced restrictions" {
+        $Cap = Get-Content "CapSnippets/SessionControl_sample02.json" | ConvertFrom-Json
+        $Controls = $($CapHelper.GetSessionControls($Cap))
+        $Controls | Should -Be "Use app enforced restrictions"
+    }
 
-Describe "ExportCapPolicies" {
+    It "handles using conditional access app control with custom policy" {
+        $Cap = Get-Content "CapSnippets/SessionControl_sample03.json" | ConvertFrom-Json
+        $Controls = $($CapHelper.GetSessionControls($Cap))
+        $Controls | Should -Be "Use Conditional Access App Control (Use custom policy)"
+    }
 
+    It "handles using conditional access app control in monitor mode" {
+        $Cap = Get-Content "CapSnippets/SessionControl_sample03.json" | ConvertFrom-Json
+        $Cap.SessionControls.CloudAppSecurity.CloudAppSecurityType = "monitorOnly"
+        $Controls = $($CapHelper.GetSessionControls($Cap))
+        $Controls | Should -Be "Use Conditional Access App Control (Monitor only)"
+    }
+
+    It "handles using conditional access app control in block mode" {
+        $Cap = Get-Content "CapSnippets/SessionControl_sample03.json" | ConvertFrom-Json
+        $Cap.SessionControls.CloudAppSecurity.CloudAppSecurityType = "blockDownloads"
+        $Controls = $($CapHelper.GetSessionControls($Cap))
+        $Controls | Should -Be "Use Conditional Access App Control (Block downloads)"
+    }
+
+    It "handles using sign-in frequency every time" {
+        $Cap = Get-Content "CapSnippets/SessionControl_sample04.json" | ConvertFrom-Json
+        $Controls = $($CapHelper.GetSessionControls($Cap))
+        $Controls | Should -Be "Sign-in frequency (every time)"
+    }
+
+    It "handles using sign-in frequency time based" {
+        $Cap = Get-Content "CapSnippets/SessionControl_sample05.json" | ConvertFrom-Json
+        $Controls = $($CapHelper.GetSessionControls($Cap))
+        $Controls | Should -Be "Sign-in frequency (every 10 days)"
+    }
+
+    It "handles using persistent browser session" {
+        $Cap = Get-Content "CapSnippets/SessionControl_sample06.json" | ConvertFrom-Json
+        $Controls = $($CapHelper.GetSessionControls($Cap))
+        $Controls | Should -Be "Persistent browser session (never persistent)"
+    }
+
+    It "handles using customized continuous access evaluation" {
+        $Cap = Get-Content "CapSnippets/SessionControl_sample07.json" | ConvertFrom-Json
+        $Controls = $($CapHelper.GetSessionControls($Cap))
+        $Controls | Should -Be "Customize continuous access evaluation"
+    }
+
+    It "handles disabling resilience defaults" {
+        $Cap = Get-Content "CapSnippets/SessionControl_sample08.json" | ConvertFrom-Json
+        $Controls = $($CapHelper.GetSessionControls($Cap))
+        $Controls | Should -Be "Disable resilience defaults"
+    }
+
+    It "handles multiple controls simultaneously" {
+        $Cap = Get-Content "CapSnippets/SessionControl_sample09.json" | ConvertFrom-Json
+        $Controls = $($CapHelper.GetSessionControls($Cap))
+        $Controls[0] | Should -Be "Persistent browser session (never persistent)"
+        $Controls[1] | Should -Be "Disable resilience defaults"
+    }
 }
 
 # TODO Test what happens when there are missing values / simulate API changes

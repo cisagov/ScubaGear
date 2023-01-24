@@ -1,0 +1,26 @@
+{
+    "SessionControls":{
+       "ApplicationEnforcedRestrictions":{
+          "IsEnabled":null
+       },
+       "CloudAppSecurity":{
+          "CloudAppSecurityType":null,
+          "IsEnabled":null
+    },
+       "ContinuousAccessEvaluation":{
+          "Mode":null
+       },
+       "DisableResilienceDefaults":null,
+       "PersistentBrowser":{
+          "IsEnabled":null,
+          "Mode":null
+       },
+       "SignInFrequency":{
+            "AuthenticationType":"primaryAndSecondaryAuthentication",
+            "FrequencyInterval":"everyTime",
+            "IsEnabled":true,
+            "Type":null,
+            "Value":null
+        }
+    }
+ }

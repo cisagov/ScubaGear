@@ -279,6 +279,8 @@ class CapHelper {
 
                 $AccessControls = "Allow access but require $($GrantControls -Join ', ')"
                 if ($GrantControls.Length -gt 1) {
+                    # If multiple access controls are in place, insert the AND or the OR
+                    # before the final access control
                     $AccessControls = $AccessControls.Insert($AccessControls.LastIndexOf(',')+1, " $($Cap.GrantControls.Operator)")
                 }
             }

@@ -1,0 +1,30 @@
+{
+    "GrantControls":{
+        "AuthenticationStrength":{
+            "AllowedCombinations":null,
+            "CombinationConfigurations":null,
+            "CreatedDateTime":null,
+            "Description":null,
+            "DisplayName":null,
+            "Id":null,
+            "ModifiedDateTime":null,
+            "PolicyType":null,
+            "RequirementsSatisfied":null
+        },
+        "BuiltInControls":[
+            "mfa",
+            "compliantDevice",
+            "domainJoinedDevice",
+            "approvedApplication",
+            "compliantApplication",
+            "passwordChange"
+        ],
+        "CustomAuthenticationFactors":[
+            
+        ],
+        "Operator":"AND",
+        "TermsOfUse":[
+            
+        ]
+    }
+}

@@ -1,0 +1,23 @@
+{
+    "GrantControls":{
+        "AuthenticationStrength":{
+            "AllowedCombinations":null,
+            "CombinationConfigurations":null,
+            "CreatedDateTime":null,
+            "Description":null,
+            "DisplayName":null,
+            "Id":null,
+            "ModifiedDateTime":null,
+            "PolicyType":null,
+            "RequirementsSatisfied":null
+        },
+        "BuiltInControls":null,
+        "CustomAuthenticationFactors":[
+            
+        ],
+        "Operator":null,
+        "TermsOfUse":[
+            
+        ]
+    }
+}

@@ -1,0 +1,29 @@
+{
+    "GrantControls":{
+       "AuthenticationStrength":{
+          "AllowedCombinations":[
+             "windowsHelloForBusiness",
+             "fido2",
+             "x509CertificateMultiFactor"
+          ],
+          "CombinationConfigurations":null,
+          "CreatedDateTime":"/Date(1638345600000)/",
+          "Description":"Phishing-resistant, Passwordless methods for the strongest authentication, such as a FIDO2 security key",
+          "DisplayName":"Phishing resistant MFA",
+          "Id":"00000000-0000-0000-0000-000000000004",
+          "ModifiedDateTime":"/Date(1638345600000)/",
+          "PolicyType":"builtIn",
+          "RequirementsSatisfied":"mfa"
+       },
+       "BuiltInControls":[
+          
+       ],
+       "CustomAuthenticationFactors":[
+          
+       ],
+       "Operator":"OR",
+       "TermsOfUse":[
+          
+       ]
+    }
+ }
