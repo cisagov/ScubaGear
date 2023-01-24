@@ -146,3 +146,23 @@ test_ExternalUserExpireInDays_CorrectV_3 if {
     RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "Requirement met"
 }
+
+test_ExternalUserExpireInDays_Incorrect if {
+    ControlNumber := "OneDrive 2.2"
+    Requirement := "Expiration date SHOULD be set to thirty days"
+
+    Output := tests with input as {
+        "SPO_tenant_info": [
+            {
+                "OneDriveLoopSharingCapability" : 2,
+                "OneDriveRequestFilesLinkExpirationInDays" : 31    
+            }
+        ]
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "Requirement not met"
+}
