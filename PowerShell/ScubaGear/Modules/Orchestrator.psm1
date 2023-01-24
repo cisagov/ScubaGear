@@ -263,7 +263,7 @@ function Get-FileEncoding{
 
     $Encoding = 'utf8'
 
-    if ($PSVersion -ge '7.2.0'){
+    if ($PSVersion -ge '6.0'){
         $Encoding = 'utf8NoBom'
     }
 
