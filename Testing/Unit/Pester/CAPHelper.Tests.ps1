@@ -2,7 +2,9 @@ BeforeAll {
     $ClassPath = "$($PSScriptRoot)/../../../PowerShell/ScubaGear/Modules/Providers/ProviderHelpers/"
     Import-Module $ClassPath/AADConditionalAccessHelper.psm1
     $CapHelper = Get-CapTracker
-    $CapHelper | Out-Null # Pointless line that makes the PS linter happy
+    $CapHelper | Out-Null # Pointless line that makes the PS linter happy,
+    # otherwise it complains that $CapHelper is never used (even though it
+    # is used in literally every single test case)
 }
 
 Describe "GetIncludedUsers" {
