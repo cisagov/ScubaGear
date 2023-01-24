@@ -93,7 +93,7 @@ ReportDetails2_2(Policy) = Description if {
 
 ReportDetails2_2(Policy) = Description if {
     Policy.OneDriveLoopSharingCapability == 2
-    Policy.OneDriveRequestFilesLinkExpirationInDays == 30
+    Policy.OneDriveRequestFilesLinkExpirationInDays != 30
     Description := "Requirement not met"
 }
 
