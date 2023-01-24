@@ -42,9 +42,9 @@ jobs:
 
         Get-ChildItem -Recurse -Path repo -Include **.ps1,**.psm1,**.psd1 | ForEach-Object {
           $path = $_.FullName
-          Set-AuthenticodeSignature -Certificate $cert -FilePath $path -TimestampServer "http://timestamp.sectigo.com/" -IncludeChain NotRoot -HashAlgorithm SHA256
-          # Delay for 15 seconds to please the timestamp server.
-          Start-Sleep -Seconds 15
+          Set-AuthenticodeSignature -Certificate $cert -FilePath $path -TimestampServer "http://timestamp.digicert.com/" -IncludeChain NotRoot -HashAlgorithm SHA256
+          # Delay for 4 seconds to avoid exceeding rate limits (1000 / 5 minutes, 100 / 5 seconds)
+          Start-Sleep -Seconds 4
         }
 
         Remove-Item -Recurse -Force certificate
