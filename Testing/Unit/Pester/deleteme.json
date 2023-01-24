@@ -1,0 +1,80 @@
+{
+    "Conditions": {
+        "Users": {
+            "ExcludeGroups": [],
+            "ExcludeGuestsOrExternalUsers": {
+                "ExternalTenants": {
+                    "MembershipKind": null
+                },
+                "GuestOrExternalUserTypes": null
+            },
+            "ExcludeRoles": [],
+            "ExcludeUsers": [],
+            "IncludeGroups": [],
+            "IncludeGuestsOrExternalUsers": {
+                "ExternalTenants": {
+                    "MembershipKind": null
+                },
+                "GuestOrExternalUserTypes": null
+            },
+            "IncludeRoles": [],
+            "IncludeUsers": [
+                "None"
+            ]
+        }
+    },
+    "DisplayName":  "Test 5",
+    "GrantControls":  {
+                          "AuthenticationStrength":  {
+                                                         "AllowedCombinations":  null,
+                                                         "CombinationConfigurations":  null,
+                                                         "CreatedDateTime":  null,
+                                                         "Description":  null,
+                                                         "DisplayName":  null,
+                                                         "Id":  null,
+                                                         "ModifiedDateTime":  null,
+                                                         "PolicyType":  null,
+                                                         "RequirementsSatisfied":  null
+                                                     },
+                          "BuiltInControls":  [
+                                                  "domainJoinedDevice"
+                                              ],
+                          "CustomAuthenticationFactors":  [
+
+                                                          ],
+                          "Operator":  "OR",
+                          "TermsOfUse":  [
+
+                                         ]
+                      },
+    "Id":  "9be5254e-312d-4d12-8f67-89d8d3706e95",
+    "ModifiedDateTime":  "/Date(1672961741958)/",
+    "SessionControls":  {
+                            "ApplicationEnforcedRestrictions":  {
+                                                                    "IsEnabled":  null
+                                                                },
+                            "CloudAppSecurity":  {
+                                                     "CloudAppSecurityType":  null,
+                                                     "IsEnabled":  null
+                                                 },
+                            "ContinuousAccessEvaluation":  {
+                                                               "Mode":  null
+                                                           },
+                            "DisableResilienceDefaults":  null,
+                            "PersistentBrowser":  {
+                                                      "IsEnabled":  null,
+                                                      "Mode":  null
+                                                  },
+                            "SignInFrequency":  {
+                                                    "AuthenticationType":  null,
+                                                    "FrequencyInterval":  null,
+                                                    "IsEnabled":  null,
+                                                    "Type":  null,
+                                                    "Value":  null
+                                                }
+                        },
+    "State":  "disabled",
+    "AdditionalProperties":  {
+
+                             }
+}

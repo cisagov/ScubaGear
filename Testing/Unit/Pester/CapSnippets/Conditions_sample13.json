@@ -1,0 +1,54 @@
+{
+    "Conditions":{
+       "UserRiskLevels":[
+            "low"
+       ],
+       "SignInRiskLevels":[
+            "high"
+       ],
+       "Platforms":{
+          "ExcludePlatforms": [
+            "android",
+            "iOS",
+            "macOS",
+            "linux"
+        ],
+          "IncludePlatforms": [
+            "all"
+          ]
+       },
+       "Locations":{
+          "ExcludeLocations":[
+
+          ],
+          "IncludeLocations":[
+            "AllTrusted"
+          ]
+       },
+       "ClientApplications":{
+          "ExcludeServicePrincipals":null,
+          "IncludeServicePrincipals":null,
+          "ServicePrincipalFilter":{
+             "Mode":null,
+             "Rule":null
+          }
+       },
+       "ClientAppTypes":[
+            "exchangeActiveSync"
+       ],
+       "DeviceStates":{
+          "ExcludeStates":null,
+          "IncludeStates":null
+       },
+       "Devices":{
+          "DeviceFilter":{
+             "Mode":"exclude",
+             "Rule":"device.manufacturer -eq 'helloworld'"
+          },
+          "ExcludeDeviceStates":null,
+          "ExcludeDevices":null,
+          "IncludeDeviceStates":null,
+          "IncludeDevices":null
+       }
+    }
+ }

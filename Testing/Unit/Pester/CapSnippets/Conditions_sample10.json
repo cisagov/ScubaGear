@@ -1,0 +1,46 @@
+{
+    "Conditions":{
+       "UserRiskLevels":[
+
+       ],
+       "SignInRiskLevels":[
+    
+       ],
+       "Platforms":{
+          "ExcludePlatforms": null,
+          "IncludePlatforms": null
+       },
+       "Locations":{
+          "ExcludeLocations":null,
+          "IncludeLocations":null
+       },
+       "ClientApplications":{
+          "ExcludeServicePrincipals":null,
+          "IncludeServicePrincipals":null,
+          "ServicePrincipalFilter":{
+             "Mode":null,
+             "Rule":null
+          }
+       },
+       "ClientAppTypes":[
+            "exchangeActiveSync",
+            "browser",
+            "mobileAppsAndDesktopClients",
+            "other"
+       ],
+       "DeviceStates":{
+          "ExcludeStates":null,
+          "IncludeStates":null
+       },
+       "Devices":{
+          "DeviceFilter":{
+             "Mode":null,
+             "Rule":null
+          },
+          "ExcludeDeviceStates":null,
+          "ExcludeDevices":null,
+          "IncludeDeviceStates":null,
+          "IncludeDevices":null
+       }
+    }
+ }

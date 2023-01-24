@@ -1,0 +1,38 @@
+{
+    "Conditions": {
+       "Users":{
+          "ExcludeGroups":[
+             
+          ],
+          "ExcludeGuestsOrExternalUsers":{
+             "ExternalTenants":{
+                "MembershipKind":null
+             },
+             "GuestOrExternalUserTypes":null
+          },
+          "ExcludeRoles":[
+             
+          ],
+          "ExcludeUsers":[
+             
+          ],
+          "IncludeGroups":[
+             
+          ],
+          "IncludeGuestsOrExternalUsers":{
+             "ExternalTenants":{
+                "MembershipKind":"all"
+             },
+             "GuestOrExternalUserTypes":"b2bCollaborationGuest,b2bCollaborationMember,b2bDirectConnectUser,internalGuest,serviceProvider,otherExternalUser"
+          },
+          "IncludeRoles":[
+             
+          ],
+          "IncludeUsers":[
+             
+          ]
+       }
+      }
+  }
+ 
+ 

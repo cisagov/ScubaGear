@@ -1,0 +1,22 @@
+{
+    "Conditions": {
+        "Applications":{
+            "ApplicationFilter":{
+               "Mode":null,
+               "Rule":null
+            },
+            "ExcludeApplications":[
+               
+            ],
+            "IncludeApplications":[
+               "All"
+            ],
+            "IncludeAuthenticationContextClassReferences":[
+               
+            ],
+            "IncludeUserActions":[
+               
+            ]
+         }
+     }
+ }

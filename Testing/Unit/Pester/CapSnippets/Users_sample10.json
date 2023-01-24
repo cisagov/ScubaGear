@@ -1,0 +1,37 @@
+{
+   "Conditions": {
+      "Users":{
+         "ExcludeGroups":[
+            
+         ],
+         "ExcludeGuestsOrExternalUsers":{
+            "ExternalTenants":{
+               "MembershipKind":"all"
+            },
+            "GuestOrExternalUserTypes":"serviceProvider"
+         },
+         "ExcludeRoles":[
+            
+         ],
+         "ExcludeUsers":[
+            
+         ],
+         "IncludeGroups":[
+            
+         ],
+         "IncludeGuestsOrExternalUsers":{
+            "ExternalTenants":{
+               "MembershipKind":"all"
+            },
+            "GuestOrExternalUserTypes":"internalGuest"
+         },
+         "IncludeRoles":[
+            
+         ],
+         "IncludeUsers":[
+            
+         ]
+      }
+     }
+ }
+

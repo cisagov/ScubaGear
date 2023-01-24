@@ -248,7 +248,7 @@ class CapHelper {
         $Conditions += "Client apps included: $($ClientApps -Join ', ')"
         # Filter for devices
         if ($null -ne $Cap.Conditions.Devices.DeviceFilter.Mode) {
-            if ($null -ne $Cap.Conditions.Devices.DeviceFilter.Mode -eq "include") {
+            if ($Cap.Conditions.Devices.DeviceFilter.Mode -eq "include") {
                 $Conditions += "Custom device filter in include mode active"
             }
             else {

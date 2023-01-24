@@ -1,0 +1,49 @@
+{
+    "Conditions":{
+       "UserRiskLevels":[
+
+       ],
+       "SignInRiskLevels":[
+    
+       ],
+       "Platforms":{
+          "ExcludePlatforms": [
+            "iOS",
+            "macOS",
+            "linux"
+          ],
+          "IncludePlatforms": [
+            "android"
+          ]
+       },
+       "Locations":{
+          "ExcludeLocations":null,
+          "IncludeLocations":null
+       },
+       "ClientApplications":{
+          "ExcludeServicePrincipals":null,
+          "IncludeServicePrincipals":null,
+          "ServicePrincipalFilter":{
+             "Mode":null,
+             "Rule":null
+          }
+       },
+       "ClientAppTypes":[
+          "all"
+       ],
+       "DeviceStates":{
+          "ExcludeStates":null,
+          "IncludeStates":null
+       },
+       "Devices":{
+          "DeviceFilter":{
+             "Mode":null,
+             "Rule":null
+          },
+          "ExcludeDeviceStates":null,
+          "ExcludeDevices":null,
+          "IncludeDeviceStates":null,
+          "IncludeDevices":null
+       }
+    }
+ }

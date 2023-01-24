@@ -1,0 +1,38 @@
+{
+   "Conditions": {
+      "Users":{
+         "ExcludeGroups":[
+            
+         ],
+         "ExcludeGuestsOrExternalUsers":{
+            "ExternalTenants":{
+               "MembershipKind":null
+            },
+            "GuestOrExternalUserTypes":null
+         },
+         "ExcludeRoles":[
+            
+         ],
+         "ExcludeUsers":[
+            "aaaaaaaaa-cccc-cccc-cccc-aaaaaaaaaaaa",
+            "aaaaaaaaa-dddd-dddd-dddd-aaaaaaaaaaaa"
+         ],
+         "IncludeGroups":[
+            
+         ],
+         "IncludeGuestsOrExternalUsers":{
+            "ExternalTenants":{
+               "MembershipKind":null
+            },
+            "GuestOrExternalUserTypes":null
+         },
+         "IncludeRoles":[
+            
+         ],
+         "IncludeUsers":[
+            "aaaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+            "aaaaaaaaa-bbbb-bbbb-bbbb-aaaaaaaaaaaa"
+         ]
+      }
+    }
+}

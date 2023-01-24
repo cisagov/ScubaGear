@@ -1,0 +1,50 @@
+{
+    "Conditions":{
+       "UserRiskLevels":[
+
+       ],
+       "SignInRiskLevels":[
+    
+       ],
+       "Platforms":{
+          "ExcludePlatforms": null,
+          "IncludePlatforms": null
+       },
+       "Locations":{
+          "ExcludeLocations":[
+            "00000000-2222-0000-0000-000000000000",
+            "00000000-3333-0000-0000-000000000000",
+            "00000000-3333-0000-0000-000000000000"
+          ],
+          "IncludeLocations":[
+            "00000000-0000-0000-0000-000000000000",
+            "00000000-1111-0000-0000-000000000000"
+          ]
+       },
+       "ClientApplications":{
+          "ExcludeServicePrincipals":null,
+          "IncludeServicePrincipals":null,
+          "ServicePrincipalFilter":{
+             "Mode":null,
+             "Rule":null
+          }
+       },
+       "ClientAppTypes":[
+          "all"
+       ],
+       "DeviceStates":{
+          "ExcludeStates":null,
+          "IncludeStates":null
+       },
+       "Devices":{
+          "DeviceFilter":{
+             "Mode":null,
+             "Rule":null
+          },
+          "ExcludeDeviceStates":null,
+          "ExcludeDevices":null,
+          "IncludeDeviceStates":null,
+          "IncludeDevices":null
+       }
+    }
+ }
