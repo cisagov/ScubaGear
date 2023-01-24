@@ -82,7 +82,7 @@ tests[{
 #Automatically met if policy 2 is met, Suggested for additional check for baseline. Will use this as a place holder. 
 ReportDetails2_2(Policy) = Description if {
     Policy.OneDriveLoopSharingCapability == 1
-    Description := "Requirement met: AnyOne Link is disabled"
+    Description := "Requirement met: Anyone links are disabled"
 }
 
 ReportDetails2_2(Policy) = Description if {
