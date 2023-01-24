@@ -51,6 +51,8 @@ jobs:
         Remove-Item -Recurse -Force repo -Include .git*
 
         Compress-Archive -Path repo\* -DestinationPath "ScubaGear-${env:RELEASE_VERSION}.zip"
+
+        Get-ChildItem -Path . | Write-Output
     - name: release
       uses: softprops/action-gh-release@v1
       id: create_release
@@ -59,6 +61,6 @@ jobs:
         prerelease: false
         name: ${{ inputs.releaseName }}
         tag_name: ${{ inputs.version }}
-        files: ScubaGear-${{ inputs.version}}.zip
+        files: ScubaGear-${{ inputs.version }}.zip
         generate_release_notes: true
         fail_on_unmatched_files: true
