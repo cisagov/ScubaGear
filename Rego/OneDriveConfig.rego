@@ -125,7 +125,7 @@ tests[{
 #--
 ReportDetails2_3(Policy) = Description if {
     Policy.OneDriveLoopSharingCapability == 1
-    Description := "Requirement met: AnyOne Link is disabled"
+    Description := "Requirement met: Anyone links are disabled"
 }
 
 ReportDetails2_3(Policy) = Description if {
