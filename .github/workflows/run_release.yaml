@@ -19,7 +19,7 @@ jobs:
     env:
       CODESIGN_PW: ${{ secrets.CODESIGN_PW }}
       CODESIGN_PFX: ${{ secrets.CODESIGN_PFX }}
-      RELEASE_VERSION: ${{ inputs.vesion }}
+      RELEASE_VERSION: ${{ inputs.version }}
     permissions:
       contents: write
     steps:
