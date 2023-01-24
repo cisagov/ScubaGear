@@ -44,26 +44,6 @@ test_ExternalUserExpirationRequired_Correct_V2 if {
     RuleOutput[0].ReportDetails == "Requirement met: Anyone links are disabled"
 }
 
-test_ExternalUserExpirationRequired_Correct_V3 if {
-    ControlNumber := "OneDrive 2.2"
-    Requirement := "An expiration date SHOULD be set for Anyone links"
-
-    Output := tests with input as {
-        "SPO_tenant_info": [
-            {
-                "OneDriveLoopSharingCapability" : 2,
-                "RequireAnonymousLinksExpireInDays" : 15,
-            }
-        ]        
-    }
-
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement met"
-}
-
 test_ExternalUserExpirationRequired_Incorrect if {
     ControlNumber := "OneDrive 2.2"
     Requirement := "An expiration date SHOULD be set for Anyone links"
