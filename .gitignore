@@ -27,3 +27,8 @@
 **/M365BaselineConformance*
 /Testing/Functional/Reports*
 /Testing/Functional/Archive*
+
+# Testing files
+/Testing/Unit/Pester/**/*.json
+/Testing/Unit/Pester/**/*.csv
+/Testing/Unit/Pester/**/*.html
