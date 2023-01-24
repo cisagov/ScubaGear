@@ -19,6 +19,7 @@ jobs:
     env:
       CODESIGN_PW: ${{ secrets.CODESIGN_PW }}
       CODESIGN_PFX: ${{ secrets.CODESIGN_PFX }}
+      RELEASE_VERSION: ${{ inputs.vesion }}
     permissions:
       contents: write
     steps:
@@ -41,13 +42,15 @@ jobs:
 
         Get-ChildItem -Recurse -Path repo -Include **.ps1,**.psm1,**.psd1 | ForEach-Object {
           $path = $_.FullName
-          Set-AuthenticodeSignature -Certificate $cert -FilePath $path -TimestampServer "http://timestamp.sectigo.com/" -IncludeChain NotRoot
+          Set-AuthenticodeSignature -Certificate $cert -FilePath $path -TimestampServer "https://timestamp.sectigo.com/" -IncludeChain NotRoot -HashAlgorithm SHA256
+          # Delay for 15 seconds to please the timestamp server.
+          Start-Sleep -Seconds 15
         }
 
         Remove-Item -Recurse -Force certificate
         Remove-Item -Recurse -Force repo -Include .git*
 
-        Compress-Archive -Path repo\* -DestinationPath release.zip
+        Compress-Archive -Path repo\* -DestinationPath "ScubaGear-${env:RELEASE_VERSION}.zip"
     - name: release
       uses: softprops/action-gh-release@v1
       id: create_release
@@ -56,6 +59,6 @@ jobs:
         prerelease: false
         name: ${{ inputs.releaseName }}
         tag_name: ${{ inputs.version }}
-        files: release.zip
+        files: ScubaGear-${{ inputs.version}}.zip
         generate_release_notes: true
         fail_on_unmatched_files: true
