@@ -21,7 +21,7 @@ test_ExternalUserExpirationRequired_Correct_V1 if {
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement met: AnyOne Link is disabled"
+    RuleOutput[0].ReportDetails == "Requirement met: Anyone links are disabled"
 }
 
 test_ExternalUserExpirationRequired_Correct_V2 if {
