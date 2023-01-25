@@ -18,6 +18,7 @@ Describe -tag "Utils" -name 'ScubaConfig' {
     }
     context 'JSON Configuration' {
         BeforeAll {
+            [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'ScubaConfigTestFile')]
             $ScubaConfigTestFile = Join-Path -Path $PSScriptRoot -ChildPath config_test.json
         }
         It 'Valid config file'{
@@ -48,6 +49,7 @@ Describe -tag "Utils" -name 'ScubaConfig' {
     }
     context 'YAML Configuration' {
         BeforeAll {
+            [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'ScubaConfigTestFile')]
             $ScubaConfigTestFile = Join-Path -Path $PSScriptRoot -ChildPath config_test.yaml
         }
         It 'Valid config file'{
