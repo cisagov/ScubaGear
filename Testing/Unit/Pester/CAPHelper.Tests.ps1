@@ -73,12 +73,19 @@ Describe "GetIncludedUsers" {
         $UsersIncluded = $($CapHelper.GetIncludedUsers($Cap)) -Join ", "
         $UsersIncluded | Should -Be "B2B collaboration guest users, B2B collaboration member users, B2B direct connect users, Local guest users, Service provider users, Other external users"
 	}
+
+    It "handles empty input" {
+        $Cap = @{}
+        $UsersIncluded = $($CapHelper.GetIncludedUsers($Cap) 3>$null) -Join ", " # 3>$null to surpress the warning 
+        # message as it is expected in this case
+        $UsersIncluded | Should -Be ""
+	}
 }
 
 Describe "GetExcludedUsers" {
     It "returns 'None' when no users are included" {
         $Cap = Get-Content "CapSnippets/Users_sample01.json" | ConvertFrom-Json
-        $UsersExcluded = $($CapHelper.GetIncludedUsers($Cap)) -Join ", "
+        $UsersExcluded = $($CapHelper.GetExcludedUsers($Cap)) -Join ", "
         $UsersExcluded | Should -Be "None"
 	}
 
@@ -135,6 +142,13 @@ Describe "GetExcludedUsers" {
         $UsersIncluded = $($CapHelper.GetExcludedUsers($Cap)) -Join ", "
         $UsersIncluded | Should -Be "Service provider users"
 	}
+
+    It "handles empty input" {
+        $Cap = @{}
+        $UsersIncluded = $($CapHelper.GetExcludedUsers($Cap) 3>$null) -Join ", " # 3>$null to surpress the warning 
+        # message as it is expected in this case
+        $UsersIncluded | Should -Be ""
+	}
 }
 
 Describe "GetApplications" {
@@ -188,6 +202,13 @@ Describe "GetApplications" {
         $Cap = Get-Content "CapSnippets/Apps_sample07.json" | ConvertFrom-Json
         $Apps = $($CapHelper.GetApplications($Cap))
         $Apps | Should -Be "Policy applies to: 2 authentication contexts"
+	}
+
+    It "handles empty input" {
+        $Cap = @{}
+        $Apps = $($CapHelper.GetApplications($Cap) 3>$null) -Join ", " # 3>$null to surpress the warning 
+        # message as it is expected in this case
+        $Apps | Should -Be ""
 	}
 }
 
@@ -289,6 +310,13 @@ Describe "GetConditions" {
         $Conditions[6] | Should -Be "Client apps included: Exchange ActiveSync Clients"
         $Conditions[7] | Should -Be "Custom device filter in exclude mode active"
     }
+
+    It "handles empty input" {
+        $Cap = @{}
+        $Conditions = $($CapHelper.GetConditions($Cap) 3>$null) -Join ", " # 3>$null to surpress the warning 
+        # message as it is expected in this case
+        $Conditions | Should -Be ""
+	}
 }
 
 Describe "GetAccessControls" {
@@ -333,6 +361,13 @@ Describe "GetAccessControls" {
         $Controls = $($CapHelper.GetAccessControls($Cap))
         $Controls | Should -Be "None"
     }
+
+    It "handles empty input" {
+        $Cap = @{}
+        $Controls = $($CapHelper.GetAccessControls($Cap) 3>$null) -Join ", " # 3>$null to surpress the warning 
+        # message as it is expected in this case
+        $Controls | Should -Be ""
+	}
 }
 
 Describe "GetSessionControls" {
@@ -404,6 +439,11 @@ Describe "GetSessionControls" {
         $Controls[0] | Should -Be "Persistent browser session (never persistent)"
         $Controls[1] | Should -Be "Disable resilience defaults"
     }
-}
 
-# TODO Test what happens when there are missing values / simulate API changes
+    It "handles empty input" {
+        $Cap = @{}
+        $Controls = $($CapHelper.GetSessionControls($Cap) 3>$null) -Join ", " # 3>$null to surpress the warning 
+        # message as it is expected in this case
+        $Controls | Should -Be ""
+	}
+}

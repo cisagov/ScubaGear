@@ -18,21 +18,9 @@
             "00000000-0000-0000-0000-000000000000"
           ]
        },
-       "ClientApplications":{
-          "ExcludeServicePrincipals":null,
-          "IncludeServicePrincipals":null,
-          "ServicePrincipalFilter":{
-             "Mode":null,
-             "Rule":null
-          }
-       },
        "ClientAppTypes":[
           "all"
        ],
-       "DeviceStates":{
-          "ExcludeStates":null,
-          "IncludeStates":null
-       },
        "Devices":{
           "DeviceFilter":{
              "Mode":null,

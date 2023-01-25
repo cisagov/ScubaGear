@@ -16,21 +16,9 @@
           "ExcludeLocations":null,
           "IncludeLocations":null
        },
-       "ClientApplications":{
-          "ExcludeServicePrincipals":null,
-          "IncludeServicePrincipals":null,
-          "ServicePrincipalFilter":{
-             "Mode":null,
-             "Rule":null
-          }
-       },
        "ClientAppTypes":[
           "all"
        ],
-       "DeviceStates":{
-          "ExcludeStates":null,
-          "IncludeStates":null
-       },
        "Devices":{
           "DeviceFilter":{
              "Mode":null,

@@ -39,6 +39,27 @@ class CapHelper {
         "blockDownloads" = "Block downloads";
         "mcasConfigured" = "Use custom policy"}
 
+    [string[]] GetMissingKeys([System.Object]$Obj, [string[]] $Keys) {
+        <#
+        .Description
+        Returns a list of the keys in $Keys are not members of $Obj. Used
+        to validate the structure of the conditonal access policies.
+        .Functionality
+        Internal
+        #>
+        $Missing = @()
+        if ($null -eq $Obj) {
+            return $Missing
+        }
+        foreach ($Key in $Keys) {
+            $HasKey = [bool]($Obj.PSobject.Properties.name -match $Key)
+            if (-not $HasKey) {
+                $Missing += $Key
+            }
+        }
+        return $Missing
+    }
+
     [string[]] GetIncludedUsers([System.Object]$Cap) {
         <#
         .Description
@@ -47,6 +68,19 @@ class CapHelper {
         Internal
         #>
 
+        # Perform some basic validation of the CAP. If some of these values
+        # are missing it could indicate that the API has been restructured.
+        $Missing = @()
+        $Missing += $this.GetMissingKeys($Cap, @("Conditions"))
+        $Missing += $this.GetMissingKeys($Cap.Conditions, @("Users"))
+        $Missing += $this.GetMissingKeys($Cap.Conditions.Users, @("IncludeGroups",
+        "IncludeGuestsOrExternalUsers", "IncludeRoles", "IncludeUsers"))
+        if ($Missing.Length -gt 0) {
+            Write-Warning "Conditional access policy structure not as expected. The following keys are missing: $($Missing -Join ', ')"
+            return @()
+        }
+
+        # Begin processing the CAP
         $IncludedUsers = @()
         if ($Cap.Conditions.Users.IncludeUsers -Contains "All") {
             $IncludedUsers += "All"
@@ -95,6 +129,20 @@ class CapHelper {
         .Functionality
         Internal
         #>
+
+        # Perform some basic validation of the CAP. If some of these values
+        # are missing it could indicate that the API has been restructured.
+        $Missing = @()
+        $Missing += $this.GetMissingKeys($Cap, @("Conditions"))
+        $Missing += $this.GetMissingKeys($Cap.Conditions, @("Users"))
+        $Missing += $this.GetMissingKeys($Cap.Conditions.Users, @("ExcludeGroups",
+            "ExcludeGuestsOrExternalUsers", "ExcludeRoles", "ExcludeUsers"))
+        if ($Missing.Length -gt 0) {
+            Write-Warning "Conditional access policy structure not as expected. The following keys are missing: $($Missing -Join ', ')"
+            return @()
+        }
+
+        # Begin processing the CAP
         $ExcludedUsers = @()
         # Users
         if ($Cap.Conditions.Users.ExcludeUsers.Length -eq 1) {
@@ -140,6 +188,21 @@ class CapHelper {
         .Functionality
         Internal
         #>
+
+        # Perform some basic validation of the CAP. If some of these values
+        # are missing it could indicate that the API has been restructured.
+        $Missing = @()
+        $Missing += $this.GetMissingKeys($Cap, @("Conditions"))
+        $Missing += $this.GetMissingKeys($Cap.Conditions, @("Applications"))
+        $Missing += $this.GetMissingKeys($Cap.Conditions.Applications, @("ApplicationFilter",
+            "ExcludeApplications", "IncludeApplications",
+            "IncludeAuthenticationContextClassReferences", "IncludeUserActions"))
+        if ($Missing.Length -gt 0) {
+            Write-Warning "Conditional access policy structure not as expected. The following keys are missing: $($Missing -Join ', ')"
+            return @()
+        }
+
+        # Begin processing the CAP
         $Actions = @()
         if ($Cap.Conditions.Applications.IncludeApplications.Length -gt 0) {
             # For "Select what this policy applies to", "Cloud Apps" was  selected
@@ -196,6 +259,22 @@ class CapHelper {
         .Functionality
         Internal
         #>
+
+        # Perform some basic validation of the CAP. If some of these values
+        # are missing it could indicate that the API has been restructured.
+        $Missing = @()
+        $Missing += $this.GetMissingKeys($Cap, @("Conditions"))
+        $Missing += $this.GetMissingKeys($Cap.Conditions, @("UserRiskLevels",
+            "SignInRiskLevels", "Platforms", "Locations", "ClientAppTypes", "Devices"))
+        $Missing += $this.GetMissingKeys($Cap.Conditions.Platforms, @("ExcludePlatforms", "IncludePlatforms"))
+        $Missing += $this.GetMissingKeys($Cap.Conditions.Locations, @("ExcludeLocations", "IncludeLocations"))
+        $Missing += $this.GetMissingKeys($Cap.Conditions.Devices, @("DeviceFilter"))
+        if ($Missing.Length -gt 0) {
+            Write-Warning "Conditional access policy structure not as expected. The following keys are missing: $($Missing -Join ', ')"
+            return @()
+        }
+
+        # Begin processing the CAP
         $Conditions = @()
         # User risk
         if ($Cap.Conditions.UserRiskLevels.Length -gt 0) {
@@ -266,6 +345,20 @@ class CapHelper {
         .Functionality
         Internal
         #>
+
+        # Perform some basic validation of the CAP. If some of these values
+        # are missing it could indicate that the API has been restructured.
+        $Missing = @()
+        $Missing += $this.GetMissingKeys($Cap, @("GrantControls"))
+        $Missing += $this.GetMissingKeys($Cap.GrantControls, @("AuthenticationStrength",
+        "BuiltInControls", "CustomAuthenticationFactors", "Operator"))
+        $Missing += $this.GetMissingKeys($Cap.GrantControls.AuthenticationStrength, @("DisplayName"))
+        if ($Missing.Length -gt 0) {
+            Write-Warning "Conditional access policy structure not as expected. The following keys are missing: $($Missing -Join ', ')"
+            return @()
+        }
+
+        # Begin processing the CAP
         $AccessControls = ""
         if ($null -ne $Cap.GrantControls.BuiltInControls) {
             if ($Cap.GrantControls.BuiltInControls -Contains "block") {
@@ -299,6 +392,27 @@ class CapHelper {
         .Functionality
         Internal
         #>
+
+        # Perform some basic validation of the CAP. If some of these values
+        # are missing it could indicate that the API has been restructured.
+        $Missing = @()
+        $Missing += $this.GetMissingKeys($Cap, @("SessionControls"))
+        $Missing += $this.GetMissingKeys($Cap.SessionControls, @("ApplicationEnforcedRestrictions",
+            "CloudAppSecurity", "ContinuousAccessEvaluation", "DisableResilienceDefaults",
+            "PersistentBrowser", "SignInFrequency"))
+        $Missing += $this.GetMissingKeys($Cap.SessionControls.ApplicationEnforcedRestrictions, @("IsEnabled"))
+        $Missing += $this.GetMissingKeys($Cap.SessionControls.CloudAppSecurity, @("CloudAppSecurityType",
+            "IsEnabled"))
+        $Missing += $this.GetMissingKeys($Cap.SessionControls.ContinuousAccessEvaluation, @("Mode"))
+        $Missing += $this.GetMissingKeys($Cap.SessionControls.PersistentBrowser, @("IsEnabled", "Mode"))
+        $Missing += $this.GetMissingKeys($Cap.SessionControls.SignInFrequency, @("IsEnabled", 
+            "FrequencyInterval", "Type", "Value"))        
+        if ($Missing.Length -gt 0) {
+            Write-Warning "Conditional access policy structure not as expected. The following keys are missing: $($Missing -Join ', ')"
+            return @()
+        }
+
+        # Begin processing the CAP
         $SessionControls = @()
         if ($Cap.SessionControls.ApplicationEnforcedRestrictions.IsEnabled) {
             $SessionControls += "Use app enforced restrictions"
