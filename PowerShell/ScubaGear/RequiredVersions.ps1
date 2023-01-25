@@ -89,5 +89,10 @@ $ModuleList = @(
         ModuleName = 'Microsoft.Graph.Users'
         ModuleVersion = [version] '1.14.0'
         MaximumVersion = [version] '1.99.99999'
+    },
+    @{
+        ModuleName = 'powershell-yaml'
+        ModuleVersion = [version] '0.4.2'
+        MaximumVersion = [version] '0.99.99999'
     }
 )

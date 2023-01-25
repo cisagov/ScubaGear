@@ -66,6 +66,9 @@ function Invoke-SCuBA {
     Invoke-SCuBA -Version
     This example returns the version of SCuBAGear.
     .Example
+    Invoke-SCuBA -ConfigFilePath MyConfig.json
+    This example uses the specified configuration file when executing SCuBAGear.
+    .Example
     Invoke-SCuBA -ProductNames aad, defender -OPAPath . -OutPath .
     The example will run the tool against the Azure Active Directory, and Defender security
     baselines.
@@ -105,11 +108,11 @@ function Invoke-SCuBA {
         [boolean]
         $LogIn = $true,
 
-        [Parameter(Mandatory = $false)]
+        [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [switch]
         $DisconnectOnExit,
 
-        [Parameter(ParameterSetName = 'Report')]
+        [Parameter(ParameterSetName = 'VersionOnly')]
         [switch]
         $Version,
 
@@ -136,7 +139,25 @@ function Invoke-SCuBA {
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
         [string]
-        $OutReportName = "BaselineReports"
+        $OutReportName = "BaselineReports",
+
+        [Parameter(Mandatory = $true, ParameterSetName = 'Configuration')]
+        [ValidateScript({
+            if (-Not ($_ | Test-Path)){
+                throw "SCuBA configuration file or folder does not exist."
+            }
+            if (-Not ($_ | Test-Path -PathType Leaf)){
+                throw "SCuBA configuration Path argument must be a file."
+            }
+            return $true
+        })]
+        [System.IO.FileInfo]
+        $ConfigFilePath,
+
+        [Parameter(Mandatory  = $false, ParameterSetName = 'Configuration')]
+        [ValidateSet("json", "yaml", IgnoreCase = $false)]
+        [string]
+        $ConfigFormat = "json"
     )
     process {
         $ParentPath = Split-Path $PSScriptRoot -Parent
@@ -145,6 +166,20 @@ function Invoke-SCuBA {
         if ($Version) {
             Write-Output("SCuBA Gear v$ModuleVersion")
             return
+        }
+
+        if ($PSCmdlet.ParameterSetName -eq 'Import-Configuration'){
+            Get-ScubaConfig -Path $ConfigFilePath -Format $ConfigFormat
+            $ProductNames = $ScubaConfig.ProductNames
+            $M365Environment = $ScubaConfig.M365Environment
+            $OPAPath = $ScubaConfig.OPAPath
+            $LogIn = $ScubaConfig.LogIn
+            $DisconnectOnExit = $ScubaConfig.DisconnectOnExit
+            $OutPath = $ScubaConfig.OutPath
+            $OutFolderName = $ScubaConfig.OutFolderName
+            $OutProviderFileName = $ScubaConfig.OutProviderFileName
+            $OutRegoFileName = $ScubaConfig.OutRegoFileName
+            $OutReportName = $ScubaConfig.OutReportName
         }
 
         if ($ProductNames -eq '*'){
