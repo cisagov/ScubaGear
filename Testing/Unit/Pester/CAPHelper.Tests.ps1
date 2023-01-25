@@ -193,7 +193,8 @@ Describe "GetExcludedUsers" {
 
 Describe "GetApplications" {
     It "handles including all apps" {
-        $Cap = Get-Content "CapSnippets/Apps_sample01.json" | ConvertFrom-Json
+        $Cap = Get-Content "CapSnippets/Apps.json" | ConvertFrom-Json
+        $Cap.Conditions.Applications.IncludeApplications += "All"
         $Apps = $($CapHelper.GetApplications($Cap))
         $Apps[0] | Should -Be "Policy applies to: apps"
         $Apps[1] | Should -Be "Apps included: All"
@@ -201,7 +202,8 @@ Describe "GetApplications" {
 	}
 
     It "handles including/excluding no apps" {
-        $Cap = Get-Content "CapSnippets/Apps_sample02.json" | ConvertFrom-Json
+        $Cap = Get-Content "CapSnippets/Apps.json" | ConvertFrom-Json
+        $Cap.Conditions.Applications.IncludeApplications += "None"
         $Apps = $($CapHelper.GetApplications($Cap))
         $Apps[0] | Should -Be "Policy applies to: apps"
         $Apps[1] | Should -Be "Apps included: None"
@@ -209,7 +211,9 @@ Describe "GetApplications" {
 	}
 
     It "handles including/excluding single specific apps" {
-        $Cap = Get-Content "CapSnippets/Apps_sample03.json" | ConvertFrom-Json
+        $Cap = Get-Content "CapSnippets/Apps.json" | ConvertFrom-Json
+        $Cap.Conditions.Applications.IncludeApplications += "aaaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
+        $Cap.Conditions.Applications.ExcludeApplications += "baaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
         $Apps = $($CapHelper.GetApplications($Cap))
         $Apps[0] | Should -Be "Policy applies to: apps"
         $Apps[1] | Should -Be "Apps included: 1 specific app"
@@ -217,7 +221,12 @@ Describe "GetApplications" {
 	}
 
     It "handles including/excluding multiple specific apps" {
-        $Cap = Get-Content "CapSnippets/Apps_sample04.json" | ConvertFrom-Json
+        $Cap = Get-Content "CapSnippets/Apps.json" | ConvertFrom-Json
+        $Cap.Conditions.Applications.IncludeApplications += "aaaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
+        $Cap.Conditions.Applications.IncludeApplications += "baaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
+        $Cap.Conditions.Applications.IncludeApplications += "caaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
+        $Cap.Conditions.Applications.ExcludeApplications += "daaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
+        $Cap.Conditions.Applications.ExcludeApplications += "eaaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
         $Apps = $($CapHelper.GetApplications($Cap))
         $Apps[0] | Should -Be "Policy applies to: apps"
         $Apps[1] | Should -Be "Apps included: 3 specific apps"
@@ -225,21 +234,25 @@ Describe "GetApplications" {
 	}
 
     It "handles registering a device" {
-        $Cap = Get-Content "CapSnippets/Apps_sample05.json" | ConvertFrom-Json
+        $Cap = Get-Content "CapSnippets/Apps.json" | ConvertFrom-Json
+        $Cap.Conditions.Applications.IncludeUserActions += "urn:user:registerdevice"
         $Apps = $($CapHelper.GetApplications($Cap))
         $Apps[0] | Should -Be "Policy applies to: actions"
         $Apps[1] | Should -Be "User action: Register or join devices"
 	}
 
     It "handles registering security info" {
-        $Cap = Get-Content "CapSnippets/Apps_sample06.json" | ConvertFrom-Json
+        $Cap = Get-Content "CapSnippets/Apps.json" | ConvertFrom-Json
+        $Cap.Conditions.Applications.IncludeUserActions += "urn:user:registersecurityinfo"
         $Apps = $($CapHelper.GetApplications($Cap))
         $Apps[0] | Should -Be "Policy applies to: actions"
         $Apps[1] | Should -Be "User action: Register security info"
 	}
 
     It "handles registering security info" {
-        $Cap = Get-Content "CapSnippets/Apps_sample07.json" | ConvertFrom-Json
+        $Cap = Get-Content "CapSnippets/Apps.json" | ConvertFrom-Json
+        $Cap.Conditions.Applications.IncludeAuthenticationContextClassReferences += "c1"
+        $Cap.Conditions.Applications.IncludeAuthenticationContextClassReferences += "c3"
         $Apps = $($CapHelper.GetApplications($Cap))
         $Apps | Should -Be "Policy applies to: 2 authentication contexts"
 	}
