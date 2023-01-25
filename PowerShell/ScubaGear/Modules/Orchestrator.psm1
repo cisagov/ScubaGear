@@ -114,6 +114,18 @@ function Invoke-SCuBA {
         $Version,
 
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
+        [string]
+        $AppId,
+
+        [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
+        [string]
+        $CertificateThumbprint,
+
+        [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
+        [string]
+        $Organization,
+
+        [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
         [string]
         $OutPath = '.',
@@ -149,6 +161,15 @@ function Invoke-SCuBA {
 
         if ($ProductNames -eq '*'){
             $ProductNames = "teams", "exo", "defender", "aad", "sharepoint", "onedrive", "powerplatform"
+        }
+
+        $ServicePrincipal
+        if($AppId) {
+            $ServicePrincipal = [pscustomobject]@{
+                "AppId" = $AppId;
+                "CertificateThumbprint" = $CertificateThumbprint;
+                "CertificatePassword" = $CertificatePassword;
+            }
         }
 
         # The equivalent of ..\..
