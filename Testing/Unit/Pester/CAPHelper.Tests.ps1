@@ -76,7 +76,7 @@ Describe "GetIncludedUsers" {
 
     It "handles empty input" {
         $Cap = @{}
-        $UsersIncluded = $($CapHelper.GetIncludedUsers($Cap) 3>$null) -Join ", " # 3>$null to surpress the warning 
+        $UsersIncluded = $($CapHelper.GetIncludedUsers($Cap) 3>$null) -Join ", " # 3>$null to surpress the warning
         # message as it is expected in this case
         $UsersIncluded | Should -Be ""
 	}
@@ -145,7 +145,7 @@ Describe "GetExcludedUsers" {
 
     It "handles empty input" {
         $Cap = @{}
-        $UsersIncluded = $($CapHelper.GetExcludedUsers($Cap) 3>$null) -Join ", " # 3>$null to surpress the warning 
+        $UsersIncluded = $($CapHelper.GetExcludedUsers($Cap) 3>$null) -Join ", " # 3>$null to surpress the warning
         # message as it is expected in this case
         $UsersIncluded | Should -Be ""
 	}
@@ -206,7 +206,7 @@ Describe "GetApplications" {
 
     It "handles empty input" {
         $Cap = @{}
-        $Apps = $($CapHelper.GetApplications($Cap) 3>$null) -Join ", " # 3>$null to surpress the warning 
+        $Apps = $($CapHelper.GetApplications($Cap) 3>$null) -Join ", " # 3>$null to surpress the warning
         # message as it is expected in this case
         $Apps | Should -Be ""
 	}
@@ -313,7 +313,7 @@ Describe "GetConditions" {
 
     It "handles empty input" {
         $Cap = @{}
-        $Conditions = $($CapHelper.GetConditions($Cap) 3>$null) -Join ", " # 3>$null to surpress the warning 
+        $Conditions = $($CapHelper.GetConditions($Cap) 3>$null) -Join ", " # 3>$null to surpress the warning
         # message as it is expected in this case
         $Conditions | Should -Be ""
 	}
@@ -364,7 +364,7 @@ Describe "GetAccessControls" {
 
     It "handles empty input" {
         $Cap = @{}
-        $Controls = $($CapHelper.GetAccessControls($Cap) 3>$null) -Join ", " # 3>$null to surpress the warning 
+        $Controls = $($CapHelper.GetAccessControls($Cap) 3>$null) -Join ", " # 3>$null to surpress the warning
         # message as it is expected in this case
         $Controls | Should -Be ""
 	}
@@ -442,7 +442,7 @@ Describe "GetSessionControls" {
 
     It "handles empty input" {
         $Cap = @{}
-        $Controls = $($CapHelper.GetSessionControls($Cap) 3>$null) -Join ", " # 3>$null to surpress the warning 
+        $Controls = $($CapHelper.GetSessionControls($Cap) 3>$null) -Join ", " # 3>$null to surpress the warning
         # message as it is expected in this case
         $Controls | Should -Be ""
 	}

@@ -405,8 +405,8 @@ class CapHelper {
             "IsEnabled"))
         $Missing += $this.GetMissingKeys($Cap.SessionControls.ContinuousAccessEvaluation, @("Mode"))
         $Missing += $this.GetMissingKeys($Cap.SessionControls.PersistentBrowser, @("IsEnabled", "Mode"))
-        $Missing += $this.GetMissingKeys($Cap.SessionControls.SignInFrequency, @("IsEnabled", 
-            "FrequencyInterval", "Type", "Value"))        
+        $Missing += $this.GetMissingKeys($Cap.SessionControls.SignInFrequency, @("IsEnabled",
+            "FrequencyInterval", "Type", "Value"))
         if ($Missing.Length -gt 0) {
             Write-Warning "Conditional access policy structure not as expected. The following keys are missing: $($Missing -Join ', ')"
             return @()
