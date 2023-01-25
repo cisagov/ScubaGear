@@ -6,9 +6,9 @@
          ],
          "ExcludeGuestsOrExternalUsers":{
             "ExternalTenants":{
-               "MembershipKind":"all"
+               "MembershipKind":null
             },
-            "GuestOrExternalUserTypes":"serviceProvider"
+            "GuestOrExternalUserTypes":null
          },
          "ExcludeRoles":[
             
@@ -21,17 +21,16 @@
          ],
          "IncludeGuestsOrExternalUsers":{
             "ExternalTenants":{
-               "MembershipKind":"all"
+               "MembershipKind":null
             },
-            "GuestOrExternalUserTypes":"internalGuest"
+            "GuestOrExternalUserTypes":null
          },
          "IncludeRoles":[
             
          ],
          "IncludeUsers":[
-            
+
          ]
       }
-     }
- }
-
+    }
+}

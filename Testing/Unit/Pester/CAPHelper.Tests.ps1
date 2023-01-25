@@ -9,67 +9,88 @@ BeforeAll {
 
 Describe "GetIncludedUsers" {
     It "returns 'None' when no users are included" {
-        $Cap = Get-Content "CapSnippets/Users_sample01.json" | ConvertFrom-Json
+        $Cap = Get-Content "CapSnippets/Users.json" | ConvertFrom-Json
+        $Cap.Conditions.Users.IncludeUsers += "None"
         $UsersIncluded = $($CapHelper.GetIncludedUsers($Cap)) -Join ", "
         $UsersIncluded | Should -Be "None"
 	}
 
     It "handles including single users" {
-        $Cap = Get-Content "CapSnippets/Users_sample02.json" | ConvertFrom-Json
+        $Cap = Get-Content "CapSnippets/Users.json" | ConvertFrom-Json
+        $Cap.Conditions.Users.IncludeUsers += "aaaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
         $UsersIncluded = $($CapHelper.GetIncludedUsers($Cap)) -Join ", "
         $UsersIncluded | Should -Be "1 specific user"
 	}
 
     It "handles including multiple users" {
-        $Cap = Get-Content "CapSnippets/Users_sample03.json" | ConvertFrom-Json
+        $Cap = Get-Content "CapSnippets/Users.json" | ConvertFrom-Json
+        $Cap.Conditions.Users.IncludeUsers += "aaaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
+        $Cap.Conditions.Users.IncludeUsers += "baaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
         $UsersIncluded = $($CapHelper.GetIncludedUsers($Cap)) -Join ", "
         $UsersIncluded | Should -Be "2 specific users"
 	}
 
     It "handles including single groups" {
-        $Cap = Get-Content "CapSnippets/Users_sample04.json" | ConvertFrom-Json
+        $Cap = Get-Content "CapSnippets/Users.json" | ConvertFrom-Json
+        $Cap.Conditions.Users.IncludeGroups += "aaaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
         $UsersIncluded = $($CapHelper.GetIncludedUsers($Cap)) -Join ", "
         $UsersIncluded | Should -Be "1 specific group"
 	}
 
     It "handles including multiple groups" {
-        $Cap = Get-Content "CapSnippets/Users_sample05.json" | ConvertFrom-Json
+        $Cap = Get-Content "CapSnippets/Users.json" | ConvertFrom-Json
+        $Cap.Conditions.Users.IncludeGroups += "aaaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
+        $Cap.Conditions.Users.IncludeGroups += "baaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
         $UsersIncluded = $($CapHelper.GetIncludedUsers($Cap)) -Join ", "
         $UsersIncluded | Should -Be "2 specific groups"
 	}
 
     It "handles including single roles" {
-        $Cap = Get-Content "CapSnippets/Users_sample06.json" | ConvertFrom-Json
+        $Cap = Get-Content "CapSnippets/Users.json" | ConvertFrom-Json
+        $Cap.Conditions.Users.IncludeRoles += "aaaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
         $UsersIncluded = $($CapHelper.GetIncludedUsers($Cap)) -Join ", "
         $UsersIncluded | Should -Be "1 specific role"
 	}
 
     It "handles including multiple roles" {
-        $Cap = Get-Content "CapSnippets/Users_sample07.json" | ConvertFrom-Json
+        $Cap = Get-Content "CapSnippets/Users.json" | ConvertFrom-Json
+        $Cap.Conditions.Users.IncludeRoles += "aaaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
+        $Cap.Conditions.Users.IncludeRoles += "baaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
         $UsersIncluded = $($CapHelper.GetIncludedUsers($Cap)) -Join ", "
         $UsersIncluded | Should -Be "2 specific roles"
 	}
 
     It "handles including users, groups, and roles simultaneously" {
-        $Cap = Get-Content "CapSnippets/Users_sample08.json" | ConvertFrom-Json
+        $Cap = Get-Content "CapSnippets/Users.json" | ConvertFrom-Json
+        $Cap.Conditions.Users.IncludeUsers += "aaaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
+        $Cap.Conditions.Users.IncludeRoles += "baaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
+        $Cap.Conditions.Users.IncludeRoles += "caaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
+        $Cap.Conditions.Users.IncludeGroups += "daaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
+        $Cap.Conditions.Users.IncludeGroups += "eaaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
+        $Cap.Conditions.Users.IncludeGroups += "faaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
         $UsersIncluded = $($CapHelper.GetIncludedUsers($Cap)) -Join ", "
         $UsersIncluded | Should -Be "1 specific user, 2 specific roles, 3 specific groups"
 	}
 
     It "returns 'All' when all users are included" {
-        $Cap = Get-Content "CapSnippets/Users_sample09.json" | ConvertFrom-Json
+        $Cap = Get-Content "CapSnippets/Users.json" | ConvertFrom-Json
+        $Cap.Conditions.Users.IncludeUsers += "all"
         $UsersIncluded = $($CapHelper.GetIncludedUsers($Cap)) -Join ", "
         $UsersIncluded | Should -Be "All"
 	}
 
     It "handles including single type of external user" {
-        $Cap = Get-Content "CapSnippets/Users_sample10.json" | ConvertFrom-Json
+        $Cap = Get-Content "CapSnippets/Users.json" | ConvertFrom-Json
+        $Cap.Conditions.Users.IncludeGuestsOrExternalUsers.ExternalTenants.MembershipKind = "all"
+        $Cap.Conditions.Users.IncludeGuestsOrExternalUsers.GuestOrExternalUserTypes = "internalGuest"
         $UsersIncluded = $($CapHelper.GetIncludedUsers($Cap)) -Join ", "
         $UsersIncluded | Should -Be "Local guest users"
 	}
 
     It "handles including all types of guest users" {
-        $Cap = Get-Content "CapSnippets/Users_sample11.json" | ConvertFrom-Json
+        $Cap = Get-Content "CapSnippets/Users.json" | ConvertFrom-Json
+        $Cap.Conditions.Users.IncludeGuestsOrExternalUsers.ExternalTenants.MembershipKind = "all"
+        $Cap.Conditions.Users.IncludeGuestsOrExternalUsers.GuestOrExternalUserTypes = "b2bCollaborationGuest,b2bCollaborationMember,b2bDirectConnectUser,internalGuest,serviceProvider,otherExternalUser"
         $UsersIncluded = $($CapHelper.GetIncludedUsers($Cap)) -Join ", "
         $UsersIncluded | Should -Be "B2B collaboration guest users, B2B collaboration member users, B2B direct connect users, Local guest users, Service provider users, Other external users"
 	}
@@ -84,70 +105,89 @@ Describe "GetIncludedUsers" {
 
 Describe "GetExcludedUsers" {
     It "returns 'None' when no users are included" {
-        $Cap = Get-Content "CapSnippets/Users_sample01.json" | ConvertFrom-Json
+        $Cap = Get-Content "CapSnippets/Users.json" | ConvertFrom-Json
         $UsersExcluded = $($CapHelper.GetExcludedUsers($Cap)) -Join ", "
         $UsersExcluded | Should -Be "None"
 	}
 
     It "handles excluding single users" {
-        $Cap = Get-Content "CapSnippets/Users_sample02.json" | ConvertFrom-Json
-        $UsersIncluded = $($CapHelper.GetExcludedUsers($Cap)) -Join ", "
-        $UsersIncluded | Should -Be "1 specific user"
+        $Cap = Get-Content "CapSnippets/Users.json" | ConvertFrom-Json
+        $Cap.Conditions.Users.ExcludeUsers += "aaaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
+        $UsersExcluded = $($CapHelper.GetExcludedUsers($Cap)) -Join ", "
+        $UsersExcluded | Should -Be "1 specific user"
 	}
 
     It "handles excluding multiple users" {
-        $Cap = Get-Content "CapSnippets/Users_sample03.json" | ConvertFrom-Json
-        $UsersIncluded = $($CapHelper.GetExcludedUsers($Cap)) -Join ", "
-        $UsersIncluded | Should -Be "2 specific users"
+        $Cap = Get-Content "CapSnippets/Users.json" | ConvertFrom-Json
+        $Cap.Conditions.Users.ExcludeUsers += "aaaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
+        $Cap.Conditions.Users.ExcludeUsers += "baaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
+        $UsersExcluded = $($CapHelper.GetExcludedUsers($Cap)) -Join ", "
+        $UsersExcluded | Should -Be "2 specific users"
 	}
 
     It "handles excluding single groups" {
-        $Cap = Get-Content "CapSnippets/Users_sample04.json" | ConvertFrom-Json
-        $UsersIncluded = $($CapHelper.GetExcludedUsers($Cap)) -Join ", "
-        $UsersIncluded | Should -Be "1 specific group"
+        $Cap = Get-Content "CapSnippets/Users.json" | ConvertFrom-Json
+        $Cap.Conditions.Users.ExcludeGroups += "aaaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
+        $UsersExcluded = $($CapHelper.GetExcludedUsers($Cap)) -Join ", "
+        $UsersExcluded | Should -Be "1 specific group"
 	}
 
     It "handles excluding multiple groups" {
-        $Cap = Get-Content "CapSnippets/Users_sample05.json" | ConvertFrom-Json
-        $UsersIncluded = $($CapHelper.GetExcludedUsers($Cap)) -Join ", "
-        $UsersIncluded | Should -Be "2 specific groups"
+        $Cap = Get-Content "CapSnippets/Users.json" | ConvertFrom-Json
+        $Cap.Conditions.Users.ExcludeGroups += "aaaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
+        $Cap.Conditions.Users.ExcludeGroups += "baaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
+        $UsersExcluded = $($CapHelper.GetExcludedUsers($Cap)) -Join ", "
+        $UsersExcluded | Should -Be "2 specific groups"
 	}
 
     It "handles excluding single roles" {
-        $Cap = Get-Content "CapSnippets/Users_sample06.json" | ConvertFrom-Json
-        $UsersIncluded = $($CapHelper.GetExcludedUsers($Cap)) -Join ", "
-        $UsersIncluded | Should -Be "1 specific role"
+        $Cap = Get-Content "CapSnippets/Users.json" | ConvertFrom-Json
+        $Cap.Conditions.Users.ExcludeRoles += "aaaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
+        $UsersExcluded = $($CapHelper.GetExcludedUsers($Cap)) -Join ", "
+        $UsersExcluded | Should -Be "1 specific role"
 	}
 
     It "handles excluding multiple roles" {
-        $Cap = Get-Content "CapSnippets/Users_sample07.json" | ConvertFrom-Json
-        $UsersIncluded = $($CapHelper.GetExcludedUsers($Cap)) -Join ", "
-        $UsersIncluded | Should -Be "2 specific roles"
+        $Cap = Get-Content "CapSnippets/Users.json" | ConvertFrom-Json
+        $Cap.Conditions.Users.ExcludeRoles += "aaaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
+        $Cap.Conditions.Users.ExcludeRoles += "baaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
+        $UsersExcluded = $($CapHelper.GetExcludedUsers($Cap)) -Join ", "
+        $UsersExcluded | Should -Be "2 specific roles"
 	}
 
     It "handles excluding users, groups, and roles simultaneously" {
-        $Cap = Get-Content "CapSnippets/Users_sample08.json" | ConvertFrom-Json
-        $UsersIncluded = $($CapHelper.GetExcludedUsers($Cap)) -Join ", "
-        $UsersIncluded | Should -Be "1 specific user, 2 specific roles, 3 specific groups"
+        $Cap = Get-Content "CapSnippets/Users.json" | ConvertFrom-Json
+        $Cap.Conditions.Users.ExcludeUsers += "aaaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
+        $Cap.Conditions.Users.ExcludeRoles += "baaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
+        $Cap.Conditions.Users.ExcludeRoles += "caaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
+        $Cap.Conditions.Users.ExcludeGroups += "daaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
+        $Cap.Conditions.Users.ExcludeGroups += "eaaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
+        $Cap.Conditions.Users.ExcludeGroups += "faaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
+        $UsersExcluded = $($CapHelper.GetExcludedUsers($Cap)) -Join ", "
+        $UsersExcluded | Should -Be "1 specific user, 2 specific roles, 3 specific groups"
 	}
 
     It "handles excluding all types of external users" {
-        $Cap = Get-Content "CapSnippets/Users_sample09.json" | ConvertFrom-Json
-        $UsersIncluded = $($CapHelper.GetExcludedUsers($Cap)) -Join ", "
-        $UsersIncluded | Should -Be "B2B collaboration guest users, B2B collaboration member users, B2B direct connect users, Local guest users, Service provider users, Other external users"
+        $Cap = Get-Content "CapSnippets/Users.json" | ConvertFrom-Json
+        $Cap.Conditions.Users.ExcludeGuestsOrExternalUsers.ExternalTenants.MembershipKind = "all"
+        $Cap.Conditions.Users.ExcludeGuestsOrExternalUsers.GuestOrExternalUserTypes = "b2bCollaborationGuest,b2bCollaborationMember,b2bDirectConnectUser,internalGuest,serviceProvider,otherExternalUser"
+        $UsersExcluded = $($CapHelper.GetExcludedUsers($Cap)) -Join ", "
+        $UsersExcluded | Should -Be "B2B collaboration guest users, B2B collaboration member users, B2B direct connect users, Local guest users, Service provider users, Other external users"
 	}
 
     It "handles excluding a single type of external user" {
-        $Cap = Get-Content "CapSnippets/Users_sample10.json" | ConvertFrom-Json
-        $UsersIncluded = $($CapHelper.GetExcludedUsers($Cap)) -Join ", "
-        $UsersIncluded | Should -Be "Service provider users"
+        $Cap = Get-Content "CapSnippets/Users.json" | ConvertFrom-Json
+        $Cap.Conditions.Users.ExcludeGuestsOrExternalUsers.ExternalTenants.MembershipKind = "all"
+        $Cap.Conditions.Users.ExcludeGuestsOrExternalUsers.GuestOrExternalUserTypes = "serviceProvider"
+        $UsersExcluded = $($CapHelper.GetExcludedUsers($Cap)) -Join ", "
+        $UsersExcluded | Should -Be "Service provider users"
 	}
 
     It "handles empty input" {
         $Cap = @{}
-        $UsersIncluded = $($CapHelper.GetExcludedUsers($Cap) 3>$null) -Join ", " # 3>$null to surpress the warning
+        $UsersExcluded = $($CapHelper.GetExcludedUsers($Cap) 3>$null) -Join ", " # 3>$null to surpress the warning
         # message as it is expected in this case
-        $UsersIncluded | Should -Be ""
+        $UsersExcluded | Should -Be ""
 	}
 }
 
