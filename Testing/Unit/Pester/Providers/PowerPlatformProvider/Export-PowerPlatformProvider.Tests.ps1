@@ -1,5 +1,5 @@
 BeforeAll {
-    Import-Module ../../../../PowerShell/ScubaGear/Modules/Providers/ExportPowerPlatformProvider.psm1  
+    Import-Module ../../../../PowerShell/ScubaGear/Modules/Providers/ExportPowerPlatformProvider.psm1
 }
 
 Describe "Export-PowerPlatformProvider" {
