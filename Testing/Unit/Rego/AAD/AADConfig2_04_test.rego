@@ -70,7 +70,6 @@ test_IncludeApplications_Incorrect if {
 test_IncludeUsers_Incorrect if {
     ControlNumber := "AAD 2.4"
     Requirement := "MFA SHALL be required for all users "
-
     Output := tests with input as {
         "conditional_access_policies": [
             {
@@ -101,6 +100,7 @@ test_IncludeUsers_Incorrect if {
 test_BuiltInControls_Incorrect if {
     ControlNumber := "AAD 2.4"
     Requirement := "MFA SHALL be required for all users "
+
 
     Output := tests with input as {
         "conditional_access_policies": [
