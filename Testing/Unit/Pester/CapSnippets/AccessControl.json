@@ -11,11 +11,13 @@
             "PolicyType":null,
             "RequirementsSatisfied":null
         },
-        "BuiltInControls":null,
+        "BuiltInControls":[
+
+        ],
         "CustomAuthenticationFactors":[
             
         ],
-        "Operator":null,
+        "Operator":"OR",
         "TermsOfUse":[
             
         ]

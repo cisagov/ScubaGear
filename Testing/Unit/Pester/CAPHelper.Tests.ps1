@@ -411,43 +411,56 @@ Describe "GetConditions" {
 
 Describe "GetAccessControls" {
     It "handles blocking access" {
-        $Cap = Get-Content "CapSnippets/AccessControl_sample01.json" | ConvertFrom-Json
+        $Cap = Get-Content "CapSnippets/AccessControl.json" | ConvertFrom-Json
+        $Cap.GrantControls.BuiltInControls = @("block")
         $Controls = $($CapHelper.GetAccessControls($Cap))
         $Controls | Should -Be "Block access"
     }
 
     It "handles requiring single control" {
-        $Cap = Get-Content "CapSnippets/AccessControl_sample02.json" | ConvertFrom-Json
+        $Cap = Get-Content "CapSnippets/AccessControl.json" | ConvertFrom-Json
+        $Cap.GrantControls.BuiltInControls = @("mfa")
         $Controls = $($CapHelper.GetAccessControls($Cap))
         $Controls | Should -Be "Allow access but require multifactor authentication"
     }
 
     It "handles requiring multiple controls in AND mode" {
-        $Cap = Get-Content "CapSnippets/AccessControl_sample03.json" | ConvertFrom-Json
+        $Cap = Get-Content "CapSnippets/AccessControl.json" | ConvertFrom-Json
+        $Cap.GrantControls.BuiltInControls = @("mfa", "compliantDevice", "domainJoinedDevice",
+            "approvedApplication", "compliantApplication", "passwordChange")
+        $Cap.GrantControls.Operator = "AND"
         $Controls = $($CapHelper.GetAccessControls($Cap))
         $Controls | Should -Be "Allow access but require multifactor authentication, device to be marked compliant, Hybrid Azure AD joined device, approved client app, app protection policy, AND password change"
     }
 
     It "handles requiring multiple controls in OR mode" {
-        $Cap = Get-Content "CapSnippets/AccessControl_sample04.json" | ConvertFrom-Json
+        $Cap = Get-Content "CapSnippets/AccessControl.json" | ConvertFrom-Json
+        $Cap.GrantControls.BuiltInControls = @("mfa", "compliantDevice", "domainJoinedDevice",
+            "approvedApplication", "compliantApplication", "passwordChange")
+        $Cap.GrantControls.Operator = "OR"
         $Controls = $($CapHelper.GetAccessControls($Cap))
         $Controls | Should -Be "Allow access but require multifactor authentication, device to be marked compliant, Hybrid Azure AD joined device, approved client app, app protection policy, OR password change"
     }
 
     It "handles using authentication strength (phishing resistant MFA)" {
-        $Cap = Get-Content "CapSnippets/AccessControl_sample05.json" | ConvertFrom-Json
+        $Cap = Get-Content "CapSnippets/AccessControl.json" | ConvertFrom-Json
+        $Cap.GrantControls.AuthenticationStrength.DisplayName = "Phishing resistant MFA"
         $Controls = $($CapHelper.GetAccessControls($Cap))
         $Controls | Should -Be "Allow access but require authentication strength (Phishing resistant MFA)"
     }
 
     It "handles using both authentication strength and a traditional control" {
-        $Cap = Get-Content "CapSnippets/AccessControl_sample06.json" | ConvertFrom-Json
+        $Cap = Get-Content "CapSnippets/AccessControl.json" | ConvertFrom-Json
+        $Cap.GrantControls.AuthenticationStrength.DisplayName = "Multi-factor authentication"
+        $Cap.GrantControls.BuiltInControls = @("passwordChange")
+        $Cap.GrantControls.Operator = "AND"
         $Controls = $($CapHelper.GetAccessControls($Cap))
         $Controls | Should -Be "Allow access but require password change, AND authentication strength (Multi-factor authentication)"
     }
 
     It "handles using no access controls" {
-        $Cap = Get-Content "CapSnippets/AccessControl_sample07.json" | ConvertFrom-Json
+        $Cap = Get-Content "CapSnippets/AccessControl.json" | ConvertFrom-Json
+        $Cap.GrantControls.BuiltInControls = $null
         $Controls = $($CapHelper.GetAccessControls($Cap))
         $Controls | Should -Be "None"
     }
