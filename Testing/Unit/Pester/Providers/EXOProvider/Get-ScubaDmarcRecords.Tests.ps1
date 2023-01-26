@@ -70,7 +70,7 @@ Describe "Get-ScubaDkimRecords" {
             $domains = @{"DomainName"="test365.cisa.dhs.gov"}
             $DKIMRecords = Get-ScubaDkimRecords $domains
             foreach ($R in $DKIMRecords){
-                $R.rdata.Trim() | Should -BeLike "v=DKIM1;*" 
+                $R.rdata.Trim() | Should -BeLike "v=DKIM1;*"
             }
 		}
 	}
@@ -86,7 +86,7 @@ Describe "Get-ScubaDkimRecords" {
             $domains = @{"DomainName"="example.com"}
             $DKIMRecords = Get-ScubaDkimRecords $domains
             foreach ($R in $DKIMRecords){
-                $R.rdata.Trim() | Should -BeLike "" 
+                $R.rdata.Trim() | Should -BeLike ""
             }
 		}
 	}
