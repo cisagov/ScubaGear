@@ -267,92 +267,129 @@ Describe "GetApplications" {
 
 Describe "GetConditions" {
     It "handles user risk levels" {
-        $Cap = Get-Content "CapSnippets/Conditions_sample01.json" | ConvertFrom-Json
+        $Cap = Get-Content "CapSnippets/Conditions.json" | ConvertFrom-Json
+        $Cap.Conditions.UserRiskLevels += "high"
+        $Cap.Conditions.UserRiskLevels += "medium"
+        $Cap.Conditions.UserRiskLevels += "low"
         $Conditions = $($CapHelper.GetConditions($Cap))
         $Conditions[0] | Should -Be "User risk levels: high, medium, low"
 	}
 
     It "handles sign-in risk levels" {
-        $Cap = Get-Content "CapSnippets/Conditions_sample02.json" | ConvertFrom-Json
+        $Cap = Get-Content "CapSnippets/Conditions.json" | ConvertFrom-Json
+        $Cap.Conditions.SignInRiskLevels += "low"
         $Conditions = $($CapHelper.GetConditions($Cap))
         $Conditions[0] | Should -Be "Sign-in risk levels: low"
 	}
 
     It "handles including all device platforms" {
-        $Cap = Get-Content "CapSnippets/Conditions_sample03.json" | ConvertFrom-Json
+        $Cap = Get-Content "CapSnippets/Conditions.json" | ConvertFrom-Json
+        $Cap.Conditions.Platforms.ExcludePlatforms = @()
+        $Cap.Conditions.Platforms.IncludePlatforms = @("all")
         $Conditions = $($CapHelper.GetConditions($Cap))
         $Conditions[0] | Should -Be "Device platforms included: all"
         $Conditions[1] | Should -Be "Device platforms excluded: none"
     }
 
     It "handles including/excluding specific device platforms" {
-        $Cap = Get-Content "CapSnippets/Conditions_sample04.json" | ConvertFrom-Json
+        $Cap = Get-Content "CapSnippets/Conditions.json" | ConvertFrom-Json
+        $Cap.Conditions.Platforms.ExcludePlatforms = @("iOS", "macOS", "linux")
+        $Cap.Conditions.Platforms.IncludePlatforms = @("android")
         $Conditions = $($CapHelper.GetConditions($Cap))
         $Conditions[0] | Should -Be "Device platforms included: android"
         $Conditions[1] | Should -Be "Device platforms excluded: iOS, macOS, linux"
     }
 
     It "handles including all locations" {
-        $Cap = Get-Content "CapSnippets/Conditions_sample05.json" | ConvertFrom-Json
+        $Cap = Get-Content "CapSnippets/Conditions.json" | ConvertFrom-Json
+        $Cap.Conditions.Locations.ExcludeLocations = @()
+        $Cap.Conditions.Locations.IncludeLocations = @("All")
         $Conditions = $($CapHelper.GetConditions($Cap))
         $Conditions[0] | Should -Be "Locations included: all locations"
         $Conditions[1] | Should -Be "Locations excluded: none"
     }
 
     It "handles excluding trusted locations" {
-        $Cap = Get-Content "CapSnippets/Conditions_sample06.json" | ConvertFrom-Json
+        $Cap = Get-Content "CapSnippets/Conditions.json" | ConvertFrom-Json
+        $Cap.Conditions.Locations.ExcludeLocations = @("AllTrusted")
+        $Cap.Conditions.Locations.IncludeLocations = @("All")
         $Conditions = $($CapHelper.GetConditions($Cap))
         $Conditions[0] | Should -Be "Locations included: all locations"
         $Conditions[1] | Should -Be "Locations excluded: all trusted locations"
     }
 
     It "handles including/excluding single custom locations" {
-        $Cap = Get-Content "CapSnippets/Conditions_sample07.json" | ConvertFrom-Json
+        $Cap = Get-Content "CapSnippets/Conditions.json" | ConvertFrom-Json
+        $Cap.Conditions.Locations.ExcludeLocations = @("00000000-0000-0000-0000-000000000000")
+        $Cap.Conditions.Locations.IncludeLocations = @("10000000-0000-0000-0000-000000000000")
         $Conditions = $($CapHelper.GetConditions($Cap))
         $Conditions[0] | Should -Be "Locations included: 1 specific location"
         $Conditions[1] | Should -Be "Locations excluded: 1 specific location"
     }
 
     It "handles including/excluding multiple custom locations" {
-        $Cap = Get-Content "CapSnippets/Conditions_sample08.json" | ConvertFrom-Json
+        $Cap = Get-Content "CapSnippets/Conditions.json" | ConvertFrom-Json
+        $Cap.Conditions.Locations.ExcludeLocations = @()
+        $Cap.Conditions.Locations.ExcludeLocations += @("00000000-0000-0000-0000-000000000000")
+        $Cap.Conditions.Locations.ExcludeLocations += @("10000000-0000-0000-0000-000000000000")
+        $Cap.Conditions.Locations.ExcludeLocations += @("20000000-0000-0000-0000-000000000000")
+        $Cap.Conditions.Locations.IncludeLocations = @()
+        $Cap.Conditions.Locations.IncludeLocations += @("30000000-0000-0000-0000-000000000000")
+        $Cap.Conditions.Locations.IncludeLocations += @("40000000-0000-0000-0000-000000000000")
         $Conditions = $($CapHelper.GetConditions($Cap))
         $Conditions[0] | Should -Be "Locations included: 2 specific locations"
         $Conditions[1] | Should -Be "Locations excluded: 3 specific locations"
     }
 
     It "handles including trusted locations" {
-        $Cap = Get-Content "CapSnippets/Conditions_sample09.json" | ConvertFrom-Json
+        $Cap = Get-Content "CapSnippets/Conditions.json" | ConvertFrom-Json
+        $Cap.Conditions.Locations.IncludeLocations = @("AllTrusted")
         $Conditions = $($CapHelper.GetConditions($Cap))
         $Conditions[0] | Should -Be "Locations included: all trusted locations"
         $Conditions[1] | Should -Be "Locations excluded: none"
     }
 
     It "handles including all client apps" {
-        $Cap = Get-Content "CapSnippets/Conditions_sample09.json" | ConvertFrom-Json
+        $Cap = Get-Content "CapSnippets/Conditions.json" | ConvertFrom-Json
         $Conditions = $($CapHelper.GetConditions($Cap))
-        $Conditions[2] | Should -Be "Client apps included: all"
+        $Conditions | Should -Be "Client apps included: all"
     }
 
     It "handles including specific client apps" {
-        $Cap = Get-Content "CapSnippets/Conditions_sample10.json" | ConvertFrom-Json
+        $Cap = Get-Content "CapSnippets/Conditions.json" | ConvertFrom-Json
+        $Cap.Conditions.ClientAppTypes = @("exchangeActiveSync", "browser",
+            "mobileAppsAndDesktopClients", "other")
         $Conditions = $($CapHelper.GetConditions($Cap))
         $Conditions | Should -Be "Client apps included: Exchange ActiveSync Clients, Browser, Mobile apps and desktop clients, Other clients"
     }
 
     It "handles custom client app filter in include mode" {
-        $Cap = Get-Content "CapSnippets/Conditions_sample11.json" | ConvertFrom-Json
+        $Cap = Get-Content "CapSnippets/Conditions.json" | ConvertFrom-Json
+        $Cap.Conditions.Devices.DeviceFilter.Mode = "include"
+        $Cap.Conditions.Devices.DeviceFilter.Rule = "device.manufacturer -eq 'helloworld'"
         $Conditions = $($CapHelper.GetConditions($Cap))
         $Conditions[1] | Should -Be "Custom device filter in include mode active"
     }
 
     It "handles custom client app filter in exclude mode" {
-        $Cap = Get-Content "CapSnippets/Conditions_sample12.json" | ConvertFrom-Json
+        $Cap = Get-Content "CapSnippets/Conditions.json" | ConvertFrom-Json
+        $Cap.Conditions.Devices.DeviceFilter.Mode = "exclude"
+        $Cap.Conditions.Devices.DeviceFilter.Rule = "device.manufacturer -eq 'helloworld'"
         $Conditions = $($CapHelper.GetConditions($Cap))
         $Conditions[1] | Should -Be "Custom device filter in exclude mode active"
     }
 
     It "handles many conditions simultaneously" {
-        $Cap = Get-Content "CapSnippets/Conditions_sample13.json" | ConvertFrom-Json
+        $Cap = Get-Content "CapSnippets/Conditions.json" | ConvertFrom-Json
+        $Cap.Conditions.UserRiskLevels += "low"
+        $Cap.Conditions.SignInRiskLevels += "high"
+        $Cap.Conditions.Platforms.ExcludePlatforms = @("android", "iOS", "macOS", "linux")
+        $Cap.Conditions.Platforms.IncludePlatforms = @("all")
+        $Cap.Conditions.Locations.IncludeLocations = @("AllTrusted")
+        $Cap.Conditions.Locations.ExcludeLocations = @()
+        $Cap.Conditions.ClientAppTypes = @("exchangeActiveSync")
+        $Cap.Conditions.Devices.DeviceFilter.Mode = "exclude"
+        $Cap.Conditions.Devices.DeviceFilter.Rule = "device.manufacturer -eq 'helloworld'"
         $Conditions = $($CapHelper.GetConditions($Cap))
         $Conditions[0] | Should -Be "User risk levels: low"
         $Conditions[1] | Should -Be "Sign-in risk levels: high"

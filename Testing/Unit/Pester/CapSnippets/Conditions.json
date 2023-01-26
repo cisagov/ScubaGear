@@ -1,9 +1,7 @@
 {
     "Conditions":{
        "UserRiskLevels":[
-          "high",
-          "medium",
-          "low"
+
        ],
        "SignInRiskLevels":[
           
