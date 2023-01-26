@@ -43,6 +43,12 @@ $AllTitles =  Get-Content $FileName | ConvertFrom-Json
 $Titles = $AllTitles.$BaselineName
 
 $FileName = Join-Path -Path $OutPath -ChildPath "$($OutProviderFileName).json"
+
+# This implements a fix for issue 134.
+if ($BaselineName -eq "aad") {
+    ((Get-Content -Path $FileName -Raw) -Replace '"conditional_access_policies": ,','"conditional_access_policies": {},') | Set-Content -Path $FileName
+}
+
 $SettingsExport =  Get-Content $FileName | ConvertFrom-Json
 
 $FileName = Join-Path -Path $OutPath -ChildPath "$($OutRegoFileName).json"
