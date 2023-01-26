@@ -411,21 +411,21 @@ Describe "GetConditions" {
 
 Describe "GetAccessControls" {
     It "handles blocking access" {
-        $Cap = Get-Content "CapSnippets/AccessControl.json" | ConvertFrom-Json
+        $Cap = Get-Content "CapSnippets/AccessControls.json" | ConvertFrom-Json
         $Cap.GrantControls.BuiltInControls = @("block")
         $Controls = $($CapHelper.GetAccessControls($Cap))
         $Controls | Should -Be "Block access"
     }
 
     It "handles requiring single control" {
-        $Cap = Get-Content "CapSnippets/AccessControl.json" | ConvertFrom-Json
+        $Cap = Get-Content "CapSnippets/AccessControls.json" | ConvertFrom-Json
         $Cap.GrantControls.BuiltInControls = @("mfa")
         $Controls = $($CapHelper.GetAccessControls($Cap))
         $Controls | Should -Be "Allow access but require multifactor authentication"
     }
 
     It "handles requiring multiple controls in AND mode" {
-        $Cap = Get-Content "CapSnippets/AccessControl.json" | ConvertFrom-Json
+        $Cap = Get-Content "CapSnippets/AccessControls.json" | ConvertFrom-Json
         $Cap.GrantControls.BuiltInControls = @("mfa", "compliantDevice", "domainJoinedDevice",
             "approvedApplication", "compliantApplication", "passwordChange")
         $Cap.GrantControls.Operator = "AND"
@@ -434,7 +434,7 @@ Describe "GetAccessControls" {
     }
 
     It "handles requiring multiple controls in OR mode" {
-        $Cap = Get-Content "CapSnippets/AccessControl.json" | ConvertFrom-Json
+        $Cap = Get-Content "CapSnippets/AccessControls.json" | ConvertFrom-Json
         $Cap.GrantControls.BuiltInControls = @("mfa", "compliantDevice", "domainJoinedDevice",
             "approvedApplication", "compliantApplication", "passwordChange")
         $Cap.GrantControls.Operator = "OR"
@@ -443,14 +443,14 @@ Describe "GetAccessControls" {
     }
 
     It "handles using authentication strength (phishing resistant MFA)" {
-        $Cap = Get-Content "CapSnippets/AccessControl.json" | ConvertFrom-Json
+        $Cap = Get-Content "CapSnippets/AccessControls.json" | ConvertFrom-Json
         $Cap.GrantControls.AuthenticationStrength.DisplayName = "Phishing resistant MFA"
         $Controls = $($CapHelper.GetAccessControls($Cap))
         $Controls | Should -Be "Allow access but require authentication strength (Phishing resistant MFA)"
     }
 
     It "handles using both authentication strength and a traditional control" {
-        $Cap = Get-Content "CapSnippets/AccessControl.json" | ConvertFrom-Json
+        $Cap = Get-Content "CapSnippets/AccessControls.json" | ConvertFrom-Json
         $Cap.GrantControls.AuthenticationStrength.DisplayName = "Multi-factor authentication"
         $Cap.GrantControls.BuiltInControls = @("passwordChange")
         $Cap.GrantControls.Operator = "AND"
@@ -459,7 +459,7 @@ Describe "GetAccessControls" {
     }
 
     It "handles using no access controls" {
-        $Cap = Get-Content "CapSnippets/AccessControl.json" | ConvertFrom-Json
+        $Cap = Get-Content "CapSnippets/AccessControls.json" | ConvertFrom-Json
         $Cap.GrantControls.BuiltInControls = $null
         $Controls = $($CapHelper.GetAccessControls($Cap))
         $Controls | Should -Be "None"
@@ -475,69 +475,87 @@ Describe "GetAccessControls" {
 
 Describe "GetSessionControls" {
     It "handles using no session controls" {
-        $Cap = Get-Content "CapSnippets/SessionControl_sample01.json" | ConvertFrom-Json
+        $Cap = Get-Content "CapSnippets/SessionControls.json" | ConvertFrom-Json
         $Controls = $($CapHelper.GetSessionControls($Cap))
         $Controls | Should -Be "None"
     }
 
     It "handles using app enforced restrictions" {
-        $Cap = Get-Content "CapSnippets/SessionControl_sample02.json" | ConvertFrom-Json
+        $Cap = Get-Content "CapSnippets/SessionControls.json" | ConvertFrom-Json
+        $Cap.SessionControls.ApplicationEnforcedRestrictions.IsEnabled = $true
         $Controls = $($CapHelper.GetSessionControls($Cap))
         $Controls | Should -Be "Use app enforced restrictions"
     }
 
     It "handles using conditional access app control with custom policy" {
-        $Cap = Get-Content "CapSnippets/SessionControl_sample03.json" | ConvertFrom-Json
+        $Cap = Get-Content "CapSnippets/SessionControls.json" | ConvertFrom-Json
+        $Cap.SessionControls.CloudAppSecurity.CloudAppSecurityType = "mcasConfigured"
+        $Cap.SessionControls.CloudAppSecurity.IsEnabled = $true
         $Controls = $($CapHelper.GetSessionControls($Cap))
         $Controls | Should -Be "Use Conditional Access App Control (Use custom policy)"
     }
 
     It "handles using conditional access app control in monitor mode" {
-        $Cap = Get-Content "CapSnippets/SessionControl_sample03.json" | ConvertFrom-Json
+        $Cap = Get-Content "CapSnippets/SessionControls.json" | ConvertFrom-Json
         $Cap.SessionControls.CloudAppSecurity.CloudAppSecurityType = "monitorOnly"
+        $Cap.SessionControls.CloudAppSecurity.IsEnabled = $true
         $Controls = $($CapHelper.GetSessionControls($Cap))
         $Controls | Should -Be "Use Conditional Access App Control (Monitor only)"
     }
 
     It "handles using conditional access app control in block mode" {
-        $Cap = Get-Content "CapSnippets/SessionControl_sample03.json" | ConvertFrom-Json
+        $Cap = Get-Content "CapSnippets/SessionControls.json" | ConvertFrom-Json
         $Cap.SessionControls.CloudAppSecurity.CloudAppSecurityType = "blockDownloads"
+        $Cap.SessionControls.CloudAppSecurity.IsEnabled = $true
         $Controls = $($CapHelper.GetSessionControls($Cap))
         $Controls | Should -Be "Use Conditional Access App Control (Block downloads)"
     }
 
     It "handles using sign-in frequency every time" {
-        $Cap = Get-Content "CapSnippets/SessionControl_sample04.json" | ConvertFrom-Json
+        $Cap = Get-Content "CapSnippets/SessionControls.json" | ConvertFrom-Json
+        $Cap.SessionControls.SignInFrequency.FrequencyInterval = "everyTime"
+        $Cap.SessionControls.SignInFrequency.IsEnabled = $true
         $Controls = $($CapHelper.GetSessionControls($Cap))
         $Controls | Should -Be "Sign-in frequency (every time)"
     }
 
     It "handles using sign-in frequency time based" {
-        $Cap = Get-Content "CapSnippets/SessionControl_sample05.json" | ConvertFrom-Json
+        $Cap = Get-Content "CapSnippets/SessionControls.json" | ConvertFrom-Json
+        $Cap.SessionControls.SignInFrequency.FrequencyInterval = "timeBased"
+        $Cap.SessionControls.SignInFrequency.Type = "days"
+        $Cap.SessionControls.SignInFrequency.Value = 10
+        $Cap.SessionControls.SignInFrequency.IsEnabled = $true
         $Controls = $($CapHelper.GetSessionControls($Cap))
         $Controls | Should -Be "Sign-in frequency (every 10 days)"
     }
 
     It "handles using persistent browser session" {
-        $Cap = Get-Content "CapSnippets/SessionControl_sample06.json" | ConvertFrom-Json
+        $Cap = Get-Content "CapSnippets/SessionControls.json" | ConvertFrom-Json
+        $Cap.SessionControls.PersistentBrowser.IsEnabled = $true
+        $Cap.SessionControls.PersistentBrowser.Mode = "never"
         $Controls = $($CapHelper.GetSessionControls($Cap))
         $Controls | Should -Be "Persistent browser session (never persistent)"
     }
 
     It "handles using customized continuous access evaluation" {
-        $Cap = Get-Content "CapSnippets/SessionControl_sample07.json" | ConvertFrom-Json
+        $Cap = Get-Content "CapSnippets/SessionControls.json" | ConvertFrom-Json
+        $Cap.SessionControls.ContinuousAccessEvaluation.Mode = "disabled"
         $Controls = $($CapHelper.GetSessionControls($Cap))
         $Controls | Should -Be "Customize continuous access evaluation"
     }
 
     It "handles disabling resilience defaults" {
-        $Cap = Get-Content "CapSnippets/SessionControl_sample08.json" | ConvertFrom-Json
+        $Cap = Get-Content "CapSnippets/SessionControls.json" | ConvertFrom-Json
+        $Cap.SessionControls.DisableResilienceDefaults = $true
         $Controls = $($CapHelper.GetSessionControls($Cap))
         $Controls | Should -Be "Disable resilience defaults"
     }
 
     It "handles multiple controls simultaneously" {
-        $Cap = Get-Content "CapSnippets/SessionControl_sample09.json" | ConvertFrom-Json
+        $Cap = Get-Content "CapSnippets/SessionControls.json" | ConvertFrom-Json
+        $Cap.SessionControls.PersistentBrowser.IsEnabled = $true
+        $Cap.SessionControls.PersistentBrowser.Mode = "never"
+        $Cap.SessionControls.DisableResilienceDefaults = $true
         $Controls = $($CapHelper.GetSessionControls($Cap))
         $Controls[0] | Should -Be "Persistent browser session (never persistent)"
         $Controls[1] | Should -Be "Disable resilience defaults"
