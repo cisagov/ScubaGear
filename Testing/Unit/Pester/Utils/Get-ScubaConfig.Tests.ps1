@@ -17,28 +17,26 @@ Describe -tag "Utils" -name 'ScubaConfig' {
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'ScubaConfigTestFile')]
             $ScubaConfigTestFile = Join-Path -Path $PSScriptRoot -ChildPath config_test.json
         }
-        It 'Valid config file'{
+        BeforeEach {
             Remove-ScubaConfig
+        }
+        It 'Valid config file'{
             { Get-ScubaConfig -Path $ScubaConfigTestFile } |
                 Should -Not -Throw
         }
         It 'Valid string parameter'{
-            Remove-ScubaConfig
             Get-ScubaConfig -Path $ScubaConfigTestFile
             $ScubaConfig.M365Environment | Should -Be 'commercial'
         }
         It 'Valid array parameter'{
-            Remove-ScubaConfig
             Get-ScubaConfig -Path $ScubaConfigTestFile
             $ScubaConfig.ProductNames | Should -Contain 'aad'
         }
         It 'Valid boolean parameter'{
-            Remove-ScubaConfig
             Get-ScubaConfig -Path $ScubaConfigTestFile
             $ScubaConfig.DisconnectOnExit | Should -Be $false
         }
         It 'Valid object parameter'{
-            Remove-ScubaConfig
             Get-ScubaConfig -Path $ScubaConfigTestFile
             $ScubaConfig.AnObject.name | Should -Be 'MyObjectName'
         }
@@ -48,28 +46,26 @@ Describe -tag "Utils" -name 'ScubaConfig' {
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'ScubaConfigTestFile')]
             $ScubaConfigTestFile = Join-Path -Path $PSScriptRoot -ChildPath config_test.yaml
         }
-        It 'Valid config file'{
+        BeforeEach {
             Remove-ScubaConfig
+        }
+        It 'Valid config file'{
             { Get-ScubaConfig -Path $ScubaConfigTestFile} |
                 Should -Not -Throw
         }
         It 'Valid string parameter'{
-            Remove-ScubaConfig
             Get-ScubaConfig -Path $ScubaConfigTestFile
             $ScubaConfig.M365Environment | Should -Be 'commercial'
         }
         It 'Valid array parameter'{
-            Remove-ScubaConfig
             Get-ScubaConfig -Path $ScubaConfigTestFile
             $ScubaConfig.ProductNames | Should -Contain 'aad'
         }
         It 'Valid boolean parameter'{
-            Remove-ScubaConfig
             Get-ScubaConfig -Path $ScubaConfigTestFile
             $ScubaConfig.DisconnectOnExit | Should -Be $false
         }
         It 'Valid object parameter'{
-            Remove-ScubaConfig
             Get-ScubaConfig -Path $ScubaConfigTestFile
             $ScubaConfig.AnObject.name | Should -Be 'MyObjectName'
         }
