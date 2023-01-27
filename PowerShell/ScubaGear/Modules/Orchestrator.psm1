@@ -163,22 +163,26 @@ function Invoke-SCuBA {
             return
         }
 
-        if ($PSCmdlet.ParameterSetName -eq 'Import-Configuration'){
-            Get-ScubaConfig -Path $ConfigFilePath
-            $ProductNames = $ScubaConfig.ProductNames
-            $M365Environment = $ScubaConfig.M365Environment
-            $OPAPath = $ScubaConfig.OPAPath
-            $LogIn = $ScubaConfig.LogIn
-            $DisconnectOnExit = $ScubaConfig.DisconnectOnExit
-            $OutPath = $ScubaConfig.OutPath
-            $OutFolderName = $ScubaConfig.OutFolderName
-            $OutProviderFileName = $ScubaConfig.OutProviderFileName
-            $OutRegoFileName = $ScubaConfig.OutRegoFileName
-            $OutReportName = $ScubaConfig.OutReportName
+        if ($PSCmdlet.ParameterSetName -eq 'Report'){
+
+            if ($ProductNames -eq '*'){
+                $ProductNames = "teams", "exo", "defender", "aad", "sharepoint", "onedrive", "powerplatform"
+            }
+
+            $ScubaConfig.ProductNames = $ProductNames | Sort-Object
+            $ScubaConfig.M365Environment = $M365Environment
+            $ScubaConfig.OPAPath = $OPAPath
+            $ScubaConfig.LogIn = $LogIn
+            $ScubaConfig.DisconnectOnExit = $DisconnectOnExit
+            $ScubaConfig.OutPath = $OutPath
+            $ScubaConfig.OutFolderName = $OutFolderName
+            $ScubaConfig.OutProviderFileName = $OutProviderFileName
+            $ScubaConfig.OutRegoFileName = $OutRegoFileName
+            $ScubaConfig.OutReportName = $OutReportName
         }
 
-        if ($ProductNames -eq '*'){
-            $ProductNames = "teams", "exo", "defender", "aad", "sharepoint", "onedrive", "powerplatform"
+        if ($PSCmdlet.ParameterSetName -eq 'Import-Configuration'){
+            Get-ScubaConfig -Path $ConfigFilePath
         }
 
         # The equivalent of ..\..
@@ -189,60 +193,58 @@ function Invoke-SCuBA {
         $DateStr = $Date.ToString("yyyy_MM_dd_HH_mm_ss")
         $FormattedTimeStamp = $DateStr
 
-        $OutFolderPath = $OutPath
-        $FolderName = "$($OutFolderName)_$($FormattedTimeStamp)"
+        $OutFolderPath = $ScubaConfig.OutPath
+        $FolderName = "$($ScubaConfig.OutFolderName)_$($FormattedTimeStamp)"
         New-Item -Path $OutFolderPath -Name $($FolderName) -ItemType Directory | Out-Null
         $OutFolderPath = Join-Path -Path $OutFolderPath -ChildPath $FolderName
-
-        $ProductNames = $ProductNames | Sort-Object
 
         Remove-Resources
         Import-Resources # Imports Providers, RunRego, CreateReport, Connection
 
         $ConnectionParams = @{
-            'LogIn' = $LogIn;
-            'ProductNames' = $ProductNames;
-            'M365Environment' = $M365Environment;
+            'LogIn' = $ScubaConfig.LogIn;
+            'ProductNames' = $ScubaConfig.ProductNames;
+            'M365Environment' = $ScubaConfig.M365Environment;
         }
 
         $ProdAuthFailed = Invoke-Connection @ConnectionParams
         if ($ProdAuthFailed.Count -gt 0) {
-            $Difference = Compare-Object $ProductNames -DifferenceObject $ProdAuthFailed -PassThru
+            $Difference = Compare-Object $ScubaConfig.ProductNames -DifferenceObject $ProdAuthFailed -PassThru
             if (-not $Difference) {
                 throw "All products were unable to establish a connection aborting execution"
             }
             else {
-                $ProductNames = $Difference
+                $ScubaConfig.ProductNames = $Difference
             }
         }
 
-        $TenantDetails = Get-TenantDetail -ProductNames $ProductNames -M365Environment $M365Environment
+        $TenantDetails = Get-TenantDetail -ProductNames $ScubaConfig.ProductNames -M365Environment $ScubaConfig.M365Environment
         $ProviderParams = @{
-            'ProductNames' = $ProductNames;
-            'M365Environment' = $M365Environment;
+            'ProductNames' = $ScubaConfig.ProductNames;
+            'M365Environment' = $ScubaConfig.M365Environment;
             'TenantDetails' = $TenantDetails;
             'ModuleVersion' = $ModuleVersion;
             'OutFolderPath' = $OutFolderPath;
-            'OutProviderFileName' = $OutProviderFileName;
+            'OutProviderFileName' = $ScubaConfig.OutProviderFileName;
         }
         $RegoParams = @{
-            'ProductNames' = $ProductNames;
-            'OPAPath' = $OPAPath;
+            'ProductNames' = $ScubaConfig.ProductNames;
+            'OPAPath' = $ScubaConfig.OPAPath;
             'ParentPath' = $ParentPath;
             'OutFolderPath' = $OutFolderPath;
-            'OutProviderFileName' = $OutProviderFileName;
-            'OutRegoFileName' = $OutRegoFileName;
+            'OutProviderFileName' = $ScubaConfig.OutProviderFileName;
+            'OutRegoFileName' = $ScubaConfig.OutRegoFileName;
         }
         # Converted back from JSON String for PS Object use
         $TenantDetails = $TenantDetails | ConvertFrom-Json
         $ReportParams = @{
-            'ProductNames' = $ProductNames;
+            'ProductNames' = $ScubaConfig.ProductNames;
             'TenantDetails' = $TenantDetails;
             'ModuleVersion' = $ModuleVersion;
             'OutFolderPath' = $OutFolderPath;
-            'OutProviderFileName' = $OutProviderFileName;
-            'OutRegoFileName' = $OutRegoFileName;
-            'OutReportName' = $OutReportName;
+            'OutProviderFileName' = $ScubaConfig.OutProviderFileName;
+            'OutRegoFileName' = $ScubaConfig.OutRegoFileName;
+            'OutReportName' = $ScubaConfig.OutReportName;
         }
 
         try {
@@ -250,12 +252,12 @@ function Invoke-SCuBA {
             Invoke-RunRego @RegoParams
             Invoke-ReportCreation @ReportParams
         } finally {
-            if ($DisconnectOnExit) {
+            if ($ScubaConfig.DisconnectOnExit) {
                 if($VerbosePreference -eq "Continue") {
-                    Disconnect-SCuBATenant -ProductNames $ProductNames -ErrorAction SilentlyContinue -Verbose
+                    Disconnect-SCuBATenant -ProductNames $ScubaConfig.ProductNames -ErrorAction SilentlyContinue -Verbose
                 }
                 else {
-                    Disconnect-SCuBATenant -ProductNames $ProductNames -ErrorAction SilentlyContinue
+                    Disconnect-SCuBATenant -ProductNames $ScubaConfig.ProductNames -ErrorAction SilentlyContinue
                 }
             }
         }
