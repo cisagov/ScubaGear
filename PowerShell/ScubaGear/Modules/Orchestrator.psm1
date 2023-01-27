@@ -152,12 +152,7 @@ function Invoke-SCuBA {
             return $true
         })]
         [System.IO.FileInfo]
-        $ConfigFilePath,
-
-        [Parameter(Mandatory  = $false, ParameterSetName = 'Configuration')]
-        [ValidateSet("json", "yaml", IgnoreCase = $false)]
-        [string]
-        $ConfigFormat = "json"
+        $ConfigFilePath
     )
     process {
         $ParentPath = Split-Path $PSScriptRoot -Parent
@@ -169,7 +164,7 @@ function Invoke-SCuBA {
         }
 
         if ($PSCmdlet.ParameterSetName -eq 'Import-Configuration'){
-            Get-ScubaConfig -Path $ConfigFilePath -Format $ConfigFormat
+            Get-ScubaConfig -Path $ConfigFilePath
             $ProductNames = $ScubaConfig.ProductNames
             $M365Environment = $ScubaConfig.M365Environment
             $OPAPath = $ScubaConfig.OPAPath
