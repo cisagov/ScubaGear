@@ -20,23 +20,13 @@ function Get-ScubaConfig {
             return $true
         })]
         [System.IO.FileInfo]
-        $Path,
-        [Parameter(Mandatory = $false)]
-        [ValidateSet("json", "yaml", IgnoreCase = $false)]
-        [string]
-        $Format = "json"
+        $Path
     )
 
     $Content = Get-Content -Raw -Path $Path
+    $Config = $Content | ConvertFrom-Yaml
 
-    if ("json" -eq $Format){
-        $config =  $Content | ConvertFrom-Json
-    }
-    else {
-        $config = $Content | ConvertFrom-Yaml
-    }
-
-    Set-Variable -Name "ScubaConfig" -Value $config -Option ReadOnly -Scope Global -Description "SCuBA Configuration parameters"
+    Set-Variable -Name "ScubaConfig" -Value $Config -Option ReadOnly -Scope Global -Description "SCuBA Configuration parameters"
 }
 
 function Remove-ScubaConfig {
