@@ -3,7 +3,7 @@ function Get-ScubaConfig {
     .Description
     This function is used to read in a SCuBA configuration file and set the
     "ScubaConfig" read only variable in local scope. The file must
-    be in JSON format and adhere to the SCUBA configuration schema.
+    be in JSON or YAML format and adhere to the SCUBA configuration schema.
     .Functionality
     Internal
     #>
@@ -26,7 +26,7 @@ function Get-ScubaConfig {
     $Content = Get-Content -Raw -Path $Path
     $Config = $Content | ConvertFrom-Yaml
 
-    Set-Variable -Name "ScubaConfig" -Value $Config -Option ReadOnly -Scope Global -Description "SCuBA Configuration parameters"
+    Set-Variable -Name "ScubaConfig" -Value $Config -Option AllScope -Scope Local -Description "SCuBA Configuration parameters"
 }
 
 function Remove-ScubaConfig {
@@ -38,8 +38,8 @@ function Remove-ScubaConfig {
     #>
 
     try {
-        if (Get-Variable -Name "ScubaConfig" -Scope Global){
-            Remove-Variable -Name "ScubaConfig" -Scope Global -Force
+        if (Get-Variable -Name "ScubaConfig" -Scope Local){
+            Remove-Variable -Name "ScubaConfig" -Scope Local -Force
         }
 
     }
