@@ -28,6 +28,41 @@ function Connect-EXOHelper {
     }
 }
 
+function Connect-DefenderHelper {
+    <#
+    .Description
+    This function is used for assisting in connecting to different M365 Environments for EXO.
+    .Functionality
+    Internal
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $false)]
+        [string]
+        $M365Environment
+    )
+    $IPPSParams = @{
+        'ErrorAction' = 'Stop';
+    }
+    switch ($M365Environment) {
+        {($_ -eq "commercial") -or ($_ -eq "gcc")} {
+            $IPPSParams = @{'ErrorAction' = 'Stop';} # sanity check
+        }
+        "gcchigh" {
+            $IPPSParams = $IPPSParams + @{'ConnectionUri' = "https://outlook.office365.us/powershell-liveID";}
+        }
+        "dod" {
+            $IPPSParams = $IPPSParams + @{'ConnectionUri' = "https://webmail.apps.mil/powershell-liveID";}
+        }
+        default {
+            throw -Message "Unsupported or invalid M365Environment argument"
+        }
+    }
+    Connect-IPPSSession @IPPSParams | Out-Null
+}
+
 Export-ModuleMember -Function @(
-    'Connect-EXOHelper'
+    'Connect-EXOHelper',
+    'Connect-DefenderHelper'
 )

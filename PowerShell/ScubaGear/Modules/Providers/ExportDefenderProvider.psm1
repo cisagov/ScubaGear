@@ -85,25 +85,8 @@ function Export-DefenderProvider {
 
     # Connect to Security & Compliance
     $IPPSConnected = $false
-    $IPPSParams = @{
-        'ErrorAction' = 'Stop';
-    }
     try {
-        switch ($M365Environment) {
-            {($_ -eq "commercial") -or ($_ -eq "gcc")} {
-                $IPPSParams = @{'ErrorAction' = 'Stop';} # sanity check
-            }
-            "gcchigh" {
-                $IPPSParams = $IPPSParams + @{'ConnectionUri' = "https://outlook.office365.us/powershell-liveID";}
-            }
-            "dod" {
-                $IPPSParams = $IPPSParams + @{'ConnectionUri' = "https://webmail.apps.mil/powershell-liveID";}
-            }
-            default {
-                throw -Message "Unsupported or invalid M365Environment argument"
-            }
-        }
-        Connect-IPPSSession @IPPSParams | Out-Null
+        Connect-DefenderHelper -M365Environment $M365Environment 
         $IPPSConnected = $true
     }
     catch {
