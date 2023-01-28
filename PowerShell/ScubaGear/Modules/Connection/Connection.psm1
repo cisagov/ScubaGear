@@ -59,21 +59,11 @@ function Connect-Tenant {
                         'ErrorAction' = 'Stop';
                     }
                     switch ($M365Environment) {
-                        {($_ -eq "commercial") -or ($_ -eq "gcc")} {
-                            # Sanity check
-                            $GraphParams = @{
-                                'Scopes' = $GraphScopes;
-                                'ErrorAction' = 'Stop';
-                            }
-                        }
                         "gcchigh" {
                             $GraphParams = $GraphParams + @{'Environment' = "USGov";}
                         }
                         "dod" {
                             $GraphParams = $GraphParams + @{'Environment' = "USGovDoD";}
-                        }
-                        default {
-                            throw "Unsupported or invalid M365Environment argument"
                         }
                     }
                     Connect-MgGraph @GraphParams | Out-Null
@@ -105,9 +95,6 @@ function Connect-Tenant {
                         "dod" {
                             $AddPowerAppsParams = $AddPowerAppsParams + @{'Endpoint'='dod';}
                         }
-                        default {
-                            throw "Unsupported or invalid M365Environment argument"
-                        }
                     }
                     Add-PowerAppsAccount @AddPowerAppsParams | Out-Null
                 }
@@ -117,19 +104,11 @@ function Connect-Tenant {
                             'ErrorAction' = 'Stop';
                         }
                         switch ($M365Environment) {
-                            {($_ -eq "commercial") -or ($_ -eq "gcc")} {
-                                $LimitedGraphParams = @{
-                                    'ErrorAction' = 'Stop';
-                                }
-                            }
                             "gcchigh" {
                                 $LimitedGraphParams = $LimitedGraphParams + @{'Environment' = "USGov";}
                             }
                             "dod" {
                                 $LimitedGraphParams = $LimitedGraphParams + @{'Environment' = "USGovDoD";}
-                            }
-                            default {
-                                throw "Unsupported or invalid M365Environment argument"
                             }
                         }
                         Connect-MgGraph @LimitedGraphParams | Out-Null
@@ -160,9 +139,6 @@ function Connect-Tenant {
                                     'Region' = "ITAR";
                                 }
                             }
-                            default {
-                                throw "Unsupported or invalid M365Environment argument"
-                            }
                         }
                         Connect-SPOService @SPOParams | Out-Null
                         $SPOAuthRequired = $false
@@ -171,23 +147,17 @@ function Connect-Tenant {
                 "teams" {
                     $TeamsParams = @{'ErrorAction'= 'Stop'}
                     switch ($M365Environment) {
-                        {($_ -eq "commercial") -or ($_ -eq "gcc")} {
-                            $TeamsParams = @{'ErrorAction'= 'Stop'} # sanity check
-                        }
                         "gcchigh" {
                             $TeamsParams = $TeamsParams + @{'TeamsEnvironmentName'= 'TeamsGCCH';}
                         }
                         "dod" {
                             $TeamsParams = $TeamsParams + @{'TeamsEnvironmentName'= 'TeamsDOD';}
                         }
-                        default {
-                            throw "Unsupported or invalid M365Environment argument"
-                        }
                     }
                     Connect-MicrosoftTeams @TeamsParams | Out-Null
                 }
                 default {
-                    Write-Error -Message "Invalid ProductName argument"
+                    throw "Invalid ProductName argument" 
                 }
             }
         }

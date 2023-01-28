@@ -163,15 +163,6 @@ function Invoke-SCuBA {
             $ProductNames = "teams", "exo", "defender", "aad", "sharepoint", "onedrive", "powerplatform"
         }
 
-        $ServicePrincipal
-        if($AppId) {
-            $ServicePrincipal = [pscustomobject]@{
-                "AppId" = $AppId;
-                "CertificateThumbprint" = $CertificateThumbprint;
-                "CertificatePassword" = $CertificatePassword;
-            }
-        }
-
         # The equivalent of ..\..
         $ParentPath = Split-Path $(Split-Path $ParentPath -Parent) -Parent
 
@@ -194,6 +185,7 @@ function Invoke-SCuBA {
             'LogIn' = $LogIn;
             'ProductNames' = $ProductNames;
             'M365Environment' = $M365Environment;
+            'BoundParameters' = $PSBoundParameters;
         }
 
         $ProdAuthFailed = Invoke-Connection @ConnectionParams
@@ -740,15 +732,24 @@ function Invoke-Connection {
 
         [ValidateSet("commercial", "gcc", "gcchigh", "dod")]
         [string]
-        $M365Environment = "commercial"
+        $M365Environment = "commercial",
+
+        [Parameter(Mandatory=$true)]
+        [hashtable]
+        $BoundParameters
     )
 
     # Increase PowerShell Maximum Function Count to support version 5.1 limitation
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'MaximumFunctionCount')]
     $MaximumFunctionCount = 32000
 
+    $ConnectTenantParams = @{
+        'ProductNames' = $ProductNames;
+        'M365Environment' = $M365Environment
+    }
+
     if ($LogIn) {
-        $AnyFailedAuth = Connect-Tenant -ProductNames $ProductNames -M365Environment $M365Environment
+        $AnyFailedAuth = Connect-Tenant @ConnectTenantParams
         $AnyFailedAuth
     }
 }
