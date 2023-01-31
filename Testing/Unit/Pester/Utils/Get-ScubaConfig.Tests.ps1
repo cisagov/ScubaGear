@@ -1,5 +1,5 @@
 $private:ExecutingTestPath = Split-Path -Parent -Path $MyInvocation.MyCommand.Path
-Import-Module -Name $(Join-Path -Path $private:ExecutingTestPath -ChildPath '..\..\..\..\PowerShell\ScubaGear\Modules\Utils\ScubaConfig.psm1')
+Import-Module -Name $(Join-Path -Path $private:ExecutingTestPath -ChildPath '..\..\..\..\PowerShell\ScubaGear\Modules\Utils\ScubaConfig.psm1') -Force
 
 Describe -tag "Utils" -name 'ScubaConfig' {
     Context 'General case'{

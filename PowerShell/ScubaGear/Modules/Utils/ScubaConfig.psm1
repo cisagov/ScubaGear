@@ -26,7 +26,7 @@ function Get-ScubaConfig {
     $Content = Get-Content -Raw -Path $Path
     $Config = $Content | ConvertFrom-Yaml
 
-    Set-Variable -Name "ScubaConfig" -Value $Config -Option AllScope -Scope Local -Description "SCuBA Configuration parameters"
+    Set-Variable -Name "ScubaConfig" -Value $Config -Option AllScope -Scope Script -Description "SCuBA Configuration parameters"
 }
 
 function Remove-ScubaConfig {
@@ -38,8 +38,9 @@ function Remove-ScubaConfig {
     #>
 
     try {
-        if (Get-Variable -Name "ScubaConfig" -Scope Local){
-            Remove-Variable -Name "ScubaConfig" -Scope Local -Force
+        $Result = Get-Variable -Name "ScubaConfig" -Scope Script -ErrorAction 'silentlycontinue'
+        if ($Result){
+            Remove-Variable -Name "ScubaConfig" -Scope Script -Force
         }
 
     }

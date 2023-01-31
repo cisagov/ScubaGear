@@ -181,7 +181,10 @@ function Invoke-SCuBA {
             $ScubaConfig.OutReportName = $OutReportName
         }
 
-        if ($PSCmdlet.ParameterSetName -eq 'Import-Configuration'){
+        Remove-Resources
+        Import-Resources # Imports Providers, RunRego, CreateReport, Connection
+
+        if ($PSCmdlet.ParameterSetName -eq 'Configuration'){
             Get-ScubaConfig -Path $ConfigFilePath
         }
 
@@ -197,9 +200,6 @@ function Invoke-SCuBA {
         $FolderName = "$($ScubaConfig.OutFolderName)_$($FormattedTimeStamp)"
         New-Item -Path $OutFolderPath -Name $($FolderName) -ItemType Directory | Out-Null
         $OutFolderPath = Join-Path -Path $OutFolderPath -ChildPath $FolderName
-
-        Remove-Resources
-        Import-Resources # Imports Providers, RunRego, CreateReport, Connection
 
         $ConnectionParams = @{
             'LogIn' = $ScubaConfig.LogIn;
@@ -790,9 +790,11 @@ function Import-Resources {
     $ConnectionPath = Join-Path -Path $PSScriptRoot -ChildPath "Connection"
     $RegoPath = Join-Path -Path $PSScriptRoot -ChildPath "RunRego"
     $ReporterPath = Join-Path -Path $PSScriptRoot -ChildPath "CreateReport"
+    $UtilsPath = Join-Path -Path $PSScriptRoot -ChildPath "Utils"
     Import-Module $ConnectionPath
     Import-Module $RegoPath
     Import-Module $ReporterPath
+    Import-Module $UtilsPath
 }
 
 function Remove-Resources {
