@@ -13,7 +13,8 @@ test_FromScope_Correct if {
         "transport_rule": [
             {
                 "FromScope" : "NotInOrganization",
-                "State" : "Enabled"
+                "State" : "Enabled",
+                "Mode" : "Enforce"
             }
         ]    
     }
@@ -25,7 +26,7 @@ test_FromScope_Correct if {
     RuleOutput[0].ReportDetails == "Requirement met"
 }
 
-test_FromScope_Incorrect1 if {
+test_FromScope_IncorrectV1 if {
     ControlNumber := "EXO 2.7"
     Requirement := "External sender warnings SHALL be implemented"
 
@@ -33,7 +34,8 @@ test_FromScope_Incorrect1 if {
         "transport_rule": [
             {
                 "FromScope" : "",
-                "State" : "Enabled"
+                "State" : "Enabled",
+                "Mode" : "Audit"
             }
         ]    
     }
@@ -45,7 +47,7 @@ test_FromScope_Incorrect1 if {
     RuleOutput[0].ReportDetails == "No transport rule found with that applies to emails received from outside the organization"
 }
 
-test_FromScope_Incorrect2 if {
+test_FromScope_IncorrectV2 if {
     ControlNumber := "EXO 2.7"
     Requirement := "External sender warnings SHALL be implemented"
 
@@ -53,7 +55,50 @@ test_FromScope_Incorrect2 if {
         "transport_rule": [
             {
                 "FromScope" : "NotInOrganization",
-                "State" : "Disabled"
+                "State" : "Disabled",
+                "Mode" : "Audit"
+            }
+        ]    
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+ 
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "No transport rule found with that applies to emails received from outside the organization"
+}
+
+test_FromScope_IncorrectV3 if {
+    ControlNumber := "EXO 2.7"
+    Requirement := "External sender warnings SHALL be implemented"
+
+    Output := tests with input as {
+        "transport_rule": [
+            {
+                "FromScope" : "",
+                "State" : "Enabled",
+                "Mode" : "AuditAndNotify"
+            }
+        ]    
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+ 
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "No transport rule found with that applies to emails received from outside the organization"
+}
+
+test_FromScope_IncorrectV4 if {
+    ControlNumber := "EXO 2.7"
+    Requirement := "External sender warnings SHALL be implemented"
+
+    Output := tests with input as {
+        "transport_rule": [
+            {
+                "FromScope" : "NotInOrganization",
+                "State" : "Disabled",
+                "Mode" : "AuditAndNotify"
             }
         ]    
     }
@@ -73,15 +118,23 @@ test_FromScope_Multiple_Correct if {
         "transport_rule": [
             {
                 "FromScope" : "",
-                "State" : "Disabled"
+                "State" : "Disabled",
+                "Mode" : "Enforce"
             },
             {
                 "FromScope" : "",
-                "State" : "Enabled"
+                "State" : "Enabled",
+                "Mode" : "Audit"
+            },
+            {
+                "FromScope" : "",
+                "State" : "Enabled",
+                "Mode" : "AuditAndNotify"
             },
             {
                 "FromScope" : "NotInOrganization",
-                "State" : "Enabled"
+                "State" : "Enabled",
+                "Mode" : "Enforce"
             }
         ]    
     }
@@ -101,19 +154,33 @@ test_FromScope_Multiple_Incorrect if {
         "transport_rule": [
             {
                 "FromScope" : "",
-                "State" : "Enabled"
+                "State" : "Enabled",
+                "Mode":"Enforce"
             },
             {
                 "FromScope" : "Hello there",
-                "State" : "Enabled"
-            },
-            {
-                "FromScope" : "",
-                "State" : "Disabled"
+                "State" : "Enabled",
+                "Mode":"Audit"
             },
             {
                 "FromScope" : "Hello there",
-                "State" : "Enabled"
+                "State" : "Enabled",
+                "Mode":"AuditAndNotify"
+            },
+            {
+                "FromScope" : "NotInOrganization",
+                "State" : "Enabled",
+                "Mode":"Audit"
+            },
+            {
+                "FromScope" : "NotInOrganization",
+                "State" : "Enabled",
+                "Mode":"AuditAndNotify"
+            },
+            {
+                "FromScope" : "NotInOrganization",
+                "State" : "Disabled",
+                "Mode":"Enforce"
             }
         ]    
     }
