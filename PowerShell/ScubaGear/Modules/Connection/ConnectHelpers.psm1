@@ -25,7 +25,7 @@ function Connect-EXOHelper {
             $EXOParams += @{'ExchangeEnvironmentName' = "O365USGovGCCHigh";}
         }
         "dod" {
-            $EXOParams += @{'ExchangeEnvironmentName' = "O365USGovDoD";} 
+            $EXOParams += @{'ExchangeEnvironmentName' = "O365USGovDoD";}
         }
     }
 
