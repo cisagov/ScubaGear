@@ -11,7 +11,11 @@ function Export-DefenderProvider {
         [Parameter(Mandatory = $true)]
         [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $false)]
         [string]
-        $M365Environment
+        $M365Environment,
+
+        [Parameter(Mandatory = $false)]
+        [hashtable]
+        $CertThumbprintParams
     )
     $ParentPath = Split-Path $PSScriptRoot -Parent
     $ConnectionFolderPath = Join-Path -Path $ParentPath -ChildPath "Connection"
@@ -29,7 +33,13 @@ function Export-DefenderProvider {
     $ExchangeConnected = Get-Command Get-OrganizationConfig -ErrorAction SilentlyContinue
     if(-not $ExchangeConnected) {
         try {
-            Connect-EXOHelper -M365Environment $M365Environment
+            $EXOHelperParams = @{
+                M365Environment = $M365Environment;
+            }
+            if ($CertThumbprintParams) {
+                $EXOHelperParams += @{CertThumbprintParams = $CertThumbprintParams}
+            }
+            Connect-EXOHelper @CertThumbprintParams;
         }
         catch {
             Write-Error "Error connecting to ExchangeOnline. $($_)"
@@ -86,7 +96,14 @@ function Export-DefenderProvider {
     # Connect to Security & Compliance
     $IPPSConnected = $false
     try {
-        Connect-DefenderHelper -M365Environment $M365Environment 
+        $DefenderHelperParams = @{
+            M365Environment = $M365Environment;
+        }
+
+        if ($CertThumbprintParams) {
+            $DefenderHelperParams += @{CertThumbprintParams = $CertThumbprintParams}
+        }
+        Connect-DefenderHelper @DefenderHelperParams
         $IPPSConnected = $true
     }
     catch {

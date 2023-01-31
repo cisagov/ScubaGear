@@ -115,11 +115,11 @@ function Invoke-SCuBA {
 
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [string]
-        $AppId,
+        $AppID,
 
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [string]
-        $CertificateThumbprint,
+        $CertificateThumbPrint,
 
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [string]
@@ -207,6 +207,7 @@ function Invoke-SCuBA {
             'ModuleVersion' = $ModuleVersion;
             'OutFolderPath' = $OutFolderPath;
             'OutProviderFileName' = $OutProviderFileName;
+            'BoundParameters' = $PSBoundParameters;
         }
         $RegoParams = @{
             'ProductNames' = $ProductNames;
@@ -315,7 +316,11 @@ function Invoke-ProviderList {
 
         [Parameter(Mandatory=$true)]
         [string]
-        $OutProviderFileName
+        $OutProviderFileName,
+
+        [Parameter(Mandatory=$true)]
+        [hashtable]
+        $BoundParameters
     )
     process {
         # yes the syntax has to be like this
@@ -324,6 +329,24 @@ function Invoke-ProviderList {
 "@
         $N = 0
         $Len = $ProductNames.Length
+
+
+        $ConnectTenantParams = @{
+            'M365Environment' = $M365Environment
+        }
+        if ($BoundParameters.CertificateThumbPrint) {
+            $CheckParams = (-not $BoundParameters.CertificateThumbPrint) `
+            -or (-not $BoundParameters.AppID) -or (-not $BoundParameters.Organization)
+            if ($CheckParams) {
+                throw "Missing parameters required for authentication with CertificateThumprints"
+            }
+            $CertThumbprintParams = @{
+                CertificateThumbPrint = $BoundParameters.CertificateThumbPrint;
+                AppID = $BoundParameters.AppID;
+                Organization = $BoundParameters.Organization;
+            }
+            $ConnectTenantParams += @{CertThumbprintParams = $CertThumbprintParams;}
+        }
         foreach ($Product in $ProductNames) {
             $BaselineName = $ArgToProd[$Product]
             $N += 1
@@ -345,7 +368,7 @@ function Invoke-ProviderList {
                     $RetVal = Export-EXOProvider | Select-Object -Last 1
                 }
                 "defender" {
-                    $RetVal = Export-DefenderProvider -M365Environment $M365Environment  | Select-Object -Last 1
+                    $RetVal = Export-DefenderProvider @ConnectTenantParams  | Select-Object -Last 1
                 }
                 "powerplatform" {
                     $RetVal = Export-PowerPlatformProvider -M365Environment $M365Environment | Select-Object -Last 1
@@ -748,6 +771,21 @@ function Invoke-Connection {
         'M365Environment' = $M365Environment
     }
 
+    if ($BoundParameters.CertificateThumbPrint) {
+        $CheckParams = (-not $BoundParameters.CertificateThumbPrint) `
+        -or (-not $BoundParameters.AppID) -or (-not $BoundParameters.Organization)
+        if ($CheckParams) {
+            throw "Missing parameters required for authentication with CertificateThumprints"
+        }
+
+        $CertThumbprintParams = @{
+            CertificateThumbPrint = $BoundParameters.CertificateThumbPrint;
+            AppID = $BoundParameters.AppID;
+            Organization = $BoundParameters.Organization;
+        }
+        $ConnectTenantParams += @{CertThumbprintParams = $CertThumbprintParams;}
+    }
+
     if ($LogIn) {
         $AnyFailedAuth = Connect-Tenant @ConnectTenantParams
         $AnyFailedAuth
@@ -981,6 +1019,7 @@ function Invoke-RunCached {
                 'LogIn' = $LogIn;
                 'ProductNames' = $ProductNames;
                 'M365Environment' = $M365Environment;
+                'BoundParameters' = $PSBoundParameters;
             }
 
             # Rego Testing failsafe

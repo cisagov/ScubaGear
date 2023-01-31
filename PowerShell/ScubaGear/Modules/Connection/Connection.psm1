@@ -19,7 +19,11 @@ function Connect-Tenant {
     [ValidateNotNullOrEmpty()]
     [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $false)]
     [string]
-    $M365Environment
+    $M365Environment,
+
+    [Parameter(Mandatory = $false)]
+    [hashtable]
+    $CertThumbprintParams
     )
     Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "ConnectHelpers.psm1")
 
@@ -60,10 +64,10 @@ function Connect-Tenant {
                     }
                     switch ($M365Environment) {
                         "gcchigh" {
-                            $GraphParams = $GraphParams + @{'Environment' = "USGov";}
+                            $GraphParams += @{'Environment' = "USGov";}
                         }
                         "dod" {
-                            $GraphParams = $GraphParams + @{'Environment' = "USGovDoD";}
+                            $GraphParams += @{'Environment' = "USGovDoD";}
                         }
                     }
                     Connect-MgGraph @GraphParams | Out-Null
@@ -72,9 +76,14 @@ function Connect-Tenant {
                 }
                 {($_ -eq "exo") -or ($_ -eq "defender")} {
                     if ($EXOAuthRequired) {
-                        # Moved switch to Connect-Helpers for Defender Provider use
-                        Connect-EXOHelper -M365Environment $M365Environment
+                        $EXOHelperParams = @{
+                            M365Environment = $M365Environment;
+                        }
+                        if ($CertThumbprintParams) {
+                            $EXOHelperParams += @{CertThumbprintParams = $CertThumbprintParams}
+                        }
                         Write-Verbose "Defender will require a sign in every single run regardless of what the LogIn parameter is set"
+                        Connect-EXOHelper @EXOHelperParams
                         $EXOAuthRequired = $false
                     }
                 }
@@ -84,16 +93,16 @@ function Connect-Tenant {
                     }
                     switch ($M365Environment) {
                         "commercial" {
-                            $AddPowerAppsParams = $AddPowerAppsParams + @{'Endpoint'='prod';}
+                            $AddPowerAppsParams += @{'Endpoint'='prod';}
                         }
                         "gcc" {
-                            $AddPowerAppsParams = $AddPowerAppsParams + @{'Endpoint'='usgov';}
+                            $AddPowerAppsParams += @{'Endpoint'='usgov';}
                         }
                         "gcchigh" {
-                            $AddPowerAppsParams = $AddPowerAppsParams + @{'Endpoint'='usgovhigh';}
+                            $AddPowerAppsParams += @{'Endpoint'='usgovhigh';}
                         }
                         "dod" {
-                            $AddPowerAppsParams = $AddPowerAppsParams + @{'Endpoint'='dod';}
+                            $AddPowerAppsParams += @{'Endpoint'='dod';}
                         }
                     }
                     Add-PowerAppsAccount @AddPowerAppsParams | Out-Null
@@ -105,10 +114,10 @@ function Connect-Tenant {
                         }
                         switch ($M365Environment) {
                             "gcchigh" {
-                                $LimitedGraphParams = $LimitedGraphParams + @{'Environment' = "USGov";}
+                                $LimitedGraphParams += @{'Environment' = "USGov";}
                             }
                             "dod" {
-                                $LimitedGraphParams = $LimitedGraphParams + @{'Environment' = "USGovDoD";}
+                                $LimitedGraphParams += @{'Environment' = "USGovDoD";}
                             }
                         }
                         Connect-MgGraph @LimitedGraphParams | Out-Null
@@ -123,18 +132,18 @@ function Connect-Tenant {
                         }
                         switch ($M365Environment) {
                             {($_ -eq "commercial") -or ($_ -eq "gcc")} {
-                                $SPOParams = $SPOParams + @{
+                                $SPOParams += @{
                                     'Url'= "https://$($InitialDomainPrefix)-admin.sharepoint.com";
                                 }
                             }
                             "gcchigh" {
-                                $SPOParams = $SPOParams + @{
+                                $SPOParams += @{
                                     'Url'= "https://$($InitialDomainPrefix)-admin.sharepoint.us";
                                     'Region' = "ITAR";
                                 }
                             }
                             "dod" {
-                                $SPOParams = $SPOParams + @{
+                                $SPOParams += @{
                                     'Url'= "https://$($InitialDomainPrefix)-admin.sharepoint-mil.us";
                                     'Region' = "ITAR";
                                 }
@@ -146,18 +155,31 @@ function Connect-Tenant {
                 }
                 "teams" {
                     $TeamsParams = @{'ErrorAction'= 'Stop'}
+                    if ($CertThumbprintParams) {
+                        try {
+                            $TeamsConnectToTenant = @{
+                                CertificateThumbPrint = $CertThumbprintParams.CertificateThumbprint;
+                                ApplicationId = $CertThumbprintParams.AppId;
+                                TenantId  = $CertThumbprintParams.Organization; # Yes. Teams PowerShell confuses Tenant ID and Organization Domain
+                            }
+                            $TeamsParams += $TeamsConnectToTenant
+                        }
+                        catch {
+                            Write-Warning "Unable to retrieve Tenant ID for Teams authenticatio with URI. This may be caused by proxy error see 'Running the Script Behind Some Proxies' in the README for a solution. $($_)"
+                        }
+                    }
                     switch ($M365Environment) {
                         "gcchigh" {
-                            $TeamsParams = $TeamsParams + @{'TeamsEnvironmentName'= 'TeamsGCCH';}
+                            $TeamsParams += @{'TeamsEnvironmentName'= 'TeamsGCCH';}
                         }
                         "dod" {
-                            $TeamsParams = $TeamsParams + @{'TeamsEnvironmentName'= 'TeamsDOD';}
+                            $TeamsParams += @{'TeamsEnvironmentName'= 'TeamsDOD';}
                         }
                     }
                     Connect-MicrosoftTeams @TeamsParams | Out-Null
                 }
                 default {
-                    throw "Invalid ProductName argument" 
+                    throw "Invalid ProductName argument"
                 }
             }
         }

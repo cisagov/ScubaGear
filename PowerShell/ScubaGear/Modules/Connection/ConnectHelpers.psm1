@@ -10,20 +10,29 @@ function Connect-EXOHelper {
         [Parameter(Mandatory = $true)]
         [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $false)]
         [string]
-        $M365Environment
+        $M365Environment,
+
+        [Parameter(Mandatory = $false)]
+        [hashtable]
+        $CertThumbprintParams
     )
+    $EXOParams = @{
+        ErrorAction = "Stop";
+        ShowBanner = $false;
+    }
     switch ($M365Environment) {
-        {($_ -eq "commercial") -or ($_ -eq "gcc")} {
-            Connect-ExchangeOnline -ShowBanner:$false -ErrorAction "Stop" | Out-Null
-        }
         "gcchigh" {
-            Connect-ExchangeOnline -ShowBanner:$false -ExchangeEnvironmentName "O365USGovGCCHigh" -ErrorAction "Stop" | Out-Null
+            $EXOParams += @{'ExchangeEnvironmentName' = "O365USGovGCCHigh";}
         }
         "dod" {
-            Connect-ExchangeOnline -ShowBanner:$false -ExchangeEnvironmentName "O365USGovDoD" -ErrorAction "Stop" | Out-Null
+            $EXOParams += @{'ExchangeEnvironmentName' = "O365USGovDoD";} 
         }
-
     }
+
+    if ($CertThumbprintParams) {
+        $EXOParams += $CertThumbprintParams
+    }
+    Connect-ExchangeOnline @EXOParams | Out-Null
 }
 
 function Connect-DefenderHelper {
@@ -38,18 +47,25 @@ function Connect-DefenderHelper {
         [Parameter(Mandatory = $true)]
         [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $false)]
         [string]
-        $M365Environment
+        $M365Environment,
+
+        [Parameter(Mandatory = $false)]
+        [hashtable]
+        $CertThumbprintParams
     )
     $IPPSParams = @{
         'ErrorAction' = 'Stop';
     }
     switch ($M365Environment) {
         "gcchigh" {
-            $IPPSParams = $IPPSParams + @{'ConnectionUri' = "https://outlook.office365.us/powershell-liveID";}
+            $IPPSParams += @{'ConnectionUri' = "https://outlook.office365.us/powershell-liveID";}
         }
         "dod" {
-            $IPPSParams = $IPPSParams + @{'ConnectionUri' = "https://webmail.apps.mil/powershell-liveID";}
+            $IPPSParams += @{'ConnectionUri' = "https://webmail.apps.mil/powershell-liveID";}
         }
+    }
+    if ($CertThumbprintParams) {
+        $IPPSParams += $CertThumbprintParams
     }
     Connect-IPPSSession @IPPSParams | Out-Null
 }
