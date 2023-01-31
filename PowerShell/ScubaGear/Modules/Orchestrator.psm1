@@ -252,6 +252,24 @@ $ProdToFullName = @{
     OneDrive = "OneDrive for Business";
 }
 
+function Get-FileEncoding{
+    <#
+    .Description
+    This function returns encoding type for setting content.
+    .Functionality
+    Internal
+    #>
+    $PSVersion = $PSVersionTable.PSVersion
+
+    $Encoding = 'utf8'
+
+    if ($PSVersion -ge '6.0'){
+        $Encoding = 'utf8NoBom'
+    }
+
+    return $Encoding
+}
+
 function Invoke-ProviderList {
     <#
     .Description
@@ -356,7 +374,7 @@ function Invoke-ProviderList {
         $BaselineSettingsExport = $BaselineSettingsExport.replace("\`"", "'")
         $BaselineSettingsExport = $BaselineSettingsExport.replace("\", "")
         $FinalPath = Join-Path -Path $OutFolderPath -ChildPath "$($OutProviderFileName).json"
-        $BaselineSettingsExport | Set-Content -Path $FinalPath
+        $BaselineSettingsExport | Set-Content -Path $FinalPath -Encoding $(Get-FileEncoding)
     }
 }
 
@@ -427,7 +445,7 @@ function Invoke-RunRego {
 
             $TestResultsJson = $TestResults | ConvertTo-Json -Depth 5
             $FileName = Join-Path -path $OutFolderPath "$($OutRegoFileName).json"
-            $TestResultsJson | Set-Content -Path $FileName
+            $TestResultsJson | Set-Content -Path $FileName -Encoding $(Get-FileEncoding)
 
             foreach ($Product in $TestResults) {
                 foreach ($Test in $Product) {
@@ -441,7 +459,7 @@ function Invoke-RunRego {
 
             $TestResultsCsv = $TestResults | ConvertTo-Csv -NoTypeInformation
             $CSVFileName = Join-Path -Path $OutFolderPath "$($OutRegoFileName).csv"
-            $TestResultsCsv | Set-Content -Path $CSVFileName
+            $TestResultsCsv | Set-Content -Path $CSVFileName -Encoding $(Get-FileEncoding)
         }
     }
 

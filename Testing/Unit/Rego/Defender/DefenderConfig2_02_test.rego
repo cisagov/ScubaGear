@@ -27,6 +27,13 @@ test_ContentContainsSensitiveInformation_Correct_V1 if {
                 ],
 	            "NotifyUserType":  "NotSet"
             }
+        ],
+        "dlp_compliance_policies": [
+            {
+                "Name": "Default Office 365 DLP policy",
+                "Mode": "Enable",
+                "Enabled": true
+            }
         ]
     }
 
@@ -60,6 +67,13 @@ test_ContentContainsSensitiveInformation_Incorrect_V1 if {
                 ],
 	            "NotifyUserType":  "NotSet"
             }
+        ],
+        "dlp_compliance_policies": [
+            {
+                "Name": "Default Office 365 DLP policy",
+                "Mode": "Enable",
+                "Enabled": true
+            }
         ]
     }
 
@@ -91,6 +105,13 @@ test_ContentContainsSensitiveInformation_Correct_V2 if {
                     "Owner"
                 ],
 	            "NotifyUserType":  "NotSet"
+            }
+        ],
+        "dlp_compliance_policies": [
+            {
+                "Name": "Default Office 365 DLP policy",
+                "Mode": "Enable",
+                "Enabled": true
             }
         ]
     }
@@ -125,6 +146,13 @@ test_ContentContainsSensitiveInformation_Incorrect_V2 if {
                 ],
 	            "NotifyUserType":  "NotSet"
             }
+        ],
+        "dlp_compliance_policies": [
+            {
+                "Name": "Default Office 365 DLP policy",
+                "Mode": "Enable",
+                "Enabled": true
+            }
         ]
     }
 
@@ -156,6 +184,13 @@ test_ContentContainsSensitiveInformation_Correct_V3 if {
                     "Owner"
                 ],
 	            "NotifyUserType":  "NotSet"
+            }
+        ],
+        "dlp_compliance_policies": [
+            {
+                "Name": "Default Office 365 DLP policy",
+                "Mode": "Enable",
+                "Enabled": true
             }
         ]
     }
@@ -189,6 +224,13 @@ test_ContentContainsSensitiveInformation_Incorrect_V3 if {
                     "Owner"
                 ],
 	            "NotifyUserType":  "NotSet"
+            }
+        ],
+        "dlp_compliance_policies": [
+            {
+                "Name": "Default Office 365 DLP policy",
+                "Mode": "Enable",
+                "Enabled": true
             }
         ]
     }
@@ -232,7 +274,9 @@ test_Exchange_Correct if {
             {
                 "ExchangeLocation":  ["All"],
                 "Workload":  "Exchange",
-                "Name":  "Default Office 365 DLP policy"
+                "Name":  "Default Office 365 DLP policy",
+                "Mode": "Enable",
+                "Enabled": true
             }
         ]
     }
@@ -273,7 +317,9 @@ test_ExchangeLocation_Incorrect if {
             {
                 "ExchangeLocation":  [""],
                 "Workload":  "Exchange",
-                "Name":  "Default Office 365 DLP policy"
+                "Name":  "Default Office 365 DLP policy",
+                "Mode": "Enable",
+                "Enabled": true
             }
         ]
     }
@@ -314,7 +360,9 @@ test_Workload_Incorrect_V1 if {
             {
                 "ExchangeLocation":  ["All"],
                 "Workload":  "",
-                "Name":  "Default Office 365 DLP policy"
+                "Name":  "Default Office 365 DLP policy",
+                "Mode": "Enable",
+                "Enabled": true
             }
         ]
     }
@@ -355,7 +403,9 @@ test_SharePoint_Correct if {
             {
                 "SharePointLocation":  ["All"],
                 "Workload":  "SharePoint",
-                "Name":  "Default Office 365 DLP policy"
+                "Name":  "Default Office 365 DLP policy",
+                "Mode": "Enable",
+                "Enabled": true
             }
         ]
     }
@@ -396,7 +446,9 @@ test_SharePointLocation_Incorrect if {
             {
                 "SharePointLocation":  [""],
                 "Workload":  "SharePoint",
-                "Name":  "Default Office 365 DLP policy"
+                "Name":  "Default Office 365 DLP policy",
+                "Mode": "Enable",
+                "Enabled": true
             }
         ]
     }
@@ -437,7 +489,9 @@ test_Workload_Incorrect_V2 if {
             {
                 "SharePointLocation":  ["All"],
                 "Workload":  "",
-                "Name":  "Default Office 365 DLP policy"
+                "Name":  "Default Office 365 DLP policy",
+                "Mode": "Enable",
+                "Enabled": true
             }
         ]
     }
@@ -478,7 +532,9 @@ test_OneDrive_Correct if {
             {
                 "OneDriveLocation":  ["All"],
                 "Workload":  "OneDrivePoint",
-                "Name":  "Default Office 365 DLP policy"
+                "Name":  "Default Office 365 DLP policy",
+                "Mode": "Enable",
+                "Enabled": true
             }
         ]
     }
@@ -519,7 +575,9 @@ test_OneDriveLocation_Incorrect if {
             {
                 "OneDriveLocation":  [""],
                 "Workload":  "OneDrivePoint",
-                "Name":  "Default Office 365 DLP policy"
+                "Name":  "Default Office 365 DLP policy",
+                "Mode": "Enable",
+                "Enabled": true
             }
         ]
     }
@@ -560,7 +618,9 @@ test_Workload_Incorrect_V3 if {
             {
                 "OneDriveLocation":  ["All"],
                 "Workload":  "",
-                "Name":  "Default Office 365 DLP policy"
+                "Name":  "Default Office 365 DLP policy",
+                "Mode": "Enable",
+                "Enabled": true
             }
         ]
     }
@@ -601,7 +661,9 @@ test_Teams_Correct if {
             {
                 "TeamsLocation":  ["All"],
                 "Workload":  "Teams",
-                "Name":  "Default Office 365 DLP policy"
+                "Name":  "Default Office 365 DLP policy",
+                "Mode": "Enable",
+                "Enabled": true
             }
         ]
     }
@@ -642,7 +704,9 @@ test_TeamsLocation_Incorrect if {
             {
                 "TeamsLocation":  [""],
                 "Workload":  "Teams",
-                "Name":  "Default Office 365 DLP policy"
+                "Name":  "Default Office 365 DLP policy",
+                "Mode": "Enable",
+                "Enabled": true
             }
         ]
     }
@@ -683,7 +747,9 @@ test_Workload_Incorrect_V4 if {
             {
                 "TeamsLocation":  ["All"],
                 "Workload":  "",
-                "Name":  "Default Office 365 DLP policy"
+                "Name":  "Default Office 365 DLP policy",
+                "Mode": "Enable",
+                "Enabled": true
             }
         ]
     }
@@ -720,6 +786,13 @@ test_BlockAccess_Correct if {
                 ],
 	            "NotifyUserType":  "NotSet"
             }
+        ],
+        "dlp_compliance_policies": [
+            {
+                "Name": "Default Office 365 DLP policy",
+                "Mode": "Enable",
+                "Enabled": true
+            }
         ]
     }
 
@@ -730,7 +803,7 @@ test_BlockAccess_Correct if {
     RuleOutput[0].ReportDetails == "Requirement met"
 }
 
-test_BlockAccess_Incorrect if {
+test_BlockAccess_IncorrectV1 if {
     ControlNumber := "Defender 2.2"
     Requirement := "The action for the DLP policy SHOULD be set to block sharing sensitive information with everyone when DLP conditions are met"
 
@@ -752,6 +825,13 @@ test_BlockAccess_Incorrect if {
                 ],
 	            "NotifyUserType":  "NotSet"
             }
+        ],
+        "dlp_compliance_policies": [
+            {
+                "Name": "Default Office 365 DLP policy",
+                "Mode": "Enable",
+                "Enabled": true
+            }
         ]
     }
 
@@ -759,7 +839,46 @@ test_BlockAccess_Incorrect if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "1 rule(s) found that do(es) not block access: Baseline Rule"
+    RuleOutput[0].ReportDetails == "1 rule(s) found that do(es) not block access or associated policy not set to enforce block action: Baseline Rule"
+}
+
+test_BlockAccess_IncorrectV2 if {
+    ControlNumber := "Defender 2.2"
+    Requirement := "The action for the DLP policy SHOULD be set to block sharing sensitive information with everyone when DLP conditions are met"
+
+    Output := tests with input as {
+        "dlp_compliance_rules": [
+            {
+                "ContentContainsSensitiveInformation":  [
+                    {"name":  "U.S. Individual Taxpayer Identification Number (ITIN)"}
+                ],
+                "Name":  "Baseline Rule",
+	            "Disabled" : false,
+                "ParentPolicyName":  "Default Office 365 DLP policy",
+	            "BlockAccess":  true,
+                "BlockAccessScope":  "All",
+	            "NotifyUser":  [
+                    "SiteAdmin",
+                    "LastModifier",
+                    "Owner"
+                ],
+	            "NotifyUserType":  "NotSet"
+            }
+        ],
+        "dlp_compliance_policies": [
+            {
+                "Name": "Default Office 365 DLP policy",
+                "Mode": "TestWithNotifications",
+                "Enabled": true
+            }
+        ]
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "1 rule(s) found that do(es) not block access or associated policy not set to enforce block action: Baseline Rule"
 }
 
 #
@@ -784,6 +903,13 @@ test_NotifyUser_Correct_V1 if {
                     "SiteAdmin"
                 ],
 	            "NotifyUserType":  "NotSet"
+            }
+        ],
+        "dlp_compliance_policies": [
+            {
+                "Name": "Default Office 365 DLP policy",
+                "Mode": "Enable",
+                "Enabled": true
             }
         ]
     }
@@ -817,6 +943,13 @@ test_NotifyUser_Correct_V2 if {
                 ],
 	            "NotifyUserType":  "NotSet"
             }
+        ],
+        "dlp_compliance_policies": [
+            {
+                "Name": "Default Office 365 DLP policy",
+                "Mode": "Enable",
+                "Enabled": true
+            }
         ]
     }
 
@@ -844,6 +977,13 @@ test_NotifyUser_Incorrect if {
                 "BlockAccessScope":  "All",
 	            "NotifyUser":  [ ],
 	            "NotifyUserType":  "NotSet"
+            }
+        ],
+        "dlp_compliance_policies": [
+            {
+                "Name": "Default Office 365 DLP policy",
+                "Mode": "Enable",
+                "Enabled": true
             }
         ]
     }
