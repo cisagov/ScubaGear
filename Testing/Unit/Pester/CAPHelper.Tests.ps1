@@ -233,6 +233,24 @@ Describe "GetApplications" {
         $Apps[2] | Should -Be "Apps excluded: 2 specific apps"
 	}
 
+    It "handles app filter in include mode" {
+        $Cap = Get-Content "CapSnippets/Apps.json" | ConvertFrom-Json
+        $Cap.Conditions.Applications.ApplicationFilter.Mode = "include"
+        $Apps = $($CapHelper.GetApplications($Cap))
+        Write-Host $Apps
+        $Apps[0] | Should -Be "Policy applies to: apps"
+        $Apps[1] | Should -Be "Custom application filter in include mode active"
+	}
+
+    It "handles app filter in exclude mode" {
+        $Cap = Get-Content "CapSnippets/Apps.json" | ConvertFrom-Json
+        $Cap.Conditions.Applications.ApplicationFilter.Mode = "exclude"
+        $Apps = $($CapHelper.GetApplications($Cap))
+        Write-Host $Apps
+        $Apps[0] | Should -Be "Policy applies to: apps"
+        $Apps[1] | Should -Be "Custom application filter in exclude mode active"
+	}
+
     It "handles registering a device" {
         $Cap = Get-Content "CapSnippets/Apps.json" | ConvertFrom-Json
         $Cap.Conditions.Applications.IncludeUserActions += "urn:user:registerdevice"

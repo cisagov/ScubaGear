@@ -221,7 +221,6 @@ class CapHelper {
                 $Actions += "Apps included: $($Cap.Conditions.Applications.IncludeApplications.Length) specific apps"
             }
 
-            # Excluded apps: # TODO FILTERs
             if ($Cap.Conditions.Applications.ExcludeApplications.Length -eq 0) {
                 $Actions += "Apps excluded: None"
             }
@@ -231,6 +230,15 @@ class CapHelper {
             else {
                 $Actions += "Apps excluded: $($Cap.Conditions.Applications.ExcludeApplications.Length) specific apps"
             }
+        }
+        elseif ($null -ne $Cap.Conditions.Applications.ApplicationFilter.Mode) {
+            $Actions += "Policy applies to: apps"
+            if ($Cap.Conditions.Applications.ApplicationFilter.Mode -eq "include") {
+                $Actions += "Custom application filter in include mode active"
+            }
+            else {
+                $Actions += "Custom application filter in exclude mode active"
+            }      
         }
         elseif ($Cap.Conditions.Applications.IncludeUserActions.Length -gt 0) {
             # For "Select what this policy applies to", "User actions" was selected

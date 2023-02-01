@@ -29,7 +29,7 @@ let capColNames = ["Name", "", "State", "Users", "Apps/Actions", "Conditions", "
 
 function fillCAPTable() {
     /* For AAD Conditional Access Policies */
-    if (caps == null) {
+    if (caps === null) {
         /*  The CAP table is only displayed for the AAD baseline, but
             this js file applies to all baselines. If caps is null,
             then the current baseline is not AAD and we don't need to
