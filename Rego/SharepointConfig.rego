@@ -18,7 +18,7 @@ tests[{
     "Control" : "Sharepoint 2.1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-SPOTenant"],
-    "ActualValue" : Policy,
+    "ActualValue" : Policy.DefaultSharingLinkType,
     "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
@@ -64,7 +64,7 @@ tests[{
     "Control" : "Sharepoint 2.2",
     "Criticality" : "Should",
     "Commandlet" : ["Get-SPOTenant"],
-    "ActualValue" : Policy,
+    "ActualValue" : [Policy.SharingCapability, Policy.SharingDomainRestrictionMode],
     "ReportDetails" : ReportDetails2_2(Policy),
     "RequirementMet" : Status
 }] {
@@ -134,7 +134,7 @@ tests[{
     "Control" : "Sharepoint 2.4",
     "Criticality" : "Should",
     "Commandlet" : ["Get-SPOTenant"],
-    "ActualValue" : Policy,
+    "ActualValue" : [Policy.ExternalUserExpirationRequired, Policy.EmailAttestationRequired],
     "ReportDetails" : ReportDetails2_4_1(Policy),
     "RequirementMet" : Status
 }] {
@@ -176,7 +176,7 @@ tests[{
     "Control" : "Sharepoint 2.4",
     "Criticality" : "Should",
     "Commandlet" : ["Get-SPOTenant"],
-    "ActualValue" : Policy,
+    "ActualValue" : [Policy.ExternalUserExpireInDays, Policy.EmailAttestationReAuthDays],
     "ReportDetails" : ReportDetails2_4_2(Policy),
     "RequirementMet" : Status
 }] {
@@ -216,7 +216,7 @@ tests[{
     "Control" : "Sharepoint 2.5",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-SPOSite"],
-    "ActualValue" : Policy,
+    "ActualValue" : Policy.DenyAddAndCustomizePages,
     "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
