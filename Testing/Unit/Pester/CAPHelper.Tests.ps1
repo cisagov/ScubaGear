@@ -237,7 +237,6 @@ Describe "GetApplications" {
         $Cap = Get-Content "CapSnippets/Apps.json" | ConvertFrom-Json
         $Cap.Conditions.Applications.ApplicationFilter.Mode = "include"
         $Apps = $($CapHelper.GetApplications($Cap))
-        Write-Host $Apps
         $Apps[0] | Should -Be "Policy applies to: apps"
         $Apps[1] | Should -Be "Custom application filter in include mode active"
 	}
@@ -246,7 +245,6 @@ Describe "GetApplications" {
         $Cap = Get-Content "CapSnippets/Apps.json" | ConvertFrom-Json
         $Cap.Conditions.Applications.ApplicationFilter.Mode = "exclude"
         $Apps = $($CapHelper.GetApplications($Cap))
-        Write-Host $Apps
         $Apps[0] | Should -Be "Policy applies to: apps"
         $Apps[1] | Should -Be "Custom application filter in exclude mode active"
 	}

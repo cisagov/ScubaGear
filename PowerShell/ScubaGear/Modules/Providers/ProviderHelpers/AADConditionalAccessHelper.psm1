@@ -238,7 +238,7 @@ class CapHelper {
             }
             else {
                 $Actions += "Custom application filter in exclude mode active"
-            }      
+            }
         }
         elseif ($Cap.Conditions.Applications.IncludeUserActions.Length -gt 0) {
             # For "Select what this policy applies to", "User actions" was selected
