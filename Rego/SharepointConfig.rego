@@ -18,7 +18,7 @@ tests[{
     "Control" : "Sharepoint 2.1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-SPOTenant"],
-    "ActualValue" : Policies,
+    "ActualValue" : Policy,
     "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
@@ -127,13 +127,14 @@ ReportDetails2_4_1(Policy) = Description if {
     Policy.ExternalUserExpirationRequired == false
     Policy.EmailAttestationRequired == false
 	Description := "Requirement not met"
+}
 
 tests[{
     "Requirement" : "Expiration timers for 'guest access to a site or OneDrive' and 'people who use a verification code' SHOULD be set",
     "Control" : "Sharepoint 2.4",
     "Criticality" : "Should",
     "Commandlet" : ["Get-SPOTenant"],
-    "ActualValue" : Policies,
+    "ActualValue" : Policy,
     "ReportDetails" : ReportDetails2_4_1(Policy),
     "RequirementMet" : Status
 }] {
@@ -175,7 +176,7 @@ tests[{
     "Control" : "Sharepoint 2.4",
     "Criticality" : "Should",
     "Commandlet" : ["Get-SPOTenant"],
-    "ActualValue" : Policies,
+    "ActualValue" : Policy,
     "ReportDetails" : ReportDetails2_4_2(Policy),
     "RequirementMet" : Status
 }] {
@@ -215,7 +216,7 @@ tests[{
     "Control" : "Sharepoint 2.5",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-SPOSite"],
-    "ActualValue" : Policies,
+    "ActualValue" : Policy,
     "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
