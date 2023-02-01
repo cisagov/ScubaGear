@@ -68,8 +68,8 @@ tests[{
     "Requirement" : "External sharing SHOULD be limited to approved domains and security groups per interagency collaboration needs",
     "Control" : "Sharepoint 2.2",
     "Criticality" : "Should",
-    "Commandlet" : ["Get-SPOTenant", "Get-PnPTenant"],
-    "ActualValue" : Policies,
+    "Commandlet" : ["Get-SPOTenant"],
+    "ActualValue" : Policy,
     "ReportDetails" : ReportDetails2_2(Status),
     "RequirementMet" : Status
 }] {
