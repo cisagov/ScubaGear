@@ -204,7 +204,7 @@ class CapHelper {
 
         # Begin processing the CAP
         $Actions = @()
-        if ($Cap.Conditions.Applications.IncludeApplications.Length -gt 0 -or 
+        if ($Cap.Conditions.Applications.IncludeApplications.Length -gt 0 -or
             $null -ne $Cap.Conditions.Applications.ApplicationFilter.Mode) {
             # For "Select what this policy applies to", "Cloud Apps" was  selected
             $Actions += "Policy applies to: apps"
@@ -234,7 +234,7 @@ class CapHelper {
             if ($Cap.Conditions.Applications.ApplicationFilter.Mode -eq "exclude") {
                 $Actions += "Apps excluded: custom application filter"
             }
-            if ($Cap.Conditions.Applications.ApplicationFilter.Mode -ne "exclude" -and 
+            if ($Cap.Conditions.Applications.ApplicationFilter.Mode -ne "exclude" -and
                 $Cap.Conditions.Applications.ExcludeApplications.Length -eq 0) {
                     $Actions += "Apps excluded: None"
             }
