@@ -58,10 +58,12 @@ function Connect-DefenderHelper {
     }
     switch ($M365Environment) {
         "gcchigh" {
-            $IPPSParams += @{'ConnectionUri' = "https://outlook.office365.us/powershell-liveID";}
+            $IPPSParams += @{'ConnectionUri' = "https://ps.compliance.protection.office365.us/powershell-liveid";}
+            $IPPSParams += @{'AzureADAuthorizationEndpointUri' = "https://login.microsoftonline.us/common";}
         }
         "dod" {
-            $IPPSParams += @{'ConnectionUri' = "https://webmail.apps.mil/powershell-liveID";}
+            $IPPSParams += @{'ConnectionUri' = "https://l5.ps.compliance.protection.office365.us/powershell-liveid";}
+            $IPPSParams += @{'AzureADAuthorizationEndpointUri' = "https://login.microsoftonline.us/common";}
         }
     }
     if ($ServicePrincipalParams.CertThumbprintParams) {
