@@ -144,7 +144,7 @@ function New-Report {
     $ReportHTML = $ReportHTML.Replace("{MAIN_CSS}", "<style>$($MainCSS)</style>")
 
     $MainJS = Get-Content $(Join-Path -Path $ReporterPath -ChildPath "main.js")
-    $MainJS = "let caps = $($CapJson);`n$($MainJS)"
+    $MainJS = "const caps = $($CapJson);`n$($MainJS)"
     $ReportHTML = $ReportHTML.Replace("{MAIN_JS}", "<script>$($MainJS)</script>")
 
     $ReportHTML = $ReportHTML.Replace("{TABLES}", $Fragments)

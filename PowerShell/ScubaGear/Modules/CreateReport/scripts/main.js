@@ -1,22 +1,24 @@
 function colorRows() {
     let rows = document.querySelectorAll('tr');
+    const statusCol = 1;
+    const criticalityCol = 2;
     for (let i = 0; i < rows.length; i++) {
-        if (rows[i].children[1].innerHTML == "Fail") {
+        if (rows[i].children[statusCol].innerHTML == "Fail") {
             rows[i].style.background = "#deb8b8";
         }
-        else if (rows[i].children[1].innerHTML == "Warning") {
+        else if (rows[i].children[statusCol].innerHTML == "Warning") {
             rows[i].style.background = "#fff7d6";
         }
-        else if (rows[i].children[1].innerHTML == "Pass") {
+        else if (rows[i].children[statusCol].innerHTML == "Pass") {
             rows[i].style.background = "#d5ebd5";
         }
-        else if (rows[i].children[2].innerHTML.includes("Not-Implemented")) {
+        else if (rows[i].children[criticalityCol].innerHTML.includes("Not-Implemented")) {
             rows[i].style.background = "#ebebf2";
         }
-        else if (rows[i].children[2].innerHTML.includes("3rd Party")) {
+        else if (rows[i].children[criticalityCol].innerHTML.includes("3rd Party")) {
             rows[i].style.background = "#ebebf2";
         }
-        else if (rows[i].children[1].innerHTML.includes("Error")) {
+        else if (rows[i].children[statusCol].innerHTML.includes("Error")) {
             rows[i].style.background = "#deb8b8";
             rows[i].querySelectorAll('td')[1].style.borderColor = "black";
             rows[i].querySelectorAll('td')[1].style.color = "#d10000";
@@ -99,10 +101,10 @@ function fillTruncatedCell(td, i, j) {
         i is the row number (0-indexed, not counting the header row)
         j is the column number (0-indexed)
     */
-    let charLimit = 50;
+    const charLimit = 50;
     let content = "";
     let truncated = false;
-    if (capColNames[j] == "") {
+    if (capColNames[j] === "") {
         content = ""
     }
     else if (caps[i][capColNames[j]].constructor === Array && caps[i][capColNames[j]].length > 1) {
@@ -112,6 +114,7 @@ function fillTruncatedCell(td, i, j) {
     else {
         content = caps[i][capColNames[j]];
     }
+
     if (content.length > charLimit) {
         td.innerHTML = content.substring(0, charLimit);
         truncated = true;
@@ -119,6 +122,7 @@ function fillTruncatedCell(td, i, j) {
     else {
         td.innerHTML = content;
     }
+
     if (truncated) {
         let span = document.createElement("span");
         span.appendChild(document.createTextNode("..."));
@@ -173,7 +177,7 @@ function expandCAPRow(evt) {
         let td = tr.querySelector("td:nth-of-type(" + (j+1).toString() + ")");
         fillTruncatedCell(td, i, j);
         td.innerHTML = "";
-        if (capColNames[j] == "") {
+        if (capColNames[j] === "") {
             td.innerHTML = "";
             let img = document.createElement("img");
             img.setAttribute('src', 'angle-down-solid.svg');
