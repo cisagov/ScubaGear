@@ -2,12 +2,12 @@
 $ModuleList = @(
     @{
         ModuleName = 'MicrosoftTeams'
-        ModuleVersion = [version] '4.8.0'
+        ModuleVersion = [version] '4.9.3'
         MaximumVersion = [version] '4.99.99999'
     },
     @{
         ModuleName = 'ExchangeOnlineManagement' # includes Defender
-        ModuleVersion = [version] '3.0.0'
+        ModuleVersion = [version] '3.1.0'
         MaximumVersion = [version] '3.99.99999'
     },
     @{
