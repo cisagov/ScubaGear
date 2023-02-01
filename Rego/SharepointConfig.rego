@@ -69,7 +69,7 @@ tests[{
     "Control" : "Sharepoint 2.2",
     "Criticality" : "Should",
     "Commandlet" : ["Get-SPOTenant"],
-    "ActualValue" : Policies,
+    "ActualValue" : Policy,
     "ReportDetails" : ReportDetails2_2(Status),
     "RequirementMet" : Status
 }] {
