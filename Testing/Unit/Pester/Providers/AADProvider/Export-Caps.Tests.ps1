@@ -1,5 +1,5 @@
 BeforeAll {
-    $ClassPath = "$($PSScriptRoot)/../../../PowerShell/ScubaGear/Modules/Providers/ProviderHelpers/"
+    $ClassPath = "$($PSScriptRoot)/../../../../../PowerShell/ScubaGear/Modules/Providers/ProviderHelpers/"
     Import-Module $ClassPath/AADConditionalAccessHelper.psm1
     $CapHelper = Get-CapTracker
     $CapHelper | Out-Null # Pointless line that makes the PS linter happy,
