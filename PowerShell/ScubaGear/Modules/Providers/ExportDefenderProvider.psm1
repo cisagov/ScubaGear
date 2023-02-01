@@ -15,7 +15,7 @@ function Export-DefenderProvider {
 
         [Parameter(Mandatory = $false)]
         [hashtable]
-        $CertThumbprintParams
+        $ServicePrincipalParams
     )
     $ParentPath = Split-Path $PSScriptRoot -Parent
     $ConnectionFolderPath = Join-Path -Path $ParentPath -ChildPath "Connection"
@@ -36,10 +36,10 @@ function Export-DefenderProvider {
             $EXOHelperParams = @{
                 M365Environment = $M365Environment;
             }
-            if ($CertThumbprintParams) {
-                $EXOHelperParams += @{CertThumbprintParams = $CertThumbprintParams}
+            if ($ServicePrincipalParams) {
+                $EXOHelperParams += @{ServicePrincipalParams = $ServicePrincipalParams}
             }
-            Connect-EXOHelper @CertThumbprintParams;
+            Connect-EXOHelper @ServicePrincipalParams;
         }
         catch {
             Write-Error "Error connecting to ExchangeOnline. $($_)"
@@ -100,8 +100,8 @@ function Export-DefenderProvider {
             M365Environment = $M365Environment;
         }
 
-        if ($CertThumbprintParams) {
-            $DefenderHelperParams += @{CertThumbprintParams = $CertThumbprintParams}
+        if ($ServicePrincipalParams) {
+            $DefenderHelperParams += @{ServicePrincipalParams = $ServicePrincipalParams}
         }
         Connect-DefenderHelper @DefenderHelperParams
         $IPPSConnected = $true

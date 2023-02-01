@@ -119,7 +119,7 @@ function Invoke-SCuBA {
 
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [string]
-        $CertificateThumbPrint,
+        $CertificateThumbprint,
 
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [string]
@@ -329,24 +329,14 @@ function Invoke-ProviderList {
 "@
         $N = 0
         $Len = $ProductNames.Length
-
-
         $ConnectTenantParams = @{
             'M365Environment' = $M365Environment
         }
-        if ($BoundParameters.CertificateThumbPrint) {
-            $CheckParams = (-not $BoundParameters.CertificateThumbPrint) `
-            -or (-not $BoundParameters.AppID) -or (-not $BoundParameters.Organization)
-            if ($CheckParams) {
-                throw "Missing parameters required for authentication with CertificateThumprints"
-            }
-            $CertThumbprintParams = @{
-                CertificateThumbPrint = $BoundParameters.CertificateThumbPrint;
-                AppID = $BoundParameters.AppID;
-                Organization = $BoundParameters.Organization;
-            }
-            $ConnectTenantParams += @{CertThumbprintParams = $CertThumbprintParams;}
+        if ($BoundParameters.AppID) {
+            $ServicePrincipalParams = Get-ServicePrincipalParams -BoundParameters $BoundParameters
+            $ConnectTenantParams += @{ServicePrincipalParams = $ServicePrincipalParams;}
         }
+
         foreach ($Product in $ProductNames) {
             $BaselineName = $ArgToProd[$Product]
             $N += 1
@@ -771,25 +761,50 @@ function Invoke-Connection {
         'M365Environment' = $M365Environment
     }
 
-    if ($BoundParameters.CertificateThumbPrint) {
-        $CheckParams = (-not $BoundParameters.CertificateThumbPrint) `
-        -or (-not $BoundParameters.AppID) -or (-not $BoundParameters.Organization)
-        if ($CheckParams) {
-            throw "Missing parameters required for authentication with CertificateThumprints"
-        }
-
-        $CertThumbprintParams = @{
-            CertificateThumbPrint = $BoundParameters.CertificateThumbPrint;
-            AppID = $BoundParameters.AppID;
-            Organization = $BoundParameters.Organization;
-        }
-        $ConnectTenantParams += @{CertThumbprintParams = $CertThumbprintParams;}
+    if ($BoundParameters.AppID) {
+        $ServicePrincipalParams = Get-ServicePrincipalParams -BoundParameters $BoundParameters
+        $ConnectTenantParams += @{ServicePrincipalParams = $ServicePrincipalParams;}
     }
 
     if ($LogIn) {
         $AnyFailedAuth = Connect-Tenant @ConnectTenantParams
         $AnyFailedAuth
     }
+}
+
+
+function Get-ServicePrincipalParams {
+    <#
+    .Description
+    Returns a valid a hastable of parameters for authentication via
+    Service Principal. Throws an error if there are none.
+    .Functionality
+    Internal
+    #>
+    [CmdletBinding()]
+    param(
+    [Parameter(Mandatory=$true)]
+    [hashtable]
+    $BoundParameters
+    )
+
+    $ServicePrincipalParams = @{}
+
+    $CheckThumbprintParams = ($BoundParameters.CertificateThumbprint) `
+    -and ($BoundParameters.AppID) -and ($BoundParameters.Organization)
+
+    if ($CheckThumbprintParams) {
+        $CertThumbprintParams = @{
+            CertificateThumbprint = $BoundParameters.CertificateThumbprint;
+            AppID = $BoundParameters.AppID;
+            Organization = $BoundParameters.Organization;
+        }
+        $ServicePrincipalParams += @{CertThumbprintParams = $CertThumbprintParams}
+    }
+    else {
+        throw "Missing parameters required for authentication with Service Principal Auth; Run Get-Help Invoke-Scuba for details on correct arguments"
+    }
+    $ServicePrincipalParams
 }
 
 function Import-Resources {

@@ -14,7 +14,7 @@ function Connect-EXOHelper {
 
         [Parameter(Mandatory = $false)]
         [hashtable]
-        $CertThumbprintParams
+        $ServicePrincipalParams
     )
     $EXOParams = @{
         ErrorAction = "Stop";
@@ -29,8 +29,8 @@ function Connect-EXOHelper {
         }
     }
 
-    if ($CertThumbprintParams) {
-        $EXOParams += $CertThumbprintParams
+    if ($ServicePrincipalParams.CertThumbprintParams) {
+        $EXOParams += $ServicePrincipalParams.CertThumbprintParams
     }
     Connect-ExchangeOnline @EXOParams | Out-Null
 }
@@ -51,7 +51,7 @@ function Connect-DefenderHelper {
 
         [Parameter(Mandatory = $false)]
         [hashtable]
-        $CertThumbprintParams
+        $ServicePrincipalParams
     )
     $IPPSParams = @{
         'ErrorAction' = 'Stop';
@@ -64,8 +64,8 @@ function Connect-DefenderHelper {
             $IPPSParams += @{'ConnectionUri' = "https://webmail.apps.mil/powershell-liveID";}
         }
     }
-    if ($CertThumbprintParams) {
-        $IPPSParams += $CertThumbprintParams
+    if ($ServicePrincipalParams.CertThumbprintParams) {
+        $IPPSParams += $ServicePrincipalParams.CertThumbprintParams
     }
     Connect-IPPSSession @IPPSParams | Out-Null
 }

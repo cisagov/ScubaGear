@@ -23,10 +23,12 @@ function Connect-Tenant {
 
     [Parameter(Mandatory = $false)]
     [hashtable]
-    $CertThumbprintParams
+    $ServicePrincipalParams
     )
     Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "ConnectHelpers.psm1")
 
+    # $a = $ServicePrincipalParams | Out-String
+    # Write-Host $a
     # Prevent duplicate sign ins
     $EXOAuthRequired = $true
     $SPOAuthRequired = $true
@@ -59,8 +61,17 @@ function Connect-Tenant {
                         'Directory.Read.All'
                     )
                     $GraphParams = @{
-                        'Scopes' = $GraphScopes;
                         'ErrorAction' = 'Stop';
+                    }
+                    if ($ServicePrincipalParams.CertThumbprintParams) {
+                        $GraphParams += @{
+                            CertificateThumbprint = $ServicePrincipalParams.CertThumbprintParams.CertificateThumbprint;
+                            ClientID = $ServicePrincipalParams.CertThumbprintParams.AppID;
+                            TenantId  = $ServicePrincipalParams.CertThumbprintParams.Organization; # Organization also works here
+                        }
+                    }
+                    else {
+                        $GraphParams += @{Scopes = $GraphScopes;}
                     }
                     switch ($M365Environment) {
                         "gcchigh" {
@@ -79,8 +90,8 @@ function Connect-Tenant {
                         $EXOHelperParams = @{
                             M365Environment = $M365Environment;
                         }
-                        if ($CertThumbprintParams) {
-                            $EXOHelperParams += @{CertThumbprintParams = $CertThumbprintParams}
+                        if ($ServicePrincipalParams) {
+                            $EXOHelperParams += @{ServicePrincipalParams = $ServicePrincipalParams}
                         }
                         Write-Verbose "Defender will require a sign in every single run regardless of what the LogIn parameter is set"
                         Connect-EXOHelper @EXOHelperParams
@@ -90,6 +101,13 @@ function Connect-Tenant {
                 "powerplatform" {
                     $AddPowerAppsParams = @{
                         'ErrorAction' = 'Stop';
+                    }
+                    if ($ServicePrincipalParams.CertThumbprintParams) {
+                        $AddPowerAppsParams += @{
+                            CertificateThumbprint = $ServicePrincipalParams.CertThumbprintParams.CertificateThumbprint;
+                            ApplicationId = $ServicePrincipalParams.CertThumbprintParams.AppID;
+                            TenantID  = $ServicePrincipalParams.CertThumbprintParams.Organization; # Organization also works here
+                        }
                     }
                     switch ($M365Environment) {
                         "commercial" {
@@ -108,6 +126,9 @@ function Connect-Tenant {
                     Add-PowerAppsAccount @AddPowerAppsParams | Out-Null
                 }
                 {($_ -eq "onedrive") -or ($_ -eq "sharepoint")} {
+                    if ($ServicePrincipalParams) {
+                        throw "currently not supported for OneDrive and SPO"
+                    }
                     if ($AADAuthRequired) {
                         $LimitedGraphParams = @{
                             'ErrorAction' = 'Stop';
@@ -155,18 +176,13 @@ function Connect-Tenant {
                 }
                 "teams" {
                     $TeamsParams = @{'ErrorAction'= 'Stop'}
-                    if ($CertThumbprintParams) {
-                        try {
-                            $TeamsConnectToTenant = @{
-                                CertificateThumbPrint = $CertThumbprintParams.CertificateThumbprint;
-                                ApplicationId = $CertThumbprintParams.AppId;
-                                TenantId  = $CertThumbprintParams.Organization; # Yes. Teams PowerShell confuses Tenant ID and Organization Domain
-                            }
-                            $TeamsParams += $TeamsConnectToTenant
+                    if ($ServicePrincipalParams.CertThumbprintParams) {
+                        $TeamsConnectToTenant = @{
+                            CertificateThumbprint = $ServicePrincipalParams.CertThumbprintParams.CertificateThumbprint;
+                            ApplicationId = $ServicePrincipalParams.CertThumbprintParams.AppID;
+                            TenantId  = $ServicePrincipalParams.CertThumbprintParams.Organization; # Organization Domain is actually required here.
                         }
-                        catch {
-                            Write-Warning "Unable to retrieve Tenant ID for Teams authenticatio with URI. This may be caused by proxy error see 'Running the Script Behind Some Proxies' in the README for a solution. $($_)"
-                        }
+                        $TeamsParams += $TeamsConnectToTenant
                     }
                     switch ($M365Environment) {
                         "gcchigh" {
