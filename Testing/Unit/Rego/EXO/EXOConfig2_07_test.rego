@@ -44,7 +44,7 @@ test_FromScope_IncorrectV1 if {
  
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "No transport rule found with that applies to emails received from outside the organization"
+    RuleOutput[0].ReportDetails == "No transport rule found that applies warnings to emails received from outside the organization"
 }
 
 test_FromScope_IncorrectV2 if {
@@ -65,7 +65,7 @@ test_FromScope_IncorrectV2 if {
  
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "No transport rule found with that applies to emails received from outside the organization"
+    RuleOutput[0].ReportDetails == "No transport rule found that applies warnings to emails received from outside the organization"
 }
 
 test_FromScope_IncorrectV3 if {
@@ -86,7 +86,7 @@ test_FromScope_IncorrectV3 if {
  
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "No transport rule found with that applies to emails received from outside the organization"
+    RuleOutput[0].ReportDetails == "No transport rule found that applies warnings to emails received from outside the organization"
 }
 
 test_FromScope_IncorrectV4 if {
@@ -107,7 +107,7 @@ test_FromScope_IncorrectV4 if {
  
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "No transport rule found with that applies to emails received from outside the organization"
+    RuleOutput[0].ReportDetails == "No transport rule found that applies warnings to emails received from outside the organization"
 }
 
 test_FromScope_Multiple_Correct if {
@@ -189,5 +189,5 @@ test_FromScope_Multiple_Incorrect if {
  
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "No transport rule found with that applies to emails received from outside the organization"
+    RuleOutput[0].ReportDetails == "No transport rule found that applies warnings to emails received from outside the organization"
 }
