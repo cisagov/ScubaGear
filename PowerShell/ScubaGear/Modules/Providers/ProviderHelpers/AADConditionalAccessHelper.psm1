@@ -204,7 +204,8 @@ class CapHelper {
 
         # Begin processing the CAP
         $Actions = @()
-        if ($Cap.Conditions.Applications.IncludeApplications.Length -gt 0) {
+        if ($Cap.Conditions.Applications.IncludeApplications.Length -gt 0 -or 
+            $null -ne $Cap.Conditions.Applications.ApplicationFilter.Mode) {
             # For "Select what this policy applies to", "Cloud Apps" was  selected
             $Actions += "Policy applies to: apps"
             # Included apps:
@@ -217,27 +218,25 @@ class CapHelper {
             elseif ($Cap.Conditions.Applications.IncludeApplications.Length -eq 1) {
                 $Actions += "Apps included: 1 specific app"
             }
-            else {
+            elseif ($Cap.Conditions.Applications.IncludeApplications.Length -gt 1) {
                 $Actions += "Apps included: $($Cap.Conditions.Applications.IncludeApplications.Length) specific apps"
             }
-
-            if ($Cap.Conditions.Applications.ExcludeApplications.Length -eq 0) {
-                $Actions += "Apps excluded: None"
+            if ($Cap.Conditions.Applications.ApplicationFilter.Mode -eq "include") {
+                $Actions += "Apps included: custom application filter"
             }
-            elseif ($Cap.Conditions.Applications.ExcludeApplications.Length -eq 1) {
+
+            if ($Cap.Conditions.Applications.ExcludeApplications.Length -eq 1) {
                 $Actions += "Apps excluded: 1 specific app"
             }
-            else {
+            elseif ($Cap.Conditions.Applications.ExcludeApplications.Length -gt 1) {
                 $Actions += "Apps excluded: $($Cap.Conditions.Applications.ExcludeApplications.Length) specific apps"
             }
-        }
-        elseif ($null -ne $Cap.Conditions.Applications.ApplicationFilter.Mode) {
-            $Actions += "Policy applies to: apps"
-            if ($Cap.Conditions.Applications.ApplicationFilter.Mode -eq "include") {
-                $Actions += "Custom application filter in include mode active"
+            if ($Cap.Conditions.Applications.ApplicationFilter.Mode -eq "exclude") {
+                $Actions += "Apps excluded: custom application filter"
             }
-            else {
-                $Actions += "Custom application filter in exclude mode active"
+            if ($Cap.Conditions.Applications.ApplicationFilter.Mode -ne "exclude" -and 
+                $Cap.Conditions.Applications.ExcludeApplications.Length -eq 0) {
+                    $Actions += "Apps excluded: None"
             }
         }
         elseif ($Cap.Conditions.Applications.IncludeUserActions.Length -gt 0) {

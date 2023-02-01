@@ -238,15 +238,41 @@ Describe "GetApplications" {
         $Cap.Conditions.Applications.ApplicationFilter.Mode = "include"
         $Apps = $($CapHelper.GetApplications($Cap))
         $Apps[0] | Should -Be "Policy applies to: apps"
-        $Apps[1] | Should -Be "Custom application filter in include mode active"
+        $Apps[1] | Should -Be "Apps included: custom application filter"
+        $Apps[2] | Should -Be "Apps excluded: None"
 	}
 
     It "handles app filter in exclude mode" {
         $Cap = Get-Content "CapSnippets/Apps.json" | ConvertFrom-Json
         $Cap.Conditions.Applications.ApplicationFilter.Mode = "exclude"
+        $Cap.Conditions.Applications.IncludeApplications += "All"
         $Apps = $($CapHelper.GetApplications($Cap))
         $Apps[0] | Should -Be "Policy applies to: apps"
-        $Apps[1] | Should -Be "Custom application filter in exclude mode active"
+        $Apps[1] | Should -Be "Apps included: All"
+        $Apps[2] | Should -Be "Apps excluded: custom application filter"
+	}
+
+    It "handles including app filter and specific apps" {
+        $Cap = Get-Content "CapSnippets/Apps.json" | ConvertFrom-Json
+        $Cap.Conditions.Applications.ApplicationFilter.Mode = "include"
+        $Cap.Conditions.Applications.IncludeApplications += "aaaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
+        $Apps = $($CapHelper.GetApplications($Cap))
+        $Apps[0] | Should -Be "Policy applies to: apps"
+        $Apps[1] | Should -Be "Apps included: 1 specific app"
+        $Apps[2] | Should -Be "Apps included: custom application filter"
+        $Apps[3] | Should -Be "Apps excluded: None"
+	}
+
+    It "handles excluding app filter and specific apps" {
+        $Cap = Get-Content "CapSnippets/Apps.json" | ConvertFrom-Json
+        $Cap.Conditions.Applications.ApplicationFilter.Mode = "exclude"
+        $Cap.Conditions.Applications.IncludeApplications += "All"
+        $Cap.Conditions.Applications.ExcludeApplications += "aaaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
+        $Apps = $($CapHelper.GetApplications($Cap))
+        $Apps[0] | Should -Be "Policy applies to: apps"
+        $Apps[1] | Should -Be "Apps included: All"
+        $Apps[2] | Should -Be "Apps excluded: 1 specific app"
+        $Apps[3] | Should -Be "Apps excluded: custom application filter"
 	}
 
     It "handles registering a device" {
