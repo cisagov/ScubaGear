@@ -13,11 +13,6 @@ ReportDetailsBoolean(Status) = "Requirement not met" if {Status == false}
 #
 # Baseline 2.1: Policy 1
 #--
-DefaultSharingLinkTypePolicy[Policy]{
-    Policy := input.SPO_tenant[_]
-    Policy.DefaultSharingLinkType == 1
-}
-
 tests[{
     "Requirement" : "File and folder links default sharing setting SHALL be set to \"Specific People (Only the People the User Specifies)\"",
     "Control" : "Sharepoint 2.1",
@@ -27,8 +22,8 @@ tests[{
     "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
-    Policies := DefaultSharingLinkTypePolicy
-    Status := count(Policies) == 1
+    Policy := input.SPO_tenant[_]
+    Status := Policy.DefaultSharingLinkType == 1
 }
 #--
 
@@ -110,10 +105,28 @@ tests[{
 #
 # Baseline 2.4: Policy 1
 #--
-ExpirationTimerPolicyRequired[Policy]{
-    Policy := input.SPO_tenant[_]
+ReportDetails2_4_1(Policy) = Description if {
     Policy.ExternalUserExpirationRequired == true
+    Policy.EmailAttestationRequired == true
+	Description := "Requirement met"
 }
+
+ReportDetails2_4_1(Policy) = Description if {
+    Policy.ExternalUserExpirationRequired == false
+    Policy.EmailAttestationRequired == true
+	Description := "Requirement not met: 'Guest access to a site or OneDrive will expire automatically after this many days' must be enabled"
+}
+
+ReportDetails2_4_1(Policy) = Description if {
+    Policy.ExternalUserExpirationRequired == true
+    Policy.EmailAttestationRequired == false
+	Description := "Requirement not met: 'People who use a verification code must reauthenticate after this many days' must be enabled"
+}
+
+ReportDetails2_4_1(Policy) = Description if {
+    Policy.ExternalUserExpirationRequired == false
+    Policy.EmailAttestationRequired == false
+	Description := "Requirement not met"
 
 tests[{
     "Requirement" : "Expiration timers for 'guest access to a site or OneDrive' and 'people who use a verification code' SHOULD be set",
@@ -121,20 +134,40 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-SPOTenant"],
     "ActualValue" : Policies,
-    "ReportDetails" : ReportDetailsBoolean(Status),
+    "ReportDetails" : ReportDetails2_4_1(Policy),
     "RequirementMet" : Status
 }] {
-    Policies := ExpirationTimerPolicyRequired
-    Status := count(Policies) == 1
+    Policy := input.SPO_tenant[_]
+    Conditions := [Policy.ExternalUserExpirationRequired == true, Policy.EmailAttestationRequired == true]
+    Status := count([Condition | Condition = Conditions[_]; Condition == false]) == 0
 }
 #--
 
 #
 # Baseline 2.4: Policy 2
 #--
-ExpirationTimerPolicy[Policy]{
-    Policy := input.SPO_tenant[_]
+ReportDetails2_4_2(Policy) = Description if {
     Policy.ExternalUserExpireInDays == 30
+    Policy.EmailAttestationReAuthDays == 30
+	Description := "Requirement met"
+}
+
+ReportDetails2_4_2(Policy) = Description if {
+    Policy.ExternalUserExpireInDays != 30
+    Policy.EmailAttestationReAuthDays == 30
+	Description := "Requirement not met: 'Guest access to a site or OneDrive will expire automatically after this many days' must be 30 days"
+}
+
+ReportDetails2_4_2(Policy) = Description if {
+    Policy.ExternalUserExpireInDays == 30
+    Policy.EmailAttestationReAuthDays != 30
+	Description := "Requirement not met: 'People who use a verification code must reauthenticate after this many days' must be 30 days"
+}
+
+ReportDetails2_4_2(Policy) = Description if {
+    Policy.ExternalUserExpireInDays != 30
+    Policy.EmailAttestationReAuthDays != 30
+	Description := "Requirement not met"
 }
 
 tests[{
@@ -143,11 +176,12 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-SPOTenant"],
     "ActualValue" : Policies,
-    "ReportDetails" : ReportDetailsBoolean(Status),
+    "ReportDetails" : ReportDetails2_4_2(Policy),
     "RequirementMet" : Status
 }] {
-    Policies := ExpirationTimerPolicy
-    Status := count(Policies) == 1
+    Policy := input.SPO_tenant[_]
+    Conditions := [Policy.ExternalUserExpireInDays == 30, Policy.EmailAttestationReAuthDays == 30]
+    Status := count([Condition | Condition = Conditions[_]; Condition == false]) == 0
 }
 #--
 
@@ -176,14 +210,6 @@ tests[{
 #
 # Baseline 2.5: Policy 2
 #--
-CustomScriptPolicy[Policy]{
-    Policy := input.SPO_site[_]
-    # DenyAddAndCustomizePages corresponds to the Custom Script config in the Sharepoint Admin classic settings page (2nd set of bullets in GUI)
-    # 1 = Allow users to run custom script on self-service created sites
-    # 2 = Prevent users from running custom script on self-service created sites
-    Policy.DenyAddAndCustomizePages == 2
-}
-
 tests[{
     "Requirement" : "Users SHALL be prevented from running custom scripts on self-service created sites",
     "Control" : "Sharepoint 2.5",
@@ -193,7 +219,9 @@ tests[{
     "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
-    Policies := CustomScriptPolicy
-    Status := count(Policies) == 1
+    Policy := input.SPO_site[_]
+    # 1 == Allow users to run custom script on self-service created sites
+    # 2 == Prevent users from running custom script on self-service created sites
+    Status := Policy.DenyAddAndCustomizePages == 2
 }
 #--
