@@ -40,9 +40,28 @@ tests[{
 #
 # Baseline 2.2: Policy 1
 #--
-ExternalSharingPolicy[Policy]{
-    Policy := input.SPO_tenant[_]
+ReportDetails2_2(Policy) = Description if {
     Policy.SharingCapability == 1
+    Policy.SharingDomainRestrictionMode == 1
+	Description := "Requirement met"
+}
+
+ReportDetails2_2(Policy) = Description if {
+    Policy.SharingCapability != 1
+    Policy.SharingDomainRestrictionMode == 1
+	Description := "Requirement not met: Sharepoint sharing slider must be set to 'New and Existing Guests'"
+}
+
+ReportDetails2_2(Policy) = Description if {
+    Policy.SharingCapability == 1
+    Policy.SharingDomainRestrictionMode != 1
+	Description := "Requirement not met: 'Limit external sharing by domain' must be enabled"
+}
+
+ReportDetails2_2(Policy) = Description if {
+    Policy.SharingCapability != 1
+    Policy.SharingDomainRestrictionMode != 1
+	Description := "Requirement not met"
 }
 
 tests[{
@@ -51,11 +70,13 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-SPOTenant"],
     "ActualValue" : Policies,
-    "ReportDetails" : ReportDetailsBoolean(Status),
+    "ReportDetails" : ReportDetails2_2(Status),
     "RequirementMet" : Status
 }] {
-    Policies := ExternalSharingPolicy
-    Status := count(Policies) == 1
+    Policy := input.SPO_tenant[_]
+    # TODO: Missing Allow only users in specific security groups to share externally
+    Conditions := [Policy.SharingCapability == 1, Policy.SharingDomainRestrictionMode == 1]
+    Status := count([Condition | Condition = Conditions[_]; Condition == false]) == 0
 }
 #--
 
