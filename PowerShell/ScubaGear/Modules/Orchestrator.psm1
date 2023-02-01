@@ -790,11 +790,11 @@ function Import-Resources {
     $ConnectionPath = Join-Path -Path $PSScriptRoot -ChildPath "Connection"
     $RegoPath = Join-Path -Path $PSScriptRoot -ChildPath "RunRego"
     $ReporterPath = Join-Path -Path $PSScriptRoot -ChildPath "CreateReport"
-    $UtilsPath = Join-Path -Path $PSScriptRoot -ChildPath "Utils"
+    $ScubaConfigPath = Join-Path -Path $PSScriptRoot -ChildPath "ScubaConfig"
     Import-Module $ConnectionPath
     Import-Module $RegoPath
     Import-Module $ReporterPath
-    Import-Module $UtilsPath
+    Import-Module $ScubaConfigPath
 }
 
 function Remove-Resources {
@@ -812,6 +812,7 @@ function Remove-Resources {
         Remove-Module $Provider -ErrorAction "SilentlyContinue"
     }
 
+    Remove-Module "ScubaConfig" -ErrorAction "SilentlyContinue"
     Remove-Module "RunRego" -ErrorAction "SilentlyContinue"
     Remove-Module "CreateReport" -ErrorAction "SilentlyContinue"
     Remove-Module "Connection" -ErrorAction "SilentlyContinue"

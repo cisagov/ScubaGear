@@ -9,7 +9,7 @@
       "onedrive"
     ],
     "M365Environment":"commercial",
-    "OPAPath":"C:\\Program Files\\OPA\\opa_windows_amd64.exe",
+    "OPAPath":"C:\\Users\\crutchfield\\source\\repos\\ScubaGear",
     "LogIn":true,
     "DisconnectOnExit":false,
     "OutPath":".",

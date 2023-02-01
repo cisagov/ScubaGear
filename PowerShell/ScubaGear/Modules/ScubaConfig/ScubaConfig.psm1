@@ -26,7 +26,7 @@ function Get-ScubaConfig {
     $Content = Get-Content -Raw -Path $Path
     $Config = $Content | ConvertFrom-Yaml
 
-    Set-Variable -Name "ScubaConfig" -Value $Config -Option AllScope -Scope Script -Description "SCuBA Configuration parameters"
+    Set-Variable -Name "ScubaConfig" -Value $Config -Option AllScope -Scope Global -Description "SCuBA Configuration parameters"
 }
 
 function Remove-ScubaConfig {
@@ -38,9 +38,9 @@ function Remove-ScubaConfig {
     #>
 
     try {
-        $Result = Get-Variable -Name "ScubaConfig" -Scope Script -ErrorAction 'silentlycontinue'
+        $Result = Get-Variable -Name "ScubaConfig" -Scope Global -ErrorAction 'silentlycontinue'
         if ($Result){
-            Remove-Variable -Name "ScubaConfig" -Scope Script -Force
+            Remove-Variable -Name "ScubaConfig" -Scope Global -Force
         }
 
     }
@@ -48,8 +48,3 @@ function Remove-ScubaConfig {
         Write-Debug "Variable, ScubaConfig, was not found"
     }
 }
-
-Export-ModuleMember -Function @(
-    'Get-ScubaConfig',
-    'Remove-ScubaConfig'
-)
