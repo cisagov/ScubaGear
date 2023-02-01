@@ -40,18 +40,18 @@ tests[{
 #
 # Baseline 2.2: Policy 1
 #--
-ReportDetails2_2(Policy) = Description if {
+ReportDetails2_2_1(Policy) = Description if {
     Policy.OneDriveLoopSharingCapability != 2
     Description := "Requirement met: Anyone links are disabled"
 }
 
-ReportDetails2_2(Policy) = Description if {
+ReportDetails2_2_1(Policy) = Description if {
     Policy.OneDriveLoopSharingCapability == 2
     Policy.RequireAnonymousLinksExpireInDays != -1
     Description := "Requirement met"
 }
 
-ReportDetails2_2(Policy) = Description if {
+ReportDetails2_2_1(Policy) = Description if {
     Policy.OneDriveLoopSharingCapability == 2
     Policy.RequireAnonymousLinksExpireInDays == -1
     Description := "Requirement not met"
@@ -63,7 +63,7 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-SPOTenant"],
     "ActualValue" : [Policy.OneDriveLoopSharingCapability, Policy.RequireAnonymousLinksExpireInDays],
-    "ReportDetails" : ReportDetails2_2(Policy),
+    "ReportDetails" : ReportDetails2_2_1(Policy),
     "RequirementMet" : Status
 }] {
     Policy := input.SPO_tenant_info[_]
@@ -80,18 +80,18 @@ tests[{
 # Baseline 2.2: Policy 2
 #--
 #Automatically met if policy 2 is met, Suggested for additional check for baseline. Will use this as a place holder. 
-ReportDetails2_2(Policy) = Description if {
+ReportDetails2_2_2(Policy) = Description if {
     Policy.OneDriveLoopSharingCapability != 2
     Description := "Requirement met: Anyone links are disabled"
 }
 
-ReportDetails2_2(Policy) = Description if {
+ReportDetails2_2_2(Policy) = Description if {
     Policy.OneDriveLoopSharingCapability == 2
     Policy.OneDriveRequestFilesLinkExpirationInDays == 30
     Description := "Requirement met"
 }
 
-ReportDetails2_2(Policy) = Description if {
+ReportDetails2_2_2(Policy) = Description if {
     Policy.OneDriveLoopSharingCapability == 2
     Policy.OneDriveRequestFilesLinkExpirationInDays != 30
     Description := "Requirement not met"
@@ -103,7 +103,7 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-SPOTenant"],
     "ActualValue" : [Policy.OneDriveLoopSharingCapability, Policy.OneDriveRequestFilesLinkExpirationInDays],
-    "ReportDetails" : ReportDetails2_2(Policy),
+    "ReportDetails" : ReportDetails2_2_2(Policy),
     "RequirementMet" : Status
 }] {
     Policy := input.SPO_tenant_info[_]
