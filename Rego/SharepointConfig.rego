@@ -70,7 +70,7 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-SPOTenant"],
     "ActualValue" : Policy,
-    "ReportDetails" : ReportDetails2_2(Status),
+    "ReportDetails" : ReportDetails2_2(Policy),
     "RequirementMet" : Status
 }] {
     Policy := input.SPO_tenant[_]
