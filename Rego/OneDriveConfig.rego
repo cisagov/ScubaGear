@@ -27,8 +27,22 @@ tests[{
     "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
+    input.OD_used_PnP == false
     Policies := AnyoneLinksPolicy
     Status := count(Policies) == 1
+}
+#--
+
+tests[{
+    "Requirement" : "Anyone links SHOULD be disabled",
+    "Control" : "OneDrive 2.1",
+    "Criticality" : "Should/Not-Implemented",
+    "Commandlet" : [],
+    "ActualValue" : [],
+    "ReportDetails" : "Currently cannot be checked automatically while using Service Principals. See Onedrive Secure Configuration Baseline policy 2.1 for instructions on manual check",
+    "RequirementMet" : false
+}] {
+    input.OD_used_PnP
 }
 #--
 

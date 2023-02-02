@@ -27,7 +27,7 @@ function Export-OneDriveProvider {
     $InitialDomainPrefix = $InitialDomain.Name.split(".")[0]
 
     $SPOSiteIdentity = Get-SPOSiteHelper -M365Environment $M365Environment -InitialDomainPrefix $InitialDomainPrefix
-
+    Write-Verbose "This is the tenant's main sharepoint domain use this for -Identity calls: $($SPOSiteIdentity)"
 
     $SPOTenantInfo = ConvertTo-Json @()
     $TenantSyncInfo = ConvertTo-Json @()
@@ -35,11 +35,15 @@ function Export-OneDriveProvider {
     if ($UsePnP) {
         $SPOTenantInfo = ConvertTo-Json @($Tracker.TryCommand("Get-PnPTenant"))
         $TenantSyncInfo = ConvertTo-Json @($Tracker.TryCommand("Get-PnPTenantSyncClientRestriction"))
+        $Tracker.AddSuccessfulCommand("Get-SPOTenant")
+        $Tracker.AddSuccessfulCommand("Get-SPOTenantSyncClientRestriction")
         $UsedPnP = ConvertTo-Json $true
     }
     else {
         $SPOTenantInfo = ConvertTo-Json @($Tracker.TryCommand("Get-SPOTenant"))
         $TenantSyncInfo = ConvertTo-Json @($Tracker.TryCommand("Get-SPOTenantSyncClientRestriction"))
+        $Tracker.AddSuccessfulCommand("Get-PnPTenant")
+        $Tracker.AddSuccessfulCommand("Get-PnPTenantSyncClientRestriction")
     }
 
     $SuccessfulCommands = ConvertTo-Json @($Tracker.GetSuccessfulCommands())

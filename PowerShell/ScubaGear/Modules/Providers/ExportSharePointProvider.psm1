@@ -34,11 +34,15 @@ function Export-SharePointProvider {
     $SPOSite = ConvertTo-Json @()
     if ($UsePnP) {
         $SPOTenant = ConvertTo-Json @($Tracker.TryCommand("Get-PnPTenant"))
-        $SPOTenant = ConvertTo-Json @($Tracker.TryCommand("Get-PnPTenantSite", @{"Identity"="$($SPOSiteIdentity)"; "Detailed"=$true}) | Select-Object -Property *)
+        $SPOSite = ConvertTo-Json @($Tracker.TryCommand("Get-PnPTenantSite",@{"Identity"="$($SPOSiteIdentity)"; "Detailed"=$true}) | Select-Object -Property *)
+        $Tracker.AddSuccessfulCommand("Get-SPOTenant")
+        $Tracker.AddSuccessfulCommand("Get-SPOSite")
     }
     else {
         $SPOTenant = ConvertTo-Json @($Tracker.TryCommand("Get-SPOTenant"))
         $SPOSite = ConvertTo-Json @($Tracker.TryCommand("Get-SPOSite", @{"Identity"="$($SPOSiteIdentity)"; "Detailed"=$true}) | Select-Object -Property *)
+        $Tracker.AddSuccessfulCommand("Get-PnPTenant")
+        $Tracker.AddSuccessfulCommand("Get-PnPTenantSite")
     }
 
 
