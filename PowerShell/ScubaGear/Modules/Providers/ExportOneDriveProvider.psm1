@@ -11,7 +11,11 @@ function Export-OneDriveProvider {
         [Parameter(Mandatory = $true)]
         [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $false)]
         [string]
-        $M365Environment
+        $M365Environment,
+
+        [Parameter(Mandatory = $false)]
+        [switch]
+        $UsePnP
     )
     $HelperFolderPath = Join-Path -Path $PSScriptRoot -ChildPath "ProviderHelpers"
     Import-Module (Join-Path -Path $HelperFolderPath -ChildPath "CommandTracker.psm1")
@@ -22,12 +26,21 @@ function Export-OneDriveProvider {
     $InitialDomain = ($Tracker.TryCommand("Get-MgOrganization")).VerifiedDomains | Where-Object {$_.isInitial}
     $InitialDomainPrefix = $InitialDomain.Name.split(".")[0]
 
-    #Get SPOSiteIdentity
     $SPOSiteIdentity = Get-SPOSiteHelper -M365Environment $M365Environment -InitialDomainPrefix $InitialDomainPrefix
 
-    $SPOTenantInfo = ConvertTo-Json @($Tracker.TryCommand("Get-SPOTenant"))
-    $ExpectedResults = ConvertTo-Json @($Tracker.TryCommand("Get-SPOSite", @{"Identity"="$($SPOSiteIdentity)"}))
-    $TenantSyncInfo = ConvertTo-Json @($Tracker.TryCommand("Get-SPOTenantSyncClientRestriction"))
+
+    $SPOTenantInfo = ConvertTo-Json @()
+    $TenantSyncInfo = ConvertTo-Json @()
+    $UsedPnP = ConvertTo-Json $false
+    if ($UsePnP) {
+        $SPOTenantInfo = ConvertTo-Json @($Tracker.TryCommand("Get-PnPTenant"))
+        $TenantSyncInfo = ConvertTo-Json @($Tracker.TryCommand("Get-PnPTenantSyncClientRestriction"))
+        $UsedPnP = ConvertTo-Json $true
+    }
+    else {
+        $SPOTenantInfo = ConvertTo-Json @($Tracker.TryCommand("Get-SPOTenant"))
+        $TenantSyncInfo = ConvertTo-Json @($Tracker.TryCommand("Get-SPOTenantSyncClientRestriction"))
+    }
 
     $SuccessfulCommands = ConvertTo-Json @($Tracker.GetSuccessfulCommands())
     $UnSuccessfulCommands = ConvertTo-Json @($Tracker.GetUnSuccessfulCommands())
@@ -35,8 +48,8 @@ function Export-OneDriveProvider {
     # Note the spacing and the last comma in the json is important
     $json = @"
     "SPO_tenant_info": $SPOTenantInfo,
-    "Expected_results": $ExpectedResults,
     "Tenant_sync_info": $TenantSyncInfo,
+    "OD_used_PnP": $UsedPnp,
     "OneDrive_successful_commands": $SuccessfulCommands,
     "OneDrive_unsuccessful_commands": $UnSuccessfulCommands,
 "@

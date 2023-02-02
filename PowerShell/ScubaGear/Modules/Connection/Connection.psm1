@@ -126,12 +126,16 @@ function Connect-Tenant {
                     Add-PowerAppsAccount @AddPowerAppsParams | Out-Null
                 }
                 {($_ -eq "onedrive") -or ($_ -eq "sharepoint")} {
-                    if ($ServicePrincipalParams) {
-                        throw "currently not supported for OneDrive and SPO"
-                    }
                     if ($AADAuthRequired) {
                         $LimitedGraphParams = @{
                             'ErrorAction' = 'Stop';
+                        }
+                        if ($ServicePrincipalParams.CertThumbprintParams) {
+                            $LimitedGraphParams += @{
+                                CertificateThumbprint = $ServicePrincipalParams.CertThumbprintParams.CertificateThumbprint;
+                                ClientID = $ServicePrincipalParams.CertThumbprintParams.AppID;
+                                TenantId  = $ServicePrincipalParams.CertThumbprintParams.Organization; # Organization also works here
+                            }
                         }
                         switch ($M365Environment) {
                             "gcchigh" {
@@ -151,10 +155,25 @@ function Connect-Tenant {
                         $SPOParams = @{
                             'ErrorAction' = 'Stop';
                         }
+                        $PnPParams = @{
+                            'ErrorAction' = 'Stop';
+                        }
                         switch ($M365Environment) {
-                            {($_ -eq "commercial") -or ($_ -eq "gcc")} {
+                            "commercial" {
                                 $SPOParams += @{
                                     'Url'= "https://$($InitialDomainPrefix)-admin.sharepoint.com";
+                                }
+                                $PnPParams += @{
+                                    'Url'= "$($InitialDomainPrefix)-admin.sharepoint.com";
+                                }
+                            }
+                            "gcc" {
+                                $SPOParams += @{
+                                    'Url'= "https://$($InitialDomainPrefix)-admin.sharepoint.com";
+                                }
+                                $PnPParams += @{
+                                    'Url'= "$($InitialDomainPrefix)-admin.sharepoint.com";
+                                    'AzureEnvironment' = 'USGovernment'
                                 }
                             }
                             "gcchigh" {
@@ -162,15 +181,33 @@ function Connect-Tenant {
                                     'Url'= "https://$($InitialDomainPrefix)-admin.sharepoint.us";
                                     'Region' = "ITAR";
                                 }
+                                $PnPParams += @{
+                                    'Url'= "$($InitialDomainPrefix)-admin.sharepoint.us";
+                                    'AzureEnvironment' = 'USGovernmentHigh'
+                                }
                             }
                             "dod" {
                                 $SPOParams += @{
                                     'Url'= "https://$($InitialDomainPrefix)-admin.sharepoint-mil.us";
                                     'Region' = "ITAR";
                                 }
+                                $PnPParams += @{
+                                    'Url'= "$($InitialDomainPrefix)-admin.sharepoint-mil.us";
+                                    'AzureEnvironment' = 'USGovernmentDoD'
+                                }
                             }
                         }
-                        Connect-SPOService @SPOParams | Out-Null
+                        if ($ServicePrincipalParams.CertThumbprintParams) {
+                            $PnPParams += @{
+                                Thumbprint = $ServicePrincipalParams.CertThumbprintParams.CertificateThumbprint;
+                                ClientId = $ServicePrincipalParams.CertThumbprintParams.AppID;
+                                Tenant  = $ServicePrincipalParams.CertThumbprintParams.Organization; # Organization Domain is actually required here.
+                            }
+                            Connect-PnPOnline @PnPParams | Out-Null
+                        }
+                        else {
+                            Connect-SPOService @SPOParams | Out-Null
+                        }
                         $SPOAuthRequired = $false
                     }
                 }
@@ -251,6 +288,7 @@ function Disconnect-SCuBATenant {
 
                 if($Product -eq "sharepoint") {
                     Disconnect-SPOService -ErrorAction SilentlyContinue
+                    Disconnect-PnPOnline -ErrorAction SilentlyContinue
                 }
             }
             elseif ($Product -eq "teams") {

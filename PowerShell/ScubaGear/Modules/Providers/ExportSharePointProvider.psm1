@@ -11,7 +11,11 @@ function Export-SharePointProvider {
         [Parameter(Mandatory = $true)]
         [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $false)]
         [string]
-        $M365Environment
+        $M365Environment,
+
+        [Parameter(Mandatory = $false)]
+        [switch]
+        $UsePnP
     )
     $HelperFolderPath = Join-Path -Path $PSScriptRoot -ChildPath "ProviderHelpers"
     Import-Module (Join-Path -Path $HelperFolderPath -ChildPath "CommandTracker.psm1")
@@ -25,8 +29,18 @@ function Export-SharePointProvider {
     #Get SPOSiteIdentity
     $SPOSiteIdentity = Get-SPOSiteHelper -M365Environment $M365Environment -InitialDomainPrefix $InitialDomainPrefix
 
-    $SPOTenant = ConvertTo-Json @($Tracker.TryCommand("Get-SPOTenant"))
-    $SPOSite = ConvertTo-Json @($Tracker.TryCommand("Get-SPOSite", @{"Identity"="$($SPOSiteIdentity)"; "Detailed"=$true}) | Select-Object -Property *)
+
+    $SPOTenant = ConvertTo-Json @()
+    $SPOSite = ConvertTo-Json @()
+    if ($UsePnP) {
+        $SPOTenant = ConvertTo-Json @($Tracker.TryCommand("Get-PnPTenant"))
+        $SPOTenant = ConvertTo-Json @($Tracker.TryCommand("Get-PnPTenantSite", @{"Identity"="$($SPOSiteIdentity)"; "Detailed"=$true}) | Select-Object -Property *)
+    }
+    else {
+        $SPOTenant = ConvertTo-Json @($Tracker.TryCommand("Get-SPOTenant"))
+        $SPOSite = ConvertTo-Json @($Tracker.TryCommand("Get-SPOSite", @{"Identity"="$($SPOSiteIdentity)"; "Detailed"=$true}) | Select-Object -Property *)
+    }
+
 
     $SuccessfulCommands = ConvertTo-Json @($Tracker.GetSuccessfulCommands())
     $UnSuccessfulCommands = ConvertTo-Json @($Tracker.GetUnSuccessfulCommands())
