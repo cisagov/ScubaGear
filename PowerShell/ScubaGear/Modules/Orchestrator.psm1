@@ -40,6 +40,16 @@ function Invoke-SCuBA {
     Note: defender will ask for authentication even if this variable is set to `$false`
     .Parameter Version
     Will output the current ScubaGear version to the terminal without running this cmdlet.
+    .Parameter AppID
+    The application ID of the service principal that's used during certificate based
+    authentication. A valid value is the GUID of the application ID (service principal).
+    .Parameter CertificateThumbprint
+    The thumbprint value specifies the certificate that's used for certificate base authentication.
+    The underlying PowerShell modules retrieve the certificate from the user's certificate store.
+    As such, a copy of the certificate must be located there.
+    .Parameter Organization
+    Specify the organization that's used in certificate based authentication.
+    Use the tenant's tenantname.onmicrosoft.com domain for the parameter value.
     .Parameter OutPath
     The folder path where both the output JSON and the HTML report will be created.
     The folder will be created if it does not exist. Defaults to current directory.
@@ -77,6 +87,9 @@ function Invoke-SCuBA {
     Invoke-SCuBA -ProductNames aad,exo -M365Environment gcc -OPAPath . -OutPath . -DisconnectOnExit
     Run the tool against Azure Active Directory and Exchange Online security
     baselines, disconnecting connections for those products when complete.
+    .Example
+    Invoke-SCuBA -ProductNames * -CertificateThumbprint <insert-thumbprint> -AppID <insert-appid> -Organization "tenant.onmicrosoft.com"
+    This example will run the tool against all available security baselines while authenticating using a Service Principal with the CertificateThumprint bundle of parameters.
     .Functionality
     Public
     #>
@@ -912,7 +925,16 @@ function Invoke-RunCached {
     this variable to be `$false` to bypass the reauthenticating in the same session. Default is $true.
     .Parameter Version
     Will output the current ScubaGear version to the terminal without running this cmdlet.
-    .Parameter OutPath
+    .Parameter AppID
+    The application ID of the service principal that's used during certificate based
+    authentication. A valid value is the GUID of the application ID (service principal).
+    .Parameter CertificateThumbprint
+    The thumbprint value specifies the certificate that's used for certificate base authentication.
+    The underlying PowerShell modules retrieve the certificate from the user's certificate store.
+    As such, a copy of the certificate must be located there.
+    .Parameter Organization
+    Specify the organization that's used in certificate based authentication.
+    Use the tenant's tenantname.onmicrosoft.com domain for the parameter value.
     The folder path where both the output JSON and the HTML report will be created.
     The folder will be created if it does not exist. Defaults to current directory.
     .Parameter OutFolderName
@@ -943,6 +965,9 @@ function Invoke-RunCached {
     Invoke-RunCached -ProductNames * -M365Environment dod -OPAPath . -OutPath .
     This example will run the tool against all available security baselines with the
     'dod' teams endpoint.
+    .Example
+    Invoke-SCuBA -ProductNames * -CertificateThumbprint <insert-thumbprint> -AppID <insert-appid> -Organization "tenant.onmicrosoft.com"
+    This example will run the tool against all available security baselines while authenticating using a Service Principal with the CertificateThumprint bundle of parameters.
     .Functionality
     Public
     #>
@@ -978,6 +1003,18 @@ function Invoke-RunCached {
         [Parameter(ParameterSetName = 'Report')]
         [switch]
         $Version,
+
+        [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
+        [string]
+        $AppID,
+
+        [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
+        [string]
+        $CertificateThumbprint,
+
+        [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
+        [string]
+        $Organization,
 
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
@@ -1016,7 +1053,7 @@ function Invoke-RunCached {
             }
 
             if ($ProductNames -eq '*'){
-                $ProductNames = "teams", "exo", "defender", "aad", "sharepoint", "onedrive"
+                $ProductNames = "teams", "exo", "defender", "aad", "sharepoint", "onedrive", "powerplatform"
             }
 
             # The equivalent of ..\..
@@ -1063,6 +1100,7 @@ function Invoke-RunCached {
                     'ModuleVersion' = $ModuleVersion;
                     'OutFolderPath' = $OutFolderPath;
                     'OutProviderFileName' = $OutProviderFileName;
+                    'BoundParameters' = $PSBoundParameters;
                 }
                 Invoke-ProviderList @ProviderParams
             }
