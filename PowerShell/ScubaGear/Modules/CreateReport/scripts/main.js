@@ -1,15 +1,15 @@
-function colorRows() {
+let colorRows = () => {
     let rows = document.querySelectorAll('tr');
     const statusCol = 1;
     const criticalityCol = 2;
     for (let i = 0; i < rows.length; i++) {
-        if (rows[i].children[statusCol].innerHTML == "Fail") {
+        if (rows[i].children[statusCol].innerHTML === "Fail") {
             rows[i].style.background = "#deb8b8";
         }
-        else if (rows[i].children[statusCol].innerHTML == "Warning") {
+        else if (rows[i].children[statusCol].innerHTML === "Warning") {
             rows[i].style.background = "#fff7d6";
         }
-        else if (rows[i].children[statusCol].innerHTML == "Pass") {
+        else if (rows[i].children[statusCol].innerHTML === "Pass") {
             rows[i].style.background = "#d5ebd5";
         }
         else if (rows[i].children[criticalityCol].innerHTML.includes("Not-Implemented")) {
@@ -26,16 +26,22 @@ function colorRows() {
     }
 }
 
-/* For AAD Conditional Access Policies */
-let capColNames = ["Name", "", "State", "Users", "Apps/Actions", "Conditions", "Block/Grant Access", "Session Controls"];
+/*  For AAD Conditional Access Policies 
+    The "" column after "Name" is for the nameless column with the Show more/Show less buttons
+*/
+const capColNames = ["Name", "", "State", "Users", "Apps/Actions", "Conditions", "Block/Grant Access", "Session Controls"];
 
-function fillCAPTable() {
+let fillCAPTable = () => {
     /* For AAD Conditional Access Policies */
-    if (caps === null) {
+    if (caps === undefined || caps === null) {
         /*  The CAP table is only displayed for the AAD baseline, but
             this js file applies to all baselines. If caps is null,
             then the current baseline is not AAD and we don't need to
             do anything.
+
+            Also, note that caps isn't declared in the static version of
+            this file. It is prepended to the version rendered in the html
+            by CreateReport.ps1.
         */
        return;
     }
@@ -85,7 +91,7 @@ function fillCAPTable() {
         }
 
         let img = document.createElement("img");
-        img.setAttribute('src', 'angle-right-solid.svg');
+        img.setAttribute('src', 'images/angle-right-solid.svg');
         img.setAttribute('alt', 'Show more');
         img.setAttribute('title', 'Show more');
         img.style.width = '10px';
@@ -96,7 +102,7 @@ function fillCAPTable() {
     }
 }
 
-function fillTruncatedCell(td, i, j) {
+let fillTruncatedCell = (td, i, j) => {
     /*  For AAD Conditional Access Policies
         i is the row number (0-indexed, not counting the header row)
         j is the column number (0-indexed)
@@ -133,9 +139,9 @@ function fillTruncatedCell(td, i, j) {
     }
 }
 
-function hideCAPRow(evt) {
+let hideCAPRow = (event) => {
     /* For AAD Conditional Access Policies */
-    let i = evt.currentTarget.rowNumber;
+    let i = event.currentTarget.rowNumber;
     let tr = document.querySelector("#caps tr:nth-of-type(" + (i+2).toString() + ")"); /*i+2
     because nth-of-type is indexed from 1 and to account for the header row */
     for (let j = 0; j < capColNames.length; j++) {
@@ -143,7 +149,7 @@ function hideCAPRow(evt) {
         fillTruncatedCell(td, i, j);
     }
     let img = document.createElement("img");
-    img.setAttribute('src', 'angle-right-solid.svg');
+    img.setAttribute('src', 'images/angle-right-solid.svg');
     img.style.width = '10px';
     img.setAttribute('alt', 'Show more');
     img.setAttribute('title', 'Show more');
@@ -152,7 +158,7 @@ function hideCAPRow(evt) {
     tr.querySelectorAll('td')[1].appendChild(img);
 }
 
-function expandAllCAPs() {
+let expandAllCAPs = () => {
     /* For AAD Conditional Access Policies */
     let buttons = document.querySelectorAll("img[src*='angle-right-solid.svg']");
     for (let i = 0; i < buttons.length; i++) {
@@ -160,7 +166,7 @@ function expandAllCAPs() {
     }
 }
 
-function collapseAllCAPs() {
+let collapseAllCAPs = () => {
     /* For AAD Conditional Access Policies */
     let buttons = document.querySelectorAll("img[src*='angle-down-solid.svg']");
     for (let i = 0; i < buttons.length; i++) {
@@ -168,9 +174,9 @@ function collapseAllCAPs() {
     }
 }
 
-function expandCAPRow(evt) {
+let expandCAPRow = (event) => {
     /* For AAD Conditional Access Policies */
-    let i = evt.currentTarget.rowNumber;
+    let i = event.currentTarget.rowNumber;
     let tr = document.querySelector("#caps tr:nth-of-type(" + (i+2).toString() + ")"); /*i+2
     because nth-of-type is indexed from 1 and to account for the header row */
     for (let j = 0; j < capColNames.length; j++) {
@@ -180,7 +186,7 @@ function expandCAPRow(evt) {
         if (capColNames[j] === "") {
             td.innerHTML = "";
             let img = document.createElement("img");
-            img.setAttribute('src', 'angle-down-solid.svg');
+            img.setAttribute('src', 'images/angle-down-solid.svg');
             img.setAttribute('alt', 'Show less');
             img.setAttribute('title', 'Show less');
             img.style.width = '14px';

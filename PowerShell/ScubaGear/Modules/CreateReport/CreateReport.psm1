@@ -78,8 +78,8 @@ function New-Report {
                 # If neither of these keys are present, it means the provider for that baseline
                 # hasn't been updated to the updated error handling method. This check
                 # here ensures backwards compatibility until all providers are udpated.
-                $MissingCommands = $test.Commandlet | Where-Object {$SettingsExport."$($BaselineName)_successful_commands" -notcontains $_}
             }
+            $MissingCommands = $test.Commandlet | Where-Object {$SettingsExport."$($BaselineName)_successful_commands" -notcontains $_}
 
             if ($MissingCommands.Count -gt 0) {
                 $Result = "Error"
@@ -125,7 +125,8 @@ function New-Report {
     Add-Type -AssemblyName System.Web
 
     $ReporterPath = $PSScriptRoot
-    $ReportHTML = Get-Content $(Join-Path -Path $ReporterPath -ChildPath "ReportTemplate.html")
+    $ReportHTMLPath = Join-Path -Path $ReporterPath -ChildPath "IndividualReport"
+    $ReportHTML = (Get-Content $(Join-Path -Path $ReportHTMLPath -ChildPath "IndividualReport.html")) -Join "`n"
     $ReportHTML = $ReportHTML.Replace("{TITLE}", $Title)
 
     # Handle AAD-specific reporting
@@ -140,12 +141,18 @@ function New-Report {
         $CapJson = "null"
     }
 
-    $MainCSS = Get-Content $(Join-Path -Path $ReporterPath -ChildPath "main.css")
-    $ReportHTML = $ReportHTML.Replace("{MAIN_CSS}", "<style>$($MainCSS)</style>")
+    $CssPath = Join-Path -Path $ReporterPath -ChildPath "styles"
+    $MainCSS = (Get-Content $(Join-Path -Path $CssPath -ChildPath "main.css")) -Join "`n"
+    $ReportHTML = $ReportHTML.Replace("{MAIN_CSS}", "<style>
+        $($MainCSS)
+    </style>")
 
-    $MainJS = Get-Content $(Join-Path -Path $ReporterPath -ChildPath "main.js")
+    $ScriptsPath = Join-Path -Path $ReporterPath -ChildPath "scripts"
+    $MainJS = (Get-Content $(Join-Path -Path $ScriptsPath -ChildPath "main.js")) -Join "`n"
     $MainJS = "const caps = $($CapJson);`n$($MainJS)"
-    $ReportHTML = $ReportHTML.Replace("{MAIN_JS}", "<script>$($MainJS)</script>")
+    $ReportHTML = $ReportHTML.Replace("{MAIN_JS}", "<script>
+        $($MainJS)
+    </script>")
 
     $ReportHTML = $ReportHTML.Replace("{TABLES}", $Fragments)
     $FileName = Join-Path -Path $IndividualReportPath -ChildPath "$($BaselineName)Report.html"
