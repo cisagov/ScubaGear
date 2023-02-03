@@ -78,8 +78,8 @@ function New-Report {
                 # If neither of these keys are present, it means the provider for that baseline
                 # hasn't been updated to the updated error handling method. This check
                 # here ensures backwards compatibility until all providers are udpated.
+                $MissingCommands = $test.Commandlet | Where-Object {$SettingsExport."$($BaselineName)_successful_commands" -notcontains $_}
             }
-            $MissingCommands = $test.Commandlet | Where-Object {$SettingsExport."$($BaselineName)_successful_commands" -notcontains $_}
 
             if ($MissingCommands.Count -gt 0) {
                 $Result = "Error"
