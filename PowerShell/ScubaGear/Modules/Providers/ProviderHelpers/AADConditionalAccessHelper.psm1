@@ -48,7 +48,8 @@ class CapHelper {
         Internal
         #>
         $Missing = @()
-        if ($null -eq $Obj) {
+        if ($Obj -eq $null) {
+
             return $Missing
         }
         foreach ($Key in $Keys) {
@@ -205,7 +206,8 @@ class CapHelper {
         # Begin processing the CAP
         $Actions = @()
         if ($Cap.Conditions.Applications.IncludeApplications.Length -gt 0 -or
-            $null -ne $Cap.Conditions.Applications.ApplicationFilter.Mode) {
+            $Cap.Conditions.Applications.ApplicationFilter.Mode -ne $null ) {
+
             # For "Select what this policy applies to", "Cloud Apps" was  selected
             $Actions += "Policy applies to: apps"
             # Included apps:
