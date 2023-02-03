@@ -48,8 +48,9 @@ class CapHelper {
         Internal
         #>
         $Missing = @()
-        if ($Obj -eq $null) {
-
+        if ($null -eq $Obj) {
+            # Note that $null needs to come first in the above check to keep the
+            # linter happy. "$null should be on the left side of equality comparisons"
             return $Missing
         }
         foreach ($Key in $Keys) {
@@ -206,8 +207,7 @@ class CapHelper {
         # Begin processing the CAP
         $Actions = @()
         if ($Cap.Conditions.Applications.IncludeApplications.Length -gt 0 -or
-            $Cap.Conditions.Applications.ApplicationFilter.Mode -ne $null ) {
-
+            $null -ne $Cap.Conditions.Applications.ApplicationFilter.Mode) {
             # For "Select what this policy applies to", "Cloud Apps" was  selected
             $Actions += "Policy applies to: apps"
             # Included apps:
