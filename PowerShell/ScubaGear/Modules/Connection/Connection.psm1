@@ -82,7 +82,10 @@ function Connect-Tenant {
                         }
                     }
                     Connect-MgGraph @GraphParams | Out-Null
-                    Select-MgProfile -Name "Beta" -ErrorAction "Stop" | Out-Null
+                    $GraphProfile = (Get-MgProfile -ErrorAction "Stop").Name
+                    if ($GraphProfile.ToLower() -ne "beta") {
+                        Select-MgProfile -Name "Beta" -ErrorAction "Stop" | Out-Null
+                    }
                     $AADAuthRequired = $false
                 }
                 {($_ -eq "exo") -or ($_ -eq "defender")} {
@@ -146,7 +149,10 @@ function Connect-Tenant {
                             }
                         }
                         Connect-MgGraph @LimitedGraphParams | Out-Null
-                        Select-MgProfile -Name "Beta" -ErrorAction "Stop" | Out-Null
+                        $GraphProfile = (Get-MgProfile -ErrorAction "Stop").Name
+                        if ($GraphProfile.ToLower() -ne "beta") {
+                            Select-MgProfile -Name "Beta" -ErrorAction "Stop" | Out-Null
+                        }
                         $AADAuthRequired = $false
                     }
                     if ($SPOAuthRequired) {
