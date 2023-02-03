@@ -59,7 +59,7 @@ header a {
 }
 
 header h3:hover {
-    border-bottom: 5px solid #005288;   
+    border-bottom: 5px solid #005288;
 }
 
 td {
@@ -111,11 +111,11 @@ img {
 }
 
 #caps tr:nth-child(even){
-    background-color: #efecec;
+    background-color: #0052882d;
 }
 
 #caps tr:hover{
-    background-color: #d0d6f1;
+    background-color: #00528850;
 }
 
 #caps ul {
@@ -142,13 +142,13 @@ img {
     text-decoration:underline;
 }
 
-#caps .button {
-    margin-bottom: 10px;
-    display: block;
-}
-
 .buttons {
     display: flex;
     width: 200px;
     justify-content: space-between;
+    margin-bottom: 5px;
+}
+
+button {
+    cursor: pointer;
 }

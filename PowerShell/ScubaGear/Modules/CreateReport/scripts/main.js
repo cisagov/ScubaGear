@@ -37,10 +37,10 @@ const colorRows = () => {
 
 /**
  * For the conditional access policy table. For AAD only.
- * The "" column after "Name" is used for the nameless column that holds the
- * Show more / Show less buttons.
+ * The "" column is used for the nameless column that holds the
+ * "Show more" / "Show less" buttons.
  */
-const capColNames = ["Name", "", "State", "Users", "Apps/Actions", "Conditions", "Block/Grant Access", "Session Controls"];
+const capColNames = ["", "Name", "State", "Users", "Apps/Actions", "Conditions", "Block/Grant Access", "Session Controls"];
 
 /**
  * Creates the conditional access policy table at the end of the AAD report.
@@ -73,15 +73,13 @@ const fillCAPTable = () => {
         buttons.classList.add("buttons");
         capDiv.appendChild(buttons);
 
-        let expandAll = document.createElement("span");
-        expandAll.classList.add("button");
+        let expandAll = document.createElement("button");
         expandAll.appendChild(document.createTextNode("&#x2b; Expand all"));
         expandAll.title = "Expand all";
         expandAll.addEventListener("click", expandAllCAPs);
         buttons.appendChild(expandAll);
 
-        let collapseAll = document.createElement("span");
-        collapseAll.classList.add("button");
+        let collapseAll = document.createElement("button");
         collapseAll.appendChild(document.createTextNode("&minus; Collapse all"));
         collapseAll.title = "Collapse all";
         collapseAll.addEventListener("click", collapseAllCAPs);
@@ -113,7 +111,7 @@ const fillCAPTable = () => {
             img.style.width = '10px';
             img.rowNumber = i;
             img.addEventListener("click", expandCAPRow);
-            tr.querySelectorAll('td')[1].appendChild(img);
+            tr.querySelectorAll('td')[0].appendChild(img);
             table.appendChild(tr);
         }
     }
@@ -190,7 +188,7 @@ const hideCAPRow = (event) => {
         img.setAttribute('title', 'Show more');
         img.rowNumber = i;
         img.addEventListener("click", expandCAPRow);
-        tr.querySelectorAll('td')[1].appendChild(img);
+        tr.querySelectorAll('td')[0].appendChild(img);
     }
     catch (error) {
         console.error("Error in hideCAPRow");
@@ -255,7 +253,7 @@ const expandCAPRow = (event) => {
                 img.style.width = '14px';
                 img.rowNumber = i;
                 img.addEventListener("click", hideCAPRow);
-                tr.querySelectorAll('td')[1].appendChild(img);
+                tr.querySelectorAll('td')[0].appendChild(img);
             }
             else if (caps[i][capColNames[j]].constructor === Array && caps[i][capColNames[j]].length > 1) {
                 let ul = document.createElement("ul");
