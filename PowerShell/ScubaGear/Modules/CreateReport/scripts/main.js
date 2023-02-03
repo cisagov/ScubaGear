@@ -1,7 +1,7 @@
 /**
  * Adds the red, green, yellow, and gray coloring to the individual report pages.
  */
-let colorRows = () => {
+const colorRows = () => {
     let rows = document.querySelectorAll('tr');
     const statusCol = 1;
     const criticalityCol = 2;
@@ -46,7 +46,7 @@ const capColNames = ["Name", "", "State", "Users", "Apps/Actions", "Conditions",
  * Creates the conditional access policy table at the end of the AAD report.
  * For all other reports (e.g., teams), this function does nothing.
  */
-let fillCAPTable = () => {
+const fillCAPTable = () => {
     if (caps === undefined || caps === null) {
         /*  The CAP table is only displayed for the AAD baseline, but
             this js file applies to all baselines. If caps is null,
@@ -130,7 +130,7 @@ let fillCAPTable = () => {
  * @param {number} i The row number (0-indexed, not counting the header row).
  * @param {number} j The the column number (0-indexed).
  */
-let fillTruncatedCell = (td, i, j) => {
+const fillTruncatedCell = (td, i, j) => {
     try {
         const charLimit = 50;
         let content = "";
@@ -174,7 +174,7 @@ let fillTruncatedCell = (td, i, j) => {
  * event with the truncated version of the row. For AAD only.
  * @param {HTMLElement} event The target of the event.
  */
-let hideCAPRow = (event) => {
+const hideCAPRow = (event) => {
     try {
         let i = event.currentTarget.rowNumber;
         let tr = document.querySelector("#caps tr:nth-of-type(" + (i+2).toString() + ")"); /*i+2
@@ -202,7 +202,7 @@ let hideCAPRow = (event) => {
  * Expands all rows of the conditional access policy table to the full version.
  * For AAD only.
  */
-let expandAllCAPs = () => {
+const expandAllCAPs = () => {
     try {
         let buttons = document.querySelectorAll("img[src*='angle-right-solid.svg']");
         for (let i = 0; i < buttons.length; i++) {
@@ -219,7 +219,7 @@ let expandAllCAPs = () => {
  * Shrinks all rows of the conditional access policy table to the truncated
  * version. For AAD only.
  */
-let collapseAllCAPs = () => {
+const collapseAllCAPs = () => {
     try {
         let buttons = document.querySelectorAll("img[src*='angle-down-solid.svg']");
         for (let i = 0; i < buttons.length; i++) {
@@ -237,7 +237,7 @@ let collapseAllCAPs = () => {
  * event with the full version of the row. For AAD only.
  * @param {HTMLElement} event The target of the event.
  */
-let expandCAPRow = (event) => {
+const expandCAPRow = (event) => {
     try {
         let i = event.currentTarget.rowNumber;
         let tr = document.querySelector("#caps tr:nth-of-type(" + (i+2).toString() + ")"); /*i+2
