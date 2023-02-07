@@ -27,8 +27,6 @@ function Connect-Tenant {
     )
     Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "ConnectHelpers.psm1")
 
-    # $a = $ServicePrincipalParams | Out-String
-    # Write-Host $a
     # Prevent duplicate sign ins
     $EXOAuthRequired = $true
     $SPOAuthRequired = $true
