@@ -348,10 +348,13 @@ function Invoke-ProviderList {
         $SPOProviderParams = @{
             'M365Environment' = $M365Environment
         }
+
+        $PnPFlag = $false
         if ($BoundParameters.AppID) {
             $ServicePrincipalParams = Get-ServicePrincipalParams -BoundParameters $BoundParameters
             $ConnectTenantParams += @{ServicePrincipalParams = $ServicePrincipalParams;}
-            $SPOProviderParams += @{UsePnP = $true;}
+            $PnPFlag = $true
+            $SPOProviderParams += @{PnPFlag = $PnPFlag}
         }
 
         foreach ($Product in $ProductNames) {
@@ -381,7 +384,7 @@ function Invoke-ProviderList {
                     $RetVal = Export-PowerPlatformProvider -M365Environment $M365Environment | Select-Object -Last 1
                 }
                 "onedrive" {
-                    $RetVal = Export-OneDriveProvider @SPOProviderParams | Select-Object -Last 1
+                    $RetVal = Export-OneDriveProvider -PnPFlag:$PnPFlag | Select-Object -Last 1
                 }
                 "sharepoint" {
                     $RetVal = Export-SharePointProvider @SPOProviderParams | Select-Object -Last 1

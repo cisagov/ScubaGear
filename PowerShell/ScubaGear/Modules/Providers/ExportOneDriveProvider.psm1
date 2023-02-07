@@ -8,31 +8,18 @@ function Export-OneDriveProvider {
     #>
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory = $true)]
-        [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $false)]
-        [string]
-        $M365Environment,
-
         [Parameter(Mandatory = $false)]
         [switch]
-        $UsePnP
+        $PnPFlag
     )
     $HelperFolderPath = Join-Path -Path $PSScriptRoot -ChildPath "ProviderHelpers"
     Import-Module (Join-Path -Path $HelperFolderPath -ChildPath "CommandTracker.psm1")
-    Import-Module (Join-Path -Path $HelperFolderPath -ChildPath "SPOSiteHelper.psm1")
     $Tracker = Get-CommandTracker
-
-    #Get InitialDomainPrefix
-    $InitialDomain = ($Tracker.TryCommand("Get-MgOrganization")).VerifiedDomains | Where-Object {$_.isInitial}
-    $InitialDomainPrefix = $InitialDomain.Name.split(".")[0]
-
-    $SPOSiteIdentity = Get-SPOSiteHelper -M365Environment $M365Environment -InitialDomainPrefix $InitialDomainPrefix
-    Write-Verbose "This is the tenant's main sharepoint domain use this for -Identity calls: $($SPOSiteIdentity)"
 
     $SPOTenantInfo = ConvertTo-Json @()
     $TenantSyncInfo = ConvertTo-Json @()
     $UsedPnP = ConvertTo-Json $false
-    if ($UsePnP) {
+    if ($PnPFlag) {
         $SPOTenantInfo = ConvertTo-Json @($Tracker.TryCommand("Get-PnPTenant"))
         $TenantSyncInfo = ConvertTo-Json @($Tracker.TryCommand("Get-PnPTenantSyncClientRestriction"))
         $Tracker.AddSuccessfulCommand("Get-SPOTenant")
@@ -53,7 +40,7 @@ function Export-OneDriveProvider {
     $json = @"
     "SPO_tenant_info": $SPOTenantInfo,
     "Tenant_sync_info": $TenantSyncInfo,
-    "OD_used_PnP": $UsedPnp,
+    "OneDrive_PnP_Flag": $UsedPnp,
     "OneDrive_successful_commands": $SuccessfulCommands,
     "OneDrive_unsuccessful_commands": $UnSuccessfulCommands,
 "@

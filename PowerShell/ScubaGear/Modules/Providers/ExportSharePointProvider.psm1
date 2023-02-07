@@ -15,7 +15,7 @@ function Export-SharePointProvider {
 
         [Parameter(Mandatory = $false)]
         [switch]
-        $UsePnP
+        $PnPFlag
     )
     $HelperFolderPath = Join-Path -Path $PSScriptRoot -ChildPath "ProviderHelpers"
     Import-Module (Join-Path -Path $HelperFolderPath -ChildPath "CommandTracker.psm1")
@@ -32,7 +32,7 @@ function Export-SharePointProvider {
 
     $SPOTenant = ConvertTo-Json @()
     $SPOSite = ConvertTo-Json @()
-    if ($UsePnP) {
+    if ($PnPFlag) {
         $SPOTenant = ConvertTo-Json @($Tracker.TryCommand("Get-PnPTenant"))
         $SPOSite = ConvertTo-Json @($Tracker.TryCommand("Get-PnPTenantSite",@{"Identity"="$($SPOSiteIdentity)"; "Detailed"=$true}) | Select-Object -Property *)
         $Tracker.AddSuccessfulCommand("Get-SPOTenant")
