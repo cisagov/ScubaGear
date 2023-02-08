@@ -163,21 +163,12 @@ function Connect-Tenant {
                             'ErrorAction' = 'Stop';
                         }
                         switch ($M365Environment) {
-                            "commercial" {
+                            {($_ -eq "commercial") -or ($_ -eq "gcc")} {
                                 $SPOParams += @{
                                     'Url'= "https://$($InitialDomainPrefix)-admin.sharepoint.com";
                                 }
                                 $PnPParams += @{
                                     'Url'= "$($InitialDomainPrefix)-admin.sharepoint.com";
-                                }
-                            }
-                            "gcc" {
-                                $SPOParams += @{
-                                    'Url'= "https://$($InitialDomainPrefix)-admin.sharepoint.com";
-                                }
-                                $PnPParams += @{
-                                    'Url'= "$($InitialDomainPrefix)-admin.sharepoint.com";
-                                    'AzureEnvironment' = 'USGovernment'
                                 }
                             }
                             "gcchigh" {
