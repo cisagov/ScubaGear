@@ -21,60 +21,16 @@ Configuration Teams_2_1_Correct
             TenantId                                   = $ConfigurationData.NonNodeData.TenantId;
             CertificateThumbprint                      = $ConfigurationData.NonNodeData.CertificateThumbprint;
         }
-        # TeamsMeetingPolicy Tag_AllOn
-        # {
-        #     Ensure                                     = "Present";
-        #     AllowExternalParticipantGiveRequestControl = $False;
-        #     Identity                                   = "Tag:AllOn";
-        #     ApplicationId                              = $ConfigurationData.NonNodeData.ApplicationId;
-        #     TenantId                                   = $ConfigurationData.NonNodeData.TenantId;
-        #     CertificateThumbprint                      = $ConfigurationData.NonNodeData.CertificateThumbprint;
-        # }
-        # TeamsMeetingPolicy Tag_RestrictedAnonymousAccess
-        # {
-        #     Ensure                                     = "Present";
-        #     AllowExternalParticipantGiveRequestControl = $False;
-        #     Identity                                   = "Tag:RestrictedAnonymousAccess";
-        #     ApplicationId                              = $ConfigurationData.NonNodeData.ApplicationId;
-        #     TenantId                                   = $ConfigurationData.NonNodeData.TenantId;
-        #     CertificateThumbprint                      = $ConfigurationData.NonNodeData.CertificateThumbprint;
-        # }
-        # TeamsMeetingPolicy Tag_AllOff
-        # {
-        #     Ensure                                     = "Present";
-        #     AllowExternalParticipantGiveRequestControl = $False;
-        #     Identity                                   = "Tag:AllOff";
-        #     ApplicationId                              = $ConfigurationData.NonNodeData.ApplicationId;
-        #     TenantId                                   = $ConfigurationData.NonNodeData.TenantId;
-        #     CertificateThumbprint                      = $ConfigurationData.NonNodeData.CertificateThumbprint;
-        # }
-        # TeamsMeetingPolicy Tag_RestrictedAnonymousNoRecording
-        # {
-        #     Ensure                                     = "Present";
-        #     AllowExternalParticipantGiveRequestControl = $False;
-        #     Identity                                   = "Tag:RestrictedAnonymousNoRecording";
-        #     ApplicationId                              = $ConfigurationData.NonNodeData.ApplicationId;
-        #     TenantId                                   = $ConfigurationData.NonNodeData.TenantId;
-        #     CertificateThumbprint                      = $ConfigurationData.NonNodeData.CertificateThumbprint;
-        # }
-        # TeamsMeetingPolicy Tag_Default
-        # {
-        #     Ensure                                     = "Present";
-        #     AllowExternalParticipantGiveRequestControl = $False;
-        #     Identity                                   = "Tag:Default";
-        #     ApplicationId                              = $ConfigurationData.NonNodeData.ApplicationId;
-        #     TenantId                                   = $ConfigurationData.NonNodeData.TenantId;
-        #     CertificateThumbprint                      = $ConfigurationData.NonNodeData.CertificateThumbprint;
-        # }
-        # TeamsMeetingPolicy Tag_Kiosk
-        # {
-        #     Ensure                                     = "Present";
-        #     AllowExternalParticipantGiveRequestControl = $False;
-        #     Identity                                   = "Tag:Kiosk";
-        #     ApplicationId                              = $ConfigurationData.NonNodeData.ApplicationId;
-        #     TenantId                                   = $ConfigurationData.NonNodeData.TenantId;
-        #     CertificateThumbprint                      = $ConfigurationData.NonNodeData.CertificateThumbprint;
-        # }
+
+        TeamsMeetingPolicy Custom_Policy_1
+        {
+            Ensure                                     = "Present";
+            AllowExternalParticipantGiveRequestControl = $False;
+            Identity                                   = "Custom Policy 1";
+            ApplicationId                              = $ConfigurationData.NonNodeData.ApplicationId;
+            TenantId                                   = $ConfigurationData.NonNodeData.TenantId;
+            CertificateThumbprint                      = $ConfigurationData.NonNodeData.CertificateThumbprint;
+        }
     }
 }
 
