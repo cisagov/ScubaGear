@@ -15,7 +15,7 @@ Configuration Teams_2_9_Incorrect
         TeamsMeetingPolicy Global
         {
             Ensure                                     = "Present";
-            AllowCloudRecording:                       = $true;
+            AllowCloudRecording                        = $true;
             AllowRecordingStorageOutsideRegion         = $false;
             Identity                                   = "Global";
             ApplicationId                              = $ConfigurationData.NonNodeData.ApplicationId;
@@ -25,7 +25,7 @@ Configuration Teams_2_9_Incorrect
         TeamsMeetingPolicy Custom_Policy_1
         {
             Ensure                                     = "Present";
-            AllowCloudRecording:                       = $true;
+            AllowCloudRecording                        = $true;
             AllowRecordingStorageOutsideRegion         = $true;
             Identity                                   = "Custom Policy 1";
             ApplicationId                              = $ConfigurationData.NonNodeData.ApplicationId;
