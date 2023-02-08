@@ -40,6 +40,16 @@ function Invoke-SCuBA {
     Note: defender will ask for authentication even if this variable is set to `$false`
     .Parameter Version
     Will output the current ScubaGear version to the terminal without running this cmdlet.
+    .Parameter AppID
+    The application ID of the service principal that's used during certificate based
+    authentication. A valid value is the GUID of the application ID (service principal).
+    .Parameter CertificateThumbprint
+    The thumbprint value specifies the certificate that's used for certificate base authentication.
+    The underlying PowerShell modules retrieve the certificate from the user's certificate store.
+    As such, a copy of the certificate must be located there.
+    .Parameter Organization
+    Specify the organization that's used in certificate based authentication.
+    Use the tenant's tenantname.onmicrosoft.com domain for the parameter value.
     .Parameter OutPath
     The folder path where both the output JSON and the HTML report will be created.
     The folder will be created if it does not exist. Defaults to current directory.
@@ -77,6 +87,9 @@ function Invoke-SCuBA {
     Invoke-SCuBA -ProductNames aad,exo -M365Environment gcc -OPAPath . -OutPath . -DisconnectOnExit
     Run the tool against Azure Active Directory and Exchange Online security
     baselines, disconnecting connections for those products when complete.
+    .Example
+    Invoke-SCuBA -ProductNames * -CertificateThumbprint <insert-thumbprint> -AppID <insert-appid> -Organization "tenant.onmicrosoft.com"
+    This example will run the tool against all available security baselines while authenticating using a Service Principal with the CertificateThumprint bundle of parameters.
     .Functionality
     Public
     #>
@@ -112,6 +125,18 @@ function Invoke-SCuBA {
         [Parameter(ParameterSetName = 'Report')]
         [switch]
         $Version,
+
+        [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
+        [string]
+        $AppID,
+
+        [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
+        [string]
+        $CertificateThumbprint,
+
+        [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
+        [string]
+        $Organization,
 
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
@@ -173,6 +198,7 @@ function Invoke-SCuBA {
             'LogIn' = $LogIn;
             'ProductNames' = $ProductNames;
             'M365Environment' = $M365Environment;
+            'BoundParameters' = $PSBoundParameters;
         }
 
         $ProdAuthFailed = Invoke-Connection @ConnectionParams
@@ -194,6 +220,7 @@ function Invoke-SCuBA {
             'ModuleVersion' = $ModuleVersion;
             'OutFolderPath' = $OutFolderPath;
             'OutProviderFileName' = $OutProviderFileName;
+            'BoundParameters' = $PSBoundParameters;
         }
         $RegoParams = @{
             'ProductNames' = $ProductNames;
@@ -302,7 +329,11 @@ function Invoke-ProviderList {
 
         [Parameter(Mandatory=$true)]
         [string]
-        $OutProviderFileName
+        $OutProviderFileName,
+
+        [Parameter(Mandatory=$true)]
+        [hashtable]
+        $BoundParameters
     )
     process {
         # yes the syntax has to be like this
@@ -311,6 +342,21 @@ function Invoke-ProviderList {
 "@
         $N = 0
         $Len = $ProductNames.Length
+        $ConnectTenantParams = @{
+            'M365Environment' = $M365Environment
+        }
+        $SPOProviderParams = @{
+            'M365Environment' = $M365Environment
+        }
+
+        $PnPFlag = $false
+        if ($BoundParameters.AppID) {
+            $ServicePrincipalParams = Get-ServicePrincipalParams -BoundParameters $BoundParameters
+            $ConnectTenantParams += @{ServicePrincipalParams = $ServicePrincipalParams;}
+            $PnPFlag = $true
+            $SPOProviderParams += @{PnPFlag = $PnPFlag}
+        }
+
         foreach ($Product in $ProductNames) {
             $BaselineName = $ArgToProd[$Product]
             $N += 1
@@ -332,16 +378,16 @@ function Invoke-ProviderList {
                     $RetVal = Export-EXOProvider | Select-Object -Last 1
                 }
                 "defender" {
-                    $RetVal = Export-DefenderProvider -M365Environment $M365Environment  | Select-Object -Last 1
+                    $RetVal = Export-DefenderProvider @ConnectTenantParams  | Select-Object -Last 1
                 }
                 "powerplatform" {
                     $RetVal = Export-PowerPlatformProvider -M365Environment $M365Environment | Select-Object -Last 1
                 }
                 "onedrive" {
-                    $RetVal = Export-OneDriveProvider -M365Environment $M365Environment | Select-Object -Last 1
+                    $RetVal = Export-OneDriveProvider -PnPFlag:$PnPFlag | Select-Object -Last 1
                 }
                 "sharepoint" {
-                    $RetVal = Export-SharePointProvider -M365Environment $M365Environment | Select-Object -Last 1
+                    $RetVal = Export-SharePointProvider @SPOProviderParams | Select-Object -Last 1
                 }
                 "teams" {
                     $RetVal = Export-TeamsProvider | Select-Object -Last 1
@@ -719,17 +765,66 @@ function Invoke-Connection {
 
         [ValidateSet("commercial", "gcc", "gcchigh", "dod")]
         [string]
-        $M365Environment = "commercial"
+        $M365Environment = "commercial",
+
+        [Parameter(Mandatory=$true)]
+        [hashtable]
+        $BoundParameters
     )
 
     # Increase PowerShell Maximum Function Count to support version 5.1 limitation
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'MaximumFunctionCount')]
     $MaximumFunctionCount = 32000
 
+    $ConnectTenantParams = @{
+        'ProductNames' = $ProductNames;
+        'M365Environment' = $M365Environment
+    }
+
+    if ($BoundParameters.AppID) {
+        $ServicePrincipalParams = Get-ServicePrincipalParams -BoundParameters $BoundParameters
+        $ConnectTenantParams += @{ServicePrincipalParams = $ServicePrincipalParams;}
+    }
+
     if ($LogIn) {
-        $AnyFailedAuth = Connect-Tenant -ProductNames $ProductNames -M365Environment $M365Environment
+        $AnyFailedAuth = Connect-Tenant @ConnectTenantParams
         $AnyFailedAuth
     }
+}
+
+
+function Get-ServicePrincipalParams {
+    <#
+    .Description
+    Returns a valid a hastable of parameters for authentication via
+    Service Principal. Throws an error if there are none.
+    .Functionality
+    Internal
+    #>
+    [CmdletBinding()]
+    param(
+    [Parameter(Mandatory=$true)]
+    [hashtable]
+    $BoundParameters
+    )
+
+    $ServicePrincipalParams = @{}
+
+    $CheckThumbprintParams = ($BoundParameters.CertificateThumbprint) `
+    -and ($BoundParameters.AppID) -and ($BoundParameters.Organization)
+
+    if ($CheckThumbprintParams) {
+        $CertThumbprintParams = @{
+            CertificateThumbprint = $BoundParameters.CertificateThumbprint;
+            AppID = $BoundParameters.AppID;
+            Organization = $BoundParameters.Organization;
+        }
+        $ServicePrincipalParams += @{CertThumbprintParams = $CertThumbprintParams}
+    }
+    else {
+        throw "Missing parameters required for authentication with Service Principal Auth; Run Get-Help Invoke-Scuba for details on correct arguments"
+    }
+    $ServicePrincipalParams
 }
 
 function Import-Resources {
@@ -833,7 +928,16 @@ function Invoke-RunCached {
     this variable to be `$false` to bypass the reauthenticating in the same session. Default is $true.
     .Parameter Version
     Will output the current ScubaGear version to the terminal without running this cmdlet.
-    .Parameter OutPath
+    .Parameter AppID
+    The application ID of the service principal that's used during certificate based
+    authentication. A valid value is the GUID of the application ID (service principal).
+    .Parameter CertificateThumbprint
+    The thumbprint value specifies the certificate that's used for certificate base authentication.
+    The underlying PowerShell modules retrieve the certificate from the user's certificate store.
+    As such, a copy of the certificate must be located there.
+    .Parameter Organization
+    Specify the organization that's used in certificate based authentication.
+    Use the tenant's tenantname.onmicrosoft.com domain for the parameter value.
     The folder path where both the output JSON and the HTML report will be created.
     The folder will be created if it does not exist. Defaults to current directory.
     .Parameter OutFolderName
@@ -864,6 +968,9 @@ function Invoke-RunCached {
     Invoke-RunCached -ProductNames * -M365Environment dod -OPAPath . -OutPath .
     This example will run the tool against all available security baselines with the
     'dod' teams endpoint.
+    .Example
+    Invoke-SCuBA -ProductNames * -CertificateThumbprint <insert-thumbprint> -AppID <insert-appid> -Organization "tenant.onmicrosoft.com"
+    This example will run the tool against all available security baselines while authenticating using a Service Principal with the CertificateThumprint bundle of parameters.
     .Functionality
     Public
     #>
@@ -899,6 +1006,18 @@ function Invoke-RunCached {
         [Parameter(ParameterSetName = 'Report')]
         [switch]
         $Version,
+
+        [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
+        [string]
+        $AppID,
+
+        [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
+        [string]
+        $CertificateThumbprint,
+
+        [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
+        [string]
+        $Organization,
 
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
@@ -937,7 +1056,7 @@ function Invoke-RunCached {
             }
 
             if ($ProductNames -eq '*'){
-                $ProductNames = "teams", "exo", "defender", "aad", "sharepoint", "onedrive"
+                $ProductNames = "teams", "exo", "defender", "aad", "sharepoint", "onedrive", "powerplatform"
             }
 
             # The equivalent of ..\..
@@ -959,6 +1078,7 @@ function Invoke-RunCached {
                 'LogIn' = $LogIn;
                 'ProductNames' = $ProductNames;
                 'M365Environment' = $M365Environment;
+                'BoundParameters' = $PSBoundParameters;
             }
 
             # Rego Testing failsafe
@@ -983,6 +1103,7 @@ function Invoke-RunCached {
                     'ModuleVersion' = $ModuleVersion;
                     'OutFolderPath' = $OutFolderPath;
                     'OutProviderFileName' = $OutProviderFileName;
+                    'BoundParameters' = $PSBoundParameters;
                 }
                 Invoke-ProviderList @ProviderParams
             }
