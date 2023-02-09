@@ -41,8 +41,6 @@ Configuration Teams_All_Incorrect
             AllowTeamsConsumer                         = $True;
             AllowTeamsConsumerInbound                  = $True;
             AllowPublicUsers                           = $true;
-            AllowCloudRecording                        = $true;
-            AllowRecordingStorageOutsideRegion         = $true;
             Identity                                    = "Global";
             ApplicationId                               = $ConfigurationData.NonNodeData.ApplicationId;
             CertificateThumbprint                       = $ConfigurationData.NonNodeData.CertificateThumbprint;
@@ -56,6 +54,8 @@ Configuration Teams_All_Incorrect
             AutoAdmittedUsers                          = "Everyone";
             AllowPSTNUsersToBypassLobby                = $True;
             AllowAnonymousUsersToJoinMeeting           = $False;
+            AllowCloudRecording                        = $true;
+            AllowRecordingStorageOutsideRegion         = $true;
             Identity                                   = "Custom Policy 1";
             ApplicationId                              = $ConfigurationData.NonNodeData.ApplicationId;
             TenantId                                   = $ConfigurationData.NonNodeData.TenantId;
