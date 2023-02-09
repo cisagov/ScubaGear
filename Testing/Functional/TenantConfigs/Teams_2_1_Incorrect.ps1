@@ -1,5 +1,3 @@
-# Generated with Microsoft365DSC version 1.23.201.1
-# For additional information on how to use Microsoft365DSC, please visit https://aka.ms/M365DSC
 param (
 )
 

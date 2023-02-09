@@ -1,9 +1,7 @@
-# Generated with Microsoft365DSC version 1.23.201.1
-# For additional information on how to use Microsoft365DSC, please visit https://aka.ms/M365DSC
 param (
 )
 
-Configuration Teams_2_5_Inorrect
+Configuration Teams_2_5_Incorrect
 {
     param (
     )
@@ -14,9 +12,8 @@ Configuration Teams_2_5_Inorrect
     {
         TeamsFederationConfiguration Global
         {
-            Ensure                                     = "Present";
-            AllowTeamsConsumer                         = $true;
-            AllowTeamsConsumerInbound                  = $true;
+            AllowTeamsConsumer                         = $True;
+            AllowTeamsConsumerInbound                  = $True;
             Identity                                   = "Global";
             ApplicationId                              = $ConfigurationData.NonNodeData.ApplicationId;
             TenantId                                   = $ConfigurationData.NonNodeData.TenantId;
@@ -25,4 +22,4 @@ Configuration Teams_2_5_Inorrect
     }
 }
 
-Teams_2_5_Inorrect -ConfigurationData .\ConfigurationData.psd1
+Teams_2_5_Incorrect -ConfigurationData .\ConfigurationData.psd1
