@@ -86,11 +86,24 @@ const fillCAPTable = () => {
         buttons.appendChild(collapseAll);
 
         let table = document.createElement("table");
+        table.setAttribute("class", "caps_table");
         capDiv.appendChild(table);
 
         let header = document.createElement("tr");
         for (let i = 0; i < capColNames.length; i++) {
             let th = document.createElement("th");
+            if (capColNames[i] === "Apps/Actions") {
+                th.setAttribute("class", "apps_actions");
+            }
+            else if (capColNames[i] === "State") {
+                th.setAttribute("class", "state");
+            }
+            else if (capColNames[i] === "Users") {
+                th.setAttribute("class", "users");
+            }
+            else if (capColNames[i] === "Conditions") {
+                th.setAttribute("class", "conditions");
+            } 
             th.innerHTML = capColNames[i];
             header.appendChild(th);
         }
