@@ -25,6 +25,21 @@ function Export-AADProvider {
     $CapHelper = Get-CapTracker
     $CapTableData = $CapHelper.ExportCapPolicies($AllPolicies) # pre-processed version of the CAPs used in generating
     # the CAP html in the report
+
+    if ($CapTableData -eq "") {
+        # Quick sanity check, did ExportCapPolicies return something?
+        Write-Warning "Error parsing CAP data, empty json returned from ExportCapPolicies."
+        $CapTableData = "[]"
+    }
+    try {
+        # Final sanity check, did ExportCapPolicies return valid json?
+        ConvertFrom-Json $CapTableData -ErrorAction "Stop" | Out-Null
+    }
+    catch {
+        Write-Warning "Error parsing CAP data, invalid json returned from ExportCapPolicies."
+        $CapTableData = "[]"
+    }
+
     $AllPolicies = ConvertTo-Json -Depth 10 @($AllPolicies)
 
     # Get a list of the tenant's provisioned service plans - used to see if the tenant has AAD premium p2 license required for some checks
