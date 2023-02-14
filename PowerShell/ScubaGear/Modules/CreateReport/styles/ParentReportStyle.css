@@ -20,35 +20,35 @@ footer {
 
 a.individual_reports:link {
     font-family: Arial, Helvetica, sans-serif;
-    color: #005288;
+    color: var(--header-color);
     text-decoration: underline;
 }
 
 a.individual_reports:visited {
     font-family: Arial, Helvetica, sans-serif;
-    color: #85B065;
+    color: var(--link-color);
 }
 
 a.individual_reports:hover {
     font-family: Arial, Helvetica, sans-serif;
-    color: #85B065;
+    color: var(--link-color);
     text-decoration: none;
 }
 
 a.individual_reports:active {
     font-family: Arial, Helvetica, sans-serif;
-    color: #85B065;
+    color: var(--link-color);
     text-decoration: none;
 } 
 
 table.tenantdata tr:first-child {
-    color: black;
+    color: var(--text-color);
 }
 
-.failure { background-color: #deb8b8; }
-.warning { background-color: #fff7d6; }
-.pass { background-color: #d5ebd5; }
-.manual { background-color: #ebebf2; }
+.failure { background-color: var(--test-fail); }
+.warning { background-color: var(--test-warning); }
+.pass { background-color: var(--test-pass); }
+.manual { background-color: var(--test-other); }
 
 .error {
     background-color: #deb8b8; 

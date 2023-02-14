@@ -1,7 +1,45 @@
+/* document.getElementsByTagName('html')[0].dataset.theme = "dark"; */
+
+:root {
+    --background-primary: white;
+    --background-secondary: #b9bec2;
+    --border-color: black;
+    --test-pass: #d5ebd5;
+    --test-fail: #deb8b8;
+    --test-warning: #fff7d6;
+    --test-other: #ebebf2;
+    --cap-even: #0052882d;
+    --cap-hover: #00528850;
+    --header-color: #005288;
+    --note-color: #ee4e04;
+    --header-bottom: black;
+    --link-color: #85B065;
+    --text-color: black;
+}
+
+html[data-theme='dark'] {
+    --background-primary: #1f1b24;
+    --background-secondary: #121212;
+    --test-pass: #1d3b1d;
+    --test-fail: #501414;
+    --test-warning: #5a3b00;
+    --test-other: #414141;
+    --cap-even: #0052882d;
+    --cap-hover: #007ccf50;
+    --header-color: #b7c8d2;
+    --note-color: #ee4e04;
+    --header-bottom: rgb(221, 221, 221);
+    --link-color: #85B065;
+    --text-color: #bdbdbd;
+    --border-color: #7b7b7b;
+
+}
+
 body {
-    background-color: #b9bec2;
+    background-color: var(--background-secondary);
     -webkit-print-color-adjust:exact !important;
     print-color-adjust:exact !important;
+    color: var(--text-color);
 }
 
 table {
@@ -15,7 +53,7 @@ table {
 h3 {
     text-align: center;
     font-family: Arial, Helvetica, sans-serif;
-    color: #005288;
+    color: var(--header-color);
 }
 
 h4 {
@@ -23,7 +61,7 @@ h4 {
     justify-content: start;
     font-size: 10px;
     font-family: Arial, Helvetica, sans-serif;
-    color: #ee4e04;
+    color: var(--note-color);
     margin-left:20%;
     margin-right: 20%;
     margin-bottom:5px;
@@ -37,7 +75,7 @@ h4 {
 header {
     width: 1000px;
     margin: auto;
-    border-bottom: 1px solid black;
+    border-bottom: 1px solid var(--header-bottom);
     margin-bottom: 50px;
     display: flex;
     justify-content: space-between;
@@ -49,7 +87,7 @@ header h3 {
     padding: 10px;
     text-align: center;
     border-bottom: 5px solid rgba(0, 0, 0, 0);
-    color: #005288;
+    color: var(--header-color);
     display: table-cell;
     vertical-align: bottom;
 }
@@ -59,7 +97,7 @@ header a {
 }
 
 header h3:hover {
-    border-bottom: 5px solid #005288;
+    border-bottom: 5px solid var(--header-color);
 }
 
 td {
@@ -68,12 +106,17 @@ td {
     overflow-wrap: break-word;
 }
 
+td a {
+    color: var(--header-color);
+}
+
 table, th, td {
     border: 1px solid;
+    border-color: var(--border-color);
 }
 
 main {
-    background-color: white;
+    background-color: var(--background-primary);
     width: 1100px;
     margin: auto;
     position: relative;
@@ -83,7 +126,7 @@ main {
 h1 {
     text-align: center;
     font-family: Arial, Helvetica, sans-serif;
-    color: #005288;
+    color: var(--header-color);
     margin-top: 10px;
     margin-bottom: 20px;
 }
@@ -91,7 +134,7 @@ h1 {
 h2 {
     text-align: center;
     font-family: Arial, Helvetica, sans-serif;
-    color: #005288;
+    color: var(--header-color);
     font-size: 16px;
     margin-top: 50px;
 }
@@ -111,11 +154,11 @@ img {
 }
 
 #caps tr:nth-child(even){
-    background-color: #0052882d;
+    background-color: var(--cap-even);
 }
 
 #caps tr:hover{
-    background-color: #00528850;
+    background-color: var(--cap-hover);
 }
 
 #caps ul {
@@ -138,7 +181,7 @@ img {
 
 #caps span {
     cursor: pointer;
-    color: #005288;
+    color: var(--header-color);
     text-decoration:underline;
 }
 
