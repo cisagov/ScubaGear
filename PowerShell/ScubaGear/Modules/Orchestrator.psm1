@@ -595,8 +595,8 @@ function Invoke-ReportCreation {
         New-Item -Path $IndividualReportPath -ItemType "Directory" -ErrorAction "SilentlyContinue" | Out-Null
 
         $ReporterPath = Join-Path -Path $PSScriptRoot -ChildPath "CreateReport"
-        $Logo = Join-Path -Path $ReporterPath -ChildPath "cisa_logo.png"
-        Copy-Item -Path $Logo -Destination $IndividualReportPath -Force
+        $Images = Join-Path -Path $ReporterPath -ChildPath "images"
+        Copy-Item -Path $Images -Destination $IndividualReportPath -Force -Recurse
 
         foreach ($Product in $ProductNames) {
             $BaselineName = $ArgToProd[$Product]
@@ -668,15 +668,17 @@ function Invoke-ReportCreation {
         $TenantMetaData = $TenantMetaData -replace '^(.*?)<table>','<table class ="tenantdata" style = "text-align:center;">'
         $Fragment = $Fragment | ConvertTo-Html -Fragment
 
-        $ReportHTML = Get-Content $(Join-Path -Path $ReporterPath -ChildPath "ParentReportTemplate.html")
+        $ReportHtmlPath = Join-Path -Path $ReporterPath -ChildPath "ParentReport"
+        $ReportHTML = (Get-Content $(Join-Path -Path $ReportHtmlPath -ChildPath "ParentReport.html")) -Join "`n"
         $ReportHTML = $ReportHTML.Replace("{TENANT_DETAILS}", $TenantMetaData)
         $ReportHTML = $ReportHTML.Replace("{TABLES}", $Fragment)
         $ReportHTML = $ReportHTML.Replace("{MODULE_VERSION}", "v$ModuleVersion")
 
-        $MainCSS = Get-Content $(Join-Path -Path $ReporterPath -ChildPath "main.css")
+        $CssPath = Join-Path -Path $ReporterPath -ChildPath "styles"
+        $MainCSS = (Get-Content $(Join-Path -Path $CssPath -ChildPath "main.css")) -Join "`n"
         $ReportHTML = $ReportHTML.Replace("{MAIN_CSS}", "<style>$($MainCSS)</style>")
 
-        $ParentCSS = Get-Content $(Join-Path -Path $ReporterPath -ChildPath "ParentStyle.css")
+        $ParentCSS = (Get-Content $(Join-Path -Path $CssPath -ChildPath "ParentReportStyle.css")) -Join "`n"
         $ReportHTML = $ReportHTML.Replace("{PARENT_CSS}", "<style>$($ParentCSS)</style>")
 
         Add-Type -AssemblyName System.Web
