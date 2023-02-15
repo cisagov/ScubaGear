@@ -24,7 +24,7 @@ const colorRows = () => {
             }
             else if (rows[i].children[statusCol].innerHTML.includes("Error")) {
                 rows[i].style.background = "var(--test-fail)";
-                rows[i].querySelectorAll('td')[1].style.borderColor = "black";
+                rows[i].querySelectorAll('td')[1].style.borderColor = "var(--border-color)";
                 rows[i].querySelectorAll('td')[1].style.color = "#d10000";
             }
         }
@@ -32,6 +32,20 @@ const colorRows = () => {
             console.error(`Error in colorRows, i = ${i}`);
             console.error(error);
         }
+    }
+}
+
+/**
+ * Toggles light and dark mode
+ */
+const toggleDarkMode = () => {
+    if (document.getElementsByTagName('html')[0].dataset.theme == "dark") {
+        document.getElementsByTagName('html')[0].dataset.theme = "light";
+        document.querySelector("#toggle-text").innerHTML = "Light mode";
+    }
+    else {
+        document.getElementsByTagName('html')[0].dataset.theme = "dark";
+        document.querySelector("#toggle-text").innerHTML = "Dark mode";
     }
 }
 

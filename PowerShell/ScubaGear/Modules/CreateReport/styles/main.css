@@ -3,7 +3,6 @@
 :root {
     --background-primary: white;
     --background-secondary: #b9bec2;
-    --border-color: black;
     --test-pass: #d5ebd5;
     --test-fail: #deb8b8;
     --test-warning: #fff7d6;
@@ -15,6 +14,10 @@
     --header-bottom: black;
     --link-color: #85B065;
     --text-color: black;
+    --border-color: black;
+    --toggle-height: 25px;
+    --toggle-width: 46px;
+    --toggle-radius: 18px;
 }
 
 html[data-theme='dark'] {
@@ -76,7 +79,7 @@ header {
     width: 1000px;
     margin: auto;
     border-bottom: 1px solid var(--header-bottom);
-    margin-bottom: 50px;
+    margin-bottom: 25px;
     display: flex;
     justify-content: space-between;
     align-items: end;
@@ -215,3 +218,72 @@ th.users {
 th.conditions {
     width: 25%;
 }
+
+#toggle-text {
+    color: #7b7b7b;
+    margin-left: 50px;
+    margin-bottom: 5px;
+}
+
+/* The switch - the box around the slider */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: var(--toggle-width);
+    height: var(--toggle-height);
+    left: 50px;
+  }
+  
+  /* Hide default HTML checkbox */
+  .switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+  
+  /* The slider */
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #b9bec2;
+    -webkit-transition: .4s;
+    transition: .4s;
+  }
+  
+  .slider:before {
+    position: absolute;
+    content: "";
+    height: var(--toggle-radius);
+    width: var(--toggle-radius);
+    left: 4px;
+    bottom: 3.5px;
+    background-color: white;
+    -webkit-transition: .4s;
+    transition: .4s;
+  }
+  
+  input:checked + .slider {
+    background-color: #005288ad;
+  }
+  
+  input:focus + .slider {
+    box-shadow: 0 0 1px #005288ad;
+  }
+  
+  input:checked + .slider:before {
+    -webkit-transform: translateX(var(--toggle-radius));
+    -ms-transform: translateX(var(--toggle-radius));
+    transform: translateX(var(--toggle-radius));
+  }
+  
+  .slider.round {
+    border-radius: var(--toggle-height);
+  }
+  
+  .slider.round:before {
+    border-radius: 50%;
+  }

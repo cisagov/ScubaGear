@@ -51,6 +51,6 @@ table.tenantdata tr:first-child {
 .manual { background-color: var(--test-other); }
 
 .error {
-    background-color: #deb8b8; 
+    background-color: var(--test-fail); 
     color: #d10000;
 }
