@@ -59,7 +59,7 @@ header a {
 }
 
 header h3:hover {
-    border-bottom: 5px solid #005288;   
+    border-bottom: 5px solid #005288;
 }
 
 td {
@@ -98,4 +98,77 @@ h2 {
 
 img {
     width: 100px;
+}
+
+#caps {
+    width: 1000px;
+    margin: auto;
+    margin-top: 50px;
+}
+
+#caps h2 {
+    margin-top: 10px;
+}
+
+#caps tr:nth-child(even){
+    background-color: #0052882d;
+}
+
+#caps tr:hover{
+    background-color: #00528850;
+}
+
+#caps ul {
+    padding: 0;
+    padding-left: 2px;
+    list-style-position: inside;
+}
+
+#caps img:hover {
+    cursor: pointer;
+}
+
+#caps td:nth-child(1), #caps th:nth-child(1) {
+    border-right: none;
+}
+
+#caps td:nth-child(2), #caps th:nth-child(2) {
+    border-left: none;
+}
+
+#caps span {
+    cursor: pointer;
+    color: #005288;
+    text-decoration:underline;
+}
+
+.buttons {
+    display: flex;
+    width: 200px;
+    justify-content: space-between;
+    margin-bottom: 5px;
+}
+
+button {
+    cursor: pointer;
+}
+
+table.caps_table {
+    width: 100%
+}
+
+th.state {
+    text-align: center;
+}
+
+th.apps_actions {
+    width: 15%;
+}
+
+th.users {
+    width: 25%;
+}
+
+th.conditions {
+    width: 25%;
 }

@@ -12,7 +12,9 @@ test_FromScope_Correct if {
     Output := tests with input as {
         "transport_rule": [
             {
-                "FromScope" : "NotInOrganization"
+                "FromScope" : "NotInOrganization",
+                "State" : "Enabled",
+                "Mode" : "Enforce"
             }
         ]    
     }
@@ -24,14 +26,16 @@ test_FromScope_Correct if {
     RuleOutput[0].ReportDetails == "Requirement met"
 }
 
-test_FromScope_Incorrect if {
+test_FromScope_IncorrectV1 if {
     ControlNumber := "EXO 2.7"
     Requirement := "External sender warnings SHALL be implemented"
 
     Output := tests with input as {
         "transport_rule": [
             {
-                "FromScope" : ""
+                "FromScope" : "",
+                "State" : "Enabled",
+                "Mode" : "Audit"
             }
         ]    
     }
@@ -40,7 +44,70 @@ test_FromScope_Incorrect if {
  
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "No transport rule found with that applies to emails received from outside the organization"
+    RuleOutput[0].ReportDetails == "No transport rule found that applies warnings to emails received from outside the organization"
+}
+
+test_FromScope_IncorrectV2 if {
+    ControlNumber := "EXO 2.7"
+    Requirement := "External sender warnings SHALL be implemented"
+
+    Output := tests with input as {
+        "transport_rule": [
+            {
+                "FromScope" : "NotInOrganization",
+                "State" : "Disabled",
+                "Mode" : "Audit"
+            }
+        ]    
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+ 
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "No transport rule found that applies warnings to emails received from outside the organization"
+}
+
+test_FromScope_IncorrectV3 if {
+    ControlNumber := "EXO 2.7"
+    Requirement := "External sender warnings SHALL be implemented"
+
+    Output := tests with input as {
+        "transport_rule": [
+            {
+                "FromScope" : "",
+                "State" : "Enabled",
+                "Mode" : "AuditAndNotify"
+            }
+        ]    
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+ 
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "No transport rule found that applies warnings to emails received from outside the organization"
+}
+
+test_FromScope_IncorrectV4 if {
+    ControlNumber := "EXO 2.7"
+    Requirement := "External sender warnings SHALL be implemented"
+
+    Output := tests with input as {
+        "transport_rule": [
+            {
+                "FromScope" : "NotInOrganization",
+                "State" : "Disabled",
+                "Mode" : "AuditAndNotify"
+            }
+        ]    
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+ 
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "No transport rule found that applies warnings to emails received from outside the organization"
 }
 
 test_FromScope_Multiple_Correct if {
@@ -50,10 +117,24 @@ test_FromScope_Multiple_Correct if {
     Output := tests with input as {
         "transport_rule": [
             {
-                "FromScope" : ""
+                "FromScope" : "",
+                "State" : "Disabled",
+                "Mode" : "Enforce"
             },
             {
-                "FromScope" : "NotInOrganization"
+                "FromScope" : "",
+                "State" : "Enabled",
+                "Mode" : "Audit"
+            },
+            {
+                "FromScope" : "",
+                "State" : "Enabled",
+                "Mode" : "AuditAndNotify"
+            },
+            {
+                "FromScope" : "NotInOrganization",
+                "State" : "Enabled",
+                "Mode" : "Enforce"
             }
         ]    
     }
@@ -72,10 +153,34 @@ test_FromScope_Multiple_Incorrect if {
     Output := tests with input as {
         "transport_rule": [
             {
-                "FromScope" : ""
+                "FromScope" : "",
+                "State" : "Enabled",
+                "Mode":"Enforce"
             },
             {
-                "FromScope" : "Hello there"
+                "FromScope" : "Hello there",
+                "State" : "Enabled",
+                "Mode":"Audit"
+            },
+            {
+                "FromScope" : "Hello there",
+                "State" : "Enabled",
+                "Mode":"AuditAndNotify"
+            },
+            {
+                "FromScope" : "NotInOrganization",
+                "State" : "Enabled",
+                "Mode":"Audit"
+            },
+            {
+                "FromScope" : "NotInOrganization",
+                "State" : "Enabled",
+                "Mode":"AuditAndNotify"
+            },
+            {
+                "FromScope" : "NotInOrganization",
+                "State" : "Disabled",
+                "Mode":"Enforce"
             }
         ]    
     }
@@ -84,5 +189,5 @@ test_FromScope_Multiple_Incorrect if {
  
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "No transport rule found with that applies to emails received from outside the organization"
+    RuleOutput[0].ReportDetails == "No transport rule found that applies warnings to emails received from outside the organization"
 }

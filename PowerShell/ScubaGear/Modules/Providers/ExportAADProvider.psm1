@@ -19,7 +19,28 @@ function Export-AADProvider {
     # - 2.9
     # - 2.10
     # - 2.17 first part
-    $AllPolicies = ConvertTo-Json -Depth 10 @($Tracker.TryCommand("Get-MgIdentityConditionalAccessPolicy"))
+    $AllPolicies = $Tracker.TryCommand("Get-MgIdentityConditionalAccessPolicy")
+
+    Import-Module $PSScriptRoot/ProviderHelpers/AADConditionalAccessHelper.psm1
+    $CapHelper = Get-CapTracker
+    $CapTableData = $CapHelper.ExportCapPolicies($AllPolicies) # pre-processed version of the CAPs used in generating
+    # the CAP html in the report
+
+    if ($CapTableData -eq "") {
+        # Quick sanity check, did ExportCapPolicies return something?
+        Write-Warning "Error parsing CAP data, empty json returned from ExportCapPolicies."
+        $CapTableData = "[]"
+    }
+    try {
+        # Final sanity check, did ExportCapPolicies return valid json?
+        ConvertFrom-Json $CapTableData -ErrorAction "Stop" | Out-Null
+    }
+    catch {
+        Write-Warning "Error parsing CAP data, invalid json returned from ExportCapPolicies."
+        $CapTableData = "[]"
+    }
+
+    $AllPolicies = ConvertTo-Json -Depth 10 @($AllPolicies)
 
     # Get a list of the tenant's provisioned service plans - used to see if the tenant has AAD premium p2 license required for some checks
     # The Rego looks at the service_plans in the JSON
@@ -84,6 +105,7 @@ function Export-AADProvider {
     # Note the spacing and the last comma in the json is important
     $json = @"
     "conditional_access_policies": $AllPolicies,
+    "cap_table_data": $CapTableData,
     "authorization_policies": $AuthZPolicies,
     "admin_consent_policies": $AdminConsentReqPolicies,
     "privileged_users": $PrivilegedUsers,
