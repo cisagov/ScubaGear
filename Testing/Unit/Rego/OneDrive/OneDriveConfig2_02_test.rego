@@ -11,7 +11,7 @@ test_ExternalUserExpirationRequired_Correct_V1 if {
     Output := tests with input as {
         "SPO_tenant_info": [
             {
-                "OneDriveLoopSharingCapability" : 1,
+                "OneDriveSharingCapability" : 1,
                 "RequireAnonymousLinksExpireInDays" : 30,
                 "OneDriveRequestFilesLinkExpirationInDays" : 31    
 
@@ -33,7 +33,7 @@ test_ExternalUserExpirationRequired_Correct_V2 if {
     Output := tests with input as {
         "SPO_tenant_info": [
             {
-                "OneDriveLoopSharingCapability" : 2,
+                "OneDriveSharingCapability" : 2,
                 "RequireAnonymousLinksExpireInDays" : 1,
                 "OneDriveRequestFilesLinkExpirationInDays" : 30   
             }
@@ -54,7 +54,7 @@ test_ExternalUserExpirationRequired_Incorrect if {
     Output := tests with input as {
         "SPO_tenant_info": [
             {
-                "OneDriveLoopSharingCapability" : 2,
+                "OneDriveSharingCapability" : 2,
                 "RequireAnonymousLinksExpireInDays" : -1,
                 "OneDriveRequestFilesLinkExpirationInDays" : 30   
             }
@@ -75,7 +75,7 @@ test_ExternalUserExpirationRequired_Incorrect_V2 if {
     Output := tests with input as {
         "SPO_tenant_info": [
             {
-                "OneDriveLoopSharingCapability" : 2,
+                "OneDriveSharingCapability" : 2,
                 "RequireAnonymousLinksExpireInDays" : 1,
                 "OneDriveRequestFilesLinkExpirationInDays" : 10   
             }
