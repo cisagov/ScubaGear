@@ -1,3 +1,4 @@
+using module 'ScubaConfig\ScubaConfig.psm1'
 function Invoke-SCuBA {
     <#
     .SYNOPSIS
@@ -169,23 +170,32 @@ function Invoke-SCuBA {
                 $ProductNames = "teams", "exo", "defender", "aad", "sharepoint", "onedrive", "powerplatform"
             }
 
-            $ScubaConfig.ProductNames = $ProductNames | Sort-Object
-            $ScubaConfig.M365Environment = $M365Environment
-            $ScubaConfig.OPAPath = $OPAPath
-            $ScubaConfig.LogIn = $LogIn
-            $ScubaConfig.DisconnectOnExit = $DisconnectOnExit
-            $ScubaConfig.OutPath = $OutPath
-            $ScubaConfig.OutFolderName = $OutFolderName
-            $ScubaConfig.OutProviderFileName = $OutProviderFileName
-            $ScubaConfig.OutRegoFileName = $OutRegoFileName
-            $ScubaConfig.OutReportName = $OutReportName
+            $ProvidedParameters = @{
+                'ProductNames' = $ProductNames | Sort-Object
+                'M365Environment' = $M365Environment
+                'OPAPath' = $OPAPath
+                'LogIn' = $LogIn
+                'DisconnectOnExit' = $DisconnectOnExit
+                'OutPath' = $OutPath
+                'OutFolderName' = $OutFolderName
+                'OutProviderFileName' = $OutProviderFileName
+                'OutRegoFileName' = $OutRegoFileName
+                'OutReportName' = $OutReportName
+            }
+
+            $ScubaConfig = New-Object -Type PSObject -Property $ProvidedParameters
         }
 
         Remove-Resources
         Import-Resources # Imports Providers, RunRego, CreateReport, Connection
 
         if ($PSCmdlet.ParameterSetName -eq 'Configuration'){
-            Get-ScubaConfig -Path $ConfigFilePath
+            if (-Not ([ScubaConfig]::GetInstance().LoadConfig($ConfigFilePath))){
+                Write-Error -Message "The config file failed to load: $ConfigFilePath"
+            }
+            else {
+                $ScubaConfig = [ScubaConfig]::GetInstance().Configuration
+            }
         }
 
         # The equivalent of ..\..

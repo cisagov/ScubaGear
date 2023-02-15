@@ -1,50 +1,76 @@
-function Get-ScubaConfig {
-    <#
-    .Description
-    This function is used to read in a SCuBA configuration file and set the
-    "ScubaConfig" read only variable in local scope. The file must
-    be in JSON or YAML format and adhere to the SCUBA configuration schema.
-    .Functionality
-    Internal
-    #>
-    [CmdletBinding()]
-    param(
-        [Parameter(Mandatory = $true)]
-        [ValidateScript({
-            if (-Not ($_ | Test-Path)){
-                throw "SCuBA configuration file or folder does not exist."
-            }
-            if (-Not ($_ | Test-Path -PathType Leaf)){
-                throw "SCuBA configuration Path argument must be a file."
-            }
-            return $true
-        })]
-        [System.IO.FileInfo]
-        $Path
-    )
+class ScubaConfig {
+    hidden static [ScubaConfig]$_Instance = [ScubaConfig]::new()
+    hidden static [Boolean]$_IsLoaded = $false
 
-    $Content = Get-Content -Raw -Path $Path
-    $Config = $Content | ConvertFrom-Yaml
+    [Boolean]LoadConfig([System.IO.FileInfo]$Path){
+        if (-Not (Test-Path -PathType Leaf $Path)){
+            throw [System.IO.FileNotFoundException]"Failed to load: $Path"
+        }
+        elseif ($false -eq [ScubaConfig]::_IsLoaded){
+            $Content = Get-Content -Raw -Path $Path
+            $this.Configuration = $Content | ConvertFrom-Yaml
 
-    Set-Variable -Name "ScubaConfig" -Value $Config -Option AllScope -Scope Global -Description "SCuBA Configuration parameters"
-}
-
-function Remove-ScubaConfig {
-    <#
-    .Description
-    This function is used to remove the SCuBA configuration variable, "ScubaConfig".
-    .Functionality
-    Internal
-    #>
-
-    try {
-        $Result = Get-Variable -Name "ScubaConfig" -Scope Global -ErrorAction 'silentlycontinue'
-        if ($Result){
-            Remove-Variable -Name "ScubaConfig" -Scope Global -Force
+            $this.SetParameterDefaults()
+            [ScubaConfig]::_IsLoaded = $true
         }
 
+        return [ScubaConfig]::_IsLoaded
     }
-    catch{
-        Write-Debug "Variable, ScubaConfig, was not found"
+
+    hidden [Guid]$Uuid = [Guid]::NewGuid()
+    hidden [Object]$Configuration
+
+    hidden [void]SetParameterDefaults(){
+        if (-Not $this.Configuration.ProductNames){
+            $this.Configuration.ProductNames = "teams", "exo", "defender", "aad", "sharepoint", "onedrive", "powerplatform" | Sort-Object
+        }
+        else{
+            $this.Configuration.ProductNames = $this.Configuration.ProductNames | Sort-Object
+        }
+
+        if (-Not $this.Configuration.M365Environment){
+            $this.Configuration.M365Environment = 'commercial'
+        }
+
+        if (-Not $this.Configuration.OPAPath){
+            $this.Configuration.OPAPath = (Join-Path -Path $PSScriptRoot -ChildPath "..\..\..")
+        }
+
+        if (-Not $this.Configuration.LogIn){
+            $this.Configuration.LogIn = $true
+        }
+
+        if (-Not $this.Configuration.DisconnectOnExit){
+            $this.Configuration.DisconnectOnExit = $false
+        }
+
+        if (-Not $this.Configuration.OutPath){
+            $this.Configuration.OutPath = '.'
+        }
+
+        if (-Not $this.Configuration.OutFolderName){
+            $this.Configuration.OutFolderName = "M365BaselineConformance"
+        }
+
+        if (-Not $this.Configuration.OutProviderFileName){
+            $this.Configuration.OutProviderFileName = "ProviderSettingsExport"
+        }
+
+        if (-Not $this.Configuration.OutRegoFileName){
+            $this.Configuration.OutFolderName = "TestResults"
+        }
+
+        if (-Not $this.Configuration.OutReportName){
+            $this.Configuration.OutReportName = "BaselineReports"
+        }
+
+        return
+    }
+
+    hidden ScubaConfig(){
+    }
+
+    static [ScubaConfig]GetInstance(){
+        return [ScubaConfig]::_Instance
     }
 }
