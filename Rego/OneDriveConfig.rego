@@ -62,7 +62,7 @@ tests[{
     "Control" : "OneDrive 2.2",
     "Criticality" : "Should",
     "Commandlet" : ["Get-SPOTenant"],
-    "ActualValue" : [Policy.OneDriveSharingCapability, Policy.RequireAnonymousLinksExpireInDays, Policy.OneDriveRequestFilesLinkExpirationInDays],
+    "ActualValue" : [Policy.OneDriveSharingCapability, Policy.RequireAnonymousLinksExpireInDays],
     "ReportDetails" : ReportDetails2_2(Policy),
     "RequirementMet" : Status
 }] {
