@@ -12,9 +12,7 @@ test_ExternalUserExpirationRequired_Correct_V1 if {
         "SPO_tenant_info": [
             {
                 "OneDriveSharingCapability" : 1,
-                "RequireAnonymousLinksExpireInDays" : 30,
-                "OneDriveRequestFilesLinkExpirationInDays" : 31    
-
+                "RequireAnonymousLinksExpireInDays" : 30
             }
         ]        
     }
@@ -34,8 +32,7 @@ test_ExternalUserExpirationRequired_Correct_V2 if {
         "SPO_tenant_info": [
             {
                 "OneDriveSharingCapability" : 2,
-                "RequireAnonymousLinksExpireInDays" : 1,
-                "OneDriveRequestFilesLinkExpirationInDays" : 30   
+                "RequireAnonymousLinksExpireInDays" : 30
             }
         ]        
     }
@@ -55,29 +52,7 @@ test_ExternalUserExpirationRequired_Incorrect if {
         "SPO_tenant_info": [
             {
                 "OneDriveSharingCapability" : 2,
-                "RequireAnonymousLinksExpireInDays" : -1,
-                "OneDriveRequestFilesLinkExpirationInDays" : 30   
-            }
-        ]        
-    }
-
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement not met: Expiration date is not set"
-}
-
-test_ExternalUserExpirationRequired_Incorrect_V2 if {
-    ControlNumber := "OneDrive 2.2"
-    Requirement := "An expiration date SHOULD be set for Anyone links"
-
-    Output := tests with input as {
-        "SPO_tenant_info": [
-            {
-                "OneDriveSharingCapability" : 2,
-                "RequireAnonymousLinksExpireInDays" : 1,
-                "OneDriveRequestFilesLinkExpirationInDays" : 10   
+                "RequireAnonymousLinksExpireInDays" : 1
             }
         ]        
     }
