@@ -14,7 +14,7 @@ test_ExternalUserExpirationRequired_Correct_V1 if {
                 "OneDriveSharingCapability" : 1,
                 "RequireAnonymousLinksExpireInDays" : 30
             }
-        ]        
+        ]
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
@@ -34,7 +34,7 @@ test_ExternalUserExpirationRequired_Correct_V2 if {
                 "OneDriveSharingCapability" : 2,
                 "RequireAnonymousLinksExpireInDays" : 30
             }
-        ]        
+        ]
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
@@ -54,7 +54,7 @@ test_ExternalUserExpirationRequired_Incorrect if {
                 "OneDriveSharingCapability" : 2,
                 "RequireAnonymousLinksExpireInDays" : 1
             }
-        ]        
+        ]
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
