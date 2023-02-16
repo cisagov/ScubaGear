@@ -29,9 +29,9 @@ function Export-AADProvider {
         # The RequiredServicePlan variable is used so that PIM Cmdlets are only executed if the tenant has the premium license
         $RequiredServicePlan = $ServicePlans | Where-Object -Property ServicePlanName -eq -Value "AAD_PREMIUM_P2"
 
-        # A list of privileged users and their role assignments is used for 2.11 and 2.12
-        # If the tenant has the premium license then we want to process PIM Eligible role assignments - otherwise we don't to avoid an error
+        # Get-PrivilegedUser provides a list of privileged users and their role assignments. Used for 2.11 and 2.12
         if ($RequiredServicePlan) {
+            # If the tenant has the premium license then we want to also include PIM Eligible role assignments - otherwise we don't to avoid an API error
             $PrivilegedUsers = $Tracker.TryCommand("Get-PrivilegedUser", @{"TenantHasPremiumLicense"=$true})
         }
         else{
@@ -50,9 +50,10 @@ function Export-AADProvider {
         # above corrects the $null ConvertTo-Json would return in that case to an empty
         # dictionary
 
-        # 2.13 support for role ID and display name mapping
-        # 2.14 - 2.16 Azure AD PIM role settings
+        # Get-PrivilegedRole provides a list of privileged roles referenced in 2.13 when checking if MFA is required for those roles
+        # Get-PrivilegedRole provides data for 2.14 - 2.16, policies that evaluate conditions related to Azure AD PIM
         if ($RequiredServicePlan){
+            # If the tenant has the premium license then we want to also include PIM Eligible role assignments - otherwise we don't to avoid an API error
             $PrivilegedRoles = $Tracker.TryCommand("Get-PrivilegedRole", @{"TenantHasPremiumLicense"=$true})
         }
         else {
