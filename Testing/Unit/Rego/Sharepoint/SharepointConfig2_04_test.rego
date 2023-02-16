@@ -5,15 +5,15 @@ import future.keywords
 #
 # Policy 1
 #--
-test_ExternalUserExpirationRequired_Correct if {
+test_Multi_Correct if {
     ControlNumber := "Sharepoint 2.4"
-    Requirement := "Expiration timers for 'guest access to a site or OneDrive' and 'people who use a verification code' SHOULD be set"
+    Requirement := "Expiration timer for 'Guest access to a site or OneDrive' should be set to 30 days"
 
     Output := tests with input as {
         "SPO_tenant": [
             {
                 "ExternalUserExpirationRequired" : true,
-                "EmailAttestationRequired" : true
+                "ExternalUserExpireInDays" : 30
             }
         ]
     }
@@ -25,15 +25,15 @@ test_ExternalUserExpirationRequired_Correct if {
     RuleOutput[0].ReportDetails == "Requirement met"
 }
 
-test_ExternalUserExpirationRequired_Incorrect_V1 if {
+test_ExternalUserExpirationRequired_Incorrect if {
     ControlNumber := "Sharepoint 2.4"
-    Requirement := "Expiration timers for 'guest access to a site or OneDrive' and 'people who use a verification code' SHOULD be set"
+    Requirement := "Expiration timer for 'Guest access to a site or OneDrive' should be set to 30 days"
 
     Output := tests with input as {
         "SPO_tenant": [
             {
                 "ExternalUserExpirationRequired" : false,
-                "EmailAttestationRequired" : true
+                "ExternalUserExpireInDays" : 30
             }
         ]
     }
@@ -42,18 +42,18 @@ test_ExternalUserExpirationRequired_Incorrect_V1 if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement not met: 'Guest access to a site or OneDrive will expire automatically after this many days' must be enabled"
+    RuleOutput[0].ReportDetails == "Requirement not met: Expiration timer for 'Guest access to a site or OneDrive' NOT enabled"
 }
 
-test_ExternalUserExpirationRequired_Incorrect_V2 if {
+test_ExternalUserExpireInDays_Incorrect_V1 if {
     ControlNumber := "Sharepoint 2.4"
-    Requirement := "Expiration timers for 'guest access to a site or OneDrive' and 'people who use a verification code' SHOULD be set"
+    Requirement := "Expiration timer for 'Guest access to a site or OneDrive' should be set to 30 days"
 
     Output := tests with input as {
         "SPO_tenant": [
             {
                 "ExternalUserExpirationRequired" : true,
-                "EmailAttestationRequired" : false
+                "ExternalUserExpireInDays" : 29
             }
         ]
     }
@@ -62,18 +62,58 @@ test_ExternalUserExpirationRequired_Incorrect_V2 if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement not met: 'People who use a verification code must reauthenticate after this many days' must be enabled"
+    RuleOutput[0].ReportDetails == "Requirement not met: Expiration timer for 'Guest access to a site or OneDrive' NOT set to 30 days"
 }
 
-test_ExternalUserExpirationRequired_Incorrect_V3 if {
+test_ExternalUserExpireInDays_Incorrect_V2 if {
     ControlNumber := "Sharepoint 2.4"
-    Requirement := "Expiration timers for 'guest access to a site or OneDrive' and 'people who use a verification code' SHOULD be set"
+    Requirement := "Expiration timer for 'Guest access to a site or OneDrive' should be set to 30 days"
+
+    Output := tests with input as {
+        "SPO_tenant": [
+            {
+                "ExternalUserExpirationRequired" : true,
+                "ExternalUserExpireInDays" : 31
+            }
+        ]
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "Requirement not met: Expiration timer for 'Guest access to a site or OneDrive' NOT set to 30 days"
+}
+
+test_Multi_Incorrect_V1 if {
+    ControlNumber := "Sharepoint 2.4"
+    Requirement := "Expiration timer for 'Guest access to a site or OneDrive' should be set to 30 days"
 
     Output := tests with input as {
         "SPO_tenant": [
             {
                 "ExternalUserExpirationRequired" : false,
-                "EmailAttestationRequired" : false
+                "ExternalUserExpireInDays" : 29
+            }
+        ]
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "Requirement not met"
+}
+
+test_Multi_Incorrect_V2 if {
+    ControlNumber := "Sharepoint 2.4"
+    Requirement := "Expiration timer for 'Guest access to a site or OneDrive' should be set to 30 days"
+
+    Output := tests with input as {
+        "SPO_tenant": [
+            {
+                "ExternalUserExpirationRequired" : false,
+                "ExternalUserExpireInDays" : 31
             }
         ]
     }
@@ -88,14 +128,14 @@ test_ExternalUserExpirationRequired_Incorrect_V3 if {
 #
 # Policy 2
 #--
-test_ExternalUserExpireInDays_Correct if {
+test_Multi_Correct if {
     ControlNumber := "Sharepoint 2.4"
-    Requirement := "Expiration timers SHOULD be set to 30 days"
+    Requirement := "Expiration timer for 'People who use a verification code' should be set to 30 days"
 
     Output := tests with input as {
         "SPO_tenant": [
             {
-                "ExternalUserExpireInDays" : 30,
+                "EmailAttestationRequired" : true,
                 "EmailAttestationReAuthDays" : 30
             }
         ]
@@ -108,14 +148,14 @@ test_ExternalUserExpireInDays_Correct if {
     RuleOutput[0].ReportDetails == "Requirement met"
 }
 
-test_ExternalUserExpireInDays_Incorrect_V1 if {
+test_EmailAttestationRequired_Incorrect if {
     ControlNumber := "Sharepoint 2.4"
-    Requirement := "Expiration timers SHOULD be set to 30 days"
+    Requirement := "Expiration timer for 'People who use a verification code' should be set to 30 days"
 
     Output := tests with input as {
         "SPO_tenant": [
             {
-                "ExternalUserExpireInDays" : 29,
+                "EmailAttestationRequired" : false,
                 "EmailAttestationReAuthDays" : 30
             }
         ]
@@ -125,37 +165,17 @@ test_ExternalUserExpireInDays_Incorrect_V1 if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement not met: 'Guest access to a site or OneDrive will expire automatically after this many days' must be 30 days"
-}
-
-test_ExternalUserExpireInDays_Incorrect_V2 if {
-    ControlNumber := "Sharepoint 2.4"
-    Requirement := "Expiration timers SHOULD be set to 30 days"
-
-    Output := tests with input as {
-        "SPO_tenant": [
-            {
-                "ExternalUserExpireInDays" : 31,
-                "EmailAttestationReAuthDays" : 30
-            }
-        ]
-    }
-
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement not met: 'Guest access to a site or OneDrive will expire automatically after this many days' must be 30 days"
+    RuleOutput[0].ReportDetails == "Requirement not met: Expiration timer for 'People who use a verification code' NOT enabled"
 }
 
 test_EmailAttestationReAuthDays_Incorrect_V1 if {
     ControlNumber := "Sharepoint 2.4"
-    Requirement := "Expiration timers SHOULD be set to 30 days"
+    Requirement := "Expiration timer for 'People who use a verification code' should be set to 30 days"
 
     Output := tests with input as {
         "SPO_tenant": [
             {
-                "ExternalUserExpireInDays" : 30,
+                "EmailAttestationRequired" : true,
                 "EmailAttestationReAuthDays" : 29
             }
         ]
@@ -165,17 +185,17 @@ test_EmailAttestationReAuthDays_Incorrect_V1 if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement not met: 'People who use a verification code must reauthenticate after this many days' must be 30 days"
+    RuleOutput[0].ReportDetails == "Requirement not met: Expiration timer for 'People who use a verification code' NOT set to 30 days"
 }
 
 test_EmailAttestationReAuthDays_Incorrect_V2 if {
     ControlNumber := "Sharepoint 2.4"
-    Requirement := "Expiration timers SHOULD be set to 30 days"
+    Requirement := "Expiration timer for 'People who use a verification code' should be set to 30 days"
 
     Output := tests with input as {
         "SPO_tenant": [
             {
-                "ExternalUserExpireInDays" : 30,
+                "EmailAttestationRequired" : true,
                 "EmailAttestationReAuthDays" : 31
             }
         ]
@@ -185,17 +205,17 @@ test_EmailAttestationReAuthDays_Incorrect_V2 if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement not met: 'People who use a verification code must reauthenticate after this many days' must be 30 days"
+    RuleOutput[0].ReportDetails == "Requirement not met: Expiration timer for 'People who use a verification code' NOT set to 30 days"
 }
 
 test_Multi_Incorrect_V1 if {
     ControlNumber := "Sharepoint 2.4"
-    Requirement := "Expiration timers SHOULD be set to 30 days"
+    Requirement := "Expiration timer for 'People who use a verification code' should be set to 30 days"
 
     Output := tests with input as {
         "SPO_tenant": [
             {
-                "ExternalUserExpireInDays" : 29,
+                "EmailAttestationRequired" : false,
                 "EmailAttestationReAuthDays" : 29
             }
         ]
@@ -210,12 +230,12 @@ test_Multi_Incorrect_V1 if {
 
 test_Multi_Incorrect_V2 if {
     ControlNumber := "Sharepoint 2.4"
-    Requirement := "Expiration timers SHOULD be set to 30 days"
+    Requirement := "Expiration timer for 'People who use a verification code' should be set to 30 days"
 
     Output := tests with input as {
         "SPO_tenant": [
             {
-                "ExternalUserExpireInDays" : 31,
+                "EmailAttestationRequired" : false,
                 "EmailAttestationReAuthDays" : 31
             }
         ]

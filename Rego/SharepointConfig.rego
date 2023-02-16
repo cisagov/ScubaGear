@@ -188,7 +188,7 @@ tests[{
     "RequirementMet" : Status
 }] {
     Policy := input.SPO_tenant[_]
-    Conditions := [Policy.EmailAttestationRequired == true, Policy.EmailAttestationReAuthDays != 30]
+    Conditions := [Policy.EmailAttestationRequired == true, Policy.EmailAttestationReAuthDays == 30]
     Status := count([Condition | Condition = Conditions[_]; Condition == false]) == 0
 }
 #--
