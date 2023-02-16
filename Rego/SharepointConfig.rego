@@ -35,46 +35,53 @@ tests[{
 #
 # Baseline 2.2: Policy 1
 #--
-ReportDetails2_2(Policy) = Description if {
-    Policy.SharingCapability == 1
-    Policy.SharingDomainRestrictionMode == 1
-	Description := "Requirement met"
-}
-
-ReportDetails2_2(Policy) = Description if {
-    Policy.SharingCapability != 1
-    Policy.SharingDomainRestrictionMode == 1
-	Description := "Requirement not met: Sharepoint sharing slider must be set to 'New and Existing Guests'"
-}
-
-ReportDetails2_2(Policy) = Description if {
-    Policy.SharingCapability == 1
-    Policy.SharingDomainRestrictionMode != 1
-	Description := "Requirement not met: 'Limit external sharing by domain' must be enabled"
-}
-
-ReportDetails2_2(Policy) = Description if {
-    Policy.SharingCapability != 1
-    Policy.SharingDomainRestrictionMode != 1
-	Description := "Requirement not met"
-}
-
 tests[{
     "Requirement" : "External sharing SHOULD be limited to approved domains and security groups per interagency collaboration needs",
     "Control" : "Sharepoint 2.2",
     "Criticality" : "Should",
     "Commandlet" : ["Get-SPOTenant"],
-    "ActualValue" : [Policy.SharingCapability, Policy.SharingDomainRestrictionMode],
-    "ReportDetails" : ReportDetails2_2(Policy),
+    "ActualValue" : Policy.SharingCapability,
+    "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
     Policy := input.SPO_tenant[_]
-    # TODO: Missing Allow only users in specific security groups to share externally
-    Conditions := [Policy.SharingCapability == 1, Policy.SharingDomainRestrictionMode == 1]
-    Status := count([Condition | Condition = Conditions[_]; Condition == false]) == 0
+    Status := Policy.SharingCapability != 2
 }
 #--
 
+#
+# Baseline 2.2: Policy 2
+#--
+#tests[{
+#    "Requirement" : "External sharing SHOULD be limited to approved domains and security groups per interagency collaboration needs",
+#    "Control" : "Sharepoint 2.2",
+#    "Criticality" : "Should",
+#    "Commandlet" : ["Get-SPOTenant"],
+#    "ActualValue" : Policy.SharingDomainRestrictionMode,
+#    "ReportDetails" : ReportDetailsBoolean(Status),
+#    "RequirementMet" : Status
+#}] {
+#    Policy := input.SPO_tenant[_]
+#    Status := Policy.SharingDomainRestrictionMode == 1
+#}
+#--
+
+#
+# Baseline 2.2: Policy 3
+#--
+#tests[{
+#    "Requirement" : "External sharing SHOULD be limited to approved domains and security groups per interagency collaboration needs",
+#    "Control" : "Sharepoint 2.2",
+#    "Criticality" : "Should",
+#    "Commandlet" : ["Get-SPOTenant"],
+#    "ActualValue" : [Policy.SharingCapability, Policy.SharingDomainRestrictionMode],
+#    "ReportDetails" : ReportDetails2_2(Policy),
+#    "RequirementMet" : Status
+#}] {
+#    Policy := input.SPO_tenant[_]
+    # TODO: Missing Allow only users in specific security groups to share externally
+#}
+#--
 
 ################
 # Baseline 2.3 #
@@ -107,39 +114,39 @@ tests[{
 #--
 ReportDetails2_4_1(Policy) = Description if {
     Policy.ExternalUserExpirationRequired == true
-    Policy.EmailAttestationRequired == true
+    Policy.ExternalUserExpireInDays == 30
 	Description := "Requirement met"
 }
 
 ReportDetails2_4_1(Policy) = Description if {
     Policy.ExternalUserExpirationRequired == false
-    Policy.EmailAttestationRequired == true
-	Description := "Requirement not met: 'Guest access to a site or OneDrive will expire automatically after this many days' must be enabled"
+    Policy.ExternalUserExpireInDays == 30
+	Description := "Requirement not met: Expiration timer for 'Guest access to a site or OneDrive' NOT enabled"
 }
 
 ReportDetails2_4_1(Policy) = Description if {
     Policy.ExternalUserExpirationRequired == true
-    Policy.EmailAttestationRequired == false
-	Description := "Requirement not met: 'People who use a verification code must reauthenticate after this many days' must be enabled"
+    Policy.ExternalUserExpireInDays != 30
+	Description := "Requirement not met: Expiration timer for 'Guest access to a site or OneDrive' NOT set to 30 days"
 }
 
 ReportDetails2_4_1(Policy) = Description if {
     Policy.ExternalUserExpirationRequired == false
-    Policy.EmailAttestationRequired == false
+    Policy.ExternalUserExpireInDays != 30
 	Description := "Requirement not met"
 }
 
 tests[{
-    "Requirement" : "Expiration timers for 'guest access to a site or OneDrive' and 'people who use a verification code' SHOULD be set",
+    "Requirement" : "Expiration timer for 'Guest access to a site or OneDrive' should be set to 30 days",
     "Control" : "Sharepoint 2.4",
     "Criticality" : "Should",
     "Commandlet" : ["Get-SPOTenant"],
-    "ActualValue" : [Policy.ExternalUserExpirationRequired, Policy.EmailAttestationRequired],
+    "ActualValue" : [Policy.ExternalUserExpirationRequired, Policy.ExternalUserExpireInDays],
     "ReportDetails" : ReportDetails2_4_1(Policy),
     "RequirementMet" : Status
 }] {
     Policy := input.SPO_tenant[_]
-    Conditions := [Policy.ExternalUserExpirationRequired == true, Policy.EmailAttestationRequired == true]
+    Conditions := [Policy.ExternalUserExpirationRequired == true, Policy.ExternalUserExpireInDays == 30]
     Status := count([Condition | Condition = Conditions[_]; Condition == false]) == 0
 }
 #--
@@ -148,40 +155,40 @@ tests[{
 # Baseline 2.4: Policy 2
 #--
 ReportDetails2_4_2(Policy) = Description if {
-    Policy.ExternalUserExpireInDays == 30
+    Policy.EmailAttestationRequired == true
     Policy.EmailAttestationReAuthDays == 30
 	Description := "Requirement met"
 }
 
 ReportDetails2_4_2(Policy) = Description if {
-    Policy.ExternalUserExpireInDays != 30
+    Policy.EmailAttestationRequired == false
     Policy.EmailAttestationReAuthDays == 30
-	Description := "Requirement not met: 'Guest access to a site or OneDrive will expire automatically after this many days' must be 30 days"
+	Description := "Requirement not met: Expiration timer for 'People who use a verification code' NOT enabled"
 }
 
 ReportDetails2_4_2(Policy) = Description if {
-    Policy.ExternalUserExpireInDays == 30
+    Policy.EmailAttestationRequired == true
     Policy.EmailAttestationReAuthDays != 30
-	Description := "Requirement not met: 'People who use a verification code must reauthenticate after this many days' must be 30 days"
+	Description := "Requirement not met: Expiration timer for 'People who use a verification code' NOT set to 30 days"
 }
 
 ReportDetails2_4_2(Policy) = Description if {
-    Policy.ExternalUserExpireInDays != 30
+    Policy.EmailAttestationRequired == false
     Policy.EmailAttestationReAuthDays != 30
 	Description := "Requirement not met"
 }
 
 tests[{
-    "Requirement" : "Expiration timers SHOULD be set to 30 days",
+    "Requirement" : "Expiration timer for 'People who use a verification code' should be set to 30 days",
     "Control" : "Sharepoint 2.4",
     "Criticality" : "Should",
     "Commandlet" : ["Get-SPOTenant"],
-    "ActualValue" : [Policy.ExternalUserExpireInDays, Policy.EmailAttestationReAuthDays],
+    "ActualValue" : [Policy.EmailAttestationRequired, Policy.EmailAttestationReAuthDays],
     "ReportDetails" : ReportDetails2_4_2(Policy),
     "RequirementMet" : Status
 }] {
     Policy := input.SPO_tenant[_]
-    Conditions := [Policy.ExternalUserExpireInDays == 30, Policy.EmailAttestationReAuthDays == 30]
+    Conditions := [Policy.EmailAttestationRequired == true, Policy.EmailAttestationReAuthDays != 30]
     Status := count([Condition | Condition = Conditions[_]; Condition == false]) == 0
 }
 #--
