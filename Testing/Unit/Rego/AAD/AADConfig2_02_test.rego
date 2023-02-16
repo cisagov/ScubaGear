@@ -15,12 +15,12 @@ test_Conditions_Correct if {
             "Conditions": {
                 "Applications": {"IncludeApplications": ["All"]},
                 "Users": {
-                    "IncludeUsers": ["All"],
-                    "ExcludeUsers": [],
-                    "IncludeGroups": ["All"],
-                    "ExcludeGroups": [],
-                    "IncludeRoles": ["All"],
-                    "ExcludeRoles": []
+                        "IncludeUsers": ["All"],
+                        "ExcludeUsers": [],
+                        "IncludeGroups": ["<undefined>"],
+                        "ExcludeGroups": [],
+                        "IncludeRoles": ["<undefined>"],
+                        "ExcludeRoles": []
                 },
                 "UserRiskLevels": ["high"]
             },
@@ -57,12 +57,12 @@ test_IncludeApplications_Incorrect if {
             "Conditions": {
                 "Applications": {"IncludeApplications": ["Office365"]},
                 "Users": {
-                    "IncludeUsers": ["All"],
-                    "ExcludeUsers": [],
-                    "IncludeGroups": ["All"],
-                    "ExcludeGroups": [],
-                    "IncludeRoles": ["All"],
-                    "ExcludeRoles": []
+                        "IncludeUsers": ["All"],
+                        "ExcludeUsers": [],
+                        "IncludeGroups": ["<undefined>"],
+                        "ExcludeGroups": [],
+                        "IncludeRoles": ["<undefined>"],
+                        "ExcludeRoles": []
                 },
                 "UserRiskLevels": ["high"]
             },
@@ -100,12 +100,12 @@ test_IncludeUsers_Incorrect if {
             "Conditions": {
                 "Applications": {"IncludeApplications": ["All"]},
                 "Users": {
-                    "IncludeUsers": ["8bc7c6ee-39a2-42a5-a31b-f77fb51db652"],
-                    "ExcludeUsers": [],
-                    "IncludeGroups": ["All"],
-                    "ExcludeGroups": [],
-                    "IncludeRoles": ["All"],
-                    "ExcludeRoles": []
+                        "IncludeUsers": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"],
+                        "ExcludeUsers": [],
+                        "IncludeGroups": ["<undefined>"],
+                        "ExcludeGroups": [],
+                        "IncludeRoles": ["<undefined>"],
+                        "ExcludeRoles": []
                 },
                 "UserRiskLevels": ["high"]
             },
@@ -131,6 +131,7 @@ test_IncludeUsers_Incorrect if {
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements"
+                            print("IncludeUsers:")
 }
 
 test_ExcludeUsers_Incorrect if {
@@ -143,12 +144,12 @@ test_ExcludeUsers_Incorrect if {
             "Conditions": {
                 "Applications": {"IncludeApplications": ["All"]},
                 "Users": {
-                    "IncludeUsers": ["All"],
-                    "ExcludeUsers": ["8bc7c6ee-39a2-42a5-a31b-f77fb51db652"],
-                    "IncludeGroups": ["All"],
-                    "ExcludeGroups": [],
-                    "IncludeRoles": ["All"],
-                    "ExcludeRoles": []
+                        "IncludeUsers": ["All"],
+                        "ExcludeUsers": ["8bc7c6ee-39a2-42a5-a31b-f77fb51db652"],
+                        "IncludeGroups": ["<undefined>"],
+                        "ExcludeGroups": [],
+                        "IncludeRoles": ["<undefined>"],
+                        "ExcludeRoles": []
                 },
                 "UserRiskLevels": ["high"]
             },
@@ -186,12 +187,12 @@ test_IncludeGroups_Incorrect if {
             "Conditions": {
                 "Applications": {"IncludeApplications": ["All"]},
                 "Users": {
-                    "IncludeUsers": ["All"],
-                    "ExcludeUsers": [],
-                    "IncludeGroups": ["8bc7c6ee-39a2-42a5-a31b-f77fb51db652"],
-                    "ExcludeGroups": [],
-                    "IncludeRoles": ["All"],
-                    "ExcludeRoles": []
+                        "IncludeUsers": ["All"],
+                        "ExcludeUsers": [],
+                        "IncludeGroups": ["8bc7c6ee-39a2-42a5-a31b-f77fb51db652"],
+                        "ExcludeGroups": [],
+                        "IncludeRoles": ["<undefined>"],
+                        "ExcludeRoles": []
                 },
                 "UserRiskLevels": ["high"]
             },
@@ -229,12 +230,12 @@ test_ExcludeGroups_Incorrect if {
             "Conditions": {
                 "Applications": {"IncludeApplications": ["All"]},
                 "Users": {
-                    "IncludeUsers": ["All"],
-                    "ExcludeUsers": [],
-                    "IncludeGroups": ["All"],
-                    "ExcludeGroups": ["8bc7c6ee-39a2-42a5-a31b-f77fb51db652"],
-                    "IncludeRoles": ["All"],
-                    "ExcludeRoles": []
+                        "IncludeUsers": ["All"],
+                        "ExcludeUsers": [],
+                        "IncludeGroups": ["<undefined>"],
+                        "ExcludeGroups": ["8bc7c6ee-39a2-42a5-a31b-f77fb51db652"],
+                        "IncludeRoles": ["<undefined>"],
+                        "ExcludeRoles": []
                 },
                 "UserRiskLevels": ["high"]
             },
@@ -272,12 +273,12 @@ test_IncludeRoles_Incorrect if {
             "Conditions": {
                 "Applications": {"IncludeApplications": ["All"]},
                 "Users": {
-                    "IncludeUsers": ["All"],
-                    "ExcludeUsers": [],
-                    "IncludeGroups": ["All"],
-                    "ExcludeGroups": [],
-                    "IncludeRoles": ["8bc7c6ee-39a2-42a5-a31b-f77fb51db652"],
-                    "ExcludeRoles": []
+                        "IncludeUsers": ["All"],
+                        "ExcludeUsers": [],
+                        "IncludeGroups": ["<undefined>"],
+                        "ExcludeGroups": [],
+                        "IncludeRoles": ["8bc7c6ee-39a2-42a5-a31b-f77fb51db652"],
+                        "ExcludeRoles": []
                 },
                 "UserRiskLevels": ["high"]
             },
@@ -315,12 +316,12 @@ test_ExcludeRoles_Incorrect if {
             "Conditions": {
                 "Applications": {"IncludeApplications": ["All"]},
                 "Users": {
-                    "IncludeUsers": ["All"],
-                    "ExcludeUsers": [],
-                    "IncludeGroups": ["All"],
-                    "ExcludeGroups": [],
-                    "IncludeRoles": ["All"],
-                    "ExcludeRoles": ["8bc7c6ee-39a2-42a5-a31b-f77fb51db652"]
+                        "IncludeUsers": ["All"],
+                        "ExcludeUsers": [],
+                        "IncludeGroups": ["<undefined>"],
+                        "ExcludeGroups": [],
+                        "IncludeRoles": ["<undefined>"],
+                        "ExcludeRoles": ["8bc7c6ee-39a2-42a5-a31b-f77fb51db652"]
                 },
                 "UserRiskLevels": ["high"]
             },
@@ -358,12 +359,12 @@ test_BuiltInControls_Incorrect if {
             "Conditions": {
                 "Applications": {"IncludeApplications": ["All"]},
                 "Users": {
-                    "IncludeUsers": ["All"],
-                    "ExcludeUsers": [],
-                    "IncludeGroups": ["All"],
-                    "ExcludeGroups": [],
-                    "IncludeRoles": ["All"],
-                    "ExcludeRoles": []
+                        "IncludeUsers": ["All"],
+                        "ExcludeUsers": [],
+                        "IncludeGroups": ["<undefined>"],
+                        "ExcludeGroups": [],
+                        "IncludeRoles": ["<undefined>"],
+                        "ExcludeRoles": []
                 },
                 "UserRiskLevels": ["high"]
             },
@@ -401,12 +402,12 @@ test_State_Incorrect if {
             "Conditions": {
                 "Applications": {"IncludeApplications": ["All"]},
                 "Users": {
-                    "IncludeUsers": ["All"],
-                    "ExcludeUsers": [],
-                    "IncludeGroups": ["All"],
-                    "ExcludeGroups": [],
-                    "IncludeRoles": ["All"],
-                    "ExcludeRoles": []
+                        "IncludeUsers": ["All"],
+                        "ExcludeUsers": [],
+                        "IncludeGroups": ["<undefined>"],
+                        "ExcludeGroups": [],
+                        "IncludeRoles": ["<undefined>"],
+                        "ExcludeRoles": []
                 },
                 "UserRiskLevels": ["high"]
             },
@@ -444,12 +445,12 @@ test_UserRiskLevels_Incorrect if {
             "Conditions": {
                 "Applications": {"IncludeApplications": ["All"]},
                 "Users": {
-                    "IncludeUsers": ["All"],
-                    "ExcludeUsers": [],
-                    "IncludeGroups": ["All"],
-                    "ExcludeGroups": [],
-                    "IncludeRoles": ["All"],
-                    "ExcludeRoles": []
+                        "IncludeUsers": ["All"],
+                        "ExcludeUsers": [],
+                        "IncludeGroups": ["<undefined>"],
+                        "ExcludeGroups": [],
+                        "IncludeRoles": ["<undefined>"],
+                        "ExcludeRoles": []
                 },
                 "UserRiskLevels": [""]
             },
@@ -491,9 +492,9 @@ test_ServicePlans_Incorrect if {
                     "Users": {
                         "IncludeUsers": ["All"],
                         "ExcludeUsers": [],
-                        "IncludeGroups": ["All"],
+                        "IncludeGroups": ["<undefined>"],
                         "ExcludeGroups": [],
-                        "IncludeRoles": ["All"],
+                        "IncludeRoles": ["<undefined>"],
                         "ExcludeRoles": []
                     },
                     "UserRiskLevels": [""]
