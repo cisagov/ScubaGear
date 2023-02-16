@@ -292,15 +292,17 @@ window.addEventListener('DOMContentLoaded', (event) => {
     colorRows();
     fillCAPTable();
     try {
-        let darkMode = sessionStorage.getItem("darkMode");
-        if (darkMode === undefined || darkMode === null) {
-            sessionStorage.setItem("darkMode", 'false');
-            setDarkMode('false');
+        let darkModeCookie = sessionStorage.getItem("darkMode");
+        if (darkModeCookie === undefined || darkModeCookie === null) {
+            if (darkMode) {
+                sessionStorage.setItem("darkMode", 'true');
+            }
+            else {
+                sessionStorage.setItem("darkMode", 'false');
+            }
         }
-        else {
-            setDarkMode(darkMode);
-            document.getElementById('toggle').checked = (darkMode === 'true');
-        }
+        setDarkMode(darkModeCookie);
+        document.getElementById('toggle').checked = (darkModeCookie === 'true');
     }
     catch (error) {
         console.error("Error applying dark mode to individual report: " + error)
