@@ -36,20 +36,6 @@ const colorRows = () => {
 }
 
 /**
- * Toggles light and dark mode
- */
-const toggleDarkMode = () => {
-    if (document.getElementsByTagName('html')[0].dataset.theme == "dark") {
-        document.getElementsByTagName('html')[0].dataset.theme = "light";
-        document.querySelector("#toggle-text").innerHTML = "Light mode";
-    }
-    else {
-        document.getElementsByTagName('html')[0].dataset.theme = "dark";
-        document.querySelector("#toggle-text").innerHTML = "Dark mode";
-    }
-}
-
-/**
  * For the conditional access policy table. For AAD only.
  * The "" column is used for the nameless column that holds the
  * "Show more" / "Show less" buttons.
@@ -305,4 +291,18 @@ const expandCAPRow = (event) => {
 window.addEventListener('DOMContentLoaded', (event) => {
     colorRows();
     fillCAPTable();
+    try {
+        let darkMode = sessionStorage.getItem("darkMode");
+        if (darkMode === undefined || darkMode === null) {
+            sessionStorage.setItem("darkMode", 'false');
+            setDarkMode('false');
+        }
+        else {
+            setDarkMode(darkMode);
+            document.getElementById('toggle').checked = (darkMode === 'true');
+        }
+    }
+    catch (error) {
+        console.error("Error applying dark mode to individual report: " + error)
+    }
 });

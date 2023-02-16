@@ -150,6 +150,15 @@ function New-Report {
     $ScriptsPath = Join-Path -Path $ReporterPath -ChildPath "scripts"
     $MainJS = (Get-Content $(Join-Path -Path $ScriptsPath -ChildPath "main.js")) -Join "`n"
     $MainJS = "const caps = $($CapJson);`n$($MainJS)"
+    $UtilsJS = (Get-Content $(Join-Path -Path $ScriptsPath -ChildPath "utils.js")) -Join "`n"
+    $MainJS = "$($MainJS)`n$($UtilsJS)"
+    $ReportHTML = $ReportHTML.Replace("{MAIN_JS}", "<script>
+        $($MainJS)
+    </script>")
+
+    $ScriptsPath = Join-Path -Path $ReporterPath -ChildPath "scripts"
+
+    $UtilsJS = "const caps = $($CapJson);`n$($UtilsJS)"
     $ReportHTML = $ReportHTML.Replace("{MAIN_JS}", "<script>
         $($MainJS)
     </script>")

@@ -731,6 +731,14 @@ function Invoke-ReportCreation {
         $ParentCSS = (Get-Content $(Join-Path -Path $CssPath -ChildPath "ParentReportStyle.css")) -Join "`n"
         $ReportHTML = $ReportHTML.Replace("{PARENT_CSS}", "<style>$($ParentCSS)</style>")
 
+        $ScriptsPath = Join-Path -Path $ReporterPath -ChildPath "scripts"
+        $ParentReportJS = (Get-Content $(Join-Path -Path $ScriptsPath -ChildPath "ParentReport.js")) -Join "`n"
+        $UtilsJS = (Get-Content $(Join-Path -Path $ScriptsPath -ChildPath "utils.js")) -Join "`n"
+        $ParentReportJS = "$($ParentReportJS)`n$($UtilsJS)"
+        $ReportHTML = $ReportHTML.Replace("{MAIN_JS}", "<script>
+            $($ParentReportJS)
+        </script>")
+
         Add-Type -AssemblyName System.Web
         $ReportFileName = Join-Path -Path $OutFolderPath "$($OutReportName).html"
         [System.Web.HttpUtility]::HtmlDecode($ReportHTML) | Out-File $ReportFileName
