@@ -97,7 +97,7 @@ function Invoke-SCuBA {
     .Functionality
     Public
     #>
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName='Report')]
     param (
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
