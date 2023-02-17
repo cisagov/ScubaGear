@@ -17,7 +17,7 @@ InModuleScope ScubaConfig {
             It 'Valid object parameter'{
                 [ScubaConfig]::GetInstance().Configuration.MissingObject.name | Should -BeNullOrEmpty
             }
-            It 'A differnt valid config file'{
+            It 'A different valid config file'{
                 $ScubaConfigTestFile = Join-Path -Path $PSScriptRoot -ChildPath config_test_missing_defaults.json
                 $Result = [ScubaConfig]::GetInstance().LoadConfig($ScubaConfigTestFile)
                 $Result | Should -Be $true
