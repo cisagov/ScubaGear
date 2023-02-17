@@ -7,7 +7,7 @@ ProductNames:
 - sharepoint
 - onedrive
 M365Environment: commercial
-OPAPath: C:\Program Files\OPA\
+OPAPath: .
 LogIn: true
 DisconnectOnExit: false
 OutPath: .
