@@ -36,7 +36,7 @@ test_ConditionalAccessPolicies_Correct if {
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "1 conditional access policy(s) found that meet(s) all requirements:<br/>Test Name"
+    RuleOutput[0].ReportDetails == "1 conditional access policy(s) found that meet(s) all requirements:<br/>Test Name. <a href='#caps'>View all CA policies</a>."
 }
 
 test_IncludeApplications_Incorrect if {
@@ -70,7 +70,7 @@ test_IncludeApplications_Incorrect if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements"
+    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
 }
 
 test_IncludeUsers_Incorrect if {
@@ -104,7 +104,7 @@ test_IncludeUsers_Incorrect if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements"
+    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
 }
 
 test_IsEnabled_Incorrect if {
@@ -138,7 +138,7 @@ test_IsEnabled_Incorrect if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements"
+    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
 }
 
 test_Mode_Incorrect if {
@@ -172,7 +172,7 @@ test_Mode_Incorrect if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements"
+    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
 }
 
 test_State_Incorrect if {
@@ -206,5 +206,5 @@ test_State_Incorrect if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements"
+    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
 }

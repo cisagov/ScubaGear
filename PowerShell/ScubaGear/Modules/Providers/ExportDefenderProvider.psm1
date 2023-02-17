@@ -11,7 +11,11 @@ function Export-DefenderProvider {
         [Parameter(Mandatory = $true)]
         [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $false)]
         [string]
-        $M365Environment
+        $M365Environment,
+
+        [Parameter(Mandatory = $false)]
+        [hashtable]
+        $ServicePrincipalParams
     )
     $ParentPath = Split-Path $PSScriptRoot -Parent
     $ConnectionFolderPath = Join-Path -Path $ParentPath -ChildPath "Connection"
@@ -29,7 +33,13 @@ function Export-DefenderProvider {
     $ExchangeConnected = Get-Command Get-OrganizationConfig -ErrorAction SilentlyContinue
     if(-not $ExchangeConnected) {
         try {
-            Connect-EXOHelper -M365Environment $M365Environment
+            $EXOHelperParams = @{
+                M365Environment = $M365Environment;
+            }
+            if ($ServicePrincipalParams) {
+                $EXOHelperParams += @{ServicePrincipalParams = $ServicePrincipalParams}
+            }
+            Connect-EXOHelper @ServicePrincipalParams;
         }
         catch {
             Write-Error "Error connecting to ExchangeOnline. $($_)"
@@ -85,25 +95,15 @@ function Export-DefenderProvider {
 
     # Connect to Security & Compliance
     $IPPSConnected = $false
-    $IPPSParams = @{
-        'ErrorAction' = 'Stop';
-    }
     try {
-        switch ($M365Environment) {
-            {($_ -eq "commercial") -or ($_ -eq "gcc")} {
-                $IPPSParams = @{'ErrorAction' = 'Stop';} # sanity check
-            }
-            "gcchigh" {
-                $IPPSParams = $IPPSParams + @{'ConnectionUri' = "https://outlook.office365.us/powershell-liveID";}
-            }
-            "dod" {
-                $IPPSParams = $IPPSParams + @{'ConnectionUri' = "https://webmail.apps.mil/powershell-liveID";}
-            }
-            default {
-                throw -Message "Unsupported or invalid M365Environment argument"
-            }
+        $DefenderHelperParams = @{
+            M365Environment = $M365Environment;
         }
-        Connect-IPPSSession @IPPSParams | Out-Null
+
+        if ($ServicePrincipalParams) {
+            $DefenderHelperParams += @{ServicePrincipalParams = $ServicePrincipalParams}
+        }
+        Connect-DefenderHelper @DefenderHelperParams
         $IPPSConnected = $true
     }
     catch {
