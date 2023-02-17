@@ -302,9 +302,9 @@ function Invoke-SCuBA {
                 else {
                     Disconnect-SCuBATenant -ProductNames $ScubaConfig.ProductNames -ErrorAction SilentlyContinue
                 }
-
-                [ScubaConfig]::ResetInstance()
             }
+
+            [ScubaConfig]::ResetInstance()
         }
     }
 }

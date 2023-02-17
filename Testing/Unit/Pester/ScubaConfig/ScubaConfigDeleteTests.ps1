@@ -11,6 +11,9 @@ InModuleScope ScubaConfig {
                 $Result = [ScubaConfig]::GetInstance().LoadConfig($ScubaConfigTestFile)
                 $Result | Should -Be $true
             }
+            It '6 Product names'{
+                [ScubaConfig]::GetInstance().Configuration.ProductNames | Should -HaveCount 6 -Because "$([ScubaConfig]::GetInstance().Configuration.ParameterNames)"
+            }
             It 'Valid object parameter'{
                 [ScubaConfig]::GetInstance().Configuration.AnObject.name | Should -Be 'MyObjectName'
             }
@@ -21,6 +24,9 @@ InModuleScope ScubaConfig {
                 $ScubaConfigTestFile = Join-Path -Path $PSScriptRoot -ChildPath config_test_missing_defaults.json
                 $Result = [ScubaConfig]::GetInstance().LoadConfig($ScubaConfigTestFile)
                 $Result | Should -Be $true
+            }
+            It '1 Product names'{
+                [ScubaConfig]::GetInstance().Configuration.ProductNames | Should -HaveCount 1
             }
             It 'Valid object parameter'{
                 [ScubaConfig]::GetInstance().Configuration.AnObject.name | Should -BeNullOrEmpty

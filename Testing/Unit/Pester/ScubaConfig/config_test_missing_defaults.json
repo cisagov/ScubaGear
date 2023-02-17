@@ -1,12 +1,7 @@
 {
     "Description": "JSON Configuration file for unit test in SCuBA",
     "ProductNames": [
-      "teams",
-      "exo",
-      "defender",
-      "aad",
-      "sharepoint",
-      "onedrive"
+      "aad"
     ],
     "OPAPath":".",
     "LogIn":true,
