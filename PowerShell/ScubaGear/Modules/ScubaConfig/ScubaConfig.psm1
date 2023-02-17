@@ -17,6 +17,11 @@ class ScubaConfig {
         return [ScubaConfig]::_IsLoaded
     }
 
+    hidden [void]ClearConfiguration(){
+        Get-Member -InputObject ($this.Configuration) -Type properties |
+          ForEach-Object { $this.Configuration.PSObject.Properties.Remove($_.name)}
+    }
+
     hidden [Guid]$Uuid = [Guid]::NewGuid()
     hidden [Object]$Configuration
 
@@ -68,6 +73,13 @@ class ScubaConfig {
     }
 
     hidden ScubaConfig(){
+    }
+
+    static [void]ResetInstance(){
+        [ScubaConfig]::_Instance.ClearConfiguration()
+        [ScubaConfig]::_IsLoaded = $false
+
+        return
     }
 
     static [ScubaConfig]GetInstance(){

@@ -16,7 +16,7 @@
     "OutProviderFileName":"ProviderSettingsExport",
     "OutRegoFileName":"TestResults",
     "OutReportName":"BaselineReports",
-    "AnObject": {
-      "name": "MyObjectName"
+    "MissingObject": {
+      "name": "MyMissingObjectName"
     }
   }

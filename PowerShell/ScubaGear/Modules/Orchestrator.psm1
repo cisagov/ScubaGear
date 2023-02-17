@@ -68,6 +68,12 @@ function Invoke-SCuBA {
     Defaults to "BaselineReports".
     .Parameter DisconnectOnExit
     Set switch to disconnect all active connections on exit from ScubaGear (default: $false)
+    .Parameter ConfigFilePath
+    Local file path to a JSON or YAML formatted configuration file.
+    Configuration file parameters can be used in place of command-line
+    parameters. Additional parameters and variables not available on the
+    command line can also be included in the file that will be provided to the
+    tool for use in specific tests.
     .Example
     Invoke-SCuBA
     Run an assessment against by default a commercial M365 Tenant against the
@@ -296,6 +302,8 @@ function Invoke-SCuBA {
                 else {
                     Disconnect-SCuBATenant -ProductNames $ScubaConfig.ProductNames -ErrorAction SilentlyContinue
                 }
+
+                [ScubaConfig]::ResetInstance()
             }
         }
     }
