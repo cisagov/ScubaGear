@@ -5,14 +5,56 @@ import future.keywords
 #
 # Policy 1
 #--
-test_DefaultLinkPermission_Correct if {
+test_DefaultLinkPermission_Correct_V1 if {
     ControlNumber := "OneDrive 2.3"
     Requirement := "Anyone link permissions SHOULD be limited to View"
 
     Output := tests with input as {
         "SPO_tenant_info": [
             {
-                "DefaultSharingLinkType" : 1,
+                "OneDriveSharingCapability" : 1,
+                "FileAnonymousLinkType" : 1,
+                "FolderAnonymousLinkType" : 1
+            }
+        ]
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "Requirement met: Anyone links are disabled"
+}
+
+test_DefaultLinkPermission_Correct_V2 if {
+    ControlNumber := "OneDrive 2.3"
+    Requirement := "Anyone link permissions SHOULD be limited to View"
+
+    Output := tests with input as {
+        "SPO_tenant_info": [
+            {
+                "OneDriveSharingCapability" : 2,
+                "FileAnonymousLinkType" : 1,
+                "FolderAnonymousLinkType" : 1
+            }
+        ]
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "Requirement met"
+}
+
+test_DefaultLinkPermission_Correct_V2 if {
+    ControlNumber := "OneDrive 2.3"
+    Requirement := "Anyone link permissions SHOULD be limited to View"
+
+    Output := tests with input as {
+        "SPO_tenant_info": [
+            {
+                "OneDriveSharingCapability" : 2,
                 "FileAnonymousLinkType" : 1,
                 "FolderAnonymousLinkType" : 1
             }
@@ -33,7 +75,7 @@ test_DefaultLinkPermission_Incorrect if {
     Output := tests with input as {
         "SPO_tenant_info": [
             {
-                "DefaultSharingLinkType" : 1,
+                "OneDriveSharingCapability" : 2,
                 "FileAnonymousLinkType" : 2,
                 "FolderAnonymousLinkType" : 2
             }
@@ -54,7 +96,7 @@ test_DefaultLinkPermission_Incorrect_V2 if {
     Output := tests with input as {
         "SPO_tenant_info": [
             {
-                "DefaultSharingLinkType" : 1,
+                "OneDriveSharingCapability" : 2,
                 "FileAnonymousLinkType" : 2,
                 "FolderAnonymousLinkType" : 1
             }
@@ -75,7 +117,7 @@ test_DefaultLinkPermission_Incorrect_V3 if {
     Output := tests with input as {
         "SPO_tenant_info": [
             {
-                "DefaultSharingLinkType" : 1,
+                "OneDriveSharingCapability" : 2,
                 "FileAnonymousLinkType" : 1,
                 "FolderAnonymousLinkType" : 2
             }
@@ -87,25 +129,4 @@ test_DefaultLinkPermission_Incorrect_V3 if {
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "Requirement not met: folders are not limited to view for Anyone"
-}
-
-test_DefaultLinkPermission_Incorrect_V4 if {
-    ControlNumber := "OneDrive 2.3"
-    Requirement := "Anyone link permissions SHOULD be limited to View"
-
-    Output := tests with input as {
-        "SPO_tenant_info": [
-            {
-                "DefaultSharingLinkType" : 3,
-                "FileAnonymousLinkType" : 1,
-                "FolderAnonymousLinkType" : 1
-            }
-        ]
-    }
-
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement not met: default link sharing type is set to Anyone with link"
 }

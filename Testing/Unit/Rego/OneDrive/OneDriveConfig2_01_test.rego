@@ -12,7 +12,7 @@ test_OneDriveLoopSharingCapability_Correct if {
     Output := tests with input as {
         "SPO_tenant_info": [
             {
-                "OneDriveLoopSharingCapability" : 1
+                "OneDriveSharingCapability" : 1
             }
         ],
         "OneDrive_PnP_Flag": false   
@@ -32,7 +32,7 @@ test_OneDriveLoopSharingCapability_Incorrect if {
     Output := tests with input as {
         "SPO_tenant_info": [
             {
-                "OneDriveLoopSharingCapability" : 2
+                "OneDriveSharingCapability" : 2
             }
         ],
         "OneDrive_PnP_Flag": false 
