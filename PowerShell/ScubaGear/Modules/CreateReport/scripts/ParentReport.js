@@ -1,3 +1,3 @@
 window.addEventListener('DOMContentLoaded', (event) => {
-    mountDarkMode("Parent report");
+    mountDarkMode("Parent Report");
 });
