@@ -28,7 +28,7 @@ jobs:
         version: latest
 
     - name: Run OPA Check
-      run: opa check --strict Rego Testing
+      run: opa check Rego Testing/Unit/Rego --strict
 
     - name: Run OPA Tests
       run: opa test Rego/*.rego Testing/Unit/Rego/**/*.rego -v

@@ -1,3 +1,4 @@
+using module 'ScubaConfig\ScubaConfig.psm1'
 function Invoke-SCuBA {
     <#
     .SYNOPSIS
@@ -67,6 +68,12 @@ function Invoke-SCuBA {
     Defaults to "BaselineReports".
     .Parameter DisconnectOnExit
     Set switch to disconnect all active connections on exit from ScubaGear (default: $false)
+    .Parameter ConfigFilePath
+    Local file path to a JSON or YAML formatted configuration file.
+    Configuration file parameters can be used in place of command-line
+    parameters. Additional parameters and variables not available on the
+    command line can also be included in the file that will be provided to the
+    tool for use in specific tests.
     .Example
     Invoke-SCuBA
     Run an assessment against by default a commercial M365 Tenant against the
@@ -75,6 +82,9 @@ function Invoke-SCuBA {
     .Example
     Invoke-SCuBA -Version
     This example returns the version of SCuBAGear.
+    .Example
+    Invoke-SCuBA -ConfigFilePath MyConfig.json
+    This example uses the specified configuration file when executing SCuBAGear.
     .Example
     Invoke-SCuBA -ProductNames aad, defender -OPAPath . -OutPath .
     The example will run the tool against the Azure Active Directory, and Defender security
@@ -93,7 +103,7 @@ function Invoke-SCuBA {
     .Functionality
     Public
     #>
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName='Report')]
     param (
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
@@ -118,11 +128,11 @@ function Invoke-SCuBA {
         [boolean]
         $LogIn = $true,
 
-        [Parameter(Mandatory = $false)]
+        [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [switch]
         $DisconnectOnExit,
 
-        [Parameter(ParameterSetName = 'Report')]
+        [Parameter(ParameterSetName = 'VersionOnly')]
         [switch]
         $Version,
 
@@ -161,7 +171,20 @@ function Invoke-SCuBA {
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
         [string]
-        $OutReportName = "BaselineReports"
+        $OutReportName = "BaselineReports",
+
+        [Parameter(Mandatory = $true, ParameterSetName = 'Configuration')]
+        [ValidateScript({
+            if (-Not ($_ | Test-Path)){
+                throw "SCuBA configuration file or folder does not exist."
+            }
+            if (-Not ($_ | Test-Path -PathType Leaf)){
+                throw "SCuBA configuration Path argument must be a file."
+            }
+            return $true
+        })]
+        [System.IO.FileInfo]
+        $ConfigFilePath
     )
     process {
         $ParentPath = Split-Path $PSScriptRoot -Parent
@@ -172,8 +195,38 @@ function Invoke-SCuBA {
             return
         }
 
-        if ($ProductNames -eq '*'){
-            $ProductNames = "teams", "exo", "defender", "aad", "sharepoint", "onedrive", "powerplatform"
+        if ($PSCmdlet.ParameterSetName -eq 'Report'){
+
+            if ($ProductNames -eq '*'){
+                $ProductNames = "teams", "exo", "defender", "aad", "sharepoint", "onedrive", "powerplatform"
+            }
+
+            $ProvidedParameters = @{
+                'ProductNames' = $ProductNames | Sort-Object
+                'M365Environment' = $M365Environment
+                'OPAPath' = $OPAPath
+                'LogIn' = $LogIn
+                'DisconnectOnExit' = $DisconnectOnExit
+                'OutPath' = $OutPath
+                'OutFolderName' = $OutFolderName
+                'OutProviderFileName' = $OutProviderFileName
+                'OutRegoFileName' = $OutRegoFileName
+                'OutReportName' = $OutReportName
+            }
+
+            $ScubaConfig = New-Object -Type PSObject -Property $ProvidedParameters
+        }
+
+        Remove-Resources
+        Import-Resources # Imports Providers, RunRego, CreateReport, Connection
+
+        if ($PSCmdlet.ParameterSetName -eq 'Configuration'){
+            if (-Not ([ScubaConfig]::GetInstance().LoadConfig($ConfigFilePath))){
+                Write-Error -Message "The config file failed to load: $ConfigFilePath"
+            }
+            else {
+                $ScubaConfig = [ScubaConfig]::GetInstance().Configuration
+            }
         }
 
         # The equivalent of ..\..
@@ -184,62 +237,57 @@ function Invoke-SCuBA {
         $DateStr = $Date.ToString("yyyy_MM_dd_HH_mm_ss")
         $FormattedTimeStamp = $DateStr
 
-        $OutFolderPath = $OutPath
-        $FolderName = "$($OutFolderName)_$($FormattedTimeStamp)"
+        $OutFolderPath = $ScubaConfig.OutPath
+        $FolderName = "$($ScubaConfig.OutFolderName)_$($FormattedTimeStamp)"
         New-Item -Path $OutFolderPath -Name $($FolderName) -ItemType Directory | Out-Null
         $OutFolderPath = Join-Path -Path $OutFolderPath -ChildPath $FolderName
 
-        $ProductNames = $ProductNames | Sort-Object
-
-        Remove-Resources
-        Import-Resources # Imports Providers, RunRego, CreateReport, Connection
-
         $ConnectionParams = @{
-            'LogIn' = $LogIn;
-            'ProductNames' = $ProductNames;
-            'M365Environment' = $M365Environment;
+            'LogIn' = $ScubaConfig.LogIn;
+            'ProductNames' = $ScubaConfig.ProductNames;
+            'M365Environment' = $ScubaConfig.M365Environment;
             'BoundParameters' = $PSBoundParameters;
         }
 
         $ProdAuthFailed = Invoke-Connection @ConnectionParams
         if ($ProdAuthFailed.Count -gt 0) {
-            $Difference = Compare-Object $ProductNames -DifferenceObject $ProdAuthFailed -PassThru
+            $Difference = Compare-Object $ScubaConfig.ProductNames -DifferenceObject $ProdAuthFailed -PassThru
             if (-not $Difference) {
                 throw "All products were unable to establish a connection aborting execution"
             }
             else {
-                $ProductNames = $Difference
+                $ScubaConfig.ProductNames = $Difference
             }
         }
 
-        $TenantDetails = Get-TenantDetail -ProductNames $ProductNames -M365Environment $M365Environment
+        $TenantDetails = Get-TenantDetail -ProductNames $ScubaConfig.ProductNames -M365Environment $ScubaConfig.M365Environment
         $ProviderParams = @{
-            'ProductNames' = $ProductNames;
-            'M365Environment' = $M365Environment;
+            'ProductNames' = $ScubaConfig.ProductNames;
+            'M365Environment' = $ScubaConfig.M365Environment;
             'TenantDetails' = $TenantDetails;
             'ModuleVersion' = $ModuleVersion;
             'OutFolderPath' = $OutFolderPath;
-            'OutProviderFileName' = $OutProviderFileName;
+            'OutProviderFileName' = $ScubaConfig.OutProviderFileName;
             'BoundParameters' = $PSBoundParameters;
         }
         $RegoParams = @{
-            'ProductNames' = $ProductNames;
-            'OPAPath' = $OPAPath;
+            'ProductNames' = $ScubaConfig.ProductNames;
+            'OPAPath' = $ScubaConfig.OPAPath;
             'ParentPath' = $ParentPath;
             'OutFolderPath' = $OutFolderPath;
-            'OutProviderFileName' = $OutProviderFileName;
-            'OutRegoFileName' = $OutRegoFileName;
+            'OutProviderFileName' = $ScubaConfig.OutProviderFileName;
+            'OutRegoFileName' = $ScubaConfig.OutRegoFileName;
         }
         # Converted back from JSON String for PS Object use
         $TenantDetails = $TenantDetails | ConvertFrom-Json
         $ReportParams = @{
-            'ProductNames' = $ProductNames;
+            'ProductNames' = $ScubaConfig.ProductNames;
             'TenantDetails' = $TenantDetails;
             'ModuleVersion' = $ModuleVersion;
             'OutFolderPath' = $OutFolderPath;
-            'OutProviderFileName' = $OutProviderFileName;
-            'OutRegoFileName' = $OutRegoFileName;
-            'OutReportName' = $OutReportName;
+            'OutProviderFileName' = $ScubaConfig.OutProviderFileName;
+            'OutRegoFileName' = $ScubaConfig.OutRegoFileName;
+            'OutReportName' = $ScubaConfig.OutReportName;
         }
 
         try {
@@ -247,14 +295,16 @@ function Invoke-SCuBA {
             Invoke-RunRego @RegoParams
             Invoke-ReportCreation @ReportParams
         } finally {
-            if ($DisconnectOnExit) {
+            if ($ScubaConfig.DisconnectOnExit) {
                 if($VerbosePreference -eq "Continue") {
-                    Disconnect-SCuBATenant -ProductNames $ProductNames -ErrorAction SilentlyContinue -Verbose
+                    Disconnect-SCuBATenant -ProductNames $ScubaConfig.ProductNames -ErrorAction SilentlyContinue -Verbose
                 }
                 else {
-                    Disconnect-SCuBATenant -ProductNames $ProductNames -ErrorAction SilentlyContinue
+                    Disconnect-SCuBATenant -ProductNames $ScubaConfig.ProductNames -ErrorAction SilentlyContinue
                 }
             }
+
+            [ScubaConfig]::ResetInstance()
         }
     }
 }
@@ -855,9 +905,11 @@ function Import-Resources {
     $ConnectionPath = Join-Path -Path $PSScriptRoot -ChildPath "Connection"
     $RegoPath = Join-Path -Path $PSScriptRoot -ChildPath "RunRego"
     $ReporterPath = Join-Path -Path $PSScriptRoot -ChildPath "CreateReport"
+    $ScubaConfigPath = Join-Path -Path $PSScriptRoot -ChildPath "ScubaConfig"
     Import-Module $ConnectionPath
     Import-Module $RegoPath
     Import-Module $ReporterPath
+    Import-Module $ScubaConfigPath
 }
 
 function Remove-Resources {
@@ -875,6 +927,7 @@ function Remove-Resources {
         Remove-Module $Provider -ErrorAction "SilentlyContinue"
     }
 
+    Remove-Module "ScubaConfig" -ErrorAction "SilentlyContinue"
     Remove-Module "RunRego" -ErrorAction "SilentlyContinue"
     Remove-Module "CreateReport" -ErrorAction "SilentlyContinue"
     Remove-Module "Connection" -ErrorAction "SilentlyContinue"
