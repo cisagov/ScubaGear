@@ -38,7 +38,7 @@ function New-Report {
         $OutRegoFileName,
 
         [Parameter(Mandatory=$true)]
-        [bool]
+        [switch]
         $DarkMode
     )
 

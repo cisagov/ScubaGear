@@ -291,20 +291,5 @@ const expandCAPRow = (event) => {
 window.addEventListener('DOMContentLoaded', (event) => {
     colorRows();
     fillCAPTable();
-    try {
-        let darkModeCookie = sessionStorage.getItem("darkMode");
-        if (darkModeCookie === undefined || darkModeCookie === null) {
-            if (darkMode) {
-                sessionStorage.setItem("darkMode", 'true');
-            }
-            else {
-                sessionStorage.setItem("darkMode", 'false');
-            }
-        }
-        setDarkMode(darkModeCookie);
-        document.getElementById('toggle').checked = (darkModeCookie === 'true');
-    }
-    catch (error) {
-        console.error("Error applying dark mode to individual report: " + error)
-    }
+    mountDarkMode("Individual Report");
 });

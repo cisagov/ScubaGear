@@ -187,7 +187,7 @@ function Invoke-SCuBA {
         })]
         [System.IO.FileInfo]
         $ConfigFilePath,
-        
+
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [switch]
         $DarkMode
@@ -643,7 +643,7 @@ function Invoke-ReportCreation {
         $Quiet = $false,
 
         [Parameter(Mandatory=$true)]
-        [bool]
+        [switch]
         $DarkMode
     )
     process {
