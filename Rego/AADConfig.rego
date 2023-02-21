@@ -98,8 +98,8 @@ Policies2_1[Cap.DisplayName] {
     Cap := input.conditional_access_policies[_]
     # Filter: only include policies that meet all the requirements
     "All" in Cap.Conditions.Users.IncludeUsers
-    "<undefined>" in Cap.Conditions.Users.IncludeGroups
-    "<undefined>" in Cap.Conditions.Users.IncludeRoles
+   # "[]" in Cap.Conditions.Users.IncludeGroups
+  #  "[]" in Cap.Conditions.Users.IncludeRoles
     count(Cap.Conditions.Users.ExcludeUsers) == 0
     count(Cap.Conditions.Users.ExcludeGroups) == 0
     count(Cap.Conditions.Users.ExcludeRoles) == 0
@@ -136,8 +136,8 @@ Policies2_2[Cap.DisplayName] {
     Cap := input.conditional_access_policies[_]
     # Filter: only include policies that meet all the requirements
     "All" in Cap.Conditions.Users.IncludeUsers
-    "<undefined>" in Cap.Conditions.Users.IncludeGroups
-    "<undefined>" in Cap.Conditions.Users.IncludeRoles
+  #  "<undefined>" in Cap.Conditions.Users.IncludeGroups
+  #  "<undefined>" in Cap.Conditions.Users.IncludeRoles
     count(Cap.Conditions.Users.ExcludeUsers) == 0
     count(Cap.Conditions.Users.ExcludeGroups) == 0
     count(Cap.Conditions.Users.ExcludeRoles) == 0
@@ -190,8 +190,8 @@ Policies2_3[Cap.DisplayName] {
     Cap := input.conditional_access_policies[_]
     # Filter: only include policies that meet all the requirements
     "All" in Cap.Conditions.Users.IncludeUsers
-    "<undefined>" in Cap.Conditions.Users.IncludeGroups
-    "<undefined>" in Cap.Conditions.Users.IncludeRoles
+   # "<undefined>" in Cap.Conditions.Users.IncludeGroups
+   # "<undefined>" in Cap.Conditions.Users.IncludeRoles
     count(Cap.Conditions.Users.ExcludeUsers) == 0
     count(Cap.Conditions.Users.ExcludeGroups) == 0
     count(Cap.Conditions.Users.ExcludeRoles) == 0
@@ -227,8 +227,8 @@ Policies2_4_1[Cap.DisplayName] {
     Cap := input.conditional_access_policies[_]
     # Filter: only include policies that meet all the requirements
     "All" in Cap.Conditions.Users.IncludeUsers
-    "<undefined>" in Cap.Conditions.Users.IncludeGroups
-    "<undefined>" in Cap.Conditions.Users.IncludeRoles
+  #  "<undefined>" in Cap.Conditions.Users.IncludeGroups
+  #  "<undefined>" in Cap.Conditions.Users.IncludeRoles
     count(Cap.Conditions.Users.ExcludeUsers) == 0
     count(Cap.Conditions.Users.ExcludeGroups) == 0
     count(Cap.Conditions.Users.ExcludeRoles) == 0
@@ -523,8 +523,8 @@ Policies2_9[Cap.DisplayName] {
     Cap := input.conditional_access_policies[_]
     # Filter: only include policies that meet all the requirements
     "All" in Cap.Conditions.Users.IncludeUsers
-    "<undefined>" in Cap.Conditions.Users.IncludeGroups
-    "<undefined>" in Cap.Conditions.Users.IncludeRoles
+   # "<undefined>" in Cap.Conditions.Users.IncludeGroups
+  #  "<undefined>" in Cap.Conditions.Users.IncludeRoles
     count(Cap.Conditions.Users.ExcludeUsers) == 0
     count(Cap.Conditions.Users.ExcludeGroups) == 0
     count(Cap.Conditions.Users.ExcludeRoles) == 0
@@ -561,8 +561,8 @@ Policies2_10[Cap.DisplayName] {
     Cap := input.conditional_access_policies[_]
     # Filter: only include policies that meet all the requirements
     "All" in Cap.Conditions.Users.IncludeUsers
-    "<undefined>" in Cap.Conditions.Users.IncludeGroups
-    "<undefined>" in Cap.Conditions.Users.IncludeRoles
+   # "[]" in Cap.Conditions.Users.IncludeGroups
+  #  "[]" in Cap.Conditions.Users.IncludeRoles
     count(Cap.Conditions.Users.ExcludeUsers) == 0
     count(Cap.Conditions.Users.ExcludeGroups) == 0
     count(Cap.Conditions.Users.ExcludeRoles) == 0
