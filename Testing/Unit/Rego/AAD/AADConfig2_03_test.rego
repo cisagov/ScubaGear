@@ -19,9 +19,7 @@ test_Conditions_Correct if {
                 "Users": {
                     "IncludeUsers": ["All"],
                     "ExcludeUsers": [],
-                    "IncludeGroups": ["All"],
                     "ExcludeGroups": [],
-                    "IncludeRoles": ["All"],
                     "ExcludeRoles": []
                 },
                 "SignInRiskLevels": ["high"]
@@ -66,9 +64,7 @@ test_IncludeApplications_Incorrect if {
                 "Users": {
                     "IncludeUsers": ["All"],
                     "ExcludeUsers": [],
-                    "IncludeGroups": ["All"],
                     "ExcludeGroups": [],
-                    "IncludeRoles": ["All"],
                     "ExcludeRoles": []
                 },
                 "SignInRiskLevels": ["high"]
@@ -113,9 +109,7 @@ test_IncludeUsers_Incorrect if {
                 "Users": {
                     "IncludeUsers": ["8bc7c6ee-39a2-42a5-a31b-f77fb51db652"],
                     "ExcludeUsers": [],
-                    "IncludeGroups": ["All"],
                     "ExcludeGroups": [],
-                    "IncludeRoles": ["All"],
                     "ExcludeRoles": []
                 },
                 "SignInRiskLevels": ["high"]
@@ -160,56 +154,7 @@ test_ExcludeUsers_Incorrect if {
                "Users": {
                     "IncludeUsers": ["All"],
                     "ExcludeUsers": ["8bc7c6ee-39a2-42a5-a31b-f77fb51db652"],
-                   "IncludeGroups": ["All"],
                     "ExcludeGroups": [],
-                    "IncludeRoles": ["All"],
-                    "ExcludeRoles": []
-                },
-                "SignInRiskLevels": ["high"]
-            },
-            "GrantControls": {
-                "BuiltInControls": ["block"]
-            },
-            "State": "enabled",
-            "DisplayName": "Test name"
-        }
-        ],
-        "service_plans": [
-        {
-            "ServicePlanName": "EXCHANGE_S_FOUNDATION",
-            "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
-        },
-        {
-            "ServicePlanName": "AAD_PREMIUM_P2",
-            "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
-        }
-        ]
-    }
-
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-}
-
-test_IncludeGroups_Incorrect if {
-    ControlNumber := "AAD 2.3"
-    Requirement := "Sign-ins detected as high risk SHALL be blocked"
-
-    Output := tests with input as {
-        "conditional_access_policies": [
-        {
-            "Conditions": {
-                "Applications": {
-                    "IncludeApplications": ["All"]
-                },
-                "Users": {
-                    "IncludeUsers": ["All"],
-                    "ExcludeUsers": [],
-                    "IncludeGroups": [],
-                    "ExcludeGroups": [],
-                    "IncludeRoles": ["All"],
                     "ExcludeRoles": []
                 },
                 "SignInRiskLevels": ["high"]
@@ -254,58 +199,9 @@ test_ExcludeGroups_Incorrect if {
                 "Users": {
                     "IncludeUsers": ["All"],
                     "ExcludeUsers": [],
-                    "IncludeGroups": ["All"],
                     "ExcludeGroups": ["8bc7c6ee-39a2-42a5-a31b-f77fb51db652"],
-                    "IncludeRoles": ["All"],
                     "ExcludeRoles": []
 
-                },
-                "SignInRiskLevels": ["high"]
-            },
-            "GrantControls": {
-                "BuiltInControls": ["block"]
-            },
-            "State": "enabled",
-            "DisplayName": "Test name"
-        }
-        ],
-        "service_plans": [
-        {
-            "ServicePlanName": "EXCHANGE_S_FOUNDATION",
-            "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
-        },
-        {
-            "ServicePlanName": "AAD_PREMIUM_P2",
-            "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
-        }
-        ]
-    }
-
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-}
-
-test_IncludeRoles_Incorrect if {
-    ControlNumber := "AAD 2.3"
-    Requirement := "Sign-ins detected as high risk SHALL be blocked"
-
-    Output := tests with input as {
-        "conditional_access_policies": [
-        {
-            "Conditions": {
-                "Applications": {
-                    "IncludeApplications": ["All"]
-                },
-                "Users": {
-                    "IncludeUsers": ["All"],
-                    "ExcludeUsers": [],
-                    "IncludeGroups": ["All"],
-                    "ExcludeGroups": [],
-                    "IncludeRoles": [],
-                    "ExcludeRoles": []
                 },
                 "SignInRiskLevels": ["high"]
             },
@@ -349,9 +245,7 @@ test_ExcludeRoles_Incorrect if {
                 "Users": {
                     "IncludeUsers": ["All"],
                     "ExcludeUsers": [],
-                    "IncludeGroups": ["All"],
                     "ExcludeGroups": [],
-                    "IncludeRoles": ["All"],
                     "ExcludeRoles": ["8bc7c6ee-39a2-42a5-a31b-f77fb51db652"]
 
                 },
@@ -397,9 +291,7 @@ test_SignInRiskLevels_Incorrect if {
                 "Users": {
                     "IncludeUsers": ["All"],
                     "ExcludeUsers": [],
-                    "IncludeGroups": ["All"],
                     "ExcludeGroups": [],
-                    "IncludeRoles": ["All"],
                     "ExcludeRoles": []
                 },
                 "SignInRiskLevels": [""]
@@ -444,9 +336,7 @@ test_BuiltInControls_Incorrect if {
                 "Users": {
                     "IncludeUsers": ["All"],
                     "ExcludeUsers": [],
-                    "IncludeGroups": ["All"],
                     "ExcludeGroups": [],
-                    "IncludeRoles": ["All"],
                     "ExcludeRoles": []
                 },
                 "SignInRiskLevels": ["high"]
@@ -491,9 +381,7 @@ test_State_Incorrect if {
                 "Users": {
                     "IncludeUsers": ["All"],
                     "ExcludeUsers": [],
-                    "IncludeGroups": ["All"],
                     "ExcludeGroups": [],
-                    "IncludeRoles": ["All"],
                     "ExcludeRoles": []
                 },
                 "SignInRiskLevels": ["high"]

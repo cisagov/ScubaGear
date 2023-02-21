@@ -19,9 +19,7 @@ test_ConditionalAccessPolicies_Correct if {
                     "Users": {
                         "IncludeUsers": ["All"],
                         "ExcludeUsers": [],
-                        "IncludeGroups": ["All"],
                         "ExcludeGroups": [],
-                        "IncludeRoles": ["All"],
                         "ExcludeRoles": []
                     }
                 },
@@ -55,9 +53,7 @@ test_IncludeApplications_Incorrect if {
                     "Users": {
                         "IncludeUsers": ["All"],
                         "ExcludeUsers": [],
-                        "IncludeGroups": ["All"],
                         "ExcludeGroups": [],
-                        "IncludeRoles": ["All"],
                         "ExcludeRoles": []
                     }
                 },
@@ -90,9 +86,7 @@ test_IncludeUsers_Incorrect if {
                     "Users": {
                         "IncludeUsers": ["8bc7c6ee-39a2-42a5-a31b-f77fb51db652"],
                         "ExcludeUsers": [],
-                        "IncludeGroups": ["All"],
                         "ExcludeGroups": [],
-                        "IncludeRoles": ["All"],
                         "ExcludeRoles": []
                     }
                 },
@@ -126,46 +120,8 @@ test_ExcludeUsers_Incorrect if {
                     "Users": {
                         "IncludeUsers": ["All"],
                         "ExcludeUsers": ["8bc7c6ee-39a2-42a5-a31b-f77fb51db652"],
-                        "IncludeGroups": ["All"],
                         "ExcludeGroups": [],
-                        "IncludeRoles": ["All"],
                         "ExcludeRoles": []
-                    }
-                },
-                "GrantControls": {
-                    "BuiltInControls": ["mfa"]
-                },
-                "State": "enabled",
-                "DisplayName": "Test Policy require MFA for All Apps, but not All Users"
-            }
-        ]
-    }
-
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-}
-
-test_IncludeGroups_Incorrect if {
-    ControlNumber := "AAD 2.4"
-    Requirement := "MFA SHALL be required for all users"
-
-    Output := tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": ["All"]
-                    },
-                    "Users": {
-                        "IncludeUsers": ["All"],
-                        "ExcludeUsers": [],
-                        "IncludeGroups": ["8bc7c6ee-39a2-42a5-a31b-f77fb51db652"],
-                        "ExcludeGroups": [],
-                        "IncludeRoles": ["All"],
-                        "ExcludeRoles":[]
                     }
                 },
                 "GrantControls": {
@@ -198,45 +154,7 @@ test_ExcludeGroups_Incorrect if {
                     "Users": {
                         "IncludeUsers": ["All"],
                         "ExcludeUsers": [],
-                        "IncludeGroups": ["All"],
                         "ExcludeGroups": ["8bc7c6ee-39a2-42a5-a31b-f77fb51db652"],
-                        "IncludeRoles": ["All"],
-                        "ExcludeRoles": []
-                    }
-                },
-                "GrantControls": {
-                    "BuiltInControls": ["mfa"]
-                },
-                "State": "enabled",
-                "DisplayName": "Test Policy require MFA for All Apps, but not All Users"
-            }
-        ]
-    }
-
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-}
-
-test_IncludeRoles_Incorrect if {
-    ControlNumber := "AAD 2.4"
-    Requirement := "MFA SHALL be required for all users"
-
-    Output := tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": ["All"]
-                    },
-                    "Users": {
-                        "IncludeUsers": ["All"],
-                        "ExcludeUsers": [],
-                        "IncludeGroups": ["All"],
-                        "ExcludeGroups": [],
-                        "IncludeRoles": ["8bc7c6ee-39a2-42a5-a31b-f77fb51db652"],
                         "ExcludeRoles": []
                     }
                 },
@@ -270,9 +188,7 @@ test_ExcludeRoles_Incorrect if {
                     "Users": {
                         "IncludeUsers": ["All"],
                         "ExcludeUsers": [],
-                        "IncludeGroups": ["All"],
                         "ExcludeGroups": [],
-                        "IncludeRoles": ["All"],
                         "ExcludeRoles": ["8bc7c6ee-39a2-42a5-a31b-f77fb51db652"]
                     }
                 },
@@ -307,9 +223,7 @@ test_BuiltInControls_Incorrect if {
                     "Users": {
                         "IncludeUsers": ["All"],
                         "ExcludeUsers": [],
-                        "IncludeGroups": ["All"],
                         "ExcludeGroups": [],
-                        "IncludeRoles": ["All"],
                         "ExcludeRoles": []
                     }
                 },
@@ -343,9 +257,7 @@ test_State_Incorrect if {
                     "Users": {
                         "IncludeUsers": ["All"],
                         "ExcludeUsers": [],
-                        "IncludeGroups": ["All"],
                         "ExcludeGroups": [],
-                        "IncludeRoles": ["All"],
                         "ExcludeRoles": []
                     }
                 },

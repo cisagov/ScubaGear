@@ -19,9 +19,7 @@ test_Conditions_Correct if {
                     "Users": {
                         "IncludeUsers": ["All"],
                         "ExcludeUsers": [],
-                        "IncludeGroups": ["<undefined>"],
                         "ExcludeGroups": [],
-                        "IncludeRoles": ["<undefined>"],
                         "ExcludeRoles": []
                     },
                     "ClientAppTypes": ["other", "exchangeActiveSync"]
@@ -56,9 +54,7 @@ test_IncludeApplications_Incorrect if {
                     "Users": {
                         "IncludeUsers": ["All"],
                         "ExcludeUsers": [],
-                        "IncludeGroups": ["<undefined>"],
                         "ExcludeGroups": [],
-                        "IncludeRoles": ["<undefined>"],
                         "ExcludeRoles": []
                     },
                     "ClientAppTypes": ["other", "exchangeActiveSync"]
@@ -93,9 +89,7 @@ test_IncludeUsers_Incorrect if {
                     "Users": {
                         "IncludeUsers": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"],
                         "ExcludeUsers": [],
-                        "IncludeGroups": ["<undefined>"],
                         "ExcludeGroups": [],
-                        "IncludeRoles": ["<undefined>"],
                         "ExcludeRoles": []
                     },
                     "ClientAppTypes": ["other", "exchangeActiveSync"]
@@ -130,46 +124,7 @@ test_ExcludeUsers_Incorrect if {
                     "Users": {
                         "IncludeUsers": ["All"],
                         "ExcludeUsers": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"],
-                        "IncludeGroups": ["<undefined>"],
                         "ExcludeGroups": [],
-                        "IncludeRoles": ["<undefined>"],
-                        "ExcludeRoles": []
-                    },
-                    "ClientAppTypes": ["other", "exchangeActiveSync"]
-                },
-                "GrantControls": {
-                    "BuiltInControls": ["block"]
-                },
-                "State": "enabled",
-                "DisplayName": "Test block Legacy Authentication"
-            }
-        ]
-    }
-
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-}
-
-test_IncludeGroups_Incorrect if {
-    ControlNumber := "AAD 2.1"
-    Requirement := "Legacy authentication SHALL be blocked"
-
-    Output := tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": ["All"]
-                    },
-                    "Users": {
-                        "IncludeUsers": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"],
-                        "ExcludeUsers": [],
-                        "IncludeGroups": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"],
-                        "ExcludeGroups": [],
-                        "IncludeRoles": ["<undefined>"],
                         "ExcludeRoles": []
                     },
                     "ClientAppTypes": ["other", "exchangeActiveSync"]
@@ -204,46 +159,7 @@ test_ExcludeGroups_Incorrect if {
                     "Users": {
                         "IncludeUsers": ["All"],
                         "ExcludeUsers": [],
-                        "IncludeGroups": ["<undefined>"],
                         "ExcludeGroups": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"],
-                        "IncludeRoles": ["<undefined>"],
-                        "ExcludeRoles": []
-                    },
-                    "ClientAppTypes": ["other", "exchangeActiveSync"]
-                },
-                "GrantControls": {
-                    "BuiltInControls": ["block"]
-                },
-                "State": "enabled",
-                "DisplayName": "Test block Legacy Authentication"
-            }
-        ]
-    }
-
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-}
-
-test_IncludeRoles_Incorrect if {
-    ControlNumber := "AAD 2.1"
-    Requirement := "Legacy authentication SHALL be blocked"
-
-    Output := tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": ["All"]
-                    },
-                    "Users": {
-                        "IncludeUsers": ["All"],
-                        "ExcludeUsers": [],
-                        "IncludeGroups": ["<undefined>"],
-                        "ExcludeGroups": [],
-                        "IncludeRoles": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"],
                         "ExcludeRoles": []
                     },
                     "ClientAppTypes": ["other", "exchangeActiveSync"]
@@ -278,9 +194,7 @@ test_ExcludeRoles_Incorrect if {
                     "Users": {
                         "IncludeUsers": ["All"],
                         "ExcludeUsers": [],
-                        "IncludeGroups": ["<undefined>"],
                         "ExcludeGroups": [],
-                        "IncludeRoles": ["<undefined>"],
                         "ExcludeRoles": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]
                     },
                     "ClientAppTypes": ["other", "exchangeActiveSync"]
@@ -315,9 +229,7 @@ test_ClientAppTypes_Incorrect if {
                     "Users": {
                         "IncludeUsers": ["All"],
                         "ExcludeUsers": [],
-                        "IncludeGroups": ["<undefined>"],
                         "ExcludeGroups": [],
-                        "IncludeRoles": ["<undefined>"],
                         "ExcludeRoles": []
                     },
                     "ClientAppTypes": [""]
@@ -352,9 +264,7 @@ test_BuiltInControls_Incorrect if {
                     "Users": {
                         "IncludeUsers": ["All"],
                         "ExcludeUsers": [],
-                        "IncludeGroups": ["<undefined>"],
                         "ExcludeGroups": [],
-                        "IncludeRoles": ["<undefined>"],
                         "ExcludeRoles": []
                     },
                     "ClientAppTypes": ["other", "exchangeActiveSync"]
@@ -389,9 +299,7 @@ test_State_Incorrect if {
                     "Users": {
                         "IncludeUsers": ["All"],
                         "ExcludeUsers": [],
-                        "IncludeGroups": ["<undefined>"],
                         "ExcludeGroups": [],
-                        "IncludeRoles": ["<undefined>"],
                         "ExcludeRoles": []
                     },
                     "ClientAppTypes": ["other", "exchangeActiveSync"]
