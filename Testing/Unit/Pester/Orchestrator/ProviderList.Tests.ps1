@@ -1,4 +1,4 @@
-param($ModuleVersion)
+# param($ModuleVersion)
 
 BeforeAll {
     Import-Module ../../../../PowerShell/ScubaGear/Modules/Orchestrator.psm1
@@ -19,7 +19,7 @@ Describe 'Invoke-ProviderList' {
             $M365Environment = "gcc"
             $TenantDetails = Get-TenantDetail -ProductNames $ProductNames -M365Environment $M365Environment
 
-            $ModuleVersion = param($ModuleVersion)
+            #$ModuleVersion = param($ModuleVersion)
 
             # Write-Host("Module version is: ")
             # Write-Host($ModuleVersion)
