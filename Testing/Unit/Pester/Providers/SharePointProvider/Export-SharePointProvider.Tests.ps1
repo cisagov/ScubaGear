@@ -6,9 +6,9 @@
 Import-Module ../../../../../PowerShell/ScubaGear/Modules/Providers/ExportSharePointProvider.psm1 -Force
 Import-Module ../../../../../PowerShell/ScubaGear/Modules/Providers/ProviderHelpers/CommandTracker.psm1 -Force
 
-Describe "Export-SharePointProvider" {
-        InModuleScope -ModuleName ExportSharePointProvider {
-        BeforeEach {
+InModuleScope -ModuleName ExportSharePointProvider {
+    Describe "Export-SharePointProvider" {
+        BeforeAll {
             class MockCommandTracker {
                 [string[]]$SuccessfulCommands = @()
                 [string[]]$UnSuccessfulCommands = @()
@@ -17,7 +17,7 @@ Describe "Export-SharePointProvider" {
                     if (-Not $CommandArgs.ContainsKey("ErrorAction")) {
                         $CommandArgs.ErrorAction = "Stop"
                     }
-                # This is where you start mocking your functions
+                # This is where you decide where to call mocked functions
                 try {
                     switch ($Command) {
                         "Get-MgOrganization" {
@@ -32,11 +32,6 @@ Describe "Export-SharePointProvider" {
                          {
                             $this.SuccessfulCommands += $Command
                             return $this.MockGetSPOTenant()
-                        }
-                        "Get-MgOrganization"
-                        {
-                           $this.SuccessfulCommands += $Command
-                           return $this.MockGetSPOTenant()
                         }
                         default {
                             throw "ERROR you forgot to create a mock method for this cmdlet: $($Command)"
@@ -54,7 +49,7 @@ Describe "Export-SharePointProvider" {
                 }
             }
 
-            # note how each function is mocked here
+            # Functions have to be mocked as class methods
             [System.Object[]] MockGetMgOrganization() {
                 return [pscustomobject]@{
                     VerifiedDomains = @(
@@ -81,6 +76,7 @@ Describe "Export-SharePointProvider" {
                     sharepointsite = "sharepointtenant"
                 }
             }
+            # End mock functions
 
             [System.Object[]] TryCommand([string]$Command) {
                 return $this.TryCommand($Command, @{})
