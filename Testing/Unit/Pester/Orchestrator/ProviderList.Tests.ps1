@@ -6,11 +6,11 @@ BeforeAll {
     Mock -ModuleName Orchestrator
 }
 
-Write-Host("(Outside Describe) Module version is: ")
-Write-Host($ModuleVersion)
+# Write-Host("(Outside Describe) Module version is: ")
+# Write-Host($ModuleVersion)
 
 Describe 'Invoke-ProviderList' {
-    Write-Host($ModuleVersion)
+    # Write-Host($ModuleVersion)
     InModuleScope Orchestrator {
         It 'Invoke-ProviderList' {
             $OutFolderPath = "./output"
@@ -21,12 +21,12 @@ Describe 'Invoke-ProviderList' {
 
             $ModuleVersion = param($ModuleVersion)
 
-            Write-Host("Module version is: ")
-            Write-Host($ModuleVersion)
+            # Write-Host("Module version is: ")
+            # Write-Host($ModuleVersion)
             #$ModuleVersion = 0.0
 
             Invoke-ProviderList -ProductNames $ProductNames -M365Environment $M365Environment -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -OutProviderfileName $OutProviderFileName
-            
+
             $Path = Join-Path -Path "$($OutFolderPath)" -ChildPath "$($OutProviderFileName).json"
             $output = Get-Content -Path $Path | Out-String
             $ValidJson = $true
