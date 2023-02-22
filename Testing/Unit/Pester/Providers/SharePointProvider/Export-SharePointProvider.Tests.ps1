@@ -2,17 +2,17 @@
  # Due to how the Error handling was implemented mocked API calls have to be mocked inside a
  # mocked CommandTracker class
 #>
-BeforeAll {
-    Import-Module ../../../../../PowerShell/ScubaGear/Modules/Providers/ExportSharePointProvider.psm1 -Force
-    Import-Module ../../../../../PowerShell/ScubaGear/Modules/Providers/ProviderHelpers/CommandTracker.psm1 -Force
-}
+
+Import-Module ../../../../../PowerShell/ScubaGear/Modules/Providers/ExportSharePointProvider.psm1 -Force
+Import-Module ../../../../../PowerShell/ScubaGear/Modules/Providers/ProviderHelpers/CommandTracker.psm1 -Force
+
 Describe "Export-SharePointProvider" {
         InModuleScope -ModuleName ExportSharePointProvider {
         BeforeEach {
             class MockCommandTracker {
                 [string[]]$SuccessfulCommands = @()
                 [string[]]$UnSuccessfulCommands = @()
-        
+
                 [System.Object[]] TryCommand([string]$Command, [hashtable]$CommandArgs) {
                     if (-Not $CommandArgs.ContainsKey("ErrorAction")) {
                         $CommandArgs.ErrorAction = "Stop"
@@ -24,13 +24,19 @@ Describe "Export-SharePointProvider" {
                             $this.SuccessfulCommands += $Command
                             return $this.MockGetMgOrganization()
                         }
-                        "Get-SPOSite" {
+                        {($_ -eq "Get-SPOSite") -or ($_ -eq "Get-PnPTenantSite")}  {
                             $this.SuccessfulCommands += $Command
                             return $this.MockGetSPOSite()
                         }
-                        "Get-SPOTenant" {
+                        {($_ -eq "Get-SPOTenant") -or ($_ -eq "Get-PnPTenant")}
+                         {
                             $this.SuccessfulCommands += $Command
                             return $this.MockGetSPOTenant()
+                        }
+                        "Get-MgOrganization"
+                        {
+                           $this.SuccessfulCommands += $Command
+                           return $this.MockGetSPOTenant()
                         }
                         default {
                             throw "ERROR you forgot to create a mock method for this cmdlet: $($Command)"
@@ -61,7 +67,7 @@ Describe "Export-SharePointProvider" {
                             "Name" = "example.onmicrosoft.com";
                         }
                         )
-                    } 
+                    }
             }
 
             [System.Object[]] MockGetSPOSite() {
@@ -75,23 +81,23 @@ Describe "Export-SharePointProvider" {
                     sharepointsite = "sharepointtenant"
                 }
             }
-        
+
             [System.Object[]] TryCommand([string]$Command) {
                 return $this.TryCommand($Command, @{})
             }
-        
+
             [void] AddSuccessfulCommand([string]$Command) {
                 $this.SuccessfulCommands += $Command
             }
-        
+
             [void] AddUnSuccessfulCommand([string]$Command) {
                 $this.UnSuccessfulCommands += $Command
             }
-        
+
             [string[]] GetUnSuccessfulCommands() {
                 return $this.UnSuccessfulCommands
             }
-        
+
             [string[]] GetSuccessfulCommands() {
                 return $this.SuccessfulCommands
             }
@@ -115,8 +121,8 @@ Describe "Export-SharePointProvider" {
         $ValidJson| Should -Be $true
     }
 
-    It "When running with Service Principals and PnPFlag set to 'true' it should return JSON" { #todo convert this to PnP
-        $json = Export-SharePointProvider -M365Environment commercial
+    It "When running with Service Principals and PnPFlag set to 'true' it should return JSON" {
+        $json = Export-SharePointProvider -M365Environment commercial -PnPFlag
         $json = $json.TrimEnd(",")
         $json = "{$($json)}"
         $ValidJson = $true
