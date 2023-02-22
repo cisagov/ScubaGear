@@ -133,3 +133,9 @@ InModuleScope -ModuleName ExportSharePointProvider {
 }
 }
 
+AfterAll {
+    Remove-Module ExportSharePointProvider -Force -ErrorAction SilentlyContinue
+    Remove-Module CommandTracker -Force -ErrorAction SilentlyContinue
+}
+
+
