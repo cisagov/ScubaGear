@@ -1,11 +1,8 @@
-BeforeAll {
-    Import-Module ../../../../../PowerShell/ScubaGear/Modules/Providers/ExportTeamsProvider.psm1
-    Connect-MicrosoftTeams
-}
+Import-Module ../../../../../PowerShell/ScubaGear/Modules/Providers/ExportTeamsProvider.psms1
 
-Describe "Export-TeamsProvider" {
-    It "return JSON" {
-        InModuleScope ExportTeamsProvider {
+InModuleScope ExportTeamsProvider {
+    Describe "Export-TeamsProvider" {
+        It "return JSON" {
             $json = Export-TeamsProvider -M365Environment "gcc"
             $json = $json.TrimEnd(",")
             $json = "{$($json)}"
@@ -16,7 +13,7 @@ Describe "Export-TeamsProvider" {
             catch {
                 $ValidJson = $false;
             }
-            $ValidJson| Should -Be $true
+            $ValidJson | Should -Be $true
         }
     }
 }

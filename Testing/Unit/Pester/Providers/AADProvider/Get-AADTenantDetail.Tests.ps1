@@ -1,24 +1,19 @@
-BeforeAll {
-    Import-Module ../../../../../PowerShell/ScubaGear/Modules/Providers/ExportAADProvider.psm1
-    $GraphScopes = (
-        'User.Read.All',
-        'Policy.Read.All',
-        'Organization.Read.All',
-        'UserAuthenticationMethod.Read.All',
-        'RoleManagement.Read.Directory',
-        'GroupMember.Read.All',
-        'Directory.Read.All'
-    )
-    $GraphParams = @{
-        'Scopes' = $GraphScopes;
-        'ErrorAction' = 'Stop';
-    }
-    Connect-MgGraph @GraphParams | Out-Null
-}
+Import-Module ../../../../../PowerShell/ScubaGear/Modules/Providers/ExportAADProvider.psm1
 
-Describe "Get-AADTenantDetail" {
-    It "return JSON" {
-        InModuleScope ExportAADProvider {
+InModuleScope ExportAADProvider {
+    BeforeAll {
+        # empty stub required for mocked cmdlets called directly in the provider
+        function Get-MgOrganization {}
+        Mock -ModuleName ExportAADProvider Get-MgOrganization -MockWith {
+            return [pscustomobject]@{
+                DisplayName = "DisplayName";
+                Name = "DomainName";
+                Id = "TenantId";
+            }
+        }
+    }
+    Describe "Get-AADTenantDetail" {
+        It "when called returns valid JSON" {
             $Json = Get-AADTenantDetail
             $ValidJson = $true
             try {
@@ -27,7 +22,11 @@ Describe "Get-AADTenantDetail" {
             catch {
                 $ValidJson = $false;
             }
-            $ValidJson| Should -Be $true
+            $ValidJson | Should -Be $true
         }
     }
+}
+
+AfterAll {
+    Remove-Module ExportAADProvider -Force -ErrorAction SilentlyContinue
 }
