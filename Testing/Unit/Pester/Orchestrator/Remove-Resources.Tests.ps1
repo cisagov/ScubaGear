@@ -1,12 +1,13 @@
-BeforeAll {
-    Import-Module ../../../../PowerShell/ScubaGear/Modules/Orchestrator.psm1
-}
+Import-Module ../../../../PowerShell/ScubaGear/Modules/Orchestrator.psm1 -Force
 
 Describe 'Remove-Resources' {
     InModuleScope Orchestrator {
-        It 'Remove-Resources' {
-            Remove-Resources
-            $LASTEXITCODE | Should -Be 0
+        It 'Removes all helper modules with no errors' {
+            {Remove-Resources} | Should -Not -Throw
         }
     }
+}
+
+AfterAll {
+    Remove-Module Orchestrator -ErrorAction SilentlyContinue
 }
