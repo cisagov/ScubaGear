@@ -1,16 +1,17 @@
-BeforeAll {
-    Import-Module ../../../../PowerShell/ScubaGear/Modules/RunRego
-}
+Import-Module ../../../../PowerShell/ScubaGear/Modules/RunRego
 
 Describe 'Invoke-Rego' {
-    It 'Takes 4 parameters and returns test results based on json and rego file' {
+    It 'Runs OPA on Teams rego and returns Test results object' {
         $RegoParams = @{
-            'InputFile' = "./ProviderSettingsExport.json";
-            'RegoFile' = "../Rego/TeamsConfig.rego";
+            'InputFile' = "./RunRegoStubs/ProviderSettingsExport.json";
+            'RegoFile' = "../../../../Rego/TeamsConfig.rego";
             'PackageName' = "teams";
-            'OPAPath' = "../";
+            'OPAPath' = "../../../../";
         }
         Invoke-Rego @RegoParams | Should -Not -Be $null
     }
 }
 
+AfterAll {
+    Remove-Module RunRego
+}
