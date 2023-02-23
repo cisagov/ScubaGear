@@ -113,24 +113,33 @@ tests[{
 # Baseline 2.4: Policy 1
 #--
 ReportDetails2_4_1(Policy) = Description if {
+    Policy.SharingCapability == 0
+	Description := "Requirement met"
+}
+
+ReportDetails2_4_1(Policy) = Description if {
+    Policy.SharingCapability != 0
     Policy.ExternalUserExpirationRequired == true
     Policy.ExternalUserExpireInDays == 30
 	Description := "Requirement met"
 }
 
 ReportDetails2_4_1(Policy) = Description if {
+    Policy.SharingCapability != 0
     Policy.ExternalUserExpirationRequired == false
     Policy.ExternalUserExpireInDays == 30
 	Description := "Requirement not met: Expiration timer for 'Guest access to a site or OneDrive' NOT enabled"
 }
 
 ReportDetails2_4_1(Policy) = Description if {
+    Policy.SharingCapability != 0
     Policy.ExternalUserExpirationRequired == true
     Policy.ExternalUserExpireInDays != 30
 	Description := "Requirement not met: Expiration timer for 'Guest access to a site or OneDrive' NOT set to 30 days"
 }
 
 ReportDetails2_4_1(Policy) = Description if {
+    Policy.SharingCapability != 0
     Policy.ExternalUserExpirationRequired == false
     Policy.ExternalUserExpireInDays != 30
 	Description := "Requirement not met"
@@ -141,13 +150,19 @@ tests[{
     "Control" : "Sharepoint 2.4",
     "Criticality" : "Should",
     "Commandlet" : ["Get-SPOTenant"],
-    "ActualValue" : [Policy.ExternalUserExpirationRequired, Policy.ExternalUserExpireInDays],
+    "ActualValue" : [Policy.SharingCapability, Policy.ExternalUserExpirationRequired, Policy.ExternalUserExpireInDays],
     "ReportDetails" : ReportDetails2_4_1(Policy),
     "RequirementMet" : Status
 }] {
     Policy := input.SPO_tenant[_]
-    Conditions := [Policy.ExternalUserExpirationRequired == true, Policy.ExternalUserExpireInDays == 30]
-    Status := count([Condition | Condition = Conditions[_]; Condition == false]) == 0
+
+    # Role policy requires assignment expiration, but maximum duration is 30 days
+    Conditions1 := [Policy.ExternalUserExpirationRequired == true, Policy.ExternalUserExpireInDays == 30]
+    Case := count([Condition | Condition = Conditions1[_]; Condition == false]) == 0
+
+    # Filter: only include rules that meet one of the two cases
+    Conditions2 := [Policy.SharingCapability == 0, Case]
+    Status := count([Condition | Condition = Conditions2[_]; Condition == true]) > 0
 }
 #--
 
@@ -155,24 +170,33 @@ tests[{
 # Baseline 2.4: Policy 2
 #--
 ReportDetails2_4_2(Policy) = Description if {
+    Policy.SharingCapability == 0
+	Description := "Requirement met"
+}
+
+ReportDetails2_4_2(Policy) = Description if {
+    Policy.SharingCapability != 0
     Policy.EmailAttestationRequired == true
     Policy.EmailAttestationReAuthDays == 30
 	Description := "Requirement met"
 }
 
 ReportDetails2_4_2(Policy) = Description if {
+    Policy.SharingCapability != 0
     Policy.EmailAttestationRequired == false
     Policy.EmailAttestationReAuthDays == 30
 	Description := "Requirement not met: Expiration timer for 'People who use a verification code' NOT enabled"
 }
 
 ReportDetails2_4_2(Policy) = Description if {
+    Policy.SharingCapability != 0
     Policy.EmailAttestationRequired == true
     Policy.EmailAttestationReAuthDays != 30
 	Description := "Requirement not met: Expiration timer for 'People who use a verification code' NOT set to 30 days"
 }
 
 ReportDetails2_4_2(Policy) = Description if {
+    Policy.SharingCapability != 0
     Policy.EmailAttestationRequired == false
     Policy.EmailAttestationReAuthDays != 30
 	Description := "Requirement not met"
@@ -183,13 +207,19 @@ tests[{
     "Control" : "Sharepoint 2.4",
     "Criticality" : "Should",
     "Commandlet" : ["Get-SPOTenant"],
-    "ActualValue" : [Policy.EmailAttestationRequired, Policy.EmailAttestationReAuthDays],
+    "ActualValue" : [Policy.SharingCapability, Policy.EmailAttestationRequired, Policy.EmailAttestationReAuthDays],
     "ReportDetails" : ReportDetails2_4_2(Policy),
     "RequirementMet" : Status
 }] {
     Policy := input.SPO_tenant[_]
-    Conditions := [Policy.EmailAttestationRequired == true, Policy.EmailAttestationReAuthDays == 30]
-    Status := count([Condition | Condition = Conditions[_]; Condition == false]) == 0
+
+    # Role policy requires assignment expiration, but maximum duration is 30 days
+    Conditions1 := [Policy.EmailAttestationRequired == true, Policy.EmailAttestationReAuthDays == 30]
+    Case := count([Condition | Condition = Conditions1[_]; Condition == false]) == 0
+
+    # Filter: only include rules that meet one of the two cases
+    Conditions2 := [Policy.SharingCapability == 0, Case]
+    Status := count([Condition | Condition = Conditions2[_]; Condition == true]) > 0
 }
 #--
 
