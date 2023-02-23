@@ -17,7 +17,7 @@ tests[{
     "Requirement" : "File and folder links default sharing setting SHALL be set to \"Specific People (Only the People the User Specifies)\"",
     "Control" : "Sharepoint 2.1",
     "Criticality" : "Shall",
-    "Commandlet" : ["Get-SPOTenant"],
+    "Commandlet" : ["Get-SPOTenant", "Get-PnPTenant"],
     "ActualValue" : Policy.DefaultSharingLinkType,
     "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
@@ -39,7 +39,7 @@ tests[{
     "Requirement" : "External sharing SHOULD be limited to approved domains and security groups per interagency collaboration needs",
     "Control" : "Sharepoint 2.2",
     "Criticality" : "Should",
-    "Commandlet" : ["Get-SPOTenant"],
+    "Commandlet" : ["Get-SPOTenant", "Get-PnPTenant"],
     "ActualValue" : Policy.SharingCapability,
     "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
@@ -56,7 +56,7 @@ tests[{
 #    "Requirement" : "External sharing SHOULD be limited to approved domains and security groups per interagency collaboration needs",
 #    "Control" : "Sharepoint 2.2",
 #    "Criticality" : "Should",
-#    "Commandlet" : ["Get-SPOTenant"],
+#    "Commandlet" : ["Get-SPOTenant", "Get-PnPTenant"],
 #    "ActualValue" : Policy.SharingDomainRestrictionMode,
 #    "ReportDetails" : ReportDetailsBoolean(Status),
 #    "RequirementMet" : Status
@@ -73,7 +73,7 @@ tests[{
 #    "Requirement" : "External sharing SHOULD be limited to approved domains and security groups per interagency collaboration needs",
 #    "Control" : "Sharepoint 2.2",
 #    "Criticality" : "Should",
-#    "Commandlet" : ["Get-SPOTenant"],
+#    "Commandlet" : ["Get-SPOTenant", "Get-PnPTenant"],
 #    "ActualValue" : [Policy.SharingCapability, Policy.SharingDomainRestrictionMode],
 #    "ReportDetails" : ReportDetails2_2(Policy),
 #    "RequirementMet" : Status
@@ -149,7 +149,7 @@ tests[{
     "Requirement" : "Expiration timer for 'Guest access to a site or OneDrive' should be set to 30 days",
     "Control" : "Sharepoint 2.4",
     "Criticality" : "Should",
-    "Commandlet" : ["Get-SPOTenant"],
+    "Commandlet" : ["Get-SPOTenant", "Get-PnPTenant"],
     "ActualValue" : [Policy.SharingCapability, Policy.ExternalUserExpirationRequired, Policy.ExternalUserExpireInDays],
     "ReportDetails" : ReportDetails2_4_1(Policy),
     "RequirementMet" : Status
@@ -206,7 +206,7 @@ tests[{
     "Requirement" : "Expiration timer for 'People who use a verification code' should be set to 30 days",
     "Control" : "Sharepoint 2.4",
     "Criticality" : "Should",
-    "Commandlet" : ["Get-SPOTenant"],
+    "Commandlet" : ["Get-SPOTenant", "Get-PnPTenant"],
     "ActualValue" : [Policy.SharingCapability, Policy.EmailAttestationRequired, Policy.EmailAttestationReAuthDays],
     "ReportDetails" : ReportDetails2_4_2(Policy),
     "RequirementMet" : Status
