@@ -1,66 +1,76 @@
 Import-Module ../../../../PowerShell/ScubaGear/Modules/RunRego
 
-Describe 'Invoke-Rego' {
-    It 'Runs the AAD Rego on a Provider JSON and returns a TestResults object' {
-        $RegoParams = @{
-            'InputFile' = "./RunRegoStubs/ProviderSettingsExport.json";
-            'RegoFile' = "../../../../Rego/AADConfig.rego";
-            'PackageName' = "aad";
-            'OPAPath' = "../../../../";
+Describe -Tag 'RunRego' -Name 'Invoke-Rego' {
+    BeforeAll {
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'ArgToProd')]
+        $ArgToProd = @{
+            teams         = "Teams";
+            exo           = "EXO";
+            defender      = "Defender";
+            aad           = "AAD";
+            powerplatform = "PowerPlatform";
+            sharepoint    = "SharePoint";
+            onedrive      = "OneDrive";
         }
-        Invoke-Rego @RegoParams | Should -Not -Be $null
-    }
-    It 'Runs the EXO Rego on a Provider JSON and returns a TestResults object' {
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'RegoParams')]
         $RegoParams = @{
             'InputFile' = "./RunRegoStubs/ProviderSettingsExport.json";
-            'RegoFile' = "../../../../Rego/EXOConfig.rego";
-            'PackageName' = "exo";
-            'OPAPath' = "../../../../";
+            'OPAPath'   = "../../../../";
+        }
+    }
+    It 'Runs the AAD Rego on a Provider JSON and returns a TestResults object' {
+        $Product = 'aad'
+        $RegoParams += @{
+            'RegoFile'    = "../../../../Rego/$($ArgToProd[$Product])Config.rego";
+            'PackageName' = $Product;
         }
         Invoke-Rego @RegoParams | Should -Not -Be $null
     }
     It 'Runs the Defender Rego on a Provider JSON and returns a TestResults object' {
-        $RegoParams = @{
-            'InputFile' = "./RunRegoStubs/ProviderSettingsExport.json";
-            'RegoFile' = "../../../../Rego/DefenderConfig.rego";
-            'PackageName' = "defender";
-            'OPAPath' = "../../../../";
+        $Product = 'defender'
+        $RegoParams += @{
+            'RegoFile'    = "../../../../Rego/$($ArgToProd[$Product])Config.rego";
+            'PackageName' = $Product;
+        }
+        Invoke-Rego @RegoParams | Should -Not -Be $null
+    }
+    It 'Runs the EXO Rego on a Provider JSON and returns a TestResults object' {
+        $Product = 'exo'
+        $RegoParams += @{
+            'RegoFile'    = "../../../../Rego/$($ArgToProd[$Product])Config.rego";
+            'PackageName' = $Product;
         }
         Invoke-Rego @RegoParams | Should -Not -Be $null
     }
     It 'Runs the OneDrive Rego on a Provider JSON and returns a TestResults object' {
-        $RegoParams = @{
-            'InputFile' = "./RunRegoStubs/ProviderSettingsExport.json";
-            'RegoFile' = "../../../../Rego/OneDriveConfig.rego";
-            'PackageName' = "onedrive";
-            'OPAPath' = "../../../../";
+        $Product = 'onedrive'
+        $RegoParams += @{
+            'RegoFile'    = "../../../../Rego/$($ArgToProd[$Product])Config.rego";
+            'PackageName' = $Product;
         }
         Invoke-Rego @RegoParams | Should -Not -Be $null
     }
     It 'Runs the PowerPlatform Rego on a Provider JSON and returns a TestResults object' {
-        $RegoParams = @{
-            'InputFile' = "./RunRegoStubs/ProviderSettingsExport.json";
-            'RegoFile' = "../../../../Rego/PowerPlatformConfig.rego";
-            'PackageName' = "powerplatform";
-            'OPAPath' = "../../../../";
+        $Product = 'powerplatform'
+        $RegoParams += @{
+            'RegoFile'    = "../../../../Rego/$($ArgToProd[$Product])Config.rego";
+            'PackageName' = $Product;
         }
         Invoke-Rego @RegoParams | Should -Not -Be $null
     }
     It 'Runs the SharePoint Rego on a Provider JSON and returns a TestResults object' {
-        $RegoParams = @{
-            'InputFile' = "./RunRegoStubs/ProviderSettingsExport.json";
-            'RegoFile' = "../../../../Rego/SharepointConfig.rego";
-            'PackageName' = "sharepoint";
-            'OPAPath' = "../../../../";
+        $Product = 'sharepoint'
+        $RegoParams += @{
+            'RegoFile'    = "../../../../Rego/$($ArgToProd[$Product])Config.rego";
+            'PackageName' = $Product;
         }
         Invoke-Rego @RegoParams | Should -Not -Be $null
     }
     It 'Runs the Teams Rego on a Provider JSON and returns a TestResults object' {
-        $RegoParams = @{
-            'InputFile' = "./RunRegoStubs/ProviderSettingsExport.json";
-            'RegoFile' = "../../../../Rego/TeamsConfig.rego";
-            'PackageName' = "teams";
-            'OPAPath' = "../../../../";
+        $Product = 'teams'
+        $RegoParams += @{
+            'RegoFile'    = "../../../../Rego/$($ArgToProd[$Product])Config.rego";
+            'PackageName' = $Product;
         }
         Invoke-Rego @RegoParams | Should -Not -Be $null
     }

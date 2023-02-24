@@ -2,6 +2,9 @@
         "baseline_version": "0.1",
         "module_version": "0.2.0",
         "date": "12/09/2022 13:26:11 Eastern Standard Time",
+        "cap_table_data": {
+            "stub_data": "stub"
+        },
         "tenant_details": [
     {
         "AADAdditionalData":  {

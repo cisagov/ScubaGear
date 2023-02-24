@@ -1,7 +1,7 @@
 Import-Module ../../../../PowerShell/ScubaGear/Modules/Connection/Connection.psm1
 
 InModuleScope Connection {
-    Describe 'Disconnect-SCuBATenant' {
+    Describe -Tag 'Connection' -Name 'Disconnect-SCuBATenant' {
         BeforeAll {
             function Disconnect-MgGraph {}
             Mock -ModuleName Connection Disconnect-MgGraph -MockWith {}

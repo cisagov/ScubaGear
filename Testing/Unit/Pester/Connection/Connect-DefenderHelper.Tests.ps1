@@ -1,7 +1,7 @@
 Import-Module ../../../../PowerShell/ScubaGear/Modules/Connection/ConnectHelpers.psm1
 
 InModuleScope ConnectHelpers {
-    Describe 'Connect-EXOHelper' {
+    Describe -Tag 'Connection' -Name 'Connect-EXOHelper' {
         BeforeAll {
             function Connect-IPPSSession {}
             Mock -ModuleName ConnectHelpers Connect-IPPSSession -MockWith {}
