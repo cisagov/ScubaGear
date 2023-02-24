@@ -1,5 +1,3 @@
-# TODO: Decompose Orchestrator into individual function tests
-
 BeforeAll {
     Import-Module ../../../../PowerShell/ScubaGear/Modules/Orchestrator.psm1
 }

@@ -18,7 +18,7 @@ InModuleScope ExportEXOProvider {
                 }
             }
         }
-        It "when called with -M365Envirnoment 'gcc' returns valid JSON" {
+        It "when called with -M365Environment 'gcc' returns valid JSON" {
             $Json = Get-EXOTenantDetail -M365Environment "gcc"
             $ValidJson = $true
             try {

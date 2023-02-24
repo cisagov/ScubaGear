@@ -1,8 +1,7 @@
 Import-Module ../../../../../PowerShell/ScubaGear/Modules/Providers/ExportPowerPlatformProvider.psm1
 
 InModuleScope ExportPowerPlatformProvider {
-    Describe "Get-PowerPlatformTenantDetail" {
-
+    Describe -Tag 'PowerPlatformProvider' -Name "Get-PowerPlatformTenantDetail" {
         BeforeAll {
             # empty stub required for mocked cmdlets called directly in the provider
             function Get-TenantDetailsFromGraph {}
@@ -22,17 +21,39 @@ InModuleScope ExportPowerPlatformProvider {
                     TenantId = "TenantId";
                 }
             }
+            function Test-SCuBAValidJson {
+                param (
+                    [string]
+                    $Json
+                )
+                $ValidJson = $true
+                try {
+                    ConvertFrom-Json $Json -ErrorAction Stop | Out-Null
+                }
+                catch {
+                    $ValidJson = $false;
+                }
+                $ValidJson
+            }
         }
-
-        It "when called with -M365Environment 'gcc' returns valid JSON" {
-            $json = Get-PowerPlatformTenantDetail -M365Environment "gcc"
-            $ValidJson = $true
-            try {
-                ConvertFrom-Json $json -ErrorAction Stop;
-            }
-            catch {
-                $ValidJson = $false;
-            }
+        It "When called with -M365Environment 'commercial', returns valid JSON" {
+            $Json = Get-PowerPlatformTenantDetail -M365Environment "commercial"
+            $ValidJson = Test-SCuBAValidJson -Json $Json | Select-Object -Last 1
+            $ValidJson | Should -Be $true
+        }
+        It "When called with -M365Environment 'gcc', returns valid JSON" {
+            $Json = Get-PowerPlatformTenantDetail -M365Environment "gcc"
+            $ValidJson = Test-SCuBAValidJson -Json $Json | Select-Object -Last 1
+            $ValidJson | Should -Be $true
+        }
+        It "When called with -M365Environment 'gcchigh', returns valid JSON" {
+            $Json = Get-PowerPlatformTenantDetail -M365Environment "gcchigh"
+            $ValidJson = Test-SCuBAValidJson -Json $Json | Select-Object -Last 1
+            $ValidJson | Should -Be $true
+        }
+        It "When called with -M365Environment 'dod', returns valid JSON" {
+            $Json = Get-PowerPlatformTenantDetail -M365Environment "dod"
+            $ValidJson = Test-SCuBAValidJson -Json $Json | Select-Object -Last 1
             $ValidJson | Should -Be $true
         }
     }

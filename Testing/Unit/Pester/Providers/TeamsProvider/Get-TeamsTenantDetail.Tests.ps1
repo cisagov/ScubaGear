@@ -1,7 +1,7 @@
 Import-Module ../../../../../PowerShell/ScubaGear/Modules/Providers/ExportTeamsProvider.psm1 -Force
 
 InModuleScope ExportTeamsProvider {
-    Describe "Get-TeamsTenantDetail" {
+    Describe -Tag 'TeamsProvider' -Name "Get-TeamsTenantDetail" {
         BeforeAll {
             # empty stub required for mocked cmdlets called directly in the provider
             function Get-CsTenant {}
@@ -21,21 +21,43 @@ InModuleScope ExportTeamsProvider {
                     TenantId = "TenantId";
                 }
             }
+            function Test-SCuBAValidJson {
+                param (
+                    [string]
+                    $Json
+                )
+                $ValidJson = $true
+                try {
+                    ConvertFrom-Json $Json -ErrorAction Stop | Out-Null
+                }
+                catch {
+                    $ValidJson = $false;
+                }
+                $ValidJson
+            }
         }
-        It "return JSON" {
+        It "When called with -M365Environment 'commercial', returns valid JSON" {
+            $Json = Get-TeamsTenantDetail -M365Environment "commercial"
+            $ValidJson = Test-SCuBAValidJson -Json $Json | Select-Object -Last 1
+            $ValidJson | Should -Be $true
+        }
+        It "When called with -M365Environment 'gcc', returns valid JSON" {
             $Json = Get-TeamsTenantDetail -M365Environment "gcc"
-            $ValidJson = $true
-            try {
-                ConvertFrom-Json $Json -ErrorAction Stop;
-            }
-            catch {
-                $ValidJson = $false;
-            }
+            $ValidJson = Test-SCuBAValidJson -Json $Json | Select-Object -Last 1
+            $ValidJson | Should -Be $true
+        }
+        It "When called with -M365Environment 'gcchigh', returns valid JSON" {
+            $Json = Get-TeamsTenantDetail -M365Environment "gcchigh"
+            $ValidJson = Test-SCuBAValidJson -Json $Json | Select-Object -Last 1
+            $ValidJson | Should -Be $true
+        }
+        It "When called with -M365Environment 'dod', returns valid JSON" {
+            $Json = Get-TeamsTenantDetail -M365Environment "dod"
+            $ValidJson = Test-SCuBAValidJson -Json $Json | Select-Object -Last 1
             $ValidJson | Should -Be $true
         }
     }
 }
-
 AfterAll {
     Remove-Module ExportTeamsProvider -Force -ErrorAction SilentlyContinue
 }

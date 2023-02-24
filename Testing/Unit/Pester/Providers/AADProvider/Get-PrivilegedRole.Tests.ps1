@@ -1,4 +1,4 @@
-Import-Module ../../../../../PowerShell/ScubaGear/Modules/Providers/ExportAADProvider.psm1 -Function "Get-AADTenantDetail" -Force
+Import-Module ../../../../../PowerShell/ScubaGear/Modules/Providers/ExportAADProvider.psm1 -Function "Get-PrivilegedRole" -Force
 
 InModuleScope ExportAADProvider {
     BeforeAll {
@@ -25,9 +25,9 @@ InModuleScope ExportAADProvider {
             $ValidJson
         }
     }
-    Describe -Tag 'AADProvider' -Name "Get-AADTenantDetail" {
+    Describe -Tag 'AADProvider' -Name "Get-PrivilegedRole" {
         It "Returns valid JSON" {
-            $Json = Get-AADTenantDetail
+            $Json = Get-PrivilegedRole
             $ValidJson = Test-SCuBAValidJson -Json $Json | Select-Object -Last 1
             $ValidJson | Should -Be $true
         }
