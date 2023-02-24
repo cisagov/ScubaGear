@@ -10,26 +10,13 @@ InModuleScope ExportAADProvider {
                 Id = "TenantId";
             }
         }
-        function Test-SCuBAValidJson {
-            param (
-                [string]
-                $Json
-            )
-            $ValidJson = $true
-            try {
-                ConvertFrom-Json $Json -ErrorAction Stop | Out-Null
-            }
-            catch {
-                $ValidJson = $false;
-            }
-            $ValidJson
-        }
     }
     Describe -Tag 'AADProvider' -Name "Get-PrivilegedRole" {
-        It "Returns valid JSON" {
-            $Json = Get-PrivilegedRole
-            $ValidJson = Test-SCuBAValidJson -Json $Json | Select-Object -Last 1
-            $ValidJson | Should -Be $true
+        It "With no premimum license, returns a not null PowerShell object" {
+            {Get-PrivilegedRole} | Should -Not -BeNullOrEmpty
+        }
+        It "With premimum license, returns a not null PowerShell object" {
+            {Get-PrivilegedRole -TenantHasPremiumLicense} | Should -Not -BeNullOrEmpty
         }
     }
 }

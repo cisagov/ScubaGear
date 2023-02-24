@@ -1,4 +1,4 @@
-Import-Module ../../../../../PowerShell/ScubaGear/Modules/Providers/ExportTeamsProvider.psm1 -Force
+Import-Module ../../../../../PowerShell/ScubaGear/Modules/Providers/ExportTeamsProvider.psm1 -Function 'Get-TeamsTenantDetail' -Force
 
 InModuleScope ExportTeamsProvider {
     Describe -Tag 'TeamsProvider' -Name "Get-TeamsTenantDetail" {

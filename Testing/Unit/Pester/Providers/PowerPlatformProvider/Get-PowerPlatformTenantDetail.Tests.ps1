@@ -1,4 +1,4 @@
-Import-Module ../../../../../PowerShell/ScubaGear/Modules/Providers/ExportPowerPlatformProvider.psm1
+Import-Module ../../../../../PowerShell/ScubaGear/Modules/Providers/ExportPowerPlatformProvider.psm1 -Function 'Get-PowerPlatformTenantDetail'
 
 InModuleScope ExportPowerPlatformProvider {
     Describe -Tag 'PowerPlatformProvider' -Name "Get-PowerPlatformTenantDetail" {

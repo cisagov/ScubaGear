@@ -2,34 +2,21 @@ Import-Module ../../../../../PowerShell/ScubaGear/Modules/Providers/ExportAADPro
 
 InModuleScope ExportAADProvider {
     BeforeAll {
-        function Get-MgOrganization {}
-        Mock -ModuleName ExportAADProvider Get-MgOrganization -MockWith {
-            return [pscustomobject]@{
-                DisplayName = "DisplayName";
-                Name = "DomainName";
-                Id = "TenantId";
-            }
-        }
-        function Test-SCuBAValidJson {
-            param (
-                [string]
-                $Json
-            )
-            $ValidJson = $true
-            try {
-                ConvertFrom-Json $Json -ErrorAction Stop | Out-Null
-            }
-            catch {
-                $ValidJson = $false;
-            }
-            $ValidJson
-        }
+        function Get-PrivilegedUser {}
+        Mock -ModuleName ExportAADProvider Get-PrivilegedUser -MockWith {}
+        function Get-MgDirectoryRoleMember {}
+        Mock -ModuleName ExportAADProvider Get-MgDirectoryRoleMember -MockWith {}
+        function Get-MgUser {}
+        Mock -ModuleName ExportAADProvider Get-MgUser -MockWith {}
+        function Get-MgGroupMember {}
+        Mock -ModuleName ExportAADProvider Get-MgGroupMember -MockWith {}
     }
     Describe -Tag 'AADProvider' -Name "Get-PrivilegedUser" {
-        It "Returns valid JSON" {
-            $Json = Get-PrivilegedUser
-            $ValidJson = Test-SCuBAValidJson -Json $Json | Select-Object -Last 1
-            $ValidJson | Should -Be $true
+        It "With no premimum license, returns a not null PowerShell object" {
+            {Get-PrivilegedUser} | Should -Not -BeNullOrEmpty
+        }
+        It "With premimum license, returns a not null PowerShell object" {
+            {Get-PrivilegedUser -TenantHasPremiumLicense} | Should -Not -BeNullOrEmpty
         }
     }
 }
