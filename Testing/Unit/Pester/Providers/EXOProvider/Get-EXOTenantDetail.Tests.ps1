@@ -1,4 +1,5 @@
-Import-Module ../../../../../PowerShell/ScubaGear/Modules/Providers/ExportEXOProvider.psm1 -Force
+$ProviderPath = "../../../../../PowerShell/ScubaGear/Modules/Providers"
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "$($ProviderPath)/ExportEXOProvider.psm1") -Function Get-EXOTenantDetail -Force
 
 InModuleScope ExportEXOProvider {
     Describe "Get-EXOTenantDetail" {
@@ -17,16 +18,39 @@ InModuleScope ExportEXOProvider {
                     Content = '{token_endpoint: "this/is/the/token/url"}'
                 }
             }
+            function Test-SCuBAValidJson {
+                param (
+                    [string]
+                    $Json
+                )
+                $ValidJson = $true
+                try {
+                    ConvertFrom-Json $Json -ErrorAction Stop | Out-Null
+                }
+                catch {
+                    $ValidJson = $false;
+                }
+                $ValidJson
+            }
         }
-        It "when called with -M365Environment 'gcc' returns valid JSON" {
+        It "When called with -M365Environment 'commercial', returns valid JSON" {
+            $Json = Get-EXOTenantDetail -M365Environment "commercial"
+            $ValidJson = Test-SCuBAValidJson -Json $Json | Select-Object -Last 1
+            $ValidJson | Should -Be $true
+        }
+        It "When called with -M365Environment 'gcc', returns valid JSON" {
             $Json = Get-EXOTenantDetail -M365Environment "gcc"
-            $ValidJson = $true
-            try {
-                ConvertFrom-Json $Json -ErrorAction Stop
-            }
-            catch {
-                $ValidJson = $false;
-            }
+            $ValidJson = Test-SCuBAValidJson -Json $Json | Select-Object -Last 1
+            $ValidJson | Should -Be $true
+        }
+        It "When called with -M365Environment 'gcchigh', returns valid JSON" {
+            $Json = Get-EXOTenantDetail -M365Environment "gcchigh"
+            $ValidJson = Test-SCuBAValidJson -Json $Json | Select-Object -Last 1
+            $ValidJson | Should -Be $true
+        }
+        It "When called with -M365Environment 'dod', returns valid JSON" {
+            $Json = Get-EXOTenantDetail -M365Environment "dod"
+            $ValidJson = Test-SCuBAValidJson -Json $Json | Select-Object -Last 1
             $ValidJson | Should -Be $true
         }
     }

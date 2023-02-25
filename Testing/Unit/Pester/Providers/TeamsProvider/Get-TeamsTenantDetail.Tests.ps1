@@ -1,4 +1,5 @@
-Import-Module ../../../../../PowerShell/ScubaGear/Modules/Providers/ExportTeamsProvider.psm1 -Function 'Get-TeamsTenantDetail' -Force
+$ProviderPath = "../../../../../PowerShell/ScubaGear/Modules/Providers"
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "$($ProviderPath)/ExportTeamsProvider.psm1") -Function Get-TeamsTenantDetail -Force
 
 InModuleScope ExportTeamsProvider {
     Describe -Tag 'TeamsProvider' -Name "Get-TeamsTenantDetail" {

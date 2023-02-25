@@ -3,8 +3,9 @@
  # mocked CommandTracker class
 #>
 
-Import-Module ../../../../../PowerShell/ScubaGear/Modules/Providers/ExportPowerPlatformProvider.psm1 -Function Export-PowerPlatformProvider -Force
-Import-Module ../../../../../PowerShell/ScubaGear/Modules/Providers/ProviderHelpers/CommandTracker.psm1 -Force
+$ProviderPath = "../../../../../PowerShell/ScubaGear/Modules/Providers"
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "$($ProviderPath)/ExportPowerPlatformProvider.psm1") -Function Export-PowerPlatformProvider -Force
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "$($ProviderPath)/ProviderHelpers/CommandTracker.psm1") -Force
 
 InModuleScope -ModuleName ExportPowerPlatformProvider {
     Describe -Tag 'ExportPowerPlatformProvider' -Name "Export-PowerPlatformProvider" {
@@ -82,7 +83,7 @@ InModuleScope -ModuleName ExportPowerPlatformProvider {
                     return $this.SuccessfulCommands
                 }
             }
-
+            function Get-CommandTracker {}
             Mock -ModuleName ExportPowerPlatformProvider Get-CommandTracker {
                 return [MockCommandTracker]::New()
             }

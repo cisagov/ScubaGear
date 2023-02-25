@@ -1,4 +1,5 @@
-Import-Module ../../../../../PowerShell/ScubaGear/Modules/Providers/ExportPowerPlatformProvider.psm1 -Function 'Get-PowerPlatformTenantDetail'
+$ProviderPath = "../../../../../PowerShell/ScubaGear/Modules/Providers"
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "$($ProviderPath)/ExportPowerPlatformProvider.psm1") -Function 'Get-PowerPlatformTenantDetail' -Force
 
 InModuleScope ExportPowerPlatformProvider {
     Describe -Tag 'PowerPlatformProvider' -Name "Get-PowerPlatformTenantDetail" {

@@ -1,5 +1,6 @@
 BeforeAll {
-    Import-Module ../../../../PowerShell/ScubaGear/Modules/Orchestrator.psm1
+    $OrchestratorPath = '../../../../PowerShell/ScubaGear/Modules/Orchestrator.psm1'
+    Import-Module (Join-Path -Path $PSScriptRoot -ChildPath $OrchestratorPath)
 }
 
 Describe 'Invoke-Connection' {

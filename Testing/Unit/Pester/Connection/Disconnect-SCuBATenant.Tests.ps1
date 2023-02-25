@@ -1,4 +1,4 @@
-Import-Module ../../../../PowerShell/ScubaGear/Modules/Connection/Connection.psm1
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../../../../PowerShell/ScubaGear/Modules/Connection/Connection.psm1") -Function 'Disconnect-SCuBATenant' -Force
 
 InModuleScope Connection {
     Describe -Tag 'Connection' -Name 'Disconnect-SCuBATenant' {

@@ -3,8 +3,9 @@
  # mocked CommandTracker class
 #>
 
-Import-Module ../../../../../PowerShell/ScubaGear/Modules/Providers/ExportOneDriveProvider.psm1 -Force
-Import-Module ../../../../../PowerShell/ScubaGear/Modules/Providers/ProviderHelpers/CommandTracker.psm1 -Force
+$ProviderPath = "../../../../../PowerShell/ScubaGear/Modules/Providers"
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "$($ProviderPath)/ExportOneDriveProvider.psm1") -Force
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "$($ProviderPath)/ProviderHelpers/CommandTracker.psm1") -Force
 
 InModuleScope -ModuleName ExportOneDriveProvider {
     Describe -Tag 'ExportOneDriveProvider' -Name "Export-OneDriveProvider" {
@@ -61,6 +62,7 @@ InModuleScope -ModuleName ExportOneDriveProvider {
                     return $this.SuccessfulCommands
                 }
             }
+            function Get-CommandTracker {}
             Mock -ModuleName ExportOneDriveProvider Get-CommandTracker {
                 return [MockCommandTracker]::New()
             }

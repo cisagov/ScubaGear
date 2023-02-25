@@ -3,8 +3,9 @@
  # mocked CommandTracker class
 #>
 
-Import-Module ../../../../../PowerShell/ScubaGear/Modules/Providers/ExportEXOProvider.psm1 -Function Export-EXOProvider -Force
-Import-Module ../../../../../PowerShell/ScubaGear/Modules/Providers/ProviderHelpers/CommandTracker.psm1 -Force
+$ProviderPath = "../../../../../PowerShell/ScubaGear/Modules/Providers"
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "$($ProviderPath)/ExportEXOProvider.psm1") -Function Export-EXOProvider -Force
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "$($ProviderPath)/ProviderHelpers/CommandTracker.psm1") -Force
 
 InModuleScope -ModuleName ExportEXOProvider {
     Describe -Tag 'ExportEXOProvider' -Name "Export-EXOProvider" {
@@ -17,7 +18,47 @@ InModuleScope -ModuleName ExportEXOProvider {
                     # This is where you decide where you mock functions called by CommandTracker :)
                     try {
                         switch ($Command) {
-                            "Get-MgOrganization" {
+                            "Get-RemoteDomain" {
+                                $this.SuccessfulCommands += $Command
+                                return [pscustomobject]@{}
+                            }
+                            "Get-AcceptedDomain" {
+                                $this.SuccessfulCommands += $Command
+                                return [pscustomobject]@{}
+                            }
+                            "Get-ScubaSpfRecords" {
+                                $this.SuccessfulCommands += $Command
+                                return [pscustomobject]@{}
+                            }
+                            "Get-DkimSigningConfig" {
+                                $this.SuccessfulCommands += $Command
+                                return [pscustomobject]@{}
+                            }
+                            "Get-ScubaDkimRecords" {
+                                $this.SuccessfulCommands += $Command
+                                return [pscustomobject]@{}
+                            }
+                            "Get-ScubaDmarcRecords" {
+                                $this.SuccessfulCommands += $Command
+                                return [pscustomobject]@{}
+                            }
+                            "Get-TransportConfig" {
+                                $this.SuccessfulCommands += $Command
+                                return [pscustomobject]@{}
+                            }
+                            "Get-SharingPolicy" {
+                                $this.SuccessfulCommands += $Command
+                                return [pscustomobject]@{}
+                            }
+                            "Get-TransportRule" {
+                                $this.SuccessfulCommands += $Command
+                                return [pscustomobject]@{}
+                            }
+                            "Get-HostedConnectionFilterPolicy" {
+                                $this.SuccessfulCommands += $Command
+                                return [pscustomobject]@{}
+                            }
+                            "Get-OrganizationConfig" {
                                 $this.SuccessfulCommands += $Command
                                 return [pscustomobject]@{}
                             }
@@ -57,7 +98,7 @@ InModuleScope -ModuleName ExportEXOProvider {
                     return $this.SuccessfulCommands
                 }
             }
-
+            function Get-CommandTracker {}
             Mock -ModuleName ExportEXOProvider Get-CommandTracker {
                 return [MockCommandTracker]::New()
             }
@@ -79,11 +120,26 @@ InModuleScope -ModuleName ExportEXOProvider {
                 $ValidJson
             }
         }
-        It "returns valid JSON" {
-                $Json = Export-EXOProvider -M365Environment 'commercial'
-                $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
-                $ValidJson | Should -Be $true
-            }
+        It "When called with -M365Environment 'commercial', returns valid JSON" {
+            $Json = Export-EXOProvider -M365Environment 'commercial'
+            $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
+            $ValidJson | Should -Be $true
+        }
+        It "When called with -M365Environment 'gcc', returns valid JSON" {
+            $Json = Export-EXOProvider -M365Environment 'gcc'
+            $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
+            $ValidJson | Should -Be $true
+        }
+        It "When called with -M365Environment 'gcchigh', returns valid JSON" {
+            $Json = Export-EXOProvider -M365Environment 'gcchigh'
+            $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
+            $ValidJson | Should -Be $true
+        }
+        It "When called with -M365Environment 'dod', returns valid JSON" {
+            $Json = Export-EXOProvider -M365Environment 'dod'
+            $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
+            $ValidJson | Should -Be $true
+        }
     }
 }
 AfterAll {

@@ -3,8 +3,9 @@
  # mocked CommandTracker class
 #>
 
-Import-Module ../../../../../PowerShell/ScubaGear/Modules/Providers/ExportSharePointProvider.psm1 -Force
-Import-Module ../../../../../PowerShell/ScubaGear/Modules/Providers/ProviderHelpers/CommandTracker.psm1 -Force
+$ProviderPath = "../../../../../PowerShell/ScubaGear/Modules/Providers"
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "$($ProviderPath)/ExportSharePointProvider.psm1") -Force
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "$($ProviderPath)/ProviderHelpers/CommandTracker.psm1") -Force
 
 InModuleScope -ModuleName ExportSharePointProvider {
     Describe -Tag 'SharePointProvider' -Name "Export-SharePointProvider" {
@@ -77,6 +78,7 @@ InModuleScope -ModuleName ExportSharePointProvider {
                 }
             }
 
+            function Get-CommandTracker {}
             Mock -ModuleName ExportSharePointProvider Get-CommandTracker {
                 return [MockCommandTracker]::New()
             }

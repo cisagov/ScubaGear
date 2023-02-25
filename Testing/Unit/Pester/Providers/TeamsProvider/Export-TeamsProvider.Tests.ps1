@@ -2,9 +2,9 @@
  # Due to how the Error handling was implemented, mocked API calls have to be mocked inside a
  # mocked CommandTracker class
 #>
-
-Import-Module ../../../../../PowerShell/ScubaGear/Modules/Providers/ExportTeamsProvider.psm1 -Function Export-TeamsProvider -Force
-Import-Module ../../../../../PowerShell/ScubaGear/Modules/Providers/ProviderHelpers/CommandTracker.psm1 -Force
+$ProviderPath = "../../../../../PowerShell/ScubaGear/Modules/Providers"
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "$($ProviderPath)/ExportTeamsProvider.psm1") -Function Export-TeamsProvider -Force
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "$($ProviderPath)/ProviderHelpers/CommandTracker.psm1") -Force
 
 InModuleScope -ModuleName ExportTeamsProvider {
     Describe -Tag 'ExportTeamsProvider' -Name "Export-TeamsProvider" {
@@ -77,7 +77,7 @@ InModuleScope -ModuleName ExportTeamsProvider {
                     return $this.SuccessfulCommands
                 }
             }
-
+            function Get-CommandTracker {}
             Mock -ModuleName ExportTeamsProvider Get-CommandTracker {
                 return [MockCommandTracker]::New()
             }

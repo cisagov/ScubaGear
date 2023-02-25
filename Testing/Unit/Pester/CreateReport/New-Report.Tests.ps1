@@ -1,7 +1,7 @@
 BeforeAll {
-    Import-Module ../../../../PowerShell/ScubaGear/Modules/CreateReport
-    New-Item -Path "./CreateReportStubs" -Name "CreateReportUnitFolder" -ErrorAction SilentlyContinue -ItemType Directory | Out-Null
-    New-Item -Path "./CreateReportStubs/CreateReportUnitFolder" -Name "IndividualReports" -ErrorAction SilentlyContinue -ItemType Directory | Out-Null
+    Import-Module (Join-Path -Path $PSScriptRoot -ChildPath '../../../../PowerShell/ScubaGear/Modules/CreateReport')
+    New-Item -Path (Join-Path -Path $PSScriptRoot -ChildPath "./CreateReportStubs") -Name "CreateReportUnitFolder" -ErrorAction SilentlyContinue -ItemType Directory | Out-Null
+    New-Item -Path (Join-Path -Path $PSScriptRoot -ChildPath "./CreateReportStubs/CreateReportUnitFolder") -Name "IndividualReports" -ErrorAction SilentlyContinue -ItemType Directory | Out-Null
 }
 
 Describe -Tag CreateReport -Name 'New-Report' {
@@ -29,11 +29,11 @@ Describe -Tag CreateReport -Name 'New-Report' {
                 SharePoint    = "SharePoint Online";
                 OneDrive      = "OneDrive for Business";
             }
-            $IndividualReportPath = "./CreateReportStubs/CreateReportUnitFolder/IndividualReports"
+            $IndividualReportPath = (Join-Path -Path $PSScriptRoot -ChildPath "./CreateReportStubs/CreateReportUnitFolder/IndividualReports")
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'CreateReportParams')]
             $CreateReportParams = @{
                 'IndividualReportPath' = $IndividualReportPath;
-                'OutPath'              = "./CreateReportStubs";
+                'OutPath'              = (Join-Path -Path $PSScriptRoot -ChildPath "./CreateReportStubs");
                 'OutProviderFileName'  = "ProviderSettingsExport";
                 'OutRegoFileName'      = "TestResults";
             }
@@ -106,5 +106,5 @@ Describe -Tag CreateReport -Name 'New-Report' {
 
 AfterAll {
     Remove-Module CreateReport -ErrorAction SilentlyContinue
-    Remove-Item -Recurse -Force -Path "./CreateReportStubs/CreateReportUnitFolder" -ErrorAction SilentlyContinue
+    Remove-Item -Recurse -Force -Path (Join-Path -Path $PSScriptRoot -ChildPath "./CreateReportStubs/CreateReportUnitFolder") -ErrorAction SilentlyContinue
 }

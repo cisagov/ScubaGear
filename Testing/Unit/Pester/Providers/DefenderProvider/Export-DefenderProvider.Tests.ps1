@@ -3,8 +3,9 @@
  # mocked CommandTracker class
 #>
 
-Import-Module ../../../../../PowerShell/ScubaGear/Modules/Providers/ExportDefenderProvider.psm1 -Function Export-DefenderProvider -Force
-Import-Module ../../../../../PowerShell/ScubaGear/Modules/Providers/ProviderHelpers/CommandTracker.psm1 -Force
+$ProviderPath = "../../../../../PowerShell/ScubaGear/Modules/Providers"
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "$($ProviderPath)/ExportDefenderProvider.psm1") -Function Export-DefenderProvider -Force
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "$($ProviderPath)/ProviderHelpers/CommandTracker.psm1") -Force
 
 InModuleScope -ModuleName ExportDefenderProvider {
     Describe -Tag 'ExportDefenderProvider' -Name "Export-DefenderProvider" {
@@ -17,7 +18,59 @@ InModuleScope -ModuleName ExportDefenderProvider {
                     # This is where you decide where you mock functions called by CommandTracker :)
                     try {
                         switch ($Command) {
-                            "Get-MgOrganization" {
+                            "Get-AdminAuditLogConfig" {
+                                $this.SuccessfulCommands += $Command
+                                return [pscustomobject]@{}
+                            }
+                            "Get-EOPProtectionPolicyRule" {
+                                $this.SuccessfulCommands += $Command
+                                return [pscustomobject]@{}
+                            }
+                            "Get-MalwareFilterPolicy" {
+                                $this.SuccessfulCommands += $Command
+                                return [pscustomobject]@{}
+                            }
+                            "Get-AntiPhishPolicy" {
+                                $this.SuccessfulCommands += $Command
+                                return [pscustomobject]@{}
+                            }
+                            "Get-HostedContentFilterPolicy" {
+                                $this.SuccessfulCommands += $Command
+                                return [pscustomobject]@{}
+                            }
+                            "Get-AcceptedDomain" {
+                                $this.SuccessfulCommands += $Command
+                                return [pscustomobject]@{}
+                            }
+                            "Get-SafeAttachmentPolicy" {
+                                $this.SuccessfulCommands += $Command
+                                return [pscustomobject]@{}
+                            }
+                            "Get-SafeAttachmentRule" {
+                                $this.SuccessfulCommands += $Command
+                                return [pscustomobject]@{}
+                            }
+                            "Get-SafeLinksPolicy" {
+                                $this.SuccessfulCommands += $Command
+                                return [pscustomobject]@{}
+                            }
+                            "Get-SafeLinksRule" {
+                                $this.SuccessfulCommands += $Command
+                                return [pscustomobject]@{}
+                            }
+                            "Get-AtpPolicyForO365" {
+                                $this.SuccessfulCommands += $Command
+                                return [pscustomobject]@{}
+                            }
+                            "Get-DlpCompliancePolicy" {
+                                $this.SuccessfulCommands += $Command
+                                return [pscustomobject]@{}
+                            }
+                            "Get-DlpComplianceRule" {
+                                $this.SuccessfulCommands += $Command
+                                return [pscustomobject]@{}
+                            }
+                            "Get-ProtectionAlert" {
                                 $this.SuccessfulCommands += $Command
                                 return [pscustomobject]@{}
                             }
@@ -57,11 +110,20 @@ InModuleScope -ModuleName ExportDefenderProvider {
                     return $this.SuccessfulCommands
                 }
             }
-
+            function Get-CommandTracker {}
             Mock -ModuleName ExportDefenderProvider Get-CommandTracker {
                 return [MockCommandTracker]::New()
             }
-
+            function Connect-EXOHelper {}
+            Mock -ModuleName ExportDefenderProvider Connect-EXOHelper -MockWith {}
+            function Connect-DefenderHelper {}
+            Mock -ModuleName ExportDefenderProvider Connect-DefenderHelper -MockWith {}
+            function Get-OrganizationConfig {}
+            Mock -ModuleName ExportDefenderProvider Get-OrganizationConfig -MockWith { [pscustomobject]@{
+                    "mockkey" = "mockvalue";
+                } }
+            function Get-SafeAttachmentPolicy {}
+            Mock -ModuleName ExportDefenderProvider Get-SafeAttachmentPolicy -MockWith {}
             function Test-SCuBAValidProviderJson {
                 param (
                     [string]
@@ -79,11 +141,27 @@ InModuleScope -ModuleName ExportDefenderProvider {
                 $ValidJson
             }
         }
-        It "returns valid JSON" {
-                $Json = Export-DefenderProvider -M365Environment 'commercial'
-                $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
-                $ValidJson | Should -Be $true
-            }
+        It "When called with -M365Environment 'commercial', returns valid JSON" {
+            $Json = Export-DefenderProvider -M365Environment 'commercial'
+            $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
+            $ValidJson | Should -Be $true
+        }
+        It "When called with -M365Environment 'gcc', returns valid JSON" {
+            $Json = Export-DefenderProvider -M365Environment 'gcc'
+            $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
+            $ValidJson | Should -Be $true
+        }
+        It "When called with -M365Environment 'gcchigh', returns valid JSON" {
+            $Json = Export-DefenderProvider -M365Environment 'gcchigh'
+            $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
+            $ValidJson | Should -Be $true
+        }
+        It "When called with -M365Environment 'dod', returns valid JSON" {
+            $Json = Export-DefenderProvider -M365Environment 'dod'
+            $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
+            $ValidJson | Should -Be $true
+        }
+
     }
 }
 AfterAll {

@@ -1,4 +1,4 @@
-Import-Module ../../../../PowerShell/ScubaGear/Modules/RunRego
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath '../../../../PowerShell/ScubaGear/Modules/RunRego')
 
 Describe -Tag 'RunRego' -Name 'Invoke-Rego' {
     BeforeAll {
@@ -14,14 +14,14 @@ Describe -Tag 'RunRego' -Name 'Invoke-Rego' {
         }
         [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'RegoParams')]
         $RegoParams = @{
-            'InputFile' = "./RunRegoStubs/ProviderSettingsExport.json";
-            'OPAPath'   = "../../../../";
+            'InputFile' = Join-Path -Path $PSScriptRoot -ChildPath "./RunRegoStubs/ProviderSettingsExport.json";
+            'OPAPath'   = Join-Path -Path $PSScriptRoot -ChildPath "../../../../";
         }
     }
     It 'Runs the AAD Rego on a Provider JSON and returns a TestResults object' {
         $Product = 'aad'
         $RegoParams += @{
-            'RegoFile'    = "../../../../Rego/$($ArgToProd[$Product])Config.rego";
+            'RegoFile'    = Join-Path -Path $PSScriptRoot -ChildPath "../../../../Rego/$($ArgToProd[$Product])Config.rego";
             'PackageName' = $Product;
         }
         Invoke-Rego @RegoParams | Should -Not -Be $null
@@ -29,7 +29,7 @@ Describe -Tag 'RunRego' -Name 'Invoke-Rego' {
     It 'Runs the Defender Rego on a Provider JSON and returns a TestResults object' {
         $Product = 'defender'
         $RegoParams += @{
-            'RegoFile'    = "../../../../Rego/$($ArgToProd[$Product])Config.rego";
+            'RegoFile'    = Join-Path -Path $PSScriptRoot -ChildPath "../../../../Rego/$($ArgToProd[$Product])Config.rego";
             'PackageName' = $Product;
         }
         Invoke-Rego @RegoParams | Should -Not -Be $null
@@ -37,7 +37,7 @@ Describe -Tag 'RunRego' -Name 'Invoke-Rego' {
     It 'Runs the EXO Rego on a Provider JSON and returns a TestResults object' {
         $Product = 'exo'
         $RegoParams += @{
-            'RegoFile'    = "../../../../Rego/$($ArgToProd[$Product])Config.rego";
+            'RegoFile'    = Join-Path -Path $PSScriptRoot -ChildPath "../../../../Rego/$($ArgToProd[$Product])Config.rego";
             'PackageName' = $Product;
         }
         Invoke-Rego @RegoParams | Should -Not -Be $null
@@ -45,7 +45,7 @@ Describe -Tag 'RunRego' -Name 'Invoke-Rego' {
     It 'Runs the OneDrive Rego on a Provider JSON and returns a TestResults object' {
         $Product = 'onedrive'
         $RegoParams += @{
-            'RegoFile'    = "../../../../Rego/$($ArgToProd[$Product])Config.rego";
+            'RegoFile'    = Join-Path -Path $PSScriptRoot -ChildPath "../../../../Rego/$($ArgToProd[$Product])Config.rego";
             'PackageName' = $Product;
         }
         Invoke-Rego @RegoParams | Should -Not -Be $null
@@ -53,7 +53,7 @@ Describe -Tag 'RunRego' -Name 'Invoke-Rego' {
     It 'Runs the PowerPlatform Rego on a Provider JSON and returns a TestResults object' {
         $Product = 'powerplatform'
         $RegoParams += @{
-            'RegoFile'    = "../../../../Rego/$($ArgToProd[$Product])Config.rego";
+            'RegoFile'    = Join-Path -Path $PSScriptRoot -ChildPath "../../../../Rego/$($ArgToProd[$Product])Config.rego";
             'PackageName' = $Product;
         }
         Invoke-Rego @RegoParams | Should -Not -Be $null
@@ -61,7 +61,7 @@ Describe -Tag 'RunRego' -Name 'Invoke-Rego' {
     It 'Runs the SharePoint Rego on a Provider JSON and returns a TestResults object' {
         $Product = 'sharepoint'
         $RegoParams += @{
-            'RegoFile'    = "../../../../Rego/$($ArgToProd[$Product])Config.rego";
+            'RegoFile'    = Join-Path -Path $PSScriptRoot -ChildPath "../../../../Rego/$($ArgToProd[$Product])Config.rego";
             'PackageName' = $Product;
         }
         Invoke-Rego @RegoParams | Should -Not -Be $null
@@ -69,7 +69,7 @@ Describe -Tag 'RunRego' -Name 'Invoke-Rego' {
     It 'Runs the Teams Rego on a Provider JSON and returns a TestResults object' {
         $Product = 'teams'
         $RegoParams += @{
-            'RegoFile'    = "../../../../Rego/$($ArgToProd[$Product])Config.rego";
+            'RegoFile'    = Join-Path -Path $PSScriptRoot -ChildPath "../../../../Rego/$($ArgToProd[$Product])Config.rego";
             'PackageName' = $Product;
         }
         Invoke-Rego @RegoParams | Should -Not -Be $null

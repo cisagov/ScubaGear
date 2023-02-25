@@ -3,8 +3,10 @@
  # mocked CommandTracker class
 #>
 
-Import-Module ../../../../../PowerShell/ScubaGear/Modules/Providers/ExportAADProvider.psm1 -Function Export-AADProvider -Force
-Import-Module ../../../../../PowerShell/ScubaGear/Modules/Providers/ProviderHelpers/CommandTracker.psm1 -Force
+$ProviderPath = '../../../../../PowerShell/ScubaGear/Modules/Providers'
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "$($ProviderPath)/ExportAADProvider.psm1") -Function Export-AADProvider -Force
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "$($ProviderPath)/ProviderHelpers/CommandTracker.psm1") -Force
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "$($ProviderPath)/ProviderHelpers/AADConditionalAccessHelper.psm1") -Force
 
 InModuleScope -ModuleName ExportAADProvider {
     Describe -Tag 'ExportAADProvider' -Name "Export-AADProvider" {
@@ -17,7 +19,38 @@ InModuleScope -ModuleName ExportAADProvider {
                     # This is where you decide where you mock functions called by CommandTracker :)
                     try {
                         switch ($Command) {
-                            "Get-MgOrganization" {
+                            "Get-MgIdentityConditionalAccessPolicy" {
+                                $this.SuccessfulCommands += $Command
+                                return [pscustomobject]@{}
+                            }
+                            "Get-MgSubscribedSku" {
+                                $this.SuccessfulCommands += $Command
+                                return [pscustomobject]@{
+                                    ServicePlans = @(
+                                        @{
+                                            ProvisioningStatus = 'Success'
+                                        }
+                                    )
+                                    ServicePlanName = 'AAD_PREMIUM_P2'
+                                }
+                            }
+                            "Get-PrivilegedUser" {
+                                $this.SuccessfulCommands += $Command
+                                return [pscustomobject]@{}
+                            }
+                            "Get-PrivilegedRole" {
+                                $this.SuccessfulCommands += $Command
+                                return [pscustomobject]@{}
+                            }
+                            "Get-MgPolicyAuthorizationPolicy" {
+                                $this.SuccessfulCommands += $Command
+                                return [pscustomobject]@{}
+                            }
+                            "Get-MgDirectorySetting" {
+                                $this.SuccessfulCommands += $Command
+                                return [pscustomobject]@{}
+                            }
+                            "Get-MgPolicyAdminConsentRequestPolicy" {
                                 $this.SuccessfulCommands += $Command
                                 return [pscustomobject]@{}
                             }
@@ -57,9 +90,19 @@ InModuleScope -ModuleName ExportAADProvider {
                     return $this.SuccessfulCommands
                 }
             }
-
-            Mock -ModuleName ExportAADProvider Get-CommandTracker {
+            function Get-CommandTracker {}
+            Mock -ModuleName 'ExportAADProvider' Get-CommandTracker {
                 return [MockCommandTracker]::New()
+            }
+
+            class MockCapTracker {
+                [string] ExportCapPolicies([System.Object]$Caps) {
+                    return "[]"
+                }
+            }
+            function Get-CapTracker {}
+            Mock -ModuleName 'ExportAADProvider' Get-CapTracker  -MockWith {
+                return [MockCapTracker]::New()
             }
 
             function Test-SCuBAValidProviderJson {
@@ -79,14 +122,15 @@ InModuleScope -ModuleName ExportAADProvider {
                 $ValidJson
             }
         }
-        It "returns valid JSON" {
-                $Json = Export-AADProvider -M365Environment 'commercial'
+        It "With a AAD P2 license, returns valid JSON" {
+                $Json = Export-AADProvider
                 $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
                 $ValidJson | Should -Be $true
             }
     }
 }
 AfterAll {
-    Remove-Module ExportAADProvider -Force -ErrorAction SilentlyContinue
-    Remove-Module CommandTracker -Force -ErrorAction SilentlyContinue
+    Remove-Module ExportAADProvider -Force -ErrorAction 'SilentlyContinue'
+    Remove-Module CommandTracker -Force -ErrorAction 'SilentlyContinue'
+    Remove-Module AADConditionalAccessHelper -Force -ErrorAction 'SilentlyContinue'
 }

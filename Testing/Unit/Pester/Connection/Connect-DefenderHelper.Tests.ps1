@@ -1,7 +1,7 @@
-Import-Module ../../../../PowerShell/ScubaGear/Modules/Connection/ConnectHelpers.psm1
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../../../../PowerShell/ScubaGear/Modules/Connection/ConnectHelpers.psm1") -Function 'Connect-DefenderHelper' -Force
 
 InModuleScope ConnectHelpers {
-    Describe -Tag 'Connection' -Name 'Connect-EXOHelper' {
+    Describe -Tag 'Connection' -Name 'Connect-DefenderHelper' {
         BeforeAll {
             function Connect-IPPSSession {}
             Mock -ModuleName ConnectHelpers Connect-IPPSSession -MockWith {}

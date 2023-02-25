@@ -1,4 +1,4 @@
-Import-Module ../../../../PowerShell/ScubaGear/Modules/Connection/ConnectHelpers.psm1
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../../../../PowerShell/ScubaGear/Modules/Connection/ConnectHelpers.psm1") -Function 'Connect-EXOHelper' -Force
 
 InModuleScope ConnectHelpers {
     Describe -Tag 'Connection' -Name 'Connect-EXOHelper' {
