@@ -2,7 +2,7 @@ BeforeAll {
     Import-Module ../../../../PowerShell/ScubaGear/Modules/Orchestrator.psm1
 }
 
-Describe 'Invoke-RunRego' {
+Describe -Tag 'Orchestrator' -Name 'Invoke-RunRego' {
     InModuleScope Orchestrator {
         It 'Invoke-RunRego' {
             #how to call this?

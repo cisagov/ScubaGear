@@ -2,7 +2,7 @@ BeforeAll {
     Import-Module ../../../../PowerShell/ScubaGear/Modules/Orchestrator.psm1
 }
 
-Describe 'Invoke-Scuba' {
+Describe -Tag 'Orchestrator' -Name 'Invoke-Scuba' {
     InModuleScope Orchestrator {
         It 'Invoke-Scuba: given the product name will validate configuration' {
             #Invoke-Scuba -Login $True -ProductNames @("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", "onedirve") -Endpoint "usgov" -OPAPath "./" -OutPath output #just make sure that this runs completely there isnt really much to test

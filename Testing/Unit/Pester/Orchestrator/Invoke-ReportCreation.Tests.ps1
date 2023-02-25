@@ -2,7 +2,7 @@ BeforeAll {
     Import-Module ../../../../PowerShell/ScubaGear/Modules/Orchestrator.psm1
 }
 
-Describe 'Invoke-ReportCreation' {
+Describe -Tag 'Orchestrator' -Name 'Invoke-ReportCreation' {
     InModuleScope Orchestrator {
         It 'Invoke-ReportCreation' {
             $ProductNames = @("teams")
