@@ -8,7 +8,7 @@ InModuleScope Orchestrator {
                 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'ConnectParams')]
                 $ConnectParams = @{
                     LogIn           = $true
-                    M365Environment = "gcc"
+                    M365Environment = "commercial"
                     BoundParameters = @{}
                 }
                 function Connect-Tenant {}
