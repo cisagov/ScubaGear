@@ -141,7 +141,7 @@ function Get-AADTenantDetail {
         $AADTenantInfo = @{
             "DisplayName" = $OrgInfo.DisplayName;
             "DomainName" = $InitialDomain.Name;
-            "TenantId" = $OrgInfo.Id
+            "TenantId" = $OrgInfo.Id;
             "AADAdditionalData" = $OrgInfo;
         }
         $AADTenantInfo = ConvertTo-Json @($AADTenantInfo) -Depth 4
