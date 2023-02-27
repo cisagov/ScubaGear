@@ -36,6 +36,7 @@ Describe -Tag CreateReport -Name 'New-Report' {
                 'OutPath'              = (Join-Path -Path $PSScriptRoot -ChildPath "./CreateReportStubs");
                 'OutProviderFileName'  = "ProviderSettingsExport";
                 'OutRegoFileName'      = "TestResults";
+                'DarkMode'             = $false;
             }
         }
         It 'Creates a report for Azure Active Directory' {

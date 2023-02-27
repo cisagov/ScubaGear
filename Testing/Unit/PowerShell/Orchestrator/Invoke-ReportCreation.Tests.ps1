@@ -24,6 +24,7 @@ InModuleScope Orchestrator {
                 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'ProviderParameters')]
                 $ProviderParameters = @{
                     TenantDetails       = '{"DisplayName": "displayName"}';
+                    DarkMode            = $false;
                     ModuleVersion       = '1.0';
                     OutFolderPath       = "./"
                     OutProviderFileName = "ProviderSettingsExport"
@@ -84,6 +85,7 @@ InModuleScope Orchestrator {
             BeforeAll {
                 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'ProviderParameters')]
                 $ProviderParameters = @{
+                    DarkMode            = $false;
                     TenantDetails       = '{"DisplayName": "displayName"}';
                     ModuleVersion       = '1.0';
                     OutFolderPath       = "./"
