@@ -221,6 +221,8 @@ th.conditions {
     color: #7b7b7b;
     margin-left: 50px;
     margin-bottom: 5px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 14px;
 }
 
 /* The switch - the box around the slider */
