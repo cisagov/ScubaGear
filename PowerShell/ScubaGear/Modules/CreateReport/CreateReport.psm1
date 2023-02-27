@@ -35,7 +35,11 @@ function New-Report {
 
         [Parameter(Mandatory=$true)]
         [string]
-        $OutRegoFileName
+        $OutRegoFileName,
+
+        [Parameter(Mandatory=$true)]
+        [switch]
+        $DarkMode
     )
 
     $FileName = Join-Path -Path $PSScriptRoot -ChildPath "BaselineTitles.json"
@@ -150,7 +154,10 @@ function New-Report {
     $ScriptsPath = Join-Path -Path $ReporterPath -ChildPath "scripts"
     $MainJS = (Get-Content $(Join-Path -Path $ScriptsPath -ChildPath "main.js")) -Join "`n"
     $MainJS = "const caps = $($CapJson);`n$($MainJS)"
+    $UtilsJS = (Get-Content $(Join-Path -Path $ScriptsPath -ChildPath "utils.js")) -Join "`n"
+    $MainJS = "$($MainJS)`n$($UtilsJS)"
     $ReportHTML = $ReportHTML.Replace("{MAIN_JS}", "<script>
+        let darkMode = $($DarkMode.ToString().ToLower());
         $($MainJS)
     </script>")
 

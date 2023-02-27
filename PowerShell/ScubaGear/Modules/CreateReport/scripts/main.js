@@ -8,23 +8,23 @@ const colorRows = () => {
     for (let i = 0; i < rows.length; i++) {
         try {
             if (rows[i].children[statusCol].innerHTML === "Fail") {
-                rows[i].style.background = "#deb8b8";
+                rows[i].style.background = "var(--test-fail)";
             }
             else if (rows[i].children[statusCol].innerHTML === "Warning") {
-                rows[i].style.background = "#fff7d6";
+                rows[i].style.background = "var(--test-warning)";
             }
             else if (rows[i].children[statusCol].innerHTML === "Pass") {
-                rows[i].style.background = "#d5ebd5";
+                rows[i].style.background = "var(--test-pass)";
             }
             else if (rows[i].children[criticalityCol].innerHTML.includes("Not-Implemented")) {
-                rows[i].style.background = "#ebebf2";
+                rows[i].style.background = "var(--test-other)";
             }
             else if (rows[i].children[criticalityCol].innerHTML.includes("3rd Party")) {
-                rows[i].style.background = "#ebebf2";
+                rows[i].style.background = "var(--test-other)";
             }
             else if (rows[i].children[statusCol].innerHTML.includes("Error")) {
-                rows[i].style.background = "#deb8b8";
-                rows[i].querySelectorAll('td')[1].style.borderColor = "black";
+                rows[i].style.background = "var(--test-fail)";
+                rows[i].querySelectorAll('td')[1].style.borderColor = "var(--border-color)";
                 rows[i].querySelectorAll('td')[1].style.color = "#d10000";
             }
         }
@@ -291,4 +291,5 @@ const expandCAPRow = (event) => {
 window.addEventListener('DOMContentLoaded', (event) => {
     colorRows();
     fillCAPTable();
+    mountDarkMode("Individual Report");
 });

@@ -74,6 +74,8 @@ function Invoke-SCuBA {
     parameters. Additional parameters and variables not available on the
     command line can also be included in the file that will be provided to the
     tool for use in specific tests.
+    .Parameter DarkMode
+    Set switch to enable report dark mode by default.
     .Example
     Invoke-SCuBA
     Run an assessment against by default a commercial M365 Tenant against the
@@ -184,7 +186,11 @@ function Invoke-SCuBA {
             return $true
         })]
         [System.IO.FileInfo]
-        $ConfigFilePath
+        $ConfigFilePath,
+
+        [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
+        [switch]
+        $DarkMode
     )
     process {
         $ParentPath = Split-Path $PSScriptRoot -Parent
@@ -288,6 +294,7 @@ function Invoke-SCuBA {
             'OutProviderFileName' = $ScubaConfig.OutProviderFileName;
             'OutRegoFileName' = $ScubaConfig.OutRegoFileName;
             'OutReportName' = $ScubaConfig.OutReportName;
+            'DarkMode' = $DarkMode;
         }
 
         try {
@@ -633,7 +640,11 @@ function Invoke-ReportCreation {
 
         [Parameter(Mandatory = $false)]
         [boolean]
-        $Quiet = $false
+        $Quiet = $false,
+
+        [Parameter(Mandatory=$true)]
+        [switch]
+        $DarkMode
     )
     process {
         $N = 0
@@ -670,6 +681,7 @@ function Invoke-ReportCreation {
                 'OutPath' = $OutFolderPath;
                 'OutProviderFileName' = $OutProviderFileName;
                 'OutRegoFileName' = $OutRegoFileName;
+                'DarkMode' = $DarkMode;
             }
 
             $Report = New-Report @CreateReportParams
@@ -730,6 +742,15 @@ function Invoke-ReportCreation {
 
         $ParentCSS = (Get-Content $(Join-Path -Path $CssPath -ChildPath "ParentReportStyle.css")) -Join "`n"
         $ReportHTML = $ReportHTML.Replace("{PARENT_CSS}", "<style>$($ParentCSS)</style>")
+
+        $ScriptsPath = Join-Path -Path $ReporterPath -ChildPath "scripts"
+        $ParentReportJS = (Get-Content $(Join-Path -Path $ScriptsPath -ChildPath "ParentReport.js")) -Join "`n"
+        $UtilsJS = (Get-Content $(Join-Path -Path $ScriptsPath -ChildPath "utils.js")) -Join "`n"
+        $ParentReportJS = "$($ParentReportJS)`n$($UtilsJS)"
+        $ReportHTML = $ReportHTML.Replace("{MAIN_JS}", "<script>
+            let darkMode = $($DarkMode.ToString().ToLower());
+            $($ParentReportJS)
+        </script>")
 
         Add-Type -AssemblyName System.Web
         $ReportFileName = Join-Path -Path $OutFolderPath "$($OutReportName).html"
@@ -1007,6 +1028,8 @@ function Invoke-RunCached {
     .Parameter OutReportName
     The name of the main html file page created in the folder created in OutPath.
     Defaults to "BaselineReports".
+    .Parameter DarkMode
+    Set switch to enable report dark mode by default.
     .Example
     Invoke-RunCached
     Run an assessment against by default a commercial M365 Tenant against the
@@ -1098,7 +1121,11 @@ function Invoke-RunCached {
         [ValidateNotNullOrEmpty()]
         [ValidateSet($true, $false)]
         [boolean]
-        $Quiet = $false
+        $Quiet = $false,
+
+        [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
+        [switch]
+        $DarkMode
         )
         process {
             $ParentPath = Split-Path $PSScriptRoot -Parent
@@ -1182,6 +1209,7 @@ function Invoke-RunCached {
                 'OutRegoFileName' = $OutRegoFileName;
                 'OutReportName' = $OutReportName;
                 'Quiet' = $Quiet;
+                'DarkMode' = $DarkMode;
             }
             Invoke-RunRego @RegoParams
             Invoke-ReportCreation @ReportParams
