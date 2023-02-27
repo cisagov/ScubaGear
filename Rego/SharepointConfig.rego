@@ -252,7 +252,7 @@ tests[{
     "Requirement" : "Users SHALL be prevented from running custom scripts on self-service created sites",
     "Control" : "Sharepoint 2.5",
     "Criticality" : "Shall",
-    "Commandlet" : ["Get-SPOSite"],
+    "Commandlet" : ["Get-SPOSite", "Get-PnPTenantSite"],
     "ActualValue" : Policy.DenyAddAndCustomizePages,
     "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
