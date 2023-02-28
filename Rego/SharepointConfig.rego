@@ -13,22 +13,17 @@ ReportDetailsBoolean(Status) = "Requirement not met" if {Status == false}
 #
 # Baseline 2.1: Policy 1
 #--
-DefaultSharingLinkTypePolicy[Policy]{
-    Policy := input.SPO_tenant[_]
-    Policy.DefaultSharingLinkType == 1
-}
-
 tests[{
     "Requirement" : "File and folder links default sharing setting SHALL be set to \"Specific People (Only the People the User Specifies)\"",
     "Control" : "Sharepoint 2.1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-SPOTenant", "Get-PnPTenant"],
-    "ActualValue" : Policies,
+    "ActualValue" : Policy.DefaultSharingLinkType,
     "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
-    Policies := DefaultSharingLinkTypePolicy
-    Status := count(Policies) == 1
+    Policy := input.SPO_tenant[_]
+    Status := Policy.DefaultSharingLinkType == 1
 }
 #--
 
@@ -40,25 +35,53 @@ tests[{
 #
 # Baseline 2.2: Policy 1
 #--
-ExternalSharingPolicy[Policy]{
-    Policy := input.SPO_tenant[_]
-    Policy.SharingCapability == 1
-}
-
 tests[{
     "Requirement" : "External sharing SHOULD be limited to approved domains and security groups per interagency collaboration needs",
     "Control" : "Sharepoint 2.2",
     "Criticality" : "Should",
     "Commandlet" : ["Get-SPOTenant", "Get-PnPTenant"],
-    "ActualValue" : Policies,
+    "ActualValue" : Policy.SharingCapability,
     "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
-    Policies := ExternalSharingPolicy
-    Status := count(Policies) == 1
+    Policy := input.SPO_tenant[_]
+    Status := Policy.SharingCapability != 2
 }
 #--
 
+#
+# Baseline 2.2: Policy 2
+#--
+#tests[{
+#    "Requirement" : "External sharing SHOULD be limited to approved domains and security groups per interagency collaboration needs",
+#    "Control" : "Sharepoint 2.2",
+#    "Criticality" : "Should",
+#    "Commandlet" : ["Get-SPOTenant", "Get-PnPTenant"],
+#    "ActualValue" : Policy.SharingDomainRestrictionMode,
+#    "ReportDetails" : ReportDetailsBoolean(Status),
+#    "RequirementMet" : Status
+#}] {
+#    Policy := input.SPO_tenant[_]
+#    Status := Policy.SharingDomainRestrictionMode == 1
+#}
+#--
+
+#
+# Baseline 2.2: Policy 3
+#--
+#tests[{
+#    "Requirement" : "External sharing SHOULD be limited to approved domains and security groups per interagency collaboration needs",
+#    "Control" : "Sharepoint 2.2",
+#    "Criticality" : "Should",
+#    "Commandlet" : ["Get-SPOTenant", "Get-PnPTenant"],
+#    "ActualValue" : [Policy.SharingCapability, Policy.SharingDomainRestrictionMode],
+#    "ReportDetails" : ReportDetails2_2(Policy),
+#    "RequirementMet" : Status
+#}] {
+#    Policy := input.SPO_tenant[_]
+    # TODO: Missing Allow only users in specific security groups to share externally
+#}
+#--
 
 ################
 # Baseline 2.3 #
@@ -89,44 +112,114 @@ tests[{
 #
 # Baseline 2.4: Policy 1
 #--
-ExpirationTimerPolicyRequired[Policy]{
-    Policy := input.SPO_tenant[_]
+ReportDetails2_4_1(Policy) = Description if {
+    Policy.SharingCapability == 0
+	Description := "Requirement met"
+}
+
+ReportDetails2_4_1(Policy) = Description if {
+    Policy.SharingCapability != 0
     Policy.ExternalUserExpirationRequired == true
+    Policy.ExternalUserExpireInDays == 30
+	Description := "Requirement met"
+}
+
+ReportDetails2_4_1(Policy) = Description if {
+    Policy.SharingCapability != 0
+    Policy.ExternalUserExpirationRequired == false
+    Policy.ExternalUserExpireInDays == 30
+	Description := "Requirement not met: Expiration timer for 'Guest access to a site or OneDrive' NOT enabled"
+}
+
+ReportDetails2_4_1(Policy) = Description if {
+    Policy.SharingCapability != 0
+    Policy.ExternalUserExpirationRequired == true
+    Policy.ExternalUserExpireInDays != 30
+	Description := "Requirement not met: Expiration timer for 'Guest access to a site or OneDrive' NOT set to 30 days"
+}
+
+ReportDetails2_4_1(Policy) = Description if {
+    Policy.SharingCapability != 0
+    Policy.ExternalUserExpirationRequired == false
+    Policy.ExternalUserExpireInDays != 30
+	Description := "Requirement not met"
 }
 
 tests[{
-    "Requirement" : "Expiration timers for 'guest access to a site or OneDrive' and 'people who use a verification code' SHOULD be set",
+    "Requirement" : "Expiration timer for 'Guest access to a site or OneDrive' should be set to 30 days",
     "Control" : "Sharepoint 2.4",
     "Criticality" : "Should",
     "Commandlet" : ["Get-SPOTenant", "Get-PnPTenant"],
-    "ActualValue" : Policies,
-    "ReportDetails" : ReportDetailsBoolean(Status),
+    "ActualValue" : [Policy.SharingCapability, Policy.ExternalUserExpirationRequired, Policy.ExternalUserExpireInDays],
+    "ReportDetails" : ReportDetails2_4_1(Policy),
     "RequirementMet" : Status
 }] {
-    Policies := ExpirationTimerPolicyRequired
-    Status := count(Policies) == 1
+    Policy := input.SPO_tenant[_]
+
+    # Role policy requires assignment expiration, but maximum duration is 30 days
+    Conditions1 := [Policy.ExternalUserExpirationRequired == true, Policy.ExternalUserExpireInDays == 30]
+    Case := count([Condition | Condition = Conditions1[_]; Condition == false]) == 0
+
+    # Filter: only include rules that meet one of the two cases
+    Conditions2 := [Policy.SharingCapability == 0, Case]
+    Status := count([Condition | Condition = Conditions2[_]; Condition == true]) > 0
 }
 #--
 
 #
 # Baseline 2.4: Policy 2
 #--
-ExpirationTimerPolicy[Policy]{
-    Policy := input.SPO_tenant[_]
-    Policy.ExternalUserExpireInDays == 30
+ReportDetails2_4_2(Policy) = Description if {
+    Policy.SharingCapability == 0
+	Description := "Requirement met"
+}
+
+ReportDetails2_4_2(Policy) = Description if {
+    Policy.SharingCapability != 0
+    Policy.EmailAttestationRequired == true
+    Policy.EmailAttestationReAuthDays == 30
+	Description := "Requirement met"
+}
+
+ReportDetails2_4_2(Policy) = Description if {
+    Policy.SharingCapability != 0
+    Policy.EmailAttestationRequired == false
+    Policy.EmailAttestationReAuthDays == 30
+	Description := "Requirement not met: Expiration timer for 'People who use a verification code' NOT enabled"
+}
+
+ReportDetails2_4_2(Policy) = Description if {
+    Policy.SharingCapability != 0
+    Policy.EmailAttestationRequired == true
+    Policy.EmailAttestationReAuthDays != 30
+	Description := "Requirement not met: Expiration timer for 'People who use a verification code' NOT set to 30 days"
+}
+
+ReportDetails2_4_2(Policy) = Description if {
+    Policy.SharingCapability != 0
+    Policy.EmailAttestationRequired == false
+    Policy.EmailAttestationReAuthDays != 30
+	Description := "Requirement not met"
 }
 
 tests[{
-    "Requirement" : "Expiration timers SHOULD be set to 30 days",
+    "Requirement" : "Expiration timer for 'People who use a verification code' should be set to 30 days",
     "Control" : "Sharepoint 2.4",
     "Criticality" : "Should",
     "Commandlet" : ["Get-SPOTenant", "Get-PnPTenant"],
-    "ActualValue" : Policies,
-    "ReportDetails" : ReportDetailsBoolean(Status),
+    "ActualValue" : [Policy.SharingCapability, Policy.EmailAttestationRequired, Policy.EmailAttestationReAuthDays],
+    "ReportDetails" : ReportDetails2_4_2(Policy),
     "RequirementMet" : Status
 }] {
-    Policies := ExpirationTimerPolicy
-    Status := count(Policies) == 1
+    Policy := input.SPO_tenant[_]
+
+    # Role policy requires assignment expiration, but maximum duration is 30 days
+    Conditions1 := [Policy.EmailAttestationRequired == true, Policy.EmailAttestationReAuthDays == 30]
+    Case := count([Condition | Condition = Conditions1[_]; Condition == false]) == 0
+
+    # Filter: only include rules that meet one of the two cases
+    Conditions2 := [Policy.SharingCapability == 0, Case]
+    Status := count([Condition | Condition = Conditions2[_]; Condition == true]) > 0
 }
 #--
 
@@ -155,24 +248,18 @@ tests[{
 #
 # Baseline 2.5: Policy 2
 #--
-CustomScriptPolicy[Policy]{
-    Policy := input.SPO_site[_]
-    # DenyAddAndCustomizePages corresponds to the Custom Script config in the Sharepoint Admin classic settings page (2nd set of bullets in GUI)
-    # 1 = Allow users to run custom script on self-service created sites
-    # 2 = Prevent users from running custom script on self-service created sites
-    Policy.DenyAddAndCustomizePages == 2
-}
-
 tests[{
     "Requirement" : "Users SHALL be prevented from running custom scripts on self-service created sites",
     "Control" : "Sharepoint 2.5",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-SPOSite", "Get-PnPTenantSite"],
-    "ActualValue" : Policies,
+    "ActualValue" : Policy.DenyAddAndCustomizePages,
     "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
-    Policies := CustomScriptPolicy
-    Status := count(Policies) == 1
+    Policy := input.SPO_site[_]
+    # 1 == Allow users to run custom script on self-service created sites
+    # 2 == Prevent users from running custom script on self-service created sites
+    Status := Policy.DenyAddAndCustomizePages == 2
 }
 #--
