@@ -96,18 +96,31 @@ ReportDetailsBooleanLicenseWarning(Status) = Description if {
 #--
 Policies2_1[Cap.DisplayName] {
     Cap := input.conditional_access_policies[_]
-    # Filter: only include policies that meet all the requirements
+
+    # Filter: only include policies that meet the "All Users" requirement
     "All" in Cap.Conditions.Users.IncludeUsers
-   # "[]" in Cap.Conditions.Users.IncludeGroups
-  #  "[]" in Cap.Conditions.Users.IncludeRoles
-    count(Cap.Conditions.Users.ExcludeUsers) == 0
-    count(Cap.Conditions.Users.ExcludeGroups) == 0
-    count(Cap.Conditions.Users.ExcludeRoles) == 0
+    #Filter: only include policies that either have no user exclusions or that have exclusions that match with the config file
+    #ExcludeConfiguredUsers = input.scuba_config.aad.Policy2_1.CapExclusions.Users
+  #  IncludeUsers := Cap.Conditions.Users.IncludeUsers
+ #   ExcludeUsers := Cap.Conditions.Users.ExcludeUsers
+
+    #any (count(Cap.Conditions.Users.ExcludeUsers)== 0, ExcludeUsers == Cap.Conditions.Users.ExcludeUsers)
+    #ExcludedUsers = Cap.Conditions.Users.ExcludeUsers
+    #ExcludedUserSet := { ExcludeUsers | User = input.scuba_config.aad.Policy2_1.CapExclusions.Users }
+
+   # count(Cap.Conditions.Users.ExcludeUsers) == 0
+   # count(Cap.Conditions.Users.ExcludeGroups) == 0
+   # count(Cap.Conditions.Users.ExcludeRoles) == 0
     "All" in Cap.Conditions.Applications.IncludeApplications
     "other" in Cap.Conditions.ClientAppTypes
     "exchangeActiveSync" in Cap.Conditions.ClientAppTypes
     "block" in Cap.GrantControls.BuiltInControls
     Cap.State == "enabled"
+    print("Cap.Name:", Cap.DisplayName)
+    print("ExcludeUsers:", Cap.Conditions.Users.ExcludeUsers)
+    print("IncludeUsers:", Cap.Conditions.Users.IncludeUsers)
+    print("ExcludeGroups:", Cap.Conditions.Users.ExcludeGroups)
+    print("ExcludeConfiguredUsers:", input.scuba_config.Aad)
 }
 
 tests[{

@@ -464,12 +464,20 @@ function Invoke-ProviderList {
         else {
             $TimeZone = (Get-TimeZone).StandardName
         }
+
+        # $ConfigDetails = ConvertTo-Json @$([ScubaConfig]::GetInstance().Configuration) -Depth 10
+       # $ConfigDetails = @(ConvertTo-Json -Depth 4 $([ScubaConfig]::GetInstance().Configuration))
+        $ConfigDetails = $([ScubaConfig]::GetInstance().Configuration))
+        $ConfigDetailsJson = $ConfigDetails | ConvertTo-Json -Depth 5
+        #$ConfigDetails = @$([ScubaConfig]::GetInstance().Configuration) | ConvertTo-Json -Depth 10
+
         $BaselineSettingsExport = @"
 {
         "baseline_version": "0.1",
         "module_version": "$ModuleVersion",
         "date": "$(Get-Date) $($TimeZone)",
         "tenant_details": $($TenantDetails),
+        "scuba_config": $($ConfigDetailsJson),
 
         $ProviderJSON
 }
