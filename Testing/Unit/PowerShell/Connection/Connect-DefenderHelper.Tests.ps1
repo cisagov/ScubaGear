@@ -3,20 +3,53 @@ Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../../../../PowerShell/
 InModuleScope ConnectHelpers {
     Describe -Tag 'Connection' -Name 'Connect-DefenderHelper' {
         BeforeAll {
-            function Connect-IPPSSession {}
-            Mock -ModuleName ConnectHelpers Connect-IPPSSession -MockWith {}
+            Mock -CommandName Connect-IPPSSession -MockWith {}
         }
-        It 'When connecting interactively to commercial endpoint, connects to Security & Compliance' {
-            {Connect-DefenderHelper -M365Environment 'commercial'} | Should -Not -Throw
+        context 'Without Service Principal'{
+            It 'Invalid M365nvironment parameter' {
+                {Connect-DefenderHelper -M365Environment 'invalid_parameter'} | Should -Throw
+            }
+            It 'Invokes for commercial environment' {
+                Connect-DefenderHelper -M365Environment 'commercial'
+                Should -Invoke -CommandName Connect-IPPSSession -Times 1 -ParameterFilter {$ErrorAction -eq 'Stop' -And $CertificateThumbprint -eq $null}
+            }
+            It 'Invokes for gcc enviorment' {
+                Connect-DefenderHelper -M365Environment 'gcc'
+                Should -Invoke -CommandName Connect-IPPSSession -Times 1 -ParameterFilter {$ErrorAction -eq 'Stop' -And $CertificateThumbprint -eq $null}
+            }
+            It 'Invokes for gcchigh environment' {
+                Connect-DefenderHelper -M365Environment 'gcchigh'
+                Should -Invoke -CommandName Connect-IPPSSession -Times 1 `
+                -ParameterFilter {
+                    $ErrorAction -eq 'Stop' -And
+                    $CertificateThumbprint -eq $null -And
+                    $ConnectionUri -eq 'https://ps.compliance.protection.office365.us/powershell-liveid' -and
+                    $AzureADAuthorizationEndpointUri -eq 'https://login.microsoftonline.us/common'
+                }
+            }
+            It 'Invokes for dod environment' {
+                Connect-DefenderHelper -M365Environment 'dod'
+                Should -Invoke -CommandName Connect-IPPSSession -Times 1 `
+                -ParameterFilter {
+                    $ErrorAction -eq 'Stop' -And
+                    $CertificateThumbprint -eq $null -And
+                    $ConnectionUri -eq 'https://l5.ps.compliance.protection.office365.us/powershell-liveid' -and
+                    $AzureADAuthorizationEndpointUri -eq 'https://login.microsoftonline.us/common'
+                }
+            }
         }
-        It 'When connecting interactively to GCC endpoint, connects to Security & Compliance' {
-            {Connect-DefenderHelper -M365Environment 'gcc'} | Should -Not -Throw
-        }
-        It 'When connecting interactively to GCC High endpoint, connects to Security & Compliance' {
-            {Connect-DefenderHelper -M365Environment 'gcchigh'} | Should -Not -Throw
-        }
-        It 'When connecting interactively to DOD endpoint, connects to Security & Compliance' {
-            {Connect-DefenderHelper -M365Environment 'dod'} | Should -Not -Throw
+        context 'With Service Principal'{
+            It 'Invoke with Service Principal parameters'{
+                $sp = @{
+                    CertThumbprintParams = @{
+                        CertificateThumbprint = 'A thumbprint';
+                        AppID = 'My Id';
+                        Organization = 'My Organization';
+                    }
+                }
+                Connect-DefenderHelper -M365Environment 'commercial' -ServicePrincipalParams $sp
+                Should -Invoke -CommandName Connect-IPPSSession -Times 1 -ParameterFilter {$ErrorAction -eq 'Stop' -And   $CertificateThumbprint -eq 'A thumbprint'}
+            }
         }
     }
 }
