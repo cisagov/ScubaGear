@@ -9,13 +9,14 @@ jobs:
     defaults:
           run:
             shell: powershell 
-
+    permissions:
+      contents: read
     steps:
     - name: Checkout repo code
       uses: actions/checkout@v3
     - name: Execute ScubaGear
       run: |
-        echo 'Branch: ${{ github.ref }}''
+        echo 'Branch: ${{ github.ref }}'
         $PSVersionTable
 
 
