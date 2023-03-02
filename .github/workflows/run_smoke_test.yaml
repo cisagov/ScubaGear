@@ -1,5 +1,8 @@
 on: 
   workflow_dispatch:
+  push:
+    branches:
+      - 'automated-smoke-test'
 
 name: Smoke Test
 
@@ -10,7 +13,7 @@ jobs:
           run:
             shell: powershell 
     permissions:
-      contents: write
+      contents: read
     steps:
     - name: Checkout repo code
       uses: actions/checkout@v3
