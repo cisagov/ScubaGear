@@ -21,5 +21,6 @@ jobs:
       run: |
         echo 'Branch: ${{ github.ref }}'
         $PSVersionTable
-
+        ./SetUp.ps1
+        Import-Module -Name ./PowerShell/ScubaGear
 
