@@ -9,8 +9,7 @@ jobs:
     defaults:
           run:
             shell: powershell 
-    permissions:
-      contents: read
+
     steps:
     - name: Checkout repo code
       uses: actions/checkout@v3
