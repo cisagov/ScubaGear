@@ -147,6 +147,128 @@ function Get-EXOTenantDetail {
         $EXOTenantInfo
     }
 }
+
+function Invoke-RebustDnsTxt {
+    <#
+    .Description
+    Requests the TXT record for the given qname. First tries to make the query over traditional DNS
+    but retries over DoH in the event of failure.
+    .Parameter Qname
+    The fully-qualified domain name to request.
+    .Parameter MaxTries
+    The number of times to retry each kind of query. If all queries are unsuccessful, the traditional
+    queries and the DoH queries will each be made $MaxTries times. Default is 2.
+    .Functionality
+    Internal
+    #>
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory=$true)]
+        [string]
+        $Qname,
+
+        [Parameter(Mandatory=$false)]
+        [string]
+        $MaxTries = 2
+    )
+    $Answers = @()
+    $ErrorMessages = @()
+    $TryNumber = 0
+    $Success = $false
+    $TradEmptyOrNx = $false
+    while ($TryNumber -lt $MaxTries) {
+        try {
+            $TryNumber += 1
+            $Response = Resolve-DnsName $Qname txt | Where-Object {$_.Section -eq "Answer"} -ErrorAction Stop
+            if ($Response.Strings.Length -gt 0) {
+                $Answers += $Response.Strings
+                # We got our answer, so break out of the retry loop and set $Success to $true, no
+                # need to retry the traditional query or retry with DoH.
+                $Success = $true
+                break
+            }
+            else {
+                # The answer section was empty. This usually means that while the domain exists, but
+                # there are no records of the requested type. No need to retry the traditional query,
+                # this was not a transient failure. Don't set $Success to $true though, as we want to
+                # retry this query from a public resolver, in case the internal DNS server returns a
+                # different answer than what is served to the public (i.e., split horizon DNS).
+                $TradEmptyOrNx = $true
+                break
+            }
+        }
+        catch {
+            if ($_.FullyQualifiedErrorId -eq "DNS_ERROR_RCODE_NAME_ERROR,Microsoft.DnsClient.Commands.ResolveDnsName") {
+                # The server returned NXDomain, no need to retry the traditional query, this was not
+                # a transient failure. Don't set $Success to $true though, as we want to retry this
+                # query from a public resolver, in case the internal DNS server returns a different
+                # answer than what is served to the public (i.e., split horizon DNS).
+                $TradEmptyOrNx = $true
+                break
+            }
+            else {
+                # The query failed, possibly a transient failure. Retry if we haven't reached $MaxsTries.
+                $ErrorMessages += "Traditional DNS query resulted in $($_.FullyQualifiedErrorId)."
+            }
+        }
+    }
+
+    if (-not $Success) {
+        # The traditional DNS query(ies) failed. Retry with DoH
+        $TryNumber = 0
+        while ($TryNumber -lt $MaxTries) {
+            try {
+                $TryNumber += 1
+                $Uri = "https://1.1.1.1/dns-query?name=$($Qname)&type=txt"
+                $RawResponse = $(Invoke-WebRequest -H @{"accept"="application/dns-json"} -Uri $Uri).RawContent
+                $ResponseLines = $RawResponse -Split "`n"
+                $LastLine = $ResponseLines[$ResponseLines.Length - 1]
+                $ResponseBody = ConvertFrom-Json $LastLine
+                if ($ResponseBody.Status -eq 0) {
+                    # 0 indicates there was no error
+                    $Answers += ($ResponseBody.Answer.data | ForEach-Object {$_.Replace('"', '')})
+                    $Success = $true
+                    break
+                }
+                elseif ($ResponseBody.Status -eq 3) {
+                    # 3 indicates NXDomain. The DNS query succeeded, but the domain did not exist.
+                    # Set $Success to $true, because event though the domain does not exist, the
+                    # query succeeded, and this came from an external resolver so split horizon is
+                    # not an issue here.
+                    $Success = $true
+                    break
+                }
+                else {
+                    # The remainder of the response codes indicate that the query did not succeed.
+                    # Retry if we haven't reached $MaxTries.
+                    $ErrorMessages += "DoH query returned response code $($ResponseBody.Status)."
+                }
+            }
+            catch {
+                # The DoH query failed, likely due to a network issue. Retry if we haven't reached
+                # $MaxTries.
+                $ErrorMessages = "DoH query returned response code $($_.FullyQualifiedErrorId)."
+            }
+        }
+    }
+
+    # There are three possible outcomes of this function:
+    # - Full confidence: we know conclusively that the domain exists or not, either via an answer
+    # from traditional DNS, an answer from DoH, or NXDomain from DoH.
+    # - Medium confidence: domain likely doesn't exist, but there is some doubt (NXDomain from
+    # traditonal DNS and DoH failed).
+    # No confidence: all queries failed. Throw an exception in this case.
+    if ($Success) {
+        @{"Answers" = $Answers; "HighConfidence" = $true}
+    }
+    elseif ($TradEmptyOrNx) {
+        @{"Answers" = $Answers; "HighConfidence" = $false}
+    }
+    else {
+        throw "Failed to resolve $($Qname). $($ErrorMessages)"
+    }
+}
+
 function Get-ScubaSpfRecords {
     <#
     .Description
@@ -162,30 +284,23 @@ function Get-ScubaSpfRecords {
     )
 
     $SPFRecords = @()
+    $NLowConf = 0
 
     foreach ($d in $Domains) {
-        try {
-            $response = Resolve-DnsName $d.DomainName txt -ErrorAction Stop
-            $rdata = @($response.Strings)
+        $Response = Invoke-RebustDnsTxt $d.DomainName txt
+        if (-not $Response.HighConfidence) {
+            $NLowConf += 1
         }
-        catch {
-            if ($_.FullyQualifiedErrorId -eq "DNS_ERROR_RCODE_NAME_ERROR,Microsoft.DnsClient.Commands.ResolveDnsName") {
-                # Error is expected, just means the SPF record does not exist, does not mean the command failed
-                $rdata = ""
-            }
-            else {
-                # Error is not expected, let the exception propagate
-                throw $_
-            }
-        }
-
         $DomainName = $d.DomainName
         $SPFRecords += [PSCustomObject]@{
             "domain" = $DomainName;
-            "rdata" = $rdata
+            "rdata" = $Response.Answers
         }
     }
 
+    if ($NLowConf -gt 0) {
+        Write-Warning "Get-ScubaSpfRecords: for $($NLowConf) domain(s), the tradtional DNS queries returned either NXDomain or an empty answer section and the DoH queries failed. Will assume SPF not configured, but can't guarantee that failure isn't due to something like split horizon DNS."
+    }
     $SPFRecords
 }
 
@@ -204,6 +319,7 @@ function Get-ScubaDkimRecords {
     )
 
     $DKIMRecords = @()
+    $NLowConf = 0
 
     foreach ($d in $domains) {
         $DomainName = $d.DomainName
@@ -211,32 +327,32 @@ function Get-ScubaDkimRecords {
         $selectors += "selector1.$DomainName" -replace "\.", "-"
         $selectors += "selector2.$DomainName" -replace "\.", "-"
 
-        $rdata = ""
         foreach ($s in $selectors) {
-            try {
-                $response = Resolve-DnsName  "$s._domainkey.$DomainName" txt -ErrorAction Stop
-                $rdata = $response.Strings
+            $Response = Invoke-RebustDnsTxt "$s._domainkey.$DomainName" txt
+            if ($Response.Answers.Length -eq 0) {
+                # The DKIM record does not exist with this selector, we need to try again with
+                # a different one
+                continue
+            }
+            else {
+                # The DKIM record exists with this selector, no need to try the rest
                 break
             }
-            catch {
-                if ($_.FullyQualifiedErrorId -eq "DNS_ERROR_RCODE_NAME_ERROR,Microsoft.DnsClient.Commands.ResolveDnsName") {
-                    # Error is expected, just means the DKIM record does not exist with this selector,
-                    # we need to try again with a different one
-                    continue
-                }
-                else {
-                    # Error is not expected, let the exception propagate
-                    throw $_
-                }
-            }
+        }
+
+        if (-not $Response.HighConfidence) {
+            $NLowConf += 1
         }
 
         $DKIMRecords += [PSCustomObject]@{
             "domain" = $DomainName;
-            "rdata" = "$rdata"
+            "rdata" = $Response.Answers
         }
     }
 
+    if ($NLowConf -gt 0) {
+        Write-Warning "Get-ScubaDkimRecords: for $($NLowConf) domain(s), the tradtional DNS queries returned either NXDomain or an empty answer section and the DoH queries failed. Will assume DKIM not configured, but can't guarantee that failure isn't due to something like split horizon DNS."
+    }
     $DKIMRecords
 }
 
@@ -255,53 +371,33 @@ function Get-ScubaDmarcRecords {
     )
 
     $DMARCRecords = @()
+    $NLowConf = 0
 
     foreach ($d in $domains) {
-        try {
             # First check to see if the record is available at the full domain level
             $DomainName = $d.DomainName
-            $response = Resolve-DnsName "_dmarc.$DomainName" txt -ErrorAction Stop
-            $rdata = $response.Strings
-        }
-        catch {
-            if ($_.FullyQualifiedErrorId -eq "DNS_ERROR_RCODE_NAME_ERROR,Microsoft.DnsClient.Commands.ResolveDnsName") {
-                # Error is expected, just means the domain does not exist, does not mean the command failed
-                # If the record is not available at the full domain level, we need to check at the
-                # organizational domain level
+            $Response = Invoke-RebustDnsTxt "_dmarc.$DomainName" txt
+            if ($Response.Answers.Length -eq 0) {
+                # The domain does not exist. If the record is not available at the full domain
+                # level, we need to check at the organizational domain level.
                 $Labels = $d.DomainName.Split(".")
-                try {
-                     $Labels = $d.DomainName.Split(".")
-                     $OrgDomain = $Labels[-2] + "." + $Labels[-1]
-                     # Technically the logic above is incomplete. This will work when the tld is single
-                     # label (e.g., com, org, gov). However, when the tld is two-labels (e.g., gov.uk),
-                     # this will cause an error. Leaving cases like that as out-of-scope for now.
-                     $response = Resolve-DnsName "_dmarc.$OrgDomain" txt -ErrorAction Stop
-                     $rdata = $response.Strings
-                }
-                catch {
-                    if ($_.FullyQualifiedErrorId -eq "DNS_ERROR_RCODE_NAME_ERROR,Microsoft.DnsClient.Commands.ResolveDnsName") {
-                        # Error is expected, just means the dmarc record does not exist, does not mean
-                        # the command failed
-                        $rdata = ""
-                    }
-                    else {
-                        # Error is not expected, let the exception propagate
-                        throw $_
-                    }
-                }
-            }
-            else {
-                # Error is not expected, let the exception propagate
-                throw $_
+                $Labels = $d.DomainName.Split(".")
+                $OrgDomain = $Labels[-2] + "." + $Labels[-1]
+                $Response = Invoke-RebustDnsTxt "_dmarc.$OrgDomain" txt
             }
         }
 
         $DomainName = $d.DomainName
+        if (-not $Response.HighConfidence) {
+            $NLowConf += 1
+        }
         $DMARCRecords += [PSCustomObject]@{
             "domain" = $DomainName;
-            "rdata" = "$rdata"
+            "rdata" = $Response.Answers
         }
-    }
 
+    if ($NLowConf -gt 0) {
+        Write-Warning "Get-ScubaDmarcRecords: for $($NLowConf) domain(s), the tradtional DNS queries returned either NXDomain or an empty answer section and the DoH queries failed. Will assume DMARC not configured, but can't guarantee that failure isn't due to something like split horizon DNS."
+    }
     $DMARCRecords
 }
