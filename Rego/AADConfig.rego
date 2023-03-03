@@ -94,33 +94,35 @@ ReportDetailsBooleanLicenseWarning(Status) = Description if {
 #
 # Baseline 2.1: Policy 1
 #--
+#Only select policies without user or group exclusions
 Policies2_1[Cap.DisplayName] {
     Cap := input.conditional_access_policies[_]
 
     # Filter: only include policies that meet the "All Users" requirement
     "All" in Cap.Conditions.Users.IncludeUsers
-    #Filter: only include policies that either have no user exclusions or that have exclusions that match with the config file
-    #ExcludeConfiguredUsers = input.scuba_config.aad.Policy2_1.CapExclusions.Users
-  #  IncludeUsers := Cap.Conditions.Users.IncludeUsers
- #   ExcludeUsers := Cap.Conditions.Users.ExcludeUsers
-
-    #any (count(Cap.Conditions.Users.ExcludeUsers)== 0, ExcludeUsers == Cap.Conditions.Users.ExcludeUsers)
-    #ExcludedUsers = Cap.Conditions.Users.ExcludeUsers
-    #ExcludedUserSet := { ExcludeUsers | User = input.scuba_config.aad.Policy2_1.CapExclusions.Users }
-
-   # count(Cap.Conditions.Users.ExcludeUsers) == 0
-   # count(Cap.Conditions.Users.ExcludeGroups) == 0
-   # count(Cap.Conditions.Users.ExcludeRoles) == 0
+    count(Cap.Conditions.Users.ExcludeUsers) == 0
+    count(Cap.Conditions.Users.ExcludeGroups) == 0
     "All" in Cap.Conditions.Applications.IncludeApplications
     "other" in Cap.Conditions.ClientAppTypes
     "exchangeActiveSync" in Cap.Conditions.ClientAppTypes
     "block" in Cap.GrantControls.BuiltInControls
     Cap.State == "enabled"
-    print("Cap.Name:", Cap.DisplayName)
-    print("ExcludeUsers:", Cap.Conditions.Users.ExcludeUsers)
-    print("IncludeUsers:", Cap.Conditions.Users.IncludeUsers)
-    print("ExcludeGroups:", Cap.Conditions.Users.ExcludeGroups)
-    print("ExcludeConfiguredUsers:", input.scuba_config.Aad)
+}
+
+#Only select policies with user exclusions that are in the allowed exclusions list and without group exclusions
+Policies2_1[Cap.DisplayName] {
+    Cap := input.conditional_access_policies[_]
+    ExcludedUser := Cap.Conditions.Users.ExcludeUsers[_]
+    AllowedExcludedUsers := input.scuba_config.Aad.Policy2_1.CapExclusions.Users
+    AllowedExcludedUsers
+    count(Cap.Conditions.Users.ExcludeGroups) == 0
+    "All" in Cap.Conditions.Users.IncludeUsers
+    "All" in Cap.Conditions.Applications.IncludeApplications
+    "other" in Cap.Conditions.ClientAppTypes
+    "exchangeActiveSync" in Cap.Conditions.ClientAppTypes
+    "block" in Cap.GrantControls.BuiltInControls
+    ExcludedUser in AllowedExcludedUsers
+    Cap.State == "enabled"
 }
 
 tests[{
@@ -137,7 +139,68 @@ tests[{
 }
 #--
 
+#Only select policies without user exclusions and with group exclusions that are in the allowed exclusions list
+Policies2_1[Cap.DisplayName] {
+    Cap := input.conditional_access_policies[_]
+    count(Cap.Conditions.Users.ExcludeUsers) == 0
+    ExcludedGroup := Cap.Conditions.Users.ExcludeGroups[_]
+    AllowedExcludedGroups := input.scuba_config.Aad.Policy2_1.CapExclusions.Groups
+    AllowedExcludedGroups
 
+    "All" in Cap.Conditions.Users.IncludeUsers
+    "All" in Cap.Conditions.Applications.IncludeApplications
+    "other" in Cap.Conditions.ClientAppTypes
+    "exchangeActiveSync" in Cap.Conditions.ClientAppTypes
+    "block" in Cap.GrantControls.BuiltInControls
+    ExcludedGroup in AllowedExcludedGroups
+    Cap.State == "enabled"
+}
+
+tests[{
+    "Requirement" : "Legacy authentication SHALL be blocked",
+    "Control" : "AAD 2.1",
+    "Criticality" : "Shall",
+    "Commandlet" : ["Get-MgIdentityConditionalAccessPolicy"],
+    "ActualValue" : Policies2_1,
+    "ReportDetails" : concat(". ", [ReportFullDetailsArray(Policies2_1, DescriptionString), CapLink]),
+    "RequirementMet" : count(Policies2_1) > 0
+}] {
+    DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
+    true
+}
+
+#Only select policies with user exclusions and with group exclusions that are in the allowed exclusions list
+Policies2_1[Cap.DisplayName] {
+    Cap := input.conditional_access_policies[_]
+    ExcludedUser := Cap.Conditions.Users.ExcludeUsers[_]
+    AllowedExcludedUsers := input.scuba_config.Aad.Policy2_1.CapExclusions.Users
+    AllowedExcludedUsers
+    ExcludedGroup := Cap.Conditions.Users.ExcludeGroups[_]
+    AllowedExcludedGroups := input.scuba_config.Aad.Policy2_1.CapExclusions.Groups
+    AllowedExcludedGroups
+
+    "All" in Cap.Conditions.Users.IncludeUsers
+    "All" in Cap.Conditions.Applications.IncludeApplications
+    "other" in Cap.Conditions.ClientAppTypes
+    "exchangeActiveSync" in Cap.Conditions.ClientAppTypes
+    "block" in Cap.GrantControls.BuiltInControls
+    ExcludedUser in AllowedExcludedUsers
+    Cap.State == "enabled"
+}
+
+tests[{
+    "Requirement" : "Legacy authentication SHALL be blocked",
+    "Control" : "AAD 2.1",
+    "Criticality" : "Shall",
+    "Commandlet" : ["Get-MgIdentityConditionalAccessPolicy"],
+    "ActualValue" : Policies2_1,
+    "ReportDetails" : concat(". ", [ReportFullDetailsArray(Policies2_1, DescriptionString), CapLink]),
+    "RequirementMet" : count(Policies2_1) > 0
+}] {
+    DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
+    true
+}
+#--
 ################
 # Baseline 2.2 #
 ################
