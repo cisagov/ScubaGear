@@ -287,7 +287,7 @@ function Get-ScubaSpfRecords {
     $NLowConf = 0
 
     foreach ($d in $Domains) {
-        $Response = Invoke-RebustDnsTxt $d.DomainName txt
+        $Response = Invoke-RebustDnsTxt $d.DomainName
         if (-not $Response.HighConfidence) {
             $NLowConf += 1
         }
@@ -328,7 +328,7 @@ function Get-ScubaDkimRecords {
         $selectors += "selector2.$DomainName" -replace "\.", "-"
 
         foreach ($s in $selectors) {
-            $Response = Invoke-RebustDnsTxt "$s._domainkey.$DomainName" txt
+            $Response = Invoke-RebustDnsTxt "$s._domainkey.$DomainName"
             if ($Response.Answers.Length -eq 0) {
                 # The DKIM record does not exist with this selector, we need to try again with
                 # a different one
@@ -373,27 +373,27 @@ function Get-ScubaDmarcRecords {
     $DMARCRecords = @()
     $NLowConf = 0
 
-    foreach ($d in $domains) {
+    foreach ($d in $Domains) {
             # First check to see if the record is available at the full domain level
             $DomainName = $d.DomainName
-            $Response = Invoke-RebustDnsTxt "_dmarc.$DomainName" txt
+            $Response = Invoke-RebustDnsTxt "_dmarc.$DomainName"
             if ($Response.Answers.Length -eq 0) {
                 # The domain does not exist. If the record is not available at the full domain
                 # level, we need to check at the organizational domain level.
                 $Labels = $d.DomainName.Split(".")
                 $Labels = $d.DomainName.Split(".")
                 $OrgDomain = $Labels[-2] + "." + $Labels[-1]
-                $Response = Invoke-RebustDnsTxt "_dmarc.$OrgDomain" txt
+                $Response = Invoke-RebustDnsTxt "_dmarc.$OrgDomain"
             }
-        }
 
-        $DomainName = $d.DomainName
-        if (-not $Response.HighConfidence) {
-            $NLowConf += 1
-        }
-        $DMARCRecords += [PSCustomObject]@{
-            "domain" = $DomainName;
-            "rdata" = $Response.Answers
+            $DomainName = $d.DomainName
+            if (-not $Response.HighConfidence) {
+                $NLowConf += 1
+            }
+            $DMARCRecords += [PSCustomObject]@{
+                "domain" = $DomainName;
+                "rdata" = $Response.Answers
+            }
         }
 
     if ($NLowConf -gt 0) {
