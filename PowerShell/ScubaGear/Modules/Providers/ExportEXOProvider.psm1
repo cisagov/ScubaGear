@@ -179,7 +179,7 @@ function Invoke-RebustDnsTxt {
     while ($TryNumber -lt $MaxTries) {
         try {
             $TryNumber += 1
-            $Response = Resolve-DnsName $Qname txt | Where-Object {$_.Section -eq "Answer"} -ErrorAction Stop
+            $Response = Resolve-DnsName $Qname txt -ErrorAction Stop | Where-Object {$_.Section -eq "Answer"}
             if ($Response.Strings.Length -gt 0) {
                 $Answers += $Response.Strings
                 # We got our answer, so break out of the retry loop and set $Success to $true, no
