@@ -148,7 +148,7 @@ function Get-EXOTenantDetail {
     }
 }
 
-function Invoke-RebustDnsTxt {
+function Invoke-RobustDnsTxt {
     <#
     .Description
     Requests the TXT record for the given qname. First tries to make the query over traditional DNS
@@ -287,7 +287,7 @@ function Get-ScubaSpfRecords {
     $NLowConf = 0
 
     foreach ($d in $Domains) {
-        $Response = Invoke-RebustDnsTxt $d.DomainName
+        $Response = Invoke-RobustDnsTxt $d.DomainName
         if (-not $Response.HighConfidence) {
             $NLowConf += 1
         }
@@ -328,7 +328,7 @@ function Get-ScubaDkimRecords {
         $selectors += "selector2.$DomainName" -replace "\.", "-"
 
         foreach ($s in $selectors) {
-            $Response = Invoke-RebustDnsTxt "$s._domainkey.$DomainName"
+            $Response = Invoke-RobustDnsTxt "$s._domainkey.$DomainName"
             if ($Response.Answers.Length -eq 0) {
                 # The DKIM record does not exist with this selector, we need to try again with
                 # a different one
@@ -376,14 +376,14 @@ function Get-ScubaDmarcRecords {
     foreach ($d in $Domains) {
             # First check to see if the record is available at the full domain level
             $DomainName = $d.DomainName
-            $Response = Invoke-RebustDnsTxt "_dmarc.$DomainName"
+            $Response = Invoke-RobustDnsTxt "_dmarc.$DomainName"
             if ($Response.Answers.Length -eq 0) {
                 # The domain does not exist. If the record is not available at the full domain
                 # level, we need to check at the organizational domain level.
                 $Labels = $d.DomainName.Split(".")
                 $Labels = $d.DomainName.Split(".")
                 $OrgDomain = $Labels[-2] + "." + $Labels[-1]
-                $Response = Invoke-RebustDnsTxt "_dmarc.$OrgDomain"
+                $Response = Invoke-RobustDnsTxt "_dmarc.$OrgDomain"
             }
 
             $DomainName = $d.DomainName
