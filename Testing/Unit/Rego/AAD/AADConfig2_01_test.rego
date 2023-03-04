@@ -305,22 +305,18 @@ test_UserExclusionsConditions_Correct if {
                 "DisplayName": "Test block Legacy Authentication"
             }
         ],
-        "scuba_config": [
-            {
-                "Aad": {
-                    "Policy2_1": {
-                        "CapExclusions": {
-                            "Users": {
-                                ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]
-                            },
-                            "Groups": []
-                        }
+        "scuba_config": {
+            "Aad": {
+                 "Policy2_1": {
+                    "CapExclusions": {
+                        "Users": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
+                        "Groups": []
                     }
-
                 }
 
             }
-        ]
+
+        }
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
@@ -355,22 +351,18 @@ test_UserExclusionsIncludeApplications_Incorrect if {
                 "DisplayName": "Test block Legacy Authentication"
             }
         ],
-        "scuba_config": [
-            {
-                "Aad": {
-                    "Policy2_1": {
-                        "CapExclusions": {
-                            "Users": {
-                                ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]
-                            },
-                            "Groups": []
-                        }
+        "scuba_config": {
+            "Aad": {
+                 "Policy2_1": {
+                    "CapExclusions": {
+                        "Users": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
+                        "Groups": []
                     }
-
                 }
 
             }
-        ]
+
+        }
     }
     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
 
@@ -404,22 +396,18 @@ test_UserExclusionsIncludeUsers_Incorrect if {
                 "DisplayName": "Test block Legacy Authentication"
             }
         ],
-        "scuba_config": [
-            {
-                "Aad": {
-                    "Policy2_1": {
-                        "CapExclusions": {
-                            "Users": {
-                                ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]
-                            },
-                            "Groups": []
-                        }
+        "scuba_config": {
+            "Aad": {
+                 "Policy2_1": {
+                    "CapExclusions": {
+                        "Users": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
+                        "Groups": []
                     }
-
                 }
 
             }
-        ]
+
+        }
     }
     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
 
@@ -453,22 +441,19 @@ test_UserExclusionsExcludeUsers_Incorrect if {
                 "DisplayName": "Test block Legacy Authentication"
             }
         ],
-        "scuba_config": [
-            {
-                "Aad": {
-                    "Policy2_1": {
-                        "CapExclusions": {
-                            "Users": {
-                                ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]
-                            },
-                            "Groups": []
-                        }
-                    }
+        "scuba_config": {
+            "Aad": {
+                 "Policy2_1": {
+                    "CapExclusions": {
+                        "Users": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
 
+                        "Groups": []
+                    }
                 }
 
             }
-        ]
+
+        }
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
@@ -492,7 +477,7 @@ test_UserExclusionsExcludeGroups_Incorrect if {
                     "Users": {
                         "IncludeUsers": ["All"],
                         "ExcludeUsers": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
-                        "ExcludeGroups": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"],
+                        "ExcludeGroups": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]
                     },
                     "ClientAppTypes": ["other", "exchangeActiveSync"]
                 },
@@ -503,22 +488,20 @@ test_UserExclusionsExcludeGroups_Incorrect if {
                 "DisplayName": "Test block Legacy Authentication"
             }
         ],
-        "scuba_config": [
-            {
-                "Aad": {
-                    "Policy2_1": {
-                        "CapExclusions": {
-                            "Users": {
-                                ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]
-                            },
-                            "Groups": []
-                        }
-                    }
+        "scuba_config": {
 
+            "Aad": {
+                 "Policy2_1": {
+                    "CapExclusions": {
+                        "Users": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
+
+                        "Groups": []
+                    }
                 }
 
             }
-        ]
+
+        }
     }
 
 
@@ -555,22 +538,18 @@ test_UserExclusionsClientAppTypes_Incorrect if {
                 "DisplayName": "Test block Legacy Authentication"
             }
         ],
-        "scuba_config": [
-            {
-                "Aad": {
-                    "Policy2_1": {
-                        "CapExclusions": {
-                            "Users": {
-                                ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]
-                            },
-                            "Groups": []
-                        }
+        "scuba_config": {
+            "Aad": {
+                 "Policy2_1": {
+                    "CapExclusions": {
+                        "Users": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
+                        "Groups": []
                     }
-
                 }
 
             }
-        ]
+
+        }
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
@@ -605,22 +584,18 @@ test_UserExclusionsBuiltInControls_Incorrect if {
                 "DisplayName": "Test block Legacy Authentication"
             }
         ],
-        "scuba_config": [
-            {
-                "Aad": {
-                    "Policy2_1": {
-                        "CapExclusions": {
-                            "Users": {
-                                ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]
-                            },
-                            "Groups": []
-                        }
+        "scuba_config": {
+            "Aad": {
+                 "Policy2_1": {
+                    "CapExclusions": {
+                        "Users": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
+                        "Groups": []
                     }
-
                 }
 
             }
-        ]
+
+        }
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
@@ -655,22 +630,18 @@ test_UserExclusionsState_Incorrect if {
                 "DisplayName": "Test block Legacy Authentication"
             }
         ],
-        "scuba_config": [
-            {
-                "Aad": {
-                    "Policy2_1": {
-                        "CapExclusions": {
-                            "Users": {
-                                ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]
-                            },
-                            "Groups": []
-                        }
+        "scuba_config": {
+            "Aad": {
+                 "Policy2_1": {
+                    "CapExclusions": {
+                        "Users": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
+                        "Groups": []
                     }
-
                 }
 
             }
-        ]
+
+        }
     }
 
 

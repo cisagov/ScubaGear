@@ -94,7 +94,7 @@ ReportDetailsBooleanLicenseWarning(Status) = Description if {
 #
 # Baseline 2.1: Policy 1
 #--
-#Only select policies without user or group exclusions
+
 Policies2_1[Cap.DisplayName] {
     Cap := input.conditional_access_policies[_]
 
@@ -112,10 +112,10 @@ Policies2_1[Cap.DisplayName] {
 #Only select policies with user exclusions that are in the allowed exclusions list and without group exclusions
 Policies2_1[Cap.DisplayName] {
     Cap := input.conditional_access_policies[_]
+    count(Cap.Conditions.Users.ExcludeGroups) == 0
     ExcludedUser := Cap.Conditions.Users.ExcludeUsers[_]
     AllowedExcludedUsers := input.scuba_config.Aad.Policy2_1.CapExclusions.Users
     AllowedExcludedUsers
-    count(Cap.Conditions.Users.ExcludeGroups) == 0
     "All" in Cap.Conditions.Users.IncludeUsers
     "All" in Cap.Conditions.Applications.IncludeApplications
     "other" in Cap.Conditions.ClientAppTypes
@@ -124,20 +124,6 @@ Policies2_1[Cap.DisplayName] {
     ExcludedUser in AllowedExcludedUsers
     Cap.State == "enabled"
 }
-
-tests[{
-    "Requirement" : "Legacy authentication SHALL be blocked",
-    "Control" : "AAD 2.1",
-    "Criticality" : "Shall",
-    "Commandlet" : ["Get-MgIdentityConditionalAccessPolicy"],
-    "ActualValue" : Policies2_1,
-    "ReportDetails" : concat(". ", [ReportFullDetailsArray(Policies2_1, DescriptionString), CapLink]),
-    "RequirementMet" : count(Policies2_1) > 0
-}] {
-    DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
-    true
-}
-#--
 
 #Only select policies without user exclusions and with group exclusions that are in the allowed exclusions list
 Policies2_1[Cap.DisplayName] {
@@ -156,18 +142,6 @@ Policies2_1[Cap.DisplayName] {
     Cap.State == "enabled"
 }
 
-tests[{
-    "Requirement" : "Legacy authentication SHALL be blocked",
-    "Control" : "AAD 2.1",
-    "Criticality" : "Shall",
-    "Commandlet" : ["Get-MgIdentityConditionalAccessPolicy"],
-    "ActualValue" : Policies2_1,
-    "ReportDetails" : concat(". ", [ReportFullDetailsArray(Policies2_1, DescriptionString), CapLink]),
-    "RequirementMet" : count(Policies2_1) > 0
-}] {
-    DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
-    true
-}
 
 #Only select policies with user exclusions and with group exclusions that are in the allowed exclusions list
 Policies2_1[Cap.DisplayName] {
@@ -200,6 +174,7 @@ tests[{
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
     true
 }
+
 #--
 ################
 # Baseline 2.2 #
@@ -210,13 +185,54 @@ tests[{
 #--
 Policies2_2[Cap.DisplayName] {
     Cap := input.conditional_access_policies[_]
-    # Filter: only include policies that meet all the requirements
+    # Filter: only include policies that meet the "All Users" requirement
     "All" in Cap.Conditions.Users.IncludeUsers
-  #  "<undefined>" in Cap.Conditions.Users.IncludeGroups
-  #  "<undefined>" in Cap.Conditions.Users.IncludeRoles
     count(Cap.Conditions.Users.ExcludeUsers) == 0
     count(Cap.Conditions.Users.ExcludeGroups) == 0
-    count(Cap.Conditions.Users.ExcludeRoles) == 0
+    "All" in Cap.Conditions.Applications.IncludeApplications
+    "high" in Cap.Conditions.UserRiskLevels
+    "block" in Cap.GrantControls.BuiltInControls
+    Cap.State == "enabled"
+}
+
+Policies2_2[Cap.DisplayName] {
+    Cap := input.conditional_access_policies[_]
+    #Only select policies with user exclusions that are in the allowed exclusions list and without group exclusions
+    "All" in Cap.Conditions.Users.IncludeUsers
+    ExcludedUser := Cap.Conditions.Users.ExcludeUsers[_]
+    AllowedExcludedUsers := input.scuba_config.Aad.Policy2_2.CapExclusions.Users
+    AllowedExcludedUsers
+    count(Cap.Conditions.Users.ExcludeGroups) == 0
+    "All" in Cap.Conditions.Applications.IncludeApplications
+    "high" in Cap.Conditions.UserRiskLevels
+    "block" in Cap.GrantControls.BuiltInControls
+    Cap.State == "enabled"
+}
+
+Policies2_2[Cap.DisplayName] {
+    Cap := input.conditional_access_policies[_]
+    #Only select policies without user exclusions and with group exclusions that are in the allowed exclusions list
+    "All" in Cap.Conditions.Users.IncludeUsers
+    ExcludedGroup := Cap.Conditions.Users.ExcludeGroups[_]
+    AllowedExcludedGroups := input.scuba_config.Aad.Policy2_2.CapExclusions.Groups
+    AllowedExcludedGroups
+    count(Cap.Conditions.Users.ExcludeUsers) == 0
+    "All" in Cap.Conditions.Applications.IncludeApplications
+    "high" in Cap.Conditions.UserRiskLevels
+    "block" in Cap.GrantControls.BuiltInControls
+    Cap.State == "enabled"
+}
+
+Policies2_2[Cap.DisplayName] {
+    Cap := input.conditional_access_policies[_]
+    #Only select policies with user exclusions and with group exclusions that are in the allowed exclusions list
+    "All" in Cap.Conditions.Users.IncludeUsers
+    ExcludedUser := Cap.Conditions.Users.ExcludeUsers[_]
+    AllowedExcludedUsers := input.scuba_config.Aad.Policy2_2.CapExclusions.Users
+    AllowedExcludedUsers
+    ExcludedGroup := Cap.Conditions.Users.ExcludeGroups[_]
+    AllowedExcludedGroups := input.scuba_config.Aad.Policy2_2.CapExclusions.Groups
+    AllowedExcludedGroups
     "All" in Cap.Conditions.Applications.IncludeApplications
     "high" in Cap.Conditions.UserRiskLevels
     "block" in Cap.GrantControls.BuiltInControls
@@ -264,13 +280,54 @@ tests[{
 #--
 Policies2_3[Cap.DisplayName] {
     Cap := input.conditional_access_policies[_]
-    # Filter: only include policies that meet all the requirements
+    # Filter: only include policies that meet the "All Users" requirement
     "All" in Cap.Conditions.Users.IncludeUsers
-   # "<undefined>" in Cap.Conditions.Users.IncludeGroups
-   # "<undefined>" in Cap.Conditions.Users.IncludeRoles
     count(Cap.Conditions.Users.ExcludeUsers) == 0
     count(Cap.Conditions.Users.ExcludeGroups) == 0
-    count(Cap.Conditions.Users.ExcludeRoles) == 0
+    "All" in Cap.Conditions.Applications.IncludeApplications
+    "high" in Cap.Conditions.SignInRiskLevels
+    "block" in Cap.GrantControls.BuiltInControls
+    Cap.State == "enabled"
+}
+
+Policies2_3[Cap.DisplayName] {
+    Cap := input.conditional_access_policies[_]
+    #Only select policies with user exclusions that are in the allowed exclusions list and without group exclusions
+    "All" in Cap.Conditions.Users.IncludeUsers
+    ExcludedUser := Cap.Conditions.Users.ExcludeUsers[_]
+    AllowedExcludedUsers := input.scuba_config.Aad.Policy2_3.CapExclusions.Users
+    AllowedExcludedUsers
+    count(Cap.Conditions.Users.ExcludeGroups) == 0
+    "All" in Cap.Conditions.Applications.IncludeApplications
+    "high" in Cap.Conditions.SignInRiskLevels
+    "block" in Cap.GrantControls.BuiltInControls
+    Cap.State == "enabled"
+}
+
+Policies2_3[Cap.DisplayName] {
+    Cap := input.conditional_access_policies[_]
+    #Only select policies without user exclusions and with group exclusions that are in the allowed exclusions list
+    "All" in Cap.Conditions.Users.IncludeUsers
+    ExcludedGroup := Cap.Conditions.Users.ExcludeGroups[_]
+    AllowedExcludedGroups := input.scuba_config.Aad.Policy2_3.CapExclusions.Groups
+    AllowedExcludedGroups
+    count(Cap.Conditions.Users.ExcludeUsers) == 0
+    "All" in Cap.Conditions.Applications.IncludeApplications
+    "high" in Cap.Conditions.SignInRiskLevels
+    "block" in Cap.GrantControls.BuiltInControls
+    Cap.State == "enabled"
+}
+
+Policies2_3[Cap.DisplayName] {
+    Cap := input.conditional_access_policies[_]
+    #Only select policies with user exclusions and with group exclusions that are in the allowed exclusions list
+    "All" in Cap.Conditions.Users.IncludeUsers
+    ExcludedUser := Cap.Conditions.Users.ExcludeUsers[_]
+    AllowedExcludedUsers := input.scuba_config.Aad.Policy2_3.CapExclusions.Users
+    AllowedExcludedUsers
+    ExcludedGroup := Cap.Conditions.Users.ExcludeGroups[_]
+    AllowedExcludedGroups := input.scuba_config.Aad.Policy2_3.CapExclusions.Groups
+    AllowedExcludedGroups
     "All" in Cap.Conditions.Applications.IncludeApplications
     "high" in Cap.Conditions.SignInRiskLevels
     "block" in Cap.GrantControls.BuiltInControls
@@ -301,13 +358,51 @@ tests[{
 #--
 Policies2_4_1[Cap.DisplayName] {
     Cap := input.conditional_access_policies[_]
-    # Filter: only include policies that meet all the requirements
+    # Filter: only include policies that meet the "All Users" requirement
     "All" in Cap.Conditions.Users.IncludeUsers
-  #  "<undefined>" in Cap.Conditions.Users.IncludeGroups
-  #  "<undefined>" in Cap.Conditions.Users.IncludeRoles
     count(Cap.Conditions.Users.ExcludeUsers) == 0
     count(Cap.Conditions.Users.ExcludeGroups) == 0
-    count(Cap.Conditions.Users.ExcludeRoles) == 0
+    "All" in Cap.Conditions.Applications.IncludeApplications
+    "mfa" in Cap.GrantControls.BuiltInControls
+    Cap.State == "enabled"
+}
+
+Policies2_4_1[Cap.DisplayName] {
+    Cap := input.conditional_access_policies[_]
+    #Only select policies with user exclusions that are in the allowed exclusions list and without group exclusions
+    "All" in Cap.Conditions.Users.IncludeUsers
+    ExcludedUser := Cap.Conditions.Users.ExcludeUsers[_]
+    AllowedExcludedUsers := input.scuba_config.Aad.Policy2_4.CapExclusions.Users
+    AllowedExcludedUsers
+    count(Cap.Conditions.Users.ExcludeGroups) == 0
+    "All" in Cap.Conditions.Applications.IncludeApplications
+    "mfa" in Cap.GrantControls.BuiltInControls
+    Cap.State == "enabled"
+}
+
+Policies2_4_1[Cap.DisplayName] {
+    Cap := input.conditional_access_policies[_]
+    #Only select policies without user exclusions and with group exclusions that are in the allowed exclusions list
+    "All" in Cap.Conditions.Users.IncludeUsers
+    ExcludedGroup := Cap.Conditions.Users.ExcludeGroups[_]
+    AllowedExcludedGroups := input.scuba_config.Aad.Policy2_4.CapExclusions.Groups
+    AllowedExcludedGroups
+    count(Cap.Conditions.Users.ExcludeUsers) == 0
+    "All" in Cap.Conditions.Applications.IncludeApplications
+    "mfa" in Cap.GrantControls.BuiltInControls
+    Cap.State == "enabled"
+}
+
+Policies2_4_1[Cap.DisplayName] {
+    Cap := input.conditional_access_policies[_]
+     #Only select policies with user exclusions and with group exclusions that are in the allowed exclusions list
+    "All" in Cap.Conditions.Users.IncludeUsers
+    ExcludedUser := Cap.Conditions.Users.ExcludeUsers[_]
+    AllowedExcludedUsers := input.scuba_config.Aad.Policy2_4.CapExclusions.Users
+    AllowedExcludedUsers
+    ExcludedGroup := Cap.Conditions.Users.ExcludeGroups[_]
+    AllowedExcludedGroups := input.scuba_config.Aad.Policy2_4.CapExclusions.Groups
+    AllowedExcludedGroups
     "All" in Cap.Conditions.Applications.IncludeApplications
     "mfa" in Cap.GrantControls.BuiltInControls
     Cap.State == "enabled"
@@ -597,14 +692,58 @@ tests[{
 #--
 Policies2_9[Cap.DisplayName] {
     Cap := input.conditional_access_policies[_]
-    # Filter: only include policies that meet all the requirements
+    # Filter: only include policies that meet the "All Users" requirement
     "All" in Cap.Conditions.Users.IncludeUsers
-   # "<undefined>" in Cap.Conditions.Users.IncludeGroups
-  #  "<undefined>" in Cap.Conditions.Users.IncludeRoles
     count(Cap.Conditions.Users.ExcludeUsers) == 0
     count(Cap.Conditions.Users.ExcludeGroups) == 0
-    count(Cap.Conditions.Users.ExcludeRoles) == 0
     "All" in Cap.Conditions.Applications.IncludeApplications
+    Cap.SessionControls.SignInFrequency.IsEnabled == true
+    Cap.SessionControls.SignInFrequency.Type == "hours"
+    Cap.SessionControls.SignInFrequency.Value == 12
+    Cap.State == "enabled"
+}
+
+Policies2_9[Cap.DisplayName] {
+    Cap := input.conditional_access_policies[_]
+    #Only select policies with user exclusions that are in the allowed exclusions list and without group exclusions
+    "All" in Cap.Conditions.Users.IncludeUsers
+    ExcludedUser := Cap.Conditions.Users.ExcludeUsers[_]
+    AllowedExcludedUsers := input.scuba_config.Aad.Policy2_9.CapExclusions.Users
+    AllowedExcludedUsers
+    count(Cap.Conditions.Users.ExcludeGroups) == 0
+    "All" in Cap.Conditions.Applications.IncludeApplications
+    Cap.SessionControls.SignInFrequency.IsEnabled == true
+    Cap.SessionControls.SignInFrequency.Type == "hours"
+    Cap.SessionControls.SignInFrequency.Value == 12
+    Cap.State == "enabled"
+}
+
+Policies2_9[Cap.DisplayName] {
+    Cap := input.conditional_access_policies[_]
+    #Only select policies without user exclusions and with group exclusions that are in the allowed exclusions list
+    "All" in Cap.Conditions.Users.IncludeUsers
+    ExcludedGroup := Cap.Conditions.Users.ExcludeGroups[_]
+    AllowedExcludedGroups := input.scuba_config.Aad.Policy2_9.CapExclusions.Groups
+    AllowedExcludedGroups
+    count(Cap.Conditions.Users.ExcludeUsers) == 0
+    "All" in Cap.Conditions.Applications.IncludeApplications
+    Cap.SessionControls.SignInFrequency.IsEnabled == true
+    Cap.SessionControls.SignInFrequency.Type == "hours"
+    Cap.SessionControls.SignInFrequency.Value == 12
+    Cap.State == "enabled"
+}
+
+Policies2_9[Cap.DisplayName] {
+    Cap := input.conditional_access_policies[_]
+    #Only select policies with user exclusions and with group exclusions that are in the allowed exclusions list
+    "All" in Cap.Conditions.Users.IncludeUsers
+    ExcludedUser := Cap.Conditions.Users.ExcludeUsers[_]
+    AllowedExcludedUsers := input.scuba_config.Aad.Policy2_9.CapExclusions.Users
+    AllowedExcludedUsers
+    ExcludedGroup := Cap.Conditions.Users.ExcludeGroups[_]
+    AllowedExcludedGroups := input.scuba_config.Aad.Policy2_9.CapExclusions.Groups
+    "All" in Cap.Conditions.Applications.IncludeApplications
+    AllowedExcludedGroups
     Cap.SessionControls.SignInFrequency.IsEnabled == true
     Cap.SessionControls.SignInFrequency.Type == "hours"
     Cap.SessionControls.SignInFrequency.Value == 12
@@ -635,18 +774,59 @@ tests[{
 #--
 Policies2_10[Cap.DisplayName] {
     Cap := input.conditional_access_policies[_]
-    # Filter: only include policies that meet all the requirements
+    # Filter: only include policies that meet the "All Users" requirement
     "All" in Cap.Conditions.Users.IncludeUsers
-   # "[]" in Cap.Conditions.Users.IncludeGroups
-  #  "[]" in Cap.Conditions.Users.IncludeRoles
     count(Cap.Conditions.Users.ExcludeUsers) == 0
     count(Cap.Conditions.Users.ExcludeGroups) == 0
-    count(Cap.Conditions.Users.ExcludeRoles) == 0
     "All" in Cap.Conditions.Applications.IncludeApplications
     Cap.SessionControls.PersistentBrowser.IsEnabled == true
     Cap.SessionControls.PersistentBrowser.Mode == "never"
     Cap.State == "enabled"
 }
+
+Policies2_10[Cap.DisplayName] {
+    Cap := input.conditional_access_policies[_]
+    #Only select policies with user exclusions that are in the allowed exclusions list and without group exclusions
+    "All" in Cap.Conditions.Users.IncludeUsers
+    ExcludedUser := Cap.Conditions.Users.ExcludeUsers[_]
+    AllowedExcludedUsers := input.scuba_config.Aad.Policy2_10.CapExclusions.Users
+    AllowedExcludedUsers
+    count(Cap.Conditions.Users.ExcludeGroups) == 0
+    "All" in Cap.Conditions.Applications.IncludeApplications
+    Cap.SessionControls.PersistentBrowser.IsEnabled == true
+    Cap.SessionControls.PersistentBrowser.Mode == "never"
+    Cap.State == "enabled"
+}
+
+Policies2_10[Cap.DisplayName] {
+    Cap := input.conditional_access_policies[_]
+    #Only select policies without user exclusions and with group exclusions that are in the allowed exclusions list
+    "All" in Cap.Conditions.Users.IncludeUsers
+    ExcludedGroup := Cap.Conditions.Users.ExcludeGroups[_]
+    AllowedExcludedGroups := input.scuba_config.Aad.Policy2_10.CapExclusions.Groups
+    AllowedExcludedGroups
+    count(Cap.Conditions.Users.ExcludeUsers) == 0
+    "All" in Cap.Conditions.Applications.IncludeApplications
+    Cap.SessionControls.PersistentBrowser.IsEnabled == true
+    Cap.SessionControls.PersistentBrowser.Mode == "never"
+    Cap.State == "enabled"
+}
+
+Policies2_10[Cap.DisplayName] {
+    Cap := input.conditional_access_policies[_]
+    #Only select policies with user exclusions and with group exclusions that are in the allowed exclusions list
+    "All" in Cap.Conditions.Users.IncludeUsers
+    ExcludedUser := Cap.Conditions.Users.ExcludeUsers[_]
+    AllowedExcludedUsers := input.scuba_config.Aad.Policy2_10.CapExclusions.Users
+    AllowedExcludedUsers
+    ExcludedGroup := Cap.Conditions.Users.ExcludeGroups[_]
+    AllowedExcludedGroups := input.scuba_config.Aad.Policy2_10.CapExclusions.Groups
+    "All" in Cap.Conditions.Applications.IncludeApplications
+    Cap.SessionControls.PersistentBrowser.IsEnabled == true
+    Cap.SessionControls.PersistentBrowser.Mode == "never"
+    Cap.State == "enabled"
+}
+
 
 tests[{
     "Requirement" : "Browser sessions SHALL not be persistent",
