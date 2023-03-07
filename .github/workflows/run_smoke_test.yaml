@@ -9,6 +9,9 @@ name: Smoke Test
 jobs:
   Run-Smoke-Test:
     runs-on: windows-latest
+    env:
+      SCUBA_EXECUTION_CERT_PFX: ${{ secrets.SCUBA_EXECUTION_CERT_PFX }}
+      SCUBA_EXECUTION_CERT_PW: ${{ secrets.SCUBA_EXECUTION_CERT_PW }}
     defaults:
           run:
             shell: powershell 
@@ -19,9 +22,19 @@ jobs:
       uses: actions/checkout@v3
     - name: Execute ScubaGear
       run: |
+        $ErrorActionPreference = "Stop"
+        $PSDefaultParameterValues['*:ErrorAction']='Stop'
+
         echo 'Branch: ${{ github.ref }}'
         $PSVersionTable
         pwd
-        ./SetUp.ps1
-        Import-Module -Name ./PowerShell/ScubaGear
+
+        Set-Content -Path .\ScubaExecutionCert.txt -Value $env:SCUBA_EXECUTION_CERT_PFX
+        certutil -decode .\ScubaExecutionCert.txt .\ScubaExecutionCert.pfx
+        $CertPwd = ConvertTo-SecureString -String "$env:SCUBA_EXECUTION_CERT_PW" -Force -AsPlainText
+        Import-PfxCertificate -FilePath .\ScubaExecutionCert.pfx -CertStoreLocation Cert:\CurrentUser\My -Password $CertPwd
+
+        # ./SetUp.ps1
+        # Import-Module -Name ./PowerShell/ScubaGear
+
 
