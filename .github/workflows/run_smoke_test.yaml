@@ -42,10 +42,8 @@ jobs:
 
         ##### Run ScubaGear with a service principal
         Import-Module -Name ./PowerShell/ScubaGear
-        Invoke-Scuba -CertificateThumbPrint "A9D4870B12F94A344C20BB3FC5774C89F8B5EF33" -AppID "b682d3a5-bc68-450e-80ba-018b97aa2b21" -Organization "cisaent.onmicrosoft.com" -ProductNames "onedrive" -M365Environment "gcc" -OutPath .
-
-        ##### Test that the tool created a TestResults.json file
-        Test-Path .\TestResults2.json
+        # Invoke-Scuba -CertificateThumbPrint "A9D4870B12F94A344C20BB3FC5774C89F8B5EF33" -AppID "b682d3a5-bc68-450e-80ba-018b97aa2b21" -Organization "cisaent.onmicrosoft.com" -ProductNames "onedrive" -M365Environment "gcc" -OutPath .
+        Invoke-Scuba -CertificateThumbPrint "A9D4870B12F94A344C20BB3FC5774C89F8B5EF33" -AppID "b682d3a5-bc68-450e-80ba-018b97aa2b25" -Organization "cisaent.onmicrosoft.com" -ProductNames "onedrive" -M365Environment "gcc" -OutPath .
 
         ##### Test that the TestResults.json file is a structurally valid JSON document
         $JSONContent = Get-Content .\TestResults.json -Raw | ConvertFrom-Json
