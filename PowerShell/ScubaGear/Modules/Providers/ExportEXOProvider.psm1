@@ -183,7 +183,6 @@ function Invoke-RobustDnsTxt {
     while ($TryNumber -lt $MaxTries) {
         $TryNumber += 1
         try {
-            x/2
             $Response = Resolve-DnsName $Qname txt -ErrorAction Stop | Where-Object {$_.Section -eq "Answer"}
             if ($Response.Strings.Length -gt 0) {
                 # We got our answer, so break out of the retry loop and set $Success to $true, no
@@ -227,7 +226,6 @@ function Invoke-RobustDnsTxt {
         while ($TryNumber -lt $MaxTries) {
             $TryNumber += 1
             try {
-                x/2
                 $Uri = "https://1.1.1.1/dns-query?name=$($Qname)&type=txt"
                 $RawResponse = $(Invoke-WebRequest -H @{"accept"="application/dns-json"} -Uri $Uri).RawContent
                 $ResponseLines = $RawResponse -Split "`n"
