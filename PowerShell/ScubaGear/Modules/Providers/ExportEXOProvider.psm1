@@ -25,18 +25,18 @@ function Export-EXOProvider {
     2.2 SPF
     #>
     $domains = $Tracker.TryCommand("Get-AcceptedDomain")
-    $SPFRecords = ConvertTo-Json @($Tracker.TryCommand("Get-ScubaSpfRecords", @{"Domains"=$domains; "Verbose"=$VerbosePreference})) -Depth 3
+    $SPFRecords = ConvertTo-Json @($Tracker.TryCommand("Get-ScubaSpfRecords", @{"Domains"=$domains})) -Depth 3
 
     <#
     2.3 DKIM
     #>
     $DKIMConfig = ConvertTo-Json @($Tracker.TryCommand("Get-DkimSigningConfig"))
-    $DKIMRecords = ConvertTo-Json @($Tracker.TryCommand("Get-ScubaDkimRecords", @{"Domains"=$domains; "Verbose"=$VerbosePreference})) -Depth 3
+    $DKIMRecords = ConvertTo-Json @($Tracker.TryCommand("Get-ScubaDkimRecords", @{"Domains"=$domains})) -Depth 3
 
     <#
     2.4 DMARC
     #>
-    $DMARCRecords = ConvertTo-Json @($Tracker.TryCommand("Get-ScubaDmarcRecords", @{"Domains"=$domains; "Verbose"=$VerbosePreference})) -Depth 3
+    $DMARCRecords = ConvertTo-Json @($Tracker.TryCommand("Get-ScubaDmarcRecords", @{"Domains"=$domains})) -Depth 3
 
     <#
     2.5
