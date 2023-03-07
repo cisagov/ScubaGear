@@ -926,28 +926,37 @@ function Import-Resources {
     Internal
     #>
     [CmdletBinding()]
-    $ProvidersPath = Join-Path -Path $PSScriptRoot `
-    -ChildPath "Providers" `
-    -Resolve
-    $ProviderResources = Get-ChildItem $ProvidersPath -Recurse | Where-Object { $_.Name -like 'Export*.psm1' }
-    if (!$ProviderResources)
-    {
-        throw "Provider files were not found, aborting this run"
-    }
+    param()
+    try {
+        $ProvidersPath = Join-Path -Path $PSScriptRoot `
+        -ChildPath "Providers" `
+        -Resolve `
+        -ErrorAction 'Stop'
+        $ProviderResources = Get-ChildItem $ProvidersPath -Recurse | Where-Object { $_.Name -like 'Export*.psm1' }
+        if (!$ProviderResources)
+        {
+            throw "Provider files were not found, aborting this run"
+        }
 
-    foreach ($Provider in $ProviderResources.Name) {
-        $ProvidersPath = Join-Path -Path $PSScriptRoot -ChildPath "Providers"
-        $ModulePath = Join-Path -Path $ProvidersPath -ChildPath $Provider
-        Import-Module $ModulePath
+        foreach ($Provider in $ProviderResources.Name) {
+            $ProvidersPath = Join-Path -Path $PSScriptRoot -ChildPath "Providers" -ErrorAction 'Stop'
+            $ModulePath = Join-Path -Path $ProvidersPath -ChildPath $Provider -ErrorAction 'Stop'
+            Import-Module $ModulePath
+        }
+        $ConnectionPath = Join-Path -Path $PSScriptRoot -ChildPath "Connection" -ErrorAction 'Stop'
+        $RegoPath = Join-Path -Path $PSScriptRoot -ChildPath "RunRego" -ErrorAction 'Stop'
+        $ReporterPath = Join-Path -Path $PSScriptRoot -ChildPath "CreateReport" -ErrorAction 'Stop'
+        $ScubaConfigPath = Join-Path -Path $PSScriptRoot -ChildPath "ScubaConfig" -ErrorAction 'Stop'
+        Import-Module $ConnectionPath
+        Import-Module $RegoPath
+        Import-Module $ReporterPath
+        Import-Module $ScubaConfigPath
     }
-    $ConnectionPath = Join-Path -Path $PSScriptRoot -ChildPath "Connection"
-    $RegoPath = Join-Path -Path $PSScriptRoot -ChildPath "RunRego"
-    $ReporterPath = Join-Path -Path $PSScriptRoot -ChildPath "CreateReport"
-    $ScubaConfigPath = Join-Path -Path $PSScriptRoot -ChildPath "ScubaConfig"
-    Import-Module $ConnectionPath
-    Import-Module $RegoPath
-    Import-Module $ReporterPath
-    Import-Module $ScubaConfigPath
+    catch {
+        $ImportResourcesErrorMessage = "Fatal Error involving importing PowerShell modules. `
+            Ending ScubaGear execution. See the exception message for more details: $($_)"
+            throw $ImportResourcesErrorMessage
+    }
 }
 
 function Remove-Resources {
