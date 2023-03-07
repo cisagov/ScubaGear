@@ -34,7 +34,9 @@ jobs:
         $CertPwd = ConvertTo-SecureString -String "$env:SCUBA_EXECUTION_CERT_PW" -Force -AsPlainText
         Import-PfxCertificate -FilePath .\ScubaExecutionCert.pfx -CertStoreLocation Cert:\CurrentUser\My -Password $CertPwd
 
-        # ./SetUp.ps1
-        # Import-Module -Name ./PowerShell/ScubaGear
+        ./SetUp.ps1
+
+        Import-Module -Name ./PowerShell/ScubaGear
+        Invoke-Scuba -CertificateThumbPrint "A9D4870B12F94A344C20BB3FC5774C89F8B5EF33" -AppID "b682d3a5-bc68-450e-80ba-018b97aa2b21" -Organization "cisaent.onmicrosoft.com" -ProductNames "onedrive" -M365Environment "gcc"
 
 
