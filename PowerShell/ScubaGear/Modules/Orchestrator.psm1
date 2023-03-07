@@ -193,8 +193,8 @@ function Invoke-SCuBA {
         $DarkMode
     )
     process {
-        $ParentPath = Split-Path $PSScriptRoot -Parent
-        $ScubaManifest = Import-PowerShellDataFile (Join-Path -Path $ParentPath -ChildPath 'ScubaGear.psd1' -Resolve)
+        $ParentPath = Split-Path $PSScriptRoot -Parent -ErrorAction 'Stop'
+        $ScubaManifest = Import-PowerShellDataFile (Join-Path -Path $ParentPath -ChildPath 'ScubaGear.psd1' -Resolve) -ErrorAction 'Stop'
         $ModuleVersion = $ScubaManifest.ModuleVersion
         if ($Version) {
             Write-Output("SCuBA Gear v$ModuleVersion")
@@ -664,116 +664,123 @@ function Invoke-ReportCreation {
         $DarkMode
     )
     process {
-        $N = 0
-        $Len = $ProductNames.Length
-        $Fragment = @()
+        try {
+            $N = 0
+            $Len = $ProductNames.Length
+            $Fragment = @()
+            $IndividualReportFolderName = "IndividualReports"
+            $IndividualReportPath = Join-Path -Path $OutFolderPath -ChildPath $IndividualReportFolderName
+            New-Item -Path $IndividualReportPath -ItemType "Directory" -ErrorAction "SilentlyContinue" | Out-Null
 
-        $IndividualReportFolderName = "IndividualReports"
-        $IndividualReportPath = Join-Path -Path $OutFolderPath -ChildPath $IndividualReportFolderName
-        New-Item -Path $IndividualReportPath -ItemType "Directory" -ErrorAction "SilentlyContinue" | Out-Null
+            $ReporterPath = Join-Path -Path $PSScriptRoot -ChildPath "CreateReport" -ErrorAction 'Stop'
+            $Images = Join-Path -Path $ReporterPath -ChildPath "images" -ErrorAction 'Stop'
+            Copy-Item -Path $Images -Destination $IndividualReportPath -Force -Recurse -ErrorAction 'Stop'
 
-        $ReporterPath = Join-Path -Path $PSScriptRoot -ChildPath "CreateReport"
-        $Images = Join-Path -Path $ReporterPath -ChildPath "images"
-        Copy-Item -Path $Images -Destination $IndividualReportPath -Force -Recurse
+            foreach ($Product in $ProductNames) {
+                $BaselineName = $ArgToProd[$Product]
+                $N += 1
+                $Percent = $N*100/$Len
+                $Status = "Running the $($BaselineName) Report creation; $($N) of $($Len) Baselines Reports created";
+                $ProgressParams = @{
+                    'Activity' = "Creating the reports for each baseline";
+                    'Status' = $Status;
+                    'PercentComplete' = $Percent;
+                    'Id' = 1;
+                    'ErrorAction' = 'Stop';
+                }
+                Write-Progress @ProgressParams
 
-        foreach ($Product in $ProductNames) {
-            $BaselineName = $ArgToProd[$Product]
-            $N += 1
-            $Percent = $N*100/$Len
-            $Status = "Running the $($BaselineName) Report creation; $($N) of $($Len) Baselines Reports created";
-            $ProgressParams = @{
-                'Activity' = "Creating the reports for each baseline"
-                'Status' = $Status;
-                'PercentComplete' = $Percent;
-                'Id' = 1;
+                $FullName = $ProdToFullName[$BaselineName]
+
+                $CreateReportParams = @{
+                    'BaselineName' = $BaselineName;
+                    'FullName' = $FullName;
+                    'IndividualReportPath' = $IndividualReportPath;
+                    'OutPath' = $OutFolderPath;
+                    'OutProviderFileName' = $OutProviderFileName;
+                    'OutRegoFileName' = $OutRegoFileName;
+                    'DarkMode' = $DarkMode;
+                }
+
+                $Report = New-Report @CreateReportParams
+                $LinkPath = "$($IndividualReportFolderName)/$($BaselineName)Report.html"
+                $LinkClassName = '"individual_reports"' # uses no escape characters
+                $Link = "<a class=$($LinkClassName) href='$($LinkPath)'>$($FullName)</a>"
+
+                $PassesSummary = "<div class='summary pass'>$($Report.Passes) tests passed</div>"
+                $WarningsSummary = "<div class='summary'></div>"
+                $FailuresSummary = "<div class='summary'></div>"
+                $ManualSummary = "<div class='summary'></div>"
+                $ErrorSummary = "<div class='summary'></div>"
+
+                if ($Report.Warnings -gt 0) {
+                    $Noun = Pluralize -SingularNoun "warning" -PluralNoun "warnings" -Count $Report.Warnings
+                    $WarningsSummary = "<div class='summary warning'>$($Report.Warnings) $($Noun)</div>"
+                }
+
+                if ($Report.Failures -gt 0) {
+                    $Noun = Pluralize -SingularNoun "test" -PluralNoun "tests" -Count $Report.Failures
+                    $FailuresSummary = "<div class='summary failure'>$($Report.Failures) $($Noun) failed</div>"
+                }
+
+                if ($Report.Manual -gt 0) {
+                    $Noun = Pluralize -SingularNoun "check" -PluralNoun "checks" -Count $Report.Manual
+                    $ManualSummary = "<div class='summary manual'>$($Report.Manual) manual $($Noun) needed</div>"
+                }
+
+                if ($Report.Errors -gt 0) {
+                    $Noun = Pluralize -SingularNoun "check" -PluralNoun "errors" -Count $Report.Manual
+                    $ErrorSummary = "<div class='summary error'>$($Report.Errors) PowerShell $($Noun)</div>"
+                }
+
+                $Fragment += [pscustomobject]@{
+                "Baseline Conformance Reports" = $Link;
+                "Details" = "$($PassesSummary) $($WarningsSummary) $($FailuresSummary) $($ManualSummary) $($ErrorSummary)"
+                }
             }
-            Write-Progress @ProgressParams
-
-            $FullName = $ProdToFullName[$BaselineName]
-
-            $CreateReportParams = @{
-                'BaselineName' = $BaselineName;
-                'FullName' = $FullName;
-                'IndividualReportPath' = $IndividualReportPath;
-                'OutPath' = $OutFolderPath;
-                'OutProviderFileName' = $OutProviderFileName;
-                'OutRegoFileName' = $OutRegoFileName;
-                'DarkMode' = $DarkMode;
+            $TenantMetaData += [pscustomobject]@{
+                "Tenant Display Name" = $TenantDetails.DisplayName;
+                "Tenant Domain Name" = $TenantDetails.DomainName
+                "Tenant ID" = $TenantDetails.TenantId;
+                "Report Date" = $Report.Date;
             }
+            $TenantMetaData = $TenantMetaData | ConvertTo-Html -Fragment -ErrorAction 'Stop'
+            $TenantMetaData = $TenantMetaData -replace '^(.*?)<table>','<table class ="tenantdata" style = "text-align:center;">'
+            $Fragment = $Fragment | ConvertTo-Html -Fragment -ErrorAction 'Stop'
 
-            $Report = New-Report @CreateReportParams
-            $LinkPath = "$($IndividualReportFolderName)/$($BaselineName)Report.html"
-            $LinkClassName = '"individual_reports"' # uses no escape characters
-            $Link = "<a class=$($LinkClassName) href='$($LinkPath)'>$($FullName)</a>"
+            $ReportHtmlPath = Join-Path -Path $ReporterPath -ChildPath "ParentReport" -ErrorAction 'Stop'
+            $ReportHTML = (Get-Content $(Join-Path -Path $ReportHtmlPath -ChildPath "ParentReport.html") -ErrorAction 'Stop') -Join "`n"
+            $ReportHTML = $ReportHTML.Replace("{TENANT_DETAILS}", $TenantMetaData)
+            $ReportHTML = $ReportHTML.Replace("{TABLES}", $Fragment)
+            $ReportHTML = $ReportHTML.Replace("{MODULE_VERSION}", "v$ModuleVersion")
 
-            $PassesSummary = "<div class='summary pass'>$($Report.Passes) tests passed</div>"
-            $WarningsSummary = "<div class='summary'></div>"
-            $FailuresSummary = "<div class='summary'></div>"
-            $ManualSummary = "<div class='summary'></div>"
-            $ErrorSummary = "<div class='summary'></div>"
+            $CssPath = Join-Path -Path $ReporterPath -ChildPath "styles" -ErrorAction 'Stop'
+            $MainCSS = (Get-Content $(Join-Path -Path $CssPath -ChildPath "main.css") -ErrorAction 'Stop') -Join "`n"
+            $ReportHTML = $ReportHTML.Replace("{MAIN_CSS}", "<style>$($MainCSS)</style>")
 
-            if ($Report.Warnings -gt 0) {
-                $Noun = Pluralize -SingularNoun "warning" -PluralNoun "warnings" -Count $Report.Warnings
-                $WarningsSummary = "<div class='summary warning'>$($Report.Warnings) $($Noun)</div>"
-            }
+            $ParentCSS = (Get-Content $(Join-Path -Path $CssPath -ChildPath "ParentReportStyle.css") -ErrorAction 'Stop') -Join "`n"
+            $ReportHTML = $ReportHTML.Replace("{PARENT_CSS}", "<style>$($ParentCSS)</style>")
 
-            if ($Report.Failures -gt 0) {
-                $Noun = Pluralize -SingularNoun "test" -PluralNoun "tests" -Count $Report.Failures
-                $FailuresSummary = "<div class='summary failure'>$($Report.Failures) $($Noun) failed</div>"
-            }
+            $ScriptsPath = Join-Path -Path $ReporterPath -ChildPath "scripts" -ErrorAction 'Stop'
+            $ParentReportJS = (Get-Content $(Join-Path -Path $ScriptsPath -ChildPath "ParentReport.js") -ErrorAction 'Stop') -Join "`n"
+            $UtilsJS = (Get-Content $(Join-Path -Path $ScriptsPath -ChildPath "utils.js") -ErrorAction 'Stop') -Join "`n"
+            $ParentReportJS = "$($ParentReportJS)`n$($UtilsJS)"
+            $ReportHTML = $ReportHTML.Replace("{MAIN_JS}", "<script>
+                let darkMode = $($DarkMode.ToString().ToLower());
+                $($ParentReportJS)
+            </script>")
 
-            if ($Report.Manual -gt 0) {
-                $Noun = Pluralize -SingularNoun "check" -PluralNoun "checks" -Count $Report.Manual
-                $ManualSummary = "<div class='summary manual'>$($Report.Manual) manual $($Noun) needed</div>"
-            }
-
-            if ($Report.Errors -gt 0) {
-                $Noun = Pluralize -SingularNoun "check" -PluralNoun "errors" -Count $Report.Manual
-                $ErrorSummary = "<div class='summary error'>$($Report.Errors) PowerShell $($Noun)</div>"
-            }
-
-            $Fragment += [pscustomobject]@{
-            "Baseline Conformance Reports" = $Link;
-            "Details" = "$($PassesSummary) $($WarningsSummary) $($FailuresSummary) $($ManualSummary) $($ErrorSummary)"
+            Add-Type -AssemblyName System.Web -ErrorAction 'Stop'
+            $ReportFileName = Join-Path -Path $OutFolderPath "$($OutReportName).html" -ErrorAction 'Stop'
+            [System.Web.HttpUtility]::HtmlDecode($ReportHTML) | Out-File $ReportFileName -ErrorAction 'Stop'
+            if ($Quiet -eq $False) {
+                Invoke-Item $ReportFileName
             }
         }
-        $TenantMetaData += [pscustomobject]@{
-            "Tenant Display Name" = $TenantDetails.DisplayName;
-            "Tenant Domain Name" = $TenantDetails.DomainName
-            "Tenant ID" = $TenantDetails.TenantId;
-            "Report Date" = $Report.Date;
-        }
-        $TenantMetaData = $TenantMetaData | ConvertTo-Html -Fragment
-        $TenantMetaData = $TenantMetaData -replace '^(.*?)<table>','<table class ="tenantdata" style = "text-align:center;">'
-        $Fragment = $Fragment | ConvertTo-Html -Fragment
-
-        $ReportHtmlPath = Join-Path -Path $ReporterPath -ChildPath "ParentReport"
-        $ReportHTML = (Get-Content $(Join-Path -Path $ReportHtmlPath -ChildPath "ParentReport.html")) -Join "`n"
-        $ReportHTML = $ReportHTML.Replace("{TENANT_DETAILS}", $TenantMetaData)
-        $ReportHTML = $ReportHTML.Replace("{TABLES}", $Fragment)
-        $ReportHTML = $ReportHTML.Replace("{MODULE_VERSION}", "v$ModuleVersion")
-
-        $CssPath = Join-Path -Path $ReporterPath -ChildPath "styles"
-        $MainCSS = (Get-Content $(Join-Path -Path $CssPath -ChildPath "main.css")) -Join "`n"
-        $ReportHTML = $ReportHTML.Replace("{MAIN_CSS}", "<style>$($MainCSS)</style>")
-
-        $ParentCSS = (Get-Content $(Join-Path -Path $CssPath -ChildPath "ParentReportStyle.css")) -Join "`n"
-        $ReportHTML = $ReportHTML.Replace("{PARENT_CSS}", "<style>$($ParentCSS)</style>")
-
-        $ScriptsPath = Join-Path -Path $ReporterPath -ChildPath "scripts"
-        $ParentReportJS = (Get-Content $(Join-Path -Path $ScriptsPath -ChildPath "ParentReport.js")) -Join "`n"
-        $UtilsJS = (Get-Content $(Join-Path -Path $ScriptsPath -ChildPath "utils.js")) -Join "`n"
-        $ParentReportJS = "$($ParentReportJS)`n$($UtilsJS)"
-        $ReportHTML = $ReportHTML.Replace("{MAIN_JS}", "<script>
-            let darkMode = $($DarkMode.ToString().ToLower());
-            $($ParentReportJS)
-        </script>")
-
-        Add-Type -AssemblyName System.Web
-        $ReportFileName = Join-Path -Path $OutFolderPath "$($OutReportName).html"
-        [System.Web.HttpUtility]::HtmlDecode($ReportHTML) | Out-File $ReportFileName
-        if ($Quiet -eq $False) {
-            Invoke-Item $ReportFileName
+        catch {
+            $InvokeReportErrorMessage = "Fatal Error involving the Report Creation Process. `
+            Ending ScubaGear execution. See the exception message for more details: $($_)"
+            throw $InvokeReportErrorMessage
         }
     }
 }
