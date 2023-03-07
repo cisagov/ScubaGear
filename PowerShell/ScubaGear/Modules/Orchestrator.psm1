@@ -432,7 +432,7 @@ function Invoke-ProviderList {
                     $RetVal = Export-AADProvider | Select-Object -Last 1
                 }
                 "exo" {
-                    $RetVal = Export-EXOProvider -Verbose:$VerbosePreference | Select-Object -Last 1
+                    $RetVal = Export-EXOProvider | Select-Object -Last 1
                 }
                 "defender" {
                     $RetVal = Export-DefenderProvider @ConnectTenantParams  | Select-Object -Last 1
