@@ -816,25 +816,6 @@ Policies2_10[Cap.DisplayName] {
     GroupExclusionsFullyExempt(Cap) == true
 }
 
-
-Policies2_10[Cap.DisplayName] {
-    Cap := input.conditional_access_policies[_]
-    #Only select policies with user exclusions and with group exclusions that are in the allowed exclusions list
-    "All" in Cap.Conditions.Users.IncludeUsers
-    ExcludedUser := Cap.Conditions.Users.ExcludeUsers[_]
-    AllowedExcludedUsers := input.scuba_config.Aad.Policy2_10.CapExclusions.Users
-    AllowedExcludedUsers
-    ExcludedGroup := Cap.Conditions.Users.ExcludeGroups[_]
-    AllowedExcludedGroups := input.scuba_config.Aad.Policy2_10.CapExclusions.Groups
-    AllowedExcludedGroups
-    count(Cap.Conditions.Users.ExcludeRoles) == 0
-
-    "All" in Cap.Conditions.Applications.IncludeApplications
-    Cap.SessionControls.PersistentBrowser.IsEnabled == true
-    Cap.SessionControls.PersistentBrowser.Mode == "never"
-    Cap.State == "enabled"
-}
-
 tests[{
     "Requirement" : "Browser sessions SHALL not be persistent",
     "Control" : "AAD 2.10",
