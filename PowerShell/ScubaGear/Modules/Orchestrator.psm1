@@ -364,120 +364,130 @@ function Invoke-ProviderList {
     #>
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string[]]
         $ProductNames,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string]
         $M365Environment,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string]
         $TenantDetails,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string]
         $ModuleVersion,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string]
         $OutFolderPath,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string]
         $OutProviderFileName,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [hashtable]
         $BoundParameters
     )
     process {
-        # yes the syntax has to be like this
-        # fixing the spacing causes PowerShell interpreter errors
-        $ProviderJSON = @"
+        try {
+            # yes the syntax has to be like this
+            # fixing the spacing causes PowerShell interpreter errors
+            $ProviderJSON = @"
 "@
-        $N = 0
-        $Len = $ProductNames.Length
-        $ConnectTenantParams = @{
-            'M365Environment' = $M365Environment
-        }
-        $SPOProviderParams = @{
-            'M365Environment' = $M365Environment
-        }
-
-        $PnPFlag = $false
-        if ($BoundParameters.AppID) {
-            $ServicePrincipalParams = Get-ServicePrincipalParams -BoundParameters $BoundParameters
-            $ConnectTenantParams += @{ServicePrincipalParams = $ServicePrincipalParams;}
-            $PnPFlag = $true
-            $SPOProviderParams += @{PnPFlag = $PnPFlag}
-        }
-
-        foreach ($Product in $ProductNames) {
-            $BaselineName = $ArgToProd[$Product]
-            $N += 1
-            $Percent = $N*100/$Len
-            $Status = "Running the $($BaselineName) Provider; $($N) of $($Len) Product settings extracted"
-            $ProgressParams = @{
-                'Activity' = "Running the provider for each baseline"
-                'Status' = $Status;
-                'PercentComplete' = $Percent;
-                'Id' = 1;
+            $N = 0
+            $Len = $ProductNames.Length
+            $ConnectTenantParams = @{
+                'M365Environment' = $M365Environment
             }
-            Write-Progress @ProgressParams
-            $RetVal = ""
-            switch ($Product) {
-                "aad" {
-                    $RetVal = Export-AADProvider | Select-Object -Last 1
-                }
-                "exo" {
-                    $RetVal = Export-EXOProvider | Select-Object -Last 1
-                }
-                "defender" {
-                    $RetVal = Export-DefenderProvider @ConnectTenantParams  | Select-Object -Last 1
-                }
-                "powerplatform" {
-                    $RetVal = Export-PowerPlatformProvider -M365Environment $M365Environment | Select-Object -Last 1
-                }
-                "onedrive" {
-                    $RetVal = Export-OneDriveProvider -PnPFlag:$PnPFlag | Select-Object -Last 1
-                }
-                "sharepoint" {
-                    $RetVal = Export-SharePointProvider @SPOProviderParams | Select-Object -Last 1
-                }
-                "teams" {
-                    $RetVal = Export-TeamsProvider | Select-Object -Last 1
-                }
-                default {
-                    Write-Error -Message "Invalid ProductName argument"
-                }
+            $SPOProviderParams = @{
+                'M365Environment' = $M365Environment
             }
-            $ProviderJSON += $RetVal
-        }
 
-        $ProviderJSON = $ProviderJSON.TrimEnd(",")
-        $TimeZone = ""
-        if ((Get-Date).IsDaylightSavingTime()) {
-            $TimeZone = (Get-TimeZone).DaylightName
-        }
-        else {
-            $TimeZone = (Get-TimeZone).StandardName
-        }
-        $BaselineSettingsExport = @"
-{
-        "baseline_version": "0.1",
-        "module_version": "$ModuleVersion",
-        "date": "$(Get-Date) $($TimeZone)",
-        "tenant_details": $($TenantDetails),
+            $PnPFlag = $false
+            if ($BoundParameters.AppID) {
+                $ServicePrincipalParams = Get-ServicePrincipalParams -BoundParameters $BoundParameters
+                $ConnectTenantParams += @{ServicePrincipalParams = $ServicePrincipalParams; }
+                $PnPFlag = $true
+                $SPOProviderParams += @{PnPFlag = $PnPFlag }
+            }
 
-        $ProviderJSON
-}
+            foreach ($Product in $ProductNames) {
+                $BaselineName = $ArgToProd[$Product]
+                $N += 1
+                $Percent = $N * 100 / $Len
+                $Status = "Running the $($BaselineName) Provider; $($N) of $($Len) Product settings extracted"
+                $ProgressParams = @{
+                    'Activity' = "Running the provider for each baseline";
+                    'Status' = $Status;
+                    'PercentComplete' = $Percent;
+                    'Id' = 1;
+                    'ErrorAction' = 'Stop';
+                }
+                Write-Progress @ProgressParams
+                $RetVal = ""
+                switch ($Product) {
+                    "aad" {
+                        $RetVal = Export-AADProvider | Select-Object -Last 1
+                    }
+                    "exo" {
+                        $RetVal = Export-EXOProvider | Select-Object -Last 1
+                    }
+                    "defender" {
+                        $RetVal = Export-DefenderProvider @ConnectTenantParams  | Select-Object -Last 1
+                    }
+                    "powerplatform" {
+                        $RetVal = Export-PowerPlatformProvider -M365Environment $M365Environment | Select-Object -Last 1
+                    }
+                    "onedrive" {
+                        $RetVal = Export-OneDriveProvider -PnPFlag:$PnPFlag | Select-Object -Last 1
+                    }
+                    "sharepoint" {
+                        $RetVal = Export-SharePointProvider @SPOProviderParams | Select-Object -Last 1
+                    }
+                    "teams" {
+                        $RetVal = Export-TeamsProvider | Select-Object -Last 1
+                    }
+                    default {
+                        Write-Error -Message "Invalid ProductName argument"
+                    }
+                }
+                $ProviderJSON += $RetVal
+            }
+
+            $ProviderJSON = $ProviderJSON.TrimEnd(",")
+            $TimeZone = ""
+            $CurrentDate = Get-Date -ErrorAction 'Stop'
+            $GetTimeZone = Get-TimeZone -ErrorAction 'Stop'
+            if (($CurrentDate).IsDaylightSavingTime()) {
+                $TimeZone = ($GetTimeZone).DaylightName
+            }
+            else {
+                $TimeZone = ($GetTimeZone).StandardName
+            }
+            $BaselineSettingsExport = @"
+        {
+                "baseline_version": "0.1",
+                "module_version": "$ModuleVersion",
+                "date": "$($CurrentDate) $($TimeZone)",
+                "tenant_details": $($TenantDetails),
+
+                $ProviderJSON
+        }
 "@
-        $BaselineSettingsExport = $BaselineSettingsExport.replace("\`"", "'")
-        $BaselineSettingsExport = $BaselineSettingsExport.replace("\", "")
-        $FinalPath = Join-Path -Path $OutFolderPath -ChildPath "$($OutProviderFileName).json"
-        $BaselineSettingsExport | Set-Content -Path $FinalPath -Encoding $(Get-FileEncoding)
+            $BaselineSettingsExport = $BaselineSettingsExport.replace("\`"", "'")
+            $BaselineSettingsExport = $BaselineSettingsExport.replace("\", "")
+            $FinalPath = Join-Path -Path $OutFolderPath -ChildPath "$($OutProviderFileName).json" -ErrorAction 'Stop'
+            $BaselineSettingsExport | Set-Content -Path $FinalPath -Encoding $(Get-FileEncoding) -ErrorAction 'Stop'
+        }
+        catch {
+            $InvokeProviderListErrorMessage = "Fatal Error involving the Provider Output JSON. `
+            Ending ScubaGear execution. See the exception message for more details: $($_)"
+            throw $InvokeProviderListErrorMessage
+        }
     }
 }
 
@@ -493,78 +503,85 @@ function Invoke-RunRego {
     #>
     [CmdletBinding()]
     param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string[]]
         $ProductNames,
 
         [string]
         $OPAPath = $PSScriptRoot,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [String]
         $ParentPath,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [String]
         $OutFolderPath,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [String]
         $OutProviderFileName,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string]
         $OutRegoFileName
     )
     process {
-        $TestResults = @()
-        $N = 0
-        $Len = $ProductNames.Length
-        foreach ($Product in $ProductNames) {
-            $BaselineName = $ArgToProd[$Product]
-            $N += 1
-            $Percent = $N*100/$Len
+        try {
+            $TestResults = @()
+            $N = 0
+            $Len = $ProductNames.Length
+            foreach ($Product in $ProductNames) {
+                $BaselineName = $ArgToProd[$Product]
+                $N += 1
+                $Percent = $N * 100 / $Len
 
-            $Status = "Running the $($BaselineName) Rego Verification; $($N) of $($Len) Rego verifications completed"
-            $ProgressParams = @{
-                'Activity' = "Running the rego for each baseline";
-                'Status' = $Status;
-                'PercentComplete' = $Percent;
-                'Id' = 1;
-            }
-            Write-Progress @ProgressParams
-            $InputFile = Join-Path -Path $OutFolderPath "$($OutProviderFileName).json"
-            $RegoFile = Join-Path -Path $ParentPath -ChildPath "Rego"
-            $RegoFile = Join-Path -Path $RegoFile -ChildPath "$($BaselineName)Config.rego"
-            $params = @{
-                'InputFile' = $InputFile;
-                'RegoFile' = $RegoFile;
-                'PackageName' = $Product;
-                'OPAPath' = $OPAPath
-            }
-            $RetVal = Invoke-Rego @params
-            $TestResults += $RetVal
+                $Status = "Running the $($BaselineName) Rego Verification; $($N) of $($Len) Rego verifications completed"
+                $ProgressParams = @{
+                    'Activity' = "Running the rego for each baseline";
+                    'Status' = $Status;
+                    'PercentComplete' = $Percent;
+                    'Id' = 1;
+                    'ErrorAction' = 'Stop';
+                }
+                Write-Progress @ProgressParams
+                $InputFile = Join-Path -Path $OutFolderPath "$($OutProviderFileName).json" -ErrorAction 'Stop'
+                $RegoFile = Join-Path -Path $ParentPath -ChildPath "Rego" -ErrorAction 'Stop'
+                $RegoFile = Join-Path -Path $RegoFile -ChildPath "$($BaselineName)Config.rego" -ErrorAction 'Stop'
+                $params = @{
+                    'InputFile' = $InputFile;
+                    'RegoFile' = $RegoFile;
+                    'PackageName' = $Product;
+                    'OPAPath' = $OPAPath
+                }
+                $RetVal = Invoke-Rego @params
+                $TestResults += $RetVal
             }
 
-            $TestResultsJson = $TestResults | ConvertTo-Json -Depth 5
-            $FileName = Join-Path -path $OutFolderPath "$($OutRegoFileName).json"
-            $TestResultsJson | Set-Content -Path $FileName -Encoding $(Get-FileEncoding)
+            $TestResultsJson = $TestResults | ConvertTo-Json -Depth 5 -ErrorAction 'Stop'
+            $FileName = Join-Path -Path $OutFolderPath "$($OutRegoFileName).json" -ErrorAction 'Stop'
+            $TestResultsJson | Set-Content -Path $FileName -Encoding $(Get-FileEncoding) -ErrorAction 'Stop'
 
             foreach ($Product in $TestResults) {
                 foreach ($Test in $Product) {
                     # ConvertTo-Csv struggles with the nested nature of the ActualValue
                     # and Commandlet fields. Explicitly convert these to json strings before
                     # calling ConvertTo-Csv
-                    $Test.ActualValue = $Test.ActualValue | ConvertTo-Json -Depth 3 -Compress
+                    $Test.ActualValue = $Test.ActualValue | ConvertTo-Json -Depth 3 -Compress -ErrorAction 'Stop'
                     $Test.Commandlet = $Test.Commandlet -Join ", "
                 }
             }
-
-            $TestResultsCsv = $TestResults | ConvertTo-Csv -NoTypeInformation
-            $CSVFileName = Join-Path -Path $OutFolderPath "$($OutRegoFileName).csv"
-            $TestResultsCsv | Set-Content -Path $CSVFileName -Encoding $(Get-FileEncoding)
+            $TestResultsCsv = $TestResults | ConvertTo-Csv -NoTypeInformation -ErrorAction 'Stop'
+            $CSVFileName = Join-Path -Path $OutFolderPath "$($OutRegoFileName).csv" -ErrorAction 'Stop'
+            $TestResultsCsv | Set-Content -Path $CSVFileName -Encoding $(Get-FileEncoding) -ErrorAction 'Stop'
+        }
+        catch {
+            $InvokeRegoErrorMessage = "Fatal Error involving the OPA Output JSON. `
+            Ending ScubaGear execution. See the exception message for more details: $($_)"
+            throw $InvokeRegoErrorMessage
         }
     }
+}
 
 function Pluralize {
     <#
