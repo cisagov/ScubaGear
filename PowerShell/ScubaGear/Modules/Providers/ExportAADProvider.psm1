@@ -132,27 +132,32 @@ function Get-AADTenantDetail {
     .Functionality
     Internal
     #>
-    $TenantInfo = @{}
     try {
         $OrgInfo = Get-MgOrganization -ErrorAction "Stop"
         $InitialDomain = $OrgInfo.VerifiedDomains | Where-Object {$_.isInitial}
         if (-not $InitialDomain) {
             $InitialDomain = "AAD: Domain Unretrievable"
         }
-        $TenantInfo.DisplayName = $OrgInfo.DisplayName
-        $TenantInfo.DomainName = $InitialDomain.name
-        $TenantInfo.TenantId = $OrgInfo.Id
-        $TenantInfo.AADAdditionalData = $OrgInfo
+        $AADTenantInfo = @{
+            "DisplayName" = $OrgInfo.DisplayName;
+            "DomainName" = $InitialDomain.Name;
+            "TenantId" = $OrgInfo.Id;
+            "AADAdditionalData" = $OrgInfo;
+        }
+        $AADTenantInfo = ConvertTo-Json @($AADTenantInfo) -Depth 4
+        $AADTenantInfo
     }
     catch {
-        $TenantInfo.DisplayName = "*Get-AADTenantDetail ERROR*"
-        $TenantInfo.DisplayName = "*Get-AADTenantDetail ERROR*"
-        $TenantInfo.DomainName = "*Get-AADTenantDetail ERROR*"
-        $TenantInfo.TenantId = "*Get-AADTenantDetail ERROR*"
-        $TenantInfo.AADAdditionalData = "*Get-AADTenantDetail ERROR*"
+        Write-Warning "Error retrieving Tenant details using Get-AADTenantDetail $($_)"
+        $AADTenantInfo = @{
+            "DisplayName" = "Error retrieving Display name";
+            "DomainName" = "Error retrieving Domain name";
+            "TenantId" = "Error retrieving Tenant ID";
+            "AADAdditionalData" = "Error retrieving additional data";
+        }
+        $AADTenantInfo = ConvertTo-Json @($AADTenantInfo) -Depth 4
+        $AADTenantInfo
     }
-    $TenantInfo = $TenantInfo | ConvertTo-Json -Depth 4
-    $TenantInfo
 }
 
 function Get-PrivilegedUser {
