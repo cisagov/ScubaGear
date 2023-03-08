@@ -104,7 +104,8 @@ foreach ($Module in $ModuleList) {
             -AllowClobber `
             -Scope CurrentUser `
             -MaximumVersion $Module.MaximumVersion
-        Write-Information -MessageData "Installed the latest acceptable version of $ModuleName"
+            $MaxInstalledVersion = (Get-Module -ListAvailable -Name $ModuleName | Sort-Object Version -Descending | Select-Object Version -First 1).Version
+        Write-Information -MessageData "Installed the latest acceptable version of ${ModuleName} version ${MaxInstalledVersion}"
     }
 }
 
