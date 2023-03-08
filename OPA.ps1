@@ -4,7 +4,7 @@
         This script installs the required OPA executable used by the
         assessment tool
     .DESCRIPTION
-        Installs the OPA executable required to support SCuBAGear.  
+        Installs the OPA executable required to support SCuBAGear.
     .EXAMPLE
         .\OPA.ps1
 #>
