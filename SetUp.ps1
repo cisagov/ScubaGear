@@ -79,7 +79,8 @@ foreach ($Module in $ModuleList) {
                 Install-Module -Name $ModuleName `
                     -Force `
                     -AllowClobber `
-                    -Scope CurrentUser
+                    -Scope CurrentUser `
+                    -MaximumVersion $Module.MaximumVersion
                 Write-Information -MessageData "Re-installing module: ${ModuleName}"
             }
         } else {
@@ -91,14 +92,16 @@ foreach ($Module in $ModuleList) {
                 Install-Module -Name $ModuleName `
                     -Force `
                     -AllowClobber `
-                    -Scope CurrentUser
+                    -Scope CurrentUser `
+                    -MaximumVersion $Module.MaximumVersion
                 Write-Information -MessageData " ${ModuleName}:${HighestInstalledVersion} updated to version ${LatestVersion}."
             }
         }
     } else {
         Install-Module -Name $ModuleName `
             -AllowClobber `
-            -Scope CurrentUser
+            -Scope CurrentUser `
+            -MaximumVersion $Module.MaximumVersion
         Write-Information -MessageData "Installed latest version of $ModuleName"
     }
 }
@@ -107,4 +110,3 @@ foreach ($Module in $ModuleList) {
 $Stopwatch.stop()
 
 Write-Debug "ScubaGear setup time elapsed:  $([math]::Round($stopwatch.Elapsed.TotalSeconds,0)) seconds."
-
