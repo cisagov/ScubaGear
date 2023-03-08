@@ -32,7 +32,7 @@ foreach ($Module in $ModuleList) {
         throw [System.IO.FileNotFoundException] "No acceptable installed version found for module: $($Module.ModuleName)
         Required Min Version: $($Module.ModuleVersion) | Max Version: $($Module.MaximumVersion)
         Run Get-InstalledModule to see a list of currently installed modules
-        Run SetUp.ps1 or Install-Module $($Module.ModuleName) -force to install the latest version of $($Module.ModuleName)"
+        Run SetUp.ps1 or Install-Module $($Module.ModuleName) -force to install the latest acceptable version of $($Module.ModuleName)"
     }
 }
 

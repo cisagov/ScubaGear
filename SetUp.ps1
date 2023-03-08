@@ -34,10 +34,10 @@ param(
 $DebugPreference = "Continue"
 $InformationPreference = "Continue"
 
-if (-not $DoNotAutoTrustRepository){
+if (-not $DoNotAutoTrustRepository) {
     $Policy = Get-PSRepository -Name "PSGallery" | Select-Object -Property -InstallationPolicy
 
-    if ($($Policy.InstallationPolicy) -ne "Trusted"){
+    if ($($Policy.InstallationPolicy) -ne "Trusted") {
         Set-PSRepository -Name "PSGallery" -InstallationPolicy Trusted
         Write-Information -MessageData "Setting PSGallery repository to trusted."
     }
@@ -47,11 +47,11 @@ if (-not $DoNotAutoTrustRepository){
 $Stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
 
 $RequiredModulesPath = Join-Path -Path $PSScriptRoot -ChildPath "PowerShell\ScubaGear\RequiredVersions.ps1"
-if (Test-Path -Path $RequiredModulesPath){
+if (Test-Path -Path $RequiredModulesPath) {
   . $RequiredModulesPath
 }
 
-if ($ModuleList){
+if ($ModuleList) {
     # Add PowerShellGet to beginning of ModuleList for installing required modules.
     $ModuleList = ,@{
         ModuleName = 'PowerShellGet'
@@ -81,10 +81,10 @@ foreach ($Module in $ModuleList) {
                     -AllowClobber `
                     -Scope CurrentUser `
                     -MaximumVersion $Module.MaximumVersion
-                Write-Information -MessageData "Re-installing module: ${ModuleName}"
+                Write-Information -MessageData "Re-installing module to latest acceptable version: ${ModuleName}"
             }
-        } else {
-
+        }
+        else {
             if ($SkipUpdate -eq $true) {
                 Write-Debug "Skipping update for ${ModuleName}:${HighestInstalledVersion} to newer version ${LatestVersion}."
             }
@@ -94,15 +94,17 @@ foreach ($Module in $ModuleList) {
                     -AllowClobber `
                     -Scope CurrentUser `
                     -MaximumVersion $Module.MaximumVersion
-                Write-Information -MessageData " ${ModuleName}:${HighestInstalledVersion} updated to version ${LatestVersion}."
+                $MaxInstalledVersion = (Get-Module -ListAvailable -Name $ModuleName | Sort-Object Version -Descending | Select-Object Version -First 1).Version
+                Write-Information -MessageData " ${ModuleName}:${HighestInstalledVersion} updated to version ${MaxInstalledVersion}."
             }
         }
-    } else {
+    }
+    else {
         Install-Module -Name $ModuleName `
             -AllowClobber `
             -Scope CurrentUser `
             -MaximumVersion $Module.MaximumVersion
-        Write-Information -MessageData "Installed latest version of $ModuleName"
+        Write-Information -MessageData "Installed the latest acceptable version of $ModuleName"
     }
 }
 
