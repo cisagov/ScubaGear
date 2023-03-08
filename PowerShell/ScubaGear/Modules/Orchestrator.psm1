@@ -239,7 +239,7 @@ function Invoke-SCuBA {
         $ParentPath = Split-Path $(Split-Path $ParentPath -Parent) -Parent
 
         # Creates the output folder
-        $Date = Get-Date
+        $Date = Get-Date -ErrorAction 'Stop'
         $DateStr = $Date.ToString("yyyy_MM_dd_HH_mm_ss")
         $FormattedTimeStamp = $DateStr
 
@@ -428,34 +428,40 @@ function Invoke-ProviderList {
                     'ErrorAction' = 'Stop';
                 }
                 Write-Progress @ProgressParams
-                $RetVal = ""
-                switch ($Product) {
-                    "aad" {
-                        $RetVal = Export-AADProvider | Select-Object -Last 1
+                try {
+                    $RetVal = ""
+                    switch ($Product) {
+                        "aad" {
+                            $RetVal = Export-AADProvider | Select-Object -Last 1
+                        }
+                        "exo" {
+                            $RetVal = Export-EXOProvider | Select-Object -Last 1
+                        }
+                        "defender" {
+                            $RetVal = Export-DefenderProvider @ConnectTenantParams  | Select-Object -Last 1
+                        }
+                        "powerplatform" {
+                            $RetVal = Export-PowerPlatformProvider -M365Environment $M365Environment | Select-Object -Last 1
+                        }
+                        "onedrive" {
+                            $RetVal = Export-OneDriveProvider -PnPFlag:$PnPFlag | Select-Object -Last 1
+                        }
+                        "sharepoint" {
+                            $RetVal = Export-SharePointProvider @SPOProviderParams | Select-Object -Last 1
+                        }
+                        "teams" {
+                            $RetVal = Export-TeamsProvider | Select-Object -Last 1
+                        }
+                        default {
+                            Write-Error -Message "Invalid ProductName argument"
+                        }
                     }
-                    "exo" {
-                        $RetVal = Export-EXOProvider | Select-Object -Last 1
-                    }
-                    "defender" {
-                        $RetVal = Export-DefenderProvider @ConnectTenantParams  | Select-Object -Last 1
-                    }
-                    "powerplatform" {
-                        $RetVal = Export-PowerPlatformProvider -M365Environment $M365Environment | Select-Object -Last 1
-                    }
-                    "onedrive" {
-                        $RetVal = Export-OneDriveProvider -PnPFlag:$PnPFlag | Select-Object -Last 1
-                    }
-                    "sharepoint" {
-                        $RetVal = Export-SharePointProvider @SPOProviderParams | Select-Object -Last 1
-                    }
-                    "teams" {
-                        $RetVal = Export-TeamsProvider | Select-Object -Last 1
-                    }
-                    default {
-                        Write-Error -Message "Invalid ProductName argument"
-                    }
+                    $ProviderJSON += $RetVal
                 }
-                $ProviderJSON += $RetVal
+                catch {
+                    Write-Error "Error with the $($BaselineName) Provider. The report may display incorrect output. See the exception message for more details:  $($_)"
+                    # TODO Omit the a failed provider from the report in a future update
+                }
             }
 
             $ProviderJSON = $ProviderJSON.TrimEnd(",")

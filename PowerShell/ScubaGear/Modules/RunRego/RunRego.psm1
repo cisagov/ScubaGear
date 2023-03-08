@@ -28,15 +28,15 @@ function Invoke-Rego {
 
 # PowerShell 5.1 compatible Windows OS check
 if ("Windows_NT" -eq $Env:OS) {
-    $Cmd = Join-Path -Path $OPAPath -ChildPath "opa_windows_amd64.exe"
+    $Cmd = Join-Path -Path $OPAPath -ChildPath "opa_windows_amd64.exe" -ErrorAction 'Stop'
 }
 else {
     # Permissions: chmod 755 ./opa
-    $Cmd = Join-Path -Path $OPAPath -ChildPath "opa"
+    $Cmd = Join-Path -Path $OPAPath -ChildPath "opa" -ErrorAction 'Stop'
 }
 
 $CmdArgs = @("eval", "-i", $InputFile, "-d", $RegoFile, "data.$PackageName.tests", "-f", "values")
-$TestResults = $(& $Cmd @CmdArgs) | Out-String | ConvertFrom-Json
+$TestResults = $(& $Cmd @CmdArgs) | Out-String -ErrorAction 'Stop' | ConvertFrom-Json -ErrorAction 'Stop'
 
 $TestResults
 }
