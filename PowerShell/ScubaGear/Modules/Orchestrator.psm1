@@ -245,8 +245,8 @@ function Invoke-SCuBA {
 
         $OutFolderPath = $ScubaConfig.OutPath
         $FolderName = "$($ScubaConfig.OutFolderName)_$($FormattedTimeStamp)"
-        New-Item -Path $OutFolderPath -Name $($FolderName) -ItemType Directory | Out-Null
-        $OutFolderPath = Join-Path -Path $OutFolderPath -ChildPath $FolderName
+        New-Item -Path $OutFolderPath -Name $($FolderName) -ItemType Directory -ErrorAction 'Stop' | Out-Null
+        $OutFolderPath = Join-Path -Path $OutFolderPath -ChildPath $FolderName -ErrorAction 'Stop'
 
         $ConnectionParams = @{
             'LogIn' = $ScubaConfig.LogIn;
@@ -484,7 +484,7 @@ function Invoke-ProviderList {
             $BaselineSettingsExport | Set-Content -Path $FinalPath -Encoding $(Get-FileEncoding) -ErrorAction 'Stop'
         }
         catch {
-            $InvokeProviderListErrorMessage = "Fatal Error involving the Provider Output JSON. `
+            $InvokeProviderListErrorMessage = "Fatal Error involving the Provider functions. `
             Ending ScubaGear execution. See the exception message for more details: $($_)"
             throw $InvokeProviderListErrorMessage
         }
@@ -576,7 +576,7 @@ function Invoke-RunRego {
             $TestResultsCsv | Set-Content -Path $CSVFileName -Encoding $(Get-FileEncoding) -ErrorAction 'Stop'
         }
         catch {
-            $InvokeRegoErrorMessage = "Fatal Error involving the OPA Output JSON. `
+            $InvokeRegoErrorMessage = "Fatal Error involving the OPA Output. `
             Ending ScubaGear execution. See the exception message for more details: $($_)"
             throw $InvokeRegoErrorMessage
         }
@@ -778,7 +778,7 @@ function Invoke-ReportCreation {
             }
         }
         catch {
-            $InvokeReportErrorMessage = "Fatal Error involving the Report Creation Process. `
+            $InvokeReportErrorMessage = "Fatal Error involving the Report Creation. `
             Ending ScubaGear execution. See the exception message for more details: $($_)"
             throw $InvokeReportErrorMessage
         }
