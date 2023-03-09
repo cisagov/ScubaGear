@@ -30,7 +30,7 @@ param(
     $DoNotAutoTrustRepository
 )
 
-# Set prefernces for writing messages
+# Set preferences for writing messages
 $DebugPreference = "Continue"
 $InformationPreference = "Continue"
 
@@ -113,3 +113,5 @@ foreach ($Module in $ModuleList) {
 $Stopwatch.stop()
 
 Write-Debug "ScubaGear setup time elapsed:  $([math]::Round($stopwatch.Elapsed.TotalSeconds,0)) seconds."
+$DebugPreference = "SilentlyContinue"
+$InformationPreference = "SilentlyContinue"
