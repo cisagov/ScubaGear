@@ -1,11 +1,23 @@
-Description: YAML Configuration file for unit test in SCuBA
+Description: |
+  SCuBAGear YAML Configuration file with custom variables
+  This configuration shows a standard SCuBAGear set of parameters to run
+  but also includes examples of custom variables for use and reference
+  in Rego policy assessments against the AAD baseline.  Specifically, using
+  policy specific variables to exempt specific user and group exclusions from
+  conditional access policy checks that normally would not pass if exclusions
+  are present.  These parameters support operational use cases for having
+  backup or break glass account exclusions to global user policies without
+  failing best practices.  Any exemptions and their risks should be carefully 
+  considered and documented as part of an organization's cybersecurity risk
+  management program process and practices.
+  This example includes the following design choices for illustrative purposes:
+  - Use of Pascal case convention for varible names
+  - Defines a namespace for values to be used across baselines/products (i.e., GlobalVars)
+  - Per product namespace for values related to that specific product (i.e., Aad, SharePoint)
+  - Namespace for each policy item within a product for variables related only to one policy item (i.e., Aad.Policy2_1)
+  - Use of YAML anchors and aliases following DRY (Don't Repeat Yourself) principle for repeated values and sections
 ProductNames:
-# - teams
-# - exo
-# - defender
- - aad
-# - sharepoint
-# - onedrive
+- aad
 M365Environment: commercial
 OPAPath: .
 LogIn: true
@@ -15,30 +27,20 @@ OutFolderName: M365BaselineConformance
 OutProviderFileName: ProviderSettingsExport
 OutRegoFileName: TestResults
 OutReportName: BaselineReports
-AnObject:
-  name: MyObjectName
+GlobalVars:  # For cross product variables
+  AllProductVar: value_example
 Aad:
-# All AAD specific variables go here
-  Common:
-    # Common variables can be applied to any or all relevant policies
-      CapExclusions:
-        # These exclusions will be applied to all policies checking conditional access policies
-        # in addition to any individual policy exclusions
-      - Group:
-        - BackupGroup
-  Policy2_1:
+# All AAD specific variables go here 
+  Policy2_1: &CommonExclusions
     CapExclusions:
-    # The exclusions could include both groups and users
-      Groups:
-      # "TEST CAP EXclusions Group 1" from y2zj1 E5 tenant
-        - 08adb07a-956f-450e-b41c-81e92e3db2c4
       Users:
-      # "Test CAP Exclusions User 1" from y2zj1 E5 tenant
-       - fc29f4a8-2b27-4d1e-898e-cfacb98bd8f8
+        - fc29f4a8-2b27-4d1e-898e-cfacb98bd8f8
+      Groups:
+        - 08adb07a-956f-450e-b41c-81e92e3db2c4
+  Policy2_2:  *CommonExclusions
+  Policy2_3:  *CommonExclusions
+  Policy2_4:  *CommonExclusions
+  Policy2_9:  *CommonExclusions
+  Policy2_10: *CommonExclusions
 #SharePoint:
 #Teams:
-
-# Rego code examples to reference a config file variable value
-# input.scuba_config.Aad.Common.CapExclusions.Group
-# input.scuba_config.GlobalVars.AllProductVar
-# input.scuba_config.Aad.Policy2_1.CapExclusions.Group
