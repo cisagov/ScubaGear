@@ -193,6 +193,7 @@ function Invoke-SCuBA {
         $DarkMode
     )
     process {
+        # Retrive ScubaGear Module versions
         $ParentPath = Split-Path $PSScriptRoot -Parent -ErrorAction 'Stop'
         $ScubaManifest = Import-PowerShellDataFile (Join-Path -Path $ParentPath -ChildPath 'ScubaGear.psd1' -Resolve) -ErrorAction 'Stop'
         $ModuleVersion = $ScubaManifest.ModuleVersion
@@ -201,6 +202,7 @@ function Invoke-SCuBA {
             return
         }
 
+        # Default execution ParameterSet
         if ($PSCmdlet.ParameterSetName -eq 'Report'){
 
             if ($ProductNames -eq '*'){
@@ -223,9 +225,10 @@ function Invoke-SCuBA {
             $ScubaConfig = New-Object -Type PSObject -Property $ProvidedParameters
         }
 
-        Remove-Resources
+        Remove-Resources # Unload helper modules if they are still in the PowerShell session
         Import-Resources # Imports Providers, RunRego, CreateReport, Connection
 
+        # Loads and executes parameters from a Configuration file
         if ($PSCmdlet.ParameterSetName -eq 'Configuration'){
             if (-Not ([ScubaConfig]::GetInstance().LoadConfig($ConfigFilePath))){
                 Write-Error -Message "The config file failed to load: $ConfigFilePath"
@@ -240,77 +243,87 @@ function Invoke-SCuBA {
 
         # Creates the output folder
         $Date = Get-Date -ErrorAction 'Stop'
-        $DateStr = $Date.ToString("yyyy_MM_dd_HH_mm_ss")
-        $FormattedTimeStamp = $DateStr
-
+        $FormattedTimeStamp = $Date.ToString("yyyy_MM_dd_HH_mm_ss")
         $OutFolderPath = $ScubaConfig.OutPath
         $FolderName = "$($ScubaConfig.OutFolderName)_$($FormattedTimeStamp)"
         New-Item -Path $OutFolderPath -Name $($FolderName) -ItemType Directory -ErrorAction 'Stop' | Out-Null
         $OutFolderPath = Join-Path -Path $OutFolderPath -ChildPath $FolderName -ErrorAction 'Stop'
 
+        # Product Authentication
         $ConnectionParams = @{
             'LogIn' = $ScubaConfig.LogIn;
             'ProductNames' = $ScubaConfig.ProductNames;
             'M365Environment' = $ScubaConfig.M365Environment;
             'BoundParameters' = $PSBoundParameters;
         }
-
         $ProdAuthFailed = Invoke-Connection @ConnectionParams
         if ($ProdAuthFailed.Count -gt 0) {
-            $Difference = Compare-Object $ScubaConfig.ProductNames -DifferenceObject $ProdAuthFailed -PassThru
-            if (-not $Difference) {
-                throw "All products were unable to establish a connection aborting execution"
-            }
-            else {
-                $ScubaConfig.ProductNames = $Difference
-            }
+            $ScubaConfig.ProductNames = Compare-ProductList -ProductNames $ScubaConfig.ProductNames `
+            -ProductsFailed $ProdAuthFailed `
+            -ExceptionMessage 'All indicated Products were unable to authenticate'
         }
 
+        # Tenant Metadata for the Report
         $TenantDetails = Get-TenantDetail -ProductNames $ScubaConfig.ProductNames -M365Environment $ScubaConfig.M365Environment
-        $ProviderParams = @{
-            'ProductNames' = $ScubaConfig.ProductNames;
-            'M365Environment' = $ScubaConfig.M365Environment;
-            'TenantDetails' = $TenantDetails;
-            'ModuleVersion' = $ModuleVersion;
-            'OutFolderPath' = $OutFolderPath;
-            'OutProviderFileName' = $ScubaConfig.OutProviderFileName;
-            'BoundParameters' = $PSBoundParameters;
-        }
-        $RegoParams = @{
-            'ProductNames' = $ScubaConfig.ProductNames;
-            'OPAPath' = $ScubaConfig.OPAPath;
-            'ParentPath' = $ParentPath;
-            'OutFolderPath' = $OutFolderPath;
-            'OutProviderFileName' = $ScubaConfig.OutProviderFileName;
-            'OutRegoFileName' = $ScubaConfig.OutRegoFileName;
-        }
-        # Converted back from JSON String for PS Object use
-        $TenantDetails = $TenantDetails | ConvertFrom-Json
-        $ReportParams = @{
-            'ProductNames' = $ScubaConfig.ProductNames;
-            'TenantDetails' = $TenantDetails;
-            'ModuleVersion' = $ModuleVersion;
-            'OutFolderPath' = $OutFolderPath;
-            'OutProviderFileName' = $ScubaConfig.OutProviderFileName;
-            'OutRegoFileName' = $ScubaConfig.OutRegoFileName;
-            'OutReportName' = $ScubaConfig.OutReportName;
-            'DarkMode' = $DarkMode;
-        }
 
         try {
-            Invoke-ProviderList @ProviderParams
-            Invoke-RunRego @RegoParams
+            # Provider Execution
+            $ProviderParams = @{
+                'ProductNames' = $ScubaConfig.ProductNames;
+                'M365Environment' = $ScubaConfig.M365Environment;
+                'TenantDetails' = $TenantDetails;
+                'ModuleVersion' = $ModuleVersion;
+                'OutFolderPath' = $OutFolderPath;
+                'OutProviderFileName' = $ScubaConfig.OutProviderFileName;
+                'BoundParameters' = $PSBoundParameters;
+            }
+            $ProdProviderFailed = Invoke-ProviderList @ProviderParams
+            if ($ProdProviderFailed.Count -gt 0) {
+                $ScubaConfig.ProductNames = Compare-ProductList -ProductNames $ScubaConfig.ProductNames `
+                 -ProductsFailed $ProdProviderFailed `
+                 -ExceptionMessage 'All indicated Product Providers failed to execute'
+            }
+
+            # OPA Rego invocation
+            $RegoParams = @{
+                'ProductNames' = $ScubaConfig.ProductNames;
+                'OPAPath' = $ScubaConfig.OPAPath;
+                'ParentPath' = $ParentPath;
+                'OutFolderPath' = $OutFolderPath;
+                'OutProviderFileName' = $ScubaConfig.OutProviderFileName;
+                'OutRegoFileName' = $ScubaConfig.OutRegoFileName;
+            }
+            $ProdRegoFailed = Invoke-RunRego @RegoParams
+            if ($ProdRegoFailed.Count -gt 0) {
+                $ScubaConfig.ProductNames = Compare-ProductList -ProductNames $ScubaConfig.ProductNames `
+                -ProductsFailed  $ProdRegoFailed `
+                -ExceptionMessage 'All indicated Product Rego invocations failed'
+            }
+
+            # Report Creation
+            # Converted back from JSON String for PS Object use
+            $TenantDetails = $TenantDetails | ConvertFrom-Json
+            $ReportParams = @{
+                'ProductNames' = $ScubaConfig.ProductNames;
+                'TenantDetails' = $TenantDetails;
+                'ModuleVersion' = $ModuleVersion;
+                'OutFolderPath' = $OutFolderPath;
+                'OutProviderFileName' = $ScubaConfig.OutProviderFileName;
+                'OutRegoFileName' = $ScubaConfig.OutRegoFileName;
+                'OutReportName' = $ScubaConfig.OutReportName;
+                'DarkMode' = $DarkMode;
+            }
             Invoke-ReportCreation @ReportParams
-        } finally {
+        }
+        finally {
             if ($ScubaConfig.DisconnectOnExit) {
-                if($VerbosePreference -eq "Continue") {
+                if ($VerbosePreference -eq "Continue") {
                     Disconnect-SCuBATenant -ProductNames $ScubaConfig.ProductNames -ErrorAction SilentlyContinue -Verbose
                 }
                 else {
                     Disconnect-SCuBATenant -ProductNames $ScubaConfig.ProductNames -ErrorAction SilentlyContinue
                 }
             }
-
             [ScubaConfig]::ResetInstance()
         }
     }
@@ -400,6 +413,7 @@ function Invoke-ProviderList {
 "@
             $N = 0
             $Len = $ProductNames.Length
+            $ProdProviderFailed = @()
             $ConnectTenantParams = @{
                 'M365Environment' = $M365Environment
             }
@@ -459,8 +473,9 @@ function Invoke-ProviderList {
                     $ProviderJSON += $RetVal
                 }
                 catch {
-                    Write-Error "Error with the $($BaselineName) Provider. The report may display incorrect output. See the exception message for more details:  $($_)"
-                    # TODO Omit the a failed provider from the report in a future update
+                    Write-Error "Error with the $($BaselineName) Provider. See the exception message for more details:  $($_)"
+                    $ProdProviderFailed += $Product
+                    Write-Warning "$($Product) will be omitted from the output because of the failure above `n`n"
                 }
             }
 
@@ -488,6 +503,7 @@ function Invoke-ProviderList {
             $BaselineSettingsExport = $BaselineSettingsExport.replace("\", "")
             $FinalPath = Join-Path -Path $OutFolderPath -ChildPath "$($OutProviderFileName).json" -ErrorAction 'Stop'
             $BaselineSettingsExport | Set-Content -Path $FinalPath -Encoding $(Get-FileEncoding) -ErrorAction 'Stop'
+            $ProdProviderFailed
         }
         catch {
             $InvokeProviderListErrorMessage = "Fatal Error involving the Provider functions. `
@@ -534,6 +550,7 @@ function Invoke-RunRego {
     )
     process {
         try {
+            $ProdRegoFailed = @()
             $TestResults = @()
             $N = 0
             $Len = $ProductNames.Length
@@ -560,8 +577,15 @@ function Invoke-RunRego {
                     'PackageName' = $Product;
                     'OPAPath' = $OPAPath
                 }
-                $RetVal = Invoke-Rego @params
-                $TestResults += $RetVal
+                try {
+                    $RetVal = Invoke-Rego @params
+                    $TestResults += $RetVal
+                }
+                catch {
+                    Write-Error "Error with the $($BaselineName) Rego invocation. See the exception message for more details:  $($_)"
+                    $ProdRegoFailed += $Product
+                    Write-Warning "$($Product) will be omitted from the output because of the failure above"
+                }
             }
 
             $TestResultsJson = $TestResults | ConvertTo-Json -Depth 5 -ErrorAction 'Stop'
@@ -580,9 +604,10 @@ function Invoke-RunRego {
             $TestResultsCsv = $TestResults | ConvertTo-Csv -NoTypeInformation -ErrorAction 'Stop'
             $CSVFileName = Join-Path -Path $OutFolderPath "$($OutRegoFileName).csv" -ErrorAction 'Stop'
             $TestResultsCsv | Set-Content -Path $CSVFileName -Encoding $(Get-FileEncoding) -ErrorAction 'Stop'
+            $ProdRegoFailed
         }
         catch {
-            $InvokeRegoErrorMessage = "Fatal Error involving the OPA Output. `
+            $InvokeRegoErrorMessage = "Fatal Error involving the OPA output function. `
             Ending ScubaGear execution. See the exception message for more details: $($_)"
             throw $InvokeRegoErrorMessage
         }
@@ -895,6 +920,37 @@ function Invoke-Connection {
     }
 }
 
+function Compare-ProductList {
+    <#
+    .Description
+    Compares two ProductNames Lists and returns the Diff between them
+    Used to compare a failed execution list with the original list
+    .Functionality
+    Internal
+    #>
+    param(
+
+        [Parameter(Mandatory=$true)]
+        [string[]]
+        $ProductNames,
+
+        [Parameter(Mandatory=$true)]
+        [string[]]
+        $ProductsFailed,
+
+        [Parameter(Mandatory=$true)]
+        [string]
+        $ExceptionMessage
+    )
+
+    $Difference = Compare-Object $ProductNames -DifferenceObject $ProductsFailed -PassThru
+    if (-not $Difference) {
+        throw "$($ExceptionMessage); aborting ScubaGear execution"
+    }
+    else {
+        $Difference
+    }
+}
 
 function Get-ServicePrincipalParams {
     <#
