@@ -90,18 +90,20 @@ ReportDetailsBooleanLicenseWarning(Status) = Description if {
 ################
 # User/Group Exclusion support functions
 ################
-default UserExclusionsFullyExempt(Policy) := false
-UserExclusionsFullyExempt(Policy) := true if {
-    ExcludedUsers := { x | x := Policy.Conditions.Users.ExcludeUsers }
-    AllowedExcludedUsers := { y | y := input.scuba_config.Aad.Policy2_1.CapExclusions.Users }
+default UserExclusionsFullyExempt(Policy, PolicyID) := false
+UserExclusionsFullyExempt(Policy, PolicyID) := true if {
+    ExemptedUsers := input.scuba_config.Aad[PolicyID].CapExclusions.Users
+    ExcludedUsers := { x | x := Policy.Conditions.Users.ExcludeUsers[_] }
+    AllowedExcludedUsers := { y | y := input.scuba_config.Aad[PolicyID].CapExclusions.Users[_] }
     AllowedExcludedUsers
     count(ExcludedUsers - AllowedExcludedUsers) == 0
 }
 
-default GroupExclusionsFullyExempt(Policy) := false
-GroupExclusionsFullyExempt(Policy) := true if {
+default GroupExclusionsFullyExempt(Policy, PolicyID) := false
+GroupExclusionsFullyExempt(Policy, PolicyID) := true if {
+    ExemptedGroups := input.scuba_config.Aad[PolicyID].CapExclusions.Groups
     ExcludedGroups := { x | x := Policy.Conditions.Users.ExcludeGroups[_] }
-    AllowedExcludedGroups := { y | y := input.scuba_config.Aad.Policy2_1.CapExclusions.Groups[_] }
+    AllowedExcludedGroups := { y | y:= ExemptedGroups[_] }
     AllowedExcludedGroups
     count(ExcludedGroups - AllowedExcludedGroups) == 0
 }
@@ -144,7 +146,7 @@ Policies2_1[Cap.DisplayName] {
 
     # Only match policies with user exclusions if all exempted
     count(Cap.Conditions.Users.ExcludeGroups) == 0
-    UserExclusionsFullyExempt(Cap) == true
+    UserExclusionsFullyExempt(Cap, "Policy2_1") == true
 }
 
 Policies2_1[Cap.DisplayName] {
@@ -155,7 +157,7 @@ Policies2_1[Cap.DisplayName] {
 
     # Only match policies with group exclusions if all exempted
     count(Cap.Conditions.Users.ExcludeUsers) == 0
-    GroupExclusionsFullyExempt(Cap) == true
+    GroupExclusionsFullyExempt(Cap, "Policy2_1") == true
 }
 
 Policies2_1[Cap.DisplayName] {
@@ -165,8 +167,8 @@ Policies2_1[Cap.DisplayName] {
     Policy2_1ConditionsMatch(Cap)
 
     # Only match policies with user and group exclusions if all exempted
-    UserExclusionsFullyExempt(Cap) == true
-    GroupExclusionsFullyExempt(Cap) == true
+    UserExclusionsFullyExempt(Cap, "Policy2_1") == true
+    GroupExclusionsFullyExempt(Cap, "Policy2_1") == true
 }
 
 tests[{
@@ -201,7 +203,7 @@ Policy2_2_1ConditionsMatch(Policy) := true if {
     count(Policy.Conditions.Users.ExcludeRoles) == 0
 }
 
-Policies2_2[Cap.DisplayName] {
+Policies2_2_1[Cap.DisplayName] {
     Cap := input.conditional_access_policies[_]
 
     # Match all simple conditions
@@ -220,7 +222,7 @@ Policies2_2_1[Cap.DisplayName] {
 
     # Only match policies with user exclusions if all exempted
     count(Cap.Conditions.Users.ExcludeGroups) == 0
-    UserExclusionsFullyExempt(Cap) == true
+    UserExclusionsFullyExempt(Cap, "Policy2_2_1") == true
 }
 
 Policies2_2_1[Cap.DisplayName] {
@@ -231,7 +233,7 @@ Policies2_2_1[Cap.DisplayName] {
 
     # Only match policies with group exclusions if all exempted
     count(Cap.Conditions.Users.ExcludeUsers) == 0
-    GroupExclusionsFullyExempt(Cap) == true
+    GroupExclusionsFullyExempt(Cap, "Policy2_2_1") == true
 }
 
 Policies2_2_1[Cap.DisplayName] {
@@ -241,8 +243,8 @@ Policies2_2_1[Cap.DisplayName] {
     Policy2_2_1ConditionsMatch(Cap)
 
     # Only match policies with user and group exclusions if all exempted
-    UserExclusionsFullyExempt(Cap) == true
-    GroupExclusionsFullyExempt(Cap) == true
+    UserExclusionsFullyExempt(Cap, "Policy2_2_1") == true
+    GroupExclusionsFullyExempt(Cap, "Policy2_2_1") == true
 }
 
 tests[{
@@ -250,8 +252,8 @@ tests[{
     "Control" : "AAD 2.2",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-MgIdentityConditionalAccessPolicy"],
-    "ActualValue" : Policies2_2,
-    "ReportDetails" : ReportDetailsArrayLicenseWarningCap(Policies2_2, DescriptionString),
+    "ActualValue" : Policies2_2_1,
+    "ReportDetails" : ReportDetailsArrayLicenseWarningCap(Policies2_2_1, DescriptionString),
     "RequirementMet" : Status
 }] {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
@@ -314,7 +316,7 @@ Policies2_3[Cap.DisplayName] {
 
     # Only match policies with user exclusions if all exempted
     count(Cap.Conditions.Users.ExcludeGroups) == 0
-    UserExclusionsFullyExempt(Cap) == true
+    UserExclusionsFullyExempt(Cap, "Policy2_3") == true
 }
 
 Policies2_3[Cap.DisplayName] {
@@ -325,7 +327,7 @@ Policies2_3[Cap.DisplayName] {
 
     # Only match policies with group exclusions if all exempted
     count(Cap.Conditions.Users.ExcludeUsers) == 0
-    GroupExclusionsFullyExempt(Cap) == true
+    GroupExclusionsFullyExempt(Cap, "Policy2_3") == true
 }
 
 Policies2_3[Cap.DisplayName] {
@@ -335,8 +337,8 @@ Policies2_3[Cap.DisplayName] {
     Policy2_3ConditionsMatch(Cap)
 
     # Only match policies with user and group exclusions if all exempted
-    UserExclusionsFullyExempt(Cap) == true
-    GroupExclusionsFullyExempt(Cap) == true
+    UserExclusionsFullyExempt(Cap, "Policy2_3") == true
+    GroupExclusionsFullyExempt(Cap, "Policy2_3") == true
 }
 
 tests[{
@@ -389,7 +391,7 @@ Policies2_4_1[Cap.DisplayName] {
 
     # Only match policies with user exclusions if all exempted
     count(Cap.Conditions.Users.ExcludeGroups) == 0
-    UserExclusionsFullyExempt(Cap) == true
+    UserExclusionsFullyExempt(Cap, "Policy2_4_1") == true
 }
 
 Policies2_4_1[Cap.DisplayName] {
@@ -400,7 +402,18 @@ Policies2_4_1[Cap.DisplayName] {
 
     # Only match policies with group exclusions if all exempted
     count(Cap.Conditions.Users.ExcludeUsers) == 0
-    GroupExclusionsFullyExempt(Cap) == true
+    GroupExclusionsFullyExempt(Cap, "Policy2_4_1") == true
+}
+
+Policies2_4_1[Cap.DisplayName] {
+    Cap := input.conditional_access_policies[_]
+
+    # Match all simple conditions
+    Policy2_4_1ConditionsMatch(Cap)
+
+    # Only match policies with user and group exclusions if all exempted
+    UserExclusionsFullyExempt(Cap, "Policy2_4_1") == true
+    GroupExclusionsFullyExempt(Cap, "Policy2_4_1") == true
 }
 
 tests[{
@@ -715,18 +728,18 @@ Policies2_9[Cap.DisplayName] {
 
     # Only match policies with user exclusions if all exempted
     count(Cap.Conditions.Users.ExcludeGroups) == 0
-    UserExclusionsFullyExempt(Cap) == true
+    UserExclusionsFullyExempt(Cap, "Policy2_9") == true
 }
 
-Policies2_3[Cap.DisplayName] {
+Policies2_9[Cap.DisplayName] {
     Cap := input.conditional_access_policies[_]
 
     # Match all simple conditions
-    Policy2_3ConditionsMatch(Cap)
+    Policy2_9ConditionsMatch(Cap)
 
     # Only match policies with group exclusions if all exempted
     count(Cap.Conditions.Users.ExcludeUsers) == 0
-    GroupExclusionsFullyExempt(Cap) == true
+    GroupExclusionsFullyExempt(Cap, "Policy2_9") == true
 }
 
 Policies2_9[Cap.DisplayName] {
@@ -736,8 +749,8 @@ Policies2_9[Cap.DisplayName] {
     Policy2_9ConditionsMatch(Cap)
 
     # Only match policies with user and group exclusions if all exempted
-    UserExclusionsFullyExempt(Cap) == true
-    GroupExclusionsFullyExempt(Cap) == true
+    UserExclusionsFullyExempt(Cap, "Policy2_9") == true
+    GroupExclusionsFullyExempt(Cap, "Policy2_9") == true
 }
 
 tests[{
@@ -791,18 +804,18 @@ Policies2_10[Cap.DisplayName] {
 
     # Only match policies with user exclusions if all exempted
     count(Cap.Conditions.Users.ExcludeGroups) == 0
-    UserExclusionsFullyExempt(Cap) == true
+    UserExclusionsFullyExempt(Cap, "Policy2_10") == true
 }
 
-Policies2_3[Cap.DisplayName] {
+Policies2_10[Cap.DisplayName] {
     Cap := input.conditional_access_policies[_]
 
     # Match all simple conditions
-    Policy2_3ConditionsMatch(Cap)
+    Policy2_10ConditionsMatch(Cap)
 
     # Only match policies with group exclusions if all exempted
     count(Cap.Conditions.Users.ExcludeUsers) == 0
-    GroupExclusionsFullyExempt(Cap) == true
+    GroupExclusionsFullyExempt(Cap, "Policy2_10") == true
 }
 
 Policies2_10[Cap.DisplayName] {
@@ -812,8 +825,8 @@ Policies2_10[Cap.DisplayName] {
     Policy2_10ConditionsMatch(Cap)
 
     # Only match policies with user and group exclusions if all exempted
-    UserExclusionsFullyExempt(Cap) == true
-    GroupExclusionsFullyExempt(Cap) == true
+    UserExclusionsFullyExempt(Cap, "Policy2_10") == true
+    GroupExclusionsFullyExempt(Cap, "Policy2_10") == true
 }
 
 tests[{
