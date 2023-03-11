@@ -28,7 +28,7 @@ To download ScubaGear:
 
 To import the module, open a new PowerShell 5.1 terminal and navigate to the repository folder. 
 
-Depending on the [PowerShell execution policy](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_execution_policies?view=powershell-5.1), running `Unblock-File` on the ScubaGear folder may be required. See [here](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/unblock-file?view=powershell-5.1) for more information.
+Starting with release 0.3.0, ScubaGear is signed by a commonly trusted CA. See [below]() for information about running ScubaGear with different [PowerShell execution policies](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_execution_policies?view=powershell-5.1).  In 0.2.1 and earlier, running `Unblock-File` on the ScubaGear folder may be required. See [here](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/unblock-file?view=powershell-5.1) for more information.  
 
 Then run:
 
@@ -281,4 +281,10 @@ ScubaGear requires a number of PowerShell modules to function.  A user or develo
 
 >PowerShellGet 2.x has a known issue uninstalling modules installed on a OneDrive path that may result in an "Access to the cloud file is denied" error.  Installing PSGet 3.0, currently in beta, will allow the script to successfully uninstall such modules or you can remove the modules files from OneDrive manually.
 
+### PowerShell Execution Policies
 
+On Windows Servers, the default [execution policy](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.security/set-executionpolicy?view=powershell-7.3) is `RemoteSigned`, which will allow ScubaGear to run after the publisher (CISA) is agreed to once.
+
+On Windows Clients, the default execution policy is `Restricted`.  In this case, Unblock-File may be necessary to run the SetUp.ps1 script.
+
+When the execution policy is set to Unrestricted (which is the default in Powershell 6.0+ on non-Windows machines), the user must unblock the tool on each use.
