@@ -227,7 +227,7 @@ function Invoke-RobustDnsTxt {
             $TryNumber += 1
             try {
                 $Uri = "https://1.1.1.1/dns-query?name=$($Qname)&type=txt"
-                $RawResponse = $(Invoke-WebRequest -H @{"accept"="application/dns-json"} -Uri $Uri).RawContent
+                $RawResponse = $(Invoke-WebRequest -H @{"accept"="application/dns-json"} -Uri $Uri -ErrorAction Stop).RawContent
                 $ResponseLines = $RawResponse -Split "`n"
                 $LastLine = $ResponseLines[$ResponseLines.Length - 1]
                 $ResponseBody = ConvertFrom-Json $LastLine
