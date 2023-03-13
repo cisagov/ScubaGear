@@ -7,15 +7,23 @@ function Export-OneDriveProvider {
     Internal
     #>
     [CmdletBinding()]
+<<<<<<< HEAD
+
+=======
     param (
         [Parameter(Mandatory = $false)]
         [switch]
         $PnPFlag
     )
+>>>>>>> 29db18183de483316c212627bf251a66f889cdc2
     $HelperFolderPath = Join-Path -Path $PSScriptRoot -ChildPath "ProviderHelpers"
     Import-Module (Join-Path -Path $HelperFolderPath -ChildPath "CommandTracker.psm1")
     $Tracker = Get-CommandTracker
 
+<<<<<<< HEAD
+    $SPOTenantInfo = ConvertTo-Json @($Tracker.TryCommand("Get-SPOTenant"))
+    $TenantSyncInfo = ConvertTo-Json @($Tracker.TryCommand("Get-SPOTenantSyncClientRestriction"))
+=======
     $SPOTenantInfo = ConvertTo-Json @()
     $TenantSyncInfo = ConvertTo-Json @()
     $UsedPnP = ConvertTo-Json $false
@@ -32,6 +40,7 @@ function Export-OneDriveProvider {
         $Tracker.AddSuccessfulCommand("Get-PnPTenant")
         $Tracker.AddSuccessfulCommand("Get-PnPTenantSyncClientRestriction")
     }
+>>>>>>> 29db18183de483316c212627bf251a66f889cdc2
 
     $SuccessfulCommands = ConvertTo-Json @($Tracker.GetSuccessfulCommands())
     $UnSuccessfulCommands = ConvertTo-Json @($Tracker.GetUnSuccessfulCommands())

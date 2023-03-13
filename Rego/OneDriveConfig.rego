@@ -75,7 +75,11 @@ tests[{
     "Requirement" : "An expiration date SHOULD be set for Anyone links",
     "Control" : "OneDrive 2.2",
     "Criticality" : "Should",
+<<<<<<< HEAD
+    "Commandlet" : ["Get-SPOTenant"],
+=======
     "Commandlet" : ["Get-SPOTenant", "Get-PnPTenant"],
+>>>>>>> 29db18183de483316c212627bf251a66f889cdc2
     "ActualValue" : [Policy.OneDriveSharingCapability, Policy.RequireAnonymousLinksExpireInDays],
     "ReportDetails" : ReportDetails2_2(Policy),
     "RequirementMet" : Status
@@ -135,7 +139,11 @@ tests[{
     "Requirement" : "Anyone link permissions SHOULD be limited to View",
     "Control" : "OneDrive 2.3",
     "Criticality" : "Should",
+<<<<<<< HEAD
+    "Commandlet" : ["Get-SPOTenant"],
+=======
     "Commandlet" : ["Get-SPOTenant", "Get-PnPTenant"],
+>>>>>>> 29db18183de483316c212627bf251a66f889cdc2
     "ActualValue" : [Policy.OneDriveSharingCapability, Policy.FileAnonymousLinkType, Policy.FolderAnonymousLinkType],
     "ReportDetails" : ReportDetails2_3(Policy),
     "RequirementMet" : Status
