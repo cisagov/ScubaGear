@@ -22,13 +22,27 @@ tests[{
     "Requirement" : "Anyone links SHOULD be disabled",
     "Control" : "OneDrive 2.1",
     "Criticality" : "Should",
-    "Commandlet" : ["Get-SPOTenant"],
+    "Commandlet" : ["Get-SPOTenant", "Get-PnPTenant"],
     "ActualValue" : Policies,
     "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
+    input.OneDrive_PnP_Flag == false
     Policies := AnyoneLinksPolicy
     Status := count(Policies) == 1
+}
+#--
+
+tests[{
+    "Requirement" : "Anyone links SHOULD be disabled",
+    "Control" : "OneDrive 2.1",
+    "Criticality" : "Should/Not-Implemented",
+    "Commandlet" : [],
+    "ActualValue" : [],
+    "ReportDetails" : "Currently cannot be checked automatically while using Service Principals. See Onedrive Secure Configuration Baseline policy 2.1 for instructions on manual check",
+    "RequirementMet" : false
+}] {
+    input.OneDrive_PnP_Flag
 }
 #--
 
@@ -61,7 +75,11 @@ tests[{
     "Requirement" : "An expiration date SHOULD be set for Anyone links",
     "Control" : "OneDrive 2.2",
     "Criticality" : "Should",
+<<<<<<< HEAD
     "Commandlet" : ["Get-SPOTenant"],
+=======
+    "Commandlet" : ["Get-SPOTenant", "Get-PnPTenant"],
+>>>>>>> 29db18183de483316c212627bf251a66f889cdc2
     "ActualValue" : [Policy.OneDriveSharingCapability, Policy.RequireAnonymousLinksExpireInDays],
     "ReportDetails" : ReportDetails2_2(Policy),
     "RequirementMet" : Status
@@ -121,7 +139,11 @@ tests[{
     "Requirement" : "Anyone link permissions SHOULD be limited to View",
     "Control" : "OneDrive 2.3",
     "Criticality" : "Should",
+<<<<<<< HEAD
     "Commandlet" : ["Get-SPOTenant"],
+=======
+    "Commandlet" : ["Get-SPOTenant", "Get-PnPTenant"],
+>>>>>>> 29db18183de483316c212627bf251a66f889cdc2
     "ActualValue" : [Policy.OneDriveSharingCapability, Policy.FileAnonymousLinkType, Policy.FolderAnonymousLinkType],
     "ReportDetails" : ReportDetails2_3(Policy),
     "RequirementMet" : Status
@@ -153,7 +175,7 @@ tests[{
     "Requirement" : "OneDrive Client for Windows SHALL be restricted to agency-Defined Domain(s)",
     "Control" : "OneDrive 2.4",
     "Criticality" : "Shall",
-    "Commandlet" : ["Get-SPOTenant"],
+    "Commandlet" : ["Get-SPOTenant", "Get-PnPTenant"],
     "ActualValue" : Policies,
     "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
@@ -180,7 +202,7 @@ tests[{
     "Requirement" : "OneDrive Client Sync SHALL only be allowed only within the local domain",
     "Control" : "OneDrive 2.5",
     "Criticality" : "Shall",
-    "Commandlet" : ["Get-SPOTenantSyncClientRestriction"],
+    "Commandlet" : ["Get-SPOTenantSyncClientRestriction", "Get-PnPTenantSyncClientRestriction"],
     "ActualValue" : Policies,
     "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status

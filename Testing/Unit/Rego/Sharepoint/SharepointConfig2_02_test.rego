@@ -5,7 +5,7 @@ import future.keywords
 #
 # Policy 1
 #--
-test_SharingCapability_Correct if {
+test_SharingCapability_Correct_V1 if {
     ControlNumber := "Sharepoint 2.2"
     Requirement := "External sharing SHOULD be limited to approved domains and security groups per interagency collaboration needs"
 
@@ -13,6 +13,25 @@ test_SharingCapability_Correct if {
         "SPO_tenant": [
             {
                 "SharingCapability" : 1
+            }
+        ]
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "Requirement met"
+}
+
+test_SharingCapability_Correct_V2 if {
+    ControlNumber := "Sharepoint 2.2"
+    Requirement := "External sharing SHOULD be limited to approved domains and security groups per interagency collaboration needs"
+
+    Output := tests with input as {
+        "SPO_tenant": [
+            {
+                "SharingCapability" : 0
             }
         ]
     }
@@ -33,7 +52,7 @@ test_SharingCapability_Incorrect if {
             {
                 "SharingCapability" : 2
             }
-        ]        
+        ]
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]

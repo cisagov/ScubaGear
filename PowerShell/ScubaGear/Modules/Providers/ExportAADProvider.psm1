@@ -19,7 +19,28 @@ function Export-AADProvider {
     # - 2.9
     # - 2.10
     # - 2.17 first part
-    $AllPolicies = ConvertTo-Json -Depth 10 @($Tracker.TryCommand("Get-MgIdentityConditionalAccessPolicy"))
+    $AllPolicies = $Tracker.TryCommand("Get-MgIdentityConditionalAccessPolicy")
+
+    Import-Module $PSScriptRoot/ProviderHelpers/AADConditionalAccessHelper.psm1
+    $CapHelper = Get-CapTracker
+    $CapTableData = $CapHelper.ExportCapPolicies($AllPolicies) # pre-processed version of the CAPs used in generating
+    # the CAP html in the report
+
+    if ($CapTableData -eq "") {
+        # Quick sanity check, did ExportCapPolicies return something?
+        Write-Warning "Error parsing CAP data, empty json returned from ExportCapPolicies."
+        $CapTableData = "[]"
+    }
+    try {
+        # Final sanity check, did ExportCapPolicies return valid json?
+        ConvertFrom-Json $CapTableData -ErrorAction "Stop" | Out-Null
+    }
+    catch {
+        Write-Warning "Error parsing CAP data, invalid json returned from ExportCapPolicies."
+        $CapTableData = "[]"
+    }
+
+    $AllPolicies = ConvertTo-Json -Depth 10 @($AllPolicies)
 
     # Get a list of the tenant's provisioned service plans - used to see if the tenant has AAD premium p2 license required for some checks
     # The Rego looks at the service_plans in the JSON
@@ -29,9 +50,9 @@ function Export-AADProvider {
         # The RequiredServicePlan variable is used so that PIM Cmdlets are only executed if the tenant has the premium license
         $RequiredServicePlan = $ServicePlans | Where-Object -Property ServicePlanName -eq -Value "AAD_PREMIUM_P2"
 
-        # A list of privileged users and their role assignments is used for 2.11 and 2.12
-        # If the tenant has the premium license then we want to process PIM Eligible role assignments - otherwise we don't to avoid an error
+        # Get-PrivilegedUser provides a list of privileged users and their role assignments. Used for 2.11 and 2.12
         if ($RequiredServicePlan) {
+            # If the tenant has the premium license then we want to also include PIM Eligible role assignments - otherwise we don't to avoid an API error
             $PrivilegedUsers = $Tracker.TryCommand("Get-PrivilegedUser", @{"TenantHasPremiumLicense"=$true})
         }
         else{
@@ -50,9 +71,10 @@ function Export-AADProvider {
         # above corrects the $null ConvertTo-Json would return in that case to an empty
         # dictionary
 
-        # 2.13 support for role ID and display name mapping
-        # 2.14 - 2.16 Azure AD PIM role settings
+        # Get-PrivilegedRole provides a list of privileged roles referenced in 2.13 when checking if MFA is required for those roles
+        # Get-PrivilegedRole provides data for 2.14 - 2.16, policies that evaluate conditions related to Azure AD PIM
         if ($RequiredServicePlan){
+            # If the tenant has the premium license then we want to also include PIM Eligible role assignments - otherwise we don't to avoid an API error
             $PrivilegedRoles = $Tracker.TryCommand("Get-PrivilegedRole", @{"TenantHasPremiumLicense"=$true})
         }
         else {
@@ -84,6 +106,7 @@ function Export-AADProvider {
     # Note the spacing and the last comma in the json is important
     $json = @"
     "conditional_access_policies": $AllPolicies,
+    "cap_table_data": $CapTableData,
     "authorization_policies": $AuthZPolicies,
     "admin_consent_policies": $AdminConsentReqPolicies,
     "privileged_users": $PrivilegedUsers,
@@ -109,27 +132,32 @@ function Get-AADTenantDetail {
     .Functionality
     Internal
     #>
-    $TenantInfo = @{}
     try {
         $OrgInfo = Get-MgOrganization -ErrorAction "Stop"
         $InitialDomain = $OrgInfo.VerifiedDomains | Where-Object {$_.isInitial}
         if (-not $InitialDomain) {
             $InitialDomain = "AAD: Domain Unretrievable"
         }
-        $TenantInfo.DisplayName = $OrgInfo.DisplayName
-        $TenantInfo.DomainName = $InitialDomain.name
-        $TenantInfo.TenantId = $OrgInfo.Id
-        $TenantInfo.AADAdditionalData = $OrgInfo
+        $AADTenantInfo = @{
+            "DisplayName" = $OrgInfo.DisplayName;
+            "DomainName" = $InitialDomain.Name;
+            "TenantId" = $OrgInfo.Id;
+            "AADAdditionalData" = $OrgInfo;
+        }
+        $AADTenantInfo = ConvertTo-Json @($AADTenantInfo) -Depth 4
+        $AADTenantInfo
     }
     catch {
-        $TenantInfo.DisplayName = "*Get-AADTenantDetail ERROR*"
-        $TenantInfo.DisplayName = "*Get-AADTenantDetail ERROR*"
-        $TenantInfo.DomainName = "*Get-AADTenantDetail ERROR*"
-        $TenantInfo.TenantId = "*Get-AADTenantDetail ERROR*"
-        $TenantInfo.AADAdditionalData = "*Get-AADTenantDetail ERROR*"
+        Write-Warning "Error retrieving Tenant details using Get-AADTenantDetail $($_)"
+        $AADTenantInfo = @{
+            "DisplayName" = "Error retrieving Display name";
+            "DomainName" = "Error retrieving Domain name";
+            "TenantId" = "Error retrieving Tenant ID";
+            "AADAdditionalData" = "Error retrieving additional data";
+        }
+        $AADTenantInfo = ConvertTo-Json @($AADTenantInfo) -Depth 4
+        $AADTenantInfo
     }
-    $TenantInfo = $TenantInfo | ConvertTo-Json -Depth 4
-    $TenantInfo
 }
 
 function Get-PrivilegedUser {
@@ -146,37 +174,40 @@ function Get-PrivilegedUser {
 
     $PrivilegedUsers = @{}
     $PrivilegedRoles = @("Global Administrator", "Privileged Role Administrator", "User Administrator", "SharePoint Administrator", "Exchange Administrator", "Hybrid identity administrator", "Application Administrator", "Cloud Application Administrator")
-    $AADRoles = Get-MgDirectoryRole -ErrorAction Stop | Where-Object { $_.DisplayName -in $PrivilegedRoles }
+    # Get a list of the Id values for the privileged roles in the list above.
+    # The Id value is passed to other cmdlets to construct a list of users assigned to privileged roles.
+    $AADRoles = Get-MgDirectoryRole -All -ErrorAction Stop | Where-Object { $_.DisplayName -in $PrivilegedRoles }
 
-    # Process the Active role assignments
+    # Construct a list of privileged users based on the Active role assignments
     foreach ($Role in $AADRoles) {
 
-        $UsersAssignedRole = Get-MgDirectoryRoleMember -ErrorAction Stop -DirectoryRoleId $Role.Id
+        # Get a list of all the users and groups Actively assigned to this role
+        $UsersAssignedRole = Get-MgDirectoryRoleMember -All -ErrorAction Stop -DirectoryRoleId $Role.Id
 
         foreach ($User in $UsersAssignedRole) {
 
             $Objecttype = $User.AdditionalProperties."@odata.type" -replace "#microsoft.graph."
 
             if ($Objecttype -eq "user") {
-                $AADUser = Get-MgUser -ErrorAction Stop -UserId $User.Id
-
-                if (-Not $PrivilegedUsers.ContainsKey($AADUser.Id)) {
+                if (-Not $PrivilegedUsers.ContainsKey($User.Id)) {
+                    $AADUser = Get-MgUser -ErrorAction Stop -UserId $User.Id
                     $PrivilegedUsers[$AADUser.Id] = @{"DisplayName"=$AADUser.DisplayName; "OnPremisesImmutableId"=$AADUser.OnPremisesImmutableId; "roles"=@()}
                 }
-                $PrivilegedUsers[$AADUser.Id].roles += $Role.DisplayName
+                $PrivilegedUsers[$User.Id].roles += $Role.DisplayName
             }
 
             elseif ($Objecttype -eq "group") {
-                $GroupMembers = Get-MgGroupMember -ErrorAction Stop -GroupId $User.Id
+                # In this context $User.Id is a group identifier
+                $GroupMembers = Get-MgGroupMember -All -ErrorAction Stop -GroupId $User.Id
+
                 foreach ($GroupMember in $GroupMembers) {
                     $Membertype = $GroupMember.AdditionalProperties."@odata.type" -replace "#microsoft.graph."
                     if ($Membertype -eq "user") {
-                        $AADUser = Get-MgUser -ErrorAction Stop -UserId $GroupMember.Id
-
-                        if (-Not $PrivilegedUsers.ContainsKey($AADUser.Id)) {
+                        if (-Not $PrivilegedUsers.ContainsKey($GroupMember.Id)) {
+                            $AADUser = Get-MgUser -ErrorAction Stop -UserId $GroupMember.Id
                             $PrivilegedUsers[$AADUser.Id] = @{"DisplayName"=$AADUser.DisplayName; "OnPremisesImmutableId"=$AADUser.OnPremisesImmutableId; "roles"=@()}
                         }
-                        $PrivilegedUsers[$AADUser.Id].roles += $Role.DisplayName
+                        $PrivilegedUsers[$GroupMember.Id].roles += $Role.DisplayName
                     }
                 }
             }
@@ -185,43 +216,48 @@ function Get-PrivilegedUser {
 
     # Process the Eligible role assignments if the premium license for PIM is there
     if ($TenantHasPremiumLicense) {
+        # Get a list of all the users and groups that have Eligible assignments
+        $AllPIMRoleAssignments = Get-MgRoleManagementDirectoryRoleEligibilityScheduleInstance -All -ErrorAction Stop
 
+        # Add to the list of privileged users based on Eligible assignments
         foreach ($Role in $AADRoles) {
             $PrivRoleId = $Role.RoleTemplateId
-            $PIMRoleAssignments = Get-MgRoleManagementDirectoryRoleEligibilityScheduleInstance -ErrorAction Stop -Filter "roleDefinitionId eq '$PrivRoleId'"
+            # Get a list of all the users and groups Eligible assigned to this role
+            $PIMRoleAssignments = $AllPIMRoleAssignments | Where-Object { $_.RoleDefinitionId -eq $PrivRoleId }
 
             foreach ($PIMRoleAssignment in $PIMRoleAssignments) {
                 $UserObjectId = $PIMRoleAssignment.PrincipalId
                 try {
-                    $AADUser = Get-MgUser -ErrorAction Stop -Filter "Id eq '$UserObjectId'"
                     $UserType = "user"
 
-                    if (-Not $PrivilegedUsers.ContainsKey($AADUser.Id)) {
+                    if (-Not $PrivilegedUsers.ContainsKey($UserObjectId)) {
+                        $AADUser = Get-MgUser -ErrorAction Stop -Filter "Id eq '$UserObjectId'"
                         $PrivilegedUsers[$AADUser.Id] = @{"DisplayName"=$AADUser.DisplayName; "OnPremisesImmutableId"=$AADUser.OnPremisesImmutableId; "roles"=@()}
                     }
-                    $PrivilegedUsers[$AADUser.Id].roles += $Role.DisplayName
+                    $PrivilegedUsers[$UserObjectId].roles += $Role.DisplayName
                 }
+                # Catch the specific error which indicates Get-MgUser does not find the user, therefore it is a group
                 catch {
-                    $UserType = "unknown"
+                    if ($_.FullyQualifiedErrorId.Contains("Request_ResourceNotFound")) {
+                        $UserType = "group"
+                    }
+                    else {
+                        throw $_
+                    }
                 }
 
-                if ($UserType -eq "unknown") {
-                    try {
-                        $GroupMembers = Get-MgGroupMember -ErrorAction Stop -GroupId $UserObjectId
-                        $UserType = "group"
-                        foreach ($GroupMember in $GroupMembers) {
-                            $Membertype = $GroupMember.AdditionalProperties."@odata.type" -replace "#microsoft.graph."
-                            if ($Membertype -eq "user") {
+                # This if statement handles when the object eligible assigned is a Group
+                if ($UserType -eq "group") {
+                    $GroupMembers = Get-MgGroupMember -All -ErrorAction Stop -GroupId $UserObjectId
+                    foreach ($GroupMember in $GroupMembers) {
+                        $Membertype = $GroupMember.AdditionalProperties."@odata.type" -replace "#microsoft.graph."
+                        if ($Membertype -eq "user") {
+                            if (-Not $PrivilegedUsers.ContainsKey($GroupMember.Id)) {
                                 $AADUser = Get-MgUser -ErrorAction Stop -UserId $GroupMember.Id
-                                if (-Not $PrivilegedUsers.ContainsKey($AADUser.Id)) {
-                                    $PrivilegedUsers[$AADUser.Id] = @{"DisplayName"=$AADUser.DisplayName; "OnPremisesImmutableId"=$AADUser.OnPremisesImmutableId; "roles"=@()}
-                                }
-                                $PrivilegedUsers[$AADUser.Id].roles += $Role.DisplayName
+                                $PrivilegedUsers[$AADUser.Id] = @{"DisplayName"=$AADUser.DisplayName; "OnPremisesImmutableId"=$AADUser.OnPremisesImmutableId; "roles"=@()}
                             }
+                            $PrivilegedUsers[$GroupMember.Id].roles += $Role.DisplayName
                         }
-                    }
-                    catch {
-                        $UserType = "unknown"
                     }
                 }
             }
@@ -234,7 +270,7 @@ function Get-PrivilegedUser {
 function Get-PrivilegedRole {
     <#
     .Description
-    Gets the array of the highly privileged roles along with the users assigned to the role and the security policies applied to it
+    Creates an array of the highly privileged roles along with the users assigned to the role and the security policies (aka rules) applied to it
     .Functionality
     Internal
     #>
@@ -244,26 +280,28 @@ function Get-PrivilegedRole {
     )
 
     $PrivilegedRoles = @("Global Administrator", "Privileged Role Administrator", "User Administrator", "SharePoint Administrator", "Exchange Administrator", "Hybrid identity administrator", "Application Administrator", "Cloud Application Administrator")
-    $AADRoles = Get-MgDirectoryRoleTemplate -ErrorAction Stop | Where-Object { $_.DisplayName -in $PrivilegedRoles } | Select-Object "DisplayName", @{Name='RoleTemplateId'; Expression={$_.Id}}
+    # Get a list of the RoleTemplateId values for the privileged roles in the list above.
+    # The RoleTemplateId value is passed to other cmdlets to retrieve role security policies and user assignments.
+    $AADRoles = Get-MgDirectoryRoleTemplate -All -ErrorAction Stop | Where-Object { $_.DisplayName -in $PrivilegedRoles } | Select-Object "DisplayName", @{Name='RoleTemplateId'; Expression={$_.Id}}
 
-    # If the tenant has the premium license then you can access the PIM service to get the role configuration policies and the eligible / active role assigments
+    # If the tenant has the premium license then you can access the PIM service to get the role configuration policies and the active role assigments
     if ($TenantHasPremiumLicense) {
-        $RolePolicyAssignments = Get-MgPolicyRoleManagementPolicyAssignment -ErrorAction Stop -Filter "scopeId eq '/' and scopeType eq 'Directory'"
+        # Get all the roles and policies (rules) assigned to them
+        $RolePolicyAssignments = Get-MgPolicyRoleManagementPolicyAssignment -All -ErrorAction Stop -Filter "scopeId eq '/' and scopeType eq 'Directory'"
 
-        # Create an array of the highly privileged roles along with the users assigned to the role and the security policies applied to it
+        # Get ALL the roles and users actively assigned to them
+        $AllRoleAssignments = Get-MgRoleManagementDirectoryRoleAssignmentScheduleInstance -All -ErrorAction Stop
 
         foreach ($Role in $AADRoles) {
             $RolePolicies = @()
             $RoleTemplateId = $Role.RoleTemplateId
 
-            # Get role policy assignments
-            # Note: Each role can only be assigned a single policy at most
+            # Get a list of the rules (aka policies) assigned to this role
             $PolicyAssignment = $RolePolicyAssignments | Where-Object -Property RoleDefinitionId -eq -Value $RoleTemplateId
-            $RoleAssignments = @(Get-MgRoleManagementDirectoryRoleAssignmentScheduleInstance -ErrorAction Stop -Filter "roleDefinitionId eq '$RoleTemplateId'")
 
-            # Append each policy assignment to the role object
+            # Get the details of policy (rule)
             if ($PolicyAssignment.length -eq 1) {
-                $RolePolicies = Get-MgPolicyRoleManagementPolicyRule -ErrorAction Stop -UnifiedRoleManagementPolicyId $PolicyAssignment.PolicyId
+                $RolePolicies = Get-MgPolicyRoleManagementPolicyRule -All -ErrorAction Stop -UnifiedRoleManagementPolicyId $PolicyAssignment.PolicyId
             }
             elseif ($PolicyAssignment.length -gt 1) {
                 $RolePolicies = "Too many policies found"
@@ -272,6 +310,10 @@ function Get-PrivilegedRole {
                 $RolePolicies = "No policies found"
             }
 
+            # Get a list of the users / groups assigned to this role
+            $RoleAssignments = @($AllRoleAssignments | Where-Object { $_.RoleDefinitionId -eq $RoleTemplateId })
+
+            # Store the data that we retrieved in the Role object that will be returned from this function
             $Role | Add-Member -Name "Rules" -Value $RolePolicies -MemberType NoteProperty
             $Role | Add-Member -Name "Assignments" -Value $RoleAssignments -MemberType NoteProperty
         }

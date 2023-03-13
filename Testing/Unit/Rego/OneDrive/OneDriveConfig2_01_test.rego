@@ -14,7 +14,8 @@ test_OneDriveLoopSharingCapability_Correct if {
             {
                 "OneDriveSharingCapability" : 1
             }
-        ]        
+        ],
+        "OneDrive_PnP_Flag": false   
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
@@ -33,7 +34,8 @@ test_OneDriveLoopSharingCapability_Incorrect if {
             {
                 "OneDriveSharingCapability" : 2
             }
-        ]        
+        ],
+        "OneDrive_PnP_Flag": false 
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
