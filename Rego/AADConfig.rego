@@ -55,7 +55,7 @@ ReportDetailsArrayLicenseWarningCap(Array, String) = Description if {
   Description :=  concat(". ", [ReportFullDetailsArray(Array, String), CapLink])
 }
 
-ReportDetailsArrayLicenseWarningCap(Array, String) = Description if {
+ReportDetailsArrayLicenseWarningCap(_, _) = Description if {
   count(Aad2P2Licenses) == 0
   Description := P2WarningString
 }
@@ -65,7 +65,7 @@ ReportDetailsArrayLicenseWarning(Array, String) = Description if {
   Description :=  ReportFullDetailsArray(Array, String)
 }
 
-ReportDetailsArrayLicenseWarning(Array, String) = Description if {
+ReportDetailsArrayLicenseWarning(_, _) = Description if {
   count(Aad2P2Licenses) == 0
   Description := P2WarningString
 }
@@ -82,7 +82,7 @@ ReportDetailsBooleanLicenseWarning(Status) = Description if {
     Description := "Requirement not met"
 }
 
-ReportDetailsBooleanLicenseWarning(Status) = Description if {
+ReportDetailsBooleanLicenseWarning(_) = Description if {
     count(Aad2P2Licenses) == 0
     Description := P2WarningString
 }
@@ -90,16 +90,16 @@ ReportDetailsBooleanLicenseWarning(Status) = Description if {
 ################
 # User/Group Exclusion support functions
 ################
-default UserExclusionsFullyExempt(Policy, PolicyID) := false
+default UserExclusionsFullyExempt(_, _) := false
 UserExclusionsFullyExempt(Policy, PolicyID) := true if {
     ExemptedUsers := input.scuba_config.Aad[PolicyID].CapExclusions.Users
     ExcludedUsers := { x | x := Policy.Conditions.Users.ExcludeUsers[_] }
-    AllowedExcludedUsers := { y | y := input.scuba_config.Aad[PolicyID].CapExclusions.Users[_] }
+    AllowedExcludedUsers := { y | y := ExemptedUsers[_] }
     AllowedExcludedUsers
     count(ExcludedUsers - AllowedExcludedUsers) == 0
 }
 
-default GroupExclusionsFullyExempt(Policy, PolicyID) := false
+default GroupExclusionsFullyExempt(_, _) := false
 GroupExclusionsFullyExempt(Policy, PolicyID) := true if {
     ExemptedGroups := input.scuba_config.Aad[PolicyID].CapExclusions.Groups
     ExcludedGroups := { x | x := Policy.Conditions.Users.ExcludeGroups[_] }
@@ -116,7 +116,7 @@ GroupExclusionsFullyExempt(Policy, PolicyID) := true if {
 # Baseline 2.1: Policy 1
 #--
 
-default Policy2_1ConditionsMatch(Policy) := false
+default Policy2_1ConditionsMatch(_) := false
 Policy2_1ConditionsMatch(Policy) := true if {
     "All" in Policy.Conditions.Users.IncludeUsers
     "All" in Policy.Conditions.Applications.IncludeApplications
@@ -193,7 +193,7 @@ tests[{
 # Baseline 2.2: Policy 1
 #--
 
-default Policy2_2_1ConditionsMatch(Policy) := false
+default Policy2_2_1ConditionsMatch(_) := false
 Policy2_2_1ConditionsMatch(Policy) := true if {
     "All" in Policy.Conditions.Users.IncludeUsers   
     "All" in Policy.Conditions.Applications.IncludeApplications
@@ -287,7 +287,7 @@ tests[{
 # Baseline 2.3: Policy 1
 #--
 
-default Policy2_3ConditionsMatch(Policy) := false
+default Policy2_3ConditionsMatch(_) := false
 Policy2_3ConditionsMatch(Policy) := true if {
     "All" in Policy.Conditions.Users.IncludeUsers   
     "All" in Policy.Conditions.Applications.IncludeApplications
@@ -363,7 +363,7 @@ tests[{
 #
 # Baseline 2.4: Policy 1
 #--
-default Policy2_4_1ConditionsMatch(Policy) := false
+default Policy2_4_1ConditionsMatch(_) := false
 Policy2_4_1ConditionsMatch(Policy) := true if {
     "All" in Policy.Conditions.Users.IncludeUsers
     "All" in Policy.Conditions.Applications.IncludeApplications
@@ -698,7 +698,7 @@ tests[{
 #
 # Baseline 2.9: Policy 1
 #--
-default Policy2_9ConditionsMatch(Policy) := false
+default Policy2_9ConditionsMatch(_) := false
 Policy2_9ConditionsMatch(Policy) := true if {
     "All" in Policy.Conditions.Users.IncludeUsers
     "All" in Policy.Conditions.Applications.IncludeApplications
@@ -775,7 +775,7 @@ tests[{
 #
 # Baseline 2.10: Policy 1
 #--
-default Policy2_10ConditionsMatch(Policy) := false
+default Policy2_10ConditionsMatch(_) := false
 Policy2_10ConditionsMatch(Policy) := true if {
     "All" in Policy.Conditions.Users.IncludeUsers
     "All" in Policy.Conditions.Applications.IncludeApplications
