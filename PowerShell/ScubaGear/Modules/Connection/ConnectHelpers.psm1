@@ -10,69 +10,24 @@ function Connect-EXOHelper {
         [Parameter(Mandatory = $true)]
         [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $false)]
         [string]
-        $M365Environment,
-
-        [Parameter(Mandatory = $false)]
-        [hashtable]
-        $ServicePrincipalParams
+        $M365Environment
     )
-    $EXOParams = @{
-        ErrorAction = "Stop";
-        ShowBanner = $false;
-    }
     switch ($M365Environment) {
+        {($_ -eq "commercial") -or ($_ -eq "gcc")} {
+            Connect-ExchangeOnline -ShowBanner:$false -ErrorAction "Stop" | Out-Null
+        }
         "gcchigh" {
-            $EXOParams += @{'ExchangeEnvironmentName' = "O365USGovGCCHigh";}
+            Connect-ExchangeOnline -ShowBanner:$false -ExchangeEnvironmentName "O365USGovGCCHigh" -ErrorAction "Stop" | Out-Null
         }
         "dod" {
-            $EXOParams += @{'ExchangeEnvironmentName' = "O365USGovDoD";}
+            Connect-ExchangeOnline -ShowBanner:$false -ExchangeEnvironmentName "O365USGovDoD" -ErrorAction "Stop" | Out-Null
+        }
+        default {
+            throw "Unsupported or invalid M365Environment argument"
         }
     }
-
-    if ($ServicePrincipalParams.CertThumbprintParams) {
-        $EXOParams += $ServicePrincipalParams.CertThumbprintParams
-    }
-    Connect-ExchangeOnline @EXOParams | Out-Null
-}
-
-function Connect-DefenderHelper {
-    <#
-    .Description
-    This function is used for assisting in connecting to different M365 Environments for EXO.
-    .Functionality
-    Internal
-    #>
-    [CmdletBinding()]
-    param(
-        [Parameter(Mandatory = $true)]
-        [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $false)]
-        [string]
-        $M365Environment,
-
-        [Parameter(Mandatory = $false)]
-        [hashtable]
-        $ServicePrincipalParams
-    )
-    $IPPSParams = @{
-        'ErrorAction' = 'Stop';
-    }
-    switch ($M365Environment) {
-        "gcchigh" {
-            $IPPSParams += @{'ConnectionUri' = "https://ps.compliance.protection.office365.us/powershell-liveid";}
-            $IPPSParams += @{'AzureADAuthorizationEndpointUri' = "https://login.microsoftonline.us/common";}
-        }
-        "dod" {
-            $IPPSParams += @{'ConnectionUri' = "https://l5.ps.compliance.protection.office365.us/powershell-liveid";}
-            $IPPSParams += @{'AzureADAuthorizationEndpointUri' = "https://login.microsoftonline.us/common";}
-        }
-    }
-    if ($ServicePrincipalParams.CertThumbprintParams) {
-        $IPPSParams += $ServicePrincipalParams.CertThumbprintParams
-    }
-    Connect-IPPSSession @IPPSParams | Out-Null
 }
 
 Export-ModuleMember -Function @(
-    'Connect-EXOHelper',
-    'Connect-DefenderHelper'
+    'Connect-EXOHelper'
 )

@@ -61,8 +61,8 @@ function Export-EXOProvider {
     <#
     2.13
     #>
-    $Config = $Tracker.TryCommand("Get-OrganizationConfig") | Select-Object Name, DisplayName, AuditDisabled
-    $Config = ConvertTo-Json @($Config)
+
+    $Config = ConvertTo-Json @($Tracker.TryCommand("Get-OrganizationConfig"))
 
 
     $SuccessfulCommands = ConvertTo-Json @($Tracker.GetSuccessfulCommands())
@@ -130,7 +130,7 @@ function Get-EXOTenantDetail {
             "DisplayName"= $OrgConfig.DisplayName;
             "DomainName" = $DomainName;
             "TenantId" = $TenantId;
-            "EXOAdditionalData" = "Unable to safely retrieve due to EXO API changes";
+            "EXOAdditionalData" = $OrgConfig;
         }
         $EXOTenantInfo = ConvertTo-Json @($EXOTenantInfo) -Depth 4
         $EXOTenantInfo

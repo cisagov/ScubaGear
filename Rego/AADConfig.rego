@@ -38,8 +38,6 @@ ReportFullDetailsArray(Array, String) = Details {
     Details := Description(Format(Array), concat(":<br/>", [String, TruncatedList]), TruncationWarning)
 }
 
-CapLink := "<a href='#caps'>View all CA policies</a>."
-
 ################
 # The report formatting functions below are for policies that check the required Azure AD Premium P2 license #
 ################
@@ -49,16 +47,6 @@ Aad2P2Licenses[ServicePlan.ServicePlanId] {
 }
 
 P2WarningString := "**NOTE: Your tenant does not have an Azure AD Premium P2 license, which is required for this feature**"
-
-ReportDetailsArrayLicenseWarningCap(Array, String) = Description if {
-  count(Aad2P2Licenses) > 0
-  Description :=  concat(". ", [ReportFullDetailsArray(Array, String), CapLink])
-}
-
-ReportDetailsArrayLicenseWarningCap(Array, String) = Description if {
-  count(Aad2P2Licenses) == 0
-  Description := P2WarningString
-}
 
 ReportDetailsArrayLicenseWarning(Array, String) = Description if {
   count(Aad2P2Licenses) > 0
@@ -111,7 +99,7 @@ tests[{
     "Criticality" : "Shall",
     "Commandlet" : ["Get-MgIdentityConditionalAccessPolicy"],
     "ActualValue" : Policies2_1,
-    "ReportDetails" : concat(". ", [ReportFullDetailsArray(Policies2_1, DescriptionString), CapLink]),
+    "ReportDetails" : ReportFullDetailsArray(Policies2_1, DescriptionString),
     "RequirementMet" : count(Policies2_1) > 0
 }] {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
@@ -143,7 +131,7 @@ tests[{
     "Criticality" : "Shall",
     "Commandlet" : ["Get-MgIdentityConditionalAccessPolicy"],
     "ActualValue" : Policies2_2,
-    "ReportDetails" : ReportDetailsArrayLicenseWarningCap(Policies2_2, DescriptionString),
+    "ReportDetails" : ReportDetailsArrayLicenseWarning(Policies2_2, DescriptionString),
     "RequirementMet" : Status
 }] {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
@@ -192,7 +180,7 @@ tests[{
     "Criticality" : "Shall",
     "Commandlet" : ["Get-MgIdentityConditionalAccessPolicy"],
     "ActualValue" : Policies2_3,
-    "ReportDetails" : ReportDetailsArrayLicenseWarningCap(Policies2_3, DescriptionString),
+    "ReportDetails" : ReportDetailsArrayLicenseWarning(Policies2_3, DescriptionString),
     "RequirementMet" : Status
 }] {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
@@ -218,12 +206,12 @@ Policies2_4_1[Cap.DisplayName] {
 }
 
 tests[{
-    "Requirement" : "MFA SHALL be required for all users",
+    "Requirement" : "Phishing-Resistant MFA SHALL be required for all users",
     "Control" : "AAD 2.4",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-MgIdentityConditionalAccessPolicy"],
     "ActualValue" : Policies2_4_1,
-    "ReportDetails" : concat(". ", [ReportFullDetailsArray(Policies2_4_1, DescriptionString), CapLink]),
+    "ReportDetails" : ReportFullDetailsArray(Policies2_4_1, DescriptionString),
     "RequirementMet" : count(Policies2_4_1) > 0
 }]{
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
@@ -516,7 +504,7 @@ tests[{
     "Criticality" : "Shall",
     "Commandlet" : ["Get-MgIdentityConditionalAccessPolicy"],
     "ActualValue" : Policies2_9,
-    "ReportDetails" : concat(". ", [ReportFullDetailsArray(Policies2_9, DescriptionString), CapLink]),
+    "ReportDetails" : ReportFullDetailsArray(Policies2_9, DescriptionString),
     "RequirementMet" : count(Policies2_9) > 0
 }] {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
@@ -548,7 +536,7 @@ tests[{
     "Criticality" : "Shall",
     "Commandlet" : ["Get-MgIdentityConditionalAccessPolicy"],
     "ActualValue" : Policies2_10,
-    "ReportDetails" : concat(". ", [ReportFullDetailsArray(Policies2_10, DescriptionString), CapLink]),
+    "ReportDetails" : ReportFullDetailsArray(Policies2_10, DescriptionString),
     "RequirementMet" : count(Policies2_10) > 0
 }] {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
@@ -639,7 +627,7 @@ tests[{
     "Criticality" : "Shall",
     "Commandlet" : ["Get-MgSubscribedSku", "Get-PrivilegedRole", "Get-MgIdentityConditionalAccessPolicy"],
     "ActualValue" : Policies2_13,
-    "ReportDetails" : concat(". ", [ReportFullDetailsArray(Policies2_13, DescriptionString), CapLink]),
+    "ReportDetails" : ReportFullDetailsArray(Policies2_13, DescriptionString),
     "RequirementMet" : count(Policies2_13) > 0
 }] {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
@@ -887,7 +875,7 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-MgIdentityConditionalAccessPolicy"],
     "ActualValue" : Policies2_17,
-    "ReportDetails" : concat(". ", [ReportFullDetailsArray(Policies2_17, DescriptionString), CapLink]),
+    "ReportDetails" : ReportFullDetailsArray(Policies2_17, DescriptionString),
     "RequirementMet" : count(Policies2_17) > 0
 }] {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"

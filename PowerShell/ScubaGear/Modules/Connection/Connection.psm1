@@ -19,11 +19,7 @@ function Connect-Tenant {
     [ValidateNotNullOrEmpty()]
     [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $false)]
     [string]
-    $M365Environment,
-
-    [Parameter(Mandatory = $false)]
-    [hashtable]
-    $ServicePrincipalParams
+    $M365Environment
     )
     Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "ConnectHelpers.psm1")
 
@@ -59,43 +55,36 @@ function Connect-Tenant {
                         'Directory.Read.All'
                     )
                     $GraphParams = @{
+                        'Scopes' = $GraphScopes;
                         'ErrorAction' = 'Stop';
                     }
-                    if ($ServicePrincipalParams.CertThumbprintParams) {
-                        $GraphParams += @{
-                            CertificateThumbprint = $ServicePrincipalParams.CertThumbprintParams.CertificateThumbprint;
-                            ClientID = $ServicePrincipalParams.CertThumbprintParams.AppID;
-                            TenantId  = $ServicePrincipalParams.CertThumbprintParams.Organization; # Organization also works here
-                        }
-                    }
-                    else {
-                        $GraphParams += @{Scopes = $GraphScopes;}
-                    }
                     switch ($M365Environment) {
+                        {($_ -eq "commercial") -or ($_ -eq "gcc")} {
+                            # Sanity check
+                            $GraphParams = @{
+                                'Scopes' = $GraphScopes;
+                                'ErrorAction' = 'Stop';
+                            }
+                        }
                         "gcchigh" {
-                            $GraphParams += @{'Environment' = "USGov";}
+                            $GraphParams = $GraphParams + @{'Environment' = "USGov";}
                         }
                         "dod" {
-                            $GraphParams += @{'Environment' = "USGovDoD";}
+                            $GraphParams = $GraphParams + @{'Environment' = "USGovDoD";}
+                        }
+                        default {
+                            throw "Unsupported or invalid M365Environment argument"
                         }
                     }
                     Connect-MgGraph @GraphParams | Out-Null
-                    $GraphProfile = (Get-MgProfile -ErrorAction "Stop").Name
-                    if ($GraphProfile.ToLower() -ne "beta") {
-                        Select-MgProfile -Name "Beta" -ErrorAction "Stop" | Out-Null
-                    }
+                    Select-MgProfile -Name "Beta" -ErrorAction "Stop" | Out-Null
                     $AADAuthRequired = $false
                 }
                 {($_ -eq "exo") -or ($_ -eq "defender")} {
                     if ($EXOAuthRequired) {
-                        $EXOHelperParams = @{
-                            M365Environment = $M365Environment;
-                        }
-                        if ($ServicePrincipalParams) {
-                            $EXOHelperParams += @{ServicePrincipalParams = $ServicePrincipalParams}
-                        }
+                        # Moved switch to Connect-Helpers for Defender Provider use
+                        Connect-EXOHelper -M365Environment $M365Environment
                         Write-Verbose "Defender will require a sign in every single run regardless of what the LogIn parameter is set"
-                        Connect-EXOHelper @EXOHelperParams
                         $EXOAuthRequired = $false
                     }
                 }
@@ -103,25 +92,21 @@ function Connect-Tenant {
                     $AddPowerAppsParams = @{
                         'ErrorAction' = 'Stop';
                     }
-                    if ($ServicePrincipalParams.CertThumbprintParams) {
-                        $AddPowerAppsParams += @{
-                            CertificateThumbprint = $ServicePrincipalParams.CertThumbprintParams.CertificateThumbprint;
-                            ApplicationId = $ServicePrincipalParams.CertThumbprintParams.AppID;
-                            TenantID  = $ServicePrincipalParams.CertThumbprintParams.Organization; # Organization also works here
-                        }
-                    }
                     switch ($M365Environment) {
                         "commercial" {
-                            $AddPowerAppsParams += @{'Endpoint'='prod';}
+                            $AddPowerAppsParams = $AddPowerAppsParams + @{'Endpoint'='prod';}
                         }
                         "gcc" {
-                            $AddPowerAppsParams += @{'Endpoint'='usgov';}
+                            $AddPowerAppsParams = $AddPowerAppsParams + @{'Endpoint'='usgov';}
                         }
                         "gcchigh" {
-                            $AddPowerAppsParams += @{'Endpoint'='usgovhigh';}
+                            $AddPowerAppsParams = $AddPowerAppsParams + @{'Endpoint'='usgovhigh';}
                         }
                         "dod" {
-                            $AddPowerAppsParams += @{'Endpoint'='dod';}
+                            $AddPowerAppsParams = $AddPowerAppsParams + @{'Endpoint'='dod';}
+                        }
+                        default {
+                            throw "Unsupported or invalid M365Environment argument"
                         }
                     }
                     Add-PowerAppsAccount @AddPowerAppsParams | Out-Null
@@ -131,26 +116,24 @@ function Connect-Tenant {
                         $LimitedGraphParams = @{
                             'ErrorAction' = 'Stop';
                         }
-                        if ($ServicePrincipalParams.CertThumbprintParams) {
-                            $LimitedGraphParams += @{
-                                CertificateThumbprint = $ServicePrincipalParams.CertThumbprintParams.CertificateThumbprint;
-                                ClientID = $ServicePrincipalParams.CertThumbprintParams.AppID;
-                                TenantId  = $ServicePrincipalParams.CertThumbprintParams.Organization; # Organization also works here
-                            }
-                        }
                         switch ($M365Environment) {
+                            {($_ -eq "commercial") -or ($_ -eq "gcc")} {
+                                $LimitedGraphParams = @{
+                                    'ErrorAction' = 'Stop';
+                                }
+                            }
                             "gcchigh" {
-                                $LimitedGraphParams += @{'Environment' = "USGov";}
+                                $LimitedGraphParams = $LimitedGraphParams + @{'Environment' = "USGov";}
                             }
                             "dod" {
-                                $LimitedGraphParams += @{'Environment' = "USGovDoD";}
+                                $LimitedGraphParams = $LimitedGraphParams + @{'Environment' = "USGovDoD";}
+                            }
+                            default {
+                                throw "Unsupported or invalid M365Environment argument"
                             }
                         }
                         Connect-MgGraph @LimitedGraphParams | Out-Null
-                        $GraphProfile = (Get-MgProfile -ErrorAction "Stop").Name
-                        if ($GraphProfile.ToLower() -ne "beta") {
-                            Select-MgProfile -Name "Beta" -ErrorAction "Stop" | Out-Null
-                        }
+                        Select-MgProfile -Name "Beta" -ErrorAction "Stop" | Out-Null
                         $AADAuthRequired = $false
                     }
                     if ($SPOAuthRequired) {
@@ -159,75 +142,52 @@ function Connect-Tenant {
                         $SPOParams = @{
                             'ErrorAction' = 'Stop';
                         }
-                        $PnPParams = @{
-                            'ErrorAction' = 'Stop';
-                        }
                         switch ($M365Environment) {
                             {($_ -eq "commercial") -or ($_ -eq "gcc")} {
-                                $SPOParams += @{
+                                $SPOParams = $SPOParams + @{
                                     'Url'= "https://$($InitialDomainPrefix)-admin.sharepoint.com";
-                                }
-                                $PnPParams += @{
-                                    'Url'= "$($InitialDomainPrefix)-admin.sharepoint.com";
                                 }
                             }
                             "gcchigh" {
-                                $SPOParams += @{
+                                $SPOParams = $SPOParams + @{
                                     'Url'= "https://$($InitialDomainPrefix)-admin.sharepoint.us";
                                     'Region' = "ITAR";
                                 }
-                                $PnPParams += @{
-                                    'Url'= "$($InitialDomainPrefix)-admin.sharepoint.us";
-                                    'AzureEnvironment' = 'USGovernmentHigh'
-                                }
                             }
                             "dod" {
-                                $SPOParams += @{
+                                $SPOParams = $SPOParams + @{
                                     'Url'= "https://$($InitialDomainPrefix)-admin.sharepoint-mil.us";
                                     'Region' = "ITAR";
                                 }
-                                $PnPParams += @{
-                                    'Url'= "$($InitialDomainPrefix)-admin.sharepoint-mil.us";
-                                    'AzureEnvironment' = 'USGovernmentDoD'
-                                }
+                            }
+                            default {
+                                throw "Unsupported or invalid M365Environment argument"
                             }
                         }
-                        if ($ServicePrincipalParams.CertThumbprintParams) {
-                            $PnPParams += @{
-                                Thumbprint = $ServicePrincipalParams.CertThumbprintParams.CertificateThumbprint;
-                                ClientId = $ServicePrincipalParams.CertThumbprintParams.AppID;
-                                Tenant  = $ServicePrincipalParams.CertThumbprintParams.Organization; # Organization Domain is actually required here.
-                            }
-                            Connect-PnPOnline @PnPParams | Out-Null
-                        }
-                        else {
-                            Connect-SPOService @SPOParams | Out-Null
-                        }
+                        Connect-SPOService @SPOParams | Out-Null
                         $SPOAuthRequired = $false
                     }
                 }
                 "teams" {
                     $TeamsParams = @{'ErrorAction'= 'Stop'}
-                    if ($ServicePrincipalParams.CertThumbprintParams) {
-                        $TeamsConnectToTenant = @{
-                            CertificateThumbprint = $ServicePrincipalParams.CertThumbprintParams.CertificateThumbprint;
-                            ApplicationId = $ServicePrincipalParams.CertThumbprintParams.AppID;
-                            TenantId  = $ServicePrincipalParams.CertThumbprintParams.Organization; # Organization Domain is actually required here.
-                        }
-                        $TeamsParams += $TeamsConnectToTenant
-                    }
                     switch ($M365Environment) {
+                        {($_ -eq "commercial") -or ($_ -eq "gcc")} {
+                            $TeamsParams = @{'ErrorAction'= 'Stop'} # sanity check
+                        }
                         "gcchigh" {
-                            $TeamsParams += @{'TeamsEnvironmentName'= 'TeamsGCCH';}
+                            $TeamsParams = $TeamsParams + @{'TeamsEnvironmentName'= 'TeamsGCCH';}
                         }
                         "dod" {
-                            $TeamsParams += @{'TeamsEnvironmentName'= 'TeamsDOD';}
+                            $TeamsParams = $TeamsParams + @{'TeamsEnvironmentName'= 'TeamsDOD';}
+                        }
+                        default {
+                            throw "Unsupported or invalid M365Environment argument"
                         }
                     }
                     Connect-MicrosoftTeams @TeamsParams | Out-Null
                 }
                 default {
-                    throw "Invalid ProductName argument"
+                    Write-Error -Message "Invalid ProductName argument"
                 }
             }
         }
@@ -283,7 +243,6 @@ function Disconnect-SCuBATenant {
 
                 if($Product -eq "sharepoint") {
                     Disconnect-SPOService -ErrorAction SilentlyContinue
-                    Disconnect-PnPOnline -ErrorAction SilentlyContinue
                 }
             }
             elseif ($Product -eq "teams") {

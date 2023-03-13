@@ -28,7 +28,7 @@ jobs:
         version: <0.50
 
     - name: Run OPA Check
-      run: opa check Rego Testing/Unit/Rego --strict
+      run: opa check --strict Rego Testing
 
     - name: Run OPA Tests
       run: opa test Rego/*.rego Testing/Unit/Rego/**/*.rego -v

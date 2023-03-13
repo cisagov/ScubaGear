@@ -1,4 +1,3 @@
-using module 'ScubaConfig\ScubaConfig.psm1'
 function Invoke-SCuBA {
     <#
     .SYNOPSIS
@@ -41,16 +40,6 @@ function Invoke-SCuBA {
     Note: defender will ask for authentication even if this variable is set to `$false`
     .Parameter Version
     Will output the current ScubaGear version to the terminal without running this cmdlet.
-    .Parameter AppID
-    The application ID of the service principal that's used during certificate based
-    authentication. A valid value is the GUID of the application ID (service principal).
-    .Parameter CertificateThumbprint
-    The thumbprint value specifies the certificate that's used for certificate base authentication.
-    The underlying PowerShell modules retrieve the certificate from the user's certificate store.
-    As such, a copy of the certificate must be located there.
-    .Parameter Organization
-    Specify the organization that's used in certificate based authentication.
-    Use the tenant's tenantname.onmicrosoft.com domain for the parameter value.
     .Parameter OutPath
     The folder path where both the output JSON and the HTML report will be created.
     The folder will be created if it does not exist. Defaults to current directory.
@@ -68,14 +57,6 @@ function Invoke-SCuBA {
     Defaults to "BaselineReports".
     .Parameter DisconnectOnExit
     Set switch to disconnect all active connections on exit from ScubaGear (default: $false)
-    .Parameter ConfigFilePath
-    Local file path to a JSON or YAML formatted configuration file.
-    Configuration file parameters can be used in place of command-line
-    parameters. Additional parameters and variables not available on the
-    command line can also be included in the file that will be provided to the
-    tool for use in specific tests.
-    .Parameter DarkMode
-    Set switch to enable report dark mode by default.
     .Example
     Invoke-SCuBA
     Run an assessment against by default a commercial M365 Tenant against the
@@ -84,9 +65,6 @@ function Invoke-SCuBA {
     .Example
     Invoke-SCuBA -Version
     This example returns the version of SCuBAGear.
-    .Example
-    Invoke-SCuBA -ConfigFilePath MyConfig.json
-    This example uses the specified configuration file when executing SCuBAGear.
     .Example
     Invoke-SCuBA -ProductNames aad, defender -OPAPath . -OutPath .
     The example will run the tool against the Azure Active Directory, and Defender security
@@ -99,13 +77,10 @@ function Invoke-SCuBA {
     Invoke-SCuBA -ProductNames aad,exo -M365Environment gcc -OPAPath . -OutPath . -DisconnectOnExit
     Run the tool against Azure Active Directory and Exchange Online security
     baselines, disconnecting connections for those products when complete.
-    .Example
-    Invoke-SCuBA -ProductNames * -CertificateThumbprint <insert-thumbprint> -AppID <insert-appid> -Organization "tenant.onmicrosoft.com"
-    This example will run the tool against all available security baselines while authenticating using a Service Principal with the CertificateThumprint bundle of parameters.
     .Functionality
     Public
     #>
-    [CmdletBinding(DefaultParameterSetName='Report')]
+    [CmdletBinding()]
     param (
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
@@ -130,25 +105,13 @@ function Invoke-SCuBA {
         [boolean]
         $LogIn = $true,
 
-        [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
+        [Parameter(Mandatory = $false)]
         [switch]
         $DisconnectOnExit,
 
-        [Parameter(ParameterSetName = 'VersionOnly')]
+        [Parameter(ParameterSetName = 'Report')]
         [switch]
         $Version,
-
-        [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
-        [string]
-        $AppID,
-
-        [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
-        [string]
-        $CertificateThumbprint,
-
-        [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
-        [string]
-        $Organization,
 
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
@@ -173,24 +136,7 @@ function Invoke-SCuBA {
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
         [string]
-        $OutReportName = "BaselineReports",
-
-        [Parameter(Mandatory = $true, ParameterSetName = 'Configuration')]
-        [ValidateScript({
-            if (-Not ($_ | Test-Path)){
-                throw "SCuBA configuration file or folder does not exist."
-            }
-            if (-Not ($_ | Test-Path -PathType Leaf)){
-                throw "SCuBA configuration Path argument must be a file."
-            }
-            return $true
-        })]
-        [System.IO.FileInfo]
-        $ConfigFilePath,
-
-        [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
-        [switch]
-        $DarkMode
+        $OutReportName = "BaselineReports"
     )
     process {
         $ParentPath = Split-Path $PSScriptRoot -Parent
@@ -201,38 +147,8 @@ function Invoke-SCuBA {
             return
         }
 
-        if ($PSCmdlet.ParameterSetName -eq 'Report'){
-
-            if ($ProductNames -eq '*'){
-                $ProductNames = "teams", "exo", "defender", "aad", "sharepoint", "onedrive", "powerplatform"
-            }
-
-            $ProvidedParameters = @{
-                'ProductNames' = $ProductNames | Sort-Object
-                'M365Environment' = $M365Environment
-                'OPAPath' = $OPAPath
-                'LogIn' = $LogIn
-                'DisconnectOnExit' = $DisconnectOnExit
-                'OutPath' = $OutPath
-                'OutFolderName' = $OutFolderName
-                'OutProviderFileName' = $OutProviderFileName
-                'OutRegoFileName' = $OutRegoFileName
-                'OutReportName' = $OutReportName
-            }
-
-            $ScubaConfig = New-Object -Type PSObject -Property $ProvidedParameters
-        }
-
-        Remove-Resources
-        Import-Resources # Imports Providers, RunRego, CreateReport, Connection
-
-        if ($PSCmdlet.ParameterSetName -eq 'Configuration'){
-            if (-Not ([ScubaConfig]::GetInstance().LoadConfig($ConfigFilePath))){
-                Write-Error -Message "The config file failed to load: $ConfigFilePath"
-            }
-            else {
-                $ScubaConfig = [ScubaConfig]::GetInstance().Configuration
-            }
+        if ($ProductNames -eq '*'){
+            $ProductNames = "teams", "exo", "defender", "aad", "sharepoint", "onedrive", "powerplatform"
         }
 
         # The equivalent of ..\..
@@ -243,58 +159,60 @@ function Invoke-SCuBA {
         $DateStr = $Date.ToString("yyyy_MM_dd_HH_mm_ss")
         $FormattedTimeStamp = $DateStr
 
-        $OutFolderPath = $ScubaConfig.OutPath
-        $FolderName = "$($ScubaConfig.OutFolderName)_$($FormattedTimeStamp)"
+        $OutFolderPath = $OutPath
+        $FolderName = "$($OutFolderName)_$($FormattedTimeStamp)"
         New-Item -Path $OutFolderPath -Name $($FolderName) -ItemType Directory | Out-Null
         $OutFolderPath = Join-Path -Path $OutFolderPath -ChildPath $FolderName
 
+        $ProductNames = $ProductNames | Sort-Object
+
+        Remove-Resources
+        Import-Resources # Imports Providers, RunRego, CreateReport, Connection
+
         $ConnectionParams = @{
-            'LogIn' = $ScubaConfig.LogIn;
-            'ProductNames' = $ScubaConfig.ProductNames;
-            'M365Environment' = $ScubaConfig.M365Environment;
-            'BoundParameters' = $PSBoundParameters;
+            'LogIn' = $LogIn;
+            'ProductNames' = $ProductNames;
+            'M365Environment' = $M365Environment;
         }
 
         $ProdAuthFailed = Invoke-Connection @ConnectionParams
         if ($ProdAuthFailed.Count -gt 0) {
-            $Difference = Compare-Object $ScubaConfig.ProductNames -DifferenceObject $ProdAuthFailed -PassThru
+            $Difference = Compare-Object $ProductNames -DifferenceObject $ProdAuthFailed -PassThru
             if (-not $Difference) {
                 throw "All products were unable to establish a connection aborting execution"
             }
             else {
-                $ScubaConfig.ProductNames = $Difference
+                $ProductNames = $Difference
             }
         }
 
-        $TenantDetails = Get-TenantDetail -ProductNames $ScubaConfig.ProductNames -M365Environment $ScubaConfig.M365Environment
+        $TenantDetails = Get-TenantDetail -ProductNames $ProductNames -M365Environment $M365Environment
         $ProviderParams = @{
-            'ProductNames' = $ScubaConfig.ProductNames;
-            'M365Environment' = $ScubaConfig.M365Environment;
+            'ProductNames' = $ProductNames;
+            'M365Environment' = $M365Environment;
             'TenantDetails' = $TenantDetails;
             'ModuleVersion' = $ModuleVersion;
             'OutFolderPath' = $OutFolderPath;
-            'OutProviderFileName' = $ScubaConfig.OutProviderFileName;
-            'BoundParameters' = $PSBoundParameters;
+            'OutProviderFileName' = $OutProviderFileName;
         }
         $RegoParams = @{
-            'ProductNames' = $ScubaConfig.ProductNames;
-            'OPAPath' = $ScubaConfig.OPAPath;
+            'ProductNames' = $ProductNames;
+            'OPAPath' = $OPAPath;
             'ParentPath' = $ParentPath;
             'OutFolderPath' = $OutFolderPath;
-            'OutProviderFileName' = $ScubaConfig.OutProviderFileName;
-            'OutRegoFileName' = $ScubaConfig.OutRegoFileName;
+            'OutProviderFileName' = $OutProviderFileName;
+            'OutRegoFileName' = $OutRegoFileName;
         }
         # Converted back from JSON String for PS Object use
         $TenantDetails = $TenantDetails | ConvertFrom-Json
         $ReportParams = @{
-            'ProductNames' = $ScubaConfig.ProductNames;
+            'ProductNames' = $ProductNames;
             'TenantDetails' = $TenantDetails;
             'ModuleVersion' = $ModuleVersion;
             'OutFolderPath' = $OutFolderPath;
-            'OutProviderFileName' = $ScubaConfig.OutProviderFileName;
-            'OutRegoFileName' = $ScubaConfig.OutRegoFileName;
-            'OutReportName' = $ScubaConfig.OutReportName;
-            'DarkMode' = $DarkMode;
+            'OutProviderFileName' = $OutProviderFileName;
+            'OutRegoFileName' = $OutRegoFileName;
+            'OutReportName' = $OutReportName;
         }
 
         try {
@@ -302,16 +220,14 @@ function Invoke-SCuBA {
             Invoke-RunRego @RegoParams
             Invoke-ReportCreation @ReportParams
         } finally {
-            if ($ScubaConfig.DisconnectOnExit) {
+            if ($DisconnectOnExit) {
                 if($VerbosePreference -eq "Continue") {
-                    Disconnect-SCuBATenant -ProductNames $ScubaConfig.ProductNames -ErrorAction SilentlyContinue -Verbose
+                    Disconnect-SCuBATenant -ProductNames $ProductNames -ErrorAction SilentlyContinue -Verbose
                 }
                 else {
-                    Disconnect-SCuBATenant -ProductNames $ScubaConfig.ProductNames -ErrorAction SilentlyContinue
+                    Disconnect-SCuBATenant -ProductNames $ProductNames -ErrorAction SilentlyContinue
                 }
             }
-
-            [ScubaConfig]::ResetInstance()
         }
     }
 }
@@ -334,24 +250,6 @@ $ProdToFullName = @{
     PowerPlatform = "Microsoft Power Platform";
     SharePoint = "SharePoint Online";
     OneDrive = "OneDrive for Business";
-}
-
-function Get-FileEncoding{
-    <#
-    .Description
-    This function returns encoding type for setting content.
-    .Functionality
-    Internal
-    #>
-    $PSVersion = $PSVersionTable.PSVersion
-
-    $Encoding = 'utf8'
-
-    if ($PSVersion -ge '6.0'){
-        $Encoding = 'utf8NoBom'
-    }
-
-    return $Encoding
 }
 
 function Invoke-ProviderList {
@@ -386,11 +284,7 @@ function Invoke-ProviderList {
 
         [Parameter(Mandatory=$true)]
         [string]
-        $OutProviderFileName,
-
-        [Parameter(Mandatory=$true)]
-        [hashtable]
-        $BoundParameters
+        $OutProviderFileName
     )
     process {
         # yes the syntax has to be like this
@@ -399,21 +293,6 @@ function Invoke-ProviderList {
 "@
         $N = 0
         $Len = $ProductNames.Length
-        $ConnectTenantParams = @{
-            'M365Environment' = $M365Environment
-        }
-        $SPOProviderParams = @{
-            'M365Environment' = $M365Environment
-        }
-
-        $PnPFlag = $false
-        if ($BoundParameters.AppID) {
-            $ServicePrincipalParams = Get-ServicePrincipalParams -BoundParameters $BoundParameters
-            $ConnectTenantParams += @{ServicePrincipalParams = $ServicePrincipalParams;}
-            $PnPFlag = $true
-            $SPOProviderParams += @{PnPFlag = $PnPFlag}
-        }
-
         foreach ($Product in $ProductNames) {
             $BaselineName = $ArgToProd[$Product]
             $N += 1
@@ -435,16 +314,16 @@ function Invoke-ProviderList {
                     $RetVal = Export-EXOProvider | Select-Object -Last 1
                 }
                 "defender" {
-                    $RetVal = Export-DefenderProvider @ConnectTenantParams  | Select-Object -Last 1
+                    $RetVal = Export-DefenderProvider -M365Environment $M365Environment  | Select-Object -Last 1
                 }
                 "powerplatform" {
                     $RetVal = Export-PowerPlatformProvider -M365Environment $M365Environment | Select-Object -Last 1
                 }
                 "onedrive" {
-                    $RetVal = Export-OneDriveProvider -PnPFlag:$PnPFlag | Select-Object -Last 1
+                    $RetVal = Export-OneDriveProvider -M365Environment $M365Environment | Select-Object -Last 1
                 }
                 "sharepoint" {
-                    $RetVal = Export-SharePointProvider @SPOProviderParams | Select-Object -Last 1
+                    $RetVal = Export-SharePointProvider -M365Environment $M365Environment | Select-Object -Last 1
                 }
                 "teams" {
                     $RetVal = Export-TeamsProvider | Select-Object -Last 1
@@ -477,7 +356,7 @@ function Invoke-ProviderList {
         $BaselineSettingsExport = $BaselineSettingsExport.replace("\`"", "'")
         $BaselineSettingsExport = $BaselineSettingsExport.replace("\", "")
         $FinalPath = Join-Path -Path $OutFolderPath -ChildPath "$($OutProviderFileName).json"
-        $BaselineSettingsExport | Set-Content -Path $FinalPath -Encoding $(Get-FileEncoding)
+        $BaselineSettingsExport | Set-Content -Path $FinalPath
     }
 }
 
@@ -548,7 +427,7 @@ function Invoke-RunRego {
 
             $TestResultsJson = $TestResults | ConvertTo-Json -Depth 5
             $FileName = Join-Path -path $OutFolderPath "$($OutRegoFileName).json"
-            $TestResultsJson | Set-Content -Path $FileName -Encoding $(Get-FileEncoding)
+            $TestResultsJson | Set-Content -Path $FileName
 
             foreach ($Product in $TestResults) {
                 foreach ($Test in $Product) {
@@ -562,7 +441,7 @@ function Invoke-RunRego {
 
             $TestResultsCsv = $TestResults | ConvertTo-Csv -NoTypeInformation
             $CSVFileName = Join-Path -Path $OutFolderPath "$($OutRegoFileName).csv"
-            $TestResultsCsv | Set-Content -Path $CSVFileName -Encoding $(Get-FileEncoding)
+            $TestResultsCsv | Set-Content -Path $CSVFileName
         }
     }
 
@@ -640,11 +519,7 @@ function Invoke-ReportCreation {
 
         [Parameter(Mandatory = $false)]
         [boolean]
-        $Quiet = $false,
-
-        [Parameter(Mandatory=$true)]
-        [switch]
-        $DarkMode
+        $Quiet = $false
     )
     process {
         $N = 0
@@ -656,8 +531,8 @@ function Invoke-ReportCreation {
         New-Item -Path $IndividualReportPath -ItemType "Directory" -ErrorAction "SilentlyContinue" | Out-Null
 
         $ReporterPath = Join-Path -Path $PSScriptRoot -ChildPath "CreateReport"
-        $Images = Join-Path -Path $ReporterPath -ChildPath "images"
-        Copy-Item -Path $Images -Destination $IndividualReportPath -Force -Recurse
+        $Logo = Join-Path -Path $ReporterPath -ChildPath "cisa_logo.png"
+        Copy-Item -Path $Logo -Destination $IndividualReportPath -Force
 
         foreach ($Product in $ProductNames) {
             $BaselineName = $ArgToProd[$Product]
@@ -681,7 +556,6 @@ function Invoke-ReportCreation {
                 'OutPath' = $OutFolderPath;
                 'OutProviderFileName' = $OutProviderFileName;
                 'OutRegoFileName' = $OutRegoFileName;
-                'DarkMode' = $DarkMode;
             }
 
             $Report = New-Report @CreateReportParams
@@ -730,27 +604,16 @@ function Invoke-ReportCreation {
         $TenantMetaData = $TenantMetaData -replace '^(.*?)<table>','<table class ="tenantdata" style = "text-align:center;">'
         $Fragment = $Fragment | ConvertTo-Html -Fragment
 
-        $ReportHtmlPath = Join-Path -Path $ReporterPath -ChildPath "ParentReport"
-        $ReportHTML = (Get-Content $(Join-Path -Path $ReportHtmlPath -ChildPath "ParentReport.html")) -Join "`n"
+        $ReportHTML = Get-Content $(Join-Path -Path $ReporterPath -ChildPath "ParentReportTemplate.html")
         $ReportHTML = $ReportHTML.Replace("{TENANT_DETAILS}", $TenantMetaData)
         $ReportHTML = $ReportHTML.Replace("{TABLES}", $Fragment)
         $ReportHTML = $ReportHTML.Replace("{MODULE_VERSION}", "v$ModuleVersion")
 
-        $CssPath = Join-Path -Path $ReporterPath -ChildPath "styles"
-        $MainCSS = (Get-Content $(Join-Path -Path $CssPath -ChildPath "main.css")) -Join "`n"
+        $MainCSS = Get-Content $(Join-Path -Path $ReporterPath -ChildPath "main.css")
         $ReportHTML = $ReportHTML.Replace("{MAIN_CSS}", "<style>$($MainCSS)</style>")
 
-        $ParentCSS = (Get-Content $(Join-Path -Path $CssPath -ChildPath "ParentReportStyle.css")) -Join "`n"
+        $ParentCSS = Get-Content $(Join-Path -Path $ReporterPath -ChildPath "ParentStyle.css")
         $ReportHTML = $ReportHTML.Replace("{PARENT_CSS}", "<style>$($ParentCSS)</style>")
-
-        $ScriptsPath = Join-Path -Path $ReporterPath -ChildPath "scripts"
-        $ParentReportJS = (Get-Content $(Join-Path -Path $ScriptsPath -ChildPath "ParentReport.js")) -Join "`n"
-        $UtilsJS = (Get-Content $(Join-Path -Path $ScriptsPath -ChildPath "utils.js")) -Join "`n"
-        $ParentReportJS = "$($ParentReportJS)`n$($UtilsJS)"
-        $ReportHTML = $ReportHTML.Replace("{MAIN_JS}", "<script>
-            let darkMode = $($DarkMode.ToString().ToLower());
-            $($ParentReportJS)
-        </script>")
 
         Add-Type -AssemblyName System.Web
         $ReportFileName = Join-Path -Path $OutFolderPath "$($OutReportName).html"
@@ -838,66 +701,17 @@ function Invoke-Connection {
 
         [ValidateSet("commercial", "gcc", "gcchigh", "dod")]
         [string]
-        $M365Environment = "commercial",
-
-        [Parameter(Mandatory=$true)]
-        [hashtable]
-        $BoundParameters
+        $M365Environment = "commercial"
     )
 
     # Increase PowerShell Maximum Function Count to support version 5.1 limitation
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'MaximumFunctionCount')]
     $MaximumFunctionCount = 32000
 
-    $ConnectTenantParams = @{
-        'ProductNames' = $ProductNames;
-        'M365Environment' = $M365Environment
-    }
-
-    if ($BoundParameters.AppID) {
-        $ServicePrincipalParams = Get-ServicePrincipalParams -BoundParameters $BoundParameters
-        $ConnectTenantParams += @{ServicePrincipalParams = $ServicePrincipalParams;}
-    }
-
     if ($LogIn) {
-        $AnyFailedAuth = Connect-Tenant @ConnectTenantParams
+        $AnyFailedAuth = Connect-Tenant -ProductNames $ProductNames -M365Environment $M365Environment
         $AnyFailedAuth
     }
-}
-
-
-function Get-ServicePrincipalParams {
-    <#
-    .Description
-    Returns a valid a hastable of parameters for authentication via
-    Service Principal. Throws an error if there are none.
-    .Functionality
-    Internal
-    #>
-    [CmdletBinding()]
-    param(
-    [Parameter(Mandatory=$true)]
-    [hashtable]
-    $BoundParameters
-    )
-
-    $ServicePrincipalParams = @{}
-
-    $CheckThumbprintParams = ($BoundParameters.CertificateThumbprint) `
-    -and ($BoundParameters.AppID) -and ($BoundParameters.Organization)
-
-    if ($CheckThumbprintParams) {
-        $CertThumbprintParams = @{
-            CertificateThumbprint = $BoundParameters.CertificateThumbprint;
-            AppID = $BoundParameters.AppID;
-            Organization = $BoundParameters.Organization;
-        }
-        $ServicePrincipalParams += @{CertThumbprintParams = $CertThumbprintParams}
-    }
-    else {
-        throw "Missing parameters required for authentication with Service Principal Auth; Run Get-Help Invoke-Scuba for details on correct arguments"
-    }
-    $ServicePrincipalParams
 }
 
 function Import-Resources {
@@ -926,11 +740,9 @@ function Import-Resources {
     $ConnectionPath = Join-Path -Path $PSScriptRoot -ChildPath "Connection"
     $RegoPath = Join-Path -Path $PSScriptRoot -ChildPath "RunRego"
     $ReporterPath = Join-Path -Path $PSScriptRoot -ChildPath "CreateReport"
-    $ScubaConfigPath = Join-Path -Path $PSScriptRoot -ChildPath "ScubaConfig"
     Import-Module $ConnectionPath
     Import-Module $RegoPath
     Import-Module $ReporterPath
-    Import-Module $ScubaConfigPath
 }
 
 function Remove-Resources {
@@ -948,7 +760,6 @@ function Remove-Resources {
         Remove-Module $Provider -ErrorAction "SilentlyContinue"
     }
 
-    Remove-Module "ScubaConfig" -ErrorAction "SilentlyContinue"
     Remove-Module "RunRego" -ErrorAction "SilentlyContinue"
     Remove-Module "CreateReport" -ErrorAction "SilentlyContinue"
     Remove-Module "Connection" -ErrorAction "SilentlyContinue"
@@ -1004,16 +815,7 @@ function Invoke-RunCached {
     this variable to be `$false` to bypass the reauthenticating in the same session. Default is $true.
     .Parameter Version
     Will output the current ScubaGear version to the terminal without running this cmdlet.
-    .Parameter AppID
-    The application ID of the service principal that's used during certificate based
-    authentication. A valid value is the GUID of the application ID (service principal).
-    .Parameter CertificateThumbprint
-    The thumbprint value specifies the certificate that's used for certificate base authentication.
-    The underlying PowerShell modules retrieve the certificate from the user's certificate store.
-    As such, a copy of the certificate must be located there.
-    .Parameter Organization
-    Specify the organization that's used in certificate based authentication.
-    Use the tenant's tenantname.onmicrosoft.com domain for the parameter value.
+    .Parameter OutPath
     The folder path where both the output JSON and the HTML report will be created.
     The folder will be created if it does not exist. Defaults to current directory.
     .Parameter OutFolderName
@@ -1028,8 +830,6 @@ function Invoke-RunCached {
     .Parameter OutReportName
     The name of the main html file page created in the folder created in OutPath.
     Defaults to "BaselineReports".
-    .Parameter DarkMode
-    Set switch to enable report dark mode by default.
     .Example
     Invoke-RunCached
     Run an assessment against by default a commercial M365 Tenant against the
@@ -1046,9 +846,6 @@ function Invoke-RunCached {
     Invoke-RunCached -ProductNames * -M365Environment dod -OPAPath . -OutPath .
     This example will run the tool against all available security baselines with the
     'dod' teams endpoint.
-    .Example
-    Invoke-SCuBA -ProductNames * -CertificateThumbprint <insert-thumbprint> -AppID <insert-appid> -Organization "tenant.onmicrosoft.com"
-    This example will run the tool against all available security baselines while authenticating using a Service Principal with the CertificateThumprint bundle of parameters.
     .Functionality
     Public
     #>
@@ -1086,18 +883,6 @@ function Invoke-RunCached {
         $Version,
 
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
-        [string]
-        $AppID,
-
-        [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
-        [string]
-        $CertificateThumbprint,
-
-        [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
-        [string]
-        $Organization,
-
-        [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
         [string]
         $OutPath = '.',
@@ -1121,11 +906,7 @@ function Invoke-RunCached {
         [ValidateNotNullOrEmpty()]
         [ValidateSet($true, $false)]
         [boolean]
-        $Quiet = $false,
-
-        [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
-        [switch]
-        $DarkMode
+        $Quiet = $false
         )
         process {
             $ParentPath = Split-Path $PSScriptRoot -Parent
@@ -1138,7 +919,7 @@ function Invoke-RunCached {
             }
 
             if ($ProductNames -eq '*'){
-                $ProductNames = "teams", "exo", "defender", "aad", "sharepoint", "onedrive", "powerplatform"
+                $ProductNames = "teams", "exo", "defender", "aad", "sharepoint", "onedrive"
             }
 
             # The equivalent of ..\..
@@ -1160,7 +941,6 @@ function Invoke-RunCached {
                 'LogIn' = $LogIn;
                 'ProductNames' = $ProductNames;
                 'M365Environment' = $M365Environment;
-                'BoundParameters' = $PSBoundParameters;
             }
 
             # Rego Testing failsafe
@@ -1185,7 +965,6 @@ function Invoke-RunCached {
                     'ModuleVersion' = $ModuleVersion;
                     'OutFolderPath' = $OutFolderPath;
                     'OutProviderFileName' = $OutProviderFileName;
-                    'BoundParameters' = $PSBoundParameters;
                 }
                 Invoke-ProviderList @ProviderParams
             }
@@ -1209,7 +988,6 @@ function Invoke-RunCached {
                 'OutRegoFileName' = $OutRegoFileName;
                 'OutReportName' = $OutReportName;
                 'Quiet' = $Quiet;
-                'DarkMode' = $DarkMode;
             }
             Invoke-RunRego @RegoParams
             Invoke-ReportCreation @ReportParams

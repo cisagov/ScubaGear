@@ -139,10 +139,6 @@ SensitiveRules[{
                     "U.S. Individual Taxpayer Identification Number (ITIN)" in ContentNames,
                     "Credit Card Number" in ContentNames]
     count([Condition | Condition = Conditions[_]; Condition == true]) > 0
-
-    Policy := input.dlp_compliance_policies[_]
-    Rules.ParentPolicyName == Policy.Name
-    Policy.Enabled == true
 }
 
 #
@@ -159,7 +155,7 @@ ITINRules[Rule.Name] {
     "U.S. Individual Taxpayer Identification Number (ITIN)" in Rule.ContentNames
 }
 
-CardRules[Rule.Name] {
+CardRules[ Rule.Name] {
     Rule := SensitiveRules[_]
     "Credit Card Number" in Rule.ContentNames
 }
@@ -323,19 +319,6 @@ tests[{
 SensitiveRulesNotBlocking[Rule.Name] {
     Rule := SensitiveRules[_]
     not Rule.BlockAccess
-    Policy := input.dlp_compliance_policies[_]
-    Rule.ParentPolicyName == Policy.Name
-    Policy.Mode == "Enable"
-}
-
-# Covers rules set to block, but inside policies set to
-# "TestWithNotifications" or "TestWithoutNotifications" that won't enforce the block
-SensitiveRulesNotBlocking[Rule.Name] {
-    Rule := SensitiveRules[_]
-    Policy := input.dlp_compliance_policies[_]
-    Rule.ParentPolicyName == Policy.Name
-    Rule.BlockAccess
-    startswith(Policy.Mode, "TestWith") == true
 }
 
 tests[{
@@ -348,7 +331,7 @@ tests[{
     "RequirementMet" : Status
 }] {
     Rules := SensitiveRulesNotBlocking
-    ErrorMessage := "rule(s) found that do(es) not block access or associated policy not set to enforce block action:"
+    ErrorMessage := "rule(s) found that do(es) not block access:"
 	Status := count(Rules) == 0
 }
 #--

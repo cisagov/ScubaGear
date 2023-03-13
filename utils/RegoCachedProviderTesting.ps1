@@ -18,7 +18,6 @@ $ProductNames = @("aad", "defender", "exo", "onedrive", "powerplatform", "sharep
 $M365Environment = "gcc"
 $OPAPath = "../" # Path to OPA Executable
 $OutPath = "../output" # output directory
-$DarkMode = $true
 
 $RunCachedParams = @{
     'ExportProvider' = $ExportProvider;
@@ -27,7 +26,6 @@ $RunCachedParams = @{
     'M365Environment' = $M365Environment;
     'OPAPath' = $OPAPath;
     'OutPath' = $OutPath;
-    'DarkMode' = $DarkMode;
 }
 
 $ManifestPath = Join-Path -Path "../PowerShell" -ChildPath "ScubaGear"

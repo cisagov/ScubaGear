@@ -1,0 +1,56 @@
+main {
+    height: 100vh;
+    padding-bottom: 0px;
+}
+
+footer {
+    position: absolute;
+    bottom: 5px;
+    text-align: center;
+    width: 100%;
+}
+
+.summary {
+    display: inline-block;
+    padding: 5px;
+    border-radius: 5px;
+    min-width: 140px;
+    text-align: center;
+}
+
+a.individual_reports:link {
+    font-family: Arial, Helvetica, sans-serif;
+    color: #005288;
+    text-decoration: underline;
+}
+
+a.individual_reports:visited {
+    font-family: Arial, Helvetica, sans-serif;
+    color: #85B065;
+}
+
+a.individual_reports:hover {
+    font-family: Arial, Helvetica, sans-serif;
+    color: #85B065;
+    text-decoration: none;
+}
+
+a.individual_reports:active {
+    font-family: Arial, Helvetica, sans-serif;
+    color: #85B065;
+    text-decoration: none;
+} 
+
+table.tenantdata tr:first-child {
+    color: black;
+}
+
+.failure { background-color: #deb8b8; }
+.warning { background-color: #fff7d6; }
+.pass { background-color: #d5ebd5; }
+.manual { background-color: #ebebf2; }
+
+.error {
+    background-color: #deb8b8; 
+    color: #d10000;
+}

@@ -7,7 +7,7 @@ import future.keywords
 #--
 test_ConditionalAccessPolicies_Correct if {
     ControlNumber := "AAD 2.4"
-    Requirement := "MFA SHALL be required for all users"
+    Requirement := "Phishing-Resistant MFA SHALL be required for all users"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -33,12 +33,12 @@ test_ConditionalAccessPolicies_Correct if {
 
     count(RuleOutput)>= 1
     RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "1 conditional access policy(s) found that meet(s) all requirements:<br/>Test Policy require MFA for All Users. <a href='#caps'>View all CA policies</a>."
+    RuleOutput[0].ReportDetails == "1 conditional access policy(s) found that meet(s) all requirements:<br/>Test Policy require MFA for All Users"
 }
 
 test_IncludeApplications_Incorrect if {
     ControlNumber := "AAD 2.4"
-    Requirement := "MFA SHALL be required for all users"
+    Requirement := "Phishing-Resistant MFA SHALL be required for all users"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -64,12 +64,13 @@ test_IncludeApplications_Incorrect if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements"
 }
 
 test_IncludeUsers_Incorrect if {
     ControlNumber := "AAD 2.4"
-    Requirement := "MFA SHALL be required for all users"
+    Requirement := "Phishing-Resistant MFA SHALL be required for all users"
+
     Output := tests with input as {
         "conditional_access_policies": [
             {
@@ -94,13 +95,12 @@ test_IncludeUsers_Incorrect if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements"
 }
 
 test_BuiltInControls_Incorrect if {
     ControlNumber := "AAD 2.4"
-    Requirement := "MFA SHALL be required for all users"
-
+    Requirement := "Phishing-Resistant MFA SHALL be required for all users"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -126,12 +126,12 @@ test_BuiltInControls_Incorrect if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements"
 }
 
 test_State_Incorrect if {
     ControlNumber := "AAD 2.4"
-    Requirement := "MFA SHALL be required for all users"
+    Requirement := "Phishing-Resistant MFA SHALL be required for all users"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -157,7 +157,7 @@ test_State_Incorrect if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements"
 }
 
 #
