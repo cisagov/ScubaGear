@@ -23,8 +23,6 @@ $uri=New-Object "System.Uri" "$Install_url"
 $request=[System.Net.HttpWebRequest]::Create($uri)
 $request.set_Timeout(5000)
 $response=$request.GetResponse()
-#$totalLength=[System.Math]::Floor($response.get_ContentLength()/1024)
-#$length=$response.get_ContentLength()
 $responseStream=$response.GetResponseStream()
 $destStream=New-Object -TypeName System.IO.FileStream -ArgumentList $OutFile, Create
 $buffer=New-Object byte[] 10KB
