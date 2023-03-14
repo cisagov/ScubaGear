@@ -52,7 +52,7 @@ Try {
     }
 }
 catch {
-    Write-Error "Unable to verify the current OPA version: please see details on manually in README"
+    Write-Error "Unable to verify the current OPA version: please see details on manually in README under 'Download the required OPA executable'"
 }
 
 $DebugPreference = "SilientlyContinue"

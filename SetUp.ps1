@@ -111,8 +111,13 @@ if ($NoOPA -eq $true) {
     Write-Debug "Skipping Download for OPA."
 }
 else {
+    try {
     $ScriptDir = Split-Path -Path $MyInvocation.MyCommand.Definition -Parent
     . $ScriptDir\OPA.ps1
+    }
+    catch {
+        Write-Error "An error occurred: cannot call OPA download script"
+    }
 }
 
 # Stop the clock and report total elapsed time
@@ -120,3 +125,4 @@ $Stopwatch.stop()
 
 Write-Debug "ScubaGear setup time elapsed:  $([math]::Round($stopwatch.Elapsed.TotalSeconds,0)) seconds."
 
+$DebugPreference = 'SilentlyContinue'
