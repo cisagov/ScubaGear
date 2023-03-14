@@ -38,16 +38,21 @@ if ((Get-FileHash .\opa_windows_amd64.exe).Hash -eq $ExpectedHash)
     Write-Information "SHA256 verified successful"
     }
 else {
-    Write-Information "SHA256 verified failed, try re-download or manual install see details in README "
+    Write-Information "SHA256 verified failed, try re-download or manual install see details in README"
 }
 # Version checks
-$InstalledVersion= .\opa_windows_amd64.exe version | Select-Object -First 1
-if ($InstalledVersion -eq "Version: $($ExpectedVersion)")
-    {
-    Write-Information "`Downloaded OPA version` `"$InstalledVersion`" meets the ScubaGear Requirement"
+Try {
+    $InstalledVersion= .\opa_windows_amd64.exe version | Select-Object -First 1
+    if ($InstalledVersion -eq "Version: $($ExpectedVersion)")
+        {
+        Write-Information "`Downloaded OPA version` `"$InstalledVersion`" meets the ScubaGear Requirement"
+        }
+    else {
+        Write-Information "`Downloaded OPA version` `"$InstalledVersion`" does not meet the ScubaGear Requirement of` `"$ExpectedVersion`""
     }
-else {
-    Write-Information "`Downloaded OPA version` `"$InstalledVersion`" does not meet the ScubaGear Requirement of` `"$ExpectedVersion`""
+}
+catch {
+    Write-Information "Unabele to verify the current OPA version"
 }
 
 $DebugPreference = "SilientlyContinue"
