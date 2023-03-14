@@ -36,6 +36,13 @@ Then run:
 .\Setup.ps1 #Installs the required modules
 Import-Module -Name .\PowerShell\ScubaGear #Imports the tool into your session
 ```
+### Download the required OPA executable
+> **Note**: OPA executable download is included by default when run Setup.ps. 
+
+In the event of unsuccessful downloads, users can manually download the OPA executable with the following step:
+1. Go to OPA download site (https://www.openpolicyagent.org/docs/latest/#running-opa)
+2. Check the acceptable OPA version for Scuba and select the corresponding version on top left of the website 
+3. Navigate to the menu on left side of the screen: Introduction - Running OPA - Download OPA 
 
 ## Usage
 ### Example 1: Run an assessment against all products (except PowerPlatform)
