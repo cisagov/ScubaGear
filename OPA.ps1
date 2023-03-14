@@ -28,7 +28,7 @@ try {
     Write-Information "`nDownload of `"$OutFile`" finished."
 }
 catch {
-    "An error has occurred: Unable to download OPA executable, try manual install see details in README"
+    Write-Error "An error has occurred: Unable to download OPA executable. To try manually downloading, see details in README under 'Download the required OPA executable'"
 }
 $WebClient.Dispose()
 
@@ -52,7 +52,7 @@ Try {
     }
 }
 catch {
-    Write-Information "Unabele to verify the current OPA version: please see details on manually in README"
+    Write-Error "Unable to verify the current OPA version: please see details on manually in README"
 }
 
 $DebugPreference = "SilientlyContinue"
