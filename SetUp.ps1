@@ -27,7 +27,11 @@ param(
 
     [Parameter(HelpMessage = 'Do not automatically trust the PSGallery repository for module installation')]
     [switch]
-    $DoNotAutoTrustRepository
+    $DoNotAutoTrustRepository,
+
+    [Parameter(HelpMessage = 'Do not automatically trust the PSGallery repository for module installation')]
+    [switch]
+    $NoOPA
 )
 
 # Set prefernces for writing messages
@@ -101,6 +105,14 @@ foreach ($Module in $ModuleList) {
             -Scope CurrentUser
         Write-Information -MessageData "Installed latest version of $ModuleName"
     }
+}
+
+if ($NoOPA -eq $true) {
+    Write-Debug "Skipping Download for OPA."
+}
+else {
+    $ScriptDir = Split-Path -Path $MyInvocation.MyCommand.Definition -Parent
+    . $ScriptDir\OPA.ps1
 }
 
 # Stop the clock and report total elapsed time
