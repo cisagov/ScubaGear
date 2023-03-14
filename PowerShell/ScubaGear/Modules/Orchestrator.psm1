@@ -466,6 +466,10 @@ function Invoke-ProviderList {
         }
 
         $ConfigDetails = @(ConvertTo-Json -Depth 100 $([ScubaConfig]::GetInstance().Configuration))
+        if(! $ConfigDetails) {
+            $ConfigDetails = "{}"
+        }
+
         $BaselineSettingsExport = @"
 {
         "baseline_version": "0.1",
