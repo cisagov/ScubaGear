@@ -52,7 +52,7 @@ Try {
     }
 }
 catch {
-    Write-Information "Unabele to verify the current OPA version"
+    Write-Information "Unabele to verify the current OPA version: please see details on manually in README"
 }
 
 $DebugPreference = "SilientlyContinue"

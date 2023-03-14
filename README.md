@@ -43,6 +43,10 @@ In the event of unsuccessful downloads, users can manually download the OPA exec
 1. Go to OPA download site (https://www.openpolicyagent.org/docs/latest/#running-opa)
 2. Check the acceptable OPA version for Scuba and select the corresponding version on top left of the website 
 3. Navigate to the menu on left side of the screen: Introduction - Running OPA - Download OPA 
+4. Locate the downeloaded file and open powershell and use the following command to check downloaded OPA version
+```powershell
+\opa_windows_amd64.exe version
+```
 
 ## Usage
 ### Example 1: Run an assessment against all products (except PowerPlatform)
