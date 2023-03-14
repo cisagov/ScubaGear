@@ -193,14 +193,16 @@ function Invoke-SCuBA {
         $DarkMode
     )
     process {
-        $ParentPath = Split-Path $PSScriptRoot -Parent
-        $ScubaManifest = Import-PowerShellDataFile (Join-Path -Path $ParentPath -ChildPath 'ScubaGear.psd1' -Resolve)
+        # Retrive ScubaGear Module versions
+        $ParentPath = Split-Path $PSScriptRoot -Parent -ErrorAction 'Stop'
+        $ScubaManifest = Import-PowerShellDataFile (Join-Path -Path $ParentPath -ChildPath 'ScubaGear.psd1' -Resolve) -ErrorAction 'Stop'
         $ModuleVersion = $ScubaManifest.ModuleVersion
         if ($Version) {
             Write-Output("SCuBA Gear v$ModuleVersion")
             return
         }
 
+        # Default execution ParameterSet
         if ($PSCmdlet.ParameterSetName -eq 'Report'){
 
             if ($ProductNames -eq '*'){
@@ -223,9 +225,10 @@ function Invoke-SCuBA {
             $ScubaConfig = New-Object -Type PSObject -Property $ProvidedParameters
         }
 
-        Remove-Resources
+        Remove-Resources # Unload helper modules if they are still in the PowerShell session
         Import-Resources # Imports Providers, RunRego, CreateReport, Connection
 
+        # Loads and executes parameters from a Configuration file
         if ($PSCmdlet.ParameterSetName -eq 'Configuration'){
             if (-Not ([ScubaConfig]::GetInstance().LoadConfig($ConfigFilePath))){
                 Write-Error -Message "The config file failed to load: $ConfigFilePath"
@@ -239,78 +242,88 @@ function Invoke-SCuBA {
         $ParentPath = Split-Path $(Split-Path $ParentPath -Parent) -Parent
 
         # Creates the output folder
-        $Date = Get-Date
-        $DateStr = $Date.ToString("yyyy_MM_dd_HH_mm_ss")
-        $FormattedTimeStamp = $DateStr
-
+        $Date = Get-Date -ErrorAction 'Stop'
+        $FormattedTimeStamp = $Date.ToString("yyyy_MM_dd_HH_mm_ss")
         $OutFolderPath = $ScubaConfig.OutPath
         $FolderName = "$($ScubaConfig.OutFolderName)_$($FormattedTimeStamp)"
-        New-Item -Path $OutFolderPath -Name $($FolderName) -ItemType Directory | Out-Null
-        $OutFolderPath = Join-Path -Path $OutFolderPath -ChildPath $FolderName
+        New-Item -Path $OutFolderPath -Name $($FolderName) -ItemType Directory -ErrorAction 'Stop' | Out-Null
+        $OutFolderPath = Join-Path -Path $OutFolderPath -ChildPath $FolderName -ErrorAction 'Stop'
 
+        # Product Authentication
         $ConnectionParams = @{
             'LogIn' = $ScubaConfig.LogIn;
             'ProductNames' = $ScubaConfig.ProductNames;
             'M365Environment' = $ScubaConfig.M365Environment;
             'BoundParameters' = $PSBoundParameters;
         }
-
         $ProdAuthFailed = Invoke-Connection @ConnectionParams
         if ($ProdAuthFailed.Count -gt 0) {
-            $Difference = Compare-Object $ScubaConfig.ProductNames -DifferenceObject $ProdAuthFailed -PassThru
-            if (-not $Difference) {
-                throw "All products were unable to establish a connection aborting execution"
-            }
-            else {
-                $ScubaConfig.ProductNames = $Difference
-            }
+            $ScubaConfig.ProductNames = Compare-ProductList -ProductNames $ScubaConfig.ProductNames `
+            -ProductsFailed $ProdAuthFailed `
+            -ExceptionMessage 'All indicated Products were unable to authenticate'
         }
 
+        # Tenant Metadata for the Report
         $TenantDetails = Get-TenantDetail -ProductNames $ScubaConfig.ProductNames -M365Environment $ScubaConfig.M365Environment
-        $ProviderParams = @{
-            'ProductNames' = $ScubaConfig.ProductNames;
-            'M365Environment' = $ScubaConfig.M365Environment;
-            'TenantDetails' = $TenantDetails;
-            'ModuleVersion' = $ModuleVersion;
-            'OutFolderPath' = $OutFolderPath;
-            'OutProviderFileName' = $ScubaConfig.OutProviderFileName;
-            'BoundParameters' = $PSBoundParameters;
-        }
-        $RegoParams = @{
-            'ProductNames' = $ScubaConfig.ProductNames;
-            'OPAPath' = $ScubaConfig.OPAPath;
-            'ParentPath' = $ParentPath;
-            'OutFolderPath' = $OutFolderPath;
-            'OutProviderFileName' = $ScubaConfig.OutProviderFileName;
-            'OutRegoFileName' = $ScubaConfig.OutRegoFileName;
-        }
-        # Converted back from JSON String for PS Object use
-        $TenantDetails = $TenantDetails | ConvertFrom-Json
-        $ReportParams = @{
-            'ProductNames' = $ScubaConfig.ProductNames;
-            'TenantDetails' = $TenantDetails;
-            'ModuleVersion' = $ModuleVersion;
-            'OutFolderPath' = $OutFolderPath;
-            'OutProviderFileName' = $ScubaConfig.OutProviderFileName;
-            'OutRegoFileName' = $ScubaConfig.OutRegoFileName;
-            'OutReportName' = $ScubaConfig.OutReportName;
-            'DarkMode' = $DarkMode;
-        }
 
         try {
-            Invoke-ProviderList @ProviderParams
-            Invoke-RunRego @RegoParams
+            # Provider Execution
+            $ProviderParams = @{
+                'ProductNames' = $ScubaConfig.ProductNames;
+                'M365Environment' = $ScubaConfig.M365Environment;
+                'TenantDetails' = $TenantDetails;
+                'ModuleVersion' = $ModuleVersion;
+                'OutFolderPath' = $OutFolderPath;
+                'OutProviderFileName' = $ScubaConfig.OutProviderFileName;
+                'BoundParameters' = $PSBoundParameters;
+            }
+            $ProdProviderFailed = Invoke-ProviderList @ProviderParams
+            if ($ProdProviderFailed.Count -gt 0) {
+                $ScubaConfig.ProductNames = Compare-ProductList -ProductNames $ScubaConfig.ProductNames `
+                 -ProductsFailed $ProdProviderFailed `
+                 -ExceptionMessage 'All indicated Product Providers failed to execute'
+            }
+
+            # OPA Rego invocation
+            $RegoParams = @{
+                'ProductNames' = $ScubaConfig.ProductNames;
+                'OPAPath' = $ScubaConfig.OPAPath;
+                'ParentPath' = $ParentPath;
+                'OutFolderPath' = $OutFolderPath;
+                'OutProviderFileName' = $ScubaConfig.OutProviderFileName;
+                'OutRegoFileName' = $ScubaConfig.OutRegoFileName;
+            }
+            $ProdRegoFailed = Invoke-RunRego @RegoParams
+            if ($ProdRegoFailed.Count -gt 0) {
+                $ScubaConfig.ProductNames = Compare-ProductList -ProductNames $ScubaConfig.ProductNames `
+                -ProductsFailed  $ProdRegoFailed `
+                -ExceptionMessage 'All indicated Product Rego invocations failed'
+            }
+
+            # Report Creation
+            # Converted back from JSON String for PS Object use
+            $TenantDetails = $TenantDetails | ConvertFrom-Json
+            $ReportParams = @{
+                'ProductNames' = $ScubaConfig.ProductNames;
+                'TenantDetails' = $TenantDetails;
+                'ModuleVersion' = $ModuleVersion;
+                'OutFolderPath' = $OutFolderPath;
+                'OutProviderFileName' = $ScubaConfig.OutProviderFileName;
+                'OutRegoFileName' = $ScubaConfig.OutRegoFileName;
+                'OutReportName' = $ScubaConfig.OutReportName;
+                'DarkMode' = $DarkMode;
+            }
             Invoke-ReportCreation @ReportParams
-        } finally {
+        }
+        finally {
             if ($ScubaConfig.DisconnectOnExit) {
-                if($VerbosePreference -eq "Continue") {
+                if ($VerbosePreference -eq "Continue") {
                     Disconnect-SCuBATenant -ProductNames $ScubaConfig.ProductNames -ErrorAction SilentlyContinue -Verbose
                 }
                 else {
                     Disconnect-SCuBATenant -ProductNames $ScubaConfig.ProductNames -ErrorAction SilentlyContinue
                 }
             }
-
             [ScubaConfig]::ResetInstance()
         }
     }
@@ -364,106 +377,118 @@ function Invoke-ProviderList {
     #>
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string[]]
         $ProductNames,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string]
         $M365Environment,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string]
         $TenantDetails,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string]
         $ModuleVersion,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string]
         $OutFolderPath,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string]
         $OutProviderFileName,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [hashtable]
         $BoundParameters
     )
     process {
-        # yes the syntax has to be like this
-        # fixing the spacing causes PowerShell interpreter errors
-        $ProviderJSON = @"
+        try {
+            # yes the syntax has to be like this
+            # fixing the spacing causes PowerShell interpreter errors
+            $ProviderJSON = @"
 "@
-        $N = 0
-        $Len = $ProductNames.Length
-        $ConnectTenantParams = @{
-            'M365Environment' = $M365Environment
-        }
-        $SPOProviderParams = @{
-            'M365Environment' = $M365Environment
-        }
-
-        $PnPFlag = $false
-        if ($BoundParameters.AppID) {
-            $ServicePrincipalParams = Get-ServicePrincipalParams -BoundParameters $BoundParameters
-            $ConnectTenantParams += @{ServicePrincipalParams = $ServicePrincipalParams;}
-            $PnPFlag = $true
-            $SPOProviderParams += @{PnPFlag = $PnPFlag}
-        }
-
-        foreach ($Product in $ProductNames) {
-            $BaselineName = $ArgToProd[$Product]
-            $N += 1
-            $Percent = $N*100/$Len
-            $Status = "Running the $($BaselineName) Provider; $($N) of $($Len) Product settings extracted"
-            $ProgressParams = @{
-                'Activity' = "Running the provider for each baseline"
-                'Status' = $Status;
-                'PercentComplete' = $Percent;
-                'Id' = 1;
+            $N = 0
+            $Len = $ProductNames.Length
+            $ProdProviderFailed = @()
+            $ConnectTenantParams = @{
+                'M365Environment' = $M365Environment
             }
-            Write-Progress @ProgressParams
-            $RetVal = ""
-            switch ($Product) {
-                "aad" {
-                    $RetVal = Export-AADProvider | Select-Object -Last 1
+            $SPOProviderParams = @{
+                'M365Environment' = $M365Environment
+            }
+
+            $PnPFlag = $false
+            if ($BoundParameters.AppID) {
+                $ServicePrincipalParams = Get-ServicePrincipalParams -BoundParameters $BoundParameters
+                $ConnectTenantParams += @{ServicePrincipalParams = $ServicePrincipalParams; }
+                $PnPFlag = $true
+                $SPOProviderParams += @{PnPFlag = $PnPFlag }
+            }
+
+            foreach ($Product in $ProductNames) {
+                $BaselineName = $ArgToProd[$Product]
+                $N += 1
+                $Percent = $N * 100 / $Len
+                $Status = "Running the $($BaselineName) Provider; $($N) of $($Len) Product settings extracted"
+                $ProgressParams = @{
+                    'Activity' = "Running the provider for each baseline";
+                    'Status' = $Status;
+                    'PercentComplete' = $Percent;
+                    'Id' = 1;
+                    'ErrorAction' = 'Stop';
                 }
-                "exo" {
-                    $RetVal = Export-EXOProvider | Select-Object -Last 1
+                Write-Progress @ProgressParams
+                try {
+                    $RetVal = ""
+                    switch ($Product) {
+                        "aad" {
+                            $RetVal = Export-AADProvider | Select-Object -Last 1
+                        }
+                        "exo" {
+                            $RetVal = Export-EXOProvider | Select-Object -Last 1
+                        }
+                        "defender" {
+                            $RetVal = Export-DefenderProvider @ConnectTenantParams  | Select-Object -Last 1
+                        }
+                        "powerplatform" {
+                            $RetVal = Export-PowerPlatformProvider -M365Environment $M365Environment | Select-Object -Last 1
+                        }
+                        "onedrive" {
+                            $RetVal = Export-OneDriveProvider -PnPFlag:$PnPFlag | Select-Object -Last 1
+                        }
+                        "sharepoint" {
+                            $RetVal = Export-SharePointProvider @SPOProviderParams | Select-Object -Last 1
+                        }
+                        "teams" {
+                            $RetVal = Export-TeamsProvider | Select-Object -Last 1
+                        }
+                        default {
+                            Write-Error -Message "Invalid ProductName argument"
+                        }
+                    }
+                    $ProviderJSON += $RetVal
                 }
-                "defender" {
-                    $RetVal = Export-DefenderProvider @ConnectTenantParams  | Select-Object -Last 1
-                }
-                "powerplatform" {
-                    $RetVal = Export-PowerPlatformProvider -M365Environment $M365Environment | Select-Object -Last 1
-                }
-                "onedrive" {
-                    $RetVal = Export-OneDriveProvider -PnPFlag:$PnPFlag | Select-Object -Last 1
-                }
-                "sharepoint" {
-                    $RetVal = Export-SharePointProvider @SPOProviderParams | Select-Object -Last 1
-                }
-                "teams" {
-                    $RetVal = Export-TeamsProvider | Select-Object -Last 1
-                }
-                default {
-                    Write-Error -Message "Invalid ProductName argument"
+                catch {
+                    Write-Error "Error with the $($BaselineName) Provider. See the exception message for more details:  $($_)"
+                    $ProdProviderFailed += $Product
+                    Write-Warning "$($Product) will be omitted from the output because of the failure above `n`n"
                 }
             }
-            $ProviderJSON += $RetVal
-        }
 
-        $ProviderJSON = $ProviderJSON.TrimEnd(",")
-        $TimeZone = ""
-        if ((Get-Date).IsDaylightSavingTime()) {
-            $TimeZone = (Get-TimeZone).DaylightName
-        }
-        else {
-            $TimeZone = (Get-TimeZone).StandardName
-        }
+            $ProviderJSON = $ProviderJSON.TrimEnd(",")
+            $TimeZone = ""
+            $CurrentDate = Get-Date -ErrorAction 'Stop'
+            $GetTimeZone = Get-TimeZone -ErrorAction 'Stop'
+            if (($CurrentDate).IsDaylightSavingTime()) {
+                $TimeZone = ($GetTimeZone).DaylightName
+            }
+            else {
+                $TimeZone = ($GetTimeZone).StandardName
+            }
 
         $ConfigDetails = @(ConvertTo-Json -Depth 100 $([ScubaConfig]::GetInstance().Configuration))
         if(! $ConfigDetails) {
@@ -471,20 +496,27 @@ function Invoke-ProviderList {
         }
 
         $BaselineSettingsExport = @"
-{
-        "baseline_version": "0.1",
-        "module_version": "$ModuleVersion",
-        "date": "$(Get-Date) $($TimeZone)",
-        "tenant_details": $($TenantDetails),
-        "scuba_config": $($ConfigDetails),
+        {
+                "baseline_version": "0.1",
+                "module_version": "$ModuleVersion",
+                "date": "$($CurrentDate) $($TimeZone)",
+                "tenant_details": $($TenantDetails),
+                "scuba_config": $($ConfigDetails),
 
-        $ProviderJSON
-}
+                $ProviderJSON
+        }
 "@
-        $BaselineSettingsExport = $BaselineSettingsExport.replace("\`"", "'")
-        $BaselineSettingsExport = $BaselineSettingsExport.replace("\", "")
-        $FinalPath = Join-Path -Path $OutFolderPath -ChildPath "$($OutProviderFileName).json"
-        $BaselineSettingsExport | Set-Content -Path $FinalPath -Encoding $(Get-FileEncoding)
+            $BaselineSettingsExport = $BaselineSettingsExport.replace("\`"", "'")
+            $BaselineSettingsExport = $BaselineSettingsExport.replace("\", "")
+            $FinalPath = Join-Path -Path $OutFolderPath -ChildPath "$($OutProviderFileName).json" -ErrorAction 'Stop'
+            $BaselineSettingsExport | Set-Content -Path $FinalPath -Encoding $(Get-FileEncoding) -ErrorAction 'Stop'
+            $ProdProviderFailed
+        }
+        catch {
+            $InvokeProviderListErrorMessage = "Fatal Error involving the Provider functions. `
+            Ending ScubaGear execution. See the exception message for more details: $($_)"
+            throw $InvokeProviderListErrorMessage
+        }
     }
 }
 
@@ -500,78 +532,94 @@ function Invoke-RunRego {
     #>
     [CmdletBinding()]
     param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string[]]
         $ProductNames,
 
         [string]
         $OPAPath = $PSScriptRoot,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [String]
         $ParentPath,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [String]
         $OutFolderPath,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [String]
         $OutProviderFileName,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string]
         $OutRegoFileName
     )
     process {
-        $TestResults = @()
-        $N = 0
-        $Len = $ProductNames.Length
-        foreach ($Product in $ProductNames) {
-            $BaselineName = $ArgToProd[$Product]
-            $N += 1
-            $Percent = $N*100/$Len
+        try {
+            $ProdRegoFailed = @()
+            $TestResults = @()
+            $N = 0
+            $Len = $ProductNames.Length
+            foreach ($Product in $ProductNames) {
+                $BaselineName = $ArgToProd[$Product]
+                $N += 1
+                $Percent = $N * 100 / $Len
 
-            $Status = "Running the $($BaselineName) Rego Verification; $($N) of $($Len) Rego verifications completed"
-            $ProgressParams = @{
-                'Activity' = "Running the rego for each baseline";
-                'Status' = $Status;
-                'PercentComplete' = $Percent;
-                'Id' = 1;
-            }
-            Write-Progress @ProgressParams
-            $InputFile = Join-Path -Path $OutFolderPath "$($OutProviderFileName).json"
-            $RegoFile = Join-Path -Path $ParentPath -ChildPath "Rego"
-            $RegoFile = Join-Path -Path $RegoFile -ChildPath "$($BaselineName)Config.rego"
-            $params = @{
-                'InputFile' = $InputFile;
-                'RegoFile' = $RegoFile;
-                'PackageName' = $Product;
-                'OPAPath' = $OPAPath
-            }
-            $RetVal = Invoke-Rego @params
-            $TestResults += $RetVal
+                $Status = "Running the $($BaselineName) Rego Verification; $($N) of $($Len) Rego verifications completed"
+                $ProgressParams = @{
+                    'Activity' = "Running the rego for each baseline";
+                    'Status' = $Status;
+                    'PercentComplete' = $Percent;
+                    'Id' = 1;
+                    'ErrorAction' = 'Stop';
+                }
+                Write-Progress @ProgressParams
+                $InputFile = Join-Path -Path $OutFolderPath "$($OutProviderFileName).json" -ErrorAction 'Stop'
+                $RegoFile = Join-Path -Path $ParentPath -ChildPath "Rego" -ErrorAction 'Stop'
+                $RegoFile = Join-Path -Path $RegoFile -ChildPath "$($BaselineName)Config.rego" -ErrorAction 'Stop'
+                $params = @{
+                    'InputFile' = $InputFile;
+                    'RegoFile' = $RegoFile;
+                    'PackageName' = $Product;
+                    'OPAPath' = $OPAPath
+                }
+                try {
+                    $RetVal = Invoke-Rego @params
+                    $TestResults += $RetVal
+                }
+                catch {
+                    Write-Error "Error with the $($BaselineName) Rego invocation. See the exception message for more details:  $($_)"
+                    $ProdRegoFailed += $Product
+                    Write-Warning "$($Product) will be omitted from the output because of the failure above"
+                }
             }
 
-            $TestResultsJson = $TestResults | ConvertTo-Json -Depth 5
-            $FileName = Join-Path -path $OutFolderPath "$($OutRegoFileName).json"
-            $TestResultsJson | Set-Content -Path $FileName -Encoding $(Get-FileEncoding)
+            $TestResultsJson = $TestResults | ConvertTo-Json -Depth 5 -ErrorAction 'Stop'
+            $FileName = Join-Path -Path $OutFolderPath "$($OutRegoFileName).json" -ErrorAction 'Stop'
+            $TestResultsJson | Set-Content -Path $FileName -Encoding $(Get-FileEncoding) -ErrorAction 'Stop'
 
             foreach ($Product in $TestResults) {
                 foreach ($Test in $Product) {
                     # ConvertTo-Csv struggles with the nested nature of the ActualValue
                     # and Commandlet fields. Explicitly convert these to json strings before
                     # calling ConvertTo-Csv
-                    $Test.ActualValue = $Test.ActualValue | ConvertTo-Json -Depth 3 -Compress
+                    $Test.ActualValue = $Test.ActualValue | ConvertTo-Json -Depth 3 -Compress -ErrorAction 'Stop'
                     $Test.Commandlet = $Test.Commandlet -Join ", "
                 }
             }
-
-            $TestResultsCsv = $TestResults | ConvertTo-Csv -NoTypeInformation
-            $CSVFileName = Join-Path -Path $OutFolderPath "$($OutRegoFileName).csv"
-            $TestResultsCsv | Set-Content -Path $CSVFileName -Encoding $(Get-FileEncoding)
+            $TestResultsCsv = $TestResults | ConvertTo-Csv -NoTypeInformation -ErrorAction 'Stop'
+            $CSVFileName = Join-Path -Path $OutFolderPath "$($OutRegoFileName).csv" -ErrorAction 'Stop'
+            $TestResultsCsv | Set-Content -Path $CSVFileName -Encoding $(Get-FileEncoding) -ErrorAction 'Stop'
+            $ProdRegoFailed
+        }
+        catch {
+            $InvokeRegoErrorMessage = "Fatal Error involving the OPA output function. `
+            Ending ScubaGear execution. See the exception message for more details: $($_)"
+            throw $InvokeRegoErrorMessage
         }
     }
+}
 
 function Pluralize {
     <#
@@ -654,116 +702,123 @@ function Invoke-ReportCreation {
         $DarkMode
     )
     process {
-        $N = 0
-        $Len = $ProductNames.Length
-        $Fragment = @()
+        try {
+            $N = 0
+            $Len = $ProductNames.Length
+            $Fragment = @()
+            $IndividualReportFolderName = "IndividualReports"
+            $IndividualReportPath = Join-Path -Path $OutFolderPath -ChildPath $IndividualReportFolderName
+            New-Item -Path $IndividualReportPath -ItemType "Directory" -ErrorAction "SilentlyContinue" | Out-Null
 
-        $IndividualReportFolderName = "IndividualReports"
-        $IndividualReportPath = Join-Path -Path $OutFolderPath -ChildPath $IndividualReportFolderName
-        New-Item -Path $IndividualReportPath -ItemType "Directory" -ErrorAction "SilentlyContinue" | Out-Null
+            $ReporterPath = Join-Path -Path $PSScriptRoot -ChildPath "CreateReport" -ErrorAction 'Stop'
+            $Images = Join-Path -Path $ReporterPath -ChildPath "images" -ErrorAction 'Stop'
+            Copy-Item -Path $Images -Destination $IndividualReportPath -Force -Recurse -ErrorAction 'Stop'
 
-        $ReporterPath = Join-Path -Path $PSScriptRoot -ChildPath "CreateReport"
-        $Images = Join-Path -Path $ReporterPath -ChildPath "images"
-        Copy-Item -Path $Images -Destination $IndividualReportPath -Force -Recurse
+            foreach ($Product in $ProductNames) {
+                $BaselineName = $ArgToProd[$Product]
+                $N += 1
+                $Percent = $N*100/$Len
+                $Status = "Running the $($BaselineName) Report creation; $($N) of $($Len) Baselines Reports created";
+                $ProgressParams = @{
+                    'Activity' = "Creating the reports for each baseline";
+                    'Status' = $Status;
+                    'PercentComplete' = $Percent;
+                    'Id' = 1;
+                    'ErrorAction' = 'Stop';
+                }
+                Write-Progress @ProgressParams
 
-        foreach ($Product in $ProductNames) {
-            $BaselineName = $ArgToProd[$Product]
-            $N += 1
-            $Percent = $N*100/$Len
-            $Status = "Running the $($BaselineName) Report creation; $($N) of $($Len) Baselines Reports created";
-            $ProgressParams = @{
-                'Activity' = "Creating the reports for each baseline"
-                'Status' = $Status;
-                'PercentComplete' = $Percent;
-                'Id' = 1;
+                $FullName = $ProdToFullName[$BaselineName]
+
+                $CreateReportParams = @{
+                    'BaselineName' = $BaselineName;
+                    'FullName' = $FullName;
+                    'IndividualReportPath' = $IndividualReportPath;
+                    'OutPath' = $OutFolderPath;
+                    'OutProviderFileName' = $OutProviderFileName;
+                    'OutRegoFileName' = $OutRegoFileName;
+                    'DarkMode' = $DarkMode;
+                }
+
+                $Report = New-Report @CreateReportParams
+                $LinkPath = "$($IndividualReportFolderName)/$($BaselineName)Report.html"
+                $LinkClassName = '"individual_reports"' # uses no escape characters
+                $Link = "<a class=$($LinkClassName) href='$($LinkPath)'>$($FullName)</a>"
+
+                $PassesSummary = "<div class='summary pass'>$($Report.Passes) tests passed</div>"
+                $WarningsSummary = "<div class='summary'></div>"
+                $FailuresSummary = "<div class='summary'></div>"
+                $ManualSummary = "<div class='summary'></div>"
+                $ErrorSummary = "<div class='summary'></div>"
+
+                if ($Report.Warnings -gt 0) {
+                    $Noun = Pluralize -SingularNoun "warning" -PluralNoun "warnings" -Count $Report.Warnings
+                    $WarningsSummary = "<div class='summary warning'>$($Report.Warnings) $($Noun)</div>"
+                }
+
+                if ($Report.Failures -gt 0) {
+                    $Noun = Pluralize -SingularNoun "test" -PluralNoun "tests" -Count $Report.Failures
+                    $FailuresSummary = "<div class='summary failure'>$($Report.Failures) $($Noun) failed</div>"
+                }
+
+                if ($Report.Manual -gt 0) {
+                    $Noun = Pluralize -SingularNoun "check" -PluralNoun "checks" -Count $Report.Manual
+                    $ManualSummary = "<div class='summary manual'>$($Report.Manual) manual $($Noun) needed</div>"
+                }
+
+                if ($Report.Errors -gt 0) {
+                    $Noun = Pluralize -SingularNoun "check" -PluralNoun "errors" -Count $Report.Manual
+                    $ErrorSummary = "<div class='summary error'>$($Report.Errors) PowerShell $($Noun)</div>"
+                }
+
+                $Fragment += [pscustomobject]@{
+                "Baseline Conformance Reports" = $Link;
+                "Details" = "$($PassesSummary) $($WarningsSummary) $($FailuresSummary) $($ManualSummary) $($ErrorSummary)"
+                }
             }
-            Write-Progress @ProgressParams
-
-            $FullName = $ProdToFullName[$BaselineName]
-
-            $CreateReportParams = @{
-                'BaselineName' = $BaselineName;
-                'FullName' = $FullName;
-                'IndividualReportPath' = $IndividualReportPath;
-                'OutPath' = $OutFolderPath;
-                'OutProviderFileName' = $OutProviderFileName;
-                'OutRegoFileName' = $OutRegoFileName;
-                'DarkMode' = $DarkMode;
+            $TenantMetaData += [pscustomobject]@{
+                "Tenant Display Name" = $TenantDetails.DisplayName;
+                "Tenant Domain Name" = $TenantDetails.DomainName
+                "Tenant ID" = $TenantDetails.TenantId;
+                "Report Date" = $Report.Date;
             }
+            $TenantMetaData = $TenantMetaData | ConvertTo-Html -Fragment -ErrorAction 'Stop'
+            $TenantMetaData = $TenantMetaData -replace '^(.*?)<table>','<table class ="tenantdata" style = "text-align:center;">'
+            $Fragment = $Fragment | ConvertTo-Html -Fragment -ErrorAction 'Stop'
 
-            $Report = New-Report @CreateReportParams
-            $LinkPath = "$($IndividualReportFolderName)/$($BaselineName)Report.html"
-            $LinkClassName = '"individual_reports"' # uses no escape characters
-            $Link = "<a class=$($LinkClassName) href='$($LinkPath)'>$($FullName)</a>"
+            $ReportHtmlPath = Join-Path -Path $ReporterPath -ChildPath "ParentReport" -ErrorAction 'Stop'
+            $ReportHTML = (Get-Content $(Join-Path -Path $ReportHtmlPath -ChildPath "ParentReport.html") -ErrorAction 'Stop') -Join "`n"
+            $ReportHTML = $ReportHTML.Replace("{TENANT_DETAILS}", $TenantMetaData)
+            $ReportHTML = $ReportHTML.Replace("{TABLES}", $Fragment)
+            $ReportHTML = $ReportHTML.Replace("{MODULE_VERSION}", "v$ModuleVersion")
 
-            $PassesSummary = "<div class='summary pass'>$($Report.Passes) tests passed</div>"
-            $WarningsSummary = "<div class='summary'></div>"
-            $FailuresSummary = "<div class='summary'></div>"
-            $ManualSummary = "<div class='summary'></div>"
-            $ErrorSummary = "<div class='summary'></div>"
+            $CssPath = Join-Path -Path $ReporterPath -ChildPath "styles" -ErrorAction 'Stop'
+            $MainCSS = (Get-Content $(Join-Path -Path $CssPath -ChildPath "main.css") -ErrorAction 'Stop') -Join "`n"
+            $ReportHTML = $ReportHTML.Replace("{MAIN_CSS}", "<style>$($MainCSS)</style>")
 
-            if ($Report.Warnings -gt 0) {
-                $Noun = Pluralize -SingularNoun "warning" -PluralNoun "warnings" -Count $Report.Warnings
-                $WarningsSummary = "<div class='summary warning'>$($Report.Warnings) $($Noun)</div>"
-            }
+            $ParentCSS = (Get-Content $(Join-Path -Path $CssPath -ChildPath "ParentReportStyle.css") -ErrorAction 'Stop') -Join "`n"
+            $ReportHTML = $ReportHTML.Replace("{PARENT_CSS}", "<style>$($ParentCSS)</style>")
 
-            if ($Report.Failures -gt 0) {
-                $Noun = Pluralize -SingularNoun "test" -PluralNoun "tests" -Count $Report.Failures
-                $FailuresSummary = "<div class='summary failure'>$($Report.Failures) $($Noun) failed</div>"
-            }
+            $ScriptsPath = Join-Path -Path $ReporterPath -ChildPath "scripts" -ErrorAction 'Stop'
+            $ParentReportJS = (Get-Content $(Join-Path -Path $ScriptsPath -ChildPath "ParentReport.js") -ErrorAction 'Stop') -Join "`n"
+            $UtilsJS = (Get-Content $(Join-Path -Path $ScriptsPath -ChildPath "utils.js") -ErrorAction 'Stop') -Join "`n"
+            $ParentReportJS = "$($ParentReportJS)`n$($UtilsJS)"
+            $ReportHTML = $ReportHTML.Replace("{MAIN_JS}", "<script>
+                let darkMode = $($DarkMode.ToString().ToLower());
+                $($ParentReportJS)
+            </script>")
 
-            if ($Report.Manual -gt 0) {
-                $Noun = Pluralize -SingularNoun "check" -PluralNoun "checks" -Count $Report.Manual
-                $ManualSummary = "<div class='summary manual'>$($Report.Manual) manual $($Noun) needed</div>"
-            }
-
-            if ($Report.Errors -gt 0) {
-                $Noun = Pluralize -SingularNoun "check" -PluralNoun "errors" -Count $Report.Manual
-                $ErrorSummary = "<div class='summary error'>$($Report.Errors) PowerShell $($Noun)</div>"
-            }
-
-            $Fragment += [pscustomobject]@{
-            "Baseline Conformance Reports" = $Link;
-            "Details" = "$($PassesSummary) $($WarningsSummary) $($FailuresSummary) $($ManualSummary) $($ErrorSummary)"
+            Add-Type -AssemblyName System.Web -ErrorAction 'Stop'
+            $ReportFileName = Join-Path -Path $OutFolderPath "$($OutReportName).html" -ErrorAction 'Stop'
+            [System.Web.HttpUtility]::HtmlDecode($ReportHTML) | Out-File $ReportFileName -ErrorAction 'Stop'
+            if ($Quiet -eq $False) {
+                Invoke-Item $ReportFileName
             }
         }
-        $TenantMetaData += [pscustomobject]@{
-            "Tenant Display Name" = $TenantDetails.DisplayName;
-            "Tenant Domain Name" = $TenantDetails.DomainName
-            "Tenant ID" = $TenantDetails.TenantId;
-            "Report Date" = $Report.Date;
-        }
-        $TenantMetaData = $TenantMetaData | ConvertTo-Html -Fragment
-        $TenantMetaData = $TenantMetaData -replace '^(.*?)<table>','<table class ="tenantdata" style = "text-align:center;">'
-        $Fragment = $Fragment | ConvertTo-Html -Fragment
-
-        $ReportHtmlPath = Join-Path -Path $ReporterPath -ChildPath "ParentReport"
-        $ReportHTML = (Get-Content $(Join-Path -Path $ReportHtmlPath -ChildPath "ParentReport.html")) -Join "`n"
-        $ReportHTML = $ReportHTML.Replace("{TENANT_DETAILS}", $TenantMetaData)
-        $ReportHTML = $ReportHTML.Replace("{TABLES}", $Fragment)
-        $ReportHTML = $ReportHTML.Replace("{MODULE_VERSION}", "v$ModuleVersion")
-
-        $CssPath = Join-Path -Path $ReporterPath -ChildPath "styles"
-        $MainCSS = (Get-Content $(Join-Path -Path $CssPath -ChildPath "main.css")) -Join "`n"
-        $ReportHTML = $ReportHTML.Replace("{MAIN_CSS}", "<style>$($MainCSS)</style>")
-
-        $ParentCSS = (Get-Content $(Join-Path -Path $CssPath -ChildPath "ParentReportStyle.css")) -Join "`n"
-        $ReportHTML = $ReportHTML.Replace("{PARENT_CSS}", "<style>$($ParentCSS)</style>")
-
-        $ScriptsPath = Join-Path -Path $ReporterPath -ChildPath "scripts"
-        $ParentReportJS = (Get-Content $(Join-Path -Path $ScriptsPath -ChildPath "ParentReport.js")) -Join "`n"
-        $UtilsJS = (Get-Content $(Join-Path -Path $ScriptsPath -ChildPath "utils.js")) -Join "`n"
-        $ParentReportJS = "$($ParentReportJS)`n$($UtilsJS)"
-        $ReportHTML = $ReportHTML.Replace("{MAIN_JS}", "<script>
-            let darkMode = $($DarkMode.ToString().ToLower());
-            $($ParentReportJS)
-        </script>")
-
-        Add-Type -AssemblyName System.Web
-        $ReportFileName = Join-Path -Path $OutFolderPath "$($OutReportName).html"
-        [System.Web.HttpUtility]::HtmlDecode($ReportHTML) | Out-File $ReportFileName
-        if ($Quiet -eq $False) {
-            Invoke-Item $ReportFileName
+        catch {
+            $InvokeReportErrorMessage = "Fatal Error involving the Report Creation. `
+            Ending ScubaGear execution. See the exception message for more details: $($_)"
+            throw $InvokeReportErrorMessage
         }
     }
 }
@@ -872,6 +927,37 @@ function Invoke-Connection {
     }
 }
 
+function Compare-ProductList {
+    <#
+    .Description
+    Compares two ProductNames Lists and returns the Diff between them
+    Used to compare a failed execution list with the original list
+    .Functionality
+    Internal
+    #>
+    param(
+
+        [Parameter(Mandatory=$true)]
+        [string[]]
+        $ProductNames,
+
+        [Parameter(Mandatory=$true)]
+        [string[]]
+        $ProductsFailed,
+
+        [Parameter(Mandatory=$true)]
+        [string]
+        $ExceptionMessage
+    )
+
+    $Difference = Compare-Object $ProductNames -DifferenceObject $ProductsFailed -PassThru
+    if (-not $Difference) {
+        throw "$($ExceptionMessage); aborting ScubaGear execution"
+    }
+    else {
+        $Difference
+    }
+}
 
 function Get-ServicePrincipalParams {
     <#
@@ -916,28 +1002,37 @@ function Import-Resources {
     Internal
     #>
     [CmdletBinding()]
-    $ProvidersPath = Join-Path -Path $PSScriptRoot `
-    -ChildPath "Providers" `
-    -Resolve
-    $ProviderResources = Get-ChildItem $ProvidersPath -Recurse | Where-Object { $_.Name -like 'Export*.psm1' }
-    if (!$ProviderResources)
-    {
-        throw "Provider files were not found, aborting this run"
-    }
+    param()
+    try {
+        $ProvidersPath = Join-Path -Path $PSScriptRoot `
+        -ChildPath "Providers" `
+        -Resolve `
+        -ErrorAction 'Stop'
+        $ProviderResources = Get-ChildItem $ProvidersPath -Recurse | Where-Object { $_.Name -like 'Export*.psm1' }
+        if (!$ProviderResources)
+        {
+            throw "Provider files were not found, aborting this run"
+        }
 
-    foreach ($Provider in $ProviderResources.Name) {
-        $ProvidersPath = Join-Path -Path $PSScriptRoot -ChildPath "Providers"
-        $ModulePath = Join-Path -Path $ProvidersPath -ChildPath $Provider
-        Import-Module $ModulePath
+        foreach ($Provider in $ProviderResources.Name) {
+            $ProvidersPath = Join-Path -Path $PSScriptRoot -ChildPath "Providers" -ErrorAction 'Stop'
+            $ModulePath = Join-Path -Path $ProvidersPath -ChildPath $Provider -ErrorAction 'Stop'
+            Import-Module $ModulePath
+        }
+        $ConnectionPath = Join-Path -Path $PSScriptRoot -ChildPath "Connection" -ErrorAction 'Stop'
+        $RegoPath = Join-Path -Path $PSScriptRoot -ChildPath "RunRego" -ErrorAction 'Stop'
+        $ReporterPath = Join-Path -Path $PSScriptRoot -ChildPath "CreateReport" -ErrorAction 'Stop'
+        $ScubaConfigPath = Join-Path -Path $PSScriptRoot -ChildPath "ScubaConfig" -ErrorAction 'Stop'
+        Import-Module $ConnectionPath
+        Import-Module $RegoPath
+        Import-Module $ReporterPath
+        Import-Module $ScubaConfigPath
     }
-    $ConnectionPath = Join-Path -Path $PSScriptRoot -ChildPath "Connection"
-    $RegoPath = Join-Path -Path $PSScriptRoot -ChildPath "RunRego"
-    $ReporterPath = Join-Path -Path $PSScriptRoot -ChildPath "CreateReport"
-    $ScubaConfigPath = Join-Path -Path $PSScriptRoot -ChildPath "ScubaConfig"
-    Import-Module $ConnectionPath
-    Import-Module $RegoPath
-    Import-Module $ReporterPath
-    Import-Module $ScubaConfigPath
+    catch {
+        $ImportResourcesErrorMessage = "Fatal Error involving importing PowerShell modules. `
+            Ending ScubaGear execution. See the exception message for more details: $($_)"
+            throw $ImportResourcesErrorMessage
+    }
 }
 
 function Remove-Resources {
