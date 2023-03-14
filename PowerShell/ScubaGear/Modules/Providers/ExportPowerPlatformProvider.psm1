@@ -98,7 +98,7 @@ function Export-PowerPlatformProvider {
             }
             # spacing is intentional
             $EnvErrorMessage = @"
-"Power Platform Provider ERROR: The M365Environment parameter value is not set correctly which SHALL cause the Power Platform report to display incorrect values.
+"Power Platform Provider ERROR: The M365Environment parameter value is not set correctly which WILL cause the Power Platform report to display incorrect values.
             ---------------------------------------
             M365Environment Parameter value: $($M365Environment)
             Your tenant's OpenId-Configuration: tenant_region_scope: $($RegionScope), tenant_region_sub_scope: $($RegionSubScope)
@@ -124,9 +124,8 @@ $($_)
         dod: tenant_region_scope:USGov, tenant_region_sub_scope: DOD
         ---------------------------------------
         Example Rerun for gcc tenants: Invoke-Scuba -M365Environment gcc
-        See Rerun
 "@
-        Write-Warning $FullEnvErrorMessage
+        throw $FullEnvErrorMessage
     }
 
     # 2.1
