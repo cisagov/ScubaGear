@@ -11,46 +11,67 @@
 # Set prefernces for writing messages
 $DebugPreference = "Continue"
 $InformationPreference = "Continue"
+$ErrorActionPreference = "Stop"
 
 # Set expected version and OutFile path
-$Expected_version = "0.42.1"
-$Install_url= "https://openpolicyagent.org/downloads/v$($Expected_version)/opa_windows_amd64.exe"
-$OutFile=(Join-Path $pwd.Path $Install_url.SubString($Install_url.LastIndexOf('/')))
+$ExpectedVersion = "0.42.1"
+$InstallUrl= "https://openpolicyagent.org/downloads/v$($ExpectedVersion)/opa_windows_amd64.exe"
+$OutFile=(Join-Path $pwd.Path $InstallUrl.SubString($InstallUrl.LastIndexOf('/')))
+$ExpectedHash ="5D71028FED935DC98B9D69369D42D2C03CE84A7720D61ED777E10AAE7528F399"
 
 # Download files
-Write-Information "Downloading $Install_url`n"
-$uri=New-Object "System.Uri" "$Install_url"
-$request=[System.Net.HttpWebRequest]::Create($uri)
-$request.set_Timeout(5000)
-$response=$request.GetResponse()
-#$totalLength=[System.Math]::Floor($response.get_ContentLength()/1024)
-#$length=$response.get_ContentLength()
-$responseStream=$response.GetResponseStream()
-$destStream=New-Object -TypeName System.IO.FileStream -ArgumentList $OutFile, Create
-$buffer=New-Object byte[] 10KB
-$count=$responseStream.Read($buffer,0,$buffer.length)
-$downloadedBytes=$count
-while ($count -gt 0)
-    {
-    [System.Console]::CursorLeft=0
-#    [System.Console]::Write("Downloaded {0}K of {1}K ({2}%)", [System.Math]::Floor($downloadedBytes/1024), $totalLength, [System.Math]::Round(($downloadedBytes / $length) * 100,0))
-    $destStream.Write($buffer, 0, $count)
-    $count=$responseStream.Read($buffer,0,$buffer.length)
-    $downloadedBytes+=$count
-    }
-Write-Information ""
-Write-Information "`nDownload of `"$OutFile`" finished."
-$destStream.Flush()
-$destStream.Close()
-$destStream.Dispose()
-$responseStream.Dispose()
+try {
+    Write-Information "Downloading $InstallUrl`n"
+    $Uri=New-Object "System.Uri" "$InstallUrl"
+    $Request=[System.Net.HttpWebRequest]::Create($Uri)
+    $Request.set_Timeout(5000)
+    $Response=$Request.GetResponse()
+}
+catch {
+    "An error has occurred: Unable to reach the download URL"
+}
+try {
+    $ResponseStream=$Response.GetResponseStream()
+    $DestStream=New-Object -TypeName System.IO.FileStream -ArgumentList $OutFile, Create
+    $Buffer=New-Object byte[] 10KB
+    $Count=$ResponseStream.Read($Buffer,0,$Buffer.length)
+    $DownloadedBytes=$Count
+    while ($Count -gt 0)
+        {
+        [System.Console]::CursorLeft=0
+        $DestStream.Write($Buffer, 0, $Count)
+        $Count=$ResponseStream.Read($Buffer,0,$Buffer.length)
+        $DownloadedBytes+=$Count
+        }
+    Write-Information ""
+    Write-Information "`nDownload of `"$OutFile`" finished."
+}
+catch {
+    "An error has occurred: Unable to download OPA executable, try manual install see details in README"
+}
+$DestStream.Flush()
+$DestStream.Close()
+$DestStream.Dispose()
+$ResponseStream.Dispose()
 
-# Version checks
-$Installed_Version= .\opa_windows_amd64.exe version | Select-Object -First 1
-if ($Installed_Version -eq "Version: $($Expected_version)")
+# Hash checks
+if ((Get-FileHash .\opa_windows_amd64.exe).Hash -eq $ExpectedHash)
     {
-    Write-Information "`nDownloaed OPA version` `"$Installed_Version`" meets the ScubaGear Requirement"
+    Write-Information "SHA256 verified successful"
     }
 else {
-    Write-Information "`nDownloaed OPA version` `"$Installed_Version`" does not meet the ScubaGear Requirement of` `"$Expected_version`""
+    Write-Information "SHA256 verified failed, try re-download or manual install see details in README "
 }
+# Version checks
+$InstalledVersion= .\opa_windows_amd64.exe version | Select-Object -First 1
+if ($InstalledVersion -eq "Version: $($ExpectedVersion)")
+    {
+    Write-Information "`nDownloaded OPA version` `"$InstalledVersion`" meets the ScubaGear Requirement"
+    }
+else {
+    Write-Information "`nDownloaded OPA version` `"$InstalledVersion`" does not meet the ScubaGear Requirement of` `"$ExpectedVersion`""
+}
+
+$DebugPreference = "SilientlyContinue"
+$InformationPreference = "SilientlyContinue"
+$ErrorActionPreference = "Continue"
