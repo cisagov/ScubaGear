@@ -45,7 +45,7 @@ In the event of unsuccessful downloads, users can manually download the OPA exec
 3. Navigate to the menu on left side of the screen: Introduction - Running OPA - Download OPA 
 4. Locate the downeloaded file and open powershell and use the following command to check downloaded OPA version
 ```powershell
-\opa_windows_amd64.exe version
+.\opa_windows_amd64.exe version
 ```
 
 ## Usage
