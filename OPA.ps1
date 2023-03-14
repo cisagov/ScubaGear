@@ -21,38 +21,16 @@ $ExpectedHash ="5D71028FED935DC98B9D69369D42D2C03CE84A7720D61ED777E10AAE7528F399
 
 # Download files
 try {
-    Write-Information "Downloading $InstallUrl`n"
-    $Uri=New-Object "System.Uri" "$InstallUrl"
-    $Request=[System.Net.HttpWebRequest]::Create($Uri)
-    $Request.set_Timeout(5000)
-    $Response=$Request.GetResponse()
-}
-catch {
-    "An error has occurred: Unable to reach the download URL"
-}
-try {
-    $ResponseStream=$Response.GetResponseStream()
-    $DestStream=New-Object -TypeName System.IO.FileStream -ArgumentList $OutFile, Create
-    $Buffer=New-Object byte[] 10KB
-    $Count=$ResponseStream.Read($Buffer,0,$Buffer.length)
-    $DownloadedBytes=$Count
-    while ($Count -gt 0)
-        {
-        [System.Console]::CursorLeft=0
-        $DestStream.Write($Buffer, 0, $Count)
-        $Count=$ResponseStream.Read($Buffer,0,$Buffer.length)
-        $DownloadedBytes+=$Count
-        }
+    Write-Information "Downloading $InstallUrl"
+    $WebClient = New-Object System.Net.WebClient
+    $WebClient.DownloadFile($InstallUrl, $OutFile)
     Write-Information ""
     Write-Information "`nDownload of `"$OutFile`" finished."
 }
 catch {
     "An error has occurred: Unable to download OPA executable, try manual install see details in README"
 }
-$DestStream.Flush()
-$DestStream.Close()
-$DestStream.Dispose()
-$ResponseStream.Dispose()
+$WebClient.Dispose()
 
 # Hash checks
 if ((Get-FileHash .\opa_windows_amd64.exe).Hash -eq $ExpectedHash)
@@ -66,10 +44,10 @@ else {
 $InstalledVersion= .\opa_windows_amd64.exe version | Select-Object -First 1
 if ($InstalledVersion -eq "Version: $($ExpectedVersion)")
     {
-    Write-Information "`nDownloaded OPA version` `"$InstalledVersion`" meets the ScubaGear Requirement"
+    Write-Information "`Downloaded OPA version` `"$InstalledVersion`" meets the ScubaGear Requirement"
     }
 else {
-    Write-Information "`nDownloaded OPA version` `"$InstalledVersion`" does not meet the ScubaGear Requirement of` `"$ExpectedVersion`""
+    Write-Information "`Downloaded OPA version` `"$InstalledVersion`" does not meet the ScubaGear Requirement of` `"$ExpectedVersion`""
 }
 
 $DebugPreference = "SilientlyContinue"
