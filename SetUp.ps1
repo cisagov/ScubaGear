@@ -113,6 +113,7 @@ if ($NoOPA -eq $true) {
 else {
     try {
     $ScriptDir = Split-Path -Path $MyInvocation.MyCommand.Definition -Parent
+    $DebugPreference = 'Continue'
     . $ScriptDir\OPA.ps1
     }
     catch {
