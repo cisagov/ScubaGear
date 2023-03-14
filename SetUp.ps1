@@ -29,7 +29,7 @@ param(
     [switch]
     $DoNotAutoTrustRepository,
 
-    [Parameter(HelpMessage = 'Do not automatically trust the PSGallery repository for module installation')]
+    [Parameter(HelpMessage = 'Do not download OPA')]
     [switch]
     $NoOPA
 )
