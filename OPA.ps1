@@ -52,7 +52,7 @@ Try {
         Write-Information "`Downloaded OPA version` `"$InstalledVersion`" meets the ScubaGear requirement"
         }
     else {
-        Write-Information "`Downloaded OPA version` `"$InstalledVersion`" does not meet the ScubaGear Requirement of` `"$ExpectedVersion`""
+        Write-Information "`Downloaded OPA version` `"$InstalledVersion`" does not meet the ScubaGear requirement of` `"$ExpectedVersion`""
     }
 }
 catch {
