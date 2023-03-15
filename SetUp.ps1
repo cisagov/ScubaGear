@@ -27,7 +27,11 @@ param(
 
     [Parameter(HelpMessage = 'Do not automatically trust the PSGallery repository for module installation')]
     [switch]
-    $DoNotAutoTrustRepository
+    $DoNotAutoTrustRepository,
+
+    [Parameter(HelpMessage = 'Do not download OPA')]
+    [switch]
+    $NoOPA
 )
 
 # Set preferences for writing messages
@@ -109,9 +113,24 @@ foreach ($Module in $ModuleList) {
     }
 }
 
+if ($NoOPA -eq $true) {
+    Write-Debug "Skipping Download for OPA."
+}
+else {
+    $DebugPreference = 'Continue'
+    try {
+    $ScriptDir = Split-Path -Path $MyInvocation.MyCommand.Definition -Parent
+    . $ScriptDir\OPA.ps1
+    }
+    catch {
+        Write-Error "An error occurred: cannot call OPA download script"
+    }
+}
+
 # Stop the clock and report total elapsed time
 $Stopwatch.stop()
 
 Write-Debug "ScubaGear setup time elapsed:  $([math]::Round($stopwatch.Elapsed.TotalSeconds,0)) seconds."
+
 $DebugPreference = "SilentlyContinue"
 $InformationPreference = "SilentlyContinue"
