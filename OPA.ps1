@@ -15,7 +15,8 @@ $ErrorActionPreference = "Stop"
 
 # Set expected version and OutFile path
 $ExpectedVersion = "0.42.1"
-$InstallUrl= "https://openpolicyagent.org/downloads/v$($ExpectedVersion)/opa_windows_amd64.exe"
+$OPAExe = "opa_windows_amd64.exe"
+$InstallUrl = "https://openpolicyagent.org/downloads/v$($ExpectedVersion)/$OPAExe"
 $OutFile=(Join-Path (Get-Location).Path $InstallUrl.SubString($InstallUrl.LastIndexOf('/')))
 $ExpectedHash ="5D71028FED935DC98B9D69369D42D2C03CE84A7720D61ED777E10AAE7528F399"
 
