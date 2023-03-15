@@ -43,7 +43,7 @@ else {
 }
 # Version checks
 Try {
-    $InstalledVersion= .\opa_windows_amd64.exe version | Select-Object -First 1
+    $InstalledVersion= .\$OPAExe version | Select-Object -First 1
     if ($InstalledVersion -eq "Version: $($ExpectedVersion)")
         {
         Write-Information "`Downloaded OPA version` `"$InstalledVersion`" meets the ScubaGear Requirement"
