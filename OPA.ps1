@@ -49,7 +49,7 @@ Try {
     $InstalledVersion= $(& "./$($OPAExe)" @OPAArgs) | Select-Object -First 1
     if ($InstalledVersion -eq "Version: $($ExpectedVersion)")
         {
-        Write-Information "`Downloaded OPA version` `"$InstalledVersion`" meets the ScubaGear Requirement"
+        Write-Information "`Downloaded OPA version` `"$InstalledVersion`" meets the ScubaGear requirement"
         }
     else {
         Write-Information "`Downloaded OPA version` `"$InstalledVersion`" does not meet the ScubaGear Requirement of` `"$ExpectedVersion`""
