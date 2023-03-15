@@ -41,7 +41,7 @@ if ((Get-FileHash .\opa_windows_amd64.exe).Hash -eq $ExpectedHash)
     Write-Information "SHA256 verified successfully"
     }
 else {
-    Write-Information "SHA256 verified failed, try re-download or manual install see details in README"
+    Write-Information "SHA256 verification failed, retry download or install manually. See README under 'Download the required OPA executable' for instructions."
 }
 # Version checks
 Try {
