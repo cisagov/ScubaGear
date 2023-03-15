@@ -31,7 +31,9 @@ try {
 catch {
     Write-Error "An error has occurred: Unable to download OPA executable. To try manually downloading, see details in README under 'Download the required OPA executable'"
 }
-$WebClient.Dispose()
+finally {
+    $WebClient.Dispose()
+}
 
 # Hash checks
 if ((Get-FileHash .\opa_windows_amd64.exe).Hash -eq $ExpectedHash)
