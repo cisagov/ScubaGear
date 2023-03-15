@@ -107,6 +107,7 @@ function Get-EXOTenantDetail {
     param (
         [Parameter(Mandatory = $true)]
         [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $false)]
+        [ValidateNotNullOrEmpty()]
         [string]
         $M365Environment
     )
@@ -167,10 +168,12 @@ function Invoke-RobustDnsTxt {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
         [string]
         $Qname,
 
         [Parameter(Mandatory=$false)]
+        [ValidateNotNullOrEmpty()]
         [string]
         $MaxTries = 2
     )
@@ -289,6 +292,7 @@ function Get-ScubaSpfRecords {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
         [System.Object[]]
         $Domains
     )
@@ -326,6 +330,7 @@ function Get-ScubaDkimRecords {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
         [System.Object[]]
         $Domains
     )
@@ -381,6 +386,7 @@ function Get-ScubaDmarcRecords {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
         [System.Object[]]
         $Domains
     )

@@ -123,6 +123,7 @@ function Invoke-SCuBA {
         $M365Environment = "commercial",
 
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
+        [ValidateNotNullOrEmpty()]
         [ValidateScript({Test-Path -PathType Container $_})]
         [string]
         $OPAPath = (Join-Path -Path $PSScriptRoot -ChildPath "..\..\.."),
@@ -134,22 +135,27 @@ function Invoke-SCuBA {
         $LogIn = $true,
 
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
+        [ValidateNotNullOrEmpty()]
         [switch]
         $DisconnectOnExit,
 
         [Parameter(ParameterSetName = 'VersionOnly')]
+        [ValidateNotNullOrEmpty()]
         [switch]
         $Version,
 
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
+        [ValidateNotNullOrEmpty()]
         [string]
         $AppID,
 
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
+        [ValidateNotNullOrEmpty()]
         [string]
         $CertificateThumbprint,
 
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
+        [ValidateNotNullOrEmpty()]
         [string]
         $Organization,
 
@@ -179,6 +185,7 @@ function Invoke-SCuBA {
         $OutReportName = "BaselineReports",
 
         [Parameter(Mandatory = $true, ParameterSetName = 'Configuration')]
+        [ValidateNotNullOrEmpty()]
         [ValidateScript({
             if (-Not ($_ | Test-Path)){
                 throw "SCuBA configuration file or folder does not exist."
@@ -192,6 +199,7 @@ function Invoke-SCuBA {
         $ConfigFilePath,
 
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
+        [ValidateNotNullOrEmpty()]
         [switch]
         $DarkMode
     )
@@ -381,30 +389,39 @@ function Invoke-ProviderList {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", "onedrive", '*', IgnoreCase = $false)]
         [string[]]
         $ProductNames,
 
         [Parameter(Mandatory = $true)]
+        [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $false)]
+        [ValidateNotNullOrEmpty()]
         [string]
         $M365Environment,
 
         [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
         [string]
         $TenantDetails,
 
         [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
         [string]
         $ModuleVersion,
 
         [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
         [string]
         $OutFolderPath,
 
         [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
         [string]
         $OutProviderFileName,
 
         [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
         [hashtable]
         $BoundParameters
     )
@@ -536,25 +553,32 @@ function Invoke-RunRego {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", "onedrive", '*', IgnoreCase = $false)]
         [string[]]
         $ProductNames,
 
+        [ValidateNotNullOrEmpty()]
         [string]
         $OPAPath = $PSScriptRoot,
 
         [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
         [String]
         $ParentPath,
 
         [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
         [String]
         $OutFolderPath,
 
         [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
         [String]
         $OutProviderFileName,
 
         [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
         [string]
         $OutRegoFileName
     )
@@ -635,14 +659,17 @@ function Pluralize {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
         [string]
         $SingularNoun,
 
         [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
         [string]
         $PluralNoun,
 
         [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
         [int]
         $Count
     )
@@ -669,38 +696,48 @@ function Invoke-ReportCreation {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", "onedrive", '*', IgnoreCase = $false)]
         [string[]]
         $ProductNames,
 
         [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
         [object]
         $TenantDetails,
 
         [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
         [string]
         $ModuleVersion,
 
         [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
         [string]
         $OutFolderPath,
 
         [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
         [string]
         $OutProviderFileName,
 
         [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
         [string]
         $OutRegoFileName,
 
         [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
         [string]
         $OutReportName,
 
         [Parameter(Mandatory = $false)]
+        [ValidateNotNullOrEmpty()]
         [boolean]
         $Quiet = $false,
 
         [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
         [switch]
         $DarkMode
     )
@@ -838,11 +875,13 @@ function Get-TenantDetail {
     param (
         [Parameter(Mandatory=$true)]
         [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", "onedrive", IgnoreCase = $false)]
+        [ValidateNotNullOrEmpty()]
         [string[]]
         $ProductNames,
 
         [Parameter(Mandatory = $true)]
         [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $false)]
+        [ValidateNotNullOrEmpty()]
         [string]
         $M365Environment
     )
@@ -894,14 +933,18 @@ function Invoke-Connection {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
         [boolean]
         $LogIn,
 
         [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", "onedrive", '*', IgnoreCase = $false)]
         [string[]]
         $ProductNames,
 
         [ValidateSet("commercial", "gcc", "gcchigh", "dod")]
+        [ValidateNotNullOrEmpty()]
         [string]
         $M365Environment = "commercial",
 
@@ -941,14 +984,19 @@ function Compare-ProductList {
     param(
 
         [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", "onedrive", '*', IgnoreCase = $false)]
         [string[]]
         $ProductNames,
 
         [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", "onedrive", '*', IgnoreCase = $false)]
         [string[]]
         $ProductsFailed,
 
         [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
         [string]
         $ExceptionMessage
     )
@@ -973,6 +1021,7 @@ function Get-ServicePrincipalParams {
     [CmdletBinding()]
     param(
     [Parameter(Mandatory=$true)]
+    [ValidateNotNullOrEmpty()]
     [hashtable]
     $BoundParameters
     )
@@ -1172,11 +1221,13 @@ function Invoke-RunCached {
 
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateSet("commercial", "gcc", "gcchigh", "dod")]
+        [ValidateNotNullOrEmpty()]
         [string]
         $M365Environment = "commercial",
 
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateScript({Test-Path -PathType Container $_})]
+        [ValidateNotNullOrEmpty()]
         [string]
         $OPAPath = (Join-Path -Path $PSScriptRoot -ChildPath "..\..\.."),
 
@@ -1187,18 +1238,22 @@ function Invoke-RunCached {
         $LogIn = $true,
 
         [Parameter(ParameterSetName = 'Report')]
+        [ValidateNotNullOrEmpty()]
         [switch]
         $Version,
 
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
+        [ValidateNotNullOrEmpty()]
         [string]
         $AppID,
 
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
+        [ValidateNotNullOrEmpty()]
         [string]
         $CertificateThumbprint,
 
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
+        [ValidateNotNullOrEmpty()]
         [string]
         $Organization,
 

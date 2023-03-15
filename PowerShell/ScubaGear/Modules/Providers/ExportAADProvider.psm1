@@ -168,6 +168,7 @@ function Get-PrivilegedUser {
     Internal
     #>
     param (
+        [ValidateNotNullOrEmpty()]
         [switch]
         $TenantHasPremiumLicense
     )
@@ -275,6 +276,7 @@ function Get-PrivilegedRole {
     Internal
     #>
     param (
+        [ValidateNotNullOrEmpty()]
         [switch]
         $TenantHasPremiumLicense
     )

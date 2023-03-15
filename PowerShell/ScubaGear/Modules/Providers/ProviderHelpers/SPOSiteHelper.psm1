@@ -9,10 +9,12 @@ function Get-SPOSiteHelper {
     param(
         [Parameter(Mandatory = $true, ParameterSetName = 'Report')]
         [ValidateSet("commercial", "gcc", "gcchigh", "dod")]
+        [ValidateNotNullOrEmpty()]
         [string]
         $M365Environment,
 
         [Parameter(Mandatory = $true, ParameterSetName = 'Report')]
+        [ValidateNotNullOrEmpty()]
         [string]
         $InitialDomainPrefix
     )
