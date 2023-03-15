@@ -38,7 +38,7 @@ finally {
 # Hash checks
 if ((Get-FileHash .\opa_windows_amd64.exe).Hash -eq $ExpectedHash)
     {
-    Write-Information "SHA256 verified successful"
+    Write-Information "SHA256 verified successfully"
     }
 else {
     Write-Information "SHA256 verified failed, try re-download or manual install see details in README"
