@@ -88,6 +88,18 @@ tests[{
     Conditions := [Case1, Case2]
     Status := count([Condition | Condition = Conditions[_]; Condition == true]) > 0
 }
+
+tests[{
+    "Requirement" : "An expiration date SHOULD be set for Anyone links",
+    "Control" : "OneDrive 2.2",
+    "Criticality" : "Should/Not-Implemented",
+    "Commandlet" : [],
+    "ActualValue" : [],
+    "ReportDetails" : "Currently cannot be checked automatically while using Service Principals. See Onedrive Secure Configuration Baseline policy 2.2 for instructions on manual check",
+    "RequirementMet" : false
+}] {
+    input.OneDrive_PnP_Flag
+}
 #--
 
 
@@ -147,6 +159,18 @@ tests[{
     Case2 := count([Condition | Condition = Conditions2[_]; Condition == false]) == 0
     Conditions := [Case1, Case2]
     Status := count([Condition | Condition = Conditions[_]; Condition == true]) > 0
+}
+
+tests[{
+    "Requirement" : "Anyone link permissions SHOULD be limited to View",
+    "Control" : "OneDrive 2.3",
+    "Criticality" : "Should/Not-Implemented",
+    "Commandlet" : [],
+    "ActualValue" : [],
+    "ReportDetails" : "Currently cannot be checked automatically while using Service Principals. See Onedrive Secure Configuration Baseline policy 2.3 for instructions on manual check",
+    "RequirementMet" : false
+}] {
+    input.OneDrive_PnP_Flag
 }
 #--
 
