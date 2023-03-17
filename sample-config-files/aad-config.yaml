@@ -31,16 +31,16 @@ GlobalVars:  # For cross product variables
   AllProductVar: value_example
 Aad:
 # All AAD specific variables go here 
-  Policy2_1: &CommonExclusions
+  Policy2_1_1: &CommonExclusions
     CapExclusions:
       Users:
         - fc29f4a8-2b27-4d1e-898e-cfacb98bd8f8
       Groups:
         - 08adb07a-956f-450e-b41c-81e92e3db2c4
-  Policy2_2:  *CommonExclusions
-  Policy2_3:  *CommonExclusions
-  Policy2_4:  *CommonExclusions
-  Policy2_9:  *CommonExclusions
-  Policy2_10: *CommonExclusions
+  Policy2_2_1:  *CommonExclusions
+  Policy2_3_1:  *CommonExclusions
+  Policy2_4_1:  *CommonExclusions
+  Policy2_9_1:  *CommonExclusions
+  Policy2_10_1: *CommonExclusions
 #SharePoint:
 #Teams:

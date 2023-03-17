@@ -92,20 +92,36 @@ ReportDetailsBooleanLicenseWarning(_) = Description if {
 ################
 default UserExclusionsFullyExempt(_, _) := false
 UserExclusionsFullyExempt(Policy, PolicyID) := true if {
+    # Returns true when all user exclusions present in the conditional 
+    # access policy are exempted in matching config variable for the
+    # baseline policy item.  Undefined if no exclusions AND no exemptions.
     ExemptedUsers := input.scuba_config.Aad[PolicyID].CapExclusions.Users
     ExcludedUsers := { x | x := Policy.Conditions.Users.ExcludeUsers[_] }
     AllowedExcludedUsers := { y | y := ExemptedUsers[_] }
-    AllowedExcludedUsers
     count(ExcludedUsers - AllowedExcludedUsers) == 0
+}
+
+UserExclusionsFullyExempt(Policy, PolicyID) := true if {
+    # Returns true when user inputs are not defined or user exclusion lists are empty
+    count({ x | x := Policy.Conditions.Users.ExcludeUsers[_] }) == 0
+    count({ y | y := input.scuba_config.Aad[PolicyID].CapExclusions.Users }) == 0
 }
 
 default GroupExclusionsFullyExempt(_, _) := false
 GroupExclusionsFullyExempt(Policy, PolicyID) := true if {
+    # Returns true when all group exclusions present in the conditional 
+    # access policy are exempted in matching config variable for the 
+    # baseline policy item.  Undefined if no exclusions AND no exemptions.
     ExemptedGroups := input.scuba_config.Aad[PolicyID].CapExclusions.Groups
     ExcludedGroups := { x | x := Policy.Conditions.Users.ExcludeGroups[_] }
     AllowedExcludedGroups := { y | y:= ExemptedGroups[_] }
-    AllowedExcludedGroups
     count(ExcludedGroups - AllowedExcludedGroups) == 0
+}
+
+GroupExclusionsFullyExempt(Policy, PolicyID) := true if {
+    # Returns true when user inputs are not defined or group exclusion lists are empty
+    count({ x | x := Policy.Conditions.Users.ExcludeGroups[_] }) == 0
+    count({ y | y := input.scuba_config.Aad[PolicyID].CapExclusions.Groups }) == 0
 }
 
 ################
@@ -116,8 +132,8 @@ GroupExclusionsFullyExempt(Policy, PolicyID) := true if {
 # Baseline 2.1: Policy 1
 #--
 
-default Policy2_1ConditionsMatch(_) := false
-Policy2_1ConditionsMatch(Policy) := true if {
+default Policy2_1_1ConditionsMatch(_) := false
+Policy2_1_1ConditionsMatch(Policy) := true if {
     "All" in Policy.Conditions.Users.IncludeUsers
     "All" in Policy.Conditions.Applications.IncludeApplications
     "other" in Policy.Conditions.ClientAppTypes
@@ -131,44 +147,11 @@ Policies2_1[Cap.DisplayName] {
     Cap := input.conditional_access_policies[_]
 
     # Match all simple conditions
-    Policy2_1ConditionsMatch(Cap)
-
-    # Only match policies with no user exclusions
-    count(Cap.Conditions.Users.ExcludeUsers) == 0
-    count(Cap.Conditions.Users.ExcludeGroups) == 0
-}
-
-Policies2_1[Cap.DisplayName] {
-    Cap := input.conditional_access_policies[_]
-
-    # Match all simple conditions
-    Policy2_1ConditionsMatch(Cap)
-
-    # Only match policies with user exclusions if all exempted
-    count(Cap.Conditions.Users.ExcludeGroups) == 0
-    UserExclusionsFullyExempt(Cap, "Policy2_1") == true
-}
-
-Policies2_1[Cap.DisplayName] {
-    Cap := input.conditional_access_policies[_]
-
-    # Match all simple conditions
-    Policy2_1ConditionsMatch(Cap)
-
-    # Only match policies with group exclusions if all exempted
-    count(Cap.Conditions.Users.ExcludeUsers) == 0
-    GroupExclusionsFullyExempt(Cap, "Policy2_1") == true
-}
-
-Policies2_1[Cap.DisplayName] {
-    Cap := input.conditional_access_policies[_]
-
-    # Match all simple conditions
-    Policy2_1ConditionsMatch(Cap)
+    Policy2_1_1ConditionsMatch(Cap)
 
     # Only match policies with user and group exclusions if all exempted
-    UserExclusionsFullyExempt(Cap, "Policy2_1") == true
-    GroupExclusionsFullyExempt(Cap, "Policy2_1") == true
+    UserExclusionsFullyExempt(Cap, "Policy2_1_1") == true
+    GroupExclusionsFullyExempt(Cap, "Policy2_1_1") == true
 }
 
 tests[{
@@ -201,39 +184,6 @@ Policy2_2_1ConditionsMatch(Policy) := true if {
     "block" in Policy.GrantControls.BuiltInControls
     Policy.State == "enabled"
     count(Policy.Conditions.Users.ExcludeRoles) == 0
-}
-
-Policies2_2_1[Cap.DisplayName] {
-    Cap := input.conditional_access_policies[_]
-
-    # Match all simple conditions
-    Policy2_2_1ConditionsMatch(Cap)
-
-    # Only match policies with no user exclusions
-    count(Cap.Conditions.Users.ExcludeUsers) == 0
-    count(Cap.Conditions.Users.ExcludeGroups) == 0
-}
-
-Policies2_2_1[Cap.DisplayName] {
-    Cap := input.conditional_access_policies[_]
-
-    # Match all simple conditions
-    Policy2_2_1ConditionsMatch(Cap)
-
-    # Only match policies with user exclusions if all exempted
-    count(Cap.Conditions.Users.ExcludeGroups) == 0
-    UserExclusionsFullyExempt(Cap, "Policy2_2_1") == true
-}
-
-Policies2_2_1[Cap.DisplayName] {
-    Cap := input.conditional_access_policies[_]
-
-    # Match all simple conditions
-    Policy2_2_1ConditionsMatch(Cap)
-
-    # Only match policies with group exclusions if all exempted
-    count(Cap.Conditions.Users.ExcludeUsers) == 0
-    GroupExclusionsFullyExempt(Cap, "Policy2_2_1") == true
 }
 
 Policies2_2_1[Cap.DisplayName] {
@@ -287,8 +237,8 @@ tests[{
 # Baseline 2.3: Policy 1
 #--
 
-default Policy2_3ConditionsMatch(_) := false
-Policy2_3ConditionsMatch(Policy) := true if {
+default Policy2_3_1ConditionsMatch(_) := false
+Policy2_3_1ConditionsMatch(Policy) := true if {
     "All" in Policy.Conditions.Users.IncludeUsers   
     "All" in Policy.Conditions.Applications.IncludeApplications
     "high" in Policy.Conditions.SignInRiskLevels
@@ -301,44 +251,11 @@ Policies2_3[Cap.DisplayName] {
     Cap := input.conditional_access_policies[_]
 
     # Match all simple conditions
-    Policy2_3ConditionsMatch(Cap)
-
-    # Only match policies with no user exclusions
-    count(Cap.Conditions.Users.ExcludeUsers) == 0
-    count(Cap.Conditions.Users.ExcludeGroups) == 0
-}
-
-Policies2_3[Cap.DisplayName] {
-    Cap := input.conditional_access_policies[_]
-
-    # Match all simple conditions
-    Policy2_3ConditionsMatch(Cap)
-
-    # Only match policies with user exclusions if all exempted
-    count(Cap.Conditions.Users.ExcludeGroups) == 0
-    UserExclusionsFullyExempt(Cap, "Policy2_3") == true
-}
-
-Policies2_3[Cap.DisplayName] {
-    Cap := input.conditional_access_policies[_]
-
-    # Match all simple conditions
-    Policy2_3ConditionsMatch(Cap)
-
-    # Only match policies with group exclusions if all exempted
-    count(Cap.Conditions.Users.ExcludeUsers) == 0
-    GroupExclusionsFullyExempt(Cap, "Policy2_3") == true
-}
-
-Policies2_3[Cap.DisplayName] {
-    Cap := input.conditional_access_policies[_]
-
-    # Match all simple conditions
-    Policy2_3ConditionsMatch(Cap)
+    Policy2_3_1ConditionsMatch(Cap)
 
     # Only match policies with user and group exclusions if all exempted
-    UserExclusionsFullyExempt(Cap, "Policy2_3") == true
-    GroupExclusionsFullyExempt(Cap, "Policy2_3") == true
+    UserExclusionsFullyExempt(Cap, "Policy2_3_1") == true
+    GroupExclusionsFullyExempt(Cap, "Policy2_3_1") == true
 }
 
 tests[{
@@ -370,39 +287,6 @@ Policy2_4_1ConditionsMatch(Policy) := true if {
     "mfa" in Policy.GrantControls.BuiltInControls
     Policy.State == "enabled"
     count(Policy.Conditions.Users.ExcludeRoles) == 0
-}
-
-Policies2_4_1[Cap.DisplayName] {
-    Cap := input.conditional_access_policies[_]
-
-    # Match all simple conditions
-    Policy2_4_1ConditionsMatch(Cap)
-
-    # Only match policies with no user exclusions
-    count(Cap.Conditions.Users.ExcludeUsers) == 0
-    count(Cap.Conditions.Users.ExcludeGroups) == 0
-}
-
-Policies2_4_1[Cap.DisplayName] {
-    Cap := input.conditional_access_policies[_]
-
-    # Match all simple conditions
-    Policy2_4_1ConditionsMatch(Cap)
-
-    # Only match policies with user exclusions if all exempted
-    count(Cap.Conditions.Users.ExcludeGroups) == 0
-    UserExclusionsFullyExempt(Cap, "Policy2_4_1") == true
-}
-
-Policies2_4_1[Cap.DisplayName] {
-    Cap := input.conditional_access_policies[_]
-
-    # Match all simple conditions
-    Policy2_4_1ConditionsMatch(Cap)
-
-    # Only match policies with group exclusions if all exempted
-    count(Cap.Conditions.Users.ExcludeUsers) == 0
-    GroupExclusionsFullyExempt(Cap, "Policy2_4_1") == true
 }
 
 Policies2_4_1[Cap.DisplayName] {
@@ -698,8 +582,8 @@ tests[{
 #
 # Baseline 2.9: Policy 1
 #--
-default Policy2_9ConditionsMatch(_) := false
-Policy2_9ConditionsMatch(Policy) := true if {
+default Policy2_9_1ConditionsMatch(_) := false
+Policy2_9_1ConditionsMatch(Policy) := true if {
     "All" in Policy.Conditions.Users.IncludeUsers
     "All" in Policy.Conditions.Applications.IncludeApplications
     Policy.SessionControls.SignInFrequency.IsEnabled == true
@@ -713,44 +597,11 @@ Policies2_9[Cap.DisplayName] {
     Cap := input.conditional_access_policies[_]
 
     # Match all simple conditions
-    Policy2_9ConditionsMatch(Cap)
-
-    # Only match policies with no user exclusions
-    count(Cap.Conditions.Users.ExcludeUsers) == 0
-    count(Cap.Conditions.Users.ExcludeGroups) == 0
-}
-
-Policies2_9[Cap.DisplayName] {
-    Cap := input.conditional_access_policies[_]
-
-    # Match all simple conditions
-    Policy2_9ConditionsMatch(Cap)
-
-    # Only match policies with user exclusions if all exempted
-    count(Cap.Conditions.Users.ExcludeGroups) == 0
-    UserExclusionsFullyExempt(Cap, "Policy2_9") == true
-}
-
-Policies2_9[Cap.DisplayName] {
-    Cap := input.conditional_access_policies[_]
-
-    # Match all simple conditions
-    Policy2_9ConditionsMatch(Cap)
-
-    # Only match policies with group exclusions if all exempted
-    count(Cap.Conditions.Users.ExcludeUsers) == 0
-    GroupExclusionsFullyExempt(Cap, "Policy2_9") == true
-}
-
-Policies2_9[Cap.DisplayName] {
-    Cap := input.conditional_access_policies[_]
-
-    # Match all simple conditions
-    Policy2_9ConditionsMatch(Cap)
+    Policy2_9_1ConditionsMatch(Cap)
 
     # Only match policies with user and group exclusions if all exempted
-    UserExclusionsFullyExempt(Cap, "Policy2_9") == true
-    GroupExclusionsFullyExempt(Cap, "Policy2_9") == true
+    UserExclusionsFullyExempt(Cap, "Policy2_9_1") == true
+    GroupExclusionsFullyExempt(Cap, "Policy2_9_1") == true
 }
 
 tests[{
@@ -775,8 +626,8 @@ tests[{
 #
 # Baseline 2.10: Policy 1
 #--
-default Policy2_10ConditionsMatch(_) := false
-Policy2_10ConditionsMatch(Policy) := true if {
+default Policy2_10_1ConditionsMatch(_) := false
+Policy2_10_1ConditionsMatch(Policy) := true if {
     "All" in Policy.Conditions.Users.IncludeUsers
     "All" in Policy.Conditions.Applications.IncludeApplications
     Policy.SessionControls.PersistentBrowser.IsEnabled == true
@@ -789,44 +640,11 @@ Policies2_10[Cap.DisplayName] {
     Cap := input.conditional_access_policies[_]
 
     # Match all simple conditions
-    Policy2_10ConditionsMatch(Cap)
-
-    # Only match policies with no user exclusions
-    count(Cap.Conditions.Users.ExcludeUsers) == 0
-    count(Cap.Conditions.Users.ExcludeGroups) == 0
-}
-
-Policies2_10[Cap.DisplayName] {
-    Cap := input.conditional_access_policies[_]
-
-    # Match all simple conditions
-    Policy2_10ConditionsMatch(Cap)
-
-    # Only match policies with user exclusions if all exempted
-    count(Cap.Conditions.Users.ExcludeGroups) == 0
-    UserExclusionsFullyExempt(Cap, "Policy2_10") == true
-}
-
-Policies2_10[Cap.DisplayName] {
-    Cap := input.conditional_access_policies[_]
-
-    # Match all simple conditions
-    Policy2_10ConditionsMatch(Cap)
-
-    # Only match policies with group exclusions if all exempted
-    count(Cap.Conditions.Users.ExcludeUsers) == 0
-    GroupExclusionsFullyExempt(Cap, "Policy2_10") == true
-}
-
-Policies2_10[Cap.DisplayName] {
-    Cap := input.conditional_access_policies[_]
-
-    # Match all simple conditions
-    Policy2_10ConditionsMatch(Cap)
+    Policy2_10_1ConditionsMatch(Cap)
 
     # Only match policies with user and group exclusions if all exempted
-    UserExclusionsFullyExempt(Cap, "Policy2_10") == true
-    GroupExclusionsFullyExempt(Cap, "Policy2_10") == true
+    UserExclusionsFullyExempt(Cap, "Policy2_10_1") == true
+    GroupExclusionsFullyExempt(Cap, "Policy2_10_1") == true
 }
 
 tests[{

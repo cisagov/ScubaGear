@@ -88,7 +88,7 @@ test_NoExclusionsExemptUsers_Correct if {
         ],
         "scuba_config": {
             "Aad": {
-                 "Policy2_3": {
+                 "Policy2_3_1": {
                     "CapExclusions": {
                         "Users": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
                         "Groups": []
@@ -144,7 +144,7 @@ test_NoExclusionsExemptGroups_Correct if {
         ],
         "scuba_config": {
             "Aad": {
-                 "Policy2_3": {
+                 "Policy2_3_1": {
                     "CapExclusions": {
                         "Users": [],
                         "Groups": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]
@@ -245,7 +245,7 @@ test_UserExclusionConditions_Correct if {
         ],
         "scuba_config": {
             "Aad": {
-                 "Policy2_3": {
+                 "Policy2_3_1": {
                     "CapExclusions": {
                         "Users": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
                         "Groups": []
@@ -345,7 +345,7 @@ test_UserExclusionsSingleExempt_Incorrect if {
         ],
         "scuba_config": {
             "Aad": {
-                 "Policy2_3": {
+                 "Policy2_3_1": {
                     "CapExclusions": {
                         "Users": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
                         "Groups": []
@@ -401,7 +401,7 @@ test_MultiUserExclusionsConditions_Correct if {
         ],
         "scuba_config": {
             "Aad": {
-                 "Policy2_3": {
+                 "Policy2_3_1": {
                     "CapExclusions": {
                         "Users": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3", "65fea286-22d3-42f9-b4ca-93a6f75817d4"],
                         "Groups": []
@@ -502,7 +502,7 @@ test_GroupExclusionsConditions_Correct if {
         ],
         "scuba_config": {
             "Aad": {
-                 "Policy2_3": {
+                 "Policy2_3_1": {
                     "CapExclusions": {
                         "Users": [],
                         "Groups": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]
@@ -601,7 +601,7 @@ test_GroupExclusionsSingleExempt_Incorrect if {
         ],
         "scuba_config": {
             "Aad": {
-                 "Policy2_3": {
+                 "Policy2_3_1": {
                     "CapExclusions": {
                         "Users": [],
                         "Groups": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]
@@ -656,7 +656,7 @@ test_MultiGroupExclusionsConditions_Correct if {
         ],
         "scuba_config": {
             "Aad": {
-                 "Policy2_3": {
+                 "Policy2_3_1": {
                     "CapExclusions": {
                         "Users": [],
                         "Groups": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423", "65fea286-22d3-42f9-b4ca-93a6f75817d4"]
@@ -712,7 +712,7 @@ test_UserGroupExclusionConditions_Correct if {
         ],
         "scuba_config": {
             "Aad": {
-                 "Policy2_3": {
+                 "Policy2_3_1": {
                     "CapExclusions": {
                         "Users": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
                         "Groups": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]
@@ -810,7 +810,7 @@ test_UserGroupExclusionUserExemptOnly_Incorrect if {
         ],
         "scuba_config": {
             "Aad": {
-                 "Policy2_3": {
+                 "Policy2_3_1": {
                     "CapExclusions": {
                         "Users": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
                         "Groups": []
@@ -864,7 +864,7 @@ test_UserGroupExclusionGroupExemptOnly_Incorrect if {
         ],
         "scuba_config": {
             "Aad": {
-                 "Policy2_3": {
+                 "Policy2_3_1": {
                     "CapExclusions": {
                         "Users": [],
                         "Groups": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]
@@ -918,7 +918,7 @@ test_UserGroupExclusionTooFewUserExempts_Incorrect if {
         ],
         "scuba_config": {
             "Aad": {
-                 "Policy2_3": {
+                 "Policy2_3_1": {
                     "CapExclusions": {
                         "Users": ["65fea286-22d3-42f9-b4ca-93a6f75817d4"],
                         "Groups": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]

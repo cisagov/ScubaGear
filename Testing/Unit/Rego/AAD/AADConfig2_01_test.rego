@@ -308,7 +308,7 @@ test_NoExclusionsExemptUsers_Correct if {
         ],
         "scuba_config": {
             "Aad": {
-                 "Policy2_1": {
+                 "Policy2_1_1": {
                     "CapExclusions": {
                         "Users": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
                         "Groups": []
@@ -355,7 +355,7 @@ test_UserExclusionsConditions_Correct if {
         ],
         "scuba_config": {
             "Aad": {
-                 "Policy2_1": {
+                 "Policy2_1_1": {
                     "CapExclusions": {
                         "Users": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
                         "Groups": []
@@ -401,7 +401,7 @@ test_MultiUserExclusionsConditions_Correct if {
         ],
         "scuba_config": {
             "Aad": {
-                 "Policy2_1": {
+                 "Policy2_1_1": {
                     "CapExclusions": {
                         "Users": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3", "df269963-a081-4315-b7de-172755221504"],
                         "Groups": []
@@ -481,7 +481,7 @@ test_UserExclusionsSingleExempt_Incorrect if {
         ],
         "scuba_config": {
             "Aad": {
-                 "Policy2_1": {
+                 "Policy2_1_1": {
                     "CapExclusions": {
                         "Users": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
                         "Groups": []
@@ -525,7 +525,7 @@ test_UserExclusionsNoExempt_Incorrect if {
         ],
         "scuba_config": {
             "Aad": {
-                 "Policy2_1": {
+                 "Policy2_1_1": {
                     "CapExclusions": {
                         "Users": [],
                         "Groups": []
@@ -569,7 +569,7 @@ test_UserExclusionsIncludeApplications_Incorrect if {
         ],
         "scuba_config": {
             "Aad": {
-                 "Policy2_1": {
+                 "Policy2_1_1": {
                     "CapExclusions": {
                         "Users": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
                         "Groups": []
@@ -614,7 +614,7 @@ test_UserExclusionsIncludeUsers_Incorrect if {
         ],
         "scuba_config": {
             "Aad": {
-                 "Policy2_1": {
+                 "Policy2_1_1": {
                     "CapExclusions": {
                         "Users": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
                         "Groups": []
@@ -659,7 +659,7 @@ test_UserExclusionsExcludeGroups_Incorrect if {
         ],
         "scuba_config": {
             "Aad": {
-                 "Policy2_1": {
+                 "Policy2_1_1": {
                     "CapExclusions": {
                         "Users": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
                         "Groups": []
@@ -703,7 +703,7 @@ test_UserExclusionsClientAppTypes_Incorrect if {
         ],
         "scuba_config": {
             "Aad": {
-                 "Policy2_1": {
+                 "Policy2_1_1": {
                     "CapExclusions": {
                         "Users": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
                         "Groups": []
@@ -749,7 +749,7 @@ test_UserExclusionsBuiltInControls_Incorrect if {
         ],
         "scuba_config": {
             "Aad": {
-                 "Policy2_1": {
+                 "Policy2_1_1": {
                     "CapExclusions": {
                         "Users": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
                         "Groups": []
@@ -795,7 +795,7 @@ test_UserExclusionsState_Incorrect if {
         ],
         "scuba_config": {
             "Aad": {
-                 "Policy2_1": {
+                 "Policy2_1_1": {
                     "CapExclusions": {
                         "Users": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
                         "Groups": []
@@ -844,7 +844,7 @@ test_NoExclusionsExemptGroups_Correct if {
         ],
         "scuba_config": {
             "Aad": {
-                 "Policy2_1": {
+                 "Policy2_1_1": {
                     "CapExclusions": {
                         "Users": [],
                         "Groups": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]
@@ -891,7 +891,7 @@ test_GroupExclusionNoExempt_Incorrect if {
         ],
         "scuba_config": {
             "Aad": {
-                 "Policy2_1": {
+                 "Policy2_1_1": {
                     "CapExclusions": {
                         "Users": [],
                         "Groups": []
@@ -937,7 +937,7 @@ test_GroupExclusionsNoExempt_Incorrect if {
         ],
         "scuba_config": {
             "Aad": {
-                 "Policy2_1": {
+                 "Policy2_1_1": {
                     "CapExclusions": {
                         "Users": [],
                         "Groups": []
@@ -983,7 +983,7 @@ test_GroupExclusionsSingleExempt_Incorrect if {
         ],
         "scuba_config": {
             "Aad": {
-                 "Policy2_1": {
+                 "Policy2_1_1": {
                     "CapExclusions": {
                         "Users": [],
                         "Groups": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]
@@ -1030,7 +1030,7 @@ test_GroupExclusionConditions_Correct if {
         ],
         "scuba_config": {
             "Aad": {
-                 "Policy2_1": {
+                 "Policy2_1_1": {
                     "CapExclusions": {
                         "Users": [],
                         "Groups": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]
@@ -1077,7 +1077,7 @@ test_MultiGroupExclusionsConditions_Correct if {
         ],
         "scuba_config": {
             "Aad": {
-                 "Policy2_1": {
+                 "Policy2_1_1": {
                     "CapExclusions": {
                         "Users": [],
                         "Groups": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423", "65fea286-22d3-42f9-b4ca-93a6f75817d4"]
@@ -1125,7 +1125,7 @@ test_UserGroupExclusionConditions_Correct if {
         ],
         "scuba_config": {
             "Aad": {
-                 "Policy2_1": {
+                 "Policy2_1_1": {
                     "CapExclusions": {
                         "Users": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
                         "Groups": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]
@@ -1207,7 +1207,7 @@ test_UserGroupExclusionUserExemptOnly_Incorrect if {
         ],
         "scuba_config": {
             "Aad": {
-                 "Policy2_1": {
+                 "Policy2_1_1": {
                     "CapExclusions": {
                         "Users": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
                         "Groups": []
@@ -1254,7 +1254,7 @@ test_UserGroupExclusionGroupExemptOnly_Incorrect if {
         ],
         "scuba_config": {
             "Aad": {
-                 "Policy2_1": {
+                 "Policy2_1_1": {
                     "CapExclusions": {
                         "Users": [],
                         "Groups": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]
@@ -1301,7 +1301,7 @@ test_UserGroupExclusionTooFewUserExempts_Incorrect if {
         ],
         "scuba_config": {
             "Aad": {
-                 "Policy2_1": {
+                 "Policy2_1_1": {
                     "CapExclusions": {
                         "Users": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
                         "Groups": []
