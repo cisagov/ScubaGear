@@ -100,7 +100,7 @@ Get-Help -Name Invoke-SCuBA -Full
 The HTML report should open in your browser once the script completes. If it does not, navigate to the output folder and open the BaselineReports.html file using your browser. The result files generated from the tool are also saved to the output folder.
 
 ## Required Permissions
-The tool has two types of permissions that are required:
+The tool has two types of permissions that are required for running interactively:
 - User Permissions (which are associated with Azure AD roles assigned to a user)
 - Application Permissions (which are assigned to the MS Graph PowerShell application in Azure AD).
 
@@ -145,7 +145,7 @@ The following API permissions are required for Microsoft Graph Powershell:
 
 
 ### Application Service Principal Permissions
-Permissions for running ScubaGear non-interactively. The minimum API permissions for all products are listed in the image below. The minimum user role permissions that need to be granted to the application are listed in the *Role Assignments* subsection.
+Permissions for running the tool non-interactively. The minimum API permissions for all products are listed in the image below. The minimum user role permissions that need to be granted to the application are listed in the *Role Assignments* subsection.
 
 This [video](https://www.youtube.com/watch?v=GyF8HV_35GA) provides a good tutorial for creating an application manually in the Azure Portal. Augment the API permissions and replace the role assignment instructions in the video with the permissions listed below.
 
