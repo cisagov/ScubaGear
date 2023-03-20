@@ -120,7 +120,7 @@ The minimum user roles needed for each product are described in the table below.
 | Sharepoint Online       |  SharePoint Administrator                                                           |
 | OneDrive                |  SharePoint Administrator                                                           |
 
-**Note**: Users with the Global Administrator role always have the necessary user permissions to run the tool.
+> **Note**: Users with the Global Administrator role always have the necessary user permissions to run the tool.
 
 
 ### Application Service Principal Permissions
@@ -128,8 +128,10 @@ The minimum API permissions for all products are listed in the image below. The 
 
 This [video](https://www.youtube.com/watch?v=GyF8HV_35GA) provides a good tutorial for creating an application manually in the Azure Portal. Augment the API permissions and replace the role assignment instructions in the video with the permissions listed below.
 
+
 **API Permissions**
 ![ScubaGear App Service Principal API Permissions](/images/appserviceprincipal-api-permssions.png)
+
 
 **Power Platform**
 For Power Platform, the application must be [manually registered to Power Platform via interactive authentication](https://learn.microsoft.com/en-us/power-platform/admin/powershell-create-service-principal#registering-an-admin-management-application).
@@ -138,11 +140,12 @@ Add-PowerAppsAccount -Endpoint prod -TenantID $tenantId # use -Endpoint usgov fo
 New-PowerAppManagementApp -ApplicationId $appId # Must be run from a Power Platform Adminstrator or Global Adminstrator account
 ```
 
+
 **Role Assignments**
 - SharePoint Administrator
 - Global Reader (May not be necessary on G5 tenants)
 
-**Note**: We will be automating the app registration in a later release.
+> **Note**: We will be automating the app registration in a later release.
 
 
 ### Microsoft Graph Powershell SDK permissions
