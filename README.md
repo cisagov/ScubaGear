@@ -100,7 +100,7 @@ Get-Help -Name Invoke-SCuBA -Full
 The HTML report should open in your browser once the script completes. If it does not, navigate to the output folder and open the BaselineReports.html file using your browser. The result files generated from the tool are also saved to the output folder.
 
 ## Required Permissions
-The tool has two types of permissions that are required for running interactively:
+When executing the tool interactively, there are two types of permissions that are required:
 - User Permissions (which are associated with Azure AD roles assigned to a user)
 - Application Permissions (which are assigned to the MS Graph PowerShell application in Azure AD).
 
@@ -167,7 +167,12 @@ New-PowerAppManagementApp -ApplicationId $appId # Must be run from a Power Platf
 - SharePoint Administrator
 - Global Reader (May not be necessary on G5 licensed tenants)
 
-> **Note**: We will be automating the app registration in a later release.
+
+**Certificate store notes**
+- Power Platform has a [hardcoded expectation](https://github.com/microsoft/Microsoft365DSC/issues/2781) that the certificate is located in "Cert:\CurrentUser\My".
+- MS Graph seems to also have an expectation that the certificate at least be located in one of the local client's certificate store(s).
+
+> **Notes**: Only authentication via `CertificateThumbprint` is currently supported. We will also be supporting automated app registration in a later release.
 
 
 ## Architecture
