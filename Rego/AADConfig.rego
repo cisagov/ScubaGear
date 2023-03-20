@@ -55,7 +55,7 @@ ReportDetailsArrayLicenseWarningCap(Array, String) = Description if {
   Description :=  concat(". ", [ReportFullDetailsArray(Array, String), CapLink])
 }
 
-ReportDetailsArrayLicenseWarningCap(Array, String) = Description if {
+ReportDetailsArrayLicenseWarningCap(_, _) = Description if {
   count(Aad2P2Licenses) == 0
   Description := P2WarningString
 }
@@ -65,7 +65,7 @@ ReportDetailsArrayLicenseWarning(Array, String) = Description if {
   Description :=  ReportFullDetailsArray(Array, String)
 }
 
-ReportDetailsArrayLicenseWarning(Array, String) = Description if {
+ReportDetailsArrayLicenseWarning(_, _) = Description if {
   count(Aad2P2Licenses) == 0
   Description := P2WarningString
 }
@@ -82,9 +82,46 @@ ReportDetailsBooleanLicenseWarning(Status) = Description if {
     Description := "Requirement not met"
 }
 
-ReportDetailsBooleanLicenseWarning(Status) = Description if {
+ReportDetailsBooleanLicenseWarning(_) = Description if {
     count(Aad2P2Licenses) == 0
     Description := P2WarningString
+}
+
+################
+# User/Group Exclusion support functions
+################
+default UserExclusionsFullyExempt(_, _) := false
+UserExclusionsFullyExempt(Policy, PolicyID) := true if {
+    # Returns true when all user exclusions present in the conditional 
+    # access policy are exempted in matching config variable for the
+    # baseline policy item.  Undefined if no exclusions AND no exemptions.
+    ExemptedUsers := input.scuba_config.Aad[PolicyID].CapExclusions.Users
+    ExcludedUsers := { x | x := Policy.Conditions.Users.ExcludeUsers[_] }
+    AllowedExcludedUsers := { y | y := ExemptedUsers[_] }
+    count(ExcludedUsers - AllowedExcludedUsers) == 0
+}
+
+UserExclusionsFullyExempt(Policy, PolicyID) := true if {
+    # Returns true when user inputs are not defined or user exclusion lists are empty
+    count({ x | x := Policy.Conditions.Users.ExcludeUsers[_] }) == 0
+    count({ y | y := input.scuba_config.Aad[PolicyID].CapExclusions.Users }) == 0
+}
+
+default GroupExclusionsFullyExempt(_, _) := false
+GroupExclusionsFullyExempt(Policy, PolicyID) := true if {
+    # Returns true when all group exclusions present in the conditional 
+    # access policy are exempted in matching config variable for the 
+    # baseline policy item.  Undefined if no exclusions AND no exemptions.
+    ExemptedGroups := input.scuba_config.Aad[PolicyID].CapExclusions.Groups
+    ExcludedGroups := { x | x := Policy.Conditions.Users.ExcludeGroups[_] }
+    AllowedExcludedGroups := { y | y:= ExemptedGroups[_] }
+    count(ExcludedGroups - AllowedExcludedGroups) == 0
+}
+
+GroupExclusionsFullyExempt(Policy, PolicyID) := true if {
+    # Returns true when user inputs are not defined or group exclusion lists are empty
+    count({ x | x := Policy.Conditions.Users.ExcludeGroups[_] }) == 0
+    count({ y | y := input.scuba_config.Aad[PolicyID].CapExclusions.Groups }) == 0
 }
 
 ################
@@ -94,15 +131,27 @@ ReportDetailsBooleanLicenseWarning(Status) = Description if {
 #
 # Baseline 2.1: Policy 1
 #--
+
+default Policy2_1_1ConditionsMatch(_) := false
+Policy2_1_1ConditionsMatch(Policy) := true if {
+    "All" in Policy.Conditions.Users.IncludeUsers
+    "All" in Policy.Conditions.Applications.IncludeApplications
+    "other" in Policy.Conditions.ClientAppTypes
+    "exchangeActiveSync" in Policy.Conditions.ClientAppTypes
+    "block" in Policy.GrantControls.BuiltInControls
+    count(Policy.Conditions.Users.ExcludeRoles) == 0
+    Policy.State == "enabled"
+}
+
 Policies2_1[Cap.DisplayName] {
     Cap := input.conditional_access_policies[_]
-    # Filter: only include policies that meet all the requirements
-    "All" in Cap.Conditions.Users.IncludeUsers
-    "All" in Cap.Conditions.Applications.IncludeApplications
-    "other" in Cap.Conditions.ClientAppTypes
-    "exchangeActiveSync" in Cap.Conditions.ClientAppTypes
-    "block" in Cap.GrantControls.BuiltInControls
-    Cap.State == "enabled"
+
+    # Match all simple conditions
+    Policy2_1_1ConditionsMatch(Cap)
+
+    # Only match policies with user and group exclusions if all exempted
+    UserExclusionsFullyExempt(Cap, "Policy2_1_1") == true
+    GroupExclusionsFullyExempt(Cap, "Policy2_1_1") == true
 }
 
 tests[{
@@ -117,9 +166,8 @@ tests[{
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
     true
 }
+
 #--
-
-
 ################
 # Baseline 2.2 #
 ################
@@ -127,14 +175,26 @@ tests[{
 #
 # Baseline 2.2: Policy 1
 #--
-Policies2_2[Cap.DisplayName] {
+
+default Policy2_2_1ConditionsMatch(_) := false
+Policy2_2_1ConditionsMatch(Policy) := true if {
+    "All" in Policy.Conditions.Users.IncludeUsers   
+    "All" in Policy.Conditions.Applications.IncludeApplications
+    "high" in Policy.Conditions.UserRiskLevels
+    "block" in Policy.GrantControls.BuiltInControls
+    Policy.State == "enabled"
+    count(Policy.Conditions.Users.ExcludeRoles) == 0
+}
+
+Policies2_2_1[Cap.DisplayName] {
     Cap := input.conditional_access_policies[_]
-    # Filter: only include policies that meet all the requirements
-    "All" in Cap.Conditions.Users.IncludeUsers
-    "All" in Cap.Conditions.Applications.IncludeApplications
-    "high" in Cap.Conditions.UserRiskLevels
-    "block" in Cap.GrantControls.BuiltInControls
-    Cap.State == "enabled"
+
+    # Match all simple conditions
+    Policy2_2_1ConditionsMatch(Cap)
+
+    # Only match policies with user and group exclusions if all exempted
+    UserExclusionsFullyExempt(Cap, "Policy2_2_1") == true
+    GroupExclusionsFullyExempt(Cap, "Policy2_2_1") == true
 }
 
 tests[{
@@ -142,12 +202,12 @@ tests[{
     "Control" : "AAD 2.2",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-MgIdentityConditionalAccessPolicy"],
-    "ActualValue" : Policies2_2,
-    "ReportDetails" : ReportDetailsArrayLicenseWarningCap(Policies2_2, DescriptionString),
+    "ActualValue" : Policies2_2_1,
+    "ReportDetails" : ReportDetailsArrayLicenseWarningCap(Policies2_2_1, DescriptionString),
     "RequirementMet" : Status
 }] {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
-    Status := count(Policies2_2) > 0
+    Status := count(Policies2_2_1) > 0
 }
 #--
 
@@ -176,14 +236,26 @@ tests[{
 #
 # Baseline 2.3: Policy 1
 #--
+
+default Policy2_3_1ConditionsMatch(_) := false
+Policy2_3_1ConditionsMatch(Policy) := true if {
+    "All" in Policy.Conditions.Users.IncludeUsers   
+    "All" in Policy.Conditions.Applications.IncludeApplications
+    "high" in Policy.Conditions.SignInRiskLevels
+    "block" in Policy.GrantControls.BuiltInControls
+    Policy.State == "enabled"
+    count(Policy.Conditions.Users.ExcludeRoles) == 0
+}
+
 Policies2_3[Cap.DisplayName] {
     Cap := input.conditional_access_policies[_]
-    # Filter: only include policies that meet all the requirements
-    "All" in Cap.Conditions.Users.IncludeUsers
-    "All" in Cap.Conditions.Applications.IncludeApplications
-    "high" in Cap.Conditions.SignInRiskLevels
-    "block" in Cap.GrantControls.BuiltInControls
-    Cap.State == "enabled"
+
+    # Match all simple conditions
+    Policy2_3_1ConditionsMatch(Cap)
+
+    # Only match policies with user and group exclusions if all exempted
+    UserExclusionsFullyExempt(Cap, "Policy2_3_1") == true
+    GroupExclusionsFullyExempt(Cap, "Policy2_3_1") == true
 }
 
 tests[{
@@ -208,13 +280,24 @@ tests[{
 #
 # Baseline 2.4: Policy 1
 #--
+default Policy2_4_1ConditionsMatch(_) := false
+Policy2_4_1ConditionsMatch(Policy) := true if {
+    "All" in Policy.Conditions.Users.IncludeUsers
+    "All" in Policy.Conditions.Applications.IncludeApplications
+    "mfa" in Policy.GrantControls.BuiltInControls
+    Policy.State == "enabled"
+    count(Policy.Conditions.Users.ExcludeRoles) == 0
+}
+
 Policies2_4_1[Cap.DisplayName] {
     Cap := input.conditional_access_policies[_]
-    # Filter: only include policies that meet all the requirements
-    "All" in Cap.Conditions.Users.IncludeUsers
-    "All" in Cap.Conditions.Applications.IncludeApplications
-    "mfa" in Cap.GrantControls.BuiltInControls
-    Cap.State == "enabled"
+
+    # Match all simple conditions
+    Policy2_4_1ConditionsMatch(Cap)
+
+    # Only match policies with user and group exclusions if all exempted
+    UserExclusionsFullyExempt(Cap, "Policy2_4_1") == true
+    GroupExclusionsFullyExempt(Cap, "Policy2_4_1") == true
 }
 
 tests[{
@@ -499,15 +582,26 @@ tests[{
 #
 # Baseline 2.9: Policy 1
 #--
+default Policy2_9_1ConditionsMatch(_) := false
+Policy2_9_1ConditionsMatch(Policy) := true if {
+    "All" in Policy.Conditions.Users.IncludeUsers
+    "All" in Policy.Conditions.Applications.IncludeApplications
+    Policy.SessionControls.SignInFrequency.IsEnabled == true
+    Policy.SessionControls.SignInFrequency.Type == "hours"
+    Policy.SessionControls.SignInFrequency.Value == 12
+    Policy.State == "enabled"
+    count(Policy.Conditions.Users.ExcludeRoles) == 0
+}
+
 Policies2_9[Cap.DisplayName] {
     Cap := input.conditional_access_policies[_]
-    # Filter: only include policies that meet all the requirements
-    "All" in Cap.Conditions.Users.IncludeUsers
-    "All" in Cap.Conditions.Applications.IncludeApplications
-    Cap.SessionControls.SignInFrequency.IsEnabled == true
-    Cap.SessionControls.SignInFrequency.Type == "hours"
-    Cap.SessionControls.SignInFrequency.Value == 12
-    Cap.State == "enabled"
+
+    # Match all simple conditions
+    Policy2_9_1ConditionsMatch(Cap)
+
+    # Only match policies with user and group exclusions if all exempted
+    UserExclusionsFullyExempt(Cap, "Policy2_9_1") == true
+    GroupExclusionsFullyExempt(Cap, "Policy2_9_1") == true
 }
 
 tests[{
@@ -532,14 +626,25 @@ tests[{
 #
 # Baseline 2.10: Policy 1
 #--
+default Policy2_10_1ConditionsMatch(_) := false
+Policy2_10_1ConditionsMatch(Policy) := true if {
+    "All" in Policy.Conditions.Users.IncludeUsers
+    "All" in Policy.Conditions.Applications.IncludeApplications
+    Policy.SessionControls.PersistentBrowser.IsEnabled == true
+    Policy.SessionControls.PersistentBrowser.Mode == "never"
+    Policy.State == "enabled"
+    count(Policy.Conditions.Users.ExcludeRoles) == 0
+}
+
 Policies2_10[Cap.DisplayName] {
     Cap := input.conditional_access_policies[_]
-    # Filter: only include policies that meet all the requirements
-    "All" in Cap.Conditions.Users.IncludeUsers
-    "All" in Cap.Conditions.Applications.IncludeApplications
-    Cap.SessionControls.PersistentBrowser.IsEnabled == true
-    Cap.SessionControls.PersistentBrowser.Mode == "never"
-    Cap.State == "enabled"
+
+    # Match all simple conditions
+    Policy2_10_1ConditionsMatch(Cap)
+
+    # Only match policies with user and group exclusions if all exempted
+    UserExclusionsFullyExempt(Cap, "Policy2_10_1") == true
+    GroupExclusionsFullyExempt(Cap, "Policy2_10_1") == true
 }
 
 tests[{
@@ -628,6 +733,11 @@ Policies2_13[Cap.DisplayName] {
     MissingRoles := PrivRolesSet - CondIncludedRolesSet
     # Filter: only include policies that meet all the requirements
     count(MissingRoles) == 0
+    CondExcludedRolesSet := { Y | Y = Cap.Conditions.Users.ExcludeRoles[_] }
+    #make sure excluded roles do not contain any of the privileged roles (if it does, that means you are excluding it which is not what the policy says)
+    MatchingExcludeRoles := PrivRolesSet & CondExcludedRolesSet
+    #only succeeds if there is no intersection, i.e., excluded roles are none of the privileged roles
+    count(MatchingExcludeRoles) == 0
     "All" in Cap.Conditions.Applications.IncludeApplications
     "mfa" in Cap.GrantControls.BuiltInControls
     Cap.State == "enabled"

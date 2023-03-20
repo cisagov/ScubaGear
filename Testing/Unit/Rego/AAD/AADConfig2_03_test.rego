@@ -5,16 +5,24 @@ import future.keywords
 #
 # Policy 1
 #--
-test_Conditions_Correct if {
+
+test_NoExclusionsConditions_Correct if {
     ControlNumber := "AAD 2.3"
     Requirement := "Sign-ins detected as high risk SHALL be blocked"
 
-    Output := tests with input as
-    {"conditional_access_policies": [
+    Output := tests with input as {
+        "conditional_access_policies": [
         {
             "Conditions": {
-                "Applications": {"IncludeApplications": ["All"]},
-                "Users": {"IncludeUsers": ["All"]},
+                "Applications": {
+                    "IncludeApplications": ["All"]
+                },
+                "Users": {
+                        "IncludeUsers": ["All"],
+                        "ExcludeUsers": [],
+                        "ExcludeGroups": [],
+                        "ExcludeRoles": []
+                },
                 "SignInRiskLevels": ["high"]
             },
             "GrantControls": {
@@ -25,12 +33,943 @@ test_Conditions_Correct if {
         }
         ],
         "service_plans": [
-            { "ServicePlanName": "EXCHANGE_S_FOUNDATION",
-                "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
+        {
+            "ServicePlanName": "EXCHANGE_S_FOUNDATION",
+            "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
+        },
+        {
+            "ServicePlanName": "AAD_PREMIUM_P2",
+            "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
+        }
+        ]
+    }
+    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "1 conditional access policy(s) found that meet(s) all requirements:<br/>Test name. <a href='#caps'>View all CA policies</a>."
+}
+
+test_NoExclusionsExemptUsers_Correct if {
+    ControlNumber := "AAD 2.3"
+    Requirement := "Sign-ins detected as high risk SHALL be blocked"
+
+    Output := tests with input as {
+        "conditional_access_policies": [
+        {
+            "Conditions": {
+                "Applications": {
+                    "IncludeApplications": ["All"]
+                },
+                "Users": {
+                        "IncludeUsers": ["All"],
+                        "ExcludeUsers": [],
+                        "ExcludeGroups": [],
+                        "ExcludeRoles": []
+                },
+                "SignInRiskLevels": ["high"]
             },
-            { "ServicePlanName": "AAD_PREMIUM_P2",
-                "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
+            "GrantControls": {
+                "BuiltInControls": ["block"]
+            },
+            "State": "enabled",
+            "DisplayName": "Test name"
+        }
+        ],
+        "service_plans": [
+        {
+            "ServicePlanName": "EXCHANGE_S_FOUNDATION",
+            "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
+        },
+        {
+            "ServicePlanName": "AAD_PREMIUM_P2",
+            "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
+        }
+        ],
+        "scuba_config": {
+            "Aad": {
+                 "Policy2_3_1": {
+                    "CapExclusions": {
+                        "Users": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
+                        "Groups": []
+                    }
+                }
+
             }
+
+        }
+    }
+    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "1 conditional access policy(s) found that meet(s) all requirements:<br/>Test name. <a href='#caps'>View all CA policies</a>."
+}
+
+test_NoExclusionsExemptGroups_Correct if {
+    ControlNumber := "AAD 2.3"
+    Requirement := "Sign-ins detected as high risk SHALL be blocked"
+
+    Output := tests with input as {
+        "conditional_access_policies": [
+        {
+            "Conditions": {
+                "Applications": {
+                    "IncludeApplications": ["All"]
+                },
+                "Users": {
+                        "IncludeUsers": ["All"],
+                        "ExcludeUsers": [],
+                        "ExcludeGroups": [],
+                        "ExcludeRoles": []
+                },
+                "SignInRiskLevels": ["high"]
+            },
+            "GrantControls": {
+                "BuiltInControls": ["block"]
+            },
+            "State": "enabled",
+            "DisplayName": "Test name"
+        }
+        ],
+        "service_plans": [
+        {
+            "ServicePlanName": "EXCHANGE_S_FOUNDATION",
+            "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
+        },
+        {
+            "ServicePlanName": "AAD_PREMIUM_P2",
+            "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
+        }
+        ],
+        "scuba_config": {
+            "Aad": {
+                 "Policy2_3_1": {
+                    "CapExclusions": {
+                        "Users": [],
+                        "Groups": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]
+                    }
+                }
+
+            }
+
+        }
+    }
+    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "1 conditional access policy(s) found that meet(s) all requirements:<br/>Test name. <a href='#caps'>View all CA policies</a>."
+}
+
+# User exclusions test
+test_UserExclusionNoExempt_Incorrect if {
+    ControlNumber := "AAD 2.3"
+    Requirement := "Sign-ins detected as high risk SHALL be blocked"
+
+    Output := tests with input as {
+        "conditional_access_policies": [
+        {
+            "Conditions": {
+                "Applications": {
+                    "IncludeApplications": ["All"]
+                },
+                "Users": {
+                        "IncludeUsers": ["All"],
+                        "ExcludeUsers": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
+                        "ExcludeGroups": [],
+                        "ExcludeRoles": []
+                },
+                "SignInRiskLevels": ["high"]
+            },
+            "GrantControls": {
+                "BuiltInControls": ["block"]
+            },
+            "State": "enabled",
+            "DisplayName": "Test name"
+        }
+        ],
+        "service_plans": [
+        {
+            "ServicePlanName": "EXCHANGE_S_FOUNDATION",
+            "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
+        },
+        {
+            "ServicePlanName": "AAD_PREMIUM_P2",
+            "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
+        }
+        ]
+    }
+    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+}
+
+test_UserExclusionConditions_Correct if {
+    ControlNumber := "AAD 2.3"
+    Requirement := "Sign-ins detected as high risk SHALL be blocked"
+
+    Output := tests with input as {
+        "conditional_access_policies": [
+        {
+            "Conditions": {
+                "Applications": {
+                    "IncludeApplications": ["All"]
+                },
+                "Users": {
+                        "IncludeUsers": ["All"],
+                        "ExcludeUsers": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
+                        "ExcludeGroups": [],
+                        "ExcludeRoles": []
+                },
+                "SignInRiskLevels": ["high"]
+            },
+            "GrantControls": {
+                "BuiltInControls": ["block"]
+            },
+            "State": "enabled",
+            "DisplayName": "Test name"
+        }
+        ],
+        "service_plans": [
+        {
+            "ServicePlanName": "EXCHANGE_S_FOUNDATION",
+            "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
+        },
+        {
+            "ServicePlanName": "AAD_PREMIUM_P2",
+            "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
+        }
+        ],
+        "scuba_config": {
+            "Aad": {
+                 "Policy2_3_1": {
+                    "CapExclusions": {
+                        "Users": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
+                        "Groups": []
+                    }
+                }
+
+            }
+
+        }
+    }
+    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "1 conditional access policy(s) found that meet(s) all requirements:<br/>Test name. <a href='#caps'>View all CA policies</a>."
+}
+
+test_UserExclusionsNoExempt_Incorrect if {
+    ControlNumber := "AAD 2.3"
+    Requirement := "Sign-ins detected as high risk SHALL be blocked"
+
+    Output := tests with input as {
+        "conditional_access_policies": [
+        {
+            "Conditions": {
+                "Applications": {
+                    "IncludeApplications": ["All"]
+                },
+                "Users": {
+                        "IncludeUsers": ["All"],
+                        "ExcludeUsers": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3", "65fea286-22d3-42f9-b4ca-93a6f75817d4"],
+                        "ExcludeGroups": [],
+                        "ExcludeRoles": []
+                },
+                "SignInRiskLevels": ["high"]
+            },
+            "GrantControls": {
+                "BuiltInControls": ["block"]
+            },
+            "State": "enabled",
+            "DisplayName": "Test name"
+        }
+        ],
+        "service_plans": [
+        {
+            "ServicePlanName": "EXCHANGE_S_FOUNDATION",
+            "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
+        },
+        {
+            "ServicePlanName": "AAD_PREMIUM_P2",
+            "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
+        }
+        ]
+    }
+    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+}
+
+test_UserExclusionsSingleExempt_Incorrect if {
+    ControlNumber := "AAD 2.3"
+    Requirement := "Sign-ins detected as high risk SHALL be blocked"
+
+    Output := tests with input as {
+        "conditional_access_policies": [
+        {
+            "Conditions": {
+                "Applications": {
+                    "IncludeApplications": ["All"]
+                },
+                "Users": {
+                        "IncludeUsers": ["All"],
+                        "ExcludeUsers": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3", "65fea286-22d3-42f9-b4ca-93a6f75817d4"],
+                        "ExcludeGroups": [],
+                        "ExcludeRoles": []
+                },
+                "SignInRiskLevels": ["high"]
+            },
+            "GrantControls": {
+                "BuiltInControls": ["block"]
+            },
+            "State": "enabled",
+            "DisplayName": "Test name"
+        }
+        ],
+        "service_plans": [
+        {
+            "ServicePlanName": "EXCHANGE_S_FOUNDATION",
+            "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
+        },
+        {
+            "ServicePlanName": "AAD_PREMIUM_P2",
+            "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
+        }
+        ],
+        "scuba_config": {
+            "Aad": {
+                 "Policy2_3_1": {
+                    "CapExclusions": {
+                        "Users": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
+                        "Groups": []
+                    }
+                }
+
+            }
+
+        }
+    }
+    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+}
+
+test_MultiUserExclusionsConditions_Correct if {
+    ControlNumber := "AAD 2.3"
+    Requirement := "Sign-ins detected as high risk SHALL be blocked"
+
+    Output := tests with input as {
+        "conditional_access_policies": [
+        {
+            "Conditions": {
+                "Applications": {
+                    "IncludeApplications": ["All"]
+                },
+                "Users": {
+                        "IncludeUsers": ["All"],
+                        "ExcludeUsers": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3", "65fea286-22d3-42f9-b4ca-93a6f75817d4"],
+                        "ExcludeGroups": [],
+                        "ExcludeRoles": []
+                },
+                "SignInRiskLevels": ["high"]
+            },
+            "GrantControls": {
+                "BuiltInControls": ["block"]
+            },
+            "State": "enabled",
+            "DisplayName": "Test name"
+        }
+        ],
+        "service_plans": [
+        {
+            "ServicePlanName": "EXCHANGE_S_FOUNDATION",
+            "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
+        },
+        {
+            "ServicePlanName": "AAD_PREMIUM_P2",
+            "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
+        }
+        ],
+        "scuba_config": {
+            "Aad": {
+                 "Policy2_3_1": {
+                    "CapExclusions": {
+                        "Users": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3", "65fea286-22d3-42f9-b4ca-93a6f75817d4"],
+                        "Groups": []
+                    }
+                }
+
+            }
+
+        }
+    }
+    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "1 conditional access policy(s) found that meet(s) all requirements:<br/>Test name. <a href='#caps'>View all CA policies</a>."
+}
+
+# Group Exclusion tests
+test_GroupExclusionNoExempt_Incorrect if {
+    ControlNumber := "AAD 2.3"
+    Requirement := "Sign-ins detected as high risk SHALL be blocked"
+
+    Output := tests with input as {
+        "conditional_access_policies": [
+        {
+            "Conditions": {
+                "Applications": {
+                    "IncludeApplications": ["All"]
+                },
+                "Users": {
+                        "IncludeUsers": ["All"],
+                        "ExcludeUsers": [],
+                        "ExcludeGroups": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
+                        "ExcludeRoles": []
+                },
+                "SignInRiskLevels": ["high"]
+            },
+            "GrantControls": {
+                "BuiltInControls": ["block"]
+            },
+            "State": "enabled",
+            "DisplayName": "Test name"
+        }
+        ],
+        "service_plans": [
+        {
+            "ServicePlanName": "EXCHANGE_S_FOUNDATION",
+            "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
+        },
+        {
+            "ServicePlanName": "AAD_PREMIUM_P2",
+            "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
+        }
+        ]
+    }
+    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+}
+
+test_GroupExclusionsConditions_Correct if {
+    ControlNumber := "AAD 2.3"
+    Requirement := "Sign-ins detected as high risk SHALL be blocked"
+
+    Output := tests with input as {
+        "conditional_access_policies": [
+        {
+            "Conditions": {
+                "Applications": {
+                    "IncludeApplications": ["All"]
+                },
+                "Users": {
+                        "IncludeUsers": ["All"],
+                        "ExcludeUsers": [],
+                        "ExcludeGroups": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"],
+                        "ExcludeRoles": []
+                },
+                "SignInRiskLevels": ["high"]
+            },
+            "GrantControls": {
+                "BuiltInControls": ["block"]
+            },
+            "State": "enabled",
+            "DisplayName": "Test name"
+        }
+        ],
+        "service_plans": [
+        {
+            "ServicePlanName": "EXCHANGE_S_FOUNDATION",
+            "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
+        },
+        {
+            "ServicePlanName": "AAD_PREMIUM_P2",
+            "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
+        }
+        ],
+        "scuba_config": {
+            "Aad": {
+                 "Policy2_3_1": {
+                    "CapExclusions": {
+                        "Users": [],
+                        "Groups": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]
+                    }
+                }
+
+            }
+        }
+    }
+    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "1 conditional access policy(s) found that meet(s) all requirements:<br/>Test name. <a href='#caps'>View all CA policies</a>."
+}
+
+test_GroupExclusionsNoExempt_Incorrect if {
+    ControlNumber := "AAD 2.3"
+    Requirement := "Sign-ins detected as high risk SHALL be blocked"
+
+    Output := tests with input as {
+        "conditional_access_policies": [
+        {
+            "Conditions": {
+                "Applications": {
+                    "IncludeApplications": ["All"]
+                },
+                "Users": {
+                        "IncludeUsers": ["All"],
+                        "ExcludeUsers": [],
+                        "ExcludeGroups": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3", "65fea286-22d3-42f9-b4ca-93a6f75817d4"],
+                        "ExcludeRoles": []
+                },
+                "SignInRiskLevels": ["high"]
+            },
+            "GrantControls": {
+                "BuiltInControls": ["block"]
+            },
+            "State": "enabled",
+            "DisplayName": "Test name"
+        }
+        ],
+        "service_plans": [
+        {
+            "ServicePlanName": "EXCHANGE_S_FOUNDATION",
+            "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
+        },
+        {
+            "ServicePlanName": "AAD_PREMIUM_P2",
+            "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
+        }
+        ]
+    }
+    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+}
+
+test_GroupExclusionsSingleExempt_Incorrect if {
+    ControlNumber := "AAD 2.3"
+    Requirement := "Sign-ins detected as high risk SHALL be blocked"
+
+    Output := tests with input as {
+        "conditional_access_policies": [
+        {
+            "Conditions": {
+                "Applications": {
+                    "IncludeApplications": ["All"]
+                },
+                "Users": {
+                        "IncludeUsers": ["All"],
+                        "ExcludeUsers": [],
+                        "ExcludeGroups": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3", "65fea286-22d3-42f9-b4ca-93a6f75817d4"],
+                        "ExcludeRoles": []
+                },
+                "SignInRiskLevels": ["high"]
+            },
+            "GrantControls": {
+                "BuiltInControls": ["block"]
+            },
+            "State": "enabled",
+            "DisplayName": "Test name"
+        }
+        ],
+        "service_plans": [
+        {
+            "ServicePlanName": "EXCHANGE_S_FOUNDATION",
+            "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
+        },
+        {
+            "ServicePlanName": "AAD_PREMIUM_P2",
+            "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
+        }
+        ],
+        "scuba_config": {
+            "Aad": {
+                 "Policy2_3_1": {
+                    "CapExclusions": {
+                        "Users": [],
+                        "Groups": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]
+                    }
+                }
+
+            }
+        }
+    }
+    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+}
+
+test_MultiGroupExclusionsConditions_Correct if {
+    ControlNumber := "AAD 2.3"
+    Requirement := "Sign-ins detected as high risk SHALL be blocked"
+
+    Output := tests with input as {
+        "conditional_access_policies": [
+        {
+            "Conditions": {
+                "Applications": {
+                    "IncludeApplications": ["All"]
+                },
+                "Users": {
+                        "IncludeUsers": ["All"],
+                        "ExcludeUsers": [],
+                        "ExcludeGroups": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423", "65fea286-22d3-42f9-b4ca-93a6f75817d4"],
+                        "ExcludeRoles": []
+                },
+                "SignInRiskLevels": ["high"]
+            },
+            "GrantControls": {
+                "BuiltInControls": ["block"]
+            },
+            "State": "enabled",
+            "DisplayName": "Test name"
+        }
+        ],
+        "service_plans": [
+        {
+            "ServicePlanName": "EXCHANGE_S_FOUNDATION",
+            "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
+        },
+        {
+            "ServicePlanName": "AAD_PREMIUM_P2",
+            "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
+        }
+        ],
+        "scuba_config": {
+            "Aad": {
+                 "Policy2_3_1": {
+                    "CapExclusions": {
+                        "Users": [],
+                        "Groups": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423", "65fea286-22d3-42f9-b4ca-93a6f75817d4"]
+                    }
+                }
+
+            }
+        }
+    }
+    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "1 conditional access policy(s) found that meet(s) all requirements:<br/>Test name. <a href='#caps'>View all CA policies</a>."
+}
+
+# User and group exclusions tests
+test_UserGroupExclusionConditions_Correct if {
+    ControlNumber := "AAD 2.3"
+    Requirement := "Sign-ins detected as high risk SHALL be blocked"
+
+    Output := tests with input as {
+        "conditional_access_policies": [
+        {
+            "Conditions": {
+                "Applications": {
+                    "IncludeApplications": ["All"]
+                },
+                "Users": {
+                        "IncludeUsers": ["All"],
+                        "ExcludeUsers": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
+                        "ExcludeGroups": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"],
+                        "ExcludeRoles": []
+                },
+                "SignInRiskLevels": ["high"]
+            },
+            "GrantControls": {
+                "BuiltInControls": ["block"]
+            },
+            "State": "enabled",
+            "DisplayName": "Test name"
+        }
+        ],
+        "service_plans": [
+        {
+            "ServicePlanName": "EXCHANGE_S_FOUNDATION",
+            "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
+        },
+        {
+            "ServicePlanName": "AAD_PREMIUM_P2",
+            "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
+        }
+        ],
+        "scuba_config": {
+            "Aad": {
+                 "Policy2_3_1": {
+                    "CapExclusions": {
+                        "Users": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
+                        "Groups": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]
+                    }
+                }
+            }
+        }
+    }
+    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "1 conditional access policy(s) found that meet(s) all requirements:<br/>Test name. <a href='#caps'>View all CA policies</a>."
+}
+
+test_UserGroupExclusionNoExempt_Incorrect if {
+    ControlNumber := "AAD 2.3"
+    Requirement := "Sign-ins detected as high risk SHALL be blocked"
+
+    Output := tests with input as {
+        "conditional_access_policies": [
+        {
+            "Conditions": {
+                "Applications": {
+                    "IncludeApplications": ["All"]
+                },
+                "Users": {
+                        "IncludeUsers": ["All"],
+                        "ExcludeUsers": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
+                        "ExcludeGroups": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"],
+                        "ExcludeRoles": []
+                },
+                "SignInRiskLevels": ["high"]
+            },
+            "GrantControls": {
+                "BuiltInControls": ["block"]
+            },
+            "State": "enabled",
+            "DisplayName": "Test name"
+        }
+        ],
+        "service_plans": [
+        {
+            "ServicePlanName": "EXCHANGE_S_FOUNDATION",
+            "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
+        },
+        {
+            "ServicePlanName": "AAD_PREMIUM_P2",
+            "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
+        }
+        ]
+    }
+    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+}
+
+test_UserGroupExclusionUserExemptOnly_Incorrect if {
+    ControlNumber := "AAD 2.3"
+    Requirement := "Sign-ins detected as high risk SHALL be blocked"
+
+    Output := tests with input as {
+        "conditional_access_policies": [
+        {
+            "Conditions": {
+                "Applications": {
+                    "IncludeApplications": ["All"]
+                },
+                "Users": {
+                        "IncludeUsers": ["All"],
+                        "ExcludeUsers": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
+                        "ExcludeGroups": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"],
+                        "ExcludeRoles": []
+                },
+                "SignInRiskLevels": ["high"]
+            },
+            "GrantControls": {
+                "BuiltInControls": ["block"]
+            },
+            "State": "enabled",
+            "DisplayName": "Test name"
+        }
+        ],
+        "service_plans": [
+        {
+            "ServicePlanName": "EXCHANGE_S_FOUNDATION",
+            "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
+        },
+        {
+            "ServicePlanName": "AAD_PREMIUM_P2",
+            "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
+        }
+        ],
+        "scuba_config": {
+            "Aad": {
+                 "Policy2_3_1": {
+                    "CapExclusions": {
+                        "Users": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
+                        "Groups": []
+                    }
+                }
+            }
+        }
+    }
+    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+}
+
+test_UserGroupExclusionGroupExemptOnly_Incorrect if {
+    ControlNumber := "AAD 2.3"
+    Requirement := "Sign-ins detected as high risk SHALL be blocked"
+
+    Output := tests with input as {
+        "conditional_access_policies": [
+        {
+            "Conditions": {
+                "Applications": {
+                    "IncludeApplications": ["All"]
+                },
+                "Users": {
+                        "IncludeUsers": ["All"],
+                        "ExcludeUsers": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
+                        "ExcludeGroups": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"],
+                        "ExcludeRoles": []
+                },
+                "SignInRiskLevels": ["high"]
+            },
+            "GrantControls": {
+                "BuiltInControls": ["block"]
+            },
+            "State": "enabled",
+            "DisplayName": "Test name"
+        }
+        ],
+        "service_plans": [
+        {
+            "ServicePlanName": "EXCHANGE_S_FOUNDATION",
+            "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
+        },
+        {
+            "ServicePlanName": "AAD_PREMIUM_P2",
+            "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
+        }
+        ],
+        "scuba_config": {
+            "Aad": {
+                 "Policy2_3_1": {
+                    "CapExclusions": {
+                        "Users": [],
+                        "Groups": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]
+                    }
+                }
+            }
+        }
+    }
+    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+}
+
+test_UserGroupExclusionTooFewUserExempts_Incorrect if {
+    ControlNumber := "AAD 2.3"
+    Requirement := "Sign-ins detected as high risk SHALL be blocked"
+
+    Output := tests with input as {
+        "conditional_access_policies": [
+        {
+            "Conditions": {
+                "Applications": {
+                    "IncludeApplications": ["All"]
+                },
+                "Users": {
+                        "IncludeUsers": ["All"],
+                        "ExcludeUsers": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423", "65fea286-22d3-42f9-b4ca-93a6f75817d4"],
+                        "ExcludeGroups": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"],
+                        "ExcludeRoles": []
+                },
+                "SignInRiskLevels": ["high"]
+            },
+            "GrantControls": {
+                "BuiltInControls": ["block"]
+            },
+            "State": "enabled",
+            "DisplayName": "Test name"
+        }
+        ],
+        "service_plans": [
+        {
+            "ServicePlanName": "EXCHANGE_S_FOUNDATION",
+            "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
+        },
+        {
+            "ServicePlanName": "AAD_PREMIUM_P2",
+            "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
+        }
+        ],
+        "scuba_config": {
+            "Aad": {
+                 "Policy2_3_1": {
+                    "CapExclusions": {
+                        "Users": ["65fea286-22d3-42f9-b4ca-93a6f75817d4"],
+                        "Groups": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]
+                    }
+                }
+            }
+        }
+    }
+    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+}
+
+# Other Conditions
+test_Conditions_Correct if {
+    ControlNumber := "AAD 2.3"
+    Requirement := "Sign-ins detected as high risk SHALL be blocked"
+
+    Output := tests with input as {
+        "conditional_access_policies": [
+        {
+            "Conditions": {
+                "Applications": {
+                    "IncludeApplications": ["All"]
+                    },
+                "Users": {
+                    "IncludeUsers": ["All"],
+                    "ExcludeUsers": [],
+                    "ExcludeGroups": [],
+                    "ExcludeRoles": []
+                },
+                "SignInRiskLevels": ["high"]
+            },
+            "GrantControls": {
+                "BuiltInControls": ["block"]
+            },
+            "State": "enabled",
+            "DisplayName": "Test name"
+        }
+        ],
+        "service_plans": [
+        {
+            "ServicePlanName": "EXCHANGE_S_FOUNDATION",
+            "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
+        },
+        {
+            "ServicePlanName": "AAD_PREMIUM_P2",
+            "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
+        }
         ]
     }
 
@@ -45,12 +984,19 @@ test_IncludeApplications_Incorrect if {
     ControlNumber := "AAD 2.3"
     Requirement := "Sign-ins detected as high risk SHALL be blocked"
 
-    Output := tests with input as
-    {"conditional_access_policies": [
+    Output := tests with input as {
+        "conditional_access_policies": [
         {
             "Conditions": {
-                "Applications": {"IncludeApplications": ["Office365"]},
-                "Users": {"IncludeUsers": ["All"]},
+                "Applications": {
+                    "IncludeApplications": ["Office365"]
+                },
+                "Users": {
+                    "IncludeUsers": ["All"],
+                    "ExcludeUsers": [],
+                    "ExcludeGroups": [],
+                    "ExcludeRoles": []
+                },
                 "SignInRiskLevels": ["high"]
             },
             "GrantControls": {
@@ -61,12 +1007,14 @@ test_IncludeApplications_Incorrect if {
         }
         ],
         "service_plans": [
-            { "ServicePlanName": "EXCHANGE_S_FOUNDATION",
-                "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
-            },
-            { "ServicePlanName": "AAD_PREMIUM_P2",
-                "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
-            }
+        {
+            "ServicePlanName": "EXCHANGE_S_FOUNDATION",
+            "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
+        },
+        {
+            "ServicePlanName": "AAD_PREMIUM_P2",
+            "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
+        }
         ]
     }
 
@@ -81,12 +1029,19 @@ test_IncludeUsers_Incorrect if {
     ControlNumber := "AAD 2.3"
     Requirement := "Sign-ins detected as high risk SHALL be blocked"
 
-    Output := tests with input as
-    {"conditional_access_policies": [
+    Output := tests with input as {
+        "conditional_access_policies": [
         {
             "Conditions": {
-                "Applications": {"IncludeApplications": ["All"]},
-                "Users": {"IncludeUsers": ["8bc7c6ee-39a2-42a5-a31b-f77fb51db652"]},
+                "Applications": {
+                    "IncludeApplications": ["All"]
+                },
+                "Users": {
+                    "IncludeUsers": ["8bc7c6ee-39a2-42a5-a31b-f77fb51db652"],
+                    "ExcludeUsers": [],
+                    "ExcludeGroups": [],
+                    "ExcludeRoles": []
+                },
                 "SignInRiskLevels": ["high"]
             },
             "GrantControls": {
@@ -97,12 +1052,151 @@ test_IncludeUsers_Incorrect if {
         }
         ],
         "service_plans": [
-            { "ServicePlanName": "EXCHANGE_S_FOUNDATION",
-                "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
+        {
+            "ServicePlanName": "EXCHANGE_S_FOUNDATION",
+            "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
+        },
+        {
+            "ServicePlanName": "AAD_PREMIUM_P2",
+            "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
+        }
+        ]
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+}
+
+test_ExcludeUsers_Incorrect if {
+    ControlNumber := "AAD 2.3"
+  Requirement := "Sign-ins detected as high risk SHALL be blocked"
+
+    Output := tests with input as {
+        "conditional_access_policies": [
+       {
+            "Conditions": {
+                "Applications": {
+                    "IncludeApplications": ["All"]
+                },
+               "Users": {
+                    "IncludeUsers": ["All"],
+                    "ExcludeUsers": ["8bc7c6ee-39a2-42a5-a31b-f77fb51db652"],
+                    "ExcludeGroups": [],
+                    "ExcludeRoles": []
+                },
+                "SignInRiskLevels": ["high"]
             },
-            { "ServicePlanName": "AAD_PREMIUM_P2",
-                "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
-            }
+            "GrantControls": {
+                "BuiltInControls": ["block"]
+            },
+            "State": "enabled",
+            "DisplayName": "Test name"
+        }
+        ],
+        "service_plans": [
+        {
+            "ServicePlanName": "EXCHANGE_S_FOUNDATION",
+            "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
+        },
+        {
+            "ServicePlanName": "AAD_PREMIUM_P2",
+            "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
+        }
+        ]
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+}
+
+test_ExcludeGroups_Incorrect if {
+    ControlNumber := "AAD 2.3"
+    Requirement := "Sign-ins detected as high risk SHALL be blocked"
+
+    Output := tests with input as {
+        "conditional_access_policies": [
+        {
+            "Conditions": {
+                "Applications": {
+                    "IncludeApplications": ["All"]
+                },
+                "Users": {
+                    "IncludeUsers": ["All"],
+                    "ExcludeUsers": [],
+                    "ExcludeGroups": ["8bc7c6ee-39a2-42a5-a31b-f77fb51db652"],
+                    "ExcludeRoles": []
+
+                },
+                "SignInRiskLevels": ["high"]
+            },
+            "GrantControls": {
+                "BuiltInControls": ["block"]
+            },
+            "State": "enabled",
+            "DisplayName": "Test name"
+        }
+        ],
+        "service_plans": [
+        {
+            "ServicePlanName": "EXCHANGE_S_FOUNDATION",
+            "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
+        },
+        {
+            "ServicePlanName": "AAD_PREMIUM_P2",
+            "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
+        }
+        ]
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+}
+
+test_ExcludeRoles_Incorrect if {
+    ControlNumber := "AAD 2.3"
+    Requirement := "Sign-ins detected as high risk SHALL be blocked"
+
+    Output := tests with input as {
+        "conditional_access_policies": [
+        {
+            "Conditions": {
+                "Applications": {
+                    "IncludeApplications": ["All"]
+                },
+                "Users": {
+                    "IncludeUsers": ["All"],
+                    "ExcludeUsers": [],
+                    "ExcludeGroups": [],
+                    "ExcludeRoles": ["8bc7c6ee-39a2-42a5-a31b-f77fb51db652"]
+
+                },
+                "SignInRiskLevels": ["high"]
+            },
+            "GrantControls": {
+                "BuiltInControls": ["block"]
+            },
+            "State": "enabled",
+            "DisplayName": "Test name"
+        }
+        ],
+        "service_plans": [
+        {
+            "ServicePlanName": "EXCHANGE_S_FOUNDATION",
+            "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
+        },
+        {
+            "ServicePlanName": "AAD_PREMIUM_P2",
+            "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
+        }
         ]
     }
 
@@ -117,12 +1211,19 @@ test_SignInRiskLevels_Incorrect if {
     ControlNumber := "AAD 2.3"
     Requirement := "Sign-ins detected as high risk SHALL be blocked"
 
-    Output := tests with input as
-    {"conditional_access_policies": [
+    Output := tests with input as {
+        "conditional_access_policies": [
         {
             "Conditions": {
-                "Applications": {"IncludeApplications": ["All"]},
-                "Users": {"IncludeUsers": ["All"]},
+                "Applications": {
+                    "IncludeApplications": ["All"]
+                },
+                "Users": {
+                    "IncludeUsers": ["All"],
+                    "ExcludeUsers": [],
+                    "ExcludeGroups": [],
+                    "ExcludeRoles": []
+                },
                 "SignInRiskLevels": [""]
             },
             "GrantControls": {
@@ -133,12 +1234,14 @@ test_SignInRiskLevels_Incorrect if {
         }
         ],
         "service_plans": [
-            { "ServicePlanName": "EXCHANGE_S_FOUNDATION",
-                "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
-            },
-            { "ServicePlanName": "AAD_PREMIUM_P2",
-                "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
-            }
+        {
+            "ServicePlanName": "EXCHANGE_S_FOUNDATION",
+            "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
+        },
+        {
+            "ServicePlanName": "AAD_PREMIUM_P2",
+            "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
+        }
         ]
     }
 
@@ -153,12 +1256,19 @@ test_BuiltInControls_Incorrect if {
     ControlNumber := "AAD 2.3"
     Requirement := "Sign-ins detected as high risk SHALL be blocked"
 
-    Output := tests with input as
-    {"conditional_access_policies": [
+    Output := tests with input as {
+        "conditional_access_policies": [
         {
             "Conditions": {
-                "Applications": {"IncludeApplications": ["All"]},
-                "Users": {"IncludeUsers": ["All"]},
+                "Applications": {
+                    "IncludeApplications": ["All"]
+                },
+                "Users": {
+                    "IncludeUsers": ["All"],
+                    "ExcludeUsers": [],
+                    "ExcludeGroups": [],
+                    "ExcludeRoles": []
+                },
                 "SignInRiskLevels": ["high"]
             },
             "GrantControls": {
@@ -169,12 +1279,14 @@ test_BuiltInControls_Incorrect if {
         }
         ],
         "service_plans": [
-            { "ServicePlanName": "EXCHANGE_S_FOUNDATION",
-                "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
-            },
-            { "ServicePlanName": "AAD_PREMIUM_P2",
-                "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
-            }
+        {
+            "ServicePlanName": "EXCHANGE_S_FOUNDATION",
+            "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
+        },
+        {
+            "ServicePlanName": "AAD_PREMIUM_P2",
+            "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
+        }
         ]
     }
 
@@ -189,12 +1301,19 @@ test_State_Incorrect if {
     ControlNumber := "AAD 2.3"
     Requirement := "Sign-ins detected as high risk SHALL be blocked"
 
-    Output := tests with input as
-    {"conditional_access_policies": [
+    Output := tests with input as {
+        "conditional_access_policies": [
         {
             "Conditions": {
-                "Applications": {"IncludeApplications": ["All"]},
-                "Users": {"IncludeUsers": ["All"]},
+                "Applications": {
+                    "IncludeApplications": ["All"]
+                },
+                "Users": {
+                    "IncludeUsers": ["All"],
+                    "ExcludeUsers": [],
+                    "ExcludeGroups": [],
+                    "ExcludeRoles": []
+                },
                 "SignInRiskLevels": ["high"]
             },
             "GrantControls": {
@@ -205,12 +1324,14 @@ test_State_Incorrect if {
         }
         ],
         "service_plans": [
-            { "ServicePlanName": "EXCHANGE_S_FOUNDATION",
-                "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
-            },
-            { "ServicePlanName": "AAD_PREMIUM_P2",
-                "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
-            }
+        {
+            "ServicePlanName": "EXCHANGE_S_FOUNDATION",
+            "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
+        },
+        {
+            "ServicePlanName": "AAD_PREMIUM_P2",
+            "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
+        }
         ]
     }
 
