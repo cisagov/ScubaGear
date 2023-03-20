@@ -134,6 +134,7 @@ This [video](https://www.youtube.com/watch?v=GyF8HV_35GA) provides a good tutori
 
 
 **Power Platform**
+
 For Power Platform, the application must be [manually registered to Power Platform via interactive authentication](https://learn.microsoft.com/en-us/power-platform/admin/powershell-create-service-principal#registering-an-admin-management-application).
 ```
 Add-PowerAppsAccount -Endpoint prod -TenantID $tenantId # use -Endpoint usgov for gcc tenants
