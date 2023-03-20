@@ -120,7 +120,7 @@ The minimum user roles needed for each product are described in the table below.
 | Sharepoint Online       |  SharePoint Administrator                                                           |
 | OneDrive                |  SharePoint Administrator                                                           |
 
-> **Note**: Users with the Global Administrator role always have the necessary user permissions to run the tool.
+- **Note**: Users with the Global Administrator role always have the necessary user permissions to run the tool.
 
 
 ### Microsoft Graph Powershell SDK permissions
