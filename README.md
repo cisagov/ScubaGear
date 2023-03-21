@@ -48,8 +48,9 @@ In the event of an unsuccessful download, users can manually download the OPA ex
 ```
 
 ## Usage
-### Example 1: Run an assessment against all products (except PowerPlatform)
+ScubaGear can be invoked interactively or non-interactively. The interactive authentication mode will prompt the user for credentials via Microsoft's popup windows. Non-interactive mode is for invoking ScubaGear using an Azure AD application service principal and supports running the tool in automated scenarios such as pipelines or scheduled jobs. Examples 1-3 provide examples for running with interactive mode and example 4 provides an example for running in non-interactive mode.
 
+### Example 1: Run an assessment against all products (except PowerPlatform)
 ```powershell
 Invoke-SCuBA
 ```
@@ -60,6 +61,10 @@ Invoke-SCuBA -ProductNames aad -OutPath C:\Users\johndoe\reports
 ### Example 3: Run assessments against multiple products
 ```powershell
 Invoke-SCuBA -ProductNames aad, spo, teams
+```
+### Example 4: Run assessments non-interactively using an application service principal and authenticating via CertificateThumbprint
+```powershell
+Invoke-SCuBA -ProductNames * -CertificateThumbprint "<insert-thumbprint>" -AppID "<insert-appid>" -Organization tenant.onmicrosoft.com
 ```
 
 To view more examples and see detailed help run:
@@ -95,7 +100,7 @@ Get-Help -Name Invoke-SCuBA -Full
 The HTML report should open in your browser once the script completes. If it does not, navigate to the output folder and open the BaselineReports.html file using your browser. The result files generated from the tool are also saved to the output folder.
 
 ## Required Permissions
-The tool has two types of permissions that are required:
+When executing the tool interactively, there are two types of permissions that are required:
 - User Permissions (which are associated with Azure AD roles assigned to a user)
 - Application Permissions (which are assigned to the MS Graph PowerShell application in Azure AD).
 
@@ -115,7 +120,7 @@ The minimum user roles needed for each product are described in the table below.
 | Sharepoint Online       |  SharePoint Administrator                                                           |
 | OneDrive                |  SharePoint Administrator                                                           |
 
-**Note**: Users with the Global Administrator role always have the necessary user permissions to run the tool.
+- **Note**: Users with the Global Administrator role always have the necessary user permissions to run the tool.
 
 
 ### Microsoft Graph Powershell SDK permissions
@@ -137,6 +142,37 @@ The following API permissions are required for Microsoft Graph Powershell:
 - RoleManagement.Read.Directory
 - User.Read.All
 - UserAuthenticationMethod.Read.All
+
+
+### Application Service Principal Permissions & Setup
+Below are the permissions for running the tool non-interactively. The minimum API permissions for all products are listed in the image below. The minimum user role permissions that need to be granted to the application are listed in the *Assign the following Azure AD roles to the service principal* subsection.
+
+This [video](https://www.youtube.com/watch?v=GyF8HV_35GA) provides a good tutorial for creating an application manually in the Azure Portal. Augment the API permissions and replace the role assignment instructions in the video with the permissions listed below.
+
+
+**API Permissions**
+![ScubaGear App Service Principal API Permissions](/images/appserviceprincipal-api-permssions.png)
+
+
+**Power Platform**
+
+For Power Platform, the application must be [manually registered to Power Platform via interactive authentication](https://learn.microsoft.com/en-us/power-platform/admin/powershell-create-service-principal#registering-an-admin-management-application).
+```powershell
+Add-PowerAppsAccount -Endpoint prod -TenantID $tenantId # use -Endpoint usgov for gcc tenants
+New-PowerAppManagementApp -ApplicationId $appId # Must be run from a Power Platform Adminstrator or Global Adminstrator account
+```
+
+
+**Assign the following Azure AD roles to the service principal**
+- SharePoint Administrator
+- Global Reader
+
+
+**Certificate store notes**
+- Power Platform has a [hardcoded expectation](https://github.com/microsoft/Microsoft365DSC/issues/2781) that the certificate is located in "Cert:\CurrentUser\My".
+- MS Graph seems to also have an expectation that the certificate at least be located in one of the local client's certificate store(s).
+
+> **Notes**: Only authentication via `CertificateThumbprint` is currently supported. We will also be supporting automated app registration in a later release.
 
 
 ## Architecture
