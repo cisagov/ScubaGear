@@ -12,13 +12,13 @@ test_Rdata_Correct if {
     Output := tests with input as {
         "dmarc_records":[
             {
-                "rdata" : "v=DMARC1; p=reject; pct=100; rua=mailto:DMARC@hq.dhs.gov, mailto:reports@dmarc.cyber.dhs.gov", 
+                "rdata" : ["v=DMARC1; p=reject; pct=100; rua=mailto:DMARC@hq.dhs.gov, mailto:reports@dmarc.cyber.dhs.gov"], 
                 "domain" : "test.name"
             }
         ],
         "spf_records": [
             {
-                "rdata" : "spf1 ", 
+                "rdata" : ["spf1 "], 
                 "domain" : "test.name"
             }
         ]  
@@ -38,13 +38,13 @@ test_Rdata_Incorrect if {
     Output := tests with input as {
         "dmarc_records":[
             {
-                "rdata" : " ", 
+                "rdata" : [], 
                 "domain" : "test.name"
             }
         ],
         "spf_records": [
             {
-                "rdata" : "spf1 ", 
+                "rdata" : ["spf1 "], 
                 "domain" : "test.name"
             }
         ]  
@@ -64,13 +64,13 @@ test_Rdata_Incorrect_V2 if {
     Output := tests with input as {
         "dmarc_records":[  
             {
-                "rdata" : "v=DMARC1", 
+                "rdata" : ["v=DMARC1"], 
                 "domain" : "test.name"
             }
         ],
         "spf_records": [
             {
-                "rdata" : "spf1 ", 
+                "rdata" : ["spf1 "], 
                 "domain" : "test.name"
             }
         ]  
@@ -90,21 +90,21 @@ test_Rdata_Incorrect_V3 if {
     Output := tests with input as {
         "dmarc_records": [
             {
-                "rdata" : "v=DMARC1; p=reject; pct=100; rua=mailto:DMARC@hq.dhs.gov, mailto:reports@dmarc.cyber.dhs.gov", 
+                "rdata" : ["v=DMARC1; p=reject; pct=100; rua=mailto:DMARC@hq.dhs.gov, mailto:reports@dmarc.cyber.dhs.gov"], 
                 "domain" : "test.name"
             },
             {
-                "rdata" : "", 
+                "rdata" : [], 
                 "domain" : "bad.name"
             }
         ],
         "spf_records": [
             {
-                "rdata" : "spf1 ", 
+                "rdata" : ["spf1 "], 
                 "domain" : "test.name"
             },
             {
-                "rdata" : "spf1 ", 
+                "rdata" : ["spf1 "], 
                 "domain" : "bad.name"
             }
         ]  
@@ -127,13 +127,13 @@ test_Rdata_Correct_V2 if {
     Output := tests with input as {
         "dmarc_records": [
             {
-                "rdata" : "v=DMARC1; p=reject; pct=100; rua=mailto:DMARC@hq.dhs.gov, mailto:reports@dmarc.cyber.dhs.gov", 
+                "rdata" : ["v=DMARC1; p=reject; pct=100; rua=mailto:DMARC@hq.dhs.gov, mailto:reports@dmarc.cyber.dhs.gov"], 
                 "domain" : "test.name"
             }
         ],
         "spf_records": [
             {
-                "rdata" : "spf1 ", 
+                "rdata" : ["spf1 "], 
                 "domain" : "test.name"
             }
         ]  
@@ -153,13 +153,13 @@ test_Rdata_Incorrect_V4 if {
     Output := tests with input as {
         "dmarc_records": [
             {
-                "rdata" : "v=DMARC1; p=none; mailto:reports@dmarc.cyber.dhs.gov mailto:jsmith@dhs.gov mailto:jsomething@dhs.gov", 
+                "rdata" : ["v=DMARC1; p=none; mailto:reports@dmarc.cyber.dhs.gov mailto:jsmith@dhs.gov mailto:jsomething@dhs.gov"], 
                 "domain" : "test.name"
             }
         ],
         "spf_records": [
             {
-                "rdata" : "spf1 ", 
+                "rdata" : ["spf1 "], 
                 "domain" : "test.name"
             }
         ]  
@@ -179,13 +179,13 @@ test_Rdata_Incorrect_V5 if {
     Output := tests with input as {
         "dmarc_records": [
             {
-                "rdata" : "v=DMARC1; mailto:reports@dmarc.cyber.dhs.gov mailto:jsmith@dhs.gov mailto:jsomething@dhs.gov", 
+                "rdata" : ["v=DMARC1; mailto:reports@dmarc.cyber.dhs.gov mailto:jsmith@dhs.gov mailto:jsomething@dhs.gov"], 
                 "domain" : "test.name"
             }
         ],
         "spf_records": [
             {
-                "rdata" : "spf1 ", 
+                "rdata" : ["spf1 "], 
                 "domain" : "test.name"
             }
         ]  
@@ -208,13 +208,13 @@ test_Rdata_Correct_V3 if {
     Output := tests with input as {
         "dmarc_records": [
             {
-                "rdata" : "v=DMARC1; p=reject; pct=100; rua=mailto:DMARC@hq.dhs.gov, mailto:reports@dmarc.cyber.dhs.gov", 
+                "rdata" : ["v=DMARC1; p=reject; pct=100; rua=mailto:DMARC@hq.dhs.gov, mailto:reports@dmarc.cyber.dhs.gov"], 
                 "domain" : "test.name"
             }
         ],
         "spf_records": [
             {
-                "rdata" : "spf1 ", 
+                "rdata" : ["spf1 "], 
                 "domain" : "test.name"
             }
         ]  
@@ -234,13 +234,13 @@ test_Rdata_Incorrect_V6 if {
     Output := tests with input as {
         "dmarc_records": [
             {
-                "rdata" : "v=DMARC1; p=reject; pct=100;", 
+                "rdata" : ["v=DMARC1; p=reject; pct=100;"], 
                 "domain" : "test.name"
             }
         ],
         "spf_records": [
             {
-                "rdata" : "spf1 ", 
+                "rdata" : ["spf1 "], 
                 "domain" : "test.name"
             }
         ]  
@@ -260,13 +260,13 @@ test_Rdata_Incorrect_V7 if {
     Output := tests with input as {
         "dmarc_records": [
             {
-                "rdata" : "v=DMARC1; p=reject; pct=100; rua=mailto:reports@wrong.address", 
+                "rdata" : ["v=DMARC1; p=reject; pct=100; rua=mailto:reports@wrong.address"], 
                 "domain" : "test.name"
             }
         ],
         "spf_records": [
             {
-                "rdata" : "spf1 ", 
+                "rdata" : ["spf1 "], 
                 "domain" : "test.name"
             }
         ]  
@@ -289,13 +289,13 @@ test_Rdata_Incorrect_V4 if {
     Output := tests with input as {
         "dmarc_records": [
             {
-                "rdata" : "v=DMARC1; p=reject; pct=100; rua=mailto:DMARC@hq.dhs.gov, mailto:reports@dmarc.cyber.dhs.gov", 
+                "rdata" : ["v=DMARC1; p=reject; pct=100; rua=mailto:DMARC@hq.dhs.gov, mailto:reports@dmarc.cyber.dhs.gov"], 
                 "domain" : "test.name"
             }
         ],
         "spf_records": [
             {
-                "rdata" : "spf1 ", 
+                "rdata" : ["spf1 "], 
                 "domain" : "test.name"
             }
         ]  
@@ -315,13 +315,13 @@ test_Rdata_Incorrect_V8 if {
     Output := tests with input as {
         "dmarc_records": [
             {
-                "rdata" : "v=DMARC1; p=reject; pct=100; rua=mailto:reports@dmarc.cyber.dhs.gov", 
+                "rdata" : ["v=DMARC1; p=reject; pct=100; rua=mailto:reports@dmarc.cyber.dhs.gov"], 
                 "domain" : "test.name"
             }
         ],
         "spf_records": [
             {
-                "rdata" : "spf1 ", 
+                "rdata" : ["spf1 "], 
                 "domain" : "test.name"
             }
         ]  

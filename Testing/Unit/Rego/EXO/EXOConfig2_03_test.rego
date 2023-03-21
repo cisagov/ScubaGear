@@ -18,13 +18,13 @@ test_Enabled_Correct_V1 if {
         ],
         "dkim_records": [
             {
-                "rdata" : "v=DKIM1;", 
+                "rdata" : ["v=DKIM1;"], 
                 "domain" : "test.name"
             }
         ],
         "spf_records": [
             {
-                "rdata" : "spf1 ", 
+                "rdata" : ["spf1 "], 
                 "domain" : "test.name"
             }
         ]  
@@ -57,21 +57,21 @@ test_Enabled_Correct_V2 if {
         ],
         "dkim_records": [
             {
-                "rdata" : "v=DKIM1;", 
+                "rdata" : ["v=DKIM1;"], 
                 "domain" : "test.name"
             },
             {
-                "rdata" : "", 
+                "rdata" : [], 
                 "domain" : "example.onmicrosoft.com"
             }
         ],
         "spf_records": [
             {
-                "rdata" : "spf1 ", 
+                "rdata" : ["spf1 "], 
                 "domain" : "test.name"
             },
             {
-                "rdata" : "spf1 ", 
+                "rdata" : ["spf1 "], 
                 "domain" : "example.onmicrosoft.com"
             }
         ]  
@@ -102,21 +102,21 @@ test_Enabled_Correct_V3 if {
         ],
         "dkim_records": [
             {
-                "rdata" : "v=DKIM1;", 
+                "rdata" : ["v=DKIM1;"], 
                 "domain" : "test.name"
             },
             {
-                "rdata" : "v=DKIM1;", 
+                "rdata" : ["v=DKIM1;"], 
                 "domain" : "test2.name"
             }
         ],
         "spf_records": [
             {
-                "rdata" : "spf1 ", 
+                "rdata" : ["spf1 "], 
                 "domain" : "test.name"
             },
             {
-                "rdata" : "spf1 ", 
+                "rdata" : ["spf1 "], 
                 "domain" : "test2.name"
             }
         ]  
@@ -143,13 +143,13 @@ test_Enabled_Correct_V4 if {
         ],
         "dkim_records": [
             {
-                "rdata" : "v=DKIM1;", 
+                "rdata" : ["v=DKIM1;"], 
                 "domain" : "example.onmicrosoft.com"
             }
         ],
         "spf_records": [
             {
-                "rdata" : "spf1 ", 
+                "rdata" : ["spf1 "], 
                 "domain" : "example.onmicrosoft.com"
             }
         ]  
@@ -175,13 +175,13 @@ test_Enabled_Incorrect if {
         ],
         "dkim_records": [
             {
-                "rdata" : "v=DKIM1;", 
+                "rdata" : ["v=DKIM1;"], 
                 "domain" : "test.name"
             }
         ],
         "spf_records": [
             {
-                "rdata" : "spf1 ", 
+                "rdata" : ["spf1 "], 
                 "domain" : "test.name"
             }
         ]  
@@ -207,13 +207,13 @@ test_Rdata_Incorrect if {
         ],
         "dkim_records": [
             {
-                "rdata" : " ", 
+                "rdata" : [], 
                 "domain" : "test.name"
             }
         ],
         "spf_records": [
             {
-                "rdata" : "spf1 ", 
+                "rdata" : ["spf1 "], 
                 "domain" : "test.name"
             }
         ]  
@@ -239,13 +239,13 @@ test_Rdata_Incorrect_V2 if {
         ],
         "dkim_records": [
             {
-                "rdata" : "Hello World", 
+                "rdata" : ["Hello World"], 
                 "domain" : "test.name"
             }
         ],
         "spf_records": [
             {
-                "rdata" : "spf1 ", 
+                "rdata" : ["spf1 "], 
                 "domain" : "test.name"
             }
         ]  
@@ -275,21 +275,21 @@ test_Enabled_Correct_V2 if {
         ],
         "dkim_records": [
             {
-                "rdata" : "v=DKIM1;", 
+                "rdata" : ["v=DKIM1;"], 
                 "domain" : "test.name"
             },
             {
-                "rdata" : "v=DKIM1;", 
+                "rdata" : ["v=DKIM1;"], 
                 "domain" : "test2.name"
             }
         ],
         "spf_records": [
             {
-                "rdata" : "spf1 ", 
+                "rdata" : ["spf1 "], 
                 "domain" : "test.name"
             },
             {
-                "rdata" : "spf1 ", 
+                "rdata" : ["spf1 "], 
                 "domain" : "test2.name"
             }
         ]  
@@ -319,21 +319,21 @@ test_Enabled_Inorrect_V3 if {
         ],
         "dkim_records": [
             {
-                "rdata" : "v=DKIM1;", 
+                "rdata" : ["v=DKIM1;"], 
                 "domain" : "test.name"
             },
             {
-                "rdata" : "v=DKIM1;", 
+                "rdata" : ["v=DKIM1;"], 
                 "domain" : "test2.name"
             }
         ],
         "spf_records": [
             {
-                "rdata" : "spf1 ", 
+                "rdata" : ["spf1 "], 
                 "domain" : "test.name"
             },
             {
-                "rdata" : "spf1 ", 
+                "rdata" : ["spf1 "], 
                 "domain" : "test2.name"
             }
         ]  
