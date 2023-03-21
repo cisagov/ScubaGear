@@ -284,7 +284,7 @@ ScubaGear requires a number of PowerShell modules to function.  A user or develo
 
 ### PowerShell Execution Policies
 
-On Windows Servers, the default [execution policy](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.security/set-executionpolicy?view=powershell-7.3) is `RemoteSigned`, which will allow ScubaGear to run after the publisher (CISA) is agreed to once.
+On Windows Servers, the default [execution policy](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.security/set-executionpolicy?view=powershell-5.1) is `RemoteSigned`, which will allow ScubaGear to run after the publisher (CISA) is agreed to once.
 
 On Windows Clients, the default execution policy is `Restricted`.  In this case, `Set-ExecutionPolicy RemoteSigned` should be invoked to permit ScubaGear to run.
 
