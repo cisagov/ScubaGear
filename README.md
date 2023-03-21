@@ -36,7 +36,7 @@ Import-Module -Name .\PowerShell\ScubaGear #Imports the tool into your session
 ```
 
 > **Note**
-> Starting with release 0.3.0, ScubaGear is signed by a commonly trusted CA.  Depending on the [PowerShell execution policy](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_execution_policies?view=powershell-5.1) of the system running ScubaGear, different steps may be required before running running ScubaGear.  See [PowerShell Execution Policies](#powershell-execution-policies) for more details.
+> Starting with release 0.3.0, ScubaGear is signed by a commonly trusted CA.  Depending on the [PowerShell execution policy](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_execution_policies?view=powershell-5.1) of the system running ScubaGear, different steps may be required before running ScubaGear.  See [PowerShell Execution Policies](#powershell-execution-policies) for more details.
 
 ## Usage
 ### Example 1: Run an assessment against all products (except PowerPlatform)
