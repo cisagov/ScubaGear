@@ -48,6 +48,8 @@ In the event of an unsuccessful download, users can manually download the OPA ex
 ```
 
 ## Usage
+ScubaGear can be invoked interactively or non-interactively. The interactive authentication mode will prompt the user for credentials via Microsoft's popup windows. Non-interactive mode is for invoking ScubaGear using an Azure AD application service principal and supports running the tool in automated scenarios such as pipelines or scheduled jobs. Examples 1-3 provide examples for running with interactive mode and example 4 provides an example for running in non-interactive mode.
+
 ### Example 1: Run an assessment against all products (except PowerPlatform)
 
 ```powershell
@@ -62,7 +64,7 @@ Invoke-SCuBA -ProductNames aad -OutPath C:\Users\johndoe\reports
 Invoke-SCuBA -ProductNames aad, spo, teams
 ```
 
-### Example 4: Run assessments non-interactively using an application service principal and authenticating via CertficateThumbprint
+### Example 4: Run assessments non-interactively using an application service principal and authenticating via CertificateThumbprint
 ```powershell
 Invoke-SCuBA -ProductNames * -CertificateThumbprint "<insert-thumbprint>" -AppID "<insert-appid>" -Organization tenant.onmicrosoft.com
 ```
@@ -144,8 +146,8 @@ The following API permissions are required for Microsoft Graph Powershell:
 - UserAuthenticationMethod.Read.All
 
 
-### Application Service Principal Permissions
-Permissions for running the tool non-interactively. The minimum API permissions for all products are listed in the image below. The minimum user role permissions that need to be granted to the application are listed in the *Role Assignments* subsection.
+### Application Service Principal Permissions & Setup
+Below are the permissions for running the tool non-interactively. The minimum API permissions for all products are listed in the image below. The minimum user role permissions that need to be granted to the application are listed in the *Role Assignments* subsection.
 
 This [video](https://www.youtube.com/watch?v=GyF8HV_35GA) provides a good tutorial for creating an application manually in the Azure Portal. Augment the API permissions and replace the role assignment instructions in the video with the permissions listed below.
 
@@ -157,13 +159,13 @@ This [video](https://www.youtube.com/watch?v=GyF8HV_35GA) provides a good tutori
 **Power Platform**
 
 For Power Platform, the application must be [manually registered to Power Platform via interactive authentication](https://learn.microsoft.com/en-us/power-platform/admin/powershell-create-service-principal#registering-an-admin-management-application).
-```
+```powershell
 Add-PowerAppsAccount -Endpoint prod -TenantID $tenantId # use -Endpoint usgov for gcc tenants
 New-PowerAppManagementApp -ApplicationId $appId # Must be run from a Power Platform Adminstrator or Global Adminstrator account
 ```
 
 
-**Application Role Assignments**
+**Assign the following Azure AD roles to the service principal**
 - SharePoint Administrator
 - Global Reader (May not be necessary on G5 licensed tenants)
 
