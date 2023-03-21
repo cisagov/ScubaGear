@@ -28,14 +28,15 @@ To download ScubaGear:
 
 To import the module, open a new PowerShell 5.1 terminal and navigate to the repository folder. 
 
-Starting with release 0.3.0, ScubaGear is signed by a commonly trusted CA. See [below]() for information about running ScubaGear with different [PowerShell execution policies](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_execution_policies?view=powershell-5.1).  In 0.2.1 and earlier, running `Unblock-File` on the ScubaGear folder may be required. See [here](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/unblock-file?view=powershell-5.1) for more information.  
-
 Then run:
 
 ```powershell
 .\Setup.ps1 #Installs the required modules
 Import-Module -Name .\PowerShell\ScubaGear #Imports the tool into your session
 ```
+
+> **Note**
+> Starting with release 0.3.0, ScubaGear is signed by a commonly trusted CA.  Depending on the [PowerShell execution policy](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_execution_policies?view=powershell-5.1) of the system running ScubaGear, different steps may be required before running running ScubaGear.  See [PowerShell Execution Policies](#powershell-execution-policies) for more details.
 
 ## Usage
 ### Example 1: Run an assessment against all products (except PowerPlatform)
@@ -288,3 +289,5 @@ On Windows Servers, the default [execution policy](https://learn.microsoft.com/e
 On Windows Clients, the default execution policy is `Restricted`.  In this case, Unblock-File may be necessary to run the SetUp.ps1 script.
 
 When the execution policy is set to Unrestricted (which is the default in Powershell 6.0+ on non-Windows machines), the user must unblock the tool on each use.
+
+In ScubaGear version 0.2.1 and earlier, running `Unblock-File` on the ScubaGear folder may be required. See [here](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/unblock-file?view=powershell-5.1) for more information.  
