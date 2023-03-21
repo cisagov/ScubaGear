@@ -1,63 +1,23 @@
-[
+ï»¿[
     {
-        "ActualValue":  false,
-        "Commandlet":  "Get-MgPolicyAdminConsentRequestPolicy",
-        "Control":  "AAD 2.7",
-        "Criticality":  "Shall",
-        "ReportDetails":  "Requirement not met",
-        "Requirement":  "An admin consent workflow SHALL be configured",
-        "RequirementMet":  false
-    },
-    {
-        "ActualValue":  true,
-        "Commandlet":  "Get-MgPolicyAuthorizationPolicy",
-        "Control":  "AAD 2.6",
-        "Criticality":  "Shall",
-        "ReportDetails":  "Requirement not met",
-        "Requirement":  "Only administrators SHALL be allowed to register third-party applications",
-        "RequirementMet":  false
-    },
-    {
-        "ActualValue":  "",
-        "Commandlet":  "Get-MgDirectoryRoleMember",
+        "ActualValue":  "Doe, Jane",
+        "Commandlet":  [
+                           "Get-MgSubscribedSku",
+                           "Get-PrivilegedUser"
+                       ],
         "Control":  "AAD 2.12",
         "Criticality":  "Shall",
-        "ReportDetails":  "0 admin(s) that are not cloud-only found",
+        "ReportDetails":  "1 admin(s) that are not cloud-only found:\u003cbr/\u003eDoe, Jane",
         "Requirement":  "Users that need to be assigned to highly privileged Azure AD roles SHALL be provisioned cloud-only accounts that are separate from the on-premises directory or other federated identity providers",
-        "RequirementMet":  true
-    },
-    {
-        "ActualValue":  "Role ID : 10dae51f-b6af-4016-8d66-8c2a99b929b3",
-        "Commandlet":  "Get-MgPolicyAuthorizationPolicy",
-        "Control":  "AAD 2.18",
-        "Criticality":  "Should",
-        "ReportDetails":  "Permission level set to \"Limited access\"",
-        "Requirement":  "Guest users SHOULD have limited access to Azure AD directory objects",
-        "RequirementMet":  true
-    },
-    {
-        "ActualValue":  "[ManagePermissionGrantsForSelf.microsoft-user-default-legacy]",
-        "Commandlet":  "Get-MgPolicyAuthorizationPolicy",
-        "Control":  "AAD 2.7",
-        "Criticality":  "Shall",
-        "ReportDetails":  "Requirement not met",
-        "Requirement":  "Only administrators SHALL be allowed to consent to third-party applications",
-        "RequirementMet":  false
-    },
-    {
-        "ActualValue":  "everyone",
-        "Commandlet":  "Get-MgPolicyAuthorizationPolicy",
-        "Control":  "AAD 2.18",
-        "Criticality":  "Should",
-        "ReportDetails":  "Requirement not met",
-        "Requirement":  "Only users with the Guest Inviter role SHOULD be able to invite guest users",
         "RequirementMet":  false
     },
     {
         "ActualValue":  [
 
                         ],
-        "Commandlet":  "",
+        "Commandlet":  [
+
+                       ],
         "Control":  "AAD 2.18",
         "Criticality":  "Should/Not-Implemented",
         "ReportDetails":  "Currently cannot be checked automatically. See Azure Active Directory Secure Configuration Baseline policy 2.18 for instructions on manual check",
@@ -68,7 +28,9 @@
         "ActualValue":  [
 
                         ],
-        "Commandlet":  "",
+        "Commandlet":  [
+
+                       ],
         "Control":  "AAD 2.2",
         "Criticality":  "Should/Not-Implemented",
         "ReportDetails":  "Currently cannot be checked automatically. See Azure Active Directory Secure Configuration Baseline policy 2.2 for instructions on manual check",
@@ -79,7 +41,9 @@
         "ActualValue":  [
 
                         ],
-        "Commandlet":  "",
+        "Commandlet":  [
+
+                       ],
         "Control":  "AAD 2.4",
         "Criticality":  "Shall/Not-Implemented",
         "ReportDetails":  "Currently cannot be checked automatically. See Azure Active Directory Secure Configuration Baseline policy 2.4 for instructions on manual check",
@@ -90,7 +54,9 @@
         "ActualValue":  [
 
                         ],
-        "Commandlet":  "",
+        "Commandlet":  [
+
+                       ],
         "Control":  "AAD 2.4",
         "Criticality":  "Shall/Not-Implemented",
         "ReportDetails":  "Currently cannot be checked automatically. See Azure Active Directory Secure Configuration Baseline policy 2.4 for instructions on manual check",
@@ -101,7 +67,9 @@
         "ActualValue":  [
 
                         ],
-        "Commandlet":  "",
+        "Commandlet":  [
+
+                       ],
         "Control":  "AAD 2.4",
         "Criticality":  "Shall/Not-Implemented",
         "ReportDetails":  "Currently cannot be checked automatically. See Azure Active Directory Secure Configuration Baseline policy 2.4 for instructions on manual check",
@@ -112,7 +80,9 @@
         "ActualValue":  [
 
                         ],
-        "Commandlet":  "",
+        "Commandlet":  [
+
+                       ],
         "Control":  "AAD 2.5",
         "Criticality":  "Shall/Not-Implemented",
         "ReportDetails":  "Currently cannot be checked automatically. See Azure Active Directory Secure Configuration Baseline policy 2.5 for instructions on manual check",
@@ -123,7 +93,9 @@
         "ActualValue":  [
 
                         ],
-        "Commandlet":  "",
+        "Commandlet":  [
+
+                       ],
         "Control":  "AAD 2.5",
         "Criticality":  "Shall/Not-Implemented",
         "ReportDetails":  "Currently cannot be checked automatically. See Azure Active Directory Secure Configuration Baseline policy 2.5 for instructions on manual check",
@@ -134,7 +106,9 @@
         "ActualValue":  [
 
                         ],
-        "Commandlet":  "",
+        "Commandlet":  [
+
+                       ],
         "Control":  "AAD 2.8",
         "Criticality":  "Shall/Not-Implemented",
         "ReportDetails":  "Currently cannot be checked automatically. See Azure Active Directory Secure Configuration Baseline policy 2.8 for instructions on manual check",
@@ -142,203 +116,318 @@
         "RequirementMet":  false
     },
     {
-        "ActualValue":  [
-
-                        ],
-        "Commandlet":  "Get-MgIdentityConditionalAccessPolicy",
-        "Control":  "AAD 2.1",
-        "Criticality":  "Shall",
-        "ReportDetails":  "0 conditional access policy(s) found that meet(s) all requirements",
-        "Requirement":  "Legacy authentication SHALL be blocked",
+        "ActualValue":  {
+                            "all_allow_invite_values":  [
+                                                            {
+                                                                "AllowInvitesFromValue":  "everyone",
+                                                                "PolicyId":  "authorizationPolicy"
+                                                            }
+                                                        ]
+                        },
+        "Commandlet":  [
+                           "Get-MgPolicyAuthorizationPolicy"
+                       ],
+        "Control":  "AAD 2.18",
+        "Criticality":  "Should",
+        "ReportDetails":  "Permission level set to \"everyone\" (authorizationPolicy)",
+        "Requirement":  "Only users with the Guest Inviter role SHOULD be able to invite guest users",
         "RequirementMet":  false
+    },
+    {
+        "ActualValue":  {
+                            "all_allowed_create_values":  [
+                                                              {
+                                                                  "DefaultUser_AllowedToCreateApps":  true,
+                                                                  "PolicyId":  "authorizationPolicy"
+                                                              }
+                                                          ]
+                        },
+        "Commandlet":  [
+                           "Get-MgPolicyAuthorizationPolicy"
+                       ],
+        "Control":  "AAD 2.6",
+        "Criticality":  "Shall",
+        "ReportDetails":  "1 authorization policies found that allow non-admin users to register third-party applications:\u003cbr/\u003eauthorizationPolicy",
+        "Requirement":  "Only administrators SHALL be allowed to register third-party applications",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  {
+                            "all_consent_policies":  [
+                                                         {
+                                                             "IsEnabled":  true,
+                                                             "PolicyId":  null
+                                                         }
+                                                     ]
+                        },
+        "Commandlet":  [
+                           "Get-MgPolicyAdminConsentRequestPolicy"
+                       ],
+        "Control":  "AAD 2.7",
+        "Criticality":  "Shall",
+        "ReportDetails":  "Requirement met",
+        "Requirement":  "An admin consent workflow SHALL be configured",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  {
+                            "all_grant_policy_values":  [
+                                                            {
+                                                                "DefaultUser_DefaultGrantPolicy":  [
+                                                                                                       "ManagePermissionGrantsForSelf.microsoft-user-default-legacy"
+                                                                                                   ],
+                                                                "PolicyId":  "authorizationPolicy"
+                                                            }
+                                                        ]
+                        },
+        "Commandlet":  [
+                           "Get-MgPolicyAuthorizationPolicy"
+                       ],
+        "Control":  "AAD 2.7",
+        "Criticality":  "Shall",
+        "ReportDetails":  "1 authorization policies found that allow non-admin users to consent to third-party applications:\u003cbr/\u003eauthorizationPolicy",
+        "Requirement":  "Only administrators SHALL be allowed to consent to third-party applications",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  {
+                            "all_roleid_values":  [
+                                                      {
+                                                          "GuestUserRoleId":  "10dae51f-b6af-4016-8d66-8c2a99b929b3",
+                                                          "GuestUserRoleIdString":  "Limited access",
+                                                          "Id":  "authorizationPolicy"
+                                                      }
+                                                  ]
+                        },
+        "Commandlet":  [
+                           "Get-MgPolicyAuthorizationPolicy"
+                       ],
+        "Control":  "AAD 2.18",
+        "Criticality":  "Should",
+        "ReportDetails":  "Permission level set to \"Limited access\" (authorizationPolicy)",
+        "Requirement":  "Guest users SHOULD have limited access to Azure AD directory objects",
+        "RequirementMet":  true
     },
     {
         "ActualValue":  [
 
                         ],
-        "Commandlet":  "Get-MgIdentityConditionalAccessPolicy",
-        "Control":  "AAD 2.10",
-        "Criticality":  "Shall",
-        "ReportDetails":  "0 conditional access policy(s) found that meet(s) all requirements",
-        "Requirement":  "Browser sessions SHALL not be persistent",
-        "RequirementMet":  false
-    },
-    {
-        "ActualValue":  [
-
-                        ],
-        "Commandlet":  "Get-MgIdentityConditionalAccessPolicy",
-        "Control":  "AAD 2.13",
-        "Criticality":  "Shall",
-        "ReportDetails":  "0 conditional access policy(s) found that meet(s) all requirements",
-        "Requirement":  "MFA SHALL be required for user access to highly privileged roles",
-        "RequirementMet":  false
-    },
-    {
-        "ActualValue":  [
-
-                        ],
-        "Commandlet":  "Get-MgIdentityConditionalAccessPolicy",
+        "Commandlet":  [
+                           "Get-MgIdentityConditionalAccessPolicy"
+                       ],
         "Control":  "AAD 2.17",
         "Criticality":  "Should",
-        "ReportDetails":  "0 conditional access policy(s) found that meet(s) all requirements",
+        "ReportDetails":  "0 conditional access policy(s) found that meet(s) all requirements. \u003ca href=\u0027#caps\u0027\u003eView all CA policies\u003c/a\u003e.",
         "Requirement":  "Managed devices SHOULD be required for authentication",
         "RequirementMet":  false
     },
     {
         "ActualValue":  [
-
+                            "Doe, Jane"
                         ],
-        "Commandlet":  "Get-MgIdentityConditionalAccessPolicy",
-        "Control":  "AAD 2.2",
-        "Criticality":  "Shall",
-        "ReportDetails":  "0 conditional access policy(s) found that meet(s) all requirements",
-        "Requirement":  "Users detected as high risk SHALL be blocked",
-        "RequirementMet":  false
-    },
-    {
-        "ActualValue":  [
-
-                        ],
-        "Commandlet":  "Get-MgIdentityConditionalAccessPolicy",
-        "Control":  "AAD 2.3",
-        "Criticality":  "Shall",
-        "ReportDetails":  "0 conditional access policy(s) found that meet(s) all requirements",
-        "Requirement":  "Sign-ins detected as high risk SHALL be blocked",
-        "RequirementMet":  false
-    },
-    {
-        "ActualValue":  [
-
-                        ],
-        "Commandlet":  "Get-MgIdentityConditionalAccessPolicy",
-        "Control":  "AAD 2.4",
-        "Criticality":  "Shall",
-        "ReportDetails":  "0 conditional access policy(s) found that meet(s) all requirements",
-        "Requirement":  "MFA SHALL be required for all users",
-        "RequirementMet":  false
-    },
-    {
-        "ActualValue":  [
-
-                        ],
-        "Commandlet":  "Get-MgIdentityConditionalAccessPolicy",
-        "Control":  "AAD 2.9",
-        "Criticality":  "Shall",
-        "ReportDetails":  "0 conditional access policy(s) found that meet(s) all requirements",
-        "Requirement":  "Sign-in frequency SHALL be configured to 12 hours",
-        "RequirementMet":  false
-    },
-    {
-        "ActualValue":  [
-                            "Application Administrator",
-                            "Cloud Application Administrator",
-                            "Exchange Administrator",
-                            "Global Administrator",
-                            "Hybrid Identity Administrator",
-                            "Privileged Role Administrator",
-                            "SharePoint Administrator",
-                            "User Administrator"
-                        ],
-        "Commandlet":  "Get-MgRoleManagementDirectoryRoleAssignmentScheduleInstance",
-        "Control":  "AAD 2.14",
-        "Criticality":  "Shall",
-        "ReportDetails":  "8 role(s) configured to allow permanent active assignment or expiration period too long:\u003cbr/\u003eApplication Administrator, Cloud Application Administrator, Exchange Administrator, Global Administrator, Hybrid Identity Administrator, Privileged Role Administrator, SharePoint Administrator, User Administrator",
-        "Requirement":  "Permanent active role assignments SHALL NOT be allowed for highly privileged roles. Active assignments SHALL have an expiration period.",
-        "RequirementMet":  false
-    },
-    {
-        "ActualValue":  [
-                            "Application Administrator",
-                            "Cloud Application Administrator",
-                            "Exchange Administrator",
-                            "Global Administrator",
-                            "Hybrid Identity Administrator",
-                            "Privileged Role Administrator",
-                            "SharePoint Administrator",
-                            "User Administrator"
-                        ],
-        "Commandlet":  "Get-MgRoleManagementDirectoryRoleAssignmentScheduleInstance",
-        "Control":  "AAD 2.15",
-        "Criticality":  "Should",
-        "ReportDetails":  "8 role(s) that do not require approval to activate found:\u003cbr/\u003eApplication Administrator, Cloud Application Administrator, Exchange Administrator, Global Administrator, Hybrid Identity Administrator, Privileged Role Administrator, SharePoint Administrator, User Administrator",
-        "Requirement":  "Activation of highly privileged roles SHOULD require approval",
-        "RequirementMet":  false
-    },
-    {
-        "ActualValue":  [
-                            "Application Administrator",
-                            "Cloud Application Administrator",
-                            "Exchange Administrator",
-                            "Global Administrator",
-                            "Hybrid Identity Administrator",
-                            "Privileged Role Administrator",
-                            "SharePoint Administrator",
-                            "User Administrator"
-                        ],
-        "Commandlet":  "Get-MgRoleManagementDirectoryRoleAssignmentScheduleInstance",
-        "Control":  "AAD 2.16",
-        "Criticality":  "Shall",
-        "ReportDetails":  "8 role(s) without notification e-mail configured for role assignments found:\u003cbr/\u003eApplication Administrator, Cloud Application Administrator, Exchange Administrator, Global Administrator, Hybrid Identity Administrator, Privileged Role Administrator, SharePoint Administrator, User Administrator",
-        "Requirement":  "Eligible and Active highly privileged role assignments SHALL trigger an alert",
-        "RequirementMet":  false
-    },
-    {
-        "ActualValue":  [
-                            "Application Administrator",
-                            "Cloud Application Administrator",
-                            "Exchange Administrator",
-                            "Global Administrator",
-                            "Hybrid Identity Administrator",
-                            "Privileged Role Administrator",
-                            "SharePoint Administrator",
-                            "User Administrator"
-                        ],
-        "Commandlet":  "Get-MgRoleManagementDirectoryRoleAssignmentScheduleInstance",
-        "Control":  "AAD 2.16",
-        "Criticality":  "Shall",
-        "ReportDetails":  "Requirement not met",
-        "Requirement":  "User activation of the Global Administrator role SHALL trigger an alert",
-        "RequirementMet":  false
-    },
-    {
-        "ActualValue":  [
-                            "Application Administrator",
-                            "Cloud Application Administrator",
-                            "Exchange Administrator",
-                            "Hybrid Identity Administrator",
-                            "Privileged Role Administrator",
-                            "SharePoint Administrator",
-                            "User Administrator"
-                        ],
-        "Commandlet":  "Get-MgRoleManagementDirectoryRoleAssignmentScheduleInstance",
-        "Control":  "AAD 2.16",
-        "Criticality":  "Should",
-        "ReportDetails":  "7 role(s) without notification e-mail configured for role activations found:\u003cbr/\u003eApplication Administrator, Cloud Application Administrator, Exchange Administrator, Hybrid Identity Administrator, Privileged Role Administrator, SharePoint Administrator, User Administrator",
-        "Requirement":  "User activation of other highly privileged roles SHOULD trigger an alert",
-        "RequirementMet":  false
-    },
-    {
-        "ActualValue":  [
-                            "FNU LNU"
-                        ],
-        "Commandlet":  "Get-MgDirectoryRoleMember",
+        "Commandlet":  [
+                           "Get-MgSubscribedSku",
+                           "Get-PrivilegedUser"
+                       ],
         "Control":  "AAD 2.11",
         "Criticality":  "Shall",
-        "ReportDetails":  "1 global admin(s) found:\u003cbr/\u003eFNU LNU",
+        "ReportDetails":  "1 global admin(s) found:\u003cbr/\u003eDoe, Jane",
         "Requirement":  "A minimum of two users and a maximum of four users SHALL be provisioned with the Global Administrator role",
         "RequirementMet":  false
     },
     {
         "ActualValue":  [
-                            "Global Administrator"
+                            "Doe, John"
                         ],
-        "Commandlet":  "Get-MgRoleManagementDirectoryRoleAssignmentScheduleInstance",
+        "Commandlet":  [
+                           "Get-MgSubscribedSku",
+                           "Get-PrivilegedRole"
+                       ],
         "Control":  "AAD 2.14",
         "Criticality":  "Shall",
-        "ReportDetails":  "1 role(s) assigned to users outside of PIM:\u003cbr/\u003eGlobal Administrator",
+        "ReportDetails":  "1 role(s) assigned to users outside of PIM:\u003cbr/\u003eDoe, John",
         "Requirement":  "Provisioning of users to highly privileged roles SHALL NOT occur outside of a PAM system, such as the Azure AD PIM service, because this bypasses the controls the PAM system provides",
         "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+                            "Doe, John"
+                        ],
+        "Commandlet":  [
+                           "Get-MgSubscribedSku",
+                           "Get-PrivilegedRole"
+                       ],
+        "Control":  "AAD 2.14",
+        "Criticality":  "Shall",
+        "ReportDetails":  "1 role(s) configured to allow permanent active assignment or expiration period too long:\u003cbr/\u003eDoe, John",
+        "Requirement":  "Permanent active role assignments SHALL NOT be allowed for highly privileged roles. Active assignments SHALL have an expiration period.",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+                            "Doe, John"
+                        ],
+        "Commandlet":  [
+                           "Get-MgSubscribedSku",
+                           "Get-PrivilegedRole"
+                       ],
+        "Control":  "AAD 2.15",
+        "Criticality":  "Should",
+        "ReportDetails":  "1 role(s) that do not require approval to activate found:\u003cbr/\u003eDoe, John",
+        "Requirement":  "Activation of highly privileged roles SHOULD require approval",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+                            "Doe, John"
+                        ],
+        "Commandlet":  [
+                           "Get-MgSubscribedSku",
+                           "Get-PrivilegedRole"
+                       ],
+        "Control":  "AAD 2.16",
+        "Criticality":  "Shall",
+        "ReportDetails":  "1 role(s) without notification e-mail configured for role assignments found:\u003cbr/\u003eDoe, John",
+        "Requirement":  "Eligible and Active highly privileged role assignments SHALL trigger an alert",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+                            "Doe, John"
+                        ],
+        "Commandlet":  [
+                           "Get-MgSubscribedSku",
+                           "Get-PrivilegedRole"
+                       ],
+        "Control":  "AAD 2.16",
+        "Criticality":  "Shall",
+        "ReportDetails":  "Requirement met",
+        "Requirement":  "User activation of the Global Administrator role SHALL trigger an alert",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+                            "Doe, John"
+                        ],
+        "Commandlet":  [
+                           "Get-MgSubscribedSku",
+                           "Get-PrivilegedRole"
+                       ],
+        "Control":  "AAD 2.16",
+        "Criticality":  "Should",
+        "ReportDetails":  "1 role(s) without notification e-mail configured for role activations found:\u003cbr/\u003eDoe, John",
+        "Requirement":  "User activation of other highly privileged roles SHOULD trigger an alert",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+                            "Live - Block legacy authentication"
+                        ],
+        "Commandlet":  [
+                           "Get-MgIdentityConditionalAccessPolicy"
+                       ],
+        "Control":  "AAD 2.1",
+        "Criticality":  "Shall",
+        "ReportDetails":  "1 conditional access policy(s) found that meet(s) all requirements:\u003cbr/\u003eLive - Block legacy authentication. \u003ca href=\u0027#caps\u0027\u003eView all CA policies\u003c/a\u003e.",
+        "Requirement":  "Legacy authentication SHALL be blocked",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+                            "Live - MFA Required for Everyone"
+                        ],
+        "Commandlet":  [
+                           "Get-MgIdentityConditionalAccessPolicy"
+                       ],
+        "Control":  "AAD 2.4",
+        "Criticality":  "Shall",
+        "ReportDetails":  "1 conditional access policy(s) found that meet(s) all requirements:\u003cbr/\u003eLive - MFA Required for Everyone. \u003ca href=\u0027#caps\u0027\u003eView all CA policies\u003c/a\u003e.",
+        "Requirement":  "MFA SHALL be required for all users",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+                            "Live - MFA required for Highly Privileged Roles"
+                        ],
+        "Commandlet":  [
+                           "Get-MgSubscribedSku",
+                           "Get-PrivilegedRole",
+                           "Get-MgIdentityConditionalAccessPolicy"
+                       ],
+        "Control":  "AAD 2.13",
+        "Criticality":  "Shall",
+        "ReportDetails":  "1 conditional access policy(s) found that meet(s) all requirements:\u003cbr/\u003eLive - MFA required for Highly Privileged Roles. \u003ca href=\u0027#caps\u0027\u003eView all CA policies\u003c/a\u003e.",
+        "Requirement":  "MFA SHALL be required for user access to highly privileged roles",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+                            "Live - Prevent Persistent Sessions u0026 Enforce Sign-in Frequency"
+                        ],
+        "Commandlet":  [
+                           "Get-MgIdentityConditionalAccessPolicy"
+                       ],
+        "Control":  "AAD 2.10",
+        "Criticality":  "Shall",
+        "ReportDetails":  "1 conditional access policy(s) found that meet(s) all requirements:\u003cbr/\u003eLive - Prevent Persistent Sessions u0026 Enforce Sign-in Frequency. \u003ca href=\u0027#caps\u0027\u003eView all CA policies\u003c/a\u003e.",
+        "Requirement":  "Browser sessions SHALL not be persistent",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+                            "Live - Prevent Persistent Sessions u0026 Enforce Sign-in Frequency"
+                        ],
+        "Commandlet":  [
+                           "Get-MgIdentityConditionalAccessPolicy"
+                       ],
+        "Control":  "AAD 2.9",
+        "Criticality":  "Shall",
+        "ReportDetails":  "1 conditional access policy(s) found that meet(s) all requirements:\u003cbr/\u003eLive - Prevent Persistent Sessions u0026 Enforce Sign-in Frequency. \u003ca href=\u0027#caps\u0027\u003eView all CA policies\u003c/a\u003e.",
+        "Requirement":  "Sign-in frequency SHALL be configured to 12 hours",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+                            "Live - Risky Sign Ins Block Access"
+                        ],
+        "Commandlet":  [
+                           "Get-MgIdentityConditionalAccessPolicy"
+                       ],
+        "Control":  "AAD 2.3",
+        "Criticality":  "Shall",
+        "ReportDetails":  "1 conditional access policy(s) found that meet(s) all requirements:\u003cbr/\u003eLive - Risky Sign Ins Block Access. \u003ca href=\u0027#caps\u0027\u003eView all CA policies\u003c/a\u003e.",
+        "Requirement":  "Sign-ins detected as high risk SHALL be blocked",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+                            "Live - Risky Users Block Access"
+                        ],
+        "Commandlet":  [
+                           "Get-MgIdentityConditionalAccessPolicy"
+                       ],
+        "Control":  "AAD 2.2",
+        "Criticality":  "Shall",
+        "ReportDetails":  "1 conditional access policy(s) found that meet(s) all requirements:\u003cbr/\u003eLive - Risky Users Block Access. \u003ca href=\u0027#caps\u0027\u003eView all CA policies\u003c/a\u003e.",
+        "Requirement":  "Users detected as high risk SHALL be blocked",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+                            {
+                                "Name":  "EnableGroupSpecificConsent",
+                                "SettingsGroup":  "Consent Policy Settings",
+                                "Value":  "false"
+                            }
+                        ],
+        "Commandlet":  [
+                           "Get-MgDirectorySetting"
+                       ],
+        "Control":  "AAD 2.7",
+        "Criticality":  "Shall",
+        "ReportDetails":  "Requirement met",
+        "Requirement":  "Group owners SHALL NOT be allowed to consent to third-party applications",
+        "RequirementMet":  true
     },
     {
         "ActualValue":  false,
@@ -641,19 +730,6 @@
 
                         ],
         "Commandlet":  [
-                           "Get-AdminAuditLogConfig"
-                       ],
-        "Control":  "Defender 2.10",
-        "Criticality":  "Shall",
-        "ReportDetails":  "Requirement not met",
-        "Requirement":  "Unified audit logging SHALL be enabled",
-        "RequirementMet":  false
-    },
-    {
-        "ActualValue":  [
-
-                        ],
-        "Commandlet":  [
                            "Get-AntiPhishPolicy"
                        ],
         "Control":  "Defender 2.5",
@@ -829,19 +905,6 @@
         "Criticality":  "Should",
         "ReportDetails":  "The Custom Domains protection policies: Enabled, EnableTargetedDomainsProtection, and TargetedDomainsToProtect are not set correctly",
         "Requirement":  "Domain impersonation protection SHOULD be added for frequent partners",
-        "RequirementMet":  false
-    },
-    {
-        "ActualValue":  [
-
-                        ],
-        "Commandlet":  [
-                           "Get-AtpPolicyForO365"
-                       ],
-        "Control":  "Defender 2.8",
-        "Criticality":  "Should",
-        "ReportDetails":  "Requirement not met",
-        "Requirement":  "Safe attachments SHOULD be enabled for SharePoint, OneDrive, and Microsoft Teams",
         "RequirementMet":  false
     },
     {
@@ -1352,7 +1415,7 @@
                        ],
         "Control":  "Defender 2.2",
         "Criticality":  "Should",
-        "ReportDetails":  "3 rule(s) found that do(es) not block access: Default Teams DLP policy rule, Items containing 1-9 credit card numbers shared externally, Items with 10 or more credit card numbers shared externally",
+        "ReportDetails":  "3 rule(s) found that do(es) not block access or associated policy not set to enforce block action: Default Teams DLP policy rule, Items containing 1-9 credit card numbers shared externally, Items with 10 or more credit card numbers shared externally",
         "Requirement":  "The action for the DLP policy SHOULD be set to block sharing sensitive information with everyone when DLP conditions are met",
         "RequirementMet":  false
     },
@@ -1369,6 +1432,38 @@
         "ReportDetails":  "2 disabled required alert(s) found: Malware campaign detected after delivery, Unusual increase in email reported as phish",
         "Requirement":  "At a minimum, the alerts required by the Exchange Online Minimum Viable Secure Configuration Baseline SHALL be enabled",
         "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+                            {
+                                "EnableATPForSPOTeamsODB":  true,
+                                "Identity":  "Default"
+                            }
+                        ],
+        "Commandlet":  [
+                           "Get-AtpPolicyForO365"
+                       ],
+        "Control":  "Defender 2.8",
+        "Criticality":  "Should",
+        "ReportDetails":  "Requirement met",
+        "Requirement":  "Safe attachments SHOULD be enabled for SharePoint, OneDrive, and Microsoft Teams",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+                            {
+                                "Identity":  "Admin Audit Log Settings",
+                                "UnifiedAuditLogIngestionEnabled":  true
+                            }
+                        ],
+        "Commandlet":  [
+                           "Get-AdminAuditLogConfig"
+                       ],
+        "Control":  "Defender 2.10",
+        "Criticality":  "Shall",
+        "ReportDetails":  "Requirement met",
+        "Requirement":  "Unified audit logging SHALL be enabled",
+        "RequirementMet":  true
     },
     {
         "ActualValue":  [
@@ -1428,37 +1523,12 @@
         "RequirementMet":  true
     },
     {
-        "ActualValue":  false,
-        "Commandlet":  "Get-HostedConnectionFilterPolicy",
-        "Control":  "EXO 2.12",
-        "Criticality":  "Should",
-        "ReportDetails":  "Requirement met",
-        "Requirement":  "Safe lists SHOULD NOT be enabled",
-        "RequirementMet":  true
-    },
-    {
-        "ActualValue":  false,
-        "Commandlet":  "Get-OrganizationConfig",
-        "Control":  "EXO 2.13",
-        "Criticality":  "Shall",
-        "ReportDetails":  "Requirement met",
-        "Requirement":  "Mailbox auditing SHALL be enabled",
-        "RequirementMet":  true
-    },
-    {
-        "ActualValue":  true,
-        "Commandlet":  "Get-TransportConfig",
-        "Control":  "EXO 2.5",
-        "Criticality":  "Shall",
-        "ReportDetails":  "Requirement met",
-        "Requirement":  "SMTP AUTH SHALL be disabled in Exchange Online",
-        "RequirementMet":  true
-    },
-    {
         "ActualValue":  [
 
                         ],
-        "Commandlet":  "",
+        "Commandlet":  [
+
+                       ],
         "Control":  "EXO 2.10",
         "Criticality":  "Shall/3rd Party",
         "ReportDetails":  "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
@@ -1469,7 +1539,9 @@
         "ActualValue":  [
 
                         ],
-        "Commandlet":  "",
+        "Commandlet":  [
+
+                       ],
         "Control":  "EXO 2.10",
         "Criticality":  "Shall/3rd Party",
         "ReportDetails":  "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
@@ -1480,7 +1552,9 @@
         "ActualValue":  [
 
                         ],
-        "Commandlet":  "",
+        "Commandlet":  [
+
+                       ],
         "Control":  "EXO 2.10",
         "Criticality":  "Should/3rd Party",
         "ReportDetails":  "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
@@ -1491,7 +1565,9 @@
         "ActualValue":  [
 
                         ],
-        "Commandlet":  "",
+        "Commandlet":  [
+
+                       ],
         "Control":  "EXO 2.11",
         "Criticality":  "Should/3rd Party",
         "ReportDetails":  "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
@@ -1502,7 +1578,9 @@
         "ActualValue":  [
 
                         ],
-        "Commandlet":  "",
+        "Commandlet":  [
+
+                       ],
         "Control":  "EXO 2.11",
         "Criticality":  "Should/3rd Party",
         "ReportDetails":  "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
@@ -1513,7 +1591,9 @@
         "ActualValue":  [
 
                         ],
-        "Commandlet":  "",
+        "Commandlet":  [
+
+                       ],
         "Control":  "EXO 2.11",
         "Criticality":  "Should/3rd Party",
         "ReportDetails":  "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
@@ -1524,7 +1604,9 @@
         "ActualValue":  [
 
                         ],
-        "Commandlet":  "",
+        "Commandlet":  [
+
+                       ],
         "Control":  "EXO 2.14",
         "Criticality":  "Shall/3rd Party",
         "ReportDetails":  "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
@@ -1535,7 +1617,9 @@
         "ActualValue":  [
 
                         ],
-        "Commandlet":  "",
+        "Commandlet":  [
+
+                       ],
         "Control":  "EXO 2.14",
         "Criticality":  "Shall/3rd Party",
         "ReportDetails":  "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
@@ -1546,7 +1630,9 @@
         "ActualValue":  [
 
                         ],
-        "Commandlet":  "",
+        "Commandlet":  [
+
+                       ],
         "Control":  "EXO 2.14",
         "Criticality":  "Shall/3rd Party",
         "ReportDetails":  "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
@@ -1557,7 +1643,9 @@
         "ActualValue":  [
 
                         ],
-        "Commandlet":  "",
+        "Commandlet":  [
+
+                       ],
         "Control":  "EXO 2.15",
         "Criticality":  "Should/3rd Party",
         "ReportDetails":  "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
@@ -1568,7 +1656,9 @@
         "ActualValue":  [
 
                         ],
-        "Commandlet":  "",
+        "Commandlet":  [
+
+                       ],
         "Control":  "EXO 2.15",
         "Criticality":  "Should/3rd Party",
         "ReportDetails":  "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
@@ -1579,7 +1669,9 @@
         "ActualValue":  [
 
                         ],
-        "Commandlet":  "",
+        "Commandlet":  [
+
+                       ],
         "Control":  "EXO 2.15",
         "Criticality":  "Should/3rd Party",
         "ReportDetails":  "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
@@ -1590,7 +1682,9 @@
         "ActualValue":  [
 
                         ],
-        "Commandlet":  "",
+        "Commandlet":  [
+
+                       ],
         "Control":  "EXO 2.16",
         "Criticality":  "Shall/3rd Party",
         "ReportDetails":  "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
@@ -1601,7 +1695,9 @@
         "ActualValue":  [
 
                         ],
-        "Commandlet":  "",
+        "Commandlet":  [
+
+                       ],
         "Control":  "EXO 2.16",
         "Criticality":  "Should/3rd Party",
         "ReportDetails":  "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
@@ -1612,7 +1708,9 @@
         "ActualValue":  [
 
                         ],
-        "Commandlet":  "",
+        "Commandlet":  [
+
+                       ],
         "Control":  "EXO 2.17",
         "Criticality":  "Shall/3rd Party",
         "ReportDetails":  "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
@@ -1623,7 +1721,9 @@
         "ActualValue":  [
 
                         ],
-        "Commandlet":  "",
+        "Commandlet":  [
+
+                       ],
         "Control":  "EXO 2.17",
         "Criticality":  "Shall/3rd Party",
         "ReportDetails":  "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
@@ -1634,7 +1734,9 @@
         "ActualValue":  [
 
                         ],
-        "Commandlet":  "",
+        "Commandlet":  [
+
+                       ],
         "Control":  "EXO 2.17",
         "Criticality":  "Shall/3rd Party",
         "ReportDetails":  "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
@@ -1645,7 +1747,9 @@
         "ActualValue":  [
 
                         ],
-        "Commandlet":  "",
+        "Commandlet":  [
+
+                       ],
         "Control":  "EXO 2.2",
         "Criticality":  "Shall/Not-Implemented",
         "ReportDetails":  "Currently cannot be checked automatically. See Exchange Online Secure Configuration Baseline policy 2.# for instructions on manual check",
@@ -1656,7 +1760,9 @@
         "ActualValue":  [
 
                         ],
-        "Commandlet":  "",
+        "Commandlet":  [
+
+                       ],
         "Control":  "EXO 2.8",
         "Criticality":  "Shall/3rd Party",
         "ReportDetails":  "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
@@ -1667,7 +1773,9 @@
         "ActualValue":  [
 
                         ],
-        "Commandlet":  "",
+        "Commandlet":  [
+
+                       ],
         "Control":  "EXO 2.8",
         "Criticality":  "Shall/3rd Party",
         "ReportDetails":  "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
@@ -1678,7 +1786,9 @@
         "ActualValue":  [
 
                         ],
-        "Commandlet":  "",
+        "Commandlet":  [
+
+                       ],
         "Control":  "EXO 2.9",
         "Criticality":  "Shall/3rd Party",
         "ReportDetails":  "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
@@ -1689,7 +1799,9 @@
         "ActualValue":  [
 
                         ],
-        "Commandlet":  "",
+        "Commandlet":  [
+
+                       ],
         "Control":  "EXO 2.9",
         "Criticality":  "Shall/3rd Party",
         "ReportDetails":  "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
@@ -1700,7 +1812,9 @@
         "ActualValue":  [
 
                         ],
-        "Commandlet":  "",
+        "Commandlet":  [
+
+                       ],
         "Control":  "EXO 2.9",
         "Criticality":  "Should/3rd Party",
         "ReportDetails":  "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
@@ -1711,61 +1825,48 @@
         "ActualValue":  [
 
                         ],
-        "Commandlet":  "Get-HostedConnectionFilterPolicy",
-        "Control":  "EXO 2.12",
-        "Criticality":  "Should",
-        "ReportDetails":  "Requirement met",
-        "Requirement":  "IP allow lists SHOULD NOT be created",
-        "RequirementMet":  true
-    },
-    {
-        "ActualValue":  [
-
-                        ],
-        "Commandlet":  "Get-TransportRule",
+        "Commandlet":  [
+                           "Get-TransportRule"
+                       ],
         "Control":  "EXO 2.7",
         "Criticality":  "Shall",
-        "ReportDetails":  "No transport rule found with that applies to emails received from outside the organization",
+        "ReportDetails":  "No transport rule found that applies warnings to emails received from outside the organization",
         "Requirement":  "External sender warnings SHALL be implemented",
         "RequirementMet":  false
-    },
-    {
-        "ActualValue":  [
-                            "Anonymous:CalendarSharingFreeBusyReviewer",
-                            "*:CalendarSharingFreeBusySimple"
-                        ],
-        "Commandlet":  "Get-SharingPolicy",
-        "Control":  "EXO 2.6",
-        "Criticality":  "Shall",
-        "ReportDetails":  "Requirement met",
-        "Requirement":  "Calendar details SHALL NOT be shared with all domains, although they MAY be shared with specific domains",
-        "RequirementMet":  true
-    },
-    {
-        "ActualValue":  [
-                            "Anonymous:CalendarSharingFreeBusyReviewer",
-                            "*:CalendarSharingFreeBusySimple"
-                        ],
-        "Commandlet":  "Get-SharingPolicy",
-        "Control":  "EXO 2.6",
-        "Criticality":  "Shall",
-        "ReportDetails":  "Requirement met",
-        "Requirement":  "Contact folders SHALL NOT be shared with all domains, although they MAY be shared with specific domains",
-        "RequirementMet":  true
     },
     {
         "ActualValue":  [
                             [
                                 {
                                     "domain":  "tqhjy.onmicrosoft.com",
-                                    "rdata":  ""
+                                    "log":  [
+                                                "@{query_method=traditional; query_name=selector1._domainkey.tqhjy.onmicrosoft.com; query_result=Query returned NXDomain}",
+                                                "@{query_method=DoH; query_name=selector1._domainkey.tqhjy.onmicrosoft.com; query_result=Query resulted in exception, WebCmdletWebResponseException,Microsoft.PowerShell.Commands.InvokeWebRequestCommand}",
+                                                "@{query_method=DoH; query_name=selector1._domainkey.tqhjy.onmicrosoft.com; query_result=Query resulted in exception, WebCmdletWebResponseException,Microsoft.PowerShell.Commands.InvokeWebRequestCommand}",
+                                                "@{query_method=traditional; query_name=selector2._domainkey.tqhjy.onmicrosoft.com; query_result=Query returned NXDomain}",
+                                                "@{query_method=DoH; query_name=selector2._domainkey.tqhjy.onmicrosoft.com; query_result=Query resulted in exception, WebCmdletWebResponseException,Microsoft.PowerShell.Commands.InvokeWebRequestCommand}",
+                                                "@{query_method=DoH; query_name=selector2._domainkey.tqhjy.onmicrosoft.com; query_result=Query resulted in exception, WebCmdletWebResponseException,Microsoft.PowerShell.Commands.InvokeWebRequestCommand}",
+                                                "@{query_method=traditional; query_name=selector1-tqhjy-onmicrosoft-com._domainkey.tqhjy.onmicrosoft.com; query_result=Query returned NXDomain}",
+                                                "@{query_method=DoH; query_name=selector1-tqhjy-onmicrosoft-com._domainkey.tqhjy.onmicrosoft.com; query_result=Query resulted in exception, WebCmdletWebResponseException,Microsoft.PowerShell.Commands.InvokeWebRequestCommand}",
+                                                "@{query_method=DoH; query_name=selector1-tqhjy-onmicrosoft-com._domainkey.tqhjy.onmicrosoft.com; query_result=Query resulted in exception, WebCmdletWebResponseException,Microsoft.PowerShell.Commands.InvokeWebRequestCommand}",
+                                                "@{query_method=traditional; query_name=selector2-tqhjy-onmicrosoft-com._domainkey.tqhjy.onmicrosoft.com; query_result=Query returned NXDomain}",
+                                                "@{query_method=DoH; query_name=selector2-tqhjy-onmicrosoft-com._domainkey.tqhjy.onmicrosoft.com; query_result=Query resulted in exception, WebCmdletWebResponseException,Microsoft.PowerShell.Commands.InvokeWebRequestCommand}",
+                                                "@{query_method=DoH; query_name=selector2-tqhjy-onmicrosoft-com._domainkey.tqhjy.onmicrosoft.com; query_result=Query resulted in exception, WebCmdletWebResponseException,Microsoft.PowerShell.Commands.InvokeWebRequestCommand}"
+                                            ],
+                                    "rdata":  [
+
+                                              ]
                                 }
                             ],
                             [
-
+                                null
                             ]
                         ],
-        "Commandlet":  "Get-DkimSigningConfig, Resolve-DnsName",
+        "Commandlet":  [
+                           "Get-DkimSigningConfig",
+                           "Get-ScubaDkimRecords",
+                           "Get-AcceptedDomain"
+                       ],
         "Control":  "EXO 2.3",
         "Criticality":  "Should",
         "ReportDetails":  "Requirement met",
@@ -1775,11 +1876,380 @@
     {
         "ActualValue":  [
                             {
-                                "domain":  "tqhjy.onmicrosoft.com",
-                                "rdata":  ""
+                                "AddressBookPolicyRoutingEnabled":  false,
+                                "AdminDisplayName":  "",
+                                "AgentGeneratedMessageLoopDetectionInSmtpEnabled":  true,
+                                "AgentGeneratedMessageLoopDetectionInSubmissionEnabled":  true,
+                                "AllowLegacyTLSClients":  false,
+                                "AnonymousSenderToRecipientRatePerHour":  1800,
+                                "AttributionRejectBeforeMServRequest":  false,
+                                "AttributionRejectConsumerMessages":  false,
+                                "ClearCategories":  true,
+                                "ConvertDisclaimerWrapperToEml":  false,
+                                "ConvertReportToMessage":  false,
+                                "CurrentTransportSystemState":  "Green",
+                                "DSNConversionMode":  "PreserveDSNBody",
+                                "DiagnosticsAggregationServicePort":  9710,
+                                "DistinguishedName":  "CN=Transport Settings,CN=Configuration,CN=tqhjy.onmicrosoft.com,CN=ConfigurationUnits,DC=NAMPR10A008,DC=PROD,DC=OUTLOOK,DC=COM",
+                                "EnableExternalHTTPMailDelivery":  false,
+                                "ExchangeObjectId":  "b4f29764-fa61-4718-ac8d-29e1ad3007b9",
+                                "ExchangeVersion":  "0.1 (8.0.535.0)",
+                                "ExternalDelayDsnEnabled":  true,
+                                "ExternalDsnDefaultLanguage":  null,
+                                "ExternalDsnLanguageDetectionEnabled":  true,
+                                "ExternalDsnMaxMessageAttachSize":  "10 MB (10,485,760 bytes)",
+                                "ExternalDsnReportingAuthority":  null,
+                                "ExternalDsnSendHtml":  true,
+                                "ExternalPostmasterAddress":  null,
+                                "GenerateCopyOfDSNFor":  [
+
+                                                         ],
+                                "Guid":  "b4f29764-fa61-4718-ac8d-29e1ad3007b9",
+                                "HeaderPromotionModeSetting":  "NoCreate",
+                                "HygieneSuite":  "Premium",
+                                "Id":  "Transport Settings",
+                                "Identity":  "Transport Settings",
+                                "InternalDelayDsnEnabled":  true,
+                                "InternalDsnDefaultLanguage":  null,
+                                "InternalDsnLanguageDetectionEnabled":  true,
+                                "InternalDsnMaxMessageAttachSize":  "10 MB (10,485,760 bytes)",
+                                "InternalDsnReportingAuthority":  null,
+                                "InternalDsnSendHtml":  true,
+                                "InternalSMTPServers":  [
+
+                                                        ],
+                                "IsValid":  true,
+                                "JournalArchivingEnabled":  false,
+                                "JournalMessageExpirationDays":  0,
+                                "JournalReportDLMemberSubstitutionEnabled":  false,
+                                "JournalingReportNdrTo":  "u003cu003e",
+                                "LegacyArchiveJournalingEnabled":  false,
+                                "LegacyArchiveLiveJournalingEnabled":  false,
+                                "LegacyJournalingMigrationEnabled":  false,
+                                "MaxAllowedAgentGeneratedMessageDepth":  3,
+                                "MaxAllowedAgentGeneratedMessageDepthPerAgent":  2,
+                                "MaxDumpsterSizePerDatabase":  "18 MB (18,874,368 bytes)",
+                                "MaxDumpsterTime":  "7.00:00:00",
+                                "MaxReceiveSize":  "Unlimited",
+                                "MaxRecipientEnvelopeLimit":  "Unlimited",
+                                "MaxSendSize":  "Unlimited",
+                                "MessageExpiration":  "1.00:00:00",
+                                "MigrationEnabled":  true,
+                                "Name":  "Transport Settings",
+                                "ObjectCategory":  "NAMPR10A008.PROD.OUTLOOK.COM/Configuration/Schema/ms-Exch-Transport-Settings",
+                                "ObjectClass":  [
+                                                    "top",
+                                                    "container",
+                                                    "msExchTransportSettings"
+                                                ],
+                                "ObjectState":  "Unchanged",
+                                "OpenDomainRoutingEnabled":  false,
+                                "OrganizationFederatedMailbox":  "FederatedEmail.4c1f4d8b-8179-4148-93bf-00a95fa1e042@tqhjy.onmicrosoft.com",
+                                "OrganizationId":  "NAMPR10A008.PROD.OUTLOOK.COM/Microsoft Exchange Hosted Organizations/tqhjy.onmicrosoft.com - NAMPR10A008.PROD.OUTLOOK.COM/ConfigurationUnits/tqhjy.onmicrosoft.com/Configuration",
+                                "OrganizationalUnitRoot":  "tqhjy.onmicrosoft.com",
+                                "OriginatingServer":  "CY4PR10A08DC001.NAMPR10A008.PROD.OUTLOOK.COM",
+                                "OtherWellKnownObjects":  [
+
+                                                          ],
+                                "PreserveReportBodypart":  true,
+                                "QueueDiagnosticsAggregationInterval":  "00:01:00",
+                                "RedirectDLMessagesForLegacyArchiveJournaling":  false,
+                                "RedirectUnprovisionedUserMessagesForLegacyArchiveJournaling":  false,
+                                "ReplyAllStormBlockDurationHours":  6,
+                                "ReplyAllStormDetectionMinimumRecipients":  2500,
+                                "ReplyAllStormDetectionMinimumReplies":  10,
+                                "ReplyAllStormProtectionEnabled":  true,
+                                "Rfc2231EncodingEnabled":  false,
+                                "SafetyNetHoldTime":  "7.00:00:00",
+                                "SmtpClientAuthenticationDisabled":  true,
+                                "SupervisionTags":  [
+                                                        "Reject",
+                                                        "Allow"
+                                                    ],
+                                "TLSReceiveDomainSecureList":  [
+
+                                                               ],
+                                "TLSSendDomainSecureList":  [
+
+                                                            ],
+                                "TransportRuleAttachmentTextScanLimit":  "1 MB (1,048,576 bytes)",
+                                "TransportRuleCollectionAddedRecipientsLimit":  100,
+                                "TransportRuleCollectionRegexCharsLimit":  "20 KB (20,480 bytes)",
+                                "TransportRuleConfig":  [
+                                                            "TransportRuleMinProductVersion:14.0.0.0",
+                                                            "TransportRuleRegexValidationTimeout:00:00:00.3000000",
+                                                            "TransportRuleAttachmentTextScanLimit:1 MB (1,048,576 bytes)",
+                                                            "TransportRuleSizeLimit:8 KB (8,192 bytes)",
+                                                            "TransportRuleCollectionRegexCharsLimit:20 KB (20,480 bytes)",
+                                                            "TransportRuleLimit:300",
+                                                            "TransportRuleCollectionAddedRecipientsLimit:100"
+                                                        ],
+                                "TransportRuleLimit":  300,
+                                "TransportRuleMinProductVersion":  {
+                                                                       "Build":  0,
+                                                                       "Major":  14,
+                                                                       "MajorRevision":  0,
+                                                                       "Minor":  0,
+                                                                       "MinorRevision":  0,
+                                                                       "Revision":  0
+                                                                   },
+                                "TransportRuleRegexValidationTimeout":  "00:00:00.3000000",
+                                "TransportRuleSizeLimit":  "8 KB (8,192 bytes)",
+                                "TransportSystemState":  "",
+                                "VerifySecureSubmitEnabled":  false,
+                                "VoicemailJournalingEnabled":  true,
+                                "WhenChanged":  "/Date(1643184488000)/",
+                                "WhenChangedUTC":  "/Date(1643184488000)/",
+                                "WhenCreated":  "/Date(1643059670000)/",
+                                "WhenCreatedUTC":  "/Date(1643059670000)/",
+                                "Xexch50Enabled":  true
                             }
                         ],
-        "Commandlet":  "Resolve-DnsName",
+        "Commandlet":  [
+                           "Get-TransportConfig"
+                       ],
+        "Control":  "EXO 2.5",
+        "Criticality":  "Shall",
+        "ReportDetails":  "Requirement met",
+        "Requirement":  "SMTP AUTH SHALL be disabled in Exchange Online",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+                            {
+                                "AdminDisplayName":  "",
+                                "Default":  true,
+                                "DistinguishedName":  "CN=Default Sharing Policy,CN=Federation,CN=Configuration,CN=tqhjy.onmicrosoft.com,CN=ConfigurationUnits,DC=NAMPR10A008,DC=PROD,DC=OUTLOOK,DC=COM",
+                                "Domains":  [
+                                                "Anonymous:CalendarSharingFreeBusyReviewer",
+                                                "*:CalendarSharingFreeBusySimple"
+                                            ],
+                                "Enabled":  true,
+                                "ExchangeObjectId":  "2f1ca8cf-5ba5-45e3-b73a-1405ff552a2e",
+                                "ExchangeVersion":  "0.10 (14.0.100.0)",
+                                "Guid":  "2f1ca8cf-5ba5-45e3-b73a-1405ff552a2e",
+                                "Id":  "Default Sharing Policy",
+                                "Identity":  "Default Sharing Policy",
+                                "IsValid":  true,
+                                "Name":  "Default Sharing Policy",
+                                "ObjectCategory":  "NAMPR10A008.PROD.OUTLOOK.COM/Configuration/Schema/ms-Exch-Sharing-Policy",
+                                "ObjectClass":  [
+                                                    "top",
+                                                    "msExchSharingPolicy"
+                                                ],
+                                "ObjectState":  "Changed",
+                                "OrganizationId":  "NAMPR10A008.PROD.OUTLOOK.COM/Microsoft Exchange Hosted Organizations/tqhjy.onmicrosoft.com - NAMPR10A008.PROD.OUTLOOK.COM/ConfigurationUnits/tqhjy.onmicrosoft.com/Configuration",
+                                "OrganizationalUnitRoot":  "tqhjy.onmicrosoft.com",
+                                "OriginatingServer":  "CY4PR10A08DC001.NAMPR10A008.PROD.OUTLOOK.COM",
+                                "WhenChanged":  "/Date(1645650766000)/",
+                                "WhenChangedUTC":  "/Date(1645650766000)/",
+                                "WhenCreated":  "/Date(1645650752000)/",
+                                "WhenCreatedUTC":  "/Date(1645650752000)/"
+                            }
+                        ],
+        "Commandlet":  [
+                           "Get-SharingPolicy"
+                       ],
+        "Control":  "EXO 2.6",
+        "Criticality":  "Shall",
+        "ReportDetails":  "Requirement met",
+        "Requirement":  "Calendar details SHALL NOT be shared with all domains, although they MAY be shared with specific domains",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+                            {
+                                "AdminDisplayName":  "",
+                                "Default":  true,
+                                "DistinguishedName":  "CN=Default Sharing Policy,CN=Federation,CN=Configuration,CN=tqhjy.onmicrosoft.com,CN=ConfigurationUnits,DC=NAMPR10A008,DC=PROD,DC=OUTLOOK,DC=COM",
+                                "Domains":  [
+                                                "Anonymous:CalendarSharingFreeBusyReviewer",
+                                                "*:CalendarSharingFreeBusySimple"
+                                            ],
+                                "Enabled":  true,
+                                "ExchangeObjectId":  "2f1ca8cf-5ba5-45e3-b73a-1405ff552a2e",
+                                "ExchangeVersion":  "0.10 (14.0.100.0)",
+                                "Guid":  "2f1ca8cf-5ba5-45e3-b73a-1405ff552a2e",
+                                "Id":  "Default Sharing Policy",
+                                "Identity":  "Default Sharing Policy",
+                                "IsValid":  true,
+                                "Name":  "Default Sharing Policy",
+                                "ObjectCategory":  "NAMPR10A008.PROD.OUTLOOK.COM/Configuration/Schema/ms-Exch-Sharing-Policy",
+                                "ObjectClass":  [
+                                                    "top",
+                                                    "msExchSharingPolicy"
+                                                ],
+                                "ObjectState":  "Changed",
+                                "OrganizationId":  "NAMPR10A008.PROD.OUTLOOK.COM/Microsoft Exchange Hosted Organizations/tqhjy.onmicrosoft.com - NAMPR10A008.PROD.OUTLOOK.COM/ConfigurationUnits/tqhjy.onmicrosoft.com/Configuration",
+                                "OrganizationalUnitRoot":  "tqhjy.onmicrosoft.com",
+                                "OriginatingServer":  "CY4PR10A08DC001.NAMPR10A008.PROD.OUTLOOK.COM",
+                                "WhenChanged":  "/Date(1645650766000)/",
+                                "WhenChangedUTC":  "/Date(1645650766000)/",
+                                "WhenCreated":  "/Date(1645650752000)/",
+                                "WhenCreatedUTC":  "/Date(1645650752000)/"
+                            }
+                        ],
+        "Commandlet":  [
+                           "Get-SharingPolicy"
+                       ],
+        "Control":  "EXO 2.6",
+        "Criticality":  "Shall",
+        "ReportDetails":  "Requirement met",
+        "Requirement":  "Contact folders SHALL NOT be shared with all domains, although they MAY be shared with specific domains",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+                            {
+                                "AdminDisplayName":  "",
+                                "DirectoryBasedEdgeBlockMode":  "Default",
+                                "DistinguishedName":  "CN=Default,CN=Hosted Connection Filter,CN=Transport Settings,CN=Configuration,CN=tqhjy.onmicrosoft.com,CN=ConfigurationUnits,DC=NAMPR10A008,DC=PROD,DC=OUTLOOK,DC=COM",
+                                "EnableSafeList":  false,
+                                "ExchangeObjectId":  "3843aef3-f3bd-49c1-a674-4d6741ac11b6",
+                                "ExchangeVersion":  "0.20 (15.0.0.0)",
+                                "Guid":  "3843aef3-f3bd-49c1-a674-4d6741ac11b6",
+                                "IPAllowList":  [
+
+                                                ],
+                                "IPBlockList":  [
+
+                                                ],
+                                "Id":  "Default",
+                                "Identity":  "Default",
+                                "IsDefault":  true,
+                                "IsValid":  true,
+                                "Name":  "Default",
+                                "ObjectCategory":  "NAMPR10A008.PROD.OUTLOOK.COM/Configuration/Schema/ms-Exch-Hosted-Connection-Filter-Policy",
+                                "ObjectClass":  [
+                                                    "top",
+                                                    "msExchHostedConnectionFilterPolicy"
+                                                ],
+                                "ObjectState":  "Unchanged",
+                                "OrganizationId":  "NAMPR10A008.PROD.OUTLOOK.COM/Microsoft Exchange Hosted Organizations/tqhjy.onmicrosoft.com - NAMPR10A008.PROD.OUTLOOK.COM/ConfigurationUnits/tqhjy.onmicrosoft.com/Configuration",
+                                "OrganizationalUnitRoot":  "tqhjy.onmicrosoft.com",
+                                "OriginatingServer":  "CY4PR10A08DC001.NAMPR10A008.PROD.OUTLOOK.COM",
+                                "WhenChanged":  "/Date(1645650840000)/",
+                                "WhenChangedUTC":  "/Date(1645650840000)/",
+                                "WhenCreated":  "/Date(1645650828000)/",
+                                "WhenCreatedUTC":  "/Date(1645650828000)/"
+                            }
+                        ],
+        "Commandlet":  [
+                           "Get-HostedConnectionFilterPolicy"
+                       ],
+        "Control":  "EXO 2.12",
+        "Criticality":  "Should",
+        "ReportDetails":  "Requirement met",
+        "Requirement":  "IP allow lists SHOULD NOT be created",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+                            {
+                                "AdminDisplayName":  "",
+                                "DirectoryBasedEdgeBlockMode":  "Default",
+                                "DistinguishedName":  "CN=Default,CN=Hosted Connection Filter,CN=Transport Settings,CN=Configuration,CN=tqhjy.onmicrosoft.com,CN=ConfigurationUnits,DC=NAMPR10A008,DC=PROD,DC=OUTLOOK,DC=COM",
+                                "EnableSafeList":  false,
+                                "ExchangeObjectId":  "3843aef3-f3bd-49c1-a674-4d6741ac11b6",
+                                "ExchangeVersion":  "0.20 (15.0.0.0)",
+                                "Guid":  "3843aef3-f3bd-49c1-a674-4d6741ac11b6",
+                                "IPAllowList":  [
+
+                                                ],
+                                "IPBlockList":  [
+
+                                                ],
+                                "Id":  "Default",
+                                "Identity":  "Default",
+                                "IsDefault":  true,
+                                "IsValid":  true,
+                                "Name":  "Default",
+                                "ObjectCategory":  "NAMPR10A008.PROD.OUTLOOK.COM/Configuration/Schema/ms-Exch-Hosted-Connection-Filter-Policy",
+                                "ObjectClass":  [
+                                                    "top",
+                                                    "msExchHostedConnectionFilterPolicy"
+                                                ],
+                                "ObjectState":  "Unchanged",
+                                "OrganizationId":  "NAMPR10A008.PROD.OUTLOOK.COM/Microsoft Exchange Hosted Organizations/tqhjy.onmicrosoft.com - NAMPR10A008.PROD.OUTLOOK.COM/ConfigurationUnits/tqhjy.onmicrosoft.com/Configuration",
+                                "OrganizationalUnitRoot":  "tqhjy.onmicrosoft.com",
+                                "OriginatingServer":  "CY4PR10A08DC001.NAMPR10A008.PROD.OUTLOOK.COM",
+                                "WhenChanged":  "/Date(1645650840000)/",
+                                "WhenChangedUTC":  "/Date(1645650840000)/",
+                                "WhenCreated":  "/Date(1645650828000)/",
+                                "WhenCreatedUTC":  "/Date(1645650828000)/"
+                            }
+                        ],
+        "Commandlet":  [
+                           "Get-HostedConnectionFilterPolicy"
+                       ],
+        "Control":  "EXO 2.12",
+        "Criticality":  "Should",
+        "ReportDetails":  "Requirement met",
+        "Requirement":  "Safe lists SHOULD NOT be enabled",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+                            {
+                                "AuditDisabled":  false,
+                                "DisplayName":  "tqhjy",
+                                "Name":  "tqhjy.onmicrosoft.com"
+                            }
+                        ],
+        "Commandlet":  [
+                           "Get-OrganizationConfig"
+                       ],
+        "Control":  "EXO 2.13",
+        "Criticality":  "Shall",
+        "ReportDetails":  "Requirement met",
+        "Requirement":  "Mailbox auditing SHALL be enabled",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+                            {
+                                "domain":  "tqhjy.onmicrosoft.com",
+                                "log":  [
+                                            {
+                                                "query_method":  "traditional",
+                                                "query_name":  "_dmarc.tqhjy.onmicrosoft.com",
+                                                "query_result":  "Query returned NXDomain"
+                                            },
+                                            {
+                                                "query_method":  "DoH",
+                                                "query_name":  "_dmarc.tqhjy.onmicrosoft.com",
+                                                "query_result":  "Query resulted in exception, WebCmdletWebResponseException,Microsoft.PowerShell.Commands.InvokeWebRequestCommand"
+                                            },
+                                            {
+                                                "query_method":  "DoH",
+                                                "query_name":  "_dmarc.tqhjy.onmicrosoft.com",
+                                                "query_result":  "Query resulted in exception, WebCmdletWebResponseException,Microsoft.PowerShell.Commands.InvokeWebRequestCommand"
+                                            },
+                                            {
+                                                "query_method":  "traditional",
+                                                "query_name":  "_dmarc.onmicrosoft.com",
+                                                "query_result":  "Query returned NXDomain"
+                                            },
+                                            {
+                                                "query_method":  "DoH",
+                                                "query_name":  "_dmarc.onmicrosoft.com",
+                                                "query_result":  "Query resulted in exception, WebCmdletWebResponseException,Microsoft.PowerShell.Commands.InvokeWebRequestCommand"
+                                            },
+                                            {
+                                                "query_method":  "DoH",
+                                                "query_name":  "_dmarc.onmicrosoft.com",
+                                                "query_result":  "Query resulted in exception, WebCmdletWebResponseException,Microsoft.PowerShell.Commands.InvokeWebRequestCommand"
+                                            }
+                                        ],
+                                "rdata":  [
+
+                                          ]
+                            }
+                        ],
+        "Commandlet":  [
+                           "Get-ScubaDmarcRecords",
+                           "Get-AcceptedDomain"
+                       ],
         "Control":  "EXO 2.4",
         "Criticality":  "Shall",
         "ReportDetails":  "1 of 1 agency domain(s) found in violation: tqhjy.onmicrosoft.com",
@@ -1790,24 +2260,47 @@
         "ActualValue":  [
                             {
                                 "domain":  "tqhjy.onmicrosoft.com",
-                                "rdata":  ""
+                                "log":  [
+                                            {
+                                                "query_method":  "traditional",
+                                                "query_name":  "_dmarc.tqhjy.onmicrosoft.com",
+                                                "query_result":  "Query returned NXDomain"
+                                            },
+                                            {
+                                                "query_method":  "DoH",
+                                                "query_name":  "_dmarc.tqhjy.onmicrosoft.com",
+                                                "query_result":  "Query resulted in exception, WebCmdletWebResponseException,Microsoft.PowerShell.Commands.InvokeWebRequestCommand"
+                                            },
+                                            {
+                                                "query_method":  "DoH",
+                                                "query_name":  "_dmarc.tqhjy.onmicrosoft.com",
+                                                "query_result":  "Query resulted in exception, WebCmdletWebResponseException,Microsoft.PowerShell.Commands.InvokeWebRequestCommand"
+                                            },
+                                            {
+                                                "query_method":  "traditional",
+                                                "query_name":  "_dmarc.onmicrosoft.com",
+                                                "query_result":  "Query returned NXDomain"
+                                            },
+                                            {
+                                                "query_method":  "DoH",
+                                                "query_name":  "_dmarc.onmicrosoft.com",
+                                                "query_result":  "Query resulted in exception, WebCmdletWebResponseException,Microsoft.PowerShell.Commands.InvokeWebRequestCommand"
+                                            },
+                                            {
+                                                "query_method":  "DoH",
+                                                "query_name":  "_dmarc.onmicrosoft.com",
+                                                "query_result":  "Query resulted in exception, WebCmdletWebResponseException,Microsoft.PowerShell.Commands.InvokeWebRequestCommand"
+                                            }
+                                        ],
+                                "rdata":  [
+
+                                          ]
                             }
                         ],
-        "Commandlet":  "Resolve-DnsName",
-        "Control":  "EXO 2.4",
-        "Criticality":  "Shall",
-        "ReportDetails":  "1 of 1 agency domain(s) found in violation: tqhjy.onmicrosoft.com",
-        "Requirement":  "An agency point of contact SHOULD be included for aggregate and/or failure reports",
-        "RequirementMet":  false
-    },
-    {
-        "ActualValue":  [
-                            {
-                                "domain":  "tqhjy.onmicrosoft.com",
-                                "rdata":  ""
-                            }
-                        ],
-        "Commandlet":  "Resolve-DnsName",
+        "Commandlet":  [
+                           "Get-ScubaDmarcRecords",
+                           "Get-AcceptedDomain"
+                       ],
         "Control":  "EXO 2.4",
         "Criticality":  "Shall",
         "ReportDetails":  "1 of 1 agency domain(s) found in violation: tqhjy.onmicrosoft.com",
@@ -1818,10 +2311,47 @@
         "ActualValue":  [
                             {
                                 "domain":  "tqhjy.onmicrosoft.com",
-                                "rdata":  ""
+                                "log":  [
+                                            {
+                                                "query_method":  "traditional",
+                                                "query_name":  "_dmarc.tqhjy.onmicrosoft.com",
+                                                "query_result":  "Query returned NXDomain"
+                                            },
+                                            {
+                                                "query_method":  "DoH",
+                                                "query_name":  "_dmarc.tqhjy.onmicrosoft.com",
+                                                "query_result":  "Query resulted in exception, WebCmdletWebResponseException,Microsoft.PowerShell.Commands.InvokeWebRequestCommand"
+                                            },
+                                            {
+                                                "query_method":  "DoH",
+                                                "query_name":  "_dmarc.tqhjy.onmicrosoft.com",
+                                                "query_result":  "Query resulted in exception, WebCmdletWebResponseException,Microsoft.PowerShell.Commands.InvokeWebRequestCommand"
+                                            },
+                                            {
+                                                "query_method":  "traditional",
+                                                "query_name":  "_dmarc.onmicrosoft.com",
+                                                "query_result":  "Query returned NXDomain"
+                                            },
+                                            {
+                                                "query_method":  "DoH",
+                                                "query_name":  "_dmarc.onmicrosoft.com",
+                                                "query_result":  "Query resulted in exception, WebCmdletWebResponseException,Microsoft.PowerShell.Commands.InvokeWebRequestCommand"
+                                            },
+                                            {
+                                                "query_method":  "DoH",
+                                                "query_name":  "_dmarc.onmicrosoft.com",
+                                                "query_result":  "Query resulted in exception, WebCmdletWebResponseException,Microsoft.PowerShell.Commands.InvokeWebRequestCommand"
+                                            }
+                                        ],
+                                "rdata":  [
+
+                                          ]
                             }
                         ],
-        "Commandlet":  "Resolve-DnsName",
+        "Commandlet":  [
+                           "Get-ScubaDmarcRecords",
+                           "Get-AcceptedDomain"
+                       ],
         "Control":  "EXO 2.4",
         "Criticality":  "Shall",
         "ReportDetails":  "1 of 1 agency domain(s) found in violation: tqhjy.onmicrosoft.com",
@@ -1830,9 +2360,63 @@
     },
     {
         "ActualValue":  [
+                            {
+                                "domain":  "tqhjy.onmicrosoft.com",
+                                "log":  [
+                                            {
+                                                "query_method":  "traditional",
+                                                "query_name":  "_dmarc.tqhjy.onmicrosoft.com",
+                                                "query_result":  "Query returned NXDomain"
+                                            },
+                                            {
+                                                "query_method":  "DoH",
+                                                "query_name":  "_dmarc.tqhjy.onmicrosoft.com",
+                                                "query_result":  "Query resulted in exception, WebCmdletWebResponseException,Microsoft.PowerShell.Commands.InvokeWebRequestCommand"
+                                            },
+                                            {
+                                                "query_method":  "DoH",
+                                                "query_name":  "_dmarc.tqhjy.onmicrosoft.com",
+                                                "query_result":  "Query resulted in exception, WebCmdletWebResponseException,Microsoft.PowerShell.Commands.InvokeWebRequestCommand"
+                                            },
+                                            {
+                                                "query_method":  "traditional",
+                                                "query_name":  "_dmarc.onmicrosoft.com",
+                                                "query_result":  "Query returned NXDomain"
+                                            },
+                                            {
+                                                "query_method":  "DoH",
+                                                "query_name":  "_dmarc.onmicrosoft.com",
+                                                "query_result":  "Query resulted in exception, WebCmdletWebResponseException,Microsoft.PowerShell.Commands.InvokeWebRequestCommand"
+                                            },
+                                            {
+                                                "query_method":  "DoH",
+                                                "query_name":  "_dmarc.onmicrosoft.com",
+                                                "query_result":  "Query resulted in exception, WebCmdletWebResponseException,Microsoft.PowerShell.Commands.InvokeWebRequestCommand"
+                                            }
+                                        ],
+                                "rdata":  [
+
+                                          ]
+                            }
+                        ],
+        "Commandlet":  [
+                           "Get-ScubaDmarcRecords",
+                           "Get-AcceptedDomain"
+                       ],
+        "Control":  "EXO 2.4",
+        "Criticality":  "Should",
+        "ReportDetails":  "Requirement met",
+        "Requirement":  "An agency point of contact SHOULD be included for aggregate and/or failure reports",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
 
                         ],
-        "Commandlet":  "Resolve-DnsName",
+        "Commandlet":  [
+                           "Get-ScubaSpfRecords",
+                           "Get-AcceptedDomain"
+                       ],
         "Control":  "EXO 2.2",
         "Criticality":  "Shall",
         "ReportDetails":  "Requirement met",
@@ -1843,7 +2427,9 @@
         "ActualValue":  [
                             "*"
                         ],
-        "Commandlet":  "Get-RemoteDomain",
+        "Commandlet":  [
+                           "Get-RemoteDomain"
+                       ],
         "Control":  "EXO 2.1",
         "Criticality":  "Shall",
         "ReportDetails":  "1 remote domain(s) that allows automatic forwarding: *",
@@ -1878,62 +2464,42 @@
     },
     {
         "ActualValue":  [
-
+                            1,
+                            -1
                         ],
         "Commandlet":  [
-                           "Get-SPOTenant"
-                       ],
-        "Control":  "OneDrive 2.1",
-        "Criticality":  "Should",
-        "ReportDetails":  "Requirement not met",
-        "Requirement":  "Anyone links SHOULD be disabled",
-        "RequirementMet":  false
-    },
-    {
-        "ActualValue":  [
-
-                        ],
-        "Commandlet":  [
-                           "Get-SPOTenant"
+                           "Get-SPOTenant",
+                           "Get-PnPTenant"
                        ],
         "Control":  "OneDrive 2.2",
         "Criticality":  "Should",
-        "ReportDetails":  "Requirement not met",
+        "ReportDetails":  "Requirement met: Anyone links are disabled",
         "Requirement":  "An expiration date SHOULD be set for Anyone links",
-        "RequirementMet":  false
+        "RequirementMet":  true
     },
     {
         "ActualValue":  [
-
+                            1,
+                            2,
+                            2
                         ],
         "Commandlet":  [
-                           "Get-SPOTenant"
-                       ],
-        "Control":  "OneDrive 2.2",
-        "Criticality":  "Should",
-        "ReportDetails":  "Requirement not met",
-        "Requirement":  "Expiration date SHOULD be set to thirty days",
-        "RequirementMet":  false
-    },
-    {
-        "ActualValue":  [
-
-                        ],
-        "Commandlet":  [
-                           "Get-SPOTenant"
+                           "Get-SPOTenant",
+                           "Get-PnPTenant"
                        ],
         "Control":  "OneDrive 2.3",
         "Criticality":  "Should",
-        "ReportDetails":  "Requirement not met",
+        "ReportDetails":  "Requirement met: Anyone links are disabled",
         "Requirement":  "Anyone link permissions SHOULD be limited to View",
-        "RequirementMet":  false
+        "RequirementMet":  true
     },
     {
         "ActualValue":  [
 
                         ],
         "Commandlet":  [
-                           "Get-SPOTenant"
+                           "Get-SPOTenant",
+                           "Get-PnPTenant"
                        ],
         "Control":  "OneDrive 2.4",
         "Criticality":  "Shall",
@@ -1943,28 +2509,262 @@
     },
     {
         "ActualValue":  [
-                            {
-                                "AllowedDomainList":  [
 
-                                                      ],
-                                "BlockMacSync":  false,
-                                "DisableReportProblemDialog":  false,
-                                "ExcludedFileExtensions":  [
-                                                               ""
-                                                           ],
-                                "OptOutOfGrooveBlock":  false,
-                                "OptOutOfGrooveSoftBlock":  false,
-                                "TenantRestrictionEnabled":  false
-                            }
                         ],
         "Commandlet":  [
-                           "Get-SPOTenantSyncClientRestriction"
+                           "Get-SPOTenantSyncClientRestriction",
+                           "Get-PnPTenantSyncClientRestriction"
                        ],
         "Control":  "OneDrive 2.5",
         "Criticality":  "Shall",
-        "ReportDetails":  "Requirement met",
+        "ReportDetails":  "Requirement not met",
         "Requirement":  "OneDrive Client Sync SHALL only be allowed only within the local domain",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+                            {
+                                "AllowAnonymousMeetingParticipantsToAccessWhiteboards":  0,
+                                "AllowCommentsTextOnEmailEnabled":  true,
+                                "AllowDownloadingNonWebViewableFiles":  true,
+                                "AllowEditing":  true,
+                                "AllowEveryoneExceptExternalUsersClaimInPrivateSite":  true,
+                                "AllowGuestUserShareToUsersNotInSiteCollection":  false,
+                                "AllowOverrideForBlockUserInfoVisibility":  false,
+                                "AnyoneLinkTrackUsers":  false,
+                                "ApplyAppEnforcedRestrictionsToAdHocRecipients":  true,
+                                "AuthContextResilienceMode":  0,
+                                "BccExternalSharingInvitations":  false,
+                                "BccExternalSharingInvitationsList":  null,
+                                "BlockDownloadFileTypeIds":  [
+
+                                                             ],
+                                "BlockDownloadFileTypePolicy":  false,
+                                "BlockDownloadLinksFileType":  1,
+                                "BlockSendLabelMismatchEmail":  false,
+                                "BlockUserInfoVisibility":  "",
+                                "BlockUserInfoVisibilityInOneDrive":  0,
+                                "BlockUserInfoVisibilityInSharePoint":  0,
+                                "CommentsOnFilesDisabled":  false,
+                                "CommentsOnListItemsDisabled":  false,
+                                "CommentsOnSitePagesDisabled":  false,
+                                "CompatibilityRange":  "15,15",
+                                "ConditionalAccessPolicy":  0,
+                                "ConditionalAccessPolicyErrorHelpLink":  "",
+                                "ContentTypeSyncSiteTemplatesList":  [
+
+                                                                     ],
+                                "CoreDefaultLinkToExistingAccess":  false,
+                                "CoreDefaultShareLinkRole":  0,
+                                "CoreDefaultShareLinkScope":  -1,
+                                "CoreLoopDefaultSharingLinkRole":  0,
+                                "CoreLoopDefaultSharingLinkScope":  -1,
+                                "CoreLoopSharingCapability":  2,
+                                "CoreRequestFilesLinkEnabled":  false,
+                                "CoreRequestFilesLinkExpirationInDays":  -1,
+                                "CoreSharingCapability":  2,
+                                "CustomizedExternalSharingServiceUrl":  "",
+                                "DefaultLinkPermission":  1,
+                                "DefaultOneDriveInformationBarrierMode":  "Explicit",
+                                "DefaultSharingLinkType":  1,
+                                "DisableAddShortcutsToOneDrive":  false,
+                                "DisableBackToClassic":  false,
+                                "DisableCustomAppAuthentication":  true,
+                                "DisableListSync":  false,
+                                "DisableOutlookPSTVersionTrimming":  false,
+                                "DisablePersonalListCreation":  false,
+                                "DisableSpacesActivation":  false,
+                                "DisableVivaConnectionsAnalytics":  false,
+                                "DisabledModernListTemplateIds":  [
+
+                                                                  ],
+                                "DisabledWebPartIds":  null,
+                                "DisallowInfectedFileDownload":  false,
+                                "DisplayStartASiteOption":  true,
+                                "EmailAttestationReAuthDays":  30,
+                                "EmailAttestationRequired":  false,
+                                "EnableAIPIntegration":  false,
+                                "EnableAutoNewsDigest":  true,
+                                "EnableAzureADB2BIntegration":  false,
+                                "EnableGuestSignInAcceleration":  false,
+                                "EnableMinimumVersionRequirement":  true,
+                                "EnablePromotedFileHandlers":  true,
+                                "EnableRestrictedAccessControl":  false,
+                                "ExcludedBlockDownloadGroupIds":  [
+
+                                                                  ],
+                                "ExternalServicesEnabled":  true,
+                                "ExternalUserExpirationRequired":  false,
+                                "ExternalUserExpireInDays":  60,
+                                "FileAnonymousLinkType":  2,
+                                "FilePickerExternalImageSearchEnabled":  true,
+                                "FolderAnonymousLinkType":  2,
+                                "HideSyncButtonOnTeamSite":  false,
+                                "IBImplicitGroupBased":  false,
+                                "IPAddressAllowList":  "",
+                                "IPAddressEnforcement":  false,
+                                "IPAddressWACTokenLifetime":  15,
+                                "IncludeAtAGlanceInShareEmails":  true,
+                                "InformationBarriersSuspension":  true,
+                                "IsCollabMeetingNotesFluidEnabled":  true,
+                                "IsFluidEnabled":  true,
+                                "IsLoopEnabled":  true,
+                                "IsWBFluidEnabled":  true,
+                                "LabelMismatchEmailHelpLink":  null,
+                                "LegacyAuthProtocolsEnabled":  true,
+                                "LimitedAccessFileType":  1,
+                                "MarkNewFilesSensitiveByDefault":  0,
+                                "MediaTranscription":  0,
+                                "NoAccessRedirectUrl":  null,
+                                "NotificationsInOneDriveForBusinessEnabled":  true,
+                                "NotificationsInSharePointEnabled":  true,
+                                "NotifyOwnersWhenInvitationsAccepted":  true,
+                                "NotifyOwnersWhenItemsReshared":  true,
+                                "ODBAccessRequests":  0,
+                                "ODBMembersCanShare":  0,
+                                "OfficeClientADALDisabled":  false,
+                                "OneDriveDefaultLinkToExistingAccess":  false,
+                                "OneDriveDefaultShareLinkRole":  0,
+                                "OneDriveDefaultShareLinkScope":  -1,
+                                "OneDriveForGuestsEnabled":  false,
+                                "OneDriveLoopDefaultSharingLinkRole":  0,
+                                "OneDriveLoopDefaultSharingLinkScope":  -1,
+                                "OneDriveLoopSharingCapability":  1,
+                                "OneDriveRequestFilesLinkEnabled":  false,
+                                "OneDriveRequestFilesLinkExpirationInDays":  -1,
+                                "OneDriveSharingCapability":  1,
+                                "OneDriveStorageQuota":  1048576,
+                                "OrphanedPersonalSitesRetentionPeriod":  30,
+                                "OwnerAnonymousNotification":  true,
+                                "PermissiveBrowserFileHandlingOverride":  false,
+                                "PreventExternalUsersFromResharing":  true,
+                                "ProvisionSharedWithEveryoneFolder":  false,
+                                "PublicCdnAllowedFileTypes":  "CSS,EOT,GIF,ICO,JPEG,JPG,JS,MAP,PNG,SVG,TTF,WOFF",
+                                "PublicCdnEnabled":  false,
+                                "PublicCdnOrigins":  [
+
+                                                     ],
+                                "ReduceTempTokenLifetimeEnabled":  false,
+                                "ReduceTempTokenLifetimeValue":  15,
+                                "RequireAcceptingAccountMatchInvitedAccount":  true,
+                                "RequireAnonymousLinksExpireInDays":  -1,
+                                "ResourceQuota":  0,
+                                "ResourceQuotaAllocated":  0,
+                                "SearchResolveExactEmailOrUPN":  false,
+                                "SharingAllowedDomainList":  null,
+                                "SharingBlockedDomainList":  null,
+                                "SharingCapability":  2,
+                                "SharingDomainRestrictionMode":  0,
+                                "ShowAllUsersClaim":  false,
+                                "ShowEveryoneClaim":  false,
+                                "ShowEveryoneExceptExternalUsersClaim":  true,
+                                "ShowOpenInDesktopOptionForSyncedFiles":  false,
+                                "ShowPeoplePickerGroupSuggestionsForIB":  false,
+                                "ShowPeoplePickerSuggestionsForGuestUsers":  false,
+                                "SignInAccelerationDomain":  "",
+                                "SocialBarOnSitePagesDisabled":  false,
+                                "SpecialCharactersStateInFileFolderNames":  1,
+                                "StartASiteFormUrl":  null,
+                                "StopNew2010Workflows":  false,
+                                "StopNew2013Workflows":  false,
+                                "StorageQuota":  1304576,
+                                "StorageQuotaAllocated":  0,
+                                "StreamLaunchConfig":  0,
+                                "SyncPrivacyProfileProperties":  true,
+                                "TlsTokenBindingPolicyValue":  0,
+                                "UseFindPeopleInPeoplePicker":  false,
+                                "UsePersistentCookiesForExplorerView":  false,
+                                "UserVoiceForFeedbackEnabled":  true,
+                                "ViewInFileExplorerEnabled":  false,
+                                "ViewersCanCommentOnMediaDisabled":  false,
+                                "Workflow2010Disabled":  true,
+                                "Workflows2013State":  2
+                            }
+                        ],
+        "Commandlet":  [
+                           "Get-SPOTenant",
+                           "Get-PnPTenant"
+                       ],
+        "Control":  "OneDrive 2.1",
+        "Criticality":  "Should",
+        "ReportDetails":  "Requirement met",
+        "Requirement":  "Anyone links SHOULD be disabled",
         "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+
+                       ],
+        "Control":  "Power Platform 2.3",
+        "Criticality":  "Should/Not-Implemented",
+        "ReportDetails":  "Currently cannot be checked automatically. See Power Platform Secure Configuration Baseline policy 2.3 for instructions on manual check",
+        "Requirement":  "An inbound/outbound connection allowlist SHOULD be configured",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+
+                       ],
+        "Control":  "Power Platform 2.4",
+        "Criticality":  "Shall/Not-Implemented",
+        "ReportDetails":  "Currently cannot be checked automatically. See Power Platform Secure Configuration Baseline policy 2.4 for instructions on manual check",
+        "Requirement":  "Content security policies for model-driven Power Apps SHALL be enabled",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-DlpPolicy"
+                       ],
+        "Control":  "Power Platform 2.2",
+        "Criticality":  "Shall",
+        "ReportDetails":  "No policy found that applies to default environment",
+        "Requirement":  "A DLP policy SHALL be created to restrict connector access in the default Power Platform environment",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  1,
+        "Commandlet":  [
+                           "Get-SPOTenant",
+                           "Get-PnPTenant"
+                       ],
+        "Control":  "Sharepoint 2.1",
+        "Criticality":  "Shall",
+        "ReportDetails":  "Requirement met",
+        "Requirement":  "File and folder links default sharing setting SHALL be set to \"Specific People (Only the People the User Specifies)\"",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  2,
+        "Commandlet":  [
+                           "Get-SPOSite",
+                           "Get-PnPTenantSite"
+                       ],
+        "Control":  "Sharepoint 2.5",
+        "Criticality":  "Shall",
+        "ReportDetails":  "Requirement met",
+        "Requirement":  "Users SHALL be prevented from running custom scripts on self-service created sites",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  2,
+        "Commandlet":  [
+                           "Get-SPOTenant",
+                           "Get-PnPTenant"
+                       ],
+        "Control":  "Sharepoint 2.2",
+        "Criticality":  "Should",
+        "ReportDetails":  "Requirement not met",
+        "Requirement":  "External sharing SHOULD be limited to approved domains and security groups per interagency collaboration needs",
+        "RequirementMet":  false
     },
     {
         "ActualValue":  [
@@ -1994,150 +2794,35 @@
     },
     {
         "ActualValue":  [
-
+                            2,
+                            false,
+                            30
                         ],
         "Commandlet":  [
-                           "Get-SPOTenant"
+                           "Get-SPOTenant",
+                           "Get-PnPTenant"
                        ],
-        "Control":  "Sharepoint 2.1",
-        "Criticality":  "Shall",
-        "ReportDetails":  "Requirement not met",
-        "Requirement":  "File and folder links default sharing setting SHALL be set to \"Specific People (Only the People the User Specifies)\"",
-        "RequirementMet":  false
-    },
-    {
-        "ActualValue":  [
-
-                        ],
-        "Commandlet":  [
-                           "Get-SPOTenant"
-                       ],
-        "Control":  "Sharepoint 2.2",
+        "Control":  "Sharepoint 2.4",
         "Criticality":  "Should",
-        "ReportDetails":  "Requirement not met",
-        "Requirement":  "External sharing SHOULD be limited to approved domains and security groups per interagency collaboration needs",
+        "ReportDetails":  "Requirement not met: Expiration timer for \u0027People who use a verification code\u0027 NOT enabled",
+        "Requirement":  "Expiration timer for \u0027People who use a verification code\u0027 should be set to 30 days",
         "RequirementMet":  false
     },
     {
         "ActualValue":  [
-
+                            2,
+                            false,
+                            60
                         ],
         "Commandlet":  [
-                           "Get-SPOTenant"
+                           "Get-SPOTenant",
+                           "Get-PnPTenant"
                        ],
         "Control":  "Sharepoint 2.4",
         "Criticality":  "Should",
         "ReportDetails":  "Requirement not met",
-        "Requirement":  "Expiration timers SHOULD be set to 30 days",
+        "Requirement":  "Expiration timer for \u0027Guest access to a site or OneDrive\u0027 should be set to 30 days",
         "RequirementMet":  false
-    },
-    {
-        "ActualValue":  [
-
-                        ],
-        "Commandlet":  [
-                           "Get-SPOTenant"
-                       ],
-        "Control":  "Sharepoint 2.4",
-        "Criticality":  "Should",
-        "ReportDetails":  "Requirement not met",
-        "Requirement":  "Expiration timers for \u0027guest access to a site or OneDrive\u0027 and \u0027people who use a verification code\u0027 SHOULD be set",
-        "RequirementMet":  false
-    },
-    {
-        "ActualValue":  [
-                            {
-                                "AllowDownloadingNonWebViewableFiles":  false,
-                                "AllowEditing":  true,
-                                "AllowSelfServiceUpgrade":  true,
-                                "AnonymousLinkExpirationInDays":  0,
-                                "AuthenticationContextName":  null,
-                                "BlockDownloadLinksFileType":  1,
-                                "BlockDownloadPolicy":  false,
-                                "CommentsOnSitePagesDisabled":  false,
-                                "CompatibilityLevel":  15,
-                                "ConditionalAccessPolicy":  0,
-                                "DefaultLinkPermission":  0,
-                                "DefaultLinkToExistingAccess":  false,
-                                "DefaultShareLinkRole":  0,
-                                "DefaultShareLinkScope":  0,
-                                "DefaultSharingLinkType":  0,
-                                "DenyAddAndCustomizePages":  2,
-                                "DisableAppViews":  2,
-                                "DisableCompanyWideSharingLinks":  2,
-                                "DisableFlows":  2,
-                                "DisableSharingForNonOwnersStatus":  null,
-                                "ExcludeBlockDownloadPolicySiteOwners":  false,
-                                "ExcludedBlockDownloadGroupIds":  [
-
-                                                                  ],
-                                "ExternalUserExpirationInDays":  0,
-                                "GroupId":  "00000000-0000-0000-0000-000000000000",
-                                "HubSiteId":  "00000000-0000-0000-0000-000000000000",
-                                "InformationBarriersMode":  "",
-                                "InformationSegment":  [
-
-                                                       ],
-                                "IsHubSite":  false,
-                                "IsTeamsChannelConnected":  false,
-                                "IsTeamsConnected":  false,
-                                "LastContentModifiedDate":  "/Date(1669883125563)/",
-                                "LimitedAccessFileType":  1,
-                                "LocaleId":  1033,
-                                "LockIssue":  null,
-                                "LockState":  "Unlock",
-                                "LoopDefaultSharingLinkRole":  0,
-                                "LoopDefaultSharingLinkScope":  -1,
-                                "LoopOverrideSharingCapability":  false,
-                                "LoopSharingCapability":  2,
-                                "MediaTranscription":  0,
-                                "OverrideBlockUserInfoVisibility":  0,
-                                "OverrideSharingCapability":  false,
-                                "OverrideTenantAnonymousLinkExpirationPolicy":  false,
-                                "OverrideTenantExternalUserExpirationPolicy":  false,
-                                "Owner":  "efb52a3c-c813-4e58-855e-63e4bfb5a20e",
-                                "PWAEnabled":  1,
-                                "ReadOnlyForUnmanagedDevices":  false,
-                                "RelatedGroupId":  "00000000-0000-0000-0000-000000000000",
-                                "RequestFilesLinkEnabled":  true,
-                                "RequestFilesLinkExpirationInDays":  -1,
-                                "ResourceQuota":  300,
-                                "ResourceQuotaWarningLevel":  255,
-                                "ResourceUsageAverage":  0,
-                                "ResourceUsageCurrent":  0,
-                                "RestrictedAccessControl":  false,
-                                "RestrictedToGeo":  3,
-                                "SandboxedCodeActivationCapability":  2,
-                                "SensitivityLabel":  null,
-                                "SharingAllowedDomainList":  "",
-                                "SharingBlockedDomainList":  "",
-                                "SharingCapability":  2,
-                                "SharingDomainRestrictionMode":  0,
-                                "SharingLockDownCanBeCleared":  true,
-                                "SharingLockDownEnabled":  false,
-                                "ShowPeoplePickerSuggestionsForGuestUsers":  false,
-                                "SiteDefinedSharingCapability":  2,
-                                "SocialBarOnSitePagesDisabled":  false,
-                                "Status":  "Active",
-                                "StorageQuota":  26214400,
-                                "StorageQuotaType":  null,
-                                "StorageQuotaWarningLevel":  25574400,
-                                "StorageUsageCurrent":  1,
-                                "TeamsChannelType":  0,
-                                "Template":  "SITEPAGEPUBLISHING#0",
-                                "Title":  "Communication site",
-                                "Url":  "https://tqhjy.sharepoint.com/",
-                                "WebsCount":  1
-                            }
-                        ],
-        "Commandlet":  [
-                           "Get-SPOSite"
-                       ],
-        "Control":  "Sharepoint 2.5",
-        "Criticality":  "Shall",
-        "ReportDetails":  "Requirement met",
-        "Requirement":  "Users SHALL be prevented from running custom scripts on self-service created sites",
-        "RequirementMet":  true
     },
     {
         "ActualValue":  true,
@@ -2153,7 +2838,7 @@
     {
         "ActualValue":  "AlwaysEnabled",
         "Commandlet":  [
-                           "Get-CsTeamsMeetingPolicy"
+                           "Get-CsTeamsMeetingBroadcastPolicy"
                        ],
         "Control":  "Teams 2.10",
         "Criticality":  "Should",
@@ -2306,18 +2991,18 @@
     {
         "ActualValue":  [
                             [
-                                "Global"
+
                             ],
-                            "MicrosoftCommunicationsOnline/NOAM-ED6-A5"
+                            "MicrosoftCommunicationsOnline/NOAM-ED6-A7"
                         ],
         "Commandlet":  [
                            "Get-CsTeamsClientConfiguration"
                        ],
         "Control":  "Teams 2.7",
         "Criticality":  "Shall",
-        "ReportDetails":  "1 Requirement not met: Email integration is enabled across domain: Global",
+        "ReportDetails":  "Requirement met",
         "Requirement":  "Teams email integration SHALL be disabled",
-        "RequirementMet":  false
+        "RequirementMet":  true
     },
     {
         "ActualValue":  [
@@ -2381,7 +3066,7 @@
         "Control":  "Teams 2.9",
         "Criticality":  "Should",
         "ReportDetails":  "Requirement met",
-        "Requirement":  "For all meeting polices that allow cloud recording, recordings SHOULD be stored inside the country of that agencyGÇÖs tenant",
+        "Requirement":  "For all meeting polices that allow cloud recording, recordings SHOULD be stored inside the country of that agency\u0027s tenant",
         "RequirementMet":  true
     },
     {
@@ -2395,32 +3080,6 @@
         "Criticality":  "Shall",
         "ReportDetails":  "Requirement met",
         "Requirement":  "External access SHALL only be enabled on a per-domain basis",
-        "RequirementMet":  true
-    },
-    {
-        "ActualValue":  [
-
-                        ],
-        "Commandlet":  [
-                           "Get-CsTenantFederationConfiguration"
-                       ],
-        "Control":  "Teams 2.5",
-        "Criticality":  "Shall",
-        "ReportDetails":  "Requirement met",
-        "Requirement":  "Unmanaged users SHALL NOT be enabled to initiate contact with internal users",
-        "RequirementMet":  true
-    },
-    {
-        "ActualValue":  [
-
-                        ],
-        "Commandlet":  [
-                           "Get-CsTenantFederationConfiguration"
-                       ],
-        "Control":  "Teams 2.5",
-        "Criticality":  "Should",
-        "ReportDetails":  "Requirement met",
-        "Requirement":  "Internal users SHOULD NOT be enabled to initiate contact with unmanaged users",
         "RequirementMet":  true
     },
     {
@@ -2460,6 +3119,32 @@
         "Criticality":  "Should",
         "ReportDetails":  "1 meeting policy(ies) found that allow third-party apps by default: Global",
         "Requirement":  "Agencies SHOULD NOT allow installation of all third-party apps, but MAY allow specific apps as needed",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+                            "Global"
+                        ],
+        "Commandlet":  [
+                           "Get-CsTenantFederationConfiguration"
+                       ],
+        "Control":  "Teams 2.5",
+        "Criticality":  "Shall",
+        "ReportDetails":  "1 Configuration allowed unmanaged users to initiate contact with internal user across domains: Global",
+        "Requirement":  "Unmanaged users SHALL NOT be enabled to initiate contact with internal users",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+                            "Global"
+                        ],
+        "Commandlet":  [
+                           "Get-CsTenantFederationConfiguration"
+                       ],
+        "Control":  "Teams 2.5",
+        "Criticality":  "Should",
+        "ReportDetails":  "1 Internal users are enabled to initiate contact with unmanaged users across domains: Global",
+        "Requirement":  "Internal users SHOULD NOT be enabled to initiate contact with unmanaged users",
         "RequirementMet":  false
     }
 ]
