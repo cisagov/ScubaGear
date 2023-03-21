@@ -286,8 +286,6 @@ ScubaGear requires a number of PowerShell modules to function.  A user or develo
 
 On Windows Servers, the default [execution policy](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.security/set-executionpolicy?view=powershell-7.3) is `RemoteSigned`, which will allow ScubaGear to run after the publisher (CISA) is agreed to once.
 
-On Windows Clients, the default execution policy is `Restricted`.  In this case, Unblock-File may be necessary to run the SetUp.ps1 script.
-
-When the execution policy is set to Unrestricted (which is the default in Powershell 6.0+ on non-Windows machines), the user must unblock the tool on each use.
+On Windows Clients, the default execution policy is `Restricted`.  In this case, `Set-ExecutionPolicy RemoteSigned` should be invoked to permit ScubaGear to run.
 
 In ScubaGear version 0.2.1 and earlier, running `Unblock-File` on the ScubaGear folder may be required. See [here](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/unblock-file?view=powershell-5.1) for more information.  
