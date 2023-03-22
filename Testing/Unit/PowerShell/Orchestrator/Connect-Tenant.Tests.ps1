@@ -18,7 +18,8 @@ InModuleScope Orchestrator {
                 $ConnectParams += @{
                     ProductNames = 'aad'
                 }
-                $FailedAuthList = Invoke-Connection @ConnectParams
+                Invoke-Connection @ConnectParams
+                Should -Invoke -CommandName Connect-Tenant -Times 1 -Exactly
                 $FailedAuthList.Length | Should -Be 0
             }
             It 'With -ProductNames "defender", connects to Microsoft Defender for Office 365' {
