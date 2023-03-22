@@ -4,7 +4,13 @@ Import-Module (Join-Path -Path $PSScriptRoot -ChildPath $OrchestratorPath) -Func
 Describe -Tag 'Orchestrator' -Name 'Get-FileEncoding' {
     InModuleScope Orchestrator {
         It 'Gets utf8 file encoding according to current PS version with no errors' {
-            {Get-FileEncoding} | Should -Not -BeNullOrEmpty
+            $PSVersion = $PSVersionTable.PSVersion
+            if ($PSVersion -ge [System.Version]"6.0"){
+                Get-FileEncoding | Should -Be 'utf8NoBom'
+            }
+            else{
+                Get-FileEncoding | Should -Be 'utf8'
+            }
         }
     }
 }
