@@ -87,8 +87,8 @@ InModuleScope Orchestrator {
                 $ConnectParams += @{
                     ProductNames = 'aad'
                 }
-                $FailedAuthList = Invoke-Connection @ConnectParams
-                $FailedAuthList.Length | Should -Be 0
+                Invoke-Connection @ConnectParams
+                Should -Invoke -CommandName Connect-Tenant -Times 0 -Exactly
             }
         }
     }
