@@ -28,8 +28,6 @@ To download ScubaGear:
 
 To import the module, open a new PowerShell 5.1 terminal and navigate to the repository folder. 
 
-Depending on the [PowerShell execution policy](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_execution_policies?view=powershell-5.1), running `Unblock-File` on the ScubaGear folder may be required. See [here](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/unblock-file?view=powershell-5.1) for more information.
-
 Then run:
 
 ```powershell
@@ -46,6 +44,9 @@ In the event of an unsuccessful download, users can manually download the OPA ex
 ```powershell
 .\opa_windows_amd64.exe version
 ```
+
+> **Note**
+> Starting with release 0.3.0, ScubaGear is signed by a commonly trusted CA.  Depending on the [PowerShell execution policy](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_execution_policies?view=powershell-5.1) of the system running ScubaGear, different steps may be required before running ScubaGear.  See [PowerShell Execution Policies](#powershell-execution-policies) for more details.
 
 ## Usage
 ScubaGear can be invoked interactively or non-interactively. The interactive authentication mode will prompt the user for credentials via Microsoft's popup windows. Non-interactive mode is for invoking ScubaGear using an Azure AD application service principal and supports running the tool in automated scenarios such as pipelines or scheduled jobs. Examples 1-3 provide examples for running with interactive mode and example 4 provides an example for running in non-interactive mode.
@@ -327,4 +328,10 @@ ScubaGear requires a number of PowerShell modules to function.  A user or develo
 
 >PowerShellGet 2.x has a known issue uninstalling modules installed on a OneDrive path that may result in an "Access to the cloud file is denied" error.  Installing PSGet 3.0, currently in beta, will allow the script to successfully uninstall such modules or you can remove the modules files from OneDrive manually.
 
+### PowerShell Execution Policies
 
+On Windows Servers, the default [execution policy](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.security/set-executionpolicy?view=powershell-5.1) is `RemoteSigned`, which will allow ScubaGear to run after the publisher (CISA) is agreed to once.
+
+On Windows Clients, the default execution policy is `Restricted`.  In this case, `Set-ExecutionPolicy RemoteSigned` should be invoked to permit ScubaGear to run.
+
+In ScubaGear version 0.2.1 and earlier, running `Unblock-File` on the ScubaGear folder may be required. See [here](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/unblock-file?view=powershell-5.1) for more information.  
