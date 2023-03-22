@@ -3,25 +3,21 @@ Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../../../../PowerShell/
 InModuleScope Connection {
     Describe -Tag 'Connection' -Name 'Disconnect-SCuBATenant' {
         BeforeAll {
-            function Disconnect-MgGraph {}
-            Mock -ModuleName Connection Disconnect-MgGraph -MockWith {}
-            function Disconnect-ExchangeOnline {}
-            Mock -ModuleName Connection Disconnect-ExchangeOnline -MockWith {}
-            function Disconnect-SPOService {}
-            Mock -ModuleName Connection Disconnect-SPOService -MockWith {}
-            function Disconnect-PnPOnline {}
-            Mock -ModuleName Connection Disconnect-PnPOnline -MockWith {}
-            function Remove-PowerAppsAccount {}
-            Mock -ModuleName Connection Remove-PowerAppsAccount -MockWith {}
-            function Disconnect-MicrosoftTeams {}
-            Mock -ModuleName Connection Disconnect-MicrosoftTeams -MockWith {}
+            Mock Disconnect-MgGraph -MockWith {}
+            Mock Disconnect-ExchangeOnline -MockWith {}
+            Mock Disconnect-SPOService -MockWith {}
+            Mock Disconnect-PnPOnline -MockWith {}
+            Mock Remove-PowerAppsAccount -MockWith {}
+            Mock Disconnect-MicrosoftTeams -MockWith {}
             Mock -CommandName Write-Progress {}
         }
         It 'Disconnects from Microsoft Graph' {
-            {Disconnect-SCuBATenant -ProductNames 'aad'} | Should -Not -Throw
+            Disconnect-SCuBATenant -ProductNames 'aad'
+            Should -Invoke -CommandName Disconnect-MgGraph -Times 1 -Exactly
         }
         It 'Disconnects from Exchange Online' {
-            {Disconnect-SCuBATenant -ProductNames 'exo'} | Should -Not -Throw
+            Disconnect-SCuBATenant -ProductNames 'exo'
+            Should -Invoke -CommandName Disconnect-ExchangeOnline -Times 1 -Exactly
         }
         It 'Disconnects from Defender (Exchange Online and Security & Compliance)' {
             {Disconnect-SCuBATenant -ProductNames 'defender'} | Should -Not -Throw
