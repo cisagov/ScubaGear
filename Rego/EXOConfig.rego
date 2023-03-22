@@ -124,7 +124,8 @@ DomainsWithDkim[DkimConfig.Domain] {
     DkimConfig.Enabled == true
     DkimRecord := input.dkim_records[_]
     DkimRecord.domain == DkimConfig.Domain
-    startswith(DkimRecord.rdata, "v=DKIM1;")
+    ValidAnswers := [Answer | Answer := DkimRecord.rdata[_]; startswith(Answer, "v=DKIM1;")]
+    count(ValidAnswers) > 0
 }
 
 tests[{
@@ -151,7 +152,8 @@ tests[{
 #--
 DomainsWithoutDmarc[DmarcRecord.domain] {
     DmarcRecord := input.dmarc_records[_]
-    not startswith(DmarcRecord.rdata, "v=DMARC1;")
+    ValidAnswers := [Answer | Answer := DmarcRecord.rdata[_]; startswith(Answer, "v=DMARC1;")]
+    count(ValidAnswers) == 0
 }
 
 tests[{
@@ -173,7 +175,8 @@ tests[{
 #--
 DomainsWithoutPreject[DmarcRecord.domain] {
     DmarcRecord := input.dmarc_records[_]
-    not contains(DmarcRecord.rdata, "p=reject;")
+    ValidAnswers := [Answer | Answer := DmarcRecord.rdata[_]; contains(Answer, "p=reject;")]
+    count(ValidAnswers) == 0
 }
 
 tests[{
@@ -195,7 +198,8 @@ tests[{
 #--
 DomainsWithoutDHSContact[DmarcRecord.domain] {
     DmarcRecord := input.dmarc_records[_]
-    not contains(DmarcRecord.rdata, "mailto:reports@dmarc.cyber.dhs.gov")
+    ValidAnswers := [Answer | Answer := DmarcRecord.rdata[_]; contains(Answer, "mailto:reports@dmarc.cyber.dhs.gov")]
+    count(ValidAnswers) == 0
 }
 
 tests[{
@@ -217,7 +221,8 @@ tests[{
 #--
 DomainsWithoutAgencyContact[DmarcRecord.domain] {
     DmarcRecord := input.dmarc_records[_]
-    count(split(DmarcRecord.rdata, "@")) < 3
+    EnoughContacts := [Answer | Answer := DmarcRecord.rdata[_]; count(split(Answer, "@")) >= 3]
+    count(EnoughContacts) == 0
 }
 
 tests[{
