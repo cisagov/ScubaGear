@@ -8,7 +8,7 @@ on:
       version:
         description: "Release Version"
         required: true
-        type: string     
+        type: string
 
 name: Build and Sign Release
 
