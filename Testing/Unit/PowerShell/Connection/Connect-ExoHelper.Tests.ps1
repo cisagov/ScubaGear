@@ -3,8 +3,7 @@ Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../../../../PowerShell/
 InModuleScope ConnectHelpers {
     Describe -Tag 'Connection' -Name 'Connect-EXOHelper' {
         BeforeAll {
-            function Connect-ExchangeOnline {}
-            Mock -ModuleName ConnectHelpers Connect-ExchangeOnline -MockWith {}
+            Mock Connect-ExchangeOnline -MockWith {}
         }
         It 'When connecting interactively to commercial endpoint, connects to Exchange Online' {
             {Connect-EXOHelper -M365Environment 'commercial'} | Should -Not -Throw
