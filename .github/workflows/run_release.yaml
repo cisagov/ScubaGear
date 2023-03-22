@@ -9,9 +9,11 @@ on:
         description: "Release Version"
         required: true
         type: string
+  push:
+    branches:
+      - '219-scuba-release-should-be-in-root-folder'      
 
 name: Build and Sign Release
-
 
 jobs:
   build-and-deploy:
@@ -50,7 +52,8 @@ jobs:
         Remove-Item -Recurse -Force certificate
         Remove-Item -Recurse -Force repo -Include .git*
 
-        Compress-Archive -Path repo\* -DestinationPath "ScubaGear-${env:RELEASE_VERSION}.zip"
+        Move-Item  -Path repo -Destination "ScubaGear-${env:RELEASE_VERSION}" -Force
+        Compress-Archive -Path "ScubaGear-${env:RELEASE_VERSION}" -DestinationPath "ScubaGear-${env:RELEASE_VERSION}.zip"
 
         Get-ChildItem -Path . | Write-Output
     - name: release
