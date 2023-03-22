@@ -8,10 +8,7 @@ on:
       version:
         description: "Release Version"
         required: true
-        type: string
-  push:
-    branches:
-      - '219-scuba-release-should-be-in-root-folder'      
+        type: string     
 
 name: Build and Sign Release
 
