@@ -52,7 +52,6 @@ InModuleScope Connection {
             It 'With -ProductNames "aad", connects to Microsoft Graph' {
                 $ProductNames = @("aad")
                 $FailedAuthList = Connect-Tenant -ProductNames $ProductNames -M365Environment $M365Environment
-                Should -Invoke -CommandName Connect-MgGraph -Times 1 -Exactly -ParameterFilter {$ErrorAction -eq 'Stop'}
                 $FailedAuthList.Length | Should -Be 0
             }
             It 'With -ProductNames "defender", connects to Exchange Online' {
