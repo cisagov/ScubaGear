@@ -120,23 +120,8 @@ InModuleScope -ModuleName ExportEXOProvider {
                 $ValidJson
             }
         }
-        It "When called with -M365Environment 'commercial', returns valid JSON" {
-            $Json = Export-EXOProvider -M365Environment 'commercial'
-            $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
-            $ValidJson | Should -Be $true
-        }
-        It "When called with -M365Environment 'gcc', returns valid JSON" {
-            $Json = Export-EXOProvider -M365Environment 'gcc'
-            $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
-            $ValidJson | Should -Be $true
-        }
-        It "When called with -M365Environment 'gcchigh', returns valid JSON" {
-            $Json = Export-EXOProvider -M365Environment 'gcchigh'
-            $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
-            $ValidJson | Should -Be $true
-        }
-        It "When called with -M365Environment 'dod', returns valid JSON" {
-            $Json = Export-EXOProvider -M365Environment 'dod'
+        It "When called, returns valid JSON" {
+            $Json = Export-EXOProvider
             $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
             $ValidJson | Should -Be $true
         }
