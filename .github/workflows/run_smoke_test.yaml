@@ -26,6 +26,7 @@ jobs:
 
         $CertPwd = ConvertTo-SecureString -String "$env:SCUBA_EXECUTION_CERT_PW" -Force -AsPlainText
         $Thumbprint = New-ServicePrincipalCertificate -EncodedCertificate $env:SCUBA_EXECUTION_CERT_PFX -CertificatePassword $CertPwd
+        $Thumbprint.GetType()
 
         ##### Install MS Graph and all the dependencies
         #Workaround till update to version 2.0+
@@ -35,7 +36,7 @@ jobs:
         ##### Run ScubaGear with a service principal
         Import-Module -Name ./PowerShell/ScubaGear
         #Invoke-Scuba -CertificateThumbPrint "A9D4870B12F94A344C20BB3FC5774C89F8B5EF33" -AppID "b682d3a5-bc68-450e-80ba-018b97aa2b21" -Organization "cisaent.onmicrosoft.com" -ProductNames "onedrive" -M365Environment "gcc"
-        Invoke-Scuba -CertificateThumbprint $Thumbprint -AppID "b682d3a5-bc68-450e-80ba-018b97aa2b21" -Organization "cisaent.onmicrosoft.com" -ProductNames "onedrive" -M365Environment "gcc"
+        Invoke-SCuBA -CertificateThumbprint $Thumbprint -AppID "b682d3a5-bc68-450e-80ba-018b97aa2b21" -Organization "cisaent.onmicrosoft.com" -ProductNames "onedrive" -M365Environment "gcc"
 
         ##### Get the output folder path
         $ReportFolders = Get-ChildItem . -directory -Filter "M365BaselineConformance*" | Sort-Object -Property LastWriteTime -Descending
