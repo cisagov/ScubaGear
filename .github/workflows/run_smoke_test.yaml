@@ -25,7 +25,9 @@ jobs:
         . Testing/Functional/SmokeTest/SmokeTestInit.ps1
 
         $CertPwd = ConvertTo-SecureString -String "$env:SCUBA_EXECUTION_CERT_PW" -Force -AsPlainText
-        $Thumbprint = New-ServicePrincipalCertificate -EncodedCertificate $env:SCUBA_EXECUTION_CERT_PFX -CertificatePassword $CertPwd
+        $Result = New-ServicePrincipalCertificate -EncodedCertificate $env:SCUBA_EXECUTION_CERT_PFX -CertificatePassword $CertPwd
+        $Result.GetType()
+        $Thumbprint = $Result[-1]
         $Thumbprint.GetType()
 
         ##### Install MS Graph and all the dependencies
