@@ -30,7 +30,7 @@ jobs:
         ##### Install MS Graph and all the dependencies
         #Workaround till update to version 2.0+
         Install-Module -Name "PnP.PowerShell" -RequiredVersion 1.12 -Force 
-        ./SetUp.ps1
+        ./SetUp.ps1 -SkipUpdate
 
         ##### Run ScubaGear with a service principal
         Import-Module -Name ./PowerShell/ScubaGear
