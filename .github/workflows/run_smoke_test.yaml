@@ -22,15 +22,13 @@ jobs:
       uses: actions/checkout@v3
     - name: Execute ScubaGear and Check Outputs
       run: |
-        pwd 
-        Get-Location
         . Testing/Functional/SmokeTest/SmokeTestInit.ps1
 
         $CertPwd = ConvertTo-SecureString -String "$env:SCUBA_EXECUTION_CERT_PW" -Force -AsPlainText
         New-ServicePrincipalCertificate -EncodedCertificate $env:SCUBA_EXECUTION_CERT_PFX -CertificatePassword $CertPwd
 
         ##### Install MS Graph and all the dependencies
-        #./SetUp.ps1
+        # ./SetUp.ps1
 
         ##### Run ScubaGear with a service principal
         #Import-Module -Name ./PowerShell/ScubaGear
@@ -42,6 +40,5 @@ jobs:
 
         ##### Test that the TestResults.json file is a structurally valid JSON document
         #$JSONContent = Get-Content ".\$OutputFolder\TestResults.json" -Raw | ConvertFrom-Json
-
 
         Write-Output "Completed Smoke Test"
