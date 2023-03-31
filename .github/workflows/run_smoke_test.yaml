@@ -28,8 +28,10 @@ jobs:
         New-ServicePrincipalCertificate -EncodedCertificate $env:SCUBA_EXECUTION_CERT_PFX -CertificatePassword $CertPwd
 
         ##### Install MS Graph and all the dependencies
+        Get-InstalledModule
         ./SetUp.ps1
-
+        Get-InstalledModule
+        
         ##### Run ScubaGear with a service principal
         Import-Module -Name ./PowerShell/ScubaGear
         Invoke-Scuba -CertificateThumbPrint "A9D4870B12F94A344C20BB3FC5774C89F8B5EF33" -AppID "b682d3a5-bc68-450e-80ba-018b97aa2b21" -Organization "cisaent.onmicrosoft.com" -ProductNames "onedrive" -M365Environment "gcc"
