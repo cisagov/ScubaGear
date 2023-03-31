@@ -28,6 +28,7 @@ jobs:
         New-ServicePrincipalCertificate -EncodedCertificate $env:SCUBA_EXECUTION_CERT_PFX -CertificatePassword $CertPwd
 
         ##### Install MS Graph and all the dependencies
+        Install-Module -Name "PnP.PowerShell" -RequiredVersion 1.12.0 #Workaround till update to version 2.0+
         ./SetUp.ps1 -Force
 
         ##### Run ScubaGear with a service principal
