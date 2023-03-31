@@ -25,7 +25,8 @@ jobs:
         . Testing/Functional/SmokeTest/SmokeTestInit.ps1
 
         $CertPwd = ConvertTo-SecureString -String "$env:SCUBA_EXECUTION_CERT_PW" -Force -AsPlainText
-        $Thumbprint = New-ServicePrincipalCertificate -EncodedCertificate $env:SCUBA_EXECUTION_CERT_PFX -CertificatePassword $CertPwd
+        New-ServicePrincipalCertificate -EncodedCertificate $env:SCUBA_EXECUTION_CERT_PFX -CertificatePassword $CertPwd
+        Get-ChildItem Cert:\LocalMachine\My\
 
         ##### Install MS Graph and all the dependencies
         #Workaround till update to version 2.0+
@@ -44,5 +45,5 @@ jobs:
         ##### Test that the TestResults.json file is a structurally valid JSON document
         $JSONContent = Get-Content ".\$OutputFolder\TestResults.json" -Raw | ConvertFrom-Json
         $JSONContent
-        
+
         Write-Output "Completed Smoke Test"
