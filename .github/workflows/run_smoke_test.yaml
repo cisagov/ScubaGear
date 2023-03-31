@@ -26,8 +26,6 @@ jobs:
 
         $CertPwd = ConvertTo-SecureString -String "$env:SCUBA_EXECUTION_CERT_PW" -Force -AsPlainText
         $Thumbprint = New-ServicePrincipalCertificate -EncodedCertificate $env:SCUBA_EXECUTION_CERT_PFX -CertificatePassword $CertPwd
-        $Thumbprint
-        Get-ChildItem Cert:\LocalMachine\My\
 
         ##### Install MS Graph and all the dependencies
         #Workaround till update to version 2.0+
