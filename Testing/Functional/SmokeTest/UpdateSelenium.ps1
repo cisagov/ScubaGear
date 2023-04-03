@@ -109,7 +109,7 @@ if (Confirm-NeedForUpdate $edgeVersion $edgeDriverVersion){
 
 # download new Chrome driver if neccessary
 if (Confirm-NeedForUpdate $chromeVersion $chromeDriverVersion){
-    Write-Debug -Message "Need to update chrome driver from $chromeDriverVersion to$chromeVersion"
+    Write-Debug -Message "Need to update chrome driver from $chromeDriverVersion to $chromeVersion"
 
     # find exact matching version
     $chromeDriverAvailableVersions = (Invoke-RestMethod $chromeDriverWebsite) -split " " | Where-Object {$_ -like "*href=*?path=*"} | ForEach-Object {$_.replace("href=","").replace('"','')}
