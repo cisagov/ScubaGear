@@ -6,7 +6,7 @@ on:
         required: true
         type: string
       version:
-        description: "Release Version"
+        description: "Release Version (e.g., 1.2.4)"
         required: true
         type: string
 
