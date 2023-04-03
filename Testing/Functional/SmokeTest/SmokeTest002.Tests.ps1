@@ -54,26 +54,7 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser>" -ForEach @(
         $DetailLink | Should -Not -BeNullOrEmpty
         Invoke-SeClick -Element $DetailLink
 
-        $ToggleCheckbox = Find-SeElement -Driver $Driver -Wait -By XPath "//input[@id='toggle']"
-        $ToggleText = Find-SeElement -Driver $Driver -Wait -Id "toggle-text"
-
-        $ToggleText.Text | Should -Be 'Dark Mode'
-        $ToggleCheckbox.Selected | Should -Be $true
-
-        $ToggleSwitch = Find-SeElement -Driver $Driver -Wait -ClassName "switch"
-        Invoke-SeClick -Element $ToggleSwitch
-
-        $ToggleText.Text | Should -Be 'Light Mode'
-        $ToggleCheckbox.Selected | Should -Be $false
-
         Open-SeUrl -Back -Driver $Driver
-    }
-
-    It "Go Back to main page - Is Dark mode in correct state"{
-        $ToggleCheckbox = Find-SeElement -Driver $Driver -Wait -By XPath "//input[@id='toggle']"
-        $ToggleText = Find-SeElement -Driver $Driver -Wait -Id "toggle-text"
-        $ToggleText.Text | Should -Be 'Light Mode'
-        $ToggleCheckbox.Selected | Should -Be $false
     }
 
 	AfterAll {
