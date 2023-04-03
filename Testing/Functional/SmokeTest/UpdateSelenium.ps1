@@ -5,7 +5,7 @@ param (
     $chromeDriverPath    = "$($webDriversPath)\chromedriver.exe",                                   # direct Chrome driver path
     $chromeDriverWebsite = "https://chromedriver.chromium.org/downloads",                           # Chrome dooesn't allow to query the version from downloads page; instead available pages can be found here
     $chromeDriverUrlBase = "https://chromedriver.storage.googleapis.com",                           # URL base to ubild direct download link for Chrome driver
-    $chromeDriverUrlEnd  = "chromedriver_win32.zip",                                                # Chrome driver download ending (to finish building the URL)
+    $chromeDriverUrlEnd  = "chromedriver_win32.zip"                                                 # Chrome driver download ending (to finish building the URL)
 )
 function Get-LocalDriverVersion{
     param(
