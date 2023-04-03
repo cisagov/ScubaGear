@@ -23,9 +23,6 @@ function Install-SmokeTestExternalDependencies{
     $PNPPOWERSHELL_UPDATECHECK = 'Off'
     Install-Module -Name "PnP.PowerShell" -RequiredVersion 1.12 -Force
     ./SetUp.ps1 -SkipUpdate
-    ./AllowBasicAuthentication.ps1
-
-    #TODO: Install OPA if needed
 
     #Import Selenium and update drivers
     Install-Module Selenium
