@@ -8,7 +8,7 @@ param (
     $registryRoot        = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths",             # root location in registry to check version of currently installed apps
     $edgeRegistryPath    = "$registryRoot\msedge.exe",                                              # direct registry location for MS Edge (to check version)
     $chromeRegistryPath  = "$registryRoot\chrome.exe",                                              # direct registry location for Chrome (to check version)
-    $webDriversPath      = "$([Environment]::GetFolderPath('MyDocuments'))\Documents\WindowsPowerShell\Modules\Selenium\3.0.1\assemblies",  # local path for all web drivers (assuming that both are in the same location)
+    $webDriversPath      = "$([Environment]::GetFolderPath('MyDocuments'))\WindowsPowerShell\Modules\Selenium\3.0.1\assemblies",  # local path for all web drivers (assuming that both are in the same location)
     $edgeDriverPath      = "$($webDriversPath)\msedgedriver.exe",                                   # direct MS Edge driver path
     $chromeDriverPath    = "$($webDriversPath)\chromedriver.exe",                                   # direct Chrome driver path
     $chromeDriverWebsite = "https://chromedriver.chromium.org/downloads",                           # Chrome dooesn't allow to query the version from downloads page; instead available pages can be found here
