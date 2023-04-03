@@ -23,6 +23,7 @@ jobs:
     - name: Execute ScubaGear and Check Outputs
       run: |
         . Testing/Functional/SmokeTest/SmokeTestInit.ps1
+        ./AllowBasicAuthentication.ps1 -RunAsAdmin
 
         $CertPwd = ConvertTo-SecureString -String "$env:SCUBA_EXECUTION_CERT_PW" -Force -AsPlainText
         $Result = New-ServicePrincipalCertificate -EncodedCertificate $env:SCUBA_EXECUTION_CERT_PFX -CertificatePassword $CertPwd
