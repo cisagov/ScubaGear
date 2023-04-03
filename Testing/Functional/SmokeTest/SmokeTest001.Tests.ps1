@@ -3,14 +3,23 @@ BeforeAll {
     Import-Module $ScubaModulePath
    }
 
-Describe "Smoke Test <Config>" -ForEach @(
-    @{ConfigPath = "SmokeTestConfig001.yaml"; ExpectedResults = "SmokeTestExpected001.json"}
+Describe "Smoke Test: Generate Output"
 ){
-    It "Config: <ConfigPath>; Expected: <ExpectedResults>" {
-        Invoke-SCuBA -CertificateThumbprint $Env:Thumbprint -AppID $Env:AppId -Organization $Env:Organization -ProductNames "aad" -M365Environment "gcc"
+    BeforeAll {
+        Invoke-SCuBA -CertificateThumbprint $Env:Thumbprint -AppID $Env:AppId -Organization $Env:Organization -ProductNames "*" -M365Environment "gcc"
         $ReportFolders = Get-ChildItem . -directory -Filter "M365BaselineConformance*" | Sort-Object -Property LastWriteTime -Descending
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'OutputFolder',
+        Justification = 'Variable is used in another scope')]
         $OutputFolder = $ReportFolders[0]
-        Test-Path -Path ".\$OutputFolder\TestResults.json" -PathType Leaf |
+    }
+    It "Item, <Item>, exists" -ForEach @(
+        @{Item = 'BaselineReports.html'; ItemType = 'Leaf'},
+        @{Item = 'TestResults.json'; ItemType = 'Leaf'},
+        @{Item = 'TestResults.csv'; ItemType = 'Leaf'},
+        @{Item = 'ProviderSettingsExport.json'; ItemType = 'Leaf'},
+        @{Item = 'IndividualReports'; ItemType = 'Container'}
+    ){
+        Test-Path -Path "./$OutputFolder/$Item" -PathType $ItemType |
             Should -Be $true
 	}
 }
