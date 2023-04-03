@@ -41,7 +41,7 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser>" -ForEach @(
         $Domain | Should -Be "cisaent.onmicrosoft.com" -Because "Domain is $Domain"
     }
 
-    It "Goto <Product> (<LinkText>) details" -ForEach @(
+    It "Navigate to <Product> (<LinkText>) details" -ForEach @(
         @{Product = "aad"; LinkText = "Azure Active Directory"}
         @{Product = "defender"; LinkText = "Microsoft 365 Defender"}
         @{Product = "onedrive"; LinkText = "OneDrive for Business"}
@@ -57,6 +57,10 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser>" -ForEach @(
         Open-SeUrl -Back -Driver $Driver
     }
 
+    It "Dark mode test"{
+
+    }
+    
 	AfterAll {
 		Stop-SeDriver -Driver $Driver 2>$null
 	}
