@@ -4,7 +4,7 @@ BeforeAll {
    }
 
 Describe "Smoke Test: Generate Output"
-){
+{
     BeforeAll {
         Invoke-SCuBA -CertificateThumbprint $Env:Thumbprint -AppID $Env:AppId -Organization $Env:Organization -ProductNames "*" -M365Environment "gcc"
         $ReportFolders = Get-ChildItem . -directory -Filter "M365BaselineConformance*" | Sort-Object -Property LastWriteTime -Descending
