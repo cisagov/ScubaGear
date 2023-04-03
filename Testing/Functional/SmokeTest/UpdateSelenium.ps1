@@ -39,7 +39,7 @@ function Get-LocalDriverVersion{
     $processStOutput    = $process.StandardOutput.ReadToEnd()
 
     if ($pathToDriver.Contains("msedgedriver")){
-        return ($processStOutput -split " ")[3]                     # MS Edge returns version on 4th place in the output (be carefulm in old versions it was on 1st as well)... 
+        return ($processStOutput -split " ")[3]                     # MS Edge returns version on 4th place in the output (be carefulm in old versions it was on 1st as well)...
     }
     else {
         return ($processStOutput -split " ")[1]                     # ... while Chrome on 2nd place
@@ -78,7 +78,7 @@ if (Confirm-NeedForUpdate $edgeVersion $edgeDriverVersion){
     Write-Debug -Message "Need to update edge driver from $edgeVersion to $edgeDriverVersion"
 
     # find exact matching version
-    $edgeDriverAvailableVersions = (Invoke-RestMethod $edgeDriverWebsite) -split " " | Where-Object {$_ -like "*href=*win64*"} | % {$_.replace("href=","").replace('"','')}
+    $edgeDriverAvailableVersions = (Invoke-RestMethod $edgeDriverWebsite) -split " " | Where-Object {$_ -like "*href=*win64*"} | ForEach-Object {$_.replace("href=","").replace('"','')}
     $downloadLink                = $edgeDriverAvailableVersions | Where-Object {$_ -like "*/$edgeVersion/*"}
 
     # if cannot find (e.g. it's too new to have a web driver), look for relevant major version
@@ -109,13 +109,13 @@ if (Confirm-NeedForUpdate $chromeVersion $chromeDriverVersion){
     Write-Debug -Message "Need to update chrome driver from $chromeVersion to $chromeDriverVersion"
 
     # find exact matching version
-    $chromeDriverAvailableVersions = (Invoke-RestMethod $chromeDriverWebsite) -split " " | Where-Object {$_ -like "*href=*?path=*"} | % {$_.replace("href=","").replace('"','')}
+    $chromeDriverAvailableVersions = (Invoke-RestMethod $chromeDriverWebsite) -split " " | Where-Object {$_ -like "*href=*?path=*"} | ForEach-Object {$_.replace("href=","").replace('"','')}
     $versionLink                   = $chromeDriverAvailableVersions | Where-Object {$_ -like "*$chromeVersion/*"}
 
     # if cannot find (e.g. it's too new to have a web driver), look for relevant major version
     if (!$versionLink){
         $browserMajorVersion = $chromeVersion.Substring(0, $chromeVersion.IndexOf("."))
-        $versionLink         = $chromeDriverAvailableVersions | where {$_ -like "*$browserMajorVersion.*"}
+        $versionLink         = $chromeDriverAvailableVersions | Where-Object {$_ -like "*$browserMajorVersion.*"}
     }
 
     # in case of multiple links, take the first only
