@@ -21,5 +21,5 @@ function Install-SmokeTestExternalDependencies{
     Install-Module -Name "PnP.PowerShell" -RequiredVersion 1.12 -Force
     ./SetUp.ps1 -SkipUpdate
     #TODO: Install OPA if needed
-    ./UpdateSelenium.ps1
+    Testing/Functional/SmokeTest/UpdateSelenium.ps1
 }
