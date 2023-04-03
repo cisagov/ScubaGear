@@ -18,6 +18,9 @@ function New-ServicePrincipalCertificate{
 
 function Install-SmokeTestExternalDependencies{
     #Workaround till update to version 2.0+
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'PNPPOWERSHELL_UPDATECHECK',
+        Justification = 'Variable defined outside this scope')]
+    $PNPPOWERSHELL_UPDATECHECK = 'Off'
     Install-Module -Name "PnP.PowerShell" -RequiredVersion 1.12 -Force
     ./SetUp.ps1 -SkipUpdate
 

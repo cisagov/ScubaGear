@@ -9,7 +9,9 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser>" -ForEach @(
         $script:url = "file:///$OutputFolder/BaselineReports.html"
         Enter-SeUrl $script:url -Driver $Driver 2>$null
 	}
-
+    It "Output Folder"{
+        $OutputFolder | Should -Be 'C:/User'
+    }
 	It "Toggle Dark Mode" {
         $ToggleCheckbox = Find-SeElement -Driver $Driver -Wait -By XPath "//input[@id='toggle']"
         $ToggleText = Find-SeElement -Driver $Driver -Wait -Id "toggle-text"

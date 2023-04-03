@@ -14,7 +14,14 @@ Describe "Smoke Test: Generate Output" {
         @{Item = 'TestResults.json'; ItemType = 'Leaf'},
         @{Item = 'TestResults.csv'; ItemType = 'Leaf'},
         @{Item = 'ProviderSettingsExport.json'; ItemType = 'Leaf'},
-        @{Item = 'IndividualReports'; ItemType = 'Container'}
+        @{Item = 'IndividualReports'; ItemType = 'Container'},
+        @{Item = 'IndividualReports/AADReport'; ItemType = 'Leaf'},
+        @{Item = 'IndividualReports/DefenderReport'; ItemType = 'Leaf'},
+        @{Item = 'IndividualReports/EXOReport'; ItemType = 'Leaf'},
+        @{Item = 'IndividualReports/OneDriveReport'; ItemType = 'Leaf'},
+        @{Item = 'IndividualReports/PowerPlatformReport'; ItemType = 'Leaf'},
+        @{Item = 'IndividualReports/SharePointReport'; ItemType = 'Leaf'},
+        @{Item = 'IndividualReports/TeamsReport'; ItemType = 'Leaf'}
     ){
         Test-Path -Path "./$OutputFolder/$Item" -PathType $ItemType |
             Should -Be $true
