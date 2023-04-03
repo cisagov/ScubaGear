@@ -68,6 +68,8 @@ Write-Debug -Message "Edge driver version(registry):  $edgeVersion"
 Write-Debug -Message "Chrome driver version(registery):  $chromeVersion"
 
 # check which driver versions are installed
+Write-Debug -Message "Edge driver path:  $edgeDriverPath"
+Write-Debug -Message "Chrome driver path:  $chromeDriverPath"
 $edgeDriverVersion   = Get-LocalDriverVersion -pathToDriver $edgeDriverPath
 $chromeDriverVersion = Get-LocalDriverVersion -pathToDriver $chromeDriverPath
 Write-Debug -Message "Edge driver version(file system):  $edgeDriverVersion"
