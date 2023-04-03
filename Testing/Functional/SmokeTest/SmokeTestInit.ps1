@@ -24,6 +24,6 @@ function Install-SmokeTestExternalDependencies{
     #TODO: Install OPA if needed
 
     #Import Selenium and update drivers
-    Install-Module Selenium
+    Install-Module Selenium -Verbose
     Testing/Functional/SmokeTest/UpdateSelenium.ps1
 }
