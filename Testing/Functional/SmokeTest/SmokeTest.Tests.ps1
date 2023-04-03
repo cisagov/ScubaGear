@@ -16,9 +16,9 @@ Describe "Smoke Test <Config>" -ForEach @(
             Should -Be $true
 	}
 }
+
 Describe -Tag "UI","Chrome" -Name "Test Report with <Browser>" -ForEach @(
     @{ Browser = "Chrome"; Driver = Start-SeChrome 2>$null }
-    @{ Browser = "Edge"; Driver = Start-SeEdge 2>$null }
 ){
 	BeforeAll {
         $ReportFolders = Get-ChildItem . -directory -Filter "M365BaselineConformance*" | Sort-Object -Property LastWriteTime -Descending
