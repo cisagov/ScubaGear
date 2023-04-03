@@ -8,7 +8,7 @@ param (
     $registryRoot        = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths",             # root location in registry to check version of currently installed apps
     $edgeRegistryPath    = "$registryRoot\msedge.exe",                                              # direct registry location for MS Edge (to check version)
     $chromeRegistryPath  = "$registryRoot\chrome.exe",                                              # direct registry location for Chrome (to check version)
-    $webDriversPath      = "$([Environment]::GetFolderPath('MyDocuments'))\WindowsPowerShell\Modules\Selenium\3.0.1\assemblies",  # local path for all web drivers (assuming that both are in the same location)
+    $webDriversPath      = "C:\Program Files\WindowsPowerShell\Modules\Selenium\3.0.1\assemblies",  # local path for all web drivers (assuming that both are in the same location)
     $edgeDriverPath      = "$($webDriversPath)\msedgedriver.exe",                                   # direct MS Edge driver path
     $chromeDriverPath    = "$($webDriversPath)\chromedriver.exe",                                   # direct Chrome driver path
     $chromeDriverWebsite = "https://chromedriver.chromium.org/downloads",                           # Chrome dooesn't allow to query the version from downloads page; instead available pages can be found here
@@ -70,8 +70,7 @@ Write-Debug -Message "Chrome driver version(registery):  $chromeVersion"
 # check which driver versions are installed
 Write-Debug -Message "Edge driver path:  $edgeDriverPath"
 Write-Debug -Message "Chrome driver path:  $chromeDriverPath"
-Write-Debug -Message "$(Get-ChildItem 'C:/Users/runneradmin/Documents/WindowsPowerShell/Modules' -Recurse)"
-Write-Debug -Message "$(Get-ChildItem $webDriversPath)"
+Write-Debug -Message "$(Get-ChildItem $webDriversPath -Recurse)"
 $edgeDriverVersion   = Get-LocalDriverVersion -pathToDriver $edgeDriverPath
 $chromeDriverVersion = Get-LocalDriverVersion -pathToDriver $chromeDriverPath
 Write-Debug -Message "Edge driver version(file system):  $edgeDriverVersion"
