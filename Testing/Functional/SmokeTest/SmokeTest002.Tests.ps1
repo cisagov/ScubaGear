@@ -11,19 +11,6 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser>" -ForEach @(
         $script:url = (Get-Item $BaselineReports).FullName
         Enter-SeUrl $script:url -Driver $Driver 2>$null
 	}
-	It "Toggle Dark Mode" {
-        $ToggleCheckbox = Find-SeElement -Driver $Driver -Wait -By XPath "//input[@id='toggle']"
-        $ToggleText = Find-SeElement -Driver $Driver -Wait -Id "toggle-text"
-
-        $ToggleCheckbox.Selected | Should -Be $false
-        $ToggleText.Text | Should -Be 'Light Mode'
-
-        $ToggleSwitch = Find-SeElement -Driver $Driver -Wait -ClassName "switch"
-        Invoke-SeClick -Element $ToggleSwitch
-
-        $ToggleText.Text | Should -Be 'Dark Mode'
-        $ToggleCheckbox.Selected | Should -Be $true
-	}
 
     It "Verify Tenant"{
         $TenantDataElement = Find-SeElement -Driver $Driver -Wait -ClassName "tenantdata"
@@ -56,7 +43,6 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser>" -ForEach @(
 
         Open-SeUrl -Back -Driver $Driver
     }
-
 
     Context "Dark Mode test"{
         It "Toggle to Dark Mode" {
