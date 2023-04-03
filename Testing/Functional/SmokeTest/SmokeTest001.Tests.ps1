@@ -1,10 +1,7 @@
-BeforeAll {
-    $ScubaModulePath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/ScubaGear.psd1"
-    Import-Module $ScubaModulePath
-}
+$ScubaModulePath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/ScubaGear.psd1"
+Import-Module $ScubaModulePath
 
-Describe "Smoke Test: Generate Output"
-{
+Describe "Smoke Test: Generate Output" {
     BeforeAll {
         Invoke-SCuBA -CertificateThumbprint $Env:Thumbprint -AppID $Env:AppId -Organization $Env:Organization -ProductNames "*" -M365Environment "gcc"
         $ReportFolders = Get-ChildItem . -directory -Filter "M365BaselineConformance*" | Sort-Object -Property LastWriteTime -Descending

@@ -1,6 +1,4 @@
-BeforeAll {
-    Import-Module Selenium
-}
+Import-Module Selenium
 
 Describe -Tag "UI","Chrome" -Name "Test Report with <Browser>" -ForEach @(
     @{ Browser = "Chrome"; Driver = Start-SeChrome 2>$null }
