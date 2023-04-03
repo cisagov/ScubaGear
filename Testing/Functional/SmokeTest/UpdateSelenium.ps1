@@ -49,11 +49,11 @@ function Get-LocalDriverVersion{
 # function evaluating a need for update
 function Confirm-NeedForUpdate{
     param(
-        $v1,                                                                                 # version 1 to compare
-        $v2                                                                                  # version 2 to compare
+        $v1,   # version 1 to compare
+        $v2    # version 2 to compare
     )
     Write-Debug -Message "v1: $v1; v2: $v2"
-    return $v1.Substring(0, $v1.LastIndexOf(".")) -ne $v2.Substring(0, $v2.LastIndexOf(".")) # return true if update is needed, otherwise false. Ignore last minor version - it's not so important and can be skipped
+    return ([System.Version]$v2).Major -lt ([System.Version]$v1).Major
 }
 #endregion FUNCTIONS
 
