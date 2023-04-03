@@ -1,7 +1,7 @@
 Import-Module Selenium
 
 Describe -Tag "UI","Chrome" -Name "Test Report with <Browser>" -ForEach @(
-    @{ Browser = "Chrome"; Driver = Start-SeChrome 2>$null }
+    @{ Browser = "Chrome"; Driver = Start-SeChrome -Arguments @('start-maximized') 2>$null }
 ){
 	BeforeAll {
         $ReportFolders = Get-ChildItem . -directory -Filter "M365BaselineConformance*" | Sort-Object -Property LastWriteTime -Descending
