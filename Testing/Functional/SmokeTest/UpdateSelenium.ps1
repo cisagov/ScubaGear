@@ -78,7 +78,7 @@ Write-Debug -Message "Chrome driver version(file system):  $chromeDriverVersion"
 
 # download new MS Edge driver if neccessary
 if (Confirm-NeedForUpdate $edgeVersion $edgeDriverVersion){
-    Write-Debug -Message "Need to update edge driver from $edgeVersion to $edgeDriverVersion"
+    Write-Debug -Message "Need to update edge driver from $edgeDriverVersion to $edgeVersion"
 
     # find exact matching version
     $edgeDriverAvailableVersions = (Invoke-RestMethod $edgeDriverWebsite) -split " " | Where-Object {$_ -like "*href=*win64*"} | ForEach-Object {$_.replace("href=","").replace('"','')}
@@ -109,7 +109,7 @@ if (Confirm-NeedForUpdate $edgeVersion $edgeDriverVersion){
 
 # download new Chrome driver if neccessary
 if (Confirm-NeedForUpdate $chromeVersion $chromeDriverVersion){
-    Write-Debug -Message "Need to update chrome driver from $chromeVersion to $chromeDriverVersion"
+    Write-Debug -Message "Need to update chrome driver from $chromeDriverVersion to$chromeVersion"
 
     # find exact matching version
     $chromeDriverAvailableVersions = (Invoke-RestMethod $chromeDriverWebsite) -split " " | Where-Object {$_ -like "*href=*?path=*"} | ForEach-Object {$_.replace("href=","").replace('"','')}

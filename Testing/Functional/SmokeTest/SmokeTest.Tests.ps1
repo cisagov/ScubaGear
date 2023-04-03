@@ -1,6 +1,7 @@
 BeforeAll {
     $ScubaModulePath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/ScubaGear.psd1"
     Import-Module $ScubaModulePath
+    Import-Module Selenium
    }
 
 Describe "Smoke Test <Config>" -ForEach @(
