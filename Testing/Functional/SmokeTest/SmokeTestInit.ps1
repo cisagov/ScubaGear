@@ -15,3 +15,11 @@ function New-ServicePrincipalCertificate{
     $Thumbprint = ([System.Security.Cryptography.X509Certificates.X509Certificate2]$Certificate).Thumbprint
     return $Thumbprint
 }
+
+function Install-SmokeTestExternalDependencies{
+    #Workaround till update to version 2.0+
+    Install-Module -Name "PnP.PowerShell" -RequiredVersion 1.12 -Force
+    ./SetUp.ps1 -SkipUpdate
+    #TODO: Install OPA if needed
+    #TODO: Install Selenium if needed
+}

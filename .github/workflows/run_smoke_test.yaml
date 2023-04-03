@@ -30,15 +30,9 @@ jobs:
         $Env:Organization = "cisaent.onmicrosoft.com"
         $Env:AppId = "b682d3a5-bc68-450e-80ba-018b97aa2b21"
 
-        ##### Install MS Graph and all the dependencies
-        #Workaround till update to version 2.0+
-        Install-Module -Name "PnP.PowerShell" -RequiredVersion 1.12 -Force 
-        ./SetUp.ps1 -SkipUpdate
-        Invoke-Pester -Path Testing/Functional/SmokeTest -Output Detailed
+        ##### Install all the dependencies
+        Install-SmokeTestExternalDependencies
 
-        ##### Run ScubaGear with a service principal
-        #Import-Module -Name ./PowerShell/ScubaGear
-        #Invoke-Scuba -CertificateThumbPrint "A9D4870B12F94A344C20BB3FC5774C89F8B5EF33" -AppID "b682d3a5-bc68-450e-80ba-018b97aa2b21" -Organization "cisaent.onmicrosoft.com" -ProductNames "onedrive" -M365Environment "gcc"
-        #Invoke-SCuBA -CertificateThumbprint $Thumbprint -AppID "b682d3a5-bc68-450e-80ba-018b97aa2b21" -Organization "cisaent.onmicrosoft.com" -ProductNames "onedrive" -M365Environment "gcc"
+        Invoke-Pester -Path Testing/Functional/SmokeTest -Output Detailed
 
         Write-Output "Completed Smoke Test"
