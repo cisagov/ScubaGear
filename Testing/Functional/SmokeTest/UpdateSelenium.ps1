@@ -70,8 +70,8 @@ Write-Debug -Message "Chrome driver version(registery):  $chromeVersion"
 # check which driver versions are installed
 Write-Debug -Message "Edge driver path:  $edgeDriverPath"
 Write-Debug -Message "Chrome driver path:  $chromeDriverPath"
-Write-Debug -Message "$(Join-Path -Path $webDriversPath -ChildPath '/WindowsPowerShell/Modules/Selenium')"
-Write-Debug -Message "$(Join-Path -Path $webDriversPath -ChildPath '/WindowsPowerShell/Modules/Selenium/3.0.1/assemblies')"
+Write-Debug -Message Get-ChildItem "$(Join-Path -Path $webDriversPath -ChildPath '/WindowsPowerShell/Modules/Selenium')"
+Write-Debug -Message Get-ChildItem "$(Join-Path -Path $webDriversPath -ChildPath '/WindowsPowerShell/Modules/Selenium/3.0.1/assemblies')"
 $edgeDriverVersion   = Get-LocalDriverVersion -pathToDriver $edgeDriverPath
 $chromeDriverVersion = Get-LocalDriverVersion -pathToDriver $chromeDriverPath
 Write-Debug -Message "Edge driver version(file system):  $edgeDriverVersion"
