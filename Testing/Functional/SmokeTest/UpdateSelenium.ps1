@@ -39,7 +39,7 @@ function Get-LocalDriverVersion{
     $processStOutput    = $process.StandardOutput.ReadToEnd()
 
     if ($pathToDriver.Contains("msedgedriver")){
-        return ($processStOutput -split " ")[3]                     # MS Edge returns version on 4th place in the output (be carefulm in old versions it was on 1st as well)...
+        return ($processStOutput -split " ")[1]                     # MS Edge returns version on 4th place in the output (be carefulm in old versions it was on 1st as well)...
     }
     else {
         return ($processStOutput -split " ")[1]                     # ... while Chrome on 2nd place
