@@ -6,12 +6,10 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser>" -ForEach @(
 	BeforeAll {
         $ReportFolders = Get-ChildItem . -directory -Filter "M365BaselineConformance*" | Sort-Object -Property LastWriteTime -Descending
         $OutputFolder = $ReportFolders[0]
-        $script:url = "file:///$OutputFolder/BaselineReports.html"
+        $BaselineReports = Join-Path -Path $OutputFolder -ChildPath 'BaselineReports.html'
+        $script:url = ([System.Uri](Get-Item $BaselineReports).FullName).AbsoluteUri
         Enter-SeUrl $script:url -Driver $Driver 2>$null
 	}
-    It "Output Folder"{
-        $OutputFolder | Should -Be 'C:/User'
-    }
 	It "Toggle Dark Mode" {
         $ToggleCheckbox = Find-SeElement -Driver $Driver -Wait -By XPath "//input[@id='toggle']"
         $ToggleText = Find-SeElement -Driver $Driver -Wait -Id "toggle-text"

@@ -15,13 +15,18 @@ Describe "Smoke Test: Generate Output" {
         @{Item = 'TestResults.csv'; ItemType = 'Leaf'},
         @{Item = 'ProviderSettingsExport.json'; ItemType = 'Leaf'},
         @{Item = 'IndividualReports'; ItemType = 'Container'},
-        @{Item = 'IndividualReports/AADReport'; ItemType = 'Leaf'},
-        @{Item = 'IndividualReports/DefenderReport'; ItemType = 'Leaf'},
-        @{Item = 'IndividualReports/EXOReport'; ItemType = 'Leaf'},
-        @{Item = 'IndividualReports/OneDriveReport'; ItemType = 'Leaf'},
-        @{Item = 'IndividualReports/PowerPlatformReport'; ItemType = 'Leaf'},
-        @{Item = 'IndividualReports/SharePointReport'; ItemType = 'Leaf'},
-        @{Item = 'IndividualReports/TeamsReport'; ItemType = 'Leaf'}
+        @{Item = 'IndividualReports/AADReport.html'; ItemType = 'Leaf'},
+        @{Item = 'IndividualReports/DefenderReport.html'; ItemType = 'Leaf'},
+        @{Item = 'IndividualReports/EXOReport.html'; ItemType = 'Leaf'},
+        @{Item = 'IndividualReports/OneDriveReport.html'; ItemType = 'Leaf'},
+        @{Item = 'IndividualReports/PowerPlatformReport.html'; ItemType = 'Leaf'},
+        @{Item = 'IndividualReports/SharePointReport.html'; ItemType = 'Leaf'},
+        @{Item = 'IndividualReports/TeamsReport.html'; ItemType = 'Leaf'},
+        @{Item = 'IndividualReports/images'; ItemType = 'Container'},
+        @{Item = 'IndividualReports/images/angle-down-solid.svg'; ItemType = 'Leaf'},
+        @{Item = 'IndividualReports/images/angle-right-solid.svg'; ItemType = 'Leaf'},
+        @{Item = 'IndividualReports/images/cisa_logo.png'; ItemType = 'Leaf'}
+
     ){
         Test-Path -Path "./$OutputFolder/$Item" -PathType $ItemType |
             Should -Be $true
