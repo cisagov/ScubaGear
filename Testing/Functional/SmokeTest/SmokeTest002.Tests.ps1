@@ -7,7 +7,8 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser>" -ForEach @(
         $ReportFolders = Get-ChildItem . -directory -Filter "M365BaselineConformance*" | Sort-Object -Property LastWriteTime -Descending
         $OutputFolder = $ReportFolders[0]
         $BaselineReports = Join-Path -Path $OutputFolder -ChildPath 'BaselineReports.html'
-        $script:url = ([System.Uri](Get-Item $BaselineReports).FullName).AbsoluteUri
+        #$script:url = ([System.Uri](Get-Item $BaselineReports).FullName).AbsoluteUri
+        $script:url = (Get-Item $BaselineReports).FullName
         Enter-SeUrl $script:url -Driver $Driver 2>$null
 	}
 	It "Toggle Dark Mode" {
