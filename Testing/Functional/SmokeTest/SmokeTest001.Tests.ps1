@@ -1,3 +1,5 @@
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'TestParameters',
+Justification = 'False positive as rule does not scan child scopes')]
 param (
     [Parameter(Mandatory = $true)]
     [ValidateNotNullOrEmpty()]
@@ -9,11 +11,11 @@ $ScubaModulePath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell
 Import-Module $ScubaModulePath
 
 Describe "Smoke Test: Generate Output" {
-    Context "Invoke Scuba for $TestParameters:Organization" -ForEach @(
+    Context "Invoke Scuba for $TestParameters.Organization" -ForEach @(
 
     ){
         BeforeAll {
-            Invoke-SCuBA -CertificateThumbprint $TestParameters:Thumbprint -AppID $TestParameters:AppId -Organization $TestParameters:Organization -ProductNames "*" -M365Environment "gcc"
+            Invoke-SCuBA -CertificateThumbprint $TestParameters.Thumbprint -AppID $TestParameters.AppId -Organization $TestParameters.Organization -ProductNames "*" -M365Environment "gcc"
             $ReportFolders = Get-ChildItem . -directory -Filter "M365BaselineConformance*" | Sort-Object -Property LastWriteTime -Descending
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'OutputFolder',
             Justification = 'Variable is used in another scope')]
