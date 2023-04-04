@@ -1,6 +1,19 @@
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'OrganizationDomain', Justification = 'False positive as rule does not scan child scopes')]
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'OrganizationName', Justification = 'False positive as rule does not scan child scopes')]
+param (
+    [Parameter(Mandatory = $true)]
+    [ValidateNotNullOrEmpty()]
+    [string]
+    $OrganizationDomain,
+    [Parameter(Mandatory = $true)]
+    [ValidateNotNullOrEmpty()]
+    [string]
+    $OrganizationName
+)
+
 Import-Module Selenium
 
-Describe -Tag "UI","Chrome" -Name "Test Report with <Browser>" -ForEach @(
+Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for $OrganizationName" -ForEach @(
     @{ Browser = "Chrome"; Driver = Start-SeChrome -Arguments @('start-maximized') 2>$null }
 ){
 	BeforeAll {
@@ -22,12 +35,12 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser>" -ForEach @(
         It "Verify Tenant"{
 
             $Tenant = $TenantDataColumns[0].Text
-            $Tenant | Should -Be "Cybersecurity and Infrastructure Security Agency" -Because $Tenant
+            $Tenant | Should -Be $OrganizationName -Because $Tenant
         }
 
         It "Verify  Domain"{
             $Domain = $TenantDataColumns[1].Text
-            $Domain | Should -Be "cisaent.onmicrosoft.com" -Because "Domain is $Domain"
+            $Domain | Should -Be $OrganizationDomain -Because "Domain is $Domain"
         }
     }
 

@@ -32,9 +32,9 @@ jobs:
 
         $TestContainers = @()
         $TestContainers += New-PesterContainer -Path "Testing/Functional/SmokeTest/SmokeTest001.Tests.ps1" -Data @{ Thumbprint = $Thumbprint; Organization = "cisaent.onmicrosoft.com"; AppId = $AppId }
-        $TestContainers += New-PesterContainer -Path "Testing/Functional/SmokeTest/SmokeTest002.Tests.ps1"
+        $TestContainers += New-PesterContainer -Path "Testing/Functional/SmokeTest/SmokeTest002.Tests.ps1" -Data @{ OrganizationDomain = "cisaent.onmicrosoft.com"; OrganizationName = "Cybersecurity and Infrastructure Security Agency" }
         $TestContainers += New-PesterContainer -Path "Testing/Functional/SmokeTest/SmokeTest001.Tests.ps1" -Data @{ Thumbprint = $Thumbprint; Organization = "cisaent.onmicrosoft.com"; AppId = $AppId }
-        $TestContainers += New-PesterContainer -Path "Testing/Functional/SmokeTest/SmokeTest002.Tests.ps1"
+        $TestContainers += New-PesterContainer -Path "Testing/Functional/SmokeTest/SmokeTest002.Tests.ps1" -Data @{ OrganizationDomain = "cisaent.onmicrosoft.com"; OrganizationName = "Cybersecurity and Infrastructure Security Agency" }
 
         ##### Install all the dependencies
         Install-SmokeTestExternalDependencies
