@@ -14,6 +14,7 @@ InModuleScope Connection {
             Mock Connect-SPOService -MockWith {}
             Mock Connect-MicrosoftTeams -MockWith {}
             Mock Add-PowerAppsAccount -MockWith {}
+            function Connect-EXOHelper {}
             Mock Connect-EXOHelper -MockWith {}
             Mock Select-MgProfile -MockWith {}
             Mock Get-MgProfile -MockWith {
