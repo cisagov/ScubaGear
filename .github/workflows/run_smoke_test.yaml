@@ -1,8 +1,11 @@
 on: 
   workflow_dispatch:
-  push:
+  pull_request:
+    types: [opened, reopened]
     branches:
-      - 'automated-smoke-test'
+      - "main"
+  pull_request_review:
+      types: [submitted]  
 
 name: Smoke Test
 

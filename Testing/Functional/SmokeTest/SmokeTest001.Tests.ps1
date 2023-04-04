@@ -1,3 +1,21 @@
+<#
+    .SYNOPSIS
+    Test script to verify Invoke-SCuBA file outputs.
+    .DESCRIPTION
+    Test script to execute Invoke-SCuBA against a given tenant using a service
+    principal. Verifies that all expected products (i.e., files) are generated.
+    .PARAMETER Thumbprint
+    Thumbprint of thee certificate associated with the Service Principal.
+    .PARAMETER Organization
+    The tenant domain name for the organization.
+    .PARAMETER AppId
+    The Application Id associated with the Service Principal and certificate.
+    .EXAMPLE
+    $TestContainer = New-PesterContainer -Path "SmokeTest001.Tests.ps1" -Data @{ Thumbprint = $Thumbprint; Organization = "cisaent.onmicrosoft.com"; AppId = $AppId }
+    Invoke-Pester -Container $TestContainer -Output Detailed
+
+#>
+
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'Thumbprint', Justification = 'False positive as rule does not scan child scopes')]
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'Organization', Justification = 'False positive as rule does not scan child scopes')]
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'AppId', Justification = 'False positive as rule does not scan child scopes')]
