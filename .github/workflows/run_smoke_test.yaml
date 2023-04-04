@@ -30,25 +30,24 @@ jobs:
         $Thumbprint = $Result[-1]
         $AppId = "b682d3a5-bc68-450e-80ba-018b97aa2b21" #TODO: Make Github Secret
 
-        $TestScripts = @(
-          @{Path = "Testing/Functional/SmokeTest/SmokeTest001.Tests.ps1"; 
-            TestParameters = @{
+        $TestContainers = @(
+          New-PesterContainer -Path "Testing/Functional/SmokeTest/SmokeTest001.Tests.ps1" -Data @{
               Thumbprint = $Thumbprint; 
               Organization = "cisaent.onmicrosoft.com"; 
-              AppId = $AppId}
-          }
-          @(Path = "Testing/Functional/SmokeTest/SmokeTest002.Tests.ps1")
-          @{Path = "Testing/Functional/SmokeTest/SmokeTest001.Tests.ps1"; 
-            TestParameters = @{
+              AppId = $AppId
+          },
+          New-PesterContainer -Path "Testing/Functional/SmokeTest/SmokeTest002.Tests.ps1",
+          New-PesterContainer -Path "Testing/Functional/SmokeTest/SmokeTest001.Tests.ps1" -Data @{
               Thumbprint = $Thumbprint; 
               Organization = "y2zj1.onmicrosoft.com"; 
-              AppId = $AppId}}
-          @(Path = "Testing/Functional/SmokeTest/SmokeTest002.Tests.ps1")
+              AppId = $AppId
+          },
+          New-PesterContainer -Path "Testing/Functional/SmokeTest/SmokeTest002.Tests.ps1"
         )
 
         ##### Install all the dependencies
         Install-SmokeTestExternalDependencies
 
-        Invoke-Pester -Script $TestScripts -Output Detailed
+        Invoke-Pester -Container $TestContainers -Output Detailed
 
         Write-Output "Completed Smoke Test"
