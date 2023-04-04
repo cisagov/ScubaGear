@@ -27,13 +27,28 @@ jobs:
 
         $CertPwd = ConvertTo-SecureString -String "$env:SCUBA_EXECUTION_CERT_PW" -Force -AsPlainText
         $Result = New-ServicePrincipalCertificate -EncodedCertificate $env:SCUBA_EXECUTION_CERT_PFX -CertificatePassword $CertPwd
-        $Env:Thumbprint = $Result[-1]
-        $Env:Organization = "cisaent.onmicrosoft.com"
-        $Env:AppId = "b682d3a5-bc68-450e-80ba-018b97aa2b21"
+        $Thumbprint = $Result[-1]
+        $AppId = "b682d3a5-bc68-450e-80ba-018b97aa2b21" #TODO: Make Github Secret
+
+        @TestScripts = @(
+          @{Path = "Testing/Functional/SmokeTest/SmokeTest001.Tests.ps1"; 
+            TestParameters = @{
+              Thumbprint = $Thumbprint; 
+              Organization = "cisaent.onmicrosoft.com"; 
+              AppId = $AppId}
+          }
+          @(Path = "Testing/Functional/SmokeTest/SmokeTest002.Tests.ps1")
+          @{Path = "Testing/Functional/SmokeTest/SmokeTest001.Tests.ps1"; 
+            TestParameters = @{
+              Thumbprint = $Thumbprint; 
+              Organization = "y2zj1.onmicrosoft.com"; 
+              AppId = $AppId}}
+          @(Path = "Testing/Functional/SmokeTest/SmokeTest002.Tests.ps1")
+        )
 
         ##### Install all the dependencies
         Install-SmokeTestExternalDependencies
 
-        Invoke-Pester -Path Testing/Functional/SmokeTest -Output Detailed
+        Invoke-Pester -Script $TestScripts -Output Detailed
 
         Write-Output "Completed Smoke Test"
