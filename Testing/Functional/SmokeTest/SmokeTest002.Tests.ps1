@@ -13,18 +13,19 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser>" -ForEach @(
 	}
 
     Context "Check Main HTML" {
-        It "Verify Tenant"{
+        BeforeAll {
             $TenantDataElement = Find-SeElement -Driver $Driver -Wait -ClassName "tenantdata"
             $TenantDataRows = Find-SeElement -Target $TenantDataElement -By TagName "tr"
-            $TenantDataColumns = Find-SeElement -Target $TenantDataRows[1] -By TagName "td"
+            [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'TenantDataColumns',
+                Justification = 'Variable is used in another scope')]
+            $TenantDataColumns = Find-SeElement -Target $TenantDataRows[1] -By TagName "td"        }
+        It "Verify Tenant"{
+
             $Tenant = $TenantDataColumns[0].Text
             $Tenant | Should -Be "Cybersecurity and Infrastructure Security Agency" -Because $Tenant
         }
 
         It "Verify  Domain"{
-            $TenantDataElement = Find-SeElement -Driver $Driver -Wait -ClassName "tenantdata"
-            $TenantDataRows = Find-SeElement -Target $TenantDataElement -By TagName "tr"
-            $TenantDataColumns = Find-SeElement -Target $TenantDataRows[1] -By TagName "td"
             $Domain = $TenantDataColumns[1].Text
             $Domain | Should -Be "cisaent.onmicrosoft.com" -Because "Domain is $Domain"
         }
