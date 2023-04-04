@@ -6,7 +6,7 @@ on:
         required: true
         type: string
       version:
-        description: "Release Version"
+        description: "Release Version (e.g., 1.2.4)"
         required: true
         type: string
 
@@ -60,7 +60,7 @@ jobs:
         draft: true
         prerelease: false
         name: ${{ inputs.releaseName }}
-        tag_name: ${{ inputs.version }}
+        tag_name: v${{ inputs.version }}
         files: ScubaGear-${{ inputs.version }}.zip
         generate_release_notes: true
         fail_on_unmatched_files: true
