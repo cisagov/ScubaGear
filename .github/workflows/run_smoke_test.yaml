@@ -8,7 +8,7 @@ on:
       types: [submitted]  
   push:
     branches:
-      - "automated-smoke-tests"
+      - "automated-smoke-test"
 
 name: Smoke Test
 
