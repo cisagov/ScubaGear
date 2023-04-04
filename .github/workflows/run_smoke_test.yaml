@@ -6,6 +6,9 @@ on:
       - "main"
   pull_request_review:
       types: [submitted]  
+  push:
+    branches:
+      - "automated-smoke-tests"
 
 name: Smoke Test
 
