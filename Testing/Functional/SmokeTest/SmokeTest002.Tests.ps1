@@ -8,7 +8,7 @@
     .PARAMETER OrganizationName
     The Organizations friendly name (e.g., The ABC Corporation)
     .EXAMPLE
-    $TestContainer = New-PesterContainer -Path "SmokeTest002.Tests.ps1" -Data @{ OrganizationDomain = "cisaent.onmicrosoft.com"; OrganizationName = "The ABC Corporation" }
+    $TestContainer = New-PesterContainer -Path "SmokeTest002.Tests.ps1" -Data @{ OrganizationDomain = "cisaent.onmicrosoft.com"; OrganizationName = "Cybersecurity and Infrastructure Security Agency" }
     Invoke-Pester -Container $TestContainer -Output Detailed
     .NOTES
     The test expects the Scuba output files to exists from a previous run of Invoke-Scuba for the same tenant and all products.
@@ -16,7 +16,6 @@
 #>
 
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'OrganizationDomain', Justification = 'False positive as rule does not scan child scopes')]
-[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'OrganizationName', Justification = 'False positive as rule does not scan child scopes')]
 param (
     [Parameter(Mandatory = $true)]
     [ValidateNotNullOrEmpty()]
@@ -39,16 +38,16 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for $OrganizationN
         $BaselineReports = Join-Path -Path $OutputFolder -ChildPath 'BaselineReports.html'
         #$script:url = ([System.Uri](Get-Item $BaselineReports).FullName).AbsoluteUri
         $script:url = (Get-Item $BaselineReports).FullName
-        Enter-SeUrl $script:url -Driver $Driver 2>$null
+        Open-SeUrl $script:url -Driver $Driver 2>$null
 	}
 
     Context "Check Main HTML" {
         BeforeAll {
-            $TenantDataElement = Find-SeElement -Driver $Driver -Wait -ClassName "tenantdata"
-            $TenantDataRows = Find-SeElement -Target $TenantDataElement -By TagName "tr"
+            $TenantDataElement = Get-SeElement -Driver $Driver -Wait -ClassName "tenantdata"
+            $TenantDataRows = Get-SeElement -Target $TenantDataElement -By TagName "tr"
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'TenantDataColumns',
                 Justification = 'Variable is used in another scope')]
-            $TenantDataColumns = Find-SeElement -Target $TenantDataRows[1] -By TagName "td"        }
+            $TenantDataColumns = Get-SeElement -Target $TenantDataRows[1] -By TagName "td"        }
         It "Verify Tenant"{
 
             $Tenant = $TenantDataColumns[0].Text
@@ -71,7 +70,7 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for $OrganizationN
             @{Product = "sharepoint"; LinkText = "SharePoint Online"}
             @{Product = "teams"; LinkText = "Microsoft Teams"}
         ){
-            $DetailLink = Find-SeElement -Driver $Driver -Wait -By LinkText $LinkText
+            $DetailLink = Get-SeElement -Driver $Driver -Wait -By LinkText $LinkText
             $DetailLink | Should -Not -BeNullOrEmpty
             Invoke-SeClick -Element $DetailLink
 
@@ -81,13 +80,13 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for $OrganizationN
 
     Context "Dark Mode test"{
         It "Toggle to Dark Mode" {
-            $ToggleCheckbox = Find-SeElement -Driver $Driver -Wait -By XPath "//input[@id='toggle']"
-            $ToggleText = Find-SeElement -Driver $Driver -Wait -Id "toggle-text"
+            $ToggleCheckbox = Get-SeElement -Driver $Driver -Wait -By XPath "//input[@id='toggle']"
+            $ToggleText = Get-SeElement -Driver $Driver -Wait -Id "toggle-text"
 
             $ToggleCheckbox.Selected | Should -Be $false
             $ToggleText.Text | Should -Be 'Light Mode'
 
-            $ToggleSwitch = Find-SeElement -Driver $Driver -Wait -ClassName "switch"
+            $ToggleSwitch = Get-SeElement -Driver $Driver -Wait -ClassName "switch"
             Invoke-SeClick -Element $ToggleSwitch
 
             $ToggleText.Text | Should -Be 'Dark Mode'
@@ -97,17 +96,17 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for $OrganizationN
         It "Navigate to <Product> (<LinkText>) details - Switch to Light Mode" -ForEach @(
             @{Product = "aad"; LinkText = "Azure Active Directory"}
         ){
-            $DetailLink = Find-SeElement -Driver $Driver -Wait -By LinkText $LinkText
+            $DetailLink = Get-SeElement -Driver $Driver -Wait -By LinkText $LinkText
             $DetailLink | Should -Not -BeNullOrEmpty
             Invoke-SeClick -Element $DetailLink
 
-            $ToggleCheckbox = Find-SeElement -Driver $Driver -Wait -By XPath "//input[@id='toggle']"
-            $ToggleText = Find-SeElement -Driver $Driver -Wait -Id "toggle-text"
+            $ToggleCheckbox = Get-SeElement -Driver $Driver -Wait -By XPath "//input[@id='toggle']"
+            $ToggleText = Get-SeElement -Driver $Driver -Wait -Id "toggle-text"
 
             $ToggleText.Text | Should -Be 'Dark Mode'
             $ToggleCheckbox.Selected | Should -Be $true
 
-            $ToggleSwitch = Find-SeElement -Driver $Driver -Wait -ClassName "switch"
+            $ToggleSwitch = Get-SeElement -Driver $Driver -Wait -ClassName "switch"
             Invoke-SeClick -Element $ToggleSwitch
 
             $ToggleText.Text | Should -Be 'Light Mode'
@@ -116,8 +115,8 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for $OrganizationN
 
         It "Go Back to main page - Is Dark mode in correct state"{
             Open-SeUrl -Back -Driver $Driver
-            $ToggleCheckbox = Find-SeElement -Driver $Driver -Wait -By XPath "//input[@id='toggle']"
-            $ToggleText = Find-SeElement -Driver $Driver -Wait -Id "toggle-text"
+            $ToggleCheckbox = Get-SeElement -Driver $Driver -Wait -By XPath "//input[@id='toggle']"
+            $ToggleText = Get-SeElement -Driver $Driver -Wait -Id "toggle-text"
             $ToggleText.Text | Should -Be 'Light Mode'
             $ToggleCheckbox.Selected | Should -Be $false
         }

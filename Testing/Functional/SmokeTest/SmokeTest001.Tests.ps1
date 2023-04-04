@@ -13,25 +13,35 @@
     .EXAMPLE
     $TestContainer = New-PesterContainer -Path "SmokeTest001.Tests.ps1" -Data @{ Thumbprint = $Thumbprint; Organization = "cisaent.onmicrosoft.com"; AppId = $AppId }
     Invoke-Pester -Container $TestContainer -Output Detailed
+    .EXAMPLE
+    Invoke-Pester -Script .\Testing\Functional\SmokeTest\SmokeTest001.Tests.ps1 -Output Detailed
 
 #>
 
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'Thumbprint', Justification = 'False positive as rule does not scan child scopes')]
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'Organization', Justification = 'False positive as rule does not scan child scopes')]
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'AppId', Justification = 'False positive as rule does not scan child scopes')]
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'M365Environment', Justification = 'False positive as rule does not scan child scopes')]
+[CmdletBinding(DefaultParameterSetName='Manual')]
 param (
-    [Parameter(Mandatory = $true)]
+    [Parameter(Mandatory = $true, ParameterSetName = 'Auto')]
     [ValidateNotNullOrEmpty()]
     [string]
     $Thumbprint,
-    [Parameter(Mandatory = $true)]
+    [Parameter(Mandatory = $true, ParameterSetName = 'Auto')]
     [ValidateNotNullOrEmpty()]
     [string]
     $Organization,
-    [Parameter(Mandatory = $true)]
+    [Parameter(Mandatory = $true,  ParameterSetName = 'Auto')]
     [ValidateNotNullOrEmpty()]
     [string]
-    $AppId
+    $AppId,
+    [Parameter(ParameterSetName = 'Auto')]
+    [Parameter(ParameterSetName = 'Manual')]
+    [Parameter(Mandatory = $false)]
+    [ValidateNotNullOrEmpty()]
+    [string]
+    $M365Environment = 'gcc'
 )
 
 $ScubaModulePath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/ScubaGear.psd1"
@@ -40,7 +50,12 @@ Import-Module $ScubaModulePath
 Describe "Smoke Test: Generate Output" {
     Context "Invoke Scuba for $Organization" {
         BeforeAll {
-            Invoke-SCuBA -CertificateThumbprint $Thumbprint -AppID $AppId -Organization $Organization -ProductNames "*" -M365Environment "gcc"
+            if ($PSCmdlet.ParameterSetName -eq 'Manual'){
+                Invoke-SCuBA -ProductNames "*" -M365Environment $M365Environment
+            }
+            else {
+                Invoke-SCuBA -CertificateThumbprint $Thumbprint -AppID $AppId -Organization $Organization -ProductNames "*" -M365Environment $M365Environment
+            }
             $ReportFolders = Get-ChildItem . -directory -Filter "M365BaselineConformance*" | Sort-Object -Property LastWriteTime -Descending
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'OutputFolder',
             Justification = 'Variable is used in another scope')]
