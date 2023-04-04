@@ -30,7 +30,7 @@ jobs:
         $Thumbprint = $Result[-1]
         $AppId = "b682d3a5-bc68-450e-80ba-018b97aa2b21" #TODO: Make Github Secret
 
-        @TestScripts = @(
+        $TestScripts = @(
           @{Path = "Testing/Functional/SmokeTest/SmokeTest001.Tests.ps1"; 
             TestParameters = @{
               Thumbprint = $Thumbprint; 
