@@ -12,20 +12,22 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser>" -ForEach @(
         Enter-SeUrl $script:url -Driver $Driver 2>$null
 	}
 
-    It "Verify Tenant"{
-        $TenantDataElement = Find-SeElement -Driver $Driver -Wait -ClassName "tenantdata"
-        $TenantDataRows = Find-SeElement -Target $TenantDataElement -By TagName "tr"
-        $TenantDataColumns = Find-SeElement -Target $TenantDataRows[1] -By TagName "td"
-        $Tenant = $TenantDataColumns[0].Text
-        $Tenant | Should -Be "Cybersecurity and Infrastructure Security Agency" -Because $Tenant
-    }
+    Context "Check Main HTML" {
+        It "Verify Tenant"{
+            $TenantDataElement = Find-SeElement -Driver $Driver -Wait -ClassName "tenantdata"
+            $TenantDataRows = Find-SeElement -Target $TenantDataElement -By TagName "tr"
+            $TenantDataColumns = Find-SeElement -Target $TenantDataRows[1] -By TagName "td"
+            $Tenant = $TenantDataColumns[0].Text
+            $Tenant | Should -Be "Cybersecurity and Infrastructure Security Agency" -Because $Tenant
+        }
 
-    It "Verify  Domain"{
-        $TenantDataElement = Find-SeElement -Driver $Driver -Wait -ClassName "tenantdata"
-        $TenantDataRows = Find-SeElement -Target $TenantDataElement -By TagName "tr"
-        $TenantDataColumns = Find-SeElement -Target $TenantDataRows[1] -By TagName "td"
-        $Domain = $TenantDataColumns[1].Text
-        $Domain | Should -Be "cisaent.onmicrosoft.com" -Because "Domain is $Domain"
+        It "Verify  Domain"{
+            $TenantDataElement = Find-SeElement -Driver $Driver -Wait -ClassName "tenantdata"
+            $TenantDataRows = Find-SeElement -Target $TenantDataElement -By TagName "tr"
+            $TenantDataColumns = Find-SeElement -Target $TenantDataRows[1] -By TagName "td"
+            $Domain = $TenantDataColumns[1].Text
+            $Domain | Should -Be "cisaent.onmicrosoft.com" -Because "Domain is $Domain"
+        }
     }
 
     Context "Navigation to detailed reports" {
