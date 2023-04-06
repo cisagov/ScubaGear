@@ -34,8 +34,9 @@ jobs:
 
         $AUTOMATION_CREDS = ConvertFrom-Json $env:SCUBA_GITHUB_AUTOMATION_CREDS
         $TestTenants = $AUTOMATION_CREDS.TestTenants
+        Write-Output "Identified $($TestTenants.Count()) Test Tenants"
         ForEach ($TestTenant in $TestTenants){
-          echo $TestTenant
+          Write-Output $TestTenant
         }
         $CertPwd = ConvertTo-SecureString -String "$env:SCUBA_EXECUTION_CERT_PW" -Force -AsPlainText
         $Result = New-ServicePrincipalCertificate -EncodedCertificate $env:SCUBA_EXECUTION_CERT_PFX -CertificatePassword $CertPwd
