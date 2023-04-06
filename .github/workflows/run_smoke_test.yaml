@@ -18,6 +18,7 @@ jobs:
     env:
       SCUBA_EXECUTION_CERT_PFX: ${{ secrets.SCUBA_EXECUTION_CERT_PFX }}
       SCUBA_EXECUTION_CERT_PW: ${{ secrets.SCUBA_EXECUTION_CERT_PW }}
+      SCUBA_GITHUB_AUTOMATION_CREDS: ${{ secrets.SCUBA_GITHUB_AUTOMATION_CREDS }}
     defaults:
           run:
             shell: powershell 
@@ -31,6 +32,11 @@ jobs:
         . Testing/Functional/SmokeTest/SmokeTestInit.ps1
         ./AllowBasicAuthentication.ps1 -RunAsAdmin
 
+        $AUTOMATION_CREDS = ConvertFrom-Json $env:SCUBA_GITHUB_AUTOMATION_CREDS
+        $TestTenants = $AUTOMATION_CREDS.TestTenants
+        ForEach ($TestTenant in $TestTenants){
+          echo $TestTenant
+        }
         $CertPwd = ConvertTo-SecureString -String "$env:SCUBA_EXECUTION_CERT_PW" -Force -AsPlainText
         $Result = New-ServicePrincipalCertificate -EncodedCertificate $env:SCUBA_EXECUTION_CERT_PFX -CertificatePassword $CertPwd
         $Thumbprint = $Result[-1]
