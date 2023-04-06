@@ -34,7 +34,7 @@ jobs:
 
         $AUTOMATION_CREDS = ConvertFrom-Json $env:SCUBA_GITHUB_AUTOMATION_CREDS
         $TestTenants = $AUTOMATION_CREDS.TestTenants
-        Write-Output "Identified $($TestTenants.Count()) Test Tenants"
+        Write-Output "Identified $($TestTenants.Count) Test Tenants"
         ForEach ($TestTenant in $TestTenants){
           Write-Output $TestTenant
         }
