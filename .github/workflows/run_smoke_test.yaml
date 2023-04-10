@@ -46,11 +46,15 @@ jobs:
         }
 
         ForEach ($TestTenant in $TestTenantsHash.GetEnumerator()){
-          
-          Write-Output "Processing test tenant: $TestTenant.Name"
-          $CertPwd = ConvertTo-SecureString -String $TestTenant.Value.CertificatePassword -Force -AsPlainText
-          $Result = New-ServicePrincipalCertificate -EncodedCertificate $TestTenant.Value.CertificateB64 -CertificatePassword $CertPwd
-          $Thumbprint = $Result[-1]
+          $PlainTextPassword = $TestTenant.Value.CertificatePassword
+          $CertPwd = ConvertTo-SecureString -String $PlainTextPassword -Force -AsPlainText
+          try {
+            $Result = New-ServicePrincipalCertificate -EncodedCertificate $TestTenant.Value.CertificateB64 -CertificatePassword $CertPwd
+            $Thumbprint = $Result[-1]
+          }
+          catch {
+            Write-Output "Failed to install certificate"
+          }
           $OrgName = $TestTenant.Value.DisplayName
           $DomainName = $TestTenant.Value.DomainName
           $AppId = $TestTenant.Value.AppId
