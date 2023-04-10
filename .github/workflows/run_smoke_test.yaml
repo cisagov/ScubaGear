@@ -45,7 +45,7 @@ jobs:
           $TestTenantObject.PsObject.Properties | ForEach { $TestTenantsHash[$_.Name] = $_.Value }
         }
 
-        ForEach ($TestTenant in $TestTenantsHashGetEnumerator()){
+        ForEach ($TestTenant in $TestTenantsHash.GetEnumerator()){
           
           Write-Output "Processing test tenant: $TestTenant.Name"
           $CertPwd = ConvertTo-SecureString -String $TestTenant.Value.CertificatePassword -Force -AsPlainText
