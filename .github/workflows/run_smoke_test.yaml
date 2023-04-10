@@ -40,22 +40,24 @@ jobs:
         Write-Output "Identified $($TestTenants.Count) Test Tenants"
         $TestContainers = @()
 
-        ForEach ($TestTenant in $TestTenants){
+        $TestTenantsHash = @{}
+        ForEach ($TestTenantObject in $TestTenants){       
+          $TestTenantObject.PsObject.Properties | ForEach { $TestTenantsHash[$_.Name] = $_.Value }
+        }
 
-          $TestTenantsHash = @{}
-          $TestTenant.PsObject.Properties | ForEach { $TestTenantsHash[$_.Name] = $_.Value }
-
-          $CertPwd = ConvertTo-SecureString -String $TestTenantHash['CertificatePassword'] -Force -AsPlainText
-          #$Result = New-ServicePrincipalCertificate -EncodedCertificate $TestTenantHash['CertificateB64'] -CertificatePassword $CertPwd
-          #$Thumbprint = $Result[-1]
-          $OrgName = $TestTenantHash['DisplayName']
-          $DomainName = $TestTenantHash['DomainName']
-          $AppId = $TestTenantHash['AppId']
+        ForEach ($TestTenant in $TestTenantsHashGetEnumerator()){
+          
+          Write-Output "Processing test tenant: $TestTenant.Name"
+          $CertPwd = ConvertTo-SecureString -String $TestTenant.Value.CertificatePassword -Force -AsPlainText
+          $Result = New-ServicePrincipalCertificate -EncodedCertificate $TestTenant.Value.CertificateB64 -CertificatePassword $CertPwd
+          $Thumbprint = $Result[-1]
+          $OrgName = $TestTenant.Value.DisplayName
+          $DomainName = $TestTenant.Value.DomainName
+          $AppId = $TestTenant.Value.AppId
 
           $TestContainers += New-PesterContainer -Path "Testing/Functional/SmokeTest/SmokeTest001.Tests.ps1" -Data @{ Thumbprint = $Thumbprint; Organization = $DomainName; AppId = $AppId }
           $TestContainers += New-PesterContainer -Path "Testing/Functional/SmokeTest/SmokeTest002.Tests.ps1" -Data @{ OrganizationDomain = $DomainName; OrganizationName = $OrgName }
         }
-
         Invoke-Pester -Container $TestContainers -Output Detailed
 
         Write-Output "Completed Smoke Test"
