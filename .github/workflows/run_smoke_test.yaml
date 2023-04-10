@@ -41,11 +41,16 @@ jobs:
         $TestContainers = @()
 
         ForEach ($TestTenant in $TestTenants){
-          Write-Output "Processing test tenant: $($TestTenant.PSObject)"
+          $TestTenant.PSObject
 
           $TestTenantsHash = @{}
           $TestTenant.PsObject.Properties | ForEach { $TestTenantsHash[$_.Name] = $_.Value }
           
+          ForEach ($T in $TestTenantsHash.GetEnumerator()){
+            $T.Key
+            $T.Value
+          }
+
           $CertPwd = ConvertTo-SecureString -String $TestTenantHash['CertificatePassword'] -Force -AsPlainText
           $Result = New-ServicePrincipalCertificate -EncodedCertificate $TestTenantHash['CertificateB64'] -CertificatePassword $CertPwd
           $OrgName = $TestTenantHash['DisplayName']
