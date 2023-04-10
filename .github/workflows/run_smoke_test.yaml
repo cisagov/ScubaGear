@@ -32,36 +32,30 @@ jobs:
         . Testing/Functional/SmokeTest/SmokeTestInit.ps1
         ./AllowBasicAuthentication.ps1 -RunAsAdmin
 
+        ##### Install all the dependencies
+        Install-SmokeTestExternalDependencies
+
         $AUTOMATION_CREDS = $env:SCUBA_GITHUB_AUTOMATION_CREDS | ConvertFrom-Json
         $TestTenants = $AUTOMATION_CREDS.TestTenants
         Write-Output "Identified $($TestTenants.Count) Test Tenants"
+        $TestContainers = @()
+
         ForEach ($TestTenant in $TestTenants){
-          Write-Output "Testing tenant: $($TestTenant.PSObject)"
+          Write-Output "Processing test tenant: $($TestTenant.PSObject)"
 
           $TestTenantsHash = @{}
           $TestTenant.PsObject.Properties | ForEach { $TestTenantsHash[$_.Name] = $_.Value }
           
-          ForEach ($T in $TestTenantsHash.GetEnumerator()){
-            $T.Key
-            $T.Value
-          }
+          $CertPwd = ConvertTo-SecureString -String $TestTenantHash['CertificatePassword'] -Force -AsPlainText
+          $Result = New-ServicePrincipalCertificate -EncodedCertificate $TestTenantHash['CertificateB64'] -CertificatePassword $CertPwd
+          $OrgName = $TestTenantHash['DisplayName']
+          $DomainName = $TestTenantHash['DomainName']
+          $Thumbprint = $Result[-1]
+          $AppId = $TestTenantHash['AppId']
+
+          $TestContainers += New-PesterContainer -Path "Testing/Functional/SmokeTest/SmokeTest001.Tests.ps1" -Data @{ Thumbprint = $Thumbprint; Organization = $DomainName; AppId = $AppId }
+          $TestContainers += New-PesterContainer -Path "Testing/Functional/SmokeTest/SmokeTest002.Tests.ps1" -Data @{ OrganizationDomain = $DomainName; OrganizationName = $OrgName }
         }
-
-        Exit 1
-        
-        $CertPwd = ConvertTo-SecureString -String "$env:SCUBA_EXECUTION_CERT_PW" -Force -AsPlainText
-        $Result = New-ServicePrincipalCertificate -EncodedCertificate $env:SCUBA_EXECUTION_CERT_PFX -CertificatePassword $CertPwd
-        $Thumbprint = $Result[-1]
-        $AppId = "b682d3a5-bc68-450e-80ba-018b97aa2b21" #TODO: Make Github Secret
-
-        $TestContainers = @()
-        $TestContainers += New-PesterContainer -Path "Testing/Functional/SmokeTest/SmokeTest001.Tests.ps1" -Data @{ Thumbprint = $Thumbprint; Organization = "cisaent.onmicrosoft.com"; AppId = $AppId }
-        $TestContainers += New-PesterContainer -Path "Testing/Functional/SmokeTest/SmokeTest002.Tests.ps1" -Data @{ OrganizationDomain = "cisaent.onmicrosoft.com"; OrganizationName = "Cybersecurity and Infrastructure Security Agency" }
-        #$TestContainers += New-PesterContainer -Path "Testing/Functional/SmokeTest/SmokeTest001.Tests.ps1" -Data @{ Thumbprint = $Thumbprint; Organization = "cisaent.onmicrosoft.com"; AppId = $AppId }
-        #$TestContainers += New-PesterContainer -Path "Testing/Functional/SmokeTest/SmokeTest002.Tests.ps1" -Data @{ OrganizationDomain = "cisaent.onmicrosoft.com"; OrganizationName = "Cybersecurity and Infrastructure Security Agency" }
-
-        ##### Install all the dependencies
-        Install-SmokeTestExternalDependencies
 
         Invoke-Pester -Container $TestContainers -Output Detailed
 
