@@ -41,21 +41,15 @@ jobs:
         $TestContainers = @()
 
         ForEach ($TestTenant in $TestTenants){
-          $TestTenant.PSObject
 
           $TestTenantsHash = @{}
           $TestTenant.PsObject.Properties | ForEach { $TestTenantsHash[$_.Name] = $_.Value }
-          
-          ForEach ($T in $TestTenantsHash.GetEnumerator()){
-            $T.Key
-            $T.Value
-          }
 
           $CertPwd = ConvertTo-SecureString -String $TestTenantHash['CertificatePassword'] -Force -AsPlainText
-          $Result = New-ServicePrincipalCertificate -EncodedCertificate $TestTenantHash['CertificateB64'] -CertificatePassword $CertPwd
+          #$Result = New-ServicePrincipalCertificate -EncodedCertificate $TestTenantHash['CertificateB64'] -CertificatePassword $CertPwd
+          #$Thumbprint = $Result[-1]
           $OrgName = $TestTenantHash['DisplayName']
           $DomainName = $TestTenantHash['DomainName']
-          $Thumbprint = $Result[-1]
           $AppId = $TestTenantHash['AppId']
 
           $TestContainers += New-PesterContainer -Path "Testing/Functional/SmokeTest/SmokeTest001.Tests.ps1" -Data @{ Thumbprint = $Thumbprint; Organization = $DomainName; AppId = $AppId }
