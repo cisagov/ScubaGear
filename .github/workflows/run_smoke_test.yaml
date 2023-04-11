@@ -46,6 +46,9 @@ jobs:
         }
 
         ForEach ($TestTenant in $TestTenantsHash.GetEnumerator()){
+          $OrgName = $TestTenant.Value.DisplayName
+          $DomainName = $TestTenant.Value.DomainName
+          $AppId = $TestTenant.Value.AppId
           $PlainTextPassword = $TestTenant.Value.CertificatePassword
           $CertPwd = ConvertTo-SecureString -String $PlainTextPassword -Force -AsPlainText
           try {
@@ -53,11 +56,8 @@ jobs:
             $Thumbprint = $Result[-1]
           }
           catch {
-            Write-Output "Failed to install certificate"
+            Write-Output "Failed to install certificate for $OrgName"
           }
-          $OrgName = $TestTenant.Value.DisplayName
-          $DomainName = $TestTenant.Value.DomainName
-          $AppId = $TestTenant.Value.AppId
 
           $TestContainers += New-PesterContainer -Path "Testing/Functional/SmokeTest/SmokeTest001.Tests.ps1" -Data @{ Thumbprint = $Thumbprint; Organization = $DomainName; AppId = $AppId }
           $TestContainers += New-PesterContainer -Path "Testing/Functional/SmokeTest/SmokeTest002.Tests.ps1" -Data @{ OrganizationDomain = $DomainName; OrganizationName = $OrgName }
