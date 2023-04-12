@@ -65,4 +65,8 @@ jobs:
         }
         Invoke-Pester -Container $TestContainers -Output Detailed
 
+        Get-ChildItem Cert:\CurrentUser\My
+        Remove-MyCertificates
+        Get-ChildItem Cert:\CurrentUser\My
+
         Write-Output "Completed Smoke Test"

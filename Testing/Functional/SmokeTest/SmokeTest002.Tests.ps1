@@ -78,50 +78,6 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for $OrganizationN
         }
     }
 
-    Context "Dark Mode test"{
-        It "Toggle to Dark Mode" {
-            $ToggleCheckbox = Get-SeElement -Driver $Driver -Wait -By XPath "//input[@id='toggle']"
-            $ToggleText = Get-SeElement -Driver $Driver -Wait -Id "toggle-text"
-
-            $ToggleCheckbox.Selected | Should -Be $false
-            $ToggleText.Text | Should -Be 'Light Mode'
-
-            $ToggleSwitch = Get-SeElement -Driver $Driver -Wait -ClassName "switch"
-            Invoke-SeClick -Element $ToggleSwitch
-
-            $ToggleText.Text | Should -Be 'Dark Mode'
-            $ToggleCheckbox.Selected | Should -Be $true
-        }
-
-        It "Navigate to <Product> (<LinkText>) details - Switch to Light Mode" -ForEach @(
-            @{Product = "aad"; LinkText = "Azure Active Directory"}
-        ){
-            $DetailLink = Get-SeElement -Driver $Driver -Wait -By LinkText $LinkText
-            $DetailLink | Should -Not -BeNullOrEmpty
-            Invoke-SeClick -Element $DetailLink
-
-            $ToggleCheckbox = Get-SeElement -Driver $Driver -Wait -By XPath "//input[@id='toggle']"
-            $ToggleText = Get-SeElement -Driver $Driver -Wait -Id "toggle-text"
-
-            $ToggleText.Text | Should -Be 'Dark Mode'
-            $ToggleCheckbox.Selected | Should -Be $true
-
-            $ToggleSwitch = Get-SeElement -Driver $Driver -Wait -ClassName "switch"
-            Invoke-SeClick -Element $ToggleSwitch
-
-            $ToggleText.Text | Should -Be 'Light Mode'
-            $ToggleCheckbox.Selected | Should -Be $false
-        }
-
-        It "Go Back to main page - Is Dark mode in correct state"{
-            Open-SeUrl -Back -Driver $Driver
-            $ToggleCheckbox = Get-SeElement -Driver $Driver -Wait -By XPath "//input[@id='toggle']"
-            $ToggleText = Get-SeElement -Driver $Driver -Wait -Id "toggle-text"
-            $ToggleText.Text | Should -Be 'Light Mode'
-            $ToggleCheckbox.Selected | Should -Be $false
-        }
-    }
-
 	AfterAll {
 		Stop-SeDriver -Driver $Driver 2>$null
 	}

@@ -18,6 +18,12 @@ function New-ServicePrincipalCertificate{
     return $Thumbprint
 }
 
+function Remove-MyCertificates{
+    Get-ChildItem Cert:\CurrentUser\My | ForEach-Object {
+        Rmove-Item -Path $_.PSPath -Recurse -Force
+    }
+}
+
 function Install-SmokeTestExternalDependencies{
     #Workaround till update to version 2.0+
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'PNPPOWERSHELL_UPDATECHECK',
