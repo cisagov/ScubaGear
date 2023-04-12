@@ -63,6 +63,7 @@ jobs:
           $TestContainers += New-PesterContainer -Path "Testing/Functional/SmokeTest/SmokeTest001.Tests.ps1" -Data @{ Thumbprint = $Thumbprint; Organization = $DomainName; AppId = $AppId; M365Environment = $M365Env }
           $TestContainers += New-PesterContainer -Path "Testing/Functional/SmokeTest/SmokeTest002.Tests.ps1" -Data @{ OrganizationDomain = $DomainName; OrganizationName = $OrgName }
         }
+        
         Invoke-Pester -Container $TestContainers -Output Detailed
 
         Remove-MyCertificates
