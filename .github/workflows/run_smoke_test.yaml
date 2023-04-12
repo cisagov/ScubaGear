@@ -16,8 +16,6 @@ jobs:
   Run-Smoke-Test:
     runs-on: windows-latest
     env:
-      SCUBA_EXECUTION_CERT_PFX: ${{ secrets.SCUBA_EXECUTION_CERT_PFX }}
-      SCUBA_EXECUTION_CERT_PW: ${{ secrets.SCUBA_EXECUTION_CERT_PW }}
       SCUBA_GITHUB_AUTOMATION_CREDS: ${{ secrets.SCUBA_GITHUB_AUTOMATION_CREDS }}
     defaults:
           run:
