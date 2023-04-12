@@ -51,6 +51,7 @@ jobs:
           $AppId = $TestTenant.Value.AppId
           $PlainTextPassword = $TestTenant.Value.CertificatePassword
           $CertPwd = ConvertTo-SecureString -String $PlainTextPassword -Force -AsPlainText
+          $M365Env = $TestTenant.Value.M365Env
           try {
             $Result = New-ServicePrincipalCertificate -EncodedCertificate $TestTenant.Value.CertificateB64 -CertificatePassword $CertPwd
             $Thumbprint = $Result[-1]
@@ -59,7 +60,7 @@ jobs:
             Write-Output "Failed to install certificate for $OrgName"
           }
 
-          $TestContainers += New-PesterContainer -Path "Testing/Functional/SmokeTest/SmokeTest001.Tests.ps1" -Data @{ Thumbprint = $Thumbprint; Organization = $DomainName; AppId = $AppId }
+          $TestContainers += New-PesterContainer -Path "Testing/Functional/SmokeTest/SmokeTest001.Tests.ps1" -Data @{ Thumbprint = $Thumbprint; Organization = $DomainName; AppId = $AppId; M365Environment = $M365Env }
           $TestContainers += New-PesterContainer -Path "Testing/Functional/SmokeTest/SmokeTest002.Tests.ps1" -Data @{ OrganizationDomain = $DomainName; OrganizationName = $OrgName }
         }
         Invoke-Pester -Container $TestContainers -Output Detailed
