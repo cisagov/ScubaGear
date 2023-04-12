@@ -20,7 +20,7 @@ function New-ServicePrincipalCertificate{
 
 function Remove-MyCertificates{
     Get-ChildItem Cert:\CurrentUser\My | ForEach-Object {
-        Rmove-Item -Path $_.PSPath -Recurse -Force
+        Remove-Item -Path $_.PSPath -Recurse -Force
     }
 }
 
