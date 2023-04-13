@@ -1,0 +1,68 @@
+on: 
+  workflow_dispatch:
+  pull_request:
+    types: [opened, reopened]
+    branches:
+      - "main"
+  pull_request_review:
+      types: [submitted]  
+  push:
+    branches:
+      - "main"
+      - "clean-smoke-test"
+
+name: Smoke Test
+
+jobs:
+  Run-Smoke-Test:
+    runs-on: windows-latest
+    env:
+      SCUBA_GITHUB_AUTOMATION_CREDS: ${{ secrets.SCUBA_GITHUB_AUTOMATION_CREDS }}
+    defaults:
+          run:
+            shell: powershell 
+    permissions:
+      contents: read 
+    steps:
+    - name: Checkout repo code
+      uses: actions/checkout@v3
+    - name: Execute ScubaGear and Check Outputs
+      run: |
+        . Testing/Functional/SmokeTest/SmokeTestUtils.ps1
+        ./AllowBasicAuthentication.ps1 -RunAsAdmin
+
+        ##### Install all the dependencies
+        Install-SmokeTestExternalDependencies
+
+        $AUTOMATION_CREDS = $env:SCUBA_GITHUB_AUTOMATION_CREDS | ConvertFrom-Json
+        $TestTenants = $AUTOMATION_CREDS.TestTenants
+        Write-Output "Identified $($TestTenants.Count) Test Tenants"
+        $TestContainers = @()
+
+        $TestTenantsHash = @{}
+        ForEach ($TestTenantObject in $TestTenants){       
+          $TestTenantObject.PsObject.Properties | ForEach { $TestTenantsHash[$_.Name] = $_.Value }
+        }
+
+        ForEach ($TestTenant in $TestTenantsHash.GetEnumerator()){
+          $OrgName = $TestTenant.Value.DisplayName
+          $DomainName = $TestTenant.Value.DomainName
+          $AppId = $TestTenant.Value.AppId
+          $PlainTextPassword = $TestTenant.Value.CertificatePassword
+          $CertPwd = ConvertTo-SecureString -String $PlainTextPassword -Force -AsPlainText
+          $M365Env = $TestTenant.Value.M365Env
+          try {
+            $Result = New-ServicePrincipalCertificate -EncodedCertificate $TestTenant.Value.CertificateB64 -CertificatePassword $CertPwd
+            $Thumbprint = $Result[-1]
+          }
+          catch {
+            Write-Output "Failed to install certificate for $OrgName"
+          }
+
+          $TestContainers += New-PesterContainer -Path "Testing/Functional/SmokeTest/SmokeTest001.Tests.ps1" -Data @{ Thumbprint = $Thumbprint; Organization = $DomainName; AppId = $AppId; M365Environment = $M365Env }
+          $TestContainers += New-PesterContainer -Path "Testing/Functional/SmokeTest/SmokeTest002.Tests.ps1" -Data @{ OrganizationDomain = $DomainName; OrganizationName = $OrgName }
+        }
+
+        Invoke-Pester -Container $TestContainers -Output Detailed
+
+        Remove-MyCertificates
