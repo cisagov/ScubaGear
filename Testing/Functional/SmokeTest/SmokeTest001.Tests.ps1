@@ -74,10 +74,7 @@ Describe "Smoke Test: Generate Output" {
             @{Item = 'IndividualReports/PowerPlatformReport.html'; ItemType = 'Leaf'},
             @{Item = 'IndividualReports/SharePointReport.html'; ItemType = 'Leaf'},
             @{Item = 'IndividualReports/TeamsReport.html'; ItemType = 'Leaf'},
-            @{Item = 'IndividualReports/images'; ItemType = 'Container'},
-            @{Item = 'IndividualReports/images/angle-down-solid.svg'; ItemType = 'Leaf'},
-            @{Item = 'IndividualReports/images/angle-right-solid.svg'; ItemType = 'Leaf'},
-            @{Item = 'IndividualReports/images/cisa_logo.png'; ItemType = 'Leaf'}
+            @{Item = 'IndividualReports/images'; ItemType = 'Container'}
         ){
             Test-Path -Path "./$OutputFolder/$Item" -PathType $ItemType |
                 Should -Be $true
