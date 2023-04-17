@@ -78,6 +78,40 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for $OrganizationN
         }
     }
 
+    Context "Verify Table are populated" {
+        BeforeEach{
+            Open-SeUrl $script:url -Driver $Driver 2>$null
+        }
+        It "Navigate to <Product> (<LinkText>) details" -ForEach @(
+            @{Product = "aad"; LinkText = "Azure Active Directory"}
+            @{Product = "defender"; LinkText = "Microsoft 365 Defender"}
+            @{Product = "onedrive"; LinkText = "OneDrive for Business"}
+            @{Product = "exo"; LinkText = "Exchange Online"}
+            @{Product = "powerplatform"; LinkText = "Microsoft Power Platform"}
+            @{Product = "sharepoint"; LinkText = "SharePoint Online"}
+            @{Product = "teams"; LinkText = "Microsoft Teams"}
+        ){
+            $DetailLink = Get-SeElement -Driver $Driver -Wait -By LinkText $LinkText
+            $DetailLink | Should -Not -BeNullOrEmpty
+            Invoke-SeClick -Element $DetailLink
+
+            $Tables = Get-SeElement -Driver $Driver -By TagName 'table'
+            $Tables.Count | Should -BeGreaterThan 1
+
+            ForEach ($Table in $Tables){
+                $Row = Get-SeElement -Element $Table -By TagName 'tr'
+                $Row.Count | Should -BeGreaterThan 0
+
+                ForEach ($Row in $Rows){
+                    $RowHeaders = Get-SeElement -Element $Row -By TagName 'th'
+                    $RowHeaders.Count | Should -BeExactly 1
+                    $RowData = Get-SeElement -Element $Row -By TagName 'td'
+                    $RowData.Count | Should -BeGreaterThan 0
+                }
+            }
+        }
+    }
+
 	AfterAll {
 		Stop-SeDriver -Driver $Driver 2>$null
 	}

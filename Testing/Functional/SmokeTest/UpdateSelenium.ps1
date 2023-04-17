@@ -1,7 +1,8 @@
 param (
     $registryRoot        = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths",             # root location in registry to check version of currently installed apps
     $chromeRegistryPath  = "$registryRoot\chrome.exe",                                              # direct registry location for Chrome (to check version)
-    $webDriversPath      = "C:\Program Files\WindowsPowerShell\Modules\Selenium\3.0.1\assemblies",  # local path for all web drivers (assuming that both are in the same location)
+    #$webDriversPath      = "C:\Program Files\WindowsPowerShell\Modules\Selenium\3.0.1\assemblies",  # local path for all web drivers (assuming that both are in the same location)
+    $webDriversPath      = "C:\Users\crutchfield\OneDrive - The MITRE Corporation\Documents\WindowsPowerShell\Modules\Selenium\3.0.1\assemblies",  # local path for all web drivers (assuming that both are in the same location)
     $chromeDriverPath    = "$($webDriversPath)\chromedriver.exe",                                   # direct Chrome driver path
     $chromeDriverWebsite = "https://chromedriver.chromium.org/downloads",                           # Chrome dooesn't allow to query the version from downloads page; instead available pages can be found here
     $chromeDriverUrlBase = "https://chromedriver.storage.googleapis.com",                           # URL base to ubild direct download link for Chrome driver
@@ -74,6 +75,7 @@ if (Confirm-NeedForUpdate $chromeVersion $chromeDriverVersion){
 
     # epand archive and replace the old file
     Expand-Archive "chromeNewDriver.zip"              -DestinationPath "chromeNewDriver\"                    -Force
+    Remove-Item -Path "$($webDriversPath)\chromedriver.exe" -Force
     Move-Item      "chromeNewDriver/chromedriver.exe" -Destination     "$($webDriversPath)\chromedriver.exe" -Force
 
     # clean-up
