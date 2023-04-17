@@ -38,6 +38,7 @@ jobs:
         $TestTenants = $AUTOMATION_CREDS.TestTenants
         Write-Output "Identified $($TestTenants.Count) Test Tenants"
 
+        $TestContainers = @()
         ForEach ($TestTenantObj in $TestTenants){
           $Properties = Get-Member -InputObject $TestTenantObj -MemberType NoteProperty
           $TestTenant = $TestTenantObj | Select-Object -ExpandProperty $Properties.Name
