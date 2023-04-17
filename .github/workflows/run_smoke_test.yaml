@@ -9,6 +9,7 @@ on:
   push:
     branches:
       - "main"
+      - "clean-smoke-test"
 
 name: Smoke Test
 
@@ -36,22 +37,18 @@ jobs:
         $AUTOMATION_CREDS = $env:SCUBA_GITHUB_AUTOMATION_CREDS | ConvertFrom-Json
         $TestTenants = $AUTOMATION_CREDS.TestTenants
         Write-Output "Identified $($TestTenants.Count) Test Tenants"
-        $TestContainers = @()
 
-        $TestTenantsHash = @{}
-        ForEach ($TestTenantObject in $TestTenants){       
-          $TestTenantObject.PsObject.Properties | ForEach { $TestTenantsHash[$_.Name] = $_.Value }
-        }
-
-        ForEach ($TestTenant in $TestTenantsHash.GetEnumerator()){
-          $OrgName = $TestTenant.Value.DisplayName
-          $DomainName = $TestTenant.Value.DomainName
-          $AppId = $TestTenant.Value.AppId
-          $PlainTextPassword = $TestTenant.Value.CertificatePassword
+        ForEach ($TestTenantObj in $TestTenants){
+          $Properties = Get-Member -InputObject $TestTenantObj -MemberType NoteProperty
+          $TestTenant = $TestTenantObj | Select-Object -ExpandProperty $Properties.Name
+          $OrgName = $TestTenant.DisplayName
+          $DomainName = $TestTenant.DomainName
+          $AppId = $TestTenant.AppId
+          $PlainTextPassword = $TestTenant.CertificatePassword
           $CertPwd = ConvertTo-SecureString -String $PlainTextPassword -Force -AsPlainText
-          $M365Env = $TestTenant.Value.M365Env
+          $M365Env = $TestTenant.M365Env
           try {
-            $Result = New-ServicePrincipalCertificate -EncodedCertificate $TestTenant.Value.CertificateB64 -CertificatePassword $CertPwd
+            $Result = New-ServicePrincipalCertificate -EncodedCertificate $TestTenant.CertificateB64 -CertificatePassword $CertPwd
             $Thumbprint = $Result[-1]
           }
           catch {
