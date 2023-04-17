@@ -75,7 +75,7 @@ strengthen the security of widely used cloud-based software services.
   
 # Baseline
 
-## 1 External Sharing SHOULD be Disabled 
+## 1 External Sharing
 
 External sharing can represent a potential security risk, therefore,
 disabling it is a best practice unless specific, approved use cases make
@@ -133,7 +133,7 @@ If external sharing is deemed appropriate, the agency SHOULD limit the sharing a
     group that includes users who should be able to share data and
     reports externally.
 
-## 2 Publish to Web SHOULD be Disabled
+## 2 Publish to Web
 
 Power BI has a capability to publish reports and content to the web.
 This capability creates a publicly accessible web URL that does not
@@ -180,7 +180,7 @@ information security.
     codes**. In that case, users can create embed codes, but they must
     contact the tenant’s Power BI admin to allow them to do so.
 
-## 3 Power BI Guest Access SHOULD be Disabled
+## 3 Power BI Guest Access
 
 A best practice is to disallow guest user access. Disallowing guest
 access also aligns with zero trust principles. The agency with
@@ -243,7 +243,7 @@ Guest user access to the Power BI tenant SHOULD be disabled unless the agency mi
 2.  Disable the **Allow Azure Active Directory guest users to access
     Power BI** toggle.
 
-## 4 External Invitations SHOULD be Disabled
+## 4 External Invitations
 
 This setting controls whether Power BI allows inviting external users to
 the agency’s organization through Power BI’s sharing workflows and
@@ -296,7 +296,7 @@ The **Invite external users to your organization** feature SHOULD be disabled un
 
 2.  Disable the **Invite external users to your organization** toggle.
 
-## 5 The External Editing Capability SHOULD be Disabled
+## 5 External Editing Capability
 
 It is possible to give external guest users the ability to edit and
 manage Power BI content; however, this could have considerable data
@@ -338,7 +338,7 @@ and manage content within the inviting organization’s Power BI tenant.
 2.  Disable the toggle labeled **Allow Azure Active Directory guest
     users to edit and manage content in the organization**.
 
-## 6 Service Principals SHALL be Allowed to be Used to Securely Manage Application Identities 
+## 6 Service Principals
 
 Power BI supports the use of service principals to manage application
 identities. Service principals can use application programming
@@ -434,7 +434,7 @@ recommended to allow access only to specific security groups.
 Alternatively, one can create a dedicated security group for service
 principals and exclude it from the desired tenant settings.
 
-## 7 ResourceKey Authentication SHOULD be Blocked 
+## 7 ResourceKey Authentication
 
 This setting pertains to the security and development of Power BI
 embedded content. The Power BI tenant states that “for extra security,
@@ -477,7 +477,7 @@ ResourceKey Authentication SHOULD be blocked unless a specific use case (e.g., s
 1.  Under **Developer Settings** in the Power BI tenant admin portal,
     toggle **Block ResourceKey Authentication** to an enabled state.
 
-## 8 Python and R Visual Sharing SHOULD be Disabled
+## 8 Python and R Visual Sharing
 
 Power BI can interact with Python and R scripts to integrate
 visualizations from these languages. Python visuals are created from
@@ -492,6 +492,9 @@ and deems the scripts free of security risks.
 
 #### POWER.BI.8.1v1
 R and Python interactions SHOULD be disabled.
+
+#### POWER.BI.8.2v1
+R and Python scripts MAY be allowed through organizational review.
 
 ### Resources
 
@@ -509,7 +512,7 @@ R and Python interactions SHOULD be disabled.
 2.  Toggle off the **Interact with and share R and Python visuals**
     option.
 
-## 9 Data Stewards and Power BI Admins SHOULD Discover, Classify, and Label Sensitive Data
+## 9 Data Stewards and Power BI Admins
 
 There are multiple ways to secure sensitive information, such as warning
 users, encryption, or blocking attempts to share. Use Microsoft
@@ -609,7 +612,7 @@ has permissions to do so.
 
 8.  Click **Apply**.
 
-## 10 Audit Logs SHALL be Enabled in Power BI Tenant
+## 10 Audit Logs
 
 The Power BI tenant has a setting for audit log generation to monitor
 internal activity and compliance. Users within the agency can use
