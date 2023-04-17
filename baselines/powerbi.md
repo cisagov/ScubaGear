@@ -48,7 +48,7 @@ Agencies using Power BI have a data classification scheme in place for
   license level. Therefore, only licenses not included in E3/G3 are
   listed. Additionally, M365 G5 is required for Power BI Pro. Power BI Premium is available as an add-on to G5 and provides
   dedicated capacity-based BI, self-service data prep for big data, and
-  simplification of data management and access at enterprise scale.
+  simplification of data management and access at enterprise scale. An Azure Information Protection Premium P1 or Premium P2 license is required to apply or view Microsoft Information Protection sensitivity labels in Power BI.
 
 ## Resources
 
