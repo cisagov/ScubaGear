@@ -82,7 +82,7 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for $OrganizationN
         BeforeEach{
             Open-SeUrl $script:url -Driver $Driver 2>$null
         }
-        It "Navigate to <Product> (<LinkText>) details" -ForEach @(
+        It "Check <Product> (<LinkText>) tables" -ForEach @(
             @{Product = "aad"; LinkText = "Azure Active Directory"}
             @{Product = "defender"; LinkText = "Microsoft 365 Defender"}
             @{Product = "onedrive"; LinkText = "OneDrive for Business"}
