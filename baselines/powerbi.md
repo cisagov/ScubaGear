@@ -32,13 +32,6 @@ operations staff.
 
 ## Assumptions
 
-The **License Requirements** sections of this document assume the
-organization is using an [M365
-E3](https://www.microsoft.com/en-us/microsoft-365/compare-microsoft-365-enterprise-plans)
-or [G3](https://www.microsoft.com/en-us/microsoft-365/government)
-license level. Therefore, only licenses not included in E3/G3 are
-listed.
-
 Agencies using Power BI have a data classification scheme in place for
   the data entering Power BI.
 
