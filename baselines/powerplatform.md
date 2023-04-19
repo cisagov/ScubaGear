@@ -22,7 +22,7 @@ created:
     Model-Driven apps revolve around building the view and controller on
     top of the model.
 
-3.  **Portals**: These apps are created to be websites.
+3.  **Power Pages**: These apps are created to be either internal or external facing websites.
 
 **Power Automate**: This is an online tool within the Microsoft 365
 applications and add-ins used to create automated workflows between apps
@@ -69,8 +69,8 @@ strengthen the security of widely used cloud-based software services.
 # Baseline
 
 Baselines in this section are for administrative controls that apply to
-all Power Platform applications at the Power Platform tenant and
-environment level. Additional Power Platform security settings would be
+all Power Platform applications at either the Power Platform tenant or
+environment level. Additional Power Platform security settings can be
 implemented at the app level, connector level, or Dataverse table level.
 Refer to Microsoft documentation for those additional controls.
 
@@ -331,8 +331,10 @@ current Model-driven apps at only the environment level.
 ###  Policy
 
 #### POWER.PLATFORM.4.1v1
-- Content security policies for model-driven Power Apps SHALL be
-  enabled.
+- Content security policy violations for Model-driven and Canvas Power Apps SHALL be
+  blocked.
+#### POWER.PLATFORM.4.2v1
+- Reporting for Content Security Policy violations MAY be enabled.
 
 ### Resources
 
@@ -345,33 +347,48 @@ current Model-driven apps at only the environment level.
 
 ### Implementation
 
-1.  Sign in to [Make Power Apps](https://make.powerapps.com) (for GCC
-    environments sign in to the [GCC Make Power
-    Apps](https://make.gov.powerapps.us) center).
+1.  Sign in to the your tenant's appropriate Power Platform [admin center](https://make.powerapps.com).
 
-2. On the left-hand pane select **Apps** and select one of the
-    Model-Driven Apps (if there is no available Model-Driven app, create
-    one).
+2. On the left-hand pane click on **Environments** and then select an environment from the list.
 
-3. While in the model-driven app menu with an account with entity
-    update permissions, such as System Administrator or Power Platform
-    Administrator, open the browser dev tools.
+3. Select the **Settings** icon that appears at the top of the page.
 
-4. How to open the browser dev tools depends on which browser is used.
-    For a chromium-based browser, right click -\> **inspect** -\>
-    **console**).
+4. Click on **Product** then click on **Privacy + Security** from the options that appear.
 
-5. Paste the JavaScript code found
-[here](https://docs.microsoft.com/en-us/power-platform/admin/content-security-policy)
-into the console.
+5. At the bottom of the page under the **Content security policy** section, turn the slider **On** for **Model-driven** and **Canvas**
 
-6. To simply enable CSP, pass the default configuration, i.e., call the
-    function like so - `enableFrameAncestors(["'self'"])`.
+6. Repeat steps 2 - 5 for all active Power Platform environments.
 
-7. As an example of enabling additional origins to embed the app -
-    `enableFrameAncestors(["*.powerapps.com", "'self'", "abcxyz"])`.
+7. At the same location **Enable reporting** may be turned **On** and an appropriate endpoint can be added.
 
-8. To disable CSP call - `disableCSP()`.
+## 5 Power Pages Creation
+
+Power Pages formerly known as Power Portals can be created as external facing websites by any user in the tenant. Admins are able to restrict the creation of new Power Pages to admins.
+
+###  Policy
+
+#### POWER.PLATFORM.5.1v1
+- The ability to create Power Pages SHALL be restricted to
+  admins.
+
+### Resources
+
+- [Control Portal Creation \| Microsoft
+  Docs](https://learn.microsoft.com/en-us/power-apps/maker/portals/control-portal-creation)
+
+### License Requirements
+
+- N/A
+
+### Implementation
+
+1.  There is currently no setting in the Admin center for this control and can only be enabled through the [Power Apps PowerShell modules](https://learn.microsoft.com/en-us/power-platform/admin/powerapps-powershell#installation).
+
+2. After installing the Power Apps PowerShell modules, run the following PowerShell command to enable  which will prompt in an interactive sign in window for admin credentials.
+```
+Set-TenantSettings -RequestBody @{ "disablePortalsCreationByNonAdminUsers" = $true }
+```
+
 
 # Acknowledgements
 
