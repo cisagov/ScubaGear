@@ -5,7 +5,7 @@
     Test script to execute Invoke-SCuBA against a given tenant using a service
     principal. Verifies that all expected products (i.e., files) are generated.
     .PARAMETER Thumbprint
-    Thumbprint of thee certificate associated with the Service Principal.
+    Thumbprint of the certificate associated with the Service Principal.
     .PARAMETER Organization
     The tenant domain name for the organization.
     .PARAMETER AppId
