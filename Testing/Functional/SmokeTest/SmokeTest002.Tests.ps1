@@ -54,7 +54,7 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for $OrganizationN
             $Tenant | Should -Be $OrganizationName -Because $Tenant
         }
 
-        It "Verify  Domain"{
+        It "Verify Domain"{
             $Domain = $TenantDataColumns[1].Text
             $Domain | Should -Be $OrganizationDomain -Because "Domain is $Domain"
         }
