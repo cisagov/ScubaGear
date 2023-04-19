@@ -4,7 +4,7 @@ function New-ServicePrincipalCertificate{
     Add certificate into 'My' certificate store of current user.
 
     .DESCRIPTION
-    This script adds a certificate into the 'My' certificxate store of the current user.
+    This script adds a certificate into the 'My' certificate store of the current user.
 
     .PARAMETER EncodedCertificate
     A base 64 encoded PFX certificate
