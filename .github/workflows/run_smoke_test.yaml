@@ -9,7 +9,7 @@ on:
   push:
     branches:
       - "main"
-      - "clean-smoke-test"
+      - "*smoke*"
 
 name: Smoke Test
 
@@ -46,15 +46,11 @@ jobs:
           $Properties = Get-Member -InputObject $TestTenantObj -MemberType NoteProperty
           $TestTenant = $TestTenantObj | Select-Object -ExpandProperty $Properties.Name
           $OrgName = $TestTenant.DisplayName
-          $OrgName
           $DomainName = $TestTenant.DomainName
-          $DomainName
           $AppId = $TestTenant.AppId
-          $AppId
           $PlainTextPassword = $TestTenant.CertificatePassword
           $CertPwd = ConvertTo-SecureString -String $PlainTextPassword -Force -AsPlainText
           $M365Env = $TestTenant.M365Env
-          $M365Env
           try {
             $Result = New-ServicePrincipalCertificate `
               -EncodedCertificate $TestTenant.CertificateB64 `

@@ -1,11 +1,40 @@
+<#
+.SYNOPSIS
+Installs Chrome Web Driver on local machine
+
+.DESCRIPTION
+This script installs the required web driver needed for the current Chrome Browser installed on the machine.
+
+.PARAMETER rootRegistry
+The root location in registry to check version of currently installed apps
+
+.PARAMETER chromeRegistryPath
+The direct registry location for Chrome (to check version)
+
+.PARAMETER webDriversPath
+The local path for all web drivers
+
+.PARAMETER chromeDriverPath
+The direct Chrome driver path
+
+.PARAMETER chromeDriverWebsite
+The Chrome web driver downloads page
+
+.PARAMETER chromeDriverUrlBase
+URL base to ubild direct download link for Chrome driver
+
+.PARAMETER chromeDriverUrlEnd
+Chrome driver download ending (to finish building the URL)
+
+#>
 param (
-    $registryRoot        = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths",             # root location in registry to check version of currently installed apps
-    $chromeRegistryPath  = "$registryRoot\chrome.exe",                                              # direct registry location for Chrome (to check version)
-    $webDriversPath      = "C:\Program Files\WindowsPowerShell\Modules\Selenium\3.0.1\assemblies",  # local path for all web drivers (assuming that both are in the same location)
-    $chromeDriverPath    = "$($webDriversPath)\chromedriver.exe",                                   # direct Chrome driver path
-    $chromeDriverWebsite = "https://chromedriver.chromium.org/downloads",                           # Chrome dooesn't allow to query the version from downloads page; instead available pages can be found here
-    $chromeDriverUrlBase = "https://chromedriver.storage.googleapis.com",                           # URL base to ubild direct download link for Chrome driver
-    $chromeDriverUrlEnd  = "chromedriver_win32.zip"                                                 # Chrome driver download ending (to finish building the URL)
+    $registryRoot        = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths",
+    $chromeRegistryPath  = "$registryRoot\chrome.exe",
+    $webDriversPath      = "C:\Program Files\WindowsPowerShell\Modules\Selenium\3.0.1\assemblies",
+    $chromeDriverPath    = "$($webDriversPath)\chromedriver.exe",
+    $chromeDriverWebsite = "https://chromedriver.chromium.org/downloads",
+    $chromeDriverUrlBase = "https://chromedriver.storage.googleapis.com",
+    $chromeDriverUrlEnd  = "chromedriver_win32.zip"
 )
 function Get-LocalDriverVersion{
     param(

@@ -1,4 +1,34 @@
 function New-ServicePrincipalCertificate{
+    <#
+    .SYNOPSIS
+    Add certificate into 'My' certificate store of current user.
+
+    .DESCRIPTION
+    This script adds a certificate into the 'My' certificxate store of the current user.
+
+    .PARAMETER EncodedCertificate
+    A base 64 encoded PFX certificate
+
+    .PARAMETER CertificatePassword
+    The password of the certificate
+
+    .OUTPUTS
+    Thumbprint of the added certificate. <System.String>
+
+    .EXAMPLE
+    $CertPwd = ConvertTo-SecureString -String $PlainTextPassword -Force -AsPlainText
+    $M365Env = $TestTenant.M365Env
+    try {
+      $Result = New-ServicePrincipalCertificate `
+        -EncodedCertificate $TestTenant.CertificateB64 `
+        -CertificatePassword $CertPwd
+      $Thumbprint = $Result[-1]
+    }
+    catch {
+      Write-Output "Failed to install certificate for $OrgName"
+    }
+    #>
+
     [CmdletBinding()]
     param (
         [Parameter(Mandatory = $true)]
@@ -19,12 +49,32 @@ function New-ServicePrincipalCertificate{
 }
 
 function Remove-MyCertificates{
+    <#
+    .SYNOPSIS
+    Remove all certificates from 'My' certificate store of current user.
+
+    .DESCRIPTION
+    This script removes all certificates from the 'My' certificxate store of the current user.
+
+    .EXAMPLE
+    Remove-MyCertificates
+    #>
     Get-ChildItem Cert:\CurrentUser\My | ForEach-Object {
         Remove-Item -Path $_.PSPath -Recurse -Force
     }
 }
 
 function Install-SmokeTestExternalDependencies{
+    <#
+    .SYNOPSIS
+    Install dependencies on GitHub runner to support smoke test.
+
+    .DESCRIPTION
+    This script installs dependencies needed by the SCuBA smoke test.  For example, Selenium and the Open Policy Agent.
+
+    .EXAMPLE
+    Install-SmokeTestExternalDependencies
+    #>
     #Workaround till update to version 2.0+
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'PNPPOWERSHELL_UPDATECHECK',
         Justification = 'Variable defined outside this scope')]
