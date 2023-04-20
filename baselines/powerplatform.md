@@ -85,14 +85,15 @@ Platform admins.
 
 ### Policy
 
-#### POWER.PLATFORM.1.1v1
+#### MS.POWERPLATFORM.1.1v1
+The ability to create production and sandbox environments SHALL be restricted to admins.
+- _Rationale:_ TODO
+- _Last Modified:_ April 2023
 
-- The ability to create production and sandbox environments SHALL be restricted to
-  admins.
-
-#### POWER.PLATFORM.1.2v1
-
-- The ability to create trial environments SHALL be restricted to admins.
+#### MS.POWERPLATFORM.1.2v1
+The ability to create trial environments SHALL be restricted to admins.
+- _Rationale:_ TODO
+- _Last Modified:_ April 2023
 
 ### Resources
 
@@ -161,15 +162,21 @@ creating apps in all other created environments.
 
 ### Policy
 
-#### POWER.PLATFORM.2.1v1
-- A DLP policy SHALL be created to restrict connector access in the
-  default Power Platform environment.
+#### MS.POWERPLATFORM.2.1v1
+A DLP policy SHALL be created to restrict connector access in the
+default Power Platform environment.
+- _Rationale:_ TODO
+- _Last Modified:_ April 2023
 
-- Non-default environments SHOULD have at least one DLP policy that
+#### MS.POWERPLATFORM.2.2v1
+Non-default environments SHOULD have at least one DLP policy that
   affects them.
+- _Rationale:_ TODO
+- _Last Modified:_ April 2023
 
-- All connectors except those listed below SHOULD be added to the
-  Blocked category in the default environment policy:
+#### MS.POWERPLATFORM.2.3v1
+All connectors except those listed below SHOULD be added to the
+Blocked category in the default environment policy:
 
   - Approvals
 
@@ -206,6 +213,9 @@ creating apps in all other created environments.
   - Shifts for Microsoft Teams
 
   - Yammer
+
+- _Rationale:_ TODO
+- _Last Modified:_ April 2023
 
 ### Resources
 
@@ -282,12 +292,20 @@ source.
 
 ### Policy
 
-### POWER.PLATFORM.3.1v1
-- Power Platform tenant isolation SHALL be enabled.
+### MS.POWERPLATFORM.3.1v1
+Power Platform tenant isolation SHALL be enabled.
+- _Rationale:_ TODO
+- _Last Modified:_ April 2023
 
-- An inbound/outbound connection allowlist SHOULD be configured.
+### MS.POWERPLATFORM.3.2v1
+An inbound/outbound connection allowlist SHOULD be configured.
+- _Rationale:_ TODO
+- _Last Modified:_ April 2023
 
-- The allowlist MAY be empty.
+### MS.POWERPLATFORM.3.3v1
+The allowlist MAY be empty.
+- _Rationale:_ TODO
+- _Last Modified:_ April 2023
 
 ### Resources
 
@@ -330,11 +348,16 @@ current Model-driven apps at only the environment level.
 
 ###  Policy
 
-#### POWER.PLATFORM.4.1v1
-- Content security policy violations for Model-driven and Canvas Power Apps SHALL be
-  blocked.
-#### POWER.PLATFORM.4.2v1
-- Reporting for Content Security Policy violations MAY be enabled.
+#### MS.POWERPLATFORM.4.1v1
+Content security policy violations for Model-driven and Canvas Power Apps SHALL be blocked.
+- _Rationale:_ TODO
+- _Last Modified:_ April 2023
+
+#### MS.POWERPLATFORM.4.2v1
+Reporting for Content Security Policy violations MAY be enabled.
+- _Rationale:_ TODO
+- _Last Modified:_ April 2023
+
 
 ### Resources
 
@@ -367,12 +390,12 @@ Power Pages formerly known as Power Portals can be created as external facing we
 
 ###  Policy
 
-#### POWER.PLATFORM.5.1v1
-- The ability to create Power Pages SHALL be restricted to
-  admins.
+#### MS.POWERPLATFORM.5.1v1
+The ability to create Power Pages sites SHALL be restricted to admins.
+- _Rationale:_ TODO
+- _Last Modified:_ April 2023
 
 ### Resources
-
 - [Control Portal Creation \| Microsoft
   Docs](https://learn.microsoft.com/en-us/power-apps/maker/portals/control-portal-creation)
 
@@ -382,9 +405,9 @@ Power Pages formerly known as Power Portals can be created as external facing we
 
 ### Implementation
 
-1.  There is currently no setting in the Admin center for this control and can only be enabled through the [Power Apps PowerShell modules](https://learn.microsoft.com/en-us/power-platform/admin/powerapps-powershell#installation).
+1.  This setting currently can only be enabled through the [Power Apps PowerShell modules](https://learn.microsoft.com/en-us/power-platform/admin/powerapps-powershell#installation).
 
-2. After installing the Power Apps PowerShell modules, run the following PowerShell command to enable  which will prompt in an interactive sign in window for admin credentials.
+2. After installing the Power Apps PowerShell modules, run the following PowerShell command to disable the creation of Power Pages sites by non-adminstrative users.
 ```
 Set-TenantSettings -RequestBody @{ "disablePortalsCreationByNonAdminUsers" = $true }
 ```
