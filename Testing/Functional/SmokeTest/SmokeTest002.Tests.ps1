@@ -48,6 +48,9 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for $OrganizationN
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'TenantDataColumns',
                 Justification = 'Variable is used in another scope')]
             $TenantDataColumns = Get-SeElement -Target $TenantDataRows[1] -By TagName "td"        }
+        AfterAll {
+            Invoke-SeScreenshot -Drive $Driver | Save-SeScreenshot -Path "images/main.png"
+        }
         It "Verify Tenant"{
 
             $Tenant = $TenantDataColumns[0].Text
@@ -61,6 +64,9 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for $OrganizationN
     }
 
     Context "Navigation to detailed reports" {
+        AfterEach {
+            Invoke-SeScreenshot -Drive $Driver | Save-SeScreenshot -Path "images/$Product.png"
+        }
         It "Navigate to <Product> (<LinkText>) details" -ForEach @(
             @{Product = "aad"; LinkText = "Azure Active Directory"}
             @{Product = "defender"; LinkText = "Microsoft 365 Defender"}
