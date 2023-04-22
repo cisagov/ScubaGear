@@ -69,7 +69,7 @@ jobs:
             -Data @{ OrganizationDomain = $DomainName; OrganizationName = $OrgName }
         }
 
-        New-Item "images" -Type Directory
+        New-Item "testimages" -Type Directory
 
         Invoke-Pester -Container $TestContainers -Output Detailed
 
