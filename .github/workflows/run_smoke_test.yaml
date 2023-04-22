@@ -79,3 +79,4 @@ jobs:
       with:
         name: images
         path: testimages/
+        retention-days: 14
