@@ -74,7 +74,8 @@ jobs:
         Invoke-Pester -Container $TestContainers -Output Detailed
 
         Remove-MyCertificates
-    -uses: actions/upload-artifact@v3
-     with:
-       name: images
-       path: images/
+    - name: Save Artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: images
+        path: images/
