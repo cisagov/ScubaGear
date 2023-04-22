@@ -64,9 +64,6 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for $OrganizationN
     }
 
     Context "Navigation to detailed reports" {
-        AfterEach {
-            Invoke-SeScreenshot -Drive $Driver | Save-SeScreenshot -Path "testimages/$Product.png"
-        }
         It "Navigate to <Product> (<LinkText>) details" -ForEach @(
             @{Product = "aad"; LinkText = "Azure Active Directory"}
             @{Product = "defender"; LinkText = "Microsoft 365 Defender"}
@@ -79,6 +76,8 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for $OrganizationN
             $DetailLink = Get-SeElement -Driver $Driver -Wait -By LinkText $LinkText
             $DetailLink | Should -Not -BeNullOrEmpty
             Invoke-SeClick -Element $DetailLink
+
+            Invoke-SeScreenshot -Drive $Driver | Save-SeScreenshot -Path "testimages/$Product.png"
 
             Open-SeUrl -Back -Driver $Driver
         }
