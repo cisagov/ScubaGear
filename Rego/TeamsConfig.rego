@@ -47,8 +47,7 @@ MeetingsAllowingExternalControl[Policy.Identity] {
 }
 
 tests[{
-	"Requirement" : "External participants SHOULD NOT be enabled to request control of shared desktops or windows in the Global (Org-wide default) meeting policy or in custom meeting policies if any exist",
-    "Control" : "Teams 2.1",
+	"PolicyId" : "MS.TEAMS.1.1v1",
 	"Criticality" : "Should",
 	"Commandlet" : ["Get-CsTeamsMeetingPolicy"],
 	"ActualValue" : Policies,
@@ -75,8 +74,7 @@ MeetingsAllowingAnonStart[Policy.Identity] {
 }
 
 tests[{
-	"Requirement" : "Anonymous users SHALL NOT be enabled to start meetings in the Global (Org-wide default) meeting policy or in custom meeting policies if any exist",
-	"Control" : "Teams 2.2",
+	"PolicyId" : "MS.TEAMS.2.1v1",
 	"Criticality" : "Shall",
 	"Commandlet" : ["Get-CsTeamsMeetingPolicy"],
 	"ActualValue" : Policies,
@@ -115,8 +113,7 @@ ReportDetails2_3(Policy) = Description if {
 }
 
 tests[{
-	"Requirement" : "Anonymous users, including dial-in users, SHOULD NOT be admitted automatically",
-	"Control" : "Teams 2.3",
+	"PolicyId" : "MS.TEAMS.3.1v1",
 	"Criticality" : "Should",
 	"Commandlet" : ["Get-CsTeamsMeetingPolicy"],
 	"ActualValue" : [Policy.AutoAdmittedUsers, Policy.AllowPSTNUsersToBypassLobby],
@@ -131,8 +128,7 @@ tests[{
 }
 
 tests[{
-	"Requirement" : "Anonymous users, including dial-in users, SHOULD NOT be admitted automatically",
-	"Control" : "Teams 2.3",
+	"PolicyId" : "MS.TEAMS.3.1v1",
 	"Criticality" : "Should",
 	"Commandlet" : ["Get-CsTeamsMeetingPolicy"],
 	"ActualValue" : "PowerShell Error",
@@ -147,8 +143,7 @@ tests[{
 # Baseline 2.3: Policy 2
 #--
 tests[{
-	"Requirement" : "Internal users SHOULD be admitted automatically",
-	"Control" : "Teams 2.3",
+	"PolicyId" : "MS.TEAMS.3.2v1",
 	"Criticality" : "Should",
 	"Commandlet" : ["Get-CsTeamsMeetingPolicy"],
 	"ActualValue" : Policy.AutoAdmittedUsers,
@@ -165,8 +160,7 @@ tests[{
 # Baseline 2.3: Policy 2
 #--
 tests[{
-	"Requirement" : "Internal users SHOULD be admitted automatically",
-	"Control" : "Teams 2.3",
+	"PolicyId" : "MS.TEAMS.3.2v1",
 	"Criticality" : "Should",
 	"Commandlet" : ["Get-CsTeamsMeetingPolicy"],
 	"ActualValue" : "PowerShell Error",
@@ -193,8 +187,7 @@ ExternalAccessConfig[Policy.Identity] {
 }
 
 tests[{
-	"Requirement" : "External access SHALL only be enabled on a per-domain basis",
-	"Control" : "Teams 2.4",
+	"PolicyId" : "MS.TEAMS.4.1v1",
 	"Criticality" : "Shall",
 	"Commandlet" : ["Get-CsTenantFederationConfiguration"],
 	"ActualValue" : Policies,
@@ -262,8 +255,7 @@ FederationConfiguration[Policy.Identity] {
 }
 
 tests[{
-	"Requirement" : "Unmanaged users SHALL NOT be enabled to initiate contact with internal users",
-	"Control" : "Teams 2.5",
+	"PolicyId" : "MS.TEAMS.5.1v1",
 	"Criticality" : "Shall",
 	"Commandlet" : ["Get-CsTenantFederationConfiguration"],
 	"ActualValue" : Policies,
@@ -285,8 +277,7 @@ InternalCannotenable[Policy.Identity] {
 }
 
 tests[{
-	"Requirement" : "Internal users SHOULD NOT be enabled to initiate contact with unmanaged users",
-	"Control" : "Teams 2.5",
+	"PolicyId" : "MS.TEAMS.5.2v1",
 	"Criticality" : "Should",
 	"Commandlet" : ["Get-CsTenantFederationConfiguration"],
 	"ActualValue" : Policies,
@@ -313,8 +304,7 @@ SkpyeBlocConfig[Policy.Identity] {
 }
 
 tests[{
-	"Requirement" : "Contact with Skype users SHALL be blocked",
-	"Control" : "Teams 2.6",
+	"PolicyId" : "MS.TEAMS.6.1v1",
 	"Criticality" : "Shall",
 	"Commandlet" : ["Get-CsTenantFederationConfiguration"],
 	"ActualValue" : Policies,
@@ -359,8 +349,7 @@ ReportDetails2_7(IsGCC, ComfirmCorrectConfig, Policies) = Description if {
 }
 
 tests[{
-	"Requirement" : "Teams email integration SHALL be disabled",
-	"Control" : "Teams 2.7",
+	"PolicyId" : "MS.TEAMS.7.1v1",
 	"Criticality" : "Shall",
 	"Commandlet" : ["Get-CsTeamsClientConfiguration"],
 	"ActualValue" : [Policies, ServiceInstance],
@@ -377,8 +366,7 @@ tests[{
 }
 
 tests[{
-	"Requirement" : "Teams email integration SHALL be disabled",
-	"Control" : "Teams 2.7",
+	"PolicyId" : "MS.TEAMS.7.1v1",
 	"Criticality" : "Shall",
 	"Commandlet" : ["Get-CsTeamsClientConfiguration"],
 	"ActualValue" : "PowerShell Error",
@@ -403,8 +391,7 @@ PoliciesBlockingDefaultApps[Policy.Identity] {
 }
 
 tests[{
-	"Requirement" : "Agencies SHOULD allow all apps published by Microsoft, but MAY block specific Microsoft apps as needed",
-	"Control" : "Teams 2.8",
+	"PolicyId" : "MS.TEAMS.8.1v1",
 	"Criticality" : "Should",
 	"Commandlet" : ["Get-CsTeamsAppPermissionPolicy"],
 	"ActualValue" : Policies,
@@ -431,8 +418,7 @@ PoliciesAllowingCustomApps[Policy.Identity] {
 }
 
 tests[{
-	"Requirement" : "Agencies SHOULD NOT allow installation of all third-party apps, but MAY allow specific apps as needed",
-	"Control" : "Teams 2.8",
+	"PolicyId" : "MS.TEAMS.8.2v1",
 	"Criticality" : "Should",
 	"Commandlet" : ["Get-CsTeamsAppPermissionPolicy"],
 	"ActualValue" : Policies,
@@ -445,8 +431,7 @@ tests[{
 }
 
 tests[{
-	"Requirement" : "Agencies SHOULD NOT allow installation of all custom apps, but MAY allow specific apps as needed",
-	"Control" : "Teams 2.8",
+	"PolicyId" : "MS.TEAMS.8.2av1",
 	"Criticality" : "Should",
 	"Commandlet" : ["Get-CsTeamsAppPermissionPolicy"],
 	"ActualValue" : Policies,
@@ -464,8 +449,7 @@ tests[{
 #--
 # At this time we are unable to test for X because of Y
 tests[{
-    "Requirement" : "Agencies SHALL establish policy dictating the app review and approval process to be used by the agency",
-    "Control" : "Teams 2.8",
+    "PolicyId" : "MS.TEAMS.8.3v1",
     "Criticality" : "Shall/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
@@ -485,8 +469,7 @@ tests[{
 # Baseline 2.9: Policy 1
 #--
 tests[{
-	"Requirement" : "Cloud video recording SHOULD be disabled in the global (org-wide default) meeting policy",
-	"Control" : "Teams 2.9",
+	"PolicyId" : "MS.TEAMS.9.1v1",
 	"Criticality" : "Should",
 	"Commandlet" : ["Get-CsTeamsMeetingPolicy"],
 	"ActualValue" : Policy.AllowCloudRecording,
@@ -502,8 +485,7 @@ tests[{
 # Baseline 2.9: Policy 1
 #--
 tests[{
-	"Requirement" : "Cloud video recording SHOULD be disabled in the global (org-wide default) meeting policy",
-	"Control" : "Teams 2.9",
+	"PolicyId" : "MS.TEAMS.9.1v1",
 	"Criticality" : "Should",
 	"Commandlet" : ["Get-CsTeamsMeetingPolicy"],
 	"ActualValue" : "PowerShell Error",
@@ -524,8 +506,7 @@ PoliciesAllowingOutsideRegionStorage[Policy.Identity] {
 }
 
 tests[{
-	"Requirement" : "For all meeting polices that allow cloud recording, recordings SHOULD be stored inside the country of that agency's tenant",
-	"Control" : "Teams 2.9",
+	"PolicyId" : "MS.TEAMS.9.3v1",
 	"Criticality" : "Should",
 	"Commandlet" : ["Get-CsTeamsMeetingPolicy"],
 	"ActualValue" : Policies,
@@ -547,8 +528,7 @@ tests[{
 # Baseline 2.10: Policy 1
 #--
 tests[{
-	"Requirement" : "Record an event SHOULD be set to Organizer can record",
-	"Control" : "Teams 2.10",
+	"PolicyId" : "MS.TEAMS.10.1v1",
 	"Criticality" : "Should",
 	"Commandlet" : ["Get-CsTeamsMeetingBroadcastPolicy"],
 	"ActualValue" : Policy.BroadcastRecordingMode,
@@ -564,8 +544,7 @@ tests[{
 # Baseline 2.10: Policy 1
 #--
 tests[{
-	"Requirement" : "Record an event SHOULD be set to Organizer can record",
-	"Control" : "Teams 2.10",
+	"PolicyId" : "MS.TEAMS.10.1v1",
 	"Criticality" : "Should",
 	"Commandlet" : ["Get-CsTeamsMeetingBroadcastPolicy"],
 	"ActualValue" : "PowerShell Error",
@@ -586,8 +565,7 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "Requirement" : "A DLP solution SHALL be enabled",
-    "Control" : "Teams 2.11",
+    "PolicyId" : "MS.TEAMS.11.1v1",
     "Criticality" : "Shall/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
@@ -603,8 +581,7 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-	"Requirement" : "Agencies SHOULD use either the native DLP solution offered by Microsoft or a DLP solution that offers comparable services",
-    "Control" : "Teams 2.11",
+	"PolicyId" : "MS.TEAMS.11.2v1",
     "Criticality" : "Should/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
@@ -620,8 +597,7 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-	"Requirement" : "The DLP solution SHALL protect Personally Identifiable Information (PII) and sensitive information, as defined by the agency. At a minimum, the sharing of credit card numbers, taxpayer Identification Numbers (TIN), and Social Security Numbers (SSN) via email SHALL be restricted",
-    "Control" : "Teams 2.11",
+	"PolicyId" : "MS.TEAMS.11.4v1",
     "Criticality" : "Shall/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
@@ -642,8 +618,7 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-	"Requirement" : "Attachments included with Teams messages SHOULD be scanned for malware",
-    "Control" : "Teams 2.12",
+    "PolicyId" : "MS.TEAMS.12.1v1",
     "Criticality" : "Should/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
@@ -659,8 +634,7 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-	"Requirement" : "Users SHOULD be prevented from opening or downloading files detected as malware",
-    "Control" : "Teams 2.12",
+	"PolicyId" : "MS.TEAMS.12.2v1",
     "Criticality" : "Should/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
@@ -681,8 +655,7 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-	"Requirement" : "URL comparison with a block-list SHOULD be enabled",
-    "Control" : "Teams 2.13",
+    "PolicyId" : "MS.TEAMS.13.1v1",
     "Criticality" : "Should/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
@@ -698,8 +671,7 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-	"Requirement" : "Direct download links SHOULD be scanned for malware",
-    "Control" : "Teams 2.13",
+	"PolicyId" : "MS.TEAMS.13.2v1",
     "Criticality" : "Should/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
@@ -715,8 +687,7 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-	"Requirement" : "User click tracking SHOULD be enabled",
-    "Control" : "Teams 2.13",
+	"PolicyId" : "MS.TEAMS.13.3v1",
     "Criticality" : "Should/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],

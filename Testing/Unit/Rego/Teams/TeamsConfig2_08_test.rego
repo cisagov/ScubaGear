@@ -6,8 +6,7 @@ import future.keywords
 # Policy 1
 #--
 test_DefaultCatalogAppsType_Correct_V1 if {
-    ControlNumber := "Teams 2.8"
-    Requirement := "Agencies SHOULD allow all apps published by Microsoft, but MAY block specific Microsoft apps as needed"
+    PolicyId := "MS.TEAMS.8.1v1"
 
     Output := tests with input as {
         "app_policies": [
@@ -18,7 +17,7 @@ test_DefaultCatalogAppsType_Correct_V1 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -26,8 +25,7 @@ test_DefaultCatalogAppsType_Correct_V1 if {
 }
 
 test_DefaultCatalogAppsType_Correct_V2 if {
-    ControlNumber := "Teams 2.8"
-    Requirement := "Agencies SHOULD allow all apps published by Microsoft, but MAY block specific Microsoft apps as needed"
+    PolicyId := "MS.TEAMS.8.1v1"
 
     Output := tests with input as {
         "app_policies": [
@@ -38,7 +36,7 @@ test_DefaultCatalogAppsType_Correct_V2 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -46,8 +44,7 @@ test_DefaultCatalogAppsType_Correct_V2 if {
 }
 
 test_DefaultCatalogAppsType_Incorrect_V1 if {
-    ControlNumber := "Teams 2.8"
-    Requirement := "Agencies SHOULD allow all apps published by Microsoft, but MAY block specific Microsoft apps as needed"
+    PolicyId := "MS.TEAMS.8.1v1"
 
     Output := tests with input as {
         "app_policies": [
@@ -58,7 +55,7 @@ test_DefaultCatalogAppsType_Incorrect_V1 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -66,8 +63,7 @@ test_DefaultCatalogAppsType_Incorrect_V1 if {
 }
 
 test_DefaultCatalogAppsType_Incorrect_V2 if {
-    ControlNumber := "Teams 2.8"
-    Requirement := "Agencies SHOULD allow all apps published by Microsoft, but MAY block specific Microsoft apps as needed"
+    PolicyId := "MS.TEAMS.8.1v1"
 
     Output := tests with input as {
         "app_policies": [
@@ -78,7 +74,7 @@ test_DefaultCatalogAppsType_Incorrect_V2 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -86,8 +82,7 @@ test_DefaultCatalogAppsType_Incorrect_V2 if {
 }
 
 test_DefaultCatalogAppsType_Multiple if {
-    ControlNumber := "Teams 2.8"
-    Requirement := "Agencies SHOULD allow all apps published by Microsoft, but MAY block specific Microsoft apps as needed"
+    PolicyId := "MS.TEAMS.8.1v1"
 
     Output := tests with input as {
         "app_policies": [
@@ -106,7 +101,7 @@ test_DefaultCatalogAppsType_Multiple if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -119,8 +114,7 @@ test_DefaultCatalogAppsType_Multiple if {
 # Policy 2
 #--
 test_GlobalCatalogAppsType_Correct_V1 if {
-    ControlNumber := "Teams 2.8"
-    Requirement := "Agencies SHOULD NOT allow installation of all third-party apps, but MAY allow specific apps as needed"
+    PolicyId := "MS.TEAMS.8.2v1"
 
     Output := tests with input as {
         "app_policies": [
@@ -131,7 +125,7 @@ test_GlobalCatalogAppsType_Correct_V1 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -139,8 +133,7 @@ test_GlobalCatalogAppsType_Correct_V1 if {
 }
 
 test_GlobalCatalogAppsType_Correct_V2 if {
-    ControlNumber := "Teams 2.8"
-    Requirement := "Agencies SHOULD NOT allow installation of all third-party apps, but MAY allow specific apps as needed"
+    PolicyId := "MS.TEAMS.8.2v1"
 
     Output := tests with input as {
         "app_policies": [
@@ -151,7 +144,7 @@ test_GlobalCatalogAppsType_Correct_V2 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -159,8 +152,7 @@ test_GlobalCatalogAppsType_Correct_V2 if {
 }
 
 test_GlobalCatalogAppsType_Incorrect_V1 if {
-    ControlNumber := "Teams 2.8"
-    Requirement := "Agencies SHOULD NOT allow installation of all third-party apps, but MAY allow specific apps as needed"
+    PolicyId := "MS.TEAMS.8.2v1"
 
     Output := tests with input as {
         "app_policies": [
@@ -171,7 +163,7 @@ test_GlobalCatalogAppsType_Incorrect_V1 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -179,8 +171,7 @@ test_GlobalCatalogAppsType_Incorrect_V1 if {
 }
 
 test_GlobalCatalogAppsType_Incorrect_V2 if {
-    ControlNumber := "Teams 2.8"
-    Requirement := "Agencies SHOULD NOT allow installation of all third-party apps, but MAY allow specific apps as needed"
+    PolicyId := "MS.TEAMS.8.2v1"
 
     Output := tests with input as {
         "app_policies": [
@@ -191,7 +182,7 @@ test_GlobalCatalogAppsType_Incorrect_V2 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -199,8 +190,7 @@ test_GlobalCatalogAppsType_Incorrect_V2 if {
 }
 
 test_GlobalCatalogAppsType_Multiple if {
-    ControlNumber := "Teams 2.8"
-    Requirement := "Agencies SHOULD NOT allow installation of all third-party apps, but MAY allow specific apps as needed"
+    PolicyId := "MS.TEAMS.8.2v1"
 
     Output := tests with input as {
         "app_policies": [
@@ -219,7 +209,7 @@ test_GlobalCatalogAppsType_Multiple if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -229,8 +219,7 @@ test_GlobalCatalogAppsType_Multiple if {
 }
 
 test_PrivateCatalogAppsType_Correct_V1 if {
-    ControlNumber := "Teams 2.8"
-    Requirement := "Agencies SHOULD NOT allow installation of all custom apps, but MAY allow specific apps as needed"
+    PolicyId := "MS.TEAMS.8.2av1"
 
     Output := tests with input as {
         "app_policies": [
@@ -241,7 +230,7 @@ test_PrivateCatalogAppsType_Correct_V1 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -249,8 +238,7 @@ test_PrivateCatalogAppsType_Correct_V1 if {
 }
 
 test_PrivateCatalogAppsType_Correct_V2 if {
-    ControlNumber := "Teams 2.8"
-    Requirement := "Agencies SHOULD NOT allow installation of all custom apps, but MAY allow specific apps as needed"
+    PolicyId := "MS.TEAMS.8.2av1"
 
     Output := tests with input as {
         "app_policies": [
@@ -261,7 +249,7 @@ test_PrivateCatalogAppsType_Correct_V2 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
     
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -269,8 +257,7 @@ test_PrivateCatalogAppsType_Correct_V2 if {
 }
 
 test_PrivateCatalogAppsType_Incorrect_V1 if {
-    ControlNumber := "Teams 2.8"
-    Requirement := "Agencies SHOULD NOT allow installation of all custom apps, but MAY allow specific apps as needed"
+    PolicyId := "MS.TEAMS.8.2av1"
 
     Output := tests with input as {
         "app_policies": [
@@ -281,7 +268,7 @@ test_PrivateCatalogAppsType_Incorrect_V1 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -289,8 +276,7 @@ test_PrivateCatalogAppsType_Incorrect_V1 if {
 }
 
 test_PrivateCatalogAppsType_Incorrect_V2 if {
-    ControlNumber := "Teams 2.8"
-    Requirement := "Agencies SHOULD NOT allow installation of all custom apps, but MAY allow specific apps as needed"
+    PolicyId := "MS.TEAMS.8.2av1"
 
     Output := tests with input as {
         "app_policies": [
@@ -301,7 +287,7 @@ test_PrivateCatalogAppsType_Incorrect_V2 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -309,8 +295,7 @@ test_PrivateCatalogAppsType_Incorrect_V2 if {
 }
 
 test_PrivateCatalogAppsType_Multiple if {
-    ControlNumber := "Teams 2.8"
-    Requirement := "Agencies SHOULD NOT allow installation of all custom apps, but MAY allow specific apps as needed"
+    PolicyId := "MS.TEAMS.8.2av1"
 
     Output := tests with input as {
         "app_policies": [
@@ -329,7 +314,7 @@ test_PrivateCatalogAppsType_Multiple if {
         ]
     }
     
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -342,12 +327,11 @@ test_PrivateCatalogAppsType_Multiple if {
 # Policy 3
 #--
 test_3rdParty_Correct if {
-    ControlNumber := "Teams 2.8"
-    Requirement := "Agencies SHALL establish policy dictating the app review and approval process to be used by the agency"
+    PolicyId := "MS.TEAMS.8.3v1"
 
     Output := tests with input as { }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet

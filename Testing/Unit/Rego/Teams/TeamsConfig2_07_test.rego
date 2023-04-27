@@ -6,8 +6,7 @@ import future.keywords
 # Policy 1
 #--
 test_AllowEmailIntoChannel_Correct_V1 if {
-    ControlNumber := "Teams 2.7"
-    Requirement := "Teams email integration SHALL be disabled"
+    PolicyId := "MS.TEAMS.7.1v1"
 
     Output := tests with input as {
         "client_configuration": [
@@ -23,7 +22,7 @@ test_AllowEmailIntoChannel_Correct_V1 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -31,8 +30,7 @@ test_AllowEmailIntoChannel_Correct_V1 if {
 }
 
 test_AllowEmailIntoChannel_Correct_V1_multi if {
-    ControlNumber := "Teams 2.7"
-    Requirement := "Teams email integration SHALL be disabled"
+    PolicyId := "MS.TEAMS.7.1v1"
 
     Output := tests with input as {
         "client_configuration": [
@@ -52,7 +50,7 @@ test_AllowEmailIntoChannel_Correct_V1_multi if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -60,8 +58,7 @@ test_AllowEmailIntoChannel_Correct_V1_multi if {
 }
 
 test_AllowEmailIntoChannel_Incorrect if {
-    ControlNumber := "Teams 2.7"
-    Requirement := "Teams email integration SHALL be disabled"
+    PolicyId := "MS.TEAMS.7.1v1"
 
     Output := tests with input as {
         "client_configuration": [
@@ -77,7 +74,7 @@ test_AllowEmailIntoChannel_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -85,8 +82,7 @@ test_AllowEmailIntoChannel_Incorrect if {
 }
 
 test_AllowEmailIntoChannel_Incorrect_multi if {
-    ControlNumber := "Teams 2.7"
-    Requirement := "Teams email integration SHALL be disabled"
+    PolicyId := "MS.TEAMS.7.1v1"
 
     Output := tests with input as {
         "client_configuration": [
@@ -106,7 +102,7 @@ test_AllowEmailIntoChannel_Incorrect_multi if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -114,8 +110,7 @@ test_AllowEmailIntoChannel_Incorrect_multi if {
 }
 
 test_AllowEmailIntoChannel_Correct_V2 if {
-    ControlNumber := "Teams 2.7"
-    Requirement := "Teams email integration SHALL be disabled"
+    PolicyId := "MS.TEAMS.7.1v1"
 
     Output := tests with input as {
         "client_configuration": [
@@ -131,7 +126,7 @@ test_AllowEmailIntoChannel_Correct_V2 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
     
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -139,8 +134,7 @@ test_AllowEmailIntoChannel_Correct_V2 if {
 }
 
 test_AllowEmailIntoChannel_Correct_V2_multi if {
-    ControlNumber := "Teams 2.7"
-    Requirement := "Teams email integration SHALL be disabled"
+    PolicyId := "MS.TEAMS.7.1v1"
 
     Output := tests with input as {
         "client_configuration": [
@@ -160,7 +154,7 @@ test_AllowEmailIntoChannel_Correct_V2_multi if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
     
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -168,8 +162,7 @@ test_AllowEmailIntoChannel_Correct_V2_multi if {
 }
 
 test_AllowEmailIntoChannel_Correct_V3 if {
-    ControlNumber := "Teams 2.7"
-    Requirement := "Teams email integration SHALL be disabled"
+    PolicyId := "MS.TEAMS.7.1v1"
 
     Output := tests with input as {
         "client_configuration": [
@@ -185,7 +178,7 @@ test_AllowEmailIntoChannel_Correct_V3 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -193,8 +186,7 @@ test_AllowEmailIntoChannel_Correct_V3 if {
 }
 
 test_AllowEmailIntoChannel_Correct_V3 if {
-    ControlNumber := "Teams 2.7"
-    Requirement := "Teams email integration SHALL be disabled"
+    PolicyId := "MS.TEAMS.7.1v1"
 
     Output := tests with input as {
         "client_configuration": [
@@ -214,7 +206,7 @@ test_AllowEmailIntoChannel_Correct_V3 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet

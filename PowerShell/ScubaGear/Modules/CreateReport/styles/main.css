@@ -5,6 +5,9 @@
     --test-fail: #deb8b8;
     --test-warning: #fff7d6;
     --test-other: #ebebf2;
+    --test-deleted-bg: #b2beb5;
+    --test-deleted-color: #6f7478;
+    --test-bug-color: #e80b0b;
     --cap-even: #0052882d;
     --cap-hover: #00528850;
     --header-color: #005288;

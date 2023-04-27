@@ -6,8 +6,7 @@ import future.keywords
 # Policy 1
 #--
 test_AllowPublicUsers_Correct if {
-    ControlNumber := "Teams 2.6"
-    Requirement := "Contact with Skype users SHALL be blocked"
+    PolicyId := "MS.TEAMS.6.1v1"
 
     Output := tests with input as {
         "federation_configuration": [
@@ -18,7 +17,7 @@ test_AllowPublicUsers_Correct if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
     
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -26,8 +25,7 @@ test_AllowPublicUsers_Correct if {
 }
 
 test_AllowPublicUsers_InCorrect if {
-    ControlNumber := "Teams 2.6"
-    Requirement := "Contact with Skype users SHALL be blocked"
+    PolicyId := "MS.TEAMS.6.1v1"
 
     Output := tests with input as {
         "federation_configuration": [
@@ -38,7 +36,7 @@ test_AllowPublicUsers_InCorrect if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -46,8 +44,7 @@ test_AllowPublicUsers_InCorrect if {
 }
 
 test_AllowPublicUsers_Correct_multi if {
-    ControlNumber := "Teams 2.6"
-    Requirement := "Contact with Skype users SHALL be blocked"
+    PolicyId := "MS.TEAMS.6.1v1"
 
     Output := tests with input as {
         "federation_configuration": [
@@ -62,7 +59,7 @@ test_AllowPublicUsers_Correct_multi if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
     
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -70,8 +67,7 @@ test_AllowPublicUsers_Correct_multi if {
 }
 
 test_AllowPublicUsers_InCorrect_multi if {
-    ControlNumber := "Teams 2.6"
-    Requirement := "Contact with Skype users SHALL be blocked"
+    PolicyId := "MS.TEAMS.6.1v1"
 
     Output := tests with input as {
         "federation_configuration": [
@@ -86,7 +82,7 @@ test_AllowPublicUsers_InCorrect_multi if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet

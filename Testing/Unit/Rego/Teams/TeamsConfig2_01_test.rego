@@ -6,8 +6,7 @@ import future.keywords
 # Policy 1
 #--
 test_ExternalParticipantControl_Correct_V1 if {
-    ControlNumber := "Teams 2.1"
-    Requirement := "External participants SHOULD NOT be enabled to request control of shared desktops or windows in the Global (Org-wide default) meeting policy or in custom meeting policies if any exist"
+    PolicyId := "MS.TEAMS.1.1v1"
     Output := tests with input as {
         "meeting_policies": [
             {
@@ -17,7 +16,7 @@ test_ExternalParticipantControl_Correct_V1 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -25,18 +24,17 @@ test_ExternalParticipantControl_Correct_V1 if {
 }
 
 test_ExternalParticipantControl_Correct_V2 if {
-    ControlNumber := "Teams 2.1"
-    Requirement := "External participants SHOULD NOT be enabled to request control of shared desktops or windows in the Global (Org-wide default) meeting policy or in custom meeting policies if any exist"
+    PolicyId := "MS.TEAMS.1.1v1"
     Output := tests with input as {
-        "meeting_policies": [
-            {
-                "Identity": "Tag:FirstCustomPolicy", 
-                "AllowExternalParticipantGiveRequestControl" : false
-            }
-        ]
+    "meeting_policies": [
+        {
+            "Identity": "Tag:FirstCustomPolicy", 
+            "AllowExternalParticipantGiveRequestControl" : false
+        }
+    ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -44,8 +42,7 @@ test_ExternalParticipantControl_Correct_V2 if {
 }
 
 test_ExternalParticipantControl_Incorrect_V1 if {
-    ControlNumber := "Teams 2.1"
-    Requirement := "External participants SHOULD NOT be enabled to request control of shared desktops or windows in the Global (Org-wide default) meeting policy or in custom meeting policies if any exist"
+    PolicyId := "MS.TEAMS.1.1v1"
     Output := tests with input as {
         "meeting_policies": [
             {
@@ -55,7 +52,7 @@ test_ExternalParticipantControl_Incorrect_V1 if {
         ]
     }
     
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -63,8 +60,7 @@ test_ExternalParticipantControl_Incorrect_V1 if {
 }
 
 test_ExternalParticipantControl_Incorrect_V2 if {
-    ControlNumber := "Teams 2.1"
-    Requirement := "External participants SHOULD NOT be enabled to request control of shared desktops or windows in the Global (Org-wide default) meeting policy or in custom meeting policies if any exist"
+    PolicyId := "MS.TEAMS.1.1v1"
     Output := tests with input as {
         "meeting_policies": [
             {
@@ -74,7 +70,7 @@ test_ExternalParticipantControl_Incorrect_V2 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -82,8 +78,7 @@ test_ExternalParticipantControl_Incorrect_V2 if {
 }
 
 test_ExternalParticipantControl_MultiplePolicies if {
-    ControlNumber := "Teams 2.1"
-    Requirement := "External participants SHOULD NOT be enabled to request control of shared desktops or windows in the Global (Org-wide default) meeting policy or in custom meeting policies if any exist"
+    PolicyId := "MS.TEAMS.1.1v1"
     Output := tests with input as {
         "meeting_policies": [
             {
@@ -101,7 +96,7 @@ test_ExternalParticipantControl_MultiplePolicies if {
         ] 
     }
     
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
     
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet

@@ -6,8 +6,7 @@ import future.keywords
 # Policy 1
 #--
 test_AllowCloudRecording_Correct if {
-    ControlNumber := "Teams 2.9"
-    Requirement := "Cloud video recording SHOULD be disabled in the global (org-wide default) meeting policy"
+    PolicyId := "MS.TEAMS.9.1v1"
 
     Output := tests with input as {
         "meeting_policies": [
@@ -18,7 +17,7 @@ test_AllowCloudRecording_Correct if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -26,8 +25,7 @@ test_AllowCloudRecording_Correct if {
 }
 
 test_AllowCloudRecording_Incorrect if {
-    ControlNumber := "Teams 2.9"
-    Requirement := "Cloud video recording SHOULD be disabled in the global (org-wide default) meeting policy"
+    PolicyId := "MS.TEAMS.9.1v1"
 
     Output := tests with input as {
         "meeting_policies": [
@@ -38,7 +36,7 @@ test_AllowCloudRecording_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -46,8 +44,7 @@ test_AllowCloudRecording_Incorrect if {
 }
 
 test_AllowCloudRecording_Multiple if {
-    ControlNumber := "Teams 2.9"
-    Requirement := "Cloud video recording SHOULD be disabled in the global (org-wide default) meeting policy"
+    PolicyId := "MS.TEAMS.9.1v1"
 
     Output := tests with input as {
         "meeting_policies": [
@@ -63,7 +60,7 @@ test_AllowCloudRecording_Multiple if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -74,8 +71,7 @@ test_AllowCloudRecording_Multiple if {
 # Policy 2
 #--
 test_AllowCloudRecording_Correct_V1 if {
-    ControlNumber := "Teams 2.9"
-    Requirement := "For all meeting polices that allow cloud recording, recordings SHOULD be stored inside the country of that agency's tenant"
+    PolicyId := "MS.TEAMS.9.3v1"
 
     Output := tests with input as {
         "meeting_policies": [
@@ -87,7 +83,7 @@ test_AllowCloudRecording_Correct_V1 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -95,8 +91,7 @@ test_AllowCloudRecording_Correct_V1 if {
 }
 
 test_AllowCloudRecording_Correct_V2 if {
-    ControlNumber := "Teams 2.9"
-    Requirement := "For all meeting polices that allow cloud recording, recordings SHOULD be stored inside the country of that agency's tenant"
+    PolicyId := "MS.TEAMS.9.3v1"
 
     Output := tests with input as {
         "meeting_policies": [
@@ -108,7 +103,7 @@ test_AllowCloudRecording_Correct_V2 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -116,8 +111,7 @@ test_AllowCloudRecording_Correct_V2 if {
 }
 
 test_AllowCloudRecording_Incorrect if {
-    ControlNumber := "Teams 2.9"
-    Requirement := "For all meeting polices that allow cloud recording, recordings SHOULD be stored inside the country of that agency's tenant"
+    PolicyId := "MS.TEAMS.9.3v1"
 
     Output := tests with input as {
         "meeting_policies": [
@@ -129,7 +123,7 @@ test_AllowCloudRecording_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -137,8 +131,7 @@ test_AllowCloudRecording_Incorrect if {
 }
 
 test_AllowCloudRecording_Multiple if {
-    ControlNumber := "Teams 2.9"
-    Requirement := "For all meeting polices that allow cloud recording, recordings SHOULD be stored inside the country of that agency's tenant"
+    PolicyId := "MS.TEAMS.9.3v1"
 
     Output := tests with input as {
         "meeting_policies": [
@@ -155,7 +148,7 @@ test_AllowCloudRecording_Multiple if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet

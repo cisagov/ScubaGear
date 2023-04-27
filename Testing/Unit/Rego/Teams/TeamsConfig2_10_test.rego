@@ -6,8 +6,7 @@ import future.keywords
 # Policy 1
 #--
 test_BroadcastRecordingMode_Correct if {
-    ControlNumber := "Teams 2.10"
-    Requirement := "Record an event SHOULD be set to Organizer can record"
+    PolicyId := "MS.TEAMS.10.1v1"
    
     Output := tests with input as {
         "broadcast_policies": [
@@ -18,7 +17,7 @@ test_BroadcastRecordingMode_Correct if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -26,8 +25,7 @@ test_BroadcastRecordingMode_Correct if {
 }
 
 test_BroadcastRecordingMode_Incorrect if {
-    ControlNumber := "Teams 2.10"
-    Requirement := "Record an event SHOULD be set to Organizer can record"
+    PolicyId := "MS.TEAMS.10.1v1"
    
     Output := tests with input as {
         "broadcast_policies": [
@@ -38,7 +36,7 @@ test_BroadcastRecordingMode_Incorrect if {
         ]
     }
    
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
     
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -47,8 +45,7 @@ test_BroadcastRecordingMode_Incorrect if {
 
 
 test_BroadcastRecordingMode_Multiple if {
-    ControlNumber := "Teams 2.10"
-    Requirement := "Record an event SHOULD be set to Organizer can record"
+    PolicyId := "MS.TEAMS.10.1v1"
 
     Output := tests with input as {
         "broadcast_policies": [
@@ -63,7 +60,7 @@ test_BroadcastRecordingMode_Multiple if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet

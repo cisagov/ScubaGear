@@ -6,8 +6,7 @@ import future.keywords
 # Policy 1
 #--
 test_meeting_policies_Correct if {
-    ControlNumber := "Teams 2.3"
-    Requirement := "Anonymous users, including dial-in users, SHOULD NOT be admitted automatically"
+    PolicyId := "MS.TEAMS.3.1v1"
 
     Output := tests with input as {
         "meeting_policies": [
@@ -19,7 +18,7 @@ test_meeting_policies_Correct if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -27,8 +26,7 @@ test_meeting_policies_Correct if {
 }
 
 test_AllowPSTNUsersToBypassLobby_Incorrect if {
-    ControlNumber := "Teams 2.3"
-    Requirement := "Anonymous users, including dial-in users, SHOULD NOT be admitted automatically"
+    PolicyId := "MS.TEAMS.3.1v1"
 
     Output := tests with input as {
         "meeting_policies": [
@@ -40,7 +38,7 @@ test_AllowPSTNUsersToBypassLobby_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -48,8 +46,7 @@ test_AllowPSTNUsersToBypassLobby_Incorrect if {
 }
 
 test_AutoAdmittedUsers_Incorrect if {
-    ControlNumber := "Teams 2.3"
-    Requirement := "Anonymous users, including dial-in users, SHOULD NOT be admitted automatically"
+    PolicyId := "MS.TEAMS.3.1v1"
 
     Output := tests with input as {
         "meeting_policies": [
@@ -61,7 +58,7 @@ test_AutoAdmittedUsers_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -70,8 +67,7 @@ test_AutoAdmittedUsers_Incorrect if {
 
 # It shouldn't matter that the custom policy is incorrect as this policy only applies to the Global policy
 test_Multiple_Correct if {
-    ControlNumber := "Teams 2.3"
-    Requirement := "Anonymous users, including dial-in users, SHOULD NOT be admitted automatically"
+    PolicyId := "MS.TEAMS.3.1v1"
 
     Output := tests with input as {
         "meeting_policies": [
@@ -88,7 +84,7 @@ test_Multiple_Correct if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -99,8 +95,7 @@ test_Multiple_Correct if {
 # Policy 2
 #--
 test_AutoAdmittedUsers_Correct_V1 if {
-    ControlNumber := "Teams 2.3"
-    Requirement := "Internal users SHOULD be admitted automatically"
+    PolicyId := "MS.TEAMS.3.2v1"
 
     Output := tests with input as {
         "meeting_policies": [
@@ -111,7 +106,7 @@ test_AutoAdmittedUsers_Correct_V1 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -119,8 +114,7 @@ test_AutoAdmittedUsers_Correct_V1 if {
 }
 
 test_AutoAdmittedUsers_Correct_V2 if {
-    ControlNumber := "Teams 2.3"
-    Requirement := "Internal users SHOULD be admitted automatically"
+    PolicyId := "MS.TEAMS.3.2v1"
 
     Output := tests with input as {
         "meeting_policies": [
@@ -131,7 +125,7 @@ test_AutoAdmittedUsers_Correct_V2 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -139,8 +133,7 @@ test_AutoAdmittedUsers_Correct_V2 if {
 }
 
 test_AutoAdmittedUsers_Incorrect_V2 if {
-    ControlNumber := "Teams 2.3"
-    Requirement := "Internal users SHOULD be admitted automatically"
+    PolicyId := "MS.TEAMS.3.2v1"
 
     Output := tests with input as {
         "meeting_policies": [
@@ -151,7 +144,7 @@ test_AutoAdmittedUsers_Incorrect_V2 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -159,8 +152,7 @@ test_AutoAdmittedUsers_Incorrect_V2 if {
 }
 
 test_AutoAdmittedUsers_Incorrect_V3 if {
-    ControlNumber := "Teams 2.3"
-    Requirement := "Internal users SHOULD be admitted automatically"
+    PolicyId := "MS.TEAMS.3.2v1"
 
     Output := tests with input as {
         "meeting_policies": [
@@ -171,7 +163,7 @@ test_AutoAdmittedUsers_Incorrect_V3 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
     
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet

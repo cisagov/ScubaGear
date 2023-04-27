@@ -6,9 +6,8 @@ import future.keywords
 # Policy 1
 #--
 test_AnonymousMeetingStart_Correct_V1 if {
-    ControlNumber := "Teams 2.2"
-    Requirement := "Anonymous users SHALL NOT be enabled to start meetings in the Global (Org-wide default) meeting policy or in custom meeting policies if any exist"
-
+    PolicyId := "MS.TEAMS.2.1v1"
+    
     Output := tests with input as {
         "meeting_policies": [
             {
@@ -18,7 +17,7 @@ test_AnonymousMeetingStart_Correct_V1 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -26,8 +25,7 @@ test_AnonymousMeetingStart_Correct_V1 if {
 }
 
 test_AnonymousMeetingStart_Correct_V2 if {
-    ControlNumber := "Teams 2.2"
-    Requirement := "Anonymous users SHALL NOT be enabled to start meetings in the Global (Org-wide default) meeting policy or in custom meeting policies if any exist"
+    PolicyId := "MS.TEAMS.2.1v1"
 
     Output := tests with input as {
         "meeting_policies": [
@@ -38,7 +36,7 @@ test_AnonymousMeetingStart_Correct_V2 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -46,8 +44,7 @@ test_AnonymousMeetingStart_Correct_V2 if {
 }
 
 test_AnonymousMeetingStart_Incorrect_V1 if {
-    ControlNumber := "Teams 2.2"
-    Requirement := "Anonymous users SHALL NOT be enabled to start meetings in the Global (Org-wide default) meeting policy or in custom meeting policies if any exist"
+    PolicyId := "MS.TEAMS.2.1v1"
 
     Output := tests with input as {
         "meeting_policies": [
@@ -58,7 +55,7 @@ test_AnonymousMeetingStart_Incorrect_V1 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -66,8 +63,7 @@ test_AnonymousMeetingStart_Incorrect_V1 if {
 }
 
 test_AnonymousMeetingStart_Incorrect_V2 if {
-    ControlNumber := "Teams 2.2"
-    Requirement := "Anonymous users SHALL NOT be enabled to start meetings in the Global (Org-wide default) meeting policy or in custom meeting policies if any exist"
+    PolicyId := "MS.TEAMS.2.1v1"
 
     Output := tests with input as {
         "meeting_policies": [
@@ -78,7 +74,7 @@ test_AnonymousMeetingStart_Incorrect_V2 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -86,8 +82,7 @@ test_AnonymousMeetingStart_Incorrect_V2 if {
 }
 
 test_AnonymousMeetingStart_MultiplePolicies if {
-    ControlNumber := "Teams 2.2"
-    Requirement := "Anonymous users SHALL NOT be enabled to start meetings in the Global (Org-wide default) meeting policy or in custom meeting policies if any exist"
+    PolicyId := "MS.TEAMS.2.1v1"
 
     Output := tests with input as {
         "meeting_policies": [
@@ -106,7 +101,7 @@ test_AnonymousMeetingStart_MultiplePolicies if {
         ] 
     }
     
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
     
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet

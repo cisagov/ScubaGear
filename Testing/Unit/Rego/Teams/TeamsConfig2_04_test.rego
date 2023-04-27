@@ -6,8 +6,7 @@ import future.keywords
 # Policy 1
 #--
 test_AllowFederatedUsers_Correct_V1 if {
-    ControlNumber := "Teams 2.4"
-    Requirement := "External access SHALL only be enabled on a per-domain basis"
+    PolicyId := "MS.TEAMS.4.1v1"
 
     Output := tests with input as {
         "federation_configuration": [
@@ -19,7 +18,7 @@ test_AllowFederatedUsers_Correct_V1 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -27,8 +26,7 @@ test_AllowFederatedUsers_Correct_V1 if {
 }
 
 test_AllowFederatedUsers_Correct_V2 if {
-    ControlNumber := "Teams 2.4"
-    Requirement := "External access SHALL only be enabled on a per-domain basis"
+    PolicyId := "MS.TEAMS.4.1v1"
 
     Output := tests with input as {
         "federation_configuration": [
@@ -44,7 +42,7 @@ test_AllowFederatedUsers_Correct_V2 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
     
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -52,8 +50,7 @@ test_AllowFederatedUsers_Correct_V2 if {
 }
 
 test_AllowedDomains_Correct if {
-    ControlNumber := "Teams 2.4"
-    Requirement := "External access SHALL only be enabled on a per-domain basis"
+    PolicyId := "MS.TEAMS.4.1v1"
 
     Output := tests with input as {
         "federation_configuration":[
@@ -69,7 +66,7 @@ test_AllowedDomains_Correct if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -77,8 +74,7 @@ test_AllowedDomains_Correct if {
 }
 
 test_AllowedDomains_Incorrect if {
-    ControlNumber := "Teams 2.4"
-    Requirement := "External access SHALL only be enabled on a per-domain basis"
+    PolicyId := "MS.TEAMS.4.1v1"
 
     Output := tests with input as {
         "federation_configuration": [
@@ -90,7 +86,7 @@ test_AllowedDomains_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -98,8 +94,7 @@ test_AllowedDomains_Incorrect if {
 }
 
 test_AllowFederatedUsers_Correct_V1_multi if {
-    ControlNumber := "Teams 2.4"
-    Requirement := "External access SHALL only be enabled on a per-domain basis"
+    PolicyId := "MS.TEAMS.4.1v1"
 
     Output := tests with input as {
         "federation_configuration": [
@@ -116,7 +111,7 @@ test_AllowFederatedUsers_Correct_V1_multi if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -124,8 +119,7 @@ test_AllowFederatedUsers_Correct_V1_multi if {
 }
 
 test_AllowFederatedUsers_Correct_V2_multi if {
-    ControlNumber := "Teams 2.4"
-    Requirement := "External access SHALL only be enabled on a per-domain basis"
+    PolicyId := "MS.TEAMS.4.1v1"
 
     Output := tests with input as {
         "federation_configuration": [
@@ -150,7 +144,7 @@ test_AllowFederatedUsers_Correct_V2_multi if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
     
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -159,8 +153,7 @@ test_AllowFederatedUsers_Correct_V2_multi if {
 
 
 test_AllowedDomains_Correct_multi if {
-    ControlNumber := "Teams 2.4"
-    Requirement := "External access SHALL only be enabled on a per-domain basis"
+    PolicyId := "MS.TEAMS.4.1v1"
 
     Output := tests with input as {
         "federation_configuration":[
@@ -185,7 +178,7 @@ test_AllowedDomains_Correct_multi if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -193,8 +186,7 @@ test_AllowedDomains_Correct_multi if {
 }
 
 test_AllowedDomains_Incorrect_multi if {
-    ControlNumber := "Teams 2.4"
-	Requirement := "External access SHALL only be enabled on a per-domain basis"
+    PolicyId := "MS.TEAMS.4.1v1"
 
     Output := tests with input as {
         "federation_configuration":[
@@ -211,7 +203,7 @@ test_AllowedDomains_Incorrect_multi if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
     
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet

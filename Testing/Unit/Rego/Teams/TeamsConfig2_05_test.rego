@@ -6,8 +6,7 @@ import future.keywords
 # Policy 1
 #--
 test_AllowTeamsConsumerInbound_Correct_V1 if {
-    ControlNumber := "Teams 2.5"
-    Requirement := "Unmanaged users SHALL NOT be enabled to initiate contact with internal users"
+    PolicyId := "MS.TEAMS.5.1v1"
 
     Output := tests with input as {
         "federation_configuration": [
@@ -19,7 +18,7 @@ test_AllowTeamsConsumerInbound_Correct_V1 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -27,8 +26,7 @@ test_AllowTeamsConsumerInbound_Correct_V1 if {
 }
 
 test_AllowTeamsConsumerInbound_Correct_V1_multi if {
-    ControlNumber := "Teams 2.5"
-    Requirement := "Unmanaged users SHALL NOT be enabled to initiate contact with internal users"
+    PolicyId := "MS.TEAMS.5.1v1"
 
     Output := tests with input as {
         "federation_configuration": [
@@ -45,7 +43,7 @@ test_AllowTeamsConsumerInbound_Correct_V1_multi if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -53,8 +51,7 @@ test_AllowTeamsConsumerInbound_Correct_V1_multi if {
 }
 
 test_AllowTeamsConsumerInbound_Correct_V2 if {
-    ControlNumber := "Teams 2.5"
-    Requirement := "Unmanaged users SHALL NOT be enabled to initiate contact with internal users"
+    PolicyId := "MS.TEAMS.5.1v1"
 
     Output := tests with input as {
         "federation_configuration": [
@@ -66,7 +63,7 @@ test_AllowTeamsConsumerInbound_Correct_V2 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -74,8 +71,7 @@ test_AllowTeamsConsumerInbound_Correct_V2 if {
 }
 
 test_AllowTeamsConsumerInbound_Correct_V2_multi if {
-    ControlNumber := "Teams 2.5"
-    Requirement := "Unmanaged users SHALL NOT be enabled to initiate contact with internal users"
+    PolicyId := "MS.TEAMS.5.1v1"
 
     Output := tests with input as {
         "federation_configuration": [
@@ -92,7 +88,7 @@ test_AllowTeamsConsumerInbound_Correct_V2_multi if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -100,8 +96,7 @@ test_AllowTeamsConsumerInbound_Correct_V2_multi if {
 }
 
 test_AllowTeamsConsumer_Incorrect if {
-    ControlNumber := "Teams 2.5"
-    Requirement := "Unmanaged users SHALL NOT be enabled to initiate contact with internal users"
+    PolicyId := "MS.TEAMS.5.1v1"
 
     Output := tests with input as {
         "federation_configuration": [
@@ -113,7 +108,7 @@ test_AllowTeamsConsumer_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -121,8 +116,7 @@ test_AllowTeamsConsumer_Incorrect if {
 }
 
 test_AllowTeamsConsumer_Incorrect_multi if {
-    ControlNumber := "Teams 2.5"
-    Requirement := "Unmanaged users SHALL NOT be enabled to initiate contact with internal users"
+    PolicyId := "MS.TEAMS.5.1v1"
 
     Output := tests with input as {
         "federation_configuration": [
@@ -139,7 +133,7 @@ test_AllowTeamsConsumer_Incorrect_multi if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -147,8 +141,7 @@ test_AllowTeamsConsumer_Incorrect_multi if {
 }
 
 test_AllowTeamsConsumer_Incorrect if {
-    ControlNumber := "Teams 2.5"
-    Requirement := "Unmanaged users SHALL NOT be enabled to initiate contact with internal users"
+    PolicyId := "MS.TEAMS.5.1v1"
 
     Output := tests with input as {
         "federation_configuration": [
@@ -160,7 +153,7 @@ test_AllowTeamsConsumer_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -168,8 +161,7 @@ test_AllowTeamsConsumer_Incorrect if {
 }
 
 test_AllowTeamsConsumer_Incorrect_multi if {
-    ControlNumber := "Teams 2.5"
-    Requirement := "Unmanaged users SHALL NOT be enabled to initiate contact with internal users"
+    PolicyId := "MS.TEAMS.5.1v1"
 
     Output := tests with input as {
         "federation_configuration": [
@@ -186,7 +178,7 @@ test_AllowTeamsConsumer_Incorrect_multi if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -196,8 +188,7 @@ test_AllowTeamsConsumer_Incorrect_multi if {
 # Policy 2
 #--
 test_AllowTeamsConsumer_Correct if {
-    ControlNumber := "Teams 2.5"
-    Requirement := "Internal users SHOULD NOT be enabled to initiate contact with unmanaged users"
+    PolicyId := "MS.TEAMS.5.2v1"
 
     Output := tests with input as {
         "federation_configuration": [
@@ -209,7 +200,7 @@ test_AllowTeamsConsumer_Correct if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
     
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -217,8 +208,7 @@ test_AllowTeamsConsumer_Correct if {
 }
 
 test_AllowTeamsConsumer_Correct_multi if {
-    ControlNumber := "Teams 2.5"
-    Requirement := "Internal users SHOULD NOT be enabled to initiate contact with unmanaged users"
+    PolicyId := "MS.TEAMS.5.2v1"
 
     Output := tests with input as {
         "federation_configuration": [
@@ -235,7 +225,7 @@ test_AllowTeamsConsumer_Correct_multi if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
     
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -243,8 +233,7 @@ test_AllowTeamsConsumer_Correct_multi if {
 }
 
 test_AllowTeamsConsumer_Incorrect if {
-    ControlNumber := "Teams 2.5"
-    Requirement := "Internal users SHOULD NOT be enabled to initiate contact with unmanaged users"
+    PolicyId := "MS.TEAMS.5.2v1"
     
     Output := tests with input as {
         "federation_configuration": [
@@ -256,7 +245,7 @@ test_AllowTeamsConsumer_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -264,8 +253,7 @@ test_AllowTeamsConsumer_Incorrect if {
 }
 
 test_AllowTeamsConsumer_Incorrect_multi if {
-    ControlNumber := "Teams 2.5"
-    Requirement := "Internal users SHOULD NOT be enabled to initiate contact with unmanaged users"
+    PolicyId := "MS.TEAMS.5.2v1"
     
     Output := tests with input as {
         "federation_configuration": [
@@ -282,7 +270,7 @@ test_AllowTeamsConsumer_Incorrect_multi if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
