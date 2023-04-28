@@ -43,10 +43,7 @@ InModuleScope CreateReport {
         ){
             {$Baselines.$Product} | Should -Not -Throw
             $Groups = $Baselines.$Product
-            Write-Host "Baseline: $($Baselines | ConvertTo-Json -Depth 4)"
             $Groups.Length | Should -BeExactly $GroupCount
-
-            #Write-Host "Baseline: $($Baselines | ConvertTo-Json -Depth 4)"
 
             $NumberOfPolicies = 0
             foreach ($Group in $Groups){

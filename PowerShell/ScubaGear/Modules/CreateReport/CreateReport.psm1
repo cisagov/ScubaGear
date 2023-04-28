@@ -206,7 +206,7 @@ function Import-SecureBaseline{
     $Output = @{}
 
     foreach ($Product in $ProductNames) {
-        $Output[$Product] = ,@()
+        $Output[$Product] = @()
         $ProductPath = Join-Path -Path $BaselinePath -ChildPath "$Product.md"
         $MdLines = Get-Content -Path $ProductPath
 
