@@ -10,8 +10,8 @@ on:
         branches:
         - "main"
         - "*Baseline*"
-        #paths:
-        #- "baselines/*.md"
+        paths:
+        - "baselines/*.md"
 
 name: Markdown Check
   
