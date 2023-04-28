@@ -152,7 +152,7 @@ Anonymous users, including dial-in users, SHOULD NOT be admitted automatically.
 - _Rationale:_ TODO add rationale.
 - _Last modified:_ February 2023
 
-#### MS.TEAMS.3.2v1X
+#### MS.TEAMS.3.2v1
 Internal users SHOULD be admitted automatically.
 - _Rationale:_ TODO add rationale.
 - _Last modified:_ February 2023

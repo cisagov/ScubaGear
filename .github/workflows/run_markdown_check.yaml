@@ -11,7 +11,7 @@ on:
         - "main"
         - "*Baseline*"
         paths:
-        - "baslines/*.md"
+        - "baselines/*.md"
 
 name: Markdown Check
   
