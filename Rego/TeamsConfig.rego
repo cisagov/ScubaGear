@@ -1,3 +1,12 @@
+################
+# Teams Baseline 
+################
+
+#
+# Reference: Secure Baseline file, teams.md
+#--
+# This file implements controls/policies documented in the secure baseline.  The tests.PolicyId 
+# (e.g., MS.TEAMS.1.1v1) aligns this files to the secure baseline control.
 package teams
 import future.keywords
 
@@ -32,11 +41,11 @@ ReportDetailsString(Status, String) =  Detail if {
 
 
 ################
-# Baseline 2.1 #
+# Teams 1      #
 ################
 
 #
-# Baseline 2.1: Policy 1
+# MS.TEAMS.1.1v1
 #--
 # The english translation of the following is:
 # Iterate through all meeting policies. For each, check if AllowExternalParticipantGiveRequestControl
@@ -62,11 +71,11 @@ tests[{
 
 
 ################
-# Baseline 2.2 #
+# Teams 2      #
 ################
 
 #
-# Baseline 2.2: Policy 1
+# MS.TEAMS.2.1v1
 #--
 MeetingsAllowingAnonStart[Policy.Identity] {
 	Policy := input.meeting_policies[_]
@@ -89,11 +98,11 @@ tests[{
 
 
 ################
-# Baseline 2.3 #
+# Teams 3      #
 ################
 
 #
-# Baseline 2.3: Policy 1
+# MS.TEAMS.3.1v1
 #--
 ReportDetails2_3(Policy) = Description if {
 	Policy.AutoAdmittedUsers != "Everyone"
@@ -140,7 +149,7 @@ tests[{
 #--
 
 #
-# Baseline 2.3: Policy 2
+# MS.TEAMS.3.2v1
 #--
 tests[{
 	"PolicyId" : "MS.TEAMS.3.2v1",
@@ -157,7 +166,7 @@ tests[{
 }
 
 #
-# Baseline 2.3: Policy 2
+# MS.TEAMS.3.2v1
 #--
 tests[{
 	"PolicyId" : "MS.TEAMS.3.2v1",
@@ -173,11 +182,11 @@ tests[{
 
 
 ################
-# Baseline 2.4 #
+# Teams 4      #
 ################
 
 #
-# Baseline 2.4: Policy 1
+# MS.TEAMS.4.1v1
 #--
 ExternalAccessConfig[Policy.Identity] {
     	Policy := input.federation_configuration[_]
@@ -223,13 +232,12 @@ tests[{
 }
 #--
 
-
 ################
-# Baseline 2.5 #
+# Teams 5 #
 ################
 
 #
-# Baseline 2.5: Policy 1
+# MS.TEAMS.5.1v1
 #--
 # There are two relevant settings:
 #	- AllowTeamsConsumer: Is contact to or from unmanaged users allowed at all?
@@ -269,7 +277,7 @@ tests[{
 #--
 
 #
-# Baseline 2.5: Policy 2
+# MS.TEAMS.5.2v1
 #--
 InternalCannotenable[Policy.Identity] {
     Policy := input.federation_configuration[_]
@@ -292,11 +300,11 @@ tests[{
 
 
 ################
-# Baseline 2.6 #
+# Teams 6      #
 ################
 
 #
-# Baseline 2.6: Policy 1
+# MS.TEAMS.6.1v1
 #--
 SkpyeBlocConfig[Policy.Identity] {
     Policy := input.federation_configuration[_]
@@ -319,11 +327,11 @@ tests[{
 
 
 ################
-# Baseline 2.7 #
+# Teams 7      #
 ################
 
 #
-# Baseline 2.7: Policy 1
+# MS.TEAMS.7.1v1
 #--
 ConfigsAllowingEmail[Policy.Identity] {
     Policy := input.client_configuration[_]
@@ -379,11 +387,11 @@ tests[{
 
 
 ################
-# Baseline 2.8 #
+# Teams 8      #
 ################
 
 #
-# Baseline 2.8: Policy 1
+# MS.TEAMS.8.1v1
 #--
 PoliciesBlockingDefaultApps[Policy.Identity] {
 	Policy := input.app_policies[_]
@@ -405,7 +413,7 @@ tests[{
 #--
 
 #
-# Baseline 2.8: Policy 2
+# MS.TEAMS.8.2v1
 #--
 PoliciesAllowingGlobalApps[Policy.Identity] {
 	Policy := input.app_policies[_]
@@ -445,7 +453,7 @@ tests[{
 #--
 
 #
-# Baseline 2.8: Policy 3
+# MS.TEAMS.8.3v1
 #--
 # At this time we are unable to test for X because of Y
 tests[{
@@ -462,11 +470,11 @@ tests[{
 
 
 ################
-# Baseline 2.9 #
+# Teams 9      #
 ################
 
 #
-# Baseline 2.9: Policy 1
+# MS.TEAMS.9.1v1
 #--
 tests[{
 	"PolicyId" : "MS.TEAMS.9.1v1",
@@ -482,7 +490,7 @@ tests[{
 }
 
 #
-# Baseline 2.9: Policy 1
+# MS.TEAMS.9.1v1
 #--
 tests[{
 	"PolicyId" : "MS.TEAMS.9.1v1",
@@ -497,7 +505,7 @@ tests[{
 #--
 
 #
-# Baseline 2.9: Policy 2
+# MS.TEAMS.9.3v1
 #--
 PoliciesAllowingOutsideRegionStorage[Policy.Identity] {
 	Policy := input.meeting_policies[_]
@@ -519,13 +527,12 @@ tests[{
 }
 #--
 
-
 #################
-# Baseline 2.10 #
+# Teams 10      #
 #################
 
 #
-# Baseline 2.10: Policy 1
+# MS.TEAMS.10.1v1
 #--
 tests[{
 	"PolicyId" : "MS.TEAMS.10.1v1",
@@ -541,7 +548,7 @@ tests[{
 }
 
 #
-# Baseline 2.10: Policy 1
+# MS.TEAMS.10.1v1
 #--
 tests[{
 	"PolicyId" : "MS.TEAMS.10.1v1",
@@ -557,11 +564,11 @@ tests[{
 
 
 #################
-# Baseline 2.11 #
+# Teams 11      #
 #################
 
 #
-# Baseline 2.11: Policy 1
+# MS.TEAMS.11.1v1
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
@@ -577,7 +584,7 @@ tests[{
 #--
 
 #
-# Baseline 2.11: Policy 2
+# MS.TEAMS.11.2v1
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
@@ -593,7 +600,7 @@ tests[{
 #--
 
 #
-# Baseline 2.11: Policy 3
+# MS.TEAMS.11.4v1
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
@@ -610,11 +617,11 @@ tests[{
 
 
 #################
-# Baseline 2.12 #
+# Teams 12      #
 #################
 
 #
-# Baseline 2.12: Policy 1
+# MS.TEAMS.12.1v1
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
@@ -630,7 +637,7 @@ tests[{
 #--
 
 #
-# Baseline 2.12: Policy 2
+# MS.TEAMS.12.2v1
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
@@ -647,11 +654,11 @@ tests[{
 
 
 #################
-# Baseline 2.13 #
+# Teams 13      #
 #################
 
 #
-# Baseline 2.13: Policy 1
+# MS.TEAMS.13.1v1
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
@@ -667,7 +674,7 @@ tests[{
 #--
 
 #
-# Baseline 2.13: Policy 2
+# MS.TEAMS.13.2v1
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
@@ -683,7 +690,7 @@ tests[{
 #--
 
 #
-# Baseline 2.13: Policy 3
+# MS.TEAMS.13.3v1
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{

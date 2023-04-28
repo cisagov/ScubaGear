@@ -42,7 +42,8 @@ function New-Report {
         $DarkMode
     )
 
-    #$FileName = Join-Path -Path $PSScriptRoot -ChildPath "BaselineTitles.json"
+    $ScubaGitHubUrl = "https://github.com/cisagov/ScubaGear"
+
     $SecureBaselines =  Import-SecureBaseline
     $ProductSecureBaseline = $SecureBaselines.$BaselineName
 
@@ -125,19 +126,19 @@ function New-Report {
                 $Fragment += [pscustomobject]@{
                     "Control ID"=$Control.Id
                     "Requirement"=$Control.Value
-                    "Result"= "Bug"
+                    "Result"= "Bug - Test results missing"
                     "Criticality"= "-"
-                    "Details"= "Contact developer."
+                    "Details"= "Report bug on <a href=`"$ScubaGitHubUrl/issues`" target=`"_blank`">GitHub</a>"
                 }
             }
         }
 
         $Number = $BaselineName.ToUpper() + '-' + $BaselineGroup.GroupNumber
         $Name = $BaselineGroup.GroupName
-        #$MarkdownLink = "<a href=`"https://github.com/cisagov/ScubaGear/blob/$($SettingsExport.module_version)/baselines/$($BaselineName.ToLower()).md`">$Name</a>"
-        $MarkdownLink = "<a href=`"https://github.com/cisagov/ScubaGear/blob/AutoBaselineSync/baselines/$($BaselineName.ToLower()).md`">$Name</a>"
+        $GroupAnchor = New-MarkdownAnchor -GroupNumber $BaselineGroup.GroupNumber -GroupName $BaselineGroup.GroupName
+        #$MarkdownLink = "<a href=`"$($ScubaGitHubUrl)/blob/$($SettingsExport.module_version)/baselines/$($BaselineName.ToLower()).md#$GroupAnchor`">$Name</a>"
+        $MarkdownLink = "<a href=`"$ScubaGitHubUrl/blob/AutoBaselineSync/baselines/$($BaselineName.ToLower()).md$GroupAnchor`" target=`"_blank`">$Name</a>"
         $Fragments += $Fragment | ConvertTo-Html -PreContent "<h2>$Number $MarkdownLink</h2>" -Fragment
-
     }
 
     $Title = "$($FullName) Baseline Report"
@@ -205,7 +206,7 @@ function Import-SecureBaseline{
     $Output = @{}
 
     foreach ($Product in $ProductNames) {
-        $Output[$Product] = @()
+        $Output[$Product] = ,@()
         $ProductPath = Join-Path -Path $BaselinePath -ChildPath "$Product.md"
         $MdLines = Get-Content -Path $ProductPath
 
@@ -254,22 +255,19 @@ function Import-SecureBaseline{
     $Output
 }
 
-function Get-PolicyGroupNumber{
+function New-MarkdownAnchor{
     param (
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [string]
-        $PolicyId
+        $GroupNumber,
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $GroupName
     )
-
-    $Parts = $PolicyId.Split('.')
-
-    if ($Parts.Length -eq 4){
-        return $Parts[2]
-    }
-    else {
-        Write-Error "Failed to find group for $PolicyId"
-    }
+    $MangledName = $GroupName.ToLower().Trim().Replace(' ', '-')
+    "#$GroupNumber-$MangledName"
 }
 
 Export-ModuleMember -Function @(

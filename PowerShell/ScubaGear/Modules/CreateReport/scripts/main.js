@@ -12,7 +12,7 @@ const colorRows = () => {
                 rows[i].style.color = "var(--test-deleted-color)";
                 rows[i].style.background = "var(--test-other)";
             }
-            else if (rows[i].children[statusCol].innerHTML === "Bug"){
+            else if (rows[i].children[statusCol].innerHTML.startsWith("Bug")){
                 rows[i].style.color = "var(--test-bug-color)";
                 rows[i].style.background = "var(--test-other)";
             }
