@@ -1,4 +1,4 @@
-# 1. Introduction
+# Introduction
 
 Microsoft Exchange Online provides users easy access to their email and
 supports organizational meetings, contacts, and calendars.
