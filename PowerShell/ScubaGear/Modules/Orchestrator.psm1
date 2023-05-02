@@ -421,7 +421,6 @@ function Invoke-ProviderList {
         $OutProviderFileName,
 
         [Parameter(Mandatory = $true)]
-        [ValidateNotNullOrEmpty()]
         [hashtable]
         $BoundParameters
     )
