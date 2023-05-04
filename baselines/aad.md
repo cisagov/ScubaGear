@@ -80,7 +80,7 @@ strengthen the security of widely used cloud-based software services.
 
 # Baseline
 
-## 1 Legacy Authentication
+## 1. Legacy Authentication
 
 Block legacy authentication protocols using a conditional access policy.
 Legacy authentication does not support multifactor authentication (MFA),
@@ -114,7 +114,7 @@ Legacy authentication SHALL be blocked.
     to block legacy authentication. **Note:** The instructions suggest
     using Report-only mode which will not block legacy authentication.
 
-## 2 High Risk Users
+## 2. High Risk Users
 
 Azure AD Identity Protection uses various signals to detect the risk
 level for each user and determine if an account has likely been
@@ -172,7 +172,7 @@ A notification SHOULD be sent to the administrator when high-risk users are dete
     determined to be high risk so that they can review and respond to
     threats.
 
-## 3 High Risk Sign-ins
+## 3. High Risk Sign-ins
 
 Azure AD Identity Protection uses various signals to detect the risk
 level for each user sign-in. Sign-ins detected as high risk are to be
@@ -226,7 +226,7 @@ locations. Azure AD Identity Protection considers the Trusted Location
 data when it calculates sign-in risk, and this may help to prevent users
 signing in from legitimate locations from being flagged as high risk.
 
-## 4 Phishing-Resistant Multifactor Authentication
+## 4. Phishing-Resistant Multifactor Authentication
 
 Phishing-resistant multifactor authentication protects against
 sophisticated phishing attacks. Recognizing the significant risk these
@@ -433,7 +433,7 @@ Passwordless Sign-in) or Microsoft Authenticator (Push Notifications)**
 5.  Under **verification options**, make sure that **Text message to
     phone** and **Call to phone** are **disabled**.
 
-## 5 Azure AD logs
+## 5. Azure AD logs
 
 Configure Azure AD to send critical logs to the agency’s centralized
 SIEM and to CISA’s central analysis system so that they can be audited
@@ -504,7 +504,7 @@ to configure sending the logs to a storage account:
 
 4.  In the **Retention** field enter “365” days.
 
-## 6 Register Third-Party Applications
+## 6. Register Third-Party Applications
 
 Ensure that only administrators can register third-party applications
 that can access the tenant.
@@ -539,7 +539,7 @@ Only administrators SHALL be allowed to register third-party applications.
 
 5. Click **Save**.
 
-## 7 Consenting to Third-Party Applications
+## 7. Consenting to Third-Party Applications
 
 Ensure that only administrators can consent to third-party applications
 and only administrators can control which permissions are granted. An
@@ -609,7 +609,7 @@ Group owners SHALL NOT be allowed to consent to third-party applications.
 
 11. Click **Save**
 
-## 8 Passwords
+## 8. Passwords
 
 Ensure that user passwords do not expire. Both the National Institute of
 Standards and Technology (NIST) and Microsoft emphasize MFA because they
@@ -642,7 +642,7 @@ indicate that mandated password changes make user accounts less secure.
 link](https://docs.microsoft.com/en-us/microsoft-365/admin/manage/set-password-expiration-policy?view=o365-worldwide#set-password-expiration-policy)
 to configure the password expiration policy.
 
-## 9 Session Length
+## 9. Session Length
 
 To reduce the risk of credential theft during user sessions, configure
 the sign-in frequency to a limited period of time.
@@ -680,7 +680,7 @@ frequency,
 3.  Set the **Access Controls** -\> **Session** -\> **Sign-in
     frequency** to a value of “12 hours”.
 
-## 10 Browser Sessions
+## 10. Browser Sessions
 
 To reduce the risk of credential theft during user sessions, disallow
 persistent browser sessions.
@@ -714,7 +714,7 @@ browser sessions.
 3.  Set the **Access Controls -**\> **Session** -\> **Persistent browser
     session** to **Never persistent.**
 
-## 11 Global Administrators
+## 11. Global Administrators
 
 Global Administrator is the highest privileged role in Azure AD because
 it provides unfettered access to the tenant. Therefore, if a user’s
@@ -795,7 +795,7 @@ A minimum of two users and a maximum of four users SHALL be provisioned with the
     Administrator. Once the roles are reassigned according to the
     guidance, check the score again after 48 hours to ensure compliance.
 
-## 12 Highly Privileged User Accounts
+## 12. Highly Privileged User Accounts
 
 Assign users that need to perform highly privileged tasks to cloud-only
 Azure AD accounts to minimize the collateral damage of an on-premises
@@ -842,7 +842,7 @@ Review [these](https://docs.microsoft.com/en-us/azure/active-directory/roles/vie
 instructions to identify users assigned to highly privileged roles and
 verify the account does not exist outside Azure AD.
 
-## 13 Multifactor Authentication for Highly Privileged Roles
+## 13. Multifactor Authentication for Highly Privileged Roles
 
 Require users to perform MFA to access highly privileged roles. This
 configuration provides a backup policy to enforce MFA for highly
@@ -892,7 +892,7 @@ policy to privileged roles.
 3.  Under **Exclude**, follow Microsoft’s guidance from the previously
     provided instructions link.
 
-## 14 Permanent Permissions 
+## 14. Permanent Permissions 
 
 Do not assign users to highly privileged roles using permanent active
 role assignments. Instead, assign users to eligible role assignments in
@@ -991,7 +991,7 @@ system.
     non-compliant role assignments and then recreate them using the PIM
     service.
 
-## 15 Activation of Highly Privileged Roles
+## 15. Activation of Highly Privileged Roles
 
 Require approval for a user to activate a highly privileged role, such
 as Global Administrator. This makes it more challenging for an attacker
@@ -1062,7 +1062,7 @@ system.
     Approvers**, and then click **Select**.
   6.  Click **Update**.
 
-## 16 Highly Privileged Role Assignment and Activation
+## 16. Highly Privileged Role Assignment and Activation
 
 Since many cyber attacks leverage privileged access, it is imperative to
 closely monitor the assignment and activation of the highest privileged
@@ -1171,7 +1171,7 @@ system.
     of a mailbox that is different from the one used to monitor Global
     Administrator activations.
 
-## 17 Managed Devices
+## 17. Managed Devices
 
 Require that users connect to M365 from a device that is managed using
 conditional access. Agencies that are implementing a hybrid Azure AD
@@ -1282,7 +1282,7 @@ of the tenant):
 
 5.  Under **Users and Groups** -\> **Applies to**, select **All users.**
 
-## 18 Guest User Access
+## 18. Guest User Access
 
 Ensure that only users with specific privileges can invite guest users
 to the tenant and that invites can only be sent to specific external
