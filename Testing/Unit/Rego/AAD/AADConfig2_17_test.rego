@@ -6,8 +6,7 @@ import future.keywords
 # Policy 1
 #--
 test_ConditionalAccessPolicies_Correct if {
-    ControlNumber := "AAD 2.17"
-    Requirement := "Managed devices SHOULD be required for authentication"
+    PolicyId := "MS.AAD.17.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -29,7 +28,7 @@ test_ConditionalAccessPolicies_Correct if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -37,8 +36,7 @@ test_ConditionalAccessPolicies_Correct if {
 }
 
 test_BuiltInControls_Correct if {
-    ControlNumber := "AAD 2.17"
-    Requirement := "Managed devices SHOULD be required for authentication"
+    PolicyId := "MS.AAD.17.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -60,7 +58,7 @@ test_BuiltInControls_Correct if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -68,8 +66,7 @@ test_BuiltInControls_Correct if {
 }
 
 test_IncludeApplications_Incorrect if {
-    ControlNumber := "AAD 2.17"
-    Requirement := "Managed devices SHOULD be required for authentication"
+    PolicyId := "MS.AAD.17.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -91,7 +88,7 @@ test_IncludeApplications_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -99,8 +96,7 @@ test_IncludeApplications_Incorrect if {
 }
 
 test_IncludeUsers_Incorrect if {
-    ControlNumber := "AAD 2.17"
-    Requirement := "Managed devices SHOULD be required for authentication"
+    PolicyId := "MS.AAD.17.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -122,7 +118,7 @@ test_IncludeUsers_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -130,8 +126,7 @@ test_IncludeUsers_Incorrect if {
 }
 
 test_BuiltInControls_Incorrect if {
-    ControlNumber := "AAD 2.17"
-    Requirement := "Managed devices SHOULD be required for authentication"
+    PolicyId := "MS.AAD.17.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -153,7 +148,7 @@ test_BuiltInControls_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -161,8 +156,7 @@ test_BuiltInControls_Incorrect if {
 }
 
 test_State_Incorrect if {
-    ControlNumber := "AAD 2.17"
-    Requirement := "Managed devices SHOULD be required for authentication"
+    PolicyId := "MS.AAD.17.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -184,7 +178,7 @@ test_State_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet

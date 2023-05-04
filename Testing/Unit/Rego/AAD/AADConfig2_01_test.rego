@@ -6,8 +6,7 @@ import future.keywords
 # Policy 1
 #--tests for no exclusions
 test_NoExclusionsConditions_Correct if {
-    ControlNumber := "AAD 2.1"
-    Requirement := "Legacy authentication SHALL be blocked"
+    PolicyId := "MS.AAD.1.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -33,7 +32,7 @@ test_NoExclusionsConditions_Correct if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -41,8 +40,7 @@ test_NoExclusionsConditions_Correct if {
 }
 
 test_NoExclusionsIncludeApplications_Incorrect if {
-    ControlNumber := "AAD 2.1"
-    Requirement := "Legacy authentication SHALL be blocked"
+    PolicyId := "MS.AAD.1.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -67,7 +65,7 @@ test_NoExclusionsIncludeApplications_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -75,8 +73,7 @@ test_NoExclusionsIncludeApplications_Incorrect if {
 }
 
 test_NoExclusionsIncludeUsers_Incorrect if {
-    ControlNumber := "AAD 2.1"
-    Requirement := "Legacy authentication SHALL be blocked"
+    PolicyId := "MS.AAD.1.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -101,7 +98,7 @@ test_NoExclusionsIncludeUsers_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -109,8 +106,7 @@ test_NoExclusionsIncludeUsers_Incorrect if {
 }
 
 test_NoExclusionsExcludeUsers_Incorrect if {
-    ControlNumber := "AAD 2.1"
-    Requirement := "Legacy authentication SHALL be blocked"
+    PolicyId := "MS.AAD.1.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -136,7 +132,7 @@ test_NoExclusionsExcludeUsers_Incorrect if {
 
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -144,8 +140,7 @@ test_NoExclusionsExcludeUsers_Incorrect if {
 }
 
 test_NoExclusionsExcludeGroups_Incorrect if {
-    ControlNumber := "AAD 2.1"
-    Requirement := "Legacy authentication SHALL be blocked"
+    PolicyId := "MS.AAD.1.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -170,7 +165,7 @@ test_NoExclusionsExcludeGroups_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -178,8 +173,7 @@ test_NoExclusionsExcludeGroups_Incorrect if {
 }
 
 test_NoExclusionsClientAppTypes_Incorrect if {
-    ControlNumber := "AAD 2.1"
-    Requirement := "Legacy authentication SHALL be blocked"
+    PolicyId := "MS.AAD.1.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -204,7 +198,7 @@ test_NoExclusionsClientAppTypes_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -212,8 +206,7 @@ test_NoExclusionsClientAppTypes_Incorrect if {
 }
 
 test_NoExclusionsBuiltInControls_Incorrect if {
-    ControlNumber := "AAD 2.1"
-    Requirement := "Legacy authentication SHALL be blocked"
+    PolicyId := "MS.AAD.1.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -238,7 +231,7 @@ test_NoExclusionsBuiltInControls_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -246,8 +239,7 @@ test_NoExclusionsBuiltInControls_Incorrect if {
 }
 
 test_NoExclusionsState_Incorrect if {
-    ControlNumber := "AAD 2.1"
-    Requirement := "Legacy authentication SHALL be blocked"
+    PolicyId := "MS.AAD.1.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -272,7 +264,7 @@ test_NoExclusionsState_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -281,8 +273,7 @@ test_NoExclusionsState_Incorrect if {
 
 #--tests for user exclusions and no group exclusions
 test_NoExclusionsExemptUsers_Correct if {
-    ControlNumber := "AAD 2.1"
-    Requirement := "Legacy authentication SHALL be blocked"
+    PolicyId := "MS.AAD.1.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -320,7 +311,7 @@ test_NoExclusionsExemptUsers_Correct if {
         }
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -328,8 +319,7 @@ test_NoExclusionsExemptUsers_Correct if {
 }
 
 test_UserExclusionsConditions_Correct if {
-    ControlNumber := "AAD 2.1"
-    Requirement := "Legacy authentication SHALL be blocked"
+    PolicyId := "MS.AAD.1.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -366,7 +356,7 @@ test_UserExclusionsConditions_Correct if {
         }
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -374,8 +364,7 @@ test_UserExclusionsConditions_Correct if {
 }
 
 test_MultiUserExclusionsConditions_Correct if {
-    ControlNumber := "AAD 2.1"
-    Requirement := "Legacy authentication SHALL be blocked"
+    PolicyId := "MS.AAD.1.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -413,7 +402,7 @@ test_MultiUserExclusionsConditions_Correct if {
         }
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -421,8 +410,7 @@ test_MultiUserExclusionsConditions_Correct if {
 }
 
 test_UserExclusionNoExempt_Incorrect if {
-    ControlNumber := "AAD 2.1"
-    Requirement := "Legacy authentication SHALL be blocked"
+    PolicyId := "MS.AAD.1.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -446,7 +434,7 @@ test_UserExclusionNoExempt_Incorrect if {
             }
         ]
     }
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -454,8 +442,7 @@ test_UserExclusionNoExempt_Incorrect if {
 }
 
 test_UserExclusionsSingleExempt_Incorrect if {
-    ControlNumber := "AAD 2.1"
-    Requirement := "Legacy authentication SHALL be blocked"
+    PolicyId := "MS.AAD.1.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -491,7 +478,7 @@ test_UserExclusionsSingleExempt_Incorrect if {
             }
         }
     }
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -499,8 +486,7 @@ test_UserExclusionsSingleExempt_Incorrect if {
 }
 
 test_UserExclusionsNoExempt_Incorrect if {
-    ControlNumber := "AAD 2.1"
-    Requirement := "Legacy authentication SHALL be blocked"
+    PolicyId := "MS.AAD.1.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -535,7 +521,7 @@ test_UserExclusionsNoExempt_Incorrect if {
             }
         }
     }
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -543,8 +529,7 @@ test_UserExclusionsNoExempt_Incorrect if {
 }
 
 test_UserExclusionsIncludeApplications_Incorrect if {
-    ControlNumber := "AAD 2.1"
-    Requirement := "Legacy authentication SHALL be blocked"
+    PolicyId := "MS.AAD.1.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -580,7 +565,7 @@ test_UserExclusionsIncludeApplications_Incorrect if {
 
         }
     }
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -588,8 +573,7 @@ test_UserExclusionsIncludeApplications_Incorrect if {
 }
 
 test_UserExclusionsIncludeUsers_Incorrect if {
-    ControlNumber := "AAD 2.1"
-    Requirement := "Legacy authentication SHALL be blocked"
+    PolicyId := "MS.AAD.1.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -625,7 +609,7 @@ test_UserExclusionsIncludeUsers_Incorrect if {
 
         }
     }
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -633,8 +617,7 @@ test_UserExclusionsIncludeUsers_Incorrect if {
 }
 
 test_UserExclusionsExcludeGroups_Incorrect if {
-    ControlNumber := "AAD 2.1"
-    Requirement := "Legacy authentication SHALL be blocked"
+    PolicyId := "MS.AAD.1.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -669,7 +652,7 @@ test_UserExclusionsExcludeGroups_Incorrect if {
         }
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -677,8 +660,7 @@ test_UserExclusionsExcludeGroups_Incorrect if {
 }
 
 test_UserExclusionsClientAppTypes_Incorrect if {
-    ControlNumber := "AAD 2.1"
-    Requirement := "Legacy authentication SHALL be blocked"
+    PolicyId := "MS.AAD.1.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -715,7 +697,7 @@ test_UserExclusionsClientAppTypes_Incorrect if {
         }
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -723,8 +705,7 @@ test_UserExclusionsClientAppTypes_Incorrect if {
 }
 
 test_UserExclusionsBuiltInControls_Incorrect if {
-    ControlNumber := "AAD 2.1"
-    Requirement := "Legacy authentication SHALL be blocked"
+    PolicyId := "MS.AAD.1.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -761,7 +742,7 @@ test_UserExclusionsBuiltInControls_Incorrect if {
         }
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -769,8 +750,7 @@ test_UserExclusionsBuiltInControls_Incorrect if {
 }
 
 test_UserExclusionsState_Incorrect if {
-    ControlNumber := "AAD 2.1"
-    Requirement := "Legacy authentication SHALL be blocked"
+    PolicyId := "MS.AAD.1.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -808,7 +788,7 @@ test_UserExclusionsState_Incorrect if {
     }
 
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -817,8 +797,7 @@ test_UserExclusionsState_Incorrect if {
 
 #--tests for group exclusions and no user exclusions
 test_NoExclusionsExemptGroups_Correct if {
-    ControlNumber := "AAD 2.1"
-    Requirement := "Legacy authentication SHALL be blocked"
+    PolicyId := "MS.AAD.1.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -856,7 +835,7 @@ test_NoExclusionsExemptGroups_Correct if {
         }
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -864,8 +843,7 @@ test_NoExclusionsExemptGroups_Correct if {
 }
 
 test_GroupExclusionNoExempt_Incorrect if {
-    ControlNumber := "AAD 2.1"
-    Requirement := "Legacy authentication SHALL be blocked"
+    PolicyId := "MS.AAD.1.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -903,7 +881,7 @@ test_GroupExclusionNoExempt_Incorrect if {
         }
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -911,8 +889,7 @@ test_GroupExclusionNoExempt_Incorrect if {
 }
 
 test_GroupExclusionsNoExempt_Incorrect if {
-    ControlNumber := "AAD 2.1"
-    Requirement := "Legacy authentication SHALL be blocked"
+    PolicyId := "MS.AAD.1.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -949,7 +926,7 @@ test_GroupExclusionsNoExempt_Incorrect if {
         }
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -957,8 +934,7 @@ test_GroupExclusionsNoExempt_Incorrect if {
 }
 
 test_GroupExclusionsSingleExempt_Incorrect if {
-    ControlNumber := "AAD 2.1"
-    Requirement := "Legacy authentication SHALL be blocked"
+    PolicyId := "MS.AAD.1.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -995,7 +971,7 @@ test_GroupExclusionsSingleExempt_Incorrect if {
         }
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -1003,8 +979,7 @@ test_GroupExclusionsSingleExempt_Incorrect if {
 }
 
 test_GroupExclusionConditions_Correct if {
-    ControlNumber := "AAD 2.1"
-    Requirement := "Legacy authentication SHALL be blocked"
+    PolicyId := "MS.AAD.1.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -1042,7 +1017,7 @@ test_GroupExclusionConditions_Correct if {
         }
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -1050,8 +1025,7 @@ test_GroupExclusionConditions_Correct if {
 }
 
 test_MultiGroupExclusionsConditions_Correct if {
-    ControlNumber := "AAD 2.1"
-    Requirement := "Legacy authentication SHALL be blocked"
+    PolicyId := "MS.AAD.1.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -1089,7 +1063,7 @@ test_MultiGroupExclusionsConditions_Correct if {
         }
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -1098,8 +1072,7 @@ test_MultiGroupExclusionsConditions_Correct if {
 
 #--tests when both group and user exclusions present
 test_UserGroupExclusionConditions_Correct if {
-    ControlNumber := "AAD 2.1"
-    Requirement := "Legacy authentication SHALL be blocked"
+    PolicyId := "MS.AAD.1.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -1137,7 +1110,7 @@ test_UserGroupExclusionConditions_Correct if {
         }
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -1145,8 +1118,7 @@ test_UserGroupExclusionConditions_Correct if {
 }
 
 test_UserGroupExclusionNoExempt_Incorrect if {
-    ControlNumber := "AAD 2.1"
-    Requirement := "Legacy authentication SHALL be blocked"
+    PolicyId := "MS.AAD.1.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -1172,7 +1144,7 @@ test_UserGroupExclusionNoExempt_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -1180,8 +1152,7 @@ test_UserGroupExclusionNoExempt_Incorrect if {
 }
 
 test_UserGroupExclusionUserExemptOnly_Incorrect if {
-    ControlNumber := "AAD 2.1"
-    Requirement := "Legacy authentication SHALL be blocked"
+    PolicyId := "MS.AAD.1.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -1219,7 +1190,7 @@ test_UserGroupExclusionUserExemptOnly_Incorrect if {
         }
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -1227,8 +1198,7 @@ test_UserGroupExclusionUserExemptOnly_Incorrect if {
 }
 
 test_UserGroupExclusionGroupExemptOnly_Incorrect if {
-    ControlNumber := "AAD 2.1"
-    Requirement := "Legacy authentication SHALL be blocked"
+    PolicyId := "MS.AAD.1.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -1266,7 +1236,7 @@ test_UserGroupExclusionGroupExemptOnly_Incorrect if {
         }
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -1274,8 +1244,7 @@ test_UserGroupExclusionGroupExemptOnly_Incorrect if {
 }
 
 test_UserGroupExclusionTooFewUserExempts_Incorrect if {
-    ControlNumber := "AAD 2.1"
-    Requirement := "Legacy authentication SHALL be blocked"
+    PolicyId := "MS.AAD.1.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -1313,7 +1282,7 @@ test_UserGroupExclusionTooFewUserExempts_Incorrect if {
         }
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet

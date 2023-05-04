@@ -6,8 +6,7 @@ import future.keywords
 # Policy 1
 #--
 test_AllowedToCreateApps_Correct if {
-    ControlNumber := "AAD 2.6"
-    Requirement := "Only administrators SHALL be allowed to register third-party applications"
+    PolicyId := "MS.AAD.6.1v1"
 
     Output := tests with input as {
         "authorization_policies": [
@@ -22,7 +21,7 @@ test_AllowedToCreateApps_Correct if {
 
     # filter for just the output produced by the specific rule by 
     # checking 1) the control number and 2) the requirement string
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
     
     # Each rule should produce exactly 1 line of output in the report
     count(RuleOutput) == 1
@@ -31,8 +30,7 @@ test_AllowedToCreateApps_Correct if {
 }
 
 test_AllowedToCreateApps_Incorrect_V1 if {
-    ControlNumber := "AAD 2.6"
-    Requirement := "Only administrators SHALL be allowed to register third-party applications"
+    PolicyId := "MS.AAD.6.1v1"
 
     Output := tests with input as {
         "authorization_policies": [
@@ -45,7 +43,7 @@ test_AllowedToCreateApps_Incorrect_V1 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -53,8 +51,7 @@ test_AllowedToCreateApps_Incorrect_V1 if {
 }
 
 test_AllowedToCreateApps_Incorrect_V2 if {
-    ControlNumber := "AAD 2.6"
-    Requirement := "Only administrators SHALL be allowed to register third-party applications"
+    PolicyId := "MS.AAD.6.1v1"
 
     Output := tests with input as {
         "authorization_policies": [
@@ -73,7 +70,7 @@ test_AllowedToCreateApps_Incorrect_V2 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet

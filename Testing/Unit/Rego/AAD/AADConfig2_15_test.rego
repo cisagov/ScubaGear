@@ -6,8 +6,7 @@ import future.keywords
 # Policy 1
 #--
 test_AdditionalProperties_Correct if {
-    ControlNumber := "AAD 2.15"
-    Requirement := "Activation of highly privileged roles SHOULD require approval"
+    PolicyId := "MS.AAD.15.1v1"
 
     Output := tests with input as {
         "privileged_roles": [
@@ -35,7 +34,7 @@ test_AdditionalProperties_Correct if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -43,8 +42,7 @@ test_AdditionalProperties_Correct if {
 }
 
 test_AdditionalProperties_Incorrect if {
-    ControlNumber := "AAD 2.15"
-    Requirement := "Activation of highly privileged roles SHOULD require approval"
+    PolicyId := "MS.AAD.15.1v1"
 
     Output := tests with input as {
         "privileged_roles": [
@@ -72,7 +70,7 @@ test_AdditionalProperties_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet

@@ -6,12 +6,11 @@ import future.keywords
 # Policy 1
 #--
 test_NotImplemented_Correct if {
-    ControlNumber := "AAD 2.8"
-    Requirement := "User passwords SHALL NOT expire"
+    PolicyId := "MS.AAD.8.1v1"
 
     Output := tests with input as { }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet

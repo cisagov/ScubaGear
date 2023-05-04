@@ -6,9 +6,8 @@ import future.keywords
 # Policy 1
 #--
 test_AdditionalProperties_Correct if {
-    ControlNumber := "AAD 2.14"
-    Requirement := "Permanent active role assignments SHALL NOT be allowed for highly privileged roles. Active assignments SHALL have an expiration period."
-
+    PolicyId := "MS.AAD.14.1v1"
+    
     Output := tests with input as {
         "privileged_roles": [
             {
@@ -34,7 +33,7 @@ test_AdditionalProperties_Correct if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -42,8 +41,7 @@ test_AdditionalProperties_Correct if {
 }
 
 test_AdditionalProperties_Incorrect_V1 if {
-    ControlNumber := "AAD 2.14"
-    Requirement := "Permanent active role assignments SHALL NOT be allowed for highly privileged roles. Active assignments SHALL have an expiration period."
+    PolicyId := "MS.AAD.14.1v1"
 
     Output := tests with input as {
         "privileged_roles": [
@@ -70,7 +68,7 @@ test_AdditionalProperties_Incorrect_V1 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -78,8 +76,7 @@ test_AdditionalProperties_Incorrect_V1 if {
 }
 
 test_AdditionalProperties_Incorrect_V2 if {
-    ControlNumber := "AAD 2.14"
-    Requirement := "Permanent active role assignments SHALL NOT be allowed for highly privileged roles. Active assignments SHALL have an expiration period."
+    PolicyId := "MS.AAD.14.1v1"
 
     Output := tests with input as {
         "privileged_roles": [
@@ -106,7 +103,7 @@ test_AdditionalProperties_Incorrect_V2 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -117,8 +114,7 @@ test_AdditionalProperties_Incorrect_V2 if {
 # Policy 2
 #--
 test_Assignments_Correct if {
-    ControlNumber := "AAD 2.14"
-    Requirement := "Provisioning of users to highly privileged roles SHALL NOT occur outside of a PAM system, such as the Azure AD PIM service, because this bypasses the controls the PAM system provides"
+    PolicyId := "MS.AAD.14.2v1"
 
     Output := tests with input as {
         "privileged_roles": [
@@ -150,7 +146,7 @@ test_Assignments_Correct if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -158,8 +154,7 @@ test_Assignments_Correct if {
 }
 
 test_Assignments_Incorrect if {
-    ControlNumber := "AAD 2.14"
-    Requirement := "Provisioning of users to highly privileged roles SHALL NOT occur outside of a PAM system, such as the Azure AD PIM service, because this bypasses the controls the PAM system provides"
+    PolicyId := "MS.AAD.14.2v1"
 
     Output := tests with input as {
         "privileged_roles": [
@@ -191,7 +186,7 @@ test_Assignments_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet

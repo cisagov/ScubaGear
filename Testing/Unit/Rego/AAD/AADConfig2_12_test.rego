@@ -6,9 +6,8 @@ import future.keywords
 # Policy 1
 #--
 test_OnPremisesImmutableId_Correct if {
-    ControlNumber := "AAD 2.12"
-    Requirement := "Users that need to be assigned to highly privileged Azure AD roles SHALL be provisioned cloud-only accounts that are separate from the on-premises directory or other federated identity providers"
-
+    PolicyId := "MS.AAD.12.1v1"
+    
     Output := tests with input as {
         "privileged_users": {
             "User1": { 
@@ -23,7 +22,7 @@ test_OnPremisesImmutableId_Correct if {
             }
         }
     }
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -31,8 +30,7 @@ test_OnPremisesImmutableId_Correct if {
 }
 
 test_OnPremisesImmutableId_Incorrect_V1 if {
-    ControlNumber := "AAD 2.12"
-    Requirement := "Users that need to be assigned to highly privileged Azure AD roles SHALL be provisioned cloud-only accounts that are separate from the on-premises directory or other federated identity providers"
+    PolicyId := "MS.AAD.12.1v1"
 
     Output := tests with input as {
         "privileged_users": {
@@ -44,7 +42,7 @@ test_OnPremisesImmutableId_Incorrect_V1 if {
         }
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -52,9 +50,8 @@ test_OnPremisesImmutableId_Incorrect_V1 if {
 }
 
 test_OnPremisesImmutableId_Incorrect_V2 if {
-    ControlNumber := "AAD 2.12"
-    Requirement := "Users that need to be assigned to highly privileged Azure AD roles SHALL be provisioned cloud-only accounts that are separate from the on-premises directory or other federated identity providers"
-
+    PolicyId := "MS.AAD.12.1v1"
+    
     Output := tests with input as {
         "privileged_users": {
             "User1": { 
@@ -70,7 +67,7 @@ test_OnPremisesImmutableId_Incorrect_V2 if {
         }
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet

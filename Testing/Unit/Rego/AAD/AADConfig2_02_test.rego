@@ -7,8 +7,7 @@ import future.keywords
 #--
 
 test_NoExclusionsConditions_Correct if {
-    ControlNumber := "AAD 2.2"
-    Requirement := "Users detected as high risk SHALL be blocked"
+    PolicyId := "MS.AAD.2.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -43,7 +42,7 @@ test_NoExclusionsConditions_Correct if {
         }
         ]
     }
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -51,8 +50,7 @@ test_NoExclusionsConditions_Correct if {
 }
 
 test_NoExclusionsExemptUsers_Correct if {
-    ControlNumber := "AAD 2.2"
-    Requirement := "Users detected as high risk SHALL be blocked"
+    PolicyId := "MS.AAD.2.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -99,7 +97,7 @@ test_NoExclusionsExemptUsers_Correct if {
 
         }
     }
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -107,8 +105,7 @@ test_NoExclusionsExemptUsers_Correct if {
 }
 
 test_NoExclusionsExemptGroups_Correct if {
-    ControlNumber := "AAD 2.2"
-    Requirement := "Users detected as high risk SHALL be blocked"
+    PolicyId := "MS.AAD.2.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -155,7 +152,7 @@ test_NoExclusionsExemptGroups_Correct if {
 
         }
     }
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -164,8 +161,7 @@ test_NoExclusionsExemptGroups_Correct if {
 
 # User exclusions test
 test_UserExclusionNoExempt_Incorrect if {
-    ControlNumber := "AAD 2.2"
-    Requirement := "Users detected as high risk SHALL be blocked"
+    PolicyId := "MS.AAD.2.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -200,7 +196,7 @@ test_UserExclusionNoExempt_Incorrect if {
         }
         ]
     }
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -208,8 +204,7 @@ test_UserExclusionNoExempt_Incorrect if {
 }
 
 test_UserExclusionConditions_Correct if {
-    ControlNumber := "AAD 2.2"
-    Requirement := "Users detected as high risk SHALL be blocked"
+    PolicyId := "MS.AAD.2.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -256,7 +251,7 @@ test_UserExclusionConditions_Correct if {
 
         }
     }
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -264,8 +259,7 @@ test_UserExclusionConditions_Correct if {
 }
 
 test_UserExclusionsNoExempt_Incorrect if {
-    ControlNumber := "AAD 2.2"
-    Requirement := "Users detected as high risk SHALL be blocked"
+    PolicyId := "MS.AAD.2.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -300,7 +294,7 @@ test_UserExclusionsNoExempt_Incorrect if {
         }
         ]
     }
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -308,8 +302,7 @@ test_UserExclusionsNoExempt_Incorrect if {
 }
 
 test_UserExclusionsSingleExempt_Incorrect if {
-    ControlNumber := "AAD 2.2"
-    Requirement := "Users detected as high risk SHALL be blocked"
+    PolicyId := "MS.AAD.2.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -356,7 +349,7 @@ test_UserExclusionsSingleExempt_Incorrect if {
 
         }
     }
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -364,8 +357,7 @@ test_UserExclusionsSingleExempt_Incorrect if {
 }
 
 test_MultiUserExclusionsConditions_Correct if {
-    ControlNumber := "AAD 2.2"
-    Requirement := "Users detected as high risk SHALL be blocked"
+    PolicyId := "MS.AAD.2.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -412,7 +404,7 @@ test_MultiUserExclusionsConditions_Correct if {
 
         }
     }
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -421,8 +413,7 @@ test_MultiUserExclusionsConditions_Correct if {
 
 # Group Exclusion tests
 test_GroupExclusionNoExempt_Incorrect if {
-    ControlNumber := "AAD 2.2"
-    Requirement := "Users detected as high risk SHALL be blocked"
+    PolicyId := "MS.AAD.2.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -457,7 +448,7 @@ test_GroupExclusionNoExempt_Incorrect if {
         }
         ]
     }
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -465,8 +456,7 @@ test_GroupExclusionNoExempt_Incorrect if {
 }
 
 test_GroupExclusionsConditions_Correct if {
-    ControlNumber := "AAD 2.2"
-    Requirement := "Users detected as high risk SHALL be blocked"
+    PolicyId := "MS.AAD.2.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -512,7 +502,7 @@ test_GroupExclusionsConditions_Correct if {
             }
         }
     }
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -520,8 +510,7 @@ test_GroupExclusionsConditions_Correct if {
 }
 
 test_GroupExclusionsNoExempt_Incorrect if {
-    ControlNumber := "AAD 2.2"
-    Requirement := "Users detected as high risk SHALL be blocked"
+    PolicyId := "MS.AAD.2.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -556,7 +545,7 @@ test_GroupExclusionsNoExempt_Incorrect if {
         }
         ]
     }
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -564,8 +553,7 @@ test_GroupExclusionsNoExempt_Incorrect if {
 }
 
 test_GroupExclusionsSingleExempt_Incorrect if {
-    ControlNumber := "AAD 2.2"
-    Requirement := "Users detected as high risk SHALL be blocked"
+    PolicyId := "MS.AAD.2.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -611,7 +599,7 @@ test_GroupExclusionsSingleExempt_Incorrect if {
             }
         }
     }
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -619,8 +607,7 @@ test_GroupExclusionsSingleExempt_Incorrect if {
 }
 
 test_MultiGroupExclusionsConditions_Correct if {
-    ControlNumber := "AAD 2.2"
-    Requirement := "Users detected as high risk SHALL be blocked"
+    PolicyId := "MS.AAD.2.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -666,7 +653,7 @@ test_MultiGroupExclusionsConditions_Correct if {
             }
         }
     }
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -675,8 +662,7 @@ test_MultiGroupExclusionsConditions_Correct if {
 
 # User and group exclusions tests
 test_UserGroupExclusionConditions_Correct if {
-    ControlNumber := "AAD 2.2"
-    Requirement := "Users detected as high risk SHALL be blocked"
+    PolicyId := "MS.AAD.2.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -721,7 +707,7 @@ test_UserGroupExclusionConditions_Correct if {
             }
         }
     }
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -729,8 +715,7 @@ test_UserGroupExclusionConditions_Correct if {
 }
 
 test_UserGroupExclusionNoExempt_Incorrect if {
-    ControlNumber := "AAD 2.2"
-    Requirement := "Users detected as high risk SHALL be blocked"
+    PolicyId := "MS.AAD.2.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -765,7 +750,7 @@ test_UserGroupExclusionNoExempt_Incorrect if {
         }
         ]
     }
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -773,8 +758,7 @@ test_UserGroupExclusionNoExempt_Incorrect if {
 }
 
 test_UserGroupExclusionUserExemptOnly_Incorrect if {
-    ControlNumber := "AAD 2.2"
-    Requirement := "Users detected as high risk SHALL be blocked"
+    PolicyId := "MS.AAD.2.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -819,7 +803,7 @@ test_UserGroupExclusionUserExemptOnly_Incorrect if {
             }
         }
     }
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -827,8 +811,7 @@ test_UserGroupExclusionUserExemptOnly_Incorrect if {
 }
 
 test_UserGroupExclusionGroupExemptOnly_Incorrect if {
-    ControlNumber := "AAD 2.2"
-    Requirement := "Users detected as high risk SHALL be blocked"
+    PolicyId := "MS.AAD.2.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -873,7 +856,7 @@ test_UserGroupExclusionGroupExemptOnly_Incorrect if {
             }
         }
     }
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -881,8 +864,7 @@ test_UserGroupExclusionGroupExemptOnly_Incorrect if {
 }
 
 test_UserGroupExclusionTooFewUserExempts_Incorrect if {
-    ControlNumber := "AAD 2.2"
-    Requirement := "Users detected as high risk SHALL be blocked"
+    PolicyId := "MS.AAD.2.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -927,7 +909,7 @@ test_UserGroupExclusionTooFewUserExempts_Incorrect if {
             }
         }
     }
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -936,8 +918,7 @@ test_UserGroupExclusionTooFewUserExempts_Incorrect if {
 
 # Other Conditions tests
 test_IncludeApplications_Incorrect if {
-    ControlNumber := "AAD 2.2"
-    Requirement := "Users detected as high risk SHALL be blocked"
+    PolicyId := "MS.AAD.2.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -973,7 +954,7 @@ test_IncludeApplications_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -981,8 +962,7 @@ test_IncludeApplications_Incorrect if {
 }
 
 test_IncludeUsers_Incorrect if {
-    ControlNumber := "AAD 2.2"
-    Requirement := "Users detected as high risk SHALL be blocked"
+    PolicyId := "MS.AAD.2.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -1018,7 +998,7 @@ test_IncludeUsers_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -1026,8 +1006,7 @@ test_IncludeUsers_Incorrect if {
 }
 
 test_ExcludeUsers_Incorrect if {
-    ControlNumber := "AAD 2.2"
-    Requirement := "Users detected as high risk SHALL be blocked"
+    PolicyId := "MS.AAD.2.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -1063,7 +1042,7 @@ test_ExcludeUsers_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -1071,8 +1050,7 @@ test_ExcludeUsers_Incorrect if {
 }
 
 test_ExcludeGroups_Incorrect if {
-    ControlNumber := "AAD 2.2"
-    Requirement := "Users detected as high risk SHALL be blocked"
+    PolicyId := "MS.AAD.2.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -1108,7 +1086,7 @@ test_ExcludeGroups_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -1116,8 +1094,7 @@ test_ExcludeGroups_Incorrect if {
 }
 
 test_ExcludeRoles_Incorrect if {
-    ControlNumber := "AAD 2.2"
-    Requirement := "Users detected as high risk SHALL be blocked"
+    PolicyId := "MS.AAD.2.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -1153,7 +1130,7 @@ test_ExcludeRoles_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -1161,8 +1138,7 @@ test_ExcludeRoles_Incorrect if {
 }
 
 test_BuiltInControls_Incorrect if {
-    ControlNumber := "AAD 2.2"
-    Requirement := "Users detected as high risk SHALL be blocked"
+    PolicyId := "MS.AAD.2.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -1198,7 +1174,7 @@ test_BuiltInControls_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -1206,8 +1182,7 @@ test_BuiltInControls_Incorrect if {
 }
 
 test_State_Incorrect if {
-    ControlNumber := "AAD 2.2"
-    Requirement := "Users detected as high risk SHALL be blocked"
+    PolicyId := "MS.AAD.2.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -1243,7 +1218,7 @@ test_State_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -1251,8 +1226,7 @@ test_State_Incorrect if {
 }
 
 test_UserRiskLevels_Incorrect if {
-    ControlNumber := "AAD 2.2"
-    Requirement := "Users detected as high risk SHALL be blocked"
+    PolicyId := "MS.AAD.2.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -1288,7 +1262,7 @@ test_UserRiskLevels_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -1296,8 +1270,7 @@ test_UserRiskLevels_Incorrect if {
 }
 
 test_ServicePlans_Incorrect if {
-    ControlNumber := "AAD 2.2"
-    Requirement := "Users detected as high risk SHALL be blocked"
+    PolicyId := "MS.AAD.2.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -1329,7 +1302,7 @@ test_ServicePlans_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -1340,12 +1313,11 @@ test_ServicePlans_Incorrect if {
 # Policy 2
 #--
 test_NotImplemented_Correct if {
-    ControlNumber := "AAD 2.2"
-    Requirement := "A notification SHOULD be sent to the administrator when high-risk users are detected"
+    PolicyId := "MS.AAD.2.2v1"
 
     Output := tests with input as { }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet

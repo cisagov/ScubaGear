@@ -6,8 +6,7 @@ import future.keywords
 # Policy 1
 #--
 test_ConditionalAccessPolicies_Correct if {
-    ControlNumber := "AAD 2.13"
-    Requirement := "MFA SHALL be required for user access to highly privileged roles"
+    PolicyId := "MS.AAD.13.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -40,7 +39,7 @@ test_ConditionalAccessPolicies_Correct if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -48,8 +47,7 @@ test_ConditionalAccessPolicies_Correct if {
 }
 
 test_IncludeApplications_Incorrect if {
-    ControlNumber := "AAD 2.13"
-    Requirement := "MFA SHALL be required for user access to highly privileged roles"
+    PolicyId := "MS.AAD.13.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -82,7 +80,7 @@ test_IncludeApplications_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -90,8 +88,7 @@ test_IncludeApplications_Incorrect if {
 }
 
 test_BuiltInControls_Incorrect if {
-    ControlNumber := "AAD 2.13"
-    Requirement := "MFA SHALL be required for user access to highly privileged roles"
+    PolicyId := "MS.AAD.13.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -124,7 +121,7 @@ test_BuiltInControls_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -132,8 +129,7 @@ test_BuiltInControls_Incorrect if {
 }
 
 test_State_Incorrect if {
-    ControlNumber := "AAD 2.13"
-    Requirement := "MFA SHALL be required for user access to highly privileged roles"
+    PolicyId := "MS.AAD.13.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -166,7 +162,7 @@ test_State_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -174,8 +170,7 @@ test_State_Incorrect if {
 }
 
 test_IncludeRoles_Incorrect_V1 if {
-    ControlNumber := "AAD 2.13"
-    Requirement := "MFA SHALL be required for user access to highly privileged roles"
+    PolicyId := "MS.AAD.13.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -208,7 +203,7 @@ test_IncludeRoles_Incorrect_V1 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -216,8 +211,7 @@ test_IncludeRoles_Incorrect_V1 if {
 }
 
 test_IncludeRoles_Incorrect_V2 if {
-    ControlNumber := "AAD 2.13"
-    Requirement := "MFA SHALL be required for user access to highly privileged roles"
+    PolicyId := "MS.AAD.13.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -246,7 +240,7 @@ test_IncludeRoles_Incorrect_V2 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -254,8 +248,7 @@ test_IncludeRoles_Incorrect_V2 if {
 }
 
 test_ExcludeRoles_Incorrect if {
-    ControlNumber := "AAD 2.13"
-    Requirement := "MFA SHALL be required for user access to highly privileged roles"
+    PolicyId := "MS.AAD.13.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -284,7 +277,7 @@ test_ExcludeRoles_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet

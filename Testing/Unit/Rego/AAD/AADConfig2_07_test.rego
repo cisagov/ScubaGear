@@ -6,8 +6,7 @@ import future.keywords
 # Policy 1
 #--
 test_PermissionGrantPolicyIdsAssignedToDefaultUserRole_Correct if {
-    ControlNumber := "AAD 2.7"
-    Requirement := "Only administrators SHALL be allowed to consent to third-party applications"
+    PolicyId := "MS.AAD.7.1v1"
 
     Output := tests with input as {
         "authorization_policies": [
@@ -18,7 +17,7 @@ test_PermissionGrantPolicyIdsAssignedToDefaultUserRole_Correct if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -26,8 +25,7 @@ test_PermissionGrantPolicyIdsAssignedToDefaultUserRole_Correct if {
 }
 
 test_PermissionGrantPolicyIdsAssignedToDefaultUserRole_Incorrect_V1 if {
-    ControlNumber := "AAD 2.7"
-    Requirement := "Only administrators SHALL be allowed to consent to third-party applications"
+    PolicyId := "MS.AAD.7.1v1"
 
     Output := tests with input as {
         "authorization_policies": [
@@ -38,7 +36,7 @@ test_PermissionGrantPolicyIdsAssignedToDefaultUserRole_Incorrect_V1 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
     print(RuleOutput)
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -46,8 +44,7 @@ test_PermissionGrantPolicyIdsAssignedToDefaultUserRole_Incorrect_V1 if {
 }
 
 test_PermissionGrantPolicyIdsAssignedToDefaultUserRole_Incorrect_V2 if {
-    ControlNumber := "AAD 2.7"
-    Requirement := "Only administrators SHALL be allowed to consent to third-party applications"
+    PolicyId := "MS.AAD.7.1v1"
 
     Output := tests with input as {
         "authorization_policies": [
@@ -62,7 +59,7 @@ test_PermissionGrantPolicyIdsAssignedToDefaultUserRole_Incorrect_V2 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
     print(RuleOutput)
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -74,8 +71,7 @@ test_PermissionGrantPolicyIdsAssignedToDefaultUserRole_Incorrect_V2 if {
 # Policy 2
 #--
 test_IsEnabled_Correct if {
-    ControlNumber := "AAD 2.7"
-    Requirement := "An admin consent workflow SHALL be configured"
+    PolicyId := "MS.AAD.7.2v1"
 
     Output := tests with input as {
         "admin_consent_policies": [
@@ -86,7 +82,7 @@ test_IsEnabled_Correct if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -94,8 +90,7 @@ test_IsEnabled_Correct if {
 }
 
 test_IsEnabled_Incorrect if {
-    ControlNumber := "AAD 2.7"
-    Requirement := "An admin consent workflow SHALL be configured"
+    PolicyId := "MS.AAD.7.2v1"
 
     Output := tests with input as {
         "admin_consent_policies": [
@@ -106,7 +101,7 @@ test_IsEnabled_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -117,8 +112,7 @@ test_IsEnabled_Incorrect if {
 # Policy 3
 #--
 test_Value_Correct if {
-    ControlNumber := "AAD 2.7"
-    Requirement := "Group owners SHALL NOT be allowed to consent to third-party applications"
+    PolicyId := "MS.AAD.7.3v1"
 
     Output := tests with input as {
         "directory_settings": [
@@ -134,7 +128,7 @@ test_Value_Correct if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -142,8 +136,7 @@ test_Value_Correct if {
 }
 
 test_Value_Incorrect if {
-    ControlNumber := "AAD 2.7"
-    Requirement := "Group owners SHALL NOT be allowed to consent to third-party applications"
+    PolicyId := "MS.AAD.7.3v1"
 
     Output := tests with input as {
         "directory_settings": [
@@ -159,7 +152,7 @@ test_Value_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet

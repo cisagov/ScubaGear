@@ -1,5 +1,5 @@
 $CreateReportModulePath = Join-Path -Path $PSScriptRoot -ChildPath "../../../../PowerShell/ScubaGear/Modules/CreateReport/CreateReport.psm1"
-Import-Module $CreateReportModulePath
+Import-Module $CreateReportModulePath -Force
 
 InModuleScope CreateReport {
 
@@ -29,16 +29,17 @@ InModuleScope CreateReport {
             $Baselines = Import-SecureBaseline -BaselinePath "./baselines/"
         }
         It "Validate import of markdown for all products" {
-            $Baselines.Length | Should -BeExactly 8 -Because "Markdown expected for all products."
+            $Baselines.GetType().Name -Eq [hashtable] | Should -BeTrue
+            $Baselines.Count | Should -BeExactly 8 -Because "Markdown expected for all products."
         }
         It "Validate markdown group count for <Product>" -ForEach @(
-            @{Product = "aad"; GroupCount = 1; PolicyCount = 1}
-            @{Product = "defender"; GroupCount = 0; PolicyCount = 0}
-            @{Product = "exchange"; GroupCount = 0; PolicyCount = 0}
-            @{Product = "onedrive"; GroupCount = 0; PolicyCount = 0}
-            @{Product = "powerbi"; GroupCount = 0; PolicyCount = 0}
-            @{Product = "powerplatform"; GroupCount = 0; PolicyCount = 0}
-            @{Product = "sharepoint"; GroupCount = 0; PolicyCount = 0}
+            @{Product = "aad"; GroupCount = 18; PolicyCount = 33}
+            @{Product = "defender"; GroupCount = 10; PolicyCount = 46}
+            @{Product = "exchange"; GroupCount = 17; PolicyCount = 39}
+            @{Product = "onedrive"; GroupCount = 3; PolicyCount = 8}
+            @{Product = "powerbi"; GroupCount = 10; PolicyCount = 12}
+            @{Product = "powerplatform"; GroupCount = 4; PolicyCount = 8}
+            @{Product = "sharepoint"; GroupCount = 4; PolicyCount = 8}
             @{Product = "teams"; GroupCount = 13; PolicyCount = 28}
         ){
             {$Baselines.$Product} | Should -Not -Throw

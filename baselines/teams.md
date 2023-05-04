@@ -67,7 +67,7 @@ guest users, unmanaged users and anonymous users.
 ### Policy
 
 #### MS.TEAMS.1.1v1
-External participants SHOULD NOT be enabled to request control of shared desktops or windows in the Global (Org-wide default) meeting policy or in custom meeting policies if any exist.
+External participants SHOULD NOT be enabled to request control of shared desktops or windows in the Global (Org-wide default) meeting policy or in custom meeting policies if any exist
 
 - _Rationale:_ While there is some inherent risk in granting an external participant
 control of a shared screen, legitimate use cases for this exist.
@@ -76,7 +76,7 @@ user’s screen unless the user giving control explicitly accepts a
 control request. As such, while enabling external participants to
 request control is discouraged, it may be done, depending on agency
 need.
-- _Last modified:_ February 2023
+- _Last modified:_ July 2023
 
 ### Resources
 
@@ -114,9 +114,9 @@ joining calls that are not authenticated through the agency’s tenant.
 ### Policy
 
 #### MS.TEAMS.2.1v1
-Anonymous users SHALL NOT be enabled to start meetings in the Global (Org-wide default) meeting policy or in custom meeting policies if any exist.
+Anonymous users SHALL NOT be enabled to start meetings in the Global (Org-wide default) meeting policy or in custom meeting policies if any exist
 - _Rationale:_ TODO add rationale.
-- _Last modified:_ February 2023
+- _Last modified:_ July 2023
 
 ### Resources
 - [Meeting policy settings - Participants & guests \| Microsoft
@@ -150,27 +150,27 @@ before they are admitted to the meeting.
 #### MS.TEAMS.3.1v1
 Anonymous users, including dial-in users, SHOULD NOT be admitted automatically.
 - _Rationale:_ TODO add rationale.
-- _Last modified:_ February 2023
+- _Last modified:_ July 2023
 
 #### MS.TEAMS.3.2v1
 Internal users SHOULD be admitted automatically.
 - _Rationale:_ TODO add rationale.
-- _Last modified:_ February 2023
+- _Last modified:_ July 2023
 
 #### MS.TEAMS.3.3v1
 B2B guest users MAY be admitted automatically.
 - _Rationale:_ TODO add rationale.
-- _Last modified:_ February 2023
+- _Last modified:_ July 2023
 
 #### MS.TEAMS.3.4v1
 MS.TEAMS.3.1.1, MS.TEAMS.3.2.1, and MS.TEAMS.3.3.1 SHOULD be applied in the Global (Org-wide default) meeting policy.
 - _Rationale:_ TODO add rationale.
-- _Last modified:_ February 2023
+- _Last modified:_ July 2023
 
 #### MS.TEAMS.3.5v1
 Custom meeting policies MAY be created that allow more flexibility for specific users.
 - _Rationale:_ TODO add rationale.
-- _Last modified:_ February 2023
+- _Last modified:_ July 2023
 
 ### Resources
 - [Meeting policy settings - Participants & guests \| Microsoft
@@ -225,7 +225,7 @@ separately.
 #### MS.TEAMS.4.1v1
 External access SHALL only be enabled on a per-domain basis.
 - _Rationale:_ TODO add rationale.
-- _Last modified:_ February 2023
+- _Last modified:_ July 2023
 
 ### Resources
 
@@ -273,13 +273,13 @@ added to Teams chats if the internal user initiates the contact.
 Unmanaged users SHALL NOT be enabled to initiate contact with internal
 users.
 - _Rationale:_ TODO add rationale.
-- _Last modified:_ February 2023
+- _Last modified:_ July 2023
 
 #### MS.TEAMS.5.2v1
 Internal users SHOULD NOT be enabled to initiate contact with unmanaged
 users.
 - _Rationale:_ TODO add rationale.
-- _Last modified:_ February 2023
+- _Last modified:_ July 2023
 
 ### Resources
 
@@ -323,7 +323,7 @@ TODO add context.
 Contact with Skype users SHALL be blocked.
 - _Rationale:_ Microsoft officially retired Skype for Business Online on July 31, 2021,
 and it is no longer supported.
-- _Last modified:_ February 2023
+- _Last modified:_ July 2023
 
 ### Resources
 
@@ -367,7 +367,7 @@ disabled.
 #### MS.TEAMS.7.1v1
 Teams email integration SHALL be disabled.
 - _Rationale:_ TODO
-- _Last modified:_ February 2023
+- _Last modified:_ July 2023
 
 ### Resources
 
@@ -408,17 +408,17 @@ development, that users “sideload” into Teams.
 #### MS.TEAMS.8.1v1
 Agencies SHOULD allow all apps published by Microsoft, but MAY block specific Microsoft apps as needed.
 - _Rationale:_ TODO
-- _Last modified:_ February 2023
+- _Last modified:_ July 2023
 
 #### MS.TEAMS.8.2v1
 Agencies SHOULD NOT allow installation of all third-party apps or custom apps, but MAY allow specific apps as needed.
 - _Rationale:_ TODO
-- _Last modified:_ February 2023
+- _Last modified:_ July 2023
 
 #### MS.TEAMS.8.3v1
 Agencies SHALL establish policy dictating the app review and approval process to be used by the agency.
 - _Rationale:_ TODO
-- _Last modified:_ February 2023
+- _Last modified:_ July 2023
 
 ### Resources
 
@@ -472,18 +472,17 @@ legislation in addition to this guidance.
 #### MS.TEAMS.9.1v1
 Cloud video recording SHOULD be disabled in the global (org-wide default) meeting policy.
 - _Rationale:_ TODO
-- _Last modified:_ February 2023
+- _Last modified:_ July 2023
 
 #### MS.TEAMS.9.2v1
  Alternate meeting policies MAY be created that allow agency-approved users the ability to record.
 - _Rationale:_ TODO
-- _Last modified:_ February 2023
+- _Last modified:_ July 2023
 
 #### MS.TEAMS.9.3v1
-For all meeting polices that allow cloud recording, recordings SHOULD be
-stored inside the country of that agency's tenant.
+For all meeting polices that allow cloud recording, recordings SHOULD be stored inside the country of that agency’s tenant.
 - _Rationale:_ TODO
-- _Last modified:_ February 2023
+- _Last modified:_ July 2023
 
 ### Resources
 
@@ -551,7 +550,7 @@ organizer’s discretion.
 #### MS.TEAMS.10.1v1
 Record an event SHOULD be set to Organizer can record.
 - _Rationale:_ TODO
-- _Last modified:_ February 2023
+- _Last modified:_ July 2023
 
 ### Resources
 
@@ -598,17 +597,17 @@ Microsoft.
 #### MS.TEAMS.11.1v1
 A DLP solution SHALL be enabled.
 - _Rationale:_ TODO
-- _Last modified:_ February 2023
+- _Last modified:_ July 2023
 
 #### MS.TEAMS.11.2v1
 Agencies SHOULD use either the native DLP solution offered by Microsoft or a DLP solution that offers comparable services.
 - _Rationale:_ TODO
-- _Last modified:_ February 2023
+- _Last modified:_ July 2023
 
 #### MS.TEAMS.11.3v1
 Agencies SHOULD use either the native DLP solution offered by Microsoft or a DLP solution that offers comparable services.
 - _Rationale:_ TODO
-- _Last modified:_ February 2023
+- _Last modified:_ July 2023
 
 #### MS.TEAMS.11.4v1
 The DLP solution SHALL protect Personally Identifiable Information (PII)
@@ -616,7 +615,7 @@ and sensitive information, as defined by the agency. At a minimum, the
 sharing of credit card numbers, taxpayer Identification Numbers (TIN),
 and Social Security Numbers (SSN) via email SHALL be restricted.
 - _Rationale:_ TODO
-- _Last modified:_ February 2023
+- _Last modified:_ July 2023
 
 ### Resources
 
@@ -636,13 +635,12 @@ Configuration Baseline*.
 #### MS.TEAMS.12.1v1
 Attachments included with Teams messages SHOULD be scanned for malware.
 - _Rationale:_ TODO
-- _Last modified:_ February 2023
+- _Last modified:_ July 2023
 
 #### MS.TEAMS.12.2v1
-Users SHOULD be prevented from opening or downloading files detected as
-malware.
+Users SHOULD be prevented from opening or downloading files detected as malware.
 - _Rationale:_ TODO
-- _Last modified:_ February 2023
+- _Last modified:_ July 2023
 
 ### Resources
 
@@ -680,17 +678,17 @@ Minimum Viable Secure Configuration Baseline.*
 #### MS.TEAMS.13.1v1
 URL comparison with a block-list SHOULD be enabled.
 - _Rationale:_ TODO
-- _Last modified:_ February 2023
+- _Last modified:_ July 2023
 
 #### MS.TEAMS.13.2v1
 Direct download links SHOULD be scanned for malware.
 - _Rationale:_ TODO
-- _Last modified:_ February 2023
+- _Last modified:_ July 2023
 
 #### MS.TEAMS.13.3v1
 User click tracking SHOULD be enabled.
 - _Rationale:_ TODO
-- _Last modified:_ February 2023
+- _Last modified:_ July 2023
 
 ### Resources
 

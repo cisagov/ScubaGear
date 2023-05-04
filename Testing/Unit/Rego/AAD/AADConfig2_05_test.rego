@@ -6,12 +6,11 @@ import future.keywords
 # Policy 1
 #--
 test_NotImplemented_Correct_V1 if {
-    ControlNumber := "AAD 2.5"
-    Requirement := "The following critical logs SHALL be sent at a minimum: AuditLogs, SignInLogs, RiskyUsers, UserRiskEvents, NonInteractiveUserSignInLogs, ServicePrincipalSignInLogs, ADFSSignInLogs, RiskyServicePrincipals, ServicePrincipalRiskEvents"
+    PolicyId := "MS.AAD.5.1v1"
 
     Output := tests with input as { }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -22,12 +21,11 @@ test_NotImplemented_Correct_V1 if {
 # Policy 2
 #--
 test_NotImplemented_Correct_V2 if {
-    ControlNumber := "AAD 2.5"
-    Requirement := "The logs SHALL be sent to the agency's SOC for monitoring"
+    PolicyId := "MS.AAD.5.4v1"
 
     Output := tests with input as { }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet

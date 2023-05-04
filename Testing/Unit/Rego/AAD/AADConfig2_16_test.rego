@@ -6,8 +6,7 @@ import future.keywords
 # Policy 1
 #--
 test_notificationRecipients_Correct if {
-    ControlNumber := "AAD 2.16"
-    Requirement := "Eligible and Active highly privileged role assignments SHALL trigger an alert"
+    PolicyId := "MS.AAD.16.1v1"
 
     Output := tests with input as {
         "privileged_roles": [
@@ -40,7 +39,7 @@ test_notificationRecipients_Correct if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -48,8 +47,7 @@ test_notificationRecipients_Correct if {
 }
 
 test_notificationRecipients_Incorrect_V1 if {
-    ControlNumber := "AAD 2.16"
-    Requirement := "Eligible and Active highly privileged role assignments SHALL trigger an alert"
+    PolicyId := "MS.AAD.16.1v1"
 
     Output := tests with input as {
         "privileged_roles": [
@@ -82,7 +80,7 @@ test_notificationRecipients_Incorrect_V1 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -90,8 +88,7 @@ test_notificationRecipients_Incorrect_V1 if {
 }
 
 test_notificationRecipients_Incorrect_V2 if {
-    ControlNumber := "AAD 2.16"
-    Requirement := "Eligible and Active highly privileged role assignments SHALL trigger an alert"
+    PolicyId := "MS.AAD.16.1v1"
 
     Output := tests with input as {
         "privileged_roles": [
@@ -124,7 +121,7 @@ test_notificationRecipients_Incorrect_V2 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -132,8 +129,7 @@ test_notificationRecipients_Incorrect_V2 if {
 }
 
 test_notificationRecipients_Incorrect_V3 if {
-    ControlNumber := "AAD 2.16"
-    Requirement := "Eligible and Active highly privileged role assignments SHALL trigger an alert"
+    PolicyId := "MS.AAD.16.1v1"
 
     Output := tests with input as {
         "privileged_roles": [
@@ -166,7 +162,7 @@ test_notificationRecipients_Incorrect_V3 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -174,8 +170,7 @@ test_notificationRecipients_Incorrect_V3 if {
 }
 
 test_Id_Correct_V1 if {
-    ControlNumber := "AAD 2.16"
-    Requirement := "User activation of the Global Administrator role SHALL trigger an alert"
+    PolicyId := "MS.AAD.16.2v1"
 
     Output := tests with input as {
         "privileged_roles": [
@@ -203,7 +198,7 @@ test_Id_Correct_V1 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -211,8 +206,7 @@ test_Id_Correct_V1 if {
 }
 
 test_Id_Correct_V2 if {
-    ControlNumber := "AAD 2.16"
-    Requirement := "User activation of the Global Administrator role SHALL trigger an alert"
+    PolicyId := "MS.AAD.16.2v1"
 
     Output := tests with input as {
         "privileged_roles": [
@@ -240,7 +234,7 @@ test_Id_Correct_V2 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -248,8 +242,7 @@ test_Id_Correct_V2 if {
 }
 
 test_Id_Incorrect if {
-    ControlNumber := "AAD 2.16"
-    Requirement := "User activation of the Global Administrator role SHALL trigger an alert"
+    PolicyId := "MS.AAD.16.2v1"
 
     Output := tests with input as {
         "privileged_roles": [
@@ -277,7 +270,7 @@ test_Id_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -285,8 +278,7 @@ test_Id_Incorrect if {
 }
 
 test_DisplayName_Correct if {
-    ControlNumber := "AAD 2.16"
-    Requirement := "User activation of other highly privileged roles SHOULD trigger an alert"
+    PolicyId := "MS.AAD.16.3v1"
 
     Output := tests with input as {
         "privileged_roles": [
@@ -314,7 +306,7 @@ test_DisplayName_Correct if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -322,8 +314,7 @@ test_DisplayName_Correct if {
 }
 
 test_DisplayName_Incorrect if {
-    ControlNumber := "AAD 2.16"
-    Requirement := "User activation of other highly privileged roles SHOULD trigger an alert"
+    PolicyId := "MS.AAD.16.3v1"
 
     Output := tests with input as {
         "privileged_roles": [
@@ -351,7 +342,7 @@ test_DisplayName_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet

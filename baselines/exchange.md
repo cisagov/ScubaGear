@@ -1,4 +1,4 @@
-# 1. Introduction
+# Introduction
 
 Microsoft Exchange Online provides users easy access to their email and
 supports organizational meetings, contacts, and calendars.
@@ -14,7 +14,7 @@ this baseline. When noted, alternative products may be used in lieu of
 Defender, on the condition that they fulfill these required baseline
 settings.
 
-## 1.1 Assumptions
+## Assumptions
 
 The **License Requirements** sections of this document assume the
 organization is using an [M365
@@ -23,7 +23,7 @@ or [G3](https://www.microsoft.com/en-us/microsoft-365/government)
 license level. Therefore, only licenses not included in E3/G3 are
 listed.
 
-## 1.2 Resources
+## Resources
 
 **<u>License Compliance and Copyright</u>**
 
@@ -39,28 +39,31 @@ document. The United States Government has adapted selections of these
 documents to develop innovative and scalable configuration standards to
 strengthen the security of widely used cloud-based software services.
 
-# 2. Baseline
+# Baseline
 
-## 2.1 Automatic Forwarding to External Domains SHALL Be Disabled
+## 1. Automatic Forwarding to External Domains
 
 This control is intended to prevent bad actors from using client-side
 forwarding rules to exfiltrate data to external recipients.
 
-### 2.1.1 Policy
+### Policy
 
-- Automatic forwarding to external domains SHALL be disabled.
+#### MS.EXCHANGE.1.1v1
+Automatic forwarding to external domains SHALL be disabled.
+- _Rationale:_ TODO
+- _Last modified:_ June 2023
 
-### 2.1.2 Resources
+### Resources
 
 - [Reducing or increasing information flow to another company \|
   Microsoft
   Docs](https://docs.microsoft.com/en-us/exchange/mail-flow-best-practices/remote-domains/remote-domains#reducing-or-increasing-information-flow-to-another-company)
 
-### 2.1.3 License Requirements
+### License Requirements
 
 - N/A
 
-### 2.1.4 Implementation
+### Implementation
 
 To disallow automatic forwarding to external domains:
 
@@ -76,7 +79,7 @@ To disallow automatic forwarding to external domains:
 5.  Clear the checkbox next to **Allow automatic forwarding**, then
     click **Save**.
 
-## 2.2 Sender Policy Framework SHALL Be Enabled
+## 2. Sender Policy Framework
 
 The Sender Policy Framework (SPF) is a mechanism that allows domain
 administrators to specify which IP addresses are explicitly approved to
@@ -86,14 +89,19 @@ rather via DNS records hosted by the agency’s domain. Thus, the exact
 steps needed to set up SPF varies from agency to agency, but Microsoft’s
 documentation provides some helpful starting points.
 
-### 2.2.1 Policy
+### Policies
 
-- A list of approved IP addresses for sending mail SHALL be maintained.
+#### MS.EXCHANGE.2.1v1
+A list of approved IP addresses for sending mail SHALL be maintained.
+- _Rationale:_ TODO
+- _Last modified:_ June 2023
 
-- An SPF policy(s) that designates only these addresses as approved
-  senders SHALL be published.
+#### MS.EXCHANGE.2.2v1
+An SPF policy(s) that designates only these addresses as approved senders SHALL be published.
+- _Rationale:_ TODO
+- _Last modified:_ June 2023
 
-### 2.2.2 Resources
+### Resources
 
 - [Binding Operational Directive 18-01 - Enhance Email and Web Security
   \| DHS](https://cyber.dhs.gov/bod/18-01/)
@@ -108,11 +116,11 @@ documentation provides some helpful starting points.
   spoofing \| Microsoft
   Docs](https://docs.microsoft.com/en-us/microsoft-365/security/office-365-security/how-office-365-uses-spf-to-prevent-spoofing?view=o365-worldwide)
 
-### 2.2.3 License Requirements
+### License Requirements
 
 - N/A
 
-### 2.2.4 Implementation
+### Implementation
 
 SPF is not configured through the Exchange admin center, but rather via
 DNS records hosted by the agency’s domain. Thus, the exact steps needed
@@ -123,7 +131,7 @@ PowerShell tool Resolve-DnsName. For example:
 
 `Resolve-DnsName example.com txt`
 
-## 2.3 DomainKeys Identified Mail SHOULD Be Enabled
+## 3. DomainKeys Identified Mail
 
 DomainKeys Identified Mail (DKIM) allows digital signatures to be added
 to email messages in the message header, providing a layer of both
@@ -133,11 +141,13 @@ agency manages its DNS. DKIM is enabled for your tenant's default domain
 (e.g., onmicrosoft.com domains), but it must be manually enabled for
 custom domains.
 
-### 2.3.1 Policy
+### Policy
+#### MS.EXCHANGE.3.1v1
+DKIM SHOULD be enabled for any custom domain.
+- _Rationale:_ TODO
+- _Last modified:_ June 2023
 
-- DKIM SHOULD be enabled for any custom domain.
-
-### 2.3.2 Resources
+### Resources
 
 - [Binding Operational Directive 18-01 - Enhance Email and Web Security
   \| DHS](https://cyber.dhs.gov/bod/18-01/)
@@ -155,13 +165,13 @@ custom domains.
 - [What is EOP? \| Microsoft
   Docs](https://docs.microsoft.com/en-us/microsoft-365/security/office-365-security/eop-general-faq?view=o365-worldwide#what-is-eop-)
 
-### 2.3.3 License Requirements
+### License Requirements
 
 - DKIM signing is included with Exchange Online Protection (EOP), which
   in turn is included in all Microsoft 365 subscriptions that contain
   Exchange Online mailboxes.
 
-### 2.3.4 Implementation
+### Implementation
 
 To enable DKIM, follow the instructions listed on [Steps to Create,
 enable and disable DKIM from Microsoft 365 Defender portal \| Microsoft
@@ -188,7 +198,7 @@ Docs](https://docs.microsoft.com/en-us/microsoft-365/security/office-365-securit
 8.  Return to the DKIM page on the Defender admin center to finish
     enabling DKIM.
 
-## 2.4 Domain-Based Message Authentication, Reporting, and Conformance SHALL Be Enabled
+## 4. Domain-Based Message Authentication, Reporting, and Conformance (DMARC)
 
 Domain-based Message Authentication, Reporting, and Conformance (DMARC)
 works with SPF and DKIM to authenticate mail senders and ensure that
@@ -196,19 +206,30 @@ destination email systems can validate messages sent from your domain.
 DMARC helps receiving mail systems determine what to do with messages
 sent from your domain that fail SPF or DKIM checks.
 
-### 2.4.1 Policy
-
+### Policies
+#### MS.EXCHANGE.4.1v1
 - A DMARC policy SHALL be published for every second-level domain.
+- _Rationale:_ TODO
+- _Last modified:_ June 2023
 
+#### MS.EXCHANGE.4.2v1
 - The DMARC message rejection option SHALL be “p=reject”.
+- _Rationale:_ TODO
+- _Last modified:_ June 2023
 
+#### MS.EXCHANGE.4.3v1
 - The DMARC point of contact for aggregate reports SHALL include
   <reports@dmarc.cyber.dhs.gov>.
+- _Rationale:_ TODO
+- _Last modified:_ June 2023
 
+#### MS.EXCHANGE.4.4v1
 - An agency point of contact SHOULD be included for aggregate and/or
   failure reports.
+- _Rationale:_ TODO
+- _Last modified:_ June 2023
 
-### 2.4.2 Resources
+### Resources
 
 - [Binding Operational Directive 18-01 - Enhance Email and Web Security
   \| DHS](https://cyber.dhs.gov/bod/18-01/)
@@ -225,11 +246,11 @@ sent from your domain that fail SPF or DKIM checks.
 - [How Office 365 handles outbound email that fails DMARC \| Microsoft
   Docs](https://docs.microsoft.com/en-us/microsoft-365/security/office-365-security/use-dmarc-to-validate-email?view=o365-worldwide#how-microsoft-365-handles-inbound-email-that-fails-dmarc)
 
-### 2.4.3 License Requirements
+### License Requirements
 
 - N/A
 
-### 2.4.4 Implementation
+### Implementation
 
 DMARC implementation varies depending on how an agency manages its DNS
 records. See [Form the DMARC TXT record for your domain \| Microsoft
@@ -247,7 +268,7 @@ is included in the policy returned from the query, and that (3)
 <reports@dmarc.cyber.dhs.gov> is included as a point for contact for
 aggregate feedback.
 
-## 2.5 Simple Mail Transfer Protocol Authentication SHALL Be Disabled
+## 5. Simple Mail Transfer Protocol Authentication (SMTP AUTH)
 
 Modern email clients that connect to Exchange Online mailboxes—including
 Outlook, Outlook on the web, iOS Mail, and Outlook for iOS and
@@ -255,13 +276,19 @@ Android—do not use Simple Mail Transfer Protocol Authentication (SMTP
 AUTH) to send email messages. SMTP AUTH is only needed for applications
 outside of Outlook that send email messages.
 
-### 2.5.1 Policy
+### Policies
 
-- SMTP AUTH SHALL be disabled in Exchange Online.
+#### MS.EXCHANGE.5.1v1
+SMTP AUTH SHALL be disabled in Exchange Online.
+- _Rationale:_ TODO
+- _Last modified:_ June 2023
 
-- SMTP AUTH MAY be enabled on a per-mailbox basis as needed.
+#### MS.EXCHANGE.5.2v1
+SMTP AUTH MAY be enabled on a per-mailbox basis as needed.
+- _Rationale:_ TODO
+- _Last modified:_ June 2023
 
-### 2.5.2 Resources
+### Resources
 
 - [Enable or disable authenticated client SMTP submission (SMTP AUTH) in
   Exchange Online \| Microsoft
@@ -271,11 +298,11 @@ outside of Outlook that send email messages.
   specific mailboxes \| Microsoft
   Docs](https://docs.microsoft.com/en-us/exchange/clients-and-mobile-in-exchange-online/authenticated-client-smtp-submission#use-the-microsoft-365-admin-center-to-enable-or-disable-smtp-auth-on-specific-mailboxes)
 
-### 2.5.3 License Requirements
+### License Requirements
 
 - N/A
 
-### 2.5.4 Implementation
+### Implementation
 
 SMTP AUTH can only be disabled tenant-wide using Exchange Online
 PowerShell. Follow the instructions listed at [Disable SMTP AUTH in your
@@ -287,22 +314,27 @@ listed at [Use the Microsoft 365 admin center to enable or disable SMTP
 AUTH on specific mailboxes \| Microsoft
 Docs](https://docs.microsoft.com/en-us/exchange/clients-and-mobile-in-exchange-online/authenticated-client-smtp-submission#use-the-microsoft-365-admin-center-to-enable-or-disable-smtp-auth-on-specific-mailboxes).
 
-## 2.6 Calendar and Contact Sharing SHALL Be Restricted
+## 6. Calendar and Contact Sharing
 
 Exchange Online allows the creation of sharing polices that soften
 default restrictions on contact and calendar details sharing. These
 policies should only be enabled with caution and must comply with the
 following policies.
 
-### 2.6.1 Policy
+### Policies
 
+#### MS.EXCHANGE.6.1v1
 - Contact folders SHALL NOT be shared with all domains, although they
   MAY be shared with specific domains.
+- _Rationale:_ TODO
+- _Last modified:_ June 2023
 
-- Calendar details SHALL NOT be shared with all domains, although they
-  MAY be shared with specific domains.
+#### MS.EXCHANGE.6.2v1
+- Calendar details SHALL NOT be shared with all domains, although they MAY be shared with specific domains.
+- _Rationale:_ TODO
+- _Last modified:_ June 2023
 
-### 2.6.2 Resources
+### Resources
 
 - [Sharing in Exchange Online \| Microsoft
   Docs](https://docs.microsoft.com/en-us/exchange/sharing/sharing)
@@ -313,11 +345,11 @@ following policies.
 - [Sharing policies in Exchange Online \| Microsoft
   Docs](https://docs.microsoft.com/en-us/exchange/sharing/sharing-policies/sharing-policies)
 
-### 2.6.3 License Requirements
+### License Requirements
 
 - N/A
 
-### 2.6.4 Implementation
+### Implementation
 
 To restrict sharing with all domains:
 
@@ -329,17 +361,19 @@ To restrict sharing with all domains:
 3.  Under **Individual Sharing**, for all existing policies, ensure that
     for all sharing rules, **Sharing with all domains** is not selected.
 
-## 2.7 External Sender Warnings SHALL Be Implemented
+## 7. External Sender Warnings
 
 Mail flow rules allow the modification of incoming mail, such that mail
 from external users can be easily identified, for example by prepending
 the subject line with “\[External\].”
 
-### 2.7.1 Policy
+### Policy
+#### MS.EXCHANGE.7.1v1
+External sender warnings SHALL be implemented.
+- _Rationale:_ TODO
+- _Last modified:_ June 2023
 
-- External sender warnings SHALL be implemented.
-
-### 2.7.2 Resources
+### Resources
 
 - [Mail flow rules (transport rules) in Exchange Online \| Microsoft
   Docs](https://docs.microsoft.com/en-us/exchange/security-and-compliance/mail-flow-rules/mail-flow-rules)
@@ -352,11 +386,11 @@ the subject line with “\[External\].”
   \|
   Cisa](https://www.cisa.gov/sites/default/files/publications/CISA_Insights_Actions_to_Counter_Email-Based_Attacks_on_Election-Related_S508C.pdf)
 
-### 2.7.3 License Requirements
+### License Requirements
 
 - N/A
 
-### 2.7.4 Implementation
+### Implementation
 
 To enable external sender warnings:
 
@@ -386,7 +420,7 @@ To enable external sender warnings:
 
 11. Click **Save**.
 
-## 2.8 Data Loss Prevention Solutions SHALL Be Enabled
+## 8. Data Loss Prevention Solutions
 
 Data loss prevention (DLP) helps prevent both accidental leakage of
 sensitive information as well as intentional exfiltration of data. DLP
@@ -404,22 +438,23 @@ Minimum Viable Secure Configuration Baseline*. The DLP solution selected
 by an agency should offer services comparable to those offered by
 Microsoft.
 
-### 2.8.1 Policy
+### Policies
+#### MS.EXCHANGE.8.1v1
+A DLP solution SHALL be used. The selected DLP solution SHOULD offer services comparable to the native DLP solution offered by Microsoft.
+- _Rationale:_ TODO
+- _Last modified:_ June 2023
 
-- A DLP solution SHALL be used. The selected DLP solution SHOULD offer
-  services comparable to the native DLP solution offered by Microsoft.
+#### MS.EXCHANGE.8.2v1
+The DLP solution SHALL protect PII and sensitive information, as defined by the agency. At a minimum, the sharing of credit card numbers, Taxpayer Identification Numbers (TIN), and Social Security Numbers (SSN) via email SHALL be restricted.
+- _Rationale:_ TODO
+- _Last modified:_ June 2023
 
-- The DLP solution SHALL protect PII and sensitive information, as
-  defined by the agency. At a minimum, the sharing of credit card
-  numbers, Taxpayer Identification Numbers (TIN), and Social Security
-  Numbers (SSN) via email SHALL be restricted.
-
-### 2.8.2 Resources
+### Resources
 
 - The “Data Loss Prevention SHALL Be Enabled” section of the *Defender
   for Office 365 Minimum Viable Secure Configuration Baseline*.
 
-## 2.9 Emails SHALL Be Filtered by Attachment File Type
+## 9. Attachment File Type
 
 For some types of files (e.g., executable files), the dangers of
 allowing them to be sent over email outweigh any potential benefits.
@@ -436,25 +471,29 @@ Be Enabled” section of the Defender for Office 365 Minimum Viable Secure
 Configuration Baseline. The solution selected by an agency should offer
 services comparable to those offered by Microsoft.
 
-### 2.9.1 Policy
+### Policies
+#### MS.EXCHANGE.9.1v1
+Emails SHALL be filtered by the file types of included attachments. The selected filtering solution SHOULD offer services comparable to Microsoft Defender’s Common Attachment Filter.
+- _Rationale:_ TODO
+- _Last modified:_ June 2023
 
-- Emails SHALL be filtered by the file types of included attachments.
-  The selected filtering solution SHOULD offer services comparable to
-  Microsoft Defender’s Common Attachment Filter.
+#### MS.EXCHANGE.9.2v1
+The attachment filter SHOULD attempt to determine the true file type and assess the file extension.
+- _Rationale:_ TODO
+- _Last modified:_ June 2023
 
-- The attachment filter SHOULD attempt to determine the true file type
-  and assess the file extension.
+#### MS.EXCHANGE.9.3v1
+Disallowed file types SHALL be determined and set. At a minimum, click-to-run files SHOULD be blocked (e.g., .exe, .cmd, and .vbe).
+- _Rationale:_ TODO
+- _Last modified:_ June 2023
 
-- Disallowed file types SHALL be determined and set. At a minimum,
-  click-to-run files SHOULD be blocked (e.g., .exe, .cmd, and .vbe).
-
-### 2.9.2 Resources
+### Resources
 
 - The “Common Attachments Filter SHALL Be Enabled” section of the
   *Defender for Office 365 Minimum Viable Secure Configuration
   Baseline*.
 
-## 2.10 Emails SHALL Be Scanned for Malware
+## 10. Malware
 
 Though any product that fills the requirements outlined in this baseline
 setting may be used, for guidance on implementing malware scanning using
@@ -465,16 +504,24 @@ Office 365 Minimum Viable Secure Configuration Baseline*:
 
 - “Zero-hour Auto Purge for Malware SHALL Be Enabled”
 
-### 2.10.1 Policy
+### Policies
 
-- Emails SHALL be scanned for malware.
+#### MS.EXCHANGE.10.1v1
+Emails SHALL be scanned for malware.
+- _Rationale:_ TODO
+- _Last modified:_ June 2023
 
-- Emails identified as containing malware SHALL be quarantined or
-  dropped.
+#### MS.EXCHANGE.10.2v1
+Emails identified as containing malware SHALL be quarantined or dropped.
+- _Rationale:_ TODO
+- _Last modified:_ June 2023
 
-- Email scanning SHOULD be capable of reviewing emails after delivery.
+#### MS.EXCHANGE.10.3v1
+Email scanning SHOULD be capable of reviewing emails after delivery.
+- _Rationale:_ TODO
+- _Last modified:_ June 2023
 
-### 2.10.2 Resources
+### Resources
 
 - The “Safe-Attachments SHALL Be Enabled” section of the *Defender for
   Office 365 Minimum Viable Secure Configuration Baseline.*
@@ -483,7 +530,7 @@ Office 365 Minimum Viable Secure Configuration Baseline*:
   *Defender for Office 365 Minimum Viable Secure Configuration
   Baseline.*
 
-## 2.11 Phishing Protections SHOULD Be Enabled
+## 11. Phishing Protections
 
 Several techniques exist for protecting against phishing attacks,
 including the following techniques:
@@ -505,22 +552,28 @@ phishing protections with Microsoft’s native solutions, see the
 “Phishing Protections SHOULD Be Enabled,” section of the *Defender for
 Office 365 Minimum Viable Secure Configuration Baseline*.
 
-### 2.11.1 Policy
+### Policies
+#### MS.EXCHANGE.11.1v1
+Impersonation protection checks SHOULD be used.
+- _Rationale:_ TODO
+- _Last modified:_ June 2023
 
-- Impersonation protection checks SHOULD be used.
+#### MS.EXCHANGE.11.2v1
+User warnings, comparable to the user safety tips included with EOP, SHOULD be displayed.
+- _Rationale:_ TODO
+- _Last modified:_ June 2023
 
-- User warnings, comparable to the user safety tips included with EOP,
-  SHOULD be displayed.
+#### MS.EXCHANGE.11.3v1
+The phishing protection solution SHOULD include an AI-based phishing detection tool comparable to EOP Mailbox Intelligence.
+- _Rationale:_ TODO
+- _Last modified:_ June 2023
 
-- The phishing protection solution SHOULD include an AI-based phishing
-  detection tool comparable to EOP Mailbox Intelligence.
-
-### 2.11.2 Resources
+### Resources
 
 - The “Phishing Protections SHOULD Be Enabled” section of the *Defender
   for Office 365 Minimum Viable Secure Configuration Baseline.*
 
-## 2.12 IP Allow Lists SHOULD NOT be Implemented
+## 12. IP Allow Lists
 
 Microsoft Defender supports the creations of IP “allow lists,” intended
 to ensure that emails from *specific* senders are not blocked. However,
@@ -537,15 +590,23 @@ Microsoft sources from various third-party subscriptions. As with
 senders in the allow list, emails from these senders bypass important
 security mechanisms.
 
-### 2.12.1 Policy
-
+### Policies
+#### MS.EXCHANGE.12.1v1
 - IP allow lists SHOULD NOT be created.
+- _Rationale:_ TODO
+- _Last modified:_ June 2023
 
+#### MS.EXCHANGE.12.2v1
 - Safe lists SHOULD NOT be enabled.
+- _Rationale:_ TODO
+- _Last modified:_ June 2023
 
+#### MS.EXCHANGE.12.3v1
 - A connection filter MAY be implemented to create an IP “Block list.”
+- _Rationale:_ TODO
+- _Last modified:_ June 2023
 
-### 2.12.2 Resources
+### Resources
 
 - [Use the IP Allow List \| Microsoft
   Docs](https://docs.microsoft.com/en-us/microsoft-365/security/office-365-security/create-safe-sender-lists-in-office-365?view=o365-worldwide#use-the-ip-allow-list)
@@ -557,11 +618,11 @@ security mechanisms.
   connection filter policy \| Microsoft
   Docs](https://docs.microsoft.com/en-us/microsoft-365/security/office-365-security/configure-the-connection-filter-policy?view=o365-worldwide#use-the-microsoft-365-defender-portal-to-modify-the-default-connection-filter-policy)
 
-### 2.12.3 License Requirements
+### License Requirements
 
 - Exchange Online Protection
 
-### 2.12.4 Implementation
+### Implementation
 
 To modify the connection filters, follow the instructions found on [Use
 the Microsoft 365 Defender portal to modify the default connection
@@ -587,7 +648,7 @@ policy](https://docs.microsoft.com/en-us/microsoft-365/security/office-365-secur
 
 8.  Ensure **Turn on safe list** is not selected.
 
-## 2.13 Mailbox Auditing SHALL Be Enabled
+## 13. Mailbox Auditing
 
 Mailbox auditing helps users investigate compromised accounts or
 discover illicit access to Exchange Online. Some actions performed by
@@ -595,11 +656,13 @@ administrators, delegates, and owners are logged automatically. While
 mailbox auditing is enabled by default, agencies should ensure that it
 has not been inadvertently disabled.
 
-### 2.13.1 Policy
+### Policy
+#### MS.EXCHANGE.13.1v1
+Mailbox auditing SHALL be enabled.
+- _Rationale:_ TODO
+- _Last modified:_ June 2023
 
-- Mailbox auditing SHALL be enabled.
-
-### 2.13.2 Resources
+### Resources
 
 - [Manage mailbox auditing in Office 365 \| Microsoft
   Docs](https://docs.microsoft.com/en-us/microsoft-365/compliance/enable-mailbox-auditing?view=o365-worldwide)
@@ -610,11 +673,11 @@ has not been inadvertently disabled.
 - [Microsoft Compliance Manager - Microsoft 365 Compliance \|Microsoft
   Docs](https://docs.microsoft.com/en-us/microsoft-365/compliance/compliance-manager?view=o365-worldwide)
 
-### 2.13.3 License Requirements
+### License Requirements
 
 - N/A
 
-### 2.13.4 Implementation
+### Implementation
 
 Mailbox auditing can be enabled from the Exchange Online PowerShell.
 Follow the instructions listed on [Manage mailbox auditing in Office
@@ -636,7 +699,7 @@ To enable mailbox auditing via PowerShell:
 
 `Set-OrganizationConfig –AuditDisabled $false`
 
-## 2.14 Inbound Anti-Spam Protections SHALL Be Enabled
+## 14. Inbound Anti-Spam Protections
 
 Microsoft Defender includes several capabilities for protecting against
 inbound spam emails. Use of Microsoft Defender is not strictly required
@@ -645,24 +708,30 @@ this baseline setting may be used. See the “Inbound Anti-Spam
 Protections SHALL Be Enabled” section of the *Defender for Office 365
 Minimum Viable Secure Configuration Baseline* for additional guidance.
 
-### 2.14.1 Policy
-
-- A spam filter SHALL be enabled. The filtering solution selected SHOULD
-  offer services comparable to the native spam filtering offered by
+### Policies
+#### MS.EXCHANGE.14.1v1
+A spam filter SHALL be enabled. The filtering solution selected SHOULD offer services comparable to the native spam filtering offered by
   Microsoft.
+- _Rationale:_ TODO
+- _Last modified:_ June 2023
 
-- Spam and high confidence spam SHALL be moved to either the junk email
-  folder or the quarantine folder.
+#### MS.EXCHANGE.14.2v1
+Spam and high confidence spam SHALL be moved to either the junk email folder or the quarantine folder.
+- _Rationale:_ TODO
+- _Last modified:_ June 2023
 
-- Allowed senders MAY be added, but allowed domains SHALL NOT be added.
+#### MS.EXCHANGE.14.3v1
+Allowed senders MAY be added, but allowed domains SHALL NOT be added.
+- _Rationale:_ TODO
+- _Last modified:_ June 2023
 
-### 2.14.2 Resources
+### Resources
 
 - The “Inbound Anti-Spam Protections SHALL Be Enabled” section of the
   *Defender for Office 365 Minimum Viable Secure Configuration
   Baseline*.
 
-## 2.15 Link Protection SHOULD Be Enabled
+## 15. Link Protection
 
 Several technologies exist for protecting users from malicious links
 included in emails. For example, Microsoft Defender accomplishes this by
@@ -688,20 +757,29 @@ guidance for enabling link scanning using Microsoft Defender is included
 in the “Safe Links Policies SHALL Be Enabled” section of the *Defender for Office 365
 Minimum Viable Secure Configuration Baseline.*
 
-### 2.15.1 Policy
+### Policies
 
-- URL comparison with a block-list SHOULD be enabled.
+#### MS.EXCHANGE.15.1v1
+URL comparison with a block-list SHOULD be enabled.
+- _Rationale:_ TODO
+- _Last modified:_ June 2023
 
-- Direct download links SHOULD be scanned for malware.
+#### MS.EXCHANGE.15.2v1
+Direct download links SHOULD be scanned for malware.
+- _Rationale:_ TODO
+- _Last modified:_ June 2023
 
-- User click tracking SHOULD be enabled.
+#### MS.EXCHANGE.15.3v1
+User click tracking SHOULD be enabled.
+- _Rationale:_ TODO
+- _Last modified:_ June 2023
 
-### 2.15.2 Resources
+### Resources
 
 - The “Safe Links Policies SHOULD Be Enabled” section of the *Defender
   for Office 365 Minimum Viable Secure Configuration Baseline*.
 
-## 2.16 Alerts SHALL Be Enabled
+## 16. Alerts
 
 Microsoft Defender includes several prebuilt alert policies, many of
 which pertain to Exchange Online. These alerts give admins better
@@ -710,9 +788,9 @@ configuring alerts in Microsoft Defender is given in the “Alerts SHALL
 Be Enabled” section of the *Defender for Office 365 Minimum Viable
 Secure Configuration Baseline*.
 
-### 2.16.1 Policy
-
-- At a minimum, the following alerts SHALL be enabled:
+### Policies
+#### MS.EXCHANGE.16.1v1
+At a minimum, the following alerts SHALL be enabled:
 
   - Suspicious email sending patterns detected.
 
@@ -731,16 +809,20 @@ Secure Configuration Baseline*.
   - Malware campaign detected after delivery.
 
   - A potentially malicious URL click was detected.
+- _Rationale:_ TODO
+- _Last modified:_ June 2023
 
-- The alerts SHOULD be sent to a monitored address or incorporated into
-  a SIEM.
+#### MS.EXCHANGE.16.2v1
+- The alerts SHOULD be sent to a monitored address or incorporated into a SIEM.
+- _Rationale:_ TODO
+- _Last modified:_ June 2023
 
-### 2.16.2 Resources
+### Resources
 
 - The “Alerts SHALL Be Enabled” section of the *Defender for Office 365
   Minimum Viable Secure Configuration Baseline*.
 
-## 2.17 Unified Audit Logging SHALL Be Enabled
+## 17. Unified Audit Logging
 
 Unified audit logging generates logs of user activity in M365 services. 
 These logs are essential for conducting incident response and threat detection activity.
@@ -757,17 +839,23 @@ guidance configuring audit logging, see the “Audit Logging SHALL Be
 Enabled” section of the *Defender for Office 365 Minimum Viable Secure
 Configuration Baseline*.
 
-### 2.17.1 Policy
+### Policies
+#### MS.EXCHANGE.17.1v1
+Unified audit logging SHALL be enabled.
+- _Rationale:_ TODO
+- _Last modified:_ June 2023
 
-- Unified audit logging SHALL be enabled.
+#### MS.EXCHANGE.17.2v1
+Advanced audit SHALL be enabled.
+- _Rationale:_ TODO
+- _Last modified:_ June 2023
 
-- Advanced audit SHALL be enabled.
+#### MS.EXCHANGE.17.3v1
+Audit logs SHALL be maintained for at least the minimum duration dictated by [OMB M-21-31 (Appendix C)](https://www.whitehouse.gov/wp-content/uploads/2021/08/M-21-31-Improving-the-Federal-Governments-Investigative-and-Remediation-Capabilities-Related-to-Cybersecurity-Incidents.pdf).
+- _Rationale:_ TODO
+- _Last modified:_ June 2023
 
-- Audit logs SHALL be maintained for at least the minimum duration
-  dictated by [OMB M-21-31 (Appendix
-  C)](https://www.whitehouse.gov/wp-content/uploads/2021/08/M-21-31-Improving-the-Federal-Governments-Investigative-and-Remediation-Capabilities-Related-to-Cybersecurity-Incidents.pdf).
-
-### 2.17.2 Resources
+### Resources
 
 - The “Unified Audit Logging SHALL Be Enabled” section of the *Defender for
   Office 365 Minimum Viable Secure Configuration Baseline*.

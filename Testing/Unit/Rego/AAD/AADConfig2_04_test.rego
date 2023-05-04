@@ -7,8 +7,7 @@ import future.keywords
 #--
 
 test_NoExclusionsConditions_Correct if {
-    ControlNumber := "AAD 2.4"
-    Requirement := "MFA SHALL be required for all users"
+    PolicyId := "MS.AAD.4.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -32,7 +31,7 @@ test_NoExclusionsConditions_Correct if {
         }
         ]
     }
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -40,8 +39,7 @@ test_NoExclusionsConditions_Correct if {
 }
 
 test_NoExclusionsExemptUsers_Correct if {
-    ControlNumber := "AAD 2.4"
-    Requirement := "MFA SHALL be required for all users"
+    PolicyId := "MS.AAD.4.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -77,7 +75,7 @@ test_NoExclusionsExemptUsers_Correct if {
 
         }
     }
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -85,8 +83,7 @@ test_NoExclusionsExemptUsers_Correct if {
 }
 
 test_NoExclusionsExemptGroups_Correct if {
-    ControlNumber := "AAD 2.4"
-    Requirement := "MFA SHALL be required for all users"
+    PolicyId := "MS.AAD.4.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -122,7 +119,7 @@ test_NoExclusionsExemptGroups_Correct if {
 
         }
     }
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -131,8 +128,7 @@ test_NoExclusionsExemptGroups_Correct if {
 
 # User exclusions test
 test_UserExclusionNoExempt_Incorrect if {
-    ControlNumber := "AAD 2.4"
-    Requirement := "MFA SHALL be required for all users"
+    PolicyId := "MS.AAD.4.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -156,7 +152,7 @@ test_UserExclusionNoExempt_Incorrect if {
         }
         ]
     }
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -164,8 +160,7 @@ test_UserExclusionNoExempt_Incorrect if {
 }
 
 test_UserExclusionConditions_Correct if {
-    ControlNumber := "AAD 2.4"
-    Requirement := "MFA SHALL be required for all users"
+    PolicyId := "MS.AAD.4.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -201,7 +196,7 @@ test_UserExclusionConditions_Correct if {
 
         }
     }
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -209,8 +204,7 @@ test_UserExclusionConditions_Correct if {
 }
 
 test_UserExclusionsNoExempt_Incorrect if {
-    ControlNumber := "AAD 2.4"
-    Requirement := "MFA SHALL be required for all users"
+    PolicyId := "MS.AAD.4.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -234,7 +228,7 @@ test_UserExclusionsNoExempt_Incorrect if {
         }
         ]
     }
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -242,8 +236,7 @@ test_UserExclusionsNoExempt_Incorrect if {
 }
 
 test_UserExclusionsSingleExempt_Incorrect if {
-    ControlNumber := "AAD 2.4"
-    Requirement := "MFA SHALL be required for all users"
+    PolicyId := "MS.AAD.4.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -279,7 +272,7 @@ test_UserExclusionsSingleExempt_Incorrect if {
 
         }
     }
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -287,8 +280,7 @@ test_UserExclusionsSingleExempt_Incorrect if {
 }
 
 test_MultiUserExclusionsConditions_Correct if {
-    ControlNumber := "AAD 2.4"
-    Requirement := "MFA SHALL be required for all users"
+    PolicyId := "MS.AAD.4.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -324,7 +316,7 @@ test_MultiUserExclusionsConditions_Correct if {
 
         }
     }
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -333,8 +325,7 @@ test_MultiUserExclusionsConditions_Correct if {
 
 # Group Exclusion tests
 test_GroupExclusionNoExempt_Incorrect if {
-    ControlNumber := "AAD 2.4"
-    Requirement := "MFA SHALL be required for all users"
+    PolicyId := "MS.AAD.4.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -358,7 +349,7 @@ test_GroupExclusionNoExempt_Incorrect if {
         }
         ]
     }
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -366,8 +357,7 @@ test_GroupExclusionNoExempt_Incorrect if {
 }
 
 test_GroupExclusionsConditions_Correct if {
-    ControlNumber := "AAD 2.4"
-    Requirement := "MFA SHALL be required for all users"
+    PolicyId := "MS.AAD.4.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -402,7 +392,7 @@ test_GroupExclusionsConditions_Correct if {
             }
         }
     }
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -410,8 +400,7 @@ test_GroupExclusionsConditions_Correct if {
 }
 
 test_GroupExclusionsNoExempt_Incorrect if {
-    ControlNumber := "AAD 2.4"
-    Requirement := "MFA SHALL be required for all users"
+    PolicyId := "MS.AAD.4.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -435,7 +424,7 @@ test_GroupExclusionsNoExempt_Incorrect if {
         }
         ]
     }
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -443,8 +432,7 @@ test_GroupExclusionsNoExempt_Incorrect if {
 }
 
 test_GroupExclusionsSingleExempt_Incorrect if {
-    ControlNumber := "AAD 2.4"
-    Requirement := "MFA SHALL be required for all users"
+    PolicyId := "MS.AAD.4.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -479,7 +467,7 @@ test_GroupExclusionsSingleExempt_Incorrect if {
             }
         }
     }
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -487,8 +475,7 @@ test_GroupExclusionsSingleExempt_Incorrect if {
 }
 
 test_MultiGroupExclusionsConditions_Correct if {
-    ControlNumber := "AAD 2.4"
-    Requirement := "MFA SHALL be required for all users"
+    PolicyId := "MS.AAD.4.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -523,7 +510,7 @@ test_MultiGroupExclusionsConditions_Correct if {
             }
         }
     }
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -532,8 +519,7 @@ test_MultiGroupExclusionsConditions_Correct if {
 
 # User and group exclusions tests
 test_UserGroupExclusionConditions_Correct if {
-    ControlNumber := "AAD 2.4"
-    Requirement := "MFA SHALL be required for all users"
+    PolicyId := "MS.AAD.4.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -567,7 +553,7 @@ test_UserGroupExclusionConditions_Correct if {
             }
         }
     }
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -575,8 +561,7 @@ test_UserGroupExclusionConditions_Correct if {
 }
 
 test_UserGroupExclusionNoExempt_Incorrect if {
-    ControlNumber := "AAD 2.4"
-    Requirement := "MFA SHALL be required for all users"
+    PolicyId := "MS.AAD.4.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -600,7 +585,7 @@ test_UserGroupExclusionNoExempt_Incorrect if {
         }
         ]
     }
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -608,8 +593,7 @@ test_UserGroupExclusionNoExempt_Incorrect if {
 }
 
 test_UserGroupExclusionUserExemptOnly_Incorrect if {
-    ControlNumber := "AAD 2.4"
-    Requirement := "MFA SHALL be required for all users"
+    PolicyId := "MS.AAD.4.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -643,7 +627,7 @@ test_UserGroupExclusionUserExemptOnly_Incorrect if {
             }
         }
     }
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -651,8 +635,7 @@ test_UserGroupExclusionUserExemptOnly_Incorrect if {
 }
 
 test_UserGroupExclusionGroupExemptOnly_Incorrect if {
-    ControlNumber := "AAD 2.4"
-    Requirement := "MFA SHALL be required for all users"
+    PolicyId := "MS.AAD.4.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -686,7 +669,7 @@ test_UserGroupExclusionGroupExemptOnly_Incorrect if {
             }
         }
     }
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -694,8 +677,7 @@ test_UserGroupExclusionGroupExemptOnly_Incorrect if {
 }
 
 test_UserGroupExclusionTooFewUserExempts_Incorrect if {
-    ControlNumber := "AAD 2.4"
-    Requirement := "MFA SHALL be required for all users"
+    PolicyId := "MS.AAD.4.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -729,7 +711,7 @@ test_UserGroupExclusionTooFewUserExempts_Incorrect if {
             }
         }
     }
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -738,8 +720,7 @@ test_UserGroupExclusionTooFewUserExempts_Incorrect if {
 
 # Other conditions
 test_ConditionalAccessPolicies_Correct if {
-    ControlNumber := "AAD 2.4"
-    Requirement := "MFA SHALL be required for all users"
+    PolicyId := "MS.AAD.4.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -764,7 +745,7 @@ test_ConditionalAccessPolicies_Correct if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput)>= 1
     RuleOutput[0].RequirementMet
@@ -772,8 +753,7 @@ test_ConditionalAccessPolicies_Correct if {
 }
 
 test_IncludeApplications_Incorrect if {
-    ControlNumber := "AAD 2.4"
-    Requirement := "MFA SHALL be required for all users"
+    PolicyId := "MS.AAD.4.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -798,7 +778,7 @@ test_IncludeApplications_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -806,8 +786,8 @@ test_IncludeApplications_Incorrect if {
 }
 
 test_IncludeUsers_Incorrect if {
-    ControlNumber := "AAD 2.4"
-    Requirement := "MFA SHALL be required for all users"
+    PolicyId := "MS.AAD.4.1v1"
+
     Output := tests with input as {
         "conditional_access_policies": [
             {
@@ -831,7 +811,7 @@ test_IncludeUsers_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -839,8 +819,7 @@ test_IncludeUsers_Incorrect if {
 }
 
 test_ExcludeUsers_Incorrect if {
-    ControlNumber := "AAD 2.4"
-    Requirement := "MFA SHALL be required for all users"
+    PolicyId := "MS.AAD.4.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -865,7 +844,7 @@ test_ExcludeUsers_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -873,8 +852,7 @@ test_ExcludeUsers_Incorrect if {
 }
 
 test_ExcludeGroups_Incorrect if {
-    ControlNumber := "AAD 2.4"
-    Requirement := "MFA SHALL be required for all users"
+    PolicyId := "MS.AAD.4.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -899,7 +877,7 @@ test_ExcludeGroups_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -907,8 +885,7 @@ test_ExcludeGroups_Incorrect if {
 }
 
 test_ExcludeRoles_Incorrect if {
-    ControlNumber := "AAD 2.4"
-    Requirement := "MFA SHALL be required for all users"
+    PolicyId := "MS.AAD.4.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -933,7 +910,7 @@ test_ExcludeRoles_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -941,8 +918,7 @@ test_ExcludeRoles_Incorrect if {
 }
 
 test_BuiltInControls_Incorrect if {
-    ControlNumber := "AAD 2.4"
-    Requirement := "MFA SHALL be required for all users"
+    PolicyId := "MS.AAD.4.1v1"
 
 
     Output := tests with input as {
@@ -968,7 +944,7 @@ test_BuiltInControls_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -976,8 +952,7 @@ test_BuiltInControls_Incorrect if {
 }
 
 test_State_Incorrect if {
-    ControlNumber := "AAD 2.4"
-    Requirement := "MFA SHALL be required for all users"
+    PolicyId := "MS.AAD.4.1v1"
 
     Output := tests with input as {
         "conditional_access_policies": [
@@ -1002,7 +977,7 @@ test_State_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -1013,12 +988,11 @@ test_State_Incorrect if {
 # Policy 2
 #--
 test_NotImplemented_Correct_V1 if {
-    ControlNumber := "AAD 2.4"
-    Requirement := "Phishing-resistant MFA SHALL be used for all users"
+    PolicyId := "MS.AAD.4.2v1"
 
     Output := tests with input as { }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -1029,12 +1003,11 @@ test_NotImplemented_Correct_V1 if {
 # Policy 3
 #--
 test_NotImplemented_Correct_V2 if {
-    ControlNumber := "AAD 2.4"
-    Requirement := "If phishing-resistant MFA cannot be used, an MFA method from the list [see AAD baseline 2.4] SHALL be used in the interim"
+    PolicyId := "MS.AAD.4.3v1"
 
     Output := tests with input as { }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -1045,12 +1018,11 @@ test_NotImplemented_Correct_V2 if {
 # Policy 4
 #--
 test_NotImplemented_Correct_V3 if {
-    ControlNumber := "AAD 2.4"
-    Requirement := "SMS or Voice as the MFA method SHALL NOT be used"
+    PolicyId := "MS.AAD.4.4v1"
 
     Output := tests with input as { }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet

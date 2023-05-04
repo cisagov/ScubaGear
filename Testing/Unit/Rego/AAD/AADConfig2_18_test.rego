@@ -6,8 +6,7 @@ import future.keywords
 # Policy 1
 #--
 test_AllowInvitesFrom_Correct if {
-    ControlNumber := "AAD 2.18"
-    Requirement := "Only users with the Guest Inviter role SHOULD be able to invite guest users"
+    PolicyId := "MS.AAD.18.1v1"
 
     Output := tests with input as {
         "authorization_policies": [
@@ -18,7 +17,7 @@ test_AllowInvitesFrom_Correct if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -26,8 +25,7 @@ test_AllowInvitesFrom_Correct if {
 }
 
 test_AllowInvitesFrom_Incorrect if {
-    ControlNumber := "AAD 2.18"
-    Requirement := "Only users with the Guest Inviter role SHOULD be able to invite guest users"
+    PolicyId := "MS.AAD.18.1v1"
 
     Output := tests with input as {
         "authorization_policies": [
@@ -38,7 +36,7 @@ test_AllowInvitesFrom_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -49,12 +47,10 @@ test_AllowInvitesFrom_Incorrect if {
 # Policy 2
 #--
 test_NotImplemented_Correct if {
-    ControlNumber := "AAD 2.18"
-    Requirement := "Guest invites SHOULD only be allowed to specific external domains that have been authorized by the agency for legitimate business purposes"
-
+    PolicyId := "MS.AAD.18.2v1"
     Output := tests with input as { }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -65,8 +61,7 @@ test_NotImplemented_Correct if {
 # Policy 3
 #--
 test_GuestUserRoleId_Correct_V1 if {
-    ControlNumber := "AAD 2.18"
-    Requirement := "Guest users SHOULD have limited access to Azure AD directory objects"
+    PolicyId := "MS.AAD.18.3v1"
 
     Output := tests with input as {
         "authorization_policies": [
@@ -77,7 +72,7 @@ test_GuestUserRoleId_Correct_V1 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -85,8 +80,7 @@ test_GuestUserRoleId_Correct_V1 if {
 }
 
 test_GuestUserRoleId_Correct_V2 if {
-    ControlNumber := "AAD 2.18"
-    Requirement := "Guest users SHOULD have limited access to Azure AD directory objects"
+    PolicyId := "MS.AAD.18.3v1"
 
     Output := tests with input as {
         "authorization_policies": [
@@ -97,7 +91,7 @@ test_GuestUserRoleId_Correct_V2 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -105,8 +99,7 @@ test_GuestUserRoleId_Correct_V2 if {
 }
 
 test_GuestUserRoleId_Incorrect_V1 if {
-    ControlNumber := "AAD 2.18"
-    Requirement := "Guest users SHOULD have limited access to Azure AD directory objects"
+    PolicyId := "MS.AAD.18.3v1"
 
     Output := tests with input as {
         "authorization_policies": [
@@ -117,7 +110,7 @@ test_GuestUserRoleId_Incorrect_V1 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -125,8 +118,7 @@ test_GuestUserRoleId_Incorrect_V1 if {
 }
 
 test_GuestUserRoleId_Incorrect_V2 if {
-    ControlNumber := "AAD 2.18"
-    Requirement := "Guest users SHOULD have limited access to Azure AD directory objects"
+    PolicyId := "MS.AAD.18.3v1"
 
     Output := tests with input as {
         "authorization_policies": [
@@ -137,7 +129,7 @@ test_GuestUserRoleId_Incorrect_V2 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -145,8 +137,7 @@ test_GuestUserRoleId_Incorrect_V2 if {
 }
 
 test_GuestUserRoleId_Incorrect_V3 if {
-    ControlNumber := "AAD 2.18"
-    Requirement := "Guest users SHOULD have limited access to Azure AD directory objects"
+    PolicyId := "MS.AAD.18.3v1"
 
     Output := tests with input as {
         "authorization_policies": [
@@ -161,7 +152,7 @@ test_GuestUserRoleId_Incorrect_V3 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet

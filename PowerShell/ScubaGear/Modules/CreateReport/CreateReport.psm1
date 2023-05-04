@@ -197,12 +197,7 @@ function Import-SecureBaseline{
         $BaselinePath = (Join-Path -Path $PSScriptRoot -ChildPath "..\..\..\..\baselines\")
     )
 
-    # $ProductNames = Get-ChildItem $BaselinePath -Filter "*.md" | ForEach-Object {$_.Name.SubString(0, $_.Name.Length - 3)}
-    # TODO as other products are updated to the new format
-    $ProductNames =  Get-ChildItem $BaselinePath -Filter "teams.md" | ForEach-Object {$_.Name.SubString(0, $_.Name.Length - 3)}
-    # add them to above list. Once all products have been updated, replace the list with
-    # the commented out code above to generate the list automatically.
-
+    $ProductNames = Get-ChildItem $BaselinePath -Filter "*.md" | ForEach-Object {$_.Name.SubString(0, $_.Name.Length - 3)}
     $Output = @{}
 
     foreach ($Product in $ProductNames) {
@@ -211,7 +206,7 @@ function Import-SecureBaseline{
         $MdLines = Get-Content -Path $ProductPath
 
         # Select-String line numbers aren't 0-indexed, hence the "-1" on the next line
-        $LineNumbers = Select-String "## [0-9]+\." "$($BaselinePath)$($Product).md" | ForEach-Object {$_."LineNumber"-1}
+        $LineNumbers = Select-String "^## [0-9]+\." "$($BaselinePath)$($Product).md" | ForEach-Object {$_."LineNumber"-1}
         $Groups = $LineNumbers | ForEach-Object {$MdLines[$_]}
 
         foreach ($GroupName in $Groups) {
