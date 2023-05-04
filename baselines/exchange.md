@@ -41,7 +41,7 @@ strengthen the security of widely used cloud-based software services.
 
 # Baseline
 
-## 1 Automatic Forwarding to External Domains
+## 1. Automatic Forwarding to External Domains
 
 This control is intended to prevent bad actors from using client-side
 forwarding rules to exfiltrate data to external recipients.
@@ -79,7 +79,7 @@ To disallow automatic forwarding to external domains:
 5.  Clear the checkbox next to **Allow automatic forwarding**, then
     click **Save**.
 
-## 2 Sender Policy Framework
+## 2. Sender Policy Framework
 
 The Sender Policy Framework (SPF) is a mechanism that allows domain
 administrators to specify which IP addresses are explicitly approved to
@@ -131,7 +131,7 @@ PowerShell tool Resolve-DnsName. For example:
 
 `Resolve-DnsName example.com txt`
 
-## 3 DomainKeys Identified Mail
+## 3. DomainKeys Identified Mail
 
 DomainKeys Identified Mail (DKIM) allows digital signatures to be added
 to email messages in the message header, providing a layer of both
@@ -268,7 +268,7 @@ is included in the policy returned from the query, and that (3)
 <reports@dmarc.cyber.dhs.gov> is included as a point for contact for
 aggregate feedback.
 
-##5 Simple Mail Transfer Protocol Authentication (SMTP AUTH)
+## 5. Simple Mail Transfer Protocol Authentication (SMTP AUTH)
 
 Modern email clients that connect to Exchange Online mailboxes—including
 Outlook, Outlook on the web, iOS Mail, and Outlook for iOS and
@@ -314,7 +314,7 @@ listed at [Use the Microsoft 365 admin center to enable or disable SMTP
 AUTH on specific mailboxes \| Microsoft
 Docs](https://docs.microsoft.com/en-us/exchange/clients-and-mobile-in-exchange-online/authenticated-client-smtp-submission#use-the-microsoft-365-admin-center-to-enable-or-disable-smtp-auth-on-specific-mailboxes).
 
-## 6 Calendar and Contact Sharing
+## 6. Calendar and Contact Sharing
 
 Exchange Online allows the creation of sharing polices that soften
 default restrictions on contact and calendar details sharing. These
@@ -361,7 +361,7 @@ To restrict sharing with all domains:
 3.  Under **Individual Sharing**, for all existing policies, ensure that
     for all sharing rules, **Sharing with all domains** is not selected.
 
-## 7 External Sender Warnings
+## 7. External Sender Warnings
 
 Mail flow rules allow the modification of incoming mail, such that mail
 from external users can be easily identified, for example by prepending
@@ -420,7 +420,7 @@ To enable external sender warnings:
 
 11. Click **Save**.
 
-## 8 Data Loss Prevention Solutions
+## 8. Data Loss Prevention Solutions
 
 Data loss prevention (DLP) helps prevent both accidental leakage of
 sensitive information as well as intentional exfiltration of data. DLP
@@ -454,7 +454,7 @@ The DLP solution SHALL protect PII and sensitive information, as defined by the 
 - The “Data Loss Prevention SHALL Be Enabled” section of the *Defender
   for Office 365 Minimum Viable Secure Configuration Baseline*.
 
-## 9 Attachment File Type
+## 9. Attachment File Type
 
 For some types of files (e.g., executable files), the dangers of
 allowing them to be sent over email outweigh any potential benefits.
@@ -493,7 +493,7 @@ Disallowed file types SHALL be determined and set. At a minimum, click-to-run fi
   *Defender for Office 365 Minimum Viable Secure Configuration
   Baseline*.
 
-## Malware
+## 10. Malware
 
 Though any product that fills the requirements outlined in this baseline
 setting may be used, for guidance on implementing malware scanning using
@@ -530,7 +530,7 @@ Email scanning SHOULD be capable of reviewing emails after delivery.
   *Defender for Office 365 Minimum Viable Secure Configuration
   Baseline.*
 
-## 11 Phishing Protections
+## 11. Phishing Protections
 
 Several techniques exist for protecting against phishing attacks,
 including the following techniques:
@@ -573,7 +573,7 @@ The phishing protection solution SHOULD include an AI-based phishing detection t
 - The “Phishing Protections SHOULD Be Enabled” section of the *Defender
   for Office 365 Minimum Viable Secure Configuration Baseline.*
 
-## 12 IP Allow Lists
+## 12. IP Allow Lists
 
 Microsoft Defender supports the creations of IP “allow lists,” intended
 to ensure that emails from *specific* senders are not blocked. However,
@@ -648,7 +648,7 @@ policy](https://docs.microsoft.com/en-us/microsoft-365/security/office-365-secur
 
 8.  Ensure **Turn on safe list** is not selected.
 
-## 13 Mailbox Auditing
+## 13. Mailbox Auditing
 
 Mailbox auditing helps users investigate compromised accounts or
 discover illicit access to Exchange Online. Some actions performed by
@@ -699,7 +699,7 @@ To enable mailbox auditing via PowerShell:
 
 `Set-OrganizationConfig –AuditDisabled $false`
 
-## 14 Inbound Anti-Spam Protections
+## 14. Inbound Anti-Spam Protections
 
 Microsoft Defender includes several capabilities for protecting against
 inbound spam emails. Use of Microsoft Defender is not strictly required
@@ -731,7 +731,7 @@ Allowed senders MAY be added, but allowed domains SHALL NOT be added.
   *Defender for Office 365 Minimum Viable Secure Configuration
   Baseline*.
 
-## 15 Link Protection
+## 15. Link Protection
 
 Several technologies exist for protecting users from malicious links
 included in emails. For example, Microsoft Defender accomplishes this by
@@ -779,7 +779,7 @@ User click tracking SHOULD be enabled.
 - The “Safe Links Policies SHOULD Be Enabled” section of the *Defender
   for Office 365 Minimum Viable Secure Configuration Baseline*.
 
-## 16 Alerts
+## 16. Alerts
 
 Microsoft Defender includes several prebuilt alert policies, many of
 which pertain to Exchange Online. These alerts give admins better
@@ -822,7 +822,7 @@ At a minimum, the following alerts SHALL be enabled:
 - The “Alerts SHALL Be Enabled” section of the *Defender for Office 365
   Minimum Viable Secure Configuration Baseline*.
 
-## 17 Unified Audit Logging
+## 17. Unified Audit Logging
 
 Unified audit logging generates logs of user activity in M365 services. 
 These logs are essential for conducting incident response and threat detection activity.
