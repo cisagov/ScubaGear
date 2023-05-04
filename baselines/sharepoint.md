@@ -66,7 +66,7 @@ listed.
 
 # Baselines
 
-## 1 External Sharing Settings 
+## 1. External Sharing Settings 
 
 SharePoint allows sharing with users who are outside the agency, which
 is convenient but may pose a data loss or other information security
@@ -124,7 +124,7 @@ External sharing SHOULD be limited to approved security groups per interagency c
 - N/A
 
 
-## 2 Sensitivity Levels
+## 2. Sensitivity Levels
 
 SharePoint allows sharing with users who are outside the agency, which
 is convenient but may pose a data loss or other information security
@@ -149,7 +149,7 @@ Sharing settings for specific SharePoint sites SHOULD align to their sensitivity
 
 - N/A
 
-## 3 Guest Access
+## 3. Guest Access
 
 SharePoint allows sharing with users who are outside the agency, which
 is convenient but may pose a data loss or other information security
@@ -181,7 +181,7 @@ Expiration timers SHOULD be set to 30 days.
 - [Managing SharePoint Online Security: A Team Effort \| Microsoft
   Build](https://docs.microsoft.com/en-us/microsoft-365/community/sharepoint-security-a-team-effort)
 
-## 4 Custom Scripts
+## 4. Custom Scripts
 
 Allowing users to run custom scripts can potentially allow malicious
 scripts to run in a trusted environment. For this reason, running custom
