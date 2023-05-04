@@ -49,7 +49,7 @@ strengthen the security of widely used cloud-based software services.
 
 # Baseline
 
-## 1 Preset Security Profiles
+## 1. Preset Security Profiles
 
 Microsoft Defender defines two [preset security
 profiles](https://docs.microsoft.com/en-us/microsoft-365/security/office-365-security/preset-security-policies?view=o365-worldwide):
@@ -75,7 +75,7 @@ Preset security profiles SHOULD NOT be used.
 
 - N/A
 
-## 2 Data Loss Prevention
+## 2. Data Loss Prevention
 
 There are multiple, different ways to secure sensitive information, such
 as warning users, encryption, or blocking attempts to share. The
@@ -220,7 +220,7 @@ A list of browsers that are not allowed to access files protected by DLP policy 
 
   8.  Switch **Always audit file activity for devices** to **ON**.
 
-## 3 Common Attachments Filter
+## 3. Common Attachments Filter
 
 Filtering emails by attachment file types will flag emails as malware if
 the file type has been put in a predefined list of disallowed file
@@ -279,7 +279,7 @@ To create a new, custom policy, follow the instructions on [Use the
 Microsoft 365 Defender portal to create anti-malware
 policies](https://docs.microsoft.com/en-us/microsoft-365/security/office-365-security/configure-anti-malware-policies?view=o365-worldwide#use-the-microsoft-365-defender-portal-to-create-anti-malware-policies).
 
-## 4 Zero-Hour Auto Purge
+## 4. Zero-Hour Auto Purge
 
 This setting determines whether emails can be quarantined automatically
 after delivery to a user’s mailbox (e.g., in the case of a match with an
@@ -326,7 +326,7 @@ To enable ZAP:
 
 8.  Click **Save**.
 
-## 5 Phishing Protections
+## 5. Phishing Protections
 
 There are multiple ways to protect against phishing, including
 impersonation protection, mailbox intelligence and safety tips.
@@ -484,7 +484,7 @@ an AI-based tool for identifying potential impersonation attempts.
 
 22. Click **Save**.
 
-## 6 Inbound Anti-Spam Protections
+## 6. Inbound Anti-Spam Protections
 
 There are several features that protect against inbound spam. Bulk
 compliant level, quarantines, safety tips, and zero-hour auto purge.
@@ -591,7 +591,7 @@ The previously listed configurations SHALL be set in the default policy and SHOU
 
 11. Click **Save.**
 
-## 7 Safe Links
+## 7. Safe Links
 
 When enabled, URLs in emails are rewritten by prepending
 
@@ -729,7 +729,7 @@ message.**
 
 5.  Review the new policy, then click **Submit**.
 
-## 8 Safe-Attachments
+## 8. Safe-Attachments
 
 The Safe Attachments will scan messages for attachments with malicious
 content. It routes all messages and attachments that do not have a
@@ -829,7 +829,7 @@ Docs](https://docs.microsoft.com/en-us/microsoft-365/security/office-365-securit
 6.  Set **Turn on Defender for Office 365 for SharePoint, OneDrive, and
     Microsoft Teams** to on.
 
-## 9 Alerts
+## 9. Alerts
 
 There are several pre-built alert policies available pertaining to
 various apps in the M365 suite. These alerts give admins better
@@ -870,7 +870,7 @@ The alerts SHOULD be sent to a monitored address or incorporated into a SIEM.
 
 6.  Ensure **Email recipients** includes at least one monitored address.
 
-## 10 Microsoft Purview Audit
+## 10. Microsoft Purview Audit
 
 Unified audit logging generates logs of user activity in M365 services. 
 These logs are essential for conducting incident response and threat detection activity.
