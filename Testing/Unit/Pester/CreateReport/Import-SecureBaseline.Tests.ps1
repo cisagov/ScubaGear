@@ -29,10 +29,10 @@ InModuleScope CreateReport {
             $Baselines = Import-SecureBaseline -BaselinePath "./baselines/"
         }
         It "Validate import of markdown for all products" {
-            $Baselines.Length | Should -BeExactly 8
+            $Baselines.Length | Should -BeExactly 8 -Because "Markdown expected for all products."
         }
         It "Validate markdown group count for <Product>" -ForEach @(
-            @{Product = "aad"; GroupCount = 0; PolicyCount = 0}
+            @{Product = "aad"; GroupCount = 1; PolicyCount = 1}
             @{Product = "defender"; GroupCount = 0; PolicyCount = 0}
             @{Product = "exchange"; GroupCount = 0; PolicyCount = 0}
             @{Product = "onedrive"; GroupCount = 0; PolicyCount = 0}
@@ -54,8 +54,8 @@ InModuleScope CreateReport {
 
                 foreach ($Control in $Controls){
                     $Control.Id -Match  "^MS\.$($Product.ToUpper())\.\d{1,}\.\d{1,}v\d{1,}$" | Should -BeTrue
-                    $Control.Value -Match "^.*\.$" | Should -BeTrue
-                    $Control.Deleted | Should -Not -BeNullOrEmpty
+                    $Control.Value -Match "^.*\.$" | Should -BeTrue -Because "$Control.Id does not end with period."
+                    $Control.Deleted.GetType() -Eq [bool]| Should -BeTrue -Because "Type should be boolean."
                 }
             }
 

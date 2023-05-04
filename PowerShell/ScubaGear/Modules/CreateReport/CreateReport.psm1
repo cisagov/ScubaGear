@@ -266,8 +266,16 @@ function New-MarkdownAnchor{
         [string]
         $GroupName
     )
-    $MangledName = $GroupName.ToLower().Trim().Replace(' ', '-')
-    "#$GroupNumber-$MangledName"
+    [Int32]$OutNumber = $null
+
+    if ($true -eq [Int32]::TryParse($GroupNumber, [ref]$OutNumber)){
+        $MangledName = $GroupName.ToLower().Trim().Replace(' ', '-')
+        return "#$($GroupNumber.Trim())-$MangledName"
+    }
+    else {
+        $InvalidGroupNumber = New-Object System.ArgumentException "$GroupNumber is not valid"
+        throw $InvalidGroupNumber
+    }
 }
 
 Export-ModuleMember -Function @(
