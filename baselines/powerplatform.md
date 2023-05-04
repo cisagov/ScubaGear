@@ -74,7 +74,7 @@ environment level. Additional Power Platform security settings would be
 implemented at the app level, connector level, or Dataverse table level.
 Refer to Microsoft documentation for those additional controls.
 
-## 1 Power Platform Environments
+## 1. Power Platform Environments
 
 Power Platform environments are used to group together, manage, and
 store Power Apps and Power Virtual Agents. By default, any user in the
@@ -126,7 +126,7 @@ The ability to create additional environments SHALL be restricted to admins.
 Now only Global admins, Dynamics 365 service admins, Power Platform
 Service admins, and Delegated admins can create environments.
 
-## 2 Data Loss Prevention Policies
+## 2. Data Loss Prevention Policies
 
 To secure Power Platform environments Data Loss Prevention (DLP)
 policies can be created to restrict the connectors that can be used with
@@ -260,7 +260,7 @@ blocked to the **Blocked** category.
 
 14. Select **Next**-\> **Create Policy** to finish.
 
-## 3 Tenant Isolation
+## 3. Tenant Isolation
 
 Power Platform tenant isolation is different from Azure AD-wide tenant
 restriction. It does not impact Azure AD-based access outside of Power
@@ -322,7 +322,7 @@ The allowlist MAY be empty.
     the allowlist. However, these rules won't be enforced until tenant
     isolation is turned **On**.
 
-## 4 Content Security Policy
+## 4. Content Security Policy
 
 Content Security Policy (CSP) is an added layer of security that helps
 to detect and mitigate certain types of attacks, including Cross-Site
