@@ -315,7 +315,7 @@ organization](https://docs.microsoft.com/en-us/microsoftteams/manage-external-ac
     2.  Clear the check next to **External users with Teams accounts not managed by an organization can contact users in my organization**.
 
 ## 6. Skype Users
-TODO add context.
+Microsoft officially retired Skype for Business Online on July 31, 2021, and it is no longer supported. Skype for Business 2015 is slated for Apr 11, 2023 and Skype for Business Server 2015, 2016, 2019 LTSC and Server 2019 is slated for Oct 14, 2025.
 
 ### Policy
 
