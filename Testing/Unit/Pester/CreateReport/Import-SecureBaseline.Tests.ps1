@@ -35,11 +35,11 @@ InModuleScope CreateReport {
         It "Validate markdown group count for <Product>" -ForEach @(
             @{Product = "aad"; GroupCount = 18; PolicyCount = 33}
             @{Product = "defender"; GroupCount = 10; PolicyCount = 46}
-            @{Product = "exo"; GroupCount = 17; PolicyCount = 39}
-            @{Product = "onedrive"; GroupCount = 7; PolicyCount = 8}
+            @{Product = "exchange"; GroupCount = 17; PolicyCount = 39}
+            @{Product = "onedrive"; GroupCount = 3; PolicyCount = 8}
             @{Product = "powerbi"; GroupCount = 10; PolicyCount = 12}
             @{Product = "powerplatform"; GroupCount = 4; PolicyCount = 8}
-            @{Product = "sharepoint"; GroupCount = 5; PolicyCount = 6}
+            @{Product = "sharepoint"; GroupCount = 4; PolicyCount = 8}
             @{Product = "teams"; GroupCount = 13; PolicyCount = 28}
         ){
             {$Baselines.$Product} | Should -Not -Throw
