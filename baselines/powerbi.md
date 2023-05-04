@@ -71,7 +71,7 @@ Agencies using Power BI have a data classification scheme in place for
   
 # Baseline
 
-## 1 External Sharing
+## 1. External Sharing
 
 External sharing can represent a potential security risk, therefore,
 disabling it is a best practice unless specific, approved use cases make
@@ -122,7 +122,7 @@ If external sharing is deemed appropriate, the agency SHOULD limit the sharing a
 
 - N/A
 
-## 2 Publish to Web
+## 2. Publish to Web
 
 Power BI has a capability to publish reports and content to the web.
 This capability creates a publicly accessible web URL that does not
@@ -155,7 +155,7 @@ The Publish to Web feature SHOULD be disabled unless the agency mission requires
 - N/A
 
 
-## 3 Power BI Guest Access
+## 3. Power BI Guest Access
 
 A best practice is to disallow guest user access. Disallowing guest
 access also aligns with zero trust principles. The agency with
@@ -212,7 +212,7 @@ Guest user access to the Power BI tenant SHOULD be disabled unless the agency mi
 - N/A
 
 
-## 4 External Invitations
+## 4. External Invitations
 
 This setting controls whether Power BI allows inviting external users to
 the agency’s organization through Power BI’s sharing workflows and
@@ -261,7 +261,7 @@ The **Invite external users to your organization** feature SHOULD be disabled un
 - N/A
 
 
-## 5 The External Editing 
+## 5. The External Editing 
 
 It is possible to give external guest users the ability to edit and
 manage Power BI content; however, this could have considerable data
@@ -298,7 +298,7 @@ Pro license in a workspace other than the “My workspace” area to edit
 and manage content within the inviting organization’s Power BI tenant.
 
 
-## 6 Service Principals
+## 6. Service Principals
 
 Power BI supports the use of service principals to manage application
 identities. Service principals can use application programming
@@ -378,7 +378,7 @@ Service Principal credentials used for encrypting or accessing Power BI SHALL NO
 
 - N/A
 
-## 7 ResourceKey Authentication  
+## 7. ResourceKey Authentication  
 
 This setting pertains to the security and development of Power BI
 embedded content. The Power BI tenant states that “for extra security,
@@ -417,7 +417,7 @@ RourceKey Authentication SHOULD be blocked unless a specific use case (e.g., str
 
 - N/A
 
-## 8 Python and R Visual Sharing
+## 8. Python and R Visual Sharing
 
 Power BI can interact with Python and R scripts to integrate
 visualizations from these languages. Python visuals are created from
@@ -444,7 +444,7 @@ R and Python interactions SHOULD be disabled.
 - N/A
 
 
-## 9 Sensitive Data
+## 9. Sensitive Data
 
 There are multiple ways to secure sensitive information, such as warning
 users, encryption, or blocking attempts to share. Use Microsoft
@@ -505,7 +505,7 @@ Sensitivity labels SHOULD be enabled for Power BI and employed for sensitive dat
   policies](https://docs.microsoft.com/en-us/microsoft-365/compliance/create-sensitivity-labels)
   for detail.
 
-## 10 Audit Logs
+## 10. Audit Logs
 
 The Power BI tenant has a setting for audit log generation to monitor
 internal activity and compliance. Users within the agency can use
