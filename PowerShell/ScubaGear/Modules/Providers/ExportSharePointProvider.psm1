@@ -10,12 +10,11 @@ function Export-SharePointProvider {
     param (
         [Parameter(Mandatory = $true)]
         [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $false)]
-        [ValidateNotNullOrEmpty()]
+        #[ValidateNotNullOrEmpty()]
         [string]
         $M365Environment,
 
         [Parameter(Mandatory = $false)]
-        [ValidateNotNullOrEmpty()]
         [switch]
         $PnPFlag
     )

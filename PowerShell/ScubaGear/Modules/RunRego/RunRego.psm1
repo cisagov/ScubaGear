@@ -10,7 +10,7 @@ function Invoke-Rego {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory = $true)]
-        [ValidateNotNullOrEmpty()]
+        [ValidateScript({Test-Path -PathType Leaf $_})]
         [string]
         $InputFile,
 

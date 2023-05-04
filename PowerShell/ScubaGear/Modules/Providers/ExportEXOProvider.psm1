@@ -173,8 +173,8 @@ function Invoke-RobustDnsTxt {
         $Qname,
 
         [Parameter(Mandatory=$false)]
-        [ValidateNotNullOrEmpty()]
-        [string]
+        [ValidateRange(1, [int]::MaxValue)]
+        [int]
         $MaxTries = 2
     )
     $Answers = @()

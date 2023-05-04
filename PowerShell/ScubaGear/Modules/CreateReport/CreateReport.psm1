@@ -31,7 +31,7 @@ function New-Report {
         # The location to save the html report in.
         [Parameter(Mandatory=$true)]
         [ValidateScript({Test-Path -PathType Container $_})]
-        [ValidateNotNullOrEmpty()]
+        [ValidateScript({Test-Path -IsValid $_})]
         [string]
         $OutPath,
 
@@ -41,7 +41,7 @@ function New-Report {
         $OutProviderFileName,
 
         [Parameter(Mandatory=$true)]
-        [ValidateNotNullOrEmpty()]
+        [ValidateScript({Test-Path -IsValid $_})]
         [string]
         $OutRegoFileName,
 

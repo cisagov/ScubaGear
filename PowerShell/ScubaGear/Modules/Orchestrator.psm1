@@ -123,7 +123,6 @@ function Invoke-SCuBA {
         $M365Environment = "commercial",
 
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
-        [ValidateNotNullOrEmpty()]
         [ValidateScript({Test-Path -PathType Container $_})]
         [string]
         $OPAPath = (Join-Path -Path $PSScriptRoot -ChildPath "..\..\.."),
