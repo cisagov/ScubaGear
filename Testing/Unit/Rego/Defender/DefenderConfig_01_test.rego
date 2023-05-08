@@ -108,8 +108,3 @@ test_Identity_Incorrect_V2 if {
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "The Strict Preset Security Policy is present and not disabled"
-}

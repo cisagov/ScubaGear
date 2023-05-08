@@ -92,7 +92,3 @@ test_AutoForwardEnabled_Incorrect_V3 if {
     not RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "2 remote domain(s) that allows automatic forwarding: Test name, Test name 2"
 }
-
-# TODO: what about the case where "remote_domains" is empty?
-# Is this possible? Or will the default domain "*" always be there?
-# Requires exploration online and manual testing.
