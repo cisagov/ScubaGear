@@ -6,8 +6,7 @@ import future.keywords
 # Policy 1
 #--
 test_FromScope_Correct if {
-    ControlNumber := "EXO 2.7"
-    Requirement := "External sender warnings SHALL be implemented"
+    PolicyId := "MS.EXCHANGE.7.1v1"
     
     Output := tests with input as {
         "transport_rule": [
@@ -19,7 +18,7 @@ test_FromScope_Correct if {
         ]    
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
  
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -27,8 +26,7 @@ test_FromScope_Correct if {
 }
 
 test_FromScope_IncorrectV1 if {
-    ControlNumber := "EXO 2.7"
-    Requirement := "External sender warnings SHALL be implemented"
+    PolicyId := "MS.EXCHANGE.7.1v1"
 
     Output := tests with input as {
         "transport_rule": [
@@ -40,7 +38,7 @@ test_FromScope_IncorrectV1 if {
         ]    
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
  
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -48,8 +46,7 @@ test_FromScope_IncorrectV1 if {
 }
 
 test_FromScope_IncorrectV2 if {
-    ControlNumber := "EXO 2.7"
-    Requirement := "External sender warnings SHALL be implemented"
+    PolicyId := "MS.EXCHANGE.7.1v1"
 
     Output := tests with input as {
         "transport_rule": [
@@ -61,7 +58,7 @@ test_FromScope_IncorrectV2 if {
         ]    
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
  
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -69,8 +66,7 @@ test_FromScope_IncorrectV2 if {
 }
 
 test_FromScope_IncorrectV3 if {
-    ControlNumber := "EXO 2.7"
-    Requirement := "External sender warnings SHALL be implemented"
+    PolicyId := "MS.EXCHANGE.7.1v1"
 
     Output := tests with input as {
         "transport_rule": [
@@ -82,7 +78,7 @@ test_FromScope_IncorrectV3 if {
         ]    
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
  
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -90,8 +86,7 @@ test_FromScope_IncorrectV3 if {
 }
 
 test_FromScope_IncorrectV4 if {
-    ControlNumber := "EXO 2.7"
-    Requirement := "External sender warnings SHALL be implemented"
+    PolicyId := "MS.EXCHANGE.7.1v1"
 
     Output := tests with input as {
         "transport_rule": [
@@ -103,7 +98,7 @@ test_FromScope_IncorrectV4 if {
         ]    
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
  
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -111,8 +106,7 @@ test_FromScope_IncorrectV4 if {
 }
 
 test_FromScope_Multiple_Correct if {
-    ControlNumber := "EXO 2.7"
-    Requirement := "External sender warnings SHALL be implemented"
+    PolicyId := "MS.EXCHANGE.7.1v1"
 
     Output := tests with input as {
         "transport_rule": [
@@ -139,7 +133,7 @@ test_FromScope_Multiple_Correct if {
         ]    
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
  
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -147,8 +141,7 @@ test_FromScope_Multiple_Correct if {
 }
 
 test_FromScope_Multiple_Incorrect if {
-    ControlNumber := "EXO 2.7"
-    Requirement := "External sender warnings SHALL be implemented"
+    PolicyId := "MS.EXCHANGE.7.1v1"
 
     Output := tests with input as {
         "transport_rule": [
@@ -185,7 +178,7 @@ test_FromScope_Multiple_Incorrect if {
         ]    
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
  
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet

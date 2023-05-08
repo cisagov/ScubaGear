@@ -124,12 +124,8 @@ GroupExclusionsFullyExempt(Policy, PolicyID) := true if {
     count({ y | y := input.scuba_config.Aad[PolicyID].CapExclusions.Groups }) == 0
 }
 
-################
-# Baseline 2.1 #
-################
-
 #
-# Baseline 2.1: Policy 1
+# MS.AAD.1.1v1
 #--
 
 default Policy2_1_1ConditionsMatch(_) := false
@@ -166,13 +162,8 @@ tests[{
     true
 }
 
-#--
-################
-# Baseline 2.2 #
-################
-
 #
-# Baseline 2.2: Policy 1
+# MS.AAD.2.1v1
 #--
 
 default Policy2_2_1ConditionsMatch(_) := false
@@ -210,7 +201,7 @@ tests[{
 #--
 
 #
-# Baseline 2.2: Policy 2
+# MS.AAD.2.2v1
 #--
 # At this time we are unable to test for X because of Y
 tests[{
@@ -226,12 +217,8 @@ tests[{
 #--
 
 
-################
-# Baseline 2.3 #
-################
-
 #
-# Baseline 2.3: Policy 1
+# MS.AAD.3.1v1
 #--
 
 default Policy2_3_1ConditionsMatch(_) := false
@@ -269,12 +256,8 @@ tests[{
 #--
 
 
-################
-# Baseline 2.4 #
-################
-
 #
-# Baseline 2.4: Policy 1
+# MS.AAD.4.1v1
 #--
 default Policy2_4_1ConditionsMatch(_) := false
 Policy2_4_1ConditionsMatch(Policy) := true if {
@@ -310,7 +293,7 @@ tests[{
 #--
 
 #
-# Baseline 2.4: Policy 2
+# MS.AAD.4.2v1
 #--
 # At this time we are unable to fully test for MFA due to conflicting and multiple ways to configure authentication methods
 # Awaiting API changes and feature updates from Microsoft for automated checking
@@ -327,7 +310,7 @@ tests[{
 #--
 
 #
-# Baseline 2.4: Policy 3
+# MS.AAD.4.3v1
 #--
 # At this time we are unable to test for all users due to conflicting and multiple ways to configure authentication methods
 # Awaiting API changes and feature updates from Microsoft for automated checking
@@ -344,7 +327,7 @@ tests[{
 #--
 
 #
-# Baseline 2.4: Policy 4
+# MS.AAD.4.4v1
 #--
 # At this time we are unable to test for SMS/Voice settings due to lack of API to validate
 # Awaiting API changes and feature updates from Microsoft for automated checking
@@ -361,12 +344,8 @@ tests[{
 #--
 
 
-################
-# Baseline 2.5 #
-################
-
 #
-# Baseline 2.5: Policy 1
+# MS.AAD.5.1v1
 #--
 # At this time we are unable to test for log collection until we integrate Azure Powershell capabilities
 tests[{
@@ -382,7 +361,7 @@ tests[{
 #--
 
 #
-# Baseline 2.5: Policy 2
+# MS.AAD.5.4v1
 #--
 # At this time we are unable to test for X because of Y
 tests[{
@@ -398,10 +377,6 @@ tests[{
 #--
 
 
-################
-# Baseline 2.6 #
-################
-
 AuthPoliciesBad_2_6[Policy.Id] {
     Policy = input.authorization_policies[_]
     Policy.DefaultUserRolePermissions.AllowedToCreateApps == true
@@ -415,7 +390,7 @@ AllAuthPoliciesAllowedCreate[{
 }
 
 #
-# Baseline 2.6: Policy 1
+# MS.AAD.6.1v1
 #--
 tests[{
     "PolicyId" : "MS.AAD.6.1v1",
@@ -432,12 +407,8 @@ tests[{
 #--
 
 
-################
-# Baseline 2.7 #
-################
-
 #
-# Baseline 2.7: Policy 1
+# MS.AAD.7.1v1
 #--
 BadDefaultGrantPolicies[Policy.Id] {
     Policy = input.authorization_policies[_]
@@ -466,7 +437,7 @@ tests[{
 #--
 
 #
-# Baseline 2.7: Policy 2
+# MS.AAD.7.2v1
 #--
 BadConsentPolicies[Policy.Id] {
     Policy := input.admin_consent_policies[_]
@@ -495,7 +466,7 @@ tests[{
 #--
 
 #
-# Baseline 2.7: Policy 3
+# MS.AAD.7.3v1
 #--
 AllConsentSettings[{
     "SettingsGroup": SettingGroup.DisplayName,
@@ -538,13 +509,8 @@ tests[{
 }
 #--
 
-
-################
-# Baseline 2.8 #
-################
-
 #
-# Baseline 2.8: Policy 1
+# MS.AAD.8.1v1
 #--
 # At this time we are unable to test for X because of Y
 tests[{
@@ -559,13 +525,8 @@ tests[{
 }
 #--
 
-
-################
-# Baseline 2.9 #
-################
-
 #
-# Baseline 2.9: Policy 1
+# MS.AAD.9.1v1
 #--
 default Policy2_9_1ConditionsMatch(_) := false
 Policy2_9_1ConditionsMatch(Policy) := true if {
@@ -602,13 +563,8 @@ tests[{
 }
 #--
 
-
-#################
-# Baseline 2.10 #
-#################
-
 #
-# Baseline 2.10: Policy 1
+# MS.AAD.10.1v1
 #--
 default Policy2_10_1ConditionsMatch(_) := false
 Policy2_10_1ConditionsMatch(Policy) := true if {
@@ -644,12 +600,8 @@ tests[{
 }
 #--
 
-#################
-# Baseline 2.11 #
-#################
-
 #
-# Baseline 2.11: Policy 1
+# MS.AAD.11.1v1
 #--
 GlobalAdmins[User.DisplayName] {
     some id
@@ -671,13 +623,8 @@ tests[{
 }
 #--
 
-
-#################
-# Baseline 2.12 #
-#################
-
 #
-# Baseline 2.12: Policy 1
+# MS.AAD.12.1v1
 #--
 FederatedAdmins[User.DisplayName] {
     some id
@@ -699,12 +646,8 @@ tests[{
 }
 #--
 
-#################
-# Baseline 2.13 #
-#################
-
 #
-# Baseline 2.13: Policy 1
+# MS.AAD.13.1v1
 #--
 Policies2_13[Cap.DisplayName] {
     Cap := input.conditional_access_policies[_]
@@ -737,7 +680,7 @@ tests[{
 
 
 #################
-# Helper functions for policies 2.14, 2.15, 2.16
+# Helper functions for policies
 #################
 
 # DoPIMRoleRulesExist will return true when the JSON privileged_roles.Rules element exists and false when it does not.
@@ -762,12 +705,8 @@ DoPIMRoleAssignmentsExist {
 default check_if_role_assignments_exist := false
 check_if_role_assignments_exist := DoPIMRoleAssignmentsExist
 
-#################
-# Baseline 2.14 #
-#################
-
 #
-# Baseline 2.14: Policy 1
+# MS.AAD.14.1v1
 #--
 RolesWithoutLimitedExpirationPeriod[Role.DisplayName] {
     Role := input.privileged_roles[_]
@@ -804,7 +743,7 @@ tests[{
 #--
 
 #
-# Baseline 2.14: Policy 2
+# MS.AAD.14.2v1
 #--
 RolesAssignedOutsidePim[Role.DisplayName] {
     Role := input.privileged_roles[_]
@@ -828,12 +767,8 @@ tests[{
 #--
 
 
-#################
-# Baseline 2.15 #
-#################
-
 #
-# Baseline 2.15: Policy 1
+# MS.AAD.15.1v1
 #--
 RolesWithoutApprovalRequired[RoleName] {
     Role := input.privileged_roles[_]
@@ -858,13 +793,8 @@ tests[{
 }
 #--
 
-
-#################
-# Baseline 2.16 #
-#################
-
 #
-# Baseline 2.16: Policy 1
+# MS.AAD.16.1v1
 #--
 RolesWithoutActiveAssignmentAlerts[RoleName] {
     Role := input.privileged_roles[_]
@@ -900,7 +830,7 @@ tests[{
 #--
 
 #
-# Baseline 2.16: Policy 2
+# MS.AAD.16.2v1
 #--
 AdminsWithoutActivationAlert[RoleName] {
     Role := input.privileged_roles[_]
@@ -927,7 +857,7 @@ tests[{
 #--
 
 #
-# Baseline 2.16: Policy 3
+# MS.AAD.16.3v1
 #--
 tests[{
     "PolicyId" : "MS.AAD.16.3v1",
@@ -944,13 +874,8 @@ tests[{
 }
 #--
 
-
-#################
-# Baseline 2.17 #
-#################
-
 #
-# Baseline 2.17: Policy 1
+# MS.AAD.17.1v1
 #--
 Policies2_17[Cap.DisplayName] {
     Cap := input.conditional_access_policies[_]
@@ -977,15 +902,9 @@ tests[{
 }
 #--
 
-
-#################
-# Baseline 2.18 #
-#################
-
 #
-# Baseline 2.18: Policy 1
+# MS.AAD.18.1v1
 #--
-
 AuthPoliciesBadAllowInvites[Policy.Id] {
     Policy = input.authorization_policies[_]
     Policy.AllowInvitesFrom != "adminsAndGuestInviters"
@@ -1017,7 +936,7 @@ tests[{
 #--
 
 #
-# Baseline 2.18: Policy 2
+# MS.AAD.18.2v1
 #--
 # At this time we are unable to test for X because of Y
 tests[{
@@ -1033,7 +952,7 @@ tests[{
 #--
 
 #
-# Baseline 2.18: Policy 3
+# MS.AAD.18.3v1
 #--
 # must hardcode the ID. See
 # https://docs.microsoft.com/en-us/azure/active-directory/enterprise-users/users-restrict-guest-permissions
@@ -1060,7 +979,6 @@ RoleIdByPolicy[concat("", ["\"", Level, "\"", " (", Policy.Id, ")"])] {
     Policy := input.authorization_policies[_]
     Level := LevelAsString(Policy.GuestUserRoleId)
 }
-
 
 tests[{
     "PolicyId" : "MS.AAD.18.3v1",

@@ -6,8 +6,7 @@ import future.keywords
 # Policy 1
 #--
 test_SmtpClientAuthenticationDisabled_Correct if {
-    ControlNumber := "EXO 2.5"
-    Requirement := "SMTP AUTH SHALL be disabled in Exchange Online"
+    PolicyId := "MS.EXCHANGE.5.1v1"
 
     Output := tests with input as {
         "transport_config": 
@@ -19,7 +18,7 @@ test_SmtpClientAuthenticationDisabled_Correct if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
  
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -27,8 +26,7 @@ test_SmtpClientAuthenticationDisabled_Correct if {
 }
 
 test_SmtpClientAuthenticationDisabled_Incorrect if {
-    ControlNumber := "EXO 2.5"
-    Requirement := "SMTP AUTH SHALL be disabled in Exchange Online"
+    PolicyId := "MS.EXCHANGE.5.1v1"
 
     Output := tests with input as {
         "transport_config": [
@@ -39,7 +37,7 @@ test_SmtpClientAuthenticationDisabled_Incorrect if {
         ]  
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
  
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet

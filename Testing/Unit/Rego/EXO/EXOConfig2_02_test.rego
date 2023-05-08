@@ -6,12 +6,11 @@ import future.keywords
 # Policy 1
 #--
 test_NotImplemented_Correct if {
-    ControlNumber := "EXO 2.2"
-    Requirement := "A list of approved IP addresses for sending mail SHALL be maintained"
+    PolicyId := "MS.EXCHANGE.2.1v1"
 
     Output := tests with input as { }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -22,8 +21,7 @@ test_NotImplemented_Correct if {
 # Policy 2
 #--
 test_Rdata_Correct if {
-    ControlNumber := "EXO 2.2"
-    Requirement := "An SPF policy(s) that designates only these addresses as approved senders SHALL be published"
+    PolicyId := "MS.EXCHANGE.2.2v1"
 
     Output := tests with input as {
         "spf_records": [
@@ -35,7 +33,7 @@ test_Rdata_Correct if {
     }
 
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -43,8 +41,7 @@ test_Rdata_Correct if {
 }
 
 test_Rdata_Correct_V2 if {
-    ControlNumber := "EXO 2.2"
-    Requirement := "An SPF policy(s) that designates only these addresses as approved senders SHALL be published"
+    PolicyId := "MS.EXCHANGE.2.2v1"
 
     Output := tests with input as {
         "spf_records": [
@@ -55,7 +52,7 @@ test_Rdata_Correct_V2 if {
         ]    
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
     
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -63,8 +60,7 @@ test_Rdata_Correct_V2 if {
 }
 
 test_Rdata_Incorrect if {
-    ControlNumber := "EXO 2.2"
-    Requirement := "An SPF policy(s) that designates only these addresses as approved senders SHALL be published"
+    PolicyId := "MS.EXCHANGE.2.2v1"
 
     Output := tests with input as {
         "spf_records": [
@@ -75,7 +71,7 @@ test_Rdata_Incorrect if {
         ]    
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
     
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -83,8 +79,7 @@ test_Rdata_Incorrect if {
 }
 
 test_Rdata_Incorrect_V2 if {
-    ControlNumber := "EXO 2.2"
-    Requirement := "An SPF policy(s) that designates only these addresses as approved senders SHALL be published"
+    PolicyId := "MS.EXCHANGE.2.2v1"
 
     Output := tests with input as {
         "spf_records": [
@@ -95,7 +90,7 @@ test_Rdata_Incorrect_V2 if {
         ]    
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
     
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -103,8 +98,7 @@ test_Rdata_Incorrect_V2 if {
 }
 
 test_Rdata_Incorrect_V3 if {
-    ControlNumber := "EXO 2.2"
-    Requirement := "An SPF policy(s) that designates only these addresses as approved senders SHALL be published"
+    PolicyId := "MS.EXCHANGE.2.2v1"
     
     Output := tests with input as {
         "spf_records": [
@@ -123,7 +117,7 @@ test_Rdata_Incorrect_V3 if {
         ]    
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -137,8 +131,7 @@ test_Rdata_Incorrect_V3 if {
 }
 
 test_Rdata_Multiple_Correct_V1 if {
-    ControlNumber := "EXO 2.2"
-    Requirement := "An SPF policy(s) that designates only these addresses as approved senders SHALL be published"
+    PolicyId := "MS.EXCHANGE.2.2v1"
     
     Output := tests with input as {
         "spf_records": [
@@ -149,7 +142,7 @@ test_Rdata_Multiple_Correct_V1 if {
         ]    
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -157,8 +150,7 @@ test_Rdata_Multiple_Correct_V1 if {
 }
 
 test_Rdata_Multiple_Correct_V2 if {
-    ControlNumber := "EXO 2.2"
-    Requirement := "An SPF policy(s) that designates only these addresses as approved senders SHALL be published"
+    PolicyId := "MS.EXCHANGE.2.2v1"
     
     Output := tests with input as {
         "spf_records": [
@@ -169,7 +161,7 @@ test_Rdata_Multiple_Correct_V2 if {
         ]    
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -177,8 +169,7 @@ test_Rdata_Multiple_Correct_V2 if {
 }
 
 test_Rdata_Multiple_Incorrect if {
-    ControlNumber := "EXO 2.2"
-    Requirement := "An SPF policy(s) that designates only these addresses as approved senders SHALL be published"
+    PolicyId := "MS.EXCHANGE.2.2v1"
     
     Output := tests with input as {
         "spf_records": [
@@ -189,7 +180,7 @@ test_Rdata_Multiple_Incorrect if {
         ]    
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet

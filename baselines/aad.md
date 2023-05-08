@@ -463,7 +463,7 @@ If the Azure AD Provisioning Service is used to provision users to
 <!-- -->
 
 #### MS.AAD.5.4v1
-The logs SHALL be sent to the agency’s SOC for monitoring.
+The logs SHALL be sent to the agency’'s SOC for monitoring.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
@@ -1003,7 +1003,7 @@ instructions, an equivalent third-party PAM service may be used instead.
 
 ### Policies
 #### MS.AAD.15.1v1
-Activation of highly privileged roles SHOULD require approval
+Activation of highly privileged roles SHOULD require approval.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 

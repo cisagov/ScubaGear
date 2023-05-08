@@ -6,12 +6,11 @@ import future.keywords
 # Policy 1
 #--
 test_3rdParty_Correct_V1 if {
-    ControlNumber := "EXO 2.14"
-    Requirement := "A spam filter SHALL be enabled. The filtering solution selected SHOULD offer services comparable to the native spam filtering offered by Microsoft"
-
+    PolicyId := "MS.EXCHANGE.14.1v1"
+    
     Output := tests with input as { }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -22,12 +21,11 @@ test_3rdParty_Correct_V1 if {
 # Policy 2
 #--
 test_3rdParty_Correct_V2 if {
-    ControlNumber := "EXO 2.14"
-    Requirement := "Spam and high confidence spam SHALL be moved to either the junk email folder or the quarantine folder"
-
+    PolicyId := "MS.EXCHANGE.14.2v1"
+    
     Output := tests with input as { }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -38,12 +36,11 @@ test_3rdParty_Correct_V2 if {
 # Policy 3
 #--
 test_3rdParty_Correct_V3 if {
-    ControlNumber := "EXO 2.14"
-    Requirement := "Allowed senders MAY be added, but allowed domains SHALL NOT be added"
-
+    PolicyId := "MS.EXCHANGE.14.3v1"
+    
     Output := tests with input as { }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet

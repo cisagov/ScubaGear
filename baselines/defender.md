@@ -841,7 +841,7 @@ At a minimum, the alerts required by the *Exchange Online Minimum Viable Secure 
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
-#### MS.DEFENDER.9.1v1
+#### MS.DEFENDER.9.2v1
 The alerts SHOULD be sent to a monitored address or incorporated into a SIEM.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023

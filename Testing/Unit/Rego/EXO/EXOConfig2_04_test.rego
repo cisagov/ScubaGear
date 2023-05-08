@@ -6,8 +6,7 @@ import future.keywords
 # Policy 1
 #--
 test_Rdata_Correct if {
-    ControlNumber := "EXO 2.4"
-    Requirement := "A DMARC policy SHALL be published for every second-level domain"
+    PolicyId := "MS.EXCHANGE.4.1v1"
 
     Output := tests with input as {
         "dmarc_records":[
@@ -24,7 +23,7 @@ test_Rdata_Correct if {
         ]  
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
  
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -32,8 +31,7 @@ test_Rdata_Correct if {
 }
 
 test_Rdata_Incorrect if {
-    ControlNumber := "EXO 2.4"
-    Requirement := "A DMARC policy SHALL be published for every second-level domain"
+    PolicyId := "MS.EXCHANGE.4.1v1"
 
     Output := tests with input as {
         "dmarc_records":[
@@ -50,7 +48,7 @@ test_Rdata_Incorrect if {
         ]  
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
  
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -58,8 +56,7 @@ test_Rdata_Incorrect if {
 }
 
 test_Rdata_Incorrect_V2 if {
-    ControlNumber := "EXO 2.4"
-    Requirement := "A DMARC policy SHALL be published for every second-level domain"
+    PolicyId := "MS.EXCHANGE.4.1v1"
 
     Output := tests with input as {
         "dmarc_records":[  
@@ -76,7 +73,7 @@ test_Rdata_Incorrect_V2 if {
         ]  
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
  
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -84,8 +81,7 @@ test_Rdata_Incorrect_V2 if {
 }
 
 test_Rdata_Incorrect_V3 if {
-    ControlNumber := "EXO 2.4"
-    Requirement := "A DMARC policy SHALL be published for every second-level domain"
+    PolicyId := "MS.EXCHANGE.4.1v1"
 
     Output := tests with input as {
         "dmarc_records": [
@@ -110,7 +106,7 @@ test_Rdata_Incorrect_V3 if {
         ]  
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
  
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -121,8 +117,7 @@ test_Rdata_Incorrect_V3 if {
 # Policy 2
 #--
 test_Rdata_Correct_V2 if {
-    ControlNumber := "EXO 2.4"
-    Requirement := "The DMARC message rejection option SHALL be \"p=reject\""
+    PolicyId := "MS.EXCHANGE.4.2v1"
 
     Output := tests with input as {
         "dmarc_records": [
@@ -139,7 +134,7 @@ test_Rdata_Correct_V2 if {
         ]  
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
  
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -147,8 +142,7 @@ test_Rdata_Correct_V2 if {
 }
 
 test_Rdata_Incorrect_V4 if {
-    ControlNumber := "EXO 2.4"
-    Requirement := "The DMARC message rejection option SHALL be \"p=reject\""
+    PolicyId := "MS.EXCHANGE.4.2v1"
 
     Output := tests with input as {
         "dmarc_records": [
@@ -165,7 +159,7 @@ test_Rdata_Incorrect_V4 if {
         ]  
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
  
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -173,8 +167,7 @@ test_Rdata_Incorrect_V4 if {
 }
 
 test_Rdata_Incorrect_V5 if {
-    ControlNumber := "EXO 2.4"
-    Requirement := "The DMARC message rejection option SHALL be \"p=reject\""
+    PolicyId := "MS.EXCHANGE.4.2v1"
 
     Output := tests with input as {
         "dmarc_records": [
@@ -191,7 +184,7 @@ test_Rdata_Incorrect_V5 if {
         ]  
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
  
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -202,8 +195,7 @@ test_Rdata_Incorrect_V5 if {
 # Policy 3
 #--
 test_Rdata_Correct_V3 if {
-    ControlNumber := "EXO 2.4"
-    Requirement := "The DMARC point of contact for aggregate reports SHALL include reports@dmarc.cyber.dhs.gov"
+    PolicyId := "MS.EXCHANGE.4.3v1"
 
     Output := tests with input as {
         "dmarc_records": [
@@ -220,7 +212,7 @@ test_Rdata_Correct_V3 if {
         ]  
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
  
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -228,8 +220,7 @@ test_Rdata_Correct_V3 if {
 }
 
 test_Rdata_Incorrect_V6 if {
-    ControlNumber := "EXO 2.4"
-    Requirement := "The DMARC point of contact for aggregate reports SHALL include reports@dmarc.cyber.dhs.gov"
+    PolicyId := "MS.EXCHANGE.4.3v1"
 
     Output := tests with input as {
         "dmarc_records": [
@@ -246,7 +237,7 @@ test_Rdata_Incorrect_V6 if {
         ]  
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
  
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -254,8 +245,7 @@ test_Rdata_Incorrect_V6 if {
 }
 
 test_Rdata_Incorrect_V7 if {
-    ControlNumber := "EXO 2.4"
-    Requirement := "The DMARC point of contact for aggregate reports SHALL include reports@dmarc.cyber.dhs.gov"
+    PolicyId := "MS.EXCHANGE.4.3v1"
 
     Output := tests with input as {
         "dmarc_records": [
@@ -272,7 +262,7 @@ test_Rdata_Incorrect_V7 if {
         ]  
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
  
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -283,8 +273,7 @@ test_Rdata_Incorrect_V7 if {
 # Policy 4
 #--
 test_Rdata_Incorrect_V4 if {
-    ControlNumber := "EXO 2.4"
-    Requirement := "An agency point of contact SHOULD be included for aggregate and/or failure reports"
+    PolicyId := "MS.EXCHANGE.4.4v1"
 
     Output := tests with input as {
         "dmarc_records": [
@@ -301,7 +290,7 @@ test_Rdata_Incorrect_V4 if {
         ]  
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
  
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -309,8 +298,7 @@ test_Rdata_Incorrect_V4 if {
 }
 
 test_Rdata_Incorrect_V8 if {
-    ControlNumber := "EXO 2.4"
-    Requirement := "An agency point of contact SHOULD be included for aggregate and/or failure reports"
+    PolicyId := "MS.EXCHANGE.4.4v1"
     
     Output := tests with input as {
         "dmarc_records": [
@@ -327,7 +315,7 @@ test_Rdata_Incorrect_V8 if {
         ]  
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
  
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet

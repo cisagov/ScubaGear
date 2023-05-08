@@ -6,8 +6,7 @@ import future.keywords
 # Policy 1
 #--
 test_IPAllowList_Correct_V1 if {
-    ControlNumber := "EXO 2.12"
-    Requirement := "IP allow lists SHOULD NOT be created"
+    PolicyId := "MS.EXCHANGE.12.1v1"
     
     Output := tests with input as {
         "conn_filter": [
@@ -19,7 +18,7 @@ test_IPAllowList_Correct_V1 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
  
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -27,8 +26,7 @@ test_IPAllowList_Correct_V1 if {
 }
 
 test_IPAllowList_Correct_V2 if {
-    ControlNumber := "EXO 2.12"
-    Requirement := "IP allow lists SHOULD NOT be created"
+    PolicyId := "MS.EXCHANGE.12.1v1"
 
     Output := tests with input as {
         "conn_filter": 
@@ -41,7 +39,7 @@ test_IPAllowList_Correct_V2 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
  
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -49,8 +47,7 @@ test_IPAllowList_Correct_V2 if {
 }
 
 test_IPAllowList_Incorrect if {
-    ControlNumber := "EXO 2.12"
-    Requirement := "IP allow lists SHOULD NOT be created"
+    PolicyId := "MS.EXCHANGE.12.1v1"
 
     Output := tests with input as {
         "conn_filter": [
@@ -62,7 +59,7 @@ test_IPAllowList_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
  
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -73,8 +70,7 @@ test_IPAllowList_Incorrect if {
 # Policy 2
 #--
 test_EnableSafeList_Correct_V1 if {
-    ControlNumber := "EXO 2.12"
-    Requirement := "Safe lists SHOULD NOT be enabled"
+    PolicyId := "MS.EXCHANGE.12.2v1"
 
     Output := tests with input as {
         "conn_filter": [
@@ -86,7 +82,7 @@ test_EnableSafeList_Correct_V1 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
  
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -94,8 +90,7 @@ test_EnableSafeList_Correct_V1 if {
 }
 
 test_EnableSafeList_Incorrect_V1 if {
-    ControlNumber := "EXO 2.12"
-    Requirement := "Safe lists SHOULD NOT be enabled"
+    PolicyId := "MS.EXCHANGE.12.2v1"
 
     Output := tests with input as {
         "conn_filter": [
@@ -107,7 +102,7 @@ test_EnableSafeList_Incorrect_V1 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
  
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -115,8 +110,7 @@ test_EnableSafeList_Incorrect_V1 if {
 }
 
 test_EnableSafeList_Correct_V2 if {
-    ControlNumber := "EXO 2.12"
-    Requirement := "Safe lists SHOULD NOT be enabled"
+    PolicyId := "MS.EXCHANGE.12.2v1"
 
     Output := tests with input as {
         "conn_filter": [
@@ -128,7 +122,7 @@ test_EnableSafeList_Correct_V2 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
  
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet

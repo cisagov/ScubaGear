@@ -6,14 +6,13 @@ import future.keywords
 # Policy 1
 #--
 test_Identity_Correct_V1 if {
-    ControlNumber := "Defender 2.1"
-    Requirement := "Standard Preset security profiles SHOULD NOT be used"
+    PolicyId := "MS.DEFENDER.1.1v1"
 
     Output := tests with input as {  
         "protection_policy_rules" : [] 
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -21,8 +20,7 @@ test_Identity_Correct_V1 if {
 }
 
 test_Identity_Correct_V2 if {
-    ControlNumber := "Defender 2.1"
-    Requirement := "Standard Preset security profiles SHOULD NOT be used"
+    PolicyId := "MS.DEFENDER.1.1v1"
 
     Output := tests with input as {  
         "protection_policy_rules" : [
@@ -33,7 +31,7 @@ test_Identity_Correct_V2 if {
         ] 
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -41,8 +39,7 @@ test_Identity_Correct_V2 if {
 }
 
 test_Identity_Incorrect_V1 if {
-    ControlNumber := "Defender 2.1"
-    Requirement := "Standard Preset security profiles SHOULD NOT be used"
+    PolicyId := "MS.DEFENDER.1.1v1"
 
     Output := tests with input as {  
         "protection_policy_rules" : [
@@ -53,7 +50,7 @@ test_Identity_Incorrect_V1 if {
         ] 
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -64,14 +61,14 @@ test_Identity_Incorrect_V1 if {
 # Policy 2
 #--
 test_Identity_Correct_V1 if {
-    ControlNumber := "Defender 2.1"
-    Requirement := "Strict Preset security profiles SHOULD NOT be used"
+    PolicyId := "MS.DEFENDER.1.1av1"
+    #Requirement := "Strict Preset security profiles SHOULD NOT be used"
 
     Output := tests with input as {  
         "protection_policy_rules" : [] 
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -79,8 +76,8 @@ test_Identity_Correct_V1 if {
 }
 
 test_Identity_Correct_V2 if {
-    ControlNumber := "Defender 2.1"
-    Requirement := "Strict Preset security profiles SHOULD NOT be used"
+    PolicyId := "MS.DEFENDER.1.1av1"
+    #Requirement := "Strict Preset security profiles SHOULD NOT be used"
 
     Output := tests with input as {  
         "protection_policy_rules" : [
@@ -91,7 +88,7 @@ test_Identity_Correct_V2 if {
         ] 
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -99,8 +96,8 @@ test_Identity_Correct_V2 if {
 }
 
 test_Identity_Incorrect_V2 if {
-    ControlNumber := "Defender 2.1"
-    Requirement := "Strict Preset security profiles SHOULD NOT be used"
+    PolicyId := "MS.DEFENDER.1.1av1"
+    #Requirement := "Strict Preset security profiles SHOULD NOT be used"
 
     Output := tests with input as {  
         "protection_policy_rules" : [
@@ -111,7 +108,7 @@ test_Identity_Incorrect_V2 if {
         ] 
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet

@@ -6,8 +6,7 @@ import future.keywords
 # Policy 1
 #--
 test_AuditDisabled_Correct if {
-    ControlNumber := "EXO 2.13"
-    Requirement := "Mailbox auditing SHALL be enabled"
+    PolicyId := "MS.EXCHANGE.13.1v1"
 
     Output := tests with input as {
         "org_config": 
@@ -20,7 +19,7 @@ test_AuditDisabled_Correct if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
     
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -28,8 +27,7 @@ test_AuditDisabled_Correct if {
 }
 
 test_AuditDisabled_Incorrect if {
-    ControlNumber := "EXO 2.13"
-    Requirement := "Mailbox auditing SHALL be enabled"
+    PolicyId := "MS.EXCHANGE.13.1v1"
 
     Output := tests with input as {
         "org_config": [
@@ -41,7 +39,7 @@ test_AuditDisabled_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
  
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet

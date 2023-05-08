@@ -6,12 +6,11 @@ import future.keywords
 # Policy 1
 #--
 test_3rdParty_Correct_V1 if {
-    ControlNumber := "EXO 2.11"
-    Requirement := "Impersonation protection checks SHOULD be used"
+    PolicyId := "MS.EXCHANGE.11.1v1"
 
     Output := tests with input as { }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -22,12 +21,11 @@ test_3rdParty_Correct_V1 if {
 # Policy 2
 #--
 test_3rdParty_Correct_V2 if {
-    ControlNumber := "EXO 2.11"
-    Requirement := "User warnings, comparable to the user safety tips included with EOP, SHOULD be displayed"
+    PolicyId := "MS.EXCHANGE.11.2v1"
 
     Output := tests with input as { }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -38,12 +36,11 @@ test_3rdParty_Correct_V2 if {
 # Policy 3
 #--
 test_3rdParty_Correct_V3 if {
-    ControlNumber := "EXO 2.11"
-    Requirement := "The phishing protection solution SHOULD include an AI-based phishing detection tool comparable to EOP Mailbox Intelligence"
+    PolicyId := "MS.EXCHANGE.11.3v1"
 
     Output := tests with input as { }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet

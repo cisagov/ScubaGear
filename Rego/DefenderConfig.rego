@@ -77,8 +77,8 @@ StandardPresetSecurityPolicy[Rules.State] {
 }
 
 tests[{
-    "Requirement" : "Standard Preset security profiles SHOULD NOT be used",
-    "Control" : "Defender 2.1",
+    #TODO: Multiple mappings
+    "PolicyId" : "MS.DEFENDER.1.1v1",
     "Criticality" : "Should",
     "Commandlet" : ["Get-EOPProtectionPolicyRule"],
 	"ActualValue" : Policy,
@@ -165,8 +165,9 @@ CardRules[Rule.Name] {
 }
 
 tests[{
-    "Requirement" : "A custom policy SHALL be configured to protect PII and sensitive information, as defined by the agency: U.S. Social Security Number (SSN)",
-    "Control" : "Defender 2.2",
+    #TODO: Appears this policy is broken into 3 parts in code and only 1 in baseline 
+    #"Requirement" : "A custom policy SHALL be configured to protect PII and sensitive information, as defined by the agency: U.S. Social Security Number (SSN)",
+    "PolicyId" : "MS.DEFENDER.2.1v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-DlpComplianceRule"],
 	"ActualValue" : Rules,
@@ -260,8 +261,9 @@ TeamsPolicies[{
 }
 
 tests[{
-    "Requirement" : "The custom policy SHOULD be applied in Exchange",
-    "Control" : "Defender 2.2",
+    #TODO: Appears this policy is broken into 4 parts in code and only 1 in baseline
+    #"Requirement" : "The custom policy SHOULD be applied in Exchange",
+    "PolicyId" : "MS.DEFENDER.2.2v1",
     "Criticality" : "Should",
     "Commandlet" : ["Get-DLPCompliancePolicy"],
 	"ActualValue" : Policies,
@@ -339,8 +341,7 @@ SensitiveRulesNotBlocking[Rule.Name] {
 }
 
 tests[{
-    "Requirement" : "The action for the DLP policy SHOULD be set to block sharing sensitive information with everyone when DLP conditions are met",
-    "Control" : "Defender 2.2",
+    "PolicyId" : "MS.DEFENDER.2.3v1",
     "Criticality" : "Should",
     "Commandlet" : ["Get-DlpComplianceRule"],
 	"ActualValue" : Rules,
@@ -363,8 +364,7 @@ SensitiveRulesNotNotifying[Rule.Name] {
 }
 
 tests[{
-    "Requirement" : "Notifications to inform users and help educate them on the proper use of sensitive information SHOULD be enabled",
-    "Control" : "Defender 2.2",
+    "PolicyId" : "MS.DEFENDER.2.4v1",
     "Criticality" : "Should",
     "Commandlet" : ["Get-DlpComplianceRule"],
 	"ActualValue" : Rules,
@@ -382,8 +382,7 @@ tests[{
 #--
 # At this time we are unable to test for X because of Y
 tests[{
-    "Requirement" : "A list of apps that are not allowed to access files protected by DLP policy SHOULD be defined",
-    "Control" : "Defender 2.2",
+    "PolicyId" : "MS.DEFENDER.2.5v1",
     "Criticality" : "Should/Not-Implemented",
     "Commandlet" : [],
     "ActualValue" : [],
@@ -399,8 +398,7 @@ tests[{
 #--
 # At this time we are unable to test for X because of Y
 tests[{
-    "Requirement" : "A list of browsers that are not allowed to access files protected by DLP policy SHOULD be defined",
-    "Control" : "Defender 2.2",
+    "PolicyId" : "MS.DEFENDER.2.6v1",
     "Criticality" : "Should/Not-Implemented",
     "Commandlet" : [],
     "ActualValue" : [],
@@ -425,8 +423,7 @@ MalwarePoliciesWithoutFileFilter[Policy.Name] {
 }
 
 tests[{
-    "Requirement" : "The common attachments filter SHALL be enabled in the default anti-malware policy and in all existing policies",
-    "Control" : "Defender 2.3",
+    "PolicyId" : "MS.DEFENDER.3.1v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-MalwareFilterPolicy"],
 	"ActualValue" : Policies,
@@ -450,8 +447,9 @@ MalwarePoliciesBlockingEXE[Policy.Name] {
 }
 
 tests[{
-    "Requirement" : "Disallowed file types SHALL be determined and set. At a minimum, click-to-run files SHOULD be blocked: exe files",
-    "Control" : "Defender 2.3",
+    #TODO: Appears this policy is broken into 3 parts in code and only 1 in baseline
+    #"Requirement" : "Disallowed file types SHALL be determined and set. At a minimum, click-to-run files SHOULD be blocked: exe files",
+    "PolicyId" : "MS.DEFENDER.3.2v1",
     "Criticality" : "Should",
     "Commandlet" : ["Get-MalwareFilterPolicy"],
 	"ActualValue" : Policies,
@@ -520,8 +518,7 @@ MalwarePoliciesWithoutZAP[Policy.Name] {
 }
 
 tests[{
-    "Requirement" : "Zero-hour Auto Purge (ZAP) for malware SHOULD be enabled in the default anti-malware policy and in all existing custom policies",
-    "Control" : "Defender 2.4",
+    "PolicyId" : "MS.DEFENDER.4.1v1",
     "Criticality" : "Should",
     "Commandlet" : ["Get-MalwareFilterPolicy"],
 	"ActualValue" : Policies,
@@ -555,8 +552,7 @@ ProtectedUsersPolicies[{
 
 # assert that at least one of the enabled policies includes protected users
 tests[{
-    "Requirement" : "User impersonation protection SHOULD be enabled for key agency leaders",
-    "Control" : "Defender 2.5",
+    "PolicyId" : "MS.DEFENDER.5.1v1",
     "Criticality" : "Should",
     "Commandlet" : ["Get-AntiPhishPolicy"],
 	"ActualValue" : Policies,
@@ -586,8 +582,7 @@ ProtectedOrgDomainsPolicies[{
 # assert that at least one of the enabled policies includes
 # protection for the org's own domains
 tests[{
-    "Requirement" : "Domain impersonation protection SHOULD be enabled for domains owned by the agency",
-    "Control" : "Defender 2.5",
+    "PolicyId" : "MS.DEFENDER.5.2v1",
     "Criticality" : "Should",
     "Commandlet" : ["Get-AntiPhishPolicy"],
 	"ActualValue" : Policies,
@@ -616,8 +611,7 @@ ProtectedCustomDomainsPolicies[{
 # assert that at least one of the enabled policies includes
 # protection for custom domains
 tests[{
-    "Requirement" : "Domain impersonation protection SHOULD be added for frequent partners",
-    "Control" : "Defender 2.5",
+    "PolicyId" : "MS.DEFENDER.5.3v1",
     "Criticality" : "Should",
     "Commandlet" : ["Get-AntiPhishPolicy"],
 	"ActualValue" : Policies,
@@ -646,8 +640,7 @@ IntelligenceProtectionPolicies[{
 # assert that at least one of the enabled policies includes
 # intelligence protection
 tests[{
-    "Requirement" : "Intelligence for impersonation protection SHALL be enabled",
-    "Control" : "Defender 2.5",
+    "PolicyId" : "MS.DEFENDER.5.5v1",
     "Criticality" : "Should",
     "Commandlet" : ["Get-AntiPhishPolicy"],
 	"ActualValue" : Policies,
@@ -664,8 +657,9 @@ tests[{
 #--
 # Step 1: Default (SHALL)
 tests[{
-    "Requirement" : "Message action SHALL be set to quarantine if the message is detected as impersonated: users default policy",
-    "Control" : "Defender 2.5",
+    #TODO: Multiple mappings
+    #"Requirement" : "Message action SHALL be set to quarantine if the message is detected as impersonated: users default policy",
+    "PolicyId" : "MS.DEFENDER.5.6v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-AntiPhishPolicy"],
 	"ActualValue" : Policy.TargetedUserProtectionAction,
@@ -781,8 +775,9 @@ tests[ {
 # represent this, we have two tests checking the default and the
 # nondefault.
 tests[ {
-    "Requirement" : "Mail classified as spoofed SHALL be quarantined: default policy",
-    "Control" : "Defender 2.5",
+    #TODO: Multiple Mappings
+    #"Requirement" : "Mail classified as spoofed SHALL be quarantined: default policy",
+    "PolicyId" : "MS.DEFENDER.5.7v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-AntiPhishPolicy"],
 	"ActualValue" : Policy.AuthenticationFailAction,
@@ -824,8 +819,9 @@ tests[ {
 #--
 # First contact default policy
 tests[ {
-    "Requirement" : "All safety tips SHALL be enabled: first contact default policy",
-    "Control" : "Defender 2.5",
+    #TODO: Multiple Mappings
+    #"Requirement" : "All safety tips SHALL be enabled: first contact default policy",
+    "PolicyId" : "MS.DEFENDER.5.8v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-AntiPhishPolicy"],
 	"ActualValue" : Policy.EnableFirstContactSafetyTips,
@@ -1061,8 +1057,9 @@ tests[{
 # Baseline 2.6: Policy 1
 #--
 tests[{
-    "Requirement" : "The bulk complaint level (BCL) threshold SHOULD be set to six or lower: default policy",
-    "Control" : "Defender 2.6",
+    #TODO:  Multiple mappings
+    #"Requirement" : "The bulk complaint level (BCL) threshold SHOULD be set to six or lower: default policy",
+    "PolicyId" : "MS.DEFENDER.6.1v1",
     "Criticality" : "Should",
     "Commandlet" : ["Get-HostedContentFilterPolicy"],
 	"ActualValue" : Policy.BulkThreshold,
@@ -1100,8 +1097,9 @@ tests[{
 #--
 # Step 1: The default policy (SHALL)
 tests[{
-    "Requirement" : "Spam SHALL be moved to either the junk email folder or the quarantine folder: default policy",
-    "Control" : "Defender 2.6",
+    #TODO: Multiple Mappings
+    #"Requirement" : "Spam SHALL be moved to either the junk email folder or the quarantine folder: default policy",
+    "PolicyId" : "MS.DEFENDER.6.2v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-HostedContentFilterPolicy"],
     "ActualValue" : Policy.SpamAction,
@@ -1174,8 +1172,9 @@ tests[{
 #--
 # Step 1: The default policy (SHALL)
 tests[{
-    "Requirement" : "Phishing SHALL be quarantined: default policy",
-    "Control" : "Defender 2.6",
+    #TODO: Multiple mappings
+    #"Requirement" : "Phishing SHALL be quarantined: default policy",
+    "PolicyId" : "MS.DEFENDER.6.3v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-HostedContentFilterPolicy"],
     "ActualValue" : Policy.PhishSpamAction,
@@ -1247,8 +1246,9 @@ tests[{
 # Baseline 2.6: Policy 4
 #--
 tests[{
-    "Requirement" : "Bulk email SHOULD be moved to either the junk email folder or the quarantine folder: default policy",
-    "Control" : "Defender 2.6",
+    #TODO: Multiple mappings
+    #"Requirement" : "Bulk email SHOULD be moved to either the junk email folder or the quarantine folder: default policy",
+    "PolicyId" : "MS.DEFENDER.6.4v1",
     "Criticality" : "Should",
     "Commandlet" : ["Get-HostedContentFilterPolicy"],
     "ActualValue" : Policy.BulkSpamAction,
@@ -1285,8 +1285,9 @@ tests[{
 # Baseline 2.6: Policy 5
 #--
 tests[{
-    "Requirement" : "Spam in quarantine SHOULD be retained for at least 30 days: default policy",
-    "Control" : "Defender 2.6",
+    #TODO: Multiple Mappings
+    #"Requirement" : "Spam in quarantine SHOULD be retained for at least 30 days: default policy",
+    "PolicyId" : "MS.DEFENDER.6.5v1",
     "Criticality" : "Should",
     "Commandlet" : ["Get-HostedContentFilterPolicy"],
     "ActualValue" : Policy.QuarantineRetentionPeriod,
@@ -1323,8 +1324,9 @@ tests[{
 # Baseline 2.6: Policy 6
 #--
 tests[{
-    "Requirement" : "Spam safety tips SHOULD be turned on: default policy",
-    "Control" : "Defender 2.6",
+    #TODO: Multiple mappings
+    #"Requirement" : "Spam safety tips SHOULD be turned on: default policy",
+    "PolicyId" : "MS.DEFENDER.6.6v1",
     "Criticality" : "Should",
     "Commandlet" : ["Get-HostedContentFilterPolicy"],
     "ActualValue" : Policy.InlineSafetyTipsEnabled,
@@ -1362,8 +1364,9 @@ tests[{
 #--
 # Step 1: The default policy (SHALL)
 tests[{
-    "Requirement" : "Zero-hour auto purge (ZAP) SHALL be enabled: default policy",
-    "Control" : "Defender 2.6",
+    #TODO: Multiple mappings
+    #"Requirement" : "Zero-hour auto purge (ZAP) SHALL be enabled: default policy",
+    "PolicyId" : "MS.DEFENDER.6.7v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-HostedContentFilterPolicy"],
     "ActualValue" : Policy.ZapEnabled,
@@ -1474,8 +1477,9 @@ AllowedSenderDomainsNotEmpty [Policy.Identity] {
     count(Policy.AllowedSenderDomains) > 0
 }
 tests[{
-    "Requirement" : "Allowed senders MAY be added but allowed domains SHALL NOT be added: default policy",
-    "Control" : "Defender 2.6",
+    #TODO: Multiple mappings
+    #"Requirement" : "Allowed senders MAY be added but allowed domains SHALL NOT be added: default policy",
+    "PolicyId" : "MS.DEFENDER.6.8v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-HostedContentFilterPolicy"],
     "ActualValue" : Policies,
@@ -1527,8 +1531,7 @@ AllDomainsSafeLinksPolicies[{
 }
 
 tests[{
-    "Requirement" : "The Safe Links Policy SHALL include all agency domains-and by extension-all users",
-    "Control" : "Defender 2.7",
+    "PolicyId" : "MS.DEFENDER.7.1v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-SafeLinksRule", "Get-AcceptedDomain"],
 	"ActualValue" : AllDomainsSafeLinksPolicies,
@@ -1554,8 +1557,7 @@ EnableSafeLinksForEmailCorrect[Policy.Identity] {
 }
 
 tests[{
-    "Requirement" : "URL rewriting and malicious link click checking SHALL be enabled",
-    "Control" : "Defender 2.7",
+    "PolicyId" : "MS.DEFENDER.7.2v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-SafeLinksPolicy", "Get-SafeLinksRule"],
 	"ActualValue" : Policies,
@@ -1580,8 +1582,7 @@ EnableSafeLinksForTeamsCorrect[Policy.Identity] {
 }
 
 tests[{
-    "Requirement" : "Malicious link click checking SHALL be enabled with Microsoft Teams",
-    "Control" : "Defender 2.7",
+    "PolicyId" : "MS.DEFENDER.7.3v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-SafeLinksPolicy", "Get-SafeLinksRule"],
 	"ActualValue" : Policies,
@@ -1606,8 +1607,7 @@ ScanUrlsCorrect[Policy.Identity] {
 }
 
 tests[{
-    "Requirement" : "Real-time suspicious URL and file-link scanning SHALL be enabled",
-    "Control" : "Defender 2.7",
+    "PolicyId" : "MS.DEFENDER.7.4v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-SafeLinksPolicy", "Get-SafeLinksRule"],
 	"ActualValue" : Policies,
@@ -1632,8 +1632,7 @@ DeliverMessageAfterScanCorrect[Policy.Identity] {
 }
 
 tests[{
-    "Requirement" : "URLs SHALL be scanned completely before message delivery",
-    "Control" : "Defender 2.7",
+    "PolicyId" : "MS.DEFENDER.7.5v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-SafeLinksPolicy", "Get-SafeLinksRule"],
 	"ActualValue" : Policies,
@@ -1658,8 +1657,7 @@ EnableForInternalSendersCorrect[Policy.Identity] {
 }
 
 tests[{
-    "Requirement" : "Internal agency email messages SHALL have safe links enabled",
-    "Control" : "Defender 2.7",
+    "PolicyId" : "MS.DEFENDER.7.6v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-SafeLinksPolicy", "Get-SafeLinksRule"],
 	"ActualValue" : Policies,
@@ -1684,8 +1682,7 @@ TrackClicksCorrect[Policy.Identity] {
 }
 
 tests[{
-    "Requirement" : "User click tracking SHALL be enabled",
-    "Control" : "Defender 2.7",
+    "PolicyId" : "MS.DEFENDER.7.7v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-SafeLinksPolicy", "Get-SafeLinksRule"],
 	"ActualValue" : Policies,
@@ -1709,8 +1706,7 @@ EnableSafeLinksForOfficeCorrect[Policy.Identity] {
 }
 
 tests[{
-    "Requirement" : "Safe Links in Office 365 apps SHALL be turned on",
-    "Control" : "Defender 2.7",
+    "PolicyId" : "MS.DEFENDER.7.8v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-SafeLinksPolicy", "Get-SafeLinksRule"],
 	"ActualValue" : Policies,
@@ -1734,8 +1730,7 @@ AllowClickThroughCorrect[Policy.Identity] {
 }
 
 tests[{
-    "Requirement" : "Users SHALL NOT be enabled to click through to the original URL",
-    "Control" : "Defender 2.7",
+    "PolicyId" : "MS.DEFENDER.7.9v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-SafeLinksPolicy", "Get-SafeLinksRule"],
 	"ActualValue" : Policies,
@@ -1767,8 +1762,7 @@ AllDomainsSafeAttachmentRules[{
 }
 
 tests[{
-    "Requirement" : "At least one Safe Attachments Policy SHALL include all agency domains-and by extension-all users",
-    "Control" : "Defender 2.8",
+    "PolicyId" : "MS.DEFENDER.8.1v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-SafeAttachmentRule", "Get-AcceptedDomain"],
 	"ActualValue" : AllDomainsSafeAttachmentRules,
@@ -1801,8 +1795,7 @@ BlockMalwarePolicies[{
 }
 
 tests[{
-    "Requirement" : "The action for malware in email attachments SHALL be set to block",
-    "Control" : "Defender 2.8",
+    "PolicyId" : "MS.DEFENDER.8.2v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-SafeAttachmentPolicy", "Get-SafeAttachmentRule", "Get-AcceptedDomain"],
 	"ActualValue" : Policies,
@@ -1828,8 +1821,7 @@ RedirectionPolicies[{
 }
 
 tests[{
-    "Requirement" : "Redirect emails with detected attachments to an agency-specified email SHOULD be enabled",
-    "Control" : "Defender 2.8",
+    "PolicyId" : "MS.DEFENDER.8.3v1",
     "Criticality" : "Should",
     "Commandlet" : ["Get-SafeAttachmentPolicy", "Get-SafeAttachmentRule", "Get-AcceptedDomain"],
 	"ActualValue" : Policies,
@@ -1854,8 +1846,7 @@ ATPPolicies[{
 }
 
 tests[{
-    "Requirement" : "Safe attachments SHOULD be enabled for SharePoint, OneDrive, and Microsoft Teams",
-    "Control" : "Defender 2.8",
+    "PolicyId" : "MS.DEFENDER.8.4v1",
     "Criticality" : "Should",
     "Commandlet" : ["Get-AtpPolicyForO365"],
 	"ActualValue" : Policies,
@@ -1894,8 +1885,7 @@ EnabledAlerts[Alert.Name] {
 }
 
 tests[{
-    "Requirement" : "At a minimum, the alerts required by the Exchange Online Minimum Viable Secure Configuration Baseline SHALL be enabled",
-    "Control" : "Defender 2.9",
+    "PolicyId" : "MS.DEFENDER.9.1v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-ProtectionAlert"],
 	"ActualValue" : MissingAlerts,
@@ -1913,8 +1903,7 @@ tests[{
 #--
 # SIEM incorporation cannot be checked programmatically
 tests[{
-    "Requirement" : "The alerts SHOULD be sent to a monitored address or incorporated into a SIEM",
-    "Control" : "Defender 2.9",
+    "PolicyId" : "MS.DEFENDER.9.2v1",
     "Criticality" : "Should/Not-Implemented",
     "Commandlet" : [],
     "ActualValue" : [],
@@ -1942,8 +1931,7 @@ CorrectLogConfigs[{
 # Baseline 2.10: Policy 1
 #--
 tests[{
-    "Requirement" : "Unified audit logging SHALL be enabled",
-    "Control" : "Defender 2.10",
+    "PolicyID" : "MS.DEFENDER.10.1v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-AdminAuditLogConfig"],
 	"ActualValue" : CorrectLogConfigs,
@@ -1961,8 +1949,7 @@ tests[{
 # Would require looping through all users. See discussion in GitHub
 # issue #200.
 tests[{
-    "Requirement" : "Advanced audit SHALL be enabled",
-    "Control" : "Defender 2.10",
+    "PolicyId" : "MS.DEFENDER.10.2v1",
     "Criticality" : "Shall/Not-Implemented",
     "Commandlet" : [],
     "ActualValue" : [],
@@ -1980,8 +1967,7 @@ tests[{
 # It is not required to maintain these logs in the M365 cloud environment; doing so would require an additional add-on SKU.
 # This requirement can be met by offloading the logs out of the cloud environment.
 tests[{
-    "Requirement" : "Audit logs SHALL be maintained for at least the minimum duration dictated by OMB M-21-31",
-    "Control" : "Defender 2.10",
+    "PollicyId" : "MS.DEFENDER.10.3v1",
     "Criticality" : "Shall/Not-Implemented",
     "Commandlet" : [],
     "ActualValue" : [],

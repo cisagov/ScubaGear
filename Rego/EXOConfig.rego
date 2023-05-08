@@ -52,8 +52,7 @@ RemoteDomainsAllowingForwarding[Domain.DomainName] {
 }
 
 tests[{
-    "Requirement" : "Automatic forwarding to external domains SHALL be disabled",
-    "Control" : "EXO 2.1",
+    "PolicyId" : "MS.EXCHANGE.1.1v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-RemoteDomain"],
     "ActualValue" : Domains,
@@ -76,8 +75,7 @@ tests[{
 #--
 # At this time we are unable to test for X because of Y
 tests[{
-    "Requirement" : "A list of approved IP addresses for sending mail SHALL be maintained",
-    "Control" : "EXO 2.2",
+    "PolicyId" : "MS.EXCHANGE.2.1v1",
     "Criticality" : "Shall/Not-Implemented",
     "Commandlet" : [],
     "ActualValue" : [],
@@ -98,8 +96,7 @@ DomainsWithoutSpf[DNSResponse.domain] {
 }
 
 tests[{
-    "Requirement" : "An SPF policy(s) that designates only these addresses as approved senders SHALL be published",
-    "Control" : "EXO 2.2",
+    "PolicyId" : "MS.EXCHANGE.2.2v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-ScubaSpfRecords", "Get-AcceptedDomain"],
     "ActualValue" : Domains,
@@ -129,8 +126,7 @@ DomainsWithDkim[DkimConfig.Domain] {
 }
 
 tests[{
-    "Requirement" : "DKIM SHOULD be enabled for any custom domain",
-    "Control" : "EXO 2.3",
+    "PolicyId" : "MS.EXCHANGE.3.1v1",
     "Criticality" : "Should",
     "Commandlet" : ["Get-DkimSigningConfig", "Get-ScubaDkimRecords", "Get-AcceptedDomain"],
     "ActualValue" : [input.dkim_records, input.dkim_config],
@@ -157,8 +153,7 @@ DomainsWithoutDmarc[DmarcRecord.domain] {
 }
 
 tests[{
-    "Requirement" : "A DMARC policy SHALL be published for every second-level domain",
-    "Control" : "EXO 2.4",
+    "PolicyId" : "MS.EXCHANGE.4.1v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-ScubaDmarcRecords", "Get-AcceptedDomain"],
     "ActualValue" : input.dmarc_records,
@@ -180,8 +175,7 @@ DomainsWithoutPreject[DmarcRecord.domain] {
 }
 
 tests[{
-    "Requirement" : "The DMARC message rejection option SHALL be \"p=reject\"",
-    "Control" : "EXO 2.4",
+    "PolicyId" : "MS.EXCHANGE.4.2v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-ScubaDmarcRecords", "Get-AcceptedDomain"],
     "ActualValue" : input.dmarc_records,
@@ -203,8 +197,7 @@ DomainsWithoutDHSContact[DmarcRecord.domain] {
 }
 
 tests[{
-    "Requirement" : "The DMARC point of contact for aggregate reports SHALL include reports@dmarc.cyber.dhs.gov",
-    "Control" : "EXO 2.4",
+    "PolicyId" : "MS.EXCHANGE.4.3v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-ScubaDmarcRecords", "Get-AcceptedDomain"],
     "ActualValue" : input.dmarc_records,
@@ -226,8 +219,7 @@ DomainsWithoutAgencyContact[DmarcRecord.domain] {
 }
 
 tests[{
-    "Requirement" : "An agency point of contact SHOULD be included for aggregate and/or failure reports",
-    "Control" : "EXO 2.4",
+    "PolicyId" : "MS.EXCHANGE.4.4v1",
     "Criticality" : "Should",
     "Commandlet" : ["Get-ScubaDmarcRecords", "Get-AcceptedDomain"],
     "ActualValue" : input.dmarc_records,
@@ -254,8 +246,7 @@ SmtpClientAuthEnabled[TransportConfig.Name] {
 }
 
 tests[{
-    "Requirement" : "SMTP AUTH SHALL be disabled in Exchange Online",
-    "Control" : "EXO 2.5",
+    "PolicyId" : "MS.EXCHANGE.5.1v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-TransportConfig"],
     "ActualValue" : input.transport_config,
@@ -285,8 +276,7 @@ SharingPolicyAllowedSharing[SharingPolicy.Name] {
 
 
 tests[{
-    "Requirement" : "Contact folders SHALL NOT be shared with all domains, although they MAY be shared with specific domains",
-    "Control" : "EXO 2.6",
+    "PolicyId" : "MS.EXCHANGE.6.1v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-SharingPolicy"],
     "ActualValue" : input.sharing_policy,
@@ -304,8 +294,7 @@ tests[{
 #--
 
 tests[{
-    "Requirement" : "Calendar details SHALL NOT be shared with all domains, although they MAY be shared with specific domains",
-    "Control" : "EXO 2.6",
+    "PolicyId" : "MS.EXCHANGE.6.2v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-SharingPolicy"],
     "ActualValue" : input.sharing_policy,
@@ -325,8 +314,7 @@ tests[{
 # Baseline 2.7: Policy 1
 #--
 tests[{
-    "Requirement" : "External sender warnings SHALL be implemented",
-    "Control" : "EXO 2.7",
+    "PolicyId" : "MS.EXCHANGE.7.1v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-TransportRule"],
     "ActualValue" : [Rule.FromScope | Rule = Rules[_]],
@@ -351,8 +339,7 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "Requirement" : "A DLP solution SHALL be used. The selected DLP solution SHOULD offer services comparable to the native DLP solution offered by Microsoft",
-    "Control" : "EXO 2.8",
+    "PolicyId" : "MS.EXCHANGE.8.1v1",
     "Criticality" : "Shall/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
@@ -368,8 +355,7 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "Requirement" : "The DLP solution SHALL protect PII and sensitive information, as defined by the agency. At a minimum, the sharing of credit card numbers, Taxpayer Identification Numbers (TIN), and Social Security Numbers (SSN) via email SHALL be restricted",
-    "Control" : "EXO 2.8",
+    "PolicyId" : "MS.EXCHANGE.8.2v1",
     "Criticality" : "Shall/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
@@ -390,8 +376,7 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "Requirement" : "Emails SHALL be filtered by the file types of included attachments. The selected filtering solution SHOULD offer services comparable to Microsoft Defender's Common Attachment Filter",
-    "Control" : "EXO 2.9",
+    "PolicyId" : "MS.EXCHANGE.9.1v1",
     "Criticality" : "Shall/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
@@ -407,8 +392,7 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "Requirement" : "The attachment filter SHOULD attempt to determine the true file type and assess the file extension",
-    "Control" : "EXO 2.9",
+    "PolicyId" : "MS.EXCHANGE.9.2v1",
     "Criticality" : "Should/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
@@ -424,8 +408,7 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "Requirement" : "Disallowed file types SHALL be determined and set. At a minimum, click-to-run files SHOULD be blocked (e.g., .exe, .cmd, and .vbe)",
-    "Control" : "EXO 2.9",
+    "PolicyId" : "MS.EXCHANGE.9.3v1",
     "Criticality" : "Shall/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
@@ -446,8 +429,7 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "Requirement" : "Emails SHALL be scanned for malware",
-    "Control" : "EXO 2.10",
+    "PolicyId" : "MS.EXCHANGE.10.1v1",
     "Criticality" : "Shall/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
@@ -463,8 +445,7 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "Requirement" : "Emails identified as containing malware SHALL be quarantined or dropped",
-    "Control" : "EXO 2.10",
+    "PolicyId" : "MS.EXCHANGE.10.2v1",
     "Criticality" : "Shall/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
@@ -480,8 +461,7 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "Requirement" : "Email scanning SHOULD be capable of reviewing emails after delivery",
-    "Control" : "EXO 2.10",
+    "PolicyId" : "MS.EXCHANGE.10.3v1",
     "Criticality" : "Should/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
@@ -502,8 +482,7 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "Requirement" : "Impersonation protection checks SHOULD be used",
-    "Control" : "EXO 2.11",
+    "PolicyId" : "MS.EXCHANGE.11.1v1",
     "Criticality" : "Should/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
@@ -519,8 +498,7 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "Requirement" : "User warnings, comparable to the user safety tips included with EOP, SHOULD be displayed",
-    "Control" : "EXO 2.11",
+    "PolicyId" : "MS.EXCHANGE.11.2v1",
     "Criticality" : "Should/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
@@ -536,8 +514,7 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "Requirement" : "The phishing protection solution SHOULD include an AI-based phishing detection tool comparable to EOP Mailbox Intelligence",
-    "Control" : "EXO 2.11",
+    "PolicyId" : "MS.EXCHANGE.11.3v1",
     "Criticality" : "Should/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
@@ -563,8 +540,7 @@ ConnFiltersWithIPAllowList[ConnFilter.Name] {
 }
 
 tests[{
-    "Requirement" : "IP allow lists SHOULD NOT be created",
-    "Control" : "EXO 2.12",
+    "PolicyId" : "MS.EXCHANGE.12.1v1",
     "Criticality" : "Should",
     "Commandlet" : ["Get-HostedConnectionFilterPolicy"],
     "ActualValue" : input.conn_filter,
@@ -586,8 +562,7 @@ ConnFiltersWithSafeList[ConnFilter.Name] {
 }
 
 tests[{
-    "Requirement" : "Safe lists SHOULD NOT be enabled",
-    "Control" : "EXO 2.12",
+    "PolicyId" : "MS.EXCHANGE.12.2v1",
     "Criticality" : "Should",
     "Commandlet" : ["Get-HostedConnectionFilterPolicy"],
     "ActualValue" : input.conn_filter,
@@ -612,8 +587,7 @@ AuditEnabled[OrgConfig.Name] {
 }
 
 tests[{
-    "Requirement" : "Mailbox auditing SHALL be enabled",
-    "Control" : "EXO 2.13",
+    "PolicyId" : "MS.EXCHANGE.13.1v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-OrganizationConfig"],
     "ActualValue" : input.org_config,
@@ -634,8 +608,7 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "Requirement" : "A spam filter SHALL be enabled. The filtering solution selected SHOULD offer services comparable to the native spam filtering offered by Microsoft",
-    "Control" : "EXO 2.14",
+    "PolicyId" : "MS.EXCHANGE.14.1v1",
     "Criticality" : "Shall/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
@@ -651,8 +624,7 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "Requirement" : "Spam and high confidence spam SHALL be moved to either the junk email folder or the quarantine folder",
-    "Control" : "EXO 2.14",
+    "PolicyId" : "MS.EXCHANGE.14.2v1",
     "Criticality" : "Shall/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
@@ -668,8 +640,7 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "Requirement" : "Allowed senders MAY be added, but allowed domains SHALL NOT be added",
-    "Control" : "EXO 2.14",
+    "PolicyId" : "MS.EXCHANGE.14.2v1",
     "Criticality" : "Shall/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],

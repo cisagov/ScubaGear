@@ -6,8 +6,7 @@ import future.keywords
 # Policy 1
 #--
 test_AutoForwardEnabled_Correct if {
-    ControlNumber := "EXO 2.1"
-    Requirement := "Automatic forwarding to external domains SHALL be disabled"
+    PolicyId := "MS.EXCHANGE.1.1v1"
 
     Output := tests with input as {
         "remote_domains": [
@@ -18,7 +17,7 @@ test_AutoForwardEnabled_Correct if {
         ]    
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -26,8 +25,7 @@ test_AutoForwardEnabled_Correct if {
 }
 
 test_AutoForwardEnabled_Incorrect_V1 if {
-    ControlNumber := "EXO 2.1"
-    Requirement := "Automatic forwarding to external domains SHALL be disabled"
+    PolicyId := "MS.EXCHANGE.1.1v1"
 
     Output := tests with input as {
         "remote_domains": [
@@ -38,7 +36,7 @@ test_AutoForwardEnabled_Incorrect_V1 if {
         ]    
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -46,8 +44,7 @@ test_AutoForwardEnabled_Incorrect_V1 if {
 }
 
 test_AutoForwardEnabled_Incorrect_V2 if {
-    ControlNumber := "EXO 2.1"
-    Requirement := "Automatic forwarding to external domains SHALL be disabled"
+    PolicyId := "MS.EXCHANGE.1.1v1"
 
     Output := tests with input as {
         "remote_domains": [
@@ -62,7 +59,7 @@ test_AutoForwardEnabled_Incorrect_V2 if {
         ]    
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -70,8 +67,7 @@ test_AutoForwardEnabled_Incorrect_V2 if {
 }
 
 test_AutoForwardEnabled_Incorrect_V3 if {
-    ControlNumber := "EXO 2.1"
-    Requirement := "Automatic forwarding to external domains SHALL be disabled"
+    PolicyId := "MS.EXCHANGE.1.1v1"
 
     Output := tests with input as {
         "remote_domains": [
@@ -90,7 +86,7 @@ test_AutoForwardEnabled_Incorrect_V3 if {
         ]    
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet

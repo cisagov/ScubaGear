@@ -6,8 +6,7 @@ import future.keywords
 # Policy 1
 #--
 test_Enabled_Correct_V1 if {
-    ControlNumber := "EXO 2.3"
-    Requirement := "DKIM SHOULD be enabled for any custom domain"
+    PolicyId := "MS.EXCHANGE.3.1v1"
 
     Output := tests with input as {
         "dkim_config": [
@@ -30,7 +29,7 @@ test_Enabled_Correct_V1 if {
         ]  
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
  
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -39,8 +38,7 @@ test_Enabled_Correct_V1 if {
 
 test_Enabled_Correct_V2 if {
     # Test with incorrect default domain
-    ControlNumber := "EXO 2.3"
-    Requirement := "DKIM SHOULD be enabled for any custom domain"
+    PolicyId := "MS.EXCHANGE.3.1v1"
 
     Output := tests with input as {
         "dkim_config": [
@@ -77,7 +75,7 @@ test_Enabled_Correct_V2 if {
         ]  
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
  
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -86,8 +84,7 @@ test_Enabled_Correct_V2 if {
 
 test_Enabled_Correct_V3 if {
     # Test for multiple custom domains
-    ControlNumber := "EXO 2.3"
-    Requirement := "DKIM SHOULD be enabled for any custom domain"
+    PolicyId := "MS.EXCHANGE.3.1v1"
 
     Output := tests with input as {
         "dkim_config": [
@@ -122,7 +119,7 @@ test_Enabled_Correct_V3 if {
         ]  
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
  
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -131,8 +128,7 @@ test_Enabled_Correct_V3 if {
 
 test_Enabled_Correct_V4 if {
     # Test for no custom domains, just the default domain 
-    ControlNumber := "EXO 2.3"
-    Requirement := "DKIM SHOULD be enabled for any custom domain"
+    PolicyId := "MS.EXCHANGE.3.1v1"
 
     Output := tests with input as {
         "dkim_config": [
@@ -155,7 +151,7 @@ test_Enabled_Correct_V4 if {
         ]  
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
  
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -163,8 +159,7 @@ test_Enabled_Correct_V4 if {
 }
 
 test_Enabled_Incorrect if {
-    ControlNumber := "EXO 2.3"
-    Requirement := "DKIM SHOULD be enabled for any custom domain"
+    PolicyId := "MS.EXCHANGE.3.1v1"
 
     Output := tests with input as {
         "dkim_config": [
@@ -187,7 +182,7 @@ test_Enabled_Incorrect if {
         ]  
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
  
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -195,8 +190,7 @@ test_Enabled_Incorrect if {
 }
 
 test_Rdata_Incorrect if {
-    ControlNumber := "EXO 2.3"
-    Requirement := "DKIM SHOULD be enabled for any custom domain"
+    PolicyId := "MS.EXCHANGE.3.1v1"
 
     Output := tests with input as {
         "dkim_config": [
@@ -219,7 +213,7 @@ test_Rdata_Incorrect if {
         ]  
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
  
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -227,8 +221,7 @@ test_Rdata_Incorrect if {
 }
 
 test_Rdata_Incorrect_V2 if {
-    ControlNumber := "EXO 2.3"
-    Requirement := "DKIM SHOULD be enabled for any custom domain"
+    PolicyId := "MS.EXCHANGE.3.1v1"
 
     Output := tests with input as {
         "dkim_config": [
@@ -251,7 +244,7 @@ test_Rdata_Incorrect_V2 if {
         ]  
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
  
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -259,8 +252,7 @@ test_Rdata_Incorrect_V2 if {
 }
 
 test_Enabled_Correct_V2 if {
-    ControlNumber := "EXO 2.3"
-    Requirement := "DKIM SHOULD be enabled for any custom domain"
+    PolicyId := "MS.EXCHANGE.3.1v1"
 
     Output := tests with input as {
         "dkim_config": [
@@ -295,7 +287,7 @@ test_Enabled_Correct_V2 if {
         ]  
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
  
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -303,8 +295,7 @@ test_Enabled_Correct_V2 if {
 }
 
 test_Enabled_Inorrect_V3 if {
-    ControlNumber := "EXO 2.3"
-    Requirement := "DKIM SHOULD be enabled for any custom domain"
+    PolicyId := "MS.EXCHANGE.3.1v1"
     
     Output := tests with input as {
         "dkim_config": [
@@ -339,7 +330,7 @@ test_Enabled_Inorrect_V3 if {
         ]  
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
     
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
