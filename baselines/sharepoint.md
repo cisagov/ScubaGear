@@ -66,7 +66,39 @@ listed.
 
 # Baselines
 
-## 1. External Sharing Settings 
+## 1 File and Folder Links Default Sharing Settings
+
+This policy ensures that when sharing files in SharePoint, there are
+several possible scopes, including agency-wide or “anyone with the
+link.”
+
+### Policy
+
+#### MS.SHAREPOINT.1.1v1
+File and folder links default sharing setting SHALL be set to Specific People (Only the People the User Specifies).
+- _Rationale:_ TODO
+- _Last modified:_ June 2023
+
+### Resources
+
+- [File and folder links \| Microsoft
+  Documents](https://docs.microsoft.com/en-us/sharepoint/turn-external-sharing-on-or-off#file-and-folder-links)
+
+### License Requirements
+
+- N/A
+
+### Implementation
+
+In the **SharePoint admin** **center**:
+
+1.  In the left-hand navigation bar, click **Policies** -\> **Sharing**
+    to display sharing settings.
+
+2.  Under **File and folder links**, ensure that the default link type
+    is set to **Specific people (only the people the user specifies)**.
+
+## 2 External Sharing
 
 SharePoint allows sharing with users who are outside the agency, which
 is convenient but may pose a data loss or other information security
@@ -86,45 +118,49 @@ the CIO Council's [Interagency Collaboration
 Program](https://community.max.gov/display/Egov/Interagency+Collaboration+Program)’s
 OMB Max Site for a list of .gov domains for sharing).
 
-### Policies
-
-#### MS.SHAREPOINT.1.1v1
-File and folder links default sharing setting SHALL be set to Specific People (Only the People the User Specifies)”.
+### Policy
+#### MS.SHAREPOINT.2.1v1
+External sharing SHOULD be limited to approved domains and security groups per interagency collaboration needs.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
-
-#### MS.SHAREPOINT.1.2v1
-External Sharing SHOULD be Set to “New and Existing Guests”.
-- _Rationale:_ TODO
-- _Last modified:_ June 2023
-
-#### MS.SHAREPOINT.1.3v1
-External sharing SHOULD be limited to approved domains per interagency collaboration needs.
-- _Rationale:_ TODO
-- _Last modified:_ June 2023
-
-
-#### MS.SHAREPOINT.1.3v1
-External sharing SHOULD be limited to approved security groups per interagency collaboration needs.
-- _Rationale:_ TODO
-- _Last modified:_ June 2023
-
 
 ### Resources
 
-- [File and folder links \| Microsoft
-  Documents](https://docs.microsoft.com/en-us/sharepoint/turn-external-sharing-on-or-off#file-and-folder-links)
-
 - [Manage sharing settings \| Microsoft
   Documents](https://docs.microsoft.com/en-us/sharepoint/turn-external-sharing-on-or-off)
-  
 
 ### License Requirements
 
 - N/A
 
+### Implementation 
 
-## 2. Sensitivity Levels
+To adjust sharing settings, in the **SharePoint admin center**:
+
+1.  Select **Policies** -\> **Sharing**.
+
+2.  Adjust external sharing slider to **New and Existing Guests.**
+
+3.  Expand **More external sharing settings.**
+
+4.  Select **Limit external sharing by domain**.
+
+5.  Select **Add domains.**
+
+6.  Add domains.
+
+7.  Select **Save.**
+
+8.  Select **Allow only users in specific security groups to share
+    externally**.
+
+9.  Select **Manage security groups.**
+
+10. Add security groups.
+
+11. Select **Save.**
+
+## 3 Sensitivity Levels 
 
 SharePoint allows sharing with users who are outside the agency, which
 is convenient but may pose a data loss or other information security
@@ -134,8 +170,7 @@ adjust sharing settings best aligned to their respective sensitivity
 level.
 
 ### Policy
-
-#### MS.SHAREPOINT.2.1v1
+#### MS.SHAREPOINT.3.1v1
 Sharing settings for specific SharePoint sites SHOULD align to their sensitivity level.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
@@ -149,7 +184,28 @@ Sharing settings for specific SharePoint sites SHOULD align to their sensitivity
 
 - N/A
 
-## 3. Guest Access
+### Implementation 
+
+To limit external sharing by domain, in the **SharePoint admin center**:
+
+1.  Select **Sites.**
+
+2.  Select **Active sites.**
+
+3.  Select **Site name.**
+
+4.  Select **Add domains.**
+
+5.  Select **Policies.**
+
+6.  Under **external sharing**, select **Edit**.
+
+7.  Select permissions aligning to the risk posture associated with the
+    sensitivity of the SharePoint site.
+
+8.  Select **Save.**
+
+## 4 Guest Access to a Site or OneDrive
 
 SharePoint allows sharing with users who are outside the agency, which
 is convenient but may pose a data loss or other information security
@@ -160,17 +216,15 @@ access to the site or OneDrive.
 for OneDrive and Teams to the same, specified expiration times.
 
 ### Policies
-
-#### MS.SHAREPOINT.3.1v1
-Expiration timers for ‘guest access to a site or OneDrive’ and ‘people who use a verification code’ SHOULD be set.
+#### MS.SHAREPOINT.4.1v1
+Expiration timers for guest access to a site or OneDrive and people who use a verification code SHOULD be set.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
-#### MS.SHAREPOINT.3.2v1
+#### MS.SHAREPOINT.4.2v1
 Expiration timers SHOULD be set to 30 days.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
-
 
 ### License Requirements
 
@@ -181,27 +235,54 @@ Expiration timers SHOULD be set to 30 days.
 - [Managing SharePoint Online Security: A Team Effort \| Microsoft
   Build](https://docs.microsoft.com/en-us/microsoft-365/community/sharepoint-security-a-team-effort)
 
-## 4. Custom Scripts
+### Implementation 
+
+To limit external sharing by domain, in the **SharePoint admin center**:
+
+1.  Select **Policies** -\> **Sharing**.
+
+2.  Expand **More external sharing settings.**
+
+3.  Select **Guest access to a site or OneDrive will expire
+    automatically after this many days.**
+
+4.  Enter “30” days.
+
+5.  Select **People who use a verification code must reauthenticate
+    after this many days**.
+
+6.  Enter “30 days”.
+
+## 5 Custom Scripts
 
 Allowing users to run custom scripts can potentially allow malicious
 scripts to run in a trusted environment. For this reason, running custom
 scripts should not be allowed.
 
-### Policy
-
-#### MS.SHAREPOINT.4.1v1
+###  Policy
+#### MS.SHAREPOINT.5.1v1
 Users SHALL be prevented from running custom scripts.
-- _Rationale:_ TODO
-- _Last modified:_ June 2023
 
-### 2.5.2 Resources
+### Resources
 
 - [Allow or prevent custom script \| Microsoft
   Documents](https://docs.microsoft.com/en-us/sharepoint/allow-or-prevent-custom-script)
 
-### 2.5.3 License Requirements
+### License Requirements
 
 - N/A
+
+### Implementation
+
+In the **SharePoint Classic admin center**:
+
+1.  Scroll to the **Custom Script** setting and select both of the
+    following:
+
+2.  **Prevent users from running custom script on personal sites.**
+
+3.  **Prevent users from running custom script on self-service created
+    sites.**
 
 # Acknowledgements
 
