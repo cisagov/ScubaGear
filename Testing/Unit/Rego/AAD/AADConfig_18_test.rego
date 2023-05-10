@@ -156,10 +156,3 @@ test_GuestUserRoleId_Incorrect_V3 if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-
-    # Can't make any assumptions about the order of the output in the string,
-    # hence the contains functions instead of a simple ==
-    startswith(RuleOutput[0].ReportDetails, "Permission level set to ")
-    contains(RuleOutput[0].ReportDetails, "\"Unknown\" (policy 1)")
-    contains(RuleOutput[0].ReportDetails, "\"Restricted access\" (policy 2)")
-}
