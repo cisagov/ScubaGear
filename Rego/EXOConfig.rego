@@ -1,5 +1,6 @@
 package exo
 import future.keywords
+import data.report.utils.notCheckedDetails
 
 Format(Array) = format_int(count(Array), 10)
 
@@ -52,7 +53,7 @@ RemoteDomainsAllowingForwarding[Domain.DomainName] {
 }
 
 tests[{
-    "PolicyId" : "MS.EXCHANGE.1.1v1",
+    "PolicyId" : "MS.EXO.1.1v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-RemoteDomain"],
     "ActualValue" : Domains,
@@ -75,13 +76,14 @@ tests[{
 #--
 # At this time we are unable to test for X because of Y
 tests[{
-    "PolicyId" : "MS.EXCHANGE.2.1v1",
+    "PolicyId" : PolicyId,
     "Criticality" : "Shall/Not-Implemented",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "Currently cannot be checked automatically. See Exchange Online Secure Configuration Baseline policy 2.# for instructions on manual check",
+    "ReportDetails" : notCheckedDetails(PolicyId),
     "RequirementMet" : false
 }] {
+    PolicyId := "MS.EXO.2.1v1"
     true
 }
 #--
@@ -96,7 +98,7 @@ DomainsWithoutSpf[DNSResponse.domain] {
 }
 
 tests[{
-    "PolicyId" : "MS.EXCHANGE.2.2v1",
+    "PolicyId" : "MS.EXO.2.2v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-ScubaSpfRecords", "Get-AcceptedDomain"],
     "ActualValue" : Domains,
@@ -126,7 +128,7 @@ DomainsWithDkim[DkimConfig.Domain] {
 }
 
 tests[{
-    "PolicyId" : "MS.EXCHANGE.3.1v1",
+    "PolicyId" : "MS.EXO.3.1v1",
     "Criticality" : "Should",
     "Commandlet" : ["Get-DkimSigningConfig", "Get-ScubaDkimRecords", "Get-AcceptedDomain"],
     "ActualValue" : [input.dkim_records, input.dkim_config],
@@ -153,7 +155,7 @@ DomainsWithoutDmarc[DmarcRecord.domain] {
 }
 
 tests[{
-    "PolicyId" : "MS.EXCHANGE.4.1v1",
+    "PolicyId" : "MS.EXO.4.1v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-ScubaDmarcRecords", "Get-AcceptedDomain"],
     "ActualValue" : input.dmarc_records,
@@ -175,7 +177,7 @@ DomainsWithoutPreject[DmarcRecord.domain] {
 }
 
 tests[{
-    "PolicyId" : "MS.EXCHANGE.4.2v1",
+    "PolicyId" : "MS.EXO.4.2v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-ScubaDmarcRecords", "Get-AcceptedDomain"],
     "ActualValue" : input.dmarc_records,
@@ -197,7 +199,7 @@ DomainsWithoutDHSContact[DmarcRecord.domain] {
 }
 
 tests[{
-    "PolicyId" : "MS.EXCHANGE.4.3v1",
+    "PolicyId" : "MS.EXO.4.3v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-ScubaDmarcRecords", "Get-AcceptedDomain"],
     "ActualValue" : input.dmarc_records,
@@ -219,7 +221,7 @@ DomainsWithoutAgencyContact[DmarcRecord.domain] {
 }
 
 tests[{
-    "PolicyId" : "MS.EXCHANGE.4.4v1",
+    "PolicyId" : "MS.EXO.4.4v1",
     "Criticality" : "Should",
     "Commandlet" : ["Get-ScubaDmarcRecords", "Get-AcceptedDomain"],
     "ActualValue" : input.dmarc_records,
@@ -246,7 +248,7 @@ SmtpClientAuthEnabled[TransportConfig.Name] {
 }
 
 tests[{
-    "PolicyId" : "MS.EXCHANGE.5.1v1",
+    "PolicyId" : "MS.EXO.5.1v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-TransportConfig"],
     "ActualValue" : input.transport_config,
@@ -276,7 +278,7 @@ SharingPolicyAllowedSharing[SharingPolicy.Name] {
 
 
 tests[{
-    "PolicyId" : "MS.EXCHANGE.6.1v1",
+    "PolicyId" : "MS.EXO.6.1v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-SharingPolicy"],
     "ActualValue" : input.sharing_policy,
@@ -294,7 +296,7 @@ tests[{
 #--
 
 tests[{
-    "PolicyId" : "MS.EXCHANGE.6.2v1",
+    "PolicyId" : "MS.EXO.6.2v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-SharingPolicy"],
     "ActualValue" : input.sharing_policy,
@@ -314,7 +316,7 @@ tests[{
 # Baseline 2.7: Policy 1
 #--
 tests[{
-    "PolicyId" : "MS.EXCHANGE.7.1v1",
+    "PolicyId" : "MS.EXO.7.1v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-TransportRule"],
     "ActualValue" : [Rule.FromScope | Rule = Rules[_]],
@@ -339,7 +341,7 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "PolicyId" : "MS.EXCHANGE.8.1v1",
+    "PolicyId" : "MS.EXO.8.1v1",
     "Criticality" : "Shall/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
@@ -355,7 +357,7 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "PolicyId" : "MS.EXCHANGE.8.2v1",
+    "PolicyId" : "MS.EXO.8.2v1",
     "Criticality" : "Shall/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
@@ -376,7 +378,7 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "PolicyId" : "MS.EXCHANGE.9.1v1",
+    "PolicyId" : "MS.EXO.9.1v1",
     "Criticality" : "Shall/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
@@ -392,7 +394,7 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "PolicyId" : "MS.EXCHANGE.9.2v1",
+    "PolicyId" : "MS.EXO.9.2v1",
     "Criticality" : "Should/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
@@ -408,7 +410,7 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "PolicyId" : "MS.EXCHANGE.9.3v1",
+    "PolicyId" : "MS.EXO.9.3v1",
     "Criticality" : "Shall/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
@@ -429,7 +431,7 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "PolicyId" : "MS.EXCHANGE.10.1v1",
+    "PolicyId" : "MS.EXO.10.1v1",
     "Criticality" : "Shall/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
@@ -445,7 +447,7 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "PolicyId" : "MS.EXCHANGE.10.2v1",
+    "PolicyId" : "MS.EXO.10.2v1",
     "Criticality" : "Shall/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
@@ -461,7 +463,7 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "PolicyId" : "MS.EXCHANGE.10.3v1",
+    "PolicyId" : "MS.EXO.10.3v1",
     "Criticality" : "Should/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
@@ -482,7 +484,7 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "PolicyId" : "MS.EXCHANGE.11.1v1",
+    "PolicyId" : "MS.EXO.11.1v1",
     "Criticality" : "Should/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
@@ -498,7 +500,7 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "PolicyId" : "MS.EXCHANGE.11.2v1",
+    "PolicyId" : "MS.EXO.11.2v1",
     "Criticality" : "Should/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
@@ -514,7 +516,7 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "PolicyId" : "MS.EXCHANGE.11.3v1",
+    "PolicyId" : "MS.EXO.11.3v1",
     "Criticality" : "Should/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
@@ -540,7 +542,7 @@ ConnFiltersWithIPAllowList[ConnFilter.Name] {
 }
 
 tests[{
-    "PolicyId" : "MS.EXCHANGE.12.1v1",
+    "PolicyId" : "MS.EXO.12.1v1",
     "Criticality" : "Should",
     "Commandlet" : ["Get-HostedConnectionFilterPolicy"],
     "ActualValue" : input.conn_filter,
@@ -562,7 +564,7 @@ ConnFiltersWithSafeList[ConnFilter.Name] {
 }
 
 tests[{
-    "PolicyId" : "MS.EXCHANGE.12.2v1",
+    "PolicyId" : "MS.EXO.12.2v1",
     "Criticality" : "Should",
     "Commandlet" : ["Get-HostedConnectionFilterPolicy"],
     "ActualValue" : input.conn_filter,
@@ -587,7 +589,7 @@ AuditEnabled[OrgConfig.Name] {
 }
 
 tests[{
-    "PolicyId" : "MS.EXCHANGE.13.1v1",
+    "PolicyId" : "MS.EXO.13.1v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-OrganizationConfig"],
     "ActualValue" : input.org_config,
@@ -608,7 +610,7 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "PolicyId" : "MS.EXCHANGE.14.1v1",
+    "PolicyId" : "MS.EXO.14.1v1",
     "Criticality" : "Shall/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
@@ -624,7 +626,7 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "PolicyId" : "MS.EXCHANGE.14.2v1",
+    "PolicyId" : "MS.EXO.14.2v1",
     "Criticality" : "Shall/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
@@ -640,7 +642,7 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "PolicyId" : "MS.EXCHANGE.14.2v1",
+    "PolicyId" : "MS.EXO.14.3v1",
     "Criticality" : "Shall/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
@@ -661,8 +663,7 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "Requirement" : "URL comparison with a block-list SHOULD be enabled",
-    "Control" : "EXO 2.15",
+    "PolicyId" : "MS.EXO.15.1v1",
     "Criticality" : "Should/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
@@ -678,8 +679,7 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "Requirement" : "Direct download links SHOULD be scanned for malware",
-    "Control" : "EXO 2.15",
+    "PolicyId" : "MS.EXO.15.2v1",
     "Criticality" : "Should/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
@@ -695,8 +695,7 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "Requirement" : "User click tracking SHOULD be enabled",
-    "Control" : "EXO 2.15",
+    "PolicyId" : "MS.EXO.15.3v1",
     "Criticality" : "Should/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
@@ -717,8 +716,7 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "Requirement" : "At a minimum, the following alerts SHALL be enabled...[see Exchange Online secure baseline for list]",
-    "Control" : "EXO 2.16",
+    "PolicyId" : "MS.EXO.16.1v1",
     "Criticality" : "Shall/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
@@ -734,8 +732,7 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "Requirement" : "The alerts SHOULD be sent to a monitored address or incorporated into a SIEM",
-    "Control" : "EXO 2.16",
+    "PolicyId" : "MS.EXO.16.2v1",
     "Criticality" : "Should/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
@@ -756,8 +753,7 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "Requirement" : "Unified audit logging SHALL be enabled",
-    "Control" : "EXO 2.17",
+    "PolicyId" : "MS.EXO.17.1v1",
     "Criticality" : "Shall/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
@@ -773,8 +769,7 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "Requirement" : "Advanced audit SHALL be enabled",
-    "Control" : "EXO 2.17",
+    "PolicyId" : "MS.EXO.17.2v1",
     "Criticality" : "Shall/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
@@ -790,8 +785,7 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "Requirement" : "Audit logs SHALL be maintained for at least the minimum duration dictated by OMB M-21-31",
-    "Control" : "EXO 2.17",
+    "PolicyId" : "MS.EXO.17.3v1",
     "Criticality" : "Shall/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],

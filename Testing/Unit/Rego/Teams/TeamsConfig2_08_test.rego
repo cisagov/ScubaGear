@@ -335,5 +335,5 @@ test_3rdParty_Correct if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Cannot be checked automatically. See Microsoft Teams Secure Configuration Baseline policy 2.8 for instructions on manual check"
+    RuleOutput[0].ReportDetails == sprintf("Cannot be checked automatically. See Microsoft Teams Secure Configuration Baseline policy %v for instructions on manual check", [PolicyId])
 }

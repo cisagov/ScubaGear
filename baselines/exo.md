@@ -48,7 +48,7 @@ forwarding rules to exfiltrate data to external recipients.
 
 ### Policy
 
-#### MS.EXCHANGE.1.1v1
+#### MS.EXO.1.1v1
 Automatic forwarding to external domains SHALL be disabled.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
@@ -91,12 +91,12 @@ documentation provides some helpful starting points.
 
 ### Policies
 
-#### MS.EXCHANGE.2.1v1
+#### MS.EXO.2.1v1
 A list of approved IP addresses for sending mail SHALL be maintained.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
-#### MS.EXCHANGE.2.2v1
+#### MS.EXO.2.2v1
 An SPF policy(s) that designates only these addresses as approved senders SHALL be published.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
@@ -142,7 +142,7 @@ agency manages its DNS. DKIM is enabled for your tenant's default domain
 custom domains.
 
 ### Policy
-#### MS.EXCHANGE.3.1v1
+#### MS.EXO.3.1v1
 DKIM SHOULD be enabled for any custom domain.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
@@ -207,23 +207,23 @@ DMARC helps receiving mail systems determine what to do with messages
 sent from your domain that fail SPF or DKIM checks.
 
 ### Policies
-#### MS.EXCHANGE.4.1v1
+#### MS.EXO.4.1v1
 - A DMARC policy SHALL be published for every second-level domain.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
-#### MS.EXCHANGE.4.2v1
+#### MS.EXO.4.2v1
 - The DMARC message rejection option SHALL be “p=reject”.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
-#### MS.EXCHANGE.4.3v1
+#### MS.EXO.4.3v1
 - The DMARC point of contact for aggregate reports SHALL include
   <reports@dmarc.cyber.dhs.gov>.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
-#### MS.EXCHANGE.4.4v1
+#### MS.EXO.4.4v1
 - An agency point of contact SHOULD be included for aggregate and/or
   failure reports.
 - _Rationale:_ TODO
@@ -278,12 +278,12 @@ outside of Outlook that send email messages.
 
 ### Policies
 
-#### MS.EXCHANGE.5.1v1
+#### MS.EXO.5.1v1
 SMTP AUTH SHALL be disabled in Exchange Online.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
-#### MS.EXCHANGE.5.2v1
+#### MS.EXO.5.2v1
 SMTP AUTH MAY be enabled on a per-mailbox basis as needed.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
@@ -323,13 +323,13 @@ following policies.
 
 ### Policies
 
-#### MS.EXCHANGE.6.1v1
+#### MS.EXO.6.1v1
 - Contact folders SHALL NOT be shared with all domains, although they
   MAY be shared with specific domains.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
-#### MS.EXCHANGE.6.2v1
+#### MS.EXO.6.2v1
 - Calendar details SHALL NOT be shared with all domains, although they MAY be shared with specific domains.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
@@ -368,7 +368,7 @@ from external users can be easily identified, for example by prepending
 the subject line with “\[External\].”
 
 ### Policy
-#### MS.EXCHANGE.7.1v1
+#### MS.EXO.7.1v1
 External sender warnings SHALL be implemented.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
@@ -439,12 +439,12 @@ by an agency should offer services comparable to those offered by
 Microsoft.
 
 ### Policies
-#### MS.EXCHANGE.8.1v1
+#### MS.EXO.8.1v1
 A DLP solution SHALL be used. The selected DLP solution SHOULD offer services comparable to the native DLP solution offered by Microsoft.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
-#### MS.EXCHANGE.8.2v1
+#### MS.EXO.8.2v1
 The DLP solution SHALL protect PII and sensitive information, as defined by the agency. At a minimum, the sharing of credit card numbers, Taxpayer Identification Numbers (TIN), and Social Security Numbers (SSN) via email SHALL be restricted.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
@@ -472,17 +472,17 @@ Configuration Baseline. The solution selected by an agency should offer
 services comparable to those offered by Microsoft.
 
 ### Policies
-#### MS.EXCHANGE.9.1v1
+#### MS.EXO.9.1v1
 Emails SHALL be filtered by the file types of included attachments. The selected filtering solution SHOULD offer services comparable to Microsoft Defender’s Common Attachment Filter.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
-#### MS.EXCHANGE.9.2v1
+#### MS.EXO.9.2v1
 The attachment filter SHOULD attempt to determine the true file type and assess the file extension.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
-#### MS.EXCHANGE.9.3v1
+#### MS.EXO.9.3v1
 Disallowed file types SHALL be determined and set. At a minimum, click-to-run files SHOULD be blocked (e.g., .exe, .cmd, and .vbe).
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
@@ -506,17 +506,17 @@ Office 365 Minimum Viable Secure Configuration Baseline*:
 
 ### Policies
 
-#### MS.EXCHANGE.10.1v1
+#### MS.EXO.10.1v1
 Emails SHALL be scanned for malware.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
-#### MS.EXCHANGE.10.2v1
+#### MS.EXO.10.2v1
 Emails identified as containing malware SHALL be quarantined or dropped.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
-#### MS.EXCHANGE.10.3v1
+#### MS.EXO.10.3v1
 Email scanning SHOULD be capable of reviewing emails after delivery.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
@@ -553,17 +553,17 @@ phishing protections with Microsoft’s native solutions, see the
 Office 365 Minimum Viable Secure Configuration Baseline*.
 
 ### Policies
-#### MS.EXCHANGE.11.1v1
+#### MS.EXO.11.1v1
 Impersonation protection checks SHOULD be used.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
-#### MS.EXCHANGE.11.2v1
+#### MS.EXO.11.2v1
 User warnings, comparable to the user safety tips included with EOP, SHOULD be displayed.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
-#### MS.EXCHANGE.11.3v1
+#### MS.EXO.11.3v1
 The phishing protection solution SHOULD include an AI-based phishing detection tool comparable to EOP Mailbox Intelligence.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
@@ -591,17 +591,17 @@ senders in the allow list, emails from these senders bypass important
 security mechanisms.
 
 ### Policies
-#### MS.EXCHANGE.12.1v1
+#### MS.EXO.12.1v1
 - IP allow lists SHOULD NOT be created.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
-#### MS.EXCHANGE.12.2v1
+#### MS.EXO.12.2v1
 - Safe lists SHOULD NOT be enabled.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
-#### MS.EXCHANGE.12.3v1
+#### MS.EXO.12.3v1
 - A connection filter MAY be implemented to create an IP “Block list.”
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
@@ -657,7 +657,7 @@ mailbox auditing is enabled by default, agencies should ensure that it
 has not been inadvertently disabled.
 
 ### Policy
-#### MS.EXCHANGE.13.1v1
+#### MS.EXO.13.1v1
 Mailbox auditing SHALL be enabled.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
@@ -709,18 +709,18 @@ Protections SHALL Be Enabled” section of the *Defender for Office 365
 Minimum Viable Secure Configuration Baseline* for additional guidance.
 
 ### Policies
-#### MS.EXCHANGE.14.1v1
+#### MS.EXO.14.1v1
 A spam filter SHALL be enabled. The filtering solution selected SHOULD offer services comparable to the native spam filtering offered by
   Microsoft.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
-#### MS.EXCHANGE.14.2v1
+#### MS.EXO.14.2v1
 Spam and high confidence spam SHALL be moved to either the junk email folder or the quarantine folder.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
-#### MS.EXCHANGE.14.3v1
+#### MS.EXO.14.3v1
 Allowed senders MAY be added, but allowed domains SHALL NOT be added.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
@@ -759,17 +759,17 @@ Minimum Viable Secure Configuration Baseline.*
 
 ### Policies
 
-#### MS.EXCHANGE.15.1v1
+#### MS.EXO.15.1v1
 URL comparison with a block-list SHOULD be enabled.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
-#### MS.EXCHANGE.15.2v1
+#### MS.EXO.15.2v1
 Direct download links SHOULD be scanned for malware.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
-#### MS.EXCHANGE.15.3v1
+#### MS.EXO.15.3v1
 User click tracking SHOULD be enabled.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
@@ -789,7 +789,7 @@ Be Enabled” section of the *Defender for Office 365 Minimum Viable
 Secure Configuration Baseline*.
 
 ### Policies
-#### MS.EXCHANGE.16.1v1
+#### MS.EXO.16.1v1
 At a minimum, the following alerts SHALL be enabled:
 
   - Suspicious email sending patterns detected.
@@ -812,7 +812,7 @@ At a minimum, the following alerts SHALL be enabled:
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
-#### MS.EXCHANGE.16.2v1
+#### MS.EXO.16.2v1
 - The alerts SHOULD be sent to a monitored address or incorporated into a SIEM.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
@@ -840,17 +840,17 @@ Enabled” section of the *Defender for Office 365 Minimum Viable Secure
 Configuration Baseline*.
 
 ### Policies
-#### MS.EXCHANGE.17.1v1
+#### MS.EXO.17.1v1
 Unified audit logging SHALL be enabled.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
-#### MS.EXCHANGE.17.2v1
+#### MS.EXO.17.2v1
 Advanced audit SHALL be enabled.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
-#### MS.EXCHANGE.17.3v1
+#### MS.EXO.17.3v1
 Audit logs SHALL be maintained for at least the minimum duration dictated by [OMB M-21-31 (Appendix C)](https://www.whitehouse.gov/wp-content/uploads/2021/08/M-21-31-Improving-the-Federal-Governments-Investigative-and-Remediation-Capabilities-Related-to-Cybersecurity-Incidents.pdf).
 - _Rationale:_ TODO
 - _Last modified:_ June 2023

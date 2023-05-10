@@ -6,8 +6,7 @@ import future.keywords
 # Policy 1
 #--
 test_SharingCapability_Correct_V1 if {
-    ControlNumber := "Sharepoint 2.4"
-    Requirement := "Expiration timer for 'Guest access to a site or OneDrive' should be set to 30 days"
+    PolicyId := "MS.SHAREPOINT.3.1v1"
 
     Output := tests with input as {
         "SPO_tenant": [
@@ -19,7 +18,7 @@ test_SharingCapability_Correct_V1 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -27,8 +26,7 @@ test_SharingCapability_Correct_V1 if {
 }
 
 test_SharingCapability_Correct_V2 if {
-    ControlNumber := "Sharepoint 2.4"
-    Requirement := "Expiration timer for 'Guest access to a site or OneDrive' should be set to 30 days"
+    PolicyId := "MS.SHAREPOINT.3.1v1"
 
     Output := tests with input as {
         "SPO_tenant": [
@@ -40,7 +38,7 @@ test_SharingCapability_Correct_V2 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -48,8 +46,7 @@ test_SharingCapability_Correct_V2 if {
 }
 
 test_SharingCapability_Correct_V3 if {
-    ControlNumber := "Sharepoint 2.4"
-    Requirement := "Expiration timer for 'Guest access to a site or OneDrive' should be set to 30 days"
+    PolicyId := "MS.SHAREPOINT.3.1v1"
 
     Output := tests with input as {
         "SPO_tenant": [
@@ -61,7 +58,7 @@ test_SharingCapability_Correct_V3 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -69,8 +66,7 @@ test_SharingCapability_Correct_V3 if {
 }
 
 test_SharingCapability_Correct_V4 if {
-    ControlNumber := "Sharepoint 2.4"
-    Requirement := "Expiration timer for 'Guest access to a site or OneDrive' should be set to 30 days"
+    PolicyId := "MS.SHAREPOINT.3.1v1"
 
     Output := tests with input as {
         "SPO_tenant": [
@@ -82,7 +78,7 @@ test_SharingCapability_Correct_V4 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -90,8 +86,7 @@ test_SharingCapability_Correct_V4 if {
 }
 
 test_SharingCapability_Correct_V5 if {
-    ControlNumber := "Sharepoint 2.4"
-    Requirement := "Expiration timer for 'Guest access to a site or OneDrive' should be set to 30 days"
+    PolicyId := "MS.SHAREPOINT.3.1v1"
 
     Output := tests with input as {
         "SPO_tenant": [
@@ -103,7 +98,7 @@ test_SharingCapability_Correct_V5 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -111,8 +106,7 @@ test_SharingCapability_Correct_V5 if {
 }
 
 test_SharingCapability_Correct_V6 if {
-    ControlNumber := "Sharepoint 2.4"
-    Requirement := "Expiration timer for 'Guest access to a site or OneDrive' should be set to 30 days"
+    PolicyId := "MS.SHAREPOINT.3.1v1"
 
     Output := tests with input as {
         "SPO_tenant": [
@@ -124,7 +118,7 @@ test_SharingCapability_Correct_V6 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -132,8 +126,7 @@ test_SharingCapability_Correct_V6 if {
 }
 
 test_Multi_Correct if {
-    ControlNumber := "Sharepoint 2.4"
-    Requirement := "Expiration timer for 'Guest access to a site or OneDrive' should be set to 30 days"
+    PolicyId := "MS.SHAREPOINT.3.1v1"
 
     Output := tests with input as {
         "SPO_tenant": [
@@ -145,7 +138,7 @@ test_Multi_Correct if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -153,8 +146,7 @@ test_Multi_Correct if {
 }
 
 test_ExternalUserExpirationRequired_Incorrect if {
-    ControlNumber := "Sharepoint 2.4"
-    Requirement := "Expiration timer for 'Guest access to a site or OneDrive' should be set to 30 days"
+    PolicyId := "MS.SHAREPOINT.3.1v1"
 
     Output := tests with input as {
         "SPO_tenant": [
@@ -166,7 +158,7 @@ test_ExternalUserExpirationRequired_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -174,8 +166,7 @@ test_ExternalUserExpirationRequired_Incorrect if {
 }
 
 test_ExternalUserExpireInDays_Incorrect_V1 if {
-    ControlNumber := "Sharepoint 2.4"
-    Requirement := "Expiration timer for 'Guest access to a site or OneDrive' should be set to 30 days"
+    PolicyId := "MS.SHAREPOINT.3.1v1"
 
     Output := tests with input as {
         "SPO_tenant": [
@@ -187,7 +178,7 @@ test_ExternalUserExpireInDays_Incorrect_V1 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -195,8 +186,7 @@ test_ExternalUserExpireInDays_Incorrect_V1 if {
 }
 
 test_ExternalUserExpireInDays_Incorrect_V2 if {
-    ControlNumber := "Sharepoint 2.4"
-    Requirement := "Expiration timer for 'Guest access to a site or OneDrive' should be set to 30 days"
+    PolicyId := "MS.SHAREPOINT.3.1v1"
 
     Output := tests with input as {
         "SPO_tenant": [
@@ -208,7 +198,7 @@ test_ExternalUserExpireInDays_Incorrect_V2 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -216,8 +206,7 @@ test_ExternalUserExpireInDays_Incorrect_V2 if {
 }
 
 test_Multi_Incorrect_V1 if {
-    ControlNumber := "Sharepoint 2.4"
-    Requirement := "Expiration timer for 'Guest access to a site or OneDrive' should be set to 30 days"
+    PolicyId := "MS.SHAREPOINT.3.1v1"
 
     Output := tests with input as {
         "SPO_tenant": [
@@ -229,7 +218,7 @@ test_Multi_Incorrect_V1 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -237,8 +226,7 @@ test_Multi_Incorrect_V1 if {
 }
 
 test_Multi_Incorrect_V2 if {
-    ControlNumber := "Sharepoint 2.4"
-    Requirement := "Expiration timer for 'Guest access to a site or OneDrive' should be set to 30 days"
+    PolicyId := "MS.SHAREPOINT.3.1v1"
 
     Output := tests with input as {
         "SPO_tenant": [
@@ -250,7 +238,7 @@ test_Multi_Incorrect_V2 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet

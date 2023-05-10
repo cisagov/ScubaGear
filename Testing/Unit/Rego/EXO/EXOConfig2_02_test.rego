@@ -6,7 +6,7 @@ import future.keywords
 # Policy 1
 #--
 test_NotImplemented_Correct if {
-    PolicyId := "MS.EXCHANGE.2.1v1"
+    PolicyId := "MS.EXO.2.1v1"
 
     Output := tests with input as { }
 
@@ -21,7 +21,7 @@ test_NotImplemented_Correct if {
 # Policy 2
 #--
 test_Rdata_Correct if {
-    PolicyId := "MS.EXCHANGE.2.2v1"
+    PolicyId := "MS.EXO.2.2v1"
 
     Output := tests with input as {
         "spf_records": [
@@ -41,7 +41,7 @@ test_Rdata_Correct if {
 }
 
 test_Rdata_Correct_V2 if {
-    PolicyId := "MS.EXCHANGE.2.2v1"
+    PolicyId := "MS.EXO.2.2v1"
 
     Output := tests with input as {
         "spf_records": [
@@ -60,7 +60,7 @@ test_Rdata_Correct_V2 if {
 }
 
 test_Rdata_Incorrect if {
-    PolicyId := "MS.EXCHANGE.2.2v1"
+    PolicyId := "MS.EXO.2.2v1"
 
     Output := tests with input as {
         "spf_records": [
@@ -79,7 +79,7 @@ test_Rdata_Incorrect if {
 }
 
 test_Rdata_Incorrect_V2 if {
-    PolicyId := "MS.EXCHANGE.2.2v1"
+    PolicyId := "MS.EXO.2.2v1"
 
     Output := tests with input as {
         "spf_records": [
@@ -98,7 +98,7 @@ test_Rdata_Incorrect_V2 if {
 }
 
 test_Rdata_Incorrect_V3 if {
-    PolicyId := "MS.EXCHANGE.2.2v1"
+    PolicyId := "MS.EXO.2.2v1"
     
     Output := tests with input as {
         "spf_records": [
@@ -131,7 +131,7 @@ test_Rdata_Incorrect_V3 if {
 }
 
 test_Rdata_Multiple_Correct_V1 if {
-    PolicyId := "MS.EXCHANGE.2.2v1"
+    PolicyId := "MS.EXO.2.2v1"
     
     Output := tests with input as {
         "spf_records": [
@@ -150,7 +150,7 @@ test_Rdata_Multiple_Correct_V1 if {
 }
 
 test_Rdata_Multiple_Correct_V2 if {
-    PolicyId := "MS.EXCHANGE.2.2v1"
+    PolicyId := "MS.EXO.2.2v1"
     
     Output := tests with input as {
         "spf_records": [
@@ -169,7 +169,7 @@ test_Rdata_Multiple_Correct_V2 if {
 }
 
 test_Rdata_Multiple_Incorrect if {
-    PolicyId := "MS.EXCHANGE.2.2v1"
+    PolicyId := "MS.EXO.2.2v1"
     
     Output := tests with input as {
         "spf_records": [

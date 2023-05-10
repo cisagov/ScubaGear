@@ -46,6 +46,7 @@ test_AdminAuditLogEnabled_Incorrect if {
 #--
 test_NotImplemented_Correct_V1 if {
     ControlNumber := "Defender 2.10"
+    PolicyId := "TBD"
     Requirement := "Advanced audit SHALL be enabled"
 
     Output := tests with input as { }
@@ -54,7 +55,7 @@ test_NotImplemented_Correct_V1 if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Currently cannot be checked automatically. See Defender Secure Configuration Baseline policy 2.10 for instructions on manual check"
+    RuleOutput[0].ReportDetails == sprintf("Currently cannot be checked automatically. See Defender Secure Configuration Baseline policy %v for instructions on manual check", [PolicyId])
 }
 
 #
@@ -62,6 +63,7 @@ test_NotImplemented_Correct_V1 if {
 #--
 test_NotImplemented_Correct_V2 if {
     ControlNumber := "Defender 2.10"
+    PolicyId := "TBD"
     Requirement := "Audit logs SHALL be maintained for at least the minimum duration dictated by OMB M-21-31"
 
     Output := tests with input as { }
@@ -70,5 +72,5 @@ test_NotImplemented_Correct_V2 if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Currently cannot be checked automatically. See Defender Secure Configuration Baseline policy 2.10 for instructions on manual check"
+    RuleOutput[0].ReportDetails == sprintf("Currently cannot be checked automatically. See Defender Secure Configuration Baseline policy %v for instructions on manual check", [PolicyId])
 }

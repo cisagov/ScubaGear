@@ -6,8 +6,7 @@ import future.keywords
 # Policy 1
 #--
 test_DefaultLinkPermission_Correct_V1 if {
-    ControlNumber := "OneDrive 2.3"
-    Requirement := "Anyone link permissions SHOULD be limited to View"
+    PolicyId := "MS.ONEDRIVE.1.3v1"
 
     Output := tests with input as {
         "SPO_tenant_info": [
@@ -19,7 +18,7 @@ test_DefaultLinkPermission_Correct_V1 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -27,8 +26,7 @@ test_DefaultLinkPermission_Correct_V1 if {
 }
 
 test_DefaultLinkPermission_Correct_V2 if {
-    ControlNumber := "OneDrive 2.3"
-    Requirement := "Anyone link permissions SHOULD be limited to View"
+    PolicyId := "MS.ONEDRIVE.1.3v1"
 
     Output := tests with input as {
         "SPO_tenant_info": [
@@ -40,7 +38,7 @@ test_DefaultLinkPermission_Correct_V2 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -48,8 +46,7 @@ test_DefaultLinkPermission_Correct_V2 if {
 }
 
 test_DefaultLinkPermission_Correct_V2 if {
-    ControlNumber := "OneDrive 2.3"
-    Requirement := "Anyone link permissions SHOULD be limited to View"
+    PolicyId := "MS.ONEDRIVE.1.3v1"
 
     Output := tests with input as {
         "SPO_tenant_info": [
@@ -61,7 +58,7 @@ test_DefaultLinkPermission_Correct_V2 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -69,8 +66,7 @@ test_DefaultLinkPermission_Correct_V2 if {
 }
 
 test_DefaultLinkPermission_Incorrect if {
-    ControlNumber := "OneDrive 2.3"
-    Requirement := "Anyone link permissions SHOULD be limited to View"
+    PolicyId := "MS.ONEDRIVE.1.3v1"
 
     Output := tests with input as {
         "SPO_tenant_info": [
@@ -82,7 +78,7 @@ test_DefaultLinkPermission_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -90,8 +86,7 @@ test_DefaultLinkPermission_Incorrect if {
 }
 
 test_DefaultLinkPermission_Incorrect_V2 if {
-    ControlNumber := "OneDrive 2.3"
-    Requirement := "Anyone link permissions SHOULD be limited to View"
+    PolicyId := "MS.ONEDRIVE.1.3v1"
 
     Output := tests with input as {
         "SPO_tenant_info": [
@@ -103,7 +98,7 @@ test_DefaultLinkPermission_Incorrect_V2 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -111,8 +106,7 @@ test_DefaultLinkPermission_Incorrect_V2 if {
 }
 
 test_DefaultLinkPermission_Incorrect_V3 if {
-    ControlNumber := "OneDrive 2.3"
-    Requirement := "Anyone link permissions SHOULD be limited to View"
+    PolicyId := "MS.ONEDRIVE.1.3v1"
 
     Output := tests with input as {
         "SPO_tenant_info": [
@@ -124,7 +118,7 @@ test_DefaultLinkPermission_Incorrect_V3 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -132,8 +126,7 @@ test_DefaultLinkPermission_Incorrect_V3 if {
 }
 
 test_UsingServicePrincipal if {
-    ControlNumber := "OneDrive 2.3"
-    Requirement := "Anyone link permissions SHOULD be limited to View"
+    PolicyId := "MS.ONEDRIVE.1.3v1"
 
     Output := tests with input as {
         "SPO_tenant_info": [
@@ -141,10 +134,10 @@ test_UsingServicePrincipal if {
         "OneDrive_PnP_Flag": true
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
     RuleOutput[0].Criticality == "Should/Not-Implemented"
-    RuleOutput[0].ReportDetails == "Currently cannot be checked automatically while using Service Principals. See Onedrive Secure Configuration Baseline policy 2.3 for instructions on manual check"
+    RuleOutput[0].ReportDetails == sprintf("Currently cannot be checked automatically while using Service Principals. See Onedrive Secure Configuration Baseline policy %v for instructions on manual check", [PolicyId])
 }

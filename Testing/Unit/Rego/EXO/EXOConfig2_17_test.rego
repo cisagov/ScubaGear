@@ -6,12 +6,11 @@ import future.keywords
 # Policy 1
 #--
 test_3rdParty_Correct_V1 if {
-    ControlNumber := "EXO 2.17"
-    Requirement := "Unified audit logging SHALL be enabled"
+    PolicyId := "MS.EXO.17.1v1"
 
     Output := tests with input as { }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -22,12 +21,11 @@ test_3rdParty_Correct_V1 if {
 # Policy 2
 #--
 test_3rdParty_Correct_V2 if {
-    ControlNumber := "EXO 2.17"
-    Requirement := "Advanced audit SHALL be enabled"
+    PolicyId := "MS.EXO.17.2v1"
 
     Output := tests with input as { }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -38,12 +36,11 @@ test_3rdParty_Correct_V2 if {
 # Policy 3
 #--
 test_3rdParty_Correct_V3 if {
-    ControlNumber := "EXO 2.17"
-    Requirement := "Audit logs SHALL be maintained for at least the minimum duration dictated by OMB M-21-31"
+    PolicyId := "MS.EXO.17.3v1"
 
     Output := tests with input as { }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet

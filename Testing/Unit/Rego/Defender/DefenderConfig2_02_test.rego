@@ -1000,6 +1000,7 @@ test_NotifyUser_Incorrect if {
 #--
 test_NotImplemented_Correct_V1 if {
     ControlNumber := "Defender 2.2"
+    PolicyId := "TBD"
     Requirement := "A list of apps that are not allowed to access files protected by DLP policy SHOULD be defined"
 
     Output := tests with input as { }
@@ -1008,7 +1009,7 @@ test_NotImplemented_Correct_V1 if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Currently cannot be checked automatically. See Defender Secure Configuration Baseline policy 2.2 for instructions on manual check"
+    RuleOutput[0].ReportDetails == sprintf("Currently cannot be checked automatically. See Defender Secure Configuration Baseline policy %v for instructions on manual check", [PolicyId])
 }
 
 #
@@ -1016,6 +1017,7 @@ test_NotImplemented_Correct_V1 if {
 #--
 test_NotImplemented_Correct_V2 if {
     ControlNumber := "Defender 2.2"
+    PolicyId := "TBD"
     Requirement := "A list of browsers that are not allowed to access files protected by DLP policy SHOULD be defined"
 
     Output := tests with input as { }
@@ -1024,5 +1026,5 @@ test_NotImplemented_Correct_V2 if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Currently cannot be checked automatically. See Defender Secure Configuration Baseline policy 2.2 for instructions on manual check"
+    RuleOutput[0].ReportDetails == sprintf("Currently cannot be checked automatically. See Defender Secure Configuration Baseline policy %v for instructions on manual check", [PolicyId])
 }

@@ -750,6 +750,7 @@ function Invoke-ReportCreation {
                 $FailuresSummary = "<div class='summary'></div>"
                 $ManualSummary = "<div class='summary'></div>"
                 $ErrorSummary = "<div class='summary'></div>"
+                $BugSummary = "<div class='summary'></div>"
 
                 if ($Report.Warnings -gt 0) {
                     $Noun = Pluralize -SingularNoun "warning" -PluralNoun "warnings" -Count $Report.Warnings
@@ -767,13 +768,18 @@ function Invoke-ReportCreation {
                 }
 
                 if ($Report.Errors -gt 0) {
-                    $Noun = Pluralize -SingularNoun "check" -PluralNoun "errors" -Count $Report.Manual
+                    $Noun = Pluralize -SingularNoun "error" -PluralNoun "errors" -Count $Report.Errors
                     $ErrorSummary = "<div class='summary error'>$($Report.Errors) PowerShell $($Noun)</div>"
+                }
+
+                if ($Report.Bugs -gt 0) {
+                    $Noun = Pluralize -SingularNoun "bug" -PluralNoun "bugs" -Count $Report.Bugs
+                    $BugSummary = "<div class='summary bug'>$($Report.Bugs) $($Noun)</div>"
                 }
 
                 $Fragment += [pscustomobject]@{
                 "Baseline Conformance Reports" = $Link;
-                "Details" = "$($PassesSummary) $($WarningsSummary) $($FailuresSummary) $($ManualSummary) $($ErrorSummary)"
+                "Details" = "$($PassesSummary) $($WarningsSummary) $($FailuresSummary) $($ManualSummary) $($ErrorSummary) $($BugSummary)"
                 }
             }
             $TenantMetaData += [pscustomobject]@{

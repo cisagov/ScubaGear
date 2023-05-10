@@ -6,7 +6,7 @@ import future.keywords
 # Policy 1
 #--
 test_3rdParty_Correct_V1 if {
-    PolicyId := "MS.EXCHANGE.9.1v1"
+    PolicyId := "MS.EXO.9.1v1"
     
     Output := tests with input as { }
 
@@ -21,7 +21,7 @@ test_3rdParty_Correct_V1 if {
 # Policy 2
 #--
 test_3rdParty_Correct_V2 if {
-    PolicyId := "MS.EXCHANGE.9.2v1"
+    PolicyId := "MS.EXO.9.2v1"
 
     Output := tests with input as { }
 
@@ -36,7 +36,7 @@ test_3rdParty_Correct_V2 if {
 # Policy 3
 #--
 test_3rdParty_Correct_V3 if {
-    PolicyId := "MS.EXCHANGE.9.3v1"
+    PolicyId := "MS.EXO.9.3v1"
     Output := tests with input as { }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]

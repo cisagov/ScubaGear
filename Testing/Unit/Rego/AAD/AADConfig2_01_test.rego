@@ -1,7 +1,6 @@
 package aad
 import future.keywords
 
-
 #
 # Policy 1
 #--tests for no exclusions

@@ -9,6 +9,7 @@
 # (e.g., MS.TEAMS.1.1v1) aligns this files to the secure baseline control.
 package teams
 import future.keywords
+import data.report.utils.notCheckedDetails
 
 Format(Array) = format_int(count(Array), 10)
 
@@ -461,7 +462,7 @@ tests[{
     "Criticality" : "Shall/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "Cannot be checked automatically. See Microsoft Teams Secure Configuration Baseline policy 2.8 for instructions on manual check",
+    "ReportDetails" : "Cannot be checked automatically. See Microsoft Teams Secure Configuration Baseline policy MS.TEAMS.8.3v1 for instructions on manual check",
     "RequirementMet" : false
 }] {
     true

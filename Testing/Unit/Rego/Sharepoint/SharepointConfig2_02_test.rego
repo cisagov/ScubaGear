@@ -6,9 +6,8 @@ import future.keywords
 # Policy 1
 #--
 test_SharingCapability_Correct_V1 if {
-    ControlNumber := "Sharepoint 2.2"
-    Requirement := "External sharing SHOULD be limited to approved domains and security groups per interagency collaboration needs"
-
+    PolicyId := "MS.SHAREPOINT.1.3v1"
+ 
     Output := tests with input as {
         "SPO_tenant": [
             {
@@ -17,7 +16,7 @@ test_SharingCapability_Correct_V1 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -25,8 +24,7 @@ test_SharingCapability_Correct_V1 if {
 }
 
 test_SharingCapability_Correct_V2 if {
-    ControlNumber := "Sharepoint 2.2"
-    Requirement := "External sharing SHOULD be limited to approved domains and security groups per interagency collaboration needs"
+    PolicyId := "MS.SHAREPOINT.1.3v1"
 
     Output := tests with input as {
         "SPO_tenant": [
@@ -36,7 +34,7 @@ test_SharingCapability_Correct_V2 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -44,8 +42,7 @@ test_SharingCapability_Correct_V2 if {
 }
 
 test_SharingCapability_Incorrect if {
-    ControlNumber := "Sharepoint 2.2"
-    Requirement := "External sharing SHOULD be limited to approved domains and security groups per interagency collaboration needs"
+    PolicyId := "MS.SHAREPOINT.1.3v1"
 
     Output := tests with input as {
         "SPO_tenant": [
@@ -55,7 +52,7 @@ test_SharingCapability_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet

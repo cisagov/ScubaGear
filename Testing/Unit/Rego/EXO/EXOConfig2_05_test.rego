@@ -6,7 +6,7 @@ import future.keywords
 # Policy 1
 #--
 test_SmtpClientAuthenticationDisabled_Correct if {
-    PolicyId := "MS.EXCHANGE.5.1v1"
+    PolicyId := "MS.EXO.5.1v1"
 
     Output := tests with input as {
         "transport_config": 
@@ -26,7 +26,7 @@ test_SmtpClientAuthenticationDisabled_Correct if {
 }
 
 test_SmtpClientAuthenticationDisabled_Incorrect if {
-    PolicyId := "MS.EXCHANGE.5.1v1"
+    PolicyId := "MS.EXO.5.1v1"
 
     Output := tests with input as {
         "transport_config": [

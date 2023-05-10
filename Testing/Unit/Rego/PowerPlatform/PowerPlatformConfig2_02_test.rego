@@ -6,8 +6,7 @@ import future.keywords
 # Policy 1
 #--
 test_name_Correct if {
-    ControlNumber := "Power Platform 2.2"
-    Requirement := "A DLP policy SHALL be created to restrict connector access in the default Power Platform environment"
+    PolicyId := "MS.POWERPLATFORM.2.1v1"
 
     Output := tests with input as {
         "tenant_id": "Test Id",
@@ -21,7 +20,7 @@ test_name_Correct if {
         }]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -29,8 +28,7 @@ test_name_Correct if {
 }
 
 test_name_Incorrect if {
-    ControlNumber := "Power Platform 2.2"
-    Requirement := "A DLP policy SHALL be created to restrict connector access in the default Power Platform environment"
+    PolicyId := "MS.POWERPLATFORM.2.1v1"
 
     Output := tests with input as {
         "tenant_id": "Test Id",
@@ -44,7 +42,7 @@ test_name_Incorrect if {
         }]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -55,8 +53,7 @@ test_name_Incorrect if {
 # Policy 2
 #--
 test_environment_list_Correct if {
-    ControlNumber := "Power Platform 2.2"
-    Requirement := "Non-default environments SHOULD have at least one DLP policy that affects them"
+    PolicyId := "MS.POWERPLATFORM.2.2v1"
 
     Output := tests with input as {
         "dlp_policies": [{
@@ -72,7 +69,7 @@ test_environment_list_Correct if {
         }]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -80,8 +77,7 @@ test_environment_list_Correct if {
 }
 
 test_environment_list_Incorrect if {
-    ControlNumber := "Power Platform 2.2"
-    Requirement := "Non-default environments SHOULD have at least one DLP policy that affects them"
+    PolicyId := "MS.POWERPLATFORM.2.2v1"
 
     Output := tests with input as {
         "dlp_policies": [{
@@ -102,7 +98,7 @@ test_environment_list_Incorrect if {
         }]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -113,8 +109,7 @@ test_environment_list_Incorrect if {
 # Policy 3
 #--
 test_classification_Correct_V1 if {
-    ControlNumber := "Power Platform 2.2"
-    Requirement := "All connectors except those listed...[see Power Platform secure configuration baseline for list]...SHOULD be added to the Blocked category in the default environment policy"
+    PolicyId := "MS.POWERPLATFORM.2.3v1"
 
     Output := tests with input as {
         "tenant_id": "Test Id",
@@ -133,7 +128,7 @@ test_classification_Correct_V1 if {
         }]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -141,8 +136,7 @@ test_classification_Correct_V1 if {
 }
 
 test_classification_Correct_V2 if {
-    ControlNumber := "Power Platform 2.2"
-    Requirement := "All connectors except those listed...[see Power Platform secure configuration baseline for list]...SHOULD be added to the Blocked category in the default environment policy"
+    PolicyId := "MS.POWERPLATFORM.2.3v1"
 
     Output := tests with input as {
         "tenant_id": "Test Id",
@@ -161,7 +155,7 @@ test_classification_Correct_V2 if {
         }]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -169,8 +163,7 @@ test_classification_Correct_V2 if {
 }
 
 test_connectorGroups_Correct if {
-    ControlNumber := "Power Platform 2.2"
-    Requirement := "All connectors except those listed...[see Power Platform secure configuration baseline for list]...SHOULD be added to the Blocked category in the default environment policy"
+    PolicyId := "MS.POWERPLATFORM.2.3v1"
 
     Output := tests with input as {
         "tenant_id": "Test Id",
@@ -195,7 +188,7 @@ test_connectorGroups_Correct if {
         }]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -203,8 +196,7 @@ test_connectorGroups_Correct if {
 }
 
 test_classification_Incorrect_V1 if {
-    ControlNumber := "Power Platform 2.2"
-    Requirement := "All connectors except those listed...[see Power Platform secure configuration baseline for list]...SHOULD be added to the Blocked category in the default environment policy"
+    PolicyId := "MS.POWERPLATFORM.2.3v1"
 
     Output := tests with input as {
         "tenant_id": "Test Id",
@@ -223,7 +215,7 @@ test_classification_Incorrect_V1 if {
         }]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -231,8 +223,7 @@ test_classification_Incorrect_V1 if {
 }
 
 test_classification_Incorrect_V2 if {
-    ControlNumber := "Power Platform 2.2"
-    Requirement := "All connectors except those listed...[see Power Platform secure configuration baseline for list]...SHOULD be added to the Blocked category in the default environment policy"
+    PolicyId := "MS.POWERPLATFORM.2.3v1"
 
     Output := tests with input as {
         "tenant_id": "Test Id",
@@ -251,7 +242,7 @@ test_classification_Incorrect_V2 if {
         }]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -259,8 +250,7 @@ test_classification_Incorrect_V2 if {
 }
 
 test_connectorGroups_Incorrect if {
-    ControlNumber := "Power Platform 2.2"
-    Requirement := "All connectors except those listed...[see Power Platform secure configuration baseline for list]...SHOULD be added to the Blocked category in the default environment policy"
+    PolicyId := "MS.POWERPLATFORM.2.3v1"
 
     Output := tests with input as {
         "tenant_id": "Test Id",
@@ -285,7 +275,7 @@ test_connectorGroups_Incorrect if {
         }]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet

@@ -6,12 +6,11 @@ import future.keywords
 # Policy 1
 #--
 test_3rdParty_Correct_V1 if {
-    ControlNumber := "EXO 2.16"
-    Requirement := "At a minimum, the following alerts SHALL be enabled...[see Exchange Online secure baseline for list]"
+    PolicyId := "MS.EXO.16.1v1"
 
     Output := tests with input as { }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -22,12 +21,11 @@ test_3rdParty_Correct_V1 if {
 # Policy 2
 #--
 test_3rdParty_Correct_V2 if {
-    ControlNumber := "EXO 2.16"
-    Requirement := "The alerts SHOULD be sent to a monitored address or incorporated into a SIEM"
+    PolicyId := "MS.EXO.16.1v1"
 
     Output := tests with input as { }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet

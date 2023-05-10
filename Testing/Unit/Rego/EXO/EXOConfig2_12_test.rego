@@ -6,7 +6,7 @@ import future.keywords
 # Policy 1
 #--
 test_IPAllowList_Correct_V1 if {
-    PolicyId := "MS.EXCHANGE.12.1v1"
+    PolicyId := "MS.EXO.12.1v1"
     
     Output := tests with input as {
         "conn_filter": [
@@ -26,7 +26,7 @@ test_IPAllowList_Correct_V1 if {
 }
 
 test_IPAllowList_Correct_V2 if {
-    PolicyId := "MS.EXCHANGE.12.1v1"
+    PolicyId := "MS.EXO.12.1v1"
 
     Output := tests with input as {
         "conn_filter": 
@@ -47,7 +47,7 @@ test_IPAllowList_Correct_V2 if {
 }
 
 test_IPAllowList_Incorrect if {
-    PolicyId := "MS.EXCHANGE.12.1v1"
+    PolicyId := "MS.EXO.12.1v1"
 
     Output := tests with input as {
         "conn_filter": [
@@ -70,7 +70,7 @@ test_IPAllowList_Incorrect if {
 # Policy 2
 #--
 test_EnableSafeList_Correct_V1 if {
-    PolicyId := "MS.EXCHANGE.12.2v1"
+    PolicyId := "MS.EXO.12.2v1"
 
     Output := tests with input as {
         "conn_filter": [
@@ -90,7 +90,7 @@ test_EnableSafeList_Correct_V1 if {
 }
 
 test_EnableSafeList_Incorrect_V1 if {
-    PolicyId := "MS.EXCHANGE.12.2v1"
+    PolicyId := "MS.EXO.12.2v1"
 
     Output := tests with input as {
         "conn_filter": [
@@ -110,7 +110,7 @@ test_EnableSafeList_Incorrect_V1 if {
 }
 
 test_EnableSafeList_Correct_V2 if {
-    PolicyId := "MS.EXCHANGE.12.2v1"
+    PolicyId := "MS.EXO.12.2v1"
 
     Output := tests with input as {
         "conn_filter": [

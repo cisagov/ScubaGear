@@ -6,7 +6,7 @@ import future.keywords
 # Policy 1
 #--
 test_AutoForwardEnabled_Correct if {
-    PolicyId := "MS.EXCHANGE.1.1v1"
+    PolicyId := "MS.EXO.1.1v1"
 
     Output := tests with input as {
         "remote_domains": [
@@ -25,7 +25,7 @@ test_AutoForwardEnabled_Correct if {
 }
 
 test_AutoForwardEnabled_Incorrect_V1 if {
-    PolicyId := "MS.EXCHANGE.1.1v1"
+    PolicyId := "MS.EXO.1.1v1"
 
     Output := tests with input as {
         "remote_domains": [
@@ -44,7 +44,7 @@ test_AutoForwardEnabled_Incorrect_V1 if {
 }
 
 test_AutoForwardEnabled_Incorrect_V2 if {
-    PolicyId := "MS.EXCHANGE.1.1v1"
+    PolicyId := "MS.EXO.1.1v1"
 
     Output := tests with input as {
         "remote_domains": [
@@ -67,7 +67,7 @@ test_AutoForwardEnabled_Incorrect_V2 if {
 }
 
 test_AutoForwardEnabled_Incorrect_V3 if {
-    PolicyId := "MS.EXCHANGE.1.1v1"
+    PolicyId := "MS.EXO.1.1v1"
 
     Output := tests with input as {
         "remote_domains": [

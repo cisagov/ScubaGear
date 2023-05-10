@@ -6,8 +6,7 @@ import future.keywords
 # Policy 1
 #--
 test_BlockMacSync_Correct if {
-    ControlNumber := "OneDrive 2.5"
-    Requirement := "OneDrive Client Sync SHALL only be allowed only within the local domain"
+    PolicyId := "MS.ONEDRIVE.2.3v1"
 
     Output := tests with input as {
         "Tenant_sync_info": [
@@ -17,7 +16,7 @@ test_BlockMacSync_Correct if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -25,8 +24,7 @@ test_BlockMacSync_Correct if {
 }
 
 test_BlockMacSync_Incorrect if {
-    ControlNumber := "OneDrive 2.5"
-    Requirement := "OneDrive Client Sync SHALL only be allowed only within the local domain"
+    PolicyId := "MS.ONEDRIVE.2.3v1"
 
     Output := tests with input as {
         "Tenant_sync_info": [
@@ -36,7 +34,7 @@ test_BlockMacSync_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet

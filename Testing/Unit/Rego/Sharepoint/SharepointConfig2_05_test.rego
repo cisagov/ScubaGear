@@ -6,6 +6,7 @@ import future.keywords
 #--
 test_NotImplemented_Correct if {
     ControlNumber := "Sharepoint 2.5"
+    PolicyId := "TBD"
     Requirement := "Users SHALL be prevented from running custom scripts on personal sites (OneDrive)"
 
     Output := tests with input as { }
@@ -14,7 +15,7 @@ test_NotImplemented_Correct if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Currently cannot be checked automatically. See Sharepoint Secure Configuration Baseline policy 2.5 for instructions on manual check"
+    RuleOutput[0].ReportDetails == sprintf("Currently cannot be checked automatically. See Sharepoint Secure Configuration Baseline policy %v for instructions on manual check", [PolicyId])
 }
 
 #

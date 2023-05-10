@@ -1,5 +1,5 @@
 package aad
-import future.keywords
+import future.keywords.if
 
 
 #
@@ -1321,5 +1321,5 @@ test_NotImplemented_Correct if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Currently cannot be checked automatically. See Azure Active Directory Secure Configuration Baseline policy 2.2 for instructions on manual check"
+    RuleOutput[0].ReportDetails == sprintf("Currently cannot be checked automatically. See Azure Active Directory Secure Configuration Baseline policy %v for instructions on manual check", [PolicyId])
 }

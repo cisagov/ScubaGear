@@ -49,7 +49,10 @@ table.tenantdata tr:first-child {
 .warning { background-color: var(--test-warning); }
 .pass { background-color: var(--test-pass); }
 .manual { background-color: var(--test-other); }
-
+.bug { 
+    background-color: var(--test-other);
+    color: hsl(16, 98%, 50%)
+}
 .error {
     background-color: var(--test-fail); 
     color: #d10000;

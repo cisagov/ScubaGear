@@ -1,5 +1,6 @@
 package aad
 import future.keywords
+import data.report.utils.notCheckedDetails
 
 ################
 # The report formatting functions below are generic and used throughout the policies #
@@ -209,7 +210,7 @@ tests[{
     "Criticality" : "Should/Not-Implemented",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "Currently cannot be checked automatically. See Azure Active Directory Secure Configuration Baseline policy 2.2 for instructions on manual check",
+    "ReportDetails" : "Currently cannot be checked automatically. See Azure Active Directory Secure Configuration Baseline policy MS.AAD.2.2v1 for instructions on manual check",
     "RequirementMet" : false
 }] {
     true
@@ -302,7 +303,7 @@ tests[{
     "Criticality" : "Shall/Not-Implemented",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "Currently cannot be checked automatically. See Azure Active Directory Secure Configuration Baseline policy 2.4 for instructions on manual check",
+    "ReportDetails" : "Currently cannot be checked automatically. See Azure Active Directory Secure Configuration Baseline policy MS.AAD.4.2v1 for instructions on manual check",
     "RequirementMet" : false
 }] {
     true
@@ -319,7 +320,7 @@ tests[{
     "Criticality" : "Shall/Not-Implemented",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "Currently cannot be checked automatically. See Azure Active Directory Secure Configuration Baseline policy 2.4 for instructions on manual check",
+    "ReportDetails" : "Currently cannot be checked automatically. See Azure Active Directory Secure Configuration Baseline policy MS.AAD.4.3v1 for instructions on manual check",
     "RequirementMet" : false
 }] {
     true
@@ -336,7 +337,7 @@ tests[{
     "Criticality" : "Shall/Not-Implemented",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "Currently cannot be checked automatically. See Azure Active Directory Secure Configuration Baseline policy 2.4 for instructions on manual check",
+    "ReportDetails" : "Currently cannot be checked automatically. See Azure Active Directory Secure Configuration Baseline policy MS.AAD.4.4v1 for instructions on manual check",
     "RequirementMet" : false
 }] {
     true
@@ -353,7 +354,7 @@ tests[{
     "Criticality" : "Shall/Not-Implemented",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "Currently cannot be checked automatically. See Azure Active Directory Secure Configuration Baseline policy 2.5 for instructions on manual check",
+    "ReportDetails" : "Currently cannot be checked automatically. See Azure Active Directory Secure Configuration Baseline policy MS.AAD.5.1v1 for instructions on manual check",
     "RequirementMet" : false
 }] {
     true
@@ -365,13 +366,14 @@ tests[{
 #--
 # At this time we are unable to test for X because of Y
 tests[{
-    "PolicyId" : "MS.AAD.5.4v1",
+    "PolicyId" : PolicyId,
     "Criticality" : "Shall/Not-Implemented",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "Currently cannot be checked automatically. See Azure Active Directory Secure Configuration Baseline policy 2.5 for instructions on manual check",
+    "ReportDetails" : notCheckedDetails(PolicyId),
     "RequirementMet" : false
 }] {
+    PolicyId := "MS.AAD.5.4v1"
     true
 }
 #--
@@ -514,13 +516,14 @@ tests[{
 #--
 # At this time we are unable to test for X because of Y
 tests[{
-    "PolicyId" : "MS.AAD.8.1v1",
+    "PolicyId" : PolicyId,
     "Criticality" : "Shall/Not-Implemented",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "Currently cannot be checked automatically. See Azure Active Directory Secure Configuration Baseline policy 2.8 for instructions on manual check",
+    "ReportDetails" : notCheckedDetails(PolicyId),
     "RequirementMet" : false
 }] {
+    PolicyId := "MS.AAD.8.1v1"
     true
 }
 #--
@@ -944,7 +947,7 @@ tests[{
     "Criticality" : "Should/Not-Implemented",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "Currently cannot be checked automatically. See Azure Active Directory Secure Configuration Baseline policy 2.18 for instructions on manual check",
+    "ReportDetails" : "Currently cannot be checked automatically. See Azure Active Directory Secure Configuration Baseline policy MS.AAD.18.2v1 for instructions on manual check",
     "RequirementMet" : false
 }] {
     true

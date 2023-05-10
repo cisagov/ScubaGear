@@ -6,7 +6,7 @@ import future.keywords
 # Policy 1
 #--
 test_Domains_Contacts_Correct if {
-    PolicyId := "MS.EXCHANGE.6.1v1"
+    PolicyId := "MS.EXO.6.1v1"
  
     Output := tests with input as {
         "sharing_policy": [
@@ -28,7 +28,7 @@ test_Domains_Contacts_Correct if {
 }
 
 test_Domains_Contacts_Incorrect if {
-    PolicyId := "MS.EXCHANGE.6.1v1"
+    PolicyId := "MS.EXO.6.1v1"
 
     Output := tests with input as {
         "sharing_policy": [
@@ -58,7 +58,7 @@ test_Domains_Contacts_Incorrect if {
 # Policy 2
 #--
 test_Domains_Calender_Correct if {
-    PolicyId := "MS.EXCHANGE.6.2v1"
+    PolicyId := "MS.EXO.6.2v1"
 
     Output := tests with input as {
         "sharing_policy": [
@@ -80,7 +80,7 @@ test_Domains_Calender_Correct if {
 }
 
 test_Domains_Calender_Incorrect if {
-    PolicyId := "MS.EXCHANGE.6.2v1"
+    PolicyId := "MS.EXO.6.2v1"
 
     Output := tests with input as {
         "sharing_policy": [

@@ -6,7 +6,7 @@ import future.keywords
 # Policy 1
 #--
 test_disableProductionEnvironmentCreationByNonAdminUsers_Correct if {
-    ControlNumber := "Power Platform 2.1"
+    PolicyId := "MS.POWERPLATFORM.1.1v1"
     Requirement := "The ability to create production and sandbox environments SHALL be restricted to admins"
 
     Output := tests with input as {
@@ -15,7 +15,7 @@ test_disableProductionEnvironmentCreationByNonAdminUsers_Correct if {
         }]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -23,7 +23,7 @@ test_disableProductionEnvironmentCreationByNonAdminUsers_Correct if {
 }
 
 test_disableProductionEnvironmentCreationByNonAdminUsers_Incorrect if {
-    ControlNumber := "Power Platform 2.1"
+    PolicyId := "MS.POWERPLATFORM.1.1v1"
     Requirement := "The ability to create production and sandbox environments SHALL be restricted to admins"
 
     Output := tests with input as {
@@ -32,7 +32,7 @@ test_disableProductionEnvironmentCreationByNonAdminUsers_Incorrect if {
         }]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet

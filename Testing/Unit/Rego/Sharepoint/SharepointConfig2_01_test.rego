@@ -6,8 +6,7 @@ import future.keywords
 # Policy 1
 #--
 test_DefaultSharingLinkType_Correct if {
-    ControlNumber := "Sharepoint 2.1"
-    Requirement := "File and folder links default sharing setting SHALL be set to \"Specific People (Only the People the User Specifies)\""
+    PolicyId := "MS.SHAREPOINT.1.1v1"
 
     Output := tests with input as {
         "SPO_tenant": [
@@ -17,7 +16,7 @@ test_DefaultSharingLinkType_Correct if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -25,8 +24,7 @@ test_DefaultSharingLinkType_Correct if {
 }
 
 test_DefaultSharingLinkType_Incorrect if {
-    ControlNumber := "Sharepoint 2.1"
-    Requirement := "File and folder links default sharing setting SHALL be set to \"Specific People (Only the People the User Specifies)\""
+    PolicyId := "MS.SHAREPOINT.1.1v1"
 
     Output := tests with input as {
         "SPO_tenant": [
@@ -36,7 +34,7 @@ test_DefaultSharingLinkType_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet

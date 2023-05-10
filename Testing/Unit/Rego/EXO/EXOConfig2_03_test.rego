@@ -6,7 +6,7 @@ import future.keywords
 # Policy 1
 #--
 test_Enabled_Correct_V1 if {
-    PolicyId := "MS.EXCHANGE.3.1v1"
+    PolicyId := "MS.EXO.3.1v1"
 
     Output := tests with input as {
         "dkim_config": [
@@ -38,7 +38,7 @@ test_Enabled_Correct_V1 if {
 
 test_Enabled_Correct_V2 if {
     # Test with incorrect default domain
-    PolicyId := "MS.EXCHANGE.3.1v1"
+    PolicyId := "MS.EXO.3.1v1"
 
     Output := tests with input as {
         "dkim_config": [
@@ -84,7 +84,7 @@ test_Enabled_Correct_V2 if {
 
 test_Enabled_Correct_V3 if {
     # Test for multiple custom domains
-    PolicyId := "MS.EXCHANGE.3.1v1"
+    PolicyId := "MS.EXO.3.1v1"
 
     Output := tests with input as {
         "dkim_config": [
@@ -128,7 +128,7 @@ test_Enabled_Correct_V3 if {
 
 test_Enabled_Correct_V4 if {
     # Test for no custom domains, just the default domain 
-    PolicyId := "MS.EXCHANGE.3.1v1"
+    PolicyId := "MS.EXO.3.1v1"
 
     Output := tests with input as {
         "dkim_config": [
@@ -159,7 +159,7 @@ test_Enabled_Correct_V4 if {
 }
 
 test_Enabled_Incorrect if {
-    PolicyId := "MS.EXCHANGE.3.1v1"
+    PolicyId := "MS.EXO.3.1v1"
 
     Output := tests with input as {
         "dkim_config": [
@@ -190,7 +190,7 @@ test_Enabled_Incorrect if {
 }
 
 test_Rdata_Incorrect if {
-    PolicyId := "MS.EXCHANGE.3.1v1"
+    PolicyId := "MS.EXO.3.1v1"
 
     Output := tests with input as {
         "dkim_config": [
@@ -221,7 +221,7 @@ test_Rdata_Incorrect if {
 }
 
 test_Rdata_Incorrect_V2 if {
-    PolicyId := "MS.EXCHANGE.3.1v1"
+    PolicyId := "MS.EXO.3.1v1"
 
     Output := tests with input as {
         "dkim_config": [
@@ -252,7 +252,7 @@ test_Rdata_Incorrect_V2 if {
 }
 
 test_Enabled_Correct_V2 if {
-    PolicyId := "MS.EXCHANGE.3.1v1"
+    PolicyId := "MS.EXO.3.1v1"
 
     Output := tests with input as {
         "dkim_config": [
@@ -295,7 +295,7 @@ test_Enabled_Correct_V2 if {
 }
 
 test_Enabled_Inorrect_V3 if {
-    PolicyId := "MS.EXCHANGE.3.1v1"
+    PolicyId := "MS.EXO.3.1v1"
     
     Output := tests with input as {
         "dkim_config": [

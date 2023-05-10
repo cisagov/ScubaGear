@@ -14,5 +14,5 @@ test_NotImplemented_Correct if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Currently cannot be checked automatically. See Azure Active Directory Secure Configuration Baseline policy 2.8 for instructions on manual check"
+    RuleOutput[0].ReportDetails == sprintf("Currently cannot be checked automatically. See Azure Active Directory Secure Configuration Baseline policy %v for instructions on manual check", [PolicyId])
 }

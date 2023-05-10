@@ -6,12 +6,11 @@ import future.keywords
 # Policy 1
 #--
 test_3rdParty_Correct_V1 if {
-    ControlNumber := "EXO 2.15"
-    Requirement := "URL comparison with a block-list SHOULD be enabled"
+    PolicyId := "MS.EXO.15.1v1"
 
     Output := tests with input as { }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -22,12 +21,11 @@ test_3rdParty_Correct_V1 if {
 # Policy 2
 #--
 test_3rdParty_Correct_V2 if {
-    ControlNumber := "EXO 2.15"
-    Requirement := "Direct download links SHOULD be scanned for malware"
+    PolicyId := "MS.EXO.15.2v1"
 
     Output := tests with input as { }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -38,12 +36,11 @@ test_3rdParty_Correct_V2 if {
 # Policy 3
 #--
 test_3rdParty_Correct_V3 if {
-    ControlNumber := "EXO 2.15"
-    Requirement := "User click tracking SHOULD be enabled"
+    PolicyId := "MS.EXO.15.3v1"
 
     Output := tests with input as { }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet

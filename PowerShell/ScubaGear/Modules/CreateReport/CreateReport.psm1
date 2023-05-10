@@ -71,6 +71,7 @@ function New-Report {
         "Passes" = 0;
         "Manual" = 0;
         "Errors" = 0;
+        "Bugs" = 0;
         "Date" = $SettingsExport.date;
     }
 
@@ -123,6 +124,7 @@ function New-Report {
                 }
             }
             else {
+                $ReportSummary.Bugs += 1
                 $Fragment += [pscustomobject]@{
                     "Control ID"=$Control.Id
                     "Requirement"=$Control.Value
@@ -228,6 +230,13 @@ function Import-SecureBaseline{
                     $LineAdvance++
                     $Value += ' ' + ([string]$MdLines[$LineNumber+$LineAdvance]).Trim()
                 }
+
+                $null = $Control.Value -Match '^(.+)(SHALL|SHOULD|MAY){1,1}(.+\.)$'
+                $Cricality = "UNK"
+                if (@("SHALL", "SHOULD", "MAY") -Contains $Matches.2){
+                    $Cricality = $Matches.2
+                }
+
                 $Value = [System.Net.WebUtility]::HtmlEncode($Value)
                 $Id = [string]$MdLines[$LineNumber].Substring(5)
 
@@ -240,7 +249,7 @@ function Import-SecureBaseline{
                     $Deleted = $false
                 }
 
-                $Group.Controls += @{"Id"=$Id; "Value"=$Value; "Deleted"=$Deleted}
+                $Group.Controls += @{"Id"=$Id; "Value"=$Value; "Cricality"=$Cricality; "Deleted"=$Deleted}
             }
 
             $Output[$Product] += $Group

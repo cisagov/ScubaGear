@@ -6,7 +6,7 @@ import future.keywords
 # Policy 1
 #--
 test_Rdata_Correct if {
-    PolicyId := "MS.EXCHANGE.4.1v1"
+    PolicyId := "MS.EXO.4.1v1"
 
     Output := tests with input as {
         "dmarc_records":[
@@ -31,7 +31,7 @@ test_Rdata_Correct if {
 }
 
 test_Rdata_Incorrect if {
-    PolicyId := "MS.EXCHANGE.4.1v1"
+    PolicyId := "MS.EXO.4.1v1"
 
     Output := tests with input as {
         "dmarc_records":[
@@ -56,7 +56,7 @@ test_Rdata_Incorrect if {
 }
 
 test_Rdata_Incorrect_V2 if {
-    PolicyId := "MS.EXCHANGE.4.1v1"
+    PolicyId := "MS.EXO.4.1v1"
 
     Output := tests with input as {
         "dmarc_records":[  
@@ -81,7 +81,7 @@ test_Rdata_Incorrect_V2 if {
 }
 
 test_Rdata_Incorrect_V3 if {
-    PolicyId := "MS.EXCHANGE.4.1v1"
+    PolicyId := "MS.EXO.4.1v1"
 
     Output := tests with input as {
         "dmarc_records": [
@@ -117,7 +117,7 @@ test_Rdata_Incorrect_V3 if {
 # Policy 2
 #--
 test_Rdata_Correct_V2 if {
-    PolicyId := "MS.EXCHANGE.4.2v1"
+    PolicyId := "MS.EXO.4.2v1"
 
     Output := tests with input as {
         "dmarc_records": [
@@ -142,7 +142,7 @@ test_Rdata_Correct_V2 if {
 }
 
 test_Rdata_Incorrect_V4 if {
-    PolicyId := "MS.EXCHANGE.4.2v1"
+    PolicyId := "MS.EXO.4.2v1"
 
     Output := tests with input as {
         "dmarc_records": [
@@ -167,7 +167,7 @@ test_Rdata_Incorrect_V4 if {
 }
 
 test_Rdata_Incorrect_V5 if {
-    PolicyId := "MS.EXCHANGE.4.2v1"
+    PolicyId := "MS.EXO.4.2v1"
 
     Output := tests with input as {
         "dmarc_records": [
@@ -195,7 +195,7 @@ test_Rdata_Incorrect_V5 if {
 # Policy 3
 #--
 test_Rdata_Correct_V3 if {
-    PolicyId := "MS.EXCHANGE.4.3v1"
+    PolicyId := "MS.EXO.4.3v1"
 
     Output := tests with input as {
         "dmarc_records": [
@@ -220,7 +220,7 @@ test_Rdata_Correct_V3 if {
 }
 
 test_Rdata_Incorrect_V6 if {
-    PolicyId := "MS.EXCHANGE.4.3v1"
+    PolicyId := "MS.EXO.4.3v1"
 
     Output := tests with input as {
         "dmarc_records": [
@@ -245,7 +245,7 @@ test_Rdata_Incorrect_V6 if {
 }
 
 test_Rdata_Incorrect_V7 if {
-    PolicyId := "MS.EXCHANGE.4.3v1"
+    PolicyId := "MS.EXO.4.3v1"
 
     Output := tests with input as {
         "dmarc_records": [
@@ -273,7 +273,7 @@ test_Rdata_Incorrect_V7 if {
 # Policy 4
 #--
 test_Rdata_Incorrect_V4 if {
-    PolicyId := "MS.EXCHANGE.4.4v1"
+    PolicyId := "MS.EXO.4.4v1"
 
     Output := tests with input as {
         "dmarc_records": [
@@ -298,7 +298,7 @@ test_Rdata_Incorrect_V4 if {
 }
 
 test_Rdata_Incorrect_V8 if {
-    PolicyId := "MS.EXCHANGE.4.4v1"
+    PolicyId := "MS.EXO.4.4v1"
     
     Output := tests with input as {
         "dmarc_records": [

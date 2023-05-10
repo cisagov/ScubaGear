@@ -6,7 +6,7 @@ InModuleScope CreateReport {
     Describe -tag "Markdown" -name 'Check Secure Baseline Markdown document for <Product>' -ForEach @(
         @{Product = "aad"; MarkdownFilePath = "baselines/aad.md"}
         @{Product = "defender"; MarkdownFilePath = "baselines/defender.md"}
-        @{Product = "exchange"; MarkdownFilePath = "baselines/exchange.md"}
+        @{Product = "exo"; MarkdownFilePath = "baselines/exo.md"}
         @{Product = "onedrive"; MarkdownFilePath = "baselines/onedrive.md"}
         @{Product = "powerbi"; MarkdownFilePath = "baselines/powerbi.md"}
         @{Product = "powerplatform"; MarkdownFilePath = "baselines/powerplatform.md"}
@@ -35,7 +35,7 @@ InModuleScope CreateReport {
         It "Validate markdown group count for <Product>" -ForEach @(
             @{Product = "aad"; GroupCount = 18; PolicyCount = 33}
             @{Product = "defender"; GroupCount = 10; PolicyCount = 46}
-            @{Product = "exchange"; GroupCount = 17; PolicyCount = 39}
+            @{Product = "exo"; GroupCount = 17; PolicyCount = 39}
             @{Product = "onedrive"; GroupCount = 3; PolicyCount = 8}
             @{Product = "powerbi"; GroupCount = 10; PolicyCount = 12}
             @{Product = "powerplatform"; GroupCount = 4; PolicyCount = 8}
@@ -56,6 +56,9 @@ InModuleScope CreateReport {
                 foreach ($Control in $Controls){
                     $Control.Id -Match  "^MS\.$($Product.ToUpper())\.\d{1,}\.\d{1,}v\d{1,}$" | Should -BeTrue
                     $Control.Value -Match "^.*\.$" | Should -BeTrue -Because "$Control.Id does not end with period."
+                    $Control.Value -Match '^(.+)(SHALL|SHOULD|MAY){1,1}(.+\.)$'
+                    @("SHALL", "SHOULD", "MAY") -Contains $Matches.2 | Should -BeTrue -Because "$($Control.Id) must contain criticality"
+                    @("SHALL", "SHOULD", "MAY") -Contains $Control.Cricality | Should -BeTrue
                     $Control.Deleted.GetType() -Eq [bool]| Should -BeTrue -Because "Type should be boolean."
                 }
             }

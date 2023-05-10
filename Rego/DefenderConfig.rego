@@ -1,5 +1,6 @@
 package defender
 import future.keywords
+import data.report.utils.notCheckedDetails
 
 ## Report details menu
 #
@@ -382,13 +383,14 @@ tests[{
 #--
 # At this time we are unable to test for X because of Y
 tests[{
-    "PolicyId" : "MS.DEFENDER.2.5v1",
+    "PolicyId" : PolicyId,
     "Criticality" : "Should/Not-Implemented",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "Currently cannot be checked automatically. See Defender Secure Configuration Baseline policy 2.2 for instructions on manual check",
+    "ReportDetails" : notCheckedDetails(PolicyId),
     "RequirementMet" : false
 }] {
+    PolicyId := "MS.DEFENDER.2.5v1"
     true
 }
 #--
@@ -398,13 +400,14 @@ tests[{
 #--
 # At this time we are unable to test for X because of Y
 tests[{
-    "PolicyId" : "MS.DEFENDER.2.6v1",
+    "PolicyId" : PolicyId,
     "Criticality" : "Should/Not-Implemented",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "Currently cannot be checked automatically. See Defender Secure Configuration Baseline policy 2.2 for instructions on manual check",
+    "ReportDetails" : notCheckedDetails(PolicyId),
     "RequirementMet" : false
 }] {
+    PolicyId := "MS.DEFENDER.2.6v1"
     true
 }
 #--
@@ -1903,13 +1906,14 @@ tests[{
 #--
 # SIEM incorporation cannot be checked programmatically
 tests[{
-    "PolicyId" : "MS.DEFENDER.9.2v1",
+    "PolicyId" : PolicyId,
     "Criticality" : "Should/Not-Implemented",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "Currently cannot be checked automatically. See Defender Secure Configuration Baseline policy 2.9 for instructions on manual check",
+    "ReportDetails" : notCheckedDetails(PolicyId),
     "RequirementMet" : false
 }] {
+    PolicyId := "MS.DEFENDER.9.2v1"
     true
 }
 #--
@@ -1949,13 +1953,14 @@ tests[{
 # Would require looping through all users. See discussion in GitHub
 # issue #200.
 tests[{
-    "PolicyId" : "MS.DEFENDER.10.2v1",
+    "PolicyId" : PolicyId,
     "Criticality" : "Shall/Not-Implemented",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "Currently cannot be checked automatically. See Defender Secure Configuration Baseline policy 2.10 for instructions on manual check",
+    "ReportDetails" : notCheckedDetails(PolicyId),
     "RequirementMet" : false
 }] {
+    PolicyId := "MS.DEFENDER.10.2v1"
     true
 }
 #--
@@ -1971,9 +1976,10 @@ tests[{
     "Criticality" : "Shall/Not-Implemented",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "Currently cannot be checked automatically. See Defender Secure Configuration Baseline policy 2.10 for instructions on manual check",
+    "ReportDetails" : notCheckedDetails(PolicyId),
     "RequirementMet" : false
 }] {
+    PolicyId := "MS.DEFENDER.10.3v1"
     true
 }
 #--

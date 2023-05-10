@@ -6,8 +6,7 @@ import future.keywords
 # Policy 1
 #--
 test_isDisabled_Correct if {
-    ControlNumber := "Power Platform 2.3"
-    Requirement := "Power Platform tenant isolation SHALL be enabled"
+    PolicyId := "MS.POWERPLATFORM.3.1v1"
 
     Output := tests with input as {
         "tenant_isolation": [{
@@ -17,7 +16,7 @@ test_isDisabled_Correct if {
         }]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -25,8 +24,7 @@ test_isDisabled_Correct if {
 }
 
 test_isDisabled_Incorrect if {
-    ControlNumber := "Power Platform 2.3"
-    Requirement := "Power Platform tenant isolation SHALL be enabled"
+    PolicyId := "MS.POWERPLATFORM.3.1v1"
 
     Output := tests with input as {
         "tenant_isolation": [{
@@ -36,7 +34,7 @@ test_isDisabled_Incorrect if {
         }]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -47,14 +45,13 @@ test_isDisabled_Incorrect if {
 # Policy 2
 #--
 test_NotImplemented_Correct if {
-    ControlNumber := "Power Platform 2.3"
-    Requirement := "An inbound/outbound connection allowlist SHOULD be configured"
+    PolicyId := "MS.POWERPLATFORM.3.2v1"
 
     Output := tests with input as { }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Currently cannot be checked automatically. See Power Platform Secure Configuration Baseline policy 2.3 for instructions on manual check"
+    RuleOutput[0].ReportDetails == sprintf("Currently cannot be checked automatically. See Power Platform Secure Configuration Baseline policy %v for instructions on manual check", [PolicyId])
 }

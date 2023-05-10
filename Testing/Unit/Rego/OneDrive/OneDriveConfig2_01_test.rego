@@ -6,8 +6,7 @@ import future.keywords
 # Policy 1
 #--
 test_OneDriveLoopSharingCapability_Correct if {
-    ControlNumber := "OneDrive 2.1"
-    Requirement := "Anyone links SHOULD be disabled"
+    PolicyId := "MS.ONEDRIVE.1.1v1"
 
     Output := tests with input as {
         "SPO_tenant_info": [
@@ -18,7 +17,7 @@ test_OneDriveLoopSharingCapability_Correct if {
         "OneDrive_PnP_Flag": false   
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -26,8 +25,7 @@ test_OneDriveLoopSharingCapability_Correct if {
 }
 
 test_OneDriveLoopSharingCapability_Incorrect if {
-    ControlNumber := "OneDrive 2.1"
-    Requirement := "Anyone links SHOULD be disabled"
+    PolicyId := "MS.ONEDRIVE.1.1v1"
 
     Output := tests with input as {
         "SPO_tenant_info": [
@@ -38,7 +36,7 @@ test_OneDriveLoopSharingCapability_Incorrect if {
         "OneDrive_PnP_Flag": false 
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -46,8 +44,7 @@ test_OneDriveLoopSharingCapability_Incorrect if {
 }
 
 test_UsingServicePrincipal if {
-    ControlNumber := "OneDrive 2.1"
-    Requirement := "Anyone links SHOULD be disabled"
+    PolicyId := "MS.ONEDRIVE.1.1v1"
 
     Output := tests with input as {
         "SPO_tenant_info": [
@@ -55,10 +52,10 @@ test_UsingServicePrincipal if {
         "OneDrive_PnP_Flag": true 
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
     RuleOutput[0].Criticality == "Should/Not-Implemented"
-    RuleOutput[0].ReportDetails == "Currently cannot be checked automatically while using Service Principals. See Onedrive Secure Configuration Baseline policy 2.1 for instructions on manual check"
+    RuleOutput[0].ReportDetails == sprintf("Currently cannot be checked automatically while using Service Principals. See Onedrive Secure Configuration Baseline policy %v for instructions on manual check", [PolicyId])
 }

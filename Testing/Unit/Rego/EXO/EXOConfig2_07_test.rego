@@ -6,7 +6,7 @@ import future.keywords
 # Policy 1
 #--
 test_FromScope_Correct if {
-    PolicyId := "MS.EXCHANGE.7.1v1"
+    PolicyId := "MS.EXO.7.1v1"
     
     Output := tests with input as {
         "transport_rule": [
@@ -26,7 +26,7 @@ test_FromScope_Correct if {
 }
 
 test_FromScope_IncorrectV1 if {
-    PolicyId := "MS.EXCHANGE.7.1v1"
+    PolicyId := "MS.EXO.7.1v1"
 
     Output := tests with input as {
         "transport_rule": [
@@ -46,7 +46,7 @@ test_FromScope_IncorrectV1 if {
 }
 
 test_FromScope_IncorrectV2 if {
-    PolicyId := "MS.EXCHANGE.7.1v1"
+    PolicyId := "MS.EXO.7.1v1"
 
     Output := tests with input as {
         "transport_rule": [
@@ -66,7 +66,7 @@ test_FromScope_IncorrectV2 if {
 }
 
 test_FromScope_IncorrectV3 if {
-    PolicyId := "MS.EXCHANGE.7.1v1"
+    PolicyId := "MS.EXO.7.1v1"
 
     Output := tests with input as {
         "transport_rule": [
@@ -86,7 +86,7 @@ test_FromScope_IncorrectV3 if {
 }
 
 test_FromScope_IncorrectV4 if {
-    PolicyId := "MS.EXCHANGE.7.1v1"
+    PolicyId := "MS.EXO.7.1v1"
 
     Output := tests with input as {
         "transport_rule": [
@@ -106,7 +106,7 @@ test_FromScope_IncorrectV4 if {
 }
 
 test_FromScope_Multiple_Correct if {
-    PolicyId := "MS.EXCHANGE.7.1v1"
+    PolicyId := "MS.EXO.7.1v1"
 
     Output := tests with input as {
         "transport_rule": [
@@ -141,7 +141,7 @@ test_FromScope_Multiple_Correct if {
 }
 
 test_FromScope_Multiple_Incorrect if {
-    PolicyId := "MS.EXCHANGE.7.1v1"
+    PolicyId := "MS.EXO.7.1v1"
 
     Output := tests with input as {
         "transport_rule": [
