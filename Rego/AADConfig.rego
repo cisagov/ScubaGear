@@ -206,13 +206,14 @@ tests[{
 #--
 # At this time we are unable to test for X because of Y
 tests[{
-    "PolicyId": "MS.AAD.2.2v1",
+    "PolicyId": PolicyId,
     "Criticality" : "Should/Not-Implemented",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "Currently cannot be checked automatically. See Azure Active Directory Secure Configuration Baseline policy MS.AAD.2.2v1 for instructions on manual check",
+    "ReportDetails" : notCheckedDetails(PolicyId),
     "RequirementMet" : false
 }] {
+    PolicyId := "MS.AAD.2.2v1"
     true
 }
 #--
@@ -299,13 +300,14 @@ tests[{
 # At this time we are unable to fully test for MFA due to conflicting and multiple ways to configure authentication methods
 # Awaiting API changes and feature updates from Microsoft for automated checking
 tests[{
-    "PolicyId" : "MS.AAD.4.2v1",
+    "PolicyId" : PolicyId,
     "Criticality" : "Shall/Not-Implemented",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "Currently cannot be checked automatically. See Azure Active Directory Secure Configuration Baseline policy MS.AAD.4.2v1 for instructions on manual check",
+    "ReportDetails" : notCheckedDetails(PolicyId),
     "RequirementMet" : false
 }] {
+    PolicyId := "MS.AAD.4.2v1"
     true
 }
 #--
@@ -316,13 +318,14 @@ tests[{
 # At this time we are unable to test for all users due to conflicting and multiple ways to configure authentication methods
 # Awaiting API changes and feature updates from Microsoft for automated checking
 tests[{
-    "PolicyId" : "MS.AAD.4.3v1",
+    "PolicyId" : PolicyId,
     "Criticality" : "Shall/Not-Implemented",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "Currently cannot be checked automatically. See Azure Active Directory Secure Configuration Baseline policy MS.AAD.4.3v1 for instructions on manual check",
+    "ReportDetails" : notCheckedDetails(PolicyId),
     "RequirementMet" : false
 }] {
+    PolicyId := "MS.AAD.4.3v1"
     true
 }
 #--
@@ -333,13 +336,14 @@ tests[{
 # At this time we are unable to test for SMS/Voice settings due to lack of API to validate
 # Awaiting API changes and feature updates from Microsoft for automated checking
 tests[{
-    "PolicyId" : "MS.AAD.4.4v1",
+    "PolicyId" : PolicyId,
     "Criticality" : "Shall/Not-Implemented",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "Currently cannot be checked automatically. See Azure Active Directory Secure Configuration Baseline policy MS.AAD.4.4v1 for instructions on manual check",
+    "ReportDetails" : notCheckedDetails(PolicyId),
     "RequirementMet" : false
 }] {
+    PolicyId := "MS.AAD.4.4v1"
     true
 }
 #--
@@ -350,13 +354,14 @@ tests[{
 #--
 # At this time we are unable to test for log collection until we integrate Azure Powershell capabilities
 tests[{
-    "PolicyId" : "MS.AAD.5.1v1",
+    "PolicyId" : PolicyId,
     "Criticality" : "Shall/Not-Implemented",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "Currently cannot be checked automatically. See Azure Active Directory Secure Configuration Baseline policy MS.AAD.5.1v1 for instructions on manual check",
+    "ReportDetails" : notCheckedDetails(PolicyId),
     "RequirementMet" : false
 }] {
+    PolicyId := "MS.AAD.5.1v1"
     true
 }
 #--
@@ -943,13 +948,14 @@ tests[{
 #--
 # At this time we are unable to test for X because of Y
 tests[{
-    "PolicyId" : "MS.AAD.18.2v1",
+    "PolicyId" : PolicyId,
     "Criticality" : "Should/Not-Implemented",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "Currently cannot be checked automatically. See Azure Active Directory Secure Configuration Baseline policy MS.AAD.18.2v1 for instructions on manual check",
+    "ReportDetails" : notCheckedDetails(PolicyId),
     "RequirementMet" : false
 }] {
+    PolicyId := "MS.AAD.18.2v1"
     true
 }
 #--

@@ -1,7 +1,6 @@
 package defender
 import future.keywords
 
-
 #
 # Policy 1
 #--
@@ -61,7 +60,7 @@ test_Identity_Incorrect_V1 if {
 # Policy 2
 #--
 test_Identity_Correct_V1 if {
-    PolicyId := "MS.DEFENDER.1.1av1"
+    PolicyId := "MS.DEFENDER.TBD"
     #Requirement := "Strict Preset security profiles SHOULD NOT be used"
 
     Output := tests with input as {  
@@ -76,7 +75,7 @@ test_Identity_Correct_V1 if {
 }
 
 test_Identity_Correct_V2 if {
-    PolicyId := "MS.DEFENDER.1.1av1"
+    PolicyId := "MS.DEFENDER.TBD"
     #Requirement := "Strict Preset security profiles SHOULD NOT be used"
 
     Output := tests with input as {  
@@ -96,7 +95,7 @@ test_Identity_Correct_V2 if {
 }
 
 test_Identity_Incorrect_V2 if {
-    PolicyId := "MS.DEFENDER.1.1av1"
+    PolicyId := "MS.DEFENDER.TBD"
     #Requirement := "Strict Preset security profiles SHOULD NOT be used"
 
     Output := tests with input as {  

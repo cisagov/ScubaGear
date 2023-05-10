@@ -1,12 +1,12 @@
-package powerplatform
+package onedrive
 import future.keywords
-
+import data.report.utils.notCheckedDetails
 
 #
 # Policy 1
 #--
 test_NotImplemented_Correct if {
-    PolicyId := "MS.POWERPLATFORM.4.1v1"
+    PolicyId := "MS.ONEDRIVE.3.1v1"
 
     Output := tests with input as { }
 
@@ -14,5 +14,5 @@ test_NotImplemented_Correct if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Currently cannot be checked automatically. See Power Platform Secure Configuration Baseline policy MS.POWERPLATFORM.4.1v1 for instructions on manual check"
+    RuleOutput[0].ReportDetails == notCheckedDetails(PolicyId)
 }

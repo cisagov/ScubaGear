@@ -40,12 +40,8 @@ CustomDomains[Domain.domain] {
 }
 
 
-################
-# Baseline 2.1 #
-################
-
 #
-# Baseline 2.1: Policy 1
+# MS.EXO.1.1v1
 #--
 RemoteDomainsAllowingForwarding[Domain.DomainName] {
     Domain := input.remote_domains[_]
@@ -66,13 +62,8 @@ tests[{
 }
 #--
 
-
-################
-# Baseline 2.2 #
-################
-
 #
-# Baseline 2.2: Policy 1
+# MS.EXO.2.1v1
 #--
 # At this time we are unable to test for X because of Y
 tests[{
@@ -89,7 +80,7 @@ tests[{
 #--
 
 #
-# Baseline 2.2: Policy 2
+# MS.EXO.2.2v1
 #--
 DomainsWithoutSpf[DNSResponse.domain] {
     DNSResponse := input.spf_records[_]
@@ -110,13 +101,8 @@ tests[{
 }
 #--
 
-
-################
-# Baseline 2.3 #
-################
-
 #
-# Baseline 2.3: Policy 1
+# MS.EXO.3.1v1
 #--
 DomainsWithDkim[DkimConfig.Domain] {
     DkimConfig := input.dkim_config[_]
@@ -140,13 +126,8 @@ tests[{
 }
 #--
 
-
-################
-# Baseline 2.4 #
-################
-
 #
-# Baseline 2.4: Policy 1
+# MS.EXO.4.1v1
 #--
 DomainsWithoutDmarc[DmarcRecord.domain] {
     DmarcRecord := input.dmarc_records[_]
@@ -168,7 +149,7 @@ tests[{
 #--
 
 #
-# Baseline 2.4: Policy 2
+# MS.EXO.4.2v1
 #--
 DomainsWithoutPreject[DmarcRecord.domain] {
     DmarcRecord := input.dmarc_records[_]
@@ -190,7 +171,7 @@ tests[{
 #--
 
 #
-# Baseline 2.4: Policy 3
+# MS.EXO.4.3v1
 #--
 DomainsWithoutDHSContact[DmarcRecord.domain] {
     DmarcRecord := input.dmarc_records[_]
@@ -212,7 +193,7 @@ tests[{
 #--
 
 #
-# Baseline 2.4: Policy 4
+# MS.EXO.4.4v1
 #--
 DomainsWithoutAgencyContact[DmarcRecord.domain] {
     DmarcRecord := input.dmarc_records[_]
@@ -233,13 +214,8 @@ tests[{
 }
 #--
 
-
-################
-# Baseline 2.5 #
-################
-
 #
-# Baseline 2.5: Policy 1
+# MS.EXO.5.1v1
 #--
 
 SmtpClientAuthEnabled[TransportConfig.Name] {
@@ -259,15 +235,10 @@ tests[{
 }
 #--
 
-
-################
-# Baseline 2.6 #
-################
-
 # Are both the tests supposed to be the same?
 
 #
-# Baseline 2.6: Policy 1
+# MS.EXO.6.1v1
 #--
 
 SharingPolicyAllowedSharing[SharingPolicy.Name] {
@@ -292,7 +263,7 @@ tests[{
 #--
 
 #
-# Baseline 2.6: Policy 2
+# MS.EXO.6.2v1
 #--
 
 tests[{
@@ -308,12 +279,8 @@ tests[{
 }
 #--
 
-
-################
-# Baseline 2.7 #
-################
 #
-# Baseline 2.7: Policy 1
+# MS.EXO.7.1v1
 #--
 tests[{
     "PolicyId" : "MS.EXO.7.1v1",
@@ -331,13 +298,8 @@ tests[{
 }
 #--
 
-
-################
-# Baseline 2.8 #
-################
-
 #
-# Baseline 2.8: Policy 1
+# MS.EXO.8.1v1
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
@@ -353,7 +315,7 @@ tests[{
 #--
 
 #
-# Baseline 2.8: Policy 2
+# MS.EXO.8.2v1
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
@@ -368,13 +330,8 @@ tests[{
 }
 #--
 
-
-################
-# Baseline 2.9 #
-################
-
 #
-# Baseline 2.9: Policy 1
+# MS.EXO.9.1v1
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
@@ -390,7 +347,7 @@ tests[{
 #--
 
 #
-# Baseline 2.9: Policy 2
+# MS.EXO.9.2v1
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
@@ -406,7 +363,7 @@ tests[{
 #--
 
 #
-# Baseline 2.9: Policy 3
+# MS.EXO.9.3v1
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
@@ -421,13 +378,8 @@ tests[{
 }
 #--
 
-
-#################
-# Baseline 2.10 #
-#################
-
 #
-# Baseline 2.10: Policy 1
+# MS.EXO.10.1v1
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
@@ -443,7 +395,7 @@ tests[{
 #--
 
 #
-# Baseline 2.10: Policy 2
+# MS.EXO.10.2v1
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
@@ -459,7 +411,7 @@ tests[{
 #--
 
 #
-# Baseline 2.10: Policy 3
+# MS.EXO.10.3v1
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
@@ -474,13 +426,8 @@ tests[{
 }
 #--
 
-
-#################
-# Baseline 2.11 #
-#################
-
 #
-# Baseline 2.11: Policy 1
+# MS.EXO.11.1v1
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
@@ -496,7 +443,7 @@ tests[{
 #--
 
 #
-# Baseline 2.11: Policy 2
+# MS.EXO.11.2v1
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
@@ -512,7 +459,7 @@ tests[{
 #--
 
 #
-# Baseline 2.11: Policy 3
+# MS.EXO.11.3v1
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
@@ -527,13 +474,8 @@ tests[{
 }
 #--
 
-
-#################
-# Baseline 2.12 #
-#################
-
 #
-# Baseline 2.12: Policy 1
+# MS.EXO.12.1v1
 #--
 
 ConnFiltersWithIPAllowList[ConnFilter.Name] {
@@ -555,7 +497,7 @@ tests[{
 #--
 
 #
-# Baseline 2.12: Policy 2
+# MS.EXO.12.2v1
 #--
 
 ConnFiltersWithSafeList[ConnFilter.Name] {
@@ -575,13 +517,8 @@ tests[{
 }
 #--
 
-
-#################
-# Baseline 2.13 #
-#################
-
 #
-# Baseline 2.13: Policy 1
+# MS.EXO.13.1v1
 #--
 AuditEnabled[OrgConfig.Name] {
     OrgConfig := input.org_config[_]
@@ -600,13 +537,8 @@ tests[{
 }
 #--
 
-
-#################
-# Baseline 2.14 #
-#################
-
 #
-# Baseline 2.14: Policy 1
+# MS.EXO.14.1v1
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
@@ -622,7 +554,7 @@ tests[{
 #--
 
 #
-# Baseline 2.14: Policy 2
+# MS.EXO.14.2v1
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
@@ -638,7 +570,7 @@ tests[{
 #--
 
 #
-# Baseline 2.14: Policy 3
+# MS.EXO.14.3v1
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
@@ -653,13 +585,8 @@ tests[{
 }
 #--
 
-
-#################
-# Baseline 2.15 #
-#################
-
 #
-# Baseline 2.15: Policy 1
+# MS.EXO.15.1v1
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
@@ -675,7 +602,7 @@ tests[{
 #--
 
 #
-# Baseline 2.15: Policy 2
+# MS.EXO.15.2v1
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
@@ -691,7 +618,7 @@ tests[{
 #--
 
 #
-# Baseline 2.15: Policy 3
+# MS.EXO.15.3v1
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
@@ -706,13 +633,8 @@ tests[{
 }
 #--
 
-
-#################
-# Baseline 2.16 #
-#################
-
 #
-# Baseline 2.16: Policy 1
+# MS.EXO.16.1v1
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
@@ -728,7 +650,7 @@ tests[{
 #--
 
 #
-# Baseline 2.16: Policy 2
+# MS.EXO.16.2v1
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
@@ -743,13 +665,8 @@ tests[{
 }
 #--
 
-
-#################
-# Baseline 2.17 #
-#################
-
 #
-# Baseline 2.17: Policy 1
+# MS.EXO.17.1v1
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
@@ -765,7 +682,7 @@ tests[{
 #--
 
 #
-# Baseline 2.17: Policy 2
+# MS.EXO.17.2v1
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
@@ -781,7 +698,7 @@ tests[{
 #--
 
 #
-# Baseline 2.17: Policy 3
+# MS.EXO.17.3v1
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{

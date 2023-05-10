@@ -9,7 +9,6 @@
 # (e.g., MS.TEAMS.1.1v1) aligns this files to the secure baseline control.
 package teams
 import future.keywords
-import data.report.utils.notCheckedDetails
 
 Format(Array) = format_int(count(Array), 10)
 
@@ -40,11 +39,6 @@ ReportDetailsString(Status, String) =  Detail if {
     Detail := String
 }
 
-
-################
-# Teams 1      #
-################
-
 #
 # MS.TEAMS.1.1v1
 #--
@@ -70,11 +64,6 @@ tests[{
 }
 #--
 
-
-################
-# Teams 2      #
-################
-
 #
 # MS.TEAMS.2.1v1
 #--
@@ -96,11 +85,6 @@ tests[{
 	Status := count(Policies) == 0
 }
 #--
-
-
-################
-# Teams 3      #
-################
 
 #
 # MS.TEAMS.3.1v1
@@ -181,11 +165,6 @@ tests[{
 }
 #--
 
-
-################
-# Teams 4      #
-################
-
 #
 # MS.TEAMS.4.1v1
 #--
@@ -232,10 +211,6 @@ tests[{
 	Status := count(Policies) == 0
 }
 #--
-
-################
-# Teams 5 #
-################
 
 #
 # MS.TEAMS.5.1v1
@@ -299,11 +274,6 @@ tests[{
 }
 #--
 
-
-################
-# Teams 6      #
-################
-
 #
 # MS.TEAMS.6.1v1
 #--
@@ -325,11 +295,6 @@ tests[{
 	Status := count(Policies) == 0
 }
 #--
-
-
-################
-# Teams 7      #
-################
 
 #
 # MS.TEAMS.7.1v1
@@ -385,11 +350,6 @@ tests[{
     count(input.teams_tenant_info) == 0
 }
 #--
-
-
-################
-# Teams 8      #
-################
 
 #
 # MS.TEAMS.8.1v1
@@ -469,11 +429,6 @@ tests[{
 }
 #--
 
-
-################
-# Teams 9      #
-################
-
 #
 # MS.TEAMS.9.1v1
 #--
@@ -528,10 +483,6 @@ tests[{
 }
 #--
 
-#################
-# Teams 10      #
-#################
-
 #
 # MS.TEAMS.10.1v1
 #--
@@ -562,11 +513,6 @@ tests[{
 	count(input.broadcast_policies) == 0
 }
 #--
-
-
-#################
-# Teams 11      #
-#################
 
 #
 # MS.TEAMS.11.1v1
@@ -616,11 +562,6 @@ tests[{
 }
 #--
 
-
-#################
-# Teams 12      #
-#################
-
 #
 # MS.TEAMS.12.1v1
 #--
@@ -652,11 +593,6 @@ tests[{
     true
 }
 #--
-
-
-#################
-# Teams 13      #
-#################
 
 #
 # MS.TEAMS.13.1v1

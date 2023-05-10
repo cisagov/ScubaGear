@@ -1,6 +1,6 @@
 package defender
 import future.keywords
-
+import data.report.utils.notCheckedDetails
 
 #
 # Policy 1
@@ -221,7 +221,7 @@ test_Disabled_Incorrect_V2 if {
 #--
 test_NotImplemented_Correct if {
     ControlNumber := "Defender 2.9"
-    PolicyId := "TBD"
+    PolicyId := "MS.DEFENDER.TBD"
     Requirement := "The alerts SHOULD be sent to a monitored address or incorporated into a SIEM"
 
     Output := tests with input as { }
@@ -230,5 +230,5 @@ test_NotImplemented_Correct if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == sprintf("Currently cannot be checked automatically. See Defender Secure Configuration Baseline policy %v for instructions on manual check", [PolicyId])
+    RuleOutput[0].ReportDetails == notCheckedDetails(PolicyId)
 }

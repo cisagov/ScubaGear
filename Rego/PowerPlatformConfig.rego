@@ -2,7 +2,6 @@ package powerplatform
 import future.keywords
 import data.report.utils.notCheckedDetails
 
-
 Format(Array) = format_int(count(Array), 10)
 
 Description(String1, String2, String3) = trim(concat(" ", [String1, concat(" ", [String2, String3])]), " ")
@@ -31,13 +30,8 @@ ReportDetailsString(Status, String) = Detail if {
     Detail := String
 }
 
-
-################
-# Baseline 2.1 #
-################
-
 #
-# Baseline 2.1: Policy 1
+# MS.POWERPLATFORM.1.1v1
 #--
 tests[{
     #"Requirement" : "The ability to create production and sandbox environments SHALL be restricted to admins",
@@ -53,7 +47,7 @@ tests[{
 }
 #--
 
-# Baseline 2.1: Policy 1 PoSh Error
+# MS.POWERPLATFORM.1.1v1
 #--
 tests[{
     #"Requirement" : "The ability to create production and sandbox environments SHALL be restricted to admins",
@@ -68,7 +62,7 @@ tests[{
 }
 #--
 
-#
+# TODO: Resolve Policy Id 
 # Baseline 2.1: Policy 2 
 #--
 tests[{
@@ -85,7 +79,7 @@ tests[{
 }
 #--
 
-#
+# TODO: Resolve Policy ID
 # Baseline 2.1: Policy 2 PoSh Error
 #--
 tests[{
@@ -101,13 +95,8 @@ tests[{
 }
 #--
 
-
-################
-# Baseline 2.2 #
-################
-
 #
-# Baseline 2.2: Policy 1
+# MS.POWERPLATFORM.2.1v1
 #--
 DefaultEnvPolicies[{"PolicyName" : Policy.displayName}]{
     TenantId := input.tenant_id
@@ -132,7 +121,7 @@ tests[{
 #--
 
 #
-# Baseline 2.2: Policy 2
+# MS.POWERPLATFORM.2.2v1
 #--
 # gets the list of all tenant environments
 AllEnvironments [{ "EnvName" : EnvName }] {
@@ -172,7 +161,7 @@ tests[{
 #--
 
 #
-# Baseline 2.2: Policy 2 No DLP Policies found
+# MS.POWERPLATFORM.2.2v1
 #--
 tests[{
     "PolicyId" : "MS.POWERPLATFORM.2.2v1",
@@ -188,7 +177,7 @@ tests[{
 #--
 
 #
-# Baseline 2.2: Policy 2 PoSh Error
+# MS.POWERPLATFORM.2.2v1
 #--
 tests[{
     "PolicyId" : "MS.POWERPLATFORM.2.2v1",
@@ -203,7 +192,7 @@ tests[{
 #--
 
 #
-# Baseline 2.2: Policy 3
+# MS.POWERPLATFORM.2.3v1
 #--
 # gets the set of connectors that are allowed in the default environment
 # general and confidential groups refer to business and non-business
@@ -266,7 +255,7 @@ tests[{
 #--
 
 #
-# Baseline 2.2: Policy 3 Error No DLP policies Found
+# MS.POWERPLATFORM.2.3v1
 #--
 tests[{
     "PolicyId" : "MS.POWERPLATFORM.2.3v1",
@@ -282,7 +271,7 @@ tests[{
 #--
 
 #
-# Baseline 2.2: Policy 3 PoSh Error
+# MS.POWERPLATFORM.2.3v1
 #--
 tests[{
     "PolicyId" : "MS.POWERPLATFORM.2.3v1",
@@ -296,13 +285,8 @@ tests[{
 }
 #--
 
-
-################
-# Baseline 2.3 #
-################
-
 #
-# Baseline 2.3: Policy 1
+# MS.POWERPLATFORM.3.1v1
 #--
 tests[{
     "PolicyId" : "MS.POWERPLATFORM.3.1v1",
@@ -318,7 +302,7 @@ tests[{
 #--
 
 #
-# Baseline 2.3: Policy 1 PoSh Error
+# MS.POWERPLATFORM.3.1v1
 #--
 tests[{
     "PolicyId" : "MS.POWERPLATFORM.3.1v1",
@@ -333,7 +317,7 @@ tests[{
 #--
 
 #
-# Baseline 2.3: Policy 2
+# MS.POWERPLATFORM.3.2v1
 #--
 # At this time we are unable to test for X because of Y
 tests[{
@@ -349,13 +333,8 @@ tests[{
 }
 #--
 
-
-################
-# Baseline 2.4 #
-################
-
 #
-# Baseline 2.4: Policy 1
+# MS.POWERPLATFORM.4.1v1
 #--
 # At this time we are unable to test for X because of Y
 tests[{

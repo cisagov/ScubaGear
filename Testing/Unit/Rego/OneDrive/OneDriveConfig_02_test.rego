@@ -1,5 +1,6 @@
 package onedrive
 import future.keywords
+import data.report.utils.notCheckedDetails
 
 #
 # Policy 1
@@ -75,5 +76,5 @@ test_UsingServicePrincipal if {
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
     RuleOutput[0].Criticality == "Should/Not-Implemented"
-    RuleOutput[0].ReportDetails == sprintf("Currently cannot be checked automatically while using Service Principals. See Onedrive Secure Configuration Baseline policy %v for instructions on manual check", [PolicyId])
+    RuleOutput[0].ReportDetails == notCheckedDetails(PolicyId)
 }

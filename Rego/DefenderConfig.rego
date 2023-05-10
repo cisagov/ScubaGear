@@ -65,12 +65,8 @@ ApplyLicenseWarning(Message) := concat("", [ReportDetails(false), LicenseWarning
     LicenseWarning := " **NOTE: Either you do not have sufficient permissions or your tenant does not have a license for Microsoft Defender for Office 365 Plan 1, which is required for this feature.**"
 }
 
-################
-# Baseline 2.1 #
-################
-
 #
-# Baseline 2.1: Policy 1
+# MS.DEFENDER.1.1v1
 #--
 StandardPresetSecurityPolicy[Rules.State] {
     Rules := input.protection_policy_rules[_]
@@ -93,7 +89,7 @@ tests[{
 }
 #--
 
-#
+# TODO: Resolve PolicyId
 # Baseline 2.1: Policy 2
 #--
 StrictPresetSecurityPolicy[Rules.State] {
@@ -116,11 +112,6 @@ tests[{
     Status := count([Condition | Condition = Conditions[_]; Condition == true]) > 0
 }
 #--
-
-
-################
-# Baseline 2.2 #
-################
 
 # Determine the set of rules that pertain to SSNs, ITINs, or credit card numbers.
 # Used in multiple bullet points below
@@ -147,7 +138,7 @@ SensitiveRules[{
 }
 
 #
-# Baseline 2.2: Policy 1
+# MS.DEFENDER.2.1v1
 #--
 # Step 1: Ensure that there is coverage for SSNs, ITINs, and credit cards
 SSNRules[Rule.Name] {
@@ -1972,7 +1963,7 @@ tests[{
 # It is not required to maintain these logs in the M365 cloud environment; doing so would require an additional add-on SKU.
 # This requirement can be met by offloading the logs out of the cloud environment.
 tests[{
-    "PollicyId" : "MS.DEFENDER.10.3v1",
+    "PolicyId" : PolicyId,
     "Criticality" : "Shall/Not-Implemented",
     "Commandlet" : [],
     "ActualValue" : [],

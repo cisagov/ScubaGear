@@ -6,13 +6,8 @@ ReportDetailsBoolean(Status) = "Requirement met" if {Status == true}
 
 ReportDetailsBoolean(Status) = "Requirement not met" if {Status == false}
 
-
-################
-# Baseline 2.1 #
-################
-
 #
-# Baseline 2.1: Policy 1
+# MS.ONEDRIVE.1.1v1
 #--
 AnyoneLinksPolicy[Policy]{
     Policy := input.SPO_tenant_info[_]
@@ -48,13 +43,8 @@ tests[{
 }
 #--
 
-
-################
-# Baseline 2.2 #
-################
-
 #
-# Baseline 2.2: Policy 1
+# MS.ONEDRIVE.1.2v1
 #--
 ReportDetails2_2(Policy) = Description if {
     Policy.OneDriveSharingCapability != 2
@@ -105,13 +95,8 @@ tests[{
 }
 #--
 
-
-################
-# Baseline 2.3 #
-################
-
 #
-# Baseline 2.3: Policy 1
+# MS.ONEDRIVE.1.3v1
 #--
 ReportDetails2_3(Policy) = Description if {
     Policy.OneDriveSharingCapability != 2
@@ -178,13 +163,8 @@ tests[{
 }
 #--
 
-
-################
-# Baseline 2.4 #
-################
-
 #
-# Baseline 2.4: Policy 1
+# MS.ONEDRIVE.2.1v1
 #--
 DefinedDomainsPolicy[Policy]{
     Policy := input.Tenant_sync_info[_]
@@ -204,13 +184,8 @@ tests[{
 }
 #--
 
-
-################
-# Baseline 2.5 #
-################
-
 #
-# Baseline 2.5: Policy 1
+# MS.ONEDRIVE.2.3v1
 #--
 ClientSyncPolicy[Policy]{
     Policy := input.Tenant_sync_info[_]
@@ -230,13 +205,8 @@ tests[{
 }
 #--
 
-
-################
-# Baseline 2.6 #
-################
-
 #
-# Baseline 2.6: Policy 1
+# MS.ONEDRIVE.2.2v1
 #--
 # At this time we are unable to test for X because of Y
 tests[{
@@ -252,13 +222,8 @@ tests[{
 }
 #--
 
-
-################
-# Baseline 2.7 #
-################
-
 #
-# Baseline 2.7: Policy 1
+# MS.ONEDRIVE.3.1v1
 #--
 # At this time we are unable to test for X because of Y
 tests[{

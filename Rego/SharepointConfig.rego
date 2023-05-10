@@ -6,13 +6,8 @@ ReportDetailsBoolean(Status) = "Requirement met" if {Status == true}
 
 ReportDetailsBoolean(Status) = "Requirement not met" if {Status == false}
 
-
-################
-# Baseline 2.1 #
-################
-
 #
-# Baseline 2.1: Policy 1
+# MS.SHAREPOINT.1.1v1
 #--
 tests[{
     "PolicyId" : "MS.SHAREPOINT.1.1v1",
@@ -27,13 +22,8 @@ tests[{
 }
 #--
 
-
-################
-# Baseline 2.2 #
-################
-
 #
-# Baseline 2.2: Policy 1
+# MS.SHAREPOINT.1.3v1
 #--
 tests[{
     "PolicyId" : "MS.SHAREPOINT.1.3v1",
@@ -87,7 +77,7 @@ tests[{
 ################
 
 #
-# Baseline 2.3: Policy 1
+# MS.SHAREPOINT.2.1v1
 #--
 # At this time we are unable to test for X because of Y
 tests[{
@@ -103,13 +93,8 @@ tests[{
 }
 #--
 
-
-################
-# Baseline 2.4 #
-################
-
 #
-# Baseline 2.4: Policy 1
+# MS.SHAREPOINT.3.1v1
 #--
 ReportDetails2_4_1(Policy) = Description if {
     Policy.SharingCapability == 0
@@ -164,7 +149,7 @@ tests[{
 }
 #--
 
-#
+# TODO: Resolve policy id
 # Baseline 2.4: Policy 2
 #--
 ReportDetails2_4_2(Policy) = Description if {
@@ -221,12 +206,7 @@ tests[{
 }
 #--
 
-
-################
-# Baseline 2.5 #
-################
-
-#
+# TODO: Resolve Policy Id
 # Baseline 2.5: Policy 1
 #--
 # At this time we are unable to test for X because of Y
@@ -240,12 +220,12 @@ tests[{
     "ReportDetails" : notCheckedDetails(PolicyId),
     "RequirementMet" : false
 }] {
-    PolicyId := "MS.SHAREPOINT."
+    PolicyId := "MS.SHAREPOINT.TBD"
     true
 }
 #--
 
-#
+# TODO: Resolve Policy Id
 # Baseline 2.5: Policy 2
 #--
 tests[{

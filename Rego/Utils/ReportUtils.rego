@@ -1,6 +1,7 @@
 package report.utils
-
-scubaBaseUrl := "https://github.com/cisagov/ScubaGear/blob/AutoBaselineSync/baselines/"
+baselineVersion := "AutoBaselineSync"
+#baselineVersion := input.module_version # Baseline version is pinned to a module version
+scubaBaseUrl := sprintf("https://github.com/cisagov/ScubaGear/blob/%v/baselines/", [baselineVersion])
 
 policyAnchor(PolicyId) := anchor {
     anchor := sprintf("#%v", [replace(lower(PolicyId), ".", "")])

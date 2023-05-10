@@ -1,6 +1,6 @@
 package aad
 import future.keywords
-
+import data.report.utils.notCheckedDetails
 
 #
 # Policy 1
@@ -14,7 +14,7 @@ test_NotImplemented_Correct_V1 if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == sprintf("Currently cannot be checked automatically. See Azure Active Directory Secure Configuration Baseline policy %v for instructions on manual check", [PolicyId])
+    RuleOutput[0].ReportDetails == notCheckedDetails(PolicyId)
 }
 
 #
@@ -29,5 +29,5 @@ test_NotImplemented_Correct_V2 if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == sprintf("Currently cannot be checked automatically. See Azure Active Directory Secure Configuration Baseline policy %v for instructions on manual check", [PolicyId])
+    RuleOutput[0].ReportDetails == notCheckedDetails(PolicyId)
 }

@@ -1,6 +1,6 @@
 package powerplatform
 import future.keywords
-
+import data.report.utils.notCheckedDetails
 
 #
 # Policy 1
@@ -53,5 +53,5 @@ test_NotImplemented_Correct if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == sprintf("Currently cannot be checked automatically. See Power Platform Secure Configuration Baseline policy %v for instructions on manual check", [PolicyId])
+    RuleOutput[0].ReportDetails == notCheckedDetails(PolicyId)
 }
