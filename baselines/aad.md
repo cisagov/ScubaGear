@@ -685,7 +685,7 @@ persistent browser sessions.
 
 ### Policy
 #### MS.AAD.10.1v1
-- Browser sessions SHALL not be persistent.
+Browser sessions SHALL not be persistent.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
