@@ -394,7 +394,7 @@ All safety tips SHALL be enabled, including:
 - _Last modified:_ June 2023
 
 #### MS.DEFENDER.5.9v1
-- The above configurations SHALL be set in the default policy and SHOULD
+The above configurations SHALL be set in the default policy and SHOULD
   be set in all existing custom policies.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
