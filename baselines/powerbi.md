@@ -136,7 +136,7 @@ admins should limit the ability to publish to the web to only specific
 security groups, instead of allowing the entire agency to publish data
 to the web.
 
-### Policy
+### Policies
 #### MS.POWERBI.2.1v1
 The Publish to Web feature SHOULD be disabled unless the agency mission requires the capability.
 - _Rationale:_ TODO
@@ -193,7 +193,7 @@ allow these users to use people pickers within the Power BI UX. Since
 Power BI integrates natively with AAD, the AAD Baseline should be
 consulted for additional guidance on managing guest users.
 
-### Policy
+### Policies
 #### MS.POWERBI.3.1v1
 Guest user access to the Power BI tenant SHOULD be disabled unless the agency mission requires the capability.
 - _Rationale:_ TODO
@@ -238,7 +238,7 @@ controls the ability to invite guest users through Power BI. See the
 *AAD Minimum Viable Secure Configuration Baseline* for more information
 on roles.
 
-### Policy
+### Policies
 #### MS.POWERBI.4.1v1
 The **Invite external users to your organization** feature SHOULD be disabled unless agency mission requires the capability.
 - _Rationale:_ TODO
@@ -273,7 +273,7 @@ If there is a mission need to allow external users to edit and manage
 Power BI content, the recommended best practice is to assign these
 entities to a security group.
 
-### Policy
+### Policies
 #### MS.POWERBI.5.1v1
 The external editing capability SHOULD be disabled unless agency mission requires the capability.
 - _Rationale:_ TODO
@@ -399,7 +399,7 @@ to streaming and PUSH datasets using the API with a resource key.
 However, if developers have an approved need to leverage this feature,
 an exception to the policy can be investigated.
 
-### Policy
+### Policies
 #### MS.POWERBI.7.1v1
 RourceKey Authentication SHOULD be blocked unless a specific use case (e.g., streaming and/or PUSH datasets) merits its use.
 - _Rationale:_ TODO
@@ -428,7 +428,7 @@ visuals should only be enabled if the author and source are trusted, or
 after a code review of the Python/R script(s) in question is conducted
 and deems the scripts free of security risks.
 
-### Policy
+### Policies
 #### MS.POWERBI.8.1v1
 R and Python interactions SHOULD be disabled.
 - _Rationale:_ TODO
@@ -460,7 +460,7 @@ tool for securing power Power BI datasets. Refer to the *Defender for
 Office 365 Minimum Viable Secure Configuration Baseline* for more on
 DLP.
 
-### Policy
+### Policies
 #### MS.POWERBI.9.1v1
 Sensitivity labels SHOULD be enabled for Power BI and employed for sensitive data per enterprise data protection policies.
 - _Rationale:_ TODO
@@ -486,8 +486,8 @@ Sensitivity labels SHOULD be enabled for Power BI and employed for sensitive dat
   required to apply or view Microsoft Information Protection sensitivity
   labels in Power BI. Azure Information Protection can be purchased
   either standalone or through one of the Microsoft licensing suites.
-  See [Azure Information Protection
-  pricing](https://azure.microsoft.com/services/information-protection/) for
+  See [Azure Information Protection
+  pricing](https://azure.microsoft.com/services/information-protection/) for
   detail.
 
 - Azure Information Protection sensitivity labels need to be migrated to
@@ -515,7 +515,7 @@ enabled recording user and admin activity in the Office 365 Admin
 Portal, in which case this setting appears enabled but greyed out in the
 tenant settings.
 
-### Policy
+### Policies
 #### MS.POWERBI.10.1v1
 Power BI audit log generation SHALL be enabled in the Power BI tenant.
 - _Rationale:_ TODO
@@ -649,8 +649,8 @@ the agency.
   required to apply or view Microsoft Information Protection sensitivity
   labels in Power BI. Azure Information Protection can be purchased
   either standalone or through one of the Microsoft licensing suites.
-  See [Azure Information Protection
-  pricing](https://azure.microsoft.com/services/information-protection/) for
+  See [Azure Information Protection
+  pricing](https://azure.microsoft.com/services/information-protection/) for
   detail.
 
 - Azure Information Protection sensitivity labels need to be migrated to
