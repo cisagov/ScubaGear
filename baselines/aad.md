@@ -806,7 +806,7 @@ Users that need to be assigned to highly privileged Azure AD roles SHALL be prov
 - _Last modified:_ June 2023
 
 #### MS.AAD.12.2v1
-The following built-in Azure AD roles are considered highly privileged at a minimum. Additional built-in roles that are considered highly privileged in the agency’s environment can be added to this list:
+The following built-in Azure AD roles are considered highly privileged at a minimum. Additional built-in roles that are considered highly privileged in the agency's environment can be added to this list:
 
   - Global Administrator
 
