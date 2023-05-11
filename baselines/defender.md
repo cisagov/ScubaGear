@@ -344,7 +344,7 @@ User impersonation protection SHOULD be enabled for key agency
 - _Last modified:_ June 2023
 
 #### MS.DEFENDER.5.2v1
-- Domain impersonation protection SHOULD be enabled for domains owned by
+Domain impersonation protection SHOULD be enabled for domains owned by
   the agency.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
