@@ -64,7 +64,7 @@ control of the shared desktop or window during the meeting. In this
 instance, the term “external participants” includes external users, B2B
 guest users, unmanaged users and anonymous users.
 
-### Policy
+### Policies
 
 #### MS.TEAMS.1.1v1
 External participants SHOULD NOT be enabled to request control of shared desktops or windows in the Global (Org-wide default) meeting policy or in custom meeting policies if any exist.
@@ -111,7 +111,7 @@ This setting controls which meeting participants can start a meeting. In
 this instance, the term “anonymous users” refers to any Teams users
 joining calls that are not authenticated through the agency’s tenant.
 
-### Policy
+### Policies
 
 #### MS.TEAMS.2.1v1
 Anonymous users SHALL NOT be enabled to start meetings in the Global (Org-wide default) meeting policy or in custom meeting policies if any exist.
@@ -145,7 +145,7 @@ To configure settings for anonymous users:
 This setting controls which meeting participants wait in the lobby
 before they are admitted to the meeting.
 
-### Policy
+### Policies
 
 #### MS.TEAMS.3.1v1
 Anonymous users, including dial-in users, SHOULD NOT be admitted automatically.
@@ -220,7 +220,7 @@ Importantly, this setting only pertains to external users (i.e., members
 of a different M365 tenant). Access for unmanaged users is controlled
 separately.
 
-### Policy
+### Policies
 
 #### MS.TEAMS.4.1v1
 External access SHALL only be enabled on a per-domain basis.
@@ -268,7 +268,7 @@ and calls within Teams. These users would still be able to join calls,
 assuming anonymous join is enabled. Additionally, unmanaged users may be
 added to Teams chats if the internal user initiates the contact.
 
-### Policy
+### Policies
 #### MS.TEAMS.5.1v1
 Unmanaged users SHALL NOT be enabled to initiate contact with internal
 users.
@@ -317,7 +317,7 @@ organization](https://docs.microsoft.com/en-us/microsoftteams/manage-external-ac
 ## 6. Skype Users
 Microsoft officially retired Skype for Business Online on July 31, 2021, and it is no longer supported. Skype for Business 2015 is slated for Apr 11, 2023 and Skype for Business Server 2015, 2016, 2019 LTSC and Server 2019 is slated for Oct 14, 2025.
 
-### Policy
+### Policies
 
 #### MS.TEAMS.6.1v1
 Contact with Skype users SHALL be blocked.
@@ -363,7 +363,7 @@ agencies do not have control over the security settings associated with
 this email. For this reason, email channel integration should be
 disabled.
 
-### Policy
+### Policies
 #### MS.TEAMS.7.1v1
 Teams email integration SHALL be disabled.
 - _Rationale:_ TODO
@@ -403,7 +403,7 @@ Teams store.
 *Custom apps*: apps not published to the Teams store, such as apps under
 development, that users “sideload” into Teams.
 
-### Policy
+### Policies
 
 #### MS.TEAMS.8.1v1
 Agencies SHOULD allow all apps published by Microsoft, but MAY block specific Microsoft apps as needed.
@@ -467,7 +467,7 @@ by a user, during one-on-one calls, and on group calls started by a
 user. Agencies should comply with any other applicable policies or
 legislation in addition to this guidance.
 
-### Policy
+### Policies
 
 #### MS.TEAMS.9.1v1
 Cloud video recording SHOULD be disabled in the global (org-wide default) meeting policy.
@@ -546,7 +546,7 @@ Live events are recorded by default. Agencies should increase their
 privacy by changing the policy so that events are only recorded at the
 organizer’s discretion.
 
-### Policy
+### Policies
 #### MS.TEAMS.10.1v1
 Record an event SHOULD be set to Organizer can record.
 - _Rationale:_ TODO
@@ -592,7 +592,7 @@ Minimum Viable Secure Configuration Baseline*. The DLP solution selected
 by an agency should offer services comparable to those offered by
 Microsoft.
 
-### Policy
+### Policies
 
 #### MS.TEAMS.11.1v1
 A DLP solution SHALL be enabled.
@@ -630,7 +630,7 @@ Microsoft Defender, see the “Data Loss Prevention SHALL Be Enabled”
 section of the *Defender for Office 365 Minimum Viable Secure
 Configuration Baseline*.
 
-### Policy
+### Policies
 
 #### MS.TEAMS.12.1v1
 Attachments included with Teams messages SHOULD be scanned for malware.
@@ -673,7 +673,7 @@ in the “Safe Links Policies SHALL Be Enabled” and “Safe Links in Global
 Settings SHALL be Configured” sections of the *Defender for Office 365
 Minimum Viable Secure Configuration Baseline.*
 
-### Policy
+### Policies
 
 #### MS.TEAMS.13.1v1
 URL comparison with a block-list SHOULD be enabled.
