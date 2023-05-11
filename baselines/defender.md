@@ -366,7 +366,7 @@ Intelligence for impersonation protection SHALL be enabled.
 - _Last modified:_ June 2023
 
 #### MS.DEFENDER.5.6v1
-- Message action SHALL be set to quarantine if the message is detected
+Message action SHALL be set to quarantine if the message is detected
   as impersonated.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
