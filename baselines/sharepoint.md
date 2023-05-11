@@ -253,7 +253,7 @@ To limit external sharing by domain, in the **SharePoint admin center**:
 
 6.  Enter “30 days”.
 
-## 5 Custom Scripts
+## 5. Custom Scripts
 
 Allowing users to run custom scripts can potentially allow malicious
 scripts to run in a trusted environment. For this reason, running custom
