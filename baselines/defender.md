@@ -350,7 +350,7 @@ Domain impersonation protection SHOULD be enabled for domains owned by
 - _Last modified:_ June 2023
 
 #### MS.DEFENDER.5.3v1
-- Domain impersonation protection SHOULD be added for frequent partners.
+Domain impersonation protection SHOULD be added for frequent partners.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
