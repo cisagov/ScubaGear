@@ -372,7 +372,7 @@ Message action SHALL be set to quarantine if the message is detected
 - _Last modified:_ June 2023
 
 #### MS.DEFENDER.5.7v1
-- Mail classified as spoofed SHALL be quarantined.
+Mail classified as spoofed SHALL be quarantined.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
