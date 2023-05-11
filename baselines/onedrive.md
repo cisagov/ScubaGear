@@ -51,7 +51,7 @@ agency. To prevent users from unauthenticated sharing of content, turn
 off Anyone sharing for users outside the tenant when accessing content
 in SharePoint, Groups, or Teams.
 
-### Policy
+### Policies
 
 #### MS.ONEDRIVE.1.1v1
 Anyone links SHOULD be disabled.
@@ -181,7 +181,7 @@ Link Permissions SHOULD Be Set to Enabled Anyone Links to View.
 - [Set link permissions \| Microsoft
   Docs](https://docs.microsoft.com/en-us/microsoft-365/solutions/best-practices-anonymous-sharing?view=o365-worldwide#set-link-permissions)
 
-### 2.3.3 License Requirements
+### License Requirements
 
 - N/A
 
@@ -197,10 +197,10 @@ Link Permissions SHOULD Be Set to Enabled Anyone Links to View.
 
 ## 4. OneDrive Client
 
-Configuring OneDrive to sync only to agency-deined domains ensures that
+Configuring OneDrive to sync only to agency-defined domains ensures that
 users can only sync to agency-managed computers.
 
-### Policy
+### Policies
 
 #### MS.ONEDRIVE.4.1v1
 OneDrive Client SHALL Be Restricted to Windows for Agency-Defined Domain(s).
@@ -232,7 +232,7 @@ OneDrive Client SHALL Be Restricted to Windows for Agency-Defined Domain(s).
     domains** check box.
 
 5.  Add the [Globally Unique Identifier (GUID) of each
-    domain](https://docs.microsoft.com/en-us/powershell/module/activedirectory/get-addomain?view=windowsserver2022-ps) for
+    domain](https://docs.microsoft.com/en-us/powershell/module/activedirectory/get-addomain?view=windowsserver2022-ps) for
     the member computers that the agency wants to be able to sync.
 
 **Note:** Add the domain GUID of the computer domain membership. If
@@ -253,7 +253,7 @@ Set restrictions on whether users can sync items to non-domain joined
 machines, control the list of allowed domains, and manage whether Mac
 clients (which do not support domain join) can sync.
 
-### Policy
+### Policies
 
 #### MS.ONEDRIVE.5.1v1
 OneDrive Client SHALL Be Restricted to Sync with Mac for Agency-Defined Devices.
@@ -287,7 +287,7 @@ reflected within five minutes.
 Configuring OneDrive to sync only to agency-defined domains ensures that
 users can only sync to agency-managed computers.
 
-### Policy
+### Policies
 
 #### MS.ONEDRIVE.6.1v1
 OneDrive Client Sync SHALL Only Be Allowed Within the Local Domain.
@@ -330,7 +330,7 @@ important to make sure that only apps that support modern authentication
 are allowed to connect, assuring that only authorized devices are
 allowed to access enterprise data.
 
-### Policy
+### Policies
 
 #### MS.ONEDRIVE.7.1v1
 Legacy Authentication SHALL Be Blocked.
