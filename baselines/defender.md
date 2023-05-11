@@ -377,7 +377,7 @@ Mail classified as spoofed SHALL be quarantined.
 - _Last modified:_ June 2023
 
 #### MS.DEFENDER.5.8v1
-- All safety tips SHALL be enabled, including:
+All safety tips SHALL be enabled, including:
 
   - first contact,
 
