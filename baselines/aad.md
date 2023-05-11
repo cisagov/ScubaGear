@@ -449,21 +449,19 @@ The following critical logs SHALL be sent at a minimum: AuditLogs, SignInLogs, R
 <!-- -->
 
 #### MS.AAD.5.2v1
-If managed identities are used for Azure resources, also include the ManagedIdentitySignInLogs log type.
+If managed identities are used for Azure resources, logs SHALL include the ManagedIdentitySignInLogs log type.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
 #### MS.AAD.5.3v1
-If the Azure AD Provisioning Service is used to provision users to
-  SaaS apps or other systems, also include the ProvisioningLogs log
-  type.
+If the Azure AD Provisioning Service is used to provision users to SaaS apps or other systems, also include the ProvisioningLogs log type.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
 <!-- -->
 
 #### MS.AAD.5.4v1
-The logs SHALL be sent to the agency’s SOC for monitoring.
+The logs SHALL be sent to the agencys SOC for monitoring.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
@@ -617,7 +615,7 @@ indicate that mandated password changes make user accounts less secure.
 
 ### Policy
 #### MS.AAD.8.1v1
-- User passwords SHALL NOT expire.
+User passwords SHALL NOT expire.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
@@ -905,7 +903,8 @@ instructions, an equivalent third-party PAM service may be used instead.
 
 ### Policies
 #### MS.AAD.14.1v1
-Permanent active role assignments SHALL NOT be allowed for highly privileged roles. Active assignments SHALL have an expiration period. - Refer to the baseline statement, [Highly Privileged User Accounts SHALL be Cloud-Only](#2121-Policy), for a recommended minimum list of Azure AD built-in roles that are considered highly privileged. It is also possible to designate additional built-in roles that are considered highly privileged in the agency’s environment based on its risk tolerance.
+Permanent active role assignments SHALL NOT be allowed for highly privileged roles. Active assignments SHALL have an expiration period.
+- Refer to the baseline statement, [Highly Privileged User Accounts SHALL be Cloud-Only](#2121-Policy), for a recommended minimum list of Azure AD built-in roles that are considered highly privileged. It is also possible to designate additional built-in roles that are considered highly privileged in the agency’s environment based on its risk tolerance.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
@@ -1003,7 +1002,7 @@ instructions, an equivalent third-party PAM service may be used instead.
 
 ### Policies
 #### MS.AAD.15.1v1
-Activation of highly privileged roles SHOULD require approval
+Activation of highly privileged roles SHOULD require approval.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
@@ -1196,7 +1195,7 @@ guest access with managed devices.
 
 ### Policy
 #### MS.AAD.17.1v1
-- Managed devices SHOULD be required for authentication.
+Managed devices SHOULD be required for authentication.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
