@@ -355,7 +355,7 @@ Domain impersonation protection SHOULD be added for frequent partners.
 - _Last modified:_ June 2023
 
 #### MS.DEFENDER.5.4v1
-- Trusted senders and domains MAY be added in the event of false
+Trusted senders and domains MAY be added in the event of false
   positives.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
