@@ -46,7 +46,7 @@ strengthen the security of widely used cloud-based software services.
 This control is intended to prevent bad actors from using client-side
 forwarding rules to exfiltrate data to external recipients.
 
-### Policy
+### Policies
 
 #### MS.EXO.1.1v1
 Automatic forwarding to external domains SHALL be disabled.
@@ -141,7 +141,7 @@ agency manages its DNS. DKIM is enabled for your tenant's default domain
 (e.g., onmicrosoft.com domains), but it must be manually enabled for
 custom domains.
 
-### Policy
+### Policies
 #### MS.EXO.3.1v1
 DKIM SHOULD be enabled for any custom domain.
 - _Rationale:_ TODO
@@ -365,7 +365,7 @@ Mail flow rules allow the modification of incoming mail, such that mail
 from external users can be easily identified, for example by prepending
 the subject line with “\[External\].”
 
-### Policy
+### Policies
 #### MS.EXO.7.1v1
 External sender warnings SHALL be implemented.
 - _Rationale:_ TODO
@@ -654,7 +654,7 @@ administrators, delegates, and owners are logged automatically. While
 mailbox auditing is enabled by default, agencies should ensure that it
 has not been inadvertently disabled.
 
-### Policy
+### Policies
 #### MS.EXO.13.1v1
 Mailbox auditing SHALL be enabled.
 - _Rationale:_ TODO
