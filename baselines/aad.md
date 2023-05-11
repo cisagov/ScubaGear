@@ -822,7 +822,7 @@ The following built-in Azure AD roles are considered highly privileged at a mini
 
   - Application Administrator
 
-  - Cloud Application Administrator
+  - Cloud Application Administrator.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
