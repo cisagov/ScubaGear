@@ -338,7 +338,7 @@ an AI-based tool for identifying potential impersonation attempts.
 
 ### Policies
 #### MS.DEFENDER.5.1v1
-- User impersonation protection SHOULD be enabled for key agency
+User impersonation protection SHOULD be enabled for key agency
   leaders.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
