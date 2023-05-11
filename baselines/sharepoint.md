@@ -66,7 +66,7 @@ listed.
 
 # Baselines
 
-## 1 File and Folder Links Default Sharing Settings
+## 1. File and Folder Links Default Sharing Settings
 
 This policy ensures that when sharing files in SharePoint, there are
 several possible scopes, including agency-wide or “anyone with the
