@@ -160,7 +160,7 @@ To adjust sharing settings, in the **SharePoint admin center**:
 
 11. Select **Save.**
 
-## 3 Sensitivity Levels 
+## 3. Sensitivity Levels 
 
 SharePoint allows sharing with users who are outside the agency, which
 is convenient but may pose a data loss or other information security
