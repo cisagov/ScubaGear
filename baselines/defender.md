@@ -654,7 +654,7 @@ Safe Links in Office 365 apps SHALL be turned on.
 - _Last modified:_ June 2023
 
 #### MS.DEFENDER.7.9v1
-- Users SHALL NOT be enabled to click through to the original URL.
+Users SHALL NOT be enabled to click through to the original URL.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
