@@ -98,7 +98,7 @@ In the **SharePoint admin** **center**:
 2.  Under **File and folder links**, ensure that the default link type
     is set to **Specific people (only the people the user specifies)**.
 
-## 2 External Sharing
+## 2. External Sharing
 
 SharePoint allows sharing with users who are outside the agency, which
 is convenient but may pose a data loss or other information security
