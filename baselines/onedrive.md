@@ -169,7 +169,7 @@ and view files and upload new files to folders. To allow unauthenticated
 sharing but keep unauthenticated people from modifying the agency's
 content, consider setting the file and folder permissions to **View**.
 
-###  Policy
+### Policies
 
 #### MS.ONEDRIVE.3.1v1
 Link Permissions SHOULD Be Set to Enabled Anyone Links to View.
