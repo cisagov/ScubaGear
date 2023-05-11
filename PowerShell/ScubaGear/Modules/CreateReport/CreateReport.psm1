@@ -139,6 +139,7 @@ function New-Report {
         $Number = $BaselineName.ToUpper() + '-' + $BaselineGroup.GroupNumber
         $Name = $BaselineGroup.GroupName
         $GroupAnchor = New-MarkdownAnchor -GroupNumber $BaselineGroup.GroupNumber -GroupName $BaselineGroup.GroupName
+        #TODO:  Switch to actual version for url
         #$MarkdownLink = "<a href=`"$($ScubaGitHubUrl)/blob/$($SettingsExport.module_version)/baselines/$($BaselineName.ToLower()).md#$GroupAnchor`">$Name</a>"
         $MarkdownLink = "<a href=`"$ScubaGitHubUrl/blob/AutoBaselineSync/baselines/$($BaselineName.ToLower()).md$GroupAnchor`" target=`"_blank`">$Name</a>"
         $Fragments += $Fragment | ConvertTo-Html -PreContent "<h2>$Number $MarkdownLink</h2>" -Fragment
@@ -233,9 +234,9 @@ function Import-SecureBaseline{
                 }
 
                 $null = $Control.Value -Match '^(.+)(SHALL|SHOULD|MAY){1,1}(.+\.)$'
-                $Cricality = "UNK"
+                $Criticality = "UNK"
                 if (@("SHALL", "SHOULD", "MAY") -Contains $Matches.2){
-                    $Cricality = $Matches.2
+                    $Criticality = $Matches.2
                 }
 
                 $Value = [System.Net.WebUtility]::HtmlEncode($Value)
@@ -250,7 +251,7 @@ function Import-SecureBaseline{
                     $Deleted = $false
                 }
 
-                $Group.Controls += @{"Id"=$Id; "Value"=$Value; "Cricality"=$Cricality; "Deleted"=$Deleted}
+                $Group.Controls += @{"Id"=$Id; "Value"=$Value; "Criticality"=$Criticality; "Deleted"=$Deleted}
             }
 
             $Output[$Product] += $Group

@@ -58,7 +58,7 @@ InModuleScope CreateReport {
                     $Control.Value -Match "^.*\.$" | Should -BeTrue -Because "$Control.Id does not end with period."
                     $Control.Value -Match '^(.+)(SHALL|SHOULD|MAY){1,1}(.+\.)$'
                     @("SHALL", "SHOULD", "MAY") -Contains $Matches.2 | Should -BeTrue -Because "$($Control.Id) must contain criticality"
-                    @("SHALL", "SHOULD", "MAY") -Contains $Control.Cricality | Should -BeTrue
+                    @("SHALL", "SHOULD", "MAY") -Contains $Control.Criticality | Should -BeTrue
                     $Control.Deleted.GetType() -Eq [bool]| Should -BeTrue -Because "Type should be boolean."
                 }
             }

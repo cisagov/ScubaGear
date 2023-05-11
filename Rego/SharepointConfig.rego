@@ -149,7 +149,7 @@ tests[{
 }
 #--
 
-# TODO: Resolve policy id
+# TODO: Resolve Policy Id
 # Baseline 2.4: Policy 2
 #--
 ReportDetails2_4_2(Policy) = Description if {

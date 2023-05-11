@@ -79,7 +79,7 @@ tests[{
 }
 #--
 
-# TODO: Resolve Policy ID
+# TODO: Resolve Policy Id
 # Baseline 2.1: Policy 2 PoSh Error
 #--
 tests[{
