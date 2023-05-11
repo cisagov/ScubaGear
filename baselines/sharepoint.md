@@ -205,7 +205,7 @@ To limit external sharing by domain, in the **SharePoint admin center**:
 
 8.  Select **Save.**
 
-## 4 Guest Access to a Site or OneDrive
+## 4. Guest Access to a Site or OneDrive
 
 SharePoint allows sharing with users who are outside the agency, which
 is convenient but may pose a data loss or other information security
