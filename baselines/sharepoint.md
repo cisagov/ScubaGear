@@ -72,7 +72,7 @@ This policy ensures that when sharing files in SharePoint, there are
 several possible scopes, including agency-wide or “anyone with the
 link.”
 
-### Policy
+### Policies
 
 #### MS.SHAREPOINT.1.1v1
 File and folder links default sharing setting SHALL be set to Specific People (Only the People the User Specifies).
@@ -118,7 +118,7 @@ the CIO Council's [Interagency Collaboration
 Program](https://community.max.gov/display/Egov/Interagency+Collaboration+Program)’s
 OMB Max Site for a list of .gov domains for sharing).
 
-### Policy
+### Policies
 #### MS.SHAREPOINT.2.1v1
 External sharing SHOULD be limited to approved domains and security groups per interagency collaboration needs.
 - _Rationale:_ TODO
@@ -169,7 +169,7 @@ organizational settings agencies should evaluate each created site and
 adjust sharing settings best aligned to their respective sensitivity
 level.
 
-### Policy
+### Policies
 #### MS.SHAREPOINT.3.1v1
 Sharing settings for specific SharePoint sites SHOULD align to their sensitivity level.
 - _Rationale:_ TODO
