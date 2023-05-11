@@ -649,7 +649,7 @@ User click tracking SHALL be enabled.
 - _Last modified:_ June 2023
 
 #### MS.DEFENDER.7.8v1
-- Safe Links in Office 365 apps SHALL be turned on.
+Safe Links in Office 365 apps SHALL be turned on.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
