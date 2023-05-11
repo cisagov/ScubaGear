@@ -67,7 +67,7 @@ guest users, unmanaged users and anonymous users.
 ### Policy
 
 #### MS.TEAMS.1.1v1
-External participants SHOULD NOT be enabled to request control of shared desktops or windows in the Global (Org-wide default) meeting policy or in custom meeting policies if any exist
+External participants SHOULD NOT be enabled to request control of shared desktops or windows in the Global (Org-wide default) meeting policy or in custom meeting policies if any exist.
 
 - _Rationale:_ While there is some inherent risk in granting an external participant
 control of a shared screen, legitimate use cases for this exist.
@@ -114,7 +114,7 @@ joining calls that are not authenticated through the agency’s tenant.
 ### Policy
 
 #### MS.TEAMS.2.1v1
-Anonymous users SHALL NOT be enabled to start meetings in the Global (Org-wide default) meeting policy or in custom meeting policies if any exist
+Anonymous users SHALL NOT be enabled to start meetings in the Global (Org-wide default) meeting policy or in custom meeting policies if any exist.
 - _Rationale:_ TODO add rationale.
 - _Last modified:_ July 2023
 
@@ -480,7 +480,7 @@ Cloud video recording SHOULD be disabled in the global (org-wide default) meetin
 - _Last modified:_ July 2023
 
 #### MS.TEAMS.9.3v1
-For all meeting polices that allow cloud recording, recordings SHOULD be stored inside the country of that agency’s tenant.
+For all meeting polices that allow cloud recording, recordings SHOULD be stored inside the country of that agencys tenant.
 - _Rationale:_ TODO
 - _Last modified:_ July 2023
 
