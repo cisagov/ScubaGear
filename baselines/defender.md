@@ -361,7 +361,7 @@ Trusted senders and domains MAY be added in the event of false
 - _Last modified:_ June 2023
 
 #### MS.DEFENDER.5.5v1
-- Intelligence for impersonation protection SHALL be enabled.
+Intelligence for impersonation protection SHALL be enabled.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
