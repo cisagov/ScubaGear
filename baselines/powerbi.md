@@ -244,7 +244,7 @@ The **Invite external users to your organization** feature SHOULD be disabled un
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
-### 2.4.2 Resources
+### Resources
 
 - [Power BI Tenant settings \| Microsoft
   Docs](https://docs.microsoft.com/en-us/power-bi/guidance/admin-tenant-settings)
