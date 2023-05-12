@@ -75,7 +75,7 @@ function Export-PowerPlatformProvider {
 
             $CheckRScope = $true
             $CheckRSubScope = $true
-            if ($RegionScope -eq "NA" -or $RegionScope -eq "USGov") {
+            if ($RegionScope -eq "NA" -or $RegionScope -eq "USGov" -or $RegionScope -eq "USG") {
                 switch ($M365Environment) {
                     "commercial" {
                         $CheckRScope = $RegionScope -eq "NA"
