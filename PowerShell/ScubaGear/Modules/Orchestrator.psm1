@@ -509,7 +509,10 @@ function Invoke-ProviderList {
 
         $ConfigDetails = @(ConvertTo-Json -Depth 100 $([ScubaConfig]::GetInstance().Configuration))
         if(! $ConfigDetails) {
-            $ConfigDetails = "{}"
+            # If a config file isn't used, the full config object won't be available.
+            # However, in either case the Teams rego needs to see the value used for
+            # the $M365Environment, so at a minumum that variable needs to be saved.
+            $ConfigDetails = @(ConvertTo-Json @{"M365Environment"=$M365Environment;})
         }
 
         $BaselineSettingsExport = @"

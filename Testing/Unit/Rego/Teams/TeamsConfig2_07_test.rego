@@ -20,7 +20,10 @@ test_AllowEmailIntoChannel_Correct_V1 if {
             {
                 "ServiceInstance": "MicrosoftCommunicationsOnline/NOAM-ED6-A6"
             }
-        ]
+        ],
+        "scuba_config": {
+            "M365Environment": "commercial"
+        }
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
@@ -49,7 +52,10 @@ test_AllowEmailIntoChannel_Correct_V1_multi if {
             {
                 "ServiceInstance": "MicrosoftCommunicationsOnline/NOAM-ED6-A6"
             }
-        ]
+        ],
+        "scuba_config": {
+            "M365Environment": "commercial"
+        }
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
@@ -74,7 +80,10 @@ test_AllowEmailIntoChannel_Incorrect if {
             {
                 "ServiceInstance": "MicrosoftCommunicationsOnline/NOAM-ED6-A6"
             }
-        ]
+        ],
+        "scuba_config": {
+            "M365Environment": "commercial"
+        }
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
@@ -103,7 +112,10 @@ test_AllowEmailIntoChannel_Incorrect_multi if {
             {
                 "ServiceInstance": "MicrosoftCommunicationsOnline/NOAM-ED6-A6"
             }
-        ]
+        ],
+        "scuba_config": {
+            "M365Environment": "commercial"
+        }
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
@@ -128,7 +140,10 @@ test_AllowEmailIntoChannel_Correct_V2 if {
             {
                 "ServiceInstance": "MicrosoftCommunicationsOnline/GOV-1B-G6"
             }
-        ]
+        ],
+        "scuba_config": {
+            "M365Environment": "gcc"
+        }
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
@@ -157,7 +172,10 @@ test_AllowEmailIntoChannel_Correct_V2_multi if {
             {
                 "ServiceInstance": "MicrosoftCommunicationsOnline/GOV-1B-G6"
             }
-        ]
+        ],
+        "scuba_config": {
+            "M365Environment": "gcc"
+        }
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
@@ -182,7 +200,10 @@ test_AllowEmailIntoChannel_Correct_V3 if {
             {
                 "ServiceInstance": "MicrosoftCommunicationsOnline/GOV-1B-G6"
             }
-        ]
+        ],
+        "scuba_config": {
+            "M365Environment": "gcc"
+        }
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
@@ -211,7 +232,42 @@ test_AllowEmailIntoChannel_Correct_V3 if {
             {
                 "ServiceInstance": "MicrosoftCommunicationsOnline/GOV-1B-G6"
             }
-        ]
+        ],
+        "scuba_config": {
+            "M365Environment": "gcc"
+        }
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "N/A: Feature is unavailable in GCC environments"
+}
+
+test_AllowEmailIntoChannel_Correct_V4 if {
+    ControlNumber := "Teams 2.7"
+    Requirement := "Teams email integration SHALL be disabled"
+
+    Output := tests with input as {
+        "client_configuration": [
+            {
+                "Identity": "Global",
+                "AllowEmailIntoChannel": true
+            },
+            {
+                "Identity": "Tag:AllOn",
+                "AllowEmailIntoChannel": true
+            }
+        ],
+        "teams_tenant_info": [
+            {
+                "ServiceInstance": "MicrosoftCommunicationsOnline/ITAR-2G-S1"
+            }
+        ],
+        "scuba_config": {
+            "M365Environment": "gcchigh"
+        }
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
