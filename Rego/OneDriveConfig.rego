@@ -1,10 +1,7 @@
 package onedrive
 import future.keywords
 import data.report.utils.notCheckedDetails
-
-ReportDetailsBoolean(Status) = "Requirement met" if {Status == true}
-
-ReportDetailsBoolean(Status) = "Requirement not met" if {Status == false}
+import data.report.utils.ReportDetailsBoolean
 
 #
 # MS.ONEDRIVE.1.1v1

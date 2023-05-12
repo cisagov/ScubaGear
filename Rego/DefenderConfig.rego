@@ -1,35 +1,29 @@
 package defender
 import future.keywords
 import data.report.utils.notCheckedDetails
+import data.report.utils.ReportDetailsBoolean
 
 ## Report details menu
 #
 # If you simply want a boolean "Requirement met" / "Requirement not met"
-# just call ReportDetails(Status) and leave it at that.
+# just call ReportDetailsBoolean(Status) and leave it at that.
 #
 # If you want to customize the error message, wrap the ReportDetails call
 # inside CustomizeError, like so:
-# CustomizeError(ReportDetails(Status), "Custom error message")
+# CustomizeError(ReportDetailsBoolean(Status), "Custom error message")
 #
 # If you want to customize the error message with details about an array,
 # generate the custom error message using GenerateArrayString, for example:
-# CustomizeError(ReportDetails(Status), GenerateArrayString(BadPolicies, "bad policies found:"))
+# CustomizeError(ReportDetailsBoolean(Status), GenerateArrayString(BadPolicies, "bad policies found:"))
 #
 # If the setting in question requires a defender license,
 # wrap the details string inside ApplyLicenseWarning, like so:
-# ApplyLicenseWarning(ReportDetails(Status))
+# ApplyLicenseWarning(ReportDetailsBoolean(Status))
 #
 # These functions can be nested. For example:
-# ApplyLicenseWarning(CustomizeError(ReportDetails(Status), "Custom error message"))
+# ApplyLicenseWarning(CustomizeError(ReportDetailsBoolean(Status), "Custom error message"))
 #
 ##
-ReportDetails(Status) := "Requirement met" if {
-    Status == true
-}
-
-ReportDetails(Status) := "Requirement not met" if {
-    Status == false
-}
 
 GenerateArrayString(Array, CustomString) := Output if {
     # Example usage and output:
@@ -43,13 +37,13 @@ GenerateArrayString(Array, CustomString) := Output if {
 CustomizeError(Message, CustomString) := Message if {
     # If the message reports success, don't apply the custom
     # error message
-    Message == ReportDetails(true)
+    Message == ReportDetailsBoolean(true)
 }
 
 CustomizeError(Message, CustomString) := CustomString if {
     # If the message does not report success, apply the custom
     # error message
-    Message != ReportDetails(true)
+    Message != ReportDetailsBoolean(true)
 }
 
 ApplyLicenseWarning(Message) := Message if {
@@ -58,7 +52,7 @@ ApplyLicenseWarning(Message) := Message if {
     input.defender_license == true
 }
 
-ApplyLicenseWarning(Message) := concat("", [ReportDetails(false), LicenseWarning]) if {
+ApplyLicenseWarning(Message) := concat("", [ReportDetailsBoolean(false), LicenseWarning]) if {
     # If a defender license is not present, assume failure and
     # replace the message with the warning
     input.defender_license == false
@@ -79,7 +73,7 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-EOPProtectionPolicyRule"],
 	"ActualValue" : Policy,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), ErrorMessage),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
     "RequirementMet" : Status
 }] {
     Policy := StandardPresetSecurityPolicy
@@ -103,7 +97,7 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-EOPProtectionPolicyRule"],
 	"ActualValue" : Policy,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), ErrorMessage),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
     "RequirementMet" : Status
 }] {
     Policy := StrictPresetSecurityPolicy
@@ -163,7 +157,7 @@ tests[{
     "Criticality" : "Shall",
     "Commandlet" : ["Get-DlpComplianceRule"],
 	"ActualValue" : Rules,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), ErrorMessage),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
     "RequirementMet" : Status
 }] {
     Rules := SSNRules
@@ -177,7 +171,7 @@ tests[{
     "Criticality" : "Shall",
     "Commandlet" : ["Get-DlpComplianceRule"],
 	"ActualValue" : Rules,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), ErrorMessage),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
     "RequirementMet" : Status
 }] {
     Rules := ITINRules
@@ -191,7 +185,7 @@ tests[{
     "Criticality" : "Shall",
     "Commandlet" : ["Get-DlpComplianceRule"],
 	"ActualValue" : Rules,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), ErrorMessage),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
     "RequirementMet" : Status
 }] {
     Rules := CardRules
@@ -259,7 +253,7 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-DLPCompliancePolicy"],
 	"ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), ErrorMessage),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
     "RequirementMet" : Status
 }] {
     Policies := ExchangePolicies
@@ -273,7 +267,7 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-DLPCompliancePolicy"],
 	"ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), ErrorMessage),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
     "RequirementMet" : Status
 }] {
     Policies := SharePointPolicies
@@ -287,7 +281,7 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-DLPCompliancePolicy"],
 	"ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), ErrorMessage),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
     "RequirementMet" : Status
 }] {
     Policies := OneDrivePolicies
@@ -301,7 +295,7 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-DLPCompliancePolicy"],
 	"ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), ErrorMessage),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
     "RequirementMet" : Status
 }] {
     Policies := TeamsPolicies
@@ -337,7 +331,7 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-DlpComplianceRule"],
 	"ActualValue" : Rules,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Rules, ErrorMessage)),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), GenerateArrayString(Rules, ErrorMessage)),
     "RequirementMet" : Status
 }] {
     Rules := SensitiveRulesNotBlocking
@@ -360,7 +354,7 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-DlpComplianceRule"],
 	"ActualValue" : Rules,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Rules, ErrorMessage)),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), GenerateArrayString(Rules, ErrorMessage)),
     "RequirementMet" : Status
 }] {
     Rules := SensitiveRulesNotNotifying
@@ -421,7 +415,7 @@ tests[{
     "Criticality" : "Shall",
     "Commandlet" : ["Get-MalwareFilterPolicy"],
 	"ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Policies, ErrorMessage)),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), GenerateArrayString(Policies, ErrorMessage)),
     "RequirementMet" : Status
 }] {
     Policies := MalwarePoliciesWithoutFileFilter
@@ -447,7 +441,7 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-MalwareFilterPolicy"],
 	"ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), ErrorMessage),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
     "RequirementMet" : Status
 }] {
     Policies := MalwarePoliciesBlockingEXE
@@ -468,7 +462,7 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-MalwareFilterPolicy"],
 	"ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), ErrorMessage),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
     "RequirementMet" : Status
 }] {
     Policies := MalwarePoliciesBlockingCMD
@@ -489,7 +483,7 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-MalwareFilterPolicy"],
 	"ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), ErrorMessage),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
     "RequirementMet" : Status
 }] {
     Policies := MalwarePoliciesBlockingVBE
@@ -516,7 +510,7 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-MalwareFilterPolicy"],
 	"ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Policies, ErrorMessage)),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), GenerateArrayString(Policies, ErrorMessage)),
     "RequirementMet" : Status
 }] {
     Policies := MalwarePoliciesWithoutZAP
@@ -550,7 +544,7 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-AntiPhishPolicy"],
 	"ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), ErrorMessage),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
     "RequirementMet" : Status
 }] {
     Policies := ProtectedUsersPolicies
@@ -580,7 +574,7 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-AntiPhishPolicy"],
 	"ActualValue" : Policies,
-    "ReportDetails" : ReportDetails(Status),
+    "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
     Policies := ProtectedOrgDomainsPolicies
@@ -609,7 +603,7 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-AntiPhishPolicy"],
 	"ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), ErrorMessage),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
     "RequirementMet" : Status
 }] {
     Policies := ProtectedCustomDomainsPolicies
@@ -638,7 +632,7 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-AntiPhishPolicy"],
 	"ActualValue" : Policies,
-    "ReportDetails" : ReportDetails(Status),
+    "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
     Policies := IntelligenceProtectionPolicies
@@ -657,7 +651,7 @@ tests[{
     "Criticality" : "Shall",
     "Commandlet" : ["Get-AntiPhishPolicy"],
 	"ActualValue" : Policy.TargetedUserProtectionAction,
-    "ReportDetails" : ReportDetails(Status),
+    "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
     Policy := input.anti_phish_policies[_]
@@ -671,7 +665,7 @@ tests[{
     "Criticality" : "Shall",
     "Commandlet" : ["Get-AntiPhishPolicy"],
 	"ActualValue" : Policy.TargetedDomainProtectionAction,
-    "ReportDetails" : ReportDetails(Status),
+    "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
     Policy := input.anti_phish_policies[_]
@@ -685,7 +679,7 @@ tests[{
     "Criticality" : "Shall",
     "Commandlet" : ["Get-AntiPhishPolicy"],
 	"ActualValue" : Policy.MailboxIntelligenceProtectionAction,
-    "ReportDetails" : ReportDetails(Status),
+    "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
     Policy := input.anti_phish_policies[_]
@@ -709,7 +703,7 @@ tests[ {
     "Criticality" : "Should",
     "Commandlet" : ["Get-AntiPhishPolicy"],
 	"ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Policies, ErrorMessage)),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), GenerateArrayString(Policies, ErrorMessage)),
     "RequirementMet" : Status
 }] {
     Policies := AntiPhishTargetedUserNotQuarantine
@@ -731,7 +725,7 @@ tests[ {
     "Criticality" : "Should",
     "Commandlet" : ["Get-AntiPhishPolicy"],
 	"ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Policies, ErrorMessage)),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), GenerateArrayString(Policies, ErrorMessage)),
     "RequirementMet" : Status
 }] {
     Policies := AntiPhishTargetedDomainNotQuarantine
@@ -753,7 +747,7 @@ tests[ {
     "Criticality" : "Should",
     "Commandlet" : ["Get-AntiPhishPolicy"],
 	"ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Policies, ErrorMessage)),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), GenerateArrayString(Policies, ErrorMessage)),
     "RequirementMet" : Status
 }] {
     Policies := AntiPhishMailIntNotQuarantine
@@ -775,7 +769,7 @@ tests[ {
     "Criticality" : "Shall",
     "Commandlet" : ["Get-AntiPhishPolicy"],
 	"ActualValue" : Policy.AuthenticationFailAction,
-    "ReportDetails" : ReportDetails(Status),
+    "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
     Policy := input.anti_phish_policies[_]
@@ -799,7 +793,7 @@ tests[ {
     "Criticality" : "Should",
     "Commandlet" : ["Get-AntiPhishPolicy"],
 	"ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Policies, ErrorMessage)),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), GenerateArrayString(Policies, ErrorMessage)),
     "RequirementMet" : Status
 }] {
     ErrorMessage := "custom anti phish policy(ies) found where the action for spoofed emails is not set to quarantine:"
@@ -819,7 +813,7 @@ tests[ {
     "Criticality" : "Shall",
     "Commandlet" : ["Get-AntiPhishPolicy"],
 	"ActualValue" : Policy.EnableFirstContactSafetyTips,
-    "ReportDetails" : ReportDetails(Status),
+    "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
     Policy := input.anti_phish_policies[_]
@@ -842,7 +836,7 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-AntiPhishPolicy"],
 	"ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Policies, ErrorMessage)),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), GenerateArrayString(Policies, ErrorMessage)),
     "RequirementMet" : Status
 }] {
     ErrorMessage := "custom anti phish policy(ies) found where first contact safety tips are not enabled:"
@@ -857,7 +851,7 @@ tests[{
     "Criticality" : "Shall",
     "Commandlet" : ["Get-AntiPhishPolicy"],
 	"ActualValue" : Policy.EnableSimilarUsersSafetyTips,
-    "ReportDetails" : ReportDetails(Status),
+    "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
     Policy := input.anti_phish_policies[_]
@@ -880,7 +874,7 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-AntiPhishPolicy"],
 	"ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Policies, ErrorMessage)),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), GenerateArrayString(Policies, ErrorMessage)),
     "RequirementMet" : Status
 }] {
     ErrorMessage := "custom anti phish policy(ies) found where similar user safety tips are not enabled:"
@@ -895,7 +889,7 @@ tests[{
     "Criticality" : "Shall",
     "Commandlet" : ["Get-AntiPhishPolicy"],
 	"ActualValue" : Policy.EnableSimilarDomainsSafetyTips,
-    "ReportDetails" : ReportDetails(Status),
+    "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
     Policy := input.anti_phish_policies[_]
@@ -918,7 +912,7 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-AntiPhishPolicy"],
 	"ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Policies, ErrorMessage)),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), GenerateArrayString(Policies, ErrorMessage)),
     "RequirementMet" : Status
 }] {
     ErrorMessage := "custom anti phish policy(ies) found where similar domains safety tips are not enabled:"
@@ -933,7 +927,7 @@ tests[{
     "Criticality" : "Shall",
     "Commandlet" : ["Get-AntiPhishPolicy"],
 	"ActualValue" : Policy.EnableUnusualCharactersSafetyTips,
-    "ReportDetails" : ReportDetails(Status),
+    "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
     Policy := input.anti_phish_policies[_]
@@ -956,7 +950,7 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-AntiPhishPolicy"],
 	"ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Policies, ErrorMessage)),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), GenerateArrayString(Policies, ErrorMessage)),
     "RequirementMet" : Status
 }] {
     ErrorMessage := "custom anti phish policy(ies) found where unusual character safety tips are not enabled:"
@@ -971,7 +965,7 @@ tests[{
     "Criticality" : "Shall",
     "Commandlet" : ["Get-AntiPhishPolicy"],
 	"ActualValue" : Policy.EnableViaTag,
-    "ReportDetails" : ReportDetails(Status),
+    "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
     Policy := input.anti_phish_policies[_]
@@ -994,7 +988,7 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-AntiPhishPolicy"],
 	"ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Policies, ErrorMessage)),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), GenerateArrayString(Policies, ErrorMessage)),
     "RequirementMet" : Status
 }] {
     ErrorMessage := "custom anti phish policy(ies) found where via tag is not enabled:"
@@ -1009,7 +1003,7 @@ tests[{
     "Criticality" : "Shall",
     "Commandlet" : ["Get-AntiPhishPolicy"],
 	"ActualValue" : Policy.EnableUnauthenticatedSender,
-    "ReportDetails" : ReportDetails(Status),
+    "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
     Policy := input.anti_phish_policies[_]
@@ -1032,7 +1026,7 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-AntiPhishPolicy"],
 	"ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Policies, ErrorMessage)),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), GenerateArrayString(Policies, ErrorMessage)),
     "RequirementMet" : Status
 }] {
     ErrorMessage := "custom anti phish policy(ies) found where '?' for unauthenticated sender is not enabled:"
@@ -1057,7 +1051,7 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-HostedContentFilterPolicy"],
 	"ActualValue" : Policy.BulkThreshold,
-	"ReportDetails" : ReportDetails(Status),
+	"ReportDetails" : ReportDetailsBoolean(Status),
 	"RequirementMet" : Status
 }] {
 	Policy := input.hosted_content_filter_policies[_] # Refactor
@@ -1077,7 +1071,7 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-HostedContentFilterPolicy"],
     "ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Policies, ErrorMessage)),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), GenerateArrayString(Policies, ErrorMessage)),
 	"RequirementMet" : Status
 }] {
 	ErrorMessage := "custom anti-spam policy(ies) found where bulk complaint level threshold is set to 7 or more:"
@@ -1097,7 +1091,7 @@ tests[{
     "Criticality" : "Shall",
     "Commandlet" : ["Get-HostedContentFilterPolicy"],
     "ActualValue" : Policy.SpamAction,
-    "ReportDetails" : ReportDetails(Status),
+    "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
     Policy := input.hosted_content_filter_policies[_]
@@ -1111,7 +1105,7 @@ tests[{
     "Criticality" : "Shall",
     "Commandlet" : ["Get-HostedContentFilterPolicy"],
     "ActualValue" : Policy.HighConfidenceSpamAction,
-    "ReportDetails" : ReportDetails(Status),
+    "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
     Policy := input.hosted_content_filter_policies[_]
@@ -1132,7 +1126,7 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-HostedContentFilterPolicy"],
     "ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Policies, ErrorMessage)),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), GenerateArrayString(Policies, ErrorMessage)),
     "RequirementMet" : Status
 }] {
 	ErrorMessage := "custom anti-spam policy(ies) found where spam is not being sent to the Quarantine folder or the Junk Mail Folder:"
@@ -1152,7 +1146,7 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-HostedContentFilterPolicy"],
     "ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Policies, ErrorMessage)),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), GenerateArrayString(Policies, ErrorMessage)),
     "RequirementMet" : Status
 }] {
 	ErrorMessage := "custom anti-spam policy(ies) found where high confidence spam is not being sent to the Quarantine folder or the Junk Mail Folder:"
@@ -1172,7 +1166,7 @@ tests[{
     "Criticality" : "Shall",
     "Commandlet" : ["Get-HostedContentFilterPolicy"],
     "ActualValue" : Policy.PhishSpamAction,
-    "ReportDetails" : ReportDetails(Status),
+    "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
     Policy := input.hosted_content_filter_policies[_]
@@ -1186,7 +1180,7 @@ tests[{
     "Criticality" : "Shall",
     "Commandlet" : ["Get-HostedContentFilterPolicy"],
     "ActualValue" : Policy.HighConfidencePhishAction,
-    "ReportDetails" : ReportDetails(Status),
+    "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
     Policy := input.hosted_content_filter_policies[_]
@@ -1208,7 +1202,7 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-HostedContentFilterPolicy"],
     "ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Policies, ErrorMessage)),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), GenerateArrayString(Policies, ErrorMessage)),
     "RequirementMet" : Status
 }] {
     ErrorMessage := "custom anti-spam policy(ies) found where phishing isn't moved to the quarantine folder:"
@@ -1228,7 +1222,7 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-HostedContentFilterPolicy"],
     "ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Policies, ErrorMessage)),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), GenerateArrayString(Policies, ErrorMessage)),
     "RequirementMet" : Status
 }] {
     ErrorMessage := "custom anti-spam policy(ies) found where high-confidence phishing isn't moved to quarantine folder:"
@@ -1246,7 +1240,7 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-HostedContentFilterPolicy"],
     "ActualValue" : Policy.BulkSpamAction,
-    "ReportDetails" : ReportDetails(Status),
+    "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
     Policy := input.hosted_content_filter_policies[_]
@@ -1266,7 +1260,7 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-HostedContentFilterPolicy"],
     "ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Policies, ErrorMessage)),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), GenerateArrayString(Policies, ErrorMessage)),
     "RequirementMet" : Status
 }] {
     ErrorMessage := "custom anti-spam policy(ies) found where bulk spam action is not Quarantine or Move to Junk Email Folder"
@@ -1285,7 +1279,7 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-HostedContentFilterPolicy"],
     "ActualValue" : Policy.QuarantineRetentionPeriod,
-    "ReportDetails" : ReportDetails(Status),
+    "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
     Policy := input.hosted_content_filter_policies[_]
@@ -1305,7 +1299,7 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-HostedContentFilterPolicy"],
     "ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Policies, ErrorMessage)),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), GenerateArrayString(Policies, ErrorMessage)),
     "RequirementMet" : Status
 }] {
     ErrorMessage := "custom anti-spam policy(ies) found where spam in quarantine isn't retained for 30 days:"
@@ -1324,7 +1318,7 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-HostedContentFilterPolicy"],
     "ActualValue" : Policy.InlineSafetyTipsEnabled,
-    "ReportDetails" : ReportDetails(Status),
+    "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
     Policy := input.hosted_content_filter_policies[_]
@@ -1344,7 +1338,7 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-HostedContentFilterPolicy"],
     "ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Policies, ErrorMessage)),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), GenerateArrayString(Policies, ErrorMessage)),
     "RequirementMet" : Status
 }] {
     ErrorMessage := "custom anti-spam policy(ies) found where spam safety tips is disabled:"
@@ -1364,7 +1358,7 @@ tests[{
     "Criticality" : "Shall",
     "Commandlet" : ["Get-HostedContentFilterPolicy"],
     "ActualValue" : Policy.ZapEnabled,
-    "ReportDetails" : ReportDetails(Status),
+    "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
     Policy := input.hosted_content_filter_policies[_]
@@ -1378,7 +1372,7 @@ tests[{
     "Criticality" : "Shall",
     "Commandlet" : ["Get-HostedContentFilterPolicy"],
     "ActualValue" : Policy.SpamZapEnabled,
-    "ReportDetails" : ReportDetails(Status),
+    "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
     Policy := input.hosted_content_filter_policies[_]
@@ -1392,7 +1386,7 @@ tests[{
     "Criticality" : "Shall",
     "Commandlet" : ["Get-HostedContentFilterPolicy"],
     "ActualValue" : Policy.PhishZapEnabled,
-    "ReportDetails" : ReportDetails(Status),
+    "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
     Policy := input.hosted_content_filter_policies[_]
@@ -1413,7 +1407,7 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-HostedContentFilterPolicy"],
     "ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Policies, ErrorMessage)),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), GenerateArrayString(Policies, ErrorMessage)),
     "RequirementMet" : Status
 }] {
     ErrorMessage := "custom anti-spam policies found where Zero-hour auto purge is disabled:"
@@ -1433,7 +1427,7 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-HostedContentFilterPolicy"],
     "ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Policies, ErrorMessage)),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), GenerateArrayString(Policies, ErrorMessage)),
     "RequirementMet" : Status
 }] {
     ErrorMessage := "custom anti-spam policies found where Zero-hour auto purge for spam is disabled:"
@@ -1453,7 +1447,7 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-HostedContentFilterPolicy"],
     "ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Policies, ErrorMessage)),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), GenerateArrayString(Policies, ErrorMessage)),
     "RequirementMet" : Status
 }] {
     ErrorMessage := "custom anti-spam policy(ies) found where Zero-hour auto purge for phishing is disabled:"
@@ -1477,7 +1471,7 @@ tests[{
     "Criticality" : "Shall",
     "Commandlet" : ["Get-HostedContentFilterPolicy"],
     "ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Policies, ErrorMessage)),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), GenerateArrayString(Policies, ErrorMessage)),
     "RequirementMet" : Status
 }] {
     ErrorMessage := "custom anti-spam policy(ies) found where there is at least one allowed sender domain:"
@@ -1496,7 +1490,7 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-HostedContentFilterPolicy"],
     "ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Policies, ErrorMessage)),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), GenerateArrayString(Policies, ErrorMessage)),
     "RequirementMet" : Status
 }] {
     ErrorMessage := "custom policy(ies) found where there is at least one allowed sender domain:"
@@ -1529,7 +1523,7 @@ tests[{
     "Criticality" : "Shall",
     "Commandlet" : ["Get-SafeLinksRule", "Get-AcceptedDomain"],
 	"ActualValue" : AllDomainsSafeLinksPolicies,
-    "ReportDetails" : ApplyLicenseWarning(CustomizeError(ReportDetails(Status), ErrorMessage)),
+    "ReportDetails" : ApplyLicenseWarning(CustomizeError(ReportDetailsBoolean(Status), ErrorMessage)),
 	"RequirementMet" : Status
 }] {
 	DomainNames := {Name.DomainName | Name = input.all_domains[_]}
@@ -1555,7 +1549,7 @@ tests[{
     "Criticality" : "Shall",
     "Commandlet" : ["Get-SafeLinksPolicy", "Get-SafeLinksRule"],
 	"ActualValue" : Policies,
-    "ReportDetails" : ApplyLicenseWarning(ReportDetails(Status)),
+    "ReportDetails" : ApplyLicenseWarning(ReportDetailsBoolean(Status)),
 	"RequirementMet" : Status
 }] {
 	Policies := EnableSafeLinksForEmailCorrect
@@ -1580,7 +1574,7 @@ tests[{
     "Criticality" : "Shall",
     "Commandlet" : ["Get-SafeLinksPolicy", "Get-SafeLinksRule"],
 	"ActualValue" : Policies,
-    "ReportDetails" : ApplyLicenseWarning(ReportDetails(Status)),
+    "ReportDetails" : ApplyLicenseWarning(ReportDetailsBoolean(Status)),
 	"RequirementMet" : Status
 }] {
 	Policies := EnableSafeLinksForTeamsCorrect
@@ -1605,7 +1599,7 @@ tests[{
     "Criticality" : "Shall",
     "Commandlet" : ["Get-SafeLinksPolicy", "Get-SafeLinksRule"],
 	"ActualValue" : Policies,
-    "ReportDetails" : ApplyLicenseWarning(ReportDetails(Status)),
+    "ReportDetails" : ApplyLicenseWarning(ReportDetailsBoolean(Status)),
 	"RequirementMet" : Status
 }] {
 	Policies := ScanUrlsCorrect
@@ -1630,7 +1624,7 @@ tests[{
     "Criticality" : "Shall",
     "Commandlet" : ["Get-SafeLinksPolicy", "Get-SafeLinksRule"],
 	"ActualValue" : Policies,
-    "ReportDetails" : ApplyLicenseWarning(ReportDetails(Status)),
+    "ReportDetails" : ApplyLicenseWarning(ReportDetailsBoolean(Status)),
 	"RequirementMet" : Status
 }] {
 	Policies := DeliverMessageAfterScanCorrect
@@ -1655,7 +1649,7 @@ tests[{
     "Criticality" : "Shall",
     "Commandlet" : ["Get-SafeLinksPolicy", "Get-SafeLinksRule"],
 	"ActualValue" : Policies,
-    "ReportDetails" : ApplyLicenseWarning(ReportDetails(Status)),
+    "ReportDetails" : ApplyLicenseWarning(ReportDetailsBoolean(Status)),
 	"RequirementMet" : Status
 }] {
 	Policies := EnableForInternalSendersCorrect
@@ -1680,7 +1674,7 @@ tests[{
     "Criticality" : "Shall",
     "Commandlet" : ["Get-SafeLinksPolicy", "Get-SafeLinksRule"],
 	"ActualValue" : Policies,
-    "ReportDetails" : ApplyLicenseWarning(ReportDetails(Status)),
+    "ReportDetails" : ApplyLicenseWarning(ReportDetailsBoolean(Status)),
 	"RequirementMet" : Status
 }] {
 	Policies := TrackClicksCorrect
@@ -1704,7 +1698,7 @@ tests[{
     "Criticality" : "Shall",
     "Commandlet" : ["Get-SafeLinksPolicy", "Get-SafeLinksRule"],
 	"ActualValue" : Policies,
-    "ReportDetails" : ApplyLicenseWarning(ReportDetails(Status)),
+    "ReportDetails" : ApplyLicenseWarning(ReportDetailsBoolean(Status)),
 	"RequirementMet" : Status
 }] {
 	Policies := EnableSafeLinksForOfficeCorrect
@@ -1728,7 +1722,7 @@ tests[{
     "Criticality" : "Shall",
     "Commandlet" : ["Get-SafeLinksPolicy", "Get-SafeLinksRule"],
 	"ActualValue" : Policies,
-    "ReportDetails" : ApplyLicenseWarning(ReportDetails(Status)),
+    "ReportDetails" : ApplyLicenseWarning(ReportDetailsBoolean(Status)),
 	"RequirementMet" : Status
 }] {
 	Policies := AllowClickThroughCorrect
@@ -1760,7 +1754,7 @@ tests[{
     "Criticality" : "Shall",
     "Commandlet" : ["Get-SafeAttachmentRule", "Get-AcceptedDomain"],
 	"ActualValue" : AllDomainsSafeAttachmentRules,
-    "ReportDetails" : ApplyLicenseWarning(CustomizeError(ReportDetails(Status), ErrorMessage)),
+    "ReportDetails" : ApplyLicenseWarning(CustomizeError(ReportDetailsBoolean(Status), ErrorMessage)),
 	"RequirementMet" : Status
 }] {
 	DomainNames := {Name.DomainName | Name = input.all_domains[_]}
@@ -1793,7 +1787,7 @@ tests[{
     "Criticality" : "Shall",
     "Commandlet" : ["Get-SafeAttachmentPolicy", "Get-SafeAttachmentRule", "Get-AcceptedDomain"],
 	"ActualValue" : Policies,
-    "ReportDetails" : ApplyLicenseWarning(CustomizeError(ReportDetails(Status), ErrorMessage)),
+    "ReportDetails" : ApplyLicenseWarning(CustomizeError(ReportDetailsBoolean(Status), ErrorMessage)),
     "RequirementMet" : Status
 }] {
     Policies := BlockMalwarePolicies
@@ -1819,7 +1813,7 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-SafeAttachmentPolicy", "Get-SafeAttachmentRule", "Get-AcceptedDomain"],
 	"ActualValue" : Policies,
-    "ReportDetails" : ApplyLicenseWarning(CustomizeError(ReportDetails(Status), ErrorMessage)),
+    "ReportDetails" : ApplyLicenseWarning(CustomizeError(ReportDetailsBoolean(Status), ErrorMessage)),
     "RequirementMet" : Status
 }] {
     Policies := RedirectionPolicies
@@ -1844,7 +1838,7 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-AtpPolicyForO365"],
 	"ActualValue" : Policies,
-    "ReportDetails" : ApplyLicenseWarning(ReportDetails(Status)),
+    "ReportDetails" : ApplyLicenseWarning(ReportDetailsBoolean(Status)),
     "RequirementMet" : Status
 }] {
     Policies := ATPPolicies
@@ -1883,7 +1877,7 @@ tests[{
     "Criticality" : "Shall",
     "Commandlet" : ["Get-ProtectionAlert"],
 	"ActualValue" : MissingAlerts,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(MissingAlerts, ErrorMessage)),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), GenerateArrayString(MissingAlerts, ErrorMessage)),
     "RequirementMet" : Status
 }] {
     MissingAlerts := RequiredAlerts - EnabledAlerts
@@ -1930,7 +1924,7 @@ tests[{
     "Criticality" : "Shall",
     "Commandlet" : ["Get-AdminAuditLogConfig"],
 	"ActualValue" : CorrectLogConfigs,
-    "ReportDetails" : ReportDetails(Status),
+    "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
     Status := count(CorrectLogConfigs) >= 1

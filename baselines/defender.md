@@ -387,9 +387,9 @@ an AI-based tool for identifying potential impersonation attempts.
   
   - user impersonation unusual characters,
 
-  - “?” for unauthenticated senders for spoof, and
+  - ? for unauthenticated senders for spoof, and
 
-  - “via” tag.
+  - via tag.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
@@ -614,7 +614,7 @@ If all checks pass, the user is redirected to the original URL.
 
 ### Policies
 #### MS.DEFENDER.7.1v1
-The Safe Links Policy SHALL include all agency domains—and by extension—all users.
+The Safe Links Policy SHALL include all agency domains and by extension all users.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
@@ -740,7 +740,7 @@ scanning.
 
 ### Policies
 #### MS.DEFENDER.8.1v1
-At least one Safe Attachments Policy SHALL include all agency domains—and by extension—all users.
+At least one Safe Attachments Policy SHALL include all agency domains and by extension all users.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 

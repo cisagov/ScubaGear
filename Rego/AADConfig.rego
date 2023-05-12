@@ -1,17 +1,14 @@
 package aad
 import future.keywords
 import data.report.utils.notCheckedDetails
+import data.report.utils.Format
+import data.report.utils.ReportDetailsBoolean
 
 ################
 # The report formatting functions below are generic and used throughout the policies #
 ################
-Format(Array) = format_int(count(Array), 10)
 
 Description(String1, String2, String3) =  trim(concat(" ", [String1, String2, String3]), " ")
-
-ReportDetailsBoolean(Status) = "Requirement met" if {Status == true}
-
-ReportDetailsBoolean(Status) = "Requirement not met" if {Status == false}
 
 ReportDetailsArray(Array, String) = Description(Format(Array), String, "")
 
@@ -362,6 +359,38 @@ tests[{
     "RequirementMet" : false
 }] {
     PolicyId := "MS.AAD.5.1v1"
+    true
+}
+#--
+
+#
+# MS.AAD.5.2v1
+#--
+tests[{
+    "PolicyId": PolicyId,
+    "Criticality" : "Should/Not-Implemented",
+    "Commandlet" : [],
+    "ActualValue" : [],
+    "ReportDetails" : notCheckedDetails(PolicyId),
+    "RequirementMet" : false
+}] {
+    PolicyId := "MS.AAD.5.2v1"
+    true
+}
+#--
+
+#
+# MS.AAD.5.3v1
+#--
+tests[{
+    "PolicyId": PolicyId,
+    "Criticality" : "Should/Not-Implemented",
+    "Commandlet" : [],
+    "ActualValue" : [],
+    "ReportDetails" : notCheckedDetails(PolicyId),
+    "RequirementMet" : false
+}] {
+    PolicyId := "MS.AAD.5.3v1"
     true
 }
 #--

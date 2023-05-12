@@ -208,24 +208,22 @@ sent from your domain that fail SPF or DKIM checks.
 
 ### Policies
 #### MS.EXO.4.1v1
-- A DMARC policy SHALL be published for every second-level domain.
+A DMARC policy SHALL be published for every second-level domain.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
 #### MS.EXO.4.2v1
-- The DMARC message rejection option SHALL be “p=reject”.
+The DMARC message rejection option SHALL be p=reject.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
 #### MS.EXO.4.3v1
-- The DMARC point of contact for aggregate reports SHALL include
-  <reports@dmarc.cyber.dhs.gov>.
+The DMARC point of contact for aggregate reports SHALL include <reports@dmarc.cyber.dhs.gov>.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
 #### MS.EXO.4.4v1
-- An agency point of contact SHOULD be included for aggregate and/or
-  failure reports.
+An agency point of contact SHOULD be included for aggregate and/or failure reports.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
@@ -324,13 +322,13 @@ following policies.
 ### Policies
 
 #### MS.EXO.6.1v1
-- Contact folders SHALL NOT be shared with all domains, although they
+Contact folders SHALL NOT be shared with all domains, although they
   MAY be shared with specific domains.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
 #### MS.EXO.6.2v1
-- Calendar details SHALL NOT be shared with all domains, although they MAY be shared with specific domains.
+Calendar details SHALL NOT be shared with all domains, although they MAY be shared with specific domains.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
@@ -473,7 +471,7 @@ services comparable to those offered by Microsoft.
 
 ### Policies
 #### MS.EXO.9.1v1
-Emails SHALL be filtered by the file types of included attachments. The selected filtering solution SHOULD offer services comparable to Microsoft Defender’s Common Attachment Filter.
+Emails SHALL be filtered by the file types of included attachments. The selected filtering solution SHOULD offer services comparable to Microsoft Defenders Common Attachment Filter.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
@@ -592,17 +590,17 @@ security mechanisms.
 
 ### Policies
 #### MS.EXO.12.1v1
-- IP allow lists SHOULD NOT be created.
+IP allow lists SHOULD NOT be created.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
 #### MS.EXO.12.2v1
-- Safe lists SHOULD NOT be enabled.
+Safe lists SHOULD NOT be enabled.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
 #### MS.EXO.12.3v1
-- A connection filter MAY be implemented to create an IP “Block list.”
+A connection filter MAY be implemented to create an IP Block list.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
@@ -813,7 +811,7 @@ At a minimum, the following alerts SHALL be enabled:
 - _Last modified:_ June 2023
 
 #### MS.EXO.16.2v1
-- The alerts SHOULD be sent to a monitored address or incorporated into a SIEM.
+The alerts SHOULD be sent to a monitored address or incorporated into a SIEM.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 

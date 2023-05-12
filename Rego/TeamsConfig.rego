@@ -9,14 +9,10 @@
 # (e.g., MS.TEAMS.1.1v1) aligns this files to the secure baseline control.
 package teams
 import future.keywords
-
-Format(Array) = format_int(count(Array), 10)
-
-Description(String1, String2, String3) = trim(concat(" ", [String1, concat(" ", [String2, String3])]), " ")
-
-ReportDetailsBoolean(Status) = "Requirement met" if {Status == true}
-
-ReportDetailsBoolean(Status) = "Requirement not met" if {Status == false}
+import data.report.utils.Format
+import data.report.utils.ReportDetailsBoolean
+import data.report.utils.Description
+import data.report.utils.ReportDetailsString
 
 ReportDetailsArray(Status, Array, String1) =  Detail if {
     Status == true
@@ -27,16 +23,6 @@ ReportDetailsArray(Status, Array, String1) = Detail if {
 	Status == false
 	String2 := concat(", ", Array)
     Detail := Description(Format(Array), String1, String2)
-}
-
-ReportDetailsString(Status, String) =  Detail if {
-    Status == true
-    Detail := "Requirement met"
-}
-
-ReportDetailsString(Status, String) =  Detail if {
-    Status == false
-    Detail := String
 }
 
 #

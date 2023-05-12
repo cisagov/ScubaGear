@@ -156,17 +156,17 @@ creating apps in all other created environments.
 
 ### Policies
 #### MS.POWERPLATFORM.2.1v1
-- A DLP policy SHALL be created to restrict connector access in the default Power Platform environment.
+A DLP policy SHALL be created to restrict connector access in the default Power Platform environment.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
 #### MS.POWERPLATFORM.2.2v1
-- Non-default environments SHOULD have at least one DLP policy that affects them.
+Non-default environments SHOULD have at least one DLP policy that affects them.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
 #### MS.POWERPLATFORM.2.3v1
-- All connectors except those listed below SHOULD be added to the Blocked category in the default environment policy:
+All connectors except those listed below SHOULD be added to the Blocked category in the default environment policy:
 
   - Approvals
 
@@ -202,7 +202,7 @@ creating apps in all other created environments.
 
   - Shifts for Microsoft Teams
 
-  - Yammer
+  - Yammer.
 
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
