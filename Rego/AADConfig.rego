@@ -7,6 +7,7 @@ import data.report.utils.ReportDetailsBoolean
 ################
 # The report formatting functions below are generic and used throughout the policies #
 ################
+
 Description(String1, String2, String3) =  trim(concat(" ", [String1, String2, String3]), " ")
 
 ReportDetailsArray(Array, String) = Description(Format(Array), String, "")
@@ -367,7 +368,7 @@ tests[{
 #--
 tests[{
     "PolicyId": PolicyId,
-    "Criticality" : "Shall/Not-Implemented",
+    "Criticality" : "Should/Not-Implemented",
     "Commandlet" : [],
     "ActualValue" : [],
     "ReportDetails" : notCheckedDetails(PolicyId),
@@ -383,7 +384,7 @@ tests[{
 #--
 tests[{
     "PolicyId": PolicyId,
-    "Criticality" : "Shall/Not-Implemented",
+    "Criticality" : "Should/Not-Implemented",
     "Commandlet" : [],
     "ActualValue" : [],
     "ReportDetails" : notCheckedDetails(PolicyId),
