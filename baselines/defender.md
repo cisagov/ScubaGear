@@ -902,7 +902,7 @@ Audit logs SHALL be maintained for at least the minimum duration dictated by OMB
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
-### 2.10.2 Resources
+### Resources
 
 - [OMB M-21-31 \| Office of Management and
   Budget](https://www.whitehouse.gov/wp-content/uploads/2021/08/M-21-31-Improving-the-Federal-Governments-Investigative-and-Remediation-Capabilities-Related-to-Cybersecurity-Incidents.pdf)
