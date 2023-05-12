@@ -885,7 +885,7 @@ policy to privileged roles.
 
 2.  Under **Include**, choose **Select users and groups**, then click
     the **Directory roles** checkbox. Select each of the roles listed in
-    the baseline statement, [Highly Privileged User Accounts SHALL be Cloud-Only](#2121-Policy).
+    the baseline statement, [Highly Privileged User Accounts SHALL be Cloud-Only](Policy MS.AAD.12.1v1).
 
 3.  Under **Exclude**, follow Microsoft’s guidance from the previously
     provided instructions link.
