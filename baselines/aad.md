@@ -178,7 +178,7 @@ Azure AD Identity Protection uses various signals to detect the risk
 level for each user sign-in. Sign-ins detected as high risk are to be
 blocked via Conditional Access.
 
-###  Policy
+### Policies
 #### MS.AAD.3.1v1
 Sign-ins detected as high risk SHALL be blocked.
 - _Rationale:_ TODO
