@@ -181,7 +181,7 @@ Link Permissions SHOULD Be Set to Enabled Anyone Links to View.
 - [Set link permissions \| Microsoft
   Docs](https://docs.microsoft.com/en-us/microsoft-365/solutions/best-practices-anonymous-sharing?view=o365-worldwide#set-link-permissions)
 
-### License Requirements
+### 2.3.3 License Requirements
 
 - N/A
 
