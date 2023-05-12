@@ -374,7 +374,7 @@ Service Principal credentials used for encrypting or accessing Power BI SHALL NO
   Microsoft
   Docs](https://docs.microsoft.com/en-us/security/benchmark/azure/baselines/power-bi-security-baseline)
 
-### 2.6.3 License Requirements
+### License Requirements
 
 - N/A
 
