@@ -1,6 +1,5 @@
 using module 'ScubaConfig\ScubaConfig.psm1'
 
-#(Erase this line when done. Start of assessing #76 issue)
 
 function Invoke-SCuBA {
     <#
