@@ -1288,7 +1288,6 @@ to the tenant and that invites can only be sent to specific external
 domains. Also ensure that guest users have limited access to Azure AD
 directory objects.
 
-### 2.18.1 Policy
 #### MS.AAD.18.1v1
 Only users with the Guest Inviter role SHOULD be able to invite guest users.
 - _Rationale:_ TODO
