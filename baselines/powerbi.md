@@ -349,7 +349,7 @@ Service Principal credentials used for encrypting or accessing Power BI SHALL NO
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
-### 2.6.2 Resources
+### Resources
 
 - [Automate Premium workspace and dataset tasks with service principal
   \| Microsoft
