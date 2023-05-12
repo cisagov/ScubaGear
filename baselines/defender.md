@@ -154,7 +154,7 @@ A list of browsers that are not allowed to access files protected by DLP policy 
 5.  Select **Edit policy**.
 
 6.  Edit the name and description of the policy if desired, then click
-    **Next**. 
+    **Next**.
 
 7.  Under **Locations to apply the policy**, set **Status** to **On**
     for all products except Power BI (preview).
