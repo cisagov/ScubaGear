@@ -59,7 +59,7 @@ the use of the preset profiles. Instead, it enumerates all relevant
 settings, as the preset security profiles are inflexible and take
 precedence over all other present policies.
 
-### Policy
+### Policies
 #### MS.DEFENDER.1.1v1
 Preset security profiles SHOULD NOT be used.
 - _Rationale:_ TODO
@@ -154,7 +154,7 @@ A list of browsers that are not allowed to access files protected by DLP policy 
 5.  Select **Edit policy**.
 
 6.  Edit the name and description of the policy if desired, then click
-    **Next**. 
+    **Next**.
 
 7.  Under **Locations to apply the policy**, set **Status** to **On**
     for all products except Power BI (preview).
@@ -285,7 +285,7 @@ This setting determines whether emails can be quarantined automatically
 after delivery to a user’s mailbox (e.g., in the case of a match with an
 updated malware classification rule).
 
-### Policy
+### Policies
 
 #### MS.DEFENDER.4.1v1
 Zero-hour Auto Purge (ZAP) for malware SHOULD be enabled in the default anti-malware policy and in all existing custom policies.
@@ -338,46 +338,48 @@ an AI-based tool for identifying potential impersonation attempts.
 
 ### Policies
 #### MS.DEFENDER.5.1v1
-- User impersonation protection SHOULD be enabled for key agency
+User impersonation protection SHOULD be enabled for key agency
   leaders.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
 #### MS.DEFENDER.5.2v1
-- Domain impersonation protection SHOULD be enabled for domains owned by
+Domain impersonation protection SHOULD be enabled for domains owned by
   the agency.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
 #### MS.DEFENDER.5.3v1
-- Domain impersonation protection SHOULD be added for frequent partners.
+Domain impersonation protection SHOULD be added for frequent partners.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
 #### MS.DEFENDER.5.4v1
-- Trusted senders and domains MAY be added in the event of false
+Trusted senders and domains MAY be added in the event of false
   positives.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
 #### MS.DEFENDER.5.5v1
-- Intelligence for impersonation protection SHALL be enabled.
+Intelligence for impersonation protection SHALL be enabled.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
 #### MS.DEFENDER.5.6v1
-- Message action SHALL be set to quarantine if the message is detected
+Message action SHALL be set to quarantine if the message is detected
   as impersonated.
+- _Rationale:_ TODO
+- _Last modified:_ June 2023
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
 #### MS.DEFENDER.5.7v1
-- Mail classified as spoofed SHALL be quarantined.
+Mail classified as spoofed SHALL be quarantined.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
 #### MS.DEFENDER.5.8v1
-- All safety tips SHALL be enabled, including:
+All safety tips SHALL be enabled, including:
 
   - first contact,
 
@@ -394,7 +396,7 @@ an AI-based tool for identifying potential impersonation attempts.
 - _Last modified:_ June 2023
 
 #### MS.DEFENDER.5.9v1
-- The above configurations SHALL be set in the default policy and SHOULD
+The above configurations SHALL be set in the default policy and SHOULD
   be set in all existing custom policies.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
@@ -649,12 +651,12 @@ User click tracking SHALL be enabled.
 - _Last modified:_ June 2023
 
 #### MS.DEFENDER.7.8v1
-- Safe Links in Office 365 apps SHALL be turned on.
+Safe Links in Office 365 apps SHALL be turned on.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
 #### MS.DEFENDER.7.9v1
-- Users SHALL NOT be enabled to click through to the original URL.
+Users SHALL NOT be enabled to click through to the original URL.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
@@ -835,7 +837,7 @@ There are several pre-built alert policies available pertaining to
 various apps in the M365 suite. These alerts give admins better
 real-time insight into possible security incidents.
 
-### Policy
+### Policies
 #### MS.DEFENDER.9.1v1
 At a minimum, the alerts required by the *Exchange Online Minimum Viable Secure Configuration Baseline* SHALL be enabled.
 - _Rationale:_ TODO
@@ -886,7 +888,7 @@ policy](https://docs.microsoft.com/en-us/microsoft-365/compliance/audit-log-rete
 
 OMB M-21-13 also requires Advanced Audit be configured in M365. Advanced Audit adds additional event types to the Unified Audit Log.
 
-### Policy
+### Policies
 #### MS.DEFENDER.10.1v1
 Microsoft Purview Audit (Standard) logging SHALL be enabled.
 - _Rationale:_ TODO
@@ -902,19 +904,19 @@ Audit logs SHALL be maintained for at least the minimum duration dictated by OMB
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
-### 2.10.2 Resources
+### Resources
 
 - [OMB M-21-31 \| Office of Management and
   Budget](https://www.whitehouse.gov/wp-content/uploads/2021/08/M-21-31-Improving-the-Federal-Governments-Investigative-and-Remediation-Capabilities-Related-to-Cybersecurity-Incidents.pdf)
 
 - [<u>Turn auditing on or off \| Microsoft
-  Docs</u>](https://docs.microsoft.com/en-us/microsoft-365/compliance/turn-audit-log-search-on-or-off?view=o365-worldwide) 
+  Docs</u>](https://docs.microsoft.com/en-us/microsoft-365/compliance/turn-audit-log-search-on-or-off?view=o365-worldwide) 
 
 - [Create an audit log retention policy \| Microsoft
   Docs](https://docs.microsoft.com/en-us/microsoft-365/compliance/audit-log-retention-policies?view=o365-worldwide#create-an-audit-log-retention-policy)
 
 - [<u>Search the audit log in the compliance center \| Microsoft
-  Docs </u>](https://docs.microsoft.com/en-us/microsoft-365/compliance/search-the-audit-log-in-security-and-compliance?view=o365-worldwide) 
+  Docs </u>](https://docs.microsoft.com/en-us/microsoft-365/compliance/search-the-audit-log-in-security-and-compliance?view=o365-worldwide) 
 
 - [Audited Activities \| Microsoft
   Docs](https://docs.microsoft.com/en-us/microsoft-365/compliance/search-the-audit-log-in-security-and-compliance?view=o365-worldwide#audited-activities)

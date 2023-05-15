@@ -86,7 +86,7 @@ Block legacy authentication protocols using a conditional access policy.
 Legacy authentication does not support multifactor authentication (MFA),
 which is required to minimize the impact of user credential theft.
 
-### Policy
+### Policies
 #### MS.AAD.1.1v1
 Legacy authentication SHALL be blocked.
 - _Rationale:_ TODO
@@ -178,7 +178,7 @@ Azure AD Identity Protection uses various signals to detect the risk
 level for each user sign-in. Sign-ins detected as high risk are to be
 blocked via Conditional Access.
 
-###  Policy
+### Policies
 #### MS.AAD.3.1v1
 Sign-ins detected as high risk SHALL be blocked.
 - _Rationale:_ TODO
@@ -507,7 +507,7 @@ to configure sending the logs to a storage account:
 Ensure that only administrators can register third-party applications
 that can access the tenant.
 
-### Policy
+### Policies
 #### MS.AAD.6.1v1
 Only administrators SHALL be allowed to register third-party applications.
 - _Rationale:_ TODO
@@ -601,7 +601,7 @@ Group owners SHALL NOT be allowed to consent to third-party applications.
 9. Under **Admin consent requests** -\> **Users can request admin
     consent to apps they are unable to consent to**, select **Yes.**
 
-10. Under **Who can review admin consent requests**​, select the group
+10. Under **Who can review admin consent requests**, select the group
     created in step two that is responsible for reviewing and
     adjudicating app requests.
 
@@ -613,7 +613,7 @@ Ensure that user passwords do not expire. Both the National Institute of
 Standards and Technology (NIST) and Microsoft emphasize MFA because they
 indicate that mandated password changes make user accounts less secure.
 
-### Policy
+### Policies
 #### MS.AAD.8.1v1
 User passwords SHALL NOT expire.
 - _Rationale:_ TODO
@@ -645,7 +645,7 @@ to configure the password expiration policy.
 To reduce the risk of credential theft during user sessions, configure
 the sign-in frequency to a limited period of time.
 
-### Policy
+### Policies
 #### MS.AAD.9.1v1
 Sign-in frequency SHALL be configured to 12 hours.
 - _Rationale:_ TODO
@@ -683,7 +683,7 @@ frequency,
 To reduce the risk of credential theft during user sessions, disallow
 persistent browser sessions.
 
-### Policy
+### Policies
 #### MS.AAD.10.1v1
 Browser sessions SHALL not be persistent.
 - _Rationale:_ TODO
@@ -722,7 +722,7 @@ users that are assigned the role of Global Administrator. Assign users
 to finer-grained administrative roles that they need to perform their
 duties instead of being assigned the Global Administrator role.
 
-### Policy
+### Policies
 #### MS.AAD.11.1v1
 A minimum of two users and a maximum of four users SHALL be provisioned with the Global Administrator role.
 - _Rationale:_ TODO
@@ -847,7 +847,7 @@ configuration provides a backup policy to enforce MFA for highly
 privileged users in case the main conditional access policy—which
 requires MFA for all users—is disabled or misconfigured.
 
-### Policy
+### Policies
 #### MS.AAD.13.1v1
 MFA SHALL be required for user access to highly privileged roles.
 - _Rationale:_ TODO
@@ -885,7 +885,7 @@ policy to privileged roles.
 
 2.  Under **Include**, choose **Select users and groups**, then click
     the **Directory roles** checkbox. Select each of the roles listed in
-    the baseline statement, [Highly Privileged User Accounts SHALL be Cloud-Only](#2121-Policy).
+    the baseline statement, [Highly Privileged User Accounts SHALL be Cloud-Only](Policy MS.AAD.12.1v1).
 
 3.  Under **Exclude**, follow Microsoft’s guidance from the previously
     provided instructions link.
@@ -1193,7 +1193,7 @@ The implementation section describes the cross-tenant settings that must
 be configured in both the home and the resource tenants to facilitate
 guest access with managed devices.
 
-### Policy
+### Policies
 #### MS.AAD.17.1v1
 Managed devices SHOULD be required for authentication.
 - _Rationale:_ TODO
@@ -1288,7 +1288,6 @@ to the tenant and that invites can only be sent to specific external
 domains. Also ensure that guest users have limited access to Azure AD
 directory objects.
 
-### 2.18.1 Policy
 #### MS.AAD.18.1v1
 Only users with the Guest Inviter role SHOULD be able to invite guest users.
 - _Rationale:_ TODO

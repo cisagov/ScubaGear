@@ -83,7 +83,7 @@ control will restrict the creation of new environments to users with the
 following admin roles: Global admins, Dynamics 365 admins, and Power
 Platform admins.
 
-### Policy
+### Policies
 #### MS.POWERPLATFORM.1.1v1
 The ability to create additional environments SHALL be restricted to admins.
 - _Rationale:_ TODO
@@ -336,7 +336,7 @@ to apply this setting. Also, there is no current way to implement this
 setting for Canvas Apps. When enabled, this setting will apply to all
 current Model-driven apps at only the environment level.
 
-### Policy
+### Policies
 #### MS.POWERPLATFORM.4.1v1
 Content security policies for model-driven Power Apps SHALL be enabled.
 - _Rationale:_ TODO
