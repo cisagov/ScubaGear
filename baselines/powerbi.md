@@ -68,65 +68,7 @@ strengthen the security of widely used cloud-based software services.
   
 # Baseline
 
-## 1 External Sharing
-
-External sharing can represent a potential security risk, therefore,
-disabling it is a best practice unless specific, approved use cases make
-it a necessity. As with the other collaboration capabilities within the
-Power BI tenant, the agency must evaluate whether its use case requires
-allowing external sharing.
-
-When sharing with users outside an agency, the external users receive an
-email with a link to the shared report or dashboard. The recipient must
-sign into Power BI to view the shared content.
-
-After the shared-to user signs into the Power BI service, they see the
-shared report or dashboard in its own browser window, not in the usual
-Power BI portal.
-
-People outside the agency can't edit content in the shared report or
-dashboard. They can interact with the charts and change filters or
-slicers, but changes are not saved.
-
-Only direct recipients see the shared report or dashboard. For example,
-if a sharing invite is sent to powerbiuser1@contoso.com, only
-powerbiuser1 sees the dashboard. No other user can see the dashboard,
-even if powerbiuser1 forwards them the link. Powerbiuser1 must use the
-same email address to access it: if powerbiuser1 signs in with any other
-email address, they will not have access to the dashboard.
-
-People outside the tenant agency cannot see any data if role or
-row-level security is implemented on on-premises Analysis Services
-tabular models.
-
-### Policy
-
-#### POWER.BI.1.1v1
-External sharing SHOULD be disabled unless the agency mission requires the capability.
-#### POWER.BI.1.2v1
-If external sharing is deemed appropriate, the agency SHOULD limit the sharing ability to a security group instead of the entire agency.
-
-### Resources
-
-- [Power BI Tenant settings \| Microsoft
-  Docs](https://docs.microsoft.com/en-us/power-bi/guidance/admin-tenant-settings)
-
-### License Requirements
-
-- N/A
-
-### Implementation
-
-1.  In the **Power BI tenant admin portal**, go to **Export and Sharing
-    Settings.**
-
-2.  Disable the **External sharing** toggle.
-
-3.  If the agency approves external sharing, select a specific security
-    group that includes users who should be able to share data and
-    reports externally.
-
-## 2 Publish to Web
+## 1 Publish to Web
 
 Power BI has a capability to publish reports and content to the web.
 This capability creates a publicly accessible web URL that does not
@@ -142,7 +84,7 @@ to the web.
 
 ### Policy
 
-#### POWER.BI.2.1v1
+#### POWER.BI.1.1v1
 The Publish to Web feature SHOULD be disabled unless the agency mission requires the capability.
 
 ### Resources
@@ -173,7 +115,7 @@ information security.
     codes**. In that case, users can create embed codes, but they must
     contact the tenant’s Power BI admin to allow them to do so.
 
-## 3 Power BI Guest Access
+## 2 Power BI Guest Access
 
 A best practice is to disallow guest user access. Disallowing guest
 access also aligns with zero trust principles. The agency with
@@ -213,7 +155,7 @@ consulted for additional guidance on managing guest users.
 
 ### Policy
 
-#### POWER.BI.3.1v1
+#### POWER.BI.2.1v1
 Guest user access to the Power BI tenant SHOULD be disabled unless the agency mission requires the capability.
 
 ### Resources
@@ -236,7 +178,7 @@ Guest user access to the Power BI tenant SHOULD be disabled unless the agency mi
 2.  Disable the **Allow Azure Active Directory guest users to access
     Power BI** toggle.
 
-## 4 External Invitations
+## 3 External Invitations
 
 This setting controls whether Power BI allows inviting external users to
 the agency’s organization through Power BI’s sharing workflows and
@@ -264,7 +206,7 @@ on roles.
 
 ### Policy
 
-#### POWER.BI.4.1v1
+#### POWER.BI.3.1v1
 The **Invite external users to your organization** feature SHOULD be disabled unless agency mission requires the capability.
 
 ### Resources
@@ -289,49 +231,7 @@ The **Invite external users to your organization** feature SHOULD be disabled un
 
 2.  Disable the **Invite external users to your organization** toggle.
 
-## 5 External Editing Capability
-
-It is possible to give external guest users the ability to edit and
-manage Power BI content; however, this could have considerable data
-security implications.
-
-Microsoft notes that Power BI comes with this setting disabled.
-
-If there is a mission need to allow external users to edit and manage
-Power BI content, the recommended best practice is to assign these
-entities to a security group.
-
-### Policy
-
-#### POWER.BI.5.1v1
-The external editing capability SHOULD be disabled unless agency mission requires the capability.
-
-### Resources
-
-- [Power BI Tenant settings \| Microsoft
-  Docs](https://docs.microsoft.com/en-us/power-bi/guidance/admin-tenant-settings)
-
-- [Azure AD B2B Guest users can now edit and manage content in Power BI
-  to collaborate better across organizations \| Microsoft
-  Docs](https://powerbi.microsoft.com/en-us/blog/azure-ad-b2b-guest-users-can-now-edit-and-manage-content-in-power-bi-to-collaborate-better-across-organizations/)
-
-- [Power BI Security Baseline v2.0 \| Microsoft benchmarks GitHub
-  repo](https://github.com/MicrosoftDocs/SecurityBenchmarks/blob/master/Azure%20Offer%20Security%20Baselines/2.0/power-bi-security-baseline-v2.0.xlsx)
-
-### License Requirements
-
-If this setting is enabled, an AAD B2B guest user must have a Power BI
-Pro license in a workspace other than the “My workspace” area to edit
-and manage content within the inviting organization’s Power BI tenant.
-
-### Implementation
-
-1.  In the tenant admin portal, go to **Export and Sharing Settings**.
-
-2.  Disable the toggle labeled **Allow Azure Active Directory guest
-    users to edit and manage content in the organization**.
-
-## 6 Service Principals
+## 4 Service Principals
 
 Power BI supports the use of service principals to manage application
 identities. Service principals can use application programming
@@ -372,10 +272,10 @@ permissions.
 
 ### Policy
 
-#### POWER.BI.6.1v1
+#### POWER.BI.4.1v1
 Service Principals SHOULD be allowed for Power BI where applicable.
 
-#### POWER.BI.6.2v1
+#### POWER.BI.4.2v1
 Service Principal credentials used for encrypting or accessing Power BI SHALL NOT be stored in scripts or config files and SHALL be stored in a secure vault such as Azure Key Vault.
 
 ### Resources
@@ -427,7 +327,7 @@ recommended to allow access only to specific security groups.
 Alternatively, one can create a dedicated security group for service
 principals and exclude it from the desired tenant settings.
 
-## 7 ResourceKey Authentication
+## 5 ResourceKey Authentication
 
 This setting pertains to the security and development of Power BI
 embedded content. The Power BI tenant states that “for extra security,
@@ -450,7 +350,7 @@ an exception to the policy can be investigated.
 
 ### Policy
 
-#### POWER.BI.7.1v1
+#### POWER.BI.5.1v1
 ResourceKey Authentication SHOULD be blocked unless a specific use case (e.g., streaming and/or PUSH datasets) merits its use.
 
 ### Resources
@@ -470,7 +370,7 @@ ResourceKey Authentication SHOULD be blocked unless a specific use case (e.g., s
 1.  Under **Developer Settings** in the Power BI tenant admin portal,
     toggle **Block ResourceKey Authentication** to an enabled state.
 
-## 8 Python and R Visual Sharing
+## 6 Python and R Visual Sharing
 
 Power BI can interact with Python and R scripts to integrate
 visualizations from these languages. Python visuals are created from
@@ -483,10 +383,10 @@ and deems the scripts free of security risks.
 
 ### Policy
 
-#### POWER.BI.8.1v1
+#### POWER.BI.6.1v1
 R and Python interactions SHOULD be disabled.
 
-#### POWER.BI.8.2v1
+#### POWER.BI.6.2v1
 R and Python scripts MAY be allowed through organizational review.
 
 ### Resources
@@ -505,7 +405,7 @@ R and Python scripts MAY be allowed through organizational review.
 2.  Toggle off the **Interact with and share R and Python visuals**
     option.
 
-## 9 Data Stewards and Power BI Admins
+## 7 Data Stewards and Power BI Admins
 
 There are multiple ways to secure sensitive information, such as warning
 users, encryption, or blocking attempts to share. Use Microsoft
@@ -523,7 +423,7 @@ DLP.
 
 ### Policy
 
-#### POWER.BI.9.1v1
+#### POWER.BI.7.1v1
 Sensitivity labels SHOULD be enabled for Power BI and employed for sensitive data per enterprise data protection policies.
 
 ### Resources
@@ -605,7 +505,7 @@ has permissions to do so.
 
 8.  Click **Apply**.
 
-## 10 Audit Logs
+## 8 Audit Logs
 
 The Power BI tenant has a setting for audit log generation to monitor
 internal activity and compliance. Users within the agency can use
@@ -617,7 +517,7 @@ tenant settings.
 
 ### Policy
 
-#### POWER.BI.10.1v1
+#### POWER.BI.8.1v1
 Power BI audit log generation SHALL be enabled in the Power BI tenant.
 
 ### Resources
