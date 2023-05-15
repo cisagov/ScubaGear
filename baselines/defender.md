@@ -370,6 +370,8 @@ Message action SHALL be set to quarantine if the message is detected
   as impersonated.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
+- _Rationale:_ TODO
+- _Last modified:_ June 2023
 
 #### MS.DEFENDER.5.7v1
 Mail classified as spoofed SHALL be quarantined.
