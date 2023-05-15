@@ -1,4 +1,4 @@
-# 1. Introduction
+# Introduction
 
 The Microsoft Power Platform is a group of applications involving
 low-code application development, business intelligence, a custom chat
@@ -41,7 +41,7 @@ often used to store data in SQL-like tables. A Power App would then use
 a connector to connect to the Dataverse table and perform create, read,
 update and delete (CRUD) operations.
 
-## 1.1 Assumptions
+## Assumptions
 
 The **License Requirements** sections of this document assume the
 organization is using an [M365
@@ -50,7 +50,7 @@ or [G3](https://www.microsoft.com/en-us/microsoft-365/government)
 license level. Therefore, only licenses not included in E3/G3 are
 listed.
 
-## 1.2 Resources
+## Resources
 
 **<u>License Compliance and Copyright</u>**
 
@@ -66,7 +66,7 @@ document. The United States Government has adapted selections of these
 documents to develop innovative and scalable configuration standards to
 strengthen the security of widely used cloud-based software services.
 
-# 2. Baseline
+# Baseline
 
 Baselines in this section are for administrative controls that apply to
 all Power Platform applications at the Power Platform tenant and
@@ -74,7 +74,7 @@ environment level. Additional Power Platform security settings would be
 implemented at the app level, connector level, or Dataverse table level.
 Refer to Microsoft documentation for those additional controls.
 
-## 2.1 Creation of Power Platform Environments SHALL Be Restricted
+## 1. Power Platform Environments
 
 Power Platform environments are used to group together, manage, and
 store Power Apps and Power Virtual Agents. By default, any user in the
@@ -83,12 +83,13 @@ control will restrict the creation of new environments to users with the
 following admin roles: Global admins, Dynamics 365 admins, and Power
 Platform admins.
 
-### 2.1.1 Policy
+### Policies
+#### MS.POWERPLATFORM.1.1v1
+The ability to create additional environments SHALL be restricted to admins.
+- _Rationale:_ TODO
+- _Last modified:_ June 2023
 
-- The ability to create additional environments SHALL be restricted to
-  admins.
-
-### 2.1.2 Resources
+### Resources
 
 - [Control who can create and manage environments in the Power Platform
   admin center \| Microsoft
@@ -100,11 +101,11 @@ Platform admins.
 - [Microsoft Technical Documentation \| Power
   Apps](https://docs.microsoft.com/en-us/power-apps/)
 
-### 2.1.3 License Requirements
+### License Requirements
 
 - N/A
 
-### 2.1.4 Implementation
+### Implementation
 
 1.  Sign in to the [Power Platform admin
     center](https://admin.powerplatform.microsoft.com/) or for GCC
@@ -125,7 +126,7 @@ Platform admins.
 Now only Global admins, Dynamics 365 service admins, Power Platform
 Service admins, and Delegated admins can create environments.
 
-## 2.2 Data Loss Prevention Policies for Power Platform Environments SHALL Be Created
+## 2. Data Loss Prevention Policies
 
 To secure Power Platform environments Data Loss Prevention (DLP)
 policies can be created to restrict the connectors that can be used with
@@ -153,16 +154,19 @@ restrict users in the Azure AD tenant from creating Power Apps in the
 default Power Platform environment. Admins can restrict users from
 creating apps in all other created environments.
 
-### 2.2.1 Policy
+### Policies
+#### MS.POWERPLATFORM.2.1v1
+A DLP policy SHALL be created to restrict connector access in the default Power Platform environment.
+- _Rationale:_ TODO
+- _Last modified:_ June 2023
 
-- A DLP policy SHALL be created to restrict connector access in the
-  default Power Platform environment.
+#### MS.POWERPLATFORM.2.2v1
+Non-default environments SHOULD have at least one DLP policy that affects them.
+- _Rationale:_ TODO
+- _Last modified:_ June 2023
 
-- Non-default environments SHOULD have at least one DLP policy that
-  affects them.
-
-- All connectors except those listed below SHOULD be added to the
-  Blocked category in the default environment policy:
+#### MS.POWERPLATFORM.2.3v1
+All connectors except those listed below SHOULD be added to the Blocked category in the default environment policy:
 
   - Approvals
 
@@ -198,9 +202,12 @@ creating apps in all other created environments.
 
   - Shifts for Microsoft Teams
 
-  - Yammer
+  - Yammer.
 
-### 2.2.2 Resources
+- _Rationale:_ TODO
+- _Last modified:_ June 2023
+
+### Resources
 
 - [Data Policies for Power Automate and Power Apps \| Digital
   Transformation Agency of
@@ -209,11 +216,11 @@ creating apps in all other created environments.
 - [Create a data loss prevention (DLP) policy \| Microsoft
   Docs](https://docs.microsoft.com/en-us/power-platform/admin/create-dlp-policy)
 
-### 2.2.3 License Requirements
+### License Requirements
 
 - N/A
 
-### 2.2.4 Implementation
+### Implementation
 
 1.  Sign in to the [Power Platform admin
     center](https://admin.powerplatform.microsoft.com/) (for GCC
@@ -253,7 +260,7 @@ blocked to the **Blocked** category.
 
 14. Select **Next**-\> **Create Policy** to finish.
 
-## 2.3 Tenant Isolation SHALL Be Enabled to Prevent Cross Tenant Access of Power Platform environments
+## 3. Tenant Isolation
 
 Power Platform tenant isolation is different from Azure AD-wide tenant
 restriction. It does not impact Azure AD-based access outside of Power
@@ -273,24 +280,33 @@ external tenants) cross-tenant connections are blocked by Power Platform
 even if the user presents valid credentials to the Azure AD-secured data
 source.
 
-### 2.3.1 Policy
+### Policies
 
-- Power Platform tenant isolation SHALL be enabled.
+#### MS.POWERPLATFORM.3.1v1
+Power Platform tenant isolation SHALL be enabled.
+- _Rationale:_ TODO
+- _Last modified:_ June 2023
 
-- An inbound/outbound connection allowlist SHOULD be configured.
+#### MS.POWERPLATFORM.3.2v1
+An inbound/outbound connection allowlist SHOULD be configured.
+- _Rationale:_ TODO
+- _Last modified:_ June 2023
 
-- The allowlist MAY be empty.
+#### MS.POWERPLATFORM.3.3v1
+The allowlist MAY be empty.
+- _Rationale:_ TODO
+- _Last modified:_ June 2023
 
-### 2.3.2 Resources
+### Resources
 
 - [Enable tenant isolation and configure allowlist \| Microsoft
   Docs](https://docs.microsoft.com/en-us/power-platform/admin/cross-tenant-restrictions#enable-tenant-isolation-and-configure-allowlist)
 
-### 2.3.3 License Requirements
+### License Requirements
 
 - N/A
 
-### 2.3.4 Implementation
+### Implementation
 
 1.  Sign in to the [Power Platform admin
     center](https://admin.powerplatform.microsoft.com/) or for GCC
@@ -306,7 +322,7 @@ source.
     the allowlist. However, these rules won't be enforced until tenant
     isolation is turned **On**.
 
-## 2.4 Content Security Policy SHALL Be Enabled
+## 4. Content Security Policy
 
 Content Security Policy (CSP) is an added layer of security that helps
 to detect and mitigate certain types of attacks, including Cross-Site
@@ -320,21 +336,22 @@ to apply this setting. Also, there is no current way to implement this
 setting for Canvas Apps. When enabled, this setting will apply to all
 current Model-driven apps at only the environment level.
 
-### 2.4.1 Policy
+### Policies
+#### MS.POWERPLATFORM.4.1v1
+Content security policies for model-driven Power Apps SHALL be enabled.
+- _Rationale:_ TODO
+- _Last modified:_ June 2023
 
-- Content security policies for model-driven Power Apps SHALL be
-  enabled.
-
-### 2.4.2 Resources
+### Resources
 
 - [Content Security Policy \| Microsoft
   Docs](https://docs.microsoft.com/en-us/power-platform/admin/content-security-policy)
 
-### 2.4.3 License Requirements
+### License Requirements
 
 - N/A
 
-### 2.4.4 Implementation
+### Implementation
 
 1.  Sign in to [Make Power Apps](https://make.powerapps.com) (for GCC
     environments sign in to the [GCC Make Power
