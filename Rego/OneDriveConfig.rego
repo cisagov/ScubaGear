@@ -62,7 +62,7 @@ ReportDetails2_2(Policy) = Description if {
 
 tests[{
     "Requirement" : "An expiration date SHOULD be set for Anyone links",
-    "PolicyId" : "MS.ONEDRIVE.1.2v1",
+    "PolicyId" : "MS.ONEDRIVE.2.1v1",
     "Criticality" : "Should",
     "Commandlet" : ["Get-SPOTenant", "Get-PnPTenant"],
     "ActualValue" : [Policy.OneDriveSharingCapability, Policy.RequireAnonymousLinksExpireInDays],
@@ -87,7 +87,7 @@ tests[{
     "ReportDetails" : notCheckedDetails(PolicyId),
     "RequirementMet" : false
 }] {
-    PolicyId := "MS.ONEDRIVE.1.2v1"
+    PolicyId := "MS.ONEDRIVE.2.1v1"
     input.OneDrive_PnP_Flag
 }
 #--

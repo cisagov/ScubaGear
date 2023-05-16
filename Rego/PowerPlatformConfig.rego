@@ -321,6 +321,22 @@ tests[{
 #--
 
 #
+# MS.POWERPLATFORM.3.3v1
+#--
+tests[{
+    "PolicyId" : PolicyId,
+    "Criticality" : "Should/Not-Implemented",
+    "Commandlet" : [],
+    "ActualValue" : [],
+    "ReportDetails" : notCheckedDetails(PolicyId),
+    "RequirementMet" : false
+}] {
+    PolicyId := "MS.POWERPLATFORM.3.3v1"
+    true
+}
+#--
+
+#
 # MS.POWERPLATFORM.4.1v1
 #--
 # At this time we are unable to test for X because of Y

@@ -18,6 +18,21 @@ tests[{
     Status := Policy.DefaultSharingLinkType == 1
 }
 #--
+#
+# MS.SHAREPOINT.1.2v1
+#--
+tests[{
+    "PolicyId" : PolicyId,
+    "Criticality" : "Shall/Not-Implemented",
+    "Commandlet" : [],
+    "ActualValue" : [],
+    "ReportDetails" : notCheckedDetails(PolicyId),
+    "RequirementMet" : false
+}] {
+    PolicyId := "MS.SHAREPOINT.1.2v1"
+    true
+}
+#--
 
 #
 # MS.SHAREPOINT.1.3v1

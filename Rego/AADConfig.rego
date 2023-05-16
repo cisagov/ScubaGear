@@ -7,7 +7,6 @@ import data.report.utils.ReportDetailsBoolean
 ################
 # The report formatting functions below are generic and used throughout the policies #
 ################
-
 Description(String1, String2, String3) =  trim(concat(" ", [String1, String2, String3]), " ")
 
 ReportDetailsArray(Array, String) = Description(Format(Array), String, "")
@@ -368,7 +367,7 @@ tests[{
 #--
 tests[{
     "PolicyId": PolicyId,
-    "Criticality" : "Should/Not-Implemented",
+    "Criticality" : "Shall/Not-Implemented",
     "Commandlet" : [],
     "ActualValue" : [],
     "ReportDetails" : notCheckedDetails(PolicyId),
@@ -384,7 +383,7 @@ tests[{
 #--
 tests[{
     "PolicyId": PolicyId,
-    "Criticality" : "Should/Not-Implemented",
+    "Criticality" : "Shall/Not-Implemented",
     "Commandlet" : [],
     "ActualValue" : [],
     "ReportDetails" : notCheckedDetails(PolicyId),
@@ -441,7 +440,6 @@ tests[{
     DescriptionString := "authorization policies found that allow non-admin users to register third-party applications"
 }
 #--
-
 
 #
 # MS.AAD.7.1v1

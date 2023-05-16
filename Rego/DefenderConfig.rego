@@ -5,6 +5,8 @@ import data.report.utils.ReportDetailsBoolean
 
 ## Report details menu
 #
+# NOTE: Use report.utils package for common report formatting functions. 
+#
 # If you simply want a boolean "Requirement met" / "Requirement not met"
 # just call ReportDetailsBoolean(Status) and leave it at that.
 #
