@@ -99,6 +99,7 @@ The Publish to Web feature SHOULD be disabled unless the agency mission requires
 
 - N/A
 
+
 ### Implementation 
 
 ***Confirm Publish to web is disabled***
@@ -204,6 +205,7 @@ controls the ability to invite guest users through Power BI. See the
 *AAD Minimum Viable Secure Configuration Baseline* for more information
 on roles.
 
+
 ### Policy
 
 #### POWER.BI.3.1v1
@@ -224,6 +226,7 @@ The **Invite external users to your organization** feature SHOULD be disabled un
 ### License Requirements
 
 - N/A
+
 
 ### Implementation
 
@@ -270,6 +273,7 @@ permissions.
 - Instead of enabling service principals for the entire agency,
   implement for a dedicated security group.
 
+
 ### Policy
 
 #### POWER.BI.4.1v1
@@ -307,6 +311,7 @@ Service Principal credentials used for encrypting or accessing Power BI SHALL NO
 
 - N/A
 
+
 ### Implementation
 
 Standardize on a single authoritative identity and access management
@@ -329,6 +334,7 @@ principals and exclude it from the desired tenant settings.
 
 ## 5 ResourceKey Authentication
 
+
 This setting pertains to the security and development of Power BI
 embedded content. The Power BI tenant states that “for extra security,
 block using resource key-based authentication.” This baseline statement
@@ -348,6 +354,7 @@ to streaming and PUSH datasets using the API with a resource key.
 However, if developers have an approved need to leverage this feature,
 an exception to the policy can be investigated.
 
+
 ### Policy
 
 #### POWER.BI.5.1v1
@@ -365,6 +372,7 @@ ResourceKey Authentication SHOULD be blocked unless a specific use case (e.g., s
 
 - N/A
 
+
 ### Implementation
 
 1.  Under **Developer Settings** in the Power BI tenant admin portal,
@@ -380,6 +388,7 @@ time, a user is presented with a security warning message. Python and R
 visuals should only be enabled if the author and source are trusted, or
 after a code review of the Python/R script(s) in question is conducted
 and deems the scripts free of security risks.
+
 
 ### Policy
 
@@ -397,6 +406,7 @@ R and Python scripts MAY be allowed through organizational review.
 ### License Requirements
 
 - N/A
+
 
 ### Implementation
 
@@ -446,8 +456,8 @@ Sensitivity labels SHOULD be enabled for Power BI and employed for sensitive dat
   required to apply or view Microsoft Information Protection sensitivity
   labels in Power BI. Azure Information Protection can be purchased
   either standalone or through one of the Microsoft licensing suites.
-  See [Azure Information Protection
-  pricing](https://azure.microsoft.com/services/information-protection/) for
+  See [Azure Information Protection
+  pricing](https://azure.microsoft.com/services/information-protection/) for
   detail.
 
 - Azure Information Protection sensitivity labels need to be migrated to
@@ -464,6 +474,7 @@ Sensitivity labels SHOULD be enabled for Power BI and employed for sensitive dat
   their
   policies](https://docs.microsoft.com/en-us/microsoft-365/compliance/create-sensitivity-labels)
   for detail.
+
 
 ### Implementation 
 
@@ -515,6 +526,7 @@ enabled recording user and admin activity in the Office 365 Admin
 Portal, in which case this setting appears enabled but greyed out in the
 tenant settings.
 
+
 ### Policy
 
 #### POWER.BI.8.1v1
@@ -539,6 +551,7 @@ Power BI audit log generation SHALL be enabled in the Power BI tenant.
 ### License Requirements
 
 - N/A
+
 
 ### Implementation 
 
@@ -656,8 +669,8 @@ the agency.
   required to apply or view Microsoft Information Protection sensitivity
   labels in Power BI. Azure Information Protection can be purchased
   either standalone or through one of the Microsoft licensing suites.
-  See [Azure Information Protection
-  pricing](https://azure.microsoft.com/services/information-protection/) for
+  See [Azure Information Protection
+  pricing](https://azure.microsoft.com/services/information-protection/) for
   detail.
 
 - Azure Information Protection sensitivity labels need to be migrated to
