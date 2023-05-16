@@ -41,3 +41,4 @@ test_3rdParty_Correct_V3 if {
     Output := tests with input as { }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+}

@@ -108,3 +108,4 @@ test_Identity_Incorrect_V2 if {
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+}

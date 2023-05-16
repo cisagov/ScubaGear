@@ -156,3 +156,4 @@ test_GuestUserRoleId_Incorrect_V3 if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
+}

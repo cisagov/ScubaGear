@@ -1,5 +1,4 @@
 # Introduction
-# Introduction
 
 Microsoft Teams is a text and live chat workspace in Microsoft 365 that
 supports video calls, chat messaging, screen-sharing, and file sharing.
@@ -32,7 +31,6 @@ across Microsoft documentation):
     organization account, such as dial-in users.[^1]
 
 ## Assumptions
-## Assumptions
 
 The **License Requirements** sections of this document assume the
 organization is using an [M365
@@ -41,7 +39,6 @@ or [G3](https://www.microsoft.com/en-us/microsoft-365/government)
 license level. Therefore, only licenses not included in E3/G3 are
 listed.
 
-## Resources
 ## Resources
 
 **<u>License Compliance and Copyright</u>**
@@ -59,9 +56,7 @@ documents to develop innovative and scalable configuration standards to
 strengthen the security of widely used cloud-based software services.
 
 # Baseline
-# Baseline
 
-## 1. Requesting Control of Shared Desktops or Windows
 ## 1. Requesting Control of Shared Desktops or Windows
 
 This setting controls whether external meeting participants can request
@@ -69,7 +64,7 @@ control of the shared desktop or window during the meeting. In this
 instance, the term “external participants” includes external users, B2B
 guest users, unmanaged users and anonymous users.
 
-### Policy
+### Policies
 
 #### MS.TEAMS.1.1v1
 External participants SHOULD NOT be enabled to request control of shared desktops or windows in the Global (Org-wide default) meeting policy or in custom meeting policies if any exist.
@@ -84,17 +79,14 @@ need.
 - _Last modified:_ July 2023
 
 ### Resources
-### Resources
 
 - [Configure desktop sharing in Microsoft Teams \| Microsoft
   Docs](https://docs.microsoft.com/en-us/microsoftteams/configure-desktop-sharing)
 
 ### License Requirements
-### License Requirements
 
 - N/A
 
-### Implementation
 ### Implementation
 
 To ensure external participants do not have the ability to request
@@ -114,13 +106,12 @@ control of the shared desktop or window in the meeting:
     policy, selecting the appropriate policy in step 3.
 
 ## 2. Starting Teams Meetings
-## 2. Starting Teams Meetings
 
 This setting controls which meeting participants can start a meeting. In
 this instance, the term “anonymous users” refers to any Teams users
 joining calls that are not authenticated through the agency’s tenant.
 
-### Policy
+### Policies
 
 #### MS.TEAMS.2.1v1
 Anonymous users SHALL NOT be enabled to start meetings in the Global (Org-wide default) meeting policy or in custom meeting policies if any exist.
@@ -128,15 +119,12 @@ Anonymous users SHALL NOT be enabled to start meetings in the Global (Org-wide d
 - _Last modified:_ July 2023
 
 ### Resources
-### Resources
 - [Meeting policy settings - Participants & guests \| Microsoft
 Docs](https://docs.microsoft.com/en-us/microsoftteams/meeting-policies-participants-and-guests)
 
 ### License Requirements
-### License Requirements
 - N/A
 
-### Implementation
 ### Implementation
 To configure settings for anonymous users:
 
@@ -154,18 +142,17 @@ To configure settings for anonymous users:
     policy, selecting the appropriate policy in step 3.
 
 ## 3. Automatic Admittance into meetings
-## 3. Automatic Admittance into meetings
 This setting controls which meeting participants wait in the lobby
 before they are admitted to the meeting.
 
-### Policy
+### Policies
 
 #### MS.TEAMS.3.1v1
 Anonymous users, including dial-in users, SHOULD NOT be admitted automatically.
 - _Rationale:_ TODO add rationale.
 - _Last modified:_ July 2023
 
-#### MS.TEAMS.3.2v1X
+#### MS.TEAMS.3.2v1
 Internal users SHOULD be admitted automatically.
 - _Rationale:_ TODO add rationale.
 - _Last modified:_ July 2023
@@ -186,15 +173,12 @@ Custom meeting policies MAY be created that allow more flexibility for specific 
 - _Last modified:_ July 2023
 
 ### Resources
-### Resources
 - [Meeting policy settings - Participants & guests \| Microsoft
   Docs](https://docs.microsoft.com/en-us/microsoftteams/meeting-policies-participants-and-guests)
 
 ### License Requirements
-### License Requirements
 - N/A
 
-### Implementation
 ### Implementation
 To configure settings for automatic meeting admittance:
 
@@ -214,7 +198,6 @@ To configure settings for automatic meeting admittance:
 6.  If custom policies have been created, repeat these steps for each
     policy, selecting the appropriate policy in step 3.
 
-## 4. External User Access
 ## 4. External User Access
 
 External access allows external users to look up internal users by their
@@ -237,14 +220,13 @@ Importantly, this setting only pertains to external users (i.e., members
 of a different M365 tenant). Access for unmanaged users is controlled
 separately.
 
-### Policy
+### Policies
 
 #### MS.TEAMS.4.1v1
 External access SHALL only be enabled on a per-domain basis.
 - _Rationale:_ TODO add rationale.
 - _Last modified:_ July 2023
 
-### Resources
 ### Resources
 
 - [Manage external access in Microsoft Teams \| Microsoft
@@ -258,11 +240,9 @@ External access SHALL only be enabled on a per-domain basis.
   Docs](https://docs.microsoft.com/en-us/microsoftteams/communicate-with-users-from-other-organizations)
 
 ### License Requirements
-### License Requirements
 
 - N/A
 
-### Implementation
 ### Implementation
 
 To enable external access for only specific domains:
@@ -281,7 +261,6 @@ To enable external access for only specific domains:
 5.  Click **Save.**
 
 ## 5. Unmanaged User Access
-## 5. Unmanaged User Access
 
 Blocking contact with unmanaged Teams users prevents these users from
 looking up internal users by their email address and initiating chats
@@ -289,7 +268,7 @@ and calls within Teams. These users would still be able to join calls,
 assuming anonymous join is enabled. Additionally, unmanaged users may be
 added to Teams chats if the internal user initiates the contact.
 
-### Policy
+### Policies
 #### MS.TEAMS.5.1v1
 Unmanaged users SHALL NOT be enabled to initiate contact with internal
 users.
@@ -298,13 +277,10 @@ users.
 
 #### MS.TEAMS.5.2v1
 Internal users SHOULD NOT be enabled to initiate contact with unmanaged
-#### MS.TEAMS.5.2v1
-Internal users SHOULD NOT be enabled to initiate contact with unmanaged
 users.
 - _Rationale:_ TODO add rationale.
 - _Last modified:_ July 2023
 
-### Resources
 ### Resources
 
 - [Manage contact with external Teams users not managed by an organization
@@ -312,11 +288,9 @@ users.
 Docs](https://docs.microsoft.com/en-us/microsoftteams/manage-external-access#manage-contact-with-external-teams-users-not-managed-by-an-organization)
 
 ### License Requirements
-### License Requirements
 
 - N/A
 
-### Implementation
 ### Implementation
 
 Steps are outlined in [Manage contact with external Teams users not
@@ -343,18 +317,14 @@ organization](https://docs.microsoft.com/en-us/microsoftteams/manage-external-ac
 ## 6. Skype Users
 Microsoft officially retired Skype for Business Online on July 31, 2021, and it is no longer supported. Skype for Business 2015 is slated for Apr 11, 2023 and Skype for Business Server 2015, 2016, 2019 LTSC and Server 2019 is slated for Oct 14, 2025.
 
-### Policy
+### Policies
 
-#### MS.TEAMS.6.1v1
-Contact with Skype users SHALL be blocked.
-- _Rationale:_ Microsoft officially retired Skype for Business Online on July 31, 2021,
 #### MS.TEAMS.6.1v1
 Contact with Skype users SHALL be blocked.
 - _Rationale:_ Microsoft officially retired Skype for Business Online on July 31, 2021,
 and it is no longer supported.
 - _Last modified:_ July 2023
 
-### Resources
 ### Resources
 
 - [Communicate with Skype users \| Microsoft
@@ -364,11 +334,9 @@ Docs](https://docs.microsoft.com/en-us/microsoftteams/manage-external-access#com
 Blog](https://techcommunity.microsoft.com/t5/microsoft-teams-blog/skype-for-business-online-to-be-retired-in-2021/ba-p/777833)
 
 ### License Requirements
-### License Requirements
 
 - N/A
 
-### Implementation
 ### Implementation
 
 Instructions for *enabling* communications with Skype users are outlined
@@ -386,7 +354,6 @@ users](https://docs.microsoft.com/en-us/microsoftteams/manage-external-access#co
 4.  Click **Save**.
 
 ## 7. Teams Email Integration
-## 7. Teams Email Integration
 
 Teams provides an optional feature that allows channels to have an email
 address and receive email. These channel email addresses are not under
@@ -396,25 +363,22 @@ agencies do not have control over the security settings associated with
 this email. For this reason, email channel integration should be
 disabled.
 
-### Policy
+### Policies
 #### MS.TEAMS.7.1v1
 Teams email integration SHALL be disabled.
 - _Rationale:_ TODO
 - _Last modified:_ July 2023
 
 ### Resources
-### Resources
 
 - [Email Integration \| Microsoft
 Docs](https://docs.microsoft.com/en-us/microsoftteams/enable-features-office-365#email-integration)
 
 ### License Requirements
-### License Requirements
 
 - Teams email integration is only available with E3/E5 licenses. It is not
 available in GCC or DoD tenants.
 
-### Implementation
 ### Implementation
 
 To ensure that teams email integration is disabled:
@@ -428,7 +392,6 @@ To ensure that teams email integration is disabled:
     emails to a channel email address** to **Off**.
 
 ## 8. App Management
-## 8. App Management
 
 Teams is capable of integrating with the following classes of apps:
 
@@ -440,7 +403,7 @@ Teams store.
 *Custom apps*: apps not published to the Teams store, such as apps under
 development, that users “sideload” into Teams.
 
-### Policy
+### Policies
 
 #### MS.TEAMS.8.1v1
 Agencies SHOULD allow all apps published by Microsoft, but MAY block specific Microsoft apps as needed.
@@ -458,7 +421,6 @@ Agencies SHALL establish policy dictating the app review and approval process to
 - _Last modified:_ July 2023
 
 ### Resources
-### Resources
 
 - [Manage app permission policies in Microsoft Teams \| Microsoft
 Docs](https://docs.microsoft.com/en-us/microsoftteams/teams-app-permission-policies)
@@ -467,11 +429,9 @@ Docs](https://docs.microsoft.com/en-us/microsoftteams/teams-app-permission-polic
 Docs](https://docs.microsoft.com/en-us/microsoftteams/platform/concepts/deploy-and-publish/apps-upload)
 
 ### License Requirements
-### License Requirements
 
 - N/A
 
-### Implementation
 ### Implementation
 
 To restrict which Team apps can be installed:
@@ -501,14 +461,13 @@ To restrict which Team apps can be installed:
     policy, selecting the appropriate policy in step 3.
 
 ## 9. Cloud Recording of Teams Meetings
-## 9. Cloud Recording of Teams Meetings
 
 This setting determines whether video can be recorded in meetings hosted
 by a user, during one-on-one calls, and on group calls started by a
 user. Agencies should comply with any other applicable policies or
 legislation in addition to this guidance.
 
-### Policy
+### Policies
 
 #### MS.TEAMS.9.1v1
 Cloud video recording SHOULD be disabled in the global (org-wide default) meeting policy.
@@ -526,7 +485,6 @@ For all meeting polices that allow cloud recording, recordings SHOULD be stored 
 - _Last modified:_ July 2023
 
 ### Resources
-### Resources
 
 - [Teams cloud meeting recording \| Microsoft
 Docs](https://docs.microsoft.com/en-us/microsoftteams/cloud-recording)
@@ -535,11 +493,9 @@ Docs](https://docs.microsoft.com/en-us/microsoftteams/cloud-recording)
 Docs](https://docs.microsoft.com/en-us/microsoftteams/policy-assignment-overview)
 
 ### License Requirements
-### License Requirements
 
 - N/A
 
-### Implementation
 ### Implementation
 
 To configure the Meeting policies for cloud video recording:
@@ -585,30 +541,26 @@ record meetings:
 9.  Select **Apply**.
 
 ## 10. Recording of Live Events
-## 10. Recording of Live Events
 
 Live events are recorded by default. Agencies should increase their
 privacy by changing the policy so that events are only recorded at the
 organizer’s discretion.
 
-### Policy
+### Policies
 #### MS.TEAMS.10.1v1
 Record an event SHOULD be set to Organizer can record.
 - _Rationale:_ TODO
 - _Last modified:_ July 2023
 
 ### Resources
-### Resources
 
 - [Live Event Recording Policies \| Microsoft
 Docs](https://docs.microsoft.com/en-us/microsoftteams/teams-live-events/live-events-recording-policies)
 
 ### License Requirements
-### License Requirements
 
 - N/A
 
-### Implementation
 ### Implementation
 
 1.  Sign in to the **[Microsoft Teams admin
@@ -622,7 +574,6 @@ Docs](https://docs.microsoft.com/en-us/microsoftteams/teams-live-events/live-eve
 
 5.  Click **Save**.
 
-## 11. Data Loss Prevention
 ## 11. Data Loss Prevention
 
 Data loss prevention (DLP) helps prevent both accidental leakage of
@@ -641,7 +592,7 @@ Minimum Viable Secure Configuration Baseline*. The DLP solution selected
 by an agency should offer services comparable to those offered by
 Microsoft.
 
-### Policy
+### Policies
 
 #### MS.TEAMS.11.1v1
 A DLP solution SHALL be enabled.
@@ -660,8 +611,6 @@ Agencies SHOULD use either the native DLP solution offered by Microsoft or a DLP
 
 #### MS.TEAMS.11.4v1
 The DLP solution SHALL protect Personally Identifiable Information (PII)
-#### MS.TEAMS.11.4v1
-The DLP solution SHALL protect Personally Identifiable Information (PII)
 and sensitive information, as defined by the agency. At a minimum, the
 sharing of credit card numbers, taxpayer Identification Numbers (TIN),
 and Social Security Numbers (SSN) via email SHALL be restricted.
@@ -669,12 +618,10 @@ and Social Security Numbers (SSN) via email SHALL be restricted.
 - _Last modified:_ July 2023
 
 ### Resources
-### Resources
 
 - The “Data Loss Prevention SHALL Be Enabled” section of the *Defender for
 Office 365 Minimum Viable Secure Configuration Baseline*.
 
-## 12. Attachment Scanning
 ## 12. Attachment Scanning
 
 Though any product that fills the requirements outlined in this baseline
@@ -683,7 +630,7 @@ Microsoft Defender, see the “Data Loss Prevention SHALL Be Enabled”
 section of the *Defender for Office 365 Minimum Viable Secure
 Configuration Baseline*.
 
-### Policy
+### Policies
 
 #### MS.TEAMS.12.1v1
 Attachments included with Teams messages SHOULD be scanned for malware.
@@ -696,12 +643,10 @@ Users SHOULD be prevented from opening or downloading files detected as malware.
 - _Last modified:_ July 2023
 
 ### Resources
-### Resources
 
 - The “Data Loss Prevention SHALL Be Enabled” section of the *Defender for
 Office 365 Minimum Viable Secure Configuration Baseline.*
 
-## 13. Link Protection
 ## 13. Link Protection
 
 Microsoft Defender protects users from malicious links included in Teams
@@ -728,7 +673,7 @@ in the “Safe Links Policies SHALL Be Enabled” and “Safe Links in Global
 Settings SHALL be Configured” sections of the *Defender for Office 365
 Minimum Viable Secure Configuration Baseline.*
 
-### Policy
+### Policies
 
 #### MS.TEAMS.13.1v1
 URL comparison with a block-list SHOULD be enabled.
@@ -745,7 +690,6 @@ User click tracking SHOULD be enabled.
 - _Rationale:_ TODO
 - _Last modified:_ July 2023
 
-### Resources
 ### Resources
 
 - The “Safe Links Policies SHALL Be Enabled” section of the *Defender for

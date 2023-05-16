@@ -3,6 +3,7 @@ import future.keywords
 import data.report.utils.notCheckedDetails
 import data.report.utils.ReportDetailsBoolean
 
+#--
 #
 # MS.ONEDRIVE.1.1v1
 #--
@@ -12,7 +13,6 @@ AnyoneLinksPolicy[Policy]{
 }
 
 tests[{
-    "Requirement" : "Anyone links SHOULD be disabled",
     "PolicyId" : "MS.ONEDRIVE.1.1v1",
     "Criticality" : "Should",
     "Commandlet" : ["Get-SPOTenant", "Get-PnPTenant"],
@@ -27,7 +27,6 @@ tests[{
 #--
 
 tests[{
-    "Requirement" : "Anyone links SHOULD be disabled",
     "PolicyId" : PolicyId,
     "Criticality" : "Should/Not-Implemented",
     "Commandlet" : [],
@@ -41,7 +40,7 @@ tests[{
 #--
 
 #
-# MS.ONEDRIVE.1.2v1
+# MS.ONEDRIVE.2.1v1
 #--
 ReportDetails2_2(Policy) = Description if {
     Policy.OneDriveSharingCapability != 2
@@ -61,7 +60,6 @@ ReportDetails2_2(Policy) = Description if {
 }
 
 tests[{
-    "Requirement" : "An expiration date SHOULD be set for Anyone links",
     "PolicyId" : "MS.ONEDRIVE.2.1v1",
     "Criticality" : "Should",
     "Commandlet" : ["Get-SPOTenant", "Get-PnPTenant"],
@@ -79,7 +77,6 @@ tests[{
 }
 
 tests[{
-    "Requirement" : "An expiration date SHOULD be set for Anyone links",
     "PolicyId" : PolicyId,
     "Criticality" : "Should/Not-Implemented",
     "Commandlet" : [],
@@ -93,7 +90,23 @@ tests[{
 #--
 
 #
-# MS.ONEDRIVE.1.3v1
+# MS.ONEDRIVE.2.2v1
+#--
+tests[{
+    "PolicyId" : PolicyId,
+    "Criticality" : "Shall/Not-Implemented",
+    "Commandlet" : [],
+    "ActualValue" : [],
+    "ReportDetails" : notCheckedDetails(PolicyId),
+    "RequirementMet" : false
+}] {
+    PolicyId := "MS.ONEDRIVE.2.2v1"
+    true
+}
+#--
+
+#
+# MS.ONEDRIVE.3.1v1
 #--
 ReportDetails2_3(Policy) = Description if {
     Policy.OneDriveSharingCapability != 2
@@ -129,8 +142,7 @@ ReportDetails2_3(Policy) = Description if {
 }
 
 tests[{
-    "Requirement" : "Anyone link permissions SHOULD be limited to View",
-    "PolicyId" : "MS.ONEDRIVE.1.3v1",
+    "PolicyId" : "MS.ONEDRIVE.3.1v1",
     "Criticality" : "Should",
     "Commandlet" : ["Get-SPOTenant", "Get-PnPTenant"],
     "ActualValue" : [Policy.OneDriveSharingCapability, Policy.FileAnonymousLinkType, Policy.FolderAnonymousLinkType],
@@ -147,7 +159,6 @@ tests[{
 }
 
 tests[{
-    "Requirement" : "Anyone link permissions SHOULD be limited to View",
     "PolicyId" : PolicyId,
     "Criticality" : "Should/Not-Implemented",
     "Commandlet" : [],
@@ -155,13 +166,13 @@ tests[{
     "ReportDetails" : notCheckedDetails(PolicyId),
     "RequirementMet" : false
 }] {
-    PolicyId := "MS.ONEDRIVE.1.3v1"
+    PolicyId := "MS.ONEDRIVE.3.1v1"
     input.OneDrive_PnP_Flag
 }
 #--
 
 #
-# MS.ONEDRIVE.2.1v1
+# MS.ONEDRIVE.4.1v1
 #--
 DefinedDomainsPolicy[Policy]{
     Policy := input.Tenant_sync_info[_]
@@ -169,7 +180,7 @@ DefinedDomainsPolicy[Policy]{
 }
 
 tests[{
-    "PolicyId" : "MS.ONEDRIVE.2.1v1",
+    "PolicyId" : "MS.ONEDRIVE.4.1v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-SPOTenant", "Get-PnPTenant"],
     "ActualValue" : Policies,
@@ -182,7 +193,7 @@ tests[{
 #--
 
 #
-# MS.ONEDRIVE.2.3v1
+# MS.ONEDRIVE.5.1v1
 #--
 ClientSyncPolicy[Policy]{
     Policy := input.Tenant_sync_info[_]
@@ -190,7 +201,8 @@ ClientSyncPolicy[Policy]{
 }
 
 tests[{
-    "PolicyId" : "MS.ONEDRIVE.2.3v1",
+    "Requirement" : "OneDrive Client Sync SHALL only be allowed only within the local domain",
+    "PolicyId" : "MS.ONEDRIVE.5.1v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-SPOTenantSyncClientRestriction", "Get-PnPTenantSyncClientRestriction"],
     "ActualValue" : Policies,
@@ -203,9 +215,8 @@ tests[{
 #--
 
 #
-# MS.ONEDRIVE.2.2v1
+# MS.ONEDRIVE.6.1v1
 #--
-# At this time we are unable to test for X because of Y
 tests[{
     "PolicyId" : PolicyId,
     "Criticality" : "Shall/Not-Implemented",
@@ -214,15 +225,14 @@ tests[{
     "ReportDetails" : notCheckedDetails(PolicyId),
     "RequirementMet" : false
 }] {
-    PolicyId := "MS.ONEDRIVE.2.2v1"
+    PolicyId := "MS.ONEDRIVE.6.1v1"
     true
 }
 #--
 
 #
-# MS.ONEDRIVE.3.1v1
+# MS.ONEDRIVE.7.1v1
 #--
-# At this time we are unable to test for X because of Y
 tests[{
     "PolicyId" : PolicyId,
     "Criticality" : "Shall/Not-Implemented",
@@ -231,7 +241,7 @@ tests[{
     "ReportDetails" : notCheckedDetails(PolicyId),
     "RequirementMet" : false
 }] {
-    PolicyId := "MS.ONEDRIVE.3.1v1"
+    PolicyId := "MS.ONEDRIVE.7.1v1"
     true
 }
 #--
