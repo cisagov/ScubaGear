@@ -2,8 +2,7 @@ package report.utils
 import future.keywords
 
 #
-baselineVersion := "AutoBaselineSync"
-#baselineVersion := input.module_version # Baseline version is pinned to a module version
+baselineVersion := input.module_version # Baseline version is pinned to a module version
 scubaBaseUrl := sprintf("https://github.com/cisagov/ScubaGear/blob/%v/baselines/", [baselineVersion])
 
 ################

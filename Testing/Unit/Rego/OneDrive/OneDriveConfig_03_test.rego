@@ -1,12 +1,13 @@
 package onedrive
 import future.keywords
 import data.report.utils.notCheckedDetails
+import data.report.utils.ReportDetailsBoolean
 
 #
 # Policy 1
 #--
 test_DefaultLinkPermission_Correct_V1 if {
-    PolicyId := "MS.ONEDRIVE.1.3v1"
+    PolicyId := "MS.ONEDRIVE.3.1v1"
 
     Output := tests with input as {
         "SPO_tenant_info": [
@@ -26,7 +27,7 @@ test_DefaultLinkPermission_Correct_V1 if {
 }
 
 test_DefaultLinkPermission_Correct_V2 if {
-    PolicyId := "MS.ONEDRIVE.1.3v1"
+    PolicyId := "MS.ONEDRIVE.3.1v1"
 
     Output := tests with input as {
         "SPO_tenant_info": [
@@ -42,11 +43,11 @@ test_DefaultLinkPermission_Correct_V2 if {
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement met"
+    RuleOutput[0].ReportDetails == ReportDetailsBoolean(true)
 }
 
 test_DefaultLinkPermission_Correct_V2 if {
-    PolicyId := "MS.ONEDRIVE.1.3v1"
+    PolicyId := "MS.ONEDRIVE.3.1v1"
 
     Output := tests with input as {
         "SPO_tenant_info": [
@@ -62,11 +63,11 @@ test_DefaultLinkPermission_Correct_V2 if {
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement met"
+    RuleOutput[0].ReportDetails == ReportDetailsBoolean(true)
 }
 
 test_DefaultLinkPermission_Incorrect if {
-    PolicyId := "MS.ONEDRIVE.1.3v1"
+    PolicyId := "MS.ONEDRIVE.3.1v1"
 
     Output := tests with input as {
         "SPO_tenant_info": [
@@ -86,7 +87,7 @@ test_DefaultLinkPermission_Incorrect if {
 }
 
 test_DefaultLinkPermission_Incorrect_V2 if {
-    PolicyId := "MS.ONEDRIVE.1.3v1"
+    PolicyId := "MS.ONEDRIVE.3.1v1"
 
     Output := tests with input as {
         "SPO_tenant_info": [
@@ -106,7 +107,7 @@ test_DefaultLinkPermission_Incorrect_V2 if {
 }
 
 test_DefaultLinkPermission_Incorrect_V3 if {
-    PolicyId := "MS.ONEDRIVE.1.3v1"
+    PolicyId := "MS.ONEDRIVE.3.1v1"
 
     Output := tests with input as {
         "SPO_tenant_info": [
@@ -126,7 +127,7 @@ test_DefaultLinkPermission_Incorrect_V3 if {
 }
 
 test_UsingServicePrincipal if {
-    PolicyId := "MS.ONEDRIVE.1.3v1"
+    PolicyId := "MS.ONEDRIVE.3.1v1"
 
     Output := tests with input as {
         "SPO_tenant_info": [

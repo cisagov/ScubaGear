@@ -6,7 +6,7 @@ import data.report.utils.notCheckedDetails
 # Policy 1
 #--
 test_NotImplemented_Correct if {
-    PolicyId := "MS.ONEDRIVE.2.2v1"
+    PolicyId := "MS.ONEDRIVE.6.1v1"
 
     Output := tests with input as { }
 

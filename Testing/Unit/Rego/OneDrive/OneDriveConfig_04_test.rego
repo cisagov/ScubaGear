@@ -1,12 +1,12 @@
 package onedrive
 import future.keywords
-
+import data.report.utils.ReportDetailsBoolean
 
 #
-# Policy 1
+# MS.ONEDRIVE.4.1v1
 #--
 test_AllowedDomainList_Correct_V1 if {
-    PolicyId := "MS.ONEDRIVE.2.1v1"
+    PolicyId := "MS.ONEDRIVE.4.1v1"
 
     Output := tests with input as {
         "Tenant_sync_info": [
@@ -22,11 +22,11 @@ test_AllowedDomainList_Correct_V1 if {
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement met"
+    RuleOutput[0].ReportDetails == ReportDetailsBoolean(true)
 }
 
 test_AllowedDomainList_Correct_V2 if {
-    PolicyId := "MS.ONEDRIVE.2.1v1"
+    PolicyId := "MS.ONEDRIVE.4.1v1"
 
     Output := tests with input as {
         "Tenant_sync_info": [
@@ -44,11 +44,11 @@ test_AllowedDomainList_Correct_V2 if {
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement met"
+    RuleOutput[0].ReportDetails == ReportDetailsBoolean(true)
 }
 
 test_AllowedDomainList_Incorrect if {
-    PolicyId := "MS.ONEDRIVE.2.1v1"
+    PolicyId := "MS.ONEDRIVE.4.1v1"
 
     Output := tests with input as {
         "Tenant_sync_info": [
@@ -62,5 +62,5 @@ test_AllowedDomainList_Incorrect if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement not met"
+    RuleOutput[0].ReportDetails == ReportDetailsBoolean(false)
 }

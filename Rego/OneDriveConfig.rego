@@ -94,14 +94,14 @@ tests[{
 #--
 tests[{
     "PolicyId" : PolicyId,
-    "Criticality" : "Shall/Not-Implemented",
+    "Criticality" : "Should/Not-Implemented",
     "Commandlet" : [],
     "ActualValue" : [],
     "ReportDetails" : notCheckedDetails(PolicyId),
     "RequirementMet" : false
 }] {
     PolicyId := "MS.ONEDRIVE.2.2v1"
-    true
+    input.OneDrive_PnP_Flag
 }
 #--
 
