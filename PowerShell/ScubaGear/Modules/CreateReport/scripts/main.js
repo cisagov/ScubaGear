@@ -13,8 +13,7 @@ const colorRows = () => {
                 rows[i].style.background = "var(--test-other)";
             }
             else if (rows[i].children[statusCol].innerHTML.startsWith("Bug")){
-                rows[i].style.color = "var(--test-bug-color)";
-                rows[i].style.background = "var(--test-other)";
+                rows[i].style.background = "var(--test-bug-color)";
             }
             else if (rows[i].children[statusCol].innerHTML === "Fail") {
                 rows[i].style.background = "var(--test-fail)";

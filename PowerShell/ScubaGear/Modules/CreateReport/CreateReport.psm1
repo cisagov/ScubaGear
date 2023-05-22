@@ -143,7 +143,7 @@ function New-Report {
         $Number = $BaselineName.ToUpper() + '-' + $BaselineGroup.GroupNumber
         $Name = $BaselineGroup.GroupName
         $GroupAnchor = New-MarkdownAnchor -GroupNumber $BaselineGroup.GroupNumber -GroupName $BaselineGroup.GroupName
-        $MarkdownLink = "<a href=`"$($ScubaGitHubUrl)/blob/$($SettingsExport.module_version)/baselines/$($BaselineName.ToLower()).md#$GroupAnchor`">$Name</a>"
+        $MarkdownLink = "<a class='control_group' href=`"$($ScubaGitHubUrl)/blob/$($SettingsExport.module_version)/baselines/$($BaselineName.ToLower()).md#$GroupAnchor`" target=`"_blank`">$Name</a>"
         $Fragments += $Fragment | ConvertTo-Html -PreContent "<h2>$Number $MarkdownLink</h2>" -Fragment
     }
 
@@ -281,5 +281,6 @@ function New-MarkdownAnchor{
 }
 
 Export-ModuleMember -Function @(
-    'New-Report'
+    'New-Report',
+    'Import-SecureBaseline'
 )
