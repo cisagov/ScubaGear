@@ -1,5 +1,6 @@
 package teams
 import future.keywords
+import data.report.utils.NotCheckedDetails
 
 
 #
@@ -335,5 +336,5 @@ test_3rdParty_Correct if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == sprintf("Cannot be checked automatically. See Microsoft Teams Secure Configuration Baseline policy %v for instructions on manual check", [PolicyId])
+    RuleOutput[0].ReportDetails == NotCheckedDetails(PolicyId)
 }

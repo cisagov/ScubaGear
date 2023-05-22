@@ -2,8 +2,6 @@ package aad
 import future.keywords
 import data.report.utils.NotCheckedDetails
 
-#
-# Policy 1
 #--
 test_NotImplemented_Correct_V1 if {
     PolicyId := "MS.AAD.5.1v1"
@@ -17,8 +15,6 @@ test_NotImplemented_Correct_V1 if {
     RuleOutput[0].ReportDetails == NotCheckedDetails(PolicyId)
 }
 
-#
-# Policy 2
 #--
 test_NotImplemented_Correct_V2 if {
     PolicyId := "MS.AAD.5.4v1"
