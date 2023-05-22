@@ -39,12 +39,16 @@ function New-Report {
 
         [Parameter(Mandatory=$true)]
         [switch]
-        $DarkMode
+        $DarkMode,
+
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNull()]
+        [object]
+        $SecureBaselines
     )
 
     $ScubaGitHubUrl = "https://github.com/cisagov/ScubaGear"
 
-    $SecureBaselines =  Import-SecureBaseline
     $ProductSecureBaseline = $SecureBaselines.$BaselineName
 
     $FileName = Join-Path -Path $OutPath -ChildPath "$($OutProviderFileName).json"

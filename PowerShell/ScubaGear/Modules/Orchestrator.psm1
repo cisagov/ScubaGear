@@ -714,6 +714,8 @@ function Invoke-ReportCreation {
             $Images = Join-Path -Path $ReporterPath -ChildPath "images" -ErrorAction 'Stop'
             Copy-Item -Path $Images -Destination $IndividualReportPath -Force -Recurse -ErrorAction 'Stop'
 
+            $SecureBaselines =  Import-SecureBaseline
+
             foreach ($Product in $ProductNames) {
                 $BaselineName = $ArgToProd[$Product]
                 $N += 1
@@ -738,6 +740,7 @@ function Invoke-ReportCreation {
                     'OutProviderFileName' = $OutProviderFileName;
                     'OutRegoFileName' = $OutRegoFileName;
                     'DarkMode' = $DarkMode;
+                    'SecureBaselines' = $SecureBaselines
                 }
 
                 $Report = New-Report @CreateReportParams
