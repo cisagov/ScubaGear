@@ -52,6 +52,7 @@ function Get-TeamsTenantDetail {
     param (
         [Parameter(Mandatory = $true)]
         [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $false)]
+        [ValidateNotNullOrEmpty()]
         [string]
         $M365Environment
     )

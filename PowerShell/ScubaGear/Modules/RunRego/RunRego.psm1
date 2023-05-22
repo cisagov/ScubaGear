@@ -10,18 +10,22 @@ function Invoke-Rego {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory = $true)]
+        [ValidateScript({Test-Path -PathType Leaf $_})]
         [string]
         $InputFile,
 
         [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
         [string]
         $RegoFile,
 
         [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
         [string]
         $PackageName,
 
         # The path to the OPA executable. Defaults to the current directory.
+        [ValidateNotNullOrEmpty()]
         [string]
         $OPAPath = $PSScriptRoot
     )

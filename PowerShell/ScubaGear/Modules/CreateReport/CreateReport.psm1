@@ -10,34 +10,43 @@ function New-Report {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [ValidateSet("Teams", "EXO", "Defender", "AAD", "PowerPlatform", "SharePoint", "OneDrive", IgnoreCase = $false)]
         [string]
         $BaselineName,
 
         [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [ValidateSet("Microsoft Teams", "Exchange Online", "Microsoft 365 Defender", "Azure Active Directory", "Microsoft Power Platform", "SharePoint Online", "OneDrive for Business", IgnoreCase = $false)]
         [string]
         $FullName,
 
         # The location to save the html report in.
         [Parameter(Mandatory=$true)]
         [ValidateScript({Test-Path -PathType Container $_})]
+        [ValidateNotNullOrEmpty()]
         [string]
         $IndividualReportPath,
 
         # The location to save the html report in.
         [Parameter(Mandatory=$true)]
         [ValidateScript({Test-Path -PathType Container $_})]
+        [ValidateScript({Test-Path -IsValid $_})]
         [string]
         $OutPath,
 
         [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
         [string]
         $OutProviderFileName,
 
         [Parameter(Mandatory=$true)]
+        [ValidateScript({Test-Path -IsValid $_})]
         [string]
         $OutRegoFileName,
 
         [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
         [switch]
         $DarkMode
     )
