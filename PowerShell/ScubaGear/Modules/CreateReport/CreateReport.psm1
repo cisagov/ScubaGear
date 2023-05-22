@@ -195,6 +195,13 @@ function New-Report {
 }
 
 function Import-SecureBaseline{
+    <#
+    .Description
+    This function parses the secure baseline via each product markdown document to align policy with the
+    software baseline.
+    .Functionality
+    Internal
+    #>
     [CmdletBinding()]
     param (
         [Parameter(Mandatory = $false)]
