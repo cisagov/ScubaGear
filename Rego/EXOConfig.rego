@@ -1,6 +1,6 @@
 package exo
 import future.keywords
-import data.report.utils.notCheckedDetails
+import data.report.utils.NotCheckedDetails
 import data.report.utils.Format
 import data.report.utils.ReportDetailsBoolean
 import data.report.utils.Description
@@ -57,7 +57,7 @@ tests[{
     "Criticality" : "Shall/Not-Implemented",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : notCheckedDetails(PolicyId),
+    "ReportDetails" : NotCheckedDetails(PolicyId),
     "RequirementMet" : false
 }] {
     PolicyId := "MS.EXO.2.1v1"

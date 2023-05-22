@@ -1,6 +1,6 @@
 package aad
 import future.keywords
-import data.report.utils.notCheckedDetails
+import data.report.utils.NotCheckedDetails
 import data.report.utils.Format
 import data.report.utils.ReportDetailsBoolean
 
@@ -207,7 +207,7 @@ tests[{
     "Criticality" : "Should/Not-Implemented",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : notCheckedDetails(PolicyId),
+    "ReportDetails" : NotCheckedDetails(PolicyId),
     "RequirementMet" : false
 }] {
     PolicyId := "MS.AAD.2.2v1"
@@ -301,7 +301,7 @@ tests[{
     "Criticality" : "Shall/Not-Implemented",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : notCheckedDetails(PolicyId),
+    "ReportDetails" : NotCheckedDetails(PolicyId),
     "RequirementMet" : false
 }] {
     PolicyId := "MS.AAD.4.2v1"
@@ -319,7 +319,7 @@ tests[{
     "Criticality" : "Shall/Not-Implemented",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : notCheckedDetails(PolicyId),
+    "ReportDetails" : NotCheckedDetails(PolicyId),
     "RequirementMet" : false
 }] {
     PolicyId := "MS.AAD.4.3v1"
@@ -337,7 +337,7 @@ tests[{
     "Criticality" : "Shall/Not-Implemented",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : notCheckedDetails(PolicyId),
+    "ReportDetails" : NotCheckedDetails(PolicyId),
     "RequirementMet" : false
 }] {
     PolicyId := "MS.AAD.4.4v1"
@@ -355,7 +355,7 @@ tests[{
     "Criticality" : "Shall/Not-Implemented",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : notCheckedDetails(PolicyId),
+    "ReportDetails" : NotCheckedDetails(PolicyId),
     "RequirementMet" : false
 }] {
     PolicyId := "MS.AAD.5.1v1"
@@ -371,7 +371,7 @@ tests[{
     "Criticality" : "Should/Not-Implemented",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : notCheckedDetails(PolicyId),
+    "ReportDetails" : NotCheckedDetails(PolicyId),
     "RequirementMet" : false
 }] {
     PolicyId := "MS.AAD.5.2v1"
@@ -387,7 +387,7 @@ tests[{
     "Criticality" : "Should/Not-Implemented",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : notCheckedDetails(PolicyId),
+    "ReportDetails" : NotCheckedDetails(PolicyId),
     "RequirementMet" : false
 }] {
     PolicyId := "MS.AAD.5.3v1"
@@ -404,7 +404,7 @@ tests[{
     "Criticality" : "Shall/Not-Implemented",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : notCheckedDetails(PolicyId),
+    "ReportDetails" : NotCheckedDetails(PolicyId),
     "RequirementMet" : false
 }] {
     PolicyId := "MS.AAD.5.4v1"
@@ -553,7 +553,7 @@ tests[{
     "Criticality" : "Shall/Not-Implemented",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : notCheckedDetails(PolicyId),
+    "ReportDetails" : NotCheckedDetails(PolicyId),
     "RequirementMet" : false
 }] {
     PolicyId := "MS.AAD.8.1v1"
@@ -980,7 +980,7 @@ tests[{
     "Criticality" : "Should/Not-Implemented",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : notCheckedDetails(PolicyId),
+    "ReportDetails" : NotCheckedDetails(PolicyId),
     "RequirementMet" : false
 }] {
     PolicyId := "MS.AAD.18.2v1"

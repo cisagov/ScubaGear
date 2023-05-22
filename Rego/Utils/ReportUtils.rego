@@ -2,33 +2,33 @@ package report.utils
 import future.keywords
 
 #
-baselineVersion() := moduleVersion if {
+BaselineVersion() := moduleVersion if {
     not input.module_version
     moduleVersion := "main" 
 }
 
-baselineVersion() := moduleVersion if {
+BaselineVersion() := moduleVersion if {
     moduleVersion := input.module_version
 }
 
 #baselineVersion := "3.0.0." # Baseline version is pinned to a module version
-scubaBaseUrl := sprintf("https://github.com/cisagov/ScubaGear/blob/%v/baselines/", [baselineVersion()])
+ScubaBaseUrl := sprintf("https://github.com/cisagov/ScubaGear/blob/%v/baselines/", [BaselineVersion()])
 
 ################
 # Helper functions for this file
 ################
 
-policyAnchor(PolicyId) := anchor if {
+PolicyAnchor(PolicyId) := anchor if {
     anchor := sprintf("#%v", [replace(lower(PolicyId), ".", "")])
 }
 
-policyProduct(PolicyId) := product if {
+PolicyProduct(PolicyId) := product if {
     dotIndexes := indexof_n(PolicyId, ".")
     product := lower(substring(PolicyId, 3, dotIndexes[1]-dotIndexes[0]-1))
 }
 
-policyLink(PolicyId) := link if {
-    link := sprintf("<a href=\"%v%v.md%v\" target=\"_blank\">Secure Configuration Baseline policy</a>", [scubaBaseUrl, policyProduct(PolicyId), policyAnchor(PolicyId)])
+PolicyLink(PolicyId) := link if {
+    link := sprintf("<a href=\"%v%v.md%v\" target=\"_blank\">Secure Configuration Baseline policy</a>", [ScubaBaseUrl, PolicyProduct(PolicyId), PolicyAnchor(PolicyId)])
 }
 
 ################
@@ -36,8 +36,8 @@ policyLink(PolicyId) := link if {
 ################
 
 #
-notCheckedDetails(PolicyId) := details if {
-    link := policyLink(PolicyId)
+NotCheckedDetails(PolicyId) := details if {
+    link := PolicyLink(PolicyId)
     details := sprintf("Not currently checked automatically. See %v for instructions on manual check", [link])
 }
  

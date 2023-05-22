@@ -56,56 +56,58 @@ test_Identity_Incorrect_V1 if {
     RuleOutput[0].ReportDetails == "The Standard Preset Security Policy is present and not disabled"
 }
 
-#
+# TODO: Policy Id needs to be resolved
 # Policy 2
 #--
-test_Identity_Correct_V1 if {
-    PolicyId := "MS.DEFENDER.TBD"
-    #Requirement := "Strict Preset security profiles SHOULD NOT be used"
+# test_Identity_Correct_V1 if {
+#     PolicyId := "MS.DEFENDER.TBD"
+#     #Requirement := "Strict Preset security profiles SHOULD NOT be used"
 
-    Output := tests with input as {  
-        "protection_policy_rules" : [] 
-    }
+#     Output := tests with input as {  
+#         "protection_policy_rules" : [] 
+#     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+#     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement met"
-}
+#     count(RuleOutput) == 1
+#     RuleOutput[0].RequirementMet
+#     RuleOutput[0].ReportDetails == "Requirement met"
+# }
 
-test_Identity_Correct_V2 if {
-    PolicyId := "MS.DEFENDER.TBD"
-    #Requirement := "Strict Preset security profiles SHOULD NOT be used"
+# TODO: Policy Id needs to be resolved
+# test_Identity_Correct_V2 if {
+#     PolicyId := "MS.DEFENDER.TBD"
+#     #Requirement := "Strict Preset security profiles SHOULD NOT be used"
 
-    Output := tests with input as {  
-        "protection_policy_rules" : [
-            {
-                "Identity" : "Strict Preset Security Policy",
-                "State" : "Disabled"
-            }
-        ] 
-    }
+#     Output := tests with input as {  
+#         "protection_policy_rules" : [
+#             {
+#                 "Identity" : "Strict Preset Security Policy",
+#                 "State" : "Disabled"
+#             }
+#         ] 
+#     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+#     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement met"
-}
+#     count(RuleOutput) == 1
+#     RuleOutput[0].RequirementMet
+#     RuleOutput[0].ReportDetails == "Requirement met"
+# }
 
-test_Identity_Incorrect_V2 if {
-    PolicyId := "MS.DEFENDER.TBD"
-    #Requirement := "Strict Preset security profiles SHOULD NOT be used"
+# TODO: Policy Id needs to be resolved
+# test_Identity_Incorrect_V2 if {
+#     PolicyId := "MS.DEFENDER.TBD"
+#     #Requirement := "Strict Preset security profiles SHOULD NOT be used"
 
-    Output := tests with input as {  
-        "protection_policy_rules" : [
-            {
-                "Identity" : "Strict Preset Security Policy",
-                "State" : "Enabled"
-            }
-        ] 
-    }
+#     Output := tests with input as {  
+#         "protection_policy_rules" : [
+#             {
+#                 "Identity" : "Strict Preset Security Policy",
+#                 "State" : "Enabled"
+#             }
+#         ] 
+#     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-}
+#     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+# }

@@ -1,6 +1,6 @@
 package sharepoint
 import future.keywords
-import data.report.utils.notCheckedDetails
+import data.report.utils.NotCheckedDetails
 import data.report.utils.ReportDetailsBoolean
 
 #
@@ -26,7 +26,7 @@ tests[{
     "Criticality" : "Shall/Not-Implemented",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : notCheckedDetails(PolicyId),
+    "ReportDetails" : NotCheckedDetails(PolicyId),
     "RequirementMet" : false
 }] {
     PolicyId := "MS.SHAREPOINT.1.2v1"
@@ -97,7 +97,7 @@ tests[{
     "Criticality" : "Should/Not-Implemented",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : notCheckedDetails(PolicyId),
+    "ReportDetails" : NotCheckedDetails(PolicyId),
     "RequirementMet" : false
 }] {
     PolicyId := "MS.SHAREPOINT.2.1v1"
@@ -229,7 +229,7 @@ tests[{
     "Criticality" : "Shall/Not-Implemented",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : notCheckedDetails(PolicyId),
+    "ReportDetails" : NotCheckedDetails(PolicyId),
     "RequirementMet" : false
 }] {
     PolicyId := "MS.SHAREPOINT.TBD"

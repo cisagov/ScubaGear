@@ -1,6 +1,6 @@
 package powerplatform
 import future.keywords
-import data.report.utils.notCheckedDetails
+import data.report.utils.NotCheckedDetails
 import data.report.utils.Format
 import data.report.utils.ReportDetailsBoolean
 import data.report.utils.Description
@@ -312,7 +312,7 @@ tests[{
     "Criticality" : "Should/Not-Implemented",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : notCheckedDetails(PolicyId),
+    "ReportDetails" : NotCheckedDetails(PolicyId),
     "RequirementMet" : false
 }] {
     PolicyId := "MS.POWERPLATFORM.3.2v1"
@@ -328,7 +328,7 @@ tests[{
     "Criticality" : "Should/Not-Implemented",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : notCheckedDetails(PolicyId),
+    "ReportDetails" : NotCheckedDetails(PolicyId),
     "RequirementMet" : false
 }] {
     PolicyId := "MS.POWERPLATFORM.3.3v1"
@@ -345,7 +345,7 @@ tests[{
     "Criticality" : "Shall/Not-Implemented",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : notCheckedDetails(PolicyId),
+    "ReportDetails" : NotCheckedDetails(PolicyId),
     "RequirementMet" : false
 }] {
     PolicyId := "MS.POWERPLATFORM.4.1v1"

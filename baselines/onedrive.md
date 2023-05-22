@@ -197,7 +197,7 @@ Link Permissions SHOULD Be Set to Enabled Anyone Links to View.
 
 ## 4. OneDrive Client
 
-Configuring OneDrive to sync only to agency-deined domains ensures that
+Configuring OneDrive to sync only to agency-defined domains ensures that
 users can only sync to agency-managed computers.
 
 ### Policies

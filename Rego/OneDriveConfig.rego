@@ -1,6 +1,6 @@
 package onedrive
 import future.keywords
-import data.report.utils.notCheckedDetails
+import data.report.utils.NotCheckedDetails
 import data.report.utils.ReportDetailsBoolean
 
 #--
@@ -31,7 +31,7 @@ tests[{
     "Criticality" : "Should/Not-Implemented",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : notCheckedDetails(PolicyId),
+    "ReportDetails" : NotCheckedDetails(PolicyId),
     "RequirementMet" : false
 }] {
     PolicyId := "MS.ONEDRIVE.1.1v1"
@@ -81,7 +81,7 @@ tests[{
     "Criticality" : "Should/Not-Implemented",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : notCheckedDetails(PolicyId),
+    "ReportDetails" : NotCheckedDetails(PolicyId),
     "RequirementMet" : false
 }] {
     PolicyId := "MS.ONEDRIVE.2.1v1"
@@ -97,7 +97,7 @@ tests[{
     "Criticality" : "Should/Not-Implemented",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : notCheckedDetails(PolicyId),
+    "ReportDetails" : NotCheckedDetails(PolicyId),
     "RequirementMet" : false
 }] {
     PolicyId := "MS.ONEDRIVE.2.2v1"
@@ -163,7 +163,7 @@ tests[{
     "Criticality" : "Should/Not-Implemented",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : notCheckedDetails(PolicyId),
+    "ReportDetails" : NotCheckedDetails(PolicyId),
     "RequirementMet" : false
 }] {
     PolicyId := "MS.ONEDRIVE.3.1v1"
@@ -222,7 +222,7 @@ tests[{
     "Criticality" : "Shall/Not-Implemented",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : notCheckedDetails(PolicyId),
+    "ReportDetails" : NotCheckedDetails(PolicyId),
     "RequirementMet" : false
 }] {
     PolicyId := "MS.ONEDRIVE.6.1v1"
@@ -238,7 +238,7 @@ tests[{
     "Criticality" : "Shall/Not-Implemented",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : notCheckedDetails(PolicyId),
+    "ReportDetails" : NotCheckedDetails(PolicyId),
     "RequirementMet" : false
 }] {
     PolicyId := "MS.ONEDRIVE.7.1v1"

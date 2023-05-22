@@ -9,6 +9,7 @@
 # (e.g., MS.TEAMS.1.1v1) aligns this files to the secure baseline control.
 package teams
 import future.keywords
+import data.report.utils.NotCheckedDetails
 import data.report.utils.Format
 import data.report.utils.ReportDetailsBoolean
 import data.report.utils.Description
@@ -404,13 +405,14 @@ tests[{
 #--
 # At this time we are unable to test for X because of Y
 tests[{
-    "PolicyId" : "MS.TEAMS.8.3v1",
+    "PolicyId" : PolicyId,
     "Criticality" : "Shall/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "Cannot be checked automatically. See Microsoft Teams Secure Configuration Baseline policy MS.TEAMS.8.3v1 for instructions on manual check",
+    "ReportDetails" : NotCheckedDetails(PolicyId),
     "RequirementMet" : false
 }] {
+	PolicyId := "MS.TEAMS.8.3v1"
     true
 }
 #--

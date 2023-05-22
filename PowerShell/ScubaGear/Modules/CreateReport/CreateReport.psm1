@@ -222,19 +222,13 @@ function Import-SecureBaseline{
             $LineNumbers = Select-String $IdRegex "$($BaselinePath)$($Product).md" | ForEach-Object {$_."LineNumber"-1}
 
             foreach ($LineNumber in $LineNumbers) {
-                # This assumes that the value is on the immediate next line after the ID
+                # This assumes that the value is on the immediate next line after the ID and ends in a period.
                 $LineAdvance = 1;
                 $Value = ([string]$MdLines[$LineNumber+$LineAdvance]).Trim()
 
                 while ($Value.Substring($Value.Length-1,1) -ne "."){
                     $LineAdvance++
                     $Value += ' ' + ([string]$MdLines[$LineNumber+$LineAdvance]).Trim()
-                }
-
-                $null = $Control.Value -Match '^(.+)(SHALL|SHOULD|MAY){1,1}(.+\.)$'
-                $Criticality = "UNK"
-                if (@("SHALL", "SHOULD", "MAY") -Contains $Matches.2){
-                    $Criticality = $Matches.2
                 }
 
                 $Value = [System.Net.WebUtility]::HtmlEncode($Value)
@@ -249,7 +243,7 @@ function Import-SecureBaseline{
                     $Deleted = $false
                 }
 
-                $Group.Controls += @{"Id"=$Id; "Value"=$Value; "Criticality"=$Criticality; "Deleted"=$Deleted}
+                $Group.Controls += @{"Id"=$Id; "Value"=$Value; "Deleted"=$Deleted}
             }
 
             $Output[$Product] += $Group

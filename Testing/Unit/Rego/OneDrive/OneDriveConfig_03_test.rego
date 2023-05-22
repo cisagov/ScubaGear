@@ -1,6 +1,6 @@
 package onedrive
 import future.keywords
-import data.report.utils.notCheckedDetails
+import data.report.utils.NotCheckedDetails
 import data.report.utils.ReportDetailsBoolean
 
 #
@@ -140,5 +140,5 @@ test_UsingServicePrincipal if {
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
     RuleOutput[0].Criticality == "Should/Not-Implemented"
-    RuleOutput[0].ReportDetails == notCheckedDetails(PolicyId)
+    RuleOutput[0].ReportDetails == NotCheckedDetails(PolicyId)
 }
