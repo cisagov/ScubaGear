@@ -6,10 +6,13 @@ on:
   push:
     paths:
       - "**.rego"
+      - "**/run_opa_tests.yaml"
   pull_request:
     types: [opened, reopened]
     branches:
       - "main"
+      - "emerald"
+      - "AutoBaselineSync"
     paths:
       - "**.rego"
   pull_request_review:
