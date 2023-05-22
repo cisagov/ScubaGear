@@ -11,8 +11,7 @@ on:
     types: [opened, reopened]
     branches:
       - "main"
-      - "emerald"
-      - "AutoBaselineSync"
+      - "emerald" #TODO: Remove after emerald release
     paths:
       - "**.rego"
   pull_request_review:
