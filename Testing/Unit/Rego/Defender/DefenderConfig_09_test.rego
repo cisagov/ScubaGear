@@ -1,6 +1,5 @@
 package defender
 import future.keywords
-import data.report.utils.NotCheckedDetails
 
 # TODO: Policy Id(s) needs to be resolved
 #
