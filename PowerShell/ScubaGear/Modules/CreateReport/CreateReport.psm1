@@ -75,7 +75,6 @@ function New-Report {
         "Passes" = 0;
         "Manual" = 0;
         "Errors" = 0;
-        "Bugs" = 0;
         "Date" = $SettingsExport.date;
     }
 
@@ -128,13 +127,13 @@ function New-Report {
                 }
             }
             else {
-                $ReportSummary.Bugs += 1
+                $ReportSummary.Errors += 1
                 $Fragment += [pscustomobject]@{
                     "Control ID"=$Control.Id
                     "Requirement"=$Control.Value
-                    "Result"= "Bug - Test results missing"
+                    "Result"= "Error - Test results missing"
                     "Criticality"= "-"
-                    "Details"= "Report bug on <a href=`"$ScubaGitHubUrl/issues`" target=`"_blank`">GitHub</a>"
+                    "Details"= "Report issue on <a href=`"$ScubaGitHubUrl/issues`" target=`"_blank`">GitHub</a>"
                 }
                 Write-Error("ERROR: No test results found for Control Id $($Control.Id)")
             }
