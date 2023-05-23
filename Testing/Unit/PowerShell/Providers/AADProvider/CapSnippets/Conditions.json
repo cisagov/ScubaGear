@@ -1,0 +1,31 @@
+{
+    "Conditions":{
+       "UserRiskLevels":[
+
+       ],
+       "SignInRiskLevels":[
+          
+       ],
+       "Platforms":{
+          "ExcludePlatforms":null,
+          "IncludePlatforms":null
+       },
+       "Locations":{
+          "ExcludeLocations":null,
+          "IncludeLocations":null
+       },
+       "ClientAppTypes":[
+          "all"
+       ],
+       "Devices":{
+          "DeviceFilter":{
+             "Mode":null,
+             "Rule":null
+          },
+          "ExcludeDeviceStates":null,
+          "ExcludeDevices":null,
+          "IncludeDeviceStates":null,
+          "IncludeDevices":null
+       }
+    }
+ }

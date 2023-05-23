@@ -198,8 +198,8 @@ Docs](https://docs.microsoft.com/en-us/microsoft-365/security/office-365-securit
 8.  Return to the DKIM page on the Defender admin center to finish
     enabling DKIM.
 
-## 4. Domain-Based Message Authentication, Reporting, and Conformance (DMARC)
 
+## 4. Domain-Based Message Authentication, Reporting, and Conformance (DMARC)
 Domain-based Message Authentication, Reporting, and Conformance (DMARC)
 works with SPF and DKIM to authenticate mail senders and ensure that
 destination email systems can validate messages sent from your domain.
