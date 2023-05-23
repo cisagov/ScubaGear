@@ -48,7 +48,8 @@ Describe -Tag CreateReport -Name 'New-Report' {
                 'FullName'     = $ProdToFullName[$ProductName];
                 'SecureBaselines' = $SecureBaselines
             }
-            New-Report @CreateReportParams
+            New-Report @CreateReportParams -ErrorVariable Err 2>&1 > null
+            $Err.Count | Should -BeExactly 33
             Test-Path -Path "$($IndividualReportPath)/$($ArgToProd[$ProductName])Report.html" -PathType leaf | Should -Be $true
         }
         It 'Creates a report for Microsoft Defender for Office 365' {
@@ -58,7 +59,8 @@ Describe -Tag CreateReport -Name 'New-Report' {
                 'FullName'     = $ProdToFullName[$ProductName];
                 'SecureBaselines' = $SecureBaselines
             }
-            New-Report @CreateReportParams
+            New-Report @CreateReportParams -ErrorVariable Err 2>&1 > null
+            $Err.Count | Should -BeExactly 46
             Test-Path -Path "$($IndividualReportPath)/$($ArgToProd[$ProductName])Report.html" -PathType leaf | Should -Be $true
         }
         It 'Creates a report for Exchange Online' {
@@ -68,7 +70,8 @@ Describe -Tag CreateReport -Name 'New-Report' {
                 'FullName'     = $ProdToFullName[$ProductName];
                 'SecureBaselines' = $SecureBaselines
             }
-            New-Report @CreateReportParams
+            New-Report @CreateReportParams -ErrorVariable Err 2>&1 > null
+            $Err.Count | Should -BeExactly 39
             Test-Path -Path "$($IndividualReportPath)/$($ArgToProd[$ProductName])Report.html" -PathType leaf | Should -Be $true
         }
         It 'Creates a report for One Drive for Business' {
@@ -78,7 +81,8 @@ Describe -Tag CreateReport -Name 'New-Report' {
                 'FullName'     = $ProdToFullName[$ProductName];
                 'SecureBaselines' = $SecureBaselines
             }
-            New-Report @CreateReportParams
+            New-Report @CreateReportParams -ErrorVariable Err 2>&1 > null
+            $Err.Count | Should -BeExactly 8
             Test-Path -Path "$($IndividualReportPath)/$($ArgToProd[$ProductName])Report.html" -PathType leaf | Should -Be $true
         }
         It 'Creates a report for Power Platform' {
@@ -88,7 +92,8 @@ Describe -Tag CreateReport -Name 'New-Report' {
                 'FullName'     = $ProdToFullName[$ProductName];
                 'SecureBaselines' = $SecureBaselines
             }
-            New-Report @CreateReportParams
+            New-Report @CreateReportParams -ErrorVariable Err 2>&1 > null
+            $Err.Count | Should -BeExactly 8
             Test-Path -Path "$($IndividualReportPath)/$($ArgToProd[$ProductName])Report.html" -PathType leaf | Should -Be $true
         }
         It 'Creates a report for SharePoint Online' {
@@ -98,7 +103,8 @@ Describe -Tag CreateReport -Name 'New-Report' {
                 'FullName'     = $ProdToFullName[$ProductName];
                 'SecureBaselines' = $SecureBaselines
             }
-            New-Report @CreateReportParams
+            New-Report @CreateReportParams -ErrorVariable Err 2>&1 > null
+            $Err.Count | Should -BeExactly 6
             Test-Path -Path "$($IndividualReportPath)/$($ArgToProd[$ProductName])Report.html" -PathType leaf | Should -Be $true
         }
         It 'Creates a report for Microsoft Teams' {
@@ -108,7 +114,8 @@ Describe -Tag CreateReport -Name 'New-Report' {
                 'FullName'     = $ProdToFullName[$ProductName];
                 'SecureBaselines' = $SecureBaselines
             }
-            New-Report @CreateReportParams
+            New-Report @CreateReportParams -ErrorVariable Err 2>&1 > null
+            $Err.Count | Should -BeExactly 28
             Test-Path -Path "$($IndividualReportPath)/$($ArgToProd[$ProductName])Report.html" -PathType leaf | Should -Be $true
         }
     }
