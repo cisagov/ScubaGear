@@ -38,12 +38,15 @@ Describe -Tag CreateReport -Name 'New-Report' {
                 'OutRegoFileName'      = "TestResults";
                 'DarkMode'             = $false;
             }
+            [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'SecureBaselines')]
+            $SecureBaselines =  Import-SecureBaseline
         }
         It 'Creates a report for Azure Active Directory' {
             $ProductName = 'aad'
             $CreateReportParams += @{
                 'BaselineName' = $ArgToProd[$ProductName];
                 'FullName'     = $ProdToFullName[$ProductName];
+                'SecureBaselines' = $SecureBaselines
             }
             New-Report @CreateReportParams
             Test-Path -Path "$($IndividualReportPath)/$($ArgToProd[$ProductName])Report.html" -PathType leaf | Should -Be $true
@@ -53,6 +56,7 @@ Describe -Tag CreateReport -Name 'New-Report' {
             $CreateReportParams += @{
                 'BaselineName' = $ArgToProd[$ProductName];
                 'FullName'     = $ProdToFullName[$ProductName];
+                'SecureBaselines' = $SecureBaselines
             }
             New-Report @CreateReportParams
             Test-Path -Path "$($IndividualReportPath)/$($ArgToProd[$ProductName])Report.html" -PathType leaf | Should -Be $true
@@ -62,6 +66,7 @@ Describe -Tag CreateReport -Name 'New-Report' {
             $CreateReportParams += @{
                 'BaselineName' = $ArgToProd[$ProductName];
                 'FullName'     = $ProdToFullName[$ProductName];
+                'SecureBaselines' = $SecureBaselines
             }
             New-Report @CreateReportParams
             Test-Path -Path "$($IndividualReportPath)/$($ArgToProd[$ProductName])Report.html" -PathType leaf | Should -Be $true
@@ -71,6 +76,7 @@ Describe -Tag CreateReport -Name 'New-Report' {
             $CreateReportParams += @{
                 'BaselineName' = $ArgToProd[$ProductName];
                 'FullName'     = $ProdToFullName[$ProductName];
+                'SecureBaselines' = $SecureBaselines
             }
             New-Report @CreateReportParams
             Test-Path -Path "$($IndividualReportPath)/$($ArgToProd[$ProductName])Report.html" -PathType leaf | Should -Be $true
@@ -80,6 +86,7 @@ Describe -Tag CreateReport -Name 'New-Report' {
             $CreateReportParams += @{
                 'BaselineName' = $ArgToProd[$ProductName];
                 'FullName'     = $ProdToFullName[$ProductName];
+                'SecureBaselines' = $SecureBaselines
             }
             New-Report @CreateReportParams
             Test-Path -Path "$($IndividualReportPath)/$($ArgToProd[$ProductName])Report.html" -PathType leaf | Should -Be $true
@@ -89,6 +96,7 @@ Describe -Tag CreateReport -Name 'New-Report' {
             $CreateReportParams += @{
                 'BaselineName' = $ArgToProd[$ProductName];
                 'FullName'     = $ProdToFullName[$ProductName];
+                'SecureBaselines' = $SecureBaselines
             }
             New-Report @CreateReportParams
             Test-Path -Path "$($IndividualReportPath)/$($ArgToProd[$ProductName])Report.html" -PathType leaf | Should -Be $true
@@ -98,6 +106,7 @@ Describe -Tag CreateReport -Name 'New-Report' {
             $CreateReportParams += @{
                 'BaselineName' = $ArgToProd[$ProductName];
                 'FullName'     = $ProdToFullName[$ProductName];
+                'SecureBaselines' = $SecureBaselines
             }
             New-Report @CreateReportParams
             Test-Path -Path "$($IndividualReportPath)/$($ArgToProd[$ProductName])Report.html" -PathType leaf | Should -Be $true
