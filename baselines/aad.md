@@ -1,5 +1,7 @@
 # Introduction
 
+Azure Active Directory, part of Microsoft Entra, is an enterprise identity service that provides single sign-on, multifactor authentication, and conditional access to guard against cybersecurity attacks.
+
 ## Key Terminology
 
 The following are key terms and descriptions used in this document.
@@ -226,7 +228,7 @@ locations. Azure AD Identity Protection considers the Trusted Location
 data when it calculates sign-in risk, and this may help to prevent users
 signing in from legitimate locations from being flagged as high risk.
 
-## 4. Phishing-Resistant Multifactor Authentication
+## 4. Enforce Strong MFA and Secure the Registration Process
 
 Phishing-resistant multifactor authentication protects against
 sophisticated phishing attacks. Recognizing the significant risk these
@@ -245,7 +247,7 @@ security threat posed by modern phishing attacks.
 Page](https://docs.microsoft.com/en-us/azure/active-directory/authentication/concept-authentication-methods)
 article (12/29/2021).
 
-<img src="/images/aad-mfa.png" 
+<img src="/images/aad-mfa.png"
 alt="Weak MFA (SMS/Voice) Stronger MFA (Push Notifications, Software OTP, Hardware Token OTP) Strongest MFA (FIDO2, PIV, Windows Hello)" />
 
 Figure 1: Options for Weak MFA, Stronger MFA Options, and Strongest MFA
@@ -890,7 +892,7 @@ policy to privileged roles.
 3.  Under **Exclude**, follow Microsoft’s guidance from the previously
     provided instructions link.
 
-## 14. Permanent Permissions 
+## 14. Permanent Permissions
 
 Do not assign users to highly privileged roles using permanent active
 role assignments. Instead, assign users to eligible role assignments in
