@@ -20,7 +20,7 @@ footer {
 
 a.individual_reports:link {
     font-family: Arial, Helvetica, sans-serif;
-    color: var(--header-color);
+    color: var(--unvisited-link-color);
     text-decoration: underline;
 }
 

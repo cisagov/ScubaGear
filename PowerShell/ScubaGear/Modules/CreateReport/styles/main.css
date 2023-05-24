@@ -15,6 +15,7 @@
     --note-color: #ee4e04;
     --header-bottom: black;
     --link-color: #85B065;
+    --unvisited-link-color: #0092CC;
     --text-color: black;
     --border-color: black;
     --toggle-height: 25px;
@@ -36,9 +37,9 @@ html[data-theme='dark'] {
     --note-color: #ee4e04;
     --header-bottom: rgb(221, 221, 221);
     --link-color: #85B065;
+    --unvisited-link-color: #0092CC;
     --text-color: #bdbdbd;
     --border-color: #7b7b7b;
-
 }
 
 body {
@@ -295,7 +296,7 @@ input:checked + .slider:before {
 
 a.control_group:link {
     font-family: Arial, Helvetica, sans-serif;
-    color: var(--header-color);
+    color: var(--unvisited-link-color);
     text-decoration: underline;
 }
 
