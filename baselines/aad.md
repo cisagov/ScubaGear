@@ -229,19 +229,10 @@ data when it calculates sign-in risk, and this may help to prevent users
 signing in from legitimate locations from being flagged as high risk.
 
 ## 4. Enforce Strong MFA and Secure the Registration Process
-
-Phishing-resistant multifactor authentication protects against
-sophisticated phishing attacks. Recognizing the significant risk these
-attack present, the Office of Management and Budget (OMB), requires
-federal agencies to [implement phishing-resistant
-authentication](https://www.whitehouse.gov/wp-content/uploads/2022/01/M-22-09.pdf).
-
-However, phishing-resistant MFA may not always be immediately available,
-especially on mobile devices. Where phishing-resistant MFA is not yet
-available, organization should adopt an MFA method from the list below.
-Organizations must upgrade to a phishing-resistant MFA method as soon as
-possible to become compliant with this policy and address the critical
-security threat posed by modern phishing attacks.
+MFA is an important tool for preventing unauthorized access to federal systems, data, and other resources. Per
+OMB M-22-09 and EO 14028, agencies must implement a minimum of two-factor authentication (MFA with a
+minimum of two factors) whenever possible, and each authentication method must be phishing-resistant.
+MFA  should be implemented to support a zero trust architecture. Figure 1 depicts MFA options from weak to strong.
 
 **Note**: Figure adapted from [MS Build
 Page](https://docs.microsoft.com/en-us/azure/active-directory/authentication/concept-authentication-methods)
@@ -254,51 +245,73 @@ Figure 1: Options for Weak MFA, Stronger MFA Options, and Strongest MFA
 
 ### Policies
 #### MS.AAD.4.1v1
-MFA SHALL be required for all users.
-- _Rationale:_ TODO
+Phishing-resistant MFA SHALL be enforced for all users and apps.
+At this time, Azure AD supports the three phishing-resistant methods listed below:
+- Azure AD Certificate-Based Authentication (CBA) - supports Federal PIV cards
+- FIDO2 Security Key
+- Windows Hello for Business
+- Federal Personal Identity Verification (PIV) card (Federated from
+      agency Active Directory or other identity provider)
+    - Federated PIV auth IS permitted by the plain text of the policy,
+     but not preferred (versus other methods implemented in the cloud.)
+     It is not possible to check this configuration via the ScubaGear tool.
+     Implementation requires enforcing PIV usage on-prem via User Based Enforcement
+      (https://playbooks.idmanagement.gov/piv/network/group/)
+
+- _Rationale:_ Phishing-resistant multifactor authentication protects against
+sophisticated phishing attacks. Recognizing the significant risk these
+attacks present, the Office of Management and Budget (OMB), requires
+federal agencies to [implement phishing-resistant
+authentication](https://www.whitehouse.gov/wp-content/uploads/2022/01/M-22-09.pdf).
 - _Last modified:_ June 2023
 
 #### MS.AAD.4.2v1
-Phishing-resistant MFA SHALL be used for all users.
+If Phishing-resistant MFA is not implemented yet, then an alternative MFA method SHALL be enforced for all users and apps.
 
-  - Phishing-resistant methods:
+- _Rationale:_ Phishing-resistant MFA may not always be immediately available,
+especially on mobile devices. If phishing-resistant MFA is unavailable,
+one of the following options for multifactor authentication are permissible.
 
-    - Federal PIV card (Azure AD Certificate-Based authentication
-      \[CBA\])
+- Microsoft Authenticator – push notification or passwordless
+- Authenticator app or hardware token – code
 
-    - FIDO2 Security Key
-
-    - Windows Hello for Business
-
-    - Federal Personal Identity Verification (PIV) card (Federated from
-      agency Active Directory or other identity provider)
-- _Rationale:_ TODO
+However, organizations must upgrade to a phishing-resistant MFA method as soon as
+possible to become compliant with this policy and address the critical
+security threat posed by modern phishing attacks.
 - _Last modified:_ June 2023
 
 #### MS.AAD.4.3v1
-If phishing-resistant MFA cannot be used, an MFA method from the list
-  below SHALL be used in the interim:
+If Phishing-resistant MFA is not implemented yet and Microsoft Authenticator is enabled, it SHALL be
+configured to show the user context information when logging in via the app
 
-  - Microsoft Authenticator (Push Notifications)
-
-  - Microsoft Authenticator (Phone Sign-in) (Also referred to as
-    Passwordless Sign-in)
-
-    - When using Microsoft Authenticator:
-
-      - Number Matching SHALL be enabled.
-
-      - Additional Context SHALL be enabled.
-
-  - Software Tokens One-Time Password (OTP) – This option is commonly implemented using mobile phone authenticator apps
-
-  - Hardware tokens OTP
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
 #### MS.AAD.4.4v1
-SMS or Voice as the MFA method SHALL NOT be used.
-- _Rationale:_ TODO
+The Authentication Methods Manage Migration feature SHALL be set to Migration Complete
+- _Rationale:_ By configuring the Manage Migration feature to Migration Complete, we ensure
+that the tenant has disabled the legacy authentication methods screen (which was not available
+via the API to be checked by ScubaGear). This also ensures that the MFA and SSPR authentication
+methods are both managed from a central screen thereby reducing administrative complexity and
+reducing the chances of security misconfigurations.
+- _Last modified:_ June 2023
+
+#### MS.AAD.4.5v1
+The authentication methods SMS, Voice Call and Email OTP SHALL be disabled
+- _Rationale:_ This policy will only be checked if the tenant has their Manage Migration feature set
+to Migration Complete because the configuration data is not available from the legacy authentication methods page.
+- _Last modified:_ June 2023
+
+#### MS.AAD.4.6v1
+Phishing-resistant MFA SHALL be required for Highly Privileged Roles.
+- _Rationale:_ This will be implemented and assessed using authentication strength just
+like policy bullet 1 above, except that this policy is scoped to privileged roles
+- _Last modified:_ June 2023
+
+#### MS.AAD.4.7v1
+Managed Devices SHOULD be required to register MFA
+- _Rationale:_ This can help mitigate scenarios where hackers steal unused account credentials
+and then register their own MFA devices to access the tenant by meeting the MFA requirement.
 - _Last modified:_ June 2023
 
 ### Resources
