@@ -1,21 +1,13 @@
 package sharepoint
 import future.keywords
-
-ReportDetailsBoolean(Status) = "Requirement met" if {Status == true}
-
-ReportDetailsBoolean(Status) = "Requirement not met" if {Status == false}
-
-
-################
-# Baseline 2.1 #
-################
+import data.report.utils.NotCheckedDetails
+import data.report.utils.ReportDetailsBoolean
 
 #
-# Baseline 2.1: Policy 1
+# MS.SHAREPOINT.1.1v1
 #--
 tests[{
-    "Requirement" : "File and folder links default sharing setting SHALL be set to \"Specific People (Only the People the User Specifies)\"",
-    "Control" : "Sharepoint 2.1",
+    "PolicyId" : "MS.SHAREPOINT.1.1v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-SPOTenant", "Get-PnPTenant"],
     "ActualValue" : Policy.DefaultSharingLinkType,
@@ -26,18 +18,27 @@ tests[{
     Status := Policy.DefaultSharingLinkType == 1
 }
 #--
-
-
-################
-# Baseline 2.2 #
-################
-
 #
-# Baseline 2.2: Policy 1
+# MS.SHAREPOINT.1.2v1
 #--
 tests[{
-    "Requirement" : "External sharing SHOULD be limited to approved domains and security groups per interagency collaboration needs",
-    "Control" : "Sharepoint 2.2",
+    "PolicyId" : PolicyId,
+    "Criticality" : "Shall/Not-Implemented",
+    "Commandlet" : [],
+    "ActualValue" : [],
+    "ReportDetails" : NotCheckedDetails(PolicyId),
+    "RequirementMet" : false
+}] {
+    PolicyId := "MS.SHAREPOINT.1.2v1"
+    true
+}
+#--
+
+#
+# MS.SHAREPOINT.1.3v1
+#--
+tests[{
+    "PolicyId" : "MS.SHAREPOINT.1.3v1",
     "Criticality" : "Should",
     "Commandlet" : ["Get-SPOTenant", "Get-PnPTenant"],
     "ActualValue" : Policy.SharingCapability,
@@ -88,29 +89,24 @@ tests[{
 ################
 
 #
-# Baseline 2.3: Policy 1
+# MS.SHAREPOINT.2.1v1
 #--
 # At this time we are unable to test for X because of Y
 tests[{
-    "Requirement" : "Sharing settings for specific SharePoint sites SHOULD align to their sensitivity level",
-    "Control" : "Sharepoint 2.3",
+    "PolicyId" : PolicyId,
     "Criticality" : "Should/Not-Implemented",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "Currently cannot be checked automatically. See Sharepoint Secure Configuration Baseline policy 2.3 for instructions on manual check",
+    "ReportDetails" : NotCheckedDetails(PolicyId),
     "RequirementMet" : false
 }] {
+    PolicyId := "MS.SHAREPOINT.2.1v1"
     true
 }
 #--
 
-
-################
-# Baseline 2.4 #
-################
-
 #
-# Baseline 2.4: Policy 1
+# MS.SHAREPOINT.3.1v1
 #--
 ReportDetails2_4_1(Policy) = Description if {
     Policy.SharingCapability == 0
@@ -146,8 +142,7 @@ ReportDetails2_4_1(Policy) = Description if {
 }
 
 tests[{
-    "Requirement" : "Expiration timer for 'Guest access to a site or OneDrive' should be set to 30 days",
-    "Control" : "Sharepoint 2.4",
+    "PolicyId" : "MS.SHAREPOINT.3.1v1",
     "Criticality" : "Should",
     "Commandlet" : ["Get-SPOTenant", "Get-PnPTenant"],
     "ActualValue" : [Policy.SharingCapability, Policy.ExternalUserExpirationRequired, Policy.ExternalUserExpireInDays],
@@ -166,7 +161,7 @@ tests[{
 }
 #--
 
-#
+# TODO: Resolve Policy Id
 # Baseline 2.4: Policy 2
 #--
 ReportDetails2_4_2(Policy) = Description if {
@@ -223,29 +218,26 @@ tests[{
 }
 #--
 
-
-################
-# Baseline 2.5 #
-################
-
-#
+# TODO: Resolve Policy Id
 # Baseline 2.5: Policy 1
 #--
 # At this time we are unable to test for X because of Y
 tests[{
     "Requirement" : "Users SHALL be prevented from running custom scripts on personal sites (OneDrive)",
     "Control" : "Sharepoint 2.5",
+    "PolicyId" : PolicyId,
     "Criticality" : "Shall/Not-Implemented",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "Currently cannot be checked automatically. See Sharepoint Secure Configuration Baseline policy 2.5 for instructions on manual check",
+    "ReportDetails" : NotCheckedDetails(PolicyId),
     "RequirementMet" : false
 }] {
+    PolicyId := "MS.SHAREPOINT.TBD"
     true
 }
 #--
 
-#
+# TODO: Resolve Policy Id
 # Baseline 2.5: Policy 2
 #--
 tests[{

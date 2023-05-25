@@ -3,11 +3,19 @@
  */
 const colorRows = () => {
     let rows = document.querySelectorAll('tr');
-    const statusCol = 1;
-    const criticalityCol = 2;
+    const requirementCol = 1;
+    const statusCol = 2;
+    const criticalityCol = 3;
     for (let i = 0; i < rows.length; i++) {
         try {
-            if (rows[i].children[statusCol].innerHTML === "Fail") {
+            if (rows[i].children[requirementCol].innerHTML.startsWith("[DELETED]")) {
+                rows[i].style.color = "var(--test-deleted-color)";
+                rows[i].style.background = "var(--test-other)";
+            }
+            else if (rows[i].children[statusCol].innerHTML.startsWith("Bug")){
+                rows[i].style.background = "var(--test-bug-color)";
+            }
+            else if (rows[i].children[statusCol].innerHTML === "Fail") {
                 rows[i].style.background = "var(--test-fail)";
             }
             else if (rows[i].children[statusCol].innerHTML === "Warning") {
@@ -24,8 +32,8 @@ const colorRows = () => {
             }
             else if (rows[i].children[statusCol].innerHTML.includes("Error")) {
                 rows[i].style.background = "var(--test-fail)";
-                rows[i].querySelectorAll('td')[1].style.borderColor = "var(--border-color)";
-                rows[i].querySelectorAll('td')[1].style.color = "#d10000";
+                rows[i].querySelectorAll('td')[statusCol].style.borderColor = "var(--border-color)";
+                rows[i].querySelectorAll('td')[statusCol].style.color = "var(--test-error-color)";
             }
         }
         catch (error) {
@@ -103,7 +111,7 @@ const fillCAPTable = () => {
             }
             else if (capColNames[i] === "Conditions") {
                 th.setAttribute("class", "conditions");
-            } 
+            }
             th.innerHTML = capColNames[i];
             header.appendChild(th);
         }

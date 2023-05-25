@@ -751,6 +751,8 @@ function Invoke-ReportCreation {
             $Images = Join-Path -Path $ReporterPath -ChildPath "images" -ErrorAction 'Stop'
             Copy-Item -Path $Images -Destination $IndividualReportPath -Force -Recurse -ErrorAction 'Stop'
 
+            $SecureBaselines =  Import-SecureBaseline
+
             foreach ($Product in $ProductNames) {
                 $BaselineName = $ArgToProd[$Product]
                 $N += 1
@@ -775,6 +777,7 @@ function Invoke-ReportCreation {
                     'OutProviderFileName' = $OutProviderFileName;
                     'OutRegoFileName' = $OutRegoFileName;
                     'DarkMode' = $DarkMode;
+                    'SecureBaselines' = $SecureBaselines
                 }
 
                 $Report = New-Report @CreateReportParams
@@ -804,8 +807,8 @@ function Invoke-ReportCreation {
                 }
 
                 if ($Report.Errors -gt 0) {
-                    $Noun = Pluralize -SingularNoun "check" -PluralNoun "errors" -Count $Report.Manual
-                    $ErrorSummary = "<div class='summary error'>$($Report.Errors) PowerShell $($Noun)</div>"
+                    $Noun = Pluralize -SingularNoun "error" -PluralNoun "errors" -Count $Report.Errors
+                    $ErrorSummary = "<div class='summary error'>$($Report.Errors) $($Noun)</div>"
                 }
 
                 $Fragment += [pscustomobject]@{
