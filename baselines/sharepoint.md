@@ -120,7 +120,17 @@ OMB Max Site for a list of .gov domains for sharing).
 
 ### Policies
 #### MS.SHAREPOINT.2.1v1
-External sharing SHOULD be limited to approved domains and security groups per interagency collaboration needs.
+External sharing SHOULD be limited to New and Existing Guests.
+- _Rationale:_ TODO
+- _Last modified:_ June 2023
+
+#### MS.SHAREPOINT.2.2v1
+External sharing SHOULD be limited to approved domains per interagency collaboration needs.
+- _Rationale:_ TODO
+- _Last modified:_ June 2023
+
+#### MS.SHAREPOINT.2.3v1
+External sharing SHOULD be limited to approved security groups per interagency collaboration needs.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
@@ -133,7 +143,7 @@ External sharing SHOULD be limited to approved domains and security groups per i
 
 - N/A
 
-### Implementation 
+### Implementation
 
 To adjust sharing settings, in the **SharePoint admin center**:
 
@@ -160,7 +170,7 @@ To adjust sharing settings, in the **SharePoint admin center**:
 
 11. Select **Save.**
 
-## 3. Sensitivity Levels 
+## 3. Sensitivity Levels
 
 SharePoint allows sharing with users who are outside the agency, which
 is convenient but may pose a data loss or other information security
@@ -184,7 +194,7 @@ Sharing settings for specific SharePoint sites SHOULD align to their sensitivity
 
 - N/A
 
-### Implementation 
+### Implementation
 
 To limit external sharing by domain, in the **SharePoint admin center**:
 
@@ -217,12 +227,12 @@ for OneDrive and Teams to the same, specified expiration times.
 
 ### Policies
 #### MS.SHAREPOINT.4.1v1
-Expiration timers for guest access to a site or OneDrive and people who use a verification code SHOULD be set.
+Expiration timers for guest access to a site or OneDrive SHOULD be set to 30 days.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
 #### MS.SHAREPOINT.4.2v1
-Expiration timers SHOULD be set to 30 days.
+Expiration timers for people who use a verification code SHOULD be set to 30 days.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
@@ -235,9 +245,9 @@ Expiration timers SHOULD be set to 30 days.
 - [Managing SharePoint Online Security: A Team Effort \| Microsoft
   Build](https://docs.microsoft.com/en-us/microsoft-365/community/sharepoint-security-a-team-effort)
 
-### Implementation 
+### Implementation
 
-To limit external sharing by domain, in the **SharePoint admin center**:
+To provide a time limit for external sharing, in the **SharePoint admin center**:
 
 1.  Select **Policies** -\> **Sharing**.
 
@@ -262,6 +272,8 @@ scripts should not be allowed.
 ###  Policy
 #### MS.SHAREPOINT.5.1v1
 Users SHALL be prevented from running custom scripts.
+- _Rationale:_ TODO
+- _Last modified:_ June 2023
 
 ### Resources
 
