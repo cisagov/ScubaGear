@@ -134,6 +134,11 @@ External sharing SHOULD be limited to approved security groups per interagency c
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
+#### MS.SHAREPOINT.4.3v1
+Guest access SHOULD be limited to the email the invitation was sent.
+- _Rationale:_ TODO
+- _Last modified:_ June 2023
+
 ### Resources
 
 - [Manage sharing settings \| Microsoft
@@ -169,6 +174,8 @@ To adjust sharing settings, in the **SharePoint admin center**:
 10. Add security groups.
 
 11. Select **Save.**
+
+12. TODO: add implementation for MS.SHAREPOINT.4.3v1
 
 ## 3. Sensitivity Levels
 
