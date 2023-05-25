@@ -98,6 +98,8 @@ In the **SharePoint admin** **center**:
 2.  Under **File and folder links**, ensure that the default link type
     is set to **Specific people (only the people the user specifies)**.
 
+3.  Select **Save.**
+
 ## 2. External Sharing
 
 SharePoint allows sharing with users who are outside the agency, which
@@ -176,6 +178,8 @@ To adjust sharing settings, in the **SharePoint admin center**:
 11. Select **Save.**
 
 12. TODO: add implementation for MS.SHAREPOINT.4.3v1
+
+13. Select **Save.**
 
 ## 3. Sensitivity Levels
 
@@ -270,6 +274,8 @@ To provide a time limit for external sharing, in the **SharePoint admin center**
 
 6.  Enter “30 days”.
 
+7.  Select **Save.**
+
 ## 5. Custom Scripts
 
 Allowing users to run custom scripts can potentially allow malicious
@@ -302,6 +308,8 @@ In the **SharePoint Classic admin center**:
 
 3.  **Prevent users from running custom script on self-service created
     sites.**
+
+4.  Select **Save.**
 
 # Acknowledgements
 
