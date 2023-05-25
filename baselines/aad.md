@@ -1,6 +1,6 @@
 # CISA M365 Security Configuration Baseline for Azure Active Directory
 
-Azure Active Directory (AAD) is a cloud-based identity and access control service that provides security and functional capabilities to Microsoft 365. This security baseline provides policies to help secure AAD. 
+Azure Active Directory (AAD) is a cloud-based identity and access control service that provides security and functional capabilities to Microsoft 365. This security baseline provides policies to help secure AAD.
 
 ## License Compliance and Copyright
 
@@ -88,7 +88,7 @@ base, follow [these instructions](https://docs.microsoft.com/en-us/azure/active-
 
 ## 2. Risk Based Policies
 
-This section provides policies that help reduce security risks related to user accounts that may have been compromised. These policies use a combination of AAD Identity Protection and AAD Conditional Access. AAD Identity Protection uses numerous signals to detect the risk level for each user or sign-in to determine if an account may have been compromised. 
+This section provides policies that help reduce security risks related to user accounts that may have been compromised. These policies use a combination of AAD Identity Protection and AAD Conditional Access. AAD Identity Protection uses numerous signals to detect the risk level for each user or sign-in to determine if an account may have been compromised.
 
 - _Additional mitigations to secure Workload Identities:_ Although not covered in this baseline due to the need for an additional non-standard license, Microsoft also provides support for mitigating risks related to workload identities (AAD applications or service principals). Agencies should strongly consider implementing this feature because workload identities present many of the same risks as interactive user access and are commonly used in modern systems. Follow [these instructions](https://learn.microsoft.com/en-us/azure/active-directory/conditional-access/workload-identity) to apply conditional access policies to workload identities.
 
@@ -138,7 +138,7 @@ Follow the conditional access policy template below:
     Target resources > Cloud apps > All cloud apps
 
     Conditions > User risk > High
-    
+
     Access controls > Grant > Block Access
 
 #### MS.AAD.2.2v1, instructions:
@@ -156,7 +156,7 @@ Follow the conditional access policy template below:
     Target resources > Cloud apps > All cloud apps
 
     Conditions > Sign-in risk > High
-    
+
     Access controls > Grant > Block Access
 
 ## 3. Strong Authentication and a Secure Registration Process
@@ -253,26 +253,26 @@ Managed Devices SHOULD be required to register MFA.
 
 #### MS.AAD.3.1v1, instructions:
 
-1. Create a conditional access policy that enforces phishing-resistant MFA for all users. 
+1. Create a conditional access policy that enforces phishing-resistant MFA for all users.
 
 Follow the conditional access policy template below:
 
     Users > Include > All users
 
     Target resources > Cloud apps > All cloud apps
-    
+
     Access controls > Grant > Grant Access > Require authentication strength > Phishing-resistant MFA
 
 #### MS.AAD.3.2v1, instructions:
 
-1. If Phishing-resistant MFA has not been enforced for all users yet, create a conditional access policy that enforces MFA but does not dictate the MFA method. 
+1. If Phishing-resistant MFA has not been enforced for all users yet, create a conditional access policy that enforces MFA but does not dictate the MFA method.
 
 Follow the conditional access policy template below.
 
     Users > Include > All users
 
     Target resources > Cloud apps > All cloud apps
-    
+
     Access controls > Grant > Grant Access > Require multifactor authentication
 
 #### MS.AAD.3.3v1, instructions:
@@ -296,39 +296,39 @@ If Phishing-resistant MFA has not been deployed yet and Microsoft Authenticator 
 
 #### MS.AAD.3.6v1, instructions:
 
-1. Create a conditional access policy that enforces phishing-resistant MFA for highly privileged roles. 
+1. Create a conditional access policy that enforces phishing-resistant MFA for highly privileged roles.
 
 Follow the conditional access policy template below:
 
     Users > Include > Select users and groups > Directory roles > select each of the roles listed in the Highly Privileged Roles section at the top of this document
 
     Target resources > Cloud apps > All cloud apps
-    
+
     Access controls > Grant > Grant Access > Require authentication strength > Phishing-resistant MFA
 
 #### MS.AAD.3.7v1, instructions:
 
 1. Create a conditional access policy that requires a user's device to be
-either hybrid Azure AD joined or compliant during authentication. 
+either hybrid Azure AD joined or compliant during authentication.
 
 Follow the conditional access policy template below.
 
     Users > Include > All users
 
     Target resources > Cloud apps > All cloud apps
-    
+
     Access controls > Grant > Grant Access > "Require device to be marked as compliant" and "Require Hybrid Azure AD joined device" > Require one of the selected controls
 
 #### MS.AAD.3.8v1, instructions:
 
-1. Create a conditional access policy that requires a user to be on a managed device when registering for MFA. 
+1. Create a conditional access policy that requires a user to be on a managed device when registering for MFA.
 
 Follow the conditional access policy template below.
 
     Users > Include > All users
 
     Target resources > User actions > Register security information
-    
+
     Access controls > Grant > Grant Access > "Require device to be marked as compliant" and "Require Hybrid Azure AD joined device" > Require one of the selected controls
 
 ## 4. Centralized Log Collection
@@ -339,7 +339,7 @@ This section provides policies that help reduce security risks related to  the l
 #### MS.AAD.4.1v1
 Security logs SHALL be sent to the agency's Security Operations Center for monitoring.
 
-- _Rationale:_ The security risk of not having visibility into cyber attacks is reduced by collecting the logs into the agency's centralized security detection infrastructure. Thus security events can be audited,  queried and available for incident response. 
+- _Rationale:_ The security risk of not having visibility into cyber attacks is reduced by collecting the logs into the agency's centralized security detection infrastructure. Thus security events can be audited,  queried and available for incident response.
 - _Last modified:_ June 2023
 - _Scope:_ The following logs (configured in Azure AD diagnostic settings), are required: AuditLogs, SignInLogs, RiskyUsers, UserRiskEvents, NonInteractiveUserSignInLogs, ServicePrincipalSignInLogs, ADFSSignInLogs, RiskyServicePrincipals, ServicePrincipalRiskEvents, EnrichedOffice365AuditLogs, MicrosoftGraphActivityLogs. If managed identities are used for Azure resources, also send the ManagedIdentitySignInLogs log type. If the Azure AD Provisioning Service is used to provision users to SaaS apps or other systems, also send the ProvisioningLogs log type.
 - _Federal Agencies:_ It is also recommended to send the logs to the CISA CLAW system so that agencies can benefit from the security detection capabilities offered there. Contact CISA to request integration instructions.
@@ -470,7 +470,7 @@ Group owners SHALL NOT be allowed to consent to applications.
 
 ## 6. Passwords
 
-This section provides policies that help reduce security risks associated with legacy password practices that are no longer supported by research. 
+This section provides policies that help reduce security risks associated with legacy password practices that are no longer supported by research.
 
 ### Policies
 #### MS.AAD.6.1v1
@@ -608,7 +608,7 @@ User activation of other highly privileged roles SHOULD trigger an alert.
 
 4.  Review the score for the action named **Use least privileged administrative roles.**
 
-5.  Review the **current score** value and compare it to the **max score**. 
+5.  Review the **current score** value and compare it to the **max score**.
 If the current score is not the maximum value and the status is not **Completed**, you must perform the improvement actions. If that is the case, follow the detailed action steps and then check the score again after 48 hours to ensure compliance.
 
 #### MS.AAD.7.3v1, instructions:
@@ -643,21 +643,21 @@ Get-MgUser -Filter "userPrincipalName eq 'username@somedomain.com'" | FL
 4. Verify that there are no users or groups with a value of **Permanent** in the **End time** column. If there are any, recreate those assignments to have an expiration date using AAD PIM or an alternative PAM system. The only exception to this policy are emergency access accounts and service accounts that require perpetual active assignments. See policy for details.
 
 #### MS.AAD.7.5v1, instructions:
- 
+
 1. Perform the steps below for each highly privileged role. We reference the Global Administrator role as an example.
 
 2. In **Azure Active Directory** select **Roles and administrators.**
 
 3. Select the **Global administrator role.**
 
-4. Under **Manage**, select **Assignments.** Repeat the steps below for both the **Eligible** and the **Active** AAD PIM assignments. 
+4. Under **Manage**, select **Assignments.** Repeat the steps below for both the **Eligible** and the **Active** AAD PIM assignments.
 
 5. For each user or group listed, examine the value in the **Start time** column. If it contains a value of **-**, this indicates that the respective user / group was assigned to that role outside of AAD PIM. If the role was assigned outside of AAD PIM, delete the assignment and recreate it using AAD PIM.
 
 
 #### MS.AAD.7.6v1, instructions:
 
-1. In **Azure Active Directory** create a new group named **Privileged Escalation Approvers**. This group will contain users that will receive role activation approval requests and approve or deny them. 
+1. In **Azure Active Directory** create a new group named **Privileged Escalation Approvers**. This group will contain users that will receive role activation approval requests and approve or deny them.
 
 2. Assign this new group to the AAD role **Privileged Role Administrators**. This permission is required so that users in this group can adjudicate role activation approval requests.
 
@@ -709,7 +709,7 @@ Get-MgUser -Filter "userPrincipalName eq 'username@somedomain.com'" | FL
 7. Click **Update**.
 
 #### MS.AAD.7.9v1, instructions:
- 
+
  1. Follow the same instructions as MS.AAD.7.8v1 for each of the highly privileged roles (other than Global Administrator) but enter a security monitoring mailbox that is different from the one used to monitor Global Administrator activations.
 
 ## 8. Guest User Access
