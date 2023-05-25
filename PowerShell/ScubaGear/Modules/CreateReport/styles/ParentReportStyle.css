@@ -20,7 +20,7 @@ footer {
 
 a.individual_reports:link {
     font-family: Arial, Helvetica, sans-serif;
-    color: var(--header-color);
+    color: var(--unvisited-link-color);
     text-decoration: underline;
 }
 
@@ -39,7 +39,7 @@ a.individual_reports:active {
     font-family: Arial, Helvetica, sans-serif;
     color: var(--link-color);
     text-decoration: none;
-} 
+}
 
 table.tenantdata tr:first-child {
     color: var(--text-color);
@@ -49,8 +49,7 @@ table.tenantdata tr:first-child {
 .warning { background-color: var(--test-warning); }
 .pass { background-color: var(--test-pass); }
 .manual { background-color: var(--test-other); }
-
 .error {
-    background-color: var(--test-fail); 
-    color: #d10000;
+    background-color: var(--test-fail);
+    color: var(--test-error-color);
 }
