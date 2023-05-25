@@ -39,12 +39,17 @@ function New-Report {
 
         [Parameter(Mandatory=$true)]
         [switch]
-        $DarkMode
+        $DarkMode,
+
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNull()]
+        [object]
+        $SecureBaselines
     )
 
-    $FileName = Join-Path -Path $PSScriptRoot -ChildPath "BaselineTitles.json"
-    $AllTitles =  Get-Content $FileName | ConvertFrom-Json
-    $Titles = $AllTitles.$BaselineName
+    $ScubaGitHubUrl = "https://github.com/cisagov/ScubaGear"
+
+    $ProductSecureBaseline = $SecureBaselines.$BaselineName
 
     $FileName = Join-Path -Path $OutPath -ChildPath "$($OutProviderFileName).json"
     $SettingsExport =  Get-Content $FileName | ConvertFrom-Json
@@ -73,52 +78,72 @@ function New-Report {
         "Date" = $SettingsExport.date;
     }
 
-    foreach ($Title in $Titles) {
+    foreach ($BaselineGroup in $ProductSecureBaseline) {
         $Fragment = @()
-        foreach ($test in $TestResults | Where-Object -Property Control -eq $Title.Number) {
-            $MissingCommands = @()
 
-            if ($SettingsExport."$($BaselineName)_successful_commands" -or $SettingsExport."$($BaselineName)_unsuccessful_commands") {
-                # If neither of these keys are present, it means the provider for that baseline
-                # hasn't been updated to the updated error handling method. This check
-                # here ensures backwards compatibility until all providers are udpated.
-                $MissingCommands = $test.Commandlet | Where-Object {$SettingsExport."$($BaselineName)_successful_commands" -notcontains $_}
-            }
+        foreach ($Control in $BaselineGroup.Controls){
 
-            if ($MissingCommands.Count -gt 0) {
-                $Result = "Error"
-                $ReportSummary.Errors += 1
-                $MissingString = $MissingCommands -Join ", "
-                $test.ReportDetails = "This test depends on the following command(s) which did not execute successfully: $($MissingString). See terminal output for more details."
-            }
-            elseif ($test.RequirementMet) {
-                $Result = "Pass"
-                $ReportSummary.Passes += 1
-            }
-            elseif ($test.Criticality -eq "Should") {
-                $Result = "Warning"
-                $ReportSummary.Warnings += 1
-            }
-            elseif ($test.Criticality.EndsWith('3rd Party') -or $test.Criticality.EndsWith('Not-Implemented')) {
-                $Result = "N/A"
-                $ReportSummary.Manual += 1
+            $Test = $TestResults | Where-Object -Property PolicyId -eq $Control.Id
+
+            if ($null -ne $Test){
+                $MissingCommands = @()
+
+                if ($SettingsExport."$($BaselineName)_successful_commands" -or $SettingsExport."$($BaselineName)_unsuccessful_commands") {
+                    # If neither of these keys are present, it means the provider for that baseline
+                    # hasn't been updated to the updated error handling method. This check
+                    # here ensures backwards compatibility until all providers are udpated.
+                    $MissingCommands = $Test.Commandlet | Where-Object {$SettingsExport."$($BaselineName)_successful_commands" -notcontains $_}
+                }
+
+                if ($MissingCommands.Count -gt 0) {
+                    $Result = "Error"
+                    $ReportSummary.Errors += 1
+                    $MissingString = $MissingCommands -Join ", "
+                    $Test.ReportDetails = "This test depends on the following command(s) which did not execute successfully: $($MissingString). See terminal output for more details."
+                }
+                elseif ($Test.RequirementMet) {
+                    $Result = "Pass"
+                    $ReportSummary.Passes += 1
+                }
+                elseif ($Test.Criticality -eq "Should") {
+                    $Result = "Warning"
+                    $ReportSummary.Warnings += 1
+                }
+                elseif ($Test.Criticality.EndsWith('3rd Party') -or $test.Criticality.EndsWith('Not-Implemented')) {
+                    $Result = "N/A"
+                    $ReportSummary.Manual += 1
+                }
+                else {
+                    $Result = "Fail"
+                    $ReportSummary.Failures += 1
+                }
+
+                $Fragment += [pscustomobject]@{
+                    "Control ID"=$Control.Id
+                    "Requirement"=$Control.Value
+                    "Result"= if ($Control.Deleted) {"-"} else {$Result}
+                    "Criticality"=if ($Control.Deleted) {"-"} else {$Test.Criticality}
+                    "Details"=if ($Control.Deleted) {"-"} else {$Test.ReportDetails}
+                }
             }
             else {
-                $Result = "Fail"
-                $ReportSummary.Failures += 1
+                $ReportSummary.Errors += 1
+                $Fragment += [pscustomobject]@{
+                    "Control ID"=$Control.Id
+                    "Requirement"=$Control.Value
+                    "Result"= "Error - Test results missing"
+                    "Criticality"= "-"
+                    "Details"= "Report issue on <a href=`"$ScubaGitHubUrl/issues`" target=`"_blank`">GitHub</a>"
+                }
+                Write-Error("ERROR: No test results found for Control Id $($Control.Id)")
             }
-
-            $Fragment += [pscustomobject]@{
-                "Requirement"=$test.Requirement;
-                "Result"=$Result;
-                "Criticality"=$test.Criticality;
-                "Details"=$test.ReportDetails}
         }
 
-        $Number = $Title.Number
-        $Name = $Title.Title
-        $Fragments += $Fragment | ConvertTo-Html -PreContent "<h2>$Number $Name</h2>" -Fragment
-
+        $Number = $BaselineName.ToUpper() + '-' + $BaselineGroup.GroupNumber
+        $Name = $BaselineGroup.GroupName
+        $GroupAnchor = New-MarkdownAnchor -GroupNumber $BaselineGroup.GroupNumber -GroupName $BaselineGroup.GroupName
+        $MarkdownLink = "<a class='control_group' href=`"$($ScubaGitHubUrl)/blob/$($SettingsExport.module_version)/baselines/$($BaselineName.ToLower()).md#$GroupAnchor`" target=`"_blank`">$Name</a>"
+        $Fragments += $Fragment | ConvertTo-Html -PreContent "<h2>$Number $MarkdownLink</h2>" -Fragment
     }
 
     $Title = "$($FullName) Baseline Report"
@@ -168,6 +193,100 @@ function New-Report {
     $ReportSummary
 }
 
+function Import-SecureBaseline{
+    <#
+    .Description
+    This function parses the secure baseline via each product markdown document to align policy with the
+    software baseline.
+    .Functionality
+    Internal
+    #>
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory = $false)]
+        [ValidateScript({Test-Path -PathType Container $_})]
+        [string]
+        $BaselinePath = (Join-Path -Path $PSScriptRoot -ChildPath "..\..\..\..\baselines\")
+    )
+
+    $ProductNames = Get-ChildItem $BaselinePath -Filter "*.md" | ForEach-Object {$_.Name.SubString(0, $_.Name.Length - 3)}
+    $Output = @{}
+
+    foreach ($Product in $ProductNames) {
+        $Output[$Product] = @()
+        $ProductPath = Join-Path -Path $BaselinePath -ChildPath "$Product.md"
+        $MdLines = Get-Content -Path $ProductPath
+
+        # Select-String line numbers aren't 0-indexed, hence the "-1" on the next line
+        $LineNumbers = Select-String "^## [0-9]+\." "$($BaselinePath)$($Product).md" | ForEach-Object {$_."LineNumber"-1}
+        $Groups = $LineNumbers | ForEach-Object {$MdLines[$_]}
+
+        foreach ($GroupName in $Groups) {
+            $Group = @{}
+            $Group.GroupNumber = $GroupName.Split(".")[0].SubString(3) # 3 to remove the "## "
+            $Group.GroupName = $GroupName.Split(".")[1].Trim() # 1 to remove the leading space
+            $Group.Controls = @()
+
+            $IdRegex =  "#### MS\.[$($Product.ToUpper())]+\.$($Group.GroupNumber)\."
+            # Select-String line numbers aren't 0-indexed, hence the "-1" on the next line
+            $LineNumbers = Select-String $IdRegex "$($BaselinePath)$($Product).md" | ForEach-Object {$_."LineNumber"-1}
+
+            foreach ($LineNumber in $LineNumbers) {
+                # This assumes that the value is on the immediate next line after the ID and ends in a period.
+                $LineAdvance = 1;
+                $Value = ([string]$MdLines[$LineNumber+$LineAdvance]).Trim()
+
+                while ($Value.Substring($Value.Length-1,1) -ne "."){
+                    $LineAdvance++
+                    $Value += ' ' + ([string]$MdLines[$LineNumber+$LineAdvance]).Trim()
+                }
+
+                $Value = [System.Net.WebUtility]::HtmlEncode($Value)
+                $Id = [string]$MdLines[$LineNumber].Substring(5)
+
+                if ($Id.EndsWith("X")){
+                    $Deleted = $true
+                    $Id = $Id -Replace ".$"
+                    $Value = "[DELETED] " + $Value
+                }
+                else {
+                    $Deleted = $false
+                }
+
+                $Group.Controls += @{"Id"=$Id; "Value"=$Value; "Deleted"=$Deleted}
+            }
+
+            $Output[$Product] += $Group
+        }
+    }
+
+    $Output
+}
+
+function New-MarkdownAnchor{
+    param (
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $GroupNumber,
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $GroupName
+    )
+    [Int32]$OutNumber = $null
+
+    if ($true -eq [Int32]::TryParse($GroupNumber, [ref]$OutNumber)){
+        $MangledName = $GroupName.ToLower().Trim().Replace(' ', '-')
+        return "#$($GroupNumber.Trim())-$MangledName"
+    }
+    else {
+        $InvalidGroupNumber = New-Object System.ArgumentException "$GroupNumber is not valid"
+        throw $InvalidGroupNumber
+    }
+}
+
 Export-ModuleMember -Function @(
-    'New-Report'
+    'New-Report',
+    'Import-SecureBaseline'
 )

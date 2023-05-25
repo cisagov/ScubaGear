@@ -1,17 +1,11 @@
 package onedrive
 import future.keywords
+import data.report.utils.NotCheckedDetails
+import data.report.utils.ReportDetailsBoolean
 
-ReportDetailsBoolean(Status) = "Requirement met" if {Status == true}
-
-ReportDetailsBoolean(Status) = "Requirement not met" if {Status == false}
-
-
-################
-# Baseline 2.1 #
-################
-
+#--
 #
-# Baseline 2.1: Policy 1
+# MS.ONEDRIVE.1.1v1
 #--
 AnyoneLinksPolicy[Policy]{
     Policy := input.SPO_tenant_info[_]
@@ -19,8 +13,7 @@ AnyoneLinksPolicy[Policy]{
 }
 
 tests[{
-    "Requirement" : "Anyone links SHOULD be disabled",
-    "Control" : "OneDrive 2.1",
+    "PolicyId" : "MS.ONEDRIVE.1.1v1",
     "Criticality" : "Should",
     "Commandlet" : ["Get-SPOTenant", "Get-PnPTenant"],
     "ActualValue" : Policies,
@@ -34,25 +27,20 @@ tests[{
 #--
 
 tests[{
-    "Requirement" : "Anyone links SHOULD be disabled",
-    "Control" : "OneDrive 2.1",
+    "PolicyId" : PolicyId,
     "Criticality" : "Should/Not-Implemented",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "Currently cannot be checked automatically while using Service Principals. See Onedrive Secure Configuration Baseline policy 2.1 for instructions on manual check",
+    "ReportDetails" : NotCheckedDetails(PolicyId),
     "RequirementMet" : false
 }] {
+    PolicyId := "MS.ONEDRIVE.1.1v1"
     input.OneDrive_PnP_Flag
 }
 #--
 
-
-################
-# Baseline 2.2 #
-################
-
 #
-# Baseline 2.2: Policy 1
+# MS.ONEDRIVE.2.1v1
 #--
 ReportDetails2_2(Policy) = Description if {
     Policy.OneDriveSharingCapability != 2
@@ -72,8 +60,7 @@ ReportDetails2_2(Policy) = Description if {
 }
 
 tests[{
-    "Requirement" : "An expiration date SHOULD be set for Anyone links",
-    "Control" : "OneDrive 2.2",
+    "PolicyId" : "MS.ONEDRIVE.2.1v1",
     "Criticality" : "Should",
     "Commandlet" : ["Get-SPOTenant", "Get-PnPTenant"],
     "ActualValue" : [Policy.OneDriveSharingCapability, Policy.RequireAnonymousLinksExpireInDays],
@@ -90,25 +77,36 @@ tests[{
 }
 
 tests[{
-    "Requirement" : "An expiration date SHOULD be set for Anyone links",
-    "Control" : "OneDrive 2.2",
+    "PolicyId" : PolicyId,
     "Criticality" : "Should/Not-Implemented",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "Currently cannot be checked automatically while using Service Principals. See Onedrive Secure Configuration Baseline policy 2.2 for instructions on manual check",
+    "ReportDetails" : NotCheckedDetails(PolicyId),
     "RequirementMet" : false
 }] {
+    PolicyId := "MS.ONEDRIVE.2.1v1"
     input.OneDrive_PnP_Flag
 }
 #--
 
-
-################
-# Baseline 2.3 #
-################
+#
+# MS.ONEDRIVE.2.2v1
+#--
+tests[{
+    "PolicyId" : PolicyId,
+    "Criticality" : "Should/Not-Implemented",
+    "Commandlet" : [],
+    "ActualValue" : [],
+    "ReportDetails" : NotCheckedDetails(PolicyId),
+    "RequirementMet" : false
+}] {
+    PolicyId := "MS.ONEDRIVE.2.2v1"
+    input.OneDrive_PnP_Flag
+}
+#--
 
 #
-# Baseline 2.3: Policy 1
+# MS.ONEDRIVE.3.1v1
 #--
 ReportDetails2_3(Policy) = Description if {
     Policy.OneDriveSharingCapability != 2
@@ -144,8 +142,7 @@ ReportDetails2_3(Policy) = Description if {
 }
 
 tests[{
-    "Requirement" : "Anyone link permissions SHOULD be limited to View",
-    "Control" : "OneDrive 2.3",
+    "PolicyId" : "MS.ONEDRIVE.3.1v1",
     "Criticality" : "Should",
     "Commandlet" : ["Get-SPOTenant", "Get-PnPTenant"],
     "ActualValue" : [Policy.OneDriveSharingCapability, Policy.FileAnonymousLinkType, Policy.FolderAnonymousLinkType],
@@ -162,25 +159,20 @@ tests[{
 }
 
 tests[{
-    "Requirement" : "Anyone link permissions SHOULD be limited to View",
-    "Control" : "OneDrive 2.3",
+    "PolicyId" : PolicyId,
     "Criticality" : "Should/Not-Implemented",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "Currently cannot be checked automatically while using Service Principals. See Onedrive Secure Configuration Baseline policy 2.3 for instructions on manual check",
+    "ReportDetails" : NotCheckedDetails(PolicyId),
     "RequirementMet" : false
 }] {
+    PolicyId := "MS.ONEDRIVE.3.1v1"
     input.OneDrive_PnP_Flag
 }
 #--
 
-
-################
-# Baseline 2.4 #
-################
-
 #
-# Baseline 2.4: Policy 1
+# MS.ONEDRIVE.4.1v1
 #--
 DefinedDomainsPolicy[Policy]{
     Policy := input.Tenant_sync_info[_]
@@ -188,8 +180,7 @@ DefinedDomainsPolicy[Policy]{
 }
 
 tests[{
-    "Requirement" : "OneDrive Client for Windows SHALL be restricted to agency-Defined Domain(s)",
-    "Control" : "OneDrive 2.4",
+    "PolicyId" : "MS.ONEDRIVE.4.1v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-SPOTenant", "Get-PnPTenant"],
     "ActualValue" : Policies,
@@ -201,13 +192,8 @@ tests[{
 }
 #--
 
-
-################
-# Baseline 2.5 #
-################
-
 #
-# Baseline 2.5: Policy 1
+# MS.ONEDRIVE.5.1v1
 #--
 ClientSyncPolicy[Policy]{
     Policy := input.Tenant_sync_info[_]
@@ -216,7 +202,7 @@ ClientSyncPolicy[Policy]{
 
 tests[{
     "Requirement" : "OneDrive Client Sync SHALL only be allowed only within the local domain",
-    "Control" : "OneDrive 2.5",
+    "PolicyId" : "MS.ONEDRIVE.5.1v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-SPOTenantSyncClientRestriction", "Get-PnPTenantSyncClientRestriction"],
     "ActualValue" : Policies,
@@ -228,46 +214,34 @@ tests[{
 }
 #--
 
-
-################
-# Baseline 2.6 #
-################
-
 #
-# Baseline 2.6: Policy 1
+# MS.ONEDRIVE.6.1v1
 #--
-# At this time we are unable to test for X because of Y
 tests[{
-    "Requirement" : "OneDrive Client Sync SHALL be restricted to the local domain",
-    "Control" : "OneDrive 2.6",
+    "PolicyId" : PolicyId,
     "Criticality" : "Shall/Not-Implemented",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "Currently cannot be checked automatically. See Onedrive Secure Configuration Baseline policy 2.6 for instructions on manual check",
+    "ReportDetails" : NotCheckedDetails(PolicyId),
     "RequirementMet" : false
 }] {
+    PolicyId := "MS.ONEDRIVE.6.1v1"
     true
 }
 #--
 
-
-################
-# Baseline 2.7 #
-################
-
 #
-# Baseline 2.7: Policy 1
+# MS.ONEDRIVE.7.1v1
 #--
-# At this time we are unable to test for X because of Y
 tests[{
-    "Requirement" : "Legacy Authentication SHALL be blocked",
-    "Control" : "OneDrive 2.7",
+    "PolicyId" : PolicyId,
     "Criticality" : "Shall/Not-Implemented",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "Currently cannot be checked automatically. See Onedrive Secure Configuration Baseline policy 2.7 for instructions on manual check",
+    "ReportDetails" : NotCheckedDetails(PolicyId),
     "RequirementMet" : false
 }] {
+    PolicyId := "MS.ONEDRIVE.7.1v1"
     true
 }
 #--

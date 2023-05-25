@@ -8,7 +8,10 @@ InModuleScope Orchestrator {
             Mock -ModuleName Orchestrator New-Report {}
             function Pluralize {}
             Mock -ModuleName Orchestrator Pluralize {}
-
+            function Import-SecureBaseline{}
+            Mock -ModuleName Orchestrator Import-SecureBaseline {
+                return @()
+            }
             Mock -CommandName Write-Progress {}
             Mock -CommandName Join-Path { "." }
             Mock -CommandName Out-File {}

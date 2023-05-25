@@ -1,16 +1,14 @@
 package aad
 import future.keywords
+import data.report.utils.NotCheckedDetails
+import data.report.utils.Format
+import data.report.utils.ReportDetailsBoolean
 
 ################
 # The report formatting functions below are generic and used throughout the policies #
 ################
-Format(Array) = format_int(count(Array), 10)
 
 Description(String1, String2, String3) =  trim(concat(" ", [String1, String2, String3]), " ")
-
-ReportDetailsBoolean(Status) = "Requirement met" if {Status == true}
-
-ReportDetailsBoolean(Status) = "Requirement not met" if {Status == false}
 
 ReportDetailsArray(Array, String) = Description(Format(Array), String, "")
 
@@ -124,12 +122,8 @@ GroupExclusionsFullyExempt(Policy, PolicyID) := true if {
     count({ y | y := input.scuba_config.Aad[PolicyID].CapExclusions.Groups }) == 0
 }
 
-################
-# Baseline 2.1 #
-################
-
 #
-# Baseline 2.1: Policy 1
+# MS.AAD.1.1v1
 #--
 
 default Policy2_1_1ConditionsMatch(_) := false
@@ -155,8 +149,7 @@ Policies2_1[Cap.DisplayName] {
 }
 
 tests[{
-    "Requirement" : "Legacy authentication SHALL be blocked",
-    "Control" : "AAD 2.1",
+    "PolicyId" : "MS.AAD.1.1v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-MgIdentityConditionalAccessPolicy"],
     "ActualValue" : Policies2_1,
@@ -167,13 +160,8 @@ tests[{
     true
 }
 
-#--
-################
-# Baseline 2.2 #
-################
-
 #
-# Baseline 2.2: Policy 1
+# MS.AAD.2.1v1
 #--
 
 default Policy2_2_1ConditionsMatch(_) := false
@@ -198,8 +186,7 @@ Policies2_2_1[Cap.DisplayName] {
 }
 
 tests[{
-    "Requirement" : "Users detected as high risk SHALL be blocked",
-    "Control" : "AAD 2.2",
+    "PolicyId" : "MS.AAD.2.1v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-MgIdentityConditionalAccessPolicy"],
     "ActualValue" : Policies2_2_1,
@@ -212,29 +199,25 @@ tests[{
 #--
 
 #
-# Baseline 2.2: Policy 2
+# MS.AAD.2.2v1
 #--
 # At this time we are unable to test for X because of Y
 tests[{
-    "Requirement" : "A notification SHOULD be sent to the administrator when high-risk users are detected",
-    "Control" : "AAD 2.2",
+    "PolicyId": PolicyId,
     "Criticality" : "Should/Not-Implemented",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "Currently cannot be checked automatically. See Azure Active Directory Secure Configuration Baseline policy 2.2 for instructions on manual check",
+    "ReportDetails" : NotCheckedDetails(PolicyId),
     "RequirementMet" : false
 }] {
+    PolicyId := "MS.AAD.2.2v1"
     true
 }
 #--
 
 
-################
-# Baseline 2.3 #
-################
-
 #
-# Baseline 2.3: Policy 1
+# MS.AAD.3.1v1
 #--
 
 default Policy2_3_1ConditionsMatch(_) := false
@@ -259,8 +242,7 @@ Policies2_3[Cap.DisplayName] {
 }
 
 tests[{
-    "Requirement" : "Sign-ins detected as high risk SHALL be blocked",
-    "Control" : "AAD 2.3",
+    "PolicyId": "MS.AAD.3.1v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-MgIdentityConditionalAccessPolicy"],
     "ActualValue" : Policies2_3,
@@ -273,12 +255,8 @@ tests[{
 #--
 
 
-################
-# Baseline 2.4 #
-################
-
 #
-# Baseline 2.4: Policy 1
+# MS.AAD.4.1v1
 #--
 default Policy2_4_1ConditionsMatch(_) := false
 Policy2_4_1ConditionsMatch(Policy) := true if {
@@ -301,8 +279,7 @@ Policies2_4_1[Cap.DisplayName] {
 }
 
 tests[{
-    "Requirement" : "MFA SHALL be required for all users",
-    "Control" : "AAD 2.4",
+    "PolicyId" : "MS.AAD.4.1v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-MgIdentityConditionalAccessPolicy"],
     "ActualValue" : Policies2_4_1,
@@ -315,102 +292,126 @@ tests[{
 #--
 
 #
-# Baseline 2.4: Policy 2
+# MS.AAD.4.2v1
 #--
 # At this time we are unable to fully test for MFA due to conflicting and multiple ways to configure authentication methods
 # Awaiting API changes and feature updates from Microsoft for automated checking
 tests[{
-    "Requirement" : "Phishing-resistant MFA SHALL be used for all users",
-    "Control" : "AAD 2.4",
+    "PolicyId" : PolicyId,
     "Criticality" : "Shall/Not-Implemented",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "Currently cannot be checked automatically. See Azure Active Directory Secure Configuration Baseline policy 2.4 for instructions on manual check",
+    "ReportDetails" : NotCheckedDetails(PolicyId),
     "RequirementMet" : false
 }] {
+    PolicyId := "MS.AAD.4.2v1"
     true
 }
 #--
 
 #
-# Baseline 2.4: Policy 3
+# MS.AAD.4.3v1
 #--
 # At this time we are unable to test for all users due to conflicting and multiple ways to configure authentication methods
 # Awaiting API changes and feature updates from Microsoft for automated checking
 tests[{
-    "Requirement" : "If phishing-resistant MFA cannot be used, an MFA method from the list [see AAD baseline 2.4] SHALL be used in the interim",
-    "Control" : "AAD 2.4",
+    "PolicyId" : PolicyId,
     "Criticality" : "Shall/Not-Implemented",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "Currently cannot be checked automatically. See Azure Active Directory Secure Configuration Baseline policy 2.4 for instructions on manual check",
+    "ReportDetails" : NotCheckedDetails(PolicyId),
     "RequirementMet" : false
 }] {
+    PolicyId := "MS.AAD.4.3v1"
     true
 }
 #--
 
 #
-# Baseline 2.4: Policy 4
+# MS.AAD.4.4v1
 #--
 # At this time we are unable to test for SMS/Voice settings due to lack of API to validate
 # Awaiting API changes and feature updates from Microsoft for automated checking
 tests[{
-    "Requirement" : "SMS or Voice as the MFA method SHALL NOT be used",
-    "Control" : "AAD 2.4",
+    "PolicyId" : PolicyId,
     "Criticality" : "Shall/Not-Implemented",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "Currently cannot be checked automatically. See Azure Active Directory Secure Configuration Baseline policy 2.4 for instructions on manual check",
+    "ReportDetails" : NotCheckedDetails(PolicyId),
     "RequirementMet" : false
 }] {
+    PolicyId := "MS.AAD.4.4v1"
     true
 }
 #--
 
 
-################
-# Baseline 2.5 #
-################
-
 #
-# Baseline 2.5: Policy 1
+# MS.AAD.5.1v1
 #--
 # At this time we are unable to test for log collection until we integrate Azure Powershell capabilities
 tests[{
-    "Requirement" : "The following critical logs SHALL be sent at a minimum: AuditLogs, SignInLogs, RiskyUsers, UserRiskEvents, NonInteractiveUserSignInLogs, ServicePrincipalSignInLogs, ADFSSignInLogs, RiskyServicePrincipals, ServicePrincipalRiskEvents",
-    "Control" : "AAD 2.5",
+    "PolicyId" : PolicyId,
     "Criticality" : "Shall/Not-Implemented",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "Currently cannot be checked automatically. See Azure Active Directory Secure Configuration Baseline policy 2.5 for instructions on manual check",
+    "ReportDetails" : NotCheckedDetails(PolicyId),
     "RequirementMet" : false
 }] {
+    PolicyId := "MS.AAD.5.1v1"
     true
 }
 #--
 
 #
-# Baseline 2.5: Policy 2
+# MS.AAD.5.2v1
 #--
-# At this time we are unable to test for X because of Y
 tests[{
-    "Requirement" : "The logs SHALL be sent to the agency's SOC for monitoring",
-    "Control" : "AAD 2.5",
-    "Criticality" : "Shall/Not-Implemented",
+    "PolicyId": PolicyId,
+    "Criticality" : "Should/Not-Implemented",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "Currently cannot be checked automatically. See Azure Active Directory Secure Configuration Baseline policy 2.5 for instructions on manual check",
+    "ReportDetails" : NotCheckedDetails(PolicyId),
     "RequirementMet" : false
 }] {
+    PolicyId := "MS.AAD.5.2v1"
     true
 }
 #--
 
+#
+# MS.AAD.5.3v1
+#--
+tests[{
+    "PolicyId": PolicyId,
+    "Criticality" : "Should/Not-Implemented",
+    "Commandlet" : [],
+    "ActualValue" : [],
+    "ReportDetails" : NotCheckedDetails(PolicyId),
+    "RequirementMet" : false
+}] {
+    PolicyId := "MS.AAD.5.3v1"
+    true
+}
+#--
 
-################
-# Baseline 2.6 #
-################
+#
+# MS.AAD.5.4v1
+#--
+# At this time we are unable to test for X because of Y
+tests[{
+    "PolicyId" : PolicyId,
+    "Criticality" : "Shall/Not-Implemented",
+    "Commandlet" : [],
+    "ActualValue" : [],
+    "ReportDetails" : NotCheckedDetails(PolicyId),
+    "RequirementMet" : false
+}] {
+    PolicyId := "MS.AAD.5.4v1"
+    true
+}
+#--
+
 
 AuthPoliciesBad_2_6[Policy.Id] {
     Policy = input.authorization_policies[_]
@@ -425,11 +426,10 @@ AllAuthPoliciesAllowedCreate[{
 }
 
 #
-# Baseline 2.6: Policy 1
+# MS.AAD.6.1v1
 #--
 tests[{
-    "Requirement" : "Only administrators SHALL be allowed to register third-party applications",
-    "Control" : "AAD 2.6",
+    "PolicyId" : "MS.AAD.6.1v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-MgPolicyAuthorizationPolicy"],
     "ActualValue" : {"all_allowed_create_values": AllAuthPoliciesAllowedCreate},
@@ -442,13 +442,8 @@ tests[{
 }
 #--
 
-
-################
-# Baseline 2.7 #
-################
-
 #
-# Baseline 2.7: Policy 1
+# MS.AAD.7.1v1
 #--
 BadDefaultGrantPolicies[Policy.Id] {
     Policy = input.authorization_policies[_]
@@ -463,8 +458,7 @@ AllDefaultGrantPolicies[{
 }
 
 tests[{
-    "Requirement" : "Only administrators SHALL be allowed to consent to third-party applications",
-    "Control" : "AAD 2.7",
+    "PolicyId" : "MS.AAD.7.1v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-MgPolicyAuthorizationPolicy"],
     "ActualValue" : {"all_grant_policy_values": AllDefaultGrantPolicies},
@@ -478,7 +472,7 @@ tests[{
 #--
 
 #
-# Baseline 2.7: Policy 2
+# MS.AAD.7.2v1
 #--
 BadConsentPolicies[Policy.Id] {
     Policy := input.admin_consent_policies[_]
@@ -494,8 +488,7 @@ AllConsentPolicies[{
 
 
 tests[{
-    "Requirement" : "An admin consent workflow SHALL be configured",
-    "Control" : "AAD 2.7",
+    "PolicyId" : "MS.AAD.7.2v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-MgPolicyAdminConsentRequestPolicy"],
     "ActualValue" : {"all_consent_policies": AllConsentPolicies},
@@ -508,7 +501,7 @@ tests[{
 #--
 
 #
-# Baseline 2.7: Policy 3
+# MS.AAD.7.3v1
 #--
 AllConsentSettings[{
     "SettingsGroup": SettingGroup.DisplayName,
@@ -539,8 +532,7 @@ BadConsentSettings[{
 }
 
 tests[{
-    "Requirement" : "Group owners SHALL NOT be allowed to consent to third-party applications",
-    "Control" : "AAD 2.7",
+    "PolicyId" : "MS.AAD.7.3v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-MgDirectorySetting"],
     "ActualValue" : AllConsentSettings,
@@ -552,35 +544,25 @@ tests[{
 }
 #--
 
-
-################
-# Baseline 2.8 #
-################
-
 #
-# Baseline 2.8: Policy 1
+# MS.AAD.8.1v1
 #--
 # At this time we are unable to test for X because of Y
 tests[{
-    "Requirement" : "User passwords SHALL NOT expire",
-    "Control" : "AAD 2.8",
+    "PolicyId" : PolicyId,
     "Criticality" : "Shall/Not-Implemented",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "Currently cannot be checked automatically. See Azure Active Directory Secure Configuration Baseline policy 2.8 for instructions on manual check",
+    "ReportDetails" : NotCheckedDetails(PolicyId),
     "RequirementMet" : false
 }] {
+    PolicyId := "MS.AAD.8.1v1"
     true
 }
 #--
 
-
-################
-# Baseline 2.9 #
-################
-
 #
-# Baseline 2.9: Policy 1
+# MS.AAD.9.1v1
 #--
 default Policy2_9_1ConditionsMatch(_) := false
 Policy2_9_1ConditionsMatch(Policy) := true if {
@@ -605,8 +587,7 @@ Policies2_9[Cap.DisplayName] {
 }
 
 tests[{
-    "Requirement" : "Sign-in frequency SHALL be configured to 12 hours",
-    "Control" : "AAD 2.9",
+    "PolicyId" : "MS.AAD.9.1v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-MgIdentityConditionalAccessPolicy"],
     "ActualValue" : Policies2_9,
@@ -618,13 +599,8 @@ tests[{
 }
 #--
 
-
-#################
-# Baseline 2.10 #
-#################
-
 #
-# Baseline 2.10: Policy 1
+# MS.AAD.10.1v1
 #--
 default Policy2_10_1ConditionsMatch(_) := false
 Policy2_10_1ConditionsMatch(Policy) := true if {
@@ -648,8 +624,7 @@ Policies2_10[Cap.DisplayName] {
 }
 
 tests[{
-    "Requirement" : "Browser sessions SHALL not be persistent",
-    "Control" : "AAD 2.10",
+    "PolicyId" : "MS.AAD.10.1v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-MgIdentityConditionalAccessPolicy"],
     "ActualValue" : Policies2_10,
@@ -661,13 +636,8 @@ tests[{
 }
 #--
 
-
-#################
-# Baseline 2.11 #
-#################
-
 #
-# Baseline 2.11: Policy 1
+# MS.AAD.11.1v1
 #--
 GlobalAdmins[User.DisplayName] {
     some id
@@ -676,8 +646,7 @@ GlobalAdmins[User.DisplayName] {
 }
 
 tests[{
-    "Requirement" : "A minimum of two users and a maximum of four users SHALL be provisioned with the Global Administrator role",
-    "Control" : "AAD 2.11",
+    "PolicyId" : "MS.AAD.11.1v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-MgSubscribedSku", "Get-PrivilegedUser"],
     "ActualValue" : GlobalAdmins,
@@ -690,13 +659,8 @@ tests[{
 }
 #--
 
-
-#################
-# Baseline 2.12 #
-#################
-
 #
-# Baseline 2.12: Policy 1
+# MS.AAD.12.1v1
 #--
 FederatedAdmins[User.DisplayName] {
     some id
@@ -705,8 +669,7 @@ FederatedAdmins[User.DisplayName] {
 }
 
 tests[{
-    "Requirement" : "Users that need to be assigned to highly privileged Azure AD roles SHALL be provisioned cloud-only accounts that are separate from the on-premises directory or other federated identity providers",
-    "Control" : "AAD 2.12",
+    "PolicyId" : "MS.AAD.12.1v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-MgSubscribedSku", "Get-PrivilegedUser"],
     "ActualValue" : AdminNames,
@@ -719,12 +682,8 @@ tests[{
 }
 #--
 
-#################
-# Baseline 2.13 #
-#################
-
 #
-# Baseline 2.13: Policy 1
+# MS.AAD.13.1v1
 #--
 Policies2_13[Cap.DisplayName] {
     Cap := input.conditional_access_policies[_]
@@ -744,8 +703,7 @@ Policies2_13[Cap.DisplayName] {
 }
 
 tests[{
-    "Requirement" : "MFA SHALL be required for user access to highly privileged roles",
-    "Control" : "AAD 2.13",
+    "PolicyId" : "MS.AAD.13.1v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-MgSubscribedSku", "Get-PrivilegedRole", "Get-MgIdentityConditionalAccessPolicy"],
     "ActualValue" : Policies2_13,
@@ -758,7 +716,7 @@ tests[{
 
 
 #################
-# Helper functions for policies 2.14, 2.15, 2.16
+# Helper functions for policies
 #################
 
 # DoPIMRoleRulesExist will return true when the JSON privileged_roles.Rules element exists and false when it does not.
@@ -783,12 +741,8 @@ DoPIMRoleAssignmentsExist {
 default check_if_role_assignments_exist := false
 check_if_role_assignments_exist := DoPIMRoleAssignmentsExist
 
-#################
-# Baseline 2.14 #
-#################
-
 #
-# Baseline 2.14: Policy 1
+# MS.AAD.14.1v1
 #--
 RolesWithoutLimitedExpirationPeriod[Role.DisplayName] {
     Role := input.privileged_roles[_]
@@ -811,8 +765,7 @@ RolesWithoutLimitedExpirationPeriod[Role.DisplayName] {
 }
 
 tests[{
-    "Requirement" : "Permanent active role assignments SHALL NOT be allowed for highly privileged roles. Active assignments SHALL have an expiration period.",
-    "Control" : "AAD 2.14",
+    "PolicyId" : "MS.AAD.14.1v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-MgSubscribedSku", "Get-PrivilegedRole"],
     "ActualValue" : RolesWithoutLimitedExpirationPeriod,
@@ -826,7 +779,7 @@ tests[{
 #--
 
 #
-# Baseline 2.14: Policy 2
+# MS.AAD.14.2v1
 #--
 RolesAssignedOutsidePim[Role.DisplayName] {
     Role := input.privileged_roles[_]
@@ -836,8 +789,7 @@ RolesAssignedOutsidePim[Role.DisplayName] {
 }
 
 tests[{
-    "Requirement" : "Provisioning of users to highly privileged roles SHALL NOT occur outside of a PAM system, such as the Azure AD PIM service, because this bypasses the controls the PAM system provides",
-    "Control" : "AAD 2.14",
+    "PolicyId" : "MS.AAD.14.2v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-MgSubscribedSku", "Get-PrivilegedRole"],
     "ActualValue" : RolesAssignedOutsidePim,
@@ -851,12 +803,8 @@ tests[{
 #--
 
 
-#################
-# Baseline 2.15 #
-#################
-
 #
-# Baseline 2.15: Policy 1
+# MS.AAD.15.1v1
 #--
 RolesWithoutApprovalRequired[RoleName] {
     Role := input.privileged_roles[_]
@@ -868,8 +816,7 @@ RolesWithoutApprovalRequired[RoleName] {
 }
 
 tests[{
-    "Requirement" : "Activation of highly privileged roles SHOULD require approval",
-    "Control" : "AAD 2.15",
+    "PolicyId" : "MS.AAD.15.1v1",
     "Criticality" : "Should",
     "Commandlet" : ["Get-MgSubscribedSku", "Get-PrivilegedRole"],
     "ActualValue" : RolesWithoutApprovalRequired,
@@ -882,13 +829,8 @@ tests[{
 }
 #--
 
-
-#################
-# Baseline 2.16 #
-#################
-
 #
-# Baseline 2.16: Policy 1
+# MS.AAD.16.1v1
 #--
 RolesWithoutActiveAssignmentAlerts[RoleName] {
     Role := input.privileged_roles[_]
@@ -909,8 +851,7 @@ RolesWithoutEligibleAssignmentAlerts[RoleName] {
 }
 
 tests[{
-    "Requirement" : "Eligible and Active highly privileged role assignments SHALL trigger an alert",
-    "Control" : "AAD 2.16",
+    "PolicyId" : "MS.AAD.16.1v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-MgSubscribedSku", "Get-PrivilegedRole"],
     "ActualValue" : RolesWithoutAssignmentAlerts,
@@ -925,7 +866,7 @@ tests[{
 #--
 
 #
-# Baseline 2.16: Policy 2
+# MS.AAD.16.2v1
 #--
 AdminsWithoutActivationAlert[RoleName] {
     Role := input.privileged_roles[_]
@@ -938,8 +879,7 @@ AdminsWithoutActivationAlert[RoleName] {
 }
 
 tests[{
-    "Requirement" : "User activation of the Global Administrator role SHALL trigger an alert",
-    "Control" : "AAD 2.16",
+    "PolicyId" : "MS.AAD.16.2v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-MgSubscribedSku", "Get-PrivilegedRole"],
     "ActualValue" : AdminsWithoutActivationAlert,
@@ -953,11 +893,10 @@ tests[{
 #--
 
 #
-# Baseline 2.16: Policy 3
+# MS.AAD.16.3v1
 #--
 tests[{
-    "Requirement" : "User activation of other highly privileged roles SHOULD trigger an alert",
-    "Control" : "AAD 2.16",
+    "PolicyId" : "MS.AAD.16.3v1",
     "Criticality" : "Should",
     "Commandlet" : ["Get-MgSubscribedSku", "Get-PrivilegedRole"],
     "ActualValue" : NonGlobalAdminsWithoutActivationAlert,
@@ -971,13 +910,8 @@ tests[{
 }
 #--
 
-
-#################
-# Baseline 2.17 #
-#################
-
 #
-# Baseline 2.17: Policy 1
+# MS.AAD.17.1v1
 #--
 Policies2_17[Cap.DisplayName] {
     Cap := input.conditional_access_policies[_]
@@ -992,8 +926,7 @@ Policies2_17[Cap.DisplayName] {
 }
 
 tests[{
-    "Requirement" : "Managed devices SHOULD be required for authentication",
-    "Control" : "AAD 2.17",
+    "PolicyId" : "MS.AAD.17.1v1",
     "Criticality" : "Should",
     "Commandlet" : ["Get-MgIdentityConditionalAccessPolicy"],
     "ActualValue" : Policies2_17,
@@ -1005,15 +938,9 @@ tests[{
 }
 #--
 
-
-#################
-# Baseline 2.18 #
-#################
-
 #
-# Baseline 2.18: Policy 1
+# MS.AAD.18.1v1
 #--
-
 AuthPoliciesBadAllowInvites[Policy.Id] {
     Policy = input.authorization_policies[_]
     Policy.AllowInvitesFrom != "adminsAndGuestInviters"
@@ -1031,8 +958,7 @@ AllAuthPoliciesAllowInvites[{
 }
 
 tests[{
-    "Requirement" : "Only users with the Guest Inviter role SHOULD be able to invite guest users",
-    "Control" : "AAD 2.18",
+    "PolicyId" : "MS.AAD.18.1v1",
     "Criticality" : "Should",
     "Commandlet" : ["Get-MgPolicyAuthorizationPolicy"],
     "ActualValue" : {"all_allow_invite_values": AllAuthPoliciesAllowInvites},
@@ -1046,24 +972,24 @@ tests[{
 #--
 
 #
-# Baseline 2.18: Policy 2
+# MS.AAD.18.2v1
 #--
 # At this time we are unable to test for X because of Y
 tests[{
-    "Requirement" : "Guest invites SHOULD only be allowed to specific external domains that have been authorized by the agency for legitimate business purposes",
-    "Control" : "AAD 2.18",
+    "PolicyId" : PolicyId,
     "Criticality" : "Should/Not-Implemented",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "Currently cannot be checked automatically. See Azure Active Directory Secure Configuration Baseline policy 2.18 for instructions on manual check",
+    "ReportDetails" : NotCheckedDetails(PolicyId),
     "RequirementMet" : false
 }] {
+    PolicyId := "MS.AAD.18.2v1"
     true
 }
 #--
 
 #
-# Baseline 2.18: Policy 3
+# MS.AAD.18.3v1
 #--
 # must hardcode the ID. See
 # https://docs.microsoft.com/en-us/azure/active-directory/enterprise-users/users-restrict-guest-permissions
@@ -1091,10 +1017,8 @@ RoleIdByPolicy[concat("", ["\"", Level, "\"", " (", Policy.Id, ")"])] {
     Level := LevelAsString(Policy.GuestUserRoleId)
 }
 
-
 tests[{
-    "Requirement" : "Guest users SHOULD have limited access to Azure AD directory objects",
-    "Control" : "AAD 2.18",
+    "PolicyId" : "MS.AAD.18.3v1",
     "Criticality" : "Should",
     "Commandlet" : ["Get-MgPolicyAuthorizationPolicy"],
     "ActualValue" : {"all_roleid_values" : AllAuthPoliciesRoleIds},
