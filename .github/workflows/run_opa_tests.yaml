@@ -6,10 +6,12 @@ on:
   push:
     paths:
       - "**.rego"
+      - "**/run_opa_tests.yaml"
   pull_request:
     types: [opened, reopened]
     branches:
       - "main"
+      - "emerald" #TODO: Remove after emerald release
     paths:
       - "**.rego"
   pull_request_review:
@@ -31,4 +33,4 @@ jobs:
       run: opa check Rego Testing/Unit/Rego --strict
 
     - name: Run OPA Tests
-      run: opa test Rego/*.rego Testing/Unit/Rego/**/*.rego -v
+      run: opa test Rego/*.rego Rego/Utils/*.rego Testing/Unit/Rego/**/*.rego -v
