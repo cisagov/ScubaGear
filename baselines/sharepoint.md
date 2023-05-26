@@ -122,7 +122,7 @@ OMB Max Site for a list of .gov domains for sharing).
 
 ### Policies
 #### MS.SHAREPOINT.2.1v1
-External sharing SHOULD be limited to Existing Guests.
+External sharing SHOULD be limited to Existing Guests or a more restrictive setting.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
@@ -156,7 +156,7 @@ To adjust sharing settings, in the **SharePoint admin center**:
 
 1.  Select **Policies** -\> **Sharing**.
 
-2.  Adjust external sharing slider to **New and Existing Guests.**
+2.  Adjust external sharing slider to **Existing Guests.**
 
 3.  Expand **More external sharing settings.**
 
