@@ -122,7 +122,7 @@ OMB Max Site for a list of .gov domains for sharing).
 
 ### Policies
 #### MS.SHAREPOINT.2.1v1
-External sharing SHOULD be limited to New and Existing Guests.
+External sharing SHOULD be limited to Existing Guests.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
