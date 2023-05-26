@@ -238,12 +238,12 @@ for OneDrive and Teams to the same, specified expiration times.
 
 ### Policies
 #### MS.SHAREPOINT.4.1v1
-Expiration timers for guest access to a site or OneDrive SHOULD be set to 30 days.
+Expiration timers for guest access to a site or OneDrive SHOULD be set to 30 days or less.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
 #### MS.SHAREPOINT.4.2v1
-Expiration timers for people who use a verification code SHOULD be set to 30 days.
+Expiration timers for people who use a verification code SHOULD be set to 30 days or less.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
@@ -267,12 +267,12 @@ To provide a time limit for external sharing, in the **SharePoint admin center**
 3.  Select **Guest access to a site or OneDrive will expire
     automatically after this many days.**
 
-4.  Enter “30” days.
+4.  Enter “30” days or less.
 
 5.  Select **People who use a verification code must reauthenticate
     after this many days**.
 
-6.  Enter “30 days”.
+6.  Enter “30 days” or less.
 
 7.  Select **Save.**
 
