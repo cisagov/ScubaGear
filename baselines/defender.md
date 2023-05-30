@@ -55,27 +55,28 @@ Microsoft Defender defines two [preset security
 profiles](https://docs.microsoft.com/en-us/microsoft-365/security/office-365-security/preset-security-policies):
 standard and strict. These preset policies are informed by observations made by Microsoft and are designed to strike the balance between usability and security. They allow admins to enable the full feature set of Defender by simply adding users to the policies rather than manually configuring each setting.
 
-Within the preset policies, users can be enrolled in [Exchange Online Protection](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/eop-about?view=o365-worldwide), [Defender for Office 365 protection](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/microsoft-defender-for-office-365-product-overview?view=o365-worldwide), and [Impersonation Protection](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/anti-phishing-policies-about?view=o365-worldwide#impersonation-settings-in-anti-phishing-policies-in-microsoft-defender-for-office-365).
+Within the preset policies, users can be enrolled in [Exchange Online Protection](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/eop-about?view=o365-worldwide) and [Defender for Office 365 protection](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/microsoft-defender-for-office-365-product-overview?view=o365-worldwide), and [Impersonation Protection](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/anti-phishing-policies-about?view=o365-worldwide#impersonation-settings-in-anti-phishing-policies-in-microsoft-defender-for-office-365) can be configured.
 
 ### Policies
 #### MS.DEFENDER.1.1v1
-All users SHALL be added to Exchange Online Proctection in either the standard or strict preset security policy.
-- _Rationale:_ Important user protections are provided by Exchange Online Protection, including anti-spam, anti-malware, and anti-phishing. By adding all recipients, admins ensure that all new and existing users automatically have secure defaults applied.
+All users SHALL be added to Exchange Online Protection in either the standard or strict preset security policy.
+- _Rationale:_ Important user protections are provided by Exchange Online Protection, including anti-spam, anti-malware, and anti-phishing. By using the preset policies, admins can easily ensure that all new and existing users automatically have secure defaults applied.
+
 - _Last modified:_ June 2023
 
 #### MS.DEFENDER.1.2v1
 All users SHALL be added to Defender for Office 365 Protection in either the standard or strict preset security policy.
-- _Rationale:_ Important user protections are provided by Defender for Office 365 Protection, including safe attachments and safe links. By adding all recipients, admins ensure that all new and existing users automatically have secure defaults applied.
+- _Rationale:_ Important user protections are provided by Defender for Office 365 Protection, including safe attachments and safe links. By using the preset policies, admins can easily ensure that all new and existing users automatically have secure defaults applied.
 - _Last modified:_ June 2023
 
 #### MS.DEFENDER.1.3v1
-Highly privileged users, as defined in [TODO add link to definition in AAD baseline], SHALL be added to Exchange Online Proctection in the strict preset security policy.
-- _Rationale:_ The increased protection offered by the strict preset policy helps mitigate the greater harm that could result from the compromise of a highlpy privileged account.
+Highly privileged users, as defined in [TODO add link to definition in AAD baseline], SHALL be added to Exchange Online Protection in the strict preset security policy.
+- _Rationale:_ The increased protection offered by the strict preset policy helps mitigate the greater harm that could result from the compromise of a highly privileged account.
 - _Last modified:_ June 2023
 
 #### MS.DEFENDER.1.4v1
 Highly privileged users, as defined in [TODO add link to definition in AAD baseline], SHALL be added to Defender for Office 365 Protection in the strict preset security policy.
-- _Rationale:_ The increased protection offered by the strict preset policy helps mitigate the greater harm that could result from the compromise of a highlpy privileged account.
+- _Rationale:_ The increased protection offered by the strict preset policy helps mitigate the greater harm that could result from the compromise of a highly privileged account.
 - _Last modified:_ June 2023
 
 #### MS.DEFENDER.1.5v1
@@ -107,22 +108,22 @@ impersonation attempt, the email is quarantined.
 ### Policies
 #### MS.DEFENDER.2.1v1
 User impersonation protection SHOULD be enabled for key agency leaders in both the standard and strict preset policies.
-- _Rationale:_ TODO
+- _Rationale:_ User impersonation, especially the impersonation of key users, has the potential to result in serious harm. Impersonation protection mitigates this risk. By configuring impersonation protection in both preset policies, administrators ensure that all email recipients are protected from impersonated emails, regardless of whether they are added to the standard or strict policy.
 - _Last modified:_ June 2023
 
 #### MS.DEFENDER.2.2v1
 Domain impersonation protection SHOULD be enabled for domains owned by the agency in both the standard and strict preset policies.
-- _Rationale:_ TODO
+- _Rationale:_ By configuring domain impersonation protection for all agency domains, the risk of a user being deceived by a look-alike domain may be reduced. By configuring impersonation protection in both preset policies, administrators ensure that all email recipients are protected from impersonated emails, regardless of whether they are added to the standard or strict policy.
 - _Last modified:_ June 2023
 
 #### MS.DEFENDER.2.3v1
 Domain impersonation protection SHOULD be added for frequent partners in both the standard and strict preset policies.
-- _Rationale:_ TODO
+- _Rationale:_ By configuring domain impersonation protection for domains owned by frequent partners, the risk of a user being deceived by a look-alike domain may be reduced. By configuring impersonation protection in both preset policies, administrators ensure that all email recipients are protected from impersonated emails, regardless of whether they are added to the standard or strict policy.
 - _Last modified:_ June 2023
 
 #### MS.DEFENDER.2.4v1
 Trusted senders and domains MAY be added in the event of false positives.
-- _Rationale:_ TODO
+- _Rationale:_ It is possible that false positives may be raised by the impersonation protection system. In these cases, consider marking legitimate senders as trusted to prevent the same false detection from repeating.
 - _Last modified:_ June 2023
 
 ### Resources
@@ -143,8 +144,58 @@ Trusted senders and domains MAY be added in the event of false positives.
 ### Implementation
 To add email addresses and domains to flag when impersonated by attackers, follow the instructions listed under [Use the Microsoft 365 Defender portal to assign Standard and Strict preset security policies to users \| Microsoft Docs](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/preset-security-policies?view=o365-worldwide#use-the-microsoft-365-defender-portal-to-assign-standard-and-strict-preset-security-policies-to-users).
 
+## 3. Safe-Attachments
 
-## 3. Data Loss Prevention
+The Safe Attachments feature will scan messages for attachments with malicious
+content. It routes all messages and attachments that do not have a
+virus/malware signature to a special environment. It then uses machine
+learning and analysis techniques to detect malicious intent.
+While safe attachments for Exchange Online is automatically
+configured in the preset policies, separate action needs to be taken to
+enable it for other products.
+
+### Policies
+#### MS.DEFENDER.3.1v1
+Safe attachments SHOULD be enabled for SharePoint, OneDrive, and Microsoft Teams.
+- _Rationale:_ Users clicking malicious links can allow attackers an entrance. However, this danger is not limited to links included in emails. Other Microsoft products, such as Microsoft Teams, can be used to present users with malicious links. As such, it is important to protect users on these other Microsoft products as well.
+- _Last modified:_ June 2023
+
+### Resources
+
+- [Safe Attachments in Microsoft Defender for Office 365 \| Microsoft
+  Docs](https://docs.microsoft.com/en-us/microsoft-365/security/office-365-security/safe-attachments?view=o365-worldwide#safe-attachments-policy-settings)
+
+- [Turn on Safe Attachments for SharePoint, OneDrive, and Microsoft
+  Teams \| Microsoft
+  Docs](https://docs.microsoft.com/en-us/microsoft-365/security/office-365-security/turn-on-mdo-for-spo-odb-and-teams?view=o365-worldwide)
+
+### License Requirements
+
+- Requires Defender for Office 365 Plan 1 or 2. These are included with
+  E5 and G5 and are available as add-ons for E3 and G3.
+
+### Implementation
+
+To enable Safe Attachments for SharePoint, OneDrive, and Microsoft
+Teams, follow the instructions listed at [Turn on Safe Attachments for
+SharePoint, OneDrive, and Microsoft Teams \| Microsoft
+Docs](https://docs.microsoft.com/en-us/microsoft-365/security/office-365-security/turn-on-mdo-for-spo-odb-and-teams?view=o365-worldwide).
+
+1.  Sign in to [Microsoft 365
+    Defender](https://security.microsoft.com/).
+
+2.  Under **Email & collaboration**, select **Policies & rules**.
+
+3.  Select **Threat policies**.
+
+4.  Under **Policies**, select **Safe Attachments**.
+
+5.  Select **Global settings**.
+
+6.  Set **Turn on Defender for Office 365 for SharePoint, OneDrive, and
+    Microsoft Teams** to on.
+
+## 4. Data Loss Prevention
 
 There are multiple, different ways to secure sensitive information, such
 as warning users, encryption, or blocking attempts to share. The
@@ -152,32 +203,32 @@ agency’s data loss prevention (DLP) policy will dictate what agency
 information is sensitive and how that information is handled.
 
 ### Policies
-#### MS.DEFENDER.2.1v1
+#### MS.DEFENDER.4.1v1
 A custom policy SHALL be configured to protect PII and sensitive information, as defined by the agency. At a minimum, credit card numbers, Taxpayer Identification Numbers (TIN), and Social Security Numbers (SSN) SHALL be blocked.
  - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
-#### MS.DEFENDER.2.2v1
+#### MS.DEFENDER.4.2v1
 The custom policy SHOULD be applied in Exchange, OneDrive, Teams Chat, and Microsoft Defender.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
-#### MS.DEFENDER.2.3v1
+#### MS.DEFENDER.4.3v1
 The action for the DLP policy SHOULD be set to block sharing sensitive information with everyone when DLP conditions are met.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
-#### MS.DEFENDER.2.4v1
+#### MS.DEFENDER.4.4v1
 Notifications to inform users and help educate them on the proper use of sensitive information SHOULD be enabled.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
-#### MS.DEFENDER.2.5v1
+#### MS.DEFENDER.4.5v1
 A list of apps that are not allowed to access files protected by DLP policy SHOULD be defined.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
-#### MS.DEFENDER.2.6v1
+#### MS.DEFENDER.4.6v1
 A list of browsers that are not allowed to access files protected by DLP policy SHOULD be defined.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
@@ -288,91 +339,6 @@ A list of browsers that are not allowed to access files protected by DLP policy 
     prevent that browser from accessing protected files.
 
   8.  Switch **Always audit file activity for devices** to **ON**.
-
-## 4. Safe-Attachments
-
-The Safe Attachments will scan messages for attachments with malicious
-content. It routes all messages and attachments that do not have a
-virus/malware signature to a special environment. It then uses machine
-learning and analysis techniques to detect malicious intent. Enabling
-this feature may slow down message delivery to the user due to the
-scanning.
-
-### Policies
-#### MS.DEFENDER.4.1v1
-Safe attachments SHOULD be enabled for SharePoint, OneDrive, and Microsoft Teams.
-- _Rationale:_ TODO
-- _Last modified:_ June 2023
-
-### Resources
-
-- [Safe Attachments in Microsoft Defender for Office 365 \| Microsoft
-  Docs](https://docs.microsoft.com/en-us/microsoft-365/security/office-365-security/safe-attachments?view=o365-worldwide#safe-attachments-policy-settings)
-
-- [Safe Attachments Policy Settings \| Microsoft
-  Docs](https://docs.microsoft.com/en-us/microsoft-365/security/office-365-security/safe-attachments?view=o365-worldwide#safe-attachments-policy-settings)
-
-- [Use the Microsoft 365 Defender portal to create Safe Attachments
-  policies \| Microsoft
-  Docs](https://docs.microsoft.com/en-us/microsoft-365/security/office-365-security/set-up-safe-attachments-policies?view=o365-worldwide#use-the-microsoft-365-defender-portal-to-create-safe-attachments-policies)
-
-- [Turn on Safe Attachments for SharePoint, OneDrive, and Microsoft
-  Teams \| Microsoft
-  Docs](https://docs.microsoft.com/en-us/microsoft-365/security/office-365-security/turn-on-mdo-for-spo-odb-and-teams?view=o365-worldwide)
-
-### License Requirements
-
-- Requires Defender for Office 365 Plan 1 or 2. These are included with
-  E5 and G5 and are available as add-ons for E3 and G3.
-
-### Implementation
-
-To configure safe attachments for Exchange Online, follow the
-instructions listed on [Use the Microsoft 365 Defender portal to create
-Safe Attachments
-policies](https://docs.microsoft.com/en-us/microsoft-365/security/office-365-security/set-up-safe-attachments-policies?view=o365-worldwide#use-the-microsoft-365-defender-portal-to-create-safe-attachments-policies).
-
-1.  Sign in to [Microsoft 365
-    Defender](https://security.microsoft.com/).
-
-2.  Under **Email & collaboration**, select **Policies & rules**.
-
-3.  Select **Threat policies**.
-
-4.  Under **Policies**, select **Safe Attachments**.
-
-5.  Click **Create** to start a new policy.
-
-6.  Give the new policy an appropriate name and description.
-
-7.  Under domains, enter all agency tenant domains. All users under
-    these domains will be added to the policy.
-
-8.  Under **Safe Attachments unknown malware response**, select
-    **Block**.
-
-9.  Set the **Quarantine policy** to **AdminOnlyAccessPolicy**.
-
-10. Click **Next**, then **Submit**.
-
-To enable Safe Attachments for SharePoint, OneDrive, and Microsoft
-Teams, follow the instructions listed at [Turn on Safe Attachments for
-SharePoint, OneDrive, and Microsoft Teams \| Microsoft
-Docs](https://docs.microsoft.com/en-us/microsoft-365/security/office-365-security/turn-on-mdo-for-spo-odb-and-teams?view=o365-worldwide).
-
-1.  Sign in to [Microsoft 365
-    Defender](https://security.microsoft.com/).
-
-2.  Under **Email & collaboration**, select **Policies & rules**.
-
-3.  Select **Threat policies**.
-
-4.  Under **Policies**, select **Safe Attachments**.
-
-5.  Select **Global settings**.
-
-6.  Set **Turn on Defender for Office 365 for SharePoint, OneDrive, and
-    Microsoft Teams** to on.
 
 ## 5. Alerts
 
