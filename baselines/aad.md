@@ -732,15 +732,15 @@ browser sessions.
 Global Administrator is the highest privileged role in Azure AD because
 it provides unfettered access to the tenant. Therefore, if a user’s
 credential with these permissions were to be compromised, it would
-present grave risks to the security of the tenant. Limit the number of
-users that are assigned the role of Global Administrator. Assign users
-to finer-grained administrative roles that they need to perform their
-duties instead of being assigned the Global Administrator role.
+present grave risks to the security of the tenant. Assign users to finer-grained
+administrative roles that they need to perform their duties instead of being assigned the
+Global Administrator role.
 
 ### Policies
 #### MS.AAD.11.1v1
-A minimum of two users and a maximum of four users SHALL be provisioned with the Global Administrator role.
-- _Rationale:_ TODO
+A minimum of two users and a maximum of eight users SHALL be provisioned with the Global Administrator role.
+- _Rationale:_  Limit the number of users, beyond breakglass accounts, that are assigned the role
+of Global Administrator to minimize risks of tenant compromise.
 - _Last modified:_ June 2023
 
 ### Resources
@@ -768,7 +768,7 @@ A minimum of two users and a maximum of four users SHALL be provisioned with the
 
 4. Under **Manage**, select **Assignments.**
 
-5. Validate that between two to four users are listed.
+5. Validate that between two to eight users are listed.
 
 <!-- -->
 
@@ -1314,7 +1314,7 @@ Guest invites SHOULD only be allowed to specific external domains that have been
 - _Last modified:_ June 2023
 
 #### MS.AAD.18.3v1
-Guest users SHOULD have limited access to Azure AD directory objects.
+Guest users SHOULD have limited or restricted access to Azure AD directory objects.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
@@ -1332,7 +1332,9 @@ Guest users SHOULD have limited access to Azure AD directory objects.
 to configure the Azure AD **External collaboration settings**.
 
 1.  Under **Guest user access**, select **Guest users have limited
-    access to properties and memberships of directory objects.**
+    access to properties and memberships of directory objects.** or
+    **Guest user access is restricted to properties and memberships of their own directory
+    objects (most restrictive)".**
 
 2.  Under **Guest invite settings**, select **Only users assigned to
     specific admin roles can invite guest users**.
