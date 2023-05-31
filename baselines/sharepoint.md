@@ -93,12 +93,12 @@ File and folder links default sharing setting SHALL be set to Specific People (O
 In the **SharePoint admin** **center**:
 
 1.  In the left-hand navigation bar, click **Policies** -\> **Sharing**
-    to display sharing settings.
+    to display sharing settings
 
 2.  Under **File and folder links**, ensure that the default link type
-    is set to **Specific people (only the people the user specifies)**.
+    is set to **Specific people (only the people the user specifies)**
 
-3.  Select **Save.**
+3.  Select **Save**
 
 ## 2. External Sharing
 
@@ -111,7 +111,7 @@ groups per interagency collaboration needs.
 for OneDrive and Teams to the same, selected level. OneDrive and Teams
 can be less permissive (not more permissive) than SharePoint Online.
 
-Adding approved domains and/or security groups will also be reflected in
+Adding approved domains and security groups will also be reflected in
 OneDrive external sharing settings.
 
 External access may be granted on a per-domain basis. This may be
@@ -154,32 +154,32 @@ Guest access SHOULD be limited to the email the invitation was sent.
 
 To adjust sharing settings, in the **SharePoint admin center**:
 
-1.  Select **Policies** -\> **Sharing**.
+1.  Select **Policies** -\> **Sharing**
 
-2.  Adjust external sharing slider to **Existing Guests.**
+2.  Adjust external sharing slider to **Existing Guests**
 
-3.  Expand **More external sharing settings.**
+3.  Expand **More external sharing settings**
 
-4.  Select **Limit external sharing by domain**.
+4.  Select **Limit external sharing by domain**
 
-5.  Select **Add domains.**
+5.  Select **Add domains**
 
-6.  Add domains.
+6.  Add domains
 
-7.  Select **Save.**
+7.  Select **Save**
 
 8.  Select **Allow only users in specific security groups to share
-    externally**.
+    externally**
 
-9.  Select **Manage security groups.**
+9.  Select **Manage security groups**
 
-10. Add security groups.
+10. Add security groups
 
-11. Select **Save.**
+11. Select **Save**
 
-12. TODO: add implementation for MS.SHAREPOINT.4.3v1
+12. Select **Guests must sign in using the same account to which sharing invitations are sent**
 
-13. Select **Save.**
+13. Select **Save**
 
 ## 3. Sensitivity Levels
 
@@ -207,24 +207,22 @@ Sharing settings for specific SharePoint sites SHOULD align to their sensitivity
 
 ### Implementation
 
-To limit external sharing by domain, in the **SharePoint admin center**:
+To limit shareing by sharepoint sites, in the **SharePoint admin center**:
 
-1.  Select **Sites.**
+1.  Select **Sites**
 
-2.  Select **Active sites.**
+2.  Select **Active sites**
 
-3.  Select **Site name.**
+3.  Select **Site name**
 
-4.  Select **Add domains.**
+4.  Select **Settings**
 
-5.  Select **Policies.**
+5.  Select **More sharing settings**
 
-6.  Under **external sharing**, select **Edit**.
+6.  Select permissions aligning to the risk posture associated with the
+    sensitivity of the SharePoint site
 
-7.  Select permissions aligning to the risk posture associated with the
-    sensitivity of the SharePoint site.
-
-8.  Select **Save.**
+7.  Select **Save**
 
 ## 4. Guest Access to a Site or OneDrive
 
@@ -260,21 +258,21 @@ Expiration timers for people who use a verification code SHOULD be set to 30 day
 
 To provide a time limit for external sharing, in the **SharePoint admin center**:
 
-1.  Select **Policies** -\> **Sharing**.
+1.  Select **Policies** -\> **Sharing**
 
-2.  Expand **More external sharing settings.**
+2.  Expand **More external sharing settings**
 
 3.  Select **Guest access to a site or OneDrive will expire
-    automatically after this many days.**
+    automatically after this many days**
 
-4.  Enter “30” days or less.
+4.  Enter “30” days or less
 
 5.  Select **People who use a verification code must reauthenticate
-    after this many days**.
+    after this many days**
 
-6.  Enter “30 days” or less.
+6.  Enter “30 days” or less
 
-7.  Select **Save.**
+7.  Select **Save**
 
 ## 5. Custom Scripts
 
@@ -301,15 +299,19 @@ Users SHALL be prevented from running custom scripts.
 
 In the **SharePoint Classic admin center**:
 
-1.  Scroll to the **Custom Script** setting and select both of the
+1.  Select **Settings**
+
+2. Scroll down to select **classic settings page**
+
+3.  Scroll to the **Custom Script** setting and select both of the
     following:
 
-2.  **Prevent users from running custom script on personal sites.**
+4.  **Prevent users from running custom script on personal sites**
 
-3.  **Prevent users from running custom script on self-service created
-    sites.**
+5.  **Prevent users from running custom script on self-service created
+    sites**
 
-4.  Select **Save.**
+6.  Select **Ok**
 
 # Acknowledgements
 
