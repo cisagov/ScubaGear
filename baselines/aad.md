@@ -120,17 +120,22 @@ Legacy authentication SHALL be blocked.
 
 Azure AD Identity Protection uses various signals to detect the risk
 level for each user and determine if an account has likely been
-compromised. Users who are determined to be high risk are to be blocked
+compromised. In addition to high risk users, high risk workload identies
+can be mitigated by creating a conditional access policy that blocks medium
+and high risk work load identities. Follow
+[these instructions](https://learn.microsoft.com/en-us/azure/active-directory/conditional-access/workload-identity)
+to apply conditional access for workload identities.
+
+
+### Policies
+#### MS.AAD.2.1v1
+Users detected as high risk SHALL be blocked.
+- _Rationale:_ Users who are determined to be high risk are to be blocked
 from accessing the system via Conditional Access until an administrator
 remediates their account. Once a respective conditional access policy
 with a block is implemented, if a high-risk user attempts to login, the
 user will receive an error message with instructions to contact the
 administrator to re-enable their access.
-
-### Policies
-#### MS.AAD.2.1v1
-Users detected as high risk SHALL be blocked.
-- _Rationale:_ TODO
 - _Last modified:_ June 2023
 
 #### MS.AAD.2.2v1
@@ -739,7 +744,7 @@ Global Administrator role.
 ### Policies
 #### MS.AAD.11.1v1
 A minimum of two users and a maximum of eight users SHALL be provisioned with the Global Administrator role.
-- _Rationale:_  Limit the number of users, beyond breakglass accounts, that are assigned the role
+- _Rationale:_  Limit the number of users, to include "breakglass" accounts, that are assigned the role
 of Global Administrator to minimize risks of tenant compromise.
 - _Last modified:_ June 2023
 
