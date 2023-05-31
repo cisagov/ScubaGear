@@ -66,41 +66,7 @@ listed.
 
 # Baselines
 
-## 1. File and Folder Links Default Sharing Settings
-
-This policy ensures that when sharing files in SharePoint, there are
-several possible scopes, including agency-wide or “anyone with the
-link.”
-
-### Policies
-
-#### MS.SHAREPOINT.1.1v1
-File and folder links default sharing setting SHALL be set to Specific People (Only the People the User Specifies).
-- _Rationale:_ TODO
-- _Last modified:_ June 2023
-
-### Resources
-
-- [File and folder links \| Microsoft
-  Documents](https://docs.microsoft.com/en-us/sharepoint/turn-external-sharing-on-or-off#file-and-folder-links)
-
-### License Requirements
-
-- N/A
-
-### Implementation
-
-In the **SharePoint admin** **center**:
-
-1.  In the left-hand navigation bar, click **Policies** -\> **Sharing**
-    to display sharing settings
-
-2.  Under **File and folder links**, ensure that the default link type
-    is set to **Specific people (only the people the user specifies)**
-
-3.  Select **Save**
-
-## 2. External Sharing
+## 1. External Sharing
 
 SharePoint allows sharing with users who are outside the agency, which
 is convenient but may pose a data loss or other information security
@@ -180,6 +146,40 @@ To adjust sharing settings, in the **SharePoint admin center**:
 12. Select **Guests must sign in using the same account to which sharing invitations are sent**
 
 13. Select **Save**
+
+## 2. File and Folder Links Default Sharing Settings
+
+This policy ensures that when sharing files in SharePoint, there are
+several possible scopes, including agency-wide or “anyone with the
+link.”
+
+### Policies
+
+#### MS.SHAREPOINT.1.1v1
+File and folder links default sharing setting SHALL be set to Specific People (Only the People the User Specifies).
+- _Rationale:_ TODO
+- _Last modified:_ June 2023
+
+### Resources
+
+- [File and folder links \| Microsoft
+  Documents](https://docs.microsoft.com/en-us/sharepoint/turn-external-sharing-on-or-off#file-and-folder-links)
+
+### License Requirements
+
+- N/A
+
+### Implementation
+
+In the **SharePoint admin** **center**:
+
+1.  In the left-hand navigation bar, click **Policies** -\> **Sharing**
+    to display sharing settings
+
+2.  Under **File and folder links**, ensure that the default link type
+    is set to **Specific people (only the people the user specifies)**
+
+3.  Select **Save**
 
 ## 3. Sensitivity Levels
 
