@@ -67,7 +67,7 @@ function New-Report {
     }
 
     $MetaDataTable = $MetaData | ConvertTo-HTML -Fragment
-    $MetaDataTable = $MetaDataTable -replace '^(.*?)<table>','<table style = "text-align:center;">'
+    $MetaDataTable = $MetaDataTable -replace '^(.*?)<table>','<table id="tenant-data" style = "text-align:center;">'
     $Fragments += $MetaDataTable
     $ReportSummary = @{
         "Warnings" = 0;
