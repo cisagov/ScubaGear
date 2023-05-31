@@ -778,7 +778,7 @@ of Global Administrator to minimize risks of tenant compromise.
 7.  If any groups are listed, need to check how many users are members
     of each group and include that in the total count.
 
-**Establish Finer-Grained Administrative Roles **
+To establish finer-grained administrative roles:
 
 1.  In the **Azure Portal**, navigate to **Azure Active Directory.**
 
