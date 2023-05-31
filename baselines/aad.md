@@ -756,8 +756,6 @@ of Global Administrator to minimize risks of tenant compromise.
 
 ### Implementation
 
-**Policy bullet \#1:**
-
 1.  In the **Azure Portal**, navigate to **Azure Active Directory.**
 
 <!-- -->
@@ -774,13 +772,13 @@ of Global Administrator to minimize risks of tenant compromise.
 
 6.  For those who have Azure AD PIM, they will need to check both the
     **Eligible assignments** and **Active assignments** tabs. There
-    should be a total of two to four users across both of these tabs
+    should be a total of two to eight users across both of these tabs
     (not individually).
 
 7.  If any groups are listed, need to check how many users are members
     of each group and include that in the total count.
 
-**Policy bullet \#2:**
+**Establish Finer-Grained Administrative Roles **
 
 1.  In the **Azure Portal**, navigate to **Azure Active Directory.**
 
@@ -793,7 +791,7 @@ of Global Administrator to minimize risks of tenant compromise.
 4.  Click the **Columns** button and ensure that all the available
     columns are selected to display and click **Apply.**
 
-5.  Review the score for the action named **Use limited administrative
+5.  Review the score for the action named **Use least privileged administrative
     roles.**
 
 6.  Ensure that the maximum score was achieved, and that the status is
