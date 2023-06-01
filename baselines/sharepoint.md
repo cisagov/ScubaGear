@@ -187,8 +187,8 @@ In the **SharePoint admin** **center**:
 
 SharePoint allows sharing with users who are outside the agency, which
 is convenient but may pose a data loss or other information security
-risk. This working group recommends outside of the default
-organizational settings agencies should evaluate each created site and
+risk. This working group recommends, outside of the default
+organizational settings, agencies evaluate each created site and
 adjust sharing settings best aligned to their respective sensitivity
 level.
 
@@ -281,8 +281,8 @@ To provide a time limit for external sharing, in the **SharePoint admin center**
 ## 5. Custom Scripts
 
 Allowing users to run custom scripts can potentially allow malicious
-scripts to run in a trusted environment. For this reason, running custom
-scripts should not be allowed.
+scripts to run in a trusted environment. Microsoft provides settings to
+mitigate this risk by preventing users from running custom scripts.
 
 ###  Policy
 #### MS.SHAREPOINT.5.1v1
