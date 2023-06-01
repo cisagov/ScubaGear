@@ -119,34 +119,52 @@ Guest access SHOULD be limited to the email the invitation was sent.
 
 ### Implementation
 
-To adjust sharing settings, in the **SharePoint admin center**:
+MS.SHAREPOINT.1.1v1, in the **SharePoint admin center**:
 
 1.  Select **Policies** -\> **Sharing**
 
 2.  Adjust external sharing slider to **Existing Guests** or **Only people in your organization**
 
-3.  Expand **More external sharing settings**
+3. Select **Save**
 
-4.  Select **Limit external sharing by domain**
+MS.SHAREPOINT.1.2v1, in the **SharePoint admin center**:
 
-5.  Select **Add domains**
+1.  Select **Policies** -\> **Sharing**
 
-6.  Add domains
+2.  Expand **More external sharing settings**
 
-7.  Select **Save**
+3.  Select **Limit external sharing by domain**
 
-8.  Select **Allow only users in specific security groups to share
+4.  Select **Add domains**
+
+5.  Add domains
+
+6.  Select **Save**
+
+MS.SHAREPOINT.1.3v1, in the **SharePoint admin center**:
+
+1.  Select **Policies** -\> **Sharing**
+
+2.  Expand **More external sharing settings**
+
+3.  Select **Allow only users in specific security groups to share
     externally**
 
-9.  Select **Manage security groups**
+4.  Select **Manage security groups**
 
-10. Add security groups
+5. Add security groups
 
-11. Select **Save**
+6. Select **Save**
 
-12. Select **Guests must sign in using the same account to which sharing invitations are sent**
+MS.SHAREPOINT.1.4v1, in the **SharePoint admin center**:
 
-13. Select **Save**
+1.  Select **Policies** -\> **Sharing**
+
+2.  Expand **More external sharing settings**
+
+3. Select **Guests must sign in using the same account to which sharing invitations are sent**
+
+4. Select **Save**
 
 ## 2. File and Folder Links Default Sharing Settings
 
@@ -173,7 +191,7 @@ _Note:_ Similar implementation in MS.ONEDRIVE.3.1v1
 
 ### Implementation
 
-In the **SharePoint admin** **center**:
+MS.SHAREPOINT.2.1v1, in the **SharePoint admin center**:
 
 1.  In the left-hand navigation bar, click **Policies** -\> **Sharing**
     to display sharing settings
@@ -209,7 +227,7 @@ Sharing settings for specific SharePoint sites SHOULD align to their sensitivity
 
 ### Implementation
 
-To limit shareing by sharepoint sites, in the **SharePoint admin center**:
+MS.SHAREPOINT.3.1v1, in the **SharePoint admin center**:
 
 1.  Select **Sites**
 
@@ -260,7 +278,7 @@ Expiration timers for people who use a verification code SHOULD be set to 30 day
 
 ### Implementation
 
-To provide a time limit for external sharing, in the **SharePoint admin center**:
+MS.SHAREPOINT.4.1v1, in the **SharePoint admin center**:
 
 1.  Select **Policies** -\> **Sharing**
 
@@ -271,12 +289,20 @@ To provide a time limit for external sharing, in the **SharePoint admin center**
 
 4.  Enter “30” days or less
 
-5.  Select **People who use a verification code must reauthenticate
+5.  Select **Save**
+
+MS.SHAREPOINT.4.2v1, in the **SharePoint admin center**:
+
+1.  Select **Policies** -\> **Sharing**
+
+2.  Expand **More external sharing settings**
+
+3.  Select **People who use a verification code must reauthenticate
     after this many days**
 
-6.  Enter “30 days” or less
+4.  Enter “30 days” or less
 
-7.  Select **Save**
+5.  Select **Save**
 
 ## 5. Custom Scripts
 
@@ -306,21 +332,30 @@ Users SHALL be prevented from running custom scripts self-service created sites.
 
 ### Implementation
 
-In the **SharePoint Classic admin center**:
+MS.SHAREPOINT.5.1v1, in the **SharePoint classic admin center**:
 
 1.  Select **Settings**
 
 2. Scroll down to select **classic settings page**
 
-3.  Scroll to the **Custom Script** setting and select both of the
-    following:
+3.  Scroll to the **Custom Script** setting
 
-4.  **Prevent users from running custom script on personal sites**
+4.  Select **Prevent users from running custom script on personal sites**
 
-5.  **Prevent users from running custom script on self-service created
+5.  Select **Ok**
+
+MS.SHAREPOINT.5.1v1, in the **SharePoint Classic admin center**:
+
+1.  Select **Settings**
+
+2. Scroll down to select **classic settings page**
+
+3.  Scroll to the **Custom Script** setting
+
+4.  Select **Prevent users from running custom script on self-service created
     sites**
 
-6.  Select **Ok**
+5.  Select **Ok**
 
 # Acknowledgements
 
