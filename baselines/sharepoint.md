@@ -89,8 +89,9 @@ OMB Max Site for a list of .gov domains for sharing).
 ### Policies
 #### MS.SHAREPOINT.1.1v1
 External sharing SHOULD be limited to Existing Guests or a more restrictive setting.
-- _Rationale:_ You can restrict the extent of sharing at an organizational level. This will set the maximum sharing allowed. Existing guests allow sharing only with guests who are already in your directory.
+- _Rationale:_ You can restrict the extent of sharing at an organizational level. This will set the maximum sharing allowed. Existing guests allow sharing only with guests who are already in your directory. While Only people in your organization disable anyone links completely.
 - _Last modified:_ June 2023
+- _Note:_ Same implementation in MS.ONEDRIVE.1.1v1
 
 #### MS.SHAREPOINT.1.2v1
 External sharing SHOULD be limited to approved domains per interagency collaboration needs.
@@ -122,7 +123,7 @@ To adjust sharing settings, in the **SharePoint admin center**:
 
 1.  Select **Policies** -\> **Sharing**
 
-2.  Adjust external sharing slider to **Existing Guests**
+2.  Adjust external sharing slider to **Existing Guests** or **Only people in your organization**
 
 3.  Expand **More external sharing settings**
 
@@ -159,6 +160,7 @@ link.”
 File and folder links default sharing setting SHALL be set to Specific People (Only the People the User Specifies).
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
+_Note:_ Similar implementation in MS.ONEDRIVE.3.1v1
 
 ### Resources
 
