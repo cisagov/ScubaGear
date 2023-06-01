@@ -89,23 +89,23 @@ OMB Max Site for a list of .gov domains for sharing).
 ### Policies
 #### MS.SHAREPOINT.1.1v1
 External sharing SHOULD be limited to Existing Guests or a more restrictive setting.
-- _Rationale:_ You can restrict the extent of sharing at an organizational level. This will set the maximum sharing allowed. Existing guests allow sharing only with guests who are already in your directory. While Only people in your organization disable anyone links completely.
+- _Rationale:_ TODO
 - _Last modified:_ June 2023
 - _Note:_ Same implementation in MS.ONEDRIVE.1.1v1
 
 #### MS.SHAREPOINT.1.2v1
 External sharing SHOULD be limited to approved domains per interagency collaboration needs.
-- _Rationale:_ You can limit domains by allowing only the domains you specify at an organizational level.
+- _Rationale:_ TODO
 - _Last modified:_ June 2023
 
 #### MS.SHAREPOINT.1.3v1
 External sharing SHOULD be limited to approved security groups per interagency collaboration needs.
-- _Rationale:_ Restirct the users who can share sharpoint & onedrive items to specific security groups.
+- _Rationale:_ TODO
 - _Last modified:_ June 2023
 
 #### MS.SHAREPOINT.1.4v1
 Guest access SHOULD be limited to the email the invitation was sent.
-- _Rationale:_ To prevent threat actors from accessing a sharing link, this setting will prevent any email besides the email it was sent to from using the link.
+- _Rationale:_ TODO
 - _Last modified:_ June 2023
 
 ### Resources
@@ -195,7 +195,7 @@ level.
 ### Policies
 #### MS.SHAREPOINT.3.1v1
 Sharing settings for specific SharePoint sites SHOULD align to their sensitivity level.
-- _Rationale:_ If you have confidential information that should never be shared externally, we recommend storing the information in a site that has external sharing turned off. Create additional sites as needed to use for external sharing. This helps you to manage security risk by preventing external access to sensitive information.
+- _Rationale:_ TODO
 - _Last modified:_ June 2023
 
 ### Resources
