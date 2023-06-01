@@ -461,7 +461,7 @@ If the Azure AD Provisioning Service is used to provision users to SaaS apps or 
 <!-- -->
 
 #### MS.AAD.5.4v1
-The logs SHALL be sent to the agencys SOC for monitoring.
+The logs SHALL be sent to the agency's SOC for monitoring.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 

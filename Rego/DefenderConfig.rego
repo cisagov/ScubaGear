@@ -1,34 +1,31 @@
 package defender
 import future.keywords
+import data.report.utils.NotCheckedDetails
+import data.report.utils.ReportDetailsBoolean
 
 ## Report details menu
 #
+# NOTE: Use report.utils package for common report formatting functions. 
+#
 # If you simply want a boolean "Requirement met" / "Requirement not met"
-# just call ReportDetails(Status) and leave it at that.
+# just call ReportDetailsBoolean(Status) and leave it at that.
 #
 # If you want to customize the error message, wrap the ReportDetails call
 # inside CustomizeError, like so:
-# CustomizeError(ReportDetails(Status), "Custom error message")
+# CustomizeError(ReportDetailsBoolean(Status), "Custom error message")
 #
 # If you want to customize the error message with details about an array,
 # generate the custom error message using GenerateArrayString, for example:
-# CustomizeError(ReportDetails(Status), GenerateArrayString(BadPolicies, "bad policies found:"))
+# CustomizeError(ReportDetailsBoolean(Status), GenerateArrayString(BadPolicies, "bad policies found:"))
 #
 # If the setting in question requires a defender license,
 # wrap the details string inside ApplyLicenseWarning, like so:
-# ApplyLicenseWarning(ReportDetails(Status))
+# ApplyLicenseWarning(ReportDetailsBoolean(Status))
 #
 # These functions can be nested. For example:
-# ApplyLicenseWarning(CustomizeError(ReportDetails(Status), "Custom error message"))
+# ApplyLicenseWarning(CustomizeError(ReportDetailsBoolean(Status), "Custom error message"))
 #
 ##
-ReportDetails(Status) := "Requirement met" if {
-    Status == true
-}
-
-ReportDetails(Status) := "Requirement not met" if {
-    Status == false
-}
 
 GenerateArrayString(Array, CustomString) := Output if {
     # Example usage and output:
@@ -42,13 +39,13 @@ GenerateArrayString(Array, CustomString) := Output if {
 CustomizeError(Message, CustomString) := Message if {
     # If the message reports success, don't apply the custom
     # error message
-    Message == ReportDetails(true)
+    Message == ReportDetailsBoolean(true)
 }
 
 CustomizeError(Message, CustomString) := CustomString if {
     # If the message does not report success, apply the custom
     # error message
-    Message != ReportDetails(true)
+    Message != ReportDetailsBoolean(true)
 }
 
 ApplyLicenseWarning(Message) := Message if {
@@ -57,19 +54,15 @@ ApplyLicenseWarning(Message) := Message if {
     input.defender_license == true
 }
 
-ApplyLicenseWarning(Message) := concat("", [ReportDetails(false), LicenseWarning]) if {
+ApplyLicenseWarning(Message) := concat("", [ReportDetailsBoolean(false), LicenseWarning]) if {
     # If a defender license is not present, assume failure and
     # replace the message with the warning
     input.defender_license == false
     LicenseWarning := " **NOTE: Either you do not have sufficient permissions or your tenant does not have a license for Microsoft Defender for Office 365 Plan 1, which is required for this feature.**"
 }
 
-################
-# Baseline 2.1 #
-################
-
 #
-# Baseline 2.1: Policy 1
+# MS.DEFENDER.1.1v1
 #--
 StandardPresetSecurityPolicy[Rules.State] {
     Rules := input.protection_policy_rules[_]
@@ -77,12 +70,12 @@ StandardPresetSecurityPolicy[Rules.State] {
 }
 
 tests[{
-    "Requirement" : "Standard Preset security profiles SHOULD NOT be used",
-    "Control" : "Defender 2.1",
+    #TODO: Multiple mappings
+    "PolicyId" : "MS.DEFENDER.1.1v1",
     "Criticality" : "Should",
     "Commandlet" : ["Get-EOPProtectionPolicyRule"],
 	"ActualValue" : Policy,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), ErrorMessage),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
     "RequirementMet" : Status
 }] {
     Policy := StandardPresetSecurityPolicy
@@ -92,7 +85,7 @@ tests[{
 }
 #--
 
-#
+# TODO: Resolve Policy Id
 # Baseline 2.1: Policy 2
 #--
 StrictPresetSecurityPolicy[Rules.State] {
@@ -106,7 +99,7 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-EOPProtectionPolicyRule"],
 	"ActualValue" : Policy,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), ErrorMessage),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
     "RequirementMet" : Status
 }] {
     Policy := StrictPresetSecurityPolicy
@@ -115,11 +108,6 @@ tests[{
     Status := count([Condition | Condition = Conditions[_]; Condition == true]) > 0
 }
 #--
-
-
-################
-# Baseline 2.2 #
-################
 
 # Determine the set of rules that pertain to SSNs, ITINs, or credit card numbers.
 # Used in multiple bullet points below
@@ -146,7 +134,7 @@ SensitiveRules[{
 }
 
 #
-# Baseline 2.2: Policy 1
+# MS.DEFENDER.2.1v1
 #--
 # Step 1: Ensure that there is coverage for SSNs, ITINs, and credit cards
 SSNRules[Rule.Name] {
@@ -165,12 +153,13 @@ CardRules[Rule.Name] {
 }
 
 tests[{
-    "Requirement" : "A custom policy SHALL be configured to protect PII and sensitive information, as defined by the agency: U.S. Social Security Number (SSN)",
-    "Control" : "Defender 2.2",
+    #TODO: Appears this policy is broken into 3 parts in code and only 1 in baseline 
+    #"Requirement" : "A custom policy SHALL be configured to protect PII and sensitive information, as defined by the agency: U.S. Social Security Number (SSN)",
+    "PolicyId" : "MS.DEFENDER.2.1v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-DlpComplianceRule"],
 	"ActualValue" : Rules,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), ErrorMessage),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
     "RequirementMet" : Status
 }] {
     Rules := SSNRules
@@ -184,7 +173,7 @@ tests[{
     "Criticality" : "Shall",
     "Commandlet" : ["Get-DlpComplianceRule"],
 	"ActualValue" : Rules,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), ErrorMessage),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
     "RequirementMet" : Status
 }] {
     Rules := ITINRules
@@ -198,7 +187,7 @@ tests[{
     "Criticality" : "Shall",
     "Commandlet" : ["Get-DlpComplianceRule"],
 	"ActualValue" : Rules,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), ErrorMessage),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
     "RequirementMet" : Status
 }] {
     Rules := CardRules
@@ -260,12 +249,13 @@ TeamsPolicies[{
 }
 
 tests[{
-    "Requirement" : "The custom policy SHOULD be applied in Exchange",
-    "Control" : "Defender 2.2",
+    #TODO: Appears this policy is broken into 4 parts in code and only 1 in baseline
+    #"Requirement" : "The custom policy SHOULD be applied in Exchange",
+    "PolicyId" : "MS.DEFENDER.2.2v1",
     "Criticality" : "Should",
     "Commandlet" : ["Get-DLPCompliancePolicy"],
 	"ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), ErrorMessage),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
     "RequirementMet" : Status
 }] {
     Policies := ExchangePolicies
@@ -279,7 +269,7 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-DLPCompliancePolicy"],
 	"ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), ErrorMessage),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
     "RequirementMet" : Status
 }] {
     Policies := SharePointPolicies
@@ -293,7 +283,7 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-DLPCompliancePolicy"],
 	"ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), ErrorMessage),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
     "RequirementMet" : Status
 }] {
     Policies := OneDrivePolicies
@@ -307,7 +297,7 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-DLPCompliancePolicy"],
 	"ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), ErrorMessage),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
     "RequirementMet" : Status
 }] {
     Policies := TeamsPolicies
@@ -339,12 +329,11 @@ SensitiveRulesNotBlocking[Rule.Name] {
 }
 
 tests[{
-    "Requirement" : "The action for the DLP policy SHOULD be set to block sharing sensitive information with everyone when DLP conditions are met",
-    "Control" : "Defender 2.2",
+    "PolicyId" : "MS.DEFENDER.2.3v1",
     "Criticality" : "Should",
     "Commandlet" : ["Get-DlpComplianceRule"],
 	"ActualValue" : Rules,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Rules, ErrorMessage)),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), GenerateArrayString(Rules, ErrorMessage)),
     "RequirementMet" : Status
 }] {
     Rules := SensitiveRulesNotBlocking
@@ -363,12 +352,11 @@ SensitiveRulesNotNotifying[Rule.Name] {
 }
 
 tests[{
-    "Requirement" : "Notifications to inform users and help educate them on the proper use of sensitive information SHOULD be enabled",
-    "Control" : "Defender 2.2",
+    "PolicyId" : "MS.DEFENDER.2.4v1",
     "Criticality" : "Should",
     "Commandlet" : ["Get-DlpComplianceRule"],
 	"ActualValue" : Rules,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Rules, ErrorMessage)),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), GenerateArrayString(Rules, ErrorMessage)),
     "RequirementMet" : Status
 }] {
     Rules := SensitiveRulesNotNotifying
@@ -382,14 +370,14 @@ tests[{
 #--
 # At this time we are unable to test for X because of Y
 tests[{
-    "Requirement" : "A list of apps that are not allowed to access files protected by DLP policy SHOULD be defined",
-    "Control" : "Defender 2.2",
+    "PolicyId" : PolicyId,
     "Criticality" : "Should/Not-Implemented",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "Currently cannot be checked automatically. See Defender Secure Configuration Baseline policy 2.2 for instructions on manual check",
+    "ReportDetails" : NotCheckedDetails(PolicyId),
     "RequirementMet" : false
 }] {
+    PolicyId := "MS.DEFENDER.2.5v1"
     true
 }
 #--
@@ -399,14 +387,14 @@ tests[{
 #--
 # At this time we are unable to test for X because of Y
 tests[{
-    "Requirement" : "A list of browsers that are not allowed to access files protected by DLP policy SHOULD be defined",
-    "Control" : "Defender 2.2",
+    "PolicyId" : PolicyId,
     "Criticality" : "Should/Not-Implemented",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "Currently cannot be checked automatically. See Defender Secure Configuration Baseline policy 2.2 for instructions on manual check",
+    "ReportDetails" : NotCheckedDetails(PolicyId),
     "RequirementMet" : false
 }] {
+    PolicyId := "MS.DEFENDER.2.6v1"
     true
 }
 #--
@@ -425,12 +413,11 @@ MalwarePoliciesWithoutFileFilter[Policy.Name] {
 }
 
 tests[{
-    "Requirement" : "The common attachments filter SHALL be enabled in the default anti-malware policy and in all existing policies",
-    "Control" : "Defender 2.3",
+    "PolicyId" : "MS.DEFENDER.3.1v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-MalwareFilterPolicy"],
 	"ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Policies, ErrorMessage)),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), GenerateArrayString(Policies, ErrorMessage)),
     "RequirementMet" : Status
 }] {
     Policies := MalwarePoliciesWithoutFileFilter
@@ -450,12 +437,13 @@ MalwarePoliciesBlockingEXE[Policy.Name] {
 }
 
 tests[{
-    "Requirement" : "Disallowed file types SHALL be determined and set. At a minimum, click-to-run files SHOULD be blocked: exe files",
-    "Control" : "Defender 2.3",
+    #TODO: Appears this policy is broken into 3 parts in code and only 1 in baseline
+    #"Requirement" : "Disallowed file types SHALL be determined and set. At a minimum, click-to-run files SHOULD be blocked: exe files",
+    "PolicyId" : "MS.DEFENDER.3.2v1",
     "Criticality" : "Should",
     "Commandlet" : ["Get-MalwareFilterPolicy"],
 	"ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), ErrorMessage),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
     "RequirementMet" : Status
 }] {
     Policies := MalwarePoliciesBlockingEXE
@@ -476,7 +464,7 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-MalwareFilterPolicy"],
 	"ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), ErrorMessage),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
     "RequirementMet" : Status
 }] {
     Policies := MalwarePoliciesBlockingCMD
@@ -497,7 +485,7 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-MalwareFilterPolicy"],
 	"ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), ErrorMessage),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
     "RequirementMet" : Status
 }] {
     Policies := MalwarePoliciesBlockingVBE
@@ -520,12 +508,11 @@ MalwarePoliciesWithoutZAP[Policy.Name] {
 }
 
 tests[{
-    "Requirement" : "Zero-hour Auto Purge (ZAP) for malware SHOULD be enabled in the default anti-malware policy and in all existing custom policies",
-    "Control" : "Defender 2.4",
+    "PolicyId" : "MS.DEFENDER.4.1v1",
     "Criticality" : "Should",
     "Commandlet" : ["Get-MalwareFilterPolicy"],
 	"ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Policies, ErrorMessage)),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), GenerateArrayString(Policies, ErrorMessage)),
     "RequirementMet" : Status
 }] {
     Policies := MalwarePoliciesWithoutZAP
@@ -555,12 +542,11 @@ ProtectedUsersPolicies[{
 
 # assert that at least one of the enabled policies includes protected users
 tests[{
-    "Requirement" : "User impersonation protection SHOULD be enabled for key agency leaders",
-    "Control" : "Defender 2.5",
+    "PolicyId" : "MS.DEFENDER.5.1v1",
     "Criticality" : "Should",
     "Commandlet" : ["Get-AntiPhishPolicy"],
 	"ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), ErrorMessage),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
     "RequirementMet" : Status
 }] {
     Policies := ProtectedUsersPolicies
@@ -586,12 +572,11 @@ ProtectedOrgDomainsPolicies[{
 # assert that at least one of the enabled policies includes
 # protection for the org's own domains
 tests[{
-    "Requirement" : "Domain impersonation protection SHOULD be enabled for domains owned by the agency",
-    "Control" : "Defender 2.5",
+    "PolicyId" : "MS.DEFENDER.5.2v1",
     "Criticality" : "Should",
     "Commandlet" : ["Get-AntiPhishPolicy"],
 	"ActualValue" : Policies,
-    "ReportDetails" : ReportDetails(Status),
+    "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
     Policies := ProtectedOrgDomainsPolicies
@@ -616,12 +601,11 @@ ProtectedCustomDomainsPolicies[{
 # assert that at least one of the enabled policies includes
 # protection for custom domains
 tests[{
-    "Requirement" : "Domain impersonation protection SHOULD be added for frequent partners",
-    "Control" : "Defender 2.5",
+    "PolicyId" : "MS.DEFENDER.5.3v1",
     "Criticality" : "Should",
     "Commandlet" : ["Get-AntiPhishPolicy"],
 	"ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), ErrorMessage),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
     "RequirementMet" : Status
 }] {
     Policies := ProtectedCustomDomainsPolicies
@@ -646,12 +630,11 @@ IntelligenceProtectionPolicies[{
 # assert that at least one of the enabled policies includes
 # intelligence protection
 tests[{
-    "Requirement" : "Intelligence for impersonation protection SHALL be enabled",
-    "Control" : "Defender 2.5",
+    "PolicyId" : "MS.DEFENDER.5.5v1",
     "Criticality" : "Should",
     "Commandlet" : ["Get-AntiPhishPolicy"],
 	"ActualValue" : Policies,
-    "ReportDetails" : ReportDetails(Status),
+    "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
     Policies := IntelligenceProtectionPolicies
@@ -664,12 +647,13 @@ tests[{
 #--
 # Step 1: Default (SHALL)
 tests[{
-    "Requirement" : "Message action SHALL be set to quarantine if the message is detected as impersonated: users default policy",
-    "Control" : "Defender 2.5",
+    #TODO: Multiple mappings
+    #"Requirement" : "Message action SHALL be set to quarantine if the message is detected as impersonated: users default policy",
+    "PolicyId" : "MS.DEFENDER.5.6v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-AntiPhishPolicy"],
 	"ActualValue" : Policy.TargetedUserProtectionAction,
-    "ReportDetails" : ReportDetails(Status),
+    "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
     Policy := input.anti_phish_policies[_]
@@ -683,7 +667,7 @@ tests[{
     "Criticality" : "Shall",
     "Commandlet" : ["Get-AntiPhishPolicy"],
 	"ActualValue" : Policy.TargetedDomainProtectionAction,
-    "ReportDetails" : ReportDetails(Status),
+    "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
     Policy := input.anti_phish_policies[_]
@@ -697,7 +681,7 @@ tests[{
     "Criticality" : "Shall",
     "Commandlet" : ["Get-AntiPhishPolicy"],
 	"ActualValue" : Policy.MailboxIntelligenceProtectionAction,
-    "ReportDetails" : ReportDetails(Status),
+    "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
     Policy := input.anti_phish_policies[_]
@@ -721,7 +705,7 @@ tests[ {
     "Criticality" : "Should",
     "Commandlet" : ["Get-AntiPhishPolicy"],
 	"ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Policies, ErrorMessage)),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), GenerateArrayString(Policies, ErrorMessage)),
     "RequirementMet" : Status
 }] {
     Policies := AntiPhishTargetedUserNotQuarantine
@@ -743,7 +727,7 @@ tests[ {
     "Criticality" : "Should",
     "Commandlet" : ["Get-AntiPhishPolicy"],
 	"ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Policies, ErrorMessage)),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), GenerateArrayString(Policies, ErrorMessage)),
     "RequirementMet" : Status
 }] {
     Policies := AntiPhishTargetedDomainNotQuarantine
@@ -765,7 +749,7 @@ tests[ {
     "Criticality" : "Should",
     "Commandlet" : ["Get-AntiPhishPolicy"],
 	"ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Policies, ErrorMessage)),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), GenerateArrayString(Policies, ErrorMessage)),
     "RequirementMet" : Status
 }] {
     Policies := AntiPhishMailIntNotQuarantine
@@ -781,12 +765,13 @@ tests[ {
 # represent this, we have two tests checking the default and the
 # nondefault.
 tests[ {
-    "Requirement" : "Mail classified as spoofed SHALL be quarantined: default policy",
-    "Control" : "Defender 2.5",
+    #TODO: Multiple Mappings
+    #"Requirement" : "Mail classified as spoofed SHALL be quarantined: default policy",
+    "PolicyId" : "MS.DEFENDER.5.7v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-AntiPhishPolicy"],
 	"ActualValue" : Policy.AuthenticationFailAction,
-    "ReportDetails" : ReportDetails(Status),
+    "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
     Policy := input.anti_phish_policies[_]
@@ -810,7 +795,7 @@ tests[ {
     "Criticality" : "Should",
     "Commandlet" : ["Get-AntiPhishPolicy"],
 	"ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Policies, ErrorMessage)),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), GenerateArrayString(Policies, ErrorMessage)),
     "RequirementMet" : Status
 }] {
     ErrorMessage := "custom anti phish policy(ies) found where the action for spoofed emails is not set to quarantine:"
@@ -824,12 +809,13 @@ tests[ {
 #--
 # First contact default policy
 tests[ {
-    "Requirement" : "All safety tips SHALL be enabled: first contact default policy",
-    "Control" : "Defender 2.5",
+    #TODO: Multiple Mappings
+    #"Requirement" : "All safety tips SHALL be enabled: first contact default policy",
+    "PolicyId" : "MS.DEFENDER.5.8v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-AntiPhishPolicy"],
 	"ActualValue" : Policy.EnableFirstContactSafetyTips,
-    "ReportDetails" : ReportDetails(Status),
+    "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
     Policy := input.anti_phish_policies[_]
@@ -852,7 +838,7 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-AntiPhishPolicy"],
 	"ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Policies, ErrorMessage)),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), GenerateArrayString(Policies, ErrorMessage)),
     "RequirementMet" : Status
 }] {
     ErrorMessage := "custom anti phish policy(ies) found where first contact safety tips are not enabled:"
@@ -867,7 +853,7 @@ tests[{
     "Criticality" : "Shall",
     "Commandlet" : ["Get-AntiPhishPolicy"],
 	"ActualValue" : Policy.EnableSimilarUsersSafetyTips,
-    "ReportDetails" : ReportDetails(Status),
+    "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
     Policy := input.anti_phish_policies[_]
@@ -890,7 +876,7 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-AntiPhishPolicy"],
 	"ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Policies, ErrorMessage)),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), GenerateArrayString(Policies, ErrorMessage)),
     "RequirementMet" : Status
 }] {
     ErrorMessage := "custom anti phish policy(ies) found where similar user safety tips are not enabled:"
@@ -905,7 +891,7 @@ tests[{
     "Criticality" : "Shall",
     "Commandlet" : ["Get-AntiPhishPolicy"],
 	"ActualValue" : Policy.EnableSimilarDomainsSafetyTips,
-    "ReportDetails" : ReportDetails(Status),
+    "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
     Policy := input.anti_phish_policies[_]
@@ -928,7 +914,7 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-AntiPhishPolicy"],
 	"ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Policies, ErrorMessage)),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), GenerateArrayString(Policies, ErrorMessage)),
     "RequirementMet" : Status
 }] {
     ErrorMessage := "custom anti phish policy(ies) found where similar domains safety tips are not enabled:"
@@ -943,7 +929,7 @@ tests[{
     "Criticality" : "Shall",
     "Commandlet" : ["Get-AntiPhishPolicy"],
 	"ActualValue" : Policy.EnableUnusualCharactersSafetyTips,
-    "ReportDetails" : ReportDetails(Status),
+    "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
     Policy := input.anti_phish_policies[_]
@@ -966,7 +952,7 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-AntiPhishPolicy"],
 	"ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Policies, ErrorMessage)),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), GenerateArrayString(Policies, ErrorMessage)),
     "RequirementMet" : Status
 }] {
     ErrorMessage := "custom anti phish policy(ies) found where unusual character safety tips are not enabled:"
@@ -981,7 +967,7 @@ tests[{
     "Criticality" : "Shall",
     "Commandlet" : ["Get-AntiPhishPolicy"],
 	"ActualValue" : Policy.EnableViaTag,
-    "ReportDetails" : ReportDetails(Status),
+    "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
     Policy := input.anti_phish_policies[_]
@@ -1004,7 +990,7 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-AntiPhishPolicy"],
 	"ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Policies, ErrorMessage)),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), GenerateArrayString(Policies, ErrorMessage)),
     "RequirementMet" : Status
 }] {
     ErrorMessage := "custom anti phish policy(ies) found where via tag is not enabled:"
@@ -1019,7 +1005,7 @@ tests[{
     "Criticality" : "Shall",
     "Commandlet" : ["Get-AntiPhishPolicy"],
 	"ActualValue" : Policy.EnableUnauthenticatedSender,
-    "ReportDetails" : ReportDetails(Status),
+    "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
     Policy := input.anti_phish_policies[_]
@@ -1042,7 +1028,7 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-AntiPhishPolicy"],
 	"ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Policies, ErrorMessage)),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), GenerateArrayString(Policies, ErrorMessage)),
     "RequirementMet" : Status
 }] {
     ErrorMessage := "custom anti phish policy(ies) found where '?' for unauthenticated sender is not enabled:"
@@ -1061,12 +1047,13 @@ tests[{
 # Baseline 2.6: Policy 1
 #--
 tests[{
-    "Requirement" : "The bulk complaint level (BCL) threshold SHOULD be set to six or lower: default policy",
-    "Control" : "Defender 2.6",
+    #TODO:  Multiple mappings
+    #"Requirement" : "The bulk complaint level (BCL) threshold SHOULD be set to six or lower: default policy",
+    "PolicyId" : "MS.DEFENDER.6.1v1",
     "Criticality" : "Should",
     "Commandlet" : ["Get-HostedContentFilterPolicy"],
 	"ActualValue" : Policy.BulkThreshold,
-	"ReportDetails" : ReportDetails(Status),
+	"ReportDetails" : ReportDetailsBoolean(Status),
 	"RequirementMet" : Status
 }] {
 	Policy := input.hosted_content_filter_policies[_] # Refactor
@@ -1086,7 +1073,7 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-HostedContentFilterPolicy"],
     "ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Policies, ErrorMessage)),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), GenerateArrayString(Policies, ErrorMessage)),
 	"RequirementMet" : Status
 }] {
 	ErrorMessage := "custom anti-spam policy(ies) found where bulk complaint level threshold is set to 7 or more:"
@@ -1100,12 +1087,13 @@ tests[{
 #--
 # Step 1: The default policy (SHALL)
 tests[{
-    "Requirement" : "Spam SHALL be moved to either the junk email folder or the quarantine folder: default policy",
-    "Control" : "Defender 2.6",
+    #TODO: Multiple Mappings
+    #"Requirement" : "Spam SHALL be moved to either the junk email folder or the quarantine folder: default policy",
+    "PolicyId" : "MS.DEFENDER.6.2v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-HostedContentFilterPolicy"],
     "ActualValue" : Policy.SpamAction,
-    "ReportDetails" : ReportDetails(Status),
+    "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
     Policy := input.hosted_content_filter_policies[_]
@@ -1119,7 +1107,7 @@ tests[{
     "Criticality" : "Shall",
     "Commandlet" : ["Get-HostedContentFilterPolicy"],
     "ActualValue" : Policy.HighConfidenceSpamAction,
-    "ReportDetails" : ReportDetails(Status),
+    "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
     Policy := input.hosted_content_filter_policies[_]
@@ -1140,7 +1128,7 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-HostedContentFilterPolicy"],
     "ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Policies, ErrorMessage)),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), GenerateArrayString(Policies, ErrorMessage)),
     "RequirementMet" : Status
 }] {
 	ErrorMessage := "custom anti-spam policy(ies) found where spam is not being sent to the Quarantine folder or the Junk Mail Folder:"
@@ -1160,7 +1148,7 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-HostedContentFilterPolicy"],
     "ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Policies, ErrorMessage)),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), GenerateArrayString(Policies, ErrorMessage)),
     "RequirementMet" : Status
 }] {
 	ErrorMessage := "custom anti-spam policy(ies) found where high confidence spam is not being sent to the Quarantine folder or the Junk Mail Folder:"
@@ -1174,12 +1162,13 @@ tests[{
 #--
 # Step 1: The default policy (SHALL)
 tests[{
-    "Requirement" : "Phishing SHALL be quarantined: default policy",
-    "Control" : "Defender 2.6",
+    #TODO: Multiple mappings
+    #"Requirement" : "Phishing SHALL be quarantined: default policy",
+    "PolicyId" : "MS.DEFENDER.6.3v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-HostedContentFilterPolicy"],
     "ActualValue" : Policy.PhishSpamAction,
-    "ReportDetails" : ReportDetails(Status),
+    "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
     Policy := input.hosted_content_filter_policies[_]
@@ -1193,7 +1182,7 @@ tests[{
     "Criticality" : "Shall",
     "Commandlet" : ["Get-HostedContentFilterPolicy"],
     "ActualValue" : Policy.HighConfidencePhishAction,
-    "ReportDetails" : ReportDetails(Status),
+    "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
     Policy := input.hosted_content_filter_policies[_]
@@ -1215,7 +1204,7 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-HostedContentFilterPolicy"],
     "ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Policies, ErrorMessage)),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), GenerateArrayString(Policies, ErrorMessage)),
     "RequirementMet" : Status
 }] {
     ErrorMessage := "custom anti-spam policy(ies) found where phishing isn't moved to the quarantine folder:"
@@ -1235,7 +1224,7 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-HostedContentFilterPolicy"],
     "ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Policies, ErrorMessage)),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), GenerateArrayString(Policies, ErrorMessage)),
     "RequirementMet" : Status
 }] {
     ErrorMessage := "custom anti-spam policy(ies) found where high-confidence phishing isn't moved to quarantine folder:"
@@ -1247,12 +1236,13 @@ tests[{
 # Baseline 2.6: Policy 4
 #--
 tests[{
-    "Requirement" : "Bulk email SHOULD be moved to either the junk email folder or the quarantine folder: default policy",
-    "Control" : "Defender 2.6",
+    #TODO: Multiple mappings
+    #"Requirement" : "Bulk email SHOULD be moved to either the junk email folder or the quarantine folder: default policy",
+    "PolicyId" : "MS.DEFENDER.6.4v1",
     "Criticality" : "Should",
     "Commandlet" : ["Get-HostedContentFilterPolicy"],
     "ActualValue" : Policy.BulkSpamAction,
-    "ReportDetails" : ReportDetails(Status),
+    "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
     Policy := input.hosted_content_filter_policies[_]
@@ -1272,7 +1262,7 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-HostedContentFilterPolicy"],
     "ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Policies, ErrorMessage)),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), GenerateArrayString(Policies, ErrorMessage)),
     "RequirementMet" : Status
 }] {
     ErrorMessage := "custom anti-spam policy(ies) found where bulk spam action is not Quarantine or Move to Junk Email Folder"
@@ -1285,12 +1275,13 @@ tests[{
 # Baseline 2.6: Policy 5
 #--
 tests[{
-    "Requirement" : "Spam in quarantine SHOULD be retained for at least 30 days: default policy",
-    "Control" : "Defender 2.6",
+    #TODO: Multiple Mappings
+    #"Requirement" : "Spam in quarantine SHOULD be retained for at least 30 days: default policy",
+    "PolicyId" : "MS.DEFENDER.6.5v1",
     "Criticality" : "Should",
     "Commandlet" : ["Get-HostedContentFilterPolicy"],
     "ActualValue" : Policy.QuarantineRetentionPeriod,
-    "ReportDetails" : ReportDetails(Status),
+    "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
     Policy := input.hosted_content_filter_policies[_]
@@ -1310,7 +1301,7 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-HostedContentFilterPolicy"],
     "ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Policies, ErrorMessage)),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), GenerateArrayString(Policies, ErrorMessage)),
     "RequirementMet" : Status
 }] {
     ErrorMessage := "custom anti-spam policy(ies) found where spam in quarantine isn't retained for 30 days:"
@@ -1323,12 +1314,13 @@ tests[{
 # Baseline 2.6: Policy 6
 #--
 tests[{
-    "Requirement" : "Spam safety tips SHOULD be turned on: default policy",
-    "Control" : "Defender 2.6",
+    #TODO: Multiple mappings
+    #"Requirement" : "Spam safety tips SHOULD be turned on: default policy",
+    "PolicyId" : "MS.DEFENDER.6.6v1",
     "Criticality" : "Should",
     "Commandlet" : ["Get-HostedContentFilterPolicy"],
     "ActualValue" : Policy.InlineSafetyTipsEnabled,
-    "ReportDetails" : ReportDetails(Status),
+    "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
     Policy := input.hosted_content_filter_policies[_]
@@ -1348,7 +1340,7 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-HostedContentFilterPolicy"],
     "ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Policies, ErrorMessage)),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), GenerateArrayString(Policies, ErrorMessage)),
     "RequirementMet" : Status
 }] {
     ErrorMessage := "custom anti-spam policy(ies) found where spam safety tips is disabled:"
@@ -1362,12 +1354,13 @@ tests[{
 #--
 # Step 1: The default policy (SHALL)
 tests[{
-    "Requirement" : "Zero-hour auto purge (ZAP) SHALL be enabled: default policy",
-    "Control" : "Defender 2.6",
+    #TODO: Multiple mappings
+    #"Requirement" : "Zero-hour auto purge (ZAP) SHALL be enabled: default policy",
+    "PolicyId" : "MS.DEFENDER.6.7v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-HostedContentFilterPolicy"],
     "ActualValue" : Policy.ZapEnabled,
-    "ReportDetails" : ReportDetails(Status),
+    "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
     Policy := input.hosted_content_filter_policies[_]
@@ -1381,7 +1374,7 @@ tests[{
     "Criticality" : "Shall",
     "Commandlet" : ["Get-HostedContentFilterPolicy"],
     "ActualValue" : Policy.SpamZapEnabled,
-    "ReportDetails" : ReportDetails(Status),
+    "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
     Policy := input.hosted_content_filter_policies[_]
@@ -1395,7 +1388,7 @@ tests[{
     "Criticality" : "Shall",
     "Commandlet" : ["Get-HostedContentFilterPolicy"],
     "ActualValue" : Policy.PhishZapEnabled,
-    "ReportDetails" : ReportDetails(Status),
+    "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
     Policy := input.hosted_content_filter_policies[_]
@@ -1416,7 +1409,7 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-HostedContentFilterPolicy"],
     "ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Policies, ErrorMessage)),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), GenerateArrayString(Policies, ErrorMessage)),
     "RequirementMet" : Status
 }] {
     ErrorMessage := "custom anti-spam policies found where Zero-hour auto purge is disabled:"
@@ -1436,7 +1429,7 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-HostedContentFilterPolicy"],
     "ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Policies, ErrorMessage)),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), GenerateArrayString(Policies, ErrorMessage)),
     "RequirementMet" : Status
 }] {
     ErrorMessage := "custom anti-spam policies found where Zero-hour auto purge for spam is disabled:"
@@ -1456,7 +1449,7 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-HostedContentFilterPolicy"],
     "ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Policies, ErrorMessage)),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), GenerateArrayString(Policies, ErrorMessage)),
     "RequirementMet" : Status
 }] {
     ErrorMessage := "custom anti-spam policy(ies) found where Zero-hour auto purge for phishing is disabled:"
@@ -1474,12 +1467,13 @@ AllowedSenderDomainsNotEmpty [Policy.Identity] {
     count(Policy.AllowedSenderDomains) > 0
 }
 tests[{
-    "Requirement" : "Allowed senders MAY be added but allowed domains SHALL NOT be added: default policy",
-    "Control" : "Defender 2.6",
+    #TODO: Multiple mappings
+    #"Requirement" : "Allowed senders MAY be added but allowed domains SHALL NOT be added: default policy",
+    "PolicyId" : "MS.DEFENDER.6.8v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-HostedContentFilterPolicy"],
     "ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Policies, ErrorMessage)),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), GenerateArrayString(Policies, ErrorMessage)),
     "RequirementMet" : Status
 }] {
     ErrorMessage := "custom anti-spam policy(ies) found where there is at least one allowed sender domain:"
@@ -1498,7 +1492,7 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-HostedContentFilterPolicy"],
     "ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Policies, ErrorMessage)),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), GenerateArrayString(Policies, ErrorMessage)),
     "RequirementMet" : Status
 }] {
     ErrorMessage := "custom policy(ies) found where there is at least one allowed sender domain:"
@@ -1527,12 +1521,11 @@ AllDomainsSafeLinksPolicies[{
 }
 
 tests[{
-    "Requirement" : "The Safe Links Policy SHALL include all agency domains-and by extension-all users",
-    "Control" : "Defender 2.7",
+    "PolicyId" : "MS.DEFENDER.7.1v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-SafeLinksRule", "Get-AcceptedDomain"],
 	"ActualValue" : AllDomainsSafeLinksPolicies,
-    "ReportDetails" : ApplyLicenseWarning(CustomizeError(ReportDetails(Status), ErrorMessage)),
+    "ReportDetails" : ApplyLicenseWarning(CustomizeError(ReportDetailsBoolean(Status), ErrorMessage)),
 	"RequirementMet" : Status
 }] {
 	DomainNames := {Name.DomainName | Name = input.all_domains[_]}
@@ -1554,12 +1547,11 @@ EnableSafeLinksForEmailCorrect[Policy.Identity] {
 }
 
 tests[{
-    "Requirement" : "URL rewriting and malicious link click checking SHALL be enabled",
-    "Control" : "Defender 2.7",
+    "PolicyId" : "MS.DEFENDER.7.2v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-SafeLinksPolicy", "Get-SafeLinksRule"],
 	"ActualValue" : Policies,
-    "ReportDetails" : ApplyLicenseWarning(ReportDetails(Status)),
+    "ReportDetails" : ApplyLicenseWarning(ReportDetailsBoolean(Status)),
 	"RequirementMet" : Status
 }] {
 	Policies := EnableSafeLinksForEmailCorrect
@@ -1580,12 +1572,11 @@ EnableSafeLinksForTeamsCorrect[Policy.Identity] {
 }
 
 tests[{
-    "Requirement" : "Malicious link click checking SHALL be enabled with Microsoft Teams",
-    "Control" : "Defender 2.7",
+    "PolicyId" : "MS.DEFENDER.7.3v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-SafeLinksPolicy", "Get-SafeLinksRule"],
 	"ActualValue" : Policies,
-    "ReportDetails" : ApplyLicenseWarning(ReportDetails(Status)),
+    "ReportDetails" : ApplyLicenseWarning(ReportDetailsBoolean(Status)),
 	"RequirementMet" : Status
 }] {
 	Policies := EnableSafeLinksForTeamsCorrect
@@ -1606,12 +1597,11 @@ ScanUrlsCorrect[Policy.Identity] {
 }
 
 tests[{
-    "Requirement" : "Real-time suspicious URL and file-link scanning SHALL be enabled",
-    "Control" : "Defender 2.7",
+    "PolicyId" : "MS.DEFENDER.7.4v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-SafeLinksPolicy", "Get-SafeLinksRule"],
 	"ActualValue" : Policies,
-    "ReportDetails" : ApplyLicenseWarning(ReportDetails(Status)),
+    "ReportDetails" : ApplyLicenseWarning(ReportDetailsBoolean(Status)),
 	"RequirementMet" : Status
 }] {
 	Policies := ScanUrlsCorrect
@@ -1632,12 +1622,11 @@ DeliverMessageAfterScanCorrect[Policy.Identity] {
 }
 
 tests[{
-    "Requirement" : "URLs SHALL be scanned completely before message delivery",
-    "Control" : "Defender 2.7",
+    "PolicyId" : "MS.DEFENDER.7.5v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-SafeLinksPolicy", "Get-SafeLinksRule"],
 	"ActualValue" : Policies,
-    "ReportDetails" : ApplyLicenseWarning(ReportDetails(Status)),
+    "ReportDetails" : ApplyLicenseWarning(ReportDetailsBoolean(Status)),
 	"RequirementMet" : Status
 }] {
 	Policies := DeliverMessageAfterScanCorrect
@@ -1658,12 +1647,11 @@ EnableForInternalSendersCorrect[Policy.Identity] {
 }
 
 tests[{
-    "Requirement" : "Internal agency email messages SHALL have safe links enabled",
-    "Control" : "Defender 2.7",
+    "PolicyId" : "MS.DEFENDER.7.6v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-SafeLinksPolicy", "Get-SafeLinksRule"],
 	"ActualValue" : Policies,
-    "ReportDetails" : ApplyLicenseWarning(ReportDetails(Status)),
+    "ReportDetails" : ApplyLicenseWarning(ReportDetailsBoolean(Status)),
 	"RequirementMet" : Status
 }] {
 	Policies := EnableForInternalSendersCorrect
@@ -1684,12 +1672,11 @@ TrackClicksCorrect[Policy.Identity] {
 }
 
 tests[{
-    "Requirement" : "User click tracking SHALL be enabled",
-    "Control" : "Defender 2.7",
+    "PolicyId" : "MS.DEFENDER.7.7v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-SafeLinksPolicy", "Get-SafeLinksRule"],
 	"ActualValue" : Policies,
-    "ReportDetails" : ApplyLicenseWarning(ReportDetails(Status)),
+    "ReportDetails" : ApplyLicenseWarning(ReportDetailsBoolean(Status)),
 	"RequirementMet" : Status
 }] {
 	Policies := TrackClicksCorrect
@@ -1709,12 +1696,11 @@ EnableSafeLinksForOfficeCorrect[Policy.Identity] {
 }
 
 tests[{
-    "Requirement" : "Safe Links in Office 365 apps SHALL be turned on",
-    "Control" : "Defender 2.7",
+    "PolicyId" : "MS.DEFENDER.7.8v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-SafeLinksPolicy", "Get-SafeLinksRule"],
 	"ActualValue" : Policies,
-    "ReportDetails" : ApplyLicenseWarning(ReportDetails(Status)),
+    "ReportDetails" : ApplyLicenseWarning(ReportDetailsBoolean(Status)),
 	"RequirementMet" : Status
 }] {
 	Policies := EnableSafeLinksForOfficeCorrect
@@ -1734,12 +1720,11 @@ AllowClickThroughCorrect[Policy.Identity] {
 }
 
 tests[{
-    "Requirement" : "Users SHALL NOT be enabled to click through to the original URL",
-    "Control" : "Defender 2.7",
+    "PolicyId" : "MS.DEFENDER.7.9v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-SafeLinksPolicy", "Get-SafeLinksRule"],
 	"ActualValue" : Policies,
-    "ReportDetails" : ApplyLicenseWarning(ReportDetails(Status)),
+    "ReportDetails" : ApplyLicenseWarning(ReportDetailsBoolean(Status)),
 	"RequirementMet" : Status
 }] {
 	Policies := AllowClickThroughCorrect
@@ -1767,12 +1752,11 @@ AllDomainsSafeAttachmentRules[{
 }
 
 tests[{
-    "Requirement" : "At least one Safe Attachments Policy SHALL include all agency domains-and by extension-all users",
-    "Control" : "Defender 2.8",
+    "PolicyId" : "MS.DEFENDER.8.1v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-SafeAttachmentRule", "Get-AcceptedDomain"],
 	"ActualValue" : AllDomainsSafeAttachmentRules,
-    "ReportDetails" : ApplyLicenseWarning(CustomizeError(ReportDetails(Status), ErrorMessage)),
+    "ReportDetails" : ApplyLicenseWarning(CustomizeError(ReportDetailsBoolean(Status), ErrorMessage)),
 	"RequirementMet" : Status
 }] {
 	DomainNames := {Name.DomainName | Name = input.all_domains[_]}
@@ -1801,12 +1785,11 @@ BlockMalwarePolicies[{
 }
 
 tests[{
-    "Requirement" : "The action for malware in email attachments SHALL be set to block",
-    "Control" : "Defender 2.8",
+    "PolicyId" : "MS.DEFENDER.8.2v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-SafeAttachmentPolicy", "Get-SafeAttachmentRule", "Get-AcceptedDomain"],
 	"ActualValue" : Policies,
-    "ReportDetails" : ApplyLicenseWarning(CustomizeError(ReportDetails(Status), ErrorMessage)),
+    "ReportDetails" : ApplyLicenseWarning(CustomizeError(ReportDetailsBoolean(Status), ErrorMessage)),
     "RequirementMet" : Status
 }] {
     Policies := BlockMalwarePolicies
@@ -1828,12 +1811,11 @@ RedirectionPolicies[{
 }
 
 tests[{
-    "Requirement" : "Redirect emails with detected attachments to an agency-specified email SHOULD be enabled",
-    "Control" : "Defender 2.8",
+    "PolicyId" : "MS.DEFENDER.8.3v1",
     "Criticality" : "Should",
     "Commandlet" : ["Get-SafeAttachmentPolicy", "Get-SafeAttachmentRule", "Get-AcceptedDomain"],
 	"ActualValue" : Policies,
-    "ReportDetails" : ApplyLicenseWarning(CustomizeError(ReportDetails(Status), ErrorMessage)),
+    "ReportDetails" : ApplyLicenseWarning(CustomizeError(ReportDetailsBoolean(Status), ErrorMessage)),
     "RequirementMet" : Status
 }] {
     Policies := RedirectionPolicies
@@ -1854,12 +1836,11 @@ ATPPolicies[{
 }
 
 tests[{
-    "Requirement" : "Safe attachments SHOULD be enabled for SharePoint, OneDrive, and Microsoft Teams",
-    "Control" : "Defender 2.8",
+    "PolicyId" : "MS.DEFENDER.8.4v1",
     "Criticality" : "Should",
     "Commandlet" : ["Get-AtpPolicyForO365"],
 	"ActualValue" : Policies,
-    "ReportDetails" : ApplyLicenseWarning(ReportDetails(Status)),
+    "ReportDetails" : ApplyLicenseWarning(ReportDetailsBoolean(Status)),
     "RequirementMet" : Status
 }] {
     Policies := ATPPolicies
@@ -1894,12 +1875,11 @@ EnabledAlerts[Alert.Name] {
 }
 
 tests[{
-    "Requirement" : "At a minimum, the alerts required by the Exchange Online Minimum Viable Secure Configuration Baseline SHALL be enabled",
-    "Control" : "Defender 2.9",
+    "PolicyId" : "MS.DEFENDER.9.1v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-ProtectionAlert"],
 	"ActualValue" : MissingAlerts,
-    "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(MissingAlerts, ErrorMessage)),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), GenerateArrayString(MissingAlerts, ErrorMessage)),
     "RequirementMet" : Status
 }] {
     MissingAlerts := RequiredAlerts - EnabledAlerts
@@ -1913,14 +1893,14 @@ tests[{
 #--
 # SIEM incorporation cannot be checked programmatically
 tests[{
-    "Requirement" : "The alerts SHOULD be sent to a monitored address or incorporated into a SIEM",
-    "Control" : "Defender 2.9",
+    "PolicyId" : PolicyId,
     "Criticality" : "Should/Not-Implemented",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "Currently cannot be checked automatically. See Defender Secure Configuration Baseline policy 2.9 for instructions on manual check",
+    "ReportDetails" : NotCheckedDetails(PolicyId),
     "RequirementMet" : false
 }] {
+    PolicyId := "MS.DEFENDER.9.2v1"
     true
 }
 #--
@@ -1942,12 +1922,11 @@ CorrectLogConfigs[{
 # Baseline 2.10: Policy 1
 #--
 tests[{
-    "Requirement" : "Unified audit logging SHALL be enabled",
-    "Control" : "Defender 2.10",
+    "PolicyId" : "MS.DEFENDER.10.1v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-AdminAuditLogConfig"],
 	"ActualValue" : CorrectLogConfigs,
-    "ReportDetails" : ReportDetails(Status),
+    "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
     Status := count(CorrectLogConfigs) >= 1
@@ -1961,14 +1940,14 @@ tests[{
 # Would require looping through all users. See discussion in GitHub
 # issue #200.
 tests[{
-    "Requirement" : "Advanced audit SHALL be enabled",
-    "Control" : "Defender 2.10",
+    "PolicyId" : PolicyId,
     "Criticality" : "Shall/Not-Implemented",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "Currently cannot be checked automatically. See Defender Secure Configuration Baseline policy 2.10 for instructions on manual check",
+    "ReportDetails" : NotCheckedDetails(PolicyId),
     "RequirementMet" : false
 }] {
+    PolicyId := "MS.DEFENDER.10.2v1"
     true
 }
 #--
@@ -1980,14 +1959,14 @@ tests[{
 # It is not required to maintain these logs in the M365 cloud environment; doing so would require an additional add-on SKU.
 # This requirement can be met by offloading the logs out of the cloud environment.
 tests[{
-    "Requirement" : "Audit logs SHALL be maintained for at least the minimum duration dictated by OMB M-21-31",
-    "Control" : "Defender 2.10",
+    "PolicyId" : PolicyId,
     "Criticality" : "Shall/Not-Implemented",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "Currently cannot be checked automatically. See Defender Secure Configuration Baseline policy 2.10 for instructions on manual check",
+    "ReportDetails" : NotCheckedDetails(PolicyId),
     "RequirementMet" : false
 }] {
+    PolicyId := "MS.DEFENDER.10.3v1"
     true
 }
 #--
