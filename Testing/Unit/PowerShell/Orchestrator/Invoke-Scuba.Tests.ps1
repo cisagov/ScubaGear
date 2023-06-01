@@ -16,7 +16,7 @@ InModuleScope Orchestrator {
             Mock -ModuleName Orchestrator Invoke-ProviderList {}
             function Invoke-RunRego {}
             Mock -ModuleName Orchestrator Invoke-RunRego {}
-            
+
             Mock -ModuleName Orchestrator Invoke-ReportCreation {}
             function Disconnect-SCuBATenant {}
             Mock -ModuleName Orchestrator Disconnect-SCuBATenant {}
