@@ -255,6 +255,8 @@ Expiration timers for people who use a verification code SHOULD be set to 30 day
 
 - [Managing SharePoint Online Security: A Team Effort \| Microsoft
   Build](https://docs.microsoft.com/en-us/microsoft-365/community/sharepoint-security-a-team-effort)
+- [Secure external sharing recipient experience \| Microsoft
+  Build](https://learn.microsoft.com/en-us/sharepoint/what-s-new-in-sharing-in-targeted-release)
 
 ### Implementation
 
