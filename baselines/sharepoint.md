@@ -282,7 +282,12 @@ scripts should not be allowed.
 
 ###  Policy
 #### MS.SHAREPOINT.5.1v1
-Users SHALL be prevented from running custom scripts.
+Users SHALL be prevented from running custom scripts on personal sites.
+- _Rationale:_ TODO
+- _Last modified:_ June 2023
+
+#### MS.SHAREPOINT.5.2v1
+Users SHALL be prevented from running custom scripts self-service created sites.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
