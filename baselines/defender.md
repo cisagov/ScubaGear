@@ -123,7 +123,7 @@ Domain impersonation protection SHOULD be added for important partners in both t
 
 #### MS.DEFENDER.2.4v1
 Trusted senders and domains MAY be added in the event of false positives.
-- _Rationale:_ It is possible that false positives may be raised by the impersonation protection system. In these cases, consider marking legitimate senders as trusted to prevent the same false detection from repeating.
+- _Rationale:_ It is possible that false positives may be raised by the impersonation protection system. In these cases, consider marking legitimate senders as trusted to prevent protection from flagging them in the future.
 - _Last modified:_ June 2023
 
 ### Resources
