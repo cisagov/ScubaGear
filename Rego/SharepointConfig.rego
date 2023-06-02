@@ -267,6 +267,10 @@ tests[{
 #
 # MS.SHAREPOINT.5.2v1
 #--
+
+# 1 == Allow users to run custom script on self-service created sites
+# 2 == Prevent users from running custom script on self-service created sites
+
 tests[{
     "PolicyId" : "MS.SHAREPOINT.5.2v1",
     "Criticality" : "Shall",
