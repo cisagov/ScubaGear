@@ -134,7 +134,7 @@ Trusted senders and domains MAY be added in the event of false positives.
 
 - Impersonation protection and advanced phishing thresholds require
   Defender for Office 365 Plan 1 or 2. These are included with E5 and G5
-  and are available as add-ons for E3 and G3. As of September 1, 2022
+  and are available as add-ons for E3 and G3. As of April 25, 2023
   anti-phishing for user and domain impersonation and spoof intelligence
   are not yet available in GCC High and DoD (see [Platform features \|
   Microsoft
