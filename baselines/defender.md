@@ -148,7 +148,7 @@ To add email addresses and domains to flag when impersonated by attackers, follo
 
 The Safe Attachments feature will scan messages for attachments with malicious
 content. It routes all messages and attachments that do not have a
-virus/malware signature to a special environment. It then uses machine
+virus or malware signature to a special environment. It then uses machine
 learning and analysis techniques to detect malicious intent.
 While safe attachments for Exchange Online is automatically
 configured in the preset policies, separate action needs to be taken to
