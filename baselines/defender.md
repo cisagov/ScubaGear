@@ -60,7 +60,7 @@ Within the preset policies, users can be enrolled in [Exchange Online Protection
 ### Policies
 #### MS.DEFENDER.1.1v1
 All users SHALL be added to Exchange Online Protection in either the standard or strict preset security policy.
-- _Rationale:_ Important user protections are provided by Exchange Online Protection, including anti-spam, anti-malware, and anti-phishing. By using the preset policies, admins can easily ensure that all new and existing users automatically have secure defaults applied.
+- _Rationale:_ Important user protections are provided by Exchange Online Protection, including anti-spam, anti-malware, and anti-phishing protections. By using the preset policies, admins can easily ensure that all new and existing users automatically have secure defaults applied.
 
 - _Last modified:_ June 2023
 
