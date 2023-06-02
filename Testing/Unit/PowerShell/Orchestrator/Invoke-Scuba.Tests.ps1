@@ -16,7 +16,7 @@ InModuleScope Orchestrator {
             Mock -ModuleName Orchestrator Invoke-ProviderList {}
             function Invoke-RunRego {}
             Mock -ModuleName Orchestrator Invoke-RunRego {}
-            function Invoke-ReportCreation {}
+
             Mock -ModuleName Orchestrator Invoke-ReportCreation {}
             function Disconnect-SCuBATenant {}
             Mock -ModuleName Orchestrator Disconnect-SCuBATenant {}
@@ -30,6 +30,14 @@ InModuleScope Orchestrator {
                 $SplatParams = @{
                     M365Environment = 'commercial';
                 }
+            }
+            It 'Do it quietly (Do not automatically show report)' {
+                {Invoke-Scuba -Quiet} | Should -Not -Throw
+                Should -Invoke -CommandName Invoke-ReportCreation -Exactly -Times 1 -ParameterFilter {$Quiet -eq $true}
+            }
+            It 'Show report' {
+                {Invoke-Scuba} | Should -Not -Throw
+                Should -Invoke -CommandName Invoke-ReportCreation -Exactly -Times 1 -ParameterFilter {$Quiet -eq $false}
             }
             It 'Given -ProductNames aad should not throw' {
                 $SplatParams += @{
