@@ -78,6 +78,8 @@ function Invoke-SCuBA {
     tool for use in specific tests.
     .Parameter DarkMode
     Set switch to enable report dark mode by default.
+    .Parameter Quiet
+    Do not launch external browser for report.
     .Example
     Invoke-SCuBA
     Run an assessment against by default a commercial M365 Tenant against the
@@ -199,7 +201,11 @@ function Invoke-SCuBA {
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
         [switch]
-        $DarkMode
+        $DarkMode,
+
+        [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
+        [switch]
+        $Quiet
     )
     process {
         # Retrive ScubaGear Module versions
@@ -313,14 +319,15 @@ function Invoke-SCuBA {
             # Converted back from JSON String for PS Object use
             $TenantDetails = $TenantDetails | ConvertFrom-Json
             $ReportParams = @{
-                'ProductNames' = $ScubaConfig.ProductNames;
-                'TenantDetails' = $TenantDetails;
-                'ModuleVersion' = $ModuleVersion;
-                'OutFolderPath' = $OutFolderPath;
-                'OutProviderFileName' = $ScubaConfig.OutProviderFileName;
-                'OutRegoFileName' = $ScubaConfig.OutRegoFileName;
-                'OutReportName' = $ScubaConfig.OutReportName;
-                'DarkMode' = $DarkMode;
+                'ProductNames' = $ScubaConfig.ProductNames
+                'TenantDetails' = $TenantDetails
+                'ModuleVersion' = $ModuleVersion
+                'OutFolderPath' = $OutFolderPath
+                'OutProviderFileName' = $ScubaConfig.OutProviderFileName
+                'OutRegoFileName' = $ScubaConfig.OutRegoFileName
+                'OutReportName' = $ScubaConfig.OutReportName
+                'DarkMode' = $DarkMode
+                'Quiet' = $Quiet
             }
             Invoke-ReportCreation @ReportParams
         }
@@ -730,8 +737,8 @@ function Invoke-ReportCreation {
 
         [Parameter(Mandatory = $false)]
         [ValidateNotNullOrEmpty()]
-        [boolean]
-        $Quiet = $false,
+        [switch]
+        $Quiet,
 
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
@@ -851,7 +858,7 @@ function Invoke-ReportCreation {
             Add-Type -AssemblyName System.Web -ErrorAction 'Stop'
             $ReportFileName = Join-Path -Path $OutFolderPath "$($OutReportName).html" -ErrorAction 'Stop'
             [System.Web.HttpUtility]::HtmlDecode($ReportHTML) | Out-File $ReportFileName -ErrorAction 'Stop'
-            if ($Quiet -eq $False) {
+            if (-Not $Quiet) {
                 Invoke-Item $ReportFileName
             }
         }
@@ -1280,8 +1287,8 @@ function Invoke-RunCached {
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
         [ValidateSet($true, $false)]
-        [boolean]
-        $Quiet = $false,
+        [switch]
+        $Quiet,
 
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [switch]

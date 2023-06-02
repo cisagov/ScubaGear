@@ -35,6 +35,22 @@ InModuleScope Orchestrator {
                     OutReportName       = "BaselineReports"
                 }
             }
+            It 'Do it quietly (Do not automatically show report)' {
+                $ProviderParameters += @{
+                    ProductNames = @("aad")
+                }
+                { Invoke-ReportCreation @ProviderParameters -Quiet} | Should -Not -Throw
+                Should -Invoke -CommandName Invoke-Item -Exactly -Times 0
+                $ProviderParameters.ProductNames = @()
+            }
+            It 'Show report' {
+                $ProviderParameters += @{
+                    ProductNames = @("aad")
+                }
+                { Invoke-ReportCreation @ProviderParameters} | Should -Not -Throw
+                Should -Invoke -CommandName Invoke-Item -Exactly -Times 1 -ParameterFilter {-Not [string]::IsNullOrEmpty($Path) }
+                $ProviderParameters.ProductNames = @()
+            }
             It 'With -ProductNames "aad", should not throw' {
                 $ProviderParameters += @{
                     ProductNames = @("aad")
