@@ -144,7 +144,7 @@ Trusted senders and domains MAY be added in the event of false positives.
 ### Implementation
 To add email addresses and domains to flag when impersonated by attackers, follow the instructions listed under [Use the Microsoft 365 Defender portal to assign Standard and Strict preset security policies to users \| Microsoft Docs](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/preset-security-policies?view=o365-worldwide#use-the-microsoft-365-defender-portal-to-assign-standard-and-strict-preset-security-policies-to-users).
 
-## 3. Safe-Attachments
+## 3. Safe Attachments
 
 The Safe Attachments feature will scan messages for attachments with malicious
 content. It routes all messages and attachments that do not have a
