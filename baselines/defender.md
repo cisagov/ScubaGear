@@ -24,6 +24,8 @@ trust principles.
 
 ## Assumptions
 
+The agency has identified a set of user accounts that have access to sensitive and high value information.  As a result, these accounts may be at a higher risk of being targeted.  These accounts are referred to as sensitive accounts for the purposes of the Defender policies in this baseline.
+
 The **License Requirements** sections of this document assume the
 organization is using an [M365
 E3](https://www.microsoft.com/en-us/microsoft-365/compare-microsoft-365-enterprise-plans)
@@ -53,35 +55,40 @@ strengthen the security of widely used cloud-based software services.
 
 Microsoft Defender defines two [preset security
 profiles](https://docs.microsoft.com/en-us/microsoft-365/security/office-365-security/preset-security-policies):
-standard and strict. These preset policies are informed by observations made by Microsoft and are designed to strike the balance between usability and security. They allow admins to enable the full feature set of Defender by simply adding users to the policies rather than manually configuring each setting.
+standard and strict. These preset policies are informed by observations made by Microsoft and are designed to strike the balance between usability and security. They allow administrators to enable the full feature set of Defender by simply adding users to the policies rather than manually configuring each setting.
 
 Within the preset policies, users can be enrolled in [Exchange Online Protection](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/eop-about?view=o365-worldwide) and [Defender for Office 365 protection](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/microsoft-defender-for-office-365-product-overview?view=o365-worldwide), and [Impersonation Protection](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/anti-phishing-policies-about?view=o365-worldwide#impersonation-settings-in-anti-phishing-policies-in-microsoft-defender-for-office-365) can be configured.
 
 ### Policies
 #### MS.DEFENDER.1.1v1
-All users SHALL be added to Exchange Online Protection in either the standard or strict preset security policy.
-- _Rationale:_ Important user protections are provided by Exchange Online Protection, including anti-spam, anti-malware, and anti-phishing protections. By using the preset policies, admins can easily ensure that all new and existing users automatically have secure defaults applied.
+The standard and strict preset security policies SHALL be enabled.
+- _Rationale:_  Defender includes a large number of features and settings to protect users against threats. Using the preset security policies, administrators can easily ensure that all new and existing users automatically have secure defaults applied.
 
 - _Last modified:_ June 2023
-
 #### MS.DEFENDER.1.2v1
-All users SHALL be added to Defender for Office 365 Protection in either the standard or strict preset security policy.
-- _Rationale:_ Important user protections are provided by Defender for Office 365 Protection, including safe attachments and safe links. By using the preset policies, admins can easily ensure that all new and existing users automatically have secure defaults applied.
+All users SHALL be added to Exchange Online Protection in either the standard or strict preset security policy.
+- _Rationale:_ Important user protections are provided by Exchange Online Protection, including anti-spam, anti-malware, and anti-phishing protections. By using the preset policies, administrators can easily ensure that all new and existing users automatically have secure defaults applied.
+
 - _Last modified:_ June 2023
 
 #### MS.DEFENDER.1.3v1
-Highly privileged users, as defined in [TODO add link to definition in AAD baseline], SHALL be added to Exchange Online Protection in the strict preset security policy.
-- _Rationale:_ The increased protection offered by the strict preset policy helps mitigate the greater harm that could result from the compromise of a highly privileged account.
+All users SHALL be added to Defender for Office 365 Protection in either the standard or strict preset security policy.
+- _Rationale:_ Important user protections are provided by Defender for Office 365 Protection, including safe attachments and safe links. By using the preset policies, administrators can easily ensure that all new and existing users automatically have secure defaults applied.
 - _Last modified:_ June 2023
 
 #### MS.DEFENDER.1.4v1
-Highly privileged users, as defined in [TODO add link to definition in AAD baseline], SHALL be added to Defender for Office 365 Protection in the strict preset security policy.
-- _Rationale:_ The increased protection offered by the strict preset policy helps mitigate the greater harm that could result from the compromise of a highly privileged account.
+Sensitive accounts SHALL be added to Exchange Online Protection in the strict preset security policy.
+- _Rationale:_ The increased protection offered by the strict preset policy helps mitigate the greater harm that could result from the compromise of a sensitive account.
 - _Last modified:_ June 2023
 
 #### MS.DEFENDER.1.5v1
-Specific users, except for highly privileged users, MAY be exempt from the preset policies, provided that they are added to a custom policy that offers comparable protection.
-- _Rationale:_ In some cases, specific users might need flexibility that is not offered by the preset policies. In these cases, these users should be added to a custom policy that conforms as closely as possible to the settings used by the preset policies (see the **Resources** section for more details).
+Sensitive accounts SHALL be added to Defender for Office 365 Protection in the strict preset security policy.
+- _Rationale:_ The increased protection offered by the strict preset policy helps mitigate the greater harm that could result from the compromise of a sensitive account.
+- _Last modified:_ June 2023
+
+#### MS.DEFENDER.1.6v1
+Specific user accounts, except for sensitive accounts, MAY be exempt from the preset policies, provided that they are added to a custom policy that offers comparable protection.
+- _Rationale:_ In some cases, specific users might need flexibility that is not offered by the preset policies. In these cases, these users' accounts should be added to a custom policy that conforms as closely as possible to the settings used by the preset policies (see the **Resources** section for more details).
 - _Last modified:_ June 2023
 
 ### Resources
@@ -97,7 +104,7 @@ Specific users, except for highly privileged users, MAY be exempt from the prese
 ### Implementation
 To add users to the preset policies, follow the instructions listed under [Use the Microsoft 365 Defender portal to assign Standard and Strict preset security policies to users \| Microsoft Docs](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/preset-security-policies?view=o365-worldwide#use-the-microsoft-365-defender-portal-to-assign-standard-and-strict-preset-security-policies-to-users).
 
-To apply a preset policy to all users, under "Apply protection to," select "All recipients." 
+To apply a preset policy to all users, under "Apply protection to," select "All recipients."
 
 ## 2. Impersonation Protection
 Impersonation protection checks incoming emails to see if the sender
@@ -107,8 +114,8 @@ impersonation attempt, the email is quarantined.
 
 ### Policies
 #### MS.DEFENDER.2.1v1
-User impersonation protection SHOULD be enabled for key agency leaders in both the standard and strict preset policies.
-- _Rationale:_ User impersonation, especially the impersonation of key users, has the potential to result in serious harm. Impersonation protection mitigates this risk. By configuring impersonation protection in both preset policies, administrators ensure that all email recipients are protected from impersonated emails, regardless of whether they are added to the standard or strict policy.
+User impersonation protection SHOULD be enabled for sensitive accounts in both the standard and strict preset policies.
+- _Rationale:_ User impersonation, especially the impersonation of users with access to sensitive or high value information and resources, has the potential to result in serious harm. Impersonation protection mitigates this risk. By configuring impersonation protection in both preset policies, administrators ensure that all email recipients are protected from impersonated emails, regardless of whether they are added to the standard or strict policy.
 - _Last modified:_ June 2023
 
 #### MS.DEFENDER.2.2v1
@@ -343,7 +350,7 @@ A list of browsers that are not allowed to access files protected by DLP policy 
 ## 5. Alerts
 
 There are several pre-built alert policies available pertaining to
-various apps in the M365 suite. These alerts give admins better
+various apps in the M365 suite. These alerts give administrators better
 real-time insight into possible security incidents.
 
 ### Policies
