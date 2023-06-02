@@ -76,25 +76,27 @@ function Export-PowerPlatformProvider {
 
             $CheckRScope = $true
             $CheckRSubScope = $true
-            switch ($M365Environment) {
-                "commercial" {
-                    $CheckRScope = $RegionScope -eq "NA"
-                    $CheckRSubScope = $RegionSubScope -eq ""
-                }
-                "gcc" {
-                    $CheckRScope = $RegionScope -eq "NA"
-                    $CheckRSubScope = $RegionSubScope -eq "GCC"
-                }
-                "gcchigh" {
-                    $CheckRScope = $RegionScope -eq "USGov" -or $RegionScope -eq "USG"
-                    $CheckRSubScope = $RegionSubScope -eq "DODCON"
-                }
-                "dod" {
-                    $CheckRScope = $RegionScope -eq "USGov" -or $RegionScope -eq "USG"
-                    $CheckRSubScope = $RegionSubScope -eq "DOD"
-                }
-                default {
-                    throw "Unsupported or invalid M365Environment argument"
+            if ($RegionScope -eq "NA" -or $RegionScope -eq "USGov" -or $RegionScope -eq "USG") {
+                switch ($M365Environment) {
+                    "commercial" {
+                        $CheckRScope = $RegionScope -eq "NA"
+                        $CheckRSubScope = $RegionSubScope -eq ""
+                    }
+                    "gcc" {
+                        $CheckRScope = $RegionScope -eq "NA"
+                        $CheckRSubScope = $RegionSubScope -eq "GCC"
+                    }
+                    "gcchigh" {
+                        $CheckRScope = $RegionScope -eq "USGov" -or $RegionScope -eq "USG"
+                        $CheckRSubScope = $RegionSubScope -eq "DODCON"
+                    }
+                    "dod" {
+                        $CheckRScope = $RegionScope -eq "USGov" -or $RegionScope -eq "USG"
+                        $CheckRSubScope = $RegionSubScope -eq "DOD"
+                    }
+                    default {
+                        throw "Unsupported or invalid M365Environment argument"
+                    }
                 }
             }
             # spacing is intentional
