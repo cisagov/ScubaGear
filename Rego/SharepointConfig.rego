@@ -270,7 +270,7 @@ tests[{
 tests[{
     "PolicyId" : "MS.SHAREPOINT.5.2v1",
     "Criticality" : "Shall",
-    "Commandlet" : ["Get-SPOTenant", "Get-PnPTenant"],
+    "Commandlet" : ["Get-SPOSite", "Get-PnPTenantSite"],
     "ActualValue" : [Policy.DenyAddAndCustomizePages],
     "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
