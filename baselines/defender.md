@@ -157,7 +157,7 @@ enable it for other products.
 ### Policies
 #### MS.DEFENDER.3.1v1
 Safe attachments SHOULD be enabled for SharePoint, OneDrive, and Microsoft Teams.
-- _Rationale:_ Users clicking malicious links can allow attackers an entrance. However, this danger is not limited to links included in emails. Other Microsoft products, such as Microsoft Teams, can be used to present users with malicious links. As such, it is important to protect users on these other Microsoft products as well.
+- _Rationale:_ Users clicking malicious links makes them vulnerable to attacks. However, this danger is not limited to links included in emails. Other Microsoft products, such as Microsoft Teams, can be used to present users with malicious links. As such, it is important to protect users on these other Microsoft products as well.
 - _Last modified:_ June 2023
 
 ### Resources
