@@ -88,7 +88,7 @@ OMB Max Site for a list of .gov domains for sharing).
 
 ### Policies
 #### MS.SHAREPOINT.1.1v1
-External sharing SHOULD be limited to Existing Guests or a more restrictive setting.
+External sharing SHOULD be limited to Existing Guests or the more restrictive setting, Only People in your Organization.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 - _Note:_ Same implementation in MS.ONEDRIVE.1.1v1
@@ -137,7 +137,7 @@ MS.SHAREPOINT.1.2v1, in the **SharePoint admin center**:
 
 4.  Select **Add domains**
 
-5.  Add domains
+5.  Add approved external domains
 
 6.  Select **Save**
 
@@ -152,7 +152,7 @@ MS.SHAREPOINT.1.3v1, in the **SharePoint admin center**:
 
 4.  Select **Manage security groups**
 
-5. Add security groups
+5. Add approved security groups
 
 6. Select **Save**
 
@@ -175,7 +175,7 @@ link.”
 ### Policies
 
 #### MS.SHAREPOINT.2.1v1
-File and folder links default sharing setting SHALL be set to Specific People (Only the People the User Specifies).
+File and folder links default sharing setting SHALL be set to Specific People (only the people the user specifies).
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 _Note:_ Similar implementation in MS.ONEDRIVE.3.1v1
@@ -205,7 +205,7 @@ MS.SHAREPOINT.2.1v1, in the **SharePoint admin center**:
 
 SharePoint allows sharing with users who are outside the agency, which
 is convenient but may pose a data loss or other information security
-risk. This working group recommends, outside of the default
+risk. This baseline policy recommends, outside of the default
 organizational settings, agencies evaluate each created site and
 adjust sharing settings best aligned to their respective sensitivity
 level.
@@ -317,7 +317,7 @@ Users SHALL be prevented from running custom scripts on personal sites.
 - _Last modified:_ June 2023
 
 #### MS.SHAREPOINT.5.2v1
-Users SHALL be prevented from running custom scripts self-service created sites.
+Users SHALL be prevented from running custom scripts on self-service created sites.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
@@ -332,7 +332,7 @@ Users SHALL be prevented from running custom scripts self-service created sites.
 
 ### Implementation
 
-MS.SHAREPOINT.5.1v1, in the **SharePoint classic admin center**:
+MS.SHAREPOINT.5.1v1, in the **SharePoint admin center**:
 
 1.  Select **Settings**
 
@@ -344,7 +344,7 @@ MS.SHAREPOINT.5.1v1, in the **SharePoint classic admin center**:
 
 5.  Select **Ok**
 
-MS.SHAREPOINT.5.1v1, in the **SharePoint Classic admin center**:
+MS.SHAREPOINT.5.1v1, in the **SharePoint admin center**:
 
 1.  Select **Settings**
 
