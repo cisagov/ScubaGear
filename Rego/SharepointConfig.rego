@@ -173,7 +173,7 @@ ExpirationTimersGuestAccess(Policy) = [ErrMsg, Status] if {
     Policy.SharingCapability != 0
     Policy.ExternalUserExpirationRequired == false
     Policy.ExternalUserExpireInDays > 30
-    ErrMsg := "Requirement not met"
+    ErrMsg := "Requirement not met: Expiration timer for 'Guest access to a site or OneDrive' NOT enabled and set to greater 30 days"
     Status := false
 }
 tests[{
@@ -226,7 +226,7 @@ ExpirationTimersVerificationCode(Policy) = [ErrMsg, Status] if {
     Policy.SharingCapability != 0
     Policy.EmailAttestationRequired == false
     Policy.EmailAttestationReAuthDays > 30
-    ErrMsg := "Requirement not met"
+    ErrMsg := "Requirement not met: Expiration timer for 'People who use a verification code' NOT enabled and set to greater 30 days"
     Status := false
 }
 tests[{

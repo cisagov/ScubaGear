@@ -82,7 +82,7 @@ test_Multi_Incorrect_V1 if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement not met"
+    RuleOutput[0].ReportDetails == "Requirement not met: Expiration timer for 'Guest access to a site or OneDrive' NOT enabled and set to greater 30 days"
 }
 
 test_ExternalUserExpirationRequired_Incorrect_V2 if {
@@ -206,7 +206,7 @@ test_Multi_Incorrect_V1 if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement not met"
+    RuleOutput[0].ReportDetails == "Requirement not met: Expiration timer for 'People who use a verification code' NOT enabled and set to greater 30 days"
 }
 
 test_EmailAttestationRequired_Incorrect_V2 if {
