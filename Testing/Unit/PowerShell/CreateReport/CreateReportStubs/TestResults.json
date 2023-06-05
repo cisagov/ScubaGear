@@ -1977,137 +1977,97 @@
 		"ReportDetails": "No policy found that applies to default environment",
 		"RequirementMet": false
 	},
+    {
+	    "ActualValue": 1,
+		"Commandlet": [
+			"Get-SPOTenant",
+			"Get-PnPTenant"
+		],
+		"Criticality": "Should",
+		"PolicyId": "MS.SHAREPOINT.1.3v1",
+		"ReportDetails": "Requirement met",
+		"RequirementMet": true
+	},
 	{
-        "ActualValue":  [
-
-                        ],
-        "Commandlet":  [
-
-                       ],
-        "Criticality":  "Shall/Not-Implemented",
-        "PolicyId":  "MS.SHAREPOINT.5.1v1",
-        "ReportDetails":  "Not currently checked automatically. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/0.3.0/baselines/sharepoint.md#mssharepoint51v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
-        "RequirementMet":  false
-    },
-    {
-        "ActualValue":  [
-
-                        ],
-        "Commandlet":  [
-
-                       ],
-        "Criticality":  "Should/Not-Implemented",
-        "PolicyId":  "MS.SHAREPOINT.1.3v1",
-        "ReportDetails":  "Not currently checked automatically. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/0.3.0/baselines/sharepoint.md#mssharepoint13v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
-        "RequirementMet":  false
-    },
-    {
-        "ActualValue":  [
-
-                        ],
-        "Commandlet":  [
-
-                       ],
-        "Criticality":  "Should/Not-Implemented",
-        "PolicyId":  "MS.SHAREPOINT.3.1v1",
-        "ReportDetails":  "Not currently checked automatically. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/0.3.0/baselines/sharepoint.md#mssharepoint31v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
-        "RequirementMet":  false
-    },
-    {
-        "ActualValue":  [
-                            true
-                        ],
-        "Commandlet":  [
-                           "Get-SPOTenant",
-                           "Get-PnPTenant"
-                       ],
-        "Criticality":  "Should",
-        "PolicyId":  "MS.SHAREPOINT.1.4v1",
-        "ReportDetails":  "Requirement met",
-        "RequirementMet":  true
-    },
-    {
-        "ActualValue":  [
-                            1
-                        ],
-        "Commandlet":  [
-                           "Get-SPOTenant",
-                           "Get-PnPTenant"
-                       ],
-        "Criticality":  "Shall",
-        "PolicyId":  "MS.SHAREPOINT.2.1v1",
-        "ReportDetails":  "Requirement met",
-        "RequirementMet":  true
-    },
-    {
-        "ActualValue":  [
-                            1
-                        ],
-        "Commandlet":  [
-                           "Get-SPOTenant",
-                           "Get-PnPTenant"
-                       ],
-        "Criticality":  "Should",
-        "PolicyId":  "MS.SHAREPOINT.1.2v1",
-        "ReportDetails":  "Requirement met",
-        "RequirementMet":  true
-    },
-    {
-        "ActualValue":  [
-                            2
-                        ],
-        "Commandlet":  [
-                           "Get-SPOSite",
-                           "Get-PnPTenantSite"
-                       ],
-        "Criticality":  "Shall",
-        "PolicyId":  "MS.SHAREPOINT.5.2v1",
-        "ReportDetails":  "Requirement met",
-        "RequirementMet":  true
-    },
-    {
-        "ActualValue":  [
-                            3
-                        ],
-        "Commandlet":  [
-                           "Get-SPOTenant",
-                           "Get-PnPTenant"
-                       ],
-        "Criticality":  "Should",
-        "PolicyId":  "MS.SHAREPOINT.1.1v1",
-        "ReportDetails":  "Requirement met",
-        "RequirementMet":  true
-    },
-    {
-        "ActualValue":  [
-                            3,
-                            true,
-                            30
-                        ],
-        "Commandlet":  [
-                           "Get-SPOTenant",
-                           "Get-PnPTenant"
-                       ],
-        "Criticality":  "Should",
-        "PolicyId":  "MS.SHAREPOINT.4.1v1",
-        "ReportDetails":  "Requirement met",
-        "RequirementMet":  true
-    },
-    {
-        "ActualValue":  [
-                            3,
-                            true,
-                            30
-                        ],
-        "Commandlet":  [
-                           "Get-SPOTenant",
-                           "Get-PnPTenant"
-                       ],
-        "Criticality":  "Should",
-        "PolicyId":  "MS.SHAREPOINT.4.2v1",
-        "ReportDetails":  "Requirement met",
-        "RequirementMet":  true
-    },
+		"ActualValue": 2,
+		"Commandlet": [
+			"Get-SPOSite",
+			"Get-PnPTenantSite"
+		],
+		"Control": "Sharepoint 2.5",
+		"Criticality": "Shall",
+		"ReportDetails": "Requirement met",
+		"Requirement": "Users SHALL be prevented from running custom scripts on self-service created sites",
+		"RequirementMet": true
+	},
+	{
+		"ActualValue": 2,
+		"Commandlet": [
+			"Get-SPOTenant",
+			"Get-PnPTenant"
+		],
+		"Criticality": "Shall",
+		"PolicyId": "MS.SHAREPOINT.1.1v1",
+		"ReportDetails": "Requirement not met",
+		"RequirementMet": false
+	},
+	{
+		"ActualValue": [],
+		"Commandlet": [],
+		"Control": "Sharepoint 2.5",
+		"Criticality": "Shall/Not-Implemented",
+		"PolicyId": "MS.SHAREPOINT.TBD",
+		"ReportDetails": "Not currently checked automatically. See <a href=\"https://github.com/cisagov/ScubaGear/blob/0.3.0/baselines/sharepoint.md#mssharepointtbd\" target=\"_blank\">Secure Configuration Baseline policy</a> for instructions on manual check",
+		"Requirement": "Users SHALL be prevented from running custom scripts on personal sites (OneDrive)",
+		"RequirementMet": false
+	},
+	{
+		"ActualValue": [],
+		"Commandlet": [],
+		"Criticality": "Shall/Not-Implemented",
+		"PolicyId": "MS.SHAREPOINT.1.2v1",
+		"ReportDetails": "Not currently checked automatically. See <a href=\"https://github.com/cisagov/ScubaGear/blob/0.3.0/baselines/sharepoint.md#mssharepoint12v1\" target=\"_blank\">Secure Configuration Baseline policy</a> for instructions on manual check",
+		"RequirementMet": false
+	},
+	{
+		"ActualValue": [],
+		"Commandlet": [],
+		"Criticality": "Should/Not-Implemented",
+		"PolicyId": "MS.SHAREPOINT.2.1v1",
+		"ReportDetails": "Not currently checked automatically. See <a href=\"https://github.com/cisagov/ScubaGear/blob/0.3.0/baselines/sharepoint.md#mssharepoint21v1\" target=\"_blank\">Secure Configuration Baseline policy</a> for instructions on manual check",
+		"RequirementMet": false
+	},
+	{
+		"ActualValue": [
+			1,
+			true,
+			29
+		],
+		"Commandlet": [
+			"Get-SPOTenant",
+			"Get-PnPTenant"
+		],
+		"Control": "Sharepoint 2.4",
+		"Criticality": "Should",
+		"ReportDetails": "Requirement not met: Expiration timer for 'People who use a verification code' NOT set to 30 days",
+		"Requirement": "Expiration timer for 'People who use a verification code' should be set to 30 days",
+		"RequirementMet": false
+	},
+	{
+		"ActualValue": [
+			1,
+			true,
+			31
+		],
+		"Commandlet": [
+			"Get-SPOTenant",
+			"Get-PnPTenant"
+		],
+		"Criticality": "Should",
+		"PolicyId": "MS.SHAREPOINT.3.1v1",
+		"ReportDetails": "Requirement not met: Expiration timer for 'Guest access to a site or OneDrive' NOT set to 30 days",
+		"RequirementMet": false
+	},
 	{
 		"ActualValue": true,
 		"Commandlet": [
