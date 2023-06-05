@@ -13,6 +13,7 @@ function Get-SPOSiteHelper {
         $M365Environment,
 
         [Parameter(Mandatory = $true, ParameterSetName = 'Report')]
+        [ValidateNotNullOrEmpty()]
         [string]
         $InitialDomainPrefix
     )

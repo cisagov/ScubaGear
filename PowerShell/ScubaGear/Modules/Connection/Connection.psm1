@@ -22,6 +22,7 @@ function Connect-Tenant {
     $M365Environment,
 
     [Parameter(Mandatory = $false)]
+    [ValidateNotNullOrEmpty()]
     [hashtable]
     $ServicePrincipalParams
     )
@@ -264,6 +265,7 @@ function Disconnect-SCuBATenant {
     [CmdletBinding()]
     param(
         [ValidateSet("aad", "defender", "exo", "onedrive","powerplatform", "sharepoint", "teams", IgnoreCase = $false)]
+        [ValidateNotNullOrEmpty()]
         [string[]]
         $ProductNames = @("aad", "defender", "exo", "onedrive", "powerplatform", "sharepoint", "teams")
     )

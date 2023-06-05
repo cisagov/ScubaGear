@@ -9,10 +9,12 @@ function Connect-EXOHelper {
     param(
         [Parameter(Mandatory = $true)]
         [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $false)]
+        [ValidateNotNullOrEmpty()]
         [string]
         $M365Environment,
 
         [Parameter(Mandatory = $false)]
+        [ValidateNotNullOrEmpty()]
         [hashtable]
         $ServicePrincipalParams
     )
@@ -46,10 +48,12 @@ function Connect-DefenderHelper {
     param(
         [Parameter(Mandatory = $true)]
         [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $false)]
+        [ValidateNotNullOrEmpty()]
         [string]
         $M365Environment,
 
         [Parameter(Mandatory = $false)]
+        [ValidateNotNullOrEmpty()]
         [hashtable]
         $ServicePrincipalParams
     )

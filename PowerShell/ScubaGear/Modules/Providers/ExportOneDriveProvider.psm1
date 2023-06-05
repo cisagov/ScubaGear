@@ -9,6 +9,7 @@ function Export-OneDriveProvider {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory = $false)]
+        [ValidateNotNullOrEmpty()]
         [switch]
         $PnPFlag
     )
