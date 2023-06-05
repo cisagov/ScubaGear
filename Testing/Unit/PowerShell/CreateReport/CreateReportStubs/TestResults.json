@@ -1978,7 +1978,7 @@
 		"RequirementMet": false
 	},
     {
-	    "ActualValue": 1,
+        "ActualValue": 1,
 		"Commandlet": [
 			"Get-SPOTenant",
 			"Get-PnPTenant"
