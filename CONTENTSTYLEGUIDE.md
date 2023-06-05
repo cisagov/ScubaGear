@@ -23,7 +23,8 @@ Test names will use the syntax `test_mainVar_In/correct_*V#` to support brevity 
 
 ```
 test_ExampleVar_Correct_V1 if {
-    PolicyId := "MS.<Product>.<Policy #>.<Bulletpoint #>v<Version #>"
+    ControlNumber := "Example 2.1"
+    Requirement := "Example Policy Bullet Point"
 
     Output := tests with input as {
         "example_policies" : [
@@ -34,7 +35,7 @@ test_ExampleVar_Correct_V1 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -46,7 +47,8 @@ test_ExampleVar_Correct_V2 if {
 }
 
 test_ExampleVar_Incorrect if {
-    PolicyId := "MS.<Product>.<Policy #>.<Bulletpoint #>v<Version #>"
+    ControlNumber := "Example 2.1"
+    Requirement := "Example Policy Bullet Point"
 
     Output := tests with input as {
         "example_policies" : [
@@ -57,7 +59,7 @@ test_ExampleVar_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -76,14 +78,14 @@ The first one directs the user to the baseline document for manual checking. The
 ```
 # At this time we are unable to test for X because of Y
 tests[{
-    "PolicyId" : PolicyId,
+    "Requirement" : "The matching policy bulletpoint from the baseline document goes here",
+    "Control" : "Example 2.1",
     "Criticality" : "Shall/Not-Implemented",
-    "Commandlet" : [],
+    "Commandlet" : "",
     "ActualValue" : [],
-    "ReportDetails" : NotCheckedDetails(PolicyId),
+    "ReportDetails" : "Currently cannot be checked automatically. See (Product) Secure Configuration Baseline policy 2.# for instructions on manual check",
     "RequirementMet" : false
 }] {
-    PolicyId := "MS.<Product>.<Control Group #>.<Control #>v<Version #>"
     true
 }
 ```
@@ -91,9 +93,10 @@ tests[{
 ```
 # At this time we are unable to test for X because of Y
 tests[{
-    "PolicyId" : "MS.<Product>.<Policy #>.<Bulletpoint #>v<Version #>",
+    "Requirement" : "The matching policy bulletpoint from the baseline document goes here",
+    "Control" : "Example 2.1",
     "Criticality" : "Shall/3rd Party",
-    "Commandlet" : [],
+    "Commandlet" : "",
     "ActualValue" : [],
     "ReportDetails" : "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
     "RequirementMet" : false
@@ -105,24 +108,26 @@ tests[{
 
 ```
 test_NotImplemented_Correct if {
-    PolicyId := "MS.<Product>.<Policy #>.<Bulletpoint #>v<Version #>"
+    ControlNumber := "Example 2.1"
+    Requirement := "Example Policy Bullet Point"
 
     Output := tests with input as { }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == NotCheckedDetails(PolicyId)
+    RuleOutput[0].ReportDetails == "Currently cannot be checked automatically. See (Product) Secure Configuration Baseline policy 2.# for instructions on manual check"
 }
 ```
 ```
-test_3rdParty_Correct_V1 if {
-    PolicyId := "MS.<Product>.<Policy #>.<Bulletpoint #>v<Version #>"
+test_3rdParty_Correct if {
+    ControlNumber := "Example 2.1"
+    Requirement := "Example Policy Bullet Point"
 
     Output := tests with input as { }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -144,7 +149,8 @@ One True Brace - requires that every braceable statement should have the opening
 
 ```
 test_Example_Correct if {
-    PolicyId := "MS.<Product>.<Policy #>.<Bulletpoint #>v<Version #>"
+    ControlNumber := "Example 2.1"
+    Requirement := "Example Requirement String"
 
     Output := tests with input as {
         "example_tag" : {
@@ -152,7 +158,7 @@ test_Example_Correct if {
         }
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -175,19 +181,20 @@ Example[Example.Id] {
 }
 
 tests[{
-    "PolicyId" : "MS.<Product>.<Policy #>.<Bulletpoint #>v<Version #>",
-    "Criticality" : "Shall",
+    "Requirement" : "Baseline String",
+    "Control" : "Example 2.2",
+    "Criticality" : "Should",
     "Commandlet" : "Example-Command",
     "ActualValue" : ExampleVar.ExampleSetting,
-    "ReportDetails" : ReportDetailsBoolean(Status),
-    "RequirementMet" : Status
+	"ReportDetails" : ReportDetailsBoolean(Status),
+	"RequirementMet" : Status
 }] {
-    ExampleVar := input.ExampleVar
-    Status := ExampleVar == 15
+	    ExampleVar := input.ExampleVar
+	    Status := ExampleVar == 15
 }
 
 tests[{
-    "PolicyId" : "MS.<Product>.<Policy #>.<Bulletpoint #>v<Version #>",,
+    "Requirement" : "Baseline String",
 ...
 ```
 
@@ -195,12 +202,13 @@ tests[{
 
 ```
 tests[{
-    "PolicyId" : "MS.<Product>.<Policy #>.<Bulletpoint #>v<Version #>",,
+    "Requirement" : "Baseline String",
+    "Control" : "Example 2.2",
     "Criticality" : "Should",
     "Commandlet" : "Example-Command",
-    "ActualValue" : ExampleVar.ExampleSetting,
-    "ReportDetails" : ReportDetailsBoolean(Status),
-    "RequirementMet" : Status
+	"ActualValue" : ExampleVar.ExampleSetting,
+	"ReportDetails" : ReportDetailsBoolean(Status),
+	"RequirementMet" : Status
 }] {
     ExampleVar := input.ExampleVar
     Status := ExampleVar == 15
@@ -215,18 +223,18 @@ tests[{
 
 ### Comments
 
-1) Indicate beginning of every policy: 1, 2, etc.
+1) Indicate beginning of every policy: 2.1, 2.2, etc.
 
 ```
-###################
-# MS.<Product>.1  #
-###################
+################
+# Baseline 2.1 #
+################
 ```
 2) Indicate the beginning of every policy bullet point.
 
 ```
 #
-# MS.<Product>.<Policy #>.<Bulletpoint #>v<Version #>
+# Baseline 2.#: Policy  #
 #--
 ```
 
@@ -250,7 +258,8 @@ In the interest of consistency across policy tests and human readability of the 
 
 ```
 tests[{
-    "PolicyId" : "MS.<Product>.<Policy #>.<Bulletpoint #>v<Version #>",,
+    "Requirement" : "Baseline String",
+    "Control" : "Example 2.1",
     "Criticality" : "Should",
     "Commandlet" : "Example-Command",
     "ActualValue" : ExampleVar.ExampleSetting,
@@ -258,11 +267,12 @@ tests[{
     "RequirementMet" : Status
 }] {
     ExampleVar := input.ExampleVar
-    Status := ExampleVar == true
+	Status := ExampleVar == true
 }
 
 tests[{
-    "PolicyId" : "MS.<Product>.<Policy #>.<Bulletpoint #>v<Version #>",,
+    "Requirement" : "Baseline String",
+    "Control" : "Example 2.2",
     "Criticality" : "Should",
     "Commandlet" : "Example-Command",
     "ActualValue" : ExampleVar.ExampleSetting,
@@ -270,7 +280,7 @@ tests[{
     "RequirementMet" : Status
 }] {
     ExampleVar := input.ExampleVar
-    Status := ExampleVar == false
+	Status := ExampleVar == false
 }
 ```
 
@@ -281,14 +291,14 @@ tests[{
     ...
 }] {
     ExampleVar := input.ExampleVar
-    Status := ExampleVar # Mising == true
+	Status := ExampleVar # Mising == true
 }
 
 tests[{
     ...
 }] {
     ExampleVar := input.ExampleVar
-    Status := ExampleVar == false
+	Status := ExampleVar == false
 }
 ```
 
@@ -319,12 +329,13 @@ It can be tempting to put the status variable in the ActualValue spot when you a
 #### InCorrect
 ```
 tests[{
-    "PolicyId" : "MS.<Product>.<Policy #>.<Bulletpoint #>v<Version #>",,
+    "Requirement" : "Baseline String",
+    "Control" : "Example 2.1",
     "Criticality" : "Should",
     "Commandlet" : "Example-Command",
-    "ActualValue" : Status,
+	"ActualValue" : Status,
     "ReportDetails" : ReportDetailsBoolean(Status),
-    "RequirementMet" : Status
+	"RequirementMet" : Status
 }] {
     ExampleVar := input.ExampleVar
     Status := ExampleVar == true
@@ -334,12 +345,13 @@ tests[{
 #### Correct
 ```
 tests[{
-    "PolicyId" : "MS.<Product>.<Policy #>.<Bulletpoint #>v<Version #>",,
+    "Requirement" : "Baseline String",
+    "Control" : "Example 2.2",
     "Criticality" : "Should",
     "Commandlet" : "Example-Command",
-    "ActualValue" : ExampleVar.ExampleSetting,
+	"ActualValue" : ExampleVar.ExampleSetting,
     "ReportDetails" : ReportDetailsBoolean(Status),
-    "RequirementMet" : Status
+	"RequirementMet" : Status
 }] {
     ExampleVar := input.ExampleVar
     Status := ExampleVar == true
