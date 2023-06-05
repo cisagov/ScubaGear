@@ -83,7 +83,7 @@ tests[{
     "ReportDetails" : NotCheckedDetails(PolicyId),
     "RequirementMet" : false
 }] {
-    PolicyId := "MS.<Product>.<Policy #>.<Bulletpoint #>v<Version #>"
+    PolicyId := "MS.<Product>.<Control Group #>.<Control #>v<Version #>"
     true
 }
 ```
@@ -178,12 +178,12 @@ tests[{
     "PolicyId" : "MS.<Product>.<Policy #>.<Bulletpoint #>v<Version #>",
     "Criticality" : "Shall",
     "Commandlet" : "Example-Command",
-	"ActualValue" : ExampleVar.ExampleSetting,
+    "ActualValue" : ExampleVar.ExampleSetting,
     "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
-	    ExampleVar := input.ExampleVar
-	    Status := ExampleVar == 15
+    ExampleVar := input.ExampleVar
+    Status := ExampleVar == 15
 }
 
 tests[{
@@ -198,7 +198,7 @@ tests[{
     "PolicyId" : "MS.<Product>.<Policy #>.<Bulletpoint #>v<Version #>",,
     "Criticality" : "Should",
     "Commandlet" : "Example-Command",
-	"ActualValue" : ExampleVar.ExampleSetting,
+    "ActualValue" : ExampleVar.ExampleSetting,
     "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
@@ -253,24 +253,24 @@ tests[{
     "PolicyId" : "MS.<Product>.<Policy #>.<Bulletpoint #>v<Version #>",,
     "Criticality" : "Should",
     "Commandlet" : "Example-Command",
-	"ActualValue" : ExampleVar.ExampleSetting,
+    "ActualValue" : ExampleVar.ExampleSetting,
     "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
     ExampleVar := input.ExampleVar
-	Status := ExampleVar == true
+    Status := ExampleVar == true
 }
 
 tests[{
     "PolicyId" : "MS.<Product>.<Policy #>.<Bulletpoint #>v<Version #>",,
     "Criticality" : "Should",
     "Commandlet" : "Example-Command",
-	"ActualValue" : ExampleVar.ExampleSetting,
+    "ActualValue" : ExampleVar.ExampleSetting,
     "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
     ExampleVar := input.ExampleVar
-	Status := ExampleVar == false
+    Status := ExampleVar == false
 }
 ```
 
@@ -281,14 +281,14 @@ tests[{
     ...
 }] {
     ExampleVar := input.ExampleVar
-	Status := ExampleVar # Mising == true
+    Status := ExampleVar # Mising == true
 }
 
 tests[{
     ...
 }] {
     ExampleVar := input.ExampleVar
-	Status := ExampleVar == false
+    Status := ExampleVar == false
 }
 ```
 
@@ -322,7 +322,7 @@ tests[{
     "PolicyId" : "MS.<Product>.<Policy #>.<Bulletpoint #>v<Version #>",,
     "Criticality" : "Should",
     "Commandlet" : "Example-Command",
-	"ActualValue" : Status,
+    "ActualValue" : Status,
     "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
@@ -337,7 +337,7 @@ tests[{
     "PolicyId" : "MS.<Product>.<Policy #>.<Bulletpoint #>v<Version #>",,
     "Criticality" : "Should",
     "Commandlet" : "Example-Command",
-	"ActualValue" : ExampleVar.ExampleSetting,
+    "ActualValue" : ExampleVar.ExampleSetting,
     "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
