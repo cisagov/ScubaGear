@@ -148,6 +148,16 @@ InModuleScope -ModuleName ExportPowerPlatformProvider {
             $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
             $ValidJson | Should -Be $true
         }
+        It "When called with -M365Environment 'commercial', from a non-NA tenant returns valid json" {
+            Mock -CommandName Invoke-WebRequest {
+                return [pscustomobject]@{
+                    Content = '{"tenant_region_scope": "EU","tenant_region_sub_scope": ""}'
+                }
+            }
+            $Json = Export-PowerPlatformProvider -M365Environment 'commercial'
+            $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
+            $ValidJson | Should -Be $true
+        }
     }
 }
 AfterAll {

@@ -4,6 +4,7 @@ InModuleScope CreateReport {
     Describe -Tag CreateReport -Name 'New-Report' {
         BeforeAll {
             Mock -CommandName Write-Warning {}
+
             New-Item -Path (Join-Path -Path "TestDrive:" -ChildPath "CreateReportStubs") -Name "CreateReportUnitFolder" -ItemType Directory
             New-Item -Path (Join-Path -Path "TestDrive:" -ChildPath "CreateReportStubs/CreateReportUnitFolder") -Name "IndividualReports" -ItemType Directory
             $TestOutPath = (Join-Path -Path "TestDrive:" -ChildPath "CreateReportStubs")
@@ -55,8 +56,8 @@ InModuleScope CreateReport {
             }
 
             { New-Report @CreateReportParams } | Should -Not -Throw
-
             Should -Invoke -CommandName Write-Warning -Exactly -Times $WarningCount
+
             Test-Path -Path "$($IndividualReportPath)/$($ArgToProd[$Product])Report.html" -PathType leaf | Should -Be $true
         }
     }
