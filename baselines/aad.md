@@ -1036,7 +1036,7 @@ Eligible and Active highly privileged role assignments SHALL trigger an alert.
 #### MS.AAD.16.2v1
 User activation of the Global Administrator role SHALL trigger an
   alert.
-- _Rationale:_ TODO
+- _Rationale:_ For insights into PIM alert configuration see https://learn.microsoft.com/en-us/azure/active-directory/privileged-identity-management/pim-how-to-configure-security-alerts
 - _Last modified:_ June 2023
 
 #### MS.AAD.16.3v1
