@@ -659,44 +659,6 @@ User passwords SHALL NOT expire.
 link](https://docs.microsoft.com/en-us/microsoft-365/admin/manage/set-password-expiration-policy?view=o365-worldwide#set-password-expiration-policy)
 to configure the password expiration policy.
 
-## 9. Session Length
-
-To reduce the risk of credential theft during user sessions, configure
-the sign-in frequency to a limited period of time.
-
-### Policies
-#### MS.AAD.9.1v1
-Sign-in frequency SHALL be configured to 12 hours.
-- _Rationale:_ TODO
-- _Last modified:_ June 2023
-
-### Resources
-
-- [Configure authentication session management with Conditional
-  Access](https://docs.microsoft.com/en-us/azure/active-directory/conditional-access/howto-conditional-access-session-lifetime)
-
-- [NIST Special Publication 800-63B - Digital Identity
-  Guidelines](https://pages.nist.gov/800-63-3/sp800-63b.html)
-
-### License Requirements
-
-- N/A
-
-### Implementation
-
-[Follow the instructions at this
-link](https://docs.microsoft.com/en-us/azure/active-directory/conditional-access/howto-conditional-access-session-lifetime#policy-1-sign-in-frequency-control)
-to implement the conditional access policy that configures the sign-in
-frequency,
-
-1.  Set the **Users** or **workload identities** to include **All
-    users.**
-
-2.  Set the **Cloud apps or actions** to include **All cloud apps.**
-
-3.  Set the **Access Controls** -\> **Session** -\> **Sign-in
-    frequency** to a value of “12 hours”.
-
 ## 11. Global Administrators
 
 Global Administrator is the highest privileged role in Azure AD because
