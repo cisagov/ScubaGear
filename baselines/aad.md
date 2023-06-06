@@ -121,10 +121,9 @@ Legacy authentication SHALL be blocked.
 Azure AD Identity Protection uses various signals to detect the risk
 level for each user and determine if an account has likely been
 compromised. In addition to high risk users, high risk workload identies
-can be mitigated by creating a conditional access policy that blocks medium
-and high risk work load identities. Follow
-[these instructions](https://learn.microsoft.com/en-us/azure/active-directory/conditional-access/workload-identity)
-to apply conditional access for workload identities.
+may be mitigated by creating a conditional access policy that blocks medium
+and high risk work load identities.
+Follow [these instructions](https://learn.microsoft.com/en-us/azure/active-directory/conditional-access/workload-identity) to apply conditional access for workload identities.
 
 
 ### Policies
@@ -697,40 +696,6 @@ frequency,
 
 3.  Set the **Access Controls** -\> **Session** -\> **Sign-in
     frequency** to a value of “12 hours”.
-
-## 10. Browser Sessions
-
-To reduce the risk of credential theft during user sessions, disallow
-persistent browser sessions.
-
-### Policies
-#### MS.AAD.10.1v1
-Browser sessions SHALL not be persistent.
-- _Rationale:_ TODO
-- _Last modified:_ June 2023
-
-### Resources
-
-- [Configure authentication session management with Conditional Access](https://docs.microsoft.com/en-us/azure/active-directory/conditional-access/howto-conditional-access-session-lifetime)
-
-- [NIST Special Publication 800-63B - Digital Identity Guidelines](https://pages.nist.gov/800-63-3/sp800-63b.html)
-
-### License Requirements
-
-- N/A
-
-### Implementation
-
-[Follow the instructions at this link](https://docs.microsoft.com/en-us/azure/active-directory/conditional-access/howto-conditional-access-session-lifetime#policy-2-persistent-browser-session)
-to implement the conditional access policy that prevents persistent
-browser sessions.
-
-1.  Set the **Users or workload identities** to **include All users.**
-
-2.  Set the **Cloud apps or actions** to include **All cloud apps.**
-
-3.  Set the **Access Controls -**\> **Session** -\> **Persistent browser
-    session** to **Never persistent.**
 
 ## 11. Global Administrators
 
