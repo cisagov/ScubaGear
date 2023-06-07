@@ -274,14 +274,14 @@ If Phishing-resistant MFA is not implemented yet, then an alternative MFA method
 
 - _Rationale:_ Phishing-resistant MFA may not always be immediately available,
 especially on mobile devices. If phishing-resistant MFA is unavailable,
-one of the following options for multifactor authentication are permissible.
-
-- Microsoft Authenticator – push notification or passwordless
-- Authenticator app or hardware token – code
-
+one of the following options for multifactor authentication is permissible.
 However, organizations must upgrade to a phishing-resistant MFA method as soon as
 possible to become compliant with this policy and address the critical
 security threat posed by modern phishing attacks.
+
+    - Microsoft Authenticator – push notification or passwordless
+    - Authenticator app or hardware token – code
+
 - _Last modified:_ June 2023
 
 #### MS.AAD.4.3v1
@@ -309,7 +309,7 @@ to Migration Complete because the configuration data is not available from the l
 #### MS.AAD.4.6v1
 Phishing-resistant MFA SHALL be required for Highly Privileged Roles.
 - _Rationale:_ This will be implemented and assessed using authentication strength just
-like policy bullet 1 above, except that this policy is scoped to privileged roles
+as for policy bullet 1 above, except that this policy is scoped to privileged roles
 - _Last modified:_ June 2023
 
 #### MS.AAD.4.7v1
@@ -324,16 +324,15 @@ and then register their own MFA devices to access the tenant by meeting the MFA 
   Active
   Directory?](https://docs.microsoft.com/en-us/azure/active-directory/authentication/concept-authentication-methods)
 
-- [Use number matching in multifactor authentication (MFA) notifications
-  (Preview) - Azure Active Directory - Microsoft Entra \| Microsoft
-  Docs](https://docs.microsoft.com/en-us/azure/active-directory/authentication/how-to-mfa-number-match#enable-number-matching-in-the-portal)
-
 - [Use additional context in Microsoft Authenticator notifications
   (Preview) - Azure Active Directory - Microsoft Entra \| Microsoft
   Docs](https://docs.microsoft.com/en-us/azure/active-directory/authentication/how-to-mfa-additional-context#enable-additional-context-in-the-portal)
 
 - [M-22-09 Federal Zero Trust
   Strategy](https://www.whitehouse.gov/wp-content/uploads/2022/01/M-22-09.pdf)
+
+- [What authentication and verification methods are available in Azure Active Directory?](  https://learn.microsoft.com/en-us/azure/active-directory/authentication/concept-authentication-methods)
+
 
 ### License Requirements
 
@@ -343,55 +342,28 @@ and then register their own MFA devices to access the tenant by meeting the MFA 
 
 **Policy \#1:**
 
-1.  Follow [these
-    instructions](https://docs.microsoft.com/en-us/azure/active-directory/conditional-access/howto-conditional-access-policy-all-users-mfa)
-    to create a conditional access policy that requires all users to
-    authenticate with MFA.
+Use the following instructions to configure a phishing-resistant MFA
+method for all users.
+1.  Follow the instructions at [this
+    link](https://learn.microsoft.com/en-us/azure/active-directory/authentication/concept-authentication-methods-managed)
+    to manage authentication strengths for all users.
+2.  Under **Authentication Methods** select **Policies**
+3.  Ensure the desired phishing-resistant method(s) **Target** "All users" and are set to **Enabled**
+4.  For configuring **FIDO Security Key** MFA Follow the instructions at [this
+    link](https://docs.microsoft.com/en-us/azure/active-directory/authentication/howto-authentication-passwordless-security-key#enable-fido2-security-key-method)
+    to configure FIDO2.
+5.  For configuring **Certificate Based Authentication** follow the instructions at [this
+    link](https://docs.microsoft.com/en-us/azure/active-directory/authentication/how-to-certificate-based-authentication#steps-to-configure-and-test-azure-ad-cba)
+6.  For configuring **Windows Hello** follow the instructions at [this
+    link](https://docs.microsoft.com/en-us/windows/security/identity-protection/hello-for-business/hello-deployment-guide).
 
 **Policy \#2:**
 
-Use the following instructions to configure a phishing-resistant MFA
-method for users with highly privileged roles. If the agency is
-configuring a phishing-resistant MFA method for all users, then the
-instructions in this section also apply, but set the **Target** to **All
-Users** instead of a specific group in the respective configuration
-screens.
-
-CISA recommends placing highly privileged users into an Azure AD group
-named “Highly Privileged Admins” or an equivalent and then referencing
-the group in the MFA configuration. Newly created, highly privileged
-users should be added to the group so they can register a
-phishing-resistant method. CISA does not recommend assigning MFA methods
-directly to individual users.
-
-Select one of the following phishing-resistant MFA methods to configure:
-
-**FIDO2 Security Key**
-
-1.  Follow the instructions at [this
-    link](https://docs.microsoft.com/en-us/azure/active-directory/authentication/howto-authentication-passwordless-security-key#enable-fido2-security-key-method)
-    to configure FIDO2.
-2.  For **Enable**, select **Yes.**
-3.  For **Target**, select the **Highly Privileged Admins** group or an
-    equivalent.
-
-**Certificate Based Authentication (CBA)**
-
-
-1.  Follow the instructions at [this
-    link](https://docs.microsoft.com/en-us/azure/active-directory/authentication/how-to-certificate-based-authentication#steps-to-configure-and-test-azure-ad-cba)
-    to configure CBA.
-2.  On the tenant, in the instructions section named [**Enable CBA on
-    the
-    tenant**](https://docs.microsoft.com/en-us/azure/active-directory/authentication/how-to-certificate-based-authentication#step-4-enable-cba-on-the-tenant)
-    , under **Target**, select the **Highly Privileged Admins** group or
-    an equivalent.
-
-**Windows Hello for Business**
-
-1.  Follow the instructions at [this
-    link](https://docs.microsoft.com/en-us/windows/security/identity-protection/hello-for-business/hello-deployment-guide)
-    to configure Windows Hello for Business.
+ If the agency is unable to use phishing-resistant MFA for all users, then
+follow [these
+    instructions](https://docs.microsoft.com/en-us/azure/active-directory/conditional-access/howto-conditional-access-policy-all-users-mfa)
+    to create a conditional access policy that requires all users to
+    authenticate with MFA.
 
 **Policy \#3:**
 
