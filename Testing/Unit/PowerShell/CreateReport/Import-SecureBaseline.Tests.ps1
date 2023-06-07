@@ -39,7 +39,7 @@ InModuleScope CreateReport {
             @{Product = "onedrive"; GroupCount = 7; PolicyCount = 8}
             @{Product = "powerbi"; GroupCount = 10; PolicyCount = 12}
             @{Product = "powerplatform"; GroupCount = 4; PolicyCount = 8}
-            @{Product = "sharepoint"; GroupCount = 5; PolicyCount = 6}
+            @{Product = "sharepoint"; GroupCount = 5; PolicyCount = 10}
             @{Product = "teams"; GroupCount = 13; PolicyCount = 28}
         ){
             {$Baselines.$Product} | Should -Not -Throw
