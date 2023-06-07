@@ -357,6 +357,7 @@ method for all users.
 6.  For configuring **Windows Hello** follow the instructions at [this
     link](https://docs.microsoft.com/en-us/windows/security/identity-protection/hello-for-business/hello-deployment-guide).
 
+
 **Policy \#2:**
 
  If the agency is unable to use phishing-resistant MFA for all users, then
@@ -366,63 +367,42 @@ follow [these
     authenticate with MFA.
 
 **Policy \#3:**
+If Phishing-resistant MFA is not implemented yet and Microsoft Authenticator is enabled, follow
+[these instructions ](https://learn.microsoft.com/en-us/azure/active-directory/authentication/concept-authentication-authenticator-app).
+To enable passwordless authentication using Microsoft Authenticator, follow
+[these instructions ](https://learn.microsoft.com/en-us/azure/active-directory/authentication/howto-authentication-passwordless-phone).
 
+
+**Policy \#4:**
+To migrate from legacy MFA and Self-Service Password Reset (SSPR) Microsoft implementation options follow
+[these instructions ](https://learn.microsoft.com/en-us/azure/active-directory/authentication/how-to-authentication-methods-manage).
+
+In the **Microsoft Authenticator** settings, under **Configure**, select
+- **No** for **Allow the use of Microsoft Authenticator OTP**
+- **Enabled** for **All Users"** under **Show application name in push and passwordless notifications**
+- **Enabled** for **All Users** under **Show geographic location in push and passwordless notifications**
+- **Microsoft Managed** for **All Users** under  **Microsoft Authenticator on companion applications**
+
+**Policy \#5:**
+To disable SMS, Voice Call, and Email OTP, from the **Authentication Methods->Policy** page:
+Set the **Enabled** status to **No** for each authentication method.
+
+**Policy \#6:**
 If the agency is implementing a phishing-resistant MFA method for all
-users, follow the instructions in the previous section. Otherwise use
+users, follow the instructions in Policy #1 above. Otherwise use
 the following instructions to configure a non-phishing resistant MFA
 method for users that are not in highly privileged roles.
 
-**Microsoft Authenticator (Phone Sign-in) (Also referred to as
-Passwordless Sign-in) or Microsoft Authenticator (Push Notifications)**
+In the **Authentication Methods->Policies** page, select one of the phishing-resistant methods.
+Under **Enable and Target**, under **Include->Target**, choose **Select groups**
 
-1.  In the Azure Portal navigate to **Azure Active Directory.**
-2.  Select **Security.**
-3.  Select **Manage** -\> **MFA.**
-4.  Under **Configure,** select **Additional cloud-based MFA settings.**
-5.  Under **verification options**, select **Notification through mobile
-    app.**
-6. If desired, to enforce Microsoft Authenticator app usage and disable
-    third party authenticator apps usage, make sure that **Verification
-    code from mobile app** or **hardware token** is not selected.
-7. Click **Save.**
-8. Go back to the **Azure Active Directory** home tab and select
-    **Security**.
-9. Select **Authentication Methods**.
-10. In the **Policies** window, select **Microsoft Authenticator**.
-11. For **Enable**, select **Yes**.
-12. For **Target**, select **All users**.
-13. In the row for the **All users**, click the … -\> **Configure**.
-14. If configuring Phone Sign-in (aka Passwordless Sign-in), for
-    **Authentication mode**, select **Passwordless**. If configuring
-    Push Notifications, for **Authentication mode**, select **Push**. If
-    configuring the usage of both, for **Authentication mode**, select
-    **Any**.
-15. For **Require number matching**, select **Enabled**.
-16. For **Show additional context in notifications**, select
-    **Enabled**.
-17. Select **Done**.
-18. Click **Save**.
+Add the appropriate groups which include the users with highly privileged roles.
+Note, Microsoft has released a new capability [(Public Preview) ](https://learn.microsoft.com/en-us/azure/active-directory/privileged-identity-management/concept-pim-for-group) for controlling access to highly privileged roles
+using Privileged Identity Management (PIM) for Groups. Future revisions of this baseline may
+include updates to this policy that take advantage of these new feautres.
 
-**Software Tokens OTP or Hardware Tokens OTP**
-
-1. In the **Azure Portal**, navigate to **Azure Active Directory**.
-2. Select **Security**.
-3. Select **Manage** -\> **MFA**.
-4. Under **Configure**, select **Additional cloud-based MFA settings**.
-5. Under **verification options**, select **Verification code from
-    mobile app** or **hardware token**.
-6. If configuring Hardware Tokens OTP, follow the additional steps at
-    [this link](https://docs.microsoft.com/en-us/azure/active-directory/authentication/concept-authentication-oath-tokens#oath-hardware-tokens-preview)
-    when provisioning a user.
-
-**Policy \#4:**
-
-1.  In the **Azure Portal,** navigate to **Azure Active Directory**.
-2.  Select **Security**.
-3.  Select **Manage** -\> **MFA**.
-4.  Under **Configure**, select **Additional cloud-based MFA settings**.
-5.  Under **verification options**, make sure that **Text message to
-    phone** and **Call to phone** are **disabled**.
+**Policy \#7:**
+To require managed devices to register for MFA, [Follow these instructions](https://learn.microsoft.com/en-us/mem/intune/enrollment/multi-factor-authentication?toc=%2Fazure%2Factive-directory%2Fconditional-access%2FTOC.json)
 
 ## 5. Azure AD logs
 
