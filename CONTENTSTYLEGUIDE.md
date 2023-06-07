@@ -25,11 +25,11 @@ Test names will use the syntax `test_mainVar_In/correct_*V#` to support brevity 
 test_ExampleVar_Correct_V1 if {
     ControlNumber := "Example 2.1"
     Requirement := "Example Policy Bullet Point"
-    
+
     Output := tests with input as {
         "example_policies" : [
             {
-                "Example3" : "ExampleString", 
+                "Example3" : "ExampleString",
                 "Example2" : false
             }
         ]
@@ -49,11 +49,11 @@ test_ExampleVar_Correct_V2 if {
 test_ExampleVar_Incorrect if {
     ControlNumber := "Example 2.1"
     Requirement := "Example Policy Bullet Point"
-    
+
     Output := tests with input as {
         "example_policies" : [
             {
-                "Example3" : "ExampleString", 
+                "Example3" : "ExampleString",
                 "Example2" : true
             }
         ]
@@ -188,7 +188,7 @@ tests[{
     "ActualValue" : ExampleVar.ExampleSetting,
 	"ReportDetails" : ReportDetailsBoolean(Status),
 	"RequirementMet" : Status
-}] {	
+}] {
 	    ExampleVar := input.ExampleVar
 	    Status := ExampleVar == 15
 }
@@ -209,7 +209,7 @@ tests[{
 	"ActualValue" : ExampleVar.ExampleSetting,
 	"ReportDetails" : ReportDetailsBoolean(Status),
 	"RequirementMet" : Status
-}] {	
+}] {
     ExampleVar := input.ExampleVar
     Status := ExampleVar == 15
 }
@@ -257,7 +257,7 @@ In the interest of consistency across policy tests and human readability of the 
 #### Correct
 
 ```
-tests[{ 
+tests[{
     "Requirement" : "Baseline String",
     "Control" : "Example 2.1",
     "Criticality" : "Should",
@@ -270,7 +270,7 @@ tests[{
 	Status := ExampleVar == true
 }
 
-tests[{ 
+tests[{
     "Requirement" : "Baseline String",
     "Control" : "Example 2.2",
     "Criticality" : "Should",
@@ -287,14 +287,14 @@ tests[{
 #### Incorrect
 
 ```
-tests[{ 
+tests[{
     ...
 }] {
     ExampleVar := input.ExampleVar
 	Status := ExampleVar # Mising == true
 }
 
-tests[{ 
+tests[{
     ...
 }] {
     ExampleVar := input.ExampleVar
@@ -309,14 +309,14 @@ We will always store the input in a variable first thing. It can sometimes be ea
 ```
 tests[{
     ...
-}] {	
+}] {
     ExampleVar := input.ExampleVar[_]
     Status := "Example" in ExampleVar
 }
 
 tests[{
     ...
-}] {	
+}] {
     ExampleVar := input.ExampleVar
     Status := ExampleVar == true
 }
@@ -336,7 +336,7 @@ tests[{
 	"ActualValue" : Status,
     "ReportDetails" : ReportDetailsBoolean(Status),
 	"RequirementMet" : Status
-}] {	
+}] {
     ExampleVar := input.ExampleVar
     Status := ExampleVar == true
 }
@@ -352,7 +352,7 @@ tests[{
 	"ActualValue" : ExampleVar.ExampleSetting,
     "ReportDetails" : ReportDetailsBoolean(Status),
 	"RequirementMet" : Status
-}] {	
+}] {
     ExampleVar := input.ExampleVar
     Status := ExampleVar == true
 }

@@ -3,15 +3,15 @@ import future.keywords
 
 
 #
-# Policy 1
+# MS.SHAREPOINT.2.1v1
 #--
-test_SharingCapability_Correct_V1 if {
-    PolicyId := "MS.SHAREPOINT.1.3v1"
- 
+test_DefaultSharingLinkType_Correct if {
+    PolicyId := "MS.SHAREPOINT.2.1v1"
+
     Output := tests with input as {
         "SPO_tenant": [
             {
-                "SharingCapability" : 1
+                "DefaultSharingLinkType" : 1
             }
         ]
     }
@@ -23,31 +23,13 @@ test_SharingCapability_Correct_V1 if {
     RuleOutput[0].ReportDetails == "Requirement met"
 }
 
-test_SharingCapability_Correct_V2 if {
-    PolicyId := "MS.SHAREPOINT.1.3v1"
+test_DefaultSharingLinkType_Incorrect if {
+    PolicyId := "MS.SHAREPOINT.2.1v1"
 
     Output := tests with input as {
         "SPO_tenant": [
             {
-                "SharingCapability" : 0
-            }
-        ]
-    }
-
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement met"
-}
-
-test_SharingCapability_Incorrect if {
-    PolicyId := "MS.SHAREPOINT.1.3v1"
-
-    Output := tests with input as {
-        "SPO_tenant": [
-            {
-                "SharingCapability" : 2
+                "DefaultSharingLinkType" : 2
             }
         ]
     }
@@ -58,3 +40,4 @@ test_SharingCapability_Incorrect if {
     not RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "Requirement not met"
 }
+#--
