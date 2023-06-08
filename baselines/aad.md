@@ -25,13 +25,8 @@ The following built-in Azure AD roles are considered highly privileged at a mini
 
 ## Assumptions
 
-The agency has created emergency access accounts in Azure AD and
-implemented strong security measures to protect the credentials of those
-accounts. Once created, those accounts should be placed into a group
-named “Emergency Users” or a similar name. Throughout Microsoft’s
-instructions, this entity is referred to as “emergency access or
-break-glass accounts.” Use the following Microsoft guidance to create
-and manage emergency access accounts.
+The agency has created emergency access accounts in Azure AD and implemented strong security measures to protect the credentials of those
+accounts. Throughout Microsoft’s instructions, this entity is referred to as “emergency access or break-glass accounts.” Use the following Microsoft guidance to create and manage emergency access accounts.
 
 [Manage emergency access accounts in Azure AD](https://docs.microsoft.com/en-us/azure/active-directory/roles/security-emergency-access)
 
