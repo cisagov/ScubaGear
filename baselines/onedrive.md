@@ -109,7 +109,7 @@ expiration date of thirty days or less is necessarry.
 ### Policies
 
 #### MS.ONEDRIVE.2.1v1
-Expiration Date SHOULD Be Set for Anyone Links for thirty days or less.
+Expiration Date SHOULD Be Set for Anyone Links for 30 days or less.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
