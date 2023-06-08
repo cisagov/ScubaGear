@@ -54,7 +54,7 @@ in SharePoint, Groups, or Teams.
 ### Policies
 
 #### MS.ONEDRIVE.1.1v1
-External sharing SHOULD be limited to Existing Guests or a more restrictive setting.
+External sharing SHOULD be limited to Existing Guests or the more restrictive setting, Only People in your Organization.
 - _Rationale:_ TODO
 - _Last Modified:_ June 2023
 - _Note:_ Same Implementation in MS.SHAREPOINT.1.1V1
