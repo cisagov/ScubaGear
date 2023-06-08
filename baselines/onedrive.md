@@ -104,7 +104,7 @@ Files that are stored in SharePoint sites, Groups, and Teams for months
 and years could lead to unexpected modifications to files if shared with
 unauthenticated people. Configuring expiration times for Anyone links
 can help avoid unwanted changes. If Anyone links are enabled, the
-expiration date of thirty days or less is necessarry.
+expiration date of thirty days or less is necessary.
 
 ### Policies
 
