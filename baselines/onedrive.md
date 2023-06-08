@@ -139,7 +139,7 @@ Only necessary when MS.ONEDRIVE.1.1v1 is not being implemented and OneDrive exte
 
 4.  Enter the number of days in the box, and then click **Save**.
 
-## 3. Link Permissions
+## 3. File and Folder Links Default Sharing Settings
 
 The Anyone links default to allow people to edit files, as well as edit
 and view files and upload new files to folders. To allow unauthenticated
