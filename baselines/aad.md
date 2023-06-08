@@ -19,6 +19,10 @@ hosts the M365 resources being used.
 [home tenant](https://docs.microsoft.com/en-us/azure/active-directory/external-identities/authentication-conditional-access)
 is the one that owns the external user’s (e.g., guest) account.
 
+## Highly Privilged Roles
+
+The following built-in Azure AD roles are considered highly privileged at a minimum: Global Administrator, Privileged Role Administrator, User Administrator, SharePoint Administrator, Exchange Administrator, Hybrid Identity Administrator, Application Administrator, Cloud Application Administrator. Additional built-in roles that are considered highly privileged in the agency's environment can be added to this list.
+
 ## Assumptions
 
 The agency has created emergency access accounts in Azure AD and
@@ -702,27 +706,6 @@ Users that need to be assigned to highly privileged Azure AD roles SHALL be prov
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
-#### MS.AAD.12.2v1
-The following built-in Azure AD roles are considered highly privileged at a minimum. Additional built-in roles that are considered highly privileged in the agency's environment can be added to this list:
-
-  - Global Administrator
-
-  - Privileged Role Administrator
-
-  - User Administrator
-
-  - SharePoint Administrator
-
-  - Exchange Administrator
-
-  - Hybrid Identity Administrator
-
-  - Application Administrator
-
-  - Cloud Application Administrator.
-- _Rationale:_ TODO
-- _Last modified:_ June 2023
-
 ### Resources
 
 - [Securing privileged access for hybrid and cloud deployments in Azure AD](https://docs.microsoft.com/en-us/azure/active-directory/roles/security-planning#ensure-separate-user-accounts-and-mail-forwarding-for-global-administrator-accounts)
@@ -800,8 +783,7 @@ instructions, an equivalent third-party PAM service may be used instead.
 
 ### Policies
 #### MS.AAD.14.1v1
-Permanent active role assignments SHALL NOT be allowed for highly privileged roles. Active assignments SHALL have an expiration period.
-- Refer to the baseline statement, [Highly Privileged User Accounts SHALL be Cloud-Only](#2121-Policy), for a recommended minimum list of Azure AD built-in roles that are considered highly privileged. It is also possible to designate additional built-in roles that are considered highly privileged in the agency’s environment based on its risk tolerance.
+Permanent active role assignments SHALL NOT be allowed for highly privileged roles except for break-glass accounts, accounts that are explicity allowed by the agency, and service accounts that require perpetual access.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
 
@@ -837,34 +819,19 @@ system.
 3. Under **Manage**, select **Roles**. This should bring up a list of
     all the Azure AD roles managed by the PIM service.
 
-4. **Note**: This step is specific to the first policy bullet.
-    Repeat this step and step 5 for each highly privileged role
-    referenced in the policy section. The role “Global Administrator” is
+4. **Note**: Repeat this step and step 5 for each highly privileged role
+    referenced in the policy section. The role “Exchange Administrator” is
     used as an example in these instructions.
 
 <!-- fix -->
-  1.  Click the **Global Administrator** role in the list.
+  1.  Click the **Exchange Administrator** role in the list.
   2.  Click **Settings**.
   3.  Click **Edit.**
   4.  Select the **Assignment** tab.
   5.  De-select the option named **Allow permanent active assignment.**
-  6.  Under **Expire active assignments after**, select **15 days**.
-  7.  Click **Update.**
+  6.  Click **Update.**
 
 <!-- -->
-
-5. Note: This step is specific to the second policy bullet.
-
-<!-- fix-->
-
-  1.  While on the **Assignments** page for the role, select the **Active
-    Assignments** tab.
-  2.  Review the assignments list. If any of the assignments show a
-    **Start time** of “-” (i.e., empty start time) and of **End time**
-    of **Permanent**, then those role assignments were made outside of
-    the PIM service and therefore are out of compliance with the policy.
-  3.  Delete the non-compliant role assignments and then recreate them
-    using the PIM service.
 
 <!-- -->
 
