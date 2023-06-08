@@ -262,18 +262,3 @@ Dr. Mukesh Rohatgi (MITRE), Lee Szilagyi (MITRE), Nanda Katikaneni
 (MITRE), Ted Kolovos (MITRE), Thomas Comeau (MITRE), Karen Caraway
 (MITRE), Jackie Whieldon (MITRE), Jeanne Firey (MITRE), Kenneth Myers
 (General Services Administration).
-
-# Configuring On-Premises Devices
-
-##### Limit Syncing to Agency-defined Equipment within the Agency (Tenants)
-
-OneDrive includes a sync client that allows users to synchronize their
-files from the OneDrive cloud service to their desktop/laptop computer.
-This allows them to interact with a local copy of the files in a way
-that is very similar to working with regular local files on their
-computer.
-
-**Resources**
-
-[Use OneDrive policies to control sync settings - OneDrive \| Microsoft
-Docs](https://learn.microsoft.com/en-us/sharepoint/use-group-policy#allow-syncing-onedrive-accounts-for-only-specific-organizations)
