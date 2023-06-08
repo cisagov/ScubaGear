@@ -125,7 +125,7 @@ Expiration Date SHOULD Be Set for Anyone Links for 30 days or less.
 ### Implementation
 
 To set an expiration date for Anyone links across the agency (**Note**:
-Only implement when 2.1 is not being implemented and set to Anyone).
+Only necessary when MS.ONEDRIVE.1.1v1 is not being implemented and OneDrive external sharing is set to Anyone).
 
 1.  Open the **SharePoint admin center.**
 
