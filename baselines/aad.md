@@ -616,21 +616,100 @@ User passwords SHALL NOT expire.
 link](https://docs.microsoft.com/en-us/microsoft-365/admin/manage/set-password-expiration-policy?view=o365-worldwide#set-password-expiration-policy)
 to configure the password expiration policy.
 
-## 11. Global Administrators
+## 11. Highly Privileged User Management and Monitoring
 
-Global Administrator is the highest privileged role in Azure AD because
-it provides unfettered access to the tenant. Therefore, if a user’s
-credential with these permissions were to be compromised, it would
-present grave risks to the security of the tenant. Assign users to finer-grained
-administrative roles that they need to perform their duties instead of being assigned the
-Global Administrator role.
+Limit the number of users, to include "breakglass" accounts, that are assigned the role
+of Global Administrator to minimize risks of tenant compromise.
 
 ### Policies
 #### MS.AAD.11.1v1
 A minimum of two users and a maximum of eight users SHALL be provisioned with the Global Administrator role.
-- _Rationale:_  Limit the number of users, to include "breakglass" accounts, that are assigned the role
-of Global Administrator to minimize risks of tenant compromise.
+- _Rationale:_  Global Administrator is the highest privileged role in Azure AD because
+it provides unfettered access to the tenant. Therefore, if a user’s
+credential with these permissions were to be compromised, it would
+present grave risks to the security of the tenant.
 - _Last modified:_ June 2023
+
+#### MS.AAD.11.2v1
+Assign users to finer-grained administrative roles that they need to perform their duties instead of being assigned the
+Global Administrator role.
+- _Rationale:_  Applying principles of least privilege is a core security best practice.
+- _Last modified:_ June 2023
+
+#### MS.AAD.11.3v1
+Users that need to be assigned to highly privileged Azure AD roles SHALL be provisioned cloud-only accounts that are separate from the on-premises directory or other federated identity providers.
+- _Rationale:_ Assign users that need to perform highly privileged tasks to cloud-only
+Azure AD accounts to minimize the collateral damage of an on-premises
+identity compromise.[^1]
+- _Last modified:_ June 2023
+
+#### MS.AAD.11.4v1
+MFA SHALL be required for user access to highly privileged roles.
+- _Rationale:_ Requiring users to perform MFA to access highly privileged roles is
+a backup policy to enforce MFA for highly privileged users in case the main
+conditional access policy—which requires MFA for all users—is disabled or misconfigured.
+- _Last modified:_ June 2023
+
+#### MS.AAD.11.5v1
+Permanent active role assignments SHALL NOT be allowed for highly privileged roles except for break-glass accounts, accounts that are explicity allowed by the agency, and service accounts that require perpetual access.
+- _Rationale:_ Assigning highly privileged roles using permanent active role assignments increases risk of privilge escalation. Privilege escalation attacks can be mitigated by assigning users to eligible role assignments in a PAM system and providing an expiration period for active assignments requiring privileged users to reactivate their highly privileged roles upon expiration. **Note**: Although Azure AD PIM is referenced in the implementation instructions, an equivalent third-party PAM service may be used instead.
+- _Last modified:_ June 2023
+
+#### MS.AAD.11.6v1
+Provisioning of users to highly privileged roles SHALL NOT occur outside of a PAM system, such as the Azure AD PIM service, because this bypasses the controls the PAM system provides.
+- _Rationale:_ TODO
+- _Last modified:_ June 2023
+
+<!-- -->
+#### MS.AAD.16.1v1
+Eligible and Active highly privileged role assignments SHALL trigger an alert.
+- _Rationale:_ TODO
+- _Last modified:_ June 2023
+
+**Note**: Although Azure AD PIM is referenced in the implementation
+instructions, an equivalent third-party PAM service may be used instead.
+
+#### MS.AAD.11.7v1
+Activation of highly privileged roles SHOULD require approval.
+- _Rationale:_ Requiring approval for a user to activate a highly privileged role, such
+as Global Administrator makes it more challenging for an attacker
+to leverage the stolen credentials of highly privileged users and
+ensures that privileged access is monitored closely.
+- _Last modified:_ June 2023
+
+#### MS.AAD.11.8v1
+Eligible and Active highly privileged role assignments SHALL trigger an alert.
+- _Rationale:_ Since many cyber attacks leverage privileged access, it is imperative to
+closely monitor the assignment and activation of the highest privileged
+roles for signs of compromise. Creating alerts to trigger when a highly
+privileged role is assigned to a user and when a user activates a highly
+privileged role can help mitigate the threat.
+Note: Although Azure AD PIM is referenced in the implementation
+instructions, an equivalent third-party PAM service may be used instead.
+- _Last modified:_ June 2023
+
+#### MS.AAD.11.9v1
+User activation of the Global Administrator role SHALL trigger an
+  alert.
+- _Rationale:_ For insights into PIM alert configuration see https://learn.microsoft.com/en-us/azure/active-directory/privileged-identity-management/pim-how-to-configure-security-alerts
+- _Last modified:_ June 2023
+
+#### MS.AAD.11.10v1
+User activation of other highly privileged roles SHOULD trigger an alert.
+- _Rationale:_ TODO
+- _Last modified:_ June 2023
+
+<!-- -->
+
+  - Note: Alerts can be configured for user activation of other highly
+  privileged roles as well but note that if users activate these other
+  roles frequently, it can prompt a significant number of alerts.
+  Therefore, for those other roles, it might be prudent to set up a
+  separate monitoring mailbox from the one configured for the alerts
+  associated with the Global Administrator role. This separate mailbox
+  would be designed to store alerts for “review as necessary” purposes
+  versus the mailbox configured for the Global Administrator role, which
+  should be monitored closely since that role is sensitive.
 
 ### Resources
 
@@ -639,12 +718,26 @@ of Global Administrator to minimize risks of tenant compromise.
 
 - [About admin roles](https://docs.microsoft.com/en-us/microsoft-365/admin/add-users/about-admin-roles?view=o365-worldwide)
 
+- [Securing privileged access for hybrid and cloud deployments in Azure AD](https://docs.microsoft.com/en-us/azure/active-directory/roles/security-planning#ensure-separate-user-accounts-and-mail-forwarding-for-global-administrator-accounts)
+
+- [Five steps to securing your identity infrastructure](https://docs.microsoft.com/en-us/azure/security/fundamentals/steps-secure-identity)
+
+- [M-22-09 Federal Zero Trust Strategy](https://www.whitehouse.gov/wp-content/uploads/2022/01/M-22-09.pdf)
+
+- [Assign Azure AD roles in Privileged Identity Management](https://docs.microsoft.com/en-us/azure/active-directory/privileged-identity-management/pim-how-to-add-role-to-user)
+
+- [Approve or deny requests for Azure AD roles in Privileged Identity Management](https://docs.microsoft.com/en-us/azure/active-directory/privileged-identity-management/azure-ad-pim-approval-workflow)
+
+- [Assign Azure AD roles in Privileged Identity Management](https://docs.microsoft.com/en-us/azure/active-directory/privileged-identity-management/pim-how-to-add-role-to-user)
+
 ### License Requirements
 
-- N/A
+- Use of an Azure AD PIM or an equivalent third-party PAM service.
+
+- Azure AD PIM requires an AAD P2 license
 
 ### Implementation
-
+#### Policy MS.AAD.11.1v1
 1.  In the **Azure Portal**, navigate to **Azure Active Directory.**
 
 <!-- -->
@@ -667,6 +760,7 @@ of Global Administrator to minimize risks of tenant compromise.
 7.  If any groups are listed, need to check how many users are members
     of each group and include that in the total count.
 
+#### Policy MS.AAD.11.2v1
 To establish finer-grained administrative roles:
 
 1.  In the **Azure Portal**, navigate to **Azure Active Directory.**
@@ -695,66 +789,12 @@ To establish finer-grained administrative roles:
     Administrator. Once the roles are reassigned according to the
     guidance, check the score again after 48 hours to ensure compliance.
 
-## 12. Highly Privileged User Accounts
-
-Assign users that need to perform highly privileged tasks to cloud-only
-Azure AD accounts to minimize the collateral damage of an on-premises
-identity compromise.[^1]
-
-### Policies
-#### MS.AAD.12.1v1
-Users that need to be assigned to highly privileged Azure AD roles SHALL be provisioned cloud-only accounts that are separate from the on-premises directory or other federated identity providers.
-- _Rationale:_ TODO
-- _Last modified:_ June 2023
-
-### Resources
-
-- [Securing privileged access for hybrid and cloud deployments in Azure AD](https://docs.microsoft.com/en-us/azure/active-directory/roles/security-planning#ensure-separate-user-accounts-and-mail-forwarding-for-global-administrator-accounts)
-
-### License Requirements
-
-- N/A
-
-### Implementation
-
+#### Policy MS.AAD.11.3v1
 Review [these](https://docs.microsoft.com/en-us/azure/active-directory/roles/view-assignments)
 instructions to identify users assigned to highly privileged roles and
 verify the account does not exist outside Azure AD.
 
-## 13. Multifactor Authentication for Highly Privileged Roles
-
-Require users to perform MFA to access highly privileged roles. This
-configuration provides a backup policy to enforce MFA for highly
-privileged users in case the main conditional access policy—which
-requires MFA for all users—is disabled or misconfigured.
-
-### Policies
-#### MS.AAD.13.1v1
-MFA SHALL be required for user access to highly privileged roles.
-- _Rationale:_ TODO
-- _Last modified:_ June 2023
-
-<!-- -->
-
-- Refer to the baseline statement [Highly Privileged User Accounts SHALL
-  be Cloud-Only](#2.12.1 Policy)
-  for a recommended minimum list of Azure AD built-in roles that are
-  considered highly privileged. It is also possible to designate
-  additional built-in roles that are considered highly privileged in the
-  agency’s environment based on its risk tolerance.
-
-### Resources
-
-- [Five steps to securing your identity infrastructure](https://docs.microsoft.com/en-us/azure/security/fundamentals/steps-secure-identity)
-
-- [M-22-09 Federal Zero Trust Strategy](https://www.whitehouse.gov/wp-content/uploads/2022/01/M-22-09.pdf)
-
-### License Requirements
-
-- N/A
-
-### Implementation
-
+#### Policy MS.AAD.11.4v1
 [Follow these instructions](https://docs.microsoft.com/en-us/azure/active-directory/conditional-access/howto-conditional-access-policy-all-users-mfa)
 to create a conditional access policy requiring MFA for access, but
 under **Assignments,** use the following tailored steps to scope the
@@ -771,41 +811,7 @@ policy to privileged roles.
 3.  Under **Exclude**, follow Microsoft’s guidance from the previously
     provided instructions link.
 
-## 14. Permanent Permissions
-
-Do not assign users to highly privileged roles using permanent active
-role assignments. Instead, assign users to eligible role assignments in
-a PAM system and provide an expiration period for active assignments
-requiring privileged users to reactivate their highly privileged roles
-upon expiration.
-
-**Note**: Although Azure AD PIM is referenced in the implementation
-instructions, an equivalent third-party PAM service may be used instead.
-
-### Policies
-#### MS.AAD.14.1v1
-Permanent active role assignments SHALL NOT be allowed for highly privileged roles except for break-glass accounts, accounts that are explicity allowed by the agency, and service accounts that require perpetual access.
-- _Rationale:_ TODO
-- _Last modified:_ June 2023
-
-<!-- fix-->
-#### MS.AAD.14.2v1
-Provisioning of users to highly privileged roles SHALL NOT occur outside of a PAM system, such as the Azure AD PIM service, because this bypasses the controls the PAM system provides.
-- _Rationale:_ TODO
-- _Last modified:_ June 2023
-
-### Resources
-
-- [Assign Azure AD roles in Privileged Identity Management](https://docs.microsoft.com/en-us/azure/active-directory/privileged-identity-management/pim-how-to-add-role-to-user)
-
-### License Requirements
-
-- Use of an Azure AD PIM or an equivalent third-party PAM service.
-
-- Azure AD PIM requires an AAD P2 license
-
-### Implementation
-
+#### Policy MS.AAD.11.5v1
 Note: Any parts of the following implementation instructions that
 reference the Azure AD PIM service will vary if using a third-party PAM
 system.
@@ -836,10 +842,8 @@ system.
 
 <!-- -->
 
-6. In addition to checking for permanent assignments using the PIM
-    Assignments page in step \#5, PIM also provides a report that lists
-    all role assignments that were performed outside of PIM so that
-    those assignments can be deleted and properly recreated using PIM.
+#### Policy MS.AAD.11.6v1
+ In addition to checking for permanent assignments using the PIM Assignments, PIM also provides a report that lists all role assignments that were performed outside of PIM so that those assignments can be deleted and properly recreated using PIM.
 
 <!-- -->
 
@@ -855,42 +859,7 @@ system.
     non-compliant role assignments and then recreate them using the PIM
     service.
 
-## 15. Activation of Highly Privileged Roles
-
-Require approval for a user to activate a highly privileged role, such
-as Global Administrator. This makes it more challenging for an attacker
-to leverage the stolen credentials of highly privileged users and
-ensures that privileged access is monitored closely.
-
-**Note**: Although Azure AD PIM is referenced in the implementation
-instructions, an equivalent third-party PAM service may be used instead.
-
-### Policies
-#### MS.AAD.15.1v1
-Activation of highly privileged roles SHOULD require approval.
-- _Rationale:_ TODO
-- _Last modified:_ June 2023
-
-<!-- -->
-
-- Refer to the baseline statement [Highly Privileged User Accounts SHALL be Cloud-Only](#2121-Policy)
-  for a list of Azure AD built-in roles that are considered highly
-  privileged. It is also possible to configure additional built-in roles
-  that are considered highly privileged in the agency’s environment
-  based on its risk tolerance.
-
-### Resources
-
-- [Approve or deny requests for Azure AD roles in Privileged Identity Management](https://docs.microsoft.com/en-us/azure/active-directory/privileged-identity-management/azure-ad-pim-approval-workflow)
-
-### License Requirements
-
-- Use an Azure AD PIM or an equivalent third-party PAM service
-
-- Azure AD PIM requires an AAD P2 license
-
-### Implementation
-
+#### Policy MS.AAD.11.7v1
 **Note**: Any parts of the following implementation instructions that
 reference the Azure AD PIM service will vary if using a third-party PAM
 system.
@@ -926,67 +895,7 @@ system.
     Approvers**, and then click **Select**.
   6.  Click **Update**.
 
-## 16. Highly Privileged Role Assignment and Activation
-
-Since many cyber attacks leverage privileged access, it is imperative to
-closely monitor the assignment and activation of the highest privileged
-roles for signs of compromise. Create alerts to trigger when a highly
-privileged role is assigned to a user and when a user activates a highly
-privileged role.
-
-Note: Although Azure AD PIM is referenced in the implementation
-instructions, an equivalent third-party PAM service may be used instead.
-
-### Policies
-#### MS.AAD.16.1v1
-Eligible and Active highly privileged role assignments SHALL trigger an alert.
-- _Rationale:_ TODO
-- _Last modified:_ June 2023
-
-<!-- -->
-
-  - Refer to the baseline statement [Highly Privileged User Accounts SHALL be Cloud-Only](#2121-Policy)
-  for a recommended minimum list of Azure AD built-in roles that are
-  considered highly privileged. It is also possible to designate
-  additional built-in roles that are considered highly privileged in the
-  agency’s environment based on its risk tolerance.
-
-<!-- -->
-
-#### MS.AAD.16.2v1
-User activation of the Global Administrator role SHALL trigger an
-  alert.
-- _Rationale:_ For insights into PIM alert configuration see https://learn.microsoft.com/en-us/azure/active-directory/privileged-identity-management/pim-how-to-configure-security-alerts
-- _Last modified:_ June 2023
-
-#### MS.AAD.16.3v1
-User activation of other highly privileged roles SHOULD trigger an alert.
-- _Rationale:_ TODO
-- _Last modified:_ June 2023
-
-<!-- -->
-
-  - Note: Alerts can be configured for user activation of other highly
-  privileged roles as well but note that if users activate these other
-  roles frequently, it can prompt a significant number of alerts.
-  Therefore, for those other roles, it might be prudent to set up a
-  separate monitoring mailbox from the one configured for the alerts
-  associated with the Global Administrator role. This separate mailbox
-  would be designed to store alerts for “review as necessary” purposes
-  versus the mailbox configured for the Global Administrator role, which
-  should be monitored closely since that role is sensitive.
-
-### Resources
-
-- [Assign Azure AD roles in Privileged Identity Management](https://docs.microsoft.com/en-us/azure/active-directory/privileged-identity-management/pim-how-to-add-role-to-user)
-
-### License Requirements
-
-- Use an Azure AD PIM or an equivalent third-party PAM service.
-
-- Azure AD PIM requires an AAD P2 license
-
-### Implementation
+#### Policies MS.AAD.11.8v1, MS.AAD.11.9v1, MS.AAD.11.10v1
 
 Note: Any parts of the following implementation instructions that
 reference the Azure AD PIM service will vary if using a third-party PAM
