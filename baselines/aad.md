@@ -404,7 +404,9 @@ include updates to this policy that take advantage of these new feautres.
 To require managed devices to register for MFA, follow these instructions
 To create the conditional access policy that requires managed devices to
 register for MFA, follow the instructions in the
-[Enable with Conditional Access policy](https://learn.microsoft.com/en-us/azure/active-directory/conditional-access/howto-conditional-access-policy-registration)
+[Enable with Conditional Access policy](https://learn.microsoft.com/en-us/azure/active-directory/conditional-access/howto-conditional-access-policy-registration) but require device to be marked as compliant or Hybrid Azure AD joined:
+
+1.  Under **Access Controls** -\> **Grant access**, select **Require device to be marked as compliant** or **Require Hybrid Azure AD joined device**
 
 
 ## 5. Azure AD logs
