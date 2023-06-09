@@ -661,10 +661,6 @@ Provisioning of users to highly privileged roles SHALL NOT occur outside of a PA
 - _Last modified:_ June 2023
 
 <!-- -->
-#### MS.AAD.16.1v1
-Eligible and Active highly privileged role assignments SHALL trigger an alert.
-- _Rationale:_ TODO
-- _Last modified:_ June 2023
 
 **Note**: Although Azure AD PIM is referenced in the implementation
 instructions, an equivalent third-party PAM service may be used instead.
