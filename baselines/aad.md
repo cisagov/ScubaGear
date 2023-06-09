@@ -339,7 +339,7 @@ and then register their own MFA devices to access the tenant by meeting the MFA 
 
 ### Implementation
 
-**Policy \#1:**
+**Policy  MS.AAD.4.1v1:**
 
 Use the following instructions to configure a phishing-resistant MFA
 method for all users.
@@ -357,7 +357,7 @@ method for all users.
     link](https://docs.microsoft.com/en-us/windows/security/identity-protection/hello-for-business/hello-deployment-guide).
 
 
-**Policy \#2:**
+**Policy  MS.AAD.4.2v1:**
 
  If the agency is unable to use phishing-resistant MFA for all users, then
 follow [these
@@ -365,14 +365,14 @@ follow [these
     to create a conditional access policy that requires all users to
     authenticate with MFA.
 
-**Policy \#3:**
+**Policy  MS.AAD.4.3v1:**
 If Phishing-resistant MFA is not implemented yet and Microsoft Authenticator is enabled, follow
 [these instructions ](https://learn.microsoft.com/en-us/azure/active-directory/authentication/concept-authentication-authenticator-app).
 To enable passwordless authentication using Microsoft Authenticator, follow
 [these instructions ](https://learn.microsoft.com/en-us/azure/active-directory/authentication/howto-authentication-passwordless-phone).
 
 
-**Policy \#4:**
+**Policy  MS.AAD.4.4v1:**
 To migrate from legacy MFA and Self-Service Password Reset (SSPR) Microsoft implementation options follow
 [these instructions ](https://learn.microsoft.com/en-us/azure/active-directory/authentication/how-to-authentication-methods-manage).
 
@@ -382,11 +382,11 @@ In the **Microsoft Authenticator** settings, under **Configure**, select
 - **Enabled** for **All Users** under **Show geographic location in push and passwordless notifications**
 - **Microsoft Managed** for **All Users** under  **Microsoft Authenticator on companion applications**
 
-**Policy \#5:**
+**Policy  MS.AAD.4.5v1:**
 To disable SMS, Voice Call, and Email OTP, from the **Authentication Methods->Policy** page:
 Set the **Enabled** status to **No** for each authentication method.
 
-**Policy \#6:**
+**Policy  MS.AAD.4.6v1:**
 If the agency is implementing a phishing-resistant MFA method for all
 users, follow the instructions in Policy #1 above. Otherwise use
 the following instructions to configure a non-phishing resistant MFA
@@ -400,8 +400,12 @@ Note, Microsoft has released a new capability [(Public Preview) ](https://learn.
 using Privileged Identity Management (PIM) for Groups. Future revisions of this baseline may
 include updates to this policy that take advantage of these new feautres.
 
-**Policy \#7:**
-To require managed devices to register for MFA, [Follow these instructions](https://learn.microsoft.com/en-us/mem/intune/enrollment/multi-factor-authentication?toc=%2Fazure%2Factive-directory%2Fconditional-access%2FTOC.json)
+**Policy  MS.AAD.4.7v1:**
+To require managed devices to register for MFA, follow these instructions
+To create the conditional access policy that requires managed devices to
+register for MFA, follow the instructions in the
+[Enable with Conditional Access policy](https://learn.microsoft.com/en-us/azure/active-directory/conditional-access/howto-conditional-access-policy-registration)
+
 
 ## 5. Azure AD logs
 
