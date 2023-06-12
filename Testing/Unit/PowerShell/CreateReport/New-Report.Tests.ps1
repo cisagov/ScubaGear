@@ -47,7 +47,7 @@ InModuleScope CreateReport {
             @{Product = 'exo'; WarningCount = 2},
             @{Product = 'onedrive'; WarningCount = 8},
             @{Product = 'powerplatform'; WarningCount = 0},
-            @{Product = 'sharepoint'; WarningCount = 3},
+            @{Product = 'sharepoint'; WarningCount = 5},
             @{Product = 'teams'; WarningCount = 5}
         ){
             $CreateReportParams += @{
