@@ -43,7 +43,7 @@ InModuleScope CreateReport {
         }
         It 'Creates a report for <Product>' -ForEach @(
             @{Product = 'aad'; WarningCount = 1},
-            @{Product = 'defender'; WarningCount = 3},
+            @{Product = 'defender'; WarningCount = 10},
             @{Product = 'exo'; WarningCount = 2},
             @{Product = 'onedrive'; WarningCount = 8},
             @{Product = 'powerplatform'; WarningCount = 0},
