@@ -149,6 +149,12 @@ content, consider setting the file and folder permissions to **View**.
 ### Policies
 
 #### MS.ONEDRIVE.3.1v1
+Default Link Sharing Type SHOULD NOT Be Set to Anyone
+- _Rationale:_ TODO
+- _Last modified:_ June 2023
+_Note:_ Similar Implementation in MS.SHAREPOINT.2.1V1
+
+#### MS.ONEDRIVE.3.2v1
 Anyone Link Permissions SHOULD Be Set to View Only
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
