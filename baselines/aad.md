@@ -570,12 +570,12 @@ Group owners SHALL NOT be allowed to consent to third-party applications.
 6. Under **Group owner consent for apps accessing data**, select **Do
     not allow group owner consent.**
 
-7. In the menu, navigate back to **Enterprise Applications**.
+7. Click **Save**
 
-8. Under **Manage**, select **User Settings**.
+8. Navigate to the Admin consent settings page.
 
-9. Under **Admin consent requests** -\> **Users can request admin
-    consent to apps they are unable to consent to**, select **Yes.**
+9. Under **Admin consent requests** -> **Users can request admin consent to apps
+they are unable to consent to**, select **Yes**.
 
 10. Under **Who can review admin consent requests**, select the group
     created in step two that is responsible for reviewing and
