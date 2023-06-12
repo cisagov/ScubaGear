@@ -22,7 +22,7 @@ created:
     Model-Driven apps revolve around building the view and controller on
     top of the model.
 
-3.  **Power Pages**: These apps are created to be either internal or external facing websites.
+3.  **Power Pages**: These apps that are created to function as either internal or external facing websites.
 
 **Power Automate**: This is an online tool within the Microsoft 365
 applications and add-ins used to create automated workflows between apps
@@ -72,7 +72,7 @@ Baselines in this section are for administrative controls that apply to
 all Power Platform applications at either the Power Platform tenant or
 environment level. Additional Power Platform security settings can be
 implemented at the app level, connector level, or Dataverse table level.
-Refer to Microsoft documentation for those additional controls.
+Refer to Microsoft Learn documentation for those additional controls.
 
 ## 1 Creation of Power Platform Environments
 
@@ -113,10 +113,8 @@ The ability to create trial environments SHALL be restricted to admins.
 
 ### Implementation
 
-1.  Sign in to the [Power Platform admin
-    center](https://admin.powerplatform.microsoft.com/) or for GCC
-    environments sign in to the [GCC Power Platform Admin
-    Center](https://gcc.admin.powerplatform.microsoft.us/).
+1.  Sign in your tenant environment's respective [Power Platform admin
+    center](https://learn.microsoft.com/en-us/power-platform/admin/powerapps-us-government#power-apps-us-government-service-urls).
 
 2.  In the upper-right corner of the Microsoft Power Platform site,
     select the **Gear icon** (Settings icon).
@@ -232,10 +230,8 @@ Blocked category in the default environment policy:
 
 ### Implementation
 
-1.  Sign in to the [Power Platform admin
-    center](https://admin.powerplatform.microsoft.com/) (for GCC
-    environments sign in to the [GCC Power Platform Admin
-    Center](https://gcc.admin.powerplatform.microsoft.us/)).
+1.  Sign in your tenant environment's respective [Power Platform admin
+    center](https://learn.microsoft.com/en-us/power-platform/admin/powerapps-us-government#power-apps-us-government-service-urls).
 
 2.  On the left pane, select **Policies** then **Data Policies.**
 
@@ -318,10 +314,8 @@ The allowlist MAY be empty.
 
 ### Implementation
 
-1.  Sign in to the [Power Platform admin
-    center](https://admin.powerplatform.microsoft.com/) or for GCC
-    environments sign in to the [GCC Power Platform Admin
-    Center](https://gcc.admin.powerplatform.microsoft.us/).
+1.  Sign in your tenant environment's respective [Power Platform admin
+    center](https://learn.microsoft.com/en-us/power-platform/admin/powerapps-us-government#power-apps-us-government-service-urls).
 
 2.  On the left pane, select **Policies -\> Tenant Isolation**.
 
@@ -370,7 +364,8 @@ Reporting for Content Security Policy violations MAY be enabled.
 
 ### Implementation
 
-1.  Sign in to the your tenant's appropriate Power Platform [admin center](https://make.powerapps.com).
+1.  Sign in your tenant environment's respective [Power Platform admin
+    center](https://learn.microsoft.com/en-us/power-platform/admin/powerapps-us-government#power-apps-us-government-service-urls).
 
 2. On the left-hand pane click on **Environments** and then select an environment from the list.
 
@@ -391,7 +386,7 @@ Power Pages formerly known as Power Portals can be created as external facing we
 ###  Policy
 
 #### MS.POWERPLATFORM.5.1v1
-The ability to create Power Pages sites SHALL be restricted to admins.
+The ability to create Power Pages sites SHOULD be restricted to admins.
 - _Rationale:_ TODO
 - _Last Modified:_ April 2023
 
