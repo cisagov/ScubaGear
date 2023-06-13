@@ -76,7 +76,7 @@ function New-Report {
     }
 
     $MetaDataTable = $MetaData | ConvertTo-HTML -Fragment
-    $MetaDataTable = $MetaDataTable -replace '^(.*?)<table>','<table style = "text-align:center;">'
+    $MetaDataTable = $MetaDataTable -replace '^(.*?)<table>','<table id="tenant-data" style = "text-align:center;">'
     $Fragments += $MetaDataTable
     $ReportSummary = @{
         "Warnings" = 0;
@@ -144,7 +144,7 @@ function New-Report {
                     "Criticality"= "-"
                     "Details"= "Report issue on <a href=`"$ScubaGitHubUrl/issues`" target=`"_blank`">GitHub</a>"
                 }
-                Write-Error("ERROR: No test results found for Control Id $($Control.Id)")
+                Write-Warning -Message "WARNING: No test results found for Control Id $($Control.Id)"
             }
         }
 
