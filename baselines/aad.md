@@ -83,14 +83,14 @@ strengthen the security of widely used cloud-based software services.
 
 ## 1. Legacy Authentication
 
-Block legacy authentication protocols using a conditional access policy.
-Legacy authentication does not support multifactor authentication (MFA),
-which is required to minimize the impact of user credential theft.
+Legacy authentication protocols such as POP, SMTP, IMAP, and MAPI can't enforce
+multifactor authentication (MFA) and should be blocked using a conditional access policy.
 
 ### Policies
 #### MS.AAD.1.1v1
 Legacy authentication SHALL be blocked.
-- _Rationale:_ TODO
+- _Rationale:_ Legacy authentication does not support MFA,
+which is required to minimize the impact of user credential theft.
 - _Last modified:_ June 2023
 
 ### Resources
@@ -133,7 +133,8 @@ from accessing the system via Conditional Access until an administrator
 remediates their account. Once a respective conditional access policy
 with a block is implemented, if a high-risk user attempts to login, the
 user will receive an error message with instructions to contact the
-administrator to re-enable their access.
+administrator to re-enable their access. This functionality provides real-time risk
+aremediation against identity-based attacks.
 - _Last modified:_ June 2023
 
 #### MS.AAD.2.2v1
@@ -616,10 +617,14 @@ User passwords SHALL NOT expire.
 link](https://docs.microsoft.com/en-us/microsoft-365/admin/manage/set-password-expiration-policy?view=o365-worldwide#set-password-expiration-policy)
 to configure the password expiration policy.
 
-## 11. Highly Privileged User Management and Monitoring
+## 11. Highly Privileged User Administration
 
-Limit the number of users, to include "breakglass" accounts, that are assigned the role
-of Global Administrator to minimize risks of tenant compromise.
+Microsoft Entra provides different ways of administering highly privileged roles and groups through
+Azure Active Directory and Privileged Identity Management (PIM) The following policies describe
+baselines for managing and monitoring highly privileged roles.
+Note, some of these policy will be augmented in the next release to include functionality provided
+by the PIM for Groups feature.
+
 
 ### Policies
 #### MS.AAD.11.1v1
