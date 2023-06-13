@@ -620,9 +620,9 @@ to configure the password expiration policy.
 ## 11. Highly Privileged User Administration
 
 Microsoft Entra provides different ways of administering highly privileged roles and groups through
-Azure Active Directory and Privileged Identity Management (PIM) The following policies describe
+Azure Active Directory and Privileged Identity Management (PIM). The following policies describe
 baselines for managing and monitoring highly privileged roles.
-Note, some of these policy will be augmented in the next release to include functionality provided
+Note, some of these policies will be augmented in the next release to include functionality provided
 by the PIM for Groups feature.
 
 
