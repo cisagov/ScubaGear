@@ -30,7 +30,7 @@ param (
 Import-Module Selenium
 
 Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for $OrganizationName" -ForEach @(
-    @{ Browser = "Chrome"; Driver = Start-SeChrome -Arguments @('start-maximized') 2>$null }
+    @{ Browser = "Chrome"; Driver = Start-SeChrome -Headless -Arguments @('start-maximized') 2>$null }
 ){
 	BeforeAll {
         $ReportFolders = Get-ChildItem . -directory -Filter "M365BaselineConformance*" | Sort-Object -Property LastWriteTime -Descending
@@ -95,20 +95,44 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for $OrganizationN
             $DetailLink | Should -Not -BeNullOrEmpty
             Invoke-SeClick -Element $DetailLink
 
+            # For better performance turn off implict wait
+            $Driver.Manage().Timeouts().ImplicitWait = New-TimeSpan -Seconds 0
+
             $Tables = Get-SeElement -Driver $Driver -By TagName 'table'
             $Tables.Count | Should -BeGreaterThan 1
 
             ForEach ($Table in $Tables){
-                $Row = Get-SeElement -Element $Table -By TagName 'tr'
-                $Row.Count | Should -BeGreaterThan 0
+                $Rows = Get-SeElement -Element $Table -By TagName 'tr'
+                $Rows.Count | Should -BeGreaterThan 0
 
-                ForEach ($Row in $Rows){
-                    $RowHeaders = Get-SeElement -Element $Row -By TagName 'th'
-                    $RowHeaders.Count | Should -BeExactly 1
-                    $RowData = Get-SeElement -Element $Row -By TagName 'td'
-                    $RowData.Count | Should -BeGreaterThan 0
+                if ($Table.GetProperty("id") -eq "tenant-data"){
+                    $Rows.Count | Should -BeExactly 2
+                    $TenantDataColumns = Get-SeElement -Target $Rows[1] -By TagName "td"
+                    $Tenant = $TenantDataColumns[0].Text
+                    $Tenant | Should -Be $OrganizationName -Because "Tenant is $Tenant"
+                } else {
+                    # Control report tables
+                    ForEach ($Row in $Rows){
+                        $RowHeaders = Get-SeElement -Element $Row -By TagName 'th'
+                        $RowData = Get-SeElement -Element $Row -By TagName 'td'
+
+                        ($RowHeaders.Count -eq 0 ) -xor ($RowData.Count -eq 0) | Should -BeTrue -Because "Any given row should be homogenious"
+
+                        if ($RowHeaders.Count -gt 0){
+                            $RowHeaders.Count | Should -BeExactly 5
+                            $RowHeaders[0].text | Should -BeLikeExactly "Control ID"
+                        }
+
+                        if ($RowData.Count -gt 0){
+                            $RowData.Count | Should -BeExactly 5
+                            $RowData[2].text | Should -Not -BeLikeExactly "Error - Test results missing" -Because "All policies should have implementations: $($RowData[0].text)"
+                        }
+                    }
                 }
             }
+
+            # Turn implict wait back on
+            $Driver.Manage().Timeouts().ImplicitWait = New-TimeSpan -Seconds 10
         }
     }
 

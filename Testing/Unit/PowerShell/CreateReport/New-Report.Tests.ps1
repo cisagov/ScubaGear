@@ -3,7 +3,8 @@ Import-Module (Join-Path -Path $PSScriptRoot -ChildPath '../../../../PowerShell/
 InModuleScope CreateReport {
     Describe -Tag CreateReport -Name 'New-Report' {
         BeforeAll {
-            Mock -CommandName Write-Error {}
+            Mock -CommandName Write-Warning {}
+
             New-Item -Path (Join-Path -Path "TestDrive:" -ChildPath "CreateReportStubs") -Name "CreateReportUnitFolder" -ItemType Directory
             New-Item -Path (Join-Path -Path "TestDrive:" -ChildPath "CreateReportStubs/CreateReportUnitFolder") -Name "IndividualReports" -ItemType Directory
             $TestOutPath = (Join-Path -Path "TestDrive:" -ChildPath "CreateReportStubs")
@@ -41,13 +42,13 @@ InModuleScope CreateReport {
             }
         }
         It 'Creates a report for <Product>' -ForEach @(
-            @{Product = 'aad'; ErrorCount = 1},
-            @{Product = 'defender'; ErrorCount = 3},
-            @{Product = 'exo'; ErrorCount = 2},
-            @{Product = 'onedrive'; ErrorCount = 8},
-            @{Product = 'powerplatform'; ErrorCount = 0},
-            @{Product = 'sharepoint'; ErrorCount = 5},
-            @{Product = 'teams'; ErrorCount = 5}
+            @{Product = 'aad'; WarningCount = 1},
+            @{Product = 'defender'; WarningCount = 10},
+            @{Product = 'exo'; WarningCount = 2},
+            @{Product = 'onedrive'; WarningCount = 8},
+            @{Product = 'powerplatform'; WarningCount = 0},
+            @{Product = 'sharepoint'; WarningCount = 5},
+            @{Product = 'teams'; WarningCount = 5}
         ){
             $CreateReportParams += @{
                 'BaselineName' = $ArgToProd[$Product];
@@ -55,8 +56,8 @@ InModuleScope CreateReport {
             }
 
             { New-Report @CreateReportParams } | Should -Not -Throw
+            Should -Invoke -CommandName Write-Warning -Exactly -Times $WarningCount
 
-            Should -Invoke -CommandName Write-Error -Exactly -Times $ErrorCount
             Test-Path -Path "$($IndividualReportPath)/$($ArgToProd[$Product])Report.html" -PathType leaf | Should -Be $true
         }
     }
