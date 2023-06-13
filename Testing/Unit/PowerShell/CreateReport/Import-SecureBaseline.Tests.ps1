@@ -34,7 +34,7 @@ InModuleScope CreateReport {
         }
         It "Validate markdown group count for <Product>" -ForEach @(
             @{Product = "aad"; GroupCount = 18; PolicyCount = 33}
-            @{Product = "defender"; GroupCount = 10; PolicyCount = 46}
+            @{Product = "defender"; GroupCount = 6; PolicyCount = 22}
             @{Product = "exo"; GroupCount = 17; PolicyCount = 39}
             @{Product = "onedrive"; GroupCount = 7; PolicyCount = 8}
             @{Product = "powerbi"; GroupCount = 10; PolicyCount = 12}
