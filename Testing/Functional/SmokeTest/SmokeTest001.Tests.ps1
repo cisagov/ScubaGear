@@ -51,10 +51,12 @@ Describe "Smoke Test: Generate Output" {
     Context "Invoke Scuba for $Organization" {
         BeforeAll {
             if ($PSCmdlet.ParameterSetName -eq 'Manual'){
-                Invoke-SCuBA -ProductNames "*" -M365Environment $M365Environment
+                { Invoke-SCuBA -ProductNames "*" -M365Environment $M365Environment } |
+                Should -Not -Throw
             }
             else {
-                Invoke-SCuBA -CertificateThumbprint $Thumbprint -AppID $AppId -Organization $Organization -ProductNames "*" -M365Environment $M365Environment
+                { Invoke-SCuBA -CertificateThumbprint $Thumbprint -AppID $AppId -Organization $Organization -ProductNames "*" -M365Environment $M365Environment } |
+                Should -Not -Throw
             }
             $ReportFolders = Get-ChildItem . -directory -Filter "M365BaselineConformance*" | Sort-Object -Property LastWriteTime -Descending
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'OutputFolder',
