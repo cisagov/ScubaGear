@@ -247,7 +247,7 @@ MS.SHAREPOINT-ONEDRIVE.3.3v1, instructions:
 
 This section provides policies for restricting the execution of custom scripts.
 
-###  Policy
+###  Policies
 #### MS.SHAREPOINT-ONEDRIVE.4.1v1
 Users SHALL be prevented from running custom scripts on personal sites (aka OneDrive).
 - _Rationale:_ TODO
