@@ -1,6 +1,6 @@
 # Introduction
 
-Azure Active Directory, part of Microsoft Entra, is an enterprise identity service that provides single sign-on, multifactor authentication, and conditional access to guard against cybersecurity attacks.
+Azure Active Directory, part of Microsoft Entra, is an enterprise identity service that provides single sign-on, multifactor authentication, and conditional access to guard against cybersecurity attacks. 
 
 ## Key Terminology
 
