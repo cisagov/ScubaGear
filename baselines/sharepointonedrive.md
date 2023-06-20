@@ -47,19 +47,19 @@ External sharing for OneDrive SHALL be limited to Existing Guests or Only People
 External sharing SHALL be restricted to approved external domains per interagency collaboration needs.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
-_Note:_ This policy is only applicable if the external sharing slider on the admin page is set to any value other than Only People in your Organization.
+- _Note:_ This policy is only applicable if the external sharing slider on the admin page is set to any value other than Only People in your Organization.
 
 #### MS.SHAREPOINT-ONEDRIVE.1.4v1
 Only users in approved security groups SHALL be allowed to share externally.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
-_Note:_ This policy is only applicable if the external sharing slider on the admin page is set to any value other than Only People in your Organization.
+- _Note:_ This policy is only applicable if the external sharing slider on the admin page is set to any value other than Only People in your Organization.
 
 #### MS.SHAREPOINT-ONEDRIVE.1.5v1
 Guest access SHALL be limited to the email the invitation was sent to.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
-_Note:_ This policy is only applicable if the external sharing slider on the admin page is set to any value other than Only People in your Organization.
+- _Note:_ This policy is only applicable if the external sharing slider on the admin page is set to any value other than Only People in your Organization.
 
 ### Resources
 
@@ -178,19 +178,19 @@ Sharing of files with external users via the usage of Anyone links or Verificati
 Expiration days for anyone links SHALL be set to 30 days or less.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
-_Note:_ This policy is only applicable if the external sharing slider on the admin center sharing page is set to Anyone.
+- _Note:_ This policy is only applicable if the external sharing slider on the admin center sharing page is set to Anyone.
 
 #### MS.SHAREPOINT-ONEDRIVE.3.2v1
 The allowable file and folder permissions for anyone links SHALL be set to View only.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
-_Note:_ This policy is only applicable if the external sharing slider on the admin center sharing page is set to Anyone.
+- _Note:_ This policy is only applicable if the external sharing slider on the admin center sharing page is set to Anyone.
 
 #### MS.SHAREPOINT-ONEDRIVE.3.3v1
 Reauthentication days for people who use a verification code SHALL be set to 30 days or less.
 - _Rationale:_ TODO
 - _Last modified:_ June 2023
-_Note:_ This policy is only applicable if the external sharing slider on the admin center sharing page is set to Anyone or New and Existing Guests.
+- _Note:_ This policy is only applicable if the external sharing slider on the admin center sharing page is set to Anyone or New and Existing Guests.
 
 ### License Requirements
 
