@@ -513,6 +513,10 @@ All of the settings in this section are configured in the **Microsoft Teams admi
 7.  If custom policies have been created, repeat these steps for each
     policy, selecting the appropriate policy in step 4 & 5.
 
+#### MS.TEAMS.8.3v1, instructions:
+
+N/A
+
 ## 9. Cloud Recording of Teams Meetings
 
 This setting determines whether video can be recorded in meetings hosted
@@ -579,22 +583,29 @@ record meetings:
 4.  Under the **Recording & transcription** section, set **Cloud
     recording** to **On**.
 
-5.  Under the **Recording & transcription** section, set **Store
-    recordings outside of your country or region** to **Off**.
+5.  Select **Save**.
 
-6.  Select **Save**.
-
-7.  After selecting **Save**, a table displays the set of policies.
+6.  After selecting **Save**, a table displays the set of policies.
     Select the row containing the new policy, then select **Manage
     users**.
 
-8.  Assign the users that need the ability to record to this policy.
+7.  Assign the users that need the ability to record to this policy.
 
-9.  Select **Apply**.
+8.  Select **Apply**.
 
 #### MS.TEAMS.9.2v1, instructions:
 
-N/A
+1.  Sign in to the **[Microsoft Teams admin
+    center](https://admin.teams.microsoft.com).**
+
+2.  Select **Meetings** -\> **Meeting policies**.
+
+3.  Select the **Global (Org-wide default)** policy.
+   
+4.  Under the **Recording & transcription** section, set **Store
+    recordings outside of your country or region** to **Off**.
+
+5.  Select **Save**.
 
 ## 10. Recording of Live Events
 
