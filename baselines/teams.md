@@ -1,4 +1,4 @@
-# CISA M365 Security Configuration Baseline for Sharepoint Teams
+# CISA M365 Security Configuration Baseline for Teams
 
 Microsoft Teams is a text and live chat workspace in Microsoft 365 that
 supports video calls, chat messaging, screen-sharing, and file sharing.
@@ -87,7 +87,7 @@ need.
 - N/A
 
 ### Implementation
-All of the settings in this section are configured in the [**Microsoft Teams admin
+All the settings in this section are configured in the [**Microsoft Teams admin
     center**](https://admin.teams.microsoft.com).
 #### MS.TEAMS.1.1v1, instructions:
 To ensure external participants do not have the ability to request
@@ -141,7 +141,7 @@ B2B guest users MAY be admitted automatically in the Global (Org-wide default) m
 - N/A
 
 ### Implementation
-All of the settings in this section are configured in the [**Microsoft Teams admin
+All the settings in this section are configured in the [**Microsoft Teams admin
     center**](https://admin.teams.microsoft.com).
 
 #### MS.TEAMS.2.1v1, instructions:
@@ -208,7 +208,7 @@ Docs](https://docs.microsoft.com/en-us/microsoftteams/meeting-policies-participa
 - N/A
 
 ### Implementation
-All of the settings in this section are configured in the [**Microsoft Teams admin center**](https://admin.teams.microsoft.com). 
+All the settings in this section are configured in the [**Microsoft Teams admin center**](https://admin.teams.microsoft.com). 
 #### MS.TEAMS.3.1v1, instructions:
 To configure settings for anonymous users:
 
@@ -271,7 +271,7 @@ External access for users SHALL only be enabled on a per-domain basis.
 
 ### Implementation
 
-All of the settings in this section are configured in the [**Microsoft Teams admin
+All the settings in this section are configured in the [**Microsoft Teams admin
     center**](https://admin.teams.microsoft.com). 
 #### MS.TEAMS.4.1v1, instructions:  
 To enable external access for only specific domains:
@@ -323,7 +323,7 @@ Docs](https://docs.microsoft.com/en-us/microsoftteams/manage-external-access#man
 
 Steps are outlined in [Manage contact with external Teams users not
 managed by an
-organization](https://docs.microsoft.com/en-us/microsoftteams/manage-external-access#manage-contact-with-external-teams-users-not-managed-by-an-organization). All of the settings in this section are configured in the [**Microsoft Teams admin center**](https://admin.teams.microsoft.com).
+organization](https://docs.microsoft.com/en-us/microsoftteams/manage-external-access#manage-contact-with-external-teams-users-not-managed-by-an-organization). All the settings in this section are configured in the [**Microsoft Teams admin center**](https://admin.teams.microsoft.com).
 
 #### MS.TEAMS.5.1v1, instructions:
     
@@ -388,7 +388,7 @@ Blog](https://techcommunity.microsoft.com/t5/microsoft-teams-blog/skype-for-busi
 
 ### Implementation
 
-All of the settings in this section are configured in the **Microsoft Teams admin center**.
+All the settings in this section are configured in the **Microsoft Teams admin center**.
 
 #### MS.TEAMS.6.1v1, instructions:
 
@@ -423,7 +423,7 @@ available in GCC or DoD tenants.
 
 ### Implementation
 
-All of the settings in this section are configured in the **Microsoft Teams admin center**.
+All the settings in this section are configured in the **Microsoft Teams admin center**.
 
 #### MS.TEAMS.7.1v1, instructions:
 
@@ -436,7 +436,7 @@ All of the settings in this section are configured in the **Microsoft Teams admi
     emails to a channel email address** to **Off**.
 
 ## 8. App Management
-This section helps reduce security risks related to app integration with Microsoft Teams. Teams is capable of integrating with the following classes of apps:
+This section helps reduce security risks related to app integration with Microsoft Teams. Teams can integrate with the following classes of apps:
 
 *Microsoft apps*: apps published by Microsoft.
 
@@ -478,7 +478,7 @@ Docs](https://docs.microsoft.com/en-us/microsoftteams/platform/concepts/deploy-a
 
 ### Implementation
 
-All of the settings in this section are configured in the **Microsoft Teams admin center**.
+All the settings in this section are configured in the **Microsoft Teams admin center**.
 
 #### MS.TEAMS.8.1v1, instructions:
 
@@ -551,7 +551,7 @@ Docs](https://docs.microsoft.com/en-us/microsoftteams/policy-assignment-overview
 
 ### Implementation
 
-All of the settings in this section are configured in the **Microsoft Teams admin center**.
+All the settings in this section are configured in the **Microsoft Teams admin center**.
 
 #### MS.TEAMS.9.1v1, instructions:
 
@@ -628,7 +628,7 @@ Docs](https://docs.microsoft.com/en-us/microsoftteams/teams-live-events/live-eve
 
 ### Implementation
 
-All of the settings in this section are configured in the **Microsoft Teams admin center**.
+All the settings in this section are configured in the **Microsoft Teams admin center**.
 
 #### MS.TEAMS.10.1v1, instructions:
 
