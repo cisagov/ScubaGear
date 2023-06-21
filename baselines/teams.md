@@ -1,4 +1,4 @@
-# Introduction
+# CISA M365 Security Configuration Baseline for Sharepoint Teams
 
 Microsoft Teams is a text and live chat workspace in Microsoft 365 that
 supports video calls, chat messaging, screen-sharing, and file sharing.
@@ -6,6 +6,7 @@ It has a permission-based team structure for managing calls and files.
 Microsoft teams also enables teams to manage their own user access
 rights, security policies, and record video calls.
 
+## Key Terminology
 Access to Teams can be controlled by the user type. In this baseline,
 the types of users are defined as follows (Note: these terms vary in use
 across Microsoft documentation):
@@ -95,12 +96,12 @@ control of the shared desktop or window in the meeting:
 1.  Sign in to the [**Microsoft Teams admin
     center**](https://admin.teams.microsoft.com).
 
-2.  Select **Meetings** -\> **Meeting policie**s.
+2.  Select **Meetings** > **Meeting policie**s.
 
 3.  Select the **Global (Org-wide default)** policy.
 
-4.  Under the **Content sharing** section, set **Allow an external
-    participant to give or request control** to **Off**.
+4.  Under the **Content sharing** section, set **External
+    participant can give or request control** to **Off**.
 
 5.  If custom policies have been created, repeat these steps for each
     policy, selecting the appropriate policy in step 3.
@@ -131,12 +132,11 @@ To configure settings for anonymous users:
 1.  Sign in to the [**Microsoft Teams admin
     center**](https://admin.teams.microsoft.com).
 
-2.  Select **Meetings -\>** **Meeting policies**.
+2.  Select **Meetings >** **Meeting policies**.
 
 3.  Select the **Global (Org-wide default)** policy.
 
-4.  Under the **Participants & guests** section**,** set **Let anonymous
-    people start a meeting** to **Off.**
+4.  Under the **Meeting join & lobby** section **,** set **Anonymous users and dial-in callers can start a meeting** to **Off.**
 
 5.  If custom policies have been created, repeat these steps for each
     policy, selecting the appropriate policy in step 3.
@@ -148,29 +148,23 @@ before they are admitted to the meeting.
 ### Policies
 
 #### MS.TEAMS.3.1v1
-Anonymous users, including dial-in users, SHOULD NOT be admitted automatically.
+Anonymous users, including dial-in users, SHOULD NOT be admitted automatically in the Global (Org-wide default) meeting policy.
 - _Rationale:_ TODO add rationale.
 - _Last modified:_ July 2023
 
 #### MS.TEAMS.3.2v1
-Internal users SHOULD be admitted automatically.
+Internal users SHOULD be admitted automatically in the Global (Org-wide default) meeting policy.
 - _Rationale:_ TODO add rationale.
 - _Last modified:_ July 2023
 
 #### MS.TEAMS.3.3v1
-B2B guest users MAY be admitted automatically.
+B2B guest users MAY be admitted automatically in the Global (Org-wide default) meeting policy.
 - _Rationale:_ TODO add rationale.
 - _Last modified:_ July 2023
 
-#### MS.TEAMS.3.4v1
-MS.TEAMS.3.1.1, MS.TEAMS.3.2.1, and MS.TEAMS.3.3.1 SHOULD be applied in the Global (Org-wide default) meeting policy.
-- _Rationale:_ TODO add rationale.
-- _Last modified:_ July 2023
 
-#### MS.TEAMS.3.5v1
-Custom meeting policies MAY be created that allow more flexibility for specific users.
-- _Rationale:_ TODO add rationale.
-- _Last modified:_ July 2023
+Note: Custom meeting policies MAY be created that allow more flexibility for specific users.
+
 
 ### Resources
 - [Meeting policy settings - Participants & guests \| Microsoft
@@ -180,23 +174,44 @@ Custom meeting policies MAY be created that allow more flexibility for specific 
 - N/A
 
 ### Implementation
-To configure settings for automatic meeting admittance:
-
-1.  Sign in to the [**Microsoft Teams admin
+All of the settings in this section are configured in the [**Microsoft Teams admin
     center**](https://admin.teams.microsoft.com).
 
-2.  Select **Meetings -\>** **Meeting** **policies**.
+#### MS.TEAMS.3.1v1, instructions:
+
+1.  Select **Meetings >** **Meeting** **policies**.
 
 3.  Select the **Global (Org-wide default)** policy.
 
-4.  Under the **Participants & guests** section**,** ensure
-    **Automatically admit people** is *not* set to **Everyone**.
+4.  Under the **Meeting join & lobby** section **,** ensure
+    **Who can bypass the lobby** is *not* set to **Everyone**.
 
-5.  In the same section, set **Dial-in users can bypass the lobby** to
+5.  In the same section, set **People dialing in can bypass the lobby** to
     **Off**.
 
-6.  If custom policies have been created, repeat these steps for each
-    policy, selecting the appropriate policy in step 3.
+#### MS.TEAMS.3.2v1, instructions:
+
+1.  Select **Meetings >** **Meeting** **policies**.
+
+3.  Select the **Global (Org-wide default)** policy.
+
+4.  Under the **Meeting join & lobby** section **,** ensure
+    **Who can bypass the lobby** is set to **People in my org**.
+
+5.  In the same section, set **People dialing in can bypass the lobby** to
+    **Off**.
+
+#### MS.TEAMS.3.3v1, instructions:
+
+1.  Select **Meetings >** **Meeting** **policies**.
+
+3.  Select the **Global (Org-wide default)** policy.
+
+4.  Under the **Meeting join & lobby** section **,** ensure
+    **Who can bypass the lobby** is set to **People in my org, trusted orgs, and guests**.
+
+5.  In the same section, set **People dialing in can bypass the lobby** to
+    **Off**.
 
 ## 4. External User Access
 
@@ -223,7 +238,7 @@ separately.
 ### Policies
 
 #### MS.TEAMS.4.1v1
-External access SHALL only be enabled on a per-domain basis.
+External access for users SHALL only be enabled on a per-domain basis.
 - _Rationale:_ TODO add rationale.
 - _Last modified:_ July 2023
 
@@ -250,7 +265,7 @@ To enable external access for only specific domains:
 1.  Sign in to the [**Microsoft Teams admin
     center**](https://admin.teams.microsoft.com).
 
-2.  Select **Users** -\> **External access**.
+2.  Select **Users** > **External access**.
 
 3.  Under **Choose which external domains your users have access to**,
     select **Allow only specific external domains**.
@@ -295,12 +310,28 @@ Docs](https://docs.microsoft.com/en-us/microsoftteams/manage-external-access#man
 
 Steps are outlined in [Manage contact with external Teams users not
 managed by an
-organization](https://docs.microsoft.com/en-us/microsoftteams/manage-external-access#manage-contact-with-external-teams-users-not-managed-by-an-organization).
+organization](https://docs.microsoft.com/en-us/microsoftteams/manage-external-access#manage-contact-with-external-teams-users-not-managed-by-an-organization). All of the settings in this section are configured in the [**Microsoft Teams admin center**](https://admin.teams.microsoft.com).
 
-1.  Sign in to the **[Microsoft Teams admin
-    center](https://admin.teams.microsoft.com).**
+#### MS.TEAMS.5.1v1, instructions:
 
-2.  Select **Users -\> External access.**
+1.  Select **Users > External access.**
+
+3.  To completely block contact with unmanaged users, under **Teams
+    accounts not managed by an organization**, set **People in my
+    organization can communicate with Teams users whose accounts aren't
+    managed by an organization** to **Off**.
+    
+4.  To allow contact with unmanaged users only if the internal user
+    initiates the contact:
+
+    1.  Under **Teams accounts not managed by an organization**, set **People in my organization can communicate with Teams users whose accounts aren't managed by an organization** to **On**.
+
+    2.  Clear the check next to **External users with Teams accounts not managed by an organization can contact users in my organization**.
+
+
+#### MS.TEAMS.5.2v1, instructions:
+
+1.  Select **Users > External access.**
 
 3.  To completely block contact with unmanaged users, under **Teams
     accounts not managed by an organization**, set **People in my
