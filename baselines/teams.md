@@ -511,7 +511,7 @@ N/A
 
 ## 9. Cloud Recording of Teams Meetings
 
-This section helps reduce security risks related to the cloud recording user permissions for Teams meetings. This setting determines whether video can be recorded in meetings hosted by a user, during one-on-one calls, and on group calls started by a user. Agencies should comply with any other applicable policies or legislation in addition to this guidance.
+This section helps reduce security risks related to the cloud recording user permissions for Teams meetings. These user permissions apply to meetings hosted by a user, during one-on-one calls, and on group calls started by a user. Agencies should comply with any other applicable policies or legislation in addition to this guidance.
 
 ### Policies
 
