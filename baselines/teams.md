@@ -315,14 +315,20 @@ organization](https://docs.microsoft.com/en-us/microsoftteams/manage-external-ac
     2.  Clear the check next to **External users with Teams accounts not managed by an organization can contact users in my organization**.
 
 ## 6. Skype Users
-Microsoft officially retired Skype for Business Online on July 31, 2021, and it is no longer supported. Skype for Business 2015 is slated for Apr 11, 2023 and Skype for Business Server 2015, 2016, 2019 LTSC and Server 2019 is slated for Oct 14, 2025.
+Microsoft is officially retiring Skype for Business Online and wants to ensure customers have the required information and resources to plan and execute a successful upgrade to Teams. Below are the decommissioning dates by product:
+- Skype for Business Online: Jul 31, 2021
+- Skype for Business 2015: Apr 11, 2023
+- Skype for Business 2016: Oct 14, 2025
+- Skype for Business 2019: Oct 14, 2025
+- Skype for Business Server 2015: Oct 14, 2025
+- Skype for Business Server 2019: Oct 14, 2025
+- Skype for Business LTSC 2021: Oct 13, 2026
 
 ### Policies
 
 #### MS.TEAMS.6.1v1
 Contact with Skype users SHALL be blocked.
-- _Rationale:_ Microsoft officially retired Skype for Business Online on July 31, 2021,
-and it is no longer supported.
+- _Rationale:_ The security risk of allowing contact with skype users is aligned with the risk of contact with a retiring product and its current vulnerabilities. Microsoft is officailly retiring all forms of Skype as listed above. Through blocking contact with skype users an agency is limiting acess to the multitude of seurity threats employing the vulnerabilities of the Skype product.
 - _Last modified:_ July 2023
 
 ### Resources
@@ -366,7 +372,7 @@ disabled.
 ### Policies
 #### MS.TEAMS.7.1v1
 Teams email integration SHALL be disabled.
-- _Rationale:_ TODO
+- _Rationale:_ The security risk with Team's email integration is due to the channel email addresses are not under the tenant’s domain, rather they are associated with the Microsoft-owned domain of "teams.ms". Due to the the email's assocaition with the Microsoft-owned domain, agencies do not have control over the security settings associated withthis email. For this reason, email channel integration should be disabled.
 - _Last modified:_ July 2023
 
 ### Resources
@@ -406,14 +412,16 @@ development, that users “sideload” into Teams.
 ### Policies
 
 #### MS.TEAMS.8.1v1
-Agencies SHOULD allow all apps published by Microsoft, but MAY block specific Microsoft apps as needed.
+Agencies SHOULD allow all apps published by Microsoft in the Global (org-wide default) meeting policy and all custom policies.
 - _Rationale:_ TODO
 - _Last modified:_ July 2023
+- _Note:_ Custom policies MAY be created to allow more flexibility for specific users.
 
 #### MS.TEAMS.8.2v1
-Agencies SHOULD NOT allow installation of all third-party apps or custom apps, but MAY allow specific apps as needed.
+Agencies SHOULD NOT allow installation of all third-party apps or custom apps in the Global (org-wide default) meeting policy and all custom policies.
 - _Rationale:_ TODO
 - _Last modified:_ July 2023
+- _Note:_ Custom policies MAY be created to allow more flexibility for specific users.
 
 #### MS.TEAMS.8.3v1
 Agencies SHALL establish policy dictating the app review and approval process to be used by the agency.
@@ -470,17 +478,13 @@ legislation in addition to this guidance.
 ### Policies
 
 #### MS.TEAMS.9.1v1
-Cloud video recording SHOULD be disabled in the global (org-wide default) meeting policy.
+Cloud video recording SHOULD be disabled in the Global (org-wide default) meeting policy and all custom policies.
 - _Rationale:_ TODO
 - _Last modified:_ July 2023
+- _Note:_ Custom policies MAY be created to allow more flexibility for specific users.
 
 #### MS.TEAMS.9.2v1
- Alternate meeting policies MAY be created that allow agency-approved users the ability to record.
-- _Rationale:_ TODO
-- _Last modified:_ July 2023
-
-#### MS.TEAMS.9.3v1
-For all meeting polices that allow cloud recording, recordings SHOULD be stored inside the country of that agencys tenant.
+For all meeting polices (Global (org-wide default) meeting policy and all custom policies) that allow cloud recording, recordings SHOULD be stored inside the country of that agencys tenant.
 - _Rationale:_ TODO
 - _Last modified:_ July 2023
 
@@ -511,6 +515,7 @@ To configure the Meeting policies for cloud video recording:
     recording** to **Off**.
 
 5.  Select **Save**.
+
 
 If there is a legitimate business need, *specific* users can be given
 permission to record meetings. To allow specific users the ability to
@@ -548,7 +553,7 @@ organizer’s discretion.
 
 ### Policies
 #### MS.TEAMS.10.1v1
-Record an event SHOULD be set to Organizer can record.
+Record an event SHOULD be set to Organizer can record Global (org-wide default) meeting policy and all custom policies.
 - _Rationale:_ TODO
 - _Last modified:_ July 2023
 
@@ -573,6 +578,9 @@ Docs](https://docs.microsoft.com/en-us/microsoftteams/teams-live-events/live-eve
 4.  Set **Record an event** to **Organizer can record**.
 
 5.  Click **Save**.
+
+6.  If custom policies have been created, repeat these steps for each
+    policy, selecting the appropriate policy in step 4.
 
 ## 11. Data Loss Prevention
 
