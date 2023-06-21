@@ -346,7 +346,8 @@ organization](https://docs.microsoft.com/en-us/microsoftteams/manage-external-ac
     2.  Clear the check next to **External users with Teams accounts not managed by an organization can contact users in my organization**.
 
 ## 6. Skype Users
-Microsoft is officially retiring Skype for Business Online and wants to ensure customers have the required information and resources to plan and execute a successful upgrade to Teams. Below are the decommissioning dates by product:
+
+This section helps reduce security risks related to contact with Skype users. As Microsoft is officially retiring Skype for Business Online and wants to ensure customers have the required information and resources to plan and execute a successful upgrade to Teams. Below are the decommissioning dates by product:
 - Skype for Business Online: Jul 31, 2021
 - Skype for Business 2015: Apr 11, 2023
 - Skype for Business 2016: Oct 14, 2025
@@ -391,14 +392,7 @@ All of the settings in this section are configured in the **Microsoft Teams admi
 4.  Click **Save**.
 
 ## 7. Teams Email Integration
-
-Teams provides an optional feature that allows channels to have an email
-address and receive email. These channel email addresses are not under
-the tenant’s domain; rather, they are associated with a Microsoft-owned
-domain, teams.ms. As such, although some basic checks are performed,
-agencies do not have control over the security settings associated with
-this email. For this reason, email channel integration should be
-disabled.
+This section helps reduce security risks related to teams email integration. Teams provides an optional feature that allows channels to have an email address and receive email.
 
 ### Policies
 #### MS.TEAMS.7.1v1
@@ -431,8 +425,7 @@ All of the settings in this section are configured in the **Microsoft Teams admi
     emails to a channel email address** to **Off**.
 
 ## 8. App Management
-
-Teams is capable of integrating with the following classes of apps:
+This section helps reduce security risks related to app integration with Microsoft Teams. Teams is capable of integrating with the following classes of apps:
 
 *Microsoft apps*: apps published by Microsoft.
 
@@ -519,10 +512,7 @@ N/A
 
 ## 9. Cloud Recording of Teams Meetings
 
-This setting determines whether video can be recorded in meetings hosted
-by a user, during one-on-one calls, and on group calls started by a
-user. Agencies should comply with any other applicable policies or
-legislation in addition to this guidance.
+This section helps reduce security risks related to the cloud recording user permissions for Teams meetings. This setting determines whether video can be recorded in meetings hosted by a user, during one-on-one calls, and on group calls started by a user. Agencies should comply with any other applicable policies or legislation in addition to this guidance.
 
 ### Policies
 
@@ -608,15 +598,12 @@ record meetings:
 5.  Select **Save**.
 
 ## 10. Recording of Live Events
-
-Live events are recorded by default. Agencies should increase their
-privacy by changing the policy so that events are only recorded at the
-organizer’s discretion.
+This section helps reduce security risks related to the recording user permissions for Live Events.
 
 ### Policies
 #### MS.TEAMS.10.1v1
 Record an event SHOULD be set to Organizer can record Global (org-wide default) meeting policy and all custom policies.
-- _Rationale:_ TODO
+- _Rationale:_ The security risk of the default settings for Live Events are that Live Events are avaialble to be recoreded by all participants by default. By limiting the recording permissions to only the organizer this minimizes the security risk to the organizer's discretion for these Live Events.
 - _Last modified:_ July 2023
 
 ### Resources
