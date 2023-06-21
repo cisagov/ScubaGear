@@ -70,10 +70,8 @@ guest users, unmanaged users and anonymous users.
 #### MS.TEAMS.1.1v1
 External participants SHOULD NOT be enabled to request control of shared desktops or windows in the Global (Org-wide default) meeting policy or in custom meeting policies if any exist.
 
-- _Rationale:_ While there is some inherent risk in granting an external participant
-control of a shared screen, legitimate use cases for this exist.
-Furthermore, the risk is minimal as users cannot gain control of another
-user’s screen unless the user giving control explicitly accepts a
+- _Rationale:_ There is some inherent risk in granting an external participant
+control of a shared screen. However, there are legitimate use cases to grant this control. Furthermore, the risk is minimal as users cannot gain control of another user’s screen unless the user giving control explicitly accepts a
 control request. As such, while enabling external participants to
 request control is discouraged, it may be done, depending on agency
 need.
@@ -89,7 +87,9 @@ need.
 - N/A
 
 ### Implementation
-
+All of the settings in this section are configured in the [**Microsoft Teams admin
+    center**](https://admin.teams.microsoft.com).
+#### MS.TEAMS.1.1v1, instructions:
 To ensure external participants do not have the ability to request
 control of the shared desktop or window in the meeting:
 
@@ -106,64 +106,31 @@ control of the shared desktop or window in the meeting:
 5.  If custom policies have been created, repeat these steps for each
     policy, selecting the appropriate policy in step 3.
 
-## 2. Starting Teams Meetings
-
-This setting controls which meeting participants can start a meeting. In
-this instance, the term “anonymous users” refers to any Teams users
-joining calls that are not authenticated through the agency’s tenant.
-
-### Policies
-
-#### MS.TEAMS.2.1v1
-Anonymous users SHALL NOT be enabled to start meetings in the Global (Org-wide default) meeting policy or in custom meeting policies if any exist.
-- _Rationale:_ TODO add rationale.
-- _Last modified:_ July 2023
-
-### Resources
-- [Meeting policy settings - Participants & guests \| Microsoft
-Docs](https://docs.microsoft.com/en-us/microsoftteams/meeting-policies-participants-and-guests)
-
-### License Requirements
-- N/A
-
-### Implementation
-To configure settings for anonymous users:
-
-1.  Sign in to the [**Microsoft Teams admin
-    center**](https://admin.teams.microsoft.com).
-
-2.  Select **Meetings >** **Meeting policies**.
-
-3.  Select the **Global (Org-wide default)** policy.
-
-4.  Under the **Meeting join & lobby** section **,** set **Anonymous users and dial-in callers can start a meeting** to **Off.**
-
-5.  If custom policies have been created, repeat these steps for each
-    policy, selecting the appropriate policy in step 3.
-
-## 3. Automatic Admittance into meetings
+## 2. Automatic Admittance into meetings
 This setting controls which meeting participants wait in the lobby
 before they are admitted to the meeting.
 
 ### Policies
 
-#### MS.TEAMS.3.1v1
+#### MS.TEAMS.2.1v1
 Anonymous users, including dial-in users, SHOULD NOT be admitted automatically in the Global (Org-wide default) meeting policy.
 - _Rationale:_ TODO add rationale.
 - _Last modified:_ July 2023
+- Custom meeting policies MAY be created that allow more flexibility for specific users.
 
-#### MS.TEAMS.3.2v1
+#### MS.TEAMS.2.2v1
 Internal users SHOULD be admitted automatically in the Global (Org-wide default) meeting policy.
 - _Rationale:_ TODO add rationale.
 - _Last modified:_ July 2023
+- Custom meeting policies MAY be created that allow more flexibility for specific users.
 
-#### MS.TEAMS.3.3v1
+#### MS.TEAMS.2.3v1
 B2B guest users MAY be admitted automatically in the Global (Org-wide default) meeting policy.
 - _Rationale:_ TODO add rationale.
 - _Last modified:_ July 2023
+- Custom meeting policies MAY be created that allow more flexibility for specific users.
 
 
-Note: Custom meeting policies MAY be created that allow more flexibility for specific users.
 
 
 ### Resources
@@ -177,9 +144,11 @@ Note: Custom meeting policies MAY be created that allow more flexibility for spe
 All of the settings in this section are configured in the [**Microsoft Teams admin
     center**](https://admin.teams.microsoft.com).
 
-#### MS.TEAMS.3.1v1, instructions:
+#### MS.TEAMS.2.1v1, instructions:
 
-1.  Select **Meetings >** **Meeting** **policies**.
+1.  Sign in to the [**Microsoft Teams admin
+    center**](https://admin.teams.microsoft.com).
+2.  Select **Meetings >** **Meeting** **policies**.
 
 3.  Select the **Global (Org-wide default)** policy.
 
@@ -189,9 +158,11 @@ All of the settings in this section are configured in the [**Microsoft Teams adm
 5.  In the same section, set **People dialing in can bypass the lobby** to
     **Off**.
 
-#### MS.TEAMS.3.2v1, instructions:
+#### MS.TEAMS.2.2v1, instructions:
 
-1.  Select **Meetings >** **Meeting** **policies**.
+1.  Sign in to the [**Microsoft Teams admin
+    center**](https://admin.teams.microsoft.com).
+2.  Select **Meetings >** **Meeting** **policies**.
 
 3.  Select the **Global (Org-wide default)** policy.
 
@@ -201,9 +172,11 @@ All of the settings in this section are configured in the [**Microsoft Teams adm
 5.  In the same section, set **People dialing in can bypass the lobby** to
     **Off**.
 
-#### MS.TEAMS.3.3v1, instructions:
+#### MS.TEAMS.2.3v1, instructions:
 
-1.  Select **Meetings >** **Meeting** **policies**.
+1.  Sign in to the [**Microsoft Teams admin
+    center**](https://admin.teams.microsoft.com).
+2.  Select **Meetings >** **Meeting** **policies**.
 
 3.  Select the **Global (Org-wide default)** policy.
 
@@ -212,6 +185,44 @@ All of the settings in this section are configured in the [**Microsoft Teams adm
 
 5.  In the same section, set **People dialing in can bypass the lobby** to
     **Off**.
+
+
+## 3. Starting Teams Meetings
+
+This setting controls which meeting participants can start a meeting. In
+this instance, the term “anonymous users” refers to any Teams users
+joining calls that are not authenticated through the agency’s tenant.
+
+### Policies
+
+#### MS.TEAMS.3.1v1
+Anonymous users SHALL NOT be enabled to start meetings in the Global (Org-wide default) meeting policy or in custom meeting policies if any exist.
+- _Rationale:_ For any agencies that implemented custom policies that provided more flexibility to some users to automatically admit "everyone" to a meeting - this policy provides protection from anonymous users starting meeting to scrape internal contacts. 
+- _Last modified:_ July 2023
+
+### Resources
+- [Meeting policy settings - Participants & guests \| Microsoft
+Docs](https://docs.microsoft.com/en-us/microsoftteams/meeting-policies-participants-and-guests)
+
+### License Requirements
+- N/A
+
+### Implementation
+All of the settings in this section are configured in the [**Microsoft Teams admin center**](https://admin.teams.microsoft.com). 
+#### MS.TEAMS.3.1v1, instructions:
+To configure settings for anonymous users:
+
+
+1.  Sign in to the [**Microsoft Teams admin
+    center**](https://admin.teams.microsoft.com).
+2.  Select **Meetings >** **Meeting policies**.
+
+3.  Select the **Global (Org-wide default)** policy.
+
+4.  Under the **Meeting join & lobby** section **,** set **Anonymous users and dial-in callers can start a meeting** to **Off.**
+
+5.  If custom policies have been created, repeat these steps for each
+    policy, selecting the appropriate policy in step 3.
 
 ## 4. External User Access
 
@@ -260,11 +271,13 @@ External access for users SHALL only be enabled on a per-domain basis.
 
 ### Implementation
 
+All of the settings in this section are configured in the [**Microsoft Teams admin
+    center**](https://admin.teams.microsoft.com). 
+#### MS.TEAMS.4.1v1, instructions:  
 To enable external access for only specific domains:
 
 1.  Sign in to the [**Microsoft Teams admin
     center**](https://admin.teams.microsoft.com).
-
 2.  Select **Users** > **External access**.
 
 3.  Under **Choose which external domains your users have access to**,
@@ -313,8 +326,10 @@ managed by an
 organization](https://docs.microsoft.com/en-us/microsoftteams/manage-external-access#manage-contact-with-external-teams-users-not-managed-by-an-organization). All of the settings in this section are configured in the [**Microsoft Teams admin center**](https://admin.teams.microsoft.com).
 
 #### MS.TEAMS.5.1v1, instructions:
-
-1.  Select **Users > External access.**
+    
+1.  Sign in to the [**Microsoft Teams admin
+    center**](https://admin.teams.microsoft.com).
+2.  Select **Users > External access.**
 
 3.  To completely block contact with unmanaged users, under **Teams
     accounts not managed by an organization**, set **People in my
@@ -330,20 +345,16 @@ organization](https://docs.microsoft.com/en-us/microsoftteams/manage-external-ac
 
 
 #### MS.TEAMS.5.2v1, instructions:
-
-1.  Select **Users > External access.**
+    
+1.  Sign in to the [**Microsoft Teams admin
+    center**](https://admin.teams.microsoft.com).
+2.  Select **Users > External access.**
 
 3.  To completely block contact with unmanaged users, under **Teams
     accounts not managed by an organization**, set **People in my
     organization can communicate with Teams users whose accounts aren't
     managed by an organization** to **Off**.
 
-4.  To allow contact with unmanaged users only if the internal user
-    initiates the contact:
-
-    1.  Under **Teams accounts not managed by an organization**, set **People in my organization can communicate with Teams users whose accounts aren't managed by an organization** to **On**.
-
-    2.  Clear the check next to **External users with Teams accounts not managed by an organization can contact users in my organization**.
 
 ## 6. Skype Users
 
@@ -384,7 +395,7 @@ All of the settings in this section are configured in the **Microsoft Teams admi
 1.  Sign in to the **[Microsoft Teams admin
     center](https://admin.teams.microsoft.com).**
 
-2.  Select **Users -\> External access.**
+2.  Select **Users > External access.**
 
 3.  Under **Skype** users, set **Allow users in my organization to
     communicate with Skype users** to **Off**.
@@ -419,7 +430,7 @@ All of the settings in this section are configured in the **Microsoft Teams admi
 1.  Sign in to the **[Microsoft Teams admin
     center](https://admin.teams.microsoft.com).**
 
-2.  Select **Teams** -\> **Teams Settings**.
+2.  Select **Teams** > **Teams Settings**.
 
 3.  Under the **Email integration** section, set **Allow users to send
     emails to a channel email address** to **Off**.
@@ -474,7 +485,7 @@ All of the settings in this section are configured in the **Microsoft Teams admi
 1.  Sign in to the **[Microsoft Teams admin
     center](https://admin.teams.microsoft.com).**
 
-2.  Select **Teams apps -**\> **Permission policies.**
+2.  Select **Teams apps** > **Permission policies.**
 
 3.  Select **Global (Org-wide default)**.
 
@@ -488,7 +499,7 @@ All of the settings in this section are configured in the **Microsoft Teams admi
 1.  Sign in to the **[Microsoft Teams admin
     center](https://admin.teams.microsoft.com).**
 
-2.  Select **Teams apps -**\> **Permission policies.**
+2.  Select **Teams apps** > **Permission policies.**
 
 3.  Select **Global (Org-wide default)**.
 
@@ -547,7 +558,7 @@ All of the settings in this section are configured in the **Microsoft Teams admi
 1.  Sign in to the **[Microsoft Teams admin
     center](https://admin.teams.microsoft.com).**
 
-2.  Select **Meetings** -\> **Meeting policies**.
+2.  Select **Meetings** > **Meeting policies**.
 
 3.  Select the **Global (Org-wide default)** policy.
 
@@ -564,7 +575,7 @@ record meetings:
 1.  Sign in to the **[Microsoft Teams admin
     center](https://admin.teams.microsoft.com).**
 
-2.  Select **Meetings** -\> **Meeting policies**.
+2.  Select **Meetings** > **Meeting policies**.
 
 3.  Create a new policy by selecting **Add**. Give this new policy a
     name and appropriate description.
@@ -587,7 +598,7 @@ record meetings:
 1.  Sign in to the **[Microsoft Teams admin
     center](https://admin.teams.microsoft.com).**
 
-2.  Select **Meetings** -\> **Meeting policies**.
+2.  Select **Meetings** > **Meeting policies**.
 
 3.  Select the **Global (Org-wide default)** policy.
    
@@ -624,7 +635,7 @@ All of the settings in this section are configured in the **Microsoft Teams admi
 1.  Sign in to the **[Microsoft Teams admin
     center](https://admin.teams.microsoft.com).**
 
-2.  Select **Meetings** -\> **Live events policies**.
+2.  Select **Meetings** > **Live events policies**.
 
 3.  Select **Global (Org-wide default)**.
 
