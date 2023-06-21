@@ -482,7 +482,7 @@ All of the settings in this section are configured in the **Microsoft Teams admi
 4.  Under **Microsoft apps**, select **Allow all apps**
 
 5.  If custom policies have been created, repeat these steps for each
-    policy, selecting the appropriate policy in step 4.
+    policy, selecting the appropriate policy in step 3.
 
 #### MS.TEAMS.8.2v1, instructions:
 
@@ -504,7 +504,7 @@ All of the settings in this section are configured in the **Microsoft Teams admi
 6.  Click **Save**.
 
 7.  If custom policies have been created, repeat these steps for each
-    policy, selecting the appropriate policy in step 4 & 5.
+    policy, selecting the appropriate policy in step 3.
 
 #### MS.TEAMS.8.3v1, instructions:
 
@@ -633,7 +633,7 @@ All of the settings in this section are configured in the **Microsoft Teams admi
 5.  Click **Save**.
 
 6.  If custom policies have been created, repeat these steps for each
-    policy, selecting the appropriate policy in step 4.
+    policy, selecting the appropriate policy in step 3.
 
 ## 11. Data Loss Prevention
 
