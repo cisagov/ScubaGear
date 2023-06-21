@@ -153,7 +153,7 @@ All the settings in this section are configured in the [**Microsoft Teams admin
 3.  Select the **Global (Org-wide default)** policy.
 
 4.  Under the **Meeting join & lobby** section **,** ensure
-    **Who can bypass the lobby** is *not* set to **Everyone**.
+    **Who can bypass the lobby** is *not* set to **Everyone**. Bypassing the lobby should be set to **People in my org**, though other options may be used if needed. 
 
 5.  In the same section, set **People dialing in can bypass the lobby** to
     **Off**.
