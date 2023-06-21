@@ -376,9 +376,9 @@ Blog](https://techcommunity.microsoft.com/t5/microsoft-teams-blog/skype-for-busi
 
 ### Implementation
 
-Instructions for *enabling* communications with Skype users are outlined
-in [Communicate with Skype
-users](https://docs.microsoft.com/en-us/microsoftteams/manage-external-access#communicate-with-skype-users).
+All of the settings in this section are configured in the **Microsoft Teams admin center**.
+
+#### MS.TEAMS.6.1v1, instructions:
 
 1.  Sign in to the **[Microsoft Teams admin
     center](https://admin.teams.microsoft.com).**
@@ -418,7 +418,9 @@ available in GCC or DoD tenants.
 
 ### Implementation
 
-To ensure that teams email integration is disabled:
+All of the settings in this section are configured in the **Microsoft Teams admin center**.
+
+#### MS.TEAMS.7.1v1, instructions:
 
 1.  Sign in to the **[Microsoft Teams admin
     center](https://admin.teams.microsoft.com).**
@@ -473,7 +475,9 @@ Docs](https://docs.microsoft.com/en-us/microsoftteams/platform/concepts/deploy-a
 
 ### Implementation
 
-To restrict which Team apps can be installed:
+All of the settings in this section are configured in the **Microsoft Teams admin center**.
+
+#### MS.TEAMS.8.1v1, instructions:
 
 1.  Sign in to the **[Microsoft Teams admin
     center](https://admin.teams.microsoft.com).**
@@ -482,22 +486,32 @@ To restrict which Team apps can be installed:
 
 3.  Select **Global (Org-wide default)**.
 
-4.  Under **Microsoft apps**, select **Allow all apps**, unless specific
-    apps need to be disallowed, in which case select **Block specific
-    apps and allow all others**.
+4.  Under **Microsoft apps**, select **Allow all apps**
 
-5.  Set **Third-party apps** to **Block all apps**, unless specific apps
+5.  If custom policies have been created, repeat these steps for each
+    policy, selecting the appropriate policy in step 4.
+
+#### MS.TEAMS.8.2v1, instructions:
+
+1.  Sign in to the **[Microsoft Teams admin
+    center](https://admin.teams.microsoft.com).**
+
+2.  Select **Teams apps -**\> **Permission policies.**
+
+3.  Select **Global (Org-wide default)**.
+
+4.  Set **Third-party apps** to **Block all apps**, unless specific apps
     have been approved by the agency, in which case select **Allow
     specific apps and block all others**.
 
-6.  Set **Custom apps** to **Block all apps**, unless specific apps have
+5.  Set **Custom apps** to **Block all apps**, unless specific apps have
     been approved by the agency, in which case select **Allow specific
     apps and block all others**.
 
-7.  Click **Save**.
+6.  Click **Save**.
 
-8.  If custom policies have been created, repeat these steps for each
-    policy, selecting the appropriate policy in step 3.
+7.  If custom policies have been created, repeat these steps for each
+    policy, selecting the appropriate policy in step 4 & 5.
 
 ## 9. Cloud Recording of Teams Meetings
 
@@ -533,7 +547,9 @@ Docs](https://docs.microsoft.com/en-us/microsoftteams/policy-assignment-overview
 
 ### Implementation
 
-To configure the Meeting policies for cloud video recording:
+All of the settings in this section are configured in the **Microsoft Teams admin center**.
+
+#### MS.TEAMS.9.1v1, instructions:
 
 1.  Sign in to the **[Microsoft Teams admin
     center](https://admin.teams.microsoft.com).**
@@ -576,6 +592,10 @@ record meetings:
 
 9.  Select **Apply**.
 
+#### MS.TEAMS.9.2v1, instructions:
+
+N/A
+
 ## 10. Recording of Live Events
 
 Live events are recorded by default. Agencies should increase their
@@ -598,6 +618,10 @@ Docs](https://docs.microsoft.com/en-us/microsoftteams/teams-live-events/live-eve
 - N/A
 
 ### Implementation
+
+All of the settings in this section are configured in the **Microsoft Teams admin center**.
+
+#### MS.TEAMS.10.1v1, instructions:
 
 1.  Sign in to the **[Microsoft Teams admin
     center](https://admin.teams.microsoft.com).**
