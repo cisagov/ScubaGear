@@ -4,39 +4,39 @@ The Microsoft Power Platform is a group of applications involving
 low-code application development, business intelligence, a custom chat
 bot creator, and app connectivity software. The following summarizes the
 Power Platform applications and other applications frequently used by
-Power Platform applications.
+Power Platform.
 
 **Power Apps**: This is a low-code application development software used
 to create custom business applications. The apps can be used as desktop,
 mobile, and web apps. Three different types of Power Apps can be
 created:
 
-1.  **Canvas Apps**: These are drag and drop style developed apps, where
+1.  [**Canvas Apps**](https://learn.microsoft.com/en-us/power-apps/maker/canvas-apps/): These are drag and drop style developed apps, where
     users drag and add User Interface (UI) components to the screen.
     Users can then connect the components to data sources to display
     data in the canvas app.
 
-2.  **Model-Driven Apps**: These apps are developed from an existing
+2.  [**Model-Driven Apps**](https://learn.microsoft.com/en-us/power-apps/maker/model-driven-apps/): These apps are developed from an existing
     data source. They can be thought of as the inverse of a Canvas App.
     For those familiar with the Model-View-Controller design pattern,
     Model-Driven apps revolve around building the view and controller on
     top of the model.
 
-3.  **Power Pages**: These apps that are created to function as either internal or external facing websites.
+3.  [**Power Pages**](https://learn.microsoft.com/en-us/power-pages/): These apps that are created to function as either internal or external facing websites.
 
-**Power Automate**: This is an online tool within the Microsoft 365
+[**Power Automate**](https://learn.microsoft.com/en-us/power-automate/): This is an online tool within the Microsoft 365
 applications and add-ins used to create automated workflows between apps
 and services to synchronize files, get notifications and collect data.
 
-**Power Virtual Agents**: These are custom chat bots for use in the
+[**Power Virtual Agents**](https://learn.microsoft.com/en-us/power-virtual-agents/): These are custom chat bots for use in the
 stand-alone Power Virtual Agents web app or in a Microsoft Teams
 channel.
 
-**Connectors**: These are a proxy or a wrapper around an API that allows
+[**Connectors**](https://learn.microsoft.com/en-us/connectors/connector-reference/): These are a proxy or a wrapper around an API that allows
 the underlying service to be accessed from Power Automate workflows, a
 Power App or Azure Logic Apps.
 
-**Microsoft Dataverse**: This is a cloud database management system most
+[**Microsoft Dataverse**](https://learn.microsoft.com/en-us/power-apps/maker/data-platform/): This is a cloud database management system most
 often used to store data in SQL-like tables. A Power App would then use
 a connector to connect to the Dataverse table and perform create, read,
 update and delete (CRUD) operations.
