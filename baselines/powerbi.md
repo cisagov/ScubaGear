@@ -104,13 +104,13 @@ tabular models.
 
 ### Policies
 #### MS.POWERBI.1.1v1
-External sharing SHOULD be disabled unless the agency mission requires the capability.
-- _Rationale:_ TODO
+Disable external sharing unless the agency mission requires the capability.
+- _Rationale:_ If this policy is not enabled there is a high likelyhood that someone outside the organization will get internal infromation. Enabling this policy disables that entirely.
 - _Last modified:_ June 2023
 
 #### MS.POWERBI.1.2v1
-If external sharing is deemed appropriate, the agency SHOULD limit the sharing ability to a security group.
-- _Rationale:_ TODO
+If external sharing is deemed appropriate, limit the sharing ability to a security group.
+- _Rationale:_ Without this policy then an external person could access everything within the organization. Using a security group will limit access and minimize risk. 
 - _Last modified:_ June 2023
 
 ### Resources
@@ -138,8 +138,8 @@ to the web.
 
 ### Policies
 #### MS.POWERBI.2.1v1
-The Publish to Web feature SHOULD be disabled unless the agency mission requires the capability.
-- _Rationale:_ TODO
+Disable the Publish to Web feature unless the agency mission requires the capability.
+- _Rationale:_ Having a publicly accessible web URL means there is no way to control who is viewing infromation. By following this policy there will be no information published to the public web.
 - _Last modified:_ June 2023
 
 ### Resources
@@ -195,8 +195,8 @@ consulted for additional guidance on managing guest users.
 
 ### Policies
 #### MS.POWERBI.3.1v1
-Guest user access to the Power BI tenant SHOULD be disabled unless the agency mission requires the capability.
-- _Rationale:_ TODO
+Disable guest user access to the Power BI tenant unless the agency mission requires the capability.
+- _Rationale:_ Allowing a guest user to use a system is a risk, as even though a guest user can have a limited experience it is sometimes not possible to limit them enough to provide ample security while also allowing them to do their necessary tasks. Implementing this policy follows zero trust principles and limits unauthorized access. 
 - _Last modified:_ June 2023
 
 ### Resources
@@ -240,8 +240,8 @@ on roles.
 
 ### Policies
 #### MS.POWERBI.4.1v1
-The **Invite external users to your organization** feature SHOULD be disabled unless agency mission requires the capability.
-- _Rationale:_ TODO
+Disable the **Invite external users to your organization** feature unless agency mission requires the capability.
+- _Rationale:_ Allowing guest users in general is a bad idea and can lead to unwanted access. Disabling this feature in PowerBI is just another way to avoid having a risky guest user in the organization.
 - _Last modified:_ June 2023
 
 ### Resources
@@ -275,8 +275,8 @@ entities to a security group.
 
 ### Policies
 #### MS.POWERBI.5.1v1
-The external editing capability SHOULD be disabled unless agency mission requires the capability.
-- _Rationale:_ TODO
+Disable the external editing capability unless agency mission requires the capability.
+- _Rationale:_ Guest users are a risk, but guest users that can edit are a threat to the integrity of internal information. Keeping guest users from editing will keep information safe from potentially harmful changes. 
 - _Last modified:_ June 2023
 
 ### Resources
@@ -339,14 +339,14 @@ permissions.
 
 ### Policies
 #### MS.POWERBI.6.1v1
-Service Principals SHOULD be allowed for Power BI where applicable.
-- _Rationale:_ TODO
+Allow Service Principals for Power BI where applicable.
+- _Rationale:_ Without Service Principles there is possibility of unwanted access to APIs. By using service principles where necessary, this will mitigate that risk.
 - _Last modified:_ June 2023
 
 #### MS.POWERBI.6.2v1
-Service Principal credentials used for encrypting or accessing Power BI SHALL NOT be stored in scripts or config files and SHALL be stored
+Do not store Service Principal credentials used for encrypting or accessing Power BI in scripts or config files but do store
   in a secure vault such as Azure Key Vault.
-- _Rationale:_ TODO
+- _Rationale:_ Credentials in scripts or config files are stored in plain text and can be read by anyone who has access to those files. By storing them in a Azure Key Vault only those with proper access can use and see the credentials. 
 - _Last modified:_ June 2023
 
 ### Resources
@@ -401,8 +401,8 @@ an exception to the policy can be investigated.
 
 ### Policies
 #### MS.POWERBI.7.1v1
-RourceKey Authentication SHOULD be blocked unless a specific use case (e.g., streaming and/or PUSH datasets) merits its use.
-- _Rationale:_ TODO
+Block ResourceKey Authentication unless a specific use case (e.g., streaming and/or PUSH datasets) merits its use. <!--- remove the examples in the policy statement? -->
+- _Rationale:_ By allwoing resource keys someone can move data without AAD OAuth bearer token, causing possibly malicious or junk data to be stored. By disabling this there is less risk that a unauthorized individual will make changes. 
 - _Last modified:_ June 2023
 
 ### Resources
@@ -430,8 +430,8 @@ and deems the scripts free of security risks.
 
 ### Policies
 #### MS.POWERBI.8.1v1
-R and Python interactions SHOULD be disabled.
-- _Rationale:_ TODO
+Disabl R and Python interactions.
+- _Rationale:_ External code poses a security and privacy risk as there is no good way to regulate what is done with the data or itegrations. Disabling this will reduce the risk of a data leak or malicious actor. 
 - _Last modified:_ June 2023
 
 ### Resources
@@ -462,8 +462,8 @@ DLP.
 
 ### Policies
 #### MS.POWERBI.9.1v1
-Sensitivity labels SHOULD be enabled for Power BI and employed for sensitive data per enterprise data protection policies.
-- _Rationale:_ TODO
+Enable sensitivity labels for Power BI and employed for sensitive data per enterprise data protection policies.
+- _Rationale:_ Without sensitivity labels it is possible for someone to open up a document unknowingly, potentially reading information they aren't supposed to access. This policy will help organize and classify data making it easier to keep data out of the wrong hands.   
 - _Last modified:_ June 2023
 
 ### Resources
@@ -517,8 +517,8 @@ tenant settings.
 
 ### Policies
 #### MS.POWERBI.10.1v1
-Power BI audit log generation SHALL be enabled in the Power BI tenant.
-- _Rationale:_ TODO
+Enable Power BI audit log generation in the Power BI tenant.
+- _Rationale:_ Without logging it is possible for a unwanted or malicious event to happen without any way of tracking it down. Audit logs will keep a record of what is happening making incident response simpler. 
 - _Last modified:_ June 2023
 
 ### Resources
