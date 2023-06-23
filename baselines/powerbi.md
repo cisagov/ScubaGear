@@ -122,6 +122,10 @@ If external sharing is deemed appropriate, limit the sharing ability to a securi
 
 - N/A
 
+### Implementation
+#### MS.POWERBI.1.1v1, instructions:
+**Tenant Settings** > **Export and sharing settings** > 
+
 ## 2. Publish to Web
 
 Power BI has a capability to publish reports and content to the web.
