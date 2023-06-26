@@ -227,7 +227,7 @@ blocked.
 - _Last modified:_ June 2023
 
 #### MS.DEFENDER.4.2v1
-The custom policy SHOULD be applied in Exchange, OneDrive, Teams Chat,
+The custom policy SHOULD be applied in Exchange, OneDrive, SharePoint, Teams chat,
 and Devices.
 - _Rationale:_ Unauthorized disclosures may happen through Microsoft 365
                services or endpoint devices.  Data loss prevention
@@ -369,8 +369,8 @@ MS.DEFENDER.4.2v1 implementation:
    Locations page.
 
 6. Under **Choose locations to apply the policy**, ensure **Status** is set
-   to **On** for at least the Exchange email, OneDrive accounts, Teams chat
-   and channel messages, and Devices.
+   to **On** for at least the Exchange email, OneDrive accounts, SharePoint
+   sites, Teams chat and channel messages, and Devices.
 
 7. Click **Next** on each page until reaching the
    **Review your policy and create it** page.
