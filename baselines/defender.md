@@ -204,40 +204,69 @@ Docs](https://docs.microsoft.com/en-us/microsoft-365/security/office-365-securit
 
 ## 4. Data Loss Prevention
 
-There are multiple, different ways to secure sensitive information, such
+There are several approaches to secure sensitive information, such
 as warning users, encryption, or blocking attempts to share. The
 agency’s data loss prevention (DLP) policy will dictate what agency
-information is sensitive and how that information is handled.
+information is sensitive and how that information is handled.  Defender
+can detect sensitive information and associates a default confidence
+level with this detection based on the sensitive information type
+matched.  Confidence levels are used to reduce false positives in
+detecting access to sensitive information.  Agencies may choose to use
+the default confidence levels or adjust the levels in custom DLP policies
+to fit their environment and needs.
 
 ### Policies
 #### MS.DEFENDER.4.1v1
-A custom policy SHALL be configured to protect PII and sensitive information, as defined by the agency. At a minimum, credit card numbers, Taxpayer Identification Numbers (TIN), and Social Security Numbers (SSN) SHALL be blocked.
- - _Rationale:_ TODO
+A custom policy SHALL be configured to protect PII and sensitive information,
+as defined by the agency. At a minimum, credit card numbers, Taxpayer
+Identification Numbers (TIN), and Social Security Numbers (SSN) SHALL be
+blocked.
+ - _Rationale:_ Users may inadvertently share sensitive information with
+                others who should not have access to it.  Data loss prevention policies provide a way for agencies to detect
+                and prevent unauthorized disclosures.
 - _Last modified:_ June 2023
 
 #### MS.DEFENDER.4.2v1
-The custom policy SHOULD be applied in Exchange, OneDrive, Teams Chat, and Microsoft Defender.
-- _Rationale:_ TODO
+The custom policy SHOULD be applied in Exchange, OneDrive, Teams Chat,
+and Devices.
+- _Rationale:_ Unauthorized disclosures may happen through Microsoft 365
+               services or endpoint devices.  Data loss prevention
+               policies should cover all affected locations to be
+               effective.
 - _Last modified:_ June 2023
 
 #### MS.DEFENDER.4.3v1
 The action for the DLP policy SHOULD be set to block sharing sensitive information with everyone when DLP conditions are met.
-- _Rationale:_ TODO
+- _Rationale:_ Access to sensitive information should be prohibited unless
+               explicitly allowed.  Specific exemptions can be made based
+               on agency policies and valid business justifications.
 - _Last modified:_ June 2023
 
 #### MS.DEFENDER.4.4v1
 Notifications to inform users and help educate them on the proper use of sensitive information SHOULD be enabled.
-- _Rationale:_ TODO
+- _Rationale:_ Some users may not be aware of agency policies on the
+               proper use of sensitive information.  Enabling
+               notifications provides positive feedback to users when
+               accessing sensitive information.
 - _Last modified:_ June 2023
 
 #### MS.DEFENDER.4.5v1
-A list of apps that are not allowed to access files protected by DLP policy SHOULD be defined.
-- _Rationale:_ TODO
+A list of apps that are restricted when accessing files protected by DLP policy SHOULD be defined.
+- _Rationale:_ Some applications may inappropriately share accessed files
+               or not conform to agency policies for access to sensitive
+               information.  Defining a list of those apps makes it
+               possible to use DLP policies to restrict those apps access
+               to sensitive information on endpoints using Defender.
 - _Last modified:_ June 2023
 
 #### MS.DEFENDER.4.6v1
-A list of browsers that are not allowed to access files protected by DLP policy SHOULD be defined.
-- _Rationale:_ TODO
+The custom policy SHOULD include an action to block access to sensitive
+information by restricted apps and unwanted bluetooth applications.
+- _Rationale:_ Some applications may inappropriately share accessed files
+               or not conform to agency policies for access to sensitive
+               information.  Defining a DLP policy with an action to block
+               access from restricted apps and unwanted bluetooth applications prevents unauthorized disclosure by those
+               programs.
 - _Last modified:_ June 2023
 
 ### Resources
@@ -269,55 +298,54 @@ A list of browsers that are not allowed to access files protected by DLP policy 
 
 ### Implementation
 
-1.  Sign in to the [Microsoft 365
-    compliance](https://compliance.microsoft.com) admin center.
+MS.DEFENDER.4.1v1 implementation:
 
-2.  Under **Solutions**, select **Data loss prevention**.
+1. Sign in to the [Microsoft 365
+   compliance](https://compliance.microsoft.com) admin center.
 
-3.  Select **Policies** from the top of the page.
+2. Under **Solutions**, select **Data loss prevention**.
 
-4.  Select **Default Office 365 DLP policy**.
+3. Select **Policies** from the top of the page.
 
-5.  Select **Edit policy**.
+4. Select **Default Office 365 DLP policy**.
 
-6.  Edit the name and description of the policy if desired, then click
-    **Next**.
+5. Select **Copy policy**.
 
-7.  Under **Locations to apply the policy**, set **Status** to **On**
-    for all products except Power BI (preview).
+6. Edit the name and description of the policy if desired, then click
+   **Next**.
 
-8.  Click **Create rule**. Assign the rule an appropriate name and
-    description.
+7. Under **Assign admin units**, select **Full directory**, then click
+   **Next**.
 
-9.  Click **Add condition**, then **Content contains**.
+8. Under **Choose Locations to apply the policy**, set **Status** to **On**
+   for all products except Power BI and Microsoft Defender for Cloud
+   Apps.
 
-10. Click **Add**, then **Sensitive info types**.
+9. Click **Create rule**. Assign the rule an appropriate name and
+   description.
 
-11. Create policies that protect information that is sensitive to the
+10. Click **Add condition**, then **Content contains**.
+
+11. Click **Add**, then **Sensitive info types**.
+
+12. Add info types that protect information that is sensitive to the
     agency. At a minimum, the agency should protect:
 
-  - Credit card numbers
+    - Credit card numbers
+    - U.S. Individual Taxpayer Identification Numbers (TIN)
+    - U.S. Social Security Numbers (SSN)
+    - All agency defined PII and sensitive information
 
-  - U.S. Individual Taxpayer Identification Numbers (TIN)
+13. Click **Add**.
 
-  - U.S. Social Security Numbers (SSN)
-
-  - All agency defined PII and sensitive information
-
-12. Click **Add**.
-
-13. Under **Actions**, click **Add an action**.
-
-14. Click **Restrict access of encrypt the content in Microsoft 365
-    locations**.
+14. Under **Actions**, click **Add an action**.
 
 15. Check **Restrict Access or encrypt the content in Microsoft 365
     locations**.
 
 16. Select **Block Everyone**.
 
-17. Turn on **Use notifications to inform your users and help educate
-    them on the proper use of sensitive info**.
+17. Turn on **Use notifications to inform your users and help educate them on the proper use of sensitive info**.
 
 18. Click **Save**, then **Next**.
 
@@ -325,27 +353,146 @@ A list of browsers that are not allowed to access files protected by DLP policy 
 
 20. Click **Submit**.
 
-21. Go to **Endpoint DLP Settings.**
+MS.DEFENDER.4.2v1 implementation:
 
-  1.  Go to **Unallowed Apps.**
+1. Sign in to the [Microsoft 365
+   compliance](https://compliance.microsoft.com) admin center.
 
-  2.  Click **Add** or **Edit Unallowed Apps.**
+2. Under **Solutions**, select **Data loss prevention**.
 
-  3.  Enter an app and executable name to disallow said app from accessing
-    protected files and to log the incident.
+3. Select **Policies** from the top of the page.
 
-  4.  Return and click **Unallowed Bluetooth Apps**.
+4. Find the relevant DLP policy in the list and click the Policy name to select.
+   Select **Edit Policy**.
 
-  5.  Enter an app and executable name to disallow said app from accessing
-    protected files and to log the incident.
+5. Click **Next** on each page in the policy wizard until you reach the
+   Locations page.
 
-  6.  Return and click **Browser and domain restrictions to sensitive
-    data**.
+6. Under **Choose locations to apply the policy**, ensure **Status** is set
+   to **On** for at least the Exchange email, OneDrive accounts, Teams chat
+   and channel messages, and Devices.
 
-  7.  Under **Unallowed Browsers**, enter and select needed browsers to
-    prevent that browser from accessing protected files.
+7. Click **Next** on each page until reaching the
+   **Review your policy and create it** page.
 
-  8.  Switch **Always audit file activity for devices** to **ON**.
+8. Review the policy locations listed and click **Submit**.
+
+MS.DEFENDER.4.3v1 implementation:
+
+1. Sign in to the [Microsoft 365
+   compliance](https://compliance.microsoft.com) admin center.
+
+2. Under **Solutions**, select **Data loss prevention**.
+
+3. Select **Policies** from the top of the page.
+
+4. Select the relevant custom policy and select **Edit policy**.
+
+5. Click **Next** on each page in the policy wizard until you reach the
+   Advanced DLP rules page.
+
+6. Select the relevant rule and click the pencil icon to edit it.
+
+7. Under **Actions**, click **Add an action**.
+
+8. Select **Restrict Access or encrypt the content in Microsoft 365
+   locations**.
+
+9. Select **Block Everyone**.
+
+10. Click **Save** to save the changes.
+
+11. Click **Next** on each page until reaching the
+    **Review your policy and create it** page.
+
+12. Review the policy and click **Submit** to complete the policy changes.
+
+MS.DEFENDER.4.4v1 implementation:
+
+1. Sign in to the [Microsoft 365
+   compliance](https://compliance.microsoft.com) admin center.
+
+2. Under **Solutions**, select **Data loss prevention**.
+
+3. Select **Policies** from the top of the page.
+
+4. Select the relevant custom policy and select **Edit policy**.
+
+5. Click **Next** on each page in the policy wizard until you reach the
+   Advanced DLP rules page.
+
+6. Select the relevant rule and click the pencil icon to edit it.
+
+7. Under **User notifications**, toggle **Turn on Use notifications to inform
+   your users and help educate them on the proper use of sensitive info.**
+   to **On**.
+
+8. Click **Save** to save the changes.
+
+9. Click **Next** on each page until reaching the
+  **Review your policy and create it** page.
+
+10. Review the policy and click **Submit** to complete the policy changes.
+
+MS.DEFENDER.4.5v1 implementation:
+
+1. Sign in to the [Microsoft 365
+   compliance](https://compliance.microsoft.com) admin center.
+
+2. Under **Solutions**, select **Data loss prevention**.
+  
+3. Go to **Endpoint DLP Settings**.
+
+4. Go to **Restricted apps and app groups**.
+
+5. Click **Add or edit Restricted Apps**.
+
+6. Enter an app and executable name to disallow said app from
+   accessing protected files and to log the incident.
+
+7. Return and click **Unallowed Bluetooth apps**.
+
+8. Click **Add or edit unallowed Bluetooth apps**.
+
+9. Enter an app and executable name to disallow said app from
+   accessing protected files and to log the incident.
+
+MS.DEFENDER.4.6v1 implementation:
+
+1. Sign in to the [Microsoft 365
+   compliance](https://compliance.microsoft.com) admin center.
+
+2. Under **Solutions**, select **Data loss prevention**.
+
+3. Select **Policies** from the top of the page.
+
+4. Find the relevant DLP policy in the list and click the Policy name to select.
+   Select **Edit Policy**.
+
+5. Click **Next** on each page in the policy wizard until you reach the
+   Advanced DLP rules page.
+
+6. Select the relevant rule and click the pencil icon to edit it.
+
+7. Under **Actions**, click **Add an action**.
+
+8. Choose **Audit or restrict activities on device**
+
+9. Under **File activities for all apps**, select
+   **Apply restrictions to specific activity**.
+
+10. Check the box next to **Copy or move using unallowed Bluetooth app**
+    and set its action to **Block**.
+
+11. Under **Restricted app activities** , check the **Access by restricted apps** box
+   and set the action drop-down to **Block**.
+
+12. Click **Save** to save the changes.
+
+13. Click **Next** on each page until reaching the
+    **Review your policy and create it** page.
+
+14. Review the policy and click **Submit** to complete the policy changes.
 
 ## 5. Alerts
 
