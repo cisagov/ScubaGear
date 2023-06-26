@@ -115,7 +115,7 @@ The ability to create trial environments SHALL be restricted to admins.
 
 ### Implementation
 
-#### MS.POWERPLATFORM.1.1v1
+#### MS.POWERPLATFORM.1.1v1 instructions:
 1.  Sign in your tenant environment's respective [Power Platform admin
     center](https://learn.microsoft.com/en-us/power-platform/admin/powerapps-us-government#power-apps-us-government-service-urls).
 
@@ -127,12 +127,12 @@ The ability to create trial environments SHALL be restricted to admins.
 4.  Under **Who can create production and sandbox environments**, select
     **Only specific admins.**
 
-#### MS.POWERPLATFORM.1.2v1
+#### MS.POWERPLATFORM.1.2v1 instructions:
 1.  Follow the instructions in the previous policy up to step **3**.
 
 2.  Under **Who can create trial environments**, select **Only specific admins.**
 
-## 2. Data Loss Prevention Policies
+## 2. Power Platform Data Loss Prevention Policies
 
 To secure Power Platform environments Data Loss Prevention (DLP)
 policies can be created to restrict the connectors that can be used with
