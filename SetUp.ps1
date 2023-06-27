@@ -77,7 +77,7 @@ foreach ($Module in $ModuleList) {
         $LatestVersion = (Find-Module -Name $ModuleName).Version
 
         if ($HighestInstalledVersion -ge $LatestVersion) {
-            Write-Debug "${ModuleName}:${HighestInstalledVersion} already has latest installed."
+            Write-Debug "${ModuleName}: v${HighestInstalledVersion}, already has latest installed."
 
             if ($Force -eq $true) {
                 Install-Module -Name $ModuleName `
@@ -85,7 +85,7 @@ foreach ($Module in $ModuleList) {
                     -AllowClobber `
                     -Scope CurrentUser `
                     -MaximumVersion $Module.MaximumVersion
-                Write-Information -MessageData "Re-installing module to latest acceptable version: ${ModuleName}"
+                Write-Information -MessageData "TASK: Re-installing module to latest acceptable version: ${ModuleName}"
             }
         }
         else {
@@ -99,7 +99,7 @@ foreach ($Module in $ModuleList) {
                     -Scope CurrentUser `
                     -MaximumVersion $Module.MaximumVersion
                 $MaxInstalledVersion = (Get-Module -ListAvailable -Name $ModuleName | Sort-Object Version -Descending | Select-Object Version -First 1).Version
-                Write-Information -MessageData " ${ModuleName}:${HighestInstalledVersion} updated to version ${MaxInstalledVersion}."
+                Write-Information -MessageData "TASK: ${ModuleName}:${HighestInstalledVersion} updated to version ${MaxInstalledVersion}."
             }
         }
     }
