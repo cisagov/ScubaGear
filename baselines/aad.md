@@ -253,7 +253,9 @@ Managed Devices SHOULD be required to register MFA.
 
 #### MS.AAD.3.1v1, instructions:
 
-1. Create a conditional access policy that enforces phishing-resistant MFA for all users. Follow the conditional access policy template below:
+1. Create a conditional access policy that enforces phishing-resistant MFA for all users. 
+
+Follow the conditional access policy template below:
 
     Users > Include > All users
 
@@ -263,7 +265,9 @@ Managed Devices SHOULD be required to register MFA.
 
 #### MS.AAD.3.2v1, instructions:
 
-1. If Phishing-resistant MFA has not been enforced for all users yet, create a conditional access policy that enforces MFA but does not dictate the MFA method. Follow the conditional access policy template below.
+1. If Phishing-resistant MFA has not been enforced for all users yet, create a conditional access policy that enforces MFA but does not dictate the MFA method. 
+
+Follow the conditional access policy template below.
 
     Users > Include > All users
 
@@ -274,7 +278,7 @@ Managed Devices SHOULD be required to register MFA.
 #### MS.AAD.3.3v1, instructions:
 If Phishing-resistant MFA has not been deployed yet and Microsoft Authenticator is in use, configure Authenticator to display context information to users when they login.
 
-1. In the Azure portal, click **Security > Authentication methods > Microsoft Authenticator**.
+1. In **Azure Active Directory**, click **Security > Authentication methods > Microsoft Authenticator**.
 2. Click the **Configure** tab.
 3. For **Allow use of Microsoft Authenticator OTP** select *No*.
 4. Under **Show application name in push and passwordless notifications** select **Status > Enabled** and **Target > Include > All users**.
@@ -287,12 +291,14 @@ If Phishing-resistant MFA has not been deployed yet and Microsoft Authenticator 
 2. Once ready to finish the migration, follow [these instructions ](https://learn.microsoft.com/en-us/azure/active-directory/authentication/how-to-authentication-methods-manage#finish-the-migration) and set the **Manage Migration** option to **Migration Complete**.
 
 #### MS.AAD.3.5v1, instructions:
-1. In the Azure portal, click **Security > Authentication methods**
+1. In **Azure Active Directory**, click **Security > Authentication methods**
 2. Click on the **SMS**, **Voice Call**, and **Email OTP** authentication methods and disable each of them. Their statuses should be **Enabled > No** on the **Authentication methods > Policies** page.
 
 #### MS.AAD.3.6v1, instructions:
 
-1. Create a conditional access policy that enforces phishing-resistant MFA for highly privileged roles. Follow the conditional access policy template below:
+1. Create a conditional access policy that enforces phishing-resistant MFA for highly privileged roles. 
+
+Follow the conditional access policy template below:
 
     Users > Include > Select users and groups > Directory roles > select each of the roles listed in the Highly Privileged Roles section at the top of this document
 
@@ -303,7 +309,9 @@ If Phishing-resistant MFA has not been deployed yet and Microsoft Authenticator 
 #### MS.AAD.3.7v1, instructions:
 
 1. Create a conditional access policy that requires a user's device to be
-either hybrid Azure AD joined or compliant during authentication. Follow the conditional access policy template below.
+either hybrid Azure AD joined or compliant during authentication. 
+
+Follow the conditional access policy template below.
 
     Users > Include > All users
 
@@ -313,25 +321,28 @@ either hybrid Azure AD joined or compliant during authentication. Follow the con
 
 #### MS.AAD.3.8v1, instructions:
 
-1. Create a conditional access policy that requires a user to be on a managed device when registering for MFA. Follow the conditional access policy template below.
+1. Create a conditional access policy that requires a user to be on a managed device when registering for MFA. 
+
+Follow the conditional access policy template below.
 
     Users > Include > All users
 
     Target resources > User actions > Register security information
     
     Access controls > Grant > Grant Access > "Require device to be marked as compliant" and "Require Hybrid Azure AD joined device" > Require one of the selected controls
+
 ## 4. Centralized Log Collection
 
 This section provides policies that help reduce security risks related to  the lack of security logs which hampers security visibility.
 
 ### Policies
 #### MS.AAD.4.1v1
-Security logs SHALL be sent to the agency's SOC for monitoring.
+Security logs SHALL be sent to the agency's Security Operations Center for monitoring.
 
 - _Rationale:_ The security risk of not having visibility into cyber attacks is reduced by collecting the logs into the agency's centralized security detection infrastructure. Thus security events can be audited,  queried and available for incident response. 
 - _Last modified:_ June 2023
-- _Scope:_ The following logs (configured in Azure AD diagnostic settings), are required: AuditLogs, SignInLogs, RiskyUsers, UserRiskEvents, NonInteractiveUserSignInLogs, ServicePrincipalSignInLogs, ADFSSignInLogs, RiskyServicePrincipals, ServicePrincipalRiskEvents. If managed identities are used for Azure resources, also send the ManagedIdentitySignInLogs log type. If the Azure AD Provisioning Service is used to provision users to SaaS apps or other systems, also send the ProvisioningLogs log type.
-- Federal Agencies:_ It is also recommended to send the logs to the CISA CLAW system so that agencies can benefit from the security detection capabilities offered there. Contact CISA to request integration instructions.
+- _Scope:_ The following logs (configured in Azure AD diagnostic settings), are required: AuditLogs, SignInLogs, RiskyUsers, UserRiskEvents, NonInteractiveUserSignInLogs, ServicePrincipalSignInLogs, ADFSSignInLogs, RiskyServicePrincipals, ServicePrincipalRiskEvents, EnrichedOffice365AuditLogs, MicrosoftGraphActivityLogs. If managed identities are used for Azure resources, also send the ManagedIdentitySignInLogs log type. If the Azure AD Provisioning Service is used to provision users to SaaS apps or other systems, also send the ProvisioningLogs log type.
+- _Federal Agencies:_ It is also recommended to send the logs to the CISA CLAW system so that agencies can benefit from the security detection capabilities offered there. Contact CISA to request integration instructions.
 
 ### Resources
 
@@ -347,7 +358,7 @@ Security logs SHALL be sent to the agency's SOC for monitoring.
 
 ### License Requirements
 
-- N/A
+- An Azure subscription is required to send the logs to an external system such as the agency's SIEM.
 
 ### Implementation
 
@@ -414,49 +425,48 @@ Group owners SHALL NOT be allowed to consent to applications.
 ### Implementation
 
 #### MS.AAD.5.1v1, instructions:
-#### MS.AAD.5.1v2, instructions:
-#### MS.AAD.5.1v3, instructions:
-#### MS.AAD.5.1v4, instructions:
 
-1.  In the **Azure Portal**, navigate to **Azure Active Directory.**
+1.  In **Azure Active Directory**, under **Manage**, select **Users**.
 
-2. Under **Manage**, select **Users**.
+2. Select **User settings**.
 
-3. Select **User settings**.
+3. For **Users can register applications**, select **No.**
 
-4. Under **App Registrations** -\> **Users can register applications**,
-    select **No.**
+4. Click **Save**.
 
-5. Click **Save**.
+#### MS.AAD.5.2v1, instructions:
 
-1.  In the **Azure Portal**, navigate to **Azure Active Directory.**
+1.  In **Azure Active Directory** under **Manage**, select **Enterprise Applications.**
 
-2. Create a new Azure AD Group that contains admin users responsible
-    for reviewing and adjudicating app requests.
+2. Under **Security**, select **Consent and permissions.**
 
-3. Under **Manage**, select **Enterprise Applications.**
+3. Under **User consent for applications**, select **Do not allow user consent.**
 
-4. Under **Security**, select **Consent and permissions.**
+4. Click **Save**.
 
-5. Under **User consent for applications**, select **Do not allow user
-    consent.**
+#### MS.AAD.5.3v1, instructions:
 
-6. Under **Group owner consent for apps accessing data**, select **Do
-    not allow group owner consent.**
+1.  In **Azure Active Directory** create a new Azure AD Group that contains admin users responsible for reviewing and adjudicating application consent requests. Users in this group will be notified when users request consent for new applications.
 
-7. Click **Save**
+2. Then in **Azure Active Directory** under **Manage**, select **Enterprise Applications.**
 
-8. Navigate to the Admin consent settings page.
+3. Select **Admin consent settings**.
 
-9. Under **Admin consent requests** -> **Users can request admin consent to apps
-they are unable to consent to**, select **Yes**.
+4. Under **Admin consent requests** > **Users can request admin consent to apps they are unable to consent to**, select **Yes**.
 
-10. Under **Who can review admin consent requests**, select the group
-    created in step two that is responsible for reviewing and
-    adjudicating app requests.
+5. Under **Who can review admin consent requests**, select the group created in step 1 that is responsible for reviewing and adjudicating app requests.
 
-11. Click **Save**
+6. Click **Save**.
 
+#### MS.AAD.5.4v1, instructions:
+
+1.  In **Azure Active Directory** under **Manage**, select **Enterprise Applications.**
+
+2. Under **Security**, select **Consent and permissions.**
+
+3. Under **Group owner consent for apps accessing data**, select **Do not allow group owner consent.**
+
+4. Click **Save**.
 
 ## 6. Passwords
 
@@ -489,9 +499,7 @@ User passwords SHALL NOT expire.
 
 #### MS.AAD.6.1v1, instructions:
 
-[Follow the instructions at this
-link](https://docs.microsoft.com/en-us/microsoft-365/admin/manage/set-password-expiration-policy?view=o365-worldwide#set-password-expiration-policy)
-to configure the password expiration policy.
+1. [Follow the instructions at this link](https://docs.microsoft.com/en-us/microsoft-365/admin/manage/set-password-expiration-policy?view=o365-worldwide#set-password-expiration-policy) and configure the **Password expiration policy** to **Set passwords to never expire**.
 
 ## 7. Highly Privileged User Access
 
@@ -520,13 +528,13 @@ Privileged users SHALL be provisioned cloud-only accounts that are separate from
 #### MS.AAD.7.4v1
 Permanent active role assignments SHALL NOT be allowed for highly privileged roles except for emergency and service accounts.
 
-- _Rationale:_ Instead of giving users permanent assignments to privileges roles, provisioning access "just in time" lessens the exposure period if those accounts become compromised. In AAD PIM or an alternative PAM system, just in time access can be provisioned by assigning users to roles as "eligible" instead of perpetually "active".
+- _Rationale:_ Instead of giving users permanent assignments to privileged roles, provisioning access "just in time" lessens the exposure period if those accounts become compromised. In AAD PIM or an alternative PAM system, just in time access can be provisioned by assigning users to roles as "eligible" instead of perpetually "active".
 - _Last modified:_ June 2023
 - _Note:_ There are a couple of exceptions to this policy. Emergency access accounts need perpetual access to the tenant in the rare event of system degredation or other scenarios. Some types of service accounts require a user account with privileged roles and since those are software they cannot perform role activation.
 
 #### MS.AAD.7.5v1
 Provisioning users to highly privileged roles SHALL NOT occur outside of a PAM system, because this bypasses critical controls the PAM system provides.
-- _Rationale:_ By provisioning users to privileged roles within a PAM system, numerous privileges access policies and monitoring can be enforced. If privileged users are assigned directly to roles in the M365 admin center or via Powershell outside of the context of a PAM system, a significant set of critical security capabilities are bypassed.
+- _Rationale:_ By provisioning users to privileged roles within a PAM system, numerous privileged access policies and monitoring can be enforced. If privileged users are assigned directly to roles in the M365 admin center or via Powershell outside of the context of a PAM system, a significant set of critical security capabilities are bypassed.
 - _Last modified:_ June 2023
 
 #### MS.AAD.7.6v1
@@ -574,194 +582,156 @@ User activation of other highly privileged roles SHOULD trigger an alert.
 
 ### Implementation
 
-- _Note:_ Any steps in the following implementation instructions that reference the AAD PIM service will vary if using a third-party PAM system instead.
+- _Note:_ Steps in the following implementation instructions that reference the AAD PIM service will vary if using a third-party PAM system instead.
 
 - _Future revisions:_ Some of the implementation instructions associated with this group of policies may be revised in the next release to incorporate functionality provided by the the AAD PIM for Groups feature.
 
 #### MS.AAD.7.1v1, instructions:
 
-1.  In the **Azure Portal**, navigate to **Azure Active Directory.**
+1. In **Azure Active Directory** select **Roles and administrators.**
 
-2. Select **Roles and administrators.**
+2. Select the **Global administrator role.**
 
-3. Select the **Global administrator role.**
+3. Under **Manage**, select **Assignments.**
 
-4. Under **Manage**, select **Assignments.**
+4. Validate that between two to eight users are listed.
 
-5. Validate that between two to eight users are listed.
-
-6.  For those who have Azure AD PIM, they will need to check both the
-    **Eligible assignments** and **Active assignments** tabs. There
-    should be a total of two to eight users across both of these tabs
-    (not individually).
-
-7.  If any groups are listed, need to check how many users are members
-    of each group and include that in the total count.
+5.  If you have AAD PIM, count the number of users in both the **Eligible assignments** and **Active assignments** tabs. There should be a total of two to eight users across both of these tabs (not individually). Do not count the same username twice. If any groups are listed, count the number of users that are members of the group and include it in the total count.
 
 #### MS.AAD.7.2v1, instructions:
 
-1.  In the **Azure Portal**, navigate to **Azure Active Directory.**
+1.  In **Azure Active Directory** select **Security.**
 
-2.  Select **Security.**
+2.  Under **Manage**, select **Identity Secure Score.**
 
-3.  Under **Manage**, select **Identity Secure Score.**
+3.  Click the **Columns** button and select all the available columns and click **Apply.**
 
-4.  Click the **Columns** button and ensure that all the available
-    columns are selected to display and click **Apply.**
+4.  Review the score for the action named **Use least privileged administrative roles.**
 
-5.  Review the score for the action named **Use least privileged administrative roles.**
-
-6.  Ensure that the maximum score was achieved, and that the status is
-    **Completed.**
-
-7.  If the maximum score was not achieved, click the improvement action
-    and Microsoft provides a pop-up page with detailed instructions on
-    how to address the weakness. To address the weakness,
-    assign users to finer grained roles (e.g., SharePoint Administrator,
-    Exchange Administrator) instead of Global Administrator. Once the roles are reassigned according to the guidance, check the score again after 48 hours to ensure compliance.
+5.  Review the **current score** value and compare it to the **max score**. 
+If the current score is not the maximum value and the status is not **Completed**, you must perform the improvement actions. If that is the case, follow the detailed action steps and then check the score again after 48 hours to ensure compliance.
 
 #### MS.AAD.7.3v1, instructions:
-Review [these](https://docs.microsoft.com/en-us/azure/active-directory/roles/view-assignments)
-instructions to identify users assigned to highly privileged roles and
-verify the account does not exist outside Azure AD.
+Note: Performing a manual review of highly privileged users to determine which ones are not cloud-only is labor intensive so we recommend running the ScubaGear tool instead. ScubaGear will provide a list of the highly privileged users that are not cloud-only.
+
+1. Perform the steps below for each highly privileged role. We reference the Global Administrator role as an example.
+
+2. In **Azure Active Directory** select **Roles and administrators.**
+
+3. Select the **Global administrator role.**
+
+4. Under **Manage**, select **Assignments.** If you have AAD PIM, repeat the steps below for both the **Eligible** and the **Active** assignments. If a group is listed, you will need to determine the members of the group and perform the steps for each group member.
+
+5. For each highly privileged user, execute the Powershell code below but replace the **username@somedomain.com** sample data value with the principal name of the user that is specific to your environment. You can get the data value from the **Principal name** field displayed in the Azure Active Directory portal.
+
+```
+Connect-MgGraph
+Select-Mgprofile beta
+Get-MgUser -Filter "userPrincipalName eq 'username@somedomain.com'" | FL
+```
+
+6. Review the output field named **OnPremisesImmutableId**. If this field has a data value, it means that this specific user is not cloud-only. If the user is not cloud-only, create a cloud-only account for that user, assign the user to their respective roles and then remove the account that is not cloud-only from AAD.
 
 #### MS.AAD.7.4v1, instructions:
 
-1.  In the **Azure Portal**, navigate to **Azure AD Privileged Identity
-    Management (PIM).**
+1. In **Azure Active Directory** select **Roles and administrators**. Perform the steps below for each highly privileged role. We reference the Global Administrator role as an example.
 
-2. Under **Manage**, select **Azure AD roles**.
+2. Select the **Global administrator role.**
 
-3. Under **Manage**, select **Roles**. This should bring up a list of
-    all the Azure AD roles managed by the PIM service.
+3. Under **Manage**, select **Assignments** and click the **Active assignments** tab.
 
-4. **Note**: Repeat this step and step 5 for each highly privileged role
-    referenced in the policy section. The role “Exchange Administrator” is
-    used as an example in these instructions.
-
-  1.  Click the **Exchange Administrator** role in the list.
-  2.  Click **Settings**.
-  3.  Click **Edit.**
-  4.  Select the **Assignment** tab.
-  5.  De-select the option named **Allow permanent active assignment.**
-  6.  Click **Update.**
+4. Verify that there are no users or groups with a value of **Permanent** in the **End time** column. If there are any, recreate those assignments to have an expiration date using AAD PIM or an alternative PAM system. The only exception to this policy are emergency access accounts and service accounts that require perpetual active assignments. See policy for details.
 
 #### MS.AAD.7.5v1, instructions:
- In addition to checking for permanent assignments using the PIM Assignments, PIM also provides a report that lists all role assignments that were performed outside of PIM so that those assignments can be deleted and properly recreated using PIM.
+ 
+1. Perform the steps below for each highly privileged role. We reference the Global Administrator role as an example.
 
-  1.  From the **PIM landing page**, under **Manage**, select **Azure AD
-    roles.**
-  2.  Under **Manage**, select **Alerts.**
-  3.  Click the **Scan** button and wait for the scan to complete.
-  4.  If there were any roles assigned outside of PIM, the report will
-    display an alert named, **Roles are being assigned outside of
-    Privileged Identity Management**; Click that alert.
-  5.  PIM displays a list of users, their associated roles, and the
-    date/time that they were assigned a role outside of PIM: Delete the
-    non-compliant role assignments and then recreate them using the PIM
-    service.
+2. In **Azure Active Directory** select **Roles and administrators.**
+
+3. Select the **Global administrator role.**
+
+4. Under **Manage**, select **Assignments.** Repeat the steps below for both the **Eligible** and the **Active** AAD PIM assignments. 
+
+5. For each user or group listed, examine the value in the **Start time** column. If it contains a value of **-**, this indicates that the respective user / group was assigned to that role outside of AAD PIM. If the role was assigned outside of AAD PIM, delete the assignment and recreate it using AAD PIM.
+
 
 #### MS.AAD.7.6v1, instructions:
-**Note**: Any parts of the following implementation instructions that
-reference the Azure AD PIM service will vary if using a third-party PAM
-system.
 
-1.  In the **Azure Portal**, navigate to **Azure AD** and create a new
-    group named “Privileged Escalation Approvers.” This group will
-    contain users that will receive role activation approval requests
-    and approve or deny them. Users in this group must, at least, have
-    the permissions provided to the Privileged Role Administrators role
-    to adjudicate requests.
+1. In **Azure Active Directory** create a new group named **Privileged Escalation Approvers**. This group will contain users that will receive role activation approval requests and approve or deny them. 
 
-2.  In the **Azure Portal**, navigate to **Azure AD Privileged Identity
-    Management (PIM).**
+2. Assign this new group to the AAD role **Privileged Role Administrators**. This permission is required so that users in this group can adjudicate role activation approval requests.
 
-3. Under **Manage**, select **Azure AD roles**.
+3. Assign the users responsible for reviewing approval requests to the new **Privileged Escalation Approvers** group via the [PIM for Groups feature](https://learn.microsoft.com/en-us/azure/active-directory/privileged-identity-management/concept-pim-for-groups).
 
-4. Under **Manage**, select **Roles**. This should bring up a list of
-    all the Azure AD roles managed by the PIM service.
+4. In **AAD Privileged Identity Management (PIM)**, under **Manage**, select **Azure AD roles**.
 
-5. Repeat this step for the Privileged Role Administrator role, User
-    Administrator role, and other roles that the agency has designated
-    as highly privileged.
+5. Under **Manage**, select **Roles**.
 
-  1.  Click the **Global Administrator** role in the list.
-  2.  Click **Settings.**
+  1.  Select the **Global Administrator** role in the list.
+  2.  Click **Settings**.
   3.  Click **Edit**.
   4.  Select the **Require approval to activate** option.
-  5.  Click **Select approver**s, select the group **Privileged Escalation
-    Approvers**, and then click **Select**.
+  5.  Click **Select approvers** and select the group **Privileged Escalation Approvers**, and then click **Select**.
   6.  Click **Update**.
 
 #### MS.AAD.7.7v1, instructions:
 
-Note: Any parts of the following implementation instructions that
-reference the Azure AD PIM service will vary if using a third-party PAM
-system.
+1.  In **AAD Privileged Identity Management (PIM)**, under **Manage**, select **Azure AD roles.**
 
-1.  In the **Azure Portal**, navigate to **Azure AD Privileged Identity
-    Management (PIM).**
+2. Under **Manage**, select **Roles**. Perform the steps below for each highly privileged role. We reference the Global Administrator role as an example.
 
-2. Under **Manage**, select A**zure AD roles.**
+3. Click the **Global Administrator** role.
 
-3. Under **Manage**, select **Roles**. This should bring up a list of
-    all the Azure AD roles managed by the PIM service.
+4. Click **Settings** and then click **Edit.**
 
-4. Click the **Global Administrator** role.
+5. Click the **Notification** tab.
 
-5. Click **Settings** and then click **Edit.**
+6. Under **Send notifications when members are assigned as eligible to this role**, in the **Role assignment alert > Additional recipients** textbox, enter the email address of the security monitoring mailbox configured to receive privileged role assignment alerts.
 
-6. Click the **Notification** tab.
+7. Under **Send notifications when members are assigned as active to this role**, in the **Role assignment alert > Additional recipients** textbox, enter the email address of the security monitoring mailbox configured to receive privileged role assignment alerts.
 
-7. Under **Send notifications when members are assigned as eligible to
-    this role**, in the **Role assignment alert** -\> **Additional
-    recipients** textbox, enter the email address of the mailbox
-    configured to receive the alerts for this role.
-
-8. Under S**end notifications when members are assigned as active to
-    this role**, in the **Role assignment alert** -\> **Additional
-    recipients** textbox, enter the email address of the mailbox
-    configured to receive the alerts for this role.
-
-9. Under **Send notifications when eligible members activate this
-    role**, in the **Role activation alert** -\> **Additional
-    recipients** textbox, enter the email address of the mailbox
-    configured to receive the alerts for this role.
-
-10. Click **Update**.
-
-11. Repeat steps 4 through 10 for each of the other highly privileged
-    roles referenced in the policy section above, with one modification:
-
-  1.  When configuring the **Send notifications when eligible members
-    activate this role** for these other roles, enter an email address
-    of a mailbox that is different from the one used to monitor Global
-    Administrator activations.
+8. Click **Update**.
 
 #### MS.AAD.7.8v1, instructions:
 
+1. In **AAD Privileged Identity Management (PIM)**, under **Manage**, select **Azure AD roles.**
+
+2. Under **Manage**, select **Roles**.
+
+3. Click the **Global Administrator** role.
+
+4. Click **Settings** and then click **Edit.**
+
+5. Click the **Notification** tab.
+
+6. Under **Send notifications when eligible members activate this role**, in the **Role activation alert > Additional recipients** textbox, enter the email address of the security monitoring mailbox configured to receive Global Administrator activation alerts.
+
+7. Click **Update**.
+
 #### MS.AAD.7.9v1, instructions:
+ 
+ 1. Follow the same instructions as MS.AAD.7.8v1 for each of the highly privileged roles (other than Global Administrator) but enter a security monitoring mailbox that is different from the one used to monitor Global Administrator activations.
 
 ## 8. Guest User Access
 
 This section provides policies that help reduce security risks related to the integration of M365 guest users. A guest user is a specific type of external user that belongs to a separate organization but can access files, meetings, teams and other data in the target tenant. It is common to invite guest users to a tenant for cross-agency collaboration purposes.
 
 #### MS.AAD.8.1v1
+Guest users SHOULD have limited or restricted access to Azure AD directory objects.
+
+- _Rationale:_ By limiting the amount of information about objects in the tenant that is available to guest users, this reduces the malicious reconnaissance exposure if a guest account is compromised or created by an adversary.
+- _Last modified:_ June 2023
+
+#### MS.AAD.8.2v1
 Only users with the Guest Inviter role SHOULD be able to invite guest users.
 
 - _Rationale:_ By only allowing an authorized groups of individuals to invite guest users to create accounts in the tenant, this helps an agency enforce a guest user account approval process which reduces the risk of unauthorized accounts being created.
 - _Last modified:_ June 2023
 
-#### MS.AAD.8.2v1
+#### MS.AAD.8.3v1
 Guest invites SHOULD only be allowed to specific external domains that have been authorized by the agency for legitimate business purposes.
 
 - _Rationale:_ Limiting which domains can be invited to create guest accounts in the tenant helps reduce the risk of users from unauthorized external organizations getting access.
-- _Last modified:_ June 2023
-
-#### MS.AAD.8.3v1
-Guest users SHOULD have limited or restricted access to Azure AD directory objects.
-
-- _Rationale:_ By limiting the amount of information about objects in the tenant that is available to guest users, this reduces the malicious reconnaissance exposure if a guest account is compromised or created by an adversary.
 - _Last modified:_ June 2023
 
 ### Resources
@@ -777,27 +747,32 @@ Guest users SHOULD have limited or restricted access to Azure AD directory objec
 ### Implementation
 
 #### MS.AAD.8.1v1, instructions:
-[Follow these instructions](https://docs.microsoft.com/en-us/azure/active-directory/external-identities/external-collaboration-settings-configure#configure-settings-in-the-portal)
-to configure the Azure AD **External collaboration settings**.
 
-1.  Under **Guest user access**, select **Guest users have limited
-    access to properties and memberships of directory objects.** or
-    **Guest user access is restricted to properties and memberships of their own directory
-    objects (most restrictive)".**
+1. In **Azure Active Directory** select **External Identities > External collaboration settings**.
 
-2.  Under **Guest invite settings**, select **Only users assigned to
-    specific admin roles can invite guest users**.
+2. Under **Guest user access**, select either **Guest users have limited access to properties and memberships of directory objects** or **Guest user access is restricted to properties and memberships of their own directory objects (most restrictive)**.
 
-3.  Under **Collaboration restrictions**, select **Allow invitations
-    only to the specified domains (most restrictive)**.
-
-4.  Select **Target domains** and enter the names of the external
-    domains that have been authorized by the agency for guest user
-    access.
+3. Click **Save**.
 
 #### MS.AAD.8.2v1, instructions:
 
+1. In **Azure Active Directory** select **External Identities > External collaboration settings**.
+
+2.  Under **Guest invite settings**, select **Only users assigned to specific admin roles can invite guest users**.
+
+3. Click **Save**.
+
 #### MS.AAD.8.3v1, instructions:
+
+1. In **Azure Active Directory** select **External Identities > External collaboration settings**.
+
+2. Under **Collaboration restrictions**, select **Allow invitations
+    only to the specified domains (most restrictive)**.
+
+3. Select **Target domains** and enter the names of the external domains that have been authorized by the agency for guest user access.
+
+4. Click **Save**.
+
 
 # Acknowledgements
 
@@ -862,68 +837,6 @@ provided below:
 
 # Appendix B: Cross-tenant Access Guidance
 
-**Guest user access note**: This conditional access policy will impact
-guest access to the tenant because guest users will be required to
-authenticate from a managed device similar to regular Azure AD users.
-For guest users, the organization that manages their home tenant is
-responsible for managing their devices and the resource tenant must be
-configured to trust the device claims from the home tenant, otherwise
-guest users will be blocked by the policy. [This link](https://docs.microsoft.com/en-us/azure/active-directory/external-identities/authentication-conditional-access) describes the
-detailed authentication flow for guest users and how conditional access
-related to devices is applied.
-The implementation section describes the cross-tenant settings that must
-be configured in both the home and the resource tenants to facilitate
-guest access with managed devices.
+Some of the conditional access policies contained in this security baseline, if implemented as described herein, will impact guest user access to a tenant. For example, the policies require users to perform MFA and originate from a managed device to gain access. These requirements are also enforced for guest users. For these policies to work effectively with guest users, both the home tenant (the one that the guest user belongs to) and the resource tenant (the target tenant) may need to configure their AAD cross-tenant access settings.
 
-Use the following instructions to facilitate guest access with managed
-devices. Although the agency implementing this baseline only controls
-the resource tenant and does not have control over the home tenant, CISA
-provides our recommended security configuration for the home tenant in
-this section.
-
-Reference [this link](https://docs.microsoft.com/en-us/azure/active-directory/external-identities/cross-tenant-access-overview)
-for a general description of cross-tenant access settings to become
-familiar with the terminology and configurations.
-
-For the resource tenant, use the following steps (for demonstration
-purposes, the home tenant domain is named “home.onmicrosoft.com” —
-replace this name with the actual name of the tenant):
-
-1.  Navigate to **Azure AD** -\> **External Identities** -\>
-    **Cross-tenant access settings.**
-
-2.  In **Organizational Settings**, add a new organization –
-    “home.onmicrosoft.com”.
-
-3.  Open the **Inbound access** settings for the newly added
-    organization.
-
-4.  Click the **B2B collaboration** tab. Under **External users and
-    Groups** -\> **Access status**, select **Allow access.**
-
-5.  Under **External users and Groups** -\> **Applies to**, select **All
-    external users and groups.**
-
-6.  Click the **Trust settings** tab. Under **Customize settings** -\>
-    select **Trust multi-factor authentication from Azure AD tenants**,
-    **Trust compliant devices,** and **Trust hybrid Azure AD joined
-    devices**
-
-For the home tenant, use the following steps (for demonstration
-purposes the resource tenant domain is named
-“resource.onmicrosoft.com” — replace this name with the actual name
-of the tenant):
-
-1.  Navigate to **Azure AD** -\> **External Identities** -\>
-    **Cross-tenant access settings.**
-
-2.  In **Organizational Settings**, Add a new organization –
-    “resource.onmicrosoft.com”.
-
-3.  Open the **Outbound access** settings for the newly added
-    organization.
-
-4.  Click the **B2B collaboration** tab. Under **Users and Groups** -\>
-    **Access status**, select **Allow access.**
-
-5.  Under **Users and Groups** -\> **Applies to**, select **All users.**
+[Refer to this article](https://docs.microsoft.com/en-us/azure/active-directory/external-identities/authentication-conditional-access) to gain an understanding of how MFA and device claims are passed from the home tenant to the resource tenant. [Refer to this article](https://learn.microsoft.com/en-us/azure/active-directory/external-identities/cross-tenant-access-overview) to configure the inbound and outbound cross-tenant access settings in AAD.
