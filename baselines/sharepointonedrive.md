@@ -155,7 +155,7 @@ File and folder default sharing permissions SHALL be set to View only.
 
 All of the settings in this section are configured in the **SharePoint admin center**.
 
-MS.SHAREPOINT-ONEDRIVE.2.1v1, instructions:
+#### MS.SHAREPOINT-ONEDRIVE.2.1v1, instructions:
 
 1.  Select **Policies** \> **Sharing**
 
@@ -163,7 +163,7 @@ MS.SHAREPOINT-ONEDRIVE.2.1v1, instructions:
 
 3.  Select **Save**
 
-MS.SHAREPOINT-ONEDRIVE.2.2v1, instructions:
+#### MS.SHAREPOINT-ONEDRIVE.2.2v1, instructions:
 
 1.  Navigate to the same location in the portal as MS.SHAREPOINT-ONEDRIVE.2.1v1, but set the permission that's selected by default for sharing links to **View**
 
@@ -205,7 +205,7 @@ Reauthentication days for people who use a verification code SHALL be set to 30 
 
 All of the settings in this section are configured in the **SharePoint admin center**.
 
-MS.SHAREPOINT-ONEDRIVE.3.1v1, instructions:
+#### MS.SHAREPOINT-ONEDRIVE.3.1v1, instructions:
 
 1.  Select **Policies** \> **Sharing**
 
@@ -217,7 +217,7 @@ MS.SHAREPOINT-ONEDRIVE.3.1v1, instructions:
 
 5.  Select **Save**
 
-MS.SHAREPOINT-ONEDRIVE.3.2v1, instructions:
+#### MS.SHAREPOINT-ONEDRIVE.3.2v1, instructions:
 
 1.  Select **Policies** \> **Sharing**
 
@@ -231,7 +231,7 @@ MS.SHAREPOINT-ONEDRIVE.3.2v1, instructions:
 
 6.  Select **Save**
 
-MS.SHAREPOINT-ONEDRIVE.3.3v1, instructions:
+#### MS.SHAREPOINT-ONEDRIVE.3.3v1, instructions:
 
 1.  Select **Policies** \> **Sharing**
 
