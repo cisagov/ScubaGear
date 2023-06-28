@@ -89,23 +89,23 @@ OMB Max Site for a list of .gov domains for sharing).
 ### Policies
 #### MS.SHAREPOINT.1.1v1
 External sharing SHOULD be limited to Existing Guests or the more restrictive setting, Only People in your Organization.
-- _Rationale:_ TODO
+- _Rationale:_ Sharing information outside the organization increases the risk of unauthorized disclosure.  By limiting external sharing, administrators decrease the risk of unauthorized disclosure.
 - _Last modified:_ June 2023
 - _Note:_ Same implementation in MS.ONEDRIVE.1.1v1
 
 #### MS.SHAREPOINT.1.2v1
 External sharing SHOULD be limited to approved domains per interagency collaboration needs.
-- _Rationale:_ TODO
+- _Rationale:_ By limiting sharing to domains used for interagency collaboration purposes, administrators prevent sharing with unknown organizations and individuals.
 - _Last modified:_ June 2023
 
 #### MS.SHAREPOINT.1.3v1
 External sharing SHOULD be limited to approved security groups per interagency collaboration needs.
-- _Rationale:_ TODO
+- _Rationale:_ By limiting sharing to approved security groups based on interagency collaboration needs, administrators ensure only approved users can use share information outside the organization.
 - _Last modified:_ June 2023
 
 #### MS.SHAREPOINT.1.4v1
 Guest access SHOULD be limited to the email the invitation was sent.
-- _Rationale:_ TODO
+- _Rationale:_ Email invitations allow external guests to access shared information.  By requiring guests to sign in using the same account to which the invite was sent, administrators ensure only the intended guest can use the invite.
 - _Last modified:_ June 2023
 
 ### Resources
@@ -176,7 +176,7 @@ link.”
 
 #### MS.SHAREPOINT.2.1v1
 File and folder links default sharing setting SHALL be set to Specific People (only the people the user specifies).
-- _Rationale:_ TODO
+- _Rationale:_ By making the default sharing the most restrictive, administrators prevent accidentally sharing information too broadly.
 - _Last modified:_ June 2023
 _Note:_ Similar implementation in MS.ONEDRIVE.3.1v1
 
@@ -213,7 +213,7 @@ level.
 ### Policies
 #### MS.SHAREPOINT.3.1v1
 Sharing settings for specific SharePoint sites SHOULD align to their sensitivity level.
-- _Rationale:_ TODO
+- _Rationale:_ Some SharePoint sites may host public data while others contain highly sensitive information. By aligning SharePoint site sharing settings to a site's sensitivity level, administrators better prevent unauthorized data access.
 - _Last modified:_ June 2023
 
 ### Resources
@@ -257,12 +257,12 @@ for OneDrive and Teams to the same, specified expiration times.
 ### Policies
 #### MS.SHAREPOINT.4.1v1
 Expiration timers for guest access to a site or OneDrive SHOULD be set to 30 days or less.
-- _Rationale:_ TODO
+- _Rationale:_ Guest access may often be given to provide access to information for a short time. Without expiration, however, access is indefinite.  By setting expiration timers for guest access, administrators prevent guests from having sustained unintended access to information.
 - _Last modified:_ June 2023
 
 #### MS.SHAREPOINT.4.2v1
 Expiration timers for people who use a verification code SHOULD be set to 30 days or less.
-- _Rationale:_ TODO
+- _Rationale:_ A verification code may be given out to provide access to information for a short time. Without expiration, however, access is indefinite.  By setting expiration timers for verification code access, administrators prevent using a verification code for sustained unintended access to information.
 - _Last modified:_ June 2023
 
 ### License Requirements
@@ -313,12 +313,12 @@ mitigate this risk by preventing users from running custom scripts.
 ###  Policy
 #### MS.SHAREPOINT.5.1v1
 Users SHALL be prevented from running custom scripts on personal sites.
-- _Rationale:_ TODO
+- _Rationale:_ Scripts on SharePoint sites run in the context of the user visiting the site and have access to everything that user can access.  By preventing custom scripts on personal sites, administrators block a path for potentially malicious code execution.
 - _Last modified:_ June 2023
 
 #### MS.SHAREPOINT.5.2v1
 Users SHALL be prevented from running custom scripts on self-service created sites.
-- _Rationale:_ TODO
+- _Rationale:_ Scripts on SharePoint sites run in the context of the user visiting the site and have access to everything that user can access.  By preventing custom scripts on self-service created sites, administrators block a path for potentially malicious code execution.
 - _Last modified:_ June 2023
 
 ### Resources
