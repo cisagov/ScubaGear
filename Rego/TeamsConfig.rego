@@ -381,9 +381,6 @@ tests[{
 }
 #--
 
-# AssignedPlans := {Plan | Plan := TenantConfig.AssignedPlan[_]}
-# print(AssignedPlans)
-# print("MCOProfessional" in AssignedPlans)
 
 ################
 # Baseline 2.8 #
