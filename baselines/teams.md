@@ -4,7 +4,7 @@ Microsoft Teams is a text and live chat workspace in Microsoft 365 that
 supports video calls, chat messaging, screen-sharing, and file sharing.
 It has a permission-based team structure for managing calls and files.
 Microsoft teams also enables teams to manage their own user access
-rights, security policies, and record video calls.
+rights, security policies, and record video calls. This security baseline provides policies to help secure Teams.
 
 ## Key Terminology
 Access to Teams can be controlled by the user type. In this baseline,
