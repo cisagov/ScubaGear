@@ -23,12 +23,7 @@ Test names will use the syntax `test_mainVar_In/correct_*V#` to support brevity 
 
 ```
 test_ExampleVar_Correct_V1 if {
-<<<<<<< HEAD
     PolicyId := "MS.<Product>.<Policy #>.<Bulletpoint #>v<Version #>"
-=======
-    ControlNumber := "Example 2.1"
-    Requirement := "Example Policy Bullet Point"
->>>>>>> 0d37adf (Substantiative changes to Sharepoint Baseline minus Rationale (#360))
 
     Output := tests with input as {
         "example_policies" : [
@@ -51,12 +46,7 @@ test_ExampleVar_Correct_V2 if {
 }
 
 test_ExampleVar_Incorrect if {
-<<<<<<< HEAD
     PolicyId := "MS.<Product>.<Policy #>.<Bulletpoint #>v<Version #>"
-=======
-    ControlNumber := "Example 2.1"
-    Requirement := "Example Policy Bullet Point"
->>>>>>> 0d37adf (Substantiative changes to Sharepoint Baseline minus Rationale (#360))
 
     Output := tests with input as {
         "example_policies" : [
@@ -189,19 +179,11 @@ tests[{
     "Criticality" : "Shall",
     "Commandlet" : "Example-Command",
     "ActualValue" : ExampleVar.ExampleSetting,
-<<<<<<< HEAD
     "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
     ExampleVar := input.ExampleVar
     Status := ExampleVar == 15
-=======
-	"ReportDetails" : ReportDetailsBoolean(Status),
-	"RequirementMet" : Status
-}] {
-	    ExampleVar := input.ExampleVar
-	    Status := ExampleVar == 15
->>>>>>> 0d37adf (Substantiative changes to Sharepoint Baseline minus Rationale (#360))
 }
 
 tests[{
@@ -216,15 +198,9 @@ tests[{
     "PolicyId" : "MS.<Product>.<Policy #>.<Bulletpoint #>v<Version #>",,
     "Criticality" : "Should",
     "Commandlet" : "Example-Command",
-<<<<<<< HEAD
     "ActualValue" : ExampleVar.ExampleSetting,
     "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
-=======
-	"ActualValue" : ExampleVar.ExampleSetting,
-	"ReportDetails" : ReportDetailsBoolean(Status),
-	"RequirementMet" : Status
->>>>>>> 0d37adf (Substantiative changes to Sharepoint Baseline minus Rationale (#360))
 }] {
     ExampleVar := input.ExampleVar
     Status := ExampleVar == 15
@@ -274,12 +250,7 @@ In the interest of consistency across policy tests and human readability of the 
 
 ```
 tests[{
-<<<<<<< HEAD
     "PolicyId" : "MS.<Product>.<Policy #>.<Bulletpoint #>v<Version #>",,
-=======
-    "Requirement" : "Baseline String",
-    "Control" : "Example 2.1",
->>>>>>> 0d37adf (Substantiative changes to Sharepoint Baseline minus Rationale (#360))
     "Criticality" : "Should",
     "Commandlet" : "Example-Command",
     "ActualValue" : ExampleVar.ExampleSetting,
@@ -291,12 +262,7 @@ tests[{
 }
 
 tests[{
-<<<<<<< HEAD
     "PolicyId" : "MS.<Product>.<Policy #>.<Bulletpoint #>v<Version #>",,
-=======
-    "Requirement" : "Baseline String",
-    "Control" : "Example 2.2",
->>>>>>> 0d37adf (Substantiative changes to Sharepoint Baseline minus Rationale (#360))
     "Criticality" : "Should",
     "Commandlet" : "Example-Command",
     "ActualValue" : ExampleVar.ExampleSetting,
@@ -358,11 +324,7 @@ tests[{
     "Commandlet" : "Example-Command",
     "ActualValue" : Status,
     "ReportDetails" : ReportDetailsBoolean(Status),
-<<<<<<< HEAD
     "RequirementMet" : Status
-=======
-	"RequirementMet" : Status
->>>>>>> 0d37adf (Substantiative changes to Sharepoint Baseline minus Rationale (#360))
 }] {
     ExampleVar := input.ExampleVar
     Status := ExampleVar == true
@@ -377,11 +339,7 @@ tests[{
     "Commandlet" : "Example-Command",
     "ActualValue" : ExampleVar.ExampleSetting,
     "ReportDetails" : ReportDetailsBoolean(Status),
-<<<<<<< HEAD
     "RequirementMet" : Status
-=======
-	"RequirementMet" : Status
->>>>>>> 0d37adf (Substantiative changes to Sharepoint Baseline minus Rationale (#360))
 }] {
     ExampleVar := input.ExampleVar
     Status := ExampleVar == true
