@@ -370,18 +370,20 @@ tests[{
     IsEnabled := count(ConfigsAllowingEmail) == 0
 	# What is the tenant type according to Get-CsTenant? 
     TenantConfig := input.teams_tenant_info[_]
-	AssignedPlans := {Plan | Plan := TenantConfig.AssignedPlan[_]}
-	GCCConditions := ["Teams_GCC" in AssignedPlans, "Teams_GCCHIGH" in AssignedPlans]
-    IsGCC := count([Condition | Condition = GCCConditions[_]; Condition == true]) > 0
+	AssignedPlans := concat(", ", TenantConfig.AssignedPlan)
+    IsGCC := contains(AssignedPlans, "GCC")
 	# As long as either:
 	# 	1) Get-CsTeamsClientConfiguration reports email integration is disabled or
 	# 	2) Get-CsTenant reports this as a gov tenant
 	# this test should pass.
-	StatusConditions := [IsEnabled, IsGCC]
-    Status := count([Condition | Condition = StatusConditions[_]; Condition == true]) > 0
+	Conditions := [IsEnabled, IsGCC]
+    Status := count([Condition | Condition = Conditions[_]; Condition == true]) > 0
 }
 #--
 
+# AssignedPlans := {Plan | Plan := TenantConfig.AssignedPlan[_]}
+# print(AssignedPlans)
+# print("MCOProfessional" in AssignedPlans)
 
 ################
 # Baseline 2.8 #
