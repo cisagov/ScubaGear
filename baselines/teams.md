@@ -525,7 +525,7 @@ Cloud video recording SHOULD be disabled in the Global (org-wide default) meetin
 - _Note:_ Custom policies MAY be created to allow more flexibility for specific users.
 
 #### MS.TEAMS.9.2v1
-For all meeting polices (Global (org-wide default) meeting policy and all custom policies) that allow cloud recording, recordings SHOULD be stored inside the country of that agencys tenant.
+For all meeting polices (Global (org-wide default) meeting policy and all custom policies) that allow cloud recording, recordings SHOULD be stored inside the country of that agency's tenant.
 - _Rationale:_ TODO
 - _Last modified:_ July 2023
 
