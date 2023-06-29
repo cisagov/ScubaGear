@@ -340,28 +340,21 @@ ConfigsAllowingEmail[Policy.Identity] {
     Policy.AllowEmailIntoChannel == true
 }
 
-ReportDetails2_7(IsGCC, NotCommercial, ComfirmCorrectConfig, Policies) = Description if {
-	Conditions := [IsGCC, NotCommercial]
-	# Is this a gcc tenant: yes
-	count([Condition | Condition = Conditions[_]; Condition == true]) > 0
+ReportDetails2_7(IsGCC, IsEnabled) = Description if {
+	IsGCC == true
 	Description := "N/A: Feature is unavailable in GCC environments"
 }
 
-ReportDetails2_7(IsGCC, NotCommercial, ComfirmCorrectConfig, Policies) = Description if {
-	Conditions := [IsGCC, NotCommercial]
-	# Is this a gcc tenant: no
-	count([Condition | Condition = Conditions[_]; Condition == true]) == 0
-	ComfirmCorrectConfig == true
+ReportDetails2_7(IsGCC, IsEnabled) = Description if {
+	IsGCC == false
+	IsEnabled == true
 	Description := "Requirement met"
 }
 
-ReportDetails2_7(IsGCC, NotCommercial, ComfirmCorrectConfig, Policies) = Description if {
-	Conditions := [IsGCC, NotCommercial]
-	# Is this a gcc tenant: no
-	count([Condition | Condition = Conditions[_]; Condition == true]) == 0
-	ComfirmCorrectConfig == false
-	Detail := "Requirement not met: Email integration is enabled across domain:"
-	Description := ReportDetailsArray(false, Policies, Detail)
+ReportDetails2_7(IsGCC, IsEnabled) = Description if {
+	IsGCC == false
+	IsEnabled == false
+	Description := "Requirement not met"
 }
 
 tests[{
@@ -369,38 +362,23 @@ tests[{
 	"Control" : "Teams 2.7",
 	"Criticality" : "Shall",
 	"Commandlet" : ["Get-CsTeamsClientConfiguration", "Get-CsTenant"],
-	"ActualValue" : [Policies, ServiceInstance],
-	"ReportDetails" : ReportDetails2_7(IsGCC, NotCommercial, ComfirmCorrectConfig, Policies),
+	"ActualValue" : {"ClientConfig": input.client_configuration, "AssignedPlans": AssignedPlans},
+	"ReportDetails" : ReportDetails2_7(IsGCC, IsEnabled),
 	"RequirementMet" : Status
 }] {
+	# According to Get-CsTeamsClientConfiguration, is team email integration enabled?
+    IsEnabled := count(ConfigsAllowingEmail) == 0
+	# What is the tenant type according to Get-CsTenant? 
     TenantConfig := input.teams_tenant_info[_]
-	ServiceInstance := TenantConfig.ServiceInstance
-	Policies := ConfigsAllowingEmail
-    ComfirmCorrectConfig := count(Policies) == 0 # According to 
-	# Get-CsTeamsClientConfiguration, is team email integration enabled?
-    IsGCC := indexof(ServiceInstance, "GOV") != -1 # What is the tenant type according
-	# to Get-CsTenant? 
-	NotCommercial := input.scuba_config.M365Environment != "commercial" # What is the
-	# tenant type according to the user?
-	Conditions := [ComfirmCorrectConfig, IsGCC, NotCommercial]
+	AssignedPlans := {Plan | Plan := TenantConfig.AssignedPlan[_]}
+	GCCConditions := ["Teams_GCC" in AssignedPlans, "Teams_GCCHIGH" in AssignedPlans]
+    IsGCC := count([Condition | Condition = GCCConditions[_]; Condition == true]) > 0
 	# As long as either:
-	# 	1) Get-CsTeamsClientConfiguration reports email integration is disabled,
-	# 	2) Get-CsTenant reports this as a gov tenant, or
-	# 	3) the user specifies that this is a gov tenant,
+	# 	1) Get-CsTeamsClientConfiguration reports email integration is disabled or
+	# 	2) Get-CsTenant reports this as a gov tenant
 	# this test should pass.
-    Status := count([Condition | Condition = Conditions[_]; Condition == true]) > 0
-}
-
-tests[{
-	"Requirement" : "Teams email integration SHALL be disabled",
-	"Control" : "Teams 2.7",
-	"Criticality" : "Shall",
-	"Commandlet" : ["Get-CsTeamsClientConfiguration"],
-	"ActualValue" : "PowerShell Error",
-	"ReportDetails" : "PowerShell Error",
-	"RequirementMet" : false
-}] {
-    count(input.teams_tenant_info) == 0
+	StatusConditions := [IsEnabled, IsGCC]
+    Status := count([Condition | Condition = StatusConditions[_]; Condition == true]) > 0
 }
 #--
 

@@ -18,16 +18,16 @@ test_AllowEmailIntoChannel_Correct_V1 if {
         ],
         "teams_tenant_info": [
             {
-                "ServiceInstance": "MicrosoftCommunicationsOnline/NOAM-ED6-A6"
+                "AssignedPlan": [
+                    "MCOEV",
+                    "Teams",
+                    "MCOProfessional"
+                ]
             }
-        ],
-        "scuba_config": {
-            "M365Environment": "commercial"
-        }
+        ]
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
-
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "Requirement met"
@@ -50,16 +50,16 @@ test_AllowEmailIntoChannel_Correct_V1_multi if {
         ],
         "teams_tenant_info": [
             {
-                "ServiceInstance": "MicrosoftCommunicationsOnline/NOAM-ED6-A6"
+                "AssignedPlan": [
+                    "MCOEV",
+                    "Teams",
+                    "MCOProfessional"
+                ]
             }
-        ],
-        "scuba_config": {
-            "M365Environment": "commercial"
-        }
+        ]
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
-
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "Requirement met"
@@ -78,19 +78,19 @@ test_AllowEmailIntoChannel_Incorrect if {
         ],
         "teams_tenant_info": [
             {
-                "ServiceInstance": "MicrosoftCommunicationsOnline/NOAM-ED6-A6"
+                "AssignedPlan": [
+                    "MCOEV",
+                    "Teams",
+                    "MCOProfessional"
+                ]
             }
-        ],
-        "scuba_config": {
-            "M365Environment": "commercial"
-        }
+        ]
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
-
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "1 Requirement not met: Email integration is enabled across domain: Global"
+    RuleOutput[0].ReportDetails == "Requirement not met"
 }
 
 test_AllowEmailIntoChannel_Incorrect_multi if {
@@ -110,19 +110,19 @@ test_AllowEmailIntoChannel_Incorrect_multi if {
         ],
         "teams_tenant_info": [
             {
-                "ServiceInstance": "MicrosoftCommunicationsOnline/NOAM-ED6-A6"
+                "AssignedPlan": [
+                    "MCOEV",
+                    "Teams",
+                    "MCOProfessional"
+                ]
             }
-        ],
-        "scuba_config": {
-            "M365Environment": "commercial"
-        }
+        ]
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
-
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "2 Requirement not met: Email integration is enabled across domain: Global, Tag:AllOn"
+    RuleOutput[0].ReportDetails == "Requirement not met"
 }
 
 test_AllowEmailIntoChannel_Correct_V2 if {
@@ -138,16 +138,16 @@ test_AllowEmailIntoChannel_Correct_V2 if {
         ],
         "teams_tenant_info": [
             {
-                "ServiceInstance": "MicrosoftCommunicationsOnline/GOV-1B-G6"
+                "AssignedPlan": [
+                    "MCOEV",
+                    "Teams_GCC",
+                    "MCOProfessional"
+                ]
             }
-        ],
-        "scuba_config": {
-            "M365Environment": "gcc"
-        }
+        ]
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
-    
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "N/A: Feature is unavailable in GCC environments"
@@ -170,16 +170,16 @@ test_AllowEmailIntoChannel_Correct_V2_multi if {
         ],
         "teams_tenant_info": [
             {
-                "ServiceInstance": "MicrosoftCommunicationsOnline/GOV-1B-G6"
+                "AssignedPlan": [
+                    "MCOEV",
+                    "Teams_GCCHIGH",
+                    "MCOProfessional"
+                ]
             }
-        ],
-        "scuba_config": {
-            "M365Environment": "gcc"
-        }
+        ]
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
-    
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "N/A: Feature is unavailable in GCC environments"
@@ -198,48 +198,16 @@ test_AllowEmailIntoChannel_Correct_V3 if {
         ],
         "teams_tenant_info": [
             {
-                "ServiceInstance": "MicrosoftCommunicationsOnline/GOV-1B-G6"
+                "AssignedPlan": [
+                    "MCOEV",
+                    "Teams_GCC",
+                    "MCOProfessional"
+                ]
             }
-        ],
-        "scuba_config": {
-            "M365Environment": "gcc"
-        }
+        ]
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "N/A: Feature is unavailable in GCC environments"
-}
-
-test_AllowEmailIntoChannel_Correct_V3 if {
-    ControlNumber := "Teams 2.7"
-    Requirement := "Teams email integration SHALL be disabled"
-
-    Output := tests with input as {
-        "client_configuration": [
-            {
-                "Identity": "Global",
-                "AllowEmailIntoChannel": true
-            },
-            {
-                "Identity": "Tag:AllOn",
-                "AllowEmailIntoChannel": true
-            }
-        ],
-        "teams_tenant_info": [
-            {
-                "ServiceInstance": "MicrosoftCommunicationsOnline/GOV-1B-G6"
-            }
-        ],
-        "scuba_config": {
-            "M365Environment": "gcc"
-        }
-    }
-
-    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
-
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "N/A: Feature is unavailable in GCC environments"
@@ -262,16 +230,48 @@ test_AllowEmailIntoChannel_Correct_V4 if {
         ],
         "teams_tenant_info": [
             {
-                "ServiceInstance": "MicrosoftCommunicationsOnline/ITAR-2G-S1"
+                "AssignedPlan": [
+                    "MCOEV",
+                    "Teams_GCC",
+                    "MCOProfessional"
+                ]
             }
-        ],
-        "scuba_config": {
-            "M365Environment": "gcchigh"
-        }
+        ]
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "N/A: Feature is unavailable in GCC environments"
+}
 
+test_AllowEmailIntoChannel_Correct_V5 if {
+    ControlNumber := "Teams 2.7"
+    Requirement := "Teams email integration SHALL be disabled"
+
+    Output := tests with input as {
+        "client_configuration": [
+            {
+                "Identity": "Global",
+                "AllowEmailIntoChannel": true
+            },
+            {
+                "Identity": "Tag:AllOn",
+                "AllowEmailIntoChannel": true
+            }
+        ],
+        "teams_tenant_info": [
+            {
+                "AssignedPlan": [
+                    "MCOEV",
+                    "Teams_GCCHIGH",
+                    "MCOProfessional"
+                ]
+            }
+        ]
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "N/A: Feature is unavailable in GCC environments"
