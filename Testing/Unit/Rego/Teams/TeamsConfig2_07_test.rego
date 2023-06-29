@@ -172,7 +172,7 @@ test_AllowEmailIntoChannel_Correct_V2_multi if {
             {
                 "AssignedPlan": [
                     "MCOEV",
-                    "Teams_GCCHIGH",
+                    "TEAMS_GCCHIGH",
                     "MCOProfessional"
                 ]
             }
@@ -264,7 +264,7 @@ test_AllowEmailIntoChannel_Correct_V5 if {
             {
                 "AssignedPlan": [
                     "MCOEV",
-                    "Teams_GCCHIGH",
+                    "TEAMS_GCCHIGH",
                     "MCOProfessional"
                 ]
             }
