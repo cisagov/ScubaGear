@@ -1,4 +1,4 @@
-# CISA M365 Security Configuration Baseline for Sharepoint Online and OneDrive
+# CISA M365 Security Configuration Baseline for SharePoint Online and OneDrive
 
 SharePoint Online is a web-based collaboration and document management
 platform. It is primarily used to collaborate on documents and communicate information in project teams. OneDrive is a cloud-based file storage system primarily used to store a user's personal files but it can also be used to share documents with others. This security baseline provides policies to help secure both of these services.
@@ -34,7 +34,7 @@ This section helps reduce security risks related to the sharing of files with us
 
 ### Policies
 #### MS.SHAREPOINT-ONEDRIVE.1.1v1
-External sharing for Sharepoint SHALL be limited to Existing Guests or Only People in your Organization.
+External sharing for SharePoint SHALL be limited to Existing Guests or Only People in your Organization.
 - _Rationale:_ Sharing information outside the organization increases the risk of unauthorized disclosure. By limiting external sharing, administrators decrease the risk of unauthorized disclosure.
 - _Last modified:_ June 2023
 
@@ -75,19 +75,19 @@ Guest access SHALL be limited to the email the invitation was sent to.
 
 All of the settings in this section are configured in the **SharePoint admin center**.
 
-#### MS.SHAREPOINT-ONEDRIVE.1.1v1, instructions:
+#### MS.SHAREPOINT-ONEDRIVE.1.1v1 instructions:
 
 1.  Select **Policies** \> **Sharing**
 
-2.  Adjust external sharing slider for Sharepoint to **Existing Guests** or **Only people in your organization**
+2.  Adjust external sharing slider for SharePoint to **Existing Guests** or **Only people in your organization**
 
 3. Select **Save**
 
-#### MS.SHAREPOINT-ONEDRIVE.1.2v1, instructions:
+#### MS.SHAREPOINT-ONEDRIVE.1.2v1 instructions:
 
 1.  Follow the same instructions as MS.SHAREPOINT-ONEDRIVE.1.1v1 but set the slider value for OneDrive.
 
-#### MS.SHAREPOINT-ONEDRIVE.1.3v1, instructions:
+#### MS.SHAREPOINT-ONEDRIVE.1.3v1 instructions:
 
 1.  Select **Policies** \> **Sharing**
 
@@ -101,7 +101,7 @@ All of the settings in this section are configured in the **SharePoint admin cen
 
 6.  Select **Save**
 
-#### MS.SHAREPOINT-ONEDRIVE.1.4v1, instructions:
+#### MS.SHAREPOINT-ONEDRIVE.1.4v1 instructions:
 
 1.  Select **Policies** \> **Sharing**
 
@@ -116,7 +116,7 @@ All of the settings in this section are configured in the **SharePoint admin cen
 
 6. Select **Save**
 
-#### MS.SHAREPOINT-ONEDRIVE.1.4v1, instructions:
+#### MS.SHAREPOINT-ONEDRIVE.1.4v1 instructions:
 
 1.  Select **Policies** \> **Sharing**
 
@@ -155,7 +155,7 @@ File and folder default sharing permissions SHALL be set to View only.
 
 All of the settings in this section are configured in the **SharePoint admin center**.
 
-#### MS.SHAREPOINT-ONEDRIVE.2.1v1, instructions:
+#### MS.SHAREPOINT-ONEDRIVE.2.1v1 instructions:
 
 1.  Select **Policies** \> **Sharing**
 
@@ -163,7 +163,7 @@ All of the settings in this section are configured in the **SharePoint admin cen
 
 3.  Select **Save**
 
-#### MS.SHAREPOINT-ONEDRIVE.2.2v1, instructions:
+#### MS.SHAREPOINT-ONEDRIVE.2.2v1 instructions:
 
 1.  Navigate to the same location in the portal as MS.SHAREPOINT-ONEDRIVE.2.1v1, but set the permission that's selected by default for sharing links to **View**
 
@@ -205,7 +205,7 @@ Reauthentication days for people who use a verification code SHALL be set to 30 
 
 All of the settings in this section are configured in the **SharePoint admin center**.
 
-#### MS.SHAREPOINT-ONEDRIVE.3.1v1, instructions:
+#### MS.SHAREPOINT-ONEDRIVE.3.1v1 instructions:
 
 1.  Select **Policies** \> **Sharing**
 
@@ -217,7 +217,7 @@ All of the settings in this section are configured in the **SharePoint admin cen
 
 5.  Select **Save**
 
-#### MS.SHAREPOINT-ONEDRIVE.3.2v1, instructions:
+#### MS.SHAREPOINT-ONEDRIVE.3.2v1 instructions:
 
 1.  Select **Policies** \> **Sharing**
 
@@ -231,7 +231,7 @@ All of the settings in this section are configured in the **SharePoint admin cen
 
 6.  Select **Save**
 
-#### MS.SHAREPOINT-ONEDRIVE.3.3v1, instructions:
+#### MS.SHAREPOINT-ONEDRIVE.3.3v1 instructions:
 
 1.  Select **Policies** \> **Sharing**
 
@@ -270,7 +270,7 @@ Users SHALL be prevented from running custom scripts on self-service created sit
 
 All of the settings in this section are configured in the **SharePoint admin center**.
 
-#### MS.SHAREPOINT-ONEDRIVE.4.1v1, instructions:
+#### MS.SHAREPOINT-ONEDRIVE.4.1v1 instructions:
 
 1.  Select **Settings**
 
@@ -282,7 +282,7 @@ All of the settings in this section are configured in the **SharePoint admin cen
 
 5.  Select **Ok**
 
-#### MS.SHAREPOINT-ONEDRIVE.4.2v1, instructions:
+#### MS.SHAREPOINT-ONEDRIVE.4.2v1 instructions:
 
 1.  Navigate to the same location in the portal as MS.SHAREPOINT-ONEDRIVE.4.1v1, but select the option **Prevent users from running custom script on self-service created sites**
 
