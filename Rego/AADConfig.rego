@@ -4,9 +4,9 @@ import data.report.utils.NotCheckedDetails
 import data.report.utils.Format
 import data.report.utils.ReportDetailsBoolean
 
-################
-# The report formatting functions below are generic and used throughout the policies #
-################
+#############################################################################
+# The report formatting functions below are generic and used throughout AAD #
+#############################################################################
 
 Description(String1, String2, String3) =  trim(concat(" ", [String1, String2, String3]), " ")
 
@@ -38,9 +38,10 @@ ReportFullDetailsArray(Array, String) = Details {
 
 CapLink := "<a href='#caps'>View all CA policies</a>."
 
-################
+##############################################################################################################
 # The report formatting functions below are for policies that check the required Azure AD Premium P2 license #
-################
+##############################################################################################################
+
 Aad2P2Licenses[ServicePlan.ServicePlanId] {
     ServicePlan = input.service_plans[_]
     ServicePlan.ServicePlanName == "AAD_PREMIUM_P2"
@@ -85,12 +86,13 @@ ReportDetailsBooleanLicenseWarning(_) = Description if {
     Description := P2WarningString
 }
 
-################
-# User/Group Exclusion support functions
-################
+##########################################
+# User/Group Exclusion support functions #
+##########################################
+
 default UserExclusionsFullyExempt(_, _) := false
 UserExclusionsFullyExempt(Policy, PolicyID) := true if {
-    # Returns true when all user exclusions present in the conditional 
+    # Returns true when all user exclusions present in the conditional
     # access policy are exempted in matching config variable for the
     # baseline policy item.  Undefined if no exclusions AND no exemptions.
     ExemptedUsers := input.scuba_config.Aad[PolicyID].CapExclusions.Users
@@ -107,8 +109,8 @@ UserExclusionsFullyExempt(Policy, PolicyID) := true if {
 
 default GroupExclusionsFullyExempt(_, _) := false
 GroupExclusionsFullyExempt(Policy, PolicyID) := true if {
-    # Returns true when all group exclusions present in the conditional 
-    # access policy are exempted in matching config variable for the 
+    # Returns true when all group exclusions present in the conditional
+    # access policy are exempted in matching config variable for the
     # baseline policy item.  Undefined if no exclusions AND no exemptions.
     ExemptedGroups := input.scuba_config.Aad[PolicyID].CapExclusions.Groups
     ExcludedGroups := { x | x := Policy.Conditions.Users.ExcludeGroups[_] }
@@ -122,12 +124,15 @@ GroupExclusionsFullyExempt(Policy, PolicyID) := true if {
     count({ y | y := input.scuba_config.Aad[PolicyID].CapExclusions.Groups }) == 0
 }
 
+############
+# MS.AAD.1 #
+############
+
 #
 # MS.AAD.1.1v1
 #--
-
-default Policy2_1_1ConditionsMatch(_) := false
-Policy2_1_1ConditionsMatch(Policy) := true if {
+default LegacyAuthenticationConditionsMatch(_) := false
+LegacyAuthenticationConditionsMatch(Policy) := true if {
     "All" in Policy.Conditions.Users.IncludeUsers
     "All" in Policy.Conditions.Applications.IncludeApplications
     "other" in Policy.Conditions.ClientAppTypes
@@ -137,36 +142,40 @@ Policy2_1_1ConditionsMatch(Policy) := true if {
     Policy.State == "enabled"
 }
 
-Policies2_1[Cap.DisplayName] {
+LegacyAuthentication[Cap.DisplayName] {
     Cap := input.conditional_access_policies[_]
 
     # Match all simple conditions
-    Policy2_1_1ConditionsMatch(Cap)
+    LegacyAuthenticationConditionsMatch(Cap)
 
     # Only match policies with user and group exclusions if all exempted
-    UserExclusionsFullyExempt(Cap, "Policy2_1_1") == true
-    GroupExclusionsFullyExempt(Cap, "Policy2_1_1") == true
+    UserExclusionsFullyExempt(Cap, "MS.AAD.1.1v1") == true
+    GroupExclusionsFullyExempt(Cap, "MS.AAD.1.1v1") == true
 }
 
 tests[{
     "PolicyId" : "MS.AAD.1.1v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-MgIdentityConditionalAccessPolicy"],
-    "ActualValue" : Policies2_1,
-    "ReportDetails" : concat(". ", [ReportFullDetailsArray(Policies2_1, DescriptionString), CapLink]),
-    "RequirementMet" : count(Policies2_1) > 0
+    "ActualValue" : LegacyAuthentication,
+    "ReportDetails" : concat(". ", [ReportFullDetailsArray(LegacyAuthentication, DescriptionString), CapLink]),
+    "RequirementMet" : Status
 }] {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
-    true
+    Status := count(LegacyAuthentication) > 0
 }
+#--
+
+############
+# MS.AAD.2 #
+############
 
 #
 # MS.AAD.2.1v1
 #--
-
-default Policy2_2_1ConditionsMatch(_) := false
-Policy2_2_1ConditionsMatch(Policy) := true if {
-    "All" in Policy.Conditions.Users.IncludeUsers   
+default BlockHighRiskConditionsMatch(_) := false
+BlockHighRiskConditionsMatch(Policy) := true if {
+    "All" in Policy.Conditions.Users.IncludeUsers
     "All" in Policy.Conditions.Applications.IncludeApplications
     "high" in Policy.Conditions.UserRiskLevels
     "block" in Policy.GrantControls.BuiltInControls
@@ -174,27 +183,27 @@ Policy2_2_1ConditionsMatch(Policy) := true if {
     count(Policy.Conditions.Users.ExcludeRoles) == 0
 }
 
-Policies2_2_1[Cap.DisplayName] {
+BlockHighRisk[Cap.DisplayName] {
     Cap := input.conditional_access_policies[_]
 
     # Match all simple conditions
-    Policy2_2_1ConditionsMatch(Cap)
+    BlockHighRiskConditionsMatch(Cap)
 
     # Only match policies with user and group exclusions if all exempted
-    UserExclusionsFullyExempt(Cap, "Policy2_2_1") == true
-    GroupExclusionsFullyExempt(Cap, "Policy2_2_1") == true
+    UserExclusionsFullyExempt(Cap, "MS.AAD.2.1v1") == true
+    GroupExclusionsFullyExempt(Cap, "MS.AAD.2.1v1") == true
 }
 
 tests[{
     "PolicyId" : "MS.AAD.2.1v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-MgIdentityConditionalAccessPolicy"],
-    "ActualValue" : Policies2_2_1,
-    "ReportDetails" : ReportDetailsArrayLicenseWarningCap(Policies2_2_1, DescriptionString),
+    "ActualValue" : BlockHighRisk,
+    "ReportDetails" : ReportDetailsArrayLicenseWarningCap(BlockHighRisk, DescriptionString),
     "RequirementMet" : Status
 }] {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
-    Status := count(Policies2_2_1) > 0
+    Status := count(BlockHighRisk) > 0
 }
 #--
 
@@ -215,14 +224,12 @@ tests[{
 }
 #--
 
-
 #
-# MS.AAD.3.1v1
+# MS.AAD.2.3v1
 #--
-
-default Policy2_3_1ConditionsMatch(_) := false
-Policy2_3_1ConditionsMatch(Policy) := true if {
-    "All" in Policy.Conditions.Users.IncludeUsers   
+default SignInBlockedConditionsMatch(_) := false
+SignInBlockedConditionsMatch(Policy) := true if {
+    "All" in Policy.Conditions.Users.IncludeUsers
     "All" in Policy.Conditions.Applications.IncludeApplications
     "high" in Policy.Conditions.SignInRiskLevels
     "block" in Policy.GrantControls.BuiltInControls
@@ -230,69 +237,36 @@ Policy2_3_1ConditionsMatch(Policy) := true if {
     count(Policy.Conditions.Users.ExcludeRoles) == 0
 }
 
-Policies2_3[Cap.DisplayName] {
+SignInBlocked[Cap.DisplayName] {
     Cap := input.conditional_access_policies[_]
 
     # Match all simple conditions
-    Policy2_3_1ConditionsMatch(Cap)
+    SignInBlockedConditionsMatch(Cap)
 
     # Only match policies with user and group exclusions if all exempted
-    UserExclusionsFullyExempt(Cap, "Policy2_3_1") == true
-    GroupExclusionsFullyExempt(Cap, "Policy2_3_1") == true
+    UserExclusionsFullyExempt(Cap, "MS.AAD.2.3v1") == true
+    GroupExclusionsFullyExempt(Cap, "MS.AAD.2.3v1") == true
 }
 
 tests[{
-    "PolicyId": "MS.AAD.3.1v1",
+    "PolicyId": "MS.AAD.2.3v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-MgIdentityConditionalAccessPolicy"],
-    "ActualValue" : Policies2_3,
-    "ReportDetails" : ReportDetailsArrayLicenseWarningCap(Policies2_3, DescriptionString),
+    "ActualValue" : SignInBlocked,
+    "ReportDetails" : ReportDetailsArrayLicenseWarningCap(SignInBlocked, DescriptionString),
     "RequirementMet" : Status
 }] {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
-    Status := count(Policies2_3) > 0
+    Status := count(SignInBlocked) > 0
 }
 #--
 
+############
+# MS.AAD.3 #
+############
 
 #
-# MS.AAD.4.1v1
-#--
-default Policy2_4_1ConditionsMatch(_) := false
-Policy2_4_1ConditionsMatch(Policy) := true if {
-    "All" in Policy.Conditions.Users.IncludeUsers
-    "All" in Policy.Conditions.Applications.IncludeApplications
-    "mfa" in Policy.GrantControls.BuiltInControls
-    Policy.State == "enabled"
-    count(Policy.Conditions.Users.ExcludeRoles) == 0
-}
-
-Policies2_4_1[Cap.DisplayName] {
-    Cap := input.conditional_access_policies[_]
-
-    # Match all simple conditions
-    Policy2_4_1ConditionsMatch(Cap)
-
-    # Only match policies with user and group exclusions if all exempted
-    UserExclusionsFullyExempt(Cap, "Policy2_4_1") == true
-    GroupExclusionsFullyExempt(Cap, "Policy2_4_1") == true
-}
-
-tests[{
-    "PolicyId" : "MS.AAD.4.1v1",
-    "Criticality" : "Shall",
-    "Commandlet" : ["Get-MgIdentityConditionalAccessPolicy"],
-    "ActualValue" : Policies2_4_1,
-    "ReportDetails" : concat(". ", [ReportFullDetailsArray(Policies2_4_1, DescriptionString), CapLink]),
-    "RequirementMet" : count(Policies2_4_1) > 0
-}]{
-    DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
-    true
-}
-#--
-
-#
-# MS.AAD.4.2v1
+# MS.AAD.3.1v1
 #--
 # At this time we are unable to fully test for MFA due to conflicting and multiple ways to configure authentication methods
 # Awaiting API changes and feature updates from Microsoft for automated checking
@@ -304,31 +278,83 @@ tests[{
     "ReportDetails" : NotCheckedDetails(PolicyId),
     "RequirementMet" : false
 }] {
-    PolicyId := "MS.AAD.4.2v1"
+    PolicyId := "MS.AAD.3.1v1"
     true
 }
 #--
 
 #
-# MS.AAD.4.3v1
+# MS.AAD.3.2v1
 #--
-# At this time we are unable to test for all users due to conflicting and multiple ways to configure authentication methods
-# Awaiting API changes and feature updates from Microsoft for automated checking
+default AlternativeMFAConditionsMatch(_) := false
+AlternativeMFAConditionsMatch(Policy) := true if {
+    "All" in Policy.Conditions.Users.IncludeUsers
+    "All" in Policy.Conditions.Applications.IncludeApplications
+    "mfa" in Policy.GrantControls.BuiltInControls
+    Policy.State == "enabled"
+    count(Policy.Conditions.Users.ExcludeRoles) == 0
+}
+
+AlternativeMFA[Cap.DisplayName] {
+    Cap := input.conditional_access_policies[_]
+
+    # Match all simple conditions
+    AlternativeMFAConditionsMatch(Cap)
+
+    # Only match policies with user and group exclusions if all exempted
+    UserExclusionsFullyExempt(Cap, "MS.AAD.3.2v1") == true
+    GroupExclusionsFullyExempt(Cap, "MS.AAD.3.2v1") == true
+}
+
 tests[{
-    "PolicyId" : PolicyId,
-    "Criticality" : "Shall/Not-Implemented",
+    "PolicyId" : "MS.AAD.3.2v1",
+    "Criticality" : "Shall",
+    "Commandlet" : ["Get-MgIdentityConditionalAccessPolicy"],
+    "ActualValue" : AlternativeMFA,
+    "ReportDetails" : concat(". ", [ReportFullDetailsArray(AlternativeMFA, DescriptionString), CapLink]),
+    "RequirementMet" : Status
+}]{
+    DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
+    Status := count(AlternativeMFA) > 0
+}
+#--
+
+#
+# MS.AAD.3.3v1
+#--
+# At this time we are unable to test for X because of NEW POLICY
+tests[{
+    "PolicyId": PolicyId,
+    "Criticality" : "Should/Not-Implemented",
     "Commandlet" : [],
     "ActualValue" : [],
     "ReportDetails" : NotCheckedDetails(PolicyId),
     "RequirementMet" : false
 }] {
-    PolicyId := "MS.AAD.4.3v1"
+    PolicyId := "MS.AAD.3.3v1"
     true
 }
 #--
 
 #
-# MS.AAD.4.4v1
+# MS.AAD.3.4v1
+#--
+# At this time we are unable to test for X because of NEW POLICY
+tests[{
+    "PolicyId": PolicyId,
+    "Criticality" : "Should/Not-Implemented",
+    "Commandlet" : [],
+    "ActualValue" : [],
+    "ReportDetails" : NotCheckedDetails(PolicyId),
+    "RequirementMet" : false
+}] {
+    PolicyId := "MS.AAD.3.4v1"
+    true
+}
+#--
+
+#
+# MS.AAD.3.5v1
 #--
 # At this time we are unable to test for SMS/Voice settings due to lack of API to validate
 # Awaiting API changes and feature updates from Microsoft for automated checking
@@ -340,14 +366,95 @@ tests[{
     "ReportDetails" : NotCheckedDetails(PolicyId),
     "RequirementMet" : false
 }] {
-    PolicyId := "MS.AAD.4.4v1"
+    PolicyId := "MS.AAD.3.5v1"
     true
 }
 #--
 
+#
+# MS.AAD.3.6v1
+#--
+PhishingResistantMFA[Cap.DisplayName] {
+    Cap := input.conditional_access_policies[_]
+    PrivRolesSet := { Role.RoleTemplateId | Role = input.privileged_roles[_] }
+    CondIncludedRolesSet := { Y | Y = Cap.Conditions.Users.IncludeRoles[_] }
+    MissingRoles := PrivRolesSet - CondIncludedRolesSet
+    # Filter: only include policies that meet all the requirements
+    count(MissingRoles) == 0
+    CondExcludedRolesSet := { Y | Y = Cap.Conditions.Users.ExcludeRoles[_] }
+    #make sure excluded roles do not contain any of the privileged roles (if it does, that means you are excluding it which is not what the policy says)
+    MatchingExcludeRoles := PrivRolesSet & CondExcludedRolesSet
+    #only succeeds if there is no intersection, i.e., excluded roles are none of the privileged roles
+    count(MatchingExcludeRoles) == 0
+    "All" in Cap.Conditions.Applications.IncludeApplications
+    "mfa" in Cap.GrantControls.BuiltInControls
+    Cap.State == "enabled"
+}
+
+tests[{
+    "PolicyId" : "MS.AAD.3.6v1",
+    "Criticality" : "Shall",
+    "Commandlet" : ["Get-MgSubscribedSku", "Get-PrivilegedRole", "Get-MgIdentityConditionalAccessPolicy"],
+    "ActualValue" : PhishingResistantMFA,
+    "ReportDetails" : concat(". ", [ReportFullDetailsArray(PhishingResistantMFA, DescriptionString), CapLink]),
+    "RequirementMet" : Status
+}] {
+    DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
+    Status := count(PhishingResistantMFA) > 0
+}
+#--
 
 #
-# MS.AAD.5.1v1
+# MS.AAD.3.7v1
+#--
+ManagedDeviceAuth[Cap.DisplayName] {
+    Cap := input.conditional_access_policies[_]
+    CompliantDevice := "compliantDevice" in Cap.GrantControls.BuiltInControls
+    HybridJoin := "domainJoinedDevice" in Cap.GrantControls.BuiltInControls
+    Conditions := [CompliantDevice, HybridJoin]
+    # Filter: only include policies that meet all the requirements
+    "All" in Cap.Conditions.Users.IncludeUsers
+    "All" in Cap.Conditions.Applications.IncludeApplications
+    count([Condition | Condition = Conditions[_]; Condition == true]) > 0
+    Cap.State == "enabled"
+}
+
+tests[{
+    "PolicyId" : "MS.AAD.3.7v1",
+    "Criticality" : "Should",
+    "Commandlet" : ["Get-MgIdentityConditionalAccessPolicy"],
+    "ActualValue" : ManagedDeviceAuth,
+    "ReportDetails" : concat(". ", [ReportFullDetailsArray(ManagedDeviceAuth, DescriptionString), CapLink]),
+    "RequirementMet" : Status
+}] {
+    DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
+    Status := count(ManagedDeviceAuth) > 0
+}
+#--
+
+#
+# MS.AAD.3.8v1
+#--
+# At this time we are unable to test for X because NEW POLICY
+tests[{
+    "PolicyId": PolicyId,
+    "Criticality" : "Should/Not-Implemented",
+    "Commandlet" : [],
+    "ActualValue" : [],
+    "ReportDetails" : NotCheckedDetails(PolicyId),
+    "RequirementMet" : false
+}] {
+    PolicyId := "MS.AAD.3.8v1"
+    true
+}
+#--
+
+############
+# MS.AAD.4 #
+############
+
+#
+# MS.AAD.4.1v1
 #--
 # At this time we are unable to test for log collection until we integrate Azure Powershell capabilities
 tests[{
@@ -358,61 +465,18 @@ tests[{
     "ReportDetails" : NotCheckedDetails(PolicyId),
     "RequirementMet" : false
 }] {
-    PolicyId := "MS.AAD.5.1v1"
+    PolicyId := "MS.AAD.4.1v1"
     true
 }
 #--
+
+############
+# MS.AAD.5 #
+############
 
 #
-# MS.AAD.5.2v1
+# MS.AAD.5.1v1
 #--
-tests[{
-    "PolicyId": PolicyId,
-    "Criticality" : "Should/Not-Implemented",
-    "Commandlet" : [],
-    "ActualValue" : [],
-    "ReportDetails" : NotCheckedDetails(PolicyId),
-    "RequirementMet" : false
-}] {
-    PolicyId := "MS.AAD.5.2v1"
-    true
-}
-#--
-
-#
-# MS.AAD.5.3v1
-#--
-tests[{
-    "PolicyId": PolicyId,
-    "Criticality" : "Should/Not-Implemented",
-    "Commandlet" : [],
-    "ActualValue" : [],
-    "ReportDetails" : NotCheckedDetails(PolicyId),
-    "RequirementMet" : false
-}] {
-    PolicyId := "MS.AAD.5.3v1"
-    true
-}
-#--
-
-#
-# MS.AAD.5.4v1
-#--
-# At this time we are unable to test for X because of Y
-tests[{
-    "PolicyId" : PolicyId,
-    "Criticality" : "Shall/Not-Implemented",
-    "Commandlet" : [],
-    "ActualValue" : [],
-    "ReportDetails" : NotCheckedDetails(PolicyId),
-    "RequirementMet" : false
-}] {
-    PolicyId := "MS.AAD.5.4v1"
-    true
-}
-#--
-
-
 AuthPoliciesBad_2_6[Policy.Id] {
     Policy = input.authorization_policies[_]
     Policy.DefaultUserRolePermissions.AllowedToCreateApps == true
@@ -425,11 +489,8 @@ AllAuthPoliciesAllowedCreate[{
     Policy := input.authorization_policies[_]
 }
 
-#
-# MS.AAD.6.1v1
-#--
 tests[{
-    "PolicyId" : "MS.AAD.6.1v1",
+    "PolicyId" : "MS.AAD.5.1v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-MgPolicyAuthorizationPolicy"],
     "ActualValue" : {"all_allowed_create_values": AllAuthPoliciesAllowedCreate},
@@ -443,7 +504,7 @@ tests[{
 #--
 
 #
-# MS.AAD.7.1v1
+# MS.AAD.5.2v1
 #--
 BadDefaultGrantPolicies[Policy.Id] {
     Policy = input.authorization_policies[_]
@@ -458,7 +519,7 @@ AllDefaultGrantPolicies[{
 }
 
 tests[{
-    "PolicyId" : "MS.AAD.7.1v1",
+    "PolicyId" : "MS.AAD.5.2v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-MgPolicyAuthorizationPolicy"],
     "ActualValue" : {"all_grant_policy_values": AllDefaultGrantPolicies},
@@ -472,7 +533,7 @@ tests[{
 #--
 
 #
-# MS.AAD.7.2v1
+# MS.AAD.5.3v1
 #--
 BadConsentPolicies[Policy.Id] {
     Policy := input.admin_consent_policies[_]
@@ -488,7 +549,7 @@ AllConsentPolicies[{
 
 
 tests[{
-    "PolicyId" : "MS.AAD.7.2v1",
+    "PolicyId" : "MS.AAD.5.3v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-MgPolicyAdminConsentRequestPolicy"],
     "ActualValue" : {"all_consent_policies": AllConsentPolicies},
@@ -501,7 +562,7 @@ tests[{
 #--
 
 #
-# MS.AAD.7.3v1
+# MS.AAD.5.4v1
 #--
 AllConsentSettings[{
     "SettingsGroup": SettingGroup.DisplayName,
@@ -532,7 +593,7 @@ BadConsentSettings[{
 }
 
 tests[{
-    "PolicyId" : "MS.AAD.7.3v1",
+    "PolicyId" : "MS.AAD.5.4v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-MgDirectorySetting"],
     "ActualValue" : AllConsentSettings,
@@ -544,8 +605,12 @@ tests[{
 }
 #--
 
+############
+# MS.AAD.6 #
+############
+
 #
-# MS.AAD.8.1v1
+# MS.AAD.6.1v1
 #--
 # At this time we are unable to test for X because of Y
 tests[{
@@ -556,170 +621,20 @@ tests[{
     "ReportDetails" : NotCheckedDetails(PolicyId),
     "RequirementMet" : false
 }] {
-    PolicyId := "MS.AAD.8.1v1"
+    PolicyId := "MS.AAD.6.1v1"
     true
 }
 #--
 
-#
-# MS.AAD.9.1v1
-#--
-default Policy2_9_1ConditionsMatch(_) := false
-Policy2_9_1ConditionsMatch(Policy) := true if {
-    "All" in Policy.Conditions.Users.IncludeUsers
-    "All" in Policy.Conditions.Applications.IncludeApplications
-    Policy.SessionControls.SignInFrequency.IsEnabled == true
-    Policy.SessionControls.SignInFrequency.Type == "hours"
-    Policy.SessionControls.SignInFrequency.Value == 12
-    Policy.State == "enabled"
-    count(Policy.Conditions.Users.ExcludeRoles) == 0
-}
+############
+# MS.AAD.7 #
+############
 
-Policies2_9[Cap.DisplayName] {
-    Cap := input.conditional_access_policies[_]
+#################################
+# Helper functions for policies #
+#################################
 
-    # Match all simple conditions
-    Policy2_9_1ConditionsMatch(Cap)
-
-    # Only match policies with user and group exclusions if all exempted
-    UserExclusionsFullyExempt(Cap, "Policy2_9_1") == true
-    GroupExclusionsFullyExempt(Cap, "Policy2_9_1") == true
-}
-
-tests[{
-    "PolicyId" : "MS.AAD.9.1v1",
-    "Criticality" : "Shall",
-    "Commandlet" : ["Get-MgIdentityConditionalAccessPolicy"],
-    "ActualValue" : Policies2_9,
-    "ReportDetails" : concat(". ", [ReportFullDetailsArray(Policies2_9, DescriptionString), CapLink]),
-    "RequirementMet" : count(Policies2_9) > 0
-}] {
-    DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
-    true
-}
-#--
-
-#
-# MS.AAD.10.1v1
-#--
-default Policy2_10_1ConditionsMatch(_) := false
-Policy2_10_1ConditionsMatch(Policy) := true if {
-    "All" in Policy.Conditions.Users.IncludeUsers
-    "All" in Policy.Conditions.Applications.IncludeApplications
-    Policy.SessionControls.PersistentBrowser.IsEnabled == true
-    Policy.SessionControls.PersistentBrowser.Mode == "never"
-    Policy.State == "enabled"
-    count(Policy.Conditions.Users.ExcludeRoles) == 0
-}
-
-Policies2_10[Cap.DisplayName] {
-    Cap := input.conditional_access_policies[_]
-
-    # Match all simple conditions
-    Policy2_10_1ConditionsMatch(Cap)
-
-    # Only match policies with user and group exclusions if all exempted
-    UserExclusionsFullyExempt(Cap, "Policy2_10_1") == true
-    GroupExclusionsFullyExempt(Cap, "Policy2_10_1") == true
-}
-
-tests[{
-    "PolicyId" : "MS.AAD.10.1v1",
-    "Criticality" : "Shall",
-    "Commandlet" : ["Get-MgIdentityConditionalAccessPolicy"],
-    "ActualValue" : Policies2_10,
-    "ReportDetails" : concat(". ", [ReportFullDetailsArray(Policies2_10, DescriptionString), CapLink]),
-    "RequirementMet" : count(Policies2_10) > 0
-}] {
-    DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
-    true
-}
-#--
-
-#
-# MS.AAD.11.1v1
-#--
-GlobalAdmins[User.DisplayName] {
-    some id
-    User := input.privileged_users[id]
-    "Global Administrator" in User.roles
-}
-
-tests[{
-    "PolicyId" : "MS.AAD.11.1v1",
-    "Criticality" : "Shall",
-    "Commandlet" : ["Get-MgSubscribedSku", "Get-PrivilegedUser"],
-    "ActualValue" : GlobalAdmins,
-    "ReportDetails" : ReportFullDetailsArray(GlobalAdmins, DescriptionString),
-    "RequirementMet" : Status
-}] {
-    DescriptionString := "global admin(s) found"
-    Conditions := [count(GlobalAdmins) < 5, count(GlobalAdmins) >= 2]
-    Status := count([Condition | Condition = Conditions[_]; Condition == false]) == 0
-}
-#--
-
-#
-# MS.AAD.12.1v1
-#--
-FederatedAdmins[User.DisplayName] {
-    some id
-    User := input.privileged_users[id]
-    not is_null(User.OnPremisesImmutableId)
-}
-
-tests[{
-    "PolicyId" : "MS.AAD.12.1v1",
-    "Criticality" : "Shall",
-    "Commandlet" : ["Get-MgSubscribedSku", "Get-PrivilegedUser"],
-    "ActualValue" : AdminNames,
-    "ReportDetails" : ReportFullDetailsArray(FederatedAdmins, DescriptionString),
-    "RequirementMet" : Status
-}] {
-    DescriptionString := "admin(s) that are not cloud-only found"
-    Status := count(FederatedAdmins) == 0
-    AdminNames := concat(", ", FederatedAdmins)
-}
-#--
-
-#
-# MS.AAD.13.1v1
-#--
-Policies2_13[Cap.DisplayName] {
-    Cap := input.conditional_access_policies[_]
-    PrivRolesSet := { Role.RoleTemplateId | Role = input.privileged_roles[_] }
-    CondIncludedRolesSet := { Y | Y = Cap.Conditions.Users.IncludeRoles[_] }
-    MissingRoles := PrivRolesSet - CondIncludedRolesSet
-    # Filter: only include policies that meet all the requirements
-    count(MissingRoles) == 0
-    CondExcludedRolesSet := { Y | Y = Cap.Conditions.Users.ExcludeRoles[_] }
-    #make sure excluded roles do not contain any of the privileged roles (if it does, that means you are excluding it which is not what the policy says)
-    MatchingExcludeRoles := PrivRolesSet & CondExcludedRolesSet
-    #only succeeds if there is no intersection, i.e., excluded roles are none of the privileged roles
-    count(MatchingExcludeRoles) == 0
-    "All" in Cap.Conditions.Applications.IncludeApplications
-    "mfa" in Cap.GrantControls.BuiltInControls
-    Cap.State == "enabled"
-}
-
-tests[{
-    "PolicyId" : "MS.AAD.13.1v1",
-    "Criticality" : "Shall",
-    "Commandlet" : ["Get-MgSubscribedSku", "Get-PrivilegedRole", "Get-MgIdentityConditionalAccessPolicy"],
-    "ActualValue" : Policies2_13,
-    "ReportDetails" : concat(". ", [ReportFullDetailsArray(Policies2_13, DescriptionString), CapLink]),
-    "RequirementMet" : count(Policies2_13) > 0
-}] {
-    DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
-}
-#--
-
-
-#################
-# Helper functions for policies
-#################
-
-# DoPIMRoleRulesExist will return true when the JSON privileged_roles.Rules element exists and false when it does not.
+#   DoPIMRoleRulesExist will return true when the JSON privileged_roles.Rules element exists and false when it does not.
 #   This was created to add special logic for the scenario where the Azure AD premium P2 license is missing and therefore
 #   the JSON Rules element will not exist in that case because there is no PIM service.
 #   This is necessary to avoid false negatives when a policy checks for zero instances of a specific condition.
@@ -733,16 +648,71 @@ DoPIMRoleRulesExist {
 default check_if_role_rules_exist := false
 check_if_role_rules_exist := DoPIMRoleRulesExist
 
-# DoPIMRoleAssignmentsExist will return true when the JSON privileged_roles.Assignments element exists and false when it does not.
-DoPIMRoleAssignmentsExist {
-    _ = input.privileged_roles[_]["Assignments"]
+#
+# MS.AAD.7.1v1
+#--
+GlobalAdmins[User.DisplayName] {
+    some id
+    User := input.privileged_users[id]
+    "Global Administrator" in User.roles
 }
 
-default check_if_role_assignments_exist := false
-check_if_role_assignments_exist := DoPIMRoleAssignmentsExist
+tests[{
+    "PolicyId" : "MS.AAD.7.1v1",
+    "Criticality" : "Shall",
+    "Commandlet" : ["Get-MgSubscribedSku", "Get-PrivilegedUser"],
+    "ActualValue" : GlobalAdmins,
+    "ReportDetails" : ReportFullDetailsArray(GlobalAdmins, DescriptionString),
+    "RequirementMet" : Status
+}] {
+    DescriptionString := "global admin(s) found"
+    Conditions := [count(GlobalAdmins) < 5, count(GlobalAdmins) >= 2]
+    Status := count([Condition | Condition = Conditions[_]; Condition == false]) == 0
+}
+#--
 
 #
-# MS.AAD.14.1v1
+# MS.AAD.7.2v1
+#--
+# At this time we are unable to test for X because of Y
+tests[{
+    "PolicyId" : PolicyId,
+    "Criticality" : "Shall/Not-Implemented",
+    "Commandlet" : [],
+    "ActualValue" : [],
+    "ReportDetails" : NotCheckedDetails(PolicyId),
+    "RequirementMet" : false
+}] {
+    PolicyId := "MS.AAD.7.2v1"
+    true
+}
+#--
+
+#
+# MS.AAD.7.3v1
+#--
+FederatedAdmins[User.DisplayName] {
+    some id
+    User := input.privileged_users[id]
+    not is_null(User.OnPremisesImmutableId)
+}
+
+tests[{
+    "PolicyId" : "MS.AAD.7.3v1",
+    "Criticality" : "Shall",
+    "Commandlet" : ["Get-MgSubscribedSku", "Get-PrivilegedUser"],
+    "ActualValue" : AdminNames,
+    "ReportDetails" : ReportFullDetailsArray(FederatedAdmins, DescriptionString),
+    "RequirementMet" : Status
+}] {
+    DescriptionString := "admin(s) that are not cloud-only found"
+    Status := count(FederatedAdmins) == 0
+    AdminNames := concat(", ", FederatedAdmins)
+}
+#--
+
+#
+# MS.AAD.7.4v1
 #--
 RolesWithoutLimitedExpirationPeriod[Role.DisplayName] {
     Role := input.privileged_roles[_]
@@ -765,7 +735,7 @@ RolesWithoutLimitedExpirationPeriod[Role.DisplayName] {
 }
 
 tests[{
-    "PolicyId" : "MS.AAD.14.1v1",
+    "PolicyId" : "MS.AAD.7.4v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-MgSubscribedSku", "Get-PrivilegedRole"],
     "ActualValue" : RolesWithoutLimitedExpirationPeriod,
@@ -779,7 +749,7 @@ tests[{
 #--
 
 #
-# MS.AAD.14.2v1
+# MS.AAD.7.5v1
 #--
 RolesAssignedOutsidePim[Role.DisplayName] {
     Role := input.privileged_roles[_]
@@ -789,7 +759,7 @@ RolesAssignedOutsidePim[Role.DisplayName] {
 }
 
 tests[{
-    "PolicyId" : "MS.AAD.14.2v1",
+    "PolicyId" : "MS.AAD.7.5v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-MgSubscribedSku", "Get-PrivilegedRole"],
     "ActualValue" : RolesAssignedOutsidePim,
@@ -802,9 +772,8 @@ tests[{
 }
 #--
 
-
 #
-# MS.AAD.15.1v1
+# MS.AAD.7.6v1
 #--
 RolesWithoutApprovalRequired[RoleName] {
     Role := input.privileged_roles[_]
@@ -816,7 +785,7 @@ RolesWithoutApprovalRequired[RoleName] {
 }
 
 tests[{
-    "PolicyId" : "MS.AAD.15.1v1",
+    "PolicyId" : "MS.AAD.7.6v1",
     "Criticality" : "Should",
     "Commandlet" : ["Get-MgSubscribedSku", "Get-PrivilegedRole"],
     "ActualValue" : RolesWithoutApprovalRequired,
@@ -830,7 +799,7 @@ tests[{
 #--
 
 #
-# MS.AAD.16.1v1
+# MS.AAD.7.7v1
 #--
 RolesWithoutActiveAssignmentAlerts[RoleName] {
     Role := input.privileged_roles[_]
@@ -851,7 +820,7 @@ RolesWithoutEligibleAssignmentAlerts[RoleName] {
 }
 
 tests[{
-    "PolicyId" : "MS.AAD.16.1v1",
+    "PolicyId" : "MS.AAD.7.7v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-MgSubscribedSku", "Get-PrivilegedRole"],
     "ActualValue" : RolesWithoutAssignmentAlerts,
@@ -866,7 +835,7 @@ tests[{
 #--
 
 #
-# MS.AAD.16.2v1
+# MS.AAD.7.8v1
 #--
 AdminsWithoutActivationAlert[RoleName] {
     Role := input.privileged_roles[_]
@@ -879,7 +848,7 @@ AdminsWithoutActivationAlert[RoleName] {
 }
 
 tests[{
-    "PolicyId" : "MS.AAD.16.2v1",
+    "PolicyId" : "MS.AAD.7.8v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-MgSubscribedSku", "Get-PrivilegedRole"],
     "ActualValue" : AdminsWithoutActivationAlert,
@@ -893,10 +862,10 @@ tests[{
 #--
 
 #
-# MS.AAD.16.3v1
+# MS.AAD.7.9v1
 #--
 tests[{
-    "PolicyId" : "MS.AAD.16.3v1",
+    "PolicyId" : "MS.AAD.7.9v1",
     "Criticality" : "Should",
     "Commandlet" : ["Get-MgSubscribedSku", "Get-PrivilegedRole"],
     "ActualValue" : NonGlobalAdminsWithoutActivationAlert,
@@ -910,86 +879,12 @@ tests[{
 }
 #--
 
-#
-# MS.AAD.17.1v1
-#--
-Policies2_17[Cap.DisplayName] {
-    Cap := input.conditional_access_policies[_]
-    CompliantDevice := "compliantDevice" in Cap.GrantControls.BuiltInControls
-    HybridJoin := "domainJoinedDevice" in Cap.GrantControls.BuiltInControls
-    Conditions := [CompliantDevice, HybridJoin]
-    # Filter: only include policies that meet all the requirements
-    "All" in Cap.Conditions.Users.IncludeUsers
-    "All" in Cap.Conditions.Applications.IncludeApplications
-    count([Condition | Condition = Conditions[_]; Condition == true]) > 0
-    Cap.State == "enabled"
-}
-
-tests[{
-    "PolicyId" : "MS.AAD.17.1v1",
-    "Criticality" : "Should",
-    "Commandlet" : ["Get-MgIdentityConditionalAccessPolicy"],
-    "ActualValue" : Policies2_17,
-    "ReportDetails" : concat(". ", [ReportFullDetailsArray(Policies2_17, DescriptionString), CapLink]),
-    "RequirementMet" : count(Policies2_17) > 0
-}] {
-    DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
-    true
-}
-#--
+############
+# MS.AAD.8 #
+############
 
 #
-# MS.AAD.18.1v1
-#--
-AuthPoliciesBadAllowInvites[Policy.Id] {
-    Policy = input.authorization_policies[_]
-    Policy.AllowInvitesFrom != "adminsAndGuestInviters"
-}
-
-AllowInvitesByPolicy[concat("", ["\"", Policy.AllowInvitesFrom, "\"", " (", Policy.Id, ")"])] {
-    Policy := input.authorization_policies[_]
-}
-
-AllAuthPoliciesAllowInvites[{
-    "AllowInvitesFromValue" : Policy.AllowInvitesFrom,
-    "PolicyId" : Policy.Id
-}] {
-    Policy := input.authorization_policies[_]
-}
-
-tests[{
-    "PolicyId" : "MS.AAD.18.1v1",
-    "Criticality" : "Should",
-    "Commandlet" : ["Get-MgPolicyAuthorizationPolicy"],
-    "ActualValue" : {"all_allow_invite_values": AllAuthPoliciesAllowInvites},
-    "ReportDetails" : ReportDetail,
-    "RequirementMet" : Status
-}] {
-    BadPolicies := AuthPoliciesBadAllowInvites
-    Status := count(BadPolicies) == 0
-    ReportDetail := concat("", ["Permission level set to ", concat(", ", AllowInvitesByPolicy)])
-}
-#--
-
-#
-# MS.AAD.18.2v1
-#--
-# At this time we are unable to test for X because of Y
-tests[{
-    "PolicyId" : PolicyId,
-    "Criticality" : "Should/Not-Implemented",
-    "Commandlet" : [],
-    "ActualValue" : [],
-    "ReportDetails" : NotCheckedDetails(PolicyId),
-    "RequirementMet" : false
-}] {
-    PolicyId := "MS.AAD.18.2v1"
-    true
-}
-#--
-
-#
-# MS.AAD.18.3v1
+# MS.AAD.8.1v1
 #--
 # must hardcode the ID. See
 # https://docs.microsoft.com/en-us/azure/active-directory/enterprise-users/users-restrict-guest-permissions
@@ -1018,7 +913,7 @@ RoleIdByPolicy[concat("", ["\"", Level, "\"", " (", Policy.Id, ")"])] {
 }
 
 tests[{
-    "PolicyId" : "MS.AAD.18.3v1",
+    "PolicyId" : "MS.AAD.8.1v1",
     "Criticality" : "Should",
     "Commandlet" : ["Get-MgPolicyAuthorizationPolicy"],
     "ActualValue" : {"all_roleid_values" : AllAuthPoliciesRoleIds},
@@ -1028,5 +923,55 @@ tests[{
     BadPolicies := AuthPoliciesBadRoleId
     Status := count(BadPolicies) == 0
     ReportDetail := concat("", ["Permission level set to ", concat(", ", RoleIdByPolicy)])
+}
+#--
+
+#
+# MS.AAD.8.2v1
+#--
+AuthPoliciesBadAllowInvites[Policy.Id] {
+    Policy = input.authorization_policies[_]
+    Policy.AllowInvitesFrom != "adminsAndGuestInviters"
+}
+
+AllowInvitesByPolicy[concat("", ["\"", Policy.AllowInvitesFrom, "\"", " (", Policy.Id, ")"])] {
+    Policy := input.authorization_policies[_]
+}
+
+AllAuthPoliciesAllowInvites[{
+    "AllowInvitesFromValue" : Policy.AllowInvitesFrom,
+    "PolicyId" : Policy.Id
+}] {
+    Policy := input.authorization_policies[_]
+}
+
+tests[{
+    "PolicyId" : "MS.AAD.8.2v1",
+    "Criticality" : "Should",
+    "Commandlet" : ["Get-MgPolicyAuthorizationPolicy"],
+    "ActualValue" : {"all_allow_invite_values": AllAuthPoliciesAllowInvites},
+    "ReportDetails" : ReportDetail,
+    "RequirementMet" : Status
+}] {
+    BadPolicies := AuthPoliciesBadAllowInvites
+    Status := count(BadPolicies) == 0
+    ReportDetail := concat("", ["Permission level set to ", concat(", ", AllowInvitesByPolicy)])
+}
+#--
+
+#
+# MS.AAD.8.3v1
+#--
+# At this time we are unable to test for X because of Y
+tests[{
+    "PolicyId" : PolicyId,
+    "Criticality" : "Should/Not-Implemented",
+    "Commandlet" : [],
+    "ActualValue" : [],
+    "ReportDetails" : NotCheckedDetails(PolicyId),
+    "RequirementMet" : false
+}] {
+    PolicyId := "MS.AAD.8.3v1"
+    true
 }
 #--

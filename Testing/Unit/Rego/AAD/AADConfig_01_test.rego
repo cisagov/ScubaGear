@@ -1,32 +1,33 @@
 package aad
 import future.keywords
 
+
 #
-# Policy 1
-#--tests for no exclusions
+# MS.AAD.1.1v1
+#--
 test_NoExclusionsConditions_Correct if {
     PolicyId := "MS.AAD.1.1v1"
 
     Output := tests with input as {
-        "conditional_access_policies": [
+        "conditional_access_policies" : [
             {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": ["All"]
+                "Conditions" : {
+                    "Applications" : {
+                        "IncludeApplications" : ["All"]
                     },
-                    "Users": {
-                        "IncludeUsers": ["All"],
-                        "ExcludeUsers": [],
-                        "ExcludeGroups": [],
-                        "ExcludeRoles": []
+                    "Users" : {
+                        "IncludeUsers" : ["All"],
+                        "ExcludeUsers" : [],
+                        "ExcludeGroups" : [],
+                        "ExcludeRoles" : []
                     },
-                    "ClientAppTypes": ["other", "exchangeActiveSync"]
+                    "ClientAppTypes" : ["other", "exchangeActiveSync"]
                 },
-                "GrantControls": {
-                    "BuiltInControls": ["block"]
+                "GrantControls" : {
+                    "BuiltInControls" : ["block"]
                 },
-                "State": "enabled",
-                "DisplayName": "Test block Legacy Authentication"
+                "State" : "enabled",
+                "DisplayName" : "Test block Legacy Authentication"
             }
         ]
     }
@@ -42,24 +43,24 @@ test_NoExclusionsIncludeApplications_Incorrect if {
     PolicyId := "MS.AAD.1.1v1"
 
     Output := tests with input as {
-        "conditional_access_policies": [
+        "conditional_access_policies" : [
             {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": ["Office365"]
+                "Conditions" : {
+                    "Applications" : {
+                        "IncludeApplications" : ["Office365"]
                     },
-                    "Users": {
-                        "IncludeUsers": ["All"],
-                        "ExcludeUsers": [],
-                        "ExcludeGroups": [],
+                    "Users" : {
+                        "IncludeUsers" : ["All"],
+                        "ExcludeUsers" : [],
+                        "ExcludeGroups" : [],
                     },
-                    "ClientAppTypes": ["other", "exchangeActiveSync"]
+                    "ClientAppTypes" : ["other", "exchangeActiveSync"]
                 },
-                "GrantControls": {
-                    "BuiltInControls": ["block"]
+                "GrantControls" : {
+                    "BuiltInControls" : ["block"]
                 },
-                "State": "enabled",
-                "DisplayName": "Test block Legacy Authentication"
+                "State" : "enabled",
+                "DisplayName" : "Test block Legacy Authentication"
             }
         ]
     }
@@ -75,24 +76,24 @@ test_NoExclusionsIncludeUsers_Incorrect if {
     PolicyId := "MS.AAD.1.1v1"
 
     Output := tests with input as {
-        "conditional_access_policies": [
+        "conditional_access_policies" : [
             {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": ["All"]
+                "Conditions" : {
+                    "Applications" : {
+                        "IncludeApplications" : ["All"]
                     },
-                    "Users": {
-                        "IncludeUsers": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"],
-                        "ExcludeUsers": [],
-                        "ExcludeGroups": [],
+                    "Users" : {
+                        "IncludeUsers" : ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"],
+                        "ExcludeUsers" : [],
+                        "ExcludeGroups" : [],
                     },
-                    "ClientAppTypes": ["other", "exchangeActiveSync"]
+                    "ClientAppTypes" : ["other", "exchangeActiveSync"]
                 },
-                "GrantControls": {
-                    "BuiltInControls": ["block"]
+                "GrantControls" : {
+                    "BuiltInControls" : ["block"]
                 },
-                "State": "enabled",
-                "DisplayName": "Test block Legacy Authentication"
+                "State" : "enabled",
+                "DisplayName" : "Test block Legacy Authentication"
             }
         ]
     }
@@ -108,27 +109,26 @@ test_NoExclusionsExcludeUsers_Incorrect if {
     PolicyId := "MS.AAD.1.1v1"
 
     Output := tests with input as {
-        "conditional_access_policies": [
+        "conditional_access_policies" : [
             {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": ["All"]
+                "Conditions" : {
+                    "Applications" : {
+                        "IncludeApplications" : ["All"]
                     },
-                    "Users": {
-                        "IncludeUsers": ["All"],
-                        "ExcludeUsers": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"],
-                        "ExcludeGroups": [],
+                    "Users" : {
+                        "IncludeUsers" : ["All"],
+                        "ExcludeUsers" : ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"],
+                        "ExcludeGroups" : [],
                     },
-                    "ClientAppTypes": ["other", "exchangeActiveSync"]
+                    "ClientAppTypes" : ["other", "exchangeActiveSync"]
                 },
-                "GrantControls": {
-                    "BuiltInControls": ["block"]
+                "GrantControls" : {
+                    "BuiltInControls" : ["block"]
                 },
-                "State": "enabled",
-                "DisplayName": "Test block Legacy Authentication"
+                "State" : "enabled",
+                "DisplayName" : "Test block Legacy Authentication"
             }
-        ],
-
+        ]
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
@@ -142,24 +142,24 @@ test_NoExclusionsExcludeGroups_Incorrect if {
     PolicyId := "MS.AAD.1.1v1"
 
     Output := tests with input as {
-        "conditional_access_policies": [
+        "conditional_access_policies" : [
             {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": ["All"]
+                "Conditions" : {
+                    "Applications" : {
+                        "IncludeApplications" : ["All"]
                     },
-                    "Users": {
-                        "IncludeUsers": ["All"],
-                        "ExcludeUsers": [],
-                        "ExcludeGroups": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"],
+                    "Users" : {
+                        "IncludeUsers" : ["All"],
+                        "ExcludeUsers" : [],
+                        "ExcludeGroups" : ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"],
                     },
-                    "ClientAppTypes": ["other", "exchangeActiveSync"]
+                    "ClientAppTypes" : ["other", "exchangeActiveSync"]
                 },
-                "GrantControls": {
-                    "BuiltInControls": ["block"]
+                "GrantControls" : {
+                    "BuiltInControls" : ["block"]
                 },
-                "State": "enabled",
-                "DisplayName": "Test block Legacy Authentication"
+                "State" : "enabled",
+                "DisplayName" : "Test block Legacy Authentication"
             }
         ]
     }
@@ -175,24 +175,24 @@ test_NoExclusionsClientAppTypes_Incorrect if {
     PolicyId := "MS.AAD.1.1v1"
 
     Output := tests with input as {
-        "conditional_access_policies": [
+        "conditional_access_policies" : [
             {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": ["All"]
+                "Conditions" : {
+                    "Applications" : {
+                        "IncludeApplications" : ["All"]
                     },
-                    "Users": {
-                        "IncludeUsers": ["All"],
-                        "ExcludeUsers": [],
-                        "ExcludeGroups": [],
+                    "Users" : {
+                        "IncludeUsers" : ["All"],
+                        "ExcludeUsers" : [],
+                        "ExcludeGroups" : [],
                     },
-                    "ClientAppTypes": [""]
+                    "ClientAppTypes" : [""]
                 },
-                "GrantControls": {
-                    "BuiltInControls": ["block"]
+                "GrantControls" : {
+                    "BuiltInControls" : ["block"]
                 },
-                "State": "enabled",
-                "DisplayName": "Test block Legacy Authentication"
+                "State" : "enabled",
+                "DisplayName" : "Test block Legacy Authentication"
             }
         ]
     }
@@ -208,24 +208,24 @@ test_NoExclusionsBuiltInControls_Incorrect if {
     PolicyId := "MS.AAD.1.1v1"
 
     Output := tests with input as {
-        "conditional_access_policies": [
+        "conditional_access_policies" : [
             {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": ["All"]
+                "Conditions" : {
+                    "Applications" : {
+                        "IncludeApplications" : ["All"]
                     },
-                    "Users": {
-                        "IncludeUsers": ["All"],
-                        "ExcludeUsers": [],
-                        "ExcludeGroups": [],
+                    "Users" : {
+                        "IncludeUsers" : ["All"],
+                        "ExcludeUsers" : [],
+                        "ExcludeGroups" : [],
                     },
-                    "ClientAppTypes": ["other", "exchangeActiveSync"]
+                    "ClientAppTypes" : ["other", "exchangeActiveSync"]
                 },
-                "GrantControls": {
-                    "BuiltInControls": null
+                "GrantControls" : {
+                    "BuiltInControls" : null
                 },
-                "State": "enabled",
-                "DisplayName": "Test block Legacy Authentication"
+                "State" : "enabled",
+                "DisplayName" : "Test block Legacy Authentication"
             }
         ]
     }
@@ -241,24 +241,24 @@ test_NoExclusionsState_Incorrect if {
     PolicyId := "MS.AAD.1.1v1"
 
     Output := tests with input as {
-        "conditional_access_policies": [
+        "conditional_access_policies" : [
             {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": ["All"]
+                "Conditions" : {
+                    "Applications" : {
+                        "IncludeApplications" : ["All"]
                     },
-                    "Users": {
-                        "IncludeUsers": ["All"],
-                        "ExcludeUsers": [],
-                        "ExcludeGroups": [],
+                    "Users" : {
+                        "IncludeUsers" : ["All"],
+                        "ExcludeUsers" : [],
+                        "ExcludeGroups" : [],
                     },
-                    "ClientAppTypes": ["other", "exchangeActiveSync"]
+                    "ClientAppTypes" : ["other", "exchangeActiveSync"]
                 },
-                "GrantControls": {
-                    "BuiltInControls": ["block"]
+                "GrantControls" : {
+                    "BuiltInControls" : ["block"]
                 },
-                "State": "disabled",
-                "DisplayName": "Test block Legacy Authentication"
+                "State" : "disabled",
+                "DisplayName" : "Test block Legacy Authentication"
             }
         ]
     }
@@ -270,43 +270,41 @@ test_NoExclusionsState_Incorrect if {
     RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
 }
 
-#--tests for user exclusions and no group exclusions
+# tests for user exclusions and no group exclusions #
 test_NoExclusionsExemptUsers_Correct if {
     PolicyId := "MS.AAD.1.1v1"
 
     Output := tests with input as {
-        "conditional_access_policies": [
+        "conditional_access_policies" : [
             {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": ["All"]
+                "Conditions" : {
+                    "Applications" : {
+                        "IncludeApplications" : ["All"]
                     },
-                    "Users": {
-                        "IncludeUsers": ["All"],
-                        "ExcludeUsers": [],
-                        "ExcludeGroups": [],
-                        "ExcludeRoles": []
+                    "Users" : {
+                        "IncludeUsers" : ["All"],
+                        "ExcludeUsers" : [],
+                        "ExcludeGroups" : [],
+                        "ExcludeRoles" : []
                     },
-                    "ClientAppTypes": ["other", "exchangeActiveSync"]
+                    "ClientAppTypes" : ["other", "exchangeActiveSync"]
                 },
-                "GrantControls": {
-                    "BuiltInControls": ["block"]
+                "GrantControls" : {
+                    "BuiltInControls" : ["block"]
                 },
-                "State": "enabled",
-                "DisplayName": "Test block Legacy Authentication"
+                "State" : "enabled",
+                "DisplayName" : "Test block Legacy Authentication"
             }
         ],
-        "scuba_config": {
-            "Aad": {
-                 "Policy2_1_1": {
-                    "CapExclusions": {
-                        "Users": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
-                        "Groups": []
+        "scuba_config" : {
+            "Aad" : {
+                 "MS.AAD.1.1v1" : {
+                    "CapExclusions" : {
+                        "Users" : ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
+                        "Groups" : []
                     }
                 }
-
             }
-
         }
     }
 
@@ -321,36 +319,35 @@ test_UserExclusionsConditions_Correct if {
     PolicyId := "MS.AAD.1.1v1"
 
     Output := tests with input as {
-        "conditional_access_policies": [
+        "conditional_access_policies" : [
             {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": ["All"]
+                "Conditions" : {
+                    "Applications" : {
+                        "IncludeApplications" : ["All"]
                     },
-                    "Users": {
-                        "IncludeUsers": ["All"],
-                        "ExcludeUsers": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
-                        "ExcludeGroups": [],
-                        "ExcludeRoles": []
+                    "Users" : {
+                        "IncludeUsers" : ["All"],
+                        "ExcludeUsers" : ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
+                        "ExcludeGroups" : [],
+                        "ExcludeRoles" : []
                     },
-                    "ClientAppTypes": ["other", "exchangeActiveSync"]
+                    "ClientAppTypes" : ["other", "exchangeActiveSync"]
                 },
-                "GrantControls": {
-                    "BuiltInControls": ["block"]
+                "GrantControls" : {
+                    "BuiltInControls" : ["block"]
                 },
-                "State": "enabled",
-                "DisplayName": "Test block Legacy Authentication"
+                "State" : "enabled",
+                "DisplayName" : "Test block Legacy Authentication"
             }
         ],
-        "scuba_config": {
-            "Aad": {
-                 "Policy2_1_1": {
-                    "CapExclusions": {
-                        "Users": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
-                        "Groups": []
+        "scuba_config" : {
+            "Aad" : {
+                 "MS.AAD.1.1v1" : {
+                    "CapExclusions" : {
+                        "Users" : ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
+                        "Groups" : []
                     }
                 }
-
             }
         }
     }
@@ -366,38 +363,36 @@ test_MultiUserExclusionsConditions_Correct if {
     PolicyId := "MS.AAD.1.1v1"
 
     Output := tests with input as {
-        "conditional_access_policies": [
+        "conditional_access_policies" : [
             {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": ["All"]
+                "Conditions" : {
+                    "Applications" : {
+                        "IncludeApplications" : ["All"]
                     },
-                    "Users": {
-                        "IncludeUsers": ["All"],
-                        "ExcludeUsers": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3", "df269963-a081-4315-b7de-172755221504"],
-                        "ExcludeGroups": [],
-                        "ExcludeRoles": []
+                    "Users" : {
+                        "IncludeUsers" : ["All"],
+                        "ExcludeUsers" : ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3", "df269963-a081-4315-b7de-172755221504"],
+                        "ExcludeGroups" : [],
+                        "ExcludeRoles" : []
                     },
-                    "ClientAppTypes": ["other", "exchangeActiveSync"]
+                    "ClientAppTypes" : ["other", "exchangeActiveSync"]
                 },
-                "GrantControls": {
-                    "BuiltInControls": ["block"]
+                "GrantControls" : {
+                    "BuiltInControls" : ["block"]
                 },
-                "State": "enabled",
-                "DisplayName": "Test block Legacy Authentication"
+                "State" : "enabled",
+                "DisplayName" : "Test block Legacy Authentication"
             }
         ],
-        "scuba_config": {
-            "Aad": {
-                 "Policy2_1_1": {
-                    "CapExclusions": {
-                        "Users": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3", "df269963-a081-4315-b7de-172755221504"],
-                        "Groups": []
+        "scuba_config" : {
+            "Aad" : {
+                 "MS.AAD.1.1v1" : {
+                    "CapExclusions" : {
+                        "Users" : ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3", "df269963-a081-4315-b7de-172755221504"],
+                        "Groups" : []
                     }
                 }
-
             }
-
         }
     }
 
@@ -412,27 +407,28 @@ test_UserExclusionNoExempt_Incorrect if {
     PolicyId := "MS.AAD.1.1v1"
 
     Output := tests with input as {
-        "conditional_access_policies": [
+        "conditional_access_policies" : [
             {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": ["All"]
+                "Conditions" : {
+                    "Applications" : {
+                        "IncludeApplications" : ["All"]
                     },
-                    "Users": {
-                        "IncludeUsers": ["All"],
-                        "ExcludeUsers": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
-                        "ExcludeGroups": [],
+                    "Users" : {
+                        "IncludeUsers" : ["All"],
+                        "ExcludeUsers" : ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
+                        "ExcludeGroups" : [],
                     },
-                    "ClientAppTypes": ["other", "exchangeActiveSync"]
+                    "ClientAppTypes" : ["other", "exchangeActiveSync"]
                 },
-                "GrantControls": {
-                    "BuiltInControls": ["block"]
+                "GrantControls" : {
+                    "BuiltInControls" : ["block"]
                 },
-                "State": "enabled",
-                "DisplayName": "Test block Legacy Authentication"
+                "State" : "enabled",
+                "DisplayName" : "Test block Legacy Authentication"
             }
         ]
     }
+
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
@@ -444,39 +440,39 @@ test_UserExclusionsSingleExempt_Incorrect if {
     PolicyId := "MS.AAD.1.1v1"
 
     Output := tests with input as {
-        "conditional_access_policies": [
+        "conditional_access_policies" : [
             {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": ["All"]
+                "Conditions" : {
+                    "Applications" : {
+                        "IncludeApplications" : ["All"]
                     },
-                    "Users": {
-                        "IncludeUsers": ["All"],
-                        "ExcludeUsers": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3", "df269963-a081-4315-b7de-172755221504"],
-                        "ExcludeGroups": [],
-                        "ExcludeRoles": []
+                    "Users" : {
+                        "IncludeUsers" : ["All"],
+                        "ExcludeUsers" : ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3", "df269963-a081-4315-b7de-172755221504"],
+                        "ExcludeGroups" : [],
+                        "ExcludeRoles" : []
                     },
-                    "ClientAppTypes": ["other", "exchangeActiveSync"]
+                    "ClientAppTypes" : ["other", "exchangeActiveSync"]
                 },
-                "GrantControls": {
-                    "BuiltInControls": ["block"]
+                "GrantControls" : {
+                    "BuiltInControls" : ["block"]
                 },
-                "State": "enabled",
-                "DisplayName": "Test block Legacy Authentication"
+                "State" : "enabled",
+                "DisplayName" : "Test block Legacy Authentication"
             }
         ],
-        "scuba_config": {
-            "Aad": {
-                 "Policy2_1_1": {
-                    "CapExclusions": {
-                        "Users": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
-                        "Groups": []
+        "scuba_config" : {
+            "Aad" : {
+                 "MS.AAD.1.1v1" : {
+                    "CapExclusions" : {
+                        "Users" : ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
+                        "Groups" : []
                     }
                 }
-
             }
         }
     }
+
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
@@ -488,38 +484,38 @@ test_UserExclusionsNoExempt_Incorrect if {
     PolicyId := "MS.AAD.1.1v1"
 
     Output := tests with input as {
-        "conditional_access_policies": [
+        "conditional_access_policies" : [
             {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": ["All"]
+                "Conditions" : {
+                    "Applications" : {
+                        "IncludeApplications" : ["All"]
                     },
-                    "Users": {
-                        "IncludeUsers": ["All"],
-                        "ExcludeUsers": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3", "df269963-a081-4315-b7de-172755221504"],
-                        "ExcludeGroups": [],
+                    "Users" : {
+                        "IncludeUsers" : ["All"],
+                        "ExcludeUsers" : ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3", "df269963-a081-4315-b7de-172755221504"],
+                        "ExcludeGroups" : [],
                     },
-                    "ClientAppTypes": ["other", "exchangeActiveSync"]
+                    "ClientAppTypes" : ["other", "exchangeActiveSync"]
                 },
-                "GrantControls": {
-                    "BuiltInControls": ["block"]
+                "GrantControls" : {
+                    "BuiltInControls" : ["block"]
                 },
-                "State": "enabled",
-                "DisplayName": "Test block Legacy Authentication"
+                "State" : "enabled",
+                "DisplayName" : "Test block Legacy Authentication"
             }
         ],
-        "scuba_config": {
-            "Aad": {
-                 "Policy2_1_1": {
-                    "CapExclusions": {
-                        "Users": [],
-                        "Groups": []
+        "scuba_config" : {
+            "Aad" : {
+                 "MS.AAD.1.1v1" : {
+                    "CapExclusions" : {
+                        "Users" : [],
+                        "Groups" : []
                     }
                 }
-
             }
         }
     }
+
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
@@ -531,39 +527,38 @@ test_UserExclusionsIncludeApplications_Incorrect if {
     PolicyId := "MS.AAD.1.1v1"
 
     Output := tests with input as {
-        "conditional_access_policies": [
+        "conditional_access_policies" : [
             {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": ["Office365"]
+                "Conditions" : {
+                    "Applications" : {
+                        "IncludeApplications" : ["Office365"]
                     },
-                    "Users": {
-                        "IncludeUsers": ["All"],
-                        "ExcludeUsers": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
-                        "ExcludeGroups": [],
+                    "Users" : {
+                        "IncludeUsers" : ["All"],
+                        "ExcludeUsers" : ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
+                        "ExcludeGroups" : [],
                     },
-                    "ClientAppTypes": ["other", "exchangeActiveSync"]
+                    "ClientAppTypes" : ["other", "exchangeActiveSync"]
                 },
-                "GrantControls": {
-                    "BuiltInControls": ["block"]
+                "GrantControls" : {
+                    "BuiltInControls" : ["block"]
                 },
-                "State": "enabled",
-                "DisplayName": "Test block Legacy Authentication"
+                "State" : "enabled",
+                "DisplayName" : "Test block Legacy Authentication"
             }
         ],
-        "scuba_config": {
-            "Aad": {
-                 "Policy2_1_1": {
-                    "CapExclusions": {
-                        "Users": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
-                        "Groups": []
+        "scuba_config" : {
+            "Aad" : {
+                 "MS.AAD.1.1v1" : {
+                    "CapExclusions" : {
+                        "Users" : ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
+                        "Groups" : []
                     }
                 }
-
             }
-
         }
     }
+
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
@@ -575,39 +570,38 @@ test_UserExclusionsIncludeUsers_Incorrect if {
     PolicyId := "MS.AAD.1.1v1"
 
     Output := tests with input as {
-        "conditional_access_policies": [
+        "conditional_access_policies" : [
             {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": ["All"]
+                "Conditions" : {
+                    "Applications" : {
+                        "IncludeApplications" : ["All"]
                     },
-                    "Users": {
-                        "IncludeUsers": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
-                        "ExcludeUsers": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
-                        "ExcludeGroups": [],
+                    "Users" : {
+                        "IncludeUsers" : ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
+                        "ExcludeUsers" : ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
+                        "ExcludeGroups" : [],
                     },
-                    "ClientAppTypes": ["other", "exchangeActiveSync"]
+                    "ClientAppTypes" : ["other", "exchangeActiveSync"]
                 },
-                "GrantControls": {
-                    "BuiltInControls": ["block"]
+                "GrantControls" : {
+                    "BuiltInControls" : ["block"]
                 },
-                "State": "enabled",
-                "DisplayName": "Test block Legacy Authentication"
+                "State" : "enabled",
+                "DisplayName" : "Test block Legacy Authentication"
             }
         ],
-        "scuba_config": {
-            "Aad": {
-                 "Policy2_1_1": {
-                    "CapExclusions": {
-                        "Users": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
-                        "Groups": []
+        "scuba_config" : {
+            "Aad" : {
+                 "MS.AAD.1.1v1" : {
+                    "CapExclusions" : {
+                        "Users" : ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
+                        "Groups" : []
                     }
                 }
-
             }
-
         }
     }
+
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
@@ -619,32 +613,32 @@ test_UserExclusionsExcludeGroups_Incorrect if {
     PolicyId := "MS.AAD.1.1v1"
 
     Output := tests with input as {
-        "conditional_access_policies": [
+        "conditional_access_policies" : [
             {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": ["All"]
+                "Conditions" : {
+                    "Applications" : {
+                        "IncludeApplications" : ["All"]
                     },
-                    "Users": {
-                        "IncludeUsers": ["All"],
-                        "ExcludeUsers": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
-                        "ExcludeGroups": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]
+                    "Users" : {
+                        "IncludeUsers" : ["All"],
+                        "ExcludeUsers" : ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
+                        "ExcludeGroups" : ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]
                     },
-                    "ClientAppTypes": ["other", "exchangeActiveSync"]
+                    "ClientAppTypes" : ["other", "exchangeActiveSync"]
                 },
-                "GrantControls": {
-                    "BuiltInControls": ["block"]
+                "GrantControls" : {
+                    "BuiltInControls" : ["block"]
                 },
-                "State": "enabled",
-                "DisplayName": "Test block Legacy Authentication"
+                "State" : "enabled",
+                "DisplayName" : "Test block Legacy Authentication"
             }
         ],
-        "scuba_config": {
-            "Aad": {
-                 "Policy2_1_1": {
-                    "CapExclusions": {
-                        "Users": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
-                        "Groups": []
+        "scuba_config" : {
+            "Aad" : {
+                 "MS.AAD.1.1v1" : {
+                    "CapExclusions" : {
+                        "Users" : ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
+                        "Groups" : []
                     }
                 }
             }
@@ -662,37 +656,35 @@ test_UserExclusionsClientAppTypes_Incorrect if {
     PolicyId := "MS.AAD.1.1v1"
 
     Output := tests with input as {
-        "conditional_access_policies": [
+        "conditional_access_policies" : [
             {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": ["All"]
+                "Conditions" : {
+                    "Applications" : {
+                        "IncludeApplications" : ["All"]
                     },
-                    "Users": {
-                        "IncludeUsers": ["All"],
-                        "ExcludeUsers": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
-                        "ExcludeGroups": [],
+                    "Users" : {
+                        "IncludeUsers" : ["All"],
+                        "ExcludeUsers" : ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
+                        "ExcludeGroups" : [],
                     },
-                    "ClientAppTypes": [""]
+                    "ClientAppTypes" : [""]
                 },
-                "GrantControls": {
-                    "BuiltInControls": ["block"]
+                "GrantControls" : {
+                    "BuiltInControls" : ["block"]
                 },
-                "State": "enabled",
-                "DisplayName": "Test block Legacy Authentication"
+                "State" : "enabled",
+                "DisplayName" : "Test block Legacy Authentication"
             }
         ],
-        "scuba_config": {
-            "Aad": {
-                 "Policy2_1_1": {
-                    "CapExclusions": {
-                        "Users": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
-                        "Groups": []
+        "scuba_config" : {
+            "Aad" : {
+                 "MS.AAD.1.1v1" : {
+                    "CapExclusions" : {
+                        "Users" : ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
+                        "Groups" : []
                     }
                 }
-
             }
-
         }
     }
 
@@ -707,37 +699,35 @@ test_UserExclusionsBuiltInControls_Incorrect if {
     PolicyId := "MS.AAD.1.1v1"
 
     Output := tests with input as {
-        "conditional_access_policies": [
+        "conditional_access_policies" : [
             {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": ["All"]
+                "Conditions" : {
+                    "Applications" : {
+                        "IncludeApplications" : ["All"]
                     },
-                    "Users": {
-                        "IncludeUsers": ["All"],
-                        "ExcludeUsers": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
-                        "ExcludeGroups": [],
+                    "Users" : {
+                        "IncludeUsers" : ["All"],
+                        "ExcludeUsers" : ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
+                        "ExcludeGroups" : [],
                     },
-                    "ClientAppTypes": ["other", "exchangeActiveSync"]
+                    "ClientAppTypes" : ["other", "exchangeActiveSync"]
                 },
-                "GrantControls": {
-                    "BuiltInControls": null
+                "GrantControls" : {
+                    "BuiltInControls" : null
                 },
-                "State": "enabled",
-                "DisplayName": "Test block Legacy Authentication"
+                "State" : "enabled",
+                "DisplayName" : "Test block Legacy Authentication"
             }
         ],
-        "scuba_config": {
-            "Aad": {
-                 "Policy2_1_1": {
-                    "CapExclusions": {
-                        "Users": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
-                        "Groups": []
+        "scuba_config" : {
+            "Aad" : {
+                 "MS.AAD.1.1v1" : {
+                    "CapExclusions" : {
+                        "Users" : ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
+                        "Groups" : []
                     }
                 }
-
             }
-
         }
     }
 
@@ -752,40 +742,37 @@ test_UserExclusionsState_Incorrect if {
     PolicyId := "MS.AAD.1.1v1"
 
     Output := tests with input as {
-        "conditional_access_policies": [
+        "conditional_access_policies" : [
             {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": ["All"]
+                "Conditions" : {
+                    "Applications" : {
+                        "IncludeApplications" : ["All"]
                     },
-                    "Users": {
-                        "IncludeUsers": ["All"],
-                        "ExcludeUsers": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
-                        "ExcludeGroups": [],
+                    "Users" : {
+                        "IncludeUsers" : ["All"],
+                        "ExcludeUsers" : ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
+                        "ExcludeGroups" : [],
                     },
-                    "ClientAppTypes": ["other", "exchangeActiveSync"]
+                    "ClientAppTypes" : ["other", "exchangeActiveSync"]
                 },
-                "GrantControls": {
-                    "BuiltInControls": ["block"]
+                "GrantControls" : {
+                    "BuiltInControls" : ["block"]
                 },
-                "State": "disabled",
-                "DisplayName": "Test block Legacy Authentication"
+                "State" : "disabled",
+                "DisplayName" : "Test block Legacy Authentication"
             }
         ],
-        "scuba_config": {
-            "Aad": {
-                 "Policy2_1_1": {
-                    "CapExclusions": {
-                        "Users": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
-                        "Groups": []
+        "scuba_config" : {
+            "Aad" : {
+                 "MS.AAD.1.1v1" : {
+                    "CapExclusions" : {
+                        "Users" : ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
+                        "Groups" : []
                     }
                 }
-
             }
-
         }
     }
-
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
@@ -794,43 +781,41 @@ test_UserExclusionsState_Incorrect if {
     RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
 }
 
-#--tests for group exclusions and no user exclusions
+# tests for group exclusions and no user exclusions #
 test_NoExclusionsExemptGroups_Correct if {
     PolicyId := "MS.AAD.1.1v1"
 
     Output := tests with input as {
-        "conditional_access_policies": [
+        "conditional_access_policies" : [
             {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": ["All"]
+                "Conditions" : {
+                    "Applications" : {
+                        "IncludeApplications" : ["All"]
                     },
-                    "Users": {
-                        "IncludeUsers": ["All"],
-                        "ExcludeUsers": [],
-                        "ExcludeGroups": [],
-                        "ExcludeRoles": []
+                    "Users" : {
+                        "IncludeUsers" : ["All"],
+                        "ExcludeUsers" : [],
+                        "ExcludeGroups" : [],
+                        "ExcludeRoles" : []
                     },
-                    "ClientAppTypes": ["other", "exchangeActiveSync"]
+                    "ClientAppTypes" : ["other", "exchangeActiveSync"]
                 },
-                "GrantControls": {
-                    "BuiltInControls": ["block"]
+                "GrantControls" : {
+                    "BuiltInControls" : ["block"]
                 },
-                "State": "enabled",
-                "DisplayName": "Test block Legacy Authentication"
+                "State" : "enabled",
+                "DisplayName" : "Test block Legacy Authentication"
             }
         ],
-        "scuba_config": {
-            "Aad": {
-                 "Policy2_1_1": {
-                    "CapExclusions": {
-                        "Users": [],
-                        "Groups": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]
+        "scuba_config" : {
+            "Aad" : {
+                 "MS.AAD.1.1v1" : {
+                    "CapExclusions" : {
+                        "Users" : [],
+                        "Groups" : ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]
                     }
                 }
-
             }
-
         }
     }
 
@@ -845,38 +830,36 @@ test_GroupExclusionNoExempt_Incorrect if {
     PolicyId := "MS.AAD.1.1v1"
 
     Output := tests with input as {
-        "conditional_access_policies": [
+        "conditional_access_policies" : [
             {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": ["All"]
+                "Conditions" : {
+                    "Applications" : {
+                        "IncludeApplications" : ["All"]
                     },
-                    "Users": {
-                        "IncludeUsers": ["All"],
-                        "ExcludeUsers": [],
-                        "ExcludeGroups": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"],
-                        "ExcludeRoles": []
+                    "Users" : {
+                        "IncludeUsers" : ["All"],
+                        "ExcludeUsers" : [],
+                        "ExcludeGroups" : ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"],
+                        "ExcludeRoles" : []
                     },
-                    "ClientAppTypes": ["other", "exchangeActiveSync"]
+                    "ClientAppTypes" : ["other", "exchangeActiveSync"]
                 },
-                "GrantControls": {
-                    "BuiltInControls": ["block"]
+                "GrantControls" : {
+                    "BuiltInControls" : ["block"]
                 },
-                "State": "enabled",
-                "DisplayName": "Test block Legacy Authentication"
+                "State" : "enabled",
+                "DisplayName" : "Test block Legacy Authentication"
             }
         ],
-        "scuba_config": {
-            "Aad": {
-                 "Policy2_1_1": {
-                    "CapExclusions": {
-                        "Users": [],
-                        "Groups": []
+        "scuba_config" : {
+            "Aad" : {
+                 "MS.AAD.1.1v1" : {
+                    "CapExclusions" : {
+                        "Users" : [],
+                        "Groups" : []
                     }
                 }
-
             }
-
         }
     }
 
@@ -891,37 +874,35 @@ test_GroupExclusionsNoExempt_Incorrect if {
     PolicyId := "MS.AAD.1.1v1"
 
     Output := tests with input as {
-        "conditional_access_policies": [
+        "conditional_access_policies" : [
             {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": ["All"]
+                "Conditions" : {
+                    "Applications" : {
+                        "IncludeApplications" : ["All"]
                     },
-                    "Users": {
-                        "IncludeUsers": ["All"],
-                        "ExcludeUsers": [],
-                        "ExcludeGroups": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423", "65fea286-22d3-42f9-b4ca-93a6f75817d4"]
+                    "Users" : {
+                        "IncludeUsers" : ["All"],
+                        "ExcludeUsers" : [],
+                        "ExcludeGroups" : ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423", "65fea286-22d3-42f9-b4ca-93a6f75817d4"]
                     },
-                    "ClientAppTypes": ["other", "exchangeActiveSync"]
+                    "ClientAppTypes" : ["other", "exchangeActiveSync"]
                 },
-                "GrantControls": {
-                    "BuiltInControls": ["block"]
+                "GrantControls" : {
+                    "BuiltInControls" : ["block"]
                 },
-                "State": "enabled",
-                "DisplayName": "Test block Legacy Authentication"
+                "State" : "enabled",
+                "DisplayName" : "Test block Legacy Authentication"
             }
         ],
-        "scuba_config": {
-            "Aad": {
-                 "Policy2_1_1": {
-                    "CapExclusions": {
-                        "Users": [],
-                        "Groups": []
+        "scuba_config" : {
+            "Aad" : {
+                 "MS.AAD.1.1v1" : {
+                    "CapExclusions" : {
+                        "Users" : [],
+                        "Groups" : []
                     }
                 }
-
             }
-
         }
     }
 
@@ -936,37 +917,35 @@ test_GroupExclusionsSingleExempt_Incorrect if {
     PolicyId := "MS.AAD.1.1v1"
 
     Output := tests with input as {
-        "conditional_access_policies": [
+        "conditional_access_policies" : [
             {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": ["All"]
+                "Conditions" : {
+                    "Applications" : {
+                        "IncludeApplications" : ["All"]
                     },
-                    "Users": {
-                        "IncludeUsers": ["All"],
-                        "ExcludeUsers": [],
-                        "ExcludeGroups": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423", "65fea286-22d3-42f9-b4ca-93a6f75817d4"]
+                    "Users" : {
+                        "IncludeUsers" : ["All"],
+                        "ExcludeUsers" : [],
+                        "ExcludeGroups" : ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423", "65fea286-22d3-42f9-b4ca-93a6f75817d4"]
                     },
-                    "ClientAppTypes": ["other", "exchangeActiveSync"]
+                    "ClientAppTypes" : ["other", "exchangeActiveSync"]
                 },
-                "GrantControls": {
-                    "BuiltInControls": ["block"]
+                "GrantControls" : {
+                    "BuiltInControls" : ["block"]
                 },
-                "State": "enabled",
-                "DisplayName": "Test block Legacy Authentication"
+                "State" : "enabled",
+                "DisplayName" : "Test block Legacy Authentication"
             }
         ],
-        "scuba_config": {
-            "Aad": {
-                 "Policy2_1_1": {
-                    "CapExclusions": {
-                        "Users": [],
-                        "Groups": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]
+        "scuba_config" : {
+            "Aad" : {
+                 "MS.AAD.1.1v1" : {
+                    "CapExclusions" : {
+                        "Users" : [],
+                        "Groups" : ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]
                     }
                 }
-
             }
-
         }
     }
 
@@ -981,38 +960,36 @@ test_GroupExclusionConditions_Correct if {
     PolicyId := "MS.AAD.1.1v1"
 
     Output := tests with input as {
-        "conditional_access_policies": [
+        "conditional_access_policies" : [
             {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": ["All"]
+                "Conditions" : {
+                    "Applications" : {
+                        "IncludeApplications" : ["All"]
                     },
-                    "Users": {
-                        "IncludeUsers": ["All"],
-                        "ExcludeUsers": [],
-                        "ExcludeGroups": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"],
-                        "ExcludeRoles": []
+                    "Users" : {
+                        "IncludeUsers" : ["All"],
+                        "ExcludeUsers" : [],
+                        "ExcludeGroups" : ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"],
+                        "ExcludeRoles" : []
                     },
-                    "ClientAppTypes": ["other", "exchangeActiveSync"]
+                    "ClientAppTypes" : ["other", "exchangeActiveSync"]
                 },
-                "GrantControls": {
-                    "BuiltInControls": ["block"]
+                "GrantControls" : {
+                    "BuiltInControls" : ["block"]
                 },
-                "State": "enabled",
-                "DisplayName": "Test block Legacy Authentication"
+                "State" : "enabled",
+                "DisplayName" : "Test block Legacy Authentication"
             }
         ],
-        "scuba_config": {
-            "Aad": {
-                 "Policy2_1_1": {
-                    "CapExclusions": {
-                        "Users": [],
-                        "Groups": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]
+        "scuba_config" : {
+            "Aad" : {
+                 "MS.AAD.1.1v1" : {
+                    "CapExclusions" : {
+                        "Users" : [],
+                        "Groups" : ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]
                     }
                 }
-
             }
-
         }
     }
 
@@ -1027,38 +1004,36 @@ test_MultiGroupExclusionsConditions_Correct if {
     PolicyId := "MS.AAD.1.1v1"
 
     Output := tests with input as {
-        "conditional_access_policies": [
+        "conditional_access_policies" : [
             {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": ["All"]
+                "Conditions" : {
+                    "Applications" : {
+                        "IncludeApplications" : ["All"]
                     },
-                    "Users": {
-                        "IncludeUsers": ["All"],
-                        "ExcludeUsers": [],
-                        "ExcludeGroups": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423", "65fea286-22d3-42f9-b4ca-93a6f75817d4"],
-                        "ExcludeRoles": []
+                    "Users" : {
+                        "IncludeUsers" : ["All"],
+                        "ExcludeUsers" : [],
+                        "ExcludeGroups" : ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423", "65fea286-22d3-42f9-b4ca-93a6f75817d4"],
+                        "ExcludeRoles" : []
                     },
-                    "ClientAppTypes": ["other", "exchangeActiveSync"]
+                    "ClientAppTypes" : ["other", "exchangeActiveSync"]
                 },
-                "GrantControls": {
-                    "BuiltInControls": ["block"]
+                "GrantControls" : {
+                    "BuiltInControls" : ["block"]
                 },
-                "State": "enabled",
-                "DisplayName": "Test block Legacy Authentication"
+                "State" : "enabled",
+                "DisplayName" : "Test block Legacy Authentication"
             }
         ],
-        "scuba_config": {
-            "Aad": {
-                 "Policy2_1_1": {
-                    "CapExclusions": {
-                        "Users": [],
-                        "Groups": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423", "65fea286-22d3-42f9-b4ca-93a6f75817d4"]
+        "scuba_config" : {
+            "Aad" : {
+                 "MS.AAD.1.1v1" : {
+                    "CapExclusions" : {
+                        "Users" : [],
+                        "Groups" : ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423", "65fea286-22d3-42f9-b4ca-93a6f75817d4"]
                     }
                 }
-
             }
-
         }
     }
 
@@ -1069,43 +1044,41 @@ test_MultiGroupExclusionsConditions_Correct if {
     RuleOutput[0].ReportDetails == "1 conditional access policy(s) found that meet(s) all requirements:<br/>Test block Legacy Authentication. <a href='#caps'>View all CA policies</a>."
 }
 
-#--tests when both group and user exclusions present
+# tests when both group and user exclusions present #
 test_UserGroupExclusionConditions_Correct if {
     PolicyId := "MS.AAD.1.1v1"
 
     Output := tests with input as {
-        "conditional_access_policies": [
+        "conditional_access_policies" : [
             {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": ["All"]
+                "Conditions" : {
+                    "Applications" : {
+                        "IncludeApplications" : ["All"]
                     },
-                    "Users": {
-                        "IncludeUsers": ["All"],
-                        "ExcludeUsers": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
-                        "ExcludeGroups": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"],
-                        "ExcludeRoles": []
+                    "Users" : {
+                        "IncludeUsers" : ["All"],
+                        "ExcludeUsers" : ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
+                        "ExcludeGroups" : ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"],
+                        "ExcludeRoles" : []
                     },
-                    "ClientAppTypes": ["other", "exchangeActiveSync"]
+                    "ClientAppTypes" : ["other", "exchangeActiveSync"]
                 },
-                "GrantControls": {
-                    "BuiltInControls": ["block"]
+                "GrantControls" : {
+                    "BuiltInControls" : ["block"]
                 },
-                "State": "enabled",
-                "DisplayName": "Test block Legacy Authentication"
+                "State" : "enabled",
+                "DisplayName" : "Test block Legacy Authentication"
             }
         ],
-        "scuba_config": {
-            "Aad": {
-                 "Policy2_1_1": {
-                    "CapExclusions": {
-                        "Users": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
-                        "Groups": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]
+        "scuba_config" : {
+            "Aad" : {
+                 "MS.AAD.1.1v1" : {
+                    "CapExclusions" : {
+                        "Users" : ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
+                        "Groups" : ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]
                     }
                 }
-
             }
-
         }
     }
 
@@ -1120,25 +1093,25 @@ test_UserGroupExclusionNoExempt_Incorrect if {
     PolicyId := "MS.AAD.1.1v1"
 
     Output := tests with input as {
-        "conditional_access_policies": [
+        "conditional_access_policies" : [
             {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": ["All"]
+                "Conditions" : {
+                    "Applications" : {
+                        "IncludeApplications" : ["All"]
                     },
-                    "Users": {
-                        "IncludeUsers": ["All"],
-                        "ExcludeUsers": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
-                        "ExcludeGroups": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"],
-                        "ExcludeRoles": []
+                    "Users" : {
+                        "IncludeUsers" : ["All"],
+                        "ExcludeUsers" : ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
+                        "ExcludeGroups" : ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"],
+                        "ExcludeRoles" : []
                     },
-                    "ClientAppTypes": ["other", "exchangeActiveSync"]
+                    "ClientAppTypes" : ["other", "exchangeActiveSync"]
                 },
-                "GrantControls": {
-                    "BuiltInControls": ["block"]
+                "GrantControls" : {
+                    "BuiltInControls" : ["block"]
                 },
-                "State": "enabled",
-                "DisplayName": "Test block Legacy Authentication"
+                "State" : "enabled",
+                "DisplayName" : "Test block Legacy Authentication"
             }
         ]
     }
@@ -1154,38 +1127,36 @@ test_UserGroupExclusionUserExemptOnly_Incorrect if {
     PolicyId := "MS.AAD.1.1v1"
 
     Output := tests with input as {
-        "conditional_access_policies": [
+        "conditional_access_policies" : [
             {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": ["All"]
+                "Conditions" : {
+                    "Applications" : {
+                        "IncludeApplications" : ["All"]
                     },
-                    "Users": {
-                        "IncludeUsers": ["All"],
-                        "ExcludeUsers": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
-                        "ExcludeGroups": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"],
-                        "ExcludeRoles": []
+                    "Users" : {
+                        "IncludeUsers" : ["All"],
+                        "ExcludeUsers" : ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
+                        "ExcludeGroups" : ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"],
+                        "ExcludeRoles" : []
                     },
-                    "ClientAppTypes": ["other", "exchangeActiveSync"]
+                    "ClientAppTypes" : ["other", "exchangeActiveSync"]
                 },
-                "GrantControls": {
-                    "BuiltInControls": ["block"]
+                "GrantControls" : {
+                    "BuiltInControls" : ["block"]
                 },
-                "State": "enabled",
-                "DisplayName": "Test block Legacy Authentication"
+                "State" : "enabled",
+                "DisplayName" : "Test block Legacy Authentication"
             }
         ],
-        "scuba_config": {
-            "Aad": {
-                 "Policy2_1_1": {
-                    "CapExclusions": {
-                        "Users": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
-                        "Groups": []
+        "scuba_config" : {
+            "Aad" : {
+                 "MS.AAD.1.1v1" : {
+                    "CapExclusions" : {
+                        "Users" : ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
+                        "Groups" : []
                     }
                 }
-
             }
-
         }
     }
 
@@ -1200,38 +1171,36 @@ test_UserGroupExclusionGroupExemptOnly_Incorrect if {
     PolicyId := "MS.AAD.1.1v1"
 
     Output := tests with input as {
-        "conditional_access_policies": [
+        "conditional_access_policies" : [
             {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": ["All"]
+                "Conditions" : {
+                    "Applications" : {
+                        "IncludeApplications" : ["All"]
                     },
-                    "Users": {
-                        "IncludeUsers": ["All"],
-                        "ExcludeUsers": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
-                        "ExcludeGroups": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"],
-                        "ExcludeRoles": []
+                    "Users" : {
+                        "IncludeUsers" : ["All"],
+                        "ExcludeUsers" : ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
+                        "ExcludeGroups" : ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"],
+                        "ExcludeRoles" : []
                     },
-                    "ClientAppTypes": ["other", "exchangeActiveSync"]
+                    "ClientAppTypes" : ["other", "exchangeActiveSync"]
                 },
-                "GrantControls": {
-                    "BuiltInControls": ["block"]
+                "GrantControls" : {
+                    "BuiltInControls" : ["block"]
                 },
-                "State": "enabled",
-                "DisplayName": "Test block Legacy Authentication"
+                "State" : "enabled",
+                "DisplayName" : "Test block Legacy Authentication"
             }
         ],
-        "scuba_config": {
-            "Aad": {
-                 "Policy2_1_1": {
-                    "CapExclusions": {
-                        "Users": [],
-                        "Groups": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]
+        "scuba_config" : {
+            "Aad" : {
+                 "MS.AAD.1.1v1" : {
+                    "CapExclusions" : {
+                        "Users" : [],
+                        "Groups" : ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]
                     }
                 }
-
             }
-
         }
     }
 
@@ -1246,38 +1215,36 @@ test_UserGroupExclusionTooFewUserExempts_Incorrect if {
     PolicyId := "MS.AAD.1.1v1"
 
     Output := tests with input as {
-        "conditional_access_policies": [
+        "conditional_access_policies" : [
             {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": ["All"]
+                "Conditions" : {
+                    "Applications" : {
+                        "IncludeApplications" : ["All"]
                     },
-                    "Users": {
-                        "IncludeUsers": ["All"],
-                        "ExcludeUsers": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3", "df269963-a081-4315-b7de-172755221504"],
-                        "ExcludeGroups": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"],
-                        "ExcludeRoles": []
+                    "Users" : {
+                        "IncludeUsers" : ["All"],
+                        "ExcludeUsers" : ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3", "df269963-a081-4315-b7de-172755221504"],
+                        "ExcludeGroups" : ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"],
+                        "ExcludeRoles" : []
                     },
-                    "ClientAppTypes": ["other", "exchangeActiveSync"]
+                    "ClientAppTypes" : ["other", "exchangeActiveSync"]
                 },
-                "GrantControls": {
-                    "BuiltInControls": ["block"]
+                "GrantControls" : {
+                    "BuiltInControls" : ["block"]
                 },
-                "State": "enabled",
-                "DisplayName": "Test block Legacy Authentication"
+                "State" : "enabled",
+                "DisplayName" : "Test block Legacy Authentication"
             }
         ],
-        "scuba_config": {
-            "Aad": {
-                 "Policy2_1_1": {
-                    "CapExclusions": {
-                        "Users": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
-                        "Groups": []
+        "scuba_config" : {
+            "Aad" : {
+                 "MS.AAD.1.1v1" : {
+                    "CapExclusions" : {
+                        "Users" : ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"],
+                        "Groups" : []
                     }
                 }
-
             }
-
         }
     }
 
@@ -1287,3 +1254,4 @@ test_UserGroupExclusionTooFewUserExempts_Incorrect if {
     not RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
 }
+#--
