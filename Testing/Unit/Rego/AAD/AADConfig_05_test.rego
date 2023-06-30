@@ -1,6 +1,5 @@
 package aad
 import future.keywords
-import data.report.utils.NotCheckedDetails
 
 #
 # MS.AAD.5.1v1
