@@ -6,7 +6,7 @@ import data.report.utils.NotCheckedDetails
 #
 # MS.AAD.2.1v1
 #--
-test_NoExclusionsConditions_Correct if {
+test_NoExclusionsConditions_Correct_V1 if {
     PolicyId := "MS.AAD.2.1v1"
 
     Output := tests with input as {
@@ -50,7 +50,7 @@ test_NoExclusionsConditions_Correct if {
     RuleOutput[0].ReportDetails == "1 conditional access policy(s) found that meet(s) all requirements:<br/>Test name. <a href='#caps'>View all CA policies</a>."
 }
 
-test_NoExclusionsExemptUsers_Correct if {
+test_NoExclusionsExemptUsers_Correct_V1 if {
     PolicyId := "MS.AAD.2.1v1"
 
     Output := tests with input as {
@@ -104,7 +104,7 @@ test_NoExclusionsExemptUsers_Correct if {
     RuleOutput[0].ReportDetails == "1 conditional access policy(s) found that meet(s) all requirements:<br/>Test name. <a href='#caps'>View all CA policies</a>."
 }
 
-test_NoExclusionsExemptGroups_Correct if {
+test_NoExclusionsExemptGroups_Correct_V1 if {
     PolicyId := "MS.AAD.2.1v1"
 
     Output := tests with input as {
@@ -159,7 +159,7 @@ test_NoExclusionsExemptGroups_Correct if {
 }
 
 # User exclusions test
-test_UserExclusionNoExempt_Incorrect if {
+test_UserExclusionNoExempt_Incorrect_V1 if {
     PolicyId := "MS.AAD.2.1v1"
 
     Output := tests with input as {
@@ -203,7 +203,7 @@ test_UserExclusionNoExempt_Incorrect if {
     RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
 }
 
-test_UserExclusionConditions_Correct if {
+test_UserExclusionConditions_Correct_V1 if {
     PolicyId := "MS.AAD.2.1v1"
 
     Output := tests with input as {
@@ -257,7 +257,7 @@ test_UserExclusionConditions_Correct if {
     RuleOutput[0].ReportDetails == "1 conditional access policy(s) found that meet(s) all requirements:<br/>Test name. <a href='#caps'>View all CA policies</a>."
 }
 
-test_UserExclusionsNoExempt_Incorrect if {
+test_UserExclusionsNoExempt_Incorrect_V1 if {
     PolicyId := "MS.AAD.2.1v1"
 
     Output := tests with input as {
@@ -301,7 +301,7 @@ test_UserExclusionsNoExempt_Incorrect if {
     RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
 }
 
-test_UserExclusionsSingleExempt_Incorrect if {
+test_UserExclusionsSingleExempt_Incorrect_V1 if {
     PolicyId := "MS.AAD.2.1v1"
 
     Output := tests with input as {
@@ -355,7 +355,7 @@ test_UserExclusionsSingleExempt_Incorrect if {
     RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
 }
 
-test_MultiUserExclusionsConditions_Correct if {
+test_MultiUserExclusionsConditions_Correct_V1 if {
     PolicyId := "MS.AAD.2.1v1"
 
     Output := tests with input as {
@@ -410,7 +410,7 @@ test_MultiUserExclusionsConditions_Correct if {
 }
 
 # Group Exclusion tests #
-test_GroupExclusionNoExempt_Incorrect if {
+test_GroupExclusionNoExempt_Incorrect_V1 if {
     PolicyId := "MS.AAD.2.1v1"
 
     Output := tests with input as {
@@ -454,7 +454,7 @@ test_GroupExclusionNoExempt_Incorrect if {
     RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
 }
 
-test_GroupExclusionsConditions_Correct if {
+test_GroupExclusionsConditions_Correct_V1 if {
     PolicyId := "MS.AAD.2.1v1"
 
     Output := tests with input as {
@@ -508,7 +508,7 @@ test_GroupExclusionsConditions_Correct if {
     RuleOutput[0].ReportDetails == "1 conditional access policy(s) found that meet(s) all requirements:<br/>Test name. <a href='#caps'>View all CA policies</a>."
 }
 
-test_GroupExclusionsNoExempt_Incorrect if {
+test_GroupExclusionsNoExempt_Incorrect_V1 if {
     PolicyId := "MS.AAD.2.1v1"
 
     Output := tests with input as {
@@ -552,7 +552,7 @@ test_GroupExclusionsNoExempt_Incorrect if {
     RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
 }
 
-test_GroupExclusionsSingleExempt_Incorrect if {
+test_GroupExclusionsSingleExempt_Incorrect_V1 if {
     PolicyId := "MS.AAD.2.1v1"
 
     Output := tests with input as {
@@ -606,7 +606,7 @@ test_GroupExclusionsSingleExempt_Incorrect if {
     RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
 }
 
-test_MultiGroupExclusionsConditions_Correct if {
+test_MultiGroupExclusionsConditions_Correct_V1 if {
     PolicyId := "MS.AAD.2.1v1"
 
     Output := tests with input as {
@@ -661,7 +661,7 @@ test_MultiGroupExclusionsConditions_Correct if {
 }
 
 # User and group exclusions tests
-test_UserGroupExclusionConditions_Correct if {
+test_UserGroupExclusionConditions_Correct_V1 if {
     PolicyId := "MS.AAD.2.1v1"
 
     Output := tests with input as {
@@ -715,7 +715,7 @@ test_UserGroupExclusionConditions_Correct if {
     RuleOutput[0].ReportDetails == "1 conditional access policy(s) found that meet(s) all requirements:<br/>Test name. <a href='#caps'>View all CA policies</a>."
 }
 
-test_UserGroupExclusionNoExempt_Incorrect if {
+test_UserGroupExclusionNoExempt_Incorrect_V1 if {
     PolicyId := "MS.AAD.2.1v1"
 
     Output := tests with input as {
@@ -759,7 +759,7 @@ test_UserGroupExclusionNoExempt_Incorrect if {
     RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
 }
 
-test_UserGroupExclusionUserExemptOnly_Incorrect if {
+test_UserGroupExclusionUserExemptOnly_Incorrect_V1 if {
     PolicyId := "MS.AAD.2.1v1"
 
     Output := tests with input as {
@@ -813,7 +813,7 @@ test_UserGroupExclusionUserExemptOnly_Incorrect if {
     RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
 }
 
-test_UserGroupExclusionGroupExemptOnly_Incorrect if {
+test_UserGroupExclusionGroupExemptOnly_Incorrect_V1 if {
     PolicyId := "MS.AAD.2.1v1"
 
     Output := tests with input as {
@@ -867,7 +867,7 @@ test_UserGroupExclusionGroupExemptOnly_Incorrect if {
     RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
 }
 
-test_UserGroupExclusionTooFewUserExempts_Incorrect if {
+test_UserGroupExclusionTooFewUserExempts_Incorrect_V1 if {
     PolicyId := "MS.AAD.2.1v1"
 
     Output := tests with input as {
@@ -922,7 +922,7 @@ test_UserGroupExclusionTooFewUserExempts_Incorrect if {
 }
 
 # Other Conditions tests
-test_IncludeApplications_Incorrect if {
+test_IncludeApplications_Incorrect_V1 if {
     PolicyId := "MS.AAD.2.1v1"
 
     Output := tests with input as {
@@ -966,7 +966,7 @@ test_IncludeApplications_Incorrect if {
     RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
 }
 
-test_IncludeUsers_Incorrect if {
+test_IncludeUsers_Incorrect_V1 if {
     PolicyId := "MS.AAD.2.1v1"
 
     Output := tests with input as {
@@ -1010,7 +1010,7 @@ test_IncludeUsers_Incorrect if {
     RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
 }
 
-test_ExcludeUsers_Incorrect if {
+test_ExcludeUsers_Incorrect_V1 if {
     PolicyId := "MS.AAD.2.1v1"
 
     Output := tests with input as {
@@ -1054,7 +1054,7 @@ test_ExcludeUsers_Incorrect if {
     RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
 }
 
-test_ExcludeGroups_Incorrect if {
+test_ExcludeGroups_Incorrect_V1 if {
     PolicyId := "MS.AAD.2.1v1"
 
     Output := tests with input as {
@@ -1098,7 +1098,7 @@ test_ExcludeGroups_Incorrect if {
     RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
 }
 
-test_ExcludeRoles_Incorrect if {
+test_ExcludeRoles_Incorrect_V1 if {
     PolicyId := "MS.AAD.2.1v1"
 
     Output := tests with input as {
@@ -1142,7 +1142,7 @@ test_ExcludeRoles_Incorrect if {
     RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
 }
 
-test_BuiltInControls_Incorrect if {
+test_BuiltInControls_Incorrect_V1 if {
     PolicyId := "MS.AAD.2.1v1"
 
     Output := tests with input as {
@@ -1186,7 +1186,7 @@ test_BuiltInControls_Incorrect if {
     RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
 }
 
-test_State_Incorrect if {
+test_State_Incorrect_V1 if {
     PolicyId := "MS.AAD.2.1v1"
 
     Output := tests with input as {
@@ -1334,7 +1334,7 @@ test_NotImplemented_Correct if {
 #
 # MS.AAD.2.3v1
 #--
-test_NoExclusionsConditions_Correct if {
+test_NoExclusionsConditions_Correct_V2 if {
     PolicyId := "MS.AAD.2.3v1"
 
     Output := tests with input as {
@@ -1378,7 +1378,7 @@ test_NoExclusionsConditions_Correct if {
     RuleOutput[0].ReportDetails == "1 conditional access policy(s) found that meet(s) all requirements:<br/>Test name. <a href='#caps'>View all CA policies</a>."
 }
 
-test_NoExclusionsExemptUsers_Correct if {
+test_NoExclusionsExemptUsers_Correct_V2 if {
     PolicyId := "MS.AAD.2.3v1"
 
     Output := tests with input as {
@@ -1432,7 +1432,7 @@ test_NoExclusionsExemptUsers_Correct if {
     RuleOutput[0].ReportDetails == "1 conditional access policy(s) found that meet(s) all requirements:<br/>Test name. <a href='#caps'>View all CA policies</a>."
 }
 
-test_NoExclusionsExemptGroups_Correct if {
+test_NoExclusionsExemptGroups_Correct_V2 if {
     PolicyId := "MS.AAD.2.3v1"
 
     Output := tests with input as {
@@ -1487,7 +1487,7 @@ test_NoExclusionsExemptGroups_Correct if {
 }
 
 # User exclusions test
-test_UserExclusionNoExempt_Incorrect if {
+test_UserExclusionNoExempt_Incorrect_V2 if {
     PolicyId := "MS.AAD.2.3v1"
 
     Output := tests with input as {
@@ -1531,7 +1531,7 @@ test_UserExclusionNoExempt_Incorrect if {
     RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
 }
 
-test_UserExclusionConditions_Correct if {
+test_UserExclusionConditions_Correct_V2 if {
     PolicyId := "MS.AAD.2.3v1"
 
     Output := tests with input as {
@@ -1585,7 +1585,7 @@ test_UserExclusionConditions_Correct if {
     RuleOutput[0].ReportDetails == "1 conditional access policy(s) found that meet(s) all requirements:<br/>Test name. <a href='#caps'>View all CA policies</a>."
 }
 
-test_UserExclusionsNoExempt_Incorrect if {
+test_UserExclusionsNoExempt_Incorrect_V2 if {
     PolicyId := "MS.AAD.2.3v1"
 
     Output := tests with input as {
@@ -1629,7 +1629,7 @@ test_UserExclusionsNoExempt_Incorrect if {
     RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
 }
 
-test_UserExclusionsSingleExempt_Incorrect if {
+test_UserExclusionsSingleExempt_Incorrect_V2 if {
     PolicyId := "MS.AAD.2.3v1"
 
     Output := tests with input as {
@@ -1683,7 +1683,7 @@ test_UserExclusionsSingleExempt_Incorrect if {
     RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
 }
 
-test_MultiUserExclusionsConditions_Correct if {
+test_MultiUserExclusionsConditions_Correct_V2 if {
     PolicyId := "MS.AAD.2.3v1"
 
     Output := tests with input as {
@@ -1738,7 +1738,7 @@ test_MultiUserExclusionsConditions_Correct if {
 }
 
 # Group Exclusion tests
-test_GroupExclusionNoExempt_Incorrect if {
+test_GroupExclusionNoExempt_Incorrect_V2 if {
     PolicyId := "MS.AAD.2.3v1"
 
     Output := tests with input as {
@@ -1782,7 +1782,7 @@ test_GroupExclusionNoExempt_Incorrect if {
     RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
 }
 
-test_GroupExclusionsConditions_Correct if {
+test_GroupExclusionsConditions_Correct_V2 if {
     PolicyId := "MS.AAD.2.3v1"
 
     Output := tests with input as {
@@ -1836,7 +1836,7 @@ test_GroupExclusionsConditions_Correct if {
     RuleOutput[0].ReportDetails == "1 conditional access policy(s) found that meet(s) all requirements:<br/>Test name. <a href='#caps'>View all CA policies</a>."
 }
 
-test_GroupExclusionsNoExempt_Incorrect if {
+test_GroupExclusionsNoExempt_Incorrect_V2 if {
     PolicyId := "MS.AAD.2.3v1"
 
     Output := tests with input as {
@@ -1880,7 +1880,7 @@ test_GroupExclusionsNoExempt_Incorrect if {
     RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
 }
 
-test_GroupExclusionsSingleExempt_Incorrect if {
+test_GroupExclusionsSingleExempt_Incorrect_V2 if {
     PolicyId := "MS.AAD.2.3v1"
 
     Output := tests with input as {
@@ -1934,7 +1934,7 @@ test_GroupExclusionsSingleExempt_Incorrect if {
     RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
 }
 
-test_MultiGroupExclusionsConditions_Correct if {
+test_MultiGroupExclusionsConditions_Correct_V2 if {
     PolicyId := "MS.AAD.2.3v1"
 
     Output := tests with input as {
@@ -1989,7 +1989,7 @@ test_MultiGroupExclusionsConditions_Correct if {
 }
 
 # User and group exclusions tests
-test_UserGroupExclusionConditions_Correct if {
+test_UserGroupExclusionConditions_Correct_V2 if {
     PolicyId := "MS.AAD.2.3v1"
 
     Output := tests with input as {
@@ -2043,7 +2043,7 @@ test_UserGroupExclusionConditions_Correct if {
     RuleOutput[0].ReportDetails == "1 conditional access policy(s) found that meet(s) all requirements:<br/>Test name. <a href='#caps'>View all CA policies</a>."
 }
 
-test_UserGroupExclusionNoExempt_Incorrect if {
+test_UserGroupExclusionNoExempt_Incorrect_V2 if {
     PolicyId := "MS.AAD.2.3v1"
 
     Output := tests with input as {
@@ -2087,7 +2087,7 @@ test_UserGroupExclusionNoExempt_Incorrect if {
     RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
 }
 
-test_UserGroupExclusionUserExemptOnly_Incorrect if {
+test_UserGroupExclusionUserExemptOnly_Incorrect_V2 if {
     PolicyId := "MS.AAD.2.3v1"
 
     Output := tests with input as {
@@ -2141,7 +2141,7 @@ test_UserGroupExclusionUserExemptOnly_Incorrect if {
     RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
 }
 
-test_UserGroupExclusionGroupExemptOnly_Incorrect if {
+test_UserGroupExclusionGroupExemptOnly_Incorrect_V2 if {
     PolicyId := "MS.AAD.2.3v1"
 
     Output := tests with input as {
@@ -2195,7 +2195,7 @@ test_UserGroupExclusionGroupExemptOnly_Incorrect if {
     RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
 }
 
-test_UserGroupExclusionTooFewUserExempts_Incorrect if {
+test_UserGroupExclusionTooFewUserExempts_Incorrect_V2 if {
     PolicyId := "MS.AAD.2.3v1"
 
     Output := tests with input as {
@@ -2294,7 +2294,7 @@ test_Conditions_Correct if {
     RuleOutput[0].ReportDetails == "1 conditional access policy(s) found that meet(s) all requirements:<br/>Test name. <a href='#caps'>View all CA policies</a>."
 }
 
-test_IncludeApplications_Incorrect if {
+test_IncludeApplications_Incorrect_V2 if {
     PolicyId := "MS.AAD.2.3v1"
 
     Output := tests with input as {
@@ -2338,7 +2338,7 @@ test_IncludeApplications_Incorrect if {
     RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
 }
 
-test_IncludeUsers_Incorrect if {
+test_IncludeUsers_Incorrect_V2 if {
     PolicyId := "MS.AAD.2.3v1"
 
     Output := tests with input as {
@@ -2382,7 +2382,7 @@ test_IncludeUsers_Incorrect if {
     RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
 }
 
-test_ExcludeUsers_Incorrect if {
+test_ExcludeUsers_Incorrect_V2 if {
     PolicyId := "MS.AAD.2.3v1"
 
     Output := tests with input as {
@@ -2426,7 +2426,7 @@ test_ExcludeUsers_Incorrect if {
     RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
 }
 
-test_ExcludeGroups_Incorrect if {
+test_ExcludeGroups_Incorrect_V2 if {
     PolicyId := "MS.AAD.2.3v1"
 
     Output := tests with input as {
@@ -2470,7 +2470,7 @@ test_ExcludeGroups_Incorrect if {
     RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
 }
 
-test_ExcludeRoles_Incorrect if {
+test_ExcludeRoles_Incorrect_V2 if {
     PolicyId := "MS.AAD.2.3v1"
 
     Output := tests with input as {
@@ -2558,7 +2558,7 @@ test_SignInRiskLevels_Incorrect if {
     RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
 }
 
-test_BuiltInControls_Incorrect if {
+test_BuiltInControls_Incorrect_V2 if {
     PolicyId := "MS.AAD.2.3v1"
 
     Output := tests with input as {
@@ -2602,7 +2602,7 @@ test_BuiltInControls_Incorrect if {
     RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
 }
 
-test_State_Incorrect if {
+test_State_Incorrect_V2 if {
     PolicyId := "MS.AAD.2.3v1"
 
     Output := tests with input as {

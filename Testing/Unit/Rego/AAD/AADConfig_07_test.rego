@@ -29,7 +29,7 @@ test_PrivilegedUsers_Correct if {
     RuleOutput[0].ReportDetails == "2 global admin(s) found:<br/>Test Name1, Test Name2"
 }
 
-test_PrivilegedUsers_Incorrect if {
+test_PrivilegedUsers_Incorrect_V1 if {
     PolicyId := "MS.AAD.7.1v1"
 
     Output := tests with input as {
@@ -48,7 +48,7 @@ test_PrivilegedUsers_Incorrect if {
     RuleOutput[0].ReportDetails == "1 global admin(s) found:<br/>Test Name1"
 }
 
-test_PrivilegedUsers_Incorrect if {
+test_PrivilegedUsers_Incorrect_V2 if {
     PolicyId := "MS.AAD.7.1v1"
 
     Output := tests with input as {
@@ -127,7 +127,7 @@ test_OnPremisesImmutableId_Correct if {
     RuleOutput[0].ReportDetails == "0 admin(s) that are not cloud-only found"
 }
 
-test_OnPremisesImmutableId_Incorrect if {
+test_OnPremisesImmutableId_Incorrect_V1 if {
     PolicyId := "MS.AAD.7.3v1"
 
     Output := tests with input as {
@@ -147,7 +147,7 @@ test_OnPremisesImmutableId_Incorrect if {
     RuleOutput[0].ReportDetails == "1 admin(s) that are not cloud-only found:<br/>Alice"
 }
 
-test_OnPremisesImmutableId_Incorrect if {
+test_OnPremisesImmutableId_Incorrect_V2 if {
     PolicyId := "MS.AAD.7.3v1"
 
     Output := tests with input as {
@@ -176,7 +176,7 @@ test_OnPremisesImmutableId_Incorrect if {
 #
 # MS.AAD.7.4v1
 #--
-test_AdditionalProperties_Correct if {
+test_AdditionalProperties_Correct_V1 if {
     PolicyId := "MS.AAD.7.4v1"
 
     Output := tests with input as {
@@ -211,7 +211,7 @@ test_AdditionalProperties_Correct if {
     RuleOutput[0].ReportDetails == "0 role(s) configured to allow permanent active assignment or expiration period too long"
 }
 
-test_AdditionalProperties_Incorrect if {
+test_AdditionalProperties_Incorrect_V1 if {
     PolicyId := "MS.AAD.7.4v1"
 
     Output := tests with input as {
@@ -246,7 +246,7 @@ test_AdditionalProperties_Incorrect if {
     RuleOutput[0].ReportDetails == "1 role(s) configured to allow permanent active assignment or expiration period too long:<br/>Global Administrator"
 }
 
-test_AdditionalProperties_Incorrect if {
+test_AdditionalProperties_Incorrect_V2 if {
     PolicyId := "MS.AAD.7.4v1"
 
     Output := tests with input as {
@@ -369,7 +369,7 @@ test_Assignments_Incorrect if {
 #
 # MS.AAD.7.6v1
 #--
-test_AdditionalProperties_Correct if {
+test_AdditionalProperties_Correct_V2 if {
     PolicyId := "MS.AAD.7.6v1"
 
     Output := tests with input as {
@@ -405,7 +405,7 @@ test_AdditionalProperties_Correct if {
     RuleOutput[0].ReportDetails == "0 role(s) that do not require approval to activate found"
 }
 
-test_AdditionalProperties_Incorrect if {
+test_AdditionalProperties_Incorrect_V3 if {
     PolicyId := "MS.AAD.7.6v1"
 
     Output := tests with input as {

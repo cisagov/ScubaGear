@@ -6,7 +6,7 @@ import data.report.utils.NotCheckedDetails
 #
 # MS.AAD.3.1v1
 #--
-test_NotImplemented_Correct if {
+test_NotImplemented_Correct_V1 if {
     PolicyId := "MS.AAD.3.1v1"
 
     Output := tests with input as { }
@@ -740,7 +740,7 @@ test_UserGroupExclusionTooFewUserExempts_Incorrect if {
 }
 
 # Other conditions
-test_ConditionalAccessPolicies_Correct if {
+test_ConditionalAccessPolicies_Correct_V1 if {
     PolicyId := "MS.AAD.3.2v1"
 
     Output := tests with input as {
@@ -773,7 +773,7 @@ test_ConditionalAccessPolicies_Correct if {
     RuleOutput[0].ReportDetails == "1 conditional access policy(s) found that meet(s) all requirements:<br/>Test Policy require MFA for All Users. <a href='#caps'>View all CA policies</a>."
 }
 
-test_IncludeApplications_Incorrect if {
+test_IncludeApplications_Incorrect_V1 if {
     PolicyId := "MS.AAD.3.2v1"
 
     Output := tests with input as {
@@ -806,7 +806,7 @@ test_IncludeApplications_Incorrect if {
     RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
 }
 
-test_IncludeUsers_Incorrect if {
+test_IncludeUsers_Incorrect_V1 if {
     PolicyId := "MS.AAD.3.2v1"
 
     Output := tests with input as {
@@ -905,7 +905,7 @@ test_ExcludeGroups_Incorrect if {
     RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
 }
 
-test_ExcludeRoles_Incorrect if {
+test_ExcludeRoles_Incorrect_V1 if {
     PolicyId := "MS.AAD.3.2v1"
 
     Output := tests with input as {
@@ -938,7 +938,7 @@ test_ExcludeRoles_Incorrect if {
     RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
 }
 
-test_BuiltInControls_Incorrect if {
+test_BuiltInControls_Incorrect_V1 if {
     PolicyId := "MS.AAD.3.2v1"
 
     Output := tests with input as {
@@ -971,7 +971,7 @@ test_BuiltInControls_Incorrect if {
     RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
 }
 
-test_State_Incorrect if {
+test_State_Incorrect_V1 if {
     PolicyId := "MS.AAD.3.2v1"
 
     Output := tests with input as {
@@ -1008,7 +1008,7 @@ test_State_Incorrect if {
 #
 # MS.AAD.3.3v1
 #--
-test_NotImplemented_Correct if {
+test_NotImplemented_Correct_V2 if {
     PolicyId := "MS.AAD.3.3v1"
 
     Output := tests with input as { }
@@ -1024,7 +1024,7 @@ test_NotImplemented_Correct if {
 #
 # MS.AAD.3.4v1
 #--
-test_NotImplemented_Correct if {
+test_NotImplemented_Correct_V3 if {
     PolicyId := "MS.AAD.3.4v1"
 
     Output := tests with input as { }
@@ -1040,7 +1040,7 @@ test_NotImplemented_Correct if {
 #
 # MS.AAD.3.5v1
 #--
-test_NotImplemented_Correct if {
+test_NotImplemented_Correct_V4 if {
     PolicyId := "MS.AAD.3.5v1"
 
     Output := tests with input as { }
@@ -1056,7 +1056,7 @@ test_NotImplemented_Correct if {
 #
 # MS.AAD.3.6v1
 #--
-test_ConditionalAccessPolicies_Correct if {
+test_ConditionalAccessPolicies_Correct_V2 if {
     PolicyId := "MS.AAD.3.6v1"
 
     Output := tests with input as {
@@ -1097,7 +1097,7 @@ test_ConditionalAccessPolicies_Correct if {
     RuleOutput[0].ReportDetails == "1 conditional access policy(s) found that meet(s) all requirements:<br/>MFA required for all highly Privileged Roles Policy. <a href='#caps'>View all CA policies</a>."
 }
 
-test_IncludeApplications_Incorrect if {
+test_IncludeApplications_Incorrect_V2 if {
     PolicyId := "MS.AAD.3.6v1"
 
     Output := tests with input as {
@@ -1138,7 +1138,7 @@ test_IncludeApplications_Incorrect if {
     RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
 }
 
-test_BuiltInControls_Incorrect if {
+test_BuiltInControls_Incorrect_V2 if {
     PolicyId := "MS.AAD.3.6v1"
 
     Output := tests with input as {
@@ -1179,7 +1179,7 @@ test_BuiltInControls_Incorrect if {
     RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
 }
 
-test_State_Incorrect if {
+test_State_Incorrect_V2 if {
     PolicyId := "MS.AAD.3.6v1"
 
     Output := tests with input as {
@@ -1220,7 +1220,7 @@ test_State_Incorrect if {
     RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
 }
 
-test_IncludeRoles_Incorrect if {
+test_IncludeRoles_Incorrect_V1 if {
     PolicyId := "MS.AAD.3.6v1"
 
     Output := tests with input as {
@@ -1261,7 +1261,7 @@ test_IncludeRoles_Incorrect if {
     RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
 }
 
-test_IncludeRoles_Incorrect if {
+test_IncludeRoles_Incorrect_V3 if {
     PolicyId := "MS.AAD.3.6v1"
 
     Output := tests with input as {
@@ -1298,7 +1298,7 @@ test_IncludeRoles_Incorrect if {
     RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
 }
 
-test_ExcludeRoles_Incorrect if {
+test_ExcludeRoles_Incorrect_V2 if {
     PolicyId := "MS.AAD.3.6v1"
 
     Output := tests with input as {
@@ -1339,7 +1339,7 @@ test_ExcludeRoles_Incorrect if {
 #
 # MS.AAD.3.7v1
 #--
-test_ConditionalAccessPolicies_Correct if {
+test_ConditionalAccessPolicies_Correct_V3 if {
     PolicyId := "MS.AAD.3.7v1"
 
     Output := tests with input as {
@@ -1399,7 +1399,7 @@ test_BuiltInControls_Correct if {
     RuleOutput[0].ReportDetails == "1 conditional access policy(s) found that meet(s) all requirements:<br/>AD Joined Device Authentication Policy. <a href='#caps'>View all CA policies</a>."
 }
 
-test_IncludeApplications_Incorrect if {
+test_IncludeApplications_Incorrect_V3 if {
     PolicyId := "MS.AAD.3.7v1"
 
     Output := tests with input as {
@@ -1429,7 +1429,7 @@ test_IncludeApplications_Incorrect if {
     RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
 }
 
-test_IncludeUsers_Incorrect if {
+test_IncludeUsers_Incorrect_V2 if {
     PolicyId := "MS.AAD.3.7v1"
 
     Output := tests with input as {
@@ -1459,7 +1459,7 @@ test_IncludeUsers_Incorrect if {
     RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
 }
 
-test_BuiltInControls_Incorrect if {
+test_BuiltInControls_Incorrect_V3 if {
     PolicyId := "MS.AAD.3.7v1"
 
     Output := tests with input as {
@@ -1489,7 +1489,7 @@ test_BuiltInControls_Incorrect if {
     RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
 }
 
-test_State_Incorrect if {
+test_State_Incorrect_V3 if {
     PolicyId := "MS.AAD.3.7v1"
 
     Output := tests with input as {
@@ -1523,7 +1523,7 @@ test_State_Incorrect if {
 #
 # MS.AAD.3.8v1
 #--
-test_NotImplemented_Correct if {
+test_NotImplemented_Correct_V5 if {
     PolicyId := "MS.AAD.3.8v1"
 
     Output := tests with input as { }
