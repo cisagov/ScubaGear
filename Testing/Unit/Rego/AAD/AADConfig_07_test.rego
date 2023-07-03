@@ -72,6 +72,22 @@ test_PrivilegedUsers_Incorrect_V2 if {
             "User5" : {
                 "DisplayName" : "Test Name5",
                 "roles" : ["Global Administrator"]
+            },
+            "User6" : {
+                "DisplayName" : "Test Name6",
+                "roles" : ["Global Administrator"]
+            },
+            "User7" : {
+                "DisplayName" : "Test Name7",
+                "roles" : ["Global Administrator"]
+            },
+            "User8" : {
+                "DisplayName" : "Test Name8",
+                "roles" : ["Global Administrator"]
+            },
+            "User9" : {
+                "DisplayName" : "Test Name9",
+                "roles" : ["Global Administrator"]
             }
         }
     }
@@ -80,7 +96,7 @@ test_PrivilegedUsers_Incorrect_V2 if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "5 global admin(s) found:<br/>Test Name1, Test Name2, Test Name3, Test Name4, Test Name5"
+    RuleOutput[0].ReportDetails == "9 global admin(s) found:<br/>Test Name1, Test Name2, Test Name3, Test Name4, Test Name5, Test Name6, Test Name7, Test Name8, Test Name9"
 }
 #--
 

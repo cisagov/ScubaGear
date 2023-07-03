@@ -666,7 +666,7 @@ tests[{
     "RequirementMet" : Status
 }] {
     DescriptionString := "global admin(s) found"
-    Conditions := [count(GlobalAdmins) < 5, count(GlobalAdmins) >= 2]
+    Conditions := [count(GlobalAdmins) <= 8, count(GlobalAdmins) >= 2]
     Status := count([Condition | Condition = Conditions[_]; Condition == false]) == 0
 }
 #--
