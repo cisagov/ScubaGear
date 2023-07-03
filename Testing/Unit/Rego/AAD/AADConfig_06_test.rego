@@ -1,78 +1,20 @@
 package aad
 import future.keywords
+import data.report.utils.NotCheckedDetails
 
 
 #
-# Policy 1
+# MS.AAD.6.1v1
 #--
-test_AllowedToCreateApps_Correct if {
+test_NotImplemented_Correct if {
     PolicyId := "MS.AAD.6.1v1"
 
-    Output := tests with input as {
-        "authorization_policies": [
-            {
-                "DefaultUserRolePermissions": {
-                    "AllowedToCreateApps": false
-                },
-                "Id": "authorizationPolicy"
-            }
-        ]
-    }
-
-    # filter for just the output produced by the specific rule by 
-    # checking 1) the control number and 2) the requirement string
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-    
-    # Each rule should produce exactly 1 line of output in the report
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "0 authorization policies found that allow non-admin users to register third-party applications"
-}
-
-test_AllowedToCreateApps_Incorrect_V1 if {
-    PolicyId := "MS.AAD.6.1v1"
-
-    Output := tests with input as {
-        "authorization_policies": [
-            {
-                "DefaultUserRolePermissions": {
-                    "AllowedToCreateApps": true
-                },
-                "Id": "Bad policy"
-            }
-        ]
-    }
+    Output := tests with input as { }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "1 authorization policies found that allow non-admin users to register third-party applications:<br/>Bad policy"
+    RuleOutput[0].ReportDetails == NotCheckedDetails(PolicyId)
 }
-
-test_AllowedToCreateApps_Incorrect_V2 if {
-    PolicyId := "MS.AAD.6.1v1"
-
-    Output := tests with input as {
-        "authorization_policies": [
-            {
-                "DefaultUserRolePermissions": {
-                    "AllowedToCreateApps": true
-                },
-                "Id": "Bad policy"
-            },
-            {
-                "DefaultUserRolePermissions": {
-                    "AllowedToCreateApps": false
-                },
-                "Id": "Good policy"
-            }
-        ]
-    }
-
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "1 authorization policies found that allow non-admin users to register third-party applications:<br/>Bad policy"
-}
+#--
