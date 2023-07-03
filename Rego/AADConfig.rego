@@ -674,7 +674,8 @@ tests[{
 #
 # MS.AAD.7.2v1
 #--
-# At this time we are unable to test for X because of Y
+# At this time we are unable to test for finer-grained roles instead Global Administrator
+# because of the run time & infomation generated will be greater than its usefulness.
 tests[{
     "PolicyId" : PolicyId,
     "Criticality" : "Shall/Not-Implemented",
