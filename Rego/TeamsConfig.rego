@@ -371,7 +371,8 @@ tests[{
 	# What is the tenant type according to Get-CsTenant? 
     TenantConfig := input.teams_tenant_info[_]
 	AssignedPlans := concat(", ", TenantConfig.AssignedPlan)
-    IsGCC := contains(AssignedPlans, "GCC")
+    GCCConditions := [contains(AssignedPlans, "GCC"), contains(AssignedPlans, "DOD")]
+	IsGCC := count([Condition | Condition = GCCConditions[_]; Condition == true]) > 0
 	# As long as either:
 	# 	1) Get-CsTeamsClientConfiguration reports email integration is disabled or
 	# 	2) Get-CsTenant reports this as a gov tenant
