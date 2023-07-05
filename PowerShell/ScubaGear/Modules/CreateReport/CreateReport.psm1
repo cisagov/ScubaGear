@@ -236,7 +236,7 @@ function Import-SecureBaseline{
             $Group.GroupName = $GroupName.Split(".")[1].Trim() # 1 to remove the leading space
             $Group.Controls = @()
 
-            $IdRegex =  "#### MS\.[$($Product.ToUpper())]+\.$($Group.GroupNumber)\."
+            $IdRegex =  "#### MS\.[$($Product.ToUpper())]+\.$($Group.GroupNumber)\.\d+v\d+\s*$"
             # Select-String line numbers aren't 0-indexed, hence the "-1" on the next line
             $LineNumbers = Select-String $IdRegex "$($BaselinePath)$($Product).md" | ForEach-Object {$_."LineNumber"-1}
 
