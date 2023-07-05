@@ -15,7 +15,7 @@ across Microsoft documentation):
 
 2.  **External users**: members of a different M365 tenant.
 
-3.  **Business to Business** (B2B) guest users: external users that are
+3.  **Business to Business (B2B) guest users**: external users that are
     formally invited to collaborate with the team and added to the
     agency’s Azure Active Directory (AAD) as guest users. These users
     authenticate with their home organization/tenant and are granted
@@ -89,7 +89,7 @@ need.
 ### Implementation
 All the settings in this section are configured in the [**Microsoft Teams admin
     center**](https://admin.teams.microsoft.com).
-#### MS.TEAMS.1.1v1, instructions:
+#### MS.TEAMS.1.1v1 instructions:
 To ensure external participants do not have the ability to request
 control of the shared desktop or window in the meeting:
 
@@ -144,7 +144,7 @@ B2B guest users MAY be admitted automatically in the Global (Org-wide default) m
 All the settings in this section are configured in the [**Microsoft Teams admin
     center**](https://admin.teams.microsoft.com).
 
-#### MS.TEAMS.2.1v1, instructions:
+#### MS.TEAMS.2.1v1 instructions:
 
 1.  Sign in to the [**Microsoft Teams admin
     center**](https://admin.teams.microsoft.com).
@@ -158,7 +158,7 @@ All the settings in this section are configured in the [**Microsoft Teams admin
 5.  In the same section, set **People dialing in can bypass the lobby** to
     **Off**.
 
-#### MS.TEAMS.2.2v1, instructions:
+#### MS.TEAMS.2.2v1 instructions:
 
 1.  Sign in to the [**Microsoft Teams admin
     center**](https://admin.teams.microsoft.com).
@@ -172,7 +172,7 @@ All the settings in this section are configured in the [**Microsoft Teams admin
 5.  In the same section, set **People dialing in can bypass the lobby** to
     **Off**.
 
-#### MS.TEAMS.2.3v1, instructions:
+#### MS.TEAMS.2.3v1 instructions:
 
 1.  Sign in to the [**Microsoft Teams admin
     center**](https://admin.teams.microsoft.com).
@@ -209,7 +209,7 @@ Docs](https://docs.microsoft.com/en-us/microsoftteams/meeting-policies-participa
 
 ### Implementation
 All the settings in this section are configured in the [**Microsoft Teams admin center**](https://admin.teams.microsoft.com). 
-#### MS.TEAMS.3.1v1, instructions:
+#### MS.TEAMS.3.1v1 instructions:
 To configure settings for anonymous users:
 
 
@@ -273,7 +273,7 @@ External access for users SHALL only be enabled on a per-domain basis.
 
 All the settings in this section are configured in the [**Microsoft Teams admin
     center**](https://admin.teams.microsoft.com). 
-#### MS.TEAMS.4.1v1, instructions:  
+#### MS.TEAMS.4.1v1 instructions:  
 To enable external access for only specific domains:
 
 1.  Sign in to the [**Microsoft Teams admin
@@ -325,7 +325,7 @@ Steps are outlined in [Manage contact with external Teams users not
 managed by an
 organization](https://docs.microsoft.com/en-us/microsoftteams/manage-external-access#manage-contact-with-external-teams-users-not-managed-by-an-organization). All the settings in this section are configured in the [**Microsoft Teams admin center**](https://admin.teams.microsoft.com).
 
-#### MS.TEAMS.5.1v1, instructions:
+#### MS.TEAMS.5.1v1 instructions:
     
 1.  Sign in to the [**Microsoft Teams admin
     center**](https://admin.teams.microsoft.com).
@@ -344,7 +344,7 @@ organization](https://docs.microsoft.com/en-us/microsoftteams/manage-external-ac
     2.  Clear the check next to **External users with Teams accounts not managed by an organization can contact users in my organization**.
 
 
-#### MS.TEAMS.5.2v1, instructions:
+#### MS.TEAMS.5.2v1 instructions:
     
 1.  Sign in to the [**Microsoft Teams admin
     center**](https://admin.teams.microsoft.com).
@@ -388,9 +388,10 @@ Blog](https://techcommunity.microsoft.com/t5/microsoft-teams-blog/skype-for-busi
 
 ### Implementation
 
-All the settings in this section are configured in the **Microsoft Teams admin center**.
+All the settings in this section are configured in the [**Microsoft Teams admin
+    center**](https://admin.teams.microsoft.com).
 
-#### MS.TEAMS.6.1v1, instructions:
+#### MS.TEAMS.6.1v1 instructions:
 
 1.  Sign in to the **[Microsoft Teams admin
     center](https://admin.teams.microsoft.com).**
@@ -423,9 +424,10 @@ available in GCC or DoD tenants.
 
 ### Implementation
 
-All the settings in this section are configured in the **Microsoft Teams admin center**.
+All the settings in this section are configured in the [**Microsoft Teams admin
+    center**](https://admin.teams.microsoft.com).
 
-#### MS.TEAMS.7.1v1, instructions:
+#### MS.TEAMS.7.1v1 instructions:
 
 1.  Sign in to the **[Microsoft Teams admin
     center](https://admin.teams.microsoft.com).**
@@ -473,9 +475,10 @@ Docs](https://docs.microsoft.com/en-us/microsoftteams/platform/concepts/deploy-a
 
 ### Implementation
 
-All the settings in this section are configured in the **Microsoft Teams admin center**.
+All the settings in this section are configured in the [**Microsoft Teams admin
+    center**](https://admin.teams.microsoft.com). 
 
-#### MS.TEAMS.8.1v1, instructions:
+#### MS.TEAMS.8.1v1 instructions:
 
 1.  Sign in to the **[Microsoft Teams admin
     center](https://admin.teams.microsoft.com).**
@@ -489,7 +492,7 @@ All the settings in this section are configured in the **Microsoft Teams admin c
 5.  If custom policies have been created, repeat these steps for each
     policy, selecting the appropriate policy in step 3.
 
-#### MS.TEAMS.8.2v1, instructions:
+#### MS.TEAMS.8.2v1 instructions:
 
 1.  Sign in to the **[Microsoft Teams admin
     center](https://admin.teams.microsoft.com).**
@@ -543,9 +546,10 @@ Docs](https://docs.microsoft.com/en-us/microsoftteams/policy-assignment-overview
 
 ### Implementation
 
-All the settings in this section are configured in the **Microsoft Teams admin center**.
+All the settings in this section are configured in the [**Microsoft Teams admin
+    center**](https://admin.teams.microsoft.com). 
 
-#### MS.TEAMS.9.1v1, instructions:
+#### MS.TEAMS.9.1v1 instructions:
 
 1.  Sign in to the **[Microsoft Teams admin
     center](https://admin.teams.microsoft.com).**
@@ -585,7 +589,7 @@ record meetings:
 
 8.  Select **Apply**.
 
-#### MS.TEAMS.9.2v1, instructions:
+#### MS.TEAMS.9.2v1 instructions:
 
 1.  Sign in to the **[Microsoft Teams admin
     center](https://admin.teams.microsoft.com).**
@@ -620,9 +624,10 @@ Docs](https://docs.microsoft.com/en-us/microsoftteams/teams-live-events/live-eve
 
 ### Implementation
 
-All the settings in this section are configured in the **Microsoft Teams admin center**.
+All the settings in this section are configured in the [**Microsoft Teams admin
+    center**](https://admin.teams.microsoft.com). 
 
-#### MS.TEAMS.10.1v1, instructions:
+#### MS.TEAMS.10.1v1 instructions:
 
 1.  Sign in to the **[Microsoft Teams admin
     center](https://admin.teams.microsoft.com).**
