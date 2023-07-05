@@ -67,7 +67,7 @@ guest users, unmanaged users and anonymous users.
 ### Policies
 
 #### MS.TEAMS.1.1v1
-External participants SHOULD NOT be enabled to request control of shared desktops or windows.
+External meeting participants SHOULD NOT be enabled to request control of shared desktops or windows.
 
 - _Rationale:_ There is risk in granting an external participant control of a shared screen because the participant could potentially perform unauthorized actions on the shared screen. This policy reduces that risk by removing the ability of an external participant to request control.  However, if agency has a legitimate use case to grant this control, it may be done on a 'as-needed' basis.
 - _Last modified:_ July 2023
@@ -75,8 +75,9 @@ External participants SHOULD NOT be enabled to request control of shared desktop
 
 ### Resources
 
-- [Configure desktop sharing in Microsoft Teams \| Microsoft
-  Docs](https://docs.microsoft.com/en-us/microsoftteams/configure-desktop-sharing)
+- [Manage who can present and request control in Microsoft Teams \| Microsoft
+  Docs] (https://learn.microsoft.com/en-us/microsoftteams/meeting-who-present-request-control) 
+  
 
 ### License Requirements
 
@@ -129,9 +130,9 @@ B2B guest users MAY be admitted automatically in the Global (Org-wide default) m
 
 
 ### Resources
-- [Meeting policy settings - Participants & guests \| Microsoft
-  Docs](https://docs.microsoft.com/en-us/microsoftteams/meeting-policies-participants-and-guests)
-
+- [Meeting policy settings \| Microsoft
+  Docs] (https://learn.microsoft.com/en-us/microsoftteams/settings-policies-reference#meetings) 
+  
 ### License Requirements
 - N/A
 
@@ -197,8 +198,8 @@ Anonymous users SHALL NOT be enabled to start meetings.
 - _Note:_ This policy applies to the Global (Org-wide default) meeting policy and in custom meeting policies if they exist.
 
 ### Resources
-- [Meeting policy settings - Participants & guests \| Microsoft
-Docs](https://docs.microsoft.com/en-us/microsoftteams/meeting-policies-participants-and-guests)
+- [Meeting policy settings  \| Microsoft
+Docs] (https://learn.microsoft.com/en-us/microsoftteams/settings-policies-reference#meetings) 
 
 ### License Requirements
 - N/A
@@ -373,7 +374,7 @@ Contact with Skype users SHALL be blocked.
 ### Resources
 
 - [Communicate with Skype users \| Microsoft
-Docs](https://docs.microsoft.com/en-us/microsoftteams/manage-external-access#communicate-with-skype-users)
+Docs] (https://learn.microsoft.com/en-us/microsoftteams/external-meetings-skype-for-business-server-hybrid)
 
 - [Skype for Business Online to Be Retired in 2021 \| Microsoft Teams
 Blog](https://techcommunity.microsoft.com/t5/microsoft-teams-blog/skype-for-business-online-to-be-retired-in-2021/ba-p/777833)
@@ -411,7 +412,7 @@ Teams email integration SHALL be disabled.
 ### Resources
 
 - [Email Integration \| Microsoft
-Docs](https://docs.microsoft.com/en-us/microsoftteams/enable-features-office-365#email-integration)
+Docs] (https://learn.microsoft.com/en-us/microsoftteams/settings-policies-reference#email-integration)
 
 ### License Requirements
 
