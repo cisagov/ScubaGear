@@ -76,7 +76,7 @@ External meeting participants SHOULD NOT be enabled to request control of shared
 ### Resources
 
 - [Manage who can present and request control in Microsoft Teams \| Microsoft
-  Docs] (https://learn.microsoft.com/en-us/microsoftteams/meeting-who-present-request-control) 
+  Docs](https://learn.microsoft.com/en-us/microsoftteams/meeting-who-present-request-control) 
   
 
 ### License Requirements
@@ -131,7 +131,7 @@ B2B guest users MAY be admitted automatically in the Global (Org-wide default) m
 
 ### Resources
 - [Meeting policy settings \| Microsoft
-  Docs] (https://learn.microsoft.com/en-us/microsoftteams/settings-policies-reference#meetings) 
+  Docs](https://learn.microsoft.com/en-us/microsoftteams/settings-policies-reference#meetings) 
   
 ### License Requirements
 - N/A
@@ -199,7 +199,7 @@ Anonymous users SHALL NOT be enabled to start meetings.
 
 ### Resources
 - [Meeting policy settings  \| Microsoft
-Docs] (https://learn.microsoft.com/en-us/microsoftteams/settings-policies-reference#meetings) 
+Docs](https://learn.microsoft.com/en-us/microsoftteams/settings-policies-reference#meetings) 
 
 ### License Requirements
 - N/A
@@ -374,7 +374,7 @@ Contact with Skype users SHALL be blocked.
 ### Resources
 
 - [Communicate with Skype users \| Microsoft
-Docs] (https://learn.microsoft.com/en-us/microsoftteams/external-meetings-skype-for-business-server-hybrid)
+Docs](https://learn.microsoft.com/en-us/microsoftteams/external-meetings-skype-for-business-server-hybrid)
 
 - [Skype for Business Online to Be Retired in 2021 \| Microsoft Teams
 Blog](https://techcommunity.microsoft.com/t5/microsoft-teams-blog/skype-for-business-online-to-be-retired-in-2021/ba-p/777833)
@@ -412,7 +412,7 @@ Teams email integration SHALL be disabled.
 ### Resources
 
 - [Email Integration \| Microsoft
-Docs] (https://learn.microsoft.com/en-us/microsoftteams/settings-policies-reference#email-integration)
+Docs](https://learn.microsoft.com/en-us/microsoftteams/settings-policies-reference#email-integration)
 
 ### License Requirements
 
