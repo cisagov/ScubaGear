@@ -33,10 +33,10 @@ InModuleScope CreateReport {
             $Baselines.Count | Should -BeExactly 8 -Because "Markdown expected for all products."
         }
         It "Validate markdown group count for <Product>" -ForEach @(
-            @{Product = "aad"; GroupCount = 18; PolicyCount = 33}
+            @{Product = "aad"; GroupCount = 8; PolicyCount = 30}
             @{Product = "defender"; GroupCount = 6; PolicyCount = 22}
             @{Product = "exo"; GroupCount = 17; PolicyCount = 39}
-            @{Product = "onedrive"; GroupCount = 7; PolicyCount = 8}
+            @{Product = "onedrive"; GroupCount = 3; PolicyCount = 4}
             @{Product = "powerbi"; GroupCount = 10; PolicyCount = 12}
             @{Product = "powerplatform"; GroupCount = 4; PolicyCount = 8}
             @{Product = "sharepoint"; GroupCount = 5; PolicyCount = 10}
