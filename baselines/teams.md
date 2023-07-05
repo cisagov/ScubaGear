@@ -6,6 +6,30 @@ It has a permission-based team structure for managing calls and files.
 Microsoft teams also enables teams to manage their own user access
 rights, security policies, and record video calls. This security baseline provides policies to help secure Teams.
 
+
+## License Compliance and Copyright
+
+Portions of this document are adapted from documents in Microsoft’s
+[Microsoft
+365](https://github.com/MicrosoftDocs/microsoft-365-docs/blob/public/LICENSE)
+and
+[Azure](https://github.com/MicrosoftDocs/azure-docs/blob/main/LICENSE)
+GitHub repositories. The respective documents are subject to copyright
+and are adapted under the terms of the Creative Commons Attribution 4.0
+International license. Source documents are linked throughout this
+document. The United States Government has adapted selections of these
+documents to develop innovative and scalable configuration standards to
+strengthen the security of widely used cloud-based software services.
+
+## Assumptions
+
+The **License Requirements** sections of this document assume the
+organization is using an [M365
+E3](https://www.microsoft.com/en-us/microsoft-365/compare-microsoft-365-enterprise-plans)
+or [G3](https://www.microsoft.com/en-us/microsoft-365/government)
+license level. Therefore, only licenses not included in E3/G3 are
+listed.
+
 ## Key Terminology
 Access to Teams can be controlled by the user type. In this baseline,
 the types of users are defined as follows (Note: these terms vary in use
@@ -31,51 +55,23 @@ across Microsoft documentation):
     users, meaning users that are not logged in to any Microsoft or
     organization account, such as dial-in users.[^1]
 
-## Assumptions
-
-The **License Requirements** sections of this document assume the
-organization is using an [M365
-E3](https://www.microsoft.com/en-us/microsoft-365/compare-microsoft-365-enterprise-plans)
-or [G3](https://www.microsoft.com/en-us/microsoft-365/government)
-license level. Therefore, only licenses not included in E3/G3 are
-listed.
-
-## Resources
-
-**<u>License Compliance and Copyright</u>**
-
-Portions of this document are adapted from documents in Microsoft’s
-[Microsoft
-365](https://github.com/MicrosoftDocs/microsoft-365-docs/blob/public/LICENSE)
-and
-[Azure](https://github.com/MicrosoftDocs/azure-docs/blob/main/LICENSE)
-GitHub repositories. The respective documents are subject to copyright
-and are adapted under the terms of the Creative Commons Attribution 4.0
-International license. Source documents are linked throughout this
-document. The United States Government has adapted selections of these
-documents to develop innovative and scalable configuration standards to
-strengthen the security of widely used cloud-based software services.
 
 # Baseline
 
 ## 1. Requesting Control of Shared Desktops or Windows
 
-This setting controls whether external meeting participants can request
-control of the shared desktop or window during the meeting. In this
+This section helps reduce security risks posed by the control of shared desktop or window by external participants during the meeting. In this
 instance, the term “external participants” includes external users, B2B
 guest users, unmanaged users and anonymous users.
 
 ### Policies
 
 #### MS.TEAMS.1.1v1
-External participants SHOULD NOT be enabled to request control of shared desktops or windows in the Global (Org-wide default) meeting policy or in custom meeting policies if any exist.
+External participants SHOULD NOT be enabled to request control of shared desktops or windows.
 
-- _Rationale:_ There is some inherent risk in granting an external participant
-control of a shared screen. However, there are legitimate use cases to grant this control. Furthermore, the risk is minimal as users cannot gain control of another user’s screen unless the user giving control explicitly accepts a
-control request. As such, while enabling external participants to
-request control is discouraged, it may be done, depending on agency
-need.
+- _Rationale:_ There is risk in granting an external participant control of a shared screen because the participant could potentially perform unauthorized actions on the shared screen. This policy reduces that risk by removing the ability of an external participant to request control.  However, if agency has a legitimate use case to grant this control, it may be done on a 'as-needed' basis.
 - _Last modified:_ July 2023
+- _Note:_ This policy applies to the Global (Org-wide default) meeting policy and in custom meeting policies if they exist.
 
 ### Resources
 
@@ -107,8 +103,7 @@ control of the shared desktop or window in the meeting:
     policy, selecting the appropriate policy in step 3.
 
 ## 2. Automatic Admittance into meetings
-This setting controls which meeting participants wait in the lobby
-before they are admitted to the meeting.
+This section helps reduce security risks related to automatic admittance of meeting participants. This includes anaonymous users, dial-in users, internal users and guest users.
 
 ### Policies
 
@@ -116,19 +111,19 @@ before they are admitted to the meeting.
 Anonymous users, including dial-in users, SHOULD NOT be admitted automatically in the Global (Org-wide default) meeting policy.
 - _Rationale:_ TODO add rationale.
 - _Last modified:_ July 2023
-- Custom meeting policies MAY be created that allow more flexibility for specific users.
+- _Note:_ Custom meeting policies MAY be created that allow more flexibility for specific users.
 
 #### MS.TEAMS.2.2v1
 Internal users SHOULD be admitted automatically in the Global (Org-wide default) meeting policy.
 - _Rationale:_ TODO add rationale.
 - _Last modified:_ July 2023
-- Custom meeting policies MAY be created that allow more flexibility for specific users.
+- _Note:_ Custom meeting policies MAY be created that allow more flexibility for specific users.
 
 #### MS.TEAMS.2.3v1
 B2B guest users MAY be admitted automatically in the Global (Org-wide default) meeting policy.
 - _Rationale:_ TODO add rationale.
 - _Last modified:_ July 2023
-- Custom meeting policies MAY be created that allow more flexibility for specific users.
+- _Note:_ Custom meeting policies MAY be created that allow more flexibility for specific users.
 
 
 
@@ -189,16 +184,17 @@ All the settings in this section are configured in the [**Microsoft Teams admin
 
 ## 3. Starting Teams Meetings
 
-This setting controls which meeting participants can start a meeting. In
+This section helps reduce security risks related to starting a Teams meeting by anonymous users. In
 this instance, the term “anonymous users” refers to any Teams users
 joining calls that are not authenticated through the agency’s tenant.
 
 ### Policies
 
 #### MS.TEAMS.3.1v1
-Anonymous users SHALL NOT be enabled to start meetings in the Global (Org-wide default) meeting policy or in custom meeting policies if any exist.
+Anonymous users SHALL NOT be enabled to start meetings.
 - _Rationale:_ For any agencies that implemented custom policies that provided more flexibility to some users to automatically admit "everyone" to a meeting - this policy provides protection from anonymous users starting meeting to scrape internal contacts. 
 - _Last modified:_ July 2023
+- _Note:_ This policy applies to the Global (Org-wide default) meeting policy and in custom meeting policies if they exist.
 
 ### Resources
 - [Meeting policy settings - Participants & guests \| Microsoft
@@ -225,6 +221,7 @@ To configure settings for anonymous users:
     policy, selecting the appropriate policy in step 3.
 
 ## 4. External User Access
+This section helps reduce security risks related to external user access. In this instance, external users refer to members of a different M365 tenant. Access for unmnaged users is controlled separately. 
 
 External access allows external users to look up internal users by their
 email address to initiate chats and calls entirely within Teams.
@@ -242,9 +239,7 @@ the CIO Council's [Interagency Collaboration
 Program](https://community.max.gov/display/Egov/Interagency+Collaboration+Program)’s
 OMB Max Site for a list of .gov domains for sharing).
 
-Importantly, this setting only pertains to external users (i.e., members
-of a different M365 tenant). Access for unmanaged users is controlled
-separately.
+
 
 ### Policies
 
@@ -289,6 +284,7 @@ To enable external access for only specific domains:
 5.  Click **Save.**
 
 ## 5. Unmanaged User Access
+This section helps reduce security risks related to unmanaged user access. 
 
 Blocking contact with unmanaged Teams users prevents these users from
 looking up internal users by their email address and initiating chats
@@ -451,9 +447,10 @@ development, that users “sideload” into Teams.
 ### Policies
 
 #### MS.TEAMS.8.1v1
-Agencies SHOULD allow all apps published by Microsoft in the Global (org-wide default) meeting policy and all custom policies.
+Agencies SHOULD allow all apps published by Microsoft.
 - _Rationale:_ TODO
 - _Last modified:_ July 2023
+- _Note:_ This policy applies to the Global (Org-wide default) meeting policy and in custom meeting policies if they exist.
 
 #### MS.TEAMS.8.2v1
 Agencies SHOULD NOT allow installation of all third-party apps or custom apps in the Global (org-wide default) meeting policy and all custom policies.
@@ -608,10 +605,10 @@ This section helps reduce security risks related to the recording user permissio
 
 ### Policies
 #### MS.TEAMS.10.1v1
-Record an event SHOULD be set to Organizer can record Global (org-wide default) meeting policy and all custom policies.
+Record an event SHOULD be set to Organizer can record.
 - _Rationale:_ The security risk of the default settings for Live Events is that Live Events are available to be recorded by all participants by default. By limiting the recording permissions to only the organizer this minimizes the security risk to the organizer's discretion for these Live Events.
 - _Last modified:_ July 2023
-- _Note:_ Custom policies MAY be created to allow more flexibility for specific users.
+- _Note:_ This policy applies to the Global (Org-wide default) meeting policy and in custom meeting policies if they exist. Custom policies MAY be created to allow more flexibility for specific users.
 
 ### Resources
 
@@ -650,7 +647,7 @@ sensitive information as well as intentional exfiltration of data. DLP
 forms an integral part of securing Microsoft Teams. There a several
 commercial DLP solutions available that document support for Microsoft
 Teams. Agencies may select any service that fits their needs and meets
-the requirements outlined in this baseline control.
+the requirements outlined in this section.
 
 Microsoft offers DLP services, controlled within the [Microsoft 365
 compliance](https://compliance.microsoft.com) admin center. Though use
