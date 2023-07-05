@@ -435,17 +435,27 @@ tests[{
 #
 # MS.AAD.3.8v1
 #--
-# At this time we are unable to test for X because NEW POLICY
+RequireManagedDeviceMFA[Cap.DisplayName] {
+    Cap := input.conditional_access_policies[_]
+    CompliantDevice := "compliantDevice" in Cap.GrantControls.BuiltInControls
+    HybridJoin := "domainJoinedDevice" in Cap.GrantControls.BuiltInControls
+    Conditions := [CompliantDevice, HybridJoin]
+    "All" in Cap.Conditions.Users.IncludeUsers
+    "urn:user:registersecurityinfo" in Cap.Conditions.Applications.IncludeUserActions
+    count([Condition | Condition = Conditions[_]; Condition == true]) > 0
+    Cap.State == "enabled"
+}
+
 tests[{
-    "PolicyId": PolicyId,
-    "Criticality" : "Should/Not-Implemented",
-    "Commandlet" : [],
-    "ActualValue" : [],
-    "ReportDetails" : NotCheckedDetails(PolicyId),
-    "RequirementMet" : false
+    "PolicyId": "MS.AAD.3.8v1",
+    "Criticality" : "Should",
+    "Commandlet" : ["Get-MgIdentityConditionalAccessPolicy"],
+    "ActualValue" : RequireManagedDeviceMFA,
+    "ReportDetails" : concat(". ", [ReportFullDetailsArray(RequireManagedDeviceMFA, DescriptionString), CapLink]),
+    "RequirementMet" : Status
 }] {
-    PolicyId := "MS.AAD.3.8v1"
-    true
+    DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
+    Status := count(RequireManagedDeviceMFA) > 0
 }
 #--
 
