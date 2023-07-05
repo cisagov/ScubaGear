@@ -42,12 +42,12 @@ InModuleScope CreateReport {
             }
         }
         It 'Creates a report for <Product>' -ForEach @(
-            @{Product = 'aad'; WarningCount = 1},
+            @{Product = 'aad'; WarningCount = 0},
             @{Product = 'defender'; WarningCount = 10},
             @{Product = 'exo'; WarningCount = 2},
-            @{Product = 'onedrive'; WarningCount = 8},
+            @{Product = 'onedrive'; WarningCount = 1},
             @{Product = 'powerplatform'; WarningCount = 0},
-            @{Product = 'sharepoint'; WarningCount = 5},
+            @{Product = 'sharepoint'; WarningCount = 0},
             @{Product = 'teams'; WarningCount = 5}
         ){
             $CreateReportParams += @{
