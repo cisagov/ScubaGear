@@ -30,7 +30,7 @@ param (
 Import-Module Selenium
 
 Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for $OrganizationName" -ForEach @(
-    @{ Browser = "Chrome"; Driver = Start-SeChrome -Headless -Arguments @('start-maximized') 2>$null }
+    @{ Browser = "Chrome"; Driver = Start-SeChrome -Headless -Arguments @('start-maximized', 'AcceptInsecureCertificates') 2>$null }
 ){
 	BeforeAll {
         $ReportFolders = Get-ChildItem . -directory -Filter "M365BaselineConformance*" | Sort-Object -Property LastWriteTime -Descending
@@ -105,12 +105,34 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for $OrganizationN
                 $Rows = Get-SeElement -Element $Table -By TagName 'tr'
                 $Rows.Count | Should -BeGreaterThan 0
 
+                # First Table in report is generally tenant data 
                 if ($Table.GetProperty("id") -eq "tenant-data"){
                     $Rows.Count | Should -BeExactly 2
                     $TenantDataColumns = Get-SeElement -Target $Rows[1] -By TagName "td"
                     $Tenant = $TenantDataColumns[0].Text
                     $Tenant | Should -Be $OrganizationName -Because "Tenant is $Tenant"
-                } else {
+                }
+                # AAD detailed report has a Conditional Access Policy table
+                elseif ($Table.GetAttribute("class") -eq "caps_table"){
+                    ForEach ($Row in $Rows){
+                        $RowHeaders = Get-SeElement -Element $Row -By TagName 'th'
+                        $RowData = Get-SeElement -Element $Row -By TagName 'td'
+
+                        ($RowHeaders.Count -eq 0 ) -xor ($RowData.Count -eq 0) | Should -BeTrue -Because "Any given row should be homogenious"
+
+                        # NOTE: Checking for 8 columns since first is 'expand' column
+                        if ($RowHeaders.Count -gt 0){
+                            $RowHeaders.Count | Should -BeExactly 8
+                            $RowHeaders[1].text | Should -BeLikeExactly "Name"
+                        }
+
+                        if ($RowData.Count -gt 0){
+                            $RowData.Count | Should -BeExactly 8
+                        }
+                    }
+                }
+                # Default is normal policy results table
+                else {
                     # Control report tables
                     ForEach ($Row in $Rows){
                         $RowHeaders = Get-SeElement -Element $Row -By TagName 'th'
