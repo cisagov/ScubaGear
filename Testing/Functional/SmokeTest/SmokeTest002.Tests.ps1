@@ -105,7 +105,7 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for $OrganizationN
                 $Rows = Get-SeElement -Element $Table -By TagName 'tr'
                 $Rows.Count | Should -BeGreaterThan 0
 
-                # First Table in report is generally tenant data 
+                # First Table in report is generally tenant data
                 if ($Table.GetProperty("id") -eq "tenant-data"){
                     $Rows.Count | Should -BeExactly 2
                     $TenantDataColumns = Get-SeElement -Target $Rows[1] -By TagName "td"
