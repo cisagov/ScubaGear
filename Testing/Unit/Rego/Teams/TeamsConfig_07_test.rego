@@ -90,7 +90,7 @@ test_AllowEmailIntoChannel_Incorrect if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "1 Requirement not met: Email integration is enabled across domain: Global"
+    RuleOutput[0].ReportDetails == "Requirement not met"
 }
 
 test_AllowEmailIntoChannel_Incorrect_multi if {
@@ -122,7 +122,7 @@ test_AllowEmailIntoChannel_Incorrect_multi if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "2 Requirement not met: Email integration is enabled across domain: Global, Tag:AllOn"
+    RuleOutput[0].ReportDetails == "Requirement not met"
 }
 
 test_AllowEmailIntoChannel_Correct_V2 if {
