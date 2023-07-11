@@ -59,7 +59,7 @@ or [G3](https://www.microsoft.com/en-us/microsoft-365/government)
 license level. Therefore, only licenses not included in E3/G3 are
 listed.
 
-# Power Platform Policies
+# Baseline Policies
 
 Baseline Policies in this document are targeted towards administrative controls that apply to
 Power Platform applications at either the tenant or Power Platform
