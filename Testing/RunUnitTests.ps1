@@ -129,7 +129,7 @@ function Invoke-ControlGroupItem {
             $Filename = Get-ChildItem $(Join-Path -Path $FilePath -ChildPath $Product) |
             Where-Object {$_.Name -like "*$ControlGroup*" }
 
-            if ($Filename -eq $null){
+            if ($null -eq $Filename){
                 Write-Warning "`nNOT FOUND: Control Group $b does not exist in the $Product directory"
             }
 
