@@ -268,18 +268,43 @@ tests[{
 #
 # MS.AAD.3.1v1
 #--
-# At this time we are unable to fully test for MFA due to conflicting and multiple ways to configure authentication methods
-# Awaiting API changes and feature updates from Microsoft for automated checking
+default PhishingResistantMFAConditionsMatch(_) := false
+HasPhishingResistantMFA(Policy) := true if {
+    Strengths := { Strength | Strength := Policy.GrantControls.AuthenticationStrength.AllowedCombinations[_]}
+    AcceptableMFA := {"windowsHelloForBusiness", "fido2", "x509CertificateMultiFactor"}
+    count(AcceptableMFA) == count(Strengths | AcceptableMFA)
+}
+
+PhishingResistantMFAConditionsMatch(Policy) := true if {
+    "All" in Policy.Conditions.Users.IncludeUsers
+    "All" in Policy.Conditions.Applications.IncludeApplications
+    count(Policy.Conditions.Applications.ExcludeApplications) == 0
+    HasPhishingResistantMFA(Policy)
+    Policy.State == "enabled"
+    count(Policy.Conditions.Users.ExcludeRoles) == 0
+}
+
+PhishingResistantMFA[Cap.DisplayName] {
+    Cap := input.conditional_access_policies[_]
+
+    # Match all simple conditions
+    PhishingResistantMFAConditionsMatch(Cap)
+
+    # Only match policies with user and group exclusions if all exempted
+    UserExclusionsFullyExempt(Cap, "MS.AAD.3.1v1") == true
+    GroupExclusionsFullyExempt(Cap, "MS.AAD.3.1v1") == true
+}
+
 tests[{
-    "PolicyId" : PolicyId,
-    "Criticality" : "Shall/Not-Implemented",
-    "Commandlet" : [],
+    "PolicyId" : "MS.AAD.3.1v1",
+    "Criticality" : "Shall",
+    "Commandlet" : ["Get-MgIdentityConditionalAccessPolicy"],
     "ActualValue" : [],
-    "ReportDetails" : NotCheckedDetails(PolicyId),
-    "RequirementMet" : false
+    "ReportDetails" : concat(". ", [ReportFullDetailsArray(PhishingResistantMFA, DescriptionString), CapLink]),
+    "RequirementMet" : Status
 }] {
-    PolicyId := "MS.AAD.3.1v1"
-    true
+    DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
+    Status := count(PhishingResistantMFA) > 0
 }
 #--
 
