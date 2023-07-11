@@ -18,7 +18,7 @@ created:
 
 2.  [**Model-Driven Apps**](https://learn.microsoft.com/en-us/power-apps/maker/model-driven-apps/): These are apps developed from an existing
     data source. They can be thought of as the inverse of a Canvas App.
-    Since, you build the app from the source rather than building the the UI and then connecting to the source like
+    Since, you build the app from the source rather than building the UI and then connecting to the source like
     Canvas apps.
 
 3.  [**Power Pages**](https://learn.microsoft.com/en-us/power-pages/): These apps that are developed to function as either internal or external facing websites.
@@ -370,7 +370,7 @@ center](https://learn.microsoft.com/en-us/power-platform/admin/powerapps-us-gove
 
 4.  Click on **Product** then click on **Privacy + Security** from the options that appear.
 
-5.  At the bottom of the page under the **Content security policy** section, turn the slider **On** for **Model-driven** and **Canvas**
+5.  At the bottom of the page under the **Content security policy** section, turn the slider **On** for **Model-driven** and **Canvas**.
 
 6.  Repeat steps 2 - 5 for all active Power Platform environments.
 
