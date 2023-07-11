@@ -76,7 +76,7 @@ control will restrict the creation of new environments to users with the
 following admin roles: Global admins, Dynamics 365 admins, and Power
 Platform admins.
 
-### Policy
+### Policies
 
 #### MS.POWERPLATFORM.1.1v1
 The ability to create production and sandbox environments SHALL be restricted to admins.
@@ -153,7 +153,7 @@ restrict users in the Azure AD tenant from creating Power Apps in the
 default Power Platform environment. Admins can restrict users from
 creating apps in all other created environments.
 
-### Policy
+### Policies
 
 #### MS.POWERPLATFORM.2.1v1
 A DLP policy SHALL be created to restrict connector access in the
@@ -342,7 +342,7 @@ to detect and mitigate certain types of attacks, including Cross-Site
 Scripting (XSS), clickjacking, and data injection attacks. When enabled, this setting can apply to all
 current Canvas Apps and Model-driven apps at the Power Platform environment level.
 
-###  Policy
+###  Policies
 
 #### MS.POWERPLATFORM.4.1v1
 Content Security Policy SHALL be enforced for Model-driven and Canvas Power Apps.
@@ -380,7 +380,7 @@ center](https://learn.microsoft.com/en-us/power-platform/admin/powerapps-us-gove
 
 Power Pages formerly known as Power Portals are Power Apps specifically designed to act as external facing websites. By default by any user in the tenant can create a Power Page. Admins are able to restrict the creation of new Power Pages to just admins.
 
-###  Policy
+###  Policies
 
 #### MS.POWERPLATFORM.5.1v1
 The ability to create Power Pages sites SHOULD be restricted to admins.
