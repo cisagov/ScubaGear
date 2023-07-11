@@ -96,23 +96,23 @@ function Invoke-Product {
     Write-Output ""
 }
 
-function Get-Baseline {
+function Get-ControlGroup {
     [CmdletBinding()]
     param (
-        [string] $Baseline
+        [string] $ControlGroup
     )
 
     $Tens = @('01','02','03','04','05','06','07','08','09')
-    if(($Baseline -match "^\d+$") -or ($Baseline -in $Tens)) {
-        if ([int]$Baseline -lt 10) {
-            $Baseline = $Tens[[int]$Baseline-1]
+    if(($ControlGroup -match "^\d+$") -or ($ControlGroup -in $Tens)) {
+        if ([int]$ControlGroup -lt 10) {
+            $ControlGroup = $Tens[[int]$ControlGroup-1]
         }
-        return $true, $Baseline
+        return $true, $ControlGroup
     }
     return $false
 }
 
-function Invoke-BaselineItem {
+function Invoke-ControlGroupItem {
     [CmdletBinding()]
     param (
         [Parameter()]
@@ -122,15 +122,19 @@ function Invoke-BaselineItem {
     )
 
     Write-Output "`n==== Testing $Product ===="
-    foreach($Baseline in $b) {
-        $Result = Get-Baseline $Baseline
+    foreach($ControlGroup in $b) {
+        $Result = Get-ControlGroup $ControlGroup
         if($Result[0]){
-            $Baseline = $Result[1]
+            $ControlGroup = $Result[1]
             $Filename = Get-ChildItem $(Join-Path -Path $FilePath -ChildPath $Product) |
-            Where-Object {$_.Name -match $('Config2_'+$Baseline+'_test.rego')} | Select-Object Fullname
+            Where-Object {$_.Name -like "*$ControlGroup*" }
 
-            if(Test-Path -Path $Filename.Fullname -PathType Leaf) {
-                Write-Output "`nTesting Baseline $Baseline"
+            if ($Filename -eq $null){
+                Write-Warning "`nNOT FOUND: Control Group $b does not exist in the $Product directory"
+            }
+
+            elseif(Test-Path -Path $Filename.Fullname -PathType Leaf) {
+                Write-Output "`nTesting Control Group $ControlGroup"
                 ..\opa_windows_amd64.exe test ..\Rego\ .\$($Filename.Fullname) $Flag
             }
             else {
@@ -138,7 +142,7 @@ function Invoke-BaselineItem {
             }
         }
         else {
-            Get-ErrorMsg BaselineItemNumber
+            Get-ErrorMsg ControlGroupItemNumber
         }
     }
     Write-Output ""
@@ -152,21 +156,29 @@ function Invoke-TestName {
         [Parameter()]
         [string]$Product,
         [Parameter()]
-        [string]$Baseline
+        [string]$ControlGroup
     )
 
-    $Result = Get-Baseline $Baseline
+    $Result = Get-ControlGroup $ControlGroup
     if($Result[0]){
-        $Baseline = $Result[1]
+        $ControlGroup = $Result[1]
         $Filename = Get-ChildItem $(Join-Path -Path $FilePath -ChildPath $Product) |
-        Where-Object {$_.Name -match $('Config2_'+$Baseline+'_test.rego')} | Select-Object Fullname
+        Where-Object {$_.Name -like "*$ControlGroup*" }
 
         if(Test-Path -Path $Filename.Fullname -PathType Leaf) {
-            Write-Output "`n==== Testing $Product Baseline $Baseline ===="
+            Write-Output "`n==== Testing $Product Control Group $ControlGroup ===="
 
             foreach($Test in $t) {
-                Write-Output "`nTesting $Test"
-                ..\opa_windows_amd64.exe test ..\Rego\ .\$($Filename.Fullname) -r $Test $Flag
+                $Match = Select-String -Path $Filename.Fullname -Pattern $Test -Quiet
+
+                if ($Match){
+                    Write-Output "`nTesting $Test"
+                    ..\opa_windows_amd64.exe test ..\Rego\ .\$($Filename.Fullname) -r $Test $Flag
+                }
+                else{
+                    Write-Warning "`nNOT FOUND: $Test in $Filename"
+                }
+                
             }
         }
         else {
@@ -174,7 +186,7 @@ function Invoke-TestName {
         }
     }
     else {
-        Get-ErrorMsg BaselineItemNumber
+        Get-ErrorMsg ControlGroupItemNumber
     }
     Write-Output ""
 }
@@ -196,16 +208,16 @@ if($pEmpty -and $bEmpty -and $tEmpty) {
 }
 elseif((-not $pEmpty) -and (-not $bEmpty) -and (-not $tEmpty)) {
     if (($p.Count -gt 1) -or ($b.Count -gt 1)) {
-        Write-Output "**WARNING** can only take 1 argument for each: product & baseline item`n...Running test for $($p[0]) and $($b[0]) only"
+        Write-Output "**WARNING** can only take 1 argument for each: product & Control Group item`n...Running test for $($p[0]) and $($b[0]) only"
     }
 
-    Invoke-TestName -Flag $Flag -Product $p[0] -Baseline $b[0]
+    Invoke-TestName -Flag $Flag -Product $p[0] -ControlGroup $b[0]
 }
 elseif((-not $pEmpty) -and (-not $bEmpty) -and $tEmpty) {
     if ($p.Count -gt 1) {
         Write-Output "**WARNING** can only take 1 argument for product`n...Running test for $($p[0]) only"
     }
-    Invoke-BaselineItem -Flag $Flag -Product $p[0]
+    Invoke-ControlGroupItem -Flag $Flag -Product $p[0]
 }
 elseif((-not $pEmpty) -and $bEmpty -and $tEmpty) {
     Invoke-Product -Flag $Flag
@@ -214,5 +226,5 @@ elseif($pEmpty -or $bEmpty -and (-not $tEmpty)) {
     Get-ErrorMsg TestNameFlagsMissing
 }
 elseif($pEmpty -and (-not $bEmpty) -and $tEmpty) {
-    Get-ErrorMsg BaselineItemFlagMissing
+    Get-ErrorMsg ControlGroupItemFlagMissing
 }
