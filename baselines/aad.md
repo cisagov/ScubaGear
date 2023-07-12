@@ -11,7 +11,7 @@ and
 GitHub repositories. The respective documents are subject to copyright
 and are adapted under the terms of the Creative Commons Attribution 4.0
 International license. Source documents are linked throughout this
-document. The United States government has adpted selections of these
+document. The United States government has adapted selections of these
 documents to develop innovative and scalable configuration standards to
 strengthen the security of widely used cloud-based software services.
 
