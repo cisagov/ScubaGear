@@ -84,6 +84,177 @@ test_PhishingResistantSingleMFA_Correct if {
     RuleOutput[0].ReportDetails == "1 conditional access policy(s) found that meet(s) all requirements:<br/>Test name. <a href='#caps'>View all CA policies</a>."
 }
 
+
+test_PhishingResistantNoneMFA_Incorrect if {
+    PolicyId := "MS.AAD.3.1v1"
+
+    Output := tests with input as {
+"conditional_access_policies": [
+    {
+        "Conditions":  {
+                           "Applications":  {
+                                                "ApplicationFilter":  {
+                                                                          "Mode":  null,
+                                                                          "Rule":  null
+                                                                      },
+                                                "ExcludeApplications":  [
+
+                                                                        ],
+                                                "IncludeApplications":  [
+                                                                            "All"
+                                                                        ],
+                                                "IncludeAuthenticationContextClassReferences":  [],
+                                                "IncludeUserActions":  []
+                                            },
+                           "ClientAppTypes":  [
+                                                  "all"
+                                              ],
+                           "ClientApplications":  {
+                                                      "ExcludeServicePrincipals":  null,
+                                                      "IncludeServicePrincipals":  null,
+                                                      "ServicePrincipalFilter":  {
+                                                                                     "Mode":  null,
+                                                                                     "Rule":  null
+                                                                                 }
+                                                  },
+                           "DeviceStates":  {
+                                                "ExcludeStates":  null,
+                                                "IncludeStates":  null
+                                            },
+                           "Devices":  {
+                                           "DeviceFilter":  {
+                                                                "Mode":  null,
+                                                                "Rule":  null
+                                                            },
+                                           "ExcludeDeviceStates":  null,
+                                           "ExcludeDevices":  null,
+                                           "IncludeDeviceStates":  null,
+                                           "IncludeDevices":  null
+                                       },
+                           "Locations":  {
+                                             "ExcludeLocations":  null,
+                                             "IncludeLocations":  null
+                                         },
+                           "Platforms":  {
+                                             "ExcludePlatforms":  null,
+                                             "IncludePlatforms":  null
+                                         },
+                           "ServicePrincipalRiskLevels":  null,
+                           "SignInRiskLevels":  [
+
+                                                ],
+                           "UserRiskLevels":  [
+
+                                              ],
+                           "Users":  {
+                                         "ExcludeGroups":  [
+
+                                                           ],
+                                         "ExcludeGuestsOrExternalUsers":  {
+                                                                              "ExternalTenants":  {
+                                                                                                      "MembershipKind":  null
+                                                                                                  },
+                                                                              "GuestOrExternalUserTypes":  null
+                                                                          },
+                                         "ExcludeRoles":  [
+
+                                                          ],
+                                         "ExcludeUsers":  [
+                                                              "66b4d5c2-71c9-4644-8728-74e3a8324d81"
+                                                          ],
+                                         "IncludeGroups":  [
+
+                                                           ],
+                                         "IncludeGuestsOrExternalUsers":  {
+                                                                              "ExternalTenants":  {
+                                                                                                      "MembershipKind":  null
+                                                                                                  },
+                                                                              "GuestOrExternalUserTypes":  null
+                                                                          },
+                                         "IncludeRoles":  [
+                                                              "62e90394-69f5-4237-9190-012177145e10",
+                                                              "e8611ab8-c189-46e8-94e1-60213ab1f814",
+                                                              "fe930be7-5e62-47db-91af-98c3a49a38b1",
+                                                              "f28a1f50-f6e7-4571-818b-6a12f2af6b6c",
+                                                              "29232cdf-9323-42fd-ade2-1d097af3e4de",
+                                                              "8ac3fc64-6eca-42ea-9e69-59f4c7b60eb2",
+                                                              "9b895d92-2cd3-44c7-9d02-a6ac2d5ea5c3",
+                                                              "158c047a-c907-4556-b7ef-446551a6b5f7",
+                                                              "b0f54661-2d74-4c50-afa3-1ec803f12efe"
+                                                          ],
+                                         "IncludeUsers":  []
+                                     }
+                       },
+        "CreatedDateTime":  "/Date(1668112094045)/",
+        "Description":  null,
+        "DisplayName":  "Live - MFA required for Highly Privileged Roles",
+        "GrantControls":  {
+                              "AuthenticationStrength":  {
+                                                             "AllowedCombinations":  [],
+                                                             "CombinationConfigurations":  null,
+                                                             "CreatedDateTime":  null,
+                                                             "Description":  null,
+                                                             "DisplayName":  null,
+                                                             "Id":  null,
+                                                             "ModifiedDateTime":  null,
+                                                             "PolicyType":  null,
+                                                             "RequirementsSatisfied":  null
+                                                         },
+                              "BuiltInControls":  [
+                                                      "mfa"
+                                                  ],
+                              "CustomAuthenticationFactors":  [
+
+                                                              ],
+                              "Operator":  "OR",
+                              "TermsOfUse":  [
+
+                                             ]
+                          },
+        "Id":  "9e174715-5697-4695-ac39-92f4af6ac2c4",
+        "ModifiedDateTime":  "/Date(1668112265652)/",
+        "SessionControls":  {
+                                "ApplicationEnforcedRestrictions":  {
+                                                                        "IsEnabled":  null
+                                                                    },
+                                "CloudAppSecurity":  {
+                                                         "CloudAppSecurityType":  null,
+                                                         "IsEnabled":  null
+                                                     },
+                                "ContinuousAccessEvaluation":  {
+                                                                   "Mode":  null
+                                                               },
+                                "DisableResilienceDefaults":  null,
+                                "PersistentBrowser":  {
+                                                          "IsEnabled":  null,
+                                                          "Mode":  null
+                                                      },
+                                "SecureSignInSession":  {
+                                                            "IsEnabled":  null
+                                                        },
+                                "SignInFrequency":  {
+                                                        "AuthenticationType":  null,
+                                                        "FrequencyInterval":  null,
+                                                        "IsEnabled":  null,
+                                                        "Type":  null,
+                                                        "Value":  null
+                                                    }
+                            },
+        "State":  "enabled",
+        "AdditionalProperties":  {
+
+                                 }
+    }
+]
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    #RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+}
+
 test_PhishingResistantMFAExcludeApp_Incorrect if {
     PolicyId := "MS.AAD.3.1v1"
 
@@ -104,7 +275,11 @@ test_PhishingResistantMFAExcludeApp_Incorrect if {
                 },
                 "GrantControls" : {
                     "AuthenticationStrength" : {
-                        "DisplayName":  "Phishing-resistant MFA"
+                        "AllowedCombinations":  [
+                            "windowsHelloForBusiness",
+                            "fido2",
+                            "x509CertificateMultiFactor"
+                        ]
                     }
                 },
                 "State" : "enabled",
@@ -180,7 +355,11 @@ test_PhishingResistantMFAExcludeGroup_Incorrect if {
                 },
                 "GrantControls" : {
                     "AuthenticationStrength" : {
-                        "DisplayName":  "Phishing-resistant MFA"
+                        "AllowedCombinations":  [
+                            "windowsHelloForBusiness",
+                            "fido2",
+                            "x509CertificateMultiFactor"
+                        ]
                     }
                 },
                 "State" : "enabled",
