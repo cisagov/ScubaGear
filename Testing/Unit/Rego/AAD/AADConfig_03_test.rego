@@ -1679,7 +1679,7 @@ test_InCorrect_EmptyGrantControls if {
     RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
 }
 
-test_InCorrect_No_Policy if {
+test_Incorrect_No_Policy if {
     PolicyId := "MS.AAD.3.8v1"
 
     Output := tests with input as {
