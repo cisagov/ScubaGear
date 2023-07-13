@@ -3,7 +3,6 @@ import future.keywords
 import data.report.utils.NotCheckedDetails
 import data.report.utils.Format
 import data.report.utils.ReportDetailsBoolean
-import data.test.utils.IsAllUsers
 import data.test.utils.IsEmptyContainer
 import data.test.utils.Contains
 import data.test.utils.Count
