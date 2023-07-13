@@ -958,15 +958,11 @@ At a minimum, the following alerts SHALL be enabled:
 
   - Suspicious Email Forwarding Activity.
 
-  - Unusual increase in email reported as phish.
-
   - Messages have been delayed.
 
   - Tenant restricted from sending unprovisioned email.
 
   - Tenant restricted from sending email.
-
-  - Malware campaign detected after delivery.
 
   - A potentially malicious URL click was detected.
 
