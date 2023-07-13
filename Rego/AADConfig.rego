@@ -3,6 +3,10 @@ import future.keywords
 import data.report.utils.NotCheckedDetails
 import data.report.utils.Format
 import data.report.utils.ReportDetailsBoolean
+import data.test.utils.IsAllUsers
+import data.test.utils.IsEmptyContainer
+import data.test.utils.Contains
+import data.test.utils.Count
 
 #############################################################################
 # The report formatting functions below are generic and used throughout AAD #
@@ -268,42 +272,46 @@ tests[{
 #
 # MS.AAD.3.1v1
 #--
-default PhishingResistantMFAConditionsMatch(_) := false
-HasPhishingResistantMFA(Policy) := true if {
-    Strengths := { Strength | Strength := Policy.GrantControls.AuthenticationStrength.AllowedCombinations[_]}
-    AcceptableMFA := {"windowsHelloForBusiness", "fido2", "x509CertificateMultiFactor"}
-    count(AcceptableMFA) == count(Strengths | AcceptableMFA)
-}
-
-PhishingResistantMFAConditionsMatch(Policy) := true if {
-    "All" in Policy.Conditions.Users.IncludeUsers
-    "All" in Policy.Conditions.Applications.IncludeApplications
-    count(Policy.Conditions.Applications.ExcludeApplications) == 0
-    HasPhishingResistantMFA(Policy)
-    Policy.State == "enabled"
-    count(Policy.Conditions.Users.ExcludeRoles) == 0
-}
 
 PhishingResistantMFA[Cap.DisplayName] {
     Cap := input.conditional_access_policies[_]
 
-    # Match all simple conditions
-    PhishingResistantMFAConditionsMatch(Cap)
+    IsEmptyContainer(Cap.Conditions.Applications.ExcludeApplications)
+    print("app exclusion")
 
-    # Only match policies with user and group exclusions if all exempted
-    UserExclusionsFullyExempt(Cap, "MS.AAD.3.1v1") == true
+    Cap.State == "enabled"
+    print("policy enabled")
+
+    Strengths := { Strength | Strength := Cap.GrantControls.AuthenticationStrength.AllowedCombinations[_]}
+    print("Strengths: ", Strengths)
+    print("Strengths count: ", count(Strengths))
+    AcceptableMFA := {"windowsHelloForBusiness", "fido2", "x509CertificateMultiFactor"}
+    print("Acceptable count: ", count(AcceptableMFA))
+    count(Strengths) > 0
+    print("Strengths count: ", count(Strengths))
+    MinusSet := Strengths - AcceptableMFA
+    count(MinusSet) == 0
+    print("Acceptable MFA strength")
+
+    Contains(Cap.Conditions.Applications.IncludeApplications, "All")
     GroupExclusionsFullyExempt(Cap, "MS.AAD.3.1v1") == true
+    Contains(Cap.Conditions.Users.IncludeUsers, "All")
+    print("users: ", Contains(Cap.Conditions.Users.IncludeUsers, "All"))
+    UserExclusionsFullyExempt(Cap, "MS.AAD.3.1v1") == true
+    print("user exclusion")
 }
 
 tests[{
     "PolicyId" : "MS.AAD.3.1v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-MgIdentityConditionalAccessPolicy"],
-    "ActualValue" : [],
+    "ActualValue" : PhishingResistantMFA,
     "ReportDetails" : concat(". ", [ReportFullDetailsArray(PhishingResistantMFA, DescriptionString), CapLink]),
     "RequirementMet" : Status
 }] {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
+    print("Tests policy count: " , count(PhishingResistantMFA))
+    print("Tests policy count: " , PhishingResistantMFA)
     Status := count(PhishingResistantMFA) > 0
 }
 #--
