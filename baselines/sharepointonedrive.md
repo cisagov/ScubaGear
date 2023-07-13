@@ -116,7 +116,7 @@ All of the settings in this section are configured in the **SharePoint admin cen
 
 6. Select **Save**
 
-#### MS.SHAREPOINT.1.4v1 instructions:
+#### MS.SHAREPOINT.1.5v1 instructions:
 
 1.  Select **Policies** \> **Sharing**
 
