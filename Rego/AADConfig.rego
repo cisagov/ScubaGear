@@ -658,7 +658,7 @@ tests[{
 #   This was created to add special logic for the scenario where the Azure AD premium P2 license is missing and therefore
 #   the JSON Rules element will not exist in that case because there is no PIM service.
 #   This is necessary to avoid false negatives when a policy checks for zero instances of a specific condition.
-#   For example, if a policy checks for count(PrivilegedRolesWithoutExpirationPeriod) == 0 and that normally means compliant, when a
+#   For example, if a policy checks for count(PrivilegedRoleWithoutExpirationPeriod) == 0 and that normally means compliant, when a
 #   tenant does not have the license, a count of 0 does not mean compliant because 0 is the result of not having the Rules element
 #   in the JSON.
 DoPIMRoleRulesExist {
@@ -735,20 +735,20 @@ tests[{
 #
 # MS.AAD.7.4v1
 #--
-default PrivilegedRolesExclusions(_, _) := false
-PrivilegedRolesExclusions(PrivilegedRoles, PolicyID) := true if {
-    PrivilegedRolesUsers := { x.PrincipalId | some x in PrivilegedRoles.Assignments; x.ActivatedUsing.EndDateTime == null }
+default PrivilegedRoleExclusions(_, _) := false
+PrivilegedRoleExclusions(PrivilegedRole, PolicyID) := true if {
+    PrivilegedRoleAssignedPrincipals := { x.PrincipalId | some x in PrivilegedRole.Assignments; x.ActivatedUsing.EndDateTime == null }
 
-    AllowedPrivilegedRolesUsers := { y | some y in input.scuba_config.Aad[PolicyID].RoleExclusions.Users; y != null }
-    AllowedPrivilegedRolesGroups := { y | some y in input.scuba_config.Aad[PolicyID].RoleExclusions.Groups; y != null }
-    AllowedPrivilegedRoles := AllowedPrivilegedRolesUsers | AllowedPrivilegedRolesGroups
+    AllowedPrivilegedRoleUsers := { y | some y in input.scuba_config.Aad[PolicyID].RoleExclusions.Users; y != null }
+    AllowedPrivilegedRoleGroups := { y | some y in input.scuba_config.Aad[PolicyID].RoleExclusions.Groups; y != null }
+    AllowedPrivilegedRole := AllowedPrivilegedRoleUsers | AllowedPrivilegedRoleGroups
 
-    count(PrivilegedRolesUsers) > 0
-    count(PrivilegedRolesUsers - AllowedPrivilegedRoles) != 0
+    count(PrivilegedRoleAssignedPrincipals) > 0
+    count(PrivilegedRoleAssignedPrincipals - AllowedPrivilegedRole) != 0
 }
 
-PrivilegedRolesExclusions(PrivilegedRoles, PolicyID) := true if {
-    count({ x.PrincipalId | some x in PrivilegedRoles.Assignments; x.ActivatedUsing.EndDateTime == null }) > 0
+PrivilegedRoleExclusions(PrivilegedRole, PolicyID) := true if {
+    count({ x.PrincipalId | some x in PrivilegedRole.Assignments; x.ActivatedUsing.EndDateTime == null }) > 0
     count({ y | some y in input.scuba_config.Aad[PolicyID].RoleExclusions.Users; y != null }) == 0
     count({ y | some y in input.scuba_config.Aad[PolicyID].RoleExclusions.Groups; y != null }) == 0
 }
@@ -756,7 +756,7 @@ PrivilegedRolesExclusions(PrivilegedRoles, PolicyID) := true if {
 PrivilegedRolesWithoutExpirationPeriod[Role.DisplayName] {
     Role := input.privileged_roles[_]
 
-    PrivilegedRolesExclusions(Role, "MS.AAD.7.4v1") == true
+    PrivilegedRoleExclusions(Role, "MS.AAD.7.4v1") == true
 }
 
 tests[{
