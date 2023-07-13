@@ -1,3 +1,33 @@
+<#
+    .SYNOPSIS
+        Test written Rego Unit tests individually and as a whole
+
+    .DESCRIPTION
+        This script executes the files with the format *ControlGroupName*Config_##_test.rego
+        that are found within each products folder in the Testing\Unit\Rego directory. You can run
+        this script focusing only on one product or multiple such as aad, defender, exo, powerplatform, sharepoint, and teams.
+
+    .EXAMPLE
+        .\RunUnitTests.ps1
+        Runs every unit test of every product, no flags necessary
+
+    .EXAMPLE
+        .\RunUnitTests.ps1 -p teams,sharepoint
+        Runs all tests for the specified products. Products must be specified with the -p parameter.
+        Valid product names are: aad, defender, exo, onedrive, powerplatform, sharepoint, and teams.
+
+    .EXAMPLE
+        .\RunUnitTests.ps1 -p aad -b 1
+        Will run the AADConfig_01_test.rego. When specifying a baseline only one product is able to be used
+        at a time.
+
+    .EXAMPLE
+        .\RunUnitTests.ps1 -p -teams -b 3 -t test_AllowPublicUsers_Correct
+        Will run the specific test inside the TeamsConfig_06_test.rego.
+        Only one parameter is allowed for the -t option just as there is only one parameter allowed for the -b option.
+
+#>
+
 [CmdletBinding()]
 param (
     [Parameter()]
@@ -15,36 +45,6 @@ param (
 
 $ScriptName = $MyInvocation.MyCommand
 $FilePath = ".\Unit\Rego"
-
-function Show-Menu {
-    Write-Output "`n`t==================================== Flags ===================================="
-    Write-Output "`n`t-h`tshows help menu"
-    Write-Output "`n`t-p`tproduct name, can take a comma-separated list of product names"
-    Write-Output "`n`t-b`tbaseline item number, can take a comma-separated list of item numbers"
-    Write-Output "`n`t-t`ttest name, can take a comma-separated list of test names"
-    Write-Output "`n`t-v`tverbose, verbose opa output"
-    Write-Output "`n`t==================================== Usage ===================================="
-    Write-Output "`n`tRuning all tests is default, no flags are necessary"
-    Write-Output "`t.\$ScriptName"
-    Write-Output "`n`tTo run all test cases for specified products, must indicate products with -p"
-    Write-Output "`t.\$ScriptName [-p] <products>"
-    Write-Output "`n`tTo run all test cases in baseline item numbers, must indicate product with -p"
-    Write-Output "`tand baseline item numbers with -b"
-    Write-Output "`t.\$ScriptName [-p] <product> [-b] <baseline numbers>"
-    Write-Output "`n`tTo run test case for specified baseline item number must indicate product with -p,"
-    Write-Output "`tbaseline item numberwith -b, and test cases with -t"
-    Write-Output "`t.\$ScriptName [-p] <product> [-b] <baseline number> [-t] <test names>"
-    Write-Output "`n`tVerbose flag can be added to any test at beginning or end of command line"
-    Write-Output "`t.\$ScriptName [-v]"
-    Write-Output "`n`t==================================== Examples ===================================="
-    Write-Output "`n`t.\$ScriptName -p AAD, Defender, OneDrive"
-    Write-Output "`n`t.\$ScriptName -p AAD -b 01, 2, 10"
-    Write-Output "`n`t.\$ScriptName -p AAD -b 01 -t test_IncludeApplications_Incorrect, test_Conditions_Correct"
-    Write-Output "`n`t.\$ScriptName -p AAD -v"
-    Write-Output "`n`t.\$ScriptName -v -p AAD -b 01 -t test_IncludeApplications_Incorrect`n"
-    exit
-}
-
 function Get-ErrorMsg {
     [CmdletBinding()]
     param (
@@ -59,15 +59,15 @@ function Get-ErrorMsg {
     switch ($Flag[0]) {
         TestNameFlagsMissing {
             Write-Output "ERROR: Missing value(s) to run opa for specific test case(s)"
-            Write-Output ".\$ScriptName [-p] <product> [-b] <baseline numbers> [-t] <test names>`n"
+            Write-Output ".\$ScriptName [-p] <product> [-b] <control group numbers> [-t] <test names>`n"
         }
         BaselineItemFlagMissing {
-            Write-Output "ERROR: Missing value(s) to run opa for specific baseline item(s)"
-            Write-Output ".\$ScriptName [-p] <product> [-b] <baseline numbers>`n"
+            Write-Output "ERROR: Missing value(s) to run opa for specific control group item(s)"
+            Write-Output ".\$ScriptName [-p] <product> [-b] <control group numbers>`n"
         }
         BaselineItemNumber {
             Write-Output "ERROR: Unrecognized number '$b'"
-            Write-Output "Must be an integer (1, 2, 3, ...) or baseline syntax (01, 02, 03..09, 10, ...)`n"
+            Write-Output "Must be an integer (1, 2, 3, ...) or control group syntax (01, 02, 03..09, 10, ...)`n"
         }
         FileIOError {
             Write-Output "ERROR: '$($Flag[1])' not found`n"
@@ -178,7 +178,6 @@ function Invoke-TestName {
                 else{
                     Write-Warning "`nNOT FOUND: $Test in $Filename"
                 }
-                
             }
         }
         else {
