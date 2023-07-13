@@ -1555,7 +1555,7 @@ test_Correct_V1 if {
     contains(RuleOutput[0].ReportDetails, "conditional access policy(s) found that meet(s) all requirements:")
 }
 
-test_InCorrect_ReportOnly if {
+test_Incorrect_ReportOnly if {
     PolicyId := "MS.AAD.3.8v1"
 
     Output := tests with input as {
