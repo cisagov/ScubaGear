@@ -273,46 +273,34 @@ tests[{
 # MS.AAD.3.1v1
 #--
 
-PhishingResistantMFA[Cap.DisplayName] {
+MS_AAD_3_1v1_CAP[Cap.DisplayName] {
     Cap := input.conditional_access_policies[_]
 
-    IsEmptyContainer(Cap.Conditions.Applications.ExcludeApplications)
-    print("app exclusion")
-
     Cap.State == "enabled"
-    print("policy enabled")
-
-    Strengths := { Strength | Strength := Cap.GrantControls.AuthenticationStrength.AllowedCombinations[_]}
-    print("Strengths: ", Strengths)
-    print("Strengths count: ", count(Strengths))
-    AcceptableMFA := {"windowsHelloForBusiness", "fido2", "x509CertificateMultiFactor"}
-    print("Acceptable count: ", count(AcceptableMFA))
-    count(Strengths) > 0
-    print("Strengths count: ", count(Strengths))
-    MinusSet := Strengths - AcceptableMFA
-    count(MinusSet) == 0
-    print("Acceptable MFA strength")
-
+    Contains(Cap.Conditions.Users.IncludeUsers, "All")
+    IsEmptyContainer(Cap.Conditions.Applications.ExcludeApplications)
     Contains(Cap.Conditions.Applications.IncludeApplications, "All")
     GroupExclusionsFullyExempt(Cap, "MS.AAD.3.1v1") == true
-    Contains(Cap.Conditions.Users.IncludeUsers, "All")
-    print("users: ", Contains(Cap.Conditions.Users.IncludeUsers, "All"))
     UserExclusionsFullyExempt(Cap, "MS.AAD.3.1v1") == true
-    print("user exclusion")
+
+    # Strength must be at least one of acceptable with no unacceptable strengths
+    Strengths := { Strength | Strength := Cap.GrantControls.AuthenticationStrength.AllowedCombinations[_]}
+    AcceptableMFA := {"windowsHelloForBusiness", "fido2", "x509CertificateMultiFactor"}
+    MinusSet := Strengths - AcceptableMFA
+    Count(MinusSet) == 0
+    Count(Strengths) > 0
 }
 
 tests[{
     "PolicyId" : "MS.AAD.3.1v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-MgIdentityConditionalAccessPolicy"],
-    "ActualValue" : PhishingResistantMFA,
-    "ReportDetails" : concat(". ", [ReportFullDetailsArray(PhishingResistantMFA, DescriptionString), CapLink]),
+    "ActualValue" : MS_AAD_3_1v1_CAP,
+    "ReportDetails" : concat(". ", [ReportFullDetailsArray(MS_AAD_3_1v1_CAP, DescriptionString), CapLink]),
     "RequirementMet" : Status
 }] {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
-    print("Tests policy count: " , count(PhishingResistantMFA))
-    print("Tests policy count: " , PhishingResistantMFA)
-    Status := count(PhishingResistantMFA) > 0
+    Status := count(MS_AAD_3_1v1_CAP) > 0
 }
 #--
 
