@@ -790,11 +790,11 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-MgSubscribedSku", "Get-PrivilegedRole"],
     "ActualValue" : RolesWithoutApprovalRequired,
-    "ReportDetails" : ReportDetailsArrayLicenseWarning(RolesWithoutApprovalRequired, DescriptionString),
+    "ReportDetails" : ReportDetailsBooleanLicenseWarning(Status),
     "RequirementMet" : Status
 }] {
-    DescriptionString := "role(s) that do not require approval to activate found"
-    Conditions := [count(RolesWithoutApprovalRequired) == 0, check_if_role_rules_exist]
+    ApprovalNotRequired := "Global Administrator" in RolesWithoutApprovalRequired
+    Conditions := [ApprovalNotRequired == false, check_if_role_rules_exist]
     Status := count([Condition | Condition = Conditions[_]; Condition == false]) == 0
 }
 #--
