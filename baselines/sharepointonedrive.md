@@ -33,29 +33,29 @@ listed.
 This section helps reduce security risks related to the sharing of files with users external to the agency. This includes guest users, users who use a verification code and users who access an Anyone link.
 
 ### Policies
-#### MS.SHAREPOINT-ONEDRIVE.1.1v1
+#### MS.SHAREPOINT.1.1v1
 External sharing for SharePoint SHALL be limited to Existing Guests or Only People in your Organization.
 - _Rationale:_ Sharing information outside the organization increases the risk of unauthorized disclosure. By limiting external sharing, administrators decrease the risk of unauthorized disclosure.
 - _Last modified:_ June 2023
 
-#### MS.SHAREPOINT-ONEDRIVE.1.2v1
+#### MS.SHAREPOINT.1.2v1
 External sharing for OneDrive SHALL be limited to Existing Guests or Only People in your Organization.
 - _Rationale:_ Sharing files outside the organization increases the risk of unauthorized disclosure. By limiting external sharing, administrators decrease the risk of unauthorized disclosure.
 - _Last modified:_ June 2023
 
-#### MS.SHAREPOINT-ONEDRIVE.1.3v1
+#### MS.SHAREPOINT.1.3v1
 External sharing SHALL be restricted to approved external domains per interagency collaboration needs.
 - _Rationale:_ By limiting sharing to domains used for interagency collaboration purposes, administrators prevent sharing with unknown organizations and individuals.
 - _Last modified:_ June 2023
 - _Note:_ This policy is only applicable if the external sharing slider on the admin page is set to any value other than Only People in your Organization.
 
-#### MS.SHAREPOINT-ONEDRIVE.1.4v1
+#### MS.SHAREPOINT.1.4v1
 Only users in approved security groups SHALL be allowed to share externally.
 - _Rationale:_ By limiting sharing to approved security groups based on interagency collaboration needs, administrators ensure only approved users can use share information outside the organization.
 - _Last modified:_ June 2023
 - _Note:_ This policy is only applicable if the external sharing slider on the admin page is set to any value other than Only People in your Organization.
 
-#### MS.SHAREPOINT-ONEDRIVE.1.5v1
+#### MS.SHAREPOINT.1.5v1
 Guest access SHALL be limited to the email the invitation was sent to.
 - _Rationale:_ Email invitations allow external guests to access shared information. By requiring guests to sign in using the same account where the invite was sent, administrators ensure only the intended guest can use the invite.
 - _Last modified:_ June 2023
@@ -75,7 +75,7 @@ Guest access SHALL be limited to the email the invitation was sent to.
 
 All of the settings in this section are configured in the **SharePoint admin center**.
 
-#### MS.SHAREPOINT-ONEDRIVE.1.1v1 instructions:
+#### MS.SHAREPOINT.1.1v1 instructions:
 
 1.  Select **Policies** \> **Sharing**
 
@@ -83,11 +83,11 @@ All of the settings in this section are configured in the **SharePoint admin cen
 
 3. Select **Save**
 
-#### MS.SHAREPOINT-ONEDRIVE.1.2v1 instructions:
+#### MS.SHAREPOINT.1.2v1 instructions:
 
-1.  Follow the same instructions as MS.SHAREPOINT-ONEDRIVE.1.1v1 but set the slider value for OneDrive.
+1.  Follow the same instructions as MS.SHAREPOINT.1.1v1 but set the slider value for OneDrive.
 
-#### MS.SHAREPOINT-ONEDRIVE.1.3v1 instructions:
+#### MS.SHAREPOINT.1.3v1 instructions:
 
 1.  Select **Policies** \> **Sharing**
 
@@ -101,7 +101,7 @@ All of the settings in this section are configured in the **SharePoint admin cen
 
 6.  Select **Save**
 
-#### MS.SHAREPOINT-ONEDRIVE.1.4v1 instructions:
+#### MS.SHAREPOINT.1.4v1 instructions:
 
 1.  Select **Policies** \> **Sharing**
 
@@ -116,7 +116,7 @@ All of the settings in this section are configured in the **SharePoint admin cen
 
 6. Select **Save**
 
-#### MS.SHAREPOINT-ONEDRIVE.1.4v1 instructions:
+#### MS.SHAREPOINT.1.4v1 instructions:
 
 1.  Select **Policies** \> **Sharing**
 
@@ -132,12 +132,12 @@ This section provides policies to set the scope and permissions for sharing link
 
 ### Policies
 
-#### MS.SHAREPOINT-ONEDRIVE.2.1v1
+#### MS.SHAREPOINT.2.1v1
 File and folder default sharing scope SHALL be set to Specific People (only the people the user specifies).
 - _Rationale:_ By making the default sharing the most restrictive, administrators prevent accidentally sharing information too broadly.
 - _Last modified:_ June 2023
 
-#### MS.SHAREPOINT-ONEDRIVE.2.2v1
+#### MS.SHAREPOINT.2.2v1
 File and folder default sharing permissions SHALL be set to View only.
 - _Rationale:_ Edit access to files and folders could allow a user to make unauthorized changes.  By restricting default permissions to View only, administrators prevent unintended or malicious modification.
 - _Last modified:_ June 2023
@@ -155,7 +155,7 @@ File and folder default sharing permissions SHALL be set to View only.
 
 All of the settings in this section are configured in the **SharePoint admin center**.
 
-#### MS.SHAREPOINT-ONEDRIVE.2.1v1 instructions:
+#### MS.SHAREPOINT.2.1v1 instructions:
 
 1.  Select **Policies** \> **Sharing**
 
@@ -163,9 +163,9 @@ All of the settings in this section are configured in the **SharePoint admin cen
 
 3.  Select **Save**
 
-#### MS.SHAREPOINT-ONEDRIVE.2.2v1 instructions:
+#### MS.SHAREPOINT.2.2v1 instructions:
 
-1.  Navigate to the same location in the portal as MS.SHAREPOINT-ONEDRIVE.2.1v1, but set the permission that's selected by default for sharing links to **View**
+1.  Navigate to the same location in the portal as MS.SHAREPOINT.2.1v1, but set the permission that's selected by default for sharing links to **View**
 
 ## 3. Securing Anyone Links and Verification Code Users
 
@@ -174,19 +174,19 @@ Sharing of files with external users via the usage of Anyone links or Verificati
 **Note**: The settings in this section are only applicable if an agency is using anyone links or verification code sharing. See each policy below for details.
 
 ### Policies
-#### MS.SHAREPOINT-ONEDRIVE.3.1v1
+#### MS.SHAREPOINT.3.1v1
 Expiration days for anyone links SHALL be set to 30 days or less.
 - _Rationale:_ Anyone links may be used to provide access to information for a short period of time. Without expiration, however, access is indefinite. By setting expiration timers for anyone links, administrators prevent unintended sustained access to information.
 - _Last modified:_ June 2023
 - _Note:_ This policy is only applicable if the external sharing slider on the admin center sharing page is set to Anyone.
 
-#### MS.SHAREPOINT-ONEDRIVE.3.2v1
+#### MS.SHAREPOINT.3.2v1
 The allowable file and folder permissions for anyone links SHALL be set to View only.
 - _Rationale:_ Unauthorized changes to files can be made if permissions allow editing by anyone.  By restricting permissions on anyone links to View only, administrators prevent anonymous file changes.
 - _Last modified:_ June 2023
 - _Note:_ This policy is only applicable if the external sharing slider on the admin center sharing page is set to Anyone.
 
-#### MS.SHAREPOINT-ONEDRIVE.3.3v1
+#### MS.SHAREPOINT.3.3v1
 Reauthentication days for people who use a verification code SHALL be set to 30 days or less.
 - _Rationale:_ A verification code may be given out to provide access to information for a short period of time. Without expiration, however, access is indefinite. By setting expiration timers for verification code access, administrators prevent  unintended sustained access to information.
 - _Last modified:_ June 2023
@@ -205,7 +205,7 @@ Reauthentication days for people who use a verification code SHALL be set to 30 
 
 All of the settings in this section are configured in the **SharePoint admin center**.
 
-#### MS.SHAREPOINT-ONEDRIVE.3.1v1 instructions:
+#### MS.SHAREPOINT.3.1v1 instructions:
 
 1.  Select **Policies** \> **Sharing**
 
@@ -217,7 +217,7 @@ All of the settings in this section are configured in the **SharePoint admin cen
 
 5.  Select **Save**
 
-#### MS.SHAREPOINT-ONEDRIVE.3.2v1 instructions:
+#### MS.SHAREPOINT.3.2v1 instructions:
 
 1.  Select **Policies** \> **Sharing**
 
@@ -231,7 +231,7 @@ All of the settings in this section are configured in the **SharePoint admin cen
 
 6.  Select **Save**
 
-#### MS.SHAREPOINT-ONEDRIVE.3.3v1 instructions:
+#### MS.SHAREPOINT.3.3v1 instructions:
 
 1.  Select **Policies** \> **Sharing**
 
@@ -247,12 +247,12 @@ All of the settings in this section are configured in the **SharePoint admin cen
 
 This section provides policies for restricting the execution of custom scripts.
 å
-#### MS.SHAREPOINT-ONEDRIVE.4.1v1
+#### MS.SHAREPOINT.4.1v1
 Users SHALL be prevented from running custom scripts on personal sites (aka OneDrive).
 - _Rationale:_ Scripts on SharePoint sites run in the context of the user visiting the site and have access to everything that user can access. By preventing custom scripts on personal sites, administrators block a path for potentially malicious code execution.
 - _Last modified:_ June 2023
 
-#### MS.SHAREPOINT-ONEDRIVE.4.2v1
+#### MS.SHAREPOINT.4.2v1
 Users SHALL be prevented from running custom scripts on self-service created sites.
 - _Rationale:_ Scripts on SharePoint sites run in the context of the user visiting the site and have access to everything that user can access. By preventing custom scripts on self-service created sites, administrators block a path for potentially malicious code execution.
 - _Last modified:_ June 2023
@@ -270,7 +270,7 @@ Users SHALL be prevented from running custom scripts on self-service created sit
 
 All of the settings in this section are configured in the **SharePoint admin center**.
 
-#### MS.SHAREPOINT-ONEDRIVE.4.1v1 instructions:
+#### MS.SHAREPOINT.4.1v1 instructions:
 
 1.  Select **Settings**
 
@@ -282,9 +282,9 @@ All of the settings in this section are configured in the **SharePoint admin cen
 
 5.  Select **Ok**
 
-#### MS.SHAREPOINT-ONEDRIVE.4.2v1 instructions:
+#### MS.SHAREPOINT.4.2v1 instructions:
 
-1.  Navigate to the same location in the portal as MS.SHAREPOINT-ONEDRIVE.4.1v1, but select the option **Prevent users from running custom script on self-service created sites**
+1.  Navigate to the same location in the portal as MS.SHAREPOINT.4.1v1, but select the option **Prevent users from running custom script on self-service created sites**
 
 # Acknowledgements
 
