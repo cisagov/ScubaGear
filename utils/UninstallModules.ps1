@@ -30,6 +30,7 @@ $ModuleList = @(
     "Microsoft.Graph.Identity.Governance",
     "Microsoft.Graph.Identity.SignIns",
     "Microsoft.Graph.Planner",
+    "Microsoft.Graph.Security",
     "Microsoft.Graph.Teams",
     "Microsoft.Graph.Users",
     "Microsoft.Graph.Authentication"

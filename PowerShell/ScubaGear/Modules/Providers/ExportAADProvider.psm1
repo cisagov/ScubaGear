@@ -93,7 +93,10 @@ function Export-AADProvider {
 
     # 2.6, 2.7, & 2.18 1st/3rd Policy Bullets
     $AuthZPolicies = ConvertTo-Json @($Tracker.TryCommand("Get-MgPolicyAuthorizationPolicy"))
-
+    #$SecureScore = ConvertTo-Json @($Tracker.TryCommand("Get-MgSecuritySecureScore").ControlScores)
+    $SecureScore = ConvertTo-Json @($Tracker.TryCommand("Get-MgSecuritySecureScore",@{"Top"=1}) | Where-Object { $_.ControlScores.ControlName -eq 'RoleOverlap'}) -Depth 5
+    #$SecureScore = ConvertTo-Json @($Tracker.TryCommand("(Get-MgSecuritySecureScore -Top 1).ControlScores") | Where-Object { $_.ControlName -eq "RoleOverlap"})
+    #$SPOSite = ConvertTo-Json @($Tracker.TryCommand("Get-PnPTenantSite",@{"Identity"="$($SPOSiteIdentity)"; "Detailed"=$true}) | Select-Object -Property *)
     # 2.7 third bullet
     $DirectorySettings = ConvertTo-Json -Depth 10 @($Tracker.TryCommand("Get-MgDirectorySetting"))
 
@@ -108,6 +111,7 @@ function Export-AADProvider {
     "conditional_access_policies": $AllPolicies,
     "cap_table_data": $CapTableData,
     "authorization_policies": $AuthZPolicies,
+    "secure_score": $SecureScore,
     "admin_consent_policies": $AdminConsentReqPolicies,
     "privileged_users": $PrivilegedUsers,
     "privileged_roles": $PrivilegedRoles,

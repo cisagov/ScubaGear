@@ -57,6 +57,7 @@ function Connect-Tenant {
                         'UserAuthenticationMethod.Read.All',
                         'RoleManagement.Read.Directory',
                         'GroupMember.Read.All',
+                        'SecurityEvents.Read.All',
                         'Directory.Read.All'
                     )
                     $GraphParams = @{
