@@ -7,7 +7,7 @@ $ModuleList = @(
     },
     @{
         ModuleName = 'ExchangeOnlineManagement' # includes Defender
-        ModuleVersion = [version] '3.1.0'
+        ModuleVersion = [version] '3.2.0'
         MaximumVersion = [version] '3.99.99999'
     },
     @{
