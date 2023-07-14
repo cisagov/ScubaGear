@@ -418,7 +418,56 @@ test_AdditionalProperties_Correct_V2 if {
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "0 role(s) that do not require approval to activate found"
+    RuleOutput[0].ReportDetails == "Requirement met"
+}
+
+test_AdditionalProperties_Correct_V3 if {
+    PolicyId := "MS.AAD.7.6v1"
+
+    Output := tests with input as {
+        "privileged_roles" : [
+            {
+                "DisplayName" : "Global Administrator",
+                "Rules" : [
+                    {
+                        "Id" :  "Approval_EndUser_Assignment",
+                        "AdditionalProperties" :  {
+                            "setting" : {
+                                "isApprovalRequired" : true
+                            }
+                        }
+                    }
+                ]
+            },
+            {
+                "DisplayName" : "Groups Administrator",
+                "Rules" : [
+                    {
+                        "Id" :  "Approval_EndUser_Assignment",
+                        "AdditionalProperties" :  {
+                            "setting" : {
+                                "isApprovalRequired" : false # this shouldn't matter, only Global Admin matters for this control
+                            }
+                        }
+                    }
+                ]
+            }
+        ],
+        "service_plans" : [
+            { "ServicePlanName" : "EXCHANGE_S_FOUNDATION",
+                "ServicePlanId" : "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
+            },
+            { "ServicePlanName" : "AAD_PREMIUM_P2",
+                "ServicePlanId" : "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
+            }
+        ]
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "Requirement met"
 }
 
 test_AdditionalProperties_Incorrect_V3 if {
@@ -454,7 +503,7 @@ test_AdditionalProperties_Incorrect_V3 if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "1 role(s) that do not require approval to activate found:<br/>Global Administrator"
+    RuleOutput[0].ReportDetails == "Requirement not met"
 }
 #--
 
