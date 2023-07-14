@@ -245,7 +245,7 @@ test_AllowEmailIntoChannel_Correct_V3_multi if {
     RuleOutput[0].ReportDetails == "N/A: Feature is unavailable in GCC environments"
 }
 
-test_AllowEmailIntoChannel_Correct_V3 if {
+test_AllowEmailIntoChannel_Correct_V4 if {
     PolicyId := "MS.TEAMS.7.1v1"
 
     Output := tests with input as {
