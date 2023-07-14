@@ -444,6 +444,10 @@ RequireManagedDeviceMFA[Cap.DisplayName] {
     "urn:user:registersecurityinfo" in Cap.Conditions.Applications.IncludeUserActions
     count([Condition | Condition = Conditions[_]; Condition == true]) > 0
     Cap.State == "enabled"
+
+    # Only match policies with user and group exclusions if all exempted
+    UserExclusionsFullyExempt(Cap, "MS.AAD.3.8v1") == true
+    GroupExclusionsFullyExempt(Cap, "MS.AAD.3.8v1") == true
 }
 
 tests[{
