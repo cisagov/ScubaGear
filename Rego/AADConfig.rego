@@ -3,6 +3,9 @@ import future.keywords
 import data.report.utils.NotCheckedDetails
 import data.report.utils.Format
 import data.report.utils.ReportDetailsBoolean
+import data.report.utils.NotCheckedDetails
+import data.report.utils.Format
+import data.report.utils.ReportDetailsBoolean
 
 #############################################################################
 # The report formatting functions below are generic and used throughout AAD #

@@ -290,38 +290,43 @@ ConfigsAllowingEmail[Policy.Identity] {
     Policy.AllowEmailIntoChannel == true
 }
 
-ReportDetails2_7(IsGCC, ComfirmCorrectConfig, Policies) = Description if {
+ReportDetails2_7(IsGCC, IsEnabled) = Description if {
 	IsGCC == true
 	Description := "N/A: Feature is unavailable in GCC environments"
 }
 
-ReportDetails2_7(IsGCC, ComfirmCorrectConfig, Policies) = Description if {
+ReportDetails2_7(IsGCC, IsEnabled) = Description if {
 	IsGCC == false
-	ComfirmCorrectConfig == true
+	IsEnabled == true
 	Description := "Requirement met"
 }
 
-ReportDetails2_7(IsGCC, ComfirmCorrectConfig, Policies) = Description if {
+ReportDetails2_7(IsGCC, IsEnabled) = Description if {
 	IsGCC == false
-	ComfirmCorrectConfig == false
-	Detail := "Requirement not met: Email integration is enabled across domain:"
-	Description := ReportDetailsArray(false, Policies, Detail)
+	IsEnabled == false
+	Description := "Requirement not met"
 }
 
 tests[{
 	"PolicyId" : "MS.TEAMS.7.1v1",
 	"Criticality" : "Shall",
-	"Commandlet" : ["Get-CsTeamsClientConfiguration"],
-	"ActualValue" : [Policies, ServiceInstance],
-	"ReportDetails" : ReportDetails2_7(IsGCC, ComfirmCorrectConfig, Policies),
+	"Commandlet" : ["Get-CsTeamsClientConfiguration", "Get-CsTenant"],
+	"ActualValue" : {"ClientConfig": input.client_configuration, "AssignedPlans": AssignedPlans},
+	"ReportDetails" : ReportDetails2_7(IsGCC, IsEnabled),
 	"RequirementMet" : Status
 }] {
+	# According to Get-CsTeamsClientConfiguration, is team email integration enabled?
+    IsEnabled := count(ConfigsAllowingEmail) == 0
+	# What is the tenant type according to Get-CsTenant? 
     TenantConfig := input.teams_tenant_info[_]
-	ServiceInstance := TenantConfig.ServiceInstance
-	Policies := ConfigsAllowingEmail
-    ComfirmCorrectConfig := count(Policies) ==0
-    IsGCC := indexof(ServiceInstance, "GOV") != -1
-	Conditions := [ComfirmCorrectConfig, IsGCC]
+	AssignedPlans := concat(", ", TenantConfig.AssignedPlan)
+    GCCConditions := [contains(AssignedPlans, "GCC"), contains(AssignedPlans, "DOD")]
+	IsGCC := count([Condition | Condition = GCCConditions[_]; Condition == true]) > 0
+	# As long as either:
+	# 	1) Get-CsTeamsClientConfiguration reports email integration is disabled or
+	# 	2) Get-CsTenant reports this as a gov tenant
+	# this test should pass.
+	Conditions := [IsEnabled, IsGCC]
     Status := count([Condition | Condition = Conditions[_]; Condition == true]) > 0
 }
 
