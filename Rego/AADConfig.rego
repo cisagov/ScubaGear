@@ -3,9 +3,9 @@ import future.keywords
 import data.report.utils.NotCheckedDetails
 import data.report.utils.Format
 import data.report.utils.ReportDetailsBoolean
-import data.test.utils.IsEmptyContainer
-import data.test.utils.Contains
-import data.test.utils.Count
+import data.policy.utils.IsEmptyContainer
+import data.policy.utils.Contains
+import data.policy.utils.Count
 
 #############################################################################
 # The report formatting functions below are generic and used throughout AAD #

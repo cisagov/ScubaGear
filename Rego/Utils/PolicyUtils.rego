@@ -1,9 +1,5 @@
-package test.utils
+package policy.utils
 import future.keywords
-
-#IsEmpty(null, _) = true
-#IsEmpty(a, b) if not a[b]
-#IsEmpty(a, b) if a[b] == ""
 
 IsEmptyContainer(null) = true
 IsEmptyContainer(container) := true if {
