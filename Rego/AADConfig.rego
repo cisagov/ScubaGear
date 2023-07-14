@@ -705,7 +705,6 @@ tests[{
 }
 #--
 
-#
 # MS.AAD.7.2v1
 #--
 # At this time we are unable to test for user association to fine-grained privileged roles
@@ -721,6 +720,7 @@ tests[{
     PolicyId := "MS.AAD.7.2v1"
     true
 }
+
 #--
 
 #
