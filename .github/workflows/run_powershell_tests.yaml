@@ -7,12 +7,11 @@ on:
     paths:
       - "**.ps1"
       - "**.psm1"
-      - ".github/workflows/run*.yaml"
+      - ".github/workflows/run_powershell_tests.yaml"
   pull_request:
     types: [opened, reopened]
     branches:
       - "main"
-      - "*TestAction"
     paths:
       - "**.ps1"
       - "**.psm1"
