@@ -35,7 +35,7 @@ jobs:
         Uninstall-Module Microsoft.Graph.Authentication -AllowPrerelease -AllVersions
 
     - name: Run Pester Tests
-      if: always()
+      if: '!cancelled()'
       shell: powershell
       run: |
         ./SetUp.ps1
