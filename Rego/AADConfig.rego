@@ -3,6 +3,9 @@ import future.keywords
 import data.report.utils.NotCheckedDetails
 import data.report.utils.Format
 import data.report.utils.ReportDetailsBoolean
+import data.policy.utils.IsEmptyContainer
+import data.policy.utils.Contains
+import data.policy.utils.Count
 
 #############################################################################
 # The report formatting functions below are generic and used throughout AAD #
@@ -268,18 +271,35 @@ tests[{
 #
 # MS.AAD.3.1v1
 #--
-# At this time we are unable to fully test for MFA due to conflicting and multiple ways to configure authentication methods
-# Awaiting API changes and feature updates from Microsoft for automated checking
+
+MS_AAD_3_1v1_CAP[Cap.DisplayName] {
+    Cap := input.conditional_access_policies[_]
+
+    Cap.State == "enabled"
+    Contains(Cap.Conditions.Users.IncludeUsers, "All")
+    IsEmptyContainer(Cap.Conditions.Applications.ExcludeApplications)
+    Contains(Cap.Conditions.Applications.IncludeApplications, "All")
+    GroupExclusionsFullyExempt(Cap, "MS.AAD.3.1v1") == true
+    UserExclusionsFullyExempt(Cap, "MS.AAD.3.1v1") == true
+
+    # Strength must be at least one of acceptable with no unacceptable strengths
+    Strengths := { Strength | Strength := Cap.GrantControls.AuthenticationStrength.AllowedCombinations[_]}
+    AcceptableMFA := {"windowsHelloForBusiness", "fido2", "x509CertificateMultiFactor"}
+    MinusSet := Strengths - AcceptableMFA
+    Count(MinusSet) == 0
+    Count(Strengths) > 0
+}
+
 tests[{
-    "PolicyId" : PolicyId,
-    "Criticality" : "Shall/Not-Implemented",
-    "Commandlet" : [],
-    "ActualValue" : [],
-    "ReportDetails" : NotCheckedDetails(PolicyId),
-    "RequirementMet" : false
+    "PolicyId" : "MS.AAD.3.1v1",
+    "Criticality" : "Shall",
+    "Commandlet" : ["Get-MgIdentityConditionalAccessPolicy"],
+    "ActualValue" : MS_AAD_3_1v1_CAP,
+    "ReportDetails" : concat(". ", [ReportFullDetailsArray(MS_AAD_3_1v1_CAP, DescriptionString), CapLink]),
+    "RequirementMet" : Status
 }] {
-    PolicyId := "MS.AAD.3.1v1"
-    true
+    DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
+    Status := count(MS_AAD_3_1v1_CAP) > 0
 }
 #--
 
