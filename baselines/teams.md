@@ -406,7 +406,7 @@ This section helps reduce security risks related to teams email integration. Tea
 ### Policies
 #### MS.TEAMS.7.1v1
 Teams email integration SHALL be disabled.
-- _Rationale:_ The security risk with Microsoft Team's email integration is due to the fact that Teams channel's email addresses are not under the tenant’s domain, rather they are associated with the Microsoft-owned domain of "teams.ms". By disabling Teams email integration the risk of use of emails outside of the agency's security settings control is minimized.
+- _Rationale:_ The security risk with Microsoft Team's email integration is due to the fact that Teams channel's email addresses are not under the tenant’s domain, rather they are associated with the Microsoft-owned domain of "teams.ms". By disabling Teams email integration an agency will not utilize an email outside of its tenant's domain. 
 - _Last modified:_ July 2023
 
 ### Resources
