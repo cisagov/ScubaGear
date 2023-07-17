@@ -15,7 +15,7 @@ on:
     paths:
       - "**.ps1"
       - "**.psm1"
-      - "run*.yaml"
+      - "**/run*.yaml"
   pull_request_review:
     types: [submitted]
 
