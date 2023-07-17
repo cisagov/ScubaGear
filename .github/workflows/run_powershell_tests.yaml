@@ -7,6 +7,7 @@ on:
     paths:
       - "**.ps1"
       - "**.psm1"
+      - ".github/workflows/run*.yaml"
   pull_request:
     types: [opened, reopened]
     branches:
@@ -15,7 +16,6 @@ on:
     paths:
       - "**.ps1"
       - "**.psm1"
-      - "**/run*.yaml"
   pull_request_review:
     types: [submitted]
 
