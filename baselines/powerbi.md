@@ -84,8 +84,9 @@ to the web.
 
 ### Policies
 #### MS.POWERBI.1.1v1
-Disable the Publish to Web feature unless the agency mission requires the capability.
-- _Rationale:_ Having a publicly accessible web URL means there is no way to control who is viewing infromation. By following this policy there will be no information published to the public web.
+The Publish to Web feature SHOULD be disabled unless the agency mission requires the capability.
+
+- _Rationale:_ Having a publicly accessible web URL means there is no way to control who is viewing infromation. By following this policy there will be no sensitive information published to the public web that could be accessed by a malicious actor.
 - _Last modified:_ June 2023
 
 ### Resources
@@ -103,8 +104,11 @@ Disable the Publish to Web feature unless the agency mission requires the capabi
 
 ### Implementation 
 #### MS.POWERBI.1.1v1, instructions:
+Navigate to the [PowerBI Admin Portal](https://app.high.powerbigov.us)
 
-**Tenant Settings** > **Export and sharing settings** > **Publish to web** > **Disabled**
+1. **Tenant Settings**
+2. **Export and sharing settings**
+3. **Publish to web** > **Disabled**
 
 ## 2 Power BI Guest Access
 
@@ -146,7 +150,8 @@ consulted for additional guidance on managing guest users.
 
 ### Policies
 #### MS.POWERBI.2.1v1
-Disable guest user access to the Power BI tenant unless the agency mission requires the capability.
+Guest user access to the Power BI tenant SHOULD be disabled unless the agency mission requires the capability.
+
 - _Rationale:_ Allowing a guest user to use a system is a risk, as even though a guest user can have a limited experience it is sometimes not possible to limit them enough to provide ample security while also allowing them to do their necessary tasks. Implementing this policy follows zero trust principles and limits unauthorized access. 
 - _Last modified:_ June 2023
 
@@ -164,9 +169,13 @@ Disable guest user access to the Power BI tenant unless the agency mission requi
 
 ### Implementation
 #### MS.POWERBI.2.1v1, instructions:
-**Tenant Settings** > **Export and sharing settings** > **Allow Azure Active Directory guests users to access Power BI** > **Disabled**
+Navigate to the [PowerBI Admin Portal](https://app.high.powerbigov.us)
 
-## 3 External Invitations
+1. **Tenant Settings**
+2. **Export and sharing settings**
+3. **Allow Azure Active Directory guests users to access Power BI** > **Disabled**
+
+## 3 Power BI External Invitations
 
 This setting controls whether Power BI allows inviting external users to
 the agency’s organization through Power BI’s sharing workflows and
@@ -195,7 +204,8 @@ on roles.
 
 ### Policies
 #### MS.POWERBI.3.1v1
-Disable the **Invite external users to your organization** feature unless agency mission requires the capability.
+The **Invite external users to your organization** feature SHOULD be disabled unless agency mission requires the capability.
+
 - _Rationale:_ Allowing guest users in general is a bad idea and can lead to unwanted access. Disabling this feature in PowerBI is just another way to avoid having a risky guest user in the organization.
 - _Last modified:_ June 2023
 
@@ -218,9 +228,13 @@ Disable the **Invite external users to your organization** feature unless agency
 
 ### Implementation
 #### MS.POWERBI.3.1v1, instructions:
-**Tenant Settings** > **Export and sharing settings** > **Allow Azure Active Directory guests users to access Power BI** > **Disabled**
+Navigate to the [PowerBI Admin Portal](https://app.high.powerbigov.us)
 
-## 4 Service Principals
+1. **Tenant Settings**
+2. **Export and sharing settings**
+3. **Allow Azure Active Directory guests users to access Power BI** > **Disabled**
+
+## 4 Power BI Service Principals
 
 Power BI supports the use of service principals to manage application
 identities. Service principals can use application programming
@@ -262,13 +276,14 @@ permissions.
 
 ### Policies
 #### MS.POWERBI.4.1v1
-Allow Service Principals for Power BI where applicable.
+Service Principals SHOULD be allowed for Power BI where applicable.
 - _Rationale:_ Without Service Principles there is possibility of unwanted access to APIs. By using service principles where necessary, this will mitigate that risk.
 - _Last modified:_ June 2023
 
 #### MS.POWERBI.4.2v1
-Do not store Service Principal credentials used for encrypting or accessing Power BI in scripts or config files but do store
-  in a secure vault such as Azure Key Vault.
+Service Principal credentials used for encrypting or accessing Power BI SHALL NOT be stored in scripts or config files and SHALL be stored
+in a secure vault such as Azure Key Vault.
+
 - _Rationale:_ Credentials in scripts or config files are stored in plain text and can be read by anyone who has access to those files. By storing them in a Azure Key Vault only those with proper access can use and see the credentials. 
 - _Last modified:_ June 2023
 
@@ -304,16 +319,22 @@ Do not store Service Principal credentials used for encrypting or accessing Powe
 
 ### Implementation
 #### MS.POWERBI.4.1v1, instructions:
-**Tenant settings** > **Developer settings** > **Allow service principals to use Power BI APIs** > **Enabled**
+Navigate to the [PowerBI Admin Portal](https://app.high.powerbigov.us)
+
+1. **Tenant settings**
+2. **Developer settings**
+3. **Allow service principals to use Power BI APIs** > **Enabled**
 Choose a specific security group allowed to use service principles for the APIs.
 
-**Tenant settings** > **Developer settings** > **Allow service principals to create and use profiles** > **Enabled**
+1. **Tenant settings**
+2. **Developer settings**
+3. **Allow service principals to create and use profiles** > **Enabled**
 Choose a specific security group allowed to use service principles to create and use profiles
 
 #### MS.POWERBI.4.1v1, instructions:
 N/A
 
-## 5 ResourceKey Authentication
+## 5 Power BI ResourceKey Authentication
 
 
 This setting pertains to the security and development of Power BI
@@ -338,8 +359,9 @@ an exception to the policy can be investigated.
 
 ### Policies
 #### MS.POWERBI.5.1v1
-Block ResourceKey Authentication unless a specific use case (e.g., streaming and/or PUSH datasets) merits its use. <!--- remove the examples in the policy statement? -->
-- _Rationale:_ By allwoing resource keys someone can move data without AAD OAuth bearer token, causing possibly malicious or junk data to be stored. By disabling this there is less risk that a unauthorized individual will make changes. 
+ResourceKey Authentication SHOULD be blocked unless a specific use case (e.g., streaming and/or PUSH datasets) merits its use. <!--- remove the examples in the policy statement? -->
+
+- _Rationale:_ By allowing resource keys someone can move data without AAD OAuth bearer token, causing possibly malicious or junk data to be stored. By disabling this there is less risk that an unauthorized individual will make changes. 
 - _Last modified:_ June 2023
 
 ### Resources
@@ -357,7 +379,11 @@ Block ResourceKey Authentication unless a specific use case (e.g., streaming and
 
 ### Implementation
 #### MS.POWERBI.5.1v1, instructions:
-**Tenant settings** > **Developer settings** > **Block ResourceKey Authentication** > **Enabled**
+Navigate to the [PowerBI Admin Portal](https://app.high.powerbigov.us)
+
+1. **Tenant settings**
+2. **Developer settings**
+3. **Block ResourceKey Authentication** > **Enabled**
 
 ## 6 Python and R Visual Sharing
 
@@ -373,7 +399,8 @@ and deems the scripts free of security risks.
 
 ### Policies
 #### MS.POWERBI.6.1v1
-Disabl R and Python interactions.
+R and Python interactions SHOULD be disabled.
+
 - _Rationale:_ External code poses a security and privacy risk as there is no good way to regulate what is done with the data or itegrations. Disabling this will reduce the risk of a data leak or malicious actor. 
 - _Last modified:_ June 2023
 
@@ -389,9 +416,13 @@ Disabl R and Python interactions.
 
 ### Implementation
 #### MS.POWERBI.6.1v1, instructions:
-**Tenant settings** > **R and Python Visuals Settings** > **Interact with and share R and Python visuals** > **Disabled**
+Navigate to the [PowerBI Admin Portal](https://app.high.powerbigov.us)
 
-## 7 Sensitive Data
+1. **Tenant settings**
+2. **R and Python Visuals Settings**
+3. **Interact with and share R and Python visuals** > **Disabled**
+
+## 7 Power BI Sensitive Data
 
 There are multiple ways to secure sensitive information, such as warning
 users, encryption, or blocking attempts to share. Use Microsoft
@@ -409,7 +440,8 @@ DLP.
 
 ### Policies
 #### MS.POWERBI.7.1v1
-Enable sensitivity labels for Power BI and employed for sensitive data per enterprise data protection policies.
+Sensitivity labels SHOULD be enabled for Power BI and employed for sensitive data per enterprise data protection policies.
+
 - _Rationale:_ Without sensitivity labels it is possible for someone to open up a document unknowingly, potentially reading information they aren't supposed to access. This policy will help organize and classify data making it easier to keep data out of the wrong hands.   
 - _Last modified:_ June 2023
 ### Resources
@@ -454,11 +486,15 @@ Enable sensitivity labels for Power BI and employed for sensitive data per enter
 
 ### Implementation 
 #### MS.POWERBI.7.1v1, instructions:
-**Tenant settings** > **Information protection** > **Allow users to apply sensitivity labels for Power BI content** > **Enabled**
+Navigate to the [PowerBI Admin Portal](https://app.high.powerbigov.us)
+
+1. **Tenant settings**
+2. **Information protection**
+3. **Allow users to apply sensitivity labels for Power BI content** > **Enabled**
 Define who can apply and change sensitivity labels in Power BI assets.
 
 
-## 8 Audit Logs
+## 8 Power BI Audit Logs
 
 The Power BI tenant has a setting for audit log generation to monitor
 internal activity and compliance. Users within the agency can use
@@ -471,7 +507,8 @@ tenant settings.
 
 ### Policies
 #### MS.POWERBI.8.1v1
-Enable Power BI audit log generation in the Power BI tenant.
+Power BI audit log generation SHALL be enabled in the Power BI tenant.
+
 - _Rationale:_ Without logging it is possible for a unwanted or malicious event to happen without any way of tracking it down. Audit logs will keep a record of what is happening making incident response simpler. 
 - _Last modified:_ June 2023
 
@@ -498,7 +535,11 @@ Enable Power BI audit log generation in the Power BI tenant.
 
 ### Implementation 
 #### MS.POWERBI.8.1v1, instructions:
-**Tenant settings** > **Audit and Usage Settings** > **Create audit logs for internal activity auditing and compliance** > **Enabled**
+Navigate to the [PowerBI Admin Portal](https://app.high.powerbigov.us)
+
+1. **Tenant settings**
+2. **Audit and Usage Settings**
+3. **Create audit logs for internal activity auditing and compliance** > **Enabled**
 
 # Acknowledgements
 
