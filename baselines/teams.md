@@ -451,13 +451,13 @@ development, that users “sideload” into Teams.
 Agencies SHOULD "Allow specifc apps and block all others" for Microsoft Apps in the Global (org-wide default) policy, all custom policies, and the Org-wide app settings.
 - _Rationale:_ The security risk with allowing integration for all Microsoft Apps is access to Teams information through vulnerabilties that can be present in app unmanged by the agency. By only allowing specific apps and blocking all others the agency will better manage its app integration and potential exposure points.
 - _Last modified:_ July 2023
-- _Note:_ Custom policies MAY be created to allow more flexibility for specific users.
-- 
+- _Note:_ This policy applies to the Global (Org-wide default) meeting policy and in custom meeting policies if they exist. Custom policies MAY be created to allow more flexibility for specific users.
+ 
 #### MS.TEAMS.8.2v1
 Agencies SHOULD NOT allow installation of all third-party apps and custom apps in the Global (org-wide default) policy, all custom policies, and the Org-wide app settings.
 - _Rationale:_ The security risk with allowing integration third-party and custom is access to Teams information through vulnerabilties that can be present in an app unmanged by the agency. By blocking all third-party apps and custom apps the agency will restrict access of Teams information to external apps. 
 - _Last modified:_ July 2023
-- _Note:_ Custom policies MAY be created to allow more flexibility for specific users. 
+- _Note:_ This policy applies to the Global (Org-wide default) meeting policy and in custom meeting policies if they exist. Custom policies MAY be created to allow more flexibility for specific users.
 
 ### Resources
 
@@ -541,7 +541,7 @@ This section helps reduce security risks related to the recording user permissio
 Meeting recording SHOULD be disabled in the Global (org-wide default) meeting policy.
 - _Rationale:_ The security risk with allowing all users to record Teams meetings and group calls exposes the ability to capture all audio, video, screen sharing activity, and information shared. By disabling the meeting recording setting in the Global (org-wide default) meeting policy an agency will limit this exposure of information. 
 - _Last modified:_ July 2023
-- _Note:_ Custom policies MAY be created to allow more flexibility for specific users.
+- _Note:_ This policy applies to the Global (Org-wide default) meeting policy and in custom meeting policies if they exist. Custom policies MAY be created to allow more flexibility for specific users.
 
 ### Resources
 
