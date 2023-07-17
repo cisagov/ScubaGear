@@ -448,16 +448,16 @@ development, that users “sideload” into Teams.
 ### Policies
 
 #### MS.TEAMS.8.1v1
-Agencies SHOULD allow all apps published by Microsoft.
-- _Rationale:_ TODO
-- _Last modified:_ July 2023
-- _Note:_ This policy applies to the Global (Org-wide default) meeting policy and in custom meeting policies if they exist.
-
-#### MS.TEAMS.8.2v1
-Agencies SHOULD NOT allow installation of all third-party apps or custom apps in the Global (org-wide default) meeting policy and all custom policies.
-- _Rationale:_ TODO
+Agencies SHOULD "Allow specifc apps and block all others" for Microsoft Apps in the Global (org-wide default) policy, all custom policies, and the Org-wide app settings.
+- _Rationale:_ The security risk with allowing integration for all Microsoft Apps is access to Teams information through vulnerabilties that can be present in app unmanged by the agency. By only allowing specific apps and blocking all others the agency will better manage its app integration and potential exposure points.
 - _Last modified:_ July 2023
 - _Note:_ Custom policies MAY be created to allow more flexibility for specific users.
+- 
+#### MS.TEAMS.8.2v1
+Agencies SHOULD NOT allow installation of all third-party apps and custom apps in the Global (org-wide default) policy, all custom policies, and the Org-wide app settings.
+- _Rationale:_ The security risk with allowing integration third-party and custom is access to Teams information through vulnerabilties that can be present in an app unmanged by the agency. By blocking all third-party apps and custom apps the agency will restrict access of Teams information to external apps. 
+- _Last modified:_ July 2023
+- _Note:_ Custom policies MAY be created to allow more flexibility for specific users. 
 
 ### Resources
 
@@ -469,7 +469,8 @@ Docs](https://docs.microsoft.com/en-us/microsoftteams/platform/concepts/deploy-a
 
 ### License Requirements
 
-- N/A
+- third-party apps and custom apps are only available with E3/E5 licenses. It is not
+available in GCC or DoD tenants.
 
 ### Implementation
 
@@ -485,9 +486,17 @@ All the settings in this section are configured in the [**Microsoft Teams admin
 
 3.  Select **Global (Org-wide default)**.
 
-4.  Under **Microsoft apps**, select **Allow all apps**
+4.  Under **Microsoft apps**, select **"Allow specifc apps and block all others"**
 
-5.  If custom policies have been created, repeat these steps for each
+5.  Click **Allow apps**.
+
+6.  Search and Click **Add** to all appropriate Microsoft Apps.
+
+7.  Click **Allow**.
+
+8.  Click **Save**.
+
+9.  If custom policies have been created, repeat these steps for each
     policy, selecting the appropriate policy in step 3.
 
 #### MS.TEAMS.8.2v1 instructions:
@@ -509,13 +518,22 @@ All the settings in this section are configured in the [**Microsoft Teams admin
 
 6.  Click **Save**.
 
-7.  If custom policies have been created, repeat these steps for each
+7.  Select **Teams apps** > **Manage Apps**
+
+8.  Select **Org-wide app settings**.
+
+9.  Under **Third-pary apps** turn off **Third-pary apps**
+
+10.  Under **Custom apps** turn off **Interaction with custom apps**
+
+11.  If custom policies have been created, repeat these steps for each
     policy, selecting the appropriate policy in step 3.
 
 
-## 9. Cloud Recording of Teams Meetings
 
-This section helps reduce security risks related to the cloud recording user permissions for Teams meetings. These user permissions apply to meetings hosted by a user, during one-on-one calls, and on group calls started by a user. Agencies should comply with any other applicable policies or legislation in addition to this guidance.
+## 9. Recording of Teams Meetings
+
+This section helps reduce security risks related to the recording user permissions for Teams meetings. These user permissions apply to meetings hosted by a user, during one-on-one calls, and on group calls started by a user. Agencies should comply with any other applicable policies or legislation in addition to this guidance.
 
 ### Policies
 
