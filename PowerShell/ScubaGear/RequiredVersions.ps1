@@ -38,7 +38,7 @@ $ModuleList = @(
     @{
         ModuleName = 'Microsoft.Graph.Authentication'
         ModuleVersion = [version] '1.14.0'
-        MaximumVersion = [version] '1.99.9999'
+        MaximumVersion = [version] '1.99.99999'
     },
     @{
         ModuleName = 'Microsoft.Graph.DeviceManagement' #TODO: Verify is needed
