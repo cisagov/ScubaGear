@@ -317,6 +317,10 @@ AlternativeMFAConditionsMatch(Policy) := true if {
 
 AlternativeMFA[Cap.DisplayName] {
     Cap := input.conditional_access_policies[_]
+    Count(MS_AAD_3_1v1_CAP) > 0
+}
+AlternativeMFA[Cap.DisplayName] {
+    Cap := input.conditional_access_policies[_]
 
     # Match all simple conditions
     AlternativeMFAConditionsMatch(Cap)
@@ -396,6 +400,8 @@ tests[{
 #--
 PhishingResistantMFA[Cap.DisplayName] {
     Cap := input.conditional_access_policies[_]
+    Cap.State == "enabled"
+    count(MS_AAD_3_1v1_CAP) > 0
     PrivRolesSet := { Role.RoleTemplateId | Role = input.privileged_roles[_] }
     CondIncludedRolesSet := { Y | Y = Cap.Conditions.Users.IncludeRoles[_] }
     MissingRoles := PrivRolesSet - CondIncludedRolesSet
@@ -408,7 +414,9 @@ PhishingResistantMFA[Cap.DisplayName] {
     count(MatchingExcludeRoles) == 0
     "All" in Cap.Conditions.Applications.IncludeApplications
     "mfa" in Cap.GrantControls.BuiltInControls
-    Cap.State == "enabled"
+
+    GroupExclusionsFullyExempt(Cap, "MS.AAD.3.6v1") == true
+    UserExclusionsFullyExempt(Cap, "MS.AAD.3.6v1") == true
 }
 
 tests[{

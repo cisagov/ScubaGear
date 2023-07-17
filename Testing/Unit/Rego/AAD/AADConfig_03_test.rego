@@ -317,6 +317,123 @@ test_NoExclusionsConditions_Correct if {
     RuleOutput[0].ReportDetails == "1 conditional access policy(s) found that meet(s) all requirements:<br/>Test name. <a href='#caps'>View all CA policies</a>."
 }
 
+test_3_1_Passes_3_2_Fails_Correct if {
+    PolicyId := "MS.AAD.3.2v1"
+
+    Output := tests with input as {
+        "conditional_access_policies" : [
+            {
+                "Conditions" : {
+                    "Applications" : {
+                        "IncludeApplications" : ["All"],
+                        "ExcludeApplications" : []
+                    },
+                    "Users" : {
+                        "IncludeUsers" : ["All"],
+                        "ExcludeUsers" : [],
+                        "ExcludeGroups" : [],
+                        "ExcludeRoles" : []
+                    }
+                },
+                "GrantControls" : {
+                    "AuthenticationStrength" : {
+                        "AllowedCombinations":  [
+                            "windowsHelloForBusiness",
+                            "fido2",
+                            "x509CertificateMultiFactor"
+                        ]
+                    }
+                },
+                "State" : "enabled",
+                "DisplayName" : "Test name"
+            },
+            {
+                "Conditions" : {
+                    "Applications" : {
+                        "IncludeApplications" : ["All"]
+                    },
+                    "Users" : {
+                        "IncludeUsers" : ["All"],
+                        "ExcludeUsers" : [],
+                        "ExcludeGroups" : [],
+                        "ExcludeRoles" : []
+                    }
+                },
+                "GrantControls" : {
+                    "BuiltInControls" : [""]
+                },
+                "State" : "enabled",
+                "DisplayName" : "Test name"
+            }
+        ]
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "1 conditional access policy(s) found that meet(s) all requirements:<br/>Test name. <a href='#caps'>View all CA policies</a>."
+}
+
+test_3_1_Fails_3_2_Passes_Correct if {
+    PolicyId := "MS.AAD.3.2v1"
+
+    Output := tests with input as {
+        "conditional_access_policies" : [
+            {
+                "Conditions" : {
+                    "Applications" : {
+                        "IncludeApplications" : ["All"],
+                        "ExcludeApplications" : []
+                    },
+                    "Users" : {
+                        "IncludeUsers" : ["All"],
+                        "ExcludeUsers" : [],
+                        "ExcludeGroups" : [],
+                        "ExcludeRoles" : []
+                    }
+                },
+                "GrantControls" : {
+                    "AuthenticationStrength" : {
+                        "AllowedCombinations":  [
+                            "windowsHelloForBusiness",
+                            "fido2",
+                            "x509CertificateMultiFactor",
+                            "SuperStrength"
+                        ]
+                    }
+                },
+                "State" : "enabled",
+                "DisplayName" : "Test name"
+            },
+            {
+                "Conditions" : {
+                    "Applications" : {
+                        "IncludeApplications" : ["All"]
+                    },
+                    "Users" : {
+                        "IncludeUsers" : ["All"],
+                        "ExcludeUsers" : [],
+                        "ExcludeGroups" : [],
+                        "ExcludeRoles" : []
+                    }
+                },
+                "GrantControls" : {
+                    "BuiltInControls" : ["mfa"]
+                },
+                "State" : "enabled",
+                "DisplayName" : "Test name"
+            }
+        ]
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "1 conditional access policy(s) found that meet(s) all requirements:<br/>Test name. <a href='#caps'>View all CA policies</a>."
+}
+
 test_NoExclusionsExemptUsers_Correct if {
     PolicyId := "MS.AAD.3.2v1"
 
@@ -1350,6 +1467,31 @@ test_ConditionalAccessPolicies_Correct_V2 if {
             {
                 "Conditions" : {
                     "Applications" : {
+                        "IncludeApplications" : ["All"],
+                        "ExcludeApplications" : []
+                    },
+                    "Users" : {
+                        "IncludeUsers" : ["All"],
+                        "ExcludeUsers" : [],
+                        "ExcludeGroups" : [],
+                        "ExcludeRoles" : []
+                    }
+                },
+                "GrantControls" : {
+                    "AuthenticationStrength" : {
+                        "AllowedCombinations":  [
+                            "windowsHelloForBusiness",
+                            "fido2",
+                            "x509CertificateMultiFactor"
+                        ]
+                    }
+                },
+                "State" : "enabled",
+                "DisplayName" : "Test name"
+            },
+            {
+                "Conditions" : {
+                    "Applications" : {
                         "IncludeApplications" : ["All"]
                     },
                     "Users" : {
@@ -1381,6 +1523,72 @@ test_ConditionalAccessPolicies_Correct_V2 if {
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "1 conditional access policy(s) found that meet(s) all requirements:<br/>MFA required for all highly Privileged Roles Policy. <a href='#caps'>View all CA policies</a>."
+}
+
+test_GoodStrengthBadMFA if {
+    PolicyId := "MS.AAD.3.6v1"
+
+    Output := tests with input as {
+        "conditional_access_policies" : [
+            {
+                "Conditions" : {
+                    "Applications" : {
+                        "IncludeApplications" : ["All"],
+                        "ExcludeApplications" : []
+                    },
+                    "Users" : {
+                        "IncludeUsers" : ["All"],
+                        "ExcludeUsers" : [],
+                        "ExcludeGroups" : [],
+                        "ExcludeRoles" : []
+                    }
+                },
+                "GrantControls" : {
+                    "AuthenticationStrength" : {
+                        "AllowedCombinations":  [
+                            "windowsHelloForBusiness",
+                            "fido2",
+                            "x509CertificateMultiFactor"
+                        ]
+                    }
+                },
+                "State" : "enabled",
+                "DisplayName" : "Test name"
+            },
+            {
+                "Conditions" : {
+                    "Applications" : {
+                        "IncludeApplications" : ["All"]
+                    },
+                    "Users" : {
+                        "IncludeRoles" : ["Role1", "Role2" ],
+                        "ExcludeRoles" : []
+                    }
+                },
+                "GrantControls" : {
+                    "BuiltInControls" : []
+                },
+                "State" : "enabled",
+                "DisplayName" : "MFA required for all highly Privileged Roles Policy"
+            }
+        ],
+        "privileged_roles" : [
+            {
+                "RoleTemplateId" : "Role1",
+                "DisplayName" : "Global Administrator"
+            },
+            {
+                "RoleTemplateId" : "Role2",
+                "DisplayName" : "Privileged Role Administrator"
+            }
+        ]
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
 }
 
 test_IncludeApplications_Incorrect_V2 if {
