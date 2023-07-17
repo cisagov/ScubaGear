@@ -29,6 +29,6 @@ jobs:
       shell: powershell
       run: |
         # Remove module from image until SCUBA steps up to 2.0+
-        Get-InstalledModule -Name Microsoft.Graph.Authentication | Uninstall-Module
+        Get-InstalledModule -Name Microsoft.Graph | Uninstall-Module
         ./SetUp.ps1
         Invoke-Pester -Output 'Detailed' -Path './Testing/Unit/PowerShell'
