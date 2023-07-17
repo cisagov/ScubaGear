@@ -455,7 +455,7 @@ Agencies SHOULD "Allow specifc apps and block all others" for Microsoft Apps in 
  
 #### MS.TEAMS.8.2v1
 Agencies SHOULD NOT allow installation of all third-party apps and custom apps in the Global (org-wide default) policy, all custom policies, and the Org-wide app settings.
-- _Rationale:_ The security risk with allowing integration third-party and custom is access to Teams information through vulnerabilties that can be present in an app unmanged by the agency. By blocking all third-party apps and custom apps the agency will restrict access of Teams information to external apps. 
+- _Rationale:_ The security risk with allowing integration third-party and custom is access to Teams information through vulnerabilties that can be present in an app unmanged by the agency. By blocking intallation of all third-party apps and custom apps the agency will disable the integration for Teams to said apps.
 - _Last modified:_ July 2023
 - _Note:_ This policy applies to the Global (Org-wide default) meeting policy and in custom meeting policies if they exist. Custom policies MAY be created to allow more flexibility for specific users.
 
