@@ -462,10 +462,10 @@ Agencies SHOULD NOT allow installation of all third-party apps and custom apps i
 ### Resources
 
 - [Manage app permission policies in Microsoft Teams \| Microsoft
-Docs](https://docs.microsoft.com/en-us/microsoftteams/teams-app-permission-policies)
+Docs](https://learn.microsoft.com/en-us/microsoftteams/teams-app-permission-policies)
 
 - [Upload your app in Microsoft Teams \| Microsoft
-Docs](https://docs.microsoft.com/en-us/microsoftteams/platform/concepts/deploy-and-publish/apps-upload)
+Docs](https://learn.microsoft.com/en-us/microsoftteams/platform/concepts/deploy-and-publish/apps-upload)
 
 ### License Requirements
 
@@ -546,10 +546,10 @@ Meeting recording SHOULD be disabled in the Global (org-wide default) meeting po
 ### Resources
 
 - [Teams cloud meeting recording \| Microsoft
-Docs](https://docs.microsoft.com/en-us/microsoftteams/cloud-recording)
+Docs](https://learn.microsoft.com/en-us/microsoftteams/cloud-recording)
 
 - [Assign policies in Teams – getting started \| Microsoft
-Docs](https://docs.microsoft.com/en-us/microsoftteams/policy-assignment-overview)
+Docs](https://learn.microsoft.com/en-us/microsoftteams/policy-assignment-overview)
 
 ### License Requirements
 
@@ -614,7 +614,7 @@ Record an event SHOULD be set to Organizer can record.
 ### Resources
 
 - [Live Event Recording Policies \| Microsoft
-Docs](https://docs.microsoft.com/en-us/microsoftteams/teams-live-events/live-events-recording-policies)
+Docs](https://learn.microsoft.com/en-us/microsoftteams/teams-live-events/live-events-recording-policies)
 
 ### License Requirements
 
