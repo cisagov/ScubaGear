@@ -17,14 +17,14 @@
         Valid product names are: aad, defender, exo, onedrive, powerplatform, sharepoint, and teams.
 
     .EXAMPLE
-        .\RunUnitTests.ps1 -p aad -b 1
-        Will run the AADConfig_01_test.rego. When specifying a baseline only one product is able to be used
+        .\RunUnitTests.ps1 -p aad -c 1
+        Will run the AADConfig_01_test.rego. When specifying a control group, only one product is able to be used
         at a time.
 
     .EXAMPLE
-        .\RunUnitTests.ps1 -p -teams -b 3 -t test_AllowPublicUsers_Correct
+        .\RunUnitTests.ps1 -p -teams -c 3 -t test_AllowPublicUsers_Correct
         Will run the specific test inside the TeamsConfig_06_test.rego.
-        Only one parameter is allowed for the -t option just as there is only one parameter allowed for the -b option.
+        Only one parameter is allowed for the -t option just as there is only one parameter allowed for the -c option.
 
 #>
 
@@ -34,7 +34,7 @@ param (
     [ValidateSet('AAD','Defender','EXO','OneDrive','PowerPlatform','Sharepoint','Teams')]
     [string[]]$p = "",
     [Parameter()]
-    [string[]]$b = "",
+    [string[]]$c = "",
     [Parameter()]
     [string[]]$t = "",
     [Parameter()]
@@ -59,14 +59,14 @@ function Get-ErrorMsg {
     switch ($Flag[0]) {
         TestNameFlagsMissing {
             Write-Output "ERROR: Missing value(s) to run opa for specific test case(s)"
-            Write-Output ".\$ScriptName [-p] <product> [-b] <control group numbers> [-t] <test names>`n"
+            Write-Output ".\$ScriptName [-p] <product> [-c] <control group numbers> [-t] <test names>`n"
         }
         BaselineItemFlagMissing {
             Write-Output "ERROR: Missing value(s) to run opa for specific control group item(s)"
-            Write-Output ".\$ScriptName [-p] <product> [-b] <control group numbers>`n"
+            Write-Output ".\$ScriptName [-p] <product> [-c] <control group numbers>`n"
         }
         BaselineItemNumber {
-            Write-Output "ERROR: Unrecognized number '$b'"
+            Write-Output "ERROR: Unrecognized number '$c'"
             Write-Output "Must be an integer (1, 2, 3, ...) or control group syntax (01, 02, 03..09, 10, ...)`n"
         }
         FileIOError {
@@ -122,7 +122,7 @@ function Invoke-ControlGroupItem {
     )
 
     Write-Output "`n==== Testing $Product ===="
-    foreach($ControlGroup in $b) {
+    foreach($ControlGroup in $c) {
         $Result = Get-ControlGroup $ControlGroup
         if($Result[0]){
             $ControlGroup = $Result[1]
@@ -130,7 +130,7 @@ function Invoke-ControlGroupItem {
             Where-Object {$_.Name -like "*$ControlGroup*" }
 
             if ($null -eq $Filename){
-                Write-Warning "`nNOT FOUND: Control Group $b does not exist in the $Product directory"
+                Write-Warning "`nNOT FOUND: Control Group $c does not exist in the $Product directory"
             }
 
             elseif(Test-Path -Path $Filename.Fullname -PathType Leaf) {
@@ -191,7 +191,7 @@ function Invoke-TestName {
 }
 
 $pEmpty = $p[0] -eq ""
-$bEmpty = $b[0] -eq ""
+$cEmpty = $c[0] -eq ""
 $tEmpty = $t[0] -eq ""
 $Flag = ""
 
@@ -201,29 +201,29 @@ if ($h.IsPresent) {
 if ($v.IsPresent) {
     $Flag = "-v"
 }
-if($pEmpty -and $bEmpty -and $tEmpty) {
+if($pEmpty -and $cEmpty -and $tEmpty) {
     $p = @('AAD','Defender','EXO','OneDrive','PowerPlatform','Sharepoint','Teams')
     Invoke-Product -Flag $Flag
 }
-elseif((-not $pEmpty) -and (-not $bEmpty) -and (-not $tEmpty)) {
-    if (($p.Count -gt 1) -or ($b.Count -gt 1)) {
-        Write-Output "**WARNING** can only take 1 argument for each: product & Control Group item`n...Running test for $($p[0]) and $($b[0]) only"
+elseif((-not $pEmpty) -and (-not $cEmpty) -and (-not $tEmpty)) {
+    if (($p.Count -gt 1) -or ($c.Count -gt 1)) {
+        Write-Output "**WARNING** can only take 1 argument for each: product & Control Group item`n...Running test for $($p[0]) and $($c[0]) only"
     }
 
-    Invoke-TestName -Flag $Flag -Product $p[0] -ControlGroup $b[0]
+    Invoke-TestName -Flag $Flag -Product $p[0] -ControlGroup $c[0]
 }
-elseif((-not $pEmpty) -and (-not $bEmpty) -and $tEmpty) {
+elseif((-not $pEmpty) -and (-not $cEmpty) -and $tEmpty) {
     if ($p.Count -gt 1) {
         Write-Output "**WARNING** can only take 1 argument for product`n...Running test for $($p[0]) only"
     }
     Invoke-ControlGroupItem -Flag $Flag -Product $p[0]
 }
-elseif((-not $pEmpty) -and $bEmpty -and $tEmpty) {
+elseif((-not $pEmpty) -and $cEmpty -and $tEmpty) {
     Invoke-Product -Flag $Flag
 }
-elseif($pEmpty -or $bEmpty -and (-not $tEmpty)) {
+elseif($pEmpty -or $cEmpty -and (-not $tEmpty)) {
     Get-ErrorMsg TestNameFlagsMissing
 }
-elseif($pEmpty -and (-not $bEmpty) -and $tEmpty) {
+elseif($pEmpty -and (-not $cEmpty) -and $tEmpty) {
     Get-ErrorMsg ControlGroupItemFlagMissing
 }
