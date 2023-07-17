@@ -31,7 +31,7 @@ jobs:
       run: |
         # Remove Microsoft.Graph module(s) from image until SCUBA steps up to 2.0+
         Write-Output "NOTICE: Removing Microsoft.Graph version 2.0.  Remove this step when SCuBA steps up to this version."
-        Uninstall-Module Microsoft.Graph -RequiredVersion 2.0.0
+        Uninstall-Module Microsoft.Graph -ErrorAction SilentlyContinue
         Get-InstalledModule Microsoft.Graph.* | %{ if($_.Name -ne "Microsoft.Graph.Authentication"){ Write-Output "Removing: $($_.Name)"; Uninstall-Module $_.Name -AllowPrerelease -AllVersions } }
         Uninstall-Module Microsoft.Graph.Authentication -AllowPrerelease -AllVersions
 
