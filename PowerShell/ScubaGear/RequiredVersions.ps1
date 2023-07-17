@@ -7,7 +7,7 @@ $ModuleList = @(
     },
     @{
         ModuleName = 'ExchangeOnlineManagement' # includes Defender
-        ModuleVersion = [version] '3.2.0'
+        ModuleVersion = [version] '3.1.0'
         MaximumVersion = [version] '3.99.99999'
     },
     @{
@@ -38,7 +38,7 @@ $ModuleList = @(
     @{
         ModuleName = 'Microsoft.Graph.Authentication'
         ModuleVersion = [version] '1.14.0'
-        MaximumVersion = [version] '1.99.99999'
+        MaximumVersion = [version] '1.27.0'
     },
     @{
         ModuleName = 'Microsoft.Graph.DeviceManagement' #TODO: Verify is needed
