@@ -25,12 +25,17 @@ jobs:
     - name: Check out repository code
       uses: actions/checkout@v3
 
-    - name: Run Pester Tests
+    - name: Remove Graph 2.0
       shell: powershell
       run: |
         # Remove Microsoft.Graph module(s) from image until SCUBA steps up to 2.0+
+        Get-InstalledModule Microsoft.Graph.*
         Uninstall-Module Microsoft.Graph -AllowPrerelease -AllVersions
         Get-InstalledModule Microsoft.Graph.* | %{ if($_.Name -ne "Microsoft.Graph.Authentication"){ Uninstall-Module $_.Name -AllowPrerelease -AllVersions } }
         Uninstall-Module Microsoft.Graph.Authentication -AllowPrerelease -AllVersions
+
+    - name: Run Pester Tests
+      shell: powershell
+      run: |
         ./SetUp.ps1
         Invoke-Pester -Output 'Detailed' -Path './Testing/Unit/PowerShell'
