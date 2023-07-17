@@ -538,15 +538,10 @@ This section helps reduce security risks related to the recording user permissio
 ### Policies
 
 #### MS.TEAMS.9.1v1
-Cloud video recording SHOULD be disabled in the Global (org-wide default) meeting policy and all custom policies.
-- _Rationale:_ TODO
+Meeting recording SHOULD be disabled in the Global (org-wide default) meeting policy.
+- _Rationale:_ The security risk with allowing all users to record Teams meetings and group calls exposes the ability to capture all audio, video, screen sharing activity, and information shared. By disabling the meeting recording setting in the Global (org-wide default) meeting policy an agency will limit this exposure of information. 
 - _Last modified:_ July 2023
 - _Note:_ Custom policies MAY be created to allow more flexibility for specific users.
-
-#### MS.TEAMS.9.2v1
-For all meeting polices (Global (org-wide default) meeting policy and all custom policies) that allow cloud recording, recordings SHOULD be stored inside the country of that agency's tenant.
-- _Rationale:_ TODO
-- _Last modified:_ July 2023
 
 ### Resources
 
@@ -574,7 +569,7 @@ All the settings in this section are configured in the [**Microsoft Teams admin
 
 3.  Select the **Global (Org-wide default)** policy.
 
-4.  Under the **Recording & transcription** section, set **Cloud
+4.  Under the **Recording & transcription** section, set **Meeting
     recording** to **Off**.
 
 5.  Select **Save**.
@@ -605,19 +600,6 @@ record meetings:
 
 8.  Select **Apply**.
 
-#### MS.TEAMS.9.2v1 instructions:
-
-1.  Sign in to the **[Microsoft Teams admin
-    center](https://admin.teams.microsoft.com).**
-
-2.  Select **Meetings** > **Meeting policies**.
-
-3.  Select the **Global (Org-wide default)** policy.
-   
-4.  Under the **Recording & transcription** section, set **Store
-    recordings outside of your country or region** to **Off**.
-
-5.  Select **Save**.
 
 ## 10. Recording of Live Events
 This section helps reduce security risks related to the recording user permissions for Live Events.
