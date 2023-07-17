@@ -15,6 +15,7 @@ on:
     paths:
       - "**.ps1"
       - "**.psm1"
+      - "run*.yaml"
   pull_request_review:
     types: [submitted]
 
@@ -29,9 +30,9 @@ jobs:
       shell: powershell
       run: |
         # Remove Microsoft.Graph module(s) from image until SCUBA steps up to 2.0+
-        Get-InstalledModule Microsoft.Graph.*
+        Get-InstalledModule Microsoft.Graph.* -AllVersions
         Uninstall-Module Microsoft.Graph -AllowPrerelease -AllVersions
-        Get-InstalledModule Microsoft.Graph.* | %{ if($_.Name -ne "Microsoft.Graph.Authentication"){ Uninstall-Module $_.Name -AllowPrerelease -AllVersions } }
+        Get-InstalledModule Microsoft.Graph.* | %{ if($_.Name -ne "Microsoft.Graph.Authentication"){ Write-Output "Removing: $($_.Name)"; Uninstall-Module $_.Name -AllowPrerelease -AllVersions } }
         Uninstall-Module Microsoft.Graph.Authentication -AllowPrerelease -AllVersions
 
     - name: Run Pester Tests
