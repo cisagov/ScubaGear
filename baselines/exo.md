@@ -50,7 +50,10 @@ forwarding rules to exfiltrate data to external recipients.
 
 #### MS.EXO.1.1v1
 Automatic forwarding to external domains SHALL be disabled.
-- _Rationale:_ TODO
+- _Rationale:_ Adversaries can use automatic forwarding to gain
+persistent access to a victim's email (see [MITRE ATT&CK T1114.003](https://attack.mitre.org/techniques/T1114/003/)). Disabling forwarding to external domains prevents this technique
+when the adversary is external to the organization but does not
+impede legitimate internal forwarding.
 - _Last modified:_ June 2023
 
 ### Resources
@@ -93,12 +96,19 @@ documentation provides some helpful starting points.
 
 #### MS.EXO.2.1v1
 A list of approved IP addresses for sending mail SHALL be maintained.
-- _Rationale:_ TODO
+- _Rationale:_ Knowing which servers are authorized to send email for
+your domains is a prerequisite for implementing SPF. Including a server
+that no longer authorized to send email for your domains would allow it
+to continue to sending email while failing to include an authorized 
+server could negatively impact mail delivery.
 - _Last modified:_ June 2023
 
 #### MS.EXO.2.2v1
 An SPF policy(s) that designates only these addresses as approved senders SHALL be published.
-- _Rationale:_ TODO
+- _Rationale:_ It is trivial for an adversary to modify the `FROM` field
+of an email such that it appears to be a legitimate email sent by your
+agency, fasciliting phishing attacks. SPF mitigates this by providing a
+mechanism for email recipients to detect emails spoofed in this way.
 - _Last modified:_ June 2023
 
 ### Resources
@@ -136,7 +146,7 @@ PowerShell tool Resolve-DnsName. For example:
 DomainKeys Identified Mail (DKIM) allows digital signatures to be added
 to email messages in the message header, providing a layer of both
 authenticity and integrity to emails. As with SPF, DKIM relies on Domain
-Name Service (DNS) records, thus, its deployment depends on how an
+Name System (DNS) records, thus, its deployment depends on how an
 agency manages its DNS. DKIM is enabled for your tenant's default domain
 (e.g., onmicrosoft.com domains), but it must be manually enabled for
 custom domains.
@@ -144,7 +154,11 @@ custom domains.
 ### Policies
 #### MS.EXO.3.1v1
 DKIM SHOULD be enabled for any custom domain.
-- _Rationale:_ TODO
+- _Rationale:_ It is trivial for an adversary to modify the `FROM` field
+of an email such that it appears to be a legitimate email sent by your
+agency, fasciliting phishing attacks. DKIM is an additional method for
+email recipients to detect spoofed emails and additionally allows recipients
+to verify the integrity of 
 - _Last modified:_ June 2023
 
 ### Resources
