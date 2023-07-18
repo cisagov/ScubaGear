@@ -120,7 +120,7 @@ test_PhishingResistantExtraMFA_Incorrect if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    #RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
 }
 
 test_PhishingResistantNoneMFA_Incorrect if {
@@ -1784,15 +1784,345 @@ test_State_Incorrect_V3 if {
 #
 # MS.AAD.3.8v1
 #--
-test_NotImplemented_Correct_V5 if {
+test_Correct_V1 if {
     PolicyId := "MS.AAD.3.8v1"
 
-    Output := tests with input as { }
+    Output := tests with input as {
+        "conditional_access_policies" : [
+            {
+                "Conditions" : {
+                    "Applications" : {
+                        "IncludeApplications" : ["All"],
+                        "IncludeUserActions" : ["urn:user:registersecurityinfo"]
+                    },
+                    "Users" : {
+                        "IncludeUsers" : ["All"]
+                    }
+                },
+                "GrantControls" : {
+                    "BuiltInControls" : ["compliantDevice", "domainJoinedDevice"]
+                },
+                "State" : "enabled",
+                "DisplayName" : "Managed Device Required for MFA Registration"
+            }
+        ]
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet
+    contains(RuleOutput[0].ReportDetails, "conditional access policy(s) found that meet(s) all requirements:")
+}
+
+test_ExcludeUserCorrect_V1 if {
+    PolicyId := "MS.AAD.3.8v1"
+
+    Output := tests with input as {
+        "scuba_config" : {
+            "Aad" : {
+                PolicyId : {
+                    "CapExclusions" : {
+                        "Users": [
+                            "SpecialPerson"
+                        ]
+                    }
+                }
+            }
+        },
+        "conditional_access_policies" : [
+            {
+                "Conditions" : {
+                    "Applications" : {
+                        "IncludeApplications" : ["All"],
+                        "IncludeUserActions" : ["urn:user:registersecurityinfo"]
+                    },
+                    "Users" : {
+                        "IncludeUsers" : ["All"],
+                        "ExcludeUsers" : ["SpecialPerson"]
+                    }
+                },
+                "GrantControls" : {
+                    "BuiltInControls" : ["compliantDevice", "domainJoinedDevice"]
+                },
+                "State" : "enabled",
+                "DisplayName" : "Managed Device Required for MFA Registration"
+            }
+        ]
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet
+    contains(RuleOutput[0].ReportDetails, "conditional access policy(s) found that meet(s) all requirements:")
+}
+
+test_ExcludeGroupCorrect_V1 if {
+    PolicyId := "MS.AAD.3.8v1"
+
+    Output := tests with input as {
+        "scuba_config" : {
+            "Aad" : {
+                PolicyId : {
+                    "CapExclusions" : {
+                        "Groups" : [
+                            "SpecialGroup"
+                        ]
+                    }
+                }
+            }
+        },
+        "conditional_access_policies" : [
+            {
+                "Conditions" : {
+                    "Applications" : {
+                        "IncludeApplications" : ["All"],
+                        "IncludeUserActions" : ["urn:user:registersecurityinfo"]
+                    },
+                    "Users" : {
+                        "IncludeUsers" : ["All"],
+                        "ExcludeGroups" : ["SpecialGroup"]
+                    }
+                },
+                "GrantControls" : {
+                    "BuiltInControls" : ["compliantDevice", "domainJoinedDevice"]
+                },
+                "State" : "enabled",
+                "DisplayName" : "Managed Device Required for MFA Registration"
+            }
+        ]
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet
+    contains(RuleOutput[0].ReportDetails, "conditional access policy(s) found that meet(s) all requirements:")
+}
+
+test_ExcludeUserIncorrect_V1 if {
+    PolicyId := "MS.AAD.3.8v1"
+
+    Output := tests with input as {
+        "scuba_config" : {
+            "Aad" : {
+                PolicyId : {
+                    "CapExclusions" : {
+                        "Users" : [
+                            "NotSpecialUser"
+                        ]
+                    }
+                }
+            }
+        },
+        "conditional_access_policies" : [
+            {
+                "Conditions" : {
+                    "Applications" : {
+                        "IncludeApplications" : ["All"],
+                        "IncludeUserActions" : ["urn:user:registersecurityinfo"]
+                    },
+                    "Users" : {
+                        "IncludeUsers" : ["All"],
+                        "ExcludeUsers" : ["SpecialUser"]
+                    }
+                },
+                "GrantControls" : {
+                    "BuiltInControls" : ["compliantDevice", "domainJoinedDevice"]
+                },
+                "State" : "enabled",
+                "DisplayName" : "Managed Device Required for MFA Registration"
+            }
+        ]
+    }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == NotCheckedDetails(PolicyId)
+    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+}
+
+test_ExcludeGroupIncorrect_V1 if {
+    PolicyId := "MS.AAD.3.8v1"
+
+    Output := tests with input as {
+        "scuba_config" : {
+            "Aad" : {
+                PolicyId : {
+                    "CapExclusions" : {
+                        "Groups" : [
+                            "SpecialGroup"
+                        ]
+                    }
+                }
+            }
+        },
+        "conditional_access_policies" : [
+            {
+                "Conditions" : {
+                    "Applications" : {
+                        "IncludeApplications" : ["All"],
+                        "IncludeUserActions" : ["urn:user:registersecurityinfo"]
+                    },
+                    "Users" : {
+                        "IncludeUsers" : ["All"],
+                        "ExcludeGroups" : ["NotSpecialGroup"]
+                    }
+                },
+                "GrantControls" : {
+                    "BuiltInControls" : ["compliantDevice", "domainJoinedDevice"]
+                },
+                "State" : "enabled",
+                "DisplayName" : "Managed Device Required for MFA Registration"
+            }
+        ]
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+}
+
+test_InCorrect_ReportOnly if {
+    PolicyId := "MS.AAD.3.8v1"
+
+    Output := tests with input as {
+        "conditional_access_policies" : [
+            {
+                "Conditions" : {
+                    "Applications" : {
+                        "IncludeApplications" : ["All"],
+                        "IncludeUserActions" : ["urn:user:registersecurityinfo"]
+                    },
+                    "Users" : {
+                        "IncludeUsers" : ["All"]
+                    }
+                },
+                "GrantControls" : {
+                    "BuiltInControls" : ["compliantDevice", "domainJoinedDevice"]
+                },
+                "State" : "enabledForReportingButNotEnforced",
+                "DisplayName" : "Managed Device Required for MFA Registration"
+            }
+        ]
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+}
+
+test_Correct_OnlyCompliantDevice if {
+    PolicyId := "MS.AAD.3.8v1"
+
+    Output := tests with input as {
+        "conditional_access_policies" : [
+            {
+                "Conditions" : {
+                    "Applications" : {
+                        "IncludeApplications" : ["All"],
+                        "IncludeUserActions" : ["urn:user:registersecurityinfo"]
+                    },
+                    "Users" : {
+                        "IncludeUsers" : ["All"]
+                    }
+                },
+                "GrantControls" : {
+                    "BuiltInControls" : ["compliantDevice"]
+                },
+                "State" : "enabled",
+                "DisplayName" : "Managed Device Required for MFA Registration"
+            }
+        ]
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet
+    contains(RuleOutput[0].ReportDetails, "conditional access policy(s) found that meet(s) all requirements:")
+}
+
+test_Correct_OnlyDomainJoinedDevice if {
+    PolicyId := "MS.AAD.3.8v1"
+
+    Output := tests with input as {
+        "conditional_access_policies" : [
+            {
+                "Conditions" : {
+                    "Applications" : {
+                        "IncludeApplications" : ["All"],
+                        "IncludeUserActions" : ["urn:user:registersecurityinfo"]
+                    },
+                    "Users" : {
+                        "IncludeUsers" : ["All"]
+                    }
+                },
+                "GrantControls" : {
+                    "BuiltInControls" : ["domainJoinedDevice"]
+                },
+                "State" : "enabled",
+                "DisplayName" : "Managed Device Required for MFA Registration"
+            }
+        ]
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet
+    contains(RuleOutput[0].ReportDetails, "conditional access policy(s) found that meet(s) all requirements:")
+}
+
+test_InCorrect_EmptyGrantControls if {
+    PolicyId := "MS.AAD.3.8v1"
+
+    Output := tests with input as {
+        "conditional_access_policies" : [
+            {
+                "Conditions" : {
+                    "Applications" : {
+                        "IncludeApplications" : ["All"],
+                        "IncludeUserActions" : ["urn:user:registersecurityinfo"]
+                    },
+                    "Users" : {
+                        "IncludeUsers" : ["All"]
+                    }
+                },
+                "GrantControls" : {
+                    "BuiltInControls" : []
+                },
+                "State" : "enabled",
+                "DisplayName" : "Managed Device Required for MFA Registration"
+            }
+        ]
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+}
+
+test_InCorrect_No_Policy if {
+    PolicyId := "MS.AAD.3.8v1"
+
+    Output := tests with input as {
+        "conditional_access_policies" : [
+        ]
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
 }
 #--
