@@ -6,16 +6,277 @@ import data.report.utils.NotCheckedDetails
 #
 # MS.AAD.3.1v1
 #--
-test_NotImplemented_Correct_V1 if {
+test_PhishingResistantAllMFA_Correct if {
     PolicyId := "MS.AAD.3.1v1"
 
-    Output := tests with input as { }
+    Output := tests with input as {
+        "conditional_access_policies" : [
+            {
+                "Conditions" : {
+                    "Applications" : {
+                        "IncludeApplications" : ["All"],
+                        "ExcludeApplications" : []
+                    },
+                    "Users" : {
+                        "IncludeUsers" : ["All"],
+                        "ExcludeUsers" : [],
+                        "ExcludeGroups" : [],
+                        "ExcludeRoles" : []
+                    }
+                },
+                "GrantControls" : {
+                    "AuthenticationStrength" : {
+                        "AllowedCombinations":  [
+                            "windowsHelloForBusiness",
+                            "fido2",
+                            "x509CertificateMultiFactor"
+                        ]
+                    }
+                },
+                "State" : "enabled",
+                "DisplayName" : "Test name"
+            }
+        ]
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "1 conditional access policy(s) found that meet(s) all requirements:<br/>Test name. <a href='#caps'>View all CA policies</a>."
+}
+
+test_PhishingResistantSingleMFA_Correct if {
+    PolicyId := "MS.AAD.3.1v1"
+
+    Output := tests with input as {
+        "conditional_access_policies" : [
+            {
+                "Conditions" : {
+                    "Applications" : {
+                        "IncludeApplications" : ["All"],
+                        "ExcludeApplications" : []
+                    },
+                    "Users" : {
+                        "IncludeUsers" : ["All"],
+                        "ExcludeUsers" : [],
+                        "ExcludeGroups" : [],
+                        "ExcludeRoles" : []
+                    }
+                },
+                "GrantControls" : {
+                    "AuthenticationStrength" : {
+                        "AllowedCombinations":  [
+                            "x509CertificateMultiFactor"
+                        ]
+                    }
+                },
+                "State" : "enabled",
+                "DisplayName" : "Test name"
+            }
+        ]
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "1 conditional access policy(s) found that meet(s) all requirements:<br/>Test name. <a href='#caps'>View all CA policies</a>."
+}
+
+test_PhishingResistantExtraMFA_Incorrect if {
+    PolicyId := "MS.AAD.3.1v1"
+
+    Output := tests with input as {
+        "conditional_access_policies" : [
+            {
+                "Conditions" : {
+                    "Applications" : {
+                        "IncludeApplications" : ["All"],
+                        "ExcludeApplications" : []
+                    },
+                    "Users" : {
+                        "IncludeUsers" : ["All"],
+                        "ExcludeUsers" : [],
+                        "ExcludeGroups" : [],
+                        "ExcludeRoles" : []
+                    }
+                },
+                "GrantControls" : {
+                    "AuthenticationStrength" : {
+                        "AllowedCombinations": [
+                            "x509CertificateMultiFactor",
+                            "SuperStrength"
+                        ]
+                    }
+                },
+                "State" : "enabled",
+                "DisplayName" : "Test name"
+            }
+        ]
+    }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == NotCheckedDetails(PolicyId)
+    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+}
+
+test_PhishingResistantNoneMFA_Incorrect if {
+    PolicyId := "MS.AAD.3.1v1"
+
+    Output := tests with input as {
+        "conditional_access_policies" : [
+            {
+                "Conditions" : {
+                    "Applications" : {
+                        "IncludeApplications" : ["All"],
+                        "ExcludeApplications" : []
+                    },
+                    "Users" : {
+                        "IncludeUsers" : ["All"],
+                        "ExcludeUsers" : [],
+                        "ExcludeGroups" : [],
+                        "ExcludeRoles" : []
+                    }
+                },
+                "GrantControls" : {
+                    "AuthenticationStrength" : {
+                        "AllowedCombinations": null
+                    }
+                },
+                "State" : "enabled",
+                "DisplayName" : "Test name"
+            }
+        ]
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    #RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+}
+
+test_PhishingResistantMFAExcludeApp_Incorrect if {
+    PolicyId := "MS.AAD.3.1v1"
+
+    Output := tests with input as {
+        "conditional_access_policies" : [
+            {
+                "Conditions" : {
+                    "Applications" : {
+                        "IncludeApplications" : ["All"],
+                        "ExcludeApplications" : ["Some App"]
+                    },
+                    "Users" : {
+                        "IncludeUsers" : ["All"],
+                        "ExcludeUsers" : [],
+                        "ExcludeGroups" : [],
+                        "ExcludeRoles" : []
+                    }
+                },
+                "GrantControls" : {
+                    "AuthenticationStrength" : {
+                        "AllowedCombinations":  [
+                            "windowsHelloForBusiness",
+                            "fido2",
+                            "x509CertificateMultiFactor"
+                        ]
+                    }
+                },
+                "State" : "enabled",
+                "DisplayName" : "Test name"
+            }
+        ]
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+}
+
+test_PhishingResistantMFAExcludeUser_Incorrect if {
+    PolicyId := "MS.AAD.3.1v1"
+
+    Output := tests with input as {
+        "conditional_access_policies" : [
+            {
+                "Conditions" : {
+                    "Applications" : {
+                        "IncludeApplications" : ["All"],
+                        "ExcludeApplications" : []
+                    },
+                    "Users" : {
+                        "IncludeUsers" : ["All"],
+                        "ExcludeUsers" : ["me"],
+                        "ExcludeGroups" : [],
+                        "ExcludeRoles" : []
+                    }
+                },
+                "GrantControls" : {
+                    "AuthenticationStrength" : {
+                        "AllowedCombinations":  [
+                            "windowsHelloForBusiness",
+                            "fido2",
+                            "x509CertificateMultiFactor"
+                        ]
+                    }
+                },
+                "State" : "enabled",
+                "DisplayName" : "Test name"
+            }
+        ]
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+}
+
+test_PhishingResistantMFAExcludeGroup_Incorrect if {
+    PolicyId := "MS.AAD.3.1v1"
+
+    Output := tests with input as {
+        "conditional_access_policies" : [
+            {
+                "Conditions" : {
+                    "Applications" : {
+                        "IncludeApplications" : ["All"],
+                        "ExcludeApplications" : []
+                    },
+                    "Users" : {
+                        "IncludeUsers" : ["All"],
+                        "ExcludeUsers" : [],
+                        "ExcludeGroups" : ["some"],
+                        "ExcludeRoles" : []
+                    }
+                },
+                "GrantControls" : {
+                    "AuthenticationStrength" : {
+                        "AllowedCombinations":  [
+                            "windowsHelloForBusiness",
+                            "fido2",
+                            "x509CertificateMultiFactor"
+                        ]
+                    }
+                },
+                "State" : "enabled",
+                "DisplayName" : "Test name"
+            }
+        ]
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
 }
 #--
 
@@ -1520,7 +1781,6 @@ test_State_Incorrect_V3 if {
 }
 #--
 
-#
 #
 # MS.AAD.3.8v1
 #--
