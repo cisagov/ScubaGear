@@ -479,7 +479,8 @@ Microsoft.
 ### Policies
 #### MS.EXO.8.1v1
 A DLP solution SHALL be used. The selected DLP solution SHOULD offer services comparable to the native DLP solution offered by Microsoft.
-- _Rationale:_ TODO
+- _Rationale:_ Email can be used as a mechanism of exfiltrating data.
+DLP makes data exfiltration through email more difficult.
 - _Last modified:_ June 2023
 
 #### MS.EXO.8.2v1
