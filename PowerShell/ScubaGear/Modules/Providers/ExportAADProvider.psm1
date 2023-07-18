@@ -93,7 +93,7 @@ function Export-AADProvider {
 
     # 2.6, 2.7, & 2.18 1st/3rd Policy Bullets
     $AuthZPolicies = ConvertTo-Json @($Tracker.TryCommand("Get-MgPolicyAuthorizationPolicy"))
-    $SecureScore = ConvertTo-Json -Depth 100 @($Tracker.TryCommand("Get-MgSecuritySecureScore", @{"Top"=1}).ControlScores |Where-Object {$_.ControlName -eq 'RoleOverlap'})
+    $SecureScore = ConvertTo-Json -Depth 2 @($Tracker.TryCommand("Get-MgSecuritySecureScore", @{"Top"=1}).ControlScores | Where-Object {$_.ControlName -eq 'RoleOverlap'})
 
     # 2.7 third bullet
     $DirectorySettings = ConvertTo-Json -Depth 10 @($Tracker.TryCommand("Get-MgDirectorySetting"))
