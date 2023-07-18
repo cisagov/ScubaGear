@@ -15,6 +15,10 @@ Description(String1, String2, String3) =  trim(concat(" ", [String1, String2, St
 
 ReportDetailsArray(Array, String) = Description(Format(Array), String, "")
 
+ReportDetailsBoolean(Status) = "Requirement met" if {Status == true}
+
+ReportDetailsBoolean(Status) = "Requirement not met" if {Status == false}
+
 # Set to the maximum number of array items to be
 # printed in the report details section
 ReportArrayMaxCount := 20
@@ -707,18 +711,20 @@ tests[{
 
 # MS.AAD.7.2v1
 #--
-# At this time we are unable to test for user association to fine-grained privileged roles
-# rather than Global Administrator due to runtime and data response size constraints
+# Check for secure score value for RoleOverlap Control Category
+# Requirements is met if score is equal to 1 (100%) and fails if it is less than 1
+#--
+
 tests[{
-    "PolicyId" : PolicyId,
-    "Criticality" : "Shall/Not-Implemented",
-    "Commandlet" : [],
-    "ActualValue" : [],
-    "ReportDetails" : NotCheckedDetails(PolicyId),
-    "RequirementMet" : false
+    "PolicyId" : "MS.AAD.7.2v1",
+    "Criticality" : "Shall",
+    "Commandlet" : ["Get-MgSubscribedSku", "Get-MgSecuritySecureScore"],
+    "ActualValue" : SecureScorePolicy,
+    "ReportDetails" : ReportDetailsBoolean(Status),
+    "RequirementMet" : Status
 }] {
-    PolicyId := "MS.AAD.7.2v1"
-    true
+   SecureScorePolicy := input.secure_score[_]
+   Status := SecureScorePolicy.Score == 1.0
 }
 
 #--
