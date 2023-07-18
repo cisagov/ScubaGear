@@ -80,25 +80,26 @@ Anonymous users SHALL NOT be enabled to start meetings.
 - _Note:_ This policy applies to the Global (Org-wide default) meeting policy and in custom meeting policies if they exist.
 
 #### MS.TEAMS.1.3v1
-Anonymous users and dial-in callers, SHOULD NOT be admitted automatically in the Global (Org-wide default) meeting policy.
+Anonymous users and dial-in callers, SHOULD NOT be admitted automatically. 
+
 - _Rationale:_ Allowing the anonymous and dial-in users automatically reduces the control on who can participate in a meeting and potential for data breaches. This policy reduces the risk by requiring all anonymous and dial-in users to wait in a lobby until they were admitted by an authorized meeting participant. If the agency has a use case to have members of specific trusted organizations and/or B2B guests enter a meeting automatically, custom policies may be created and assigned to authorized meeting organizers.  
 - _Last modified:_ July 2023
-- _Note:_ Custom meeting policies MAY be created that allow more flexibility for specific users. For example, B2B guest users and trusted partner members maybe auto admitted into meetings organized by authorized users. 
+- _Note:_ This policy applies to the Global (Org-wide default) meeting policy.Custom meeting policies MAY be created that allow more flexibility for specific users. For example, B2B guest users and trusted partner members maybe auto admitted into meetings organized by authorized users. 
 
 #### MS.TEAMS.1.4v1
-Internal users SHOULD be admitted automatically in the Global (Org-wide default) meeting policy.
+Internal users SHOULD be admitted automatically.
 - _Rationale:_ Requiring internal users to waint in the lobby for explicit admit can lead to admit fatigue. This policy enables the internal users to be automatically admitted to meeting through global policy.  
 - _Last modified:_ July 2023
-- _Note:_ Custom meeting policies MAY be created that allow more flexibility for specific users.
+- _Note:_ This policy applies to the Global (Org-wide default) meeting policy. Custom meeting policies MAY be created that allow more flexibility for specific users.
 
 #### MS.TEAMS.1.5v1
-Dial-in users, SHOULD NOT be enabled to bypass the lobby in the Global (Org-wide default) meeting policy.
+Dial-in users, SHOULD NOT be enabled to bypass the lobby.
 - _Rationale:_ Allowing the Dial-in users automatically reduces the control on who can participate in a meeting and potential for data breaches. This policy reduces the risk by requiring all dial-in users to wait in a lobby until they were admitted by an authorized meeting participant.   
 - _Last modified:_ July 2023
 - _Note:_ This policy applies to the Global (Org-wide default) meeting policy and in custom meeting policies if they exist.  
 
 #### MS.TEAMS.1.6v1
-Meeting recording SHOULD be disabled in the Global (org-wide default) meeting policy.
+Meeting recording SHOULD be disabled.
 - _Rationale:_ The security risk with allowing all users to record Teams meetings and group calls exposes the ability to capture all audio, video, screen sharing activity, and information shared. By disabling the meeting recording setting in the Global (org-wide default) meeting policy an agency will limit this exposure of information. 
 - _Last modified:_ July 2023
 - _Note:_ This policy applies to the Global (Org-wide default) meeting policy and in custom meeting policies if they exist. Custom policies MAY be created to allow more flexibility for specific users.
@@ -273,7 +274,7 @@ Docs](https://docs.microsoft.com/en-us/microsoftteams/manage-external-access#man
 
 ### Implementation
 
-All the settings in this section are configured in the [**Microsoft Teams admin center**](https://admin.teams.microsoft.com). Steps for the unmanaged users are outlined in [Manage contact with external Teams users not
+All the settings in this section are configured in the **Microsoft Teams admin center**. Steps for the unmanaged users are outlined in [Manage contact with external Teams users not
 managed by an
 organization](https://docs.microsoft.com/en-us/microsoftteams/manage-external-access#manage-contact-with-external-teams-users-not-managed-by-an-organization).
 
@@ -294,8 +295,7 @@ To enable external access for only specific domains:
 
 #### MS.TEAMS.2.2v1 instructions:
     
-1.  Sign in to the **Microsoft Teams admin
-    center**.
+1.  Sign in to the **Microsoft Teams admin center**.
 2.  Select **Users > External access.**
 
 3.  To completely block contact with unmanaged users, under **Teams
@@ -355,8 +355,7 @@ Blog](https://techcommunity.microsoft.com/t5/microsoft-teams-blog/skype-for-busi
 
 ### Implementation
 
-All the settings in this section are configured in the [**Microsoft Teams admin
-    center**](https://admin.teams.microsoft.com).
+All the settings in this section are configured in the **Microsoft Teams admin center**.
 
 #### MS.TEAMS.3.1v1 instructions:
 
@@ -391,8 +390,7 @@ available in GCC or DoD tenants.
 
 ### Implementation
 
-All the settings in this section are configured in the [**Microsoft Teams admin
-    center**](https://admin.teams.microsoft.com).
+All the settings in this section are configured in the **Microsoft Teams admin center**.
 
 #### MS.TEAMS.4.1v1 instructions:
 
@@ -418,16 +416,16 @@ development, that users “sideload” into Teams.
 ### Policies
 
 #### MS.TEAMS.5.1v1
-Agencies SHOULD "Allow specifc apps and block all others" for Microsoft Apps in the Global (org-wide default) policy, all custom policies, and the Org-wide app settings.
+Agencies SHOULD "Allow specifc apps and block all others" for Microsoft Apps.
 - _Rationale:_ The security risk with allowing integration for all Microsoft Apps is access to Teams information through vulnerabilties that can be present in app unmanged by the agency. By only allowing specific apps and blocking all others the agency will better manage its app integration and potential exposure points.
 - _Last modified:_ July 2023
-- _Note:_ This policy applies to the Global (Org-wide default) meeting policy and in custom meeting policies if they exist. Custom policies MAY be created to allow more flexibility for specific users.
+- _Note:_ This policy applies to the Global (Org-wide default) policy, all custom policies, and the org-wide app settings. Custom policies MAY be created to allow more flexibility for specific users.
  
 #### MS.TEAMS.5.2v1
-Agencies SHOULD NOT allow installation of all third-party apps and custom apps in the Global (org-wide default) policy, all custom policies, and the Org-wide app settings.
+Agencies SHOULD NOT allow installation of all third-party apps and custom apps.
 - _Rationale:_ The security risk with allowing integration third-party and custom is access to Teams information through vulnerabilties that can be present in an app unmanged by the agency. By blocking intallation of all third-party apps and custom apps the agency will disable the integration for Teams to said apps.
 - _Last modified:_ July 2023
-- _Note:_ This policy applies to the Global (Org-wide default) meeting policy and in custom meeting policies if they exist. Custom policies MAY be created to allow more flexibility for specific users.
+- _Note:_ This policy applies to the Global (Org-wide default) policy, all custom policies if they exist, and the org-wise settings. Custom policies MAY be created to allow more flexibility for specific users.
 
 ### Resources
 
@@ -444,8 +442,7 @@ available in GCC or DoD tenants.
 
 ### Implementation
 
-All the settings in this section are configured in the [**Microsoft Teams admin
-    center**](https://admin.teams.microsoft.com). 
+All the settings in this section are configured in the **Microsoft Teams admin center**. 
 
 #### MS.TEAMS.5.1v1 instructions:
 
