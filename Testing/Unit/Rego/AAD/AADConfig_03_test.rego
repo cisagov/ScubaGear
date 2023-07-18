@@ -1,6 +1,7 @@
 package aad
 import future.keywords
 import data.report.utils.NotCheckedDetails
+import data.report.utils.ReportDetailsBoolean
 
 
 #
@@ -1285,16 +1286,40 @@ test_NotImplemented_Correct_V2 if {
 #
 # MS.AAD.3.4v1
 #--
-test_NotImplemented_Correct_V3 if {
+test_Migrated_Correct if {
     PolicyId := "MS.AAD.3.4v1"
 
-    Output := tests with input as { }
+    Output := tests with input as { 
+        "authentication_method": [
+            {
+                "PolicyMigrationState": "migrationComplete"
+            }
+        ]
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == ReportDetailsBoolean(true)
+}
+
+test_Migrated_Incorrect if {
+    PolicyId := "MS.AAD.3.4v1"
+
+    Output := tests with input as { 
+        "authentication_method": [
+            {
+                "PolicyMigrationState": "preMigration"
+            }
+        ]
+    }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == NotCheckedDetails(PolicyId)
+    RuleOutput[0].ReportDetails == ReportDetailsBoolean(false)
 }
 #--
 
