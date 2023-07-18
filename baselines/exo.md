@@ -307,12 +307,16 @@ outside of Outlook that send email messages.
 
 #### MS.EXO.5.1v1
 SMTP AUTH SHALL be disabled in Exchange Online.
-- _Rationale:_ TODO
+- _Rationale:_ In almost all cases, SMTP auth is not used or needed.
+Therefore, disabling it conforms to the principle of least
+functionality.
 - _Last modified:_ June 2023
 
 #### MS.EXO.5.2v1
 SMTP AUTH MAY be enabled on a per-mailbox basis as needed.
-- _Rationale:_ TODO
+- _Rationale:_ SMTP AUTH is required for POP3 and IMAP4 clients.
+As there are still legitimate use cases for such clients, SMTP
+AUTH MAY be enabled on a per-mailbox basis as needed.
 - _Last modified:_ June 2023
 
 ### Resources
