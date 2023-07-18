@@ -381,9 +381,9 @@ AUTH can be enabled on a per-mailbox basis as necessary.
 ### Implementation
 
 #### MS.EXO.5.1v1 instructions:
-SMTP AUTH can only be disabled tenant-wide using Exchange Online
-PowerShell. Follow the instructions listed at [Disable SMTP AUTH in your
-organization \| Microsoft
+SMTP AUTH can be disabled tenant-wide using the Exchange admin center
+or Exchange Online PowerShell. Follow the instructions listed at [Disable 
+SMTP AUTH in your organization \| Microsoft
 Learn](https://learn.microsoft.com/en-us/exchange/clients-and-mobile-in-exchange-online/authenticated-client-smtp-submission#disable-smtp-auth-in-your-organization).
 
 #### MS.EXO.5.2v1 instructions:
