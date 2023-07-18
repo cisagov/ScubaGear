@@ -440,7 +440,7 @@ To restrict sharing with all domains:
 1.  Sign in to the [Exchange admin
     center](https://admin.exchange.microsoft.com).
 
-2.  On the left hand pane under **Organization**, select **Sharing** > .
+2.  On the left hand pane under **Organization**, select **Sharing** .
 
 3.  Select **Individual Sharing**.
 
