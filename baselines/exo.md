@@ -572,7 +572,7 @@ services comparable to those offered by Microsoft.
 ### Policies
 
 #### MS.EXO.9.1v1
-Emails SHALL be filtered by the file types of included attachments. The selected filtering solution SHOULD offer services comparable to Microsoft Defenders Common Attachment Filter.
+Emails SHALL be filtered by the file types of included attachments. The selected filtering solution SHOULD offer services comparable to Microsoft Defender's Common Attachment Filter.
 
 - _Rationale:_ Malicious attachments often take the form of click-to-run files.
 Sharing of high risk file types, when necessary, is better left to a means other
