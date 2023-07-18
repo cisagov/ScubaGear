@@ -308,9 +308,9 @@ Learn](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-secur
 for Microsoft guidance.
 
 Note that a DMARC record published at the second-level domain will protect all subdomains.
-In other words, a DMARC record published for "example.com" will protect both
-"a.example.com" and "b.example.com," but a separate record would need to be
-published for "c.example.gov."
+In other words, a DMARC record published for `example.com` will protect both
+`a.example.com` and `b.example.com`, but a separate record would need to be
+published for `c.example.gov`.
 
 To test your DMARC configuration, consider using one of many publicly available
 web-based tools. Additionally, DMARC records can be requested using the
