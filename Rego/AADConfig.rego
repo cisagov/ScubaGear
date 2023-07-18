@@ -455,27 +455,6 @@ tests[{
 #
 # MS.AAD.3.8v1
 #--
-# At this time we are unable to test for X because NEW POLICY
-tests[{
-    "PolicyId": PolicyId,
-    "Criticality" : "Should/Not-Implemented",
-    "Commandlet" : [],
-    "ActualValue" : [],
-    "ReportDetails" : NotCheckedDetails(PolicyId),
-    "RequirementMet" : false
-}] {
-    PolicyId := "MS.AAD.3.8v1"
-    true
-}
-#--
-
-############
-# MS.AAD.4 #
-############
-
-#
-# MS.AAD.3.8v1
-#--
 RequireManagedDeviceMFA[Cap.DisplayName] {
     Cap := input.conditional_access_policies[_]
     CompliantDevice := "compliantDevice" in Cap.GrantControls.BuiltInControls
