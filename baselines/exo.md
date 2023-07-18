@@ -109,6 +109,8 @@ An SPF policy(s) that designates only these addresses as approved senders SHALL 
 of an email such that it appears to be a legitimate email sent by your
 agency, fasciliting phishing attacks. SPF mitigates this by providing a
 mechanism for email recipients to detect emails spoofed in this way.
+SPF is required for federal, executive branch, departments and agencies
+by BOD 18-01.
 - _Last modified:_ June 2023
 
 ### Resources
@@ -218,27 +220,40 @@ Domain-based Message Authentication, Reporting, and Conformance (DMARC)
 works with SPF and DKIM to authenticate mail senders and ensure that
 destination email systems can validate messages sent from your domain.
 DMARC helps receiving mail systems determine what to do with messages
-sent from your domain that fail SPF or DKIM checks.
+sent from your domain that fail SPF and DKIM checks.
 
 ### Policies
 #### MS.EXO.4.1v1
 A DMARC policy SHALL be published for every second-level domain.
-- _Rationale:_ TODO
+- _Rationale:_ Without a DMARC policy available for each domain, recipients
+may improperly handle SPF and DKIM failures, possibly enabling spoofed
+emails to reach end users' mailboxes. By publishing DMARC records at the 
+second-level domain, the second-level domains and all subdomains will be
+protected.
 - _Last modified:_ June 2023
 
 #### MS.EXO.4.2v1
 The DMARC message rejection option SHALL be p=reject.
-- _Rationale:_ TODO
+- _Rationale:_ Of the three policy options (none, quarantine, and reject),
+reject provides the strongest protection. This is the level of protection
+required by BOD 18-01 for federal, executive branch, departments and agencies.
 - _Last modified:_ June 2023
 
 #### MS.EXO.4.3v1
 The DMARC point of contact for aggregate reports SHALL include <reports@dmarc.cyber.dhs.gov>.
-- _Rationale:_ TODO
+- _Rationale:_ Email spoofing attempts are not inherently visible to domain
+owners. DMARC provides a mechanism to be receive reports of spoofing attempts.
+Including <reports@dmarc.cyber.dhs.gov> as a point of contact for these reports
+gives CISA insight into spoofing attempts and is required by BOD 18-01 for
+federal, executive branch, departments and agencies.
 - _Last modified:_ June 2023
 
 #### MS.EXO.4.4v1
 An agency point of contact SHOULD be included for aggregate and/or failure reports.
-- _Rationale:_ TODO
+- _Rationale:_ Email spoofing attempts are not inherently visible to domain
+owners. DMARC provides a mechanism to be receive reports of spoofing attempts.
+Including an agency point of contact gives the agency insight into attempts
+to spoof their domains.
 - _Last modified:_ June 2023
 
 ### Resources
