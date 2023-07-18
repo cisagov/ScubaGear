@@ -35,12 +35,12 @@ This section helps reduce security risks related to the sharing of files with us
 ### Policies
 #### MS.SHAREPOINT.1.1v1
 External sharing for SharePoint SHALL be limited to Existing Guests or Only People in your Organization.
-- _Rationale:_ Sharing information outside the organization increases the risk of unauthorized disclosure. By limiting external sharing, administrators decrease the risk of unauthorized disclosure.
+- _Rationale:_ Sharing information outside the organization via Sharepoint increases the risk of unauthorized access. By limiting external sharing, administrators decrease the risk of unauthorized access to information.
 - _Last modified:_ June 2023
 
 #### MS.SHAREPOINT.1.2v1
 External sharing for OneDrive SHALL be limited to Existing Guests or Only People in your Organization.
-- _Rationale:_ Sharing files outside the organization increases the risk of unauthorized disclosure. By limiting external sharing, administrators decrease the risk of unauthorized disclosure.
+- _Rationale:_ Sharing files outside the organization via OneDrive increases the risk of unauthorized access. By limiting external sharing, administrators decrease the risk of unauthorized unauthorized access to information.
 - _Last modified:_ June 2023
 
 #### MS.SHAREPOINT.1.3v1
@@ -249,7 +249,7 @@ This section provides policies for restricting the execution of custom scripts.
 å
 #### MS.SHAREPOINT.4.1v1
 Users SHALL be prevented from running custom scripts on personal sites (aka OneDrive).
-- _Rationale:_ Scripts on SharePoint sites run in the context of the user visiting the site and have access to everything that user can access. By preventing custom scripts on personal sites, administrators block a path for potentially malicious code execution.
+- _Rationale:_ Scripts in OneDrive folders run in the context of the user visiting the site and have access to everything that user can access. By preventing custom scripts on personal sites, administrators block a path for potentially malicious code execution.
 - _Last modified:_ June 2023
 
 #### MS.SHAREPOINT.4.2v1
