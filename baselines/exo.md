@@ -160,7 +160,7 @@ DKIM SHOULD be enabled for any custom domain.
 of an email such that it appears to be a legitimate email sent by your
 agency, fasciliting phishing attacks. DKIM is an additional method for
 email recipients to detect spoofed emails and additionally allows recipients
-to verify the integrity of 
+to verify the integrity of email content.
 - _Last modified:_ June 2023
 
 ### Resources
@@ -357,12 +357,16 @@ following policies.
 #### MS.EXO.6.1v1
 Contact folders SHALL NOT be shared with all domains, although they
   MAY be shared with specific domains.
-- _Rationale:_ TODO
+- _Rationale:_ Disabling indiscriminate sharing with all domains closes
+up an easily avoided avenue for data exfiltration while still allowing
+for legitimate use cases.
 - _Last modified:_ June 2023
 
 #### MS.EXO.6.2v1
 Calendar details SHALL NOT be shared with all domains, although they MAY be shared with specific domains.
-- _Rationale:_ TODO
+- _Rationale:_ Disabling indiscriminate sharing with all domains closes
+up an easily avoided avenue for data exfiltration while still allowing
+for legitimate use cases.
 - _Last modified:_ June 2023
 
 ### Resources
