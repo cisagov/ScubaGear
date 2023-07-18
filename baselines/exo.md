@@ -833,7 +833,7 @@ To check the current mailbox auditing status for your organization via PowerShel
 
 2.  Run the following command:
 
-`Get-OrganizationConfig | Format-List AuditDisabled`
+    `Get-OrganizationConfig | Format-List AuditDisabled`
 
 3. An `AuditDisabled : False` result indicates that mailbox auditing is enabled.
 
