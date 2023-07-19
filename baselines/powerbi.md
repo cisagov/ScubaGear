@@ -1,4 +1,4 @@
-# Introduction
+# CISA M365 Security Configuration Baseline for Power BI
 
 Power BI is a Software as a Service (SaaS) offering from Microsoft that
 facilitates self-service business intelligence dashboards, reports,
@@ -30,6 +30,20 @@ separate Power BI desktop baseline with tailored security requirements
 and considerations should be developed by security and end user
 operations staff.
 
+## License Compliance and Copyright
+
+Portions of this document are adapted from documents in Microsoft’s
+[Microsoft
+365](https://github.com/MicrosoftDocs/microsoft-365-docs/blob/public/LICENSE)
+and
+[Azure](https://github.com/MicrosoftDocs/azure-docs/blob/main/LICENSE)
+GitHub repositories. The respective documents are subject to copyright
+and are adapted under the terms of the Creative Commons Attribution 4.0
+International license. Source documents are linked throughout this
+document. The United States Government has adapted selections of these
+documents to develop innovative and scalable configuration standards to
+strengthen the security of widely used cloud-based software services.
+
 ## Assumptions
 
 Agencies using Power BI have a data classification scheme in place for
@@ -49,26 +63,10 @@ Agencies using Power BI have a data classification scheme in place for
   listed. Additionally, M365 G5 is required for Power BI Pro. Power BI Premium is available as an add-on to G5 and provides
   dedicated capacity-based BI, self-service data prep for big data, and
   simplification of data management and access at enterprise scale. An Azure Information Protection Premium P1 or Premium P2 license is required to apply or view Microsoft Information Protection sensitivity labels in Power BI.
-
-## Resources
-
-**<u>License Compliance and Copyright</u>**
-
-Portions of this document are adapted from documents in Microsoft’s
-[Microsoft
-365](https://github.com/MicrosoftDocs/microsoft-365-docs/blob/public/LICENSE)
-and
-[Azure](https://github.com/MicrosoftDocs/azure-docs/blob/main/LICENSE)
-GitHub repositories. The respective documents are subject to copyright
-and are adapted under the terms of the Creative Commons Attribution 4.0
-International license. Source documents are linked throughout this
-document. The United States Government has adapted selections of these
-documents to develop innovative and scalable configuration standards to
-strengthen the security of widely used cloud-based software services.
   
-# Baseline
+# Baseline Policies
 
-## 1 Publish to Web
+## 1. Publish to Web
 
 Power BI has a capability to publish reports and content to the web.
 This capability creates a publicly accessible web URL that does not
@@ -110,7 +108,7 @@ Navigate to the [PowerBI Admin Portal](https://app.high.powerbigov.us)
 2. **Export and sharing settings**
 3. **Publish to web** > **Disabled**
 
-## 2 Power BI Guest Access
+## 2. Power BI Guest Access
 
 A best practice is to disallow guest user access. Disallowing guest
 access also aligns with zero trust principles. The agency with
@@ -175,7 +173,7 @@ Navigate to the [PowerBI Admin Portal](https://app.high.powerbigov.us)
 2. **Export and sharing settings**
 3. **Allow Azure Active Directory guests users to access Power BI** > **Disabled**
 
-## 3 Power BI External Invitations
+## 3. Power BI External Invitations
 
 This setting controls whether Power BI allows inviting external users to
 the agency’s organization through Power BI’s sharing workflows and
@@ -234,7 +232,7 @@ Navigate to the [PowerBI Admin Portal](https://app.high.powerbigov.us)
 2. **Export and sharing settings**
 3. **Allow Azure Active Directory guests users to access Power BI** > **Disabled**
 
-## 4 Power BI Service Principals
+## 4. Power BI Service Principals
 
 Power BI supports the use of service principals to manage application
 identities. Service principals can use application programming
@@ -334,7 +332,7 @@ Choose a specific security group allowed to use service principles to create and
 #### MS.POWERBI.4.1v1, instructions:
 N/A
 
-## 5 Power BI ResourceKey Authentication
+## 5. Power BI ResourceKey Authentication
 
 
 This setting pertains to the security and development of Power BI
@@ -385,7 +383,7 @@ Navigate to the [PowerBI Admin Portal](https://app.high.powerbigov.us)
 2. **Developer settings**
 3. **Block ResourceKey Authentication** > **Enabled**
 
-## 6 Python and R Visual Sharing
+## 6. Python and R Visual Sharing
 
 Power BI can interact with Python and R scripts to integrate
 visualizations from these languages. Python visuals are created from
@@ -422,7 +420,7 @@ Navigate to the [PowerBI Admin Portal](https://app.high.powerbigov.us)
 2. **R and Python Visuals Settings**
 3. **Interact with and share R and Python visuals** > **Disabled**
 
-## 7 Power BI Sensitive Data
+## 7. Power BI Sensitive Data
 
 There are multiple ways to secure sensitive information, such as warning
 users, encryption, or blocking attempts to share. Use Microsoft
@@ -494,7 +492,7 @@ Navigate to the [PowerBI Admin Portal](https://app.high.powerbigov.us)
 Define who can apply and change sensitivity labels in Power BI assets.
 
 
-## 8 Power BI Audit Logs
+## 8. Power BI Audit Logs
 
 The Power BI tenant has a setting for audit log generation to monitor
 internal activity and compliance. Users within the agency can use
