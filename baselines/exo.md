@@ -611,17 +611,24 @@ Office 365 Minimum Viable Secure Configuration Baseline*.
 ### Policies
 #### MS.EXO.11.1v1
 Impersonation protection checks SHOULD be used.
-- _Rationale:_ TODO
+- _Rationale:_ Users might not be able to reliably identify phishing emails, especially
+if the `FROM` address is nearly indistinguishable from that of a known entity.
+By automatically identifying senders that appear to be impersonating known
+senders, the risk of users falling for phishing attempts can be reduced.
 - _Last modified:_ June 2023
 
 #### MS.EXO.11.2v1
 User warnings, comparable to the user safety tips included with EOP, SHOULD be displayed.
-- _Rationale:_ TODO
+- _Rationale:_ Many tasks are better suited for automated processes, such as identifying
+unusual characters in the `FROM` address or identifying a first-time sender.
+User warnings can handle these tasks, reducing the burden on end-users and the risk of
+successful phishing attempts.
 - _Last modified:_ June 2023
 
 #### MS.EXO.11.3v1
 The phishing protection solution SHOULD include an AI-based phishing detection tool comparable to EOP Mailbox Intelligence.
-- _Rationale:_ TODO
+- _Rationale:_ AI-based phishing detection tools might detect phishing attempts that
+might otherwise go unnoticed, thus reducing the risk of successful phishing attempts.
 - _Last modified:_ June 2023
 
 ### Resources
