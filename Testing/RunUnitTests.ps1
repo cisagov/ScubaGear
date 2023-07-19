@@ -38,8 +38,6 @@ param (
     [Parameter()]
     [string[]]$t = "",
     [Parameter()]
-    [switch]$h,
-    [Parameter()]
     [switch]$v
 )
 
@@ -195,9 +193,6 @@ $cEmpty = $c[0] -eq ""
 $tEmpty = $t[0] -eq ""
 $Flag = ""
 
-if ($h.IsPresent) {
-    Show-Menu
-}
 if ($v.IsPresent) {
     $Flag = "-v"
 }
