@@ -171,35 +171,35 @@ tests[{
 #--
 
 ReportDetails2_2(Policy) = Description if {
-    Policy.OneDriveSharingCapability = 0
+    Policy.SharingCapability = 0
     Description := "Requirement met: External Sharing is set to Only People In Organization"
 }
 
 ReportDetails2_2(Policy) = Description if {
-    Policy.OneDriveSharingCapability = 3
+    Policy.SharingCapability = 3
     Description := "Requirement met: External Sharing is set to Existing Guests"
 }
 
 ReportDetails2_2(Policy) = Description if {
-    Policy.OneDriveSharingCapability == 1
+    Policy.SharingCapability == 1
     Policy.RequireAnonymousLinksExpireInDays <= 30
     Description := "Requirement met"
 }
 
 ReportDetails2_2(Policy) = Description if {
-    Policy.OneDriveSharingCapability == 2
+    Policy.SharingCapability == 2
     Policy.RequireAnonymousLinksExpireInDays <= 30
     Description := "Requirement met"
 }
 
 ReportDetails2_2(Policy) = Description if {
-    Policy.OneDriveSharingCapability == 1
+    Policy.SharingCapability == 1
     Policy.RequireAnonymousLinksExpireInDays > 30
     Description := "Requirement not met: External Sharing is set to New and Existing Guests and expiration date is not 30 days or less"
 }
 
 ReportDetails2_2(Policy) = Description if {
-    Policy.OneDriveSharingCapability == 2
+    Policy.SharingCapability == 2
     Policy.RequireAnonymousLinksExpireInDays > 30
     Description := "Requirement not met: External Sharing is set to Anyone and expiration date is not 30 days or less"
 }
@@ -208,18 +208,18 @@ tests[{
     "PolicyId" : "MS.SHAREPOINT.3.1v1",
     "Criticality" : "Should",
     "Commandlet" : ["Get-SPOTenant", "Get-PnPTenant"],
-    "ActualValue" : [Policy.OneDriveSharingCapability, Policy.RequireAnonymousLinksExpireInDays],
+    "ActualValue" : [Policy.SharingCapability, Policy.RequireAnonymousLinksExpireInDays],
     "ReportDetails" : ReportDetails2_2(Policy),
     "RequirementMet" : Status
 }] {
     Policy := input.SPO_tenant[_]
-    Conditions1 := [Policy.OneDriveSharingCapability == 0]
+    Conditions1 := [Policy.SharingCapability == 0]
     Case1 := count([Condition | Condition = Conditions1[_]; Condition == false]) == 0
-    Conditions2 := [Policy.OneDriveSharingCapability == 3]
+    Conditions2 := [Policy.SharingCapability == 3]
     Case2 := count([Condition | Condition = Conditions2[_]; Condition == false]) == 0
-    Conditions3 := [Policy.OneDriveSharingCapability == 1, Policy.RequireAnonymousLinksExpireInDays <= 30]
+    Conditions3 := [Policy.SharingCapability == 1, Policy.RequireAnonymousLinksExpireInDays <= 30]
     Case3 := count([Condition | Condition = Conditions3[_]; Condition == false]) == 0
-    Conditions4 := [Policy.OneDriveSharingCapability == 2, Policy.RequireAnonymousLinksExpireInDays <= 30]
+    Conditions4 := [Policy.SharingCapability == 2, Policy.RequireAnonymousLinksExpireInDays <= 30]
     Case4 := count([Condition | Condition = Conditions4[_]; Condition == false]) == 0
     Conditions := [Case1, Case2, Case3, Case4]
     Status := count([Condition | Condition = Conditions[_]; Condition == true]) > 0
