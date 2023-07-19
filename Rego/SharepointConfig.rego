@@ -170,38 +170,47 @@ tests[{
 # MS.SHAREPOINT.3.1v1
 #--
 
-ReportDetails2_2(Policy) = Description if {
+ExternalUserExpireInDays(Policy) = [Description, Status] if {
     Policy.SharingCapability = 0
     Description := "Requirement met: External Sharing is set to Only People In Organization"
+    Status := true
 }
 
-ReportDetails2_2(Policy) = Description if {
+ExternalUserExpireInDays(Policy) = [Description, Status] if {
     Policy.SharingCapability = 3
     Description := "Requirement met: External Sharing is set to Existing Guests"
+    Status := true
+
 }
 
-ReportDetails2_2(Policy) = Description if {
+ExternalUserExpireInDays(Policy) = [Description, Status] if {
     Policy.SharingCapability == 1
     Policy.RequireAnonymousLinksExpireInDays <= 30
     Description := "Requirement met"
+    Status := true
+
 }
 
-ReportDetails2_2(Policy) = Description if {
+ExternalUserExpireInDays(Policy) = [Description, Status] if {
     Policy.SharingCapability == 2
     Policy.RequireAnonymousLinksExpireInDays <= 30
     Description := "Requirement met"
+    Status := true
+
 }
 
-ReportDetails2_2(Policy) = Description if {
+ExternalUserExpireInDays(Policy) = [Description, Status] if {
     Policy.SharingCapability == 1
     Policy.RequireAnonymousLinksExpireInDays > 30
     Description := "Requirement not met: External Sharing is set to New and Existing Guests and expiration date is not 30 days or less"
+    Status := false
 }
 
-ReportDetails2_2(Policy) = Description if {
+ExternalUserExpireInDays(Policy) = [Description, Status] if {
     Policy.SharingCapability == 2
     Policy.RequireAnonymousLinksExpireInDays > 30
     Description := "Requirement not met: External Sharing is set to Anyone and expiration date is not 30 days or less"
+    Status := false
 }
 
 tests[{
@@ -209,20 +218,11 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-SPOTenant", "Get-PnPTenant"],
     "ActualValue" : [Policy.SharingCapability, Policy.RequireAnonymousLinksExpireInDays],
-    "ReportDetails" : ReportDetails2_2(Policy),
+    "ReportDetails" : ReportDetailsString(Status, Description),
     "RequirementMet" : Status
 }] {
     Policy := input.SPO_tenant[_]
-    Conditions1 := [Policy.SharingCapability == 0]
-    Case1 := count([Condition | Condition = Conditions1[_]; Condition == false]) == 0
-    Conditions2 := [Policy.SharingCapability == 3]
-    Case2 := count([Condition | Condition = Conditions2[_]; Condition == false]) == 0
-    Conditions3 := [Policy.SharingCapability == 1, Policy.RequireAnonymousLinksExpireInDays <= 30]
-    Case3 := count([Condition | Condition = Conditions3[_]; Condition == false]) == 0
-    Conditions4 := [Policy.SharingCapability == 2, Policy.RequireAnonymousLinksExpireInDays <= 30]
-    Case4 := count([Condition | Condition = Conditions4[_]; Condition == false]) == 0
-    Conditions := [Case1, Case2, Case3, Case4]
-    Status := count([Condition | Condition = Conditions[_]; Condition == true]) > 0
+    [Description, Status]: = ExternalUserExpireInDays(Policy)
 }
 
 tests[{
