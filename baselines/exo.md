@@ -601,7 +601,7 @@ organization, to be made in accordance with their risk tolerance.
 
 Any product that meets the requirements outlined in this baseline
 policy group may be used. If the agency is using Microsoft Defender to
-implement malware scanning, see the following policies of the [Defender for Office 365 Minimum Viable Secure Configuration Baseline](https://github.com/cisagov/ScubaGear/blob/main/baselines/defender.md).
+implement malware scanning, see the following policies of the [Defender for Office 365 Minimum Viable Secure Configuration Baseline](https://github.com/cisagov/ScubaGear/blob/main/baselines/defender.md) for additional guidance.
 
 - [MS.DEFENDER.1.2v1](https://github.com/cisagov/ScubaGear/blob/main/baselines/defender.md#msdefender12v1)
   - All users SHALL be added to Exchange Online Protection in either the standard or strict preset security policy.
