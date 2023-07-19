@@ -656,17 +656,23 @@ security mechanisms.
 ### Policies
 #### MS.EXO.12.1v1
 IP allow lists SHOULD NOT be created.
-- _Rationale:_ TODO
+- _Rationale:_ Emails from allow-listed IP addresses bypass important
+security mechanisms. As such, allow lists do not conform with the zero trust
+tenet that "all communication is secured regardless of network location" ([NIST SP 800-207](https://csrc.nist.gov/pubs/sp/800/207/final)).
 - _Last modified:_ June 2023
 
 #### MS.EXO.12.2v1
 Safe lists SHOULD NOT be enabled.
-- _Rationale:_ TODO
+- _Rationale:_ Emails from allow-listed IP addresses bypass important
+security mechanisms. As such, allow lists do not conform with the zero trust
+tenet that "all communication is secured regardless of network location" ([NIST SP 800-207](https://csrc.nist.gov/pubs/sp/800/207/final)).
 - _Last modified:_ June 2023
 
 #### MS.EXO.12.3v1
 A connection filter MAY be implemented to create an IP Block list.
-- _Rationale:_ TODO
+- _Rationale:_ While blocking all malicious senders is not feasible,
+blocking specific known-bad IP addresses may reduce the threat from
+specific senders.
 - _Last modified:_ June 2023
 
 ### Resources
