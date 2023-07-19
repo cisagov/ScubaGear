@@ -7,7 +7,7 @@ on:
   pull_request_review:
       types: [submitted]  
   push:
-      paths:
+    paths:
       - ".github/workflows/run_smoke_test.yaml"
     branches:
       - "main"
