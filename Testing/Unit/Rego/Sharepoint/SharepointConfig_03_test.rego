@@ -123,7 +123,7 @@ test_ExternalUserExpireInDays_Incorrect_V2 if {
 #
 # MS.SHAREPOINT.3.2v1
 #--
-test_SharingCapability_Correct if {
+test_AnonymousLinkType_Correct if {
     PolicyId := "MS.SHAREPOINT.3.2v1"
 
     Output := tests with input as {
@@ -142,7 +142,7 @@ test_SharingCapability_Correct if {
     RuleOutput[0].ReportDetails == "Requirement met"
 }
 
-test_SharingCapability_Incorrect_V1 if {
+test_AnonymousLinkType_Incorrect_V1 if {
     PolicyId := "MS.SHAREPOINT.3.2v1"
 
     Output := tests with input as {
@@ -156,12 +156,12 @@ test_SharingCapability_Incorrect_V1 if {
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
-    count(RuleOutput) == 1
+    not count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "Requirement not met: both files and folders are not limited to view for Anyone"
 }
 
-test_SharingCapability_Incorrect_V2 if {
+test_AnonymousLinkType_Incorrect_V2 if {
     PolicyId := "MS.SHAREPOINT.3.2v1"
 
     Output := tests with input as {
@@ -180,7 +180,7 @@ test_SharingCapability_Incorrect_V2 if {
     RuleOutput[0].ReportDetails == "Requirement not met: folders are not limited to view for Anyone"
 }
 
-test_SharingCapability_Incorrect_V3 if {
+test_AnonymousLinkType_Incorrect_V3 if {
     PolicyId := "MS.SHAREPOINT.3.2v1"
 
     Output := tests with input as {
@@ -202,7 +202,7 @@ test_SharingCapability_Incorrect_V3 if {
 #
 # MS.SHAREPOINT.3.3v1
 #--
-test_SharingCapability_Correct_V3 if {
+test_SharingCapability_Correct if {
     PolicyId := "MS.SHAREPOINT.3.3v1"
 
     Output := tests with input as {

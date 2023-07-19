@@ -224,6 +224,18 @@ tests[{
     Conditions := [Case1, Case2, Case3, Case4]
     Status := count([Condition | Condition = Conditions[_]; Condition == true]) > 0
 }
+
+tests[{
+    "PolicyId" : PolicyId,
+    "Criticality" : "Should/Not-Implemented",
+    "Commandlet" : [],
+    "ActualValue" : [],
+    "ReportDetails" : NotCheckedDetails(PolicyId),
+    "RequirementMet" : false
+}] {
+    PolicyId := "MS.ONEDRIVE.2.1v1"
+    input.OneDrive_PnP_Flag
+}
 #--
 
 #
