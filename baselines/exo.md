@@ -728,7 +728,8 @@ has not been inadvertently disabled.
 ### Policies
 #### MS.EXO.13.1v1
 Mailbox auditing SHALL be enabled.
-- _Rationale:_ TODO
+- _Rationale:_ In the event of mailbox misuse or compromise, mailbox auditing
+represents a valuable tool for incident response.
 - _Last modified:_ June 2023
 
 ### Resources
