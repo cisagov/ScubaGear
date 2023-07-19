@@ -222,19 +222,7 @@ tests[{
     "RequirementMet" : Status
 }] {
     Policy := input.SPO_tenant[_]
-    [ErrMsg, Status]: = ExternalUserExpireInDays(Policy)
-}
-
-tests[{
-    "PolicyId" : PolicyId,
-    "Criticality" : "Should/Not-Implemented",
-    "Commandlet" : [],
-    "ActualValue" : [],
-    "ReportDetails" : NotCheckedDetails(PolicyId),
-    "RequirementMet" : false
-}] {
-    PolicyId := "MS.ONEDRIVE.2.1v1"
-    input.OneDrive_PnP_Flag
+    [ErrMsg, Status] := ExternalUserExpireInDays(Policy)
 }
 #--
 
