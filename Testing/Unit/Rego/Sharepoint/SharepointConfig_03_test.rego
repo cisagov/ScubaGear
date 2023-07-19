@@ -21,7 +21,7 @@ test_ExternalUserExpireInDays_Correct_V1 if {
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == ""
+    RuleOutput[0].ReportDetails == "Requirement met"
 }
 
 test_ExternalUserExpireInDays_Correct_V2 if {
@@ -40,7 +40,7 @@ test_ExternalUserExpireInDays_Correct_V2 if {
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == ""
+    RuleOutput[0].ReportDetails == "Requirement met"
 }
 
 test_ExternalUserExpireInDays_Correct_V3 if {
