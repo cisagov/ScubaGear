@@ -837,17 +837,22 @@ Minimum Viable Secure Configuration Baseline.*
 
 #### MS.EXO.15.1v1
 URL comparison with a block-list SHOULD be enabled.
-- _Rationale:_ TODO
+- _Rationale:_ While blocking all malicious URLs is not feasible,
+blocking specific known-bad URLs eliminates the threat from
+those specific URLs.
 - _Last modified:_ June 2023
 
 #### MS.EXO.15.2v1
 Direct download links SHOULD be scanned for malware.
-- _Rationale:_ TODO
+- _Rationale:_ While blocking all malicious files is not feasible,
+blocking specific known-bad files eliminates the threat from
+those specific files.
 - _Last modified:_ June 2023
 
 #### MS.EXO.15.3v1
 User click tracking SHOULD be enabled.
-- _Rationale:_ TODO
+- _Rationale:_ In the compromise, click tracking represents a valuable
+tool for incident response.
 - _Last modified:_ June 2023
 
 ### Resources
