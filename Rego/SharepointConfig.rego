@@ -218,7 +218,7 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-SPOTenant", "Get-PnPTenant"],
     "ActualValue" : [Policy.SharingCapability, Policy.RequireAnonymousLinksExpireInDays],
-    "ReportDetails" : ReportDetailsString(Status, Description),
+    "ReportDetails" : ReportDetailsString(Status, ErrMsg),
     "RequirementMet" : Status
 }] {
     Policy := input.SPO_tenant[_]
