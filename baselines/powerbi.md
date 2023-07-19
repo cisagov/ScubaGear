@@ -346,23 +346,13 @@ in a secure vault such as Azure Key Vault.
 
 5. Scroll to **Developer settings**
 
-6. Click on **Allow service principals to use Power BI APIs** set to **Enabled**
+6. Click on **Allow service principals to use Power BI APIs** set to **Enabled**.
 Choose a specific security group allowed to use service principles for the APIs.
 
-1. Navigate to the **PowerBI Admin Portal**
-
-2. Click on the 3 dots in the upper right hand corner
-
-3. Click on **Settings** > **Admin Portal**
-
-4. Click on **Tenant settings**
-
-5. Scroll to **Developer settings**
-
-6. Click on **Allow service principals to create and use profiles** set to **Enabled**
+7. Then, click on **Allow service principals to create and use profiles** set to **Enabled**.
 Choose a specific security group allowed to use service principles to create and use profiles
 
-#### MS.POWERBI.4.1v1, instructions:
+#### MS.POWERBI.4.1v2, instructions:
 N/A
 
 ## 5. Power BI ResourceKey Authentication
