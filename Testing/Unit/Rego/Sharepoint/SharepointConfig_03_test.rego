@@ -129,7 +129,7 @@ test_SharingCapability_Correct if {
     Output := tests with input as {
         "SPO_tenant": [
             {
-                "FileAnonymousLinkType" : 1
+                "FileAnonymousLinkType" : 1,
                 "FolderAnonymousLinkType" : 1
             }
         ]
@@ -148,7 +148,7 @@ test_SharingCapability_Incorrect_V1 if {
     Output := tests with input as {
         "SPO_tenant": [
             {
-                "FileAnonymousLinkType" : 2
+                "FileAnonymousLinkType" : 2,
                 "FolderAnonymousLinkType" : 2
             }
         ]
@@ -167,7 +167,7 @@ test_SharingCapability_Incorrect_V2 if {
     Output := tests with input as {
         "SPO_tenant": [
             {
-                "FileAnonymousLinkType" : 1
+                "FileAnonymousLinkType" : 1,
                 "FolderAnonymousLinkType" : 2
             }
         ]
@@ -186,7 +186,7 @@ test_SharingCapability_Incorrect_V3 if {
     Output := tests with input as {
         "SPO_tenant": [
             {
-                "FileAnonymousLinkType" : 2
+                "FileAnonymousLinkType" : 2,
                 "FolderAnonymousLinkType" : 1
             }
         ]
