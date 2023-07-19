@@ -39,7 +39,7 @@ tests[{
     "PolicyId" : "MS.SHAREPOINT.1.2v1",
     "Criticality" : "Should",
     "Commandlet" : ["Get-SPOTenant", "Get-PnPTenant"],
-    "ActualValue" : [Policy.SharingCapability],
+    "ActualValue" : [Policy.OneDriveSharingCapability],
     "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
