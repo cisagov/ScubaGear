@@ -209,7 +209,7 @@ ExternalUserExpireInDays(Policy) = [ErrMsg, Status] if {
 ExternalUserExpireInDays(Policy) = [ErrMsg, Status] if {
     Policy.SharingCapability == 2
     Policy.RequireAnonymousLinksExpireInDays > 30
-    Description := "Requirement not met: External Sharing is set to Anyone and expiration date is not 30 days or less"
+    ErrMsg := "Requirement not met: External Sharing is set to Anyone and expiration date is not 30 days or less"
     Status := false
 }
 
