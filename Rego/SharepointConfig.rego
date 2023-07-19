@@ -275,8 +275,8 @@ tests[{
     "RequirementMet" : Status
 }] {
     Policy := input.SPO_tenant[_]
-    Conditions := [Policy.FileAnonymousLinkType == 1, Policy.FolderAnonymousLinkType == 1]
-    Status := count([Condition | Condition = Conditions[_]; Condition == true]) > 0
+    Conditions := [Policy.FileAnonymousLinkType == 2, Policy.FolderAnonymousLinkType == 2]
+    Status := count([Condition | Condition = Conditions[_]; Condition == true]) == 0
 }
 
 tests[{

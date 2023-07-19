@@ -156,8 +156,8 @@ test_AnonymousLinkType_Incorrect_V1 if {
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
-    not count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "Requirement not met: both files and folders are not limited to view for Anyone"
 }
 
@@ -176,7 +176,7 @@ test_AnonymousLinkType_Incorrect_V2 if {
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
+    not RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "Requirement not met: folders are not limited to view for Anyone"
 }
 
@@ -195,7 +195,7 @@ test_AnonymousLinkType_Incorrect_V3 if {
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
+    not RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "Requirement not met: files are not limited to view for Anyone"
 }
 
