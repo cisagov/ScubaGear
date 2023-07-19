@@ -540,7 +540,7 @@ Sensitivity labels SHOULD be enabled for Power BI and employed for sensitive dat
 5. Scroll to **Information protection**
 
 6. Click on **Allow users to apply sensitivity labels for Power BI content** set to **Enabled**
-Define who can apply and change sensitivity labels in Power BI assets.
+   Define who can apply and change sensitivity labels in Power BI assets.
 
 # Acknowledgements
 
