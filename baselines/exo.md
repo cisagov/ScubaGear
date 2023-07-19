@@ -557,17 +557,24 @@ Office 365 Minimum Viable Secure Configuration Baseline*:
 
 #### MS.EXO.10.1v1
 Emails SHALL be scanned for malware.
-- _Rationale:_ TODO
+- _Rationale:_ Email can be used as a mechanism for delivering malware.
+In many cases, malware can be detected through scanning, reducing
+the risk for end users.
 - _Last modified:_ June 2023
 
 #### MS.EXO.10.2v1
 Emails identified as containing malware SHALL be quarantined or dropped.
-- _Rationale:_ TODO
+- _Rationale:_ Email can be used as a mechanism for delivering malware.
+Preventing emails with known malware from reaching user mailboxes ensures
+users cannot interact with those emails.
 - _Last modified:_ June 2023
 
 #### MS.EXO.10.3v1
 Email scanning SHOULD be capable of reviewing emails after delivery.
-- _Rationale:_ TODO
+- _Rationale:_ As known malware signatures are updated, it is possible
+for an email to be retroactively identified as containing malware after
+delivery. By scanning emails in cases like this, the number of emails
+containing malware in any given user's mailbox can be reduced.
 - _Last modified:_ June 2023
 
 ### Resources
