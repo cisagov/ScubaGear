@@ -172,13 +172,13 @@ tests[{
 
 ExternalUserExpireInDays(Policy) = [ErrMsg, Status] if {
     Policy.SharingCapability = 0
-    ErrMsg := "Requirement met: External Sharing is set to Only People In Organization"
+    ErrMsg := ""
     Status := true
 }
 
 ExternalUserExpireInDays(Policy) = [ErrMsg, Status] if {
     Policy.SharingCapability = 3
-    ErrMsg := "Requirement met: External Sharing is set to Existing Guests"
+    ErrMsg := ""
     Status := true
 }
 
