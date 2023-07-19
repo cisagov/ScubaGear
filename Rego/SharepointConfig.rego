@@ -186,7 +186,7 @@ ExternalUserExpireInDays(Policy) = [Description, Status] if {
 ExternalUserExpireInDays(Policy) = [Description, Status] if {
     Policy.SharingCapability == 1
     Policy.RequireAnonymousLinksExpireInDays <= 30
-    Description := ""
+    Description := "Requirement met"
     Status := true
 
 }
@@ -194,7 +194,7 @@ ExternalUserExpireInDays(Policy) = [Description, Status] if {
 ExternalUserExpireInDays(Policy) = [Description, Status] if {
     Policy.SharingCapability == 2
     Policy.RequireAnonymousLinksExpireInDays <= 30
-    Description := ""
+    Description := "Requirement met"
     Status := true
 
 }
