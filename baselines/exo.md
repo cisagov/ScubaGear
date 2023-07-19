@@ -107,7 +107,7 @@ server could negatively impact mail delivery.
 An SPF policy(s) that designates only these addresses as approved senders SHALL be published.
 - _Rationale:_ It is trivial for an adversary to modify the `FROM` field
 of an email such that it appears to be a legitimate email sent by your
-agency, fasciliting phishing attacks. SPF mitigates this by providing a
+agency, facilitating phishing attacks. SPF mitigates this by providing a
 mechanism for email recipients to detect emails spoofed in this way.
 SPF is required for federal, executive branch, departments and agencies
 by BOD 18-01.
@@ -158,7 +158,7 @@ custom domains.
 DKIM SHOULD be enabled for any custom domain.
 - _Rationale:_ It is trivial for an adversary to modify the `FROM` field
 of an email such that it appears to be a legitimate email sent by your
-agency, fasciliting phishing attacks. DKIM is an additional method for
+agency, facilitating phishing attacks. DKIM is an additional method for
 email recipients to detect spoofed emails and additionally allows recipients
 to verify the integrity of email content.
 - _Last modified:_ June 2023
@@ -532,7 +532,7 @@ can help detect instances where the file extension has been changed.
 Disallowed file types SHALL be determined and set. At a minimum, click-to-run files SHOULD be blocked (e.g., .exe, .cmd, and .vbe).
 - _Rationale:_ Malicious attachments often take the form of click-to-run files,
 though other file types can contain malicious content as well. As such, the
-determination of the full list of file types to block is left to each indiviual
+determination of the full list of file types to block is left to each individual
 organization, to be made according to their own risk tolerance posture.
 - _Last modified:_ June 2023
 
@@ -929,7 +929,7 @@ Configuration Baseline*.
 Unified audit logging SHALL be enabled.
 - _Rationale:_ In the event of compromise, Microsoft Purview Audit (Standard)
 represents a valuable tool for incident response. Furthermore, it is required
-for government agencies by OMB M-21-31 (refered to therein by its former name,
+for government agencies by OMB M-21-31 (referred to therein by its former name,
 Unified Audit Log). 
 - _Last modified:_ June 2023
 
@@ -937,7 +937,7 @@ Unified Audit Log).
 Advanced audit SHALL be enabled.
 - _Rationale:_ Microsoft Purview Audit (Premium) logs additional event types that
 are not included with Standard. Furthermore, it is required for government 
-agencies by OMB M-21-13 (refered to therein as by its former name, Advanced Audit).
+agencies by OMB M-21-13 (referred to therein as by its former name, Advanced Audit).
 - _Last modified:_ June 2023
 
 #### MS.EXO.17.3v1
