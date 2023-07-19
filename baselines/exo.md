@@ -3,12 +3,11 @@
 Microsoft Exchange Online provides users easy access to their email and
 supports organizational meetings, contacts, and calendars.
 
-Many admin controls for Exchange Online are found in the [Exchange admin
-center](https://admin.exchange.microsoft.com/). However, several of the
+Many admin controls for Exchange Online are found in the **Exchange admin center**.
+However, several of the
 security features for Exchange Online are shared between Microsoft
-products and are configured in either the [Microsoft 365
-Defender](https://security.microsoft.com/) or the [Microsoft 365
-compliance](https://compliance.microsoft.com) admin centers. Generally
+products and are configured in either the **Microsoft 365 Defender portal**
+or **Microsoft 365 Purview compliance portal** admin centers. Generally
 speaking, the use of Microsoft Defender is not strictly required for
 this baseline. When noted, alternative products may be used in lieu of
 Defender, on the condition that they fulfill these required baseline
@@ -70,8 +69,7 @@ internal forwarding.
 #### MS.EXO.1.1v1 instructions:
 To disallow automatic forwarding to external domains:
 
-1.  Sign in to the [Exchange admin
-    center](https://admin.exchange.microsoft.com/).
+1.  Sign in to the **Exchange admin center**.
 
 2.  Select **Mail flow,** then **Remote domains**.
 
@@ -209,25 +207,26 @@ To enable DKIM, follow the instructions listed on [Steps to Create,
 enable and disable DKIM from Microsoft 365 Defender portal \| Microsoft
 Learn](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/email-authentication-dkim-configure?view=o365-worldwide#steps-to-create-enable-and-disable-dkim-from-microsoft-365-defender-portal).
 
-1.  Navigate to the [Microsoft 365
-    Defender](http://security.microsoft.com) admin center.
+1.  Navigate to the [Microsoft 365 Defender portal](https://learn.microsoft.com/en-us/microsoft-365/security/defender/usgov?view=o365-worldwide#portal-urls).
 
-2.  On the left hand side go to **Policies & Rules** > **Threat Policies**.
+2.  On the left hand side go to **Email & collaboration** > **Policies & Rules**.
 
-3.  Under **Rules**, select **Email Authentication Settings**
+3. From the list of policies, select *Threat Policies**.
 
-4.  Select **DKIM**.
+4. Under **Rules**, select **Email Authentication Settings**.
 
-5.  Select your domain.
+5. Select **DKIM**.
 
-6.  Switch **Sign messages for this domain with DKIM signatures** to
+6.  Select your domain.
+
+7.  Switch **Sign messages for this domain with DKIM signatures** to
     **Enabled**.
 
-7.  If you are enabling DKIM for the first time, a pop-up window listing
+8.  If you are enabling DKIM for the first time, a pop-up window listing
     Canonical Name (CNAME) records displays. Publish these records to
     your DNS service provider.
 
-8.  Return to the DKIM page on the Defender admin center to finish
+9.  Return to the DKIM page on the Defender admin center to finish
     enabling DKIM.
 
 
@@ -382,7 +381,7 @@ AUTH can be enabled on a per-mailbox basis as necessary.
 
 #### MS.EXO.5.1v1 instructions:
 SMTP AUTH can be disabled tenant-wide using the Exchange admin center
-or Exchange Online PowerShell. Follow the instructions listed at [Disable 
+or Exchange Online PowerShell. Follow the instructions listed at [Disable
 SMTP AUTH in your organization \| Microsoft
 Learn](https://learn.microsoft.com/en-us/exchange/clients-and-mobile-in-exchange-online/authenticated-client-smtp-submission#disable-smtp-auth-in-your-organization).
 
@@ -396,8 +395,8 @@ Learn](https://learn.microsoft.com/en-us/exchange/clients-and-mobile-in-exchange
 
 Exchange Online allows the creation of sharing polices that soften
 default restrictions on contact and calendar details sharing. These
-policies should only be enabled with caution and must comply with the
-following policies.
+policies should only be enabled with caution and after considering
+the following policies.
 
 ### Policies
 
@@ -434,11 +433,10 @@ for legitimate uses as needed.
 
 ### Implementation
 
-#### MS.EXO.6.1v1 - MS.EXO.6.2v1 instructions:
+#### MS.EXO.6.1v1 instructions:
 To restrict sharing with all domains:
 
-1.  Sign in to the [Exchange admin
-    center](https://admin.exchange.microsoft.com).
+1.  Sign in to the **Exchange admin center**.
 
 2.  On the left hand pane under **Organization**, select **Sharing** .
 
@@ -447,6 +445,11 @@ To restrict sharing with all domains:
 4. For all existing policies, Select the policy, then select **Manage domains**
 
 5. For all sharing rules under all existing policies, ensure **Sharing with all domains** is not selected.
+
+#### MS.EXO.6.2v1 instructions:
+
+1. Refer to step 5 in [MS.EXO.6.1v1 instructions](#msexo61v1-instructions) to implement
+this policy.
 
 ## 7. External Sender Warnings
 
@@ -487,8 +490,7 @@ have expected to be sent from an internal sender.
 #### MS.EXO.7.1v1 instructions:
 To enable external sender warnings:
 
-1.  Sign in to the [Exchange admin
-    center](https://admin.exchange.microsoft.com).
+1.  Sign in to the **Exchange admin center**
 
 2.  Under **Mail flow**, select **Rules**.
 
@@ -519,19 +521,16 @@ To enable external sender warnings:
 
 Data loss prevention (DLP) helps prevent both accidental leakage of
 sensitive information as well as intentional exfiltration of data. DLP
-forms an integral part of securing Microsoft Exchange Online. There a
+forms an integral part of securing Microsoft Exchange Online. There are
 several commercial DLP solutions available that document support for
 M365. Agencies may select any service that fits their needs and meets
 the requirements outlined in this baseline setting.
 
-Microsoft offers DLP services, controlled within the [Microsoft 365
-compliance](https://compliance.microsoft.com) admin center. Though use
-of Microsoft’s DLP solution is not strictly required, guidance for
-configuring Microsoft’s DLP solution can be found in the “Data Loss
-Prevention SHALL Be Enabled” section of the *Defender for Office 365
-Minimum Viable Secure Configuration Baseline*. The DLP solution selected
-by an agency should offer services comparable to those offered by
-Microsoft.
+Microsoft offers DLP services, controlled within the Microsoft Purview
+compliance portal. Though use of Microsoft’s DLP solution is not strictly
+required, guidance for configuring Microsoft’s DLP solution can be found in the
+`Data Loss Prevention` section of the *Defender for Office 365 Minimum Viable Secure Configuration Baseline*. The DLP solution selected by an agency should offer services comparable
+to those offered by Microsoft.
 
 ### Policies
 
@@ -549,8 +548,7 @@ The DLP solution SHALL protect PII and sensitive information, as defined by the 
 
 ### Resources
 
-- The “Data Loss Prevention SHALL Be Enabled” section of the *Defender
-  for Office 365 Minimum Viable Secure Configuration Baseline*.
+- The `Data Loss Prevention` section of the *Defender for Office 365 Minimum Viable Secure Configuration Baseline*.
 
 ## 9. Attachment File Type
 
@@ -564,10 +562,7 @@ baseline setting may be used.
 
 Though use of Microsoft Defender’s solution is not strictly required for
 this purpose, guidance for configuring the Common Attachment Filter in
-Microsoft Defender can be found in the “Common Attachments Filter SHALL
-Be Enabled” section of the Defender for Office 365 Minimum Viable Secure
-Configuration Baseline. The solution selected by an agency should offer
-services comparable to those offered by Microsoft.
+Microsoft Defender can be found in the `Preset Security Policies` section of the *Defender for Office 365 Minimum Viable Secure Configuration Baseline*. The solution selected by an agency should offer services comparable to those offered by Microsoft.
 
 ### Policies
 
@@ -600,9 +595,7 @@ organization, to be made in accordance with their risk tolerance.
 
 ### Resources
 
-- The “Common Attachments Filter SHALL Be Enabled” section of the
-  *Defender for Office 365 Minimum Viable Secure Configuration
-  Baseline*.
+- The `Preset Security Policies` section of the *Defender for Office 365 Minimum Viable Secure Configuration Baseline*.
 
 ## 10. Malware
 
@@ -763,30 +756,41 @@ specific senders.
 
 ### Implementation
 
-#### MS.EXO.12.1v1 - MS.EXO.12.3v1 instructions:
+#### MS.EXO.12.1v1 instructions:
 To modify the connection filters, follow the instructions found on [Use
 the Microsoft 365 Defender portal to modify the default connection
 filter
 policy](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/connection-filter-policies-configure?view=o365-worldwide#use-the-microsoft-365-defender-portal-to-modify-the-default-connection-filter-policy).
 
-1.  Sign in to [Microsoft 365
-    Defender](https://security.microsoft.com/threatpolicy)**.**
+1.  Sign in to [Microsoft 365 Defender portal](https://learn.microsoft.com/en-us/microsoft-365/security/defender/usgov?view=o365-worldwide#portal-urls).
 
-2.  Under **Email & collaboration**, select **Threat Policies**.
+2.  From the left-hand menu, find **Email & collaboration** and select **Policies and Rules**
 
-3.  Under **Policies**, select **Anti-spam.**
+3.  Select **Threat Policies** from the list of policy names.
 
-4.  Select **Connection filter policy (Default).**
+4.  Under **Policies**, select **Anti-spam.**
 
-5.  Click **Edit connection filter policy.**
+5.  Select **Connection filter policy (Default).**
 
-6.  Ensure no addresses are specified under **Always allow messages from
+6.  Click **Edit connection filter policy.**
+
+7.  Ensure no addresses are specified under **Always allow messages from
     the following IP addresses or address range**.
 
-7.  Enter addresses under **Always block messages from the following IP
+8.  Enter addresses under **Always block messages from the following IP
     addresses or address range** as needed.
 
-8.  Ensure **Turn on safe list** is not selected.
+9.  Ensure **Turn on safe list** is not selected.
+
+#### MS.EXO.12.2v1 instructions:
+
+1. Refer to step 7 in [MS.EXO.12.1v1 instructions](#msexo121v1-instructions) to implement
+this policy.
+
+#### MS.EXO.12.3v1 instructions:
+1. Divert from step 4 in [MS.EXO.12.1v1 instructions](#msexo121v1-instructions) to implement
+this policy.
+
 
 ## 13. Mailbox Auditing
 
@@ -835,7 +839,7 @@ To check the current mailbox auditing status for your organization via PowerShel
 
     `Get-OrganizationConfig | Format-List AuditDisabled`
 
-3. An `AuditDisabled : False` result indicates that mailbox auditing is enabled.
+3.  An `AuditDisabled : False` result indicates that mailbox auditing is enabled.
 
 To enable mailbox auditing by default for your organization via PowerShell:
 
@@ -843,7 +847,7 @@ To enable mailbox auditing by default for your organization via PowerShell:
 
 2.  Run the following command:
 
-`Set-OrganizationConfig –AuditDisabled $false`
+    `Set-OrganizationConfig –AuditDisabled $false`
 
 ## 14. Inbound Anti-Spam Protections
 
