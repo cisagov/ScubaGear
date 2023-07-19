@@ -21,7 +21,7 @@ test_ExternalUserExpireInDays_Correct_V1 if {
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement met"
+    RuleOutput[0].ReportDetails == "Requirement met: External Sharing is set to Only People In Organization"
 }
 
 test_ExternalUserExpireInDays_Correct_V2 if {
@@ -40,7 +40,7 @@ test_ExternalUserExpireInDays_Correct_V2 if {
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement met"
+    RuleOutput[0].ReportDetails == "Requirement met: External Sharing is set to Existing Guests"
 }
 
 test_ExternalUserExpireInDays_Correct_V3 if {
