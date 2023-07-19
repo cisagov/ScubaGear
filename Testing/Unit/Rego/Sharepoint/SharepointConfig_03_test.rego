@@ -5,7 +5,7 @@ import future.keywords
 #
 # MS.SHAREPOINT.3.1v1
 #--
-test_SharingCapability_Correct_V1 if {
+test_ExternalSharingCapability_Correct_V1 if {
     PolicyId := "MS.SHAREPOINT.3.1v1"
 
     Output := tests with input as {
@@ -24,7 +24,7 @@ test_SharingCapability_Correct_V1 if {
     RuleOutput[0].ReportDetails == "Requirement met: External Sharing is set to Only People In Organization"
 }
 
-test_SharingCapability_Correct_V2 if {
+test_ExternalSharingCapability_Correct_V2 if {
     PolicyId := "MS.SHAREPOINT.3.1v1"
 
     Output := tests with input as {
