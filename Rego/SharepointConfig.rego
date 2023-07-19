@@ -35,12 +35,44 @@ tests[{
 # MS.SHAREPOINT.1.2v1
 #--
 
+tests[{
+    "PolicyId" : "MS.SHAREPOINT.1.2v1",
+    "Criticality" : "Should",
+    "Commandlet" : ["Get-SPOTenant", "Get-PnPTenant"],
+    "ActualValue" : [Policy.SharingCapability],
+    "ReportDetails" : ReportDetailsBoolean(Status),
+    "RequirementMet" : Status
+}] {
+    Policy := input.SPO_tenant[_]
+    input.OneDrive_PnP_Flag == false
+    Conditions := [Policy.OneDriveSharingCapability == 0, Policy.OneDriveSharingCapability == 3]
+    Status := count([Condition | Condition = Conditions[_]; Condition == true]) == 1
+}
+#--
+
+tests[{
+    "PolicyId" : PolicyId,
+    "Criticality" : "Should/Not-Implemented",
+    "Commandlet" : [],
+    "ActualValue" : [],
+    "ReportDetails" : NotCheckedDetails(PolicyId),
+    "RequirementMet" : false
+}] {
+    PolicyId := "MS.SHAREPOINT.1.2v1"
+    input.OneDrive_PnP_Flag
+}
+#--
+
+#
+# MS.SHAREPOINT.1.3v1
+#--
+
 # SharingDomainRestrictionMode == 0 Unchecked
 # SharingDomainRestrictionMode == 1 Checked
 # SharingAllowedDomainList == "domains" Domain list
 
 tests[{
-    "PolicyId" : "MS.SHAREPOINT.1.2v1",
+    "PolicyId" : "MS.SHAREPOINT.1.3v1",
     "Criticality" : "Should",
     "Commandlet" : ["Get-SPOTenant", "Get-PnPTenant"],
     "ActualValue" : [Policy.SharingDomainRestrictionMode],
@@ -53,10 +85,11 @@ tests[{
 #--
 
 #
-# MS.SHAREPOINT.1.3v1
+# MS.SHAREPOINT.1.4v1
 #--
 # At this time we are unable to test for approved security groups
 # because we have yet to find the setting to check
+
 tests[{
     "PolicyId" : PolicyId,
     "Criticality" : "Should/Not-Implemented",
@@ -65,16 +98,17 @@ tests[{
     "ReportDetails" : NotCheckedDetails(PolicyId),
     "RequirementMet" : false
 }] {
-    PolicyId := "MS.SHAREPOINT.1.3v1"
+    PolicyId := "MS.SHAREPOINT.1.4v1"
     true
 }
 #--
 
 #
-# MS.SHAREPOINT.1.4v1
+# MS.SHAREPOINT.1.5v1
 #--
+
 tests[{
-    "PolicyId" : "MS.SHAREPOINT.1.4v1",
+    "PolicyId" : "MS.SHAREPOINT.1.5v1",
     "Criticality" : "Should",
     "Commandlet" : ["Get-SPOTenant", "Get-PnPTenant"],
     "ActualValue" : [Policy.RequireAcceptingAccountMatchInvitedAccount],
@@ -110,6 +144,24 @@ tests[{
 }
 #--
 
+#
+# MS.SHAREPOINT.2.2v1
+# SPO_tenant - DefaultLinkPermission
+# 1 view 2 edit
+#--
+
+tests[{
+    "PolicyId" : "MS.SHAREPOINT.2.2v1",
+    "Criticality" : "Shall",
+    "Commandlet" : ["Get-SPOTenant", "Get-PnPTenant"],
+    "ActualValue" : [Policy.DefaultLinkPermission],
+    "ReportDetails" : ReportDetailsBoolean(Status),
+    "RequirementMet" : Status
+}] {
+    Policy := input.SPO_tenant[_]
+    Status := Policy.DefaultLinkPermission == 1
+}
+
 ###################
 # MS.SHAREPOINT.3 #
 ###################
@@ -117,8 +169,62 @@ tests[{
 #
 # MS.SHAREPOINT.3.1v1
 #--
-# At this time we are unable to test for sharing settings of specific SharePoint sites
-# because we have yet to find the setting to check
+
+ReportDetails2_2(Policy) = Description if {
+    Policy.OneDriveSharingCapability = 0
+    Description := "Requirement met: External Sharing is set to Only People In Organization"
+}
+
+ReportDetails2_2(Policy) = Description if {
+    Policy.OneDriveSharingCapability = 3
+    Description := "Requirement met: External Sharing is set to Existing Guests"
+}
+
+ReportDetails2_2(Policy) = Description if {
+    Policy.OneDriveSharingCapability == 1
+    Policy.RequireAnonymousLinksExpireInDays <= 30
+    Description := "Requirement met"
+}
+
+ReportDetails2_2(Policy) = Description if {
+    Policy.OneDriveSharingCapability == 2
+    Policy.RequireAnonymousLinksExpireInDays <= 30
+    Description := "Requirement met"
+}
+
+ReportDetails2_2(Policy) = Description if {
+    Policy.OneDriveSharingCapability == 1
+    Policy.RequireAnonymousLinksExpireInDays > 30
+    Description := "Requirement not met: External Sharing is set to New and Existing Guests and expiration date is not 30 days or less"
+}
+
+ReportDetails2_2(Policy) = Description if {
+    Policy.OneDriveSharingCapability == 2
+    Policy.RequireAnonymousLinksExpireInDays > 30
+    Description := "Requirement not met: External Sharing is set to Anyone and expiration date is not 30 days or less"
+}
+
+tests[{
+    "PolicyId" : "MS.SHAREPOINT.3.1v1",
+    "Criticality" : "Should",
+    "Commandlet" : ["Get-SPOTenant", "Get-PnPTenant"],
+    "ActualValue" : [Policy.OneDriveSharingCapability, Policy.RequireAnonymousLinksExpireInDays],
+    "ReportDetails" : ReportDetails2_2(Policy),
+    "RequirementMet" : Status
+}] {
+    Policy := input.SPO_tenant[_]
+    Conditions1 := [Policy.OneDriveSharingCapability == 0]
+    Case1 := count([Condition | Condition = Conditions1[_]; Condition == false]) == 0
+    Conditions2 := [Policy.OneDriveSharingCapability == 3]
+    Case2 := count([Condition | Condition = Conditions2[_]; Condition == false]) == 0
+    Conditions3 := [Policy.OneDriveSharingCapability == 1, Policy.RequireAnonymousLinksExpireInDays <= 30]
+    Case3 := count([Condition | Condition = Conditions3[_]; Condition == false]) == 0
+    Conditions4 := [Policy.OneDriveSharingCapability == 2, Policy.RequireAnonymousLinksExpireInDays <= 30]
+    Case4 := count([Condition | Condition = Conditions4[_]; Condition == false]) == 0
+    Conditions := [Case1, Case2, Case3, Case4]
+    Status := count([Condition | Condition = Conditions[_]; Condition == true]) > 0
+}
+
 tests[{
     "PolicyId" : PolicyId,
     "Criticality" : "Should/Not-Implemented",
@@ -127,71 +233,69 @@ tests[{
     "ReportDetails" : NotCheckedDetails(PolicyId),
     "RequirementMet" : false
 }] {
-    PolicyId := "MS.SHAREPOINT.3.1v1"
-    true
+    PolicyId := "MS.ONEDRIVE.2.1v1"
+    input.OneDrive_PnP_Flag
 }
 #--
-
-###################
-# MS.SHAREPOINT.4 #
-###################
 
 #
-# MS.SHAREPOINT.4.1v1
+# MS.SHAREPOINT-ONEDRIVE.3.2v1
 #--
-ExpirationTimersGuestAccess(Policy) = [ErrMsg, Status] if {
-    Policy.SharingCapability == 0
-    ErrMsg := ""
-    Status := true
+
+ReportDetails2_3(Policy) = Description if {
+    Policy.FileAnonymousLinkType == 1
+    Policy.FolderAnonymousLinkType == 1
+	Description := "Requirement met"
 }
 
-ExpirationTimersGuestAccess(Policy) = [ErrMsg, Status] if {
-    Policy.SharingCapability != 0
-    Policy.ExternalUserExpirationRequired == true
-    Policy.ExternalUserExpireInDays <= 30
-    ErrMsg := ""
-    Status := true
+ReportDetails2_3(Policy) = Description if {
+    Policy.FileAnonymousLinkType == 2
+    Policy.FolderAnonymousLinkType == 2
+	Description := "Requirement not met: both files and folders are not limited to view for Anyone"
 }
 
-ExpirationTimersGuestAccess(Policy) = [ErrMsg, Status] if {
-    Policy.SharingCapability != 0
-    Policy.ExternalUserExpirationRequired == false
-    Policy.ExternalUserExpireInDays <= 30
-    ErrMsg := "Requirement not met: Expiration timer for 'Guest access to a site or OneDrive' NOT enabled"
-    Status := false
+ReportDetails2_3(Policy) = Description if {
+    Policy.FileAnonymousLinkType == 1
+    Policy.FolderAnonymousLinkType == 2
+	Description := "Requirement not met: folders are not limited to view for Anyone"
 }
 
-ExpirationTimersGuestAccess(Policy) = [ErrMsg, Status] if {
-    Policy.SharingCapability != 0
-    Policy.ExternalUserExpirationRequired == true
-    Policy.ExternalUserExpireInDays > 30
-    ErrMsg := "Requirement not met: Expiration timer for 'Guest access to a site or OneDrive' NOT set to 30 days or less"
-    Status := false
+ReportDetails2_3(Policy) = Description if {
+    Policy.FileAnonymousLinkType == 2
+    Policy.FolderAnonymousLinkType == 1
+	Description := "Requirement not met: files are not limited to view for Anyone"
 }
 
-ExpirationTimersGuestAccess(Policy) = [ErrMsg, Status] if {
-    Policy.SharingCapability != 0
-    Policy.ExternalUserExpirationRequired == false
-    Policy.ExternalUserExpireInDays > 30
-    ErrMsg := "Requirement not met: Expiration timer for 'Guest access to a site or OneDrive' NOT enabled and set to greater 30 days"
-    Status := false
-}
 tests[{
-    "PolicyId" : "MS.SHAREPOINT.4.1v1",
+    "PolicyId" : "MS.SHAREPOINT.3.2v1",
     "Criticality" : "Should",
     "Commandlet" : ["Get-SPOTenant", "Get-PnPTenant"],
-    "ActualValue" : [Policy.SharingCapability, Policy.ExternalUserExpirationRequired, Policy.ExternalUserExpireInDays],
-    "ReportDetails" : ReportDetailsString(Status, ErrMsg),
+    "ActualValue" : [Policy.FileAnonymousLinkType, Policy.FolderAnonymousLinkType],
+    "ReportDetails" : ReportDetails2_3(Policy),
     "RequirementMet" : Status
 }] {
     Policy := input.SPO_tenant[_]
-    [ErrMsg, Status] := ExpirationTimersGuestAccess(Policy)
+    Conditions := [Policy.FileAnonymousLinkType == 1, Policy.FolderAnonymousLinkType == 1]
+    Status := count([Condition | Condition = Conditions[_]; Condition == true]) > 0
+}
+
+tests[{
+    "PolicyId" : PolicyId,
+    "Criticality" : "Should/Not-Implemented",
+    "Commandlet" : [],
+    "ActualValue" : [],
+    "ReportDetails" : NotCheckedDetails(PolicyId),
+    "RequirementMet" : false
+}] {
+    PolicyId := "MS.ONEDRIVE.3.2v1"
+    input.OneDrive_PnP_Flag
 }
 #--
 
 #
-# MS.SHAREPOINT.4.2v1
+# MS.SHAREPOINT.3.3v1
 #--
+
 ExpirationTimersVerificationCode(Policy) = [ErrMsg, Status] if {
     Policy.SharingCapability == 0
     ErrMsg := ""
@@ -230,7 +334,7 @@ ExpirationTimersVerificationCode(Policy) = [ErrMsg, Status] if {
     Status := false
 }
 tests[{
-    "PolicyId" : "MS.SHAREPOINT.4.2v1",
+    "PolicyId" : "MS.SHAREPOINT.3.3v1",
     "Criticality" : "Should",
     "Commandlet" : ["Get-SPOTenant", "Get-PnPTenant"],
     "ActualValue" : [Policy.SharingCapability, Policy.EmailAttestationRequired, Policy.EmailAttestationReAuthDays],
@@ -240,14 +344,13 @@ tests[{
     Policy := input.SPO_tenant[_]
     [ErrMsg, Status] := ExpirationTimersVerificationCode(Policy)
 }
-#--
 
 ###################
-# MS.SHAREPOINT.5 #
+# MS.SHAREPOINT.4 #
 ###################
 
 #
-# MS.SHAREPOINT.5.1v1
+# MS.SHAREPOINT.4.1v1
 #--
 # At this time we are unable to test for running custom scripts on personal sites
 # because we have yet to find the setting to check
@@ -259,20 +362,20 @@ tests[{
     "ReportDetails" : NotCheckedDetails(PolicyId),
     "RequirementMet" : false
 }] {
-    PolicyId := "MS.SHAREPOINT.5.1v1"
+    PolicyId := "MS.SHAREPOINT.4.1v1"
     true
 }
 #--
 
 #
-# MS.SHAREPOINT.5.2v1
+# MS.SHAREPOINT.4.2v1
 #--
 
 # 1 == Allow users to run custom script on self-service created sites
 # 2 == Prevent users from running custom script on self-service created sites
 
 tests[{
-    "PolicyId" : "MS.SHAREPOINT.5.2v1",
+    "PolicyId" : "MS.SHAREPOINT.4.2v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-SPOSite", "Get-PnPTenantSite"],
     "ActualValue" : [Policy.DenyAddAndCustomizePages],

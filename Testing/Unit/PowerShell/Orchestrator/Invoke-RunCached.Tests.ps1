@@ -49,12 +49,6 @@ InModuleScope Orchestrator {
                 }
                 {Invoke-RunCached @SplatParams} | Should -Not -Throw
             }
-            It 'Given -ProductNames onedrive should not throw' {
-                $SplatParams += @{
-                    ProductNames = @("onedrive")
-                }
-                {Invoke-RunCached @SplatParams} | Should -Not -Throw
-            }
             It 'Given -ProductNames powerplatform should not throw' {
                 $SplatParams += @{
                     ProductNames = @("powerplatform")
@@ -97,12 +91,6 @@ InModuleScope Orchestrator {
             It 'Given -ProductNames exo should not throw' {
                 $SplatParams += @{
                     ProductNames = @("exo")
-                }
-                {Invoke-RunCached @SplatParams} | Should -Not -Throw
-            }
-            It 'Given -ProductNames onedrive should not throw' {
-                $SplatParams += @{
-                    ProductNames = @("onedrive")
                 }
                 {Invoke-RunCached @SplatParams} | Should -Not -Throw
             }

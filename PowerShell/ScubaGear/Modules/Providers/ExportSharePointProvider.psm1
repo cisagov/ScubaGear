@@ -1,7 +1,7 @@
 function Export-SharePointProvider {
     <#
     .Description
-    Gets the SharePoint settings that are relevant
+    Gets the SharePoint/OneDrive settings that are relevant
     to the SCuBA SharePoint baselines using the SharePoint PowerShell Module
     .Functionality
     Internal

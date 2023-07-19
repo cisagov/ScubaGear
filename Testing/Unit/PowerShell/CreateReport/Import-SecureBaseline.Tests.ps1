@@ -7,7 +7,6 @@ InModuleScope CreateReport {
         @{Product = "aad"; MarkdownFilePath = "baselines/aad.md"}
         @{Product = "defender"; MarkdownFilePath = "baselines/defender.md"}
         @{Product = "exo"; MarkdownFilePath = "baselines/exo.md"}
-        @{Product = "onedrive"; MarkdownFilePath = "baselines/onedrive.md"}
         @{Product = "powerbi"; MarkdownFilePath = "baselines/powerbi.md"}
         @{Product = "powerplatform"; MarkdownFilePath = "baselines/powerplatform.md"}
         @{Product = "sharepoint"; MarkdownFilePath = "baselines/sharepoint.md"}
@@ -36,10 +35,9 @@ InModuleScope CreateReport {
             @{Product = "aad"; GroupCount = 8; PolicyCount = 30}
             @{Product = "defender"; GroupCount = 6; PolicyCount = 22}
             @{Product = "exo"; GroupCount = 17; PolicyCount = 39}
-            @{Product = "onedrive"; GroupCount = 3; PolicyCount = 4}
             @{Product = "powerbi"; GroupCount = 10; PolicyCount = 12}
             @{Product = "powerplatform"; GroupCount = 4; PolicyCount = 8}
-            @{Product = "sharepoint"; GroupCount = 5; PolicyCount = 10}
+            @{Product = "sharepoint"; GroupCount = 4; PolicyCount = 12}
             @{Product = "teams"; GroupCount = 13; PolicyCount = 28}
         ){
             {$Baselines.$Product} | Should -Not -Throw

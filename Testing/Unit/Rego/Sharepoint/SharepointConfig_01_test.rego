@@ -82,8 +82,84 @@ test_SharingCapability_Incorrect_V2 if {
 #
 # MS.SHAREPOINT.1.2v1
 #--
-test_SharingDomainRestrictionMode_Correct if {
+test_OneDriveSharingCapability_Correct_V1 if {
     PolicyId := "MS.SHAREPOINT.1.2v1"
+
+    Output := tests with input as {
+        "SPO_tenant": [
+            {
+                "OneDriveSharingCapability" : 0
+            }
+        ]
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "Requirement met"
+}
+
+test_OneDriveSharingCapability_Correct_V2 if {
+    PolicyId := "MS.SHAREPOINT.1.2v1"
+
+    Output := tests with input as {
+        "SPO_tenant": [
+            {
+                "OneDriveSharingCapability" : 3
+            }
+        ]
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "Requirement met"
+}
+
+test_OneDriveSharingCapability_Incorrect_V1 if {
+    PolicyId := "MS.SHAREPOINT.1.2v1"
+
+    Output := tests with input as {
+        "SPO_tenant": [
+            {
+                "OneDriveSharingCapability" : 1
+            }
+        ]
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "Requirement not met"
+}
+
+test_OneDriveSharingCapability_Incorrect_V2 if {
+    PolicyId := "MS.SHAREPOINT.1.2v1"
+
+    Output := tests with input as {
+        "SPO_tenant": [
+            {
+                "OneDriveSharingCapability" : 2
+            }
+        ]
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "Requirement not met"
+}
+#--
+
+#
+# MS.SHAREPOINT.1.3v1
+#--
+test_SharingDomainRestrictionMode_Correct if {
+    PolicyId := "MS.SHAREPOINT.1.3v1"
 
     Output := tests with input as {
         "SPO_tenant": [
@@ -101,7 +177,7 @@ test_SharingDomainRestrictionMode_Correct if {
 }
 
 test_SharingDomainRestrictionMode_Incorrect if {
-    PolicyId := "MS.SHAREPOINT.1.2v1"
+    PolicyId := "MS.SHAREPOINT.1.3v1"
 
     Output := tests with input as {
         "SPO_tenant": [
@@ -120,10 +196,10 @@ test_SharingDomainRestrictionMode_Incorrect if {
 #--
 
 #
-# MS.SHAREPOINT.1.3v1
+# MS.SHAREPOINT.1.4v1
 #--
 test_NotImplemented_Correct if {
-    PolicyId := "MS.SHAREPOINT.1.3v1"
+    PolicyId := "MS.SHAREPOINT.1.4v1"
 
     Output := tests with input as { }
 
@@ -136,10 +212,10 @@ test_NotImplemented_Correct if {
 #--
 
 #
-# MS.SHAREPOINT.1.4v1
+# MS.SHAREPOINT.1.5v1
 #--
 test_RequireAcceptingAccountMatchInvitedAccount_Correct if {
-    PolicyId := "MS.SHAREPOINT.1.4v1"
+    PolicyId := "MS.SHAREPOINT.1.5v1"
 
     Output := tests with input as {
         "SPO_tenant": [
@@ -157,7 +233,7 @@ test_RequireAcceptingAccountMatchInvitedAccount_Correct if {
 }
 
 test_RequireAcceptingAccountMatchInvitedAccount_Incorrect if {
-    PolicyId := "MS.SHAREPOINT.1.4v1"
+    PolicyId := "MS.SHAREPOINT.1.5v1"
 
     Output := tests with input as {
         "SPO_tenant": [
