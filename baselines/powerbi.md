@@ -102,7 +102,7 @@ The Publish to Web feature SHOULD be disabled unless the agency mission requires
 
 ### Implementation 
 #### MS.POWERBI.1.1v1, instructions:
-Navigate to the [PowerBI Admin Portal](https://app.high.powerbigov.us)
+Navigate to the **PowerBI Admin Portal**
 
 1. **Tenant Settings**
 2. **Export and sharing settings**
@@ -167,7 +167,7 @@ Guest user access to the Power BI tenant SHOULD be disabled unless the agency mi
 
 ### Implementation
 #### MS.POWERBI.2.1v1, instructions:
-Navigate to the [PowerBI Admin Portal](https://app.high.powerbigov.us)
+Navigate to the **PowerBI Admin Portal**
 
 1. **Tenant Settings**
 2. **Export and sharing settings**
@@ -226,7 +226,7 @@ The **Invite external users to your organization** feature SHOULD be disabled un
 
 ### Implementation
 #### MS.POWERBI.3.1v1, instructions:
-Navigate to the [PowerBI Admin Portal](https://app.high.powerbigov.us)
+Navigate to the **PowerBI Admin Portal**
 
 1. **Tenant Settings**
 2. **Export and sharing settings**
@@ -317,7 +317,7 @@ in a secure vault such as Azure Key Vault.
 
 ### Implementation
 #### MS.POWERBI.4.1v1, instructions:
-Navigate to the [PowerBI Admin Portal](https://app.high.powerbigov.us)
+Navigate to the **PowerBI Admin Portal**
 
 1. **Tenant settings**
 2. **Developer settings**
@@ -377,7 +377,7 @@ ResourceKey Authentication SHOULD be blocked unless a specific use case (e.g., s
 
 ### Implementation
 #### MS.POWERBI.5.1v1, instructions:
-Navigate to the [PowerBI Admin Portal](https://app.high.powerbigov.us)
+Navigate to the **PowerBI Admin Portal**
 
 1. **Tenant settings**
 2. **Developer settings**
@@ -414,7 +414,7 @@ R and Python interactions SHOULD be disabled.
 
 ### Implementation
 #### MS.POWERBI.6.1v1, instructions:
-Navigate to the [PowerBI Admin Portal](https://app.high.powerbigov.us)
+Navigate to the **PowerBI Admin Portal**
 
 1. **Tenant settings**
 2. **R and Python Visuals Settings**
@@ -484,60 +484,12 @@ Sensitivity labels SHOULD be enabled for Power BI and employed for sensitive dat
 
 ### Implementation 
 #### MS.POWERBI.7.1v1, instructions:
-Navigate to the [PowerBI Admin Portal](https://app.high.powerbigov.us)
+Navigate to the **PowerBI Admin Portal**
 
 1. **Tenant settings**
 2. **Information protection**
 3. **Allow users to apply sensitivity labels for Power BI content** > **Enabled**
 Define who can apply and change sensitivity labels in Power BI assets.
-
-
-## 8. Power BI Audit Logs
-
-The Power BI tenant has a setting for audit log generation to monitor
-internal activity and compliance. Users within the agency can use
-auditing to monitor actions taken in Power BI by other users in the
-agency. Power BI audit logs are always available for tenants that have
-enabled recording user and admin activity in the Office 365 Admin
-Portal, in which case this setting appears enabled but greyed out in the
-tenant settings.
-
-
-### Policies
-#### MS.POWERBI.8.1v1
-Power BI audit log generation SHALL be enabled in the Power BI tenant.
-
-- _Rationale:_ Without logging it is possible for a unwanted or malicious event to happen without any way of tracking it down. Audit logs will keep a record of what is happening making incident response simpler. 
-- _Last modified:_ June 2023
-
-### Resources
-
-- [Power BI Tenant settings \| Microsoft
-  Docs](https://docs.microsoft.com/en-us/power-bi/guidance/admin-tenant-settings)
-
-- [National Cybersecurity Protection System-Cloud Interface Reference
-  Architecture Volume
-  1](https://www.cisa.gov/sites/default/files/publications/NCPS%20Cloud%20Interface%20RA%20Volume%20One%20%282021-05-14%29.pdf)
-
-- [National Cybersecurity Protection System - Cloud Interface Reference
-  Architecture Volume
-  2](https://www.cisa.gov/sites/default/files/publications/NCPS%20Cloud%20Interface%20RA%20Volume%20Two%202021-06-11%20%28508%20COMPLIANT%29.pdf)
-
-- [Power BI Security Baseline v2.0 \| Microsoft benchmarks GitHub
-  repo](https://github.com/MicrosoftDocs/SecurityBenchmarks/blob/master/Azure%20Offer%20Security%20Baselines/2.0/power-bi-security-baseline-v2.0.xlsx)
-
-### License Requirements
-
-- N/A
-
-
-### Implementation 
-#### MS.POWERBI.8.1v1, instructions:
-Navigate to the [PowerBI Admin Portal](https://app.high.powerbigov.us)
-
-1. **Tenant settings**
-2. **Audit and Usage Settings**
-3. **Create audit logs for internal activity auditing and compliance** > **Enabled**
 
 # Acknowledgements
 
