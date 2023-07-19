@@ -43,8 +43,8 @@ tests[{
     "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
-    Policy := input.SPO_tenant[_]
     input.OneDrive_PnP_Flag == false
+    Policy := input.SPO_tenant[_]
     Conditions := [Policy.OneDriveSharingCapability == 0, Policy.OneDriveSharingCapability == 3]
     Status := count([Condition | Condition = Conditions[_]; Condition == true]) == 1
 }
