@@ -81,9 +81,8 @@ Get-Help -Name Invoke-SCuBA -Full
   - Azure Active Directory: **aad**
   - Defender for Office 365: **defender**
   - Exchange Online: **exo**
-  - OneDrive: **onedrive**
   - Power Platform: **powerplatform**
-  - SharePoint Online: **sharepoint**
+  - SharePoint Online and OneDrive for Business: **sharepoint**
   - Teams: **teams**
 
 - **$M365Environment** parameter is used to authenticate to the various M365 commercial/ government environments. Valid values include `commercial`, `gcc`, `gcchigh`, or `dod`.     Default value is `commercial`.
@@ -119,7 +118,6 @@ The minimum user roles needed for each product are described in the table below.
 | Defender for Office 365 |  Global Reader (or Exchange Administrator)                                                             |
 | Power Platform          |  Power Platform Administrator and a "Power Apps for Office 365" license             |
 | Sharepoint Online       |  SharePoint Administrator                                                           |
-| OneDrive                |  SharePoint Administrator                                                           |
 
 - **Note**: Users with the Global Administrator role always have the necessary user permissions to run the tool.
 
@@ -198,7 +196,7 @@ Unless otherwise noted, this project is distributed under the Creative Commons Z
 ### Executing against multiple tenants
 ScubaGear creates connections to several M365 services. If running against multiple tenants, it is necessary to disconnect those sessions. 
 
-`Invoke-SCuBA` includes the `-DisconnectOnExit` parameter to disconnect each of connection upon exit.  To disconnect sessions after a run, use `Disconnect-SCuBATenant`.  The cmdlet disconnects from Azure Active Directory (via MS Graph API), Defender, Exchange Online, OneDrive, Power Platform, SharePoint Online, and Microsoft Teams.
+`Invoke-SCuBA` includes the `-DisconnectOnExit` parameter to disconnect each of connection upon exit.  To disconnect sessions after a run, use `Disconnect-SCuBATenant`.  The cmdlet disconnects from Azure Active Directory (via MS Graph API), Defender, Exchange Online, Power Platform, SharePoint Online, and Microsoft Teams.
 
 ```PowerShell
 Disconnect-SCuBATenant
