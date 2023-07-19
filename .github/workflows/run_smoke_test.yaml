@@ -26,6 +26,16 @@ jobs:
     steps:
     - name: Checkout repo code
       uses: actions/checkout@v3
+
+    - name: Remove Graph 2.0
+      shell: powershell
+      run: |
+        # Remove Microsoft.Graph module(s) from image until SCUBA steps up to 2.0+
+        Write-Output "NOTICE: Removing Microsoft.Graph version 2.0.  Remove this step when SCuBA steps up to this version."
+        Uninstall-Module Microsoft.Graph -ErrorAction SilentlyContinue
+        Get-InstalledModule Microsoft.Graph.* | %{ if($_.Name -ne "Microsoft.Graph.Authentication"){ Write-Output "Removing: $($_.Name)"; Uninstall-Module $_.Name -AllowPrerelease -AllVersions } }
+        Uninstall-Module Microsoft.Graph.Authentication -AllowPrerelease -AllVersions
+  
     - name: Execute ScubaGear and Check Outputs
       run: |
         . Testing/Functional/SmokeTest/SmokeTestUtils.ps1
