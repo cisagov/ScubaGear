@@ -890,12 +890,16 @@ At a minimum, the following alerts SHALL be enabled:
   - Malware campaign detected after delivery.
 
   - A potentially malicious URL click was detected.
-- _Rationale:_ TODO
+- _Rationale:_ While all alerts contain some value, some may be more
+or less valuable to a given organization. The above list of alerts is
+intended as baseline set of alerts that should be applicable to most
+organizations. 
 - _Last modified:_ June 2023
 
 #### MS.EXO.16.2v1
 The alerts SHOULD be sent to a monitored address or incorporated into a SIEM.
-- _Rationale:_ TODO
+- _Rationale:_ Alerts can contain time-sensitive actionable information. However,
+they are only of value if they are monitored.
 - _Last modified:_ June 2023
 
 ### Resources
