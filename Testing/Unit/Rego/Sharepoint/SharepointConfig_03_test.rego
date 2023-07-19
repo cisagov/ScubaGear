@@ -12,7 +12,7 @@ test_ExternalUserExpireInDays_Correct_V1 if {
         "SPO_tenant": [
             {
                 "SharingCapability" : 0,
-                "ExternalUserExpireInDays": 30
+                "RequireAnonymousLinksExpireInDays": 30
             }
         ]
     }
@@ -21,7 +21,7 @@ test_ExternalUserExpireInDays_Correct_V1 if {
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement met"
+    RuleOutput[0].ReportDetails == "Requirement met: External Sharing is set to Only People In Organization"
 }
 
 test_ExternalUserExpireInDays_Correct_V2 if {
@@ -31,7 +31,7 @@ test_ExternalUserExpireInDays_Correct_V2 if {
         "SPO_tenant": [
             {
                 "SharingCapability" : 3,
-                "ExternalUserExpireInDays": 30
+                "RequireAnonymousLinksExpireInDays": 30
             }
         ]
     }
@@ -40,7 +40,7 @@ test_ExternalUserExpireInDays_Correct_V2 if {
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement met"
+    RuleOutput[0].ReportDetails == "Requirement met: External Sharing is set to Existing Guests"
 }
 
 test_ExternalUserExpireInDays_Correct_V3 if {
@@ -50,7 +50,7 @@ test_ExternalUserExpireInDays_Correct_V3 if {
         "SPO_tenant": [
             {
                 "SharingCapability" : 1,
-                "ExternalUserExpireInDays": 29
+                "RequireAnonymousLinksExpireInDays": 29
             }
         ]
     }
@@ -69,7 +69,7 @@ test_ExternalUserExpireInDays_Correct_V4 if {
         "SPO_tenant": [
             {
                 "SharingCapability" : 2,
-                "ExternalUserExpireInDays": 29
+                "RequireAnonymousLinksExpireInDays": 29
             }
         ]
     }
@@ -81,14 +81,14 @@ test_ExternalUserExpireInDays_Correct_V4 if {
     RuleOutput[0].ReportDetails == "Requirement met"
 }
 
-test_ExternalUserExpireInDays_Incorrect_V1 if {
+test_ExternalUserExpireInDays_Incorrect if {
     PolicyId := "MS.SHAREPOINT.3.1v1"
 
     Output := tests with input as {
         "SPO_tenant": [
             {
                 "SharingCapability" : 1,
-                "ExternalUserExpireInDays": 31
+                "RequireAnonymousLinksExpireInDays": 31
             }
         ]
     }
@@ -107,7 +107,7 @@ test_ExternalUserExpireInDays_Incorrect_V2 if {
         "SPO_tenant": [
             {
                 "SharingCapability" : 2,
-                "ExternalUserExpireInDays": 31
+                "RequireAnonymousLinksExpireInDays": 31
             }
         ]
     }

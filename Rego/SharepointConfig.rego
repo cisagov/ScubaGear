@@ -172,15 +172,14 @@ tests[{
 
 ExternalUserExpireInDays(Policy) = [ErrMsg, Status] if {
     Policy.SharingCapability = 0
-    ErrMsg := ""
+    ErrMsg := "Requirement met: External Sharing is set to Only People In Organization"
     Status := true
 }
 
 ExternalUserExpireInDays(Policy) = [ErrMsg, Status] if {
     Policy.SharingCapability = 3
-    ErrMsg := ""
+    ErrMsg := "Requirement met: External Sharing is set to Existing Guests"
     Status := true
-
 }
 
 ExternalUserExpireInDays(Policy) = [ErrMsg, Status] if {
@@ -188,7 +187,6 @@ ExternalUserExpireInDays(Policy) = [ErrMsg, Status] if {
     Policy.RequireAnonymousLinksExpireInDays <= 30
     ErrMsg := ""
     Status := true
-
 }
 
 ExternalUserExpireInDays(Policy) = [ErrMsg, Status] if {
@@ -196,7 +194,6 @@ ExternalUserExpireInDays(Policy) = [ErrMsg, Status] if {
     Policy.RequireAnonymousLinksExpireInDays <= 30
     ErrMsg := ""
     Status := true
-
 }
 
 ExternalUserExpireInDays(Policy) = [ErrMsg, Status] if {
