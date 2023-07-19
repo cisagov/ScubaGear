@@ -479,13 +479,13 @@ Microsoft.
 ### Policies
 #### MS.EXO.8.1v1
 A DLP solution SHALL be used. The selected DLP solution SHOULD offer services comparable to the native DLP solution offered by Microsoft.
-- _Rationale:_ Email can be used as a mechanism of exfiltrating data.
-DLP makes data exfiltration through email more difficult.
+- _Rationale:_ Users may inadvertently share sensitive information with others who should not have access to it. Microsoft's DLP solution mitigates this risk but requires additional licensing beyond E3/G3. As such, alternative DLP
+solutions that offer comparable services may be used.
 - _Last modified:_ June 2023
 
 #### MS.EXO.8.2v1
 The DLP solution SHALL protect PII and sensitive information, as defined by the agency. At a minimum, the sharing of credit card numbers, Taxpayer Identification Numbers (TIN), and Social Security Numbers (SSN) via email SHALL be restricted.
-- _Rationale:_ TODO
+- _Rationale:_ Users may inadvertently share sensitive information with others who should not have access to it. Data loss prevention policies provide a way for agencies to detect and prevent unauthorized disclosures.
 - _Last modified:_ June 2023
 
 ### Resources
@@ -513,17 +513,27 @@ services comparable to those offered by Microsoft.
 ### Policies
 #### MS.EXO.9.1v1
 Emails SHALL be filtered by the file types of included attachments. The selected filtering solution SHOULD offer services comparable to Microsoft Defenders Common Attachment Filter.
-- _Rationale:_ TODO
+- _Rationale:_ Malicious attachments often take the form of click-to-run files.
+Legitimate sharing of these kind of files is better situated for some channel
+other than email; the dangers of allowing them to be sent over email outweigh
+any potential benefits. Microsoft's Common Attachment Filter requires additional
+licensing beyond E3/G3. As such, alternative solutions that offer comparable
+services may be used.
 - _Last modified:_ June 2023
 
 #### MS.EXO.9.2v1
 The attachment filter SHOULD attempt to determine the true file type and assess the file extension.
-- _Rationale:_ TODO
+- _Rationale:_ Changing the extension at the end of a file name is trivial (e.g.,
+renaming notepad.exe to notepad.txt). Performing checks beyond the file extension
+can help detect instances where the file extension has been changed.
 - _Last modified:_ June 2023
 
 #### MS.EXO.9.3v1
 Disallowed file types SHALL be determined and set. At a minimum, click-to-run files SHOULD be blocked (e.g., .exe, .cmd, and .vbe).
-- _Rationale:_ TODO
+- _Rationale:_ Malicious attachments often take the form of click-to-run files,
+though other file types can contain malicious content as well. As such, the
+determination of the full list of file types to block is left to each indiviual
+organization, to be made according to their own risk tolerance posture.
 - _Last modified:_ June 2023
 
 ### Resources
