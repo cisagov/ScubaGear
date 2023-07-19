@@ -200,9 +200,7 @@ test_AdditionalProperties_Correct_V1 if {
                 "DisplayName" : "Global Administrator",
                 "Assignments" : [
                     {
-                        "ActivatedUsing" : {
-                            "EndDateTime" : 10
-                        },
+                        "EndDateTime" : "/Date(1691006065170)/",
                         "PrincipalId" : "ae71e61c-f465-4db6-8d26-5f3e52bdd800"
                     }
                 ]
@@ -234,9 +232,7 @@ test_AdditionalProperties_Correct_V2 if {
                 "DisplayName" : "Global Administrator",
                 "Assignments" : [
                     {
-                        "ActivatedUsing" : {
-                            "EndDateTime" : null
-                        },
+                        "EndDateTime" : null,
                         "PrincipalId" : "ae71e61c-f465-4db6-8d26-5f3e52bdd800"
                     }
                 ]
@@ -278,9 +274,7 @@ test_AdditionalProperties_Correct_V3 if {
                 "DisplayName" : "Global Administrator",
                 "Assignments" : [
                     {
-                        "ActivatedUsing" : {
-                            "EndDateTime" : null
-                        },
+                        "EndDateTime" : null,
                         "PrincipalId" : "ae71e61c-f465-4db6-8d26-5f3e52bdd800"
                     }
                 ]
@@ -322,9 +316,7 @@ test_AdditionalProperties_Correct_V4 if {
                 "DisplayName" : "Global Administrator",
                 "Assignments" : [
                     {
-                        "ActivatedUsing" : {
-                            "EndDateTime" : null
-                        },
+                        "EndDateTime" : null,
                         "PrincipalId" : "ae71e61c-f465-4db6-8d26-5f3e52bdd800"
                     }
                 ]
@@ -333,9 +325,7 @@ test_AdditionalProperties_Correct_V4 if {
                 "DisplayName" : "Application Administrator",
                 "Assignments" : [
                     {
-                        "ActivatedUsing" : {
-                            "EndDateTime" : 10
-                        },
+                        "EndDateTime" : "/Date(1691006065170)/",
                         "PrincipalId" : "e54ac846-1f5a-4afe-aa69-273b42c3b0c1"
                     }
                 ]
@@ -369,9 +359,7 @@ test_AdditionalProperties_Incorrect_V1 if {
                 "DisplayName" : "Global Administrator",
                 "Assignments" : [
                     {
-                        "ActivatedUsing" :  {
-                            "EndDateTime" :  null
-                        },
+                        "EndDateTime" :  null,
                         "PrincipalId" : "ae71e61c-f465-4db6-8d26-5f3e52bdd800"
                     }
                 ]
@@ -403,9 +391,7 @@ test_AdditionalProperties_Incorrect_V2 if {
                 "DisplayName" : "Global Administrator",
                 "Assignments" : [
                     {
-                        "ActivatedUsing" : {
-                            "EndDateTime" : null
-                        },
+                        "EndDateTime" : null,
                         "PrincipalId" : "ae71e61c-f465-4db6-8d26-5f3e52bdd800"
                     }
                 ]
@@ -414,9 +400,7 @@ test_AdditionalProperties_Incorrect_V2 if {
                 "DisplayName" : "Application Administrator",
                 "Assignments" : [
                     {
-                        "ActivatedUsing" : {
-                            "EndDateTime" : 10
-                        },
+                        "EndDateTime" : "/Date(1691006065170)/",
                         "PrincipalId" : "e54ac846-1f5a-4afe-aa69-273b42c3b0c1"
                     }
                 ]
@@ -448,9 +432,7 @@ test_AdditionalProperties_Incorrect_V3 if {
                 "DisplayName" : "Global Administrator",
                 "Assignments" : [
                     {
-                        "ActivatedUsing" : {
-                            "EndDateTime" : null
-                        },
+                        "EndDateTime" : null,
                         "PrincipalId" : "ae71e61c-f465-4db6-8d26-5f3e52bdd800"
                     }
                 ]
@@ -459,9 +441,7 @@ test_AdditionalProperties_Incorrect_V3 if {
                 "DisplayName" : "Application Administrator",
                 "Assignments" : [
                     {
-                        "ActivatedUsing" : {
-                            "EndDateTime" : null
-                        },
+                        "EndDateTime" : null,
                         "PrincipalId" : "e54ac846-1f5a-4afe-aa69-273b42c3b0c1"
                     }
                 ]
@@ -493,15 +473,11 @@ test_AdditionalProperties_Incorrect_V4 if {
                 "DisplayName" : "Global Administrator",
                 "Assignments" : [
                     {
-                        "ActivatedUsing" : {
-                            "EndDateTime" : null
-                        },
+                        "EndDateTime" : null,
                         "PrincipalId" : "ae71e61c-f465-4db6-8d26-5f3e52bdd800"
                     },
                     {
-                        "ActivatedUsing" : {
-                            "EndDateTime" : null
-                        },
+                        "EndDateTime" : null,
                         "PrincipalId" : "38035edd-63a1-4c08-8bd2-ad78d0624057"
                     }
                 ]
@@ -510,9 +486,7 @@ test_AdditionalProperties_Incorrect_V4 if {
                 "DisplayName" : "Application Administrator",
                 "Assignments" : [
                     {
-                        "ActivatedUsing" : {
-                            "EndDateTime" : null
-                        },
+                        "EndDateTime" : null,
                         "PrincipalId" : "e54ac846-1f5a-4afe-aa69-273b42c3b0c1"
                     }
                 ]
@@ -544,9 +518,7 @@ test_AdditionalProperties_Incorrect_V5 if {
                 "DisplayName" : "Global Administrator",
                 "Assignments" : [
                     {
-                        "ActivatedUsing" :  {
-                            "EndDateTime" :  null
-                        },
+                        "EndDateTime" :  null,
                         "PrincipalId" : "ae71e61c-f465-4db6-8d26-5f3e52bdd800"
                     }
                 ]
@@ -588,9 +560,7 @@ test_AdditionalProperties_Incorrect_V6 if {
                 "DisplayName" : "Global Administrator",
                 "Assignments" : [
                     {
-                        "ActivatedUsing" : {
-                            "EndDateTime" : null
-                        },
+                        "EndDateTime" : null,
                         "PrincipalId" : "ae71e61c-f465-4db6-8d26-5f3e52bdd800"
                     }
                 ]
@@ -599,9 +569,7 @@ test_AdditionalProperties_Incorrect_V6 if {
                 "DisplayName" : "Application Administrator",
                 "Assignments" : [
                     {
-                        "ActivatedUsing" : {
-                            "EndDateTime" : 10
-                        },
+                        "EndDateTime" : "/Date(1691006065170)/",
                         "PrincipalId" : "e54ac846-1f5a-4afe-aa69-273b42c3b0c1"
                     }
                 ]
@@ -643,9 +611,7 @@ test_AdditionalProperties_Incorrect_V7 if {
                 "DisplayName" : "Global Administrator",
                 "Assignments" : [
                     {
-                        "ActivatedUsing" : {
-                            "EndDateTime" : null
-                        },
+                        "EndDateTime" : null,
                         "PrincipalId" : "ae71e61c-f465-4db6-8d26-5f3e52bdd800"
                     }
                 ]
@@ -654,9 +620,7 @@ test_AdditionalProperties_Incorrect_V7 if {
                 "DisplayName" : "Application Administrator",
                 "Assignments" : [
                     {
-                        "ActivatedUsing" : {
-                            "EndDateTime" : null
-                        },
+                        "EndDateTime" : null,
                         "PrincipalId" : "e54ac846-1f5a-4afe-aa69-273b42c3b0c1"
                     }
                 ]
@@ -698,15 +662,11 @@ test_AdditionalProperties_Incorrect_V8 if {
                 "DisplayName" : "Global Administrator",
                 "Assignments" : [
                     {
-                        "ActivatedUsing" : {
-                            "EndDateTime" : null
-                        },
+                        "EndDateTime" : null,
                         "PrincipalId" : "ae71e61c-f465-4db6-8d26-5f3e52bdd800"
                     },
                     {
-                        "ActivatedUsing" : {
-                            "EndDateTime" : null
-                        },
+                        "EndDateTime" : null,
                         "PrincipalId" : "38035edd-63a1-4c08-8bd2-ad78d0624057"
                     }
                 ]
@@ -715,9 +675,7 @@ test_AdditionalProperties_Incorrect_V8 if {
                 "DisplayName" : "Application Administrator",
                 "Assignments" : [
                     {
-                        "ActivatedUsing" : {
-                            "EndDateTime" : null
-                        },
+                        "EndDateTime" : null,
                         "PrincipalId" : "e54ac846-1f5a-4afe-aa69-273b42c3b0c1"
                     }
                 ]
@@ -759,9 +717,7 @@ test_AdditionalProperties_Incorrect_V9 if {
                 "DisplayName" : "Global Administrator",
                 "Assignments" : [
                     {
-                        "ActivatedUsing" : {
-                            "EndDateTime" : null
-                        },
+                        "EndDateTime" : null,
                         "PrincipalId" : "ae71e61c-f465-4db6-8d26-5f3e52bdd800"
                     }
                 ]
@@ -770,9 +726,7 @@ test_AdditionalProperties_Incorrect_V9 if {
                 "DisplayName" : "Application Administrator",
                 "Assignments" : [
                     {
-                        "ActivatedUsing" : {
-                            "EndDateTime" : 10
-                        },
+                        "EndDateTime" : "/Date(1691006065170)/",
                         "PrincipalId" : "e54ac846-1f5a-4afe-aa69-273b42c3b0c1"
                     }
                 ]
@@ -813,9 +767,7 @@ test_AdditionalProperties_Incorrect_V10 if {
                 "DisplayName" : "Global Administrator",
                 "Assignments" : [
                     {
-                        "ActivatedUsing" :  {
-                            "EndDateTime" :  null
-                        },
+                        "EndDateTime" :  null,
                         "PrincipalId" : "ae71e61c-f465-4db6-8d26-5f3e52bdd800"
                     }
                 ]
@@ -857,9 +809,7 @@ test_AdditionalProperties_Incorrect_V11 if {
                 "DisplayName" : "Global Administrator",
                 "Assignments" : [
                     {
-                        "ActivatedUsing" : {
-                            "EndDateTime" : null
-                        },
+                        "EndDateTime" : null,
                         "PrincipalId" : "ae71e61c-f465-4db6-8d26-5f3e52bdd800"
                     }
                 ]
@@ -868,9 +818,7 @@ test_AdditionalProperties_Incorrect_V11 if {
                 "DisplayName" : "Application Administrator",
                 "Assignments" : [
                     {
-                        "ActivatedUsing" : {
-                            "EndDateTime" : 10
-                        },
+                        "EndDateTime" : "/Date(1691006065170)/",
                         "PrincipalId" : "e54ac846-1f5a-4afe-aa69-273b42c3b0c1"
                     }
                 ]
@@ -912,9 +860,7 @@ test_AdditionalProperties_Incorrect_V12 if {
                 "DisplayName" : "Global Administrator",
                 "Assignments" : [
                     {
-                        "ActivatedUsing" : {
-                            "EndDateTime" : null
-                        },
+                        "EndDateTime" : null,
                         "PrincipalId" : "ae71e61c-f465-4db6-8d26-5f3e52bdd800"
                     }
                 ]
@@ -923,9 +869,7 @@ test_AdditionalProperties_Incorrect_V12 if {
                 "DisplayName" : "Application Administrator",
                 "Assignments" : [
                     {
-                        "ActivatedUsing" : {
-                            "EndDateTime" : null
-                        },
+                        "EndDateTime" : null,
                         "PrincipalId" : "e54ac846-1f5a-4afe-aa69-273b42c3b0c1"
                     }
                 ]
@@ -967,15 +911,11 @@ test_AdditionalProperties_Incorrect_V13 if {
                 "DisplayName" : "Global Administrator",
                 "Assignments" : [
                     {
-                        "ActivatedUsing" : {
-                            "EndDateTime" : null
-                        },
+                        "EndDateTime" : null,
                         "PrincipalId" : "ae71e61c-f465-4db6-8d26-5f3e52bdd800"
                     },
                     {
-                        "ActivatedUsing" : {
-                            "EndDateTime" : null
-                        },
+                        "EndDateTime" : null,
                         "PrincipalId" : "38035edd-63a1-4c08-8bd2-ad78d0624057"
                     }
                 ]
@@ -984,9 +924,7 @@ test_AdditionalProperties_Incorrect_V13 if {
                 "DisplayName" : "Application Administrator",
                 "Assignments" : [
                     {
-                        "ActivatedUsing" : {
-                            "EndDateTime" : null
-                        },
+                        "EndDateTime" : null,
                         "PrincipalId" : "e54ac846-1f5a-4afe-aa69-273b42c3b0c1"
                     }
                 ]
@@ -1028,9 +966,7 @@ test_AdditionalProperties_Incorrect_V14 if {
                 "DisplayName" : "Global Administrator",
                 "Assignments" : [
                     {
-                        "ActivatedUsing" : {
-                            "EndDateTime" : null
-                        },
+                        "EndDateTime" : null,
                         "PrincipalId" : "ae71e61c-f465-4db6-8d26-5f3e52bdd800"
                     }
                 ]
@@ -1039,9 +975,7 @@ test_AdditionalProperties_Incorrect_V14 if {
                 "DisplayName" : "Application Administrator",
                 "Assignments" : [
                     {
-                        "ActivatedUsing" : {
-                            "EndDateTime" : 10
-                        },
+                        "EndDateTime" : "/Date(1691006065170)/",
                         "PrincipalId" : "e54ac846-1f5a-4afe-aa69-273b42c3b0c1"
                     }
                 ]

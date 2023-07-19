@@ -737,7 +737,7 @@ tests[{
 #--
 default PrivilegedRoleExclusions(_, _) := false
 PrivilegedRoleExclusions(PrivilegedRole, PolicyID) := true if {
-    PrivilegedRoleAssignedPrincipals := { x.PrincipalId | some x in PrivilegedRole.Assignments; x.ActivatedUsing.EndDateTime == null }
+    PrivilegedRoleAssignedPrincipals := { x.PrincipalId | some x in PrivilegedRole.Assignments; x.EndDateTime == null }
 
     AllowedPrivilegedRoleUsers := { y | some y in input.scuba_config.Aad[PolicyID].RoleExclusions.Users; y != null }
     AllowedPrivilegedRoleGroups := { y | some y in input.scuba_config.Aad[PolicyID].RoleExclusions.Groups; y != null }
@@ -748,7 +748,7 @@ PrivilegedRoleExclusions(PrivilegedRole, PolicyID) := true if {
 }
 
 PrivilegedRoleExclusions(PrivilegedRole, PolicyID) := true if {
-    count({ x.PrincipalId | some x in PrivilegedRole.Assignments; x.ActivatedUsing.EndDateTime == null }) > 0
+    count({ x.PrincipalId | some x in PrivilegedRole.Assignments; x.EndDateTime == null }) > 0
     count({ y | some y in input.scuba_config.Aad[PolicyID].RoleExclusions.Users; y != null }) == 0
     count({ y | some y in input.scuba_config.Aad[PolicyID].RoleExclusions.Groups; y != null }) == 0
 }
