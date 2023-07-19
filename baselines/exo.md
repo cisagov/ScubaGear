@@ -780,19 +780,25 @@ Minimum Viable Secure Configuration Baseline* for additional guidance.
 
 ### Policies
 #### MS.EXO.14.1v1
-A spam filter SHALL be enabled. The filtering solution selected SHOULD offer services comparable to the native spam filtering offered by
-  Microsoft.
-- _Rationale:_ TODO
+A spam filter SHALL be enabled. The filtering solution selected SHOULD offer services comparable to the native spam filtering offered by Microsoft.
+- _Rationale:_ Spam is a constant threat, many instances of which can be caught by a reliable spam filter.
+While Microsoft's anti-spam solution does not require any additional licensing beyond E3/G3, alternative
+third-party tools that offer comparable protection may be used at the agency's discretion.
 - _Last modified:_ June 2023
 
 #### MS.EXO.14.2v1
 Spam and high confidence spam SHALL be moved to either the junk email folder or the quarantine folder.
-- _Rationale:_ TODO
+- _Rationale:_ Spam is a constant threat, many instances of which can be caught by a reliable spam filter.
+Such spam should not be allowed to reach the primary inboxes of end users.
 - _Last modified:_ June 2023
 
 #### MS.EXO.14.3v1
 Allowed senders MAY be added, but allowed domains SHALL NOT be added.
-- _Rationale:_ TODO
+- _Rationale:_ There may be instances of legitimate emails being filtered
+by spam filters. Adding allowed senders is an acceptable method of combating
+these false positives. However, allow-listing an entire domain, especially
+a common domain like office.com, allows a large quantity of
+potentially unknown users to bypass spam protections.
 - _Last modified:_ June 2023
 
 ### Resources
