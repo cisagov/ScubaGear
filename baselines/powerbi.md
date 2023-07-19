@@ -107,7 +107,7 @@ The Publish to Web feature SHOULD be disabled unless the agency mission requires
 
 2. Click on the 3 dots in the upper right hand corner
 
-3. Click on Settings > Admin Portal
+3. Click on **Settings** > **Admin Portal**
 
 4. Click on **Tenant Settings**
 
@@ -178,7 +178,7 @@ Guest user access to the Power BI tenant SHOULD be disabled unless the agency mi
 
 2. Click on the 3 dots in the upper right hand corner
 
-3. Click on Settings > Admin Portal
+3. Click on **Settings** > **Admin Portal**
 
 4. Click on **Tenant Settings**
 
@@ -243,7 +243,7 @@ The **Invite external users to your organization** feature SHOULD be disabled un
 
 2. Click on the 3 dots in the upper right hand corner
 
-3. Click on Settings > Admin Portal
+3. Click on **Settings** > **Admin Portal**
 
 4. Click on **Tenant Settings**
 
@@ -340,7 +340,7 @@ in a secure vault such as Azure Key Vault.
 
 2. Click on the 3 dots in the upper right hand corner
 
-3. Click on Settings > Admin Portal
+3. Click on **Settings** > **Admin Portal**
 
 4. Click on **Tenant settings**
 
@@ -353,7 +353,7 @@ Choose a specific security group allowed to use service principles for the APIs.
 
 2. Click on the 3 dots in the upper right hand corner
 
-3. Click on Settings > Admin Portal
+3. Click on **Settings** > **Admin Portal**
 
 4. Click on **Tenant settings**
 
@@ -414,7 +414,7 @@ ResourceKey Authentication SHOULD be blocked unless a specific use case (e.g., s
 
 2. Click on the 3 dots in the upper right hand corner
 
-3. Click on Settings > Admin Portal
+3. Click on **Settings** > **Admin Portal**
 
 4. Click on **Tenant settings**
 
@@ -457,7 +457,7 @@ R and Python interactions SHOULD be disabled.
 
 2. Click on the 3 dots in the upper right hand corner
 
-3. Click on Settings > Admin Portal
+3. Click on **Settings** > **Admin Portal**
 
 4. Click on **Tenant settings**
 
@@ -533,10 +533,12 @@ Sensitivity labels SHOULD be enabled for Power BI and employed for sensitive dat
 
 2. Click on the 3 dots in the upper right hand corner
 
-3. Click on Settings > Admin Portal
+3. Click on **Settings** > **Admin Portal**
 
 4. Click on **Tenant settings**
+
 5. Scroll to **Information protection**
+
 6. Click on **Allow users to apply sensitivity labels for Power BI content** set to **Enabled**
 Define who can apply and change sensitivity labels in Power BI assets.
 
