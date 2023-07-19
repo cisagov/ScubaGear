@@ -170,39 +170,39 @@ tests[{
 # MS.SHAREPOINT.3.1v1
 #--
 
-ExternalUserExpireInDays(Policy) = [Description, Status] if {
+ExternalUserExpireInDays(Policy) = [ErrMsg, Status] if {
     Policy.SharingCapability = 0
-    Description := "Requirement met: External Sharing is set to Only People In Organization"
+    ErrMsg := ""
     Status := true
 }
 
-ExternalUserExpireInDays(Policy) = [Description, Status] if {
+ExternalUserExpireInDays(Policy) = [ErrMsg, Status] if {
     Policy.SharingCapability = 3
-    Description := "Requirement met: External Sharing is set to Existing Guests"
+    ErrMsg := ""
     Status := true
 
 }
 
-ExternalUserExpireInDays(Policy) = [Description, Status] if {
+ExternalUserExpireInDays(Policy) = [ErrMsg, Status] if {
     Policy.SharingCapability == 1
     Policy.RequireAnonymousLinksExpireInDays <= 30
-    Description := "Requirement met"
+    ErrMsg := ""
     Status := true
 
 }
 
-ExternalUserExpireInDays(Policy) = [Description, Status] if {
+ExternalUserExpireInDays(Policy) = [ErrMsg, Status] if {
     Policy.SharingCapability == 2
     Policy.RequireAnonymousLinksExpireInDays <= 30
-    Description := "Requirement met"
+    ErrMsg := ""
     Status := true
 
 }
 
-ExternalUserExpireInDays(Policy) = [Description, Status] if {
+ExternalUserExpireInDays(Policy) = [ErrMsg, Status] if {
     Policy.SharingCapability == 1
     Policy.RequireAnonymousLinksExpireInDays > 30
-    Description := "Requirement not met: External Sharing is set to New and Existing Guests and expiration date is not 30 days or less"
+    ErrMsg := "Requirement not met: External Sharing is set to New and Existing Guests and expiration date is not 30 days or less"
     Status := false
 }
 
@@ -218,11 +218,11 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-SPOTenant", "Get-PnPTenant"],
     "ActualValue" : [Policy.SharingCapability, Policy.RequireAnonymousLinksExpireInDays],
-    "ReportDetails" : ReportDetailsString(Status, Description),
+    "ReportDetails" : ReportDetailsString(Status, ErrMsg),
     "RequirementMet" : Status
 }] {
     Policy := input.SPO_tenant[_]
-    [Description, Status] := ExternalUserExpireInDays(Policy)
+    [ErrMsg, Status] := ExternalUserExpireInDays(Policy)
 }
 #--
 
