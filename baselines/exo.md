@@ -851,8 +851,8 @@ those specific files.
 
 #### MS.EXO.15.3v1
 User click tracking SHOULD be enabled.
-- _Rationale:_ In the compromise, click tracking represents a valuable
-tool for incident response.
+- _Rationale:_ In the event of compromise, click tracking represents
+a valuable tool for incident response.
 - _Last modified:_ June 2023
 
 ### Resources
@@ -927,17 +927,23 @@ Configuration Baseline*.
 ### Policies
 #### MS.EXO.17.1v1
 Unified audit logging SHALL be enabled.
-- _Rationale:_ TODO
+- _Rationale:_ In the event of compromise, Microsoft Purview Audit (Standard)
+represents a valuable tool for incident response. Furthermore, it is required
+for government agencies by OMB M-21-31 (refered to therein by its former name,
+Unified Audit Log). 
 - _Last modified:_ June 2023
 
 #### MS.EXO.17.2v1
 Advanced audit SHALL be enabled.
-- _Rationale:_ TODO
+- _Rationale:_ Microsoft Purview Audit (Premium) logs additional event types that
+are not included with Standard. Furthermore, it is required for government 
+agencies by OMB M-21-13 (refered to therein as by its former name, Advanced Audit).
 - _Last modified:_ June 2023
 
 #### MS.EXO.17.3v1
 Audit logs SHALL be maintained for at least the minimum duration dictated by [OMB M-21-31 (Appendix C)](https://www.whitehouse.gov/wp-content/uploads/2021/08/M-21-31-Improving-the-Federal-Governments-Investigative-and-Remediation-Capabilities-Related-to-Cybersecurity-Incidents.pdf).
-- _Rationale:_ TODO
+- _Rationale:_ Increased log retention time gives incident responders power
+to investigate incidents that may have gone some time unnoticed.
 - _Last modified:_ June 2023
 
 ### Resources
