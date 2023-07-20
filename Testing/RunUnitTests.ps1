@@ -1,50 +1,48 @@
+<#
+    .SYNOPSIS
+        Test written Rego Unit tests individually and as a whole
+
+    .DESCRIPTION
+        This script executes the files with the format *ControlGroupName*Config_##_test.rego
+        that are found within each products folder in the Testing\Unit\Rego directory. You can run
+        this script focusing only on one product or multiple such as aad, defender, exo, powerplatform, sharepoint, and teams.
+
+    .EXAMPLE
+        .\RunUnitTests.ps1
+        Runs every unit test of every product, no flags necessary
+
+    .EXAMPLE
+        .\RunUnitTests.ps1 -p teams,sharepoint
+        Runs all tests for the specified products. Products must be specified with the -p parameter.
+        Valid product names are: aad, defender, exo, onedrive, powerplatform, sharepoint, and teams.
+
+    .EXAMPLE
+        .\RunUnitTests.ps1 -p aad -c 1
+        Will run the AADConfig_01_test.rego. When specifying a control group, only one product is able to be used
+        at a time.
+
+    .EXAMPLE
+        .\RunUnitTests.ps1 -p -teams -c 3 -t test_AllowPublicUsers_Correct
+        Will run the specific test inside the TeamsConfig_06_test.rego.
+        Only one parameter is allowed for the -t option just as there is only one parameter allowed for the -c option.
+
+#>
+
 [CmdletBinding()]
 param (
     [Parameter()]
     [ValidateSet('AAD','Defender','EXO','OneDrive','PowerPlatform','Sharepoint','Teams')]
     [string[]]$p = "",
     [Parameter()]
-    [string[]]$b = "",
+    [string[]]$c = "",
     [Parameter()]
     [string[]]$t = "",
-    [Parameter()]
-    [switch]$h,
     [Parameter()]
     [switch]$v
 )
 
 $ScriptName = $MyInvocation.MyCommand
 $FilePath = ".\Unit\Rego"
-
-function Show-Menu {
-    Write-Output "`n`t==================================== Flags ===================================="
-    Write-Output "`n`t-h`tshows help menu"
-    Write-Output "`n`t-p`tproduct name, can take a comma-separated list of product names"
-    Write-Output "`n`t-b`tbaseline item number, can take a comma-separated list of item numbers"
-    Write-Output "`n`t-t`ttest name, can take a comma-separated list of test names"
-    Write-Output "`n`t-v`tverbose, verbose opa output"
-    Write-Output "`n`t==================================== Usage ===================================="
-    Write-Output "`n`tRuning all tests is default, no flags are necessary"
-    Write-Output "`t.\$ScriptName"
-    Write-Output "`n`tTo run all test cases for specified products, must indicate products with -p"
-    Write-Output "`t.\$ScriptName [-p] <products>"
-    Write-Output "`n`tTo run all test cases in baseline item numbers, must indicate product with -p"
-    Write-Output "`tand baseline item numbers with -b"
-    Write-Output "`t.\$ScriptName [-p] <product> [-b] <baseline numbers>"
-    Write-Output "`n`tTo run test case for specified baseline item number must indicate product with -p,"
-    Write-Output "`tbaseline item numberwith -b, and test cases with -t"
-    Write-Output "`t.\$ScriptName [-p] <product> [-b] <baseline number> [-t] <test names>"
-    Write-Output "`n`tVerbose flag can be added to any test at beginning or end of command line"
-    Write-Output "`t.\$ScriptName [-v]"
-    Write-Output "`n`t==================================== Examples ===================================="
-    Write-Output "`n`t.\$ScriptName -p AAD, Defender, OneDrive"
-    Write-Output "`n`t.\$ScriptName -p AAD -b 01, 2, 10"
-    Write-Output "`n`t.\$ScriptName -p AAD -b 01 -t test_IncludeApplications_Incorrect, test_Conditions_Correct"
-    Write-Output "`n`t.\$ScriptName -p AAD -v"
-    Write-Output "`n`t.\$ScriptName -v -p AAD -b 01 -t test_IncludeApplications_Incorrect`n"
-    exit
-}
-
 function Get-ErrorMsg {
     [CmdletBinding()]
     param (
@@ -59,15 +57,15 @@ function Get-ErrorMsg {
     switch ($Flag[0]) {
         TestNameFlagsMissing {
             Write-Output "ERROR: Missing value(s) to run opa for specific test case(s)"
-            Write-Output ".\$ScriptName [-p] <product> [-b] <baseline numbers> [-t] <test names>`n"
+            Write-Output ".\$ScriptName [-p] <product> [-c] <control group numbers> [-t] <test names>`n"
         }
         BaselineItemFlagMissing {
-            Write-Output "ERROR: Missing value(s) to run opa for specific baseline item(s)"
-            Write-Output ".\$ScriptName [-p] <product> [-b] <baseline numbers>`n"
+            Write-Output "ERROR: Missing value(s) to run opa for specific control group item(s)"
+            Write-Output ".\$ScriptName [-p] <product> [-c] <control group numbers>`n"
         }
         BaselineItemNumber {
-            Write-Output "ERROR: Unrecognized number '$b'"
-            Write-Output "Must be an integer (1, 2, 3, ...) or baseline syntax (01, 02, 03..09, 10, ...)`n"
+            Write-Output "ERROR: Unrecognized number '$c'"
+            Write-Output "Must be an integer (1, 2, 3, ...) or control group syntax (01, 02, 03..09, 10, ...)`n"
         }
         FileIOError {
             Write-Output "ERROR: '$($Flag[1])' not found`n"
@@ -96,23 +94,23 @@ function Invoke-Product {
     Write-Output ""
 }
 
-function Get-Baseline {
+function Get-ControlGroup {
     [CmdletBinding()]
     param (
-        [string] $Baseline
+        [string] $ControlGroup
     )
 
     $Tens = @('01','02','03','04','05','06','07','08','09')
-    if(($Baseline -match "^\d+$") -or ($Baseline -in $Tens)) {
-        if ([int]$Baseline -lt 10) {
-            $Baseline = $Tens[[int]$Baseline-1]
+    if(($ControlGroup -match "^\d+$") -or ($ControlGroup -in $Tens)) {
+        if ([int]$ControlGroup -lt 10) {
+            $ControlGroup = $Tens[[int]$ControlGroup-1]
         }
-        return $true, $Baseline
+        return $true, $ControlGroup
     }
     return $false
 }
 
-function Invoke-BaselineItem {
+function Invoke-ControlGroupItem {
     [CmdletBinding()]
     param (
         [Parameter()]
@@ -122,15 +120,19 @@ function Invoke-BaselineItem {
     )
 
     Write-Output "`n==== Testing $Product ===="
-    foreach($Baseline in $b) {
-        $Result = Get-Baseline $Baseline
+    foreach($ControlGroup in $c) {
+        $Result = Get-ControlGroup $ControlGroup
         if($Result[0]){
-            $Baseline = $Result[1]
+            $ControlGroup = $Result[1]
             $Filename = Get-ChildItem $(Join-Path -Path $FilePath -ChildPath $Product) |
-            Where-Object {$_.Name -match $('Config2_'+$Baseline+'_test.rego')} | Select-Object Fullname
+            Where-Object {$_.Name -like "*$ControlGroup*" }
 
-            if(Test-Path -Path $Filename.Fullname -PathType Leaf) {
-                Write-Output "`nTesting Baseline $Baseline"
+            if ($null -eq $Filename){
+                Write-Warning "`nNOT FOUND: Control Group $c does not exist in the $Product directory"
+            }
+
+            elseif(Test-Path -Path $Filename.Fullname -PathType Leaf) {
+                Write-Output "`nTesting Control Group $ControlGroup"
                 ..\opa_windows_amd64.exe test ..\Rego\ .\$($Filename.Fullname) $Flag
             }
             else {
@@ -138,7 +140,7 @@ function Invoke-BaselineItem {
             }
         }
         else {
-            Get-ErrorMsg BaselineItemNumber
+            Get-ErrorMsg ControlGroupItemNumber
         }
     }
     Write-Output ""
@@ -152,21 +154,28 @@ function Invoke-TestName {
         [Parameter()]
         [string]$Product,
         [Parameter()]
-        [string]$Baseline
+        [string]$ControlGroup
     )
 
-    $Result = Get-Baseline $Baseline
+    $Result = Get-ControlGroup $ControlGroup
     if($Result[0]){
-        $Baseline = $Result[1]
+        $ControlGroup = $Result[1]
         $Filename = Get-ChildItem $(Join-Path -Path $FilePath -ChildPath $Product) |
-        Where-Object {$_.Name -match $('Config2_'+$Baseline+'_test.rego')} | Select-Object Fullname
+        Where-Object {$_.Name -like "*$ControlGroup*" }
 
         if(Test-Path -Path $Filename.Fullname -PathType Leaf) {
-            Write-Output "`n==== Testing $Product Baseline $Baseline ===="
+            Write-Output "`n==== Testing $Product Control Group $ControlGroup ===="
 
             foreach($Test in $t) {
-                Write-Output "`nTesting $Test"
-                ..\opa_windows_amd64.exe test ..\Rego\ .\$($Filename.Fullname) -r $Test $Flag
+                $Match = Select-String -Path $Filename.Fullname -Pattern $Test -Quiet
+
+                if ($Match){
+                    Write-Output "`nTesting $Test"
+                    ..\opa_windows_amd64.exe test ..\Rego\ .\$($Filename.Fullname) -r $Test $Flag
+                }
+                else{
+                    Write-Warning "`nNOT FOUND: $Test in $Filename"
+                }
             }
         }
         else {
@@ -174,45 +183,42 @@ function Invoke-TestName {
         }
     }
     else {
-        Get-ErrorMsg BaselineItemNumber
+        Get-ErrorMsg ControlGroupItemNumber
     }
     Write-Output ""
 }
 
 $pEmpty = $p[0] -eq ""
-$bEmpty = $b[0] -eq ""
+$cEmpty = $c[0] -eq ""
 $tEmpty = $t[0] -eq ""
 $Flag = ""
 
-if ($h.IsPresent) {
-    Show-Menu
-}
 if ($v.IsPresent) {
     $Flag = "-v"
 }
-if($pEmpty -and $bEmpty -and $tEmpty) {
+if($pEmpty -and $cEmpty -and $tEmpty) {
     $p = @('AAD','Defender','EXO','OneDrive','PowerPlatform','Sharepoint','Teams')
     Invoke-Product -Flag $Flag
 }
-elseif((-not $pEmpty) -and (-not $bEmpty) -and (-not $tEmpty)) {
-    if (($p.Count -gt 1) -or ($b.Count -gt 1)) {
-        Write-Output "**WARNING** can only take 1 argument for each: product & baseline item`n...Running test for $($p[0]) and $($b[0]) only"
+elseif((-not $pEmpty) -and (-not $cEmpty) -and (-not $tEmpty)) {
+    if (($p.Count -gt 1) -or ($c.Count -gt 1)) {
+        Write-Output "**WARNING** can only take 1 argument for each: product & Control Group item`n...Running test for $($p[0]) and $($c[0]) only"
     }
 
-    Invoke-TestName -Flag $Flag -Product $p[0] -Baseline $b[0]
+    Invoke-TestName -Flag $Flag -Product $p[0] -ControlGroup $c[0]
 }
-elseif((-not $pEmpty) -and (-not $bEmpty) -and $tEmpty) {
+elseif((-not $pEmpty) -and (-not $cEmpty) -and $tEmpty) {
     if ($p.Count -gt 1) {
         Write-Output "**WARNING** can only take 1 argument for product`n...Running test for $($p[0]) only"
     }
-    Invoke-BaselineItem -Flag $Flag -Product $p[0]
+    Invoke-ControlGroupItem -Flag $Flag -Product $p[0]
 }
-elseif((-not $pEmpty) -and $bEmpty -and $tEmpty) {
+elseif((-not $pEmpty) -and $cEmpty -and $tEmpty) {
     Invoke-Product -Flag $Flag
 }
-elseif($pEmpty -or $bEmpty -and (-not $tEmpty)) {
+elseif($pEmpty -or $cEmpty -and (-not $tEmpty)) {
     Get-ErrorMsg TestNameFlagsMissing
 }
-elseif($pEmpty -and (-not $bEmpty) -and $tEmpty) {
-    Get-ErrorMsg BaselineItemFlagMissing
+elseif($pEmpty -and (-not $cEmpty) -and $tEmpty) {
+    Get-ErrorMsg ControlGroupItemFlagMissing
 }
