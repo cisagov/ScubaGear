@@ -103,7 +103,7 @@ test_PrivilegedUsers_Incorrect_V2 if {
 #
 # MS.AAD.7.2v1
 #--
-test_Score_Correct if {
+test_SecureScore_Correct if {
     PolicyId := "MS.AAD.7.2v1"
 
     Output := tests with input as {
@@ -118,10 +118,10 @@ test_Score_Correct if {
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "secure-score:<br/> 1.0"
+    RuleOutput[0].ReportDetails == "Requirement met"
 }
 
-test_Score_Incorrect_V1 if {
+test_SecureScore_Incorrect if {
     PolicyId := "MS.AAD.7.2v1"
 
     Output := tests with input as {
@@ -136,7 +136,7 @@ test_Score_Incorrect_V1 if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "secure-score:<br/> 0.5"
+    RuleOutput[0].ReportDetails == "Requirement not met"
 }
 #--
 
