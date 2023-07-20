@@ -103,16 +103,40 @@ test_PrivilegedUsers_Incorrect_V2 if {
 #
 # MS.AAD.7.2v1
 #--
-test_NotImplemented_Correct if {
+test_Score_Correct if {
     PolicyId := "MS.AAD.7.2v1"
 
-    Output := tests with input as { }
+    Output := tests with input as {
+        "secure_score" : [
+            {
+                "Score" : 1.0
+            }
+        ]
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "secure-score:<br/> 1.0"
+}
+
+test_Score_Incorrect_V1 if {
+    PolicyId := "MS.AAD.7.2v1"
+
+    Output := tests with input as {
+        "secure_score" : [
+            {
+                "Score": 0.5
+            }
+        ]
+    }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == NotCheckedDetails(PolicyId)
+    RuleOutput[0].ReportDetails == "secure-score:<br/> 0.5"
 }
 #--
 
