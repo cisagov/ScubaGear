@@ -211,7 +211,7 @@ Learn](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-secur
 
 2.  On the left hand side go to **Email & collaboration** > **Policies & Rules**.
 
-3. From the list of policies, select *Threat Policies**.
+3. From the list of policies, select **Threat Policies**.
 
 4. Under **Rules**, select **Email Authentication Settings**.
 
@@ -530,7 +530,7 @@ should offer services comparable to those offered by Microsoft.
 
 Though use of Microsoft’s DLP solution is not strictly
 required, guidance for configuring Microsoft’s DLP solution can be found in the
-[Data Loss Prevention](https://github.com/cisagov/ScubaGear/blob/main/baselines/defender.md#4-data-loss-prevention) section of the [Defender for Office 365 Minimum Viable Secure Configuration Baseline](https://github.com/cisagov/ScubaGear/blob/main/baselines/defender.md).
+[Data Loss Prevention](./defender.md#4-data-loss-prevention) section of the [Defender for Office 365 Minimum Viable Secure Configuration Baseline](./defender.md).
 
 ### Policies
 
@@ -548,7 +548,7 @@ The DLP solution SHALL protect PII and sensitive information, as defined by the 
 
 ### Resources
 
-- The [Data Loss Prevention](https://github.com/cisagov/ScubaGear/blob/main/baselines/defender.md#4-data-loss-prevention) section of the [Defender for Office 365 Minimum Viable Secure Configuration Baseline](https://github.com/cisagov/ScubaGear/blob/main/baselines/defender.md).
+- The [Data Loss Prevention](./defender.md#4-data-loss-prevention) section of the [Defender for Office 365 Minimum Viable Secure Configuration Baseline](./defender.md).
 
 ## 9. Attachment File Type
 
@@ -562,7 +562,7 @@ those offered by Microsoft.
 
 Though use of Microsoft Defender’s solution is not strictly required for
 this purpose, guidance for configuring the Common Attachment Filter in
-Microsoft Defender can be found in the [Preset Security Policies](https://github.com/cisagov/ScubaGear/blob/main/baselines/defender.md#baseline) section of the [Defender for Office 365 Minimum Viable Secure Configuration Baseline](https://github.com/cisagov/ScubaGear/blob/main/baselines/defender.md).
+Microsoft Defender can be found in the [Preset Security Policies](./defender.md#1-preset-security-profiles) section of the [Defender for Office 365 Minimum Viable Secure Configuration Baseline](./defender.md).
 
 ### Policies
 
@@ -595,18 +595,18 @@ organization, to be made in accordance with their risk tolerance.
 
 ### Resources
 
-- The [Preset Security Policies](https://github.com/cisagov/ScubaGear/blob/main/baselines/defender.md#baseline) section of the [Defender for Office 365 Minimum Viable Secure Configuration Baseline](https://github.com/cisagov/ScubaGear/blob/main/baselines/defender.md).
+- The [Preset Security Policies](./defender.md#1-preset-security-profiles) section of the [Defender for Office 365 Minimum Viable Secure Configuration Baseline](./defender.md).
 
 ## 10. Malware
 
 Any product that meets the requirements outlined in this baseline
 policy group may be used. If the agency is using Microsoft Defender to
-implement malware scanning, see the following policies of the [Defender for Office 365 Minimum Viable Secure Configuration Baseline](https://github.com/cisagov/ScubaGear/blob/main/baselines/defender.md) for additional guidance.
+implement malware scanning, see the following policies of the [Defender for Office 365 Minimum Viable Secure Configuration Baseline](./defender.md) for additional guidance.
 
-- [MS.DEFENDER.1.2v1](https://github.com/cisagov/ScubaGear/blob/main/baselines/defender.md#msdefender12v1)
+- [MS.DEFENDER.1.2v1](./defender.md#msdefender12v1)
   - All users SHALL be added to Exchange Online Protection in either the standard or strict preset security policy.
 
-- [MS.DEFENDER.1.3v1](https://github.com/cisagov/ScubaGear/blob/main/baselines/defender.md#msdefender13v1)
+- [MS.DEFENDER.1.3v1](./defender.md#msdefender13v1)
   - All users SHALL be added to Defender for Office 365 Protection in either the standard or strict preset security policy.
 
 ### Policies
@@ -638,10 +638,10 @@ containing malware in any given user's mailbox can be reduced.
 
 ### Resources
 
-- [MS.DEFENDER.1.2v1](https://github.com/cisagov/ScubaGear/blob/main/baselines/defender.md#msdefender12v1) policy of the [Defender for Office 365 Minimum Viable Secure Configuration Baseline](https://github.com/cisagov/ScubaGear/blob/main/baselines/defender.md).
+- [MS.DEFENDER.1.2v1](./defender.md#msdefender12v1) policy of the [Defender for Office 365 Minimum Viable Secure Configuration Baseline](./defender.md).
   - All users SHALL be added to Exchange Online Protection in either the standard or strict preset security policy.
 
-- [MS.DEFENDER.1.3v1](https://github.com/cisagov/ScubaGear/blob/main/baselines/defender.md#msdefender13v1)  policy of the [Defender for Office 365 Minimum Viable Secure Configuration Baseline](https://github.com/cisagov/ScubaGear/blob/main/baselines/defender.md).
+- [MS.DEFENDER.1.3v1](./defender.md#msdefender13v1)  policy of the [Defender for Office 365 Minimum Viable Secure Configuration Baseline](./defender.md).
   - All users SHALL be added to Defender for Office 365 Protection in either the standard or strict preset security policy.
 
 ## 11. Phishing Protections
@@ -663,12 +663,12 @@ protections. With the exception for impersonation protection, these features are
 available with Exchange Online Protection (EOP), which is included in all
 Microsoft 365 subscriptions that contain Exchange Online mailboxes.
 For more guidance on configuring phishing protections with Microsoft’s native solutions,
-see the following policy and section of the [Defender for Office 365 Minimum Viable Secure Configuration Baseline](https://github.com/cisagov/ScubaGear/blob/main/baselines/defender.md).
+see the following policy and section of the [Defender for Office 365 Minimum Viable Secure Configuration Baseline](./defender.md).
 
-- [MS.DEFENDER.1.2v1](https://github.com/cisagov/ScubaGear/blob/main/baselines/defender.md#msdefender12v1).
+- [MS.DEFENDER.1.2v1](./defender.md#msdefender12v1).
   - All users SHALL be added to Exchange Online Protection in either the standard or strict preset security policy.
 
-- [Impersonation Protection](https://github.com/cisagov/ScubaGear/blob/main/baselines/defender.md#2-impersonation-protection) section of the [Defender for Office 365 Minimum Viable Secure Configuration Baseline](https://github.com/cisagov/ScubaGear/blob/main/baselines/defender.md).
+- [Impersonation Protection](./defender.md#2-impersonation-protection) section of the [Defender for Office 365 Minimum Viable Secure Configuration Baseline](./defender.md).
 
 ### Policies
 
@@ -698,10 +698,10 @@ The phishing protection solution SHOULD include an AI-based phishing detection t
 
 ### Resources
 
-- [MS.DEFENDER.1.2v1](https://github.com/cisagov/ScubaGear/blob/main/baselines/defender.md#msdefender12v1) policy of the [Defender for Office 365 Minimum Viable Secure Configuration Baseline](https://github.com/cisagov/ScubaGear/blob/main/baselines/defender.md).
+- [MS.DEFENDER.1.2v1](./defender.md#msdefender12v1) policy of the [Defender for Office 365 Minimum Viable Secure Configuration Baseline](./defender.md).
   - All users SHALL be added to Exchange Online Protection in either the standard or strict preset security policy.
 
-- [Impersonation Protection](https://github.com/cisagov/ScubaGear/blob/main/baselines/defender.md#2-impersonation-protection) section of the [Defender for Office 365 Minimum Viable Secure Configuration Baseline](https://github.com/cisagov/ScubaGear/blob/main/baselines/defender.md).
+- [Impersonation Protection](./defender.md#2-impersonation-protection) section of the [Defender for Office 365 Minimum Viable Secure Configuration Baseline](./defender.md).
 
 ## 12. IP Allow Lists
 
@@ -803,7 +803,7 @@ this policy.
 Mailbox auditing helps users investigate compromised accounts or
 discover illicit access to Exchange Online. Some actions performed by
 administrators, delegates, and owners are logged automatically. While
-mailbox auditing is enabled by default, agencies should ensure that it
+mailbox auditing is enabled by default, this policy is to ensure that it
 has not been inadvertently disabled.
 
 ### Policies
@@ -860,9 +860,9 @@ To enable mailbox auditing by default for your organization via PowerShell:
 Microsoft Defender includes several capabilities for protecting against
 inbound spam emails. Use of Microsoft Defender is not strictly required
 for this purpose; any product that fulfills the requirements outlined in
-this baseline policy group may be used. If the agency is using Microsoft Defender to meet this baseline policy group, see the following policy of the [Defender for Office 365 Minimum Viable Secure Configuration Baseline](https://github.com/cisagov/ScubaGear/blob/main/baselines/defender.md) for additional guidance.
+this baseline policy group may be used. If the agency is using Microsoft Defender to meet this baseline policy group, see the following policy of the [Defender for Office 365 Minimum Viable Secure Configuration Baseline](./defender.md) for additional guidance.
 
-- [MS.DEFENDER.1.2v1](https://github.com/cisagov/ScubaGear/blob/main/baselines/defender.md#msdefender12v1).
+- [MS.DEFENDER.1.2v1](./defender.md#msdefender12v1).
   - All users SHALL be added to Exchange Online Protection in either the standard or strict preset security policy.
 
 ### Policies
@@ -893,7 +893,7 @@ potentially unknown users to bypass spam protections.
 
 ### Resources
 
-- [MS.DEFENDER.1.2v1](https://github.com/cisagov/ScubaGear/blob/main/baselines/defender.md#msdefender12v1) policy of the [Defender for Office 365 Minimum Viable Secure Configuration Baseline](https://github.com/cisagov/ScubaGear/blob/main/baselines/defender.md).
+- [MS.DEFENDER.1.2v1](./defender.md#msdefender12v1) policy of the [Defender for Office 365 Minimum Viable Secure Configuration Baseline](./defender.md).
   - All users SHALL be added to Exchange Online Protection in either the standard or strict preset security policy.
 
 ## 15. Link Protection
@@ -920,9 +920,9 @@ If all checks pass, the user is redirected to the original URL.
 Microsoft Defender includes link scanning capabilities
 Use of Microsoft Defender is not strictly required for this purpose;
 any product that fulfills the requirements outlined in this baseline policy group may be used.
-If the agency is using Microsoft Defender to meet this baseline policy group, see the following policy of the [Defender for Office 365 Minimum Viable Secure Configuration Baseline](https://github.com/cisagov/ScubaGear/blob/main/baselines/defender.md) for additional guidance.
+If the agency is using Microsoft Defender to meet this baseline policy group, see the following policy of the [Defender for Office 365 Minimum Viable Secure Configuration Baseline](./defender.md) for additional guidance.
 
-- [MS.DEFENDER.1.3v1](https://github.com/cisagov/ScubaGear/blob/main/baselines/defender.md#msdefender13v1).
+- [MS.DEFENDER.1.3v1](./defender.md#msdefender13v1).
   - All users SHALL be added to Defender for Office 365 Protection in either the standard or strict preset security policy.
 
 ### Policies
@@ -949,7 +949,7 @@ User click tracking SHOULD be enabled.
 
 ### Resources
 
-- [MS.DEFENDER.1.3v1](https://github.com/cisagov/ScubaGear/blob/main/baselines/defender.md#msdefender13v1) policy of the [Defender for Office 365 Minimum Viable Secure Configuration Baseline](https://github.com/cisagov/ScubaGear/blob/main/baselines/defender.md)
+- [MS.DEFENDER.1.3v1](./defender.md#msdefender13v1) policy of the [Defender for Office 365 Minimum Viable Secure Configuration Baseline](./defender.md)
   - All users SHALL be added to Defender for Office 365 Protection in either the standard or strict preset security policy.
 
 ## 16. Alerts
@@ -957,26 +957,27 @@ User click tracking SHOULD be enabled.
 Microsoft Defender includes several prebuilt alert policies, many of
 which pertain to Exchange Online. These alerts give admins better
 real-time insight into possible security incidents. Guidance for
-configuring alerts in Microsoft Defender is given in the [Alerts](https://github.com/cisagov/ScubaGear/blob/main/baselines/defender.md#5-alerts) section of the [Defender for Office 365 Minimum Viable Secure Configuration Baseline](https://github.com/cisagov/ScubaGear/blob/main/baselines/defender.md).
+configuring alerts in Microsoft Defender is given in the [Alerts](./defender.md#5-alerts) section of the [Defender for Office 365 Minimum Viable Secure Configuration Baseline](./defender.md).
 
 ### Policies
 
 #### MS.EXO.16.1v1
 At a minimum, the following alerts SHALL be enabled:
 
-  - Suspicious email sending patterns detected.
+  a. **Suspicious email sending patterns detected.**
 
-  - Suspicious Connector Activity.
+  b. **Suspicious Connector Activity.**
 
-  - Suspicious Email Forwarding Activity.
+  c. **Suspicious Email Forwarding Activity.**
 
-  - Messages have been delayed.
+  d. **Messages have been delayed.**
 
-  - Tenant restricted from sending unprovisioned email.
+  e. **Tenant restricted from sending unprovisioned email.**
 
-  - Tenant restricted from sending email.
+  f. **Tenant restricted from sending email.**
 
-  - A potentially malicious URL click was detected.
+  g. **A potentially malicious URL click was detected.**
+
 
 - _Rationale:_ Potentially malicious or service impacting events may go undetected
 without a means of detecting these events.  Setting up a mechanism to alert
@@ -992,7 +993,7 @@ The alerts SHOULD be sent to a monitored address or incorporated into a SIEM.
 
 ### Resources
 
-- The [Alerts](https://github.com/cisagov/ScubaGear/blob/main/baselines/defender.md#5-alerts) section of the [Defender for Office 365 Minimum Viable Secure Configuration Baseline](https://github.com/cisagov/ScubaGear/blob/main/baselines/defender.md).
+- The [Alerts](./defender.md#5-alerts) section of the [Defender for Office 365 Minimum Viable Secure Configuration Baseline](./defender.md).
 
 ## 17. Microsoft Purview Audit
 
@@ -1007,7 +1008,7 @@ This can be accomplished either by offloading the logs out of the cloud environm
 OMB M-21-13 also requires Advanced Audit be configured in M365. Advanced Audit adds additional event types to the Unified Audit Log.
 
 Audit logging is managed from the Microsoft Purview compliance center. For
-guidance configuring audit logging, see the [Microsoft Purview Audit](https://github.com/cisagov/ScubaGear/blob/main/baselines/defender.md#6-microsoft-purview-audit) section of the [Defender for Office 365 Minimum Viable Secure Configuration Baseline](https://github.com/cisagov/ScubaGear/blob/main/baselines/defender.md).
+guidance configuring audit logging, see the [Microsoft Purview Audit](./defender.md#6-microsoft-purview-audit) section of the [Defender for Office 365 Minimum Viable Secure Configuration Baseline](./defender.md).
 
 ### Policies
 
@@ -1039,7 +1040,7 @@ to investigate incidents that occurred some time ago.
 
 ### Resources
 
-- [Microsoft Purview Audit](https://github.com/cisagov/ScubaGear/blob/main/baselines/defender.md#6-microsoft-purview-audit) section of the [Defender for Office 365 Minimum Viable Secure Configuration Baseline](https://github.com/cisagov/ScubaGear/blob/main/baselines/defender.md).
+- [Microsoft Purview Audit](./defender.md#6-microsoft-purview-audit) section of the [Defender for Office 365 Minimum Viable Secure Configuration Baseline](./defender.md).
 
 
 # Acknowledgements
