@@ -12,13 +12,11 @@ function Export-AADProvider {
     $Tracker = Get-CommandTracker
 
     # The below cmdlet covers the following baselines
+    # - 1.1
     # - 2.1
-    # - 2.2
-    # - 2.3 First Policy bullet
-    # - 2.4 First Policy bullet
-    # - 2.9
-    # - 2.10
-    # - 2.17 first part
+    # - 3.1
+    # - 4.2
+    # - 3.7
     $AllPolicies = $Tracker.TryCommand("Get-MgIdentityConditionalAccessPolicy")
 
     Import-Module $PSScriptRoot/ProviderHelpers/AADConditionalAccessHelper.psm1
@@ -91,14 +89,14 @@ function Export-AADProvider {
     }
     $ServicePlans = ConvertTo-Json -Depth 3 @($ServicePlans)
 
-    # 2.6, 2.7, & 2.18 1st/3rd Policy Bullets
+    # 5.1, 5.2, 8.1 & 8.3
     $AuthZPolicies = ConvertTo-Json @($Tracker.TryCommand("Get-MgPolicyAuthorizationPolicy"))
     $SecureScore = ConvertTo-Json -Depth 2 @($Tracker.TryCommand("Get-MgSecuritySecureScore", @{"Top"=1}).ControlScores | Where-Object {$_.ControlName -eq 'RoleOverlap'})
 
-    # 2.7 third bullet
+    # 5.4
     $DirectorySettings = ConvertTo-Json -Depth 10 @($Tracker.TryCommand("Get-MgDirectorySetting"))
 
-    # 2.7 Policy Bullet 2]
+    # 5.3
     $AdminConsentReqPolicies = ConvertTo-Json @($Tracker.TryCommand("Get-MgPolicyAdminConsentRequestPolicy"))
 
     $SuccessfulCommands = ConvertTo-Json @($Tracker.GetSuccessfulCommands())
