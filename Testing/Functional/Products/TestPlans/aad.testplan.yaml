@@ -1,0 +1,302 @@
+ProductName: aad
+TestPlan:
+  - PolicyId: MS.AAD.1.1v1
+    Tests:
+      - TestDescription: MS.AAD.1.1v1 ReportOnly
+        Preconditions:
+          - Command: UpdateConditionalAccessPolicyByName
+            Splat:
+              displayName: Live - Block legacy authentication
+              updates: 
+                state: enabledForReportingButNotEnforced
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.AAD.1.1v1 Default
+        Preconditions:
+          - Command: UpdateConditionalAccessPolicyByName
+            Splat:
+              displayName: Live - Block legacy authentication
+              updates:
+                state: enabled
+        Postconditions: []
+        ExpectedResult: true       
+  - PolicyId: MS.AAD.2.1v1
+    Tests:
+      - TestDescription: MS.AAD.2.1v1 Report Only
+        Preconditions:
+          - Command: UpdateConditionalAccessPolicyByName
+            Splat:
+              displayName: Live - Risky Users Block Access
+              updates: 
+                state: enabledForReportingButNotEnforced
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.AAD.2.1v1 Default
+        Preconditions:
+          - Command: UpdateConditionalAccessPolicyByName
+            Splat:
+              displayName: Live - Risky Users Block Access
+              updates:
+                state: enabled
+        Postconditions: [] 
+        ExpectedResult: true
+  - PolicyId: MS.AAD.2.2v1
+    Tests:
+      - TestDescription: MS.AAD.2.2v1 Not Checked
+        Preconditions: []
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false
+  - PolicyId: MS.AAD.2.3v1
+    Tests:
+      - TestDescription: MS.AAD.2.3v1 Default
+        Preconditions: []
+        Postconditions: []
+        ExpectedResult: true
+  - PolicyId: MS.AAD.3.1v1
+    Tests:
+      - TestDescription: MS.AAD.3.1v1 Default
+        Preconditions: []
+        Postconditions: []
+        ExpectedResult: true
+  - PolicyId: MS.AAD.3.2v1
+    Tests:
+      - TestDescription: MS.AAD.3.2v1 MFA Not Required
+        Preconditions:
+          - Command: UpdateConditionalAccessPolicyByName
+            Splat:
+              displayName: Live - MFA Required for Everyone
+              updates: 
+                state: enabledForReportingButNotEnforced
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.AAD.3.2v1 Default
+        Preconditions:
+          - Command: UpdateConditionalAccessPolicyByName
+            Splat:
+              displayName: Live - MFA Required for Everyone
+              updates: 
+                state: enabled
+        Postconditions: []
+        ExpectedResult: true
+  - PolicyId: MS.AAD.3.3v1
+    Tests:
+      - TestDescription: MS.AAD.3.3v1 Not Checked
+        Preconditions: []
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false
+  - PolicyId: MS.AAD.3.4v1
+    Tests:
+      - TestDescription: MS.AAD.3.4v1 Not Checked
+        Preconditions: []
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false 
+  - PolicyId: MS.AAD.3.5v1
+    Tests:
+      - TestDescription: MS.AAD.3.5v1 Not Checked
+        Preconditions: []
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false
+  - PolicyId: MS.AAD.3.6v1
+    Tests:
+      - TestDescription: MS.AAD.3.6v1 Report Only
+        Preconditions:
+          - Command: UpdateConditionalAccessPolicyByName
+            Splat:
+              displayName: Live - MFA required for Highly Privileged Roles
+              updates: 
+                state: enabled
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.AAD.3.6v1 Default
+        Preconditions:
+          - Command: UpdateConditionalAccessPolicyByName
+            Splat:
+              displayName: Live - MFA required for Highly Privileged Roles
+              updates: 
+                state: disabled
+        Postconditions: []
+        ExpectedResult: false
+  - PolicyId: MS.AAD.3.7v1
+    Tests:
+      - TestDescription: MS.AAD.3.7v1 Default
+        Preconditions: []
+        Postconditions: []
+        ExpectedResult: false
+  - PolicyId: MS.AAD.3.8v1
+    Tests:
+      - TestDescription: MS.AAD.3.8v1 Default
+        Preconditions: []
+        Postconditions: []
+        ExpectedResult: false
+  - PolicyId: MS.AAD.4.1v1
+    Tests:
+      - TestDescription: MS.AAD.4.1v1 Not Checked
+        Preconditions: []
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false
+  - PolicyId: MS.AAD.5.1v1
+    Tests:
+      - TestDescription: MS.AAD.5.1v1 Allow 
+        Preconditions:
+          - Command: Update-MgPolicyAuthorizationPolicy
+            Splat:
+              AuthorizationPolicyId: authorizationPolicy
+              DefaultUserRolePermissions:
+                AllowedToCreateApps: true
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.AAD.5.1v1 Default 
+        Preconditions:
+          - Command: Update-MgPolicyAuthorizationPolicy
+            Splat:
+              AuthorizationPolicyId: authorizationPolicy
+              DefaultUserRolePermissions:
+                AllowedToCreateApps: false
+        Postconditions: []
+        ExpectedResult: true  
+  - PolicyId: MS.AAD.5.2v1
+    Tests:
+      - TestDescription: MS.AAD.5.2v1 Default
+        Preconditions: []
+        Postconditions: []
+        ExpectedResult: true
+  - PolicyId: MS.AAD.5.3v1
+    Tests:
+      - TestDescription: MS.AAD.5.3v1 No Admin Consent Request Policy Enabled
+        Preconditions:
+          - Command: Update-MgPolicyAdminConsentRequestPolicy
+            Splat:
+              IsEnabled: false
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.AAD.5.3v1 Default
+        Preconditions:
+          - Command: Update-MgPolicyAdminConsentRequestPolicy
+            Splat:
+              IsEnabled: true
+        Postconditions: []
+        ExpectedResult: false
+  - PolicyId: MS.AAD.5.4v1
+    Tests:
+      - TestDescription: MS.AAD.5.4v1 Default
+        Preconditions: []
+        Postconditions: []
+        ExpectedResult: true
+  - PolicyId: MS.AAD.6.1v1
+    Tests:
+      - TestDescription: MS.AAD.6.1v1 Not Checked
+        Preconditions: []
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false
+  - PolicyId: MS.AAD.7.1v1
+    Tests:
+      - TestDescription: MS.AAD.7.1v1 Default
+        Preconditions: []
+        Postconditions: []
+        ExpectedResult: true
+  - PolicyId: MS.AAD.7.2v1
+    Tests:
+      - TestDescription: MS.AAD.7.2v1 Not Checked
+        Preconditions: []
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false
+  - PolicyId: MS.AAD.7.3v1
+    Tests:
+      - TestDescription: MS.AAD.7.3v1 Default
+        Preconditions: []
+        Postconditions: []
+        ExpectedResult: true
+  - PolicyId: MS.AAD.7.4v1
+    Tests:
+      - TestDescription: MS.AAD.7.4v1 Default
+        Preconditions: []
+        Postconditions: []
+        ExpectedResult: true
+  - PolicyId: MS.AAD.7.5v1
+    Tests:
+      - TestDescription: MS.AAD.7.5v1 Default
+        Preconditions: []
+        Postconditions: []
+        ExpectedResult: true
+  - PolicyId: MS.AAD.7.6v1
+    Tests:
+      - TestDescription: MS.AAD.7.6v1 Default
+        Preconditions: []
+        Postconditions: []
+        ExpectedResult: true
+  - PolicyId: MS.AAD.7.7v1
+    Tests:
+      - TestDescription: MS.AAD.7.7v1 Default
+        Preconditions: []
+        Postconditions: []
+        ExpectedResult: true
+  - PolicyId: MS.AAD.7.8v1
+    Tests:
+      - TestDescription: MS.AAD.7.8v1 Default
+        Preconditions: []
+        Postconditions: []
+        ExpectedResult: true
+  - PolicyId: MS.AAD.7.9v1
+    Tests:
+      - TestDescription: MS.AAD.7.9v1 Default
+        Preconditions: []
+        Postconditions: []
+        ExpectedResult: true
+  - PolicyId: MS.AAD.8.1v1
+    Tests:
+      - TestDescription: MS.AAD.8.1v1 Restricted access
+        Preconditions: 
+          - Command: Update-MgPolicyAuthorizationPolicy
+            Splat:
+              AuthorizationPolicyId: authorizationPolicy
+              GuestUserRoleId: "2af84b1e-32c8-42b7-82bc-daa82404023b"
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.AAD.8.1v1 Same as member users
+        Preconditions: 
+          - Command: Update-MgPolicyAuthorizationPolicy
+            Splat:
+              AuthorizationPolicyId: authorizationPolicy
+              GuestUserRoleId: "a0b1b346-4d3e-4e8b-98f8-753987be4970"
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.AAD.8.1v1 Default
+        Preconditions: 
+          - Command: Update-MgPolicyAuthorizationPolicy
+            Splat:
+              AuthorizationPolicyId: authorizationPolicy
+              GuestUserRoleId: "10dae51f-b6af-4016-8d66-8c2a99b929b3"
+        Postconditions: []
+        ExpectedResult: true
+  - PolicyId: MS.AAD.8.2v1
+    Tests:
+      - TestDescription: MS.AAD.8.2v1 Everyone
+        Preconditions:
+          - Command: Update-MgPolicyAuthorizationPolicy
+            Splat:
+              AuthorizationPolicyId: authorizationPolicy
+              AllowInvitesFrom: everyone
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.AAD.8.2v1 Default
+        Preconditions:
+          - Command: Update-MgPolicyAuthorizationPolicy
+            Splat:
+              AuthorizationPolicyId: authorizationPolicy
+              AllowInvitesFrom: adminsAndGuestInviters
+        Postconditions: []
+        ExpectedResult: true
+  - PolicyId: MS.AAD.8.3v1
+    Tests:
+      - TestDescription: MS.AAD.8.3v1 Not Checked
+        Preconditions: []
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: true
