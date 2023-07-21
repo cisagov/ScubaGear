@@ -10,7 +10,7 @@ TestPlan:
               AllowExternalParticipantGiveRequestControl: true
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: Does not Allows  External Participant Give Request Control
+      - TestDescription: Does not Allows External Participant Give Request Control
         Preconditions:
           - Command: Set-CsTeamsMeetingPolicy
             Splat:
@@ -35,7 +35,7 @@ TestPlan:
             Splat:
               AllowAnonymousUsersToStartMeeting: false
               Identity: Test Draft Teams Minimum Viable Secure Configuration Baseline
-        TestDescription: Does not Allows  External Participant Give Request Control
+        TestDescription: Does not Allows External Participant Give Request Control
   - PolicyId: MS.TEAMS.3.1v1
     Tests:
       - Postconditions: []
@@ -49,7 +49,7 @@ TestPlan:
             Splat:
               AutoAdmittedUsers: EveryOne
               Identity: Global
-        TestDescription: Dialin bypass lobby; Everyone is autoadmitted user
+        TestDescription: Dialin bypass lobby - Everyone is autoadmitted user
       - Postconditions: []
         ExpectedResult: false
         Preconditions:
@@ -61,7 +61,7 @@ TestPlan:
             Splat:
               AutoAdmittedUsers: EveryoneInCompany
               Identity: Global
-        TestDescription: Dialin bypass lobby; Everyone not auto admitted user
+        TestDescription: Dialin bypass lobby - Everyone not auto admitted user
       - Postconditions: []
         ExpectedResult: true
         Preconditions:
@@ -92,7 +92,7 @@ TestPlan:
             Splat:
               AllowTeamsConsumer: true
               AllowTeamsConsumerInbound: true
-        TestDescription: AllowTeamsConsumerInbound; AllowTeamsConsumer
+        TestDescription: AllowTeamsConsumerInbound - AllowTeamsConsumer
       - Postconditions: []
         ExpectedResult: true
         Preconditions:
@@ -100,7 +100,7 @@ TestPlan:
             Splat:
               AllowTeamsConsumer: false
               AllowTeamsConsumerInbound: true
-        TestDescription: AllowTeamsConsumerInbound; Not AllowTeamsConsumer
+        TestDescription: AllowTeamsConsumerInbound - Not AllowTeamsConsumer
       - Postconditions: []
         ExpectedResult: true
         Preconditions:
@@ -108,7 +108,7 @@ TestPlan:
             Splat:
               AllowTeamsConsumer: true
               AllowTeamsConsumerInbound: false
-        TestDescription: Not AllowTeamsConsumerInbound; AllowTeamsConsumer
+        TestDescription: Not AllowTeamsConsumerInbound - AllowTeamsConsumer
       - Postconditions: []
         ExpectedResult: true
         Preconditions:
@@ -116,7 +116,7 @@ TestPlan:
             Splat:
               AllowTeamsConsumer: false
               AllowTeamsConsumerInbound: false
-        TestDescription: Not AllowTeamsConsumerInbound; Not AllowTeamsConsumer
+        TestDescription: Not AllowTeamsConsumerInbound - Not AllowTeamsConsumer
   - PolicyId: MS.TEAMS.5.2v1
     Tests:
       - Postconditions: []
@@ -125,16 +125,16 @@ TestPlan:
           - Command: Set-CsTenantFederationConfiguration
             Splat:
               AllowTeamsConsumer: true
-        TestDescription: AllowTeamsConsumerInbound; AllowTeamsConsumer
+        TestDescription: AllowTeamsConsumerInbound - AllowTeamsConsumer
       - Postconditions: []
         ExpectedResult: true
         Preconditions:
           - Command: Set-CsTenantFederationConfiguration
             Splat:
               AllowTeamsConsumer: false
-        TestDescription: AllowTeamsConsumerInbound; Not AllowTeamsConsumer
-    - PolicyId: MS.TEAMS.6.1v1
-      Tests:
+        TestDescription: AllowTeamsConsumerInbound - Not AllowTeamsConsumer
+  - PolicyId: MS.TEAMS.6.1v1
+    Tests:
       - Postconditions: []
         ExpectedResult: false
         Preconditions:
@@ -193,7 +193,7 @@ TestPlan:
               Identity: Global
               GlobalCatalogAppsType: BlockedAppList
               PrivateCatalogAppsType: BlockedAppList
-        TestDescription: GlobalCatalogAppsType:Block; PrivateCatalogAppsType:Block
+        TestDescription: GlobalCatalogAppsType:Block - PrivateCatalogAppsType:Block
       - Postconditions: []
         ExpectedResult: false
         Preconditions:
@@ -202,7 +202,7 @@ TestPlan:
               Identity: Global
               GlobalCatalogAppsType: AllowedAppList
               PrivateCatalogAppsType: BlockedAppList
-        TestDescription: GlobalCatalogAppsType:Allow; PrivateCatalogAppsType:Block
+        TestDescription: GlobalCatalogAppsType:Allow - PrivateCatalogAppsType:Block
       - Postconditions: []
         ExpectedResult: false
         Preconditions:
@@ -211,7 +211,7 @@ TestPlan:
               Identity: Global
               GlobalCatalogAppsType: BlockedAppList
               PrivateCatalogAppsType: AllowedAppList
-        TestDescription: GlobalCatalogAppsType:Block; PrivateCatalogAppsType:Allow
+        TestDescription: GlobalCatalogAppsType:Block - PrivateCatalogAppsType:Allow
       - Postconditions: []
         ExpectedResult: true
         Preconditions:
@@ -220,7 +220,7 @@ TestPlan:
               Identity: Global
               GlobalCatalogAppsType: AllowedAppList
               PrivateCatalogAppsType: AllowedAppList
-        TestDescription: GlobalCatalogAppsType:Allow; PrivateCatalogAppsType:Allow
+        TestDescription: GlobalCatalogAppsType:Allow - PrivateCatalogAppsType:Allow
   - PolicyId: MS.TEAMS.8.3v1
     Tests:
     - TestDescription: Not Checked
@@ -256,7 +256,7 @@ TestPlan:
               AllowRecordingStorageOutsideRegion: true
               Identity: Global
               AllowCloudRecording: true
-        TestDescription: AllowCloudRecording:true; AllowRecordingStorageOutsideRegion:true
+        TestDescription: AllowCloudRecording:true - AllowRecordingStorageOutsideRegion:true
       - Postconditions: []
         ExpectedResult: true
         Preconditions:
@@ -265,7 +265,7 @@ TestPlan:
               AllowRecordingStorageOutsideRegion: false
               Identity: Global
               AllowCloudRecording: true
-        TestDescription: AllowCloudRecording:true; AllowRecordingStorageOutsideRegion:false
+        TestDescription: AllowCloudRecording:true - AllowRecordingStorageOutsideRegion:false
       - Postconditions: []
         ExpectedResult: true
         Preconditions:
@@ -274,7 +274,7 @@ TestPlan:
               AllowRecordingStorageOutsideRegion: true
               Identity: Global
               AllowCloudRecording: false
-        TestDescription: AllowCloudRecording:false; AllowRecordingStorageOutsideRegion:true
+        TestDescription: AllowCloudRecording:false - AllowRecordingStorageOutsideRegion:true
       - Postconditions: []
         ExpectedResult: true
         Preconditions:
@@ -283,7 +283,7 @@ TestPlan:
               AllowRecordingStorageOutsideRegion: false
               Identity: Global
               AllowCloudRecording: false
-        TestDescription: AllowCloudRecording:false; AllowRecordingStorageOutsideRegion:false
+        TestDescription: AllowCloudRecording:false - AllowRecordingStorageOutsideRegion:false
   - PolicyId: MS.TEAMS.10.1v1
     Tests:
       - Postconditions: []
