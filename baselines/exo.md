@@ -51,9 +51,10 @@ forwarding rules to exfiltrate data to external recipients.
 #### MS.EXO.1.1v1
 Automatic forwarding to external domains SHALL be disabled.
 - _Rationale:_ Adversaries can use automatic forwarding to gain
-persistent access to a victim's email (see [MITRE ATT&CK T1114.003](https://attack.mitre.org/techniques/T1114/003/)). Disabling forwarding to external domains prevents this technique
-when the adversary is external to the organization but does not
-impede legitimate internal forwarding.
+persistent access to a victim's email. Disabling forwarding to 
+external domains prevents this technique when the adversary is
+external to the organization but does not impede legitimate
+internal forwarding.
 - _Last modified:_ June 2023
 
 ### Resources
