@@ -1,0 +1,20 @@
+ProductName: sharepoint
+TestPlan:
+  - PolicyId: MS.SHAREPOINT.1.1v1
+    Tests:
+      - TestDescription: Allows External Participant Give Request Control
+        Preconditions:
+          - Command: Set-CsTeamsMeetingPolicy
+            Splat:
+              Identity: Test Draft Teams Minimum Viable Secure Configuration Baseline
+              AllowExternalParticipantGiveRequestControl: true
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: Does not Allows  External Participant Give Request Control
+        Preconditions:
+          - Command: Set-CsTeamsMeetingPolicy
+            Splat:
+              Identity: Test Draft Teams Minimum Viable Secure Configuration Baseline
+              AllowExternalParticipantGiveRequestControl: false
+        Postconditions: []
+        ExpectedResult: true
