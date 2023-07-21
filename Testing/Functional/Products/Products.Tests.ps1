@@ -6,20 +6,37 @@
     principal. Verifies that all teams policies work properly.
     .PARAMETER Thumbprint
     Thumbprint of the certificate associated with the Service Principal.
-    .PARAMETER Organization
+    .PARAMETER TenantDomain
     The tenant domain name for the organization.
+    .PARAMETER TenantDisplayName
+    The tenant display name for the organization.
     .PARAMETER AppId
     The Application Id associated with the Service Principal and certificate.
+    .PARAMETER ProductName
+    The O365 product name to test
+    .Parameter M365Environment
+    This parameter is used to authenticate to the different commercial/government environments.
+    Valid values include "commercial", "gcc", "gcchigh", or "dod".
+    - For M365 tenants with E3/E5 licenses enter the value **"commercial"**.
+    - For M365 Government Commercial Cloud tenants with G3/G5 licenses enter the value **"gcc"**.
+    - For M365 Government Commercial Cloud High tenants enter the value **"gcchigh"**.
+    - For M365 Department of Defense tenants enter the value **"dod"**.
+    Default value is 'commercial'.
     .EXAMPLE
-    $TestContainer = New-PesterContainer -Path "Teams.Tests.ps1" -Data @{ Thumbprint = $Thumbprint; Organization = "cisaent.onmicrosoft.com"; AppId = $AppId }
-    Invoke-Pester -Container $TestContainer -Output Detailed
+    Test using service principal
+    $TestContainers = @()
+    $TestContainers += New-PesterContainer -Path "Testing/Functional/Products" -Data @{ Thumbprint = "04C04809CC43AF66D805399D09B69069041574B0"; TenantDomain = "y2zj1.onmicrosoft.com"; TenantDisplayName = "y2zj1"; AppId = "9947b06c-46a9-4ff2-80c8-27261e58868a"; ProductName = "aad"; M365Environment = "commercial" }
+    Invoke-Pester -Container $TestContainers -Output Detailed
     .EXAMPLE
-    Invoke-Pester -Script .\Testing\Functional\Auto\Products\Teams\Teams.Tests.ps1 -Output Detailed
+    $TestContainers = @()
+    $TestContainers += New-PesterContainer -Path "Testing/Functional/Products" -Data @{ TenantDomain = "y2zj1.onmicrosoft.com"; TenantDisplayName = "y2zj1"; ProductName = "sharepoint"; M365Environment = "commercial" }
+    Invoke-Pester -Container $TestContainers -Output Detailed
 
 #>
 
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'Thumbprint', Justification = 'False positive as rule does not scan child scopes')]
-[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'Organization', Justification = 'False positive as rule does not scan child scopes')]
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'TenantDomain', Justification = 'False positive as rule does not scan child scopes')]
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'TenantDisplayName', Justification = 'False positive as rule does not scan child scopes')]
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'AppId', Justification = 'False positive as rule does not scan child scopes')]
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'ProductName', Justification = 'False positive as rule does not scan child scopes')]
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'M365Environment', Justification = 'False positive as rule does not scan child scopes')]
@@ -31,15 +48,21 @@ param (
     [string]
     $Thumbprint,
     [Parameter(Mandatory = $true, ParameterSetName = 'Auto')]
+    [Parameter(Mandatory = $true, ParameterSetName = 'Manual')]
     [ValidateNotNullOrEmpty()]
     [string]
-    $Organization,
+    $TenantDomain,
+    [Parameter(Mandatory = $true, ParameterSetName = 'Auto')]
+    [Parameter(Mandatory = $true, ParameterSetName = 'Manual')]
+    [ValidateNotNullOrEmpty()]
+    [string]
+    $TenantDisplayName,
     [Parameter(Mandatory = $true,  ParameterSetName = 'Auto')]
     [ValidateNotNullOrEmpty()]
     [string]
     $AppId,
     [Parameter(Mandatory = $true,  ParameterSetName = 'Auto')]
-    [Parameter(Mandatory = $true, ParameterSetName = 'Report')]
+    [Parameter(Mandatory = $true, ParameterSetName = 'Manual')]
     [ValidateNotNullOrEmpty()]
     [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", IgnoreCase = $false)]
     [string]
@@ -65,21 +88,29 @@ BeforeDiscovery{
     $TestPlan = $ProductTestPlan.TestPlan.ToArray()
     $Tests = $TestPlan.Tests
 
-    if (-not [string]::IsNullOrEmpty($Thumbprint)){
-        $ServicePrincipalParams += @{CertThumbprintParams = @{
-            CertificateThumbprint = $Thumbprint;
-            AppID = $AppId;
-            Organization = $Organization;
-        }}
-        Connect-Tenant -ProductNames $ProductName -M365Environment $M365Environment -ServicePrincipalParams $ServicePrincipalParams
-    }
-    else {
-        Connect-Tenant -ProductNames $ProductName -M365Environment $M365Environment
-    }
+    $ServicePrincipalParams = @{CertThumbprintParams = @{
+        CertificateThumbprint = $Thumbprint;
+        AppID = $AppId;
+        Organization = $TenantDomain;
+    }}
 
+    InModuleScope Connection -Parameters @{
+        ProductName = $ProductName
+        M365Environment = $M365Environment
+        ServicePrincipalParams = $ServicePrincipalParams
+    }{
+        if (-not [string]::IsNullOrEmpty($ServicePrincipalParams.CertThumbprintParams)){
 
+            Connect-Tenant -ProductNames $ProductName -M365Environment $M365Environment -ServicePrincipalParams $ServicePrincipalParams
+        }
+        else {
+            Connect-Tenant -ProductNames $ProductName -M365Environment $M365Environment
+        }
+    }
+}
 
 BeforeAll{
+    # Shared Data for functional test
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'ProductDetails', Justification = 'False positive as rule does not scan child scopes')]
     $ProductDetails = @{
         aad = "Azure Active Directory"
@@ -89,6 +120,9 @@ BeforeAll{
         sharepoint = "SharePoint Online"
         teams = "Microsoft Teams"
     }
+
+    # Dot source utility functions
+    . Join-Path -Path $PSScriptRoot -ChildPath "FunctionalTestUtils.ps1"
 
     function SetConditions {
         param(
@@ -114,13 +148,12 @@ BeforeAll{
 
     function ExecuteScubagear() {
         # Execute ScubaGear to extract the config data and produce the output JSON
-        Invoke-SCuBA -CertificateThumbPrint $Thumbprint -AppId $AppId -Organization $Organization -Productnames $ProductName -OutPath . -M365Environment $M365Environment -Quiet
-
+        Invoke-SCuBA -CertificateThumbPrint $Thumbprint -AppId $AppId -Organization $TenantDomain -Productnames $ProductName -OutPath . -M365Environment $M365Environment -Quiet
     }
 
-    function LoadSPOTenantData($OutputFolder) {
-        $SPOTenant = Get-Content "$OutputFolder/TestResults.json" -Raw | ConvertFrom-Json
-        $SPOTenant
+    function LoadTestResults($OutputFolder) {
+        $IntermediateTestResults = Get-Content "$OutputFolder/TestResults.json" -Raw | ConvertFrom-Json
+        $IntermediateTestResults
     }
 
     function RemoveConditionalAccessPolicyByName{
@@ -134,7 +167,7 @@ BeforeAll{
 
         $Ids = Get-MgIdentityConditionalAccessPolicy | Where-Object {$_.DisplayName -match $DisplayName} | Select-Object -Property Id
 
-        foreach($Id in $Ids){
+       foreach($Id in $Ids){
             if (-not ([string]::IsNullOrEmpty($Id.Id))){
                 Write-Output "Removing $DisplayName with id of $($Id.Id)"
                 Remove-MgIdentityConditionalAccessPolicy -ConditionalAccessPolicyId $Id.Id
@@ -166,6 +199,7 @@ BeforeAll{
         }
     }
 }
+
 Describe "Policy Checks for <ProductName>"{
     Context "Start tests for policy <PolicyId>" -ForEach $TestPlan{
         BeforeEach{
@@ -173,16 +207,16 @@ Describe "Policy Checks for <ProductName>"{
             ExecuteScubagear
             $ReportFolders = Get-ChildItem . -directory -Filter "M365BaselineConformance*" | Sort-Object -Property LastWriteTime -Descending
             $OutputFolder = $ReportFolders[0]
-            $SPOTenant = LoadSPOTenantData($OutputFolder)
+            $IntermediateTestResults = LoadTestResults($OutputFolder)
             # Search the results object for the specific requirement we are validating and ensure the results are what we expect
-            $PolicyResultObj = $SPOTenant | Where-Object { $_.PolicyId -eq $PolicyId }
+            $PolicyResultObj = $IntermediateTestResults | Where-Object { $_.PolicyId -eq $PolicyId }
             $BaselineReports = Join-Path -Path $OutputFolder -ChildPath 'BaselineReports.html'
             $script:url = (Get-Item $BaselineReports).FullName
             $Driver = Start-SeChrome -Headless -Arguments @('start-maximized') 2>$null
             Open-SeUrl $script:url -Driver $Driver 2>$null
         }
         Context "Execute test, <TestDescription>" -ForEach $Tests {
-            It "Check intermediate results" {
+            It "Check test case results" {
 
                 # Check intermediate output 
                 $PolicyResultObj.RequirementMet | Should -Be $ExpectedResult
@@ -218,8 +252,27 @@ Describe "Policy Checks for <ProductName>"{
                         $Rows.Count | Should -BeExactly 2
                         $TenantDataColumns = Get-SeElement -Target $Rows[1] -By TagName "td"
                         $Tenant = $TenantDataColumns[0].Text
-                        $Tenant | Should -Be $OrganizationName -Because "Tenant is $Tenant"
-                    } else {
+                        $Tenant | Should -Be $TenantDisplayName -Because "Tenant is $Tenant"
+                    }
+                    elseif ($Table.GetAttribute("class") -eq "caps_table"){
+                        ForEach ($Row in $Rows){
+                            $RowHeaders = Get-SeElement -Element $Row -By TagName 'th'
+                            $RowData = Get-SeElement -Element $Row -By TagName 'td'
+
+                            ($RowHeaders.Count -eq 0 ) -xor ($RowData.Count -eq 0) | Should -BeTrue -Because "Any given row should be homogenious"
+
+                            # NOTE: Checking for 8 columns since first is 'expand' column
+                            if ($RowHeaders.Count -gt 0){
+                                $RowHeaders.Count | Should -BeExactly 8
+                                $RowHeaders[1].text | Should -BeLikeExactly "Name"
+                            }
+
+                            if ($RowData.Count -gt 0){
+                                $RowData.Count | Should -BeExactly 8
+                            }
+                        }
+                    }
+                    else {
                         # Control report tables
                         ForEach ($Row in $Rows){
                             $RowHeaders = Get-SeElement -Element $Row -By TagName 'th'
@@ -249,7 +302,7 @@ Describe "Policy Checks for <ProductName>"{
                                     }
                                     elseif ($true -eq $ExpectedResult) {
                                         $RowData[2].text | Should -BeLikeExactly "Pass" -Because "expected policy to pass. [$Msg]"
-                                        $RowData[4].text | Should -Match 'Requirement met'
+                                        $RowData[4].GetAttribute("innerHTML") | FromInnerHtml | Should -BeExactly $PolicyResultObj.ReportDetails
                                     }
                                     elseif ($null -ne $ExpectedResult ) {
                                         if ('Shall' -eq $RowData[3].text){
@@ -262,7 +315,7 @@ Describe "Policy Checks for <ProductName>"{
                                             $RowData[2].text | Should -BeLikeExactly "Unknown" -Because "unexpected criticality. [$Msg]"
                                         }
 
-                                        $RowData[4].text | Should -Not -BeNullOrEmpty
+                                        $RowData[4].GetAttribute("innerHTML") | FromInnerHtml | Should -BeExactly $PolicyResultObj.ReportDetails
                                     }
                                     else {
                                        $false | Should -BeTrue -Because "policy should be custom, not checked, or have and expected result. [$Msg]"
