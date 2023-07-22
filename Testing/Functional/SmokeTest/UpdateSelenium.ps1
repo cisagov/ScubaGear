@@ -77,14 +77,14 @@ $DebugPreference = 'Continue'
 #$DebugPreference = 'SilentlyContinue'
 
 # firstly check which browser versions are installed (from registry)
-$chromeVersion = (Get-Item (Get-ItemProperty $chromeRegistryPath).'(Default)').VersionInfo.ProductVersion
+$chromeVersion = (Get-Item (Get-ItemProperty $chromeRegistryPath).'(Default)').VersionInfo.ProductVersion -as [System.Version]
 Write-Debug -Message "Chrome driver version(registery):  $chromeVersion"
 
 # check which driver versions are installed
-$chromeDriverVersion = Get-LocalDriverVersion -pathToDriver $chromeDriverPath
+$localDriverVersion = Get-LocalDriverVersion -pathToDriver $chromeDriverPath
 
-if (Confirm-NeedForUpdate $chromeVersion $chromeDriverVersion){
-    Write-Debug -Message "Need to update chrome driver from $chromeDriverVersion to $chromeVersion"
+if (Confirm-NeedForUpdate $chromeVersion $localDriverVersion){
+    Write-Debug -Message "Need to update chrome driver from $localDriverVersion to $chromeVersion"
 
     # find exact matching version
     $chromeDriverAvailableVersions = (Invoke-RestMethod $chromeDriverWebsite) -split " " | Where-Object {$_ -like "*href=*?path=*"} | ForEach-Object {$_.replace("href=","").replace('"','')}
