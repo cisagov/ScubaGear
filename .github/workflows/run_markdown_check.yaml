@@ -14,6 +14,7 @@ on:
         paths:
         - "baselines/*.md"
         - ".github/workflows/run_markdown_check.yaml"
+        - ".github/actions/spelling/*.*"
 
 name: Markdown Check
   
