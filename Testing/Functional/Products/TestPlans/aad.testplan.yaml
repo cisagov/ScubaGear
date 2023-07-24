@@ -109,7 +109,7 @@ TestPlan:
                       State: "enabled"
                       DisplayName: "Test Policy - MS.AAD.3.1v1 Default"
         Postconditions: []
-        ExpectedResult: true
+        ExpectedResult: false
   - PolicyId: MS.AAD.3.2v1
     TestDriver: RunScuba
     Tests:
@@ -349,7 +349,7 @@ TestPlan:
                       roles: 
                         - "Global Administrator"
         Postconditions: []
-        ExpectedResult: true
+        ExpectedResult: false
   - PolicyId: MS.AAD.7.2v1
     TestDriver: RunScuba
     Tests:
@@ -402,7 +402,7 @@ TestPlan:
       - TestDescription: MS.AAD.7.4v1 Default
         Preconditions: []
         Postconditions: []
-        ExpectedResult: true
+        ExpectedResult: false
   - PolicyId: MS.AAD.7.5v1
     TestDriver: RunScuba
     Tests:
