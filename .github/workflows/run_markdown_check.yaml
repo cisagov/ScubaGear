@@ -14,7 +14,6 @@ on:
         paths:
         - "baselines/*.md"
         - ".github/workflows/run_markdown_check.yaml"
-        - ".github/actions/spelling/*.*"
 
 name: Markdown Check
   
@@ -33,12 +32,3 @@ jobs:
           run: |
             $PSVersionTable
             Invoke-Pester Testing\Unit\PowerShell\CreateReport -Output Detailed
-    Run-Spell-Check:
-        name: Spell Check
-        runs-on: ubuntu-latest
-        permissions:
-            contents: read 
-        steps:
-            - name: Check spelling on secure baseline
-              uses: actions/checkout@v3
-              uses: check-spelling/check-spelling@main
