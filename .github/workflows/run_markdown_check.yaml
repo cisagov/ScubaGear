@@ -32,7 +32,6 @@ jobs:
           run: |
             $PSVersionTable
             Invoke-Pester Testing\Unit\PowerShell\CreateReport -Output Detailed
-jobs:
     Run-Spell-Check:
         name: Spell Check
         runs-on: ubuntu-latest
