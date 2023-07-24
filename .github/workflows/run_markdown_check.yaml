@@ -36,6 +36,8 @@ jobs:
     Run-Spell-Check:
         name: Spell Check
         runs-on: ubuntu-latest
+        permissions:
+            contents: read 
         steps:
             - name: Check spelling on secure baseline
               uses: actions/checkout@v3
