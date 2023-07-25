@@ -173,14 +173,14 @@ TestPlan:
             Splat:
               IsEnabled: false
         Postconditions: []
-        ExpectedResult: true
+        ExpectedResult: false
       - TestDescription: MS.AAD.5.3v1 Default
         Preconditions:
           - Command: Update-MgPolicyAdminConsentRequestPolicy
             Splat:
               IsEnabled: true
         Postconditions: []
-        ExpectedResult: false
+        ExpectedResult: true
   - PolicyId: MS.AAD.5.4v1
     Tests:
       - TestDescription: MS.AAD.5.4v1 Default
