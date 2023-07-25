@@ -399,7 +399,7 @@ External sender warnings SHALL be implemented.
 - _Rationale:_ Phishing is an ever-present threat. Alerting the user when
 an email originates from outside their organization can encourage them
 to exercise increased caution, especially if it is an email they would
-have expected to be sent internally.
+have expected to be sent from an internal sender.
 - _Last modified:_ June 2023
 
 ### Resources
