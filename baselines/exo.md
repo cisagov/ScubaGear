@@ -611,7 +611,7 @@ senders, the risk of a successful phishing attempt can be reduced.
 User warnings, comparable to the user safety tips included with EOP, SHOULD be displayed.
 - _Rationale:_ Many tasks are better suited for automated processes, such as identifying
 unusual characters in the `FROM` address or identifying a first-time sender.
-User warnings can handle these tasks, reducing the burden on end-users and the risk of
+User warnings can handle these tasks, reducing the burden on end users and the risk of
 successful phishing attempts.
 - _Last modified:_ June 2023
 
