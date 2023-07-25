@@ -552,79 +552,109 @@ Any product that meets the requirements outlined in this baseline policy may be 
 #### MS.TEAMS.6.2v1 instructions:
 Any product that meets the requirements outlined in this baseline policy may be used. If the agency is using Microsoft Defender, see the following implementation steps for [DLP](./defender.md#implementation-3) for additional guidance.
 
-## 7. Attachment Scanning
+## 7. Malware
 
-Though any product that fills the requirements outlined in this baseline
-control may be used, for guidance on implementing malware scanning using
-Microsoft Defender, see the “Data Loss Prevention SHALL Be Enabled”
-section of the *Defender for Office 365 Minimum Viable Secure
-Configuration Baseline*.
+Any product that meets the requirements outlined in this baseline
+policy group may be used. If the agency is using Microsoft Defender to
+implement malware scanning, see the following policies of the CISA M365 Security Configuration Baseline for Defender for Office 365 for additional guidance.
+
+- [MS.DEFENDER.1.3v1 \| CISA M365 Security Configuration Baseline for Defender for Office 365](./defender.md#msdefender13v1)
+  - All users SHALL be added to Defender for Office 365 Protection in either the standard or strict preset security policy.
 
 ### Policies
 
 #### MS.TEAMS.7.1v1
 Attachments included with Teams messages SHOULD be scanned for malware.
-- _Rationale:_ TODO
+- _Rationale:_ Teams can be used as a mechanism for delivering malware. In many cases, malware can be detected through scanning, reducing the risk for end users.
 - _Last modified:_ July 2023
 
 #### MS.TEAMS.7.2v1
 Users SHOULD be prevented from opening or downloading files detected as malware.
-- _Rationale:_ TODO
+- _Rationale:_ Teams can be used as a mechanism for delivering malware. In many cases, malware can be detected through scanning, reducing the risk for end users.
 - _Last modified:_ July 2023
 
 ### Resources
 
-- The “Data Loss Prevention SHALL Be Enabled” section of the *Defender for
-Office 365 Minimum Viable Secure Configuration Baseline.*
+- [Recommended settings for EOP and Microsoft Defender for Office 365
+  security \| Microsoft
+  Docs](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/recommended-settings-for-eop-and-office365)
+
+### License Requirements
+
+- N/A
+
+### Implementation
+#### MS.TEAMS.7.1v1 instructions:
+Any product that meets the requirements outlined in this baseline policy may be used. If the agency is using Microsoft Defender, see the following implementation steps for [DLP](./defender.md#implementation) for additional guidance.
+
+#### MS.TEAMS.7.2v1 instructions:
+Any product that meets the requirements outlined in this baseline policy may be used. If the agency is using Microsoft Defender, see the following implementation steps for [DLP](./defender.md#implementation) for additional guidance.
 
 ## 8. Link Protection
 
-Microsoft Defender protects users from malicious links included in Teams
-messages by prepending
+Several technologies exist for protecting users from malicious links
+included in emails. For example, Microsoft Defender accomplishes this by
+prepending
 
-`https://\*.safelinks.protection.outlook.com/?url=`
+`https://*.safelinks.protection.outlook.com/?url=`
 
-to URLs included in the messages. By prepending the safe links URL,
+to any URLs included in emails. By prepending the safe links URL,
 Microsoft can proxy the initial URL through their scanning service.
-Their proxy performs the following checks:
+Their proxy can perform the following actions:
 
-- Compares the URL with a block list
+- Compare the URL with a block list,
 
-- Compares the URL with a list of know malicious sites
+- Compare the URL with a list of know malicious sites, and
 
-- If the URL points to a downloadable file, applies real-time file
-scanning
+- If the URL points to a downloadable file, apply real-time file
+  scanning.
 
-- If all checks pass, the user is redirected to the original URL.
+If all checks pass, the user is redirected to the original URL.
 
-Though Defender’s use is not strictly required for this purpose,
-guidance for enabling link scanning using Microsoft Defender is included
-in the “Safe Links Policies SHALL Be Enabled” and “Safe Links in Global
-Settings SHALL be Configured” sections of the *Defender for Office 365
-Minimum Viable Secure Configuration Baseline.*
+Microsoft Defender includes link scanning capabilities
+Use of Microsoft Defender is not strictly required for this purpose;
+any product that fulfills the requirements outlined in this baseline policy group may be used.
+If the agency is using Microsoft Defender to meet this baseline policy group, see the following policy of the CISA M365 Security Configuration Baseline for Defender for Office 365 for additional guidance.
+
+- [MS.DEFENDER.1.3v1 \| CISA M365 Security Configuration Baseline for Defender for Office 365](./defender.md#msdefender13v1).
+  - All users SHALL be added to Defender for Office 365 Protection in either the standard or strict preset security policy.
 
 ### Policies
 
 #### MS.TEAMS.8.1v1
 URL comparison with a block-list SHOULD be enabled.
-- _Rationale:_ TODO
+- _Rationale:_ Users may be directed to malicious websites via links in Teams. Blocking access to known, malicious URLs can prevent users from accessing known malicious websites.
 - _Last modified:_ July 2023
 
 #### MS.TEAMS.8.2v1
 Direct download links SHOULD be scanned for malware.
-- _Rationale:_ TODO
+- _Rationale:_ URLs in Teams may direct users to download and run malware. Scanning direct download links in real-time for known malware and blocking access can prevent users from infecting their devices.
 - _Last modified:_ July 2023
 
 #### MS.TEAMS.8.3v1
 User click tracking SHOULD be enabled.
-- _Rationale:_ TODO
+- _Rationale:_ Users may click on malicious links in Teams, leading to compromise or authorized data disclosure. Enabling user click tracking lets agencies know if a malicious link may have been visited after the fact to help tailor a response to a potential incident.
 - _Last modified:_ July 2023
 
 ### Resources
 
-- The “Safe Links Policies SHALL Be Enabled” section of the *Defender for
-Office 365 Minimum Viable Secure Configuration Baseline.*
+- [Recommended settings for EOP and Microsoft Defender for Office 365
+  security \| Microsoft
+  Docs](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/recommended-settings-for-eop-and-office365)
 
+### License Requirements
+
+- N/A
+
+### Implementation
+#### MS.TEAMS.8.1v1 instructions:
+Any product that meets the requirements outlined in this baseline policy may be used. If the agency is using Microsoft Defender, see the following implementation steps for [DLP](./defender.md#implementation) for additional guidance.
+
+#### MS.TEAMS.8.2v1 instructions:
+Any product that meets the requirements outlined in this baseline policy may be used. If the agency is using Microsoft Defender, see the following implementation steps for [DLP](./defender.md#implementation) for additional guidance.
+
+#### MS.TEAMS.8.3v1 instructions:
+Any product that meets the requirements outlined in this baseline policy may be used. If the agency is using Microsoft Defender, see the following implementation steps for [DLP](./defender.md#implementation) for additional guidance.
 
 # Acknowledgements
 
