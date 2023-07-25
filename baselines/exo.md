@@ -822,9 +822,9 @@ Minimum Viable Secure Configuration Baseline.*
 
 #### MS.EXO.15.1v1
 URL comparison with a block-list SHOULD be enabled.
-- _Rationale:_ While blocking all malicious URLs is not feasible,
-blocking specific known-bad URLs eliminates the threat from
-those specific URLs.
+- _Rationale:_ Users may be directed to malicious websites via links in email.  
+Blocking access to known, malicious URLs can prevent users from accessing
+known malicious websites.
 - _Last modified:_ June 2023
 
 #### MS.EXO.15.2v1
