@@ -309,7 +309,7 @@ functionality.
 SMTP AUTH MAY be enabled on a per-mailbox basis as needed.
 - _Rationale:_ SMTP AUTH is required for POP3 and IMAP4 clients.
 As there are still legitimate uses for such clients, SMTP
-AUTH can be enabled on a per-mailbox basis  as necessary.
+AUTH can be enabled on a per-mailbox basis as necessary.
 - _Last modified:_ June 2023
 
 ### Resources
