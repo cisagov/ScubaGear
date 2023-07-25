@@ -268,7 +268,7 @@ federal, executive branch, departments and agencies.
 - _Last modified:_ June 2023
 
 #### MS.EXO.4.4v1
-An agency point of contact SHOULD be included for aggregate and/or failure reports.
+An agency point of contact SHOULD be included for aggregate and failure reports.
 
 - _Rationale:_ Email spoofing attempts are not inherently visible to domain
 owners. DMARC provides a mechanism to receive reports of spoofing attempts.
