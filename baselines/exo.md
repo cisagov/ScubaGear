@@ -785,14 +785,12 @@ policy](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-secu
 9.  Ensure **Turn on safe list** is not selected.
 
 #### MS.EXO.12.2v1 instructions:
-
 1. Refer to step 7 in [MS.EXO.12.1v1 instructions](#msexo121v1-instructions) to implement
 this policy.
 
 #### MS.EXO.12.3v1 instructions:
-1. Divert from step 4 in [MS.EXO.12.1v1 instructions](#msexo121v1-instructions) to implement
+1. Refer to step 8 in [MS.EXO.12.1v1 instructions](#msexo121v1-instructions) to implement
 this policy.
-
 
 ## 13. Mailbox Auditing
 
