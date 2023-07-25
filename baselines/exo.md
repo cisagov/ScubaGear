@@ -645,9 +645,8 @@ security mechanisms.
 ### Policies
 #### MS.EXO.12.1v1
 IP allow lists SHOULD NOT be created.
-- _Rationale:_ Emails from allow-listed IP addresses bypass important
-security mechanisms. As such, allow lists do not conform with the zero trust
-tenet that "all communication is secured regardless of network location" ([NIST SP 800-207](https://csrc.nist.gov/pubs/sp/800/207/final)).
+- _Rationale:_ Messages sent from IP addresses on an allow list bypass important
+security mechanisms, including spam filtering and sender authentication checks.  Avoiding use of IP allow lists prevents potential threats from circumventing security mechanisms.
 - _Last modified:_ June 2023
 
 #### MS.EXO.12.2v1
