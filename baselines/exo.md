@@ -767,9 +767,8 @@ Minimum Viable Secure Configuration Baseline* for additional guidance.
 ### Policies
 #### MS.EXO.14.1v1
 A spam filter SHALL be enabled. The filtering solution selected SHOULD offer services comparable to the native spam filtering offered by Microsoft.
-- _Rationale:_ Spam is a constant threat, many instances of which can be caught by a reliable spam filter.
-While Microsoft's anti-spam solution does not require any additional licensing beyond E3/G3, alternative
-third-party tools that offer comparable protection may be used at the agency's discretion.
+- _Rationale:_ Spam is a constant threat as junk mail can reduce user productivity and fill up mailboxes unnecessarily.
+Filtering out spam reduces the workload burden on users and prevents filling up user mailbox size quotas with junk mail.
 - _Last modified:_ June 2023
 
 #### MS.EXO.14.2v1
