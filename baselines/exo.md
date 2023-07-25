@@ -47,6 +47,7 @@ forwarding rules to exfiltrate data to external recipients.
 
 #### MS.EXO.1.1v1
 Automatic forwarding to external domains SHALL be disabled.
+
 - _Rationale:_ Adversaries can use automatic forwarding to gain
 persistent access to a victim's email. Disabling forwarding to
 external domains prevents this technique when the adversary is
@@ -94,6 +95,7 @@ documentation provides some helpful starting points.
 
 #### MS.EXO.2.1v1
 A list of approved IP addresses for sending mail SHALL be maintained.
+
 - _Rationale:_ Failing to maintain an accurate list of authorized IP addresses may result in spoofed email messages or failure to deliver legitimate messages when SPF is enabled.  Maintaining such a list ensures that unauthorized servers sending spoofed messages can be detected and permit messages from legitimate senders to be delivered.
 - _Last modified:_ June 2023
 
@@ -590,6 +592,7 @@ file extension can help detect instances where the file extension has been chang
 
 #### MS.EXO.9.3v1
 Disallowed file types SHALL be determined and set. At a minimum, click-to-run files SHOULD be blocked (e.g., .exe, .cmd, and .vbe).
+
 - _Rationale:_ Malicious attachments often take the form of click-to-run files,
 though other file types can contain malicious content as well. As such, the
 determination of the full list of file types to block is left to each
@@ -1004,7 +1007,7 @@ OMB M-21-13 also requires Advanced Audit be configured in M365. Advanced Audit a
 Audit logging is managed from the Microsoft Purview compliance center. For
 guidance configuring audit logging, see the  following section of the CISA M365 Security Configuration Baseline for Defender for Office 365.
 
-- [Microsoft Purview Audit](./defender.md#6-microsoft-purview-audit)
+- [Microsoft Purview Audit \| CISA M365 Security Configuration Baseline for Defender for Office 365](./defender.md#6-microsoft-purview-audit)
 
 ### Policies
 
