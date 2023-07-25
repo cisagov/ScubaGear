@@ -773,8 +773,8 @@ Filtering out spam reduces the workload burden on users and prevents filling up 
 
 #### MS.EXO.14.2v1
 Spam and high confidence spam SHALL be moved to either the junk email folder or the quarantine folder.
-- _Rationale:_ Spam is a constant threat, many instances of which can be caught by a reliable spam filter.
-Such spam should not be allowed to reach the primary inboxes of end users.
+- _Rationale:_ Spam is a constant threat, as junk mail can reduce user productivity and fill up mailboxes unnecessarily.
+Moving spam messages to a separate junk or quarantine folder helps users filter out spam while still giving them the ability to review them, as needed, in case of a message is filtered incorrectly.
 - _Last modified:_ June 2023
 
 #### MS.EXO.14.3v1
