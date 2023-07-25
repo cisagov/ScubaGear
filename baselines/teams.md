@@ -585,10 +585,10 @@ Users SHOULD be prevented from opening or downloading files detected as malware.
 
 ### Implementation
 #### MS.TEAMS.7.1v1 instructions:
-Any product that meets the requirements outlined in this baseline policy may be used. If the agency is using Microsoft Defender, see the following implementation steps for [DLP](./defender.md#implementation) for additional guidance.
+Any product that meets the requirements outlined in this baseline policy may be used. If the agency is using Microsoft Defender, see the following implementation steps for [Malware](./defender.md#implementation) for additional guidance.
 
 #### MS.TEAMS.7.2v1 instructions:
-Any product that meets the requirements outlined in this baseline policy may be used. If the agency is using Microsoft Defender, see the following implementation steps for [DLP](./defender.md#implementation) for additional guidance.
+Any product that meets the requirements outlined in this baseline policy may be used. If the agency is using Microsoft Defender, see the following implementation steps for [Malware](./defender.md#implementation) for additional guidance.
 
 ## 8. Link Protection
 
@@ -648,13 +648,13 @@ User click tracking SHOULD be enabled.
 
 ### Implementation
 #### MS.TEAMS.8.1v1 instructions:
-Any product that meets the requirements outlined in this baseline policy may be used. If the agency is using Microsoft Defender, see the following implementation steps for [DLP](./defender.md#implementation) for additional guidance.
+Any product that meets the requirements outlined in this baseline policy may be used. If the agency is using Microsoft Defender, see the following implementation steps for [Link Protection](./defender.md#implementation) for additional guidance.
 
 #### MS.TEAMS.8.2v1 instructions:
-Any product that meets the requirements outlined in this baseline policy may be used. If the agency is using Microsoft Defender, see the following implementation steps for [DLP](./defender.md#implementation) for additional guidance.
+Any product that meets the requirements outlined in this baseline policy may be used. If the agency is using Microsoft Defender, see the following implementation steps for [Link Protection](./defender.md#implementation) for additional guidance.
 
 #### MS.TEAMS.8.3v1 instructions:
-Any product that meets the requirements outlined in this baseline policy may be used. If the agency is using Microsoft Defender, see the following implementation steps for [DLP](./defender.md#implementation) for additional guidance.
+Any product that meets the requirements outlined in this baseline policy may be used. If the agency is using Microsoft Defender, see the following implementation steps for [Link Protection](./defender.md#implementation) for additional guidance.
 
 # Acknowledgements
 
