@@ -658,7 +658,7 @@ security mechanisms, including spam filtering and sender authentication checks. 
 #### MS.EXO.12.3v1
 A connection filter MAY be implemented to create an IP Block list.
 - _Rationale:_ While blocking all malicious senders is not feasible,
-blocking specific known-bad IP addresses may reduce the threat from
+blocking specific known, malicious IP addresses may reduce the threat from
 specific senders.
 - _Last modified:_ June 2023
 
