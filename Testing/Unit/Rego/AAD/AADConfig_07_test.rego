@@ -189,7 +189,6 @@ test_OnPremisesImmutableId_Incorrect_V2 if {
 }
 #--
 
-#
 # MS.AAD.7.4v1
 #--
 test_AdditionalProperties_Correct_V1 if {
@@ -199,13 +198,10 @@ test_AdditionalProperties_Correct_V1 if {
         "privileged_roles" : [
             {
                 "DisplayName" : "Global Administrator",
-                "Rules" : [
+                "Assignments" : [
                     {
-                        "Id" : "Expiration_Admin_Assignment",
-                        "AdditionalProperties" : {
-                            "isExpirationRequired" : true,
-                            "maximumDuration" : "P15D"
-                        }
+                        "EndDateTime" : "/Date(1691006065170)/",
+                        "PrincipalId" : "ae71e61c-f465-4db6-8d26-5f3e52bdd800"
                     }
                 ]
             }
@@ -224,7 +220,134 @@ test_AdditionalProperties_Correct_V1 if {
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "0 role(s) configured to allow permanent active assignment or expiration period too long"
+    RuleOutput[0].ReportDetails == "0 role(s) that contain users with permanent active assignment"
+}
+
+test_AdditionalProperties_Correct_V2 if {
+    PolicyId := "MS.AAD.7.4v1"
+
+    Output := tests with input as {
+        "privileged_roles" : [
+            {
+                "DisplayName" : "Global Administrator",
+                "Assignments" : [
+                    {
+                        "EndDateTime" : null,
+                        "PrincipalId" : "ae71e61c-f465-4db6-8d26-5f3e52bdd800"
+                    }
+                ]
+            }
+        ],
+        "service_plans" : [
+            { "ServicePlanName" : "EXCHANGE_S_FOUNDATION",
+                "ServicePlanId" : "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
+            },
+            { "ServicePlanName" : "AAD_PREMIUM_P2",
+                "ServicePlanId" : "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
+            }
+        ],
+        "scuba_config" : {
+            "Aad" : {
+                "MS.AAD.7.4v1" : {
+                    "RoleExclusions" : {
+                        "Users" : ["ae71e61c-f465-4db6-8d26-5f3e52bdd800"],
+                        "Groups" : []
+                    }
+                }
+            }
+        }
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "0 role(s) that contain users with permanent active assignment"
+}
+
+test_AdditionalProperties_Correct_V3 if {
+    PolicyId := "MS.AAD.7.4v1"
+
+    Output := tests with input as {
+        "privileged_roles" : [
+            {
+                "DisplayName" : "Global Administrator",
+                "Assignments" : [
+                    {
+                        "EndDateTime" : null,
+                        "PrincipalId" : "ae71e61c-f465-4db6-8d26-5f3e52bdd800"
+                    }
+                ]
+            }
+        ],
+        "service_plans" : [
+            { "ServicePlanName" : "EXCHANGE_S_FOUNDATION",
+                "ServicePlanId" : "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
+            },
+            { "ServicePlanName" : "AAD_PREMIUM_P2",
+                "ServicePlanId" : "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
+            }
+        ],
+        "scuba_config" : {
+            "Aad" : {
+                "MS.AAD.7.4v1" : {
+                    "RoleExclusions" : {
+                        "Users" : [],
+                        "Groups" : ["ae71e61c-f465-4db6-8d26-5f3e52bdd800"]
+                    }
+                }
+            }
+        }
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "0 role(s) that contain users with permanent active assignment"
+}
+
+test_AdditionalProperties_Correct_V4 if {
+    PolicyId := "MS.AAD.7.4v1"
+
+    Output := tests with input as {
+        "privileged_roles" : [
+            {
+                "DisplayName" : "Global Administrator",
+                "Assignments" : [
+                    {
+                        "EndDateTime" : null,
+                        "PrincipalId" : "ae71e61c-f465-4db6-8d26-5f3e52bdd800"
+                    }
+                ]
+            },
+            {
+                "DisplayName" : "Application Administrator",
+                "Assignments" : [
+                    {
+                        "EndDateTime" : "/Date(1691006065170)/",
+                        "PrincipalId" : "e54ac846-1f5a-4afe-aa69-273b42c3b0c1"
+                    }
+                ]
+            }
+        ],
+        "scuba_config" : {
+            "Aad" : {
+                "MS.AAD.7.4v1" : {
+                    "RoleExclusions" : {
+                        "Users" : [],
+                        "Groups" : ["ae71e61c-f465-4db6-8d26-5f3e52bdd800"]
+                    }
+                }
+            }
+        }
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "**NOTE: Your tenant does not have an Azure AD Premium P2 license, which is required for this feature**"
 }
 
 test_AdditionalProperties_Incorrect_V1 if {
@@ -234,13 +357,10 @@ test_AdditionalProperties_Incorrect_V1 if {
         "privileged_roles" : [
             {
                 "DisplayName" : "Global Administrator",
-                "Rules" : [
+                "Assignments" : [
                     {
-                        "Id" : "Expiration_Admin_Assignment",
-                        "AdditionalProperties" : {
-                            "isExpirationRequired" : false,
-                            "maximumDuration" : "P30D"
-                        }
+                        "EndDateTime" :  null,
+                        "PrincipalId" : "ae71e61c-f465-4db6-8d26-5f3e52bdd800"
                     }
                 ]
             }
@@ -259,7 +379,7 @@ test_AdditionalProperties_Incorrect_V1 if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "1 role(s) configured to allow permanent active assignment or expiration period too long:<br/>Global Administrator"
+    RuleOutput[0].ReportDetails == "1 role(s) that contain users with permanent active assignment:<br/>Global Administrator"
 }
 
 test_AdditionalProperties_Incorrect_V2 if {
@@ -269,13 +389,19 @@ test_AdditionalProperties_Incorrect_V2 if {
         "privileged_roles" : [
             {
                 "DisplayName" : "Global Administrator",
-                "Rules" : [
+                "Assignments" : [
                     {
-                        "Id" : "Expiration_Admin_Assignment",
-                        "AdditionalProperties" : {
-                            "isExpirationRequired" : true,
-                            "maximumDuration" : "P30D"
-                        }
+                        "EndDateTime" : null,
+                        "PrincipalId" : "ae71e61c-f465-4db6-8d26-5f3e52bdd800"
+                    }
+                ]
+            },
+            {
+                "DisplayName" : "Application Administrator",
+                "Assignments" : [
+                    {
+                        "EndDateTime" : "/Date(1691006065170)/",
+                        "PrincipalId" : "e54ac846-1f5a-4afe-aa69-273b42c3b0c1"
                     }
                 ]
             }
@@ -294,7 +420,592 @@ test_AdditionalProperties_Incorrect_V2 if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "1 role(s) configured to allow permanent active assignment or expiration period too long:<br/>Global Administrator"
+    RuleOutput[0].ReportDetails == "1 role(s) that contain users with permanent active assignment:<br/>Global Administrator"
+}
+
+test_AdditionalProperties_Incorrect_V3 if {
+    PolicyId := "MS.AAD.7.4v1"
+
+    Output := tests with input as {
+        "privileged_roles" : [
+            {
+                "DisplayName" : "Global Administrator",
+                "Assignments" : [
+                    {
+                        "EndDateTime" : null,
+                        "PrincipalId" : "ae71e61c-f465-4db6-8d26-5f3e52bdd800"
+                    }
+                ]
+            },
+            {
+                "DisplayName" : "Application Administrator",
+                "Assignments" : [
+                    {
+                        "EndDateTime" : null,
+                        "PrincipalId" : "e54ac846-1f5a-4afe-aa69-273b42c3b0c1"
+                    }
+                ]
+            }
+        ],
+        "service_plans" : [
+            { "ServicePlanName" : "EXCHANGE_S_FOUNDATION",
+                "ServicePlanId" : "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
+            },
+            { "ServicePlanName" : "AAD_PREMIUM_P2",
+                "ServicePlanId" : "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
+            }
+        ]
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "2 role(s) that contain users with permanent active assignment:<br/>Application Administrator, Global Administrator"
+}
+
+test_AdditionalProperties_Incorrect_V4 if {
+    PolicyId := "MS.AAD.7.4v1"
+
+    Output := tests with input as {
+        "privileged_roles" : [
+            {
+                "DisplayName" : "Global Administrator",
+                "Assignments" : [
+                    {
+                        "EndDateTime" : null,
+                        "PrincipalId" : "ae71e61c-f465-4db6-8d26-5f3e52bdd800"
+                    },
+                    {
+                        "EndDateTime" : null,
+                        "PrincipalId" : "38035edd-63a1-4c08-8bd2-ad78d0624057"
+                    }
+                ]
+            },
+            {
+                "DisplayName" : "Application Administrator",
+                "Assignments" : [
+                    {
+                        "EndDateTime" : null,
+                        "PrincipalId" : "e54ac846-1f5a-4afe-aa69-273b42c3b0c1"
+                    }
+                ]
+            }
+        ],
+        "service_plans" : [
+            { "ServicePlanName" : "EXCHANGE_S_FOUNDATION",
+                "ServicePlanId" : "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
+            },
+            { "ServicePlanName" : "AAD_PREMIUM_P2",
+                "ServicePlanId" : "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
+            }
+        ]
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "2 role(s) that contain users with permanent active assignment:<br/>Application Administrator, Global Administrator"
+}
+
+test_AdditionalProperties_Incorrect_V5 if {
+    PolicyId := "MS.AAD.7.4v1"
+
+    Output := tests with input as {
+        "privileged_roles" : [
+            {
+                "DisplayName" : "Global Administrator",
+                "Assignments" : [
+                    {
+                        "EndDateTime" :  null,
+                        "PrincipalId" : "ae71e61c-f465-4db6-8d26-5f3e52bdd800"
+                    }
+                ]
+            }
+        ],
+        "service_plans" : [
+            { "ServicePlanName" : "EXCHANGE_S_FOUNDATION",
+                "ServicePlanId" : "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
+            },
+            { "ServicePlanName" : "AAD_PREMIUM_P2",
+                "ServicePlanId" : "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
+            }
+        ],
+        "scuba_config" : {
+            "Aad" : {
+                "MS.AAD.7.4v1" : {
+                    "RoleExclusions" : {
+                        "Users" : ["7b36d094-0211-400b-aabd-3793e9a30fc6"],
+                        "Groups" : []
+                    }
+                }
+            }
+        }
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "1 role(s) that contain users with permanent active assignment:<br/>Global Administrator"
+}
+
+test_AdditionalProperties_Incorrect_V6 if {
+    PolicyId := "MS.AAD.7.4v1"
+
+    Output := tests with input as {
+        "privileged_roles" : [
+            {
+                "DisplayName" : "Global Administrator",
+                "Assignments" : [
+                    {
+                        "EndDateTime" : null,
+                        "PrincipalId" : "ae71e61c-f465-4db6-8d26-5f3e52bdd800"
+                    }
+                ]
+            },
+            {
+                "DisplayName" : "Application Administrator",
+                "Assignments" : [
+                    {
+                        "EndDateTime" : "/Date(1691006065170)/",
+                        "PrincipalId" : "e54ac846-1f5a-4afe-aa69-273b42c3b0c1"
+                    }
+                ]
+            }
+        ],
+        "service_plans" : [
+            { "ServicePlanName" : "EXCHANGE_S_FOUNDATION",
+                "ServicePlanId" : "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
+            },
+            { "ServicePlanName" : "AAD_PREMIUM_P2",
+                "ServicePlanId" : "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
+            }
+        ],
+        "scuba_config" : {
+            "Aad" : {
+                "MS.AAD.7.4v1" : {
+                    "RoleExclusions" : {
+                        "Users" : ["7b36d094-0211-400b-aabd-3793e9a30fc6"],
+                        "Groups" : []
+                    }
+                }
+            }
+        }
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "1 role(s) that contain users with permanent active assignment:<br/>Global Administrator"
+}
+
+test_AdditionalProperties_Incorrect_V7 if {
+    PolicyId := "MS.AAD.7.4v1"
+
+    Output := tests with input as {
+        "privileged_roles" : [
+            {
+                "DisplayName" : "Global Administrator",
+                "Assignments" : [
+                    {
+                        "EndDateTime" : null,
+                        "PrincipalId" : "ae71e61c-f465-4db6-8d26-5f3e52bdd800"
+                    }
+                ]
+            },
+            {
+                "DisplayName" : "Application Administrator",
+                "Assignments" : [
+                    {
+                        "EndDateTime" : null,
+                        "PrincipalId" : "e54ac846-1f5a-4afe-aa69-273b42c3b0c1"
+                    }
+                ]
+            }
+        ],
+        "service_plans" : [
+            { "ServicePlanName" : "EXCHANGE_S_FOUNDATION",
+                "ServicePlanId" : "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
+            },
+            { "ServicePlanName" : "AAD_PREMIUM_P2",
+                "ServicePlanId" : "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
+            }
+        ],
+        "scuba_config" : {
+            "Aad" : {
+                "MS.AAD.7.4v1" : {
+                    "RoleExclusions" : {
+                        "Users" : ["7b36d094-0211-400b-aabd-3793e9a30fc6"],
+                        "Groups" : []
+                    }
+                }
+            }
+        }
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "2 role(s) that contain users with permanent active assignment:<br/>Application Administrator, Global Administrator"
+}
+
+test_AdditionalProperties_Incorrect_V8 if {
+    PolicyId := "MS.AAD.7.4v1"
+
+    Output := tests with input as {
+        "privileged_roles" : [
+            {
+                "DisplayName" : "Global Administrator",
+                "Assignments" : [
+                    {
+                        "EndDateTime" : null,
+                        "PrincipalId" : "ae71e61c-f465-4db6-8d26-5f3e52bdd800"
+                    },
+                    {
+                        "EndDateTime" : null,
+                        "PrincipalId" : "38035edd-63a1-4c08-8bd2-ad78d0624057"
+                    }
+                ]
+            },
+            {
+                "DisplayName" : "Application Administrator",
+                "Assignments" : [
+                    {
+                        "EndDateTime" : null,
+                        "PrincipalId" : "e54ac846-1f5a-4afe-aa69-273b42c3b0c1"
+                    }
+                ]
+            }
+        ],
+        "service_plans" : [
+            { "ServicePlanName" : "EXCHANGE_S_FOUNDATION",
+                "ServicePlanId" : "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
+            },
+            { "ServicePlanName" : "AAD_PREMIUM_P2",
+                "ServicePlanId" : "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
+            }
+        ],
+        "scuba_config" : {
+            "Aad" : {
+                "MS.AAD.7.4v1" : {
+                    "RoleExclusions" : {
+                        "Users" : ["7b36d094-0211-400b-aabd-3793e9a30fc6"],
+                        "Groups" : []
+                    }
+                }
+            }
+        }
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "2 role(s) that contain users with permanent active assignment:<br/>Application Administrator, Global Administrator"
+}
+
+test_AdditionalProperties_Incorrect_V9 if {
+    PolicyId := "MS.AAD.7.4v1"
+
+    Output := tests with input as {
+        "privileged_roles" : [
+            {
+                "DisplayName" : "Global Administrator",
+                "Assignments" : [
+                    {
+                        "EndDateTime" : null,
+                        "PrincipalId" : "ae71e61c-f465-4db6-8d26-5f3e52bdd800"
+                    }
+                ]
+            },
+            {
+                "DisplayName" : "Application Administrator",
+                "Assignments" : [
+                    {
+                        "EndDateTime" : "/Date(1691006065170)/",
+                        "PrincipalId" : "e54ac846-1f5a-4afe-aa69-273b42c3b0c1"
+                    }
+                ]
+            }
+        ],
+        "service_plans" : [
+            { "ServicePlanName" : "EXCHANGE_S_FOUNDATION",
+                "ServicePlanId" : "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
+            },
+            { "ServicePlanName" : "AAD_PREMIUM_P2",
+                "ServicePlanId" : "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
+            }
+        ],
+        "scuba_config" : {
+            "Aad" : {
+                "MS.AAD.7.4v1" : {
+                    "RoleExclusions" : {
+                        "Users" : ["e54ac846-1f5a-4afe-aa69-273b42c3b0c1"],
+                        "Groups" : []
+                    }
+                }
+            }
+        }
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "1 role(s) that contain users with permanent active assignment:<br/>Global Administrator"
+}
+test_AdditionalProperties_Incorrect_V10 if {
+    PolicyId := "MS.AAD.7.4v1"
+
+    Output := tests with input as {
+        "privileged_roles" : [
+            {
+                "DisplayName" : "Global Administrator",
+                "Assignments" : [
+                    {
+                        "EndDateTime" :  null,
+                        "PrincipalId" : "ae71e61c-f465-4db6-8d26-5f3e52bdd800"
+                    }
+                ]
+            }
+        ],
+        "service_plans" : [
+            { "ServicePlanName" : "EXCHANGE_S_FOUNDATION",
+                "ServicePlanId" : "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
+            },
+            { "ServicePlanName" : "AAD_PREMIUM_P2",
+                "ServicePlanId" : "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
+            }
+        ],
+        "scuba_config" : {
+            "Aad" : {
+                "MS.AAD.7.4v1" : {
+                    "RoleExclusions" : {
+                        "Users" : [],
+                        "Groups" : ["7b36d094-0211-400b-aabd-3793e9a30fc6"]
+                    }
+                }
+            }
+        }
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "1 role(s) that contain users with permanent active assignment:<br/>Global Administrator"
+}
+
+test_AdditionalProperties_Incorrect_V11 if {
+    PolicyId := "MS.AAD.7.4v1"
+
+    Output := tests with input as {
+        "privileged_roles" : [
+            {
+                "DisplayName" : "Global Administrator",
+                "Assignments" : [
+                    {
+                        "EndDateTime" : null,
+                        "PrincipalId" : "ae71e61c-f465-4db6-8d26-5f3e52bdd800"
+                    }
+                ]
+            },
+            {
+                "DisplayName" : "Application Administrator",
+                "Assignments" : [
+                    {
+                        "EndDateTime" : "/Date(1691006065170)/",
+                        "PrincipalId" : "e54ac846-1f5a-4afe-aa69-273b42c3b0c1"
+                    }
+                ]
+            }
+        ],
+        "service_plans" : [
+            { "ServicePlanName" : "EXCHANGE_S_FOUNDATION",
+                "ServicePlanId" : "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
+            },
+            { "ServicePlanName" : "AAD_PREMIUM_P2",
+                "ServicePlanId" : "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
+            }
+        ],
+        "scuba_config" : {
+            "Aad" : {
+                "MS.AAD.7.4v1" : {
+                    "RoleExclusions" : {
+                        "Users" : [],
+                        "Groups" : ["7b36d094-0211-400b-aabd-3793e9a30fc6"]
+                    }
+                }
+            }
+        }
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "1 role(s) that contain users with permanent active assignment:<br/>Global Administrator"
+}
+
+test_AdditionalProperties_Incorrect_V12 if {
+    PolicyId := "MS.AAD.7.4v1"
+
+    Output := tests with input as {
+        "privileged_roles" : [
+            {
+                "DisplayName" : "Global Administrator",
+                "Assignments" : [
+                    {
+                        "EndDateTime" : null,
+                        "PrincipalId" : "ae71e61c-f465-4db6-8d26-5f3e52bdd800"
+                    }
+                ]
+            },
+            {
+                "DisplayName" : "Application Administrator",
+                "Assignments" : [
+                    {
+                        "EndDateTime" : null,
+                        "PrincipalId" : "e54ac846-1f5a-4afe-aa69-273b42c3b0c1"
+                    }
+                ]
+            }
+        ],
+        "service_plans" : [
+            { "ServicePlanName" : "EXCHANGE_S_FOUNDATION",
+                "ServicePlanId" : "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
+            },
+            { "ServicePlanName" : "AAD_PREMIUM_P2",
+                "ServicePlanId" : "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
+            }
+        ],
+        "scuba_config" : {
+            "Aad" : {
+                "MS.AAD.7.4v1" : {
+                    "RoleExclusions" : {
+                        "Users" : [],
+                        "Groups" : ["7b36d094-0211-400b-aabd-3793e9a30fc6"]
+                    }
+                }
+            }
+        }
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "2 role(s) that contain users with permanent active assignment:<br/>Application Administrator, Global Administrator"
+}
+
+test_AdditionalProperties_Incorrect_V13 if {
+    PolicyId := "MS.AAD.7.4v1"
+
+    Output := tests with input as {
+        "privileged_roles" : [
+            {
+                "DisplayName" : "Global Administrator",
+                "Assignments" : [
+                    {
+                        "EndDateTime" : null,
+                        "PrincipalId" : "ae71e61c-f465-4db6-8d26-5f3e52bdd800"
+                    },
+                    {
+                        "EndDateTime" : null,
+                        "PrincipalId" : "38035edd-63a1-4c08-8bd2-ad78d0624057"
+                    }
+                ]
+            },
+            {
+                "DisplayName" : "Application Administrator",
+                "Assignments" : [
+                    {
+                        "EndDateTime" : null,
+                        "PrincipalId" : "e54ac846-1f5a-4afe-aa69-273b42c3b0c1"
+                    }
+                ]
+            }
+        ],
+        "service_plans" : [
+            { "ServicePlanName" : "EXCHANGE_S_FOUNDATION",
+                "ServicePlanId" : "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
+            },
+            { "ServicePlanName" : "AAD_PREMIUM_P2",
+                "ServicePlanId" : "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
+            }
+        ],
+        "scuba_config" : {
+            "Aad" : {
+                "MS.AAD.7.4v1" : {
+                    "RoleExclusions" : {
+                        "Users" : [],
+                        "Groups" : ["7b36d094-0211-400b-aabd-3793e9a30fc6"]
+                    }
+                }
+            }
+        }
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "2 role(s) that contain users with permanent active assignment:<br/>Application Administrator, Global Administrator"
+}
+
+test_AdditionalProperties_Incorrect_V14 if {
+    PolicyId := "MS.AAD.7.4v1"
+
+    Output := tests with input as {
+        "privileged_roles" : [
+            {
+                "DisplayName" : "Global Administrator",
+                "Assignments" : [
+                    {
+                        "EndDateTime" : null,
+                        "PrincipalId" : "ae71e61c-f465-4db6-8d26-5f3e52bdd800"
+                    }
+                ]
+            },
+            {
+                "DisplayName" : "Application Administrator",
+                "Assignments" : [
+                    {
+                        "EndDateTime" : "/Date(1691006065170)/",
+                        "PrincipalId" : "e54ac846-1f5a-4afe-aa69-273b42c3b0c1"
+                    }
+                ]
+            }
+        ],
+        "service_plans" : [
+            { "ServicePlanName" : "EXCHANGE_S_FOUNDATION",
+                "ServicePlanId" : "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
+            },
+            { "ServicePlanName" : "AAD_PREMIUM_P2",
+                "ServicePlanId" : "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
+            }
+        ],
+        "scuba_config" : {
+            "Aad" : {
+                "MS.AAD.7.4v1" : {
+                    "RoleExclusions" : {
+                        "Users" : [],
+                        "Groups" : ["e54ac846-1f5a-4afe-aa69-273b42c3b0c1"]
+                    }
+                }
+            }
+        }
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "1 role(s) that contain users with permanent active assignment:<br/>Global Administrator"
 }
 #--
 
