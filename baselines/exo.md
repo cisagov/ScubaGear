@@ -886,10 +886,10 @@ At a minimum, the following alerts SHALL be enabled:
   - Malware campaign detected after delivery.
 
   - A potentially malicious URL click was detected.
-- _Rationale:_ While all alerts contain some value, some may be more
-or less valuable to a given organization. The above list of alerts is
-intended as baseline set of alerts that should be applicable to most
-organizations. 
+- _Rationale:_ Potentially malicious or service impacting events may go undetected
+without a means of detecting these events.  Setting up a mechanism to alert
+administrators to the list of events above draws attention to them to ensure that any
+impact to users and the agency are minimized.
 - _Last modified:_ June 2023
 
 #### MS.EXO.16.2v1
