@@ -522,8 +522,8 @@ file extension can help detect instances where the file extension has been chang
 Disallowed file types SHALL be determined and set. At a minimum, click-to-run files SHOULD be blocked (e.g., .exe, .cmd, and .vbe).
 - _Rationale:_ Malicious attachments often take the form of click-to-run files,
 though other file types can contain malicious content as well. As such, the
-determination of the full list of file types to block is left to each individual
-organization, to be made according to their own risk tolerance posture.
+determination of the full list of file types to block is left to each
+organization, to be made in accordance with their risk tolerance.
 - _Last modified:_ June 2023
 
 ### Resources
