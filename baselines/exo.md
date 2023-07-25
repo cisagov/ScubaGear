@@ -836,8 +836,7 @@ users from infecting their devices.
 
 #### MS.EXO.15.3v1
 User click tracking SHOULD be enabled.
-- _Rationale:_ In the event of compromise, click tracking represents
-a valuable tool for incident response.
+- _Rationale:_ Users may click on malicious links in emails, leading to compromise or authorized data disclosure.  Enabling user click tracking lets agencies know if a malicious link may have been visited after the fact to help tailor a response to a potential incident.
 - _Last modified:_ June 2023
 
 ### Resources
