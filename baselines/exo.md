@@ -504,11 +504,10 @@ services comparable to those offered by Microsoft.
 #### MS.EXO.9.1v1
 Emails SHALL be filtered by the file types of included attachments. The selected filtering solution SHOULD offer services comparable to Microsoft Defenders Common Attachment Filter.
 - _Rationale:_ Malicious attachments often take the form of click-to-run files.
-Legitimate sharing of these kind of files is better situated for some channel
-other than email; the dangers of allowing them to be sent over email outweigh
-any potential benefits. Microsoft's Common Attachment Filter requires additional
-licensing beyond E3/G3. As such, alternative solutions that offer comparable
-services may be used.
+Sharing of high risk file types, when necessary, is better left to a means other
+than email; the dangers of allowing them to be sent over email outweigh
+any potential benefits. Filtering email attachment based on file types can
+prevent the spread of malware distributed via click-to-run email attachments.
 - _Last modified:_ June 2023
 
 #### MS.EXO.9.2v1
