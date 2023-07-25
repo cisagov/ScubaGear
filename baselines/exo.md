@@ -939,8 +939,8 @@ agencies by OMB M-21-13 (referred to therein as by its former name, Advanced Aud
 
 #### MS.EXO.17.3v1
 Audit logs SHALL be maintained for at least the minimum duration dictated by [OMB M-21-31 (Appendix C)](https://www.whitehouse.gov/wp-content/uploads/2021/08/M-21-31-Improving-the-Federal-Governments-Investigative-and-Remediation-Capabilities-Related-to-Cybersecurity-Incidents.pdf).
-- _Rationale:_ Increased log retention time gives incident responders power
-to investigate incidents that may have gone some time unnoticed.
+- _Rationale:_ Audit logs may no longer be available at the time of need if they are not retained for a sufficient period of time.  Increased log retention time gives an agency the necessary visibility
+to investigate incidents that occurred some time ago.
 - _Last modified:_ June 2023
 
 ### Resources
