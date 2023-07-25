@@ -617,8 +617,7 @@ successful phishing attempts.
 
 #### MS.EXO.11.3v1
 The phishing protection solution SHOULD include an AI-based phishing detection tool comparable to EOP Mailbox Intelligence.
-- _Rationale:_ AI-based phishing detection tools might detect phishing attempts that
-might otherwise go unnoticed, thus reducing the risk of successful phishing attempts.
+- _Rationale:_ Phishing attacks can result in a unauthorized data disclosure and unauthorized access.  Using AI-based phishing detection tools to improve the detection rate of phishing attempts helps reduce the risk of successful phishing attacks.
 - _Last modified:_ June 2023
 
 ### Resources
