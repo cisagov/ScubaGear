@@ -153,11 +153,10 @@ custom domains.
 ### Policies
 #### MS.EXO.3.1v1
 DKIM SHOULD be enabled for any custom domain.
-- _Rationale:_ It is trivial for an adversary to modify the `FROM` field
-of an email such that it appears to be a legitimate email sent by your
-agency, facilitating phishing attacks. DKIM is an additional method for
-email recipients to detect spoofed emails and additionally allows recipients
-to verify the integrity of email content.
+- _Rationale:_ An adversary may modify the `FROM` field
+of an email such that it appears to be a legitimate email sent by an
+agency, facilitating phishing attacks. Enabling DKIM is another means to allow
+recipients to detect spoofed emails and verify the integrity of email content.
 - _Last modified:_ June 2023
 
 ### Resources
