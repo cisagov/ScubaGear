@@ -238,9 +238,9 @@ required by BOD 18-01 for federal, executive branch, departments and agencies.
 #### MS.EXO.4.3v1
 The DMARC point of contact for aggregate reports SHALL include <reports@dmarc.cyber.dhs.gov>.
 - _Rationale:_ Email spoofing attempts are not inherently visible to domain
-owners. DMARC provides a mechanism to be receive reports of spoofing attempts.
+owners. DMARC provides a mechanism to receive reports of spoofing attempts.
 Including <reports@dmarc.cyber.dhs.gov> as a point of contact for these reports
-gives CISA insight into spoofing attempts and is required by BOD 18-01 for
+gives CISA insight into spoofing attempts and is required by Binding Operational Directive 18-01, "Enhance Email and Web Security” for
 federal, executive branch, departments and agencies.
 - _Last modified:_ June 2023
 
