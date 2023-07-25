@@ -779,10 +779,10 @@ Moving spam messages to a separate junk or quarantine folder helps users filter 
 
 #### MS.EXO.14.3v1
 Allowed senders MAY be added, but allowed domains SHALL NOT be added.
-- _Rationale:_ There may be instances of legitimate emails being filtered
-by spam filters. Adding allowed senders is an acceptable method of combating
-these false positives. However, allow-listing an entire domain, especially
-a common domain like office.com, allows a large quantity of
+- _Rationale:_ Legitimate emails may be incorrectly filtered
+by spam protections. Adding allowed senders is an acceptable method of combating
+these false positives. Allowing an entire domain, especially
+a common domain like office.com, however, provides for a large number of
 potentially unknown users to bypass spam protections.
 - _Last modified:_ June 2023
 
