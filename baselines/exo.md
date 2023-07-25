@@ -894,8 +894,7 @@ impact to users and the agency are minimized.
 
 #### MS.EXO.16.2v1
 The alerts SHOULD be sent to a monitored address or incorporated into a SIEM.
-- _Rationale:_ Alerts can contain time-sensitive actionable information. However,
-they are only of value if they are monitored.
+- _Rationale:_Suspicious or malicious events, if not resolved promptly, may have a greater impact to users and the agency.  Sending alerts to a monitored email address or SIEM helps ensure it is acted upon in a timely manner to limit overall impact.
 - _Last modified:_ June 2023
 
 ### Resources
