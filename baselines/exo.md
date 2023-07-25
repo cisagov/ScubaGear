@@ -97,11 +97,7 @@ documentation provides some helpful starting points.
 
 #### MS.EXO.2.1v1
 A list of approved IP addresses for sending mail SHALL be maintained.
-- _Rationale:_ Knowing which servers are authorized to send email for
-your domains is a prerequisite for implementing SPF. Including a server
-that no longer authorized to send email for your domains would allow it
-to continue to sending email while failing to include an authorized 
-server could negatively impact mail delivery.
+- _Rationale:_ Failing to maintain an accurate list of authorized IP addresses may result in spoofed email messages or failure to deliver legitimate messages when SPF is enabled.  Maintaining such a list ensures that unauthorized servers sending spoofed messages can be detected and permit messages from legitimate senders to be delivered.
 - _Last modified:_ June 2023
 
 #### MS.EXO.2.2v1
