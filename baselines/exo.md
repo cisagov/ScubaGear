@@ -356,9 +356,8 @@ for specific legitimate uses as needed.
 
 #### MS.EXO.6.2v1
 Calendar details SHALL NOT be shared with all domains, although they MAY be shared with specific domains.
-- _Rationale:_ Disabling indiscriminate sharing with all domains closes
-up an easily avoided avenue for data exfiltration while still allowing
-for legitimate use cases.
+- _Rationale:_ Calendar details may contain information that should not be shared by default with all domains.  Disabling sharing with all domains closes an avenue for data exfiltration while still allowing
+for legitimate uses as needed.
 - _Last modified:_ June 2023
 
 ### Resources
