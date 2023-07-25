@@ -552,7 +552,7 @@ Any product that meets the requirements outlined in this baseline policy may be 
 #### MS.TEAMS.6.2v1 instructions:
 Any product that meets the requirements outlined in this baseline policy may be used. If the agency is using Microsoft Defender, see the following implementation steps for [DLP](./defender.md#implementation-3) for additional guidance.
 
-## 7. Malware
+## 7. Malware Scanning
 
 Any product that meets the requirements outlined in this baseline
 policy group may be used. If the agency is using Microsoft Defender to
@@ -585,10 +585,10 @@ Users SHOULD be prevented from opening or downloading files detected as malware.
 
 ### Implementation
 #### MS.TEAMS.7.1v1 instructions:
-Any product that meets the requirements outlined in this baseline policy may be used. If the agency is using Microsoft Defender, see the following implementation steps for [Malware](./defender.md#implementation) for additional guidance.
+Any product that meets the requirements outlined in this baseline policy may be used. If the agency is using Microsoft Defender, see the following implementation steps for [Malware Scanning](./defender.md#implementation) for additional guidance.
 
 #### MS.TEAMS.7.2v1 instructions:
-Any product that meets the requirements outlined in this baseline policy may be used. If the agency is using Microsoft Defender, see the following implementation steps for [Malware](./defender.md#implementation) for additional guidance.
+Any product that meets the requirements outlined in this baseline policy may be used. If the agency is using Microsoft Defender, see the following implementation steps for [Malware Scanning](./defender.md#implementation) for additional guidance.
 
 ## 8. Link Protection
 
