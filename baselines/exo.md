@@ -604,7 +604,7 @@ Impersonation protection checks SHOULD be used.
 - _Rationale:_ Users might not be able to reliably identify phishing emails, especially
 if the `FROM` address is nearly indistinguishable from that of a known entity.
 By automatically identifying senders that appear to be impersonating known
-senders, the risk of users falling for phishing attempts can be reduced.
+senders, the risk of a successful phishing attempt can be reduced.
 - _Last modified:_ June 2023
 
 #### MS.EXO.11.2v1
