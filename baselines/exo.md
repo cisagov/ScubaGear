@@ -350,7 +350,7 @@ following policies.
 #### MS.EXO.6.1v1
 Contact folders SHALL NOT be shared with all domains, although they
   MAY be shared with specific domains.
-- _Rationale:_ Contact folders may contain information that should not be shared by default with all domains.  Disabling sharing with all domains closes an avenue for data exfiltration while still allowing
+- _Rationale:_ Contact folders may contain information that should not be shared by default with all domains. Disabling sharing with all domains closes an avenue for data exfiltration while still allowing
 for specific legitimate uses as needed.
 - _Last modified:_ June 2023
 
