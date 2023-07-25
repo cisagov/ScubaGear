@@ -470,8 +470,7 @@ Microsoft.
 ### Policies
 #### MS.EXO.8.1v1
 A DLP solution SHALL be used. The selected DLP solution SHOULD offer services comparable to the native DLP solution offered by Microsoft.
-- _Rationale:_ Users may inadvertently share sensitive information with others who should not have access to it. Microsoft's DLP solution mitigates this risk but requires additional licensing beyond E3/G3. As such, alternative DLP
-solutions that offer comparable services may be used.
+- _Rationale:_ Users may inadvertently disclose sensitive information to unauthorized individuals. A capable DLP solution should to detect the presence of sensitive information in Exchange Online and block access to authorized entities.
 - _Last modified:_ June 2023
 
 #### MS.EXO.8.2v1
