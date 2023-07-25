@@ -546,7 +546,10 @@ and Social Security Numbers (SSN) via email SHALL be restricted.
   for more information.
 
 ### Implementation
-#### MS.TEAMS.6.1v1 - MS.TEAMS.6.2v1 instructions:
+#### MS.TEAMS.6.1v1 instructions:
+Any product that meets the requirements outlined in this baseline policy may be used. If the agency is using Microsoft Defender, see the following implementation steps for [DLP](./defender.md#implementation-3) for additional guidance.
+
+#### MS.TEAMS.6.2v1 instructions:
 Any product that meets the requirements outlined in this baseline policy may be used. If the agency is using Microsoft Defender, see the following implementation steps for [DLP](./defender.md#implementation-3) for additional guidance.
 
 ## 7. Attachment Scanning
