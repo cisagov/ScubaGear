@@ -922,10 +922,12 @@ Configuration Baseline*.
 ### Policies
 #### MS.EXO.17.1v1
 Unified audit logging SHALL be enabled.
-- _Rationale:_ In the event of compromise, Microsoft Purview Audit (Standard)
-represents a valuable tool for incident response. Furthermore, it is required
-for government agencies by OMB M-21-31 (referred to therein by its former name,
-Unified Audit Log). 
+- _Rationale:_ Responding to incidents without detailed information about
+activities that took place slows response actions.  Enabling Microsoft
+Purview Audit (Standard) helps ensure agencies have visibility into user
+actions. Furthermore, Microsoft Purview Audit (Standard) is required for
+government agencies by OMB M-21-31 (referred to therein by its former
+name, Unified Audit Logs). 
 - _Last modified:_ June 2023
 
 #### MS.EXO.17.2v1
