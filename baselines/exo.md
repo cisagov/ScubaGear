@@ -715,8 +715,7 @@ has not been inadvertently disabled.
 ### Policies
 #### MS.EXO.13.1v1
 Mailbox auditing SHALL be enabled.
-- _Rationale:_ In the event of mailbox misuse or compromise, mailbox auditing
-represents a valuable tool for incident response.
+- _Rationale:_ Exchange online user accounts may be compromised or misused in some cases.  Enabling mailbox auditing provides a valuable source of information to detect and respond to mailbox misuse.
 - _Last modified:_ June 2023
 
 ### Resources
