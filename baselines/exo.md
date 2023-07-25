@@ -102,12 +102,9 @@ A list of approved IP addresses for sending mail SHALL be maintained.
 
 #### MS.EXO.2.2v1
 An SPF policy(s) that designates only these addresses as approved senders SHALL be published.
-- _Rationale:_ It is trivial for an adversary to modify the `FROM` field
-of an email such that it appears to be a legitimate email sent by your
-agency, facilitating phishing attacks. SPF mitigates this by providing a
-mechanism for email recipients to detect emails spoofed in this way.
-SPF is required for federal, executive branch, departments and agencies
-by BOD 18-01.
+- _Rationale:_ An adversary may modify the `FROM` field
+of an email such that it appears to be a legitimate email sent by an
+agency, facilitating phishing attacks. Publishing an SPF policy for each agency domain mitigates forged `FROM` fields by providing a means for recipients to detect emails spoofed in this way.  SPF is required for federal, executive branch, departments and agencies by Binding Operational Directive 18-01, “Enhance Email and Web Security”.
 - _Last modified:_ June 2023
 
 ### Resources
