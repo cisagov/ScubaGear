@@ -529,8 +529,9 @@ the requirements outlined in this baseline setting. The DLP solution selected by
 should offer services comparable to those offered by Microsoft.
 
 Though use of Microsoft’s DLP solution is not strictly
-required, guidance for configuring Microsoft’s DLP solution can be found in the
-[Data Loss Prevention](./defender.md#4-data-loss-prevention) section of the [Defender for Office 365 Minimum Viable Secure Configuration Baseline](./defender.md).
+required, guidance for configuring Microsoft’s DLP solution can be found in following section of the CISA M365 Security Configuration Baseline for Defender for Office 365.
+
+- [Data Loss Prevention \| CISA M365 Security Configuration Baseline for Defender for Office 365](./defender.md#4-data-loss-prevention)
 
 ### Policies
 
@@ -548,7 +549,7 @@ The DLP solution SHALL protect PII and sensitive information, as defined by the 
 
 ### Resources
 
-- The [Data Loss Prevention](./defender.md#4-data-loss-prevention) section of the [Defender for Office 365 Minimum Viable Secure Configuration Baseline](./defender.md).
+- None
 
 ## 9. Attachment File Type
 
@@ -562,7 +563,9 @@ those offered by Microsoft.
 
 Though use of Microsoft Defender’s solution is not strictly required for
 this purpose, guidance for configuring the Common Attachment Filter in
-Microsoft Defender can be found in the [Preset Security Policies](./defender.md#1-preset-security-profiles) section of the [Defender for Office 365 Minimum Viable Secure Configuration Baseline](./defender.md).
+Microsoft Defender can be found in the follow section of the CISA M365 Security Configuration Baseline for Defender for Office 365.
+
+- [Preset Security Policies \| CISA M365 Security Configuration Baseline for Defender for Office 365](./defender.md#1-preset-security-profiles)
 
 ### Policies
 
@@ -595,18 +598,18 @@ organization, to be made in accordance with their risk tolerance.
 
 ### Resources
 
-- The [Preset Security Policies](./defender.md#1-preset-security-profiles) section of the [Defender for Office 365 Minimum Viable Secure Configuration Baseline](./defender.md).
+- None
 
 ## 10. Malware
 
 Any product that meets the requirements outlined in this baseline
 policy group may be used. If the agency is using Microsoft Defender to
-implement malware scanning, see the following policies of the [Defender for Office 365 Minimum Viable Secure Configuration Baseline](./defender.md) for additional guidance.
+implement malware scanning, see the following policies of the CISA M365 Security Configuration Baseline for Defender for Office 365 for additional guidance.
 
-- [MS.DEFENDER.1.2v1](./defender.md#msdefender12v1)
+- [MS.DEFENDER.1.2v1 \| CISA M365 Security Configuration Baseline for Defender for Office 365](./defender.md#msdefender12v1)
   - All users SHALL be added to Exchange Online Protection in either the standard or strict preset security policy.
 
-- [MS.DEFENDER.1.3v1](./defender.md#msdefender13v1)
+- [MS.DEFENDER.1.3v1 \| CISA M365 Security Configuration Baseline for Defender for Office 365](./defender.md#msdefender13v1)
   - All users SHALL be added to Defender for Office 365 Protection in either the standard or strict preset security policy.
 
 ### Policies
@@ -638,11 +641,7 @@ containing malware in any given user's mailbox can be reduced.
 
 ### Resources
 
-- [MS.DEFENDER.1.2v1](./defender.md#msdefender12v1) policy of the [Defender for Office 365 Minimum Viable Secure Configuration Baseline](./defender.md).
-  - All users SHALL be added to Exchange Online Protection in either the standard or strict preset security policy.
-
-- [MS.DEFENDER.1.3v1](./defender.md#msdefender13v1)  policy of the [Defender for Office 365 Minimum Viable Secure Configuration Baseline](./defender.md).
-  - All users SHALL be added to Defender for Office 365 Protection in either the standard or strict preset security policy.
+- None
 
 ## 11. Phishing Protections
 
@@ -651,7 +650,7 @@ including the following techniques:
 
 - Impersonation protection checks, wherein a tool compares the sender’s
   address to the addresses of known senders to flag look-alike
-  addresses, like <user@exmple.com> and <user@example.com>
+  addresses, like `user@exmple.com` and `user@example.com`
 
 - User warnings, such as displaying a notice the first time a user
   receives an email from a new sender
@@ -663,12 +662,12 @@ protections. With the exception for impersonation protection, these features are
 available with Exchange Online Protection (EOP), which is included in all
 Microsoft 365 subscriptions that contain Exchange Online mailboxes.
 For more guidance on configuring phishing protections with Microsoft’s native solutions,
-see the following policy and section of the [Defender for Office 365 Minimum Viable Secure Configuration Baseline](./defender.md).
+see the following policy and section of the CISA M365 Security Configuration Baseline for Defender for Office 365.
 
-- [MS.DEFENDER.1.2v1](./defender.md#msdefender12v1).
+- [MS.DEFENDER.1.2v1 \| CISA M365 Security Configuration Baseline for Defender for Office 365](./defender.md#msdefender12v1).
   - All users SHALL be added to Exchange Online Protection in either the standard or strict preset security policy.
 
-- [Impersonation Protection](./defender.md#2-impersonation-protection) section of the [Defender for Office 365 Minimum Viable Secure Configuration Baseline](./defender.md).
+- [Impersonation Protection \| CISA M365 Security Configuration Baseline for Defender for Office 365](./defender.md#2-impersonation-protection)
 
 ### Policies
 
@@ -698,10 +697,7 @@ The phishing protection solution SHOULD include an AI-based phishing detection t
 
 ### Resources
 
-- [MS.DEFENDER.1.2v1](./defender.md#msdefender12v1) policy of the [Defender for Office 365 Minimum Viable Secure Configuration Baseline](./defender.md).
-  - All users SHALL be added to Exchange Online Protection in either the standard or strict preset security policy.
-
-- [Impersonation Protection](./defender.md#2-impersonation-protection) section of the [Defender for Office 365 Minimum Viable Secure Configuration Baseline](./defender.md).
+- None
 
 ## 12. IP Allow Lists
 
@@ -860,9 +856,9 @@ To enable mailbox auditing by default for your organization via PowerShell:
 Microsoft Defender includes several capabilities for protecting against
 inbound spam emails. Use of Microsoft Defender is not strictly required
 for this purpose; any product that fulfills the requirements outlined in
-this baseline policy group may be used. If the agency is using Microsoft Defender to meet this baseline policy group, see the following policy of the [Defender for Office 365 Minimum Viable Secure Configuration Baseline](./defender.md) for additional guidance.
+this baseline policy group may be used. If the agency is using Microsoft Defender to meet this baseline policy group, see the following policy of the CISA M365 Security Configuration Baseline for Defender for Office 365.
 
-- [MS.DEFENDER.1.2v1](./defender.md#msdefender12v1).
+- [MS.DEFENDER.1.2v1 \| CISA M365 Security Configuration Baseline for Defender for Office 365](./defender.md#msdefender12v1)
   - All users SHALL be added to Exchange Online Protection in either the standard or strict preset security policy.
 
 ### Policies
@@ -893,8 +889,7 @@ potentially unknown users to bypass spam protections.
 
 ### Resources
 
-- [MS.DEFENDER.1.2v1](./defender.md#msdefender12v1) policy of the [Defender for Office 365 Minimum Viable Secure Configuration Baseline](./defender.md).
-  - All users SHALL be added to Exchange Online Protection in either the standard or strict preset security policy.
+- None
 
 ## 15. Link Protection
 
@@ -920,9 +915,9 @@ If all checks pass, the user is redirected to the original URL.
 Microsoft Defender includes link scanning capabilities
 Use of Microsoft Defender is not strictly required for this purpose;
 any product that fulfills the requirements outlined in this baseline policy group may be used.
-If the agency is using Microsoft Defender to meet this baseline policy group, see the following policy of the [Defender for Office 365 Minimum Viable Secure Configuration Baseline](./defender.md) for additional guidance.
+If the agency is using Microsoft Defender to meet this baseline policy group, see the following policy of the CISA M365 Security Configuration Baseline for Defender for Office 365 for additional guidance.
 
-- [MS.DEFENDER.1.3v1](./defender.md#msdefender13v1).
+- [MS.DEFENDER.1.3v1 \| CISA M365 Security Configuration Baseline for Defender for Office 365](./defender.md#msdefender13v1).
   - All users SHALL be added to Defender for Office 365 Protection in either the standard or strict preset security policy.
 
 ### Policies
@@ -949,15 +944,16 @@ User click tracking SHOULD be enabled.
 
 ### Resources
 
-- [MS.DEFENDER.1.3v1](./defender.md#msdefender13v1) policy of the [Defender for Office 365 Minimum Viable Secure Configuration Baseline](./defender.md)
-  - All users SHALL be added to Defender for Office 365 Protection in either the standard or strict preset security policy.
+- None
 
 ## 16. Alerts
 
 Microsoft Defender includes several prebuilt alert policies, many of
 which pertain to Exchange Online. These alerts give admins better
 real-time insight into possible security incidents. Guidance for
-configuring alerts in Microsoft Defender is given in the [Alerts](./defender.md#5-alerts) section of the [Defender for Office 365 Minimum Viable Secure Configuration Baseline](./defender.md).
+configuring alerts in Microsoft Defender is given in the following section of the CISA M365 Security Configuration Baseline for Defender for Office 365.
+
+- [Alerts \| CISA M365 Security Configuration Baseline for Defender for Office 365](./defender.md#5-alerts)
 
 ### Policies
 
@@ -993,7 +989,7 @@ The alerts SHOULD be sent to a monitored address or incorporated into a SIEM.
 
 ### Resources
 
-- The [Alerts](./defender.md#5-alerts) section of the [Defender for Office 365 Minimum Viable Secure Configuration Baseline](./defender.md).
+- None
 
 ## 17. Microsoft Purview Audit
 
@@ -1008,7 +1004,9 @@ This can be accomplished either by offloading the logs out of the cloud environm
 OMB M-21-13 also requires Advanced Audit be configured in M365. Advanced Audit adds additional event types to the Unified Audit Log.
 
 Audit logging is managed from the Microsoft Purview compliance center. For
-guidance configuring audit logging, see the [Microsoft Purview Audit](./defender.md#6-microsoft-purview-audit) section of the [Defender for Office 365 Minimum Viable Secure Configuration Baseline](./defender.md).
+guidance configuring audit logging, see the  following section of the CISA M365 Security Configuration Baseline for Defender for Office 365.
+
+- [Microsoft Purview Audit](./defender.md#6-microsoft-purview-audit)
 
 ### Policies
 
@@ -1040,7 +1038,7 @@ to investigate incidents that occurred some time ago.
 
 ### Resources
 
-- [Microsoft Purview Audit](./defender.md#6-microsoft-purview-audit) section of the [Defender for Office 365 Minimum Viable Secure Configuration Baseline](./defender.md).
+- None
 
 
 # Acknowledgements
