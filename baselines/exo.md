@@ -247,7 +247,7 @@ federal, executive branch, departments and agencies.
 #### MS.EXO.4.4v1
 An agency point of contact SHOULD be included for aggregate and/or failure reports.
 - _Rationale:_ Email spoofing attempts are not inherently visible to domain
-owners. DMARC provides a mechanism to be receive reports of spoofing attempts.
+owners. DMARC provides a mechanism to receive reports of spoofing attempts.
 Including an agency point of contact gives the agency insight into attempts
 to spoof their domains.
 - _Last modified:_ June 2023
