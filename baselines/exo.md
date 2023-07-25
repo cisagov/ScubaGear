@@ -932,9 +932,10 @@ name, Unified Audit Logs).
 
 #### MS.EXO.17.2v1
 Advanced audit SHALL be enabled.
-- _Rationale:_ Microsoft Purview Audit (Premium) logs additional event types that
-are not included with Standard. Furthermore, it is required for government 
-agencies by OMB M-21-13 (referred to therein as by its former name, Advanced Audit).
+- _Rationale:_ Standard logging may not include relevant details necessary for
+visibility into user actions during an incident.  Enabling Microsoft Purview Audit
+(Premium) captures additional event types that are not included with Standard.
+Furthermore, it is required for government agencies by OMB M-21-13 (referred to therein as by its former name, Unified Audit Logs w/ Advanced Features).
 - _Last modified:_ June 2023
 
 #### MS.EXO.17.3v1
