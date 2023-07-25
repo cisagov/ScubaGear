@@ -300,8 +300,8 @@ outside of Outlook that send email messages.
 
 #### MS.EXO.5.1v1
 SMTP AUTH SHALL be disabled in Exchange Online.
-- _Rationale:_ In almost all cases, SMTP auth is not used or needed.
-Therefore, disabling it conforms to the principle of least
+- _Rationale:_ SMTP AUTH is not used or needed by modern email clients.
+Therefore, disabling it as the global default conforms to the principle of least
 functionality.
 - _Last modified:_ June 2023
 
