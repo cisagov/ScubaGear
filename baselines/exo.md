@@ -829,9 +829,9 @@ known malicious websites.
 
 #### MS.EXO.15.2v1
 Direct download links SHOULD be scanned for malware.
-- _Rationale:_ While blocking all malicious files is not feasible,
-blocking specific known-bad files eliminates the threat from
-those specific files.
+- _Rationale:_ URLs in emails may direct users to download and run malware.
+Scanning direct download links in real-time for known malware and blocking access can prevent
+users from infecting their devices.
 - _Last modified:_ June 2023
 
 #### MS.EXO.15.3v1
