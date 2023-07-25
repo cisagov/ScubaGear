@@ -40,5 +40,11 @@ Aad:
   MS.AAD.2.1v1:  *CommonExclusions
   MS.AAD.2.3v1:  *CommonExclusions
   MS.AAD.3.2v1:  *CommonExclusions
+  MS.AAD.7.4v1: &CommonRoleExclusions
+    RoleExclusions:
+      Users:
+        - 2a8adc58-b7c5-4086-a5cc-244b8df40ce8
+      Groups:
+        - 4a471183-d934-4fb4-b1b3-d9525e0e1b45
 #SharePoint:
 #Teams:
