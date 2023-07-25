@@ -512,9 +512,10 @@ prevent the spread of malware distributed via click-to-run email attachments.
 
 #### MS.EXO.9.2v1
 The attachment filter SHOULD attempt to determine the true file type and assess the file extension.
-- _Rationale:_ Changing the extension at the end of a file name is trivial (e.g.,
-renaming notepad.exe to notepad.txt). Performing checks beyond the file extension
-can help detect instances where the file extension has been changed.
+- _Rationale:_ Users have the ability to change a file extension at the end of a 
+file name (e.g., notepad.exe to notepad.txt) to obscure the actual file type.
+Performing checks to verify the file type and whether it matches the designated
+file extension can help detect instances where the file extension has been changed.
 - _Last modified:_ June 2023
 
 #### MS.EXO.9.3v1
