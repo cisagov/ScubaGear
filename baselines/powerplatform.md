@@ -2,62 +2,52 @@
 
 Microsoft Power Platform is a group of applications comprised of a
 low-code application development toolkit, business intelligence software,
-a custom chat bot creator, and app connectivity software. The following sections summarizes
-the various Power Platform applications.
+a custom chat bot creator, and app connectivity software.  This Secure Configuration Baseline (SCB) provides specific policies to strengthen Power Platform security.
 
-**Power Apps**: Low-code application development software used
+## License Compliance and Copyright
+
+Portions of this document are adapted from documents in Microsoft’s [Microsoft 365](https://github.com/MicrosoftDocs/microsoft-365-docs/blob/public/LICENSE) and [Azure](https://github.com/MicrosoftDocs/azure-docs/blob/main/LICENSE) GitHub repositories. The respective documents are subject to copyright and are adapted under the terms of the Creative Commons Attribution 4.0 International license. Source documents are linked throughout this document. The United States Government has adapted selections of these documents to develop innovative and scalable configuration standards to strengthen the security of widely used cloud-based software services.
+
+## Assumptions
+
+The **License Requirements** sections of this document assume the organization is using an [M365 E3](https://www.microsoft.com/en-us/microsoft-365/compare-microsoft-365-enterprise-plans) or [G3](https://www.microsoft.com/en-us/microsoft-365/government) license level at a minimum. Therefore, only licenses not included in E3/G3 are listed.
+
+## Key Terminology
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [RFC 2119](https://datatracker.ietf.org/doc/html/rfc2119).
+
+The following section summarizes the various Power Platform applications referenced in this baseline:
+
+1. **Power Apps**: Low-code application development software used
 to create custom business applications. The apps can be developed as desktop,
 mobile, and even web apps. Three different types of Power Apps can be
 created:
 
-1.  [**Canvas Apps**](https://learn.microsoft.com/en-us/power-apps/maker/canvas-apps/): These are drag and
+   1. [**Canvas Apps**](https://learn.microsoft.com/en-us/power-apps/maker/canvas-apps/): These are drag and
     drop style developed apps, where
     users drag and add User Interface (UI) components to the screen.
     Users can then connect the components to data sources to display
     data in the canvas app.
 
-2.  [**Model-Driven Apps**](https://learn.microsoft.com/en-us/power-apps/maker/model-driven-apps/): These are apps developed from an existing
+   2. [**Model-Driven Apps**](https://learn.microsoft.com/en-us/power-apps/maker/model-driven-apps/): These are apps developed from an existing
     data source. They can be thought of as the inverse of a Canvas App.
     Since, you build the app from the source rather than building the UI and then connecting to the source like
     Canvas apps.
 
-3.  [**Power Pages**](https://learn.microsoft.com/en-us/power-pages/): These apps that are developed to function as either internal or external facing websites.
+   3. [**Power Pages**](https://learn.microsoft.com/en-us/power-pages/): These apps that are developed to function as either internal or external facing websites.
 
-[**Power Automate**](https://learn.microsoft.com/en-us/power-automate/): This is an online tool within Microsoft 365 and add-ins used to create automated workflows between apps
+2. [**Power Automate**](https://learn.microsoft.com/en-us/power-automate/): This is an online tool within Microsoft 365 and add-ins used to create automated workflows between apps
 and services to synchronize files, get notifications, and collect data.
 
-[**Power Virtual Agents**](https://learn.microsoft.com/en-us/power-virtual-agents/): These are custom chat bots for use in the stand-alone Power Virtual Agents web app or in a Microsoft Teams
+3. [**Power Virtual Agents**](https://learn.microsoft.com/en-us/power-virtual-agents/): These are custom chat bots for use in the stand-alone Power Virtual Agents web app or in a Microsoft Teams
 channel.
 
-[**Connectors**](https://learn.microsoft.com/en-us/connectors/connector-reference/): These are proxies or wrappers around an API that allow the underlying service to be accessed from Power Automate Workflows, Power Apps, or Azure Logic Apps.
+4. [**Connectors**](https://learn.microsoft.com/en-us/connectors/connector-reference/): These are proxies or wrappers around an API that allow the underlying service to be accessed from Power Automate Workflows, Power Apps, or Azure Logic Apps.
 
-[**Microsoft Dataverse**](https://learn.microsoft.com/en-us/power-apps/maker/data-platform/): This is a cloud database management system most
+5. [**Microsoft Dataverse**](https://learn.microsoft.com/en-us/power-apps/maker/data-platform/): This is a cloud database management system most
 often used to store data in SQL-like tables. A Power App would then use
 a connector to connect to the Dataverse table and perform create, read,
 update, and delete (CRUD) operations.
-
-## License Compliance and Copyright
-
-Portions of this document are adapted from documents in Microsoft’s
-[Microsoft
-365](https://github.com/MicrosoftDocs/microsoft-365-docs/blob/public/LICENSE)
-and
-[Azure](https://github.com/MicrosoftDocs/azure-docs/blob/main/LICENSE)
-GitHub repositories. The respective documents are subject to copyright
-and are adapted under the terms of the Creative Commons Attribution 4.0
-International license. Source documents are linked throughout this
-document. The United States Government has adapted selections of these
-documents to develop innovative and scalable configuration standards to
-strengthen the security of widely used cloud-based software services.
-
-## Assumptions
-
-The **License Requirements** sections of this document assume the
-organization is using an [M365
-E3](https://www.microsoft.com/en-us/microsoft-365/compare-microsoft-365-enterprise-plans)
-or [G3](https://www.microsoft.com/en-us/microsoft-365/government)
-license level. Therefore, only licenses not included in E3/G3 are
-listed.
 
 # Baseline Policies
 
@@ -404,10 +394,10 @@ The ability to create Power Pages sites SHOULD be restricted to admins.
 Discover the valid endpoint parameter [here](https://learn.microsoft.com/en-us/powershell/module/microsoft.powerapps.administration.powershell/add-powerappsaccount?view=pa-ps-latest#-endpoint). Commercial tenants use `-Endpoint prod`, GCC tenants use `-Endpoint usgov` and so on.
 
 3. Then run the following PowerShell command to disable the creation of Power Pages sites by non-administrative users.
-```
-Set-TenantSettings -RequestBody @{ "disablePortalsCreationByNonAdminUsers" = $true }
-```
 
+    ```
+    Set-TenantSettings -RequestBody @{ "disablePortalsCreationByNonAdminUsers" = $true }
+    ```
 
 # Acknowledgements
 
@@ -420,42 +410,25 @@ response to Section 3 of [Executive Order (EO) 14028, *Improving the
 Nation’s
 Cybersecurity*](https://www.federalregister.gov/documents/2021/05/17/2021-10460/improving-the-nations-cybersecurity):
 
-- Consumer Financial Protection Bureau (CFPB)
-
-- Department of the Interior (DOI)
-
-- National Aeronautics and Space Administration (NASA)
-
+- The MITRE Corporation
 - Sandia National Laboratories (Sandia)
 
-- U.S. Census Bureau (USCB)
+The SCBs were informed by materials produced by the following organizations:
 
-- U.S. Geological Survey (USGS)
+- Center for Internet Security (CIS)
+- Internet Engineering Task Force (IETF)
+- Mandiant
+- Microsoft
+- U.S. Defense Information Systems Agency (DISA)
+- U.S. National Institute of Standards (NIST)
+- U.S. Office of Management and Budget (OMB)
 
+The cross-agency collaboration and partnerships developed during this initiative serve as an example for solving complex problems faced by the federal government. CISA also thanks the Cybersecurity Innovation Tiger Team (CITT) for its leadership and the following federal agencies that provided input during the development of the baselines:
+
+- Consumer Financial Protection Bureau (CFPB)
+- Department of the Interior (DOI)
+- National Aeronautics and Space Administration (NASA)
 - U.S. Office of Personnel Management (OPM)
-
 - U.S. Small Business Administration (SBA)
-
-The cross-agency collaboration and partnerships developed during this
-initiative serve as an example for solving complex problems faced by the
-federal government.
-
-**Cybersecurity Innovation Tiger Team (CITT) Leadership**
-
-Beau Houser (USCB), Sanjay Gupta (SBA), Michael Witt (NASA), James
-Saunders (OPM), Han Lin (Sandia), Andrew Havely (DOI).
-
-**CITT Authors**
-
-Trafenia Salzman (SBA), Benjamin McChesney (OPM), Robert Collier (USCB),
-Matthew Snitchler (Sandia), Darryl Purdy (USCB), Brandon Frankens
-(NASA), Brandon Goss (NASA), Nicole Bogeajis (DOI/USGS), Kevin Kelly
-(DOI), Adnan Ehsan (CFPB), Michael Griffin (CFPB), Vincent Urias
-(Sandia), Angela Calabaza (Sandia).
-
-**CITT Contributors**
-
-Dr. Mukesh Rohatgi (MITRE), Lee Szilagyi (MITRE), Nanda Katikaneni
-(MITRE), Ted Kolovos (MITRE), Thomas Comeau (MITRE), Karen Caraway
-(MITRE), Jackie Whieldon (MITRE), Jeanne Firey (MITRE), Kenneth Myers
-(General Services Administration).
+- U.S. Census Bureau (USCB)
+- U.S. Geological Survey (USGS)
