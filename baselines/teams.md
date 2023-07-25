@@ -500,38 +500,26 @@ All the settings in this section are configured in the **Microsoft Teams admin c
 
 Data loss prevention (DLP) helps prevent both accidental leakage of
 sensitive information as well as intentional exfiltration of data. DLP
-forms an integral part of securing Microsoft Teams. There a several
-commercial DLP solutions available that document support for Microsoft
-Teams. Agencies may select any service that fits their needs and meets
-the requirements outlined in this section.
+forms an integral part of securing Microsoft Exchange Online. There are
+several commercial DLP solutions available that document support for
+M365. Microsoft themselves offers DLP services, controlled within the Microsoft Purview
+compliance portal. Agencies may select any service that fits their needs and meets
+the requirements outlined in this baseline setting. The DLP solution selected by an agency
+should offer services comparable to those offered by Microsoft.
 
-Microsoft offers DLP services, controlled within the [Microsoft 365
-compliance](https://compliance.microsoft.com) admin center. Though use
-of Microsoft’s DLP solution is not strictly required, guidance for
-configuring Microsoft’s DLP solution can be found in the “Data Loss
-Prevention SHALL Be Enabled” section of the *Defender for Office 365
-Minimum Viable Secure Configuration Baseline*. The DLP solution selected
-by an agency should offer services comparable to those offered by
-Microsoft.
+Though use of Microsoft’s DLP solution is not strictly
+required, guidance for configuring Microsoft’s DLP solution can be found in following section of the CISA M365 Security Configuration Baseline for Defender for Office 365.
+
+- [Data Loss Prevention \| CISA M365 Security Configuration Baseline for Defender for Office 365](./defender.md#4-data-loss-prevention)
 
 ### Policies
 
 #### MS.TEAMS.6.1v1
-A DLP solution SHALL be enabled.
+A DLP solution SHALL be enabled. The selected DLP solution SHOULD offer services comparable to the native DLP solution offered by Microsoft.
 - _Rationale:_ TODO
 - _Last modified:_ July 2023
 
 #### MS.TEAMS.6.2v1
-Agencies SHOULD use either the native DLP solution offered by Microsoft or a DLP solution that offers comparable services.
-- _Rationale:_ TODO
-- _Last modified:_ July 2023
-
-#### MS.TEAMS.6.3v1
-Agencies SHOULD use either the native DLP solution offered by Microsoft or a DLP solution that offers comparable services.
-- _Rationale:_ TODO
-- _Last modified:_ July 2023
-
-#### MS.TEAMS.6.4v1
 The DLP solution SHALL protect Personally Identifiable Information (PII)
 and sensitive information, as defined by the agency. At a minimum, the
 sharing of credit card numbers, taxpayer Identification Numbers (TIN),
@@ -541,8 +529,25 @@ and Social Security Numbers (SSN) via email SHALL be restricted.
 
 ### Resources
 
-- The “Data Loss Prevention SHALL Be Enabled” section of the *Defender for
-Office 365 Minimum Viable Secure Configuration Baseline*.
+- [Plan for data loss prevention (DLP) \| Microsoft
+  Docs](https://docs.microsoft.com/en-us/microsoft-365/compliance/dlp-overview-plan-for-dlp?view=o365-worldwide)
+
+- [Personally identifiable information (PII) \|
+  NIST](https://csrc.nist.gov/glossary/term/personally_identifiable_information#:~:text=NISTIR%208259,2%20under%20PII%20from%20EGovAct)
+
+- [Sensitive information \|
+  NIST](https://csrc.nist.gov/glossary/term/sensitive_information)
+
+### License Requirements
+
+- DLP for Teams requires an E5 or G5 license. See [Information
+  Protection: Data Loss Prevention for Teams \| Microsoft
+  Docs](https://docs.microsoft.com/en-us/office365/servicedescriptions/microsoft-365-service-descriptions/microsoft-365-tenantlevel-services-licensing-guidance/microsoft-365-security-compliance-licensing-guidance#information-protection-data-loss-prevention-for-teams)
+  for more information.
+
+### Implementation
+#### MS.TEAMS.6.1v1 - MS.TEAMS.6.2v1 instructions:
+Any product that meets the requirements outlined in this baseline policy may be used. If the agency is using Microsoft Defender, see the following implementation steps for [DLP](./defender.md#implementation-3) for additional guidance.
 
 ## 7. Attachment Scanning
 
