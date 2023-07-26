@@ -31,7 +31,6 @@
     $TestContainers = @()
     $TestContainers += New-PesterContainer -Path "Testing/Functional/Products" -Data @{ TenantDomain = "y2zj1.onmicrosoft.com"; TenantDisplayName = "y2zj1"; ProductName = "sharepoint"; M365Environment = "commercial" }
     Invoke-Pester -Container $TestContainers -Output Detailed
-
 #>
 
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'Thumbprint', Justification = 'False positive as rule does not scan child scopes')]
@@ -86,6 +85,7 @@ BeforeDiscovery{
     $YamlString = Get-Content -Path $TestPlanPath | Out-String
     $ProductTestPlan = ConvertFrom-Yaml $YamlString
     $TestPlan = $ProductTestPlan.TestPlan.ToArray()
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'Tests', Justification = 'Variable is used in ScriptBlock')]
     $Tests = $TestPlan.Tests
 
     $ServicePrincipalParams = @{CertThumbprintParams = @{
@@ -122,31 +122,64 @@ BeforeAll{
     }
 
     # Dot source utility functions
-    . Join-Path -Path $PSScriptRoot -ChildPath "FunctionalTestUtils.ps1"
+    . (Join-Path -Path $PSScriptRoot -ChildPath "FunctionalTestUtils.ps1")
 
     function SetConditions {
+        [CmdletBinding(DefaultParameterSetName = 'Actual')]
         param(
-            [Parameter(Mandatory = $true)]
+            [Parameter(Mandatory = $true, ParameterSetName = 'Actual')]
+            [Parameter(Mandatory = $true, ParameterSetName = 'Cached')]
             [AllowEmptyCollection()]
             [array]
-            $Conditions
+            $Conditions,
+            [Parameter(Mandatory = $true, ParameterSetName = 'Cached')]
+            [string]
+            $OutputFolder
         )
 
         ForEach($Condition in $Conditions){
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'Splat', Justification = 'Variable is used in ScriptBlock')]
             $Splat = $Condition.Splat
+
+            if ('Cached' -eq $PSCmdlet.ParameterSetName){
+                Write-Output "Setting output folder to: $OutputFolder"
+                $Splat.Add("OutputFolder", [string]$OutputFolder)
+            }
+
             $ScriptBlock = [ScriptBlock]::Create("$($Condition.Command) @Splat")
 
             try {
                 $ScriptBlock.Invoke()
             }
-            catch [Newtonsoft.Json.JsonReaderException]{
+            catch {
                 Write-Error $PSItem.ToString()
             }
         }
     }
 
-    function ExecuteScubagear() {
+    function UpdateProviderExport{
+        param(
+            [Parameter(Mandatory = $true)]
+            [AllowNull()]
+            [object]
+            $Updates,
+            [Parameter(Mandatory = $true)]
+            [string]
+            $OutputFolder
+        )
+
+        $ProviderExport = LoadProviderExport($OutputFolder)
+
+        foreach ($Update in $Updates.ToArray()){
+            $Key = $Update.Key
+            $ProviderExport.$Key = $Update.Value
+        }
+
+        PublishProviderExport -OutputFolder $OutputFolder -Export $ProviderExport
+
+    }
+
+    function RunScuba() {
         # Execute ScubaGear to extract the config data and produce the output JSON
         Invoke-SCuBA -CertificateThumbPrint $Thumbprint -AppId $AppId -Organization $TenantDomain -Productnames $ProductName -OutPath . -M365Environment $M365Environment -Quiet
     }
@@ -155,6 +188,27 @@ BeforeAll{
         $IntermediateTestResults = Get-Content "$OutputFolder/TestResults.json" -Raw | ConvertFrom-Json
         $IntermediateTestResults
     }
+    function LoadProviderExport($OutputFolder) {
+        if (-not (Test-Path -Path "$OutputFolder/ModifiedProviderSettingsExport.json" -PathType Leaf)){
+            Copy-Item -Path "$OutputFolder/ProviderSettingsExport.json" -Destination "$OutputFolder/ModifiedProviderSettingsExport.json"
+        }
+
+        $ProviderExport = Get-Content "$OutputFolder/ModifiedProviderSettingsExport.json" -Raw | ConvertFrom-Json
+        $ProviderExport
+    }
+
+function PublishProviderExport() {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]
+        $OutputFolder,
+        [Parameter(Mandatory = $true)]
+        [object]
+        $Export
+    )
+    $Json = $Export | ConvertTo-Json -Depth 10 | Out-String
+    Set-Content -Path "$OutputFolder/ModifiedProviderSettingsExport.json" -Value $Json
+}
 
     function RemoveConditionalAccessPolicyByName{
         [CmdletBinding()]
@@ -167,7 +221,7 @@ BeforeAll{
 
         $Ids = Get-MgIdentityConditionalAccessPolicy | Where-Object {$_.DisplayName -match $DisplayName} | Select-Object -Property Id
 
-       foreach($Id in $Ids){
+        foreach($Id in $Ids){
             if (-not ([string]::IsNullOrEmpty($Id.Id))){
                 Write-Output "Removing $DisplayName with id of $($Id.Id)"
                 Remove-MgIdentityConditionalAccessPolicy -ConditionalAccessPolicyId $Id.Id
@@ -203,12 +257,26 @@ BeforeAll{
 Describe "Policy Checks for <ProductName>"{
     Context "Start tests for policy <PolicyId>" -ForEach $TestPlan{
         BeforeEach{
-            SetConditions -Conditions $Preconditions.ToArray()
-            ExecuteScubagear
+            if ('RunScuba' -eq $TestDriver){
+                SetConditions -Conditions $Preconditions.ToArray()
+                RunScuba
+            }
+            elseif ('RunCached' -eq $TestDriver){
+                RunScuba
+                $ReportFolders = Get-ChildItem . -directory -Filter "M365BaselineConformance*" | Sort-Object -Property LastWriteTime -Descending
+                $OutputFolder = $ReportFolders[0].Name
+                SetConditions -Conditions $Preconditions.ToArray() -OutputFolder $OutputFolder
+                Invoke-RunCached -Productnames $ProductName -ExportProvider $false -OutPath $OutputFolder -OutProviderFileName 'ModifiedProviderSettingsExport' -Quiet
+            }
+            else {
+                Write-Error -Message "Invalid Test Driver: $TestDriver"
+            }
+
             $ReportFolders = Get-ChildItem . -directory -Filter "M365BaselineConformance*" | Sort-Object -Property LastWriteTime -Descending
             $OutputFolder = $ReportFolders[0]
             $IntermediateTestResults = LoadTestResults($OutputFolder)
             # Search the results object for the specific requirement we are validating and ensure the results are what we expect
+            [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'PolicyResultObj', Justification = 'Variable is used in ScriptBlock')]
             $PolicyResultObj = $IntermediateTestResults | Where-Object { $_.PolicyId -eq $PolicyId }
             $BaselineReports = Join-Path -Path $OutputFolder -ChildPath 'BaselineReports.html'
             $script:url = (Get-Item $BaselineReports).FullName
@@ -218,7 +286,7 @@ Describe "Policy Checks for <ProductName>"{
         Context "Execute test, <TestDescription>" -ForEach $Tests {
             It "Check test case results" {
 
-                # Check intermediate output 
+                #Check intermediate output
                 $PolicyResultObj.RequirementMet | Should -Be $ExpectedResult
 
                 $Details = $PolicyResultObj.ReportDetails
@@ -318,7 +386,7 @@ Describe "Policy Checks for <ProductName>"{
                                         $RowData[4].GetAttribute("innerHTML") | FromInnerHtml | Should -BeExactly $PolicyResultObj.ReportDetails
                                     }
                                     else {
-                                       $false | Should -BeTrue -Because "policy should be custom, not checked, or have and expected result. [$Msg]"
+                                        $false | Should -BeTrue -Because "policy should be custom, not checked, or have and expected result. [$Msg]"
                                     }
                                 }
                             }
