@@ -1,6 +1,7 @@
 ProductName: aad
 TestPlan:
   - PolicyId: MS.AAD.1.1v1
+    TestDriver: RunScuba
     Tests:
       - TestDescription: MS.AAD.1.1v1 ReportOnly
         Preconditions:
@@ -21,6 +22,7 @@ TestPlan:
         Postconditions: []
         ExpectedResult: true       
   - PolicyId: MS.AAD.2.1v1
+    TestDriver: RunScuba
     Tests:
       - TestDescription: MS.AAD.2.1v1 Report Only
         Preconditions:
@@ -41,6 +43,7 @@ TestPlan:
         Postconditions: [] 
         ExpectedResult: true
   - PolicyId: MS.AAD.2.2v1
+    TestDriver: RunScuba
     Tests:
       - TestDescription: MS.AAD.2.2v1 Not Checked
         Preconditions: []
@@ -48,18 +51,67 @@ TestPlan:
         IsNotChecked: true
         ExpectedResult: false
   - PolicyId: MS.AAD.2.3v1
+    TestDriver: RunScuba
     Tests:
       - TestDescription: MS.AAD.2.3v1 Default
         Preconditions: []
         Postconditions: []
         ExpectedResult: false
   - PolicyId: MS.AAD.3.1v1
+    TestDriver: RunCached
     Tests:
-      - TestDescription: MS.AAD.3.1v1 Default
-        Preconditions: []
+      - TestDescription: MS.AAD.3.1v1 Bad Authentication Strength
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                - Key: "conditional_access_policies"
+                  Value:
+                    - Conditions:
+                        Applications:
+                          IncludeApplications: 
+                            - "All"
+                          ExcludeApplications: []  
+                        Users:
+                          IncludeUsers:
+                            - "All"
+                      GrantControls:
+                        AuthenticationStrength:
+                          AllowedCombinations:
+                            - "windowsHelloForBusiness"
+                            - "Super Strength"
+                            - "x509CertificateMultiFactor"
+                      State: "enabled"
+                      DisplayName: "MS.AAD.3.1v1 Bad Authentication Strength"
         Postconditions: []
-        ExpectedResult: false
+        ExpectedResult: false        
+      - TestDescription: MS.AAD.3.1v1 Default
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                - Key: "conditional_access_policies"
+                  Value:
+                    - Conditions:
+                        Applications:
+                          IncludeApplications: 
+                            - "All"
+                          ExcludeApplications: []
+                        Users:
+                          IncludeUsers:
+                            - "All"
+                      GrantControls:
+                        AuthenticationStrength:
+                          AllowedCombinations:
+                            - "windowsHelloForBusiness"
+                            - "fido2"
+                            - "x509CertificateMultiFactor"
+                      State: "enabled"
+                      DisplayName: "Test Policy - MS.AAD.3.1v1 Default"
+        Postconditions: []
+        ExpectedResult: true
   - PolicyId: MS.AAD.3.2v1
+    TestDriver: RunScuba
     Tests:
       - TestDescription: MS.AAD.3.2v1 MFA Not Required
         Preconditions:
@@ -80,6 +132,7 @@ TestPlan:
         Postconditions: []
         ExpectedResult: true
   - PolicyId: MS.AAD.3.3v1
+    TestDriver: RunScuba
     Tests:
       - TestDescription: MS.AAD.3.3v1 Not Checked
         Preconditions: []
@@ -87,6 +140,7 @@ TestPlan:
         IsNotChecked: true
         ExpectedResult: false
   - PolicyId: MS.AAD.3.4v1
+    TestDriver: RunScuba
     Tests:
       - TestDescription: MS.AAD.3.4v1 Not Checked
         Preconditions: []
@@ -94,6 +148,7 @@ TestPlan:
         IsNotChecked: true
         ExpectedResult: false 
   - PolicyId: MS.AAD.3.5v1
+    TestDriver: RunScuba
     Tests:
       - TestDescription: MS.AAD.3.5v1 Not Checked
         Preconditions: []
@@ -101,6 +156,7 @@ TestPlan:
         IsNotChecked: true
         ExpectedResult: false
   - PolicyId: MS.AAD.3.6v1
+    TestDriver: RunScuba
     Tests:
       - TestDescription: MS.AAD.3.6v1 Report Only
         Preconditions:
@@ -121,18 +177,21 @@ TestPlan:
         Postconditions: []
         ExpectedResult: false
   - PolicyId: MS.AAD.3.7v1
+    TestDriver: RunScuba
     Tests:
       - TestDescription: MS.AAD.3.7v1 Default
         Preconditions: []
         Postconditions: []
         ExpectedResult: false
   - PolicyId: MS.AAD.3.8v1
+    TestDriver: RunScuba
     Tests:
       - TestDescription: MS.AAD.3.8v1 Default
         Preconditions: []
         Postconditions: []
         ExpectedResult: false
   - PolicyId: MS.AAD.4.1v1
+    TestDriver: RunScuba
     Tests:
       - TestDescription: MS.AAD.4.1v1 Not Checked
         Preconditions: []
@@ -140,6 +199,7 @@ TestPlan:
         IsNotChecked: true
         ExpectedResult: false
   - PolicyId: MS.AAD.5.1v1
+    TestDriver: RunScuba
     Tests:
       - TestDescription: MS.AAD.5.1v1 Allow 
         Preconditions:
@@ -160,34 +220,46 @@ TestPlan:
         Postconditions: []
         ExpectedResult: true  
   - PolicyId: MS.AAD.5.2v1
+    TestDriver: RunScuba
     Tests:
       - TestDescription: MS.AAD.5.2v1 Default
         Preconditions: []
         Postconditions: []
         ExpectedResult: true
   - PolicyId: MS.AAD.5.3v1
+    TestDriver: RunCached
     Tests:
       - TestDescription: MS.AAD.5.3v1 No Admin Consent Request Policy Enabled
         Preconditions:
-          - Command: Update-MgPolicyAdminConsentRequestPolicy
+          - Command: UpdateProviderExport
             Splat:
-              IsEnabled: false
+              Updates:
+                - Key: "admin_consent_policies"
+                  Value:
+                    - Id: "Test Policy - MS.AAD.5.3v1 No Admin Consent Request Policy Enabled"
+                      IsEnabled: false
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.AAD.5.3v1 Default
         Preconditions:
-          - Command: Update-MgPolicyAdminConsentRequestPolicy
+          - Command: UpdateProviderExport
             Splat:
-              IsEnabled: true
+              Updates:
+                - Key: "admin_consent_policies"
+                  Value:
+                    - Id: "Test Policy - MS.AAD.5.3v1 Default"
+                      IsEnabled: true
         Postconditions: []
         ExpectedResult: true
   - PolicyId: MS.AAD.5.4v1
+    TestDriver: RunScuba
     Tests:
       - TestDescription: MS.AAD.5.4v1 Default
         Preconditions: []
         Postconditions: []
         ExpectedResult: true
   - PolicyId: MS.AAD.6.1v1
+    TestDriver: RunScuba
     Tests:
       - TestDescription: MS.AAD.6.1v1 Not Checked
         Preconditions: []
@@ -195,12 +267,91 @@ TestPlan:
         IsNotChecked: true
         ExpectedResult: false
   - PolicyId: MS.AAD.7.1v1
+    TestDriver: RunCached
     Tests:
-      - TestDescription: MS.AAD.7.1v1 Default
-        Preconditions: []
+      - TestDescription: MS.AAD.7.1v1 To Many Admin
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                - Key: "privileged_users"
+                  Value:
+                    User1:
+                      DisplayName: "Test User1"
+                      roles: 
+                        - "Privileged Role Administrator"
+                        - "Global Administrator"
+                    User2:
+                      DisplayName: "Test User2"
+                      roles: 
+                        - "Global Administrator"
+                    User3:
+                      DisplayName: "Test User3"
+                      roles: 
+                        - "Privileged Role Administrator"
+                        - "Global Administrator"
+                    User4:
+                      DisplayName: "Test User4"
+                      roles: 
+                        - "Global Administrator"
+                    User5:
+                      DisplayName: "Test User5"
+                      roles: 
+                        - "Privileged Role Administrator"
+                        - "Global Administrator"
+                    User6:
+                      DisplayName: "Test User6"
+                      roles: 
+                        - "Global Administrator"
+                    User7:
+                      DisplayName: "Test User7"
+                      roles: 
+                        - "Privileged Role Administrator"
+                        - "Global Administrator"
+                    User8:
+                      DisplayName: "Test User8"
+                      roles: 
+                        - "Global Administrator"
+                    User9:
+                      DisplayName: "Test User9"
+                      roles: 
+                        - "Global Administrator"
         Postconditions: []
         ExpectedResult: false
+      - TestDescription: MS.AAD.7.1v1 To Few Admin
+        Preconditions: 
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                - Key: "privileged_users"
+                  Value:
+                    User1:
+                      DisplayName: "Test User1"
+                      roles: 
+                        - "Privileged Role Administrator"
+                        - "Global Administrator"
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.AAD.7.1v1 Default
+        Preconditions: 
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                - Key: "privileged_users"
+                  Value:
+                    User1:
+                      DisplayName: "Test User1"
+                      roles: 
+                        - "Privileged Role Administrator"
+                        - "Global Administrator"
+                    User2:
+                      DisplayName: "Test User2"
+                      roles: 
+                        - "Global Administrator"
+        Postconditions: []
+        ExpectedResult: true
   - PolicyId: MS.AAD.7.2v1
+    TestDriver: RunScuba
     Tests:
       - TestDescription: MS.AAD.7.2v1 Not Checked
         Preconditions: []
@@ -208,48 +359,87 @@ TestPlan:
         IsNotChecked: true
         ExpectedResult: false
   - PolicyId: MS.AAD.7.3v1
+    TestDriver: RunCached
     Tests:
+      - TestDescription: MS.AAD.7.3v1 On Prem Admin
+        Preconditions:  
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                - Key: "privileged_users"
+                  Value:
+                    User1:
+                      DisplayName: "Test User1"
+                      OnPremisesImmutableId: "Test On-Prem User1"
+                      roles: 
+                        - "Privileged Role Administrator"
+                        - "Global Administrator"
+        Postconditions: []
+        ExpectedResult: false
       - TestDescription: MS.AAD.7.3v1 Default
-        Preconditions: []
+        Preconditions:  
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                - Key: "privileged_users"
+                  Value:
+                    User1:
+                      DisplayName: "Test User1"
+                      OnPremisesImmutableId: null
+                      roles: 
+                        - "Privileged Role Administrator"
+                        - "Global Administrator"
+                    User2:
+                      DisplayName: "Test User2"
+                      OnPremisesImmutableId: null
+                      roles: 
+                        - "Global Administrator"
         Postconditions: []
         ExpectedResult: true
   - PolicyId: MS.AAD.7.4v1
+    TestDriver: RunCached
     Tests:
       - TestDescription: MS.AAD.7.4v1 Default
         Preconditions: []
         Postconditions: []
-        ExpectedResult: false
+        ExpectedResult: true
   - PolicyId: MS.AAD.7.5v1
+    TestDriver: RunScuba
     Tests:
       - TestDescription: MS.AAD.7.5v1 Default
         Preconditions: []
         Postconditions: []
         ExpectedResult: false
   - PolicyId: MS.AAD.7.6v1
+    TestDriver: RunScuba
     Tests:
       - TestDescription: MS.AAD.7.6v1 Default
         Preconditions: []
         Postconditions: []
         ExpectedResult: true
   - PolicyId: MS.AAD.7.7v1
+    TestDriver: RunScuba
     Tests:
       - TestDescription: MS.AAD.7.7v1 Default
         Preconditions: []
         Postconditions: []
         ExpectedResult: false
   - PolicyId: MS.AAD.7.8v1
+    TestDriver: RunScuba
     Tests:
       - TestDescription: MS.AAD.7.8v1 Default
         Preconditions: []
         Postconditions: []
         ExpectedResult: true
   - PolicyId: MS.AAD.7.9v1
+    TestDriver: RunScuba
     Tests:
       - TestDescription: MS.AAD.7.9v1 Default
         Preconditions: []
         Postconditions: []
         ExpectedResult: false
   - PolicyId: MS.AAD.8.1v1
+    TestDriver: RunScuba
     Tests:
       - TestDescription: MS.AAD.8.1v1 Restricted access
         Preconditions: 
@@ -276,6 +466,7 @@ TestPlan:
         Postconditions: []
         ExpectedResult: true
   - PolicyId: MS.AAD.8.2v1
+    TestDriver: RunScuba
     Tests:
       - TestDescription: MS.AAD.8.2v1 Everyone
         Preconditions:
@@ -294,6 +485,7 @@ TestPlan:
         Postconditions: []
         ExpectedResult: true
   - PolicyId: MS.AAD.8.3v1
+    TestDriver: RunScuba
     Tests:
       - TestDescription: MS.AAD.8.3v1 Not Checked
         Preconditions: []
