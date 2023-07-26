@@ -222,7 +222,7 @@ BeforeAll{
 
         $Ids = Get-MgIdentityConditionalAccessPolicy | Where-Object {$_.DisplayName -match $DisplayName} | Select-Object -Property Id
 
-       foreach($Id in $Ids){
+        foreach($Id in $Ids){
             if (-not ([string]::IsNullOrEmpty($Id.Id))){
                 Write-Output "Removing $DisplayName with id of $($Id.Id)"
                 Remove-MgIdentityConditionalAccessPolicy -ConditionalAccessPolicyId $Id.Id
