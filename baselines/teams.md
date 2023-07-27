@@ -42,7 +42,7 @@ across Microsoft documentation):
     organization account, such as dial-in users.[^1]
 
 
-# Baseline
+# Baseline Policies
 
 ## 1. Meeting Policies
 
@@ -385,7 +385,7 @@ All the settings in this section are configured in the **Microsoft Teams admin c
 
 2.  Select **Teams** > **Teams Settings**.
 
-3.  Under the **Email integration** section, set **Allow users to send
+3.  Under the **Email integration** section, set **Users can send
     emails to a channel email address** to **Off**.
 
 ## 5. App Management
@@ -502,7 +502,7 @@ required, guidance for configuring Microsoft’s DLP solution can be found in fo
 
 #### MS.TEAMS.6.1v1
 A DLP solution SHALL be enabled. The selected DLP solution SHOULD offer services comparable to the native DLP solution offered by Microsoft.
-- _Rationale:_ TODO
+- _Rationale:_ Teams users may inadvertently disclose sensitive information to unauthorized individuals. Data loss prevention policies provide a way for agencies to detect and prevent unauthorized disclosures.
 - _Last modified:_ July 2023
 
 #### MS.TEAMS.6.2v1
@@ -510,7 +510,7 @@ The DLP solution SHALL protect Personally Identifiable Information (PII)
 and sensitive information, as defined by the agency. At a minimum, the
 sharing of credit card numbers, taxpayer Identification Numbers (TIN),
 and Social Security Numbers (SSN) via email SHALL be restricted.
-- _Rationale:_ TODO
+- _Rationale:_ Teams users may inadvertently share sensitive information with others who should not have access to it. Data loss prevention policies provide a way for agencies to detect and prevent unauthorized disclosures.
 - _Last modified:_ July 2023
 
 ### Resources
