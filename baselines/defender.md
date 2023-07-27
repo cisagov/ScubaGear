@@ -5,10 +5,10 @@ coordinates prevention, detection, investigation, and response. This set
 of tools and features are used to detect many types of attacks.
 
 This baseline focuses on the features of Defender for Office 365 and
-some settings are in fact configured in the [Microsoft 365
-compliance](https://compliance.microsoft.com) admin center. However, for
-simplicity, both the Microsoft 365 Defender and Microsoft 365 compliance
-admin center items are contained in this baseline.
+some settings are in fact configured in the Microsoft 365
+compliance admin center. However, for simplicity, both the
+Microsoft 365 Defender and Microsoft 365 compliance admin center
+items are contained in this baseline.
 
 Generally, use of Microsoft Defender is not required by the baselines of
 the core M365 products (Exchange Online, Teams, etc.). However, some of
@@ -31,14 +31,14 @@ The agency has identified a set of user accounts that have access to sensitive a
 The **License Requirements** sections of this document assume the organization is using an [M365 E3](https://www.microsoft.com/en-us/microsoft-365/compare-microsoft-365-enterprise-plans) or [G3](https://www.microsoft.com/en-us/microsoft-365/government) license level at a minimum. Therefore, only licenses not included in E3/G3 are listed.
 
 ## Key Terminology
-The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [RFC 2119.](https://datatracker.ietf.org/doc/html/rfc2119)
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [RFC 2119](https://datatracker.ietf.org/doc/html/rfc2119).
 
 # Baseline Policies
 
 ## 1. Preset Security Profiles
 
 Microsoft Defender defines two [preset security
-profiles](https://docs.microsoft.com/en-us/microsoft-365/security/office-365-security/preset-security-policies):
+profiles](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/preset-security-policies?view=o365-worldwide):
 standard and strict. These preset policies are informed by observations made by Microsoft and are designed to strike the balance between usability and security. They allow administrators to enable the full feature set of Defender by simply adding users to the policies rather than manually configuring each setting.
 
 Within the preset policies, users can be enrolled in [Exchange Online Protection](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/eop-about?view=o365-worldwide) and [Defender for Office 365 protection](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/microsoft-defender-for-office-365-product-overview?view=o365-worldwide), and [Impersonation Protection](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/anti-phishing-policies-about?view=o365-worldwide#impersonation-settings-in-anti-phishing-policies-in-microsoft-defender-for-office-365) can be configured.
@@ -62,33 +62,115 @@ All users SHALL be added to Defender for Office 365 Protection in either the sta
 
 #### MS.DEFENDER.1.4v1
 Sensitive accounts SHALL be added to Exchange Online Protection in the strict preset security policy.
-- _Rationale:_ The increased protection offered by the strict preset policy helps mitigate the greater harm that could result from the compromise of a sensitive account.
+- _Rationale:_ Unauthorized access to a sensitive account may result in greater harm than a standard user account.  Adding sensitive accounts to the strict preset security policy, with its increased protections, better mitigates their increased risk to email threats.
 - _Last modified:_ June 2023
 
 #### MS.DEFENDER.1.5v1
 Sensitive accounts SHALL be added to Defender for Office 365 Protection in the strict preset security policy.
-- _Rationale:_ The increased protection offered by the strict preset policy helps mitigate the greater harm that could result from the compromise of a sensitive account.
+- _Rationale:_ Unauthorized access to a sensitive account may result in greater harm than a standard user account.  Adding sensitive accounts to the strict preset security policy, with its increased protections, better mitigates their increased risk.
 - _Last modified:_ June 2023
 
 #### MS.DEFENDER.1.6v1
-Specific user accounts, except for sensitive accounts, MAY be exempt from the preset policies, provided that they are added to a custom policy that offers comparable protection.
+Specific user accounts, except for sensitive accounts, MAY be exempt from the preset policies, provided that they are added to one or more custom policies that offer comparable protection.
 - _Rationale:_ In some cases, specific users might need flexibility that is not offered by the preset policies. In these cases, these users' accounts should be added to a custom policy that conforms as closely as possible to the settings used by the preset policies (see the **Resources** section for more details).
 - _Last modified:_ June 2023
 
 ### Resources
 
+- [Use the Microsoft 365 Defender portal to assign Standard and Strict preset security policies to users \| Microsoft Learn](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/preset-security-policies?view=o365-worldwide#use-the-microsoft-365-defender-portal-to-assign-standard-and-strict-preset-security-policies-to-users)
 - [Recommended settings for EOP and Microsoft Defender for Office 365
   security \| Microsoft
-  Docs](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/recommended-settings-for-eop-and-office365)
+  Learn](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/recommended-settings-for-eop-and-office365)
+- [Configure anti-phishing policies in EOP \| Microsoft Learn](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/anti-phishing-policies-eop-configure?view=o365-worldwide)
+- [Configure anti-malware policies in EOP \| Microsoft Learn](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/anti-malware-policies-configure?view=o365-worldwide)
+- [Configure anti-spam policies in EOP \| Microsoft Learn](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/anti-spam-policies-configure?view=o365-worldwide)
+- [Configure anti-phishing policies in Defender for Office 365 \| Microsoft Learn](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/anti-phishing-policies-mdo-configure?view=o365-worldwide)
+- [Set up Safe Attachments policies in Microsoft Defender for Office 365 \| Microsoft Learn](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/safe-attachments-policies-configure?view=o365-worldwide)
+- [Set up Safe Links policies in Microsoft Defender for Office 365 \| Microsoft Learn](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/safe-links-policies-configure?view=o365-worldwide)
 
 ### License Requirements
 
 - N/A
 
 ### Implementation
-To add users to the preset policies, follow the instructions listed under [Use the Microsoft 365 Defender portal to assign Standard and Strict preset security policies to users \| Microsoft Docs](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/preset-security-policies?view=o365-worldwide#use-the-microsoft-365-defender-portal-to-assign-standard-and-strict-preset-security-policies-to-users).
 
-To apply a preset policy to all users, under "Apply protection to," select "All recipients."
+#### MS.DEFENDER.1.1v1 instructions:
+
+1. Sign in to **Microsoft 365 Defender**.
+2. In the left-hand menu, go to **Email & Collaboration** > **Policies & Rules**.
+3. Select **Threat Policies**.
+4. From the **Templated policies** section, select **Preset Security Policies**.
+5. Under **Standard protection**, slide the toggle switch to the right so that the text next to the toggle reads **Standard protection is on**.
+6. Under **Strict protection**, slide the toggle switch to the right so that the text next to the toggle reads **Strict protection is on**.
+
+Note: If the toggle slider is grayed out, click on **Manage protection settings**
+instead and configure the policy settings according to [Use the Microsoft 365 Defender portal to assign Standard and Strict preset security policies to users \| Microsoft Learn](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/preset-security-policies?view=o365-worldwide#use-the-microsoft-365-defender-portal-to-assign-standard-and-strict-preset-security-policies-to-users) to enable each preset security policy.
+
+#### MS.DEFENDER.1.2v1 instructions:
+
+1. Sign in to **Microsoft 365 Defender**.
+2. In the left-hand menu, go to **Email & Collaboration** > **Policies & Rules**.
+3. Select **Threat Policies**.
+4. From the **Templated policies** section, select **Preset Security Policies**.
+5. Select **Manage protection settings** under either **Standard protection**
+   or **Strict protection**.
+6. On the **Apply Exchange Online Protection** page, select **All recipients**.
+7. Select **Next** on each page until the **Review and confirm your changes** page.
+8. On the **Review and confirm your changes** page, select **Confirm**.
+
+#### MS.DEFENDER.1.3v1 instructions:
+
+1. Sign in to **Microsoft 365 Defender**.
+2. In the left-hand menu, go to **Email & Collaboration** > **Policies & Rules**.
+3. Select **Threat Policies**.
+4. From the **Templated policies** section, select **Preset Security Policies**.
+5. Select **Manage protection settings** under either **Standard protection**
+   or **Strict protection**.
+6. Select **Next** until you reach the **Apply Defender for Office 365 protection** page.
+7. On the **Apply Defender for Office 365 protection** page, select **All recipients**.
+8. Select **Next** on each page until the **Review and confirm your changes** page.
+9. On the **Review and confirm your changes** page, select **Confirm**.
+
+#### MS.DEFENDER.1.4v1 instructions:
+
+1. Sign in to **Microsoft 365 Defender**.
+2. In the left-hand menu, go to **Email & Collaboration** > **Policies & Rules**.
+3. Select **Threat Policies**.
+4. From the **Templated policies** section, select **Preset Security Policies**.
+5. Select **Manage protection settings** under **Strict protection**.
+6. On the **Apply Exchange Online Protection** page, select **Specific recipients**.
+7. Add all sensitive accounts via the **User** and **Group** boxes using the names of mailboxes, users, contacts, M365 groups, and distribution groups.
+8. Select **Next** on each page until the **Review and confirm your changes** page.
+9. On the **Review and confirm your changes** page, select **Confirm**.
+
+#### MS.DEFENDER.1.5v1 instructions:
+
+1. Sign in to **Microsoft 365 Defender**.
+2. In the left-hand menu, go to **Email & Collaboration** > **Policies & Rules**.
+3. Select **Threat Policies**.
+4. From the **Templated policies** section, select **Preset Security Policies**.
+5. Select **Manage protection settings** under **Strict protection**.
+6. Select **Next** until you reach the **Apply Defender for Office 365 protection** page.
+7. On the **Apply Defender for Office 365 protection** page, select **Specific recipients** or **Previously selected recipients** if sensitive accounts were already set on the Exchange Online protections page.
+8. If adding sensitive accounts separately via **Specific recipients**, add all sensitive accounts via the **User** and **Group** boxes using the names of mailboxes, users, contacts, M365 groups, and distribution groups.
+9. Select **Next** on each page until the **Review and confirm your changes** page.
+10. On the **Review and confirm your changes** page, select **Confirm**.
+
+#### MS.DEFENDER.1.6v1 instructions:
+
+To exempt a user from preset policies:
+
+1. Sign in to **Microsoft 365 Defender**.
+2. In the left-hand menu, go to **Email & Collaboration** > **Policies & Rules**.
+3. Select **Threat Policies**.
+4. From the **Templated policies** section, select **Preset Security Policies**.
+5. Select **Manage protection settings** under either **Standard protection** or **Strict protection**.
+6. On the **Apply Exchange Online protection** page, check the **Exclude these recipients** box.
+7. Under **Exclude these recipients**, add **Users** and **Groups** to be exempted from the preset policies.
+8. Click **Next** and repeat steps 7-8 on the **Apply Defender for Office 365 protection** page.
+9. Select **Next** on each page until the **Review and confirm your changes** page.
+10. On the **Review and confirm your changes** page, select **Confirm**.
+11. Create custom policies offering comparable protection using the Microsoft documentation referenced in the **Resources** section above and add the previously exempted users to those policies.
 
 ## 2. Impersonation Protection
 Impersonation protection checks incoming emails to see if the sender
@@ -119,7 +201,7 @@ Trusted senders and domains MAY be added in the event of false positives.
 
 ### Resources
 
-- [Impersonation settings in anti-phishing policies in Microsoft Defender for Office 365 \| Microsoft Docs](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/anti-phishing-policies-about?view=o365-worldwide#impersonation-settings-in-anti-phishing-policies-in-microsoft-defender-for-office-365).
+- [Impersonation settings in anti-phishing policies in Microsoft Defender for Office 365 \| Microsoft Learn](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/anti-phishing-policies-about?view=o365-worldwide#impersonation-settings-in-anti-phishing-policies-in-microsoft-defender-for-office-365).
 
 ### License Requirements
 
@@ -129,11 +211,11 @@ Trusted senders and domains MAY be added in the event of false positives.
   anti-phishing for user and domain impersonation and spoof intelligence
   are not yet available in GCC High and DoD (see [Platform features \|
   Microsoft
-  Docs](https://docs.microsoft.com/en-us/office365/servicedescriptions/office-365-platform-service-description/office-365-us-government/office-365-us-government#platform-features)
+  Learn](https://learn.microsoft.com/en-us/office365/servicedescriptions/office-365-platform-service-description/office-365-us-government/office-365-us-government#platform-features)
   for current offerings).
 
 ### Implementation
-To add email addresses and domains to flag when impersonated by attackers, follow the instructions listed under [Use the Microsoft 365 Defender portal to assign Standard and Strict preset security policies to users \| Microsoft Docs](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/preset-security-policies?view=o365-worldwide#use-the-microsoft-365-defender-portal-to-assign-standard-and-strict-preset-security-policies-to-users).
+To add email addresses and domains to flag when impersonated by attackers, follow the instructions listed under [Use the Microsoft 365 Defender portal to assign Standard and Strict preset security policies to users \| Microsoft Learn](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/preset-security-policies?view=o365-worldwide#use-the-microsoft-365-defender-portal-to-assign-standard-and-strict-preset-security-policies-to-users).
 
 ## 3. Safe Attachments
 
@@ -154,11 +236,11 @@ Safe attachments SHOULD be enabled for SharePoint, OneDrive, and Microsoft Teams
 ### Resources
 
 - [Safe Attachments in Microsoft Defender for Office 365 \| Microsoft
-  Docs](https://docs.microsoft.com/en-us/microsoft-365/security/office-365-security/safe-attachments?view=o365-worldwide#safe-attachments-policy-settings)
+  Learn](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/safe-attachments-about?view=o365-worldwide#safe-attachments-policy-settings)
 
 - [Turn on Safe Attachments for SharePoint, OneDrive, and Microsoft
   Teams \| Microsoft
-  Docs](https://docs.microsoft.com/en-us/microsoft-365/security/office-365-security/turn-on-mdo-for-spo-odb-and-teams?view=o365-worldwide)
+  Learn](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/safe-attachments-for-spo-odfb-teams-configure?view=o365-worldwide)
 
 ### License Requirements
 
@@ -170,10 +252,9 @@ Safe attachments SHOULD be enabled for SharePoint, OneDrive, and Microsoft Teams
 To enable Safe Attachments for SharePoint, OneDrive, and Microsoft
 Teams, follow the instructions listed at [Turn on Safe Attachments for
 SharePoint, OneDrive, and Microsoft Teams \| Microsoft
-Docs](https://docs.microsoft.com/en-us/microsoft-365/security/office-365-security/turn-on-mdo-for-spo-odb-and-teams?view=o365-worldwide).
+Learn](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/safe-attachments-for-spo-odfb-teams-configure?view=o365-worldwide).
 
-1.  Sign in to [Microsoft 365
-    Defender](https://security.microsoft.com/).
+1.  Sign in to **Microsoft 365 Defender**.
 
 2.  Under **Email & collaboration**, select **Policies & rules**.
 
@@ -256,10 +337,10 @@ information by restricted apps and unwanted bluetooth applications.
 ### Resources
 
 - [Plan for data loss prevention (DLP) \| Microsoft
-  Docs](https://docs.microsoft.com/en-us/microsoft-365/compliance/dlp-overview-plan-for-dlp?view=o365-worldwide)
+  Learn](https://learn.microsoft.com/en-us/purview/dlp-overview-plan-for-dlp?view=o365-worldwide)
 
 - [Data loss prevention in Exchange Online \| Microsoft
-  Docs](https://docs.microsoft.com/en-us/exchange/security-and-compliance/data-loss-prevention/data-loss-prevention)
+  Learn](https://learn.microsoft.com/en-us/exchange/security-and-compliance/data-loss-prevention/data-loss-prevention)
 
 - [Personally identifiable information (PII) \|
   NIST](https://csrc.nist.gov/glossary/term/personally_identifiable_information#:~:text=NISTIR%208259,2%20under%20PII%20from%20EGovAct)
@@ -269,23 +350,21 @@ information by restricted apps and unwanted bluetooth applications.
 
 ### License Requirements
 
-- DLP for Teams requires an E5 or G5 license. See [Information
-  Protection: Data Loss Prevention for Teams \| Microsoft
-  Docs](https://docs.microsoft.com/en-us/office365/servicedescriptions/microsoft-365-service-descriptions/microsoft-365-tenantlevel-services-licensing-guidance/microsoft-365-security-compliance-licensing-guidance#information-protection-data-loss-prevention-for-teams)
+- DLP for Teams requires an E5 or G5 license. See [Microsoft Purview Data Loss Prevention: Data Loss Prevention for Teams \| Microsoft
+  Learn](https://learn.microsoft.com/en-us/office365/servicedescriptions/microsoft-365-service-descriptions/microsoft-365-tenantlevel-services-licensing-guidance/microsoft-365-security-compliance-licensing-guidance#microsoft-purview-data-loss-prevention-data-loss-prevention-dlp-for-teams)
   for more information.
 
 - DLP for Endpoint requires an E5 or G5 license. See [Get started with
   Endpoint data loss prevention - Microsoft Purview (compliance) \|
   Microsoft
-  Docs](https://docs.microsoft.com/en-us/microsoft-365/compliance/endpoint-dlp-getting-started?view=o365-worldwide)
+  Learn](https://learn.microsoft.com/en-us/purview/endpoint-dlp-getting-started?view=o365-worldwide)
   for more information.
 
 ### Implementation
 
-MS.DEFENDER.4.1v1 implementation:
+MS.DEFENDER.4.1v1 instructions:
 
-1. Sign in to the [Microsoft 365
-   compliance](https://compliance.microsoft.com) admin center.
+1. Sign in to the **Microsoft 365 compliance admin center**.
 
 2. Under **Solutions**, select **Data loss prevention**.
 
@@ -337,34 +416,32 @@ MS.DEFENDER.4.1v1 implementation:
 
 20. Click **Submit**.
 
-MS.DEFENDER.4.2v1 implementation:
+MS.DEFENDER.4.2v1 instructions:
 
-1. Sign in to the [Microsoft 365
-   compliance](https://compliance.microsoft.com) admin center.
+1. Sign in to the **Microsoft 365 compliance admin center**.
 
-2. Under **Solutions**, select **Data loss prevention**.
+1. Under **Solutions**, select **Data loss prevention**.
 
-3. Select **Policies** from the top of the page.
+2. Select **Policies** from the top of the page.
 
-4. Find the relevant DLP policy in the list and click the Policy name to select.
+3. Find the relevant DLP policy in the list and click the Policy name to select.
    Select **Edit Policy**.
 
-5. Click **Next** on each page in the policy wizard until you reach the
+4. Click **Next** on each page in the policy wizard until you reach the
    Locations page.
 
-6. Under **Choose locations to apply the policy**, ensure **Status** is set
+5. Under **Choose locations to apply the policy**, ensure **Status** is set
    to **On** for at least the Exchange email, OneDrive accounts, SharePoint
    sites, Teams chat and channel messages, and Devices.
 
-7. Click **Next** on each page until reaching the
+6. Click **Next** on each page until reaching the
    **Review your policy and create it** page.
 
-8. Review the policy locations listed and click **Submit**.
+7. Review the policy locations listed and click **Submit**.
 
-MS.DEFENDER.4.3v1 implementation:
+MS.DEFENDER.4.3v1 instructions:
 
-1. Sign in to the [Microsoft 365
-   compliance](https://compliance.microsoft.com) admin center.
+1. Sign in to the **Microsoft 365 compliance admin center**.
 
 2. Under **Solutions**, select **Data loss prevention**.
 
@@ -391,10 +468,9 @@ MS.DEFENDER.4.3v1 implementation:
 
 12. Review the policy and click **Submit** to complete the policy changes.
 
-MS.DEFENDER.4.4v1 implementation:
+MS.DEFENDER.4.4v1 instructions:
 
-1. Sign in to the [Microsoft 365
-   compliance](https://compliance.microsoft.com) admin center.
+1. Sign in to the **Microsoft 365 compliance admin center**.
 
 2. Under **Solutions**, select **Data loss prevention**.
 
@@ -418,10 +494,9 @@ MS.DEFENDER.4.4v1 implementation:
 
 10. Review the policy and click **Submit** to complete the policy changes.
 
-MS.DEFENDER.4.5v1 implementation:
+MS.DEFENDER.4.5v1 instructions:
 
-1. Sign in to the [Microsoft 365
-   compliance](https://compliance.microsoft.com) admin center.
+1. Sign in to the **Microsoft 365 compliance admin center**.
 
 2. Under **Solutions**, select **Data loss prevention**.
   
@@ -441,10 +516,9 @@ MS.DEFENDER.4.5v1 implementation:
 9. Enter an app and executable name to disallow said app from
    accessing protected files and to log the incident.
 
-MS.DEFENDER.4.6v1 implementation:
+MS.DEFENDER.4.6v1 instructions:
 
-1. Sign in to the [Microsoft 365
-   compliance](https://compliance.microsoft.com) admin center.
+1. Sign in to the **Microsoft 365 compliance admin center**.
 
 2. Under **Solutions**, select **Data loss prevention**.
 
@@ -486,19 +560,19 @@ real-time insight into possible security incidents.
 
 ### Policies
 #### MS.DEFENDER.5.1v1
-At a minimum, the alerts required by the *Exchange Online Minimum Viable Secure Configuration Baseline* SHALL be enabled.
-- _Rationale:_ TODO
+At a minimum, the alerts required by the _Exchange Online Minimum Viable Secure Configuration Baseline_ SHALL be enabled.
+- _Rationale:_ Potentially malicious or service impacting events may go undetected without a means of detecting these events. Setting up a mechanism to alert administrators to the list of events above draws attention to them to ensure that any impact to users and the agency are minimized.
 - _Last modified:_ June 2023
 
 #### MS.DEFENDER.5.2v1
 The alerts SHOULD be sent to a monitored address or incorporated into a SIEM.
-- _Rationale:_ TODO
+- _Rationale:_ Suspicious or malicious events, if not resolved promptly, may have a greater impact to users and the agency. Sending alerts to a monitored email address or SIEM helps ensure it is acted upon in a timely manner to limit overall impact.
 - _Last modified:_ June 2023
 
 ### Resources
 
 - [Alert policies in Microsoft 365 \| Microsoft
-  Docs](https://docs.microsoft.com/en-us/microsoft-365/compliance/alert-policies?view=o365-worldwide)
+  Learn](https://learn.microsoft.com/en-us/purview/alert-policies?view=o365-worldwide)
 
 ### License Requirements
 
@@ -506,67 +580,96 @@ The alerts SHOULD be sent to a monitored address or incorporated into a SIEM.
 
 ### Implementation
 
-1.  Sign in to [Microsoft 365
-    Defender](https://security.microsoft.com/).
+#### MS.DEFENDER.5.1v1 instructions:
 
-2.  Under **Email & collaboration**, select **Policies & rules**.
+To enable an alert:
 
-3.  Select **Alert Policy**.
+1. Sign in to **Microsoft 365 Defender**.
+
+2. Under **Email & collaboration**, select **Policies & rules**.
+
+3. Select **Alert Policy**.
 
 4. Click the policy name.
 
-5.  Ensure **Status** is set to **On**.
+5. Slide the **Status** toggle to the right so its text reads **On**.
 
-6.  Ensure **Email recipients** includes at least one monitored address.
+#### MS.DEFENDER.5.2v1 instructions:
+
+To add one or email recipients to an alert:
+
+1. Sign in to **Microsoft 365 Defender**.
+
+2. Under **Email & collaboration**, select **Policies & rules**.
+
+3. Select **Alert Policy**.
+
+4. Click the policy name.
+
+5. Click the pencil icon next to **Set your recipients**.
+
+6. Check the **Opt-In for email notifications** box.
+
+7. Add one or more email addresses to the **Email recipients** text box.
+
+8. Click **Next**.
+
+9. On the Review page, click **Submit** to save the notification settings.
 
 ## 6. Microsoft Purview Audit
 
-Unified audit logging generates logs of user activity in M365 services. 
-These logs are essential for conducting incident response and threat detection activity.
+User activity from M365 services are captured in the organization's unified
+audit log.  These logs are essential for conducting incident response and
+threat detection activity.
 
 By default, Microsoft retains the audit logs for only 90 days. Activity
-by users with E5 licenses is logged for one year. 
+by users with E5 licenses is logged for one year.
 
-However, per OMB M-21-31, Microsoft 365 audit logs are to be retained at least 12 months in
-active storage and an additional 18 months in cold storage. This can be
-accomplished either by offloading the logs out of the cloud environment
-or natively through Microsoft by creating an [audit log retention
-policy](https://docs.microsoft.com/en-us/microsoft-365/compliance/audit-log-retention-policies?view=o365-worldwide#create-an-audit-log-retention-policy).
+However, in accordance with OMB M-21-31, _Improving the Federal Government’s
+Investigative and Remediation Capabilities Related to Cybersecurity Incidents_,
+Microsoft 365 audit logs are to be retained at least 12 months in active
+storage and an additional 18 months in cold storage. This can be accomplished
+either by offloading the logs out of the cloud environment or natively through
+Microsoft by creating an [audit log retention
+policy](https://learn.microsoft.com/en-us/purview/audit-log-retention-policies?view=o365-worldwide#create-an-audit-log-retention-policy).
 
-OMB M-21-13 also requires Advanced Audit be configured in M365. Advanced Audit adds additional event types to the Unified Audit Log.
+OMB M-21-13 also requires Advanced Audit Features be configured in M365.
+Advanced Audit, now Microsoft Purview Audit (Premium), adds additional event
+types to the Unified Audit Log.
 
 ### Policies
 #### MS.DEFENDER.6.1v1
 Microsoft Purview Audit (Standard) logging SHALL be enabled.
-- _Rationale:_ TODO
+- _Rationale:_ Responding to incidents without detailed information about activities that took place slows response actions. Enabling Microsoft Purview Audit (Standard) helps ensure agencies have visibility into user actions. Furthermore, enabling the unified audit log is required for government agencies by OMB M-21-31 (referred to therein by its former name, Unified Audit Logs).
 - _Last modified:_ June 2023
 
 #### MS.DEFENDER.6.2v1
 Microsoft Purview Audit (Premium) logging SHALL be enabled.
-- _Rationale:_ TODO
+- _Rationale:_ Standard logging may not include relevant details necessary for visibility into user actions during an incident. Enabling Microsoft Purview Audit (Premium) captures additional event types that are not included with Standard. Furthermore, it is required for government agencies by OMB M-21-13 (referred to therein as by its former name, Unified Audit Logs w/ Advanced Features).
 - _Last modified:_ June 2023
 
 #### MS.DEFENDER.6.3v1
 Audit logs SHALL be maintained for at least the minimum duration dictated by OMB M-21-31.
-- _Rationale:_ TODO
+- _Rationale:_ Audit logs may no longer be available at the time of need if they are not retained for a sufficient period of time. Increased log retention time gives an agency the necessary visibility to investigate incidents that occurred some time ago.
 - _Last modified:_ June 2023
 
 ### Resources
 
-- [OMB M-21-31 \| Office of Management and
+- [OMB M-21-31, Improving the Federal Government’s Investigative and Remediation Capabilities
+Related to Cybersecurity Incidents \| Office of Management and
   Budget](https://www.whitehouse.gov/wp-content/uploads/2021/08/M-21-31-Improving-the-Federal-Governments-Investigative-and-Remediation-Capabilities-Related-to-Cybersecurity-Incidents.pdf)
 
-- [<u>Turn auditing on or off \| Microsoft
-  Docs</u>](https://docs.microsoft.com/en-us/microsoft-365/compliance/turn-audit-log-search-on-or-off?view=o365-worldwide) 
+- [Turn auditing on or off \| Microsoft
+  Learn](https://learn.microsoft.com/en-us/purview/audit-log-enable-disable?view=o365-worldwide)
 
 - [Create an audit log retention policy \| Microsoft
-  Docs](https://docs.microsoft.com/en-us/microsoft-365/compliance/audit-log-retention-policies?view=o365-worldwide#create-an-audit-log-retention-policy)
+  Learn](https://learn.microsoft.com/en-us/purview/audit-log-retention-policies?view=o365-worldwide#create-an-audit-log-retention-policy)
 
-- [<u>Search the audit log in the compliance center \| Microsoft
-  Docs </u>](https://docs.microsoft.com/en-us/microsoft-365/compliance/search-the-audit-log-in-security-and-compliance?view=o365-worldwide) 
+- [Search the audit log in the compliance center \| Microsoft
+  Learn](https://learn.microsoft.com/en-us/purview/audit-log-search?view=o365-worldwide)
 
 - [Audited Activities \| Microsoft
-  Docs](https://docs.microsoft.com/en-us/microsoft-365/compliance/search-the-audit-log-in-security-and-compliance?view=o365-worldwide#audited-activities)
+  Learn](https://learn.microsoft.com/en-us/purview/audit-log-activities)
 
 ### License Requirements
 
@@ -577,43 +680,33 @@ Audit logs SHALL be maintained for at least the minimum duration dictated by OMB
 - Additionally, maintaining logs in the M365 environment for longer than
   one year requires an add-on license. For more information, see
   [Licensing requirements \| Microsoft
-  Docs](https://docs.microsoft.com/en-us/microsoft-365/compliance/auditing-solutions-overview?view=o365-worldwide#licensing-requirements).
+  Learn](https://learn.microsoft.com/en-us/purview/audit-solutions-overview?view=o365-worldwide#licensing-requirements).
 
 ### Implementation
 
-Auditing can be enabled from the Microsoft 365 compliance admin center
-and the Exchange Online PowerShell. Follow the instructions listed on
-[Turn on
-auditing](https://docs.microsoft.com/en-us/microsoft-365/compliance/turn-audit-log-search-on-or-off?view=o365-worldwide#turn-on-auditing).
+#### MS.DEFENDER.6.1v1 instructions:
 
-1.  Sign in to the [Microsoft 365
-    compliance](https://compliance.microsoft.com) admin center.
+To enable auditing via the Microsoft 365 Compliance admin center:
+
+1. Sign in to the **Microsoft 365 compliance admin center**.
 
 2. Under **Solutions**, select **Audit**.
 
-3. If auditing is not enabled, a banner displays and prompts that the
-    user and admin activity start being recorded.
+3. If auditing is not enabled, a banner is displayed to notify the
+administrator to start recording user and admin activity.
 
-4. Click the **Start recording user and admin activity banner**.
+4. Click the **Start recording user and admin activity**.
 
-To set up advanced audit, see [Set up Advanced Audit in Microsoft 365 \|
+#### MS.DEFENDER.6.2v1 instructions:
+To set up Microsoft Purvigeew Audit (Premium), see [Set up Microsoft Purview Audit (Premium) \|
 Microsoft
-Docs.](https://docs.microsoft.com/en-us/microsoft-365/compliance/set-up-advanced-audit?view=o365-worldwide)
+Learn.](https://learn.microsoft.com/en-us/purview/audit-premium-setup?view=o365-worldwide)
 
-To create an audit retention policy, follow the instructions listed on
-[Create an audit log retention policy](https://docs.microsoft.com/en-us/microsoft-365/compliance/audit-log-retention-policies?view=o365-worldwide#create-an-audit-log-retention-policy).
-
-To check the current logging status via PowerShell
-
-1. Connect to the Exchange Online PowerShell.
-
-2. Run the following command: `Get-AdminAuditLogConfig | FL UnifiedAuditLogIngestionEnabled`
-
-To enable logging via PowerShell:
-
-1. Connect to the Exchange Online PowerShell.
-
-2. Run the following command: `Set-AdminAuditLogConfig -UnifiedAuditLogIngestionEnabled $true`
+#### MS.DEFENDER.6.3v1 instructions:
+To create an one or more audit retention policies, follow the instructions
+listed in [Create an audit log retention policy](https://learn.microsoft.com/en-us/purview/audit-log-retention-policies?view=o365-worldwide#create-an-audit-log-retention-policy).
+Ensure that the duration selected in the retention policies is at least 1 year,
+in accordance with OMB M-21-31.
 
 # Acknowledgements
 
