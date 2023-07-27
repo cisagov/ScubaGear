@@ -672,7 +672,7 @@ tests[{
 #   This was created to add special logic for the scenario where the Azure AD premium P2 license is missing and therefore
 #   the JSON Rules element will not exist in that case because there is no PIM service.
 #   This is necessary to avoid false negatives when a policy checks for zero instances of a specific condition.
-#   For example, if a policy checks for count(RolesWithoutLimitedExpirationPeriod) == 0 and that normally means compliant, when a
+#   For example, if a policy checks for count(PrivilegedRoleWithoutExpirationPeriod) == 0 and that normally means compliant, when a
 #   tenant does not have the license, a count of 0 does not mean compliant because 0 is the result of not having the Rules element
 #   in the JSON.
 DoPIMRoleRulesExist {
@@ -749,37 +749,40 @@ tests[{
 #
 # MS.AAD.7.4v1
 #--
-RolesWithoutLimitedExpirationPeriod[Role.DisplayName] {
+default PrivilegedRoleExclusions(_, _) := false
+PrivilegedRoleExclusions(PrivilegedRole, PolicyID) := true if {
+    PrivilegedRoleAssignedPrincipals := { x.PrincipalId | some x in PrivilegedRole.Assignments; x.EndDateTime == null }
+
+    AllowedPrivilegedRoleUsers := { y | some y in input.scuba_config.Aad[PolicyID].RoleExclusions.Users; y != null }
+    AllowedPrivilegedRoleGroups := { y | some y in input.scuba_config.Aad[PolicyID].RoleExclusions.Groups; y != null }
+    AllowedPrivilegedRole := AllowedPrivilegedRoleUsers | AllowedPrivilegedRoleGroups
+
+    count(PrivilegedRoleAssignedPrincipals) > 0
+    count(PrivilegedRoleAssignedPrincipals - AllowedPrivilegedRole) != 0
+}
+
+PrivilegedRoleExclusions(PrivilegedRole, PolicyID) := true if {
+    count({ x.PrincipalId | some x in PrivilegedRole.Assignments; x.EndDateTime == null }) > 0
+    count({ y | some y in input.scuba_config.Aad[PolicyID].RoleExclusions.Users; y != null }) == 0
+    count({ y | some y in input.scuba_config.Aad[PolicyID].RoleExclusions.Groups; y != null }) == 0
+}
+
+PrivilegedRolesWithoutExpirationPeriod[Role.DisplayName] {
     Role := input.privileged_roles[_]
-    Rule := Role.Rules[_]
-    RuleMatch := Rule.Id == "Expiration_Admin_Assignment"
-    ExpirationNotRequired := Rule.AdditionalProperties.isExpirationRequired == false
-    MaximumDurationCorrect := Rule.AdditionalProperties.maximumDuration == "P15D"
 
-    # Role policy does not require assignment expiration
-    Conditions1 := [RuleMatch == true, ExpirationNotRequired == true]
-    Case1 := count([Condition | Condition = Conditions1[_]; Condition == false]) == 0
-
-    # Role policy requires assignment expiration, but maximum duration is not 15 days
-    Conditions2 := [RuleMatch == true, ExpirationNotRequired == false, MaximumDurationCorrect == false]
-    Case2 := count([Condition | Condition = Conditions2[_]; Condition == false]) == 0
-
-    # Filter: only include rules that meet one of the two cases
-    Conditions := [Case1, Case2]
-    count([Condition | Condition = Conditions[_]; Condition == true]) > 0
+    PrivilegedRoleExclusions(Role, "MS.AAD.7.4v1") == true
 }
 
 tests[{
     "PolicyId" : "MS.AAD.7.4v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-MgSubscribedSku", "Get-PrivilegedRole"],
-    "ActualValue" : RolesWithoutLimitedExpirationPeriod,
-    "ReportDetails" : ReportDetailsArrayLicenseWarning(RolesWithoutLimitedExpirationPeriod, DescriptionString),
+    "ActualValue" : PrivilegedRolesWithoutExpirationPeriod,
+    "ReportDetails" : ReportDetailsArrayLicenseWarning(PrivilegedRolesWithoutExpirationPeriod, DescriptionString),
     "RequirementMet" : Status
 }] {
-    DescriptionString := "role(s) configured to allow permanent active assignment or expiration period too long"
-    Conditions := [count(RolesWithoutLimitedExpirationPeriod) == 0, check_if_role_rules_exist]
-    Status := count([Condition | Condition = Conditions[_]; Condition == false]) == 0
+    DescriptionString := "role(s) that contain users with permanent active assignment"
+    Status := count(PrivilegedRolesWithoutExpirationPeriod) == 0
 }
 #--
 
