@@ -31,6 +31,8 @@ license level. Therefore, only licenses not included in E3/G3 are
 listed.
 
 ## Key Terminology
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [RFC 2119.](https://datatracker.ietf.org/doc/html/rfc2119)
+
 Access to Teams can be controlled by the user type. In this baseline,
 the types of users are defined as follows (Note: these terms vary in use
 across Microsoft documentation):
