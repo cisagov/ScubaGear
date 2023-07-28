@@ -63,24 +63,19 @@ Refer to [Power Platform Microsoft Learn documentation](https://learn.microsoft.
 
 ## 1. Creation of Power Platform Environments
 
-Power Platform environments are used to group together, manage, and
-store Power Apps or Power Virtual Agents. By default, any user in the
-Azure AD Tenant can create additional environments. Enabling this
-control will restrict the creation of new environments to users with the
-following admin roles: Global admins, Dynamics 365 admins, and Power
-Platform admins.
+By default, any user in the Azure AD Tenant can create additional environments. Enabling this control will restrict the creation of new environments to users with the following admin roles: Global admins, Dynamics 365 admins, and Power Platform admins.
 
 ### Policies
 
 #### MS.POWERPLATFORM.1.1v1
 The ability to create production and sandbox environments SHALL be restricted to admins.
-- _Rationale:_ Users creating additional Power Platform environments may inadvertently bypass DLP policy settings or misconfigure the security settings of their environment.
+- _Rationale:_ Users creating new Power Platform environments may inadvertently bypass DLP policy settings or misconfigure the security settings of their environment.
 - _Last Modified:_ June 2023
 - Note: This control restricts the creation of environments to users with Global admin, Dynamics 365 service admin, Power Platform Service admins, or Delegated admin roles.
 
 #### MS.POWERPLATFORM.1.2v1
 The ability to create trial environments SHALL be restricted to admins.
-- _Rationale:_ Users creating additional Power Platform environments may inadvertently bypass DLP policy settings or misconfigure the security settings of their environment.
+- _Rationale:_ Users creating new Power Platform environments may inadvertently bypass DLP policy settings or misconfigure the security settings of their environment.
 - _Last Modified:_ June 2023
 - Note: This control restricts the creation of environments to users with Global admin, Dynamics 365 service admin, Power Platform Service admins, or Delegated admin roles.
 
@@ -90,7 +85,7 @@ The ability to create trial environments SHALL be restricted to admins.
   admin center \| Microsoft
   Learn](https://learn.microsoft.com/en-us/power-platform/admin/control-environment-creation)
 
-- [Environment Administrator \| Digital Transformation Agency of
+- [Power Platform \| Digital Transformation Agency of
   Australia](https://desktop.gov.au/blueprint/office-365.html#power-platform)
 
 - [Microsoft Power Apps Documentation \| Power
