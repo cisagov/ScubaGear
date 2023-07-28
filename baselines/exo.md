@@ -7,7 +7,7 @@ Many admin controls for Exchange Online are found in the **Exchange admin center
 However, several of the
 security features for Exchange Online are shared between Microsoft
 products and are configured in either the **Microsoft 365 Defender portal**
-or **Microsoft 365 Purview compliance portal** admin centers. Generally
+or **Microsoft 365 Purview compliance portal**. Generally
 speaking, the use of Microsoft Defender is not strictly required for
 this baseline. When noted, alternative products may be used in lieu of
 Defender, on the condition that they fulfill these required baseline
@@ -1019,7 +1019,7 @@ OMB M-21-13 also requires Advanced Audit be configured in M365. Advanced Audit,
 now Microsoft Purview Audit (Premium), adds additional event types to the
 Unified Audit Log.
 
-Audit logging is managed from the Microsoft Purview compliance center. For
+Audit logging is managed from the Microsoft Purview compliance portal. For
 implementation guidance for configuring audit logging, see the following
 section of the CISA M365 Security Configuration Baseline for Defender for
 Office 365.
