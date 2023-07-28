@@ -36,6 +36,13 @@ or [G3](https://www.microsoft.com/en-us/microsoft-365/government)
 license level. Therefore, only licenses not included in E3/G3 are
 listed.
 
+## Key Terminology
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
+"SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be
+interpreted as described in
+[RFC 2119](https://datatracker.ietf.org/doc/html/rfc2119).
+
 # Baseline Policies
 
 ## 1. Automatic Forwarding to External Domains
@@ -975,7 +982,6 @@ At a minimum, the following alerts SHALL be enabled:
 
   g. **A potentially malicious URL click was detected.**
 
-
 - _Rationale:_ Potentially malicious or service impacting events may go undetected
 without a means of detecting these events.  Setting up a mechanism to alert
 administrators to the list of events above draws attention to them to ensure that any
@@ -994,18 +1000,29 @@ The alerts SHOULD be sent to a monitored address or incorporated into a SIEM.
 
 ## 17. Microsoft Purview Audit
 
-Unified audit logging generates logs of user activity in M365 services.
-These logs are essential for conducting incident response and threat detection activity.
+User activity from M365 services are captured in the organization's unified
+audit log.  These logs are essential for conducting incident response and
+threat detection activity.
 
-By default, Microsoft retains the audit logs for only 90 days. Activity by users with E5 licenses is logged for one year.
+By default, Microsoft retains the audit logs for only 90 days. Activity by
+users with E5 licenses is logged for one year.
 
-However, per OMB M-21-31, Microsoft 365 audit logs are to be retained at least 12 months in active storage and an additional 18 months in cold storage.
-This can be accomplished either by offloading the logs out of the cloud environment or natively through Microsoft by creating an audit log retention policy.
+However, in accordance with OMB M-21-31, _Improving the Federal Government’s
+Investigative and Remediation Capabilities Related to Cybersecurity Incidents_,
+Microsoft 365 audit logs are to be retained at least 12 months in active
+storage and an additional 18 months in cold storage. This can be accomplished
+either by offloading the logs out of the cloud environment or natively through
+Microsoft by creating an [audit log retention
+policy](https://learn.microsoft.com/en-us/purview/audit-log-retention-policies?view=o365-worldwide#create-an-audit-log-retention-policy).
 
-OMB M-21-13 also requires Advanced Audit be configured in M365. Advanced Audit adds additional event types to the Unified Audit Log.
+OMB M-21-13 also requires Advanced Audit be configured in M365. Advanced Audit,
+now Microsoft Purview Audit (Premium), adds additional event types to the
+Unified Audit Log.
 
 Audit logging is managed from the Microsoft Purview compliance center. For
-guidance configuring audit logging, see the  following section of the CISA M365 Security Configuration Baseline for Defender for Office 365.
+implementation guidance for configuring audit logging, see the following
+section of the CISA M365 Security Configuration Baseline for Defender for
+Office 365.
 
 - [Microsoft Purview Audit \| CISA M365 Security Configuration Baseline for Defender for Office 365](./defender.md#6-microsoft-purview-audit)
 
@@ -1041,7 +1058,6 @@ to investigate incidents that occurred some time ago.
 
 - None
 
-
 # Acknowledgements
 
 In addition to acknowledging the important contributions of a diverse
@@ -1053,42 +1069,25 @@ response to Section 3 of [Executive Order (EO) 14028, *Improving the
 Nation’s
 Cybersecurity*](https://www.federalregister.gov/documents/2021/05/17/2021-10460/improving-the-nations-cybersecurity):
 
-- Consumer Financial Protection Bureau (CFPB)
-
-- Department of the Interior (DOI)
-
-- National Aeronautics and Space Administration (NASA)
-
+- The MITRE Corporation
 - Sandia National Laboratories (Sandia)
 
-- U.S. Census Bureau (USCB)
+The SCBs were informed by materials produced by the following organizations:
 
-- U.S. Geological Survey (USGS)
+- Center for Internet Security (CIS)
+- Internet Engineering Task Force (IETF)
+- Mandiant
+- Microsoft
+- U.S. Defense Information Systems Agency (DISA)
+- U.S. National Institute of Standards (NIST)
+- U.S. Office of Management and Budget (OMB)
 
+The cross-agency collaboration and partnerships developed during this initiative serve as an example for solving complex problems faced by the federal government. CISA also thanks the Cybersecurity Innovation Tiger Team (CITT) for its leadership and the following federal agencies that provided input during the development of the baselines:
+
+- Consumer Financial Protection Bureau (CFPB)
+- Department of the Interior (DOI)
+- National Aeronautics and Space Administration (NASA)
 - U.S. Office of Personnel Management (OPM)
-
 - U.S. Small Business Administration (SBA)
-
-The cross-agency collaboration and partnerships developed during this
-initiative serve as an example for solving complex problems faced by the
-federal government.
-
-**Cybersecurity Innovation Tiger Team (CITT) Leadership**
-
-Beau Houser (USCB), Sanjay Gupta (SBA), Michael Witt (NASA), James
-Saunders (OPM), Han Lin (Sandia), Andrew Havely (DOI).
-
-**CITT Authors**
-
-Trafenia Salzman (SBA), Benjamin McChesney (OPM), Robert Collier (USCB),
-Matthew Snitchler (Sandia), Darryl Purdy (USCB), Brandon Frankens
-(NASA), Brandon Goss (NASA), Nicole Bogeajis (DOI/USGS), Kevin Kelly
-(DOI), Adnan Ehsan (CFPB), Michael Griffin (CFPB), Vincent Urias
-(Sandia), Angela Calabaza (Sandia).
-
-**CITT Contributors**
-
-Dr. Mukesh Rohatgi (MITRE), Lee Szilagyi (MITRE), Nanda Katikaneni
-(MITRE), Ted Kolovos (MITRE), Thomas Comeau (MITRE), Karen Caraway
-(MITRE), Jackie Whieldon (MITRE), Jeanne Firey (MITRE), Kenneth Myers
-(General Services Administration).
+- U.S. Census Bureau (USCB)
+- U.S. Geological Survey (USGS)
