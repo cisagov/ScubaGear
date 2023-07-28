@@ -1,4 +1,4 @@
-# Introduction
+# CISA M365 Security Configuration Baseline for Defender
 
 Microsoft 365 Defender is a cloud-based enterprise defense suite that
 coordinates prevention, detection, investigation, and response. This set
