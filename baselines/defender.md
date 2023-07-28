@@ -5,9 +5,9 @@ coordinates prevention, detection, investigation, and response. This set
 of tools and features are used to detect many types of attacks.
 
 This baseline focuses on the features of Defender for Office 365 and
-some settings are in fact configured in the Microsoft 365
-compliance admin center. However, for simplicity, both the
-Microsoft 365 Defender and Microsoft 365 compliance admin center
+some settings are in fact configured in the Microsoft Purview
+compliance portal. However, for simplicity, both the
+Microsoft 365 Defender and Microsoft Purview compliance portal
 items are contained in this baseline.
 
 Generally, use of Microsoft Defender is not required by the baselines of
@@ -364,7 +364,7 @@ information by restricted apps and unwanted bluetooth applications.
 
 MS.DEFENDER.4.1v1 instructions:
 
-1. Sign in to the **Microsoft 365 compliance admin center**.
+1. Sign in to the **Microsoft Purview compliance portal**.
 
 2. Under **Solutions**, select **Data loss prevention**.
 
@@ -418,7 +418,7 @@ MS.DEFENDER.4.1v1 instructions:
 
 MS.DEFENDER.4.2v1 instructions:
 
-1. Sign in to the **Microsoft 365 compliance admin center**.
+1. Sign in to the **Microsoft Purview compliance portal**.
 
 1. Under **Solutions**, select **Data loss prevention**.
 
@@ -441,7 +441,7 @@ MS.DEFENDER.4.2v1 instructions:
 
 MS.DEFENDER.4.3v1 instructions:
 
-1. Sign in to the **Microsoft 365 compliance admin center**.
+1. Sign in to the **Microsoft Purview compliance portal**.
 
 2. Under **Solutions**, select **Data loss prevention**.
 
@@ -470,7 +470,7 @@ MS.DEFENDER.4.3v1 instructions:
 
 MS.DEFENDER.4.4v1 instructions:
 
-1. Sign in to the **Microsoft 365 compliance admin center**.
+1. Sign in to the **Microsoft Purview compliance portal**.
 
 2. Under **Solutions**, select **Data loss prevention**.
 
@@ -496,7 +496,7 @@ MS.DEFENDER.4.4v1 instructions:
 
 MS.DEFENDER.4.5v1 instructions:
 
-1. Sign in to the **Microsoft 365 compliance admin center**.
+1. Sign in to the **Microsoft Purview compliance portal**.
 
 2. Under **Solutions**, select **Data loss prevention**.
   
@@ -518,7 +518,7 @@ MS.DEFENDER.4.5v1 instructions:
 
 MS.DEFENDER.4.6v1 instructions:
 
-1. Sign in to the **Microsoft 365 compliance admin center**.
+1. Sign in to the **Microsoft Purview compliance portal**.
 
 2. Under **Solutions**, select **Data loss prevention**.
 
@@ -686,9 +686,9 @@ Related to Cybersecurity Incidents \| Office of Management and
 
 #### MS.DEFENDER.6.1v1 instructions:
 
-To enable auditing via the Microsoft 365 Compliance admin center:
+To enable auditing via the Microsoft Purview compliance portal:
 
-1. Sign in to the **Microsoft 365 compliance admin center**.
+1. Sign in to the **Microsoft Purview compliance portal**.
 
 2. Under **Solutions**, select **Audit**.
 
@@ -698,7 +698,7 @@ administrator to start recording user and admin activity.
 4. Click the **Start recording user and admin activity**.
 
 #### MS.DEFENDER.6.2v1 instructions:
-To set up Microsoft Purvigeew Audit (Premium), see [Set up Microsoft Purview Audit (Premium) \|
+To set up Microsoft Purview Audit (Premium), see [Set up Microsoft Purview Audit (Premium) \|
 Microsoft
 Learn.](https://learn.microsoft.com/en-us/purview/audit-premium-setup?view=o365-worldwide)
 
