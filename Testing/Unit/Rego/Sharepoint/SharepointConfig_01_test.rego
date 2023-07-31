@@ -121,6 +121,26 @@ test_OneDriveSharingCapability_Correct_V2 if {
     RuleOutput[0].ReportDetails == "Requirement met"
 }
 
+test_UsingServicePrincipal if {
+    PolicyId := "MS.SHAREPOINT.1.2v1"
+
+    Output := tests with input as {
+        "SPO_tenant": [
+            {
+                "OneDriveSharingCapability" : 3
+            }
+        ],
+        "OneDrive_PnP_Flag": true   
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].Criticality == "Should/Not-Implemented"
+    RuleOutput[0].ReportDetails == NotCheckedDetails(PolicyId)
+}
+
 test_OneDriveSharingCapability_Incorrect_V1 if {
     PolicyId := "MS.SHAREPOINT.1.2v1"
 
