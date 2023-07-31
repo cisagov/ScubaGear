@@ -132,7 +132,8 @@ test_AnonymousLinkType_Correct if {
                 "FileAnonymousLinkType" : 1,
                 "FolderAnonymousLinkType" : 1
             }
-        ]
+        ],
+        "OneDrive_PnP_Flag": false   
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
@@ -151,7 +152,8 @@ test_AnonymousLinkType_Incorrect_V1 if {
                 "FileAnonymousLinkType" : 2,
                 "FolderAnonymousLinkType" : 2
             }
-        ]
+        ],
+        "OneDrive_PnP_Flag": false   
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
@@ -170,7 +172,8 @@ test_AnonymousLinkType_Incorrect_V2 if {
                 "FileAnonymousLinkType" : 1,
                 "FolderAnonymousLinkType" : 2
             }
-        ]
+        ],
+        "OneDrive_PnP_Flag": false   
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
@@ -189,7 +192,8 @@ test_AnonymousLinkType_Incorrect_V3 if {
                 "FileAnonymousLinkType" : 2,
                 "FolderAnonymousLinkType" : 1
             }
-        ]
+        ],
+        "OneDrive_PnP_Flag": false   
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
@@ -197,6 +201,27 @@ test_AnonymousLinkType_Incorrect_V3 if {
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "Requirement not met: files are not limited to view for Anyone"
+}
+
+test_UsingServicePrincipal if {
+    PolicyId := "MS.SHAREPOINT.3.2v1"
+
+    Output := tests with input as {
+        "SPO_tenant": [
+            {
+                "FileAnonymousLinkType" : 2,
+                "FolderAnonymousLinkType" : 1
+            }
+        ],
+        "OneDrive_PnP_Flag": true   
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].Criticality == "Should/Not-Implemented"
+    RuleOutput[0].ReportDetails == NotCheckedDetails(PolicyId)
 }
 
 #
