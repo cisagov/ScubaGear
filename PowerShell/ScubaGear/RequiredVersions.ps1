@@ -11,6 +11,11 @@ $ModuleList = @(
         MaximumVersion = [version] '3.99.99999'
     },
     @{
+        ModuleName = 'Microsoft.Online.SharePoint.PowerShell' # includes OneDrive
+        ModuleVersion = [version] '16.0.0'
+        MaximumVersion = [version] '16.99.99999'
+    },
+    @{
         ModuleName = 'PnP.PowerShell' # alternate for SharePoint PowerShell
         ModuleVersion = [version] '1.12.0'
         MaximumVersion = [version] '1.99.99999'
