@@ -47,7 +47,6 @@ tests[{
     Conditions := [Policy.OneDriveSharingCapability == 0, Policy.OneDriveSharingCapability == 3]
     Status := count([Condition | Condition = Conditions[_]; Condition == true]) == 1
 }
-#--
 
 tests[{
     "PolicyId" : PolicyId,
@@ -86,6 +85,7 @@ tests[{
 #
 # MS.SHAREPOINT.1.4v1
 #--
+
 # At this time we are unable to test for approved security groups
 # because we have yet to find the setting to check
 
@@ -145,9 +145,10 @@ tests[{
 
 #
 # MS.SHAREPOINT.2.2v1
+#--
+
 # SPO_tenant - DefaultLinkPermission
 # 1 view 2 edit
-#--
 
 tests[{
     "PolicyId" : "MS.SHAREPOINT.2.2v1",
@@ -224,27 +225,26 @@ tests[{
 
 #
 # MS.SHAREPOINT-ONEDRIVE.3.2v1
-#--
 
-ReportDetails2_3(Policy) = Description if {
+FileAndFolderPermission(Policy) = Description if {
     Policy.FileAnonymousLinkType == 1
     Policy.FolderAnonymousLinkType == 1
 	Description := "Requirement met"
 }
 
-ReportDetails2_3(Policy) = Description if {
+FileAndFolderPermission(Policy) = Description if {
     Policy.FileAnonymousLinkType == 2
     Policy.FolderAnonymousLinkType == 2
 	Description := "Requirement not met: both files and folders are not limited to view for Anyone"
 }
 
-ReportDetails2_3(Policy) = Description if {
+FileAndFolderPermission(Policy) = Description if {
     Policy.FileAnonymousLinkType == 1
     Policy.FolderAnonymousLinkType == 2
 	Description := "Requirement not met: folders are not limited to view for Anyone"
 }
 
-ReportDetails2_3(Policy) = Description if {
+FileAndFolderPermission(Policy) = Description if {
     Policy.FileAnonymousLinkType == 2
     Policy.FolderAnonymousLinkType == 1
 	Description := "Requirement not met: files are not limited to view for Anyone"
@@ -255,7 +255,7 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-SPOTenant", "Get-PnPTenant"],
     "ActualValue" : [Policy.FileAnonymousLinkType, Policy.FolderAnonymousLinkType],
-    "ReportDetails" : ReportDetails2_3(Policy),
+    "ReportDetails" : FileAndFolderPermission(Policy),
     "RequirementMet" : Status
 }] {
     Policy := input.SPO_tenant[_]
@@ -271,7 +271,7 @@ tests[{
     "ReportDetails" : NotCheckedDetails(PolicyId),
     "RequirementMet" : false
 }] {
-    PolicyId := "MS.ONEDRIVE.3.2v1"
+    PolicyId := "MS.SHAREPOINT.3.2v1"
     input.OneDrive_PnP_Flag
 }
 #--
@@ -336,6 +336,7 @@ tests[{
 #
 # MS.SHAREPOINT.4.1v1
 #--
+
 # At this time we are unable to test for running custom scripts on personal sites
 # because we have yet to find the setting to check
 tests[{
