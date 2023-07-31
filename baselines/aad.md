@@ -383,7 +383,7 @@ This section provides policies that help reduce security risks related to  non p
 #### MS.AAD.5.1v1
 Only administrators SHALL be allowed to register applications.
 
-- _Rationale:_ Application access to the tenant presents a hightened security risk compared to interactive user access because applications are typically not subject to critical security protections such as MFA policies and others. Ensuring that only specific privileged users can register applications reduces the risks of unauthorized users installing malicious applications into the tenant.
+- _Rationale:_ Application access to the tenant presents a heightened security risk compared to interactive user access because applications are typically not subject to critical security protections such as MFA policies and others. Ensuring that only specific privileged users can register applications reduces the risks of unauthorized users installing malicious applications into the tenant.
 - _Last modified:_ June 2023
 
 #### MS.AAD.5.2v1
@@ -527,7 +527,7 @@ Permanent active role assignments SHALL NOT be allowed for highly privileged rol
 
 - _Rationale:_ Instead of giving users permanent assignments to privileged roles, provisioning access "just in time" lessens the exposure period if those accounts become compromised. In AAD PIM or an alternative PAM system, just in time access can be provisioned by assigning users to roles as "eligible" instead of perpetually "active".
 - _Last modified:_ June 2023
-- _Note:_ There are a couple of exceptions to this policy. Emergency access accounts need perpetual access to the tenant in the rare event of system degredation or other scenarios. Some types of service accounts require a user account with privileged roles and since those are software they cannot perform role activation.
+- _Note:_ There are a couple of exceptions to this policy. Emergency access accounts need perpetual access to the tenant in the rare event of system degradation or other scenarios. Some types of service accounts require a user account with privileged roles and since those are software they cannot perform role activation.
 
 #### MS.AAD.7.5v1
 Provisioning users to highly privileged roles SHALL NOT occur outside of a PAM system, because this bypasses critical controls the PAM system provides.
