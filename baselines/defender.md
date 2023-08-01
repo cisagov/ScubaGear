@@ -135,7 +135,10 @@ instead and configure the policy settings according to [Use the Microsoft 365 De
 4. From the **Templated policies** section, select **Preset Security Policies**.
 5. Select **Manage protection settings** under **Strict protection**.
 6. On the **Apply Exchange Online Protection** page, select **Specific recipients**.
-7. Add all sensitive accounts via the **User** and **Group** boxes using the names of mailboxes, users, contacts, M365 groups, and distribution groups.
+7. Add all sensitive accounts via the **User** and **Group** boxes using the
+   names of mailboxes, users, contacts, M365 groups, and distribution groups.
+7. (optional) Under **Exclude these recipients**, add **Users** and **Groups**
+   to be exempted from the preset policies.
 8. Select **Next** on each page until the **Review and confirm your changes** page.
 9. On the **Review and confirm your changes** page, select **Confirm**.
 
@@ -147,10 +150,16 @@ instead and configure the policy settings according to [Use the Microsoft 365 De
 4. From the **Templated policies** section, select **Preset Security Policies**.
 5. Select **Manage protection settings** under **Strict protection**.
 6. Select **Next** until you reach the **Apply Defender for Office 365 protection** page.
-7. On the **Apply Defender for Office 365 protection** page, select **Specific recipients** or **Previously selected recipients** if sensitive accounts were already set on the Exchange Online protections page.
-8. If adding sensitive accounts separately via **Specific recipients**, add all sensitive accounts via the **User** and **Group** boxes using the names of mailboxes, users, contacts, M365 groups, and distribution groups.
-9. Select **Next** on each page until the **Review and confirm your changes** page.
-10. On the **Review and confirm your changes** page, select **Confirm**.
+7. On the **Apply Defender for Office 365 protection** page, select
+   **Specific recipients** or **Previously selected recipients** if sensitive
+   accounts were already set on the Exchange Online protections page.
+8. If adding sensitive accounts separately via **Specific recipients**, add all
+   sensitive accounts via the **User** and **Group** boxes using the names of
+   mailboxes, users, contacts, M365 groups, and distribution groups.
+9. (optional) Under **Exclude these recipients**, add **Users** and **Groups**
+   to be exempted from the preset policies.
+10. Select **Next** on each page until the **Review and confirm your changes** page.
+11. On the **Review and confirm your changes** page, select **Confirm**.
 
 ## 2. Impersonation Protection
 Impersonation protection checks incoming emails to see if the sender
