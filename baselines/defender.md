@@ -52,13 +52,14 @@ The standard and strict preset security policies SHALL be enabled.
 #### MS.DEFENDER.1.2v1
 All users SHALL be added to Exchange Online Protection in either the standard or strict preset security policy.
 - _Rationale:_ Important user protections are provided by Exchange Online Protection, including anti-spam, anti-malware, and anti-phishing protections. By using the preset policies, administrators can easily ensure that all new and existing users automatically have secure defaults applied.
-
 - _Last modified:_ June 2023
+- _Note_: Specific user accounts, except for sensitive accounts, MAY be exempt from the preset policies, provided that they are added to one or more custom policies that offer comparable protection. These specific users might need flexibility that is not offered by the preset policies. Those users' accounts should be added to a custom policy that conforms as closely as possible to the settings used by the preset policies. See the **Resources** section for more details on configuring policies.
 
 #### MS.DEFENDER.1.3v1
 All users SHALL be added to Defender for Office 365 Protection in either the standard or strict preset security policy.
-- _Rationale:_ Important user protections are provided by Defender for Office 365 Protection, including safe attachments and safe links. By using the preset policies, administrators can easily ensure that all new and existing users automatically have secure defaults applied.
+- _Rationale:_ Important user protections are provided by Defender for Office 365 Protection, including safe attachments and safe links. By using the preset policies, administrators can easily ensure that all new and existing users automatically have secure defaults applied.  
 - _Last modified:_ June 2023
+- _Note_: Specific user accounts, except for sensitive accounts, MAY be exempt from the preset policies, provided that they are added to one or more custom policies that offer comparable protection. These specific users might need flexibility that is not offered by the preset policies. Those users' accounts should be added to a custom policy that conforms as closely as possible to the settings used by the preset policies. See the **Resources** section for more details on configuring policies.
 
 #### MS.DEFENDER.1.4v1
 Sensitive accounts SHALL be added to Exchange Online Protection in the strict preset security policy.
@@ -68,11 +69,6 @@ Sensitive accounts SHALL be added to Exchange Online Protection in the strict pr
 #### MS.DEFENDER.1.5v1
 Sensitive accounts SHALL be added to Defender for Office 365 Protection in the strict preset security policy.
 - _Rationale:_ Unauthorized access to a sensitive account may result in greater harm than a standard user account.  Adding sensitive accounts to the strict preset security policy, with its increased protections, better mitigates their increased risk.
-- _Last modified:_ June 2023
-
-#### MS.DEFENDER.1.6v1
-Specific user accounts, except for sensitive accounts, MAY be exempt from the preset policies, provided that they are added to one or more custom policies that offer comparable protection.
-- _Rationale:_ In some cases, specific users might need flexibility that is not offered by the preset policies. In these cases, these users' accounts should be added to a custom policy that conforms as closely as possible to the settings used by the preset policies (see the **Resources** section for more details).
 - _Last modified:_ June 2023
 
 ### Resources
@@ -156,22 +152,6 @@ instead and configure the policy settings according to [Use the Microsoft 365 De
 9. Select **Next** on each page until the **Review and confirm your changes** page.
 10. On the **Review and confirm your changes** page, select **Confirm**.
 
-#### MS.DEFENDER.1.6v1 instructions:
-
-To exempt a user from preset policies:
-
-1. Sign in to **Microsoft 365 Defender**.
-2. In the left-hand menu, go to **Email & Collaboration** > **Policies & Rules**.
-3. Select **Threat Policies**.
-4. From the **Templated policies** section, select **Preset Security Policies**.
-5. Select **Manage protection settings** under either **Standard protection** or **Strict protection**.
-6. On the **Apply Exchange Online protection** page, check the **Exclude these recipients** box.
-7. Under **Exclude these recipients**, add **Users** and **Groups** to be exempted from the preset policies.
-8. Click **Next** and repeat steps 7-8 on the **Apply Defender for Office 365 protection** page.
-9. Select **Next** on each page until the **Review and confirm your changes** page.
-10. On the **Review and confirm your changes** page, select **Confirm**.
-11. Create custom policies offering comparable protection using the Microsoft documentation referenced in the **Resources** section above and add the previously exempted users to those policies.
-
 ## 2. Impersonation Protection
 Impersonation protection checks incoming emails to see if the sender
 address is similar to the users or domains on an agency-defined list. If
@@ -194,14 +174,10 @@ Domain impersonation protection SHOULD be added for important partners in both t
 - _Rationale:_ By configuring domain impersonation protection for domains owned by important partners, the risk of a user being deceived by a look-alike domain may be reduced. By configuring impersonation protection in both preset policies, administrators ensure that all email recipients are protected from impersonated emails, regardless of whether they are added to the standard or strict policy.
 - _Last modified:_ June 2023
 
-#### MS.DEFENDER.2.4v1
-Trusted senders and domains MAY be added in the event of false positives.
-- _Rationale:_ It is possible that false positives may be raised by the impersonation protection system. In these cases, consider marking legitimate senders as trusted to prevent protection from flagging them in the future.
-- _Last modified:_ June 2023
-
 ### Resources
 
-- [Impersonation settings in anti-phishing policies in Microsoft Defender for Office 365 \| Microsoft Learn](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/anti-phishing-policies-about?view=o365-worldwide#impersonation-settings-in-anti-phishing-policies-in-microsoft-defender-for-office-365).
+- [Impersonation settings in anti-phishing policies in Microsoft Defender for Office 365 \| Microsoft Learn](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/anti-phishing-policies-about?view=o365-worldwide#impersonation-settings-in-anti-phishing-policies-in-microsoft-defender-for-office-365)
+- [Use the Microsoft 365 Defender portal to assign Standard and Strict preset security policies to users \| Microsoft Learn](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/preset-security-policies?view=o365-worldwide#use-the-microsoft-365-defender-portal-to-assign-standard-and-strict-preset-security-policies-to-users)
 
 ### License Requirements
 
@@ -215,7 +191,57 @@ Trusted senders and domains MAY be added in the event of false positives.
   for current offerings).
 
 ### Implementation
-To add email addresses and domains to flag when impersonated by attackers, follow the instructions listed under [Use the Microsoft 365 Defender portal to assign Standard and Strict preset security policies to users \| Microsoft Learn](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/preset-security-policies?view=o365-worldwide#use-the-microsoft-365-defender-portal-to-assign-standard-and-strict-preset-security-policies-to-users).
+
+#### MS.DEFENDER.2.1v1 instructions:
+
+1. Sign in to **Microsoft 365 Defender**.
+2. In the left-hand menu, go to **Email & Collaboration** > **Policies & Rules**.
+3. Select **Threat Policies**.
+4. From the **Templated policies** section, select **Preset Security Policies**.
+5. Select **Manage protection settings** under either **Standard protection**
+   or **Strict protection**.
+6. Select **Next** until you reach the **Impersonation Protection** page, then
+   select **Next** once more.
+7. On the **Protected custom users** page, add a name and valid email address for each
+   sensitive account and click **Add** after each.
+8. Select **Next** until you reach the **Trusted senders and domains** page.
+9. (optional) Add specific email addresses here to not flag as impersonation
+   when sending messages and prevent false positives. Click **Add** after each.
+10. Select **Next** on each page until the **Review and confirm your changes** page.
+11. On the **Review and confirm your changes** page, select **Confirm**.
+
+#### MS.DEFENDER.2.2v1 instructions:
+
+1. Sign in to **Microsoft 365 Defender**.
+2. In the left-hand menu, go to **Email & Collaboration** > **Policies & Rules**.
+3. Select **Threat Policies**.
+4. From the **Templated policies** section, select **Preset Security Policies**.
+5. Select **Manage protection settings** under either **Standard protection**
+   or **Strict protection**.
+6. Select **Next** until you reach the **Impersonation Protection** page, then
+   select **Next** once more.
+7. On the **Protected custom domains** page, add each agency domain
+   and click **Add** after each.
+8. Select **Next** until you reach the **Trusted senders and domains** page.
+9. (optional) Add specific domains here to not flag as impersonation when
+   sending messages and prevent false positives. Click **Add** after each.
+10. Select **Next** on each page until the **Review and confirm your changes** page.
+11. On the **Review and confirm your changes** page, select **Confirm**.
+
+#### MS.DEFENDER.2.3v1 instructions:
+
+1. Sign in to **Microsoft 365 Defender**.
+2. In the left-hand menu, go to **Email & Collaboration** > **Policies & Rules**.
+3. Select **Threat Policies**.
+4. From the **Templated policies** section, select **Preset Security Policies**.
+5. Select **Manage protection settings** under either **Standard protection**
+   or **Strict protection**.
+6. Select **Next** until you reach the **Impersonation Protection** page, then
+   select **Next** once more.
+7. On the **Protected custom domains** page, add each partner domain
+   and click **Add** after each.
+8. Select **Next** on each page until the **Review and confirm your changes** page.
+9. On the **Review and confirm your changes** page, select **Confirm**.
 
 ## 3. Safe Attachments
 
