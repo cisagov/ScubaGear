@@ -225,7 +225,7 @@ tests[{
 #--
 
 #
-# MS.SHAREPOINT-ONEDRIVE.3.2v1
+# MS.SHAREPOINT.3.2v1
 
 FileAndFolderPermission(Policy) = Description if {
     Policy.FileAnonymousLinkType == 1
