@@ -44,7 +44,7 @@ tests[{
     "RequirementMet" : Status
 }] {
     Policy := input.SPO_tenant[_]
-    input.sharepoint_PnP_Flag == false
+    input.OneDrive_PnP_Flag == false
     Conditions := [Policy.OneDriveSharingCapability == 0, Policy.OneDriveSharingCapability == 3]
     Status := count([Condition | Condition = Conditions[_]; Condition == true]) == 1
 }
@@ -58,7 +58,7 @@ tests[{
     "RequirementMet" : false
 }] {
     PolicyId := "MS.SHAREPOINT.1.2v1"
-    input.sharepoint_PnP_Flag
+    input.OneDrive_PnP_Flag
 }
 #--
 
@@ -260,7 +260,7 @@ tests[{
     "RequirementMet" : Status
 }] {
     Policy := input.SPO_tenant[_]
-    input.sharepoint_PnP_Flag == false
+    input.OneDrive_PnP_Flag == false
     Conditions := [Policy.FileAnonymousLinkType == 2, Policy.FolderAnonymousLinkType == 2]
     Status := count([Condition | Condition = Conditions[_]; Condition == true]) == 0
 }
@@ -274,7 +274,7 @@ tests[{
     "RequirementMet" : false
 }] {
     PolicyId := "MS.SHAREPOINT.3.2v1"
-    input.sharepoint_PnP_Flag
+    input.OneDrive_PnP_Flag
 }
 #--
 
