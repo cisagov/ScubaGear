@@ -591,11 +591,13 @@ MS.DEFENDER.4.6v1 instructions:
 
 There are several pre-built alert policies available pertaining to
 various apps in the M365 suite. These alerts give administrators better
-real-time insight into possible security incidents.
+real-time insight into possible security incidents. Guidance on specific alerts to configure can be found in the following section of the CISA M365 Security Configuration Baseline for Exchange Online.
+
+- [MS.EXO.16.1v1 \| CISA M365 Security Configuration Baseline for Exchange Online](./exo.md#msexo161v1)
 
 ### Policies
 #### MS.DEFENDER.5.1v1
-At a minimum, the alerts required by the _Exchange Online Minimum Viable Secure Configuration Baseline_ SHALL be enabled.
+At a minimum, the alerts required by the _CISA M365 Security Configuration Baseline for Exchange Online_ SHALL be enabled.
 - _Rationale:_ Potentially malicious or service impacting events may go undetected without a means of detecting these events. Setting up a mechanism to alert administrators to the list of events above draws attention to them to ensure that any impact to users and the agency are minimized.
 - _Last modified:_ June 2023
 
