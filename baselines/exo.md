@@ -347,7 +347,7 @@ SMTP Auth. Proceed with caution if SMTP Auth needs to be enabled for any use cas
 ### Policies
 
 #### MS.EXO.5.1v1
-SMTP AUTH SHALL be disabled in Exchange Online.
+SMTP AUTH SHALL be disabled.
 
 - _Rationale:_ SMTP AUTH is not used or needed by modern email clients.
 Therefore, disabling it as the global default conforms to the principle of
