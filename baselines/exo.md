@@ -769,7 +769,13 @@ The phishing protection solution SHOULD include an AI-based phishing detection t
 
 ### License Requirements
 
-- N/A
+- If using Defender for impersonation protection and advanced phishing
+  thresholds, Defender for Office 365 Plan 1 or 2 is required. These are
+  included with E5 and G5 and are available as add-ons for E3 and G3. As of
+  July 14, 2023 anti-phishing for user and domain impersonation and spoof
+  intelligence are not yet available in GCC High and DoD (see [Platform
+  features \| Microsoft Docs](https://docs.microsoft.com/en-us/office365/servicedescriptions/office-365-platform-service-description/office-365-us-government/office-365-us-government#platform-features)
+  for current offerings).
 
 ### Implementation
 
@@ -1239,7 +1245,14 @@ Audit Logs in the Cloud Azure log category.
 
 ### License Requirements
 
-- N/A
+- Microsoft Purview Audit (Premium) logging capabilities, including the
+  creation of a custom audit log retention policy, requires E5/G5 licenses or
+  E3/G3 licenses with add-on compliance licenses.
+
+- Additionally, maintaining logs in the M365 environment for longer than one
+  year requires an add-on license. For more information, see
+  [Licensing requirements \| Microsoft
+  Docs](https://docs.microsoft.com/en-us/microsoft-365/compliance/auditing-solutions-overview?view=o365-worldwide#licensing-requirements).
 
 ### Implementation
 
