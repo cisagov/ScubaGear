@@ -482,7 +482,7 @@ have expected to be sent from an internal sender.
 ### Implementation
 
 #### MS.EXO.7.1v1 instructions:
-To enable external sender warnings:
+To create a mail flow rule to produce external sender warnings:
 
 1.  Sign in to the **Exchange admin center**
 
@@ -507,9 +507,15 @@ To enable external sender warnings:
 
 11. Under **Choose a mode for this rule**, select **Enforce**.
 
-12. Leave the **Severity** as **Not Specified** and click **Next**
+12. Leave the **Severity** as **Not Specified**.
 
-13. Click **Finish**.
+13. Leave the **Match sender address in message** as **Header** and click **Next**.
+
+14. Click **Finish** and then **Done**.
+
+15. The new rule will be disabled.  Re-select the new rule to show its
+    settings and slide the **Enable or disable rule** slider to the right
+    until it shows as **Enabled**.
 
 ## 8. Data Loss Prevention Solutions
 
