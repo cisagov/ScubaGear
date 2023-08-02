@@ -653,13 +653,13 @@ To add one or email recipients to an alert:
 
 9. On the Review page, click **Submit** to save the notification settings.
 
-## 6. Microsoft Purview Audit
+## 6. Audit Logging
 
 User activity from M365 services are captured in the organization's unified
 audit log.  These logs are essential for conducting incident response and
 threat detection activity.
 
-By default, Microsoft retains the audit logs for only 90 days. Activity
+By default, Microsoft retains the audit logs for only 180 days. Activity
 by users with E5 licenses is logged for one year.
 
 However, in accordance with OMB M-21-31, _Improving the Federal Government’s
