@@ -555,6 +555,14 @@ The DLP solution SHALL protect PII and sensitive information, as defined by the 
 
 - None
 
+### Implementation
+
+#### MS.EXO.8.1v1 instructions
+Any product that meets the requirements outlined in this baseline policy may be used. If the agency is using Microsoft Defender, see the following implementation steps for [DLP](./defender.md#implementation-3) for additional guidance.
+
+#### MS.EXO.8.2v1 instructions
+Any product that meets the requirements outlined in this baseline policy may be used. If the agency is using Microsoft Defender, see the following implementation steps for [protecting PII](./defender.md#msdefender41v1-instructions) for additional guidance.
+
 ## 9. Attachment File Type
 
 For some types of files (e.g., executable files), the dangers of
@@ -605,6 +613,29 @@ organization, to be made in accordance with their risk tolerance.
 
 - None
 
+### Implementation
+
+#### MS.EXO.9.1v1 instructions:
+Any product that meets the requirements outlined in this baseline policy may be
+used. If the agency is using Microsoft Defender, see the following
+implementation steps for
+[enabling preset security policies](./defender.md#implementation) which
+include email filtering based on attachment file type.
+
+#### MS.EXO.9.2v1 instructions:
+Any product that meets the requirements outlined in this baseline policy may be
+used. If the agency is using Microsoft Defender, see the following
+implementation steps for
+[enabling preset security policies](./defender.md#implementation) which
+attempt to determine the true file type and assess the file extension.
+
+#### MS.EXO.9.3v1 instructions:
+Any product that meets the requirements outlined in this baseline policy may be
+used. If the agency is using Microsoft Defender, see the following
+implementation steps for
+[enabling preset security policies](./defender.md#implementation) which
+disallow click-to-run file types.
+
 ## 10. Malware
 
 Any product that meets the requirements outlined in this baseline
@@ -647,6 +678,30 @@ containing malware in any given user's mailbox can be reduced.
 ### Resources
 
 - None
+
+### Implementation
+
+#### MS.EXO.10.1v1 instructions:
+Any product that meets the requirements outlined in this baseline policy may be
+used. If the agency is using Microsoft Defender, see the following
+implementation steps for
+[enabling preset security policies](./defender.md#implementation) which
+includes anti-malware protection.
+
+#### MS.EXO.10.2v1 instructions:
+Any product that meets the requirements outlined in this baseline policy may be
+used. If the agency is using Microsoft Defender, see the following
+implementation steps for
+[enabling preset security policies](./defender.md#implementation) which
+includes anti-malware protection to quarantine malware in email.
+
+#### MS.EXO.10.3v1 instructions:
+Any product that meets the requirements outlined in this baseline policy may be
+used. If the agency is using Microsoft Defender, see the following
+implementation steps for
+[enabling preset security policies](./defender.md#implementation) which
+includes zero hour auto purge (ZAP) to retroactively detect malware in messages
+already delivered to mailboxes and removes them.
 
 ## 11. Phishing Protections
 
@@ -703,6 +758,29 @@ The phishing protection solution SHOULD include an AI-based phishing detection t
 ### Resources
 
 - None
+
+### Implementation
+
+#### MS.EXO.11.1v1 instructions:
+Any product that meets the requirements outlined in this baseline policy may be
+used. If the agency is using Microsoft Defender, see the following
+implementation steps for
+[enabling preset security policies](./defender.md#msdefender12v1) which
+includes impersonation protection.
+
+#### MS.EXO.11.2v1 instructions:
+Any product that meets the requirements outlined in this baseline policy may be
+used. If the agency is using Microsoft Defender, see the following
+implementation steps for
+[enabling preset security policies](./defender.md#msdefender12v1) which
+includes user safety tips to warn users.
+
+#### MS.EXO.11.3v1 instructions:
+Any product that meets the requirements outlined in this baseline policy may be
+used. If the agency is using Microsoft Defender, see the following
+implementation steps for
+[enabling preset security policies](./defender.md#msdefender13v1) which
+includes mailbox intelligence for detecting phishing attacks using AI.
 
 ## 12. IP Allow Lists
 
@@ -905,6 +983,33 @@ potentially unknown users to bypass spam protections.
 
 - None
 
+### Implementation
+
+#### MS.EXO.14.1v1 instructions:
+
+Any product that meets the requirements outlined in this baseline policy may be
+used. If the agency is using Microsoft Defender, see the following
+implementation steps for
+[enabling preset security policies](./defender.md#msdefender12v1) which
+includes spam filtering.
+
+#### MS.EXO.14.2v1 instructions:
+
+Any product that meets the requirements outlined in this baseline policy may be
+used. If the agency is using Microsoft Defender, see the following
+implementation steps for
+[enabling preset security policies](./defender.md#msdefender12v1) which
+includes spam filtering that moves high confidence spam to either the junk
+ or quarantine folder.
+
+#### MS.EXO.14.3v1 instructions:
+
+Any product that meets the requirements outlined in this baseline policy may be
+used. If the agency is using Microsoft Defender, see the following
+implementation steps for
+[enabling preset security policies](./defender.md#msdefender12v1) which do not
+include any allowed sender domains by default.
+
 ## 15. Link Protection
 
 Several technologies exist for protecting users from malicious links
@@ -960,6 +1065,33 @@ User click tracking SHOULD be enabled.
 
 - None
 
+### Implementation
+
+#### MS.EXO.15.1v1 instructions:
+
+Any product that meets the requirements outlined in this baseline policy may be
+used. If the agency is using Microsoft Defender, see the following
+implementation steps for
+[enabling preset security policies](./defender.md#msdefender13v1) which
+includes Safe Links protections to scan URLs in email messages against a list
+of known, malicious links.
+
+#### MS.EXO.15.2v1 instructions:
+
+Any product that meets the requirements outlined in this baseline policy may be
+used. If the agency is using Microsoft Defender, see the following
+implementation steps for
+[enabling preset security policies](./defender.md#msdefender13v1) which
+includes Safe Links protections to scan links to files for malware.
+
+#### MS.EXO.15.3v1 instructions:
+
+Any product that meets the requirements outlined in this baseline policy may be
+used. If the agency is using Microsoft Defender, see the following
+implementation steps for
+[enabling preset security policies](./defender.md#msdefender13v1) which
+includes Safe Links click protections to track user clicks on links in email.
+
 ## 16. Alerts
 
 Microsoft Defender includes several prebuilt alert policies, many of
@@ -1004,14 +1136,28 @@ The alerts SHOULD be sent to a monitored address or incorporated into a SIEM.
 
 - None
 
-## 17. Microsoft Purview Audit
+### Implementation
+
+#### MS.EXO.16.1v1 instructions:
+
+See the following implementation steps for
+[enabling alerts](./defender.md##msdefender51v1-instructions) for additional
+guidance.
+
+#### MS.EXO.16.2v1 instructions:
+
+See the following implementation steps for
+[add email recipients to an alert](./defender.md##msdefender51v1-instructions)
+for additional guidance.
+
+## 17. Audit Logging
 
 User activity from M365 services are captured in the organization's unified
 audit log.  These logs are essential for conducting incident response and
 threat detection activity.
 
 By default, Microsoft retains the audit logs for only 180 days. Activity by
-users with E5 licenses is logged for one year.
+users with E5 licenses assigned is retained for one year.
 
 However, in accordance with OMB M-21-31, _Improving the Federal Government’s
 Investigative and Remediation Capabilities Related to Cybersecurity Incidents_,
@@ -1030,7 +1176,7 @@ implementation guidance for configuring audit logging, see the following
 section of the CISA M365 Security Configuration Baseline for Defender for
 Office 365.
 
-- [Microsoft Purview Audit \| CISA M365 Security Configuration Baseline for Defender for Office 365](./defender.md#6-microsoft-purview-audit)
+- [Audit Logging \| CISA M365 Security Configuration Baseline for Defender for Office 365](./defender.md#6-audit-logging)
 
 ### Policies
 
@@ -1056,13 +1202,33 @@ Furthermore, it is required for government agencies by OMB M-21-13 (referred to 
 
 #### MS.EXO.17.3v1
 Audit logs SHALL be maintained for at least the minimum duration dictated by [OMB M-21-31 (Appendix C)](https://www.whitehouse.gov/wp-content/uploads/2021/08/M-21-31-Improving-the-Federal-Governments-Investigative-and-Remediation-Capabilities-Related-to-Cybersecurity-Incidents.pdf).
-- _Rationale:_ Audit logs may no longer be available at the time of need if they are not retained for a sufficient period of time.  Increased log retention time gives an agency the necessary visibility
-to investigate incidents that occurred some time ago.
+- _Rationale:_ Audit logs may no longer be available at the time of need if they
+are not retained for a sufficient period of time.  Increased log retention time
+gives an agency the necessary visibility to investigate incidents that occurred
+some time ago. OMB M-21-13, Appendix C, Table 5 specifically calls out Unified
+Audit Logs in the Cloud Azure log category.
 - _Last modified:_ June 2023
 
 ### Resources
 
 - None
+
+### Implementation
+
+#### MS.EXO.17.1v1 instructions:
+See the following implementation steps for enabling [Microsoft Purview
+(Standard)](./defender.md#msdefender61v1-instructions) for additional
+guidance.
+
+#### MS.EXO.17.1v2 instructions:
+See the following implementation steps for enabling [Microsoft Purview
+(Premium)](./defender.md#msdefender62v1-instructions) for additional
+guidance.
+
+#### MS.EXO.17.1v3 instructions:
+See the following implementation steps to
+[create an audit retention policy](./defender.md#msdefender62v1-instructions)
+for additional guidance.
 
 # Acknowledgements
 
