@@ -175,7 +175,7 @@ authenticity and integrity to emails. As with SPF, DKIM relies on Domain
 Name System (DNS) records, thus, its deployment depends on how an
 agency manages its DNS. DKIM is enabled for your tenant's default domain
 (e.g., onmicrosoft.com domains), but it must be manually enabled for
-custom domains.
+custom domains. Exchange Online Protection (EOP) features include DKIM signing capabilities.
 
 ### Policies
 
@@ -208,39 +208,14 @@ recipients to detect spoofed emails and verify the integrity of email content.
 
 ### License Requirements
 
-- DKIM signing is included with Exchange Online Protection (EOP), which
-  in turn is included in all Microsoft 365 subscriptions that contain
-  Exchange Online mailboxes.
+- N/A
 
 ### Implementation
 
 #### MS.EXO.3.1v1 instructions:
-To enable DKIM, follow the instructions listed on [Steps to Create,
+1. To enable DKIM, follow the instructions listed on [Steps to Create,
 enable and disable DKIM from Microsoft 365 Defender portal \| Microsoft
 Learn](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/email-authentication-dkim-configure?view=o365-worldwide#steps-to-create-enable-and-disable-dkim-from-microsoft-365-defender-portal).
-
-1.  Navigate to the **Microsoft 365 Defender portal**.
-
-2.  On the left hand side go to **Email & collaboration** > **Policies & Rules**.
-
-3. From the list of policies, select **Threat Policies**.
-
-4. Under **Rules**, select **Email Authentication Settings**.
-
-5. Select **DKIM**.
-
-6.  Select your domain.
-
-7.  Switch **Sign messages for this domain with DKIM signatures** to
-    **Enabled**.
-
-8.  If you are enabling DKIM for the first time, a pop-up window listing
-    Canonical Name (CNAME) records displays. Publish these records to
-    your DNS service provider.
-
-9.  Return to the DKIM page on the Defender admin center to finish
-    enabling DKIM.
-
 
 ## 4. Domain-Based Message Authentication, Reporting, and Conformance (DMARC)
 Domain-based Message Authentication, Reporting, and Conformance (DMARC)
@@ -837,7 +812,7 @@ specific senders.
 
 ### License Requirements
 
-- Exchange Online Protection
+- N/A
 
 ### Implementation
 
