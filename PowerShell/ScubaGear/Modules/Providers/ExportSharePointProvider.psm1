@@ -33,11 +33,13 @@ function Export-SharePointProvider {
 
     $SPOTenant = ConvertTo-Json @()
     $SPOSite = ConvertTo-Json @()
+    $UsedPnP = ConvertTo-Json $false
     if ($PnPFlag) {
         $SPOTenant = ConvertTo-Json @($Tracker.TryCommand("Get-PnPTenant"))
         $SPOSite = ConvertTo-Json @($Tracker.TryCommand("Get-PnPTenantSite",@{"Identity"="$($SPOSiteIdentity)"; "Detailed"=$true}) | Select-Object -Property *)
         $Tracker.AddSuccessfulCommand("Get-SPOTenant")
         $Tracker.AddSuccessfulCommand("Get-SPOSite")
+        $UsedPnP = ConvertTo-Json $true
     }
     else {
         $SPOTenant = ConvertTo-Json @($Tracker.TryCommand("Get-SPOTenant"))
@@ -54,6 +56,7 @@ function Export-SharePointProvider {
     $json = @"
     "SPO_tenant": $SPOTenant,
     "SPO_site": $SPOSite,
+    "OneDrive_PnP_Flag": $UsedPnp,
     "SharePoint_successful_commands": $SuccessfulCommands,
     "SharePoint_unsuccessful_commands": $UnSuccessfulCommands,
 "@
