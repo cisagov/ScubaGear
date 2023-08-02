@@ -360,17 +360,12 @@ SMTP Auth. Proceed with caution if SMTP Auth needs to be enabled for any use cas
 SMTP AUTH SHALL be disabled in Exchange Online.
 
 - _Rationale:_ SMTP AUTH is not used or needed by modern email clients.
-Therefore, disabling it as the global default conforms to the principle of least
-functionality.
+Therefore, disabling it as the global default conforms to the principle of
+least functionality. SMTP AUTH is required for POP3 and IMAP4 clients. As
+there are still legitimate uses for such clients, SMTP AUTH can be enabled on a
+per-mailbox basis when necessary.
 - _Last modified:_ June 2023
-
-#### MS.EXO.5.2v1
-SMTP AUTH MAY be enabled on a per-mailbox basis as needed.
-
-- _Rationale:_ SMTP AUTH is required for POP3 and IMAP4 clients.
-As there are still legitimate uses for such clients, SMTP
-AUTH can be enabled on a per-mailbox basis as necessary.
-- _Last modified:_ June 2023
+- _Note:_ SMTP AUTH MAY be enabled on a per-mailbox basis as needed.
 
 ### Resources
 
@@ -389,13 +384,13 @@ AUTH can be enabled on a per-mailbox basis as necessary.
 ### Implementation
 
 #### MS.EXO.5.1v1 instructions:
-SMTP AUTH can be disabled tenant-wide using the Exchange admin center
+
+1. SMTP AUTH can be disabled tenant-wide using the Exchange admin center
 or Exchange Online PowerShell. Follow the instructions listed at [Disable
 SMTP AUTH in your organization \| Microsoft
 Learn](https://learn.microsoft.com/en-us/exchange/clients-and-mobile-in-exchange-online/authenticated-client-smtp-submission#disable-smtp-auth-in-your-organization).
 
-#### MS.EXO.5.2v1 instructions:
-To enable SMTP AUTH on a per-mailbox basis, follow the instructions
+2. To enable SMTP AUTH on a per-mailbox basis, follow the instructions
 listed at [Use the Microsoft 365 admin center to enable or disable SMTP
 AUTH on specific mailboxes \| Microsoft
 Learn](https://learn.microsoft.com/en-us/exchange/clients-and-mobile-in-exchange-online/authenticated-client-smtp-submission#use-the-microsoft-365-admin-center-to-enable-or-disable-smtp-auth-on-specific-mailboxes).
@@ -739,16 +734,13 @@ security mechanisms, including spam filtering and sender authentication checks. 
 Safe lists SHOULD NOT be enabled.
 
 - _Rationale:_ Messages sent from allowed safe list addresses bypass important
-security mechanisms, including spam filtering and sender authentication checks.  Avoiding use of safe lists prevents potential threats from circumventing security mechanisms.
-- _Last modified:_ June 2023
-
-#### MS.EXO.12.3v1
-A connection filter MAY be implemented to create an IP Block list.
-
-- _Rationale:_ While blocking all malicious senders is not feasible,
+security mechanisms, including spam filtering and sender authentication checks.
+Avoiding use of safe lists prevents potential threats from circumventing
+security mechanisms. While blocking all malicious senders is not feasible,
 blocking specific known, malicious IP addresses may reduce the threat from
 specific senders.
 - _Last modified:_ June 2023
+- _Note:_ A connection filter MAY be implemented to create an IP Block list.
 
 ### Resources
 
@@ -774,33 +766,44 @@ the Microsoft 365 Defender portal to modify the default connection
 filter
 policy](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/connection-filter-policies-configure?view=o365-worldwide#use-the-microsoft-365-defender-portal-to-modify-the-default-connection-filter-policy).
 
-1.  Sign in to **Microsoft 365 Defender portal**.
+1. Sign in to **Microsoft 365 Defender portal**.
 
-2.  From the left-hand menu, find **Email & collaboration** and select **Policies and Rules**
+2. From the left-hand menu, find **Email & collaboration** and select **Policies and Rules**
 
-3.  Select **Threat Policies** from the list of policy names.
+3. Select **Threat Policies** from the list of policy names.
 
-4.  Under **Policies**, select **Anti-spam.**
+4. Under **Policies**, select **Anti-spam.**
 
-5.  Select **Connection filter policy (Default).**
+5. Select **Connection filter policy (Default).**
 
-6.  Click **Edit connection filter policy.**
+6. Click **Edit connection filter policy.**
 
-7.  Ensure no addresses are specified under **Always allow messages from
-    the following IP addresses or address range**.
+7. Ensure no addresses are specified under **Always allow messages from
+   the following IP addresses or address range**.
 
-8.  Enter addresses under **Always block messages from the following IP
-    addresses or address range** as needed.
+8. Enter addresses under **Always block messages from the following IP
+   addresses or address range** as needed.
 
-9.  Ensure **Turn on safe list** is not selected.
+9. Ensure **Turn on safe list** is not selected.
 
 #### MS.EXO.12.2v1 instructions:
-1. Refer to step 7 in [MS.EXO.12.1v1 instructions](#msexo121v1-instructions) to implement
-this policy.
 
-#### MS.EXO.12.3v1 instructions:
-1. Refer to step 8 in [MS.EXO.12.1v1 instructions](#msexo121v1-instructions) to implement
-this policy.
+1. Sign in to **Microsoft 365 Defender portal**.
+
+2. From the left-hand menu, find **Email & collaboration** and select **Policies and Rules**
+
+3. Select **Threat Policies** from the list of policy names.
+
+4. Under **Policies**, select **Anti-spam.**
+
+5. Select **Connection filter policy (Default).**
+
+6. Click **Edit connection filter policy.**
+
+7. (optional) Enter addresses under **Always block messages from the following
+   IP addresses or address range** as needed.
+
+8. Ensure **Turn on safe list** is not selected.
 
 ## 13. Mailbox Auditing
 
@@ -864,7 +867,9 @@ To enable mailbox auditing by default for your organization via PowerShell:
 Microsoft Defender includes several capabilities for protecting against
 inbound spam emails. Use of Microsoft Defender is not strictly required
 for this purpose; any product that fulfills the requirements outlined in
-this baseline policy group may be used. If the agency is using Microsoft Defender to meet this baseline policy group, see the following policy of the CISA M365 Security Configuration Baseline for Defender for Office 365.
+this baseline policy group may be used. If the agency is using Microsoft
+Defender to meet this baseline policy group, see the following policy of
+the CISA M365 Security Configuration Baseline for Defender for Office 365.
 
 - [MS.DEFENDER.1.2v1 \| CISA M365 Security Configuration Baseline for Defender for Office 365](./defender.md#msdefender12v1)
   - All users SHALL be added to Exchange Online Protection in either the standard or strict preset security policy.
@@ -886,14 +891,15 @@ Moving spam messages to a separate junk or quarantine folder helps users filter 
 - _Last modified:_ June 2023
 
 #### MS.EXO.14.3v1
-Allowed senders MAY be added, but allowed domains SHALL NOT be added.
+Allowed domains SHALL NOT be added.
 
 - _Rationale:_ Legitimate emails may be incorrectly filtered
-by spam protections. Adding allowed senders is an acceptable method of combating
-these false positives. Allowing an entire domain, especially
+by spam protections. Adding allowed senders is an acceptable method of
+combating these false positives. Allowing an entire domain, especially
 a common domain like office.com, however, provides for a large number of
 potentially unknown users to bypass spam protections.
 - _Last modified:_ June 2023
+- _Note:_ Allowed senders MAY be added.
 
 ### Resources
 
