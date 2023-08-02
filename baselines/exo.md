@@ -13,6 +13,12 @@ this baseline. When noted, alternative products may be used in lieu of
 Defender, on the condition that they fulfill these required baseline
 settings.
 
+The Secure Cloud Business Applications (SCuBA) project run by the Cybersecurity and Infrastructure Security Agency (CISA) provides guidance and capabilities to secure federal civilian executive branch (FCEB) agencies’ cloud business application environments and protect federal information that is created, accessed, shared, and stored in those environments.
+
+The CISA SCuBA SCBs for M365 help secure federal information assets stored within M365 cloud business application environments through consistent, effective, and manageable security configurations. CISA created baselines tailored to the federal government’s threats and risk tolerance with the knowledge that every organization has different threat models and risk tolerance. Non-governmental organizations may also find value in applying these baselines to reduce risks.
+
+The information in this document is being provided “as is” for INFORMATIONAL PURPOSES ONLY. CISA does not endorse any commercial product or service, including any subjects of analysis. Any reference to specific commercial entities or commercial products, processes, or services by service mark, trademark, manufacturer, or otherwise, does not constitute or imply endorsement, recommendation, or favoritism by CISA.
+
 ## License Compliance and Copyright
 
 Portions of this document are adapted from documents in Microsoft’s
@@ -250,9 +256,12 @@ The DMARC point of contact for aggregate reports SHALL include <reports@dmarc.cy
 - _Rationale:_ Email spoofing attempts are not inherently visible to domain
 owners. DMARC provides a mechanism to receive reports of spoofing attempts.
 Including <reports@dmarc.cyber.dhs.gov> as a point of contact for these reports
-gives CISA insight into spoofing attempts and is required by Binding Operational Directive 18-01, "Enhance Email and Web Security” for
-federal, executive branch, departments and agencies.
+gives CISA insight into spoofing attempts and is required by Binding Operational
+Directive 18-01, "Enhance Email and Web Security” for federal, executive
+branch, departments and agencies.
 - _Last modified:_ June 2023
+- _Note:_ Only federal, executive branch, departments and agencies should
+          include this email address in their DMARC record.
 
 #### MS.EXO.4.4v1
 An agency point of contact SHOULD be included for aggregate and failure reports.
@@ -306,10 +315,12 @@ PowerShell tool `Resolve-DnsName`. For example:
 Resolve-DnsName _dmarc.example.com txt
 ```
 
-If DMARC is configured, a response resembling `v=DMARC1; p=reject; pct=100; rua=mailto:reports@dmarc.cyber.dhs.gov, mailto:reports@example.com`
-will be returned, though by necessity, the contents of the record will vary by agency.
-In this example, the policy indicates that all emails that fail the SPF/DKIM checks are to
-be rejected and reported to reports@dmarc.cyber.dhs.gov and reports@example.com.
+If DMARC is configured, a response resembling `v=DMARC1; p=reject; pct=100; rua=mailto:reports@dmarc.cyber.dhs.gov, mailto:reports@example.com; ruf=mailto:reports@example.com`
+will be returned, though by necessity, the contents of the record will vary
+by agency. In this example, the policy indicates that all emails that fail the
+SPF/DKIM checks are to be rejected and aggregate reports sent to
+reports@dmarc.cyber.dhs.gov and reports@example.com. Failure reports will be
+sent to reports@example.com.
 
 #### MS.EXO.4.2v1 instructions:
 See [MS.EXO.4.1v1 instructions](#msexo41v1-instructions) for an overview of how to publish and check a DMARC record. Ensure that the record published includes `p=reject`.
@@ -321,7 +332,8 @@ as one of the emails for the `rua` field.
 #### MS.EXO.4.4v1 instructions:
 See [MS.EXO.4.1v1 instructions](#msexo41v1-instructions) for an overview of how to publish and check a DMARC record. Ensure that the record published includes a point of contact
 specific to your agency in addition to <reports@dmarc.cyber.dhs.gov>
-as one of the emails for the `rua` field.
+as one of the emails for the `rua` field and only one or more agency-defined points
+of contact for the `ruf` field.
 
 ## 5. Simple Mail Transfer Protocol Authentication (SMTP AUTH)
 
