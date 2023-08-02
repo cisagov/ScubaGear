@@ -88,6 +88,9 @@ To disallow automatic forwarding to external domains:
 5.  Clear the checkbox next to **Allow automatic forwarding**, then
     click **Save**.
 
+6.  Return to **Remote domains** and repeat steps 4-5 for each
+    additional remote domain in the list.
+
 ## 2. Sender Policy Framework
 
 The Sender Policy Framework (SPF) is a mechanism that allows domain
