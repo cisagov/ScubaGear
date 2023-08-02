@@ -397,7 +397,7 @@ information by restricted apps and unwanted bluetooth applications.
 
 ### Implementation
 
-MS.DEFENDER.4.1v1 instructions:
+#### MS.DEFENDER.4.1v1 instructions:
 
 1. Sign in to the **Microsoft Purview compliance portal**.
 
@@ -451,7 +451,7 @@ MS.DEFENDER.4.1v1 instructions:
 
 20. Click **Submit**.
 
-MS.DEFENDER.4.2v1 instructions:
+#### MS.DEFENDER.4.2v1 instructions:
 
 1. Sign in to the **Microsoft Purview compliance portal**.
 
@@ -474,7 +474,7 @@ MS.DEFENDER.4.2v1 instructions:
 
 7. Review the policy locations listed and click **Submit**.
 
-MS.DEFENDER.4.3v1 instructions:
+#### MS.DEFENDER.4.3v1 instructions:
 
 1. Sign in to the **Microsoft Purview compliance portal**.
 
@@ -503,7 +503,7 @@ MS.DEFENDER.4.3v1 instructions:
 
 12. Review the policy and click **Submit** to complete the policy changes.
 
-MS.DEFENDER.4.4v1 instructions:
+#### MS.DEFENDER.4.4v1 instructions:
 
 1. Sign in to the **Microsoft Purview compliance portal**.
 
@@ -529,7 +529,7 @@ MS.DEFENDER.4.4v1 instructions:
 
 10. Review the policy and click **Submit** to complete the policy changes.
 
-MS.DEFENDER.4.5v1 instructions:
+#### MS.DEFENDER.4.5v1 instructions:
 
 1. Sign in to the **Microsoft Purview compliance portal**.
 
@@ -551,7 +551,7 @@ MS.DEFENDER.4.5v1 instructions:
 9. Enter an app and executable name to disallow said app from
    accessing protected files and to log the incident.
 
-MS.DEFENDER.4.6v1 instructions:
+#### MS.DEFENDER.4.6v1 instructions:
 
 1. Sign in to the **Microsoft Purview compliance portal**.
 
