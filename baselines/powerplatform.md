@@ -196,7 +196,7 @@ Blocked category in the default environment policy:
 
   - Yammer.
 
-- _Rationale:_ All users in the tenant have access to the default Power Platform environment. Blocking all connectors in the default environment prevents inadvertent or malicious use of connectors by users in the agency's tenant.
+- _Rationale:_ All users in the tenant have access to the default Power Platform environment. Blocking all connectors in the default environment prevents inadvertent or malicious use of connectors by users in the agency's tenant. The connectors listed above are driving core Power Platform functionality and enable core Office customization scenarios, as such they remain remain non-blockable to ensure that core user scenarios remain fully functional.
 - _Last modified:_ June 2023
 
 ### Resources
@@ -208,6 +208,9 @@ Blocked category in the default environment policy:
 - [Create a data loss prevention (DLP) policy \| Microsoft
   Learn](https://learn.microsoft.com/en-us/power-platform/admin/create-dlp-policy)
 
+- [dlp connector classificationy \| Microsoft
+  Learn]([https://learn.microsoft.com/en-us/power-platform/admin/create-dlp-policy](https://learn.microsoft.com/en-us/power-platform/admin/dlp-connector-classification?source=recommendations))
+  
 ### License Requirements
 
 - N/A
