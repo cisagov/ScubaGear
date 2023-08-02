@@ -1055,10 +1055,10 @@ Their proxy can perform the following actions:
 
 If all checks pass, the user is redirected to the original URL.
 
-Microsoft Defender includes link scanning capabilities
+Microsoft Defender for Office 365 includes link scanning capabilities.
 Use of Microsoft Defender is not strictly required for this purpose;
 any product that fulfills the requirements outlined in this baseline policy group may be used.
-If the agency is using Microsoft Defender to meet this baseline policy group, see the following policy of the CISA M365 Security Configuration Baseline for Defender for Office 365 for additional guidance.
+If the agency is using Microsoft Defender for Office 365 to meet this baseline policy group, see the following policy of the CISA M365 Security Configuration Baseline for Defender for Office 365 for additional guidance.
 
 - [MS.DEFENDER.1.3v1 \| CISA M365 Security Configuration Baseline for Defender for Office 365](./defender.md#msdefender13v1).
   - All users SHALL be added to Defender for Office 365 Protection in either the standard or strict preset security policy.
@@ -1098,7 +1098,7 @@ User click tracking SHOULD be enabled.
 #### MS.EXO.15.1v1 instructions:
 
 Any product that meets the requirements outlined in this baseline policy may be
-used. If the agency is using Microsoft Defender, see the following
+used. If the agency is using Microsoft Defender for Office 365, see the following
 implementation steps for
 [enabling preset security policies](./defender.md#msdefender13v1) which
 includes Safe Links protections to scan URLs in email messages against a list
@@ -1107,7 +1107,7 @@ of known, malicious links.
 #### MS.EXO.15.2v1 instructions:
 
 Any product that meets the requirements outlined in this baseline policy may be
-used. If the agency is using Microsoft Defender, see the following
+used. If the agency is using Microsoft Defender for Office 365, see the following
 implementation steps for
 [enabling preset security policies](./defender.md#msdefender13v1) which
 includes Safe Links protections to scan links to files for malware.
@@ -1115,7 +1115,7 @@ includes Safe Links protections to scan links to files for malware.
 #### MS.EXO.15.3v1 instructions:
 
 Any product that meets the requirements outlined in this baseline policy may be
-used. If the agency is using Microsoft Defender, see the following
+used. If the agency is using Microsoft Defender for Office 365, see the following
 implementation steps for
 [enabling preset security policies](./defender.md#msdefender13v1) which
 includes Safe Links click protections to track user clicks on links in email.
