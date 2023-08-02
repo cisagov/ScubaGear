@@ -725,15 +725,17 @@ including the following techniques:
 
 - AI-based tools
 
-Microsoft Defender has capabilities for all of these phishing
-protections. With the exception for impersonation protection, these features are
-available with Exchange Online Protection (EOP), which is included in all
-Microsoft 365 subscriptions that contain Exchange Online mailboxes.
-For more guidance on configuring phishing protections with Microsoft’s native solutions,
-see the following policy and section of the CISA M365 Security Configuration Baseline for Defender for Office 365.
+Any product that meets the requirements outlined in this baseline
+policy group may be used. If the agency is using Exchange Online Protection
+(EOP), which is included in all Microsoft 365 subscriptions that contain
+Exchange Online mailboxes, see the following policy and section of the CISA
+M365 Security Configuration Baseline for Defender for Office 365.
 
 - [MS.DEFENDER.1.2v1 \| CISA M365 Security Configuration Baseline for Defender for Office 365](./defender.md#msdefender12v1).
   - All users SHALL be added to Exchange Online Protection in either the standard or strict preset security policy.
+
+EOP alone does not support impersonation protection, but this is provided through
+Defender for Office 365. If using Defender for Office 365 for impersonation protection, see the following policy and section of the CISA M365 Security Configuration Baseline for Defender for Office 365.
 
 - [Impersonation Protection \| CISA M365 Security Configuration Baseline for Defender for Office 365](./defender.md#2-impersonation-protection)
 
@@ -769,9 +771,9 @@ The phishing protection solution SHOULD include an AI-based phishing detection t
 
 ### License Requirements
 
-- If using Defender for impersonation protection and advanced phishing
-  thresholds, Defender for Office 365 Plan 1 or 2 is required. These are
-  included with E5 and G5 and are available as add-ons for E3 and G3. As of
+- If using Defender for Office 365 for impersonation protection and advanced
+  phishing thresholds, Defender for Office 365 Plan 1 or 2 is required. These
+  are included with E5 and G5 and are available as add-ons for E3 and G3. As of
   July 14, 2023 anti-phishing for user and domain impersonation and spoof
   intelligence are not yet available in GCC High and DoD (see [Platform
   features \| Microsoft Docs](https://docs.microsoft.com/en-us/office365/servicedescriptions/office-365-platform-service-description/office-365-us-government/office-365-us-government#platform-features)
