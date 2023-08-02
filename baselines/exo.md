@@ -551,6 +551,10 @@ The DLP solution SHALL protect PII and sensitive information, as defined by the 
 
 - None
 
+### License Requirements
+
+- N/A
+
 ### Implementation
 
 #### MS.EXO.8.1v1 instructions
@@ -608,6 +612,10 @@ organization, to be made in accordance with their risk tolerance.
 ### Resources
 
 - None
+
+### License Requirements
+
+- N/A
 
 ### Implementation
 
@@ -674,6 +682,10 @@ containing malware in any given user's mailbox can be reduced.
 ### Resources
 
 - None
+
+### License Requirements
+
+- N/A
 
 ### Implementation
 
@@ -754,6 +766,10 @@ The phishing protection solution SHOULD include an AI-based phishing detection t
 ### Resources
 
 - None
+
+### License Requirements
+
+- N/A
 
 ### Implementation
 
@@ -979,6 +995,10 @@ potentially unknown users to bypass spam protections.
 
 - None
 
+### License Requirements
+
+- N/A
+
 ### Implementation
 
 #### MS.EXO.14.1v1 instructions:
@@ -1061,6 +1081,10 @@ User click tracking SHOULD be enabled.
 
 - None
 
+### License Requirements
+
+- N/A
+
 ### Implementation
 
 #### MS.EXO.15.1v1 instructions:
@@ -1131,6 +1155,10 @@ The alerts SHOULD be sent to a monitored address or incorporated into a SIEM.
 ### Resources
 
 - None
+
+### License Requirements
+
+- N/A
 
 ### Implementation
 
@@ -1208,6 +1236,10 @@ Audit Logs in the Cloud Azure log category.
 ### Resources
 
 - None
+
+### License Requirements
+
+- N/A
 
 ### Implementation
 
