@@ -97,7 +97,7 @@ This section provides policies that help reduce security risks related to user a
 #### MS.AAD.2.1v1
 Users detected as high risk SHALL be blocked.
 
-- _Rationale:_ By blocking users determined as high risk, this prevents accounts that are likely compromised from accessing the tenant.
+- _Rationale:_ By blocking users determined as high risk, compromised accounts are prevented from accessing the tenant.
 - _Last modified:_ June 2023
 - _Note:_ Users who are determined to be high risk by AAD Identity Protection can be blocked from accessing the system via an AAD Conditional Access policy. A high risk user will be blocked until an administrator remediates their account.
 
@@ -108,7 +108,7 @@ A notification SHOULD be sent to the administrator when high-risk users are dete
 
 #### MS.AAD.2.3v1
 Sign-ins detected as high risk SHALL be blocked.
-- _Rationale:_ By blocking sign-ins determined as high risk, this prevents accounts that are likely compromised from accessing the tenant.
+- _Rationale:_ By blocking sign-ins determined as high risk, compromised accounts are prevented from accessing the tenant.
 - _Last modified:_ June 2023
 
 ### Resources
@@ -514,7 +514,7 @@ A minimum of two users and a maximum of eight users SHALL be provisioned with th
 - _Last modified:_ June 2023
 
 #### MS.AAD.7.2v1
-Privileged users SHALL be provisioned with finer-grained roles instead Global Administrator.
+Privileged users SHALL be provisioned with finer-grained roles instead of Global Administrator.
 - _Rationale:_ Many privileged administrative users do not need unfettered access to the tenant to perform their duties. By assigning them to roles based on least privilege, the risks associated with having their accounts compromised are reduced.
 - _Last modified:_ June 2023
 
@@ -715,13 +715,13 @@ This section provides policies that help reduce security risks related to the in
 #### MS.AAD.8.1v1
 Guest users SHOULD have limited or restricted access to Azure AD directory objects.
 
-- _Rationale:_ By limiting the amount of information about objects in the tenant that is available to guest users, this reduces the malicious reconnaissance exposure if a guest account is compromised or created by an adversary.
+- _Rationale:_ By limiting the amount of information about objects in the tenant that is available to guest users, the malicious reconnaissance exposure can be reduced if a guest account is compromised or created by an adversary.
 - _Last modified:_ June 2023
 
 #### MS.AAD.8.2v1
 Only users with the Guest Inviter role SHOULD be able to invite guest users.
 
-- _Rationale:_ By only allowing an authorized groups of individuals to invite guest users to create accounts in the tenant, this helps an agency enforce a guest user account approval process which reduces the risk of unauthorized accounts being created.
+- _Rationale:_ By only allowing an authorized groups of individuals to invite guest users to create accounts in the tenant, an agency can enforce a guest user account approval process which reduces the risk of unauthorized accounts being created.
 - _Last modified:_ June 2023
 
 #### MS.AAD.8.3v1
