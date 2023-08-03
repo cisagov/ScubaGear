@@ -149,7 +149,7 @@ A DLP policy SHALL be created to restrict connector access in the default Power 
 - _Rationale:_ All users in the tenant have access to the default Power Platform environment. Those users may inadvertently use connectors that share sensitive information with others who should not have access to it. Users with a Power Apps need should be directed to conduct development in other Power Platform environments with DLP connector policies customized to suit the user's needs while maintaining the agency's security posture.
 - _Last Modified:_ June 2023
 - _Note:_ The following connectors drive core Power Platform functionality and enable core Office customization scenarios: Approvals, Dynamics 365 Customer Voice, Excel Online (Business), Microsoft DataverseMicrosoft Dataverse (legacy), Microsoft Teams, Microsoft To-Do (Business), Office 365 Groups, Office 365 Outlook, Office 365 Users, OneDrive for Business, OneNote (Business), Planner, Power Apps Notification, Power BI, SharePoint, Shifts for Microsoft Teams, and Yammer as such they remain remain non-blockable to ensure that core user scenarios remain fully functional.
-- 
+
 #### MS.POWERPLATFORM.2.2v1
 Non-default environments SHOULD have at least one DLP policy that
   affects them.
