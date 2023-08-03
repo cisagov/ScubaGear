@@ -314,7 +314,7 @@ If phishing-resistant MFA has not been deployed yet and Microsoft Authenticator 
 
   Target resources > Cloud apps > <b>All cloud apps</b>
   
-  Access controls > Grant > Grant Access > <b>Require device to be marked as compliant</b> and <b>Require Hybrid Azure AD joined device</b> > <b>Require one of the selected controls</b>
+  Access controls > Grant > Grant Access > <b>Require device to be marked as compliant</b> and <b>Require Hybrid Azure AD joined device</b> > For multiple controls > <b>Require one of the selected controls</b>
 </pre>
 
 #### MS.AAD.3.8v1 instructions:
@@ -326,7 +326,7 @@ If phishing-resistant MFA has not been deployed yet and Microsoft Authenticator 
 
   Target resources > User actions > <b>Register security information</b>
   
-  Access controls > Grant > Grant Access > <b>Require device to be marked as compliant</b> and <b>Require Hybrid Azure AD joined device</b> > <b>Require one of the selected controls</b>
+  Access controls > Grant > Grant Access > <b>Require device to be marked as compliant</b> and <b>Require Hybrid Azure AD joined device</b> > For multiple controls > <b>Require one of the selected controls</b>
 </pre>
 
 ## 4. Centralized Log Collection
