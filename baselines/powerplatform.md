@@ -145,59 +145,16 @@ creating apps in all other created environments.
 ### Policies
 
 #### MS.POWERPLATFORM.2.1v1
-A DLP policy SHALL be created to restrict connector access in the
-default Power Platform environment.
+A DLP policy SHALL be created to restrict connector access in the default Power Platform environment.
 - _Rationale:_ All users in the tenant have access to the default Power Platform environment. Those users may inadvertently use connectors that share sensitive information with others who should not have access to it. Users with a Power Apps need should be directed to conduct development in other Power Platform environments with DLP connector policies customized to suit the user's needs while maintaining the agency's security posture.
 - _Last Modified:_ June 2023
-
+- _Note:_ The following connectors drive core Power Platform functionality and enable core Office customization scenarios: Approvals, Dynamics 365 Customer Voice, Excel Online (Business), Microsoft DataverseMicrosoft Dataverse (legacy), Microsoft Teams, Microsoft To-Do (Business), Office 365 Groups, Office 365 Outlook, Office 365 Users, OneDrive for Business, OneNote (Business), Planner, Power Apps Notification, Power BI, SharePoint, Shifts for Microsoft Teams, and Yammer as such they remain remain non-blockable to ensure that core user scenarios remain fully functional.
+- 
 #### MS.POWERPLATFORM.2.2v1
 Non-default environments SHOULD have at least one DLP policy that
   affects them.
 - _Rationale:_ Users may inadvertently use connectors that share sensitive information with others who should not have access to it. Data loss prevention (DLP) policies provide a way for agencies to detect and prevent unauthorized disclosures.
 - _Last Modified:_ June 2023
-
-#### MS.POWERPLATFORM.2.3v1
-All connectors except those listed below SHOULD be added to the
-Blocked category in the default environment policy:
-
-  - Approvals
-
-  - Dynamics 365 Customer Voice
-
-  - Excel Online (Business)
-
-  - Microsoft Dataverse
-
-  - Microsoft Dataverse (legacy)
-
-  - Microsoft Teams
-
-  - Microsoft To-Do (Business)
-
-  - Office 365 Groups
-
-  - Office 365 Outlook
-
-  - Office 365 Users
-
-  - OneDrive for Business
-
-  - OneNote (Business)
-
-  - Planner
-
-  - Power Apps Notification
-
-  - Power BI
-
-  - SharePoint
-
-  - Shifts for Microsoft Teams
-
-  - Yammer.
-
-- _Rationale:_ All users in the tenant have access to the default Power Platform environment. Blocking all connectors in the default environment prevents inadvertent or malicious use of connectors by users in the agency's tenant. The connectors listed above are driving core Power Platform functionality and enable core Office customization scenarios, as such they remain remain non-blockable to ensure that core user scenarios remain fully functional.
-- _Last modified:_ June 2023
 
 ### Resources
 
@@ -259,8 +216,6 @@ to policy** at the top.
 #### MS.POWERPLATFORM.2.2v1 instructions:
 1.  Repeat the steps above but for step **13** select the non-default environment you wish to enforce a DLP policy upon.
 
-#### MS.POWERPLATFORM.2.3v1 instructions:
-1.  Refer to steps **8** and **9** in the **MS.POWERPLATFORM.2.1v1** instructions to meet this policy.
 
 ## 3. Power Platform Tenant Isolation
 
