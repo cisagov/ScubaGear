@@ -141,7 +141,7 @@ Sign-ins detected as high risk SHALL be blocked.
   ```
 
   <code>
-    Users > Include > <b>All users</b>
+    Users > Include > <strong>All users</strong>
 
     Target resources > Cloud apps > <b>All cloud apps</b>
 
