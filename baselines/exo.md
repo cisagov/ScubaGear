@@ -902,10 +902,12 @@ policy](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-secu
 ## 13. Mailbox Auditing
 
 Mailbox auditing helps users investigate compromised accounts or
-discover illicit access to Exchange Online. Some actions performed by
-administrators, delegates, and owners are logged automatically. While
-mailbox auditing is enabled by default, this policy is to ensure that it
-has not been inadvertently disabled.
+discover illicit access to Exchange Online. As a feature of Exchange
+Online, mailbox auditing is enabled by default for all organizations.
+Microsoft defines a default audit policy that logs certain actions
+performed by administrators, delegates, and owners that are logged by
+the default audit policy. While mailbox auditing is enabled by default,
+this policy ensures that it has not been inadvertently disabled.
 
 ### Policies
 
