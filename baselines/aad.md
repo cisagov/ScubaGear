@@ -532,7 +532,7 @@ Permanent active role assignments SHALL NOT be allowed for highly privileged rol
 - _Note:_ There are a couple of exceptions to this policy. Emergency access accounts need perpetual access to the tenant in the rare event of system degradation or other scenarios. Some types of service accounts require a user account with privileged roles and since those are software they cannot perform role activation.
 
 #### MS.AAD.7.5v1
-Provisioning users to highly privileged roles SHALL NOT occur outside of a PAM system, because this bypasses critical controls the PAM system provides.
+Provisioning users to highly privileged roles SHALL NOT occur outside of a PAM system.
 - _Rationale:_ By provisioning users to privileged roles within a PAM system, numerous privileged access policies and monitoring can be enforced. If privileged users are assigned directly to roles in the M365 admin center or via Powershell outside of the context of a PAM system, a significant set of critical security capabilities are bypassed.
 - _Last modified:_ June 2023
 
