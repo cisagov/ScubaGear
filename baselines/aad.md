@@ -128,17 +128,15 @@ Sign-ins detected as high risk SHALL be blocked.
 
 ####  MS.AAD.2.1v1 instructions:
 
-1.  Create a conditional access policy that blocks users determined to be high risk by the Identity Protection service.
+1.  Create a conditional access policy that blocks users determined to be high risk by the Identity Protection service. Configure the following policy settings in the new conditional access policy as per the values below:
 
-Follow the conditional access policy template below:
+      Users > Include > **All users**
 
-    Users > Include > All users
+      Target resources > Cloud apps > **All cloud apps**
 
-    Target resources > Cloud apps > All cloud apps
-
-    Conditions > User risk > High
+      Conditions > User risk > **High**
     
-    Access controls > Grant > Block Access
+      Access controls > Grant > **Block Access**
 
 #### MS.AAD.2.2v1 instructions:
 
@@ -146,18 +144,22 @@ Follow the conditional access policy template below:
 
 #### MS.AAD.2.3v1 instructions:
 
-1. Create a conditional access policy that blocks sign-ins determined to be high risk by the Identity Protection service.
+Create a conditional access policy that blocks sign-ins determined to be high risk by the Identity Protection service.
 
-Follow the conditional access policy template below:
-
-    Users > Include > All users
-
-    Target resources > Cloud apps > All cloud apps
-
-    Conditions > Sign-in risk > High
+1. In the **Conditional Access** portal, click **Create new poliy**.
+2. Enter a policy name that describes the intent of the policy.
+3. On the left hand navigation, under **Users** click **users and groups selected**.
+4. Under the **Include** tab, select **All users**.
+5. On the left hand navigation, under **Target Resources** click **target resources selected**.
+6. Under the **Include** tab, select **All cloud apps**.
+7. On the left hand navigation, under **Conditions** click **conditions selected**.
+8. Under **Sign-in risk**, click **Not configured**.
+9. On the popup screen, under **Configure**, click **Yes** and select **High** for the risk level. Click the **Done** button to close the popup.
+10. On the left hand navigation, under **Grant** click **controls selected**.
+11. On the popup screen, select **Block access** and click the **Select** button to close the popup.
+12. At the bottom of the page under **Enable policy** leave the policy as **Report-only**. See the **Conditional Access Policies** section at the top of this document for guidance on testing conditional access policies before enabling them.
+13. Click the **Create** button to finish creating the policy.
     
-    Access controls > Grant > Block Access
-
 ## 3. Strong Authentication and a Secure Registration Process
 
 This section provides policies that help reduce security risks related to  user authentication and registration.
@@ -185,14 +187,14 @@ The option **Federal PIV card (federated from agency on-premises Active Director
 - _Last modified:_ June 2023
 
 #### MS.AAD.3.2v1
-If Phishing-resistant MFA has not been enforced yet, then an alternative MFA method SHALL be enforced for all users.
+If phishing-resistant MFA has not been enforced yet, then an alternative MFA method SHALL be enforced for all users.
 
 - _Rationale:_ This is a backup security policy to help protect the tenant in the event that phishing-resistant MFA has not been enforced yet. This policy requires that MFA is enforced and thus reduces the risks of single form authentication.
 - _Last modified:_ June 2023
 - _Note:_ If a conditional access policy has been created that enforces phishing-resistant MFA, then this policy is not necessary. This policy does not dictate the specific MFA method.
 
 #### MS.AAD.3.3v1
-If Phishing-resistant MFA has not been enforced yet and Microsoft Authenticator is enabled, it SHALL be configured to show login context information.
+If phishing-resistant MFA has not been enforced yet and Microsoft Authenticator is enabled, it SHALL be configured to show login context information.
 
 - _Rationale:_ This is a backup security policy to help protect the tenant in the event that phishing-resistant MFA has not been enforced yet and Microsoft Authenticator is being used. This policy helps improve the security of Microsoft Authenticator by showing the user context information which helps reduce MFA phishing compromises.
 - _Last modified:_ June 2023
@@ -264,7 +266,7 @@ Follow the conditional access policy template below:
 
 #### MS.AAD.3.2v1 instructions:
 
-1. If hishing-resistant MFA has not been enforced for all users yet, create a conditional access policy that enforces MFA but does not dictate the MFA method. 
+1. If phishing-resistant MFA has not been enforced for all users yet, create a conditional access policy that enforces MFA but does not dictate the MFA method. 
 
 Follow the conditional access policy template below.
 
@@ -340,7 +342,7 @@ Security logs SHALL be sent to the agency's Security Operations Center for monit
 
 - _Rationale:_ The security risk of not having visibility into cyber attacks is reduced by collecting the logs into the agency's centralized security detection infrastructure. Thus security events can be audited,  queried and available for incident response. 
 - _Last modified:_ June 2023
-- _Scope:_ The following logs (configured in Azure AD diagnostic settings), are required: AuditLogs, SignInLogs, RiskyUsers, UserRiskEvents, NonInteractiveUserSignInLogs, ServicePrincipalSignInLogs, ADFSSignInLogs, RiskyServicePrincipals, ServicePrincipalRiskEvents, EnrichedOffice365AuditLogs, MicrosoftGraphActivityLogs. If managed identities are used for Azure resources, also send the ManagedIdentitySignInLogs log type. If the Azure AD Provisioning Service is used to provision users to SaaS apps or other systems, also send the ProvisioningLogs log type.
+- _Scope:_ The following logs (configured in Azure AD diagnostic settings), are required: `AuditLogs, SignInLogs, RiskyUsers, UserRiskEvents, NonInteractiveUserSignInLogs, ServicePrincipalSignInLogs, ADFSSignInLogs, RiskyServicePrincipals, ServicePrincipalRiskEvents, EnrichedOffice365AuditLogs, MicrosoftGraphActivityLogs`. If managed identities are used for Azure resources, also send the `ManagedIdentitySignInLogs` log type. If the Azure AD Provisioning Service is used to provision users to SaaS apps or other systems, also send the `ProvisioningLogs` log type.
 - _Federal Agencies:_ It is also recommended to send the logs to the CISA CLAW system so that agencies can benefit from the security detection capabilities offered there. Contact CISA to request integration instructions.
 
 ### Resources
@@ -827,12 +829,7 @@ Dr. Mukesh Rohatgi (MITRE), Lee Szilagyi (MITRE), Nanda Katikaneni
 # Appendix A: Hybrid Azure AD Guidance
 
 The majority of this document does not focus on securing hybrid Azure AD
-environments. CISA released a separate [Hybrid Identity Solutions Architecture](https://www.cisa.gov/resources-tools/services/secure-cloud-business-applications-scuba-project) document that addresses the unique implementation requirements of hybrid Azure AD infrastructure. In addition, a limited set of hybrid Azure AD policies that include on-premises components are
-provided below:
-
-- [On-premises Azure AD Password Protection for Active Directory Domain Services](https://learn.microsoft.com/en-us/azure/active-directory/authentication/concept-password-ban-bad-on-premises) SHOULD be enforced.
-
-- [Password hash synchronization](https://learn.microsoft.com/en-us/azure/active-directory/hybrid/how-to-connect-password-hash-synchronization) with the on-premises directory SHOULD be implemented.
+environments. CISA released a separate [Hybrid Identity Solutions Architecture](https://www.cisa.gov/sites/default/files/2023-03/csso-scuba-guidance_document-hybrid_identity_solutions_architecture-2023.03.22-final.pdf) document that addresses the unique implementation requirements of hybrid Azure AD infrastructure.
 
 # Appendix B: Cross-tenant Access Guidance
 
