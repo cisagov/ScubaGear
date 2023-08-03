@@ -671,7 +671,7 @@ users cannot interact with those emails.
 - _Last modified:_ June 2023
 
 #### MS.EXO.10.3v1
-Email scanning SHOULD be capable of reviewing emails after delivery.
+Email scanning SHALL be capable of reviewing emails after delivery.
 
 - _Rationale:_ As known malware signatures are updated, it is possible
 for an email to be retroactively identified as containing malware after
