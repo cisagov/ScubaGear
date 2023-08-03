@@ -130,16 +130,6 @@ Sign-ins detected as high risk SHALL be blocked.
 
 1.  Create a conditional access policy that blocks users determined to be high risk by the Identity Protection service. Configure the following policy settings in the new conditional access policy as per the values below:
 
-  ```
-    Users > Include > **All users**
-
-    Target resources > Cloud apps > **All cloud apps**
-
-    Conditions > User risk > **High**
-    
-    Access controls > Grant > **Block Access**
-  ```
-
 <pre>
   Users > Include > <b>All users</b>
 
