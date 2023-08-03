@@ -275,7 +275,7 @@ Follow the conditional access policy template below.
     Access controls > Grant > Grant Access > Require multifactor authentication
 
 #### MS.AAD.3.3v1 instructions:
-If Phishing-resistant MFA has not been deployed yet and Microsoft Authenticator is in use, configure Authenticator to display context information to users when they login.
+If phishing-resistant MFA has not been deployed yet and Microsoft Authenticator is in use, configure Authenticator to display context information to users when they login.
 
 1. In **Azure Active Directory**, click **Security > Authentication methods > Microsoft Authenticator**.
 2. Click the **Configure** tab.
