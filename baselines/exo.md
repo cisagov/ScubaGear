@@ -785,8 +785,7 @@ The phishing protection solution SHOULD include an AI-based phishing detection t
 Any product that meets the requirements outlined in this baseline policy may be
 used. If the agency is using Microsoft Defender, see the following
 implementation steps for
-[enabling preset security policies](./defender.md#msdefender12v1) which
-includes impersonation protection.
+[enabling impersonation protection](./defender.md#msdefender21v1-instructions).
 
 #### MS.EXO.11.2v1 instructions:
 Any product that meets the requirements outlined in this baseline policy may be
