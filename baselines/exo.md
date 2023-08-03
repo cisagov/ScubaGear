@@ -878,10 +878,7 @@ policy](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-secu
 7. Ensure no addresses are specified under **Always allow messages from
    the following IP addresses or address range**.
 
-8. Enter addresses under **Always block messages from the following IP
-   addresses or address range** as needed.
-
-9. Ensure **Turn on safe list** is not selected.
+8. Ensure **Turn on safe list** is not selected.
 
 #### MS.EXO.12.2v1 instructions:
 
