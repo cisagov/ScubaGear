@@ -209,9 +209,9 @@ Non-default environments SHOULD have at least one DLP policy that
 #### MS.POWERPLATFORM.2.2v1 instructions:
 1.  Repeat steps 1 - 11 in the MS.POWERPLATFORM.2.1v1 instructions.
 
-2.  At the **Scope** section for the default environment, select **Add multiple environments** and select the non-default environments you wish to enforce a DLP policy upon.
+2.  At the **Scope** section for the default environment, select **Add multiple environments** and select the non-default environments you wish to enforce a DLP policy upon. If you wish to apply the DLP policy for all environments including environments created in the future select **Add all environments**.
 
-3.  Select **Next**-\> **Create Policy** to finish.
+4.  Select **Next**-\> **Create Policy** to finish.
 
 
 ## 3. Power Platform Tenant Isolation
