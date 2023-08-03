@@ -165,8 +165,11 @@ Non-default environments SHOULD have at least one DLP policy that
 - [Create a data loss prevention (DLP) policy \| Microsoft
   Learn](https://learn.microsoft.com/en-us/power-platform/admin/create-dlp-policy)
 
-- [dlp connector classificationy \| Microsoft
-  Learn]([https://learn.microsoft.com/en-us/power-platform/admin/create-dlp-policy](https://learn.microsoft.com/en-us/power-platform/admin/dlp-connector-classification?source=recommendations))
+- [DLP connector classification \| Microsoft
+  Learn](https://learn.microsoft.com/en-us/power-platform/admin/dlp-connector-classification?source=recommendations)
+
+- [DLP for custom connectors \| Microsoft
+  Learn](https://learn.microsoft.com/en-us/power-platform/admin/dlp-custom-connector-parity?WT.mc_id=ppac_inproduct_datapol)
   
 ### License Requirements
 
@@ -184,37 +187,31 @@ Non-default environments SHOULD have at least one DLP policy that
 
 4.  Give the policy a suitable agency name and click **Next.**
 
-5.  At the **Prebuilt connectors** section, select the connectors that
-fit the agency’s needs.
+5.  At the **Prebuilt connectors** section, search and select the connectors currently in the **Non-business | default** tab that contain sensitive data that can be utilized to create flows and apps.
 
-6.  Select a connector and click **Move to Business.**
+6.  Click **Move to Business.** Connectors added to this group can not share data with connectors in other groups because connectors can reside in only one data group at a time. 
 
-7.  If necessary (and possible) for the connector, click **Configure
-connector** at the top of the screen to change connector
-permissions.
+7.  If necessary (and possible) for the connector, click **Configure connector** at the top of the screen to change connector permissions. This allows greater flexibility for the agency to allow and block certain connector actions for additional customization. 
 
-8.  Refer to Table 1 for those connectors to move which **Business/Non-Business** category.
+8.  For the default environment, move all other connectors to the **Blocked** category. For connectors that are not blockable noted above, the Block action will be grayed out and a warning will appear.
 
-9.  For the default environment, move all connectors that cannot be
-blocked to the **Blocked** category.
+9.  At the bottom of the screen, select **Next** to move on.
 
-10.  At the bottom of the screen, select **Next** to move on.
+10.  Add a custom connector pattern. Custom connectors allow admins to specify an ordered list of Allow and Deny URL patterns for custom connectors.  View [DLP for custom connectors \| Microsoft
+  Learn](https://learn.microsoft.com/en-us/power-platform/admin/dlp-custom-connector-parity?WT.mc_id=ppac_inproduct_datapol) for more information.
 
-11.  Add a customer connector pattern that fit the agency’s needs. Click
-**Next**.
+11.  Click **Next**.
 
-12.  Define the scope of the policy. To use this policy for all environments including
-ones created in the future select **Add all environments**.
+12.  At the **Scope** section for the default environment, select **Add multiple environments** and add the default environment.
 
-13.  Otherwise for the default environment, select **Add multiple environments** and add the default environment.
-
-14.  Select the environments over which to add the policy and click **Add
-to policy** at the top.
-
-15.  Select **Next**-\> **Create Policy** to finish.
+13.  Select **Next**-\> **Create Policy** to finish.
 
 #### MS.POWERPLATFORM.2.2v1 instructions:
-1.  Repeat the steps above but for step **13** select the non-default environment you wish to enforce a DLP policy upon.
+1.  Repeat steps 1 - 11 in the MS.POWERPLATFORM.2.1v1 instructions.
+
+2.  At the **Scope** section for the default environment, select **Add multiple environments** and select the non-default environments you wish to enforce a DLP policy upon.
+
+3.  Select **Next**-\> **Create Policy** to finish.
 
 
 ## 3. Power Platform Tenant Isolation
