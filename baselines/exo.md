@@ -1122,10 +1122,19 @@ includes Safe Links click protections to track user clicks on links in email.
 
 ## 16. Alerts
 
-Microsoft Defender includes several prebuilt alert policies, many of
-which pertain to Exchange Online. These alerts give admins better
-real-time insight into possible security incidents. Guidance for
-configuring alerts in Microsoft Defender is given in the following section of the CISA M365 Security Configuration Baseline for Defender for Office 365.
+Managing and monitoring Exchange mailboxes and user activity requires a means
+to define activity of concern and notify administrators.  Alerts can be
+generated to help identify suspicious or malicious activity in Exchange Online.
+These alerts give administrators better real-time insight into possible
+security incidents.
+
+Use of Microsoft 365 alert policies is not strictly required for this purpose;
+any product that fulfills the requirements outlined in this baseline policy
+group may be used. If the agency is using Microsoft 365 alert policies, it
+includes several prebuilt alert policies, many of which pertain to Exchange
+Online. Guidance for configuring alerts in Microsoft 365 is
+given in the following section of the CISA M365 Security Configuration Baseline
+for Defender for Office 365.
 
 - [Alerts \| CISA M365 Security Configuration Baseline for Defender for Office 365](./defender.md#5-alerts)
 
@@ -1148,16 +1157,19 @@ At a minimum, the following alerts SHALL be enabled:
 
   g. **A potentially malicious URL click was detected.**
 
-- _Rationale:_ Potentially malicious or service impacting events may go undetected
-without a means of detecting these events.  Setting up a mechanism to alert
-administrators to the list of events above draws attention to them to ensure that any
-impact to users and the agency are minimized.
+- _Rationale:_ Potentially malicious or service impacting events may go
+  undetected without a means of detecting these events.  Setting up a mechanism
+  to alert administrators to the list of events above draws attention to them
+  to ensure that any impact to users and the agency are minimized.
 - _Last modified:_ June 2023
 
 #### MS.EXO.16.2v1
 The alerts SHOULD be sent to a monitored address or incorporated into a SIEM.
 
-- _Rationale:_ Suspicious or malicious events, if not resolved promptly, may have a greater impact to users and the agency.  Sending alerts to a monitored email address or SIEM helps ensure it is acted upon in a timely manner to limit overall impact.
+- _Rationale:_ Suspicious or malicious events, if not resolved promptly, may
+  have a greater impact to users and the agency.  Sending alerts to a
+  monitored email address or SIEM helps ensure it is acted upon in a timely
+  manner to limit overall impact.
 - _Last modified:_ June 2023
 
 ### Resources
@@ -1172,13 +1184,15 @@ The alerts SHOULD be sent to a monitored address or incorporated into a SIEM.
 
 #### MS.EXO.16.1v1 instructions:
 
-See the following implementation steps for
+Any product that meets the requirements outlined in this baseline policy may be
+used. If the agency is using Microsoft 365 alert policies, see the following implementation steps for
 [enabling alerts](./defender.md##msdefender51v1-instructions) for additional
 guidance.
 
 #### MS.EXO.16.2v1 instructions:
 
-See the following implementation steps for
+Any product that meets the requirements outlined in this baseline policy may be
+used. If the agency is using Microsoft 365 alert policies, see the following implementation steps to
 [add email recipients to an alert](./defender.md##msdefender51v1-instructions)
 for additional guidance.
 
