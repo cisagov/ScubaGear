@@ -987,7 +987,7 @@ Moving spam messages to a separate junk or quarantine folder helps users filter 
 - _Last modified:_ June 2023
 
 #### MS.EXO.14.3v1
-Allowed domains SHALL NOT be added.
+Allowed domains SHALL NOT be added to inbound anti-spam protection policies.
 
 - _Rationale:_ Legitimate emails may be incorrectly filtered
 by spam protections. Adding allowed senders is an acceptable method of
