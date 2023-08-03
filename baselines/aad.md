@@ -140,7 +140,7 @@ Sign-ins detected as high risk SHALL be blocked.
     Access controls > Grant > **Block Access**
   ```
 
-  <code>
+  <pre>
     Users > Include > <strong>All users</strong>
 
     Target resources > Cloud apps > <b>All cloud apps</b>
@@ -148,7 +148,7 @@ Sign-ins detected as high risk SHALL be blocked.
     Conditions > User risk > <b>High</b>
     
     Access controls > Grant > <b>Block Access</b>
-  </code>
+  </pre>
 
 #### MS.AAD.2.2v1 instructions:
 
