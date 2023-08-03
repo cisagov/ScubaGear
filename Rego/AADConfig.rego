@@ -15,10 +15,6 @@ Description(String1, String2, String3) =  trim(concat(" ", [String1, String2, St
 
 ReportDetailsArray(Array, String) = Description(Format(Array), String, "")
 
-ReportDetailsBoolean(Status) = "Requirement met" if {Status == true}
-
-ReportDetailsBoolean(Status) = "Requirement not met" if {Status == false}
-
 # Set to the maximum number of array items to be
 # printed in the report details section
 ReportArrayMaxCount := 20
@@ -718,7 +714,7 @@ tests[{
 tests[{
     "PolicyId" : "MS.AAD.7.2v1",
     "Criticality" : "Shall",
-    "Commandlet" : ["Get-MgSubscribedSku", "Get-MgSecuritySecureScore"],
+    "Commandlet" : ["Get-MgSecuritySecureScore"],
     "ActualValue" : SecureScorePolicy,
     "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
