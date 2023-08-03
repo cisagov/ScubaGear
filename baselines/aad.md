@@ -146,22 +146,18 @@ Sign-ins detected as high risk SHALL be blocked.
 
 #### MS.AAD.2.3v1 instructions:
 
-Create a conditional access policy that blocks sign-ins determined to be high risk by the Identity Protection service.
+1.  Create a conditional access policy that blocks sign-ins determined to be high risk by the Identity Protection service. Configure the following policy settings in the new conditional access policy as per the values below:
 
-1. In the **Conditional Access** portal, click **Create new poliy**.
-2. Enter a policy name that describes the intent of the policy.
-3. On the left hand navigation, under **Users** click **users and groups selected**.
-4. Under the **Include** tab, select **All users**.
-5. On the left hand navigation, under **Target Resources** click **target resources selected**.
-6. Under the **Include** tab, select **All cloud apps**.
-7. On the left hand navigation, under **Conditions** click **conditions selected**.
-8. Under **Sign-in risk**, click **Not configured**.
-9. On the popup screen, under **Configure**, click **Yes** and select **High** for the risk level. Click the **Done** button to close the popup.
-10. On the left hand navigation, under **Grant** click **controls selected**.
-11. On the popup screen, select **Block access** and click the **Select** button to close the popup.
-12. At the bottom of the page under **Enable policy** leave the policy as **Report-only**. See the **Conditional Access Policies** section at the top of this document for guidance on testing conditional access policies before enabling them.
-13. Click the **Create** button to finish creating the policy.
-    
+<pre>
+  Users > Include > <b>All users</b>
+
+  Target resources > Cloud apps > <b>All cloud apps</b>
+
+  Conditions > Sign-in risk > <b>High</b>
+  
+  Access controls > Grant > <b>Block Access</b>
+</pre>
+
 ## 3. Strong Authentication and a Secure Registration Process
 
 This section provides policies that help reduce security risks related to  user authentication and registration.
@@ -256,29 +252,27 @@ Managed Devices SHOULD be required to register MFA.
 
 #### MS.AAD.3.1v1 instructions:
 
-1. Create a conditional access policy that enforces phishing-resistant MFA for all users. 
+1. Create a conditional access policy that enforces phishing-resistant MFA for all users.  Configure the following policy settings in the new conditional access policy as per the values below: 
 
-Follow the conditional access policy template below:
+<pre>
+  Users > Include > <b>All users</b>
 
-  ```
-  Users > Include > All users
-
-  Target resources > Cloud apps > All cloud apps
+  Target resources > Cloud apps > <b>All cloud apps</b>
       
-  Access controls > Grant > Grant Access > Require authentication strength > Phishing-resistant MFA
-  ```
+  Access controls > Grant > Grant Access > Require authentication strength > <b>Phishing-resistant MFA</b>
+</pre>
 
 #### MS.AAD.3.2v1 instructions:
 
-1. If phishing-resistant MFA has not been enforced for all users yet, create a conditional access policy that enforces MFA but does not dictate the MFA method. 
+1. If phishing-resistant MFA has not been enforced for all users yet, create a conditional access policy that enforces MFA but does not dictate the MFA method.  Configure the following policy settings in the new conditional access policy as per the values below:
 
-Follow the conditional access policy template below.
+<pre>
+  Users > Include > <b>All users</b>
 
-    Users > Include > All users
+  Target resources > Cloud apps > <b>All cloud apps</b>
 
-    Target resources > Cloud apps > All cloud apps
-    
-    Access controls > Grant > Grant Access > Require multifactor authentication
+  Access controls > Grant > Grant Access > <b>Require multifactor authentication</b>
+</pre>
 
 #### MS.AAD.3.3v1 instructions:
 If phishing-resistant MFA has not been deployed yet and Microsoft Authenticator is in use, configure Authenticator to display context information to users when they login.
@@ -301,40 +295,39 @@ If phishing-resistant MFA has not been deployed yet and Microsoft Authenticator 
 
 #### MS.AAD.3.6v1 instructions:
 
-1. Create a conditional access policy that enforces phishing-resistant MFA for highly privileged roles. 
+1. Create a conditional access policy that enforces phishing-resistant MFA for highly privileged roles.  Configure the following policy settings in the new conditional access policy as per the values below:
 
-Follow the conditional access policy template below:
+<pre>
+  Users > Include > Select users and groups > Directory roles > <b>select each of the roles listed in the Highly Privileged Roles section at the top of this document</b>
 
-    Users > Include > Select users and groups > Directory roles > select each of the roles listed in the Highly Privileged Roles section at the top of this document
-
-    Target resources > Cloud apps > All cloud apps
-    
-    Access controls > Grant > Grant Access > Require authentication strength > Phishing-resistant MFA
+  Target resources > Cloud apps > <b>All cloud apps</b>
+  
+  Access controls > Grant > Grant Access > Require authentication strength > <b>Phishing-resistant MFA</b>
+</pre>
 
 #### MS.AAD.3.7v1 instructions:
 
-1. Create a conditional access policy that requires a user's device to be
-either hybrid Azure AD joined or compliant during authentication. 
+1. Create a conditional access policy that requires a user's device to be either hybrid Azure AD joined or compliant during authentication. Configure the following policy settings in the new conditional access policy as per the values below:
 
-Follow the conditional access policy template below.
+<pre>
+  Users > Include > <b>All users</b>
 
-    Users > Include > All users
-
-    Target resources > Cloud apps > All cloud apps
-    
-    Access controls > Grant > Grant Access > "Require device to be marked as compliant" and "Require Hybrid Azure AD joined device" > Require one of the selected controls
+  Target resources > Cloud apps > <b>All cloud apps</b>
+  
+  Access controls > Grant > Grant Access > <b>Require device to be marked as compliant</b> and <b>Require Hybrid Azure AD joined device</b> > <b>Require one of the selected controls</b>
+</pre>
 
 #### MS.AAD.3.8v1 instructions:
 
-1. Create a conditional access policy that requires a user to be on a managed device when registering for MFA. 
+1. Create a conditional access policy that requires a user to be on a managed device when registering for MFA. Configure the following policy settings in the new conditional access policy as per the values below:
 
-Follow the conditional access policy template below.
+<pre>
+  Users > Include > <b>All users</b>
 
-    Users > Include > All users
-
-    Target resources > User actions > Register security information
-    
-    Access controls > Grant > Grant Access > "Require device to be marked as compliant" and "Require Hybrid Azure AD joined device" > Require one of the selected controls
+  Target resources > User actions > <b>Register security information</b>
+  
+  Access controls > Grant > Grant Access > <b>Require device to be marked as compliant</b> and <b>Require Hybrid Azure AD joined device</b> > <b>Require one of the selected controls</b>
+</pre>
 
 ## 4. Centralized Log Collection
 
