@@ -264,7 +264,7 @@ Follow the conditional access policy template below:
 
 #### MS.AAD.3.2v1 instructions:
 
-1. If Phishing-resistant MFA has not been enforced for all users yet, create a conditional access policy that enforces MFA but does not dictate the MFA method. 
+1. If hishing-resistant MFA has not been enforced for all users yet, create a conditional access policy that enforces MFA but does not dictate the MFA method. 
 
 Follow the conditional access policy template below.
 
