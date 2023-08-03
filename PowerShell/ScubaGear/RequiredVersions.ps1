@@ -86,7 +86,7 @@ $ModuleList = @(
         MaximumVersion = [version] '1.99.99999'
     },
     @{
-        ModuleName = 'Microsoft.Graph.Security' #TODO: Verify is needed
+        ModuleName = 'Microsoft.Graph.Security'
         ModuleVersion = [version] '1.14.0'
         MaximumVersion = [version] '1.99.99999'
     },
