@@ -130,13 +130,15 @@ Sign-ins detected as high risk SHALL be blocked.
 
 1.  Create a conditional access policy that blocks users determined to be high risk by the Identity Protection service. Configure the following policy settings in the new conditional access policy as per the values below:
 
-      Users > Include > **All users**
+  ```
+    Users > Include > **All users**
 
-      Target resources > Cloud apps > **All cloud apps**
+    Target resources > Cloud apps > **All cloud apps**
 
-      Conditions > User risk > **High**
+    Conditions > User risk > **High**
     
-      Access controls > Grant > **Block Access**
+    Access controls > Grant > **Block Access**
+  ```
 
 #### MS.AAD.2.2v1 instructions:
 
@@ -164,7 +166,7 @@ Create a conditional access policy that blocks sign-ins determined to be high ri
 
 This section provides policies that help reduce security risks related to  user authentication and registration.
 
-- _Phishing-resistant MFA:_ Per [OMB memorandum M-22-09](https://www.whitehouse.gov/wp-content/uploads/2022/01/M-22-09.pdf), MFA is required and it must be phishing-resistant. Since there may be gaps in the implementation of enforcing phishing-resistant MFA for all users for various reasons, we also provide some additional backup security policies to help mitigate the risks associated with lesser forms of MFA. One example of this is the second policy below which enforces MFA but does not stipulate the specific MFA method. That said, phishing-resistant MFA is the overarching requirement.
+Per [OMB memorandum M-22-09](https://www.whitehouse.gov/wp-content/uploads/2022/01/M-22-09.pdf), MFA is required and it must be phishing-resistant. Since there may be gaps in the implementation of enforcing phishing-resistant MFA for all users for various reasons, we also provide some additional backup security policies to help mitigate the risks associated with lesser forms of MFA. One example of this is the second policy below which enforces MFA but does not stipulate the specific MFA method. That said, phishing-resistant MFA is the overarching requirement.
 
 <img src="/images/aad-mfa.png"
 alt="Weak MFA (SMS/Voice) Stronger MFA (Push Notifications, Software OTP, Hardware Token OTP) Strongest MFA (FIDO2, PIV, Windows Hello)" />
@@ -207,14 +209,14 @@ reducing the chances of security misconfigurations.
 - _Last modified:_ June 2023
 
 #### MS.AAD.3.5v1
-The authentication methods SMS, Voice Call and Email OTP SHALL be disabled.
+The authentication methods SMS, Voice Call, and Email OTP SHALL be disabled.
 
 - _Rationale:_ This policy helps reduce the possibility for users to  register and authenticate with the weakest authenticators. Thus users are forced to use stronger MFA methods.
 - _Last modified:_ June 2023
 - _Note:_ This policy is only applicable if the tenant has their Manage Migration feature set to Migration Complete because that is required to manage the respective configuration options from the combined MFA / SSPR authentication methods page.
 
 #### MS.AAD.3.6v1
-Phishing-resistant MFA SHALL be required for Highly Privileged Roles.
+Phishing-resistant MFA SHALL be required for highly privileged roles.
 
 - _Rationale:_ This is a backup security policy to help protect privileged access to the tenant in the event that the conditional access policy which requires MFA for all users is disabled or misconfigured.
 - _Last modified:_ June 2023
@@ -258,11 +260,13 @@ Managed Devices SHOULD be required to register MFA.
 
 Follow the conditional access policy template below:
 
-    Users > Include > All users
+  ```
+  Users > Include > All users
 
-    Target resources > Cloud apps > All cloud apps
-    
-    Access controls > Grant > Grant Access > Require authentication strength > Phishing-resistant MFA
+  Target resources > Cloud apps > All cloud apps
+      
+  Access controls > Grant > Grant Access > Require authentication strength > Phishing-resistant MFA
+  ```
 
 #### MS.AAD.3.2v1 instructions:
 
@@ -340,10 +344,10 @@ This section provides policies that help reduce security risks related to  the l
 #### MS.AAD.4.1v1
 Security logs SHALL be sent to the agency's Security Operations Center for monitoring.
 
-- _Rationale:_ The security risk of not having visibility into cyber attacks is reduced by collecting the logs into the agency's centralized security detection infrastructure. Thus security events can be audited,  queried and available for incident response. 
+- _Rationale:_ The security risk of not having visibility into cyber attacks is reduced by collecting the logs into the agency's centralized security detection infrastructure. Thus security events can be audited,  queried, and available for incident response. 
 - _Last modified:_ June 2023
-- _Scope:_ The following logs (configured in Azure AD diagnostic settings), are required: `AuditLogs, SignInLogs, RiskyUsers, UserRiskEvents, NonInteractiveUserSignInLogs, ServicePrincipalSignInLogs, ADFSSignInLogs, RiskyServicePrincipals, ServicePrincipalRiskEvents, EnrichedOffice365AuditLogs, MicrosoftGraphActivityLogs`. If managed identities are used for Azure resources, also send the `ManagedIdentitySignInLogs` log type. If the Azure AD Provisioning Service is used to provision users to SaaS apps or other systems, also send the `ProvisioningLogs` log type.
-- _Federal Agencies:_ It is also recommended to send the logs to the CISA CLAW system so that agencies can benefit from the security detection capabilities offered there. Contact CISA to request integration instructions.
+- _Note:_ The following logs (configured in Azure AD diagnostic settings), are required: `AuditLogs, SignInLogs, RiskyUsers, UserRiskEvents, NonInteractiveUserSignInLogs, ServicePrincipalSignInLogs, ADFSSignInLogs, RiskyServicePrincipals, ServicePrincipalRiskEvents, EnrichedOffice365AuditLogs, MicrosoftGraphActivityLogs`. If managed identities are used for Azure resources, also send the `ManagedIdentitySignInLogs` log type. If the Azure AD Provisioning Service is used to provision users to SaaS apps or other systems, also send the `ProvisioningLogs` log type.
+- _Note:_ It is also recommended to send the logs to the CISA CLAW system so that agencies can benefit from the security detection capabilities offered there. Contact CISA to request integration instructions.
 
 ### Resources
 
@@ -359,7 +363,7 @@ Security logs SHALL be sent to the agency's Security Operations Center for monit
 
 ### License Requirements
 
-- An Azure subscription is required to send the logs to an external system such as the agency's SIEM.
+- An Azure subscription is required to send the logs to an external system such as the agency's Security Information and Event Management (SIEM).
 
 ### Implementation
 
@@ -381,7 +385,7 @@ to configure sending the logs to a storage account:
 
 ## 5. Application Registration and Consent
 
-This section provides policies that help reduce security risks related to  non privileged users adding malicious applications or service principals to the tenant. Malicious applications can perform many of the same operations as interactive users and can access data "on behalf of" compromised users. These policies apply to custom-developed applications and applications published by third-party vendors.
+This section provides policies that help reduce security risks related to  non-privileged users adding malicious applications or service principals to the tenant. Malicious applications can perform many of the same operations as interactive users and can access data "on behalf of" compromised users. These policies apply to custom-developed applications and applications published by third-party vendors.
 
 ### Policies
 #### MS.AAD.5.1v1
@@ -506,14 +510,14 @@ User passwords SHALL NOT expire.
 
 This section provides policies that help reduce security risks related to the usage of highly privileged AAD built-in roles. Privileged administrative users have access to operations that can undermine the security of the tenant by changing configurations and security policies, thus special protections are necessary to secure this level of access.
 
-- _Note:_ Refer to the Highly Privileged Roles section at the top of this document for a reference list of roles considered highly privileged.
+Refer to the Highly Privileged Roles section at the top of this document for a reference list of roles considered highly privileged.
 
-- _Implementation Alternatives:_ Some of the policy implementations in this section reference specific features of the AAD Privileged Identity Management (PIM) service which provides “Privileged Access Management (PAM)” capabilities. As an alternative to AAD PIM, there are third-party products and services with equivalent PAM capabilities that can be leveraged if an agency chooses to do so.
+Some of the policy implementations in this section reference specific features of the AAD Privileged Identity Management (PIM) service which provides “Privileged Access Management (PAM)” capabilities. As an alternative to AAD PIM, there are third-party products and services with equivalent PAM capabilities that can be leveraged if an agency chooses to do so.
 
 ### Policies
 #### MS.AAD.7.1v1
 A minimum of two users and a maximum of eight users SHALL be provisioned with the Global Administrator role.
-- _Rationale:_  The Global Administrator role provides unfettered access to the tenant. Therefore, reducing the number of users with this access makes it more challenging for an adversary to compromise a tenant. Microsoft recommends fewer than five users and CISA decided on fewer than eight based on the data from federal agency pilots.
+- _Rationale:_  The Global Administrator role provides unfettered access to the tenant. Therefore, reducing the number of users with this access makes it more challenging for an adversary to compromise a tenant. Microsoft recommends fewer than five users, however, additional user accounts, up to eight, may be necessary to support emergency access and some operational scenarios.
 - _Last modified:_ June 2023
 
 #### MS.AAD.7.2v1
@@ -527,7 +531,7 @@ Privileged users SHALL be provisioned cloud-only accounts that are separate from
 - _Last modified:_ June 2023
 
 #### MS.AAD.7.4v1
-Permanent active role assignments SHALL NOT be allowed for highly privileged roles except for emergency and service accounts.
+Permanent active role assignments SHALL NOT be allowed for highly privileged roles.
 
 - _Rationale:_ Instead of giving users permanent assignments to privileged roles, provisioning access "just in time" lessens the exposure period if those accounts become compromised. In AAD PIM or an alternative PAM system, just in time access can be provisioned by assigning users to roles as "eligible" instead of perpetually "active".
 - _Last modified:_ June 2023
@@ -553,14 +557,14 @@ Eligible and Active highly privileged role assignments SHALL trigger an alert.
 #### MS.AAD.7.8v1
 User activation of the Global Administrator role SHALL trigger an alert.
 
-- _Rationale:_ The rationale for this policy is identical to the previous one, except that this policy applies to user activations. "Activation" occurs when a user that is assigned as eligible, "turns on" their access for a specific period of time. Monitoring this action closely for Global Administrator helps to detect events with significant security implications in action.
+- _Rationale:_ It is imperative to closely monitor the activation of the Global Administrator role for signs of compromise. Sending alerts when this activation occurs, provides the security monitoring team a chance to detect potential compromises in action.
 - _Last modified:_ June 2023
 - _Note:_ It is recommended to prioritize user activation of Global Administrator as one of the most important events to monitor and respond to.
 
 #### MS.AAD.7.9v1
 User activation of other highly privileged roles SHOULD trigger an alert.
 
-- _Rationale:_ The rationale for this policy is identical to the previous one, except that this policy applies to user activations of privileged roles that are not Global Administrator (i.e. the other privileged roles). CISA separated this policy from the previous one and designated it as a "SHOULD" item because in some environments activation of privileged roles can generate a significant number of alerts.
+- _Rationale:_ It is imperative to closely monitor the activation of high risk roles for signs of compromise. Sending alerts when this activation occurs, provides the security monitoring team a chance to detect potential compromises in action. In some environments activation of privileged roles can generate a significant number of alerts.
 - _Last modified:_ June 2023
 
 ### Resources
@@ -583,9 +587,7 @@ User activation of other highly privileged roles SHOULD trigger an alert.
 
 ### Implementation
 
-- _Note:_ Steps in the following implementation instructions that reference the AAD PIM service will vary if using a third-party PAM system instead.
-
-- _Future revisions:_ Some of the implementation instructions associated with this group of policies may be revised in the next release to incorporate functionality provided by the the AAD PIM for Groups feature.
+The following implementation instructions that reference the AAD PIM service will vary if using a third-party PAM system instead. Additionally, the implementation instructions associated with highly privileged user access may be revised in the next release to incorporate functionality provided by the the AAD PIM for Groups feature.
 
 #### MS.AAD.7.1v1 instructions:
 
@@ -623,13 +625,13 @@ Performing a manual review of highly privileged users to determine which ones ar
 
 4. Under **Manage**, select **Assignments.** If you have AAD PIM, repeat the steps below for both the **Eligible** and the **Active** assignments. If a group is listed, you will need to determine the members of the group and perform the steps for each group member.
 
-5. For each highly privileged user, execute the Powershell code below but replace the **username@somedomain.com** sample data value with the principal name of the user that is specific to your environment. You can get the data value from the **Principal name** field displayed in the Azure Active Directory portal.
+5. For each highly privileged user, execute the Powershell code below but replace the `username@somedomain.com` sample data value with the principal name of the user that is specific to your environment. You can get the data value from the **Principal name** field displayed in the Azure Active Directory portal.
 
-```
-Connect-MgGraph
-Select-Mgprofile beta
-Get-MgUser -Filter "userPrincipalName eq 'username@somedomain.com'" | FL
-```
+    ```
+    Connect-MgGraph
+    Select-Mgprofile beta
+    Get-MgUser -Filter "userPrincipalName eq 'username@somedomain.com'" | FL
+    ```
 
 6. Review the output field named **OnPremisesImmutableId**. If this field has a data value, it means that this specific user is not cloud-only. If the user is not cloud-only, create a cloud-only account for that user, assign the user to their respective roles and then remove the account that is not cloud-only from AAD.
 
