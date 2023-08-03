@@ -113,7 +113,7 @@ Sign-ins detected as high risk SHALL be blocked.
 
 ### Resources
 
-- [What is risk?](https://learn.microsoft.com/en-us/azure/active-directory/identity-protection/concept-identity-protection-risks)
+- [What are risk detections?](https://learn.microsoft.com/en-us/azure/active-directory/identity-protection/concept-identity-protection-risks)
 
 - [Simulating risk detections in Identity Protection](https://learn.microsoft.com/en-us/azure/active-directory/identity-protection/howto-identity-protection-simulate-risk)
 
