@@ -611,7 +611,7 @@ User activation of other highly privileged roles SHOULD trigger an alert.
 If the current score is not the maximum value and the status is not **Completed**, you must perform the improvement actions. If that is the case, follow the detailed action steps and then check the score again after 48 hours to ensure compliance.
 
 #### MS.AAD.7.3v1 instructions:
-Note: Performing a manual review of highly privileged users to determine which ones are not cloud-only is labor intensive so we recommend running the ScubaGear tool instead. ScubaGear will provide a list of the highly privileged users that are not cloud-only.
+Performing a manual review of highly privileged users to determine which ones are not cloud-only is labor intensive so we recommend running the ScubaGear tool instead. ScubaGear will provide a list of the highly privileged users that are not cloud-only.
 
 1. Perform the steps below for each highly privileged role. We reference the Global Administrator role as an example.
 
