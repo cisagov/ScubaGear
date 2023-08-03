@@ -140,6 +140,16 @@ Sign-ins detected as high risk SHALL be blocked.
     Access controls > Grant > **Block Access**
   ```
 
+  <code>
+    Users > Include > <b>All users</b>
+
+    Target resources > Cloud apps > <b>All cloud apps</b>
+
+    Conditions > User risk > <b>High</b>
+    
+    Access controls > Grant > <b>Block Access</b>
+  </code>
+
 #### MS.AAD.2.2v1 instructions:
 
 1.  Follow the instructions in the [Configure users at risk detected alerts](https://learn.microsoft.com/en-us/azure/active-directory/identity-protection/howto-identity-protection-configure-notifications#configure-users-at-risk-detected-alerts) section to configure Azure AD Identity Protection to email a regularly monitored security mailbox when a user account is determined to be high risk.
