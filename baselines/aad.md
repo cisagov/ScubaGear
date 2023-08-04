@@ -42,7 +42,14 @@ master user directory but federates access to the cloud Microsoft 365
 
 This section provides a list of what CISA considers highly privileged [built-in roles in Azure Active Directory](https://learn.microsoft.com/en-us/azure/active-directory/roles/permissions-reference). This list is referenced in numerous baseline policies throughout this document. Agencies should consider this reference as a minimum list and can apply the respective baseline policies to additional AAD roles as necessary.
 
-- Global Administrator, Privileged Role Administrator, User Administrator, SharePoint Administrator, Exchange Administrator, Hybrid Identity Administrator, Application Administrator, Cloud Application Administrator.
+- Global Administrator
+- Privileged Role Administrator
+- User Administrator
+- SharePoint Administrator
+- Exchange Administrator
+- Hybrid Identity Administrator
+- Application Administrator
+- Cloud Application Administrator.
 
 ## Conditional Access Policies
 
@@ -97,7 +104,7 @@ This section provides policies that help reduce security risks related to user a
 #### MS.AAD.2.1v1
 Users detected as high risk SHALL be blocked.
 
-- _Rationale:_ By blocking users determined as high risk, compromised accounts are prevented from accessing the tenant.
+- _Rationale:_ By blocking users determined as high risk, compromised accounts can be prevented from accessing the tenant.
 - _Last modified:_ June 2023
 - _Note:_ Users who are determined to be high risk by AAD Identity Protection can be blocked from accessing the system via an AAD Conditional Access policy. A high risk user will be blocked until an administrator remediates their account.
 
@@ -108,7 +115,7 @@ A notification SHOULD be sent to the administrator when high-risk users are dete
 
 #### MS.AAD.2.3v1
 Sign-ins detected as high risk SHALL be blocked.
-- _Rationale:_ By blocking sign-ins determined as high risk, compromised accounts are prevented from accessing the tenant.
+- _Rationale:_ By blocking sign-ins determined as high risk, compromised accounts can be prevented from accessing the tenant.
 - _Last modified:_ June 2023
 
 ### Resources
