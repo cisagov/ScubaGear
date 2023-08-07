@@ -68,12 +68,14 @@ else
    throw "Required modules list is required."
 }
 
+$AvailableModules = Get-Module -ListAvailable
+
 foreach ($Module in $ModuleList) {
 
     $ModuleName = $Module.ModuleName
 
-    if (Get-Module -ListAvailable -Name $ModuleName) {
-        $HighestInstalledVersion = (Get-Module -ListAvailable -Name $ModuleName | Sort-Object Version -Descending | Select-Object Version -First 1).Version
+    if ($AvailableModules | Where-Object -Property Name -EQ $ModuleName) {
+        $HighestInstalledVersion = ($AvailableModules | Where-Object -Property Name -EQ $ModuleName | Sort-Object Version -Descending | Select-Object Version -First 1).Version
         $LatestVersion = (Find-Module -Name $ModuleName).Version
 
         if ($HighestInstalledVersion -ge $LatestVersion) {
@@ -98,7 +100,7 @@ foreach ($Module in $ModuleList) {
                     -AllowClobber `
                     -Scope CurrentUser `
                     -MaximumVersion $Module.MaximumVersion
-                $MaxInstalledVersion = (Get-Module -ListAvailable -Name $ModuleName | Sort-Object Version -Descending | Select-Object Version -First 1).Version
+                $MaxInstalledVersion = ($AvailableModules | Where-Object -Property Name -EQ $ModuleName | Sort-Object Version -Descending | Select-Object Version -First 1).Version
                 Write-Information -MessageData " ${ModuleName}:${HighestInstalledVersion} updated to version ${MaxInstalledVersion}."
             }
         }
@@ -108,7 +110,7 @@ foreach ($Module in $ModuleList) {
             -AllowClobber `
             -Scope CurrentUser `
             -MaximumVersion $Module.MaximumVersion
-            $MaxInstalledVersion = (Get-Module -ListAvailable -Name $ModuleName | Sort-Object Version -Descending | Select-Object Version -First 1).Version
+            $MaxInstalledVersion = ($AvailableModules | Where-Object -Property Name -EQ $ModuleName | Sort-Object Version -Descending | Select-Object Version -First 1).Version
         Write-Information -MessageData "Installed the latest acceptable version of ${ModuleName} version ${MaxInstalledVersion}"
     }
 }
