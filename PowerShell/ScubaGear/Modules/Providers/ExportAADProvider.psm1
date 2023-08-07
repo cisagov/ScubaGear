@@ -100,6 +100,9 @@ function Export-AADProvider {
     # 2.7 Policy Bullet 2]
     $AdminConsentReqPolicies = ConvertTo-Json @($Tracker.TryCommand("Get-MgPolicyAdminConsentRequestPolicy"))
 
+    # Read the properties and relationships of an authentication method policy
+    $AuthenticationMethodPolicy = ConvertTo-Json @($Tracker.TryCommand("Get-MgPolicyAuthenticationMethodPolicy"))
+
     $SuccessfulCommands = ConvertTo-Json @($Tracker.GetSuccessfulCommands())
     $UnSuccessfulCommands = ConvertTo-Json @($Tracker.GetUnSuccessfulCommands())
 
@@ -113,6 +116,7 @@ function Export-AADProvider {
     "privileged_roles": $PrivilegedRoles,
     "service_plans": $ServicePlans,
     "directory_settings": $DirectorySettings,
+    "authentication_method": $AuthenticationMethodPolicy,
     "aad_successful_commands": $SuccessfulCommands,
     "aad_unsuccessful_commands": $UnSuccessfulCommands,
 "@
