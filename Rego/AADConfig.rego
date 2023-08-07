@@ -361,15 +361,15 @@ tests[{
 #--
 # At this time we are unable to test for X because of NEW POLICY
 tests[{
-    "PolicyId": PolicyId,
-    "Criticality" : "Should/Not-Implemented",
-    "Commandlet" : [],
-    "ActualValue" : [],
-    "ReportDetails" : NotCheckedDetails(PolicyId),
-    "RequirementMet" : false
+    "PolicyId": "MS.AAD.3.4v1",
+    "Criticality" : "Shall",
+    "Commandlet" : ["Get-MgPolicyAuthenticationMethodPolicy"],
+    "ActualValue" : [Policy.PolicyMigrationState],
+    "ReportDetails" : ReportDetailsBoolean(Status),
+    "RequirementMet" : Status
 }] {
-    PolicyId := "MS.AAD.3.4v1"
-    true
+    Policy := input.authentication_method[_]
+    Status := Policy.PolicyMigrationState == "migrationComplete"
 }
 #--
 
