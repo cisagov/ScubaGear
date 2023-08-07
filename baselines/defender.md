@@ -740,7 +740,7 @@ Microsoft
 Learn.](https://learn.microsoft.com/en-us/purview/audit-premium-setup?view=o365-worldwide)
 
 #### MS.DEFENDER.6.3v1 instructions:
-To create an one or more audit retention policies, follow the instructions
+To create one or more audit retention policies, follow the instructions
 listed in [Create an audit log retention policy](https://learn.microsoft.com/en-us/purview/audit-log-retention-policies?view=o365-worldwide#create-an-audit-log-retention-policy).
 Ensure that the duration selected in the retention policies is at least 1 year,
 in accordance with OMB M-21-31.
