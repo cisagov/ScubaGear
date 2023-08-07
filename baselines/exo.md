@@ -1197,14 +1197,14 @@ The alerts SHOULD be sent to a monitored address or incorporated into a SIEM.
 
 Any product that meets the requirements outlined in this baseline policy may be
 used. If the agency is using Microsoft 365 alert policies, see the following implementation steps for
-[enabling alerts](./defender.md##msdefender51v1-instructions) for additional
+[enabling alerts](./defender.md#msdefender51v1-instructions) for additional
 guidance.
 
 #### MS.EXO.16.2v1 instructions:
 
 Any product that meets the requirements outlined in this baseline policy may be
 used. If the agency is using Microsoft 365 alert policies, see the following implementation steps to
-[add email recipients to an alert](./defender.md##msdefender51v1-instructions)
+[add email recipients to an alert](./defender.md#msdefender51v1-instructions)
 for additional guidance.
 
 ## 17. Audit Logging
