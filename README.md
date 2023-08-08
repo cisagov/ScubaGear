@@ -210,7 +210,7 @@ The example below illustrates the syntax for defining user, group, and role exem
           MS.AAD.2.1v1:  *CommonExclusions
           MS.AAD.2.3v1:  *CommonExclusions
           MS.AAD.3.2v1:  *CommonExclusions
-          MS.AAD.7.4v1: &CommonRoleExclusions
+          MS.AAD.7.4v1:
             RoleExclusions:
               Users:
                 - <Exempted User 2 UUID>
