@@ -61,6 +61,7 @@ forwarding rules to exfiltrate data to external recipients.
 #### MS.EXO.1.1v1
 Automatic forwarding to external domains SHALL be disabled.
 
+<!--Policy: MS.EXO.1.1.v1; Criticality: SHALL -->
 - _Rationale:_ Adversaries can use automatic forwarding to gain
 persistent access to a victim's email. Disabling forwarding to
 external domains prevents this technique when the adversary is
@@ -112,12 +113,14 @@ documentation provides some helpful starting points.
 #### MS.EXO.2.1v1
 A list of approved IP addresses for sending mail SHALL be maintained.
 
+<!--Policy: MS.EXO.2.1.v1; Criticality: SHALL -->
 - _Rationale:_ Failing to maintain an accurate list of authorized IP addresses may result in spoofed email messages or failure to deliver legitimate messages when SPF is enabled.  Maintaining such a list ensures that unauthorized servers sending spoofed messages can be detected and permit messages from legitimate senders to be delivered.
 - _Last modified:_ June 2023
 
 #### MS.EXO.2.2v1
 An SPF policy(s) that designates only these addresses as approved senders SHALL be published.
 
+<!--Policy: MS.EXO.2.2.v1; Criticality: SHALL -->
 - _Rationale:_ An adversary may modify the `FROM` field
 of an email such that it appears to be a legitimate email sent by an
 agency, facilitating phishing attacks. Publishing an SPF policy for each agency domain mitigates forged `FROM` fields by providing a means for recipients to detect emails spoofed in this way.  SPF is required for federal, executive branch, departments and agencies by Binding Operational Directive 18-01, “Enhance Email and Web Security”.
@@ -188,6 +191,7 @@ custom domains. Exchange Online Protection (EOP) features include DKIM signing c
 #### MS.EXO.3.1v1
 DKIM SHOULD be enabled for any custom domain.
 
+<!--Policy: MS.EXO.3.1.v1; Criticality: SHOULD -->
 - _Rationale:_ An adversary may modify the `FROM` field
 of an email such that it appears to be a legitimate email sent by an
 agency, facilitating phishing attacks. Enabling DKIM is another means to allow
@@ -235,6 +239,7 @@ sent from your domain that fail SPF and DKIM checks.
 #### MS.EXO.4.1v1
 A DMARC policy SHALL be published for every second-level domain.
 
+<!--Policy: MS.EXO.4.1.v1; Criticality: SHALL -->
 - _Rationale:_ Without a DMARC policy available for each domain, recipients
 may improperly handle SPF and DKIM failures, possibly enabling spoofed
 emails to reach end users' mailboxes. By publishing DMARC records at the
@@ -245,6 +250,7 @@ protected.
 #### MS.EXO.4.2v1
 The DMARC message rejection option SHALL be p=reject.
 
+<!--Policy: MS.EXO.4.2.v1; Criticality: SHALL -->
 - _Rationale:_ Of the three policy options (none, quarantine, and reject),
 reject provides the strongest protection. This is the level of protection
 required by BOD 18-01 for federal, executive branch, departments and agencies.
@@ -253,6 +259,7 @@ required by BOD 18-01 for federal, executive branch, departments and agencies.
 #### MS.EXO.4.3v1
 The DMARC point of contact for aggregate reports SHALL include <reports@dmarc.cyber.dhs.gov>.
 
+<!--Policy: MS.EXO.4.3.v1; Criticality: SHALL -->
 - _Rationale:_ Email spoofing attempts are not inherently visible to domain
 owners. DMARC provides a mechanism to receive reports of spoofing attempts.
 Including <reports@dmarc.cyber.dhs.gov> as a point of contact for these reports
@@ -266,6 +273,7 @@ branch, departments and agencies.
 #### MS.EXO.4.4v1
 An agency point of contact SHOULD be included for aggregate and failure reports.
 
+<!--Policy: MS.EXO.4.4.v1; Criticality: SHOULD -->
 - _Rationale:_ Email spoofing attempts are not inherently visible to domain
 owners. DMARC provides a mechanism to receive reports of spoofing attempts.
 Including an agency point of contact gives the agency insight into attempts
@@ -349,6 +357,7 @@ SMTP Auth. Proceed with caution if SMTP Auth needs to be enabled for any use cas
 #### MS.EXO.5.1v1
 SMTP AUTH SHALL be disabled.
 
+<!--Policy: MS.EXO.5.1.v1; Criticality: SHALL -->
 - _Rationale:_ SMTP AUTH is not used or needed by modern email clients.
 Therefore, disabling it as the global default conforms to the principle of
 least functionality. SMTP AUTH is required for POP3 and IMAP4 clients. As
@@ -397,6 +406,7 @@ the following policies.
 #### MS.EXO.6.1v1
 Contact folders SHALL NOT be shared with all domains.
 
+<!--Policy: MS.EXO.6.1.v1; Criticality: SHALL NOT -->
 - _Rationale:_ Contact folders may contain information that should not be shared by default with all domains. Disabling sharing with all domains closes an avenue for data exfiltration while still allowing
 for specific legitimate uses as needed.
 - _Last modified:_ June 2023
@@ -405,6 +415,7 @@ for specific legitimate uses as needed.
 #### MS.EXO.6.2v1
 Calendar details SHALL NOT be shared with all domains.
 
+<!--Policy: MS.EXO.6.2.v1; Criticality: SHALL NOT -->
 - _Rationale:_ Calendar details may contain information that should not be shared by default with all domains. Disabling sharing with all domains closes an avenue for data exfiltration while still allowing
 for legitimate uses as needed.
 - _Last modified:_ June 2023
@@ -469,6 +480,7 @@ the subject line with “\[External\].”
 #### MS.EXO.7.1v1
 External sender warnings SHALL be implemented.
 
+<!--Policy: MS.EXO.7.1.v1; Criticality: SHALL -->
 - _Rationale:_ Phishing is an ever-present threat. Alerting the user when
 an email originates from outside their organization can encourage them
 to exercise increased caution, especially if it is an email they would
@@ -551,12 +563,14 @@ required, guidance for configuring Microsoft’s DLP solution can be found in fo
 #### MS.EXO.8.1v1
 A DLP solution SHALL be used. The selected DLP solution SHOULD offer services comparable to the native DLP solution offered by Microsoft.
 
+<!--Policy: MS.EXO.8.1.v1; Criticality: SHALL -->
 - _Rationale:_ Users may inadvertently disclose sensitive information to unauthorized individuals. A capable DLP solution should detect the presence of sensitive information in Exchange Online and block access to authorized entities.
 - _Last modified:_ June 2023
 
 #### MS.EXO.8.2v1
 The DLP solution SHALL protect PII and sensitive information, as defined by the agency. At a minimum, the sharing of credit card numbers, Taxpayer Identification Numbers (TIN), and Social Security Numbers (SSN) via email SHALL be restricted.
 
+<!--Policy: MS.EXO.8.2.v1; Criticality: SHALL -->
 - _Rationale:_ Users may inadvertently share sensitive information with others who should not have access to it. Data loss prevention policies provide a way for agencies to detect and prevent unauthorized disclosures.
 - _Last modified:_ June 2023
 
@@ -597,6 +611,7 @@ Microsoft Defender can be found in the follow section of the CISA M365 Security 
 #### MS.EXO.9.1v1
 Emails SHALL be filtered by the file types of included attachments. The selected filtering solution SHOULD offer services comparable to Microsoft Defender's Common Attachment Filter.
 
+<!--Policy: MS.EXO.9.1.v1; Criticality: SHALL -->
 - _Rationale:_ Malicious attachments often take the form of click-to-run files.
 Sharing of high risk file types, when necessary, is better left to a means other
 than email; the dangers of allowing them to be sent over email outweigh
@@ -607,6 +622,7 @@ prevent the spread of malware distributed via click-to-run email attachments.
 #### MS.EXO.9.2v1
 The attachment filter SHOULD attempt to determine the true file type and assess the file extension.
 
+<!--Policy: MS.EXO.9.2.v1; Criticality: SHOULD -->
 - _Rationale:_ Users have the ability to change a file extension at the end of a
 file name (e.g., notepad.exe to notepad.txt) to obscure the actual file type.
 Performing checks to verify the file type and whether it matches the designated
@@ -616,6 +632,7 @@ file extension can help detect instances where the file extension has been chang
 #### MS.EXO.9.3v1
 Disallowed file types SHALL be determined and set. At a minimum, click-to-run files SHOULD be blocked (e.g., .exe, .cmd, and .vbe).
 
+<!--Policy: MS.EXO.9.3.v1; Criticality: SHOULD -->
 - _Rationale:_ Malicious attachments often take the form of click-to-run files,
 though other file types can contain malicious content as well. As such, the
 determination of the full list of file types to block is left to each
@@ -670,6 +687,7 @@ implement malware scanning, see the following policies of the CISA M365 Security
 #### MS.EXO.10.1v1
 Emails SHALL be scanned for malware.
 
+<!--Policy: MS.EXO.10.1.v1; Criticality: SHALL -->
 - _Rationale:_ Email can be used as a mechanism for delivering malware.
 In many cases, malware can be detected through scanning, reducing
 the risk for end users.
@@ -678,6 +696,7 @@ the risk for end users.
 #### MS.EXO.10.2v1
 Emails identified as containing malware SHALL be quarantined or dropped.
 
+<!--Policy: MS.EXO.10.2.v1; Criticality: SHALL -->
 - _Rationale:_ Email can be used as a mechanism for delivering malware.
 Preventing emails with known malware from reaching user mailboxes ensures
 users cannot interact with those emails.
@@ -686,6 +705,7 @@ users cannot interact with those emails.
 #### MS.EXO.10.3v1
 Email scanning SHALL be capable of reviewing emails after delivery.
 
+<!--Policy: MS.EXO.10.3.v1; Criticality: SHALL -->
 - _Rationale:_ As known malware signatures are updated, it is possible
 for an email to be retroactively identified as containing malware after
 delivery. By scanning emails in cases like this, the number of emails
@@ -757,6 +777,7 @@ Defender for Office 365. If using Defender for Office 365 for impersonation prot
 #### MS.EXO.11.1v1
 Impersonation protection checks SHOULD be used.
 
+<!--Policy: MS.EXO.11.1.v1; Criticality: SHOULD -->
 - _Rationale:_ Users might not be able to reliably identify phishing emails, especially
 if the `FROM` address is nearly indistinguishable from that of a known entity.
 By automatically identifying senders that appear to be impersonating known
@@ -766,6 +787,7 @@ senders, the risk of a successful phishing attempt can be reduced.
 #### MS.EXO.11.2v1
 User warnings, comparable to the user safety tips included with EOP, SHOULD be displayed.
 
+<!--Policy: MS.EXO.11.2.v1; Criticality: SHOULD -->
 - _Rationale:_ Many tasks are better suited for automated processes, such as identifying
 unusual characters in the `FROM` address or identifying a first-time sender.
 User warnings can handle these tasks, reducing the burden on end users and the risk of
@@ -775,6 +797,7 @@ successful phishing attempts.
 #### MS.EXO.11.3v1
 The phishing protection solution SHOULD include an AI-based phishing detection tool comparable to EOP Mailbox Intelligence.
 
+<!--Policy: MS.EXO.11.3.v1; Criticality: SHOULD -->
 - _Rationale:_ Phishing attacks can result in a unauthorized data disclosure and unauthorized access. Using AI-based phishing detection tools to improve the detection rate of phishing attempts helps reduce the risk of successful phishing attacks.
 - _Last modified:_ June 2023
 
@@ -836,6 +859,7 @@ security mechanisms.
 #### MS.EXO.12.1v1
 IP allow lists SHOULD NOT be created.
 
+<!--Policy: MS.EXO.12.1.v1; Criticality: SHOULD NOT -->
 - _Rationale:_ Messages sent from IP addresses on an allow list bypass important
 security mechanisms, including spam filtering and sender authentication checks.  Avoiding use of IP allow lists prevents potential threats from circumventing security mechanisms.
 - _Last modified:_ June 2023
@@ -843,6 +867,7 @@ security mechanisms, including spam filtering and sender authentication checks. 
 #### MS.EXO.12.2v1
 Safe lists SHOULD NOT be enabled.
 
+<!--Policy: MS.EXO.12.2.v1; Criticality: SHOULD NOT -->
 - _Rationale:_ Messages sent from allowed safe list addresses bypass important
 security mechanisms, including spam filtering and sender authentication checks.
 Avoiding use of safe lists prevents potential threats from circumventing
@@ -927,6 +952,7 @@ this policy ensures that it has not been inadvertently disabled.
 #### MS.EXO.13.1v1
 Mailbox auditing SHALL be enabled.
 
+<!--Policy: MS.EXO.13.1.v1; Criticality: SHALL -->
 - _Rationale:_ Exchange online user accounts may be compromised or misused in some cases. Enabling mailbox auditing provides a valuable source of information to detect and respond to mailbox misuse.
 - _Last modified:_ June 2023
 
@@ -988,6 +1014,7 @@ the CISA M365 Security Configuration Baseline for Defender for Office 365.
 #### MS.EXO.14.1v1
 A spam filter SHALL be enabled. The filtering solution selected SHOULD offer services comparable to the native spam filtering offered by Microsoft.
 
+<!--Policy: MS.EXO.14.1.v1; Criticality: SHALL -->
 - _Rationale:_ Spam is a constant threat as junk mail can reduce user productivity, fill up mailboxes unnecessarily, and in some cases include malicious links or attachments.
 Filtering out spam reduces the workload burden on users, prevents filling up user mailboxes with junk mail, and reduces exposure to potentially malicious content.
 - _Last modified:_ June 2023
@@ -995,6 +1022,7 @@ Filtering out spam reduces the workload burden on users, prevents filling up use
 #### MS.EXO.14.2v1
 Spam and high confidence spam SHALL be moved to either the junk email folder or the quarantine folder.
 
+<!--Policy: MS.EXO.14.2.v1; Criticality: SHALL -->
 - _Rationale:_ Spam is a constant threat as junk mail can reduce user productivity, fill up mailboxes unnecessarily, and in some cases include malicious links or attachments.
 Moving spam messages to a separate junk or quarantine folder helps users filter out spam while still giving them the ability to review messages, as needed, in case a message is filtered incorrectly.
 - _Last modified:_ June 2023
@@ -1002,6 +1030,7 @@ Moving spam messages to a separate junk or quarantine folder helps users filter 
 #### MS.EXO.14.3v1
 Allowed domains SHALL NOT be added to inbound anti-spam protection policies.
 
+<!--Policy: MS.EXO.14.3.v1; Criticality: SHALL NOT -->
 - _Rationale:_ Legitimate emails may be incorrectly filtered
 by spam protections. Adding allowed senders is an acceptable method of
 combating these false positives. Allowing an entire domain, especially
@@ -1079,12 +1108,14 @@ If the agency is using Microsoft Defender for Office 365 to meet this baseline p
 #### MS.EXO.15.1v1
 URL comparison with a block-list SHOULD be enabled.
 
+<!--Policy: MS.EXO.15.1.v1; Criticality: SHOULD -->
 - _Rationale:_ Users may be directed to malicious websites via links in email. Blocking access to known, malicious URLs can prevent users from accessing known malicious websites.
 - _Last modified:_ June 2023
 
 #### MS.EXO.15.2v1
 Direct download links SHOULD be scanned for malware.
 
+<!--Policy: MS.EXO.15.2.v1; Criticality: SHOULD -->
 - _Rationale:_ URLs in emails may direct users to download and run malware.
 Scanning direct download links in real-time for known malware and blocking access can prevent
 users from infecting their devices.
@@ -1093,6 +1124,7 @@ users from infecting their devices.
 #### MS.EXO.15.3v1
 User click tracking SHOULD be enabled.
 
+<!--Policy: MS.EXO.15.3.v1; Criticality: SHOULD -->
 - _Rationale:_ Users may click on malicious links in emails, leading to compromise or authorized data disclosure.  Enabling user click tracking lets agencies know if a malicious link may have been visited after the fact to help tailor a response to a potential incident.
 - _Last modified:_ June 2023
 
@@ -1168,6 +1200,7 @@ At a minimum, the following alerts SHALL be enabled:
 
   g. **A potentially malicious URL click was detected.**
 
+<!--Policy: MS.EXO.16.1.v1; Criticality: SHALL -->
 - _Rationale:_ Potentially malicious or service impacting events may go
   undetected without a means of detecting these events.  Setting up a mechanism
   to alert administrators to the list of events above draws attention to them
@@ -1177,6 +1210,7 @@ At a minimum, the following alerts SHALL be enabled:
 #### MS.EXO.16.2v1
 The alerts SHOULD be sent to a monitored address or incorporated into a SIEM.
 
+<!--Policy: MS.EXO.16.2.v1; Criticality: SHOULD -->
 - _Rationale:_ Suspicious or malicious events, if not resolved promptly, may
   have a greater impact to users and the agency.  Sending alerts to a
   monitored email address or SIEM helps ensure it is acted upon in a timely
@@ -1240,6 +1274,7 @@ Office 365.
 #### MS.EXO.17.1v1
 Microsoft Purview Audit (Standard) logging SHALL be enabled.
 
+<!--Policy: MS.EXO.17.1.v1; Criticality: SHALL -->
 - _Rationale:_ Responding to incidents without detailed information about
 activities that took place slows response actions.  Enabling Microsoft
 Purview Audit (Standard) helps ensure agencies have visibility into user
@@ -1251,6 +1286,7 @@ name, Unified Audit Logs).
 #### MS.EXO.17.2v1
 Microsoft Purview Audit (Premium) logging SHALL be enabled.
 
+<!--Policy: MS.EXO.17.2.v1; Criticality: SHALL -->
 - _Rationale:_ Standard logging may not include relevant details necessary for
 visibility into user actions during an incident.  Enabling Microsoft Purview Audit
 (Premium) captures additional event types that are not included with Standard.
@@ -1259,6 +1295,8 @@ Furthermore, it is required for government agencies by OMB M-21-13 (referred to 
 
 #### MS.EXO.17.3v1
 Audit logs SHALL be maintained for at least the minimum duration dictated by [OMB M-21-31 (Appendix C)](https://www.whitehouse.gov/wp-content/uploads/2021/08/M-21-31-Improving-the-Federal-Governments-Investigative-and-Remediation-Capabilities-Related-to-Cybersecurity-Incidents.pdf).
+
+<!--Policy: MS.EXO.17.3.v1; Criticality: SHALL -->
 - _Rationale:_ Audit logs may no longer be available at the time of need if they
 are not retained for a sufficient period of time.  Increased log retention time
 gives an agency the necessary visibility to investigate incidents that occurred
