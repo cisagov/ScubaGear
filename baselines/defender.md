@@ -47,19 +47,19 @@ Within the preset policies, users can be enrolled in [Exchange Online Protection
 #### MS.DEFENDER.1.1v1
 The standard and strict preset security policies SHALL be enabled.
 - _Rationale:_  Defender includes a large number of features and settings to protect users against threats. Using the preset security policies, administrators can easily ensure that all new and existing users automatically have secure defaults applied.
-
 - _Last modified:_ June 2023
+
 #### MS.DEFENDER.1.2v1
 All users SHALL be added to Exchange Online Protection in either the standard or strict preset security policy.
 - _Rationale:_ Important user protections are provided by Exchange Online Protection, including anti-spam, anti-malware, and anti-phishing protections. By using the preset policies, administrators can easily ensure that all new and existing users automatically have secure defaults applied.
 - _Last modified:_ June 2023
-- _Note_: Specific user accounts, except for sensitive accounts, MAY be exempt from the preset policies, provided that they are added to one or more custom policies that offer comparable protection. These specific users might need flexibility that is not offered by the preset policies. Those users' accounts should be added to a custom policy that conforms as closely as possible to the settings used by the preset policies. See the **Resources** section for more details on configuring policies.
+- _Note:_ Specific user accounts, except for sensitive accounts, MAY be exempt from the preset policies, provided that they are added to one or more custom policies that offer comparable protection. These specific users might need flexibility that is not offered by the preset policies. Those users' accounts should be added to a custom policy that conforms as closely as possible to the settings used by the preset policies. See the **Resources** section for more details on configuring policies.
 
 #### MS.DEFENDER.1.3v1
 All users SHALL be added to Defender for Office 365 Protection in either the standard or strict preset security policy.
 - _Rationale:_ Important user protections are provided by Defender for Office 365 Protection, including safe attachments and safe links. By using the preset policies, administrators can easily ensure that all new and existing users automatically have secure defaults applied.  
 - _Last modified:_ June 2023
-- _Note_: Specific user accounts, except for sensitive accounts, MAY be exempt from the preset policies, provided that they are added to one or more custom policies that offer comparable protection. These specific users might need flexibility that is not offered by the preset policies. Those users' accounts should be added to a custom policy that conforms as closely as possible to the settings used by the preset policies. See the **Resources** section for more details on configuring policies.
+- _Note:_ Specific user accounts, except for sensitive accounts, MAY be exempt from the preset policies, provided that they are added to one or more custom policies that offer comparable protection. These specific users might need flexibility that is not offered by the preset policies. Those users' accounts should be added to a custom policy that conforms as closely as possible to the settings used by the preset policies. See the **Resources** section for more details on configuring policies.
 
 #### MS.DEFENDER.1.4v1
 Sensitive accounts SHALL be added to Exchange Online Protection in the strict preset security policy.
@@ -255,12 +255,12 @@ Domain impersonation protection SHOULD be added for important partners in both t
 ## 3. Safe Attachments
 
 The Safe Attachments feature will scan messages for attachments with malicious
-content. It routes all messages and attachments that do not have a
-virus or malware signature to a special environment. It then uses machine
-learning and analysis techniques to detect malicious intent.
-While safe attachments for Exchange Online is automatically
-configured in the preset policies, separate action needs to be taken to
-enable it for other products.
+content. All messages with attachments that were not already flagged by
+anti-malware protections in EOP are downloaded to a Microsoft virtual
+environment for further analysis. Safe Attachments then uses machine learning
+and other analysis techniques to detect malicious intent.  While Safe
+Attachments for Exchange Online is automatically configured in the preset
+policies, separate action needs to be taken to enable it for other products.
 
 ### Policies
 #### MS.DEFENDER.3.1v1
@@ -307,13 +307,14 @@ Learn](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-secur
 There are several approaches to secure sensitive information, such
 as warning users, encryption, or blocking attempts to share. The
 agency’s data loss prevention (DLP) policy will dictate what agency
-information is sensitive and how that information is handled.  Defender
-can detect sensitive information and associates a default confidence
-level with this detection based on the sensitive information type
-matched.  Confidence levels are used to reduce false positives in
-detecting access to sensitive information.  Agencies may choose to use
-the default confidence levels or adjust the levels in custom DLP policies
-to fit their environment and needs.
+information is sensitive, such as Personally Identifiable Information
+(PII), and how that information is handled. Defender can detect
+sensitive information and associates a default confidence level with
+this detection based on the sensitive information type matched.
+Confidence levels are used to reduce false positives in detecting access
+to sensitive information. Agencies may choose to use the default
+confidence levels or adjust the levels in custom DLP policies to fit
+their environment and needs.
 
 ### Policies
 #### MS.DEFENDER.4.1v1
@@ -334,21 +335,26 @@ and Devices.
                policies should cover all affected locations to be
                effective.
 - _Last modified:_ June 2023
-
+- _Note:_ The custom policy referenced here is the same policy
+          configured in MS.DEFENDER.4.1v1.
 #### MS.DEFENDER.4.3v1
-The action for the DLP policy SHOULD be set to block sharing sensitive information with everyone when DLP conditions are met.
+The action for the custom policy SHOULD be set to block sharing sensitive information with everyone when DLP conditions are met.
 - _Rationale:_ Access to sensitive information should be prohibited unless
                explicitly allowed.  Specific exemptions can be made based
                on agency policies and valid business justifications.
 - _Last modified:_ June 2023
+- _Note:_ The custom policy referenced here is the same policy
+          configured in MS.DEFENDER.4.1v1.
 
 #### MS.DEFENDER.4.4v1
-Notifications to inform users and help educate them on the proper use of sensitive information SHOULD be enabled.
+Notifications to inform users and help educate them on the proper use of sensitive information SHOULD be enabled in the custom policy.
 - _Rationale:_ Some users may not be aware of agency policies on the
                proper use of sensitive information.  Enabling
                notifications provides positive feedback to users when
                accessing sensitive information.
 - _Last modified:_ June 2023
+- _Note:_ The custom policy referenced here is the same policy
+          configured in MS.DEFENDER.4.1v1.
 
 #### MS.DEFENDER.4.5v1
 A list of apps that are restricted when accessing files protected by DLP policy SHOULD be defined.
@@ -368,6 +374,8 @@ information by restricted apps and unwanted bluetooth applications.
                access from restricted apps and unwanted bluetooth applications prevents unauthorized disclosure by those
                programs.
 - _Last modified:_ June 2023
+- _Note:_ The custom policy referenced here is the same policy
+          configured in MS.DEFENDER.4.1v1.
 
 ### Resources
 
