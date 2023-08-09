@@ -53,23 +53,29 @@ The standard and strict preset security policies SHALL be enabled.
 All users SHALL be added to Exchange Online Protection in either the standard or strict preset security policy.
 - _Rationale:_ Important user protections are provided by Exchange Online Protection, including anti-spam, anti-malware, and anti-phishing protections. By using the preset policies, administrators can easily ensure that all new and existing users automatically have secure defaults applied.
 - _Last modified:_ June 2023
-- _Note:_ Specific user accounts, except for sensitive accounts, MAY be exempt from the preset policies, provided that they are added to one or more custom policies that offer comparable protection. These specific users might need flexibility that is not offered by the preset policies. Those users' accounts should be added to a custom policy that conforms as closely as possible to the settings used by the preset policies. See the **Resources** section for more details on configuring policies.
+- _Note:_
+  - Specific user accounts, except for sensitive accounts, MAY be exempt from the preset policies, provided that they are added to one or more custom policies that offer comparable protection. These specific users might need flexibility that is not offered by the preset policies. Those users' accounts should be added to a custom policy that conforms as closely as possible to the settings used by the preset policies. See the **Resources** section for more details on configuring policies.
+  - The standard and strict preset security policies must be enabled for users to be protected.
 
 #### MS.DEFENDER.1.3v1
 All users SHALL be added to Defender for Office 365 Protection in either the standard or strict preset security policy.
 - _Rationale:_ Important user protections are provided by Defender for Office 365 Protection, including safe attachments and safe links. By using the preset policies, administrators can easily ensure that all new and existing users automatically have secure defaults applied.  
 - _Last modified:_ June 2023
-- _Note:_ Specific user accounts, except for sensitive accounts, MAY be exempt from the preset policies, provided that they are added to one or more custom policies that offer comparable protection. These specific users might need flexibility that is not offered by the preset policies. Those users' accounts should be added to a custom policy that conforms as closely as possible to the settings used by the preset policies. See the **Resources** section for more details on configuring policies.
+- _Note:_
+  - Specific user accounts, except for sensitive accounts, MAY be exempt from the preset policies, provided that they are added to one or more custom policies that offer comparable protection. These specific users might need flexibility that is not offered by the preset policies. Those users' accounts should be added to a custom policy that conforms as closely as possible to the settings used by the preset policies. See the **Resources** section for more details on configuring policies.
+  - The standard and strict preset security policies must be enabled for users to be protected.
 
 #### MS.DEFENDER.1.4v1
 Sensitive accounts SHALL be added to Exchange Online Protection in the strict preset security policy.
 - _Rationale:_ Unauthorized access to a sensitive account may result in greater harm than a standard user account.  Adding sensitive accounts to the strict preset security policy, with its increased protections, better mitigates their increased risk to email threats.
 - _Last modified:_ June 2023
+- _Note:_ The strict preset security policy must be enabled for accounts to be protected.
 
 #### MS.DEFENDER.1.5v1
 Sensitive accounts SHALL be added to Defender for Office 365 Protection in the strict preset security policy.
 - _Rationale:_ Unauthorized access to a sensitive account may result in greater harm than a standard user account.  Adding sensitive accounts to the strict preset security policy, with its increased protections, better mitigates their increased risk.
 - _Last modified:_ June 2023
+- _Note:_ The strict preset security policy must be enabled for accounts to be protected.
 
 ### Resources
 
@@ -172,16 +178,22 @@ impersonation attempt, the email is quarantined.
 User impersonation protection SHOULD be enabled for sensitive accounts in both the standard and strict preset policies.
 - _Rationale:_ User impersonation, especially the impersonation of users with access to sensitive or high value information and resources, has the potential to result in serious harm. Impersonation protection mitigates this risk. By configuring impersonation protection in both preset policies, administrators ensure that all email recipients are protected from impersonated emails, regardless of whether they are added to the standard or strict policy.
 - _Last modified:_ June 2023
+- _Note:_ The standard and strict preset security policies must be enabled for
+          accounts to be protected.
 
 #### MS.DEFENDER.2.2v1
 Domain impersonation protection SHOULD be enabled for domains owned by the agency in both the standard and strict preset policies.
 - _Rationale:_ By configuring domain impersonation protection for all agency domains, the risk of a user being deceived by a look-alike domain may be reduced. By configuring impersonation protection in both preset policies, administrators ensure that all email recipients are protected from impersonated emails, regardless of whether they are added to the standard or strict policy.
 - _Last modified:_ June 2023
+- _Note:_ The standard and strict preset security policies must be enabled for
+          agency domains to be protected.
 
 #### MS.DEFENDER.2.3v1
 Domain impersonation protection SHOULD be added for important partners in both the standard and strict preset policies.
 - _Rationale:_ By configuring domain impersonation protection for domains owned by important partners, the risk of a user being deceived by a look-alike domain may be reduced. By configuring impersonation protection in both preset policies, administrators ensure that all email recipients are protected from impersonated emails, regardless of whether they are added to the standard or strict policy.
 - _Last modified:_ June 2023
+- _Note:_ The standard and strict preset security policies must be enabled for
+          partner domains to be protected.
 
 ### Resources
 
