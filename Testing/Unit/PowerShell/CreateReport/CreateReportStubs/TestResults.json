@@ -1,7 +1,7 @@
 [
     {
         "ActualValue":  false,
-        "Commandlet":  "Get-MgPolicyAdminConsentRequestPolicy",
+        "Commandlet":  "Get-MgBetaPolicyAdminConsentRequestPolicy",
         "Control":  "AAD 2.7",
         "Criticality":  "Shall",
         "ReportDetails":  "Requirement not met",
@@ -10,7 +10,7 @@
     },
     {
         "ActualValue":  true,
-        "Commandlet":  "Get-MgPolicyAuthorizationPolicy",
+        "Commandlet":  "Get-MgBetaPolicyAuthorizationPolicy",
         "Control":  "AAD 2.6",
         "Criticality":  "Shall",
         "ReportDetails":  "Requirement not met",
@@ -19,7 +19,7 @@
     },
     {
         "ActualValue":  "",
-        "Commandlet":  "Get-MgDirectoryRoleMember",
+        "Commandlet":  "Get-MgBetaDirectoryRoleMember",
         "Control":  "AAD 2.12",
         "Criticality":  "Shall",
         "ReportDetails":  "0 admin(s) that are not cloud-only found",
@@ -28,7 +28,7 @@
     },
     {
         "ActualValue":  "Role ID : 10dae51f-b6af-4016-8d66-8c2a99b929b3",
-        "Commandlet":  "Get-MgPolicyAuthorizationPolicy",
+        "Commandlet":  "Get-MgBetaPolicyAuthorizationPolicy",
         "Control":  "AAD 2.18",
         "Criticality":  "Should",
         "ReportDetails":  "Permission level set to \"Limited access\"",
@@ -37,7 +37,7 @@
     },
     {
         "ActualValue":  "[ManagePermissionGrantsForSelf.microsoft-user-default-legacy]",
-        "Commandlet":  "Get-MgPolicyAuthorizationPolicy",
+        "Commandlet":  "Get-MgBetaPolicyAuthorizationPolicy",
         "Control":  "AAD 2.7",
         "Criticality":  "Shall",
         "ReportDetails":  "Requirement not met",
@@ -46,7 +46,7 @@
     },
     {
         "ActualValue":  "everyone",
-        "Commandlet":  "Get-MgPolicyAuthorizationPolicy",
+        "Commandlet":  "Get-MgBetaPolicyAuthorizationPolicy",
         "Control":  "AAD 2.18",
         "Criticality":  "Should",
         "ReportDetails":  "Requirement not met",
@@ -145,7 +145,7 @@
         "ActualValue":  [
 
                         ],
-        "Commandlet":  "Get-MgIdentityConditionalAccessPolicy",
+        "Commandlet":  "Get-MgBetaIdentityConditionalAccessPolicy",
         "Control":  "AAD 2.1",
         "Criticality":  "Shall",
         "ReportDetails":  "0 conditional access policy(s) found that meet(s) all requirements",
@@ -156,7 +156,7 @@
         "ActualValue":  [
 
                         ],
-        "Commandlet":  "Get-MgIdentityConditionalAccessPolicy",
+        "Commandlet":  "Get-MgBetaIdentityConditionalAccessPolicy",
         "Control":  "AAD 2.10",
         "Criticality":  "Shall",
         "ReportDetails":  "0 conditional access policy(s) found that meet(s) all requirements",
@@ -167,7 +167,7 @@
         "ActualValue":  [
 
                         ],
-        "Commandlet":  "Get-MgIdentityConditionalAccessPolicy",
+        "Commandlet":  "Get-MgBetaIdentityConditionalAccessPolicy",
         "Control":  "AAD 2.13",
         "Criticality":  "Shall",
         "ReportDetails":  "0 conditional access policy(s) found that meet(s) all requirements",
@@ -178,7 +178,7 @@
         "ActualValue":  [
 
                         ],
-        "Commandlet":  "Get-MgIdentityConditionalAccessPolicy",
+        "Commandlet":  "Get-MgBetaIdentityConditionalAccessPolicy",
         "Control":  "AAD 2.17",
         "Criticality":  "Should",
         "ReportDetails":  "0 conditional access policy(s) found that meet(s) all requirements",
@@ -189,7 +189,7 @@
         "ActualValue":  [
 
                         ],
-        "Commandlet":  "Get-MgIdentityConditionalAccessPolicy",
+        "Commandlet":  "Get-MgBetaIdentityConditionalAccessPolicy",
         "Control":  "AAD 2.2",
         "Criticality":  "Shall",
         "ReportDetails":  "0 conditional access policy(s) found that meet(s) all requirements",
@@ -200,7 +200,7 @@
         "ActualValue":  [
 
                         ],
-        "Commandlet":  "Get-MgIdentityConditionalAccessPolicy",
+        "Commandlet":  "Get-MgBetaIdentityConditionalAccessPolicy",
         "Control":  "AAD 2.3",
         "Criticality":  "Shall",
         "ReportDetails":  "0 conditional access policy(s) found that meet(s) all requirements",
@@ -211,7 +211,7 @@
         "ActualValue":  [
 
                         ],
-        "Commandlet":  "Get-MgIdentityConditionalAccessPolicy",
+        "Commandlet":  "Get-MgBetaIdentityConditionalAccessPolicy",
         "Control":  "AAD 2.4",
         "Criticality":  "Shall",
         "ReportDetails":  "0 conditional access policy(s) found that meet(s) all requirements",
@@ -222,7 +222,7 @@
         "ActualValue":  [
 
                         ],
-        "Commandlet":  "Get-MgIdentityConditionalAccessPolicy",
+        "Commandlet":  "Get-MgBetaIdentityConditionalAccessPolicy",
         "Control":  "AAD 2.9",
         "Criticality":  "Shall",
         "ReportDetails":  "0 conditional access policy(s) found that meet(s) all requirements",
@@ -240,7 +240,7 @@
                             "SharePoint Administrator",
                             "User Administrator"
                         ],
-        "Commandlet":  "Get-MgRoleManagementDirectoryRoleAssignmentScheduleInstance",
+        "Commandlet":  "Get-MgBetaRoleManagementDirectoryRoleAssignmentScheduleInstance",
         "Control":  "AAD 2.14",
         "Criticality":  "Shall",
         "ReportDetails":  "8 role(s) configured to allow permanent active assignment or expiration period too long:\u003cbr/\u003eApplication Administrator, Cloud Application Administrator, Exchange Administrator, Global Administrator, Hybrid Identity Administrator, Privileged Role Administrator, SharePoint Administrator, User Administrator",
@@ -258,7 +258,7 @@
                             "SharePoint Administrator",
                             "User Administrator"
                         ],
-        "Commandlet":  "Get-MgRoleManagementDirectoryRoleAssignmentScheduleInstance",
+        "Commandlet":  "Get-MgBetaRoleManagementDirectoryRoleAssignmentScheduleInstance",
         "Control":  "AAD 2.15",
         "Criticality":  "Should",
         "ReportDetails":  "8 role(s) that do not require approval to activate found:\u003cbr/\u003eApplication Administrator, Cloud Application Administrator, Exchange Administrator, Global Administrator, Hybrid Identity Administrator, Privileged Role Administrator, SharePoint Administrator, User Administrator",
@@ -276,7 +276,7 @@
                             "SharePoint Administrator",
                             "User Administrator"
                         ],
-        "Commandlet":  "Get-MgRoleManagementDirectoryRoleAssignmentScheduleInstance",
+        "Commandlet":  "Get-MgBetaRoleManagementDirectoryRoleAssignmentScheduleInstance",
         "Control":  "AAD 2.16",
         "Criticality":  "Shall",
         "ReportDetails":  "8 role(s) without notification e-mail configured for role assignments found:\u003cbr/\u003eApplication Administrator, Cloud Application Administrator, Exchange Administrator, Global Administrator, Hybrid Identity Administrator, Privileged Role Administrator, SharePoint Administrator, User Administrator",
@@ -294,7 +294,7 @@
                             "SharePoint Administrator",
                             "User Administrator"
                         ],
-        "Commandlet":  "Get-MgRoleManagementDirectoryRoleAssignmentScheduleInstance",
+        "Commandlet":  "Get-MgBetaRoleManagementDirectoryRoleAssignmentScheduleInstance",
         "Control":  "AAD 2.16",
         "Criticality":  "Shall",
         "ReportDetails":  "Requirement not met",
@@ -311,7 +311,7 @@
                             "SharePoint Administrator",
                             "User Administrator"
                         ],
-        "Commandlet":  "Get-MgRoleManagementDirectoryRoleAssignmentScheduleInstance",
+        "Commandlet":  "Get-MgBetaRoleManagementDirectoryRoleAssignmentScheduleInstance",
         "Control":  "AAD 2.16",
         "Criticality":  "Should",
         "ReportDetails":  "7 role(s) without notification e-mail configured for role activations found:\u003cbr/\u003eApplication Administrator, Cloud Application Administrator, Exchange Administrator, Hybrid Identity Administrator, Privileged Role Administrator, SharePoint Administrator, User Administrator",
@@ -322,7 +322,7 @@
         "ActualValue":  [
                             "FNU LNU"
                         ],
-        "Commandlet":  "Get-MgDirectoryRoleMember",
+        "Commandlet":  "Get-MgBetaDirectoryRoleMember",
         "Control":  "AAD 2.11",
         "Criticality":  "Shall",
         "ReportDetails":  "1 global admin(s) found:\u003cbr/\u003eFNU LNU",
@@ -333,7 +333,7 @@
         "ActualValue":  [
                             "Global Administrator"
                         ],
-        "Commandlet":  "Get-MgRoleManagementDirectoryRoleAssignmentScheduleInstance",
+        "Commandlet":  "Get-MgBetaRoleManagementDirectoryRoleAssignmentScheduleInstance",
         "Control":  "AAD 2.14",
         "Criticality":  "Shall",
         "ReportDetails":  "1 role(s) assigned to users outside of PIM:\u003cbr/\u003eGlobal Administrator",
@@ -2381,7 +2381,7 @@
         "Control":  "Teams 2.9",
         "Criticality":  "Should",
         "ReportDetails":  "Requirement met",
-        "Requirement":  "For all meeting polices that allow cloud recording, recordings SHOULD be stored inside the country of that agencyGÇÖs tenant",
+        "Requirement":  "For all meeting polices that allow cloud recording, recordings SHOULD be stored inside the country of that agencyGï¿½ï¿½s tenant",
         "RequirementMet":  true
     },
     {

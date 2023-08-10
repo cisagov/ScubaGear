@@ -16,13 +16,9 @@ InModuleScope Connection {
             Mock Add-PowerAppsAccount -MockWith {}
             function Connect-EXOHelper {}
             Mock Connect-EXOHelper -MockWith {}
-            Mock Select-MgProfile -MockWith {}
-            Mock Get-MgProfile -MockWith {
-                [pscustomobject]@{
-                    Name = "alpha";
-                }
-            }
-            Mock Get-MgOrganization -MockWith {
+            Mock Select-MgBetaProfile -MockWith {}
+            #now using Microsoft Graph Beta
+            Mock Get-MgBetaOrganization -MockWith {
                 return [pscustomobject]@{
                     DisplayName     = "DisplayName";
                     Name            = "DomainName";

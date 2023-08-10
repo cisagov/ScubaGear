@@ -7766,13 +7766,13 @@
                                }
                            ],
     "aad_successful_commands":  [
-                                    "Get-MgIdentityConditionalAccessPolicy",
-                                    "Get-MgSubscribedSku",
+                                    "Get-MgBetaIdentityConditionalAccessPolicy",
+                                    "Get-MgBetaSubscribedSku",
                                     "Get-PrivilegedUser",
                                     "Get-PrivilegedRole",
-                                    "Get-MgPolicyAuthorizationPolicy",
-                                    "Get-MgDirectorySetting",
-                                    "Get-MgPolicyAdminConsentRequestPolicy"
+                                    "Get-MgBetaPolicyAuthorizationPolicy",
+                                    "Get-MgBetaDirectorySetting",
+                                    "Get-MgBetaPolicyAdminConsentRequestPolicy"
                                 ],
     "aad_unsuccessful_commands":  [
 

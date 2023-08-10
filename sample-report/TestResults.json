@@ -2,7 +2,7 @@
     {
         "ActualValue":  "Doe, Jane",
         "Commandlet":  [
-                           "Get-MgSubscribedSku",
+                           "Get-MgBetaSubscribedSku",
                            "Get-PrivilegedUser"
                        ],
         "Control":  "AAD 2.12",
@@ -125,7 +125,7 @@
                                                         ]
                         },
         "Commandlet":  [
-                           "Get-MgPolicyAuthorizationPolicy"
+                           "Get-MgBetaPolicyAuthorizationPolicy"
                        ],
         "Control":  "AAD 2.18",
         "Criticality":  "Should",
@@ -143,7 +143,7 @@
                                                           ]
                         },
         "Commandlet":  [
-                           "Get-MgPolicyAuthorizationPolicy"
+                           "Get-MgBetaPolicyAuthorizationPolicy"
                        ],
         "Control":  "AAD 2.6",
         "Criticality":  "Shall",
@@ -161,7 +161,7 @@
                                                      ]
                         },
         "Commandlet":  [
-                           "Get-MgPolicyAdminConsentRequestPolicy"
+                           "Get-MgBetaPolicyAdminConsentRequestPolicy"
                        ],
         "Control":  "AAD 2.7",
         "Criticality":  "Shall",
@@ -181,7 +181,7 @@
                                                         ]
                         },
         "Commandlet":  [
-                           "Get-MgPolicyAuthorizationPolicy"
+                           "Get-MgBetaPolicyAuthorizationPolicy"
                        ],
         "Control":  "AAD 2.7",
         "Criticality":  "Shall",
@@ -200,7 +200,7 @@
                                                   ]
                         },
         "Commandlet":  [
-                           "Get-MgPolicyAuthorizationPolicy"
+                           "Get-MgBetaPolicyAuthorizationPolicy"
                        ],
         "Control":  "AAD 2.18",
         "Criticality":  "Should",
@@ -213,7 +213,7 @@
 
                         ],
         "Commandlet":  [
-                           "Get-MgIdentityConditionalAccessPolicy"
+                           "Get-MgBetaIdentityConditionalAccessPolicy"
                        ],
         "Control":  "AAD 2.17",
         "Criticality":  "Should",
@@ -240,7 +240,7 @@
                             "Doe, John"
                         ],
         "Commandlet":  [
-                           "Get-MgSubscribedSku",
+                           "Get-MgBetaSubscribedSku",
                            "Get-PrivilegedRole"
                        ],
         "Control":  "AAD 2.14",
@@ -254,7 +254,7 @@
                             "Doe, John"
                         ],
         "Commandlet":  [
-                           "Get-MgSubscribedSku",
+                           "Get-MgBetaSubscribedSku",
                            "Get-PrivilegedRole"
                        ],
         "Control":  "AAD 2.14",
@@ -268,7 +268,7 @@
                             "Doe, John"
                         ],
         "Commandlet":  [
-                           "Get-MgSubscribedSku",
+                           "Get-MgBetaSubscribedSku",
                            "Get-PrivilegedRole"
                        ],
         "Control":  "AAD 2.15",
@@ -282,7 +282,7 @@
                             "Doe, John"
                         ],
         "Commandlet":  [
-                           "Get-MgSubscribedSku",
+                           "Get-MgBetaSubscribedSku",
                            "Get-PrivilegedRole"
                        ],
         "Control":  "AAD 2.16",
@@ -296,7 +296,7 @@
                             "Doe, John"
                         ],
         "Commandlet":  [
-                           "Get-MgSubscribedSku",
+                           "Get-MgBetaSubscribedSku",
                            "Get-PrivilegedRole"
                        ],
         "Control":  "AAD 2.16",
@@ -310,7 +310,7 @@
                             "Doe, John"
                         ],
         "Commandlet":  [
-                           "Get-MgSubscribedSku",
+                           "Get-MgBetaSubscribedSku",
                            "Get-PrivilegedRole"
                        ],
         "Control":  "AAD 2.16",
@@ -324,7 +324,7 @@
                             "Live - Block legacy authentication"
                         ],
         "Commandlet":  [
-                           "Get-MgIdentityConditionalAccessPolicy"
+                           "Get-MgBetaIdentityConditionalAccessPolicy"
                        ],
         "Control":  "AAD 2.1",
         "Criticality":  "Shall",
@@ -337,7 +337,7 @@
                             "Live - MFA Required for Everyone"
                         ],
         "Commandlet":  [
-                           "Get-MgIdentityConditionalAccessPolicy"
+                           "Get-MgBetaIdentityConditionalAccessPolicy"
                        ],
         "Control":  "AAD 2.4",
         "Criticality":  "Shall",
@@ -350,9 +350,9 @@
                             "Live - MFA required for Highly Privileged Roles"
                         ],
         "Commandlet":  [
-                           "Get-MgSubscribedSku",
+                           "Get-MgBetaSubscribedSku",
                            "Get-PrivilegedRole",
-                           "Get-MgIdentityConditionalAccessPolicy"
+                           "Get-MgBetaIdentityConditionalAccessPolicy"
                        ],
         "Control":  "AAD 2.13",
         "Criticality":  "Shall",
@@ -365,7 +365,7 @@
                             "Live - Prevent Persistent Sessions u0026 Enforce Sign-in Frequency"
                         ],
         "Commandlet":  [
-                           "Get-MgIdentityConditionalAccessPolicy"
+                           "Get-MgBetaIdentityConditionalAccessPolicy"
                        ],
         "Control":  "AAD 2.10",
         "Criticality":  "Shall",
@@ -378,7 +378,7 @@
                             "Live - Prevent Persistent Sessions u0026 Enforce Sign-in Frequency"
                         ],
         "Commandlet":  [
-                           "Get-MgIdentityConditionalAccessPolicy"
+                           "Get-MgBetaIdentityConditionalAccessPolicy"
                        ],
         "Control":  "AAD 2.9",
         "Criticality":  "Shall",
@@ -391,7 +391,7 @@
                             "Live - Risky Sign Ins Block Access"
                         ],
         "Commandlet":  [
-                           "Get-MgIdentityConditionalAccessPolicy"
+                           "Get-MgBetaIdentityConditionalAccessPolicy"
                        ],
         "Control":  "AAD 2.3",
         "Criticality":  "Shall",
@@ -404,7 +404,7 @@
                             "Live - Risky Users Block Access"
                         ],
         "Commandlet":  [
-                           "Get-MgIdentityConditionalAccessPolicy"
+                           "Get-MgBetaIdentityConditionalAccessPolicy"
                        ],
         "Control":  "AAD 2.2",
         "Criticality":  "Shall",
@@ -421,7 +421,7 @@
                             }
                         ],
         "Commandlet":  [
-                           "Get-MgDirectorySetting"
+                           "Get-MgBetaDirectorySetting"
                        ],
         "Control":  "AAD 2.7",
         "Criticality":  "Shall",
