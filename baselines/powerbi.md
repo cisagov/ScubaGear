@@ -1,50 +1,19 @@
 # CISA M365 Security Configuration Baseline for Power BI
 
-Power BI is a Software as a Service (SaaS) offering from Microsoft that
-facilitates self-service business intelligence dashboards, reports,
-datasets, and visualizations. Power BI can connect to multiple,
-different data sources, combine and shape data from those connections,
-then create reports and dashboards to share with others.
+Power BI is a Software as a Service (SaaS) offering from Microsoft thatfacilitates self-service business intelligence dashboards, reports, datasets, and visualizations. Power BI can connect to multiple, different data sources, combine and shape data from those connections, then create reports and dashboards to share with others. This Secure Configuration Baseline (SCB) provides specific policies to strengthen Power BI security.
 
-The Power BI service is built on Azure. The Power BI service
-architecture is based on two clusters: the Web Front End (WFE) cluster
-and the Back-End cluster. End users neither control nor have visibility
-into these underlying clusters, as they are part of the underlying SaaS
-architecture. The WFE cluster manages the initial connection and
-authentication to the Power BI service, and once authenticated, the
-Back-End handles all subsequent user interactions. Power BI uses Azure
-Active Directory (AAD) to store and manage user identities and manages
-the storage of data and metadata using Azure Binary Large Object (BLOB)
-and Azure Structured Query Language (SQL) Database, respectively. (For
-additional detail, please refer to the [Power BI
-Security](https://learn.microsoft.com/en-us/power-bi/enterprise/service-admin-power-bi-security)
-documentation page.)
+The Secure Cloud Business Applications (SCuBA) project run by the Cybersecurity and Infrastructure Security Agency (CISA) provides guidance and capabilities to secure federal civilian executive branch (FCEB) agencies’ cloud business application environments and protect federal information that is created, accessed, shared, and stored in those environments. 
 
-This baseline focuses on the Power BI SaaS service that comes integrated
-with Microsoft 365, noting that there is also a desktop version of Power
-BI that can be installed locally. Users who are developing business
-intelligence products and analytics in Power BI desktop can push content
-to either the Power BI Report Server or to the Power BI SaaS service
-previously described. If required for a given environment or use case, a
-separate Power BI desktop baseline with tailored security requirements
-and considerations should be developed by security and end user
-operations staff.
+The CISA SCuBA SCBs for M365 help secure federal information assets stored within M365 cloud business application environments through consistent, effective, and manageable security configurations. CISA created baselines tailored to the federal government’s threats and risk tolerance with the knowledge that every organization has different threat models and risk tolerance. Non-governmental organizations may also find value in applying these baselines to reduce risks.
 
-## License Compliance and Copyright
+The information in this document is being provided “as is” for INFORMATIONAL PURPOSES ONLY. CISA does not endorse any commercial product or service, including any subjects of analysis. Any reference to specific commercial entities or commercial products, processes, or services by service mark, trademark, manufacturer, or otherwise, does not constitute or imply endorsement, recommendation, or favoritism by CISA.
 
-Portions of this document are adapted from documents in Microsoft’s
-[Microsoft
-365](https://github.com/MicrosoftDocs/microsoft-365-docs/blob/public/LICENSE)
-and
-[Azure](https://github.com/MicrosoftDocs/azure-docs/blob/main/LICENSE)
-GitHub repositories. The respective documents are subject to copyright
-and are adapted under the terms of the Creative Commons Attribution 4.0
-International license. Source documents are linked throughout this
-document. The United States Government has adapted selections of these
-documents to develop innovative and scalable configuration standards to
-strengthen the security of widely used cloud-based software services.
+## License Compliance and Copyright 
+Portions of this document are adapted from documents in Microsoft’s [Microsoft 365](https://github.com/MicrosoftDocs/microsoft-365-docs/blob/public/LICENSE) and [Azure](https://github.com/MicrosoftDocs/azure-docs/blob/main/LICENSE) GitHub repositories. The respective documents are subject to copyright and are adapted under the terms of the Creative Commons Attribution 4.0 International license. Source documents are linked throughout this document. The United States Government has adapted selections of these documents to develop innovative and scalable configuration standards to strengthen the security of widely used cloud-based software services.
 
 ## Assumptions
+The **License Requirements** sections of this document assume the organization is using an [M365 E3](https://www.microsoft.com/en-us/microsoft-365/compare-microsoft-365-enterprise-plans) or [G3](https://www.microsoft.com/en-us/microsoft-365/government) license level at a minimum. Therefore, only licenses not included in E3/G3 are listed.
+
 
 Agencies using Power BI have a data classification scheme in place for
   the data entering Power BI.
@@ -55,15 +24,9 @@ Agencies using Power BI have a data classification scheme in place for
 - All data sources use a secure connection for data transfer to and from
   the Power BI tenant; the agency disallows non-secure connections.
 
-- The **License Requirements** sections of this document assume the
-  organization is using an [M365
-  E3](https://www.microsoft.com/en-us/microsoft-365/compare-microsoft-365-enterprise-plans)
-  or [G3](https://www.microsoft.com/en-us/microsoft-365/government)
-  license level. Therefore, only licenses not included in E3/G3 are
-  listed. Additionally, M365 G5 is required for Power BI Pro. Power BI Premium is available as an add-on to G5 and provides
-  dedicated capacity-based BI, self-service data prep for big data, and
-  simplification of data management and access at enterprise scale. An Azure Information Protection Premium P1 or Premium P2 license is required to apply or view Microsoft Information Protection sensitivity labels in Power BI.
-  
+## Key Terminology
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [RFC 2119](https://datatracker.ietf.org/doc/html/rfc2119).
+
 # Baseline Policies
 
 ## 1. Publish to Web
@@ -543,45 +506,29 @@ response to Section 3 of [Executive Order (EO) 14028, *Improving the
 Nation’s
 Cybersecurity*](https://www.federalregister.gov/documents/2021/05/17/2021-10460/improving-the-nations-cybersecurity):
 
-- Consumer Financial Protection Bureau (CFPB)
-
-- Department of the Interior (DOI)
-
-- National Aeronautics and Space Administration (NASA)
-
+- The MITRE Corporation
 - Sandia National Laboratories (Sandia)
 
-- U.S. Census Bureau (USCB)
+The SCBs were informed by materials produced by the following organizations: 
 
-- U.S. Geological Survey (USGS)
 
+- Center for Internet Security (CIS)
+- Internet Engineering Task Force (IETF)
+- Mandiant
+- Microsoft
+- U.S. Defense Information Systems Agency (DISA)
+- U.S. National Institute of Standards (NIST)
+- U.S. Office of Management and Budget (OMB)
+
+The cross-agency collaboration and partnerships developed during this initiative serve as an example for solving complex problems faced by the federal government. CISA also thanks the Cybersecurity Innovation Tiger Team (CITT) for its leadership and the following federal agencies that provided input during the development of the baselines:
+
+- Consumer Financial Protection Bureau (CFPB)
+- Department of the Interior (DOI)
+- National Aeronautics and Space Administration (NASA)
 - U.S. Office of Personnel Management (OPM)
-
 - U.S. Small Business Administration (SBA)
-
-The cross-agency collaboration and partnerships developed during this
-initiative serve as an example for solving complex problems faced by the
-federal government.
-
-**Cybersecurity Innovation Tiger Team (CITT) Leadership**
-
-Beau Houser (USCB), Sanjay Gupta (SBA), Michael Witt (NASA), James
-Saunders (OPM), Han Lin (Sandia), Andrew Havely (DOI).
-
-**CITT Authors**
-
-Trafenia Salzman (SBA), Benjamin McChesney (OPM), Robert Collier (USCB),
-Matthew Snitchler (Sandia), Darryl Purdy (USCB), Brandon Frankens
-(NASA), Brandon Goss (NASA), Nicole Bogeajis (DOI/USGS), Kevin Kelly
-(DOI), Adnan Ehsan (CFPB), Michael Griffin (CFPB), Vincent Urias
-(Sandia), Angela Calabaza (Sandia).
-
-**CITT Contributors**
-
-Dr. Mukesh Rohatgi (MITRE), Lee Szilagyi (MITRE), Nanda Katikaneni
-(MITRE), Ted Kolovos (MITRE), Thomas Comeau (MITRE), Karen Caraway
-(MITRE), Jackie Whieldon (MITRE), Jeanne Firey (MITRE), Kenneth Myers
-(General Services Administration).
+- U.S. Census Bureau (USCB)
+- U.S. Geological Survey (USGS)
 
 # Implementation Considerations
 
