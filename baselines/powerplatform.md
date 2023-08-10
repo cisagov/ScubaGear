@@ -63,7 +63,7 @@ Refer to [Power Platform Microsoft Learn documentation](https://learn.microsoft.
 
 ## 1. Creation of Power Platform Environments
 
-By default, any user in the Azure AD Tenant can create additional environments. Enabling this control will restrict the creation of new environments to users with the following admin roles: Global admins, Dynamics 365 admins, and Power Platform admins.
+By default, any user in the Azure AD Tenant can create additional environments. Enabling these controls will restrict the creation of new environments to users with the following admin roles: Global admins, Dynamics 365 admins, and Power Platform admins.
 
 ### Policies
 
