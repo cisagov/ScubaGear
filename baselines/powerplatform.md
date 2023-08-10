@@ -316,9 +316,9 @@ center](https://learn.microsoft.com/en-us/power-platform/admin/powerapps-us-gove
 
 5.  At the bottom of the page under the **Content security policy** section, turn the slider **On** for **Model-driven** and **Canvas**.
 
-6.  Repeat steps 2 - 5 for all active Power Platform environments.
+6.  At the same location set **Enable reporting**  to **On** and add an appropriate endpoint that CSP violations can be reported to.
 
-7.  At the same location set **Enable reporting**  to **On** and add an appropriate endpoint that CSP violations can be reported to.
+7.  Repeat steps 2 - 6 for all active Power Platform environments.
 
 ## 5 Power Pages Creation
 
