@@ -322,7 +322,7 @@ center](https://learn.microsoft.com/en-us/power-platform/admin/powerapps-us-gove
 
 ## 5. Power Pages Creation
 
-Power Pages formerly known as Power Portals are Power Apps specifically designed to act as external facing websites. By default by any user in the tenant can create a Power Page. Admins are able to restrict the creation of new Power Pages to just admins.
+Power Pages formerly known as Power Portals are Power Apps specifically designed to act as external facing websites. By default any user in the tenant can create a Power Page. Admins are able to restrict the creation of new Power Pages to just admins.
 
 ###  Policies
 
