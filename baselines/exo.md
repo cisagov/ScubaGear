@@ -632,7 +632,7 @@ file extension can help detect instances where the file extension has been chang
 #### MS.EXO.9.3v1
 Disallowed file types SHALL be determined and set. At a minimum, click-to-run files SHOULD be blocked (e.g., .exe, .cmd, and .vbe).
 
-<!--Policy: MS.EXO.9.3v1; Criticality: SHOULD -->
+<!--Policy: MS.EXO.9.3v1; Criticality: SHALL -->
 - _Rationale:_ Malicious attachments often take the form of click-to-run files,
 though other file types can contain malicious content as well. As such, the
 determination of the full list of file types to block is left to each
