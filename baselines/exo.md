@@ -867,7 +867,7 @@ security mechanisms, including spam filtering and sender authentication checks. 
 #### MS.EXO.12.2v1
 Safe lists SHOULD NOT be enabled.
 
-<!--Policy: MS.EXO.12.2v1; Criticality: SHOULD NOT -->
+<!--Policy: MS.EXO.12.2v1; Criticality: SHOULD -->
 - _Rationale:_ Messages sent from allowed safe list addresses bypass important
 security mechanisms, including spam filtering and sender authentication checks.
 Avoiding use of safe lists prevents potential threats from circumventing
