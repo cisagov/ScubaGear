@@ -859,7 +859,7 @@ security mechanisms.
 #### MS.EXO.12.1v1
 IP allow lists SHOULD NOT be created.
 
-<!--Policy: MS.EXO.12.1v1; Criticality: SHOULD NOT -->
+<!--Policy: MS.EXO.12.1v1; Criticality: SHOULD -->
 - _Rationale:_ Messages sent from IP addresses on an allow list bypass important
 security mechanisms, including spam filtering and sender authentication checks.  Avoiding use of IP allow lists prevents potential threats from circumventing security mechanisms.
 - _Last modified:_ June 2023
