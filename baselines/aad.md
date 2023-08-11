@@ -413,7 +413,7 @@ An admin consent workflow SHALL be configured for applications.
 #### MS.AAD.5.4v1
 Group owners SHALL NOT be allowed to consent to applications.
 
-<!--Policy: MS.AAD.5.3v1; Criticality: SHALL NOT -->
+<!--Policy: MS.AAD.5.3v1; Criticality: SHALL -->
 - _Rationale:_ In M365 group and team owners can consent to applications accessing data in the tenant, thus by preventing this and requiring consent requests to go through an approval consent workflow, the risks of exposure to malicious applications is reduced.
 - _Last modified:_ June 2023
 
@@ -486,7 +486,7 @@ This section provides policies that help reduce security risks associated with l
 #### MS.AAD.6.1v1
 User passwords SHALL NOT expire.
 
-<!--Policy: MS.AAD.6.1v1; Criticality: SHALL NOT -->
+<!--Policy: MS.AAD.6.1v1; Criticality: SHALL -->
 - _Rationale:_ At a minimum, NIST, OMB and Microsoft have published guidance indicating that mandated periodic password changes make user accounts less secure. OMB-22-09 specifically states "Password policies must not require use of special characters or regular rotation".
 
 - _Last modified:_ June 2023
@@ -545,7 +545,7 @@ Privileged users SHALL be provisioned cloud-only accounts that are separate from
 #### MS.AAD.7.4v1
 Permanent active role assignments SHALL NOT be allowed for highly privileged roles.
 
-<!--Policy: MS.AAD.7.4v1; Criticality: SHALL NOT -->
+<!--Policy: MS.AAD.7.4v1; Criticality: SHALL -->
 - _Rationale:_ Instead of giving users permanent assignments to privileged roles, provisioning access "just in time" lessens the exposure period if those accounts become compromised. In AAD PIM or an alternative PAM system, just in time access can be provisioned by assigning users to roles as "eligible" instead of perpetually "active".
 - _Last modified:_ June 2023
 - _Note:_ There are a couple of exceptions to this policy. Emergency access accounts need perpetual access to the tenant in the rare event of system degradation or other scenarios. Some types of service accounts require a user account with privileged roles and since those are software they cannot perform role activation.
@@ -553,7 +553,7 @@ Permanent active role assignments SHALL NOT be allowed for highly privileged rol
 #### MS.AAD.7.5v1
 Provisioning users to highly privileged roles SHALL NOT occur outside of a PAM system.
 
-<!--Policy: MS.AAD.7.5v1; Criticality: SHALL NOT -->
+<!--Policy: MS.AAD.7.5v1; Criticality: SHALL -->
 - _Rationale:_ By provisioning users to privileged roles within a PAM system, numerous privileged access policies and monitoring can be enforced. If privileged users are assigned directly to roles in the M365 admin center or via Powershell outside of the context of a PAM system, a significant set of critical security capabilities are bypassed.
 - _Last modified:_ June 2023
 
