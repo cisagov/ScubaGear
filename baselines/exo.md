@@ -1,7 +1,6 @@
 # CISA M365 Security Configuration Baseline for Exchange Online
 
-Microsoft Exchange Online provides users easy access to their email and
-supports organizational meetings, contacts, and calendars.
+Microsoft Exchange Online provides users easy access to their email and supports organizational meetings, contacts, and calendars. This Secure Configuration Baseline (SCB) provides specific policies to strengthen Exchange Online security.
 
 Many admin controls for Exchange Online are found in the **Exchange admin center**.
 However, several of the
