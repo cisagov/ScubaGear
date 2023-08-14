@@ -117,8 +117,10 @@ instead and configure the policy settings according to [Use the Microsoft 365 De
 5. Select **Manage protection settings** under either **Standard protection**
    or **Strict protection**.
 6. On the **Apply Exchange Online Protection** page, select **All recipients**.
-7. Select **Next** on each page until the **Review and confirm your changes** page.
-8. On the **Review and confirm your changes** page, select **Confirm**.
+7. (optional) Under **Exclude these recipients**, add **Users** and **Groups**
+   to be exempted from the preset policies.
+8. Select **Next** on each page until the **Review and confirm your changes** page.
+9. On the **Review and confirm your changes** page, select **Confirm**.
 
 #### MS.DEFENDER.1.3v1 instructions:
 
@@ -130,8 +132,10 @@ instead and configure the policy settings according to [Use the Microsoft 365 De
    or **Strict protection**.
 6. Select **Next** until you reach the **Apply Defender for Office 365 protection** page.
 7. On the **Apply Defender for Office 365 protection** page, select **All recipients**.
-8. Select **Next** on each page until the **Review and confirm your changes** page.
-9. On the **Review and confirm your changes** page, select **Confirm**.
+8. (optional) Under **Exclude these recipients**, add **Users** and **Groups**
+   to be exempted from the preset policies.
+9. Select **Next** on each page until the **Review and confirm your changes** page.
+10. On the **Review and confirm your changes** page, select **Confirm**.
 
 #### MS.DEFENDER.1.4v1 instructions:
 
@@ -143,8 +147,6 @@ instead and configure the policy settings according to [Use the Microsoft 365 De
 6. On the **Apply Exchange Online Protection** page, select **Specific recipients**.
 7. Add all sensitive accounts via the **User** and **Group** boxes using the
    names of mailboxes, users, contacts, M365 groups, and distribution groups.
-7. (optional) Under **Exclude these recipients**, add **Users** and **Groups**
-   to be exempted from the preset policies.
 8. Select **Next** on each page until the **Review and confirm your changes** page.
 9. On the **Review and confirm your changes** page, select **Confirm**.
 
@@ -421,32 +423,36 @@ information by restricted apps and unwanted bluetooth applications.
 
 1. Sign in to the **Microsoft Purview compliance portal**.
 
-2. Under **Solutions**, select **Data loss prevention**.
+2. Under the **Solutions** section on the left-hand menu, select **Data loss
+   prevention**.
 
 3. Select **Policies** from the top of the page.
 
-4. Select **Default Office 365 DLP policy**.
+4. Select **Create policy**.
 
-5. Select **Copy policy**.
+5. From the **Categories** list, select **Custom**.
 
-6. Edit the name and description of the policy if desired, then click
+6. From the **Templates** list, select **Custom policy** and then click
    **Next**.
 
-7. Under **Assign admin units**, select **Full directory**, then click
+7. Edit the name and description of the policy if desired, then click
    **Next**.
 
-8. Under **Choose Locations to apply the policy**, set **Status** to **On**
+8. Under **Choose locations to apply the policy**, set **Status** to **On**
    for all products except Power BI and Microsoft Defender for Cloud
-   Apps.
+   Apps and then click **Next**.
 
-9. Click **Create rule**. Assign the rule an appropriate name and
+9. Under **Define policy settings**, select **Create or customize advanced
+   DLP rules**, and then click **Next**.
+
+10. Click **Create rule**. Assign the rule an appropriate name and
    description.
 
-10. Click **Add condition**, then **Content contains**.
+11. Click **Add condition**, then **Content contains**.
 
-11. Click **Add**, then **Sensitive info types**.
+12. Click **Add**, then **Sensitive info types**.
 
-12. Add info types that protect information that is sensitive to the
+13. Add info types that protect information that is sensitive to the
     agency. At a minimum, the agency should protect:
 
     - Credit card numbers
@@ -454,22 +460,22 @@ information by restricted apps and unwanted bluetooth applications.
     - U.S. Social Security Numbers (SSN)
     - All agency defined PII and sensitive information
 
-13. Click **Add**.
+14. Click **Add**.
 
-14. Under **Actions**, click **Add an action**.
+15. Under **Actions**, click **Add an action**.
 
-15. Check **Restrict Access or encrypt the content in Microsoft 365
+16. Check **Restrict Access or encrypt the content in Microsoft 365
     locations**.
 
-16. Select **Block Everyone**.
+17. Under this action, select **Block Everyone**.
 
-17. Turn on **Use notifications to inform your users and help educate them on the proper use of sensitive info**.
+18. Under **User notifications**, turn on **Use notifications to inform your users and help educate them on the proper use of sensitive info**.
 
-18. Click **Save**, then **Next**.
+19. Click **Save**, then **Next**.
 
-19. Select **Turn it on right away**, then click **Next**.
+20. Select **Turn it on right away**, then click **Next**.
 
-20. Click **Submit**.
+21. Click **Submit**.
 
 #### MS.DEFENDER.4.2v1 instructions:
 
