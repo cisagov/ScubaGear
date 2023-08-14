@@ -241,7 +241,7 @@ All of the settings in this section are configured in the **SharePoint admin cen
 
 3. Select **People who use a verification code must reauthenticate after this many days**
 
-4.  Enter “30” days or less
+4.  Enter **30** days or less
 
 5. Select **Save**
 
