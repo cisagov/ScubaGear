@@ -290,7 +290,16 @@ All of the settings in this section are configured in the **SharePoint admin cen
 
 #### MS.SHAREPOINT.4.2v1 instructions:
 
-1.  Navigate to the same location in the portal as MS.SHAREPOINT.4.1v1, but select the option **Prevent users from running custom script on self-service created sites**
+1.  Select **Settings**
+
+2.  Scroll down and select **classic settings page**
+
+3.  Scroll to the **Custom Script** section
+
+4.  Select **Prevent users from running custom script on self-service created sites**
+
+5.  Select **Ok**
+
 
 # Acknowledgements
 
