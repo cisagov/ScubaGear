@@ -588,17 +588,20 @@ The alerts SHOULD be sent to a monitored address or incorporated into a SIEM.
 
 #### MS.DEFENDER.5.1v1 instructions:
 
-For each alert to be enabled as determined by the agency and at a minimum those referenced in the _CISA M365 Security Configuration Baseline for Exchange Online_ :
-
 1. Sign in to **Microsoft 365 Defender**.
 
 2. Under **Email & collaboration**, select **Policies & rules**.
 
 3. Select **Alert Policy**.
 
-4. Click the named alert policy to be enabled.
+4. Select the checkbox next to each alert to be enabled as determined by the
+   agency and at a minimum those referenced in the
+   _CISA M365 Security Configuration Baseline for Exchange Online_.
 
-5. Slide the **Status** toggle to the right so its text reads **On**.
+5. Click the pencil icon from the top menu.
+
+6. Select the **Enable selected policies** action from the **Bulk actions**
+   menu.
 
 #### MS.DEFENDER.5.2v1 instructions:
 
