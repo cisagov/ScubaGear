@@ -60,7 +60,7 @@ Guest access SHALL be limited to the email the invitation was sent to.
 
 - [Overview of external sharing in SharePoint and OneDrive in Microsoft 365 \| Microsoft Documents](https://learn.microsoft.com/en-us/sharepoint/external-sharing-overview)
 
-- [Manage sharing settings for SharePoint and OneDrive in Microsoft 365 \| Microsoft Documents](https://docs.microsoft.com/en-us/sharepoint/turn-external-sharing-on-or-off)
+- [Manage sharing settings for SharePoint and OneDrive in Microsoft 365 \| Microsoft Documents](https://learn.microsoft.com/en-us/sharepoint/turn-external-sharing-on-or-off)
 
 ### License Requirements
 
@@ -137,7 +137,7 @@ File and folder default sharing permissions SHALL be set to View only.
 ### Resources
 
 - [File and folder links \| Microsoft
-  Documents](https://docs.microsoft.com/en-us/sharepoint/turn-external-sharing-on-or-off#file-and-folder-links)
+  Documents](https://learn.microsoft.com/en-us/sharepoint/turn-external-sharing-on-or-off#file-and-folder-links)
 
 ### License Requirements
 
@@ -157,7 +157,11 @@ All of the settings in this section are configured in the **SharePoint admin cen
 
 #### MS.SHAREPOINT.2.2v1 instructions:
 
-1.  Navigate to the same location in the portal as MS.SHAREPOINT.2.1v1, but set the permission that's selected by default for sharing links to **View**
+1. Select Policies > Sharing
+
+2. Under **File and folder links**, set the set the permission that's selected by default for sharing links to **View**
+
+3. Select **Save**.
 
 ## 3. Securing Anyone Links and Verification Code Users
 
