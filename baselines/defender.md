@@ -352,7 +352,7 @@ and Devices.
 - _Note:_ The custom policy referenced here is the same policy
           configured in MS.DEFENDER.4.1v1.
 #### MS.DEFENDER.4.3v1
-The action for the custom policy SHOULD be set to block sharing sensitive information with everyone when DLP conditions are met.
+The action for the custom policy SHOULD be set to block sharing sensitive information with everyone.
 - _Rationale:_ Access to sensitive information should be prohibited unless
                explicitly allowed.  Specific exemptions can be made based
                on agency policies and valid business justifications.
@@ -439,7 +439,8 @@ information by restricted apps and unwanted bluetooth applications.
    **Next**.
 
 8. Under **Choose locations to apply the policy**, set **Status** to **On**
-   for all products except Power BI and Microsoft Defender for Cloud
+   for all products except Power BI, Microsoft Defender for Cloud, and
+   On-premises repositories
    Apps and then click **Next**.
 
 9. Under **Define policy settings**, select **Create or customize advanced
