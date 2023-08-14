@@ -79,7 +79,7 @@ Get-Help -Name Invoke-SCuBA -Full
   - A global namespace for values to be used across baselines/products (i.e., GlobalVars)
   - Per product namespace for values related to that specific product (i.e., Aad, SharePoint)
   - Namespace for each policy item within a product for variables related only to one policy item (i.e., MS.AAD.2.1v1)
-  - Use of YAML anchors and aliases following DRY (Don't Repeat Yourself) principle for repeated values and sections
+  - Use of YAML anchors and aliases following Don't Repeat Yourself (DRY) principle for repeated values and sections
 
   When using the configuration file option all non-default parameters must be specified in the file as the tool ignores other command line options. The file path defaults to the same directory where the script is executed. The file can be used to specify both standard tool parameters as well as custom parameteres used by the Azure Active Directory (AAD) product assessment. See [AAD Conditional Access Policy Exemptions](#aad-conditional-access-policy-exemptions) for more details.
 
