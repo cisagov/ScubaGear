@@ -84,6 +84,8 @@ All of the settings in this section are configured in the **SharePoint admin cen
 
 #### MS.SHAREPOINT.1.3v1 instructions:
 
+Note: If SharePoint external sharing is set to its most restrictive setting of "Only people in your organization", then no external sharing is allowed and no implementation changes are required for this policy item.
+
 1.  Select **Policies** \> **Sharing**
 
 2.  Expand **More external sharing settings**
@@ -94,24 +96,15 @@ All of the settings in this section are configured in the **SharePoint admin cen
 
 5.  Add each approved external domain that users allowed to share files with
 
-6.  Select **Save**
+6.  Select **Manage security groups**
+
+7. Add each approved security group - members of these groups will be allowed to share files externally
+
+8.  Select **Save**
 
 #### MS.SHAREPOINT.1.4v1 instructions:
 
-1.  Select **Policies** \> **Sharing**
-
-2.  Expand **More external sharing settings**
-
-3.  Select **Allow only users in specific security groups to share
-    externally**
-
-4.  Select **Manage security groups**
-
-5. Add each approved security group - members of these groups will be allowed to share files externally
-
-6. Select **Save**
-
-#### MS.SHAREPOINT.1.5v1 instructions:
+Note: If SharePoint external sharing is set to its most restrictive setting of "Only people in your organization", then no external sharing is allowed and no implementation changes are required for this policy item.
 
 1.  Select **Policies** \> **Sharing**
 
