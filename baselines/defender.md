@@ -342,7 +342,7 @@ blocked.
 - _Last modified:_ June 2023
 
 #### MS.DEFENDER.4.2v1
-The custom policy SHOULD be applied in Exchange, OneDrive, SharePoint, Teams chat,
+The custom policy SHOULD be applied to Exchange, OneDrive, SharePoint, Teams chat,
 and Devices.
 - _Rationale:_ Unauthorized disclosures may happen through Microsoft 365
                services or endpoint devices.  Data loss prevention
@@ -439,9 +439,9 @@ information by restricted apps and unwanted bluetooth applications.
    **Next**.
 
 8. Under **Choose locations to apply the policy**, set **Status** to **On**
-   for all products except Power BI, Microsoft Defender for Cloud, and
-   On-premises repositories
-   Apps and then click **Next**.
+   for at least the Exchange email, OneDrive accounts, SharePoint
+   sites, Teams chat and channel messages, and Devices locations, then
+   click **Next**.
 
 9. Under **Define policy settings**, select **Create or customize advanced
    DLP rules**, and then click **Next**.
@@ -480,81 +480,20 @@ information by restricted apps and unwanted bluetooth applications.
 
 #### MS.DEFENDER.4.2v1 instructions:
 
-1. Sign in to the **Microsoft Purview compliance portal**.
-
-1. Under **Solutions**, select **Data loss prevention**.
-
-2. Select **Policies** from the top of the page.
-
-3. Find the relevant DLP policy in the list and click the Policy name to select.
-   Select **Edit Policy**.
-
-4. Click **Next** on each page in the policy wizard until you reach the
-   Locations page.
-
-5. Under **Choose locations to apply the policy**, ensure **Status** is set
-   to **On** for at least the Exchange email, OneDrive accounts, SharePoint
-   sites, Teams chat and channel messages, and Devices.
-
-6. Click **Next** on each page until reaching the
-   **Review your policy and create it** page.
-
-7. Review the policy locations listed and click **Submit**.
+1. See [MS.DEFENDER.4.1v1 instructions](#msdefender41v1-instructions) for
+   details to enforce DLP policy in specific M365 service locations.
 
 #### MS.DEFENDER.4.3v1 instructions:
 
-1. Sign in to the **Microsoft Purview compliance portal**.
-
-2. Under **Solutions**, select **Data loss prevention**.
-
-3. Select **Policies** from the top of the page.
-
-4. Select the relevant custom policy and select **Edit policy**.
-
-5. Click **Next** on each page in the policy wizard until you reach the
-   Advanced DLP rules page.
-
-6. Select the relevant rule and click the pencil icon to edit it.
-
-7. Under **Actions**, click **Add an action**.
-
-8. Select **Restrict Access or encrypt the content in Microsoft 365
-   locations**.
-
-9. Select **Block Everyone**.
-
-10. Click **Save** to save the changes.
-
-11. Click **Next** on each page until reaching the
-    **Review your policy and create it** page.
-
-12. Review the policy and click **Submit** to complete the policy changes.
+1. See [MS.DEFENDER.4.1v1 instructions](#msdefender41v1-instructions) for
+   details to configure the DLP policy to block sharing sensitive
+   information with everyone.
 
 #### MS.DEFENDER.4.4v1 instructions:
 
-1. Sign in to the **Microsoft Purview compliance portal**.
-
-2. Under **Solutions**, select **Data loss prevention**.
-
-3. Select **Policies** from the top of the page.
-
-4. Select the relevant custom policy and select **Edit policy**.
-
-5. Click **Next** on each page in the policy wizard until you reach the
-   Advanced DLP rules page.
-
-6. Select the relevant rule and click the pencil icon to edit it.
-
-7. Under **User notifications**, toggle **Turn on Use notifications to inform
-   your users and help educate them on the proper use of sensitive info.**
-   to **On**.
-
-8. Click **Save** to save the changes.
-
-9. Click **Next** on each page until reaching the
-  **Review your policy and create it** page.
-
-10. Review the policy and click **Submit** to complete the policy changes.
+1. See [MS.DEFENDER.4.1v1 instructions](#msdefender41v1-instructions) for
+   details to  configure the DLP policy to notify users when accessing
+   sensitive information.
 
 #### MS.DEFENDER.4.5v1 instructions:
 
@@ -586,33 +525,36 @@ information by restricted apps and unwanted bluetooth applications.
 
 3. Select **Policies** from the top of the page.
 
-4. Find the relevant DLP policy in the list and click the Policy name to select.
-   Select **Edit Policy**.
+4. Find the custom DLP policy configured under
+   [MS.DEFENDER.4.1v1 instructions](#msdefender41v1-instructions) in the list
+   and click the Policy name to select.
 
-5. Click **Next** on each page in the policy wizard until you reach the
+5. Select **Edit Policy**.
+
+6. Click **Next** on each page in the policy wizard until you reach the
    Advanced DLP rules page.
 
-6. Select the relevant rule and click the pencil icon to edit it.
+7. Select the relevant rule and click the pencil icon to edit it.
 
-7. Under **Actions**, click **Add an action**.
+8. Under **Actions**, click **Add an action**.
 
-8. Choose **Audit or restrict activities on device**
+9. Choose **Audit or restrict activities on device**
 
-9. Under **File activities for all apps**, select
-   **Apply restrictions to specific activity**.
+10. Under **File activities for all apps**, select
+    **Apply restrictions to specific activity**.
 
-10. Check the box next to **Copy or move using unallowed Bluetooth app**
+11. Check the box next to **Copy or move using unallowed Bluetooth app**
     and set its action to **Block**.
 
-11. Under **Restricted app activities** , check the **Access by restricted apps** box
+12. Under **Restricted app activities** , check the **Access by restricted apps** box
    and set the action drop-down to **Block**.
 
-12. Click **Save** to save the changes.
+13. Click **Save** to save the changes.
 
-13. Click **Next** on each page until reaching the
+14. Click **Next** on each page until reaching the
     **Review your policy and create it** page.
 
-14. Review the policy and click **Submit** to complete the policy changes.
+15. Review the policy and click **Submit** to complete the policy changes.
 
 ## 5. Alerts
 
