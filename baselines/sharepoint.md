@@ -22,7 +22,8 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 ## 1. External Sharing
 
-This section helps reduce security risks related to the sharing of files with users external to the agency. This includes guest users, users who use a verification code and users who access an Anyone link.
+This section helps reduce security risks related to the sharing of files with users external to the agency. This includes guest users, users who use a verification code, and users who access an Anyone link.
+
 
 ### Policies
 #### MS.SHAREPOINT.1.1v1
