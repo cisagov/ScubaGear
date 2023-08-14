@@ -588,7 +588,7 @@ The alerts SHOULD be sent to a monitored address or incorporated into a SIEM.
 
 #### MS.DEFENDER.5.1v1 instructions:
 
-To enable an alert:
+For each alert to be enabled as determined by the agency and at a minimum those referenced in the _CISA M365 Security Configuration Baseline for Exchange Online_ :
 
 1. Sign in to **Microsoft 365 Defender**.
 
@@ -596,13 +596,13 @@ To enable an alert:
 
 3. Select **Alert Policy**.
 
-4. Click the policy name.
+4. Click the named alert policy to be enabled.
 
 5. Slide the **Status** toggle to the right so its text reads **On**.
 
 #### MS.DEFENDER.5.2v1 instructions:
 
-To add one or email recipients to an alert:
+For each enabled alert, to add one or more email recipients:
 
 1. Sign in to **Microsoft 365 Defender**.
 
@@ -610,7 +610,7 @@ To add one or email recipients to an alert:
 
 3. Select **Alert Policy**.
 
-4. Click the policy name.
+4. Click the alert policy to be modified.
 
 5. Click the pencil icon next to **Set your recipients**.
 
