@@ -24,7 +24,7 @@ function Export-SharePointProvider {
     $Tracker = Get-CommandTracker
 
     #Get InitialDomainPrefix
-    $InitialDomain = ($Tracker.TryCommand("Get-MgOrganization")).VerifiedDomains | Where-Object {$_.isInitial}
+    $InitialDomain = ($Tracker.TryCommand("Get-MgBetaOrganization")).VerifiedDomains | Where-Object {$_.isInitial}
     $InitialDomainPrefix = $InitialDomain.Name.split(".")[0]
 
     #Get SPOSiteIdentity

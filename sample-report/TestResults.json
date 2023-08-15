@@ -226,7 +226,7 @@
                             "Doe, Jane"
                         ],
         "Commandlet":  [
-                           "Get-MgSubscribedSku",
+                           "Get-MgBetaSubscribedSku",
                            "Get-PrivilegedUser"
                        ],
         "Control":  "AAD 2.11",

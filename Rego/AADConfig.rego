@@ -158,7 +158,7 @@ tests[{
     "Requirement" : "Legacy authentication SHALL be blocked",
     "Control" : "AAD 2.1",
     "Criticality" : "Shall",
-    "Commandlet" : ["Get-MgIdentityConditionalAccessPolicy"],
+    "Commandlet" : ["Get-MgBetaIdentityConditionalAccessPolicy"],
     "ActualValue" : Policies2_1,
     "ReportDetails" : concat(". ", [ReportFullDetailsArray(Policies2_1, DescriptionString), CapLink]),
     "RequirementMet" : count(Policies2_1) > 0
@@ -201,7 +201,7 @@ tests[{
     "Requirement" : "Users detected as high risk SHALL be blocked",
     "Control" : "AAD 2.2",
     "Criticality" : "Shall",
-    "Commandlet" : ["Get-MgIdentityConditionalAccessPolicy"],
+    "Commandlet" : ["Get-MgBetaIdentityConditionalAccessPolicy"],
     "ActualValue" : Policies2_2_1,
     "ReportDetails" : ReportDetailsArrayLicenseWarningCap(Policies2_2_1, DescriptionString),
     "RequirementMet" : Status
@@ -262,7 +262,7 @@ tests[{
     "Requirement" : "Sign-ins detected as high risk SHALL be blocked",
     "Control" : "AAD 2.3",
     "Criticality" : "Shall",
-    "Commandlet" : ["Get-MgIdentityConditionalAccessPolicy"],
+    "Commandlet" : ["Get-MgBetaIdentityConditionalAccessPolicy"],
     "ActualValue" : Policies2_3,
     "ReportDetails" : ReportDetailsArrayLicenseWarningCap(Policies2_3, DescriptionString),
     "RequirementMet" : Status
@@ -304,7 +304,7 @@ tests[{
     "Requirement" : "MFA SHALL be required for all users",
     "Control" : "AAD 2.4",
     "Criticality" : "Shall",
-    "Commandlet" : ["Get-MgIdentityConditionalAccessPolicy"],
+    "Commandlet" : ["Get-MgBetaIdentityConditionalAccessPolicy"],
     "ActualValue" : Policies2_4_1,
     "ReportDetails" : concat(". ", [ReportFullDetailsArray(Policies2_4_1, DescriptionString), CapLink]),
     "RequirementMet" : count(Policies2_4_1) > 0
@@ -431,7 +431,7 @@ tests[{
     "Requirement" : "Only administrators SHALL be allowed to register third-party applications",
     "Control" : "AAD 2.6",
     "Criticality" : "Shall",
-    "Commandlet" : ["Get-MgPolicyAuthorizationPolicy"],
+    "Commandlet" : ["Get-MgBetaPolicyAuthorizationPolicy"],
     "ActualValue" : {"all_allowed_create_values": AllAuthPoliciesAllowedCreate},
     "ReportDetails" : ReportFullDetailsArray(BadPolicies, DescriptionString),
     "RequirementMet" : Status
@@ -466,7 +466,7 @@ tests[{
     "Requirement" : "Only administrators SHALL be allowed to consent to third-party applications",
     "Control" : "AAD 2.7",
     "Criticality" : "Shall",
-    "Commandlet" : ["Get-MgPolicyAuthorizationPolicy"],
+    "Commandlet" : ["Get-MgBetaPolicyAuthorizationPolicy"],
     "ActualValue" : {"all_grant_policy_values": AllDefaultGrantPolicies},
     "ReportDetails" : ReportFullDetailsArray(BadPolicies, DescriptionString),
     "RequirementMet" : Status
@@ -497,7 +497,7 @@ tests[{
     "Requirement" : "An admin consent workflow SHALL be configured",
     "Control" : "AAD 2.7",
     "Criticality" : "Shall",
-    "Commandlet" : ["Get-MgPolicyAdminConsentRequestPolicy"],
+    "Commandlet" : ["Get-MgBetaPolicyAdminConsentRequestPolicy"],
     "ActualValue" : {"all_consent_policies": AllConsentPolicies},
     "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
@@ -542,7 +542,7 @@ tests[{
     "Requirement" : "Group owners SHALL NOT be allowed to consent to third-party applications",
     "Control" : "AAD 2.7",
     "Criticality" : "Shall",
-    "Commandlet" : ["Get-MgDirectorySetting"],
+    "Commandlet" : ["Get-MgBetaDirectorySetting"],
     "ActualValue" : AllConsentSettings,
     "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
@@ -608,7 +608,7 @@ tests[{
     "Requirement" : "Sign-in frequency SHALL be configured to 12 hours",
     "Control" : "AAD 2.9",
     "Criticality" : "Shall",
-    "Commandlet" : ["Get-MgIdentityConditionalAccessPolicy"],
+    "Commandlet" : ["Get-MgBetaIdentityConditionalAccessPolicy"],
     "ActualValue" : Policies2_9,
     "ReportDetails" : concat(". ", [ReportFullDetailsArray(Policies2_9, DescriptionString), CapLink]),
     "RequirementMet" : count(Policies2_9) > 0
@@ -651,7 +651,7 @@ tests[{
     "Requirement" : "Browser sessions SHALL not be persistent",
     "Control" : "AAD 2.10",
     "Criticality" : "Shall",
-    "Commandlet" : ["Get-MgIdentityConditionalAccessPolicy"],
+    "Commandlet" : ["Get-MgBetaIdentityConditionalAccessPolicy"],
     "ActualValue" : Policies2_10,
     "ReportDetails" : concat(". ", [ReportFullDetailsArray(Policies2_10, DescriptionString), CapLink]),
     "RequirementMet" : count(Policies2_10) > 0
@@ -679,7 +679,7 @@ tests[{
     "Requirement" : "A minimum of two users and a maximum of four users SHALL be provisioned with the Global Administrator role",
     "Control" : "AAD 2.11",
     "Criticality" : "Shall",
-    "Commandlet" : ["Get-MgSubscribedSku", "Get-PrivilegedUser"],
+    "Commandlet" : ["Get-MgBetaSubscribedSku", "Get-PrivilegedUser"],
     "ActualValue" : GlobalAdmins,
     "ReportDetails" : ReportFullDetailsArray(GlobalAdmins, DescriptionString),
     "RequirementMet" : Status
@@ -708,7 +708,7 @@ tests[{
     "Requirement" : "Users that need to be assigned to highly privileged Azure AD roles SHALL be provisioned cloud-only accounts that are separate from the on-premises directory or other federated identity providers",
     "Control" : "AAD 2.12",
     "Criticality" : "Shall",
-    "Commandlet" : ["Get-MgSubscribedSku", "Get-PrivilegedUser"],
+    "Commandlet" : ["GetBetaSubscribedSku", "Get-PrivilegedUser"],
     "ActualValue" : AdminNames,
     "ReportDetails" : ReportFullDetailsArray(FederatedAdmins, DescriptionString),
     "RequirementMet" : Status
@@ -747,7 +747,7 @@ tests[{
     "Requirement" : "MFA SHALL be required for user access to highly privileged roles",
     "Control" : "AAD 2.13",
     "Criticality" : "Shall",
-    "Commandlet" : ["Get-MgSubscribedSku", "Get-PrivilegedRole", "Get-MgIdentityConditionalAccessPolicy"],
+    "Commandlet" : ["Get-MgBetaSubscribedSku", "Get-PrivilegedRole", "Get-MgBetaIdentityConditionalAccessPolicy"],
     "ActualValue" : Policies2_13,
     "ReportDetails" : concat(". ", [ReportFullDetailsArray(Policies2_13, DescriptionString), CapLink]),
     "RequirementMet" : count(Policies2_13) > 0
@@ -814,7 +814,7 @@ tests[{
     "Requirement" : "Permanent active role assignments SHALL NOT be allowed for highly privileged roles. Active assignments SHALL have an expiration period.",
     "Control" : "AAD 2.14",
     "Criticality" : "Shall",
-    "Commandlet" : ["Get-MgSubscribedSku", "Get-PrivilegedRole"],
+    "Commandlet" : ["Get-MgBetaSubscribedSku", "Get-PrivilegedRole"],
     "ActualValue" : RolesWithoutLimitedExpirationPeriod,
     "ReportDetails" : ReportDetailsArrayLicenseWarning(RolesWithoutLimitedExpirationPeriod, DescriptionString),
     "RequirementMet" : Status
@@ -839,7 +839,7 @@ tests[{
     "Requirement" : "Provisioning of users to highly privileged roles SHALL NOT occur outside of a PAM system, such as the Azure AD PIM service, because this bypasses the controls the PAM system provides",
     "Control" : "AAD 2.14",
     "Criticality" : "Shall",
-    "Commandlet" : ["Get-MgSubscribedSku", "Get-PrivilegedRole"],
+    "Commandlet" : ["Get-MgBetaSubscribedSku", "Get-PrivilegedRole"],
     "ActualValue" : RolesAssignedOutsidePim,
     "ReportDetails" : ReportDetailsArrayLicenseWarning(RolesAssignedOutsidePim, DescriptionString),
     "RequirementMet" : Status
@@ -871,7 +871,7 @@ tests[{
     "Requirement" : "Activation of highly privileged roles SHOULD require approval",
     "Control" : "AAD 2.15",
     "Criticality" : "Should",
-    "Commandlet" : ["Get-MgSubscribedSku", "Get-PrivilegedRole"],
+    "Commandlet" : ["Get-MgBetaSubscribedSku", "Get-PrivilegedRole"],
     "ActualValue" : RolesWithoutApprovalRequired,
     "ReportDetails" : ReportDetailsArrayLicenseWarning(RolesWithoutApprovalRequired, DescriptionString),
     "RequirementMet" : Status
@@ -912,7 +912,7 @@ tests[{
     "Requirement" : "Eligible and Active highly privileged role assignments SHALL trigger an alert",
     "Control" : "AAD 2.16",
     "Criticality" : "Shall",
-    "Commandlet" : ["Get-MgSubscribedSku", "Get-PrivilegedRole"],
+    "Commandlet" : ["Get-MgBetaBetaSubscribedSku", "Get-PrivilegedRole"],
     "ActualValue" : RolesWithoutAssignmentAlerts,
     "ReportDetails" : ReportDetailsArrayLicenseWarning(RolesWithoutAssignmentAlerts, DescriptionString),
     "RequirementMet" : Status
@@ -941,7 +941,7 @@ tests[{
     "Requirement" : "User activation of the Global Administrator role SHALL trigger an alert",
     "Control" : "AAD 2.16",
     "Criticality" : "Shall",
-    "Commandlet" : ["Get-MgSubscribedSku", "Get-PrivilegedRole"],
+    "Commandlet" : ["Get-MgBetaSubscribedSku", "Get-PrivilegedRole"],
     "ActualValue" : AdminsWithoutActivationAlert,
     "ReportDetails" : ReportDetailsBooleanLicenseWarning(Status),
     "RequirementMet" : Status
@@ -959,7 +959,7 @@ tests[{
     "Requirement" : "User activation of other highly privileged roles SHOULD trigger an alert",
     "Control" : "AAD 2.16",
     "Criticality" : "Should",
-    "Commandlet" : ["Get-MgSubscribedSku", "Get-PrivilegedRole"],
+    "Commandlet" : ["Get-MgBetaSubscribedSku", "Get-PrivilegedRole"],
     "ActualValue" : NonGlobalAdminsWithoutActivationAlert,
     "ReportDetails" : ReportDetailsArrayLicenseWarning(NonGlobalAdminsWithoutActivationAlert, DescriptionString),
     "RequirementMet" : Status
@@ -995,7 +995,7 @@ tests[{
     "Requirement" : "Managed devices SHOULD be required for authentication",
     "Control" : "AAD 2.17",
     "Criticality" : "Should",
-    "Commandlet" : ["Get-MgIdentityConditionalAccessPolicy"],
+    "Commandlet" : ["Get-MgBetaIdentityConditionalAccessPolicy"],
     "ActualValue" : Policies2_17,
     "ReportDetails" : concat(". ", [ReportFullDetailsArray(Policies2_17, DescriptionString), CapLink]),
     "RequirementMet" : count(Policies2_17) > 0
@@ -1034,7 +1034,7 @@ tests[{
     "Requirement" : "Only users with the Guest Inviter role SHOULD be able to invite guest users",
     "Control" : "AAD 2.18",
     "Criticality" : "Should",
-    "Commandlet" : ["Get-MgPolicyAuthorizationPolicy"],
+    "Commandlet" : ["Get-MgBetaPolicyAuthorizationPolicy"],
     "ActualValue" : {"all_allow_invite_values": AllAuthPoliciesAllowInvites},
     "ReportDetails" : ReportDetail,
     "RequirementMet" : Status
@@ -1096,7 +1096,7 @@ tests[{
     "Requirement" : "Guest users SHOULD have limited access to Azure AD directory objects",
     "Control" : "AAD 2.18",
     "Criticality" : "Should",
-    "Commandlet" : ["Get-MgPolicyAuthorizationPolicy"],
+    "Commandlet" : ["Get-MgBetaPolicyAuthorizationPolicy"],
     "ActualValue" : {"all_roleid_values" : AllAuthPoliciesRoleIds},
     "ReportDetails" : ReportDetail,
     "RequirementMet" : Status
