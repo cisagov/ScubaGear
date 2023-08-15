@@ -388,8 +388,12 @@ information by restricted apps and unwanted bluetooth applications.
                access from restricted apps and unwanted bluetooth applications prevents unauthorized disclosure by those
                programs.
 - _Last modified:_ June 2023
-- _Note:_ The custom policy referenced here is the same policy
-          configured in MS.DEFENDER.4.1v1.
+- _Note:_
+  - The custom policy referenced here is the same policy
+    configured in MS.DEFENDER.4.1v1.
+  - This action can only be included if at least one device has been onboarded
+    to the agency tenant.  Otherwise, the option to block restricted apps will
+    not be available.
 
 ### Resources
 
@@ -404,6 +408,9 @@ information by restricted apps and unwanted bluetooth applications.
 
 - [Sensitive information \|
   NIST](https://csrc.nist.gov/glossary/term/sensitive_information)
+
+- [Get started with Endpoint data loss prevention - Microsoft Purview
+  (compliance) \| Microsoft Learn](https://learn.microsoft.com/en-us/purview/endpoint-dlp-getting-started?view=o365-worldwide)
 
 ### License Requirements
 
@@ -518,6 +525,10 @@ information by restricted apps and unwanted bluetooth applications.
    accessing protected files and to log the incident.
 
 #### MS.DEFENDER.4.6v1 instructions:
+
+If restricted app and unwanted Bluetooth app restrictions are desired,
+associated devices must be onboarded with Defender for Endpoint
+before the instructions below can be completed.
 
 1. Sign in to the **Microsoft Purview compliance portal**.
 
@@ -653,7 +664,7 @@ Microsoft Purview Audit (Standard) logging SHALL be enabled.
 - _Last modified:_ June 2023
 
 #### MS.DEFENDER.6.2v1
-Microsoft Purview Audit (Premium) logging SHALL be enabled.
+Microsoft Purview Audit (Premium) logging SHALL be enabled for ALL users.
 - _Rationale:_ Standard logging may not include relevant details necessary for visibility into user actions during an incident. Enabling Microsoft Purview Audit (Premium) captures additional event types that are not included with Standard. Furthermore, it is required for government agencies by OMB M-21-13 (referred to therein as by its former name, Unified Audit Logs w/ Advanced Features).
 - _Last modified:_ June 2023
 
