@@ -248,7 +248,7 @@ All of the settings in this section are configured in the **SharePoint admin cen
 ## 4. Custom Scripts
 
 This section provides policies for restricting the execution of custom scripts.
-å
+
 #### MS.SHAREPOINT.4.1v1
 Users SHALL be prevented from running custom scripts on personal sites (aka OneDrive).
 
