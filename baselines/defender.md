@@ -661,6 +661,10 @@ Microsoft Purview Audit (Premium) logging SHALL be enabled.
 Audit logs SHALL be maintained for at least the minimum duration dictated by OMB M-21-31.
 - _Rationale:_ Audit logs may no longer be available at the time of need if they are not retained for a sufficient period of time. Increased log retention time gives an agency the necessary visibility to investigate incidents that occurred some time ago.
 - _Last modified:_ June 2023
+- _Note_: Purview Audit (Premium) provides a default audit log retention policy
+          that retains Exchange Online, SharePoint Online, OneDrive for
+          Business, and Azure Active Directory audit records for one year.
+          Additional record types require custom audit retention policies.
 
 ### Resources
 
@@ -712,7 +716,7 @@ Microsoft
 Learn.](https://learn.microsoft.com/en-us/purview/audit-premium-setup?view=o365-worldwide)
 
 #### MS.DEFENDER.6.3v1 instructions:
-To create one or more audit retention policies, follow the instructions
+To create one or more custom audit retention policies if the default retention policy is not sufficient for agency needs, follow the instructions
 listed in [Create an audit log retention policy](https://learn.microsoft.com/en-us/purview/audit-log-retention-policies?view=o365-worldwide#create-an-audit-log-retention-policy).
 Ensure that the duration selected in the retention policies is at least 1 year,
 in accordance with OMB M-21-31.
