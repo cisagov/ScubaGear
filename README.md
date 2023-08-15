@@ -81,7 +81,7 @@ Get-Help -Name Invoke-SCuBA -Full
   - Namespace for each policy item within a product for variables related only to one policy item (i.e., MS.AAD.2.1v1)
   - Use of YAML anchors and aliases following Don't Repeat Yourself (DRY) principle for repeated values and sections
 
-  When using the configuration file option all non-default parameters must be specified in the file as the tool ignores other command line options. The file path defaults to the same directory where the script is executed. The file can be used to specify both standard tool parameters as well as custom parameteres used by the Azure Active Directory (AAD) product assessment. See [AAD Conditional Access Policy Exemptions](#aad-conditional-access-policy-exemptions) for more details.
+  When using the configuration file option all non-default parameters must be specified in the file as the tool does not allow other command line options. The file path defaults to the same directory where the script is executed. The file path must point to a valid configuration file. It can be either relative or absolute. The file can be used to specify both standard tool parameters as well as custom parameteres used by the Azure Active Directory (AAD) product assessment. See [AAD Conditional Access Policy Exemptions](#aad-conditional-access-policy-exemptions) for more details.
 
 - **$LogIn** is a `$true` or `$false` variable that if set to `$true` will prompt the user to provide credentials to establish a connection to the specified M365 products in the **$ProductNames** variable. For most use cases, leave this variable to be `$true`. A connection is established in the current PowerShell terminal session with the first authentication. To run another verification in the same PowerShell session,  set this variable to be `$false` to bypass the need to authenticate again in the same session. Note: defender will ask for authentication even if this variable is set to `$false`
 
@@ -184,7 +184,7 @@ New-PowerAppManagementApp -ApplicationId $appId # Must be run from a Power Platf
 > **Notes**: Only authentication via `CertificateThumbprint` is currently supported. We will also be supporting automated app registration in a later release.
 
 ### AAD Conditional Access Policy Exemptions
-The ScubaGear ConfigFilePath command line option allows users to define custom variables in YAML format for use in policy assessments against the AAD baseline.  These custom variables are used to exempt specific user and group exclusions from conditional access policy checks that normally would not pass if exclusions are present.  These parameters support operational use cases for having backup or break glass account exclusions to global user policies without failing best practices.  Any exemptions and their risks should be carefully considered and documented as part of an organization's cybersecurity risk management program process and practices.
+The ScubaGear ConfigFilePath command line option allows users to define custom variables for use in policy assessments against the AAD baseline.  These custom variables are used to exempt specific user and group exclusions from conditional access policy checks that normally would not pass if exclusions are present.  These parameters support operational use cases for having backup or break glass account exclusions to global user policies without failing best practices.  Any exemptions and their risks should be carefully considered and documented as part of an organization's cybersecurity risk management program process and practices.
 
 **YAML AAD Configuration File Syntax and Examples**
 
@@ -198,7 +198,7 @@ The ScubaGear ConfigFilePath command line option allows users to define custom v
 - MS.AAD.3.8: *Managed Devices SHOULD be required to register MFA*
 - MS.AAD.7.4: *Permanent active role assignments SHALL NOT be allowed for highly privileged roles*
 
-The example below illustrates the syntax for defining user, group, and role exemptions to select policies. It also makes use of a YAML anchor and alias to simplify formatting policies having the same documented exemptions. Items surrounded by chevrons are to be supplied by the user.
+The example below illustrates the syntax for defining user, group, and role exemptions to select policies. User and group exemptions are used for policies that can be modified to exclude specific users and groups from having to comply. Role exemptions are for those policies that can be modified to exclude specific roles from having to comply. It also makes use of a YAML anchor and alias to simplify formatting policies having the same documented exemptions. Items surrounded by chevrons are to be supplied by the user.
 
         Aad:
           MS.AAD.1.1v1: &CommonExclusions
@@ -374,5 +374,3 @@ ScubaGear requires a number of PowerShell modules to function.  A user or develo
 On Windows Servers, the default [execution policy](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.security/set-executionpolicy?view=powershell-5.1) is `RemoteSigned`, which will allow ScubaGear to run after the publisher (CISA) is agreed to once.
 
 On Windows Clients, the default execution policy is `Restricted`.  In this case, `Set-ExecutionPolicy RemoteSigned` should be invoked to permit ScubaGear to run.
-
-In ScubaGear version 0.2.1 and earlier, running `Unblock-File` on the ScubaGear folder may be required. See [here](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/unblock-file?view=powershell-5.1) for more information.
