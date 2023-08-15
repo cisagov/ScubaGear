@@ -7,6 +7,7 @@ on:
     paths:
       - "**.ps1"
       - "**.psm1"
+      - ".github/workflows/run_powershell_tests.yaml"
   pull_request:
     types: [opened, reopened]
     branches:
@@ -24,7 +25,17 @@ jobs:
     - name: Check out repository code
       uses: actions/checkout@v3
 
+    - name: Remove Graph 2.0
+      shell: powershell
+      run: |
+        # Remove Microsoft.Graph module(s) from image until SCUBA steps up to 2.0+
+        Write-Output "NOTICE: Removing Microsoft.Graph version 2.0.  Remove this step when SCuBA steps up to this version."
+        Uninstall-Module Microsoft.Graph -ErrorAction SilentlyContinue
+        Get-InstalledModule Microsoft.Graph.* | %{ if($_.Name -ne "Microsoft.Graph.Authentication"){ Write-Output "Removing: $($_.Name)"; Uninstall-Module $_.Name -AllowPrerelease -AllVersions } }
+        Uninstall-Module Microsoft.Graph.Authentication -AllowPrerelease -AllVersions
+
     - name: Run Pester Tests
+      if: '!cancelled()'
       shell: powershell
       run: |
         ./SetUp.ps1
