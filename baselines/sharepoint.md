@@ -157,9 +157,9 @@ All of the settings in this section are configured in the **SharePoint admin cen
 
 #### MS.SHAREPOINT.2.2v1 instructions:
 
-1. Select Policies > Sharing
+1. Select **Policies** \> **Sharing**.
 
-2. Under **File and folder links**, set the set the permission that's selected by default for sharing links to **View**
+2. Under **File and folder links**, set the permission that's selected by default for sharing links to **View**.
 
 3. Select **Save**.
 
