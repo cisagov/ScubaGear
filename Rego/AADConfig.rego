@@ -708,7 +708,7 @@ tests[{
     "Requirement" : "Users that need to be assigned to highly privileged Azure AD roles SHALL be provisioned cloud-only accounts that are separate from the on-premises directory or other federated identity providers",
     "Control" : "AAD 2.12",
     "Criticality" : "Shall",
-    "Commandlet" : ["GetBetaSubscribedSku", "Get-PrivilegedUser"],
+    "Commandlet" : ["Get-MgBetaSubscribedSku", "Get-PrivilegedUser"],
     "ActualValue" : AdminNames,
     "ReportDetails" : ReportFullDetailsArray(FederatedAdmins, DescriptionString),
     "RequirementMet" : Status
