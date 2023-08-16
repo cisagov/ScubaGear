@@ -18,7 +18,6 @@ InModuleScope CreateReport {
                 aad           = "AAD";
                 powerplatform = "PowerPlatform";
                 sharepoint    = "SharePoint";
-                onedrive      = "OneDrive";
             }
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'ProdToFullName')]
             $ProdToFullName = @{
@@ -28,7 +27,6 @@ InModuleScope CreateReport {
                 AAD           = "Azure Active Directory";
                 PowerPlatform = "Microsoft Power Platform";
                 SharePoint    = "SharePoint Online";
-                OneDrive      = "OneDrive for Business";
             }
             $IndividualReportPath = (Join-Path -Path "TestDrive:" -ChildPath "CreateReportStubs/CreateReportUnitFolder/IndividualReports")
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'CreateReportParams')]
@@ -45,7 +43,6 @@ InModuleScope CreateReport {
             @{Product = 'aad'; WarningCount = 0},
             @{Product = 'defender'; WarningCount = 10},
             @{Product = 'exo'; WarningCount = 2},
-            @{Product = 'onedrive'; WarningCount = 1},
             @{Product = 'powerplatform'; WarningCount = 0},
             @{Product = 'sharepoint'; WarningCount = 0},
             @{Product = 'teams'; WarningCount = 5}
