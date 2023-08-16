@@ -912,7 +912,7 @@ tests[{
     "Requirement" : "Eligible and Active highly privileged role assignments SHALL trigger an alert",
     "Control" : "AAD 2.16",
     "Criticality" : "Shall",
-    "Commandlet" : ["Get-MgBetaBetaSubscribedSku", "Get-PrivilegedRole"],
+    "Commandlet" : ["Get-MgBetaSubscribedSku", "Get-PrivilegedRole"],
     "ActualValue" : RolesWithoutAssignmentAlerts,
     "ReportDetails" : ReportDetailsArrayLicenseWarning(RolesWithoutAssignmentAlerts, DescriptionString),
     "RequirementMet" : Status

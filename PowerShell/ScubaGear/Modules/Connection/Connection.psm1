@@ -145,7 +145,7 @@ function Connect-Tenant {
                             }
                         }
                         Connect-MgGraph @LimitedGraphParams | Out-Null
-                        #Using Microsoft.Graph.Beta Now
+
                         $AADAuthRequired = $false
                     }
                     if ($SPOAuthRequired) {
