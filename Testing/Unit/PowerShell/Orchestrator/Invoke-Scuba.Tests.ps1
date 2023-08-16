@@ -57,12 +57,6 @@ InModuleScope Orchestrator {
                 }
                 {Invoke-Scuba @SplatParams} | Should -Not -Throw
             }
-            It 'Given -ProductNames onedrive should not throw' {
-                $SplatParams += @{
-                    ProductNames = @("onedrive")
-                }
-                {Invoke-Scuba @SplatParams} | Should -Not -Throw
-            }
             It 'Given -ProductNames powerplatform should not throw' {
                 $SplatParams += @{
                     ProductNames = @("powerplatform")

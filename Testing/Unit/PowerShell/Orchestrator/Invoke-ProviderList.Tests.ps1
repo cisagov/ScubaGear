@@ -12,8 +12,6 @@ Describe -Tag 'Orchestrator' -Name 'Invoke-ProviderList' {
         Mock -ModuleName Orchestrator Export-DefenderProvider {}
         function Export-PowerPlatformProvider {}
         Mock -ModuleName Orchestrator Export-PowerPlatformProvider {}
-        function Export-OneDriveProvider {}
-        Mock -ModuleName Orchestrator Export-OneDriveProvider {}
         function Export-SharePointProvider {}
         Mock -ModuleName Orchestrator Export-SharePointProvider {}
         function Export-TeamsProvider {}
@@ -56,12 +54,6 @@ Describe -Tag 'Orchestrator' -Name 'Invoke-ProviderList' {
             }
             {Invoke-ProviderList @ProviderParameters} | Should -Not -Throw
         }
-        It 'With -ProductNames "onedrive", should not throw' {
-            $ProviderParameters += @{
-                ProductNames = @("onedrive")
-            }
-            {Invoke-ProviderList @ProviderParameters} | Should -Not -Throw
-        }
         It 'With -ProductNames "powerplatform", should not throw' {
             $ProviderParameters += @{
                 ProductNames = @("powerplatform")
@@ -82,7 +74,7 @@ Describe -Tag 'Orchestrator' -Name 'Invoke-ProviderList' {
         }
         It 'With all products, should not throw' {
             $ProviderParameters += @{
-                ProductNames = @("aad", "defender", "exo", "onedrive", "powerplatform", "sharepoint", "teams")
+                ProductNames = @("aad", "defender", "exo", "powerplatform", "sharepoint", "teams")
             }
             {Invoke-ProviderList @ProviderParameters} | Should -Not -Throw
         }

@@ -14,7 +14,6 @@ function Invoke-SCuBA {
     - Azure Active Directory: aad
     - Defender for Office 365: defender
     - Exchange Online: exo
-    - OneDrive: onedrive
     - MS Power Platform: powerplatform
     - SharePoint Online: sharepoint
     - MS Teams: teams.
@@ -113,9 +112,9 @@ function Invoke-SCuBA {
     param (
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", "onedrive", '*', IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
         [string[]]
-        $ProductNames = @("teams", "exo", "defender", "aad", "sharepoint", "onedrive"),
+        $ProductNames = @("teams", "exo", "defender", "aad", "sharepoint"),
 
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $false)]
@@ -221,7 +220,7 @@ function Invoke-SCuBA {
         if ($PSCmdlet.ParameterSetName -eq 'Report'){
 
             if ($ProductNames -eq '*'){
-                $ProductNames = "teams", "exo", "defender", "aad", "sharepoint", "onedrive", "powerplatform"
+                $ProductNames = "teams", "exo", "defender", "aad", "sharepoint", "powerplatform"
             }
 
             $ProvidedParameters = @{
@@ -352,7 +351,6 @@ $ArgToProd = @{
     aad = "AAD";
     powerplatform = "PowerPlatform";
     sharepoint = "SharePoint";
-    onedrive = "OneDrive";
 }
 
 $ProdToFullName = @{
@@ -362,7 +360,6 @@ $ProdToFullName = @{
     AAD = "Azure Active Directory";
     PowerPlatform = "Microsoft Power Platform";
     SharePoint = "SharePoint Online";
-    OneDrive = "OneDrive for Business";
 }
 
 function Get-FileEncoding{
@@ -395,7 +392,7 @@ function Invoke-ProviderList {
     param (
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", "onedrive", '*', IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
         [string[]]
         $ProductNames,
 
@@ -481,9 +478,6 @@ function Invoke-ProviderList {
                         "powerplatform" {
                             $RetVal = Export-PowerPlatformProvider -M365Environment $M365Environment | Select-Object -Last 1
                         }
-                        "onedrive" {
-                            $RetVal = Export-OneDriveProvider -PnPFlag:$PnPFlag | Select-Object -Last 1
-                        }
                         "sharepoint" {
                             $RetVal = Export-SharePointProvider @SPOProviderParams | Select-Object -Last 1
                         }
@@ -558,7 +552,7 @@ function Invoke-RunRego {
     param(
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", "onedrive", '*', IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
         [string[]]
         $ProductNames,
 
@@ -701,7 +695,7 @@ function Invoke-ReportCreation {
     param(
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", "onedrive", '*', IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
         [string[]]
         $ProductNames,
 
@@ -881,7 +875,7 @@ function Get-TenantDetail {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory=$true)]
-        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", "onedrive", IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", IgnoreCase = $false)]
         [ValidateNotNullOrEmpty()]
         [string[]]
         $ProductNames,
@@ -898,9 +892,6 @@ function Get-TenantDetail {
         Get-AADTenantDetail
     }
     elseif ($ProductNames.Contains("sharepoint")) {
-        Get-AADTenantDetail
-    }
-    elseif ($ProductNames.Contains("onedrive")) {
         Get-AADTenantDetail
     }
     elseif ($ProductNames.Contains("teams")) {
@@ -946,7 +937,7 @@ function Invoke-Connection {
 
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", "onedrive", '*', IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
         [string[]]
         $ProductNames,
 
@@ -992,13 +983,13 @@ function Compare-ProductList {
 
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", "onedrive", '*', IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
         [string[]]
         $ProductNames,
 
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", "onedrive", '*', IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
         [string[]]
         $ProductsFailed,
 
@@ -1104,7 +1095,7 @@ function Remove-Resources {
     #>
     [CmdletBinding()]
     $Providers = @("ExportPowerPlatform", "ExportEXOProvider", "ExportAADProvider",
-    "ExportDefenderProvider", "ExportTeamsProvider", "ExportSharePointProvider", "ExportOneDriveProvider")
+    "ExportDefenderProvider", "ExportTeamsProvider", "ExportSharePointProvider")
     foreach ($Provider in $Providers) {
         Remove-Module $Provider -ErrorAction "SilentlyContinue"
     }
@@ -1137,7 +1128,6 @@ function Invoke-RunCached {
     - Azure Active Directory: aad
     - Defender for Office 365: defender
     - Exchange Online: exo
-    - OneDrive: onedrive
     - MS Power Platform: powerplatform
     - SharePoint Online: sharepoint
     - MS Teams: teams.
@@ -1222,7 +1212,7 @@ function Invoke-RunCached {
 
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", "onedrive", '*', IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
         [string[]]
         $ProductNames = '*',
 
@@ -1305,7 +1295,7 @@ function Invoke-RunCached {
             }
 
             if ($ProductNames -eq '*'){
-                $ProductNames = "teams", "exo", "defender", "aad", "sharepoint", "onedrive", "powerplatform"
+                $ProductNames = "teams", "exo", "defender", "aad", "sharepoint", "powerplatform"
             }
 
             # The equivalent of ..\..

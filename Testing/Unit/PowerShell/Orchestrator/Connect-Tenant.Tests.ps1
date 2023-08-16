@@ -36,13 +36,6 @@ InModuleScope Orchestrator {
                 $FailedAuthList = Invoke-Connection @ConnectParams
                 $FailedAuthList.Length | Should -Be 0
             }
-            It 'With -ProductNames "onedrive", connects to One Drive for Business' {
-                $ConnectParams += @{
-                    ProductNames = 'onedrive'
-                }
-                $FailedAuthList = Invoke-Connection @ConnectParams
-                $FailedAuthList.Length | Should -Be 0
-            }
             It 'With -ProductNames "powerplatform", connects to Power Platform' {
                 $ConnectParams += @{
                     ProductNames = 'powerplatform'
@@ -66,7 +59,7 @@ InModuleScope Orchestrator {
             }
             It 'authenticates to all products' {
                 $ConnectParams += @{
-                    ProductNames = @("aad", "defender", "exo", "onedrive", "powerplatform", "sharepoint", "teams")
+                    ProductNames = @("aad", "defender", "exo", "powerplatform", "sharepoint", "teams")
                 }
                 $FailedAuthList = Invoke-Connection @ConnectParams
                 $FailedAuthList.Length | Should -Be 0

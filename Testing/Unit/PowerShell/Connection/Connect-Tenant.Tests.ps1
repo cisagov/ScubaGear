@@ -46,11 +46,10 @@ InModuleScope Connection {
             @{ProductNames = "aad"}
             @{ProductNames = "defender"}
             @{ProductNames = "exo"}
-            @{ProductNames = "onedrive"}
             @{ProductNames = "powerplatform"}
             @{ProductNames = "sharepoint"}
             @{ProductNames = "teams"}
-            @{ProductNames = "aad", "defender", "exo", "onedrive", "powerplatform", "sharepoint", "teams"}
+            @{ProductNames = "aad", "defender", "exo", "powerplatform", "sharepoint", "teams"}
 
         ){
             $FailedAuthList = Connect-Tenant -ProductNames $ProductNames -M365Environment $Endpoint
