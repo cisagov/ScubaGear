@@ -27,7 +27,7 @@ class ScubaConfig {
 
     hidden [void]SetParameterDefaults(){
         if (-Not $this.Configuration.ProductNames){
-            $this.Configuration.ProductNames = "teams", "exo", "defender", "aad", "sharepoint", "onedrive", "powerplatform" | Sort-Object
+            $this.Configuration.ProductNames = "teams", "exo", "defender", "aad", "sharepoint", "powerplatform" | Sort-Object
         }
         else{
             $this.Configuration.ProductNames = $this.Configuration.ProductNames | Sort-Object
