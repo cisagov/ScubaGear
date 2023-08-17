@@ -352,3 +352,20 @@ tests[{
     true
 }
 #--
+
+#
+# MS.POWERPLATFORM.5.1v1
+#--
+# At this time we are unable to test for X because of Y
+tests[{
+    "PolicyId" : PolicyId,
+    "Criticality" : "Should",
+    "Commandlet" : [],
+    "ActualValue" : [],
+    "ReportDetails" : NotCheckedDetails(PolicyId),
+    "RequirementMet" : false
+}] {
+    PolicyId := "MS.POWERPLATFORM.5.1v1"
+    true
+}
+#--
