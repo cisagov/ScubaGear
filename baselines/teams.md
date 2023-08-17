@@ -499,7 +499,7 @@ All the settings in this section are configured in the **Microsoft Teams admin c
 
 Data loss prevention (DLP) helps prevent both accidental leakage of
 sensitive information as well as intentional exfiltration of data. DLP
-forms an integral part of securing Microsoft Exchange Online. There are
+forms an integral part of securing Microsoft Teams. There are
 several commercial DLP solutions available that document support for
 M365. Microsoft themselves offers DLP services, controlled within the Microsoft Purview
 compliance portal. Agencies may select any service that fits their needs and meets
