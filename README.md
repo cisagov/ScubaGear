@@ -190,6 +190,7 @@ The ScubaGear ConfigFilePath command line option allows users to define custom v
 **YAML AAD Configuration File Syntax and Examples**
 
 **Aad** refers to the AAD specific variables that enable users to specify user, group, and role exclusions that are documented exemptions to select conditional access policies in the AAD configuration policy baselines. Users, groups, and roles are specified by their respective Universally Unique Identifier (UUID) in the tenant. This variable set is only needed if the agency has documented exemptions for one or more of the conditional access policy baselines:
+CapExclusions
 - MS.AAD.1.1: *Legacy authentication SHALL be blocked*
 - MS.AAD.2.1: *Users detected as high risk SHALL be blocked*
 - MS.AAD.2.3: *Sign-ins detected as high risk SHALL be blocked*
