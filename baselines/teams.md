@@ -557,8 +557,8 @@ Any product that meets the requirements outlined in this baseline
 policy group may be used. If the agency is using Microsoft Defender to
 implement malware scanning, see the following policies of the CISA M365 Security Configuration Baseline for Defender for Office 365 for additional guidance.
 
-- [MS.DEFENDER.1.3v1 \| CISA M365 Security Configuration Baseline for Defender for Office 365](./defender.md#msdefender13v1)
-  - All users SHALL be added to Defender for Office 365 Protection in either the standard or strict preset security policy.
+- [MS.DEFENDER.3.1v1 \| CISA M365 Security Configuration Baseline for Defender for Office 365](./defender.md#msdefender31v1)
+  - Safe attachments SHOULD be enabled for SharePoint, OneDrive, and Microsoft Teams.
 
 ### Policies
 
@@ -574,20 +574,24 @@ Users SHOULD be prevented from opening or downloading files detected as malware.
 
 ### Resources
 
-- [Recommended settings for EOP and Microsoft Defender for Office 365
-  security \| Microsoft
-  Docs](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/recommended-settings-for-eop-and-office365)
+- [Safe Attachments in Microsoft Defender for Office 365 \| Microsoft
+  Learn](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/safe-attachments-about?view=o365-worldwide#safe-attachments-policy-settings)
+
+- [Turn on Safe Attachments for SharePoint, OneDrive, and Microsoft
+  Teams \| Microsoft
+  Learn](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/safe-attachments-for-spo-odfb-teams-configure?view=o365-worldwide)
 
 ### License Requirements
 
-- N/A
+- IF using Microsfot Defender, requires Defender for Office 365 Plan 1 or 2. These are included with
+  E5 and G5 and are available as add-ons for E3 and G3.
 
 ### Implementation
 #### MS.TEAMS.7.1v1 instructions:
-Any product that meets the requirements outlined in this baseline policy may be used. If the agency is using Microsoft Defender, see the following implementation steps for [standard or strict preset security policy](./defender.md#implementation) for additional guidance.
+Any product that meets the requirements outlined in this baseline policy may be used. If the agency is using Microsoft Defender, see the following implementation steps for [Safe Attachments](./defender.md#implementation-2) for additional guidance.
 
 #### MS.TEAMS.7.2v1 instructions:
-Any product that meets the requirements outlined in this baseline policy may be used. If the agency is using Microsoft Defender, see the following implementation steps for [standard or strict preset security policy](./defender.md#implementation) for additional guidance.
+Any product that meets the requirements outlined in this baseline policy may be used. If the agency is using Microsoft Defender, see the following implementation steps for [Safe Attachments](./defender.md#implementation-2) for additional guidance.
 
 ## 8. Link Protection
 
