@@ -402,13 +402,13 @@ development, that users “sideload” into Teams.
 ### Policies
 
 #### MS.TEAMS.5.1v1
-Agencies SHOULD "Allow specifc apps and block all others" for Microsoft Apps.
+Agencies SHOULD only allow installation of Microsoft Apps approved and used by the agency.
 - _Rationale:_ The security risk with allowing integration for all Microsoft Apps is access to Teams information through vulnerabilties that can be present in app unmanged by the agency. By only allowing specific apps and blocking all others the agency will better manage its app integration and potential exposure points.
 - _Last modified:_ July 2023
 - _Note:_ This policy applies to the Global (Org-wide default) policy, all custom policies, and the org-wide app settings. Custom policies MAY be created to allow more flexibility for specific users.
  
 #### MS.TEAMS.5.2v1
-Agencies SHOULD NOT allow installation of all third-party apps and custom apps.
+Agencies SHOULD only allow installation of third-party or custom apps approved and used by the agency.
 - _Rationale:_ The security risk with allowing integration third-party and custom is access to Teams information through vulnerabilties that can be present in an app unmanged by the agency. By blocking intallation of all third-party apps and custom apps the agency will disable the integration for Teams to said apps.
 - _Last modified:_ July 2023
 - _Note:_ This policy applies to the Global (Org-wide default) policy, all custom policies if they exist, and the org-wise settings. Custom policies MAY be created to allow more flexibility for specific users.
@@ -431,7 +431,6 @@ available in GCC or DoD tenants.
 All the settings in this section are configured in the **Microsoft Teams admin center**. 
 
 #### MS.TEAMS.5.1v1 instructions:
-
 1.  Sign in to the **Microsoft Teams admin center.**
 
 2.  Select **Teams apps** > **Permission policies.**
