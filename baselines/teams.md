@@ -411,7 +411,7 @@ This section helps reduce security risks related to app integration with Microso
 Teams store.
 
 *Custom apps*: apps not published to the Teams store, such as apps under
-development, that users “sideload” into Teams.
+development, that users sideload into Teams.
 
 ### Policies
 
