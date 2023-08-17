@@ -425,7 +425,8 @@ Agencies SHOULD only allow installation of Microsoft Apps approved and used by t
 Agencies SHOULD only allow installation of third-party or custom apps approved and used by the agency.
 - _Rationale:_ The security risk with allowing integration third-party and custom is access to Teams information through vulnerabilties that can be present in an app unmanged by the agency. By blocking intallation of all third-party apps and custom apps the agency will disable the integration for Teams to said apps.
 - _Last modified:_ July 2023
-- _Note:_ This policy applies to the Global (Org-wide default) policy, all custom policies if they exist, and the org-wise settings. Custom policies MAY be created to allow more flexibility for specific users.
+- _Note:_ This policy applies to the Global (Org-wide default) policy, all custom policies if they exist, and the org-wise settings. Custom policies MAY be created to allow more flexibility for specific users. Third-party apps and custom apps are not
+available in GCC or DoD tenants.
 
 ### Resources
 
@@ -437,8 +438,7 @@ Docs](https://learn.microsoft.com/en-us/microsoftteams/platform/concepts/deploy-
 
 ### License Requirements
 
-- Third-party apps and custom apps are only available with E3/E5 licenses. It is not
-available in GCC or DoD tenants.
+- Third-party apps and custom apps are only available with E3/E5 licenses.
 
 ### Implementation
 
