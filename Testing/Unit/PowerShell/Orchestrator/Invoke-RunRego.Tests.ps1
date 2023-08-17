@@ -44,12 +44,6 @@ InModuleScope Orchestrator {
                 }
                 { Invoke-RunRego @RunRegoParameters } | Should -Not -Throw
             }
-            It 'With -ProductNames "onedrive", should not throw' {
-                $RunRegoParameters += @{
-                    ProductNames = @("onedrive")
-                }
-                { Invoke-RunRego @RunRegoParameters } | Should -Not -Throw
-            }
             It 'With -ProductNames "powerplatform", should not throw' {
                 $RunRegoParameters += @{
                     ProductNames = @("powerplatform")
@@ -70,7 +64,7 @@ InModuleScope Orchestrator {
             }
             It 'With all products, should not throw' {
                 $RunRegoParameters += @{
-                    ProductNames = @("aad", "defender", "exo", "onedrive", "powerplatform", "sharepoint", "teams")
+                    ProductNames = @("aad", "defender", "exo", "powerplatform", "sharepoint", "teams")
                 }
                 { Invoke-RunRego @RunRegoParameters } | Should -Not -Throw
             }

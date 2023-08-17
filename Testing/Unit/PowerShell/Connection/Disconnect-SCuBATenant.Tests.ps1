@@ -22,9 +22,6 @@ InModuleScope Connection {
         It 'Disconnects from Defender (Exchange Online and Security & Compliance)' {
             {Disconnect-SCuBATenant -ProductNames 'defender'} | Should -Not -Throw
         }
-        It 'Disconnects from One Drive (SharePoint Online)' {
-            {Disconnect-SCuBATenant -ProductNames 'onedrive'} | Should -Not -Throw
-        }
         It 'Disconnects from Power Platform' {
             {Disconnect-SCuBATenant -ProductNames 'powerplatform'} | Should -Not -Throw
         }
