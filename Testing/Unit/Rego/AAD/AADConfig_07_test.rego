@@ -1,7 +1,5 @@
 package aad
 import future.keywords
-import data.report.utils.NotCheckedDetails
-
 
 #
 # MS.AAD.7.1v1
@@ -103,16 +101,40 @@ test_PrivilegedUsers_Incorrect_V2 if {
 #
 # MS.AAD.7.2v1
 #--
-test_NotImplemented_Correct if {
+test_SecureScore_Correct if {
     PolicyId := "MS.AAD.7.2v1"
 
-    Output := tests with input as { }
+    Output := tests with input as {
+        "secure_score" : [
+            {
+                "Score" : 1.0
+            }
+        ]
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "Requirement met"
+}
+
+test_SecureScore_Incorrect if {
+    PolicyId := "MS.AAD.7.2v1"
+
+    Output := tests with input as {
+        "secure_score" : [
+            {
+                "Score": 0.5
+            }
+        ]
+    }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == NotCheckedDetails(PolicyId)
+    RuleOutput[0].ReportDetails == "Requirement not met"
 }
 #--
 

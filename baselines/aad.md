@@ -1,6 +1,6 @@
 # CISA M365 Security Configuration Baseline for Azure Active Directory
 
-Azure Active Directory (AAD) is a cloud-based identity and access control service that provides security and functional capabilities to Microsoft 365. This security baseline provides policies to help secure AAD. 
+Azure Active Directory (AAD) is a cloud-based identity and access control service that provides security and functional capabilities to Microsoft 365. This security baseline provides policies to help secure AAD.
 
 ## License Compliance and Copyright
 
@@ -94,7 +94,7 @@ base, follow [these instructions](https://learn.microsoft.com/en-us/azure/active
 
 ## 2. Risk Based Policies
 
-This section provides policies that help reduce security risks related to user accounts that may have been compromised. These policies use a combination of AAD Identity Protection and AAD Conditional Access. AAD Identity Protection uses numerous signals to detect the risk level for each user or sign-in to determine if an account may have been compromised. 
+This section provides policies that help reduce security risks related to user accounts that may have been compromised. These policies use a combination of AAD Identity Protection and AAD Conditional Access. AAD Identity Protection uses numerous signals to detect the risk level for each user or sign-in to determine if an account may have been compromised.
 
 - _Additional mitigations to secure Workload Identities:_ Although not covered in this baseline due to the need for an additional non-standard license, Microsoft also provides support for mitigating risks related to workload identities (AAD applications or service principals). Agencies should strongly consider implementing this feature because workload identities present many of the same risks as interactive user access and are commonly used in modern systems. Follow [these instructions](https://learn.microsoft.com/en-us/azure/active-directory/conditional-access/workload-identity) to apply conditional access policies to workload identities.
 
@@ -475,7 +475,7 @@ Group owners SHALL NOT be allowed to consent to applications.
 
 ## 6. Passwords
 
-This section provides policies that help reduce security risks associated with legacy password practices that are no longer supported by research. 
+This section provides policies that help reduce security risks associated with legacy password practices that are no longer supported by research.
 
 ### Policies
 #### MS.AAD.6.1v1
@@ -611,7 +611,7 @@ The following implementation instructions that reference the AAD PIM service wil
 
 4.  Review the score for the action named **Use least privileged administrative roles.**
 
-5.  Review the **current score** value and compare it to the **max score**. 
+5.  Review the **current score** value and compare it to the **max score**.
 If the current score is not the maximum value and the status is not **Completed**, you must perform the improvement actions. If that is the case, follow the detailed action steps and then check the score again after 48 hours to ensure compliance.
 
 #### MS.AAD.7.3v1 instructions:
@@ -653,14 +653,14 @@ Performing a manual review of highly privileged users to determine which ones ar
 
 3. Select the **Global administrator role.**
 
-4. Under **Manage**, select **Assignments.** Repeat the steps below for both the **Eligible** and the **Active** AAD PIM assignments. 
+4. Under **Manage**, select **Assignments.** Repeat the steps below for both the **Eligible** and the **Active** AAD PIM assignments.
 
 5. For each user or group listed, examine the value in the **Start time** column. If it contains a value of **-**, this indicates that the respective user / group was assigned to that role outside of AAD PIM. If the role was assigned outside of AAD PIM, delete the assignment and recreate it using AAD PIM.
 
 
 #### MS.AAD.7.6v1 instructions:
 
-1. In **Azure Active Directory** create a new group named **Privileged Escalation Approvers**. This group will contain users that will receive role activation approval requests and approve or deny them. 
+1. In **Azure Active Directory** create a new group named **Privileged Escalation Approvers**. This group will contain users that will receive role activation approval requests and approve or deny them.
 
 2. Assign this new group to the AAD role **Privileged Role Administrators**. This permission is required so that users in this group can adjudicate role activation approval requests.
 
