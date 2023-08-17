@@ -72,47 +72,52 @@ All of the settings in this section are configured in the **SharePoint admin cen
 
 #### MS.SHAREPOINT.1.1v1 instructions:
 
-1.  Select **Policies** \> **Sharing**
+1.  Select **Policies** \> **Sharing**.
 
-2.  Adjust external sharing slider for SharePoint to **Existing Guests** or **Only people in your organization**
+2.  Adjust external sharing slider for SharePoint to **Existing Guests** or **Only people in your organization**.
 
-3. Select **Save**
+3. Select **Save**.
 
 #### MS.SHAREPOINT.1.2v1 instructions:
 
-1.  Follow the same instructions as MS.SHAREPOINT.1.1v1 but set the slider value for OneDrive.
+
+1.  Select **Policies** \> **Sharing**.
+
+2.  Adjust external sharing slider for OneDrive to **Existing Guests** or **Only people in your organization**.
+
+3. Select **Save**.
 
 #### MS.SHAREPOINT.1.3v1 instructions:
 
 Note: If SharePoint external sharing is set to its most restrictive setting of "Only people in your organization", then no external sharing is allowed and no implementation changes are required for this policy item.
 
-1.  Select **Policies** \> **Sharing**
+1.  Select **Policies** \> **Sharing**.
 
-2.  Expand **More external sharing settings**
+2.  Expand **More external sharing settings**.
 
-3.  Select **Limit external sharing by domain**
+3.  Select **Limit external sharing by domain**.
 
-4.  Select **Add domains**
+4.  Select **Add domains**.
 
-5.  Add each approved external domain that users allowed to share files with
+5.  Add each approved external domain that users are allowed to share files with.
 
 6.  Select **Manage security groups**
 
 7. Add each approved security group - members of these groups will be allowed to share files externally
 
-8.  Select **Save**
+8.  Select **Save**.
 
 #### MS.SHAREPOINT.1.4v1 instructions:
 
 Note: If SharePoint external sharing is set to its most restrictive setting of "Only people in your organization", then no external sharing is allowed and no implementation changes are required for this policy item.
 
-1.  Select **Policies** \> **Sharing**
+1.  Select **Policies** \> **Sharing**.
 
-2.  Expand **More external sharing settings**
+2.  Expand **More external sharing settings**.
 
-3. Select **Guests must sign in using the same account to which sharing invitations are sent**
+3. Select **Guests must sign in using the same account to which sharing invitations are sent**.
 
-4. Select **Save**
+4. Select **Save**.
 
 ## 2. File and Folder Default Sharing Settings
 
@@ -209,41 +214,41 @@ All of the settings in this section are configured in the **SharePoint admin cen
 
 #### MS.SHAREPOINT.3.1v1 instructions:
 
-1.  Select **Policies** \> **Sharing**
+1.  Select **Policies** \> **Sharing**.
 
-2.  Scroll to the section **Choose expiration and permissions options for Anyone links**
+2.  Scroll to the section **Choose expiration and permissions options for Anyone links**.
 
-3.  Select the checkbox **These links must expire within this many days**
+3.  Select the checkbox **These links must expire within this many days**.
 
-4.  Enter “30” days or less
+4.  Enter **30** days or less.
 
-5.  Select **Save**
+5.  Select **Save**.
 
 #### MS.SHAREPOINT.3.2v1 instructions:
 
-1.  Select **Policies** \> **Sharing**
+1.  Select **Policies** \> **Sharing**.
 
-2.  Scroll to the section **Choose expiration and permissions options for Anyone links**
+2.  Scroll to the section **Choose expiration and permissions options for Anyone links**.
 
-3.  Set the configuration items in the section **These links can give these permissions**
+3.  Set the configuration items in the section **These links can give these permissions**.
 
-4.  Set the **Files** option to **View**
+4.  Set the **Files** option to **View**.
 
-5.  Set the **Folders** option to **View**
+5.  Set the **Folders** option to **View**.
 
-6.  Select **Save**
+6.  Select **Save**.
 
 #### MS.SHAREPOINT.3.3v1 instructions:
 
-1.  Select **Policies** \> **Sharing**
+1.  Select **Policies** \> **Sharing**.
 
-2.  Expand **More external sharing settings**
+2.  Expand **More external sharing settings**.
 
-3. Select **People who use a verification code must reauthenticate after this many days**
+3. Select **People who use a verification code must reauthenticate after this many days**.
 
-4.  Enter **30** days or less
+4.  Enter **30** days or less.
 
-5. Select **Save**
+5. Select **Save**.
 
 ## 4. Custom Scripts
 
@@ -278,27 +283,27 @@ All of the settings in this section are configured in the **SharePoint admin cen
 
 #### MS.SHAREPOINT.4.1v1 instructions:
 
-1.  Select **Settings**
+1.  Select **Settings**.
 
-2.  Scroll down and select **classic settings page**
+2.  Scroll down and select **classic settings page**.
 
-3.  Scroll to the **Custom Script** section
+3.  Scroll to the **Custom Script** section.
 
-4.  Select **Prevent users from running custom script on personal sites**
+4.  Select **Prevent users from running custom script on personal sites**.
 
-5.  Select **Ok**
+5.  Select **Ok**.
 
 #### MS.SHAREPOINT.4.2v1 instructions:
 
-1.  Select **Settings**
+1.  Select **Settings**.
 
-2.  Scroll down and select **classic settings page**
+2.  Scroll down and select **classic settings page**.
 
-3.  Scroll to the **Custom Script** section
+3.  Scroll to the **Custom Script** section.
 
-4.  Select **Prevent users from running custom script on self-service created sites**
+4.  Select **Prevent users from running custom script on self-service created sites**.
 
-5.  Select **Ok**
+5.  Select **Ok**.
 
 
 # Acknowledgements
