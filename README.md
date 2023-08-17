@@ -75,13 +75,14 @@ Get-Help -Name Invoke-SCuBA -Full
 
 ### Parameter Definitions
 
-- **$ConfigFilePath** is an optional configuration file that the tool parses for input parameters when executing ScubaGear. The file can be in YAML or JSON format. A sample configuration file ("aad-config.yaml") is included in the "sample-config-files" sub-folder. The example file includes use of Pascal case convention for varible names. The syntax defines
-  - A global namespace for values to be used across baselines/products (i.e., GlobalVars)
+- **$ConfigFilePath** is an optional parameter that refers to the path to a configuration file that the tool parses for input parameters when executing ScubaGear. ScubaGear supports either a YAML or JSON formatted configuration file. A sample configuration file is included in [sample-config-files/aad-config.yaml](./sample-config-files/aad-config.yaml). The syntax defines:
+  - Use of Pascal case convention for variable names consistent with parameters on the command line
+  - A global namespace for values to be used across baselines and products (i.e., GlobalVars)
   - Per product namespace for values related to that specific product (i.e., Aad, SharePoint)
   - Namespace for each policy item within a product for variables related only to one policy item (i.e., MS.AAD.2.1v1)
   - Use of YAML anchors and aliases following Don't Repeat Yourself (DRY) principle for repeated values and sections
 
-  When using the configuration file option all non-default parameters must be specified in the file as the tool does not allow other command line options. The file path defaults to the same directory where the script is executed. The file path must point to a valid configuration file. It can be either relative or absolute. The file can be used to specify both standard tool parameters as well as custom parameteres used by the Azure Active Directory (AAD) product assessment. See [AAD Conditional Access Policy Exemptions](#aad-conditional-access-policy-exemptions) for more details.
+  When using the configuration file option, all non-default parameters must be specified in the file. ScubaGear does not allow other command line options with `-ConfigFilePath`. The file path defaults to the same directory where the script is executed. The file path must point to a valid configuration file. It can be either a relative or absolute path. The file can be used to specify both standard tool parameters as well as custom parameters used by the Azure Active Directory (AAD) product assessment. See [AAD Conditional Access Policy Exemptions](#aad-conditional-access-policy-exemptions) for more details.
 
 - **$LogIn** is a `$true` or `$false` variable that if set to `$true` will prompt the user to provide credentials to establish a connection to the specified M365 products in the **$ProductNames** variable. For most use cases, leave this variable to be `$true`. A connection is established in the current PowerShell terminal session with the first authentication. To run another verification in the same PowerShell session,  set this variable to be `$false` to bypass the need to authenticate again in the same session. Note: defender will ask for authentication even if this variable is set to `$false`
 
