@@ -1,11 +1,11 @@
-on: 
+on:
     workflow_dispatch:
     pull_request:
         types: [opened, reopened]
         branches:
-        - "main"        
+        - "main"
     pull_request_review:
-        types: [submitted]  
+        types: [submitted]
     push:
         branches:
         - "main"
@@ -14,13 +14,13 @@ on:
         - "baselines/*.md"
 
 name: Markdown Check
-  
+
 jobs:
     Run-Markdown-Check:
         runs-on: windows-latest
         defaults:
             run:
-                shell: powershell 
+                shell: powershell
         permissions:
             contents: read
         steps:
