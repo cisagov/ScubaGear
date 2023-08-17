@@ -553,9 +553,7 @@ Any product that meets the requirements outlined in this baseline policy may be 
 
 ## 7. Malware Scanning
 
-Any product that meets the requirements outlined in this baseline
-policy group may be used. If the agency is using Microsoft Defender to
-implement malware scanning, see the following policies of the CISA M365 Security Configuration Baseline for Defender for Office 365 for additional guidance.
+Any product that meets the requirements outlined in this baselinepolicy group may be used. If the agency is using Microsoft Defender to implement malware scanning, see the following policies of the CISA M365 Security Configuration Baseline for Defender for Office 365 for additional guidance.
 
 - [MS.DEFENDER.3.1v1 \| CISA M365 Security Configuration Baseline for Defender for Office 365](./defender.md#msdefender31v1)
   - Safe attachments SHOULD be enabled for SharePoint, OneDrive, and Microsoft Teams.
@@ -614,9 +612,7 @@ Their proxy can perform the following actions:
 
 If all checks pass, the user is redirected to the original URL.
 
-Microsoft Defender includes link scanning capabilities
-Use of Microsoft Defender is not strictly required for this purpose;
-any product that fulfills the requirements outlined in this baseline policy group may be used.
+Microsoft Defender includes link scanning capabilities. Use of Microsoft Defender is not strictly required for this purpose; any product that fulfills the requirements outlined in this baseline policy group may be used.
 If the agency is using Microsoft Defender to meet this baseline policy group, see the following policy of the CISA M365 Security Configuration Baseline for Defender for Office 365 for additional guidance.
 
 - [MS.DEFENDER.1.3v1 \| CISA M365 Security Configuration Baseline for Defender for Office 365](./defender.md#msdefender13v1).
@@ -630,11 +626,6 @@ URL comparison with a block-list SHOULD be enabled.
 - _Last modified:_ July 2023
 
 #### MS.TEAMS.8.2v1
-Direct download links SHOULD be scanned for malware.
-- _Rationale:_ URLs in Teams may direct users to download and run malware. Scanning direct download links in real-time for known malware and blocking access can prevent users from infecting their devices.
-- _Last modified:_ July 2023
-
-#### MS.TEAMS.8.3v1
 User click tracking SHOULD be enabled.
 - _Rationale:_ Users may click on malicious links in Teams, leading to compromise or authorized data disclosure. Enabling user click tracking lets agencies know if a malicious link may have been visited after the fact to help tailor a response to a potential incident.
 - _Last modified:_ July 2023
@@ -645,19 +636,18 @@ User click tracking SHOULD be enabled.
   security \| Microsoft
   Docs](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/recommended-settings-for-eop-and-office365)
 
+- [Set up Safe Links policies in Microsoft Defender for Office 365 \| Microsoft Learn](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/safe-links-policies-configure?view=o365-worldwide)
+  
 ### License Requirements
 
 - N/A
 
 ### Implementation
 #### MS.TEAMS.8.1v1 instructions:
-Any product that meets the requirements outlined in this baseline policy may be used. If the agency is using Microsoft Defender, see the following implementation steps for [standard or strict preset security policy](./defender.md#implementation) for additional guidance.
+Any product that meets the requirements outlined in this baseline policy may be used. If the agency is using Microsoft Defender, see the following implementation steps for [standard or strict preset security policy](.defender.md#msdefender13v1) for additional guidance.
 
 #### MS.TEAMS.8.2v1 instructions:
-Any product that meets the requirements outlined in this baseline policy may be used. If the agency is using Microsoft Defender, see the following implementation steps for [standard or strict preset security policy](./defender.md#implementation) for additional guidance.
-
-#### MS.TEAMS.8.3v1 instructions:
-Any product that meets the requirements outlined in this baseline policy may be used. If the agency is using Microsoft Defender, see the following implementation steps for [standard or strict preset security policy](./defender.md#implementation) for additional guidance.
+Any product that meets the requirements outlined in this baseline policy may be used. If the agency is using Microsoft Defender, see the following implementation steps for [standard or strict preset security policy](.defender.md#msdefender13v1) for additional guidance.
 
 # Acknowledgements
 
