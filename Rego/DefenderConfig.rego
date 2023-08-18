@@ -265,7 +265,108 @@ tests[{
 }
 #--
 
+#
+# MS.DEFENDER.2.1v1
+#--
 
+# TODO: update this policy to match emerald baseline
+# The following check is from pre-emerald 2.5 first bullet,
+# which is similar but needs some adjustments.
+
+ProtectedUsersPolicies[{
+    "Name" : Policy.Name,
+	"Users" : Policy.TargetedUsersToProtect,
+    "Action" : Policy.TargetedUserProtectionAction
+}] {
+    Policy := input.anti_phish_policies[_]
+    Policy.Enabled # filter out the disabled policies
+    Policy.EnableTargetedUserProtection # filter out the policies that have impersonation protections disabled
+    count(Policy.TargetedUsersToProtect) > 0 # filter out the policies that don't list any protected users
+}
+
+# assert that at least one of the enabled policies includes protected users
+tests[{
+    "PolicyId" : "MS.DEFENDER.2.1v1",
+    "Criticality" : "Should",
+    "Commandlet" : ["Get-AntiPhishPolicy"],
+	"ActualValue" : Policies,
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
+    "RequirementMet" : Status
+}] {
+    Policies := ProtectedUsersPolicies
+    ErrorMessage := "No users are included for targeted user protection."
+    Status := count(Policies) > 0
+}
+#--
+
+#
+# MS.DEFENDER.2.2v1
+#--
+
+# TODO: update this policy to match emerald baseline
+# The following check is from pre-emerald 2.5 second bullet,
+# which is similar but needs some adjustments.
+
+ProtectedOrgDomainsPolicies[{
+    "Name" : Policy.Name,
+	"OrgDomains" : Policy.EnableOrganizationDomainsProtection,
+    "Action" : Policy.TargetedDomainProtectionAction
+}] {
+    Policy := input.anti_phish_policies[_]
+    Policy.Enabled # filter out the disabled policies
+    Policy.EnableTargetedDomainsProtection # filter out the policies that don't have domain impersonation protection enabled
+    Policy.EnableOrganizationDomainsProtection # filter out the policies that don't protect org domains
+}
+
+# assert that at least one of the enabled policies includes
+# protection for the org's own domains
+tests[{
+    "PolicyId" : "MS.DEFENDER.2.2v1",
+    "Criticality" : "Should",
+    "Commandlet" : ["Get-AntiPhishPolicy"],
+	"ActualValue" : Policies,
+    "ReportDetails" : ReportDetailsBoolean(Status),
+    "RequirementMet" : Status
+}] {
+    Policies := ProtectedOrgDomainsPolicies
+    Status := count(Policies) > 0
+}
+#--
+
+#
+# MS.DEFENDER.2.3v1
+#--
+
+# TODO: update this policy to match emerald baseline
+# The following check is from pre-emerald 2.5 third bullet,
+# which is similar but needs some adjustments.
+
+ProtectedCustomDomainsPolicies[{
+    "Name" : Policy.Name,
+	"CustomDomains" : Policy.TargetedDomainsToProtect,
+    "Action" : Policy.TargetedDomainProtectionAction
+}] {
+    Policy := input.anti_phish_policies[_]
+    Policy.Enabled # filter out the disabled policies
+    Policy.EnableTargetedDomainsProtection # filter out the policies that don't have domain impersonation protection enabled
+    count(Policy.TargetedDomainsToProtect) > 0 # filter out the policies that don't list any custom domains
+}
+
+# assert that at least one of the enabled policies includes
+# protection for custom domains
+tests[{
+    "PolicyId" : "MS.DEFENDER.2.3v1",
+    "Criticality" : "Should",
+    "Commandlet" : ["Get-AntiPhishPolicy"],
+	"ActualValue" : Policies,
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
+    "RequirementMet" : Status
+}] {
+    Policies := ProtectedCustomDomainsPolicies
+    ErrorMessage := "The Custom Domains protection policies: Enabled, EnableTargetedDomainsProtection, and TargetedDomainsToProtect are not set correctly"
+    Status := count(Policies) > 0
+}
+#--
 
 
 
@@ -682,523 +783,6 @@ tests[{
     ErrorMessage := "malware policy(ies) found without ZAP for malware enabled:"
 }
 #--
-
-
-################
-# Baseline 2.5 #
-################
-
-#
-# Baseline 2.5: Policy 1
-#--
-ProtectedUsersPolicies[{
-    "Name" : Policy.Name,
-	"Users" : Policy.TargetedUsersToProtect,
-    "Action" : Policy.TargetedUserProtectionAction
-}] {
-    Policy := input.anti_phish_policies[_]
-    Policy.Enabled # filter out the disabled policies
-    Policy.EnableTargetedUserProtection # filter out the policies that have impersonation protections disabled
-    count(Policy.TargetedUsersToProtect) > 0 # filter out the policies that don't list any protected users
-}
-
-# assert that at least one of the enabled policies includes protected users
-tests[{
-    "PolicyId" : "MS.DEFENDER.5.1v1",
-    "Criticality" : "Should",
-    "Commandlet" : ["Get-AntiPhishPolicy"],
-	"ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
-    "RequirementMet" : Status
-}] {
-    Policies := ProtectedUsersPolicies
-    ErrorMessage := "No users are included for targeted user protection."
-    Status := count(Policies) > 0
-}
-#--
-
-#
-# Baseline 2.5: Policy 2
-#--
-ProtectedOrgDomainsPolicies[{
-    "Name" : Policy.Name,
-	"OrgDomains" : Policy.EnableOrganizationDomainsProtection,
-    "Action" : Policy.TargetedDomainProtectionAction
-}] {
-    Policy := input.anti_phish_policies[_]
-    Policy.Enabled # filter out the disabled policies
-    Policy.EnableTargetedDomainsProtection # filter out the policies that don't have domain impersonation protection enabled
-    Policy.EnableOrganizationDomainsProtection # filter out the policies that don't protect org domains
-}
-
-# assert that at least one of the enabled policies includes
-# protection for the org's own domains
-tests[{
-    "PolicyId" : "MS.DEFENDER.5.2v1",
-    "Criticality" : "Should",
-    "Commandlet" : ["Get-AntiPhishPolicy"],
-	"ActualValue" : Policies,
-    "ReportDetails" : ReportDetailsBoolean(Status),
-    "RequirementMet" : Status
-}] {
-    Policies := ProtectedOrgDomainsPolicies
-    Status := count(Policies) > 0
-}
-#--
-
-#
-# Baseline 2.5: Policy 3
-#--
-ProtectedCustomDomainsPolicies[{
-    "Name" : Policy.Name,
-	"CustomDomains" : Policy.TargetedDomainsToProtect,
-    "Action" : Policy.TargetedDomainProtectionAction
-}] {
-    Policy := input.anti_phish_policies[_]
-    Policy.Enabled # filter out the disabled policies
-    Policy.EnableTargetedDomainsProtection # filter out the policies that don't have domain impersonation protection enabled
-    count(Policy.TargetedDomainsToProtect) > 0 # filter out the policies that don't list any custom domains
-}
-
-# assert that at least one of the enabled policies includes
-# protection for custom domains
-tests[{
-    "PolicyId" : "MS.DEFENDER.5.3v1",
-    "Criticality" : "Should",
-    "Commandlet" : ["Get-AntiPhishPolicy"],
-	"ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
-    "RequirementMet" : Status
-}] {
-    Policies := ProtectedCustomDomainsPolicies
-    ErrorMessage := "The Custom Domains protection policies: Enabled, EnableTargetedDomainsProtection, and TargetedDomainsToProtect are not set correctly"
-    Status := count(Policies) > 0
-}
-#--
-
-#
-# Baseline 2.5: Policy 4
-#--
-IntelligenceProtectionPolicies[{
-    "Name" : Policy.Name,
-	"IntelligenceProtection" : Policy.EnableMailboxIntelligenceProtection,
-    "Action" : Policy.MailboxIntelligenceProtectionAction
-}] {
-    Policy := input.anti_phish_policies[_]
-    Policy.Enabled # filter out the disabled policies
-    Policy.EnableMailboxIntelligenceProtection # filter out the policies that don't have intelligence protection enabled
-}
-
-# assert that at least one of the enabled policies includes
-# intelligence protection
-tests[{
-    "PolicyId" : "MS.DEFENDER.5.5v1",
-    "Criticality" : "Should",
-    "Commandlet" : ["Get-AntiPhishPolicy"],
-	"ActualValue" : Policies,
-    "ReportDetails" : ReportDetailsBoolean(Status),
-    "RequirementMet" : Status
-}] {
-    Policies := IntelligenceProtectionPolicies
-    Status := count(Policies) > 0
-}
-#--
-
-#
-# Baseline 2.5: Policy 5
-#--
-# Step 1: Default (SHALL)
-tests[{
-    #TODO: Multiple mappings
-    #"Requirement" : "Message action SHALL be set to quarantine if the message is detected as impersonated: users default policy",
-    "PolicyId" : "MS.DEFENDER.5.6v1",
-    "Criticality" : "Shall",
-    "Commandlet" : ["Get-AntiPhishPolicy"],
-	"ActualValue" : Policy.TargetedUserProtectionAction,
-    "ReportDetails" : ReportDetailsBoolean(Status),
-    "RequirementMet" : Status
-}] {
-    Policy := input.anti_phish_policies[_]
-    Policy.Identity == "Office365 AntiPhish Default"
-    Status := Policy.TargetedUserProtectionAction == "Quarantine"
-}
-
-tests[{
-    "Requirement" : "Message action SHALL be set to quarantine if the message is detected as impersonated: domains default policy",
-    "Control" : "Defender 2.5",
-    "Criticality" : "Shall",
-    "Commandlet" : ["Get-AntiPhishPolicy"],
-	"ActualValue" : Policy.TargetedDomainProtectionAction,
-    "ReportDetails" : ReportDetailsBoolean(Status),
-    "RequirementMet" : Status
-}] {
-    Policy := input.anti_phish_policies[_]
-    Policy.Identity == "Office365 AntiPhish Default"
-    Status := Policy.TargetedDomainProtectionAction == "Quarantine"
-}
-
-tests[{
-    "Requirement" : "Message action SHALL be set to quarantine if the message is detected as impersonated: mailbox default policy",
-    "Control" : "Defender 2.5",
-    "Criticality" : "Shall",
-    "Commandlet" : ["Get-AntiPhishPolicy"],
-	"ActualValue" : Policy.MailboxIntelligenceProtectionAction,
-    "ReportDetails" : ReportDetailsBoolean(Status),
-    "RequirementMet" : Status
-}] {
-    Policy := input.anti_phish_policies[_]
-    Policy.Identity == "Office365 AntiPhish Default"
-    Status := Policy.MailboxIntelligenceProtectionAction == "Quarantine"
-}
-
-
-# Step 2: non-default (SHOULD)
-AntiPhishTargetedUserNotQuarantine[Policy.Identity] {
-    Policy := input.anti_phish_policies[_]
-    # Ignore the standard preset security policy because we can't change it in the tenant but it's always there.
-    not regex.match("Standard Preset Security Policy[0-9]+", Policy.Identity)
-    not Policy.Identity == "Office365 AntiPhish Default"
-    not Policy.TargetedUserProtectionAction == "Quarantine"
-}
-
-tests[ {
-    "Requirement" : "Message action SHOULD be set to quarantine if the message is detected as impersonated: users non-default policies",
-    "Control" : "Defender 2.5",
-    "Criticality" : "Should",
-    "Commandlet" : ["Get-AntiPhishPolicy"],
-	"ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), GenerateArrayString(Policies, ErrorMessage)),
-    "RequirementMet" : Status
-}] {
-    Policies := AntiPhishTargetedUserNotQuarantine
-    ErrorMessage := "non-default anti phish policy(ies) found where the action for messages detected as user impersonation is not quarantine:"
-    Status := count(Policies) == 0
-}
-
-AntiPhishTargetedDomainNotQuarantine[Policy.Identity] {
-    Policy := input.anti_phish_policies[_]
-    # Ignore the standard preset security policy because we can't change it in the tenant but it's always there.
-    not regex.match("Standard Preset Security Policy[0-9]+", Policy.Identity)
-    not Policy.Identity == "Office365 AntiPhish Default"
-    not Policy.TargetedDomainProtectionAction == "Quarantine"
-}
-
-tests[ {
-    "Requirement" : "Message action SHOULD be set to quarantine if the message is detected as impersonated: domains non-default policies",
-    "Control" : "Defender 2.5",
-    "Criticality" : "Should",
-    "Commandlet" : ["Get-AntiPhishPolicy"],
-	"ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), GenerateArrayString(Policies, ErrorMessage)),
-    "RequirementMet" : Status
-}] {
-    Policies := AntiPhishTargetedDomainNotQuarantine
-    ErrorMessage := "non-default anti phish policy(ies) found where the action for messages detected as domain impersonation is not quarantine:"
-    Status := count(Policies) == 0
-}
-
-AntiPhishMailIntNotQuarantine[Policy.Identity] {
-    Policy := input.anti_phish_policies[_]
-    # Ignore the standard preset security policy because we can't change it in the tenant but it's always there.
-    not regex.match("Standard Preset Security Policy[0-9]+", Policy.Identity)
-    not Policy.Identity == "Office365 AntiPhish Default"
-    not Policy.MailboxIntelligenceProtectionAction == "Quarantine"
-}
-
-tests[ {
-    "Requirement" : "Message action SHOULD be set to quarantine if the message is detected as impersonated: mailbox non-default policies",
-    "Control" : "Defender 2.5",
-    "Criticality" : "Should",
-    "Commandlet" : ["Get-AntiPhishPolicy"],
-	"ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), GenerateArrayString(Policies, ErrorMessage)),
-    "RequirementMet" : Status
-}] {
-    Policies := AntiPhishMailIntNotQuarantine
-    ErrorMessage := "non-default anti phish policy(ies) found where the action for messages flagged by mailbox intelligence is not quarantine:"
-    Status := count(Policies) == 0
-}
-
-#
-# Baseline 2.5: Policy 6
-#--
-# Previous test divided into two rules. In the baseline we specify
-# that default policies SHALL and custom policies SHOULD. To
-# represent this, we have two tests checking the default and the
-# nondefault.
-tests[ {
-    #TODO: Multiple Mappings
-    #"Requirement" : "Mail classified as spoofed SHALL be quarantined: default policy",
-    "PolicyId" : "MS.DEFENDER.5.7v1",
-    "Criticality" : "Shall",
-    "Commandlet" : ["Get-AntiPhishPolicy"],
-	"ActualValue" : Policy.AuthenticationFailAction,
-    "ReportDetails" : ReportDetailsBoolean(Status),
-    "RequirementMet" : Status
-}] {
-    Policy := input.anti_phish_policies[_]
-    Policy.Identity == "Office365 AntiPhish Default"
-    Status := Policy.AuthenticationFailAction == "Quarantine"
-}
-
-# Helper rule to get set of custom anti phishing policies where the
-# AuthenticationFailAction is not set to quarantine
-CustomAntiPhishSpoofNotQuarantine[Policy.Identity] {
-    Policy := input.anti_phish_policies[_]
-    # Ignore the standard preset security policy because we can't change it in the tenant but it's always there.
-    not regex.match("Standard Preset Security Policy[0-9]+", Policy.Identity)
-    Policy.Identity != "Office365 AntiPhish Default"
-    Policy.AuthenticationFailAction != "Quarantine"
-}
-
-tests[ {
-    "Requirement" : "Mail classified as spoofed SHOULD be quarantined: non-default policies",
-    "Control" : "Defender 2.5",
-    "Criticality" : "Should",
-    "Commandlet" : ["Get-AntiPhishPolicy"],
-	"ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), GenerateArrayString(Policies, ErrorMessage)),
-    "RequirementMet" : Status
-}] {
-    ErrorMessage := "custom anti phish policy(ies) found where the action for spoofed emails is not set to quarantine:"
-    Policies := CustomAntiPhishSpoofNotQuarantine
-    Status := count(Policies) == 0
-}
-#--
-
-#
-# Baseline 2.5: Policy 7
-#--
-# First contact default policy
-tests[ {
-    #TODO: Multiple Mappings
-    #"Requirement" : "All safety tips SHALL be enabled: first contact default policy",
-    "PolicyId" : "MS.DEFENDER.5.8v1",
-    "Criticality" : "Shall",
-    "Commandlet" : ["Get-AntiPhishPolicy"],
-	"ActualValue" : Policy.EnableFirstContactSafetyTips,
-    "ReportDetails" : ReportDetailsBoolean(Status),
-    "RequirementMet" : Status
-}] {
-    Policy := input.anti_phish_policies[_]
-    Policy.Identity == "Office365 AntiPhish Default"
-    Status := Policy.EnableFirstContactSafetyTips == true
-}
-
-# First contact non-default policies
-CustomAntiPhishNoSafetyTips[Policy.Identity] {
-    Policy := input.anti_phish_policies[_]
-    # Ignore the standard preset security policy because we can't change it in the tenant but it's always there.
-    not regex.match("Standard Preset Security Policy[0-9]+", Policy.Identity)
-    Policy.Identity != "Office365 AntiPhish Default"
-    not Policy.EnableFirstContactSafetyTips
-}
-
-tests[{
-    "Requirement" : "All safety tips SHOULD be enabled: first contact non-default policies",
-    "Control" : "Defender 2.5",
-    "Criticality" : "Should",
-    "Commandlet" : ["Get-AntiPhishPolicy"],
-	"ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), GenerateArrayString(Policies, ErrorMessage)),
-    "RequirementMet" : Status
-}] {
-    ErrorMessage := "custom anti phish policy(ies) found where first contact safety tips are not enabled:"
-    Policies := CustomAntiPhishNoSafetyTips
-    Status := count(Policies) == 0
-}
-
-# Similar users default policy
-tests[{
-    "Requirement" : "All safety tips SHALL be enabled: user impersonation default policy",
-    "Control" : "Defender 2.5",
-    "Criticality" : "Shall",
-    "Commandlet" : ["Get-AntiPhishPolicy"],
-	"ActualValue" : Policy.EnableSimilarUsersSafetyTips,
-    "ReportDetails" : ReportDetailsBoolean(Status),
-    "RequirementMet" : Status
-}] {
-    Policy := input.anti_phish_policies[_]
-    Policy.Identity == "Office365 AntiPhish Default"
-    Status := Policy.EnableSimilarUsersSafetyTips == true
-}
-
-# Similar users non-default policies
-CustomAntiPhishNoSimilarUserTips[Policy.Identity] {
-    Policy := input.anti_phish_policies[_]
-    # Ignore the standard preset security policy because we can't change it in the tenant but it's always there.
-    not regex.match("Standard Preset Security Policy[0-9]+", Policy.Identity)
-    Policy.Identity != "Office365 AntiPhish Default"
-    not Policy.EnableSimilarUsersSafetyTips
-}
-
-tests[{
-    "Requirement" : "All safety tips SHOULD be enabled: user impersonation non-default policies",
-    "Control" : "Defender 2.5",
-    "Criticality" : "Should",
-    "Commandlet" : ["Get-AntiPhishPolicy"],
-	"ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), GenerateArrayString(Policies, ErrorMessage)),
-    "RequirementMet" : Status
-}] {
-    ErrorMessage := "custom anti phish policy(ies) found where similar user safety tips are not enabled:"
-    Policies := CustomAntiPhishNoSimilarUserTips
-    Status := count(Policies) == 0
-}
-
-# Similar domains default policy
-tests[{
-    "Requirement" : "All safety tips SHALL be enabled: domain impersonation default policy",
-    "Control" : "Defender 2.5",
-    "Criticality" : "Shall",
-    "Commandlet" : ["Get-AntiPhishPolicy"],
-	"ActualValue" : Policy.EnableSimilarDomainsSafetyTips,
-    "ReportDetails" : ReportDetailsBoolean(Status),
-    "RequirementMet" : Status
-}] {
-    Policy := input.anti_phish_policies[_]
-    Policy.Identity == "Office365 AntiPhish Default"
-    Status := Policy.EnableSimilarDomainsSafetyTips == true
-}
-
-# Similar domains non-default policies
-CustomAntiPhishNoSimilarDomainTips[Policy.Identity] {
-    Policy := input.anti_phish_policies[_]
-    # Ignore the standard preset security policy because we can't change it in the tenant but it's always there.
-    not regex.match("Standard Preset Security Policy[0-9]+", Policy.Identity)
-    Policy.Identity != "Office365 AntiPhish Default"
-    not Policy.EnableSimilarDomainsSafetyTips
-}
-
-tests[{
-    "Requirement" : "All safety tips SHOULD be enabled: domain impersonation non-default policies",
-    "Control" : "Defender 2.5",
-    "Criticality" : "Should",
-    "Commandlet" : ["Get-AntiPhishPolicy"],
-	"ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), GenerateArrayString(Policies, ErrorMessage)),
-    "RequirementMet" : Status
-}] {
-    ErrorMessage := "custom anti phish policy(ies) found where similar domains safety tips are not enabled:"
-    Policies := CustomAntiPhishNoSimilarDomainTips
-    Status := count(Policies) == 0
-}
-
-# Unusual characters default policy
-tests[{
-    "Requirement" : "All safety tips SHALL be enabled: user impersonation unusual characters default policy",
-    "Control" : "Defender 2.5",
-    "Criticality" : "Shall",
-    "Commandlet" : ["Get-AntiPhishPolicy"],
-	"ActualValue" : Policy.EnableUnusualCharactersSafetyTips,
-    "ReportDetails" : ReportDetailsBoolean(Status),
-    "RequirementMet" : Status
-}] {
-    Policy := input.anti_phish_policies[_]
-    Policy.Identity == "Office365 AntiPhish Default"
-    Status := Policy.EnableUnusualCharactersSafetyTips == true
-}
-
-# Unusual characters non-default policies
-CustomAntiPhishNoUnusualCharTips[Policy.Identity] {
-    Policy := input.anti_phish_policies[_]
-    # Ignore the standard preset security policy because we can't change it in the tenant but it's always there.
-    not regex.match("Standard Preset Security Policy[0-9]+", Policy.Identity)
-    Policy.Identity != "Office365 AntiPhish Default"
-    not Policy.EnableUnusualCharactersSafetyTips
-}
-
-tests[{
-    "Requirement" : "All safety tips SHOULD be enabled: user impersonation unusual characters non-default policies",
-    "Control" : "Defender 2.5",
-    "Criticality" : "Should",
-    "Commandlet" : ["Get-AntiPhishPolicy"],
-	"ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), GenerateArrayString(Policies, ErrorMessage)),
-    "RequirementMet" : Status
-}] {
-    ErrorMessage := "custom anti phish policy(ies) found where unusual character safety tips are not enabled:"
-    Policies := CustomAntiPhishNoUnusualCharTips
-    Status := count(Policies) == 0
-}
-
-# Via tag default policy
-tests[{
-    "Requirement" : "All safety tips SHALL be enabled: \"via\" tag default policy",
-    "Control" : "Defender 2.5",
-    "Criticality" : "Shall",
-    "Commandlet" : ["Get-AntiPhishPolicy"],
-	"ActualValue" : Policy.EnableViaTag,
-    "ReportDetails" : ReportDetailsBoolean(Status),
-    "RequirementMet" : Status
-}] {
-    Policy := input.anti_phish_policies[_]
-    Policy.Identity == "Office365 AntiPhish Default"
-    Status := Policy.EnableViaTag == true
-}
-
-# Via tag non-default policies
-CustomAntiPhishNoViaTagTips[Policy.Identity] {
-    Policy := input.anti_phish_policies[_]
-    # Ignore the standard preset security policy because we can't change it in the tenant but it's always there.
-    not regex.match("Standard Preset Security Policy[0-9]+", Policy.Identity)
-    Policy.Identity != "Office365 AntiPhish Default"
-    not Policy.EnableViaTag
-}
-
-tests[{
-    "Requirement" : "All safety tips SHOULD be enabled: \"via\" tag non-default policies",
-    "Control" : "Defender 2.5",
-    "Criticality" : "Should",
-    "Commandlet" : ["Get-AntiPhishPolicy"],
-	"ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), GenerateArrayString(Policies, ErrorMessage)),
-    "RequirementMet" : Status
-}] {
-    ErrorMessage := "custom anti phish policy(ies) found where via tag is not enabled:"
-    Policies := CustomAntiPhishNoViaTagTips
-    Status := count(Policies) == 0
-}
-
-# Unauthenticated sender default policy
-tests[{
-    "Requirement" : "All safety tips SHALL be enabled: \"?\" for unauthenticated senders for spoof default policy",
-    "Control" : "Defender 2.5",
-    "Criticality" : "Shall",
-    "Commandlet" : ["Get-AntiPhishPolicy"],
-	"ActualValue" : Policy.EnableUnauthenticatedSender,
-    "ReportDetails" : ReportDetailsBoolean(Status),
-    "RequirementMet" : Status
-}] {
-    Policy := input.anti_phish_policies[_]
-    Policy.Identity == "Office365 AntiPhish Default"
-    Status := Policy.EnableUnauthenticatedSender == true
-}
-
-# Unauthenticated sender non-default policies
-CustomAntiPhishNoUnauthSenderTips[Policy.Identity] {
-    Policy := input.anti_phish_policies[_]
-    # Ignore the standard preset security policy because we can't  change it in the tenant but it's always there.
-    not regex.match("Standard Preset Security Policy[0-9]+", Policy.Identity)
-    Policy.Identity != "Office365 AntiPhish Default"
-    not Policy.EnableUnauthenticatedSender
-}
-
-tests[{
-    "Requirement" : "All safety tips SHOULD be enabled: \"?\" for unauthenticated senders for spoof non-default policies",
-    "Control" : "Defender 2.5",
-    "Criticality" : "Should",
-    "Commandlet" : ["Get-AntiPhishPolicy"],
-	"ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), GenerateArrayString(Policies, ErrorMessage)),
-    "RequirementMet" : Status
-}] {
-    ErrorMessage := "custom anti phish policy(ies) found where '?' for unauthenticated sender is not enabled:"
-    Policies := CustomAntiPhishNoUnauthSenderTips
-    Status := count(Policies) == 0
-}
-#--
-
 
 
 ################
