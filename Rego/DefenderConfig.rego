@@ -64,6 +64,7 @@ ApplyLicenseWarning(Message) := concat("", [ReportDetailsBoolean(false), License
 #
 # MS.DEFENDER.1.1v1
 #--
+
 ReportDetails1_1(Standard, Strict) := "Requirement met" if {
     Standard == true
     Strict == true
@@ -84,18 +85,53 @@ ReportDetails1_1(Standard, Strict) := "Standard and Strict preset policies are b
 tests[{
     "PolicyId" : "MS.DEFENDER.1.1v1",
     "Criticality" : "Shall",
-    "Commandlet" : ["Get-EOPProtectionPolicyRule"],
+    "Commandlet" : ["Get-EOPProtectionPolicyRule", "Get-ATPProtectionPolicyRule"],
 	"ActualValue" : {"StandardPresetState": IsStandardEnabled, "StrictPresetState": IsStrictEnabled},
     "ReportDetails" : ReportDetails1_1(IsStandardEnabled, IsStrictEnabled),
     "RequirementMet" : Status
 }] {
-    Policies := input.protection_policy_rules
-    IsStandardEnabled := count([Policy | Policy = Policies[_];
+    # For this one you need to check both:
+    # - Get-EOPProtectionPolicyRule
+    # - Get-ATPProtectionPolicyRule
+    #
+    # This is because there isn't an easy way to check if the toggle on
+    # the main "Preset secuirity policies" page is or set not. It is
+    # entirely possible for the standard/strict policies to be enabled
+    # but for one of the above commands to not reflect it.
+    #
+    # For example, if I enable the standard policy but only add users to
+    # Exchange online protection, Get-EOPProtectionPolicyRule will report
+    # the standard policy as enabled, but the standard policy won't even
+    # be included in the output of Get-ATPProtectionPolicyRule, and vice
+    # versa.
+    #
+    # TLDR: If at least one of the commandlets reports the policy as
+    # enabled, then the policy is enabled; if the policy is missing in
+    # the output of one, you need to check the other before you can
+    # conclude that it is disabled.
+
+    EOPPolicies := input.protection_policy_rules
+    IsStandardEOPEnabled := count([Policy | Policy = EOPPolicies[_];
         Policy.Identity == "Standard Preset Security Policy";
         Policy.State == "Enabled"]) > 0
-    IsStrictEnabled := count([Policy | Policy = Policies[_];
+    IsStrictEOPEnabled := count([Policy | Policy = EOPPolicies[_];
         Policy.Identity == "Strict Preset Security Policy";
         Policy.State == "Enabled"]) > 0
+
+    ATPPolicies := input.atp_policy_rules
+    IsStandardATPEnabled := count([Policy | Policy = ATPPolicies[_];
+        Policy.Identity == "Standard Preset Security Policy";
+        Policy.State == "Enabled"]) > 0
+    IsStrictATPEnabled := count([Policy | Policy = ATPPolicies[_];
+        Policy.Identity == "Strict Preset Security Policy";
+        Policy.State == "Enabled"]) > 0
+
+    StandardConditions := [IsStandardEOPEnabled, IsStandardATPEnabled]
+    IsStandardEnabled := count([Condition | Condition = StandardConditions[_]; Condition == true]) > 0
+
+    StrictConditions := [IsStrictEOPEnabled, IsStrictATPEnabled]
+    IsStrictEnabled := count([Condition | Condition = StrictConditions[_]; Condition == true]) > 0   
+
     Conditions := [IsStandardEnabled, IsStrictEnabled]
     Status := count([Condition | Condition = Conditions[_]; Condition == false]) == 0
 }
@@ -104,19 +140,6 @@ tests[{
 #
 # MS.DEFENDER.1.2v1
 #--
-
-# If "Apply protection to" is set to "All recipients":
-# - The policy will be included in the list output by Get-EOPProtectionPolicyRule"
-# - SentTo, SentToMemberOf, and RecipientDomainIs will all be null
-#
-# If "Apply protection to" is set to "None," the policy will be missing
-# entirely.
-#
-# If "Apply protection to" is set to "Specific recipients," at least
-# one of SentTo, SentToMemberOf, or RecipientDomainIs will not be null
-#
-# In short, we need to assert that at least one of the preset policies
-# is included in the output and has those three fields set to null.
 
 # TODO check exclusions
 
@@ -128,6 +151,23 @@ tests[{
     "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
+    # If "Apply protection to" is set to "All recipients":
+    # - The policy will be included in the list output by 
+    #   Get-EOPProtectionPolicyRule"
+    # - SentTo, SentToMemberOf, and RecipientDomainIs will all be
+    #   null.
+    #
+    # If "Apply protection to" is set to "None," the policy will be
+    # missing entirely.
+    #
+    # If "Apply protection to" is set to "Specific recipients," at
+    # least one of SentTo, SentToMemberOf, or RecipientDomainIs will
+    # not be null.
+    #
+    # In short, we need to assert that at least one of the preset
+    # policies is included in the output and has those three fields
+    # set to null.
+
     Policies := input.protection_policy_rules
     IsStandardAll := count([Policy | Policy = Policies[_];
         Policy.Identity == "Standard Preset Security Policy";
@@ -148,9 +188,6 @@ tests[{
 # MS.DEFENDER.1.3v1
 #--
 
-# See MS.DEFENDER.1.2v1, the same logic applies, just with a 
-# different commandlet.
-
 # TODO check exclusions
 
 tests[{
@@ -161,6 +198,9 @@ tests[{
     "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
+    # See MS.DEFENDER.1.2v1, the same logic applies, just with a
+    # different commandlet.
+
     Policies := input.atp_policy_rules
     IsStandardAll := count([Policy | Policy = Policies[_];
         Policy.Identity == "Standard Preset Security Policy";
