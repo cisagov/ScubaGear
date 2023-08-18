@@ -37,6 +37,41 @@ test_disableProductionEnvironmentCreationByNonAdminUsers_Incorrect if {
     RuleOutput[0].ReportDetails == "Requirement not met"
 }
 
+#
+# Policy 2
+#--
+test_disableTrialEnvironmentCreationByNonAdminUsers_Correct if {
+    PolicyId := "MS.POWERPLATFORM.1.2v1"
+
+    Output := tests with input as {
+        "environment_creation": [{
+            "disableTrialEnvironmentCreationByNonAdminUsers" : true
+        }]
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "Requirement met"
+}
+
+test_disableTrialEnvironmentCreationByNonAdminUsers_Incorrect if {
+    PolicyId := "MS.POWERPLATFORM.1.2v1"
+
+    Output := tests with input as {
+        "environment_creation": [{
+            "disableTrialEnvironmentCreationByNonAdminUsers" : false
+        }]
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "Requirement not met"
+}
+
 # TODO: Need to resolve Policy ID
 # 
 #--
