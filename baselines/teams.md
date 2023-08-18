@@ -118,7 +118,7 @@ Learn](https://learn.microsoft.com/en-us/microsoftteams/teams-live-events/live-e
 
 ### Implementation
 All the settings in this section are configured in the **Microsoft Teams admin
-    center**
+    center**.
 #### MS.TEAMS.1.1v1 instructions:
 To ensure external participants do not have the ability to request
 control of the shared desktop or window in the meeting:
@@ -143,7 +143,7 @@ To configure settings for anonymous users:
 
 3.	Select the **Global (Org-wide default)** policy.
 
-4.	Under the **Meeting join & lobby** section , set **Anonymous users and dial-in callers can start a meeting** to **Off**.
+4.	Under the **Meeting join & lobby** section, set **Anonymous users and dial-in callers can start a meeting** to **Off**.
 
 5.	If custom policies have been created, repeat these steps for each policy, selecting the appropriate policy in step 3.
 
@@ -154,7 +154,7 @@ To configure settings for anonymous users:
 
 3.	Select the **Global (Org-wide default)** policy.
 
-4.	Under the **Meeting join & lobby** section , ensure **Who can bypass the lobby** is **not** set to **Everyone**. Bypassing the lobby should be set to **People in my org**, though other options may be used if needed.
+4.	Under the **Meeting join & lobby** section, ensure **Who can bypass the lobby** is **not** set to **Everyone**. Bypassing the lobby should be set to **People in my org**, though other options may be used if needed.
 
 5.	In the same section, set **People dialing in can bypass the lobby** to **Off**.
 #### MS.TEAMS.1.4v1 instructions:
@@ -164,7 +164,7 @@ To configure settings for anonymous users:
 
 3.	Select the **Global (Org-wide default)** policy.
 
-4.	Under the **Meeting join & lobby** section , ensure **Who can bypass the lobby** is set to **People in my org**.
+4.	Under the **Meeting join & lobby** section, ensure **Who can bypass the lobby** is set to **People in my org**.
 
 5.	In the same section, set **People dialing in can bypass the lobby** to **Off**.
 #### MS.TEAMS.1.5v1 instructions:
@@ -333,7 +333,7 @@ This section helps reduce security risks related to contact with Skype users. As
 
 #### MS.TEAMS.3.1v1
 Contact with Skype users SHALL be blocked.
-- _Rationale:_ The security risk of allowing contact with Skype users is aligned with the risk of contact with a retiring product and its current vulnerabilities. Microsoft is officailly retiring all forms of Skype as listed above. By blocking contact with Skype users an agency is limiting access to security threats utilizing the vulnerabilities of the Skype product.
+- _Rationale:_ The security risk of allowing contact with Skype users is aligned with the risk of contact with a retiring product and its current vulnerabilities. Microsoft is officially retiring all forms of Skype as listed above. By blocking contact with Skype users an agency is limiting access to security threats utilizing the vulnerabilities of the Skype product.
 - _Last modified:_ July 2023
 
 ### Resources
@@ -411,19 +411,19 @@ development, that users sideload into Teams.
 
 #### MS.TEAMS.5.1v1
 Agencies SHOULD only allow installation of Microsoft Apps approved by the agency.
-- _Rationale:_ The security risk with allowing integration for all Microsoft Apps is access to Teams information through vulnerabilties that can be present in app unmanged by the agency. By only allowing specific apps and blocking all others the agency will better manage its app integration and potential exposure points.
+- _Rationale:_ The security risk with allowing integration for all Microsoft Apps is access to Teams information through vulnerabilities that can be present in app unmanaged by the agency. By only allowing specific apps and blocking all others the agency will better manage its app integration and potential exposure points.
 - _Last modified:_ July 2023
 - _Note:_ This policy applies to the Global (Org-wide default) policy, all custom policies, and the org-wide app settings. Custom policies MAY be created to allow more flexibility for specific users.
  
 #### MS.TEAMS.5.2v1
 Agencies SHOULD only allow installation of third-party apps approved by the agency.
-- _Rationale:_ The security risk with allowing integration of third-party apps is access to Teams information through vulnerabilties that can be present in an app unmanged by the agency. By blocking intallation of all third-party apps, the agency will disable the integration for Teams to said apps.
+- _Rationale:_ The security risk with allowing integration of third-party apps is access to Teams information through vulnerabilities that can be present in an app unmanaged by the agency. By blocking installation of all third-party apps, the agency will disable the integration for Teams to said apps.
 - _Last modified:_ July 2023
 - _Note:_ This policy applies to the Global (Org-wide default) policy, all custom policies if they exist, and the org-wise settings. Custom policies MAY be created to allow more flexibility for specific users. Third-party apps are not available in GCC, GCC High, or DoD regions.
 
 #### MS.TEAMS.5.3v1
 Agencies SHOULD only allow installation of custom apps approved by the agency.
-- _Rationale:_ The security risk with allowing integration of custom apps is access to Teams information through vulnerabilties that can be present in an app unmanged by the agency. By blocking intallation of all custom apps, the agency will disable the integration for Teams to said apps.
+- _Rationale:_ The security risk with allowing integration of custom apps is access to Teams information through vulnerabilities that can be present in an app unmanaged by the agency. By blocking installation of all custom apps, the agency will disable the integration for Teams to said apps.
 - _Last modified:_ July 2023
 - _Note:_ This policy applies to the Global (Org-wide default) policy, all custom policies if they exist, and the org-wise settings. Custom policies MAY be created to allow more flexibility for specific users. Custom apps are not available in GCC, GCC High, or DoD regions.
 
@@ -601,7 +601,7 @@ Any product that meets the requirements outlined in this baseline policy may be 
 
 Several technologies exist for protecting users from malicious links
 included in emails. For example, Microsoft Defender accomplishes this by
-prepending
+prepending:
 
 `https://*.safelinks.protection.outlook.com/?url=`
 
