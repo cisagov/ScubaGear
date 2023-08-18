@@ -740,9 +740,9 @@ tests[{
 #--
 
 
-#################
-# Baseline 2.10 #
-#################
+#
+# MS.DEFENDER.6.1v1
+#--
 
 CorrectLogConfigs[{
     "Identity": AuditLog.Identity,
@@ -752,11 +752,8 @@ CorrectLogConfigs[{
     AuditLog.UnifiedAuditLogIngestionEnabled == true
 }
 
-#
-# Baseline 2.10: Policy 1
-#--
 tests[{
-    "PolicyId" : "MS.DEFENDER.10.1v1",
+    "PolicyId" : "MS.DEFENDER.6.1v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-AdminAuditLogConfig"],
 	"ActualValue" : CorrectLogConfigs,
@@ -768,7 +765,7 @@ tests[{
 #--
 
 #
-# Baseline 2.10: Policy 2
+# MS.DEFENDER.6.2v1
 #--
 # Turns out audit logging is non-trivial to implement and test for.
 # Would require looping through all users. See discussion in GitHub
@@ -781,13 +778,13 @@ tests[{
     "ReportDetails" : NotCheckedDetails(PolicyId),
     "RequirementMet" : false
 }] {
-    PolicyId := "MS.DEFENDER.10.2v1"
+    PolicyId := "MS.DEFENDER.6.2v1"
     true
 }
 #--
 
 #
-# Baseline 2.10: Policy 3
+# MS.DEFENDER.6.3v1
 #--
 # Dictated by OMB M-21-31: 12 months in hot storage and 18 months in cold
 # It is not required to maintain these logs in the M365 cloud environment; doing so would require an additional add-on SKU.
@@ -800,7 +797,7 @@ tests[{
     "ReportDetails" : NotCheckedDetails(PolicyId),
     "RequirementMet" : false
 }] {
-    PolicyId := "MS.DEFENDER.10.3v1"
+    PolicyId := "MS.DEFENDER.6.3v1"
     true
 }
 #--
