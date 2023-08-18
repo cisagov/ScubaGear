@@ -393,20 +393,9 @@ tests[{
 }
 #--
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#
+# MS.DEFENDER.4.1v1
+#--
 
 # Determine the set of rules that pertain to SSNs, ITINs, or credit card numbers.
 # Used in multiple bullet points below
@@ -432,9 +421,6 @@ SensitiveRules[{
     Policy.Enabled == true
 }
 
-#
-# MS.DEFENDER.2.1v1
-#--
 # Step 1: Ensure that there is coverage for SSNs, ITINs, and credit cards
 SSNRules[Rule.Name] {
     Rule := SensitiveRules[_]
@@ -453,8 +439,9 @@ CardRules[Rule.Name] {
 
 tests[{
     #TODO: Appears this policy is broken into 3 parts in code and only 1 in baseline 
+    # Combine this and the following two that are commented out into a single test
     #"Requirement" : "A custom policy SHALL be configured to protect PII and sensitive information, as defined by the agency: U.S. Social Security Number (SSN)",
-    "PolicyId" : "MS.DEFENDER.2.1v1",
+    "PolicyId" : "MS.DEFENDER.4.1v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-DlpComplianceRule"],
 	"ActualValue" : Rules,
@@ -466,38 +453,39 @@ tests[{
     Status := count(Rules) > 0
 }
 
-tests[{
-    "Requirement" : "A custom policy SHALL be configured to protect PII and sensitive information, as defined by the agency: U.S. Individual Taxpayer Identification Number (ITIN)",
-    "Control" : "Defender 2.2",
-    "Criticality" : "Shall",
-    "Commandlet" : ["Get-DlpComplianceRule"],
-	"ActualValue" : Rules,
-    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
-    "RequirementMet" : Status
-}] {
-    Rules := ITINRules
-    ErrorMessage := "No matching rule found for U.S. Individual Taxpayer Identification Number (ITIN)"
-    Status := count(Rules) > 0
-}
+# tests[{
+#     "Requirement" : "A custom policy SHALL be configured to protect PII and sensitive information, as defined by the agency: U.S. Individual Taxpayer Identification Number (ITIN)",
+#     "Control" : "Defender 2.2",
+#     "Criticality" : "Shall",
+#     "Commandlet" : ["Get-DlpComplianceRule"],
+# 	"ActualValue" : Rules,
+#     "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
+#     "RequirementMet" : Status
+# }] {
+#     Rules := ITINRules
+#     ErrorMessage := "No matching rule found for U.S. Individual Taxpayer Identification Number (ITIN)"
+#     Status := count(Rules) > 0
+# }
 
-tests[{
-    "Requirement" : "A custom policy SHALL be configured to protect PII and sensitive information, as defined by the agency: Credit Card Number",
-    "Control" : "Defender 2.2",
-    "Criticality" : "Shall",
-    "Commandlet" : ["Get-DlpComplianceRule"],
-	"ActualValue" : Rules,
-    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
-    "RequirementMet" : Status
-}] {
-    Rules := CardRules
-    ErrorMessage := "No matching rule found for Credit Card Number"
-    Status := count(Rules) > 0
-}
+# tests[{
+#     "Requirement" : "A custom policy SHALL be configured to protect PII and sensitive information, as defined by the agency: Credit Card Number",
+#     "Control" : "Defender 2.2",
+#     "Criticality" : "Shall",
+#     "Commandlet" : ["Get-DlpComplianceRule"],
+# 	"ActualValue" : Rules,
+#     "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
+#     "RequirementMet" : Status
+# }] {
+#     Rules := CardRules
+#     ErrorMessage := "No matching rule found for Credit Card Number"
+#     Status := count(Rules) > 0
+# }
 #--
 
 #
-# Baseline 2.2: Policy 2
+# MS.DEFENDER.4.2v1
 #--
+
 # Step 2: determine the set of sensitive policies that apply to EXO, Teams, etc.
 ExchangePolicies[{
     "Name" : Policy.Name,
@@ -548,9 +536,10 @@ TeamsPolicies[{
 }
 
 tests[{
-    #TODO: Appears this policy is broken into 4 parts in code and only 1 in baseline
+    # TODO: Appears this policy is broken into 4 parts in code and only 1 in baseline
+    # Combine this test and the following 3 commented out tests into a single test
     #"Requirement" : "The custom policy SHOULD be applied in Exchange",
-    "PolicyId" : "MS.DEFENDER.2.2v1",
+    "PolicyId" : "MS.DEFENDER.4.2v1",
     "Criticality" : "Should",
     "Commandlet" : ["Get-DLPCompliancePolicy"],
 	"ActualValue" : Policies,
@@ -562,51 +551,51 @@ tests[{
     Status := count(Policies) > 0
 }
 
-tests[{
-    "Requirement" : "The custom policy SHOULD be applied in SharePoint",
-    "Control" : "Defender 2.2",
-    "Criticality" : "Should",
-    "Commandlet" : ["Get-DLPCompliancePolicy"],
-	"ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
-    "RequirementMet" : Status
-}] {
-    Policies := SharePointPolicies
-    ErrorMessage := "No policy found that applies to SharePoint."
-    Status := count(Policies) > 0
-}
+# tests[{
+#     "Requirement" : "The custom policy SHOULD be applied in SharePoint",
+#     "Control" : "Defender 2.2",
+#     "Criticality" : "Should",
+#     "Commandlet" : ["Get-DLPCompliancePolicy"],
+# 	"ActualValue" : Policies,
+#     "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
+#     "RequirementMet" : Status
+# }] {
+#     Policies := SharePointPolicies
+#     ErrorMessage := "No policy found that applies to SharePoint."
+#     Status := count(Policies) > 0
+# }
 
-tests[{
-    "Requirement" : "The custom policy SHOULD be applied in OneDrive",
-    "Control" : "Defender 2.2",
-    "Criticality" : "Should",
-    "Commandlet" : ["Get-DLPCompliancePolicy"],
-	"ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
-    "RequirementMet" : Status
-}] {
-    Policies := OneDrivePolicies
-    ErrorMessage := "No policy found that applies to OneDrive."
-    Status := count(Policies) > 0
-}
+# tests[{
+#     "Requirement" : "The custom policy SHOULD be applied in OneDrive",
+#     "Control" : "Defender 2.2",
+#     "Criticality" : "Should",
+#     "Commandlet" : ["Get-DLPCompliancePolicy"],
+# 	"ActualValue" : Policies,
+#     "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
+#     "RequirementMet" : Status
+# }] {
+#     Policies := OneDrivePolicies
+#     ErrorMessage := "No policy found that applies to OneDrive."
+#     Status := count(Policies) > 0
+# }
 
-tests[{
-    "Requirement" : "The custom policy SHOULD be applied in Teams",
-    "Control" : "Defender 2.2",
-    "Criticality" : "Should",
-    "Commandlet" : ["Get-DLPCompliancePolicy"],
-	"ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
-    "RequirementMet" : Status
-}] {
-    Policies := TeamsPolicies
-    ErrorMessage := "No policy found that applies to Teams."
-    Status := count(Policies) > 0
-}
+# tests[{
+#     "Requirement" : "The custom policy SHOULD be applied in Teams",
+#     "Control" : "Defender 2.2",
+#     "Criticality" : "Should",
+#     "Commandlet" : ["Get-DLPCompliancePolicy"],
+# 	"ActualValue" : Policies,
+#     "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
+#     "RequirementMet" : Status
+# }] {
+#     Policies := TeamsPolicies
+#     ErrorMessage := "No policy found that applies to Teams."
+#     Status := count(Policies) > 0
+# }
 #--
 
 #
-# Baseline 2.2: Policy 3
+# MS.DEFENDER.4.3v1
 #--
 # Step 3: Ensure that the action for the rules is set to block
 SensitiveRulesNotBlocking[Rule.Name] {
@@ -628,7 +617,7 @@ SensitiveRulesNotBlocking[Rule.Name] {
 }
 
 tests[{
-    "PolicyId" : "MS.DEFENDER.2.3v1",
+    "PolicyId" : "MS.DEFENDER.4.3v1",
     "Criticality" : "Should",
     "Commandlet" : ["Get-DlpComplianceRule"],
 	"ActualValue" : Rules,
@@ -642,7 +631,7 @@ tests[{
 #--
 
 #
-# Baseline 2.2: Policy 4
+# MS.DEFENDER.4.4v1
 #--
 # Step 4: ensure that some user is notified in the event of a DLP violation
 SensitiveRulesNotNotifying[Rule.Name] {
@@ -651,7 +640,7 @@ SensitiveRulesNotNotifying[Rule.Name] {
 }
 
 tests[{
-    "PolicyId" : "MS.DEFENDER.2.4v1",
+    "PolicyId" : "MS.DEFENDER.4.4v1",
     "Criticality" : "Should",
     "Commandlet" : ["Get-DlpComplianceRule"],
 	"ActualValue" : Rules,
@@ -665,7 +654,7 @@ tests[{
 #--
 
 #
-# Baseline 2.2: Policy 5
+# MS.DEFENDER.4.5v1
 #--
 # At this time we are unable to test for X because of Y
 tests[{
@@ -676,13 +665,13 @@ tests[{
     "ReportDetails" : NotCheckedDetails(PolicyId),
     "RequirementMet" : false
 }] {
-    PolicyId := "MS.DEFENDER.2.5v1"
+    PolicyId := "MS.DEFENDER.4.5v1"
     true
 }
 #--
 
 #
-# Baseline 2.2: Policy 6
+# MS.DEFENDER.4.6v1
 #--
 # At this time we are unable to test for X because of Y
 tests[{
@@ -693,7 +682,7 @@ tests[{
     "ReportDetails" : NotCheckedDetails(PolicyId),
     "RequirementMet" : false
 }] {
-    PolicyId := "MS.DEFENDER.2.6v1"
+    PolicyId := "MS.DEFENDER.4.6v1"
     true
 }
 #--
