@@ -247,7 +247,7 @@ Internal users SHOULD NOT be enabled to initiate contact with unmanaged
 users.
 - _Rationale:_ Access to unmanaged users can pose the risk of data leakage and other security threats. This policy provides protection by disabling the internal user access to unmanaged users. 
 - _Last modified:_ July 2023
-- _Note:_ This policy is not applicable to gcc, gcchigh and dod licensed tenants.  
+- _Note:_ This policy is not applicable to GCC, GCC High and DoD tenants.  
 
 ### Resources
 
