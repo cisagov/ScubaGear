@@ -448,7 +448,7 @@ All the settings in this section are configured in the **Microsoft Teams admin c
 
 3.  Select **Global (Org-wide default)**.
 
-4.  Under **Microsoft apps**, select **"Allow specific apps and block all others"** or **Block all apps**.
+4.  Under **Microsoft apps**, select **Allow specific apps and block all others** or **Block all apps**.
 
 5.  Click **Allow apps**.
 
