@@ -49,6 +49,25 @@ tests[{
 }
 #--
 
+#
+# MS.POWERPLATFORM.1.2v1
+#--
+tests[{
+    #"Requirement" : "The ability to create production and sandbox environments SHALL be restricted to admins",
+    "PolicyId" : "MS.POWERPLATFORM.1.2v1",
+    "Criticality" : "Shall",
+    "Commandlet" : ["Get-TenantSettings"],
+    "ActualValue" : EnvironmentCreation.disableTrialEnvironmentCreationByNonAdminUsers,
+    "ReportDetails" : ReportDetailsBoolean(Status),
+    "RequirementMet" : Status
+}] {
+    EnvironmentCreation := input.environment_creation[_]
+    Status := EnvironmentCreation.disableTrialEnvironmentCreationByNonAdminUsers == true
+    #TenantSettings := input.tenant_settings[_]
+    #Status := TenantSettings.disablePortalsCreationByNonAdminUsers == true
+}
+#--
+
 # TODO: Resolve Policy Id 
 # Baseline 2.1: Policy 2 
 #--
@@ -321,22 +340,6 @@ tests[{
 #--
 
 #
-# MS.POWERPLATFORM.3.3v1
-#--
-tests[{
-    "PolicyId" : PolicyId,
-    "Criticality" : "Should/Not-Implemented",
-    "Commandlet" : [],
-    "ActualValue" : [],
-    "ReportDetails" : NotCheckedDetails(PolicyId),
-    "RequirementMet" : false
-}] {
-    PolicyId := "MS.POWERPLATFORM.3.3v1"
-    true
-}
-#--
-
-#
 # MS.POWERPLATFORM.4.1v1
 #--
 # At this time we are unable to test for X because of Y
@@ -356,16 +359,18 @@ tests[{
 #
 # MS.POWERPLATFORM.5.1v1
 #--
-# At this time we are unable to test for X because of Y
+#
 tests[{
-    "PolicyId" : PolicyId,
+    "PolicyId" : "MS.POWERPLATFORM.5.1v1",
     "Criticality" : "Should",
-    "Commandlet" : [],
-    "ActualValue" : [],
-    "ReportDetails" : NotCheckedDetails(PolicyId),
-    "RequirementMet" : false
+    "Commandlet" : ["Get-TenantSettings"],
+    "ActualValue" : EnvironmentCreation.disablePortalsCreationByNonAdminUsers,
+    "ReportDetails" : ReportDetailsBoolean(Status),
+    "RequirementMet" : Status
 }] {
-    PolicyId := "MS.POWERPLATFORM.5.1v1"
-    true
+    EnvironmentCreation := input.environment_creation[_]
+    Status := EnvironmentCreation.disablePortalsCreationByNonAdminUsers == true
+    #TenantSettings := input.tenant_settings[_]
+    #Status := TenantSettings.disablePortalsCreationByNonAdminUsers == true
 }
 #--
