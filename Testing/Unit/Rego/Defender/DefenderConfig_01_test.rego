@@ -161,6 +161,7 @@ test_Enabled_Incorrect_V4 if {
     not RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "Standard and Strict preset policies are both disabled"
 }
+#--
 
 #
 # Policy 2
@@ -295,6 +296,7 @@ test_AllEOP_Incorrect_V3 if {
     not RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "Requirement not met"
 }
+#--
 
 #
 # Policy 3
@@ -429,3 +431,75 @@ test_AllDefender_Incorrect_V3 if {
     not RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "Requirement not met"
 }
+
+#
+# Policy 4
+#--
+test_SensitiveEOP_Correct_V1 if {
+    PolicyId := "MS.DEFENDER.1.4v1"
+
+    Output := tests with input as {  
+        "protection_policy_rules" : [
+            {
+                "Identity" : "Strict Preset Security Policy"
+            }
+        ] 
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "Requirement met"
+}
+
+test_SensitiveEOP_Incorrect_V1 if {
+    PolicyId := "MS.DEFENDER.1.4v1"
+
+    Output := tests with input as {  
+        "protection_policy_rules" : [] 
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "Requirement not met"
+}
+#--
+
+#
+# Policy 5
+#--
+test_SensitiveEOP_Correct_V1 if {
+    PolicyId := "MS.DEFENDER.1.5v1"
+
+    Output := tests with input as {  
+        "atp_policy_rules" : [
+            {
+                "Identity" : "Strict Preset Security Policy"
+            }
+        ] 
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "Requirement met"
+}
+
+test_SensitiveEOP_Incorrect_V1 if {
+    PolicyId := "MS.DEFENDER.1.5v1"
+
+    Output := tests with input as {  
+        "atp_policy_rules" : [] 
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "Requirement not met"
+}
+#--
