@@ -99,16 +99,16 @@ Record an event SHOULD be set to Organizer can record.
 ### Resources
 
 - [Manage who can present and request control in Microsoft Teams \| Microsoft
-  Docs](https://learn.microsoft.com/en-us/microsoftteams/meeting-who-present-request-control) 
-- [Meeting policy settings \| Microsoft Docs](https://learn.microsoft.com/en-us/microsoftteams/settings-policies-reference#meetings)
+  Learn](https://learn.microsoft.com/en-us/microsoftteams/meeting-who-present-request-control) 
+- [Meeting policy settings \| Microsoft Learn](https://learn.microsoft.com/en-us/microsoftteams/settings-policies-reference#meetings)
 
 - [Teams cloud meeting recording \| Microsoft
-Docs](https://learn.microsoft.com/en-us/microsoftteams/cloud-recording)
+Learn ](https://learn.microsoft.com/en-us/microsoftteams/cloud-recording)
 
 - [Assign policies in Teams – getting started \| Microsoft
-Docs](https://learn.microsoft.com/en-us/microsoftteams/policy-assignment-overview)
+Learn](https://learn.microsoft.com/en-us/microsoftteams/policy-assignment-overview)
 - [Live Event Recording Policies \| Microsoft
-Docs](https://learn.microsoft.com/en-us/microsoftteams/teams-live-events/live-events-recording-policies)
+Learn](https://learn.microsoft.com/en-us/microsoftteams/teams-live-events/live-events-recording-policies)
 
 
 
@@ -247,23 +247,23 @@ Internal users SHOULD NOT be enabled to initiate contact with unmanaged
 users.
 - _Rationale:_ Access to unmanaged users can pose the risk of data leakage and other security threats. This policy provides protection by disabling the internal user access to unmanaged users. 
 - _Last modified:_ July 2023
-- _Note:_ This policy is not applicable to GCC, GCC High and DoD tenants.  
+- _Note:_ This policy is not applicable to GCC, GCC High, and DoD tenants.  
 
 ### Resources
 
 - [Manage external access in Microsoft Teams \| Microsoft
-  Docs](https://learn.microsoft.com/en-us/microsoftteams/manage-external-access)
+  Learn](https://learn.microsoft.com/en-us/microsoftteams/manage-external-access)
 
 - [Allow anonymous users to join meetings \| Microsoft
-  Docs](https://learn.microsoft.com/en-us/microsoftteams/meeting-settings-in-teams#allow-anonymous-users-to-join-meetings)
+  Learn](https://learn.microsoft.com/en-us/microsoftteams/meeting-settings-in-teams#allow-anonymous-users-to-join-meetings)
 
 - [Use guest access and external access to collaborate with people
   outside your organization \| Microsoft
-  Docs](https://learn.microsoft.com/en-us/microsoftteams/communicate-with-users-from-other-organizations)
+  Learn](https://learn.microsoft.com/en-us/microsoftteams/communicate-with-users-from-other-organizations)
 
 - [Manage contact with external Teams users not managed by an organization
 \| Microsoft
-Docs](https://learn.microsoft.com/en-us/microsoftteams/manage-external-access#manage-contact-with-external-teams-users-not-managed-by-an-organization)
+Learn](https://learn.microsoft.com/en-us/microsoftteams/manage-external-access#manage-contact-with-external-teams-users-not-managed-by-an-organization)
 
 ### License Requirements
 
@@ -339,7 +339,7 @@ Contact with Skype users SHALL be blocked.
 ### Resources
 
 - [Communicate with Skype users \| Microsoft
-Docs](https://learn.microsoft.com/en-us/microsoftteams/external-meetings-skype-for-business-server-hybrid)
+Learn](https://learn.microsoft.com/en-us/microsoftteams/external-meetings-skype-for-business-server-hybrid)
 
 - [Skype for Business Online to Be Retired in 2021 \| Microsoft Teams
 Blog](https://techcommunity.microsoft.com/t5/microsoft-teams-blog/skype-for-business-online-to-be-retired-in-2021/ba-p/777833)
@@ -371,12 +371,12 @@ This section helps reduce security risks related to Teams email integration. Tea
 Teams email integration SHALL be disabled.
 - _Rationale:_ Microsoft Teams email integration associates a Microsoft, not tenant domain, email address with a Teams channel. Channel emails are addressed using the Microsoft-owned domain teams.ms. By disabling Teams email integration, an agency prevents potentially sensitive Teams messages from being sent through external email gateways.  
 - _Last modified:_ July 2023
-- _Note:_ Teams email integration is not available in GCC, GCC High or DoD regions.
+- _Note:_ Teams email integration is not available in GCC, GCC High, or DoD regions.
 
 ### Resources
 
 - [Email Integration \| Microsoft
-Docs](https://learn.microsoft.com/en-us/microsoftteams/settings-policies-reference#email-integration)
+Learn](https://learn.microsoft.com/en-us/microsoftteams/settings-policies-reference#email-integration)
 
 ### License Requirements
 
@@ -419,21 +419,19 @@ Agencies SHOULD only allow installation of Microsoft Apps approved by the agency
 Agencies SHOULD only allow installation of third-party apps approved by the agency.
 - _Rationale:_ The security risk with allowing integration of third-party apps is access to Teams information through vulnerabilties that can be present in an app unmanged by the agency. By blocking intallation of all third-party apps, the agency will disable the integration for Teams to said apps.
 - _Last modified:_ July 2023
-- _Note:_ This policy applies to the Global (Org-wide default) policy, all custom policies if they exist, and the org-wise settings. Custom policies MAY be created to allow more flexibility for specific users. Third-party apps are not available in GCC, GCC High or DoD regions.
+- _Note:_ This policy applies to the Global (Org-wide default) policy, all custom policies if they exist, and the org-wise settings. Custom policies MAY be created to allow more flexibility for specific users. Third-party apps are not available in GCC, GCC High, or DoD regions.
 
 #### MS.TEAMS.5.3v1
 Agencies SHOULD only allow installation of custom apps approved by the agency.
 - _Rationale:_ The security risk with allowing integration of custom apps is access to Teams information through vulnerabilties that can be present in an app unmanged by the agency. By blocking intallation of all custom apps, the agency will disable the integration for Teams to said apps.
 - _Last modified:_ July 2023
-- _Note:_ This policy applies to the Global (Org-wide default) policy, all custom policies if they exist, and the org-wise settings. Custom policies MAY be created to allow more flexibility for specific users. Custom apps are not available in GCC, GCC High or DoD regions.
+- _Note:_ This policy applies to the Global (Org-wide default) policy, all custom policies if they exist, and the org-wise settings. Custom policies MAY be created to allow more flexibility for specific users. Custom apps are not available in GCC, GCC High, or DoD regions.
 
 ### Resources
 
-- [Manage app permission policies in Microsoft Teams \| Microsoft
-Docs](https://learn.microsoft.com/en-us/microsoftteams/teams-app-permission-policies)
+- [Manage app permission policies in Microsoft Teams \| Microsoft Learn](https://learn.microsoft.com/en-us/microsoftteams/teams-app-permission-policies)
 
-- [Upload your app in Microsoft Teams \| Microsoft
-Docs](https://learn.microsoft.com/en-us/microsoftteams/platform/concepts/deploy-and-publish/apps-upload)
+- [Upload your app in Microsoft Teams \| Microsoft Learn](https://learn.microsoft.com/en-us/microsoftteams/platform/concepts/deploy-and-publish/apps-upload)
 
 ### License Requirements
 
@@ -538,8 +536,7 @@ and Social Security Numbers (SSN) via email SHALL be restricted.
 
 ### Resources
 
-- [Plan for data loss prevention (DLP) \| Microsoft
-  Docs](https://learn.microsoft.com/en-us/microsoft-365/compliance/dlp-overview-plan-for-dlp?view=o365-worldwide)
+- [Plan for data loss prevention (DLP) \| Microsoft Learn](https://learn.microsoft.com/en-us/microsoft-365/compliance/dlp-overview-plan-for-dlp?view=o365-worldwide)
 
 - [Personally identifiable information (PII) \|
   NIST](https://csrc.nist.gov/glossary/term/personally_identifiable_information#:~:text=NISTIR%208259,2%20under%20PII%20from%20EGovAct)
@@ -550,8 +547,7 @@ and Social Security Numbers (SSN) via email SHALL be restricted.
 ### License Requirements
 
 - DLP for Teams requires an E5 or G5 license. See [Information
-  Protection: Data Loss Prevention for Teams \| Microsoft
-  Docs](https://learn.microsoft.com/en-us/office365/servicedescriptions/microsoft-365-service-descriptions/microsoft-365-tenantlevel-services-licensing-guidance/microsoft-365-security-compliance-licensing-guidance#information-protection-data-loss-prevention-for-teams)
+  Protection: Data Loss Prevention for Teams \| Microsoft Learn](https://learn.microsoft.com/en-us/office365/servicedescriptions/microsoft-365-service-descriptions/microsoft-365-tenantlevel-services-licensing-guidance/microsoft-365-security-compliance-licensing-guidance#information-protection-data-loss-prevention-for-teams)
   for more information.
 
 ### Implementation
@@ -563,7 +559,7 @@ Any product that meets the requirements outlined in this baseline policy may be 
 
 ## 7. Malware Scanning
 
-Any product that meets the requirements outlined in this baselinepolicy group may be used. If the agency is using Microsoft Defender to implement malware scanning, see the following policies of the CISA M365 Security Configuration Baseline for Defender for Office 365 for additional guidance.
+Any product that meets the requirements outlined in this baseline policy group may be used. If the agency is using Microsoft Defender to implement malware scanning, see the following policies of the CISA M365 Security Configuration Baseline for Defender for Office 365 for additional guidance.
 
 - [MS.DEFENDER.3.1v1 \| CISA M365 Security Configuration Baseline for Defender for Office 365](./defender.md#msdefender31v1)
   - Safe attachments SHOULD be enabled for SharePoint, OneDrive, and Microsoft Teams.
@@ -591,7 +587,7 @@ Users SHOULD be prevented from opening or downloading files detected as malware.
 
 ### License Requirements
 
-- IF using Microsfot Defender, requires Defender for Office 365 Plan 1 or 2. These are included with
+- If using Microsoft Defender, requires Defender for Office 365 Plan 1 or 2. These are included with
   E5 and G5 and are available as add-ons for E3 and G3.
 
 ### Implementation
@@ -643,8 +639,7 @@ User click tracking SHOULD be enabled.
 ### Resources
 
 - [Recommended settings for EOP and Microsoft Defender for Office 365
-  security \| Microsoft
-  Docs](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/recommended-settings-for-eop-and-office365)
+  security \| Microsoft Learn](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/recommended-settings-for-eop-and-office365)
 
 - [Set up Safe Links policies in Microsoft Defender for Office 365 \| Microsoft Learn](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/safe-links-policies-configure?view=o365-worldwide)
   
