@@ -368,6 +368,42 @@ tests[{
 }
 #--
 
+#
+# MS.DEFENDER.3.1v1
+#--
+
+# Find the set of policies that have EnableATPForSPOTeamsODB set to true
+ATPPolicies[{
+    "Identity" : Policy.Identity,
+    "EnableATPForSPOTeamsODB" : Policy.EnableATPForSPOTeamsODB}] {
+    Policy := input.atp_policy_for_o365[_]
+    Policy.EnableATPForSPOTeamsODB == true
+}
+
+tests[{
+    "PolicyId" : "MS.DEFENDER.3.1v1",
+    "Criticality" : "Should",
+    "Commandlet" : ["Get-AtpPolicyForO365"],
+	"ActualValue" : Policies,
+    "ReportDetails" : ApplyLicenseWarning(ReportDetailsBoolean(Status)),
+    "RequirementMet" : Status
+}] {
+    Policies := ATPPolicies
+    Status := count(Policies) > 0
+}
+#--
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1477,123 +1513,6 @@ tests[{
     Status := count(Policies) >= 1
 }
 #--
-
-
-################
-# Baseline 2.8 #
-################
-
-#
-# Baseline 2.8: Policy 1
-#--
-# find the set of policies that are applied to all of the tenant's domains
-AllDomainsSafeAttachmentRules[{
-    "SafeAttachmentPolicy" : Rule.SafeAttachmentPolicy,
-    "RecipientDomains" : RecipientDomains}] {
-    Rule := input.safe_attachment_rules[_]
-    DomainNames = {Name.DomainName | Name = input.all_domains[_]}
-    RecipientDomains = {Name | Name = Rule.RecipientDomainIs[_]}
-    Difference := DomainNames - RecipientDomains # set difference
-    count(Difference) == 0
-}
-
-tests[{
-    "PolicyId" : "MS.DEFENDER.8.1v1",
-    "Criticality" : "Shall",
-    "Commandlet" : ["Get-SafeAttachmentRule", "Get-AcceptedDomain"],
-	"ActualValue" : AllDomainsSafeAttachmentRules,
-    "ReportDetails" : ApplyLicenseWarning(CustomizeError(ReportDetailsBoolean(Status), ErrorMessage)),
-	"RequirementMet" : Status
-}] {
-	DomainNames := {Name.DomainName | Name = input.all_domains[_]}
-    ErrorMessage := concat("", ["No policy found that applies to all domains: ", concat(", ", DomainNames)])
-    Status := count(AllDomainsSafeAttachmentRules) > 0
-}
-#--
-
-#
-# Baseline 2.8: Policy 2
-#--
-# Find the set of policies that:
-# - have the action set to block
-# - are enabled
-# - and are one of the policies that apply to all domains
-BlockMalwarePolicies[{
-    "Identity" : SafeAttachmentPolicies.Identity,
-    "Action" : SafeAttachmentPolicies.Action,
-    "Enable" : SafeAttachmentPolicies.Enable,
-    "RedirectAddress" : SafeAttachmentPolicies.RedirectAddress}] {
-        SafeAttachmentPolicies := input.safe_attachment_policies[_]
-        SafeAttachmentPolicies.Action == "Block"
-        SafeAttachmentPolicies.Enable
-        AllDomainsPoliciesNames := {Rule.SafeAttachmentPolicy | Rule = AllDomainsSafeAttachmentRules[_]}
-        SafeAttachmentPolicies.Identity in AllDomainsPoliciesNames
-}
-
-tests[{
-    "PolicyId" : "MS.DEFENDER.8.2v1",
-    "Criticality" : "Shall",
-    "Commandlet" : ["Get-SafeAttachmentPolicy", "Get-SafeAttachmentRule", "Get-AcceptedDomain"],
-	"ActualValue" : Policies,
-    "ReportDetails" : ApplyLicenseWarning(CustomizeError(ReportDetailsBoolean(Status), ErrorMessage)),
-    "RequirementMet" : Status
-}] {
-    Policies := BlockMalwarePolicies
-    ErrorMessage := "No enabled policy found with action set to block that apply to all domains"
-    Status := count(Policies) > 0
-}
-#--
-
-#
-# Baseline 2.8: Policy 3
-#--
-# Find the set of policies that are blocking malware and have a
-# redirection address specified
-RedirectionPolicies[{
-    "Identity" : Policy.Identity,
-    "RedirectAddress" : Policy.RedirectAddress}] {
-    Policy := BlockMalwarePolicies[_]
-    Policy.RedirectAddress != ""
-}
-
-tests[{
-    "PolicyId" : "MS.DEFENDER.8.3v1",
-    "Criticality" : "Should",
-    "Commandlet" : ["Get-SafeAttachmentPolicy", "Get-SafeAttachmentRule", "Get-AcceptedDomain"],
-	"ActualValue" : Policies,
-    "ReportDetails" : ApplyLicenseWarning(CustomizeError(ReportDetailsBoolean(Status), ErrorMessage)),
-    "RequirementMet" : Status
-}] {
-    Policies := RedirectionPolicies
-    ErrorMessage := "No enabled policy found with action set to block and at least one contact specified"
-    Status := count(Policies) > 0
-}
-#--
-
-#
-# Baseline 2.8: Policy 4
-#--
-# Find the set of policies that have EnableATPForSPOTeamsODB set to true
-ATPPolicies[{
-    "Identity" : Policy.Identity,
-    "EnableATPForSPOTeamsODB" : Policy.EnableATPForSPOTeamsODB}] {
-    Policy := input.atp_policy_for_o365[_]
-    Policy.EnableATPForSPOTeamsODB == true
-}
-
-tests[{
-    "PolicyId" : "MS.DEFENDER.8.4v1",
-    "Criticality" : "Should",
-    "Commandlet" : ["Get-AtpPolicyForO365"],
-	"ActualValue" : Policies,
-    "ReportDetails" : ApplyLicenseWarning(ReportDetailsBoolean(Status)),
-    "RequirementMet" : Status
-}] {
-    Policies := ATPPolicies
-    Status := count(Policies) > 0
-}
-#--
-
 
 #################
 # Baseline 2.9 #
