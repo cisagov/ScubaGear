@@ -74,7 +74,7 @@ Anonymous users and dial-in callers, SHOULD NOT be admitted automatically.
 
 #### MS.TEAMS.1.4v1
 Internal users SHOULD be admitted automatically.
-- _Rationale:_ Requiring internal users to waint in the lobby for explicit admit can lead to admit fatigue. This policy enables the internal users to be automatically admitted to meeting through global policy.  
+- _Rationale:_ Requiring internal users to wait in the lobby for explicit admit can lead to admit fatigue. This policy enables the internal users to be automatically admitted to meeting through global policy.  
 - _Last modified:_ July 2023
 - _Note:_ This policy applies to the Global (Org-wide default) meeting policy. Custom meeting policies MAY be created that allow more flexibility for specific users.
 
@@ -468,7 +468,7 @@ All the settings in this section are configured in the **Microsoft Teams admin c
 
 7.  Select **Teams apps** > **Manage apps**.
 8.  Select **Org-wide app settings** button to access pop-up options.
-    - Under **Third-pary apps** turn off **Third-pary apps**.
+    - Under **Third-party apps** turn off **Third-party apps**.
     - Click **Save**.
 2.  Select **Teams apps** > **Permission policies**.
 3.  Select **Global (Org-wide default)**.
