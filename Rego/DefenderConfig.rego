@@ -64,24 +64,40 @@ ApplyLicenseWarning(Message) := concat("", [ReportDetailsBoolean(false), License
 #
 # MS.DEFENDER.1.1v1
 #--
-StandardPresetSecurityPolicy[Rules.State] {
-    Rules := input.protection_policy_rules[_]
-    Rules.Identity == "Standard Preset Security Policy"
+ReportDetails1_1(Standard, Strict) := "Requirement met" if {
+    Standard == true
+    Strict == true
+}
+ReportDetails1_1(Standard, Strict) := "Standard preset policy is disabled" if {
+    Standard == false
+    Strict == true
+}
+ReportDetails1_1(Standard, Strict) := "Strict preset policy is disabled" if {
+    Standard == true
+    Strict == false
+}
+ReportDetails1_1(Standard, Strict) := "Standard and Strict preset policies are both disabled" if {
+    Standard == false
+    Strict == false
 }
 
 tests[{
-    #TODO: Multiple mappings
     "PolicyId" : "MS.DEFENDER.1.1v1",
-    "Criticality" : "Should",
+    "Criticality" : "Shall",
     "Commandlet" : ["Get-EOPProtectionPolicyRule"],
-	"ActualValue" : Policy,
-    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
+	"ActualValue" : {"StandardPresetState": IsStandardEnabled, "StrictPresetState": IsStrictEnabled},
+    "ReportDetails" : ReportDetails1_1(IsStandardEnabled, IsStrictEnabled),
     "RequirementMet" : Status
 }] {
-    Policy := StandardPresetSecurityPolicy
-    ErrorMessage := "The Standard Preset Security Policy is present and not disabled"
-    Conditions := [count(Policy) == 0, "Disabled" in Policy]
-    Status := count([Condition | Condition = Conditions[_]; Condition == true]) > 0
+    Policies := input.protection_policy_rules
+    IsStandardEnabled := count([Policy | Policy = Policies[_];
+        Policy.Identity == "Standard Preset Security Policy";
+        Policy.State == "Enabled"]) > 0
+    IsStrictEnabled := count([Policy | Policy = Policies[_];
+        Policy.Identity == "Strict Preset Security Policy";
+        Policy.State == "Enabled"]) > 0
+    Conditions := [IsStandardEnabled, IsStrictEnabled]
+    Status := count([Condition | Condition = Conditions[_]; Condition == false]) == 0
 }
 #--
 
