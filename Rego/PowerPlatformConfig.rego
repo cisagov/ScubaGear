@@ -63,34 +63,15 @@ tests[{
 }] {
     EnvironmentCreation := input.environment_creation[_]
     Status := EnvironmentCreation.disableTrialEnvironmentCreationByNonAdminUsers == true
-    #TenantSettings := input.tenant_settings[_]
-    #Status := TenantSettings.disablePortalsCreationByNonAdminUsers == true
 }
 #--
 
-# TODO: Resolve Policy Id 
-# Baseline 2.1: Policy 2 
+#
+# MS.POWERPLATFORM.1.2v1
 #--
 tests[{
-    "Requirement" : "The ability to create trial environments SHALL be restricted to admins",
-    "Control" : "Power Platform 2.1",
-    "Criticality" : "Shall",
-    "Commandlet" : ["Get-TenantSettings"],
-    "ActualValue" : EnvironmentCreation.disableTrialEnvironmentCreationByNonAdminUsers,
-    "ReportDetails" : ReportDetailsBoolean(Status),
-    "RequirementMet" : Status
-}] {
-    EnvironmentCreation := input.environment_creation[_]
-    Status := EnvironmentCreation.disableTrialEnvironmentCreationByNonAdminUsers == true
-}
-#--
-
-# TODO: Resolve Policy Id
-# Baseline 2.1: Policy 2 PoSh Error
-#--
-tests[{
-    "Requirement" : "The ability to create trial environments SHALL be restricted to admins",
-    "Control" : "Power Platform 2.1",
+    #"Requirement" : "The ability to create trial environments SHALL be restricted to admins",
+    "Control" : "MS.POWERPLATFORM.1.2v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-TenantSettings"],
     "ActualValue" : "PowerShell Error",
@@ -370,7 +351,5 @@ tests[{
 }] {
     EnvironmentCreation := input.environment_creation[_]
     Status := EnvironmentCreation.disablePortalsCreationByNonAdminUsers == true
-    #TenantSettings := input.tenant_settings[_]
-    #Status := TenantSettings.disablePortalsCreationByNonAdminUsers == true
 }
 #--
