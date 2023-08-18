@@ -6,34 +6,21 @@ import future.keywords
 #
 # Policy 1
 #--
-# test_ContentContainsSensitiveInformation_Correct_V1 if {
-#     ControlNumber := "Defender 2.2"
-#     Requirement := "A custom policy SHALL be configured to protect PII and sensitive information, as defined by the agency: U.S. Social Security Number (SSN)"
+# test_TargetedUsers_Correct if {
+#     ControlNumber := "Defender 2.5"
+#     Requirement := "User impersonation protection SHOULD be enabled for key agency leaders"
 
 #     Output := tests with input as {
-#         "dlp_compliance_rules": [
+#         "anti_phish_policies": [
 #             {
-#                 "ContentContainsSensitiveInformation":  [
-#                     {"name":  "U.S. Social Security Number (SSN)"}
+#                 "Name" : "Standard Preset Security Policy1659535429826",
+#                 "Enabled" : true,
+#                 "EnableTargetedUserProtection" : true,
+#                 "TargetedUsersToProtect" : [
+#                     "john doe;jdoe@someemail.com",
+#                     "jane doe;jadoe@someemail.com"
 #                 ],
-#                 "Name":  "Baseline Rule",
-# 	            "Disabled" : false,
-#                 "ParentPolicyName":  "Default Office 365 DLP policy",
-# 	            "BlockAccess":  true,
-#                 "BlockAccessScope":  "All",
-# 	            "NotifyUser":  [
-#                     "SiteAdmin",
-#                     "LastModifier",
-#                     "Owner"
-#                 ],
-# 	            "NotifyUserType":  "NotSet"
-#             }
-#         ],
-#         "dlp_compliance_policies": [
-#             {
-#                 "Name": "Default Office 365 DLP policy",
-#                 "Mode": "Enable",
-#                 "Enabled": true
+#                 "TargetedUserProtectionAction": "Quarantine"
 #             }
 #         ]
 #     }
@@ -45,35 +32,21 @@ import future.keywords
 #     RuleOutput[0].ReportDetails == "Requirement met"
 # }
 
-# test_ContentContainsSensitiveInformation_Incorrect_V1 if {
-#     ControlNumber := "Defender 2.2"
-#     Requirement := "A custom policy SHALL be configured to protect PII and sensitive information, as defined by the agency: U.S. Social Security Number (SSN)"
+# test_Enabled_Incorrect if {
+#     ControlNumber := "Defender 2.5"
+#     Requirement := "User impersonation protection SHOULD be enabled for key agency leaders"
 
 #     Output := tests with input as {
-#         "dlp_compliance_rules": [
+#         "anti_phish_policies" : [
 #             {
-#                 "ContentContainsSensitiveInformation":  [
-#                     {"name":  "U.S. Individual Taxpayer Identification Number (ITIN)"},
-#                     {"name":  "Credit Card Number"}
+#                 "Name" : "Standard Preset Security Policy1659535429826",
+#                 "Enabled" : false,
+#                 "EnableTargetedUserProtection" : true,
+#                 "TargetedUsersToProtect" : [
+#                     "john doe;jdoe@someemail.com",
+#                     "jane doe;jadoe@someemail.com"
 #                 ],
-#                 "Name":  "Baseline Rule",
-# 	            "Disabled" : false,
-#                 "ParentPolicyName":  "Default Office 365 DLP policy",
-# 	            "BlockAccess":  true,
-#                 "BlockAccessScope":  "All",
-# 	            "NotifyUser":  [
-#                     "SiteAdmin",
-#                     "LastModifier",
-#                     "Owner"
-#                 ],
-# 	            "NotifyUserType":  "NotSet"
-#             }
-#         ],
-#         "dlp_compliance_policies": [
-#             {
-#                 "Name": "Default Office 365 DLP policy",
-#                 "Mode": "Enable",
-#                 "Enabled": true
+#                 "TargetedUserProtectionAction" : "Quarantine"
 #             }
 #         ]
 #     }
@@ -82,77 +55,24 @@ import future.keywords
 
 #     count(RuleOutput) == 1
 #     not RuleOutput[0].RequirementMet
-#     RuleOutput[0].ReportDetails == "No matching rule found for U.S. Social Security Number (SSN)"
+#     RuleOutput[0].ReportDetails == "No users are included for targeted user protection."
 # }
 
-# test_ContentContainsSensitiveInformation_Correct_V2 if {
-#     ControlNumber := "Defender 2.2"
-#     Requirement := "A custom policy SHALL be configured to protect PII and sensitive information, as defined by the agency: U.S. Individual Taxpayer Identification Number (ITIN)"
+# test_EnableTargetedUserProtection_Incorrect if {
+#     ControlNumber := "Defender 2.5"
+#     Requirement := "User impersonation protection SHOULD be enabled for key agency leaders"
 
 #     Output := tests with input as {
-#         "dlp_compliance_rules": [
+#         "anti_phish_policies" : [
 #             {
-#                 "ContentContainsSensitiveInformation":  [
-#                     {"name":  "U.S. Individual Taxpayer Identification Number (ITIN)"}
+#                 "Name" : "Standard Preset Security Policy1659535429826",
+#                 "Enabled" : true,
+#                 "EnableTargetedUserProtection" : false,
+#                 "TargetedUsersToProtect" : [
+#                     "john doe;jdoe@someemail.com",
+#                     "jane doe;jadoe@someemail.com"
 #                 ],
-#                 "Name":  "Baseline Rule",
-# 	            "Disabled" : false,
-#                 "ParentPolicyName":  "Default Office 365 DLP policy",
-# 	            "BlockAccess":  true,
-#                 "BlockAccessScope":  "All",
-# 	            "NotifyUser":  [
-#                     "SiteAdmin",
-#                     "LastModifier",
-#                     "Owner"
-#                 ],
-# 	            "NotifyUserType":  "NotSet"
-#             }
-#         ],
-#         "dlp_compliance_policies": [
-#             {
-#                 "Name": "Default Office 365 DLP policy",
-#                 "Mode": "Enable",
-#                 "Enabled": true
-#             }
-#         ]
-#     }
-
-#     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
-
-#     count(RuleOutput) == 1
-#     RuleOutput[0].RequirementMet
-#     RuleOutput[0].ReportDetails == "Requirement met"
-# }
-
-# test_ContentContainsSensitiveInformation_Incorrect_V2 if {
-#     ControlNumber := "Defender 2.2"
-#     Requirement := "A custom policy SHALL be configured to protect PII and sensitive information, as defined by the agency: U.S. Individual Taxpayer Identification Number (ITIN)"
-
-#     Output := tests with input as {
-#         "dlp_compliance_rules": [
-#             {
-#                 "ContentContainsSensitiveInformation":  [
-#                     {"name":  "Credit Card Number"},
-#                     {"name":  "U.S. Social Security Number (SSN)"}
-#                 ],
-#                 "Name":  "Baseline Rule",
-# 	            "Disabled" : false,
-#                 "ParentPolicyName":  "Default Office 365 DLP policy",
-# 	            "BlockAccess":  true,
-#                 "BlockAccessScope":  "All",
-# 	            "NotifyUser":  [
-#                     "SiteAdmin",
-#                     "LastModifier",
-#                     "Owner"
-#                 ],
-# 	            "NotifyUserType":  "NotSet"
-#             }
-#         ],
-#         "dlp_compliance_policies": [
-#             {
-#                 "Name": "Default Office 365 DLP policy",
-#                 "Mode": "Enable",
-#                 "Enabled": true
+#                 "TargetedUserProtectionAction" : "Quarantine"
 #             }
 #         ]
 #     }
@@ -161,77 +81,21 @@ import future.keywords
 
 #     count(RuleOutput) == 1
 #     not RuleOutput[0].RequirementMet
-#     RuleOutput[0].ReportDetails == "No matching rule found for U.S. Individual Taxpayer Identification Number (ITIN)"
+#     RuleOutput[0].ReportDetails == "No users are included for targeted user protection."
 # }
 
-# test_ContentContainsSensitiveInformation_Correct_V3 if {
-#     ControlNumber := "Defender 2.2"
-#     Requirement := "A custom policy SHALL be configured to protect PII and sensitive information, as defined by the agency: Credit Card Number"
+# test_TargetedUsersToProtect_Incorrect if {
+#     ControlNumber := "Defender 2.5"
+#     Requirement := "User impersonation protection SHOULD be enabled for key agency leaders"
 
 #     Output := tests with input as {
-#         "dlp_compliance_rules": [
+#         "anti_phish_policies" : [
 #             {
-#                 "ContentContainsSensitiveInformation":  [
-#                     {"name":  "Credit Card Number"}
-#                 ],
-#                 "Name":  "Baseline Rule",
-# 	            "Disabled" : false,
-#                 "ParentPolicyName":  "Default Office 365 DLP policy",
-# 	            "BlockAccess":  true,
-#                 "BlockAccessScope":  "All",
-# 	            "NotifyUser":  [
-#                     "SiteAdmin",
-#                     "LastModifier",
-#                     "Owner"
-#                 ],
-# 	            "NotifyUserType":  "NotSet"
-#             }
-#         ],
-#         "dlp_compliance_policies": [
-#             {
-#                 "Name": "Default Office 365 DLP policy",
-#                 "Mode": "Enable",
-#                 "Enabled": true
-#             }
-#         ]
-#     }
-
-#     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
-
-#     count(RuleOutput) == 1
-#     RuleOutput[0].RequirementMet
-#     RuleOutput[0].ReportDetails == "Requirement met"
-# }
-
-# test_ContentContainsSensitiveInformation_Incorrect_V3 if {
-#     ControlNumber := "Defender 2.2"
-#     Requirement := "A custom policy SHALL be configured to protect PII and sensitive information, as defined by the agency: Credit Card Number"
-
-#     Output := tests with input as {
-#         "dlp_compliance_rules": [
-#             {
-#                 "ContentContainsSensitiveInformation":  [
-#                     {"name":  "U.S. Individual Taxpayer Identification Number (ITIN)"},
-#                     {"name":  "U.S. Social Security Number (SSN)"}
-#                 ],
-#                 "Name":  "Baseline Rule",
-# 	            "Disabled" : false,
-#                 "ParentPolicyName":  "Default Office 365 DLP policy",
-# 	            "BlockAccess":  true,
-#                 "BlockAccessScope":  "All",
-# 	            "NotifyUser":  [
-#                     "SiteAdmin",
-#                     "LastModifier",
-#                     "Owner"
-#                 ],
-# 	            "NotifyUserType":  "NotSet"
-#             }
-#         ],
-#         "dlp_compliance_policies": [
-#             {
-#                 "Name": "Default Office 365 DLP policy",
-#                 "Mode": "Enable",
-#                 "Enabled": true
+# 	            "Name" : "Standard Preset Security Policy1659535429826",
+#                 "Enabled" : true,
+#                 "EnableTargetedUserProtection" : true,
+#                 "TargetedUsersToProtect" : [ ],
+#                 "TargetedUserProtectionAction" : "Quarantine"
 #             }
 #         ]
 #     }
@@ -240,44 +104,24 @@ import future.keywords
 
 #     count(RuleOutput) == 1
 #     not RuleOutput[0].RequirementMet
-#     RuleOutput[0].ReportDetails == "No matching rule found for Credit Card Number"
+#     RuleOutput[0].ReportDetails == "No users are included for targeted user protection."
 # }
 
 #
 # Policy 2
 #--
-# test_Exchange_Correct if {
-#     ControlNumber := "Defender 2.2"
-#     Requirement := "The custom policy SHOULD be applied in Exchange"
+# test_OrganizationDomain_Correct if {
+#     ControlNumber := "Defender 2.5"
+#     Requirement := "Domain impersonation protection SHOULD be enabled for domains owned by the agency"
 
 #     Output := tests with input as {
-#         "dlp_compliance_rules": [
+#         "anti_phish_policies" : [
 #             {
-#                 "ContentContainsSensitiveInformation":  [
-#                     {"name":  "U.S. Individual Taxpayer Identification Number (ITIN)"},
-#                     {"name":  "Credit Card Number"},
-#                     {"name":  "U.S. Social Security Number (SSN)"}
-#                 ],
-#                 "Name":  "Baseline Rule",
-# 	            "Disabled" : false,
-#                 "ParentPolicyName":  "Default Office 365 DLP policy",
-# 	            "BlockAccess":  true,
-#                 "BlockAccessScope":  "All",
-# 	            "NotifyUser":  [
-#                     "SiteAdmin",
-#                     "LastModifier",
-#                     "Owner"
-#                 ],
-# 	            "NotifyUserType":  "NotSet"
-#             }
-#         ],
-#         "dlp_compliance_policies": [
-#             {
-#                 "ExchangeLocation":  ["All"],
-#                 "Workload":  "Exchange",
-#                 "Name":  "Default Office 365 DLP policy",
-#                 "Mode": "Enable",
-#                 "Enabled": true
+# 	            "Name" : "Standard Preset Security Policy1659535429826",
+#                 "Enabled" : true,
+#                 "EnableOrganizationDomainsProtection" : true,
+# 	            "EnableTargetedDomainsProtection" : true,
+#                 "TargetedDomainProtectionAction" : "Quarantine",
 #             }
 #         ]
 #     }
@@ -289,38 +133,18 @@ import future.keywords
 #     RuleOutput[0].ReportDetails == "Requirement met"
 # }
 
-# test_ExchangeLocation_Incorrect if {
-#     ControlNumber := "Defender 2.2"
-#     Requirement := "The custom policy SHOULD be applied in Exchange"
+# test_Enabled_Incorrect_V2 if {
+#     ControlNumber := "Defender 2.5"
+#     Requirement := "Domain impersonation protection SHOULD be enabled for domains owned by the agency"
 
 #     Output := tests with input as {
-#         "dlp_compliance_rules": [
+#        "anti_phish_policies" : [
 #             {
-#                 "ContentContainsSensitiveInformation":  [
-#                     {"name":  "U.S. Individual Taxpayer Identification Number (ITIN)"},
-#                     {"name":  "Credit Card Number"},
-#                     {"name":  "U.S. Social Security Number (SSN)"}
-#                 ],
-#                 "Name":  "Baseline Rule",
-# 	            "Disabled" : false,
-#                 "ParentPolicyName":  "Default Office 365 DLP policy",
-# 	            "BlockAccess":  true,
-#                 "BlockAccessScope":  "All",
-# 	            "NotifyUser":  [
-#                     "SiteAdmin",
-#                     "LastModifier",
-#                     "Owner"
-#                 ],
-# 	            "NotifyUserType":  "NotSet"
-#             }
-#         ],
-#         "dlp_compliance_policies": [
-#             {
-#                 "ExchangeLocation":  [""],
-#                 "Workload":  "Exchange",
-#                 "Name":  "Default Office 365 DLP policy",
-#                 "Mode": "Enable",
-#                 "Enabled": true
+# 	            "Name" : "Standard Preset Security Policy1659535429826",
+#                 "Enabled" : false,
+#                 "EnableOrganizationDomainsProtection" : true,
+# 	            "EnableTargetedDomainsProtection" : true,
+#                 "TargetedDomainProtectionAction" : "Quarantine",
 #             }
 #         ]
 #     }
@@ -329,41 +153,21 @@ import future.keywords
 
 #     count(RuleOutput) == 1
 #     not RuleOutput[0].RequirementMet
-#     RuleOutput[0].ReportDetails == "No policy found that applies to Exchange."
+#     RuleOutput[0].ReportDetails == "Requirement not met"
 # }
 
-# test_Workload_Incorrect_V1 if {
-#     ControlNumber := "Defender 2.2"
-#     Requirement := "The custom policy SHOULD be applied in Exchange"
+# test_EnableOrganizationDomainsProtection_Incorrect if {
+#     ControlNumber := "Defender 2.5"
+#     Requirement := "Domain impersonation protection SHOULD be enabled for domains owned by the agency"
 
 #     Output := tests with input as {
-#         "dlp_compliance_rules": [
+#        "anti_phish_policies" : [
 #             {
-#                 "ContentContainsSensitiveInformation":  [
-#                     {"name":  "U.S. Individual Taxpayer Identification Number (ITIN)"},
-#                     {"name":  "Credit Card Number"},
-#                     {"name":  "U.S. Social Security Number (SSN)"}
-#                 ],
-#                 "Name":  "Baseline Rule",
-# 	            "Disabled" : false,
-#                 "ParentPolicyName":  "Default Office 365 DLP policy",
-# 	            "BlockAccess":  true,
-#                 "BlockAccessScope":  "All",
-# 	            "NotifyUser":  [
-#                     "SiteAdmin",
-#                     "LastModifier",
-#                     "Owner"
-#                 ],
-# 	            "NotifyUserType":  "NotSet"
-#             }
-#         ],
-#         "dlp_compliance_policies": [
-#             {
-#                 "ExchangeLocation":  ["All"],
-#                 "Workload":  "",
-#                 "Name":  "Default Office 365 DLP policy",
-#                 "Mode": "Enable",
-#                 "Enabled": true
+# 	            "Name" : "Standard Preset Security Policy1659535429826",
+#                 "Enabled" : true,
+#                 "EnableOrganizationDomainsProtection" : false,
+# 	            "EnableTargetedDomainsProtection" : true,
+#                 "TargetedDomainProtectionAction" : "Quarantine",
 #             }
 #         ]
 #     }
@@ -372,84 +176,21 @@ import future.keywords
 
 #     count(RuleOutput) == 1
 #     not RuleOutput[0].RequirementMet
-#     RuleOutput[0].ReportDetails == "No policy found that applies to Exchange."
+#     RuleOutput[0].ReportDetails == "Requirement not met"
 # }
 
-# test_SharePoint_Correct if {
-#     ControlNumber := "Defender 2.2"
-#     Requirement := "The custom policy SHOULD be applied in SharePoint"
+# test_EnableTargetedDomainsProtection_Incorrect if {
+#     ControlNumber := "Defender 2.5"
+#     Requirement := "Domain impersonation protection SHOULD be enabled for domains owned by the agency"
 
 #     Output := tests with input as {
-#         "dlp_compliance_rules": [
+#        "anti_phish_policies" : [
 #             {
-#                 "ContentContainsSensitiveInformation":  [
-#                     {"name":  "U.S. Individual Taxpayer Identification Number (ITIN)"},
-#                     {"name":  "Credit Card Number"},
-#                     {"name":  "U.S. Social Security Number (SSN)"}
-#                 ],
-#                 "Name":  "Baseline Rule",
-# 	            "Disabled" : false,
-#                 "ParentPolicyName":  "Default Office 365 DLP policy",
-# 	            "BlockAccess":  true,
-#                 "BlockAccessScope":  "All",
-# 	            "NotifyUser":  [
-#                     "SiteAdmin",
-#                     "LastModifier",
-#                     "Owner"
-#                 ],
-# 	            "NotifyUserType":  "NotSet"
-#             }
-#         ],
-#         "dlp_compliance_policies": [
-#             {
-#                 "SharePointLocation":  ["All"],
-#                 "Workload":  "SharePoint",
-#                 "Name":  "Default Office 365 DLP policy",
-#                 "Mode": "Enable",
-#                 "Enabled": true
-#             }
-#         ]
-#     }
-
-#     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
-
-#     count(RuleOutput) == 1
-#     RuleOutput[0].RequirementMet
-#     RuleOutput[0].ReportDetails == "Requirement met"
-# }
-
-# test_SharePointLocation_Incorrect if {
-#     ControlNumber := "Defender 2.2"
-#     Requirement := "The custom policy SHOULD be applied in SharePoint"
-
-#     Output := tests with input as {
-#         "dlp_compliance_rules": [
-#             {
-#                 "ContentContainsSensitiveInformation":  [
-#                     {"name":  "U.S. Individual Taxpayer Identification Number (ITIN)"},
-#                     {"name":  "Credit Card Number"},
-#                     {"name":  "U.S. Social Security Number (SSN)"}
-#                 ],
-#                 "Name":  "Baseline Rule",
-# 	            "Disabled" : false,
-#                 "ParentPolicyName":  "Default Office 365 DLP policy",
-# 	            "BlockAccess":  true,
-#                 "BlockAccessScope":  "All",
-# 	            "NotifyUser":  [
-#                     "SiteAdmin",
-#                     "LastModifier",
-#                     "Owner"
-#                 ],
-# 	            "NotifyUserType":  "NotSet"
-#             }
-#         ],
-#         "dlp_compliance_policies": [
-#             {
-#                 "SharePointLocation":  [""],
-#                 "Workload":  "SharePoint",
-#                 "Name":  "Default Office 365 DLP policy",
-#                 "Mode": "Enable",
-#                 "Enabled": true
+# 	            "Name" : "Standard Preset Security Policy1659535429826",
+#                 "Enabled" : true,
+#                 "EnableOrganizationDomainsProtection" : true,
+# 	            "EnableTargetedDomainsProtection" : false,
+#                 "TargetedDomainProtectionAction" : "Quarantine",
 #             }
 #         ]
 #     }
@@ -458,341 +199,24 @@ import future.keywords
 
 #     count(RuleOutput) == 1
 #     not RuleOutput[0].RequirementMet
-#     RuleOutput[0].ReportDetails == "No policy found that applies to SharePoint."
-# }
-
-# test_Workload_Incorrect_V2 if {
-#     ControlNumber := "Defender 2.2"
-#     Requirement := "The custom policy SHOULD be applied in SharePoint"
-
-#     Output := tests with input as {
-#         "dlp_compliance_rules": [
-#             {
-#                 "ContentContainsSensitiveInformation":  [
-#                     {"name":  "U.S. Individual Taxpayer Identification Number (ITIN)"},
-#                     {"name":  "Credit Card Number"},
-#                     {"name":  "U.S. Social Security Number (SSN)"}
-#                 ],
-#                 "Name":  "Baseline Rule",
-# 	            "Disabled" : false,
-#                 "ParentPolicyName":  "Default Office 365 DLP policy",
-# 	            "BlockAccess":  true,
-#                 "BlockAccessScope":  "All",
-# 	            "NotifyUser":  [
-#                     "SiteAdmin",
-#                     "LastModifier",
-#                     "Owner"
-#                 ],
-# 	            "NotifyUserType":  "NotSet"
-#             }
-#         ],
-#         "dlp_compliance_policies": [
-#             {
-#                 "SharePointLocation":  ["All"],
-#                 "Workload":  "",
-#                 "Name":  "Default Office 365 DLP policy",
-#                 "Mode": "Enable",
-#                 "Enabled": true
-#             }
-#         ]
-#     }
-
-#     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
-
-#     count(RuleOutput) == 1
-#     not RuleOutput[0].RequirementMet
-#     RuleOutput[0].ReportDetails == "No policy found that applies to SharePoint."
-# }
-
-# test_OneDrive_Correct if {
-#     ControlNumber := "Defender 2.2"
-#     Requirement := "The custom policy SHOULD be applied in OneDrive"
-
-#     Output := tests with input as {
-#         "dlp_compliance_rules": [
-#             {
-#                 "ContentContainsSensitiveInformation":  [
-#                     {"name":  "U.S. Individual Taxpayer Identification Number (ITIN)"},
-#                     {"name":  "Credit Card Number"},
-#                     {"name":  "U.S. Social Security Number (SSN)"}
-#                 ],
-#                 "Name":  "Baseline Rule",
-# 	            "Disabled" : false,
-#                 "ParentPolicyName":  "Default Office 365 DLP policy",
-# 	            "BlockAccess":  true,
-#                 "BlockAccessScope":  "All",
-# 	            "NotifyUser":  [
-#                     "SiteAdmin",
-#                     "LastModifier",
-#                     "Owner"
-#                 ],
-# 	            "NotifyUserType":  "NotSet"
-#             }
-#         ],
-#         "dlp_compliance_policies": [
-#             {
-#                 "OneDriveLocation":  ["All"],
-#                 "Workload":  "OneDrivePoint",
-#                 "Name":  "Default Office 365 DLP policy",
-#                 "Mode": "Enable",
-#                 "Enabled": true
-#             }
-#         ]
-#     }
-
-#     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
-
-#     count(RuleOutput) == 1
-#     RuleOutput[0].RequirementMet
-#     RuleOutput[0].ReportDetails == "Requirement met"
-# }
-
-# test_OneDriveLocation_Incorrect if {
-#     ControlNumber := "Defender 2.2"
-#     Requirement := "The custom policy SHOULD be applied in OneDrive"
-
-#     Output := tests with input as {
-#         "dlp_compliance_rules": [
-#             {
-#                 "ContentContainsSensitiveInformation":  [
-#                     {"name":  "U.S. Individual Taxpayer Identification Number (ITIN)"},
-#                     {"name":  "Credit Card Number"},
-#                     {"name":  "U.S. Social Security Number (SSN)"}
-#                 ],
-#                 "Name":  "Baseline Rule",
-# 	            "Disabled" : false,
-#                 "ParentPolicyName":  "Default Office 365 DLP policy",
-# 	            "BlockAccess":  true,
-#                 "BlockAccessScope":  "All",
-# 	            "NotifyUser":  [
-#                     "SiteAdmin",
-#                     "LastModifier",
-#                     "Owner"
-#                 ],
-# 	            "NotifyUserType":  "NotSet"
-#             }
-#         ],
-#         "dlp_compliance_policies": [
-#             {
-#                 "OneDriveLocation":  [""],
-#                 "Workload":  "OneDrivePoint",
-#                 "Name":  "Default Office 365 DLP policy",
-#                 "Mode": "Enable",
-#                 "Enabled": true
-#             }
-#         ]
-#     }
-
-#     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
-
-#     count(RuleOutput) == 1
-#     not RuleOutput[0].RequirementMet
-#     RuleOutput[0].ReportDetails == "No policy found that applies to OneDrive."
-# }
-
-# test_Workload_Incorrect_V3 if {
-#     ControlNumber := "Defender 2.2"
-#     Requirement := "The custom policy SHOULD be applied in OneDrive"
-
-#     Output := tests with input as {
-#         "dlp_compliance_rules": [
-#             {
-#                 "ContentContainsSensitiveInformation":  [
-#                     {"name":  "U.S. Individual Taxpayer Identification Number (ITIN)"},
-#                     {"name":  "Credit Card Number"},
-#                     {"name":  "U.S. Social Security Number (SSN)"}
-#                 ],
-#                 "Name":  "Baseline Rule",
-# 	            "Disabled" : false,
-#                 "ParentPolicyName":  "Default Office 365 DLP policy",
-# 	            "BlockAccess":  true,
-#                 "BlockAccessScope":  "All",
-# 	            "NotifyUser":  [
-#                     "SiteAdmin",
-#                     "LastModifier",
-#                     "Owner"
-#                 ],
-# 	            "NotifyUserType":  "NotSet"
-#             }
-#         ],
-#         "dlp_compliance_policies": [
-#             {
-#                 "OneDriveLocation":  ["All"],
-#                 "Workload":  "",
-#                 "Name":  "Default Office 365 DLP policy",
-#                 "Mode": "Enable",
-#                 "Enabled": true
-#             }
-#         ]
-#     }
-
-#     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
-
-#     count(RuleOutput) == 1
-#     not RuleOutput[0].RequirementMet
-#     RuleOutput[0].ReportDetails == "No policy found that applies to OneDrive."
-# }
-
-# test_Teams_Correct if {
-#     ControlNumber := "Defender 2.2"
-#     Requirement := "The custom policy SHOULD be applied in Teams"
-
-#     Output := tests with input as {
-#         "dlp_compliance_rules": [
-#             {
-#                 "ContentContainsSensitiveInformation":  [
-#                     {"name":  "U.S. Individual Taxpayer Identification Number (ITIN)"},
-#                     {"name":  "Credit Card Number"},
-#                     {"name":  "U.S. Social Security Number (SSN)"}
-#                 ],
-#                 "Name":  "Baseline Rule",
-# 	            "Disabled" : false,
-#                 "ParentPolicyName":  "Default Office 365 DLP policy",
-# 	            "BlockAccess":  true,
-#                 "BlockAccessScope":  "All",
-# 	            "NotifyUser":  [
-#                     "SiteAdmin",
-#                     "LastModifier",
-#                     "Owner"
-#                 ],
-# 	            "NotifyUserType":  "NotSet"
-#             }
-#         ],
-#         "dlp_compliance_policies": [
-#             {
-#                 "TeamsLocation":  ["All"],
-#                 "Workload":  "Teams",
-#                 "Name":  "Default Office 365 DLP policy",
-#                 "Mode": "Enable",
-#                 "Enabled": true
-#             }
-#         ]
-#     }
-
-#     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
-
-#     count(RuleOutput) == 1
-#     RuleOutput[0].RequirementMet
-#     RuleOutput[0].ReportDetails == "Requirement met"
-# }
-
-# test_TeamsLocation_Incorrect if {
-#     ControlNumber := "Defender 2.2"
-#     Requirement := "The custom policy SHOULD be applied in Teams"
-
-#     Output := tests with input as {
-#         "dlp_compliance_rules": [
-#             {
-#                 "ContentContainsSensitiveInformation":  [
-#                     {"name":  "U.S. Individual Taxpayer Identification Number (ITIN)"},
-#                     {"name":  "Credit Card Number"},
-#                     {"name":  "U.S. Social Security Number (SSN)"}
-#                 ],
-#                 "Name":  "Baseline Rule",
-# 	            "Disabled" : false,
-#                 "ParentPolicyName":  "Default Office 365 DLP policy",
-# 	            "BlockAccess":  true,
-#                 "BlockAccessScope":  "All",
-# 	            "NotifyUser":  [
-#                     "SiteAdmin",
-#                     "LastModifier",
-#                     "Owner"
-#                 ],
-# 	            "NotifyUserType":  "NotSet"
-#             }
-#         ],
-#         "dlp_compliance_policies": [
-#             {
-#                 "TeamsLocation":  [""],
-#                 "Workload":  "Teams",
-#                 "Name":  "Default Office 365 DLP policy",
-#                 "Mode": "Enable",
-#                 "Enabled": true
-#             }
-#         ]
-#     }
-
-#     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
-
-#     count(RuleOutput) == 1
-#     not RuleOutput[0].RequirementMet
-#     RuleOutput[0].ReportDetails == "No policy found that applies to Teams."
-# }
-
-# test_Workload_Incorrect_V4 if {
-#     ControlNumber := "Defender 2.2"
-#     Requirement := "The custom policy SHOULD be applied in Teams"
-
-#     Output := tests with input as {
-#         "dlp_compliance_rules": [
-#             {
-#                 "ContentContainsSensitiveInformation":  [
-#                     {"name":  "U.S. Individual Taxpayer Identification Number (ITIN)"},
-#                     {"name":  "Credit Card Number"},
-#                     {"name":  "U.S. Social Security Number (SSN)"}
-#                 ],
-#                 "Name":  "Baseline Rule",
-# 	            "Disabled" : false,
-#                 "ParentPolicyName":  "Default Office 365 DLP policy",
-# 	            "BlockAccess":  true,
-#                 "BlockAccessScope":  "All",
-# 	            "NotifyUser":  [
-#                     "SiteAdmin",
-#                     "LastModifier",
-#                     "Owner"
-#                 ],
-# 	            "NotifyUserType":  "NotSet"
-#             }
-#         ],
-#         "dlp_compliance_policies": [
-#             {
-#                 "TeamsLocation":  ["All"],
-#                 "Workload":  "",
-#                 "Name":  "Default Office 365 DLP policy",
-#                 "Mode": "Enable",
-#                 "Enabled": true
-#             }
-#         ]
-#     }
-
-#     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
-
-#     count(RuleOutput) == 1
-#     not RuleOutput[0].RequirementMet
-#     RuleOutput[0].ReportDetails == "No policy found that applies to Teams."
+#     RuleOutput[0].ReportDetails == "Requirement not met"
 # }
 
 #
 # Policy 3
 #--
-# test_BlockAccess_Correct if {
-#     ControlNumber := "Defender 2.2"
-#     Requirement := "The action for the DLP policy SHOULD be set to block sharing sensitive information with everyone when DLP conditions are met"
+# test_CustomDomains_Correct if {
+#     ControlNumber := "Defender 2.5"
+#     Requirement := "Domain impersonation protection SHOULD be added for frequent partners"
 
 #     Output := tests with input as {
-#         "dlp_compliance_rules": [
+#         "anti_phish_policies" : [
 #             {
-#                 "ContentContainsSensitiveInformation":  [
-#                     {"name":  "U.S. Individual Taxpayer Identification Number (ITIN)"}
-#                 ],
-#                 "Name":  "Baseline Rule",
-# 	            "Disabled" : false,
-#                 "ParentPolicyName":  "Default Office 365 DLP policy",
-# 	            "BlockAccess":  true,
-#                 "BlockAccessScope":  "All",
-# 	            "NotifyUser":  [
-#                     "SiteAdmin",
-#                     "LastModifier",
-#                     "Owner"
-#                 ],
-# 	            "NotifyUserType":  "NotSet"
-#             }
-#         ],
-#         "dlp_compliance_policies": [
-#             {
-#                 "Name": "Default Office 365 DLP policy",
-#                 "Mode": "Enable",
-#                 "Enabled": true
+# 	            "Name" : "Standard Preset Security Policy1659535429826",
+#                 "Enabled" : true,
+#                 "EnableTargetedDomainsProtection" : true,
+#                 "TargetedDomainsToProtect" : [ "test domain" ],
+# 	            "TargetedDomainProtectionAction" : "Quarantine"
 #             }
 #         ]
 #     }
@@ -804,34 +228,18 @@ import future.keywords
 #     RuleOutput[0].ReportDetails == "Requirement met"
 # }
 
-# test_BlockAccess_IncorrectV1 if {
-#     ControlNumber := "Defender 2.2"
-#     Requirement := "The action for the DLP policy SHOULD be set to block sharing sensitive information with everyone when DLP conditions are met"
+# test_Enabled_Incorrect_V3 if {
+#     ControlNumber := "Defender 2.5"
+#     Requirement := "Domain impersonation protection SHOULD be added for frequent partners"
 
 #     Output := tests with input as {
-#         "dlp_compliance_rules": [
+#         "anti_phish_policies" : [
 #             {
-#                 "ContentContainsSensitiveInformation":  [
-#                     {"name":  "U.S. Individual Taxpayer Identification Number (ITIN)"}
-#                 ],
-#                 "Name":  "Baseline Rule",
-# 	            "Disabled" : false,
-#                 "ParentPolicyName":  "Default Office 365 DLP policy",
-# 	            "BlockAccess":  false,
-#                 "BlockAccessScope":  "All",
-# 	            "NotifyUser":  [
-#                     "SiteAdmin",
-#                     "LastModifier",
-#                     "Owner"
-#                 ],
-# 	            "NotifyUserType":  "NotSet"
-#             }
-#         ],
-#         "dlp_compliance_policies": [
-#             {
-#                 "Name": "Default Office 365 DLP policy",
-#                 "Mode": "Enable",
-#                 "Enabled": true
+# 	            "Name" : "Standard Preset Security Policy1659535429826",
+#                 "Enabled" : false,
+#                 "EnableTargetedDomainsProtection" : true,
+#                 "TargetedDomainsToProtect" : [ "test domain" ],
+# 	            "TargetedDomainProtectionAction" : "Quarantine"
 #             }
 #         ]
 #     }
@@ -840,37 +248,21 @@ import future.keywords
 
 #     count(RuleOutput) == 1
 #     not RuleOutput[0].RequirementMet
-#     RuleOutput[0].ReportDetails == "1 rule(s) found that do(es) not block access or associated policy not set to enforce block action: Baseline Rule"
+#     RuleOutput[0].ReportDetails == "The Custom Domains protection policies: Enabled, EnableTargetedDomainsProtection, and TargetedDomainsToProtect are not set correctly"
 # }
 
-# test_BlockAccess_IncorrectV2 if {
-#     ControlNumber := "Defender 2.2"
-#     Requirement := "The action for the DLP policy SHOULD be set to block sharing sensitive information with everyone when DLP conditions are met"
+# test_EnableTargetedDomainsProtection_Incorrect if {
+#     ControlNumber := "Defender 2.5"
+#     Requirement := "Domain impersonation protection SHOULD be added for frequent partners"
 
 #     Output := tests with input as {
-#         "dlp_compliance_rules": [
+#         "anti_phish_policies" : [
 #             {
-#                 "ContentContainsSensitiveInformation":  [
-#                     {"name":  "U.S. Individual Taxpayer Identification Number (ITIN)"}
-#                 ],
-#                 "Name":  "Baseline Rule",
-# 	            "Disabled" : false,
-#                 "ParentPolicyName":  "Default Office 365 DLP policy",
-# 	            "BlockAccess":  true,
-#                 "BlockAccessScope":  "All",
-# 	            "NotifyUser":  [
-#                     "SiteAdmin",
-#                     "LastModifier",
-#                     "Owner"
-#                 ],
-# 	            "NotifyUserType":  "NotSet"
-#             }
-#         ],
-#         "dlp_compliance_policies": [
-#             {
-#                 "Name": "Default Office 365 DLP policy",
-#                 "Mode": "TestWithNotifications",
-#                 "Enabled": true
+# 	            "Name" : "Standard Preset Security Policy1659535429826",
+#                 "Enabled" : true,
+#                 "EnableTargetedDomainsProtection" : false,
+#                 "TargetedDomainsToProtect" : [ "test domain" ],
+# 	            "TargetedDomainProtectionAction" : "Quarantine"
 #             }
 #         ]
 #     }
@@ -879,112 +271,21 @@ import future.keywords
 
 #     count(RuleOutput) == 1
 #     not RuleOutput[0].RequirementMet
-#     RuleOutput[0].ReportDetails == "1 rule(s) found that do(es) not block access or associated policy not set to enforce block action: Baseline Rule"
+#     RuleOutput[0].ReportDetails == "The Custom Domains protection policies: Enabled, EnableTargetedDomainsProtection, and TargetedDomainsToProtect are not set correctly"
 # }
 
-#
-# Policy 4
-#--
-# test_NotifyUser_Correct_V1 if {
-#     ControlNumber := "Defender 2.2"
-#     Requirement := "Notifications to inform users and help educate them on the proper use of sensitive information SHOULD be enabled"
+# test_TargetedDomainsToProtect_Incorrect if {
+#     ControlNumber := "Defender 2.5"
+#     Requirement := "Domain impersonation protection SHOULD be added for frequent partners"
 
 #     Output := tests with input as {
-#         "dlp_compliance_rules": [
+#         "anti_phish_policies" : [
 #             {
-#                 "ContentContainsSensitiveInformation":  [
-#                     {"name":  "U.S. Individual Taxpayer Identification Number (ITIN)"}
-#                 ],
-#                 "Name":  "Baseline Rule",
-# 	            "Disabled" : false,
-#                 "ParentPolicyName":  "Default Office 365 DLP policy",
-# 	            "BlockAccess":  true,
-#                 "BlockAccessScope":  "All",
-# 	            "NotifyUser":  [
-#                     "SiteAdmin"
-#                 ],
-# 	            "NotifyUserType":  "NotSet"
-#             }
-#         ],
-#         "dlp_compliance_policies": [
-#             {
-#                 "Name": "Default Office 365 DLP policy",
-#                 "Mode": "Enable",
-#                 "Enabled": true
-#             }
-#         ]
-#     }
-
-#     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
-
-#     count(RuleOutput) == 1
-#     RuleOutput[0].RequirementMet
-#     RuleOutput[0].ReportDetails == "Requirement met"
-# }
-
-# test_NotifyUser_Correct_V2 if {
-#     ControlNumber := "Defender 2.2"
-#     Requirement := "Notifications to inform users and help educate them on the proper use of sensitive information SHOULD be enabled"
-
-#     Output := tests with input as {
-#         "dlp_compliance_rules": [
-#             {
-#                 "ContentContainsSensitiveInformation":  [
-#                     {"name":  "U.S. Individual Taxpayer Identification Number (ITIN)"}
-#                 ],
-#                 "Name":  "Baseline Rule",
-# 	            "Disabled" : false,
-#                 "ParentPolicyName":  "Default Office 365 DLP policy",
-# 	            "BlockAccess":  true,
-#                 "BlockAccessScope":  "All",
-# 	            "NotifyUser":  [
-#                     "SiteAdmin",
-#                     "LastModifier",
-#                     "Owner"
-#                 ],
-# 	            "NotifyUserType":  "NotSet"
-#             }
-#         ],
-#         "dlp_compliance_policies": [
-#             {
-#                 "Name": "Default Office 365 DLP policy",
-#                 "Mode": "Enable",
-#                 "Enabled": true
-#             }
-#         ]
-#     }
-
-#     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
-
-#     count(RuleOutput) == 1
-#     RuleOutput[0].RequirementMet
-#     RuleOutput[0].ReportDetails == "Requirement met"
-# }
-
-# test_NotifyUser_Incorrect if {
-#     ControlNumber := "Defender 2.2"
-#     Requirement := "Notifications to inform users and help educate them on the proper use of sensitive information SHOULD be enabled"
-
-#     Output := tests with input as {
-#         "dlp_compliance_rules": [
-#             {
-#                 "ContentContainsSensitiveInformation":  [
-#                     {"name":  "U.S. Individual Taxpayer Identification Number (ITIN)"}
-#                 ],
-#                 "Name":  "Baseline Rule",
-# 	            "Disabled" : false,
-#                 "ParentPolicyName":  "Default Office 365 DLP policy",
-# 	            "BlockAccess":  true,
-#                 "BlockAccessScope":  "All",
-# 	            "NotifyUser":  [ ],
-# 	            "NotifyUserType":  "NotSet"
-#             }
-#         ],
-#         "dlp_compliance_policies": [
-#             {
-#                 "Name": "Default Office 365 DLP policy",
-#                 "Mode": "Enable",
-#                 "Enabled": true
+# 	            "Name" : "Standard Preset Security Policy1659535429826",
+#                 "Enabled" : true,
+#                 "EnableTargetedDomainsProtection" : true,
+#                 "TargetedDomainsToProtect" : [ ],
+# 	            "TargetedDomainProtectionAction" : "Quarantine"
 #             }
 #         ]
 #     }
@@ -993,39 +294,5 @@ import future.keywords
 
 #     count(RuleOutput) == 1
 #     not RuleOutput[0].RequirementMet
-#     RuleOutput[0].ReportDetails == "1 rule(s) found that do(es) not notify at least one user: Baseline Rule"
-# }
-
-#
-# Policy 5
-#--
-# test_NotImplemented_Correct_V1 if {
-#     ControlNumber := "Defender 2.2"
-#     PolicyId := "TBD"
-#     Requirement := "A list of apps that are not allowed to access files protected by DLP policy SHOULD be defined"
-
-#     Output := tests with input as { }
-
-#     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
-
-#     count(RuleOutput) == 1
-#     not RuleOutput[0].RequirementMet
-#     RuleOutput[0].ReportDetails == sprintf("Currently cannot be checked automatically. See Defender Secure Configuration Baseline policy %v for instructions on manual check", [PolicyId])
-# }
-
-#
-# Policy 6
-#--
-# test_NotImplemented_Correct_V2 if {
-#     ControlNumber := "Defender 2.2"
-#     PolicyId := "TBD"
-#     Requirement := "A list of browsers that are not allowed to access files protected by DLP policy SHOULD be defined"
-
-#     Output := tests with input as { }
-
-#     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
-
-#     count(RuleOutput) == 1
-#     not RuleOutput[0].RequirementMet
-#     RuleOutput[0].ReportDetails == sprintf("Currently cannot be checked automatically. See Defender Secure Configuration Baseline policy %v for instructions on manual check", [PolicyId])
+#     RuleOutput[0].ReportDetails == "The Custom Domains protection policies: Enabled, EnableTargetedDomainsProtection, and TargetedDomainsToProtect are not set correctly"
 # }
