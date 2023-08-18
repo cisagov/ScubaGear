@@ -101,26 +101,45 @@ tests[{
 }
 #--
 
-# TODO: Resolve Policy Id
-# Baseline 2.1: Policy 2
+#
+# MS.DEFENDER.1.2v1
 #--
-StrictPresetSecurityPolicy[Rules.State] {
-    Rules := input.protection_policy_rules[_]
-    Rules.Identity == "Strict Preset Security Policy"
-}
+
+# If "Apply protection to" is set to "All recipients":
+# - The policy will be included in the list output by Get-EOPProtectionPolicyRule"
+# - SentTo, SentToMemberOf, and RecipientDomainIs will all be null
+#
+# If "Apply protection to" is set to "None," the policy will be missing
+# entirely.
+#
+# If "Apply protection to" is set to "Specific recipients," at least
+# one of SentTo, SentToMemberOf, or RecipientDomainIs will not be null
+#
+# In short, we need to assert that at least one of the preset policies
+# is included in the output and has those three fields set to null.
+
+# TODO check exclusions
 
 tests[{
-    "Requirement" : "Strict Preset security profiles SHOULD NOT be used",
-    "Control" : "Defender 2.1",
-    "Criticality" : "Should",
+    "PolicyId" : "MS.DEFENDER.1.2v1",
+    "Criticality" : "Shall",
     "Commandlet" : ["Get-EOPProtectionPolicyRule"],
-	"ActualValue" : Policy,
-    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
+	"ActualValue" : {"StandardSetToAll": IsStandardAll, "StrictSetToAll": IsStrictAll},
+    "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
-    Policy := StrictPresetSecurityPolicy
-    ErrorMessage := "The Strict Preset Security Policy is present and not disabled"
-    Conditions := [count(Policy) == 0, "Disabled" in Policy]
+    Policies := input.protection_policy_rules
+    IsStandardAll := count([Policy | Policy = Policies[_];
+        Policy.Identity == "Standard Preset Security Policy";
+        Policy.SentTo == null;
+        Policy.SentToMemberOf == null;
+        Policy.RecipientDomainIs == null]) > 0
+    IsStrictAll := count([Policy | Policy = Policies[_];
+        Policy.Identity == "Strict Preset Security Policy";
+        Policy.SentTo == null;
+        Policy.SentToMemberOf == null;
+        Policy.RecipientDomainIs == null]) > 0
+    Conditions := [IsStandardAll, IsStrictAll]
     Status := count([Condition | Condition = Conditions[_]; Condition == true]) > 0
 }
 #--
