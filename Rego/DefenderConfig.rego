@@ -144,6 +144,50 @@ tests[{
 }
 #--
 
+#
+# MS.DEFENDER.1.3v1
+#--
+
+# See MS.DEFENDER.1.2v1, the same logic applies, just with a 
+# different commandlet.
+
+# TODO check exclusions
+
+tests[{
+    "PolicyId" : "MS.DEFENDER.1.3v1",
+    "Criticality" : "Shall",
+    "Commandlet" : ["Get-ATPProtectionPolicyRule"],
+	"ActualValue" : {"StandardSetToAll": IsStandardAll, "StrictSetToAll": IsStrictAll},
+    "ReportDetails" : ReportDetailsBoolean(Status),
+    "RequirementMet" : Status
+}] {
+    Policies := input.atp_policy_rules
+    IsStandardAll := count([Policy | Policy = Policies[_];
+        Policy.Identity == "Standard Preset Security Policy";
+        Policy.SentTo == null;
+        Policy.SentToMemberOf == null;
+        Policy.RecipientDomainIs == null]) > 0
+    IsStrictAll := count([Policy | Policy = Policies[_];
+        Policy.Identity == "Strict Preset Security Policy";
+        Policy.SentTo == null;
+        Policy.SentToMemberOf == null;
+        Policy.RecipientDomainIs == null]) > 0
+    Conditions := [IsStandardAll, IsStrictAll]
+    Status := count([Condition | Condition = Conditions[_]; Condition == true]) > 0
+}
+#--
+
+
+
+
+
+
+
+
+
+
+
+
 # Determine the set of rules that pertain to SSNs, ITINs, or credit card numbers.
 # Used in multiple bullet points below
 SensitiveRules[{

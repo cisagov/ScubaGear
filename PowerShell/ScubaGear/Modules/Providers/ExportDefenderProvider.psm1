@@ -51,6 +51,7 @@ function Export-DefenderProvider {
     # Regular Exchange i.e non IPPSSession cmdlets
     $AdminAuditLogConfig = ConvertTo-Json @($Tracker.TryCommand("Get-AdminAuditLogConfig"))
     $ProtectionPolicyRule = ConvertTo-Json @($Tracker.TryCommand("Get-EOPProtectionPolicyRule"))
+    $ATPProtectionPolicyRule = ConvertTo-Json @($Tracker.TryCommand("Get-ATPProtectionPolicyRule"))
     $MalwareFilterPolicy = ConvertTo-Json @($Tracker.TryCommand("Get-MalwareFilterPolicy"))
     $AntiPhishPolicy = ConvertTo-Json @($Tracker.TryCommand("Get-AntiPhishPolicy"))
     $HostedContentFilterPolicy = ConvertTo-Json @($Tracker.TryCommand("Get-HostedContentFilterPolicy"))
@@ -147,6 +148,7 @@ function Export-DefenderProvider {
     # Note the spacing and the last comma in the json is important
     $json = @"
     "protection_policy_rules": $ProtectionPolicyRule,
+    "atp_policy_rules": $ATPProtectionPolicyRule,
     "dlp_compliance_policies": $DLPCompliancePolicy,
     "dlp_compliance_rules": $DLPComplianceRules,
     "malware_filter_policies": $MalwareFilterPolicy,
