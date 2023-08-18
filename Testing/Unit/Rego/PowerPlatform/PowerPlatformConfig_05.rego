@@ -1,6 +1,5 @@
 package powerplatform
 import future.keywords
-import data.report.utils.NotCheckedDetails
 
 #
 # Policy 1
