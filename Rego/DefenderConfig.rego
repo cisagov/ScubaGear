@@ -687,16 +687,8 @@ tests[{
 }
 #--
 
-
-
-
-
-#################
-# Baseline 2.9 #
-#################
-
 #
-# Baseline 2.9: Policy 1
+# MS.DEFENDER.5.1v1
 #--
 # At a minimum, the alerts required by the EXO baseline SHALL be enabled.
 RequiredAlerts := {
@@ -717,7 +709,7 @@ EnabledAlerts[Alert.Name] {
 }
 
 tests[{
-    "PolicyId" : "MS.DEFENDER.9.1v1",
+    "PolicyId" : "MS.DEFENDER.5.1v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-ProtectionAlert"],
 	"ActualValue" : MissingAlerts,
@@ -731,7 +723,7 @@ tests[{
 #--
 
 #
-# Baseline 2.9: Policy 2
+# MS.DEFENDER.5.2v1
 #--
 # SIEM incorporation cannot be checked programmatically
 tests[{
@@ -742,7 +734,7 @@ tests[{
     "ReportDetails" : NotCheckedDetails(PolicyId),
     "RequirementMet" : false
 }] {
-    PolicyId := "MS.DEFENDER.9.2v1"
+    PolicyId := "MS.DEFENDER.5.2v1"
     true
 }
 #--
