@@ -45,7 +45,7 @@ test_AllowEmailIntoChannel_Correct_V1_multi if {
             {
                 "Identity": "Tag:AllOn",
                 "AllowEmailIntoChannel": false
-            }            
+            }
         ],
         "teams_tenant_info": [
             {
@@ -147,7 +147,7 @@ test_AllowEmailIntoChannel_Correct_V2 if {
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-    
+
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "N/A: Feature is unavailable in GCC environments"
@@ -179,7 +179,7 @@ test_AllowEmailIntoChannel_Correct_V2_multi if {
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-    
+
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "N/A: Feature is unavailable in GCC environments"

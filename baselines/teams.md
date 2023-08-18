@@ -123,7 +123,7 @@ All the settings in this section are configured in the **Microsoft Teams admin
 To ensure external participants do not have the ability to request
 control of the shared desktop or window in the meeting:
 
-1.  Sign in to the **Microsoft Teams admin center**
+1.  Sign in to the **Microsoft Teams admin center**.
 
 2.  Select **Meetings** > **Meeting policies**.
 
@@ -140,34 +140,45 @@ To configure settings for anonymous users:
 1.	Sign in to the **Microsoft Teams admin center**.
 
 2.	Select **Meetings** > **Meeting policies**.
+
 3.	Select the **Global (Org-wide default)** policy.
+
 4.	Under the **Meeting join & lobby** section , set **Anonymous users and dial-in callers can start a meeting** to Off.
+
 5.	If custom policies have been created, repeat these steps for each policy, selecting the appropriate policy in step 3.
 
 #### MS.TEAMS.1.3v1 instructions:
 1.	Sign in to the **Microsoft Teams admin center**.
 
 2.	Select **Meetings** > **Meeting policies**.
+
 3.	Select the **Global (Org-wide default)** policy.
+
 4.	Under the **Meeting join & lobby** section , ensure **Who can bypass the lobby** is **not** set to **Everyone**. Bypassing the lobby should be set to **People in my org**, though other options may be used if needed.
+
 5.	In the same section, set **People dialing in can bypass the lobby** to Off.
 #### MS.TEAMS.1.4v1 instructions:
 1.	Sign in to the **Microsoft Teams admin center**.
 
 2.	Select **Meetings** > **Meeting policies**.
+
 3.	Select the **Global (Org-wide default)** policy.
+
 4.	Under the **Meeting join & lobby** section , ensure **Who can bypass the lobby** is set to **People in my org**.
+
 5.	In the same section, set **People dialing in can bypass the lobby** to Off.
 #### MS.TEAMS.1.5v1 instructions:
 1.	Sign in to the **Microsoft Teams admin center**.
 
 2.	Select **Meetings** > **Meeting policies**.
+
 3.	Select the **Global (Org-wide default)** policy.
+
 4.	Under the **Meeting join & lobby** section, set **People dialing in can bypass the lobby** to Off.
 
 #### MS.TEAMS.1.6v1 instructions:
 
-1.  Sign in to the **Microsoft Teams admin center**
+1.  Sign in to the **Microsoft Teams admin center**.
 
 2.  Select **Meetings** > **Meeting policies**.
 
@@ -182,7 +193,7 @@ To configure settings for anonymous users:
 #### MS.TEAMS.1.7v1 instructions:
 
 1.  Sign in to the **Microsoft Teams admin
-    center**
+    center**.
 
 2.  Select **Meetings** > **Live events policies**.
 
@@ -268,6 +279,7 @@ organization](https://docs.microsoft.com/en-us/microsoftteams/manage-external-ac
 To enable external access for only specific domains:
 
 1.  Sign in to the **Microsoft Teams admin center**.
+
 2.  Select **Users** > **External access**.
 
 3.  Under **Choose which external domains your users have access to**,
@@ -276,12 +288,13 @@ To enable external access for only specific domains:
 4.  Click **Allow domains** to add allowed external domains. All domains
     not added in this step will be blocked.
 
-5.  Click **Save.**
+5.  Click **Save**.
 
 
 #### MS.TEAMS.2.2v1 instructions:
     
 1.  Sign in to the **Microsoft Teams admin center**.
+
 2.  Select **Users > External access.**
 
 3.  To completely block contact with unmanaged users, under **Teams
@@ -300,7 +313,8 @@ To enable external access for only specific domains:
 #### MS.TEAMS.2.3v1 instructions:
     
 1.  Sign in to the **Microsoft Teams admin center**.
-2.  Select **Users > External access.**
+
+2.  Select **Users > External access**.
 
 3.  To completely block contact with unmanaged users, under **Teams
     accounts not managed by an organization**, set **People in my
@@ -346,9 +360,9 @@ All the settings in this section are configured in the **Microsoft Teams admin c
 #### MS.TEAMS.3.1v1 instructions:
 
 1.  Sign in to the **Microsoft Teams admin
-    center.**
+    center**.
 
-2.  Select **Users > External access.**
+2.  Select **Users > External access**.
 
 3.  Under **Skype** users, set **Allow users in my organization to
     communicate with Skype users** to **Off**.
@@ -381,7 +395,7 @@ All the settings in this section are configured in the **Microsoft Teams admin c
 #### MS.TEAMS.4.1v1 instructions:
 
 1.  Sign in to the **Microsoft Teams admin
-    center.**
+    center**.
 
 2.  Select **Teams** > **Teams Settings**.
 
@@ -397,21 +411,22 @@ This section helps reduce security risks related to app integration with Microso
 Teams store.
 
 *Custom apps*: apps not published to the Teams store, such as apps under
-development, that users “sideload” into Teams.
+development, that users sideload into Teams.
 
 ### Policies
 
 #### MS.TEAMS.5.1v1
-Agencies SHOULD "Allow specifc apps and block all others" for Microsoft Apps.
+Agencies SHOULD only allow installation of Microsoft Apps approved and used by the agency.
 - _Rationale:_ The security risk with allowing integration for all Microsoft Apps is access to Teams information through vulnerabilties that can be present in app unmanged by the agency. By only allowing specific apps and blocking all others the agency will better manage its app integration and potential exposure points.
 - _Last modified:_ July 2023
 - _Note:_ This policy applies to the Global (Org-wide default) policy, all custom policies, and the org-wide app settings. Custom policies MAY be created to allow more flexibility for specific users.
  
 #### MS.TEAMS.5.2v1
-Agencies SHOULD NOT allow installation of all third-party apps and custom apps.
+Agencies SHOULD only allow installation of third-party or custom apps approved and used by the agency.
 - _Rationale:_ The security risk with allowing integration third-party and custom is access to Teams information through vulnerabilties that can be present in an app unmanged by the agency. By blocking intallation of all third-party apps and custom apps the agency will disable the integration for Teams to said apps.
 - _Last modified:_ July 2023
-- _Note:_ This policy applies to the Global (Org-wide default) policy, all custom policies if they exist, and the org-wise settings. Custom policies MAY be created to allow more flexibility for specific users.
+- _Note:_ This policy applies to the Global (Org-wide default) policy, all custom policies if they exist, and the org-wise settings. Custom policies MAY be created to allow more flexibility for specific users. Third-party apps and custom apps are not
+available in GCC or DoD tenants.
 
 ### Resources
 
@@ -423,22 +438,20 @@ Docs](https://learn.microsoft.com/en-us/microsoftteams/platform/concepts/deploy-
 
 ### License Requirements
 
-- third-party apps and custom apps are only available with E3/E5 licenses. It is not
-available in GCC or DoD tenants.
+- Third-party apps and custom apps are only available with E3/E5 licenses.
 
 ### Implementation
 
 All the settings in this section are configured in the **Microsoft Teams admin center**. 
 
 #### MS.TEAMS.5.1v1 instructions:
+1.  Sign in to the **Microsoft Teams admin center**.
 
-1.  Sign in to the **Microsoft Teams admin center.**
-
-2.  Select **Teams apps** > **Permission policies.**
+2.  Select **Teams apps** > **Permission policies**.
 
 3.  Select **Global (Org-wide default)**.
 
-4.  Under **Microsoft apps**, select **"Allow specifc apps and block all others"**
+4.  Under **Microsoft apps**, select **"Allow specifc apps and block all others"**.
 
 5.  Click **Allow apps**.
 
@@ -453,9 +466,9 @@ All the settings in this section are configured in the **Microsoft Teams admin c
 
 #### MS.TEAMS.5.2v1 instructions:
 
-1.  Sign in to the **Microsoft Teams admin center.**
+1.  Sign in to the **Microsoft Teams admin center**.
 
-2.  Select **Teams apps** > **Permission policies.**
+2.  Select **Teams apps** > **Permission policies**.
 
 3.  Select **Global (Org-wide default)**.
 
@@ -469,13 +482,13 @@ All the settings in this section are configured in the **Microsoft Teams admin c
 
 6.  Click **Save**.
 
-7.  Select **Teams apps** > **Manage Apps**
+7.  Select **Teams apps** > **Manage Apps**.
 
 8.  Select **Org-wide app settings**.
 
-9.  Under **Third-pary apps** turn off **Third-pary apps**
+9.  Under **Third-pary apps** turn off **Third-pary apps**.
 
-10.  Under **Custom apps** turn off **Interaction with custom apps**
+10.  Under **Custom apps** turn off **Interaction with custom apps**.
 
 11.  If custom policies have been created, repeat these steps for each
     policy, selecting the appropriate policy in step 3.
@@ -486,7 +499,7 @@ All the settings in this section are configured in the **Microsoft Teams admin c
 
 Data loss prevention (DLP) helps prevent both accidental leakage of
 sensitive information as well as intentional exfiltration of data. DLP
-forms an integral part of securing Microsoft Exchange Online. There are
+forms an integral part of securing Microsoft Teams. There are
 several commercial DLP solutions available that document support for
 M365. Microsoft themselves offers DLP services, controlled within the Microsoft Purview
 compliance portal. Agencies may select any service that fits their needs and meets
@@ -540,12 +553,10 @@ Any product that meets the requirements outlined in this baseline policy may be 
 
 ## 7. Malware Scanning
 
-Any product that meets the requirements outlined in this baseline
-policy group may be used. If the agency is using Microsoft Defender to
-implement malware scanning, see the following policies of the CISA M365 Security Configuration Baseline for Defender for Office 365 for additional guidance.
+Any product that meets the requirements outlined in this baselinepolicy group may be used. If the agency is using Microsoft Defender to implement malware scanning, see the following policies of the CISA M365 Security Configuration Baseline for Defender for Office 365 for additional guidance.
 
-- [MS.DEFENDER.1.3v1 \| CISA M365 Security Configuration Baseline for Defender for Office 365](./defender.md#msdefender13v1)
-  - All users SHALL be added to Defender for Office 365 Protection in either the standard or strict preset security policy.
+- [MS.DEFENDER.3.1v1 \| CISA M365 Security Configuration Baseline for Defender for Office 365](./defender.md#msdefender31v1)
+  - Safe attachments SHOULD be enabled for SharePoint, OneDrive, and Microsoft Teams.
 
 ### Policies
 
@@ -561,20 +572,24 @@ Users SHOULD be prevented from opening or downloading files detected as malware.
 
 ### Resources
 
-- [Recommended settings for EOP and Microsoft Defender for Office 365
-  security \| Microsoft
-  Docs](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/recommended-settings-for-eop-and-office365)
+- [Safe Attachments in Microsoft Defender for Office 365 \| Microsoft
+  Learn](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/safe-attachments-about?view=o365-worldwide#safe-attachments-policy-settings)
+
+- [Turn on Safe Attachments for SharePoint, OneDrive, and Microsoft
+  Teams \| Microsoft
+  Learn](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/safe-attachments-for-spo-odfb-teams-configure?view=o365-worldwide)
 
 ### License Requirements
 
-- N/A
+- IF using Microsfot Defender, requires Defender for Office 365 Plan 1 or 2. These are included with
+  E5 and G5 and are available as add-ons for E3 and G3.
 
 ### Implementation
 #### MS.TEAMS.7.1v1 instructions:
-Any product that meets the requirements outlined in this baseline policy may be used. If the agency is using Microsoft Defender, see the following implementation steps for [Malware Scanning](./defender.md#implementation) for additional guidance.
+Any product that meets the requirements outlined in this baseline policy may be used. If the agency is using Microsoft Defender, see the following implementation steps for [Safe Attachments](./defender.md#implementation-2) for additional guidance.
 
 #### MS.TEAMS.7.2v1 instructions:
-Any product that meets the requirements outlined in this baseline policy may be used. If the agency is using Microsoft Defender, see the following implementation steps for [Malware Scanning](./defender.md#implementation) for additional guidance.
+Any product that meets the requirements outlined in this baseline policy may be used. If the agency is using Microsoft Defender, see the following implementation steps for [Safe Attachments](./defender.md#implementation-2) for additional guidance.
 
 ## 8. Link Protection
 
@@ -597,9 +612,7 @@ Their proxy can perform the following actions:
 
 If all checks pass, the user is redirected to the original URL.
 
-Microsoft Defender includes link scanning capabilities
-Use of Microsoft Defender is not strictly required for this purpose;
-any product that fulfills the requirements outlined in this baseline policy group may be used.
+Microsoft Defender includes link scanning capabilities. Use of Microsoft Defender is not strictly required for this purpose; any product that fulfills the requirements outlined in this baseline policy group may be used.
 If the agency is using Microsoft Defender to meet this baseline policy group, see the following policy of the CISA M365 Security Configuration Baseline for Defender for Office 365 for additional guidance.
 
 - [MS.DEFENDER.1.3v1 \| CISA M365 Security Configuration Baseline for Defender for Office 365](./defender.md#msdefender13v1).
@@ -613,11 +626,6 @@ URL comparison with a block-list SHOULD be enabled.
 - _Last modified:_ July 2023
 
 #### MS.TEAMS.8.2v1
-Direct download links SHOULD be scanned for malware.
-- _Rationale:_ URLs in Teams may direct users to download and run malware. Scanning direct download links in real-time for known malware and blocking access can prevent users from infecting their devices.
-- _Last modified:_ July 2023
-
-#### MS.TEAMS.8.3v1
 User click tracking SHOULD be enabled.
 - _Rationale:_ Users may click on malicious links in Teams, leading to compromise or authorized data disclosure. Enabling user click tracking lets agencies know if a malicious link may have been visited after the fact to help tailor a response to a potential incident.
 - _Last modified:_ July 2023
@@ -628,19 +636,18 @@ User click tracking SHOULD be enabled.
   security \| Microsoft
   Docs](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/recommended-settings-for-eop-and-office365)
 
+- [Set up Safe Links policies in Microsoft Defender for Office 365 \| Microsoft Learn](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/safe-links-policies-configure?view=o365-worldwide)
+  
 ### License Requirements
 
 - N/A
 
 ### Implementation
 #### MS.TEAMS.8.1v1 instructions:
-Any product that meets the requirements outlined in this baseline policy may be used. If the agency is using Microsoft Defender, see the following implementation steps for [Link Protection](./defender.md#implementation) for additional guidance.
+Any product that meets the requirements outlined in this baseline policy may be used. If the agency is using Microsoft Defender, see the following implementation steps for [standard or strict preset security policy](.defender.md#msdefender13v1) for additional guidance.
 
 #### MS.TEAMS.8.2v1 instructions:
-Any product that meets the requirements outlined in this baseline policy may be used. If the agency is using Microsoft Defender, see the following implementation steps for [Link Protection](./defender.md#implementation) for additional guidance.
-
-#### MS.TEAMS.8.3v1 instructions:
-Any product that meets the requirements outlined in this baseline policy may be used. If the agency is using Microsoft Defender, see the following implementation steps for [Link Protection](./defender.md#implementation) for additional guidance.
+Any product that meets the requirements outlined in this baseline policy may be used. If the agency is using Microsoft Defender, see the following implementation steps for [standard or strict preset security policy](.defender.md#msdefender13v1) for additional guidance.
 
 # Acknowledgements
 
