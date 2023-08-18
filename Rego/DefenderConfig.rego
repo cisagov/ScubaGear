@@ -217,10 +217,53 @@ tests[{
 }
 #--
 
+#
+# MS.DEFENDER.1.4v1
+#--
 
+# TODO: look at config file to get list of sensitive users. Current
+# implementation just asserts that the strict policy applies to at
+# least one person.
 
+tests[{
+    "PolicyId" : "MS.DEFENDER.1.4v1",
+    "Criticality" : "Shall",
+    "Commandlet" : ["Get-EOPProtectionPolicyRule"],
+	"ActualValue" : {"EOPProtectionPolicies": Policies},
+    "ReportDetails" : ReportDetailsBoolean(Status),
+    "RequirementMet" : Status
+}] {
+    Policies := input.protection_policy_rules
+    # If no one has been assigned to the strict policy, it won't even
+    # be included in the output of Get-EOPProtectionPolicyRule
+    Status := count([Policy | Policy = Policies[_];
+        Policy.Identity == "Strict Preset Security Policy"]) > 0
+}
+#--
 
+#
+# MS.DEFENDER.1.5v1
+#--
 
+# TODO: look at config file to get list of sensitive users. Current
+# implementation just asserts that the strict policy applies to at
+# least one person.
+
+tests[{
+    "PolicyId" : "MS.DEFENDER.1.5v1",
+    "Criticality" : "Shall",
+    "Commandlet" : ["Get-ATPProtectionPolicyRule"],
+	"ActualValue" : {"ATPProtectionPolicies": Policies},
+    "ReportDetails" : ReportDetailsBoolean(Status),
+    "RequirementMet" : Status
+}] {
+    Policies := input.atp_policy_rules
+    # If no one has been assigned to the strict policy, it won't even
+    # be included in the output of Get-ATPProtectionPolicyRule
+    Status := count([Policy | Policy = Policies[_];
+        Policy.Identity == "Strict Preset Security Policy"]) > 0
+}
+#--
 
 
 
