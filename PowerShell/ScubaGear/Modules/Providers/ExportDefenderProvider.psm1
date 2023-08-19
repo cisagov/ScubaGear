@@ -52,47 +52,27 @@ function Export-DefenderProvider {
     $AdminAuditLogConfig = ConvertTo-Json @($Tracker.TryCommand("Get-AdminAuditLogConfig"))
     $ProtectionPolicyRule = ConvertTo-Json @($Tracker.TryCommand("Get-EOPProtectionPolicyRule"))
     $ATPProtectionPolicyRule = ConvertTo-Json @($Tracker.TryCommand("Get-ATPProtectionPolicyRule"))
-    $MalwareFilterPolicy = ConvertTo-Json @($Tracker.TryCommand("Get-MalwareFilterPolicy"))
     $AntiPhishPolicy = ConvertTo-Json @($Tracker.TryCommand("Get-AntiPhishPolicy"))
-    $HostedContentFilterPolicy = ConvertTo-Json @($Tracker.TryCommand("Get-HostedContentFilterPolicy"))
-    $AllDomains = ConvertTo-Json @($Tracker.TryCommand("Get-AcceptedDomain"))
 
     # Test if Defender specific commands are available. If the tenant does
     # not have a defender license (plan 1 or plan 2), the following
     # commandlets will fail with "The term [Cmdlet name] is not recognized
     # as the name of a cmdlet, function, script file, or operable program,"
     # so we can test for this using Get-Command.
-    if (Get-Command Get-SafeAttachmentPolicy -ErrorAction SilentlyContinue) {
-        $SafeAttachmentPolicy = ConvertTo-Json @($Tracker.TryCommand("Get-SafeAttachmentPolicy"))
-        $SafeAttachmentRule = ConvertTo-Json @($Tracker.TryCommand("Get-SafeAttachmentRule"))
-        $SafeLinksPolicy = ConvertTo-Json @($Tracker.TryCommand("Get-SafeLinksPolicy"))
-        $SafeLinksRule = ConvertTo-Json @($Tracker.TryCommand("Get-SafeLinksRule"))
+    if (Get-Command Get-AtpPolicyForO365 -ErrorAction SilentlyContinue) {
         $ATPPolicy = ConvertTo-Json @($Tracker.TryCommand("Get-AtpPolicyForO365"))
         $DefenderLicense = ConvertTo-Json $true
     }
     else {
         # The tenant can't make use of the defender commands
-        Write-Warning "Defender license not available in tenant. Omitting the following commands: Get-SafeAttachmentPolicy, Get-SafeAttachmentRule, Get-SafeLinksPolicy, Get-SafeLinksRule, and Get-AtpPolicyForO365."
-        $SafeAttachmentPolicy = ConvertTo-Json @()
-        $SafeAttachmentRule = ConvertTo-Json @()
-        $SafeLinksPolicy = ConvertTo-Json @()
-        $SafeLinksRule = ConvertTo-Json @()
+        Write-Warning "Defender license not available in tenant. Omitting the following commands: Get-AtpPolicyForO365."
         $ATPPolicy = ConvertTo-Json @()
         $DefenderLicense = ConvertTo-Json $false
 
-        # While it is counter-intuitive to add these to SuccessfulCommands
+        # While it is counter-intuitive to add this both to SuccessfulCommands
         # and UnSuccessfulCommands, this is a unique error case that is
         # handled within the Rego.
-        $Tracker.AddSuccessfulCommand("Get-SafeAttachmentPolicy")
-        $Tracker.AddSuccessfulCommand("Get-SafeAttachmentRule")
-        $Tracker.AddSuccessfulCommand("Get-SafeLinksPolicy")
-        $Tracker.AddSuccessfulCommand("Get-SafeLinksRule")
         $Tracker.AddSuccessfulCommand("Get-AtpPolicyForO365")
-
-        $Tracker.AddUnSuccessfulCommand("Get-SafeAttachmentPolicy")
-        $Tracker.AddUnSuccessfulCommand("Get-SafeAttachmentRule")
-        $Tracker.AddUnSuccessfulCommand("Get-SafeLinksPolicy")
-        $Tracker.AddUnSuccessfulCommand("Get-SafeLinksRule")
         $Tracker.AddUnSuccessfulCommand("Get-AtpPolicyForO365")
     }
 
@@ -151,16 +131,9 @@ function Export-DefenderProvider {
     "atp_policy_rules": $ATPProtectionPolicyRule,
     "dlp_compliance_policies": $DLPCompliancePolicy,
     "dlp_compliance_rules": $DLPComplianceRules,
-    "malware_filter_policies": $MalwareFilterPolicy,
     "anti_phish_policies": $AntiPhishPolicy,
-    "hosted_content_filter_policies": $HostedContentFilterPolicy,
-    "safe_attachment_policies": $SafeAttachmentPolicy,
-    "safe_attachment_rules": $SafeAttachmentRule,
-    "all_domains": $AllDomains,
     "protection_alerts": $ProtectionAlert,
     "admin_audit_log_config": $AdminAuditLogConfig,
-    "safe_links_policies": $SafeLinksPolicy,
-    "safe_links_rules": $SafeLinksRule,
     "atp_policy_for_o365": $ATPPolicy,
     "defender_license": $DefenderLicense,
     "defender_successful_commands": $SuccessfulCommands,
