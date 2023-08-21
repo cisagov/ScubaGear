@@ -188,17 +188,27 @@ The ScubaGear ConfigFilePath command line option allows users to define custom v
 
 **YAML AAD Configuration File Syntax and Examples**
 
-**Aad** refers to the AAD specific variables that enable users to specify user, group, and role exclusions that are documented exemptions to select conditional access policies in the AAD configuration policy baselines. Users, groups, and roles are specified by their respective Universally Unique Identifier (UUID) in the tenant. This variable set is only needed if the agency has documented exemptions for one or more of the conditional access policy baselines:
-- MS.AAD.1.1: *Legacy authentication SHALL be blocked*
-- MS.AAD.2.1: *Users detected as high risk SHALL be blocked*
-- MS.AAD.2.3: *Sign-ins detected as high risk SHALL be blocked*
-- MS.AAD.3.2: *Phishing-resistant MFA SHALL be enforced for all users*
-- MS.AAD.3.3: *If phishing-resistant MFA has not been enforced yet, then an alternative MFA method SHALL be enforced for all users*
-- MS.AAD.3.7: *Managed devices SHOULD be required for authentication*
-- MS.AAD.3.8: *Managed Devices SHOULD be required to register MFA*
-- MS.AAD.7.4: *Permanent active role assignments SHALL NOT be allowed for highly privileged roles*
+**Aad** defines the AAD specific variables to specify user, group, and role exclusions that are documented exemptions to select conditional access policies (CAP) in the AAD configuration policy baselines. Users, groups, and roles are specified by their respective Universally Unique Identifier (UUID) in the tenant. This variable set is only needed if the agency has documented CAP exemptions.
 
-The example below illustrates the syntax for defining user, group, and role exemptions to select policies. User and group exemptions are used for policies that can be modified to exclude specific users and groups from having to comply. Role exemptions are for those policies that can be modified to exclude specific roles from having to comply. It also makes use of a YAML anchor and alias to simplify formatting policies having the same documented exemptions. Items surrounded by chevrons are to be supplied by the user.
+**CapExclusions** - Supports both a Users and Groups list with each entry representing the UUID of a user or group that is approved by the agency to be included in a conditional access policy assignment exclusion. Adding an entry to this variable will prevent ScubaGear from failing the policy assessment due to the presence of the users and groups in an exclusion.
+
+CapExclusions can be defined in the following policy namespaces:
+
+MS.AAD.1.1v1
+MS.AAD.2.1v1
+MS.AAD.2.3v1
+MS.AAD.3.2v1
+MS.AAD.3.3v1
+MS.AAD.3.7v1
+MS.AAD.3.8v1
+**RoleExclusions** - Supports both a Users and Groups list with each entry representing the UUID of a user or group that is approved by the agency to be included in a role assignment. Adding an entry to this variable will prevent ScubaGear from failing the policy assessment due to the presence of a role assignment for those users and groups.
+
+RoleExclusions can be defined in the following policy namespaces:
+
+MS.AAD.7.4v1
+
+
+The example below illustrates the syntax for defining user, group, and role exemptions to select policies.  The syntax allows the use of a YAML anchor and alias to simplify formatting policies having the same documented exemptions. Items surrounded by chevrons are to be supplied by the user.
 
         Aad:
           MS.AAD.1.1v1: &CommonExclusions
