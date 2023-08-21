@@ -195,19 +195,19 @@ The ScubaGear ConfigFilePath command line option allows users to define custom v
 
 CapExclusions can be defined in the following policy namespaces:
 
-MS.AAD.1.1v1
-MS.AAD.2.1v1
-MS.AAD.2.3v1
-MS.AAD.3.2v1
-MS.AAD.3.3v1
-MS.AAD.3.7v1
-MS.AAD.3.8v1
+- MS.AAD.1.1v1
+- MS.AAD.2.1v1
+- MS.AAD.2.3v1
+- MS.AAD.3.2v1
+- MS.AAD.3.3v1
+- MS.AAD.3.7v1
+- MS.AAD.3.8v1
 
 **RoleExclusions** - Supports both a Users and Groups list with each entry representing the UUID of a user or group that is approved by the agency to be included in a role assignment. Adding an entry to this variable will prevent ScubaGear from failing the policy assessment due to the presence of a role assignment for those users and groups.
 
 RoleExclusions can be defined in the following policy namespaces:
 
-MS.AAD.7.4v1
+- MS.AAD.7.4v1
 
 The example below illustrates the syntax for defining user, group, and role exemptions to select policies.  The syntax allows the use of a YAML anchor and alias to simplify formatting policies having the same documented exemptions. Items surrounded by chevrons are to be supplied by the user.
 
