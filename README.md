@@ -216,6 +216,7 @@ The example below illustrates the syntax for defining user, group, and role exem
             CapExclusions:
               Users:
                 - <Exempted User 1 UUID>
+                - <Exempted User 2 UUID>
               Groups:
                 - <Exempted Group 1 UUID>
           MS.AAD.2.1v1:  *CommonExclusions
@@ -224,7 +225,7 @@ The example below illustrates the syntax for defining user, group, and role exem
           MS.AAD.7.4v1:
             RoleExclusions:
               Users:
-                - <Exempted User 2 UUID>
+                - <Exempted User 3 UUID>
               Groups:
                 - <Exempted Group 2 UUID>
 
