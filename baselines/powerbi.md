@@ -68,15 +68,11 @@ The Publish to Web feature SHOULD be disabled unless the agency mission requires
 
 1. Navigate to the **PowerBI Admin Portal**
 
-2. Click on the 3 dots in the upper right hand corner
+2. Click on **Tenant Settings**
 
-3. Click on **Settings** > **Admin Portal**
+3. Scroll to **Export and sharing settings**
 
-4. Click on **Tenant Settings**
-
-5. Scroll to **Export and sharing settings**
-
-6. Click **Publish to web** set to **Disabled**
+4. Click **Publish to web** set to **Disabled**
 
 ## 2. Power BI Guest Access
 
@@ -139,15 +135,11 @@ Guest user access to the Power BI tenant SHOULD be disabled unless the agency mi
 #### MS.POWERBI.2.1v1 instructions:
 1. Navigate to the **PowerBI Admin Portal**
 
-2. Click on the 3 dots in the upper right hand corner
+2. Click on **Tenant Settings**
 
-3. Click on **Settings** > **Admin Portal**
+3. Scroll to **Export and sharing settings**
 
-4. Click on **Tenant Settings**
-
-5. Scroll to **Export and sharing settings**
-
-6. Click on **Allow Azure Active Directory guests users to access Power BI** and set to **Disabled**
+4. Click on **Allow Azure Active Directory guest users to edit and manage content in the organization** and set to **Disabled**
 
 ## 3. Power BI External Invitations
 
@@ -204,15 +196,11 @@ The **Invite external users to your organization** feature SHOULD be disabled un
 #### MS.POWERBI.3.1v1 instructions:
 1. Navigate to the **PowerBI Admin Portal**
 
-2. Click on the 3 dots in the upper right hand corner
+2. Click on **Tenant Settings**
 
-3. Click on **Settings** > **Admin Portal**
+3. Scroll to **Export and sharing settings**
 
-4. Click on **Tenant Settings**
-
-5. Scroll to **Export and sharing settings**
-
-6. Click on **Allow Azure Active Directory guests users to access Power BI** and set to **Disabled**
+4. Click on **Invite external users to your organization** and set to **Disabled**
 
 ## 4. Power BI Service Principals
 
@@ -301,18 +289,14 @@ in a secure vault such as Azure Key Vault.
 #### MS.POWERBI.4.1v1 instructions:
 1. Navigate to the **PowerBI Admin Portal**
 
-2. Click on the 3 dots in the upper right hand corner
+2. Click on **Tenant settings**
 
-3. Click on **Settings** > **Admin Portal**
+3. Scroll to **Developer settings**
 
-4. Click on **Tenant settings**
-
-5. Scroll to **Developer settings**
-
-6. Click on **Allow service principals to use Power BI APIs** set to **Enabled**.
+4. Click on **Allow service principals to use Power BI APIs** set to **Enabled**.
 Choose a specific security group allowed to use service principles for the APIs.
 
-7. Then, click on **Allow service principals to create and use profiles** set to **Enabled**.
+5. Then, click on **Allow service principals to create and use profiles** set to **Enabled**.
 Choose a specific security group allowed to use service principles to create and use profiles
 
 #### MS.POWERBI.4.1v2 instructions:
@@ -365,15 +349,11 @@ ResourceKey Authentication SHOULD be blocked unless a specific use case (e.g., s
 #### MS.POWERBI.5.1v1 instructions:
 1. Navigate to the **PowerBI Admin Portal**
 
-2. Click on the 3 dots in the upper right hand corner
+2. Click on **Tenant settings**
 
-3. Click on **Settings** > **Admin Portal**
+3. Scroll to **Developer settings**
 
-4. Click on **Tenant settings**
-
-5. Scroll to **Developer settings**
-
-6. Click on **Block ResourceKey Authentication** set to **Enabled**
+4. Click on **Block ResourceKey Authentication** set to **Enabled**
 
 ## 6. Python and R Visual Sharing
 
@@ -408,15 +388,11 @@ R and Python interactions SHOULD be disabled.
 #### MS.POWERBI.6.1v1 instructions:
 1. Navigate to the **PowerBI Admin Portal**
 
-2. Click on the 3 dots in the upper right hand corner
+2. Click on **Tenant settings**
 
-3. Click on **Settings** > **Admin Portal**
+3. Scroll to **R and Python Visuals Settings**
 
-4. Click on **Tenant settings**
-
-5. Scroll to **R and Python Visuals Settings**
-
-6. Click on **Interact with and share R and Python visuals** set to **Disabled**
+4. Click on **Interact with and share R and Python visuals** set to **Disabled**
 
 ## 7. Power BI Sensitive Data
 
@@ -484,15 +460,11 @@ Sensitivity labels SHOULD be enabled for Power BI and employed for sensitive dat
 #### MS.POWERBI.7.1v1 instructions:
 1. Navigate to the **PowerBI Admin Portal**
 
-2. Click on the 3 dots in the upper right hand corner
+2. Click on **Tenant settings**
 
-3. Click on **Settings** > **Admin Portal**
+3. Scroll to **Information protection**
 
-4. Click on **Tenant settings**
-
-5. Scroll to **Information protection**
-
-6. Click on **Allow users to apply sensitivity labels for Power BI content** set to **Enabled**
+4. Click on **Allow users to apply sensitivity labels for content** set to **Enabled**
    Define who can apply and change sensitivity labels in Power BI assets.
 
 # Acknowledgements
