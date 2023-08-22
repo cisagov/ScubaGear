@@ -26,7 +26,7 @@ To download ScubaGear:
 ### Installing the required PowerShell Modules
 > **Note**: Only PowerShell 5.1 is currently supported. PowerShell 7 may work, but has not been tested. PowerShell 7 will be added in a future release.
 
-To import the module, open a new PowerShell 5.1 terminal and navigate to the repository folder. 
+To import the module, open a new PowerShell 5.1 terminal and navigate to the repository folder.
 
 Then run:
 
@@ -38,8 +38,8 @@ Import-Module -Name .\PowerShell\ScubaGear #Imports the tool into your session
 > **Note**: OPA executable download script is called by default when running SetUp.ps1. OPA.ps1 can also be run by itself to download the executable.
 In the event of an unsuccessful download, users can manually download the OPA executable with the following steps:
 1. Go to OPA download site (https://www.openpolicyagent.org/docs/latest/#running-opa)
-2. Check the acceptable OPA version (Currently v0.42.1) for Scuba and select the corresponding version on top left of the website 
-3. Navigate to the menu on left side of the screen: Introduction - Running OPA - Download OPA 
+2. Check the acceptable OPA version (Currently v0.42.1) for Scuba and select the corresponding version on top left of the website
+3. Navigate to the menu on left side of the screen: Introduction - Running OPA - Download OPA
 4. Locate the downloaded file, add the file to the root directory of this repository, open PowerShell, and use the following command to check the downloaded OPA version
 ```powershell
 .\opa_windows_amd64.exe version
@@ -74,6 +74,15 @@ Get-Help -Name Invoke-SCuBA -Full
 ```
 
 ### Parameter Definitions
+
+- **$ConfigFilePath** is an optional parameter that refers to the path to a configuration file that the tool parses for input parameters when executing ScubaGear. ScubaGear supports either a YAML or JSON formatted configuration file. A sample configuration file is included in [sample-config-files/aad-config.yaml](./sample-config-files/aad-config.yaml). The syntax defines:
+  - Use of Pascal case convention for variable names consistent with parameters on the command line
+  - A global namespace for values to be used across baselines and products (i.e., GlobalVars)
+  - Per product namespace for values related to that specific product (i.e., Aad, SharePoint)
+  - Namespace for each policy item within a product for variables related only to one policy item (i.e., MS.AAD.2.1v1)
+  - Use of YAML anchors and aliases following Don't Repeat Yourself (DRY) principle for repeated values and sections
+
+  When using the configuration file option, all non-default parameters must be specified in the file. ScubaGear does not allow other command line options with `-ConfigFilePath`. The file path defaults to the same directory where the script is executed. The file path must point to a valid configuration file. It can be either a relative or absolute path. The file can be used to specify both standard tool parameters as well as custom parameters used by the Azure Active Directory (AAD) product assessment. See [AAD Conditional Access Policy Exemptions](#aad-conditional-access-policy-exemptions) for more details.
 
 - **$LogIn** is a `$true` or `$false` variable that if set to `$true` will prompt the user to provide credentials to establish a connection to the specified M365 products in the **$ProductNames** variable. For most use cases, leave this variable to be `$true`. A connection is established in the current PowerShell terminal session with the first authentication. To run another verification in the same PowerShell session,  set this variable to be `$false` to bypass the need to authenticate again in the same session. Note: defender will ask for authentication even if this variable is set to `$false`
 
@@ -173,6 +182,50 @@ New-PowerAppManagementApp -ApplicationId $appId # Must be run from a Power Platf
 
 > **Notes**: Only authentication via `CertificateThumbprint` is currently supported. We will also be supporting automated app registration in a later release.
 
+### AAD Conditional Access Policy Exemptions
+The ScubaGear ConfigFilePath command line option allows users to define custom variables for use in policy assessments against the AAD baseline.  These custom variables are used to exempt specific user and group exclusions from conditional access policy checks that normally would not pass if exclusions are present.  These parameters support operational use cases for having backup or break glass account exclusions to global user policies without failing best practices.  Any exemptions and their risks should be carefully considered and documented as part of an organization's cybersecurity risk management program process and practices.
+
+**YAML AAD Configuration File Syntax and Examples**
+
+**Aad** defines the AAD specific variables to specify user, group, and role exclusions that are documented exemptions to select conditional access policies (CAP) in the AAD configuration policy baselines. Users, groups, and roles are specified by their respective Universally Unique Identifier (UUID) in the tenant. This variable set is only needed if the agency has documented CAP exemptions.
+
+**CapExclusions** - Supports both a Users and Groups list with each entry representing the UUID of a user or group that is approved by the agency to be included in a conditional access policy assignment exclusion. Adding an entry to this variable will prevent ScubaGear from failing the policy assessment due to the presence of the users and groups in an exclusion.
+
+CapExclusions can be defined in the following policy namespaces:
+
+- MS.AAD.1.1v1
+- MS.AAD.2.1v1
+- MS.AAD.2.3v1
+- MS.AAD.3.2v1
+- MS.AAD.3.3v1
+- MS.AAD.3.7v1
+- MS.AAD.3.8v1
+
+**RoleExclusions** - Supports both a Users and Groups list with each entry representing the UUID of a user or group that is approved by the agency to be included in a role assignment. Adding an entry to this variable will prevent ScubaGear from failing the policy assessment due to the presence of a role assignment for those users and groups.
+
+RoleExclusions can be defined in the following policy namespaces:
+
+- MS.AAD.7.4v1
+
+The example below illustrates the syntax for defining user, group, and role exemptions to select policies.  The syntax allows the use of a YAML anchor and alias to simplify formatting policies having the same documented exemptions. Items surrounded by chevrons are to be supplied by the user.
+
+        Aad:
+          MS.AAD.1.1v1: &CommonExclusions
+            CapExclusions:
+              Users:
+                - <Exempted User 1 UUID>
+                - <Exempted User 2 UUID>
+              Groups:
+                - <Exempted Group 1 UUID>
+          MS.AAD.2.1v1:  *CommonExclusions
+          MS.AAD.2.3v1:  *CommonExclusions
+          MS.AAD.3.2v1:  *CommonExclusions
+          MS.AAD.7.4v1:
+            RoleExclusions:
+              Users:
+                - <Exempted User 3 UUID>
+              Groups:
+                - <Exempted Group 2 UUID>
 
 ## Architecture
 ![SCuBA Architecture diagram](/images/scuba-architecture.png)
@@ -194,7 +247,7 @@ Unless otherwise noted, this project is distributed under the Creative Commons Z
 ## Troubleshooting
 
 ### Executing against multiple tenants
-ScubaGear creates connections to several M365 services. If running against multiple tenants, it is necessary to disconnect those sessions. 
+ScubaGear creates connections to several M365 services. If running against multiple tenants, it is necessary to disconnect those sessions.
 
 `Invoke-SCuBA` includes the `-DisconnectOnExit` parameter to disconnect each of connection upon exit.  To disconnect sessions after a run, use `Disconnect-SCuBATenant`.  The cmdlet disconnects from Azure Active Directory (via MS Graph API), Defender, Exchange Online, Power Platform, SharePoint Online, and Microsoft Teams.
 
@@ -331,5 +384,3 @@ ScubaGear requires a number of PowerShell modules to function.  A user or develo
 On Windows Servers, the default [execution policy](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.security/set-executionpolicy?view=powershell-5.1) is `RemoteSigned`, which will allow ScubaGear to run after the publisher (CISA) is agreed to once.
 
 On Windows Clients, the default execution policy is `Restricted`.  In this case, `Set-ExecutionPolicy RemoteSigned` should be invoked to permit ScubaGear to run.
-
-In ScubaGear version 0.2.1 and earlier, running `Unblock-File` on the ScubaGear folder may be required. See [here](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/unblock-file?view=powershell-5.1) for more information.  
