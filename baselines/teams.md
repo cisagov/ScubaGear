@@ -55,12 +55,15 @@ This section also helps reduce security risks related to the user permissions fo
 #### MS.TEAMS.1.1v1
 External meeting participants SHOULD NOT be enabled to request control of shared desktops or windows.
 
+<!--Policy: MS.TEAMS.1.1v1; Criticality: SHOULD -->
 - _Rationale:_ There is risk in granting an external participant control of a shared screen because the participant could potentially perform unauthorized actions on the shared screen. This policy reduces that risk by removing the ability of an external participant to request control.  However, if agency has a legitimate use case to grant this control, it may be done on a 'as-needed' basis.
 - _Last modified:_ July 2023
 - _Note:_ This policy applies to the Global (Org-wide default) meeting policy and in custom meeting policies if they exist.
 
 #### MS.TEAMS.1.2v1
 Anonymous users SHALL NOT be enabled to start meetings.
+
+<!--Policy: MS.TEAMS.1.2v1; Criticality: SHALL -->
 - _Rationale:_ For any agencies that implemented custom policies that provided more flexibility to some users to automatically admit "everyone" to a meeting - this policy provides protection from anonymous users starting meeting to scrape internal contacts.
 - _Last modified:_ July 2023
 - _Note:_ This policy applies to the Global (Org-wide default) meeting policy and in custom meeting policies if they exist.
@@ -68,30 +71,39 @@ Anonymous users SHALL NOT be enabled to start meetings.
 #### MS.TEAMS.1.3v1
 Anonymous users and dial-in callers, SHOULD NOT be admitted automatically. 
 
+<!--Policy: MS.TEAMS.1.3v1; Criticality: SHOULD -->
 - _Rationale:_ Allowing the anonymous and dial-in users automatically reduces the control on who can participate in a meeting and potential for data breaches. This policy reduces the risk by requiring all anonymous and dial-in users to wait in a lobby until they were admitted by an authorized meeting participant. If the agency has a use case to have members of specific trusted organizations and/or B2B guests enter a meeting automatically, custom policies may be created and assigned to authorized meeting organizers.  
 - _Last modified:_ July 2023
 - _Note:_ This policy applies to the Global (Org-wide default) meeting policy. Custom meeting policies MAY be created that allow more flexibility for specific users. For example, B2B guest users and trusted partner members maybe auto admitted into meetings organized by authorized users. 
 
 #### MS.TEAMS.1.4v1
 Internal users SHOULD be admitted automatically.
+
+<!--Policy: MS.TEAMS.1.4v1; Criticality: SHOULD -->
 - _Rationale:_ Requiring internal users to wait in the lobby for explicit admit can lead to admit fatigue. This policy enables the internal users to be automatically admitted to meeting through global policy.  
 - _Last modified:_ July 2023
 - _Note:_ This policy applies to the Global (Org-wide default) meeting policy. Custom meeting policies MAY be created that allow more flexibility for specific users.
 
 #### MS.TEAMS.1.5v1
 Dial-in users, SHOULD NOT be enabled to bypass the lobby.
+
+<!--Policy: MS.TEAMS.1.5v1; Criticality: SHOULD -->
 - _Rationale:_ Allowing the Dial-in users automatically reduces the control on who can participate in a meeting and potential for data breaches. This policy reduces the risk by requiring all dial-in users to wait in a lobby until they were admitted by an authorized meeting participant.   
 - _Last modified:_ July 2023
 - _Note:_ This policy applies to the Global (Org-wide default) meeting policy and in custom meeting policies if they exist.  
 
 #### MS.TEAMS.1.6v1
 Meeting recording SHOULD be disabled.
+
+<!--Policy: MS.TEAMS.1.6v1; Criticality: SHOULD -->
 - _Rationale:_ The security risk with allowing all users to record Teams meetings and group calls exposes the ability to capture all audio, video, screen sharing activity, and information shared. By disabling the meeting recording setting in the Global (org-wide default) meeting policy an agency will limit this exposure of information. 
 - _Last modified:_ July 2023
 - _Note:_ This policy applies to the Global (Org-wide default) meeting policy and in custom meeting policies if they exist. Custom policies MAY be created to allow more flexibility for specific users.
 
 #### MS.TEAMS.1.7v1
 Record an event SHOULD be set to Organizer can record.
+
+<!--Policy: MS.TEAMS.1.7v1; Criticality: SHOULD -->
 - _Rationale:_ The security risk of the default settings for Live Events is that Live Events are available to be recorded by all participants by default. By limiting the recording permissions to only the organizer this minimizes the security risk to the organizer's discretion for these Live Events.
 - _Last modified:_ July 2023
 - _Note:_ This policy applies to the Global (Org-wide default) meeting policy and in custom meeting policies if they exist. Custom policies MAY be created to allow more flexibility for specific users.
@@ -233,18 +245,22 @@ Blocking contact with unmanaged Teams users prevents these users from looking up
 
 #### MS.TEAMS.2.1v1
 External access for users SHALL only be enabled on a per-domain basis.
+
+<!--Policy: MS.TEAMS.2.1v1; Criticality: SHALL -->
 - _Rationale:_ The default configuration is to allow members to communicate with all external users with similar access permissions. This unrestricted access can lead to data breaches and other security threats. This policy provides protection against threats posed by unrestricted access by allowing communication with only trusted domains.  
 - _Last modified:_ July 2023
 
 #### MS.TEAMS.2.2v1
-Unmanaged users SHALL NOT be enabled to initiate contact with internal
-users.
+Unmanaged users SHALL NOT be enabled to initiate contact with internal users.
+
+<!--Policy: MS.TEAMS.2.2v1; Criticality: SHALL -->
 - _Rationale:_ Allowing access to unmanaged users can open up the threat of email and contact address scavenging. This policy provides protection against this threat. 
 - _Last modified:_ July 2023
 
 #### MS.TEAMS.2.3v1
-Internal users SHOULD NOT be enabled to initiate contact with unmanaged
-users.
+Internal users SHOULD NOT be enabled to initiate contact with unmanaged users.
+
+<!--Policy: MS.TEAMS.2.3v1; Criticality: SHOULD -->
 - _Rationale:_ Access to unmanaged users can pose the risk of data leakage and other security threats. This policy provides protection by disabling the internal user access to unmanaged users. 
 - _Last modified:_ July 2023
 - _Note:_ This policy is not applicable to GCC, GCC High, and DoD tenants.  
@@ -333,6 +349,8 @@ This section helps reduce security risks related to contact with Skype users. As
 
 #### MS.TEAMS.3.1v1
 Contact with Skype users SHALL be blocked.
+
+<!--Policy: MS.TEAMS.3.1v1; Criticality: SHALL -->
 - _Rationale:_ The security risk of allowing contact with Skype users is aligned with the risk of contact with a retiring product and its current vulnerabilities. Microsoft is officially retiring all forms of Skype as listed above. By blocking contact with Skype users an agency is limiting access to security threats utilizing the vulnerabilities of the Skype product.
 - _Last modified:_ July 2023
 
@@ -369,6 +387,8 @@ This section helps reduce security risks related to Teams email integration. Tea
 ### Policies
 #### MS.TEAMS.4.1v1
 Teams email integration SHALL be disabled.
+
+<!--Policy: MS.TEAMS.4.1v1; Criticality: SHALL -->
 - _Rationale:_ Microsoft Teams email integration associates a Microsoft, not tenant domain, email address with a Teams channel. Channel emails are addressed using the Microsoft-owned domain teams.ms. By disabling Teams email integration, an agency prevents potentially sensitive Teams messages from being sent through external email gateways.  
 - _Last modified:_ July 2023
 - _Note:_ Teams email integration is not available in GCC, GCC High, or DoD regions.
@@ -411,18 +431,24 @@ development, that users sideload into Teams.
 
 #### MS.TEAMS.5.1v1
 Agencies SHOULD only allow installation of Microsoft Apps approved by the agency.
+
+<!--Policy: MS.TEAMS.5.1v1; Criticality: SHOULD -->
 - _Rationale:_ The security risk with allowing integration for all Microsoft Apps is access to Teams information through vulnerabilities that can be present in app unmanaged by the agency. By only allowing specific apps and blocking all others the agency will better manage its app integration and potential exposure points.
 - _Last modified:_ July 2023
 - _Note:_ This policy applies to the Global (Org-wide default) policy, all custom policies, and the org-wide app settings. Custom policies MAY be created to allow more flexibility for specific users.
  
 #### MS.TEAMS.5.2v1
 Agencies SHOULD only allow installation of third-party apps approved by the agency.
+
+<!--Policy: MS.TEAMS.5.2v1; Criticality: SHOULD -->
 - _Rationale:_ The security risk with allowing integration of third-party apps is access to Teams information through vulnerabilities that can be present in an app unmanaged by the agency. By blocking installation of all third-party apps, the agency will disable the integration for Teams to said apps.
 - _Last modified:_ July 2023
 - _Note:_ This policy applies to the Global (Org-wide default) policy, all custom policies if they exist, and the org-wise settings. Custom policies MAY be created to allow more flexibility for specific users. Third-party apps are not available in GCC, GCC High, or DoD regions.
 
 #### MS.TEAMS.5.3v1
 Agencies SHOULD only allow installation of custom apps approved by the agency.
+
+<!--Policy: MS.TEAMS.5.3v1; Criticality: SHOULD -->
 - _Rationale:_ The security risk with allowing integration of custom apps is access to Teams information through vulnerabilities that can be present in an app unmanaged by the agency. By blocking installation of all custom apps, the agency will disable the integration for Teams to said apps.
 - _Last modified:_ July 2023
 - _Note:_ This policy applies to the Global (Org-wide default) policy, all custom policies if they exist, and the org-wise settings. Custom policies MAY be created to allow more flexibility for specific users. Custom apps are not available in GCC, GCC High, or DoD regions.
@@ -488,7 +514,7 @@ All the settings in this section are configured in the **Microsoft Teams admin c
 
 
 7.  Select **Teams apps** > **Manage apps**.
-8.  Select **Org-wide app settings** button to access pop-up options 
+8.  Select **Org-wide app settings** button to access pop-up options. 
     - Under **Custom apps** turn off **Interaction with custom apps**.
     - Click **Save**.
 2.  Select **Teams apps** > **Permission policies**.
@@ -523,6 +549,8 @@ required, guidance for configuring Microsoft’s DLP solution can be found in fo
 
 #### MS.TEAMS.6.1v1
 A DLP solution SHALL be enabled. The selected DLP solution SHOULD offer services comparable to the native DLP solution offered by Microsoft.
+
+<!--Policy: MS.TEAMS.6.1v1; Criticality: SHALL -->
 - _Rationale:_ Teams users may inadvertently disclose sensitive information to unauthorized individuals. Data loss prevention policies provide a way for agencies to detect and prevent unauthorized disclosures. 
 - _Last modified:_ July 2023
 
@@ -531,6 +559,8 @@ The DLP solution SHALL protect Personally Identifiable Information (PII)
 and sensitive information, as defined by the agency. At a minimum, the
 sharing of credit card numbers, taxpayer Identification Numbers (TIN),
 and Social Security Numbers (SSN) via email SHALL be restricted.
+
+<!--Policy: MS.TEAMS.6.2v1; Criticality: SHALL -->
 - _Rationale:_ Teams users may inadvertently share sensitive information with others who should not have access to it. Data loss prevention policies provide a way for agencies to detect and prevent unauthorized sharing of sensitive information. 
 - _Last modified:_ July 2023
 
@@ -568,11 +598,15 @@ Any product that meets the requirements outlined in this baseline policy group m
 
 #### MS.TEAMS.7.1v1
 Attachments included with Teams messages SHOULD be scanned for malware.
+
+<!--Policy: MS.TEAMS.7.1v1; Criticality: SHOULD -->
 - _Rationale:_ Teams can be used as a mechanism for delivering malware. In many cases, malware can be detected through scanning, reducing the risk for end users.
 - _Last modified:_ July 2023
 
 #### MS.TEAMS.7.2v1
 Users SHOULD be prevented from opening or downloading files detected as malware.
+
+<!--Policy: MS.TEAMS.7.1v1; Criticality: SHOULD -->
 - _Rationale:_ Teams can be used as a mechanism for delivering malware. In many cases, malware can be detected through scanning, reducing the risk for end users.
 - _Last modified:_ July 2023
 
@@ -628,11 +662,15 @@ If the agency is using Microsoft Defender to meet this baseline policy group, se
 
 #### MS.TEAMS.8.1v1
 URL comparison with a block-list SHOULD be enabled.
+
+<!--Policy: MS.TEAMS.8.1v1; Criticality: SHOULD -->
 - _Rationale:_ Users may be directed to malicious websites via links in Teams. Blocking access to known, malicious URLs can prevent users from accessing known malicious websites.
 - _Last modified:_ July 2023
 
 #### MS.TEAMS.8.2v1
 User click tracking SHOULD be enabled.
+
+<!--Policy: MS.TEAMS.8.2v1; Criticality: SHOULD -->
 - _Rationale:_ Users may click on malicious links in Teams, leading to compromise or authorized data disclosure. Enabling user click tracking lets agencies know if a malicious link may have been visited after the fact to help tailor a response to a potential incident.
 - _Last modified:_ July 2023
 
