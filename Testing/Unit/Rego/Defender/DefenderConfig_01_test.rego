@@ -27,7 +27,8 @@ test_Enabled_Correct_V1 if {
                 "Identity" : "Strict Preset Security Policy",
                 "State" : "Enabled"
             }
-        ]
+        ],
+        "defender_license": true
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
@@ -51,7 +52,8 @@ test_Enabled_Correct_V2 if {
                 "State" : "Enabled"
             }
         ],
-        "atp_policy_rules" : []
+        "atp_policy_rules" : [],
+        "defender_license": true
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
@@ -61,7 +63,7 @@ test_Enabled_Correct_V2 if {
     RuleOutput[0].ReportDetails == "Requirement met"
 }
 
-test_Enabled_Correct_V1 if {
+test_Enabled_Correct_V3 if {
     PolicyId := "MS.DEFENDER.1.1v1"
 
     Output := tests with input as {  
@@ -75,7 +77,8 @@ test_Enabled_Correct_V1 if {
                 "Identity" : "Strict Preset Security Policy",
                 "State" : "Enabled"
             }
-        ]
+        ],
+        "defender_license": true
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
@@ -90,7 +93,8 @@ test_Enabled_Incorrect_V1 if {
 
     Output := tests with input as {  
         "protection_policy_rules" : [],
-        "atp_policy_rules" : []
+        "atp_policy_rules" : [],
+        "defender_license": true
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
@@ -109,7 +113,8 @@ test_Enabled_Incorrect_V2 if {
                 "State" : "Disabled"
             }
         ],
-        "atp_policy_rules" : []
+        "atp_policy_rules" : [],
+        "defender_license": true
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
@@ -129,7 +134,8 @@ test_Enabled_Incorrect_V3 if {
                 "State" : "Enabled"
             }
         ],
-        "atp_policy_rules" : []
+        "atp_policy_rules" : [],
+        "defender_license": true
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
@@ -153,7 +159,8 @@ test_Enabled_Incorrect_V4 if {
                 "State" : "Disabled"
             }
         ],
-        "atp_policy_rules" : []
+        "atp_policy_rules" : [],
+        "defender_license": true
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
@@ -177,7 +184,8 @@ test_AllEOP_Correct_V1 if {
                 "SentToMemberOf": null,
                 "RecipientDomainIs": null
             }
-        ]
+        ],
+        "defender_license": true
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
@@ -198,7 +206,8 @@ test_AllEOP_Correct_V2 if {
                 "SentToMemberOf": null,
                 "RecipientDomainIs": null
             }
-        ] 
+        ],
+        "defender_license": true
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
@@ -225,7 +234,8 @@ test_AllEOP_Correct_V3 if {
                 "SentToMemberOf": null,
                 "RecipientDomainIs": null
             }
-        ] 
+        ],
+        "defender_license": true
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
@@ -260,7 +270,8 @@ test_AllEOP_Incorrect_V2 if {
                 "SentToMemberOf": null,
                 "RecipientDomainIs": null
             }
-        ] 
+        ],
+        "defender_license": true
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
@@ -287,7 +298,8 @@ test_AllEOP_Incorrect_V3 if {
                 "SentToMemberOf": null,
                 "RecipientDomainIs": ["example.com"]
             }
-        ] 
+        ],
+        "defender_license": true
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
@@ -312,7 +324,8 @@ test_AllDefender_Correct_V1 if {
                 "SentToMemberOf": null,
                 "RecipientDomainIs": null
             }
-        ] 
+        ],
+        "defender_license": true
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
@@ -333,7 +346,8 @@ test_AllDefender_Correct_V2 if {
                 "SentToMemberOf": null,
                 "RecipientDomainIs": null
             }
-        ] 
+        ],
+        "defender_license": true
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
@@ -360,7 +374,8 @@ test_AllDefender_Correct_V3 if {
                 "SentToMemberOf": null,
                 "RecipientDomainIs": null
             }
-        ] 
+        ],
+        "defender_license": true
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
@@ -374,7 +389,8 @@ test_AllDefender_Incorrect_V1 if {
     PolicyId := "MS.DEFENDER.1.3v1"
 
     Output := tests with input as {  
-        "atp_policy_rules" : [] 
+        "atp_policy_rules" : [],
+        "defender_license": true
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
@@ -395,7 +411,8 @@ test_AllDefender_Incorrect_V2 if {
                 "SentToMemberOf": null,
                 "RecipientDomainIs": null
             }
-        ] 
+        ],
+        "defender_license": true
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
@@ -422,7 +439,8 @@ test_AllDefender_Incorrect_V3 if {
                 "SentToMemberOf": null,
                 "RecipientDomainIs": ["example.com"]
             }
-        ] 
+        ],
+        "defender_license": true
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
@@ -430,6 +448,21 @@ test_AllDefender_Incorrect_V3 if {
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "Requirement not met"
+}
+
+test_AllDefender_Incorrect_V4 if {
+    PolicyId := "MS.DEFENDER.1.3v1"
+
+    Output := tests with input as {  
+        "atp_policy_rules" : [],
+        "defender_license": false
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "Requirement not met **NOTE: Either you do not have sufficient permissions or your tenant does not have a license for Microsoft Defender for Office 365 Plan 1, which is required for this feature.**"
 }
 
 #
@@ -443,7 +476,8 @@ test_SensitiveEOP_Correct_V1 if {
             {
                 "Identity" : "Strict Preset Security Policy"
             }
-        ] 
+        ],
+        "defender_license": true
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
@@ -457,7 +491,8 @@ test_SensitiveEOP_Incorrect_V1 if {
     PolicyId := "MS.DEFENDER.1.4v1"
 
     Output := tests with input as {  
-        "protection_policy_rules" : [] 
+        "protection_policy_rules" : [],
+        "defender_license": true
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
@@ -471,7 +506,7 @@ test_SensitiveEOP_Incorrect_V1 if {
 #
 # Policy 5
 #--
-test_SensitiveEOP_Correct_V1 if {
+test_SensitiveAtp_Correct_V1 if {
     PolicyId := "MS.DEFENDER.1.5v1"
 
     Output := tests with input as {  
@@ -479,7 +514,8 @@ test_SensitiveEOP_Correct_V1 if {
             {
                 "Identity" : "Strict Preset Security Policy"
             }
-        ] 
+        ],
+        "defender_license": true
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
@@ -489,11 +525,12 @@ test_SensitiveEOP_Correct_V1 if {
     RuleOutput[0].ReportDetails == "Requirement met"
 }
 
-test_SensitiveEOP_Incorrect_V1 if {
+test_SensitiveAtp_Incorrect_V1 if {
     PolicyId := "MS.DEFENDER.1.5v1"
 
     Output := tests with input as {  
-        "atp_policy_rules" : [] 
+        "atp_policy_rules" : [],
+        "defender_license": true
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
@@ -501,5 +538,20 @@ test_SensitiveEOP_Incorrect_V1 if {
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "Requirement not met"
+}
+
+test_SensitiveAtp_Incorrect_V2 if {
+    PolicyId := "MS.DEFENDER.1.5v1"
+
+    Output := tests with input as {  
+        "atp_policy_rules" : [],
+        "defender_license": false
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "Requirement not met **NOTE: Either you do not have sufficient permissions or your tenant does not have a license for Microsoft Defender for Office 365 Plan 1, which is required for this feature.**"
 }
 #--

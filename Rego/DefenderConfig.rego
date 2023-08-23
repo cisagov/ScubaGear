@@ -195,7 +195,7 @@ tests[{
     "Criticality" : "Shall",
     "Commandlet" : ["Get-ATPProtectionPolicyRule"],
 	"ActualValue" : {"StandardSetToAll": IsStandardAll, "StrictSetToAll": IsStrictAll},
-    "ReportDetails" : ReportDetailsBoolean(Status),
+    "ReportDetails" : ApplyLicenseWarning(ReportDetailsBoolean(Status)),
     "RequirementMet" : Status
 }] {
     # See MS.DEFENDER.1.2v1, the same logic applies, just with a
@@ -254,7 +254,7 @@ tests[{
     "Criticality" : "Shall",
     "Commandlet" : ["Get-ATPProtectionPolicyRule"],
 	"ActualValue" : {"ATPProtectionPolicies": Policies},
-    "ReportDetails" : ReportDetailsBoolean(Status),
+    "ReportDetails" : ApplyLicenseWarning(ReportDetailsBoolean(Status)),
     "RequirementMet" : Status
 }] {
     Policies := input.atp_policy_rules

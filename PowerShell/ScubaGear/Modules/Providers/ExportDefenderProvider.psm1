@@ -51,7 +51,6 @@ function Export-DefenderProvider {
     # Regular Exchange i.e non IPPSSession cmdlets
     $AdminAuditLogConfig = ConvertTo-Json @($Tracker.TryCommand("Get-AdminAuditLogConfig"))
     $ProtectionPolicyRule = ConvertTo-Json @($Tracker.TryCommand("Get-EOPProtectionPolicyRule"))
-    $ATPProtectionPolicyRule = ConvertTo-Json @($Tracker.TryCommand("Get-ATPProtectionPolicyRule"))
     $AntiPhishPolicy = ConvertTo-Json @($Tracker.TryCommand("Get-AntiPhishPolicy"))
 
     # Test if Defender specific commands are available. If the tenant does
@@ -61,12 +60,14 @@ function Export-DefenderProvider {
     # so we can test for this using Get-Command.
     if (Get-Command Get-AtpPolicyForO365 -ErrorAction SilentlyContinue) {
         $ATPPolicy = ConvertTo-Json @($Tracker.TryCommand("Get-AtpPolicyForO365"))
+        $ATPProtectionPolicyRule = ConvertTo-Json @($Tracker.TryCommand("Get-ATPProtectionPolicyRule"))
         $DefenderLicense = ConvertTo-Json $true
     }
     else {
         # The tenant can't make use of the defender commands
-        Write-Warning "Defender license not available in tenant. Omitting the following commands: Get-AtpPolicyForO365."
+        Write-Warning "Defender license not available in tenant. Omitting the following commands: Get-AtpPolicyForO365, Get-ATPProtectionPolicyRule."
         $ATPPolicy = ConvertTo-Json @()
+        $ATPProtectionPolicyRule = ConvertTo-Json @()
         $DefenderLicense = ConvertTo-Json $false
 
         # While it is counter-intuitive to add this both to SuccessfulCommands
@@ -74,6 +75,8 @@ function Export-DefenderProvider {
         # handled within the Rego.
         $Tracker.AddSuccessfulCommand("Get-AtpPolicyForO365")
         $Tracker.AddUnSuccessfulCommand("Get-AtpPolicyForO365")
+        $Tracker.AddSuccessfulCommand("Get-ATPProtectionPolicyRule")
+        $Tracker.AddUnSuccessfulCommand("Get-ATPProtectionPolicyRule")
     }
 
     # Connect to Security & Compliance
