@@ -413,7 +413,7 @@ An admin consent workflow SHALL be configured for applications.
 #### MS.AAD.5.4v1
 Group owners SHALL NOT be allowed to consent to applications.
 
-<!--Policy: MS.AAD.5.3v1; Criticality: SHALL -->
+<!--Policy: MS.AAD.5.4v1; Criticality: SHALL -->
 - _Rationale:_ In M365 group and team owners can consent to applications accessing data in the tenant, thus by preventing this and requiring consent requests to go through an approval consent workflow, the risks of exposure to malicious applications is reduced.
 - _Last modified:_ June 2023
 
