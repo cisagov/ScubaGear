@@ -371,7 +371,7 @@ tests[{
     "RequirementMet" : false
 }] {
     PolicyId := "MS.AAD.3.3v1"
-    count(MS_AAD_3_1v1_CAP) = 0
+    count(MS_AAD_3_1v1_CAP) == 0
 }
 #--
 
