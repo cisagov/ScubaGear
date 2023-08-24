@@ -606,7 +606,7 @@ Attachments included with Teams messages SHOULD be scanned for malware.
 #### MS.TEAMS.7.2v1
 Users SHOULD be prevented from opening or downloading files detected as malware.
 
-<!--Policy: MS.TEAMS.7.1v1; Criticality: SHOULD -->
+<!--Policy: MS.TEAMS.7.2v1; Criticality: SHOULD -->
 - _Rationale:_ Teams can be used as a mechanism for delivering malware. In many cases, malware can be detected through scanning, reducing the risk for end users.
 - _Last modified:_ July 2023
 
