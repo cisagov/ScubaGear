@@ -93,8 +93,8 @@ ReportDetailsBooleanLicenseWarning(_) = Description if {
 # User/Group Exclusion support functions #
 ##########################################
 
-default UserExclusionsFullyExempt(_, _) = false
-UserExclusionsFullyExempt(Policy, PolicyID) = true if {
+default UserExclusionsFullyExempt(_, _) := false
+UserExclusionsFullyExempt(Policy, PolicyID) := true if {
     # Returns true when all user exclusions present in the conditional
     # access policy are exempted in matching config variable for the
     # baseline policy item.  Undefined if no exclusions AND no exemptions.
@@ -104,14 +104,14 @@ UserExclusionsFullyExempt(Policy, PolicyID) = true if {
     count(ExcludedUsers - AllowedExcludedUsers) == 0
 }
 
-UserExclusionsFullyExempt(Policy, PolicyID) = true if {
+UserExclusionsFullyExempt(Policy, PolicyID) := true if {
     # Returns true when user inputs are not defined or user exclusion lists are empty
     count({ x | x := Policy.Conditions.Users.ExcludeUsers[_] }) == 0
     count({ y | y := input.scuba_config.Aad[PolicyID].CapExclusions.Users }) == 0
 }
 
-default GroupExclusionsFullyExempt(_, _) = false
-GroupExclusionsFullyExempt(Policy, PolicyID) = true if {
+default GroupExclusionsFullyExempt(_, _) := false
+GroupExclusionsFullyExempt(Policy, PolicyID) := true if {
     # Returns true when all group exclusions present in the conditional
     # access policy are exempted in matching config variable for the
     # baseline policy item.  Undefined if no exclusions AND no exemptions.
@@ -121,7 +121,7 @@ GroupExclusionsFullyExempt(Policy, PolicyID) = true if {
     count(ExcludedGroups - AllowedExcludedGroups) == 0
 }
 
-GroupExclusionsFullyExempt(Policy, PolicyID) = true if {
+GroupExclusionsFullyExempt(Policy, PolicyID) := true if {
     # Returns true when user inputs are not defined or group exclusion lists are empty
     count({ x | x := Policy.Conditions.Users.ExcludeGroups[_] }) == 0
     count({ y | y := input.scuba_config.Aad[PolicyID].CapExclusions.Groups }) == 0
@@ -134,8 +134,8 @@ GroupExclusionsFullyExempt(Policy, PolicyID) = true if {
 #
 # MS.AAD.1.1v1
 #--
-default LegacyAuthenticationConditionsMatch(_) = false
-LegacyAuthenticationConditionsMatch(Policy) = true if {
+default LegacyAuthenticationConditionsMatch(_) := false
+LegacyAuthenticationConditionsMatch(Policy) := true if {
     "All" in Policy.Conditions.Users.IncludeUsers
     "All" in Policy.Conditions.Applications.IncludeApplications
     "other" in Policy.Conditions.ClientAppTypes
@@ -176,8 +176,8 @@ tests[{
 #
 # MS.AAD.2.1v1
 #--
-default BlockHighRiskConditionsMatch(_) = false
-BlockHighRiskConditionsMatch(Policy) = true if {
+default BlockHighRiskConditionsMatch(_) := false
+BlockHighRiskConditionsMatch(Policy) := true if {
     "All" in Policy.Conditions.Users.IncludeUsers
     "All" in Policy.Conditions.Applications.IncludeApplications
     "high" in Policy.Conditions.UserRiskLevels
@@ -230,8 +230,8 @@ tests[{
 #
 # MS.AAD.2.3v1
 #--
-default SignInBlockedConditionsMatch(_) = false
-SignInBlockedConditionsMatch(Policy) = true if {
+default SignInBlockedConditionsMatch(_) := false
+SignInBlockedConditionsMatch(Policy) := true if {
     "All" in Policy.Conditions.Users.IncludeUsers
     "All" in Policy.Conditions.Applications.IncludeApplications
     "high" in Policy.Conditions.SignInRiskLevels
@@ -306,8 +306,8 @@ tests[{
 #
 # MS.AAD.3.2v1
 #--
-default AlternativeMFAConditionsMatch(_) = false
-AlternativeMFAConditionsMatch(Policy) = true if {
+default AlternativeMFAConditionsMatch(_) := false
+AlternativeMFAConditionsMatch(Policy) := true if {
     "All" in Policy.Conditions.Users.IncludeUsers
     "All" in Policy.Conditions.Applications.IncludeApplications
     "mfa" in Policy.GrantControls.BuiltInControls
@@ -701,7 +701,7 @@ DoPIMRoleRulesExist {
     _ = input.privileged_roles[_]["Rules"]
 }
 
-default check_if_role_rules_exist = false
+default check_if_role_rules_exist := false
 check_if_role_rules_exist := DoPIMRoleRulesExist
 
 #
@@ -773,8 +773,8 @@ tests[{
 #
 # MS.AAD.7.4v1
 #--
-default PrivilegedRoleExclusions(_, _) = false
-PrivilegedRoleExclusions(PrivilegedRole, PolicyID) = true if {
+default PrivilegedRoleExclusions(_, _) := false
+PrivilegedRoleExclusions(PrivilegedRole, PolicyID) := true if {
     PrivilegedRoleAssignedPrincipals := { x.PrincipalId | some x in PrivilegedRole.Assignments; x.EndDateTime == null }
 
     AllowedPrivilegedRoleUsers := { y | some y in input.scuba_config.Aad[PolicyID].RoleExclusions.Users; y != null }
@@ -785,7 +785,7 @@ PrivilegedRoleExclusions(PrivilegedRole, PolicyID) = true if {
     count(PrivilegedRoleAssignedPrincipals - AllowedPrivilegedRole) != 0
 }
 
-PrivilegedRoleExclusions(PrivilegedRole, PolicyID) = true if {
+PrivilegedRoleExclusions(PrivilegedRole, PolicyID) := true if {
     count({ x.PrincipalId | some x in PrivilegedRole.Assignments; x.EndDateTime == null }) > 0
     count({ y | some y in input.scuba_config.Aad[PolicyID].RoleExclusions.Users; y != null }) == 0
     count({ y | some y in input.scuba_config.Aad[PolicyID].RoleExclusions.Groups; y != null }) == 0
@@ -950,10 +950,10 @@ tests[{
 #--
 # must hardcode the ID. See
 # https://docs.microsoft.com/en-us/azure/active-directory/enterprise-users/users-restrict-guest-permissions
-LevelAsString(Id) = "Restricted access" if {Id == "2af84b1e-32c8-42b7-82bc-daa82404023b"}
-LevelAsString(Id) = "Limited access" if {Id == "10dae51f-b6af-4016-8d66-8c2a99b929b3"}
-LevelAsString(Id) = "Same as member users" if {Id == "a0b1b346-4d3e-4e8b-98f8-753987be4970"}
-LevelAsString(Id) = "Unknown" if {not Id in ["2af84b1e-32c8-42b7-82bc-daa82404023b", "10dae51f-b6af-4016-8d66-8c2a99b929b3", "a0b1b346-4d3e-4e8b-98f8-753987be4970"]}
+LevelAsString(Id) := "Restricted access" if {Id == "2af84b1e-32c8-42b7-82bc-daa82404023b"}
+LevelAsString(Id) := "Limited access" if {Id == "10dae51f-b6af-4016-8d66-8c2a99b929b3"}
+LevelAsString(Id) := "Same as member users" if {Id == "a0b1b346-4d3e-4e8b-98f8-753987be4970"}
+LevelAsString(Id) := "Unknown" if {not Id in ["2af84b1e-32c8-42b7-82bc-daa82404023b", "10dae51f-b6af-4016-8d66-8c2a99b929b3", "a0b1b346-4d3e-4e8b-98f8-753987be4970"]}
 
 AuthPoliciesBadRoleId[Policy.Id] {
     Policy = input.authorization_policies[_]
