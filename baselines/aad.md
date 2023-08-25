@@ -53,7 +53,7 @@ This section provides a list of what CISA considers highly privileged [built-in 
 
 ## Conditional Access Policies
 
-Numerous policies in this baseline rely on AAD Conditional Access. This section provides guidance and tools when implementing baseline policies which rely on AAD Conditional Access.
+Numerous policies in this baseline rely on AAD Conditional Access. Conditional Access brings identity-driven signals together to make access control decisions and enforce organizational policies. Conditional Access is Microsoft's Zero Trust policy engine taking signals from various sources into account when enforcing policy decisions. This section provides guidance and tools when implementing baseline policies which rely on AAD Conditional Access.
 
 As described in Microsoft’s literature related to conditional access policies, CISA recommends initially setting a policy to
 **Report-only** when it is created and then performing thorough hands-on
@@ -70,7 +70,7 @@ This section provides policies that help reduce security risks related to legacy
 #### MS.AAD.1.1v1
 Legacy authentication SHALL be blocked.
 
-- _Rationale:_ The security risk of allowing legacy authentication protocols is that they do not support MFA. By blocking legacy protocols the impact of user credential theft is minimized.
+- _Rationale:_ The security risk of allowing legacy authentication protocols is they do not support multi-factor authentication (MFA). By blocking legacy protocols the impact of user credential theft is minimized.
 - _Last modified:_ June 2023
 
 ### Resources
@@ -90,15 +90,15 @@ Legacy authentication SHALL be blocked.
 1.  Before blocking legacy authentication across the entire application
 base, follow [these instructions](https://learn.microsoft.com/en-us/azure/active-directory/conditional-access/block-legacy-authentication#identify-legacy-authentication-use) to determine if any of the agency’s existing applications are presently using legacy authentication.
 
-2.  Follow [the instructions on this page](https://learn.microsoft.com/en-us/azure/active-directory/conditional-access/howto-conditional-access-policy-block-legacy) to create a conditional access policy that blocks legacy authentication.
+2.  Follow [the instructions on this page](https://learn.microsoft.com/en-us/azure/active-directory/conditional-access/howto-conditional-access-policy-block-legacy) to create a conditional access policy blocking legacy authentication.
 
 ## 2. Risk Based Policies
 
 This section provides policies that help reduce security risks related to user accounts that may have been compromised. These policies use a combination of AAD Identity Protection and AAD Conditional Access. AAD Identity Protection uses numerous signals to detect the risk level for each user or sign-in to determine if an account may have been compromised.
 
-- _Additional mitigations to secure Workload Identities:_ Although not covered in this baseline due to the need for an additional non-standard license, Microsoft also provides support for mitigating risks related to workload identities (AAD applications or service principals). Agencies should strongly consider implementing this feature because workload identities present many of the same risks as interactive user access and are commonly used in modern systems. Follow [these instructions](https://learn.microsoft.com/en-us/azure/active-directory/conditional-access/workload-identity) to apply conditional access policies to workload identities.
+- _Additional mitigations to secure Workload Identities:_ Although not covered in this baseline due to the need for an additional non-standard license, Microsoft provides support for mitigating risks related to workload identities (AAD applications or service principals). Agencies should strongly consider implementing this feature because workload identities present many of the same risks as interactive user access and are commonly used in modern systems. Follow [these instructions](https://learn.microsoft.com/en-us/azure/active-directory/conditional-access/workload-identity) to apply conditional access policies to workload identities.
 
-- _Note:_ The term "high risk" in the context of this section denotes the risk level applied by the AAD Identity Protection service to a user account or sign-in event. See the Resources section for a link to a detailed description of AAD Identity Protection risk and the factors that comprise it.
+- _Note:_ The term "high risk" in the context of this section denotes the risk level applied by the AAD Identity Protection service to a user account or sign-in event. See the Resources section for a link to a detailed description of AAD Identity Protection risk and the factors comprising it.
 
 ### Policies
 #### MS.AAD.2.1v1
@@ -106,11 +106,11 @@ Users detected as high risk SHALL be blocked.
 
 - _Rationale:_ By blocking users determined as high risk, compromised accounts can be prevented from accessing the tenant.
 - _Last modified:_ June 2023
-- _Note:_ Users who are determined to be high risk by AAD Identity Protection can be blocked from accessing the system via an AAD Conditional Access policy. A high risk user will be blocked until an administrator remediates their account.
+- _Note:_ Users who are determined as high risk by AAD Identity Protection can be blocked from accessing the system via an AAD Conditional Access policy. A high risk user will be blocked until an administrator remediates their account.
 
 #### MS.AAD.2.2v1
 A notification SHOULD be sent to the administrator when high-risk users are detected.
-- _Rationale:_ By alerting an administrator when high risk detections are made, the admin can respond to monitor the event and remediate the risk. This helps the organization proactively respond to cyber intrusions in action.
+- _Rationale:_ By alerting an administrator when high risk detections are made, the admin can monitor the event and remediate the risk. This helps the organization proactively respond to cyber intrusions as they occur.
 - _Last modified:_ June 2023
 
 #### MS.AAD.2.3v1
@@ -135,7 +135,7 @@ Sign-ins detected as high risk SHALL be blocked.
 
 ####  MS.AAD.2.1v1 instructions:
 
-1.  Create a conditional access policy that blocks users determined to be high risk by the Identity Protection service. Configure the following policy settings in the new conditional access policy as per the values below:
+1.  Create a conditional access policy blocking users determined to be high risk by the Identity Protection service. Configure the following policy settings in the new conditional access policy as per the values below:
 
 <pre>
   Users > Include > <b>All users</b>
@@ -143,7 +143,7 @@ Sign-ins detected as high risk SHALL be blocked.
   Target resources > Cloud apps > <b>All cloud apps</b>
 
   Conditions > User risk > <b>High</b>
-  
+
   Access controls > Grant > <b>Block Access</b>
 </pre>
 
@@ -153,7 +153,7 @@ Sign-ins detected as high risk SHALL be blocked.
 
 #### MS.AAD.2.3v1 instructions:
 
-1.  Create a conditional access policy that blocks sign-ins determined to be high risk by the Identity Protection service. Configure the following policy settings in the new conditional access policy as per the values below:
+1.  Create a conditional access policy blocking sign-ins determined to be high risk by the Identity Protection service. Configure the following policy settings in the new conditional access policy as per the values below:
 
 <pre>
   Users > Include > <b>All users</b>
@@ -161,15 +161,15 @@ Sign-ins detected as high risk SHALL be blocked.
   Target resources > Cloud apps > <b>All cloud apps</b>
 
   Conditions > Sign-in risk > <b>High</b>
-  
+
   Access controls > Grant > <b>Block Access</b>
 </pre>
 
 ## 3. Strong Authentication and a Secure Registration Process
 
-This section provides policies that help reduce security risks related to  user authentication and registration.
+This section provides policies that help reduce security risks related to user authentication and registration.
 
-Per [OMB memorandum M-22-09](https://www.whitehouse.gov/wp-content/uploads/2022/01/M-22-09.pdf), MFA is required and it must be phishing-resistant. Since there may be gaps in the implementation of enforcing phishing-resistant MFA for all users for various reasons, we also provide some additional backup security policies to help mitigate the risks associated with lesser forms of MFA. One example of this is the second policy below which enforces MFA but does not stipulate the specific MFA method. That said, phishing-resistant MFA is the overarching requirement.
+Per [OMB memorandum M-22-09](https://www.whitehouse.gov/wp-content/uploads/2022/01/M-22-09.pdf), MFA is required and it must be phishing-resistant. Since there may be gaps in enforcing phishing-resistant MFA for all users for various reasons, we provide additional backup security policies to mitigate the risks associated with lesser forms of MFA. One example of this is policy MS.AAD.3.2v1 below which enforces MFA but does not stipulate the specific MFA method. That said, phishing-resistant MFA is the overarching requirement.
 
 <img src="/images/aad-mfa.png"
 alt="Weak MFA (SMS/Voice) Stronger MFA (Push Notifications, Software OTP, Hardware Token OTP) Strongest MFA (FIDO2, PIV, Windows Hello)" />
@@ -186,55 +186,55 @@ The methods **AAD Certificate-Based Authentication (CBA)**, **FIDO2 Security Key
 
 **Non-preferred phishing-resistant methods**
 
-The option **Federal PIV card (federated from agency on-premises Active Directory Federation Services or other identity provider)**, although technically phishing-resistant presents significant risks if the on-premises authentication infrastructure (e.g. ADFS) is compromised. Therefore federated PIV is not a preferred option and agencies should migrate to the options listed in the preferred section above. If an agency does use an on-premises PIV authentication and federate to AAD, reference the [guidance at this link](https://playbooks.idmanagement.gov/piv/network/group/) to enforce PIV logon via AD group policy.
+The **Federal PIV card (federated from agency on-premises Active Directory Federation Services or other identity provider)** option, although technically phishing-resistant presents significant risks if the on-premises authentication infrastructure (e.g. ADFS) is compromised. Therefore federated PIV is not a preferred option and agencies should migrate to the options listed in the preferred section above. If an agency does use an on-premises PIV authentication and federate to AAD, reference the [guidance at this link](https://playbooks.idmanagement.gov/piv/network/group/) to enforce PIV logon via AD group policy.
 
-- _Rationale:_ The security risk of allowing weaker forms of MFA is that they do not protect against sophisticated phishing attacks. By enforcing methods which are resistant to phishing those risks are minimized.
+- _Rationale:_ Alloqing weaker forms of MFA does not protect against sophisticated phishing attacks. By enforcing methods resistant to phishing those risks are minimized.
 - _Last modified:_ June 2023
 
 #### MS.AAD.3.2v1
-If phishing-resistant MFA has not been enforced yet, then an alternative MFA method SHALL be enforced for all users.
+If phishing-resistant MFA has not been enforced yet, an alternative MFA method SHALL be enforced for all users.
 
-- _Rationale:_ This is a backup security policy to help protect the tenant in the event that phishing-resistant MFA has not been enforced yet. This policy requires that MFA is enforced and thus reduces the risks of single form authentication.
+- _Rationale:_ This is a stopgap security policy to help protect the tenant if phishing-resistant MFA has not been enforced yet. This policy requires that MFA is enforced, thus reducing the risks of single form authentication.
 - _Last modified:_ June 2023
-- _Note:_ If a conditional access policy has been created that enforces phishing-resistant MFA, then this policy is not necessary. This policy does not dictate the specific MFA method.
+- _Note:_ If a conditional access policy has been created enforcing phishing-resistant MFA, then this policy is not necessary. This policy does not dictate the specific MFA method.
 
 #### MS.AAD.3.3v1
 If phishing-resistant MFA has not been enforced yet and Microsoft Authenticator is enabled, it SHALL be configured to show login context information.
 
-- _Rationale:_ This is a backup security policy to help protect the tenant in the event that phishing-resistant MFA has not been enforced yet and Microsoft Authenticator is being used. This policy helps improve the security of Microsoft Authenticator by showing the user context information which helps reduce MFA phishing compromises.
+- _Rationale:_ This is a stopgap security policy to help protect the tenant if phishing-resistant MFA has not been enforced yet and Microsoft Authenticator is being used. This policy helps improve the security of Microsoft Authenticator by showing the user context information which helps reduce MFA phishing compromises.
 - _Last modified:_ June 2023
 
 #### MS.AAD.3.4v1
 The Authentication Methods Manage Migration feature SHALL be set to Migration Complete.
 
-- _Rationale:_ By configuring the Manage Migration feature to Migration Complete, we ensure that the tenant has disabled the legacy authentication methods screen. The MFA and SSPR authentication methods are both managed from a central admin page thereby reducing administrative complexity and
-reducing the chances of security misconfigurations.
+- _Rationale:_ By configuring the Manage Migration feature to Migration Complete, we ensure the tenant has disabled the legacy authentication methods screen. The MFA and Self-Service Password Reset (SSPR) authentication methods are both managed from a central admin page thereby reducing administrative complexity and
+the chances of security misconfigurations.
 - _Last modified:_ June 2023
 
 #### MS.AAD.3.5v1
-The authentication methods SMS, Voice Call, and Email OTP SHALL be disabled.
+The authentication methods SMS, Voice Call, and Email One-Time Passcode (OTP) SHALL be disabled.
 
-- _Rationale:_ This policy helps reduce the possibility for users to  register and authenticate with the weakest authenticators. Thus users are forced to use stronger MFA methods.
+- _Rationale:_ This policy helps reduce the possibility for users to  register and authenticate with the weakest authenticators, forcing users to use stronger MFA methods.
 - _Last modified:_ June 2023
-- _Note:_ This policy is only applicable if the tenant has their Manage Migration feature set to Migration Complete because that is required to manage the respective configuration options from the combined MFA / SSPR authentication methods page.
+- _Note:_ This policy is only applicable if the tenant has their Manage Migration feature set to Migration Complete because it is required to manage the respective configuration options from the combined MFA/SSPR authentication methods page.
 
 #### MS.AAD.3.6v1
 Phishing-resistant MFA SHALL be required for highly privileged roles.
 
-- _Rationale:_ This is a backup security policy to help protect privileged access to the tenant in the event that the conditional access policy which requires MFA for all users is disabled or misconfigured.
+- _Rationale:_ This is a backup security policy to help protect privileged access to the tenant if the conditional access policy which requires MFA for all users is disabled or misconfigured.
 - _Last modified:_ June 2023
 - _Note:_ Refer to the Highly Privileged Roles section at the top of this document for a reference list of roles considered highly privileged.
 
 #### MS.AAD.3.7v1
 Managed devices SHOULD be required for authentication.
 
-- _Rationale:_ The security risk of an adversary authenticating to the tenant from their own device is reduced by requiring a managed device to authenticate. Managed devices are under the provisioning and control of the agency. OMB-22-09 specifically states "When authorizing users to access resources, agencies must consider at least one device-level signal alongside identity information about the authenticated user".
+- _Rationale:_ The security risk of an adversary authenticating to the tenant from their own device is reduced by requiring a managed device to authenticate. Managed devices are under the provisioning and control of the agency. OMB-22-09 specifically states, "When authorizing users to access resources, agencies must consider at least one device-level signal alongside identity information about the authenticated user."
 - _Last modified:_ June 2023
 
 #### MS.AAD.3.8v1
 Managed Devices SHOULD be required to register MFA.
 
-- _Rationale:_ The security risk of an adversary using stolen user credentials and then registering their own MFA devices to access the tenant is reduced by requiring a managed device to perform registration actions. Thus the adversary cannot perform the registration from their own unmanaged device. Managed devices are under the provisioning and control of the agency.
+- _Rationale:_ The security risk of an adversary using stolen user credentials and then registering their own MFA devices to access the tenant is reduced by requiring a managed device to perform registration actions. Thus the adversary cannot perform the registration from their own unmanaged device, as managed devices are under the provisioning and control of the agency.
 - _Last modified:_ June 2023
 
 ### Resources
@@ -259,13 +259,13 @@ Managed Devices SHOULD be required to register MFA.
 
 #### MS.AAD.3.1v1 instructions:
 
-1. Create a conditional access policy that enforces phishing-resistant MFA for all users.  Configure the following policy settings in the new conditional access policy as per the values below: 
+1. Create a conditional access policy enforcing phishing-resistant MFA for all users.  Configure the following policy settings in the new conditional access policy, per the values below:
 
 <pre>
   Users > Include > <b>All users</b>
 
   Target resources > Cloud apps > <b>All cloud apps</b>
-      
+
   Access controls > Grant > Grant Access > Require authentication strength > <b>Phishing-resistant MFA</b>
 </pre>
 
@@ -302,52 +302,52 @@ If phishing-resistant MFA has not been deployed yet and Microsoft Authenticator 
 
 #### MS.AAD.3.6v1 instructions:
 
-1. Create a conditional access policy that enforces phishing-resistant MFA for highly privileged roles.  Configure the following policy settings in the new conditional access policy as per the values below:
+1. Create a conditional access policy enforcing phishing-resistant MFA for highly privileged roles.  Configure the following policy settings in the new conditional access policy, per the values below:
 
 <pre>
   Users > Include > Select users and groups > Directory roles > <b>select each of the roles listed in the Highly Privileged Roles section at the top of this document</b>
 
   Target resources > Cloud apps > <b>All cloud apps</b>
-  
+
   Access controls > Grant > Grant Access > Require authentication strength > <b>Phishing-resistant MFA</b>
 </pre>
 
 #### MS.AAD.3.7v1 instructions:
 
-1. Create a conditional access policy that requires a user's device to be either hybrid Azure AD joined or compliant during authentication. Configure the following policy settings in the new conditional access policy as per the values below:
+1. Create a conditional access policy requiring a user's device to be either hybrid Azure AD joined or compliant during authentication. Configure the following policy settings in the new conditional access policy, per the values below:
 
 <pre>
   Users > Include > <b>All users</b>
 
   Target resources > Cloud apps > <b>All cloud apps</b>
-  
+
   Access controls > Grant > Grant Access > <b>Require device to be marked as compliant</b> and <b>Require Hybrid Azure AD joined device</b> > For multiple controls > <b>Require one of the selected controls</b>
 </pre>
 
 #### MS.AAD.3.8v1 instructions:
 
-1. Create a conditional access policy that requires a user to be on a managed device when registering for MFA. Configure the following policy settings in the new conditional access policy as per the values below:
+1. Create a conditional access policy requiring a user to be on a managed device when registering for MFA. Configure the following policy settings in the new conditional access policy, per the values below:
 
 <pre>
   Users > Include > <b>All users</b>
 
   Target resources > User actions > <b>Register security information</b>
-  
+
   Access controls > Grant > Grant Access > <b>Require device to be marked as compliant</b> and <b>Require Hybrid Azure AD joined device</b> > For multiple controls > <b>Require one of the selected controls</b>
 </pre>
 
 ## 4. Centralized Log Collection
 
-This section provides policies that help reduce security risks related to  the lack of security logs which hampers security visibility.
+This section provides policies that help reduce security risks related to the lack of security logs which hampers security visibility.
 
 ### Policies
 #### MS.AAD.4.1v1
 Security logs SHALL be sent to the agency's Security Operations Center for monitoring.
 
-- _Rationale:_ The security risk of not having visibility into cyber attacks is reduced by collecting the logs into the agency's centralized security detection infrastructure. Thus security events can be audited,  queried, and available for incident response. 
+- _Rationale:_ The security risk of not having visibility into cyber attacks is reduced by collecting the logs into the agency's centralized security detection infrastructure. Thus security events can be audited, queried, and available for incident response.
 - _Last modified:_ June 2023
-- _Note:_ The following logs (configured in Azure AD diagnostic settings), are required: `AuditLogs, SignInLogs, RiskyUsers, UserRiskEvents, NonInteractiveUserSignInLogs, ServicePrincipalSignInLogs, ADFSSignInLogs, RiskyServicePrincipals, ServicePrincipalRiskEvents, EnrichedOffice365AuditLogs, MicrosoftGraphActivityLogs`. If managed identities are used for Azure resources, also send the `ManagedIdentitySignInLogs` log type. If the Azure AD Provisioning Service is used to provision users to SaaS apps or other systems, also send the `ProvisioningLogs` log type.
-- _Note:_ It is also recommended to send the logs to the CISA CLAW system so that agencies can benefit from the security detection capabilities offered there. Contact CISA to request integration instructions.
+- _Note:_ The following logs (configured in Azure AD diagnostic settings), are required: `AuditLogs, SignInLogs, RiskyUsers, UserRiskEvents, NonInteractiveUserSignInLogs, ServicePrincipalSignInLogs, ADFSSignInLogs, RiskyServicePrincipals, ServicePrincipalRiskEvents, EnrichedOffice365AuditLogs, MicrosoftGraphActivityLogs`. If managed identities are used for Azure resources, also send the `ManagedIdentitySignInLogs` log type. If the Azure AD Provisioning Service is used to provision users to Software as a Service (SaaS) apps or other systems, also send the `ProvisioningLogs` log type.
+- _Note:_ It is also recommended to send the logs to the CISA CLAW system so agencies can benefit from the security detection capabilities offered there. Contact CISA to request integration instructions.
 
 ### Resources
 
@@ -378,7 +378,7 @@ to configure sending the logs to a storage account:
 2.  Select the specific logs mentioned in the previous policy section.
 
 3.  Under **Destination Details,** select the **Archive to a storage
-    account** check box and select the storage account that was
+    account** check box and select the storage account
     specifically created to host security logs.
 
 4.  In the **Retention** field enter “365” days.
@@ -481,7 +481,7 @@ This section provides policies that help reduce security risks associated with l
 #### MS.AAD.6.1v1
 User passwords SHALL NOT expire.
 
-- _Rationale:_ At a minimum, NIST, OMB and Microsoft have published guidance indicating that mandated periodic password changes make user accounts less secure. OMB-22-09 specifically states "Password policies must not require use of special characters or regular rotation".
+- _Rationale:_ At a minimum, the National Institute of Standards & Technology (NIST), the Office of Management and Budget (OMB) and Microsoft have published guidance indicating that mandated periodic password changes make user accounts less secure. OMB-22-09 specifically states "Password policies must not require use of special characters or regular rotation".
 
 - _Last modified:_ June 2023
 
@@ -512,7 +512,7 @@ This section provides policies that help reduce security risks related to the us
 
 Refer to the Highly Privileged Roles section at the top of this document for a reference list of roles considered highly privileged.
 
-Some of the policy implementations in this section reference specific features of the AAD Privileged Identity Management (PIM) service which provides “Privileged Access Management (PAM)” capabilities. As an alternative to AAD PIM, there are third-party products and services with equivalent PAM capabilities that can be leveraged if an agency chooses to do so.
+Some of the policy implementations in this section reference specific features of the AAD Privileged Identity Management (PIM) service which provides Privileged Access Management (PAM) capabilities. As an alternative to AAD PIM, there are third-party products and services with equivalent PAM capabilities that can be leveraged if an agency chooses to do so.
 
 ### Policies
 #### MS.AAD.7.1v1
@@ -535,7 +535,7 @@ Permanent active role assignments SHALL NOT be allowed for highly privileged rol
 
 - _Rationale:_ Instead of giving users permanent assignments to privileged roles, provisioning access "just in time" lessens the exposure period if those accounts become compromised. In AAD PIM or an alternative PAM system, just in time access can be provisioned by assigning users to roles as "eligible" instead of perpetually "active".
 - _Last modified:_ June 2023
-- _Note:_ There are a couple of exceptions to this policy. Emergency access accounts need perpetual access to the tenant in the rare event of system degradation or other scenarios. Some types of service accounts require a user account with privileged roles and since those are software they cannot perform role activation.
+- _Note:_ There are a couple of exceptions to this policy. Emergency access accounts need perpetual access to the tenant in the rare event of system degradation or other scenarios. Some types of service accounts require a user account with privileged roles and since those accounts are used by software programs they cannot perform role activation.
 
 #### MS.AAD.7.5v1
 Provisioning users to highly privileged roles SHALL NOT occur outside of a PAM system.
@@ -646,7 +646,7 @@ Performing a manual review of highly privileged users to determine which ones ar
 4. Verify that there are no users or groups with a value of **Permanent** in the **End time** column. If there are any, recreate those assignments to have an expiration date using AAD PIM or an alternative PAM system. The only exception to this policy are emergency access accounts and service accounts that require perpetual active assignments. See policy for details.
 
 #### MS.AAD.7.5v1 instructions:
- 
+
 1. Perform the steps below for each highly privileged role. We reference the Global Administrator role as an example.
 
 2. In **Azure Active Directory** select **Roles and administrators.**
@@ -712,7 +712,7 @@ Performing a manual review of highly privileged users to determine which ones ar
 7. Click **Update**.
 
 #### MS.AAD.7.9v1 instructions:
- 
+
  1. Follow the same instructions as MS.AAD.7.8v1 for each of the highly privileged roles (other than Global Administrator) but enter a security monitoring mailbox that is different from the one used to monitor Global Administrator activations.
 
 ## 8. Guest User Access
