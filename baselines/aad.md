@@ -385,13 +385,13 @@ to configure sending the logs to a storage account:
 
 ## 5. Application Registration and Consent
 
-This section provides policies that help reduce security risks related to  non-privileged users adding malicious applications or service principals to the tenant. Malicious applications can perform many of the same operations as interactive users and can access data "on behalf of" compromised users. These policies apply to custom-developed applications and applications published by third-party vendors.
+This section provides policies that help reduce security risks related to non-privileged users adding malicious applications or service principals to the tenant. Malicious applications can perform many of the same operations as interactive users and can access data "on behalf of" compromised users. These policies apply to custom-developed applications and applications published by third-party vendors.
 
 ### Policies
 #### MS.AAD.5.1v1
 Only administrators SHALL be allowed to register applications.
 
-- _Rationale:_ Application access to the tenant presents a heightened security risk compared to interactive user access because applications are typically not subject to critical security protections such as MFA policies and others. Ensuring that only specific privileged users can register applications reduces the risks of unauthorized users installing malicious applications into the tenant.
+- _Rationale:_ Application access to the tenant presents a heightened security risk compared to interactive user access because applications are typically not subject to critical security protections such as MFA policies and others. Ensuring only specific privileged users can register applications reduces the risks of unauthorized users installing malicious applications into the tenant.
 - _Last modified:_ June 2023
 
 #### MS.AAD.5.2v1
@@ -459,7 +459,7 @@ Group owners SHALL NOT be allowed to consent to applications.
 
 4. Under **Admin consent requests** > **Users can request admin consent to apps they are unable to consent to**, select **Yes**.
 
-5. Under **Who can review admin consent requests**, select the group created in step 1 that is responsible for reviewing and adjudicating app requests.
+5. Under **Who can review admin consent requests**, select the group created in step 1 responsible for reviewing and adjudicating app requests.
 
 6. Click **Save**.
 
@@ -475,13 +475,13 @@ Group owners SHALL NOT be allowed to consent to applications.
 
 ## 6. Passwords
 
-This section provides policies that help reduce security risks associated with legacy password practices that are no longer supported by research.
+This section provides policies that help reduce security risks associated with legacy password practices no longer supported by research.
 
 ### Policies
 #### MS.AAD.6.1v1
 User passwords SHALL NOT expire.
 
-- _Rationale:_ At a minimum, the National Institute of Standards & Technology (NIST), the Office of Management and Budget (OMB) and Microsoft have published guidance indicating that mandated periodic password changes make user accounts less secure. OMB-22-09 specifically states "Password policies must not require use of special characters or regular rotation".
+- _Rationale:_ At a minimum, the National Institute of Standards & Technology (NIST), the Office of Management and Budget (OMB) and Microsoft have published guidance indicating mandated periodic password changes make user accounts less secure. OMB-22-09 states "Password policies must not require use of special characters or regular rotation".
 
 - _Last modified:_ June 2023
 
@@ -526,14 +526,14 @@ Privileged users SHALL be provisioned with finer-grained roles instead of Global
 - _Last modified:_ June 2023
 
 #### MS.AAD.7.3v1
-Privileged users SHALL be provisioned cloud-only accounts that are separate from an on-premises directory or other federated identity providers.
+Privileged users SHALL be provisioned cloud-only accounts separate from an on-premises directory or other federated identity providers.
 - _Rationale:_ By provisioning cloud-only AAD user accounts to privileged users, the risks associated with a compromise of on-premises federation infrastructure are reduced. It is more challenging for the adversary to pivot from the compromised environment to the cloud with privileged access.
 - _Last modified:_ June 2023
 
 #### MS.AAD.7.4v1
 Permanent active role assignments SHALL NOT be allowed for highly privileged roles.
 
-- _Rationale:_ Instead of giving users permanent assignments to privileged roles, provisioning access "just in time" lessens the exposure period if those accounts become compromised. In AAD PIM or an alternative PAM system, just in time access can be provisioned by assigning users to roles as "eligible" instead of perpetually "active".
+- _Rationale:_ Instead of giving users permanent assignments to privileged roles, provisioning access "just in time" lessens the exposure period if those accounts become compromised. In AAD PIM or an alternative PAM system, just in time access can be provisioned by assigning users to roles as "eligible" instead of perpetually "active."
 - _Last modified:_ June 2023
 - _Note:_ There are a couple of exceptions to this policy. Emergency access accounts need perpetual access to the tenant in the rare event of system degradation or other scenarios. Some types of service accounts require a user account with privileged roles and since those accounts are used by software programs they cannot perform role activation.
 
@@ -545,7 +545,7 @@ Provisioning users to highly privileged roles SHALL NOT occur outside of a PAM s
 #### MS.AAD.7.6v1
 Activation of the Global Administrator role SHALL require approval.
 
-- _Rationale:_ Requiring approval for a user to activate Global Administrator which provided unfettered access, makes it more challenging for an attacker to compromise the tenant with stolen credentials and it provides visibility of activities that may indicate a compromise is taking place.
+- _Rationale:_ Requiring approval for a user to activate Global Administrator which provided unfettered access, makes it more challenging for an attacker to compromise the tenant with stolen credentials and it provides visibility of activities indicating a compromise is taking place.
 - _Last modified:_ June 2023
 
 #### MS.AAD.7.7v1
@@ -564,7 +564,7 @@ User activation of the Global Administrator role SHALL trigger an alert.
 #### MS.AAD.7.9v1
 User activation of other highly privileged roles SHOULD trigger an alert.
 
-- _Rationale:_ It is imperative to closely monitor the activation of high risk roles for signs of compromise. Sending alerts when this activation occurs, provides the security monitoring team a chance to detect potential compromises in action. In some environments activation of privileged roles can generate a significant number of alerts.
+- _Rationale:_ It is imperative to closely monitor the activation of high risk roles for signs of compromise. Sending alerts when this activation occurs, provides the security monitoring team a chance to detect potential compromises in action. In some environments, activating privileged roles can generate a significant number of alerts.
 - _Last modified:_ June 2023
 
 ### Resources
@@ -587,7 +587,7 @@ User activation of other highly privileged roles SHOULD trigger an alert.
 
 ### Implementation
 
-The following implementation instructions that reference the AAD PIM service will vary if using a third-party PAM system instead. Additionally, the implementation instructions associated with highly privileged user access may be revised in the next release to incorporate functionality provided by the the AAD PIM for Groups feature.
+The following implementation instructions that reference the AAD PIM service will vary if using a third-party PAM system instead. Additionally, the implementation instructions associated with highly privileged user access may be revised in the next release to incorporate functionality provided by the AAD PIM for Groups feature.
 
 #### MS.AAD.7.1v1 instructions:
 
@@ -599,7 +599,7 @@ The following implementation instructions that reference the AAD PIM service wil
 
 4. Validate that between two to eight users are listed.
 
-5.  If you have AAD PIM, count the number of users in both the **Eligible assignments** and **Active assignments** tabs. There should be a total of two to eight users across both of these tabs (not individually). Do not count the same username twice. If any groups are listed, count the number of users that are members of the group and include it in the total count.
+5.  If you have AAD PIM, count the number of users in both the **Eligible assignments** and **Active assignments** tabs. There should be a total of two to eight users across both tabs (not individually). Do not count the same username twice. If any groups are listed, count the number of users who are members of the group and include it in the total count.
 
 #### MS.AAD.7.2v1 instructions:
 
@@ -612,10 +612,10 @@ The following implementation instructions that reference the AAD PIM service wil
 4.  Review the score for the action named **Use least privileged administrative roles.**
 
 5.  Review the **current score** value and compare it to the **max score**.
-If the current score is not the maximum value and the status is not **Completed**, you must perform the improvement actions. If that is the case, follow the detailed action steps and then check the score again after 48 hours to ensure compliance.
+If the current score is not the maximum value and the status is not **Completed**, you must perform the improvement actions. If that is the case, follow the detailed action steps and check the score again after 48 hours to ensure compliance.
 
 #### MS.AAD.7.3v1 instructions:
-Performing a manual review of highly privileged users to determine which ones are not cloud-only is labor intensive so we recommend running the ScubaGear tool instead. ScubaGear will provide a list of the highly privileged users that are not cloud-only.
+Performing a manual review of highly privileged users to determine which ones are not cloud-only is labor intensive; we recommend running the ScubaGear tool instead. ScubaGear will provide a list of the highly privileged users that are not cloud-only.
 
 1. Perform the steps below for each highly privileged role. We reference the Global Administrator role as an example.
 
@@ -625,7 +625,7 @@ Performing a manual review of highly privileged users to determine which ones ar
 
 4. Under **Manage**, select **Assignments.** If you have AAD PIM, repeat the steps below for both the **Eligible** and the **Active** assignments. If a group is listed, you will need to determine the members of the group and perform the steps for each group member.
 
-5. For each highly privileged user, execute the Powershell code below but replace the `username@somedomain.com` sample data value with the principal name of the user that is specific to your environment. You can get the data value from the **Principal name** field displayed in the Azure Active Directory portal.
+5. For each highly privileged user, execute the Powershell code below but replace the `username@somedomain.com` sample data value with the principal name of the user who is specific to your environment. You can get the data value from the **Principal name** field displayed in the Azure Active Directory portal.
 
     ```
     Connect-MgGraph
@@ -643,7 +643,7 @@ Performing a manual review of highly privileged users to determine which ones ar
 
 3. Under **Manage**, select **Assignments** and click the **Active assignments** tab.
 
-4. Verify that there are no users or groups with a value of **Permanent** in the **End time** column. If there are any, recreate those assignments to have an expiration date using AAD PIM or an alternative PAM system. The only exception to this policy are emergency access accounts and service accounts that require perpetual active assignments. See policy for details.
+4. Verify there are no users or groups with a value of **Permanent** in the **End time** column. If there are any, recreate those assignments to have an expiration date using AAD PIM or an alternative PAM system. The only exception to this policy is emergency access accounts and service accounts requiring perpetual active assignments. See policy for details.
 
 #### MS.AAD.7.5v1 instructions:
 
@@ -655,7 +655,7 @@ Performing a manual review of highly privileged users to determine which ones ar
 
 4. Under **Manage**, select **Assignments.** Repeat the steps below for both the **Eligible** and the **Active** AAD PIM assignments.
 
-5. For each user or group listed, examine the value in the **Start time** column. If it contains a value of **-**, this indicates that the respective user / group was assigned to that role outside of AAD PIM. If the role was assigned outside of AAD PIM, delete the assignment and recreate it using AAD PIM.
+5. For each user or group listed, examine the value in the **Start time** column. If it contains a value of **-**, this indicates the respective user/group was assigned to that role outside of AAD PIM. If the role was assigned outside of AAD PIM, delete the assignment and recreate it using AAD PIM.
 
 
 #### MS.AAD.7.6v1 instructions:
@@ -713,22 +713,22 @@ Performing a manual review of highly privileged users to determine which ones ar
 
 #### MS.AAD.7.9v1 instructions:
 
- 1. Follow the same instructions as MS.AAD.7.8v1 for each of the highly privileged roles (other than Global Administrator) but enter a security monitoring mailbox that is different from the one used to monitor Global Administrator activations.
+ 1. Follow the same instructions as MS.AAD.7.8v1 for each of the highly privileged roles (other than Global Administrator) but enter a security monitoring mailbox different from the one used to monitor Global Administrator activations.
 
 ## 8. Guest User Access
 
-This section provides policies that help reduce security risks related to the integration of M365 guest users. A guest user is a specific type of external user that belongs to a separate organization but can access files, meetings, teams and other data in the target tenant. It is common to invite guest users to a tenant for cross-agency collaboration purposes.
+This section provides policies that help reduce security risks related to integrating M365 guest users. A guest user is a specific type of external user who belongs to a separate organization but can access files, meetings, teams and other data in the target tenant. It is common to invite guest users to a tenant for cross-agency collaboration purposes.
 
 #### MS.AAD.8.1v1
 Guest users SHOULD have limited or restricted access to Azure AD directory objects.
 
-- _Rationale:_ By limiting the amount of information about objects in the tenant that is available to guest users, the malicious reconnaissance exposure can be reduced if a guest account is compromised or created by an adversary.
+- _Rationale:_ Limiting the amount of information about objects, available to guest users in the tenant, reduces the malicious reconnaissance exposure if a guest account is compromised or created by an adversary.
 - _Last modified:_ June 2023
 
 #### MS.AAD.8.2v1
 Only users with the Guest Inviter role SHOULD be able to invite guest users.
 
-- _Rationale:_ By only allowing an authorized groups of individuals to invite guest users to create accounts in the tenant, an agency can enforce a guest user account approval process which reduces the risk of unauthorized accounts being created.
+- _Rationale:_ By only allowing an authorized groups of individuals to invite guest users to create accounts in the tenant, an agency can enforce a guest user account approval process, reducing the risk of unauthorized accounts being created.
 - _Last modified:_ June 2023
 
 #### MS.AAD.8.3v1
@@ -772,7 +772,7 @@ Guest invites SHOULD only be allowed to specific external domains that have been
 2. Under **Collaboration restrictions**, select **Allow invitations
     only to the specified domains (most restrictive)**.
 
-3. Select **Target domains** and enter the names of the external domains that have been authorized by the agency for guest user access.
+3. Select **Target domains** and enter the names of the external domains authorized by the agency for guest user access.
 
 4. Click **Save**.
 
@@ -830,11 +830,11 @@ Dr. Mukesh Rohatgi (MITRE), Lee Szilagyi (MITRE), Nanda Katikaneni
 
 # Appendix A: Hybrid Azure AD Guidance
 
-The majority of this document does not focus on securing hybrid Azure AD
-environments. CISA released a separate [Hybrid Identity Solutions Architecture](https://www.cisa.gov/sites/default/files/2023-03/csso-scuba-guidance_document-hybrid_identity_solutions_architecture-2023.03.22-final.pdf) document that addresses the unique implementation requirements of hybrid Azure AD infrastructure.
+Most of this document does not focus on securing hybrid Azure AD
+environments. CISA released a separate [Hybrid Identity Solutions Architecture](https://www.cisa.gov/sites/default/files/2023-03/csso-scuba-guidance_document-hybrid_identity_solutions_architecture-2023.03.22-final.pdf) document addressing the unique implementation requirements of hybrid Azure AD infrastructure.
 
 # Appendix B: Cross-tenant Access Guidance
 
-Some of the conditional access policies contained in this security baseline, if implemented as described herein, will impact guest user access to a tenant. For example, the policies require users to perform MFA and originate from a managed device to gain access. These requirements are also enforced for guest users. For these policies to work effectively with guest users, both the home tenant (the one that the guest user belongs to) and the resource tenant (the target tenant) may need to configure their AAD cross-tenant access settings.
+Some of the conditional access policies contained in this security baseline, if implemented as described, will impact guest user access to a tenant. For example, the policies require users to perform MFA and originate from a managed device to gain access. These requirements are also enforced for guest users. For these policies to work effectively with guest users, both the home tenant (the one the guest user belongs to) and the resource tenant (the target tenant) may need to configure their AAD cross-tenant access settings.
 
 [Refer to this article](https://learn.microsoft.com/en-us/azure/active-directory/external-identities/authentication-conditional-access) to gain an understanding of how MFA and device claims are passed from the home tenant to the resource tenant. [Refer to this article](https://learn.microsoft.com/en-us/azure/active-directory/external-identities/cross-tenant-access-overview) to configure the inbound and outbound cross-tenant access settings in AAD.
