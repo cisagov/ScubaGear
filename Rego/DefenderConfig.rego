@@ -698,7 +698,6 @@ RequiredAlerts := {
     "Messages have been delayed",
     "Tenant restricted from sending unprovisioned email",
     "User restricted from sending email",
-    "Malware campaign detected after delivery",
     "A potentially malicious URL click was detected",
     "Suspicious connector activity"
 }
