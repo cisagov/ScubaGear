@@ -94,8 +94,8 @@ tests[{
     # - Get-EOPProtectionPolicyRule
     # - Get-ATPProtectionPolicyRule
     #
-    # This is because there isn't an easy way to check if the toggle on
-    # the main "Preset secuirity policies" page is or set not. It is
+    # This is because there isn't an easy way to check if the toggle is on
+    # the main "Preset security policies" page is or set not. It is
     # entirely possible for the standard/strict policies to be enabled
     # but for one of the above commands to not reflect it.
     #
