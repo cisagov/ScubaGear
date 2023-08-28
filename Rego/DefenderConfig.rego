@@ -99,7 +99,7 @@ tests[{
     # entirely possible for the standard/strict policies to be enabled
     # but for one of the above commands to not reflect it.
     #
-    # For example, if I enable the standard policy but only add users to
+    # For example, if we enable the standard policy but only add users to
     # Exchange online protection, Get-EOPProtectionPolicyRule will report
     # the standard policy as enabled, but the standard policy won't even
     # be included in the output of Get-ATPProtectionPolicyRule, and vice
