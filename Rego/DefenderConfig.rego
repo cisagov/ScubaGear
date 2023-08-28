@@ -693,7 +693,6 @@ tests[{
 # At a minimum, the alerts required by the EXO baseline SHALL be enabled.
 RequiredAlerts := {
     "Suspicious email sending patterns detected",
-    "Unusual increase in email reported as phish",
     "Suspicious Email Forwarding Activity",
     "Messages have been delayed",
     "Tenant restricted from sending unprovisioned email",
