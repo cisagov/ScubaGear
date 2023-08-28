@@ -5,7 +5,7 @@ import data.report.utils.ReportDetailsBoolean
 
 ## Report details menu
 #
-# NOTE: Use report.utils package for common report formatting functions. 
+# NOTE: Use report.utils package for common report formatting functions.
 #
 # If you simply want a boolean "Requirement met" / "Requirement not met"
 # just call ReportDetailsBoolean(Status) and leave it at that.
@@ -59,6 +59,97 @@ ApplyLicenseWarning(Message) := concat("", [ReportDetailsBoolean(false), License
     # replace the message with the warning
     input.defender_license == false
     LicenseWarning := " **NOTE: Either you do not have sufficient permissions or your tenant does not have a license for Microsoft Defender for Office 365 Plan 1, which is required for this feature.**"
+}
+
+##########################################
+# User/Group Exclusion support functions #
+##########################################
+
+default UserSensitiveIDs(_, _) := false
+UserSensitiveIDs(Policies, PolicyID) := true if {
+    count([Policy | Policy = Policies[_];
+        Policy.Identity == "Strict Preset Security Policy";
+        Policy.SentTo == null;
+        Policy.ExceptIfSentTo == null]) > 0
+}
+
+UserSensitiveIDs(Policies, PolicyID) := true if {
+    SensitiveUsers := input.scuba_config.Defender[PolicyID].SensitiveIDs.Users
+    ExcludedUsers = {
+        Policy.ExceptIfSentTo | Policy := Policies[_];
+        Policy.Identity == "Strict Preset Security Policy";
+        Policy.SentTo == null
+    }
+    ExcludedUsers != null
+    count(SensitiveUsers & ExcludedUsers) == 0
+}
+
+UserSensitiveIDs(Policies, PolicyID) := true if {
+    SensitiveUsers := input.scuba_config.Defender[PolicyID].SensitiveIDs.Users
+    IncludedUsers = {
+        Policy.SentTo | Policy := Policies[_];
+        Policy.Identity == "Strict Preset Security Policy";
+        Policy.SentTo != null
+    }
+    count(SensitiveUsers & IncludedUsers) == count(SensitiveUsers)
+}
+
+default GroupSensitiveIDs(_, _) := false
+GroupSensitiveIDs(Policies, PolicyID) := true if {
+    count([Policy | Policy = Policies[_];
+        Policy.Identity == "Strict Preset Security Policy";
+        Policy.SentToMemberOf == null;
+        Policy.ExceptIfSentToMemberOf == null]) > 0
+}
+
+GroupSensitiveIDs(Policies, PolicyID) := true if {
+    SensitiveGroups := input.scuba_config.Defender[PolicyID].SensitiveIDs.Groups
+    ExcludedGroups = {
+        Policy.ExceptIfSentToMemberOf | Policy := Policies[_];
+        Policy.Identity == "Strict Preset Security Policy";
+        Policy.SentToMemberOf == null
+    }
+    ExcludedGroups != null
+    count(SensitiveGroups & ExcludedGroups) == 0
+}
+
+GroupSensitiveIDs(Policies, PolicyID) := true if {
+    SensitiveGroups := input.scuba_config.Defender[PolicyID].SensitiveIDs.Groups
+    IncludedGroups = {
+        Policy.SentToMemberOf | Policy := Policies[_];
+        Policy.Identity == "Strict Preset Security Policy";
+        Policy.SentToMemberOf != null
+    }
+    count(SensitiveGroups & IncludedGroups) == count(SensitiveGroups)
+}
+
+default DomainSensitiveIDs(_, _) := false
+DomainSensitiveIDs(Policies, PolicyID) := true if {
+    count([Policy | Policy = Policies[_];
+        Policy.Identity == "Strict Preset Security Policy";
+        Policy.RecipientDomainIs == null;
+        Policy.ExceptIfRecipientDomainIs == null]) > 0
+}
+
+DomainSensitiveIDs(Policies, PolicyID) := true if {
+    SensitiveDomains := input.scuba_config.Defender[PolicyID].SensitiveIDs.Domains
+    ExcludedDomains = {
+        Policy.ExceptIfRecipientDomainIs | Policy := Policies[_];
+        Policy.Identity == "Strict Preset Security Policy";
+        Policy.RecipientDomainIs == null
+    }
+    ExcludedDomains != null
+    count(SensitiveDomains & ExcludedDomains) == 0
+}
+
+DomainSensitiveIDs(Policies, PolicyID) := true if {
+    SensitiveDomains := input.scuba_config.Defender[PolicyID].SensitiveIDs.Domains
+    IncludedDomains = {
+        Policy.RecipientDomainIs | Policy := Policies[_];
+        Policy.Identity == "Strict Preset Security Policy";
+        Policy.RecipientDomainIs != null
+    }
+    count(SensitiveDomains & IncludedDomains) == count(SensitiveDomains)
 }
 
 #
@@ -130,7 +221,7 @@ tests[{
     IsStandardEnabled := count([Condition | Condition = StandardConditions[_]; Condition == true]) > 0
 
     StrictConditions := [IsStrictEOPEnabled, IsStrictATPEnabled]
-    IsStrictEnabled := count([Condition | Condition = StrictConditions[_]; Condition == true]) > 0   
+    IsStrictEnabled := count([Condition | Condition = StrictConditions[_]; Condition == true]) > 0
 
     Conditions := [IsStandardEnabled, IsStrictEnabled]
     Status := count([Condition | Condition = Conditions[_]; Condition == false]) == 0
@@ -152,7 +243,7 @@ tests[{
     "RequirementMet" : Status
 }] {
     # If "Apply protection to" is set to "All recipients":
-    # - The policy will be included in the list output by 
+    # - The policy will be included in the list output by
     #   Get-EOPProtectionPolicyRule"
     # - SentTo, SentToMemberOf, and RecipientDomainIs will all be
     #   null.
@@ -221,9 +312,12 @@ tests[{
 # MS.DEFENDER.1.4v1
 #--
 
-# TODO: look at config file to get list of sensitive users. Current
-# implementation just asserts that the strict policy applies to at
-# least one person.
+default ProtectionPolicyForSensitiveIDs(_) := false
+ProtectionPolicyForSensitiveIDs(Policies) := true if {
+    UserSensitiveIDs(Policies, "MS.DEFENDER.1.4v1") == true
+    GroupSensitiveIDs(Policies, "MS.DEFENDER.1.4v1") == true
+    DomainSensitiveIDs(Policies, "MS.DEFENDER.1.4v1") == true
+}
 
 tests[{
     "PolicyId" : "MS.DEFENDER.1.4v1",
@@ -234,10 +328,7 @@ tests[{
     "RequirementMet" : Status
 }] {
     Policies := input.protection_policy_rules
-    # If no one has been assigned to the strict policy, it won't even
-    # be included in the output of Get-EOPProtectionPolicyRule
-    Status := count([Policy | Policy = Policies[_];
-        Policy.Identity == "Strict Preset Security Policy"]) > 0
+    Status := ProtectionPolicyForSensitiveIDs(Policies)
 }
 #--
 
@@ -438,7 +529,7 @@ CardRules[Rule.Name] {
 }
 
 tests[{
-    #TODO: Appears this policy is broken into 3 parts in code and only 1 in baseline 
+    #TODO: Appears this policy is broken into 3 parts in code and only 1 in baseline
     # Combine this and the following two that are commented out into a single test
     #"Requirement" : "A custom policy SHALL be configured to protect PII and sensitive information, as defined by the agency: U.S. Social Security Number (SSN)",
     "PolicyId" : "MS.DEFENDER.4.1v1",
