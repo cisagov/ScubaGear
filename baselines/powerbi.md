@@ -110,7 +110,8 @@ manage workspaces as Power BI workspace Admins, Microsoft recommends
 changing the **Guest user permissions are limited** setting in AAD to
 allow these users to use people pickers within the Power BI UX. Since
 Power BI integrates natively with AAD, the AAD Baseline should be
-consulted for additional guidance on managing guest users.
+consulted for additional guidance on managing guest users. Also, in PowerBI
+there will need to be a security group setup to limit access.
 
 ### Policies
 #### MS.POWERBI.2.1v1
@@ -133,6 +134,7 @@ Guest user access to the Power BI tenant SHOULD be disabled unless the agency mi
 
 ### Implementation
 #### MS.POWERBI.2.1v1 instructions:
+**TO DISABLE COMPLETELY**
 1. Navigate to the **PowerBI Admin Portal**
 
 2. Click on **Tenant Settings**
@@ -140,6 +142,17 @@ Guest user access to the Power BI tenant SHOULD be disabled unless the agency mi
 3. Scroll to **Export and sharing settings**
 
 4. Click on **Allow Azure Active Directory guest users to edit and manage content in the organization** and set to **Disabled**
+
+**TO ENABLE WITH SECURITY GROUP(S)**
+1. Navigate to the **PowerBI Admin Portal**
+
+2. Click on **Tenant Settings**
+
+3. Scroll to **Export and sharing settings**
+
+4. Click on **Allow Azure Active Directory guest users to edit and manage content in the organization** and set to **Enabled**
+
+5. Select the security group(s) that you want to have access to the PowerBI tenant. **Note**: you may need to create a security group for this specific case.
 
 ## 3. Power BI External Invitations
 
@@ -170,9 +183,9 @@ on roles.
 
 ### Policies
 #### MS.POWERBI.3.1v1
-The **Invite external users to your organization** feature SHOULD be disabled unless agency mission requires the capability.
+The Invite external users to your organization feature SHOULD be disabled unless agency mission requires the capability.
 
-- _Rationale:_ Allowing guest users in general is a bad idea and can lead to unwanted access. Disabling this feature in PowerBI is just another way to avoid having a risky guest user in the organization.
+- _Rationale:_ Allowing guest users in general is a bad idea and can lead to unwanted access. Disabling this feature in PowerBI is just another way to avoid having a risky guest user in the organization. If external invites are required then, guest users should be invited by authorized users via the Azure Active Directory guest invite features. This helps ensure that authorized administrative personnel with the right permissions can centrally manage who has access to the tenant.
 - _Last modified:_ June 2023
 
 ### Resources
@@ -194,6 +207,7 @@ The **Invite external users to your organization** feature SHOULD be disabled un
 
 ### Implementation
 #### MS.POWERBI.3.1v1 instructions:
+**TO DISABLE COMPLETELY**
 1. Navigate to the **PowerBI Admin Portal**
 
 2. Click on **Tenant Settings**
@@ -201,6 +215,17 @@ The **Invite external users to your organization** feature SHOULD be disabled un
 3. Scroll to **Export and sharing settings**
 
 4. Click on **Invite external users to your organization** and set to **Disabled**
+
+**TO ENABLE WITH SECURITY GROUP(S)**
+1. Navigate to the **PowerBI Admin Portal**
+
+2. Click on **Tenant Settings**
+
+3. Scroll to **Export and sharing settings**
+
+4. Click on **Invite external users to your organization** and set to **Enabled**
+
+5. Select the security group(s) needed. **Note**: You may need to make a specific security group(s)
 
 ## 4. Power BI Service Principals
 
@@ -241,11 +266,13 @@ permissions.
 - Instead of enabling service principals for the entire agency,
   implement for a dedicated security group.
 
+**Note**: This policy is only applicable if the setting **Allow service principals to use Power BI APIs** is enabled
+
 
 ### Policies
 #### MS.POWERBI.4.1v1
-Service Principals SHOULD be allowed for Power BI where applicable.
-- _Rationale:_ With unrestricted Service Principles there is possibility of unwanted access to APIs. By allowing Service Principles only where necessary, this will mitigate that risk.
+Service Principals SHOULD be restricted to specific security groups.
+- _Rationale:_ With unrestricted Service Principles there is possibility of unwanted access to APIs. By allowing Service Principles, through security groups, only where necessary, this will mitigate that risk. 
 - _Last modified:_ June 2023
 
 #### MS.POWERBI.4.2v1
