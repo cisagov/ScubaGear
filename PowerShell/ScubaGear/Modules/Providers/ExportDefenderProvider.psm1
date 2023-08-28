@@ -65,7 +65,7 @@ function Export-DefenderProvider {
     }
     else {
         # The tenant can't make use of the defender commands
-        Write-Warning "Defender for Office365 license not available in tenant. Omitting the following commands: Get-AtpPolicyForO365, Get-ATPProtectionPolicyRule."
+        Write-Warning "Defender for Office 365 license not available in tenant. Omitting the following commands: Get-AtpPolicyForO365, Get-ATPProtectionPolicyRule."
         $ATPPolicy = ConvertTo-Json @()
         $ATPProtectionPolicyRule = ConvertTo-Json @()
         $DefenderLicense = ConvertTo-Json $false
