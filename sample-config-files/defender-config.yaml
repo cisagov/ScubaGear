@@ -1,0 +1,41 @@
+Description: |
+  SCuBAGear YAML Configuration file with custom variables
+  This configuration shows a standard SCuBAGear set of parameters to run
+  but also includes examples of custom variables for use and reference
+  in Rego policy assessments against the AAD baseline.  Specifically, using
+  policy specific variables to exempt specific user and group exclusions from
+  conditional access policy checks that normally would not pass if exclusions
+  are present.  These parameters support operational use cases for having
+  backup or break glass account exclusions to global user policies without
+  failing best practices.  Any exemptions and their risks should be carefully
+  considered and documented as part of an organization's cybersecurity risk
+  management program process and practices.
+  This example includes the following design choices for illustrative purposes:
+  - Use of Pascal case convention for varible names
+  - Defines a namespace for values to be used across baselines/products (i.e., GlobalVars)
+  - Per product namespace for values related to that specific product (i.e., Aad, SharePoint)
+  - Namespace for each policy item within a product for variables related only to one policy item (i.e., MS.AAD.2.1v1)
+  - Use of YAML anchors and aliases following DRY (Don't Repeat Yourself) principle for repeated values and sections
+ProductNames:
+- defender
+M365Environment: commercial
+OPAPath: .
+LogIn: true
+DisconnectOnExit: false
+OutPath: .
+OutFolderName: M365BaselineConformance
+OutProviderFileName: ProviderSettingsExport
+OutRegoFileName: TestResults
+OutReportName: BaselineReports
+GlobalVars:  # For cross product variables
+  AllProductVar: value_example
+# Defender
+Defender:
+  MS.DEFENDER.1.4v1: &SensitiveIDs
+    SensitiveIDs:
+      Users:
+        -
+      Groups:
+        -
+      Domains:
+        -
