@@ -7,7 +7,6 @@ InModuleScope CreateReport {
         @{Product = "aad"; MarkdownFilePath = "baselines/aad.md"}
         @{Product = "defender"; MarkdownFilePath = "baselines/defender.md"}
         @{Product = "exo"; MarkdownFilePath = "baselines/exo.md"}
-        @{Product = "onedrive"; MarkdownFilePath = "baselines/onedrive.md"}
         @{Product = "powerbi"; MarkdownFilePath = "baselines/powerbi.md"}
         @{Product = "powerplatform"; MarkdownFilePath = "baselines/powerplatform.md"}
         @{Product = "sharepoint"; MarkdownFilePath = "baselines/sharepoint.md"}
@@ -30,21 +29,20 @@ InModuleScope CreateReport {
         }
         It "Validate import of markdown for all products" {
             $Baselines.GetType().Name -Eq [hashtable] | Should -BeTrue
-            $Baselines.Count | Should -BeExactly 8 -Because "Markdown expected for all products."
+            $Baselines.Count | Should -BeExactly 7 -Because "Baseline Markdown document expected for all products."
         }
         It "Validate markdown group count for <Product>" -ForEach @(
             @{Product = "aad"; GroupCount = 8; PolicyCount = 30}
-            @{Product = "defender"; GroupCount = 6; PolicyCount = 22}
-            @{Product = "exo"; GroupCount = 17; PolicyCount = 39}
-            @{Product = "onedrive"; GroupCount = 3; PolicyCount = 4}
-            @{Product = "powerbi"; GroupCount = 10; PolicyCount = 12}
-            @{Product = "powerplatform"; GroupCount = 4; PolicyCount = 8}
-            @{Product = "sharepoint"; GroupCount = 5; PolicyCount = 10}
-            @{Product = "teams"; GroupCount = 13; PolicyCount = 28}
+            @{Product = "defender"; GroupCount = 6; PolicyCount = 20}
+            @{Product = "exo"; GroupCount = 17; PolicyCount = 37}
+            @{Product = "powerbi"; GroupCount = 7; PolicyCount = 8}
+            @{Product = "powerplatform"; GroupCount = 5; PolicyCount = 8}
+            @{Product = "sharepoint"; GroupCount = 4; PolicyCount = 12}
+            @{Product = "teams"; GroupCount = 8; PolicyCount = 21}
         ){
             {$Baselines.$Product} | Should -Not -Throw
             $Groups = $Baselines.$Product
-            $Groups.Length | Should -BeExactly $GroupCount
+            $Groups.Length | Should -BeExactly $GroupCount -Because "known count of groups for $Product"
 
             $NumberOfPolicies = 0
             foreach ($Group in $Groups){
@@ -63,7 +61,7 @@ InModuleScope CreateReport {
                 }
             }
 
-            $NumberOfPolicies | Should -BeExactly $PolicyCount
+            $NumberOfPolicies | Should -BeExactly $PolicyCount -Because "known count of policies for $Product"
         }
     }
 }
