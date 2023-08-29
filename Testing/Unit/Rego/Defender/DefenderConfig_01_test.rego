@@ -7,7 +7,7 @@ import future.keywords
 test_Enabled_Correct_V1 if {
     PolicyId := "MS.DEFENDER.1.1v1"
 
-    Output := tests with input as {  
+    Output := tests with input as {
         "protection_policy_rules" : [
             {
                 "Identity" : "Standard Preset Security Policy",
@@ -41,7 +41,7 @@ test_Enabled_Correct_V1 if {
 test_Enabled_Correct_V2 if {
     PolicyId := "MS.DEFENDER.1.1v1"
 
-    Output := tests with input as {  
+    Output := tests with input as {
         "protection_policy_rules" : [
             {
                 "Identity" : "Standard Preset Security Policy",
@@ -66,7 +66,7 @@ test_Enabled_Correct_V2 if {
 test_Enabled_Correct_V3 if {
     PolicyId := "MS.DEFENDER.1.1v1"
 
-    Output := tests with input as {  
+    Output := tests with input as {
         "protection_policy_rules" : [],
         "atp_policy_rules" : [
             {
@@ -91,7 +91,7 @@ test_Enabled_Correct_V3 if {
 test_Enabled_Incorrect_V1 if {
     PolicyId := "MS.DEFENDER.1.1v1"
 
-    Output := tests with input as {  
+    Output := tests with input as {
         "protection_policy_rules" : [],
         "atp_policy_rules" : [],
         "defender_license": true
@@ -106,7 +106,7 @@ test_Enabled_Incorrect_V1 if {
 test_Enabled_Incorrect_V2 if {
     PolicyId := "MS.DEFENDER.1.1v1"
 
-    Output := tests with input as {  
+    Output := tests with input as {
         "protection_policy_rules" : [
             {
                 "Identity" : "Standard Preset Security Policy",
@@ -127,7 +127,7 @@ test_Enabled_Incorrect_V2 if {
 test_Enabled_Incorrect_V3 if {
     PolicyId := "MS.DEFENDER.1.1v1"
 
-    Output := tests with input as {  
+    Output := tests with input as {
         "protection_policy_rules" : [
             {
                 "Identity" : "Standard Preset Security Policy",
@@ -148,7 +148,7 @@ test_Enabled_Incorrect_V3 if {
 test_Enabled_Incorrect_V4 if {
     PolicyId := "MS.DEFENDER.1.1v1"
 
-    Output := tests with input as {  
+    Output := tests with input as {
         "protection_policy_rules" : [
             {
                 "Identity" : "Standard Preset Security Policy",
@@ -176,7 +176,7 @@ test_Enabled_Incorrect_V4 if {
 test_AllEOP_Correct_V1 if {
     PolicyId := "MS.DEFENDER.1.2v1"
 
-    Output := tests with input as {  
+    Output := tests with input as {
         "protection_policy_rules" : [
             {
                 "Identity" : "Standard Preset Security Policy",
@@ -198,7 +198,7 @@ test_AllEOP_Correct_V1 if {
 test_AllEOP_Correct_V2 if {
     PolicyId := "MS.DEFENDER.1.2v1"
 
-    Output := tests with input as {  
+    Output := tests with input as {
         "protection_policy_rules" : [
             {
                 "Identity" : "Strict Preset Security Policy",
@@ -220,7 +220,7 @@ test_AllEOP_Correct_V2 if {
 test_AllEOP_Correct_V3 if {
     PolicyId := "MS.DEFENDER.1.2v1"
 
-    Output := tests with input as {  
+    Output := tests with input as {
         "protection_policy_rules" : [
             {
                 "Identity" : "Standard Preset Security Policy",
@@ -248,8 +248,8 @@ test_AllEOP_Correct_V3 if {
 test_AllEOP_Incorrect_V1 if {
     PolicyId := "MS.DEFENDER.1.2v1"
 
-    Output := tests with input as {  
-        "protection_policy_rules" : [] 
+    Output := tests with input as {
+        "protection_policy_rules" : []
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
@@ -262,7 +262,7 @@ test_AllEOP_Incorrect_V1 if {
 test_AllEOP_Incorrect_V2 if {
     PolicyId := "MS.DEFENDER.1.2v1"
 
-    Output := tests with input as {  
+    Output := tests with input as {
         "protection_policy_rules" : [
             {
                 "Identity" : "Strict Preset Security Policy",
@@ -284,7 +284,7 @@ test_AllEOP_Incorrect_V2 if {
 test_AllEOP_Incorrect_V3 if {
     PolicyId := "MS.DEFENDER.1.2v1"
 
-    Output := tests with input as {  
+    Output := tests with input as {
         "protection_policy_rules" : [
             {
                 "Identity" : "Strict Preset Security Policy",
@@ -316,7 +316,7 @@ test_AllEOP_Incorrect_V3 if {
 test_AllDefender_Correct_V1 if {
     PolicyId := "MS.DEFENDER.1.3v1"
 
-    Output := tests with input as {  
+    Output := tests with input as {
         "atp_policy_rules" : [
             {
                 "Identity" : "Standard Preset Security Policy",
@@ -338,7 +338,7 @@ test_AllDefender_Correct_V1 if {
 test_AllDefender_Correct_V2 if {
     PolicyId := "MS.DEFENDER.1.3v1"
 
-    Output := tests with input as {  
+    Output := tests with input as {
         "atp_policy_rules" : [
             {
                 "Identity" : "Strict Preset Security Policy",
@@ -360,7 +360,7 @@ test_AllDefender_Correct_V2 if {
 test_AllDefender_Correct_V3 if {
     PolicyId := "MS.DEFENDER.1.3v1"
 
-    Output := tests with input as {  
+    Output := tests with input as {
         "atp_policy_rules" : [
             {
                 "Identity" : "Standard Preset Security Policy",
@@ -388,7 +388,7 @@ test_AllDefender_Correct_V3 if {
 test_AllDefender_Incorrect_V1 if {
     PolicyId := "MS.DEFENDER.1.3v1"
 
-    Output := tests with input as {  
+    Output := tests with input as {
         "atp_policy_rules" : [],
         "defender_license": true
     }
@@ -403,7 +403,7 @@ test_AllDefender_Incorrect_V1 if {
 test_AllDefender_Incorrect_V2 if {
     PolicyId := "MS.DEFENDER.1.3v1"
 
-    Output := tests with input as {  
+    Output := tests with input as {
         "atp_policy_rules" : [
             {
                 "Identity" : "Strict Preset Security Policy",
@@ -425,7 +425,7 @@ test_AllDefender_Incorrect_V2 if {
 test_AllDefender_Incorrect_V3 if {
     PolicyId := "MS.DEFENDER.1.3v1"
 
-    Output := tests with input as {  
+    Output := tests with input as {
         "atp_policy_rules" : [
             {
                 "Identity" : "Strict Preset Security Policy",
@@ -453,7 +453,7 @@ test_AllDefender_Incorrect_V3 if {
 test_AllDefender_Incorrect_V4 if {
     PolicyId := "MS.DEFENDER.1.3v1"
 
-    Output := tests with input as {  
+    Output := tests with input as {
         "atp_policy_rules" : [],
         "defender_license": false
     }
@@ -471,12 +471,273 @@ test_AllDefender_Incorrect_V4 if {
 test_SensitiveEOP_Correct_V1 if {
     PolicyId := "MS.DEFENDER.1.4v1"
 
-    Output := tests with input as {  
+    Output := tests with input as {
         "protection_policy_rules" : [
             {
-                "Identity" : "Strict Preset Security Policy"
+                "Identity" : "Strict Preset Security Policy",
+                "SentTo": null,
+                "SentToMemberOf": null,
+                "RecipientDomainIs": null,
+                "ExceptIfSentTo": null,
+                "ExceptIfSentToMemberOf": null,
+                "ExceptIfRecipientDomainIs": null,
             }
         ],
+        "scuba_config" : {
+            "Defender" : {
+                "MS.DEFENDER.1.4v1" : {
+                    "SensitiveIDs" : {
+                        "Users" : [],
+                        "Groups" : [],
+                        "Domains" : []
+                    }
+                }
+            }
+        },
+        "defender_license": true
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "Requirement met"
+}
+
+test_SensitiveEOP_Correct_V2 if {
+    PolicyId := "MS.DEFENDER.1.4v1"
+
+    Output := tests with input as {
+        "protection_policy_rules" : [
+            {
+                "Identity" : "Strict Preset Security Policy",
+                "SentTo": [
+                    "johndoe@random.onmicrosoft.com"
+                ],
+                "SentToMemberOf": null,
+                "RecipientDomainIs": null,
+                "ExceptIfSentTo": null,
+                "ExceptIfSentToMemberOf": null,
+                "ExceptIfRecipientDomainIs": null,
+            }
+        ],
+        "scuba_config" : {
+            "Defender" : {
+                "MS.DEFENDER.1.4v1" : {
+                    "SensitiveIDs" : {
+                        "Users" : [
+                            "johndoe@random.onmicrosoft.com"
+                        ]
+                    }
+                }
+            }
+        },
+        "defender_license": true
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "Requirement met"
+}
+
+test_SensitiveEOP_Correct_V3 if {
+    PolicyId := "MS.DEFENDER.1.4v1"
+
+    Output := tests with input as {
+        "protection_policy_rules" : [
+            {
+                "Identity" : "Strict Preset Security Policy",
+                "SentTo": null,
+                "SentToMemberOf": [
+                    "dune@random.onmicrosoft.com"
+                ],
+                "RecipientDomainIs": null,
+                "ExceptIfSentTo": null,
+                "ExceptIfSentToMemberOf": null,
+                "ExceptIfRecipientDomainIs": null,
+            }
+        ],
+        "scuba_config" : {
+            "Defender" : {
+                "MS.DEFENDER.1.4v1" : {
+                    "SensitiveIDs" : {
+                        "Users" : [],
+                        "Groups" : [
+                            "dune@random.onmicrosoft.com"
+                        ],
+                        "Domains" : []
+                    }
+                }
+            }
+        },
+        "defender_license": true
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "Requirement met"
+}
+
+test_SensitiveEOP_Correct_V4 if {
+    PolicyId := "MS.DEFENDER.1.4v1"
+
+    Output := tests with input as {
+        "protection_policy_rules" : [
+            {
+                "Identity" : "Strict Preset Security Policy",
+                "SentTo": null,
+                "SentToMemberOf": null,
+                "RecipientDomainIs": [
+                    "random.mail.onmicrosoft.com"
+                ],
+                "ExceptIfSentTo": null,
+                "ExceptIfSentToMemberOf": null,
+                "ExceptIfRecipientDomainIs": null,
+            }
+        ],
+        "scuba_config" : {
+            "Defender" : {
+                "MS.DEFENDER.1.4v1" : {
+                    "SensitiveIDs" : {
+                        "Users" : [],
+                        "Groups" : [],
+                        "Domains" : [
+                            "random.mail.onmicrosoft.com"
+                        ]
+                    }
+                }
+            }
+        },
+        "defender_license": true
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "Requirement met"
+}
+
+test_SensitiveEOP_Correct_V5 if {
+    PolicyId := "MS.DEFENDER.1.4v1"
+
+    Output := tests with input as {
+        "protection_policy_rules" : [
+            {
+                "Identity" : "Strict Preset Security Policy",
+                "SentTo": [
+                    "johndoe@random.onmicrosoft.com"
+                ],
+                "SentToMemberOf": null,
+                "RecipientDomainIs": null,
+                "ExceptIfSentTo": [
+                    "janedoe@random.onmicrosoft.com"
+                ],
+                "ExceptIfSentToMemberOf": null,
+                "ExceptIfRecipientDomainIs": null,
+            }
+        ],
+        "scuba_config" : {
+            "Defender" : {
+                "MS.DEFENDER.1.4v1" : {
+                    "SensitiveIDs" : {
+                        "Users" : [
+                            "johndoe@random.onmicrosoft.com"
+                        ],
+                        "Groups" : [],
+                        "Domains" : []
+                    }
+                }
+            }
+        },
+        "defender_license": true
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "Requirement met"
+}
+
+test_SensitiveEOP_Correct_V6 if {
+    PolicyId := "MS.DEFENDER.1.4v1"
+
+    Output := tests with input as {
+        "protection_policy_rules" : [
+            {
+                "Identity" : "Strict Preset Security Policy",
+                "SentTo": null,
+                "SentToMemberOf": [
+                    "dune@random.onmicrosoft.com"
+                ],
+                "RecipientDomainIs": null,
+                "ExceptIfSentTo": null,
+                "ExceptIfSentToMemberOf": [
+                    "dune12@random.onmicrosoft.com"
+                ],
+                "ExceptIfRecipientDomainIs": null,
+            }
+        ],
+        "scuba_config" : {
+            "Defender" : {
+                "MS.DEFENDER.1.4v1" : {
+                    "SensitiveIDs" : {
+                        "Users" : [],
+                        "Groups" : [
+                            "dune@random.onmicrosoft.com"
+                        ],
+                        "Domains" : []
+                    }
+                }
+            }
+        },
+        "defender_license": true
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "Requirement met"
+}
+
+test_SensitiveEOP_Correct_V7 if {
+    PolicyId := "MS.DEFENDER.1.4v1"
+
+    Output := tests with input as {
+        "protection_policy_rules" : [
+            {
+                "Identity" : "Strict Preset Security Policy",
+                "SentTo": null,
+                "SentToMemberOf": null,
+                "RecipientDomainIs": [
+                    "random.mail.onmicrosoft.com"
+                ],
+                "ExceptIfSentTo": null,
+                "ExceptIfSentToMemberOf": null,
+                "ExceptIfRecipientDomainIs": [
+                    "randomdancing.mail.onmicrosoft.com"
+                ],
+            }
+        ],
+        "scuba_config" : {
+            "Defender" : {
+                "MS.DEFENDER.1.4v1" : {
+                    "SensitiveIDs" : {
+                        "Users" : [],
+                        "Groups" : [],
+                        "Domains" : [
+                            "random.mail.onmicrosoft.com"
+                        ]
+                    }
+                }
+            }
+        },
         "defender_license": true
     }
 
@@ -490,8 +751,175 @@ test_SensitiveEOP_Correct_V1 if {
 test_SensitiveEOP_Incorrect_V1 if {
     PolicyId := "MS.DEFENDER.1.4v1"
 
-    Output := tests with input as {  
-        "protection_policy_rules" : [],
+    Output := tests with input as {
+        "protection_policy_rules" : [
+            {
+                "Identity" : "Standard Preset Security Policy",
+                "SentTo": null,
+                "SentToMemberOf": null,
+                "RecipientDomainIs": null,
+                "ExceptIfSentTo": null,
+                "ExceptIfSentToMemberOf": null,
+                "ExceptIfRecipientDomainIs": null,
+            }
+        ],
+        "scuba_config" : {
+            "Defender" : {
+                "MS.DEFENDER.1.4v1" : {
+                    "SensitiveIDs" : {
+                        "Users" : [],
+                        "Groups" : [],
+                        "Domains" : []
+                    }
+                }
+            }
+        },
+        "defender_license": true
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "Requirement not met"
+}
+
+test_SensitiveEOP_Incorrect_V2 if {
+    PolicyId := "MS.DEFENDER.1.4v1"
+
+    Output := tests with input as {
+        "protection_policy_rules" : [ ],
+        "scuba_config" : {
+            "Defender" : {
+                "MS.DEFENDER.1.4v1" : {
+                    "SensitiveIDs" : {
+                        "Users" : [],
+                        "Groups" : [],
+                        "Domains" : []
+                    }
+                }
+            }
+        },
+        "defender_license": true
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "Requirement not met"
+}
+
+test_SensitiveEOP_Incorrect_V3 if {
+    PolicyId := "MS.DEFENDER.1.4v1"
+
+    Output := tests with input as {
+        "protection_policy_rules" : [
+            {
+                "Identity" : "Strict Preset Security Policy",
+                "SentTo": null,
+                "SentToMemberOf": null,
+                "RecipientDomainIs": null,
+                "ExceptIfSentTo": [
+                    "johndoe@random.onmicrosoft.com"
+                ],
+                "ExceptIfSentToMemberOf": null,
+                "ExceptIfRecipientDomainIs": null,
+            }
+        ],
+        "scuba_config" : {
+            "Defender" : {
+                "MS.DEFENDER.1.4v1" : {
+                    "SensitiveIDs" : {
+                        "Users" : [
+                            "johndoe@random.onmicrosoft.com"
+                        ],
+                        "Groups" : [],
+                        "Domains" : []
+                    }
+                }
+            }
+        },
+        "defender_license": true
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "Requirement not met"
+}
+
+test_SensitiveEOP_Incorrect_V4 if {
+    PolicyId := "MS.DEFENDER.1.4v1"
+
+    Output := tests with input as {
+        "protection_policy_rules" : [
+            {
+                "Identity" : "Strict Preset Security Policy",
+                "SentTo": null,
+                "SentToMemberOf": null,
+                "RecipientDomainIs": null,
+                "ExceptIfSentTo": null,
+                "ExceptIfSentToMemberOf": [
+                    "dune@random.onmicrosoft.com"
+                ],
+                "ExceptIfRecipientDomainIs": null,
+            }
+        ],
+        "scuba_config" : {
+            "Defender" : {
+                "MS.DEFENDER.1.4v1" : {
+                    "SensitiveIDs" : {
+                        "Users" : [],
+                        "Groups" : [
+                            "dune@random.onmicrosoft.com"
+                        ],
+                        "Domains" : []
+                    }
+                }
+            }
+        },
+        "defender_license": true
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "Requirement not met"
+}
+
+test_SensitiveEOP_Incorrect_V5 if {
+    PolicyId := "MS.DEFENDER.1.4v1"
+
+    Output := tests with input as {
+        "protection_policy_rules" : [
+            {
+                "Identity" : "Strict Preset Security Policy",
+                "SentTo": null,
+                "SentToMemberOf": null,
+                "RecipientDomainIs": null,
+                "ExceptIfSentTo": null,
+                "ExceptIfSentToMemberOf": null,
+                "ExceptIfRecipientDomainIs": [
+                    "random.mail.onmicrosoft.com"
+                ],
+            }
+        ],
+        "scuba_config" : {
+            "Defender" : {
+                "MS.DEFENDER.1.4v1" : {
+                    "SensitiveIDs" : {
+                        "Users" : [],
+                        "Groups" : [],
+                        "Domains" : [
+                            "random.mail.onmicrosoft.com"
+                        ]
+                    }
+                }
+            }
+        },
         "defender_license": true
     }
 
@@ -509,7 +937,7 @@ test_SensitiveEOP_Incorrect_V1 if {
 test_SensitiveAtp_Correct_V1 if {
     PolicyId := "MS.DEFENDER.1.5v1"
 
-    Output := tests with input as {  
+    Output := tests with input as {
         "atp_policy_rules" : [
             {
                 "Identity" : "Strict Preset Security Policy"
@@ -528,7 +956,7 @@ test_SensitiveAtp_Correct_V1 if {
 test_SensitiveAtp_Incorrect_V1 if {
     PolicyId := "MS.DEFENDER.1.5v1"
 
-    Output := tests with input as {  
+    Output := tests with input as {
         "atp_policy_rules" : [],
         "defender_license": true
     }
@@ -543,7 +971,7 @@ test_SensitiveAtp_Incorrect_V1 if {
 test_SensitiveAtp_Incorrect_V2 if {
     PolicyId := "MS.DEFENDER.1.5v1"
 
-    Output := tests with input as {  
+    Output := tests with input as {
         "atp_policy_rules" : [],
         "defender_license": false
     }
