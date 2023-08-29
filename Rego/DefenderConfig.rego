@@ -74,24 +74,12 @@ UserSensitiveIDs(Policies, PolicyID) := true if {
 }
 
 UserSensitiveIDs(Policies, PolicyID) := true if {
-    SensitiveUsers := input.scuba_config.Defender[PolicyID].SensitiveIDs.Users
-    ExcludedUsers = {
-        Policy.ExceptIfSentTo | Policy := Policies[_];
-        Policy.Identity == "Strict Preset Security Policy";
-        Policy.SentTo == null
-    }
-    ExcludedUsers != null
-    count(SensitiveUsers & ExcludedUsers) == 0
-}
+    SensitiveUsers := { input.scuba_config.Defender[PolicyID].SensitiveIDs.Users }
+    ExcludedUsers = { Policy.ExceptIfSentTo | Policy := Policies[_]; Policy.Identity == "Strict Preset Security Policy" }
+    IncludedUsers := { Policy.SentTo | Policy := Policies[_]; Policy.Identity == "Strict Preset Security Policy" }
 
-UserSensitiveIDs(Policies, PolicyID) := true if {
-    SensitiveUsers := input.scuba_config.Defender[PolicyID].SensitiveIDs.Users
-    IncludedUsers = {
-        Policy.SentTo | Policy := Policies[_];
-        Policy.Identity == "Strict Preset Security Policy";
-        Policy.SentTo != null
-    }
-    count(SensitiveUsers & IncludedUsers) == count(SensitiveUsers)
+    count(SensitiveUsers & ExcludedUsers) == 0
+    count(SensitiveUsers - IncludedUsers) == 0
 }
 
 default GroupSensitiveIDs(_, _) := false
@@ -103,24 +91,12 @@ GroupSensitiveIDs(Policies, PolicyID) := true if {
 }
 
 GroupSensitiveIDs(Policies, PolicyID) := true if {
-    SensitiveGroups := input.scuba_config.Defender[PolicyID].SensitiveIDs.Groups
-    ExcludedGroups = {
-        Policy.ExceptIfSentToMemberOf | Policy := Policies[_];
-        Policy.Identity == "Strict Preset Security Policy";
-        Policy.SentToMemberOf == null
-    }
-    ExcludedGroups != null
-    count(SensitiveGroups & ExcludedGroups) == 0
-}
+    SensitiveGroups := { input.scuba_config.Defender[PolicyID].SensitiveIDs.Groups }
+    ExcludedGroups = { Policy.ExceptIfSentToMemberOf | Policy := Policies[_]; Policy.Identity == "Strict Preset Security Policy" }
+    IncludedGroups := { Policy.SentToMemberOf | Policy := Policies[_]; Policy.Identity == "Strict Preset Security Policy" }
 
-GroupSensitiveIDs(Policies, PolicyID) := true if {
-    SensitiveGroups := input.scuba_config.Defender[PolicyID].SensitiveIDs.Groups
-    IncludedGroups = {
-        Policy.SentToMemberOf | Policy := Policies[_];
-        Policy.Identity == "Strict Preset Security Policy";
-        Policy.SentToMemberOf != null
-    }
-    count(SensitiveGroups & IncludedGroups) == count(SensitiveGroups)
+    count(SensitiveGroups & ExcludedGroups) == 0
+    count(SensitiveGroups - IncludedGroups) == 0
 }
 
 default DomainSensitiveIDs(_, _) := false
@@ -132,25 +108,14 @@ DomainSensitiveIDs(Policies, PolicyID) := true if {
 }
 
 DomainSensitiveIDs(Policies, PolicyID) := true if {
-    SensitiveDomains := input.scuba_config.Defender[PolicyID].SensitiveIDs.Domains
-    ExcludedDomains = {
-        Policy.ExceptIfRecipientDomainIs | Policy := Policies[_];
-        Policy.Identity == "Strict Preset Security Policy";
-        Policy.RecipientDomainIs == null
-    }
-    ExcludedDomains != null
+    SensitiveDomains := { input.scuba_config.Defender[PolicyID].SensitiveIDs.Domains }
+    ExcludedDomains = { Policy.ExceptIfRecipientDomainIs | Policy := Policies[_]; Policy.Identity == "Strict Preset Security Policy" }
+    IncludedDomains := { Policy.RecipientDomainIs | Policy := Policies[_]; Policy.Identity == "Strict Preset Security Policy" }
+
     count(SensitiveDomains & ExcludedDomains) == 0
+    count(SensitiveDomains - IncludedDomains) == 0
 }
 
-DomainSensitiveIDs(Policies, PolicyID) := true if {
-    SensitiveDomains := input.scuba_config.Defender[PolicyID].SensitiveIDs.Domains
-    IncludedDomains = {
-        Policy.RecipientDomainIs | Policy := Policies[_];
-        Policy.Identity == "Strict Preset Security Policy";
-        Policy.RecipientDomainIs != null
-    }
-    count(SensitiveDomains & IncludedDomains) == count(SensitiveDomains)
-}
 
 #
 # MS.DEFENDER.1.1v1
@@ -312,8 +277,9 @@ tests[{
 # MS.DEFENDER.1.4v1
 #--
 
-default ProtectionPolicyForSensitiveIDs(_) := false
-ProtectionPolicyForSensitiveIDs(Policies) := true if {
+ProtectionPolicyForSensitiveIDs[Policies] {
+    Policies := input.protection_policy_rules
+
     UserSensitiveIDs(Policies, "MS.DEFENDER.1.4v1") == true
     GroupSensitiveIDs(Policies, "MS.DEFENDER.1.4v1") == true
     DomainSensitiveIDs(Policies, "MS.DEFENDER.1.4v1") == true
@@ -323,12 +289,11 @@ tests[{
     "PolicyId" : "MS.DEFENDER.1.4v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-EOPProtectionPolicyRule"],
-	"ActualValue" : {"EOPProtectionPolicies": Policies},
+	"ActualValue" : {"EOPProtectionPolicies": ProtectionPolicyForSensitiveIDs},
     "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
-    Policies := input.protection_policy_rules
-    Status := ProtectionPolicyForSensitiveIDs(Policies)
+    Status := count(ProtectionPolicyForSensitiveIDs) == 1
 }
 #--
 

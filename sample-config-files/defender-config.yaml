@@ -14,7 +14,7 @@ Description: |
   - Use of Pascal case convention for varible names
   - Defines a namespace for values to be used across baselines/products (i.e., GlobalVars)
   - Per product namespace for values related to that specific product (i.e., Aad, SharePoint)
-  - Namespace for each policy item within a product for variables related only to one policy item (i.e., MS.AAD.2.1v1)
+  - Namespace for each policy item within a product for variables related only to one policy item (i.e., Aad.Policy2_1)
   - Use of YAML anchors and aliases following DRY (Don't Repeat Yourself) principle for repeated values and sections
 ProductNames:
 - defender
@@ -29,13 +29,12 @@ OutRegoFileName: TestResults
 OutReportName: BaselineReports
 GlobalVars:  # For cross product variables
   AllProductVar: value_example
-# Defender
 Defender:
   MS.DEFENDER.1.4v1: &SensitiveIDs
     SensitiveIDs:
       Users:
-        -
+        - johndoe@random.onmicrosoft.com
       Groups:
-        -
+        - dune@random.onmicrosoft.com
       Domains:
-        -
+        - random.mail.onmicrosoft.com
