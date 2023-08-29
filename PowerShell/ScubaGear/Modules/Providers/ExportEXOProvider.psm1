@@ -264,6 +264,36 @@ function Invoke-RobustDnsTxt {
         }
     }
 
+    if (-not $Success) {
+        # Traditional DNS and DoH queries failed. Try using the dnsviz.net server provided by DNS-OARC
+        # (https://dnsviz.net/d/$Qname/dnssec/).
+        while ($TryNumber -lt $MaxTries) {
+            $TryNumber += 1
+            try {
+                $dnsVizResponse = Invoke-WebRequest -Uri "https://dnsviz.net/d/$($Qname)/responses/" -ErrorAction Stop
+                if ($dnsVizResponse.StatusCode -eq 200) {
+                    # http status code 200 indicates there was no error
+                    # for each tr element, get the td elements with class name "rr"
+                    $dnsVizResponse.ParsedHtml.getElementsByTagName("tr") | ForEach-Object { if ($_.outerhtml -like "*TXT*") { $_.getElementsByClassName("rr") | foreach-Object {$Answers += $_.innerText}} }
+                    $LogEntries += @{"query_name"=$Qname; "query_method"="DNSViz.net_WebService"; "query_result"="Query returned $($textrecords.Length) txt records"}
+                    $Success = $true
+                    write-output "Query returned response code $($dnsVizResponse.Status)"
+                    break
+                }
+                else {
+                # The remainder of the response codes indicate that the web service request did not succeed.
+                # Retry if we haven't reached $MaxTries.
+                $LogEntries += @{"query_name"=$Qname; "query_method"="DNSViz.net_WebService"; "query_result"="Query returned status code $($dnsVizResponse.StatusCode)"}
+                }
+            }
+            catch {
+                # Web request to DNSViz.net failed
+                # Retry if we haven't reached $MaxTries.
+                $LogEntries += @{"query_name"=$Qname; "query_method"="DNSViz.net_WebService"; "query_result"="Query resulted in exception, $($_.FullyQualifiedErrorId)"}
+                write-output "$(convertTo-json $LogEntries)"
+            }
+        }
+    }
     # There are three possible outcomes of this function:
     # - Full confidence: we know conclusively that the domain exists or not, either via an answer
     # from traditional DNS, an answer from DoH, or NXDomain from DoH.
