@@ -527,7 +527,9 @@ test_SensitiveEOP_Correct_V2 if {
                     "SensitiveIDs" : {
                         "Users" : [
                             "johndoe@random.onmicrosoft.com"
-                        ]
+                        ],
+                        "Groups" : [ ],
+                        "Domains" : []
                     }
                 }
             }
@@ -748,6 +750,51 @@ test_SensitiveEOP_Correct_V7 if {
     RuleOutput[0].ReportDetails == "Requirement met"
 }
 
+test_SensitiveEOP_Correct_V8 if {
+    PolicyId := "MS.DEFENDER.1.4v1"
+
+    Output := tests with input as {
+        "protection_policy_rules" : [
+            {
+                "Identity" : "Strict Preset Security Policy",
+                "SentTo": [
+                    "johndoe@random.onmicrosoft.com"
+                ],
+                "SentToMemberOf": null,
+                "RecipientDomainIs": [
+                    "random.mail.onmicrosoft.com"
+                ],
+                "ExceptIfSentTo": null,
+                "ExceptIfSentToMemberOf": null,
+                "ExceptIfRecipientDomainIs": [
+                    "randomdancing.mail.onmicrosoft.com"
+                ],
+            }
+        ],
+        "scuba_config" : {
+            "Defender" : {
+                "MS.DEFENDER.1.4v1" : {
+                    "SensitiveIDs" : {
+                        "Users" : [],
+                        "Groups" : [],
+                        "Domains" : [
+                            "random.mail.onmicrosoft.com",
+                            "random.onmicrosoft.com"
+                        ]
+                    }
+                }
+            }
+        },
+        "defender_license": true
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "Requirement met"
+}
+
 test_SensitiveEOP_Incorrect_V1 if {
     PolicyId := "MS.DEFENDER.1.4v1"
 
@@ -915,6 +962,93 @@ test_SensitiveEOP_Incorrect_V5 if {
                         "Groups" : [],
                         "Domains" : [
                             "random.mail.onmicrosoft.com"
+                        ]
+                    }
+                }
+            }
+        },
+        "defender_license": true
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "Requirement not met"
+}
+
+test_SensitiveEOP_Incorrect_V6 if {
+    PolicyId := "MS.DEFENDER.1.4v1"
+
+    Output := tests with input as {
+        "protection_policy_rules" : [
+            {
+                "Identity" : "Strict Preset Security Policy",
+                "SentTo": null,
+                "SentToMemberOf": null,
+                "RecipientDomainIs": [
+                    "random.mail.onmicrosoft.com"
+                ],
+                "ExceptIfSentTo": null,
+                "ExceptIfSentToMemberOf": null,
+                "ExceptIfRecipientDomainIs": [
+                    "randomdancing.mail.onmicrosoft.com"
+                ],
+            }
+        ],
+        "scuba_config" : {
+            "Defender" : {
+                "MS.DEFENDER.1.4v1" : {
+                    "SensitiveIDs" : {
+                        "Users" : [],
+                        "Groups" : [],
+                        "Domains" : [
+                            "random.mail.onmicrosoft.com",
+                            "random.onmicrosoft.com"
+                        ]
+                    }
+                }
+            }
+        },
+        "defender_license": true
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "Requirement not met"
+}
+
+test_SensitiveEOP_Incorrect_V7 if {
+    PolicyId := "MS.DEFENDER.1.4v1"
+
+    Output := tests with input as {
+        "protection_policy_rules" : [
+            {
+                "Identity" : "Strict Preset Security Policy",
+                "SentTo": null,
+                "SentToMemberOf": null,
+                "RecipientDomainIs": [
+                    "random.mail.onmicrosoft.com"
+                ],
+                "ExceptIfSentTo": null,
+                "ExceptIfSentToMemberOf": null,
+                "ExceptIfRecipientDomainIs": [
+                    "randomdancing.mail.onmicrosoft.com",
+                    "random.onmicrosoft.com"
+                ],
+            }
+        ],
+        "scuba_config" : {
+            "Defender" : {
+                "MS.DEFENDER.1.4v1" : {
+                    "SensitiveIDs" : {
+                        "Users" : [],
+                        "Groups" : [],
+                        "Domains" : [
+                            "random.mail.onmicrosoft.com",
+                            "random.onmicrosoft.com"
                         ]
                     }
                 }
