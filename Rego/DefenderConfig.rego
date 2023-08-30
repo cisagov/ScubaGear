@@ -1,6 +1,5 @@
 package defender
 import future.keywords
-import data.policy.utils.IsEmptyContainer
 import data.report.utils.NotCheckedDetails
 import data.report.utils.ReportDetailsBoolean
 
