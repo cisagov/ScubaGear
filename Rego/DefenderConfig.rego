@@ -367,7 +367,6 @@ ProtectionPolicyForSensitiveIDs[Policies] {
 
     UserSensitiveIDs(Policies, "MS.DEFENDER.1.4v1") == true
     GroupSensitiveIDs(Policies, "MS.DEFENDER.1.4v1") == true
-    # DomainSensitiveIDs(Policies, "MS.DEFENDER.1.4v1") == true
 }
 
 tests[{
@@ -378,7 +377,6 @@ tests[{
     "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
-    #CheckProtectionForSensitiveEOP("MS.DEFENDER.1.4v1") #
     Status := count(ProtectionPolicyForSensitiveIDs) == 1
 }
 #--
