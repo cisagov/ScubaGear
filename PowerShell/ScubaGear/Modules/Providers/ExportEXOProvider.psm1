@@ -271,8 +271,16 @@ function Invoke-RobustDnsTxt {
             $TryNumber += 1
             try {
                 $dnsVizResponse = Invoke-WebRequest -Uri "https://dnsviz.net/d/$($Qname)/responses/" -ErrorAction Stop
+                # http status code 200 indicates there was no error retrieving the page
                 if ($dnsVizResponse.StatusCode -eq 200) {
-                    # http status code 200 indicates there was no error
+                    # check if domain has not been analyzed before by dnsviz.net service
+                    $needsAnalysis = $dnsVizResponse.ParsedHtml.getElementByID("analysis-text").innerText
+                    if ($needsAnalysis -like "has not been analyzed before") {
+                        $LogEntries += @{"query_name"=$Qname; "query_method"="DNSViz.net_WebService"; "query_result"="Web service https://dnsviz.net has not analyzed the domain $Qname before. Visit the web page https://dnsviz.net and enter the domain name. The service may take serveral minutes to complete the analysis."}
+                        $TradEmptyOrNx = $true
+                        break
+                    }
+
                     # for each tr element, get the td elements with class name "rr"
                     $dnsVizResponse.ParsedHtml.getElementsByTagName("tr") | ForEach-Object { if ($_.outerhtml -like "*TXT*") { $_.getElementsByClassName("rr") | foreach-Object {$Answers += $_.innerText}} }
                     $LogEntries += @{"query_name"=$Qname; "query_method"="DNSViz.net_WebService"; "query_result"="Query returned $($textrecords.Length) txt records"}
