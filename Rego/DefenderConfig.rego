@@ -1,5 +1,6 @@
 package defender
 import future.keywords
+import data.policy.utils.IsEmptyContainer
 import data.report.utils.NotCheckedDetails
 import data.report.utils.ReportDetailsBoolean
 
@@ -65,38 +66,96 @@ ApplyLicenseWarning(Message) := concat("", [ReportDetailsBoolean(false), License
 # User/Group Exclusion support functions #
 ##########################################
 
+SensitiveUsers(Policies, PolicyID) := {
+    "ConfigUsers" : ConfigUsers,
+    "ExcludedUsers" : ExcludedUsers,
+    "IncludedUsers" : IncludedUsers
+} {
+    Config := input.scuba_config.Defender[PolicyID].SensitiveIDs.Users
+    Policy := [Policy | Policy := Policies[_]; Policy.Identity == "Strict Preset Security Policy"]
+    ConfigUsers := { x | x := Config[_] }
+    ExcludedUsers := { x | x := Policy[0].ExceptIfSentTo[_] }
+    IncludedUsers := { x | x := Policy[0].SentTo[_] }
+}
+
+SensitiveDomains(Policies, PolicyID) := {
+    "ConfigDomains" : ConfigDomains,
+    "ExcludedDomains" : ExcludedDomains,
+    "IncludedDomains" : IncludedDomains
+} {
+    Config := input.scuba_config.Defender[PolicyID].SensitiveIDs.Domains
+    Policy := [Policy | Policy := Policies[_]; Policy.Identity == "Strict Preset Security Policy"]
+    ConfigDomains := { x | x := Config[_] }
+    ExcludedDomains := { x | x := Policy[0].ExceptIfRecipientDomainIs[_] }
+    IncludedDomains := { x | x := Policy[0].RecipientDomainIs[_] }
+}
+
+FindRegexMatches(ParsingArray, MatchingArray, RegexString) := {
+    "Matches" : Matches, "MatchingArray" : NewArray
+} {
+    Matches := {
+        Item | Item := ParsingArray[_];
+        splitString := regex.split(RegexString, Item);
+        splitString[1] in MatchingArray
+    }
+    MatchingItemArray := {
+        splitString[1] | Item := Matches[_];
+        splitString := regex.split(RegexString, Item)
+    }
+    NewArray := MatchingArray - MatchingItemArray
+}
+
+SensitiveUserAndDomainCrossCheck(UsersNotProtected, ConfigDomains) := {
+    "Result" : true, "ConfigDomains" : ConfigDomains
+} if {
+    count(UsersNotProtected) == 0
+}
+
+SensitiveUserAndDomainCrossCheck(UsersNotProtected, ConfigDomains) := {
+    "Result" : true, "ConfigDomains" : DomainProtectedUsers.MatchingArray
+} if {
+    count(UsersNotProtected) > 0
+    DomainProtectedUsers := FindRegexMatches(UsersNotProtected, ConfigDomains, ".+@")
+    count(UsersNotProtected - DomainProtectedUsers.Matches) == 0
+}
+
+SensitiveUserAndDomainCrossCheck(UsersNotProtected, ConfigDomains) := {
+    "Result" : false, "ConfigDomains" : ConfigDomains
+} if {
+    count(UsersNotProtected) > 0
+    DomainProtectedUsers := FindRegexMatches(UsersNotProtected, ConfigDomains, ".+@")
+    count(UsersNotProtected - DomainProtectedUsers.Matches) > 0
+}
+
 default UserSensitiveIDs(_, _) := false
 UserSensitiveIDs(Policies, PolicyID) := true if {
     count([Policy | Policy = Policies[_];
         Policy.Identity == "Strict Preset Security Policy";
         Policy.SentTo == null;
         Policy.ExceptIfSentTo == null]) > 0
+    DomainSensitiveIDs(Policies, PolicyID) == true
 }
 
 UserSensitiveIDs(Policies, PolicyID) := true if {
-    SensitiveUsers := { input.scuba_config.Defender[PolicyID].SensitiveIDs.Users }
-    ExcludedUsers = { Policy.ExceptIfSentTo | Policy := Policies[_]; Policy.Identity == "Strict Preset Security Policy" }
-    IncludedUsers := { Policy.SentTo | Policy := Policies[_]; Policy.Identity == "Strict Preset Security Policy" }
+    AllSensitiveUsers := SensitiveUsers(Policies, PolicyID)
 
-    count(SensitiveUsers & ExcludedUsers) == 0
-    count(SensitiveUsers - IncludedUsers) == 0
+    count(AllSensitiveUsers.ConfigUsers & AllSensitiveUsers.ExcludedUsers) == 0
+    count(AllSensitiveUsers.ConfigUsers - AllSensitiveUsers.IncludedUsers) == 0
+    DomainSensitiveIDs(Policies, PolicyID) == true
 }
 
-default GroupSensitiveIDs(_, _) := false
-GroupSensitiveIDs(Policies, PolicyID) := true if {
-    count([Policy | Policy = Policies[_];
-        Policy.Identity == "Strict Preset Security Policy";
-        Policy.SentToMemberOf == null;
-        Policy.ExceptIfSentToMemberOf == null]) > 0
-}
+UserSensitiveIDs(Policies, PolicyID) := true if {
+    AllSensitiveUsers := SensitiveUsers(Policies, PolicyID)
+    SensitiveUsersUnaccountedFor :=  AllSensitiveUsers.IncludedUsers - AllSensitiveUsers.ConfigUsers
+    count(AllSensitiveUsers.ConfigUsers & AllSensitiveUsers.ExcludedUsers) == 0
+    count(SensitiveUsersUnaccountedFor) > 0
+    DomainSensitiveIDs(Policies, PolicyID) == false
 
-GroupSensitiveIDs(Policies, PolicyID) := true if {
-    SensitiveGroups := { input.scuba_config.Defender[PolicyID].SensitiveIDs.Groups }
-    ExcludedGroups = { Policy.ExceptIfSentToMemberOf | Policy := Policies[_]; Policy.Identity == "Strict Preset Security Policy" }
-    IncludedGroups := { Policy.SentToMemberOf | Policy := Policies[_]; Policy.Identity == "Strict Preset Security Policy" }
-
-    count(SensitiveGroups & ExcludedGroups) == 0
-    count(SensitiveGroups - IncludedGroups) == 0
+    AllSensitiveDomains := SensitiveDomains(Policies, PolicyID)
+    count(AllSensitiveDomains.ConfigDomains & AllSensitiveDomains.ExcludedDomains) == 0
+    Results := SensitiveUserAndDomainCrossCheck(SensitiveUsersUnaccountedFor, AllSensitiveDomains.ConfigDomains)
+    Results.Result == true
+    count(Results.ConfigDomains - AllSensitiveDomains.IncludedDomains) == 0
 }
 
 default DomainSensitiveIDs(_, _) := false
@@ -108,12 +167,38 @@ DomainSensitiveIDs(Policies, PolicyID) := true if {
 }
 
 DomainSensitiveIDs(Policies, PolicyID) := true if {
-    SensitiveDomains := { input.scuba_config.Defender[PolicyID].SensitiveIDs.Domains }
-    ExcludedDomains = { Policy.ExceptIfRecipientDomainIs | Policy := Policies[_]; Policy.Identity == "Strict Preset Security Policy" }
-    IncludedDomains := { Policy.RecipientDomainIs | Policy := Policies[_]; Policy.Identity == "Strict Preset Security Policy" }
+    AllSensitiveDomains := SensitiveDomains(Policies, PolicyID)
 
-    count(SensitiveDomains & ExcludedDomains) == 0
-    count(SensitiveDomains - IncludedDomains) == 0
+    count(AllSensitiveDomains.IncludedDomains) > 0
+    count(AllSensitiveDomains.ConfigDomains & AllSensitiveDomains.ExcludedDomains) == 0
+    count(AllSensitiveDomains.ConfigDomains - AllSensitiveDomains.IncludedDomains) == 0
+}
+
+DomainSensitiveIDs(Policies, PolicyID) := false if {
+    AllSensitiveDomains := SensitiveDomains(Policies, PolicyID)
+
+    count(AllSensitiveDomains.IncludedDomains) > 0
+    count(AllSensitiveDomains.ConfigDomains & AllSensitiveDomains.ExcludedDomains) == 0
+    count(AllSensitiveDomains.ConfigDomains - AllSensitiveDomains.IncludedDomains) > 0
+}
+
+default GroupSensitiveIDs(_, _) := false
+GroupSensitiveIDs(Policies, PolicyID) := true if {
+    count([Policy | Policy = Policies[_];
+        Policy.Identity == "Strict Preset Security Policy";
+        Policy.SentToMemberOf == null;
+        Policy.ExceptIfSentToMemberOf == null]) > 0
+}
+
+GroupSensitiveIDs(Policies, PolicyID) := true if {
+    Config := input.scuba_config.Defender[PolicyID].SensitiveIDs.Groups
+    Policy := [Policy | Policy := Policies[_]; Policy.Identity == "Strict Preset Security Policy"]
+    ConfigGroups := { x | x := Config[_] }
+    ExcludedGroups := { x | x := Policy[0].ExceptIfSentToMemberOf[_] }
+    IncludedGroups := { x | x := Policy[0].SentToMemberOf[_] }
+
+    count(ConfigGroups & ExcludedGroups) == 0
+    count(ConfigGroups - IncludedGroups) == 0
 }
 
 
@@ -282,7 +367,7 @@ ProtectionPolicyForSensitiveIDs[Policies] {
 
     UserSensitiveIDs(Policies, "MS.DEFENDER.1.4v1") == true
     GroupSensitiveIDs(Policies, "MS.DEFENDER.1.4v1") == true
-    DomainSensitiveIDs(Policies, "MS.DEFENDER.1.4v1") == true
+    # DomainSensitiveIDs(Policies, "MS.DEFENDER.1.4v1") == true
 }
 
 tests[{
@@ -293,6 +378,7 @@ tests[{
     "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
+    #CheckProtectionForSensitiveEOP("MS.DEFENDER.1.4v1") #
     Status := count(ProtectionPolicyForSensitiveIDs) == 1
 }
 #--
