@@ -53,7 +53,7 @@ This section provides a list of what CISA considers highly privileged [built-in 
 
 ## Conditional Access Policies
 
-Numerous policies in this baseline rely on AAD Conditional Access. Conditional Access brings identity-driven signals together to make access control decisions and enforce organizational policies. Conditional Access is Microsoft's Zero Trust policy engine taking signals from various sources into account when enforcing policy decisions. This section provides guidance and tools when implementing baseline policies which rely on AAD Conditional Access.
+Numerous policies in this baseline rely on AAD Conditional Access. Conditional Access is a feature that allows administrators to limit access to resources using conditions such as user or group membership, device, IP location, and real-time risk detection. This section provides guidance and tools when implementing baseline policies which rely on AAD Conditional Access.
 
 As described in Microsoft’s literature related to conditional access policies, CISA recommends initially setting a policy to
 **Report-only** when it is created and then performing thorough hands-on
@@ -188,7 +188,7 @@ The methods **AAD Certificate-Based Authentication (CBA)**, **FIDO2 Security Key
 
 The **Federal PIV card (federated from agency on-premises Active Directory Federation Services or other identity provider)** option, although technically phishing-resistant presents significant risks if the on-premises authentication infrastructure (e.g. ADFS) is compromised. Therefore federated PIV is not a preferred option and agencies should migrate to the options listed in the preferred section above. If an agency does use an on-premises PIV authentication and federate to AAD, reference the [guidance at this link](https://playbooks.idmanagement.gov/piv/network/group/) to enforce PIV logon via AD group policy.
 
-- _Rationale:_ Alloqing weaker forms of MFA does not protect against sophisticated phishing attacks. By enforcing methods resistant to phishing those risks are minimized.
+- _Rationale:_ Allowing weaker forms of MFA does not protect against sophisticated phishing attacks. By enforcing methods resistant to phishing those risks are minimized.
 - _Last modified:_ June 2023
 
 #### MS.AAD.3.2v1
