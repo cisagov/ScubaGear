@@ -1291,6 +1291,12 @@ visibility into user actions during an incident.  Enabling Microsoft Purview Aud
 (Premium) captures additional event types that are not included with Standard.
 Furthermore, it is required for government agencies by OMB M-21-13 (referred to therein as by its former name, Unified Audit Logs w/ Advanced Features).
 - _Last modified:_ June 2023
+- _Note:_ At the time of this writing, Microsoft has announced upcoming changes
+          to its Purview Audit service that include making audit events
+          currently available in Purview Audit (Premium) available to Purview
+          Audit (Standard) subscribers.  After rollout of changes are complete,
+          Purview (Standard) may be sufficient for agencies to meet basic
+          logging requirements.
 
 #### MS.EXO.17.3v1
 Audit logs SHALL be maintained for at least the minimum duration dictated by [OMB M-21-31 (Appendix C)](https://www.whitehouse.gov/wp-content/uploads/2021/08/M-21-31-Improving-the-Federal-Governments-Investigative-and-Remediation-Capabilities-Related-to-Cybersecurity-Incidents.pdf).
@@ -1305,7 +1311,8 @@ Audit Logs in the Cloud Azure log category.
 
 ### Resources
 
-- None
+- [Expanding cloud logging to give customers deeper security visibility \|
+  Microsoft Security Blog](https://www.microsoft.com/en-us/security/blog/2023/07/19/expanding-cloud-logging-to-give-customers-deeper-security-visibility/)
 
 ### License Requirements
 

@@ -705,6 +705,12 @@ Microsoft Purview Audit (Premium) logging SHALL be enabled for ALL users.
 <!--Policy: MS.DEFENDER.6.2v1; Criticality: SHALL -->
 - _Rationale:_ Standard logging may not include relevant details necessary for visibility into user actions during an incident. Enabling Microsoft Purview Audit (Premium) captures additional event types that are not included with Standard. Furthermore, it is required for government agencies by OMB M-21-13 (referred to therein as by its former name, Unified Audit Logs w/ Advanced Features).
 - _Last modified:_ June 2023
+- _Note:_ At the time of this writing, Microsoft has announced upcoming changes
+          to its Purview Audit service that include making audit events
+          currently available in Purview Audit (Premium) available to Purview
+          Audit (Standard) subscribers.  After rollout of changes are complete,
+          Purview (Standard) may be sufficient for agencies to meet basic
+          logging requirements.
 
 #### MS.DEFENDER.6.3v1
 Audit logs SHALL be maintained for at least the minimum duration dictated by OMB M-21-31.
@@ -716,6 +722,8 @@ Audit logs SHALL be maintained for at least the minimum duration dictated by OMB
           that retains Exchange Online, SharePoint Online, OneDrive for
           Business, and Azure Active Directory audit records for one year.
           Additional record types require custom audit retention policies.
+          Agencies may also consider alternate storage locations and services
+          to meet audit log retention needs.
 
 ### Resources
 
@@ -734,6 +742,10 @@ Related to Cybersecurity Incidents \| Office of Management and
 
 - [Audited Activities \| Microsoft
   Learn](https://learn.microsoft.com/en-us/purview/audit-log-activities)
+
+- [Expanding cloud logging to give customers deeper security visibility \|
+  Microsoft Security Blog](https://www.microsoft.com/en-us/security/blog/2023/07/19/expanding-cloud-logging-to-give-customers-deeper-security-visibility/)
+
 
 ### License Requirements
 
