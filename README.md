@@ -267,7 +267,7 @@ https://docs.microsoft.com/en-us/powershell/exchange/exchange-online-powershell-
 Create Powershell Session is failed using OAuth
 ```
 
-If you see this error message it means that basic authentication needs to be enabled on the client computer running the automation scripts. The automation relies on the Microsoft Security & Compliance PowerShell environment for Defender information. Security & Compliance PowerShell connections, unlike other services used by the ExchangeOnlineManagement module, required basic authentication to be enabled on the local machine for versions of ExchangeOnlineManagement prior to Version 3. To resolve the need for basic authentication you should update to the latest ExchangeOnlineManagement module. Instructions for updating the module are [here](https://learn.microsoft.com/en-us/powershell/exchange/exchange-online-powershell-v2?view=exchange-ps#updates-for-the-exo-v3-module).
+If you see this error message it means that basic authentication needs to be enabled on the client computer running the automation scripts. The automation relies on the Microsoft Security & Compliance PowerShell environment for Defender information. Security & Compliance PowerShell connections, unlike other services used by the ExchangeOnlineManagement module, required basic authentication to be enabled on the local machine for versions of ExchangeOnlineManagement prior to Version 3. To resolve the need for basic authentication you should run the .\SetUp.ps1 script to install the latest ExchangeOnlineManagement module.
 
 ### Exchange Online maximum connections error
 If when running the tool against Exchange Online, you see the error below in the Powershell window, follow the instructions in this section.
