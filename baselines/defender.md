@@ -26,12 +26,18 @@ trust principles.
 Portions of this document are adapted from documents in Microsoft’s [Microsoft 365](https://github.com/MicrosoftDocs/microsoft-365-docs/blob/public/LICENSE) and [Azure](https://github.com/MicrosoftDocs/azure-docs/blob/main/LICENSE) GitHub repositories. The respective documents are subject to copyright and are adapted under the terms of the Creative Commons Attribution 4.0 International license. Source documents are linked throughout this document. The United States Government has adapted selections of these documents to develop innovative and scalable configuration standards to strengthen the security of widely used cloud-based software services.
 
 ## Assumptions
-The agency has identified a set of user accounts that have access to sensitive and high value information.  As a result, these accounts may be at a higher risk of being targeted.  These accounts are referred to as sensitive accounts for the purposes of the Defender policies in this baseline.
+The agency has identified a set of user accounts that are considered sensitive accounts.  See [Key Terminology](#key-terminology) for a detailed description of sensitive accounts.
 
 The **License Requirements** sections of this document assume the organization is using an [M365 E3](https://www.microsoft.com/en-us/microsoft-365/compare-microsoft-365-enterprise-plans) or [G3](https://www.microsoft.com/en-us/microsoft-365/government) license level at a minimum. Therefore, only licenses not included in E3/G3 are listed.
 
 ## Key Terminology
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [RFC 2119](https://datatracker.ietf.org/doc/html/rfc2119).
+
+The following are key terms and descriptions used in this document.
+
+**Sensitive Accounts** – This term denotes a set of user accounts that have
+access to sensitive and high value information.  As a result, these accounts
+may be at a higher risk of being targeted.
 
 # Baseline Policies
 
