@@ -21,7 +21,6 @@ ReportDetailsArray(Status, Array, String1) = Detail if {
 # MS.POWERPLATFORM.1.1v1
 #--
 tests[{
-    #"Requirement" : "The ability to create production and sandbox environments SHALL be restricted to admins",
     "PolicyId" : "MS.POWERPLATFORM.1.1v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-TenantSettings"],
@@ -37,7 +36,6 @@ tests[{
 # MS.POWERPLATFORM.1.1v1
 #--
 tests[{
-    #"Requirement" : "The ability to create production and sandbox environments SHALL be restricted to admins",
     "PolicyId" : "MS.POWERPLATFORM.1.1v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-TenantSettings"],
@@ -53,7 +51,6 @@ tests[{
 # MS.POWERPLATFORM.1.2v1
 #--
 tests[{
-    #"Requirement" : "The ability to create production and sandbox environments SHALL be restricted to admins",
     "PolicyId" : "MS.POWERPLATFORM.1.2v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-TenantSettings"],
@@ -70,8 +67,7 @@ tests[{
 # MS.POWERPLATFORM.1.2v1
 #--
 tests[{
-    #"Requirement" : "The ability to create trial environments SHALL be restricted to admins",
-    "Control" : "MS.POWERPLATFORM.1.2v1",
+    "PolicyId" : "MS.POWERPLATFORM.1.2v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-TenantSettings"],
     "ActualValue" : "PowerShell Error",
