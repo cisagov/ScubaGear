@@ -267,6 +267,7 @@ function Invoke-RobustDnsTxt {
     if (-not $Success) {
         # Traditional DNS and DoH queries failed. Try using the dnsviz.net server provided by DNS-OARC
         # (https://dnsviz.net/d/$Qname/dnssec/).
+        $TryNumber = 0
         while ($TryNumber -lt $MaxTries) {
             $TryNumber += 1
             try {
@@ -276,29 +277,28 @@ function Invoke-RobustDnsTxt {
                     # check if domain has not been analyzed before by dnsviz.net service
                     $needsAnalysis = $dnsVizResponse.ParsedHtml.getElementByID("analysis-text").innerText
                     if ($needsAnalysis -like "has not been analyzed before") {
-                        $LogEntries += @{"query_name"=$Qname; "query_method"="DNSViz.net_WebService"; "query_result"="Web service https://dnsviz.net has not analyzed the domain $Qname before. Visit the web page https://dnsviz.net and enter the domain name. The service may take serveral minutes to complete the analysis."}
+                        $LogEntries += @{"query_name"=$Qname; "query_method"="DNSViz.net_WebService"; "query_result"="Must start analysis of the domain $Qname at https://dnsviz.net. May take serveral minutes to complete the analysis."}
                         $TradEmptyOrNx = $true
                         break
                     }
-
-                    # for each tr element, get the td elements with class name "rr"
-                    $dnsVizResponse.ParsedHtml.getElementsByTagName("tr") | ForEach-Object { if ($_.outerhtml -like "*TXT*") { $_.getElementsByClassName("rr") | foreach-Object {$Answers += $_.innerText}} }
-                    $LogEntries += @{"query_name"=$Qname; "query_method"="DNSViz.net_WebService"; "query_result"="Query returned $($textrecords.Length) txt records"}
-                    $Success = $true
-                    write-output "Query returned response code $($dnsVizResponse.Status)"
-                    break
+                    else {
+                        # for each tr element, get the td elements with class name "rr"
+                        $dnsVizResponse.ParsedHtml.getElementsByTagName("tr") | ForEach-Object { if ($_.outerhtml -like "*TXT*") { $_.getElementsByClassName("rr") | foreach-Object {$Answers += $_.innerText.Trim('"')}} }
+                        $LogEntries += @{"query_name"=$Qname; "query_method"="DNSViz.net_WebService"; "query_result"="Query returned $($textrecords.Length) txt records"}
+                        $Success = $true
+                        break
+                    }
                 }
                 else {
-                # The remainder of the response codes indicate that the web service request did not succeed.
-                # Retry if we haven't reached $MaxTries.
-                $LogEntries += @{"query_name"=$Qname; "query_method"="DNSViz.net_WebService"; "query_result"="Query returned status code $($dnsVizResponse.StatusCode)"}
+                    # The other HTTP response codes indicate that the web service request did not succeed.
+                    # Retry if we haven't reached $MaxTries.
+                    $LogEntries += @{"query_name"=$Qname; "query_method"="DNSViz.net_WebService"; "query_result"="Query returned status code $($dnsVizResponse.StatusCode)"}
                 }
             }
             catch {
                 # Web request to DNSViz.net failed
                 # Retry if we haven't reached $MaxTries.
                 $LogEntries += @{"query_name"=$Qname; "query_method"="DNSViz.net_WebService"; "query_result"="Query resulted in exception, $($_.FullyQualifiedErrorId)"}
-                write-output "$(convertTo-json $LogEntries)"
             }
         }
     }
