@@ -5,12 +5,12 @@ InModuleScope ExportAADProvider {
     BeforeAll {
         function Get-PrivilegedUser {}
         Mock -ModuleName ExportAADProvider Get-PrivilegedUser -MockWith {}
-        function Get-MgDirectoryRoleMember {}
-        Mock -ModuleName ExportAADProvider Get-MgDirectoryRoleMember -MockWith {}
-        function Get-MgUser {}
-        Mock -ModuleName ExportAADProvider Get-MgUser -MockWith {}
-        function Get-MgGroupMember {}
-        Mock -ModuleName ExportAADProvider Get-MgGroupMember -MockWith {}
+        function Get-MgBetaDirectoryRoleMember {}
+        Mock -ModuleName ExportAADProvider Get-MgBetaDirectoryRoleMember -MockWith {}
+        function Get-MgBetaUser {}
+        Mock -ModuleName ExportAADProvider Get-MgBetaUser -MockWith {}
+        function Get-MgBetaGroupMember {}
+        Mock -ModuleName ExportAADProvider Get-MgBetaGroupMember -MockWith {}
     }
     Describe -Tag 'AADProvider' -Name "Get-PrivilegedUser" {
         It "With no premimum license, returns a not null PowerShell object" {
