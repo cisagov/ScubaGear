@@ -276,7 +276,7 @@ function Invoke-RobustDnsTxt {
                 if ($dnsVizResponse.StatusCode -eq 200) {
                     # check if domain has not been analyzed before by dnsviz.net service
                     $needsAnalysis = $dnsVizResponse.ParsedHtml.getElementByID("analysis-text").innerText
-                    if ($needsAnalysis -like "has not been analyzed before") {
+                    if ($needsAnalysis -like "*has not been analyzed before*") {
                         $LogEntries += @{"query_name"=$Qname; "query_method"="DNSViz.net_WebService"; "query_result"="Must start analysis of the domain $Qname at https://dnsviz.net. May take serveral minutes to complete the analysis."}
                         $TradEmptyOrNx = $true
                         break
@@ -290,7 +290,7 @@ function Invoke-RobustDnsTxt {
                     }
                 }
                 else {
-                    # The other HTTP response codes indicate that the web service request did not succeed.
+                    # The other HTTP response codes (not 200) indicate that the web service request did not succeed.
                     # Retry if we haven't reached $MaxTries.
                     $LogEntries += @{"query_name"=$Qname; "query_method"="DNSViz.net_WebService"; "query_result"="Query returned status code $($dnsVizResponse.StatusCode)"}
                 }
