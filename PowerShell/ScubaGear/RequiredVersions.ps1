@@ -31,32 +31,12 @@ $ModuleList = @(
         MaximumVersion = [version] '1.99.99999'
     },
     @{
-        ModuleName = 'Microsoft.Graph.Beta.Applications' #TODO: Verify is needed
+        ModuleName = 'Microsoft.Graph.Authentication' # No beta module
         ModuleVersion = [version] '2.0.0'
         MaximumVersion = [version] '2.99.99999'
     },
     @{
-        ModuleName = 'Microsoft.Graph.Authentication' # No beta endpoint
-        ModuleVersion = [version] '2.0.0'
-        MaximumVersion = [version] '2.99.99999'
-    },
-    @{
-        ModuleName = 'Microsoft.Graph.Beta.DeviceManagement' #TODO: Verify is needed
-        ModuleVersion = [version] '2.0.0'
-        MaximumVersion = [version] '2.99.99999'
-    },
-    @{
-        ModuleName = 'Microsoft.Graph.Beta.DeviceManagement.Administration' #TODO: Verify is needed
-        ModuleVersion = [version] '2.0.0'
-        MaximumVersion = [version] '2.99.99999'
-    },
-    @{
-        ModuleName = 'Microsoft.Graph.Beta.DeviceManagement.Enrollment' #TODO: Verify is needed
-        ModuleVersion = [version] '2.0.0'
-        MaximumVersion = [version] '2.99.99999'
-    },
-    @{
-        ModuleName = 'Microsoft.Graph.Beta.Devices.CorporateManagement' #TODO: Verify is needed
+        ModuleName = 'Microsoft.Graph.Beta.DeviceManagement.Enrollment'
         ModuleVersion = [version] '2.0.0'
         MaximumVersion = [version] '2.99.99999'
     },
@@ -71,27 +51,12 @@ $ModuleList = @(
         MaximumVersion = [version] '2.99.99999'
     },
     @{
-        ModuleName = 'Microsoft.Graph.Beta.Identity.Governance' #TODO: Verify is needed
-        ModuleVersion = [version] '2.0.0'
-        MaximumVersion = [version] '2.99.99999'
-    },
-    @{
         ModuleName = 'Microsoft.Graph.Beta.Identity.SignIns'
         ModuleVersion = [version] '2.0.0'
         MaximumVersion = [version] '2.99.99999'
     },
     @{
-        ModuleName = 'Microsoft.Graph.Beta.Planner' #TODO: Verify is needed
-        ModuleVersion = [version] '2.0.0'
-        MaximumVersion = [version] '2.99.99999'
-    },
-    @{
         ModuleName = 'Microsoft.Graph.Beta.Security'
-        ModuleVersion = [version] '2.0.0'
-        MaximumVersion = [version] '2.99.99999'
-    },
-    @{
-        ModuleName = 'Microsoft.Graph.Beta.Teams' #TODO: Verify is needed
         ModuleVersion = [version] '2.0.0'
         MaximumVersion = [version] '2.99.99999'
     },
