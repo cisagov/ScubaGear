@@ -25,6 +25,7 @@ $ModuleList = @(
     "Microsoft.Graph.Beta.DeviceManagement.Enrollment",
     "Microsoft.Graph.Beta.Groups",
     "Microsoft.Graph.Beta.Identity.DirectoryManagement",
+    "Microsoft.Graph.Beta.Identity.Governance",
     "Microsoft.Graph.Beta.Identity.SignIns",
     "Microsoft.Graph.Beta.Security",
     "Microsoft.Graph.Beta.Users",
