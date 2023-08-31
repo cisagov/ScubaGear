@@ -17,23 +17,18 @@
 $ModuleList = @(
     "MicrosoftTeams",
     "ExchangeOnlineManagement", # includes Defender
-    "Microsoft.Online.SharePoint.PowerShell", # includes OneDrive
+    "Microsoft.Online.SharePoint.PowerShell",
+    "PnP.PowerShell", # for authenticating to SharePoint with an application
     "Microsoft.PowerApps.Administration.PowerShell",
     "Microsoft.PowerApps.PowerShell",
-    "Microsoft.Graph.Beta.Applications", # starting here, modules for AAD
-    "Microsoft.Graph.Beta.DeviceManagement",
-    "Microsoft.Graph.Beta.DeviceManagement.Administration",
-    "Microsoft.Graph.Beta.DeviceManagement.Enrolment",
-    "Microsoft.Graph.Beta.Devices.CorporateManagement",
+    "Microsoft.Graph.Authentication", # starting here, modules for AAD
+    "Microsoft.Graph.Beta.DeviceManagement.Enrollment",
     "Microsoft.Graph.Beta.Groups",
     "Microsoft.Graph.Beta.Identity.DirectoryManagement",
-    "Microsoft.Graph.Beta.Identity.Governance",
     "Microsoft.Graph.Beta.Identity.SignIns",
-    "Microsoft.Graph.Beta.Planner",
     "Microsoft.Graph.Beta.Security",
-    "Microsoft.Graph.Beta.Teams",
     "Microsoft.Graph.Beta.Users",
-    "Microsoft.Graph.Authentication"
+    "powershell-yaml"
     )
 
 $PSGetVersion = (Get-Module -ListAvailable -Name "PowerShellGet") |
