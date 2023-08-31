@@ -2,7 +2,7 @@
     {
         "ActualValue":  [],
         "Commandlet":  [
-                           "Get-MgSubscribedSku",
+                           "Get-MgBetaSubscribedSku",
                            "Get-PrivilegedUser"
                        ],
         "Criticality":  "Shall",
@@ -87,7 +87,7 @@
                             "preMigration"
                         ],
         "Commandlet":  [
-                           "Get-MgPolicyAuthenticationMethodPolicy"
+                           "Get-MgBetaPolicyAuthenticationMethodPolicy"
                        ],
         "Criticality":  "Shall",
         "PolicyId":  "MS.AAD.3.4v1",
@@ -110,7 +110,7 @@
                             "Score":  1
                         },
         "Commandlet":  [
-                           "Get-MgSecuritySecureScore"
+                           "Get-MgBetaSecuritySecureScore"
                        ],
         "Criticality":  "Shall",
         "PolicyId":  "MS.AAD.7.2v1",
@@ -127,7 +127,7 @@
                                                         ]
                         },
         "Commandlet":  [
-                           "Get-MgPolicyAuthorizationPolicy"
+                           "Get-MgBetaPolicyAuthorizationPolicy"
                        ],
         "Criticality":  "Should",
         "PolicyId":  "MS.AAD.8.2v1",
@@ -144,7 +144,7 @@
                                                           ]
                         },
         "Commandlet":  [
-                           "Get-MgPolicyAuthorizationPolicy"
+                           "Get-MgBetaPolicyAuthorizationPolicy"
                        ],
         "Criticality":  "Shall",
         "PolicyId":  "MS.AAD.5.1v1",
@@ -161,7 +161,7 @@
                                                      ]
                         },
         "Commandlet":  [
-                           "Get-MgPolicyAdminConsentRequestPolicy"
+                           "Get-MgBetaPolicyAdminConsentRequestPolicy"
                        ],
         "Criticality":  "Shall",
         "PolicyId":  "MS.AAD.5.3v1",
@@ -180,7 +180,7 @@
                                                         ]
                         },
         "Commandlet":  [
-                           "Get-MgPolicyAuthorizationPolicy"
+                           "Get-MgBetaPolicyAuthorizationPolicy"
                        ],
         "Criticality":  "Shall",
         "PolicyId":  "MS.AAD.5.2v1",
@@ -198,7 +198,7 @@
                                                   ]
                         },
         "Commandlet":  [
-                           "Get-MgPolicyAuthorizationPolicy"
+                           "Get-MgBetaPolicyAuthorizationPolicy"
                        ],
         "Criticality":  "Should",
         "PolicyId":  "MS.AAD.8.1v1",
@@ -210,7 +210,7 @@
 
                         ],
         "Commandlet":  [
-                           "Get-MgIdentityConditionalAccessPolicy"
+                           "Get-MgBetaIdentityConditionalAccessPolicy"
                        ],
         "Criticality":  "Shall",
         "PolicyId":  "MS.AAD.1.1v1",
@@ -222,7 +222,7 @@
 
                         ],
         "Commandlet":  [
-                           "Get-MgIdentityConditionalAccessPolicy"
+                           "Get-MgBetaIdentityConditionalAccessPolicy"
                        ],
         "Criticality":  "Shall",
         "PolicyId":  "MS.AAD.2.1v1",
@@ -234,7 +234,7 @@
 
                         ],
         "Commandlet":  [
-                           "Get-MgIdentityConditionalAccessPolicy"
+                           "Get-MgBetaIdentityConditionalAccessPolicy"
                        ],
         "Criticality":  "Shall",
         "PolicyId":  "MS.AAD.3.1v1",
@@ -246,7 +246,7 @@
 
                         ],
         "Commandlet":  [
-                           "Get-MgIdentityConditionalAccessPolicy"
+                           "Get-MgBetaIdentityConditionalAccessPolicy"
                        ],
         "Criticality":  "Shall",
         "PolicyId":  "MS.AAD.3.2v1",
@@ -258,7 +258,7 @@
 
                         ],
         "Commandlet":  [
-                           "Get-MgIdentityConditionalAccessPolicy"
+                           "Get-MgBetaIdentityConditionalAccessPolicy"
                        ],
         "Criticality":  "Should",
         "PolicyId":  "MS.AAD.3.7v1",
@@ -270,7 +270,7 @@
 
                         ],
         "Commandlet":  [
-                           "Get-MgIdentityConditionalAccessPolicy"
+                           "Get-MgBetaIdentityConditionalAccessPolicy"
                        ],
         "Criticality":  "Should",
         "PolicyId":  "MS.AAD.3.8v1",
@@ -281,7 +281,7 @@
         "ActualValue":  [
                         ],
         "Commandlet":  [
-                           "Get-MgSubscribedSku",
+                           "Get-MgBetaSubscribedSku",
                            "Get-PrivilegedUser"
                        ],
         "Criticality":  "Shall",
@@ -300,7 +300,7 @@
                             "User Administrator"
                         ],
         "Commandlet":  [
-                           "Get-MgSubscribedSku",
+                           "Get-MgBetaSubscribedSku",
                            "Get-PrivilegedRole"
                        ],
         "Criticality":  "Shall",
@@ -319,7 +319,7 @@
                             "User Administrator"
                         ],
         "Commandlet":  [
-                           "Get-MgSubscribedSku",
+                           "Get-MgBetaSubscribedSku",
                            "Get-PrivilegedRole"
                        ],
         "Criticality":  "Shall",
@@ -336,7 +336,7 @@
                             "User Administrator"
                         ],
         "Commandlet":  [
-                           "Get-MgSubscribedSku",
+                           "Get-MgBetaSubscribedSku",
                            "Get-PrivilegedRole"
                        ],
         "Criticality":  "Should",
@@ -354,7 +354,7 @@
                             "SharePoint Administrator"
                         ],
         "Commandlet":  [
-                           "Get-MgSubscribedSku",
+                           "Get-MgBetaSubscribedSku",
                            "Get-PrivilegedRole"
                        ],
         "Criticality":  "Shall",
@@ -371,7 +371,7 @@
                             "SharePoint Administrator"
                         ],
         "Commandlet":  [
-                           "Get-MgSubscribedSku",
+                           "Get-MgBetaSubscribedSku",
                            "Get-PrivilegedRole"
                        ],
         "Criticality":  "Shall",
@@ -388,7 +388,7 @@
                             "SharePoint Administrator"
                         ],
         "Commandlet":  [
-                           "Get-MgSubscribedSku",
+                           "Get-MgBetaSubscribedSku",
                            "Get-PrivilegedRole"
                        ],
         "Criticality":  "Should",
@@ -401,7 +401,7 @@
                             "Live - High Risk Sign-ins SHALL be Blocked"
                         ],
         "Commandlet":  [
-                           "Get-MgIdentityConditionalAccessPolicy"
+                           "Get-MgBetaIdentityConditionalAccessPolicy"
                        ],
         "Criticality":  "Shall",
         "PolicyId":  "MS.AAD.2.3v1",
@@ -413,9 +413,9 @@
                             "Live - MFA SHALL be required for Highly Privileged Roles"
                         ],
         "Commandlet":  [
-                           "Get-MgSubscribedSku",
+                           "Get-MgBetaSubscribedSku",
                            "Get-PrivilegedRole",
-                           "Get-MgIdentityConditionalAccessPolicy"
+                           "Get-MgBetaIdentityConditionalAccessPolicy"
                        ],
         "Criticality":  "Shall",
         "PolicyId":  "MS.AAD.3.6v1",
@@ -431,7 +431,7 @@
                             }
                         ],
         "Commandlet":  [
-                           "Get-MgDirectorySetting"
+                           "Get-MgBetaDirectorySetting"
                        ],
         "Criticality":  "Shall",
         "PolicyId":  "MS.AAD.5.4v1",
