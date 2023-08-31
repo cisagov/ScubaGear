@@ -11853,15 +11853,15 @@
     }
 ],
     "aad_successful_commands": [
-    "Get-MgIdentityConditionalAccessPolicy",
-    "Get-MgSubscribedSku",
+    "Get-MgBetaIdentityConditionalAccessPolicy",
+    "Get-MgBetaSubscribedSku",
     "Get-PrivilegedUser",
     "Get-PrivilegedRole",
-    "Get-MgPolicyAuthorizationPolicy",
-    "Get-MgSecuritySecureScore",
-    "Get-MgDirectorySetting",
-    "Get-MgPolicyAdminConsentRequestPolicy",
-    "Get-MgPolicyAuthenticationMethodPolicy"
+    "Get-MgBetaPolicyAuthorizationPolicy",
+    "Get-MgBetaSecuritySecureScore",
+    "Get-MgBetaDirectorySetting",
+    "Get-MgBetaPolicyAdminConsentRequestPolicy",
+    "Get-MgBetaPolicyAuthenticationMethodPolicy"
 ],
     "aad_unsuccessful_commands": [
 
@@ -21477,7 +21477,7 @@
 ],
     "OneDrive_PnP_Flag": false,
     "SharePoint_successful_commands": [
-    "Get-MgOrganization",
+    "Get-MgBetaOrganization",
     "Get-SPOTenant",
     "Get-SPOSite",
     "Get-PnPTenant",

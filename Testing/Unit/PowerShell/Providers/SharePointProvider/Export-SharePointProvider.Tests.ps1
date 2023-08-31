@@ -18,7 +18,7 @@ InModuleScope -ModuleName ExportSharePointProvider {
                     # This is where you decide where you mock functions called by CommandTracker :)
                     try {
                         switch ($Command) {
-                            "Get-MgOrganization" {
+                            "Get-MgBetaOrganization" {
                                 $this.SuccessfulCommands += $Command
                                 return [pscustomobject]@{
                                     VerifiedDomains = @(

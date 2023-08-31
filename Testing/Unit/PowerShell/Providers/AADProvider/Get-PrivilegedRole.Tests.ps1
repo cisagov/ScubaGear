@@ -3,14 +3,14 @@ Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "$($ProviderPath)/Export
 
 InModuleScope ExportAADProvider {
     BeforeAll {
-        function Get-MgDirectoryRoleTemplate {}
-        Mock -ModuleName ExportAADProvider Get-MgDirectoryRoleTemplate -MockWith {}
-        function Get-MgPolicyRoleManagementPolicyAssignment {}
-        Mock -ModuleName ExportAADProvider Get-MgPolicyRoleManagementPolicyAssignment -MockWith {}
-        function Get-MgRoleManagementDirectoryRoleAssignmentScheduleInstance {}
-        Mock -ModuleName ExportAADProvider Get-MgRoleManagementDirectoryRoleAssignmentScheduleInstance -MockWith {}
-        function Get-MgPolicyRoleManagementPolicyRule {}
-        Mock -ModuleName ExportAADProvider Get-MgPolicyRoleManagementPolicyRule -MockWith {}
+        function Get-MgBetaDirectoryRoleTemplate {}
+        Mock -ModuleName ExportAADProvider Get-MgBetaDirectoryRoleTemplate -MockWith {}
+        function Get-MgBetaPolicyRoleManagementPolicyAssignment {}
+        Mock -ModuleName ExportAADProvider Get-MgBetaPolicyRoleManagementPolicyAssignment -MockWith {}
+        function Get-MgBetaRoleManagementDirectoryRoleAssignmentScheduleInstance {}
+        Mock -ModuleName ExportAADProvider Get-MgBetaRoleManagementDirectoryRoleAssignmentScheduleInstance -MockWith {}
+        function Get-MgBetaPolicyRoleManagementPolicyRule {}
+        Mock -ModuleName ExportAADProvider Get-MgBetaPolicyRoleManagementPolicyRule -MockWith {}
     }
     Describe -Tag 'AADProvider' -Name "Get-PrivilegedRole" {
         It "With no premimum license, returns a not null PowerShell object" {
