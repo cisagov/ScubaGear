@@ -152,7 +152,7 @@ instead and configure the policy settings according to [Use the Microsoft 365 De
 7. On the **Apply Defender for Office 365 protection** page, select **All recipients**.
 8. (optional) Under **Exclude these recipients**, add **Users** and **Groups**
    to be exempted from the preset policies.
-9.  Select **Next** on each page until the **Review and confirm your changes** page.
+9. Select **Next** on each page until the **Review and confirm your changes** page.
 10. On the **Review and confirm your changes** page, select **Confirm**.
 
 #### MS.DEFENDER.1.4v1 instructions:
@@ -359,7 +359,7 @@ their environment and needs.
 ### Policies
 #### MS.DEFENDER.4.1v1
 A custom policy SHALL be configured to protect PII and sensitive information,
-as defined by the agency. At a minimum, credit card numbers, Taxpayer
+as defined by the agency. At a minimum, credit card numbers, taxpayer
 identification numbers (TIN), and social security numbers (SSN) SHALL be
 blocked.
 
