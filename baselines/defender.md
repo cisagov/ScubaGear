@@ -116,7 +116,7 @@ Sensitive accounts SHALL be added to Defender for Office 365 Protection in the s
 
 #### MS.DEFENDER.1.1v1 instructions:
 
-1. Sign into **Microsoft 365 Defender**.
+1. Sign in to **Microsoft 365 Defender**.
 2. In the left-hand menu, go to **Email & Collaboration** > **Policies & Rules**.
 3. Select **Threat Policies**.
 4. From the **Templated policies** section, select **Preset Security Policies**.
@@ -128,7 +128,7 @@ instead and configure the policy settings according to [Use the Microsoft 365 De
 
 #### MS.DEFENDER.1.2v1 instructions:
 
-1. Sign into **Microsoft 365 Defender**.
+1. Sign in to **Microsoft 365 Defender**.
 2. In the left-hand menu, go to **Email & Collaboration** > **Policies & Rules**.
 3. Select **Threat Policies**.
 4. From the **Templated policies** section, select **Preset Security Policies**.
@@ -142,7 +142,7 @@ instead and configure the policy settings according to [Use the Microsoft 365 De
 
 #### MS.DEFENDER.1.3v1 instructions:
 
-1. Sign into **Microsoft 365 Defender**.
+1. Sign in to **Microsoft 365 Defender**.
 2. In the left-hand menu, go to **Email & Collaboration** > **Policies & Rules**.
 3. Select **Threat Policies**.
 4. From the **Templated policies** section, select **Preset Security Policies**.
@@ -157,7 +157,7 @@ instead and configure the policy settings according to [Use the Microsoft 365 De
 
 #### MS.DEFENDER.1.4v1 instructions:
 
-1. Sign into **Microsoft 365 Defender**.
+1. Sign in to **Microsoft 365 Defender**.
 2. In the left-hand menu, go to **Email & Collaboration** > **Policies & Rules**.
 3. Select **Threat Policies**.
 4. From the **Templated policies** section, select **Preset Security Policies**.
@@ -170,7 +170,7 @@ instead and configure the policy settings according to [Use the Microsoft 365 De
 
 #### MS.DEFENDER.1.5v1 instructions:
 
-1. Sign into **Microsoft 365 Defender**.
+1. Sign in to **Microsoft 365 Defender**.
 2. In the left-hand menu, go to **Email & Collaboration** > **Policies & Rules**.
 3. Select **Threat Policies**.
 4. From the **Templated policies** section, select **Preset Security Policies**.
@@ -241,7 +241,7 @@ Domain impersonation protection SHOULD be added for important partners in both t
 
 #### MS.DEFENDER.2.1v1 instructions:
 
-1. Sign into **Microsoft 365 Defender**.
+1. Sign in to **Microsoft 365 Defender**.
 2. In the left-hand menu, go to **Email & Collaboration** > **Policies & Rules**.
 3. Select **Threat Policies**.
 4. From the **Templated policies** section, select **Preset Security Policies**.
@@ -259,7 +259,7 @@ Domain impersonation protection SHOULD be added for important partners in both t
 
 #### MS.DEFENDER.2.2v1 instructions:
 
-1. Sign into **Microsoft 365 Defender**.
+1. Sign in to **Microsoft 365 Defender**.
 2. In the left-hand menu, go to **Email & Collaboration** > **Policies & Rules**.
 3. Select **Threat Policies**.
 4. From the **Templated policies** section, select **Preset Security Policies**.
@@ -277,7 +277,7 @@ Domain impersonation protection SHOULD be added for important partners in both t
 
 #### MS.DEFENDER.2.3v1 instructions:
 
-1. Sign into **Microsoft 365 Defender**.
+1. Sign in to **Microsoft 365 Defender**.
 2. In the left-hand menu, go to **Email & Collaboration** > **Policies & Rules**.
 3. Select **Threat Policies**.
 4. From the **Templated policies** section, select **Preset Security Policies**.
@@ -329,7 +329,7 @@ Teams, follow the instructions listed at [Turn on Safe Attachments for
 SharePoint, OneDrive, and Microsoft Teams \| Microsoft
 Learn](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/safe-attachments-for-spo-odfb-teams-configure?view=o365-worldwide).
 
-1.  Sign into **Microsoft 365 Defender**.
+1.  Sign in to **Microsoft 365 Defender**.
 
 2.  Under **Email & collaboration**, select **Policies & rules**.
 
@@ -467,7 +467,7 @@ information by restricted apps and unwanted Bluetooth applications.
 
 #### MS.DEFENDER.4.1v1 instructions:
 
-1. Sign into the **Microsoft Purview compliance portal**.
+1. Sign in to the **Microsoft Purview compliance portal**.
 
 2. Under the **Solutions** section on the left-hand menu, select **Data loss
    prevention**.
@@ -543,7 +543,7 @@ information by restricted apps and unwanted Bluetooth applications.
 
 #### MS.DEFENDER.4.5v1 instructions:
 
-1. Sign into the **Microsoft Purview compliance portal**.
+1. Sign in to the **Microsoft Purview compliance portal**.
 
 2. Under **Solutions**, select **Data loss prevention**.
   
@@ -569,7 +569,7 @@ If restricted app and unwanted Bluetooth app restrictions are desired,
 associated devices must be onboarded with Defender for Endpoint
 before the instructions below can be completed.
 
-1. Sign into the **Microsoft Purview compliance portal**.
+1. Sign in to the **Microsoft Purview compliance portal**.
 
 2. Under **Solutions**, select **Data loss prevention**.
 
@@ -642,7 +642,7 @@ The alerts SHOULD be sent to a monitored address or incorporated into a SIEM.
 
 #### MS.DEFENDER.5.1v1 instructions:
 
-1. Sign into **Microsoft 365 Defender**.
+1. Sign in to **Microsoft 365 Defender**.
 
 2. Under **Email & collaboration**, select **Policies & rules**.
 
@@ -661,7 +661,7 @@ The alerts SHOULD be sent to a monitored address or incorporated into a SIEM.
 
 For each enabled alert, to add one or more email recipients:
 
-1. Sign into **Microsoft 365 Defender**.
+1. Sign in to **Microsoft 365 Defender**.
 
 2. Under **Email & collaboration**, select **Policies & rules**.
 
@@ -773,7 +773,7 @@ Related to Cybersecurity Incidents \| Office of Management and
 
 To enable auditing via the Microsoft Purview compliance portal:
 
-1. Sign into the **Microsoft Purview compliance portal**.
+1. Sign in to the **Microsoft Purview compliance portal**.
 
 2. Under **Solutions**, select **Audit**.
 
