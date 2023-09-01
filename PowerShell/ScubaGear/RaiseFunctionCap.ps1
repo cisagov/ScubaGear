@@ -3,4 +3,5 @@
 $MaximumFunctionCount = 32767
 
 # Fallback in case the first assignment doesn't execute for some latent reasons
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', 'MaximumFunctionCount')]
 $Global:MaximumFunctionCount = 32767
