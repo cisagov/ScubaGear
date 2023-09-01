@@ -26,12 +26,18 @@ trust principles.
 Portions of this document are adapted from documents in Microsoft’s [Microsoft 365](https://github.com/MicrosoftDocs/microsoft-365-docs/blob/public/LICENSE) and [Azure](https://github.com/MicrosoftDocs/azure-docs/blob/main/LICENSE) GitHub repositories. The respective documents are subject to copyright and are adapted under the terms of the Creative Commons Attribution 4.0 International license. Source documents are linked throughout this document. The United States Government has adapted selections of these documents to develop innovative and scalable configuration standards to strengthen the security of widely used cloud-based software services.
 
 ## Assumptions
-The agency has identified a set of user accounts that have access to sensitive and high value information.  As a result, these accounts may be at a higher risk of being targeted.  These accounts are referred to as sensitive accounts for the purposes of the Defender policies in this baseline.
+The agency has identified a set of user accounts that are considered sensitive accounts.  See [Key Terminology](#key-terminology) for a detailed description of sensitive accounts.
 
 The **License Requirements** sections of this document assume the organization is using an [M365 E3](https://www.microsoft.com/en-us/microsoft-365/compare-microsoft-365-enterprise-plans) or [G3](https://www.microsoft.com/en-us/microsoft-365/government) license level at a minimum. Therefore, only licenses not included in E3/G3 are listed.
 
 ## Key Terminology
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [RFC 2119](https://datatracker.ietf.org/doc/html/rfc2119).
+
+The following are key terms and descriptions used in this document.
+
+**Sensitive Accounts** – This term denotes a set of user accounts that have
+access to sensitive and high value information.  As a result, these accounts
+may be at a higher risk of being targeted.
 
 # Baseline Policies
 
@@ -705,6 +711,12 @@ Microsoft Purview Audit (Premium) logging SHALL be enabled for ALL users.
 <!--Policy: MS.DEFENDER.6.2v1; Criticality: SHALL -->
 - _Rationale:_ Standard logging may not include relevant details necessary for visibility into user actions during an incident. Enabling Microsoft Purview Audit (Premium) captures additional event types that are not included with Standard. Furthermore, it is required for government agencies by OMB M-21-13 (referred to therein as by its former name, Unified Audit Logs w/ Advanced Features).
 - _Last modified:_ June 2023
+- _Note:_ At the time of this writing, Microsoft has announced upcoming changes
+          to its Purview Audit service that include making audit events
+          currently available in Purview Audit (Premium) available to Purview
+          Audit (Standard) subscribers.  After rollout of changes are complete,
+          Purview (Standard) may be sufficient for agencies to meet basic
+          logging requirements.
 
 #### MS.DEFENDER.6.3v1
 Audit logs SHALL be maintained for at least the minimum duration dictated by OMB M-21-31.
@@ -716,6 +728,8 @@ Audit logs SHALL be maintained for at least the minimum duration dictated by OMB
           that retains Exchange Online, SharePoint Online, OneDrive for
           Business, and Azure Active Directory audit records for one year.
           Additional record types require custom audit retention policies.
+          Agencies may also consider alternate storage locations and services
+          to meet audit log retention needs.
 
 ### Resources
 
@@ -734,6 +748,10 @@ Related to Cybersecurity Incidents \| Office of Management and
 
 - [Audited Activities \| Microsoft
   Learn](https://learn.microsoft.com/en-us/purview/audit-log-activities)
+
+- [Expanding cloud logging to give customers deeper security visibility \|
+  Microsoft Security Blog](https://www.microsoft.com/en-us/security/blog/2023/07/19/expanding-cloud-logging-to-give-customers-deeper-security-visibility/)
+
 
 ### License Requirements
 
