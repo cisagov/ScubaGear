@@ -951,10 +951,6 @@ function Invoke-Connection {
         $BoundParameters
     )
 
-    # Increase PowerShell Maximum Function Count to support version 5.1 limitation
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'MaximumFunctionCount')]
-    $MaximumFunctionCount = 32000
-
     $ConnectTenantParams = @{
         'ProductNames' = $ProductNames;
         'M365Environment' = $M365Environment
