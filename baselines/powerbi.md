@@ -1,6 +1,6 @@
 # CISA M365 Security Configuration Baseline for Power BI
 
-Power BI is a Software as a Service (SaaS) offering from Microsoft thatfacilitates self-service business intelligence dashboards, reports, datasets, and visualizations. Power BI can connect to multiple, different data sources, combine and shape data from those connections, then create reports and dashboards to share with others. This Secure Configuration Baseline (SCB) provides specific policies to strengthen Power BI security.
+Power BI is a Software as a Service (SaaS) offering from Microsoft that facilitates self-service business intelligence dashboards, reports, datasets, and visualizations. Power BI can connect to multiple, different data sources, combine and shape data from those connections, then create reports and dashboards to share with others. This Secure Configuration Baseline (SCB) provides specific policies to strengthen Power BI security.
 
 The Secure Cloud Business Applications (SCuBA) project run by the Cybersecurity and Infrastructure Security Agency (CISA) provides guidance and capabilities to secure federal civilian executive branch (FCEB) agencies’ cloud business application environments and protect federal information that is created, accessed, shared, and stored in those environments. 
 
@@ -185,7 +185,7 @@ on roles.
 #### MS.POWERBI.3.1v1
 The Invite external users to your organization feature SHOULD be disabled unless agency mission requires the capability.
 
-- _Rationale:_ Allowing guest users in general is a bad idea and can lead to unwanted access. Disabling this feature in PowerBI is just another way to avoid having a risky guest user in the organization. If external invites are required then, guest users should be invited by authorized users via the Azure Active Directory guest invite features. This helps ensure that authorized administrative personnel with the right permissions can centrally manage who has access to the tenant.
+- _Rationale:_ Disabling this feature in PowerBI is just another way to avoid having a risky guest user in the organization. If external invites are required then, guest users should be invited by authorized users via the Azure Active Directory guest invite features. This helps ensure that authorized administrative personnel with the right permissions can centrally manage who has access to the tenant.
 - _Last modified:_ June 2023
 
 ### Resources
