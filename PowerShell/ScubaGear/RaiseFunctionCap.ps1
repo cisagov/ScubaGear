@@ -3,5 +3,6 @@
 $MaximumFunctionCount = 32767
 
 # Fallback in case the first assignment doesn't execute for some latent reasons
-[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '')]
+# PSScriptAnalyzer also is not supressing this warning even with this attribute
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', 'Global:MaximumFunctionCount', Scope='Function')]
 $Global:MaximumFunctionCount = 32767
