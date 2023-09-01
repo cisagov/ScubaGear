@@ -4,6 +4,7 @@
     ExcludeRules=@(
       'PSUseSingularNouns',
       'PSUseShouldProcessForStateChangingFunctions',
-      'PSUseOutputTypeCorrectly'
+      'PSUseOutputTypeCorrectly',
+      'PSAvoidGlobalVars' # Unable to individually suppress exceptions
       )
 }
