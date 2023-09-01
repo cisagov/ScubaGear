@@ -185,7 +185,7 @@ on roles.
 #### MS.POWERBI.3.1v1
 The Invite external users to your organization feature SHOULD be disabled unless agency mission requires the capability.
 
-- _Rationale:_ Disabling this feature in PowerBI is just another way to avoid having a risky guest user in the organization. If external invites are required then, guest users should be invited by authorized users via the Azure Active Directory guest invite features. This helps ensure that authorized administrative personnel with the right permissions can centrally manage who has access to the tenant.
+- _Rationale:_ Disabling this feature in PowerBI keeps guest users from accessing potentially risky data/APIs. If external invites are required then, guest users should be invited by authorized users via the Azure Active Directory guest invite features. By only allowing an authorized groups of individuals to invite guest users to create accounts in the tenant, this helps an agency enforce a centrally managed guest user account approval process which reduces the risk of unauthorized accounts being created.
 - _Last modified:_ June 2023
 
 ### Resources
@@ -243,9 +243,8 @@ permissions.
 
 **Several high-level use cases for service principals:**
 
-- Power BI interactions with data sources. There will be some cases
-  where a service principal is not possible from Power BI to a data
-  source (e.g., Azure Table Storage).
+- There will be some cases where it is not possible to access
+  a data source using service principals in Power BI. (e.g., Azure Table Storage).
 
 - A user’s service principal for accessing the Power BI Service (e.g.,
   app.powerbi.com, app.powerbigov.us).
@@ -271,15 +270,13 @@ permissions.
 
 ### Policies
 #### MS.POWERBI.4.1v1
-Service Principals SHOULD be restricted to specific security groups.
-- _Rationale:_ With unrestricted Service Principles there is possibility of unwanted access to APIs. By allowing Service Principles, through security groups, only where necessary, this will mitigate that risk. 
+Service Principals with access to APIs SHOULD be restricted to specific security groups.
+- _Rationale:_ With unrestricted Service Principals there is possibility of unwanted access to APIs. By allowing Service Principals, through security groups, only where necessary, this will mitigate that risk. 
 - _Last modified:_ June 2023
 
 #### MS.POWERBI.4.2v1
-Service Principal credentials used for encrypting or accessing Power BI SHALL NOT be stored in scripts or config files and SHALL be stored
-in a secure vault such as Azure Key Vault.
-
-- _Rationale:_ Credentials in scripts or config files are stored in plain text and can be read by anyone who has access to those files. By storing them in a Azure Key Vault only those with proper access can use and see the credentials. 
+Service Principals creating and using profiles SHOULD be restricted to specific security groups.
+- _Rationale:_ With unrestricted Service Principals using/creating profiles there is a risk of an unauthorized user using a profile with more permissions than they have. By allowing Service Principals, through security groups, only where necessary, this will mitigate that risk. 
 - _Last modified:_ June 2023
 
 ### Resources
@@ -323,11 +320,17 @@ in a secure vault such as Azure Key Vault.
 4. Click on **Allow service principals to use Power BI APIs** set to **Enabled**.
 Choose a specific security group allowed to use service principles for the APIs.
 
-5. Then, click on **Allow service principals to create and use profiles** set to **Enabled**.
+
+#### MS.POWERBI.4.2v1 instructions:
+1. Navigate to the **PowerBI Admin Portal**
+
+2. Click on **Tenant settings**
+
+3. Scroll to **Developer settings**
+   
+4. Then, click on **Allow service principals to create and use profiles** set to **Enabled**.
 Choose a specific security group allowed to use service principles to create and use profiles
 
-#### MS.POWERBI.4.1v2 instructions:
-N/A
 
 ## 5. Power BI ResourceKey Authentication
 
@@ -382,7 +385,7 @@ ResourceKey Authentication SHOULD be blocked unless a specific use case (e.g., s
 
 4. Click on **Block ResourceKey Authentication** set to **Enabled**
 
-## 6. Python and R Visual Sharing
+## 6. Python and R Visual Sharing <!--- may need to change or delete this -->
 
 Power BI can interact with Python and R scripts to integrate
 visualizations from these languages. Python visuals are created from
@@ -529,7 +532,7 @@ The cross-agency collaboration and partnerships developed during this initiative
 - U.S. Census Bureau (USCB)
 - U.S. Geological Survey (USGS)
 
-# Implementation Considerations
+# Appendix A: Implementation Considerations
 
 ## Information Protection Considerations
 
