@@ -387,7 +387,7 @@ per-mailbox basis when necessary.
 
 To disable SMTP AUTH for the organization:
 
-1. Sign into the **Exchange admin center**.
+1. Sign in to the **Exchange admin center**.
 
 2. On the left hand pane select **Settings**, then from the settings list select **Mail Flow**.
 
@@ -395,7 +395,7 @@ To disable SMTP AUTH for the organization:
 
 To enable SMTP AUTH on a per-mailbox basis:
 
-1. Sign into the **Microsoft 365 admin center** and go to **Users > Active users**.
+1. Sign in to the **Microsoft 365 admin center** and go to **Users > Active users**.
 
 2. Select the user, and in the properties that appear, click the **Mail** tab.
 
@@ -452,7 +452,7 @@ for legitimate use as needed.
 #### MS.EXO.6.1v1 instructions:
 To restrict sharing with all domains:
 
-1. Sign into the **Exchange admin center**.
+1. Sign in to the **Exchange admin center**.
 
 2. On the left hand pane under **Organization**, select **Sharing**.
 
@@ -522,7 +522,7 @@ have expected to be sent from an internal sender.
 #### MS.EXO.7.1v1 instructions:
 To create a mail flow rule to produce external sender warnings:
 
-1.  Sign into the **Exchange admin center**.
+1.  Sign in to the **Exchange admin center**.
 
 2.  Under **Mail flow**, select **Rules**.
 
@@ -921,7 +921,7 @@ the Microsoft 365 Defender portal to modify the default connection
 filter
 policy](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/connection-filter-policies-configure?view=o365-worldwide#use-the-microsoft-365-defender-portal-to-modify-the-default-connection-filter-policy).
 
-1. Sign into **Microsoft 365 Defender portal**.
+1. Sign in to **Microsoft 365 Defender portal**.
 
 2. From the left-hand menu, find **Email & collaboration** and select **Policies and Rules**.
 
@@ -940,7 +940,7 @@ policy](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-secu
 
 #### MS.EXO.12.2v1 instructions:
 
-1. Sign into **Microsoft 365 Defender portal**.
+1. Sign in to **Microsoft 365 Defender portal**.
 
 2. From the left-hand menu, find **Email & collaboration** and select **Policies and Rules**.
 
