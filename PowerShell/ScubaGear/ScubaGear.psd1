@@ -61,6 +61,7 @@ PowerShellVersion = '5.1'
 
 # Script files (.ps1) that are run in the caller's environment prior to importing this module.
 ScriptsToProcess = @(
+    './RaiseFunctionCap.ps1',
     './Dependencies.ps1'
 )
 
