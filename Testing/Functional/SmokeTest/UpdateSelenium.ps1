@@ -86,7 +86,10 @@ if (Confirm-NeedForUpdate $chromeVersion $chromeDriverVersion){
     # if cannot find (e.g. it's too new to have a web driver), look for relevant major version
     if (!$versionLink){
         $browserMajorVersion = $chromeVersion.Substring(0, $chromeVersion.IndexOf("."))
-        $versionLink         = $chromeDriverAvailableVersions | Where-Object {$_ -like "*$browserMajorVersion.*"}
+        $lkg_chrome = invoke-RestMethod https://googlechromelabs.github.io/chrome-for-testing/last-known-good-versions-with-downloads.json
+        $lkg_chrome.PSobject.Properties | ForEach-Object {$_.Value | ForEach-Object {$chromeDriverAvailableVersions += $_.PSobject.Properties.Value.downloads.chromedriver.url }}
+
+        $versionLink         = $chromeDriverAvailableVersions | Where-Object {$_ -like "*$browserMajorVersion.*win32*"}
     }
 
     # in case of multiple links, take the first only
@@ -94,14 +97,19 @@ if (Confirm-NeedForUpdate $chromeVersion $chromeDriverVersion){
         $versionLink = $versionLink[0]
     }
 
-    # build tge download URL according to found version and download URL schema
-    $version      = ($versionLink -split"=" | Where-Object {$_ -like "*.*.*.*/"}).Replace('/','')
-    $downloadLink = "$chromeDriverUrlBase/$version/$chromeDriverUrlEnd"
+    if ($versionLink -like "*chrome-for-testing*") {
+        $downloadLink = $versionLink
+    }
+    else {
+        # build tge download URL according to found version and download URL schema
+        $version      = ($versionLink -split"=" | Where-Object {$_ -like "*.*.*.*/"}).Replace('/','')
+        $downloadLink = "$chromeDriverUrlBase/$version/$chromeDriverUrlEnd"
+    }
 
     # download the file
     Invoke-WebRequest $downloadLink -OutFile "chromeNewDriver.zip"
 
-    # epand archive and replace the old file
+    # expand archive and replace the old file
     Expand-Archive "chromeNewDriver.zip"              -DestinationPath "chromeNewDriver\"                    -Force
     Remove-Item -Path "$($webDriversPath)\chromedriver.exe" -Force
     Move-Item      "chromeNewDriver/chromedriver.exe" -Destination     "$($webDriversPath)\chromedriver.exe" -Force
