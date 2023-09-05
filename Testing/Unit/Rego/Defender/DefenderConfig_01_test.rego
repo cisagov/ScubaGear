@@ -512,7 +512,7 @@ test_SensitiveEOP_Correct_V2 if {
             {
                 "Identity" : "Strict Preset Security Policy",
                 "SentTo": [
-                    "johndoe@random.onmicrosoft.com"
+                    "johndoe@random.example.com"
                 ],
                 "SentToMemberOf": null,
                 "RecipientDomainIs": null,
@@ -526,7 +526,7 @@ test_SensitiveEOP_Correct_V2 if {
                 "MS.DEFENDER.1.4v1" : {
                     "SensitiveAccounts" : {
                         "Users" : [
-                            "johndoe@random.onmicrosoft.com"
+                            "johndoe@random.example.com"
                         ],
                         "Groups" : [ ],
                         "Domains" : []
@@ -553,7 +553,7 @@ test_SensitiveEOP_Correct_V3 if {
                 "Identity" : "Strict Preset Security Policy",
                 "SentTo": null,
                 "SentToMemberOf": [
-                    "dune@random.onmicrosoft.com"
+                    "dune@random.example.com"
                 ],
                 "RecipientDomainIs": null,
                 "ExceptIfSentTo": null,
@@ -567,7 +567,7 @@ test_SensitiveEOP_Correct_V3 if {
                     "SensitiveAccounts" : {
                         "Users" : [],
                         "Groups" : [
-                            "dune@random.onmicrosoft.com"
+                            "dune@random.example.com"
                         ],
                         "Domains" : []
                     }
@@ -594,7 +594,7 @@ test_SensitiveEOP_Correct_V4 if {
                 "SentTo": null,
                 "SentToMemberOf": null,
                 "RecipientDomainIs": [
-                    "random.mail.onmicrosoft.com"
+                    "random.mail.example.com"
                 ],
                 "ExceptIfSentTo": null,
                 "ExceptIfSentToMemberOf": null,
@@ -608,7 +608,7 @@ test_SensitiveEOP_Correct_V4 if {
                         "Users" : [],
                         "Groups" : [],
                         "Domains" : [
-                            "random.mail.onmicrosoft.com"
+                            "random.mail.example.com"
                         ]
                     }
                 }
@@ -632,12 +632,12 @@ test_SensitiveEOP_Correct_V5 if {
             {
                 "Identity" : "Strict Preset Security Policy",
                 "SentTo": [
-                    "johndoe@random.onmicrosoft.com"
+                    "johndoe@random.example.com"
                 ],
                 "SentToMemberOf": null,
                 "RecipientDomainIs": null,
                 "ExceptIfSentTo": [
-                    "janedoe@random.onmicrosoft.com"
+                    "janedoe@random.example.com"
                 ],
                 "ExceptIfSentToMemberOf": null,
                 "ExceptIfRecipientDomainIs": null,
@@ -648,7 +648,7 @@ test_SensitiveEOP_Correct_V5 if {
                 "MS.DEFENDER.1.4v1" : {
                     "SensitiveAccounts" : {
                         "Users" : [
-                            "johndoe@random.onmicrosoft.com"
+                            "johndoe@random.example.com"
                         ],
                         "Groups" : [],
                         "Domains" : []
@@ -675,12 +675,12 @@ test_SensitiveEOP_Correct_V6 if {
                 "Identity" : "Strict Preset Security Policy",
                 "SentTo": null,
                 "SentToMemberOf": [
-                    "dune@random.onmicrosoft.com"
+                    "dune@random.example.com"
                 ],
                 "RecipientDomainIs": null,
                 "ExceptIfSentTo": null,
                 "ExceptIfSentToMemberOf": [
-                    "dune12@random.onmicrosoft.com"
+                    "dune12@random.example.com"
                 ],
                 "ExceptIfRecipientDomainIs": null,
             }
@@ -691,7 +691,7 @@ test_SensitiveEOP_Correct_V6 if {
                     "SensitiveAccounts" : {
                         "Users" : [],
                         "Groups" : [
-                            "dune@random.onmicrosoft.com"
+                            "dune@random.example.com"
                         ],
                         "Domains" : []
                     }
@@ -718,12 +718,12 @@ test_SensitiveEOP_Correct_V7 if {
                 "SentTo": null,
                 "SentToMemberOf": null,
                 "RecipientDomainIs": [
-                    "random.mail.onmicrosoft.com"
+                    "random.mail.example.com"
                 ],
                 "ExceptIfSentTo": null,
                 "ExceptIfSentToMemberOf": null,
                 "ExceptIfRecipientDomainIs": [
-                    "randomdancing.mail.onmicrosoft.com"
+                    "randomdancing.mail.example.com"
                 ],
             }
         ],
@@ -734,7 +734,7 @@ test_SensitiveEOP_Correct_V7 if {
                         "Users" : [],
                         "Groups" : [],
                         "Domains" : [
-                            "random.mail.onmicrosoft.com"
+                            "random.mail.example.com"
                         ]
                     }
                 }
@@ -758,16 +758,16 @@ test_SensitiveEOP_Correct_V8 if {
             {
                 "Identity" : "Strict Preset Security Policy",
                 "SentTo": [
-                    "johndoe@random.onmicrosoft.com"
+                    "johndoe@random.example.com"
                 ],
                 "SentToMemberOf": null,
                 "RecipientDomainIs": [
-                    "random.mail.onmicrosoft.com"
+                    "random.mail.example.com"
                 ],
                 "ExceptIfSentTo": null,
                 "ExceptIfSentToMemberOf": null,
                 "ExceptIfRecipientDomainIs": [
-                    "randomdancing.mail.onmicrosoft.com"
+                    "randomdancing.mail.example.com"
                 ],
             }
         ],
@@ -778,8 +778,8 @@ test_SensitiveEOP_Correct_V8 if {
                         "Users" : [],
                         "Groups" : [],
                         "Domains" : [
-                            "random.mail.onmicrosoft.com",
-                            "random.onmicrosoft.com"
+                            "random.mail.example.com",
+                            "random.example.com"
                         ]
                     }
                 }
@@ -803,8 +803,8 @@ test_SensitiveEOP_Correct_V9 if {
             {
                 "Identity" : "Strict Preset Security Policy",
                 "SentTo": [
-                    "johndoe@random.onmicrosoft.com",
-                    "janedoe@random.onmicrosoft.com"
+                    "johndoe@random.example.com",
+                    "janedoe@random.example.com"
                 ],
                 "SentToMemberOf": null,
                 "RecipientDomainIs": null,
@@ -818,8 +818,8 @@ test_SensitiveEOP_Correct_V9 if {
                 "MS.DEFENDER.1.4v1" : {
                     "SensitiveAccounts" : {
                         "Users" : [
-                            "johndoe@random.onmicrosoft.com",
-                            "janedoe@random.onmicrosoft.com"
+                            "johndoe@random.example.com",
+                            "janedoe@random.example.com"
                         ],
                         "Groups" : [ ],
                         "Domains" : []
@@ -846,8 +846,8 @@ test_SensitiveEOP_Correct_V10 if {
                 "Identity" : "Strict Preset Security Policy",
                 "SentTo": null,
                 "SentToMemberOf": [
-                    "dune@random.onmicrosoft.com",
-                    "dune12@random.onmicrosoft.com"
+                    "dune@random.example.com",
+                    "dune12@random.example.com"
                 ],
                 "RecipientDomainIs": null,
                 "ExceptIfSentTo": null,
@@ -861,8 +861,8 @@ test_SensitiveEOP_Correct_V10 if {
                     "SensitiveAccounts" : {
                         "Users" : [],
                         "Groups" : [
-                            "dune@random.onmicrosoft.com",
-                            "dune12@random.onmicrosoft.com"
+                            "dune@random.example.com",
+                            "dune12@random.example.com"
                         ],
                         "Domains" : []
                     }
@@ -889,8 +889,8 @@ test_SensitiveEOP_Correct_V11 if {
                 "SentTo": null,
                 "SentToMemberOf": null,
                 "RecipientDomainIs": [
-                    "random.mail.onmicrosoft.com",
-                    "randomdancing.mail.onmicrosoft.com"
+                    "random.mail.example.com",
+                    "randomdancing.mail.example.com"
                 ],
                 "ExceptIfSentTo": null,
                 "ExceptIfSentToMemberOf": null,
@@ -904,8 +904,8 @@ test_SensitiveEOP_Correct_V11 if {
                         "Users" : [],
                         "Groups" : [],
                         "Domains" : [
-                            "random.mail.onmicrosoft.com",
-                            "randomdancing.mail.onmicrosoft.com"
+                            "random.mail.example.com",
+                            "randomdancing.mail.example.com"
                         ]
                     }
                 }
@@ -929,8 +929,8 @@ test_SensitiveEOP_Correct_V12 if {
             {
                 "Identity" : "Strict Preset Security Policy",
                 "SentTo": [
-                    "johndoe@random.onmicrosoft.com",
-                    "janedoe@random.onmicrosoft.com"
+                    "johndoe@random.example.com",
+                    "janedoe@random.example.com"
                 ],
                 "SentToMemberOf": null,
                 "RecipientDomainIs": null,
@@ -944,7 +944,7 @@ test_SensitiveEOP_Correct_V12 if {
                 "MS.DEFENDER.1.4v1" : {
                     "SensitiveAccounts" : {
                         "Users" : [
-                            "johndoe@random.onmicrosoft.com"
+                            "johndoe@random.example.com"
                         ],
                         "Groups" : [ ],
                         "Domains" : []
@@ -971,8 +971,8 @@ test_SensitiveEOP_Correct_V13 if {
                 "Identity" : "Strict Preset Security Policy",
                 "SentTo": null,
                 "SentToMemberOf": [
-                    "dune@random.onmicrosoft.com",
-                    "dune12@random.onmicrosoft.com"
+                    "dune@random.example.com",
+                    "dune12@random.example.com"
                 ],
                 "RecipientDomainIs": null,
                 "ExceptIfSentTo": null,
@@ -986,7 +986,7 @@ test_SensitiveEOP_Correct_V13 if {
                     "SensitiveAccounts" : {
                         "Users" : [],
                         "Groups" : [
-                            "dune@random.onmicrosoft.com"
+                            "dune@random.example.com"
                         ],
                         "Domains" : []
                     }
@@ -1013,8 +1013,8 @@ test_SensitiveEOP_Correct_V14 if {
                 "SentTo": null,
                 "SentToMemberOf": null,
                 "RecipientDomainIs": [
-                    "random.mail.onmicrosoft.com",
-                    "randomdancing.mail.onmicrosoft.com"
+                    "random.mail.example.com",
+                    "randomdancing.mail.example.com"
                 ],
                 "ExceptIfSentTo": null,
                 "ExceptIfSentToMemberOf": null,
@@ -1028,7 +1028,7 @@ test_SensitiveEOP_Correct_V14 if {
                         "Users" : [],
                         "Groups" : [],
                         "Domains" : [
-                            "random.mail.onmicrosoft.com"
+                            "random.mail.example.com"
                         ]
                     }
                 }
@@ -1052,9 +1052,9 @@ test_SensitiveEOP_Correct_V15 if {
             {
                 "Identity" : "Strict Preset Security Policy",
                 "SentTo": [
-                    "johndoe@random.onmicrosoft.com",
-                    "janedoe@random.onmicrosoft.com",
-                    "johndoe@random.mail.onmicrosoft.com"
+                    "johndoe@random.example.com",
+                    "janedoe@random.example.com",
+                    "johndoe@random.mail.example.com"
                 ],
                 "SentToMemberOf": null,
                 "RecipientDomainIs": null,
@@ -1068,12 +1068,12 @@ test_SensitiveEOP_Correct_V15 if {
                 "MS.DEFENDER.1.4v1" : {
                     "SensitiveAccounts" : {
                         "Users" : [
-                            "johndoe@random.onmicrosoft.com",
-                            "janedoe@random.onmicrosoft.com"
+                            "johndoe@random.example.com",
+                            "janedoe@random.example.com"
                         ],
                         "Groups" : [ ],
                         "Domains" : [
-                            "random.mail.onmicrosoft.com"
+                            "random.mail.example.com"
                         ]
                     }
                 }
@@ -1097,13 +1097,13 @@ test_SensitiveEOP_Correct_V16 if {
             {
                 "Identity" : "Strict Preset Security Policy",
                 "SentTo": [
-                    "johndoe@random.onmicrosoft.com",
-                    "janedoe@random.onmicrosoft.com",
-                    "johndoe@random.mail.onmicrosoft.com"
+                    "johndoe@random.example.com",
+                    "janedoe@random.example.com",
+                    "johndoe@random.mail.example.com"
                 ],
                 "SentToMemberOf": null,
                 "RecipientDomainIs": [
-                    "randomdancing.mail.onmicrosoft.com"
+                    "randomdancing.mail.example.com"
                 ],
                 "ExceptIfSentTo": null,
                 "ExceptIfSentToMemberOf": null,
@@ -1115,13 +1115,13 @@ test_SensitiveEOP_Correct_V16 if {
                 "MS.DEFENDER.1.4v1" : {
                     "SensitiveAccounts" : {
                         "Users" : [
-                            "johndoe@random.onmicrosoft.com",
-                            "janedoe@random.onmicrosoft.com"
+                            "johndoe@random.example.com",
+                            "janedoe@random.example.com"
                         ],
                         "Groups" : [ ],
                         "Domains" : [
-                            "random.mail.onmicrosoft.com",
-                            "randomdancing.mail.onmicrosoft.com"
+                            "random.mail.example.com",
+                            "randomdancing.mail.example.com"
                         ]
                     }
                 }
@@ -1210,7 +1210,7 @@ test_SensitiveEOP_Incorrect_V3 if {
                 "SentToMemberOf": null,
                 "RecipientDomainIs": null,
                 "ExceptIfSentTo": [
-                    "johndoe@random.onmicrosoft.com"
+                    "johndoe@random.example.com"
                 ],
                 "ExceptIfSentToMemberOf": null,
                 "ExceptIfRecipientDomainIs": null,
@@ -1221,7 +1221,7 @@ test_SensitiveEOP_Incorrect_V3 if {
                 "MS.DEFENDER.1.4v1" : {
                     "SensitiveAccounts" : {
                         "Users" : [
-                            "johndoe@random.onmicrosoft.com"
+                            "johndoe@random.example.com"
                         ],
                         "Groups" : [],
                         "Domains" : []
@@ -1251,7 +1251,7 @@ test_SensitiveEOP_Incorrect_V4 if {
                 "RecipientDomainIs": null,
                 "ExceptIfSentTo": null,
                 "ExceptIfSentToMemberOf": [
-                    "dune@random.onmicrosoft.com"
+                    "dune@random.example.com"
                 ],
                 "ExceptIfRecipientDomainIs": null,
             }
@@ -1262,7 +1262,7 @@ test_SensitiveEOP_Incorrect_V4 if {
                     "SensitiveAccounts" : {
                         "Users" : [],
                         "Groups" : [
-                            "dune@random.onmicrosoft.com"
+                            "dune@random.example.com"
                         ],
                         "Domains" : []
                     }
@@ -1292,7 +1292,7 @@ test_SensitiveEOP_Incorrect_V5 if {
                 "ExceptIfSentTo": null,
                 "ExceptIfSentToMemberOf": null,
                 "ExceptIfRecipientDomainIs": [
-                    "random.mail.onmicrosoft.com"
+                    "random.mail.example.com"
                 ],
             }
         ],
@@ -1303,7 +1303,7 @@ test_SensitiveEOP_Incorrect_V5 if {
                         "Users" : [],
                         "Groups" : [],
                         "Domains" : [
-                            "random.mail.onmicrosoft.com"
+                            "random.mail.example.com"
                         ]
                     }
                 }
@@ -1329,12 +1329,12 @@ test_SensitiveEOP_Incorrect_V6 if {
                 "SentTo": null,
                 "SentToMemberOf": null,
                 "RecipientDomainIs": [
-                    "random.mail.onmicrosoft.com"
+                    "random.mail.example.com"
                 ],
                 "ExceptIfSentTo": null,
                 "ExceptIfSentToMemberOf": null,
                 "ExceptIfRecipientDomainIs": [
-                    "randomdancing.mail.onmicrosoft.com"
+                    "randomdancing.mail.example.com"
                 ],
             }
         ],
@@ -1345,8 +1345,8 @@ test_SensitiveEOP_Incorrect_V6 if {
                         "Users" : [],
                         "Groups" : [],
                         "Domains" : [
-                            "random.mail.onmicrosoft.com",
-                            "random.onmicrosoft.com"
+                            "random.mail.example.com",
+                            "random.example.com"
                         ]
                     }
                 }
@@ -1372,13 +1372,13 @@ test_SensitiveEOP_Incorrect_V7 if {
                 "SentTo": null,
                 "SentToMemberOf": null,
                 "RecipientDomainIs": [
-                    "random.mail.onmicrosoft.com"
+                    "random.mail.example.com"
                 ],
                 "ExceptIfSentTo": null,
                 "ExceptIfSentToMemberOf": null,
                 "ExceptIfRecipientDomainIs": [
-                    "randomdancing.mail.onmicrosoft.com",
-                    "random.onmicrosoft.com"
+                    "randomdancing.mail.example.com",
+                    "random.example.com"
                 ],
             }
         ],
@@ -1389,8 +1389,8 @@ test_SensitiveEOP_Incorrect_V7 if {
                         "Users" : [],
                         "Groups" : [],
                         "Domains" : [
-                            "random.mail.onmicrosoft.com",
-                            "random.onmicrosoft.com"
+                            "random.mail.example.com",
+                            "random.example.com"
                         ]
                     }
                 }
@@ -1414,7 +1414,7 @@ test_SensitiveEOP_Correct_V8 if {
             {
                 "Identity" : "Strict Preset Security Policy",
                 "SentTo": [
-                    "johndoe@random.onmicrosoft.com"
+                    "johndoe@random.example.com"
                 ],
                 "SentToMemberOf": null,
                 "RecipientDomainIs": null,
@@ -1428,8 +1428,8 @@ test_SensitiveEOP_Correct_V8 if {
                 "MS.DEFENDER.1.4v1" : {
                     "SensitiveAccounts" : {
                         "Users" : [
-                            "johndoe@random.onmicrosoft.com",
-                            "janedoe@random.onmicrosoft.com"
+                            "johndoe@random.example.com",
+                            "janedoe@random.example.com"
                         ],
                         "Groups" : [ ],
                         "Domains" : []
@@ -1456,7 +1456,7 @@ test_SensitiveEOP_Correct_V9 if {
                 "Identity" : "Strict Preset Security Policy",
                 "SentTo": null,
                 "SentToMemberOf": [
-                    "dune@random.onmicrosoft.com"
+                    "dune@random.example.com"
                 ],
                 "RecipientDomainIs": null,
                 "ExceptIfSentTo": null,
@@ -1470,8 +1470,8 @@ test_SensitiveEOP_Correct_V9 if {
                     "SensitiveAccounts" : {
                         "Users" : [],
                         "Groups" : [
-                            "dune@random.onmicrosoft.com",
-                            "dune12@random.onmicrosoft.com"
+                            "dune@random.example.com",
+                            "dune12@random.example.com"
                         ],
                         "Domains" : []
                     }
@@ -1498,7 +1498,7 @@ test_SensitiveEOP_Correct_V10 if {
                 "SentTo": null,
                 "SentToMemberOf": null,
                 "RecipientDomainIs": [
-                    "random.mail.onmicrosoft.com"
+                    "random.mail.example.com"
                 ],
                 "ExceptIfSentTo": null,
                 "ExceptIfSentToMemberOf": null,
@@ -1512,8 +1512,8 @@ test_SensitiveEOP_Correct_V10 if {
                         "Users" : [],
                         "Groups" : [],
                         "Domains" : [
-                            "random.mail.onmicrosoft.com",
-                            "randomdancing.mail.onmicrosoft.com"
+                            "random.mail.example.com",
+                            "randomdancing.mail.example.com"
                         ]
                     }
                 }
