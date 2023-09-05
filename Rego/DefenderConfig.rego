@@ -70,9 +70,8 @@ SensitiveUsers(Policies, PolicyID) := {
     "ExcludedUsers" : ExcludedUsers,
     "IncludedUsers" : IncludedUsers
 } {
-    Config := input.scuba_config.Defender[PolicyID].SensitiveIDs.Users
-    Policy := [Policy | Policy := Policies[_]; Policy.Identity == "Strict Preset Security Policy"]
-    ConfigUsers := { x | x := Config[_] }
+    Policy := [ Policy | Policy := Policies[_]; Policy.Identity == "Strict Preset Security Policy" ]
+    ConfigUsers := { x | some x in input.scuba_config.Defender[PolicyID].SensitiveIDs.Users; x != null }
     ExcludedUsers := { x | x := Policy[0].ExceptIfSentTo[_] }
     IncludedUsers := { x | x := Policy[0].SentTo[_] }
 }
@@ -82,9 +81,8 @@ SensitiveDomains(Policies, PolicyID) := {
     "ExcludedDomains" : ExcludedDomains,
     "IncludedDomains" : IncludedDomains
 } {
-    Config := input.scuba_config.Defender[PolicyID].SensitiveIDs.Domains
-    Policy := [Policy | Policy := Policies[_]; Policy.Identity == "Strict Preset Security Policy"]
-    ConfigDomains := { x | x := Config[_] }
+    Policy := [ Policy | Policy := Policies[_]; Policy.Identity == "Strict Preset Security Policy" ]
+    ConfigDomains := { x | some x in input.scuba_config.Defender[PolicyID].SensitiveIDs.Domains; x != null }
     ExcludedDomains := { x | x := Policy[0].ExceptIfRecipientDomainIs[_] }
     IncludedDomains := { x | x := Policy[0].RecipientDomainIs[_] }
 }
@@ -191,8 +189,8 @@ GroupSensitiveIDs(Policies, PolicyID) := true if {
 
 GroupSensitiveIDs(Policies, PolicyID) := true if {
     Config := input.scuba_config.Defender[PolicyID].SensitiveIDs.Groups
-    Policy := [Policy | Policy := Policies[_]; Policy.Identity == "Strict Preset Security Policy"]
-    ConfigGroups := { x | x := Config[_] }
+    Policy := [ Policy | Policy := Policies[_]; Policy.Identity == "Strict Preset Security Policy" ]
+    ConfigGroups := { x | some x in input.scuba_config.Defender[PolicyID].SensitiveIDs.Groups; x != null }
     ExcludedGroups := { x | x := Policy[0].ExceptIfSentToMemberOf[_] }
     IncludedGroups := { x | x := Policy[0].SentToMemberOf[_] }
 
