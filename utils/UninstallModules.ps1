@@ -21,8 +21,7 @@ $ModuleList = @(
     "PnP.PowerShell", # for authenticating to SharePoint with an application
     "Microsoft.PowerApps.Administration.PowerShell",
     "Microsoft.PowerApps.PowerShell",
-    "Microsoft.Graph.Authentication", # starting here, modules for AAD
-    "Microsoft.Graph.Beta.DeviceManagement.Enrollment",
+    "Microsoft.Graph.Authentication", # starting here, MS Graph modules for AAD
     "Microsoft.Graph.Beta.Groups",
     "Microsoft.Graph.Beta.Identity.DirectoryManagement",
     "Microsoft.Graph.Beta.Identity.Governance",
