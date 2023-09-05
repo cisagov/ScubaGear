@@ -29,8 +29,8 @@ OutReportName: BaselineReports
 GlobalVars:  # For cross product variables
   AllProductVar: value_example
 Defender:
-  MS.DEFENDER.1.4v1: &SensitiveIDs
-    SensitiveIDs:
+  MS.DEFENDER.1.4v1: &CommonSensitiveAccounts
+    SensitiveAccounts:
       Users:
         - johndoe@random.onmicrosoft.com
       Groups:

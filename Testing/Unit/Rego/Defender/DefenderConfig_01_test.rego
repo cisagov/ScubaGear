@@ -486,7 +486,7 @@ test_SensitiveEOP_Correct_V1 if {
         "scuba_config" : {
             "Defender" : {
                 "MS.DEFENDER.1.4v1" : {
-                    "SensitiveIDs" : {
+                    "SensitiveAccounts" : {
                         "Users" : [],
                         "Groups" : [],
                         "Domains" : []
@@ -524,7 +524,7 @@ test_SensitiveEOP_Correct_V2 if {
         "scuba_config" : {
             "Defender" : {
                 "MS.DEFENDER.1.4v1" : {
-                    "SensitiveIDs" : {
+                    "SensitiveAccounts" : {
                         "Users" : [
                             "johndoe@random.onmicrosoft.com"
                         ],
@@ -564,7 +564,7 @@ test_SensitiveEOP_Correct_V3 if {
         "scuba_config" : {
             "Defender" : {
                 "MS.DEFENDER.1.4v1" : {
-                    "SensitiveIDs" : {
+                    "SensitiveAccounts" : {
                         "Users" : [],
                         "Groups" : [
                             "dune@random.onmicrosoft.com"
@@ -604,7 +604,7 @@ test_SensitiveEOP_Correct_V4 if {
         "scuba_config" : {
             "Defender" : {
                 "MS.DEFENDER.1.4v1" : {
-                    "SensitiveIDs" : {
+                    "SensitiveAccounts" : {
                         "Users" : [],
                         "Groups" : [],
                         "Domains" : [
@@ -646,7 +646,7 @@ test_SensitiveEOP_Correct_V5 if {
         "scuba_config" : {
             "Defender" : {
                 "MS.DEFENDER.1.4v1" : {
-                    "SensitiveIDs" : {
+                    "SensitiveAccounts" : {
                         "Users" : [
                             "johndoe@random.onmicrosoft.com"
                         ],
@@ -688,7 +688,7 @@ test_SensitiveEOP_Correct_V6 if {
         "scuba_config" : {
             "Defender" : {
                 "MS.DEFENDER.1.4v1" : {
-                    "SensitiveIDs" : {
+                    "SensitiveAccounts" : {
                         "Users" : [],
                         "Groups" : [
                             "dune@random.onmicrosoft.com"
@@ -730,7 +730,7 @@ test_SensitiveEOP_Correct_V7 if {
         "scuba_config" : {
             "Defender" : {
                 "MS.DEFENDER.1.4v1" : {
-                    "SensitiveIDs" : {
+                    "SensitiveAccounts" : {
                         "Users" : [],
                         "Groups" : [],
                         "Domains" : [
@@ -774,7 +774,7 @@ test_SensitiveEOP_Correct_V8 if {
         "scuba_config" : {
             "Defender" : {
                 "MS.DEFENDER.1.4v1" : {
-                    "SensitiveIDs" : {
+                    "SensitiveAccounts" : {
                         "Users" : [],
                         "Groups" : [],
                         "Domains" : [
@@ -816,7 +816,7 @@ test_SensitiveEOP_Correct_V9 if {
         "scuba_config" : {
             "Defender" : {
                 "MS.DEFENDER.1.4v1" : {
-                    "SensitiveIDs" : {
+                    "SensitiveAccounts" : {
                         "Users" : [
                             "johndoe@random.onmicrosoft.com",
                             "janedoe@random.onmicrosoft.com"
@@ -858,7 +858,7 @@ test_SensitiveEOP_Correct_V10 if {
         "scuba_config" : {
             "Defender" : {
                 "MS.DEFENDER.1.4v1" : {
-                    "SensitiveIDs" : {
+                    "SensitiveAccounts" : {
                         "Users" : [],
                         "Groups" : [
                             "dune@random.onmicrosoft.com",
@@ -900,7 +900,7 @@ test_SensitiveEOP_Correct_V11 if {
         "scuba_config" : {
             "Defender" : {
                 "MS.DEFENDER.1.4v1" : {
-                    "SensitiveIDs" : {
+                    "SensitiveAccounts" : {
                         "Users" : [],
                         "Groups" : [],
                         "Domains" : [
@@ -942,7 +942,7 @@ test_SensitiveEOP_Correct_V12 if {
         "scuba_config" : {
             "Defender" : {
                 "MS.DEFENDER.1.4v1" : {
-                    "SensitiveIDs" : {
+                    "SensitiveAccounts" : {
                         "Users" : [
                             "johndoe@random.onmicrosoft.com"
                         ],
@@ -983,7 +983,7 @@ test_SensitiveEOP_Correct_V13 if {
         "scuba_config" : {
             "Defender" : {
                 "MS.DEFENDER.1.4v1" : {
-                    "SensitiveIDs" : {
+                    "SensitiveAccounts" : {
                         "Users" : [],
                         "Groups" : [
                             "dune@random.onmicrosoft.com"
@@ -1024,7 +1024,7 @@ test_SensitiveEOP_Correct_V14 if {
         "scuba_config" : {
             "Defender" : {
                 "MS.DEFENDER.1.4v1" : {
-                    "SensitiveIDs" : {
+                    "SensitiveAccounts" : {
                         "Users" : [],
                         "Groups" : [],
                         "Domains" : [
@@ -1066,7 +1066,7 @@ test_SensitiveEOP_Correct_V15 if {
         "scuba_config" : {
             "Defender" : {
                 "MS.DEFENDER.1.4v1" : {
-                    "SensitiveIDs" : {
+                    "SensitiveAccounts" : {
                         "Users" : [
                             "johndoe@random.onmicrosoft.com",
                             "janedoe@random.onmicrosoft.com"
@@ -1113,7 +1113,7 @@ test_SensitiveEOP_Correct_V16 if {
         "scuba_config" : {
             "Defender" : {
                 "MS.DEFENDER.1.4v1" : {
-                    "SensitiveIDs" : {
+                    "SensitiveAccounts" : {
                         "Users" : [
                             "johndoe@random.onmicrosoft.com",
                             "janedoe@random.onmicrosoft.com"
@@ -1155,7 +1155,7 @@ test_SensitiveEOP_Incorrect_V1 if {
         "scuba_config" : {
             "Defender" : {
                 "MS.DEFENDER.1.4v1" : {
-                    "SensitiveIDs" : {
+                    "SensitiveAccounts" : {
                         "Users" : [],
                         "Groups" : [],
                         "Domains" : []
@@ -1181,7 +1181,7 @@ test_SensitiveEOP_Incorrect_V2 if {
         "scuba_config" : {
             "Defender" : {
                 "MS.DEFENDER.1.4v1" : {
-                    "SensitiveIDs" : {
+                    "SensitiveAccounts" : {
                         "Users" : [],
                         "Groups" : [],
                         "Domains" : []
@@ -1219,7 +1219,7 @@ test_SensitiveEOP_Incorrect_V3 if {
         "scuba_config" : {
             "Defender" : {
                 "MS.DEFENDER.1.4v1" : {
-                    "SensitiveIDs" : {
+                    "SensitiveAccounts" : {
                         "Users" : [
                             "johndoe@random.onmicrosoft.com"
                         ],
@@ -1259,7 +1259,7 @@ test_SensitiveEOP_Incorrect_V4 if {
         "scuba_config" : {
             "Defender" : {
                 "MS.DEFENDER.1.4v1" : {
-                    "SensitiveIDs" : {
+                    "SensitiveAccounts" : {
                         "Users" : [],
                         "Groups" : [
                             "dune@random.onmicrosoft.com"
@@ -1299,7 +1299,7 @@ test_SensitiveEOP_Incorrect_V5 if {
         "scuba_config" : {
             "Defender" : {
                 "MS.DEFENDER.1.4v1" : {
-                    "SensitiveIDs" : {
+                    "SensitiveAccounts" : {
                         "Users" : [],
                         "Groups" : [],
                         "Domains" : [
@@ -1341,7 +1341,7 @@ test_SensitiveEOP_Incorrect_V6 if {
         "scuba_config" : {
             "Defender" : {
                 "MS.DEFENDER.1.4v1" : {
-                    "SensitiveIDs" : {
+                    "SensitiveAccounts" : {
                         "Users" : [],
                         "Groups" : [],
                         "Domains" : [
@@ -1385,7 +1385,7 @@ test_SensitiveEOP_Incorrect_V7 if {
         "scuba_config" : {
             "Defender" : {
                 "MS.DEFENDER.1.4v1" : {
-                    "SensitiveIDs" : {
+                    "SensitiveAccounts" : {
                         "Users" : [],
                         "Groups" : [],
                         "Domains" : [
@@ -1426,7 +1426,7 @@ test_SensitiveEOP_Correct_V8 if {
         "scuba_config" : {
             "Defender" : {
                 "MS.DEFENDER.1.4v1" : {
-                    "SensitiveIDs" : {
+                    "SensitiveAccounts" : {
                         "Users" : [
                             "johndoe@random.onmicrosoft.com",
                             "janedoe@random.onmicrosoft.com"
@@ -1467,7 +1467,7 @@ test_SensitiveEOP_Correct_V9 if {
         "scuba_config" : {
             "Defender" : {
                 "MS.DEFENDER.1.4v1" : {
-                    "SensitiveIDs" : {
+                    "SensitiveAccounts" : {
                         "Users" : [],
                         "Groups" : [
                             "dune@random.onmicrosoft.com",
@@ -1508,7 +1508,7 @@ test_SensitiveEOP_Correct_V10 if {
         "scuba_config" : {
             "Defender" : {
                 "MS.DEFENDER.1.4v1" : {
-                    "SensitiveIDs" : {
+                    "SensitiveAccounts" : {
                         "Users" : [],
                         "Groups" : [],
                         "Domains" : [
