@@ -91,7 +91,16 @@ function Export-AADProvider {
 
     # 5.1, 5.2, 8.1 & 8.3
     $AuthZPolicies = ConvertTo-Json @($Tracker.TryCommand("Get-MgBetaPolicyAuthorizationPolicy"))
-    $SecureScore = ConvertTo-Json -Depth 2 @($Tracker.TryCommand("Get-MgBetaSecuritySecureScore", @{"Top"=1}).ControlScores | Where-Object {$_.ControlName -eq 'RoleOverlap'})
+
+    #TODO: Temp work around - cannot process result of failed TryCommand. Issue #519
+    $SecureScoreResults = $Tracker.TryCommand("Get-MgBetaSecuritySecureScore", @{"Top"=1})
+
+    if (0 -ne $SecureScoreResults.Count){
+        $SecureScore = ConvertTo-Json -Depth 2 @($SecureScoreResults.ControlScores | Where-Object {$_.ControlName -eq 'RoleOverlap'})
+    }
+    else {
+        $SecureScore = ConvertTo-Json -Depth 2 @(@{"Score" = -1.0})
+    }
 
     # 5.4
     $DirectorySettings = ConvertTo-Json -Depth 10 @($Tracker.TryCommand("Get-MgBetaDirectorySetting"))
