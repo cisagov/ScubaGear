@@ -397,7 +397,7 @@ The action for the custom policy SHOULD be set to block sharing sensitive inform
 Notifications to inform users and help educate them on the proper use of sensitive information SHOULD be enabled in the custom policy.
 
 <!--Policy: MS.DEFENDER.4.141; Criticality: SHOULD -->
-- _Rationale:_ Some users may not be aware of agency policies on the
+- _Rationale:_ Some users may not be aware of agency policies on
                properly using sensitive information. Enabling
                notifications provides positive feedback to users when
                accessing sensitive information.
