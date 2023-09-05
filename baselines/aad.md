@@ -536,7 +536,6 @@ Privileged users SHALL be provisioned with finer-grained roles instead of Global
 - _Last modified:_ June 2023
 
 #### MS.AAD.7.3v1
-
 Privileged users SHALL be provisioned cloud-only accounts separate from an on-premises directory or other federated identity providers.
 
 <!--Policy: MS.AAD.7.3v1; Criticality: SHALL -->
