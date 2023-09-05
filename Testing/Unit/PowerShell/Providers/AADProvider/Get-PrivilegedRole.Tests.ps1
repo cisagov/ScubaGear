@@ -3,13 +3,9 @@ Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "$($ProviderPath)/Export
 
 InModuleScope ExportAADProvider {
     BeforeAll {
-        function Get-MgBetaDirectoryRoleTemplate {}
         Mock -ModuleName ExportAADProvider Get-MgBetaDirectoryRoleTemplate -MockWith {}
-        function Get-MgBetaPolicyRoleManagementPolicyAssignment {}
         Mock -ModuleName ExportAADProvider Get-MgBetaPolicyRoleManagementPolicyAssignment -MockWith {}
-        function Get-MgBetaRoleManagementDirectoryRoleAssignmentScheduleInstance {}
         Mock -ModuleName ExportAADProvider Get-MgBetaRoleManagementDirectoryRoleAssignmentScheduleInstance -MockWith {}
-        function Get-MgBetaPolicyRoleManagementPolicyRule {}
         Mock -ModuleName ExportAADProvider Get-MgBetaPolicyRoleManagementPolicyRule -MockWith {}
     }
     Describe -Tag 'AADProvider' -Name "Get-PrivilegedRole" {

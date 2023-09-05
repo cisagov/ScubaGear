@@ -1,5 +1,5 @@
-[CmdletBind()]
-[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars')]
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '')]
+[CmdletBinding()]
 param()
 # Increase PowerShell Maximum Function Count to support version 5.1 limitation
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'MaximumFunctionCount')]
