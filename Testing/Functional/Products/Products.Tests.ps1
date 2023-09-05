@@ -1,3 +1,4 @@
+#Requires -Modules @{ ModuleName='Selenium'; ModuleVersion='3.0.0'}
 <#
     .SYNOPSIS
     Test script for MS365 Teams product.
@@ -197,18 +198,18 @@ BeforeAll{
         $ProviderExport
     }
 
-function PublishProviderExport() {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]
-        $OutputFolder,
-        [Parameter(Mandatory = $true)]
-        [object]
-        $Export
-    )
-    $Json = $Export | ConvertTo-Json -Depth 10 | Out-String
-    Set-Content -Path "$OutputFolder/ModifiedProviderSettingsExport.json" -Value $Json
-}
+    function PublishProviderExport() {
+        param(
+            [Parameter(Mandatory = $true)]
+            [string]
+            $OutputFolder,
+            [Parameter(Mandatory = $true)]
+            [object]
+            $Export
+        )
+        $Json = $Export | ConvertTo-Json -Depth 10 | Out-String
+        Set-Content -Path "$OutputFolder/ModifiedProviderSettingsExport.json" -Value $Json
+    }
 
     function RemoveConditionalAccessPolicyByName{
         [CmdletBinding()]
