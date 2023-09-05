@@ -690,7 +690,7 @@ by users with E5 licenses is logged for one year.
 
 However, in accordance with OMB M-21-31, _Improving the Federal Government’s
 Investigative and Remediation Capabilities Related to Cybersecurity Incidents_,
-Microsoft 365 audit logs should be retained for at least 12 months in active
+Microsoft 365 audit logs are to be retained for at least 12 months in active
 storage and an additional 18 months in cold storage. This can be accomplished
 either by offloading the logs out of the cloud environment, or natively through
 Microsoft by creating an [audit log retention
