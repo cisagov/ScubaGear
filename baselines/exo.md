@@ -118,7 +118,7 @@ A list of approved IP addresses for sending mail SHALL be maintained.
 - _Last modified:_ June 2023
 
 #### MS.EXO.2.2v1
-One or more SPF policies designating only these addresses as approved senders SHALL be published.
+An SPF policy SHALL be published for each domain, designating only these addresses as approved senders.
 
 <!--Policy: MS.EXO.2.2v1; Criticality: SHALL -->
 - _Rationale:_ An adversary may modify the `FROM` field
