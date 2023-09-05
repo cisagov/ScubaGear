@@ -32,8 +32,8 @@ Defender:
   MS.DEFENDER.1.4v1: &CommonSensitiveAccounts
     SensitiveAccounts:
       Users:
-        - johndoe@random.onmicrosoft.com
+        - johndoe@random.example.com
       Groups:
-        - dune@random.onmicrosoft.com
+        - dune@random.example.com
       Domains:
-        - random.mail.onmicrosoft.com
+        - random.mail.example.com
