@@ -581,7 +581,7 @@ A DLP solution SHALL be used. The selected DLP solution SHOULD offer services co
 - _Last modified:_ June 2023
 
 #### MS.EXO.8.2v1
-The DLP solution SHALL protect PII and sensitive information, as defined by the agency. At a minimum, sharing credit card numbers, Taxpayer Identification Numbers (TIN), and Social Security Numbers (SSN) via email SHALL be restricted.
+The DLP solution SHALL protect PII and sensitive information, as defined by the agency. At a minimum, sharing credit card numbers, Taxpayer Identification Numbers (TIN), and Social Security numbers (SSN) via email SHALL be restricted.
 
 <!--Policy: MS.EXO.8.2v1; Criticality: SHALL -->
 - _Rationale:_ Users may inadvertently share sensitive information with others who should not have access to it. Data loss prevention policies provide a way for agencies to detect and prevent unauthorized disclosures.
