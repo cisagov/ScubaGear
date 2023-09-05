@@ -54,6 +54,11 @@ GroupsInDomain(SensitiveDomain, SensitiveGroups) := true if {
     false
 }
 
+# Have to include case because function is returning undefined instead of false, still under investigation as to why
+GroupsInDomain(SensitiveDomain, SensitiveGroups) := false if {
+    true
+}
+
 default UsersInDomain(_, _) := false
 UsersInDomain(SensitiveDomain, SensitiveUsers) := true if {
     UsersInDomain := {
@@ -117,6 +122,7 @@ SensitiveAccounts(Policies, PolicyID) := true if {
 SensitiveAccounts(Policies, PolicyID) := true if {
     count([ Policy | Policy = Policies[_];
         Policy.Identity == "Strict Preset Security Policy";
+        Policy.SentTo != null;
         Policy.SentToMemberOf == null;
         Policy.ExceptIfSentToMemberOf == null ]) == 1
 
@@ -237,6 +243,26 @@ SensitiveAccounts(Policies, PolicyID) := true if {
         Policy.ExceptIfSentTo == null;
         Policy.SentToMemberOf == null;
         Policy.ExceptIfSentToMemberOf == null ]) == 1
+
+    AllSensitiveGroups := SensitiveGroups(Policies, PolicyID)
+    count(AllSensitiveGroups.ConfigGroups) > 0
+
+    AllSensitiveDomains := SensitiveDomains(Policies, PolicyID)
+    GroupsInDomain(AllSensitiveDomains.IncludedDomains, AllSensitiveGroups.IncludedGroups) == true
+    count(AllSensitiveDomains.ConfigDomains & AllSensitiveDomains.ExcludedDomains) == 0
+    count(AllSensitiveDomains.ConfigDomains - AllSensitiveDomains.IncludedDomains) == 0
+}
+
+SensitiveAccounts(Policies, PolicyID) := true if {
+    count([ Policy | Policy = Policies[_];
+        Policy.Identity == "Strict Preset Security Policy";
+        Policy.SentTo == null;
+        Policy.ExceptIfSentTo == null;
+        Policy.SentToMemberOf == null;
+        Policy.ExceptIfSentToMemberOf == null ]) == 1
+
+    AllSensitiveGroups := SensitiveGroups(Policies, PolicyID)
+    count(AllSensitiveGroups.ConfigGroups) == 0
 
     AllSensitiveDomains := SensitiveDomains(Policies, PolicyID)
     count(AllSensitiveDomains.ConfigDomains & AllSensitiveDomains.ExcludedDomains) == 0

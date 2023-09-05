@@ -1601,6 +1601,1002 @@ test_SensitiveEOP_Correct_V26 if {
     RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "Requirement met"
 }
+
+test_SensitiveEOP_Incorrect_V1 if {
+    PolicyId := "MS.DEFENDER.1.4v1"
+
+    Output := tests with input as {
+        "protection_policy_rules" : [
+            {
+                "Identity" : "Standard Preset Security Policy",
+                "SentTo": null,
+                "SentToMemberOf": null,
+                "RecipientDomainIs": null,
+                "ExceptIfSentTo": null,
+                "ExceptIfSentToMemberOf": null,
+                "ExceptIfRecipientDomainIs": null,
+            }
+        ],
+        "scuba_config" : {
+            "Defender" : {
+                "MS.DEFENDER.1.4v1" : {
+                    "SensitiveAccounts" : {
+                        "Users" : [],
+                        "Groups" : [],
+                        "Domains" : []
+                    }
+                }
+            }
+        },
+        "defender_license": true
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "Requirement not met"
+}
+
+test_SensitiveEOP_Incorrect_V2 if {
+    PolicyId := "MS.DEFENDER.1.4v1"
+
+    Output := tests with input as {
+        "protection_policy_rules" : [ ],
+        "scuba_config" : {
+            "Defender" : {
+                "MS.DEFENDER.1.4v1" : {
+                    "SensitiveAccounts" : {
+                        "Users" : [],
+                        "Groups" : [],
+                        "Domains" : []
+                    }
+                }
+            }
+        },
+        "defender_license": true
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "Requirement not met"
+}
+
+test_SensitiveEOP_Incorrect_V3 if {
+    PolicyId := "MS.DEFENDER.1.4v1"
+
+    Output := tests with input as {
+        "protection_policy_rules" : [
+            {
+                "Identity" : "Strict Preset Security Policy",
+                "SentTo": [
+                    "johndoe12@random.example.com"
+                ],
+                "SentToMemberOf": null,
+                "RecipientDomainIs": null,
+                "ExceptIfSentTo": null,
+                "ExceptIfSentToMemberOf": null,
+                "ExceptIfRecipientDomainIs": null,
+            }
+        ],
+        "scuba_config" : {
+            "Defender" : {
+                "MS.DEFENDER.1.4v1" : {
+                    "SensitiveAccounts" : {
+                        "Users" : [
+                            "johndoe@random.example.com"
+                        ],
+                        "Groups" : [],
+                        "Domains" : []
+                    }
+                }
+            }
+        },
+        "defender_license": true
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "Requirement not met"
+}
+
+test_SensitiveEOP_Incorrect_V4 if {
+    PolicyId := "MS.DEFENDER.1.4v1"
+
+    Output := tests with input as {
+        "protection_policy_rules" : [
+            {
+                "Identity" : "Strict Preset Security Policy",
+                "SentTo": [
+                    "johndoe12@random.example.com",
+                    "johndoe13@random.example.com"
+                ],
+                "SentToMemberOf": null,
+                "RecipientDomainIs": null,
+                "ExceptIfSentTo": null,
+                "ExceptIfSentToMemberOf": null,
+                "ExceptIfRecipientDomainIs": null,
+            }
+        ],
+        "scuba_config" : {
+            "Defender" : {
+                "MS.DEFENDER.1.4v1" : {
+                    "SensitiveAccounts" : {
+                        "Users" : [
+                            "johndoe@random.example.com"
+                        ],
+                        "Groups" : [],
+                        "Domains" : []
+                    }
+                }
+            }
+        },
+        "defender_license": true
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "Requirement not met"
+}
+
+test_SensitiveEOP_Incorrect_V5 if {
+    PolicyId := "MS.DEFENDER.1.4v1"
+
+    Output := tests with input as {
+        "protection_policy_rules" : [
+            {
+                "Identity" : "Strict Preset Security Policy",
+                "SentTo": [
+                    "johndoe12@random.example.com"
+                ],
+                "SentToMemberOf": null,
+                "RecipientDomainIs": null,
+                "ExceptIfSentTo": null,
+                "ExceptIfSentToMemberOf": null,
+                "ExceptIfRecipientDomainIs": null,
+            }
+        ],
+        "scuba_config" : {
+            "Defender" : {
+                "MS.DEFENDER.1.4v1" : {
+                    "SensitiveAccounts" : {
+                        "Users" : [
+                            "johndoe@random.example.com",
+                            "janedoe@random.example.com"
+                        ],
+                        "Groups" : [],
+                        "Domains" : []
+                    }
+                }
+            }
+        },
+        "defender_license": true
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "Requirement not met"
+}
+
+test_SensitiveEOP_Incorrect_V6 if {
+    PolicyId := "MS.DEFENDER.1.4v1"
+
+    Output := tests with input as {
+        "protection_policy_rules" : [
+            {
+                "Identity" : "Strict Preset Security Policy",
+                "SentTo": [
+                    "johndoe@random.example.com"
+                ],
+                "SentToMemberOf": [
+                    "Dune12"
+                ],
+                "RecipientDomainIs": null,
+                "ExceptIfSentTo": null,
+                "ExceptIfSentToMemberOf": null,
+                "ExceptIfRecipientDomainIs": null,
+            }
+        ],
+        "scuba_config" : {
+            "Defender" : {
+                "MS.DEFENDER.1.4v1" : {
+                    "SensitiveAccounts" : {
+                        "Users" : [
+                            "johndoe@random.example.com"
+                        ],
+                        "Groups" : [],
+                        "Domains" : []
+                    }
+                }
+            }
+        },
+        "defender_license": true
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "Requirement not met"
+}
+
+test_SensitiveEOP_Incorrect_V7 if {
+    PolicyId := "MS.DEFENDER.1.4v1"
+
+    Output := tests with input as {
+        "protection_policy_rules" : [
+            {
+                "Identity" : "Strict Preset Security Policy",
+                "SentTo": [
+                    "johndoe@random.example.com",
+                    "janedoe@random.example.com"
+                ],
+                "SentToMemberOf": [
+                    "Dune12"
+                ],
+                "RecipientDomainIs": null,
+                "ExceptIfSentTo": null,
+                "ExceptIfSentToMemberOf": null,
+                "ExceptIfRecipientDomainIs": null,
+            }
+        ],
+        "scuba_config" : {
+            "Defender" : {
+                "MS.DEFENDER.1.4v1" : {
+                    "SensitiveAccounts" : {
+                        "Users" : [
+                            "johndoe@random.example.com",
+                            "janedoe@random.example.com"
+                        ],
+                        "Groups" : [],
+                        "Domains" : []
+                    }
+                }
+            }
+        },
+        "defender_license": true
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "Requirement not met"
+}
+test_SensitiveEOP_Incorrect_V8 if {
+    PolicyId := "MS.DEFENDER.1.4v1"
+
+    Output := tests with input as {
+        "protection_policy_rules" : [
+            {
+                "Identity" : "Strict Preset Security Policy",
+                "SentTo": [
+                    "johndoe@random.example.com"
+                ],
+                "SentToMemberOf": null,
+                "RecipientDomainIs": [
+                    "random.mail.example.com"
+                ],
+                "ExceptIfSentTo": null,
+                "ExceptIfSentToMemberOf": null,
+                "ExceptIfRecipientDomainIs": null,
+            }
+        ],
+        "scuba_config" : {
+            "Defender" : {
+                "MS.DEFENDER.1.4v1" : {
+                    "SensitiveAccounts" : {
+                        "Users" : [
+                            "johndoe@random.example.com"
+                        ],
+                        "Groups" : [],
+                        "Domains" : []
+                    }
+                }
+            }
+        },
+        "defender_license": true
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "Requirement not met"
+}
+
+test_SensitiveEOP_Incorrect_V9 if {
+    PolicyId := "MS.DEFENDER.1.4v1"
+
+    Output := tests with input as {
+        "protection_policy_rules" : [
+            {
+                "Identity" : "Strict Preset Security Policy",
+                "SentTo": [
+                    "johndoe@random.example.com",
+                    "janedoe@random.example.com"
+                ],
+                "SentToMemberOf": null,
+                "RecipientDomainIs": [
+                    "random.mail.example.com"
+                ],
+                "ExceptIfSentTo": null,
+                "ExceptIfSentToMemberOf": null,
+                "ExceptIfRecipientDomainIs": null,
+            }
+        ],
+        "scuba_config" : {
+            "Defender" : {
+                "MS.DEFENDER.1.4v1" : {
+                    "SensitiveAccounts" : {
+                        "Users" : [
+                            "johndoe@random.example.com",
+                            "janedoe@random.example.com"
+                        ],
+                        "Groups" : [],
+                        "Domains" : []
+                    }
+                }
+            }
+        },
+        "defender_license": true
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "Requirement not met"
+}
+
+test_SensitiveEOP_Incorrect_V10 if {
+    PolicyId := "MS.DEFENDER.1.4v1"
+
+    Output := tests with input as {
+        "protection_policy_rules" : [
+            {
+                "Identity" : "Strict Preset Security Policy",
+                "SentTo": [
+                    "johndoe@random.example.com"
+                ],
+                "SentToMemberOf": [
+                    "Dune12"
+                ],
+                "RecipientDomainIs": [
+                    "random.mail.example.com"
+                ],
+                "ExceptIfSentTo": null,
+                "ExceptIfSentToMemberOf": null,
+                "ExceptIfRecipientDomainIs": null,
+            }
+        ],
+        "scuba_config" : {
+            "Defender" : {
+                "MS.DEFENDER.1.4v1" : {
+                    "SensitiveAccounts" : {
+                        "Users" : [
+                            "johndoe@random.example.com"
+                        ],
+                        "Groups" : [],
+                        "Domains" : []
+                    }
+                }
+            }
+        },
+        "defender_license": true
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "Requirement not met"
+}
+
+test_SensitiveEOP_Incorrect_V11 if {
+    PolicyId := "MS.DEFENDER.1.4v1"
+
+    Output := tests with input as {
+        "protection_policy_rules" : [
+            {
+                "Identity" : "Strict Preset Security Policy",
+                "SentTo": [
+                    "johndoe@random.example.com",
+                    "janedoe@random.example.com"
+                ],
+                "SentToMemberOf": [
+                    "Dune12"
+                ],
+                "RecipientDomainIs": [
+                    "random.mail.example.com"
+                ],
+                "ExceptIfSentTo": null,
+                "ExceptIfSentToMemberOf": null,
+                "ExceptIfRecipientDomainIs": null,
+            }
+        ],
+        "scuba_config" : {
+            "Defender" : {
+                "MS.DEFENDER.1.4v1" : {
+                    "SensitiveAccounts" : {
+                        "Users" : [
+                            "johndoe@random.example.com",
+                            "janedoe@random.example.com"
+                        ],
+                        "Groups" : [],
+                        "Domains" : []
+                    }
+                }
+            }
+        },
+        "defender_license": true
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "Requirement not met"
+}
+
+test_SensitiveEOP_Incorrect_V12 if {
+    PolicyId := "MS.DEFENDER.1.4v1"
+
+    Output := tests with input as {
+        "protection_policy_rules" : [
+            {
+                "Identity" : "Strict Preset Security Policy",
+                "SentTo": null,
+                "SentToMemberOf": [
+                    "Dune"
+                ],
+                "RecipientDomainIs": null,
+                "ExceptIfSentTo": [
+                    "johndoe@random.example.com"
+                ],
+                "ExceptIfSentToMemberOf": null,
+                "ExceptIfRecipientDomainIs": null,
+            }
+        ],
+        "scuba_config" : {
+            "Defender" : {
+                "MS.DEFENDER.1.4v1" : {
+                    "SensitiveAccounts" : {
+                        "Users" : [
+                            "johndoe@random.example.com"
+                        ],
+                        "Groups" : [],
+                        "Domains" : []
+                    }
+                }
+            }
+        },
+        "defender_license": true
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "Requirement not met"
+}
+
+test_SensitiveEOP_Incorrect_V13 if {
+    PolicyId := "MS.DEFENDER.1.4v1"
+
+    Output := tests with input as {
+        "protection_policy_rules" : [
+            {
+                "Identity" : "Strict Preset Security Policy",
+                "SentTo": null,
+                "SentToMemberOf": [
+                    "Dune"
+                ],
+                "RecipientDomainIs": null,
+                "ExceptIfSentTo": [
+                    "johndoe@random.example.com",
+                    "janedoe@random.example.com"
+                ],
+                "ExceptIfSentToMemberOf": null,
+                "ExceptIfRecipientDomainIs": null,
+            }
+        ],
+        "scuba_config" : {
+            "Defender" : {
+                "MS.DEFENDER.1.4v1" : {
+                    "SensitiveAccounts" : {
+                        "Users" : [
+                            "johndoe@random.example.com",
+                            "janedoe@random.example.com"
+                        ],
+                        "Groups" : [],
+                        "Domains" : []
+                    }
+                }
+            }
+        },
+        "defender_license": true
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "Requirement not met"
+}
+
+test_SensitiveEOP_Incorrect_V14 if {
+    PolicyId := "MS.DEFENDER.1.4v1"
+
+    Output := tests with input as {
+        "protection_policy_rules" : [
+            {
+                "Identity" : "Strict Preset Security Policy",
+                "SentTo": null,
+                "SentToMemberOf": null,
+                "RecipientDomainIs": [
+                    "random.example.com"
+                ],
+                "ExceptIfSentTo": [
+                    "johndoe@random.example.com"
+                ],
+                "ExceptIfSentToMemberOf": null,
+                "ExceptIfRecipientDomainIs": null,
+            }
+        ],
+        "scuba_config" : {
+            "Defender" : {
+                "MS.DEFENDER.1.4v1" : {
+                    "SensitiveAccounts" : {
+                        "Users" : [
+                            "johndoe@random.example.com"
+                        ],
+                        "Groups" : [],
+                        "Domains" : []
+                    }
+                }
+            }
+        },
+        "defender_license": true
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "Requirement not met"
+}
+
+test_SensitiveEOP_Incorrect_V15 if {
+    PolicyId := "MS.DEFENDER.1.4v1"
+
+    Output := tests with input as {
+        "protection_policy_rules" : [
+            {
+                "Identity" : "Strict Preset Security Policy",
+                "SentTo": null,
+                "SentToMemberOf": null,
+                "RecipientDomainIs": [
+                    "random.example.com"
+                ],
+                "ExceptIfSentTo": [
+                    "johndoe@random.example.com",
+                    "janedoe@random.example.com"
+                ],
+                "ExceptIfSentToMemberOf": null,
+                "ExceptIfRecipientDomainIs": null,
+            }
+        ],
+        "scuba_config" : {
+            "Defender" : {
+                "MS.DEFENDER.1.4v1" : {
+                    "SensitiveAccounts" : {
+                        "Users" : [
+                            "johndoe@random.example.com",
+                            "janedoe@random.example.com"
+                        ],
+                        "Groups" : [],
+                        "Domains" : []
+                    }
+                }
+            }
+        },
+        "defender_license": true
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "Requirement not met"
+}
+
+test_SensitiveEOP_Incorrect_V16 if {
+    PolicyId := "MS.DEFENDER.1.4v1"
+
+    Output := tests with input as {
+        "protection_policy_rules" : [
+            {
+                "Identity" : "Strict Preset Security Policy",
+                "SentTo": null,
+                "SentToMemberOf": [
+                    "Dune"
+                ],
+                "RecipientDomainIs": [
+                    "random.example.com"
+                ],
+                "ExceptIfSentTo": [
+                    "johndoe@random.example.com"
+                ],
+                "ExceptIfSentToMemberOf": null,
+                "ExceptIfRecipientDomainIs": null,
+            }
+        ],
+        "scuba_config" : {
+            "Defender" : {
+                "MS.DEFENDER.1.4v1" : {
+                    "SensitiveAccounts" : {
+                        "Users" : [
+                            "johndoe@random.example.com"
+                        ],
+                        "Groups" : [],
+                        "Domains" : []
+                    }
+                }
+            }
+        },
+        "defender_license": true
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "Requirement not met"
+}
+
+test_SensitiveEOP_Incorrect_V17 if {
+    PolicyId := "MS.DEFENDER.1.4v1"
+
+    Output := tests with input as {
+        "protection_policy_rules" : [
+            {
+                "Identity" : "Strict Preset Security Policy",
+                "SentTo": null,
+                "SentToMemberOf": [
+                    "Dune"
+                ],
+                "RecipientDomainIs": [
+                    "random.example.com"
+                ],
+                "ExceptIfSentTo": [
+                    "johndoe@random.example.com",
+                    "janedoe@random.example.com"
+                ],
+                "ExceptIfSentToMemberOf": null,
+                "ExceptIfRecipientDomainIs": null,
+            }
+        ],
+        "scuba_config" : {
+            "Defender" : {
+                "MS.DEFENDER.1.4v1" : {
+                    "SensitiveAccounts" : {
+                        "Users" : [
+                            "johndoe@random.example.com",
+                            "janedoe@random.example.com"
+                        ],
+                        "Groups" : [],
+                        "Domains" : []
+                    }
+                }
+            }
+        },
+        "defender_license": true
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "Requirement not met"
+}
+
+test_SensitiveEOP_Incorrect_V18 if {
+    PolicyId := "MS.DEFENDER.1.4v1"
+
+    Output := tests with input as {
+        "protection_policy_rules" : [
+            {
+                "Identity" : "Strict Preset Security Policy",
+                "SentTo": null,
+                "SentToMemberOf": null,
+                "RecipientDomainIs": null,
+                "ExceptIfSentTo": null,
+                "ExceptIfSentToMemberOf": [
+                    "Dune"
+                ],
+                "ExceptIfRecipientDomainIs": null,
+            }
+        ],
+        "scuba_config" : {
+            "Defender" : {
+                "MS.DEFENDER.1.4v1" : {
+                    "SensitiveAccounts" : {
+                        "Users" : [],
+                        "Groups" : [
+                            "Dune"
+                        ],
+                        "Domains" : []
+                    }
+                }
+            }
+        },
+        "defender_license": true
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "Requirement not met"
+}
+
+test_SensitiveEOP_Incorrect_V19 if {
+    PolicyId := "MS.DEFENDER.1.4v1"
+
+    Output := tests with input as {
+        "protection_policy_rules" : [
+            {
+                "Identity" : "Strict Preset Security Policy",
+                "SentTo": null,
+                "SentToMemberOf": [
+                    "Dune"
+                ],
+                "RecipientDomainIs": null,
+                "ExceptIfSentTo": null,
+                "ExceptIfSentToMemberOf": null,
+                "ExceptIfRecipientDomainIs": null,
+            }
+        ],
+        "scuba_config" : {
+            "Defender" : {
+                "MS.DEFENDER.1.4v1" : {
+                    "SensitiveAccounts" : {
+                        "Users" : [],
+                        "Groups" : [
+                            "Dune",
+                            "Dune12"
+                        ],
+                        "Domains" : []
+                    }
+                }
+            }
+        },
+        "defender_license": true
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "Requirement not met"
+}
+
+test_SensitiveEOP_Incorrect_V20 if {
+    PolicyId := "MS.DEFENDER.1.4v1"
+
+    Output := tests with input as {
+        "protection_policy_rules" : [
+            {
+                "Identity" : "Strict Preset Security Policy",
+                "SentTo": null,
+                "SentToMemberOf": [
+                    "Dune"
+                ],
+                "RecipientDomainIs": null,
+                "ExceptIfSentTo": null,
+                "ExceptIfSentToMemberOf": [
+                    "Dune12"
+                ],
+                "ExceptIfRecipientDomainIs": null,
+            }
+        ],
+        "scuba_config" : {
+            "Defender" : {
+                "MS.DEFENDER.1.4v1" : {
+                    "SensitiveAccounts" : {
+                        "Users" : [],
+                        "Groups" : [
+                            "Dune",
+                            "Dune12"
+                        ],
+                        "Domains" : []
+                    }
+                }
+            }
+        },
+        "defender_license": true
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "Requirement not met"
+}
+
+test_SensitiveEOP_Incorrect_V21 if {
+    PolicyId := "MS.DEFENDER.1.4v1"
+
+    Output := tests with input as {
+        "protection_policy_rules" : [
+            {
+                "Identity" : "Strict Preset Security Policy",
+                "SentTo": null,
+                "SentToMemberOf": null,
+                "RecipientDomainIs": [
+                    "random.mail.example.com"
+                ],
+                "ExceptIfSentTo": null,
+                "ExceptIfSentToMemberOf": null,
+                "ExceptIfRecipientDomainIs": null,
+            }
+        ],
+        "scuba_config" : {
+            "Defender" : {
+                "MS.DEFENDER.1.4v1" : {
+                    "SensitiveAccounts" : {
+                        "Users" : [],
+                        "Groups" : [
+                            "Dune"
+                        ],
+                        "Domains" : []
+                    }
+                }
+            }
+        },
+        "defender_license": true
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "Requirement not met"
+}
+
+test_SensitiveEOP_Incorrect_V22 if {
+    PolicyId := "MS.DEFENDER.1.4v1"
+
+    Output := tests with input as {
+        "protection_policy_rules" : [
+            {
+                "Identity" : "Strict Preset Security Policy",
+                "SentTo": null,
+                "SentToMemberOf": null,
+                "RecipientDomainIs": [
+                    "random.mail.example.com"
+                ],
+                "ExceptIfSentTo": null,
+                "ExceptIfSentToMemberOf": [
+                    "Dune"
+                ],
+                "ExceptIfRecipientDomainIs": null,
+            }
+        ],
+        "scuba_config" : {
+            "Defender" : {
+                "MS.DEFENDER.1.4v1" : {
+                    "SensitiveAccounts" : {
+                        "Users" : [],
+                        "Groups" : [
+                            "Dune"
+                        ],
+                        "Domains" : []
+                    }
+                }
+            }
+        },
+        "defender_license": true
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "Requirement not met"
+}
+
+test_SensitiveEOP_Incorrect_V23 if {
+    PolicyId := "MS.DEFENDER.1.4v1"
+
+    Output := tests with input as {
+        "protection_policy_rules" : [
+            {
+                "Identity" : "Strict Preset Security Policy",
+                "SentTo": null,
+                "SentToMemberOf": null,
+                "RecipientDomainIs": null,
+                "ExceptIfSentTo": null,
+                "ExceptIfSentToMemberOf": null,
+                "ExceptIfRecipientDomainIs": [
+                    "random.example.com"
+                ],
+            }
+        ],
+        "scuba_config" : {
+            "Defender" : {
+                "MS.DEFENDER.1.4v1" : {
+                    "SensitiveAccounts" : {
+                        "Users" : [],
+                        "Groups" : [],
+                        "Domains" : [
+                            "random.example.com"
+                        ]
+                    }
+                }
+            }
+        },
+        "defender_license": true
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "Requirement not met"
+}
+
+test_SensitiveEOP_Incorrect_V24 if {
+    PolicyId := "MS.DEFENDER.1.4v1"
+
+    Output := tests with input as {
+        "protection_policy_rules" : [
+            {
+                "Identity" : "Strict Preset Security Policy",
+                "SentTo": null,
+                "SentToMemberOf": null,
+                "RecipientDomainIs": [
+                    "random.example.com"
+                ],
+                "ExceptIfSentTo": null,
+                "ExceptIfSentToMemberOf": null,
+                "ExceptIfRecipientDomainIs": [
+                    "random.mail.example.com"
+                ],
+            }
+        ],
+        "scuba_config" : {
+            "Defender" : {
+                "MS.DEFENDER.1.4v1" : {
+                    "SensitiveAccounts" : {
+                        "Users" : [],
+                        "Groups" : [],
+                        "Domains" : [
+                            "random.example.com",
+                            "random.mail.example.com"
+                        ]
+                    }
+                }
+            }
+        },
+        "defender_license": true
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "Requirement not met"
+}
 #--
 
 #
