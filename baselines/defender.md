@@ -359,8 +359,8 @@ their environment and needs.
 ### Policies
 #### MS.DEFENDER.4.1v1
 A custom policy SHALL be configured to protect PII and sensitive information,
-as defined by the agency. At a minimum, credit card numbers, taxpayer
-identification numbers (TIN), and social security numbers (SSN) SHALL be
+as defined by the agency. At a minimum, credit card numbers, Taxpayer
+Identification Numbers (TIN), and Social Security numbers (SSN) SHALL be
 blocked.
 
 <!--Policy: MS.DEFENDER.4.1v1; Criticality: SHALL -->
