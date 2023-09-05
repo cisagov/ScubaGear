@@ -2,6 +2,7 @@ package defender
 import future.keywords
 import data.report.utils.NotCheckedDetails
 import data.report.utils.ReportDetailsBoolean
+import data.eop.utils.SensitiveAccounts
 
 ## Report details menu
 #
@@ -59,142 +60,6 @@ ApplyLicenseWarning(Message) := concat("", [ReportDetailsBoolean(false), License
     # replace the message with the warning
     input.defender_license == false
     LicenseWarning := " **NOTE: Either you do not have sufficient permissions or your tenant does not have a license for Microsoft Defender for Office 365 Plan 1, which is required for this feature.**"
-}
-
-##########################################
-# User/Group Exclusion support functions #
-##########################################
-
-SensitiveUsers(Policies, PolicyID) := {
-    "ConfigUsers" : ConfigUsers,
-    "ExcludedUsers" : ExcludedUsers,
-    "IncludedUsers" : IncludedUsers
-} {
-    Policy := [ Policy | Policy := Policies[_]; Policy.Identity == "Strict Preset Security Policy" ]
-    ConfigUsers := { x | some x in input.scuba_config.Defender[PolicyID].SensitiveAccounts.Users; x != null }
-    ExcludedUsers := { x | x := Policy[0].ExceptIfSentTo[_] }
-    IncludedUsers := { x | x := Policy[0].SentTo[_] }
-}
-
-SensitiveDomains(Policies, PolicyID) := {
-    "ConfigDomains" : ConfigDomains,
-    "ExcludedDomains" : ExcludedDomains,
-    "IncludedDomains" : IncludedDomains
-} {
-    Policy := [ Policy | Policy := Policies[_]; Policy.Identity == "Strict Preset Security Policy" ]
-    ConfigDomains := { x | some x in input.scuba_config.Defender[PolicyID].SensitiveAccounts.Domains; x != null }
-    ExcludedDomains := { x | x := Policy[0].ExceptIfRecipientDomainIs[_] }
-    IncludedDomains := { x | x := Policy[0].RecipientDomainIs[_] }
-}
-
-FindRegexMatches(ParsingArray, MatchingArray, RegexString) := {
-    "Matches" : Matches, "MatchingArray" : NewArray
-} {
-    Matches := {
-        Item | Item := ParsingArray[_];
-        splitString := regex.split(RegexString, Item);
-        splitString[1] in MatchingArray
-    }
-    MatchingItemArray := {
-        splitString[1] | Item := Matches[_];
-        splitString := regex.split(RegexString, Item)
-    }
-    NewArray := MatchingArray - MatchingItemArray
-}
-
-SensitiveUserAndDomainCrossCheck(UsersNotProtected, ConfigDomains) := {
-    "Result" : true, "ConfigDomains" : ConfigDomains
-} if {
-    count(UsersNotProtected) == 0
-}
-
-SensitiveUserAndDomainCrossCheck(UsersNotProtected, ConfigDomains) := {
-    "Result" : true, "ConfigDomains" : DomainProtectedUsers.MatchingArray
-} if {
-    count(UsersNotProtected) > 0
-    DomainProtectedUsers := FindRegexMatches(UsersNotProtected, ConfigDomains, ".+@")
-    count(UsersNotProtected - DomainProtectedUsers.Matches) == 0
-}
-
-SensitiveUserAndDomainCrossCheck(UsersNotProtected, ConfigDomains) := {
-    "Result" : false, "ConfigDomains" : ConfigDomains
-} if {
-    count(UsersNotProtected) > 0
-    DomainProtectedUsers := FindRegexMatches(UsersNotProtected, ConfigDomains, ".+@")
-    count(UsersNotProtected - DomainProtectedUsers.Matches) > 0
-}
-
-default UserSensitiveIDs(_, _) := false
-UserSensitiveIDs(Policies, PolicyID) := true if {
-    count([Policy | Policy = Policies[_];
-        Policy.Identity == "Strict Preset Security Policy";
-        Policy.SentTo == null;
-        Policy.ExceptIfSentTo == null]) > 0
-    DomainSensitiveIDs(Policies, PolicyID) == true
-}
-
-UserSensitiveIDs(Policies, PolicyID) := true if {
-    AllSensitiveUsers := SensitiveUsers(Policies, PolicyID)
-
-    count(AllSensitiveUsers.ConfigUsers & AllSensitiveUsers.ExcludedUsers) == 0
-    count(AllSensitiveUsers.ConfigUsers - AllSensitiveUsers.IncludedUsers) == 0
-    DomainSensitiveIDs(Policies, PolicyID) == true
-}
-
-UserSensitiveIDs(Policies, PolicyID) := true if {
-    AllSensitiveUsers := SensitiveUsers(Policies, PolicyID)
-    SensitiveUsersUnaccountedFor :=  AllSensitiveUsers.IncludedUsers - AllSensitiveUsers.ConfigUsers
-    count(AllSensitiveUsers.ConfigUsers & AllSensitiveUsers.ExcludedUsers) == 0
-    count(SensitiveUsersUnaccountedFor) > 0
-    DomainSensitiveIDs(Policies, PolicyID) == false
-
-    AllSensitiveDomains := SensitiveDomains(Policies, PolicyID)
-    count(AllSensitiveDomains.ConfigDomains & AllSensitiveDomains.ExcludedDomains) == 0
-    Results := SensitiveUserAndDomainCrossCheck(SensitiveUsersUnaccountedFor, AllSensitiveDomains.ConfigDomains)
-    Results.Result == true
-    count(Results.ConfigDomains - AllSensitiveDomains.IncludedDomains) == 0
-}
-
-default DomainSensitiveIDs(_, _) := false
-DomainSensitiveIDs(Policies, PolicyID) := true if {
-    count([Policy | Policy = Policies[_];
-        Policy.Identity == "Strict Preset Security Policy";
-        Policy.RecipientDomainIs == null;
-        Policy.ExceptIfRecipientDomainIs == null]) > 0
-}
-
-DomainSensitiveIDs(Policies, PolicyID) := true if {
-    AllSensitiveDomains := SensitiveDomains(Policies, PolicyID)
-
-    count(AllSensitiveDomains.IncludedDomains) > 0
-    count(AllSensitiveDomains.ConfigDomains & AllSensitiveDomains.ExcludedDomains) == 0
-    count(AllSensitiveDomains.ConfigDomains - AllSensitiveDomains.IncludedDomains) == 0
-}
-
-DomainSensitiveIDs(Policies, PolicyID) := false if {
-    AllSensitiveDomains := SensitiveDomains(Policies, PolicyID)
-
-    count(AllSensitiveDomains.IncludedDomains) > 0
-    count(AllSensitiveDomains.ConfigDomains & AllSensitiveDomains.ExcludedDomains) == 0
-    count(AllSensitiveDomains.ConfigDomains - AllSensitiveDomains.IncludedDomains) > 0
-}
-
-default GroupSensitiveIDs(_, _) := false
-GroupSensitiveIDs(Policies, PolicyID) := true if {
-    count([Policy | Policy = Policies[_];
-        Policy.Identity == "Strict Preset Security Policy";
-        Policy.SentToMemberOf == null;
-        Policy.ExceptIfSentToMemberOf == null]) > 0
-}
-
-GroupSensitiveIDs(Policies, PolicyID) := true if {
-    Policy := [ Policy | Policy := Policies[_]; Policy.Identity == "Strict Preset Security Policy" ]
-    ConfigGroups := { x | some x in input.scuba_config.Defender[PolicyID].SensitiveAccounts.Groups; x != null }
-    ExcludedGroups := { x | x := Policy[0].ExceptIfSentToMemberOf[_] }
-    IncludedGroups := { x | x := Policy[0].SentToMemberOf[_] }
-
-    count(ConfigGroups & ExcludedGroups) == 0
-    count(ConfigGroups - IncludedGroups) == 0
 }
 
 
@@ -361,15 +226,14 @@ tests[{
 ProtectionPolicyForSensitiveIDs[Policies] {
     Policies := input.protection_policy_rules
 
-    UserSensitiveIDs(Policies, "MS.DEFENDER.1.4v1") == true
-    GroupSensitiveIDs(Policies, "MS.DEFENDER.1.4v1") == true
+    SensitiveAccounts(Policies, "MS.DEFENDER.1.4v1") == true
 }
 
 tests[{
     "PolicyId" : "MS.DEFENDER.1.4v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-EOPProtectionPolicyRule"],
-	"ActualValue" : {"EOPProtectionPolicies": ProtectionPolicyForSensitiveIDs},
+	"ActualValue" : {"EOPProtectionPolicies": Status},
     "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
