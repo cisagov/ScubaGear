@@ -31,12 +31,12 @@ $ModuleList = @(
         MaximumVersion = [version] '1.99.99999'
     },
     @{
-        ModuleName = 'Microsoft.Graph.Authentication' # No beta module
+        ModuleName = 'Microsoft.Graph.Authentication'
         ModuleVersion = [version] '2.0.0'
         MaximumVersion = [version] '2.99.99999'
     },
     @{
-        ModuleName = 'Microsoft.Graph.Beta.DeviceManagement.Enrollment'
+        ModuleName = 'Microsoft.Graph.Beta.Users'
         ModuleVersion = [version] '2.0.0'
         MaximumVersion = [version] '2.99.99999'
     },
@@ -62,11 +62,6 @@ $ModuleList = @(
     },
     @{
         ModuleName = 'Microsoft.Graph.Beta.Security'
-        ModuleVersion = [version] '2.0.0'
-        MaximumVersion = [version] '2.99.99999'
-    },
-    @{
-        ModuleName = 'Microsoft.Graph.Beta.Users'
         ModuleVersion = [version] '2.0.0'
         MaximumVersion = [version] '2.99.99999'
     },
