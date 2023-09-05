@@ -1,0 +1,58 @@
+ProductName: sharepoint
+TestPlan:
+  - PolicyId: MS.SHAREPOINT.1.1v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.SHAREPOINT.1.1v1 ExternalUserAndGuestSharing (3)
+        Preconditions:
+          - Command: Set-PnPTenant
+            Splat:
+              SharingCapability: ExternalUserAndGuestSharing
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.SHAREPOINT.1.1v1 ExternalUserSharingOnly (1)
+        Preconditions:
+          - Command: Set-PnPTenant
+            Splat:
+              SharingCapability: ExternalUserSharingOnly
+        Postconditions: []
+        ExpectedResult: false        
+      - TestDescription: MS.SHAREPOINT.1.1v1 ExistingExternalUserSharingOnly (2)
+        Preconditions:
+          - Command: Set-PnPTenant
+            Splat:
+              SharingCapability: ExistingExternalUserSharingOnly
+        Postconditions: []
+        ExpectedResult: true        
+      - TestDescription: MS.SHAREPOINT.1.1v1 Disabled (0)
+        Preconditions:
+          - Command: Set-PnPTenant
+            Splat:
+              SharingCapability: Disabled
+        Postconditions: []
+        ExpectedResult: true
+  - PolicyId: MS.SHAREPOINT.1.2v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.SHAREPOINT.1.2v1 Not Checked (PnP)
+        Preconditions: []
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false
+  - PolicyId: MS.SHAREPOINT.1.3v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.SHAREPOINT.1.3v1 Unchecked (0)
+        Preconditions:
+          - Command: Set-PnPTenant
+            Splat:
+              SharingCapability: ExternalUserAndGuestSharing
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.SHAREPOINT.1.1v1 ExternalUserSharingOnly (1)
+        Preconditions:
+          - Command: Set-PnPTenant
+            Splat:
+              SharingCapability: ExternalUserSharingOnly
+        Postconditions: []
+        ExpectedResult: false  
