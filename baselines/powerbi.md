@@ -76,19 +76,7 @@ The Publish to Web feature SHOULD be disabled unless the agency mission requires
 
 ## 2. Power BI Guest Access
 
-A best practice is to disallow guest user access. Disallowing guest
-access also aligns with zero trust principles. The agency with
-potentially shareable Power BI resources and data in its tenant must
-evaluate its unique sharing requirements and whether an exception should
-be granted to allow external guests to access content in the agency’s
-tenant.
-
-Enabling this setting allows AAD Business-to-Business (AAD B2B) guest
-users to access Power BI. If this setting is disabled, guest users
-receive an error when trying to access Power BI. Disabling this setting
-for the entire agency also prevents users from inviting guests to the
-agency. Using the specific security groups option allows administrators
-to control which guest users can access Power BI.
+This section provides policies that help reduce guest user access risks related to Power BI data and resources. An agency with externally shareable Power BI resources and data must consider its unique risk tolerance when granting access to guest users.
 
 The types of users are defined as follows (**Note**: these terms vary in
 use across Microsoft documentation):
@@ -110,14 +98,13 @@ manage workspaces as Power BI workspace Admins, Microsoft recommends
 changing the **Guest user permissions are limited** setting in AAD to
 allow these users to use people pickers within the Power BI UX. Since
 Power BI integrates natively with AAD, the AAD Baseline should be
-consulted for additional guidance on managing guest users. Also, in PowerBI
-there will need to be a security group setup to limit access.
+consulted for additional guidance on managing guest users.
 
 ### Policies
 #### MS.POWERBI.2.1v1
 Guest user access to the Power BI tenant SHOULD be disabled unless the agency mission requires the capability.
 
-- _Rationale:_ Allowing a guest user to use a system is a risk, as even though a guest user can have a limited experience it is sometimes not possible to limit them enough to provide ample security while also allowing them to do their necessary tasks. Implementing this policy follows zero trust principles and limits unauthorized access.
+- _Rationale:_ By disabling Power BI external access, this helps keep guest users from accessing potentially risky data/APIs. If an agency needs to allow guest access, it can be limited to users in specific security groups to help limit risk.
 - _Last modified:_ June 2023
 
 ### Resources
@@ -156,37 +143,20 @@ Guest user access to the Power BI tenant SHOULD be disabled unless the agency mi
 
 ## 3. Power BI External Invitations
 
-This setting controls whether Power BI allows inviting external users to
+This section provides policies that help reduce guest user invitation risks related to Power BI data and resources.
+The settings in this section control whether Power BI allows inviting external users to
 the agency’s organization through Power BI’s sharing workflows and
 experiences. After an external user accepts the invite, they become an
 AAD B2B guest user in the organization. They will then appear in user
 pickers throughout the Power BI user experience.
 
-If this setting is disabled:
-
-- Existing guest users in the tenant organization continue to have
-  access to any items they already had access to and continue to be
-  listed in user picker experiences.
-
-- An external user who is not already a guest user in the agency cannot
-  be added to the agency through Power BI.
-
-For maintaining least privilege, a best practice is to disable this
-setting unless dictated by the mission need.
-
-**Note**: To invite external users to the tenant, a user also needs the
-AAD Guest Inviter role. The setting in this baseline statement only
-controls the ability to invite guest users through Power BI. See the
-*AAD Minimum Viable Secure Configuration Baseline* for more information
-on roles.
-
-
 ### Policies
 #### MS.POWERBI.3.1v1
 The Invite external users to your organization feature SHOULD be disabled unless agency mission requires the capability.
 
-- _Rationale:_ Disabling this feature in PowerBI keeps guest users from accessing potentially risky data/APIs. If external invites are required then, guest users should be invited by authorized users via the Azure Active Directory guest invite features. By only allowing an authorized groups of individuals to invite guest users to create accounts in the tenant, this helps an agency enforce a centrally managed guest user account approval process which reduces the risk of unauthorized accounts being created.
+- _Rationale:_ Disabling this feature keeps internal users from inviting guest users. Therefore guest users can be limited from accessing potentially risky data/APIs. If an agency needs to allow guest access, the invitation feature can be limited to users in specific security groups to help limit risk.
 - _Last modified:_ June 2023
+- _Note:_ If this feature is disabled, existing guest users in the tenant continue to have access to Power BI items they already had access to and continue to be listed in user picker experiences. After it is disabled, an external user who is not already a guest user cannot be added to the tenant through Power BI.
 
 ### Resources
 
