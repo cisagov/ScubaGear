@@ -1011,7 +1011,7 @@ To check the current mailbox auditing status for your organization via PowerShel
 
 To enable mailbox auditing by default for your organization via PowerShell:
 
-1.  Connect to the Exchange Online PowerShell
+1.  Connect to the Exchange Online PowerShell.
 
 2.  Run the following command:
 
