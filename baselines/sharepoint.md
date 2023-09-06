@@ -22,7 +22,7 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 ## 1. External Sharing
 
-This section helps reduce security risks related to the sharing of files with users external to the agency. This includes guest users, users who use a verification code, and users who access an Anyone link.
+This section helps reduce security risks related to sharing files with users external to the agency. This includes guest users, users who use a verification code, and users who access an Anyone link.
 
 
 ### Policies
@@ -30,7 +30,7 @@ This section helps reduce security risks related to the sharing of files with us
 External sharing for SharePoint SHALL be limited to Existing Guests or Only People in your Organization.
 
 <!--Policy: MS.SHAREPOINT.1.1v1; Criticality: SHALL -->
-- _Rationale:_ Sharing information outside the organization via Sharepoint increases the risk of unauthorized access. By limiting external sharing, administrators decrease the risk of unauthorized access to information.
+- _Rationale:_ Sharing information outside the organization via SharePoint increases the risk of unauthorized access. By limiting external sharing, administrators decrease the risk of access to information.
 - _Last modified:_ June 2023
 
 #### MS.SHAREPOINT.1.2v1
@@ -68,56 +68,62 @@ Guest access SHALL be limited to the email the invitation was sent to.
 
 ### Implementation
 
-All of the settings in this section are configured in the **SharePoint admin center**.
-
 #### MS.SHAREPOINT.1.1v1 instructions:
 
-1.  Select **Policies** \> **Sharing**.
+1. Sign in to the **SharePoint admin center**.
 
-2.  Adjust external sharing slider for SharePoint to **Existing Guests** or **Only people in your organization**.
+2.  Select **Policies** \> **Sharing**.
 
-3. Select **Save**.
+3.  Adjust external sharing slider for SharePoint to **Existing Guests** or **Only people in your organization**.
+
+4. Select **Save**.
 
 #### MS.SHAREPOINT.1.2v1 instructions:
 
 
-1.  Select **Policies** \> **Sharing**.
+1.  Sign in to the **SharePoint admin center**.
 
-2.  Adjust external sharing slider for OneDrive to **Existing Guests** or **Only people in your organization**.
+2.  Select **Policies** \> **Sharing**.
 
-3. Select **Save**.
+3.  Adjust external sharing slider for OneDrive to **Existing Guests** or **Only people in your organization**.
+
+4. Select **Save**.
 
 #### MS.SHAREPOINT.1.3v1 instructions:
 
 Note: If SharePoint external sharing is set to its most restrictive setting of "Only people in your organization", then no external sharing is allowed and no implementation changes are required for this policy item.
 
-1.  Select **Policies** \> **Sharing**.
+1.  Sign in to the **SharePoint admin center**.
 
-2.  Expand **More external sharing settings**.
+2.  Select **Policies** \> **Sharing**.
 
-3.  Select **Limit external sharing by domain**.
+3.  Expand **More external sharing settings**.
 
-4.  Select **Add domains**.
+4.  Select **Limit external sharing by domain**.
 
-5.  Add each approved external domain that users are allowed to share files with.
+5.  Select **Add domains**.
 
-6.  Select **Manage security groups**
+6.  Add each approved external domain users are allowed to share files with.
 
-7. Add each approved security group - members of these groups will be allowed to share files externally
+7.  Select **Manage security groups**
 
-8.  Select **Save**.
+8. Add each approved security group - members of these groups will be allowed to share files externally
+
+9.  Select **Save**.
 
 #### MS.SHAREPOINT.1.4v1 instructions:
 
 Note: If SharePoint external sharing is set to its most restrictive setting of "Only people in your organization", then no external sharing is allowed and no implementation changes are required for this policy item.
 
-1.  Select **Policies** \> **Sharing**.
+1.  Sign in to the **SharePoint admin center**.
 
-2.  Expand **More external sharing settings**.
+2.  Select **Policies** \> **Sharing**.
 
-3. Select **Guests must sign in using the same account to which sharing invitations are sent**.
+3.  Expand **More external sharing settings**.
 
-4. Select **Save**.
+4. Select **Guests must sign in using the same account to which sharing invitations are sent**.
+
+5. Select **Save**.
 
 ## 2. File and Folder Default Sharing Settings
 
@@ -150,29 +156,31 @@ File and folder default sharing permissions SHALL be set to View only.
 
 ### Implementation
 
-All of the settings in this section are configured in the **SharePoint admin center**.
-
 #### MS.SHAREPOINT.2.1v1 instructions:
 
-1.  Select **Policies** \> **Sharing**
+1.  Sign in to the **SharePoint admin center**.
 
-2.  Under **File and folder links**, set the default link type to **Specific people (only the people the user specifies)**
+2.  Select **Policies** \> **Sharing**
 
-3.  Select **Save**
+3.  Under **File and folder links**, set the default link type to **Specific people (only the people the user specifies)**
+
+4.  Select **Save**
 
 #### MS.SHAREPOINT.2.2v1 instructions:
 
-1. Select **Policies** \> **Sharing**.
+1.  Sign in to the **SharePoint admin center**.
 
-2. Under **File and folder links**, set the permission that's selected by default for sharing links to **View**.
+2. Select **Policies** \> **Sharing**.
 
-3. Select **Save**.
+3. Under **File and folder links**, set the permission that's selected by default for sharing links to **View**.
+
+4. Select **Save**.
 
 ## 3. Securing Anyone Links and Verification Code Users
 
-Sharing of files with external users via the usage of Anyone links or Verification codes is strongly discouraged because it provides access to data within a tenant with weak or no authentication. In the event that these features are being used, this section provides some access restrictions that could provide limited security risk mitigations. 
+Sharing files with external users via the usage of Anyone links or Verification codes is strongly discouraged because it provides access to data within a tenant with weak or no authentication. If these features are used, this section provides some access restrictions that could provide limited security risk mitigations. 
 
-**Note**: The settings in this section are only applicable if an agency is using anyone links or verification code sharing. See each policy below for details.
+**Note**: The settings in this section are only applicable if an agency is using Anyone links or verification code sharing. See each policy below for details.
 
 ### Policies
 #### MS.SHAREPOINT.3.1v1
@@ -210,62 +218,66 @@ Reauthentication days for people who use a verification code SHALL be set to 30 
 
 ### Implementation
 
-All of the settings in this section are configured in the **SharePoint admin center**.
-
 #### MS.SHAREPOINT.3.1v1 instructions:
 
-1.  Select **Policies** \> **Sharing**.
+1.  Sign in to the **SharePoint admin center**.
 
-2.  Scroll to the section **Choose expiration and permissions options for Anyone links**.
+2.  Select **Policies** \> **Sharing**.
 
-3.  Select the checkbox **These links must expire within this many days**.
+3.  Scroll to the section **Choose expiration and permissions options for Anyone links**.
 
-4.  Enter **30** days or less.
+4.  Select the checkbox **These links must expire within this many days**.
 
-5.  Select **Save**.
-
-#### MS.SHAREPOINT.3.2v1 instructions:
-
-1.  Select **Policies** \> **Sharing**.
-
-2.  Scroll to the section **Choose expiration and permissions options for Anyone links**.
-
-3.  Set the configuration items in the section **These links can give these permissions**.
-
-4.  Set the **Files** option to **View**.
-
-5.  Set the **Folders** option to **View**.
+5.  Enter **30** days or less.
 
 6.  Select **Save**.
 
+#### MS.SHAREPOINT.3.2v1 instructions:
+
+1.  Sign in to the **SharePoint admin center**.
+
+2.  Select **Policies** \> **Sharing**.
+
+3.  Scroll to the section **Choose expiration and permissions options for Anyone links**.
+
+4.  Set the configuration items in the section **These links can give these permissions**.
+
+5.  Set the **Files** option to **View**.
+
+6.  Set the **Folders** option to **View**.
+
+7.  Select **Save**.
+
 #### MS.SHAREPOINT.3.3v1 instructions:
 
-1.  Select **Policies** \> **Sharing**.
+1.  Sign in to the **SharePoint admin center**.
 
-2.  Expand **More external sharing settings**.
+2.  Select **Policies** \> **Sharing**.
 
-3. Select **People who use a verification code must reauthenticate after this many days**.
+3.  Expand **More external sharing settings**.
 
-4.  Enter **30** days or less.
+4. Select **People who use a verification code must reauthenticate after this many days**.
 
-5. Select **Save**.
+5.  Enter **30** days or less.
+
+6. Select **Save**.
 
 ## 4. Custom Scripts
 
-This section provides policies for restricting the execution of custom scripts.
+This section provides policies for restricting custom scripts execution.
 
 #### MS.SHAREPOINT.4.1v1
 Users SHALL be prevented from running custom scripts on personal sites (aka OneDrive).
 
 <!--Policy: MS.SHAREPOINT.4.1v1; Criticality: SHALL -->
-- _Rationale:_ Scripts in OneDrive folders run in the context of the user visiting the site and have access to everything that user can access. By preventing custom scripts on personal sites, administrators block a path for potentially malicious code execution.
+- _Rationale:_ Scripts in OneDrive folders run in the context of the user visiting the site and have access to everything user can access. By preventing custom scripts on personal sites, administrators block a path for potentially malicious code execution.
 - _Last modified:_ June 2023
 
 #### MS.SHAREPOINT.4.2v1
 Users SHALL be prevented from running custom scripts on self-service created sites.
 
 <!--Policy: MS.SHAREPOINT.4.2v1; Criticality: SHALL -->
-- _Rationale:_ Scripts on SharePoint sites run in the context of the user visiting the site and have access to everything that user can access. By preventing custom scripts on self-service created sites, administrators block a path for potentially malicious code execution.
+- _Rationale:_ Scripts on SharePoint sites run in the context of the user visiting the site and have access to everything user can access. By preventing custom scripts on self-service created sites, administrators block a path for potentially malicious code execution.
 - _Last modified:_ June 2023
 
 ### Resources
@@ -279,31 +291,33 @@ Users SHALL be prevented from running custom scripts on self-service created sit
 
 ### Implementation
 
-All of the settings in this section are configured in the **SharePoint admin center**.
-
 #### MS.SHAREPOINT.4.1v1 instructions:
 
-1.  Select **Settings**.
+1.  Sign in to the **SharePoint admin center**.
 
-2.  Scroll down and select **classic settings page**.
+2.  Select **Settings**.
 
-3.  Scroll to the **Custom Script** section.
+3.  Scroll down and select **classic settings page**.
 
-4.  Select **Prevent users from running custom script on personal sites**.
+4.  Scroll to the **Custom Script** section.
 
-5.  Select **Ok**.
+5.  Select **Prevent users from running custom script on personal sites**.
+
+6.  Select **Ok**.
 
 #### MS.SHAREPOINT.4.2v1 instructions:
 
-1.  Select **Settings**.
+1.  Sign in to the **SharePoint admin center**.
 
-2.  Scroll down and select **classic settings page**.
+2.  Select **Settings**.
 
-3.  Scroll to the **Custom Script** section.
+3.  Scroll down and select **classic settings page**.
 
-4.  Select **Prevent users from running custom script on self-service created sites**.
+4.  Scroll to the **Custom Script** section.
 
-5.  Select **Ok**.
+5.  Select **Prevent users from running custom script on self-service created sites**.
+
+6.  Select **Ok**.
 
 
 # Acknowledgements
