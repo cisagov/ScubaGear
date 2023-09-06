@@ -16,64 +16,60 @@ function Export-EXOProvider {
 
     Import-Module $PSScriptRoot/ProviderHelpers/CommandTracker.psm1
     $Tracker = Get-CommandTracker
+
     <#
-    2.1
+    MS.EXO.1.1v1
     #>
     $RemoteDomains = ConvertTo-Json @($Tracker.TryCommand("Get-RemoteDomain"))
 
     <#
-    2.2 SPF
+    MS.EXO.2.1v1 SPF
     #>
     $domains = $Tracker.TryCommand("Get-AcceptedDomain")
     $SPFRecords = ConvertTo-Json @($Tracker.TryCommand("Get-ScubaSpfRecords", @{"Domains"=$domains})) -Depth 3
 
     <#
-    2.3 DKIM
+    MS.EXO.3.1v1 DKIM
     #>
     $DKIMConfig = ConvertTo-Json @($Tracker.TryCommand("Get-DkimSigningConfig"))
     $DKIMRecords = ConvertTo-Json @($Tracker.TryCommand("Get-ScubaDkimRecords", @{"Domains"=$domains})) -Depth 3
 
     <#
-    2.4 DMARC
+    MS.EXO.4.1v1 DMARC
     #>
     $DMARCRecords = ConvertTo-Json @($Tracker.TryCommand("Get-ScubaDmarcRecords", @{"Domains"=$domains})) -Depth 3
 
     <#
-    2.5
+    MS.EXO.5.1v1
     #>
-
     $TransportConfig = ConvertTo-Json @($Tracker.TryCommand("Get-TransportConfig"))
 
     <#
-    2.6
+    MS.EXO.6.1v1
     #>
     $SharingPolicy = ConvertTo-Json @($Tracker.TryCommand("Get-SharingPolicy"))
 
     <#
-    2.7
+    MS.EXO.7.1v1
     #>
-
     $TransportRules = ConvertTo-Json @($Tracker.TryCommand("Get-TransportRule"))
 
     <#
-    2.12
+    MS.EXO.12.1v1
     #>
-
     $ConnectionFilter = ConvertTo-Json @($Tracker.TryCommand("Get-HostedConnectionFilterPolicy"))
 
     <#
-    2.13
+    MS.EXO.13.1v1
     #>
     $Config = $Tracker.TryCommand("Get-OrganizationConfig") | Select-Object Name, DisplayName, AuditDisabled
     $Config = ConvertTo-Json @($Config)
 
-
+    # Used in the reporter to check successful cmdlet invocation
     $SuccessfulCommands = ConvertTo-Json @($Tracker.GetSuccessfulCommands())
     $UnSuccessfulCommands = ConvertTo-Json @($Tracker.GetUnSuccessfulCommands())
 
-    <#
-    Save output
-    #>
+    # Note the spacing and the last comma in the json is important
     $json = @"
     "remote_domains": $RemoteDomains,
     "spf_records": $SPFRecords,
