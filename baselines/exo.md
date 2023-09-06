@@ -1109,9 +1109,9 @@ to any URLs included in emails. By prepending the safe links URL,
 Microsoft can proxy the initial URL through their scanning service.
 Their proxy can perform the following actions:
 
-- Compare the URL with a block list
+- Compare the URL with a block list.
 
-- Compare the URL with a list of know malicious sites
+- Compare the URL with a list of know malicious sites.
 
 - If the URL points to a downloadable file, apply real-time file
   scanning.
