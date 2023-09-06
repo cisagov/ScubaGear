@@ -685,7 +685,7 @@ disallow click-to-run file types.
 
 ## 10. Malware Scanning
 
-Email messages may include attachments that contain malware.  Therefore, email
+Email messages may include attachments that contain malware. Therefore, email
 messages should be scanned for malware to prevent infections. Once malware has
 been identified, the scanner should drop or quarantine the associated messages.
 Because malware detections may be updated, it is also important that emails
@@ -818,7 +818,7 @@ successful phishing attempts.
 The phishing protection solution SHOULD include an AI-based phishing detection tool comparable to EOP Mailbox Intelligence.
 
 <!--Policy: MS.EXO.11.3v1; Criticality: SHOULD -->
-- _Rationale:_ Phishing attacks can result in an unauthorized data disclosure and unauthorized access. Using AI-based phishing detection tools to improve the detection rate of phishing attempts helps reduce the risk of successful phishing attacks.
+- _Rationale:_ Phishing attacks can result in unauthorized data disclosure and unauthorized access. Using AI-based phishing detection tools to improve the detection rate of phishing attempts helps reduce the risk of successful phishing attacks.
 - _Last modified:_ June 2023
 
 ### Resources
@@ -1148,7 +1148,7 @@ users from infecting their devices.
 User click tracking SHOULD be enabled.
 
 <!--Policy: MS.EXO.15.3v1; Criticality: SHOULD -->
-- _Rationale:_ Users may click on malicious links in emails, leading to compromise or unauthorized data disclosure.  Enabling user click tracking lets agencies know if a malicious link may have been visited after the fact to help tailor a response to a potential incident.
+- _Rationale:_ Users may click on malicious links in emails, leading to compromise or unauthorized data disclosure. Enabling user click tracking lets agencies know if a malicious link may have been visited after the fact to help tailor a response to a potential incident.
 - _Last modified:_ June 2023
 
 ### Resources
