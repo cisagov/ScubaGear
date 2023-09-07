@@ -27,6 +27,19 @@ Agencies using Power BI have a data classification scheme in place for
 ## Key Terminology
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [RFC 2119](https://datatracker.ietf.org/doc/html/rfc2119).
 
+Access to PowerBI can be controlled by the user type. In this baseline,
+the types of users are defined as follows (Note: these terms vary in use
+across Microsoft documentation):
+
+1.  **Internal users**: members of the agency’s M365 tenant.
+2.  **External users**: members of a different M365 tenant.
+3.  **Business to Business (B2B) guest users**: external users that are
+  formally invited to view and/or edit Power BI workspace content and
+  are added to the agency’s AAD as guest users. These users authenticate
+  with their home organization/tenant and are granted access to Power BI
+  content by virtue of being listed as guest users in the tenant’s AAD.
+
+
 # Baseline Policies
 
 ## 1. Publish to Web
@@ -77,19 +90,6 @@ The Publish to Web feature SHOULD be disabled unless the agency mission requires
 ## 2. Power BI Guest Access
 
 This section provides policies that help reduce guest user access risks related to Power BI data and resources. An agency with externally shareable Power BI resources and data must consider its unique risk tolerance when granting access to guest users.
-
-The types of users are defined as follows (**Note**: these terms vary in
-use across Microsoft documentation):
-
-- **Internal users**: members of the agency’s M365 tenant.
-
-- **External users**: members of a different M365 tenant.
-
-- **Business to Business (B2B) guest users**: external users that are
-  formally invited to view and/or edit Power BI workspace content and
-  are added to the agency’s AAD as guest users. These users authenticate
-  with their home organization/tenant and are granted access to Power BI
-  content by virtue of being listed as guest users in the tenant’s AAD.
 
 ### Policies
 #### MS.POWERBI.2.1v1
