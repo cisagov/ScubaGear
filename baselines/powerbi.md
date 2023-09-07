@@ -91,15 +91,6 @@ use across Microsoft documentation):
   with their home organization/tenant and are granted access to Power BI
   content by virtue of being listed as guest users in the tenant’s AAD.
 
-**Note**: Guest users are subject to restrictions to their experience
-that are controlled by the AAD administrator. If the Power BI tenant’s
-guest users will need to own and share Power BI content with others and
-manage workspaces as Power BI workspace Admins, Microsoft recommends
-changing the **Guest user permissions are limited** setting in AAD to
-allow these users to use people pickers within the Power BI UX. Since
-Power BI integrates natively with AAD, the AAD Baseline should be
-consulted for additional guidance on managing guest users.
-
 ### Policies
 #### MS.POWERBI.2.1v1
 Guest user access to the Power BI tenant SHOULD be disabled unless the agency mission requires the capability.
