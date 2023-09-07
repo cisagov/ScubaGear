@@ -2597,6 +2597,46 @@ test_SensitiveEOP_Incorrect_V24 if {
     not RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "Requirement not met"
 }
+
+test_SensitiveEOP_Incorrect_V25 if {
+    PolicyId := "MS.DEFENDER.1.4v1"
+
+    Output := tests with input as {
+        "protection_policy_rules" : [
+            {
+                "Identity" : "Strict Preset Security Policy",
+                "SentTo": null,
+                "SentToMemberOf": null,
+                "RecipientDomainIs": [
+                    "random.mail.example.com"
+                ],
+                "ExceptIfSentTo": null,
+                "ExceptIfSentToMemberOf": null,
+                "ExceptIfRecipientDomainIs": null,
+            }
+        ],
+        "scuba_config" : {
+            "Defender" : {
+                "MS.DEFENDER.1.4v1" : {
+                    "SensitiveAccounts" : {
+                        "Users" : [
+                            "johndoe@random.example.com"
+                        ],
+                        "Groups" : [],
+                        "Domains" : [ ]
+                    }
+                }
+            }
+        },
+        "defender_license": true
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "Requirement not met"
+}
 #--
 
 #
