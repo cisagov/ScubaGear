@@ -21,7 +21,6 @@ ReportDetailsArray(Status, Array, String1) = Detail if {
 # MS.POWERPLATFORM.1.1v1
 #--
 tests[{
-    #"Requirement" : "The ability to create production and sandbox environments SHALL be restricted to admins",
     "PolicyId" : "MS.POWERPLATFORM.1.1v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-TenantSettings"],
@@ -37,7 +36,6 @@ tests[{
 # MS.POWERPLATFORM.1.1v1
 #--
 tests[{
-    #"Requirement" : "The ability to create production and sandbox environments SHALL be restricted to admins",
     "PolicyId" : "MS.POWERPLATFORM.1.1v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-TenantSettings"],
@@ -49,12 +47,11 @@ tests[{
 }
 #--
 
-# TODO: Resolve Policy Id 
-# Baseline 2.1: Policy 2 
+#
+# MS.POWERPLATFORM.1.2v1
 #--
 tests[{
-    "Requirement" : "The ability to create trial environments SHALL be restricted to admins",
-    "Control" : "Power Platform 2.1",
+    "PolicyId" : "MS.POWERPLATFORM.1.2v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-TenantSettings"],
     "ActualValue" : EnvironmentCreation.disableTrialEnvironmentCreationByNonAdminUsers,
@@ -66,12 +63,11 @@ tests[{
 }
 #--
 
-# TODO: Resolve Policy Id
-# Baseline 2.1: Policy 2 PoSh Error
+#
+# MS.POWERPLATFORM.1.2v1
 #--
 tests[{
-    "Requirement" : "The ability to create trial environments SHALL be restricted to admins",
-    "Control" : "Power Platform 2.1",
+    "PolicyId" : "MS.POWERPLATFORM.1.2v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-TenantSettings"],
     "ActualValue" : "PowerShell Error",
@@ -321,22 +317,6 @@ tests[{
 #--
 
 #
-# MS.POWERPLATFORM.3.3v1
-#--
-tests[{
-    "PolicyId" : PolicyId,
-    "Criticality" : "Should/Not-Implemented",
-    "Commandlet" : [],
-    "ActualValue" : [],
-    "ReportDetails" : NotCheckedDetails(PolicyId),
-    "RequirementMet" : false
-}] {
-    PolicyId := "MS.POWERPLATFORM.3.3v1"
-    true
-}
-#--
-
-#
 # MS.POWERPLATFORM.4.1v1
 #--
 # At this time we are unable to test for X because of Y
@@ -350,5 +330,22 @@ tests[{
 }] {
     PolicyId := "MS.POWERPLATFORM.4.1v1"
     true
+}
+#--
+
+#
+# MS.POWERPLATFORM.5.1v1
+#--
+#
+tests[{
+    "PolicyId" : "MS.POWERPLATFORM.5.1v1",
+    "Criticality" : "Should",
+    "Commandlet" : ["Get-TenantSettings"],
+    "ActualValue" : EnvironmentCreation.disablePortalsCreationByNonAdminUsers,
+    "ReportDetails" : ReportDetailsBoolean(Status),
+    "RequirementMet" : Status
+}] {
+    EnvironmentCreation := input.environment_creation[_]
+    Status := EnvironmentCreation.disablePortalsCreationByNonAdminUsers == true
 }
 #--
