@@ -17,14 +17,14 @@ test_Rdata_Correct if {
         ],
         "spf_records": [
             {
-                "rdata" : ["spf1 "], 
+                "rdata" : ["spf1 "],
                 "domain" : "test.name"
             }
-        ]  
+        ]
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
- 
+
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "Requirement met"
@@ -36,20 +36,20 @@ test_Rdata_Incorrect if {
     Output := tests with input as {
         "dmarc_records":[
             {
-                "rdata" : [], 
+                "rdata" : [],
                 "domain" : "test.name"
             }
         ],
         "spf_records": [
             {
-                "rdata" : ["spf1 "], 
+                "rdata" : ["spf1 "],
                 "domain" : "test.name"
             }
-        ]  
+        ]
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
- 
+
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "1 of 1 agency domain(s) found in violation: test.name"
@@ -59,22 +59,22 @@ test_Rdata_Incorrect_V2 if {
     PolicyId := "MS.EXO.4.1v1"
 
     Output := tests with input as {
-        "dmarc_records":[  
+        "dmarc_records":[
             {
-                "rdata" : ["v=DMARC1"], 
+                "rdata" : ["v=DMARC1"],
                 "domain" : "test.name"
             }
         ],
         "spf_records": [
             {
-                "rdata" : ["spf1 "], 
+                "rdata" : ["spf1 "],
                 "domain" : "test.name"
             }
-        ]  
+        ]
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
- 
+
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "1 of 1 agency domain(s) found in violation: test.name"
@@ -90,24 +90,24 @@ test_Rdata_Incorrect_V3 if {
                 "domain" : "test.name"
             },
             {
-                "rdata" : [], 
+                "rdata" : [],
                 "domain" : "bad.name"
             }
         ],
         "spf_records": [
             {
-                "rdata" : ["spf1 "], 
+                "rdata" : ["spf1 "],
                 "domain" : "test.name"
             },
             {
-                "rdata" : ["spf1 "], 
+                "rdata" : ["spf1 "],
                 "domain" : "bad.name"
             }
-        ]  
+        ]
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
- 
+
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "1 of 2 agency domain(s) found in violation: bad.name"
@@ -128,14 +128,14 @@ test_Rdata_Correct_V2 if {
         ],
         "spf_records": [
             {
-                "rdata" : ["spf1 "], 
+                "rdata" : ["spf1 "],
                 "domain" : "test.name"
             }
-        ]  
+        ]
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
- 
+
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "Requirement met"
@@ -153,14 +153,14 @@ test_Rdata_Incorrect_V4 if {
         ],
         "spf_records": [
             {
-                "rdata" : ["spf1 "], 
+                "rdata" : ["spf1 "],
                 "domain" : "test.name"
             }
-        ]  
+        ]
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
- 
+
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "1 of 1 agency domain(s) found in violation: test.name"
@@ -178,14 +178,14 @@ test_Rdata_Incorrect_V5 if {
         ],
         "spf_records": [
             {
-                "rdata" : ["spf1 "], 
+                "rdata" : ["spf1 "],
                 "domain" : "test.name"
             }
-        ]  
+        ]
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
- 
+
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "1 of 1 agency domain(s) found in violation: test.name"
@@ -206,14 +206,14 @@ test_Rdata_Correct_V3 if {
         ],
         "spf_records": [
             {
-                "rdata" : ["spf1 "], 
+                "rdata" : ["spf1 "],
                 "domain" : "test.name"
             }
-        ]  
+        ]
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
- 
+
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "Requirement met"
@@ -225,20 +225,20 @@ test_Rdata_Incorrect_V6 if {
     Output := tests with input as {
         "dmarc_records": [
             {
-                "rdata" : ["v=DMARC1; p=reject; pct=100;"], 
+                "rdata" : ["v=DMARC1; p=reject; pct=100;"],
                 "domain" : "test.name"
             }
         ],
         "spf_records": [
             {
-                "rdata" : ["spf1 "], 
+                "rdata" : ["spf1 "],
                 "domain" : "test.name"
             }
-        ]  
+        ]
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
- 
+
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "1 of 1 agency domain(s) found in violation: test.name"
@@ -256,14 +256,14 @@ test_Rdata_Incorrect_V7 if {
         ],
         "spf_records": [
             {
-                "rdata" : ["spf1 "], 
+                "rdata" : ["spf1 "],
                 "domain" : "test.name"
             }
-        ]  
+        ]
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
- 
+
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "1 of 1 agency domain(s) found in violation: test.name"
@@ -284,14 +284,14 @@ test_Rdata_Incorrect_V4 if {
         ],
         "spf_records": [
             {
-                "rdata" : ["spf1 "], 
+                "rdata" : ["spf1 "],
                 "domain" : "test.name"
             }
-        ]  
+        ]
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
- 
+
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "Requirement met"
@@ -299,7 +299,7 @@ test_Rdata_Incorrect_V4 if {
 
 test_Rdata_Incorrect_V8 if {
     PolicyId := "MS.EXO.4.4v1"
-    
+
     Output := tests with input as {
         "dmarc_records": [
             {
@@ -309,14 +309,14 @@ test_Rdata_Incorrect_V8 if {
         ],
         "spf_records": [
             {
-                "rdata" : ["spf1 "], 
+                "rdata" : ["spf1 "],
                 "domain" : "test.name"
             }
-        ]  
+        ]
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
- 
+
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "1 of 1 agency domain(s) found in violation: test.name"

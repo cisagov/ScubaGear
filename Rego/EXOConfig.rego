@@ -221,18 +221,18 @@ tests[{
 }
 #--
 
-# Are both the tests supposed to be the same?
-
 #
 # MS.EXO.6.1v1
 #--
 
-SharingPolicyAllowedSharing[SharingPolicy.Name] {
+SharingPolicyContactsAllowedAllDomains[SharingPolicy.Name] {
     SharingPolicy := input.sharing_policy[_]
-    InList := "*" in SharingPolicy.Domains
-    InList == true
+    Domains = SharingPolicy.Domains[_]
+    WildcardInList := contains(Domains, "*")
+    ContactsInList := contains(Domains, "Contacts")
+    WildcardInList == true
+    ContactsInList == true
 }
-
 
 tests[{
     "PolicyId" : "MS.EXO.6.1v1",
@@ -242,15 +242,24 @@ tests[{
     "ReportDetails" : ReportDetailsString(Status, ErrorMessage),
     "RequirementMet" : Status
 }] {
-    ErrorMessage := "Wildcard domain (\"*\") in shared domains list, enabling sharing with all domains by default"
-
-    Status := count(SharingPolicyAllowedSharing) == 0
+    ContactsSharingPolicies := SharingPolicyContactsAllowedAllDomains
+    ErrorMessage := Description(Format(ContactsSharingPolicies), "sharing polic(ies) are sharing contacts folders with all domains by default:", concat(", ", ContactsSharingPolicies))
+    Status := count(ContactsSharingPolicies) == 0
 }
 #--
 
 #
 # MS.EXO.6.2v1
 #--
+
+SharingPolicyCalendarAllowedAllDomains[SharingPolicy.Name] {
+    SharingPolicy := input.sharing_policy[_]
+    Domains = SharingPolicy.Domains[_]
+    WildcardInList := contains(Domains, "*")
+    CalendarInList := contains(Domains, "Calendar")
+    WildcardInList == true
+    CalendarInList == true
+}
 
 tests[{
     "PolicyId" : "MS.EXO.6.2v1",
@@ -260,8 +269,9 @@ tests[{
     "ReportDetails" : ReportDetailsString(Status, ErrorMessage),
     "RequirementMet" : Status
 }] {
-    ErrorMessage := "Wildcard domain (\"*\") in shared domains list, enabling sharing with all domains by default"
-    Status := count(SharingPolicyAllowedSharing) == 0
+    CalendarSharingPolicies := SharingPolicyCalendarAllowedAllDomains
+    ErrorMessage := Description(Format(CalendarSharingPolicies), "sharing polic(ies) are sharing calendar details with all domains by default:", concat(", ", CalendarSharingPolicies))
+    Status := count(CalendarSharingPolicies) == 0
 }
 #--
 
@@ -477,8 +487,9 @@ tests[{
     "ReportDetails" : ReportDetailsString(Status, ErrorMessage),
     "RequirementMet" : Status
 }]{
-    ErrorMessage := "Allow-list is in use"
-    Status := count(ConnFiltersWithIPAllowList) == 0
+    ConnFilterPolicies := ConnFiltersWithIPAllowList
+    ErrorMessage := Description(Format(ConnFilterPolicies), "connection filter polic(ies) with an IP allowlist:", concat(", ", ConnFilterPolicies))
+    Status := count(ConnFilterPolicies) == 0
 }
 #--
 
@@ -496,10 +507,12 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-HostedConnectionFilterPolicy"],
     "ActualValue" : input.conn_filter,
-    "ReportDetails" : ReportDetailsBoolean(Status),
+    "ReportDetails" : ReportDetailsString(Status, ErrorMessage),
     "RequirementMet" : Status
 }]{
-    Status := count(ConnFiltersWithSafeList) == 0
+    ConnFilterPolicies := ConnFiltersWithSafeList
+    ErrorMessage := Description(Format(ConnFilterPolicies), "connection filter polic(ies) with a safe list:", concat(", ", ConnFilterPolicies))
+    Status := count(ConnFilterPolicies) == 0
 }
 #--
 

@@ -7,7 +7,7 @@ import future.keywords
 #--
 test_FromScope_Correct if {
     PolicyId := "MS.EXO.7.1v1"
-    
+
     Output := tests with input as {
         "transport_rule": [
             {
@@ -15,11 +15,11 @@ test_FromScope_Correct if {
                 "State" : "Enabled",
                 "Mode" : "Enforce"
             }
-        ]    
+        ]
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
- 
+
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "Requirement met"
@@ -35,11 +35,11 @@ test_FromScope_IncorrectV1 if {
                 "State" : "Enabled",
                 "Mode" : "Audit"
             }
-        ]    
+        ]
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
- 
+
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "No transport rule found that applies warnings to emails received from outside the organization"
@@ -55,11 +55,11 @@ test_FromScope_IncorrectV2 if {
                 "State" : "Disabled",
                 "Mode" : "Audit"
             }
-        ]    
+        ]
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
- 
+
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "No transport rule found that applies warnings to emails received from outside the organization"
@@ -75,11 +75,11 @@ test_FromScope_IncorrectV3 if {
                 "State" : "Enabled",
                 "Mode" : "AuditAndNotify"
             }
-        ]    
+        ]
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
- 
+
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "No transport rule found that applies warnings to emails received from outside the organization"
@@ -95,11 +95,11 @@ test_FromScope_IncorrectV4 if {
                 "State" : "Disabled",
                 "Mode" : "AuditAndNotify"
             }
-        ]    
+        ]
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
- 
+
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "No transport rule found that applies warnings to emails received from outside the organization"
@@ -130,11 +130,11 @@ test_FromScope_Multiple_Correct if {
                 "State" : "Enabled",
                 "Mode" : "Enforce"
             }
-        ]    
+        ]
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
- 
+
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "Requirement met"
@@ -175,11 +175,11 @@ test_FromScope_Multiple_Incorrect if {
                 "State" : "Disabled",
                 "Mode":"Enforce"
             }
-        ]    
+        ]
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
- 
+
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "No transport rule found that applies warnings to emails received from outside the organization"
