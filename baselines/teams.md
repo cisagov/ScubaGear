@@ -46,7 +46,7 @@ across Microsoft documentation):
 
 ## 1. Meeting Policies
 
-This section helps reduce security risks posed by the external participants during meetings. In this instance, the term “external participants” includes external users, B2B guest users, unmanaged users, and anonymous users. 
+This section helps reduce security risks posed by the external participants during meetings. In this instance, the term “external participants” includes external users, Business to Business (B2B) guest users, unmanaged users, and anonymous users. 
 
 This section helps reduce security risks related to the user permissions for recording Teams meetings and Events. These policies and user permissions apply to meetings hosted by a user, during one-on-one calls, and group calls started by a user. Agencies should comply with any other applicable policies or legislation in addition to this guidance.
 
