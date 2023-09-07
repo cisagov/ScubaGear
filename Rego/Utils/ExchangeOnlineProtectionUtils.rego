@@ -247,6 +247,9 @@ SensitiveAccounts(Policies, PolicyID) := true if {
         Policy.RecipientDomainIs == null;
         Policy.ExceptIfRecipientDomainIs == null ]) == 1
 
+    AllSensitiveUsers := SensitiveUsers(Policies, PolicyID)
+    count(AllSensitiveUsers.ConfigUsers) == 0
+
     AllSensitiveGroups := SensitiveGroups(Policies, PolicyID)
     count(AllSensitiveGroups.ConfigGroups & AllSensitiveGroups.ExcludedGroups) == 0
     count(AllSensitiveGroups.ConfigGroups - AllSensitiveGroups.IncludedGroups) == 0
@@ -262,6 +265,9 @@ SensitiveAccounts(Policies, PolicyID) := true if {
         Policy.Identity == "Strict Preset Security Policy";
         Policy.SentTo == null;
         Policy.ExceptIfSentTo == null ]) == 1
+
+    AllSensitiveUsers := SensitiveUsers(Policies, PolicyID)
+    count(AllSensitiveUsers.ConfigUsers) == 0
 
     AllSensitiveGroups := SensitiveGroups(Policies, PolicyID)
     count(AllSensitiveGroups.ConfigGroups & AllSensitiveGroups.ExcludedGroups) == 0
@@ -282,6 +288,9 @@ SensitiveAccounts(Policies, PolicyID) := true if {
         Policy.Identity == "Strict Preset Security Policy";
         Policy.SentTo == null;
         Policy.ExceptIfSentTo == null ]) == 1
+
+    AllSensitiveUsers := SensitiveUsers(Policies, PolicyID)
+    count(AllSensitiveUsers.ConfigUsers) == 0
 
     AllSensitiveGroups := SensitiveGroups(Policies, PolicyID)
     count(AllSensitiveGroups.ConfigGroups & AllSensitiveGroups.ExcludedGroups) != 0
@@ -306,6 +315,9 @@ SensitiveAccounts(Policies, PolicyID) := true if {
         Policy.SentToMemberOf == null;
         Policy.ExceptIfSentToMemberOf == null ]) == 1
 
+    AllSensitiveUsers := SensitiveUsers(Policies, PolicyID)
+    count(AllSensitiveUsers.ConfigUsers) == 0
+
     AllSensitiveGroups := SensitiveGroups(Policies, PolicyID)
     count(AllSensitiveGroups.ConfigGroups) > 0
 
@@ -328,6 +340,9 @@ SensitiveAccounts(Policies, PolicyID) := true if {
         Policy.ExceptIfSentTo == null;
         Policy.SentToMemberOf == null;
         Policy.ExceptIfSentToMemberOf == null ]) == 1
+
+    AllSensitiveUsers := SensitiveUsers(Policies, PolicyID)
+    count(AllSensitiveUsers.ConfigUsers) == 0
 
     AllSensitiveGroups := SensitiveGroups(Policies, PolicyID)
     count(AllSensitiveGroups.ConfigGroups) == 0
