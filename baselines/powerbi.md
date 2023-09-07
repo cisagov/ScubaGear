@@ -750,7 +750,7 @@ the Export and Sharing Settings.
 2. In the **Power BI tenant** settings, under **Export and sharing
     settings**, administrators can opt to toggle off **Copy and paste visuals**.
 
-####### Establishing Private Network Access Connections Using Azure Private Link
+**Establishing Private Network Access Connections Using Azure Private Link:**
 
 When connecting to Azure services intended to supply Power BI datasets,
 agencies should consider connecting their Power BI tenant to an Azure
