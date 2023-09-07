@@ -28,11 +28,10 @@ jobs:
     steps:
     - name: Checkout repo code
       uses: actions/checkout@v3
-      
+
     - name: Execute ScubaGear and Check Outputs
       run: |
         . Testing/Functional/SmokeTest/SmokeTestUtils.ps1
-        ./AllowBasicAuthentication.ps1 -RunAsAdmin
 
         ##### Install all the dependencies
         Install-SmokeTestExternalDependencies
