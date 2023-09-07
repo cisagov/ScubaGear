@@ -9,7 +9,7 @@ test_SmtpClientAuthenticationDisabled_Correct if {
     PolicyId := "MS.EXO.5.1v1"
 
     Output := tests with input as {
-        "transport_config": 
+        "transport_config":
         [
             {
                 "SmtpClientAuthenticationDisabled" : true,
@@ -19,7 +19,7 @@ test_SmtpClientAuthenticationDisabled_Correct if {
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
- 
+
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "Requirement met"
@@ -34,11 +34,11 @@ test_SmtpClientAuthenticationDisabled_Incorrect if {
                 "SmtpClientAuthenticationDisabled" : false,
                 "Name" : "A"
             }
-        ]  
+        ]
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
- 
+
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "Requirement not met"
