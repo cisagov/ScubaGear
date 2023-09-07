@@ -213,22 +213,6 @@ permissions.
 - Power BI Embedded and other users of the Power BI REST APIs to
   interact with PBI content.
 
-**Best Practices for Service Principals:**
-
-- Evaluate whether certificates or secrets are a more secure option for
-  the implementation. Note that Microsoft recommends certificates over
-  secrets.
-
-- Use the principle of least privilege in implementing service
-  principals; only provide the ability to create app registrations to
-  entities that require it.
-
-- Instead of enabling service principals for the entire agency,
-  implement for a dedicated security group.
-
-**Note**: This policy is only applicable if the setting **Allow service principals to use Power BI APIs** is enabled
-
-
 ### Policies
 #### MS.POWERBI.4.1v1
 Service Principals with access to APIs SHOULD be restricted to specific security groups.
@@ -813,3 +797,18 @@ disabling public internet access.
 - [Microsoft Power BI Security Baseline, Baseline Statement NS-3 \|
   Microsoft
   Learn](https://learn.microsoft.com/en-us/security/benchmark/azure/baselines/power-bi-security-baseline)
+
+## Best Practices for Service Principals:
+
+- Evaluate whether certificates or secrets are a more secure option for
+  the implementation. Note that Microsoft recommends certificates over
+  secrets.
+
+- Use the principle of least privilege in implementing service
+  principals; only provide the ability to create app registrations to
+  entities that require it.
+
+- Instead of enabling service principals for the entire agency,
+  implement for a dedicated security group.
+
+**Note**: This policy is only applicable if the setting **Allow service principals to use Power BI APIs** is enabled
