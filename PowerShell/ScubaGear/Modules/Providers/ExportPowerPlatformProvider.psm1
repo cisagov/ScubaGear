@@ -131,10 +131,8 @@ $($_)
         throw $FullEnvErrorMessage
     }
 
-    # 2.1
     $EnvironmentCreation = ConvertTo-Json @($Tracker.TryCommand("Get-TenantSettings"))
 
-    # 2.2
     $EnvironmentList = ConvertTo-Json @($Tracker.TryCommand("Get-AdminPowerAppEnvironment"))
 
     # Check for null return
@@ -163,7 +161,6 @@ $($_)
         Write-Warning "Error running Get-DlpPolicy: $($_). <= If a HTTP 403 ERROR is thrown then this is because you do not have the proper permissions. Necessary roles for running ScubaGear with Power Platform: Power Platform Administrator with a Power Apps License or Global Admininstrator"
     }
 
-    # 2.3
     # has to be tested manually because of http 403 errors
     $TenantIsolation = ConvertTo-Json @()
     try {
@@ -183,8 +180,6 @@ $($_)
     catch {
         Write-Warning "Error running Get-PowerAppTenantIsolationPolicy: $($_). <= If a HTTP 403 ERROR is thrown then this is because you do not have the proper permissions. Necessary roles for running ScubaGear with Power Platform: Power Platform Administrator with a Power Apps License or Global Admininstrator"
     }
-
-    # 2.4 currently has no corresponding PowerShell Cmdlet
 
     $PowerPlatformSuccessfulCommands = ConvertTo-Json @($Tracker.GetSuccessfulCommands())
     $PowerPlatformUnSuccessfulCommands = ConvertTo-Json @($Tracker.GetUnSuccessfulCommands())
