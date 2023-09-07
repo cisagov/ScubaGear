@@ -1,14 +1,14 @@
 # CISA M365 Security Configuration Baseline for Azure Active Directory
 
-Azure Active Directory (AAD) is a cloud-based identity and access control service that provides security and functional capabilities to Microsoft 365. This Secure Configuration Baseline (SCB) provides specific policies to help secure AAD. 
+Azure Active Directory (AAD) is a cloud-based identity and access control service that provides security and functional capabilities to Microsoft 365. This Secure Configuration Baseline (SCB) provides specific policies to help secure AAD.
 
-The Secure Cloud Business Applications (SCuBA) project run by the Cybersecurity and Infrastructure Security Agency (CISA) provides guidance and capabilities to secure federal civilian executive branch (FCEB) agencies’ cloud business application environments and protect federal information that is created, accessed, shared, and stored in those environments. 
+The Secure Cloud Business Applications (SCuBA) project run by the Cybersecurity and Infrastructure Security Agency (CISA) provides guidance and capabilities to secure federal civilian executive branch (FCEB) agencies’ cloud business application environments and protect federal information that is created, accessed, shared, and stored in those environments.
 
 The CISA SCuBA SCBs for M365 help secure federal information assets stored within M365 cloud business application environments through consistent, effective, and manageable security configurations. CISA created baselines tailored to the federal government’s threats and risk tolerance with the knowledge that every organization has different threat models and risk tolerance. Non-governmental organizations may also find value in applying these baselines to reduce risks.
 
 The information in this document is being provided “as is” for INFORMATIONAL PURPOSES ONLY. CISA does not endorse any commercial product or service, including any subjects of analysis. Any reference to specific commercial entities or commercial products, processes, or services by service mark, trademark, manufacturer, or otherwise, does not constitute or imply endorsement, recommendation, or favoritism by CISA.
 
-## License Compliance and Copyright 
+## License Compliance and Copyright
 Portions of this document are adapted from documents in Microsoft’s [Microsoft 365](https://github.com/MicrosoftDocs/microsoft-365-docs/blob/public/LICENSE) and [Azure](https://github.com/MicrosoftDocs/azure-docs/blob/main/LICENSE) GitHub repositories. The respective documents are subject to copyright and are adapted under the terms of the Creative Commons Attribution 4.0 International license. Source documents are linked throughout this document. The United States Government has adapted selections of these documents to develop innovative and scalable configuration standards to strengthen the security of widely used cloud-based software services.
 
 ## Assumptions
@@ -179,10 +179,10 @@ The methods **AAD Certificate-Based Authentication (CBA)**, **FIDO2 Security Key
 
 **Non-preferred phishing-resistant methods**
 
-The **Federal PIV card (federated from agency on-premises Active Directory Federation Services or other identity provider)** option, although technically phishing-resistant presents significant risks if the on-premises authentication infrastructure (e.g. ADFS) is compromised. Therefore federated PIV is not a preferred option and agencies should migrate to the options listed in the preferred section above. If an agency does use an on-premises PIV authentication and federate to AAD, reference the [guidance at this link](https://playbooks.idmanagement.gov/piv/network/group/) to enforce PIV logon via AD group policy.
+The **Federal PIV card (federated from agency on-premises Active Directory Federation Services or other identity provider)** option, although technically phishing-resistant presents significant risks if the on-premises authentication infrastructure (e.g., ADFS) is compromised. Therefore, federated PIV is not a preferred option and agencies should migrate to the options listed in the preferred section above. If an agency does use an on-premises PIV authentication and federate to AAD, reference the [guidance at this link](https://playbooks.idmanagement.gov/piv/network/group/) to enforce PIV logon via AD group policy.
 
 <!--Policy: MS.AAD.3.1v1; Criticality: SHALL -->
-- _Rationale:_ Allowing weaker forms of MFA does not protect against sophisticated phishing attacks. By enforcing methods resistant to phishing those risks are minimized.
+- _Rationale:_ Allowing weaker forms of MFA does not protect against sophisticated phishing attacks. By enforcing methods resistant to phishing, those risks are minimized.
 - _Last modified:_ June 2023
 
 #### MS.AAD.3.2v1
@@ -197,14 +197,14 @@ If phishing-resistant MFA has not been enforced yet, an alternative MFA method S
 If phishing-resistant MFA has not been enforced yet and Microsoft Authenticator is enabled, it SHALL be configured to show login context information.
 
 <!--Policy: MS.AAD.3.3v1; Criticality: SHALL -->
-- _Rationale:_ This is a stopgap security policy to help protect the tenant if phishing-resistant MFA has not been enforced yet and Microsoft Authenticator is being used. This policy helps improve the security of Microsoft Authenticator by showing the user context information which helps reduce MFA phishing compromises.
+- _Rationale:_ This is a stopgap security policy to help protect the tenant if phishing-resistant MFA has not been enforced yet and Microsoft Authenticator is being used. This policy helps improve the security of Microsoft Authenticator by showing the user context information, which helps reduce MFA phishing compromises.
 - _Last modified:_ June 2023
 
 #### MS.AAD.3.4v1
 The Authentication Methods Manage Migration feature SHALL be set to Migration Complete.
 
 <!--Policy: MS.AAD.3.4v1; Criticality: SHALL -->
-- _Rationale:_ By configuring the Manage Migration feature to Migration Complete, we ensure the tenant has disabled the legacy authentication methods screen. The MFA and Self-Service Password Reset (SSPR) authentication methods are both managed from a central admin page thereby reducing administrative complexity and
+- _Rationale:_ By configuring the Manage Migration feature to Migration Complete, we ensure the tenant has disabled the legacy authentication methods screen. The MFA and Self-Service Password Reset (SSPR) authentication methods are both managed from a central admin page, thereby reducing administrative complexity and
 the chances of security misconfigurations.
 - _Last modified:_ June 2023
 
@@ -220,7 +220,7 @@ The authentication methods SMS, Voice Call, and Email One-Time Passcode (OTP) SH
 Phishing-resistant MFA SHALL be required for highly privileged roles.
 
 <!--Policy: MS.AAD.3.6v1; Criticality: SHALL -->
-- _Rationale:_ This is a backup security policy to help protect privileged access to the tenant if the conditional access policy which requires MFA for all users is disabled or misconfigured.
+- _Rationale:_ This is a backup security policy to help protect privileged access to the tenant if the conditional access policy, which requires MFA for all users, is disabled or misconfigured.
 - _Last modified:_ June 2023
 - _Note:_ Refer to the Highly Privileged Roles section at the top of this document for a reference list of roles considered highly privileged.
 
@@ -235,7 +235,7 @@ Managed devices SHOULD be required for authentication.
 Managed Devices SHOULD be required to register MFA.
 
 <!--Policy: MS.AAD.3.8v1; Criticality: SHOULD -->
-- _Rationale:_ The security risk of an adversary using stolen user credentials and then registering their own MFA devices to access the tenant is reduced by requiring a managed device to perform registration actions. Thus the adversary cannot perform the registration from their own unmanaged device, as managed devices are under the provisioning and control of the agency.
+- _Rationale:_ The security risk of an adversary using stolen user credentials and then registering their own MFA devices to access the tenant is reduced by requiring a managed device to perform registration actions. Thus, the adversary cannot perform the registration from their own unmanaged device, as managed devices are under the provisioning and control of the agency.
 - _Last modified:_ June 2023
 
 ### Resources
@@ -339,7 +339,7 @@ If phishing-resistant MFA has not been deployed yet and Microsoft Authenticator 
 
 ## 4. Centralized Log Collection
 
-This section provides policies that help reduce security risks related to the lack of security logs which hampers security visibility.
+This section provides policies that help reduce security risks related to the lack of security logs, which hampers security visibility.
 
 ### Policies
 #### MS.AAD.4.1v1
@@ -365,7 +365,7 @@ Security logs SHALL be sent to the agency's Security Operations Center for monit
 
 ### License Requirements
 
-- An Azure subscription is required to send the logs to an external system such as the agency's Security Information and Event Management (SIEM).
+- An Azure subscription is required to send the logs to an external system, such as the agency's Security Information and Event Management (SIEM).
 
 ### Implementation
 
@@ -394,14 +394,14 @@ This section provides policies that help reduce security risks related to non-pr
 Only administrators SHALL be allowed to register applications.
 
 <!--Policy: MS.AAD.5.1v1; Criticality: SHALL -->
-- _Rationale:_ Application access to the tenant presents a heightened security risk compared to interactive user access because applications are typically not subject to critical security protections such as MFA policies and others. Ensuring only specific privileged users can register applications reduces the risks of unauthorized users installing malicious applications into the tenant.
+- _Rationale:_ Application access to the tenant presents a heightened security risk compared to interactive user access, because applications are typically not subject to critical security protections such as MFA policies and others. Ensuring only specific privileged users can register applications reduces the risks of unauthorized users installing malicious applications into the tenant.
 - _Last modified:_ June 2023
 
 #### MS.AAD.5.2v1
 Only administrators SHALL be allowed to consent to applications.
 
 <!--Policy: MS.AAD.5.2v1; Criticality: SHALL -->
-- _Rationale:_ Ensuring that only specific privileged users can consent to applications reduces the risks of users giving insecure applications access to their data via [consent grant attacks](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/detect-and-remediate-illicit-consent-grants?view=o365-worldwide).
+- _Rationale:_ Ensuring only specific privileged users can consent to applications reduces the risks of users giving insecure applications access to their data via [consent grant attacks](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/detect-and-remediate-illicit-consent-grants?view=o365-worldwide).
 - _Last modified:_ June 2023
 
 #### MS.AAD.5.3v1
@@ -481,14 +481,14 @@ Group owners SHALL NOT be allowed to consent to applications.
 
 ## 6. Passwords
 
-This section provides policies that help reduce security risks associated with legacy password practices no longer supported by research.
+This section provides policies that reduce security risks associated with legacy password practices no longer supported by research.
 
 ### Policies
 #### MS.AAD.6.1v1
 User passwords SHALL NOT expire.
 
 <!--Policy: MS.AAD.6.1v1; Criticality: SHALL -->
-- _Rationale:_ At a minimum, the National Institute of Standards & Technology (NIST), the Office of Management and Budget (OMB) and Microsoft have published guidance indicating mandated periodic password changes make user accounts less secure. OMB-22-09 states "Password policies must not require use of special characters or regular rotation".
+- _Rationale:_ At a minimum, the National Institute of Standards & Technology (NIST), the Office of Management and Budget (OMB), and Microsoft have published guidance indicating mandated periodic password changes make user accounts less secure. OMB-22-09 states, "Password policies must not require use of special characters or regular rotation."
 - _Last modified:_ June 2023
 
 ### Resources
@@ -562,7 +562,7 @@ Provisioning users to highly privileged roles SHALL NOT occur outside of a PAM s
 Activation of the Global Administrator role SHALL require approval.
 
 <!--Policy: MS.AAD.7.6v1; Criticality: SHALL -->
-- _Rationale:_ Requiring approval for a user to activate Global Administrator which provided unfettered access, makes it more challenging for an attacker to compromise the tenant with stolen credentials and it provides visibility of activities indicating a compromise is taking place.
+- _Rationale:_ Requiring approval for a user to activate Global Administrator, which provided unfettered access, makes it more challenging for an attacker to compromise the tenant with stolen credentials and it provides visibility of activities indicating a compromise is taking place.
 - _Last modified:_ June 2023
 
 #### MS.AAD.7.7v1
@@ -603,7 +603,7 @@ User activation of other highly privileged roles SHOULD trigger an alert.
 
 - Azure AD PIM or an equivalent third-party PAM service.
 
-- Azure AD PIM requires an AAD P2 license
+- Azure AD PIM requires an AAD P2 license.
 
 ### Implementation
 
@@ -743,7 +743,7 @@ This section provides policies that help reduce security risks related to integr
 Guest users SHOULD have limited or restricted access to Azure AD directory objects.
 
 <!--Policy: MS.AAD.8.1v1; Criticality: SHOULD -->
-- _Rationale:_ Limiting the amount of information about objects, available to guest users in the tenant, reduces the malicious reconnaissance exposure if a guest account is compromised or created by an adversary.
+- _Rationale:_ Limiting the amount of information about objects available to guest users in the tenant, reduces the malicious reconnaissance exposure should a guest account become compromised or be created by an adversary.
 - _Last modified:_ June 2023
 
 #### MS.AAD.8.2v1
@@ -814,7 +814,7 @@ Cybersecurity*](https://www.federalregister.gov/documents/2021/05/17/2021-10460/
 - The MITRE Corporation
 - Sandia National Laboratories (Sandia)
 
-The SCBs were informed by materials produced by the following organizations: 
+The SCBs were informed by materials produced by the following organizations:
 
 
 - Center for Internet Security (CIS)
