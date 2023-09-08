@@ -32,10 +32,9 @@ InModuleScope CreateReport {
         }
         It "Invoke error messages on parsing errors" {
             {
-                Import-SecureBaseline -ProductNames "aad" -BaselinePath "./Testing/Unit/PowerShell/CreateReport/CreateReportStubs" 
+                Import-SecureBaseline -ProductNames "aad" -BaselinePath "./Testing/Unit/PowerShell/CreateReport/CreateReportStubs"
                 Should -Invoke -CommandName Write-Error -Exactly -Times 2 -Because "Except errors on parsing"
             } | Should -Throw
-            
         }
     }
     Describe -tag "Markdown" -name 'Import secure baseline <Product>' -ForEach @(
