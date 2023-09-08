@@ -212,60 +212,79 @@ function Import-SecureBaseline{
     #>
     [CmdletBinding()]
     param (
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", 'powerbi', IgnoreCase = $false)]
+        [string[]]
+        $ProductNames,
         [Parameter(Mandatory = $false)]
         [ValidateScript({Test-Path -PathType Container $_})]
         [string]
         $BaselinePath = (Join-Path -Path $PSScriptRoot -ChildPath "..\..\..\..\baselines\")
     )
-
-    $ProductNames = Get-ChildItem $BaselinePath -Filter "*.md" | ForEach-Object {$_.Name.SubString(0, $_.Name.Length - 3)}
     $Output = @{}
 
     foreach ($Product in $ProductNames) {
-        $Output[$Product] = @()
-        $ProductPath = Join-Path -Path $BaselinePath -ChildPath "$Product.md"
-        $MdLines = Get-Content -Path $ProductPath
+        try {
+            $Output[$Product] = @()
+            $ProductPath = Join-Path -Path $BaselinePath -ChildPath "$Product.md"
+            $MdLines = Get-Content -Path $ProductPath
 
-        # Select-String line numbers aren't 0-indexed, hence the "-1" on the next line
-        $LineNumbers = Select-String "^## [0-9]+\." "$($BaselinePath)$($Product).md" | ForEach-Object {$_."LineNumber"-1}
-        $Groups = $LineNumbers | ForEach-Object {$MdLines[$_]}
-
-        foreach ($GroupName in $Groups) {
-            $Group = @{}
-            $Group.GroupNumber = $GroupName.Split(".")[0].SubString(3) # 3 to remove the "## "
-            $Group.GroupName = $GroupName.Split(".")[1].Trim() # 1 to remove the leading space
-            $Group.Controls = @()
-
-            $IdRegex =  "#### MS\.[$($Product.ToUpper())]+\.$($Group.GroupNumber)\.\d+v\d+\s*$"
             # Select-String line numbers aren't 0-indexed, hence the "-1" on the next line
-            $LineNumbers = Select-String $IdRegex "$($BaselinePath)$($Product).md" | ForEach-Object {$_."LineNumber"-1}
+            $LineNumbers = Select-String "^## [0-9]+\." "$($BaselinePath)$($Product).md" | ForEach-Object {$_."LineNumber"-1}
+            $Groups = $LineNumbers | ForEach-Object {$MdLines[$_]}
 
-            foreach ($LineNumber in $LineNumbers) {
-                # This assumes that the value is on the immediate next line after the ID and ends in a period.
-                $LineAdvance = 1;
-                $Value = ([string]$MdLines[$LineNumber+$LineAdvance]).Trim()
+            foreach ($GroupName in $Groups) {
+                $Group = @{}
+                $Group.GroupNumber = $GroupName.Split(".")[0].SubString(3) # 3 to remove the "## "
+                $Group.GroupName = $GroupName.Split(".")[1].Trim() # 1 to remove the leading space
+                $Group.Controls = @()
 
-                while ($Value.Substring($Value.Length-1,1) -ne "."){
-                    $LineAdvance++
-                    $Value += ' ' + ([string]$MdLines[$LineNumber+$LineAdvance]).Trim()
+                $IdRegex =  "#### MS\.[$($Product.ToUpper())]+\.$($Group.GroupNumber)\.\d+v\d+\s*$"
+                # Select-String line numbers aren't 0-indexed, hence the "-1" on the next line
+                $LineNumbers = Select-String $IdRegex "$($BaselinePath)$($Product).md" | ForEach-Object {$_."LineNumber"-1}
+
+                foreach ($LineNumber in $LineNumbers) {
+
+                    $Value = [System.Net.WebUtility]::HtmlEncode($Value)
+                    $Id = [string]$MdLines[$LineNumber].Substring(5)
+
+                    if ($Id.EndsWith("X")){
+                        $Deleted = $true
+                        $Id = $Id -Replace ".$"
+                        $Value = "[DELETED] " + $Value
+                    }
+                    else {
+                        $Deleted = $false
+                    }
+
+                    # This assumes that the value is on the immediate next line after the ID and ends in a period.
+                    $LineAdvance = 1;
+                    $Value = ([string]$MdLines[$LineNumber+$LineAdvance]).Trim()
+
+                    try {
+                        if ([string]::IsNullOrWhiteSpace($Value)){
+                            Write-Error "Expected description for $Id to start on line $($LineNumber+$LineAdvance)"
+                        }
+
+                        while ($Value.Substring($Value.Length-1,1) -ne "."){
+                            $LineAdvance++
+                            $Value += ' ' + ([string]$MdLines[$LineNumber+$LineAdvance]).Trim()
+                        }
+
+                        $Group.Controls += @{"Id"=$Id; "Value"=$Value; "Deleted"=$Deleted}
+                    }
+                    catch {
+                        Write-Error "Error parsing for policies in Group $($Group.GroupNumber). $($Group.GroupName)"
+                    }
                 }
 
-                $Value = [System.Net.WebUtility]::HtmlEncode($Value)
-                $Id = [string]$MdLines[$LineNumber].Substring(5)
-
-                if ($Id.EndsWith("X")){
-                    $Deleted = $true
-                    $Id = $Id -Replace ".$"
-                    $Value = "[DELETED] " + $Value
-                }
-                else {
-                    $Deleted = $false
-                }
-
-                $Group.Controls += @{"Id"=$Id; "Value"=$Value; "Deleted"=$Deleted}
+                $Output[$Product] += $Group
             }
-
-            $Output[$Product] += $Group
+        }
+        catch {
+            Write-Error -ErrorRecord $_ -RecommendedAction "Check validity of $Product secure baseline markdown at $ProductPath" -Category InvalidData `
+                -Message "Failed to parse $ProductName secure baseline markdown.\n$($_.InvocationInfo)"
         }
     }
 

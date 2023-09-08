@@ -3,7 +3,7 @@ Import-Module $CreateReportModulePath -Force
 
 InModuleScope CreateReport {
 
-    Describe -tag "Markdown" -name 'Check Secure Baseline Markdown document for <Product>' -ForEach @(
+    Describe -tag "Markdown" -name 'Check Secure Baseline Markdown document exists for <Product>' -ForEach @(
         @{Product = "aad"; MarkdownFilePath = "baselines/aad.md"}
         @{Product = "defender"; MarkdownFilePath = "baselines/defender.md"}
         @{Product = "exo"; MarkdownFilePath = "baselines/exo.md"}
@@ -15,31 +15,43 @@ InModuleScope CreateReport {
         It "Markdown file exists for <Product>" {
             Test-Path -Path $MarkdownFilePath | Should -BeTrue -Because "Current Location: $(Get-Location) File: $MarkdownFilePath "
         }
+        It "Import of markdown for <Product> does not throw expection" {
+            {Import-SecureBaseline -ProductNames $Product -BaselinePath "./baselines/"} |
+            Should -Not -Throw -Because "expect successful parse of secure baseline markdown of $Product"
+        }
     }
-    Describe -tag "Markdown" -name 'Fail import secure baseline ' {
+    Describe -tag "Markdown" -name 'Fail import secure baseline (bad path)' {
         It "Fails on bad baseline path" {
-            {Import-SecureBaseline -BaselinePath "garbage path"} |
+            {Import-SecureBaseline -ProductNames "aad" -BaselinePath "garbage path"} |
             Should -Throw
         }
     }
-    Describe -tag "Markdown" -name 'Import secure baseline' {
+    Describe -tag "Markdown" -name 'Check error handling.' {
+        BeforeAll{
+            Mock -ModuleName CreateReport -CommandName Write-Error {}
+        }
+        It "Invoke error messages on parsing errors" {
+            {
+                Import-SecureBaseline -ProductNames "aad" -BaselinePath "./Testing/Unit/PowerShell/CreateReport/CreateReportStubs" 
+                Should -Invoke -CommandName Write-Error -Exactly -Times 2 -Because "Except errors on parsing"
+            } | Should -Throw
+            
+        }
+    }
+    Describe -tag "Markdown" -name 'Import secure baseline <Product>' -ForEach @(
+        @{Product = "aad"; GroupCount = 8; PolicyCount = 30}
+        @{Product = "defender"; GroupCount = 6; PolicyCount = 20}
+        @{Product = "exo"; GroupCount = 17; PolicyCount = 37}
+        @{Product = "powerbi"; GroupCount = 7; PolicyCount = 8}
+        @{Product = "powerplatform"; GroupCount = 5; PolicyCount = 8}
+        @{Product = "sharepoint"; GroupCount = 4; PolicyCount = 11}
+        @{Product = "teams"; GroupCount = 8; PolicyCount = 21}
+    ){
         BeforeAll{
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'Baseline', Justification = 'Variable is used in another scope')]
-            $Baselines = Import-SecureBaseline -BaselinePath "./baselines/"
+            $Baselines = Import-SecureBaseline -ProductNames $Product -BaselinePath "./baselines/"
         }
-        It "Validate import of markdown for all products" {
-            $Baselines.GetType().Name -Eq [hashtable] | Should -BeTrue
-            $Baselines.Count | Should -BeExactly 7 -Because "Baseline Markdown document expected for all products."
-        }
-        It "Validate markdown group count for <Product>" -ForEach @(
-            @{Product = "aad"; GroupCount = 8; PolicyCount = 30}
-            @{Product = "defender"; GroupCount = 6; PolicyCount = 20}
-            @{Product = "exo"; GroupCount = 17; PolicyCount = 37}
-            @{Product = "powerbi"; GroupCount = 7; PolicyCount = 8}
-            @{Product = "powerplatform"; GroupCount = 5; PolicyCount = 8}
-            @{Product = "sharepoint"; GroupCount = 4; PolicyCount = 12}
-            @{Product = "teams"; GroupCount = 8; PolicyCount = 21}
-        ){
+        It "Validate markdown group count for <Product>" {
             {$Baselines.$Product} | Should -Not -Throw
             $Groups = $Baselines.$Product
             $Groups.Length | Should -BeExactly $GroupCount -Because "known count of groups for $Product"

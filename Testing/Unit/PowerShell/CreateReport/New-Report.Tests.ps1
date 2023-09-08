@@ -28,6 +28,8 @@ InModuleScope CreateReport {
                 PowerPlatform = "Microsoft Power Platform";
                 SharePoint    = "SharePoint Online";
             }
+        }
+        BeforeEach {
             $IndividualReportPath = (Join-Path -Path "TestDrive:" -ChildPath "CreateReportStubs/CreateReportUnitFolder/IndividualReports")
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'CreateReportParams')]
             $CreateReportParams = @{
@@ -36,7 +38,6 @@ InModuleScope CreateReport {
                 'OutProviderFileName'  = "ProviderSettingsExport"
                 'OutRegoFileName'      = "TestResults"
                 'DarkMode'             = $false
-                'SecureBaselines'      = Import-SecureBaseline
             }
         }
         It 'Creates a report for <Product>' -ForEach @(
@@ -48,8 +49,9 @@ InModuleScope CreateReport {
             @{Product = 'teams'; WarningCount = 11}
         ){
             $CreateReportParams += @{
-                'BaselineName' = $ArgToProd[$Product];
-                'FullName'     = $ProdToFullName[$Product];
+                'BaselineName'    = $ArgToProd[$Product];
+                'FullName'        = $ProdToFullName[$Product];
+                'SecureBaselines' = Import-SecureBaseline -ProductNames $Product
             }
 
             { New-Report @CreateReportParams } | Should -Not -Throw
