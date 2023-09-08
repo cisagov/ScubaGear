@@ -12,6 +12,7 @@ on:
         - "*Baseline*"
         paths:
         - "baselines/*.md"
+        - ".github/workflows/run_markdowm_check.yaml"
 
 name: Markdown Check
 
