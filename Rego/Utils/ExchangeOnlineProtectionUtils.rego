@@ -11,7 +11,7 @@ SensitiveUsers(Policies, PolicyID) := {
     "IncludedUsers" : IncludedUsers,
     "ExcludedUsers" : ExcludedUsers
 } {
-    ConfigUsers := { x | some x in input.scuba_config.Defender[PolicyID].SensitiveAccounts.Users; x != null }
+    ConfigUsers := { x | some x in input.scuba_config.Defender[PolicyID].SensitiveAccounts.IncludedUsers; x != null }
     Policy := [ Policy | Policy := Policies[_]; Policy.Identity == "Strict Preset Security Policy" ]
     IncludedUsers := { x | x := Policy[0].SentTo[_] }
     ExcludedUsers := { x | x := Policy[0].ExceptIfSentTo[_] }
@@ -23,7 +23,7 @@ SensitiveGroups(Policies, PolicyID) := {
     "IncludedGroups" : IncludedGroups,
     "ExcludedGroups" : ExcludedGroups
 } {
-    ConfigGroups := { x | some x in input.scuba_config.Defender[PolicyID].SensitiveAccounts.Groups; x != null }
+    ConfigGroups := { x | some x in input.scuba_config.Defender[PolicyID].SensitiveAccounts.IncludedGroups; x != null }
     Policy := [ Policy | Policy := Policies[_]; Policy.Identity == "Strict Preset Security Policy" ]
     IncludedGroups := { x | x := Policy[0].SentToMemberOf[_] }
     ExcludedGroups := { x | x := Policy[0].ExceptIfSentToMemberOf[_] }
@@ -35,7 +35,7 @@ SensitiveDomains(Policies, PolicyID) := {
     "IncludedDomains" : IncludedDomains,
     "ExcludedDomains" : ExcludedDomains
 } {
-    ConfigDomains := { x | some x in input.scuba_config.Defender[PolicyID].SensitiveAccounts.Domains; x != null }
+    ConfigDomains := { x | some x in input.scuba_config.Defender[PolicyID].SensitiveAccounts.IncludedDomains; x != null }
     Policy := [ Policy | Policy := Policies[_]; Policy.Identity == "Strict Preset Security Policy" ]
     IncludedDomains := { x | x := Policy[0].RecipientDomainIs[_] }
     ExcludedDomains := { x | x := Policy[0].ExceptIfRecipientDomainIs[_] }

@@ -487,9 +487,9 @@ test_SensitiveEOP_Correct_V1 if {
             "Defender" : {
                 "MS.DEFENDER.1.4v1" : {
                     "SensitiveAccounts" : {
-                        "Users" : [],
-                        "Groups" : [],
-                        "Domains" : []
+                        "IncludedUsers" : [],
+                        "IncludedGroups" : [],
+                        "IncludedDomains" : []
                     }
                 }
             }
@@ -523,11 +523,11 @@ test_SensitiveEOP_Correct_V2 if {
             "Defender" : {
                 "MS.DEFENDER.1.4v1" : {
                     "SensitiveAccounts" : {
-                        "Users" : [
+                        "IncludedUsers" : [
                             "johndoe@random.example.com"
                         ],
-                        "Groups" : [],
-                        "Domains" : []
+                        "IncludedGroups" : [],
+                        "IncludedDomains" : []
                     }
                 }
             }
@@ -563,11 +563,11 @@ test_SensitiveEOP_Correct_V3 if {
             "Defender" : {
                 "MS.DEFENDER.1.4v1" : {
                     "SensitiveAccounts" : {
-                        "Users" : [
+                        "IncludedUsers" : [
                             "johndoe@random.example.com"
                         ],
-                        "Groups" : [],
-                        "Domains" : []
+                        "IncludedGroups" : [],
+                        "IncludedDomains" : []
                     }
                 }
             }
@@ -604,12 +604,12 @@ test_SensitiveEOP_Correct_V4 if {
             "Defender" : {
                 "MS.DEFENDER.1.4v1" : {
                     "SensitiveAccounts" : {
-                        "Users" : [
+                        "IncludedUsers" : [
                             "johndoe@random.example.com",
                             "janedoe@random.example.com"
                         ],
-                        "Groups" : [],
-                        "Domains" : []
+                        "IncludedGroups" : [],
+                        "IncludedDomains" : []
                     }
                 }
             }
@@ -647,11 +647,11 @@ test_SensitiveEOP_Correct_V5 if {
             "Defender" : {
                 "MS.DEFENDER.1.4v1" : {
                     "SensitiveAccounts" : {
-                        "Users" : [
+                        "IncludedUsers" : [
                             "johndoe@random.example.com"
                         ],
-                        "Groups" : [],
-                        "Domains" : []
+                        "IncludedGroups" : [],
+                        "IncludedDomains" : []
                     }
                 }
             }
@@ -692,12 +692,12 @@ test_SensitiveEOP_Correct_V6 if {
             "Defender" : {
                 "MS.DEFENDER.1.4v1" : {
                     "SensitiveAccounts" : {
-                        "Users" : [
+                        "IncludedUsers" : [
                             "johndoe@random.example.com",
                             "janedoe@random.example.com"
                         ],
-                        "Groups" : [],
-                        "Domains" : []
+                        "IncludedGroups" : [],
+                        "IncludedDomains" : []
                     }
                 }
             }
@@ -737,11 +737,11 @@ test_SensitiveEOP_Correct_V7 if {
             "Defender" : {
                 "MS.DEFENDER.1.4v1" : {
                     "SensitiveAccounts" : {
-                        "Users" : [
+                        "IncludedUsers" : [
                             "johndoe@random.example.com"
                         ],
-                        "Groups" : [],
-                        "Domains" : []
+                        "IncludedGroups" : [],
+                        "IncludedDomains" : []
                     }
                 }
             }
@@ -780,12 +780,12 @@ test_SensitiveEOP_Correct_V8 if {
             "Defender" : {
                 "MS.DEFENDER.1.4v1" : {
                     "SensitiveAccounts" : {
-                        "Users" : [
+                        "IncludedUsers" : [
                             "johndoe@random.example.com",
                             "janedoe@random.example.com"
                         ],
-                        "Groups" : [],
-                        "Domains" : []
+                        "IncludedGroups" : [],
+                        "IncludedDomains" : []
                     }
                 }
             }
@@ -825,11 +825,11 @@ test_SensitiveEOP_Correct_V9 if {
             "Defender" : {
                 "MS.DEFENDER.1.4v1" : {
                     "SensitiveAccounts" : {
-                        "Users" : [
+                        "IncludedUsers" : [
                             "johndoe@random.example.com"
                         ],
-                        "Groups" : [],
-                        "Domains" : []
+                        "IncludedGroups" : [],
+                        "IncludedDomains" : []
                     }
                 }
             }
@@ -872,12 +872,12 @@ test_SensitiveEOP_Correct_V10 if {
             "Defender" : {
                 "MS.DEFENDER.1.4v1" : {
                     "SensitiveAccounts" : {
-                        "Users" : [
+                        "IncludedUsers" : [
                             "johndoe@random.example.com",
                             "janedoe@random.example.com"
                         ],
-                        "Groups" : [],
-                        "Domains" : []
+                        "IncludedGroups" : [],
+                        "IncludedDomains" : []
                     }
                 }
             }
@@ -917,11 +917,11 @@ test_SensitiveEOP_Correct_V11 if {
             "Defender" : {
                 "MS.DEFENDER.1.4v1" : {
                     "SensitiveAccounts" : {
-                        "Users" : [
+                        "IncludedUsers" : [
                             "johndoe@random.example.com"
                         ],
-                        "Groups" : [],
-                        "Domains" : []
+                        "IncludedGroups" : [],
+                        "IncludedDomains" : []
                     }
                 }
             }
@@ -962,12 +962,12 @@ test_SensitiveEOP_Correct_V12 if {
             "Defender" : {
                 "MS.DEFENDER.1.4v1" : {
                     "SensitiveAccounts" : {
-                        "Users" : [
+                        "IncludedUsers" : [
                             "johndoe@random.example.com",
                             "janedoe@random.example.com"
                         ],
-                        "Groups" : [],
-                        "Domains" : []
+                        "IncludedGroups" : [],
+                        "IncludedDomains" : []
                     }
                 }
             }
@@ -1007,11 +1007,11 @@ test_SensitiveEOP_Correct_V13 if {
             "Defender" : {
                 "MS.DEFENDER.1.4v1" : {
                     "SensitiveAccounts" : {
-                        "Users" : [
+                        "IncludedUsers" : [
                             "johndoe@random.example.com"
                         ],
-                        "Groups" : [],
-                        "Domains" : []
+                        "IncludedGroups" : [],
+                        "IncludedDomains" : []
                     }
                 }
             }
@@ -1050,12 +1050,12 @@ test_SensitiveEOP_Correct_V14 if {
             "Defender" : {
                 "MS.DEFENDER.1.4v1" : {
                     "SensitiveAccounts" : {
-                        "Users" : [
+                        "IncludedUsers" : [
                             "johndoe@random.example.com",
                             "janedoe@random.example.com"
                         ],
-                        "Groups" : [],
-                        "Domains" : []
+                        "IncludedGroups" : [],
+                        "IncludedDomains" : []
                     }
                 }
             }
@@ -1095,11 +1095,11 @@ test_SensitiveEOP_Correct_V15 if {
             "Defender" : {
                 "MS.DEFENDER.1.4v1" : {
                     "SensitiveAccounts" : {
-                        "Users" : [
+                        "IncludedUsers" : [
                             "johndoe@random.example.com"
                         ],
-                        "Groups" : [],
-                        "Domains" : []
+                        "IncludedGroups" : [],
+                        "IncludedDomains" : []
                     }
                 }
             }
@@ -1142,12 +1142,12 @@ test_SensitiveEOP_Correct_V16 if {
             "Defender" : {
                 "MS.DEFENDER.1.4v1" : {
                     "SensitiveAccounts" : {
-                        "Users" : [
+                        "IncludedUsers" : [
                             "johndoe@random.example.com",
                             "janedoe@random.example.com"
                         ],
-                        "Groups" : [],
-                        "Domains" : []
+                        "IncludedGroups" : [],
+                        "IncludedDomains" : []
                     }
                 }
             }
@@ -1189,11 +1189,11 @@ test_SensitiveEOP_Correct_V17 if {
             "Defender" : {
                 "MS.DEFENDER.1.4v1" : {
                     "SensitiveAccounts" : {
-                        "Users" : [
+                        "IncludedUsers" : [
                             "johndoe@random.example.com"
                         ],
-                        "Groups" : [],
-                        "Domains" : []
+                        "IncludedGroups" : [],
+                        "IncludedDomains" : []
                     }
                 }
             }
@@ -1236,12 +1236,12 @@ test_SensitiveEOP_Correct_V18 if {
             "Defender" : {
                 "MS.DEFENDER.1.4v1" : {
                     "SensitiveAccounts" : {
-                        "Users" : [
+                        "IncludedUsers" : [
                             "johndoe@random.example.com",
                             "janedoe@random.example.com"
                         ],
-                        "Groups" : [],
-                        "Domains" : []
+                        "IncludedGroups" : [],
+                        "IncludedDomains" : []
                     }
                 }
             }
@@ -1279,11 +1279,11 @@ test_SensitiveEOP_Correct_V19 if {
             "Defender" : {
                 "MS.DEFENDER.1.4v1" : {
                     "SensitiveAccounts" : {
-                        "Users" : [],
-                        "Groups" : [
+                        "IncludedUsers" : [],
+                        "IncludedGroups" : [
                             "Dune"
                         ],
-                        "Domains" : []
+                        "IncludedDomains" : []
                     }
                 }
             }
@@ -1320,12 +1320,12 @@ test_SensitiveEOP_Correct_V20 if {
             "Defender" : {
                 "MS.DEFENDER.1.4v1" : {
                     "SensitiveAccounts" : {
-                        "Users" : [],
-                        "Groups" : [
+                        "IncludedUsers" : [],
+                        "IncludedGroups" : [
                             "Dune",
                             "Dune12"
                         ],
-                        "Domains" : []
+                        "IncludedDomains" : []
                     }
                 }
             }
@@ -1363,11 +1363,11 @@ test_SensitiveEOP_Correct_V21 if {
             "Defender" : {
                 "MS.DEFENDER.1.4v1" : {
                     "SensitiveAccounts" : {
-                        "Users" : [],
-                        "Groups" : [
+                        "IncludedUsers" : [],
+                        "IncludedGroups" : [
                             "Dune"
                         ],
-                        "Domains" : []
+                        "IncludedDomains" : []
                     }
                 }
             }
@@ -1408,12 +1408,12 @@ test_SensitiveEOP_Correct_V22 if {
             "Defender" : {
                 "MS.DEFENDER.1.4v1" : {
                     "SensitiveAccounts" : {
-                        "Users" : [],
-                        "Groups" : [
+                        "IncludedUsers" : [],
+                        "IncludedGroups" : [
                             "Dune",
                             "Dune12"
                         ],
-                        "Domains" : []
+                        "IncludedDomains" : []
                     }
                 }
             }
@@ -1453,11 +1453,11 @@ test_SensitiveEOP_Correct_V23 if {
             "Defender" : {
                 "MS.DEFENDER.1.4v1" : {
                     "SensitiveAccounts" : {
-                        "Users" : [],
-                        "Groups" : [
+                        "IncludedUsers" : [],
+                        "IncludedGroups" : [
                             "Dune"
                         ],
-                        "Domains" : []
+                        "IncludedDomains" : []
                     }
                 }
             }
@@ -1498,12 +1498,12 @@ test_SensitiveEOP_Correct_V24 if {
             "Defender" : {
                 "MS.DEFENDER.1.4v1" : {
                     "SensitiveAccounts" : {
-                        "Users" : [],
-                        "Groups" : [
+                        "IncludedUsers" : [],
+                        "IncludedGroups" : [
                             "Dune",
                             "Dune12"
                         ],
-                        "Domains" : []
+                        "IncludedDomains" : []
                     }
                 }
             }
@@ -1541,9 +1541,9 @@ test_SensitiveEOP_Correct_V25 if {
             "Defender" : {
                 "MS.DEFENDER.1.4v1" : {
                     "SensitiveAccounts" : {
-                        "Users" : [],
-                        "Groups" : [],
-                        "Domains" : [
+                        "IncludedUsers" : [],
+                        "IncludedGroups" : [],
+                        "IncludedDomains" : [
                             "random.mail.example.com"
                         ]
                     }
@@ -1582,9 +1582,9 @@ test_SensitiveEOP_Correct_V26 if {
             "Defender" : {
                 "MS.DEFENDER.1.4v1" : {
                     "SensitiveAccounts" : {
-                        "Users" : [],
-                        "Groups" : [],
-                        "Domains" : [
+                        "IncludedUsers" : [],
+                        "IncludedGroups" : [],
+                        "IncludedDomains" : [
                             "random.mail.example.com",
                             "random.example.com"
                         ]
@@ -1621,9 +1621,9 @@ test_SensitiveEOP_Incorrect_V1 if {
             "Defender" : {
                 "MS.DEFENDER.1.4v1" : {
                     "SensitiveAccounts" : {
-                        "Users" : [],
-                        "Groups" : [],
-                        "Domains" : []
+                        "IncludedUsers" : [],
+                        "IncludedGroups" : [],
+                        "IncludedDomains" : []
                     }
                 }
             }
@@ -1647,9 +1647,9 @@ test_SensitiveEOP_Incorrect_V2 if {
             "Defender" : {
                 "MS.DEFENDER.1.4v1" : {
                     "SensitiveAccounts" : {
-                        "Users" : [],
-                        "Groups" : [],
-                        "Domains" : []
+                        "IncludedUsers" : [],
+                        "IncludedGroups" : [],
+                        "IncludedDomains" : []
                     }
                 }
             }
@@ -1685,11 +1685,11 @@ test_SensitiveEOP_Incorrect_V3 if {
             "Defender" : {
                 "MS.DEFENDER.1.4v1" : {
                     "SensitiveAccounts" : {
-                        "Users" : [
+                        "IncludedUsers" : [
                             "johndoe@random.example.com"
                         ],
-                        "Groups" : [],
-                        "Domains" : []
+                        "IncludedGroups" : [],
+                        "IncludedDomains" : []
                     }
                 }
             }
@@ -1726,11 +1726,11 @@ test_SensitiveEOP_Incorrect_V4 if {
             "Defender" : {
                 "MS.DEFENDER.1.4v1" : {
                     "SensitiveAccounts" : {
-                        "Users" : [
+                        "IncludedUsers" : [
                             "johndoe@random.example.com"
                         ],
-                        "Groups" : [],
-                        "Domains" : []
+                        "IncludedGroups" : [],
+                        "IncludedDomains" : []
                     }
                 }
             }
@@ -1766,12 +1766,12 @@ test_SensitiveEOP_Incorrect_V5 if {
             "Defender" : {
                 "MS.DEFENDER.1.4v1" : {
                     "SensitiveAccounts" : {
-                        "Users" : [
+                        "IncludedUsers" : [
                             "johndoe@random.example.com",
                             "janedoe@random.example.com"
                         ],
-                        "Groups" : [],
-                        "Domains" : []
+                        "IncludedGroups" : [],
+                        "IncludedDomains" : []
                     }
                 }
             }
@@ -1809,11 +1809,11 @@ test_SensitiveEOP_Incorrect_V6 if {
             "Defender" : {
                 "MS.DEFENDER.1.4v1" : {
                     "SensitiveAccounts" : {
-                        "Users" : [
+                        "IncludedUsers" : [
                             "johndoe@random.example.com"
                         ],
-                        "Groups" : [],
-                        "Domains" : []
+                        "IncludedGroups" : [],
+                        "IncludedDomains" : []
                     }
                 }
             }
@@ -1852,12 +1852,12 @@ test_SensitiveEOP_Incorrect_V7 if {
             "Defender" : {
                 "MS.DEFENDER.1.4v1" : {
                     "SensitiveAccounts" : {
-                        "Users" : [
+                        "IncludedUsers" : [
                             "johndoe@random.example.com",
                             "janedoe@random.example.com"
                         ],
-                        "Groups" : [],
-                        "Domains" : []
+                        "IncludedGroups" : [],
+                        "IncludedDomains" : []
                     }
                 }
             }
@@ -1894,11 +1894,11 @@ test_SensitiveEOP_Incorrect_V8 if {
             "Defender" : {
                 "MS.DEFENDER.1.4v1" : {
                     "SensitiveAccounts" : {
-                        "Users" : [
+                        "IncludedUsers" : [
                             "johndoe@random.example.com"
                         ],
-                        "Groups" : [],
-                        "Domains" : []
+                        "IncludedGroups" : [],
+                        "IncludedDomains" : []
                     }
                 }
             }
@@ -1937,12 +1937,12 @@ test_SensitiveEOP_Incorrect_V9 if {
             "Defender" : {
                 "MS.DEFENDER.1.4v1" : {
                     "SensitiveAccounts" : {
-                        "Users" : [
+                        "IncludedUsers" : [
                             "johndoe@random.example.com",
                             "janedoe@random.example.com"
                         ],
-                        "Groups" : [],
-                        "Domains" : []
+                        "IncludedGroups" : [],
+                        "IncludedDomains" : []
                     }
                 }
             }
@@ -1982,11 +1982,11 @@ test_SensitiveEOP_Incorrect_V10 if {
             "Defender" : {
                 "MS.DEFENDER.1.4v1" : {
                     "SensitiveAccounts" : {
-                        "Users" : [
+                        "IncludedUsers" : [
                             "johndoe@random.example.com"
                         ],
-                        "Groups" : [],
-                        "Domains" : []
+                        "IncludedGroups" : [],
+                        "IncludedDomains" : []
                     }
                 }
             }
@@ -2027,12 +2027,12 @@ test_SensitiveEOP_Incorrect_V11 if {
             "Defender" : {
                 "MS.DEFENDER.1.4v1" : {
                     "SensitiveAccounts" : {
-                        "Users" : [
+                        "IncludedUsers" : [
                             "johndoe@random.example.com",
                             "janedoe@random.example.com"
                         ],
-                        "Groups" : [],
-                        "Domains" : []
+                        "IncludedGroups" : [],
+                        "IncludedDomains" : []
                     }
                 }
             }
@@ -2070,11 +2070,11 @@ test_SensitiveEOP_Incorrect_V12 if {
             "Defender" : {
                 "MS.DEFENDER.1.4v1" : {
                     "SensitiveAccounts" : {
-                        "Users" : [
+                        "IncludedUsers" : [
                             "johndoe@random.example.com"
                         ],
-                        "Groups" : [],
-                        "Domains" : []
+                        "IncludedGroups" : [],
+                        "IncludedDomains" : []
                     }
                 }
             }
@@ -2113,12 +2113,12 @@ test_SensitiveEOP_Incorrect_V13 if {
             "Defender" : {
                 "MS.DEFENDER.1.4v1" : {
                     "SensitiveAccounts" : {
-                        "Users" : [
+                        "IncludedUsers" : [
                             "johndoe@random.example.com",
                             "janedoe@random.example.com"
                         ],
-                        "Groups" : [],
-                        "Domains" : []
+                        "IncludedGroups" : [],
+                        "IncludedDomains" : []
                     }
                 }
             }
@@ -2156,11 +2156,11 @@ test_SensitiveEOP_Incorrect_V14 if {
             "Defender" : {
                 "MS.DEFENDER.1.4v1" : {
                     "SensitiveAccounts" : {
-                        "Users" : [
+                        "IncludedUsers" : [
                             "johndoe@random.example.com"
                         ],
-                        "Groups" : [],
-                        "Domains" : []
+                        "IncludedGroups" : [],
+                        "IncludedDomains" : []
                     }
                 }
             }
@@ -2199,12 +2199,12 @@ test_SensitiveEOP_Incorrect_V15 if {
             "Defender" : {
                 "MS.DEFENDER.1.4v1" : {
                     "SensitiveAccounts" : {
-                        "Users" : [
+                        "IncludedUsers" : [
                             "johndoe@random.example.com",
                             "janedoe@random.example.com"
                         ],
-                        "Groups" : [],
-                        "Domains" : []
+                        "IncludedGroups" : [],
+                        "IncludedDomains" : []
                     }
                 }
             }
@@ -2244,11 +2244,11 @@ test_SensitiveEOP_Incorrect_V16 if {
             "Defender" : {
                 "MS.DEFENDER.1.4v1" : {
                     "SensitiveAccounts" : {
-                        "Users" : [
+                        "IncludedUsers" : [
                             "johndoe@random.example.com"
                         ],
-                        "Groups" : [],
-                        "Domains" : []
+                        "IncludedGroups" : [],
+                        "IncludedDomains" : []
                     }
                 }
             }
@@ -2289,12 +2289,12 @@ test_SensitiveEOP_Incorrect_V17 if {
             "Defender" : {
                 "MS.DEFENDER.1.4v1" : {
                     "SensitiveAccounts" : {
-                        "Users" : [
+                        "IncludedUsers" : [
                             "johndoe@random.example.com",
                             "janedoe@random.example.com"
                         ],
-                        "Groups" : [],
-                        "Domains" : []
+                        "IncludedGroups" : [],
+                        "IncludedDomains" : []
                     }
                 }
             }
@@ -2330,11 +2330,11 @@ test_SensitiveEOP_Incorrect_V18 if {
             "Defender" : {
                 "MS.DEFENDER.1.4v1" : {
                     "SensitiveAccounts" : {
-                        "Users" : [],
-                        "Groups" : [
+                        "IncludedUsers" : [],
+                        "IncludedGroups" : [
                             "Dune"
                         ],
-                        "Domains" : []
+                        "IncludedDomains" : []
                     }
                 }
             }
@@ -2370,12 +2370,12 @@ test_SensitiveEOP_Incorrect_V19 if {
             "Defender" : {
                 "MS.DEFENDER.1.4v1" : {
                     "SensitiveAccounts" : {
-                        "Users" : [],
-                        "Groups" : [
+                        "IncludedUsers" : [],
+                        "IncludedGroups" : [
                             "Dune",
                             "Dune12"
                         ],
-                        "Domains" : []
+                        "IncludedDomains" : []
                     }
                 }
             }
@@ -2413,12 +2413,12 @@ test_SensitiveEOP_Incorrect_V20 if {
             "Defender" : {
                 "MS.DEFENDER.1.4v1" : {
                     "SensitiveAccounts" : {
-                        "Users" : [],
-                        "Groups" : [
+                        "IncludedUsers" : [],
+                        "IncludedGroups" : [
                             "Dune",
                             "Dune12"
                         ],
-                        "Domains" : []
+                        "IncludedDomains" : []
                     }
                 }
             }
@@ -2454,11 +2454,11 @@ test_SensitiveEOP_Incorrect_V21 if {
             "Defender" : {
                 "MS.DEFENDER.1.4v1" : {
                     "SensitiveAccounts" : {
-                        "Users" : [],
-                        "Groups" : [
+                        "IncludedUsers" : [],
+                        "IncludedGroups" : [
                             "Dune"
                         ],
-                        "Domains" : []
+                        "IncludedDomains" : []
                     }
                 }
             }
@@ -2496,11 +2496,11 @@ test_SensitiveEOP_Incorrect_V22 if {
             "Defender" : {
                 "MS.DEFENDER.1.4v1" : {
                     "SensitiveAccounts" : {
-                        "Users" : [],
-                        "Groups" : [
+                        "IncludedUsers" : [],
+                        "IncludedGroups" : [
                             "Dune"
                         ],
-                        "Domains" : []
+                        "IncludedDomains" : []
                     }
                 }
             }
@@ -2536,9 +2536,9 @@ test_SensitiveEOP_Incorrect_V23 if {
             "Defender" : {
                 "MS.DEFENDER.1.4v1" : {
                     "SensitiveAccounts" : {
-                        "Users" : [],
-                        "Groups" : [],
-                        "Domains" : [
+                        "IncludedUsers" : [],
+                        "IncludedGroups" : [],
+                        "IncludedDomains" : [
                             "random.example.com"
                         ]
                     }
@@ -2578,9 +2578,9 @@ test_SensitiveEOP_Incorrect_V24 if {
             "Defender" : {
                 "MS.DEFENDER.1.4v1" : {
                     "SensitiveAccounts" : {
-                        "Users" : [],
-                        "Groups" : [],
-                        "Domains" : [
+                        "IncludedUsers" : [],
+                        "IncludedGroups" : [],
+                        "IncludedDomains" : [
                             "random.example.com",
                             "random.mail.example.com"
                         ]
@@ -2619,11 +2619,11 @@ test_SensitiveEOP_Incorrect_V25 if {
             "Defender" : {
                 "MS.DEFENDER.1.4v1" : {
                     "SensitiveAccounts" : {
-                        "Users" : [
+                        "IncludedUsers" : [
                             "johndoe@random.example.com"
                         ],
-                        "Groups" : [],
-                        "Domains" : [ ]
+                        "IncludedGroups" : [],
+                        "IncludedDomains" : [ ]
                     }
                 }
             }
