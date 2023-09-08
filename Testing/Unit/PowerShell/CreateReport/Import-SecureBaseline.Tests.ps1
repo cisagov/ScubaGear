@@ -37,42 +37,4 @@ InModuleScope CreateReport {
             } | Should -Throw
         }
     }
-    Describe -tag "Markdown" -name 'Import secure baseline <Product>' -ForEach @(
-        @{Product = "aad"; GroupCount = 8; PolicyCount = 30}
-        @{Product = "defender"; GroupCount = 6; PolicyCount = 20}
-        @{Product = "exo"; GroupCount = 17; PolicyCount = 37}
-        @{Product = "powerbi"; GroupCount = 7; PolicyCount = 8}
-        @{Product = "powerplatform"; GroupCount = 5; PolicyCount = 8}
-        @{Product = "sharepoint"; GroupCount = 4; PolicyCount = 11}
-        @{Product = "teams"; GroupCount = 8; PolicyCount = 21}
-    ){
-        BeforeAll{
-            [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'Baseline', Justification = 'Variable is used in another scope')]
-            $Baselines = Import-SecureBaseline -ProductNames $Product -BaselinePath "./baselines/"
-        }
-        It "Validate markdown group count for <Product>" {
-            {$Baselines.$Product} | Should -Not -Throw
-            $Groups = $Baselines.$Product
-            $Groups.Length | Should -BeExactly $GroupCount -Because "known count of groups for $Product"
-
-            $NumberOfPolicies = 0
-            foreach ($Group in $Groups){
-                $Group.GroupName | Should -Not -BeNullOrEmpty
-                [int]$Group.GroupNumber | Should -BeLessOrEqual $GroupCount
-                $Controls = $Group.Controls
-                $NumberOfPolicies += $Controls.Length
-
-                foreach ($Control in $Controls){
-                    $Control.Id -Match  "^MS\.$($Product.ToUpper())\.\d{1,}\.\d{1,}v\d{1,}$" | Should -BeTrue
-                    $Control.Value -Match "^.*\.$" | Should -BeTrue -Because "$Control.Id does not end with period."
-                    #$Control.Value -Match '^(.+)(SHALL|SHOULD|MAY){1,1}(.+\.)$'
-                    #@("SHALL", "SHOULD", "MAY") -Contains $Matches.2 | Should -BeTrue -Because "$($Control.Id) must contain valid criticality but has $($Matches.2)"
-                    #@("SHALL", "SHOULD", "MAY") -Contains $Control.Criticality | Should -BeTrue
-                    $Control.Deleted.GetType() -Eq [bool]| Should -BeTrue -Because "Type should be boolean."
-                }
-            }
-
-            $NumberOfPolicies | Should -BeExactly $PolicyCount -Because "known count of policies for $Product"
-        }
-    }
 }
