@@ -2,7 +2,7 @@
 
 Microsoft Teams is a cloud-based text and live chat workspace in Microsoft 365 that supports video calls, chat messaging, screen-sharing, and file sharing.. This Secure Configuration Baseline (SCB) provides specific policies to strengthen Microsoft Teams' security.
 
-The Secure Cloud Business Applications (SCuBA) project run by the Cybersecurity and Infrastructure Security Agency (CISA) provides guidance and capabilities to secure federal civilian executive branch (FCEB) agencies’ cloud business application environments and protect federal information that is created, accessed, shared, and stored in those environments. 
+The Secure Cloud Business Applications (SCuBA) project run by the Cybersecurity and Infrastructure Security Agency (CISA) provides guidance and capabilities to secure federal civilian executive branch (FCEB) agencies’ cloud business application environments and protect federal information that is created, accessed, shared, and stored in those environments.
 
 The CISA SCuBA SCBs for M365 help secure federal information assets stored within M365 cloud business application environments through consistent, effective, and manageable security configurations. CISA created baselines tailored to the federal government’s threats and risk tolerance with the knowledge that every organization has different threat models and risk tolerance. Non-governmental organizations may also find value in applying these baselines to reduce risks.
 
@@ -41,12 +41,11 @@ across Microsoft documentation):
     users, meaning users that are not logged in to any Microsoft or
     organization account, such as dial-in users.[^1]
 
-
 # Baseline Policies
 
 ## 1. Meeting Policies
 
-This section helps reduce security risks posed by the external participants during meetings. In this instance, the term “external participants” includes external users, Business to Business (B2B) guest users, unmanaged users, and anonymous users. 
+This section helps reduce security risks posed by the external participants during meetings. In this instance, the term “external participants” includes external users, Business to Business (B2B) guest users, unmanaged users, and anonymous users.
 
 This section helps reduce security risks related to the user permissions for recording Teams meetings and Events. These policies and user permissions apply to meetings hosted by a user, during one-on-one calls, and group calls started by a user. Agencies should comply with any other applicable policies or legislation in addition to this guidance.
 
@@ -69,12 +68,12 @@ Anonymous users SHALL NOT be enabled to start meetings.
 - _Note:_ This policy applies to the Global (Org-wide default) meeting policy, and custom meeting policies if they exist.
 
 #### MS.TEAMS.1.3v1
-Anonymous users and dial-in callers, SHOULD NOT be admitted automatically. 
+Anonymous users and dial-in callers, SHOULD NOT be admitted automatically.
 
 <!--Policy: MS.TEAMS.1.3v1; Criticality: SHOULD -->
 - _Rationale:_ Automatically allowing the anonymous and dial-in users reduces the control on who can participate in a meeting and potential for data breaches. This policy reduces the risk by requiring all anonymous and dial-in users to wait in a lobby until admitted by an authorized meeting participant. If the agency has a use case to have members of specific trusted organizations and/or B2B guests enter a meeting automatically, custom policies may be created and assigned to authorized meeting organizers.  
 - _Last modified:_ July 2023
-- _Note:_ This policy applies to the Global (Org-wide default) meeting policy. Custom meeting policies MAY be created allowing specific users more flexibility. For example, B2B guest users and trusted partner members maybe auto admitted into meetings organized by authorized users. 
+- _Note:_ This policy applies to the Global (Org-wide default) meeting policy. Custom meeting policies MAY be created allowing specific users more flexibility. For example, B2B guest users and trusted partner members maybe auto admitted into meetings organized by authorized users.
 
 #### MS.TEAMS.1.4v1
 Internal users SHOULD be admitted automatically.
@@ -88,7 +87,7 @@ Internal users SHOULD be admitted automatically.
 Dial-in users, SHOULD NOT be enabled to bypass the lobby.
 
 <!--Policy: MS.TEAMS.1.5v1; Criticality: SHOULD -->
-- _Rationale:_ Allowing the Dial-in users automatically reduces the control on who can participate in a meeting and potential for data breaches. This policy reduces the risk by requiring all dial-in users to wait in a lobby until they were admitted by an authorized meeting participant.   
+- _Rationale:_ Allowing the Dial-in users automatically reduces the control on who can participate in a meeting and potential for data breaches. This policy reduces the risk by requiring all dial-in users to wait in a lobby until they were admitted by an authorized meeting participant.
 - _Last modified:_ July 2023
 - _Note:_ This policy applies to the Global (Org-wide default) meeting policy, and custom meeting policies if they exist.  
 
@@ -96,7 +95,7 @@ Dial-in users, SHOULD NOT be enabled to bypass the lobby.
 Meeting recording SHOULD be disabled.
 
 <!--Policy: MS.TEAMS.1.6v1; Criticality: SHOULD -->
-- _Rationale:_ The security risk with allowing all users to record Teams meetings and group calls exposes the ability to capture all audio, video, screen sharing activity, and information shared. By disabling the meeting recording setting in the Global (org-wide default) meeting policy an agency limits information exposure. 
+- _Rationale:_ The security risk with allowing all users to record Teams meetings and group calls exposes the ability to capture all audio, video, screen sharing activity, and information shared. By disabling the meeting recording setting in the Global (org-wide default) meeting policy an agency limits information exposure.
 - _Last modified:_ July 2023
 - _Note:_ This policy applies to the Global (Org-wide default) meeting policy, and custom meeting policies if they exist. Custom policies MAY be created to allow more flexibility for specific users.
 
@@ -122,8 +121,6 @@ Learn](https://learn.microsoft.com/en-us/microsoftteams/policy-assignment-overvi
 - [Live Event Recording Policies \| Microsoft
 Learn](https://learn.microsoft.com/en-us/microsoftteams/teams-live-events/live-events-recording-policies)
 
-
-
 ### License Requirements
 
 - N/A
@@ -131,6 +128,7 @@ Learn](https://learn.microsoft.com/en-us/microsoftteams/teams-live-events/live-e
 ### Implementation
 
 #### MS.TEAMS.1.1v1 instructions:
+
 To ensure external participants do not have the ability to request
 control of the shared desktop or window in the meeting:
 
@@ -147,7 +145,9 @@ control of the shared desktop or window in the meeting:
     policy, selecting the appropriate policy in step 3.
 
 #### MS.TEAMS.1.2v1 instructions:
+
 To configure settings for anonymous users:
+
 1.	Sign in to the **Microsoft Teams admin center**.
 
 2.	Select **Meetings** > **Meeting policies**.
@@ -159,6 +159,7 @@ To configure settings for anonymous users:
 5.	If custom policies were created, repeat these steps for each policy, selecting the appropriate policy in step 3.
 
 #### MS.TEAMS.1.3v1 instructions:
+
 1.	Sign in to the **Microsoft Teams admin center**.
 
 2.	Select **Meetings** > **Meeting policies**.
@@ -168,7 +169,9 @@ To configure settings for anonymous users:
 4.	Under the **Meeting join & lobby** section, ensure **Who can bypass the lobby** is **not** set to **Everyone**. Bypassing the lobby should be set to **People in my org**, though other options may be used if needed.
 
 5.	In the same section, set **People dialing in can bypass the lobby** to **Off**.
+
 #### MS.TEAMS.1.4v1 instructions:
+
 1.	Sign in to the **Microsoft Teams admin center**.
 
 2.	Select **Meetings** > **Meeting policies**.
@@ -178,7 +181,9 @@ To configure settings for anonymous users:
 4.	Under the **Meeting join & lobby** section, ensure **Who can bypass the lobby** is set to **People in my org**.
 
 5.	In the same section, set **People dialing in can bypass the lobby** to **Off**.
+
 #### MS.TEAMS.1.5v1 instructions:
+
 1.	Sign in to the **Microsoft Teams admin center**.
 
 2.	Select **Meetings** > **Meeting policies**.
@@ -238,8 +243,6 @@ Office of Management and Budget Max Site for a list of .gov domains for sharing)
 
 Similar to external users, blocking contact with unmanaged Teams users prevents these users from looking up internal users by their email address and initiating chats and calls within Teams. These users would still be able to join calls, assuming anonymous join is enabled. Additionally, unmanaged users may be added to Teams chats if the internal user initiates the contact.
 
-
-
 ### Policies
 
 #### MS.TEAMS.2.1v1
@@ -260,7 +263,7 @@ Unmanaged users SHALL NOT be enabled to initiate contact with internal users.
 Internal users SHOULD NOT be enabled to initiate contact with unmanaged users.
 
 <!--Policy: MS.TEAMS.2.3v1; Criticality: SHOULD -->
-- _Rationale:_ Access to unmanaged users can pose the risk of data leakage and other security threats. This policy provides protection by disabling the internal user access to unmanaged users. 
+- _Rationale:_ Access to unmanaged users can pose the risk of data leakage and other security threats. This policy provides protection by disabling the internal user access to unmanaged users.
 - _Last modified:_ July 2023
 - _Note:_ This policy is not applicable to GCC, GCC High, and DoD tenants.  
 
@@ -285,11 +288,13 @@ Learn](https://learn.microsoft.com/en-us/microsoftteams/manage-external-access#m
 - N/A
 
 ### Implementation
+
 Steps for the unmanaged users are outlined in [Manage contact with external Teams users not
 managed by an
 organization](https://learn.microsoft.com/en-us/microsoftteams/manage-external-access#manage-contact-with-external-teams-users-not-managed-by-an-organization).
 
-#### MS.TEAMS.2.1v1 instructions:  
+#### MS.TEAMS.2.1v1 instructions:
+
 To enable external access for only specific domains:
 
 1.  Sign in to the **Microsoft Teams admin center**.
@@ -306,10 +311,10 @@ To enable external access for only specific domains:
 
 
 #### MS.TEAMS.2.2v1 instructions:
-    
+
 1.  Sign in to the **Microsoft Teams admin center**.
 
-2.  Select **Users > External access**. 
+2.  Select **Users > External access**.
 
 3. Under **Teams accounts not managed by an organization**, toggle **People in my organization can communicate with Teams users whose accounts aren't managed by an organization** to one of the following:
     1. To completely block contact with unmanaged users, toggle the setting to **Off**.
@@ -317,10 +322,8 @@ To enable external access for only specific domains:
         - Toggle the setting to **On**.
         - Clear the check next to **External users with Teams accounts not managed by an organization can contact users in my organization**.
 
-
-
 #### MS.TEAMS.2.3v1 instructions:
-    
+
 1.  Sign in to the **Microsoft Teams admin center**.
 
 2.  Select **Users > External access**.
@@ -330,11 +333,10 @@ To enable external access for only specific domains:
     organization can communicate with Teams users whose accounts aren't
     managed by an organization** to **Off**.
 
-
-
 ## 3. Skype Users
 
 This section helps reduce security risks related to contact with Skype users. Microsoft is officially retiring Skype for Business Online and wants to ensure customers have the required information and resources to plan and execute a successful upgrade to Teams. Below are the decommissioning dates by product:
+
 - Skype for Business Online: Jul 31, 2021
 - Skype for Business 2015: Apr 11, 2023
 - Skype for Business 2016: Oct 14, 2025
@@ -366,7 +368,6 @@ Blog](https://techcommunity.microsoft.com/t5/microsoft-teams-blog/skype-for-busi
 
 ### Implementation
 
-
 #### MS.TEAMS.3.1v1 instructions:
 
 1.  Sign in to the **Microsoft Teams admin center**.
@@ -386,7 +387,7 @@ This section helps reduce security risks related to Teams email integration. Tea
 Teams email integration SHALL be disabled.
 
 <!--Policy: MS.TEAMS.4.1v1; Criticality: SHALL -->
-- _Rationale:_ Microsoft Teams email integration associates a Microsoft, not tenant domain, email address with a Teams channel. Channel emails are addressed using the Microsoft-owned domain <code>&lt;teams.ms&gt; </code>. By disabling Teams email integration, an agency prevents potentially sensitive Teams messages from being sent through external email gateways.  
+- _Rationale:_ Microsoft Teams email integration associates a Microsoft, not tenant domain, email address with a Teams channel. Channel emails are addressed using the Microsoft-owned domain <code>&lt;teams.ms&gt;</code>. By disabling Teams email integration, an agency prevents potentially sensitive Teams messages from being sent through external email gateways.  
 - _Last modified:_ July 2023
 - _Note:_ Teams email integration is not available in GCC, GCC High, or DoD regions.
 
@@ -400,7 +401,6 @@ Learn](https://learn.microsoft.com/en-us/microsoftteams/settings-policies-refere
 - N/A
 
 ### Implementation
-
 
 #### MS.TEAMS.4.1v1 instructions:
 
@@ -432,7 +432,7 @@ Agencies SHOULD only allow installation of Microsoft Apps approved by the agency
 - _Rationale:_ The security risk with allowing all Microsoft Apps integration, is access to Teams information through vulnerabilities possibly present in apps not managed by the agency. By only allowing specific apps and blocking all others, the agency will better manage its app integration and potential exposure points.
 - _Last modified:_ July 2023
 - _Note:_ This policy applies to the Global (Org-wide default) policy, all custom policies, and the org-wide app settings. Custom policies MAY be created to allow more flexibility for specific users.
- 
+
 #### MS.TEAMS.5.2v1
 Agencies SHOULD only allow installation of third-party apps approved by the agency.
 
@@ -461,8 +461,8 @@ Agencies SHOULD only allow installation of custom apps approved by the agency.
 
 ### Implementation
 
-
 #### MS.TEAMS.5.1v1 instructions:
+
 1.  Sign in to the **Microsoft Teams admin center**.
 
 2.  Select **Teams apps** > **Permission policies**.
@@ -486,41 +486,45 @@ Agencies SHOULD only allow installation of custom apps approved by the agency.
 
 1.  Sign in to the **Microsoft Teams admin center**.
 
+2.  Select **Teams apps** > **Manage apps**.
 
-7.  Select **Teams apps** > **Manage apps**.
-8.  Select **Org-wide app settings** button to access pop-up options.
+3.  Select **Org-wide app settings** button to access pop-up options.
     - Under **Third-party apps** turn off **Third-party apps**.
     - Click **Save**.
-2.  Select **Teams apps** > **Permission policies**.
-3.  Select **Global (Org-wide default)**.
 
-4.  Set **Third-party apps** to **Block all apps**, unless specific apps
+4.  Select **Teams apps** > **Permission policies**.
+
+5.  Select **Global (Org-wide default)**.
+
+6.  Set **Third-party apps** to **Block all apps**, unless specific apps
     have been approved by the agency, in which case select **Allow
     specific apps and block all others**.
 
-6.  Click **Save**.
+7.  Click **Save**.
 
-11.  If custom policies have been created, repeat steps 4-7 for each
+8.   If custom policies have been created, repeat steps 4-7 for each
     policy, selecting the appropriate policy in step 5.
 
 #### MS.TEAMS.5.3v1 instructions:
 
 1.  Sign in to the **Microsoft Teams admin center**.
 
+2.  Select **Teams apps** > **Manage apps**.
 
-7.  Select **Teams apps** > **Manage apps**.
-8.  Select **Org-wide app settings** button to access pop-up options. 
+3.  Select **Org-wide app settings** button to access pop-up options.
     - Under **Custom apps** turn off **Interaction with custom apps**.
     - Click **Save**.
-2.  Select **Teams apps** > **Permission policies**.
-3.  Select **Global (Org-wide default)**.
 
-5.  Set **Custom apps** to **Block all apps**, unless specific apps have
+4.  Select **Teams apps** > **Permission policies**.
+
+5.  Select **Global (Org-wide default)**.
+
+6.  Set **Custom apps** to **Block all apps**, unless specific apps have
     been approved by the agency, in which case select **Allow specific apps and block all others**.
 
-6.  Click **Save**.
+7.  Click **Save**.
 
-11.  If custom policies have been created, repeat steps 4-7 for each
+8.  If custom policies have been created, repeat steps 4-7 for each
     policy, selecting the appropriate policy in step 5.
 
 ## 6. Data Loss Prevention
@@ -545,7 +549,7 @@ required, guidance for configuring Microsoft’s DLP solution can be found in fo
 A DLP solution SHALL be enabled. The selected DLP solution SHOULD offer services comparable to the native DLP solution offered by Microsoft.
 
 <!--Policy: MS.TEAMS.6.1v1; Criticality: SHALL -->
-- _Rationale:_ Teams users may inadvertently disclose sensitive information to unauthorized individuals. Data loss prevention policies provide a way for agencies to detect and prevent unauthorized disclosures. 
+- _Rationale:_ Teams users may inadvertently disclose sensitive information to unauthorized individuals. Data loss prevention policies provide a way for agencies to detect and prevent unauthorized disclosures.
 - _Last modified:_ July 2023
 
 #### MS.TEAMS.6.2v1
@@ -574,10 +578,13 @@ and Social Security Numbers (SSN) via email SHALL be restricted.
   for more information.
 
 ### Implementation
+
 #### MS.TEAMS.6.1v1 instructions:
+
 Any product meeting the requirements outlined in this baseline policy may be used. If the agency uses Microsoft Defender, see the following implementation steps for [DLP](./defender.md#implementation-3) for additional guidance.
 
 #### MS.TEAMS.6.2v1 instructions:
+
 Any product meeting the requirements outlined in this baseline policy may be used. If the agency uses Microsoft Defender, see the following implementation steps for [DLP](./defender.md#implementation-3) for additional guidance.
 
 ## 7. Malware Scanning
@@ -618,10 +625,13 @@ Users SHOULD be prevented from opening or downloading files detected as malware.
   E5 and G5 and are available as add-ons for E3 and G3.
 
 ### Implementation
+
 #### MS.TEAMS.7.1v1 instructions:
+
 Any product meeting the requirements outlined in this baseline policy may be used. If the agency uses Microsoft Defender, see the following implementation steps for [Safe Attachments](./defender.md#implementation-2) for additional guidance.
 
 #### MS.TEAMS.7.2v1 instructions:
+
 Any product meeting the requirements outlined in this baseline policy may be used. If the agency uses Microsoft Defender, see the following implementation steps for [Safe Attachments](./defender.md#implementation-2) for additional guidance.
 
 ## 8. Link Protection
@@ -679,10 +689,13 @@ User click tracking SHOULD be enabled.
 - N/A
 
 ### Implementation
+
 #### MS.TEAMS.8.1v1 instructions:
+
 Any product meeting the requirements outlined in this baseline policy may be used. If the agency uses Microsoft Defender, see the following implementation steps for [standard or strict preset security policy](defender.md#msdefender13v1-instructions) for additional guidance.
 
 #### MS.TEAMS.8.2v1 instructions:
+
 Any product meeting the requirements outlined in this baseline policy may be used. If the agency uses Microsoft Defender, see the following implementation steps for [standard or strict preset security policy](defender.md#msdefender13v1-instructions) for additional guidance.
 
 # Acknowledgements
@@ -720,15 +733,14 @@ The cross-agency collaboration and partnerships developed during this initiative
 - U.S. Census Bureau (USCB)
 - U.S. Geological Survey (USGS)
 
-
 [^1]: Note that B2B guest users and all anonymous users except for
-    external users appear in Teams calls as *John Doe (Guest)*. To avoid
+    external users appear in Teams calls as _John Doe (Guest)_. To avoid
     any potential confusion this may cause, true guest users are always
     referred to as B2B guest users in this document.
 
 # Appendix A - Custom Meeting Policies
 
-If there is a legitimate business need, custom meeting policies can be defined with *specific* users assigned to them. For example, custom meeting policies can be configured with *specific* users having
+If there is a legitimate business need, custom meeting policies can be defined with _specific_ users assigned to them. For example, custom meeting policies can be configured with _specific_ users having
 permission to record meetings. To allow specific users the ability to
 record meetings:
 
