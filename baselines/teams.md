@@ -589,7 +589,7 @@ Any product meeting the requirements outlined in this baseline policy may be use
 
 ## 7. Malware Scanning
 
-Malware scanning protects M365 Teams assets from malicious software. There are several commercial anti-malware solutions that detect and prevent computer viruses, malware, and other malicious software from being introduced into M365 Teams service. Agencies may select any product that meets the requirements outlined in this baseline policy group. If the agency is using Microsoft Defender to implement malware scanning, see the following policies of the CISA M365 Security Configuration Baseline for Defender for Office 365 for additional guidance.
+Malware scanning protects M365 Teams assets from malicious software. There are several commercial anti-malware solutions that detect and prevent computer viruses, malware, and other malicious software from being introduced into M365 Teams. Agencies may select any product that meets the requirements outlined in this baseline policy group. If the agency is using Microsoft Defender to implement malware scanning, see the following policies of the CISA M365 Security Configuration Baseline for Defender for Office 365 for additional guidance.
 
 - [MS.DEFENDER.3.1v1 \| CISA M365 Security Configuration Baseline for Defender for Office 365](./defender.md#msdefender31v1)
   - Safe attachments SHOULD be enabled for SharePoint, OneDrive, and Microsoft Teams.
