@@ -95,7 +95,7 @@ Dial-in users SHOULD NOT be enabled to bypass the lobby.
 Meeting recording SHOULD be disabled.
 
 <!--Policy: MS.TEAMS.1.6v1; Criticality: SHOULD -->
-- _Rationale:_ The security risk with allowing all users to record Teams meetings and group calls exposes the ability to capture all audio, video, screen sharing activity, and information shared. By disabling the meeting recording setting in the Global (org-wide default) meeting policy an agency limits information exposure.
+- _Rationale:_ Allowing any user to record a Teams meeting or group call may lead to unauthorized disclosure of shared information including audio, video, and shared screens. By disabling the meeting recording setting in the Global (org-wide default) meeting policy, an agency limits information exposure.
 - _Last modified:_ July 2023
 - _Note:_ This policy applies to the Global (Org-wide default) meeting policy, and custom meeting policies if they exist. Custom policies MAY be created to allow more flexibility for specific users.
 
