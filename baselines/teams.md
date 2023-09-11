@@ -263,7 +263,7 @@ Unmanaged users SHALL NOT be enabled to initiate contact with internal users.
 Internal users SHOULD NOT be enabled to initiate contact with unmanaged users.
 
 <!--Policy: MS.TEAMS.2.3v1; Criticality: SHOULD -->
-- _Rationale:_ Access to unmanaged users can pose the risk of data leakage and other security threats. This policy provides protection by disabling the internal user access to unmanaged users.
+- _Rationale:_ Contact with unmanaged users can pose the risk of data leakage and other security threats. This policy provides protection by disabling internal user access to unmanaged users.
 - _Last modified:_ July 2023
 - _Note:_ This policy is not applicable to GCC, GCC High, and DoD tenants.  
 
