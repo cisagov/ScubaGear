@@ -44,7 +44,7 @@ External sharing for OneDrive SHALL be limited to Existing Guests or Only People
 External sharing SHALL be restricted to approved external domains and/or users in approved security groups per interagency collaboration needs. 
 
 <!--Policy: MS.SHAREPOINT.1.3v1; Criticality: SHALL -->
-- _Rationale:_ By limiting sharing to domains and/or approved security groups used for interagency collaboration purposes, administrators prevent sharing with unknown organizations and individuals.
+- _Rationale:_ By limiting sharing to domains or approved security groups used for interagency collaboration purposes, administrators prevent sharing with unknown organizations and individuals.
 - _Last modified:_ June 2023
 - _Note:_ This policy is only applicable if the external sharing slider on the admin page is set to any value other than Only People in your Organization.
 
