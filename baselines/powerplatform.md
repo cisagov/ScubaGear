@@ -81,7 +81,7 @@ The ability to create trial environments SHALL be restricted to admins.
 <!--Policy: MS.POWERPLATFORM.1.2v1; Criticality: SHALL -->
 - _Rationale:_ Users creating new Power Platform environments may inadvertently bypass DLP policy settings or misconfigure the security settings of their environment.
 - _Last Modified:_ June 2023
-- Note: This control restricts the creating environments to users with Global admin, Dynamics 365 service admin, Power Platform Service admins, or Delegated admin roles.
+- Note: This control restricts creating environments to users with Global admin, Dynamics 365 service admin, Power Platform Service admins, or Delegated admin roles.
 
 ### Resources
 
