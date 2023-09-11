@@ -79,7 +79,7 @@ Anonymous users and dial-in callers, SHOULD NOT be admitted automatically.
 Internal users SHOULD be admitted automatically.
 
 <!--Policy: MS.TEAMS.1.4v1; Criticality: SHOULD -->
-- _Rationale:_ Requiring internal users to wait in the lobby for explicit admission can lead to admit fatigue. This policy enables internal users to be automatically admitted to meeting through global policy.  
+- _Rationale:_ Requiring internal users to wait in the lobby for explicit admission can lead to admission fatigue. This policy enables internal users to be automatically admitted to meeting through global policy.  
 - _Last modified:_ July 2023
 - _Note:_ This policy applies to the Global (Org-wide default) meeting policy. Custom meeting policies MAY be created allowing specific users more flexibility.
 
