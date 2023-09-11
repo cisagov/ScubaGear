@@ -256,7 +256,7 @@ External access for users SHALL only be enabled on a per-domain basis.
 Unmanaged users SHALL NOT be enabled to initiate contact with internal users.
 
 <!--Policy: MS.TEAMS.2.2v1; Criticality: SHALL -->
-- _Rationale:_ Allowing access to unmanaged users can open the threat of email and contact address scavenging. This policy provides protection against this threat. 
+- _Rationale:_ Allowing contact from unmanaged users can expose users to email and contact address harvesting. This policy provides protection against this type of harvesting. 
 - _Last modified:_ July 2023
 
 #### MS.TEAMS.2.3v1
