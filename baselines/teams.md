@@ -351,7 +351,7 @@ This section helps reduce security risks related to contact with Skype users. Mi
 Contact with Skype users SHALL be blocked.
 
 <!--Policy: MS.TEAMS.3.1v1; Criticality: SHALL -->
-- _Rationale:_ The security risk of allowing contact with Skype users is aligned with the risk of contact with a retiring product and its current vulnerabilities. Microsoft is officially retiring all forms of Skype as listed above. By blocking contact with Skype users an agency limits access to security threats utilizing the vulnerabilities of the Skype product.
+- _Rationale:_ Microsoft is officially retiring all forms of Skype as listed above. Allowing contact with Skype users puts agency users at additional security risk.  By blocking contact with Skype users an agency limits access to security threats utilizing the vulnerabilities of the Skype product.
 - _Last modified:_ July 2023
 
 ### Resources
