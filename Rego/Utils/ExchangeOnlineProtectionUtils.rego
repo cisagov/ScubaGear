@@ -5,38 +5,39 @@ import future.keywords
 # User/Group Exclusion support functions #
 ##########################################
 
-# Gets Sensitive Users from defender-config.yaml & User rules from ProvidorSettingsExport.json
-SensitiveUsers(Policies, PolicyID) := {
-    "ConfigUsers" : ConfigUsers,
+# Gets Sensitive Account Filter configuration in defender-config.yaml
+SensitiveAccountsConfig(PolicyID) := {
     "IncludedUsers" : IncludedUsers,
-    "ExcludedUsers" : ExcludedUsers
-} {
-    ConfigUsers := { x | some x in input.scuba_config.Defender[PolicyID].SensitiveAccounts.IncludedUsers; x != null }
-    Policy := [ Policy | Policy := Policies[_]; Policy.Identity == "Strict Preset Security Policy" ]
-    IncludedUsers := { x | x := Policy[0].SentTo[_] }
-    ExcludedUsers := { x | x := Policy[0].ExceptIfSentTo[_] }
-}
-
-# Gets Sensitive Groups from defender-config.yaml & Group rules from ProvidorSettingsExport.json
-SensitiveGroups(Policies, PolicyID) := {
-    "ConfigGroups" : ConfigGroups,
+    "ExcludedUsers" : ExcludedUsers,
     "IncludedGroups" : IncludedGroups,
-    "ExcludedGroups" : ExcludedGroups
-} {
-    ConfigGroups := { x | some x in input.scuba_config.Defender[PolicyID].SensitiveAccounts.IncludedGroups; x != null }
-    Policy := [ Policy | Policy := Policies[_]; Policy.Identity == "Strict Preset Security Policy" ]
-    IncludedGroups := { x | x := Policy[0].SentToMemberOf[_] }
-    ExcludedGroups := { x | x := Policy[0].ExceptIfSentToMemberOf[_] }
-}
-
-# Gets Sensitive Domains from defender-config.yaml & Domain rules from ProvidorSettingsExport.json
-SensitiveDomains(Policies, PolicyID) := {
-    "ConfigDomains" : ConfigDomains,
+    "ExcludedGroups" : ExcludedGroups,
     "IncludedDomains" : IncludedDomains,
     "ExcludedDomains" : ExcludedDomains
 } {
-    ConfigDomains := { x | some x in input.scuba_config.Defender[PolicyID].SensitiveAccounts.IncludedDomains; x != null }
+    SensitiveAccounts := input.scuba_config.Defender[PolicyID].SensitiveAccounts
+    IncludedUsers := { x | some x in SensitiveAccounts.IncludedUsers; x != null }
+    ExcludedUsers := { x | some x in SensitiveAccounts.ExcludedUsers; x != null }
+    IncludedGroups := { x | some x in SensitiveAccounts.IncludedGroups; x != null }
+    ExcludedGroups := { x | some x in SensitiveAccounts.ExcludedGroups; x != null }
+    IncludedDomains := { x | some x in SensitiveAccounts.IncludedDomains; x != null }
+    ExcludedDomains := { x | some x in SensitiveAccounts.ExcludedDomains; x != null }
+}
+
+# Gets Sensitive Account Filter configuration from ProvidorSettingsExport.json
+SensitiveAccountsSetting(Policies) := {
+    "IncludedUsers" : IncludedUsers,
+    "ExcludedUsers" : ExcludedUsers,
+    "IncludedGroups" : IncludedGroups,
+    "ExcludedGroups" : ExcludedGroups,
+    "IncludedDomains" : IncludedDomains,
+    "ExcludedDomains" : ExcludedDomains,
+    "Policy" : Policy[0]
+} {
     Policy := [ Policy | Policy := Policies[_]; Policy.Identity == "Strict Preset Security Policy" ]
+    IncludedUsers := { x | x := Policy[0].SentTo[_] }
+    ExcludedUsers := { x | x := Policy[0].ExceptIfSentTo[_] }
+    IncludedGroups := { x | x := Policy[0].SentToMemberOf[_] }
+    ExcludedGroups := { x | x := Policy[0].ExceptIfSentToMemberOf[_] }
     IncludedDomains := { x | x := Policy[0].RecipientDomainIs[_] }
     ExcludedDomains := { x | x := Policy[0].ExceptIfRecipientDomainIs[_] }
 }
@@ -65,6 +66,7 @@ GroupsInDomain(SensitiveDomain, SensitiveGroups) := false if {
 # Checks if user is part of domain
 default UsersInDomain(_, _) := false
 UsersInDomain(SensitiveDomain, SensitiveUsers) := true if {
+    count(SensitiveDomain) > 0
     UsersInDomain := {
         Result | User := SensitiveUsers[_];
         SplitString := regex.split(".+@", User);
@@ -85,130 +87,136 @@ UsersInDomain(SensitiveDomain, SensitiveUsers) := false if {
 }
 
 default SensitiveAccounts(_, _) := false
-# Default case, all users are protected
-SensitiveAccounts(Policies, PolicyID) := true if {
-    count([ Policy | Policy = Policies[_];
-        Policy.Identity == "Strict Preset Security Policy";
-        Policy.SentTo == null;
-        Policy.ExceptIfSentTo == null;
-        Policy.SentToMemberOf == null;
-        Policy.ExceptIfSentToMemberOf == null;
-        Policy.RecipientDomainIs == null;
-        Policy.ExceptIfRecipientDomainIs == null ]) == 1
+### Case 1 ###
+# Default case, all are protected
+SensitiveAccounts(SensitiveAccountsSetting, SensitiveAccountsConfig) := true if {
+    count(SensitiveAccountsSetting.Policy) >= 0
+    count(SensitiveAccountsSetting.IncludedUsers) == 0
+    count(SensitiveAccountsSetting.ExcludedUsers) == 0
+    count(SensitiveAccountsSetting.IncludedGroups) == 0
+    count(SensitiveAccountsSetting.ExcludedGroups) == 0
+    count(SensitiveAccountsSetting.IncludedDomains) == 0
+    count(SensitiveAccountsSetting.ExcludedDomains) == 0
 }
 
+### Case 2 ###
+# Default fail, no policy present
+SensitiveAccounts(SensitiveAccountsSetting, SensitiveAccountsConfig) := false if {
+    count(SensitiveAccountsSetting.Policy) == 0
+}
+
+### Case 3 ###
 # No Group requirements
 # No Domain requirement
 # All User accounts indicated in config are not in Excluded
 # All User accounts indicated in config are in Included
-SensitiveAccounts(Policies, PolicyID) := true if {
-    count([ Policy | Policy = Policies[_];
-        Policy.Identity == "Strict Preset Security Policy";
-        Policy.SentToMemberOf == null;
-        Policy.ExceptIfSentToMemberOf == null;
-        Policy.RecipientDomainIs == null;
-        Policy.ExceptIfRecipientDomainIs == null ]) == 1
+SensitiveAccounts(SensitiveAccountsSetting, SensitiveAccountsConfig) := true if {
+    count(SensitiveAccountsSetting.Policy) >= 0
+    count(SensitiveAccountsSetting.IncludedGroups) == 0
+    count(SensitiveAccountsSetting.ExcludedGroups) == 0
+    count(SensitiveAccountsSetting.IncludedDomains) == 0
+    count(SensitiveAccountsSetting.ExcludedDomains) == 0
 
-    AllSensitiveUsers := SensitiveUsers(Policies, PolicyID)
-    count(AllSensitiveUsers.ConfigUsers & AllSensitiveUsers.ExcludedUsers) == 0
-    count(AllSensitiveUsers.ConfigUsers - AllSensitiveUsers.IncludedUsers) == 0
+    count(SensitiveAccountsConfig.IncludedUsers & SensitiveAccountsSetting.ExcludedUsers) == 0
+    count(SensitiveAccountsConfig.IncludedUsers - SensitiveAccountsSetting.IncludedUsers) == 0
 }
 
+### Case 4 ###
 # All User accounts indicated in config meet Group requirements (Fails currently because of code limitations)
 # No Domain requirement
 # All User accounts indicated in config are not in Excluded
 # All User accounts indicated in config are in Included
-SensitiveAccounts(Policies, PolicyID) := true if {
-    count([ Policy | Policy = Policies[_];
-        Policy.Identity == "Strict Preset Security Policy";
-        Policy.RecipientDomainIs == null;
-        Policy.ExceptIfRecipientDomainIs == null ]) == 1
+SensitiveAccounts(SensitiveAccountsSetting, SensitiveAccountsConfig) := true if {
+    count(SensitiveAccountsSetting.Policy) >= 0
+    count(SensitiveAccountsSetting.IncludedGroups) != 0
+    count(SensitiveAccountsSetting.IncludedDomains) == 0
+    count(SensitiveAccountsSetting.ExcludedDomains) == 0
 
-    AllSensitiveUsers := SensitiveUsers(Policies, PolicyID)
-    count(AllSensitiveUsers.ConfigUsers & AllSensitiveUsers.ExcludedUsers) == 0
-    count(AllSensitiveUsers.ConfigUsers - AllSensitiveUsers.IncludedUsers) == 0
+    count(SensitiveAccountsConfig.IncludedUsers & SensitiveAccountsSetting.ExcludedUsers) == 0
+    count(SensitiveAccountsConfig.IncludedUsers - SensitiveAccountsSetting.IncludedUsers) == 0
+    count(SensitiveAccountsConfig.IncludedGroups) > 0
+    count(SensitiveAccountsConfig.IncludedGroups - SensitiveAccountsSetting.IncludedGroups) == 0
 
-    AllSensitiveGroups := SensitiveGroups(Policies, PolicyID)
-    UsersInGroups(AllSensitiveGroups.IncludedGroups, AllSensitiveUsers.IncludedUsers) == true
+    UsersInGroups(SensitiveAccountsSetting.IncludedGroups, SensitiveAccountsSetting.IncludedUsers) == true
 }
 
+### Case 5 ###
 # No Group requirements
 # All User accounts indicated in config meet Domain requirement
 # All User accounts indicated in config are not in Excluded
 # All User accounts indicated in config are in Included
-SensitiveAccounts(Policies, PolicyID) := true if {
-    count([ Policy | Policy = Policies[_];
-        Policy.Identity == "Strict Preset Security Policy";
-        Policy.SentTo != null;
-        Policy.SentToMemberOf == null;
-        Policy.ExceptIfSentToMemberOf == null ]) == 1
+SensitiveAccounts(SensitiveAccountsSetting, SensitiveAccountsConfig) := true if {
+    count(SensitiveAccountsSetting.Policy) >= 0
+    count(SensitiveAccountsSetting.IncludedUsers) != 0
+    count(SensitiveAccountsSetting.IncludedGroups) == 0
+    count(SensitiveAccountsSetting.ExcludedGroups) == 0
 
-    AllSensitiveUsers := SensitiveUsers(Policies, PolicyID)
-    count(AllSensitiveUsers.ConfigUsers & AllSensitiveUsers.ExcludedUsers) == 0
-    count(AllSensitiveUsers.ConfigUsers - AllSensitiveUsers.IncludedUsers) == 0
+    count(SensitiveAccountsConfig.IncludedUsers & SensitiveAccountsSetting.ExcludedUsers) == 0
+    count(SensitiveAccountsConfig.IncludedUsers - SensitiveAccountsSetting.IncludedUsers) == 0
+    count(SensitiveAccountsConfig.IncludedDomains) > 0
+    count(SensitiveAccountsConfig.IncludedDomains - SensitiveAccountsSetting.IncludedDomains) == 0
 
-    AllSensitiveDomains := SensitiveDomains(Policies, PolicyID)
-    UsersInDomain(AllSensitiveDomains.IncludedDomains, AllSensitiveUsers.IncludedUsers) == true
+    UsersInDomain(SensitiveAccountsSetting.IncludedDomains, SensitiveAccountsSetting.IncludedUsers) == true
 }
 
+### Case 6 ###
 # All User accounts indicated in config meet Group requirements (Fails currently because of code limitations)
 # All User accounts indicated in config meet Domain requirement
 # All User accounts indicated in config are not in Excluded
 # All User accounts indicated in config are in Included
-SensitiveAccounts(Policies, PolicyID) := true if {
-    count([ Policy | Policy = Policies[_];
-        Policy.Identity == "Strict Preset Security Policy" ]) == 1
+SensitiveAccounts(SensitiveAccountsSetting, SensitiveAccountsConfig) := true if {
+    count(SensitiveAccountsSetting.Policy) >= 0
+    count(SensitiveAccountsConfig.IncludedUsers & SensitiveAccountsSetting.ExcludedUsers) == 0
+    count(SensitiveAccountsConfig.IncludedUsers - SensitiveAccountsSetting.IncludedUsers) == 0
+    count(SensitiveAccountsConfig.IncludedGroups) > 0
+    count(SensitiveAccountsConfig.IncludedDomains) > 0
+    count(SensitiveAccountsConfig.IncludedGroups - SensitiveAccountsSetting.IncludedGroups) == 0
+    count(SensitiveAccountsConfig.IncludedDomains - SensitiveAccountsSetting.IncludedDomains) == 0
 
-    AllSensitiveUsers := SensitiveUsers(Policies, PolicyID)
-    count(AllSensitiveUsers.ConfigUsers & AllSensitiveUsers.ExcludedUsers) == 0
-    count(AllSensitiveUsers.ConfigUsers - AllSensitiveUsers.IncludedUsers) == 0
-
-    AllSensitiveGroups := SensitiveGroups(Policies, PolicyID)
-    UsersInGroups(AllSensitiveGroups.IncludedGroups, AllSensitiveUsers.IncludedUsers) == true
-
-    AllSensitiveDomains := SensitiveDomains(Policies, PolicyID)
-    UsersInDomain(AllSensitiveDomains.IncludedDomains, AllSensitiveUsers.IncludedUsers) == true
+    UsersInGroups(SensitiveAccountsSetting.IncludedGroups, SensitiveAccountsSetting.IncludedUsers) == true
+    UsersInDomain(SensitiveAccountsSetting.IncludedDomains, SensitiveAccountsSetting.IncludedUsers) == true
 }
 
+### Case 7 ###
 # No Excluded User accounts indicated in config meet Group requirements
 # (Does not produce true result currently because of code limitations)
 # All Included User accounts indicated in config meet Group requirements (Fails currently because of code limitations)
 # No Domain requirement
 # Some User accounts indicated in config are in Excluded
 # Some User accounts indicated in config are in Included
-SensitiveAccounts(Policies, PolicyID) := true if {
-    count([ Policy | Policy = Policies[_];
-        Policy.Identity == "Strict Preset Security Policy";
-        Policy.RecipientDomainIs == null;
-        Policy.ExceptIfRecipientDomainIs == null ]) == 1
+SensitiveAccounts(SensitiveAccountsSetting, SensitiveAccountsConfig) := true if {
+    count(SensitiveAccountsSetting.Policy) >= 0
+    count(SensitiveAccountsSetting.IncludedDomains) == 0
+    count(SensitiveAccountsSetting.ExcludedDomains) == 0
 
-    AllSensitiveUsers := SensitiveUsers(Policies, PolicyID)
-    count(AllSensitiveUsers.ConfigUsers & AllSensitiveUsers.ExcludedUsers) != 0
+    count(SensitiveAccountsConfig.IncludedUsers & SensitiveAccountsSetting.ExcludedUsers) != 0
+    count(SensitiveAccountsConfig.IncludedGroups) > 0
+    count(SensitiveAccountsConfig.IncludedGroups - SensitiveAccountsSetting.IncludedGroups) == 0
 
-    AllSensitiveGroups := SensitiveGroups(Policies, PolicyID)
-    UsersInGroups(AllSensitiveGroups.IncludedGroups, AllSensitiveUsers.IncludedUsers) == true
-    UsersInGroups(AllSensitiveGroups.IncludedGroups, AllSensitiveUsers.ExcludedUsers) == false
+    UsersInGroups(SensitiveAccountsSetting.IncludedGroups, SensitiveAccountsSetting.IncludedUsers) == true
+    UsersInGroups(SensitiveAccountsSetting.IncludedGroups, SensitiveAccountsSetting.ExcludedUsers) == false
 }
 
+### Case 8 ###
 # No Group requirements
 # No Excluded User accounts indicated in config meet Domain requirement
 # All Included User accounts indicated in config meet Domain requirement
 # Some User accounts indicated in config are in Excluded
 # Some User accounts indicated in config are in Included
-SensitiveAccounts(Policies, PolicyID) := true if {
-    count([ Policy | Policy = Policies[_];
-        Policy.Identity == "Strict Preset Security Policy";
-        Policy.SentToMemberOf == null;
-        Policy.ExceptIfSentToMemberOf == null ]) == 1
+SensitiveAccounts(SensitiveAccountsSetting, SensitiveAccountsConfig) := true if {
+    count(SensitiveAccountsSetting.Policy) >= 0
+    count(SensitiveAccountsSetting.IncludedGroups) == 0
+    count(SensitiveAccountsSetting.ExcludedGroups) == 0
 
-    AllSensitiveUsers := SensitiveUsers(Policies, PolicyID)
-    count(AllSensitiveUsers.ConfigUsers & AllSensitiveUsers.ExcludedUsers) != 0
+    count(SensitiveAccountsConfig.IncludedUsers & SensitiveAccountsSetting.ExcludedUsers) != 0
+    count(SensitiveAccountsConfig.IncludedDomains) > 0
+    count(SensitiveAccountsConfig.IncludedDomains - SensitiveAccountsSetting.IncludedDomains) == 0
 
-    AllSensitiveDomains := SensitiveDomains(Policies, PolicyID)
-    UsersInDomain(AllSensitiveDomains.IncludedDomains, AllSensitiveUsers.IncludedUsers) == true
-    UsersInDomain(AllSensitiveDomains.IncludedDomains, AllSensitiveUsers.ExcludedUsers) == false
+    UsersInDomain(SensitiveAccountsSetting.IncludedDomains, SensitiveAccountsSetting.IncludedUsers) == true
+    UsersInDomain(SensitiveAccountsSetting.IncludedDomains, SensitiveAccountsSetting.ExcludedUsers) == false
 }
 
+### Case 9 ###
 # No Excluded User accounts indicated in config meet Group requirements
 # (Does not produce true result currently because of code limitations)
 # All Included User accounts indicated in config meet Group requirements (Fails currently because of code limitations)
@@ -216,138 +224,102 @@ SensitiveAccounts(Policies, PolicyID) := true if {
 # All Included User accounts indicated in config meet Domain requirement
 # Some User accounts indicated in config are in Excluded
 # Some User accounts indicated in config are in Included
-SensitiveAccounts(Policies, PolicyID) := true if {
-    count([ Policy | Policy = Policies[_];
-        Policy.Identity == "Strict Preset Security Policy" ]) == 1
+SensitiveAccounts(SensitiveAccountsSetting, SensitiveAccountsConfig) := true if {
+    count(SensitiveAccountsSetting.Policy) >= 0
+    count(SensitiveAccountsConfig.IncludedUsers & SensitiveAccountsSetting.ExcludedUsers) != 0
 
-    AllSensitiveUsers := SensitiveUsers(Policies, PolicyID)
-    count(AllSensitiveUsers.ConfigUsers & AllSensitiveUsers.ExcludedUsers) != 0
-
-    AllSensitiveGroups := SensitiveGroups(Policies, PolicyID)
-    AllSensitiveDomains := SensitiveDomains(Policies, PolicyID)
-    UsersInGroups(AllSensitiveGroups.IncludedGroups, AllSensitiveUsers.IncludedUsers) == true
-    UsersInDomain(AllSensitiveDomains.IncludedDomains, AllSensitiveUsers.IncludedUsers) == true
+    UsersInGroups(SensitiveAccountsSetting.IncludedGroups, SensitiveAccountsSetting.IncludedUsers) == true
+    UsersInDomain(SensitiveAccountsSetting.IncludedDomains, SensitiveAccountsSetting.IncludedUsers) == true
     Conditions := [
-        UsersInGroups(AllSensitiveGroups.IncludedGroups, AllSensitiveUsers.ExcludedUsers) == false,
-        UsersInDomain(AllSensitiveDomains.IncludedDomains, AllSensitiveUsers.ExcludedUsers) == false
+        UsersInGroups(SensitiveAccountsSetting.IncludedGroups, SensitiveAccountsSetting.ExcludedUsers) == false,
+        UsersInDomain(SensitiveAccountsSetting.IncludedDomains, SensitiveAccountsSetting.ExcludedUsers) == false
     ]
     count([Condition | Condition = Conditions[_]; Condition == true]) > 0
 }
 
+### Case 10 ###
 # All Groups indicated in config are not in Excluded
 # All Groups indicated in config are in Included
 # No Domain requirement
 # No User accounts requirements
 # No User accounts indicated in config
-SensitiveAccounts(Policies, PolicyID) := true if {
-    count([ Policy | Policy = Policies[_];
-        Policy.Identity == "Strict Preset Security Policy";
-        Policy.SentTo == null;
-        Policy.ExceptIfSentTo == null;
-        Policy.RecipientDomainIs == null;
-        Policy.ExceptIfRecipientDomainIs == null ]) == 1
+SensitiveAccounts(SensitiveAccountsSetting, SensitiveAccountsConfig) := true if {
+    count(SensitiveAccountsSetting.Policy) >= 0
+    count(SensitiveAccountsSetting.IncludedUsers) == 0
+    count(SensitiveAccountsSetting.ExcludedUsers) == 0
+    count(SensitiveAccountsSetting.IncludedDomains) == 0
+    count(SensitiveAccountsSetting.ExcludedDomains) == 0
 
-    AllSensitiveUsers := SensitiveUsers(Policies, PolicyID)
-    count(AllSensitiveUsers.ConfigUsers) == 0
+    count(SensitiveAccountsConfig.IncludedUsers) == 0
+    count(SensitiveAccountsConfig.ExcludedUsers) == 0
 
-    AllSensitiveGroups := SensitiveGroups(Policies, PolicyID)
-    count(AllSensitiveGroups.ConfigGroups & AllSensitiveGroups.ExcludedGroups) == 0
-    count(AllSensitiveGroups.ConfigGroups - AllSensitiveGroups.IncludedGroups) == 0
+    count(SensitiveAccountsConfig.IncludedGroups & SensitiveAccountsSetting.ExcludedGroups) == 0
+    count(SensitiveAccountsConfig.IncludedGroups - SensitiveAccountsSetting.IncludedGroups) == 0
 }
 
+### Case 11 ###
 # All Groups indicated in config are not in Excluded
 # All Groups indicated in config are in Included
 # All Groups indicated in config meet Domain requirement
+# (Does not produce true result currently because of code limitations)
 # No User accounts requirements
 # No User accounts indicated in config
-SensitiveAccounts(Policies, PolicyID) := true if {
-    count([ Policy | Policy = Policies[_];
-        Policy.Identity == "Strict Preset Security Policy";
-        Policy.SentTo == null;
-        Policy.ExceptIfSentTo == null ]) == 1
+SensitiveAccounts(SensitiveAccountsSetting, SensitiveAccountsConfig) := true if {
+    count(SensitiveAccountsSetting.Policy) >= 0
+    count(SensitiveAccountsSetting.IncludedUsers) == 0
+    count(SensitiveAccountsSetting.ExcludedUsers) == 0
 
-    AllSensitiveUsers := SensitiveUsers(Policies, PolicyID)
-    count(AllSensitiveUsers.ConfigUsers) == 0
+    count(SensitiveAccountsConfig.IncludedUsers) == 0
+    count(SensitiveAccountsConfig.ExcludedUsers) == 0
 
-    AllSensitiveGroups := SensitiveGroups(Policies, PolicyID)
-    count(AllSensitiveGroups.ConfigGroups & AllSensitiveGroups.ExcludedGroups) == 0
-    count(AllSensitiveGroups.ConfigGroups - AllSensitiveGroups.IncludedGroups) == 0
-
-    AllSensitiveDomains := SensitiveDomains(Policies, PolicyID)
-    GroupsInDomain(AllSensitiveDomains.IncludedDomains, AllSensitiveGroups.IncludedGroups) == true
+    count(SensitiveAccountsConfig.IncludedGroups & SensitiveAccountsSetting.ExcludedGroups) == 0
+    count(SensitiveAccountsConfig.IncludedGroups - SensitiveAccountsSetting.IncludedGroups) == 0
+    count(SensitiveAccountsConfig.IncludedGroups) > 0
+    GroupsInDomain(SensitiveAccountsSetting.IncludedDomains, SensitiveAccountsSetting.IncludedGroups) == true
 }
 
+### Case 12 ###
 # Some Groups indicated in config are in Excluded
 # Some Groups indicated in config are in Included
 # No Excluded Groups indicated in config meet Domain requirement
+# (Does not produce true result currently because of code limitations)
 # All Included Groups indicated in config meet Domain requirement
+# (Does not produce true result currently because of code limitations)
 # No User accounts requirements
 # No User accounts indicated in config
-SensitiveAccounts(Policies, PolicyID) := true if {
-    count([ Policy | Policy = Policies[_];
-        Policy.Identity == "Strict Preset Security Policy";
-        Policy.SentTo == null;
-        Policy.ExceptIfSentTo == null ]) == 1
+SensitiveAccounts(SensitiveAccountsSetting, SensitiveAccountsConfig) := true if {
+    count(SensitiveAccountsSetting.Policy) >= 0
+    count(SensitiveAccountsSetting.IncludedUsers) == 0
+    count(SensitiveAccountsSetting.ExcludedUsers) == 0
 
-    AllSensitiveUsers := SensitiveUsers(Policies, PolicyID)
-    count(AllSensitiveUsers.ConfigUsers) == 0
+    count(SensitiveAccountsConfig.IncludedUsers) == 0
+    count(SensitiveAccountsConfig.ExcludedUsers) == 0
 
-    AllSensitiveGroups := SensitiveGroups(Policies, PolicyID)
-    count(AllSensitiveGroups.ConfigGroups & AllSensitiveGroups.ExcludedGroups) != 0
+    count(SensitiveAccountsConfig.IncludedGroups & SensitiveAccountsSetting.ExcludedGroups) != 0
 
-    AllSensitiveDomains := SensitiveDomains(Policies, PolicyID)
-    GroupsInDomain(AllSensitiveDomains.IncludedDomains, AllSensitiveGroups.IncludedGroups) == true
-    GroupsInDomain(AllSensitiveDomains.IncludedDomains, AllSensitiveGroups.ExcludedGroups) == false
+    GroupsInDomain(SensitiveAccountsSetting.IncludedDomains, SensitiveAccountsSetting.IncludedGroups) == true
+    GroupsInDomain(SensitiveAccountsSetting.IncludedDomains, SensitiveAccountsSetting.ExcludedGroups) == false
 }
 
-# No Group requirements
-# Groups indicated in config
-# All Groups in Domain
-# All Domains indicated in config are not in Excluded
-# All Domains indicated in config are in Included
-# No User accounts requirements
-# No User accounts indicated in config
-SensitiveAccounts(Policies, PolicyID) := true if {
-    count([ Policy | Policy = Policies[_];
-        Policy.Identity == "Strict Preset Security Policy";
-        Policy.SentTo == null;
-        Policy.ExceptIfSentTo == null;
-        Policy.SentToMemberOf == null;
-        Policy.ExceptIfSentToMemberOf == null ]) == 1
-
-    AllSensitiveUsers := SensitiveUsers(Policies, PolicyID)
-    count(AllSensitiveUsers.ConfigUsers) == 0
-
-    AllSensitiveGroups := SensitiveGroups(Policies, PolicyID)
-    count(AllSensitiveGroups.ConfigGroups) > 0
-
-    AllSensitiveDomains := SensitiveDomains(Policies, PolicyID)
-    GroupsInDomain(AllSensitiveDomains.IncludedDomains, AllSensitiveGroups.IncludedGroups) == true
-    count(AllSensitiveDomains.ConfigDomains & AllSensitiveDomains.ExcludedDomains) == 0
-    count(AllSensitiveDomains.ConfigDomains - AllSensitiveDomains.IncludedDomains) == 0
-}
-
+### Case 13 ###
 # No Group requirements
 # No Group indicated in config
 # All Domains indicated in config are not in Excluded
 # All Domains indicated in config are in Included
 # No User accounts requirements
 # No User accounts indicated in config
-SensitiveAccounts(Policies, PolicyID) := true if {
-    count([ Policy | Policy = Policies[_];
-        Policy.Identity == "Strict Preset Security Policy";
-        Policy.SentTo == null;
-        Policy.ExceptIfSentTo == null;
-        Policy.SentToMemberOf == null;
-        Policy.ExceptIfSentToMemberOf == null ]) == 1
+SensitiveAccounts(SensitiveAccountsSetting, SensitiveAccountsConfig) := true if {
+    count(SensitiveAccountsSetting.Policy) >= 0
+    count(SensitiveAccountsSetting.IncludedUsers) == 0
+    count(SensitiveAccountsSetting.ExcludedUsers) == 0
+    count(SensitiveAccountsSetting.IncludedGroups) == 0
+    count(SensitiveAccountsSetting.ExcludedGroups) == 0
+    print("Case 14")
 
-    AllSensitiveUsers := SensitiveUsers(Policies, PolicyID)
-    count(AllSensitiveUsers.ConfigUsers) == 0
-
-    AllSensitiveGroups := SensitiveGroups(Policies, PolicyID)
-    count(AllSensitiveGroups.ConfigGroups) == 0
-
-    AllSensitiveDomains := SensitiveDomains(Policies, PolicyID)
-    count(AllSensitiveDomains.ConfigDomains & AllSensitiveDomains.ExcludedDomains) == 0
-    count(AllSensitiveDomains.ConfigDomains - AllSensitiveDomains.IncludedDomains) == 0
+    count(SensitiveAccountsConfig.IncludedUsers) == 0
+    count(SensitiveAccountsConfig.ExcludedUsers) == 0
+    count(SensitiveAccountsConfig.IncludedGroups) == 0
+    count(SensitiveAccountsConfig.ExcludedGroups) == 0
+    count(SensitiveAccountsConfig.ExcludedDomains & SensitiveAccountsSetting.ExcludedDomains) == 0
+    count(SensitiveAccountsConfig.IncludedDomains - SensitiveAccountsSetting.IncludedDomains) == 0
 }
