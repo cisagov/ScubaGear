@@ -445,7 +445,7 @@ Agencies SHOULD only allow installation of third-party apps approved by the agen
 Agencies SHOULD only allow installation of custom apps approved by the agency.
 
 <!--Policy: MS.TEAMS.5.3v1; Criticality: SHOULD -->
-- _Rationale:_ The security risk with allowing custom apps integration, is access to Teams information through vulnerabilities possibly present in an app not managed by the agency. By blocking all custom app installation, the agency disables Teams' integration to said apps.
+- _Rationale:_ Allowing custom apps integration exposes the agency to potential vulnerabilities present in an app not managed by the agency. By blocking all custom app installation, the agency will limit its exposure to custom app vulnerabilities.
 - _Last modified:_ July 2023
 - _Note:_ This policy applies to the Global (Org-wide default) policy, all custom policies if they exist, and the org-wide settings. Custom policies MAY be created to allow more flexibility for specific users. Custom apps are not available in GCC, GCC High, or DoD regions.
 
