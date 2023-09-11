@@ -314,7 +314,6 @@ SensitiveAccounts(SensitiveAccountsSetting, SensitiveAccountsConfig) := true if 
     count(SensitiveAccountsSetting.ExcludedUsers) == 0
     count(SensitiveAccountsSetting.IncludedGroups) == 0
     count(SensitiveAccountsSetting.ExcludedGroups) == 0
-    print("Case 14")
 
     count(SensitiveAccountsConfig.IncludedUsers) == 0
     count(SensitiveAccountsConfig.ExcludedUsers) == 0
