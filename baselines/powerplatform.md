@@ -200,7 +200,7 @@ Non-default environments SHOULD have at least one DLP policy affecting them.
 
 7.  If necessary (and possible) for the connector, click **Configure connector** at the top of the screen to change connector permissions. This allows greater flexibility for the agency to allow and block certain connector actions for additional customization. 
 
-8.  For the default environment, move all other connectors to the **Blocked** category. For non-blockable noted above, the Block action will be grayed out and a warning will appear.
+8.  For the default environment, move all other connectors to the **Blocked** category. For non-blockable connectors noted above, the Block action will be grayed out and a warning will appear.
 
 9.  At the bottom of the screen, select **Next** to move on.
 
