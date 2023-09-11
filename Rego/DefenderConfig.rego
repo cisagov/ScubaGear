@@ -3,6 +3,8 @@ import future.keywords
 import data.report.utils.NotCheckedDetails
 import data.report.utils.ReportDetailsBoolean
 import data.eop.utils.SensitiveAccounts
+import data.eop.utils.SensitiveAccountsConfig
+import data.eop.utils.SensitiveAccountsSetting
 
 ## Report details menu
 #
@@ -225,8 +227,10 @@ tests[{
 
 ProtectionPolicyForSensitiveIDs[Policies] {
     Policies := input.protection_policy_rules
+    AccountsSetting := SensitiveAccountsSetting(Policies)
+    AccountsConfig := SensitiveAccountsConfig("MS.DEFENDER.1.4v1")
 
-    SensitiveAccounts(Policies, "MS.DEFENDER.1.4v1") == true
+    SensitiveAccounts(AccountsSetting, AccountsConfig) == true
 }
 
 tests[{
