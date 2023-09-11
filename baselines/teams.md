@@ -103,7 +103,7 @@ Meeting recording SHOULD be disabled.
 Record an event SHOULD be set to Organizer can record.
 
 <!--Policy: MS.TEAMS.1.7v1; Criticality: SHOULD -->
-- _Rationale:_ The security risk of the default settings for Live Events is Live Events can be recorded by all participants. Limiting recording permissions to only the organizer minimizes the security risk to the organizer's discretion for these Live Events.
+- _Rationale:_ By default, Live Events can be recorded by all participants increasing the likelihood of an unauthorized disclosure of an event recording. Limiting recording permissions to only the organizer minimizes the potential for an unauthorized disclosure of a recording for Live Events.
 - _Last modified:_ July 2023
 - _Note:_ This policy applies to the Global (Org-wide default) meeting policy, and custom meeting policies if they exist. Custom policies MAY be created to allow more flexibility for specific users.
 
