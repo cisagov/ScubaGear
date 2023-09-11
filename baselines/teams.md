@@ -55,7 +55,7 @@ This section helps reduce security risks related to the user permissions for rec
 External meeting participants SHOULD NOT be enabled to request control of shared desktops or windows.
 
 <!--Policy: MS.TEAMS.1.1v1; Criticality: SHOULD -->
-- _Rationale:_ There is risk in granting an external participant control of a shared screen because the participant could potentially perform unauthorized actions on the shared screen. This policy reduces that risk by removing an external participant's ability to request control. However, if an agency has a legitimate use case to grant this control, it may be done on an "as-needed" basis.
+- _Rationale:_ There is risk in granting an external participant control of a shared screen because the participant could potentially perform unauthorized actions on the shared screen. This policy reduces that risk by removing an external participant's ability to request control. However, if an agency has a legitimate use case to grant this control, it may be done on a case-by-case basis.
 - _Last modified:_ July 2023
 - _Note:_ This policy applies to the Global (Org-wide default) meeting policy, and custom meeting policies if they exist.
 
