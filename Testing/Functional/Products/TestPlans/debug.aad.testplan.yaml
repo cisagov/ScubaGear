@@ -1,0 +1,13 @@
+ProductName: aad
+TestPlan:
+  - PolicyId: MS.AAD.3.4v1
+    TestDriver: RunCached
+    Tests:
+      - TestDescription: MS.AAD.3.4v1 preMigration
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                'authentication_method[0].PolicyMigrationState': preMigration  
+        Postconditions: []
+        ExpectedResult: false 
