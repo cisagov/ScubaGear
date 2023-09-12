@@ -15,12 +15,12 @@ SensitiveAccountsConfig(PolicyID) := {
     "ExcludedDomains" : ExcludedDomains
 } {
     SensitiveAccounts := input.scuba_config.Defender[PolicyID].SensitiveAccounts
-    IncludedUsers := { x | some x in SensitiveAccounts.IncludedUsers; x != null }
-    ExcludedUsers := { x | some x in SensitiveAccounts.ExcludedUsers; x != null }
-    IncludedGroups := { x | some x in SensitiveAccounts.IncludedGroups; x != null }
-    ExcludedGroups := { x | some x in SensitiveAccounts.ExcludedGroups; x != null }
-    IncludedDomains := { x | some x in SensitiveAccounts.IncludedDomains; x != null }
-    ExcludedDomains := { x | some x in SensitiveAccounts.ExcludedDomains; x != null }
+    IncludedUsers := { trim_space(x) | some x in SensitiveAccounts.IncludedUsers; x != null }
+    ExcludedUsers := { trim_space(x) | some x in SensitiveAccounts.ExcludedUsers; x != null }
+    IncludedGroups := { trim_space(x) | some x in SensitiveAccounts.IncludedGroups; x != null }
+    ExcludedGroups := { trim_space(x) | some x in SensitiveAccounts.ExcludedGroups; x != null }
+    IncludedDomains := { trim_space(x) | some x in SensitiveAccounts.IncludedDomains; x != null }
+    ExcludedDomains := { trim_space(x) | some x in SensitiveAccounts.ExcludedDomains; x != null }
 } else := {
     "IncludedUsers" : set(),
     "ExcludedUsers" : set(),
