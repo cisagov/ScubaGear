@@ -324,6 +324,7 @@ TestPlan:
         ExpectedResult: true
   - PolicyId: MS.AAD.5.3v1
     TestDriver: RunScuba
+    ToDo: Work API. How to use switch parameter?
     Tests:
       - TestDescription: MS.AAD.5.3v1 No Admin Consent Request Policy Enabled
         Preconditions:
