@@ -48,13 +48,12 @@ function Set-NestedMemberValue
 
         Write-Host "Member: $m Count: $($IndexedMember.Count)"
         if ($IndexedMember -eq 1){
-            Write-Host "Regular path"
+            Write-Host "Regular path: $m"
             $InputObject = $InputObject.$m
         }
         elseif ($IndexedMember -gt 1){
             Write-Host "Indexed members: $($IndexedMember[0]) $($IndexedMember[1]) $($IndexedMember[2]) $($IndexedMember[3])"
             $InputObject = $InputObject.$($IndexedMember[0])
-            $InputObject.GetType()
             $InputObject = $InputObject[[int]($IndexedMember[1])]
         }
         else {
@@ -64,6 +63,7 @@ function Set-NestedMemberValue
         Write-Host "Resolve: $($InputObject)"
     }
 
+    Write-Host "Value is array: $($Value.GetType())"
     $InputObject.$leaf = $Value
   }
 }

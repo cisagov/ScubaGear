@@ -39,6 +39,7 @@
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'AppId', Justification = 'False positive as rule does not scan child scopes')]
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'ProductName', Justification = 'False positive as rule does not scan child scopes')]
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'M365Environment', Justification = 'False positive as rule does not scan child scopes')]
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingWriteHost', 'Write-Host', Justification = 'Alway print for debugging issues')]
 
 [CmdletBinding(DefaultParameterSetName='Auto')]
 param (
@@ -285,7 +286,8 @@ BeforeAll{
         $Updates.Keys | ForEach-Object{
             try {
                 $Update = $Updates.Item($_)
-                Set-NestedMemberValue -InputObject $ProviderExport -MemberPath $_  -Value $Update
+                $Policy = $ConditionalAccessPolicies[$Index]
+                Set-NestedMemberValue -InputObject $Policy -MemberPath $_  -Value $Update
             }
             catch {
                 Write-Error "Exception:  $_"
