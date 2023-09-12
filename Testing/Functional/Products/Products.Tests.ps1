@@ -1,4 +1,3 @@
-#Requires -Modules @{ ModuleName='Selenium'; ModuleVersion='3.0.0'}
 <#
     .SYNOPSIS
     Test script for MS365 Teams product.
@@ -75,9 +74,12 @@ param (
     $M365Environment = 'gcc'
 )
 
-$ScubaModulePath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/ScubaGear.psd1"
-Import-Module $ScubaModulePath
-Import-Module Selenium
+$ScubaModulePath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules"
+$ScubaModule = Join-Path -Path $ScubaModulePath -ChildPath "../ScubaGear.psd1"
+$ConnectionModule = Join-Path -Path $ScubaModulePath -ChildPath "Connection/Connection.psm1"
+Import-Module $ScubaModule
+Import-Module $ConnectionModule
+Import-Module Selenium -Force
 
 BeforeDiscovery{
     $TestPlanPath = Join-Path -Path $PSScriptRoot -ChildPath "TestPlans/$ProductName.testplan.yaml"
@@ -143,7 +145,6 @@ BeforeAll{
             $Splat = $Condition.Splat
 
             if ('Cached' -eq $PSCmdlet.ParameterSetName){
-                Write-Output "Setting output folder to: $OutputFolder"
                 $Splat.Add("OutputFolder", [string]$OutputFolder)
             }
 
@@ -162,7 +163,7 @@ BeforeAll{
         param(
             [Parameter(Mandatory = $true)]
             [AllowNull()]
-            [object]
+            [hashtable]
             $Updates,
             [Parameter(Mandatory = $true)]
             [string]
@@ -171,9 +172,16 @@ BeforeAll{
 
         $ProviderExport = LoadProviderExport($OutputFolder)
 
-        foreach ($Update in $Updates.ToArray()){
-            $Key = $Update.Key
-            $ProviderExport.$Key = $Update.Value
+        $Updates.Keys | ForEach-Object{
+            try {
+                $Update = $Updates.Item($_)
+                Write-Host "Updating $_ with $Update"
+                Set-NestedMemberValue -InputObject $ProviderExport -MemberPath $_  -Value $Update
+                Write-Host "Updated to $($ProviderExport.$_)"
+            }
+            catch {
+                Write-Error "Exception:  $_"
+            }
         }
 
         PublishProviderExport -OutputFolder $OutputFolder -Export $ProviderExport
@@ -194,7 +202,7 @@ BeforeAll{
             Copy-Item -Path "$OutputFolder/ProviderSettingsExport.json" -Destination "$OutputFolder/ModifiedProviderSettingsExport.json"
         }
 
-        $ProviderExport = Get-Content "$OutputFolder/ModifiedProviderSettingsExport.json" -Raw | ConvertFrom-Json
+        $ProviderExport = Get-Content -Raw "$OutputFolder/ModifiedProviderSettingsExport.json" | ConvertFrom-Json
         $ProviderExport
     }
 
@@ -224,7 +232,6 @@ BeforeAll{
 
         foreach($Id in $Ids){
             if (-not ([string]::IsNullOrEmpty($Id.Id))){
-                Write-Output "Removing $DisplayName with id of $($Id.Id)"
                 Remove-MgIdentityConditionalAccessPolicy -ConditionalAccessPolicyId $Id.Id
             }
         }
@@ -247,11 +254,46 @@ BeforeAll{
 
         foreach($Id in $Ids){
             if (-not ([string]::IsNullOrEmpty($Id.Id))){
-                Write-Output "Updating $DisplayName with id of $($Id.Id)"
                 Update-MgIdentityConditionalAccessPolicy -ConditionalAccessPolicyId $Id.Id @Updates
                 break
             }
         }
+    }
+
+    function UpdateCachedConditionalAccessPolicyByName{
+        [CmdletBinding()]
+        param (
+            [Parameter(Mandatory = $true)]
+            [ValidateNotNullOrEmpty()]
+            [string]
+            $DisplayName,
+            [Parameter(Mandatory = $true)]
+            [ValidateNotNullOrEmpty()]
+            [hashtable]
+            $Updates,
+            [Parameter(Mandatory = $true)]
+            [ValidateNotNullOrEmpty()]
+            [string]
+            $OutputFolder
+        )
+
+        $ProviderExport = LoadProviderExport($OutputFolder)
+
+        $ConditionalAccessPolicies = $ProviderExport.conditional_access_policies
+        $Index = [array]::indexof($ConditionalAccessPolicies.DisplayName, $DisplayName)
+
+        $Updates.Keys | ForEach-Object{
+            try {
+                $Update = $Updates.Item($_)
+                Set-NestedMemberValue -InputObject $ProviderExport -MemberPath $_  -Value $Update
+            }
+            catch {
+                Write-Error "Exception:  $_"
+            }
+        }
+
+        PublishProviderExport -OutputFolder $OutputFolder -Export $ProviderExport
+
     }
 }
 
@@ -280,9 +322,9 @@ Describe "Policy Checks for <ProductName>"{
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'PolicyResultObj', Justification = 'Variable is used in ScriptBlock')]
             $PolicyResultObj = $IntermediateTestResults | Where-Object { $_.PolicyId -eq $PolicyId }
             $BaselineReports = Join-Path -Path $OutputFolder -ChildPath 'BaselineReports.html'
-            $script:url = (Get-Item $BaselineReports).FullName
-            $Driver = Start-SeChrome -Headless -Arguments @('start-maximized') 2>$null
-            Open-SeUrl $script:url -Driver $Driver 2>$null
+            $Url = (Get-Item $BaselineReports).FullName
+            $Driver = Start-SeChrome -Headless -Arguments @('start-maximized', 'AcceptInsecureCertificates') 2>$null
+            Open-SeUrl $Url -Driver $Driver 2>$null
         }
         Context "Execute test, <TestDescription>" -ForEach $Tests {
             It "Check test case results" {
