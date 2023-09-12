@@ -1,13 +1,18 @@
 ProductName: aad
 TestPlan:
-  - PolicyId: MS.AAD.3.4v1
-    TestDriver: RunCached
+  - PolicyId: MS.AAD.5.3v1
+    TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.AAD.3.4v1 preMigration
+      - TestDescription: MS.AAD.5.3v1 No Admin Consent Request Policy Enabled
         Preconditions:
-          - Command: UpdateProviderExport
-            Splat:
-              updates:
-                'authentication_method[0].PolicyMigrationState': preMigration  
+          - Command: Update-MgPolicyAdminConsentRequestPolicy
+            Splat: {}
         Postconditions: []
-        ExpectedResult: false 
+        ExpectedResult: false
+      - TestDescription: MS.AAD.5.3v1 Default
+        Preconditions:
+          - Command: Update-MgPolicyAdminConsentRequestPolicy
+            Splat:
+              'IsEnabled$true':
+        Postconditions: []
+        ExpectedResult: true
