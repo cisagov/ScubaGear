@@ -2,9 +2,9 @@ package defender
 import future.keywords
 import data.report.utils.NotCheckedDetails
 import data.report.utils.ReportDetailsBoolean
-import data.eop.utils.SensitiveAccounts
-import data.eop.utils.SensitiveAccountsConfig
-import data.eop.utils.SensitiveAccountsSetting
+import data.defender.utils.SensitiveAccounts
+import data.defender.utils.SensitiveAccountsConfig
+import data.defender.utils.SensitiveAccountsSetting
 
 ## Report details menu
 #
