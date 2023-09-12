@@ -2987,6 +2987,7 @@ test_SensitiveEOP_Correct_V25 if {
     RuleOutput[0].ReportDetails == "Requirement not met"
 }
 
+# Test is intended for later when User is part of Dune & not part of domain
 test_SensitiveEOP_Correct_V26 if {
     PolicyId := "MS.DEFENDER.1.4v1"
 
@@ -3031,12 +3032,11 @@ test_SensitiveEOP_Correct_V26 if {
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
-    # Test is set so that user is part of Dune group, so the test should pass;
-    # However, do not currently posses the ability to check users against group so test fails
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement not met"
+    RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "Requirement met"
 }
 
+# Test is intended for later when User is part of Dune & not part of domain
 test_SensitiveEOP_Correct_V27 if {
     PolicyId := "MS.DEFENDER.1.4v1"
 
@@ -3083,12 +3083,11 @@ test_SensitiveEOP_Correct_V27 if {
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
-    # Test is set so that user is part of Dune group, so the test should pass;
-    # However, do not currently posses the ability to check users against group so test fails
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement not met"
+    RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "Requirement met"
 }
 
+# Test is intended for later when User is not part of Dune12 & not part of domain
 test_SensitiveEOP_Correct_V28 if {
     PolicyId := "MS.DEFENDER.1.4v1"
 
@@ -3133,12 +3132,11 @@ test_SensitiveEOP_Correct_V28 if {
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
-    # Test is set so that user is not part of Dune12 group, so the test should pass;
-    # However, do not currently posses the ability to check users against group so test fails
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement not met"
+    RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "Requirement met"
 }
 
+# Test is intended for later when User is not part of Dune12 & not part of domain
 test_SensitiveEOP_Correct_V29 if {
     PolicyId := "MS.DEFENDER.1.4v1"
 
@@ -3185,10 +3183,8 @@ test_SensitiveEOP_Correct_V29 if {
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
-    # Test is set so that user is not part of Dune12 group, so the test should pass;
-    # However, do not currently posses the ability to check users against group so test fails
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement not met"
+    RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "Requirement met"
 }
 
 test_SensitiveEOP_Incorrect_V33 if {
@@ -3768,7 +3764,7 @@ test_SensitiveEOP_Incorrect_V41 if {
 }
 
 ### Case 12 ###
-test_SensitiveEOP_Correct_V33 if {
+test_SensitiveEOP_Correct_V34 if {
     PolicyId := "MS.DEFENDER.1.4v1"
 
     Output := tests with input as {
@@ -3813,7 +3809,7 @@ test_SensitiveEOP_Correct_V33 if {
     RuleOutput[0].ReportDetails == "Requirement not met"
 }
 
-test_SensitiveEOP_Correct_V34 if {
+test_SensitiveEOP_Correct_V35 if {
     PolicyId := "MS.DEFENDER.1.4v1"
 
     Output := tests with input as {
