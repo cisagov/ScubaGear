@@ -116,11 +116,3 @@ SensitiveAccounts(SensitiveAccountsSetting, SensitiveAccountsConfig) := true if 
     ]
     count([x | x := Mismatches[_]; x == false]) == 0
 }
-
-ProtectionPolicyForSensitiveIDs[Policies] {
-    Policies := input.protection_policy_rules
-    AccountsSetting := SensitiveAccountsSetting(Policies)
-    AccountsConfig := SensitiveAccountsConfig("MS.DEFENDER.1.4v1")
-
-    SensitiveAccounts(AccountsSetting, AccountsConfig) == true
-}
