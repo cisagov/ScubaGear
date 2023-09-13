@@ -37,39 +37,37 @@ test_disableProductionEnvironmentCreationByNonAdminUsers_Incorrect if {
     RuleOutput[0].ReportDetails == "Requirement not met"
 }
 
-# TODO: Need to resolve Policy ID
-# 
+#
+# Policy 2
 #--
-# test_disableTrialEnvironmentCreationByNonAdminUsers_Correct if {
-#     ControlNumber := "Power Platform 2.1"
-#     Requirement := "The ability to create trial environments SHALL be restricted to admins"
+test_disableTrialEnvironmentCreationByNonAdminUsers_Correct if {
+    PolicyId := "MS.POWERPLATFORM.1.2v1"
 
-#     Output := tests with input as {
-#         "environment_creation": [{
-#             "disableTrialEnvironmentCreationByNonAdminUsers" : true
-#         }]
-#     }
+    Output := tests with input as {
+        "environment_creation": [{
+            "disableTrialEnvironmentCreationByNonAdminUsers" : true
+        }]
+    }
 
-#     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
-#     count(RuleOutput) == 1
-#     RuleOutput[0].RequirementMet
-#     RuleOutput[0].ReportDetails == "Requirement met"
-# }
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "Requirement met"
+}
 
-# test_disableTrialEnvironmentCreationByNonAdminUsers_Incorrect if {
-#     ControlNumber := "Power Platform 2.1"
-#     Requirement := "The ability to create trial environments SHALL be restricted to admins"
+test_disableTrialEnvironmentCreationByNonAdminUsers_Incorrect if {
+    PolicyId := "MS.POWERPLATFORM.1.2v1"
 
-#     Output := tests with input as {
-#         "environment_creation": [{
-#             "disableTrialEnvironmentCreationByNonAdminUsers" : false
-#         }]
-#     }
+    Output := tests with input as {
+        "environment_creation": [{
+            "disableTrialEnvironmentCreationByNonAdminUsers" : false
+        }]
+    }
 
-#     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
-#     count(RuleOutput) == 1
-#     not RuleOutput[0].RequirementMet
-#     RuleOutput[0].ReportDetails == "Requirement not met"
-# }
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "Requirement not met"
+}
