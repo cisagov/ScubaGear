@@ -35,6 +35,7 @@ InModuleScope CreateReport {
                 Import-SecureBaseline -ProductNames "aad" -BaselinePath "./Testing/Unit/PowerShell/CreateReport/CreateReportStubs"
                 Should -Invoke -CommandName Write-Error -Exactly -Times 2 -Because "Except errors on parsing"
             } | Should -Throw
+
         }
     }
 }
