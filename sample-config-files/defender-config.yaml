@@ -5,7 +5,7 @@ Description: |
   in Rego policy assessments against the Defender baseline.  Using
   policy-specific variables to define sensitive users, groups, and domains.
   Defender preset security policies will then be assessed to ensure sensitive
-  accounts and domains are included according to the Defender baseline policy.
+  accounts, as specified by matching policy assignment filters, are included according to the Defender baseline policy.
   Any account or domain designated as sensitive should be carefully
   considered and documented as part of an organization's cybersecurity risk
   management program process and practices.

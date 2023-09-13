@@ -5,7 +5,7 @@ import future.keywords
 # User/Group Exclusion support functions #
 ##########################################
 
-# Gets Sensitive Account Filter configuration in defender-config.yaml
+# Gets Sensitive Account Filter specification from SCuBA config input
 SensitiveAccountsConfig(PolicyID) := {
     "IncludedUsers" : IncludedUsers,
     "ExcludedUsers" : ExcludedUsers,
@@ -30,7 +30,7 @@ SensitiveAccountsConfig(PolicyID) := {
     "ExcludedDomains" : set()
 }
 
-# Gets Sensitive Account Filter configuration from ProvidorSettingsExport.json
+# Gets Sensitive Account Filter specified in policy input
 SensitiveAccountsSetting(Policies) := {
     "IncludedUsers" : IncludedUsers,
     "ExcludedUsers" : ExcludedUsers,
