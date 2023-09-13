@@ -316,6 +316,7 @@ Describe "Policy Checks for <ProductName>"{
 
             $ReportFolders = Get-ChildItem . -directory -Filter "M365BaselineConformance*" | Sort-Object -Property LastWriteTime -Descending
             $OutputFolder = $ReportFolders[0]
+            Write-Host "OutputFolder: $OutputFolder"
             $IntermediateTestResults = LoadTestResults($OutputFolder)
             # Search the results object for the specific requirement we are validating and ensure the results are what we expect
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'PolicyResultObj', Justification = 'Variable is used in ScriptBlock')]
