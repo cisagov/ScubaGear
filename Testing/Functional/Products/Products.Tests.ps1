@@ -39,7 +39,6 @@
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'AppId', Justification = 'False positive as rule does not scan child scopes')]
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'ProductName', Justification = 'False positive as rule does not scan child scopes')]
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'M365Environment', Justification = 'False positive as rule does not scan child scopes')]
-[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingWriteHost', 'Write-Host', Justification = 'Alway print for debugging issues')]
 
 [CmdletBinding(DefaultParameterSetName='Auto')]
 param (
@@ -155,7 +154,7 @@ BeforeAll{
                 $ScriptBlock.Invoke()
             }
             catch {
-                Write-Error $PSItem.ToString()
+                Write-Error "Exceptio: SetConditions failed."
             }
         }
     }
@@ -176,12 +175,10 @@ BeforeAll{
         $Updates.Keys | ForEach-Object{
             try {
                 $Update = $Updates.Item($_)
-                Write-Host "Updating $_ with $Update"
                 Set-NestedMemberValue -InputObject $ProviderExport -MemberPath $_  -Value $Update
-                Write-Host "Updated to $($ProviderExport.$_)"
             }
             catch {
-                Write-Error "Exception:  $_"
+                Write-Error "Exception: UpdateProviderExport failed"
             }
         }
 
@@ -290,7 +287,7 @@ BeforeAll{
                 Set-NestedMemberValue -InputObject $Policy -MemberPath $_  -Value $Update
             }
             catch {
-                Write-Error "Exception:  $_"
+                Write-Error "Exception:  UpdateCachedConditionalAccessPolicyByName failed"
             }
         }
 
@@ -314,7 +311,7 @@ Describe "Policy Checks for <ProductName>"{
                 Invoke-RunCached -Productnames $ProductName -ExportProvider $false -OutPath $OutputFolder -OutProviderFileName 'ModifiedProviderSettingsExport' -Quiet
             }
             else {
-                Write-Error -Message "Invalid Test Driver: $TestDriver"
+                Write-Error "Invalid Test Driver: $TestDriver"
             }
 
             $ReportFolders = Get-ChildItem . -directory -Filter "M365BaselineConformance*" | Sort-Object -Property LastWriteTime -Descending
