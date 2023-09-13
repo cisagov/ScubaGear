@@ -565,8 +565,8 @@ TestPlan:
             Splat:
               Updates:
                 privileged_roles[0].Rules[0].Id: Notification_Admin_EndUser_Assignment
-                privileged_roles[0].Rules[0].AdditionalProperties.notificationType: Email
                 privileged_roles[0].Rules[0].AdditionalProperties:
+                  notificationType: Email
                   notificationRecipients: []
                 privileged_roles[0].DisplayName: Global Administrator
         Postconditions: []
@@ -577,8 +577,8 @@ TestPlan:
             Splat:
               Updates:
                 privileged_roles[0].Rules[0].Id: Notification_Admin_EndUser_Assignment
-                privileged_roles[0].Rules[0].AdditionalProperties.notificationType: Email
                 privileged_roles[0].Rules[0].AdditionalProperties:
+                  notificationType: Email
                   notificationRecipients:
                     - 'someone@somewhere.org'
                 privileged_roles[0].DisplayName: Global Administrator
