@@ -67,3 +67,26 @@ function Set-NestedMemberValue
     $InputObject.$leaf = $Value
   }
 }
+
+function UpdateDirectorySettingByName{
+  [CmdletBinding()]
+  param (
+      [Parameter(Mandatory = $true)]
+      [ValidateNotNullOrEmpty()]
+      [string]
+      $DisplayName,
+      [Parameter(Mandatory = $true)]
+      [ValidateNotNullOrEmpty()]
+      [hashtable]
+      $Updates
+  )
+
+  $Ids = Get-MgDirectorySetting | Where-Object { $_.DisplayName -eq $DisplayName } | Select-Object -Property Id
+
+  foreach($Id in $Ids){
+      if (-not ([string]::IsNullOrEmpty($Id.Id))){
+          Update-MgDirectorySetting -DirectorySettingId $($Id.Id) @Updates
+          break
+      }
+  }
+}
