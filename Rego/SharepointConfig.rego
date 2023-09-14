@@ -70,36 +70,60 @@ tests[{
 # SharingDomainRestrictionMode == 1 Checked
 # SharingAllowedDomainList == "domains" Domain list
 
+# At this time we are unable to test for approved security groups
+# because we have yet to find the setting to check
+
+Domainlist(Policy) = Description if {
+    Policy.SharingDomainRestrictionMode == 1
+    Description := "Requirement met: code currently only checks for the domain list not security group, see baseline document to conduct a manual check"
+}
+
+Domainlist(Policy) = Description if {
+    Policy.FileAnonymousLinkType != 1
+    Description := "Requirement not met: code currently only checks for the domain list not security group, see baseline document to conduct a manual check"
+}
+
 tests[{
     "PolicyId" : "MS.SHAREPOINT.1.3v1",
     "Criticality" : "Should",
     "Commandlet" : ["Get-SPOTenant", "Get-PnPTenant"],
     "ActualValue" : [Policy.SharingDomainRestrictionMode],
-    "ReportDetails" : ReportDetailsBoolean(Status),
+    "ReportDetails" : Domainlist(Policy),
     "RequirementMet" : Status
 }] {
     Policy := input.SPO_tenant[_]
     Status := Policy.SharingDomainRestrictionMode == 1
 }
+
+
+#tests[{
+#    "PolicyId" : "MS.SHAREPOINT.1.3v1",
+#    "Criticality" : "Should",
+#    "Commandlet" : ["Get-SPOTenant", "Get-PnPTenant"],
+#    "ActualValue" : [Policy.SharingDomainRestrictionMode],
+#    "ReportDetails" : ReportDetailsBoolean(Status),
+#    "RequirementMet" : Status
+#}] {
+#    Policy := input.SPO_tenant[_]
+#    Status := Policy.SharingDomainRestrictionMode == 1
+#}
 #--
 
 #
 # MS.SHAREPOINT.1.4v1
 #--
 
-# At this time we are unable to test for approved security groups
-# because we have yet to find the setting to check
 
 tests[{
-    "PolicyId" : PolicyId,
-    "Criticality" : "Should/Not-Implemented",
-    "Commandlet" : [],
-    "ActualValue" : [],
-    "ReportDetails" : NotCheckedDetails(PolicyId),
-    "RequirementMet" : false
+    "PolicyId" : "MS.SHAREPOINT.1.4v1",
+    "Criticality" : "Should",
+    "Commandlet" : ["Get-SPOTenant", "Get-PnPTenant"],
+    "ActualValue" : [Policy.RequireAcceptingAccountMatchInvitedAccount],
+    "ReportDetails" : ReportDetailsBoolean(Status),
+    "RequirementMet" : Status
 }] {
-    PolicyId := "MS.SHAREPOINT.1.4v1"
-    true
+    Policy := input.SPO_tenant[_]
+    Status := Policy.RequireAcceptingAccountMatchInvitedAccount == true
 }
 #--
 

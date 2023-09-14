@@ -198,7 +198,7 @@ test_SharingDomainRestrictionMode_Correct if {
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement met"
+    RuleOutput[0].ReportDetails == "Requirement met: code currently only checks for the domain list not security group, see baseline document to conduct a manual check"
 }
 
 test_SharingDomainRestrictionMode_Incorrect if {
@@ -216,23 +216,47 @@ test_SharingDomainRestrictionMode_Incorrect if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement not met"
+    RuleOutput[0].ReportDetails == "Requirement not met: code currently only checks for the domain list not security group, see baseline document to conduct a manual check"
 }
 #--
 
 #
 # MS.SHAREPOINT.1.4v1
 #--
-test_NotImplemented_Correct if {
+test_SameAccount_Incorrect if {
     PolicyId := "MS.SHAREPOINT.1.4v1"
 
-    Output := tests with input as { }
+    Output := tests with input as {
+        "SPO_tenant": [
+            {
+                "RequireAcceptingAccountMatchInvitedAccount" : true
+            }
+        ]
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "Requirement met"
+}
+
+test_SSameAccount_Incorrect if {
+    PolicyId := "MS.SHAREPOINT.1.4v1"
+
+    Output := tests with input as {
+        "SPO_tenant": [
+            {
+                "RequireAcceptingAccountMatchInvitedAccount" : false
+            }
+        ]
+    }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == NotCheckedDetails(PolicyId)
+    RuleOutput[0].ReportDetails == "Requirement met"
 }
 #--
 
