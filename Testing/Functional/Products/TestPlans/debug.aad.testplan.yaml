@@ -1,13 +1,31 @@
 ProductName: aad
-TestPlan:
-  - PolicyId: MS.AAD.3.4v1
+TestPlan:     
+  - PolicyId: MS.AAD.7.8v1
     TestDriver: RunCached
+    ToDo: Changed to RunScuba
     Tests:
-      - TestDescription: MS.AAD.3.4v1 preMigration
-        Preconditions:
+      - TestDescription: MS.AAD.7.8v1 No notificationRecipients
+        Preconditions:  
           - Command: UpdateProviderExport
             Splat:
-              updates:
-                'authentication_method[0].PolicyMigrationState': preMigration  
+              Updates:
+                privileged_roles[0].Rules[0].Id: Notification_Admin_EndUser_Assignment
+                privileged_roles[0].Rules[0].AdditionalProperties:
+                  notificationType: Email
+                  notificationRecipients: []
+                privileged_roles[0].DisplayName: Global Administrator
         Postconditions: []
-        ExpectedResult: false 
+        ExpectedResult: false
+      - TestDescription: MS.AAD.7.8v1 Default
+        Preconditions:  
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                privileged_roles[0].Rules[0].Id: Notification_Admin_EndUser_Assignment
+                privileged_roles[0].Rules[0].AdditionalProperties:
+                  notificationType: Email
+                  notificationRecipients:
+                    - 'someone@somewhere.org'
+                privileged_roles[0].DisplayName: Global Administrator
+        Postconditions: []
+        ExpectedResult: true    
