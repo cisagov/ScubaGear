@@ -131,8 +131,6 @@ Sign-ins detected as high risk SHALL be blocked.
 1.  Create a conditional access policy blocking users categorized as high risk by the Identity Protection service. Configure the following policy settings in the new conditional access policy as per the values below:
 
 <pre>
-  Home > Protections > Conditional Access | Overview > + New Policy
-
   Users > Include > <b>All users</b>
 
   Target resources > Cloud apps > <b>All cloud apps</b>
@@ -181,7 +179,7 @@ The methods **AAD Certificate-Based Authentication (CBA)**, **FIDO2 Security Key
 
 **Non-preferred phishing-resistant methods**
 
-The **Federal PIV card (federated from agency on-premises Active Directory Federation Services or other identity provider)** option, although technically phishing-resistant presents significant risks if the on-premises authentication infrastructure (e.g., Azure Directory Federation Services) is compromised. Therefore, federated PIV is not a preferred option and agencies should migrate to the options listed in the preferred section above. If an agency does use an on-premises PIV authentication and federate to AAD, reference the [guidance at this link](https://playbooks.idmanagement.gov/piv/network/group/) to enforce PIV logon via AD group policy.
+The **Federal PIV card (federated from agency on-premises Active Directory Federation Service or other identity provider)** option, although technically phishing-resistant presents significant risks if the on-premises authentication infrastructure (e.g., Active Directory Federation Service) is compromised. Therefore, federated PIV is not a preferred option and agencies should migrate to the options listed in the preferred section above. If an agency does use an on-premises PIV authentication and federate to AAD, reference the [guidance at this link](https://playbooks.idmanagement.gov/piv/network/group/) to enforce PIV logon via AD group policy.
 
 <!--Policy: MS.AAD.3.1v1; Criticality: SHALL -->
 - _Rationale:_ Allowing weaker forms of MFA does not protect against sophisticated phishing attacks. By enforcing methods resistant to phishing, those risks are minimized.
@@ -562,7 +560,7 @@ Provisioning users to highly privileged roles SHALL NOT occur outside of a PAM s
 Activation of the Global Administrator role SHALL require approval.
 
 <!--Policy: MS.AAD.7.6v1; Criticality: SHALL -->
-- _Rationale:_ Requiring approval for a user to activate Global Administrator, which provided unfettered access, makes it more challenging for an attacker to compromise the tenant with stolen credentials and it provides visibility of activities indicating a compromise is taking place.
+- _Rationale:_ Requiring approval for a user to activate Global Administrator, which provides unfettered access, makes it more challenging for an attacker to compromise the tenant with stolen credentials and it provides visibility of activities indicating a compromise is taking place.
 - _Last modified:_ June 2023
 
 #### MS.AAD.7.7v1
@@ -663,7 +661,7 @@ Performing a manual review of highly privileged users to determine which ones ar
 
 3. Under **Manage**, select **Assignments** and click the **Active assignments** tab.
 
-4. Verify there are no users or groups with a value of **Permanent** in the **End time** column. If there are any, recreate those assignments to have an expiration date using AAD PIM or an alternative PAM system. The only exception to this policy is emergency access accounts and service accounts requiring perpetual active assignments. See policy MS.AAD.7.4v1 note section for details..
+4. Verify there are no users or groups with a value of **Permanent** in the **End time** column. If there are any, recreate those assignments to have an expiration date using AAD PIM or an alternative PAM system. The only exception to this policy is emergency access accounts and service accounts requiring perpetual active assignments. See policy MS.AAD.7.4v1 note section for details.
 
 #### MS.AAD.7.5v1 instructions:
 
@@ -750,7 +748,7 @@ Guest users SHOULD have limited or restricted access to Azure AD directory objec
 Only users with the Guest Inviter role SHOULD be able to invite guest users.
 
 <!--Policy: MS.AAD.8.2v1; Criticality: SHOULD -->
-- _Rationale:_ By only allowing an authorized groups of individuals to invite external users to create accounts in the tenant, an agency can enforce a guest user account approval process, reducing the risk of unauthorized accounts being created.
+- _Rationale:_ By only allowing an authorized group of individuals to invite external users to create accounts in the tenant, an agency can enforce a guest user account approval process, reducing the risk of unauthorized accounts being created.
 - _Last modified:_ June 2023
 
 #### MS.AAD.8.3v1
