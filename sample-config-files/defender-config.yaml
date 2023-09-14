@@ -1,0 +1,45 @@
+Description: |
+  SCuBAGear YAML Configuration file with custom variables
+  This configuration shows a standard SCuBAGear set of parameters to run
+  but also includes examples of custom variables for use and reference
+  in Rego policy assessments against the Defender baseline.  Using
+  policy-specific variables to define sensitive users, groups, and domains.
+  Defender preset security policies will then be assessed to ensure sensitive
+  accounts, as specified by matching policy assignment filters, are included according to the Defender baseline policy.
+  Any account or domain designated as sensitive should be carefully
+  considered and documented as part of an organization's cybersecurity risk
+  management program process and practices.
+  This example includes the following design choices for illustrative purposes:
+  - Use of Pascal case convention for variable names
+  - Defines a namespace for values to be used across baselines/products (i.e., GlobalVars)
+  - Per product namespace for values related to that specific product (i.e., Defender, SharePoint)
+  - Namespace for each policy item within a product for variables related only to one policy item (i.e., Defender.MS.DEFENDER.1.4v1)
+  - Use of YAML anchors and aliases following DRY (Don't Repeat Yourself) principle for repeated values and sections
+ProductNames:
+- defender
+M365Environment: commercial
+OPAPath: .
+LogIn: true
+DisconnectOnExit: false
+OutPath: .
+OutFolderName: M365BaselineConformance
+OutProviderFileName: ProviderSettingsExport
+OutRegoFileName: TestResults
+OutReportName: BaselineReports
+GlobalVars:  # For cross product variables
+  AllProductVar: value_example
+Defender:
+  MS.DEFENDER.1.4v1: &CommonSensitiveAccountFilter
+    SensitiveAccounts:
+      IncludedUsers:
+        - johndoe@random.example.com
+      IncludedGroups:
+        - Dune
+      IncludedDomains:
+        - random.mail.example.com
+      ExcludedUsers:
+        -
+      ExcludedGroups:
+        -
+      ExcludedDomains:
+        -
