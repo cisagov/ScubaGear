@@ -183,12 +183,32 @@ test_OneDriveSharingCapability_Incorrect_V2 if {
 #
 # MS.SHAREPOINT.1.3v1
 #--
-test_SharingDomainRestrictionMode_Correct if {
+test_SharingDomainRestrictionMode_Correct_V1 if {
     PolicyId := "MS.SHAREPOINT.1.3v1"
 
     Output := tests with input as {
         "SPO_tenant": [
             {
+                "SharingCapability" : 0,
+                "SharingDomainRestrictionMode" : 0
+            }
+        ]
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "Requirement met: external sharing is set to Only People In Organization"
+}
+
+test_SharingDomainRestrictionMode_Correct_V2 if {
+    PolicyId := "MS.SHAREPOINT.1.3v1"
+
+    Output := tests with input as {
+        "SPO_tenant": [
+            {
+                "SharingCapability" : 1,
                 "SharingDomainRestrictionMode" : 1
             }
         ]
@@ -207,6 +227,7 @@ test_SharingDomainRestrictionMode_Incorrect if {
     Output := tests with input as {
         "SPO_tenant": [
             {
+                "SharingCapability" : 1,
                 "SharingDomainRestrictionMode" : 0
             }
         ]
@@ -256,7 +277,7 @@ test_SSameAccount_Incorrect if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement met"
+    RuleOutput[0].ReportDetails == "Requirement not met"
 }
 #--
 
