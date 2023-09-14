@@ -244,12 +244,32 @@ test_SharingDomainRestrictionMode_Incorrect if {
 #
 # MS.SHAREPOINT.1.4v1
 #--
-test_SameAccount_Incorrect if {
+test_SameAccount_Correct_V1 if {
     PolicyId := "MS.SHAREPOINT.1.4v1"
 
     Output := tests with input as {
         "SPO_tenant": [
             {
+                "SharingCapability" : 0,
+                "RequireAcceptingAccountMatchInvitedAccount" : false
+            }
+        ]
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "Requirement met"
+}
+
+test_SameAccount_Correct_V2 if {
+    PolicyId := "MS.SHAREPOINT.1.4v1"
+
+    Output := tests with input as {
+        "SPO_tenant": [
+            {
+                "SharingCapability" : 1,
                 "RequireAcceptingAccountMatchInvitedAccount" : true
             }
         ]
@@ -262,12 +282,13 @@ test_SameAccount_Incorrect if {
     RuleOutput[0].ReportDetails == "Requirement met"
 }
 
-test_SSameAccount_Incorrect if {
+test_SameAccount_Incorrect if {
     PolicyId := "MS.SHAREPOINT.1.4v1"
 
     Output := tests with input as {
         "SPO_tenant": [
             {
+                "SharingCapability" : 1,
                 "RequireAcceptingAccountMatchInvitedAccount" : false
             }
         ]
