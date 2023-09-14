@@ -63,7 +63,7 @@ Refer to [Power Platform Microsoft Learn documentation](https://learn.microsoft.
 
 ## 1. Creation of Power Platform Environments
 
-By default, any user in the Azure AD Tenant can create additional environments. Enabling these controls will restrict the creation of new environments to users with the following admin roles: Global admins, Dynamics 365 admins, and Power Platform admins.
+By default, any user in the Azure Active Directory (AAD) Tenant can create additional environments. Enabling these controls will restrict the creation of new environments to users with the following admin roles: Global admins, Dynamics 365 admins, and Power Platform admins.
 
 ### Policies
 
@@ -71,9 +71,9 @@ By default, any user in the Azure AD Tenant can create additional environments. 
 The ability to create production and sandbox environments SHALL be restricted to admins.
 
 <!--Policy: MS.POWERPLATFORM.1.1v1; Criticality: SHALL -->
-- _Rationale:_ Users creating new Power Platform environments may inadvertently bypass DLP policy settings or misconfigure the security settings of their environment.
+- _Rationale:_ Users creating new Power Platform environments may inadvertently bypass data loss prevention (DLP) policy settings or misconfigure the security settings of their environment.
 - _Last Modified:_ June 2023
-- Note: This control restricts the creation of environments to users with Global admin, Dynamics 365 service admin, Power Platform Service admins, or Delegated admin roles.
+- Note: This control restricts creating environments to users with Global admin, Dynamics 365 service admin, Power Platform Service admins, or Delegated admin roles.
 
 #### MS.POWERPLATFORM.1.2v1
 The ability to create trial environments SHALL be restricted to admins.
@@ -81,7 +81,7 @@ The ability to create trial environments SHALL be restricted to admins.
 <!--Policy: MS.POWERPLATFORM.1.2v1; Criticality: SHALL -->
 - _Rationale:_ Users creating new Power Platform environments may inadvertently bypass DLP policy settings or misconfigure the security settings of their environment.
 - _Last Modified:_ June 2023
-- Note: This control restricts the creation of environments to users with Global admin, Dynamics 365 service admin, Power Platform Service admins, or Delegated admin roles.
+- Note: This control restricts creating environments to users with Global admin, Dynamics 365 service admin, Power Platform Service admins, or Delegated admin roles.
 
 ### Resources
 
@@ -114,28 +114,28 @@ The ability to create trial environments SHALL be restricted to admins.
     **Only specific admins.**
 
 #### MS.POWERPLATFORM.1.2v1 instructions:
-1.  Follow the instructions in the previous policy up to step **3**.
+1.  Follow the instructions the MS.POWERPLATFORM.1.1v1 instructions up to step **3**.
 
 2.  Under **Who can create trial environments**, select **Only specific admins.**
 
 ## 2. Power Platform Data Loss Prevention Policies
 
-To secure Power Platform environments, Data Loss Prevention (DLP)
-policies can be created to restrict the connectors that can be used with
+To secure Power Platform environments, DLP
+policies can be created to restrict the connectors used with
 Power Apps created in an environment. A DLP policy can be created to
 affect all or some environments or exclude certain environments. The
-narrower policy will be enforced when there is a clash.
+narrower policy will be enforced when there is a conflict.
 
-Connectors can be separated by creating a DLP policy that assigns them
+Connectors can be separated by creating a DLP policy assigning them
 to one of three groups: Business, Non-Business, and Blocked. Connectors
 in different groups cannot be used in the same Power App. Connectors in
-the Blocked group cannot be used at all. Note that some M365 connectors
+the Blocked group cannot be used at all. Note: Some M365 connectors
 cannot be blocked (e.g., Teams and SharePoint connectors).
 
-In the DLP policy, connectors can also be configured to restrict read
+In the DLP policy, connectors can be configured to restrict read
 and write permissions to the data source/service. Connectors that cannot
-be blocked also cannot be configured. Agencies should evaluate the
-connectors and configure them to fit with agency needs and security
+be blocked cannot be configured. Agencies should evaluate the
+connectors and configure them to fit agency needs and security
 requirements. The agency should then create a DLP policy to only allow
 those connectors to be used in Power Platform.
 
@@ -152,16 +152,15 @@ creating apps in all other created environments.
 A DLP policy SHALL be created to restrict connector access in the default Power Platform environment.
 
 <!--Policy: MS.POWERPLATFORM.2.1v1; Criticality: SHALL -->
-- _Rationale:_ All users in the tenant have access to the default Power Platform environment. Those users may inadvertently use connectors that share sensitive information with others who should not have access to it. Users with a Power Apps need should be directed to conduct development in other Power Platform environments with DLP connector policies customized to suit the user's needs while maintaining the agency's security posture.
+- _Rationale:_ All users in the tenant have access to the default Power Platform environment. Those users may inadvertently use connectors that share sensitive information with others who should not have access to it. Users requiring Power Apps should be directed to conduct development in other Power Platform environments with DLP connector policies customized to suit the user's needs while maintaining the agency's security posture.
 - _Last Modified:_ June 2023
-- _Note:_ The following connectors drive core Power Platform functionality and enable core Office customization scenarios: Approvals, Dynamics 365 Customer Voice, Excel Online (Business), Microsoft DataverseMicrosoft Dataverse (legacy), Microsoft Teams, Microsoft To-Do (Business), Office 365 Groups, Office 365 Outlook, Office 365 Users, OneDrive for Business, OneNote (Business), Planner, Power Apps Notification, Power BI, SharePoint, Shifts for Microsoft Teams, and Yammer as such they remain remain non-blockable to ensure that core user scenarios remain fully functional.
+- _Note:_ The following connectors drive core Power Platform functionality and enable core Office customization scenarios: Approvals, Dynamics 365 Customer Voice, Excel Online (Business), Microsoft DataverseMicrosoft Dataverse (legacy), Microsoft Teams, Microsoft To-Do (Business), Office 365 Groups, Office 365 Outlook, Office 365 Users, OneDrive for Business, OneNote (Business), Planner, Power Apps Notification, Power BI, SharePoint, Shifts for Microsoft Teams, and Yammer; as such they remain non-blockable to ensure core user scenarios remain fully functional.
 
 #### MS.POWERPLATFORM.2.2v1
-Non-default environments SHOULD have at least one DLP policy that
-  affects them.
+Non-default environments SHOULD have at least one DLP policy affecting them.
 
 <!--Policy: MS.POWERPLATFORM.2.2v1; Criticality: SHOULD -->
-- _Rationale:_ Users may inadvertently use connectors that share sensitive information with others who should not have access to it. Data loss prevention (DLP) policies provide a way for agencies to detect and prevent unauthorized disclosures.
+- _Rationale:_ Users may inadvertently use connectors that share sensitive information with others who should not have access to it. DLP policies provide a way for agencies to detect and prevent unauthorized disclosures.
 - _Last Modified:_ June 2023
 
 ### Resources
@@ -195,13 +194,13 @@ Non-default environments SHOULD have at least one DLP policy that
 
 4.  Give the policy a suitable agency name and click **Next.**
 
-5.  At the **Prebuilt connectors** section, search and select the connectors currently in the **Non-business | default** tab that contain sensitive data that can be utilized to create flows and apps.
+5.  At the **Prebuilt connectors** section, search and select the connectors currently in the **Non-business | default** tab containing sensitive data that can be utilized to create flows and apps.
 
 6.  Click **Move to Business.** Connectors added to this group can not share data with connectors in other groups because connectors can reside in only one data group at a time. 
 
 7.  If necessary (and possible) for the connector, click **Configure connector** at the top of the screen to change connector permissions. This allows greater flexibility for the agency to allow and block certain connector actions for additional customization. 
 
-8.  For the default environment, move all other connectors to the **Blocked** category. For connectors that are not blockable noted above, the Block action will be grayed out and a warning will appear.
+8.  For the default environment, move all other connectors to the **Blocked** category. For non-blockable connectors noted above, the Block action will be grayed out and a warning will appear.
 
 9.  At the bottom of the screen, select **Next** to move on.
 
@@ -228,8 +227,8 @@ Power Platform tenant isolation is different from Azure AD-wide tenant
 restriction. It does not impact Azure AD-based access outside of Power
 Platform. Power Platform tenant isolation only works for connectors
 using Azure AD-based authentication, such as Office 365 Outlook or
-SharePoint. The default configuration in Power Platform is with tenant
-isolation set to **Off**, which allows for cross-tenant connections to
+SharePoint. The default configuration in Power Platform has tenant
+isolation set to **Off**, allowing for cross-tenant connections to
 be established. A user from tenant A using a Power App with a connector
 can seamlessly establish a connection to tenant B if using appropriate
 Azure AD credentials.
@@ -288,7 +287,7 @@ on the Tenant Isolation page.
 
 3.  Select the **Direction** of the rule and add the **Tenant Domain or ID** this rule applies to.
 
-4.  If Tenant Isolation is switched **Off**, these rules won't be enforced until tenant
+4.  If Tenant Isolation is switched **Off**, these rules will not be enforced until tenant
 isolation is turned **On**.
 
 ## 4. Power Apps Content Security Policy
@@ -324,19 +323,19 @@ center](https://learn.microsoft.com/en-us/power-platform/admin/powerapps-us-gove
 
 2.  On the left-hand pane click on **Environments** and then select an environment from the list.
 
-3.  Select the **Settings** icon that appears at the top of the page.
+3.  Select the **Settings** icon at the top of the page.
 
 4.  Click on **Product** then click on **Privacy + Security** from the options that appear.
 
 5.  At the bottom of the page under the **Content security policy** section, turn the slider **On** for **Model-driven** and **Canvas**.
 
-6.  At the same location set **Enable reporting**  to **On** and add an appropriate endpoint that CSP violations can be reported to.
+6.  At the same location set **Enable reporting**  to **On** and add an appropriate endpoint CSP violations can be reported to.
 
 7.  Repeat steps 2 - 6 for all active Power Platform environments.
 
 ## 5. Power Pages Creation
 
-Power Pages formerly known as Power Portals are Power Apps specifically designed to act as external facing websites. By default any user in the tenant can create a Power Page. Admins are able to restrict the creation of new Power Pages to just admins.
+Power Pages formerly known as Power Portals are Power Apps specifically designed to act as external facing websites. By default any user in the tenant can create a Power Page. Admins can restrict the creation of new Power Pages to just admins.
 
 ###  Policies
 
