@@ -7,22 +7,27 @@ function Connect-Tenant {
    .Functionality
    Internal
    #>
-   [CmdletBinding()]
+   [CmdletBinding(DefaultParameterSetName='Manual')]
    param (
+   [Parameter(ParameterSetName = 'Auto')]
+   [Parameter(ParameterSetName = 'Manual')]
    [Parameter(Mandatory = $true)]
    [ValidateNotNullOrEmpty()]
    [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", IgnoreCase = $false)]
    [string[]]
    $ProductNames,
-
+   
+   [Parameter(ParameterSetName = 'Auto')]
+   [Parameter(ParameterSetName = 'Manual')]
    [Parameter(Mandatory = $true)]
    [ValidateNotNullOrEmpty()]
    [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $false)]
    [string]
    $M365Environment,
 
+   [Parameter(ParameterSetName = 'Auto')]
    [Parameter(Mandatory = $false)]
-   [ValidateNotNullOrEmpty()]
+   [AllowNull()]
    [hashtable]
    $ServicePrincipalParams
    )
@@ -62,7 +67,7 @@ function Connect-Tenant {
                    $GraphParams = @{
                        'ErrorAction' = 'Stop';
                    }
-                   if ($ServicePrincipalParams.CertThumbprintParams) {
+                   if ($PSCmdlet.ParameterSetName -eq 'Auto') {
                        $GraphParams += @{
                            CertificateThumbprint = $ServicePrincipalParams.CertThumbprintParams.CertificateThumbprint;
                            ClientID = $ServicePrincipalParams.CertThumbprintParams.AppID;
@@ -104,7 +109,7 @@ function Connect-Tenant {
                    $AddPowerAppsParams = @{
                        'ErrorAction' = 'Stop';
                    }
-                   if ($ServicePrincipalParams.CertThumbprintParams) {
+                   if ($PSCmdlet.ParameterSetName -eq 'Auto') {
                        $AddPowerAppsParams += @{
                            CertificateThumbprint = $ServicePrincipalParams.CertThumbprintParams.CertificateThumbprint;
                            ApplicationId = $ServicePrincipalParams.CertThumbprintParams.AppID;
@@ -132,7 +137,7 @@ function Connect-Tenant {
                        $LimitedGraphParams = @{
                            'ErrorAction' = 'Stop';
                        }
-                       if ($ServicePrincipalParams.CertThumbprintParams) {
+                       if ($PSCmdlet.ParameterSetName -eq 'Auto') {
                            $LimitedGraphParams += @{
                                CertificateThumbprint = $ServicePrincipalParams.CertThumbprintParams.CertificateThumbprint;
                                ClientID = $ServicePrincipalParams.CertThumbprintParams.AppID;
@@ -193,7 +198,7 @@ function Connect-Tenant {
                                }
                            }
                        }
-                       if ($ServicePrincipalParams.CertThumbprintParams) {
+                       if ($PSCmdlet.ParameterSetName -eq 'Auto') {
                            $PnPParams += @{
                                Thumbprint = $ServicePrincipalParams.CertThumbprintParams.CertificateThumbprint;
                                ClientId = $ServicePrincipalParams.CertThumbprintParams.AppID;
@@ -209,7 +214,7 @@ function Connect-Tenant {
                }
                "teams" {
                    $TeamsParams = @{'ErrorAction'= 'Stop'}
-                   if ($ServicePrincipalParams.CertThumbprintParams) {
+                   if ($PSCmdlet.ParameterSetName -eq 'Auto') {
                        $TeamsConnectToTenant = @{
                            CertificateThumbprint = $ServicePrincipalParams.CertThumbprintParams.CertificateThumbprint;
                            ApplicationId = $ServicePrincipalParams.CertThumbprintParams.AppID;

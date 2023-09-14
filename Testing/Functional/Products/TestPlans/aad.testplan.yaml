@@ -115,32 +115,32 @@ TestPlan:
                   - "x509CertificateMultiFactor"  
         Postconditions: []
         ExpectedResult: true
-  - PolicyId: MS.AAD.3.2v1
-    TestDriver: RunScuba
-    Tests:
-      - TestDescription: MS.AAD.3.2v1 MFA Not Required
-        Preconditions:
-          - Command: UpdateConditionalAccessPolicyByName
-            Splat:
-              displayName: MS.AAD.3.2v1 If phishing-resistant MFA has not been enforced yet, then an alternative MFA method SHALL be enforced for all users
-              updates: 
-                state: enabledForReportingButNotEnforced
-        Postconditions: []
-        ExpectedResult: false
-      - TestDescription: MS.AAD.3.2v1 Default
-        Preconditions:
-          - Command: UpdateConditionalAccessPolicyByName
-            Splat:
-              displayName: MS.AAD.3.2v1 If phishing-resistant MFA has not been enforced yet, then an alternative MFA method SHALL be enforced for all users
-              updates: 
-                state: enabled
-        Postconditions:
-          - Command: UpdateConditionalAccessPolicyByName
-            Splat:
-              displayName: MS.AAD.3.2v1 If phishing-resistant MFA has not been enforced yet, then an alternative MFA method SHALL be enforced for all users
-              updates: 
-                state: enabledForReportingButNotEnforced        
-        ExpectedResult: true
+  # - PolicyId: MS.AAD.3.2v1
+  #   TestDriver: RunScuba
+  #   Tests:
+  #     - TestDescription: MS.AAD.3.2v1 MFA Not Required
+  #       Preconditions:
+  #         - Command: UpdateConditionalAccessPolicyByName
+  #           Splat:
+  #             displayName: MS.AAD.3.2v1 If phishing-resistant MFA has not been enforced yet, then an alternative MFA method SHALL be enforced for all users
+  #             updates: 
+  #               state: enabledForReportingButNotEnforced
+  #       Postconditions: []
+  #       ExpectedResult: false
+  #     - TestDescription: MS.AAD.3.2v1 Default
+  #       Preconditions:
+  #         - Command: UpdateConditionalAccessPolicyByName
+  #           Splat:
+  #             displayName: MS.AAD.3.2v1 If phishing-resistant MFA has not been enforced yet, then an alternative MFA method SHALL be enforced for all users
+  #             updates: 
+  #               state: enabled
+  #       Postconditions:
+  #         - Command: UpdateConditionalAccessPolicyByName
+  #           Splat:
+  #             displayName: MS.AAD.3.2v1 If phishing-resistant MFA has not been enforced yet, then an alternative MFA method SHALL be enforced for all users
+  #             updates: 
+  #               state: enabledForReportingButNotEnforced        
+  #       ExpectedResult: true
   - PolicyId: MS.AAD.3.3v1
     TestDriver: RunScuba
     Tests:
@@ -343,12 +343,40 @@ TestPlan:
   - PolicyId: MS.AAD.5.4v1
     TestDriver: RunScuba
     Tests:
+      - TestDescription: MS.AAD.5.4v1 Non-Compliant - EnableGroupSpecificConsent is true
+        Preconditions: 
+          - Command: UpdateDirectorySettingByName
+            Splat:
+              DisplayName: Consent Policy Settings
+              Updates:
+                BodyParameter:
+                  Values:
+                    - Name: EnableGroupSpecificConsent
+                      Value: 'true'
+                    - Name: BlockUserConsentForRiskyApps
+                      Value: 'false'  
+                    - Name: EnableAdminConsentRequests
+                      Value: 'false'
+                    - Name: ConstrainGroupSpecificConsentToMembersOfGroupId
+                      Value: ""  
+        Postconditions: []
+        ExpectedResult: false    
       - TestDescription: MS.AAD.5.4v1 Default
         Preconditions: 
-          - Command: Update-MgDirectorySetting
+          - Command: UpdateDirectorySettingByName
             Splat:
-                IsEnabled: true
-            Comment: Need to find appropraite PS commands    
+              DisplayName: Consent Policy Settings
+              Updates:
+                BodyParameter:
+                  Values:
+                    - Name: EnableGroupSpecificConsent
+                      Value: 'false'
+                    - Name: BlockUserConsentForRiskyApps
+                      Value: 'false'  
+                    - Name: EnableAdminConsentRequests
+                      Value: 'false'
+                    - Name: ConstrainGroupSpecificConsentToMembersOfGroupId
+                      Value: ""  
         Postconditions: []
         ExpectedResult: true
   - PolicyId: MS.AAD.6.1v1

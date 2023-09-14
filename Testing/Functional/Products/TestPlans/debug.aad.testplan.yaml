@@ -1,31 +1,41 @@
 ProductName: aad
 TestPlan:     
-  - PolicyId: MS.AAD.7.8v1
-    TestDriver: RunCached
-    ToDo: Changed to RunScuba
+  - PolicyId: MS.AAD.5.4v1
+    TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.AAD.7.8v1 No notificationRecipients
-        Preconditions:  
-          - Command: UpdateProviderExport
+      - TestDescription: MS.AAD.5.4v1 Non-Compliant - EnableGroupSpecificConsent is true
+        Preconditions: 
+          - Command: UpdateDirectorySettingByName
             Splat:
+              DisplayName: Consent Policy Settings
               Updates:
-                privileged_roles[0].Rules[0].Id: Notification_Admin_EndUser_Assignment
-                privileged_roles[0].Rules[0].AdditionalProperties:
-                  notificationType: Email
-                  notificationRecipients: []
-                privileged_roles[0].DisplayName: Global Administrator
+                BodyParameter:
+                  Values:
+                    - Name: EnableGroupSpecificConsent
+                      Value: 'true'
+                    - Name: BlockUserConsentForRiskyApps
+                      Value: 'false'  
+                    - Name: EnableAdminConsentRequests
+                      Value: 'false'
+                    - Name: ConstrainGroupSpecificConsentToMembersOfGroupId
+                      Value: ""  
         Postconditions: []
-        ExpectedResult: false
-      - TestDescription: MS.AAD.7.8v1 Default
-        Preconditions:  
-          - Command: UpdateProviderExport
+        ExpectedResult: false    
+      - TestDescription: MS.AAD.5.4v1 Default
+        Preconditions: 
+          - Command: UpdateDirectorySettingByName
             Splat:
+              DisplayName: Consent Policy Settings
               Updates:
-                privileged_roles[0].Rules[0].Id: Notification_Admin_EndUser_Assignment
-                privileged_roles[0].Rules[0].AdditionalProperties:
-                  notificationType: Email
-                  notificationRecipients:
-                    - 'someone@somewhere.org'
-                privileged_roles[0].DisplayName: Global Administrator
+                BodyParameter:
+                  Values:
+                    - Name: EnableGroupSpecificConsent
+                      Value: 'false'
+                    - Name: BlockUserConsentForRiskyApps
+                      Value: 'false'  
+                    - Name: EnableAdminConsentRequests
+                      Value: 'false'
+                    - Name: ConstrainGroupSpecificConsentToMembersOfGroupId
+                      Value: ""  
         Postconditions: []
-        ExpectedResult: true    
+        ExpectedResult: true
