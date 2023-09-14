@@ -85,7 +85,7 @@ Domainlist(Policy) = Description if {
 
 Domainlist(Policy) = Description if {
     Policy.SharingCapability != 0
-    Policy.FileAnonymousLinkType != 1
+    Policy.SharingDomainRestrictionMode != 1
     Description := "Requirement not met: code currently only checks for the domain list not security group, see baseline document to conduct a manual check"
 }
 
