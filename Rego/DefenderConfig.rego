@@ -2,10 +2,13 @@ package defender
 import future.keywords
 import data.report.utils.NotCheckedDetails
 import data.report.utils.ReportDetailsBoolean
+import data.defender.utils.SensitiveAccounts
+import data.defender.utils.SensitiveAccountsConfig
+import data.defender.utils.SensitiveAccountsSetting
 
 ## Report details menu
 #
-# NOTE: Use report.utils package for common report formatting functions. 
+# NOTE: Use report.utils package for common report formatting functions.
 #
 # If you simply want a boolean "Requirement met" / "Requirement not met"
 # just call ReportDetailsBoolean(Status) and leave it at that.
@@ -60,6 +63,7 @@ ApplyLicenseWarning(Message) := concat("", [ReportDetailsBoolean(false), License
     input.defender_license == false
     LicenseWarning := " **NOTE: Either you do not have sufficient permissions or your tenant does not have a license for Microsoft Defender for Office 365 Plan 1, which is required for this feature.**"
 }
+
 
 #
 # MS.DEFENDER.1.1v1
@@ -130,7 +134,7 @@ tests[{
     IsStandardEnabled := count([Condition | Condition = StandardConditions[_]; Condition == true]) > 0
 
     StrictConditions := [IsStrictEOPEnabled, IsStrictATPEnabled]
-    IsStrictEnabled := count([Condition | Condition = StrictConditions[_]; Condition == true]) > 0   
+    IsStrictEnabled := count([Condition | Condition = StrictConditions[_]; Condition == true]) > 0
 
     Conditions := [IsStandardEnabled, IsStrictEnabled]
     Status := count([Condition | Condition = Conditions[_]; Condition == false]) == 0
@@ -152,7 +156,7 @@ tests[{
     "RequirementMet" : Status
 }] {
     # If "Apply protection to" is set to "All recipients":
-    # - The policy will be included in the list output by 
+    # - The policy will be included in the list output by
     #   Get-EOPProtectionPolicyRule"
     # - SentTo, SentToMemberOf, and RecipientDomainIs will all be
     #   null.
@@ -221,23 +225,23 @@ tests[{
 # MS.DEFENDER.1.4v1
 #--
 
-# TODO: look at config file to get list of sensitive users. Current
-# implementation just asserts that the strict policy applies to at
-# least one person.
+ProtectionPolicyForSensitiveIDs[Policies] {
+    Policies := input.protection_policy_rules
+    AccountsSetting := SensitiveAccountsSetting(Policies)
+    AccountsConfig := SensitiveAccountsConfig("MS.DEFENDER.1.4v1")
+
+    SensitiveAccounts(AccountsSetting, AccountsConfig) == true
+}
 
 tests[{
     "PolicyId" : "MS.DEFENDER.1.4v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-EOPProtectionPolicyRule"],
-	"ActualValue" : {"EOPProtectionPolicies": Policies},
+	"ActualValue" : {"EOPProtectionPolicies": Status},
     "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
-    Policies := input.protection_policy_rules
-    # If no one has been assigned to the strict policy, it won't even
-    # be included in the output of Get-EOPProtectionPolicyRule
-    Status := count([Policy | Policy = Policies[_];
-        Policy.Identity == "Strict Preset Security Policy"]) > 0
+    Status := count(ProtectionPolicyForSensitiveIDs) == 1
 }
 #--
 
@@ -438,7 +442,7 @@ CardRules[Rule.Name] {
 }
 
 tests[{
-    #TODO: Appears this policy is broken into 3 parts in code and only 1 in baseline 
+    #TODO: Appears this policy is broken into 3 parts in code and only 1 in baseline
     # Combine this and the following two that are commented out into a single test
     #"Requirement" : "A custom policy SHALL be configured to protect PII and sensitive information, as defined by the agency: U.S. Social Security Number (SSN)",
     "PolicyId" : "MS.DEFENDER.4.1v1",

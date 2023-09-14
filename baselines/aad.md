@@ -1,20 +1,20 @@
 # CISA M365 Security Configuration Baseline for Azure Active Directory
 
-Azure Active Directory (AAD) is a cloud-based identity and access control service that provides security and functional capabilities to Microsoft 365. This Secure Configuration Baseline (SCB) provides specific policies to help secure AAD. 
+Azure Active Directory (AAD) is a cloud-based identity and access control service that provides security and functional capabilities to Microsoft 365. This Secure Configuration Baseline (SCB) provides specific policies to help secure AAD.
 
-The Secure Cloud Business Applications (SCuBA) project run by the Cybersecurity and Infrastructure Security Agency (CISA) provides guidance and capabilities to secure federal civilian executive branch (FCEB) agencies’ cloud business application environments and protect federal information that is created, accessed, shared, and stored in those environments. 
+The Secure Cloud Business Applications (SCuBA) project run by the Cybersecurity and Infrastructure Security Agency (CISA) provides guidance and capabilities to secure federal civilian executive branch (FCEB) agencies’ cloud business application environments and protect federal information that is created, accessed, shared, and stored in those environments.
 
 The CISA SCuBA SCBs for M365 help secure federal information assets stored within M365 cloud business application environments through consistent, effective, and manageable security configurations. CISA created baselines tailored to the federal government’s threats and risk tolerance with the knowledge that every organization has different threat models and risk tolerance. Non-governmental organizations may also find value in applying these baselines to reduce risks.
 
 The information in this document is being provided “as is” for INFORMATIONAL PURPOSES ONLY. CISA does not endorse any commercial product or service, including any subjects of analysis. Any reference to specific commercial entities or commercial products, processes, or services by service mark, trademark, manufacturer, or otherwise, does not constitute or imply endorsement, recommendation, or favoritism by CISA.
 
-## License Compliance and Copyright 
+## License Compliance and Copyright
 Portions of this document are adapted from documents in Microsoft’s [Microsoft 365](https://github.com/MicrosoftDocs/microsoft-365-docs/blob/public/LICENSE) and [Azure](https://github.com/MicrosoftDocs/azure-docs/blob/main/LICENSE) GitHub repositories. The respective documents are subject to copyright and are adapted under the terms of the Creative Commons Attribution 4.0 International license. Source documents are linked throughout this document. The United States Government has adapted selections of these documents to develop innovative and scalable configuration standards to strengthen the security of widely used cloud-based software services.
 
 ## Assumptions
 The **License Requirements** sections of this document assume the organization is using an [M365 E3](https://www.microsoft.com/en-us/microsoft-365/compare-microsoft-365-enterprise-plans) or [G3](https://www.microsoft.com/en-us/microsoft-365/government) license level at a minimum. Therefore, only licenses not included in E3/G3 are listed.
 
-Some of the policies in this baseline may link to Microsoft instruction pages which assume that an agency has created emergency access accounts in AAD and [implemented strong security measures](https://learn.microsoft.com/en-us/azure/active-directory/roles/security-emergency-access) to protect the credentials of those accounts.
+Some of the policies in this baseline may link to Microsoft instruction pages which assume that an agency has created emergency access accounts in AAD and [implemented strong security measures](https://learn.microsoft.com/en-us/azure/active-directory/roles/security-emergency-access#create-emergency-access-accounts) to protect the credentials of those accounts.
 
 ## Key Terminology
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [RFC 2119](https://datatracker.ietf.org/doc/html/rfc2119).
@@ -26,7 +26,7 @@ when an organization has an on-premises AD domain that contains the
 master user directory but federates access to the cloud Microsoft 365
 (M365) Azure AD tenant.
 
-**Resource Tenant & Home Tenant** – In scenarios where [guest users are involved](https://learn.microsoft.com/en-us/azure/active-directory/external-identities/authentication-conditional-access) the **resource tenant** hosts the M365 target resources that the guest user is accessing. The **home tenant** is the one that hosts the guest user's identity.
+**Resource Tenant & Home Tenant** – In scenarios where guest users are involved the **resource tenant** hosts the M365 target resources that the guest user is accessing. The **home tenant** is the one that hosts the guest user's identity.
 
 **Highly Privileged Roles** - This section provides a list of what CISA considers highly privileged [built-in roles in Azure Active Directory](https://learn.microsoft.com/en-us/azure/active-directory/roles/permissions-reference). This list is referenced in numerous baseline policies throughout this document. Agencies should consider this reference as a minimum list and can apply the respective baseline policies to additional AAD roles as necessary.
 
@@ -37,7 +37,7 @@ master user directory but federates access to the cloud Microsoft 365
 - Exchange Administrator
 - Hybrid Identity Administrator
 - Application Administrator
-- Cloud Application Administrator.
+- Cloud Application Administrator
 
 ## Conditional Access Policies
 
@@ -52,7 +52,7 @@ toggling the policy from **Report-only** to **On**. The policy will only be enfo
 
 ## 1. Legacy Authentication
 
-This section provides policies that help reduce security risks related to legacy authentication protocols that do not support MFA.
+This section provides policies that reduce security risks related to legacy authentication protocols that do not support multifactor authentication (MFA).
 
 ### Policies
 #### MS.AAD.1.1v1
@@ -82,11 +82,11 @@ base, follow [these instructions](https://learn.microsoft.com/en-us/azure/active
 
 ## 2. Risk Based Policies
 
-This section provides policies that help reduce security risks related to user accounts that may have been compromised. These policies use a combination of AAD Identity Protection and AAD Conditional Access. AAD Identity Protection uses numerous signals to detect the risk level for each user or sign-in to determine if an account may have been compromised.
+This section provides policies that reduce security risks related to user accounts that may have been compromised. These policies use a combination of AAD Identity Protection and AAD Conditional Access. AAD Identity Protection uses numerous signals to detect the risk level for each user or sign-in to determine if an account may have been compromised.
 
-- _Additional mitigations to secure Workload Identities:_ Although not covered in this baseline due to the need for an additional non-standard license, Microsoft provides support for mitigating risks related to workload identities (AAD applications or service principals). Agencies should strongly consider implementing this feature because workload identities present many of the same risks as interactive user access and are commonly used in modern systems. Follow [these instructions](https://learn.microsoft.com/en-us/azure/active-directory/conditional-access/workload-identity) to apply conditional access policies to workload identities.
+- _Additional mitigations to reduce risks associated with the authentication of Workload Identities:_ Although not covered in this baseline due to the need for an additional non-standard license, Microsoft provides support for mitigating risks related to workload identities (AAD applications or service principals). Agencies should strongly consider implementing this feature because workload identities present many of the same risks as interactive user access and are commonly used in modern systems. Follow [these instructions](https://learn.microsoft.com/en-us/azure/active-directory/conditional-access/workload-identity) to apply conditional access policies to workload identities.
 
-- _Note:_ The term "high risk" in the context of this section denotes the risk level applied by the AAD Identity Protection service to a user account or sign-in event. See the Resources section for a link to a detailed description of AAD Identity Protection risk and the factors comprising it.
+- _Note:_ The term ["high risk"](https://learn.microsoft.com/en-us/azure/active-directory/identity-protection/concept-identity-protection-risks) in the context of this section denotes the risk level applied by the AAD Identity Protection service to a user account or sign-in event. See the Resources section for a link to a detailed description of AAD Identity Protection risk and the factors comprising it.
 
 ### Policies
 #### MS.AAD.2.1v1
@@ -108,7 +108,7 @@ A notification SHOULD be sent to the administrator when high-risk users are dete
 Sign-ins detected as high risk SHALL be blocked.
 
 <!--Policy: MS.AAD.2.3v1; Criticality: SHALL -->
-- _Rationale:_ By blocking sign-ins determined as high risk, compromised accounts can be prevented from accessing the tenant.
+- _Rationale:_ By blocking sign-ins categorized as high risk, compromised accounts can be prevented from accessing the tenant.
 - _Last modified:_ June 2023
 
 ### Resources
@@ -128,7 +128,7 @@ Sign-ins detected as high risk SHALL be blocked.
 
 ####  MS.AAD.2.1v1 instructions:
 
-1.  Create a conditional access policy blocking users determined to be high risk by the Identity Protection service. Configure the following policy settings in the new conditional access policy as per the values below:
+1.  Create a conditional access policy blocking users categorized as high risk by the Identity Protection service. Configure the following policy settings in the new conditional access policy as per the values below:
 
 <pre>
   Users > Include > <b>All users</b>
@@ -175,36 +175,36 @@ Phishing-resistant MFA SHALL be enforced for all users.
 
 **Preferred phishing-resistant methods**
 
-The methods **AAD Certificate-Based Authentication (CBA)**, **FIDO2 Security Key** and **Windows Hello for Business** are the recommended options since they offer forms of MFA with the least potential weaknesses. AAD CBA supports Federal PIV cards when they authenticate directly to Azure AD and is likely the most appropriate option for agencies to authenticate their users.
+The methods **AAD Certificate-Based Authentication (CBA)**, **FIDO2 Security Key** and **Windows Hello for Business** are the recommended options since they offer forms of MFA with the least weaknesses. AAD CBA supports Federal PIV cards when they authenticate directly to Azure AD.
 
 **Non-preferred phishing-resistant methods**
 
-The **Federal PIV card (federated from agency on-premises Active Directory Federation Services or other identity provider)** option, although technically phishing-resistant presents significant risks if the on-premises authentication infrastructure (e.g. ADFS) is compromised. Therefore federated PIV is not a preferred option and agencies should migrate to the options listed in the preferred section above. If an agency does use an on-premises PIV authentication and federate to AAD, reference the [guidance at this link](https://playbooks.idmanagement.gov/piv/network/group/) to enforce PIV logon via AD group policy.
+The **Federal PIV card (federated from agency on-premises Active Directory Federation Services or other identity provider)** option, although technically phishing-resistant presents significant risks if the on-premises authentication infrastructure (e.g., Active Directory Federation Services) is compromised. Therefore, federated PIV is not a preferred option and agencies should migrate to the options listed in the preferred section above. If an agency does use an on-premises PIV authentication and federate to AAD, reference the [guidance at this link](https://playbooks.idmanagement.gov/piv/network/group/) to enforce PIV logon via AD group policy.
 
 <!--Policy: MS.AAD.3.1v1; Criticality: SHALL -->
-- _Rationale:_ Allowing weaker forms of MFA does not protect against sophisticated phishing attacks. By enforcing methods resistant to phishing those risks are minimized.
+- _Rationale:_ Allowing weaker forms of MFA does not protect against sophisticated phishing attacks. By enforcing methods resistant to phishing, those risks are minimized.
 - _Last modified:_ June 2023
 
 #### MS.AAD.3.2v1
-If phishing-resistant MFA has not been enforced yet, an alternative MFA method SHALL be enforced for all users.
+If phishing-resistant MFA has not been enforced, an alternative MFA method SHALL be enforced for all users.
 
 <!--Policy: MS.AAD.3.2v1; Criticality: SHALL -->
-- _Rationale:_ This is a stopgap security policy to help protect the tenant if phishing-resistant MFA has not been enforced yet. This policy requires that MFA is enforced, thus reducing the risks of single form authentication.
+- _Rationale:_ This is a stopgap security policy to help protect the tenant if phishing-resistant MFA has not been enforced. This policy requires that MFA is enforced, thus reducing the risks of single form authentication.
 - _Last modified:_ June 2023
 - _Note:_ If a conditional access policy has been created enforcing phishing-resistant MFA, then this policy is not necessary. This policy does not dictate the specific MFA method.
 
 #### MS.AAD.3.3v1
-If phishing-resistant MFA has not been enforced yet and Microsoft Authenticator is enabled, it SHALL be configured to show login context information.
+If phishing-resistant MFA has not been enforced and Microsoft Authenticator is enabled, it SHALL be configured to show login context information.
 
 <!--Policy: MS.AAD.3.3v1; Criticality: SHALL -->
-- _Rationale:_ This is a stopgap security policy to help protect the tenant if phishing-resistant MFA has not been enforced yet and Microsoft Authenticator is being used. This policy helps improve the security of Microsoft Authenticator by showing the user context information which helps reduce MFA phishing compromises.
+- _Rationale:_ This is a stopgap security policy to help protect the tenant if phishing-resistant MFA has not been enforced and Microsoft Authenticator is being used. This policy helps improve the security of Microsoft Authenticator by showing the user context information, which helps reduce MFA phishing compromises.
 - _Last modified:_ June 2023
 
 #### MS.AAD.3.4v1
 The Authentication Methods Manage Migration feature SHALL be set to Migration Complete.
 
 <!--Policy: MS.AAD.3.4v1; Criticality: SHALL -->
-- _Rationale:_ By configuring the Manage Migration feature to Migration Complete, we ensure the tenant has disabled the legacy authentication methods screen. The MFA and Self-Service Password Reset (SSPR) authentication methods are both managed from a central admin page thereby reducing administrative complexity and
+- _Rationale:_ By configuring the Manage Migration feature to Migration Complete, we ensure the tenant has disabled the legacy authentication methods screen. The MFA and Self-Service Password Reset (SSPR) authentication methods are both managed from a central admin page, thereby reducing administrative complexity and
 the chances of security misconfigurations.
 - _Last modified:_ June 2023
 
@@ -214,13 +214,13 @@ The authentication methods SMS, Voice Call, and Email One-Time Passcode (OTP) SH
 <!--Policy: MS.AAD.3.5v1; Criticality: SHALL -->
 - _Rationale:_ This policy helps reduce the possibility for users to  register and authenticate with the weakest authenticators, forcing users to use stronger MFA methods.
 - _Last modified:_ June 2023
-- _Note:_ This policy is only applicable if the tenant has their Manage Migration feature set to Migration Complete because it is required to manage the respective configuration options from the combined MFA/SSPR authentication methods page.
+- _Note:_ This policy is only applicable if the tenant has their Manage Migration feature set to Migration Complete.
 
 #### MS.AAD.3.6v1
 Phishing-resistant MFA SHALL be required for highly privileged roles.
 
 <!--Policy: MS.AAD.3.6v1; Criticality: SHALL -->
-- _Rationale:_ This is a backup security policy to help protect privileged access to the tenant if the conditional access policy which requires MFA for all users is disabled or misconfigured.
+- _Rationale:_ This is a backup security policy to help protect privileged access to the tenant if the conditional access policy, which requires MFA for all users, is disabled or misconfigured.
 - _Last modified:_ June 2023
 - _Note:_ Refer to the Highly Privileged Roles section at the top of this document for a reference list of roles considered highly privileged.
 
@@ -228,14 +228,14 @@ Phishing-resistant MFA SHALL be required for highly privileged roles.
 Managed devices SHOULD be required for authentication.
 
 <!--Policy: MS.AAD.3.7v1; Criticality: SHOULD -->
-- _Rationale:_ The security risk of an adversary authenticating to the tenant from their own device is reduced by requiring a managed device to authenticate. Managed devices are under the provisioning and control of the agency. OMB-22-09 specifically states, "When authorizing users to access resources, agencies must consider at least one device-level signal alongside identity information about the authenticated user."
+- _Rationale:_ The security risk of an adversary authenticating to the tenant from their own device is reduced by requiring a managed device to authenticate. Managed devices are under the provisioning and control of the agency. [OMB-22-09] (https://www.whitehouse.gov/wp-content/uploads/2022/01/M-22-09.pdf) specifically states, "When authorizing users to access resources, agencies must consider at least one device-level signal alongside identity information about the authenticated user."
 - _Last modified:_ June 2023
 
 #### MS.AAD.3.8v1
 Managed Devices SHOULD be required to register MFA.
 
 <!--Policy: MS.AAD.3.8v1; Criticality: SHOULD -->
-- _Rationale:_ The security risk of an adversary using stolen user credentials and then registering their own MFA devices to access the tenant is reduced by requiring a managed device to perform registration actions. Thus the adversary cannot perform the registration from their own unmanaged device, as managed devices are under the provisioning and control of the agency.
+- _Rationale:_ The security risk of an adversary using stolen user credentials and then registering their own MFA devices to access the tenant is reduced by requiring a managed device to perform registration actions. Thus, the adversary cannot perform the registration from their own unmanaged device, as managed devices are under the provisioning and control of the agency.
 - _Last modified:_ June 2023
 
 ### Resources
@@ -339,40 +339,39 @@ If phishing-resistant MFA has not been deployed yet and Microsoft Authenticator 
 
 ## 4. Centralized Log Collection
 
-This section provides policies that help reduce security risks related to the lack of security logs which hampers security visibility.
+This section provides policies to reduce security risks related to the lack of security logs, which hampers security visibility.
 
 ### Policies
 #### MS.AAD.4.1v1
 Security logs SHALL be sent to the agency's Security Operations Center for monitoring.
 
 <!--Policy: MS.AAD.4.1v1; Criticality: SHALL -->
-- _Rationale:_ The security risk of not having visibility into cyber attacks is reduced by collecting the logs into the agency's centralized security detection infrastructure. Thus security events can be audited, queried, and available for incident response.
+- _Rationale:_ The security risk of not having visibility into cyber attacks is reduced by collecting the logs into the agency's centralized security detection infrastructure. Thus, security events can be audited, queried, and available for incident response.
 - _Last modified:_ June 2023
 - _Note:_ The following logs (configured in Azure AD diagnostic settings), are required: `AuditLogs, SignInLogs, RiskyUsers, UserRiskEvents, NonInteractiveUserSignInLogs, ServicePrincipalSignInLogs, ADFSSignInLogs, RiskyServicePrincipals, ServicePrincipalRiskEvents, EnrichedOffice365AuditLogs, MicrosoftGraphActivityLogs`. If managed identities are used for Azure resources, also send the `ManagedIdentitySignInLogs` log type. If the Azure AD Provisioning Service is used to provision users to Software as a Service (SaaS) apps or other systems, also send the `ProvisioningLogs` log type.
-- _Note:_ It is also recommended to send the logs to the CISA CLAW system so agencies can benefit from the security detection capabilities offered there. Contact CISA to request integration instructions.
+- _Note:_ It is also recommended to send the logs to the CISA CLAW system so agencies can benefit from the security detection capabilities offered there. Contact CISA at cyberliason@cisa.dhs.gov to request integration instructions.
 
 ### Resources
 
 - [Everything you wanted to know about Security and Audit Logging in
   Office 365](https://thecloudtechnologist.com/2021/10/15/everything-you-wanted-to-know-about-security-and-audit-logging-in-office-365/)
 
-- [Sign-in logs in Azure Active Directory -
-  preview](https://learn.microsoft.com/en-us/azure/active-directory/reports-monitoring/concept-all-sign-ins)
+- [What are Azure Active Directory sign-in logs?](https://learn.microsoft.com/en-us/azure/active-directory/reports-monitoring/concept-all-sign-ins)
 
 - [National Cybersecurity Protection System-Cloud Interface Reference
   Architecture Volume
-  1](https://www.cisa.gov/sites/default/files/publications/NCPS%20Cloud%20Interface%20RA%20Volume%20One%20%282021-05-14%29.pdf)
+  One: General Guidance](https://www.cisa.gov/sites/default/files/publications/NCPS%20Cloud%20Interface%20RA%20Volume%20One%20%282021-05-14%29.pdf)
 
 ### License Requirements
 
-- An Azure subscription is required to send the logs to an external system such as the agency's Security Information and Event Management (SIEM).
+- An Azure subscription is required to send logs to an external system, such as the agency's Security Information and Event Management (SIEM).
 
 ### Implementation
 
 #### MS.AAD.4.1v1 instructions:
 
 [Follow these instructions](https://learn.microsoft.com/en-us/azure/active-directory/reports-monitoring/quickstart-azure-monitor-route-logs-to-storage-account)
-to configure sending the logs to a storage account:
+to configure sending the logs to an Azure storage account:
 
 1.  From the **Diagnostic settings** page, click **Add diagnostic**
     setting.
@@ -394,28 +393,28 @@ This section provides policies that help reduce security risks related to non-pr
 Only administrators SHALL be allowed to register applications.
 
 <!--Policy: MS.AAD.5.1v1; Criticality: SHALL -->
-- _Rationale:_ Application access to the tenant presents a heightened security risk compared to interactive user access because applications are typically not subject to critical security protections such as MFA policies and others. Ensuring only specific privileged users can register applications reduces the risks of unauthorized users installing malicious applications into the tenant.
+- _Rationale:_ Application access to the tenant presents a heightened security risk compared to interactive user access, because applications are typically not subject to critical security protections such as MFA policies and others. Ensuring only specific privileged users can register applications reduces the risks of unauthorized users installing malicious applications into the tenant.
 - _Last modified:_ June 2023
 
 #### MS.AAD.5.2v1
 Only administrators SHALL be allowed to consent to applications.
 
 <!--Policy: MS.AAD.5.2v1; Criticality: SHALL -->
-- _Rationale:_ Ensuring that only specific privileged users can consent to applications reduces the risks of users giving insecure applications access to their data via [consent grant attacks](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/detect-and-remediate-illicit-consent-grants?view=o365-worldwide).
+- _Rationale:_ Ensuring only specific privileged users can consent to applications reduces the risks of users giving insecure applications access to their data via [consent grant attacks](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/detect-and-remediate-illicit-consent-grants?view=o365-worldwide).
 - _Last modified:_ June 2023
 
 #### MS.AAD.5.3v1
 An admin consent workflow SHALL be configured for applications.
 
 <!--Policy: MS.AAD.5.3v1; Criticality: SHALL -->
-- _Rationale:_ Configuring an admin consent workflow helps support the risk reduction of the previous policy by setting up a process for users to securely request access to applications necessary for business purposes. Administrators get the opportunity to review the permissions requested by new applications and approve or deny access based on a risk assessment.
+- _Rationale:_ Configuring an admin consent workflow reduces the risk of the previous policy by setting up a process for users to securely request access to applications necessary for business purposes. Administrators have the opportunity to review the permissions requested by new applications and approve or deny access based on a risk assessment.
 - _Last modified:_ June 2023
 
 #### MS.AAD.5.4v1
 Group owners SHALL NOT be allowed to consent to applications.
 
 <!--Policy: MS.AAD.5.4v1; Criticality: SHALL -->
-- _Rationale:_ In M365 group and team owners can consent to applications accessing data in the tenant, thus by preventing this and requiring consent requests to go through an approval consent workflow, the risks of exposure to malicious applications is reduced.
+- _Rationale:_ In M365 group and team owners can consent to applications accessing data in the tenant. By requiring consent requests to go through an approval consent workflow, the risks of exposure to malicious applications is reduced.
 - _Last modified:_ June 2023
 
 ### Resources
@@ -463,7 +462,7 @@ Group owners SHALL NOT be allowed to consent to applications.
 
 3. Select **Admin consent settings**.
 
-4. Under **Admin consent requests** > **Users can request admin consent to apps they are unable to consent to**, select **Yes**.
+4. Under **Admin consent requests** > **Users can request admin consent to apps they are unable to consent to** select **Yes**.
 
 5. Under **Who can review admin consent requests**, select the group created in step 1 responsible for reviewing and adjudicating app requests.
 
@@ -473,7 +472,7 @@ Group owners SHALL NOT be allowed to consent to applications.
 
 1.  In **Azure Active Directory** under **Manage**, select **Enterprise Applications.**
 
-2. Under **Security**, select **Consent and permissions.**
+2. Under **Security**, select **Consent and permissions.** Then select **User Consent Settings.**
 
 3. Under **Group owner consent for apps accessing data**, select **Do not allow group owner consent.**
 
@@ -481,20 +480,19 @@ Group owners SHALL NOT be allowed to consent to applications.
 
 ## 6. Passwords
 
-This section provides policies that help reduce security risks associated with legacy password practices no longer supported by research.
+This section provides policies that reduce security risks associated with legacy password practices.
 
 ### Policies
 #### MS.AAD.6.1v1
 User passwords SHALL NOT expire.
 
 <!--Policy: MS.AAD.6.1v1; Criticality: SHALL -->
-- _Rationale:_ At a minimum, the National Institute of Standards & Technology (NIST), the Office of Management and Budget (OMB) and Microsoft have published guidance indicating mandated periodic password changes make user accounts less secure. OMB-22-09 states "Password policies must not require use of special characters or regular rotation".
+- _Rationale:_ At a minimum, the National Institute of Standards & Technology (NIST), the Office of Management and Budget (OMB), and Microsoft have published guidance indicating mandated periodic password changes make user accounts less secure. OMB-22-09 states, "Password policies must not require use of special characters or regular rotation."
 - _Last modified:_ June 2023
 
 ### Resources
 
-- [Password policy recommendations - Microsoft 365 admin \| Microsoft
-  Docs](https://learn.microsoft.com/en-us/microsoft-365/admin/misc/password-policy-recommendations?view=o365-worldwide#password-expiration-requirements-for-users)
+- [Password expiration requirements for users](https://learn.microsoft.com/en-us/microsoft-365/admin/misc/password-policy-recommendations?view=o365-worldwide#password-expiration-requirements-for-users)
 
 - [Eliminate bad passwords using Azure Active Directory Password
   Protection](https://learn.microsoft.com/en-us/azure/active-directory/authentication/concept-password-ban-bad)
@@ -561,7 +559,7 @@ Provisioning users to highly privileged roles SHALL NOT occur outside of a PAM s
 Activation of the Global Administrator role SHALL require approval.
 
 <!--Policy: MS.AAD.7.6v1; Criticality: SHALL -->
-- _Rationale:_ Requiring approval for a user to activate Global Administrator which provided unfettered access, makes it more challenging for an attacker to compromise the tenant with stolen credentials and it provides visibility of activities indicating a compromise is taking place.
+- _Rationale:_ Requiring approval for a user to activate Global Administrator, which provides unfettered access, makes it more challenging for an attacker to compromise the tenant with stolen credentials and it provides visibility of activities indicating a compromise is taking place.
 - _Last modified:_ June 2023
 
 #### MS.AAD.7.7v1
@@ -602,7 +600,7 @@ User activation of other highly privileged roles SHOULD trigger an alert.
 
 - Azure AD PIM or an equivalent third-party PAM service.
 
-- Azure AD PIM requires an AAD P2 license
+- Azure AD PIM requires an AAD P2 license.
 
 ### Implementation
 
@@ -644,7 +642,7 @@ Performing a manual review of highly privileged users to determine which ones ar
 
 4. Under **Manage**, select **Assignments.** If you have AAD PIM, repeat the steps below for both the **Eligible** and the **Active** assignments. If a group is listed, you will need to determine the members of the group and perform the steps for each group member.
 
-5. For each highly privileged user, execute the Powershell code below but replace the `username@somedomain.com` sample data value with the principal name of the user who is specific to your environment. You can get the data value from the **Principal name** field displayed in the Azure Active Directory portal.
+5. For each highly privileged user, execute the Powershell code below but replace the `username@somedomain.com` with the principal name of the user who is specific to your environment. You can get the data value from the **Principal name** field displayed in the Azure Active Directory portal.
 
     ```
     Connect-MgGraph
@@ -661,7 +659,7 @@ Performing a manual review of highly privileged users to determine which ones ar
 
 3. Under **Manage**, select **Assignments** and click the **Active assignments** tab.
 
-4. Verify there are no users or groups with a value of **Permanent** in the **End time** column. If there are any, recreate those assignments to have an expiration date using AAD PIM or an alternative PAM system. The only exception to this policy is emergency access accounts and service accounts requiring perpetual active assignments. See policy for details.
+4. Verify there are no users or groups with a value of **Permanent** in the **End time** column. If there are any, recreate those assignments to have an expiration date using AAD PIM or an alternative PAM system. The only exception to this policy is emergency access accounts and service accounts requiring perpetual active assignments. See policy MS.AAD.7.4v1 note section for details.
 
 #### MS.AAD.7.5v1 instructions:
 
@@ -735,20 +733,20 @@ Performing a manual review of highly privileged users to determine which ones ar
 
 ## 8. Guest User Access
 
-This section provides policies that help reduce security risks related to integrating M365 guest users. A guest user is a specific type of external user who belongs to a separate organization but can access files, meetings, teams and other data in the target tenant. It is common to invite guest users to a tenant for cross-agency collaboration purposes.
+This section provides policies that help reduce security risks related to integrating M365 guest users. A guest user is a specific type of external user who belongs to a separate organization but can access files, meetings, Teams and other data in the target tenant. It is common to invite guest users to a tenant for cross-agency collaboration purposes.
 
 #### MS.AAD.8.1v1
 Guest users SHOULD have limited or restricted access to Azure AD directory objects.
 
 <!--Policy: MS.AAD.8.1v1; Criticality: SHOULD -->
-- _Rationale:_ Limiting the amount of information about objects, available to guest users in the tenant, reduces the malicious reconnaissance exposure if a guest account is compromised or created by an adversary.
+- _Rationale:_ Limiting the amount of information about objects available to guest users in the tenant, reduces the malicious reconnaissance exposure should a guest account become compromised or be created by an adversary.
 - _Last modified:_ June 2023
 
 #### MS.AAD.8.2v1
 Only users with the Guest Inviter role SHOULD be able to invite guest users.
 
 <!--Policy: MS.AAD.8.2v1; Criticality: SHOULD -->
-- _Rationale:_ By only allowing an authorized groups of individuals to invite guest users to create accounts in the tenant, an agency can enforce a guest user account approval process, reducing the risk of unauthorized accounts being created.
+- _Rationale:_ By only allowing an authorized group of individuals to invite external users to create accounts in the tenant, an agency can enforce a guest user account approval process, reducing the risk of unauthorized accounts being created.
 - _Last modified:_ June 2023
 
 #### MS.AAD.8.3v1
@@ -812,7 +810,7 @@ Cybersecurity*](https://www.federalregister.gov/documents/2021/05/17/2021-10460/
 - The MITRE Corporation
 - Sandia National Laboratories (Sandia)
 
-The SCBs were informed by materials produced by the following organizations: 
+The SCBs were informed by materials produced by the following organizations:
 
 
 - Center for Internet Security (CIS)
