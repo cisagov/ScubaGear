@@ -51,7 +51,7 @@ tests[{
 #--
 
 #
-# MS.TEAMS.2.1v1
+# MS.TEAMS.1.2v1
 #--
 MeetingsAllowingAnonStart[Policy.Identity] {
 	Policy := input.meeting_policies[_]
@@ -59,7 +59,7 @@ MeetingsAllowingAnonStart[Policy.Identity] {
 }
 
 tests[{
-	"PolicyId" : "MS.TEAMS.2.1v1",
+	"PolicyId" : "MS.TEAMS.1.2v1",
 	"Criticality" : "Shall",
 	"Commandlet" : ["Get-CsTeamsMeetingPolicy"],
 	"ActualValue" : Policies,
