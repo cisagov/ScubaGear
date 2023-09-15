@@ -49,7 +49,7 @@ tests[{
 }
 #--
 
-#--
+#
 # MS.TEAMS.1.2v1
 #--
 MeetingsAllowingAnonStart[Policy.Identity] {
