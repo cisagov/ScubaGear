@@ -94,7 +94,7 @@ $ScubaModulePath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell
 $ScubaModule = Join-Path -Path $ScubaModulePath -ChildPath "../ScubaGear.psd1"
 $ConnectionModule = Join-Path -Path $ScubaModulePath -ChildPath "Connection/Connection.psm1"
 Import-Module $ScubaModule -Force
-Import-Module $ConnectionModule -Force 
+Import-Module $ConnectionModule -Force
 Import-Module Selenium -Force
 
 BeforeDiscovery{
@@ -207,18 +207,13 @@ BeforeAll{
     }
 
     function RunScuba() {
-        if ($PSCmdlet.ParameterSetName -eq 'Auto')
+        if (-not [string]::IsNullOrEmpty($Thumbprint))
         {
             Invoke-SCuBA -CertificateThumbPrint $Thumbprint -AppId $AppId -Organization $TenantDomain -Productnames $ProductName -OutPath . -M365Environment $M365Environment -Quiet
         }
-        elseif ($PSCmdlet.ParameterSetName -eq 'Manual'){
+        else {
             Invoke-SCuBA -Login $false -Productnames $ProductName -OutPath . -M365Environment $M365Environment -Quiet
         }
-        else {
-
-        }
-        # Execute ScubaGear to extract the config data and produce the output JSON
-        
     }
 
     function LoadTestResults($OutputFolder) {
@@ -330,10 +325,12 @@ Describe "Policy Checks for <ProductName>"{
     Context "Start tests for policy <PolicyId>" -ForEach $TestPlan{
         BeforeEach{
             if ('RunScuba' -eq $TestDriver){
+                Write-Host "Driver: RunScuba"
                 SetConditions -Conditions $Preconditions.ToArray()
                 RunScuba
             }
             elseif ('RunCached' -eq $TestDriver){
+                Write-Host "Driver: RunCached"
                 RunScuba
                 $ReportFolders = Get-ChildItem . -directory -Filter "M365BaselineConformance*" | Sort-Object -Property LastWriteTime -Descending
                 $OutputFolder = $ReportFolders[0].Name
@@ -341,6 +338,7 @@ Describe "Policy Checks for <ProductName>"{
                 Invoke-RunCached -Productnames $ProductName -ExportProvider $false -OutPath $OutputFolder -OutProviderFileName 'ModifiedProviderSettingsExport' -Quiet
             }
             else {
+                Write-Host "Driver: $TestDriver"
                 Write-Error "Invalid Test Driver: $TestDriver"
             }
 
