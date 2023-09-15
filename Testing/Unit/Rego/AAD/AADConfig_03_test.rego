@@ -1528,7 +1528,7 @@ test_NotImplemented_Correct_V4 if {
 #
 # MS.AAD.3.6v1
 #--
-test_ConditionalAccessPolicies_Correct_all_strenghts if {
+test_ConditionalAccessPolicies_Correct_all_strengths if {
     PolicyId := "MS.AAD.3.6v1"
 
     Output := tests with input as {
