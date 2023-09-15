@@ -642,7 +642,7 @@ GoodConsentSettings[{
     "Value": Setting.Value
 }] {
     Setting := AllConsentSettings[_]
-    Setting.Value == "false"
+    lower(Setting.Value) == "false"
 }
 
 BadConsentSettings[{
@@ -651,7 +651,7 @@ BadConsentSettings[{
     "Value": Setting.Value
 }] {
     Setting := AllConsentSettings[_]
-    Setting.Value == "true"
+    lower(Setting.Value) == "true"
 }
 
 tests[{

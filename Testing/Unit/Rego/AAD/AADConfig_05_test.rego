@@ -184,7 +184,7 @@ test_IsEnabled_Incorrect if {
 #
 # MS.AAD.5.4v1
 #--
-test_Value_Correct if {
+test_Value_Correct_Lowercase if {
     PolicyId := "MS.AAD.5.4v1"
 
     Output := tests with input as {
@@ -208,7 +208,55 @@ test_Value_Correct if {
     RuleOutput[0].ReportDetails == "Requirement met"
 }
 
-test_Value_Incorrect if {
+test_Value_Correct_Uppercase if {
+    PolicyId := "MS.AAD.5.4v1"
+
+    Output := tests with input as {
+        "directory_settings" : [
+            {
+                "DisplayName" : "Setting display name",
+                "Values" : [
+                    {
+                        "Name" : "EnableGroupSpecificConsent",
+                        "Value" : "False"
+                    }
+                ]
+            }
+        ]
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "Requirement met"
+}
+
+test_Value_Incorrect_Lowercase if {
+    PolicyId := "MS.AAD.5.4v1"
+
+    Output := tests with input as {
+        "directory_settings" : [
+            {
+                "DisplayName" : "Setting display name",
+                "Values" : [
+                    {
+                        "Name" : "EnableGroupSpecificConsent",
+                        "Value" : "true"
+                    }
+                ]
+            }
+        ]
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "Requirement not met"
+}
+
+test_Value_Incorrect_Uppercase if {
     PolicyId := "MS.AAD.5.4v1"
 
     Output := tests with input as {
