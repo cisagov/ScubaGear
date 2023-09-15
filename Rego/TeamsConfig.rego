@@ -136,7 +136,6 @@ tests[{
 }
 
 #
-
 tests[{
 	"PolicyId" : "MS.TEAMS.1.4v1",
 	"Criticality" : "Should",
@@ -211,7 +210,6 @@ tests[{
 }
 
 #
-
 tests[{
 	"PolicyId" : "MS.TEAMS.1.6v1",
 	"Criticality" : "Should",
