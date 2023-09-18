@@ -470,47 +470,47 @@ TestPlan:
           - Command: UpdateProviderExport
             Splat:
               Updates:
-                -  privileged_users:
-                     User1:
-                       DisplayName: Test User1
-                       roles: 
-                         - Privileged Role Administrator
-                         - Global Administrator
-                     User2:
-                       DisplayName: Test User2
-                       roles: 
-                         - Global Administrator
-                     User3:
-                       DisplayName: Test User3
-                       roles: 
-                         - Privileged Role Administrator
-                         - Global Administrator
-                     User4:
-                       DisplayName: Test User4
-                       roles: 
-                         - Global Administrator
-                     User5:
-                       DisplayName: Test User5
-                       roles: 
-                         - Privileged Role Administrator
-                         - Global Administrator
-                     User6:
-                       DisplayName: Test User6
-                       roles: 
-                         - Global Administrator
-                     User7:
-                       DisplayName: Test User7
-                       roles: 
-                         - Privileged Role Administrator
-                         - Global Administrator
-                     User8:
-                       DisplayName: Test User8
-                       roles: 
-                         - Global Administrator
-                     User9:
-                       DisplayName: Test User9
-                       roles: 
-                         - Global Administrator
+                privileged_users:
+                  User1:
+                    DisplayName: Test User1
+                    roles: 
+                      - Privileged Role Administrator
+                      - Global Administrator
+                  User2:
+                    DisplayName: Test User2
+                    roles: 
+                      - Global Administrator
+                  User3:
+                    DisplayName: Test User3
+                    roles: 
+                      - Privileged Role Administrator
+                      - Global Administrator
+                  User4:
+                    DisplayName: Test User4
+                    roles: 
+                      - Global Administrator
+                  User5:
+                    DisplayName: Test User5
+                    roles: 
+                      - Privileged Role Administrator
+                      - Global Administrator
+                  User6:
+                    DisplayName: Test User6
+                    roles: 
+                      - Global Administrator
+                  User7:
+                    DisplayName: Test User7
+                    roles: 
+                      - Privileged Role Administrator
+                      - Global Administrator
+                  User8:
+                    DisplayName: Test User8
+                    roles: 
+                      - Global Administrator
+                  User9:
+                    DisplayName: Test User9
+                    roles: 
+                      - Global Administrator
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.AAD.7.1v1 To Few Admin
@@ -518,12 +518,12 @@ TestPlan:
           - Command: UpdateProviderExport
             Splat:
               Updates:
-                - privileged_users:
-                    User1:
-                      DisplayName: Test User1
-                      roles: 
-                        - Privileged Role Administrator
-                        - Global Administrator
+                privileged_users:
+                  User1:
+                    DisplayName: Test User1
+                    roles: 
+                      - Privileged Role Administrator
+                      - Global Administrator
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.AAD.7.1v1 Default
@@ -531,16 +531,16 @@ TestPlan:
           - Command: UpdateProviderExport
             Splat:
               Updates:
-                - privileged_users:
-                    User1:
-                      DisplayName: Test User1
-                      roles: 
-                        - Privileged Role Administrator
-                        - Global Administrator
-                    User2:
-                      DisplayName: Test User2
-                      roles: 
-                        - Global Administrator
+                privileged_users:
+                  User1:
+                    DisplayName: Test User1
+                    roles: 
+                      - Privileged Role Administrator
+                      - Global Administrator
+                  User2:
+                    DisplayName: Test User2
+                    roles: 
+                      - Global Administrator
         Postconditions: []
         ExpectedResult: true
   - PolicyId: MS.AAD.7.2v1
@@ -568,20 +568,19 @@ TestPlan:
         ExpectedResult: false        
   - PolicyId: MS.AAD.7.3v1
     TestDriver: RunCached
-    ToDo: Change to RunCached?
     Tests:
       - TestDescription: MS.AAD.7.3v1 On Prem Admin
         Preconditions:  
           - Command: UpdateProviderExport
             Splat:
               Updates:
-                - privileged_users:
-                    User1:
-                      DisplayName: Test User1
-                      OnPremisesImmutableId: Test On-Prem User1
-                      roles: 
-                        - Privileged Role Administrator
-                        - Global Administrator
+                privileged_users:
+                  User1:
+                    DisplayName: Test User1
+                    OnPremisesImmutableId: Test On-Prem User1
+                    roles: 
+                      - Privileged Role Administrator
+                      - Global Administrator
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.AAD.7.3v1 Default
@@ -589,18 +588,18 @@ TestPlan:
           - Command: UpdateProviderExport
             Splat:
               Updates:
-                - privileged_users:
-                    User1:
-                      DisplayName: Test User1
-                      OnPremisesImmutableId: null
-                      roles: 
-                        - Privileged Role Administrator
-                        - Global Administrator
-                    User2:
-                      DisplayName: Test User2
-                      OnPremisesImmutableId: null
-                      roles: 
-                        - Global Administrator
+                privileged_users:
+                  User1:
+                    DisplayName: Test User1
+                    OnPremisesImmutableId: null
+                    roles: 
+                      - Privileged Role Administrator
+                      - Global Administrator
+                  User2:
+                    DisplayName: Test User2
+                    OnPremisesImmutableId: null
+                    roles: 
+                      - Global Administrator
         Postconditions: []
         ExpectedResult: true
   - PolicyId: MS.AAD.7.4v1
@@ -612,7 +611,7 @@ TestPlan:
           - Command: UpdateProviderExport
             Splat:
               Updates:
-                - privileged_roles[0].Assignments[0].EndDateTime: "/Date(1672947244397)/"
+                privileged_roles[0].Assignments[0].EndDateTime: "/Date(1672947244397)/"
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.AAD.7.4v1 Default
@@ -620,7 +619,7 @@ TestPlan:
           - Command: UpdateProviderExport
             Splat:
               Updates:
-                - privileged_roles[0].Assignments[0].EndDateTime: null
+                privileged_roles[0].Assignments[0].EndDateTime: null
         Postconditions: []
         ExpectedResult: true        
   - PolicyId: MS.AAD.7.5v1
@@ -632,7 +631,7 @@ TestPlan:
           - Command: UpdateProviderExport
             Splat:
               Updates:
-                - privileged_roles[0].Assignments[0].StartDateTime: null
+                privileged_roles[0].Assignments[0].StartDateTime: null
         Postconditions: []
         ExpectedResult: false
   - PolicyId: MS.AAD.7.6v1
