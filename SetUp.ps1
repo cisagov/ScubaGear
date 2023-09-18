@@ -74,7 +74,7 @@ foreach ($Module in $ModuleList) {
 
     if (Get-Module -ListAvailable -Name $ModuleName) {
         $HighestInstalledVersion = (Get-Module -ListAvailable -Name $ModuleName | Sort-Object Version -Descending | Select-Object Version -First 1).Version
-        $LatestVersion = (Find-Module -Name $ModuleName).Version
+        $LatestVersion = [Version](Find-Module -Name $ModuleName -MinimumVersion $Module.ModuleVersion -MaximumVersion $Module.MaximumVersion).Version
 
         if ($HighestInstalledVersion -ge $LatestVersion) {
             Write-Debug "${ModuleName}:${HighestInstalledVersion} already has latest installed."

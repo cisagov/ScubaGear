@@ -150,7 +150,7 @@ The following API permissions are required for Microsoft Graph Powershell:
 - RoleManagement.Read.Directory
 - User.Read.All
 - UserAuthenticationMethod.Read.All
-
+- SecurityEvents.Read.All
 
 ### Application Service Principal Permissions & Setup
 Below are the permissions for running the tool non-interactively. The minimum API permissions for all products are listed in the image below. The minimum user role permissions that need to be granted to the application are listed in the *Assign the following Azure AD roles to the service principal* subsection.

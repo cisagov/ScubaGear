@@ -19,11 +19,11 @@ InModuleScope -ModuleName ExportAADProvider {
                     # This is where you decide where you mock functions called by CommandTracker :)
                     try {
                         switch ($Command) {
-                            "Get-MgIdentityConditionalAccessPolicy" {
+                            "Get-MgBetaIdentityConditionalAccessPolicy" {
                                 $this.SuccessfulCommands += $Command
                                 return [pscustomobject]@{}
                             }
-                            "Get-MgSubscribedSku" {
+                            "Get-MgBetaSubscribedSku" {
                                 $this.SuccessfulCommands += $Command
                                 return [pscustomobject]@{
                                     ServicePlans = @(
@@ -42,15 +42,15 @@ InModuleScope -ModuleName ExportAADProvider {
                                 $this.SuccessfulCommands += $Command
                                 return [pscustomobject]@{}
                             }
-                            "Get-MgPolicyAuthorizationPolicy" {
+                            "Get-MgBetaPolicyAuthorizationPolicy" {
                                 $this.SuccessfulCommands += $Command
                                 return [pscustomobject]@{}
                             }
-                            "Get-MgDirectorySetting" {
+                            "Get-MgBetaDirectorySetting" {
                                 $this.SuccessfulCommands += $Command
                                 return [pscustomobject]@{}
                             }
-                            "Get-MgPolicyAdminConsentRequestPolicy" {
+                            "Get-MgBetaPolicyAdminConsentRequestPolicy" {
                                 $this.SuccessfulCommands += $Command
                                 return [pscustomobject]@{}
                             }
