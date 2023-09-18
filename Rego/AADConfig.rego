@@ -159,7 +159,7 @@ LegacyAuthentication[Cap.DisplayName] {
 tests[{
     "PolicyId" : "MS.AAD.1.1v1",
     "Criticality" : "Shall",
-    "Commandlet" : ["Get-MgIdentityConditionalAccessPolicy"],
+    "Commandlet" : ["Get-MgBetaIdentityConditionalAccessPolicy"],
     "ActualValue" : LegacyAuthentication,
     "ReportDetails" : concat(". ", [ReportFullDetailsArray(LegacyAuthentication, DescriptionString), CapLink]),
     "RequirementMet" : Status
@@ -200,7 +200,7 @@ BlockHighRisk[Cap.DisplayName] {
 tests[{
     "PolicyId" : "MS.AAD.2.1v1",
     "Criticality" : "Shall",
-    "Commandlet" : ["Get-MgIdentityConditionalAccessPolicy"],
+    "Commandlet" : ["Get-MgBetaIdentityConditionalAccessPolicy"],
     "ActualValue" : BlockHighRisk,
     "ReportDetails" : ReportDetailsArrayLicenseWarningCap(BlockHighRisk, DescriptionString),
     "RequirementMet" : Status
@@ -254,7 +254,7 @@ SignInBlocked[Cap.DisplayName] {
 tests[{
     "PolicyId": "MS.AAD.2.3v1",
     "Criticality" : "Shall",
-    "Commandlet" : ["Get-MgIdentityConditionalAccessPolicy"],
+    "Commandlet" : ["Get-MgBetaIdentityConditionalAccessPolicy"],
     "ActualValue" : SignInBlocked,
     "ReportDetails" : ReportDetailsArrayLicenseWarningCap(SignInBlocked, DescriptionString),
     "RequirementMet" : Status
@@ -293,7 +293,7 @@ MS_AAD_3_1v1_CAP[Cap.DisplayName] {
 tests[{
     "PolicyId" : "MS.AAD.3.1v1",
     "Criticality" : "Shall",
-    "Commandlet" : ["Get-MgIdentityConditionalAccessPolicy"],
+    "Commandlet" : ["Get-MgBetaIdentityConditionalAccessPolicy"],
     "ActualValue" : MS_AAD_3_1v1_CAP,
     "ReportDetails" : concat(". ", [ReportFullDetailsArray(MS_AAD_3_1v1_CAP, DescriptionString), CapLink]),
     "RequirementMet" : Status
@@ -333,7 +333,7 @@ AlternativeMFA[Cap.DisplayName] {
 tests[{
     "PolicyId" : "MS.AAD.3.2v1",
     "Criticality" : "Shall",
-    "Commandlet" : ["Get-MgIdentityConditionalAccessPolicy"],
+    "Commandlet" : ["Get-MgBetaIdentityConditionalAccessPolicy"],
     "ActualValue" : AlternativeMFA,
     "ReportDetails" : concat(". ", [ReportFullDetailsArray(AlternativeMFA, DescriptionString), CapLink]),
     "RequirementMet" : Status
@@ -352,7 +352,7 @@ tests[{
 tests[{
     "PolicyId" : "MS.AAD.3.3v1",
     "Criticality" : "Shall",
-    "Commandlet" : ["Get-MgIdentityConditionalAccessPolicy"],
+    "Commandlet" : ["Get-MgBetaIdentityConditionalAccessPolicy"],
     "ActualValue" : MS_AAD_3_1v1_CAP,
     "ReportDetails" : concat(". ", [ReportFullDetailsArray(MS_AAD_3_1v1_CAP, DescriptionString), CapLink]),
     "RequirementMet" : Status
@@ -382,7 +382,7 @@ tests[{
 tests[{
     "PolicyId": "MS.AAD.3.4v1",
     "Criticality" : "Shall",
-    "Commandlet" : ["Get-MgPolicyAuthenticationMethodPolicy"],
+    "Commandlet" : ["Get-MgBetaPolicyAuthenticationMethodPolicy"],
     "ActualValue" : [Policy.PolicyMigrationState],
     "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
@@ -442,7 +442,7 @@ PhishingResistantMFA[Cap.DisplayName] {
 tests[{
     "PolicyId" : "MS.AAD.3.6v1",
     "Criticality" : "Shall",
-    "Commandlet" : ["Get-MgSubscribedSku", "Get-PrivilegedRole", "Get-MgIdentityConditionalAccessPolicy"],
+    "Commandlet" : ["Get-MgBetaSubscribedSku", "Get-PrivilegedRole", "Get-MgBetaIdentityConditionalAccessPolicy"],
     "ActualValue" : PhishingResistantMFA,
     "ReportDetails" : concat(". ", [ReportFullDetailsArray(PhishingResistantMFA, DescriptionString), CapLink]),
     "RequirementMet" : Status
@@ -470,7 +470,7 @@ ManagedDeviceAuth[Cap.DisplayName] {
 tests[{
     "PolicyId" : "MS.AAD.3.7v1",
     "Criticality" : "Should",
-    "Commandlet" : ["Get-MgIdentityConditionalAccessPolicy"],
+    "Commandlet" : ["Get-MgBetaIdentityConditionalAccessPolicy"],
     "ActualValue" : ManagedDeviceAuth,
     "ReportDetails" : concat(". ", [ReportFullDetailsArray(ManagedDeviceAuth, DescriptionString), CapLink]),
     "RequirementMet" : Status
@@ -501,7 +501,7 @@ RequireManagedDeviceMFA[Cap.DisplayName] {
 tests[{
     "PolicyId": "MS.AAD.3.8v1",
     "Criticality" : "Should",
-    "Commandlet" : ["Get-MgIdentityConditionalAccessPolicy"],
+    "Commandlet" : ["Get-MgBetaIdentityConditionalAccessPolicy"],
     "ActualValue" : RequireManagedDeviceMFA,
     "ReportDetails" : concat(". ", [ReportFullDetailsArray(RequireManagedDeviceMFA, DescriptionString), CapLink]),
     "RequirementMet" : Status
@@ -554,7 +554,7 @@ AllAuthPoliciesAllowedCreate[{
 tests[{
     "PolicyId" : "MS.AAD.5.1v1",
     "Criticality" : "Shall",
-    "Commandlet" : ["Get-MgPolicyAuthorizationPolicy"],
+    "Commandlet" : ["Get-MgBetaPolicyAuthorizationPolicy"],
     "ActualValue" : {"all_allowed_create_values": AllAuthPoliciesAllowedCreate},
     "ReportDetails" : ReportFullDetailsArray(BadPolicies, DescriptionString),
     "RequirementMet" : Status
@@ -583,7 +583,7 @@ AllDefaultGrantPolicies[{
 tests[{
     "PolicyId" : "MS.AAD.5.2v1",
     "Criticality" : "Shall",
-    "Commandlet" : ["Get-MgPolicyAuthorizationPolicy"],
+    "Commandlet" : ["Get-MgBetaPolicyAuthorizationPolicy"],
     "ActualValue" : {"all_grant_policy_values": AllDefaultGrantPolicies},
     "ReportDetails" : ReportFullDetailsArray(BadPolicies, DescriptionString),
     "RequirementMet" : Status
@@ -613,7 +613,7 @@ AllConsentPolicies[{
 tests[{
     "PolicyId" : "MS.AAD.5.3v1",
     "Criticality" : "Shall",
-    "Commandlet" : ["Get-MgPolicyAdminConsentRequestPolicy"],
+    "Commandlet" : ["Get-MgBetaPolicyAdminConsentRequestPolicy"],
     "ActualValue" : {"all_consent_policies": AllConsentPolicies},
     "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
@@ -657,7 +657,7 @@ BadConsentSettings[{
 tests[{
     "PolicyId" : "MS.AAD.5.4v1",
     "Criticality" : "Shall",
-    "Commandlet" : ["Get-MgDirectorySetting"],
+    "Commandlet" : ["Get-MgBetaDirectorySetting"],
     "ActualValue" : AllConsentSettings,
     "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
@@ -722,7 +722,7 @@ GlobalAdmins[User.DisplayName] {
 tests[{
     "PolicyId" : "MS.AAD.7.1v1",
     "Criticality" : "Shall",
-    "Commandlet" : ["Get-MgSubscribedSku", "Get-PrivilegedUser"],
+    "Commandlet" : ["Get-MgBetaSubscribedSku", "Get-PrivilegedUser"],
     "ActualValue" : GlobalAdmins,
     "ReportDetails" : ReportFullDetailsArray(GlobalAdmins, DescriptionString),
     "RequirementMet" : Status
@@ -742,7 +742,7 @@ tests[{
 tests[{
     "PolicyId" : "MS.AAD.7.2v1",
     "Criticality" : "Shall",
-    "Commandlet" : ["Get-MgSecuritySecureScore"],
+    "Commandlet" : ["Get-MgBetaSecuritySecureScore"],
     "ActualValue" : SecureScorePolicy,
     "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
@@ -765,7 +765,7 @@ FederatedAdmins[User.DisplayName] {
 tests[{
     "PolicyId" : "MS.AAD.7.3v1",
     "Criticality" : "Shall",
-    "Commandlet" : ["Get-MgSubscribedSku", "Get-PrivilegedUser"],
+    "Commandlet" : ["Get-MgBetaSubscribedSku", "Get-PrivilegedUser"],
     "ActualValue" : AdminNames,
     "ReportDetails" : ReportFullDetailsArray(FederatedAdmins, DescriptionString),
     "RequirementMet" : Status
@@ -806,7 +806,7 @@ PrivilegedRolesWithoutExpirationPeriod[Role.DisplayName] {
 tests[{
     "PolicyId" : "MS.AAD.7.4v1",
     "Criticality" : "Shall",
-    "Commandlet" : ["Get-MgSubscribedSku", "Get-PrivilegedRole"],
+    "Commandlet" : ["Get-MgBetaSubscribedSku", "Get-PrivilegedRole"],
     "ActualValue" : PrivilegedRolesWithoutExpirationPeriod,
     "ReportDetails" : ReportDetailsArrayLicenseWarning(PrivilegedRolesWithoutExpirationPeriod, DescriptionString),
     "RequirementMet" : Status
@@ -829,7 +829,7 @@ RolesAssignedOutsidePim[Role.DisplayName] {
 tests[{
     "PolicyId" : "MS.AAD.7.5v1",
     "Criticality" : "Shall",
-    "Commandlet" : ["Get-MgSubscribedSku", "Get-PrivilegedRole"],
+    "Commandlet" : ["Get-MgBetaSubscribedSku", "Get-PrivilegedRole"],
     "ActualValue" : RolesAssignedOutsidePim,
     "ReportDetails" : ReportDetailsArrayLicenseWarning(RolesAssignedOutsidePim, DescriptionString),
     "RequirementMet" : Status
@@ -855,7 +855,7 @@ RolesWithoutApprovalRequired[RoleName] {
 tests[{
     "PolicyId" : "MS.AAD.7.6v1",
     "Criticality" : "Should",
-    "Commandlet" : ["Get-MgSubscribedSku", "Get-PrivilegedRole"],
+    "Commandlet" : ["Get-MgBetaSubscribedSku", "Get-PrivilegedRole"],
     "ActualValue" : RolesWithoutApprovalRequired,
     "ReportDetails" : ReportDetailsBooleanLicenseWarning(Status),
     "RequirementMet" : Status
@@ -890,7 +890,7 @@ RolesWithoutEligibleAssignmentAlerts[RoleName] {
 tests[{
     "PolicyId" : "MS.AAD.7.7v1",
     "Criticality" : "Shall",
-    "Commandlet" : ["Get-MgSubscribedSku", "Get-PrivilegedRole"],
+    "Commandlet" : ["Get-MgBetaSubscribedSku", "Get-PrivilegedRole"],
     "ActualValue" : RolesWithoutAssignmentAlerts,
     "ReportDetails" : ReportDetailsArrayLicenseWarning(RolesWithoutAssignmentAlerts, DescriptionString),
     "RequirementMet" : Status
@@ -918,7 +918,7 @@ AdminsWithoutActivationAlert[RoleName] {
 tests[{
     "PolicyId" : "MS.AAD.7.8v1",
     "Criticality" : "Shall",
-    "Commandlet" : ["Get-MgSubscribedSku", "Get-PrivilegedRole"],
+    "Commandlet" : ["Get-MgBetaSubscribedSku", "Get-PrivilegedRole"],
     "ActualValue" : AdminsWithoutActivationAlert,
     "ReportDetails" : ReportDetailsBooleanLicenseWarning(Status),
     "RequirementMet" : Status
@@ -935,7 +935,7 @@ tests[{
 tests[{
     "PolicyId" : "MS.AAD.7.9v1",
     "Criticality" : "Should",
-    "Commandlet" : ["Get-MgSubscribedSku", "Get-PrivilegedRole"],
+    "Commandlet" : ["Get-MgBetaSubscribedSku", "Get-PrivilegedRole"],
     "ActualValue" : NonGlobalAdminsWithoutActivationAlert,
     "ReportDetails" : ReportDetailsArrayLicenseWarning(NonGlobalAdminsWithoutActivationAlert, DescriptionString),
     "RequirementMet" : Status
@@ -983,7 +983,7 @@ RoleIdByPolicy[concat("", ["\"", Level, "\"", " (", Policy.Id, ")"])] {
 tests[{
     "PolicyId" : "MS.AAD.8.1v1",
     "Criticality" : "Should",
-    "Commandlet" : ["Get-MgPolicyAuthorizationPolicy"],
+    "Commandlet" : ["Get-MgBetaPolicyAuthorizationPolicy"],
     "ActualValue" : {"all_roleid_values" : AllAuthPoliciesRoleIds},
     "ReportDetails" : ReportDetail,
     "RequirementMet" : Status
@@ -1016,7 +1016,7 @@ AllAuthPoliciesAllowInvites[{
 tests[{
     "PolicyId" : "MS.AAD.8.2v1",
     "Criticality" : "Should",
-    "Commandlet" : ["Get-MgPolicyAuthorizationPolicy"],
+    "Commandlet" : ["Get-MgBetaPolicyAuthorizationPolicy"],
     "ActualValue" : {"all_allow_invite_values": AllAuthPoliciesAllowInvites},
     "ReportDetails" : ReportDetail,
     "RequirementMet" : Status

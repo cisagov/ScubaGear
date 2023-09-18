@@ -11264,7 +11264,7 @@
     }
 ],
     "OneDrive_successful_commands": [
-    "Get-MgOrganization",
+    "Get-MgBetaOrganization",
     "Get-SPOTenant",
     "Get-SPOSite",
     "Get-SPOTenantSyncClientRestriction"
@@ -11515,7 +11515,7 @@
     }
 ],
     "SharePoint_successful_commands": [
-    "Get-MgOrganization",
+    "Get-MgBetaOrganization",
     "Get-SPOTenant",
     "Get-SPOSite"
 ],

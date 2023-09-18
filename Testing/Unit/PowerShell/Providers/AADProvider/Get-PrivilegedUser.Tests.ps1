@@ -3,14 +3,10 @@ Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "$($ProviderPath)/Export
 
 InModuleScope ExportAADProvider {
     BeforeAll {
-        function Get-PrivilegedUser {}
         Mock -ModuleName ExportAADProvider Get-PrivilegedUser -MockWith {}
-        function Get-MgDirectoryRoleMember {}
-        Mock -ModuleName ExportAADProvider Get-MgDirectoryRoleMember -MockWith {}
-        function Get-MgUser {}
-        Mock -ModuleName ExportAADProvider Get-MgUser -MockWith {}
-        function Get-MgGroupMember {}
-        Mock -ModuleName ExportAADProvider Get-MgGroupMember -MockWith {}
+        Mock -ModuleName ExportAADProvider Get-MgBetaDirectoryRoleMember -MockWith {}
+        Mock -ModuleName ExportAADProvider Get-MgBetaUser -MockWith {}
+        Mock -ModuleName ExportAADProvider Get-MgBetaGroupMember -MockWith {}
     }
     Describe -Tag 'AADProvider' -Name "Get-PrivilegedUser" {
         It "With no premimum license, returns a not null PowerShell object" {
