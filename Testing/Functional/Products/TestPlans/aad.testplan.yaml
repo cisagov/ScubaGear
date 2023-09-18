@@ -543,7 +543,6 @@ TestPlan:
         ExpectedResult: true        
   - PolicyId: MS.AAD.7.3v1
     TestDriver: RunCached
-    ToDo: Change to RunCached?
     Tests:
       - TestDescription: MS.AAD.7.3v1 On Prem Admin
         Preconditions:  
