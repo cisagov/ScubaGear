@@ -77,12 +77,14 @@ SensitiveAccounts(SensitiveAccountsSetting, SensitiveAccountsConfig) := false if
     count([x | x := ConditionsAbsent[_]; x == false]) > 0
 
     # No config is defined
-    count(SensitiveAccountsConfig.IncludedUsers |
-          SensitiveAccountsConfig.ExcludedUsers |
-          SensitiveAccountsConfig.IncludedGroups |
-          SensitiveAccountsConfig.ExcludedGroups |
-          SensitiveAccountsConfig.IncludedDomains |
-          SensitiveAccountsConfig.ExcludedDomains ) == 0
+    count(
+        SensitiveAccountsConfig.IncludedUsers   |
+        SensitiveAccountsConfig.ExcludedUsers   |
+        SensitiveAccountsConfig.IncludedGroups  |
+        SensitiveAccountsConfig.ExcludedGroups  |
+        SensitiveAccountsConfig.IncludedDomains |
+        SensitiveAccountsConfig.ExcludedDomains
+        ) == 0
 }
 
 ### Case 4 ###
@@ -98,12 +100,14 @@ SensitiveAccounts(SensitiveAccountsSetting, SensitiveAccountsConfig) := true if 
     count([x | x := ConditionsAbsent[_]; x == false]) > 0
 
     # Config is defined
-    count(SensitiveAccountsConfig.IncludedUsers |
-          SensitiveAccountsConfig.ExcludedUsers |
-          SensitiveAccountsConfig.IncludedGroups |
-          SensitiveAccountsConfig.ExcludedGroups |
-          SensitiveAccountsConfig.IncludedDomains |
-          SensitiveAccountsConfig.ExcludedDomains ) > 0
+    count(
+        SensitiveAccountsConfig.IncludedUsers   |
+        SensitiveAccountsConfig.ExcludedUsers   |
+        SensitiveAccountsConfig.IncludedGroups  |
+        SensitiveAccountsConfig.ExcludedGroups  |
+        SensitiveAccountsConfig.IncludedDomains |
+        SensitiveAccountsConfig.ExcludedDomains
+        ) > 0
 
     # All filter and config file settings mismatches
     Mismatches := [
@@ -115,4 +119,45 @@ SensitiveAccounts(SensitiveAccountsSetting, SensitiveAccountsConfig) := true if 
         SensitiveAccountsSetting.ExcludedDomains == SensitiveAccountsConfig.ExcludedDomains
     ]
     count([x | x := Mismatches[_]; x == false]) == 0
+}
+
+##############################################
+# Inpersonation protection support functions #
+##############################################
+
+InpersonationProtectionSetting(Policies, IdentityString) := Policy if {
+    Policy := [
+        Policy | Policy := Policies[_];
+        regex.match(IdentityString, Policy.Identity) == true;
+        Policy.Enabled == true;
+        Policy.EnableTargetedUserProtection == true
+    ]
+} else := set()
+
+InpersonationProtectionConfig(PolicyID) := IncludedUsers if {
+    SensitiveUsers := input.scuba_config.Defender[PolicyID].SensitiveAccounts
+    IncludedUsers := { trim_space(x) | some x in SensitiveUsers.IncludedUsers; x != null }
+} else := set()
+
+InpersonationProtection(Policies, IdentityString, IncludedUsers) := {
+    "Result" : true,
+    "Policy" : {
+        "Name" : Policy[0].Identity,
+        "Users" : PolicyProtectedUsers,
+        "Action" : Policy[0].TargetedUserProtectionAction
+    }
+} if {
+    Policy := InpersonationProtectionSetting(Policies, IdentityString)
+    count(Policy[0]) > 0
+
+    PolicyProtectedUsers := { x | x := Policy[0].TargetedUsersToProtect[_] }
+    count(PolicyProtectedUsers) > 0
+    count(IncludedUsers - PolicyProtectedUsers) == 0
+} else := {
+    "Result" : false,
+    "Policy" : {
+        "Name" : IdentityString,
+        "Users" : IncludedUsers,
+        "Action" : ""
+    }
 }
