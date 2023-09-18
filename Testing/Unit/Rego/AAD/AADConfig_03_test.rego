@@ -1528,7 +1528,7 @@ test_NotImplemented_Correct_V4 if {
 #
 # MS.AAD.3.6v1
 #--
-test_ConditionalAccessPolicies_Correct_V2 if {
+test_ConditionalAccessPolicies_Correct_all_strengths if {
     PolicyId := "MS.AAD.3.6v1"
 
     Output := tests with input as {
@@ -1536,7 +1536,8 @@ test_ConditionalAccessPolicies_Correct_V2 if {
             {
                 "Conditions" : {
                     "Applications" : {
-                        "IncludeApplications" : ["All"]
+                        "IncludeApplications" : ["All"],
+                        "ExcludeApplications":  []
                     },
                     "Users" : {
                         "IncludeRoles" : ["Role1", "Role2" ],
@@ -1544,7 +1545,9 @@ test_ConditionalAccessPolicies_Correct_V2 if {
                     }
                 },
                 "GrantControls" : {
-                    "BuiltInControls" : ["mfa"]
+                    "AuthenticationStrength" : {
+                        "AllowedCombinations": ["windowsHelloForBusiness", "fido2", "x509CertificateMultiFactor"]
+                    }
                 },
                 "State" : "enabled",
                 "DisplayName" : "MFA required for all highly Privileged Roles Policy"
@@ -1569,7 +1572,7 @@ test_ConditionalAccessPolicies_Correct_V2 if {
     RuleOutput[0].ReportDetails == "1 conditional access policy(s) found that meet(s) all requirements:<br/>MFA required for all highly Privileged Roles Policy. <a href='#caps'>View all CA policies</a>."
 }
 
-test_IncludeApplications_Incorrect_V2 if {
+test_ConditionalAccessPolicies_Correct_windowsHelloForBusiness_only if {
     PolicyId := "MS.AAD.3.6v1"
 
     Output := tests with input as {
@@ -1577,7 +1580,8 @@ test_IncludeApplications_Incorrect_V2 if {
             {
                 "Conditions" : {
                     "Applications" : {
-                        "IncludeApplications" : [""]
+                        "IncludeApplications" : ["All"],
+                        "ExcludeApplications":  []
                     },
                     "Users" : {
                         "IncludeRoles" : ["Role1", "Role2" ],
@@ -1585,10 +1589,144 @@ test_IncludeApplications_Incorrect_V2 if {
                     }
                 },
                 "GrantControls" : {
-                    "BuiltInControls" : ["mfa"]
+                    "AuthenticationStrength" : {
+                        "AllowedCombinations": ["windowsHelloForBusiness"]
+                    }
                 },
                 "State" : "enabled",
-                "DisplayName" : {"MFA required for all highly Privileged Roles Policy"}
+                "DisplayName" : "MFA required for all highly Privileged Roles Policy"
+            }
+        ],
+        "privileged_roles" : [
+            {
+                "RoleTemplateId" : "Role1",
+                "DisplayName" : "Global Administrator"
+            },
+            {
+                "RoleTemplateId" : "Role2",
+                "DisplayName" : "Privileged Role Administrator"
+            }
+        ]
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "1 conditional access policy(s) found that meet(s) all requirements:<br/>MFA required for all highly Privileged Roles Policy. <a href='#caps'>View all CA policies</a>."
+}
+
+test_ConditionalAccessPolicies_Correct_fido2_only if {
+    PolicyId := "MS.AAD.3.6v1"
+
+    Output := tests with input as {
+        "conditional_access_policies" : [
+            {
+                "Conditions" : {
+                    "Applications" : {
+                        "IncludeApplications" : ["All"],
+                        "ExcludeApplications":  []
+                    },
+                    "Users" : {
+                        "IncludeRoles" : ["Role1", "Role2" ],
+                        "ExcludeRoles" : []
+                    }
+                },
+                "GrantControls" : {
+                    "AuthenticationStrength" : {
+                        "AllowedCombinations": ["fido2"]
+                    }
+                },
+                "State" : "enabled",
+                "DisplayName" : "MFA required for all highly Privileged Roles Policy"
+            }
+        ],
+        "privileged_roles" : [
+            {
+                "RoleTemplateId" : "Role1",
+                "DisplayName" : "Global Administrator"
+            },
+            {
+                "RoleTemplateId" : "Role2",
+                "DisplayName" : "Privileged Role Administrator"
+            }
+        ]
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "1 conditional access policy(s) found that meet(s) all requirements:<br/>MFA required for all highly Privileged Roles Policy. <a href='#caps'>View all CA policies</a>."
+}
+
+test_ConditionalAccessPolicies_Correct_x509_only if {
+    PolicyId := "MS.AAD.3.6v1"
+
+    Output := tests with input as {
+        "conditional_access_policies" : [
+            {
+                "Conditions" : {
+                    "Applications" : {
+                        "IncludeApplications" : ["All"],
+                        "ExcludeApplications":  []
+                    },
+                    "Users" : {
+                        "IncludeRoles" : ["Role1", "Role2" ],
+                        "ExcludeRoles" : []
+                    }
+                },
+                "GrantControls" : {
+                    "AuthenticationStrength" : {
+                        "AllowedCombinations": ["x509CertificateMultiFactor"]
+                    }
+                },
+                "State" : "enabled",
+                "DisplayName" : "MFA required for all highly Privileged Roles Policy"
+            }
+        ],
+        "privileged_roles" : [
+            {
+                "RoleTemplateId" : "Role1",
+                "DisplayName" : "Global Administrator"
+            },
+            {
+                "RoleTemplateId" : "Role2",
+                "DisplayName" : "Privileged Role Administrator"
+            }
+        ]
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "1 conditional access policy(s) found that meet(s) all requirements:<br/>MFA required for all highly Privileged Roles Policy. <a href='#caps'>View all CA policies</a>."
+}
+
+test_ConditionalAccessPolicies_Incorrect_not_all_apps if {
+    PolicyId := "MS.AAD.3.6v1"
+
+    Output := tests with input as {
+        "conditional_access_policies" : [
+            {
+                "Conditions" : {
+                    "Applications" : {
+                        "IncludeApplications" : [],
+                        "ExcludeApplications":  []
+                    },
+                    "Users" : {
+                        "IncludeRoles" : ["Role1", "Role2" ],
+                        "ExcludeRoles" : []
+                    }
+                },
+                "GrantControls" : {
+                    "AuthenticationStrength" : {
+                        "AllowedCombinations": ["windowsHelloForBusiness", "fido2", "x509CertificateMultiFactor"]
+                    }
+                },
+                "State" : "enabled",
+                "DisplayName" : "MFA required for all highly Privileged Roles Policy"
             }
         ],
         "privileged_roles" : [
@@ -1610,7 +1748,7 @@ test_IncludeApplications_Incorrect_V2 if {
     RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
 }
 
-test_BuiltInControls_Incorrect_V2 if {
+test_BuiltInControls_Incorrect_No_Authentication_Strenght if {
     PolicyId := "MS.AAD.3.6v1"
 
     Output := tests with input as {
@@ -1618,7 +1756,8 @@ test_BuiltInControls_Incorrect_V2 if {
             {
                 "Conditions" : {
                     "Applications" : {
-                        "IncludeApplications" : ["All"]
+                        "IncludeApplications" : ["All"],
+                        "ExcludeApplications":  []
                     },
                     "Users" : {
                         "IncludeRoles" : ["Role1", "Role2" ],
@@ -1626,10 +1765,13 @@ test_BuiltInControls_Incorrect_V2 if {
                     }
                 },
                 "GrantControls" : {
+                    "AuthenticationStrength" : {
+                        "AllowedCombinations": null
+                    },
                     "BuiltInControls" : [""]
                 },
                 "State" : "enabled",
-                "DisplayName" : {"MFA required for all highly Privileged Roles Policy"}
+                "DisplayName" : "MFA required for all highly Privileged Roles Policy"
             }
         ],
         "privileged_roles" : [
@@ -1651,7 +1793,7 @@ test_BuiltInControls_Incorrect_V2 if {
     RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
 }
 
-test_State_Incorrect_V2 if {
+test_ConditionalAccessPolicies_Incorrect_disabled if {
     PolicyId := "MS.AAD.3.6v1"
 
     Output := tests with input as {
@@ -1659,7 +1801,8 @@ test_State_Incorrect_V2 if {
             {
                 "Conditions" : {
                     "Applications" : {
-                        "IncludeApplications" : ["All"]
+                        "IncludeApplications" : ["All"],
+                        "ExcludeApplications":  []
                     },
                     "Users" : {
                         "IncludeRoles" : ["Role1", "Role2" ],
@@ -1667,10 +1810,12 @@ test_State_Incorrect_V2 if {
                     }
                 },
                 "GrantControls" : {
-                    "BuiltInControls" : ["mfa"]
+                    "AuthenticationStrength" : {
+                        "AllowedCombinations": ["windowsHelloForBusiness", "fido2", "x509CertificateMultiFactor"]
+                    }
                 },
                 "State" : "disabled",
-                "DisplayName" : {"MFA required for all highly Privileged Roles Policy"}
+                "DisplayName" : "MFA required for all highly Privileged Roles Policy"
             }
         ],
         "privileged_roles" : [
@@ -1692,7 +1837,7 @@ test_State_Incorrect_V2 if {
     RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
 }
 
-test_IncludeRoles_Incorrect_V1 if {
+test_ConditionalAccessPolicies_Incorrect_Covered_Roles if {
     PolicyId := "MS.AAD.3.6v1"
 
     Output := tests with input as {
@@ -1700,7 +1845,8 @@ test_IncludeRoles_Incorrect_V1 if {
             {
                 "Conditions" : {
                     "Applications" : {
-                        "IncludeApplications" : ["All"]
+                        "IncludeApplications" : ["All"],
+                        "ExcludeApplications":  []
                     },
                     "Users" : {
                         "IncludeRoles" : ["Role1"],
@@ -1708,10 +1854,12 @@ test_IncludeRoles_Incorrect_V1 if {
                     }
                 },
                 "GrantControls" : {
-                    "BuiltInControls" : ["mfa"]
+                    "AuthenticationStrength" : {
+                        "AllowedCombinations": ["windowsHelloForBusiness", "fido2", "x509CertificateMultiFactor"]
+                    }
                 },
                 "State" : "enabled",
-                "DisplayName" : {"MFA required for all highly Privileged Roles Policy"}
+                "DisplayName" : "MFA required for all highly Privileged Roles Policy"
             }
         ],
         "privileged_roles" : [
@@ -1733,7 +1881,7 @@ test_IncludeRoles_Incorrect_V1 if {
     RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
 }
 
-test_IncludeRoles_Incorrect_V3 if {
+test_ConditionalAccessPolicies_Incorrect_Wrong_Roles if {
     PolicyId := "MS.AAD.3.6v1"
 
     Output := tests with input as {
@@ -1741,24 +1889,27 @@ test_IncludeRoles_Incorrect_V3 if {
             {
                 "Conditions" : {
                     "Applications" : {
-                        "IncludeApplications" : ["All"]
+                        "IncludeApplications" : ["All"],
+                        "ExcludeApplications":  []
                     },
                     "Users" : {
-                        "IncludeRoles" : ["Role2"],
+                        "IncludeRoles" : ["Role1"],
                         "ExcludeRoles" : []
                     }
                 },
                 "GrantControls" : {
-                    "BuiltInControls" : ["mfa"]
+                    "AuthenticationStrength" : {
+                        "AllowedCombinations": ["windowsHelloForBusiness", "fido2", "x509CertificateMultiFactor"]
+                    }
                 },
                 "State" : "enabled",
-                "DisplayName" : {"MFA required for all highly Privileged Roles Policy"}
+                "DisplayName" : "MFA required for all highly Privileged Roles Policy"
             }
         ],
         "privileged_roles" : [
             {
-                "RoleTemplateId" : "Role1",
-                "DisplayName" : "Global Administrator"
+                "RoleTemplateId" : "Role2",
+                "DisplayName" : "Privileged Role Administrator"
             }
         ]
     }
@@ -1778,7 +1929,8 @@ test_ExcludeRoles_Incorrect_V2 if {
             {
                 "Conditions" : {
                     "Applications" : {
-                        "IncludeApplications" : ["All"]
+                        "IncludeApplications" : ["All"],
+                        "ExcludeApplications":  []
                     },
                     "Users" : {
                         "IncludeRoles" : ["Role1", "Role2"],
@@ -1786,16 +1938,22 @@ test_ExcludeRoles_Incorrect_V2 if {
                     }
                 },
                 "GrantControls" : {
-                    "BuiltInControls" : ["mfa"]
+                    "AuthenticationStrength" : {
+                        "AllowedCombinations": ["windowsHelloForBusiness", "fido2", "x509CertificateMultiFactor"]
+                    }
                 },
                 "State" : "enabled",
-                "DisplayName" : {"MFA required for all highly Privileged Roles Policy"}
+                "DisplayName" : "MFA required for all highly Privileged Roles Policy"
             }
         ],
         "privileged_roles" : [
             {
                 "RoleTemplateId" : "Role1",
                 "DisplayName" : "Global Administrator"
+            },
+            {
+                "RoleTemplateId" : "Role2",
+                "DisplayName" : "Privileged Role Administrator"
             }
         ]
     }

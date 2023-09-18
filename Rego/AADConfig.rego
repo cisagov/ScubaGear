@@ -426,11 +426,17 @@ PhishingResistantMFA[Cap.DisplayName] {
     MatchingExcludeRoles := PrivRolesSet & CondExcludedRolesSet
     #only succeeds if there is no intersection, i.e., excluded roles are none of the privileged roles
     count(MatchingExcludeRoles) == 0
-    "All" in Cap.Conditions.Applications.IncludeApplications
-    "mfa" in Cap.GrantControls.BuiltInControls
-
+    Contains(Cap.Conditions.Applications.IncludeApplications, "All")
+    IsEmptyContainer(Cap.Conditions.Applications.ExcludeApplications)
     GroupExclusionsFullyExempt(Cap, "MS.AAD.3.6v1") == true
     UserExclusionsFullyExempt(Cap, "MS.AAD.3.6v1") == true
+
+    # Strength must be at least one of acceptable with no unacceptable strengths
+    Strengths := { Strength | Strength := Cap.GrantControls.AuthenticationStrength.AllowedCombinations[_]}
+    AcceptableMFA := {"windowsHelloForBusiness", "fido2", "x509CertificateMultiFactor"}
+    MinusSet := Strengths - AcceptableMFA
+    Count(MinusSet) == 0
+    Count(Strengths) > 0
 }
 
 tests[{
