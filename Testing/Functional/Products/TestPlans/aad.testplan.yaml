@@ -1,30 +1,57 @@
 ProductName: aad
 TestPlan:
+
   - PolicyId: MS.AAD.1.1v1
     TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.AAD.1.1v1 ReportOnly
+      - TestDescription: MS.AAD.1.1v1 Non-Compliant case - missing client app type exchangeActiveSync
         Preconditions:
           - Command: UpdateConditionalAccessPolicyByName
             Splat:
               displayName: MS.AAD.1.1v1 Legacy authentication SHALL be blocked
               updates: 
-                state: enabledForReportingButNotEnforced
+                state: enabled
+                Conditions:
+                  Applications:
+                    IncludeApplications:
+                      - All
+                  Users:
+                    IncludeUsers:
+                      - All
+                  ClientAppTypes:
+                    - other
+                GrantControls:
+                  BuiltInControls:
+                    - block
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.AAD.1.1v1 Default
+      - TestDescription: MS.AAD.1.1v1 Compliant case
         Preconditions:
           - Command: UpdateConditionalAccessPolicyByName
             Splat:
               displayName: MS.AAD.1.1v1 Legacy authentication SHALL be blocked
               updates:
                 state: enabled
+                Conditions:
+                  Applications:
+                    IncludeApplications:
+                      - All
+                  Users:
+                    IncludeUsers:
+                      - All
+                  ClientAppTypes:
+                    - other
+                    - exchangeActiveSync
+                GrantControls:
+                  BuiltInControls:
+                    - block
         Postconditions: []
         ExpectedResult: true       
+
   - PolicyId: MS.AAD.2.1v1
     TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.AAD.2.1v1 Report Only
+      - TestDescription: MS.AAD.2.1v1 Non-Compliant case - policy set to Report Only
         Preconditions:
           - Command: UpdateConditionalAccessPolicyByName
             Splat:
@@ -33,7 +60,7 @@ TestPlan:
                 state: enabledForReportingButNotEnforced
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.AAD.2.1v1 Default
+      - TestDescription: MS.AAD.2.1v1 Compliant case
         Preconditions:
           - Command: UpdateConditionalAccessPolicyByName
             Splat:
@@ -42,6 +69,7 @@ TestPlan:
                 state: enabled
         Postconditions: [] 
         ExpectedResult: true
+  
   - PolicyId: MS.AAD.2.2v1
     TestDriver: RunScuba
     Tests:
@@ -50,6 +78,7 @@ TestPlan:
         Postconditions: []
         IsNotChecked: true
         ExpectedResult: false
+  
   - PolicyId: MS.AAD.2.3v1
     TestDriver: RunScuba
     Tests:
@@ -69,17 +98,13 @@ TestPlan:
               displayName: MS.AAD.2.3v1 Sign-ins detected as high risk SHALL be blocked
               updates:
                 state: enabled
-        Postconditions: 
-          - Command: UpdateConditionalAccessPolicyByName
-            Splat:
-              displayName: MS.AAD.2.3v1 Sign-ins detected as high risk SHALL be blocked
-              updates:
-                state: enabledForReportingButNotEnforced            
+        Postconditions: []
         ExpectedResult: true
+  
   - PolicyId: MS.AAD.3.1v1
     TestDriver: RunCached
     Tests:
-      - TestDescription: MS.AAD.3.1v1 Bad Authentication Strength
+      - TestDescription: MS.AAD.3.1v1 Non-Compliant case - Bad Authentication Strength included
         Preconditions:
           - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
@@ -89,15 +114,17 @@ TestPlan:
                 Conditions.Applications.IncludeApplications: 
                   - "All"
                 Conditions.Applications.ExcludeApplications: [] 
-                'Conditions.Users.IncludeUsers':
+                Conditions.Users.IncludeUsers:
                   - "All"
                 GrantControls.AuthenticationStrength.AllowedCombinations:    
                   - "windowsHelloForBusiness"
-                  - "Super Strength"
-                  - "x509CertificateMultiFactor"  
+                  - "fido2"
+                  - "x509CertificateMultiFactor"
+                  - "password,sms"
+                GrantControls.BuiltInControls: []
         Postconditions: []
         ExpectedResult: false        
-      - TestDescription: MS.AAD.3.1v1 Default
+      - TestDescription: MS.AAD.3.1v1 Compliant case
         Preconditions:
           - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
@@ -115,32 +142,29 @@ TestPlan:
                   - "x509CertificateMultiFactor"  
         Postconditions: []
         ExpectedResult: true
-  # - PolicyId: MS.AAD.3.2v1
-  #   TestDriver: RunScuba
-  #   Tests:
-  #     - TestDescription: MS.AAD.3.2v1 MFA Not Required
-  #       Preconditions:
-  #         - Command: UpdateConditionalAccessPolicyByName
-  #           Splat:
-  #             displayName: MS.AAD.3.2v1 If phishing-resistant MFA has not been enforced yet, then an alternative MFA method SHALL be enforced for all users
-  #             updates: 
-  #               state: enabledForReportingButNotEnforced
-  #       Postconditions: []
-  #       ExpectedResult: false
-  #     - TestDescription: MS.AAD.3.2v1 Default
-  #       Preconditions:
-  #         - Command: UpdateConditionalAccessPolicyByName
-  #           Splat:
-  #             displayName: MS.AAD.3.2v1 If phishing-resistant MFA has not been enforced yet, then an alternative MFA method SHALL be enforced for all users
-  #             updates: 
-  #               state: enabled
-  #       Postconditions:
-  #         - Command: UpdateConditionalAccessPolicyByName
-  #           Splat:
-  #             displayName: MS.AAD.3.2v1 If phishing-resistant MFA has not been enforced yet, then an alternative MFA method SHALL be enforced for all users
-  #             updates: 
-  #               state: enabledForReportingButNotEnforced        
-  #       ExpectedResult: true
+
+  - PolicyId: MS.AAD.3.2v1
+    TestDriver: RunCached
+    Tests:
+      - TestDescription: MS.AAD.3.2v1 Non-Compliant case - Report Only
+        Preconditions:
+          - Command: UpdateCachedConditionalAccessPolicyByName
+            Splat:
+              displayName: MS.AAD.3.2v1 If phishing-resistant MFA has not been enforced yet, then an alternative MFA method SHALL be enforced for all users
+              updates:
+                State: enabledForReportingButNotEnforced  
+        Postconditions: []
+        ExpectedResult: false        
+      - TestDescription: MS.AAD.3.2v1 Compliant case
+        Preconditions:
+          - Command: UpdateCachedConditionalAccessPolicyByName
+            Splat:
+              displayName: MS.AAD.3.2v1 If phishing-resistant MFA has not been enforced yet, then an alternative MFA method SHALL be enforced for all users
+              updates:
+                State: enabled  
+        Postconditions: []
+        ExpectedResult: true
+
   - PolicyId: MS.AAD.3.3v1
     TestDriver: RunScuba
     Tests:
@@ -149,25 +173,27 @@ TestPlan:
         Postconditions: []
         IsNotChecked: true
         ExpectedResult: false
+  
   - PolicyId: MS.AAD.3.4v1
     TestDriver: RunCached
     Tests:
-      - TestDescription: MS.AAD.3.4v1 preMigration
+      - TestDescription: MS.AAD.3.4v1 Non-Compliant case - preMigration
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
               updates:
-                'authentication_method[0].PolicyMigrationState': preMigration  
+                authentication_method[0].PolicyMigrationState: preMigration  
         Postconditions: []
         ExpectedResult: false 
-      - TestDescription: MS.AAD.3.4v1 Default
+      - TestDescription: MS.AAD.3.4v1 Compliant case - Migration complete
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
               updates:
-                'authentication_method[0].PolicyMigrationState': migrationComplete  
+                authentication_method[0].PolicyMigrationState: migrationComplete  
         Postconditions: []
         ExpectedResult: true 
+  
   - PolicyId: MS.AAD.3.5v1
     TestDriver: RunScuba
     Tests:
@@ -176,27 +202,60 @@ TestPlan:
         Postconditions: []
         IsNotChecked: true
         ExpectedResult: false
+  
   - PolicyId: MS.AAD.3.6v1
     TestDriver: RunCached
     Tests:
-      - TestDescription: MS.AAD.3.6v1 Report Only
+      - TestDescription: MS.AAD.3.6v1 Non-Compliant case - Bad Authentication Strength included
         Preconditions:
           - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
-              displayName: Automated Test 1 - DO NOT MODIFY
+              displayName: Live - Automated Test 1 - DO NOT MODIFY
               updates:
                 State: enabled  
+                Conditions.Applications.IncludeApplications: 
+                  - "All"
+                Conditions.Users.IncludeRoles:
+                  - "158c047a-c907-4556-b7ef-446551a6b5f7"
+                  - "62e90394-69f5-4237-9190-012177145e10"
+                  - "8ac3fc64-6eca-42ea-9e69-59f4c7b60eb2"
+                  - "e8611ab8-c189-46e8-94e1-60213ab1f814"
+                  - "f28a1f50-f6e7-4571-818b-6a12f2af6b6c"
+                  - "fe930be7-5e62-47db-91af-98c3a49a38b1"
+                  - "29232cdf-9323-42fd-ade2-1d097af3e4de"
+                  - "9b895d92-2cd3-44c7-9d02-a6ac2d5ea5c3"
+                GrantControls.AuthenticationStrength.AllowedCombinations:    
+                  - "windowsHelloForBusiness"
+                  - "fido2"
+                  - "x509CertificateMultiFactor"
+                  - "password,sms"
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.AAD.3.6v1 Default
+      - TestDescription: MS.AAD.3.6v1 Compliant case
         Preconditions:
           - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
-              displayName: Live - MFA required for Highly Privileged Roles
-              updates: 
-                state: disabled
+              displayName: Live - Automated Test 1 - DO NOT MODIFY
+              updates:
+                State: enabled  
+                Conditions.Applications.IncludeApplications: 
+                  - "All"
+                Conditions.Users.IncludeRoles:
+                  - "158c047a-c907-4556-b7ef-446551a6b5f7"
+                  - "62e90394-69f5-4237-9190-012177145e10"
+                  - "8ac3fc64-6eca-42ea-9e69-59f4c7b60eb2"
+                  - "e8611ab8-c189-46e8-94e1-60213ab1f814"
+                  - "f28a1f50-f6e7-4571-818b-6a12f2af6b6c"
+                  - "fe930be7-5e62-47db-91af-98c3a49a38b1"
+                  - "29232cdf-9323-42fd-ade2-1d097af3e4de"
+                  - "9b895d92-2cd3-44c7-9d02-a6ac2d5ea5c3"
+                GrantControls.AuthenticationStrength.AllowedCombinations:    
+                  - "windowsHelloForBusiness"
+                  - "fido2"
+                  - "x509CertificateMultiFactor"
         Postconditions: []
-        ExpectedResult: false
+        ExpectedResult: true
+  
   - PolicyId: MS.AAD.3.7v1
     TestDriver: RunCached
     Tests:
@@ -246,6 +305,7 @@ TestPlan:
                   - "All"         
         Postconditions: []
         ExpectedResult: true
+
   - PolicyId: MS.AAD.3.8v1
     TestDriver: RunCached
     Tests:
@@ -281,6 +341,7 @@ TestPlan:
                   - "All"  
         Postconditions: []
         ExpectedResult: true
+  
   - PolicyId: MS.AAD.4.1v1
     TestDriver: RunScuba
     Tests:
@@ -289,10 +350,11 @@ TestPlan:
         Postconditions: []
         IsNotChecked: true
         ExpectedResult: false
+
   - PolicyId: MS.AAD.5.1v1
     TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.AAD.5.1v1 Allow 
+      - TestDescription: MS.AAD.5.1v1 Non-Compliant case - Allow users to register apps 
         Preconditions:
           - Command: Update-MgPolicyAuthorizationPolicy
             Splat:
@@ -301,7 +363,7 @@ TestPlan:
                 AllowedToCreateApps: true
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.AAD.5.1v1 Default 
+      - TestDescription: MS.AAD.5.1v1 Compliant case - Do NOT allow users to register apps 
         Preconditions:
           - Command: Update-MgPolicyAuthorizationPolicy
             Splat:
@@ -310,40 +372,51 @@ TestPlan:
                 AllowedToCreateApps: false
         Postconditions: []
         ExpectedResult: true  
+
   - PolicyId: MS.AAD.5.2v1
     TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.AAD.5.2v1 Default
+      - TestDescription: MS.AAD.5.2v1 Non-Compliant case - Allow users to consent to apps
         Preconditions:
           - Command: Update-MgPolicyAuthorizationPolicy
             Splat:
               AuthorizationPolicyId: authorizationPolicy
-              DefaultUserRolePermissions:
-                DefaultUserRolePermissions: true
+              PermissionGrantPolicyIdsAssignedToDefaultUserRole:
+                - ManagePermissionGrantsForSelf.microsoft-user-default-legacy
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.AAD.5.2v1 Compliant case - Do NOT allow users to consent to apps
+        Preconditions:
+          - Command: Update-MgPolicyAuthorizationPolicy
+            Splat:
+              AuthorizationPolicyId: authorizationPolicy
+              PermissionGrantPolicyIdsAssignedToDefaultUserRole: []
         Postconditions: []
         ExpectedResult: true
+
+  ######### Come back to this one when we figure out the problems with the Cmdlets - Crutch will try Beta version
   - PolicyId: MS.AAD.5.3v1
     TestDriver: RunScuba
-    ToDo: Work API. How to use switch parameter?
     Tests:
-      - TestDescription: MS.AAD.5.3v1 No Admin Consent Request Policy Enabled
+      - TestDescription: MS.AAD.5.3v1 Non-Compliant case - No Admin Consent workflow configured
         Preconditions:
           - Command: Update-MgPolicyAdminConsentRequestPolicy
             Splat:
               IsEnabled: false
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.AAD.5.3v1 Default
+      - TestDescription: MS.AAD.5.3v1 Compliant case - Admin Consent workflow is configured
         Preconditions:
           - Command: Update-MgPolicyAdminConsentRequestPolicy
             Splat:
               IsEnabled: true
         Postconditions: []
         ExpectedResult: true
+  
   - PolicyId: MS.AAD.5.4v1
     TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.AAD.5.4v1 Non-Compliant - EnableGroupSpecificConsent is true
+      - TestDescription: MS.AAD.5.4v1 Non-Compliant - Allow group owners to consent to apps
         Preconditions: 
           - Command: UpdateDirectorySettingByName
             Splat:
@@ -361,7 +434,7 @@ TestPlan:
                       Value: ""  
         Postconditions: []
         ExpectedResult: false    
-      - TestDescription: MS.AAD.5.4v1 Default
+      - TestDescription: MS.AAD.5.4v1 Compliant - Do NOT allow group owners to consent to apps
         Preconditions: 
           - Command: UpdateDirectorySettingByName
             Splat:
@@ -379,6 +452,7 @@ TestPlan:
                       Value: ""  
         Postconditions: []
         ExpectedResult: true
+
   - PolicyId: MS.AAD.6.1v1
     TestDriver: RunScuba
     Tests:
@@ -387,6 +461,7 @@ TestPlan:
         Postconditions: []
         IsNotChecked: true
         ExpectedResult: false
+
   - PolicyId: MS.AAD.7.1v1
     TestDriver: RunCached
     Tests:
@@ -467,60 +542,6 @@ TestPlan:
                     roles: 
                       - Global Administrator
         Postconditions: []
-        ExpectedResult: false
-      - TestDescription: MS.AAD.7.1v1 Default
-        Preconditions: 
-          - Command: UpdateProviderExport
-            Splat:
-              Updates:
-                - Key: "privileged_users"
-                  Value:
-                    User1:
-                      DisplayName: "Test User1"
-                      roles: 
-                        - "Privileged Role Administrator"
-                        - "Global Administrator"
-                    User2:
-                      DisplayName: "Test User2"
-                      roles: 
-                        - "Global Administrator"
-        Postconditions: []
-        ExpectedResult: false
-      - TestDescription: MS.AAD.7.1v1 Default
-        Preconditions: 
-          - Command: UpdateProviderExport
-            Splat:
-              Updates:
-                - Key: "privileged_users"
-                  Value:
-                    User1:
-                      DisplayName: "Test User1"
-                      roles: 
-                        - "Privileged Role Administrator"
-                        - "Global Administrator"
-                    User2:
-                      DisplayName: "Test User2"
-                      roles: 
-                        - "Global Administrator"
-        Postconditions: []
-        ExpectedResult: false
-      - TestDescription: MS.AAD.7.1v1 Default
-        Preconditions: 
-          - Command: UpdateProviderExport
-            Splat:
-              Updates:
-                - Key: "privileged_users"
-                  Value:
-                    User1:
-                      DisplayName: "Test User1"
-                      roles: 
-                        - "Privileged Role Administrator"
-                        - "Global Administrator"
-                    User2:
-                      DisplayName: "Test User2"
-                      roles: 
-                        - "Global Administrator"
-        Postconditions: []
         ExpectedResult: true
   - PolicyId: MS.AAD.7.2v1
     TestDriver: RunCached
@@ -530,17 +551,21 @@ TestPlan:
           - Command: UpdateProviderExport
             Splat:
               Updates:
-                secure_score[0].Score: 0.2
+                - secure_score[0]:
+                    Score: 0.2
         Postconditions: []
+        IsNotChecked: true
         ExpectedResult: false
       - TestDescription: MS.AAD.7.2v1 High Score
         Preconditions: 
           - Command: UpdateProviderExport
             Splat:
               Updates:
-                secure_score[0].Score: 1
+                - secure_score[0]:
+                    Score: 1
         Postconditions: []
-        ExpectedResult: true        
+        IsNotChecked: true
+        ExpectedResult: false        
   - PolicyId: MS.AAD.7.3v1
     TestDriver: RunCached
     Tests:
@@ -581,7 +606,7 @@ TestPlan:
     TestDriver: RunCached
     ToDo: Change to RunScuba? Need better tests
     Tests:
-      - TestDescription: MS.AAD.7.4v1 Has End Date
+      - TestDescription: MS.AAD.7.4v1 Default
         Preconditions:  
           - Command: UpdateProviderExport
             Splat:
@@ -596,7 +621,7 @@ TestPlan:
               Updates:
                 privileged_roles[0].Assignments[0].EndDateTime: null
         Postconditions: []
-        ExpectedResult: true          
+        ExpectedResult: true        
   - PolicyId: MS.AAD.7.5v1
     TestDriver: RunCached
     ToDo: Change to RunScuba? Need better tests
@@ -640,31 +665,17 @@ TestPlan:
     TestDriver: RunCached
     ToDo: Changed to RunScuba
     Tests:
-      - TestDescription: MS.AAD.7.8v1 No notificationRecipients
-        Preconditions:  
-          - Command: UpdateProviderExport
-            Splat:
-              Updates:
-                privileged_roles[0].Rules[0].Id: Notification_Admin_EndUser_Assignment
-                privileged_roles[0].Rules[0].AdditionalProperties:
-                  notificationType: Email
-                  notificationRecipients: []
-                privileged_roles[0].DisplayName: Global Administrator
-        Postconditions: []
-        ExpectedResult: false
       - TestDescription: MS.AAD.7.8v1 Default
         Preconditions:  
           - Command: UpdateProviderExport
             Splat:
               Updates:
                 privileged_roles[0].Rules[0].Id: Notification_Admin_EndUser_Assignment
-                privileged_roles[0].Rules[0].AdditionalProperties:
-                  notificationType: Email
-                  notificationRecipients:
-                    - 'someone@somewhere.org'
+                privileged_roles[0].Rules[0].AdditionalProperties.notificatinType: Email
+                privileged_roles[0].Rules[0].AdditionalProperties.notificationRecipients: []
                 privileged_roles[0].DisplayName: Global Administrator
         Postconditions: []
-        ExpectedResult: true    
+        ExpectedResult: false
   - PolicyId: MS.AAD.7.9v1
     TestDriver: RunCached
     ToDo: Changed to RunScuba
@@ -680,18 +691,11 @@ TestPlan:
                 privileged_roles[0].DisplayName: Privileged Role Administrator
         Postconditions: []
         ExpectedResult: false
+  
   - PolicyId: MS.AAD.8.1v1
     TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.AAD.8.1v1 Restricted access
-        Preconditions: 
-          - Command: Update-MgPolicyAuthorizationPolicy
-            Splat:
-              AuthorizationPolicyId: authorizationPolicy
-              GuestUserRoleId: "2af84b1e-32c8-42b7-82bc-daa82404023b"
-        Postconditions: []
-        ExpectedResult: true
-      - TestDescription: MS.AAD.8.1v1 Same as member users
+      - TestDescription: MS.AAD.8.1v1 Non-Compliant - Guest users have the same access as members
         Preconditions: 
           - Command: Update-MgPolicyAuthorizationPolicy
             Splat:
@@ -699,7 +703,15 @@ TestPlan:
               GuestUserRoleId: "a0b1b346-4d3e-4e8b-98f8-753987be4970"
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.AAD.8.1v1 Default
+      - TestDescription: MS.AAD.8.1v1 Compliant - Guest user access is restricted
+        Preconditions: 
+          - Command: Update-MgPolicyAuthorizationPolicy
+            Splat:
+              AuthorizationPolicyId: authorizationPolicy
+              GuestUserRoleId: "2af84b1e-32c8-42b7-82bc-daa82404023b"
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.AAD.8.1v1 Compliant - Guest users have limited access
         Preconditions: 
           - Command: Update-MgPolicyAuthorizationPolicy
             Splat:
@@ -707,10 +719,11 @@ TestPlan:
               GuestUserRoleId: "10dae51f-b6af-4016-8d66-8c2a99b929b3"
         Postconditions: []
         ExpectedResult: true
+
   - PolicyId: MS.AAD.8.2v1
     TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.AAD.8.2v1 Everyone
+      - TestDescription: MS.AAD.8.2v1 Non-Compliant - Anyone in the organization can invite guest users
         Preconditions:
           - Command: Update-MgPolicyAuthorizationPolicy
             Splat:
@@ -718,7 +731,7 @@ TestPlan:
               AllowInvitesFrom: everyone
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.AAD.8.2v1 Default
+      - TestDescription: MS.AAD.8.2v1 Compliant - Only users assigned to specific admin roles can invite guest users
         Preconditions:
           - Command: Update-MgPolicyAuthorizationPolicy
             Splat:
@@ -726,6 +739,7 @@ TestPlan:
               AllowInvitesFrom: adminsAndGuestInviters
         Postconditions: []
         ExpectedResult: true
+
   - PolicyId: MS.AAD.8.3v1
     TestDriver: RunScuba
     Tests:

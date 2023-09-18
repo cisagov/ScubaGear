@@ -86,49 +86,34 @@ $localDriverVersion = Get-LocalDriverVersion -pathToDriver $chromeDriverPath
 if (Confirm-NeedForUpdate $chromeVersion $localDriverVersion){
     Write-Debug -Message "Need to update chrome driver from $localDriverVersion to $chromeVersion"
 
-    # find exact matching version
-    $chromeDriverAvailableVersions = (Invoke-RestMethod $chromeDriverWebsite) -split " " | Where-Object {$_ -like "*href=*?path=*"} | ForEach-Object {$_.replace("href=","").replace('"','')}
-    $versionLink                   = $chromeDriverAvailableVersions | Where-Object {$_ -like "*$chromeVersion/*"}
+    $VersionsUrl = 'https://googlechromelabs.github.io/chrome-for-testing/known-good-versions-with-downloads.json'
 
-    # if cannot find (e.g. it's too new to have a web driver), look for relevant major version
-    if (!$versionLink){
-        $browserMajorVersion = $chromeVersion.Substring(0, $chromeVersion.IndexOf("."))
-        $lkg_chrome = invoke-RestMethod https://googlechromelabs.github.io/chrome-for-testing/last-known-good-versions-with-downloads.json
-        $lkg_chrome.PSobject.Properties | ForEach-Object {$_.Value | ForEach-Object {$chromeDriverAvailableVersions += $_.PSobject.Properties.Value.downloads.chromedriver.url }}
+    $VersionsInfo = (Invoke-RestMethod $VersionsUrl).versions |
+        Sort-Object {[System.Version]($_.Version)} -Descending |
+        Where-Object {([System.Version]($_.Version)).Major -eq $chromeVersion.Major -and ([System.Version]($_.Version)).Minor -eq $chromeVersion.Minor -and ([System.Version]($_.Version)).Build -le $chromeVersion.Build} |
+        Select-Object -First 1
+    $VersionsInfo | ft
+    $Download = $VersionsInfo.Downloads.ChromeDriver |
+        Where-Object {$_.Platform -eq 'win64'}
+    $DownloadUrl = $Download.Url
 
-        $versionLink         = $chromeDriverAvailableVersions | Where-Object {$_ -like "*$browserMajorVersion.*win32*"}
+    Write-Debug -Message "Dowloading $DownloadUrl"
+    $DriverTempPath = Join-Path -Path $PSScriptRoot -ChildPath "chromeNewDriver"
+
+    if (-not (Test-Path -Path $DriverTempPath -PathType Container)){
+        New-Item -ItemType Directory -Path $DriverTempPath
     }
 
-    # in case of multiple links, take the first only
-    if ($versionLink.Count -gt 1){
-        $versionLink = $versionLink[0]
+    Invoke-WebRequest $DownloadUrl -OutFile "$DriverTempPath\chromeNewDriver.zip"
+
+    Expand-Archive "$DriverTempPath\chromeNewDriver.zip" -DestinationPath $DriverTempPath -Force
+    if (Test-Path "$($webDriversPath)\chromedriver.exe") {
+        Remove-Item -Path "$($webDriversPath)\chromedriver.exe" -Force
     }
-
-    if ($versionLink -like "*chrome-for-testing*") {
-        $downloadLink = $versionLink
-    }
-    else {
-        # build tge download URL according to found version and download URL schema
-        $version      = ($versionLink -split"=" | Where-Object {$_ -like "*.*.*.*/"}).Replace('/','')
-        $downloadLink = "$chromeDriverUrlBase/$version/$chromeDriverUrlEnd"
-    }
-
-    # download the file
-    Invoke-WebRequest $downloadLink -OutFile "chromeNewDriver.zip"
-
-    # expand archive and replace the old file
-    Expand-Archive "chromeNewDriver.zip"  -DestinationPath "."  -Force
-
-    $ChromeDriverPath = Join-Path -Path $webDriversPath -ChildPath 'chromedriver.exe'
-
-    if (Test-Path $ChromeDriverPath){
-        Remove-Item -Path $ChromeDriverPath -Force
-    }
-
-    Move-Item "chromedriver-win32/chromedriver.exe" -Destination $ChromeDriverPath -Force
+    Move-Item "$DriverTempPath\chromedriver-win64\chromedriver.exe" -Destination  "$($webDriversPath)\chromedriver.exe" -Force
 
     # clean-up
-    Remove-Item "chromeNewDriver.zip" -Force
-    Remove-Item "chromedriver-win32" -Recurse -Force
+    #Remove-Item "$DriverTempPath\chromeNewDriver.zip" -Force
+    Remove-Item $DriverTempPath\ -Recurse -Force
 }
 #endregion MAIN SCRIPT
