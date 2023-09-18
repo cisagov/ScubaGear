@@ -266,7 +266,7 @@ test_Value_Incorrect_Uppercase if {
                 "Values" : [
                     {
                         "Name" : "EnableGroupSpecificConsent",
-                        "Value" : "true"
+                        "Value" : "True"
                     }
                 ]
             }
