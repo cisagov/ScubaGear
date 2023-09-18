@@ -57,7 +57,8 @@ function Connect-Tenant {
                        'UserAuthenticationMethod.Read.All',
                        'RoleManagement.Read.Directory',
                        'GroupMember.Read.All',
-                       'Directory.Read.All'
+                       'Directory.Read.All',
+                       'SecurityEvents.Read.All'
                    )
                    $GraphParams = @{
                        'ErrorAction' = 'Stop';
@@ -81,10 +82,6 @@ function Connect-Tenant {
                        }
                    }
                    Connect-MgGraph @GraphParams | Out-Null
-                   $GraphProfile = (Get-MgProfile -ErrorAction "Stop").Name
-                   if ($GraphProfile.ToLower() -ne "beta") {
-                       Select-MgProfile -Name "Beta" -ErrorAction "Stop" | Out-Null
-                   }
                    $AADAuthRequired = $false
                }
                {($_ -eq "exo") -or ($_ -eq "defender")} {
@@ -148,14 +145,10 @@ function Connect-Tenant {
                            }
                        }
                        Connect-MgGraph @LimitedGraphParams | Out-Null
-                       $GraphProfile = (Get-MgProfile -ErrorAction "Stop").Name
-                       if ($GraphProfile.ToLower() -ne "beta") {
-                           Select-MgProfile -Name "Beta" -ErrorAction "Stop" | Out-Null
-                       }
                        $AADAuthRequired = $false
                    }
                    if ($SPOAuthRequired) {
-                       $InitialDomain = (Get-MgOrganization).VerifiedDomains | Where-Object {$_.isInitial}
+                       $InitialDomain = (Get-MgBetaOrganization).VerifiedDomains | Where-Object {$_.isInitial}
                        $InitialDomainPrefix = $InitialDomain.Name.split(".")[0]
                        $SPOParams = @{
                            'ErrorAction' = 'Stop';

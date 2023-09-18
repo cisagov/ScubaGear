@@ -72,7 +72,6 @@ Describe "Smoke Test: Generate Output" {
             @{Item = 'IndividualReports/AADReport.html'; ItemType = 'Leaf'},
             @{Item = 'IndividualReports/DefenderReport.html'; ItemType = 'Leaf'},
             @{Item = 'IndividualReports/EXOReport.html'; ItemType = 'Leaf'},
-            @{Item = 'IndividualReports/OneDriveReport.html'; ItemType = 'Leaf'},
             @{Item = 'IndividualReports/PowerPlatformReport.html'; ItemType = 'Leaf'},
             @{Item = 'IndividualReports/SharePointReport.html'; ItemType = 'Leaf'},
             @{Item = 'IndividualReports/TeamsReport.html'; ItemType = 'Leaf'},
