@@ -5,8 +5,8 @@ import data.report.utils.ReportDetailsBoolean
 import data.defender.utils.SensitiveAccounts
 import data.defender.utils.SensitiveAccountsConfig
 import data.defender.utils.SensitiveAccountsSetting
-import data.defender.utils.InpersonationProtection
-import data.defender.utils.InpersonationProtectionConfig
+import data.defender.utils.ImpersonationProtection
+import data.defender.utils.ImpersonationProtectionConfig
 
 ## Report details menu
 #
@@ -275,46 +275,46 @@ tests[{
 # MS.DEFENDER.2.1v1
 #--
 
-InpersonationProtectionErrorMsg(StrictInpersonationProtection, StandardInpersonationProtection) := Description if {
+ImpersonationProtectionErrorMsg(StrictImpersonationProtection, StandardImpersonationProtection) := Description if {
     Description := "No users are included for targeted user protection in Strict policy."
-    StrictInpersonationProtection.Result == false
-    StandardInpersonationProtection.Result == true
+    StrictImpersonationProtection.Result == false
+    StandardImpersonationProtection.Result == true
 }
 
-InpersonationProtectionErrorMsg(StrictInpersonationProtection, StandardInpersonationProtection) := Description if {
+ImpersonationProtectionErrorMsg(StrictImpersonationProtection, StandardImpersonationProtection) := Description if {
     Description := "No users are included for targeted user protection in Standard policy."
-    StrictInpersonationProtection.Result == true
-    StandardInpersonationProtection.Result == false
+    StrictImpersonationProtection.Result == true
+    StandardImpersonationProtection.Result == false
 }
 
-InpersonationProtectionErrorMsg(StrictInpersonationProtection, StandardInpersonationProtection) := Description if {
+ImpersonationProtectionErrorMsg(StrictImpersonationProtection, StandardImpersonationProtection) := Description if {
     Description := "No users are included for targeted user protection in Strict or Standard policy."
-    StrictInpersonationProtection.Result == false
-    StandardInpersonationProtection.Result == false
+    StrictImpersonationProtection.Result == false
+    StandardImpersonationProtection.Result == false
 }
 
-InpersonationProtectionErrorMsg(StrictInpersonationProtection, StandardInpersonationProtection) := Description if {
+ImpersonationProtectionErrorMsg(StrictImpersonationProtection, StandardImpersonationProtection) := Description if {
     Description := ""
-    StrictInpersonationProtection.Result == true
-    StandardInpersonationProtection.Result == true
+    StrictImpersonationProtection.Result == true
+    StandardImpersonationProtection.Result == true
 }
 
 tests[{
     "PolicyId" : "MS.DEFENDER.2.1v1",
     "Criticality" : "Should",
     "Commandlet" : ["Get-AntiPhishPolicy"],
-	"ActualValue" : [StrictInpersonationProtection.Policy, StandardInpersonationProtection.Policy],
+	"ActualValue" : [StrictImpersonationProtection.Policy, StandardImpersonationProtection.Policy],
     "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
     "RequirementMet" : Status
 }] {
     Policies := input.anti_phish_policies
-    ProtectedUsersConfig := InpersonationProtectionConfig("MS.DEFENDER.2.1v1")
-    StrictInpersonationProtection := InpersonationProtection(Policies, "Strict Preset Security Policy", ProtectedUsersConfig)
-    StandardInpersonationProtection := InpersonationProtection(Policies, "Standard Preset Security Policy", ProtectedUsersConfig)
-    ErrorMessage := InpersonationProtectionErrorMsg(StrictInpersonationProtection, StandardInpersonationProtection)
+    ProtectedUsersConfig := ImpersonationProtectionConfig("MS.DEFENDER.2.1v1")
+    StrictImpersonationProtection := ImpersonationProtection(Policies, "Strict Preset Security Policy", ProtectedUsersConfig)
+    StandardImpersonationProtection := ImpersonationProtection(Policies, "Standard Preset Security Policy", ProtectedUsersConfig)
+    ErrorMessage := ImpersonationProtectionErrorMsg(StrictImpersonationProtection, StandardImpersonationProtection)
     Conditions := [
-        StrictInpersonationProtection.Result == true,
-        StandardInpersonationProtection.Result == true
+        StrictImpersonationProtection.Result == true,
+        StandardImpersonationProtection.Result == true
     ]
     Status := count([x | x := Conditions[_]; x == false]) == 0
 }

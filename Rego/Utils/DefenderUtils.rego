@@ -122,10 +122,10 @@ SensitiveAccounts(SensitiveAccountsSetting, SensitiveAccountsConfig) := true if 
 }
 
 ##############################################
-# Inpersonation protection support functions #
+# Impersonation protection support functions #
 ##############################################
 
-InpersonationProtectionSetting(Policies, IdentityString) := Policy if {
+ImpersonationProtectionSetting(Policies, IdentityString) := Policy if {
     Policy := [
         Policy | Policy := Policies[_];
         regex.match(IdentityString, Policy.Identity) == true;
@@ -134,12 +134,12 @@ InpersonationProtectionSetting(Policies, IdentityString) := Policy if {
     ]
 } else := set()
 
-InpersonationProtectionConfig(PolicyID) := IncludedUsers if {
+ImpersonationProtectionConfig(PolicyID) := IncludedUsers if {
     SensitiveUsers := input.scuba_config.Defender[PolicyID].SensitiveAccounts
     IncludedUsers := { trim_space(x) | some x in SensitiveUsers.IncludedUsers; x != null }
 } else := set()
 
-InpersonationProtection(Policies, IdentityString, IncludedUsers) := {
+ImpersonationProtection(Policies, IdentityString, IncludedUsers) := {
     "Result" : true,
     "Policy" : {
         "Name" : Policy[0].Identity,
@@ -147,7 +147,7 @@ InpersonationProtection(Policies, IdentityString, IncludedUsers) := {
         "Action" : Policy[0].TargetedUserProtectionAction
     }
 } if {
-    Policy := InpersonationProtectionSetting(Policies, IdentityString)
+    Policy := ImpersonationProtectionSetting(Policies, IdentityString)
     count(Policy[0]) > 0
 
     PolicyProtectedUsers := { x | x := Policy[0].TargetedUsersToProtect[_] }
