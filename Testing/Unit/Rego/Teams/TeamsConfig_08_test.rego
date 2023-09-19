@@ -4,10 +4,10 @@ import data.report.utils.NotCheckedDetails
 
 
 #
-# Policy 1
+# Policy 5.1
 #--
 test_DefaultCatalogAppsType_Correct_V1 if {
-    PolicyId := "MS.TEAMS.8.1v1"
+    PolicyId := "MS.TEAMS.5.1v1"
 
     Output := tests with input as {
         "app_policies": [
@@ -26,7 +26,7 @@ test_DefaultCatalogAppsType_Correct_V1 if {
 }
 
 test_DefaultCatalogAppsType_Correct_V2 if {
-    PolicyId := "MS.TEAMS.8.1v1"
+    PolicyId := "MS.TEAMS.5.1v1"
 
     Output := tests with input as {
         "app_policies": [
@@ -45,7 +45,7 @@ test_DefaultCatalogAppsType_Correct_V2 if {
 }
 
 test_DefaultCatalogAppsType_Incorrect_V1 if {
-    PolicyId := "MS.TEAMS.8.1v1"
+    PolicyId := "MS.TEAMS.5.1v1"
 
     Output := tests with input as {
         "app_policies": [
@@ -64,7 +64,7 @@ test_DefaultCatalogAppsType_Incorrect_V1 if {
 }
 
 test_DefaultCatalogAppsType_Incorrect_V2 if {
-    PolicyId := "MS.TEAMS.8.1v1"
+    PolicyId := "MS.TEAMS.5.1v1"
 
     Output := tests with input as {
         "app_policies": [
@@ -83,7 +83,7 @@ test_DefaultCatalogAppsType_Incorrect_V2 if {
 }
 
 test_DefaultCatalogAppsType_Multiple if {
-    PolicyId := "MS.TEAMS.8.1v1"
+    PolicyId := "MS.TEAMS.5.1v1"
 
     Output := tests with input as {
         "app_policies": [
@@ -112,10 +112,10 @@ test_DefaultCatalogAppsType_Multiple if {
 }
 
 #
-# Policy 2
+# Policy 5.2
 #--
 test_GlobalCatalogAppsType_Correct_V1 if {
-    PolicyId := "MS.TEAMS.8.2v1"
+    PolicyId := "MS.TEAMS.5.2v1"
 
     Output := tests with input as {
         "app_policies": [
@@ -134,7 +134,7 @@ test_GlobalCatalogAppsType_Correct_V1 if {
 }
 
 test_GlobalCatalogAppsType_Correct_V2 if {
-    PolicyId := "MS.TEAMS.8.2v1"
+    PolicyId := "MS.TEAMS.5.2v1"
 
     Output := tests with input as {
         "app_policies": [
@@ -153,7 +153,7 @@ test_GlobalCatalogAppsType_Correct_V2 if {
 }
 
 test_GlobalCatalogAppsType_Incorrect_V1 if {
-    PolicyId := "MS.TEAMS.8.2v1"
+    PolicyId := "MS.TEAMS.5.2v1"
 
     Output := tests with input as {
         "app_policies": [
@@ -172,7 +172,7 @@ test_GlobalCatalogAppsType_Incorrect_V1 if {
 }
 
 test_GlobalCatalogAppsType_Incorrect_V2 if {
-    PolicyId := "MS.TEAMS.8.2v1"
+    PolicyId := "MS.TEAMS.5.2v1"
 
     Output := tests with input as {
         "app_policies": [
@@ -191,7 +191,7 @@ test_GlobalCatalogAppsType_Incorrect_V2 if {
 }
 
 test_GlobalCatalogAppsType_Multiple if {
-    PolicyId := "MS.TEAMS.8.2v1"
+    PolicyId := "MS.TEAMS.5.2v1"
 
     Output := tests with input as {
         "app_policies": [
@@ -218,9 +218,12 @@ test_GlobalCatalogAppsType_Multiple if {
     contains(RuleOutput[0].ReportDetails, "Global")
     contains(RuleOutput[0].ReportDetails, "Tag:TestPolicy2")
 }
+#
+# Policy 3
+#
 
 test_PrivateCatalogAppsType_Correct_V1 if {
-    PolicyId := "MS.TEAMS.8.2av1"
+    PolicyId := "MS.TEAMS.5.3v1"
 
     Output := tests with input as {
         "app_policies": [
@@ -239,7 +242,7 @@ test_PrivateCatalogAppsType_Correct_V1 if {
 }
 
 test_PrivateCatalogAppsType_Correct_V2 if {
-    PolicyId := "MS.TEAMS.8.2av1"
+    PolicyId := "MS.TEAMS.5.3v1"
 
     Output := tests with input as {
         "app_policies": [
@@ -258,7 +261,7 @@ test_PrivateCatalogAppsType_Correct_V2 if {
 }
 
 test_PrivateCatalogAppsType_Incorrect_V1 if {
-    PolicyId := "MS.TEAMS.8.2av1"
+    PolicyId := "MS.TEAMS.5.3v1"
 
     Output := tests with input as {
         "app_policies": [
@@ -277,7 +280,7 @@ test_PrivateCatalogAppsType_Incorrect_V1 if {
 }
 
 test_PrivateCatalogAppsType_Incorrect_V2 if {
-    PolicyId := "MS.TEAMS.8.2av1"
+    PolicyId := "MS.TEAMS.5.3v1"
 
     Output := tests with input as {
         "app_policies": [
@@ -296,7 +299,7 @@ test_PrivateCatalogAppsType_Incorrect_V2 if {
 }
 
 test_PrivateCatalogAppsType_Multiple if {
-    PolicyId := "MS.TEAMS.8.2av1"
+    PolicyId := "MS.TEAMS.5.3v1"
 
     Output := tests with input as {
         "app_policies": [
