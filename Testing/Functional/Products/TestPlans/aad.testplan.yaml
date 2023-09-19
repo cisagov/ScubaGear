@@ -411,6 +411,14 @@ TestPlan:
         Postconditions: []
         IsNotChecked: true
         ExpectedResult: false
+  - PolicyId: MS.AAD.4.1v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.AAD.4.1v1 Not Checked
+        Preconditions: []
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false
 
   - PolicyId: MS.AAD.5.1v1
     TestDriver: RunScuba
@@ -433,7 +441,48 @@ TestPlan:
                 AllowedToCreateApps: false
         Postconditions: []
         ExpectedResult: true  
+  - PolicyId: MS.AAD.5.1v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.AAD.5.1v1 Non-Compliant case - Allow users to register apps 
+        Preconditions:
+          - Command: Update-MgPolicyAuthorizationPolicy
+            Splat:
+              AuthorizationPolicyId: authorizationPolicy
+              DefaultUserRolePermissions:
+                AllowedToCreateApps: true
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.AAD.5.1v1 Compliant case - Do NOT allow users to register apps 
+        Preconditions:
+          - Command: Update-MgPolicyAuthorizationPolicy
+            Splat:
+              AuthorizationPolicyId: authorizationPolicy
+              DefaultUserRolePermissions:
+                AllowedToCreateApps: false
+        Postconditions: []
+        ExpectedResult: true  
 
+  - PolicyId: MS.AAD.5.2v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.AAD.5.2v1 Non-Compliant case - Allow users to consent to apps
+        Preconditions:
+          - Command: Update-MgPolicyAuthorizationPolicy
+            Splat:
+              AuthorizationPolicyId: authorizationPolicy
+              PermissionGrantPolicyIdsAssignedToDefaultUserRole:
+                - ManagePermissionGrantsForSelf.microsoft-user-default-legacy
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.AAD.5.2v1 Compliant case - Do NOT allow users to consent to apps
+        Preconditions:
+          - Command: Update-MgPolicyAuthorizationPolicy
+            Splat:
+              AuthorizationPolicyId: authorizationPolicy
+              PermissionGrantPolicyIdsAssignedToDefaultUserRole: []
+        Postconditions: []
+        ExpectedResult: true
   - PolicyId: MS.AAD.5.2v1
     TestDriver: RunScuba
     Tests:
@@ -513,7 +562,54 @@ TestPlan:
                       Value: ""  
         Postconditions: []
         ExpectedResult: true
+  - PolicyId: MS.AAD.5.4v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.AAD.5.4v1 Non-Compliant - Allow group owners to consent to apps
+        Preconditions: 
+          - Command: UpdateDirectorySettingByName
+            Splat:
+              DisplayName: Consent Policy Settings
+              Updates:
+                BodyParameter:
+                  Values:
+                    - Name: EnableGroupSpecificConsent
+                      Value: 'true'
+                    - Name: BlockUserConsentForRiskyApps
+                      Value: 'false'  
+                    - Name: EnableAdminConsentRequests
+                      Value: 'false'
+                    - Name: ConstrainGroupSpecificConsentToMembersOfGroupId
+                      Value: ""  
+        Postconditions: []
+        ExpectedResult: false    
+      - TestDescription: MS.AAD.5.4v1 Compliant - Do NOT allow group owners to consent to apps
+        Preconditions: 
+          - Command: UpdateDirectorySettingByName
+            Splat:
+              DisplayName: Consent Policy Settings
+              Updates:
+                BodyParameter:
+                  Values:
+                    - Name: EnableGroupSpecificConsent
+                      Value: 'false'
+                    - Name: BlockUserConsentForRiskyApps
+                      Value: 'false'  
+                    - Name: EnableAdminConsentRequests
+                      Value: 'false'
+                    - Name: ConstrainGroupSpecificConsentToMembersOfGroupId
+                      Value: ""  
+        Postconditions: []
+        ExpectedResult: true
 
+  - PolicyId: MS.AAD.6.1v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.AAD.6.1v1 Not Checked
+        Preconditions: []
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false
   - PolicyId: MS.AAD.6.1v1
     TestDriver: RunScuba
     Tests:

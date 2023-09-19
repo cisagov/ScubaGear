@@ -31,6 +31,22 @@
     $TestContainers = @()
     $TestContainers += New-PesterContainer -Path "Testing/Functional/Products" -Data @{ TenantDomain = "y2zj1.onmicrosoft.com"; TenantDisplayName = "y2zj1"; ProductName = "sharepoint"; M365Environment = "commercial" }
     Invoke-Pester -Container $TestContainers -Output Detailed
+    .EXAMPLE
+    $TestContainers = @()
+    $TestContainers += New-PesterContainer -Path "Testing/Functional/Products" -Data @{ Thumbprint = "04C04809CC43AF66D805399D09B69069041574B0"; TenantDomain = "y2zj1.onmicrosoft.com"; TenantDisplayName = "y2zj1"; AppId = "9947b06c-46a9-4ff2-80c8-27261e58868a"; ProductName = "aad"; M365Environment = "commercial" }
+    $PesterConfig = @{
+        Run = @{
+            Container = $TestContainers
+        }
+        Filter = @{
+            Tag = @("MS.AAD.5.4v1")
+        }
+        Output = @{
+            Verbosity = 'Detailed'
+        }
+    }
+    $Config = New-PesterConfiguration -Hashtable $PesterConfig 
+    Invoke-Pester -Configuration $Config
 #>
 
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'Thumbprint', Justification = 'False positive as rule does not scan child scopes')]
@@ -40,10 +56,10 @@
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'ProductName', Justification = 'False positive as rule does not scan child scopes')]
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'M365Environment', Justification = 'False positive as rule does not scan child scopes')]
 
-[CmdletBinding(DefaultParameterSetName='Auto')]
+[CmdletBinding(DefaultParameterSetName='Manual')]
 param (
     [Parameter(Mandatory = $true, ParameterSetName = 'Auto')]
-    [ValidateNotNullOrEmpty()]
+    [AllowEmptyString()]
     [string]
     $Thumbprint,
     [Parameter(Mandatory = $true, ParameterSetName = 'Auto')]
@@ -57,7 +73,7 @@ param (
     [string]
     $TenantDisplayName,
     [Parameter(Mandatory = $true,  ParameterSetName = 'Auto')]
-    [ValidateNotNullOrEmpty()]
+    [AllowEmptyString()]
     [string]
     $AppId,
     [Parameter(Mandatory = $true,  ParameterSetName = 'Auto')]
@@ -77,8 +93,8 @@ param (
 $ScubaModulePath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules"
 $ScubaModule = Join-Path -Path $ScubaModulePath -ChildPath "../ScubaGear.psd1"
 $ConnectionModule = Join-Path -Path $ScubaModulePath -ChildPath "Connection/Connection.psm1"
-Import-Module $ScubaModule
-Import-Module $ConnectionModule
+Import-Module $ScubaModule -Force
+Import-Module $ConnectionModule -Force
 Import-Module Selenium -Force
 
 BeforeDiscovery{
@@ -91,22 +107,25 @@ BeforeDiscovery{
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'Tests', Justification = 'Variable is used in ScriptBlock')]
     $Tests = $TestPlan.Tests
 
-    $ServicePrincipalParams = @{CertThumbprintParams = @{
-        CertificateThumbprint = $Thumbprint;
-        AppID = $AppId;
-        Organization = $TenantDomain;
-    }}
-
     InModuleScope Connection -Parameters @{
         ProductName = $ProductName
         M365Environment = $M365Environment
-        ServicePrincipalParams = $ServicePrincipalParams
+        Thumbprint = $Thumbprint
+        AppId = $AppId
+        TenantDomain = $TenantDomain
     }{
-        if (-not [string]::IsNullOrEmpty($ServicePrincipalParams.CertThumbprintParams)){
+        if (-Not [string]::IsNullOrEmpty($AppId)){
+            Write-Host "Auto Connect to Tenant"
+            $ServicePrincipalParams = @{CertThumbprintParams = @{
+                CertificateThumbprint = $Thumbprint;
+                AppID = $AppId;
+                Organization = $TenantDomain;
+            }}
 
             Connect-Tenant -ProductNames $ProductName -M365Environment $M365Environment -ServicePrincipalParams $ServicePrincipalParams
         }
         else {
+            Write-Host "Manual Connect to Tenant"
             Connect-Tenant -ProductNames $ProductName -M365Environment $M365Environment
         }
     }
@@ -154,7 +173,8 @@ BeforeAll{
                 $ScriptBlock.Invoke()
             }
             catch {
-                Write-Error "Exceptio: SetConditions failed."
+                Write-Error "Exception: SetConditions failed."
+                Write-Error "$_"
             }
         }
     }
@@ -187,8 +207,13 @@ BeforeAll{
     }
 
     function RunScuba() {
-        # Execute ScubaGear to extract the config data and produce the output JSON
-        Invoke-SCuBA -CertificateThumbPrint $Thumbprint -AppId $AppId -Organization $TenantDomain -Productnames $ProductName -OutPath . -M365Environment $M365Environment -Quiet
+        if (-not [string]::IsNullOrEmpty($Thumbprint))
+        {
+            Invoke-SCuBA -CertificateThumbPrint $Thumbprint -AppId $AppId -Organization $TenantDomain -Productnames $ProductName -OutPath . -M365Environment $M365Environment -Quiet
+        }
+        else {
+            Invoke-SCuBA -Login $false -Productnames $ProductName -OutPath . -M365Environment $M365Environment -Quiet
+        }
     }
 
     function LoadTestResults($OutputFolder) {
@@ -300,10 +325,12 @@ Describe "Policy Checks for <ProductName>"{
     Context "Start tests for policy <PolicyId>" -ForEach $TestPlan{
         BeforeEach{
             if ('RunScuba' -eq $TestDriver){
+                Write-Host "Driver: RunScuba"
                 SetConditions -Conditions $Preconditions.ToArray()
                 RunScuba
             }
             elseif ('RunCached' -eq $TestDriver){
+                Write-Host "Driver: RunCached"
                 RunScuba
                 $ReportFolders = Get-ChildItem . -directory -Filter "M365BaselineConformance*" | Sort-Object -Property LastWriteTime -Descending
                 $OutputFolder = $ReportFolders[0].Name
@@ -311,6 +338,7 @@ Describe "Policy Checks for <ProductName>"{
                 Invoke-RunCached -Productnames $ProductName -ExportProvider $false -OutPath $OutputFolder -OutProviderFileName 'ModifiedProviderSettingsExport' -Quiet
             }
             else {
+                Write-Host "Driver: $TestDriver"
                 Write-Error "Invalid Test Driver: $TestDriver"
             }
 
@@ -327,7 +355,7 @@ Describe "Policy Checks for <ProductName>"{
             Open-SeUrl $Url -Driver $Driver 2>$null
         }
         Context "Execute test, <TestDescription>" -ForEach $Tests {
-            It "Check test case results" {
+            It "Check test case results" -Tag $PolicyId {
 
                 #Check intermediate output
                 $PolicyResultObj.RequirementMet | Should -Be $ExpectedResult

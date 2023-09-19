@@ -38,8 +38,12 @@ param (
 )
 function Get-LocalDriverVersion{
     param(
-        $pathToDriver                                               # direct path to the driver
+        $PathToDriver                                               # direct path to the driver
     )
+
+    $version = '0.0.0.0'
+
+    if (Test-Path $PathToDriver){
     $processInfo = New-Object System.Diagnostics.ProcessStartInfo   # need to pass the switch & catch the output, hence ProcessStartInfo is used
 
     $processInfo.FileName               = $pathToDriver
@@ -50,11 +54,14 @@ function Get-LocalDriverVersion{
     $process = New-Object System.Diagnostics.Process
 
     $process.StartInfo  = $processInfo
-    $process.Start()    | Out-Null
+    $process.Start() | Out-Null
     $process.WaitForExit()                                          # run synchronously, we need to wait for result
     $processStOutput    = $process.StandardOutput.ReadToEnd()
 
-    return ($processStOutput -split " ")[1]                     # ... while Chrome on 2nd place
+    $Version =  ($processStOutput -split " ")[1]
+    }
+
+    return $Version
 }
 
 function Confirm-NeedForUpdate{

@@ -646,8 +646,7 @@ Performing a manual review of highly privileged users to determine which ones ar
 
     ```
     Connect-MgGraph
-    Select-Mgprofile beta
-    Get-MgUser -Filter "userPrincipalName eq 'username@somedomain.com'" | FL
+    Get-MgBetaUser -Filter "userPrincipalName eq 'username@somedomain.com'" | FL
     ```
 
 6. Review the output field named **OnPremisesImmutableId**. If this field has a data value, it means that this specific user is not cloud-only. If the user is not cloud-only, create a cloud-only account for that user, assign the user to their respective roles and then remove the account that is not cloud-only from AAD.

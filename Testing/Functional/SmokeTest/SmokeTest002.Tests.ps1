@@ -64,7 +64,6 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for $OrganizationN
         It "Navigate to <Product> (<LinkText>) details" -ForEach @(
             @{Product = "aad"; LinkText = "Azure Active Directory"}
             @{Product = "defender"; LinkText = "Microsoft 365 Defender"}
-            @{Product = "onedrive"; LinkText = "OneDrive for Business"}
             @{Product = "exo"; LinkText = "Exchange Online"}
             @{Product = "powerplatform"; LinkText = "Microsoft Power Platform"}
             @{Product = "sharepoint"; LinkText = "SharePoint Online"}
@@ -85,7 +84,6 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for $OrganizationN
         It "Check <Product> (<LinkText>) tables" -ForEach @(
             @{Product = "aad"; LinkText = "Azure Active Directory"}
             @{Product = "defender"; LinkText = "Microsoft 365 Defender"}
-            @{Product = "onedrive"; LinkText = "OneDrive for Business"}
             @{Product = "exo"; LinkText = "Exchange Online"}
             @{Product = "powerplatform"; LinkText = "Microsoft Power Platform"}
             @{Product = "sharepoint"; LinkText = "SharePoint Online"}
