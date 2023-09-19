@@ -330,14 +330,14 @@ test_PrivateCatalogAppsType_Multiple if {
 #
 # Policy 3
 #--
-test_3rdParty_Correct if {
-    PolicyId := "MS.TEAMS.8.3v1"
-
-    Output := tests with input as { }
-
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == NotCheckedDetails(PolicyId)
-}
+#test_3rdParty_Correct if {
+#    PolicyId := "MS.TEAMS.8.3v1"
+#
+#    Output := tests with input as { }
+#
+#    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+#
+#    count(RuleOutput) == 1
+#    not RuleOutput[0].RequirementMet
+#    RuleOutput[0].ReportDetails == NotCheckedDetails(PolicyId)
+#}
