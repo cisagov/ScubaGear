@@ -46,4 +46,4 @@ Defender:
   MS.DEFENDER.2.1v1 : &UserImpersonationProtection
     SensitiveAccounts:
       IncludedUsers:
-        - johndoe@random.example.com
+        - "John Doe;jdoe@someemail.com"
