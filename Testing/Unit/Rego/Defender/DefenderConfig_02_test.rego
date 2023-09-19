@@ -16,8 +16,8 @@ test_TargetedUsers_Correct_V1 if {
                 "Enabled" : true,
                 "EnableTargetedUserProtection" : true,
                 "TargetedUsersToProtect" : [
-                    "john doe;jdoe@someemail.com",
-                    "jane doe;jadoe@someemail.com"
+                    "John Doe;jdoe@someemail.com",
+                    "Jane Doe;jadoe@someemail.com"
                 ],
                 "TargetedUserProtectionAction": "Quarantine"
             },
@@ -26,8 +26,8 @@ test_TargetedUsers_Correct_V1 if {
                 "Enabled" : true,
                 "EnableTargetedUserProtection" : true,
                 "TargetedUsersToProtect" : [
-                    "john doe;jdoe@someemail.com",
-                    "jane doe;jadoe@someemail.com"
+                    "John Doe;jdoe@someemail.com",
+                    "Jane Doe;jadoe@someemail.com"
                 ],
                 "TargetedUserProtectionAction": "Quarantine"
             }
@@ -37,8 +37,8 @@ test_TargetedUsers_Correct_V1 if {
                 "MS.DEFENDER.2.1v1" : {
                     "SensitiveAccounts" : {
                         "IncludedUsers" : [
-                            "john doe;jdoe@someemail.com",
-                            "jane doe;jadoe@someemail.com"
+                            "John Doe;jdoe@someemail.com",
+                            "Jane Doe;jadoe@someemail.com"
                         ]
                     }
                 }
@@ -63,8 +63,8 @@ test_TargetedUsers_Correct_V2 if {
                 "Enabled" : true,
                 "EnableTargetedUserProtection" : true,
                 "TargetedUsersToProtect" : [
-                    "john doe;jdoe@someemail.com",
-                    "jane doe;jadoe@someemail.com"
+                    "John Doe;jdoe@someemail.com",
+                    "Jane Doe;jadoe@someemail.com"
                 ],
                 "TargetedUserProtectionAction": "Quarantine"
             },
@@ -73,8 +73,8 @@ test_TargetedUsers_Correct_V2 if {
                 "Enabled" : true,
                 "EnableTargetedUserProtection" : true,
                 "TargetedUsersToProtect" : [
-                    "john doe;jdoe@someemail.com",
-                    "jane doe;jadoe@someemail.com"
+                    "John Doe;jdoe@someemail.com",
+                    "Jane Doe;jadoe@someemail.com"
                 ],
                 "TargetedUserProtectionAction": "Quarantine"
             }
@@ -84,7 +84,7 @@ test_TargetedUsers_Correct_V2 if {
                 "MS.DEFENDER.2.1v1" : {
                     "SensitiveAccounts" : {
                         "IncludedUsers" : [
-                            "john doe;jdoe@someemail.com"
+                            "John Doe;jdoe@someemail.com"
                         ]
                     }
                 }
@@ -109,8 +109,8 @@ test_TargetedUsers_Incorrect_V1 if {
                 "Enabled" : true,
                 "EnableTargetedUserProtection" : true,
                 "TargetedUsersToProtect" : [
-                    "john doe;jdoe@someemail.com",
-                    "jane doe;jadoe@someemail.com"
+                    "John Doe;jdoe@someemail.com",
+                    "Jane Doe;jadoe@someemail.com"
                 ],
                 "TargetedUserProtectionAction": "Quarantine"
             }
@@ -120,8 +120,8 @@ test_TargetedUsers_Incorrect_V1 if {
                 "MS.DEFENDER.2.1v1" : {
                     "SensitiveAccounts" : {
                         "IncludedUsers" : [
-                            "john doe;jdoe@someemail.com",
-                            "jane doe;jadoe@someemail.com"
+                            "John Doe;jdoe@someemail.com",
+                            "Jane Doe;jadoe@someemail.com"
                         ]
                     }
                 }
@@ -146,8 +146,8 @@ test_TargetedUsers_Incorrect_V2 if {
                 "Enabled" : true,
                 "EnableTargetedUserProtection" : true,
                 "TargetedUsersToProtect" : [
-                    "john doe;jdoe@someemail.com",
-                    "jane doe;jadoe@someemail.com"
+                    "John Doe;jdoe@someemail.com",
+                    "Jane Doe;jadoe@someemail.com"
                 ],
                 "TargetedUserProtectionAction": "Quarantine"
             }
@@ -157,8 +157,8 @@ test_TargetedUsers_Incorrect_V2 if {
                 "MS.DEFENDER.2.1v1" : {
                     "SensitiveAccounts" : {
                         "IncludedUsers" : [
-                            "john doe;jdoe@someemail.com",
-                            "jane doe;jadoe@someemail.com"
+                            "John Doe;jdoe@someemail.com",
+                            "Jane Doe;jadoe@someemail.com"
                         ]
                     }
                 }
@@ -183,8 +183,8 @@ test_TargetedUsers_Incorrect_V3 if {
                 "Enabled" : true,
                 "EnableTargetedUserProtection" : true,
                 "TargetedUsersToProtect" : [
-                    "john doe;jdoe@someemail.com",
-                    "jane doe;jadoe@someemail.com"
+                    "John Doe;jdoe@someemail.com",
+                    "Jane Doe;jadoe@someemail.com"
                 ],
                 "TargetedUserProtectionAction": "Quarantine"
             }
@@ -194,8 +194,8 @@ test_TargetedUsers_Incorrect_V3 if {
                 "MS.DEFENDER.2.1v1" : {
                     "SensitiveAccounts" : {
                         "IncludedUsers" : [
-                            "john doe;jdoe@someemail.com",
-                            "jane doe;jadoe@someemail.com"
+                            "John Doe;jdoe@someemail.com",
+                            "Jane Doe;jadoe@someemail.com"
                         ]
                     }
                 }
@@ -220,8 +220,8 @@ test_TargetedUsers_Incorrect_V4 if {
                 "Enabled" : false,
                 "EnableTargetedUserProtection" : true,
                 "TargetedUsersToProtect" : [
-                    "john doe;jdoe@someemail.com",
-                    "jane doe;jadoe@someemail.com"
+                    "John Doe;jdoe@someemail.com",
+                    "Jane Doe;jadoe@someemail.com"
                 ],
                 "TargetedUserProtectionAction": "Quarantine"
             },
@@ -230,8 +230,8 @@ test_TargetedUsers_Incorrect_V4 if {
                 "Enabled" : true,
                 "EnableTargetedUserProtection" : true,
                 "TargetedUsersToProtect" : [
-                    "john doe;jdoe@someemail.com",
-                    "jane doe;jadoe@someemail.com"
+                    "John Doe;jdoe@someemail.com",
+                    "Jane Doe;jadoe@someemail.com"
                 ],
                 "TargetedUserProtectionAction": "Quarantine"
             }
@@ -241,8 +241,8 @@ test_TargetedUsers_Incorrect_V4 if {
                 "MS.DEFENDER.2.1v1" : {
                     "SensitiveAccounts" : {
                         "IncludedUsers" : [
-                            "john doe;jdoe@someemail.com",
-                            "jane doe;jadoe@someemail.com"
+                            "John Doe;jdoe@someemail.com",
+                            "Jane Doe;jadoe@someemail.com"
                         ]
                     }
                 }
@@ -267,8 +267,8 @@ test_TargetedUsers_Incorrect_V5 if {
                 "Enabled" : true,
                 "EnableTargetedUserProtection" : false,
                 "TargetedUsersToProtect" : [
-                    "john doe;jdoe@someemail.com",
-                    "jane doe;jadoe@someemail.com"
+                    "John Doe;jdoe@someemail.com",
+                    "Jane Doe;jadoe@someemail.com"
                 ],
                 "TargetedUserProtectionAction": "Quarantine"
             },
@@ -277,8 +277,8 @@ test_TargetedUsers_Incorrect_V5 if {
                 "Enabled" : true,
                 "EnableTargetedUserProtection" : true,
                 "TargetedUsersToProtect" : [
-                    "john doe;jdoe@someemail.com",
-                    "jane doe;jadoe@someemail.com"
+                    "John Doe;jdoe@someemail.com",
+                    "Jane Doe;jadoe@someemail.com"
                 ],
                 "TargetedUserProtectionAction": "Quarantine"
             }
@@ -288,8 +288,8 @@ test_TargetedUsers_Incorrect_V5 if {
                 "MS.DEFENDER.2.1v1" : {
                     "SensitiveAccounts" : {
                         "IncludedUsers" : [
-                            "john doe;jdoe@someemail.com",
-                            "jane doe;jadoe@someemail.com"
+                            "John Doe;jdoe@someemail.com",
+                            "Jane Doe;jadoe@someemail.com"
                         ]
                     }
                 }
@@ -314,8 +314,8 @@ test_TargetedUsers_Incorrect_V6 if {
                 "Enabled" : true,
                 "EnableTargetedUserProtection" : true,
                 "TargetedUsersToProtect" : [
-                    "john doe;jdoe@someemail.com",
-                    "jane doe;jadoe@someemail.com"
+                    "John Doe;jdoe@someemail.com",
+                    "Jane Doe;jadoe@someemail.com"
                 ],
                 "TargetedUserProtectionAction": "Quarantine"
             },
@@ -324,7 +324,7 @@ test_TargetedUsers_Incorrect_V6 if {
                 "Enabled" : true,
                 "EnableTargetedUserProtection" : true,
                 "TargetedUsersToProtect" : [
-                    "john doe;jdoe@someemail.com"
+                    "John Doe;jdoe@someemail.com"
                 ],
                 "TargetedUserProtectionAction": "Quarantine"
             }
@@ -334,8 +334,8 @@ test_TargetedUsers_Incorrect_V6 if {
                 "MS.DEFENDER.2.1v1" : {
                     "SensitiveAccounts" : {
                         "IncludedUsers" : [
-                            "john doe;jdoe@someemail.com",
-                            "jane doe;jadoe@someemail.com"
+                            "John Doe;jdoe@someemail.com",
+                            "Jane Doe;jadoe@someemail.com"
                         ]
                     }
                 }
