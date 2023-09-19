@@ -3,10 +3,10 @@ import future.keywords
 
 
 #
-# Policy 1
+# Policy 1.7
 #--
 test_BroadcastRecordingMode_Correct if {
-    PolicyId := "MS.TEAMS.10.1v1"
+    PolicyId := "MS.TEAMS.1.7v1"
    
     Output := tests with input as {
         "broadcast_policies": [
@@ -25,7 +25,7 @@ test_BroadcastRecordingMode_Correct if {
 }
 
 test_BroadcastRecordingMode_Incorrect if {
-    PolicyId := "MS.TEAMS.10.1v1"
+    PolicyId := "MS.TEAMS.1.7v1"
    
     Output := tests with input as {
         "broadcast_policies": [
@@ -45,7 +45,7 @@ test_BroadcastRecordingMode_Incorrect if {
 
 
 test_BroadcastRecordingMode_Multiple if {
-    PolicyId := "MS.TEAMS.10.1v1"
+    PolicyId := "MS.TEAMS.1.7v1"
 
     Output := tests with input as {
         "broadcast_policies": [

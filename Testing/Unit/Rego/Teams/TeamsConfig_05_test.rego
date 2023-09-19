@@ -3,10 +3,10 @@ import future.keywords
 
 
 #
-# Policy 1
+# Policy 2.2 and 2.3
 #--
 test_AllowTeamsConsumerInbound_Correct_V1 if {
-    PolicyId := "MS.TEAMS.5.1v1"
+    PolicyId := "MS.TEAMS.2.2v1"
 
     Output := tests with input as {
         "federation_configuration": [
@@ -26,7 +26,7 @@ test_AllowTeamsConsumerInbound_Correct_V1 if {
 }
 
 test_AllowTeamsConsumerInbound_Correct_V1_multi if {
-    PolicyId := "MS.TEAMS.5.1v1"
+    PolicyId := "MS.TEAMS.2.2v1"
 
     Output := tests with input as {
         "federation_configuration": [
@@ -51,7 +51,7 @@ test_AllowTeamsConsumerInbound_Correct_V1_multi if {
 }
 
 test_AllowTeamsConsumerInbound_Correct_V2 if {
-    PolicyId := "MS.TEAMS.5.1v1"
+    PolicyId := "MS.TEAMS.2.2v1"
 
     Output := tests with input as {
         "federation_configuration": [
@@ -71,7 +71,7 @@ test_AllowTeamsConsumerInbound_Correct_V2 if {
 }
 
 test_AllowTeamsConsumerInbound_Correct_V2_multi if {
-    PolicyId := "MS.TEAMS.5.1v1"
+    PolicyId := "MS.TEAMS.2.2v1"
 
     Output := tests with input as {
         "federation_configuration": [
@@ -96,7 +96,7 @@ test_AllowTeamsConsumerInbound_Correct_V2_multi if {
 }
 
 test_AllowTeamsConsumer_Incorrect if {
-    PolicyId := "MS.TEAMS.5.1v1"
+    PolicyId := "MS.TEAMS.2.2v1"
 
     Output := tests with input as {
         "federation_configuration": [
@@ -116,7 +116,7 @@ test_AllowTeamsConsumer_Incorrect if {
 }
 
 test_AllowTeamsConsumer_Incorrect_multi if {
-    PolicyId := "MS.TEAMS.5.1v1"
+    PolicyId := "MS.TEAMS.2.2v1"
 
     Output := tests with input as {
         "federation_configuration": [
@@ -141,7 +141,7 @@ test_AllowTeamsConsumer_Incorrect_multi if {
 }
 
 test_AllowTeamsConsumer_Incorrect if {
-    PolicyId := "MS.TEAMS.5.1v1"
+    PolicyId := "MS.TEAMS.2.2v1"
 
     Output := tests with input as {
         "federation_configuration": [
@@ -161,7 +161,7 @@ test_AllowTeamsConsumer_Incorrect if {
 }
 
 test_AllowTeamsConsumer_Incorrect_multi if {
-    PolicyId := "MS.TEAMS.5.1v1"
+    PolicyId := "MS.TEAMS.2.2v1"
 
     Output := tests with input as {
         "federation_configuration": [
@@ -185,10 +185,10 @@ test_AllowTeamsConsumer_Incorrect_multi if {
     RuleOutput[0].ReportDetails == "Requirement met"
 }
 #
-# Policy 2
+# Policy 2.3
 #--
 test_AllowTeamsConsumer_Correct if {
-    PolicyId := "MS.TEAMS.5.2v1"
+    PolicyId := "MS.TEAMS.2.3v1"
 
     Output := tests with input as {
         "federation_configuration": [
@@ -208,7 +208,7 @@ test_AllowTeamsConsumer_Correct if {
 }
 
 test_AllowTeamsConsumer_Correct_multi if {
-    PolicyId := "MS.TEAMS.5.2v1"
+    PolicyId := "MS.TEAMS.2.3v1"
 
     Output := tests with input as {
         "federation_configuration": [
@@ -233,7 +233,7 @@ test_AllowTeamsConsumer_Correct_multi if {
 }
 
 test_AllowTeamsConsumer_Incorrect if {
-    PolicyId := "MS.TEAMS.5.2v1"
+    PolicyId := "MS.TEAMS.2.3v1"
     
     Output := tests with input as {
         "federation_configuration": [
@@ -253,7 +253,7 @@ test_AllowTeamsConsumer_Incorrect if {
 }
 
 test_AllowTeamsConsumer_Incorrect_multi if {
-    PolicyId := "MS.TEAMS.5.2v1"
+    PolicyId := "MS.TEAMS.2.3v1"
     
     Output := tests with input as {
         "federation_configuration": [

@@ -3,10 +3,10 @@ import future.keywords
 
 
 #
-# Policy 1
+# Policy 1.2
 #--
 test_AnonymousMeetingStart_Correct_V1 if {
-    PolicyId := "MS.TEAMS.2.1v1"
+    PolicyId := "MS.TEAMS.1.2v1"
     
     Output := tests with input as {
         "meeting_policies": [
@@ -25,7 +25,7 @@ test_AnonymousMeetingStart_Correct_V1 if {
 }
 
 test_AnonymousMeetingStart_Correct_V2 if {
-    PolicyId := "MS.TEAMS.2.1v1"
+    PolicyId := "MS.TEAMS.1.2v1"
 
     Output := tests with input as {
         "meeting_policies": [
@@ -44,7 +44,7 @@ test_AnonymousMeetingStart_Correct_V2 if {
 }
 
 test_AnonymousMeetingStart_Incorrect_V1 if {
-    PolicyId := "MS.TEAMS.2.1v1"
+    PolicyId := "MS.TEAMS.1.2v1"
 
     Output := tests with input as {
         "meeting_policies": [
@@ -63,7 +63,7 @@ test_AnonymousMeetingStart_Incorrect_V1 if {
 }
 
 test_AnonymousMeetingStart_Incorrect_V2 if {
-    PolicyId := "MS.TEAMS.2.1v1"
+    PolicyId := "MS.TEAMS.1.2v1"
 
     Output := tests with input as {
         "meeting_policies": [
@@ -82,7 +82,7 @@ test_AnonymousMeetingStart_Incorrect_V2 if {
 }
 
 test_AnonymousMeetingStart_MultiplePolicies if {
-    PolicyId := "MS.TEAMS.2.1v1"
+    PolicyId := "MS.TEAMS.1.2v1"
 
     Output := tests with input as {
         "meeting_policies": [

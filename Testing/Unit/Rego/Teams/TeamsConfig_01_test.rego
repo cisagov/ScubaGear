@@ -3,7 +3,7 @@ import future.keywords
 
 
 #
-# Policy 1
+# Policy 1.1
 #--
 test_ExternalParticipantControl_Correct_V1 if {
     PolicyId := "MS.TEAMS.1.1v1"

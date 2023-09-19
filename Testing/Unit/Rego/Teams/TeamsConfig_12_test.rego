@@ -3,10 +3,10 @@ import future.keywords
 
 
 #
-# Policy 1
+# Policy 7.1 and 7.2
 #--
 test_3rdParty_Correct_V1 if {
-    PolicyId := "MS.TEAMS.12.1v1"
+    PolicyId := "MS.TEAMS.7.1v1"
 
     Output := tests with input as { }
 
@@ -21,7 +21,7 @@ test_3rdParty_Correct_V1 if {
 # Policy 2
 #--
 test_3rdParty_Correct_V2 if {
-    PolicyId := "MS.TEAMS.12.2v1"
+    PolicyId := "MS.TEAMS.7.2v1"
 
     Output := tests with input as { }
 

@@ -3,10 +3,10 @@ import future.keywords
 
 
 #
-# Policy 1
+# Policy 2.1
 #--
 test_AllowFederatedUsers_Correct_V1 if {
-    PolicyId := "MS.TEAMS.4.1v1"
+    PolicyId := "MS.TEAMS.2.1v1"
 
     Output := tests with input as {
         "federation_configuration": [
@@ -26,7 +26,7 @@ test_AllowFederatedUsers_Correct_V1 if {
 }
 
 test_AllowFederatedUsers_Correct_V2 if {
-    PolicyId := "MS.TEAMS.4.1v1"
+    PolicyId := "MS.TEAMS.2.1v1"
 
     Output := tests with input as {
         "federation_configuration": [
@@ -50,7 +50,7 @@ test_AllowFederatedUsers_Correct_V2 if {
 }
 
 test_AllowedDomains_Correct if {
-    PolicyId := "MS.TEAMS.4.1v1"
+    PolicyId := "MS.TEAMS.2.1v1"
 
     Output := tests with input as {
         "federation_configuration":[
@@ -74,7 +74,7 @@ test_AllowedDomains_Correct if {
 }
 
 test_AllowedDomains_Incorrect if {
-    PolicyId := "MS.TEAMS.4.1v1"
+    PolicyId := "MS.TEAMS.2.1v1"
 
     Output := tests with input as {
         "federation_configuration": [
@@ -94,7 +94,7 @@ test_AllowedDomains_Incorrect if {
 }
 
 test_AllowFederatedUsers_Correct_V1_multi if {
-    PolicyId := "MS.TEAMS.4.1v1"
+    PolicyId := "MS.TEAMS.2.1v1"
 
     Output := tests with input as {
         "federation_configuration": [
@@ -119,7 +119,7 @@ test_AllowFederatedUsers_Correct_V1_multi if {
 }
 
 test_AllowFederatedUsers_Correct_V2_multi if {
-    PolicyId := "MS.TEAMS.4.1v1"
+    PolicyId := "MS.TEAMS.2.1v1"
 
     Output := tests with input as {
         "federation_configuration": [
@@ -153,7 +153,7 @@ test_AllowFederatedUsers_Correct_V2_multi if {
 
 
 test_AllowedDomains_Correct_multi if {
-    PolicyId := "MS.TEAMS.4.1v1"
+    PolicyId := "MS.TEAMS.2.1v1"
 
     Output := tests with input as {
         "federation_configuration":[
@@ -186,7 +186,7 @@ test_AllowedDomains_Correct_multi if {
 }
 
 test_AllowedDomains_Incorrect_multi if {
-    PolicyId := "MS.TEAMS.4.1v1"
+    PolicyId := "MS.TEAMS.2.1v1"
 
     Output := tests with input as {
         "federation_configuration":[
@@ -211,7 +211,7 @@ test_AllowedDomains_Incorrect_multi if {
 }
 
 #
-# Policy 2
+# Policy 2 - delete this
 #--
 test_AllowAnonymousUsersToJoinMeeting_Correct_V1 if {
     ControlNumber := "Teams 2.4"

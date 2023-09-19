@@ -3,10 +3,10 @@ import future.keywords
 
 
 #
-# Policy 1
+# Policy 1.6
 #--
 test_AllowCloudRecording_Correct if {
-    PolicyId := "MS.TEAMS.9.1v1"
+    PolicyId := "MS.TEAMS.1.6v1"
 
     Output := tests with input as {
         "meeting_policies": [
@@ -25,7 +25,7 @@ test_AllowCloudRecording_Correct if {
 }
 
 test_AllowCloudRecording_Incorrect if {
-    PolicyId := "MS.TEAMS.9.1v1"
+    PolicyId := "MS.TEAMS.1.6v1"
 
     Output := tests with input as {
         "meeting_policies": [
@@ -44,7 +44,7 @@ test_AllowCloudRecording_Incorrect if {
 }
 
 test_AllowCloudRecording_Multiple if {
-    PolicyId := "MS.TEAMS.9.1v1"
+    PolicyId := "MS.TEAMS.1.6v1"
 
     Output := tests with input as {
         "meeting_policies": [

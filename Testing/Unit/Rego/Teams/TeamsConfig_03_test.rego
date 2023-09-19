@@ -3,10 +3,10 @@ import future.keywords
 
 
 #
-# Policy 1
+# Policy 1.3, 1.4, and 1.5
 #--
 test_meeting_policies_Correct if {
-    PolicyId := "MS.TEAMS.3.1v1"
+    PolicyId := "MS.TEAMS.1.3v1"
 
     Output := tests with input as {
         "meeting_policies": [
@@ -26,7 +26,7 @@ test_meeting_policies_Correct if {
 }
 
 test_AllowPSTNUsersToBypassLobby_Incorrect if {
-    PolicyId := "MS.TEAMS.3.1v1"
+    PolicyId := "MS.TEAMS.1.3v1"
 
     Output := tests with input as {
         "meeting_policies": [
@@ -46,7 +46,7 @@ test_AllowPSTNUsersToBypassLobby_Incorrect if {
 }
 
 test_AutoAdmittedUsers_Incorrect if {
-    PolicyId := "MS.TEAMS.3.1v1"
+    PolicyId := "MS.TEAMS.1.3v1"
 
     Output := tests with input as {
         "meeting_policies": [
@@ -67,7 +67,7 @@ test_AutoAdmittedUsers_Incorrect if {
 
 # It shouldn't matter that the custom policy is incorrect as this policy only applies to the Global policy
 test_Multiple_Correct if {
-    PolicyId := "MS.TEAMS.3.1v1"
+    PolicyId := "MS.TEAMS.1.3v1"
 
     Output := tests with input as {
         "meeting_policies": [
@@ -92,10 +92,10 @@ test_Multiple_Correct if {
 }
 
 #
-# Policy 2
+# Policy 1.4
 #--
 test_AutoAdmittedUsers_Correct_V1 if {
-    PolicyId := "MS.TEAMS.3.2v1"
+    PolicyId := "MS.TEAMS.1.4v1"
 
     Output := tests with input as {
         "meeting_policies": [
@@ -114,7 +114,7 @@ test_AutoAdmittedUsers_Correct_V1 if {
 }
 
 test_AutoAdmittedUsers_Correct_V2 if {
-    PolicyId := "MS.TEAMS.3.2v1"
+    PolicyId := "MS.TEAMS.1.4v1"
 
     Output := tests with input as {
         "meeting_policies": [
@@ -133,7 +133,7 @@ test_AutoAdmittedUsers_Correct_V2 if {
 }
 
 test_AutoAdmittedUsers_Incorrect_V2 if {
-    PolicyId := "MS.TEAMS.3.2v1"
+    PolicyId := "MS.TEAMS.1.4v1"
 
     Output := tests with input as {
         "meeting_policies": [
@@ -152,7 +152,7 @@ test_AutoAdmittedUsers_Incorrect_V2 if {
 }
 
 test_AutoAdmittedUsers_Incorrect_V3 if {
-    PolicyId := "MS.TEAMS.3.2v1"
+    PolicyId := "MS.TEAMS.1.4v1"
 
     Output := tests with input as {
         "meeting_policies": [
