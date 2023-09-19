@@ -1,6 +1,5 @@
 ProductName: aad
 TestPlan:
-
   - PolicyId: MS.AAD.1.1v1
     TestDriver: RunScuba
     Tests:
@@ -150,18 +149,41 @@ TestPlan:
         Preconditions:
           - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
-              displayName: MS.AAD.3.2v1 If phishing-resistant MFA has not been enforced yet, then an alternative MFA method SHALL be enforced for all users
+              displayName: MS.AAD.3.2v1 If phishing-resistant MFA has not been enforced, an alternative MFA method SHALL be enforced for all users
               updates:
                 State: enabledForReportingButNotEnforced  
         Postconditions: []
         ExpectedResult: false        
-      - TestDescription: MS.AAD.3.2v1 Compliant case
+      - TestDescription: MS.AAD.3.2v1 Compliant case - Non specific MFA method is enforced
         Preconditions:
           - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
-              displayName: MS.AAD.3.2v1 If phishing-resistant MFA has not been enforced yet, then an alternative MFA method SHALL be enforced for all users
+              displayName: MS.AAD.3.2v1 If phishing-resistant MFA has not been enforced, an alternative MFA method SHALL be enforced for all users
               updates:
                 State: enabled  
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.AAD.3.2v1 Compliant case - Phishing-resistant MFA is enforced so automatically pass
+        Preconditions:
+          - Command: UpdateCachedConditionalAccessPolicyByName
+            Splat:
+              displayName: Automated Test 1 - DO NOT MODIFY
+              updates:
+                State: enabled  
+                Conditions.Applications.IncludeApplications: 
+                  - "All"
+                Conditions.Applications.ExcludeApplications: [] 
+                Conditions.Users.IncludeUsers:
+                  - "All"
+                GrantControls.AuthenticationStrength.AllowedCombinations:    
+                  - "windowsHelloForBusiness"
+                  - "fido2"
+                  - "x509CertificateMultiFactor"
+          - Command: UpdateCachedConditionalAccessPolicyByName
+            Splat:
+              displayName: MS.AAD.3.2v1 If phishing-resistant MFA has not been enforced, an alternative MFA method SHALL be enforced for all users
+              updates:
+                State: enabledForReportingButNotEnforced  
         Postconditions: []
         ExpectedResult: true
 
@@ -259,7 +281,7 @@ TestPlan:
   - PolicyId: MS.AAD.3.7v1
     TestDriver: RunCached
     Tests:
-      - TestDescription: MS.AAD.3.7v1 compliantDevice
+      - TestDescription: MS.AAD.3.7v1 Non-Compliant case - require both compliant and domain joined device only for specific user
         Preconditions:
           - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
@@ -268,13 +290,48 @@ TestPlan:
                 State: enabled  
                 GrantControls.BuiltInControls: 
                   - "compliantDevice"
+                  - "domainJoinedDevice"
+                GrantControls.Operator: AND
+                Conditions.Users.IncludeUsers:
+                  - "e897fa07-cfcc-4aeb-9b61-afbf173fb9df" 
+                Conditions.Applications.IncludeApplications:
+                  - "All"         
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.AAD.3.7v1 Compliant case - require both compliant and domain joined device
+        Preconditions:
+          - Command: UpdateCachedConditionalAccessPolicyByName
+            Splat:
+              displayName: Automated Test 1 - DO NOT MODIFY
+              updates:
+                State: enabled  
+                GrantControls.BuiltInControls: 
+                  - "compliantDevice"
+                  - "domainJoinedDevice"
+                GrantControls.Operator: AND
                 Conditions.Users.IncludeUsers:
                   - "All" 
-                Conditions.Applications.ExcludeApplications:
+                Conditions.Applications.IncludeApplications:
                   - "All"         
         Postconditions: []
         ExpectedResult: true
-      - TestDescription: MS.AAD.3.7v1 domainJoinedDevice
+      - TestDescription: MS.AAD.3.7v1 Compliant case - compliant Device required
+        Preconditions:
+          - Command: UpdateCachedConditionalAccessPolicyByName
+            Splat:
+              displayName: Automated Test 1 - DO NOT MODIFY
+              updates:
+                State: enabled  
+                GrantControls.BuiltInControls: 
+                  - "compliantDevice"
+                GrantControls.Operator: OR
+                Conditions.Users.IncludeUsers:
+                  - "All" 
+                Conditions.Applications.IncludeApplications:
+                  - "All"         
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.AAD.3.7v1 Compliant case - domain Joined Device required
         Preconditions:
           - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
@@ -283,13 +340,14 @@ TestPlan:
                 State: enabled  
                 GrantControls.BuiltInControls: 
                   - "domainJoinedDevice"
+                GrantControls.Operator: OR
                 Conditions.Users.IncludeUsers:
                   - "All" 
-                Conditions.Applications.ExcludeApplications:
+                Conditions.Applications.IncludeApplications:
                   - "All"         
         Postconditions: []
         ExpectedResult: true    
-      - TestDescription: MS.AAD.3.7v1 Default
+      - TestDescription: MS.AAD.3.7v1 Compliant case - compliant or domain joined device required
         Preconditions:
           - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
@@ -299,9 +357,10 @@ TestPlan:
                 GrantControls.BuiltInControls: 
                   - "compliantDevice"
                   - "domainJoinedDevice"
+                GrantControls.Operator: OR
                 Conditions.Users.IncludeUsers:
                   - "All" 
-                Conditions.Applications.ExcludeApplications:
+                Conditions.Applications.IncludeApplications:
                   - "All"         
         Postconditions: []
         ExpectedResult: true
@@ -309,7 +368,7 @@ TestPlan:
   - PolicyId: MS.AAD.3.8v1
     TestDriver: RunCached
     Tests:
-      - TestDescription: MS.AAD.3.8v1 No registersecurityinfo
+      - TestDescription: MS.AAD.3.8v1 Non-Compliant case - Managed device to register MFA only for a specific user
         Preconditions:
           - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
@@ -319,13 +378,14 @@ TestPlan:
                 GrantControls.BuiltInControls: 
                   - "compliantDevice"
                   - "domainJoinedDevice"
+                GrantControls.Operator: OR
                 Conditions.Applications.IncludeUserActions:
-                  - "no action"
+                  - "urn:user:registersecurityinfo"
                 Conditions.Users.IncludeUsers:
-                  - "All"  
+                  - "d4ff2a72-7c1f-4690-b61d-aaaa6976bca3"  
         Postconditions: []
-        ExpectedResult: false    
-      - TestDescription: MS.AAD.3.8v1 Default
+        ExpectedResult: false
+      - TestDescription: MS.AAD.3.8v1 Compliant case - Compliant or domain managed device to register MFA
         Preconditions:
           - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
@@ -335,6 +395,7 @@ TestPlan:
                 GrantControls.BuiltInControls: 
                   - "compliantDevice"
                   - "domainJoinedDevice"
+                GrantControls.Operator: OR
                 Conditions.Applications.IncludeUserActions:
                   - "urn:user:registersecurityinfo"
                 Conditions.Users.IncludeUsers:
@@ -350,7 +411,57 @@ TestPlan:
         Postconditions: []
         IsNotChecked: true
         ExpectedResult: false
+  - PolicyId: MS.AAD.4.1v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.AAD.4.1v1 Not Checked
+        Preconditions: []
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false
 
+  - PolicyId: MS.AAD.5.1v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.AAD.5.1v1 Non-Compliant case - Allow users to register apps 
+        Preconditions:
+          - Command: Update-MgPolicyAuthorizationPolicy
+            Splat:
+              AuthorizationPolicyId: authorizationPolicy
+              DefaultUserRolePermissions:
+                AllowedToCreateApps: true
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.AAD.5.1v1 Compliant case - Do NOT allow users to register apps 
+        Preconditions:
+          - Command: Update-MgPolicyAuthorizationPolicy
+            Splat:
+              AuthorizationPolicyId: authorizationPolicy
+              DefaultUserRolePermissions:
+                AllowedToCreateApps: false
+        Postconditions: []
+        ExpectedResult: true  
+  - PolicyId: MS.AAD.5.1v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.AAD.5.1v1 Non-Compliant case - Allow users to register apps 
+        Preconditions:
+          - Command: Update-MgPolicyAuthorizationPolicy
+            Splat:
+              AuthorizationPolicyId: authorizationPolicy
+              DefaultUserRolePermissions:
+                AllowedToCreateApps: true
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.AAD.5.1v1 Compliant case - Do NOT allow users to register apps 
+        Preconditions:
+          - Command: Update-MgPolicyAuthorizationPolicy
+            Splat:
+              AuthorizationPolicyId: authorizationPolicy
+              DefaultUserRolePermissions:
+                AllowedToCreateApps: false
+        Postconditions: []
+        ExpectedResult: true  
   - PolicyId: MS.AAD.5.1v1
     TestDriver: RunScuba
     Tests:
@@ -393,26 +504,85 @@ TestPlan:
               PermissionGrantPolicyIdsAssignedToDefaultUserRole: []
         Postconditions: []
         ExpectedResult: true
-
-  ######### Come back to this one when we figure out the problems with the Cmdlets - Crutch will try Beta version
-  - PolicyId: MS.AAD.5.3v1
+  - PolicyId: MS.AAD.5.2v1
     TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.AAD.5.3v1 Non-Compliant case - No Admin Consent workflow configured
+      - TestDescription: MS.AAD.5.2v1 Non-Compliant case - Allow users to consent to apps
         Preconditions:
-          - Command: Update-MgBetaPolicyAdminConsentRequestPolicy
+          - Command: Update-MgPolicyAuthorizationPolicy
             Splat:
-              IsEnabled: false
+              AuthorizationPolicyId: authorizationPolicy
+              PermissionGrantPolicyIdsAssignedToDefaultUserRole:
+                - ManagePermissionGrantsForSelf.microsoft-user-default-legacy
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.AAD.5.3v1 Compliant case - Admin Consent workflow is configured
+      - TestDescription: MS.AAD.5.2v1 Compliant case - Do NOT allow users to consent to apps
         Preconditions:
-          - Command: Update-MgBetaPolicyAdminConsentRequestPolicy
+          - Command: Update-MgPolicyAuthorizationPolicy
             Splat:
-              IsEnabled: true
+              AuthorizationPolicyId: authorizationPolicy
+              PermissionGrantPolicyIdsAssignedToDefaultUserRole: []
         Postconditions: []
         ExpectedResult: true
+
+  ########## Come back to this one when we figure out the problem with the Cmdlet error - Crutch will try Beta version
+  # - PolicyId: MS.AAD.5.3v1
+  #   TestDriver: RunScuba
+  #   Tests:
+  #     - TestDescription: MS.AAD.5.3v1 Non-Compliant case - No Admin Consent workflow configured
+  #       Preconditions:
+  #         - Command: Update-MgPolicyAdminConsentRequestPolicy
+  #           Splat:
+  #             IsEnabled: false
+  #       Postconditions: []
+  #       ExpectedResult: false
+      # - TestDescription: MS.AAD.5.3v1 Compliant case - Admin Consent workflow is configured
+      #   Preconditions:
+      #     - Command: Update-MgPolicyAdminConsentRequestPolicy
+      #       Splat:
+      #         IsEnabled: true
+      #   Postconditions: []
+      #   ExpectedResult: true
   
+  - PolicyId: MS.AAD.5.4v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.AAD.5.4v1 Non-Compliant - Allow group owners to consent to apps
+        Preconditions: 
+          - Command: UpdateDirectorySettingByName
+            Splat:
+              DisplayName: Consent Policy Settings
+              Updates:
+                BodyParameter:
+                  Values:
+                    - Name: EnableGroupSpecificConsent
+                      Value: 'true'
+                    - Name: BlockUserConsentForRiskyApps
+                      Value: 'false'  
+                    - Name: EnableAdminConsentRequests
+                      Value: 'false'
+                    - Name: ConstrainGroupSpecificConsentToMembersOfGroupId
+                      Value: ""  
+        Postconditions: []
+        ExpectedResult: false    
+      - TestDescription: MS.AAD.5.4v1 Compliant - Do NOT allow group owners to consent to apps
+        Preconditions: 
+          - Command: UpdateDirectorySettingByName
+            Splat:
+              DisplayName: Consent Policy Settings
+              Updates:
+                BodyParameter:
+                  Values:
+                    - Name: EnableGroupSpecificConsent
+                      Value: 'false'
+                    - Name: BlockUserConsentForRiskyApps
+                      Value: 'false'  
+                    - Name: EnableAdminConsentRequests
+                      Value: 'false'
+                    - Name: ConstrainGroupSpecificConsentToMembersOfGroupId
+                      Value: ""  
+        Postconditions: []
+        ExpectedResult: true
   - PolicyId: MS.AAD.5.4v1
     TestDriver: RunScuba
     Tests:
@@ -461,237 +631,520 @@ TestPlan:
         Postconditions: []
         IsNotChecked: true
         ExpectedResult: false
+  - PolicyId: MS.AAD.6.1v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.AAD.6.1v1 Not Checked
+        Preconditions: []
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false
 
   - PolicyId: MS.AAD.7.1v1
     TestDriver: RunCached
     Tests:
-      - TestDescription: MS.AAD.7.1v1 To Many Admin
+      - TestDescription: MS.AAD.7.1v1 Non-Compliant case - Too many Global Admins
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
               Updates:
                 privileged_users:
-                  User1:
+                  16b4d5c2-71c9-4644-8728-74e3a8324d81:
                     DisplayName: Test User1
                     roles: 
-                      - Privileged Role Administrator
                       - Global Administrator
-                  User2:
+                    OnPremisesImmutableId: null
+                  26b4d5c2-71c9-4644-8728-74e3a8324d82:
                     DisplayName: Test User2
                     roles: 
                       - Global Administrator
-                  User3:
+                      - Exchange Administrator
+                    OnPremisesImmutableId: null
+                  36b4d5c2-71c9-4644-8728-74e3a8324d83:
                     DisplayName: Test User3
-                    roles: 
-                      - Privileged Role Administrator
+                    roles:
+                      - User Administrator
                       - Global Administrator
-                  User4:
+                    OnPremisesImmutableId: null
+                  46b4d5c2-71c9-4644-8728-74e3a8324d84:
                     DisplayName: Test User4
-                    roles: 
+                    roles:
+                      - Hybrid Identity Administrator
                       - Global Administrator
-                  User5:
+                    OnPremisesImmutableId: null
+                  56b4d5c2-71c9-4644-8728-74e3a8324d85:
                     DisplayName: Test User5
                     roles: 
-                      - Privileged Role Administrator
                       - Global Administrator
-                  User6:
+                    OnPremisesImmutableId: null
+                  66b4d5c2-71c9-4644-8728-74e3a8324d86:
                     DisplayName: Test User6
                     roles: 
                       - Global Administrator
-                  User7:
+                      - Sharepoint Administrator
+                    OnPremisesImmutableId: null
+                  76b4d5c2-71c9-4644-8728-74e3a8324d87:
                     DisplayName: Test User7
                     roles: 
-                      - Privileged Role Administrator
                       - Global Administrator
-                  User8:
+                    OnPremisesImmutableId: null
+                  86b4d5c2-71c9-4644-8728-74e3a8324d88:
                     DisplayName: Test User8
                     roles: 
                       - Global Administrator
-                  User9:
+                    OnPremisesImmutableId: null
+                  96b4d5c2-71c9-4644-8728-74e3a8324d89:
                     DisplayName: Test User9
                     roles: 
                       - Global Administrator
+                    OnPremisesImmutableId: null
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.AAD.7.1v1 To Few Admin
-        Preconditions: 
+      - TestDescription: MS.AAD.7.1v1 Non-Compliant case - Too few Global Admins
+        Preconditions:
           - Command: UpdateProviderExport
             Splat:
               Updates:
                 privileged_users:
-                  User1:
+                  16b4d5c2-71c9-4644-8728-74e3a8324d81:
                     DisplayName: Test User1
                     roles: 
-                      - Privileged Role Administrator
                       - Global Administrator
+                    OnPremisesImmutableId: null
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.AAD.7.1v1 Default
-        Preconditions: 
+      - TestDescription: MS.AAD.7.1v1 Compliant case - Max number of Global Admins
+        Preconditions:
           - Command: UpdateProviderExport
             Splat:
               Updates:
                 privileged_users:
-                  User1:
+                  16b4d5c2-71c9-4644-8728-74e3a8324d81:
                     DisplayName: Test User1
                     roles: 
-                      - Privileged Role Administrator
                       - Global Administrator
-                  User2:
+                    OnPremisesImmutableId: null
+                  26b4d5c2-71c9-4644-8728-74e3a8324d82:
                     DisplayName: Test User2
                     roles: 
                       - Global Administrator
+                      - Exchange Administrator
+                    OnPremisesImmutableId: null
+                  36b4d5c2-71c9-4644-8728-74e3a8324d83:
+                    DisplayName: Test User3
+                    roles:
+                      - User Administrator
+                      - Global Administrator
+                    OnPremisesImmutableId: null
+                  46b4d5c2-71c9-4644-8728-74e3a8324d84:
+                    DisplayName: Test User4
+                    roles:
+                      - Hybrid Identity Administrator
+                      - Global Administrator
+                    OnPremisesImmutableId: null
+                  56b4d5c2-71c9-4644-8728-74e3a8324d85:
+                    DisplayName: Test User5
+                    roles: 
+                      - Global Administrator
+                    OnPremisesImmutableId: null
+                  66b4d5c2-71c9-4644-8728-74e3a8324d86:
+                    DisplayName: Test User6
+                    roles: 
+                      - Global Administrator
+                      - Sharepoint Administrator
+                    OnPremisesImmutableId: null
+                  76b4d5c2-71c9-4644-8728-74e3a8324d87:
+                    DisplayName: Test User7
+                    roles: 
+                      - Global Administrator
+                    OnPremisesImmutableId: null
+                  86b4d5c2-71c9-4644-8728-74e3a8324d88:
+                    DisplayName: Test User8
+                    roles: 
+                      - Global Administrator
+                    OnPremisesImmutableId: null
         Postconditions: []
         ExpectedResult: true
-  - PolicyId: MS.AAD.7.2v1
-    TestDriver: RunCached
-    Tests:
-      - TestDescription: MS.AAD.7.2v1 Low Score
-        Preconditions: 
-          - Command: UpdateProviderExport
-            Splat:
-              Updates:
-                - secure_score[0]:
-                    Score: 0.2
-        Postconditions: []
-        IsNotChecked: true
-        ExpectedResult: false
-      - TestDescription: MS.AAD.7.2v1 High Score
-        Preconditions: 
-          - Command: UpdateProviderExport
-            Splat:
-              Updates:
-                - secure_score[0]:
-                    Score: 1
-        Postconditions: []
-        IsNotChecked: true
-        ExpectedResult: false        
+  
+  ########## Come back to this one when we figure out changes to this policy check due to secure score after the stand-up
+  # - PolicyId: MS.AAD.7.2v1
+  #   TestDriver: RunCached
+  #   Tests:
+  #     - TestDescription: MS.AAD.7.2v1 Low Score
+  #       Preconditions: 
+  #         - Command: UpdateProviderExport
+  #           Splat:
+  #             Updates:
+  #               - secure_score[0]:
+  #                   Score: 0.2
+  #       Postconditions: []
+  #       IsNotChecked: true
+  #       ExpectedResult: false
+  #     - TestDescription: MS.AAD.7.2v1 High Score
+  #       Preconditions: 
+  #         - Command: UpdateProviderExport
+  #           Splat:
+  #             Updates:
+  #               - secure_score[0]:
+  #                   Score: 1
+  #       Postconditions: []
+  #       IsNotChecked: true
+  #       ExpectedResult: false        
+  
   - PolicyId: MS.AAD.7.3v1
     TestDriver: RunCached
     Tests:
-      - TestDescription: MS.AAD.7.3v1 On Prem Admin
-        Preconditions:  
+      - TestDescription: MS.AAD.7.3v1 Non-Compliant case - Three on-prem admins
+        Preconditions:
           - Command: UpdateProviderExport
             Splat:
               Updates:
                 privileged_users:
-                  User1:
+                  16b4d5c2-71c9-4644-8728-74e3a8324d81:
                     DisplayName: Test User1
-                    OnPremisesImmutableId: Test On-Prem User1
                     roles: 
-                      - Privileged Role Administrator
                       - Global Administrator
+                    OnPremisesImmutableId: admin1
+                  26b4d5c2-71c9-4644-8728-74e3a8324d82:
+                    DisplayName: Test User2
+                    roles: 
+                      - Development Administrator
+                      - Exchange Administrator
+                    OnPremisesImmutableId: admin2
+                  36b4d5c2-71c9-4644-8728-74e3a8324d83:
+                    DisplayName: Test User3
+                    roles:
+                      - Billing Administrator
+                      - Hybrid Identity Administrator
+                    OnPremisesImmutableId: admin3
+                  46b4d5c2-71c9-4644-8728-74e3a8324d84:
+                    DisplayName: Test User4
+                    roles:
+                      - Hybrid Identity Administrator
+                      - Global Administrator
+                    OnPremisesImmutableId: null
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.AAD.7.3v1 Default
-        Preconditions:  
+      - TestDescription: MS.AAD.7.3v1 Compliant case - No on-prem admins
+        Preconditions:
           - Command: UpdateProviderExport
             Splat:
               Updates:
                 privileged_users:
-                  User1:
+                  16b4d5c2-71c9-4644-8728-74e3a8324d81:
                     DisplayName: Test User1
-                    OnPremisesImmutableId: null
                     roles: 
-                      - Privileged Role Administrator
                       - Global Administrator
-                  User2:
+                    OnPremisesImmutableId: null
+                  26b4d5c2-71c9-4644-8728-74e3a8324d82:
                     DisplayName: Test User2
-                    OnPremisesImmutableId: null
                     roles: 
-                      - Global Administrator
+                      - Development Administrator
+                      - Exchange Administrator
+                    OnPremisesImmutableId: null
+                  36b4d5c2-71c9-4644-8728-74e3a8324d83:
+                    DisplayName: Test User3
+                    roles:
+                      - Billing Administrator
+                      - Hybrid Identity Administrator
+                    OnPremisesImmutableId: null
         Postconditions: []
         ExpectedResult: true
+
   - PolicyId: MS.AAD.7.4v1
     TestDriver: RunCached
-    ToDo: Change to RunScuba? Need better tests
     Tests:
-      - TestDescription: MS.AAD.7.4v1 Default
-        Preconditions:  
-          - Command: UpdateProviderExport
-            Splat:
-              Updates:
-                privileged_roles[0].Assignments[0].EndDateTime: "/Date(1672947244397)/"
-        Postconditions: []
-        ExpectedResult: false
-      - TestDescription: MS.AAD.7.4v1 Default
+      - TestDescription: MS.AAD.7.4v1 Non-Compliant case - User with permanent active assignment
+      #### This test case guarantees that at least one privileged role assignment has an EndDateTime of null
         Preconditions:  
           - Command: UpdateProviderExport
             Splat:
               Updates:
                 privileged_roles[0].Assignments[0].EndDateTime: null
         Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.AAD.7.4v1 Compliant case - No users with permanent assignment
+        Preconditions:  
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                privileged_roles:
+                  - DisplayName: Global Administrator
+                    RoleTemplateId: "62e90394-69f5-4237-9190-012177145e10"
+                    Assignments:
+                      - EndDateTime: "/Date(1672947244397)/"
+                        PrincipalId : "ae71e61c-f465-4db6-8d26-5f3e52bdd800"
+                  - DisplayName: User Administrator
+                    RoleTemplateId: "fe930be7-5e62-47db-91af-98c3a49a38b1"
+                    Assignments:
+                      - EndDateTime: "/Date(1672947244397)/"
+                        PrincipalId : "ce71e61c-f465-4db6-8d26-5f3e52bdd801"
+        Postconditions: []
         ExpectedResult: true        
+  
   - PolicyId: MS.AAD.7.5v1
     TestDriver: RunCached
-    ToDo: Change to RunScuba? Need better tests
     Tests:
-      - TestDescription: MS.AAD.7.5v1 Null Start
-        Preconditions:           
+      - TestDescription: MS.AAD.7.5v1 Non-Compliant case - User assigned outside of PIM
+      #### This test case guarantees that at least one privileged role assignment has an StartDateTime of null
+        Preconditions:  
           - Command: UpdateProviderExport
             Splat:
               Updates:
                 privileged_roles[0].Assignments[0].StartDateTime: null
         Postconditions: []
         ExpectedResult: false
+      - TestDescription: MS.AAD.7.5v1 Compliant case - No users assigned outside of PIM
+        Preconditions:  
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                privileged_roles:
+                  - DisplayName: Global Administrator
+                    RoleTemplateId: "62e90394-69f5-4237-9190-012177145e10"
+                    Assignments:
+                      - StartDateTime: "/Date(1672947244397)/"
+                        PrincipalId : "ae71e61c-f465-4db6-8d26-5f3e52bdd800"
+                    Rules: []
+                  - DisplayName: User Administrator
+                    RoleTemplateId: "fe930be7-5e62-47db-91af-98c3a49a38b1"
+                    Assignments:
+                      - StartDateTime: "/Date(1672947244397)/"
+                        PrincipalId : "ce71e61c-f465-4db6-8d26-5f3e52bdd801"
+                    Rules: []
+        Postconditions: []
+        ExpectedResult: true
+
   - PolicyId: MS.AAD.7.6v1
     TestDriver: RunCached
     Tests:
-      - TestDescription: MS.AAD.7.6v1 Default
+      - TestDescription: MS.AAD.7.6v1 Non-Compliant case - Global admin activation does not require approval
         Preconditions:  
           - Command: UpdateProviderExport
             Splat:
               Updates:
-                privileged_roles[0].Rules[0].Id: Approval_EndUser_Assignment
-                privileged_roles[0].Rules[0].AdditionalProperties.setting.isApprovalRequired: false
-                privileged_roles[0].DisplayName: Not Global Administrator
+                privileged_roles:
+                  - DisplayName: Global Administrator
+                    RoleTemplateId: "62e90394-69f5-4237-9190-012177145e10"
+                    Rules:
+                      - Id :  "Approval_EndUser_Assignment"
+                        AdditionalProperties:
+                          setting:
+                            isApprovalRequired: false
+                  - DisplayName: User Administrator
+                    RoleTemplateId: "fe930be7-5e62-47db-91af-98c3a49a38b1"
+                    Rules:
+                      - Id :  "Approval_EndUser_Assignment"
+                        AdditionalProperties:
+                          setting:
+                            isApprovalRequired: true
         Postconditions: []
         ExpectedResult: false
+      - TestDescription: MS.AAD.7.6v1 Compliant case - Global admin activation requires approval
+        Preconditions:  
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                privileged_roles:
+                  - DisplayName: Global Administrator
+                    RoleTemplateId: "62e90394-69f5-4237-9190-012177145e10"
+                    Rules:
+                      - Id :  "Approval_EndUser_Assignment"
+                        AdditionalProperties:
+                          setting:
+                            isApprovalRequired: true
+                  - DisplayName: User Administrator
+                    RoleTemplateId: "fe930be7-5e62-47db-91af-98c3a49a38b1"
+                    Rules:
+                      - Id :  "Approval_EndUser_Assignment"
+                        AdditionalProperties:
+                          setting:
+                            isApprovalRequired: false
+        Postconditions: []
+        ExpectedResult: true
+
   - PolicyId: MS.AAD.7.7v1
     TestDriver: RunCached
-    ToDo: Changed to RunScuba
     Tests:
-      - TestDescription: MS.AAD.7.7v1 Default
+      - TestDescription: MS.AAD.7.7v1 Compliant case - Some roles with Eligible and Active assignments do NOT trigger an alert
         Preconditions:  
           - Command: UpdateProviderExport
             Splat:
               Updates:
-                privileged_roles[0].Rules[0].Id: Notification_Admin_Admin_Assignment
-                privileged_roles[0].Rules[0].AdditionalProperties.notificationRecipients[0]: "user@somewhere.org"
-                privileged_roles[0].DisplayName: Global Administrator
+                privileged_roles:
+                  - DisplayName: Global Administrator
+                    RoleTemplateId: "62e90394-69f5-4237-9190-012177145e10"
+                    Rules:
+                      - Id :  "Notification_Admin_Admin_Assignment"
+                        AdditionalProperties:
+                          notificationRecipients: []
+                      - Id :  "Notification_Admin_Admin_Eligibility"
+                        AdditionalProperties:
+                          notificationRecipients: ["test@example.com"]
+                  - DisplayName: User Administrator
+                    RoleTemplateId: "fe930be7-5e62-47db-91af-98c3a49a38b1"
+                    Rules:
+                      - Id :  "Notification_Admin_Admin_Assignment"
+                        AdditionalProperties:
+                          notificationRecipients: ["test@example.com","test2@example.com","test3@example.com"]
+                      - Id :  "Notification_Admin_Admin_Eligibility"
+                        AdditionalProperties:
+                          notificationRecipients: []
+                  - DisplayName: Privileged Role Administrator
+                    RoleTemplateId: "ae930be7-5e62-47db-91af-98c3a49a38ba"
+                    Rules:
+                      - Id :  "Notification_Admin_Admin_Assignment"
+                        AdditionalProperties:
+                          notificationRecipients: ["test@example.com","test2@example.com","test3@example.com"]
+                      - Id :  "Notification_Admin_Admin_Eligibility"
+                        AdditionalProperties:
+                          notificationRecipients: ["test@example.org"]
         Postconditions: []
         ExpectedResult: false
+      - TestDescription: MS.AAD.7.7v1 Compliant case - Eligible and Active assignments trigger an alert
+        Preconditions:  
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                privileged_roles:
+                  - DisplayName: Global Administrator
+                    RoleTemplateId: "62e90394-69f5-4237-9190-012177145e10"
+                    Rules:
+                      - Id :  "Notification_Admin_Admin_Assignment"
+                        AdditionalProperties:
+                          notificationRecipients: ["test@example.com"]
+                      - Id :  "Notification_Admin_Admin_Eligibility"
+                        AdditionalProperties:
+                          notificationRecipients: ["test@example.com"]
+                  - DisplayName: User Administrator
+                    RoleTemplateId: "fe930be7-5e62-47db-91af-98c3a49a38b1"
+                    Rules:
+                      - Id :  "Notification_Admin_Admin_Assignment"
+                        AdditionalProperties:
+                          notificationRecipients: ["test@example.com","test2@example.com","test3@example.com"]
+                      - Id :  "Notification_Admin_Admin_Eligibility"
+                        AdditionalProperties:
+                          notificationRecipients: ["test@example.com","test2@example.com"]
+        Postconditions: []
+        ExpectedResult: true
+
   - PolicyId: MS.AAD.7.8v1
     TestDriver: RunCached
-    ToDo: Changed to RunScuba
     Tests:
-      - TestDescription: MS.AAD.7.8v1 Default
+      - TestDescription: MS.AAD.7.8v1 Non-Compliant case - activation of Global Administrator does NOT triggers an alert
         Preconditions:  
           - Command: UpdateProviderExport
             Splat:
               Updates:
-                privileged_roles[0].Rules[0].Id: Notification_Admin_EndUser_Assignment
-                privileged_roles[0].Rules[0].AdditionalProperties.notificatinType: Email
-                privileged_roles[0].Rules[0].AdditionalProperties.notificationRecipients: []
-                privileged_roles[0].DisplayName: Global Administrator
+                privileged_roles:
+                  - DisplayName: Global Administrator
+                    RoleTemplateId: "62e90394-69f5-4237-9190-012177145e10"
+                    Rules:
+                      - Id :  "Notification_Admin_EndUser_Assignment"
+                        AdditionalProperties:
+                          notificationType: Email
+                          notificationRecipients: []
+                  - DisplayName: Privileged Role Administrator
+                    RoleTemplateId: "12e90394-69f5-4237-9190-012177145e11"
+                    Rules:
+                      - Id :  "Notification_Admin_EndUser_Assignment"
+                        AdditionalProperties:
+                          notificationType: Email
+                          notificationRecipients: ["test@example.com","jack@beanstalk.com"]
         Postconditions: []
         ExpectedResult: false
+      - TestDescription: MS.AAD.7.8v1 Compliant case - activation of Global Administrator triggers an alert
+        Preconditions:  
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                privileged_roles:
+                  - DisplayName: Global Administrator
+                    RoleTemplateId: "62e90394-69f5-4237-9190-012177145e10"
+                    Rules:
+                      - Id :  "Notification_Admin_EndUser_Assignment"
+                        AdditionalProperties:
+                          notificationType: Email
+                          notificationRecipients: ["test@example.com","jack@beanstalk.com"]
+                  - DisplayName: Privileged Role Administrator
+                    RoleTemplateId: "12e90394-69f5-4237-9190-012177145e11"
+                    Rules:
+                      - Id :  "Notification_Admin_EndUser_Assignment"
+                        AdditionalProperties:
+                          notificationType: Email
+                          notificationRecipients: []
+        Postconditions: []
+        ExpectedResult: true
+  
   - PolicyId: MS.AAD.7.9v1
     TestDriver: RunCached
-    ToDo: Changed to RunScuba
     Tests:
-      - TestDescription: MS.AAD.7.9v1 Default
+      - TestDescription: MS.AAD.7.9v1 Non-Compliant case - activation of other highly privileged roles do NOT trigger an alert
         Preconditions:  
           - Command: UpdateProviderExport
             Splat:
               Updates:
-                privileged_roles[0].Rules[0].Id: Notification_Admin_EndUser_Assignment
-                privileged_roles[0].Rules[0].AdditionalProperties.notificatinType: Email
-                privileged_roles[0].Rules[0].AdditionalProperties.notificationRecipients: []
-                privileged_roles[0].DisplayName: Privileged Role Administrator
+                privileged_roles:
+                  - DisplayName: Global Administrator
+                    RoleTemplateId: "62e90394-69f5-4237-9190-012177145e10"
+                    Rules:
+                      - Id :  "Notification_Admin_EndUser_Assignment"
+                        AdditionalProperties:
+                          notificationType: Email
+                          notificationRecipients: ["test@example.com","jack@beanstalk.com"]
+                  - DisplayName: Privileged Role Administrator
+                    RoleTemplateId: "12e90394-69f5-4237-9190-012177145e11"
+                    Rules:
+                      - Id :  "Notification_Admin_EndUser_Assignment"
+                        AdditionalProperties:
+                          notificationType: Email
+                          notificationRecipients: ["test@example.com","jack@beanstalk.com"]
+                  - DisplayName: User Administrator
+                    RoleTemplateId: "52e90394-69f5-4237-9190-012177145e15"
+                    Rules:
+                      - Id :  "Notification_Admin_EndUser_Assignment"
+                        AdditionalProperties:
+                          notificationType: Email
+                          notificationRecipients: []
+                  - DisplayName: Cloud Application Administrator
+                    RoleTemplateId: "62e90394-69f5-4237-9190-012177145e16"
+                    Rules:
+                      - Id :  "Notification_Admin_EndUser_Assignment"
+                        AdditionalProperties:
+                          notificationType: Email
+                          notificationRecipients: []                                                    
         Postconditions: []
         ExpectedResult: false
-  
+      - TestDescription: MS.AAD.7.9v1 Compliant case - activation of other highly privileged roles trigger an alert
+        Preconditions:  
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                privileged_roles:
+                  - DisplayName: Global Administrator
+                    RoleTemplateId: "62e90394-69f5-4237-9190-012177145e10"
+                    Rules:
+                      - Id :  "Notification_Admin_EndUser_Assignment"
+                        AdditionalProperties:
+                          notificationType: Email
+                          notificationRecipients: []
+                  - DisplayName: Privileged Role Administrator
+                    RoleTemplateId: "12e90394-69f5-4237-9190-012177145e11"
+                    Rules:
+                      - Id :  "Notification_Admin_EndUser_Assignment"
+                        AdditionalProperties:
+                          notificationType: Email
+                          notificationRecipients: ["test@example.com","jack@beanstalk.com"]
+                  - DisplayName: User Administrator
+                    RoleTemplateId: "52e90394-69f5-4237-9190-012177145e15"
+                    Rules:
+                      - Id :  "Notification_Admin_EndUser_Assignment"
+                        AdditionalProperties:
+                          notificationType: Email
+                          notificationRecipients: ["stopit@example.com","erase@beanstalk.com"]
+        Postconditions: []
+        ExpectedResult: true
+
   - PolicyId: MS.AAD.8.1v1
     TestDriver: RunScuba
     Tests:
