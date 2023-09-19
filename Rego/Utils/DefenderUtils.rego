@@ -136,7 +136,7 @@ ImpersonationProtectionSetting(Policies, IdentityString) := Policy if {
 
 ImpersonationProtectionConfig(PolicyID) := IncludedUsers if {
     SensitiveUsers := input.scuba_config.Defender[PolicyID].SensitiveAccounts
-    IncludedUsers := { trim_space(x) | some x in SensitiveUsers.IncludedUsers; x != null }
+    IncludedUsers := { lower(trim_space(x)) | some x in SensitiveUsers.IncludedUsers; x != null }
 } else := set()
 
 ImpersonationProtection(Policies, IdentityString, IncludedUsers) := {
@@ -150,7 +150,7 @@ ImpersonationProtection(Policies, IdentityString, IncludedUsers) := {
     Policy := ImpersonationProtectionSetting(Policies, IdentityString)
     count(Policy[0]) > 0
 
-    PolicyProtectedUsers := { x | x := Policy[0].TargetedUsersToProtect[_] }
+    PolicyProtectedUsers := { lower(x) | x := Policy[0].TargetedUsersToProtect[_] }
     count(PolicyProtectedUsers) > 0
     count(IncludedUsers - PolicyProtectedUsers) == 0
 } else := {

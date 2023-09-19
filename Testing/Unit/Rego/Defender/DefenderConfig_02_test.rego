@@ -99,6 +99,53 @@ test_TargetedUsers_Correct_V2 if {
     RuleOutput[0].ReportDetails == "Requirement met"
 }
 
+test_TargetedUsers_Correct_V3 if {
+    PolicyId := "MS.DEFENDER.2.1v1"
+
+    Output := tests with input as {
+        "anti_phish_policies": [
+            {
+                "Identity" : "Standard Preset Security Policy1659535429826",
+                "Enabled" : true,
+                "EnableTargetedUserProtection" : true,
+                "TargetedUsersToProtect" : [
+                    "John Doe;jdoe@someemail.com",
+                    "Jane Doe;jadoe@someemail.com"
+                ],
+                "TargetedUserProtectionAction": "Quarantine"
+            },
+            {
+                "Identity" : "Strict Preset Security Policy1659535429826",
+                "Enabled" : true,
+                "EnableTargetedUserProtection" : true,
+                "TargetedUsersToProtect" : [
+                    "John Doe;jdoe@someemail.com",
+                    "Jane Doe;jadoe@someemail.com"
+                ],
+                "TargetedUserProtectionAction": "Quarantine"
+            }
+        ],
+        "scuba_config" : {
+            "Defender" : {
+                "MS.DEFENDER.2.1v1" : {
+                    "SensitiveAccounts" : {
+                        "IncludedUsers" : [
+                            "john doe;jdoe@someemail.com",
+                            "jane doe;jadoe@someemail.com"
+                        ]
+                    }
+                }
+            }
+        }
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "Requirement met"
+}
+
 test_TargetedUsers_Incorrect_V1 if {
     PolicyId := "MS.DEFENDER.2.1v1"
 
