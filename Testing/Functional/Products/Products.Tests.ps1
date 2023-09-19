@@ -93,9 +93,9 @@ param (
 $ScubaModulePath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules"
 $ScubaModule = Join-Path -Path $ScubaModulePath -ChildPath "../ScubaGear.psd1"
 $ConnectionModule = Join-Path -Path $ScubaModulePath -ChildPath "Connection/Connection.psm1"
-Import-Module $ScubaModule -Force
-Import-Module $ConnectionModule -Force
-Import-Module Selenium -Force
+Import-Module $ScubaModule
+Import-Module $ConnectionModule
+Import-Module Selenium
 
 BeforeDiscovery{
     $TestPlanPath = Join-Path -Path $PSScriptRoot -ChildPath "TestPlans/$ProductName.testplan.yaml"
@@ -115,7 +115,7 @@ BeforeDiscovery{
         TenantDomain = $TenantDomain
     }{
         if (-Not [string]::IsNullOrEmpty($AppId)){
-            Write-Host "Auto Connect to Tenant"
+            Write-Debug "Auto Connect to Tenant"
             $ServicePrincipalParams = @{CertThumbprintParams = @{
                 CertificateThumbprint = $Thumbprint;
                 AppID = $AppId;
@@ -125,7 +125,7 @@ BeforeDiscovery{
             Connect-Tenant -ProductNames $ProductName -M365Environment $M365Environment -ServicePrincipalParams $ServicePrincipalParams
         }
         else {
-            Write-Host "Manual Connect to Tenant"
+            Write-Debug "Manual Connect to Tenant"
             Connect-Tenant -ProductNames $ProductName -M365Environment $M365Environment
         }
     }
@@ -179,33 +179,6 @@ BeforeAll{
         }
     }
 
-    function UpdateProviderExport{
-        param(
-            [Parameter(Mandatory = $true)]
-            [AllowNull()]
-            [hashtable]
-            $Updates,
-            [Parameter(Mandatory = $true)]
-            [string]
-            $OutputFolder
-        )
-
-        $ProviderExport = LoadProviderExport($OutputFolder)
-
-        $Updates.Keys | ForEach-Object{
-            try {
-                $Update = $Updates.Item($_)
-                Set-NestedMemberValue -InputObject $ProviderExport -MemberPath $_  -Value $Update
-            }
-            catch {
-                Write-Error "Exception: UpdateProviderExport failed"
-            }
-        }
-
-        PublishProviderExport -OutputFolder $OutputFolder -Export $ProviderExport
-
-    }
-
     function RunScuba() {
         if (-not [string]::IsNullOrEmpty($Thumbprint))
         {
@@ -215,122 +188,18 @@ BeforeAll{
             Invoke-SCuBA -Login $false -Productnames $ProductName -OutPath . -M365Environment $M365Environment -Quiet
         }
     }
-
-    function LoadTestResults($OutputFolder) {
-        $IntermediateTestResults = Get-Content "$OutputFolder/TestResults.json" -Raw | ConvertFrom-Json
-        $IntermediateTestResults
-    }
-    function LoadProviderExport($OutputFolder) {
-        if (-not (Test-Path -Path "$OutputFolder/ModifiedProviderSettingsExport.json" -PathType Leaf)){
-            Copy-Item -Path "$OutputFolder/ProviderSettingsExport.json" -Destination "$OutputFolder/ModifiedProviderSettingsExport.json"
-        }
-
-        $ProviderExport = Get-Content -Raw "$OutputFolder/ModifiedProviderSettingsExport.json" | ConvertFrom-Json
-        $ProviderExport
-    }
-
-    function PublishProviderExport() {
-        param(
-            [Parameter(Mandatory = $true)]
-            [string]
-            $OutputFolder,
-            [Parameter(Mandatory = $true)]
-            [object]
-            $Export
-        )
-        $Json = $Export | ConvertTo-Json -Depth 10 | Out-String
-        Set-Content -Path "$OutputFolder/ModifiedProviderSettingsExport.json" -Value $Json
-    }
-
-    function RemoveConditionalAccessPolicyByName{
-        [CmdletBinding()]
-        param (
-            [Parameter(Mandatory = $true)]
-            [ValidateNotNullOrEmpty()]
-            [string]
-            $DisplayName
-        )
-
-        $Ids = Get-MgIdentityConditionalAccessPolicy | Where-Object {$_.DisplayName -match $DisplayName} | Select-Object -Property Id
-
-        foreach($Id in $Ids){
-            if (-not ([string]::IsNullOrEmpty($Id.Id))){
-                Remove-MgIdentityConditionalAccessPolicy -ConditionalAccessPolicyId $Id.Id
-            }
-        }
-    }
-
-    function UpdateConditionalAccessPolicyByName{
-        [CmdletBinding()]
-        param (
-            [Parameter(Mandatory = $true)]
-            [ValidateNotNullOrEmpty()]
-            [string]
-            $DisplayName,
-            [Parameter(Mandatory = $true)]
-            [ValidateNotNullOrEmpty()]
-            [hashtable]
-            $Updates
-        )
-
-        $Ids = Get-MgIdentityConditionalAccessPolicy | Where-Object {$_.DisplayName -match $DisplayName} | Select-Object -Property Id
-
-        foreach($Id in $Ids){
-            if (-not ([string]::IsNullOrEmpty($Id.Id))){
-                Update-MgIdentityConditionalAccessPolicy -ConditionalAccessPolicyId $Id.Id @Updates
-                break
-            }
-        }
-    }
-
-    function UpdateCachedConditionalAccessPolicyByName{
-        [CmdletBinding()]
-        param (
-            [Parameter(Mandatory = $true)]
-            [ValidateNotNullOrEmpty()]
-            [string]
-            $DisplayName,
-            [Parameter(Mandatory = $true)]
-            [ValidateNotNullOrEmpty()]
-            [hashtable]
-            $Updates,
-            [Parameter(Mandatory = $true)]
-            [ValidateNotNullOrEmpty()]
-            [string]
-            $OutputFolder
-        )
-
-        $ProviderExport = LoadProviderExport($OutputFolder)
-
-        $ConditionalAccessPolicies = $ProviderExport.conditional_access_policies
-        $Index = [array]::indexof($ConditionalAccessPolicies.DisplayName, $DisplayName)
-
-        $Updates.Keys | ForEach-Object{
-            try {
-                $Update = $Updates.Item($_)
-                $Policy = $ConditionalAccessPolicies[$Index]
-                Set-NestedMemberValue -InputObject $Policy -MemberPath $_  -Value $Update
-            }
-            catch {
-                Write-Error "Exception:  UpdateCachedConditionalAccessPolicyByName failed"
-            }
-        }
-
-        PublishProviderExport -OutputFolder $OutputFolder -Export $ProviderExport
-
-    }
 }
 
 Describe "Policy Checks for <ProductName>"{
     Context "Start tests for policy <PolicyId>" -ForEach $TestPlan{
         BeforeEach{
             if ('RunScuba' -eq $TestDriver){
-                Write-Host "Driver: RunScuba"
+                Write-Debug "Driver: RunScuba"
                 SetConditions -Conditions $Preconditions.ToArray()
                 RunScuba
             }
             elseif ('RunCached' -eq $TestDriver){
-                Write-Host "Driver: RunCached"
+                Write-Debug "Driver: RunCached"
                 RunScuba
                 $ReportFolders = Get-ChildItem . -directory -Filter "M365BaselineConformance*" | Sort-Object -Property LastWriteTime -Descending
                 $OutputFolder = $ReportFolders[0].Name
@@ -338,13 +207,13 @@ Describe "Policy Checks for <ProductName>"{
                 Invoke-RunCached -Productnames $ProductName -ExportProvider $false -OutPath $OutputFolder -OutProviderFileName 'ModifiedProviderSettingsExport' -Quiet
             }
             else {
-                Write-Host "Driver: $TestDriver"
+                Write-Debug "Driver: $TestDriver"
                 Write-Error "Invalid Test Driver: $TestDriver"
             }
 
             $ReportFolders = Get-ChildItem . -directory -Filter "M365BaselineConformance*" | Sort-Object -Property LastWriteTime -Descending
             $OutputFolder = $ReportFolders[0]
-            Write-Host "OutputFolder: $OutputFolder"
+            Write-Debug "OutputFolder: $OutputFolder"
             $IntermediateTestResults = LoadTestResults($OutputFolder)
             # Search the results object for the specific requirement we are validating and ensure the results are what we expect
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'PolicyResultObj', Justification = 'Variable is used in ScriptBlock')]
@@ -472,7 +341,7 @@ Describe "Policy Checks for <ProductName>"{
         }
         AfterEach {
             SetConditions -Conditions $Postconditions.ToArray()
-            Stop-SeDriver -Driver $Driver 2>$null
+            Stop-SeDriver -Driver $Driver #2>$null
         }
     }
 }

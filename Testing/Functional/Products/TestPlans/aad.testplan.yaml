@@ -356,7 +356,7 @@ TestPlan:
     Tests:
       - TestDescription: MS.AAD.5.1v1 Non-Compliant case - Allow users to register apps 
         Preconditions:
-          - Command: Update-MgPolicyAuthorizationPolicy
+          - Command: Update-MgBetaPolicyAuthorizationPolicy
             Splat:
               AuthorizationPolicyId: authorizationPolicy
               DefaultUserRolePermissions:
@@ -365,7 +365,7 @@ TestPlan:
         ExpectedResult: false
       - TestDescription: MS.AAD.5.1v1 Compliant case - Do NOT allow users to register apps 
         Preconditions:
-          - Command: Update-MgPolicyAuthorizationPolicy
+          - Command: Update-MgBetaPolicyAuthorizationPolicy
             Splat:
               AuthorizationPolicyId: authorizationPolicy
               DefaultUserRolePermissions:
@@ -378,7 +378,7 @@ TestPlan:
     Tests:
       - TestDescription: MS.AAD.5.2v1 Non-Compliant case - Allow users to consent to apps
         Preconditions:
-          - Command: Update-MgPolicyAuthorizationPolicy
+          - Command: Update-MgBetaPolicyAuthorizationPolicy
             Splat:
               AuthorizationPolicyId: authorizationPolicy
               PermissionGrantPolicyIdsAssignedToDefaultUserRole:
@@ -387,7 +387,7 @@ TestPlan:
         ExpectedResult: false
       - TestDescription: MS.AAD.5.2v1 Compliant case - Do NOT allow users to consent to apps
         Preconditions:
-          - Command: Update-MgPolicyAuthorizationPolicy
+          - Command: Update-MgBetaPolicyAuthorizationPolicy
             Splat:
               AuthorizationPolicyId: authorizationPolicy
               PermissionGrantPolicyIdsAssignedToDefaultUserRole: []
@@ -400,14 +400,14 @@ TestPlan:
     Tests:
       - TestDescription: MS.AAD.5.3v1 Non-Compliant case - No Admin Consent workflow configured
         Preconditions:
-          - Command: Update-MgPolicyAdminConsentRequestPolicy
+          - Command: Update-MgBetaPolicyAdminConsentRequestPolicy
             Splat:
               IsEnabled: false
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.AAD.5.3v1 Compliant case - Admin Consent workflow is configured
         Preconditions:
-          - Command: Update-MgPolicyAdminConsentRequestPolicy
+          - Command: Update-MgBetaPolicyAdminConsentRequestPolicy
             Splat:
               IsEnabled: true
         Postconditions: []
@@ -697,7 +697,7 @@ TestPlan:
     Tests:
       - TestDescription: MS.AAD.8.1v1 Non-Compliant - Guest users have the same access as members
         Preconditions: 
-          - Command: Update-MgPolicyAuthorizationPolicy
+          - Command: Update-MgBetaPolicyAuthorizationPolicy
             Splat:
               AuthorizationPolicyId: authorizationPolicy
               GuestUserRoleId: "a0b1b346-4d3e-4e8b-98f8-753987be4970"
@@ -705,7 +705,7 @@ TestPlan:
         ExpectedResult: false
       - TestDescription: MS.AAD.8.1v1 Compliant - Guest user access is restricted
         Preconditions: 
-          - Command: Update-MgPolicyAuthorizationPolicy
+          - Command: Update-MgBetaPolicyAuthorizationPolicy
             Splat:
               AuthorizationPolicyId: authorizationPolicy
               GuestUserRoleId: "2af84b1e-32c8-42b7-82bc-daa82404023b"
@@ -713,7 +713,7 @@ TestPlan:
         ExpectedResult: true
       - TestDescription: MS.AAD.8.1v1 Compliant - Guest users have limited access
         Preconditions: 
-          - Command: Update-MgPolicyAuthorizationPolicy
+          - Command: Update-MgBetaPolicyAuthorizationPolicy
             Splat:
               AuthorizationPolicyId: authorizationPolicy
               GuestUserRoleId: "10dae51f-b6af-4016-8d66-8c2a99b929b3"
@@ -725,7 +725,7 @@ TestPlan:
     Tests:
       - TestDescription: MS.AAD.8.2v1 Non-Compliant - Anyone in the organization can invite guest users
         Preconditions:
-          - Command: Update-MgPolicyAuthorizationPolicy
+          - Command: Update-MgBetaPolicyAuthorizationPolicy
             Splat:
               AuthorizationPolicyId: authorizationPolicy
               AllowInvitesFrom: everyone
@@ -733,7 +733,7 @@ TestPlan:
         ExpectedResult: false
       - TestDescription: MS.AAD.8.2v1 Compliant - Only users assigned to specific admin roles can invite guest users
         Preconditions:
-          - Command: Update-MgPolicyAuthorizationPolicy
+          - Command: Update-MgBetaPolicyAuthorizationPolicy
             Splat:
               AuthorizationPolicyId: authorizationPolicy
               AllowInvitesFrom: adminsAndGuestInviters
