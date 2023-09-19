@@ -276,19 +276,19 @@ tests[{
 #--
 
 ImpersonationProtectionErrorMsg(StrictImpersonationProtection, StandardImpersonationProtection) := Description if {
-    Description := "No users are included for targeted user protection in Strict policy."
+    Description := "Not all sensitive users are included for targeted user protection in Strict policy."
     StrictImpersonationProtection.Result == false
     StandardImpersonationProtection.Result == true
 }
 
 ImpersonationProtectionErrorMsg(StrictImpersonationProtection, StandardImpersonationProtection) := Description if {
-    Description := "No users are included for targeted user protection in Standard policy."
+    Description := "Not all sensitive users are included for targeted user protection in Standard policy."
     StrictImpersonationProtection.Result == true
     StandardImpersonationProtection.Result == false
 }
 
 ImpersonationProtectionErrorMsg(StrictImpersonationProtection, StandardImpersonationProtection) := Description if {
-    Description := "No users are included for targeted user protection in Strict or Standard policy."
+    Description := "Not all sensitive users are included for targeted user protection in Strict or Standard policy."
     StrictImpersonationProtection.Result == false
     StandardImpersonationProtection.Result == false
 }
