@@ -25,7 +25,7 @@ ReportDetailsArray(Status, Array, String1) = Detail if {
     Detail := Description(Format(Array), String1, String2)
 }
 
-#
+#--
 # MS.TEAMS.1.1v1
 #--
 # The english translation of the following is:
@@ -50,7 +50,7 @@ tests[{
 }
 #--
 
-#
+#--
 # MS.TEAMS.1.2v1
 #--
 MeetingsAllowingAnonStart[Policy.Identity] {
@@ -72,7 +72,7 @@ tests[{
 }
 #--
 
-#
+#--
 # MS.TEAMS.1.3v1
 #--
 ReportDetails1_3(Policy) = Description if {
@@ -119,7 +119,7 @@ tests[{
 }
 #--
 
-#
+#--
 # MS.TEAMS.1.4v1
 #--
 tests[{
@@ -137,8 +137,7 @@ tests[{
 }
 
 #
-# MS.TEAMS.1.4v1
-#--
+
 tests[{
 	"PolicyId" : "MS.TEAMS.1.4v1",
 	"Criticality" : "Should",
@@ -150,7 +149,7 @@ tests[{
 	count(input.meeting_policies) == 0
 }
 #--
-#
+#--
 # MS.TEAMS.1.5v1
 #--
 ReportDetails1_5(Policy) = Description if {
@@ -197,7 +196,7 @@ tests[{
 }
 #--
 
-#
+#--
 # MS.TEAMS.1.6v1
 #--
 tests[{
@@ -214,8 +213,7 @@ tests[{
 }
 
 #
-# MS.TEAMS.1.6v1
-#--
+
 tests[{
 	"PolicyId" : "MS.TEAMS.1.6v1",
 	"Criticality" : "Should",
@@ -228,7 +226,7 @@ tests[{
 }
 #--
 
-#
+#--
 # MS.TEAMS.9.3v1
 #--
 PoliciesAllowingOutsideRegionStorage[Policy.Identity] {
@@ -251,7 +249,7 @@ tests[{
 }
 #--
 
-#
+#--
 # MS.TEAMS.1.7v1
 #--
 tests[{
@@ -268,8 +266,6 @@ tests[{
 }
 
 #
-# MS.TEAMS.1.7v1
-#--
 tests[{
 	"PolicyId" : "MS.TEAMS.1.7v1",
 	"Criticality" : "Should",
@@ -284,7 +280,7 @@ tests[{
 
 
 
-#
+#--
 # MS.TEAMS.2.1v1
 #--
 ExternalAccessConfig[Policy.Identity] {
@@ -308,7 +304,7 @@ tests[{
 }
 #--
 
-#
+#--
 # Baseline 2.4: Policy 2
 #--
 MeetingsNotAllowingAnonJoin[Policy.Identity] {
@@ -371,7 +367,7 @@ tests[{
 }
 #--
 
-#
+#--
 # MS.TEAMS.2.3v1
 #--
 InternalCannotenable[Policy.Identity] {
@@ -393,7 +389,7 @@ tests[{
 }
 #--
 
-#
+#--
 # MS.TEAMS.3.1v1
 #--
 SkpyeBlocConfig[Policy.Identity] {
@@ -415,7 +411,7 @@ tests[{
 }
 #--
 
-#
+#--
 # MS.TEAMS.4.1v1
 #--
 ConfigsAllowingEmail[Policy.Identity] {
@@ -475,7 +471,7 @@ tests[{
 }
 #--
 
-#
+#--
 # MS.TEAMS.5.1v1
 #--
 PoliciesBlockingDefaultApps[Policy.Identity] {
@@ -497,17 +493,12 @@ tests[{
 }
 #--
 
-#
+#--
 # MS.TEAMS.5.2v1
 #--
 PoliciesAllowingGlobalApps[Policy.Identity] {
 	Policy := input.app_policies[_]
 	Policy.GlobalCatalogAppsType != "AllowedAppList"
-}
-
-PoliciesAllowingCustomApps[Policy.Identity] {
-	Policy := input.app_policies[_]
-	Policy.PrivateCatalogAppsType != "AllowedAppList"
 }
 
 tests[{
@@ -523,8 +514,19 @@ tests[{
 	Status = count(Policies) == 0
 }
 
+
+#--
+
+#--
+# MS.TEAMS.5.3v1
+#--
+# 
+PoliciesAllowingCustomApps[Policy.Identity] {
+	Policy := input.app_policies[_]
+	Policy.PrivateCatalogAppsType != "AllowedAppList"
+}
 tests[{
-	"PolicyId" : "MS.TEAMS.5.2av1",
+	"PolicyId" : "MS.TEAMS.5.3v1",
 	"Criticality" : "Should",
 	"Commandlet" : ["Get-CsTeamsAppPermissionPolicy"],
 	"ActualValue" : Policies,
@@ -535,26 +537,10 @@ tests[{
 	String := "meeting policy(ies) found that allow custom apps by default:"
 	Status = count(Policies) == 0
 }
+
 #--
 
-#
-# MS.TEAMS.5.3v1
 #--
-# At this time we are unable to test for X because of Y
-tests[{
-    "PolicyId" : "MS.TEAMS.5.3v1",
-    "Criticality" : "Shall/3rd Party",
-    "Commandlet" : [],
-    "ActualValue" : [],
-    "ReportDetails" : NotCheckedDetails(PolicyId),
-    "RequirementMet" : false
-}] {
-	PolicyId := "MS.TEAMS.5.3v1"
-    true
-}
-#--
-
-#
 # MS.TEAMS.6.1v1
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
@@ -570,7 +556,7 @@ tests[{
 }
 #--
 
-#
+#--
 # MS.TEAMS.6.2v1
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
@@ -586,7 +572,7 @@ tests[{
 }
 #--
 
-#
+#--
 # MS.TEAMS.11.4v1
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
@@ -602,7 +588,7 @@ tests[{
 }
 #--
 
-#
+#--
 # MS.TEAMS.7.1v1
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
@@ -618,7 +604,7 @@ tests[{
 }
 #--
 
-#
+#--
 # MS.TEAMS.7.2v1
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
@@ -634,7 +620,7 @@ tests[{
 }
 #--
 
-#
+#--
 # MS.TEAMS.8.1v1
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
@@ -650,7 +636,7 @@ tests[{
 }
 #--
 
-#
+#--
 # MS.TEAMS.13.2v1
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
@@ -666,7 +652,7 @@ tests[{
 }
 #--
 
-#
+#--
 # MS.TEAMS.8.2v1
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
