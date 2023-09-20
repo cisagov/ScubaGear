@@ -58,7 +58,9 @@ tests[{
     "Commandlet" : ["Get-RemoteDomain"],
     "ActualValue" : Domains,
     "ReportDetails" : ReportDetailsString(Status, ErrorMessage),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "exo-2.1.1",
+    "TestId": "exo-2.1.1-t1"
 }] {
     Domains := RemoteDomainsAllowingForwarding
     ErrorMessage := Description(Format(Domains), "remote domain(s) that allows automatic forwarding:", concat(", ", Domains))
@@ -82,7 +84,9 @@ tests[{
     "Commandlet" : [],
     "ActualValue" : [],
     "ReportDetails" : "Currently cannot be checked automatically. See Exchange Online Secure Configuration Baseline policy 2.# for instructions on manual check",
-    "RequirementMet" : false
+    "RequirementMet" : false,
+    "PolicyId" : "exo-2.2.1",
+    "TestId": "exo-2.2.1-t1"
 }] {
     true
 }
@@ -104,7 +108,9 @@ tests[{
     "Commandlet" : ["Get-ScubaSpfRecords", "Get-AcceptedDomain"],
     "ActualValue" : Domains,
     "ReportDetails" : ReportDetailsArray(Status, Domains, AllDomains),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "exo-2.2.2",
+    "TestId": "exo-2.2.2-t1"
 }] {
     Domains := DomainsWithoutSpf
     Status := count(Domains) == 0
@@ -135,7 +141,9 @@ tests[{
     "Commandlet" : ["Get-DkimSigningConfig", "Get-ScubaDkimRecords", "Get-AcceptedDomain"],
     "ActualValue" : [input.dkim_records, input.dkim_config],
     "ReportDetails" : ReportDetailsArray(Status, DomainsWithoutDkim, CustomDomains),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "exo-2.3.1",
+    "TestId": "exo-2.3.1-t1"
 }] {
     DomainsWithoutDkim := CustomDomains - DomainsWithDkim
     Status := count(DomainsWithoutDkim) == 0
@@ -163,7 +171,9 @@ tests[{
     "Commandlet" : ["Get-ScubaDmarcRecords", "Get-AcceptedDomain"],
     "ActualValue" : input.dmarc_records,
     "ReportDetails" : ReportDetailsArray(Status, Domains, AllDomains),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "exo-2.4.1",
+    "TestId": "exo-2.4.1-t1"
 }] {
     Domains := DomainsWithoutDmarc
     Status := count(Domains) == 0
@@ -186,7 +196,9 @@ tests[{
     "Commandlet" : ["Get-ScubaDmarcRecords", "Get-AcceptedDomain"],
     "ActualValue" : input.dmarc_records,
     "ReportDetails" : ReportDetailsArray(Status, Domains, AllDomains),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "exo-2.4.2",
+    "TestId": "exo-2.4.2-t1"
 }] {
     Domains := DomainsWithoutPreject
     Status := count(Domains) == 0
@@ -209,7 +221,9 @@ tests[{
     "Commandlet" : ["Get-ScubaDmarcRecords", "Get-AcceptedDomain"],
     "ActualValue" : input.dmarc_records,
     "ReportDetails" : ReportDetailsArray(Status, Domains, AllDomains),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "exo-2.4.3",
+    "TestId": "exo-2.4.3-t1"
 }] {
     Domains := DomainsWithoutDHSContact
     Status := count(Domains) == 0
@@ -232,7 +246,9 @@ tests[{
     "Commandlet" : ["Get-ScubaDmarcRecords", "Get-AcceptedDomain"],
     "ActualValue" : input.dmarc_records,
     "ReportDetails" : ReportDetailsArray(Status, Domains, AllDomains),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "exo-2.4.4",
+    "TestId": "exo-2.4.4-t1"
 }] {
     Domains := DomainsWithoutAgencyContact
     Status := count(Domains) == 0
@@ -260,7 +276,9 @@ tests[{
     "Commandlet" : ["Get-TransportConfig"],
     "ActualValue" : input.transport_config,
     "ReportDetails" : ReportDetailsBoolean(Status),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "exo-2.5.1",
+    "TestId": "exo-2.5.1-t1"
 }] {
     Status := count(SmtpClientAuthEnabled) == 0
 }
@@ -291,7 +309,9 @@ tests[{
     "Commandlet" : ["Get-SharingPolicy"],
     "ActualValue" : input.sharing_policy,
     "ReportDetails" : ReportDetailsString(Status, ErrorMessage),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "exo-2.6.1",
+    "TestId": "exo-2.6.1-t1"
 }] {
     ErrorMessage := "Wildcard domain (\"*\") in shared domains list, enabling sharing with all domains by default"
 
@@ -310,7 +330,9 @@ tests[{
     "Commandlet" : ["Get-SharingPolicy"],
     "ActualValue" : input.sharing_policy,
     "ReportDetails" : ReportDetailsString(Status, ErrorMessage),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "exo-2.6.2",
+    "TestId": "exo-2.6.2-t1"
 }] {
     ErrorMessage := "Wildcard domain (\"*\") in shared domains list, enabling sharing with all domains by default"
     Status := count(SharingPolicyAllowedSharing) == 0
@@ -331,7 +353,9 @@ tests[{
     "Commandlet" : ["Get-TransportRule"],
     "ActualValue" : [Rule.FromScope | Rule = Rules[_]],
     "ReportDetails" : ReportDetailsString(Status, ErrorMessage),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "exo-2.7.1",
+    "TestId": "exo-2.7.1-t1"
 }] {
     Rules := input.transport_rule
     ErrorMessage := "No transport rule found that applies warnings to emails received from outside the organization"
@@ -357,7 +381,9 @@ tests[{
     "Commandlet" : [],
     "ActualValue" : [],
     "ReportDetails" : "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
-    "RequirementMet" : false
+    "RequirementMet" : false,
+    "PolicyId" : "exo-2.8.1",
+    "TestId": "exo-2.8.1-t1"
 }] {
     true
 }
@@ -374,7 +400,9 @@ tests[{
     "Commandlet" : [],
     "ActualValue" : [],
     "ReportDetails" : "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
-    "RequirementMet" : false
+    "RequirementMet" : false,
+    "PolicyId" : "exo-2.8.2",
+    "TestId": "exo-2.8.2-t1"
 }] {
     true
 }
@@ -396,7 +424,9 @@ tests[{
     "Commandlet" : [],
     "ActualValue" : [],
     "ReportDetails" : "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
-    "RequirementMet" : false
+    "RequirementMet" : false,
+    "PolicyId" : "exo-2.9.1",
+    "TestId": "exo-2.9.1-t1"
 }] {
     true
 }
@@ -413,7 +443,9 @@ tests[{
     "Commandlet" : [],
     "ActualValue" : [],
     "ReportDetails" : "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
-    "RequirementMet" : false
+    "RequirementMet" : false,
+    "PolicyId" : "exo-2.9.2",
+    "TestId": "exo-2.9.2-t1"
 }] {
     true
 }
@@ -430,7 +462,9 @@ tests[{
     "Commandlet" : [],
     "ActualValue" : [],
     "ReportDetails" : "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
-    "RequirementMet" : false
+    "RequirementMet" : false,
+    "PolicyId" : "exo-2.9.3",
+    "TestId": "exo-2.9.3-t1"
 }] {
     true
 }
@@ -452,7 +486,9 @@ tests[{
     "Commandlet" : [],
     "ActualValue" : [],
     "ReportDetails" : "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
-    "RequirementMet" : false
+    "RequirementMet" : false,
+    "PolicyId" : "exo-2.10.1",
+    "TestId": "exo-2.10.1-t1"
 }] {
     true
 }
@@ -469,7 +505,9 @@ tests[{
     "Commandlet" : [],
     "ActualValue" : [],
     "ReportDetails" : "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
-    "RequirementMet" : false
+    "RequirementMet" : false,
+    "PolicyId" : "exo-2.10.2",
+    "TestId": "exo-2.10.2-t1"
 }] {
     true
 }
@@ -486,7 +524,9 @@ tests[{
     "Commandlet" : [],
     "ActualValue" : [],
     "ReportDetails" : "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
-    "RequirementMet" : false
+    "RequirementMet" : false,
+    "PolicyId" : "exo-2.10.3",
+    "TestId": "exo-2.10.3-t1"
 }] {
     true
 }
@@ -508,7 +548,9 @@ tests[{
     "Commandlet" : [],
     "ActualValue" : [],
     "ReportDetails" : "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
-    "RequirementMet" : false
+    "RequirementMet" : false,
+    "PolicyId" : "exo-2.11.1",
+    "TestId": "exo-2.11.1-t1"
 }] {
     true
 }
@@ -525,7 +567,9 @@ tests[{
     "Commandlet" : [],
     "ActualValue" : [],
     "ReportDetails" : "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
-    "RequirementMet" : false
+    "RequirementMet" : false,
+    "PolicyId" : "exo-2.11.2",
+    "TestId": "exo-2.11.2-t1"
 }] {
     true
 }
@@ -542,7 +586,9 @@ tests[{
     "Commandlet" : [],
     "ActualValue" : [],
     "ReportDetails" : "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
-    "RequirementMet" : false
+    "RequirementMet" : false,
+    "PolicyId" : "exo-2.11.3",
+    "TestId": "exo-2.11.3-t1"
 }] {
     true
 }
@@ -569,7 +615,9 @@ tests[{
     "Commandlet" : ["Get-HostedConnectionFilterPolicy"],
     "ActualValue" : input.conn_filter,
     "ReportDetails" : ReportDetailsString(Status, ErrorMessage),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "exo-2.12.1",
+    "TestId": "exo-2.12.1-t1"
 }]{
     ErrorMessage := "Allow-list is in use"
     Status := count(ConnFiltersWithIPAllowList) == 0
@@ -592,7 +640,9 @@ tests[{
     "Commandlet" : ["Get-HostedConnectionFilterPolicy"],
     "ActualValue" : input.conn_filter,
     "ReportDetails" : ReportDetailsBoolean(Status),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "exo-2.12.2",
+    "TestId": "exo-2.12.2-t1"
 }]{
     Status := count(ConnFiltersWithSafeList) == 0
 }
@@ -618,7 +668,9 @@ tests[{
     "Commandlet" : ["Get-OrganizationConfig"],
     "ActualValue" : input.org_config,
     "ReportDetails" : ReportDetailsBoolean(Status),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "exo-2.13.1",
+    "TestId": "exo-2.13.1-t1"
 }] {
     Status := count(AuditEnabled) == 0
 }
@@ -640,7 +692,9 @@ tests[{
     "Commandlet" : [],
     "ActualValue" : [],
     "ReportDetails" : "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
-    "RequirementMet" : false
+    "RequirementMet" : false,
+    "PolicyId" : "exo-2.14.1",
+    "TestId": "exo-2.14.1-t1"
 }] {
     true
 }
@@ -657,7 +711,9 @@ tests[{
     "Commandlet" : [],
     "ActualValue" : [],
     "ReportDetails" : "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
-    "RequirementMet" : false
+    "RequirementMet" : false,
+    "PolicyId" : "exo-2.14.2",
+    "TestId": "exo-2.14.2-t1"
 }] {
     true
 }
@@ -674,7 +730,9 @@ tests[{
     "Commandlet" : [],
     "ActualValue" : [],
     "ReportDetails" : "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
-    "RequirementMet" : false
+    "RequirementMet" : false,
+    "PolicyId" : "exo-2.14.3",
+    "TestId": "exo-2.14.3-t1"
 }] {
     true
 }
@@ -696,7 +754,9 @@ tests[{
     "Commandlet" : [],
     "ActualValue" : [],
     "ReportDetails" : "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
-    "RequirementMet" : false
+    "RequirementMet" : false,
+    "PolicyId" : "exo-2.15.1",
+    "TestId": "exo-2.15.1-t1"
 }] {
     true
 }
@@ -713,7 +773,9 @@ tests[{
     "Commandlet" : [],
     "ActualValue" : [],
     "ReportDetails" : "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
-    "RequirementMet" : false
+    "RequirementMet" : false,
+    "PolicyId" : "exo-2.15.2",
+    "TestId": "exo-2.15.2-t1"
 }] {
     true
 }
@@ -730,7 +792,9 @@ tests[{
     "Commandlet" : [],
     "ActualValue" : [],
     "ReportDetails" : "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
-    "RequirementMet" : false
+    "RequirementMet" : false,
+    "PolicyId" : "exo-2.15.3",
+    "TestId": "exo-2.15.3-t1"
 }] {
     true
 }
@@ -752,7 +816,9 @@ tests[{
     "Commandlet" : [],
     "ActualValue" : [],
     "ReportDetails" : "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
-    "RequirementMet" : false
+    "RequirementMet" : false,
+    "PolicyId" : "exo-2.16.1",
+    "TestId": "exo-2.16.1-t1"
 }] {
     true
 }
@@ -769,7 +835,9 @@ tests[{
     "Commandlet" : [],
     "ActualValue" : [],
     "ReportDetails" : "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
-    "RequirementMet" : false
+    "RequirementMet" : false,
+    "PolicyId" : "exo-2.16.2",
+    "TestId": "exo-2.16.2-t1"
 }] {
     true
 }
@@ -791,7 +859,9 @@ tests[{
     "Commandlet" : [],
     "ActualValue" : [],
     "ReportDetails" : "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
-    "RequirementMet" : false
+    "RequirementMet" : false,
+    "PolicyId" : "exo-2.17.1",
+    "TestId": "exo-2.17.1-t1"
 }] {
     true
 }
@@ -808,7 +878,9 @@ tests[{
     "Commandlet" : [],
     "ActualValue" : [],
     "ReportDetails" : "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
-    "RequirementMet" : false
+    "RequirementMet" : false,
+    "PolicyId" : "exo-2.17.2",
+    "TestId": "exo-2.17.2-t1"
 }] {
     true
 }
@@ -825,7 +897,9 @@ tests[{
     "Commandlet" : [],
     "ActualValue" : [],
     "ReportDetails" : "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
-    "RequirementMet" : false
+    "RequirementMet" : false,
+    "PolicyId" : "exo-2.17.3",
+    "TestId": "exo-2.17.3-t1"
 }] {
     true
 }
