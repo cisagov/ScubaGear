@@ -152,6 +152,7 @@ ImpersonationProtection(Policies, IdentityString, IncludedUsers) := {
 
     PolicyProtectedUsers := { lower(x) | x := Policy[0].TargetedUsersToProtect[_] }
     count(PolicyProtectedUsers) > 0
+    count(IncludedUsers) > 0
     count(IncludedUsers - PolicyProtectedUsers) == 0
 } else := {
     "Result" : false,
