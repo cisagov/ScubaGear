@@ -425,7 +425,7 @@ TestPlan:
     Tests:
       - TestDescription: MS.AAD.5.1v1 Non-Compliant case - Allow users to register apps 
         Preconditions:
-          - Command: Update-MgPolicyAuthorizationPolicy
+          - Command: Update-MgBetaPolicyAuthorizationPolicy
             Splat:
               AuthorizationPolicyId: authorizationPolicy
               DefaultUserRolePermissions:
@@ -434,34 +434,14 @@ TestPlan:
         ExpectedResult: false
       - TestDescription: MS.AAD.5.1v1 Compliant case - Do NOT allow users to register apps 
         Preconditions:
-          - Command: Update-MgPolicyAuthorizationPolicy
+          - Command: Update-MgBetaPolicyAuthorizationPolicy
             Splat:
               AuthorizationPolicyId: authorizationPolicy
               DefaultUserRolePermissions:
                 AllowedToCreateApps: false
         Postconditions: []
         ExpectedResult: true  
-  - PolicyId: MS.AAD.5.1v1
-    TestDriver: RunScuba
-    Tests:
-      - TestDescription: MS.AAD.5.1v1 Non-Compliant case - Allow users to register apps 
-        Preconditions:
-          - Command: Update-MgPolicyAuthorizationPolicy
-            Splat:
-              AuthorizationPolicyId: authorizationPolicy
-              DefaultUserRolePermissions:
-                AllowedToCreateApps: true
-        Postconditions: []
-        ExpectedResult: false
-      - TestDescription: MS.AAD.5.1v1 Compliant case - Do NOT allow users to register apps 
-        Preconditions:
-          - Command: Update-MgPolicyAuthorizationPolicy
-            Splat:
-              AuthorizationPolicyId: authorizationPolicy
-              DefaultUserRolePermissions:
-                AllowedToCreateApps: false
-        Postconditions: []
-        ExpectedResult: true  
+
   - PolicyId: MS.AAD.5.1v1
     TestDriver: RunScuba
     Tests:
@@ -509,7 +489,7 @@ TestPlan:
     Tests:
       - TestDescription: MS.AAD.5.2v1 Non-Compliant case - Allow users to consent to apps
         Preconditions:
-          - Command: Update-MgPolicyAuthorizationPolicy
+          - Command: Update-MgBetaPolicyAuthorizationPolicy
             Splat:
               AuthorizationPolicyId: authorizationPolicy
               PermissionGrantPolicyIdsAssignedToDefaultUserRole:
@@ -518,7 +498,7 @@ TestPlan:
         ExpectedResult: false
       - TestDescription: MS.AAD.5.2v1 Compliant case - Do NOT allow users to consent to apps
         Preconditions:
-          - Command: Update-MgPolicyAuthorizationPolicy
+          - Command: Update-MgBetaPolicyAuthorizationPolicy
             Splat:
               AuthorizationPolicyId: authorizationPolicy
               PermissionGrantPolicyIdsAssignedToDefaultUserRole: []

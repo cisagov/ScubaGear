@@ -220,8 +220,8 @@ Describe "Policy Checks for <ProductName>"{
             $PolicyResultObj = $IntermediateTestResults | Where-Object { $_.PolicyId -eq $PolicyId }
             $BaselineReports = Join-Path -Path $OutputFolder -ChildPath 'BaselineReports.html'
             $Url = (Get-Item $BaselineReports).FullName
-            $Driver = Start-SeChrome -Headless -Arguments @('start-maximized', 'AcceptInsecureCertificates') 2>$null
-            Open-SeUrl $Url -Driver $Driver 2>$null
+            $Driver = Start-SeChrome -Headless -Quiet -Arguments @('start-maximized', 'AcceptInsecureCertificates')
+            Open-SeUrl $Url -Driver $Driver | Out-Null
         }
         Context "Execute test, <TestDescription>" -ForEach $Tests {
             It "Check test case results" -Tag $PolicyId {
@@ -341,7 +341,7 @@ Describe "Policy Checks for <ProductName>"{
         }
         AfterEach {
             SetConditions -Conditions $Postconditions.ToArray()
-            Stop-SeDriver -Driver $Driver #2>$null
+            Stop-SeDriver -Driver $Driver | Out-Null
         }
     }
 }
