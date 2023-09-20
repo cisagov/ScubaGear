@@ -20,7 +20,9 @@ tests[{
     "Commandlet" : ["Get-SPOTenant", "Get-PnPTenant"],
     "ActualValue" : Policy.DefaultSharingLinkType,
     "ReportDetails" : ReportDetailsBoolean(Status),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "sharepoint-2.1.1",
+    "TestId": "sharepoint-2.1.1-t1"
 }] {
     Policy := input.SPO_tenant[_]
     Status := Policy.DefaultSharingLinkType == 1
@@ -42,7 +44,9 @@ tests[{
     "Commandlet" : ["Get-SPOTenant", "Get-PnPTenant"],
     "ActualValue" : Policy.SharingCapability,
     "ReportDetails" : ReportDetailsBoolean(Status),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "sharepoint-2.2.1",
+    "TestId": "sharepoint-2.2.1-t1"
 }] {
     Policy := input.SPO_tenant[_]
     Status := Policy.SharingCapability != 2
@@ -59,7 +63,9 @@ tests[{
 #    "Commandlet" : ["Get-SPOTenant", "Get-PnPTenant"],
 #    "ActualValue" : Policy.SharingDomainRestrictionMode,
 #    "ReportDetails" : ReportDetailsBoolean(Status),
-#    "RequirementMet" : Status
+#    "RequirementMet" : Status,
+    "PolicyId" : "sharepoint-2.2.2",
+    "TestId": "sharepoint-2.2.2-t1"
 #}] {
 #    Policy := input.SPO_tenant[_]
 #    Status := Policy.SharingDomainRestrictionMode == 1
@@ -76,7 +82,9 @@ tests[{
 #    "Commandlet" : ["Get-SPOTenant", "Get-PnPTenant"],
 #    "ActualValue" : [Policy.SharingCapability, Policy.SharingDomainRestrictionMode],
 #    "ReportDetails" : ReportDetails2_2(Policy),
-#    "RequirementMet" : Status
+#    "RequirementMet" : Status,
+    "PolicyId" : "sharepoint-2.2.3",
+    "TestId": "sharepoint-2.2.3-t1"
 #}] {
 #    Policy := input.SPO_tenant[_]
     # TODO: Missing Allow only users in specific security groups to share externally
@@ -98,7 +106,9 @@ tests[{
     "Commandlet" : [],
     "ActualValue" : [],
     "ReportDetails" : "Currently cannot be checked automatically. See Sharepoint Secure Configuration Baseline policy 2.3 for instructions on manual check",
-    "RequirementMet" : false
+    "RequirementMet" : false,
+    "PolicyId" : "sharepoint-2.3.1",
+    "TestId": "sharepoint-2.3.1-t1"
 }] {
     true
 }
@@ -152,7 +162,9 @@ tests[{
     "Commandlet" : ["Get-SPOTenant", "Get-PnPTenant"],
     "ActualValue" : [Policy.SharingCapability, Policy.ExternalUserExpirationRequired, Policy.ExternalUserExpireInDays],
     "ReportDetails" : ReportDetails2_4_1(Policy),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "sharepoint-2.4.1",
+    "TestId": "sharepoint-2.4.1-t1"
 }] {
     Policy := input.SPO_tenant[_]
 
@@ -209,7 +221,9 @@ tests[{
     "Commandlet" : ["Get-SPOTenant", "Get-PnPTenant"],
     "ActualValue" : [Policy.SharingCapability, Policy.EmailAttestationRequired, Policy.EmailAttestationReAuthDays],
     "ReportDetails" : ReportDetails2_4_2(Policy),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "sharepoint-2.4.2",
+    "TestId": "sharepoint-2.4.2-t1"
 }] {
     Policy := input.SPO_tenant[_]
 
@@ -239,7 +253,9 @@ tests[{
     "Commandlet" : [],
     "ActualValue" : [],
     "ReportDetails" : "Currently cannot be checked automatically. See Sharepoint Secure Configuration Baseline policy 2.5 for instructions on manual check",
-    "RequirementMet" : false
+    "RequirementMet" : false,
+    "PolicyId" : "sharepoint-2.5.1",
+    "TestId": "sharepoint-2.5.1-t1"
 }] {
     true
 }
@@ -255,7 +271,9 @@ tests[{
     "Commandlet" : ["Get-SPOSite", "Get-PnPTenantSite"],
     "ActualValue" : Policy.DenyAddAndCustomizePages,
     "ReportDetails" : ReportDetailsBoolean(Status),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "sharepoint-2.5.2",
+    "TestId": "sharepoint-2.5.2-t1"
 }] {
     Policy := input.SPO_site[_]
     # 1 == Allow users to run custom script on self-service created sites
