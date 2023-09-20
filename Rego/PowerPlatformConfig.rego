@@ -45,7 +45,9 @@ tests[{
     "Commandlet" : ["Get-TenantSettings"],
     "ActualValue" : EnvironmentCreation.disableEnvironmentCreationByNonAdminUsers,
     "ReportDetails" : ReportDetailsBoolean(Status),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "powerplatform-2.1.1",
+    "TestId": "powerplatform-2.1.1-t1"
 }] {
     EnvironmentCreation := input.environment_creation[_]
     Status := EnvironmentCreation.disableEnvironmentCreationByNonAdminUsers == true
@@ -61,7 +63,9 @@ tests[{
     "Commandlet" : ["Get-TenantSettings"],
     "ActualValue" : "PowerShell Error",
     "ReportDetails" : "PowerShell Error",
-    "RequirementMet" : false
+    "RequirementMet" : false,
+    "PolicyId" : "powerplatform-2.1.1",
+    "TestId": "powerplatform-2.1.1-t2"
 }] {
     count(input.environment_creation) <= 0
 }
@@ -77,7 +81,9 @@ tests[{
     "Commandlet" : ["Get-TenantSettings"],
     "ActualValue" : EnvironmentCreation.disableTrialEnvironmentCreationByNonAdminUsers,
     "ReportDetails" : ReportDetailsBoolean(Status),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "powerplatform-2.1.2",
+    "TestId": "powerplatform-2.1.2-t1"
 }] {
     EnvironmentCreation := input.environment_creation[_]
     Status := EnvironmentCreation.disableTrialEnvironmentCreationByNonAdminUsers == true
@@ -94,7 +100,9 @@ tests[{
     "Commandlet" : ["Get-TenantSettings"],
     "ActualValue" : "PowerShell Error",
     "ReportDetails" : "PowerShell Error",
-    "RequirementMet" : false
+    "RequirementMet" : false,
+    "PolicyId" : "powerplatform-2.1.2",
+    "TestId": "powerplatform-2.1.2-t1"
 }] {
     count(input.environment_creation) <= 0
 }
@@ -124,7 +132,9 @@ tests[{
     "Commandlet" : ["Get-DlpPolicy"],
     "ActualValue" : DefaultEnvPolicies,
     "ReportDetails" : ReportDetailsString(Status, ErrorMessage),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "powerplatform-2.2.1",
+    "TestId": "powerplatform-2.2.1-t1"
 }] {
     ErrorMessage := "No policy found that applies to default environment"
     Status := count(DefaultEnvPolicies) > 0
@@ -163,7 +173,9 @@ tests[{
     "Commandlet" : ["Get-DlpPolicy"],
     "ActualValue" : EnvWithoutPolicies,
     "ReportDetails" : ReportDetailsArray(Status, EnvWithoutPolicies, ErrorMessage),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "powerplatform-2.2.2",
+    "TestId": "powerplatform-2.2.2-t1"
 }] {
     DLPPolicies = input.dlp_policies[_]
     count(DLPPolicies.value) > 0
@@ -182,7 +194,9 @@ tests[{
     "Commandlet" : ["Get-DlpPolicy"],
     "ActualValue" : "No DLP Policies found",
     "ReportDetails" : "No DLP Policies found",
-    "RequirementMet" : false
+    "RequirementMet" : false,
+    "PolicyId" : "powerplatform-2.2.2",
+    "TestId": "powerplatform-2.2.2-t2"
 }] {
     DLPPolicies = input.dlp_policies[_]
     count(DLPPolicies.value) <= 0
@@ -199,7 +213,9 @@ tests[{
     "Commandlet" : ["Get-DlpPolicy"],
     "ActualValue" : "PowerShell Error",
     "ReportDetails" : "PowerShell Error",
-    "RequirementMet" : false
+    "RequirementMet" : false,
+    "PolicyId" : "powerplatform-2.2.2",
+    "TestId": "powerplatform-2.2.2-t3"
 }] {
     count(input.dlp_policies) <= 0
 }
@@ -259,7 +275,9 @@ tests[{
     "Commandlet" : ["Get-DlpPolicy"],
     "ActualValue" : RogueConnectors,
     "ReportDetails" : ReportDetailsArray(Status, RogueConnectors, ErrorMessage),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "powerplatform-2.2.3",
+    "TestId": "powerplatform-2.2.3-t1"
 }] {
     DLPPolicies = input.dlp_policies[_]
     count(DLPPolicies.value) > 0
@@ -279,7 +297,9 @@ tests[{
     "Commandlet" : ["Get-DlpPolicy"],
     "ActualValue" : "No DLP Policies found",
     "ReportDetails" : "No DLP Policies found",
-    "RequirementMet" : false
+    "RequirementMet" : false,
+    "PolicyId" : "powerplatform-2.2.3",
+    "TestId": "powerplatform-2.3.3-t2"
 }] {
     DLPPolicies = input.dlp_policies[_]
     count(DLPPolicies.value) <= 0
@@ -296,7 +316,9 @@ tests[{
     "Commandlet" : ["Get-DlpPolicy"],
     "ActualValue" : "PowerShell error",
     "ReportDetails" : "PowerShell error",
-    "RequirementMet" : false
+    "RequirementMet" : false,
+    "PolicyId" : "powerplatform-2.2.3",
+    "TestId": "powerplatform-2.2.3-t3"
 }] {
     count(input.dlp_policies) <= 0
 }
@@ -317,7 +339,9 @@ tests[{
     "Commandlet" : ["Get-PowerAppTenantIsolationPolicy"],
     "ActualValue" : TenantIsolation.properties.isDisabled,
     "ReportDetails" : ReportDetailsBoolean(Status),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "powerplatform-2.3.1",
+    "TestId": "powerplatform-2.3.1-t1"
 }] {
     TenantIsolation := input.tenant_isolation[_]
     Status := TenantIsolation.properties.isDisabled == false
@@ -334,7 +358,9 @@ tests[{
     "Commandlet" : ["Get-PowerAppTenantIsolationPolicy"],
     "ActualValue" : "PowerShell Error",
     "ReportDetails" : "PowerShell Error",
-    "RequirementMet" : false
+    "RequirementMet" : false,
+    "PolicyId" : "powerplatform-2.3.1",
+    "TestId": "powerplatform-2.3.1-t2"
 }] {
     count(input.tenant_isolation) <= 0
 }
@@ -351,7 +377,9 @@ tests[{
     "Commandlet" : [],
     "ActualValue" : [],
     "ReportDetails" : "Currently cannot be checked automatically. See Power Platform Secure Configuration Baseline policy 2.3 for instructions on manual check",
-    "RequirementMet" : false
+    "RequirementMet" : false,
+    "PolicyId" : "powerplatform-2.3.2",
+    "TestId": "powerplatform-2.3.2-t1"
 }] {
     true
 }
@@ -373,7 +401,9 @@ tests[{
     "Commandlet" : [],
     "ActualValue" : [],
     "ReportDetails" : "Currently cannot be checked automatically. See Power Platform Secure Configuration Baseline policy 2.4 for instructions on manual check",
-    "RequirementMet" : false
+    "RequirementMet" : false,
+    "PolicyId" : "powerplatform-2.4.1",
+    "TestId": "powerplatform-2.4.1-t1"
 }] {
     true
 }
