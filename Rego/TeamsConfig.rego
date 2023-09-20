@@ -226,29 +226,6 @@ tests[{
 #--
 
 #--
-# MS.TEAMS.9.3v1
-#--
-PoliciesAllowingOutsideRegionStorage[Policy.Identity] {
-	Policy := input.meeting_policies[_]
-	Policy.AllowCloudRecording == true
-	Policy.AllowRecordingStorageOutsideRegion == true
-}
-
-tests[{
-	"PolicyId" : "MS.TEAMS.9.3v1",
-	"Criticality" : "Should",
-	"Commandlet" : ["Get-CsTeamsMeetingPolicy"],
-	"ActualValue" : Policies,
-	"ReportDetails" : ReportDetailsArray(Status, Policies, String),
-	"RequirementMet" : Status
-}] {
-	Policies := PoliciesAllowingOutsideRegionStorage
-	String := "meeting policy(ies) found that allow cloud recording and storage outside of the tenant's region:"
-	Status := count(Policies) == 0
-}
-#--
-
-#--
 # MS.TEAMS.1.7v1
 #--
 tests[{
@@ -277,8 +254,6 @@ tests[{
 }
 #--
 
-
-
 #--
 # MS.TEAMS.2.1v1
 #--
@@ -299,29 +274,6 @@ tests[{
 }] {
     Policies := ExternalAccessConfig
 	String := "meeting policy(ies) that allow external access across all domains:"
-	Status := count(Policies) == 0
-}
-#--
-
-#--
-# Baseline 2.4: Policy 2
-#--
-MeetingsNotAllowingAnonJoin[Policy.Identity] {
-	Policy := input.meeting_policies[_]
-	Policy.AllowAnonymousUsersToJoinMeeting == false
-}
-
-tests[{
-	"Requirement" : "Anonymous users SHOULD be enabled to join meetings",
-	"Control" : "Teams 2.4",
-	"Criticality" : "Should",
-	"Commandlet" : ["Get-CsTeamsMeetingPolicy"],
-	"ActualValue" : MeetingsNotAllowingAnonJoin,
-	"ReportDetails" : ReportDetailsArray(Status, Policies, String),
-	"RequirementMet" : Status
-}] {
-	Policies := MeetingsNotAllowingAnonJoin
-	String := "meeting policy(ies) found that don't allow anonymous users to join meetings:"
 	Status := count(Policies) == 0
 }
 #--
@@ -512,8 +464,6 @@ tests[{
 	String := "meeting policy(ies) found that does not restrict installation of third-party apps by default:"
 	Status = count(Policies) == 0
 }
-
-
 #--
 
 #--
@@ -536,7 +486,6 @@ tests[{
 	String := "meeting policy(ies) found that does not restrict installation of custom apps by default:"
 	Status = count(Policies) == 0
 }
-
 #--
 
 #--
@@ -562,22 +511,6 @@ tests[{
 tests[{
 	"PolicyId" : "MS.TEAMS.6.2v1",
     "Criticality" : "Should/3rd Party",
-    "Commandlet" : [],
-    "ActualValue" : [],
-    "ReportDetails" : "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
-    "RequirementMet" : false
-}] {
-    true
-}
-#--
-
-#--
-# MS.TEAMS.11.4v1
-#--
-# At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
-tests[{
-	"PolicyId" : "MS.TEAMS.11.4v1",
-    "Criticality" : "Shall/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
     "ReportDetails" : "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
@@ -625,22 +558,6 @@ tests[{
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
     "PolicyId" : "MS.TEAMS.8.1v1",
-    "Criticality" : "Should/3rd Party",
-    "Commandlet" : [],
-    "ActualValue" : [],
-    "ReportDetails" : "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
-    "RequirementMet" : false
-}] {
-    true
-}
-#--
-
-#--
-# MS.TEAMS.13.2v1
-#--
-# At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
-tests[{
-	"PolicyId" : "MS.TEAMS.13.2v1",
     "Criticality" : "Should/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
