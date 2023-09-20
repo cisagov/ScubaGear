@@ -53,7 +53,9 @@ tests[{
 	"Commandlet" : ["Get-CsTeamsMeetingPolicy"],
 	"ActualValue" : Policies,
 	"ReportDetails" : ReportDetailsArray(Status, Policies, String),
-	"RequirementMet" : Status
+	"RequirementMet" : Status,
+  "PolicyId" : "teams-2.1.1",
+  "TestId": "teams-2.1.1-t1"
 }] {
 	Policies := MeetingsAllowingExternalControl
 	String := "meeting policy(ies) found that allows external control:"
@@ -81,7 +83,9 @@ tests[{
 	"Commandlet" : ["Get-CsTeamsMeetingPolicy"],
 	"ActualValue" : Policies,
 	"ReportDetails" : ReportDetailsArray(Status, Policies, String),
-	"RequirementMet" : Status
+	"RequirementMet" : Status,
+  "PolicyId" : "teams-2.2.1",
+  "TestId": "teams-2.2.1-t1"
 }] {
 	Policies := MeetingsAllowingAnonStart
 	String := "meeting policy(ies) found that allows anonymous users to start meetings:"
@@ -121,7 +125,9 @@ tests[{
 	"Commandlet" : ["Get-CsTeamsMeetingPolicy"],
 	"ActualValue" : [Policy.AutoAdmittedUsers, Policy.AllowPSTNUsersToBypassLobby],
 	"ReportDetails" : ReportDetails2_3(Policy),
-	"RequirementMet" : Status
+	"RequirementMet" : Status,
+  "PolicyId" : "teams-2.3.1",
+  "TestId": "teams-2.3.1-t1"
 }] {
 	Policy := input.meeting_policies[_]
 	# This control specifically states that non-global policies MAY be different, so filter for the global policy
@@ -137,7 +143,9 @@ tests[{
 	"Commandlet" : ["Get-CsTeamsMeetingPolicy"],
 	"ActualValue" : "PowerShell Error",
 	"ReportDetails" : "PowerShell Error",
-	"RequirementMet" : false
+	"RequirementMet" : false,
+  "PolicyId" : "teams-2.3.1",
+  "TestId": "teams-2.3.1-t2"
 }] {
 	count(input.meeting_policies) == 0
 }
@@ -153,7 +161,9 @@ tests[{
 	"Commandlet" : ["Get-CsTeamsMeetingPolicy"],
 	"ActualValue" : Policy.AutoAdmittedUsers,
 	"ReportDetails" : ReportDetailsBoolean(Status),
-	"RequirementMet" : Status
+	"RequirementMet" : Status,
+  "PolicyId" : "teams-2.3.2",
+  "TestId": "teams-2.3.2-t1"
 }] {
 	Policy := input.meeting_policies[_]
     # This control specifically states that non-global policies MAY be different, so filter for the global policy
@@ -171,7 +181,9 @@ tests[{
 	"Commandlet" : ["Get-CsTeamsMeetingPolicy"],
 	"ActualValue" : "PowerShell Error",
 	"ReportDetails" : "PowerShell Error",
-	"RequirementMet" : false
+	"RequirementMet" : false,
+  "PolicyId" : "teams-2.3.2",
+  "TestId": "teams-2.3.2-t3"
 }] {
 	count(input.meeting_policies) == 0
 }
@@ -199,7 +211,9 @@ tests[{
 	"Commandlet" : ["Get-CsTenantFederationConfiguration"],
 	"ActualValue" : Policies,
 	"ReportDetails" : ReportDetailsArray(Status, Policies, String),
-	"RequirementMet" : Status
+	"RequirementMet" : Status,
+  "PolicyId" : "teams-2.4.1",
+  "TestId": "teams-2.4.1-t1"
 }] {
     Policies := ExternalAccessConfig
 	String := "meeting policy(ies) that allow external access across all domains:"
@@ -222,7 +236,9 @@ tests[{
 	"Commandlet" : ["Get-CsTeamsMeetingPolicy"],
 	"ActualValue" : MeetingsNotAllowingAnonJoin,
 	"ReportDetails" : ReportDetailsArray(Status, Policies, String),
-	"RequirementMet" : Status
+	"RequirementMet" : Status,
+  "PolicyId" : "teams-2.4.2",
+  "TestId": "teams-2.4.2-t1"
 }] {
 	Policies := MeetingsNotAllowingAnonJoin
 	String := "meeting policy(ies) found that don't allow anonymous users to join meetings:"
@@ -268,7 +284,9 @@ tests[{
 	"Commandlet" : ["Get-CsTenantFederationConfiguration"],
 	"ActualValue" : Policies,
 	"ReportDetails" : ReportDetailsArray(Status, Policies, String),
-	"RequirementMet" : Status
+	"RequirementMet" : Status,
+  "PolicyId" : "teams-2.5.1",
+  "TestId": "teams-2.5.1-t1"
 }] {
 	Policies := FederationConfiguration
     String := "Configuration allowed unmanaged users to initiate contact with internal user across domains:"
@@ -291,7 +309,9 @@ tests[{
 	"Commandlet" : ["Get-CsTenantFederationConfiguration"],
 	"ActualValue" : Policies,
 	"ReportDetails" : ReportDetailsArray(Status, Policies, String),
-	"RequirementMet" : Status
+	"RequirementMet" : Status,
+  "PolicyId" : "teams-2.5.2",
+  "TestId": "teams-2.5.2-t1"
 }] {
 	Policies := InternalCannotenable
 	String := "Internal users are enabled to initiate contact with unmanaged users across domains:"
@@ -319,7 +339,9 @@ tests[{
 	"Commandlet" : ["Get-CsTenantFederationConfiguration"],
 	"ActualValue" : Policies,
 	"ReportDetails" : ReportDetailsArray(Status, Policies, String),
-	"RequirementMet" : Status
+	"RequirementMet" : Status,
+  "PolicyId" : "teams-2.6.1",
+  "TestId": "teams-2.6.1-t1"
 }] {
 	Policies := SkpyeBlocConfig
 	String := "domains that allows contact with Skype users:"
@@ -340,45 +362,56 @@ ConfigsAllowingEmail[Policy.Identity] {
     Policy.AllowEmailIntoChannel == true
 }
 
-ReportDetails2_7(IsGCC, IsEnabled) = Description if {
+ReportDetails2_7(IsGCC, ComfirmCorrectConfig, Policies) = Description if {
 	IsGCC == true
 	Description := "N/A: Feature is unavailable in GCC environments"
 }
 
-ReportDetails2_7(IsGCC, IsEnabled) = Description if {
+ReportDetails2_7(IsGCC, ComfirmCorrectConfig, Policies) = Description if {
 	IsGCC == false
-	IsEnabled == true
+	ComfirmCorrectConfig == true
 	Description := "Requirement met"
 }
 
-ReportDetails2_7(IsGCC, IsEnabled) = Description if {
+ReportDetails2_7(IsGCC, ComfirmCorrectConfig, Policies) = Description if {
 	IsGCC == false
-	IsEnabled == false
-	Description := "Requirement not met"
+	ComfirmCorrectConfig == false
+	Detail := "Requirement not met: Email integration is enabled across domain:"
+	Description := ReportDetailsArray(false, Policies, Detail)
 }
 
 tests[{
 	"Requirement" : "Teams email integration SHALL be disabled",
 	"Control" : "Teams 2.7",
 	"Criticality" : "Shall",
-	"Commandlet" : ["Get-CsTeamsClientConfiguration", "Get-CsTenant"],
-	"ActualValue" : {"ClientConfig": input.client_configuration, "AssignedPlans": AssignedPlans},
-	"ReportDetails" : ReportDetails2_7(IsGCC, IsEnabled),
-	"RequirementMet" : Status
+	"Commandlet" : ["Get-CsTeamsClientConfiguration"],
+	"ActualValue" : [Policies, ServiceInstance],
+	"ReportDetails" : ReportDetails2_7(IsGCC, ComfirmCorrectConfig, Policies),
+	"RequirementMet" : Status,
+  "PolicyId" : "teams-2.7.1",
+  "TestId": "teams-2.7.1-t1"
 }] {
-	# According to Get-CsTeamsClientConfiguration, is team email integration enabled?
-    IsEnabled := count(ConfigsAllowingEmail) == 0
-	# What is the tenant type according to Get-CsTenant? 
     TenantConfig := input.teams_tenant_info[_]
-	AssignedPlans := concat(", ", TenantConfig.AssignedPlan)
-    GCCConditions := [contains(AssignedPlans, "GCC"), contains(AssignedPlans, "DOD")]
-	IsGCC := count([Condition | Condition = GCCConditions[_]; Condition == true]) > 0
-	# As long as either:
-	# 	1) Get-CsTeamsClientConfiguration reports email integration is disabled or
-	# 	2) Get-CsTenant reports this as a gov tenant
-	# this test should pass.
-	Conditions := [IsEnabled, IsGCC]
+	ServiceInstance := TenantConfig.ServiceInstance
+	Policies := ConfigsAllowingEmail
+    ComfirmCorrectConfig := count(Policies) ==0
+    IsGCC := indexof(ServiceInstance, "GOV") != -1
+	Conditions := [ComfirmCorrectConfig, IsGCC]
     Status := count([Condition | Condition = Conditions[_]; Condition == true]) > 0
+}
+
+tests[{
+	"Requirement" : "Teams email integration SHALL be disabled",
+	"Control" : "Teams 2.7",
+	"Criticality" : "Shall",
+	"Commandlet" : ["Get-CsTeamsClientConfiguration"],
+	"ActualValue" : "PowerShell Error",
+	"ReportDetails" : "PowerShell Error",
+	"RequirementMet" : false,
+  "PolicyId" : "teams-2.7.1",
+  "TestId": "teams-2.7.1-t2"
+}] {
+    count(input.teams_tenant_info) == 0
 }
 #--
 
@@ -402,7 +435,9 @@ tests[{
 	"Commandlet" : ["Get-CsTeamsAppPermissionPolicy"],
 	"ActualValue" : Policies,
 	"ReportDetails" : ReportDetailsArray(Status, Policies, String),
-	"RequirementMet" : Status
+	"RequirementMet" : Status,
+  "PolicyId" : "teams-2.8.1",
+  "TestId": "teams-2.8.1-t1"
 }] {
 	Policies := PoliciesBlockingDefaultApps
 	String := "meeting policy(ies) found that block Microsoft Apps by default:"
@@ -430,7 +465,9 @@ tests[{
 	"Commandlet" : ["Get-CsTeamsAppPermissionPolicy"],
 	"ActualValue" : Policies,
 	"ReportDetails" : ReportDetailsArray(Status, Policies, String),
-	"RequirementMet" : Status
+	"RequirementMet" : Status,
+  "PolicyId" : "teams-2.8.2",
+  "TestId": "teams-2.8.2-t1"
 }] {
 	Policies := PoliciesAllowingGlobalApps
 	String := "meeting policy(ies) found that allow third-party apps by default:"
@@ -444,7 +481,9 @@ tests[{
 	"Commandlet" : ["Get-CsTeamsAppPermissionPolicy"],
 	"ActualValue" : Policies,
 	"ReportDetails" :  ReportDetailsArray(Status, Policies, String),
-	"RequirementMet" : Status
+	"RequirementMet" : Status,
+  "PolicyId" : "teams-2.8.2",
+  "TestId": "teams-2.8.2-t2"
 }] {
 	Policies := PoliciesAllowingCustomApps
 	String := "meeting policy(ies) found that allow custom apps by default:"
@@ -463,7 +502,9 @@ tests[{
     "Commandlet" : [],
     "ActualValue" : [],
     "ReportDetails" : "Cannot be checked automatically. See Microsoft Teams Secure Configuration Baseline policy 2.8 for instructions on manual check",
-    "RequirementMet" : false
+    "RequirementMet" : false,
+    "PolicyId" : "teams-2.8.3",
+    "TestId": "teams-2.8.3-t1"
 }] {
     true
 }
@@ -484,7 +525,9 @@ tests[{
 	"Commandlet" : ["Get-CsTeamsMeetingPolicy"],
 	"ActualValue" : Policy.AllowCloudRecording,
 	"ReportDetails" : ReportDetailsBoolean(Status),
-	"RequirementMet" : Status
+	"RequirementMet" : Status,
+  "PolicyId" : "teams-2.9.1",
+  "TestId": "teams-2.9.1-t1"
 }] {
 	Policy := input.meeting_policies[_]
 	Policy.Identity == "Global" # Filter: this control only applies to the Global policy
@@ -501,7 +544,9 @@ tests[{
 	"Commandlet" : ["Get-CsTeamsMeetingPolicy"],
 	"ActualValue" : "PowerShell Error",
 	"ReportDetails" : "PowerShell Error",
-	"RequirementMet" : false
+	"RequirementMet" : false,
+  "PolicyId" : "teams-2.9.1",
+  "TestId": "teams-2.9.1-t2"
 }] {
 	count(input.meeting_policies) == 0
 }
@@ -523,7 +568,9 @@ tests[{
 	"Commandlet" : ["Get-CsTeamsMeetingPolicy"],
 	"ActualValue" : Policies,
 	"ReportDetails" : ReportDetailsArray(Status, Policies, String),
-	"RequirementMet" : Status
+	"RequirementMet" : Status,
+  "PolicyId" : "teams-2.9.2",
+  "TestId": "teams-2.9.2-t1"
 }] {
 	Policies := PoliciesAllowingOutsideRegionStorage
 	String := "meeting policy(ies) found that allow cloud recording and storage outside of the tenant's region:"
@@ -546,7 +593,9 @@ tests[{
 	"Commandlet" : ["Get-CsTeamsMeetingBroadcastPolicy"],
 	"ActualValue" : Policy.BroadcastRecordingMode,
 	"ReportDetails" : ReportDetailsBoolean(Status),
-	"RequirementMet" : Status
+	"RequirementMet" : Status,
+  "PolicyId" : "teams-2.10.1",
+  "TestId": "teams-2.10.1-t1"
 }] {
 	Policy := input.broadcast_policies[_]
 	Policy.Identity == "Global" # Filter: this control only applies to the Global policy
@@ -563,7 +612,9 @@ tests[{
 	"Commandlet" : ["Get-CsTeamsMeetingBroadcastPolicy"],
 	"ActualValue" : "PowerShell Error",
 	"ReportDetails" : "PowerShell Error",
-	"RequirementMet" : false
+	"RequirementMet" : false,
+  "PolicyId" : "teams-2.10.1",
+  "TestId": "teams-2.10.1-t2"
 }] {
 	count(input.broadcast_policies) == 0
 }
@@ -585,7 +636,9 @@ tests[{
     "Commandlet" : [],
     "ActualValue" : [],
     "ReportDetails" : "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
-    "RequirementMet" : false
+    "RequirementMet" : false,
+    "PolicyId" : "teams-2.11.1",
+    "TestId": "teams-2.11.1-t1"
 }] {
     true
 }
@@ -602,7 +655,9 @@ tests[{
     "Commandlet" : [],
     "ActualValue" : [],
     "ReportDetails" : "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
-    "RequirementMet" : false
+    "RequirementMet" : false,
+  "PolicyId" : "teams-2.11.2",
+  "TestId": "teams-2.11.2-t1"
 }] {
     true
 }
@@ -619,7 +674,9 @@ tests[{
     "Commandlet" : [],
     "ActualValue" : [],
     "ReportDetails" : "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
-    "RequirementMet" : false
+    "RequirementMet" : false,
+    "PolicyId" : "teams-2.11.3",
+    "TestId": "teams-2.11.3-t1"
 }] {
     true
 }
@@ -641,7 +698,9 @@ tests[{
     "Commandlet" : [],
     "ActualValue" : [],
     "ReportDetails" : "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
-    "RequirementMet" : false
+    "RequirementMet" : false,
+  "PolicyId" : "teams-2.12.1",
+  "TestId": "teams-2.12.1-t1"
 }] {
     true
 }
@@ -658,7 +717,9 @@ tests[{
     "Commandlet" : [],
     "ActualValue" : [],
     "ReportDetails" : "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
-    "RequirementMet" : false
+    "RequirementMet" : false,
+  "PolicyId" : "teams-2.12.2",
+  "TestId": "teams-2.12.2-t1"
 }] {
     true
 }
@@ -680,7 +741,9 @@ tests[{
     "Commandlet" : [],
     "ActualValue" : [],
     "ReportDetails" : "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
-    "RequirementMet" : false
+    "RequirementMet" : false,
+    "PolicyId" : "teams-2.13.1",
+    "TestId": "teams-2.13.1-t1"
 }] {
     true
 }
@@ -697,7 +760,9 @@ tests[{
     "Commandlet" : [],
     "ActualValue" : [],
     "ReportDetails" : "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
-    "RequirementMet" : false
+    "RequirementMet" : false,
+  "PolicyId" : "teams-2.13.2",
+  "TestId": "teams-2.13.2-t1"
 }] {
     true
 }
@@ -714,7 +779,9 @@ tests[{
     "Commandlet" : [],
     "ActualValue" : [],
     "ReportDetails" : "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
-    "RequirementMet" : false
+    "RequirementMet" : false,
+  "PolicyId" : "teams-2.13.3",
+  "TestId": "teams-2.13.3-t1"
 }] {
     true
 }
