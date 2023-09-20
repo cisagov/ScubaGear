@@ -161,7 +161,9 @@ tests[{
     "Commandlet" : ["Get-MgIdentityConditionalAccessPolicy"],
     "ActualValue" : Policies2_1,
     "ReportDetails" : concat(". ", [ReportFullDetailsArray(Policies2_1, DescriptionString), CapLink]),
-    "RequirementMet" : count(Policies2_1) > 0
+    "RequirementMet" : count(Policies2_1) > 0,
+    "PolicyId" : "aad-2.1.1",
+    "TestId": "aad-2.1.1-t1"
 }] {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
     true
@@ -204,7 +206,9 @@ tests[{
     "Commandlet" : ["Get-MgIdentityConditionalAccessPolicy"],
     "ActualValue" : Policies2_2_1,
     "ReportDetails" : ReportDetailsArrayLicenseWarningCap(Policies2_2_1, DescriptionString),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "aad-2.2.1",
+    "TestId": "aad-2.2.1-t1"
 }] {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
     Status := count(Policies2_2_1) > 0
@@ -222,7 +226,9 @@ tests[{
     "Commandlet" : [],
     "ActualValue" : [],
     "ReportDetails" : "Currently cannot be checked automatically. See Azure Active Directory Secure Configuration Baseline policy 2.2 for instructions on manual check",
-    "RequirementMet" : false
+    "RequirementMet" : false,
+    "PolicyId" : "aad-2.2.2",
+    "TestId": "aad-2.2.2-t1"
 }] {
     true
 }
@@ -265,7 +271,9 @@ tests[{
     "Commandlet" : ["Get-MgIdentityConditionalAccessPolicy"],
     "ActualValue" : Policies2_3,
     "ReportDetails" : ReportDetailsArrayLicenseWarningCap(Policies2_3, DescriptionString),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "aad-2.3.1",
+    "TestId": "aad-2.3.1-t1"
 }] {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
     Status := count(Policies2_3) > 0
@@ -307,7 +315,9 @@ tests[{
     "Commandlet" : ["Get-MgIdentityConditionalAccessPolicy"],
     "ActualValue" : Policies2_4_1,
     "ReportDetails" : concat(". ", [ReportFullDetailsArray(Policies2_4_1, DescriptionString), CapLink]),
-    "RequirementMet" : count(Policies2_4_1) > 0
+    "RequirementMet" : count(Policies2_4_1) > 0,
+    "PolicyId" : "aad-2.4.1",
+    "TestId": "aad-2.4.1-t1"
 }]{
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
     true
@@ -326,7 +336,9 @@ tests[{
     "Commandlet" : [],
     "ActualValue" : [],
     "ReportDetails" : "Currently cannot be checked automatically. See Azure Active Directory Secure Configuration Baseline policy 2.4 for instructions on manual check",
-    "RequirementMet" : false
+    "RequirementMet" : false,
+    "PolicyId" : "aad-2.4.2",
+    "TestId": "aad-2.4.2-t1"
 }] {
     true
 }
@@ -344,7 +356,9 @@ tests[{
     "Commandlet" : [],
     "ActualValue" : [],
     "ReportDetails" : "Currently cannot be checked automatically. See Azure Active Directory Secure Configuration Baseline policy 2.4 for instructions on manual check",
-    "RequirementMet" : false
+    "RequirementMet" : false,
+    "PolicyId" : "aad-2.4.3",
+    "TestId": "aad-2.4.3-t1"
 }] {
     true
 }
@@ -362,7 +376,9 @@ tests[{
     "Commandlet" : [],
     "ActualValue" : [],
     "ReportDetails" : "Currently cannot be checked automatically. See Azure Active Directory Secure Configuration Baseline policy 2.4 for instructions on manual check",
-    "RequirementMet" : false
+    "RequirementMet" : false,
+    "PolicyId" : "aad-2.4.4",
+    "TestId": "aad-2.4.4-t1"
 }] {
     true
 }
@@ -384,7 +400,9 @@ tests[{
     "Commandlet" : [],
     "ActualValue" : [],
     "ReportDetails" : "Currently cannot be checked automatically. See Azure Active Directory Secure Configuration Baseline policy 2.5 for instructions on manual check",
-    "RequirementMet" : false
+    "RequirementMet" : false,
+    "PolicyId" : "aad-2.5.1",
+    "TestId": "aad-2.5.1-t1"
 }] {
     true
 }
@@ -401,7 +419,9 @@ tests[{
     "Commandlet" : [],
     "ActualValue" : [],
     "ReportDetails" : "Currently cannot be checked automatically. See Azure Active Directory Secure Configuration Baseline policy 2.5 for instructions on manual check",
-    "RequirementMet" : false
+    "RequirementMet" : false,
+    "PolicyId" : "aad-2.5.2",
+    "TestId": "aad-2.5.2-t1"
 }] {
     true
 }
@@ -434,7 +454,9 @@ tests[{
     "Commandlet" : ["Get-MgPolicyAuthorizationPolicy"],
     "ActualValue" : {"all_allowed_create_values": AllAuthPoliciesAllowedCreate},
     "ReportDetails" : ReportFullDetailsArray(BadPolicies, DescriptionString),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "aad-2.6.1",
+    "TestId": "aad-2.6.1-t1"
 }] {
     BadPolicies := AuthPoliciesBad_2_6
     Status := count(BadPolicies) == 0
@@ -469,7 +491,9 @@ tests[{
     "Commandlet" : ["Get-MgPolicyAuthorizationPolicy"],
     "ActualValue" : {"all_grant_policy_values": AllDefaultGrantPolicies},
     "ReportDetails" : ReportFullDetailsArray(BadPolicies, DescriptionString),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "aad-2.7.1",
+    "TestId": "aad-2.7.1-t1"
 }] {
     BadPolicies := BadDefaultGrantPolicies
     Status := count(BadPolicies) == 0
@@ -500,7 +524,9 @@ tests[{
     "Commandlet" : ["Get-MgPolicyAdminConsentRequestPolicy"],
     "ActualValue" : {"all_consent_policies": AllConsentPolicies},
     "ReportDetails" : ReportDetailsBoolean(Status),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "aad-2.7.2",
+    "TestId": "aad-2.7.2-t1"
 }] {
     BadPolicies := BadConsentPolicies
     Status := count(BadPolicies) == 0
@@ -545,7 +571,9 @@ tests[{
     "Commandlet" : ["Get-MgDirectorySetting"],
     "ActualValue" : AllConsentSettings,
     "ReportDetails" : ReportDetailsBoolean(Status),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "aad-2.7.3",
+    "TestId": "aad-2.7.3-t1"
 }] {
     Conditions := [count(BadConsentSettings) == 0, count(GoodConsentSettings) > 0]
     Status := count([Condition | Condition = Conditions[_]; Condition == false]) == 0
@@ -568,7 +596,9 @@ tests[{
     "Commandlet" : [],
     "ActualValue" : [],
     "ReportDetails" : "Currently cannot be checked automatically. See Azure Active Directory Secure Configuration Baseline policy 2.8 for instructions on manual check",
-    "RequirementMet" : false
+    "RequirementMet" : false,
+    "PolicyId" : "aad-2.8.1",
+    "TestId": "aad-2.8.1-t1"
 }] {
     true
 }
@@ -611,7 +641,9 @@ tests[{
     "Commandlet" : ["Get-MgIdentityConditionalAccessPolicy"],
     "ActualValue" : Policies2_9,
     "ReportDetails" : concat(". ", [ReportFullDetailsArray(Policies2_9, DescriptionString), CapLink]),
-    "RequirementMet" : count(Policies2_9) > 0
+    "RequirementMet" : count(Policies2_9) > 0,
+    "PolicyId" : "aad-2.9.1",
+    "TestId": "aad-2.9.1-t1"
 }] {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
     true
@@ -654,7 +686,9 @@ tests[{
     "Commandlet" : ["Get-MgIdentityConditionalAccessPolicy"],
     "ActualValue" : Policies2_10,
     "ReportDetails" : concat(". ", [ReportFullDetailsArray(Policies2_10, DescriptionString), CapLink]),
-    "RequirementMet" : count(Policies2_10) > 0
+    "RequirementMet" : count(Policies2_10) > 0,
+    "PolicyId" : "aad-2.10.1",
+    "TestId": "aad-2.10.1-t1"
 }] {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
     true
@@ -682,7 +716,9 @@ tests[{
     "Commandlet" : ["Get-MgSubscribedSku", "Get-PrivilegedUser"],
     "ActualValue" : GlobalAdmins,
     "ReportDetails" : ReportFullDetailsArray(GlobalAdmins, DescriptionString),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "aad-2.11.1",
+    "TestId": "aad-2.11.1-t1"
 }] {
     DescriptionString := "global admin(s) found"
     Conditions := [count(GlobalAdmins) < 5, count(GlobalAdmins) >= 2]
@@ -711,7 +747,9 @@ tests[{
     "Commandlet" : ["Get-MgSubscribedSku", "Get-PrivilegedUser"],
     "ActualValue" : AdminNames,
     "ReportDetails" : ReportFullDetailsArray(FederatedAdmins, DescriptionString),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "aad-2.12.1",
+    "TestId": "aad-2.12.1-t1"
 }] {
     DescriptionString := "admin(s) that are not cloud-only found"
     Status := count(FederatedAdmins) == 0
@@ -750,7 +788,9 @@ tests[{
     "Commandlet" : ["Get-MgSubscribedSku", "Get-PrivilegedRole", "Get-MgIdentityConditionalAccessPolicy"],
     "ActualValue" : Policies2_13,
     "ReportDetails" : concat(". ", [ReportFullDetailsArray(Policies2_13, DescriptionString), CapLink]),
-    "RequirementMet" : count(Policies2_13) > 0
+    "RequirementMet" : count(Policies2_13) > 0,
+    "PolicyId" : "aad-2.13.1",
+    "TestId": "aad-2.13.1-t1"
 }] {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
 }
@@ -817,7 +857,9 @@ tests[{
     "Commandlet" : ["Get-MgSubscribedSku", "Get-PrivilegedRole"],
     "ActualValue" : RolesWithoutLimitedExpirationPeriod,
     "ReportDetails" : ReportDetailsArrayLicenseWarning(RolesWithoutLimitedExpirationPeriod, DescriptionString),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "aad-2.14.1",
+    "TestId": "aad-2.14.1-t1"
 }] {
     DescriptionString := "role(s) configured to allow permanent active assignment or expiration period too long"
     Conditions := [count(RolesWithoutLimitedExpirationPeriod) == 0, check_if_role_rules_exist]
@@ -842,7 +884,9 @@ tests[{
     "Commandlet" : ["Get-MgSubscribedSku", "Get-PrivilegedRole"],
     "ActualValue" : RolesAssignedOutsidePim,
     "ReportDetails" : ReportDetailsArrayLicenseWarning(RolesAssignedOutsidePim, DescriptionString),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "aad-2.14.2",
+    "TestId": "aad-2.14.2-t1"
 }] {
     DescriptionString := "role(s) assigned to users outside of PIM"
     Conditions := [count(RolesAssignedOutsidePim) == 0, check_if_role_rules_exist]
@@ -874,7 +918,9 @@ tests[{
     "Commandlet" : ["Get-MgSubscribedSku", "Get-PrivilegedRole"],
     "ActualValue" : RolesWithoutApprovalRequired,
     "ReportDetails" : ReportDetailsArrayLicenseWarning(RolesWithoutApprovalRequired, DescriptionString),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "aad-2.15.1",
+    "TestId": "aad-2.15.1-t1"
 }] {
     DescriptionString := "role(s) that do not require approval to activate found"
     Conditions := [count(RolesWithoutApprovalRequired) == 0, check_if_role_rules_exist]
@@ -915,7 +961,9 @@ tests[{
     "Commandlet" : ["Get-MgSubscribedSku", "Get-PrivilegedRole"],
     "ActualValue" : RolesWithoutAssignmentAlerts,
     "ReportDetails" : ReportDetailsArrayLicenseWarning(RolesWithoutAssignmentAlerts, DescriptionString),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "aad-2.16.1",
+    "TestId": "aad-2.16.1-t1"
 }] {
     DescriptionString := "role(s) without notification e-mail configured for role assignments found"
     RolesWithoutAssignmentAlerts := RolesWithoutActiveAssignmentAlerts | RolesWithoutEligibleAssignmentAlerts
@@ -944,7 +992,9 @@ tests[{
     "Commandlet" : ["Get-MgSubscribedSku", "Get-PrivilegedRole"],
     "ActualValue" : AdminsWithoutActivationAlert,
     "ReportDetails" : ReportDetailsBooleanLicenseWarning(Status),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "aad-2.16.2",
+    "TestId": "aad-2.16.2-t1"
 }] {
     GlobalAdminNotMonitored := "Global Administrator" in AdminsWithoutActivationAlert
     Conditions := [GlobalAdminNotMonitored == false, check_if_role_rules_exist]
@@ -962,7 +1012,9 @@ tests[{
     "Commandlet" : ["Get-MgSubscribedSku", "Get-PrivilegedRole"],
     "ActualValue" : NonGlobalAdminsWithoutActivationAlert,
     "ReportDetails" : ReportDetailsArrayLicenseWarning(NonGlobalAdminsWithoutActivationAlert, DescriptionString),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "aad-2.16.3",
+    "TestId": "aad-2.16.3-t1"
 }] {
     DescriptionString := "role(s) without notification e-mail configured for role activations found"
     NonGlobalAdminsWithoutActivationAlert = AdminsWithoutActivationAlert - {"Global Administrator"}
@@ -998,7 +1050,9 @@ tests[{
     "Commandlet" : ["Get-MgIdentityConditionalAccessPolicy"],
     "ActualValue" : Policies2_17,
     "ReportDetails" : concat(". ", [ReportFullDetailsArray(Policies2_17, DescriptionString), CapLink]),
-    "RequirementMet" : count(Policies2_17) > 0
+    "RequirementMet" : count(Policies2_17) > 0,
+    "PolicyId" : "aad-2.17.1",
+    "TestId": "aad-2.17.1-t1"
 }] {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
     true
@@ -1037,7 +1091,9 @@ tests[{
     "Commandlet" : ["Get-MgPolicyAuthorizationPolicy"],
     "ActualValue" : {"all_allow_invite_values": AllAuthPoliciesAllowInvites},
     "ReportDetails" : ReportDetail,
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "aad-2.18.1",
+    "TestId": "aad-2.18.1-t1"
 }] {
     BadPolicies := AuthPoliciesBadAllowInvites
     Status := count(BadPolicies) == 0
@@ -1056,7 +1112,9 @@ tests[{
     "Commandlet" : [],
     "ActualValue" : [],
     "ReportDetails" : "Currently cannot be checked automatically. See Azure Active Directory Secure Configuration Baseline policy 2.18 for instructions on manual check",
-    "RequirementMet" : false
+    "RequirementMet" : false,
+    "PolicyId" : "aad-2.18.2",
+    "TestId": "aad-2.18.2-t1"
 }] {
     true
 }
@@ -1099,7 +1157,9 @@ tests[{
     "Commandlet" : ["Get-MgPolicyAuthorizationPolicy"],
     "ActualValue" : {"all_roleid_values" : AllAuthPoliciesRoleIds},
     "ReportDetails" : ReportDetail,
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "aad-2.18.3",
+    "TestId": "aad-2.18.3-t1"
 }] {
     BadPolicies := AuthPoliciesBadRoleId
     Status := count(BadPolicies) == 0
