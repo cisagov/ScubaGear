@@ -16,25 +16,12 @@ The local path for all web drivers
 
 .PARAMETER chromeDriverPath
 The direct Chrome driver path
-
-.PARAMETER chromeDriverWebsite
-The Chrome web driver downloads page
-
-.PARAMETER chromeDriverUrlBase
-URL base to ubild direct download link for Chrome driver
-
-.PARAMETER chromeDriverUrlEnd
-Chrome driver download ending (to finish building the URL)
-
 #>
 param (
     $registryRoot        = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths",
     $chromeRegistryPath  = "$registryRoot\chrome.exe",
     $webDriversPath      = "C:\Program Files\WindowsPowerShell\Modules\Selenium\3.0.1\assemblies",
-    $chromeDriverPath    = "$($webDriversPath)\chromedriver.exe",
-    $chromeDriverWebsite = "https://chromedriver.chromium.org/downloads",
-    $chromeDriverUrlBase = "https://chromedriver.storage.googleapis.com",
-    $chromeDriverUrlEnd  = "chromedriver_win32.zip"
+    $chromeDriverPath    = "$($webDriversPath)\chromedriver.exe"
 )
 function Get-LocalDriverVersion{
     param(
@@ -92,7 +79,6 @@ if (Confirm-NeedForUpdate $chromeVersion $localDriverVersion){
         Sort-Object {[System.Version]($_.Version)} -Descending |
         Where-Object {([System.Version]($_.Version)).Major -eq $chromeVersion.Major -and ([System.Version]($_.Version)).Minor -eq $chromeVersion.Minor -and ([System.Version]($_.Version)).Build -le $chromeVersion.Build} |
         Select-Object -First 1
-    $VersionsInfo | ft
     $Download = $VersionsInfo.Downloads.ChromeDriver |
         Where-Object {$_.Platform -eq 'win64'}
     $DownloadUrl = $Download.Url
@@ -113,7 +99,7 @@ if (Confirm-NeedForUpdate $chromeVersion $localDriverVersion){
     Move-Item "$DriverTempPath\chromedriver-win64\chromedriver.exe" -Destination  "$($webDriversPath)\chromedriver.exe" -Force
 
     # clean-up
-    #Remove-Item "$DriverTempPath\chromeNewDriver.zip" -Force
+    Remove-Item "$DriverTempPath\chromeNewDriver.zip" -Force
     Remove-Item $DriverTempPath\ -Recurse -Force
 }
 #endregion MAIN SCRIPT

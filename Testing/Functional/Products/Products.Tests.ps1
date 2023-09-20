@@ -45,7 +45,7 @@
             Verbosity = 'Detailed'
         }
     }
-    $Config = New-PesterConfiguration -Hashtable $PesterConfig 
+    $Config = New-PesterConfiguration -Hashtable $PesterConfig
     Invoke-Pester -Configuration $Config
 #>
 

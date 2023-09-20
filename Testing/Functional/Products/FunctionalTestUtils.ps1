@@ -150,8 +150,9 @@ function UpdateDirectorySettingByName{
     .PARAMETER Updates
       A hashtable of key/value pairs used as a splat for the Update-MgBetaDirectorySetting commandlet.
     .NOTES
-      If more than one directory setting has the same DisplayName then only the first is updated. 
+      If more than one directory setting has the same DisplayName then only the first is updated.
   #>
+  [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'DisplayName', Justification = 'Variable is used in ScriptBlock')]
   [CmdletBinding()]
   param (
       [Parameter(Mandatory = $true)]
@@ -183,6 +184,7 @@ function RemoveConditionalAccessPolicyByName{
     .NOTES
       If more than one conditional access policy has the same DisplayName then only the first is removed.
   #>
+  [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'DisplayName', Justification = 'Variable is used in ScriptBlock')]
   [CmdletBinding()]
   param (
       [Parameter(Mandatory = $true)]
@@ -211,6 +213,7 @@ function UpdateConditionalAccessPolicyByName{
     .NOTES
       If more than one conditional access policy has the same DisplayName then only the first is updated.
   #>
+  [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'DisplayName', Justification = 'Variable is used in ScriptBlock')]
   [CmdletBinding()]
   param (
       [Parameter(Mandatory = $true)]
