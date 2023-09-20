@@ -83,7 +83,9 @@ tests[{
     "Commandlet" : ["Get-EOPProtectionPolicyRule"],
 	"ActualValue" : Policy,
     "ReportDetails" : CustomizeError(ReportDetails(Status), ErrorMessage),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "defender-2.1.1",
+    "TestId": "defender-2.1.1-t1"
 }] {
     Policy := StandardPresetSecurityPolicy
     ErrorMessage := "The Standard Preset Security Policy is present and not disabled"
@@ -107,7 +109,9 @@ tests[{
     "Commandlet" : ["Get-EOPProtectionPolicyRule"],
 	"ActualValue" : Policy,
     "ReportDetails" : CustomizeError(ReportDetails(Status), ErrorMessage),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "defender-2.1.2",
+    "TestId": "defender-2.1.2-t1"
 }] {
     Policy := StrictPresetSecurityPolicy
     ErrorMessage := "The Strict Preset Security Policy is present and not disabled"
@@ -171,7 +175,9 @@ tests[{
     "Commandlet" : ["Get-DlpComplianceRule"],
 	"ActualValue" : Rules,
     "ReportDetails" : CustomizeError(ReportDetails(Status), ErrorMessage),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "defender-2.2.1",
+    "TestId": "defender-2.2.1-t1"
 }] {
     Rules := SSNRules
     ErrorMessage := "No matching rule found for U.S. Social Security Number (SSN)"
@@ -185,7 +191,9 @@ tests[{
     "Commandlet" : ["Get-DlpComplianceRule"],
 	"ActualValue" : Rules,
     "ReportDetails" : CustomizeError(ReportDetails(Status), ErrorMessage),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "defender-2.2.1",
+    "TestId": "defender-2.2.1-t2"
 }] {
     Rules := ITINRules
     ErrorMessage := "No matching rule found for U.S. Individual Taxpayer Identification Number (ITIN)"
@@ -199,7 +207,9 @@ tests[{
     "Commandlet" : ["Get-DlpComplianceRule"],
 	"ActualValue" : Rules,
     "ReportDetails" : CustomizeError(ReportDetails(Status), ErrorMessage),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "defender-2.2.1",
+    "TestId": "defender-2.2.1-t3"
 }] {
     Rules := CardRules
     ErrorMessage := "No matching rule found for Credit Card Number"
@@ -266,7 +276,9 @@ tests[{
     "Commandlet" : ["Get-DLPCompliancePolicy"],
 	"ActualValue" : Policies,
     "ReportDetails" : CustomizeError(ReportDetails(Status), ErrorMessage),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "defender-2.2.2",
+    "TestId": "defender-2.2.2-t1"
 }] {
     Policies := ExchangePolicies
     ErrorMessage := "No policy found that applies to Exchange."
@@ -280,7 +292,9 @@ tests[{
     "Commandlet" : ["Get-DLPCompliancePolicy"],
 	"ActualValue" : Policies,
     "ReportDetails" : CustomizeError(ReportDetails(Status), ErrorMessage),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "defender-2.2.2",
+    "TestId": "defender-2.2.2-t2"
 }] {
     Policies := SharePointPolicies
     ErrorMessage := "No policy found that applies to SharePoint."
@@ -294,7 +308,9 @@ tests[{
     "Commandlet" : ["Get-DLPCompliancePolicy"],
 	"ActualValue" : Policies,
     "ReportDetails" : CustomizeError(ReportDetails(Status), ErrorMessage),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "defender-2.2.2",
+    "TestId": "defender-2.2.2-t3"
 }] {
     Policies := OneDrivePolicies
     ErrorMessage := "No policy found that applies to OneDrive."
@@ -308,7 +324,9 @@ tests[{
     "Commandlet" : ["Get-DLPCompliancePolicy"],
 	"ActualValue" : Policies,
     "ReportDetails" : CustomizeError(ReportDetails(Status), ErrorMessage),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "defender-2.2.2",
+    "TestId": "defender-2.2.2-t4"
 }] {
     Policies := TeamsPolicies
     ErrorMessage := "No policy found that applies to Teams."
@@ -345,7 +363,9 @@ tests[{
     "Commandlet" : ["Get-DlpComplianceRule"],
 	"ActualValue" : Rules,
     "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Rules, ErrorMessage)),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "defender-2.2.3",
+    "TestId": "defender-2.2.3-t1"
 }] {
     Rules := SensitiveRulesNotBlocking
     ErrorMessage := "rule(s) found that do(es) not block access or associated policy not set to enforce block action:"
@@ -369,7 +389,9 @@ tests[{
     "Commandlet" : ["Get-DlpComplianceRule"],
 	"ActualValue" : Rules,
     "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Rules, ErrorMessage)),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "defender-2.2.4",
+    "TestId": "defender-2.2.4-t1"
 }] {
     Rules := SensitiveRulesNotNotifying
     ErrorMessage := "rule(s) found that do(es) not notify at least one user:"
@@ -388,7 +410,9 @@ tests[{
     "Commandlet" : [],
     "ActualValue" : [],
     "ReportDetails" : "Currently cannot be checked automatically. See Defender Secure Configuration Baseline policy 2.2 for instructions on manual check",
-    "RequirementMet" : false
+    "RequirementMet" : false,
+    "PolicyId" : "defender-2.2.5",
+    "TestId": "defender-2.2.5-t1"
 }] {
     true
 }
@@ -405,7 +429,9 @@ tests[{
     "Commandlet" : [],
     "ActualValue" : [],
     "ReportDetails" : "Currently cannot be checked automatically. See Defender Secure Configuration Baseline policy 2.2 for instructions on manual check",
-    "RequirementMet" : false
+    "RequirementMet" : false,
+    "PolicyId" : "defender-2.2.6",
+    "TestId": "defender-2.2.6-t1"
 }] {
     true
 }
@@ -431,7 +457,9 @@ tests[{
     "Commandlet" : ["Get-MalwareFilterPolicy"],
 	"ActualValue" : Policies,
     "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Policies, ErrorMessage)),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "defender-2.3.1",
+    "TestId": "defender-2.3.1-t1"
 }] {
     Policies := MalwarePoliciesWithoutFileFilter
     ErrorMessage := "malware policy(ies) found that do(es) not have the common attachments filter enabled:"
@@ -456,7 +484,9 @@ tests[{
     "Commandlet" : ["Get-MalwareFilterPolicy"],
 	"ActualValue" : Policies,
     "ReportDetails" : CustomizeError(ReportDetails(Status), ErrorMessage),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "defender-2.3.2",
+    "TestId": "defender-2.3.2-t1"
 }] {
     Policies := MalwarePoliciesBlockingEXE
     Status := count(Policies) > 0
@@ -477,7 +507,9 @@ tests[{
     "Commandlet" : ["Get-MalwareFilterPolicy"],
 	"ActualValue" : Policies,
     "ReportDetails" : CustomizeError(ReportDetails(Status), ErrorMessage),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "defender-2.3.2",
+    "TestId": "defender-2.3.2-t2"
 }] {
     Policies := MalwarePoliciesBlockingCMD
     Status := count(Policies) > 0
@@ -498,7 +530,9 @@ tests[{
     "Commandlet" : ["Get-MalwareFilterPolicy"],
 	"ActualValue" : Policies,
     "ReportDetails" : CustomizeError(ReportDetails(Status), ErrorMessage),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "defender-2.3.2",
+    "TestId": "defender-2.3.2-t3"
 }] {
     Policies := MalwarePoliciesBlockingVBE
     Status := count(Policies) > 0
@@ -526,7 +560,9 @@ tests[{
     "Commandlet" : ["Get-MalwareFilterPolicy"],
 	"ActualValue" : Policies,
     "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Policies, ErrorMessage)),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "defender-2.4.1",
+    "TestId": "defender-2.4.1-t1"
 }] {
     Policies := MalwarePoliciesWithoutZAP
     Status := count(Policies) == 0
@@ -561,7 +597,9 @@ tests[{
     "Commandlet" : ["Get-AntiPhishPolicy"],
 	"ActualValue" : Policies,
     "ReportDetails" : CustomizeError(ReportDetails(Status), ErrorMessage),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "defender-2.5.1",
+    "TestId": "defender-2.5.1-t1"
 }] {
     Policies := ProtectedUsersPolicies
     ErrorMessage := "No users are included for targeted user protection."
@@ -592,7 +630,9 @@ tests[{
     "Commandlet" : ["Get-AntiPhishPolicy"],
 	"ActualValue" : Policies,
     "ReportDetails" : ReportDetails(Status),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "defender-2.5.2",
+    "TestId": "defender-2.5.2-t1"
 }] {
     Policies := ProtectedOrgDomainsPolicies
     Status := count(Policies) > 0
@@ -622,7 +662,9 @@ tests[{
     "Commandlet" : ["Get-AntiPhishPolicy"],
 	"ActualValue" : Policies,
     "ReportDetails" : CustomizeError(ReportDetails(Status), ErrorMessage),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "defender-2.5.3",
+    "TestId": "defender-2.5.3-t1"
 }] {
     Policies := ProtectedCustomDomainsPolicies
     ErrorMessage := "The Custom Domains protection policies: Enabled, EnableTargetedDomainsProtection, and TargetedDomainsToProtect are not set correctly"
@@ -652,7 +694,9 @@ tests[{
     "Commandlet" : ["Get-AntiPhishPolicy"],
 	"ActualValue" : Policies,
     "ReportDetails" : ReportDetails(Status),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "defender-2.5.4",
+    "TestId": "defender-2.5.4-t1"
 }] {
     Policies := IntelligenceProtectionPolicies
     Status := count(Policies) > 0
@@ -670,7 +714,9 @@ tests[{
     "Commandlet" : ["Get-AntiPhishPolicy"],
 	"ActualValue" : Policy.TargetedUserProtectionAction,
     "ReportDetails" : ReportDetails(Status),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "defender-2.5.5",
+    "TestId": "defender-2.5.5-t1"
 }] {
     Policy := input.anti_phish_policies[_]
     Policy.Identity == "Office365 AntiPhish Default"
@@ -684,7 +730,9 @@ tests[{
     "Commandlet" : ["Get-AntiPhishPolicy"],
 	"ActualValue" : Policy.TargetedDomainProtectionAction,
     "ReportDetails" : ReportDetails(Status),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "defender-2.5.5",
+    "TestId": "defender-2.5.5-t2"
 }] {
     Policy := input.anti_phish_policies[_]
     Policy.Identity == "Office365 AntiPhish Default"
@@ -698,7 +746,9 @@ tests[{
     "Commandlet" : ["Get-AntiPhishPolicy"],
 	"ActualValue" : Policy.MailboxIntelligenceProtectionAction,
     "ReportDetails" : ReportDetails(Status),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "defender-2.5.5",
+    "TestId": "defender-2.5.5-t3"
 }] {
     Policy := input.anti_phish_policies[_]
     Policy.Identity == "Office365 AntiPhish Default"
@@ -722,7 +772,9 @@ tests[ {
     "Commandlet" : ["Get-AntiPhishPolicy"],
 	"ActualValue" : Policies,
     "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Policies, ErrorMessage)),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "defender-2.5.5",
+    "TestId": "defender-2.5.5-t4"
 }] {
     Policies := AntiPhishTargetedUserNotQuarantine
     ErrorMessage := "non-default anti phish policy(ies) found where the action for messages detected as user impersonation is not quarantine:"
@@ -744,7 +796,9 @@ tests[ {
     "Commandlet" : ["Get-AntiPhishPolicy"],
 	"ActualValue" : Policies,
     "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Policies, ErrorMessage)),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "defender-2.5.5",
+    "TestId": "defender-2.5.5-t5"
 }] {
     Policies := AntiPhishTargetedDomainNotQuarantine
     ErrorMessage := "non-default anti phish policy(ies) found where the action for messages detected as domain impersonation is not quarantine:"
@@ -766,7 +820,9 @@ tests[ {
     "Commandlet" : ["Get-AntiPhishPolicy"],
 	"ActualValue" : Policies,
     "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Policies, ErrorMessage)),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "defender-2.5.5",
+    "TestId": "defender-2.5.5-t6"
 }] {
     Policies := AntiPhishMailIntNotQuarantine
     ErrorMessage := "non-default anti phish policy(ies) found where the action for messages flagged by mailbox intelligence is not quarantine:"
@@ -787,7 +843,9 @@ tests[ {
     "Commandlet" : ["Get-AntiPhishPolicy"],
 	"ActualValue" : Policy.AuthenticationFailAction,
     "ReportDetails" : ReportDetails(Status),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "defender-2.5.6",
+    "TestId": "defender-2.5.6-t1"
 }] {
     Policy := input.anti_phish_policies[_]
     Policy.Identity == "Office365 AntiPhish Default"
@@ -811,7 +869,9 @@ tests[ {
     "Commandlet" : ["Get-AntiPhishPolicy"],
 	"ActualValue" : Policies,
     "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Policies, ErrorMessage)),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "defender-2.5.6",
+    "TestId": "defender-2.5.6-t2"
 }] {
     ErrorMessage := "custom anti phish policy(ies) found where the action for spoofed emails is not set to quarantine:"
     Policies := CustomAntiPhishSpoofNotQuarantine
@@ -830,7 +890,9 @@ tests[ {
     "Commandlet" : ["Get-AntiPhishPolicy"],
 	"ActualValue" : Policy.EnableFirstContactSafetyTips,
     "ReportDetails" : ReportDetails(Status),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "defender-2.5.7",
+    "TestId": "defender-2.5.7-t1"
 }] {
     Policy := input.anti_phish_policies[_]
     Policy.Identity == "Office365 AntiPhish Default"
@@ -853,7 +915,9 @@ tests[{
     "Commandlet" : ["Get-AntiPhishPolicy"],
 	"ActualValue" : Policies,
     "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Policies, ErrorMessage)),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "defender-2.5.7",
+    "TestId": "defender-2.5.7-t2"
 }] {
     ErrorMessage := "custom anti phish policy(ies) found where first contact safety tips are not enabled:"
     Policies := CustomAntiPhishNoSafetyTips
@@ -868,7 +932,9 @@ tests[{
     "Commandlet" : ["Get-AntiPhishPolicy"],
 	"ActualValue" : Policy.EnableSimilarUsersSafetyTips,
     "ReportDetails" : ReportDetails(Status),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "defender-2.5.7",
+    "TestId": "defender-2.5.7-t3"
 }] {
     Policy := input.anti_phish_policies[_]
     Policy.Identity == "Office365 AntiPhish Default"
@@ -891,7 +957,9 @@ tests[{
     "Commandlet" : ["Get-AntiPhishPolicy"],
 	"ActualValue" : Policies,
     "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Policies, ErrorMessage)),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "defender-2.5.7",
+    "TestId": "defender-2.5.7-t4"
 }] {
     ErrorMessage := "custom anti phish policy(ies) found where similar user safety tips are not enabled:"
     Policies := CustomAntiPhishNoSimilarUserTips
@@ -906,7 +974,9 @@ tests[{
     "Commandlet" : ["Get-AntiPhishPolicy"],
 	"ActualValue" : Policy.EnableSimilarDomainsSafetyTips,
     "ReportDetails" : ReportDetails(Status),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "defender-2.5.7",
+    "TestId": "defender-2.5.7-t5"
 }] {
     Policy := input.anti_phish_policies[_]
     Policy.Identity == "Office365 AntiPhish Default"
@@ -929,7 +999,9 @@ tests[{
     "Commandlet" : ["Get-AntiPhishPolicy"],
 	"ActualValue" : Policies,
     "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Policies, ErrorMessage)),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "defender-2.5.7",
+    "TestId": "defender-2.5.7-t6"
 }] {
     ErrorMessage := "custom anti phish policy(ies) found where similar domains safety tips are not enabled:"
     Policies := CustomAntiPhishNoSimilarDomainTips
@@ -944,7 +1016,9 @@ tests[{
     "Commandlet" : ["Get-AntiPhishPolicy"],
 	"ActualValue" : Policy.EnableUnusualCharactersSafetyTips,
     "ReportDetails" : ReportDetails(Status),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "defender-2.5.7",
+    "TestId": "defender-2.5.7-t7"
 }] {
     Policy := input.anti_phish_policies[_]
     Policy.Identity == "Office365 AntiPhish Default"
@@ -967,7 +1041,9 @@ tests[{
     "Commandlet" : ["Get-AntiPhishPolicy"],
 	"ActualValue" : Policies,
     "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Policies, ErrorMessage)),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "defender-2.5.7",
+    "TestId": "defender-2.5.7-t8"
 }] {
     ErrorMessage := "custom anti phish policy(ies) found where unusual character safety tips are not enabled:"
     Policies := CustomAntiPhishNoUnusualCharTips
@@ -982,7 +1058,9 @@ tests[{
     "Commandlet" : ["Get-AntiPhishPolicy"],
 	"ActualValue" : Policy.EnableViaTag,
     "ReportDetails" : ReportDetails(Status),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "defender-2.5.7",
+    "TestId": "defender-2.5.7-t9"
 }] {
     Policy := input.anti_phish_policies[_]
     Policy.Identity == "Office365 AntiPhish Default"
@@ -1005,7 +1083,9 @@ tests[{
     "Commandlet" : ["Get-AntiPhishPolicy"],
 	"ActualValue" : Policies,
     "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Policies, ErrorMessage)),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "defender-2.5.7",
+    "TestId": "defender-2.5.7-t10"
 }] {
     ErrorMessage := "custom anti phish policy(ies) found where via tag is not enabled:"
     Policies := CustomAntiPhishNoViaTagTips
@@ -1020,7 +1100,9 @@ tests[{
     "Commandlet" : ["Get-AntiPhishPolicy"],
 	"ActualValue" : Policy.EnableUnauthenticatedSender,
     "ReportDetails" : ReportDetails(Status),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "defender-2.5.7",
+    "TestId": "defender-2.5.7-t11"
 }] {
     Policy := input.anti_phish_policies[_]
     Policy.Identity == "Office365 AntiPhish Default"
@@ -1043,7 +1125,9 @@ tests[{
     "Commandlet" : ["Get-AntiPhishPolicy"],
 	"ActualValue" : Policies,
     "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Policies, ErrorMessage)),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "defender-2.5.7",
+    "TestId": "defender-2.5.7-t12"
 }] {
     ErrorMessage := "custom anti phish policy(ies) found where '?' for unauthenticated sender is not enabled:"
     Policies := CustomAntiPhishNoUnauthSenderTips
@@ -1067,7 +1151,9 @@ tests[{
     "Commandlet" : ["Get-HostedContentFilterPolicy"],
 	"ActualValue" : Policy.BulkThreshold,
 	"ReportDetails" : ReportDetails(Status),
-	"RequirementMet" : Status
+	"RequirementMet" : Status,
+    "PolicyId" : "defender-2.6.1",
+    "TestId": "defender-2.6.1-t1"
 }] {
 	Policy := input.hosted_content_filter_policies[_] # Refactor
     Policy.Identity == "Default"
@@ -1087,7 +1173,9 @@ tests[{
     "Commandlet" : ["Get-HostedContentFilterPolicy"],
     "ActualValue" : Policies,
     "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Policies, ErrorMessage)),
-	"RequirementMet" : Status
+	"RequirementMet" : Status,
+    "PolicyId" : "defender-2.6.1",
+    "TestId": "defender-2.6.1-t2"
 }] {
 	ErrorMessage := "custom anti-spam policy(ies) found where bulk complaint level threshold is set to 7 or more:"
 	Policies = CustomBulkThresholdWrong
@@ -1106,7 +1194,9 @@ tests[{
     "Commandlet" : ["Get-HostedContentFilterPolicy"],
     "ActualValue" : Policy.SpamAction,
     "ReportDetails" : ReportDetails(Status),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "defender-2.6.2",
+    "TestId": "defender-2.6.2-t1"
 }] {
     Policy := input.hosted_content_filter_policies[_]
     Policy.Identity == "Default"
@@ -1120,7 +1210,9 @@ tests[{
     "Commandlet" : ["Get-HostedContentFilterPolicy"],
     "ActualValue" : Policy.HighConfidenceSpamAction,
     "ReportDetails" : ReportDetails(Status),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "defender-2.6.2",
+    "TestId": "defender-2.6.2-t2"
 }] {
     Policy := input.hosted_content_filter_policies[_]
     Policy.Identity == "Default"
@@ -1141,7 +1233,9 @@ tests[{
     "Commandlet" : ["Get-HostedContentFilterPolicy"],
     "ActualValue" : Policies,
     "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Policies, ErrorMessage)),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "defender-2.6.2",
+    "TestId": "defender-2.6.2-t3"
 }] {
 	ErrorMessage := "custom anti-spam policy(ies) found where spam is not being sent to the Quarantine folder or the Junk Mail Folder:"
 	Policies = CustomSpamActionWrong
@@ -1161,7 +1255,9 @@ tests[{
     "Commandlet" : ["Get-HostedContentFilterPolicy"],
     "ActualValue" : Policies,
     "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Policies, ErrorMessage)),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "defender-2.6.2",
+    "TestId": "defender-2.6.2-t4"
 }] {
 	ErrorMessage := "custom anti-spam policy(ies) found where high confidence spam is not being sent to the Quarantine folder or the Junk Mail Folder:"
 	Policies = CustomHighConfidenceSpamActionWrong
@@ -1180,7 +1276,9 @@ tests[{
     "Commandlet" : ["Get-HostedContentFilterPolicy"],
     "ActualValue" : Policy.PhishSpamAction,
     "ReportDetails" : ReportDetails(Status),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "defender-2.6.3",
+    "TestId": "defender-2.6.3-t1"
 }] {
     Policy := input.hosted_content_filter_policies[_]
     Policy.Identity == "Default"
@@ -1194,7 +1292,9 @@ tests[{
     "Commandlet" : ["Get-HostedContentFilterPolicy"],
     "ActualValue" : Policy.HighConfidencePhishAction,
     "ReportDetails" : ReportDetails(Status),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "defender-2.6.3",
+    "TestId": "defender-2.6.3-t2"
 }] {
     Policy := input.hosted_content_filter_policies[_]
     Policy.Identity == "Default"
@@ -1216,7 +1316,9 @@ tests[{
     "Commandlet" : ["Get-HostedContentFilterPolicy"],
     "ActualValue" : Policies,
     "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Policies, ErrorMessage)),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "defender-2.6.3",
+    "TestId": "defender-2.6.3-t3"
 }] {
     ErrorMessage := "custom anti-spam policy(ies) found where phishing isn't moved to the quarantine folder:"
     Policies = CustomPhishSpamActionWrong
@@ -1236,7 +1338,9 @@ tests[{
     "Commandlet" : ["Get-HostedContentFilterPolicy"],
     "ActualValue" : Policies,
     "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Policies, ErrorMessage)),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "defender-2.6.3",
+    "TestId": "defender-2.6.3-t4"
 }] {
     ErrorMessage := "custom anti-spam policy(ies) found where high-confidence phishing isn't moved to quarantine folder:"
     Policies = CustomHighConfidencePhishActionWrong
@@ -1253,7 +1357,9 @@ tests[{
     "Commandlet" : ["Get-HostedContentFilterPolicy"],
     "ActualValue" : Policy.BulkSpamAction,
     "ReportDetails" : ReportDetails(Status),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "defender-2.6.4",
+    "TestId": "defender-2.6.4-t1"
 }] {
     Policy := input.hosted_content_filter_policies[_]
     Policy.Identity == "Default"
@@ -1273,7 +1379,9 @@ tests[{
     "Commandlet" : ["Get-HostedContentFilterPolicy"],
     "ActualValue" : Policies,
     "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Policies, ErrorMessage)),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "defender-2.6.4",
+    "TestId": "defender-2.4.4-t2"
 }] {
     ErrorMessage := "custom anti-spam policy(ies) found where bulk spam action is not Quarantine or Move to Junk Email Folder"
     Policies = CustomBulkSpamActionWrong
@@ -1291,7 +1399,9 @@ tests[{
     "Commandlet" : ["Get-HostedContentFilterPolicy"],
     "ActualValue" : Policy.QuarantineRetentionPeriod,
     "ReportDetails" : ReportDetails(Status),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "defender-2.6.5",
+    "TestId": "defender-2.6.5-t1"
 }] {
     Policy := input.hosted_content_filter_policies[_]
     Policy.Identity == "Default"
@@ -1311,7 +1421,9 @@ tests[{
     "Commandlet" : ["Get-HostedContentFilterPolicy"],
     "ActualValue" : Policies,
     "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Policies, ErrorMessage)),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "defender-2.6.5",
+    "TestId": "defender-2.6.5-t2"
 }] {
     ErrorMessage := "custom anti-spam policy(ies) found where spam in quarantine isn't retained for 30 days:"
     Policies = CustomQuarantineRetentionPeriodWrong
@@ -1329,7 +1441,9 @@ tests[{
     "Commandlet" : ["Get-HostedContentFilterPolicy"],
     "ActualValue" : Policy.InlineSafetyTipsEnabled,
     "ReportDetails" : ReportDetails(Status),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "defender-2.6.6",
+    "TestId": "defender-2.6.6-t1"
 }] {
     Policy := input.hosted_content_filter_policies[_]
     Policy.Identity == "Default"
@@ -1349,7 +1463,9 @@ tests[{
     "Commandlet" : ["Get-HostedContentFilterPolicy"],
     "ActualValue" : Policies,
     "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Policies, ErrorMessage)),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "defender-2.6.6",
+    "TestId": "defender-2.6.6-t2"
 }] {
     ErrorMessage := "custom anti-spam policy(ies) found where spam safety tips is disabled:"
     Policies = CustomInlineSafetyTipsDisabled
@@ -1368,7 +1484,9 @@ tests[{
     "Commandlet" : ["Get-HostedContentFilterPolicy"],
     "ActualValue" : Policy.ZapEnabled,
     "ReportDetails" : ReportDetails(Status),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "defender-2.6.7",
+    "TestId": "defender-2.6.7-t1"
 }] {
     Policy := input.hosted_content_filter_policies[_]
     Policy.Identity == "Default"
@@ -1382,7 +1500,9 @@ tests[{
     "Commandlet" : ["Get-HostedContentFilterPolicy"],
     "ActualValue" : Policy.SpamZapEnabled,
     "ReportDetails" : ReportDetails(Status),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "defender-2.6.7",
+    "TestId": "defender-2.6.7-t2"
 }] {
     Policy := input.hosted_content_filter_policies[_]
     Policy.Identity == "Default"
@@ -1396,7 +1516,9 @@ tests[{
     "Commandlet" : ["Get-HostedContentFilterPolicy"],
     "ActualValue" : Policy.PhishZapEnabled,
     "ReportDetails" : ReportDetails(Status),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "defender-2.6.7",
+    "TestId": "defender-2.6.7-t3"
 }] {
     Policy := input.hosted_content_filter_policies[_]
     Policy.Identity == "Default"
@@ -1417,7 +1539,9 @@ tests[{
     "Commandlet" : ["Get-HostedContentFilterPolicy"],
     "ActualValue" : Policies,
     "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Policies, ErrorMessage)),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "defender-2.6.7",
+    "TestId": "defender-2.6.7-t4"
 }] {
     ErrorMessage := "custom anti-spam policies found where Zero-hour auto purge is disabled:"
     Policies = CustomZapDisabled
@@ -1437,7 +1561,9 @@ tests[{
     "Commandlet" : ["Get-HostedContentFilterPolicy"],
     "ActualValue" : Policies,
     "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Policies, ErrorMessage)),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "defender-2.6.7",
+    "TestId": "defender-2.6.7-t5"
 }] {
     ErrorMessage := "custom anti-spam policies found where Zero-hour auto purge for spam is disabled:"
     Policies = CustomSpamZapDisabled
@@ -1457,7 +1583,9 @@ tests[{
     "Commandlet" : ["Get-HostedContentFilterPolicy"],
     "ActualValue" : Policies,
     "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Policies, ErrorMessage)),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "defender-2.6.7",
+    "TestId": "defender-2.6.7-t6"
 }] {
     ErrorMessage := "custom anti-spam policy(ies) found where Zero-hour auto purge for phishing is disabled:"
     Policies = CustomPhishZapDisabled
@@ -1480,7 +1608,9 @@ tests[{
     "Commandlet" : ["Get-HostedContentFilterPolicy"],
     "ActualValue" : Policies,
     "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Policies, ErrorMessage)),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "defender-2.6.8",
+    "TestId": "defender-2.6.8-t1"
 }] {
     ErrorMessage := "custom anti-spam policy(ies) found where there is at least one allowed sender domain:"
     Policies = AllowedSenderDomainsNotEmpty
@@ -1499,7 +1629,9 @@ tests[{
     "Commandlet" : ["Get-HostedContentFilterPolicy"],
     "ActualValue" : Policies,
     "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(Policies, ErrorMessage)),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "defender-2.6.8",
+    "TestId": "defender-2.6.8-t2"
 }] {
     ErrorMessage := "custom policy(ies) found where there is at least one allowed sender domain:"
     Policies = AllowedSenderDomainsNotEmptyCustom
@@ -1533,7 +1665,9 @@ tests[{
     "Commandlet" : ["Get-SafeLinksRule", "Get-AcceptedDomain"],
 	"ActualValue" : AllDomainsSafeLinksPolicies,
     "ReportDetails" : ApplyLicenseWarning(CustomizeError(ReportDetails(Status), ErrorMessage)),
-	"RequirementMet" : Status
+	"RequirementMet" : Status,
+    "PolicyId" : "defender-2.7.1",
+    "TestId": "defender-2.7.1-t1"
 }] {
 	DomainNames := {Name.DomainName | Name = input.all_domains[_]}
     ErrorMessage := concat("", ["No policy found that applies to all domains: ", concat(", ", DomainNames)])
@@ -1560,7 +1694,9 @@ tests[{
     "Commandlet" : ["Get-SafeLinksPolicy", "Get-SafeLinksRule"],
 	"ActualValue" : Policies,
     "ReportDetails" : ApplyLicenseWarning(ReportDetails(Status)),
-	"RequirementMet" : Status
+	"RequirementMet" : Status,
+    "PolicyId" : "defender-2.7.2",
+    "TestId": "defender-2.7.2-t1"
 }] {
 	Policies := EnableSafeLinksForEmailCorrect
     Status := count(Policies) >= 1
@@ -1586,7 +1722,9 @@ tests[{
     "Commandlet" : ["Get-SafeLinksPolicy", "Get-SafeLinksRule"],
 	"ActualValue" : Policies,
     "ReportDetails" : ApplyLicenseWarning(ReportDetails(Status)),
-	"RequirementMet" : Status
+	"RequirementMet" : Status,
+    "PolicyId" : "defender-2.7.3",
+    "TestId": "defender-2.7.3-t1"
 }] {
 	Policies := EnableSafeLinksForTeamsCorrect
     Status := count(Policies) >= 1
@@ -1612,7 +1750,9 @@ tests[{
     "Commandlet" : ["Get-SafeLinksPolicy", "Get-SafeLinksRule"],
 	"ActualValue" : Policies,
     "ReportDetails" : ApplyLicenseWarning(ReportDetails(Status)),
-	"RequirementMet" : Status
+	"RequirementMet" : Status,
+    "PolicyId" : "defender-2.7.4",
+    "TestId": "defender-2.7.4-t1"
 }] {
 	Policies := ScanUrlsCorrect
     Status := count(Policies) >= 1
@@ -1638,7 +1778,9 @@ tests[{
     "Commandlet" : ["Get-SafeLinksPolicy", "Get-SafeLinksRule"],
 	"ActualValue" : Policies,
     "ReportDetails" : ApplyLicenseWarning(ReportDetails(Status)),
-	"RequirementMet" : Status
+	"RequirementMet" : Status,
+    "PolicyId" : "defender-2.7.5",
+    "TestId": "defender-2.7.5-t1"
 }] {
 	Policies := DeliverMessageAfterScanCorrect
     Status := count(Policies) >= 1
@@ -1664,7 +1806,9 @@ tests[{
     "Commandlet" : ["Get-SafeLinksPolicy", "Get-SafeLinksRule"],
 	"ActualValue" : Policies,
     "ReportDetails" : ApplyLicenseWarning(ReportDetails(Status)),
-	"RequirementMet" : Status
+	"RequirementMet" : Status,
+    "PolicyId" : "defender-2.7.6",
+    "TestId": "defender-2.7.6-t1"
 }] {
 	Policies := EnableForInternalSendersCorrect
     Status := count(Policies) >= 1
@@ -1690,7 +1834,9 @@ tests[{
     "Commandlet" : ["Get-SafeLinksPolicy", "Get-SafeLinksRule"],
 	"ActualValue" : Policies,
     "ReportDetails" : ApplyLicenseWarning(ReportDetails(Status)),
-	"RequirementMet" : Status
+	"RequirementMet" : Status,
+    "PolicyId" : "defender-2.7.7",
+    "TestId": "defender-2.7.7-t1"
 }] {
 	Policies := TrackClicksCorrect
     Status := count(Policies) >= 1
@@ -1715,7 +1861,9 @@ tests[{
     "Commandlet" : ["Get-SafeLinksPolicy", "Get-SafeLinksRule"],
 	"ActualValue" : Policies,
     "ReportDetails" : ApplyLicenseWarning(ReportDetails(Status)),
-	"RequirementMet" : Status
+	"RequirementMet" : Status,
+    "PolicyId" : "defender-2.7.8",
+    "TestId": "defender-2.7.8-t1"
 }] {
 	Policies := EnableSafeLinksForOfficeCorrect
     Status := count(Policies) >= 1
@@ -1740,7 +1888,9 @@ tests[{
     "Commandlet" : ["Get-SafeLinksPolicy", "Get-SafeLinksRule"],
 	"ActualValue" : Policies,
     "ReportDetails" : ApplyLicenseWarning(ReportDetails(Status)),
-	"RequirementMet" : Status
+	"RequirementMet" : Status,
+    "PolicyId" : "defender-2.7.9",
+    "TestId": "defender-2.7.9-t1"
 }] {
 	Policies := AllowClickThroughCorrect
     Status := count(Policies) >= 1
@@ -1773,7 +1923,9 @@ tests[{
     "Commandlet" : ["Get-SafeAttachmentRule", "Get-AcceptedDomain"],
 	"ActualValue" : AllDomainsSafeAttachmentRules,
     "ReportDetails" : ApplyLicenseWarning(CustomizeError(ReportDetails(Status), ErrorMessage)),
-	"RequirementMet" : Status
+	"RequirementMet" : Status,
+    "PolicyId" : "defender-2.8.1",
+    "TestId": "defender-2.8.1-t1"
 }] {
 	DomainNames := {Name.DomainName | Name = input.all_domains[_]}
     ErrorMessage := concat("", ["No policy found that applies to all domains: ", concat(", ", DomainNames)])
@@ -1807,7 +1959,9 @@ tests[{
     "Commandlet" : ["Get-SafeAttachmentPolicy", "Get-SafeAttachmentRule", "Get-AcceptedDomain"],
 	"ActualValue" : Policies,
     "ReportDetails" : ApplyLicenseWarning(CustomizeError(ReportDetails(Status), ErrorMessage)),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "defender-2.8.2",
+    "TestId": "defender-2.8.2-t1"
 }] {
     Policies := BlockMalwarePolicies
     ErrorMessage := "No enabled policy found with action set to block that apply to all domains"
@@ -1834,7 +1988,9 @@ tests[{
     "Commandlet" : ["Get-SafeAttachmentPolicy", "Get-SafeAttachmentRule", "Get-AcceptedDomain"],
 	"ActualValue" : Policies,
     "ReportDetails" : ApplyLicenseWarning(CustomizeError(ReportDetails(Status), ErrorMessage)),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "defender-2.8.3",
+    "TestId": "defender-2.8.3-t1"
 }] {
     Policies := RedirectionPolicies
     ErrorMessage := "No enabled policy found with action set to block and at least one contact specified"
@@ -1860,7 +2016,9 @@ tests[{
     "Commandlet" : ["Get-AtpPolicyForO365"],
 	"ActualValue" : Policies,
     "ReportDetails" : ApplyLicenseWarning(ReportDetails(Status)),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "defender-2.8.4",
+    "TestId": "defender-2.8.4-t1"
 }] {
     Policies := ATPPolicies
     Status := count(Policies) > 0
@@ -1900,7 +2058,9 @@ tests[{
     "Commandlet" : ["Get-ProtectionAlert"],
 	"ActualValue" : MissingAlerts,
     "ReportDetails" : CustomizeError(ReportDetails(Status), GenerateArrayString(MissingAlerts, ErrorMessage)),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "defender-2.9.1",
+    "TestId": "defender-2.9.1-t1"
 }] {
     MissingAlerts := RequiredAlerts - EnabledAlerts
     ErrorMessage := "disabled required alert(s) found:"
@@ -1919,7 +2079,9 @@ tests[{
     "Commandlet" : [],
     "ActualValue" : [],
     "ReportDetails" : "Currently cannot be checked automatically. See Defender Secure Configuration Baseline policy 2.9 for instructions on manual check",
-    "RequirementMet" : false
+    "RequirementMet" : false,
+    "PolicyId" : "defender-2.9.2",
+    "TestId": "defender-2.9.2-t1"
 }] {
     true
 }
@@ -1948,7 +2110,9 @@ tests[{
     "Commandlet" : ["Get-AdminAuditLogConfig"],
 	"ActualValue" : CorrectLogConfigs,
     "ReportDetails" : ReportDetails(Status),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "defender-2.10.1",
+    "TestId": "defender-2.10.1-t1"
 }] {
     Status := count(CorrectLogConfigs) >= 1
 }
@@ -1967,7 +2131,9 @@ tests[{
     "Commandlet" : [],
     "ActualValue" : [],
     "ReportDetails" : "Currently cannot be checked automatically. See Defender Secure Configuration Baseline policy 2.10 for instructions on manual check",
-    "RequirementMet" : false
+    "RequirementMet" : false,
+    "PolicyId" : "defender-2.10.2",
+    "TestId": "defender-2.10.2-t1"
 }] {
     true
 }
@@ -1986,7 +2152,9 @@ tests[{
     "Commandlet" : [],
     "ActualValue" : [],
     "ReportDetails" : "Currently cannot be checked automatically. See Defender Secure Configuration Baseline policy 2.10 for instructions on manual check",
-    "RequirementMet" : false
+    "RequirementMet" : false,
+    "PolicyId" : "defender-2.10.3",
+    "TestId": "defender-2.10.3-t1"
 }] {
     true
 }
