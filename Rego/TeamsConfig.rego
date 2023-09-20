@@ -136,10 +136,6 @@ tests[{
 }
 
 #
-<<<<<<< HEAD
-=======
-
->>>>>>> f55fa69 (policy 5 updates)
 tests[{
 	"PolicyId" : "MS.TEAMS.1.4v1",
 	"Criticality" : "Should",
@@ -214,10 +210,6 @@ tests[{
 }
 
 #
-<<<<<<< HEAD
-=======
-
->>>>>>> f55fa69 (policy 5 updates)
 tests[{
 	"PolicyId" : "MS.TEAMS.1.6v1",
 	"Criticality" : "Should",
@@ -234,6 +226,7 @@ tests[{
 #--
 =======
 #--
+<<<<<<< HEAD
 # MS.TEAMS.9.3v1
 #--
 PoliciesAllowingOutsideRegionStorage[Policy.Identity] {
@@ -258,6 +251,8 @@ tests[{
 
 #--
 >>>>>>> f55fa69 (policy 5 updates)
+=======
+>>>>>>> 32d760c (clean up rego code)
 # MS.TEAMS.1.7v1
 #--
 tests[{
@@ -287,10 +282,13 @@ tests[{
 #--
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 
 
 >>>>>>> f55fa69 (policy 5 updates)
+=======
+>>>>>>> 32d760c (clean up rego code)
 #--
 # MS.TEAMS.2.1v1
 #--
@@ -315,6 +313,7 @@ tests[{
 }
 #--
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 =======
 #--
@@ -341,6 +340,8 @@ tests[{
 #--
 
 >>>>>>> f55fa69 (policy 5 updates)
+=======
+>>>>>>> 32d760c (clean up rego code)
 #
 # MS.TEAMS.2.2v1
 #--
@@ -549,7 +550,6 @@ tests[{
 	String := "meeting policy(ies) found that does not restrict installation of custom apps by default:"
 	Status = count(Policies) == 0
 }
-
 #--
 
 #--
