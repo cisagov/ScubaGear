@@ -25,7 +25,9 @@ tests[{
     "Commandlet" : ["Get-SPOTenant", "Get-PnPTenant"],
     "ActualValue" : Policies,
     "ReportDetails" : ReportDetailsBoolean(Status),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "onedrive-2.1.1",
+    "TestId": "onedrive-2.1.1-t1"
 }] {
     input.OneDrive_PnP_Flag == false
     Policies := AnyoneLinksPolicy
@@ -40,7 +42,9 @@ tests[{
     "Commandlet" : [],
     "ActualValue" : [],
     "ReportDetails" : "Currently cannot be checked automatically while using Service Principals. See Onedrive Secure Configuration Baseline policy 2.1 for instructions on manual check",
-    "RequirementMet" : false
+    "RequirementMet" : false,
+    "PolicyId" : "onedrive-2.1.1",
+    "TestId": "onedrive-2.1.1-t2"   
 }] {
     input.OneDrive_PnP_Flag
 }
@@ -78,7 +82,9 @@ tests[{
     "Commandlet" : ["Get-SPOTenant", "Get-PnPTenant"],
     "ActualValue" : [Policy.OneDriveSharingCapability, Policy.RequireAnonymousLinksExpireInDays],
     "ReportDetails" : ReportDetails2_2(Policy),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "onedrive-2.2.1",
+    "TestId": "onedrive-2.2.1-t1"
 }] {
     Policy := input.SPO_tenant_info[_]
     Conditions1 := [Policy.OneDriveSharingCapability !=2]
@@ -96,7 +102,9 @@ tests[{
     "Commandlet" : [],
     "ActualValue" : [],
     "ReportDetails" : "Currently cannot be checked automatically while using Service Principals. See Onedrive Secure Configuration Baseline policy 2.2 for instructions on manual check",
-    "RequirementMet" : false
+    "RequirementMet" : false,
+    "PolicyId" : "onedrive-2.2.1",
+    "TestId": "onedrive-2.2.1-t2"
 }] {
     input.OneDrive_PnP_Flag
 }
@@ -150,7 +158,9 @@ tests[{
     "Commandlet" : ["Get-SPOTenant", "Get-PnPTenant"],
     "ActualValue" : [Policy.OneDriveSharingCapability, Policy.FileAnonymousLinkType, Policy.FolderAnonymousLinkType],
     "ReportDetails" : ReportDetails2_3(Policy),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "onedrive-2.3.1",
+    "TestId": "onedrive-2.3.1-t1"
 }] {
     Policy := input.SPO_tenant_info[_]
     Conditions1 := [Policy.OneDriveSharingCapability !=2]
@@ -168,7 +178,9 @@ tests[{
     "Commandlet" : [],
     "ActualValue" : [],
     "ReportDetails" : "Currently cannot be checked automatically while using Service Principals. See Onedrive Secure Configuration Baseline policy 2.3 for instructions on manual check",
-    "RequirementMet" : false
+    "RequirementMet" : false,
+    "PolicyId" : "onedrive-2.3.1",
+    "TestId": "onedrive-2.3.1-t2"
 }] {
     input.OneDrive_PnP_Flag
 }
@@ -194,7 +206,9 @@ tests[{
     "Commandlet" : ["Get-SPOTenant", "Get-PnPTenant"],
     "ActualValue" : Policies,
     "ReportDetails" : ReportDetailsBoolean(Status),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "onedrive-2.4.1",
+    "TestId": "onedrive-2.4.1-t1"
 }] {
     Policies := DefinedDomainsPolicy
     Status := count(Policies) == 1
@@ -221,7 +235,9 @@ tests[{
     "Commandlet" : ["Get-SPOTenantSyncClientRestriction", "Get-PnPTenantSyncClientRestriction"],
     "ActualValue" : Policies,
     "ReportDetails" : ReportDetailsBoolean(Status),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
+    "PolicyId" : "onedrive-2.5.1",
+    "TestId": "onedrive-2.5.1-t1"
 }] {
     Policies := ClientSyncPolicy
     Status := count(Policies) == 1
@@ -244,7 +260,9 @@ tests[{
     "Commandlet" : [],
     "ActualValue" : [],
     "ReportDetails" : "Currently cannot be checked automatically. See Onedrive Secure Configuration Baseline policy 2.6 for instructions on manual check",
-    "RequirementMet" : false
+    "RequirementMet" : false,
+    "PolicyId" : "onedrive-2.6.1",
+    "TestId": "onedrive-2.6.1-t1"
 }] {
     true
 }
@@ -266,7 +284,9 @@ tests[{
     "Commandlet" : [],
     "ActualValue" : [],
     "ReportDetails" : "Currently cannot be checked automatically. See Onedrive Secure Configuration Baseline policy 2.7 for instructions on manual check",
-    "RequirementMet" : false
+    "RequirementMet" : false,
+    "PolicyId" : "onedrive-2.7.1",
+    "TestId": "onedrive-2.7.1-t1"
 }] {
     true
 }
