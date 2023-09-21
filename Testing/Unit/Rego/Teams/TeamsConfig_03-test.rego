@@ -2,8 +2,8 @@ package teams
 import future.keywords
 
 
-#
-# Policy 3.1
+#--
+# Policy MS.TEAMS.3.1v1
 #--
 test_AllowPublicUsers_Correct if {
     PolicyId := "MS.TEAMS.3.1v1"

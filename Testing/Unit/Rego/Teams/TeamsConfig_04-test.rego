@@ -2,8 +2,8 @@ package teams
 import future.keywords
 
 
-#
-# Policy 4
+#--
+# Policy MS.TEAMS.4.1v1
 #--
 test_AllowEmailIntoChannel_Correct_V1 if {
     PolicyId := "MS.TEAMS.4.1v1"

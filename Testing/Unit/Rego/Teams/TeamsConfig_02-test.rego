@@ -2,8 +2,8 @@ package teams
 import future.keywords
 
 
-#
-# Policy 2.1
+#--
+# Policy MS.TEAMS.2.1v1
 #--
 test_AllowFederatedUsers_Correct_V1 if {
     PolicyId := "MS.TEAMS.2.1v1"
@@ -210,8 +210,8 @@ test_AllowedDomains_Incorrect_multi if {
     RuleOutput[0].ReportDetails == "2 meeting policy(ies) that allow external access across all domains: Global, Tag:AllOn"
 }
 
-#
-# Policy 2.2 and 2.3
+#--
+# Policy MS.TEAMS.2.2v1 
 #--
 test_AllowTeamsConsumerInbound_Correct_V1 if {
     PolicyId := "MS.TEAMS.2.2v1"
@@ -392,8 +392,8 @@ test_AllowTeamsConsumer_Incorrect_multi if {
     RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "Requirement met"
 }
-#
-# Policy 2.3
+#--
+# Policy MS.TEAMS.2.3v1 
 #--
 test_AllowTeamsConsumer_Correct if {
     PolicyId := "MS.TEAMS.2.3v1"

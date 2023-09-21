@@ -2,8 +2,8 @@ package teams
 import future.keywords
 
 
-#
-# Policy 1.1
+#--
+# Policy MS.TEAMS.1.1v1
 #--
 test_ExternalParticipantControl_Correct_V1 if {
     PolicyId := "MS.TEAMS.1.1v1"
@@ -106,8 +106,8 @@ test_ExternalParticipantControl_MultiplePolicies if {
     contains(RuleOutput[0].ReportDetails, "Tag:SecondCustomPolicy")
 }
 
-#
-# Policy 1.2
+#--
+# Policy MS.TEAMS.1.2v1
 #--
 test_AnonymousMeetingStart_Correct_V1 if {
     PolicyId := "MS.TEAMS.1.2v1"
@@ -215,8 +215,8 @@ test_AnonymousMeetingStart_MultiplePolicies if {
     contains(RuleOutput[0].ReportDetails, "Tag:SecondCustomPolicy")
 }
 
-#
-# Policy 1.3, 1.4, and 1.5
+#--
+# Policy MS.TEAMS.1.3v1
 #--
 test_meeting_policies_Correct if {
     PolicyId := "MS.TEAMS.1.3v1"
@@ -304,8 +304,8 @@ test_Multiple_Correct if {
     RuleOutput[0].ReportDetails == "Requirement met"
 }
 
-#
-# Policy 1.4
+#--
+# Policy MS.TEAMS.1.4v1
 #--
 test_AutoAdmittedUsers_Correct_V1 if {
     PolicyId := "MS.TEAMS.1.4v1"
@@ -383,9 +383,49 @@ test_AutoAdmittedUsers_Incorrect_V3 if {
     RuleOutput[0].ReportDetails == "Requirement not met"
 }
 
+#--
+# Policy MS.TEAMS.1.5v1
+#--
+test_meeting_policies_Correct if {
+    PolicyId := "MS.TEAMS.1.5v1"
 
-#
-# Policy 1.6
+    Output := tests with input as {
+        "meeting_policies": [
+            {
+                "Identity": "Tag:CustomPolicy",
+                "AllowPSTNUsersToBypassLobby": false
+            }
+        ]
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "Requirement met"
+}
+
+test_AllowPSTNUsersToBypassLobby_Incorrect if {
+    PolicyId := "MS.TEAMS.1.5v1"
+
+    Output := tests with input as {
+        "meeting_policies": [
+            {
+                "Identity": "Tag:CustomPolicy",
+                "AllowPSTNUsersToBypassLobby": true
+            }
+        ]
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "Requirement not met: Dial-in users are enabled to bypass the lobby"
+}
+
+#--
+# Policy MS.TEAMS.1.6v1
 #--
 test_AllowCloudRecording_Correct if {
     PolicyId := "MS.TEAMS.1.6v1"
@@ -449,8 +489,8 @@ test_AllowCloudRecording_Multiple if {
     RuleOutput[0].ReportDetails == "Requirement met"
 }
 
-#
-# Policy 1.7
+#--
+# Policy MS.TEAMS.1.7v1
 #--
 test_BroadcastRecordingMode_Correct if {
     PolicyId := "MS.TEAMS.1.7v1"

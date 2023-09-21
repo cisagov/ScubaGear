@@ -2,7 +2,7 @@ package teams
 import future.keywords
 
 #
-# Policy 8.1-8.3
+# Policy MS.TEAMS.8.1v1
 #--
 test_3rdParty_Correct_V1 if {
     PolicyId := "MS.TEAMS.8.1v1"
@@ -16,8 +16,8 @@ test_3rdParty_Correct_V1 if {
     RuleOutput[0].ReportDetails == "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check"
 }
 
-#
-# Policy 2
+#--
+# Policy MS.TEAMS.8.2v1
 #--
 test_3rdParty_Correct_V2 if {
     PolicyId := "MS.TEAMS.8.2v1"
