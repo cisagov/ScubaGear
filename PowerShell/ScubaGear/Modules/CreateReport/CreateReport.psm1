@@ -296,7 +296,7 @@ function Import-SecureBaseline{
                             $LineAdvance++
 
                             if ($Value -match [regex]::Escape("<!--")){
-                                # Reached Criticality comment so policy description is complete. 
+                                # Reached Criticality comment so policy description is complete.
                                 break
                             }
                             if (-not [string]::IsNullOrWhiteSpace([string]$MdLines[$LineNumber+$LineAdvance])) {
