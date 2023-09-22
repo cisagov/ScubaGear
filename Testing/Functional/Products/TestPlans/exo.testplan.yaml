@@ -1,0 +1,17 @@
+ProductName: exo
+TestPlan:
+  - PolicyId: MS.EXO.1.1v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.EXO.1.1v1 Non-compliant case
+        Preconditions:
+          - Command: 'Get-RemoteDomain | Where {$_.AutoForwardEnabled -eq $false} | Set-RemoteDomain -AutoForwardEnabled $true'
+            Splat: null
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.EXO.1.1v1 Compliant case
+        Preconditions:
+          - Command: 'Get-RemoteDomain | Where {$_.AutoForwardEnabled -eq $true} | Set-RemoteDomain -AutoForwardEnabled $false'
+            Splat: null
+        Postconditions: []
+        ExpectedResult: true        

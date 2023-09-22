@@ -160,14 +160,20 @@ BeforeAll{
         )
 
         ForEach($Condition in $Conditions){
-            [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'Splat', Justification = 'Variable is used in ScriptBlock')]
+
             $Splat = $Condition.Splat
 
             if ('Cached' -eq $PSCmdlet.ParameterSetName){
                 $Splat.Add("OutputFolder", [string]$OutputFolder)
             }
 
-            $ScriptBlock = [ScriptBlock]::Create("$($Condition.Command) @Splat")
+            if ($Splat ) {
+                $ScriptBlock = [ScriptBlock]::Create("$($Condition.Command) @Splat")
+            }
+            else {
+                $ScriptBlock = [ScriptBlock]::Create("$($Condition.Command)")
+            }
+
 
             try {
                 $ScriptBlock.Invoke()
