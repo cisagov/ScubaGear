@@ -144,8 +144,8 @@ ImpersonationProtection(Policies, IdentityString, IncludedAccounts, FilterKey, A
     "Policy": {
         "Name": Policy.Identity,
         "Accounts": PolicyProtectedAccounts,
-        "Action": Policy[ActionKey],
-    },
+        "Action": Policy[ActionKey]
+    }
 } if {
     Policy := ImpersonationProtectionSetting(Policies, IdentityString, FilterKey)
     count(Policy) > 0
@@ -159,6 +159,6 @@ ImpersonationProtection(Policies, IdentityString, IncludedAccounts, FilterKey, A
     "Policy": {
         "Name": IdentityString,
         "Accounts": set(),
-        "Action": "",
-    },
+        "Action": ""
+    }
 }
