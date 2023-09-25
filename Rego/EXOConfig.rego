@@ -20,11 +20,6 @@ ReportDetailsArray(Status, Array1, Array2) = Detail if {
 
 AllDomains := {Domain.domain | Domain = input.spf_records[_]}
 
-CustomDomains[Domain.domain] {
-    Domain = input.spf_records[_]
-    not endswith( Domain.domain, "onmicrosoft.com")
-}
-
 
 #
 # MS.EXO.1.1v1
@@ -104,10 +99,10 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-DkimSigningConfig", "Get-ScubaDkimRecords", "Get-AcceptedDomain"],
     "ActualValue" : [input.dkim_records, input.dkim_config],
-    "ReportDetails" : ReportDetailsArray(Status, DomainsWithoutDkim, CustomDomains),
+    "ReportDetails" : ReportDetailsArray(Status, DomainsWithoutDkim, AllDomains),
     "RequirementMet" : Status
 }] {
-    DomainsWithoutDkim := CustomDomains - DomainsWithDkim
+    DomainsWithoutDkim := AllDomains - DomainsWithDkim
     Status := count(DomainsWithoutDkim) == 0
 }
 #--
