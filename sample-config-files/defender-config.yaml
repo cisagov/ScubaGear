@@ -43,7 +43,7 @@ Defender:
         -
       ExcludedDomains:
         -
-  MS.DEFENDER.1.4v1: *CommonSensitiveAccountFilter
+  MS.DEFENDER.1.5v1: *CommonSensitiveAccountFilter
   MS.DEFENDER.2.1v1 : &UserImpersonationProtection
       SensitiveUsers:
         - John Doe;jdoe@someemail.com
