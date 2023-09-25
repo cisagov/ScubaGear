@@ -97,48 +97,20 @@ test_PrivilegedUsers_Incorrect_V2 if {
     RuleOutput[0].ReportDetails == "9 global admin(s) found:<br/>Test Name1, Test Name2, Test Name3, Test Name4, Test Name5, Test Name6, Test Name7, Test Name8, Test Name9"
 }
 #--
-
-#
 # MS.AAD.7.2v1
 #--
-test_SecureScore_Correct if {
+test_NotImplemented_Correct if {
     PolicyId := "MS.AAD.7.2v1"
 
-    Output := tests with input as {
-        "secure_score" : [
-            {
-                "Score" : 1.0
-            }
-        ]
-    }
-
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement met"
-}
-
-test_SecureScore_Incorrect if {
-    PolicyId := "MS.AAD.7.2v1"
-
-    Output := tests with input as {
-        "secure_score" : [
-            {
-                "Score": 0.5
-            }
-        ]
-    }
+    Output := tests with input as { }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement not met"
+    RuleOutput[0].ReportDetails == NotCheckedDetails(PolicyId)
 }
 #--
-
-#
 # MS.AAD.7.3v1
 #--
 test_OnPremisesImmutableId_Correct if {

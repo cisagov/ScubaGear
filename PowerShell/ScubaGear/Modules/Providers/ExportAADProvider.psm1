@@ -93,14 +93,6 @@ function Export-AADProvider {
     $AuthZPolicies = ConvertTo-Json @($Tracker.TryCommand("Get-MgBetaPolicyAuthorizationPolicy"))
 
     #TODO: Temp work around - cannot process result of failed TryCommand. Issue #519
-    $SecureScoreResults = $Tracker.TryCommand("Get-MgBetaSecuritySecureScore", @{"Top"=1})
-
-    if (0 -ne $SecureScoreResults.Count){
-        $SecureScore = ConvertTo-Json -Depth 2 @($SecureScoreResults.ControlScores | Where-Object {$_.ControlName -eq 'RoleOverlap'})
-    }
-    else {
-        $SecureScore = ConvertTo-Json -Depth 2 @(@{"Score" = -1.0})
-    }
 
     # 5.4
     $DirectorySettings = ConvertTo-Json -Depth 10 @($Tracker.TryCommand("Get-MgBetaDirectorySetting"))
@@ -119,7 +111,6 @@ function Export-AADProvider {
     "conditional_access_policies": $AllPolicies,
     "cap_table_data": $CapTableData,
     "authorization_policies": $AuthZPolicies,
-    "secure_score": $SecureScore,
     "admin_consent_policies": $AdminConsentReqPolicies,
     "privileged_users": $PrivilegedUsers,
     "privileged_roles": $PrivilegedRoles,
