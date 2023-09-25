@@ -47,3 +47,7 @@ Defender:
     SensitiveAccounts:
       IncludedUsers:
         - "John Doe;jdoe@someemail.com"
+  MS.DEFENDER.2.3v1 : &DomainImpersonationProtection
+    SensitiveAccounts:
+      IncludedDomains:
+        - "John Doe;jdoe@someemail.com"

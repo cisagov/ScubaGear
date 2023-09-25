@@ -125,40 +125,40 @@ SensitiveAccounts(SensitiveAccountsSetting, SensitiveAccountsConfig) := true if 
 # Impersonation protection support functions #
 ##############################################
 
-ImpersonationProtectionSetting(Policies, IdentityString) := Policy if {
+ImpersonationProtectionSetting(Policies, IdentityString, KeyValue) := Policy[0] if {
     Policy := [
-        Policy | Policy := Policies[_];
-        regex.match(IdentityString, Policy.Identity) == true;
-        Policy.Enabled == true;
-        Policy.EnableTargetedUserProtection == true
+        Policy | some Policy in Policies
+        regex.match(IdentityString, Policy.Identity) == true
+        Policy.Enabled == true
+        Policy[KeyValue] == true
     ]
 } else := set()
 
-ImpersonationProtectionConfig(PolicyID) := IncludedUsers if {
-    SensitiveUsers := input.scuba_config.Defender[PolicyID].SensitiveAccounts
-    IncludedUsers := { lower(trim_space(x)) | some x in SensitiveUsers.IncludedUsers; x != null }
+ImpersonationProtectionConfig(PolicyID, AccountKey) := IncludedAccounts if {
+    SensitiveAccounts := input.scuba_config.Defender[PolicyID].SensitiveAccounts
+    IncludedAccounts := { lower(trim_space(x)) | some x in SensitiveAccounts[AccountKey]; x != null }
 } else := set()
 
-ImpersonationProtection(Policies, IdentityString, IncludedUsers) := {
-    "Result" : true,
-    "Policy" : {
-        "Name" : Policy[0].Identity,
-        "Users" : PolicyProtectedUsers,
-        "Action" : Policy[0].TargetedUserProtectionAction
-    }
+ImpersonationProtection(Policies, IdentityString, IncludedAccounts, FilterKey, AccountKey, ActionKey) := {
+    "Result": true,
+    "Policy": {
+        "Name": Policy.Identity,
+        "Accounts": PolicyProtectedAccounts,
+        "Action": Policy[ActionKey],
+    },
 } if {
-    Policy := ImpersonationProtectionSetting(Policies, IdentityString)
-    count(Policy[0]) > 0
+    Policy := ImpersonationProtectionSetting(Policies, IdentityString, FilterKey)
+    count(Policy) > 0
 
-    PolicyProtectedUsers := { lower(x) | x := Policy[0].TargetedUsersToProtect[_] }
-    count(PolicyProtectedUsers) > 0
-    count(IncludedUsers) > 0
-    count(IncludedUsers - PolicyProtectedUsers) == 0
+    PolicyProtectedAccounts := { lower(x) | some x in Policy[AccountKey] }
+    count(PolicyProtectedAccounts) > 0
+    count(IncludedAccounts) > 0
+    count(IncludedAccounts - PolicyProtectedAccounts) == 0
 } else := {
-    "Result" : false,
-    "Policy" : {
-        "Name" : IdentityString,
-        "Users" : IncludedUsers,
-        "Action" : ""
-    }
+    "Result": false,
+    "Policy": {
+        "Name": IdentityString,
+        "Accounts": set(),
+        "Action": "",
+    },
 }
