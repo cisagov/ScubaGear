@@ -50,4 +50,4 @@ Defender:
   MS.DEFENDER.2.3v1 : &DomainImpersonationProtection
     SensitiveAccounts:
       IncludedDomains:
-        - "John Doe;jdoe@someemail.com"
+        - "random.mail.example.com"
