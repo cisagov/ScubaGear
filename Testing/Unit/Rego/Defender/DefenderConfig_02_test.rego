@@ -180,7 +180,7 @@ test_TargetedUsers_Incorrect_V1 if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Not all sensitive users are included for targeted user protection in Standard policy."
+    RuleOutput[0].ReportDetails == "Not all sensitive users are included for targeted protection in Standard policy."
 }
 
 test_TargetedUsers_Incorrect_V2 if {
@@ -217,7 +217,7 @@ test_TargetedUsers_Incorrect_V2 if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Not all sensitive users are included for targeted user protection in Strict policy."
+    RuleOutput[0].ReportDetails == "Not all sensitive users are included for targeted protection in Strict policy."
 }
 
 test_TargetedUsers_Incorrect_V3 if {
@@ -254,7 +254,7 @@ test_TargetedUsers_Incorrect_V3 if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Not all sensitive users are included for targeted user protection in Strict or Standard policy."
+    RuleOutput[0].ReportDetails == "Not all sensitive users are included for targeted protection in Strict or Standard policy."
 }
 
 test_TargetedUsers_Incorrect_V4 if {
@@ -301,7 +301,7 @@ test_TargetedUsers_Incorrect_V4 if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Not all sensitive users are included for targeted user protection in Standard policy."
+    RuleOutput[0].ReportDetails == "Not all sensitive users are included for targeted protection in Standard policy."
 }
 
 test_TargetedUsers_Incorrect_V5 if {
@@ -348,7 +348,7 @@ test_TargetedUsers_Incorrect_V5 if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Not all sensitive users are included for targeted user protection in Standard policy."
+    RuleOutput[0].ReportDetails == "Not all sensitive users are included for targeted protection in Standard policy."
 }
 
 test_TargetedUsers_Incorrect_V6 if {
@@ -394,7 +394,7 @@ test_TargetedUsers_Incorrect_V6 if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Not all sensitive users are included for targeted user protection in Strict policy."
+    RuleOutput[0].ReportDetails == "Not all sensitive users are included for targeted protection in Strict policy."
 }
 
 #
@@ -692,7 +692,7 @@ test_CustomDomains_Incorrect_V1 if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Not all sensitive domains are included for targeted user protection in Standard policy."
+    RuleOutput[0].ReportDetails == "Not all sensitive domains are included for targeted protection in Standard policy."
 }
 
 test_CustomDomains_Incorrect_V2 if {
@@ -729,7 +729,7 @@ test_CustomDomains_Incorrect_V2 if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Not all sensitive domains are included for targeted user protection in Strict policy."
+    RuleOutput[0].ReportDetails == "Not all sensitive domains are included for targeted protection in Strict policy."
 }
 
 test_CustomDomains_Incorrect_V3 if {
@@ -766,7 +766,7 @@ test_CustomDomains_Incorrect_V3 if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Not all sensitive domains are included for targeted user protection in Strict or Standard policy."
+    RuleOutput[0].ReportDetails == "Not all sensitive domains are included for targeted protection in Strict or Standard policy."
 }
 
 test_CustomDomains_Incorrect_V4 if {
@@ -813,7 +813,7 @@ test_CustomDomains_Incorrect_V4 if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Not all sensitive domains are included for targeted user protection in Standard policy."
+    RuleOutput[0].ReportDetails == "Not all sensitive domains are included for targeted protection in Standard policy."
 }
 
 test_CustomDomains_Incorrect_V5 if {
@@ -860,7 +860,7 @@ test_CustomDomains_Incorrect_V5 if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Not all sensitive domains are included for targeted user protection in Standard policy."
+    RuleOutput[0].ReportDetails == "Not all sensitive domains are included for targeted protection in Standard policy."
 }
 
 test_CustomDomains_Incorrect_V6 if {
@@ -906,5 +906,5 @@ test_CustomDomains_Incorrect_V6 if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Not all sensitive domains are included for targeted user protection in Strict policy."
+    RuleOutput[0].ReportDetails == "Not all sensitive domains are included for targeted protection in Strict policy."
 }

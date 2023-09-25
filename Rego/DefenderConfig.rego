@@ -277,21 +277,21 @@ tests[{
 
 ImpersonationProtectionErrorMsg(StrictImpersonationProtection, StandardImpersonationProtection, AccountType) := Description if {
     String := concat(" ", ["Not all sensitive", AccountType])
-    Description := concat(" ", [String, "are included for targeted user protection in Strict policy."])
+    Description := concat(" ", [String, "are included for targeted protection in Strict policy."])
     StrictImpersonationProtection.Result == false
     StandardImpersonationProtection.Result == true
 }
 
 ImpersonationProtectionErrorMsg(StrictImpersonationProtection, StandardImpersonationProtection, AccountType) := Description if {
     String := concat(" ", ["Not all sensitive", AccountType])
-    Description := concat(" ", [String, "are included for targeted user protection in Standard policy."])
+    Description := concat(" ", [String, "are included for targeted protection in Standard policy."])
     StrictImpersonationProtection.Result == true
     StandardImpersonationProtection.Result == false
 }
 
 ImpersonationProtectionErrorMsg(StrictImpersonationProtection, StandardImpersonationProtection, AccountType) := Description if {
     String := concat(" ", ["Not all sensitive", AccountType])
-    Description := concat(" ", [String, "are included for targeted user protection in Strict or Standard policy."])
+    Description := concat(" ", [String, "are included for targeted protection in Strict or Standard policy."])
     StrictImpersonationProtection.Result == false
     StandardImpersonationProtection.Result == false
 }
