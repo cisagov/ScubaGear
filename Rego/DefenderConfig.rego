@@ -5,6 +5,8 @@ import data.report.utils.ReportDetailsBoolean
 import data.defender.utils.SensitiveAccounts
 import data.defender.utils.SensitiveAccountsConfig
 import data.defender.utils.SensitiveAccountsSetting
+import data.defender.utils.ImpersonationProtection
+import data.defender.utils.ImpersonationProtectionConfig
 
 ## Report details menu
 #
@@ -273,33 +275,48 @@ tests[{
 # MS.DEFENDER.2.1v1
 #--
 
-# TODO: update this policy to match emerald baseline
-# The following check is from pre-emerald 2.5 first bullet,
-# which is similar but needs some adjustments.
-
-ProtectedUsersPolicies[{
-    "Name" : Policy.Name,
-	"Users" : Policy.TargetedUsersToProtect,
-    "Action" : Policy.TargetedUserProtectionAction
-}] {
-    Policy := input.anti_phish_policies[_]
-    Policy.Enabled # filter out the disabled policies
-    Policy.EnableTargetedUserProtection # filter out the policies that have impersonation protections disabled
-    count(Policy.TargetedUsersToProtect) > 0 # filter out the policies that don't list any protected users
+ImpersonationProtectionErrorMsg(StrictImpersonationProtection, StandardImpersonationProtection) := Description if {
+    Description := "Not all sensitive users are included for targeted user protection in Strict policy."
+    StrictImpersonationProtection.Result == false
+    StandardImpersonationProtection.Result == true
 }
 
-# assert that at least one of the enabled policies includes protected users
+ImpersonationProtectionErrorMsg(StrictImpersonationProtection, StandardImpersonationProtection) := Description if {
+    Description := "Not all sensitive users are included for targeted user protection in Standard policy."
+    StrictImpersonationProtection.Result == true
+    StandardImpersonationProtection.Result == false
+}
+
+ImpersonationProtectionErrorMsg(StrictImpersonationProtection, StandardImpersonationProtection) := Description if {
+    Description := "Not all sensitive users are included for targeted user protection in Strict or Standard policy."
+    StrictImpersonationProtection.Result == false
+    StandardImpersonationProtection.Result == false
+}
+
+ImpersonationProtectionErrorMsg(StrictImpersonationProtection, StandardImpersonationProtection) := Description if {
+    Description := ""
+    StrictImpersonationProtection.Result == true
+    StandardImpersonationProtection.Result == true
+}
+
 tests[{
     "PolicyId" : "MS.DEFENDER.2.1v1",
     "Criticality" : "Should",
     "Commandlet" : ["Get-AntiPhishPolicy"],
-	"ActualValue" : Policies,
+	"ActualValue" : [StrictImpersonationProtection.Policy, StandardImpersonationProtection.Policy],
     "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
     "RequirementMet" : Status
 }] {
-    Policies := ProtectedUsersPolicies
-    ErrorMessage := "No users are included for targeted user protection."
-    Status := count(Policies) > 0
+    Policies := input.anti_phish_policies
+    ProtectedUsersConfig := ImpersonationProtectionConfig("MS.DEFENDER.2.1v1")
+    StrictImpersonationProtection := ImpersonationProtection(Policies, "Strict Preset Security Policy", ProtectedUsersConfig)
+    StandardImpersonationProtection := ImpersonationProtection(Policies, "Standard Preset Security Policy", ProtectedUsersConfig)
+    ErrorMessage := ImpersonationProtectionErrorMsg(StrictImpersonationProtection, StandardImpersonationProtection)
+    Conditions := [
+        StrictImpersonationProtection.Result == true,
+        StandardImpersonationProtection.Result == true
+    ]
+    Status := count([x | x := Conditions[_]; x == false]) == 0
 }
 #--
 
