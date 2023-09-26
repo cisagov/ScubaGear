@@ -1,6 +1,7 @@
 package exo
 import future.keywords
 import data.report.utils.NotCheckedDetails
+import data.report.utils.DefenderMirrorDetails
 import data.report.utils.Format
 import data.report.utils.ReportDetailsBoolean
 import data.report.utils.Description
@@ -228,10 +229,8 @@ tests[{
 SharingPolicyContactsAllowedAllDomains[SharingPolicy.Name] {
     SharingPolicy := input.sharing_policy[_]
     Domains = SharingPolicy.Domains[_]
-    WildcardInList := contains(Domains, "*")
-    ContactsInList := contains(Domains, "Contacts")
-    WildcardInList == true
-    ContactsInList == true
+    contains(Domains, "*")
+    contains(Domains, "Contacts")
 }
 
 tests[{
@@ -255,10 +254,8 @@ tests[{
 SharingPolicyCalendarAllowedAllDomains[SharingPolicy.Name] {
     SharingPolicy := input.sharing_policy[_]
     Domains = SharingPolicy.Domains[_]
-    WildcardInList := contains(Domains, "*")
-    CalendarInList := contains(Domains, "Calendar")
-    WildcardInList == true
-    CalendarInList == true
+    contains(Domains, "*")
+    contains(Domains, "Calendar")
 }
 
 tests[{
@@ -299,13 +296,14 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "PolicyId" : "MS.EXO.8.1v1",
+    "PolicyId" : PolicyId,
     "Criticality" : "Shall/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "A custom product can be used to fulfill this policy requirement. Use a 3rd party assessment tool or manually review to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure that you are running ScubaGear with defender included in the ProductNames parameter for an automated check. Then, review the corresponding Defender for Office 365 policy that fulfills the requirements of this EXO policy.",
+    "ReportDetails" : DefenderMirrorDetails(PolicyId),
     "RequirementMet" : false
 }] {
+    PolicyId = "MS.EXO.8.1v1"
     true
 }
 #--
@@ -315,13 +313,14 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "PolicyId" : "MS.EXO.8.2v1",
+    "PolicyId" : PolicyId,
     "Criticality" : "Shall/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "A custom product can be used to fulfill this policy requirement. Use a 3rd party assessment tool or manually review to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure that you are running ScubaGear with defender included in the ProductNames parameter for an automated check. Then, review the corresponding Defender for Office 365 policy that fulfills the requirements of this EXO policy.",
+    "ReportDetails" : DefenderMirrorDetails(PolicyId),
     "RequirementMet" : false
 }] {
+    PolicyId = "MS.EXO.8.2v1"
     true
 }
 #--
@@ -331,13 +330,14 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "PolicyId" : "MS.EXO.9.1v1",
+    "PolicyId" : PolicyId,
     "Criticality" : "Shall/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "A custom product can be used to fulfill this policy requirement. Use a 3rd party assessment tool or manually review to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure that you are running ScubaGear with defender included in the ProductNames parameter for an automated check. Then, review the corresponding Defender for Office 365 policy that fulfills the requirements of this EXO policy.",
+    "ReportDetails" : DefenderMirrorDetails(PolicyId),
     "RequirementMet" : false
 }] {
+    PolicyId = "MS.EXO.9.1v1"
     true
 }
 #--
@@ -347,13 +347,14 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "PolicyId" : "MS.EXO.9.2v1",
+    "PolicyId" : PolicyId,
     "Criticality" : "Should/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "A custom product can be used to fulfill this policy requirement. Use a 3rd party assessment tool or manually review to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure that you are running ScubaGear with defender included in the ProductNames parameter for an automated check. Then, review the corresponding Defender for Office 365 policy that fulfills the requirements of this EXO policy.",
+    "ReportDetails" : DefenderMirrorDetails(PolicyId),
     "RequirementMet" : false
 }] {
+    PolicyId = "MS.EXO.9.2v1"
     true
 }
 #--
@@ -363,13 +364,14 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "PolicyId" : "MS.EXO.9.3v1",
+    "PolicyId" : PolicyId,
     "Criticality" : "Shall/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "A custom product can be used to fulfill this policy requirement. Use a 3rd party assessment tool or manually review to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure that you are running ScubaGear with defender included in the ProductNames parameter for an automated check. Then, review the corresponding Defender for Office 365 policy that fulfills the requirements of this EXO policy.",
+    "ReportDetails" : DefenderMirrorDetails(PolicyId),
     "RequirementMet" : false
 }] {
+    PolicyId = "MS.EXO.9.3v1"
     true
 }
 #--
@@ -379,13 +381,14 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "PolicyId" : "MS.EXO.10.1v1",
+    "PolicyId" : PolicyId,
     "Criticality" : "Shall/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "A custom product can be used to fulfill this policy requirement. Use a 3rd party assessment tool or manually review to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure that you are running ScubaGear with defender included in the ProductNames parameter for an automated check. Then, review the corresponding Defender for Office 365 policy that fulfills the requirements of this EXO policy.",
+    "ReportDetails" : DefenderMirrorDetails(PolicyId),
     "RequirementMet" : false
 }] {
+    PolicyId = "MS.EXO.10.1v1"
     true
 }
 #--
@@ -395,13 +398,14 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "PolicyId" : "MS.EXO.10.2v1",
+    "PolicyId" : PolicyId,
     "Criticality" : "Shall/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "A custom product can be used to fulfill this policy requirement. Use a 3rd party assessment tool or manually review to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure that you are running ScubaGear with defender included in the ProductNames parameter for an automated check. Then, review the corresponding Defender for Office 365 policy that fulfills the requirements of this EXO policy.",
+    "ReportDetails" : DefenderMirrorDetails(PolicyId),
     "RequirementMet" : false
 }] {
+    PolicyId = "MS.EXO.10.2v1"
     true
 }
 #--
@@ -411,13 +415,14 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "PolicyId" : "MS.EXO.10.3v1",
+    "PolicyId" : PolicyId,
     "Criticality" : "Should/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "A custom product can be used to fulfill this policy requirement. Use a 3rd party assessment tool or manually review to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure that you are running ScubaGear with defender included in the ProductNames parameter for an automated check. Then, review the corresponding Defender for Office 365 policy that fulfills the requirements of this EXO policy.",
+    "ReportDetails" : DefenderMirrorDetails(PolicyId),
     "RequirementMet" : false
 }] {
+    PolicyId = "MS.EXO.10.3v1"
     true
 }
 #--
@@ -427,13 +432,14 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "PolicyId" : "MS.EXO.11.1v1",
+    "PolicyId" : PolicyId,
     "Criticality" : "Should/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "A custom product can be used to fulfill this policy requirement. Use a 3rd party assessment tool or manually review to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure that you are running ScubaGear with defender included in the ProductNames parameter for an automated check. Then, review the corresponding Defender for Office 365 policy that fulfills the requirements of this EXO policy.",
+    "ReportDetails" : DefenderMirrorDetails(PolicyId),
     "RequirementMet" : false
 }] {
+    PolicyId = "MS.EXO.11.1v1"
     true
 }
 #--
@@ -443,13 +449,14 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "PolicyId" : "MS.EXO.11.2v1",
+    "PolicyId" : PolicyId,
     "Criticality" : "Should/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "A custom product can be used to fulfill this policy requirement. Use a 3rd party assessment tool or manually review to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure that you are running ScubaGear with defender included in the ProductNames parameter for an automated check. Then, review the corresponding Defender for Office 365 policy that fulfills the requirements of this EXO policy.",
+    "ReportDetails" : DefenderMirrorDetails(PolicyId),
     "RequirementMet" : false
 }] {
+    PolicyId = "MS.EXO.11.2v1"
     true
 }
 #--
@@ -459,13 +466,14 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "PolicyId" : "MS.EXO.11.3v1",
+    "PolicyId" : PolicyId,
     "Criticality" : "Should/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "A custom product can be used to fulfill this policy requirement. Use a 3rd party assessment tool or manually review to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure that you are running ScubaGear with defender included in the ProductNames parameter for an automated check. Then, review the corresponding Defender for Office 365 policy that fulfills the requirements of this EXO policy.",
+    "ReportDetails" : DefenderMirrorDetails(PolicyId),
     "RequirementMet" : false
 }] {
+    PolicyId = "MS.EXO.11.3v1"
     true
 }
 #--
@@ -541,13 +549,14 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "PolicyId" : "MS.EXO.14.1v1",
+    "PolicyId" : PolicyId,
     "Criticality" : "Shall/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "A custom product can be used to fulfill this policy requirement. Use a 3rd party assessment tool or manually review to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure that you are running ScubaGear with defender included in the ProductNames parameter for an automated check. Then, review the corresponding Defender for Office 365 policy that fulfills the requirements of this EXO policy.",
+    "ReportDetails" : DefenderMirrorDetails(PolicyId),
     "RequirementMet" : false
 }] {
+    PolicyId = "MS.EXO.14.1v1"
     true
 }
 #--
@@ -557,13 +566,14 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "PolicyId" : "MS.EXO.14.2v1",
+    "PolicyId" : PolicyId,
     "Criticality" : "Shall/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "A custom product can be used to fulfill this policy requirement. Use a 3rd party assessment tool or manually review to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure that you are running ScubaGear with defender included in the ProductNames parameter for an automated check. Then, review the corresponding Defender for Office 365 policy that fulfills the requirements of this EXO policy.",
+    "ReportDetails" : DefenderMirrorDetails(PolicyId),
     "RequirementMet" : false
 }] {
+    PolicyId = "MS.EXO.14.2v1"
     true
 }
 #--
@@ -573,13 +583,14 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "PolicyId" : "MS.EXO.14.3v1",
+    "PolicyId" : PolicyId,
     "Criticality" : "Shall/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "A custom product can be used to fulfill this policy requirement. Use a 3rd party assessment tool or manually review to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure that you are running ScubaGear with defender included in the ProductNames parameter for an automated check. Then, review the corresponding Defender for Office 365 policy that fulfills the requirements of this EXO policy.",
+    "ReportDetails" : DefenderMirrorDetails(PolicyId),
     "RequirementMet" : false
 }] {
+    PolicyId = "MS.EXO.14.3v1"
     true
 }
 #--
@@ -589,13 +600,14 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "PolicyId" : "MS.EXO.15.1v1",
+    "PolicyId" : PolicyId,
     "Criticality" : "Should/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "A custom product can be used to fulfill this policy requirement. Use a 3rd party assessment tool or manually review to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure that you are running ScubaGear with defender included in the ProductNames parameter for an automated check. Then, review the corresponding Defender for Office 365 policy that fulfills the requirements of this EXO policy.",
+    "ReportDetails" : DefenderMirrorDetails(PolicyId),
     "RequirementMet" : false
 }] {
+    PolicyId = "MS.EXO.15.1v1"
     true
 }
 #--
@@ -605,13 +617,14 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "PolicyId" : "MS.EXO.15.2v1",
+    "PolicyId" : PolicyId,
     "Criticality" : "Should/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "A custom product can be used to fulfill this policy requirement. Use a 3rd party assessment tool or manually review to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure that you are running ScubaGear with defender included in the ProductNames parameter for an automated check. Then, review the corresponding Defender for Office 365 policy that fulfills the requirements of this EXO policy.",
+    "ReportDetails" : DefenderMirrorDetails(PolicyId),
     "RequirementMet" : false
 }] {
+    PolicyId = "MS.EXO.15.2v1"
     true
 }
 #--
@@ -621,13 +634,14 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "PolicyId" : "MS.EXO.15.3v1",
+    "PolicyId" : PolicyId,
     "Criticality" : "Should/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "A custom product can be used to fulfill this policy requirement. Use a 3rd party assessment tool or manually review to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure that you are running ScubaGear with defender included in the ProductNames parameter for an automated check. Then, review the corresponding Defender for Office 365 policy that fulfills the requirements of this EXO policy.",
+    "ReportDetails" : DefenderMirrorDetails(PolicyId),
     "RequirementMet" : false
 }] {
+    PolicyId = "MS.EXO.15.3v1"
     true
 }
 #--
@@ -637,13 +651,14 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "PolicyId" : "MS.EXO.16.1v1",
+    "PolicyId" : PolicyId,
     "Criticality" : "Shall/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "A custom product can be used to fulfill this policy requirement. Use a 3rd party assessment tool or manually review to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure that you are running ScubaGear with defender included in the ProductNames parameter for an automated check. Then, review the corresponding Defender for Office 365 policy that fulfills the requirements of this EXO policy.",
+    "ReportDetails" : DefenderMirrorDetails(PolicyId),
     "RequirementMet" : false
 }] {
+    PolicyId = "MS.EXO.16.1v1"
     true
 }
 #--
@@ -653,13 +668,14 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "PolicyId" : "MS.EXO.16.2v1",
+    "PolicyId" : PolicyId,
     "Criticality" : "Should/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "A custom product can be used to fulfill this policy requirement. Use a 3rd party assessment tool or manually review to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure that you are running ScubaGear with defender included in the ProductNames parameter for an automated check. Then, review the corresponding Defender for Office 365 policy that fulfills the requirements of this EXO policy.",
+    "ReportDetails" : DefenderMirrorDetails(PolicyId),
     "RequirementMet" : false
 }] {
+    PolicyId = "MS.EXO.16.2v1"
     true
 }
 #--
@@ -669,14 +685,16 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "PolicyId" : "MS.EXO.17.1v1",
+    "PolicyId" : PolicyId,
     "Criticality" : "Shall/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "A custom product can be used to fulfill this policy requirement. Use a 3rd party assessment tool or manually review to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure that you are running ScubaGear with defender included in the ProductNames parameter for an automated check. Then, review the corresponding Defender for Office 365 policy that fulfills the requirements of this EXO policy.",
+    "ReportDetails" : DefenderMirrorDetails(PolicyId),
     "RequirementMet" : false
 }] {
+    PolicyId = "MS.EXO.17.1v1"
     true
+
 }
 #--
 
@@ -685,13 +703,14 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "PolicyId" : "MS.EXO.17.2v1",
+    "PolicyId" : PolicyId,
     "Criticality" : "Shall/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "A custom product can be used to fulfill this policy requirement. Use a 3rd party assessment tool or manually review to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure that you are running ScubaGear with defender included in the ProductNames parameter for an automated check. Then, review the corresponding Defender for Office 365 policy that fulfills the requirements of this EXO policy.",
+    "ReportDetails" : DefenderMirrorDetails(PolicyId),
     "RequirementMet" : false
 }] {
+    PolicyId = "MS.EXO.17.2v1"
     true
 }
 #--
@@ -701,13 +720,14 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "PolicyId" : "MS.EXO.17.3v1",
+    "PolicyId" : PolicyId,
     "Criticality" : "Shall/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "A custom product can be used to fulfill this policy requirement. Use a 3rd party assessment tool or manually review to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure that you are running ScubaGear with defender included in the ProductNames parameter for an automated check. Then, review the corresponding Defender for Office 365 policy that fulfills the requirements of this EXO policy.",
+    "ReportDetails" : DefenderMirrorDetails(PolicyId),
     "RequirementMet" : false
 }] {
+    PolicyId = "MS.EXO.17.3v1"
     true
 }
 #--

@@ -1,6 +1,6 @@
 package exo
 import future.keywords
-
+import data.report.utils.DefenderMirrorDetails
 
 #
 # Policy 1
@@ -14,7 +14,7 @@ test_3rdParty_Correct_V1 if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "A custom product can be used to fulfill this policy requirement. Use a 3rd party assessment tool or manually review to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure that you are running ScubaGear with defender included in the ProductNames parameter for an automated check. Then, review the corresponding Defender for Office 365 policy that fulfills the requirements of this EXO policy."
+    RuleOutput[0].ReportDetails == DefenderMirrorDetails(PolicyId)
 }
 
 #
@@ -29,7 +29,7 @@ test_3rdParty_Correct_V2 if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "A custom product can be used to fulfill this policy requirement. Use a 3rd party assessment tool or manually review to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure that you are running ScubaGear with defender included in the ProductNames parameter for an automated check. Then, review the corresponding Defender for Office 365 policy that fulfills the requirements of this EXO policy."
+    RuleOutput[0].ReportDetails == DefenderMirrorDetails(PolicyId)
 }
 
 #
@@ -43,5 +43,5 @@ test_3rdParty_Correct_V3 if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "A custom product can be used to fulfill this policy requirement. Use a 3rd party assessment tool or manually review to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure that you are running ScubaGear with defender included in the ProductNames parameter for an automated check. Then, review the corresponding Defender for Office 365 policy that fulfills the requirements of this EXO policy."
+    RuleOutput[0].ReportDetails == DefenderMirrorDetails(PolicyId)
 }
