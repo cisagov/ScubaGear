@@ -134,6 +134,7 @@ function New-Report {
                         "-"
                     }
                     elseif ($Control.MalformedDescription) {
+                        $ReportSummary.Errors += 1
                         "Error"
                     }
                     else {
