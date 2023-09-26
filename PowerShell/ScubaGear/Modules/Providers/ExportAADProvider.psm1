@@ -92,8 +92,6 @@ function Export-AADProvider {
     # 5.1, 5.2, 8.1 & 8.3
     $AuthZPolicies = ConvertTo-Json @($Tracker.TryCommand("Get-MgBetaPolicyAuthorizationPolicy"))
 
-    #TODO: Temp work around - cannot process result of failed TryCommand. Issue #519
-
     # 5.4
     $DirectorySettings = ConvertTo-Json -Depth 10 @($Tracker.TryCommand("Get-MgBetaDirectorySetting"))
 
