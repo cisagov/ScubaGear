@@ -12,6 +12,7 @@ on:
         - "*Baseline*"
         paths:
         - "baselines/*.md"
+        - ".github/workflows/run_markdowm_check.yaml"
 
 name: Markdown Check
 
@@ -28,5 +29,4 @@ jobs:
           uses: actions/checkout@v3
         - name: Execute markdown checks
           run: |
-            $PSVersionTable
-            Invoke-Pester Testing\Unit\PowerShell\CreateReport -Output Detailed
+            Invoke-Pester Testing\Functional\MarkdownChecks -Output Detailed

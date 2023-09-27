@@ -120,6 +120,7 @@ td a {
 table, th, td {
     border: 1px solid;
     border-color: var(--border-color);
+    white-space: pre-wrap;
 }
 
 main {
