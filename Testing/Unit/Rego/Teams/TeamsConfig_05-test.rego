@@ -276,7 +276,7 @@ test_PrivateCatalogAppsType_Incorrect_V1 if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "1 meeting policy(ies) found that does not restrict installation of third-party apps by default: Global"
+    RuleOutput[0].ReportDetails == "1 meeting policy(ies) found that does not restrict installation of custom apps by default: Global"
 }
 
 test_PrivateCatalogAppsType_Incorrect_V2 if {
@@ -295,7 +295,7 @@ test_PrivateCatalogAppsType_Incorrect_V2 if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "1 meeting policy(ies) found that does not restrict installation of third-party apps by default: Tag:TestPolicy"
+    RuleOutput[0].ReportDetails == "1 meeting policy(ies) found that does not restrict installation of custom apps by default: Tag:TestPolicy"
 }
 
 test_PrivateCatalogAppsType_Multiple if {
@@ -322,7 +322,7 @@ test_PrivateCatalogAppsType_Multiple if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    startswith(RuleOutput[0].ReportDetails, "2 meeting policy(ies) found that does not restrict installation of third-party apps by default: ")
+    startswith(RuleOutput[0].ReportDetails, "2 meeting policy(ies) found that does not restrict installation of custom apps by default: ")
     contains(RuleOutput[0].ReportDetails, "Global")
     contains(RuleOutput[0].ReportDetails, "Tag:TestPolicy2")
 }
