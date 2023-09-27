@@ -9,7 +9,6 @@
 # (e.g., MS.TEAMS.1.1v1) aligns this files to the secure baseline control.
 package teams
 import future.keywords
-import data.report.utils.NotCheckedDetails
 import data.report.utils.Format
 import data.report.utils.ReportDetailsBoolean
 import data.report.utils.Description
