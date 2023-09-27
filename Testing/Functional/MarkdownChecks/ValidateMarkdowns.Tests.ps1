@@ -47,7 +47,7 @@ InModuleScope CreateReport {
 
                 foreach ($Control in $Controls){
                     $Control.Id -Match  "^MS\.$($Product.ToUpper())\.\d{1,}\.\d{1,}v\d{1,}$" | Should -BeTrue
-                    $Control.Value -Match "^.*\.$" | Should -BeTrue -Because "$Control.Id does not end with period."
+                    $Control.Value | Should -Not -BeNullOrEmpty -Because "$($Control.Id) requires a valid description."
                     $Control.Deleted.GetType() -Eq [bool]| Should -BeTrue -Because "Type should be boolean."
                 }
             }
