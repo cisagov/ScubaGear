@@ -752,7 +752,7 @@ function Invoke-ReportCreation {
             $Images = Join-Path -Path $ReporterPath -ChildPath "images" -ErrorAction 'Stop'
             Copy-Item -Path $Images -Destination $IndividualReportPath -Force -Recurse -ErrorAction 'Stop'
 
-            $SecureBaselines =  Import-SecureBaseline
+            $SecureBaselines =  Import-SecureBaseline -ProductNames $ProductNames
 
             foreach ($Product in $ProductNames) {
                 $BaselineName = $ArgToProd[$Product]
