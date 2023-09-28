@@ -151,9 +151,14 @@ ImpersonationProtection(Policies, IdentityString, IncludedAccounts, FilterKey, A
     count(Policy) > 0
 
     PolicyProtectedAccounts := { lower(x) | some x in Policy[AccountKey] }
-    count(PolicyProtectedAccounts) > 0
-    count(IncludedAccounts) > 0
+    print(IncludedAccounts - PolicyProtectedAccounts)
     count(IncludedAccounts - PolicyProtectedAccounts) == 0
+
+    Conditions := [
+        (count(IncludedAccounts) > 0) == (count(PolicyProtectedAccounts) > 0),
+        (count(IncludedAccounts) == 0) == (count(PolicyProtectedAccounts) == 0)
+    ]
+    count([x | x := Conditions[_]; x == true]) > 0
 } else := {
     "Result": false,
     "Policy": {

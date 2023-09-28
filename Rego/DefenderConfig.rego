@@ -276,21 +276,21 @@ tests[{
 #--
 
 ImpersonationProtectionErrorMsg(StrictImpersonationProtection, StandardImpersonationProtection, AccountType) := Description if {
-    String := concat(" ", ["Not all sensitive", AccountType])
+    String := concat(" ", ["Not all", AccountType])
     Description := concat(" ", [String, "are included for targeted protection in Strict policy."])
     StrictImpersonationProtection.Result == false
     StandardImpersonationProtection.Result == true
 }
 
 ImpersonationProtectionErrorMsg(StrictImpersonationProtection, StandardImpersonationProtection, AccountType) := Description if {
-    String := concat(" ", ["Not all sensitive", AccountType])
+    String := concat(" ", ["Not all", AccountType])
     Description := concat(" ", [String, "are included for targeted protection in Standard policy."])
     StrictImpersonationProtection.Result == true
     StandardImpersonationProtection.Result == false
 }
 
 ImpersonationProtectionErrorMsg(StrictImpersonationProtection, StandardImpersonationProtection, AccountType) := Description if {
-    String := concat(" ", ["Not all sensitive", AccountType])
+    String := concat(" ", ["Not all", AccountType])
     Description := concat(" ", [String, "are included for targeted protection in Strict or Standard policy."])
     StrictImpersonationProtection.Result == false
     StandardImpersonationProtection.Result == false
@@ -317,7 +317,7 @@ tests[{
     ProtectedConfig := ImpersonationProtectionConfig("MS.DEFENDER.2.1v1", "IncludedUsers")
     StrictImpersonationProtection := ImpersonationProtection(Policies, "Strict Preset Security Policy", ProtectedConfig, FilterKey, AccountKey, ActionKey)
     StandardImpersonationProtection := ImpersonationProtection(Policies, "Standard Preset Security Policy", ProtectedConfig, FilterKey, AccountKey, ActionKey)
-    ErrorMessage := ImpersonationProtectionErrorMsg(StrictImpersonationProtection, StandardImpersonationProtection, "users")
+    ErrorMessage := ImpersonationProtectionErrorMsg(StrictImpersonationProtection, StandardImpersonationProtection, "sensitive users")
     Conditions := [
         StrictImpersonationProtection.Result == true,
         StandardImpersonationProtection.Result == true
@@ -378,7 +378,7 @@ tests[{
     ProtectedConfig := ImpersonationProtectionConfig("MS.DEFENDER.2.3v1", "IncludedDomains")
     StrictImpersonationProtection := ImpersonationProtection(Policies, "Strict Preset Security Policy", ProtectedConfig, FilterKey, AccountKey, ActionKey)
     StandardImpersonationProtection := ImpersonationProtection(Policies, "Standard Preset Security Policy", ProtectedConfig, FilterKey, AccountKey, ActionKey)
-    ErrorMessage := ImpersonationProtectionErrorMsg(StrictImpersonationProtection, StandardImpersonationProtection, "domains")
+    ErrorMessage := ImpersonationProtectionErrorMsg(StrictImpersonationProtection, StandardImpersonationProtection, "partner domains")
     Conditions := [
         StrictImpersonationProtection.Result == true,
         StandardImpersonationProtection.Result == true

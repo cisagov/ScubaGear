@@ -658,6 +658,43 @@ test_CustomDomains_Correct_V3 if {
     RuleOutput[0].ReportDetails == "Requirement met"
 }
 
+test_CustomDomains_Correct_V4 if {
+    PolicyId := "MS.DEFENDER.2.3v1"
+
+    Output := tests with input as {
+        "anti_phish_policies": [
+            {
+                "Identity" : "Standard Preset Security Policy1659535429826",
+                "Enabled" : true,
+                "EnableTargetedDomainsProtection" : true,
+                "TargetedDomainsToProtect" : null,
+                "TargetedDomainProtectionAction": "Quarantine"
+            },
+            {
+                "Identity" : "Strict Preset Security Policy1659535429826",
+                "Enabled" : true,
+                "EnableTargetedDomainsProtection" : true,
+                "TargetedDomainsToProtect" : null,
+                "TargetedDomainProtectionAction": "Quarantine"
+            }
+        ],
+        "scuba_config" : {
+            "Defender" : {
+                "MS.DEFENDER.2.3v1" : {
+                    "SensitiveAccounts" : {
+                    }
+                }
+            }
+        }
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "Requirement met"
+}
+
 test_CustomDomains_Incorrect_V1 if {
     PolicyId := "MS.DEFENDER.2.3v1"
 
@@ -692,7 +729,7 @@ test_CustomDomains_Incorrect_V1 if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Not all sensitive domains are included for targeted protection in Standard policy."
+    RuleOutput[0].ReportDetails == "Not all partner domains are included for targeted protection in Standard policy."
 }
 
 test_CustomDomains_Incorrect_V2 if {
@@ -729,7 +766,7 @@ test_CustomDomains_Incorrect_V2 if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Not all sensitive domains are included for targeted protection in Strict policy."
+    RuleOutput[0].ReportDetails == "Not all partner domains are included for targeted protection in Strict policy."
 }
 
 test_CustomDomains_Incorrect_V3 if {
@@ -766,7 +803,7 @@ test_CustomDomains_Incorrect_V3 if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Not all sensitive domains are included for targeted protection in Strict or Standard policy."
+    RuleOutput[0].ReportDetails == "Not all partner domains are included for targeted protection in Strict or Standard policy."
 }
 
 test_CustomDomains_Incorrect_V4 if {
@@ -813,7 +850,7 @@ test_CustomDomains_Incorrect_V4 if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Not all sensitive domains are included for targeted protection in Standard policy."
+    RuleOutput[0].ReportDetails == "Not all partner domains are included for targeted protection in Standard policy."
 }
 
 test_CustomDomains_Incorrect_V5 if {
@@ -860,7 +897,7 @@ test_CustomDomains_Incorrect_V5 if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Not all sensitive domains are included for targeted protection in Standard policy."
+    RuleOutput[0].ReportDetails == "Not all partner domains are included for targeted protection in Standard policy."
 }
 
 test_CustomDomains_Incorrect_V6 if {
@@ -906,5 +943,48 @@ test_CustomDomains_Incorrect_V6 if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Not all sensitive domains are included for targeted protection in Strict policy."
+    RuleOutput[0].ReportDetails == "Not all partner domains are included for targeted protection in Strict policy."
+}
+
+test_CustomDomains_Incorrect_V7 if {
+    PolicyId := "MS.DEFENDER.2.3v1"
+
+    Output := tests with input as {
+        "anti_phish_policies": [
+            {
+                "Identity" : "Standard Preset Security Policy1659535429826",
+                "Enabled" : true,
+                "EnableTargetedDomainsProtection" : true,
+                "TargetedDomainsToProtect" : [
+                    "random.mail.example.com",
+                    "random.example.com"
+                ],
+                "TargetedDomainProtectionAction": "Quarantine"
+            },
+            {
+                "Identity" : "Strict Preset Security Policy1659535429826",
+                "Enabled" : true,
+                "EnableTargetedDomainsProtection" : true,
+                "TargetedDomainsToProtect" : [
+                    "random.mail.example.com",
+                    "random.example.com"
+                ],
+                "TargetedDomainProtectionAction": "Quarantine"
+            }
+        ],
+        "scuba_config" : {
+            "Defender" : {
+                "MS.DEFENDER.2.3v1" : {
+                    "SensitiveAccounts" : {
+                    }
+                }
+            }
+        }
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "Not all partner domains are included for targeted protection in Strict or Standard policy."
 }
