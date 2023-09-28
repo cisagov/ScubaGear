@@ -469,9 +469,27 @@ tests[{
     "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
     "RequirementMet" : Status
 }] {
+
+    error_rules := "No matching rule found for: "
+
     Rules := SSNRules
-    ErrorMessage := "No matching rule found for U.S. Social Security Number (SSN)"
-    Status := count(Rules) > 0
+    error_rules := concat(",", [error_rules, "U.S. Social Security Number (SSN) "]) { count(SSNRules) == 0 }
+
+    Rules := ITINRules
+    error_rules := concat(",", [error_rules, "U.S. Individual Taxpayer Identification Number (ITIN) "]) { count(ITINRules) == 0 }
+
+    Rules := CardRules
+    error_rules := concat(",", [error_rules, "Credit Card Number "]) { count(CardRules) == 0 }
+
+    ErrorMessage := error_rules
+    Status := endswith(": ", error_rules)
+
+    #--------
+    # Rules := SSNRules
+    # count(SSNRules) > 0
+
+    # ErrorMessage := concat(",", ["No matching rule found for U.S. Social Security Number (SSN)", "$"])
+    # Status := count(Rules) > 0
 }
 
 # tests[{
