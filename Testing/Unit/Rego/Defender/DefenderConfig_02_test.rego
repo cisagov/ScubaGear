@@ -35,12 +35,10 @@ test_TargetedUsers_Correct_V1 if {
         "scuba_config" : {
             "Defender" : {
                 "MS.DEFENDER.2.1v1" : {
-                    "SensitiveAccounts" : {
-                        "IncludedUsers" : [
-                            "John Doe;jdoe@someemail.com",
-                            "Jane Doe;jadoe@someemail.com"
-                        ]
-                    }
+                    "SensitiveUsers" : [
+                        "John Doe;jdoe@someemail.com",
+                        "Jane Doe;jadoe@someemail.com"
+                    ]
                 }
             }
         }
@@ -82,11 +80,9 @@ test_TargetedUsers_Correct_V2 if {
         "scuba_config" : {
             "Defender" : {
                 "MS.DEFENDER.2.1v1" : {
-                    "SensitiveAccounts" : {
-                        "IncludedUsers" : [
-                            "John Doe;jdoe@someemail.com"
-                        ]
-                    }
+                    "SensitiveUsers" : [
+                        "John Doe;jdoe@someemail.com"
+                    ]
                 }
             }
         }
@@ -128,12 +124,10 @@ test_TargetedUsers_Correct_V3 if {
         "scuba_config" : {
             "Defender" : {
                 "MS.DEFENDER.2.1v1" : {
-                    "SensitiveAccounts" : {
-                        "IncludedUsers" : [
-                            "john doe;jdoe@someemail.com",
-                            "jane doe;jadoe@someemail.com"
-                        ]
-                    }
+                    "SensitiveUsers" : [
+                        "John Doe;jdoe@someemail.com",
+                        "Jane Doe;jadoe@someemail.com"
+                    ]
                 }
             }
         }
@@ -165,12 +159,10 @@ test_TargetedUsers_Incorrect_V1 if {
         "scuba_config" : {
             "Defender" : {
                 "MS.DEFENDER.2.1v1" : {
-                    "SensitiveAccounts" : {
-                        "IncludedUsers" : [
-                            "John Doe;jdoe@someemail.com",
-                            "Jane Doe;jadoe@someemail.com"
-                        ]
-                    }
+                    "SensitiveUsers" : [
+                        "John Doe;jdoe@someemail.com",
+                        "Jane Doe;jadoe@someemail.com"
+                    ]
                 }
             }
         }
@@ -202,12 +194,10 @@ test_TargetedUsers_Incorrect_V2 if {
         "scuba_config" : {
             "Defender" : {
                 "MS.DEFENDER.2.1v1" : {
-                    "SensitiveAccounts" : {
-                        "IncludedUsers" : [
-                            "John Doe;jdoe@someemail.com",
-                            "Jane Doe;jadoe@someemail.com"
-                        ]
-                    }
+                    "SensitiveUsers" : [
+                        "John Doe;jdoe@someemail.com",
+                        "Jane Doe;jadoe@someemail.com"
+                    ]
                 }
             }
         }
@@ -239,12 +229,10 @@ test_TargetedUsers_Incorrect_V3 if {
         "scuba_config" : {
             "Defender" : {
                 "MS.DEFENDER.2.1v1" : {
-                    "SensitiveAccounts" : {
-                        "IncludedUsers" : [
-                            "John Doe;jdoe@someemail.com",
-                            "Jane Doe;jadoe@someemail.com"
-                        ]
-                    }
+                    "SensitiveUsers" : [
+                        "John Doe;jdoe@someemail.com",
+                        "Jane Doe;jadoe@someemail.com"
+                    ]
                 }
             }
         }
@@ -286,12 +274,10 @@ test_TargetedUsers_Incorrect_V4 if {
         "scuba_config" : {
             "Defender" : {
                 "MS.DEFENDER.2.1v1" : {
-                    "SensitiveAccounts" : {
-                        "IncludedUsers" : [
-                            "John Doe;jdoe@someemail.com",
-                            "Jane Doe;jadoe@someemail.com"
-                        ]
-                    }
+                    "SensitiveUsers" : [
+                        "John Doe;jdoe@someemail.com",
+                        "Jane Doe;jadoe@someemail.com"
+                    ]
                 }
             }
         }
@@ -333,12 +319,10 @@ test_TargetedUsers_Incorrect_V5 if {
         "scuba_config" : {
             "Defender" : {
                 "MS.DEFENDER.2.1v1" : {
-                    "SensitiveAccounts" : {
-                        "IncludedUsers" : [
-                            "John Doe;jdoe@someemail.com",
-                            "Jane Doe;jadoe@someemail.com"
-                        ]
-                    }
+                    "SensitiveUsers" : [
+                        "John Doe;jdoe@someemail.com",
+                        "Jane Doe;jadoe@someemail.com"
+                    ]
                 }
             }
         }
@@ -379,12 +363,10 @@ test_TargetedUsers_Incorrect_V6 if {
         "scuba_config" : {
             "Defender" : {
                 "MS.DEFENDER.2.1v1" : {
-                    "SensitiveAccounts" : {
-                        "IncludedUsers" : [
-                            "John Doe;jdoe@someemail.com",
-                            "Jane Doe;jadoe@someemail.com"
-                        ]
-                    }
+                    "SensitiveUsers" : [
+                        "John Doe;jdoe@someemail.com",
+                        "Jane Doe;jadoe@someemail.com"
+                    ]
                 }
             }
         }
@@ -547,12 +529,10 @@ test_CustomDomains_Correct_V1 if {
         "scuba_config" : {
             "Defender" : {
                 "MS.DEFENDER.2.3v1" : {
-                    "SensitiveAccounts" : {
-                        "IncludedDomains" : [
-                            "random.mail.example.com",
-                            "random.example.com"
-                        ]
-                    }
+                    "PartnerDomains" : [
+                        "random.mail.example.com",
+                        "random.example.com"
+                    ]
                 }
             }
         }
@@ -594,11 +574,9 @@ test_CustomDomains_Correct_V2 if {
         "scuba_config" : {
             "Defender" : {
                 "MS.DEFENDER.2.3v1" : {
-                    "SensitiveAccounts" : {
-                        "IncludedDomains" : [
-                            "random.mail.example.com"
-                        ]
-                    }
+                    "PartnerDomains" : [
+                        "random.mail.example.com"
+                    ]
                 }
             }
         }
@@ -640,12 +618,10 @@ test_CustomDomains_Correct_V3 if {
         "scuba_config" : {
             "Defender" : {
                 "MS.DEFENDER.2.3v1" : {
-                    "SensitiveAccounts" : {
-                        "IncludedDomains" : [
-                            "Random.mail.example.com",
-                            "Random.Example.com"
-                        ]
-                    }
+                    "PartnerDomains" : [
+                        "random.mail.example.com",
+                        "random.example.com"
+                    ]
                 }
             }
         }
@@ -681,8 +657,6 @@ test_CustomDomains_Correct_V4 if {
         "scuba_config" : {
             "Defender" : {
                 "MS.DEFENDER.2.3v1" : {
-                    "SensitiveAccounts" : {
-                    }
                 }
             }
         }
@@ -714,12 +688,10 @@ test_CustomDomains_Incorrect_V1 if {
         "scuba_config" : {
             "Defender" : {
                 "MS.DEFENDER.2.3v1" : {
-                    "SensitiveAccounts" : {
-                        "IncludedDomains" : [
-                            "random.mail.example.com",
-                            "random.example.com"
-                        ]
-                    }
+                    "PartnerDomains" : [
+                        "random.mail.example.com",
+                        "random.example.com"
+                    ]
                 }
             }
         }
@@ -751,12 +723,10 @@ test_CustomDomains_Incorrect_V2 if {
         "scuba_config" : {
             "Defender" : {
                 "MS.DEFENDER.2.3v1" : {
-                    "SensitiveAccounts" : {
-                        "IncludedDomains" : [
-                            "random.mail.example.com",
-                            "random.example.com"
-                        ]
-                    }
+                    "PartnerDomains" : [
+                        "random.mail.example.com",
+                        "random.example.com"
+                    ]
                 }
             }
         }
@@ -788,12 +758,10 @@ test_CustomDomains_Incorrect_V3 if {
         "scuba_config" : {
             "Defender" : {
                 "MS.DEFENDER.2.3v1" : {
-                    "SensitiveAccounts" : {
-                        "IncludedDomains" : [
-                            "random.mail.example.com",
-                            "random.example.com"
-                        ]
-                    }
+                    "PartnerDomains" : [
+                        "random.mail.example.com",
+                        "random.example.com"
+                    ]
                 }
             }
         }
@@ -835,12 +803,10 @@ test_CustomDomains_Incorrect_V4 if {
         "scuba_config" : {
             "Defender" : {
                 "MS.DEFENDER.2.3v1" : {
-                    "SensitiveAccounts" : {
-                        "IncludedDomains" : [
-                            "random.mail.example.com",
-                            "random.example.com"
-                        ]
-                    }
+                    "PartnerDomains" : [
+                        "random.mail.example.com",
+                        "random.example.com"
+                    ]
                 }
             }
         }
@@ -882,12 +848,10 @@ test_CustomDomains_Incorrect_V5 if {
         "scuba_config" : {
             "Defender" : {
                 "MS.DEFENDER.2.3v1" : {
-                    "SensitiveAccounts" : {
-                        "IncludedDomains" : [
-                            "random.mail.example.com",
-                            "random.example.com"
-                        ]
-                    }
+                    "PartnerDomains" : [
+                        "random.mail.example.com",
+                        "random.example.com"
+                    ]
                 }
             }
         }
@@ -928,12 +892,10 @@ test_CustomDomains_Incorrect_V6 if {
         "scuba_config" : {
             "Defender" : {
                 "MS.DEFENDER.2.3v1" : {
-                    "SensitiveAccounts" : {
-                        "IncludedDomains" : [
-                            "random.mail.example.com",
-                            "random.example.com"
-                        ]
-                    }
+                    "PartnerDomains" : [
+                        "random.mail.example.com",
+                        "random.example.com"
+                    ]
                 }
             }
         }
@@ -975,8 +937,6 @@ test_CustomDomains_Incorrect_V7 if {
         "scuba_config" : {
             "Defender" : {
                 "MS.DEFENDER.2.3v1" : {
-                    "SensitiveAccounts" : {
-                    }
                 }
             }
         }

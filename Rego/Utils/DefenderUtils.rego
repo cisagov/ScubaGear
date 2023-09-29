@@ -135,7 +135,7 @@ ImpersonationProtectionSetting(Policies, IdentityString, KeyValue) := Policy[0] 
 } else := set()
 
 ImpersonationProtectionConfig(PolicyID, AccountKey) := IncludedAccounts if {
-    SensitiveAccounts := input.scuba_config.Defender[PolicyID].SensitiveAccounts
+    SensitiveAccounts := input.scuba_config.Defender[PolicyID]
     IncludedAccounts := { lower(trim_space(x)) | some x in SensitiveAccounts[AccountKey]; x != null }
 } else := set()
 
@@ -151,7 +151,6 @@ ImpersonationProtection(Policies, IdentityString, IncludedAccounts, FilterKey, A
     count(Policy) > 0
 
     PolicyProtectedAccounts := { lower(x) | some x in Policy[AccountKey] }
-    print(IncludedAccounts - PolicyProtectedAccounts)
     count(IncludedAccounts - PolicyProtectedAccounts) == 0
 
     Conditions := [

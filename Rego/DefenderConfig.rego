@@ -314,7 +314,7 @@ tests[{
     FilterKey := "EnableTargetedUserProtection"
     AccountKey := "TargetedUsersToProtect"
     ActionKey := "TargetedUserProtectionAction"
-    ProtectedConfig := ImpersonationProtectionConfig("MS.DEFENDER.2.1v1", "IncludedUsers")
+    ProtectedConfig := ImpersonationProtectionConfig("MS.DEFENDER.2.1v1", "SensitiveUsers")
     StrictImpersonationProtection := ImpersonationProtection(Policies, "Strict Preset Security Policy", ProtectedConfig, FilterKey, AccountKey, ActionKey)
     StandardImpersonationProtection := ImpersonationProtection(Policies, "Standard Preset Security Policy", ProtectedConfig, FilterKey, AccountKey, ActionKey)
     ErrorMessage := ImpersonationProtectionErrorMsg(StrictImpersonationProtection, StandardImpersonationProtection, "sensitive users")
@@ -375,7 +375,7 @@ tests[{
     FilterKey := "EnableTargetedDomainsProtection"
     AccountKey := "TargetedDomainsToProtect"
     ActionKey := "TargetedDomainProtectionAction"
-    ProtectedConfig := ImpersonationProtectionConfig("MS.DEFENDER.2.3v1", "IncludedDomains")
+    ProtectedConfig := ImpersonationProtectionConfig("MS.DEFENDER.2.3v1", "PartnerDomains")
     StrictImpersonationProtection := ImpersonationProtection(Policies, "Strict Preset Security Policy", ProtectedConfig, FilterKey, AccountKey, ActionKey)
     StandardImpersonationProtection := ImpersonationProtection(Policies, "Standard Preset Security Policy", ProtectedConfig, FilterKey, AccountKey, ActionKey)
     ErrorMessage := ImpersonationProtectionErrorMsg(StrictImpersonationProtection, StandardImpersonationProtection, "partner domains")
