@@ -393,6 +393,7 @@ test_meeting_policies_Correct if {
         "meeting_policies": [
             {
                 "Identity": "Tag:CustomPolicy",
+                "AutoAdmittedUsers": "EveryoneInCompany"
                 "AllowPSTNUsersToBypassLobby": false
             }
         ]
@@ -412,6 +413,7 @@ test_AllowPSTNUsersToBypassLobby_Incorrect if {
         "meeting_policies": [
             {
                 "Identity": "Tag:CustomPolicy",
+                "AutoAdmittedUsers": "EveryoneInCompany",
                 "AllowPSTNUsersToBypassLobby": true
             }
         ]
