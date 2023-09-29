@@ -461,6 +461,20 @@ CardRules[Rule.Name] {
     "Credit Card Number" in Rule.ContentNames
 }
 
+error_rule := "No matching rules found for:"
+
+# error_rules contains "U.S. Social Security Number (SSN)" if count(SSNRules) == 0
+# error_rules contains "U.S. Individual Taxpayer Identification Number (ITIN)" if count(ITINRules) == 0
+# error_rules contains "Credit Card Number" if count(CardRules) == 0
+
+
+error_rules1 := "U.S. Social Security Number (SSN)" if  count(SSNRules) == 0 else " "
+error_rules2 := "U.S. Individual Taxpayer Identification Number (ITIN)" if  count(ITINRules) == 0 else " "
+error_rules3 := "Credit Card Number" if count(CardRules) == 0 else " "
+error_rules  := concat(",",[error_rules1,error_rules2,error_rules3])
+
+ErrorMsg := concat(" ",  [error_rule, concat(", ", error_rules)])
+
 tests[{
     #TODO: Appears this policy is broken into 3 parts in code and only 1 in baseline
     # Combine this and the following two that are commented out into a single test
@@ -473,15 +487,7 @@ tests[{
     "RequirementMet" : Status,
 }] {
 
-
-    error_header := "No matching rule found for:"
-    error_rules1 := "U.S. Social Security Number (SSN)" if  count(SSNRules) == 0 else ""
-    error_rules2 := "U.S. Individual Taxpayer Identification Number (ITIN)" if  count(ITINRules) == 0 else ""
-    error_rules3 := "Credit Card Number" if count(CardRules) == 0 else ""
-    error_rules  := concat(",",[error_rules1,error_rules2,error_rules3])
-    ErrorMessage := concat(" ", [error_header, error_rules])
-
-    Status := endswith(": ", error_header)
+Status := endswith(": ", error_rules )
 
     #--------
     # Rules := SSNRules
