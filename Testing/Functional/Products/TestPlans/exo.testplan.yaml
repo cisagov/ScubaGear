@@ -1,544 +1,544 @@
 ProductName: exo
 TestPlan:
-  # - PolicyId: MS.EXO.1.1v1
-  #   TestDriver: RunScuba
-  #   Tests:
-  #     - TestDescription: MS.EXO.1.1v1 Non-Compliant case - domains have auto forwarding Enabled
-  #       Preconditions:
-  #         - Command: 'Get-RemoteDomain | Where {$_.AutoForwardEnabled -eq $false} | Set-RemoteDomain -AutoForwardEnabled $true'
-  #       Postconditions: []
-  #       ExpectedResult: false
-  #     - TestDescription: MS.EXO.1.1v1 Compliant case - domains have auto forwarding Disabled
-  #       Preconditions:
-  #         - Command: 'Get-RemoteDomain | Where {$_.AutoForwardEnabled -eq $true} | Set-RemoteDomain -AutoForwardEnabled $false'
-  #       Postconditions: []
-  #       ExpectedResult: true
+  - PolicyId: MS.EXO.1.1v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.EXO.1.1v1 Non-Compliant case - domains have auto forwarding Enabled
+        Preconditions:
+          - Command: 'Get-RemoteDomain | Where {$_.AutoForwardEnabled -eq $false} | Set-RemoteDomain -AutoForwardEnabled $true'
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.EXO.1.1v1 Compliant case - domains have auto forwarding Disabled
+        Preconditions:
+          - Command: 'Get-RemoteDomain | Where {$_.AutoForwardEnabled -eq $true} | Set-RemoteDomain -AutoForwardEnabled $false'
+        Postconditions: []
+        ExpectedResult: true
 
-  # - PolicyId: MS.EXO.2.1v1
+  - PolicyId: MS.EXO.2.1v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.EXO.2.1v1 Not Checked
+        Preconditions: []
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false
+
+  - PolicyId: MS.EXO.2.2v1
+    TestDriver: RunCached
+    Tests:
+      - TestDescription: MS.EXO.2.2v1 Non-Compliant case - SPF policy is missing for one of the domains
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                spf_records:
+                  - domain: bogus1.customdomain.com
+                    rdata:
+                      - "v=spf1 include:spf.protection.outlook.com -all"
+                      - "mscid=Bn4gB0qhWRMD7Dh4RElnakA+/KDrYmzhXtdxOUlJcbSX7aCxUpA5DHeCW+8BvkeY5ioX8WqoM+Ay44R/m6qh3A=="
+                  - domain: bogus2.onmicrosoft.com
+                    rdata:
+                      - "mscid=Bn4gB0qhWRMD7Dh4RElnakA+/KDrYmzhXtdxOUlJcbSX7aCxUpA5DHeCW+8BvkeY5ioX8WqoM+Ay44R/m6qh3A=="
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.EXO.2.2v1 Compliant case - SPF policy is published for the domains
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                spf_records:
+                  - domain: bogus1.customdomain.com
+                    rdata:
+                      - "v=spf1 include:spf.protection.outlook.com -all"
+                      - "mscid=Bn4gB0qhWRMD7Dh4RElnakA+/KDrYmzhXtdxOUlJcbSX7aCxUpA5DHeCW+8BvkeY5ioX8WqoM+Ay44R/m6qh3A=="
+                  - domain: bogus2.onmicrosoft.com
+                    rdata:
+                      - "v=spf1 include:spf.protection.outlook.com -all"
+                      - "mscid=Bn4gB0qhWRMD7Dh4RElnakA+/KDrYmzhXtdxOUlJcbSX7aCxUpA5DHeCW+8BvkeY5ioX8WqoM+Ay44R/m6qh3A=="
+        Postconditions: []
+        ExpectedResult: true
+
+  - PolicyId: MS.EXO.3.1v1
+    TestDriver: RunCached
+    Tests:
+      - TestDescription: MS.EXO.3.1v1 Non-Compliant case - DKIM is missing for one of the domains
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                spf_records:
+                  - domain: bogus1.customdomain.com
+                  - domain: bogus2.onmicrosoft.com
+                dkim_config:
+                  - Domain: bogus1.customdomain.com
+                    Enabled: true
+                  - domain: bogus2.onmicrosoft.com
+                    Enabled: true
+                dkim_records:
+                  - domain: bogus2.onmicrosoft.com
+                    rdata:
+                      - "v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAn/z5b0VYtWAnksnJLIo1HiKP5j0sTa93y6eIe7eRn3EfCMfnw4f0Ew6wmX/2NIsszvF0XG0mkdffCVsUa5WnzDvfhR5fkSMqGI/I4JaR+b8qHdNToVesTbk/kFv+j41TcxWgJw1j4Xeo6URJG6qx1ujh6zshr21/frskm/tq7Qlp7LpQn1uiHDO2g1If9tlvK"
+                      - "mscid=Bn4gB0qhWRMD7Dh4RElnakA+/KDrYmzhXtdxOUlJcbSX7aCxUpA5DHeCW+8BvkeY5ioX8WqoM+Ay44R/m6qh3A=="
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.EXO.3.1v1 Compliant case - DKIM is configured for the domains
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                spf_records:
+                  - domain: bogus1.customdomain.com
+                  - domain: bogus2.onmicrosoft.com
+                dkim_config:
+                  - Domain: bogus1.customdomain.com
+                    Enabled: true
+                  - domain: bogus2.onmicrosoft.com
+                    Enabled: true
+                dkim_records:
+                  - domain: bogus1.customdomain.com
+                    rdata:
+                      - "v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAn/z5b0VYtWAnksnJLIo1HiKP5j0sTa93y6eIe7eRn3EfCMfnw4f0Ew6wmX/2NIsszvF0XG0mkdffCVsUa5WnzDvfhR5fkSMqGI/I4JaR+b8qHdNToVesTbk/kFv+j41TcxWgJw1j4Xeo6URJG6qx1ujh6zshr21/frskm/tq7Qlp7LpQn1uiHDO2g1If9tlvK"
+                      - "mscid=Bn4gB0qhWRMD7Dh4RElnakA+/KDrYmzhXtdxOUlJcbSX7aCxUpA5DHeCW+8BvkeY5ioX8WqoM+Ay44R/m6qh3A=="
+                  - domain: bogus2.onmicrosoft.com
+                    rdata:
+                      - "v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAn/z5b0VYtWAnksnJLIo1HiKP5j0sTa93y6eIe7eRn3EfCMfnw4f0Ew6wmX/2NIsszvF0XG0mkdffCVsUa5WnzDvfhR5fkSMqGI/I4JaR+b8qHdNToVesTbk/kFv+j41TcxWgJw1j4Xeo6URJG6qx1ujh6zshr21/frskm/tq7Qlp7LpQn1uiHDO2g1If9tlvK"
+                      - "mscid=Bn4gB0qhWRMD7Dh4RElnakA+/KDrYmzhXtdxOUlJcbSX7aCxUpA5DHeCW+8BvkeY5ioX8WqoM+Ay44R/m6qh3A=="
+        Postconditions: []
+        ExpectedResult: true
+
+  - PolicyId: MS.EXO.4.1v1
+    TestDriver: RunCached
+    Tests:
+      - TestDescription: MS.EXO.4.1v1 Non-Compliant case - DMARC is missing for one of the domains
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                dmarc_records:
+                  - domain: bogus1.customdomain.com
+                    rdata:
+                      - "v=DMARC1; p=reject; pct=100; rua=mailto:reports@dmarc.cyber.dhs.gov, mailto:reports@example.com; ruf=mailto:reports@example.com"
+                  - domain: bogus2.onmicrosoft.com
+                    rdata: []
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.EXO.4.1v1 Compliant case - DMARC is configured for the domains
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                dmarc_records:
+                  - domain: bogus1.customdomain.com
+                    rdata:
+                      - "v=DMARC1; p=reject; pct=100; rua=mailto:reports@dmarc.cyber.dhs.gov, mailto:reports@example.com; ruf=mailto:reports@example.com"
+                  - domain: bogus2.onmicrosoft.com
+                    rdata:
+                      - "v=DMARC1; p=reject; pct=100; rua=mailto:reports@dmarc.cyber.dhs.gov, mailto:reports@example.com; ruf=mailto:reports@example.com"
+        Postconditions: []
+        ExpectedResult: true
+
+  - PolicyId: MS.EXO.4.2v1
+    TestDriver: RunCached
+    Tests:
+      - TestDescription: MS.EXO.4.2v1 Non-Compliant case - DMARC p=reject is missing for one of the domains
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                dmarc_records:
+                  - domain: bogus1.customdomain.com
+                    rdata:
+                      - "v=DMARC1; pct=100; rua=mailto:reports@dmarc.cyber.dhs.gov, mailto:reports@example.com; ruf=mailto:reports@example.com"
+                  - domain: bogus2.onmicrosoft.com
+                    rdata:
+                      - "v=DMARC1; p=reject; pct=100; rua=mailto:reports@dmarc.cyber.dhs.gov, mailto:reports@example.com; ruf=mailto:reports@example.com"
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.EXO.4.2v1 Compliant case - DMARC p=reject is configured for the domains
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                dmarc_records:
+                  - domain: bogus1.customdomain.com
+                    rdata:
+                      - "v=DMARC1; p=reject; pct=100; rua=mailto:reports@dmarc.cyber.dhs.gov, mailto:reports@example.com; ruf=mailto:reports@example.com"
+                  - domain: bogus2.onmicrosoft.com
+                    rdata:
+                      - "v=DMARC1; p=reject; pct=100; rua=mailto:reports@dmarc.cyber.dhs.gov, mailto:reports@example.com; ruf=mailto:reports@example.com"
+        Postconditions: []
+        ExpectedResult: true
+
+  - PolicyId: MS.EXO.4.3v1
+    TestDriver: RunCached
+    Tests:
+      - TestDescription: MS.EXO.4.3v1 Non-Compliant case - DMARC DHS rua point of contact is in the wrong field for one of the domains
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                dmarc_records:
+                  - domain: bogus1.customdomain.com
+                    rdata:
+                      - "v=DMARC1; p=reject; pct=100; rua=mailto:reports@example.com; ruf=mailto:reports@dmarc.cyber.dhs.gov"
+                  - domain: bogus2.onmicrosoft.com
+                    rdata:
+                      - "v=DMARC1; p=reject; pct=100; rua=mailto:reports@dmarc.cyber.dhs.gov, mailto:reports@example.com; ruf=mailto:reports@example.com"
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.EXO.4.3v1 Compliant case - DMARC DHS rua point of contact is configured for the domains
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                dmarc_records:
+                  - domain: bogus1.customdomain.com
+                    rdata:
+                      - "v=DMARC1; p=reject; pct=100; rua=mailto:mailto:reports@example.com, mailto:reports@dmarc.cyber.dhs.gov; ruf=mailto:reports@example.com"
+                  - domain: bogus2.onmicrosoft.com
+                    rdata:
+                      - "v=DMARC1; p=reject; pct=100; rua=mailto:mailto:reports@example.com, mailto:reports@dmarc.cyber.dhs.gov; ruf=mailto:reports@example.com"
+        Postconditions: []
+        ExpectedResult: true
+
+  - PolicyId: MS.EXO.4.4v1
+    TestDriver: RunCached
+    Tests:
+      - TestDescription: MS.EXO.4.4v1 Non-Compliant case - DMARC DHS rua and ruf point of contact is in the wrong field for one of the domains
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                dmarc_records:
+                  - domain: bogus1.customdomain.com
+                    rdata:
+                      - "v=DMARC1; p=reject; pct=100; lulz=mailto:reports@example.com, mailto:reports@example.com;"
+                  - domain: bogus2.onmicrosoft.com
+                    rdata:
+                      - "v=DMARC1; p=reject; pct=100; rua=mailto:reports@dmarc.cyber.dhs.gov, mailto:reports@example.com; ruf=mailto:reports@example.com"
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.EXO.4.4v1 Compliant case - DMARC Agency rua and ruf point of contact is configured for the domains
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                dmarc_records:
+                  - domain: bogus1.customdomain.com
+                    rdata:
+                      - "v=DMARC1; p=reject; pct=100; rua=mailto:mailto:reports@example.com, mailto:reports@dmarc.cyber.dhs.gov; ruf=mailto:reports@example.com"
+                  - domain: bogus2.onmicrosoft.com
+                    rdata:
+                      - "v=DMARC1; p=reject; pct=100; rua=mailto:mailto:reports@example.com, mailto:reports@dmarc.cyber.dhs.gov; ruf=mailto:reports@example.com"
+        Postconditions: []
+        ExpectedResult: true
+
+  - PolicyId: MS.EXO.5.1v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.EXO.5.1v1 Non-Compliant case - SMTP AUTH is Enabled
+        Preconditions:
+          - Command: Set-TransportConfig
+            Splat:
+              SmtpClientAuthenticationDisabled: false
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.EXO.5.1v1 Compliant case - SMTP AUTH is Disabled
+        Preconditions:
+          - Command: Set-TransportConfig
+            Splat:
+              SmtpClientAuthenticationDisabled: true
+        Postconditions: []
+        ExpectedResult: true
+
+  - PolicyId: MS.EXO.6.1v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.EXO.6.1v1 Non-Compliant case - Contacts shared with all domains
+        Preconditions:
+          - Command: 'New-SharingPolicy -Name "FunctionalTest ContactSharingAllDomains" -Domains "*:ContactsSharing"'
+        Postconditions:
+          - Command: 'Remove-SharingPolicy -Identity "FunctionalTest ContactSharingAllDomains" -Confirm:$false'
+        ExpectedResult: false
+      - TestDescription: MS.EXO.6.1v1 Compliant case - Contacts NOT shared with all domains
+        Preconditions:
+          - Command: 'Get-SharingPolicy | Where {$_.Enabled -eq $true} | Set-SharingPolicy -Domains "ted.com:ContactsSharing"'
+        Postconditions: []
+        ExpectedResult: true
+
+  - PolicyId: MS.EXO.6.2v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.EXO.6.2v1 Non-Compliant case - Calendar shared with all domains
+        Preconditions:
+          - Command: 'New-SharingPolicy -Name "FunctionalTest CalendarSharingAllDomains" -Domains "*:CalendarSharingFreeBusyReviewer"'
+        Postconditions:
+          - Command: 'Remove-SharingPolicy -Identity "FunctionalTest CalendarSharingAllDomains" -Confirm:$false'
+        ExpectedResult: false
+      - TestDescription: MS.EXO.6.2v1 Compliant case - Calendar NOT shared with all domains
+        Preconditions:
+          - Command: 'Get-SharingPolicy | Where {$_.Enabled -eq $true} | Set-SharingPolicy -Domains "ted.com:CalendarSharingFreeBusyReviewer"'
+        Postconditions: []
+        ExpectedResult: true
+
+  - PolicyId: MS.EXO.7.1v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.EXO.7.1v1 Non-Compliant case - External sender warning rules Disabled
+        Preconditions:
+          ### Disable all rules that match what the policy is checking for
+          - Command: 'Get-TransportRule | Where {$_.State -eq "Enabled" -AND $_.Mode -eq "Enforce" -AND $_.FromScope -eq "NotInOrganization"} | Disable-TransportRule -Confirm:$false'
+        Postconditions:
+          - Command: 'Get-TransportRule | Where {$_.State -eq "Disabled" -AND $_.Mode -eq "Enforce" -AND $_.FromScope -eq "NotInOrganization"} | Enable-TransportRule -Confirm:$false'
+        ExpectedResult: false
+      - TestDescription: MS.EXO.7.1v1 Compliant case - External sender warning rule exists
+        Preconditions:
+          ### By creating a new rule that matches what the policy is checking for, we guarantee that it exists in the tenant
+          - Command: 'New-TransportRule "FunctionalTest External sender warning" -FromScope "NotInOrganization" -PrependSubject "[External] "'
+        Postconditions:
+          - Command: 'Get-TransportRule | Where {$_.Identity -eq "FunctionalTest External sender warning"} | Remove-TransportRule -Confirm:$false'
+        ExpectedResult: true
+
+  # - PolicyId: MS.EXO.8.1v1
   #   TestDriver: RunScuba
   #   Tests:
-  #     - TestDescription: MS.EXO.2.1v1 Not Checked
+  #     - TestDescription: MS.EXO.8.1v1 Custom Implementation
   #       Preconditions: []
   #       Postconditions: []
-  #       IsNotChecked: true
+  #       IsCustomImplementation: true
   #       ExpectedResult: false
 
-  # - PolicyId: MS.EXO.2.2v1
-  #   TestDriver: RunCached
-  #   Tests:
-  #     - TestDescription: MS.EXO.2.2v1 Non-Compliant case - SPF policy is missing for one of the domains
-  #       Preconditions:
-  #         - Command: UpdateProviderExport
-  #           Splat:
-  #             Updates:
-  #               spf_records:
-  #                 - domain: bogus1.customdomain.com
-  #                   rdata:
-  #                     - "v=spf1 include:spf.protection.outlook.com -all"
-  #                     - "mscid=Bn4gB0qhWRMD7Dh4RElnakA+/KDrYmzhXtdxOUlJcbSX7aCxUpA5DHeCW+8BvkeY5ioX8WqoM+Ay44R/m6qh3A=="
-  #                 - domain: bogus2.onmicrosoft.com
-  #                   rdata:
-  #                     - "mscid=Bn4gB0qhWRMD7Dh4RElnakA+/KDrYmzhXtdxOUlJcbSX7aCxUpA5DHeCW+8BvkeY5ioX8WqoM+Ay44R/m6qh3A=="
-  #       Postconditions: []
-  #       ExpectedResult: false
-  #     - TestDescription: MS.EXO.2.2v1 Compliant case - SPF policy is published for the domains
-  #       Preconditions:
-  #         - Command: UpdateProviderExport
-  #           Splat:
-  #             Updates:
-  #               spf_records:
-  #                 - domain: bogus1.customdomain.com
-  #                   rdata:
-  #                     - "v=spf1 include:spf.protection.outlook.com -all"
-  #                     - "mscid=Bn4gB0qhWRMD7Dh4RElnakA+/KDrYmzhXtdxOUlJcbSX7aCxUpA5DHeCW+8BvkeY5ioX8WqoM+Ay44R/m6qh3A=="
-  #                 - domain: bogus2.onmicrosoft.com
-  #                   rdata:
-  #                     - "v=spf1 include:spf.protection.outlook.com -all"
-  #                     - "mscid=Bn4gB0qhWRMD7Dh4RElnakA+/KDrYmzhXtdxOUlJcbSX7aCxUpA5DHeCW+8BvkeY5ioX8WqoM+Ay44R/m6qh3A=="
-  #       Postconditions: []
-  #       ExpectedResult: true
-
-  # - PolicyId: MS.EXO.3.1v1
-  #   TestDriver: RunCached
-  #   Tests:
-  #     - TestDescription: MS.EXO.3.1v1 Non-Compliant case - DKIM is missing for one of the domains
-  #       Preconditions:
-  #         - Command: UpdateProviderExport
-  #           Splat:
-  #             Updates:
-  #               spf_records:
-  #                 - domain: bogus1.customdomain.com
-  #                 - domain: bogus2.onmicrosoft.com
-  #               dkim_config:
-  #                 - Domain: bogus1.customdomain.com
-  #                   Enabled: true
-  #                 - domain: bogus2.onmicrosoft.com
-  #                   Enabled: true
-  #               dkim_records:
-  #                 - domain: bogus2.onmicrosoft.com
-  #                   rdata:
-  #                     - "v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAn/z5b0VYtWAnksnJLIo1HiKP5j0sTa93y6eIe7eRn3EfCMfnw4f0Ew6wmX/2NIsszvF0XG0mkdffCVsUa5WnzDvfhR5fkSMqGI/I4JaR+b8qHdNToVesTbk/kFv+j41TcxWgJw1j4Xeo6URJG6qx1ujh6zshr21/frskm/tq7Qlp7LpQn1uiHDO2g1If9tlvK"
-  #                     - "mscid=Bn4gB0qhWRMD7Dh4RElnakA+/KDrYmzhXtdxOUlJcbSX7aCxUpA5DHeCW+8BvkeY5ioX8WqoM+Ay44R/m6qh3A=="
-  #       Postconditions: []
-  #       ExpectedResult: false
-  #     - TestDescription: MS.EXO.3.1v1 Compliant case - DKIM is configured for the domains
-  #       Preconditions:
-  #         - Command: UpdateProviderExport
-  #           Splat:
-  #             Updates:
-  #               spf_records:
-  #                 - domain: bogus1.customdomain.com
-  #                 - domain: bogus2.onmicrosoft.com
-  #               dkim_config:
-  #                 - Domain: bogus1.customdomain.com
-  #                   Enabled: true
-  #                 - domain: bogus2.onmicrosoft.com
-  #                   Enabled: true
-  #               dkim_records:
-  #                 - domain: bogus1.customdomain.com
-  #                   rdata:
-  #                     - "v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAn/z5b0VYtWAnksnJLIo1HiKP5j0sTa93y6eIe7eRn3EfCMfnw4f0Ew6wmX/2NIsszvF0XG0mkdffCVsUa5WnzDvfhR5fkSMqGI/I4JaR+b8qHdNToVesTbk/kFv+j41TcxWgJw1j4Xeo6URJG6qx1ujh6zshr21/frskm/tq7Qlp7LpQn1uiHDO2g1If9tlvK"
-  #                     - "mscid=Bn4gB0qhWRMD7Dh4RElnakA+/KDrYmzhXtdxOUlJcbSX7aCxUpA5DHeCW+8BvkeY5ioX8WqoM+Ay44R/m6qh3A=="
-  #                 - domain: bogus2.onmicrosoft.com
-  #                   rdata:
-  #                     - "v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAn/z5b0VYtWAnksnJLIo1HiKP5j0sTa93y6eIe7eRn3EfCMfnw4f0Ew6wmX/2NIsszvF0XG0mkdffCVsUa5WnzDvfhR5fkSMqGI/I4JaR+b8qHdNToVesTbk/kFv+j41TcxWgJw1j4Xeo6URJG6qx1ujh6zshr21/frskm/tq7Qlp7LpQn1uiHDO2g1If9tlvK"
-  #                     - "mscid=Bn4gB0qhWRMD7Dh4RElnakA+/KDrYmzhXtdxOUlJcbSX7aCxUpA5DHeCW+8BvkeY5ioX8WqoM+Ay44R/m6qh3A=="
-  #       Postconditions: []
-  #       ExpectedResult: true
-
-  # - PolicyId: MS.EXO.4.1v1
-  #   TestDriver: RunCached
-  #   Tests:
-  #     - TestDescription: MS.EXO.4.1v1 Non-Compliant case - DMARC is missing for one of the domains
-  #       Preconditions:
-  #         - Command: UpdateProviderExport
-  #           Splat:
-  #             Updates:
-  #               dmarc_records:
-  #                 - domain: bogus1.customdomain.com
-  #                   rdata:
-  #                     - "v=DMARC1; p=reject; pct=100; rua=mailto:reports@dmarc.cyber.dhs.gov, mailto:reports@example.com; ruf=mailto:reports@example.com"
-  #                 - domain: bogus2.onmicrosoft.com
-  #                   rdata: []
-  #       Postconditions: []
-  #       ExpectedResult: false
-  #     - TestDescription: MS.EXO.4.1v1 Compliant case - DMARC is configured for the domains
-  #       Preconditions:
-  #         - Command: UpdateProviderExport
-  #           Splat:
-  #             Updates:
-  #               dmarc_records:
-  #                 - domain: bogus1.customdomain.com
-  #                   rdata:
-  #                     - "v=DMARC1; p=reject; pct=100; rua=mailto:reports@dmarc.cyber.dhs.gov, mailto:reports@example.com; ruf=mailto:reports@example.com"
-  #                 - domain: bogus2.onmicrosoft.com
-  #                   rdata:
-  #                     - "v=DMARC1; p=reject; pct=100; rua=mailto:reports@dmarc.cyber.dhs.gov, mailto:reports@example.com; ruf=mailto:reports@example.com"
-  #       Postconditions: []
-  #       ExpectedResult: true
-
-  # - PolicyId: MS.EXO.4.2v1
-  #   TestDriver: RunCached
-  #   Tests:
-  #     - TestDescription: MS.EXO.4.2v1 Non-Compliant case - DMARC p=reject is missing for one of the domains
-  #       Preconditions:
-  #         - Command: UpdateProviderExport
-  #           Splat:
-  #             Updates:
-  #               dmarc_records:
-  #                 - domain: bogus1.customdomain.com
-  #                   rdata:
-  #                     - "v=DMARC1; pct=100; rua=mailto:reports@dmarc.cyber.dhs.gov, mailto:reports@example.com; ruf=mailto:reports@example.com"
-  #                 - domain: bogus2.onmicrosoft.com
-  #                   rdata:
-  #                     - "v=DMARC1; p=reject; pct=100; rua=mailto:reports@dmarc.cyber.dhs.gov, mailto:reports@example.com; ruf=mailto:reports@example.com"
-  #       Postconditions: []
-  #       ExpectedResult: false
-  #     - TestDescription: MS.EXO.4.2v1 Compliant case - DMARC p=reject is configured for the domains
-  #       Preconditions:
-  #         - Command: UpdateProviderExport
-  #           Splat:
-  #             Updates:
-  #               dmarc_records:
-  #                 - domain: bogus1.customdomain.com
-  #                   rdata:
-  #                     - "v=DMARC1; p=reject; pct=100; rua=mailto:reports@dmarc.cyber.dhs.gov, mailto:reports@example.com; ruf=mailto:reports@example.com"
-  #                 - domain: bogus2.onmicrosoft.com
-  #                   rdata:
-  #                     - "v=DMARC1; p=reject; pct=100; rua=mailto:reports@dmarc.cyber.dhs.gov, mailto:reports@example.com; ruf=mailto:reports@example.com"
-  #       Postconditions: []
-  #       ExpectedResult: true
-
-  # - PolicyId: MS.EXO.4.3v1
-  #   TestDriver: RunCached
-  #   Tests:
-  #     - TestDescription: MS.EXO.4.3v1 Non-Compliant case - DMARC DHS rua point of contact is in the wrong field for one of the domains
-  #       Preconditions:
-  #         - Command: UpdateProviderExport
-  #           Splat:
-  #             Updates:
-  #               dmarc_records:
-  #                 - domain: bogus1.customdomain.com
-  #                   rdata:
-  #                     - "v=DMARC1; p=reject; pct=100; rua=mailto:reports@example.com; ruf=mailto:reports@dmarc.cyber.dhs.gov"
-  #                 - domain: bogus2.onmicrosoft.com
-  #                   rdata:
-  #                     - "v=DMARC1; p=reject; pct=100; rua=mailto:reports@dmarc.cyber.dhs.gov, mailto:reports@example.com; ruf=mailto:reports@example.com"
-  #       Postconditions: []
-  #       ExpectedResult: false
-  #     - TestDescription: MS.EXO.4.3v1 Compliant case - DMARC DHS rua point of contact is configured for the domains
-  #       Preconditions:
-  #         - Command: UpdateProviderExport
-  #           Splat:
-  #             Updates:
-  #               dmarc_records:
-  #                 - domain: bogus1.customdomain.com
-  #                   rdata:
-  #                     - "v=DMARC1; p=reject; pct=100; rua=mailto:mailto:reports@example.com, mailto:reports@dmarc.cyber.dhs.gov; ruf=mailto:reports@example.com"
-  #                 - domain: bogus2.onmicrosoft.com
-  #                   rdata:
-  #                     - "v=DMARC1; p=reject; pct=100; rua=mailto:mailto:reports@example.com, mailto:reports@dmarc.cyber.dhs.gov; ruf=mailto:reports@example.com"
-  #       Postconditions: []
-  #       ExpectedResult: true
-
-  # - PolicyId: MS.EXO.4.4v1
-  #   TestDriver: RunCached
-  #   Tests:
-  #     - TestDescription: MS.EXO.4.4v1 Non-Compliant case - DMARC DHS rua and ruf point of contact is in the wrong field for one of the domains
-  #       Preconditions:
-  #         - Command: UpdateProviderExport
-  #           Splat:
-  #             Updates:
-  #               dmarc_records:
-  #                 - domain: bogus1.customdomain.com
-  #                   rdata:
-  #                     - "v=DMARC1; p=reject; pct=100; lulz=mailto:reports@example.com, mailto:reports@example.com;"
-  #                 - domain: bogus2.onmicrosoft.com
-  #                   rdata:
-  #                     - "v=DMARC1; p=reject; pct=100; rua=mailto:reports@dmarc.cyber.dhs.gov, mailto:reports@example.com; ruf=mailto:reports@example.com"
-  #       Postconditions: []
-  #       ExpectedResult: false
-  #     - TestDescription: MS.EXO.4.4v1 Compliant case - DMARC Agency rua and ruf point of contact is configured for the domains
-  #       Preconditions:
-  #         - Command: UpdateProviderExport
-  #           Splat:
-  #             Updates:
-  #               dmarc_records:
-  #                 - domain: bogus1.customdomain.com
-  #                   rdata:
-  #                     - "v=DMARC1; p=reject; pct=100; rua=mailto:mailto:reports@example.com, mailto:reports@dmarc.cyber.dhs.gov; ruf=mailto:reports@example.com"
-  #                 - domain: bogus2.onmicrosoft.com
-  #                   rdata:
-  #                     - "v=DMARC1; p=reject; pct=100; rua=mailto:mailto:reports@example.com, mailto:reports@dmarc.cyber.dhs.gov; ruf=mailto:reports@example.com"
-  #       Postconditions: []
-  #       ExpectedResult: true
-
-  # - PolicyId: MS.EXO.5.1v1
+  # - PolicyId: MS.EXO.8.2v1
   #   TestDriver: RunScuba
   #   Tests:
-  #     - TestDescription: MS.EXO.5.1v1 Non-Compliant case - SMTP AUTH is Enabled
-  #       Preconditions:
-  #         - Command: Set-TransportConfig
-  #           Splat:
-  #             SmtpClientAuthenticationDisabled: false
+  #     - TestDescription: MS.EXO.8.2v1 Custom Implementation
+  #       Preconditions: []
   #       Postconditions: []
+  #       IsCustomImplementation: true
   #       ExpectedResult: false
-  #     - TestDescription: MS.EXO.5.1v1 Compliant case - SMTP AUTH is Disabled
-  #       Preconditions:
-  #         - Command: Set-TransportConfig
-  #           Splat:
-  #             SmtpClientAuthenticationDisabled: true
-  #       Postconditions: []
-  #       ExpectedResult: true
 
-  # - PolicyId: MS.EXO.6.1v1
+  # - PolicyId: MS.EXO.9.1v1
   #   TestDriver: RunScuba
   #   Tests:
-  #     - TestDescription: MS.EXO.6.1v1 Non-Compliant case - Contacts shared with all domains
-  #       Preconditions:
-  #         - Command: 'New-SharingPolicy -Name "FunctionalTest ContactSharingAllDomains" -Domains "*:ContactsSharing"'
-  #       Postconditions:
-  #         - Command: 'Remove-SharingPolicy -Identity "FunctionalTest ContactSharingAllDomains" -Confirm:$false'
-  #       ExpectedResult: false
-  #     - TestDescription: MS.EXO.6.1v1 Compliant case - Contacts NOT shared with all domains
-  #       Preconditions:
-  #         - Command: 'Get-SharingPolicy | Where {$_.Enabled -eq $true} | Set-SharingPolicy -Domains "ted.com:ContactsSharing"'
+  #     - TestDescription: MS.EXO.9.1v1 Custom Implementation
+  #       Preconditions: []
   #       Postconditions: []
-  #       ExpectedResult: true
+  #       IsCustomImplementation: true
+  #       ExpectedResult: false
 
-  # - PolicyId: MS.EXO.6.2v1
+  # - PolicyId: MS.EXO.9.2v1
   #   TestDriver: RunScuba
   #   Tests:
-  #     - TestDescription: MS.EXO.6.2v1 Non-Compliant case - Calendar shared with all domains
-  #       Preconditions:
-  #         - Command: 'New-SharingPolicy -Name "FunctionalTest CalendarSharingAllDomains" -Domains "*:CalendarSharingFreeBusyReviewer"'
-  #       Postconditions:
-  #         - Command: 'Remove-SharingPolicy -Identity "FunctionalTest CalendarSharingAllDomains" -Confirm:$false'
-  #       ExpectedResult: false
-  #     - TestDescription: MS.EXO.6.2v1 Compliant case - Calendar NOT shared with all domains
-  #       Preconditions:
-  #         - Command: 'Get-SharingPolicy | Where {$_.Enabled -eq $true} | Set-SharingPolicy -Domains "ted.com:CalendarSharingFreeBusyReviewer"'
+  #     - TestDescription: MS.EXO.9.2v1 Custom Implementation
+  #       Preconditions: []
   #       Postconditions: []
-  #       ExpectedResult: true
+  #       IsCustomImplementation: true
+  #       ExpectedResult: false
 
-  # - PolicyId: MS.EXO.7.1v1
+  # - PolicyId: MS.EXO.9.3v1
   #   TestDriver: RunScuba
   #   Tests:
-  #     - TestDescription: MS.EXO.7.1v1 Non-Compliant case - External sender warning rules Disabled
-  #       Preconditions:
-  #         ### Disable all rules that match what the policy is checking for
-  #         - Command: 'Get-TransportRule | Where {$_.State -eq "Enabled" -AND $_.Mode -eq "Enforce" -AND $_.FromScope -eq "NotInOrganization"} | Disable-TransportRule -Confirm:$false'
-  #       Postconditions:
-  #         - Command: 'Get-TransportRule | Where {$_.State -eq "Disabled" -AND $_.Mode -eq "Enforce" -AND $_.FromScope -eq "NotInOrganization"} | Enable-TransportRule -Confirm:$false'
+  #     - TestDescription: MS.EXO.9.3v1 Custom Implementation
+  #       Preconditions: []
+  #       Postconditions: []
+  #       IsCustomImplementation: true
   #       ExpectedResult: false
-  #     - TestDescription: MS.EXO.7.1v1 Compliant case - External sender warning rule exists
-  #       Preconditions:
-  #         ### By creating a new rule that matches what the policy is checking for, we guarantee that it exists in the tenant
-  #         - Command: 'New-TransportRule "FunctionalTest External sender warning" -FromScope "NotInOrganization" -PrependSubject "[External] "'
-  #       Postconditions:
-  #         - Command: 'Get-TransportRule | Where {$_.Identity -eq "FunctionalTest External sender warning"} | Remove-TransportRule -Confirm:$false'
-  #       ExpectedResult: true
 
-  - PolicyId: MS.EXO.8.1v1
-    TestDriver: RunScuba
-    Tests:
-      - TestDescription: MS.EXO.8.1v1 Not Checked
-        Preconditions: []
-        Postconditions: []
-        IsNotChecked: true
-        ExpectedResult: false
-
-  - PolicyId: MS.EXO.8.2v1
-    TestDriver: RunScuba
-    Tests:
-      - TestDescription: MS.EXO.8.2v1 Not Checked
-        Preconditions: []
-        Postconditions: []
-        IsNotChecked: true
-        ExpectedResult: false
-
-  - PolicyId: MS.EXO.9.1v1
-    TestDriver: RunScuba
-    Tests:
-      - TestDescription: MS.EXO.9.1v1 Not Checked
-        Preconditions: []
-        Postconditions: []
-        IsNotChecked: true
-        ExpectedResult: false
-
-  - PolicyId: MS.EXO.9.2v1
-    TestDriver: RunScuba
-    Tests:
-      - TestDescription: MS.EXO.9.2v1 Not Checked
-        Preconditions: []
-        Postconditions: []
-        IsNotChecked: true
-        ExpectedResult: false
-
-  - PolicyId: MS.EXO.9.3v1
-    TestDriver: RunScuba
-    Tests:
-      - TestDescription: MS.EXO.9.3v1 Not Checked
-        Preconditions: []
-        Postconditions: []
-        IsNotChecked: true
-        ExpectedResult: false
-
-  - PolicyId: MS.EXO.10.1v1
-    TestDriver: RunScuba
-    Tests:
-      - TestDescription: MS.EXO.10.1v1 Not Checked
-        Preconditions: []
-        Postconditions: []
-        IsNotChecked: true
-        ExpectedResult: false
-
-  - PolicyId: MS.EXO.10.2v1
-    TestDriver: RunScuba
-    Tests:
-      - TestDescription: MS.EXO.10.2v1 Not Checked
-        Preconditions: []
-        Postconditions: []
-        IsNotChecked: true
-        ExpectedResult: false
-
-  - PolicyId: MS.EXO.10.3v1
-    TestDriver: RunScuba
-    Tests:
-      - TestDescription: MS.EXO.10.3v1 Not Checked
-        Preconditions: []
-        Postconditions: []
-        IsNotChecked: true
-        ExpectedResult: false
-
-  - PolicyId: MS.EXO.11.1v1
-    TestDriver: RunScuba
-    Tests:
-      - TestDescription: MS.EXO.11.1v1 Not Checked
-        Preconditions: []
-        Postconditions: []
-        IsNotChecked: true
-        ExpectedResult: false
-
-  - PolicyId: MS.EXO.11.2v1
-    TestDriver: RunScuba
-    Tests:
-      - TestDescription: MS.EXO.11.2v1 Not Checked
-        Preconditions: []
-        Postconditions: []
-        IsNotChecked: true
-        ExpectedResult: false
-
-  - PolicyId: MS.EXO.11.3v1
-    TestDriver: RunScuba
-    Tests:
-      - TestDescription: MS.EXO.11.3v1 Not Checked
-        Preconditions: []
-        Postconditions: []
-        IsNotChecked: true
-        ExpectedResult: false
-
-  # - PolicyId: MS.EXO.12.1v1
+  # - PolicyId: MS.EXO.10.1v1
   #   TestDriver: RunScuba
   #   Tests:
-  #     - TestDescription: MS.EXO.12.1v1 Non-Compliant case - IP allow list is created
-  #       Preconditions:
-  #         - Command: 'Get-HostedConnectionFilterPolicy | Set-HostedConnectionFilterPolicy -IPAllowList 192.168.1.10,192.168.1.23'
+  #     - TestDescription: MS.EXO.10.1v1 Custom Implementation
+  #       Preconditions: []
   #       Postconditions: []
+  #       IsCustomImplementation: true
   #       ExpectedResult: false
-  #     - TestDescription: MS.EXO.12.1v1 Compliant case - IP allow list is empty
-  #       Preconditions:
-  #         - Command: 'Get-HostedConnectionFilterPolicy | Set-HostedConnectionFilterPolicy -IPAllowList @{}'
-  #       Postconditions: []
-  #       ExpectedResult: true
 
-  # - PolicyId: MS.EXO.12.2v1
+  # - PolicyId: MS.EXO.10.2v1
   #   TestDriver: RunScuba
   #   Tests:
-  #     - TestDescription: MS.EXO.12.2v1 Non-Compliant case - Safe lists are Enabled
-  #       Preconditions:
-  #         - Command: 'Get-HostedConnectionFilterPolicy | Set-HostedConnectionFilterPolicy -EnableSafeList: $true'
+  #     - TestDescription: MS.EXO.10.2v1 Custom Implementation
+  #       Preconditions: []
   #       Postconditions: []
+  #       IsCustomImplementation: true
   #       ExpectedResult: false
-  #     - TestDescription: MS.EXO.12.2v1 Non-Compliant case - Safe lists are Disabled
-  #       Preconditions:
-  #         - Command: 'Get-HostedConnectionFilterPolicy | Set-HostedConnectionFilterPolicy -EnableSafeList: $false'
-  #       Postconditions: []
-  #       ExpectedResult: true
 
-  # - PolicyId: MS.EXO.13.1v1
+  # - PolicyId: MS.EXO.10.3v1
   #   TestDriver: RunScuba
   #   Tests:
-  #     - TestDescription: MS.EXO.13.1v1 Non-Compliant case - Mailbox auditing is Disabled
-  #       Preconditions:
-  #         - Command: Set-OrganizationConfig
-  #           Splat:
-  #             AuditDisabled: true
+  #     - TestDescription: MS.EXO.10.3v1 Custom Implementation
+  #       Preconditions: []
   #       Postconditions: []
+  #       IsCustomImplementation: true
   #       ExpectedResult: false
-  #     - TestDescription: MS.EXO.13.1v1 Compliant case - Mailbox auditing is Enabled
-  #       Preconditions:
-  #         - Command: Set-OrganizationConfig
-  #           Splat:
-  #             AuditDisabled: false
+
+  # - PolicyId: MS.EXO.11.1v1
+  #   TestDriver: RunScuba
+  #   Tests:
+  #     - TestDescription: MS.EXO.11.1v1 Custom Implementation
+  #       Preconditions: []
   #       Postconditions: []
-  #       ExpectedResult: true
+  #       IsCustomImplementation: true
+  #       ExpectedResult: false
 
-  - PolicyId: MS.EXO.14.1v1
+  # - PolicyId: MS.EXO.11.2v1
+  #   TestDriver: RunScuba
+  #   Tests:
+  #     - TestDescription: MS.EXO.11.2v1 Custom Implementation
+  #       Preconditions: []
+  #       Postconditions: []
+  #       IsCustomImplementation: true
+  #       ExpectedResult: false
+
+  # - PolicyId: MS.EXO.11.3v1
+  #   TestDriver: RunScuba
+  #   Tests:
+  #     - TestDescription: MS.EXO.11.3v1 Custom Implementation
+  #       Preconditions: []
+  #       Postconditions: []
+  #       IsCustomImplementation: true
+  #       ExpectedResult: false
+
+  - PolicyId: MS.EXO.12.1v1
     TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.EXO.14.1v1 Not Checked
-        Preconditions: []
+      - TestDescription: MS.EXO.12.1v1 Non-Compliant case - IP allow list is created
+        Preconditions:
+          - Command: 'Get-HostedConnectionFilterPolicy | Set-HostedConnectionFilterPolicy -IPAllowList 192.168.1.10,192.168.1.23'
         Postconditions: []
-        IsNotChecked: true
         ExpectedResult: false
+      - TestDescription: MS.EXO.12.1v1 Compliant case - IP allow list is empty
+        Preconditions:
+          - Command: 'Get-HostedConnectionFilterPolicy | Set-HostedConnectionFilterPolicy -IPAllowList @{}'
+        Postconditions: []
+        ExpectedResult: true
 
-  - PolicyId: MS.EXO.14.2v1
+  - PolicyId: MS.EXO.12.2v1
     TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.EXO.14.2v1 Not Checked
-        Preconditions: []
+      - TestDescription: MS.EXO.12.2v1 Non-Compliant case - Safe lists are Enabled
+        Preconditions:
+          - Command: 'Get-HostedConnectionFilterPolicy | Set-HostedConnectionFilterPolicy -EnableSafeList: $true'
         Postconditions: []
-        IsNotChecked: true
         ExpectedResult: false
+      - TestDescription: MS.EXO.12.2v1 Non-Compliant case - Safe lists are Disabled
+        Preconditions:
+          - Command: 'Get-HostedConnectionFilterPolicy | Set-HostedConnectionFilterPolicy -EnableSafeList: $false'
+        Postconditions: []
+        ExpectedResult: true
 
-  - PolicyId: MS.EXO.14.3v1
+  - PolicyId: MS.EXO.13.1v1
     TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.EXO.14.3v1 Not Checked
-        Preconditions: []
+      - TestDescription: MS.EXO.13.1v1 Non-Compliant case - Mailbox auditing is Disabled
+        Preconditions:
+          - Command: Set-OrganizationConfig
+            Splat:
+              AuditDisabled: true
         Postconditions: []
-        IsNotChecked: true
         ExpectedResult: false
+      - TestDescription: MS.EXO.13.1v1 Compliant case - Mailbox auditing is Enabled
+        Preconditions:
+          - Command: Set-OrganizationConfig
+            Splat:
+              AuditDisabled: false
+        Postconditions: []
+        ExpectedResult: true
 
-  - PolicyId: MS.EXO.15.1v1
-    TestDriver: RunScuba
-    Tests:
-      - TestDescription: MS.EXO.15.1v1 Not Checked
-        Preconditions: []
-        Postconditions: []
-        IsNotChecked: true
-        ExpectedResult: false
+  # - PolicyId: MS.EXO.14.1v1
+  #   TestDriver: RunScuba
+  #   Tests:
+  #     - TestDescription: MS.EXO.14.1v1 Custom Implementation
+  #       Preconditions: []
+  #       Postconditions: []
+  #       IsCustomImplementation: true
+  #       ExpectedResult: false
 
-  - PolicyId: MS.EXO.15.2v1
-    TestDriver: RunScuba
-    Tests:
-      - TestDescription: MS.EXO.15.2v1 Not Checked
-        Preconditions: []
-        Postconditions: []
-        IsNotChecked: true
-        ExpectedResult: false
+  # - PolicyId: MS.EXO.14.2v1
+  #   TestDriver: RunScuba
+  #   Tests:
+  #     - TestDescription: MS.EXO.14.2v1 Custom Implementation
+  #       Preconditions: []
+  #       Postconditions: []
+  #       IsCustomImplementation: true
+  #       ExpectedResult: false
 
-  - PolicyId: MS.EXO.15.3v1
-    TestDriver: RunScuba
-    Tests:
-      - TestDescription: MS.EXO.15.3v1 Not Checked
-        Preconditions: []
-        Postconditions: []
-        IsNotChecked: true
-        ExpectedResult: false
+  # - PolicyId: MS.EXO.14.3v1
+  #   TestDriver: RunScuba
+  #   Tests:
+  #     - TestDescription: MS.EXO.14.3v1 Custom Implementation
+  #       Preconditions: []
+  #       Postconditions: []
+  #       IsCustomImplementation: true
+  #       ExpectedResult: false
 
-  - PolicyId: MS.EXO.16.1v1
-    TestDriver: RunScuba
-    Tests:
-      - TestDescription: MS.EXO.16.1v1 Not Checked
-        Preconditions: []
-        Postconditions: []
-        IsNotChecked: true
-        ExpectedResult: false
+  # - PolicyId: MS.EXO.15.1v1
+  #   TestDriver: RunScuba
+  #   Tests:
+  #     - TestDescription: MS.EXO.15.1v1 Custom Implementation
+  #       Preconditions: []
+  #       Postconditions: []
+  #       IsCustomImplementation: true
+  #       ExpectedResult: false
 
-  - PolicyId: MS.EXO.16.2v1
-    TestDriver: RunScuba
-    Tests:
-      - TestDescription: MS.EXO.16.2v1 Not Checked
-        Preconditions: []
-        Postconditions: []
-        IsNotChecked: true
-        ExpectedResult: false
+  # - PolicyId: MS.EXO.15.2v1
+  #   TestDriver: RunScuba
+  #   Tests:
+  #     - TestDescription: MS.EXO.15.2v1 Custom Implementation
+  #       Preconditions: []
+  #       Postconditions: []
+  #       IsCustomImplementation: true
+  #       ExpectedResult: false
 
-  - PolicyId: MS.EXO.17.1v1
-    TestDriver: RunScuba
-    Tests:
-      - TestDescription: MS.EXO.17.1v1 Not Checked
-        Preconditions: []
-        Postconditions: []
-        IsNotChecked: true
-        ExpectedResult: false
+  # - PolicyId: MS.EXO.15.3v1
+  #   TestDriver: RunScuba
+  #   Tests:
+  #     - TestDescription: MS.EXO.15.3v1 Custom Implementation
+  #       Preconditions: []
+  #       Postconditions: []
+  #       IsCustomImplementation: true
+  #       ExpectedResult: false
 
-  - PolicyId: MS.EXO.17.2v1
-    TestDriver: RunScuba
-    Tests:
-      - TestDescription: MS.EXO.17.2v1 Not Checked
-        Preconditions: []
-        Postconditions: []
-        IsNotChecked: true
-        ExpectedResult: false
+  # - PolicyId: MS.EXO.16.1v1
+  #   TestDriver: RunScuba
+  #   Tests:
+  #     - TestDescription: MS.EXO.16.1v1 Custom Implementation
+  #       Preconditions: []
+  #       Postconditions: []
+  #       IsCustomImplementation: true
+  #       ExpectedResult: false
 
-  - PolicyId: MS.EXO.17.3v1
-    TestDriver: RunScuba
-    Tests:
-      - TestDescription: MS.EXO.17.3v1 Not Checked
-        Preconditions: []
-        Postconditions: []
-        IsNotChecked: true
-        ExpectedResult: false
+  # - PolicyId: MS.EXO.16.2v1
+  #   TestDriver: RunScuba
+  #   Tests:
+  #     - TestDescription: MS.EXO.16.2v1 Custom Implementation
+  #       Preconditions: []
+  #       Postconditions: []
+  #       IsCustomImplementation: true
+  #       ExpectedResult: false
+
+  # - PolicyId: MS.EXO.17.1v1
+  #   TestDriver: RunScuba
+  #   Tests:
+  #     - TestDescription: MS.EXO.17.1v1 Custom Implementation
+  #       Preconditions: []
+  #       Postconditions: []
+  #       IsCustomImplementation: true
+  #       ExpectedResult: false
+
+  # - PolicyId: MS.EXO.17.2v1
+  #   TestDriver: RunScuba
+  #   Tests:
+  #     - TestDescription: MS.EXO.17.2v1 Custom Implementation
+  #       Preconditions: []
+  #       Postconditions: []
+  #       IsCustomImplementation: true
+  #       ExpectedResult: false
+
+  # - PolicyId: MS.EXO.17.3v1
+  #   TestDriver: RunScuba
+  #   Tests:
+  #     - TestDescription: MS.EXO.17.3v1 Custom Implementation
+  #       Preconditions: []
+  #       Postconditions: []
+  #       IsCustomImplementation: true
+  #       ExpectedResult: false
