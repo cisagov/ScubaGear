@@ -470,21 +470,16 @@ tests[{
     "Commandlet" : ["Get-DlpComplianceRule"],
     "ActualValue" : Rules,
     "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
-    "RequirementMet" : Status
+    "RequirementMet" : Status,
 }] {
 
-    error_rules := "No matching rule found for: "
 
-    Rules := SSNRules
-    error_rules := concat(",", [error_rules, "U.S. Social Security Number (SSN) "]) { count(SSNRules) == 0 }
+    error_rules := "No matching rule found for:"
+    error_rules contains "U.S. Social Security Number (SSN)" if count(SSNRules) == 0
+    error_rules contains "U.S. Individual Taxpayer Identification Number (ITIN)" if count(ITINRules) == 0
+    error_rules contains "Credit Card Number" if count(CardRules) == 0
+    ErrorMessage := concat(" ",  [error_rule, concat(", ", error_rules)])
 
-    Rules := ITINRules
-    error_rules := concat(",", [error_rules, "U.S. Individual Taxpayer Identification Number (ITIN) "]) { count(ITINRules) == 0 }
-
-    Rules := CardRules
-    error_rules := concat(",", [error_rules, "Credit Card Number "]) { count(CardRules) == 0 }
-
-    ErrorMessage := error_rules
     Status := endswith(": ", error_rules)
 
     #--------
