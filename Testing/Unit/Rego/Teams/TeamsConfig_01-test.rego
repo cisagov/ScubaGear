@@ -393,7 +393,7 @@ test_meeting_policies_Correct if {
         "meeting_policies": [
             {
                 "Identity": "Tag:CustomPolicy",
-                "AutoAdmittedUsers": "EveryoneInCompany"
+                "AutoAdmittedUsers": "EveryoneInCompany",
                 "AllowPSTNUsersToBypassLobby": false
             }
         ]
