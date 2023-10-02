@@ -218,7 +218,7 @@ test_SharingDomainRestrictionMode_Correct_V2 if {
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement met: code currently only checks for the domain list not security group, see baseline document to conduct a manual check"
+    RuleOutput[0].ReportDetails == "Requirement met: Note that we currently only check for approved external domains. Approved security groups are currently not being checked, see the baseline policy for instructions on a manual check"
 }
 
 test_SharingDomainRestrictionMode_Incorrect if {
@@ -237,7 +237,7 @@ test_SharingDomainRestrictionMode_Incorrect if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement not met: code currently only checks for the domain list not security group, see baseline document to conduct a manual check"
+    RuleOutput[0].ReportDetails =="Requirement not met: Note that we currently only check for approved external domains. Approved security groups are currently not being checked, see the baseline policy for instructions on a manual check"
 }
 #--
 

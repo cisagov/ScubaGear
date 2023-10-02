@@ -80,13 +80,13 @@ Domainlist(Policy) = Description if {
 Domainlist(Policy) = Description if {
     Policy.SharingCapability != 0
     Policy.SharingDomainRestrictionMode == 1
-    Description := "Requirement met: code currently only checks for the domain list not security group, see baseline document to conduct a manual check"
+    Description := "Requirement met: Note that we currently only check for approved external domains. Approved security groups are currently not being checked, see the baseline policy for instructions on a manual check"
 }
 
 Domainlist(Policy) = Description if {
     Policy.SharingCapability != 0
     Policy.SharingDomainRestrictionMode != 1
-    Description := "Requirement not met: code currently only checks for the domain list not security group, see baseline document to conduct a manual check"
+    Description := "Requirement not met: Note that we currently only check for approved external domains. Approved security groups are currently not being checked, see the baseline policy for instructions on a manual check"
 }
 
 tests[{
