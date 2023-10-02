@@ -475,10 +475,14 @@ CardRules[Rule.Name] {
 
 #ErrorMsg := concat(" ",  [error_rule, concat(", ", error_rules)])
 
-Rules := [SSNRules, ITINRules, CardRules]
-error_rules contains "U.S. Social Security Number (SSN)" if count(Rules[0]) == 0
-error_rules contains "U.S. Individual Taxpayer Identification Number (ITIN)" if count(Rules[1]) == 0
-error_rules contains "Credit Card Number" if count(Rules[2]) == 0
+Rules := {
+    "SSN" : SSNRules,
+    "ITIN" : ITINRules,
+    "Credit_Card" : CardRules
+    }
+error_rules contains "U.S. Social Security Number (SSN)" if count(Rules.SSN) == 0
+error_rules contains "U.S. Individual Taxpayer Identification Number (ITIN)" if count(Rules.ITIN) == 0
+error_rules contains "Credit Card Number" if count(Rules.Credit_Card) == 0
 
 tests[{
     #TODO: Appears this policy is broken into 3 parts in code and only 1 in baseline
