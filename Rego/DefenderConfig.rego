@@ -461,25 +461,12 @@ CardRules[Rule.Name] {
     "Credit Card Number" in Rule.ContentNames
 }
 
-#error_rule := "No matching rules found for:"
-
-# error_rules contains "U.S. Social Security Number (SSN)" if count(SSNRules) == 0
-# error_rules contains "U.S. Individual Taxpayer Identification Number (ITIN)" if count(ITINRules) == 0
-# error_rules contains "Credit Card Number" if count(CardRules) == 0
-
-
-#error_rules1 := "U.S. Social Security Number (SSN)" if  count(SSNRules) == 0 else " "
-#error_rules2 := "U.S. Individual Taxpayer Identification Number (ITIN)" if  count(ITINRules) == 0 else " "
-#error_rules3 := "Credit Card Number" if count(CardRules) == 0 else " "
-#error_rules  := concat(",",[error_rules1,error_rules2,error_rules3])
-
-#ErrorMsg := concat(" ",  [error_rule, concat(", ", error_rules)])
-
 Rules := {
     "SSN" : SSNRules,
     "ITIN" : ITINRules,
     "Credit_Card" : CardRules
-    }
+}
+
 error_rules contains "U.S. Social Security Number (SSN)" if count(Rules.SSN) == 0
 error_rules contains "U.S. Individual Taxpayer Identification Number (ITIN)" if count(Rules.ITIN) == 0
 error_rules contains "Credit Card Number" if count(Rules.Credit_Card) == 0
@@ -495,53 +482,11 @@ tests[{
     "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
     "RequirementMet" : Status,
 }] {
-    #--------
-    # Rules := SSNRules
-    # count(SSNRules) > 0
-
-    # ErrorMessage := concat(",", ["No matching rule found for U.S. Social Security Number (SSN)", "$"])
-    # Status := count(Rules) > 0
-    # Status := endswith(": ", error_rule)
     error_rule := "No matching rules found for:"
     ErrorMessage := concat(" ",  [error_rule, concat(", ", error_rules)])
-    #Conditions := [
-    #    count(Rules[0]) > 0,
-    #    count(Rules[1]) > 0,
-    #    count(Rules[2]) > 0
-    #]
-
-    #Status := count([x | x := Conditions[_]; x == false]) == 0
     Status := count(error_rules) == 0
 }
 
-# tests[{
-#     "Requirement" : "A custom policy SHALL be configured to protect PII and sensitive information, as defined by the agency: U.S. Individual Taxpayer Identification Number (ITIN)",
-#     "Control" : "Defender 2.2",
-#     "Criticality" : "Shall",
-#     "Commandlet" : ["Get-DlpComplianceRule"],
-#     "ActualValue" : Rules,
-#     "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
-#     "RequirementMet" : Status
-# }] {
-#     Rules := ITINRules
-#     ErrorMessage := "No matching rule found for U.S. Individual Taxpayer Identification Number (ITIN)"
-#     Status := count(Rules) > 0
-# }
-
-# tests[{
-#     "Requirement" : "A custom policy SHALL be configured to protect PII and sensitive information, as defined by the agency: Credit Card Number",
-#     "Control" : "Defender 2.2",
-#     "Criticality" : "Shall",
-#     "Commandlet" : ["Get-DlpComplianceRule"],
-#     "ActualValue" : Rules,
-#     "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
-#     "RequirementMet" : Status
-# }] {
-#     Rules := CardRules
-#     ErrorMessage := "No matching rule found for Credit Card Number"
-#     Status := count(Rules) > 0
-# }
-#--
 
 #
 # MS.DEFENDER.4.2v1
