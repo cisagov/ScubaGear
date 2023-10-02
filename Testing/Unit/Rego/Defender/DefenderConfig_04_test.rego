@@ -6,44 +6,198 @@ import future.keywords
 #
 # Policy 1
 #--
-# test_ContentContainsSensitiveInformation_Correct_V1 if {
-#     ControlNumber := "Defender 2.2"
-#     Requirement := "A custom policy SHALL be configured to protect PII and sensitive information, as defined by the agency: U.S. Social Security Number (SSN)"
+test_ContentContainsSensitiveInformation_Correct_V1 if {
+    PolicyId := "MS.DEFENDER.4.1v1"
 
-#     Output := tests with input as {
-#         "dlp_compliance_rules": [
-#             {
-#                 "ContentContainsSensitiveInformation":  [
-#                     {"name":  "U.S. Social Security Number (SSN)"}
-#                 ],
-#                 "Name":  "Baseline Rule",
-# 	            "Disabled" : false,
-#                 "ParentPolicyName":  "Default Office 365 DLP policy",
-# 	            "BlockAccess":  true,
-#                 "BlockAccessScope":  "All",
-# 	            "NotifyUser":  [
-#                     "SiteAdmin",
-#                     "LastModifier",
-#                     "Owner"
-#                 ],
-# 	            "NotifyUserType":  "NotSet"
-#             }
-#         ],
-#         "dlp_compliance_policies": [
-#             {
-#                 "Name": "Default Office 365 DLP policy",
-#                 "Mode": "Enable",
-#                 "Enabled": true
-#             }
-#         ]
-#     }
+    Output := tests with input as {
+        "dlp_compliance_rules": [
+            {
+                "ContentContainsSensitiveInformation":  [
+                    {"name":  "U.S. Social Security Number (SSN)"},
+                    {"name":  "U.S. Individual Taxpayer Identification Number (ITIN)"},
+                    {"name":  "Credit Card Number"}
+                ],
+                "Name":  "Baseline Rule",
+                "Disabled" : false,
+                "ParentPolicyName":  "Default Office 365 DLP policy",
+                "BlockAccess":  true,
+                "BlockAccessScope":  "All",
+                "NotifyUser":  [
+                    "SiteAdmin",
+                    "LastModifier",
+                    "Owner"
+                ],
+                "NotifyUserType":  "NotSet"
+            }
+        ],
+        "dlp_compliance_policies": [
+            {
+                "Name": "Default Office 365 DLP policy",
+                "Mode": "Enable",
+                "Enabled": true
+            }
+        ]
+    }
 
-#     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
-#     count(RuleOutput) == 1
-#     RuleOutput[0].RequirementMet
-#     RuleOutput[0].ReportDetails == "Requirement met"
-# }
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "Requirement met"
+}
+
+test_ContentContainsSensitiveInformation_Incorrect_V1 if {
+    PolicyId := "MS.DEFENDER.4.1v1"
+
+    Output := tests with input as {
+        "dlp_compliance_rules": [
+            {
+                "ContentContainsSensitiveInformation":  [
+                    {"name":  "U.S. Individual Taxpayer Identification Number (ITIN)"},
+                    {"name":  "Credit Card Number"}
+                ],
+                "Name":  "Baseline Rule",
+                "Disabled" : false,
+                "ParentPolicyName":  "Default Office 365 DLP policy",
+                "BlockAccess":  true,
+                "BlockAccessScope":  "All",
+                "NotifyUser":  [
+                    "SiteAdmin",
+                    "LastModifier",
+                    "Owner"
+                ],
+                "NotifyUserType":  "NotSet"
+            }
+        ],
+        "dlp_compliance_policies": [
+            {
+                "Name": "Default Office 365 DLP policy",
+                "Mode": "Enable",
+                "Enabled": true
+            }
+        ]
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "No matching rules found for: U.S. Social Security Number (SSN)"
+}
+
+test_ContentContainsSensitiveInformation_Incorrect_V2 if {
+    PolicyId := "MS.DEFENDER.4.1v1"
+
+    Output := tests with input as {
+        "dlp_compliance_rules": [
+            {
+                "ContentContainsSensitiveInformation":  [
+                    {"name":  "U.S. Social Security Number (SSN)"},
+                    {"name":  "Credit Card Number"}
+                ],
+                "Name":  "Baseline Rule",
+                "Disabled" : false,
+                "ParentPolicyName":  "Default Office 365 DLP policy",
+                "BlockAccess":  true,
+                "BlockAccessScope":  "All",
+                "NotifyUser":  [
+                    "SiteAdmin",
+                    "LastModifier",
+                    "Owner"
+                ],
+                "NotifyUserType":  "NotSet"
+            }
+        ],
+        "dlp_compliance_policies": [
+            {
+                "Name": "Default Office 365 DLP policy",
+                "Mode": "Enable",
+                "Enabled": true
+            }
+        ]
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "No matching rules found for: U.S. Individual Taxpayer Identification Number (ITIN)"
+}
+
+test_ContentContainsSensitiveInformation_Incorrect_V3 if {
+    PolicyId := "MS.DEFENDER.4.1v1"
+
+    Output := tests with input as {
+        "dlp_compliance_rules": [
+            {
+                "ContentContainsSensitiveInformation":  [
+                    {"name":  "U.S. Social Security Number (SSN)"},
+                    {"name":  "U.S. Individual Taxpayer Identification Number (ITIN)"}
+                ],
+                "Name":  "Baseline Rule",
+                "Disabled" : false,
+                "ParentPolicyName":  "Default Office 365 DLP policy",
+                "BlockAccess":  true,
+                "BlockAccessScope":  "All",
+                "NotifyUser":  [
+                    "SiteAdmin",
+                    "LastModifier",
+                    "Owner"
+                ],
+                "NotifyUserType":  "NotSet"
+            }
+        ],
+        "dlp_compliance_policies": [
+            {
+                "Name": "Default Office 365 DLP policy",
+                "Mode": "Enable",
+                "Enabled": true
+            }
+        ]
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "No matching rules found for: Credit Card Number"
+}
+
+test_ContentContainsSensitiveInformation_Incorrect_V4 if {
+    PolicyId := "MS.DEFENDER.4.1v1"
+
+    Output := tests with input as {
+        "dlp_compliance_rules": [
+            {
+                "ContentContainsSensitiveInformation":  [],
+                "Name":  "Baseline Rule",
+                "Disabled" : false,
+                "ParentPolicyName":  "Default Office 365 DLP policy",
+                "BlockAccess":  true,
+                "BlockAccessScope":  "All",
+                "NotifyUser":  [
+                    "SiteAdmin",
+                    "LastModifier",
+                    "Owner"
+                ],
+                "NotifyUserType":  "NotSet"
+            }
+        ],
+        "dlp_compliance_policies": [
+            {
+                "Name": "Default Office 365 DLP policy",
+                "Mode": "Enable",
+                "Enabled": true
+            }
+        ]
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "No matching rules found for: Credit Card Number, U.S. Individual Taxpayer Identification Number (ITIN), U.S. Social Security Number (SSN)"
+}
 
 # test_ContentContainsSensitiveInformation_Incorrect_V1 if {
 #     ControlNumber := "Defender 2.2"

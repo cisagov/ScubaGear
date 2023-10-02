@@ -461,19 +461,24 @@ CardRules[Rule.Name] {
     "Credit Card Number" in Rule.ContentNames
 }
 
-error_rule := "No matching rules found for:"
+#error_rule := "No matching rules found for:"
 
 # error_rules contains "U.S. Social Security Number (SSN)" if count(SSNRules) == 0
 # error_rules contains "U.S. Individual Taxpayer Identification Number (ITIN)" if count(ITINRules) == 0
 # error_rules contains "Credit Card Number" if count(CardRules) == 0
 
 
-error_rules1 := "U.S. Social Security Number (SSN)" if  count(SSNRules) == 0 else " "
-error_rules2 := "U.S. Individual Taxpayer Identification Number (ITIN)" if  count(ITINRules) == 0 else " "
-error_rules3 := "Credit Card Number" if count(CardRules) == 0 else " "
-error_rules  := concat(",",[error_rules1,error_rules2,error_rules3])
+#error_rules1 := "U.S. Social Security Number (SSN)" if  count(SSNRules) == 0 else " "
+#error_rules2 := "U.S. Individual Taxpayer Identification Number (ITIN)" if  count(ITINRules) == 0 else " "
+#error_rules3 := "Credit Card Number" if count(CardRules) == 0 else " "
+#error_rules  := concat(",",[error_rules1,error_rules2,error_rules3])
 
-ErrorMsg := concat(" ",  [error_rule, concat(", ", error_rules)])
+#ErrorMsg := concat(" ",  [error_rule, concat(", ", error_rules)])
+
+Rules := [SSNRules, ITINRules, CardRules]
+error_rules contains "U.S. Social Security Number (SSN)" if count(Rules[0]) == 0
+error_rules contains "U.S. Individual Taxpayer Identification Number (ITIN)" if count(Rules[1]) == 0
+error_rules contains "Credit Card Number" if count(Rules[2]) == 0
 
 tests[{
     #TODO: Appears this policy is broken into 3 parts in code and only 1 in baseline
@@ -486,15 +491,23 @@ tests[{
     "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
     "RequirementMet" : Status,
 }] {
-
-Status := endswith(": ", error_rules )
-
     #--------
     # Rules := SSNRules
     # count(SSNRules) > 0
 
     # ErrorMessage := concat(",", ["No matching rule found for U.S. Social Security Number (SSN)", "$"])
     # Status := count(Rules) > 0
+    # Status := endswith(": ", error_rule)
+    error_rule := "No matching rules found for:"
+    ErrorMessage := concat(" ",  [error_rule, concat(", ", error_rules)])
+    #Conditions := [
+    #    count(Rules[0]) > 0,
+    #    count(Rules[1]) > 0,
+    #    count(Rules[2]) > 0
+    #]
+
+    #Status := count([x | x := Conditions[_]; x == false]) == 0
+    Status := count(error_rules) == 0
 }
 
 # tests[{
