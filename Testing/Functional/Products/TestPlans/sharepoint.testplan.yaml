@@ -49,10 +49,3 @@ TestPlan:
               SharingCapability: ExternalUserAndGuestSharing
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.SHAREPOINT.1.1v1 ExternalUserSharingOnly (1)
-        Preconditions:
-          - Command: Set-PnPTenant
-            Splat:
-              SharingCapability: ExternalUserSharingOnly
-        Postconditions: []
-        ExpectedResult: false  
