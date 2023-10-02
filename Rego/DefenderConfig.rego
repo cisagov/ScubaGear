@@ -330,33 +330,29 @@ tests[{
 # MS.DEFENDER.2.2v1
 #--
 
-# TODO: update this policy to match emerald baseline
-# The following check is from pre-emerald 2.5 second bullet,
-# which is similar but needs some adjustments.
-
-ProtectedOrgDomainsPolicies[{
-    "Name" : Policy.Name,
-    "OrgDomains" : Policy.EnableOrganizationDomainsProtection,
-    "Action" : Policy.TargetedDomainProtectionAction
-}] {
-    Policy := input.anti_phish_policies[_]
-    Policy.Enabled # filter out the disabled policies
-    Policy.EnableTargetedDomainsProtection # filter out the policies that don't have domain impersonation protection enabled
-    Policy.EnableOrganizationDomainsProtection # filter out the policies that don't protect org domains
-}
-
-# assert that at least one of the enabled policies includes
+# Assert that at least one of the enabled policies includes
 # protection for the org's own domains
 tests[{
     "PolicyId" : "MS.DEFENDER.2.2v1",
     "Criticality" : "Should",
     "Commandlet" : ["Get-AntiPhishPolicy"],
-    "ActualValue" : Policies,
-    "ReportDetails" : ReportDetailsBoolean(Status),
+    "ActualValue" : [StrictImpersonationProtection.Policy, StandardImpersonationProtection.Policy],
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
     "RequirementMet" : Status
 }] {
-    Policies := ProtectedOrgDomainsPolicies
-    Status := count(Policies) > 0
+    Policies := input.anti_phish_policies
+    FilterKey := "EnableTargetedDomainsProtection"
+    AccountKey := "TargetedDomainsToProtect"
+    ActionKey := "TargetedDomainProtectionAction"
+    ProtectedConfig := ImpersonationProtectionConfig("MS.DEFENDER.2.2v1", "AgencyDomains")
+    StrictImpersonationProtection := ImpersonationProtection(Policies, "Strict Preset Security Policy", ProtectedConfig, FilterKey, AccountKey, ActionKey)
+    StandardImpersonationProtection := ImpersonationProtection(Policies, "Standard Preset Security Policy", ProtectedConfig, FilterKey, AccountKey, ActionKey)
+    ErrorMessage := ImpersonationProtectionErrorMsg(StrictImpersonationProtection, StandardImpersonationProtection, "agency domains")
+    Conditions := [
+        StrictImpersonationProtection.Result == true,
+        StandardImpersonationProtection.Result == true
+    ]
+    Status := count([x | x := Conditions[_]; x == false]) == 0
 }
 #--
 
