@@ -44,6 +44,8 @@ Defender:
       ExcludedDomains:
         -
   MS.DEFENDER.2.1v1 : &UserImpersonationProtection
-    SensitiveAccounts:
-      IncludedUsers:
-        - "John Doe;jdoe@someemail.com"
+      SensitiveUsers:
+        - John Doe;jdoe@someemail.com
+  MS.DEFENDER.2.3v1 : &DomainImpersonationProtection
+      PartnerDomains:
+        - random.mail.example.com
