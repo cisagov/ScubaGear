@@ -92,7 +92,7 @@ tests[{
     "PolicyId" : "MS.DEFENDER.1.1v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-EOPProtectionPolicyRule", "Get-ATPProtectionPolicyRule"],
-	"ActualValue" : {"StandardPresetState": IsStandardEnabled, "StrictPresetState": IsStrictEnabled},
+    "ActualValue" : {"StandardPresetState": IsStandardEnabled, "StrictPresetState": IsStrictEnabled},
     "ReportDetails" : ReportDetails1_1(IsStandardEnabled, IsStrictEnabled),
     "RequirementMet" : Status
 }] {
@@ -153,7 +153,7 @@ tests[{
     "PolicyId" : "MS.DEFENDER.1.2v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-EOPProtectionPolicyRule"],
-	"ActualValue" : {"StandardSetToAll": IsStandardAll, "StrictSetToAll": IsStrictAll},
+    "ActualValue" : {"StandardSetToAll": IsStandardAll, "StrictSetToAll": IsStrictAll},
     "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
@@ -200,7 +200,7 @@ tests[{
     "PolicyId" : "MS.DEFENDER.1.3v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-ATPProtectionPolicyRule"],
-	"ActualValue" : {"StandardSetToAll": IsStandardAll, "StrictSetToAll": IsStrictAll},
+    "ActualValue" : {"StandardSetToAll": IsStandardAll, "StrictSetToAll": IsStrictAll},
     "ReportDetails" : ApplyLicenseWarning(ReportDetailsBoolean(Status)),
     "RequirementMet" : Status
 }] {
@@ -239,7 +239,7 @@ tests[{
     "PolicyId" : "MS.DEFENDER.1.4v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-EOPProtectionPolicyRule"],
-	"ActualValue" : {"EOPProtectionPolicies": Status},
+    "ActualValue" : {"EOPProtectionPolicies": Status},
     "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
@@ -259,7 +259,7 @@ tests[{
     "PolicyId" : "MS.DEFENDER.1.5v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-ATPProtectionPolicyRule"],
-	"ActualValue" : {"ATPProtectionPolicies": Policies},
+    "ActualValue" : {"ATPProtectionPolicies": Policies},
     "ReportDetails" : ApplyLicenseWarning(ReportDetailsBoolean(Status)),
     "RequirementMet" : Status
 }] {
@@ -275,25 +275,28 @@ tests[{
 # MS.DEFENDER.2.1v1
 #--
 
-ImpersonationProtectionErrorMsg(StrictImpersonationProtection, StandardImpersonationProtection) := Description if {
-    Description := "Not all sensitive users are included for targeted user protection in Strict policy."
+ImpersonationProtectionErrorMsg(StrictImpersonationProtection, StandardImpersonationProtection, AccountType) := Description if {
+    String := concat(" ", ["Not all", AccountType])
+    Description := concat(" ", [String, "are included for targeted protection in Strict policy."])
     StrictImpersonationProtection.Result == false
     StandardImpersonationProtection.Result == true
 }
 
-ImpersonationProtectionErrorMsg(StrictImpersonationProtection, StandardImpersonationProtection) := Description if {
-    Description := "Not all sensitive users are included for targeted user protection in Standard policy."
+ImpersonationProtectionErrorMsg(StrictImpersonationProtection, StandardImpersonationProtection, AccountType) := Description if {
+    String := concat(" ", ["Not all", AccountType])
+    Description := concat(" ", [String, "are included for targeted protection in Standard policy."])
     StrictImpersonationProtection.Result == true
     StandardImpersonationProtection.Result == false
 }
 
-ImpersonationProtectionErrorMsg(StrictImpersonationProtection, StandardImpersonationProtection) := Description if {
-    Description := "Not all sensitive users are included for targeted user protection in Strict or Standard policy."
+ImpersonationProtectionErrorMsg(StrictImpersonationProtection, StandardImpersonationProtection, AccountType) := Description if {
+    String := concat(" ", ["Not all", AccountType])
+    Description := concat(" ", [String, "are included for targeted protection in Strict or Standard policy."])
     StrictImpersonationProtection.Result == false
     StandardImpersonationProtection.Result == false
 }
 
-ImpersonationProtectionErrorMsg(StrictImpersonationProtection, StandardImpersonationProtection) := Description if {
+ImpersonationProtectionErrorMsg(StrictImpersonationProtection, StandardImpersonationProtection, _) := Description if {
     Description := ""
     StrictImpersonationProtection.Result == true
     StandardImpersonationProtection.Result == true
@@ -303,15 +306,18 @@ tests[{
     "PolicyId" : "MS.DEFENDER.2.1v1",
     "Criticality" : "Should",
     "Commandlet" : ["Get-AntiPhishPolicy"],
-	"ActualValue" : [StrictImpersonationProtection.Policy, StandardImpersonationProtection.Policy],
+    "ActualValue" : [StrictImpersonationProtection.Policy, StandardImpersonationProtection.Policy],
     "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
     "RequirementMet" : Status
 }] {
     Policies := input.anti_phish_policies
-    ProtectedUsersConfig := ImpersonationProtectionConfig("MS.DEFENDER.2.1v1")
-    StrictImpersonationProtection := ImpersonationProtection(Policies, "Strict Preset Security Policy", ProtectedUsersConfig)
-    StandardImpersonationProtection := ImpersonationProtection(Policies, "Standard Preset Security Policy", ProtectedUsersConfig)
-    ErrorMessage := ImpersonationProtectionErrorMsg(StrictImpersonationProtection, StandardImpersonationProtection)
+    FilterKey := "EnableTargetedUserProtection"
+    AccountKey := "TargetedUsersToProtect"
+    ActionKey := "TargetedUserProtectionAction"
+    ProtectedConfig := ImpersonationProtectionConfig("MS.DEFENDER.2.1v1", "SensitiveUsers")
+    StrictImpersonationProtection := ImpersonationProtection(Policies, "Strict Preset Security Policy", ProtectedConfig, FilterKey, AccountKey, ActionKey)
+    StandardImpersonationProtection := ImpersonationProtection(Policies, "Standard Preset Security Policy", ProtectedConfig, FilterKey, AccountKey, ActionKey)
+    ErrorMessage := ImpersonationProtectionErrorMsg(StrictImpersonationProtection, StandardImpersonationProtection, "sensitive users")
     Conditions := [
         StrictImpersonationProtection.Result == true,
         StandardImpersonationProtection.Result == true
@@ -330,7 +336,7 @@ tests[{
 
 ProtectedOrgDomainsPolicies[{
     "Name" : Policy.Name,
-	"OrgDomains" : Policy.EnableOrganizationDomainsProtection,
+    "OrgDomains" : Policy.EnableOrganizationDomainsProtection,
     "Action" : Policy.TargetedDomainProtectionAction
 }] {
     Policy := input.anti_phish_policies[_]
@@ -345,7 +351,7 @@ tests[{
     "PolicyId" : "MS.DEFENDER.2.2v1",
     "Criticality" : "Should",
     "Commandlet" : ["Get-AntiPhishPolicy"],
-	"ActualValue" : Policies,
+    "ActualValue" : Policies,
     "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
@@ -357,35 +363,27 @@ tests[{
 #
 # MS.DEFENDER.2.3v1
 #--
-
-# TODO: update this policy to match emerald baseline
-# The following check is from pre-emerald 2.5 third bullet,
-# which is similar but needs some adjustments.
-
-ProtectedCustomDomainsPolicies[{
-    "Name" : Policy.Name,
-	"CustomDomains" : Policy.TargetedDomainsToProtect,
-    "Action" : Policy.TargetedDomainProtectionAction
-}] {
-    Policy := input.anti_phish_policies[_]
-    Policy.Enabled # filter out the disabled policies
-    Policy.EnableTargetedDomainsProtection # filter out the policies that don't have domain impersonation protection enabled
-    count(Policy.TargetedDomainsToProtect) > 0 # filter out the policies that don't list any custom domains
-}
-
-# assert that at least one of the enabled policies includes
-# protection for custom domains
 tests[{
     "PolicyId" : "MS.DEFENDER.2.3v1",
     "Criticality" : "Should",
     "Commandlet" : ["Get-AntiPhishPolicy"],
-	"ActualValue" : Policies,
+    "ActualValue" : [StrictImpersonationProtection.Policy, StandardImpersonationProtection.Policy],
     "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
     "RequirementMet" : Status
 }] {
-    Policies := ProtectedCustomDomainsPolicies
-    ErrorMessage := "The Custom Domains protection policies: Enabled, EnableTargetedDomainsProtection, and TargetedDomainsToProtect are not set correctly"
-    Status := count(Policies) > 0
+    Policies := input.anti_phish_policies
+    FilterKey := "EnableTargetedDomainsProtection"
+    AccountKey := "TargetedDomainsToProtect"
+    ActionKey := "TargetedDomainProtectionAction"
+    ProtectedConfig := ImpersonationProtectionConfig("MS.DEFENDER.2.3v1", "PartnerDomains")
+    StrictImpersonationProtection := ImpersonationProtection(Policies, "Strict Preset Security Policy", ProtectedConfig, FilterKey, AccountKey, ActionKey)
+    StandardImpersonationProtection := ImpersonationProtection(Policies, "Standard Preset Security Policy", ProtectedConfig, FilterKey, AccountKey, ActionKey)
+    ErrorMessage := ImpersonationProtectionErrorMsg(StrictImpersonationProtection, StandardImpersonationProtection, "partner domains")
+    Conditions := [
+        StrictImpersonationProtection.Result == true,
+        StandardImpersonationProtection.Result == true
+    ]
+    Status := count([x | x := Conditions[_]; x == false]) == 0
 }
 #--
 
@@ -405,7 +403,7 @@ tests[{
     "PolicyId" : "MS.DEFENDER.3.1v1",
     "Criticality" : "Should",
     "Commandlet" : ["Get-AtpPolicyForO365"],
-	"ActualValue" : Policies,
+    "ActualValue" : Policies,
     "ReportDetails" : ApplyLicenseWarning(ReportDetailsBoolean(Status)),
     "RequirementMet" : Status
 }] {
@@ -422,17 +420,17 @@ tests[{
 # Used in multiple bullet points below
 SensitiveRules[{
     "Name" : Rules.Name,
-	"ParentPolicyName" : Rules.ParentPolicyName,
-	"BlockAccess" : Rules.BlockAccess,
-	"BlockAccessScope" : Rules.BlockAccessScope,
-	"NotifyUser" : Rules.NotifyUser,
-	"NotifyUserType" : Rules.NotifyUserType,
+    "ParentPolicyName" : Rules.ParentPolicyName,
+    "BlockAccess" : Rules.BlockAccess,
+    "BlockAccessScope" : Rules.BlockAccessScope,
+    "NotifyUser" : Rules.NotifyUser,
+    "NotifyUserType" : Rules.NotifyUserType,
     "ContentNames" : ContentNames
 }] {
-	Rules := input.dlp_compliance_rules[_]
-	Rules.Disabled == false
+    Rules := input.dlp_compliance_rules[_]
+    Rules.Disabled == false
     ContentNames := [Content.name | Content = Rules.ContentContainsSensitiveInformation[_]]
-	Conditions := [ "U.S. Social Security Number (SSN)" in ContentNames,
+    Conditions := [ "U.S. Social Security Number (SSN)" in ContentNames,
                     "U.S. Individual Taxpayer Identification Number (ITIN)" in ContentNames,
                     "Credit Card Number" in ContentNames]
     count([Condition | Condition = Conditions[_]; Condition == true]) > 0
@@ -465,7 +463,7 @@ tests[{
     "PolicyId" : "MS.DEFENDER.4.1v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-DlpComplianceRule"],
-	"ActualValue" : Rules,
+    "ActualValue" : Rules,
     "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
     "RequirementMet" : Status
 }] {
@@ -479,7 +477,7 @@ tests[{
 #     "Control" : "Defender 2.2",
 #     "Criticality" : "Shall",
 #     "Commandlet" : ["Get-DlpComplianceRule"],
-# 	"ActualValue" : Rules,
+#     "ActualValue" : Rules,
 #     "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
 #     "RequirementMet" : Status
 # }] {
@@ -493,7 +491,7 @@ tests[{
 #     "Control" : "Defender 2.2",
 #     "Criticality" : "Shall",
 #     "Commandlet" : ["Get-DlpComplianceRule"],
-# 	"ActualValue" : Rules,
+#     "ActualValue" : Rules,
 #     "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
 #     "RequirementMet" : Status
 # }] {
@@ -563,7 +561,7 @@ tests[{
     "PolicyId" : "MS.DEFENDER.4.2v1",
     "Criticality" : "Should",
     "Commandlet" : ["Get-DLPCompliancePolicy"],
-	"ActualValue" : Policies,
+    "ActualValue" : Policies,
     "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
     "RequirementMet" : Status
 }] {
@@ -577,7 +575,7 @@ tests[{
 #     "Control" : "Defender 2.2",
 #     "Criticality" : "Should",
 #     "Commandlet" : ["Get-DLPCompliancePolicy"],
-# 	"ActualValue" : Policies,
+#     "ActualValue" : Policies,
 #     "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
 #     "RequirementMet" : Status
 # }] {
@@ -591,7 +589,7 @@ tests[{
 #     "Control" : "Defender 2.2",
 #     "Criticality" : "Should",
 #     "Commandlet" : ["Get-DLPCompliancePolicy"],
-# 	"ActualValue" : Policies,
+#     "ActualValue" : Policies,
 #     "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
 #     "RequirementMet" : Status
 # }] {
@@ -605,7 +603,7 @@ tests[{
 #     "Control" : "Defender 2.2",
 #     "Criticality" : "Should",
 #     "Commandlet" : ["Get-DLPCompliancePolicy"],
-# 	"ActualValue" : Policies,
+#     "ActualValue" : Policies,
 #     "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
 #     "RequirementMet" : Status
 # }] {
@@ -641,13 +639,13 @@ tests[{
     "PolicyId" : "MS.DEFENDER.4.3v1",
     "Criticality" : "Should",
     "Commandlet" : ["Get-DlpComplianceRule"],
-	"ActualValue" : Rules,
+    "ActualValue" : Rules,
     "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), GenerateArrayString(Rules, ErrorMessage)),
     "RequirementMet" : Status
 }] {
     Rules := SensitiveRulesNotBlocking
     ErrorMessage := "rule(s) found that do(es) not block access or associated policy not set to enforce block action:"
-	Status := count(Rules) == 0
+    Status := count(Rules) == 0
 }
 #--
 
@@ -664,13 +662,13 @@ tests[{
     "PolicyId" : "MS.DEFENDER.4.4v1",
     "Criticality" : "Should",
     "Commandlet" : ["Get-DlpComplianceRule"],
-	"ActualValue" : Rules,
+    "ActualValue" : Rules,
     "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), GenerateArrayString(Rules, ErrorMessage)),
     "RequirementMet" : Status
 }] {
     Rules := SensitiveRulesNotNotifying
     ErrorMessage := "rule(s) found that do(es) not notify at least one user:"
-	Status := count(Rules) == 0
+    Status := count(Rules) == 0
 }
 #--
 
@@ -731,7 +729,7 @@ tests[{
     "PolicyId" : "MS.DEFENDER.5.1v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-ProtectionAlert"],
-	"ActualValue" : MissingAlerts,
+    "ActualValue" : MissingAlerts,
     "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), GenerateArrayString(MissingAlerts, ErrorMessage)),
     "RequirementMet" : Status
 }] {
@@ -775,7 +773,7 @@ tests[{
     "PolicyId" : "MS.DEFENDER.6.1v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-AdminAuditLogConfig"],
-	"ActualValue" : CorrectLogConfigs,
+    "ActualValue" : CorrectLogConfigs,
     "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
