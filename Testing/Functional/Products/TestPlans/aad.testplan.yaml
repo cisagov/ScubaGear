@@ -24,6 +24,27 @@ TestPlan:
                     - block
         Postconditions: []
         ExpectedResult: false
+      - TestDescription: MS.AAD.1.1v1 Non-Compliant case - not blocked (approvedApplication)
+        Preconditions:
+          - Command: UpdateConditionalAccessPolicyByName
+            Splat:
+              displayName: MS.AAD.1.1v1 Legacy authentication SHALL be blocked
+              updates: 
+                state: enabled
+                Conditions:
+                  Applications:
+                    IncludeApplications:
+                      - All
+                  Users:
+                    IncludeUsers:
+                      - All
+                  ClientAppTypes:
+                    - other
+                GrantControls:
+                  BuiltInControls:
+                    - approvedApplication
+        Postconditions: []
+        ExpectedResult: false        
       - TestDescription: MS.AAD.1.1v1 Compliant case
         Preconditions:
           - Command: UpdateConditionalAccessPolicyByName
@@ -81,7 +102,7 @@ TestPlan:
   - PolicyId: MS.AAD.2.3v1
     TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.AAD.2.1v1 Report Only 
+      - TestDescription: MS.AAD.2.3v1 Non-Compliant case - Report Only 
         Preconditions:
           - Command: UpdateConditionalAccessPolicyByName
             Splat:
@@ -90,7 +111,7 @@ TestPlan:
                 state: enabledForReportingButNotEnforced
         Postconditions: [] 
         ExpectedResult: false
-      - TestDescription: MS.AAD.2.1v1 Default
+      - TestDescription: MS.AAD.2.3v1 Compliant case - Default
         Preconditions:
           - Command: UpdateConditionalAccessPolicyByName
             Splat:
@@ -123,7 +144,7 @@ TestPlan:
                 GrantControls.BuiltInControls: []
         Postconditions: []
         ExpectedResult: false        
-      - TestDescription: MS.AAD.3.1v1 Compliant case
+      - TestDescription: MS.AAD.3.1v1 Compliant case - Phishing-resistant MFA enabled
         Preconditions:
           - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
@@ -484,26 +505,6 @@ TestPlan:
               PermissionGrantPolicyIdsAssignedToDefaultUserRole: []
         Postconditions: []
         ExpectedResult: true
-  - PolicyId: MS.AAD.5.2v1
-    TestDriver: RunScuba
-    Tests:
-      - TestDescription: MS.AAD.5.2v1 Non-Compliant case - Allow users to consent to apps
-        Preconditions:
-          - Command: Update-MgBetaPolicyAuthorizationPolicy
-            Splat:
-              AuthorizationPolicyId: authorizationPolicy
-              PermissionGrantPolicyIdsAssignedToDefaultUserRole:
-                - ManagePermissionGrantsForSelf.microsoft-user-default-legacy
-        Postconditions: []
-        ExpectedResult: false
-      - TestDescription: MS.AAD.5.2v1 Compliant case - Do NOT allow users to consent to apps
-        Preconditions:
-          - Command: Update-MgBetaPolicyAuthorizationPolicy
-            Splat:
-              AuthorizationPolicyId: authorizationPolicy
-              PermissionGrantPolicyIdsAssignedToDefaultUserRole: []
-        Postconditions: []
-        ExpectedResult: true
 
   ########## Come back to this one when we figure out the problem with the Cmdlet error - Crutch will try Beta version
   # - PolicyId: MS.AAD.5.3v1
@@ -524,45 +525,6 @@ TestPlan:
       #   Postconditions: []
       #   ExpectedResult: true
   
-  - PolicyId: MS.AAD.5.4v1
-    TestDriver: RunScuba
-    Tests:
-      - TestDescription: MS.AAD.5.4v1 Non-Compliant - Allow group owners to consent to apps
-        Preconditions: 
-          - Command: UpdateDirectorySettingByName
-            Splat:
-              DisplayName: Consent Policy Settings
-              Updates:
-                BodyParameter:
-                  Values:
-                    - Name: EnableGroupSpecificConsent
-                      Value: 'true'
-                    - Name: BlockUserConsentForRiskyApps
-                      Value: 'false'  
-                    - Name: EnableAdminConsentRequests
-                      Value: 'false'
-                    - Name: ConstrainGroupSpecificConsentToMembersOfGroupId
-                      Value: ""  
-        Postconditions: []
-        ExpectedResult: false    
-      - TestDescription: MS.AAD.5.4v1 Compliant - Do NOT allow group owners to consent to apps
-        Preconditions: 
-          - Command: UpdateDirectorySettingByName
-            Splat:
-              DisplayName: Consent Policy Settings
-              Updates:
-                BodyParameter:
-                  Values:
-                    - Name: EnableGroupSpecificConsent
-                      Value: 'false'
-                    - Name: BlockUserConsentForRiskyApps
-                      Value: 'false'  
-                    - Name: EnableAdminConsentRequests
-                      Value: 'false'
-                    - Name: ConstrainGroupSpecificConsentToMembersOfGroupId
-                      Value: ""  
-        Postconditions: []
-        ExpectedResult: true
   - PolicyId: MS.AAD.5.4v1
     TestDriver: RunScuba
     Tests:
