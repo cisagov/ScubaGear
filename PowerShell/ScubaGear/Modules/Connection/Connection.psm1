@@ -62,8 +62,7 @@ function Connect-Tenant {
                        'UserAuthenticationMethod.Read.All',
                        'RoleManagement.Read.Directory',
                        'GroupMember.Read.All',
-                       'Directory.Read.All',
-                       'SecurityEvents.Read.All'
+                       'Directory.Read.All'
                    )
                    $GraphParams = @{
                        'ErrorAction' = 'Stop';
