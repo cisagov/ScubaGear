@@ -30,7 +30,7 @@ param (
 Import-Module Selenium
 
 Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for $OrganizationName" -ForEach @(
-    @{ Browser = "Chrome"; Driver = Start-SeChrome -Headless -Arguments @('start-maximized', 'AcceptInsecureCertificates') 2>$null }
+    @{ Browser = "Chrome"; Driver = Start-SeChrome -Headless -Quiet -Arguments @('start-maximized', 'AcceptInsecureCertificates') 2>$null }
 ){
 	BeforeAll {
         $ReportFolders = Get-ChildItem . -directory -Filter "M365BaselineConformance*" | Sort-Object -Property LastWriteTime -Descending
@@ -38,7 +38,7 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for $OrganizationN
         $BaselineReports = Join-Path -Path $OutputFolder -ChildPath 'BaselineReports.html'
         #$script:url = ([System.Uri](Get-Item $BaselineReports).FullName).AbsoluteUri
         $script:url = (Get-Item $BaselineReports).FullName
-        Open-SeUrl $script:url -Driver $Driver 2>$null
+        Open-SeUrl $script:url -Driver $Driver | Out-Null
 	}
 
     Context "Check Main HTML" {
@@ -157,6 +157,6 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for $OrganizationN
     }
 
 	AfterAll {
-		Stop-SeDriver -Driver $Driver 2>$null
+		Stop-SeDriver -Driver $Driver | Out-Null
 	}
 }
