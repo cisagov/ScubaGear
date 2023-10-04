@@ -207,40 +207,40 @@ TestPlan:
     TestDriver: RunScuba
     Tests:
       - TestDescription: MS.SHAREPOINT.3.2v1 Non-compliant FileAnonymousLinkType = Edit; FolderAnonymousLinkType = Edit
-        Preconditions:     
+        Preconditions:       
           - Command: Set-SPOTenant
             Splat:
+              SharingCapability: ExternalUserAndGuestSharing
               FileAnonymousLinkType: Edit
               FolderAnonymousLinkType: Edit
         Postconditions: []
-        IsNotChecked: true
         ExpectedResult: false
       - TestDescription: MS.SHAREPOINT.3.2v1 Non-compliant FileAnonymousLinkType = Edit; FolderAnonymousLinkType = View
         Preconditions:     
           - Command: Set-SPOTenant
             Splat:
+              SharingCapability: ExternalUserAndGuestSharing
               FileAnonymousLinkType: Edit
               FolderAnonymousLinkType: View
         Postconditions: []
-        IsNotChecked: true
         ExpectedResult: false
       - TestDescription: MS.SHAREPOINT.3.2v1 Non-compliant FileAnonymousLinkType = View; FolderAnonymousLinkType = Edit
         Preconditions:     
           - Command: Set-SPOTenant
             Splat:
+              SharingCapability: ExternalUserAndGuestSharing
               FileAnonymousLinkType: Edit
               FolderAnonymousLinkType: View
         Postconditions: []
-        IsNotChecked: true
         ExpectedResult: false
       - TestDescription: MS.SHAREPOINT.3.2v1 Non-compliant FileAnonymousLinkType = View; FolderAnonymousLinkType = View
         Preconditions:     
           - Command: Set-SPOTenant
             Splat:
+              SharingCapability: ExternalUserAndGuestSharing
               FileAnonymousLinkType: View
               FolderAnonymousLinkType: View
         Postconditions: []
-        IsNotChecked: true
         ExpectedResult: true
   - PolicyId: MS.SHAREPOINT.3.3v1
     TestDriver: RunScuba
