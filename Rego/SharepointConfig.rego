@@ -91,7 +91,7 @@ Domainlist(Policy) = Description if {
 
 tests[{
     "PolicyId" : "MS.SHAREPOINT.1.3v1",
-    "Criticality" : "Should",
+    "Criticality" : "Shall",
     "Commandlet" : ["Get-SPOTenant", "Get-PnPTenant"],
     "ActualValue" : [Policy.SharingDomainRestrictionMode, Policy.SharingCapability],
     "ReportDetails" : Domainlist(Policy),
@@ -110,7 +110,7 @@ tests[{
 
 tests[{
     "PolicyId" : "MS.SHAREPOINT.1.4v1",
-    "Criticality" : "Should",
+    "Criticality" : "Shall",
     "Commandlet" : ["Get-SPOTenant", "Get-PnPTenant"],
     "ActualValue" : [Policy.RequireAcceptingAccountMatchInvitedAccount, Policy.SharingCapability],
     "ReportDetails" : ReportDetailsBoolean(Status),
