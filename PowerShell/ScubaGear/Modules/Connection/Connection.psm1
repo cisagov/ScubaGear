@@ -7,22 +7,27 @@ function Connect-Tenant {
    .Functionality
    Internal
    #>
-   [CmdletBinding()]
+   [CmdletBinding(DefaultParameterSetName='Manual')]
    param (
+   [Parameter(ParameterSetName = 'Auto')]
+   [Parameter(ParameterSetName = 'Manual')]
    [Parameter(Mandatory = $true)]
    [ValidateNotNullOrEmpty()]
    [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", IgnoreCase = $false)]
    [string[]]
    $ProductNames,
 
+   [Parameter(ParameterSetName = 'Auto')]
+   [Parameter(ParameterSetName = 'Manual')]
    [Parameter(Mandatory = $true)]
    [ValidateNotNullOrEmpty()]
    [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $false)]
    [string]
    $M365Environment,
 
+   [Parameter(ParameterSetName = 'Auto')]
    [Parameter(Mandatory = $false)]
-   [ValidateNotNullOrEmpty()]
+   [AllowNull()]
    [hashtable]
    $ServicePrincipalParams
    )
