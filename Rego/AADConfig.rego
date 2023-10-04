@@ -347,7 +347,7 @@ tests[{
 # MS.AAD.3.3v1
 #--
 # At this time we are unable to test for X because of NEW POLICY
-# If we have acceptable MFA then policy passes otherwise MS Authenticator need to be 
+# If we have acceptable MFA then policy passes otherwise MS Authenticator need to be
 # enabled to pass. However, we can not currently check if MS Authenticator enabled
 tests[{
     "PolicyId" : "MS.AAD.3.3v1",
@@ -360,7 +360,7 @@ tests[{
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
     Status := count(MS_AAD_3_1v1_CAP) > 0
     count(MS_AAD_3_1v1_CAP) > 0
-}   
+}
 
 tests[{
     "PolicyId": PolicyId,
@@ -642,7 +642,7 @@ GoodConsentSettings[{
     "Value": Setting.Value
 }] {
     Setting := AllConsentSettings[_]
-    Setting.Value == "false"
+    lower(Setting.Value) == "false"
 }
 
 BadConsentSettings[{
@@ -651,7 +651,7 @@ BadConsentSettings[{
     "Value": Setting.Value
 }] {
     Setting := AllConsentSettings[_]
-    Setting.Value == "true"
+    lower(Setting.Value) == "true"
 }
 
 tests[{
@@ -735,22 +735,18 @@ tests[{
 
 # MS.AAD.7.2v1
 #--
-# Check for secure score value for RoleOverlap Control Category
-# Requirements is met if score is equal to 1 (100%) and fails if it is less than 1
-#--
-
+# At this time we are unable to test for 7.2v1
 tests[{
-    "PolicyId" : "MS.AAD.7.2v1",
-    "Criticality" : "Shall",
-    "Commandlet" : ["Get-MgBetaSecuritySecureScore"],
-    "ActualValue" : SecureScorePolicy,
-    "ReportDetails" : ReportDetailsBoolean(Status),
-    "RequirementMet" : Status
+    "PolicyId" : PolicyId,
+    "Criticality" : "Shall/Not-Implemented",
+    "Commandlet" : [],
+    "ActualValue" : [],
+    "ReportDetails" : NotCheckedDetails(PolicyId),
+    "RequirementMet" : false
 }] {
-   SecureScorePolicy := input.secure_score[_]
-   Status := SecureScorePolicy.Score == 1.0
+    PolicyId := "MS.AAD.7.2v1"
+    true
 }
-
 #--
 
 #

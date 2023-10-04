@@ -10,8 +10,10 @@ on:
         branches:
         - "main"
         - "*Baseline*"
+        - "*FunctionalTest"
         paths:
         - "baselines/*.md"
+        - ".github/workflows/run_markdown_check.yaml"
 
 name: Markdown Check
 
