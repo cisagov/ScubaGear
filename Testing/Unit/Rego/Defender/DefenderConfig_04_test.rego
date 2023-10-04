@@ -400,51 +400,50 @@ test_ContentContainsSensitiveInformation_Incorrect_V4 if {
 #
 # Policy 2
 #--
-# test_Exchange_Correct if {
-#     ControlNumber := "Defender 2.2"
-#     Requirement := "The custom policy SHOULD be applied in Exchange"
+test_Exchange_Correct if {
+    PolicyId := "MS.DEFENDER.4.2v1"
 
-#     Output := tests with input as {
-#         "dlp_compliance_rules": [
-#             {
-#                 "ContentContainsSensitiveInformation":  [
-#                     {"name":  "U.S. Individual Taxpayer Identification Number (ITIN)"},
-#                     {"name":  "Credit Card Number"},
-#                     {"name":  "U.S. Social Security Number (SSN)"}
-#                 ],
-#                 "Name":  "Baseline Rule",
-# 	            "Disabled" : false,
-#                 "ParentPolicyName":  "Default Office 365 DLP policy",
-# 	            "BlockAccess":  true,
-#                 "BlockAccessScope":  "All",
-# 	            "NotifyUser":  [
-#                     "SiteAdmin",
-#                     "LastModifier",
-#                     "Owner"
-#                 ],
-# 	            "NotifyUserType":  "NotSet"
-#             }
-#         ],
-#         "dlp_compliance_policies": [
-#             {
-#                 "ExchangeLocation":  ["All"],
-#                 "Workload":  "Exchange",
-#                 "Name":  "Default Office 365 DLP policy",
-#                 "Mode": "Enable",
-#                 "Enabled": true
-#             }
-#         ]
-#     }
+    Output := tests with input as {
+        "dlp_compliance_rules": [
+            {
+                "ContentContainsSensitiveInformation":  [
+                    {"name":  "U.S. Individual Taxpayer Identification Number (ITIN)"},
+                    {"name":  "Credit Card Number"},
+                    {"name":  "U.S. Social Security Number (SSN)"}
+                ],
+                "Name":  "Baseline Rule",
+	            "Disabled" : false,
+                "ParentPolicyName":  "Default Office 365 DLP policy",
+	            "BlockAccess":  true,
+                "BlockAccessScope":  "All",
+	            "NotifyUser":  [
+                    "SiteAdmin",
+                    "LastModifier",
+                    "Owner"
+                ],
+	            "NotifyUserType":  "NotSet"
+            }
+        ],
+        "dlp_compliance_policies": [
+            {
+                "ExchangeLocation":  ["All"],
+                "Workload":  "Exchange",
+                "Name":  "Default Office 365 DLP policy",
+                "Mode": "Enable",
+                "Enabled": true
+            }
+        ]
+    }
 
-#     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
-#     count(RuleOutput) == 1
-#     RuleOutput[0].RequirementMet
-#     RuleOutput[0].ReportDetails == "Requirement met"
-# }
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "Requirement met"
+}
 
 # test_ExchangeLocation_Incorrect if {
-#     ControlNumber := "Defender 2.2"
+#     PolicyId := "MS.DEFENDER.4.2v1"
 #     Requirement := "The custom policy SHOULD be applied in Exchange"
 
 #     Output := tests with input as {
@@ -479,7 +478,7 @@ test_ContentContainsSensitiveInformation_Incorrect_V4 if {
 #         ]
 #     }
 
-#     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+#     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
 #     count(RuleOutput) == 1
 #     not RuleOutput[0].RequirementMet
@@ -487,7 +486,7 @@ test_ContentContainsSensitiveInformation_Incorrect_V4 if {
 # }
 
 # test_Workload_Incorrect_V1 if {
-#     ControlNumber := "Defender 2.2"
+#     PolicyId := "MS.DEFENDER.4.2v1"
 #     Requirement := "The custom policy SHOULD be applied in Exchange"
 
 #     Output := tests with input as {
@@ -522,7 +521,7 @@ test_ContentContainsSensitiveInformation_Incorrect_V4 if {
 #         ]
 #     }
 
-#     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+#     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
 #     count(RuleOutput) == 1
 #     not RuleOutput[0].RequirementMet
@@ -530,7 +529,7 @@ test_ContentContainsSensitiveInformation_Incorrect_V4 if {
 # }
 
 # test_SharePoint_Correct if {
-#     ControlNumber := "Defender 2.2"
+#     PolicyId := "MS.DEFENDER.4.2v1"
 #     Requirement := "The custom policy SHOULD be applied in SharePoint"
 
 #     Output := tests with input as {
@@ -565,7 +564,7 @@ test_ContentContainsSensitiveInformation_Incorrect_V4 if {
 #         ]
 #     }
 
-#     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+#     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
 #     count(RuleOutput) == 1
 #     RuleOutput[0].RequirementMet
@@ -573,7 +572,7 @@ test_ContentContainsSensitiveInformation_Incorrect_V4 if {
 # }
 
 # test_SharePointLocation_Incorrect if {
-#     ControlNumber := "Defender 2.2"
+#     PolicyId := "MS.DEFENDER.4.2v1"
 #     Requirement := "The custom policy SHOULD be applied in SharePoint"
 
 #     Output := tests with input as {
@@ -608,7 +607,7 @@ test_ContentContainsSensitiveInformation_Incorrect_V4 if {
 #         ]
 #     }
 
-#     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+#     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
 #     count(RuleOutput) == 1
 #     not RuleOutput[0].RequirementMet
@@ -616,7 +615,7 @@ test_ContentContainsSensitiveInformation_Incorrect_V4 if {
 # }
 
 # test_Workload_Incorrect_V2 if {
-#     ControlNumber := "Defender 2.2"
+#     PolicyId := "MS.DEFENDER.4.2v1"
 #     Requirement := "The custom policy SHOULD be applied in SharePoint"
 
 #     Output := tests with input as {
@@ -651,7 +650,7 @@ test_ContentContainsSensitiveInformation_Incorrect_V4 if {
 #         ]
 #     }
 
-#     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+#     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
 #     count(RuleOutput) == 1
 #     not RuleOutput[0].RequirementMet
@@ -659,7 +658,7 @@ test_ContentContainsSensitiveInformation_Incorrect_V4 if {
 # }
 
 # test_OneDrive_Correct if {
-#     ControlNumber := "Defender 2.2"
+#     PolicyId := "MS.DEFENDER.4.2v1"
 #     Requirement := "The custom policy SHOULD be applied in OneDrive"
 
 #     Output := tests with input as {
@@ -694,7 +693,7 @@ test_ContentContainsSensitiveInformation_Incorrect_V4 if {
 #         ]
 #     }
 
-#     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+#     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
 #     count(RuleOutput) == 1
 #     RuleOutput[0].RequirementMet
@@ -702,7 +701,7 @@ test_ContentContainsSensitiveInformation_Incorrect_V4 if {
 # }
 
 # test_OneDriveLocation_Incorrect if {
-#     ControlNumber := "Defender 2.2"
+#     PolicyId := "MS.DEFENDER.4.2v1"
 #     Requirement := "The custom policy SHOULD be applied in OneDrive"
 
 #     Output := tests with input as {
@@ -737,7 +736,7 @@ test_ContentContainsSensitiveInformation_Incorrect_V4 if {
 #         ]
 #     }
 
-#     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+#     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
 #     count(RuleOutput) == 1
 #     not RuleOutput[0].RequirementMet
@@ -745,7 +744,7 @@ test_ContentContainsSensitiveInformation_Incorrect_V4 if {
 # }
 
 # test_Workload_Incorrect_V3 if {
-#     ControlNumber := "Defender 2.2"
+#     PolicyId := "MS.DEFENDER.4.2v1"
 #     Requirement := "The custom policy SHOULD be applied in OneDrive"
 
 #     Output := tests with input as {
@@ -780,7 +779,7 @@ test_ContentContainsSensitiveInformation_Incorrect_V4 if {
 #         ]
 #     }
 
-#     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+#     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
 #     count(RuleOutput) == 1
 #     not RuleOutput[0].RequirementMet
@@ -788,7 +787,7 @@ test_ContentContainsSensitiveInformation_Incorrect_V4 if {
 # }
 
 # test_Teams_Correct if {
-#     ControlNumber := "Defender 2.2"
+#     PolicyId := "MS.DEFENDER.4.2v1"
 #     Requirement := "The custom policy SHOULD be applied in Teams"
 
 #     Output := tests with input as {
@@ -823,7 +822,7 @@ test_ContentContainsSensitiveInformation_Incorrect_V4 if {
 #         ]
 #     }
 
-#     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+#     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
 #     count(RuleOutput) == 1
 #     RuleOutput[0].RequirementMet
@@ -831,7 +830,7 @@ test_ContentContainsSensitiveInformation_Incorrect_V4 if {
 # }
 
 # test_TeamsLocation_Incorrect if {
-#     ControlNumber := "Defender 2.2"
+#     PolicyId := "MS.DEFENDER.4.2v1"
 #     Requirement := "The custom policy SHOULD be applied in Teams"
 
 #     Output := tests with input as {
@@ -866,7 +865,7 @@ test_ContentContainsSensitiveInformation_Incorrect_V4 if {
 #         ]
 #     }
 
-#     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+#     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
 #     count(RuleOutput) == 1
 #     not RuleOutput[0].RequirementMet
@@ -874,7 +873,7 @@ test_ContentContainsSensitiveInformation_Incorrect_V4 if {
 # }
 
 # test_Workload_Incorrect_V4 if {
-#     ControlNumber := "Defender 2.2"
+#     PolicyId := "MS.DEFENDER.4.2v1"
 #     Requirement := "The custom policy SHOULD be applied in Teams"
 
 #     Output := tests with input as {
@@ -909,7 +908,7 @@ test_ContentContainsSensitiveInformation_Incorrect_V4 if {
 #         ]
 #     }
 
-#     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+#     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
 #     count(RuleOutput) == 1
 #     not RuleOutput[0].RequirementMet
