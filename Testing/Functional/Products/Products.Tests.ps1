@@ -55,6 +55,7 @@
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'AppId', Justification = 'False positive as rule does not scan child scopes')]
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'ProductName', Justification = 'False positive as rule does not scan child scopes')]
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'M365Environment', Justification = 'False positive as rule does not scan child scopes')]
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'Variant', Justification = 'False positive as rule does not scan child scopes')]
 
 [CmdletBinding(DefaultParameterSetName='Manual')]
 param (
@@ -87,7 +88,13 @@ param (
     [Parameter(Mandatory = $false)]
     [ValidateNotNullOrEmpty()]
     [string]
-    $M365Environment = 'gcc'
+    $M365Environment = 'gcc',
+    [Parameter(ParameterSetName = 'Auto')]
+    [Parameter(ParameterSetName = 'Manual')]
+    [Parameter(Mandatory = $false)]
+    [ValidateNotNull()]
+    [string]
+    $Variant = [string]::Empty
 )
 
 $ScubaModulePath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules"
@@ -98,7 +105,14 @@ Import-Module $ConnectionModule
 Import-Module Selenium
 
 BeforeDiscovery{
-    $TestPlanPath = Join-Path -Path $PSScriptRoot -ChildPath "TestPlans/$ProductName.testplan.yaml"
+
+    if ($Variant) {
+        $TestPlanFileName = "TestPlans/$ProductName.$Variant.testplan.yaml"
+    }
+    else {
+        $TestPlanFileName = "TestPlans/$ProductName.testplan.yaml"
+    }
+    $TestPlanPath = Join-Path -Path $PSScriptRoot -ChildPath $TestPlanFileName
     Test-Path -Path $TestPlanPath -PathType Leaf
 
     $YamlString = Get-Content -Path $TestPlanPath | Out-String
@@ -115,7 +129,6 @@ BeforeDiscovery{
         TenantDomain = $TenantDomain
     }{
         if (-Not [string]::IsNullOrEmpty($AppId)){
-            Write-Debug "Auto Connect to Tenant"
             $ServicePrincipalParams = @{CertThumbprintParams = @{
                 CertificateThumbprint = $Thumbprint;
                 AppID = $AppId;
@@ -125,7 +138,6 @@ BeforeDiscovery{
             Connect-Tenant -ProductNames $ProductName -M365Environment $M365Environment -ServicePrincipalParams $ServicePrincipalParams
         }
         else {
-            Write-Debug "Manual Connect to Tenant"
             Connect-Tenant -ProductNames $ProductName -M365Environment $M365Environment
         }
     }
