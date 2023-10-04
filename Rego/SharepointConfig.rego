@@ -122,23 +122,6 @@ tests[{
 }
 #--
 
-#
-# MS.SHAREPOINT.1.5v1
-#--
-
-tests[{
-    "PolicyId" : "MS.SHAREPOINT.1.5v1",
-    "Criticality" : "Should",
-    "Commandlet" : ["Get-SPOTenant", "Get-PnPTenant"],
-    "ActualValue" : [Policy.RequireAcceptingAccountMatchInvitedAccount],
-    "ReportDetails" : ReportDetailsBoolean(Status),
-    "RequirementMet" : Status
-}] {
-    Policy := input.SPO_tenant[_]
-    Status := Policy.RequireAcceptingAccountMatchInvitedAccount == true
-}
-#--
-
 ###################
 # MS.SHAREPOINT.2 #
 ###################
