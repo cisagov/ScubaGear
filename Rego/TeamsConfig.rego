@@ -209,7 +209,9 @@ tests[{
 	Status := Policy.AllowCloudRecording == false
 }
 
+
 #
+
 tests[{
 	"PolicyId" : "MS.TEAMS.1.6v1",
 	"Criticality" : "Should",
@@ -222,37 +224,7 @@ tests[{
 }
 #--
 
-<<<<<<< HEAD
 #--
-=======
-#--
-<<<<<<< HEAD
-# MS.TEAMS.9.3v1
-#--
-PoliciesAllowingOutsideRegionStorage[Policy.Identity] {
-	Policy := input.meeting_policies[_]
-	Policy.AllowCloudRecording == true
-	Policy.AllowRecordingStorageOutsideRegion == true
-}
-
-tests[{
-	"PolicyId" : "MS.TEAMS.9.3v1",
-	"Criticality" : "Should",
-	"Commandlet" : ["Get-CsTeamsMeetingPolicy"],
-	"ActualValue" : Policies,
-	"ReportDetails" : ReportDetailsArray(Status, Policies, String),
-	"RequirementMet" : Status
-}] {
-	Policies := PoliciesAllowingOutsideRegionStorage
-	String := "meeting policy(ies) found that allow cloud recording and storage outside of the tenant's region:"
-	Status := count(Policies) == 0
-}
-#--
-
-#--
->>>>>>> f55fa69 (policy 5 updates)
-=======
->>>>>>> 32d760c (clean up rego code)
 # MS.TEAMS.1.7v1
 #--
 tests[{
@@ -281,14 +253,6 @@ tests[{
 }
 #--
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-
-
->>>>>>> f55fa69 (policy 5 updates)
-=======
->>>>>>> 32d760c (clean up rego code)
 #--
 # MS.TEAMS.2.1v1
 #--
@@ -313,35 +277,6 @@ tests[{
 }
 #--
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-#--
-# Baseline 2.4: Policy 2
-#--
-MeetingsNotAllowingAnonJoin[Policy.Identity] {
-	Policy := input.meeting_policies[_]
-	Policy.AllowAnonymousUsersToJoinMeeting == false
-}
-
-tests[{
-	"Requirement" : "Anonymous users SHOULD be enabled to join meetings",
-	"Control" : "Teams 2.4",
-	"Criticality" : "Should",
-	"Commandlet" : ["Get-CsTeamsMeetingPolicy"],
-	"ActualValue" : MeetingsNotAllowingAnonJoin,
-	"ReportDetails" : ReportDetailsArray(Status, Policies, String),
-	"RequirementMet" : Status
-}] {
-	Policies := MeetingsNotAllowingAnonJoin
-	String := "meeting policy(ies) found that don't allow anonymous users to join meetings:"
-	Status := count(Policies) == 0
-}
-#--
-
->>>>>>> f55fa69 (policy 5 updates)
-=======
->>>>>>> 32d760c (clean up rego code)
 #
 # MS.TEAMS.2.2v1
 #--
