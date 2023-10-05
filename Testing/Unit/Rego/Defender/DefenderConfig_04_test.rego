@@ -27,12 +27,57 @@ test_ContentContainsSensitiveInformation_Correct_V1 if {
                     "LastModifier",
                     "Owner"
                 ],
-                "NotifyUserType":  "NotSet"
+                "NotifyUserType":  "NotSet",
+                "IsAdvancedRule": false
             }
         ],
         "dlp_compliance_policies": [
             {
                 "Name": "Default Office 365 DLP policy",
+                "Mode": "Enable",
+                "Enabled": true
+            }
+        ]
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "Requirement met"
+}
+
+test_AdvancedRule_Correct_V2 if {
+    PolicyId := "MS.DEFENDER.4.1v1"
+
+    Output := tests with input as {
+        "dlp_compliance_rules": [
+            {
+                "ContentContainsSensitiveInformation":  null,
+                "Name":  "Baseline Rule",
+                "Disabled" : false,
+                "ParentPolicyName":  "Default Office 365 DLP policy",
+                "BlockAccess":  true,
+                "BlockAccessScope":  "All",
+                "NotifyUser":  [
+                    "SiteAdmin",
+                    "LastModifier",
+                    "Owner"
+                ],
+                "NotifyUserType":  "NotSet",
+                "IsAdvancedRule": true,
+                "AdvancedRule": "{rn  'Version': '1.0',rn  'Condition': {rn    'Operator': 'And',rn    'SubConditions': [rn      {rn        'ConditionName': 'ContentContainsSensitiveInformation',rn        'Value': [rn          {rn            'Groups': [rn              {rn                'Name': 'Default',rn                'Operator': 'Or',rn                'Sensitivetypes': [rn                  {rn                    'Name': 'Credit Card Number',rn                    'Id': '50842eb7-edc8-4019-85dd-5a5c1f2bb085',rn                    'Mincount': 1,rn                    'Maxcount': -1,rn                    'Confidencelevel': 'High',rn                    'Minconfidence': 85,rn                    'Maxconfidence': 100rn                  },rn                  {rn                    'Name': 'U.S. Individual Taxpayer Identification Number (ITIN)',rn                    'Id': 'e55e2a32-f92d-4985-a35d-a0b269eb687b',rn                    'Mincount': 1,rn                    'Maxcount': -1,rn                    'Confidencelevel': 'Medium',rn                    'Minconfidence': 75,rn                    'Maxconfidence': 100rn                  },rn                  {rn                    'Name': 'U.S. Social Security Number (SSN)',rn                    'Id': 'a44669fe-0d48-453d-a9b1-2cc83f2cba77',rn                    'Mincount': 1,rn                    'Maxcount': -1,rn                    'Confidencelevel': 'Medium',rn                    'Minconfidence': 75,rn                    'Maxconfidence': 100rn                  }rn                ]rn              }rn            ],rn            'Operator': 'And'rn          }rn        ]rn      }rn    ]rn  }rn}",
+            }
+        ],
+        "dlp_compliance_policies": [
+            {
+                "ExchangeLocation":  ["All"],
+                "SharePointLocation":  ["All"],
+                "TeamsLocation":  ["All"],
+                "EndpointDlpLocation":  ["All"],
+                "OneDriveLocation":  ["All"],
+                "Workload":  "Exchange, SharePoint, OneDriveForBusiness, Teams, EndpointDevices",
+                "Name":  "Default Office 365 DLP policy",
                 "Mode": "Enable",
                 "Enabled": true
             }
@@ -66,7 +111,8 @@ test_ContentContainsSensitiveInformation_Incorrect_V1 if {
                     "LastModifier",
                     "Owner"
                 ],
-                "NotifyUserType":  "NotSet"
+                "NotifyUserType":  "NotSet",
+                "IsAdvancedRule": false
             }
         ],
         "dlp_compliance_policies": [
@@ -105,7 +151,8 @@ test_ContentContainsSensitiveInformation_Incorrect_V2 if {
                     "LastModifier",
                     "Owner"
                 ],
-                "NotifyUserType":  "NotSet"
+                "NotifyUserType":  "NotSet",
+                "IsAdvancedRule": false
             }
         ],
         "dlp_compliance_policies": [
@@ -144,7 +191,8 @@ test_ContentContainsSensitiveInformation_Incorrect_V3 if {
                     "LastModifier",
                     "Owner"
                 ],
-                "NotifyUserType":  "NotSet"
+                "NotifyUserType":  "NotSet",
+                "IsAdvancedRule": false
             }
         ],
         "dlp_compliance_policies": [
@@ -180,7 +228,8 @@ test_ContentContainsSensitiveInformation_Incorrect_V4 if {
                     "LastModifier",
                     "Owner"
                 ],
-                "NotifyUserType":  "NotSet"
+                "NotifyUserType":  "NotSet",
+                "IsAdvancedRule": false
             }
         ],
         "dlp_compliance_policies": [
@@ -202,7 +251,7 @@ test_ContentContainsSensitiveInformation_Incorrect_V4 if {
 #
 # Policy 2
 #--
-test_Locations_Correct if {
+test_Locations_Correct_V1 if {
     PolicyId := "MS.DEFENDER.4.2v1"
 
     Output := tests with input as {
@@ -223,7 +272,52 @@ test_Locations_Correct if {
                     "LastModifier",
                     "Owner"
                 ],
-                "NotifyUserType":  "NotSet"
+                "NotifyUserType":  "NotSet",
+                "IsAdvancedRule": false
+            }
+        ],
+        "dlp_compliance_policies": [
+            {
+                "ExchangeLocation":  ["All"],
+                "SharePointLocation":  ["All"],
+                "TeamsLocation":  ["All"],
+                "EndpointDlpLocation":  ["All"],
+                "OneDriveLocation":  ["All"],
+                "Workload":  "Exchange, SharePoint, OneDriveForBusiness, Teams, EndpointDevices",
+                "Name":  "Default Office 365 DLP policy",
+                "Mode": "Enable",
+                "Enabled": true
+            }
+        ]
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "Requirement met"
+}
+
+test_Locations_Correct_V2 if {
+    PolicyId := "MS.DEFENDER.4.2v1"
+
+    Output := tests with input as {
+        "dlp_compliance_rules": [
+            {
+                "ContentContainsSensitiveInformation":  null,
+                "Name":  "Baseline Rule",
+                "Disabled" : false,
+                "ParentPolicyName":  "Default Office 365 DLP policy",
+                "BlockAccess":  true,
+                "BlockAccessScope":  "All",
+                "NotifyUser":  [
+                    "SiteAdmin",
+                    "LastModifier",
+                    "Owner"
+                ],
+                "NotifyUserType":  "NotSet",
+                "IsAdvancedRule": true,
+                "AdvancedRule": "{rn  'Version': '1.0',rn  'Condition': {rn    'Operator': 'And',rn    'SubConditions': [rn      {rn        'ConditionName': 'ContentContainsSensitiveInformation',rn        'Value': [rn          {rn            'Groups': [rn              {rn                'Name': 'Default',rn                'Operator': 'Or',rn                'Sensitivetypes': [rn                  {rn                    'Name': 'Credit Card Number',rn                    'Id': '50842eb7-edc8-4019-85dd-5a5c1f2bb085',rn                    'Mincount': 1,rn                    'Maxcount': -1,rn                    'Confidencelevel': 'High',rn                    'Minconfidence': 85,rn                    'Maxconfidence': 100rn                  },rn                  {rn                    'Name': 'U.S. Individual Taxpayer Identification Number (ITIN)',rn                    'Id': 'e55e2a32-f92d-4985-a35d-a0b269eb687b',rn                    'Mincount': 1,rn                    'Maxcount': -1,rn                    'Confidencelevel': 'Medium',rn                    'Minconfidence': 75,rn                    'Maxconfidence': 100rn                  },rn                  {rn                    'Name': 'U.S. Social Security Number (SSN)',rn                    'Id': 'a44669fe-0d48-453d-a9b1-2cc83f2cba77',rn                    'Mincount': 1,rn                    'Maxcount': -1,rn                    'Confidencelevel': 'Medium',rn                    'Minconfidence': 75,rn                    'Maxconfidence': 100rn                  }rn                ]rn              }rn            ],rn            'Operator': 'And'rn          }rn        ]rn      }rn    ]rn  }rn}",
             }
         ],
         "dlp_compliance_policies": [
@@ -270,7 +364,8 @@ test_Locations_Incorrect_V1 if {
                     "LastModifier",
                     "Owner"
                 ],
-                "NotifyUserType":  "NotSet"
+                "NotifyUserType":  "NotSet",
+                "IsAdvancedRule": false
             }
         ],
         "dlp_compliance_policies": [
@@ -317,7 +412,8 @@ test_Locations_Incorrect_V2 if {
                     "LastModifier",
                     "Owner"
                 ],
-                "NotifyUserType":  "NotSet"
+                "NotifyUserType":  "NotSet",
+                "IsAdvancedRule": false
             }
         ],
         "dlp_compliance_policies": [
@@ -364,7 +460,8 @@ test_Locations_Incorrect_V3 if {
                     "LastModifier",
                     "Owner"
                 ],
-                "NotifyUserType":  "NotSet"
+                "NotifyUserType":  "NotSet",
+                "IsAdvancedRule": false
             }
         ],
         "dlp_compliance_policies": [
@@ -411,7 +508,8 @@ test_Locations_Incorrect_V4 if {
                     "LastModifier",
                     "Owner"
                 ],
-                "NotifyUserType":  "NotSet"
+                "NotifyUserType":  "NotSet",
+                "IsAdvancedRule": false
             }
         ],
         "dlp_compliance_policies": [
@@ -458,7 +556,8 @@ test_Locations_Incorrect_V5 if {
                     "LastModifier",
                     "Owner"
                 ],
-                "NotifyUserType":  "NotSet"
+                "NotifyUserType":  "NotSet",
+                "IsAdvancedRule": false
             }
         ],
         "dlp_compliance_policies": [
@@ -505,7 +604,8 @@ test_Locations_Incorrect_V6 if {
                     "LastModifier",
                     "Owner"
                 ],
-                "NotifyUserType":  "NotSet"
+                "NotifyUserType":  "NotSet",
+                "IsAdvancedRule": false
             }
         ],
         "dlp_compliance_policies": [
@@ -552,7 +652,8 @@ test_Locations_Incorrect_V7 if {
                     "LastModifier",
                     "Owner"
                 ],
-                "NotifyUserType":  "NotSet"
+                "NotifyUserType":  "NotSet",
+                "IsAdvancedRule": false
             }
         ],
         "dlp_compliance_policies": [

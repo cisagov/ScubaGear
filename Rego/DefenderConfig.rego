@@ -432,8 +432,9 @@ SensitiveRules[{
     "NotifyUserType" : Rules.NotifyUserType,
     "ContentNames" : ContentNames
 }] {
-    Rules := input.dlp_compliance_rules[_]
-    Rules.Disabled == false
+	Rules := input.dlp_compliance_rules[_]
+	Rules.Disabled == false
+    Rules.IsAdvancedRule == false
     ContentNames := [Content.name | Content = Rules.ContentContainsSensitiveInformation[_]]
     Conditions := [ "U.S. Social Security Number (SSN)" in ContentNames,
                     "U.S. Individual Taxpayer Identification Number (ITIN)" in ContentNames,
@@ -443,6 +444,37 @@ SensitiveRules[{
     Policy := input.dlp_compliance_policies[_]
     Rules.ParentPolicyName == Policy.Name
     Policy.Enabled == true
+}
+
+SensitiveRules[{
+    "Name" : Rules.Name,
+	"ParentPolicyName" : Rules.ParentPolicyName,
+	"BlockAccess" : Rules.BlockAccess,
+	"BlockAccessScope" : Rules.BlockAccessScope,
+	"NotifyUser" : Rules.NotifyUser,
+	"NotifyUserType" : Rules.NotifyUserType,
+    "ContentNames" : ContentNames
+}] {
+	Rules := input.dlp_compliance_rules[_]
+	Rules.Disabled == false
+    Rules.IsAdvancedRule == true
+    Rules.AdvancedRule
+
+    Policy := input.dlp_compliance_policies[_]
+    Rules.ParentPolicyName == Policy.Name
+    Policy.Enabled == true
+    # Trim converted end-of-line "rn" delimters and convert single quotes to
+    # double for unmarshalling
+    RuleText := replace(replace(Rules.AdvancedRule, "rn", ""), "'", "\"")
+
+    ContentNames := regex.find_n(`(U.S. Social Security Number \(SSN\))|(U.S. Individual Taxpayer Identification Number \(ITIN\))|(Credit Card Number)`,
+                                 RuleText, -1)
+
+	Conditions := [ contains(RuleText, "U.S. Social Security Number (SSN)"),
+                    contains(RuleText, "U.S. Individual Taxpayer Identification Number (ITIN)"),
+                    contains(RuleText, "Credit Card Number")]
+
+    count([Condition | Condition = Conditions[_]; Condition == true]) > 0
 }
 
 # Step 1: Ensure that there is coverage for SSNs, ITINs, and credit cards
@@ -472,9 +504,6 @@ error_rules contains "U.S. Individual Taxpayer Identification Number (ITIN)" if 
 error_rules contains "Credit Card Number" if count(Rules.Credit_Card) == 0
 
 tests[{
-    #TODO: Appears this policy is broken into 3 parts in code and only 1 in baseline
-    # Combine this and the following two that are commented out into a single test
-    #"Requirement" : "A custom policy SHALL be configured to protect PII and sensitive information, as defined by the agency: U.S. Social Security Number (SSN)",
     "PolicyId" : "MS.DEFENDER.4.1v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-DlpComplianceRule"],
