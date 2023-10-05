@@ -289,7 +289,7 @@ tests[{
 }] {
     Rules := input.transport_rule
     ErrorMessage := "No transport rule found that applies warnings to emails received from outside the organization"
-    EnabledRules := [rule | rule = Rules[_]; rule.State == "Enabled"; rule.Mode == "Enforce"]
+    EnabledRules := [rule | rule = Rules[_]; rule.State == "Enabled"; rule.Mode == "Enforce"; count(rule.PrependSubject) >=1]
     Conditions := [IsCorrectScope | IsCorrectScope = EnabledRules[_].FromScope == "NotInOrganization"]
     Status := count([Condition | Condition = Conditions[_]; Condition == true]) > 0
 }
