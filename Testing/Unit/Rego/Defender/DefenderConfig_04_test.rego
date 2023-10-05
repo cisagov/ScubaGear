@@ -400,7 +400,7 @@ test_ContentContainsSensitiveInformation_Incorrect_V4 if {
 #
 # Policy 2
 #--
-test_Exchange_Correct if {
+test_Locations_Correct if {
     PolicyId := "MS.DEFENDER.4.2v1"
 
     Output := tests with input as {
@@ -412,22 +412,26 @@ test_Exchange_Correct if {
                     {"name":  "U.S. Social Security Number (SSN)"}
                 ],
                 "Name":  "Baseline Rule",
-	            "Disabled" : false,
+                "Disabled" : false,
                 "ParentPolicyName":  "Default Office 365 DLP policy",
-	            "BlockAccess":  true,
+                "BlockAccess":  true,
                 "BlockAccessScope":  "All",
-	            "NotifyUser":  [
+                "NotifyUser":  [
                     "SiteAdmin",
                     "LastModifier",
                     "Owner"
                 ],
-	            "NotifyUserType":  "NotSet"
+                "NotifyUserType":  "NotSet"
             }
         ],
         "dlp_compliance_policies": [
             {
                 "ExchangeLocation":  ["All"],
-                "Workload":  "Exchange",
+                "SharePointLocation":  ["All"],
+                "TeamsLocation":  ["All"],
+                "EndpointDlpLocation":  ["All"],
+                "OneDriveLocation":  ["All"],
+                "Workload":  "Exchange, SharePoint, OneDriveForBusiness, Teams, EndpointDevices",
                 "Name":  "Default Office 365 DLP policy",
                 "Mode": "Enable",
                 "Enabled": true
@@ -442,478 +446,334 @@ test_Exchange_Correct if {
     RuleOutput[0].ReportDetails == "Requirement met"
 }
 
-# test_ExchangeLocation_Incorrect if {
-#     PolicyId := "MS.DEFENDER.4.2v1"
-#     Requirement := "The custom policy SHOULD be applied in Exchange"
+# Policy exists, but Exchange location is null
+test_Locations_Incorrect_V1 if {
+    PolicyId := "MS.DEFENDER.4.2v1"
 
-#     Output := tests with input as {
-#         "dlp_compliance_rules": [
-#             {
-#                 "ContentContainsSensitiveInformation":  [
-#                     {"name":  "U.S. Individual Taxpayer Identification Number (ITIN)"},
-#                     {"name":  "Credit Card Number"},
-#                     {"name":  "U.S. Social Security Number (SSN)"}
-#                 ],
-#                 "Name":  "Baseline Rule",
-# 	            "Disabled" : false,
-#                 "ParentPolicyName":  "Default Office 365 DLP policy",
-# 	            "BlockAccess":  true,
-#                 "BlockAccessScope":  "All",
-# 	            "NotifyUser":  [
-#                     "SiteAdmin",
-#                     "LastModifier",
-#                     "Owner"
-#                 ],
-# 	            "NotifyUserType":  "NotSet"
-#             }
-#         ],
-#         "dlp_compliance_policies": [
-#             {
-#                 "ExchangeLocation":  [""],
-#                 "Workload":  "Exchange",
-#                 "Name":  "Default Office 365 DLP policy",
-#                 "Mode": "Enable",
-#                 "Enabled": true
-#             }
-#         ]
-#     }
+    Output := tests with input as {
+        "dlp_compliance_rules": [
+            {
+                "ContentContainsSensitiveInformation":  [
+                    {"name":  "U.S. Individual Taxpayer Identification Number (ITIN)"},
+                    {"name":  "Credit Card Number"},
+                    {"name":  "U.S. Social Security Number (SSN)"}
+                ],
+                "Name":  "Baseline Rule",
+                "Disabled" : false,
+                "ParentPolicyName":  "Default Office 365 DLP policy",
+                "BlockAccess":  true,
+                "BlockAccessScope":  "All",
+                "NotifyUser":  [
+                    "SiteAdmin",
+                    "LastModifier",
+                    "Owner"
+                ],
+                "NotifyUserType":  "NotSet"
+            }
+        ],
+        "dlp_compliance_policies": [
+            {
+                "ExchangeLocation":  [""],
+                "SharePointLocation":  ["All"],
+                "TeamsLocation":  ["All"],
+                "EndpointDlpLocation":  ["All"],
+                "OneDriveLocation":  ["All"],
+                "Workload":  "SharePoint, OneDriveForBusiness, Teams, EndpointDevices",
+                "Name":  "Default Office 365 DLP policy",
+                "Mode": "Enable",
+                "Enabled": true
+            }
+        ]
+    }
 
-#     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
-#     count(RuleOutput) == 1
-#     not RuleOutput[0].RequirementMet
-#     RuleOutput[0].ReportDetails == "No policy found that applies to Exchange."
-# }
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "No enabled policy found that applies to: Exchange"
+}
 
-# test_Workload_Incorrect_V1 if {
-#     PolicyId := "MS.DEFENDER.4.2v1"
-#     Requirement := "The custom policy SHOULD be applied in Exchange"
+# Policy exists, but SharePoint is not included
+test_Locations_Incorrect_V2 if {
+    PolicyId := "MS.DEFENDER.4.2v1"
 
-#     Output := tests with input as {
-#         "dlp_compliance_rules": [
-#             {
-#                 "ContentContainsSensitiveInformation":  [
-#                     {"name":  "U.S. Individual Taxpayer Identification Number (ITIN)"},
-#                     {"name":  "Credit Card Number"},
-#                     {"name":  "U.S. Social Security Number (SSN)"}
-#                 ],
-#                 "Name":  "Baseline Rule",
-# 	            "Disabled" : false,
-#                 "ParentPolicyName":  "Default Office 365 DLP policy",
-# 	            "BlockAccess":  true,
-#                 "BlockAccessScope":  "All",
-# 	            "NotifyUser":  [
-#                     "SiteAdmin",
-#                     "LastModifier",
-#                     "Owner"
-#                 ],
-# 	            "NotifyUserType":  "NotSet"
-#             }
-#         ],
-#         "dlp_compliance_policies": [
-#             {
-#                 "ExchangeLocation":  ["All"],
-#                 "Workload":  "",
-#                 "Name":  "Default Office 365 DLP policy",
-#                 "Mode": "Enable",
-#                 "Enabled": true
-#             }
-#         ]
-#     }
+    Output := tests with input as {
+        "dlp_compliance_rules": [
+            {
+                "ContentContainsSensitiveInformation":  [
+                    {"name":  "U.S. Individual Taxpayer Identification Number (ITIN)"},
+                    {"name":  "Credit Card Number"},
+                    {"name":  "U.S. Social Security Number (SSN)"}
+                ],
+                "Name":  "Baseline Rule",
+                "Disabled" : false,
+                "ParentPolicyName":  "Default Office 365 DLP policy",
+                "BlockAccess":  true,
+                "BlockAccessScope":  "All",
+                "NotifyUser":  [
+                    "SiteAdmin",
+                    "LastModifier",
+                    "Owner"
+                ],
+                "NotifyUserType":  "NotSet"
+            }
+        ],
+        "dlp_compliance_policies": [
+            {
+                "ExchangeLocation":  ["All"],
+                "SharePointLocation":  [""],
+                "TeamsLocation":  ["All"],
+                "EndpointDlpLocation":  ["All"],
+                "OneDriveLocation":  ["All"],                               
+                "Workload":  "Exchange, OneDriveForBusiness, Teams, EndpointDevices",
+                "Name":  "Default Office 365 DLP policy",
+                "Mode": "Enable",
+                "Enabled": true
+            }
+        ]
+    }
 
-#     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "No enabled policy found that applies to: SharePoint"
+}
 
-#     count(RuleOutput) == 1
-#     not RuleOutput[0].RequirementMet
-#     RuleOutput[0].ReportDetails == "No policy found that applies to Exchange."
-# }
+# Policy exists, but OneDrive location not included
+test_Locations_Incorrect_V3 if {
+    PolicyId := "MS.DEFENDER.4.2v1"
 
-# test_SharePoint_Correct if {
-#     PolicyId := "MS.DEFENDER.4.2v1"
-#     Requirement := "The custom policy SHOULD be applied in SharePoint"
+    Output := tests with input as {
+        "dlp_compliance_rules": [
+            {
+                "ContentContainsSensitiveInformation":  [
+                    {"name":  "U.S. Individual Taxpayer Identification Number (ITIN)"},
+                    {"name":  "Credit Card Number"},
+                    {"name":  "U.S. Social Security Number (SSN)"}
+                ],
+                "Name":  "Baseline Rule",
+                "Disabled" : false,
+                "ParentPolicyName":  "Default Office 365 DLP policy",
+                "BlockAccess":  true,
+                "BlockAccessScope":  "All",
+                "NotifyUser":  [
+                    "SiteAdmin",
+                    "LastModifier",
+                    "Owner"
+                ],
+                "NotifyUserType":  "NotSet"
+            }
+        ],
+        "dlp_compliance_policies": [
+            {
+                "ExchangeLocation":  ["All"],
+                "SharePointLocation":  ["All"],
+                "TeamsLocation":  ["All"],
+                "EndpointDlpLocation":  ["All"],
+                "OneDriveLocation":  [""],                               
+                "Workload":  "Exchange, SharePoint, Teams, EndpointDevices",
+                "Name":  "Default Office 365 DLP policy",
+                "Mode": "Enable",
+                "Enabled": true
+            }
+        ]
+    }
 
-#     Output := tests with input as {
-#         "dlp_compliance_rules": [
-#             {
-#                 "ContentContainsSensitiveInformation":  [
-#                     {"name":  "U.S. Individual Taxpayer Identification Number (ITIN)"},
-#                     {"name":  "Credit Card Number"},
-#                     {"name":  "U.S. Social Security Number (SSN)"}
-#                 ],
-#                 "Name":  "Baseline Rule",
-# 	            "Disabled" : false,
-#                 "ParentPolicyName":  "Default Office 365 DLP policy",
-# 	            "BlockAccess":  true,
-#                 "BlockAccessScope":  "All",
-# 	            "NotifyUser":  [
-#                     "SiteAdmin",
-#                     "LastModifier",
-#                     "Owner"
-#                 ],
-# 	            "NotifyUserType":  "NotSet"
-#             }
-#         ],
-#         "dlp_compliance_policies": [
-#             {
-#                 "SharePointLocation":  ["All"],
-#                 "Workload":  "SharePoint",
-#                 "Name":  "Default Office 365 DLP policy",
-#                 "Mode": "Enable",
-#                 "Enabled": true
-#             }
-#         ]
-#     }
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "No enabled policy found that applies to: OneDrive"
+}
 
-#     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+# Policy exists, but OneDrive location not included
+test_Locations_Incorrect_V4 if {
+    PolicyId := "MS.DEFENDER.4.2v1"
 
-#     count(RuleOutput) == 1
-#     RuleOutput[0].RequirementMet
-#     RuleOutput[0].ReportDetails == "Requirement met"
-# }
+    Output := tests with input as {
+        "dlp_compliance_rules": [
+            {
+                "ContentContainsSensitiveInformation":  [
+                    {"name":  "U.S. Individual Taxpayer Identification Number (ITIN)"},
+                    {"name":  "Credit Card Number"},
+                    {"name":  "U.S. Social Security Number (SSN)"}
+                ],
+                "Name":  "Baseline Rule",
+                "Disabled" : false,
+                "ParentPolicyName":  "Default Office 365 DLP policy",
+                "BlockAccess":  true,
+                "BlockAccessScope":  "All",
+                "NotifyUser":  [
+                    "SiteAdmin",
+                    "LastModifier",
+                    "Owner"
+                ],
+                "NotifyUserType":  "NotSet"
+            }
+        ],
+        "dlp_compliance_policies": [
+            {
+                "ExchangeLocation":  ["All"],
+                "SharePointLocation":  ["All"],
+                "TeamsLocation":  [""],
+                "EndpointDlpLocation":  ["All"],
+                "OneDriveLocation":  ["All"],                               
+                "Workload":  "Exchange, SharePoint, OneDriveForBusiness, EndpointDevices",
+                "Name":  "Default Office 365 DLP policy",
+                "Mode": "Enable",
+                "Enabled": true
+            }
+        ]
+    }
 
-# test_SharePointLocation_Incorrect if {
-#     PolicyId := "MS.DEFENDER.4.2v1"
-#     Requirement := "The custom policy SHOULD be applied in SharePoint"
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "No enabled policy found that applies to: Teams"
+}
 
-#     Output := tests with input as {
-#         "dlp_compliance_rules": [
-#             {
-#                 "ContentContainsSensitiveInformation":  [
-#                     {"name":  "U.S. Individual Taxpayer Identification Number (ITIN)"},
-#                     {"name":  "Credit Card Number"},
-#                     {"name":  "U.S. Social Security Number (SSN)"}
-#                 ],
-#                 "Name":  "Baseline Rule",
-# 	            "Disabled" : false,
-#                 "ParentPolicyName":  "Default Office 365 DLP policy",
-# 	            "BlockAccess":  true,
-#                 "BlockAccessScope":  "All",
-# 	            "NotifyUser":  [
-#                     "SiteAdmin",
-#                     "LastModifier",
-#                     "Owner"
-#                 ],
-# 	            "NotifyUserType":  "NotSet"
-#             }
-#         ],
-#         "dlp_compliance_policies": [
-#             {
-#                 "SharePointLocation":  [""],
-#                 "Workload":  "SharePoint",
-#                 "Name":  "Default Office 365 DLP policy",
-#                 "Mode": "Enable",
-#                 "Enabled": true
-#             }
-#         ]
-#     }
+# Policy exists, but Devices location not included
+test_Locations_Incorrect_V5 if {
+    PolicyId := "MS.DEFENDER.4.2v1"
 
-#     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    Output := tests with input as {
+        "dlp_compliance_rules": [
+            {
+                "ContentContainsSensitiveInformation":  [
+                    {"name":  "U.S. Individual Taxpayer Identification Number (ITIN)"},
+                    {"name":  "Credit Card Number"},
+                    {"name":  "U.S. Social Security Number (SSN)"}
+                ],
+                "Name":  "Baseline Rule",
+                "Disabled" : false,
+                "ParentPolicyName":  "Default Office 365 DLP policy",
+                "BlockAccess":  true,
+                "BlockAccessScope":  "All",
+                "NotifyUser":  [
+                    "SiteAdmin",
+                    "LastModifier",
+                    "Owner"
+                ],
+                "NotifyUserType":  "NotSet"
+            }
+        ],
+        "dlp_compliance_policies": [
+            {
+                "ExchangeLocation":  ["All"],
+                "SharePointLocation":  ["All"],
+                "TeamsLocation":  ["All"],
+                "EndpointDlpLocation":  [""],
+                "OneDriveLocation":  ["All"],                               
+                "Workload":  "Exchange, SharePoint, OneDriveForBusiness, Teams",
+                "Name":  "Default Office 365 DLP policy",
+                "Mode": "Enable",
+                "Enabled": true
+            }
+        ]
+    }
 
-#     count(RuleOutput) == 1
-#     not RuleOutput[0].RequirementMet
-#     RuleOutput[0].ReportDetails == "No policy found that applies to SharePoint."
-# }
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "No enabled policy found that applies to: Devices"
+}
 
-# test_Workload_Incorrect_V2 if {
-#     PolicyId := "MS.DEFENDER.4.2v1"
-#     Requirement := "The custom policy SHOULD be applied in SharePoint"
+# Policy exists, but is not enabled
+test_Locations_Incorrect_V6 if {
+    PolicyId := "MS.DEFENDER.4.2v1"
 
-#     Output := tests with input as {
-#         "dlp_compliance_rules": [
-#             {
-#                 "ContentContainsSensitiveInformation":  [
-#                     {"name":  "U.S. Individual Taxpayer Identification Number (ITIN)"},
-#                     {"name":  "Credit Card Number"},
-#                     {"name":  "U.S. Social Security Number (SSN)"}
-#                 ],
-#                 "Name":  "Baseline Rule",
-# 	            "Disabled" : false,
-#                 "ParentPolicyName":  "Default Office 365 DLP policy",
-# 	            "BlockAccess":  true,
-#                 "BlockAccessScope":  "All",
-# 	            "NotifyUser":  [
-#                     "SiteAdmin",
-#                     "LastModifier",
-#                     "Owner"
-#                 ],
-# 	            "NotifyUserType":  "NotSet"
-#             }
-#         ],
-#         "dlp_compliance_policies": [
-#             {
-#                 "SharePointLocation":  ["All"],
-#                 "Workload":  "",
-#                 "Name":  "Default Office 365 DLP policy",
-#                 "Mode": "Enable",
-#                 "Enabled": true
-#             }
-#         ]
-#     }
+    Output := tests with input as {
+        "dlp_compliance_rules": [
+            {
+                "ContentContainsSensitiveInformation":  [
+                    {"name":  "U.S. Individual Taxpayer Identification Number (ITIN)"},
+                    {"name":  "Credit Card Number"},
+                    {"name":  "U.S. Social Security Number (SSN)"}
+                ],
+                "Name":  "Baseline Rule",
+                "Disabled" : false,
+                "ParentPolicyName":  "Default Office 365 DLP policy",
+                "BlockAccess":  true,
+                "BlockAccessScope":  "All",
+                "NotifyUser":  [
+                    "SiteAdmin",
+                    "LastModifier",
+                    "Owner"
+                ],
+                "NotifyUserType":  "NotSet"
+            }
+        ],
+        "dlp_compliance_policies": [
+            {
+                "ExchangeLocation":  ["All"],
+                "SharePointLocation":  ["All"],
+                "TeamsLocation":  ["All"],
+                "EndpointDlpLocation":  ["All"],
+                "OneDriveLocation":  ["All"],
+                "Workload":  "Exchange, SharePoint, OneDriveForBusiness, Teams, EndpointDevices",
+                "Name":  "Default Office 365 DLP policy",
+                "Mode": "Enable",
+                "Enabled": false
+            }
+        ]
+    }
 
-#     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
-#     count(RuleOutput) == 1
-#     not RuleOutput[0].RequirementMet
-#     RuleOutput[0].ReportDetails == "No policy found that applies to SharePoint."
-# }
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "No enabled policy found that applies to: Devices, Exchange, OneDrive, SharePoint, Teams"
+}
 
-# test_OneDrive_Correct if {
-#     PolicyId := "MS.DEFENDER.4.2v1"
-#     Requirement := "The custom policy SHOULD be applied in OneDrive"
+# Policy exists and is enabled, but block rules are disabled
+test_Locations_Incorrect_V7 if {
+    PolicyId := "MS.DEFENDER.4.2v1"
 
-#     Output := tests with input as {
-#         "dlp_compliance_rules": [
-#             {
-#                 "ContentContainsSensitiveInformation":  [
-#                     {"name":  "U.S. Individual Taxpayer Identification Number (ITIN)"},
-#                     {"name":  "Credit Card Number"},
-#                     {"name":  "U.S. Social Security Number (SSN)"}
-#                 ],
-#                 "Name":  "Baseline Rule",
-# 	            "Disabled" : false,
-#                 "ParentPolicyName":  "Default Office 365 DLP policy",
-# 	            "BlockAccess":  true,
-#                 "BlockAccessScope":  "All",
-# 	            "NotifyUser":  [
-#                     "SiteAdmin",
-#                     "LastModifier",
-#                     "Owner"
-#                 ],
-# 	            "NotifyUserType":  "NotSet"
-#             }
-#         ],
-#         "dlp_compliance_policies": [
-#             {
-#                 "OneDriveLocation":  ["All"],
-#                 "Workload":  "OneDrivePoint",
-#                 "Name":  "Default Office 365 DLP policy",
-#                 "Mode": "Enable",
-#                 "Enabled": true
-#             }
-#         ]
-#     }
+    Output := tests with input as {
+        "dlp_compliance_rules": [
+            {
+                "ContentContainsSensitiveInformation":  [
+                    {"name":  "U.S. Individual Taxpayer Identification Number (ITIN)"},
+                    {"name":  "Credit Card Number"},
+                    {"name":  "U.S. Social Security Number (SSN)"}
+                ],
+                "Name":  "Baseline Rule",
+                "Disabled" : true,
+                "ParentPolicyName":  "Default Office 365 DLP policy",
+                "BlockAccess":  true,
+                "BlockAccessScope":  "All",
+                "NotifyUser":  [
+                    "SiteAdmin",
+                    "LastModifier",
+                    "Owner"
+                ],
+                "NotifyUserType":  "NotSet"
+            }
+        ],
+        "dlp_compliance_policies": [
+            {
+                "ExchangeLocation":  ["All"],
+                "SharePointLocation":  ["All"],
+                "TeamsLocation":  ["All"],
+                "EndpointDlpLocation":  ["All"],
+                "OneDriveLocation":  ["All"],
+                "Workload":  "Exchange, SharePoint, OneDriveForBusiness, Teams, EndpointDevices",
+                "Name":  "Default Office 365 DLP policy",
+                "Mode": "Enable",
+                "Enabled": true
+            }
+        ]
+    }
 
-#     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
-#     count(RuleOutput) == 1
-#     RuleOutput[0].RequirementMet
-#     RuleOutput[0].ReportDetails == "Requirement met"
-# }
-
-# test_OneDriveLocation_Incorrect if {
-#     PolicyId := "MS.DEFENDER.4.2v1"
-#     Requirement := "The custom policy SHOULD be applied in OneDrive"
-
-#     Output := tests with input as {
-#         "dlp_compliance_rules": [
-#             {
-#                 "ContentContainsSensitiveInformation":  [
-#                     {"name":  "U.S. Individual Taxpayer Identification Number (ITIN)"},
-#                     {"name":  "Credit Card Number"},
-#                     {"name":  "U.S. Social Security Number (SSN)"}
-#                 ],
-#                 "Name":  "Baseline Rule",
-# 	            "Disabled" : false,
-#                 "ParentPolicyName":  "Default Office 365 DLP policy",
-# 	            "BlockAccess":  true,
-#                 "BlockAccessScope":  "All",
-# 	            "NotifyUser":  [
-#                     "SiteAdmin",
-#                     "LastModifier",
-#                     "Owner"
-#                 ],
-# 	            "NotifyUserType":  "NotSet"
-#             }
-#         ],
-#         "dlp_compliance_policies": [
-#             {
-#                 "OneDriveLocation":  [""],
-#                 "Workload":  "OneDrivePoint",
-#                 "Name":  "Default Office 365 DLP policy",
-#                 "Mode": "Enable",
-#                 "Enabled": true
-#             }
-#         ]
-#     }
-
-#     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-#     count(RuleOutput) == 1
-#     not RuleOutput[0].RequirementMet
-#     RuleOutput[0].ReportDetails == "No policy found that applies to OneDrive."
-# }
-
-# test_Workload_Incorrect_V3 if {
-#     PolicyId := "MS.DEFENDER.4.2v1"
-#     Requirement := "The custom policy SHOULD be applied in OneDrive"
-
-#     Output := tests with input as {
-#         "dlp_compliance_rules": [
-#             {
-#                 "ContentContainsSensitiveInformation":  [
-#                     {"name":  "U.S. Individual Taxpayer Identification Number (ITIN)"},
-#                     {"name":  "Credit Card Number"},
-#                     {"name":  "U.S. Social Security Number (SSN)"}
-#                 ],
-#                 "Name":  "Baseline Rule",
-# 	            "Disabled" : false,
-#                 "ParentPolicyName":  "Default Office 365 DLP policy",
-# 	            "BlockAccess":  true,
-#                 "BlockAccessScope":  "All",
-# 	            "NotifyUser":  [
-#                     "SiteAdmin",
-#                     "LastModifier",
-#                     "Owner"
-#                 ],
-# 	            "NotifyUserType":  "NotSet"
-#             }
-#         ],
-#         "dlp_compliance_policies": [
-#             {
-#                 "OneDriveLocation":  ["All"],
-#                 "Workload":  "",
-#                 "Name":  "Default Office 365 DLP policy",
-#                 "Mode": "Enable",
-#                 "Enabled": true
-#             }
-#         ]
-#     }
-
-#     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-#     count(RuleOutput) == 1
-#     not RuleOutput[0].RequirementMet
-#     RuleOutput[0].ReportDetails == "No policy found that applies to OneDrive."
-# }
-
-# test_Teams_Correct if {
-#     PolicyId := "MS.DEFENDER.4.2v1"
-#     Requirement := "The custom policy SHOULD be applied in Teams"
-
-#     Output := tests with input as {
-#         "dlp_compliance_rules": [
-#             {
-#                 "ContentContainsSensitiveInformation":  [
-#                     {"name":  "U.S. Individual Taxpayer Identification Number (ITIN)"},
-#                     {"name":  "Credit Card Number"},
-#                     {"name":  "U.S. Social Security Number (SSN)"}
-#                 ],
-#                 "Name":  "Baseline Rule",
-# 	            "Disabled" : false,
-#                 "ParentPolicyName":  "Default Office 365 DLP policy",
-# 	            "BlockAccess":  true,
-#                 "BlockAccessScope":  "All",
-# 	            "NotifyUser":  [
-#                     "SiteAdmin",
-#                     "LastModifier",
-#                     "Owner"
-#                 ],
-# 	            "NotifyUserType":  "NotSet"
-#             }
-#         ],
-#         "dlp_compliance_policies": [
-#             {
-#                 "TeamsLocation":  ["All"],
-#                 "Workload":  "Teams",
-#                 "Name":  "Default Office 365 DLP policy",
-#                 "Mode": "Enable",
-#                 "Enabled": true
-#             }
-#         ]
-#     }
-
-#     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-#     count(RuleOutput) == 1
-#     RuleOutput[0].RequirementMet
-#     RuleOutput[0].ReportDetails == "Requirement met"
-# }
-
-# test_TeamsLocation_Incorrect if {
-#     PolicyId := "MS.DEFENDER.4.2v1"
-#     Requirement := "The custom policy SHOULD be applied in Teams"
-
-#     Output := tests with input as {
-#         "dlp_compliance_rules": [
-#             {
-#                 "ContentContainsSensitiveInformation":  [
-#                     {"name":  "U.S. Individual Taxpayer Identification Number (ITIN)"},
-#                     {"name":  "Credit Card Number"},
-#                     {"name":  "U.S. Social Security Number (SSN)"}
-#                 ],
-#                 "Name":  "Baseline Rule",
-# 	            "Disabled" : false,
-#                 "ParentPolicyName":  "Default Office 365 DLP policy",
-# 	            "BlockAccess":  true,
-#                 "BlockAccessScope":  "All",
-# 	            "NotifyUser":  [
-#                     "SiteAdmin",
-#                     "LastModifier",
-#                     "Owner"
-#                 ],
-# 	            "NotifyUserType":  "NotSet"
-#             }
-#         ],
-#         "dlp_compliance_policies": [
-#             {
-#                 "TeamsLocation":  [""],
-#                 "Workload":  "Teams",
-#                 "Name":  "Default Office 365 DLP policy",
-#                 "Mode": "Enable",
-#                 "Enabled": true
-#             }
-#         ]
-#     }
-
-#     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-#     count(RuleOutput) == 1
-#     not RuleOutput[0].RequirementMet
-#     RuleOutput[0].ReportDetails == "No policy found that applies to Teams."
-# }
-
-# test_Workload_Incorrect_V4 if {
-#     PolicyId := "MS.DEFENDER.4.2v1"
-#     Requirement := "The custom policy SHOULD be applied in Teams"
-
-#     Output := tests with input as {
-#         "dlp_compliance_rules": [
-#             {
-#                 "ContentContainsSensitiveInformation":  [
-#                     {"name":  "U.S. Individual Taxpayer Identification Number (ITIN)"},
-#                     {"name":  "Credit Card Number"},
-#                     {"name":  "U.S. Social Security Number (SSN)"}
-#                 ],
-#                 "Name":  "Baseline Rule",
-# 	            "Disabled" : false,
-#                 "ParentPolicyName":  "Default Office 365 DLP policy",
-# 	            "BlockAccess":  true,
-#                 "BlockAccessScope":  "All",
-# 	            "NotifyUser":  [
-#                     "SiteAdmin",
-#                     "LastModifier",
-#                     "Owner"
-#                 ],
-# 	            "NotifyUserType":  "NotSet"
-#             }
-#         ],
-#         "dlp_compliance_policies": [
-#             {
-#                 "TeamsLocation":  ["All"],
-#                 "Workload":  "",
-#                 "Name":  "Default Office 365 DLP policy",
-#                 "Mode": "Enable",
-#                 "Enabled": true
-#             }
-#         ]
-#     }
-
-#     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-#     count(RuleOutput) == 1
-#     not RuleOutput[0].RequirementMet
-#     RuleOutput[0].ReportDetails == "No policy found that applies to Teams."
-# }
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "No enabled policy found that applies to: Devices, Exchange, OneDrive, SharePoint, Teams"
+}
 
 #
 # Policy 3

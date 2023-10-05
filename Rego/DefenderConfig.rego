@@ -487,35 +487,6 @@ tests[{
     Status := count(error_rules) == 0
 }
 
-# tests[{
-#     "Requirement" : "A custom policy SHALL be configured to protect PII and sensitive information, as defined by the agency: U.S. Individual Taxpayer Identification Number (ITIN)",
-#     "Control" : "Defender 2.2",
-#     "Criticality" : "Shall",
-#     "Commandlet" : ["Get-DlpComplianceRule"],
-# 	"ActualValue" : Rules,
-#     "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
-#     "RequirementMet" : Status
-# }] {
-#     Rules := ITINRules
-#     ErrorMessage := "No matching rule found for U.S. Individual Taxpayer Identification Number (ITIN)"
-#     Status := count(Rules) > 0
-# }
-
-# tests[{
-#     "Requirement" : "A custom policy SHALL be configured to protect PII and sensitive information, as defined by the agency: Credit Card Number",
-#     "Control" : "Defender 2.2",
-#     "Criticality" : "Shall",
-#     "Commandlet" : ["Get-DlpComplianceRule"],
-# 	"ActualValue" : Rules,
-#     "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
-#     "RequirementMet" : Status
-# }] {
-#     Rules := CardRules
-#     ErrorMessage := "No matching rule found for Credit Card Number"
-#     Status := count(Rules) > 0
-# }
-#--
-
 #
 # MS.DEFENDER.4.2v1
 #--
@@ -545,18 +516,6 @@ SharePointPolicies[{
     contains(Policy.Workload, "SharePoint")
 }
 
-# OneDrivePolicies[{
-#     "Name" : Policy.Name,
-#     "Locations" : Policy.OneDriveLocation,
-#     "Workload" : Policy.Workload
-# }] {
-#     SensitivePolicies := {Rule.ParentPolicyName | Rule = SensitiveRules[_]}
-#     Policy := input.dlp_compliance_policies[_]
-#     Policy.Name in SensitivePolicies
-#     "All" in Policy.OneDriveLocation
-#     contains(Policy.Workload, "OneDrivePoint") # Is this supposed to be OneDrivePoint or OneDrive?
-#}
-
 OneDrivePolicies[{
     "Name" : Policy.Name,
     "Locations" : Policy.OneDriveLocation,
@@ -566,7 +525,7 @@ OneDrivePolicies[{
     Policy := input.dlp_compliance_policies[_]
     Policy.Name in SensitivePolicies
     "All" in Policy.OneDriveLocation
-    contains(Policy.Workload, "OneDriveForBusiness") # Is this supposed to be OneDrivePoint or OneDrive?
+    contains(Policy.Workload, "OneDriveForBusiness")
 }
 
 TeamsPolicies[{
@@ -581,17 +540,31 @@ TeamsPolicies[{
     contains(Policy.Workload, "Teams")
 }
 
+DevicesPolicies[{
+    "Name" : Policy.Name,
+    "Locations" : Policy.EndpointDlpLocation,
+    "Workload" : Policy.Workload
+    }] {
+    SensitivePolicies := {Rule.ParentPolicyName | Rule = SensitiveRules[_]}
+    Policy := input.dlp_compliance_policies[_]
+    Policy.Name in SensitivePolicies
+    "All" in Policy.EndpointDlpLocation
+    contains(Policy.Workload, "EndpointDevices")
+}
+
 Policies := {
     "Exchange": ExchangePolicies,
     "SharePoint": SharePointPolicies,
     "OneDrive": OneDrivePolicies,
     "Teams": TeamsPolicies,
+    "Devices": DevicesPolicies
 }
 
 error_policies contains "Exchange" if count(Policies.Exchange) == 0
 error_policies contains "SharePoint" if count(Policies.SharePoint) == 0
 error_policies contains "OneDrive" if count(Policies.OneDrive) == 0
 error_policies contains "Teams" if count(Policies.Teams) == 0
+error_policies contains "Devices" if count(Policies.Devices) == 0
 
 tests[{
     "PolicyId": "MS.DEFENDER.4.2v1",
@@ -601,53 +574,10 @@ tests[{
     "ReportDetails": CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
     "RequirementMet": Status,
 }] {
-    error_policy := "No policy found that applies to:"
+    error_policy := "No enabled policy found that applies to:"
     ErrorMessage := concat(" ", [error_policy, concat(", ", error_policies)])
     Status := count(error_policies) == 0
 }
-
-# tests[{
-#     "Requirement" : "The custom policy SHOULD be applied in SharePoint",
-#     "Control" : "Defender 2.2",
-#     "Criticality" : "Should",
-#     "Commandlet" : ["Get-DLPCompliancePolicy"],
-#     "ActualValue" : Policies,
-#     "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
-#     "RequirementMet" : Status
-# }] {
-#     Policies := SharePointPolicies
-#     ErrorMessage := "No policy found that applies to SharePoint."
-#     Status := count(Policies) > 0
-# }
-
-# tests[{
-#     "Requirement" : "The custom policy SHOULD be applied in OneDrive",
-#     "Control" : "Defender 2.2",
-#     "Criticality" : "Should",
-#     "Commandlet" : ["Get-DLPCompliancePolicy"],
-#     "ActualValue" : Policies,
-#     "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
-#     "RequirementMet" : Status
-# }] {
-#     Policies := OneDrivePolicies
-#     ErrorMessage := "No policy found that applies to OneDrive."
-#     Status := count(Policies) > 0
-# }
-
-# tests[{
-#     "Requirement" : "The custom policy SHOULD be applied in Teams",
-#     "Control" : "Defender 2.2",
-#     "Criticality" : "Should",
-#     "Commandlet" : ["Get-DLPCompliancePolicy"],
-#     "ActualValue" : Policies,
-#     "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
-#     "RequirementMet" : Status
-# }] {
-#     Policies := TeamsPolicies
-#     ErrorMessage := "No policy found that applies to Teams."
-#     Status := count(Policies) > 0
-# }
-#--
 
 #
 # MS.DEFENDER.4.3v1
