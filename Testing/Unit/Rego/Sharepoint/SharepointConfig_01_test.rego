@@ -183,13 +183,75 @@ test_OneDriveSharingCapability_Incorrect_V2 if {
 #
 # MS.SHAREPOINT.1.3v1
 #--
-test_SharingDomainRestrictionMode_Correct if {
+test_SharingDomainRestrictionMode_Correct_V1 if {
     PolicyId := "MS.SHAREPOINT.1.3v1"
 
     Output := tests with input as {
         "SPO_tenant": [
             {
+                "SharingCapability" : 0,
+                "SharingDomainRestrictionMode" : 0
+            }
+        ]
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "Requirement met: external sharing is set to Only People In Organization"
+}
+
+test_SharingDomainRestrictionMode_Correct_V2 if {
+    PolicyId := "MS.SHAREPOINT.1.3v1"
+
+    Output := tests with input as {
+        "SPO_tenant": [
+            {
+                "SharingCapability" : 1,
                 "SharingDomainRestrictionMode" : 1
+            }
+        ]
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "Requirement met: Note that we currently only check for approved external domains. Approved security groups are currently not being checked, see the baseline policy for instructions on a manual check"
+}
+
+test_SharingDomainRestrictionMode_Incorrect if {
+    PolicyId := "MS.SHAREPOINT.1.3v1"
+
+    Output := tests with input as {
+        "SPO_tenant": [
+            {
+                "SharingCapability" : 1,
+                "SharingDomainRestrictionMode" : 0
+            }
+        ]
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails =="Requirement not met: Note that we currently only check for approved external domains. Approved security groups are currently not being checked, see the baseline policy for instructions on a manual check"
+}
+#--
+
+#
+# MS.SHAREPOINT.1.4v1
+#--
+test_SameAccount_Correct_V1 if {
+    PolicyId := "MS.SHAREPOINT.1.4v1"
+
+    Output := tests with input as {
+        "SPO_tenant": [
+            {
+                "SharingCapability" : 0,
+                "RequireAcceptingAccountMatchInvitedAccount" : false
             }
         ]
     }
@@ -201,50 +263,13 @@ test_SharingDomainRestrictionMode_Correct if {
     RuleOutput[0].ReportDetails == "Requirement met"
 }
 
-test_SharingDomainRestrictionMode_Incorrect if {
-    PolicyId := "MS.SHAREPOINT.1.3v1"
-
-    Output := tests with input as {
-        "SPO_tenant": [
-            {
-                "SharingDomainRestrictionMode" : 0
-            }
-        ]
-    }
-
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement not met"
-}
-#--
-
-#
-# MS.SHAREPOINT.1.4v1
-#--
-test_NotImplemented_Correct if {
+test_SameAccount_Correct_V2 if {
     PolicyId := "MS.SHAREPOINT.1.4v1"
 
-    Output := tests with input as { }
-
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == NotCheckedDetails(PolicyId)
-}
-#--
-
-#
-# MS.SHAREPOINT.1.5v1
-#--
-test_RequireAcceptingAccountMatchInvitedAccount_Correct if {
-    PolicyId := "MS.SHAREPOINT.1.5v1"
-
     Output := tests with input as {
         "SPO_tenant": [
             {
+                "SharingCapability" : 1,
                 "RequireAcceptingAccountMatchInvitedAccount" : true
             }
         ]
@@ -257,12 +282,13 @@ test_RequireAcceptingAccountMatchInvitedAccount_Correct if {
     RuleOutput[0].ReportDetails == "Requirement met"
 }
 
-test_RequireAcceptingAccountMatchInvitedAccount_Incorrect if {
-    PolicyId := "MS.SHAREPOINT.1.5v1"
+test_SameAccount_Incorrect if {
+    PolicyId := "MS.SHAREPOINT.1.4v1"
 
     Output := tests with input as {
         "SPO_tenant": [
             {
+                "SharingCapability" : 1,
                 "RequireAcceptingAccountMatchInvitedAccount" : false
             }
         ]
