@@ -185,10 +185,10 @@ DomainsWithoutAgencyContact[DmarcRecord.domain] {
     RuaFields := [Rua | Rua := DmarcFields[_]; contains(Rua, "rua=")]
     RufFields := [Ruf | Ruf := DmarcFields[_]; contains(Ruf, "ruf=")]
     # 2 or more POCs including reports@dmarc.cyber.dhs.gov checked by policy 4.3
-    RuaEmailCount := count([Answer | Answer := RuaFields[_]; count(split(Answer, "@")) >= 2]) >= 1
+    RuaAcceptableCount := count([Answer | Answer := RuaFields[_]; count(split(Answer, "@")) >= 2]) >= 1
     # 1 or more POCs
-    RufEmailCount := count([Answer | Answer := RufFields[_]; count(split(Answer, "@")) >= 1]) >= 1
-    Conditions := [RuaEmailCount, RufEmailCount]
+    RufAcceptableCount := count([Answer | Answer := RufFields[_]; count(split(Answer, "@")) >= 1]) >= 1
+    Conditions := [RuaAcceptableCount, RufAcceptableCount]
     count([Condition | Condition = Conditions[_]; Condition == false]) > 0
 }
 
