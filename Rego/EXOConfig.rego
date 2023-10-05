@@ -201,7 +201,6 @@ tests[{
     "RequirementMet" : Status
 }] {
     Domains := DomainsWithoutAgencyContact
-    print(count(DomainsWithoutAgencyContact))
     Status := count(Domains) == 0
 }
 #--
