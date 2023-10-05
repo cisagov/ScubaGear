@@ -1311,7 +1311,7 @@ test_ServicePlans_Incorrect if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "**NOTE: Your tenant does not have an Azure AD Premium P2 license, which is required for this feature**"
+    RuleOutput[0].ReportDetails == "**NOTE: Your tenant does not have a Microsoft Entra ID P2 license, which is required for this feature**"
 }
 #--
 
