@@ -182,14 +182,12 @@ DomainKeys Identified Mail (DKIM) allows digital signatures to be added
 to email messages in the message header, providing a layer of both
 authenticity and integrity to emails. As with SPF, DKIM relies on DNS
 records, thus, its deployment depends on how an agency manages its DNS.
-DKIM is enabled for your tenant's default domain (e.g., onmicrosoft.com
-domains), but it must be manually enabled for custom domains. Exchange
-Online Protection (EOP) features include DKIM signing capabilities.
+Exchange Online Protection (EOP) features include DKIM signing capabilities.
 
 ### Policies
 
 #### MS.EXO.3.1v1
-DKIM SHOULD be enabled for any custom domain.
+DKIM SHOULD be enabled for all domains.
 
 <!--Policy: MS.EXO.3.1v1; Criticality: SHOULD -->
 - _Rationale:_ An adversary may modify the `FROM` field

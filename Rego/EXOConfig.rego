@@ -21,12 +21,6 @@ ReportDetailsArray(Status, Array1, Array2) = Detail if {
 
 AllDomains := {Domain.domain | Domain = input.spf_records[_]}
 
-CustomDomains[Domain.domain] {
-    Domain = input.spf_records[_]
-    not endswith( Domain.domain, "onmicrosoft.com")
-}
-
-
 #
 # MS.EXO.1.1v1
 #--
@@ -105,10 +99,10 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-DkimSigningConfig", "Get-ScubaDkimRecords", "Get-AcceptedDomain"],
     "ActualValue" : [input.dkim_records, input.dkim_config],
-    "ReportDetails" : ReportDetailsArray(Status, DomainsWithoutDkim, CustomDomains),
+    "ReportDetails" : ReportDetailsArray(Status, DomainsWithoutDkim, AllDomains),
     "RequirementMet" : Status
 }] {
-    DomainsWithoutDkim := CustomDomains - DomainsWithDkim
+    DomainsWithoutDkim := AllDomains - DomainsWithDkim
     Status := count(DomainsWithoutDkim) == 0
 }
 #--
@@ -162,7 +156,9 @@ tests[{
 #--
 DomainsWithoutDHSContact[DmarcRecord.domain] {
     DmarcRecord := input.dmarc_records[_]
-    ValidAnswers := [Answer | Answer := DmarcRecord.rdata[_]; contains(Answer, "mailto:reports@dmarc.cyber.dhs.gov")]
+    DmarcFields := split(DmarcRecord.rdata[_], ";")
+    RuaFields := [Rua | Rua := DmarcFields[_]; contains(Rua, "rua=")]
+    ValidAnswers := [Answer | Answer := RuaFields[_]; contains(Answer, "mailto:reports@dmarc.cyber.dhs.gov")]
     count(ValidAnswers) == 0
 }
 
@@ -184,8 +180,16 @@ tests[{
 #--
 DomainsWithoutAgencyContact[DmarcRecord.domain] {
     DmarcRecord := input.dmarc_records[_]
-    EnoughContacts := [Answer | Answer := DmarcRecord.rdata[_]; count(split(Answer, "@")) >= 3]
-    count(EnoughContacts) == 0
+    Rdata = DmarcRecord.rdata[_]
+    DmarcFields := split(Rdata, ";")
+    RuaFields := [Rua | Rua := DmarcFields[_]; contains(Rua, "rua=")]
+    RufFields := [Ruf | Ruf := DmarcFields[_]; contains(Ruf, "ruf=")]
+    # 2 or more POCs including reports@dmarc.cyber.dhs.gov checked by policy 4.3
+    RuaEmailCount := count([Answer | Answer := RuaFields[_]; count(split(Answer, "@")) >= 2]) >= 1
+    # 1 or more POCs
+    RufEmailCount := count([Answer | Answer := RufFields[_]; count(split(Answer, "@")) >= 1]) >= 1
+    Conditions := [RuaEmailCount, RufEmailCount]
+    count([Condition | Condition = Conditions[_]; Condition == false]) > 0
 }
 
 tests[{
@@ -197,6 +201,7 @@ tests[{
     "RequirementMet" : Status
 }] {
     Domains := DomainsWithoutAgencyContact
+    print(count(DomainsWithoutAgencyContact))
     Status := count(Domains) == 0
 }
 #--

@@ -272,13 +272,13 @@ test_Rdata_Incorrect_V7 if {
 #
 # Policy 4
 #--
-test_Rdata_Incorrect_V4 if {
+test_POC_Correct_V1 if {
     PolicyId := "MS.EXO.4.4v1"
-
+    # 2 emails in rua= and 1 in ruf
     Output := tests with input as {
         "dmarc_records": [
             {
-                "rdata" : ["v=DMARC1; p=reject; pct=100; rua=mailto:DMARC@hq.dhs.gov, mailto:reports@dmarc.cyber.dhs.gov"], 
+                "rdata" : ["v=DMARC1; p=reject; pct=100; rua=mailto:DMARC@hq.dhs.gov, mailto:reports@dmarc.cyber.dhs.gov; ruf=agencyemail@hq.dhs.gov"], 
                 "domain" : "test.name"
             }
         ],
@@ -297,13 +297,13 @@ test_Rdata_Incorrect_V4 if {
     RuleOutput[0].ReportDetails == "Requirement met"
 }
 
-test_Rdata_Incorrect_V8 if {
+test_POC_Incorrect_V1 if {
     PolicyId := "MS.EXO.4.4v1"
-
+    # Only 1 rua
     Output := tests with input as {
         "dmarc_records": [
             {
-                "rdata" : ["v=DMARC1; p=reject; pct=100; rua=mailto:reports@dmarc.cyber.dhs.gov"], 
+                "rdata" : ["v=DMARC1; p=reject; pct=100; rua=mailto:reports@dmarc.cyber.dhs.gov"],
                 "domain" : "test.name"
             }
         ],
