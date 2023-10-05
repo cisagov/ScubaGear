@@ -467,19 +467,6 @@ To restrict sharing calendar details with all domains:
 1. Refer to step 5 in [MS.EXO.6.1v1 instructions](#msexo61v1-instructions) to implement
 this policy.
 
-2. Additionally, sign in to the **Microsoft 365 admin center**.
-
-3. On the left-hand menu, select **Show All** and then **Settings**.
-
-4. Under **Settings**, select **Org settings**.
-
-5. From the list of **Services**, select **Calendar**.
-
-6. Make sure the **Let your users share their calendars with people outside of
-   your organization who have Office 365 or Exchange** is unchecked.
-
-7. If the settings has changed, click **Save**.
-
 ## 7. External Sender Warnings
 
 Mail flow rules allow incoming email modification, such that email
