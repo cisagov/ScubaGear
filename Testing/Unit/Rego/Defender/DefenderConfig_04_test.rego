@@ -199,204 +199,6 @@ test_ContentContainsSensitiveInformation_Incorrect_V4 if {
     RuleOutput[0].ReportDetails == "No matching rules found for: Credit Card Number, U.S. Individual Taxpayer Identification Number (ITIN), U.S. Social Security Number (SSN)"
 }
 
-# test_ContentContainsSensitiveInformation_Incorrect_V1 if {
-#     ControlNumber := "Defender 2.2"
-#     Requirement := "A custom policy SHALL be configured to protect PII and sensitive information, as defined by the agency: U.S. Social Security Number (SSN)"
-
-#     Output := tests with input as {
-#         "dlp_compliance_rules": [
-#             {
-#                 "ContentContainsSensitiveInformation":  [
-#                     {"name":  "U.S. Individual Taxpayer Identification Number (ITIN)"},
-#                     {"name":  "Credit Card Number"}
-#                 ],
-#                 "Name":  "Baseline Rule",
-# 	            "Disabled" : false,
-#                 "ParentPolicyName":  "Default Office 365 DLP policy",
-# 	            "BlockAccess":  true,
-#                 "BlockAccessScope":  "All",
-# 	            "NotifyUser":  [
-#                     "SiteAdmin",
-#                     "LastModifier",
-#                     "Owner"
-#                 ],
-# 	            "NotifyUserType":  "NotSet"
-#             }
-#         ],
-#         "dlp_compliance_policies": [
-#             {
-#                 "Name": "Default Office 365 DLP policy",
-#                 "Mode": "Enable",
-#                 "Enabled": true
-#             }
-#         ]
-#     }
-
-#     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
-
-#     count(RuleOutput) == 1
-#     not RuleOutput[0].RequirementMet
-#     RuleOutput[0].ReportDetails == "No matching rule found for U.S. Social Security Number (SSN)"
-# }
-
-# test_ContentContainsSensitiveInformation_Correct_V2 if {
-#     ControlNumber := "Defender 2.2"
-#     Requirement := "A custom policy SHALL be configured to protect PII and sensitive information, as defined by the agency: U.S. Individual Taxpayer Identification Number (ITIN)"
-
-#     Output := tests with input as {
-#         "dlp_compliance_rules": [
-#             {
-#                 "ContentContainsSensitiveInformation":  [
-#                     {"name":  "U.S. Individual Taxpayer Identification Number (ITIN)"}
-#                 ],
-#                 "Name":  "Baseline Rule",
-# 	            "Disabled" : false,
-#                 "ParentPolicyName":  "Default Office 365 DLP policy",
-# 	            "BlockAccess":  true,
-#                 "BlockAccessScope":  "All",
-# 	            "NotifyUser":  [
-#                     "SiteAdmin",
-#                     "LastModifier",
-#                     "Owner"
-#                 ],
-# 	            "NotifyUserType":  "NotSet"
-#             }
-#         ],
-#         "dlp_compliance_policies": [
-#             {
-#                 "Name": "Default Office 365 DLP policy",
-#                 "Mode": "Enable",
-#                 "Enabled": true
-#             }
-#         ]
-#     }
-
-#     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
-
-#     count(RuleOutput) == 1
-#     RuleOutput[0].RequirementMet
-#     RuleOutput[0].ReportDetails == "Requirement met"
-# }
-
-# test_ContentContainsSensitiveInformation_Incorrect_V2 if {
-#     ControlNumber := "Defender 2.2"
-#     Requirement := "A custom policy SHALL be configured to protect PII and sensitive information, as defined by the agency: U.S. Individual Taxpayer Identification Number (ITIN)"
-
-#     Output := tests with input as {
-#         "dlp_compliance_rules": [
-#             {
-#                 "ContentContainsSensitiveInformation":  [
-#                     {"name":  "Credit Card Number"},
-#                     {"name":  "U.S. Social Security Number (SSN)"}
-#                 ],
-#                 "Name":  "Baseline Rule",
-# 	            "Disabled" : false,
-#                 "ParentPolicyName":  "Default Office 365 DLP policy",
-# 	            "BlockAccess":  true,
-#                 "BlockAccessScope":  "All",
-# 	            "NotifyUser":  [
-#                     "SiteAdmin",
-#                     "LastModifier",
-#                     "Owner"
-#                 ],
-# 	            "NotifyUserType":  "NotSet"
-#             }
-#         ],
-#         "dlp_compliance_policies": [
-#             {
-#                 "Name": "Default Office 365 DLP policy",
-#                 "Mode": "Enable",
-#                 "Enabled": true
-#             }
-#         ]
-#     }
-
-#     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
-
-#     count(RuleOutput) == 1
-#     not RuleOutput[0].RequirementMet
-#     RuleOutput[0].ReportDetails == "No matching rule found for U.S. Individual Taxpayer Identification Number (ITIN)"
-# }
-
-# test_ContentContainsSensitiveInformation_Correct_V3 if {
-#     ControlNumber := "Defender 2.2"
-#     Requirement := "A custom policy SHALL be configured to protect PII and sensitive information, as defined by the agency: Credit Card Number"
-
-#     Output := tests with input as {
-#         "dlp_compliance_rules": [
-#             {
-#                 "ContentContainsSensitiveInformation":  [
-#                     {"name":  "Credit Card Number"}
-#                 ],
-#                 "Name":  "Baseline Rule",
-# 	            "Disabled" : false,
-#                 "ParentPolicyName":  "Default Office 365 DLP policy",
-# 	            "BlockAccess":  true,
-#                 "BlockAccessScope":  "All",
-# 	            "NotifyUser":  [
-#                     "SiteAdmin",
-#                     "LastModifier",
-#                     "Owner"
-#                 ],
-# 	            "NotifyUserType":  "NotSet"
-#             }
-#         ],
-#         "dlp_compliance_policies": [
-#             {
-#                 "Name": "Default Office 365 DLP policy",
-#                 "Mode": "Enable",
-#                 "Enabled": true
-#             }
-#         ]
-#     }
-
-#     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
-
-#     count(RuleOutput) == 1
-#     RuleOutput[0].RequirementMet
-#     RuleOutput[0].ReportDetails == "Requirement met"
-# }
-
-# test_ContentContainsSensitiveInformation_Incorrect_V3 if {
-#     ControlNumber := "Defender 2.2"
-#     Requirement := "A custom policy SHALL be configured to protect PII and sensitive information, as defined by the agency: Credit Card Number"
-
-#     Output := tests with input as {
-#         "dlp_compliance_rules": [
-#             {
-#                 "ContentContainsSensitiveInformation":  [
-#                     {"name":  "U.S. Individual Taxpayer Identification Number (ITIN)"},
-#                     {"name":  "U.S. Social Security Number (SSN)"}
-#                 ],
-#                 "Name":  "Baseline Rule",
-# 	            "Disabled" : false,
-#                 "ParentPolicyName":  "Default Office 365 DLP policy",
-# 	            "BlockAccess":  true,
-#                 "BlockAccessScope":  "All",
-# 	            "NotifyUser":  [
-#                     "SiteAdmin",
-#                     "LastModifier",
-#                     "Owner"
-#                 ],
-# 	            "NotifyUserType":  "NotSet"
-#             }
-#         ],
-#         "dlp_compliance_policies": [
-#             {
-#                 "Name": "Default Office 365 DLP policy",
-#                 "Mode": "Enable",
-#                 "Enabled": true
-#             }
-#         ]
-#     }
-
-#     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
-
-#     count(RuleOutput) == 1
-#     not RuleOutput[0].RequirementMet
-#     RuleOutput[0].ReportDetails == "No matching rule found for Credit Card Number"
-# }
-
 #
 # Policy 2
 #--
@@ -524,7 +326,7 @@ test_Locations_Incorrect_V2 if {
                 "SharePointLocation":  [""],
                 "TeamsLocation":  ["All"],
                 "EndpointDlpLocation":  ["All"],
-                "OneDriveLocation":  ["All"],                               
+                "OneDriveLocation":  ["All"],
                 "Workload":  "Exchange, OneDriveForBusiness, Teams, EndpointDevices",
                 "Name":  "Default Office 365 DLP policy",
                 "Mode": "Enable",
@@ -534,7 +336,7 @@ test_Locations_Incorrect_V2 if {
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-    
+
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "No enabled policy found that applies to: SharePoint"
@@ -571,7 +373,7 @@ test_Locations_Incorrect_V3 if {
                 "SharePointLocation":  ["All"],
                 "TeamsLocation":  ["All"],
                 "EndpointDlpLocation":  ["All"],
-                "OneDriveLocation":  [""],                               
+                "OneDriveLocation":  [""],
                 "Workload":  "Exchange, SharePoint, Teams, EndpointDevices",
                 "Name":  "Default Office 365 DLP policy",
                 "Mode": "Enable",
@@ -581,7 +383,7 @@ test_Locations_Incorrect_V3 if {
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-    
+
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "No enabled policy found that applies to: OneDrive"
@@ -618,7 +420,7 @@ test_Locations_Incorrect_V4 if {
                 "SharePointLocation":  ["All"],
                 "TeamsLocation":  [""],
                 "EndpointDlpLocation":  ["All"],
-                "OneDriveLocation":  ["All"],                               
+                "OneDriveLocation":  ["All"],
                 "Workload":  "Exchange, SharePoint, OneDriveForBusiness, EndpointDevices",
                 "Name":  "Default Office 365 DLP policy",
                 "Mode": "Enable",
@@ -628,7 +430,7 @@ test_Locations_Incorrect_V4 if {
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-    
+
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "No enabled policy found that applies to: Teams"
@@ -665,7 +467,7 @@ test_Locations_Incorrect_V5 if {
                 "SharePointLocation":  ["All"],
                 "TeamsLocation":  ["All"],
                 "EndpointDlpLocation":  [""],
-                "OneDriveLocation":  ["All"],                               
+                "OneDriveLocation":  ["All"],
                 "Workload":  "Exchange, SharePoint, OneDriveForBusiness, Teams",
                 "Name":  "Default Office 365 DLP policy",
                 "Mode": "Enable",
@@ -675,7 +477,7 @@ test_Locations_Incorrect_V5 if {
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-    
+
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "No enabled policy found that applies to: Devices"
