@@ -2,11 +2,11 @@ package teams
 import future.keywords
 
 
-#
-# Policy 1
+#--
+# Policy MS.TEAMS.3.1v1
 #--
 test_AllowPublicUsers_Correct if {
-    PolicyId := "MS.TEAMS.6.1v1"
+    PolicyId := "MS.TEAMS.3.1v1"
 
     Output := tests with input as {
         "federation_configuration": [
@@ -25,7 +25,7 @@ test_AllowPublicUsers_Correct if {
 }
 
 test_AllowPublicUsers_InCorrect if {
-    PolicyId := "MS.TEAMS.6.1v1"
+    PolicyId := "MS.TEAMS.3.1v1"
 
     Output := tests with input as {
         "federation_configuration": [
@@ -44,7 +44,7 @@ test_AllowPublicUsers_InCorrect if {
 }
 
 test_AllowPublicUsers_Correct_multi if {
-    PolicyId := "MS.TEAMS.6.1v1"
+    PolicyId := "MS.TEAMS.3.1v1"
 
     Output := tests with input as {
         "federation_configuration": [
@@ -67,7 +67,7 @@ test_AllowPublicUsers_Correct_multi if {
 }
 
 test_AllowPublicUsers_InCorrect_multi if {
-    PolicyId := "MS.TEAMS.6.1v1"
+    PolicyId := "MS.TEAMS.3.1v1"
 
     Output := tests with input as {
         "federation_configuration": [
