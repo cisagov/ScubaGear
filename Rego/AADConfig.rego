@@ -42,7 +42,7 @@ ReportFullDetailsArray(Array, String) = Details {
 CapLink := "<a href='#caps'>View all CA policies</a>."
 
 ##############################################################################################################
-# The report formatting functions below are for policies that check the required Azure AD Premium P2 license #
+# The report formatting functions below are for policies that check the required Microsoft Entra ID P2 license #
 ##############################################################################################################
 
 Aad2P2Licenses[ServicePlan.ServicePlanId] {
@@ -50,7 +50,7 @@ Aad2P2Licenses[ServicePlan.ServicePlanId] {
     ServicePlan.ServicePlanName == "AAD_PREMIUM_P2"
 }
 
-P2WarningString := "**NOTE: Your tenant does not have an Azure AD Premium P2 license, which is required for this feature**"
+P2WarningString := "**NOTE: Your tenant does not have a Microsoft Entra ID P2 license, which is required for this feature**"
 
 ReportDetailsArrayLicenseWarningCap(Array, String) = Description if {
   count(Aad2P2Licenses) > 0
@@ -669,7 +669,7 @@ tests[{
 #################################
 
 #   DoPIMRoleRulesExist will return true when the JSON privileged_roles.Rules element exists and false when it does not.
-#   This was created to add special logic for the scenario where the Azure AD premium P2 license is missing and therefore
+#   This was created to add special logic for the scenario where the Microsoft Entra ID P2 license is missing and therefore
 #   the JSON Rules element will not exist in that case because there is no PIM service.
 #   This is necessary to avoid false negatives when a policy checks for zero instances of a specific condition.
 #   For example, if a policy checks for count(PrivilegedRoleWithoutExpirationPeriod) == 0 and that normally means compliant, when a

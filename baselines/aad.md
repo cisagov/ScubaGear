@@ -123,7 +123,7 @@ Sign-ins detected as high risk SHALL be blocked.
 
 ### License Requirements
 
-- Requires an AAD P2 license
+- Requires a Microsoft Entra ID P2 license
 
 ### Implementation
 
@@ -578,7 +578,7 @@ User activation of other highly privileged roles SHOULD trigger an alert.
 
 - Azure AD PIM or an equivalent third-party PAM service.
 
-- Azure AD PIM requires an AAD P2 license
+- Azure AD PIM requires a Microsoft Entra ID P2 license
 
 ### Implementation
 
