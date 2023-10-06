@@ -850,7 +850,7 @@ RolesWithoutApprovalRequired[RoleName] {
 
 tests[{
     "PolicyId" : "MS.AAD.7.6v1",
-    "Criticality" : "Should",
+    "Criticality" : "Shall",
     "Commandlet" : ["Get-MgBetaSubscribedSku", "Get-PrivilegedRole"],
     "ActualValue" : RolesWithoutApprovalRequired,
     "ReportDetails" : ReportDetailsBooleanLicenseWarning(Status),
