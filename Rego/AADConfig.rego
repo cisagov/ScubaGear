@@ -795,9 +795,13 @@ PrivilegedRoleExclusions(PrivilegedRole, PolicyID) := true if {
 
 PrivilegedRolesWithoutExpirationPeriod[Role.DisplayName] {
     Role := input.privileged_roles[_]
-
     PrivilegedRoleExclusions(Role, "MS.AAD.7.4v1") == true
 }
+
+# PrivilegedRolesWithoutExpirationPeriod[Role.DisplayName] {
+#     count(Aad2P2Licenses) == 0
+#     False
+# }
 
 tests[{
     "PolicyId" : "MS.AAD.7.4v1",
@@ -808,7 +812,20 @@ tests[{
     "RequirementMet" : Status
 }] {
     DescriptionString := "role(s) that contain users with permanent active assignment"
-    Status := count(PrivilegedRolesWithoutExpirationPeriod) == 0
+    count(Aad2P2Licenses) > 0
+    Status := count(PrivilegedRolesWithoutExpirationPeriod) == 0 
+}
+
+tests[{
+    "PolicyId" : "MS.AAD.7.4v1",
+    "Criticality" : "Shall",
+    "Commandlet" : ["Get-MgBetaSubscribedSku"],
+    "ActualValue" : false,
+    "ReportDetails" : ReportDetailsArrayLicenseWarning(PrivilegedRolesWithoutExpirationPeriod, DescriptionString),
+    "RequirementMet" : false
+}] {
+    DescriptionString := "role(s) that contain users with permanent active assignment"
+    count(Aad2P2Licenses) == 0 
 }
 #--
 
