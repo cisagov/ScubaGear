@@ -1,9 +1,9 @@
 package onedrive
 import future.keywords
 
-ReportDetailsBoolean(Status) = "Requirement met" if {Status == true}
+ReportDetailsBoolean(Status) := "Requirement met" if {Status == true}
 
-ReportDetailsBoolean(Status) = "Requirement not met" if {Status == false}
+ReportDetailsBoolean(Status) := "Requirement not met" if {Status == false}
 
 
 ################
@@ -54,18 +54,18 @@ tests[{
 #
 # Baseline 2.2: Policy 1
 #--
-ReportDetails2_2(Policy) = Description if {
+ReportDetails2_2(Policy) := Description if {
     Policy.OneDriveSharingCapability != 2
     Description := "Requirement met: Anyone links are disabled"
 }
 
-ReportDetails2_2(Policy) = Description if {
+ReportDetails2_2(Policy) := Description if {
     Policy.OneDriveSharingCapability == 2
     Policy.RequireAnonymousLinksExpireInDays == 30
     Description := "Requirement met"
 }
 
-ReportDetails2_2(Policy) = Description if {
+ReportDetails2_2(Policy) := Description if {
     Policy.OneDriveSharingCapability == 2
     Policy.RequireAnonymousLinksExpireInDays != 30
     Description := "Requirement not met: Expiration date is not 30"
@@ -110,33 +110,33 @@ tests[{
 #
 # Baseline 2.3: Policy 1
 #--
-ReportDetails2_3(Policy) = Description if {
+ReportDetails2_3(Policy) := Description if {
     Policy.OneDriveSharingCapability != 2
     Description := "Requirement met: Anyone links are disabled"
 }
 
-ReportDetails2_3(Policy) = Description if {
+ReportDetails2_3(Policy) := Description if {
     Policy.OneDriveSharingCapability == 2
     Policy.FileAnonymousLinkType == 1
     Policy.FolderAnonymousLinkType == 1
 	Description := "Requirement met"
 }
 
-ReportDetails2_3(Policy) = Description if {
+ReportDetails2_3(Policy) := Description if {
     Policy.OneDriveSharingCapability == 2
     Policy.FileAnonymousLinkType == 2
     Policy.FolderAnonymousLinkType == 2
 	Description := "Requirement not met: both files and folders are not limited to view for Anyone"
 }
 
-ReportDetails2_3(Policy) = Description if {
+ReportDetails2_3(Policy) := Description if {
     Policy.OneDriveSharingCapability == 2
     Policy.FileAnonymousLinkType == 1
     Policy.FolderAnonymousLinkType == 2
 	Description := "Requirement not met: folders are not limited to view for Anyone"
 }
 
-ReportDetails2_3(Policy) = Description if {
+ReportDetails2_3(Policy) := Description if {
     Policy.OneDriveSharingCapability == 2
     Policy.FileAnonymousLinkType == 2
     Policy.FolderAnonymousLinkType == 1

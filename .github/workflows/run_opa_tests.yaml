@@ -32,3 +32,11 @@ jobs:
 
     - name: Run OPA Tests
       run: opa test Rego/*.rego Testing/Unit/Rego/**/*.rego -v
+
+    - name: Setup Regal
+      uses: StyraInc/setup-regal@v0.2.0
+      with:
+        version: v0.10.1
+
+    - name: Run Regal Lint
+      run: regal lint --format github Rego Testing

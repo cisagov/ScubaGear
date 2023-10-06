@@ -4,32 +4,32 @@ import future.keywords
 ################
 # The report formatting functions below are generic and used throughout the policies #
 ################
-Format(Array) = format_int(count(Array), 10)
+Format(Array) := format_int(count(Array), 10)
 
-Description(String1, String2, String3) =  trim(concat(" ", [String1, String2, String3]), " ")
+Description(String1, String2, String3) := trim(concat(" ", [String1, String2, String3]), " ")
 
-ReportDetailsBoolean(Status) = "Requirement met" if {Status == true}
+ReportDetailsBoolean(Status) := "Requirement met" if {Status == true}
 
-ReportDetailsBoolean(Status) = "Requirement not met" if {Status == false}
+ReportDetailsBoolean(Status) := "Requirement not met" if {Status == false}
 
-ReportDetailsArray(Array, String) = Description(Format(Array), String, "")
+ReportDetailsArray(Array, String) := Description(Format(Array), String, "")
 
 # Set to the maximum number of array items to be
 # printed in the report details section
 ReportArrayMaxCount := 20
 
-ReportFullDetailsArray(Array, String) = Details {
+ReportFullDetailsArray(Array, String) := Details {
     count(Array) == 0
     Details := ReportDetailsArray(Array, String)
 }
 
-ReportFullDetailsArray(Array, String) = Details {
+ReportFullDetailsArray(Array, String) := Details {
     count(Array) > 0
     count(Array) <= ReportArrayMaxCount
     Details := Description(Format(Array), concat(":<br/>", [String, concat(", ", Array)]), "")
 }
 
-ReportFullDetailsArray(Array, String) = Details {
+ReportFullDetailsArray(Array, String) := Details {
     count(Array) > ReportArrayMaxCount
     List := [ x | x := Array[_] ]
 
@@ -44,45 +44,45 @@ CapLink := "<a href='#caps'>View all CA policies</a>."
 # The report formatting functions below are for policies that check the required Azure AD Premium P2 license #
 ################
 Aad2P2Licenses[ServicePlan.ServicePlanId] {
-    ServicePlan = input.service_plans[_]
+    ServicePlan := input.service_plans[_]
     ServicePlan.ServicePlanName == "AAD_PREMIUM_P2"
 }
 
 P2WarningString := "**NOTE: Your tenant does not have an Azure AD Premium P2 license, which is required for this feature**"
 
-ReportDetailsArrayLicenseWarningCap(Array, String) = Description if {
+ReportDetailsArrayLicenseWarningCap(Array, String) := Description if {
   count(Aad2P2Licenses) > 0
-  Description :=  concat(". ", [ReportFullDetailsArray(Array, String), CapLink])
+  Description := concat(". ", [ReportFullDetailsArray(Array, String), CapLink])
 }
 
-ReportDetailsArrayLicenseWarningCap(_, _) = Description if {
+ReportDetailsArrayLicenseWarningCap(_, _) := Description if {
   count(Aad2P2Licenses) == 0
   Description := P2WarningString
 }
 
-ReportDetailsArrayLicenseWarning(Array, String) = Description if {
+ReportDetailsArrayLicenseWarning(Array, String) := Description if {
   count(Aad2P2Licenses) > 0
-  Description :=  ReportFullDetailsArray(Array, String)
+  Description := ReportFullDetailsArray(Array, String)
 }
 
-ReportDetailsArrayLicenseWarning(_, _) = Description if {
+ReportDetailsArrayLicenseWarning(_, _) := Description if {
   count(Aad2P2Licenses) == 0
   Description := P2WarningString
 }
 
-ReportDetailsBooleanLicenseWarning(Status) = Description if {
+ReportDetailsBooleanLicenseWarning(Status) := Description if {
     count(Aad2P2Licenses) > 0
     Status == true
     Description := "Requirement met"
 }
 
-ReportDetailsBooleanLicenseWarning(Status) = Description if {
+ReportDetailsBooleanLicenseWarning(Status) := Description if {
     count(Aad2P2Licenses) > 0
     Status == false
     Description := "Requirement not met"
 }
 
-ReportDetailsBooleanLicenseWarning(_) = Description if {
+ReportDetailsBooleanLicenseWarning(_) := Description if {
     count(Aad2P2Licenses) == 0
     Description := P2WarningString
 }
@@ -92,7 +92,7 @@ ReportDetailsBooleanLicenseWarning(_) = Description if {
 ################
 default UserExclusionsFullyExempt(_, _) := false
 UserExclusionsFullyExempt(Policy, PolicyID) := true if {
-    # Returns true when all user exclusions present in the conditional 
+    # Returns true when all user exclusions present in the conditional
     # access policy are exempted in matching config variable for the
     # baseline policy item.  Undefined if no exclusions AND no exemptions.
     ExemptedUsers := input.scuba_config.Aad[PolicyID].CapExclusions.Users
@@ -109,8 +109,8 @@ UserExclusionsFullyExempt(Policy, PolicyID) := true if {
 
 default GroupExclusionsFullyExempt(_, _) := false
 GroupExclusionsFullyExempt(Policy, PolicyID) := true if {
-    # Returns true when all group exclusions present in the conditional 
-    # access policy are exempted in matching config variable for the 
+    # Returns true when all group exclusions present in the conditional
+    # access policy are exempted in matching config variable for the
     # baseline policy item.  Undefined if no exclusions AND no exemptions.
     ExemptedGroups := input.scuba_config.Aad[PolicyID].CapExclusions.Groups
     ExcludedGroups := { x | x := Policy.Conditions.Users.ExcludeGroups[_] }
@@ -178,7 +178,7 @@ tests[{
 
 default Policy2_2_1ConditionsMatch(_) := false
 Policy2_2_1ConditionsMatch(Policy) := true if {
-    "All" in Policy.Conditions.Users.IncludeUsers   
+    "All" in Policy.Conditions.Users.IncludeUsers
     "All" in Policy.Conditions.Applications.IncludeApplications
     "high" in Policy.Conditions.UserRiskLevels
     "block" in Policy.GrantControls.BuiltInControls
@@ -239,7 +239,7 @@ tests[{
 
 default Policy2_3_1ConditionsMatch(_) := false
 Policy2_3_1ConditionsMatch(Policy) := true if {
-    "All" in Policy.Conditions.Users.IncludeUsers   
+    "All" in Policy.Conditions.Users.IncludeUsers
     "All" in Policy.Conditions.Applications.IncludeApplications
     "high" in Policy.Conditions.SignInRiskLevels
     "block" in Policy.GrantControls.BuiltInControls

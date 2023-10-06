@@ -1,32 +1,32 @@
 package exo
 import future.keywords
 
-Format(Array) = format_int(count(Array), 10)
+Format(Array) := format_int(count(Array), 10)
 
-Description(String1, String2, String3) = trim(concat(" ", [String1, concat(" ", [String2, String3])]), " ")
+Description(String1, String2, String3) := trim(concat(" ", [String1, concat(" ", [String2, String3])]), " ")
 
-ReportDetailsBoolean(Status) = "Requirement met" if {Status == true}
+ReportDetailsBoolean(Status) := "Requirement met" if {Status == true}
 
-ReportDetailsBoolean(Status) = "Requirement not met" if {Status == false}
+ReportDetailsBoolean(Status) := "Requirement not met" if {Status == false}
 
-ReportDetailsArray(Status, Array1, Array2) =  Detail if {
+ReportDetailsArray(Status, Array1, Array2) :=  Detail if {
     Status == true
     Detail := "Requirement met"
 }
 
-ReportDetailsArray(Status, Array1, Array2) = Detail if {
+ReportDetailsArray(Status, Array1, Array2) := Detail if {
 	Status == false
     Fraction := concat(" of ", [Format(Array1), Format(Array2)])
 	String := concat(", ", Array1)
     Detail := Description(Fraction, "agency domain(s) found in violation:", String)
 }
 
-ReportDetailsString(Status, String) =  Detail if {
+ReportDetailsString(Status, String) := Detail if {
     Status == true
     Detail := "Requirement met"
 }
 
-ReportDetailsString(Status, String) =  Detail if {
+ReportDetailsString(Status, String) := Detail if {
     Status == false
     Detail := String
 }

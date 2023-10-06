@@ -1,31 +1,31 @@
 package teams
 import future.keywords
 
-Format(Array) = format_int(count(Array), 10)
+Format(Array) := format_int(count(Array), 10)
 
-Description(String1, String2, String3) = trim(concat(" ", [String1, concat(" ", [String2, String3])]), " ")
+Description(String1, String2, String3) := trim(concat(" ", [String1, concat(" ", [String2, String3])]), " ")
 
-ReportDetailsBoolean(Status) = "Requirement met" if {Status == true}
+ReportDetailsBoolean(Status) := "Requirement met" if {Status == true}
 
-ReportDetailsBoolean(Status) = "Requirement not met" if {Status == false}
+ReportDetailsBoolean(Status) := "Requirement not met" if {Status == false}
 
-ReportDetailsArray(Status, Array, String1) =  Detail if {
+ReportDetailsArray(Status, Array, String1) :=  Detail if {
     Status == true
     Detail := "Requirement met"
 }
 
-ReportDetailsArray(Status, Array, String1) = Detail if {
+ReportDetailsArray(Status, Array, String1) := Detail if {
 	Status == false
 	String2 := concat(", ", Array)
     Detail := Description(Format(Array), String1, String2)
 }
 
-ReportDetailsString(Status, String) =  Detail if {
+ReportDetailsString(Status, String) :=  Detail if {
     Status == true
     Detail := "Requirement met"
 }
 
-ReportDetailsString(Status, String) =  Detail if {
+ReportDetailsString(Status, String) :=  Detail if {
     Status == false
     Detail := String
 }
@@ -97,19 +97,19 @@ tests[{
 #
 # Baseline 2.3: Policy 1
 #--
-ReportDetails2_3(Policy) = Description if {
+ReportDetails2_3(Policy) := Description if {
 	Policy.AutoAdmittedUsers != "Everyone"
 	Policy.AllowPSTNUsersToBypassLobby == false
 	Description := "Requirement met"
 }
 
-ReportDetails2_3(Policy) = Description if {
+ReportDetails2_3(Policy) := Description if {
 	Policy.AutoAdmittedUsers != "Everyone"
 	Policy.AllowPSTNUsersToBypassLobby == true
 	Description := "Requirement not met: Dial-in users are enabled to bypass the lobby"
 }
 
-ReportDetails2_3(Policy) = Description if {
+ReportDetails2_3(Policy) := Description if {
 	Policy.AutoAdmittedUsers == "Everyone"
 	Description := "Requirement not met: All users are admitted automatically"
 }
@@ -340,18 +340,18 @@ ConfigsAllowingEmail[Policy.Identity] {
     Policy.AllowEmailIntoChannel == true
 }
 
-ReportDetails2_7(IsGCC, IsEnabled) = Description if {
+ReportDetails2_7(IsGCC, IsEnabled) := Description if {
 	IsGCC == true
 	Description := "N/A: Feature is unavailable in GCC environments"
 }
 
-ReportDetails2_7(IsGCC, IsEnabled) = Description if {
+ReportDetails2_7(IsGCC, IsEnabled) := Description if {
 	IsGCC == false
 	IsEnabled == true
 	Description := "Requirement met"
 }
 
-ReportDetails2_7(IsGCC, IsEnabled) = Description if {
+ReportDetails2_7(IsGCC, IsEnabled) := Description if {
 	IsGCC == false
 	IsEnabled == false
 	Description := "Requirement not met"
@@ -368,7 +368,7 @@ tests[{
 }] {
 	# According to Get-CsTeamsClientConfiguration, is team email integration enabled?
     IsEnabled := count(ConfigsAllowingEmail) == 0
-	# What is the tenant type according to Get-CsTenant? 
+	# What is the tenant type according to Get-CsTenant?
     TenantConfig := input.teams_tenant_info[_]
 	AssignedPlans := concat(", ", TenantConfig.AssignedPlan)
     GCCConditions := [contains(AssignedPlans, "GCC"), contains(AssignedPlans, "DOD")]

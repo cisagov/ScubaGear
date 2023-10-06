@@ -1,0 +1,81 @@
+# Regal linter configuration
+# All rules documented here:
+# https://docs.styra.com/regal/category/rules
+rules:
+  bugs:
+    constant-condition:
+      # Many rule bodies containing only `true`.
+      # This is redundant, as that's the implied rule
+      # body anyway. It's harmless, but should probably
+      # be fixed anyway so real issues aren't missed.
+      level: ignore
+  custom:
+    naming-convention:
+      # Codifying the conventions used in this project.
+      # By all means, change this to be less restrictive
+      # if you wish.
+      level: error
+      conventions:
+        - pattern: '^[A-Z]+[a-zA-Z0-9_]+$|^tests$|^test_|^check_'
+          targets:
+            - rule
+        - pattern: '^[A-Z]+[a-zA-Z0-9_]+$'
+          targets:
+            - function
+        - pattern: '^[a-z]+$'
+          targets:
+            - package
+  idiomatic:
+    no-defined-entrypoint:
+      # This is a good practice for documentation, and
+      # compilation to Wasm/IR, but not a requirement.
+      # Safe to ignore.
+      level: ignore
+  imports:
+    implicit-future-keywords:
+      # This rule is on it's way out anyway, as future
+      # versions of OPA will make these keywords standard.
+      level: ignore
+  style:
+    external-reference:
+      # This rule is quite opinionated / style preference
+      # safe to ignore.
+      level: ignore
+    file-length:
+      level: ignore
+    line-length:
+      # Most of these seem fixable by concatenating strings
+      # and by using the non-breakable-word-threshold option
+      # for when that doesn't work.
+      level: ignore
+    no-whitespace-comment:
+      # This repo is actually good about this, but frequently
+      # uses '#--' as a delimeter of sorts. That should be OK,
+      # and the next version of Regal will allow for exceptions
+      # like this: https://github.com/StyraInc/regal/issues/379
+      level: ignore
+    opa-fmt:
+      level: ignore
+    prefer-some-in-iteration:
+      level: ignore
+    prefer-snake-case:
+      # This is the default style preference for Rego, but since
+      # the style of this project better matches the domain it is
+      # modeling, we'll ignore this rule in favor of the custom
+      # naming-convention rule defined above.
+      level: ignore
+    rule-length:
+      level: ignore
+    todo-comment:
+      level: ignore
+  testing:
+    identically-named-tests:
+      # Only a few of these — woulde be easy to fix
+      level: ignore
+    print-or-trace-call:
+      ignore:
+        files:
+          - "*_test.rego"
+    test-outside-test-package:
+      # This is just a style preference
+      level: ignore

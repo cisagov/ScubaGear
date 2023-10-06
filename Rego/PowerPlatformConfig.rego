@@ -2,30 +2,30 @@ package powerplatform
 import future.keywords
 
 
-Format(Array) = format_int(count(Array), 10)
+Format(Array) := format_int(count(Array), 10)
 
-Description(String1, String2, String3) = trim(concat(" ", [String1, concat(" ", [String2, String3])]), " ")
+Description(String1, String2, String3) := trim(concat(" ", [String1, concat(" ", [String2, String3])]), " ")
 
-ReportDetailsBoolean(Status) = "Requirement met" if {Status == true}
+ReportDetailsBoolean(Status) := "Requirement met" if {Status == true}
 
-ReportDetailsBoolean(Status) = "Requirement not met" if {Status == false}
+ReportDetailsBoolean(Status) := "Requirement not met" if {Status == false}
 
-ReportDetailsArray(Status, Array, String1) =  Detail if {
+ReportDetailsArray(Status, Array, String1) :=  Detail if {
     Status == true
     Detail := "Requirement met"
 }
 
-ReportDetailsArray(Status, Array, String1) = Detail if {
+ReportDetailsArray(Status, Array, String1) := Detail if {
 	Status == false
     String2 := concat(", ", Array)
     Detail := Description(Format(Array), String1, String2)
 }
-ReportDetailsString(Status, String) =  Detail if {
+ReportDetailsString(Status, String) :=  Detail if {
     Status == true
     Detail := "Requirement met"
 }
 
-ReportDetailsString(Status, String) = Detail if {
+ReportDetailsString(Status, String) := Detail if {
 	Status == false
     Detail := String
 }
@@ -68,7 +68,7 @@ tests[{
 #--
 
 #
-# Baseline 2.1: Policy 2 
+# Baseline 2.1: Policy 2
 #--
 tests[{
     "Requirement" : "The ability to create trial environments SHALL be restricted to admins",

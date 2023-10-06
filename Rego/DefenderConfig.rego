@@ -710,7 +710,7 @@ tests[{
 AntiPhishTargetedUserNotQuarantine[Policy.Identity] {
     Policy := input.anti_phish_policies[_]
     # Ignore the standard preset security policy because we can't change it in the tenant but it's always there.
-    not regex.match("Standard Preset Security Policy[0-9]+", Policy.Identity)
+    not regex.match(`Standard Preset Security Policy[0-9]+`, Policy.Identity)
     not Policy.Identity == "Office365 AntiPhish Default"
     not Policy.TargetedUserProtectionAction == "Quarantine"
 }
@@ -732,7 +732,7 @@ tests[ {
 AntiPhishTargetedDomainNotQuarantine[Policy.Identity] {
     Policy := input.anti_phish_policies[_]
     # Ignore the standard preset security policy because we can't change it in the tenant but it's always there.
-    not regex.match("Standard Preset Security Policy[0-9]+", Policy.Identity)
+    not regex.match(`Standard Preset Security Policy[0-9]+`, Policy.Identity)
     not Policy.Identity == "Office365 AntiPhish Default"
     not Policy.TargetedDomainProtectionAction == "Quarantine"
 }
@@ -754,7 +754,7 @@ tests[ {
 AntiPhishMailIntNotQuarantine[Policy.Identity] {
     Policy := input.anti_phish_policies[_]
     # Ignore the standard preset security policy because we can't change it in the tenant but it's always there.
-    not regex.match("Standard Preset Security Policy[0-9]+", Policy.Identity)
+    not regex.match(`Standard Preset Security Policy[0-9]+`, Policy.Identity)
     not Policy.Identity == "Office365 AntiPhish Default"
     not Policy.MailboxIntelligenceProtectionAction == "Quarantine"
 }
@@ -799,7 +799,7 @@ tests[ {
 CustomAntiPhishSpoofNotQuarantine[Policy.Identity] {
     Policy := input.anti_phish_policies[_]
     # Ignore the standard preset security policy because we can't change it in the tenant but it's always there.
-    not regex.match("Standard Preset Security Policy[0-9]+", Policy.Identity)
+    not regex.match(`Standard Preset Security Policy[0-9]+`, Policy.Identity)
     Policy.Identity != "Office365 AntiPhish Default"
     Policy.AuthenticationFailAction != "Quarantine"
 }
@@ -841,7 +841,7 @@ tests[ {
 CustomAntiPhishNoSafetyTips[Policy.Identity] {
     Policy := input.anti_phish_policies[_]
     # Ignore the standard preset security policy because we can't change it in the tenant but it's always there.
-    not regex.match("Standard Preset Security Policy[0-9]+", Policy.Identity)
+    not regex.match(`Standard Preset Security Policy[0-9]+`, Policy.Identity)
     Policy.Identity != "Office365 AntiPhish Default"
     not Policy.EnableFirstContactSafetyTips
 }
@@ -879,7 +879,7 @@ tests[{
 CustomAntiPhishNoSimilarUserTips[Policy.Identity] {
     Policy := input.anti_phish_policies[_]
     # Ignore the standard preset security policy because we can't change it in the tenant but it's always there.
-    not regex.match("Standard Preset Security Policy[0-9]+", Policy.Identity)
+    not regex.match(`Standard Preset Security Policy[0-9]+`, Policy.Identity)
     Policy.Identity != "Office365 AntiPhish Default"
     not Policy.EnableSimilarUsersSafetyTips
 }
@@ -917,7 +917,7 @@ tests[{
 CustomAntiPhishNoSimilarDomainTips[Policy.Identity] {
     Policy := input.anti_phish_policies[_]
     # Ignore the standard preset security policy because we can't change it in the tenant but it's always there.
-    not regex.match("Standard Preset Security Policy[0-9]+", Policy.Identity)
+    not regex.match(`Standard Preset Security Policy[0-9]+`, Policy.Identity)
     Policy.Identity != "Office365 AntiPhish Default"
     not Policy.EnableSimilarDomainsSafetyTips
 }
@@ -955,7 +955,7 @@ tests[{
 CustomAntiPhishNoUnusualCharTips[Policy.Identity] {
     Policy := input.anti_phish_policies[_]
     # Ignore the standard preset security policy because we can't change it in the tenant but it's always there.
-    not regex.match("Standard Preset Security Policy[0-9]+", Policy.Identity)
+    not regex.match(`Standard Preset Security Policy[0-9]+`, Policy.Identity)
     Policy.Identity != "Office365 AntiPhish Default"
     not Policy.EnableUnusualCharactersSafetyTips
 }
@@ -993,7 +993,7 @@ tests[{
 CustomAntiPhishNoViaTagTips[Policy.Identity] {
     Policy := input.anti_phish_policies[_]
     # Ignore the standard preset security policy because we can't change it in the tenant but it's always there.
-    not regex.match("Standard Preset Security Policy[0-9]+", Policy.Identity)
+    not regex.match(`Standard Preset Security Policy[0-9]+`, Policy.Identity)
     Policy.Identity != "Office365 AntiPhish Default"
     not Policy.EnableViaTag
 }
@@ -1031,7 +1031,7 @@ tests[{
 CustomAntiPhishNoUnauthSenderTips[Policy.Identity] {
     Policy := input.anti_phish_policies[_]
     # Ignore the standard preset security policy because we can't  change it in the tenant but it's always there.
-    not regex.match("Standard Preset Security Policy[0-9]+", Policy.Identity)
+    not regex.match(`Standard Preset Security Policy[0-9]+`, Policy.Identity)
     Policy.Identity != "Office365 AntiPhish Default"
     not Policy.EnableUnauthenticatedSender
 }
