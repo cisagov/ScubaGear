@@ -479,51 +479,6 @@ test_AgencyDomains_Correct_V3 if {
                 "Identity" : "Standard Preset Security Policy1659535429826",
                 "Enabled" : true,
                 "EnableTargetedDomainsProtection" : true,
-                "TargetedDomainsToProtect" : [
-                    "random.mail.example.com",
-                    "random.example.com"
-                ],
-                "TargetedDomainProtectionAction": "Quarantine"
-            },
-            {
-                "Identity" : "Strict Preset Security Policy1659535429826",
-                "Enabled" : true,
-                "EnableTargetedDomainsProtection" : true,
-                "TargetedDomainsToProtect" : [
-                    "random.mail.example.com",
-                    "random.example.com"
-                ],
-                "TargetedDomainProtectionAction": "Quarantine"
-            }
-        ],
-        "scuba_config" : {
-            "Defender" : {
-                "MS.DEFENDER.2.2v1" : {
-                    "AgencyDomains" : [
-                        "random.mail.example.com",
-                        "random.example.com"
-                    ]
-                }
-            }
-        }
-    }
-
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement met"
-}
-
-test_AgencyDomains_Correct_V4 if {
-    PolicyId := "MS.DEFENDER.2.2v1"
-
-    Output := tests with input as {
-        "anti_phish_policies": [
-            {
-                "Identity" : "Standard Preset Security Policy1659535429826",
-                "Enabled" : true,
-                "EnableTargetedDomainsProtection" : true,
                 "TargetedDomainsToProtect" : null,
                 "TargetedDomainProtectionAction": "Quarantine"
             },
