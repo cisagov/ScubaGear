@@ -296,10 +296,18 @@ ImpersonationProtectionErrorMsg(StrictImpersonationProtection, StandardImpersona
     StandardImpersonationProtection.Result == false
 }
 
-ImpersonationProtectionErrorMsg(StrictImpersonationProtection, StandardImpersonationProtection, _) := Description if {
+ImpersonationProtectionErrorMsg(StrictImpersonationProtection, StandardImpersonationProtection, AccountType) := Description if {
+    Description := "No agency domains defined for impersonation protection assessment. See configuration file documentation for details on how to define."
+    StrictImpersonationProtection.Result == true
+    StandardImpersonationProtection.Result == true
+    AccountType == "agency domains"
+}
+
+ImpersonationProtectionErrorMsg(StrictImpersonationProtection, StandardImpersonationProtection, AccountType) := Description if {
     Description := ""
     StrictImpersonationProtection.Result == true
     StandardImpersonationProtection.Result == true
+    AccountType != "agency domains"
 }
 
 tests[{
@@ -350,7 +358,8 @@ tests[{
     ErrorMessage := ImpersonationProtectionErrorMsg(StrictImpersonationProtection, StandardImpersonationProtection, "agency domains")
     Conditions := [
         StrictImpersonationProtection.Result == true,
-        StandardImpersonationProtection.Result == true
+        StandardImpersonationProtection.Result == true,
+        count(ProtectedConfig) > 0
     ]
     Status := count([x | x := Conditions[_]; x == false]) == 0
 }

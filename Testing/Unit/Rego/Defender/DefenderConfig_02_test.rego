@@ -470,41 +470,6 @@ test_AgencyDomains_Correct_V2 if {
     RuleOutput[0].ReportDetails == "Requirement met"
 }
 
-test_AgencyDomains_Correct_V3 if {
-    PolicyId := "MS.DEFENDER.2.2v1"
-
-    Output := tests with input as {
-        "anti_phish_policies": [
-            {
-                "Identity" : "Standard Preset Security Policy1659535429826",
-                "Enabled" : true,
-                "EnableTargetedDomainsProtection" : true,
-                "TargetedDomainsToProtect" : null,
-                "TargetedDomainProtectionAction": "Quarantine"
-            },
-            {
-                "Identity" : "Strict Preset Security Policy1659535429826",
-                "Enabled" : true,
-                "EnableTargetedDomainsProtection" : true,
-                "TargetedDomainsToProtect" : null,
-                "TargetedDomainProtectionAction": "Quarantine"
-            }
-        ],
-        "scuba_config" : {
-            "Defender" : {
-                "MS.DEFENDER.2.2v1" : {
-                }
-            }
-        }
-    }
-
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement met"
-}
-
 test_AgencyDomains_Incorrect_V1 if {
     PolicyId := "MS.DEFENDER.2.2v1"
 
@@ -785,6 +750,40 @@ test_AgencyDomains_Incorrect_V7 if {
     RuleOutput[0].ReportDetails == "Not all agency domains are included for targeted protection in Strict or Standard policy."
 }
 
+test_AgencyDomains_Incorrect_V8 if {
+    PolicyId := "MS.DEFENDER.2.2v1"
+
+    Output := tests with input as {
+        "anti_phish_policies": [
+            {
+                "Identity" : "Standard Preset Security Policy1659535429826",
+                "Enabled" : true,
+                "EnableTargetedDomainsProtection" : true,
+                "TargetedDomainsToProtect" : null,
+                "TargetedDomainProtectionAction": "Quarantine"
+            },
+            {
+                "Identity" : "Strict Preset Security Policy1659535429826",
+                "Enabled" : true,
+                "EnableTargetedDomainsProtection" : true,
+                "TargetedDomainsToProtect" : null,
+                "TargetedDomainProtectionAction": "Quarantine"
+            }
+        ],
+        "scuba_config" : {
+            "Defender" : {
+                "MS.DEFENDER.2.2v1" : {
+                }
+            }
+        }
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "No agency domains defined for impersonation protection assessment. See configuration file documentation for details on how to define."
+}
 
 #
 # Policy 3
