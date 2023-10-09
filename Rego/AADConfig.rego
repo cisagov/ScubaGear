@@ -939,7 +939,7 @@ tests[{
 }] {
     DescriptionString := "role(s) without notification e-mail configured for role activations found"
     NonGlobalAdminsWithoutActivationAlert = AdminsWithoutActivationAlert - {"Global Administrator"}
-    Conditions := [count(Aad2P2Licenses) > 0, count(NonGlobalAdminsWithoutActivationAlert) == 0, check_if_role_rules_exist]
+    Conditions := [count(Aad2P2Licenses) > 0, count(NonGlobalAdminsWithoutActivationAlert) == 0]
     Status := count([Condition | Condition = Conditions[_]; Condition == false]) == 0
 }
 #--
