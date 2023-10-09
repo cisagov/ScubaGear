@@ -1,5 +1,5 @@
 ProductName: sharepoint
-Description: This test plan is for use with a Service Principle.  It will use PnP module as primary provided setting export tool.
+Description: This test plan is for use with a Service Principal.  It will use PnP module as primary provided setting export tool.
 TestPlan:
   - PolicyId: MS.SHAREPOINT.1.1v1
     TestDriver: RunScuba
