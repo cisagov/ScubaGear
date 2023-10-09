@@ -832,7 +832,7 @@ tests[{
     "RequirementMet" : Status
 }] {
     DescriptionString := "role(s) assigned to users outside of PIM"
-    Conditions := [count(Aad2P2Licenses) > 0, count(RolesAssignedOutsidePim) == 0, check_if_role_rules_exist]
+    Conditions := [count(Aad2P2Licenses) > 0, count(RolesAssignedOutsidePim) == 0]
     Status := count([Condition | Condition = Conditions[_]; Condition == false]) == 0
 }
 #--
