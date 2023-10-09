@@ -3,45 +3,33 @@ TestPlan:
   - PolicyId: MS.TEAMS.1.1v1
     TestDriver: RunScuba
     Tests:
-      - TestDescription: Allows External Participant Give Request Control
+      - TestDescription: MS.TEAMS.1.1v1 Non-compliant - Allows External Participant Give Request Control
         Preconditions:
-          - Command: Set-CsTeamsMeetingPolicy
-            Splat:
-              Identity: Test Draft Teams Minimum Viable Secure Configuration Baseline
-              AllowExternalParticipantGiveRequestControl: true
+          - Command: 'Get-CsTeamsMeetingPolicy | % {Set-CsTeamsMeetingPolicy -Identity $($_.Identity) -AllowExternalParticipantGiveRequestControl $true}'
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: Does not Allows  External Participant Give Request Control
+      - TestDescription: MS.TEAMS.1.1v1 Compliant - Does not Allows  External Participant Give Request Control
         Preconditions:
-          - Command: Set-CsTeamsMeetingPolicy
-            Splat:
-              Identity: Test Draft Teams Minimum Viable Secure Configuration Baseline
-              AllowExternalParticipantGiveRequestControl: false
+          - Command: 'Get-CsTeamsMeetingPolicy | % {Set-CsTeamsMeetingPolicy -Identity $($_.Identity) -AllowExternalParticipantGiveRequestControl $false}'
         Postconditions: []
         ExpectedResult: true
-  - PolicyId: MS.TEAMS.2.1v1
+  - PolicyId: MS.TEAMS.1.2v1
     TestDriver: RunScuba
     Tests:
-      - TestDescription: Allows External Participant Give Request Control
+      - TestDescription: MS.TEAMS.1.2v1 Non-compliant - Allows External Participant Give Request Control
         Preconditions:
-          - Command: Set-CsTeamsMeetingPolicy
-            Splat:
-              AllowAnonymousUsersToStartMeeting: true
-              Identity: Test Draft Teams Minimum Viable Secure Configuration Baseline
+          - Command: 'Get-CsTeamsMeetingPolicy | % {Set-CsTeamsMeetingPolicy -Identity $($_.Identity) -AllowAnonymousUsersToStartMeeting $true}'
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: Does not Allows  External Participant Give Request Control
+      - TestDescription: MS.TEAMS.1.2v1 Compliant - Does not Allows  External Participant Give Request Control
         Preconditions:
-          - Command: Set-CsTeamsMeetingPolicy
-            Splat:
-              AllowAnonymousUsersToStartMeeting: false
-              Identity: Test Draft Teams Minimum Viable Secure Configuration Baseline
+          - Command: 'Get-CsTeamsMeetingPolicy | % {Set-CsTeamsMeetingPolicy -Identity $($_.Identity) -AllowAnonymousUsersToStartMeeting $false}'
         Postconditions: []
         ExpectedResult: true
-  - PolicyId: MS.TEAMS.3.1v1
+  - PolicyId: MS.TEAMS.1.3v1
     TestDriver: RunScuba
     Tests:
-      - TestDescription: Dialin bypass lobby; Everyone is autoadmitted user
+      - TestDescription: MS.TEAMS.1.3v1 Non-compliant - Dialin bypass lobby; Everyone is autoadmitted user
         Preconditions:
           - Command: Set-CsTeamsMeetingPolicy
             Splat:
@@ -49,11 +37,11 @@ TestPlan:
               AllowPSTNUsersToBypassLobby: true
           - Command: Set-CsTeamsMeetingPolicy
             Splat:
-              AutoAdmittedUsers: EveryOne
               Identity: Global
+              AutoAdmittedUsers: EveryOne
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: Dialin bypass lobby; Everyone not auto admitted user
+      - TestDescription: MS.TEAMS.1.3v1 Non-complaint - Dialin bypass lobby; Everyone not auto admitted user
         Preconditions:
           - Command: Set-CsTeamsMeetingPolicy
             Splat:
@@ -62,10 +50,10 @@ TestPlan:
           - Command: Set-CsTeamsMeetingPolicy
             Splat:
               AutoAdmittedUsers: EveryoneInCompany
-            Identity: Global
+              Identity: Global
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: Dialin not bypass lobbyEveryone not auto admitted user
+      - TestDescription: MS.TEAMS.1.3v1 Compliant - Dialin not bypass lobbyEveryone not auto admitted user
         Preconditions:
           - Command: Set-CsTeamsMeetingPolicy
             Splat:
@@ -77,315 +65,367 @@ TestPlan:
               Identity: Global
         Postconditions: []
         ExpectedResult: true
+  - PolicyId: MS.TEAMS.1.4v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.TEAMS.1.4v1 Non-compliant - AutoAdmittedUsers = InvitedUsers
+        Preconditions:
+          - Command: Set-CsTeamsMeetingPolicy
+            Splat:
+              Identity: Global
+              AutoAdmittedUsers: InvitedUsers
+        Postconditions: []
+        ExpectedResult: false   
+      - TestDescription: MS.TEAMS.1.4v1 Non-compliant - AutoAdmittedUsers = Everyone
+        Preconditions:
+          - Command: Set-CsTeamsMeetingPolicy
+            Splat:
+              Identity: Global
+              AutoAdmittedUsers: Everyone
+        Postconditions: []
+        ExpectedResult: false        
+      - TestDescription: MS.TEAMS.1.4v1 Non-compliant - AutoAdmittedUsers = OrganizerOnly
+        Preconditions:
+          - Command: Set-CsTeamsMeetingPolicy
+            Splat:
+              Identity: Global
+              AutoAdmittedUsers: OrganizerOnly
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.TEAMS.1.4v1 Compliant - AutoAdmittedUsers = EveryoneInCompany
+        Preconditions:
+          - Command: Set-CsTeamsMeetingPolicy
+            Splat:
+              Identity: Global
+              AutoAdmittedUsers: EveryoneInCompany
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.TEAMS.1.4v1 Compliant - AutoAdmittedUsers = EveryoneInSameAndFederatedCompany
+        Preconditions:
+          - Command: Set-CsTeamsMeetingPolicy
+            Splat:
+              Identity: Global
+              AutoAdmittedUsers: EveryoneInSameAndFederatedCompany
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.TEAMS.1.4v1 Compliant - AutoAdmittedUsers = EveryoneInCompanyExcludingGuests
+        Preconditions:
+          - Command: Set-CsTeamsMeetingPolicy
+            Splat:
+              Identity: Global
+              AutoAdmittedUsers: EveryoneInCompanyExcludingGuests
+        Postconditions: []
+        ExpectedResult: true
+  - PolicyId: MS.TEAMS.1.5v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.TEAMS.1.5v1 Non-compliant - AutoAdmittedUsers = InvitedUsers
+        Preconditions:
+          - Command: 'Get-CsTeamsMeetingPolicy | % {Set-CsTeamsMeetingPolicy -Identity $($_.Identity) -AutoAdmittedUsers InvitedUsers }'
+          - Command: 'Get-CsTeamsMeetingPolicy | % {Set-CsTeamsMeetingPolicy -Identity $($_.Identity) -AllowPSTNUsersToBypassLobby $true }'
+        Postconditions: []
+        ExpectedResult: false   
+      - TestDescription: MS.TEAMS.1.5v1 Non-compliant - AutoAdmittedUsers = Everyone
+        Preconditions:
+          - Command: 'Get-CsTeamsMeetingPolicy | % {Set-CsTeamsMeetingPolicy -Identity $($_.Identity) -AutoAdmittedUsers Everyone }'
+          - Command: 'Get-CsTeamsMeetingPolicy | % {Set-CsTeamsMeetingPolicy -Identity $($_.Identity) -AllowPSTNUsersToBypassLobby $true }'
+        Postconditions: []
+        ExpectedResult: false        
+      - TestDescription: MS.TEAMS.1.5v1 Non-compliant - AutoAdmittedUsers = OrganizerOnly
+        Preconditions:
+          - Command: 'Get-CsTeamsMeetingPolicy | % {Set-CsTeamsMeetingPolicy -Identity $($_.Identity) -AutoAdmittedUsers OrganizerOnly }'
+          - Command: 'Get-CsTeamsMeetingPolicy | % {Set-CsTeamsMeetingPolicy -Identity $($_.Identity) -AllowPSTNUsersToBypassLobby $true }'
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.TEAMS.1.5v1 Non-compliant - AutoAdmittedUsers = EveryoneInCompany
+        Preconditions:
+          - Command: 'Get-CsTeamsMeetingPolicy | % {Set-CsTeamsMeetingPolicy -Identity $($_.Identity) -AutoAdmittedUsers EveryoneInCompany }'
+          - Command: 'Get-CsTeamsMeetingPolicy | % {Set-CsTeamsMeetingPolicy -Identity $($_.Identity) -AllowPSTNUsersToBypassLobby $true }'
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.TEAMS.1.5v1 Non-compliant - AutoAdmittedUsers = EveryoneInSameAndFederatedCompany
+        Preconditions:
+          - Command: 'Get-CsTeamsMeetingPolicy | % {Set-CsTeamsMeetingPolicy -Identity $($_.Identity) -AutoAdmittedUsers EveryoneInSameAndFederatedCompany }'
+          - Command: 'Get-CsTeamsMeetingPolicy | % {Set-CsTeamsMeetingPolicy -Identity $($_.Identity) -AllowPSTNUsersToBypassLobby $true }'
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.TEAMS.1.5v1 Non-compliant - AutoAdmittedUsers = EveryoneInCompanyExcludingGuests
+        Preconditions:
+          - Command: 'Get-CsTeamsMeetingPolicy | % {Set-CsTeamsMeetingPolicy -Identity $($_.Identity) -AutoAdmittedUsers EveryoneInCompanyExcludingGuests }'
+          - Command: 'Get-CsTeamsMeetingPolicy | % {Set-CsTeamsMeetingPolicy -Identity $($_.Identity) -AllowPSTNUsersToBypassLobby $true }'
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.TEAMS.1.5v1 Non-compliant - AutoAdmittedUsers = Everyone
+        Preconditions:
+          - Command: 'Get-CsTeamsMeetingPolicy | % {Set-CsTeamsMeetingPolicy -Identity $($_.Identity) -AutoAdmittedUsers Everyone }'
+          - Command: 'Get-CsTeamsMeetingPolicy | % {Set-CsTeamsMeetingPolicy -Identity $($_.Identity) -AllowPSTNUsersToBypassLobby $false }'
+        Postconditions: []
+        ExpectedResult: false  
+      - TestDescription: MS.TEAMS.1.5v1 Compliant - AutoAdmittedUsers = InvitedUsers
+        Preconditions:
+          - Command: 'Get-CsTeamsMeetingPolicy | % {Set-CsTeamsMeetingPolicy -Identity $($_.Identity) -AutoAdmittedUsers InvitedUsers }'
+          - Command: 'Get-CsTeamsMeetingPolicy | % {Set-CsTeamsMeetingPolicy -Identity $($_.Identity) -AllowPSTNUsersToBypassLobby $false }'
+        Postconditions: []
+        ExpectedResult: false         
+      - TestDescription: MS.TEAMS.1.5v1 Compliant - AutoAdmittedUsers = OrganizerOnly
+        Preconditions:
+          - Command: 'Get-CsTeamsMeetingPolicy | % {Set-CsTeamsMeetingPolicy -Identity $($_.Identity) -AutoAdmittedUsers OrganizerOnly }'
+          - Command: 'Get-CsTeamsMeetingPolicy | % {Set-CsTeamsMeetingPolicy -Identity $($_.Identity) -AllowPSTNUsersToBypassLobby $false }'
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.TEAMS.1.5v1 Compliant - AutoAdmittedUsers = EveryoneInCompany
+        Preconditions:
+          - Command: 'Get-CsTeamsMeetingPolicy | % {Set-CsTeamsMeetingPolicy -Identity $($_.Identity) -AutoAdmittedUsers EveryoneInCompany }'
+          - Command: 'Get-CsTeamsMeetingPolicy | % {Set-CsTeamsMeetingPolicy -Identity $($_.Identity) -AllowPSTNUsersToBypassLobby $false }'
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.TEAMS.1.5v1 Compliant - AutoAdmittedUsers = EveryoneInSameAndFederatedCompany
+        Preconditions:
+          - Command: 'Get-CsTeamsMeetingPolicy | % {Set-CsTeamsMeetingPolicy -Identity $($_.Identity) -AutoAdmittedUsers EveryoneInSameAndFederatedCompany }'
+          - Command: 'Get-CsTeamsMeetingPolicy | % {Set-CsTeamsMeetingPolicy -Identity $($_.Identity) -AllowPSTNUsersToBypassLobby $false }'
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.TEAMS.1.5v1 Compliant - AutoAdmittedUsers = EveryoneInCompanyExcludingGuests
+        Preconditions:
+          - Command: 'Get-CsTeamsMeetingPolicy | % {Set-CsTeamsMeetingPolicy -Identity $($_.Identity) -AutoAdmittedUsers EveryoneInCompanyExcludingGuests }'
+          - Command: 'Get-CsTeamsMeetingPolicy | % {Set-CsTeamsMeetingPolicy -Identity $($_.Identity) -AllowPSTNUsersToBypassLobby $false }'
+        Postconditions: []
+        ExpectedResult: false       
+  - PolicyId: MS.TEAMS.1.6v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.TEAMS.1.6v1 Non-compliant - AllowCloudRecording = true
+        Preconditions:
+          - Command: Set-CsTeamsMeetingPolicy
+            Splat:
+              Identity: Global
+              AllowCloudRecording: true
+        Postconditions: []
+        ExpectedResult: false  
+      - TestDescription: MS.TEAMS.1.6v1 Compliant - AllowCloudRecording = false
+        Preconditions:
+          - Command: Set-CsTeamsMeetingPolicy
+            Splat:
+              Identity: Global
+              AllowCloudRecording: false  
+        Postconditions: []
+        ExpectedResult: true
+  - PolicyId: MS.TEAMS.1.7v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.TEAMS.1.7v1 Non-compliant - BroadcastRecordingMode = AlwaysEnabled
+        Preconditions:
+          - Command: Set-CsTeamsMeetingBroadcastPolicy
+            Splat:
+              Identity: Global
+              BroadcastRecordingMode: AlwaysEnabled
+        Postconditions: []
+        ExpectedResult: false  
+      - TestDescription: MS.TEAMS.1.7v1 Non-compliant - BroadcastRecordingMode = AlwaysDisabled
+        Preconditions:
+          - Command: Set-CsTeamsMeetingBroadcastPolicy
+            Splat:
+              Identity: Global
+              BroadcastRecordingMode: AlwaysDisabled
+        Postconditions: []
+        ExpectedResult: false  
+      - TestDescription: MS.TEAMS.1.7v1 Compliant - BroadcastRecordingMode = UserOverride
+        Preconditions:
+          - Command: Set-CsTeamsMeetingBroadcastPolicy
+            Splat:
+              Identity: Global
+              BroadcastRecordingMode: UserOverride  
+        Postconditions: []
+        ExpectedResult: true     
+  - PolicyId: MS.TEAMS.2.1v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.TEAMS.2.1v1 Non-compliant - Allow all known domains
+        Preconditions:
+          - Command: Set-CsTenantFederationConfiguration
+            Splat:
+              AllowFederatedUsers: true        
+          - Command: 'Set-CsTenantFederationConfiguration -AllowedDomains (New-CsEdgeAllowAllKnownDomains)'
+            Splat:
+              AllowFederatedUsers: true
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.TEAMS.2.1v1 Compliant - Allow specific domain 
+        Preconditions:
+          - Command: Set-CsTenantFederationConfiguration
+            Splat:
+              AllowFederatedUsers: true 
+          - Command: 'Set-CsTenantFederationConfiguration -AllowedDomains (New-CsEdgeAllowList -AllowedDomain (New-CsEdgeDomainPattern -Domain "domains.r.us"))'
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.TEAMS.2.1v1 Compliant - Do not allow federated users
+        Preconditions:
+          - Command: Set-CsTenantFederationConfiguration
+            Splat:
+              AllowFederatedUsers: false
+        Postconditions: []
+        ExpectedResult: true
+  - PolicyId: MS.TEAMS.2.2v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.TEAMS.2.2v1 Non-compliant - AllowTeamsConsumerInbound; AllowTeamsConsumer
+        Preconditions:
+          - Command: Set-CsTenantFederationConfiguration
+            Splat:
+              AllowTeamsConsumer: true
+              AllowTeamsConsumerInbound: true      
+        Postconditions: []
+        ExpectedResult: false 
+      - TestDescription: MS.TEAMS.2.2v1 Compliant - DoNotAllowTeamsConsumerInbound; AllowTeamsConsumer
+        Preconditions:
+          - Command: Set-CsTenantFederationConfiguration
+            Splat:
+              AllowTeamsConsumer: true
+              AllowTeamsConsumerInbound: false      
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.TEAMS.2.2v1 Compliant - AllowTeamsConsumerInbound; DoNotAllowTeamsConsumer
+        Preconditions:
+          - Command: Set-CsTenantFederationConfiguration
+            Splat:
+              AllowTeamsConsumer: false
+              AllowTeamsConsumerInbound: true      
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.TEAMS.2.2v1 Compliant - DoNotAllowTeamsConsumerInbound; DoNotAllowTeamsConsumer
+        Preconditions:
+          - Command: Set-CsTenantFederationConfiguration
+            Splat:
+              AllowTeamsConsumer: false
+              AllowTeamsConsumerInbound: false      
+        Postconditions: []
+        ExpectedResult: true
+  - PolicyId: MS.TEAMS.2.3v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.TEAMS.2.3v1 Non-compliant - AllowTeamsConsumer
+        Preconditions:
+          - Command: Set-CsTenantFederationConfiguration
+            Splat:
+              AllowTeamsConsumer: true 
+        Postconditions: []
+        ExpectedResult: false 
+      - TestDescription: MS.TEAMS.2.3v1 Compliant - DoNotAllowTeamsConsumer
+        Preconditions:
+          - Command: Set-CsTenantFederationConfiguration
+            Splat:
+              AllowTeamsConsumer: false    
+        Postconditions: []
+        ExpectedResult: true                
+  - PolicyId: MS.TEAMS.3.1v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.TEAMS.3.1v1 Non-compliant - AllowPublicUsers
+        Postconditions: []
+        ExpectedResult: false
+        Preconditions:
+          - Command: Set-CsTenantFederationConfiguration
+            Splat:
+              AllowPublicUsers: true      
+      - TestDescription: MS.TEAMS.3.1v1 Compliant - Not AllowPublicUsers
+        Preconditions:
+          - Command: Set-CsTenantFederationConfiguration
+            Splat:
+              AllowPublicUsers: false
+        Postconditions: []
+        ExpectedResult: true
   - PolicyId: MS.TEAMS.4.1v1
     TestDriver: RunScuba
     Tests:
-    - Postconditions: []
-      ExpectedResult: true
-      Preconditions:
-      - Command: Set-CsTenantFederationConfiguration
-        Splat:
-          AllowFederatedUsers: false
-      TestDescription: Do not allow federated users
+      - TestDescription: MS.TEAMS.4.1v1 Non-compliant - AllowEmailIntoChannel
+        Preconditions:
+          - Command: Set-CsTeamsClientConfiguration
+            Splat:
+              AllowEmailIntoChannel: true
+        Postconditions: []
+        ExpectedResult: false        
+      - TestDescription: MS.TEAMS.4.1v1 Compliant - Not AllowEmailIntoChannel
+        Preconditions:
+          - Command: Set-CsTeamsClientConfiguration
+            Splat:
+              AllowEmailIntoChannel: false
+        Postconditions: []
+        ExpectedResult: true        
   - PolicyId: MS.TEAMS.5.1v1
     TestDriver: RunScuba
     Tests:
-    - Postconditions: []
-      ExpectedResult: false
-      Preconditions:
-      - Command: Set-CsTenantFederationConfiguration
-        Splat:
-          AllowTeamsConsumer: true
-          AllowTeamsConsumerInbound: true
-      TestDescription: AllowTeamsConsumerInbound; AllowTeamsConsumer
-    - Postconditions: []
-      ExpectedResult: true
-      Preconditions:
-      - Command: Set-CsTenantFederationConfiguration
-        Splat:
-          AllowTeamsConsumer: false
-          AllowTeamsConsumerInbound: true
-      TestDescription: AllowTeamsConsumerInbound; Not AllowTeamsConsumer
-    - Postconditions: []
-      ExpectedResult: true
-      Preconditions:
-      - Command: Set-CsTenantFederationConfiguration
-        Splat:
-          AllowTeamsConsumer: true
-          AllowTeamsConsumerInbound: false
-      TestDescription: Not AllowTeamsConsumerInbound; AllowTeamsConsumer
-    - Postconditions: []
-      ExpectedResult: true
-      Preconditions:
-      - Command: Set-CsTenantFederationConfiguration
-        Splat:
-          AllowTeamsConsumer: false
-          AllowTeamsConsumerInbound: false
-      TestDescription: Not AllowTeamsConsumerInbound; Not AllowTeamsConsumer
+      - TestDescription: MS.TEAMS.5.1v1 Non-compliant - BlockedAppList
+        Preconditions:
+          - Command: 'Get-CsTeamsAppPermissionPolicy | % {Set-CsTeamsAppPermissionPolicy -Identity ($_.Identity) -DefaultCatalogAppsType AllowedAppList -DefaultCatalogApps @()}'
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.TEAMS.5.1v1 Compliant - AllowedAppList
+        Preconditions:
+          - Command: 'Get-CsTeamsAppPermissionPolicy | % {Set-CsTeamsAppPermissionPolicy -Identity ($_.Identity) -DefaultCatalogAppsType BlockedAppList -DefaultCatalogApps @()}'
+        Postconditions: []
+        ExpectedResult: true
   - PolicyId: MS.TEAMS.5.2v1
     TestDriver: RunScuba
     Tests:
-    - Postconditions: []
-      ExpectedResult: false
-      Preconditions:
-      - Command: Set-CsTenantFederationConfiguration
-        Splat:
-          AllowTeamsConsumer: true
-      TestDescription: AllowTeamsConsumerInbound; AllowTeamsConsumer
-    - Postconditions: []
-      ExpectedResult: true
-      Preconditions:
-      - Command: Set-CsTenantFederationConfiguration
-        Splat:
-          AllowTeamsConsumer: false
-      TestDescription: AllowTeamsConsumerInbound; Not AllowTeamsConsumer
+      - TestDescription: MS.TEAMS.5.2v1 Non-compliant - BlockedAppList
+        Preconditions:
+          - Command: 'Get-CsTeamsAppPermissionPolicy | % {Set-CsTeamsAppPermissionPolicy -Identity ($_.Identity) -GlobalCatalogAppsType AllowedAppList -GlobalCatalogApps @()}'
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.TEAMS.5.2v1 Compliant - AllowedAppList
+        Preconditions:
+          - Command: 'Get-CsTeamsAppPermissionPolicy | % {Set-CsTeamsAppPermissionPolicy -Identity ($_.Identity) -GlobalCatalogAppsType BlockedAppList -GlobalCatalogApps @()}'
+        Postconditions: []
+        ExpectedResult: true
+  - PolicyId: MS.TEAMS.5.3v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.TEAMS.5.3v1 Non-compliant - BlockedAppList
+        Preconditions:
+          - Command: 'Get-CsTeamsAppPermissionPolicy | % {Set-CsTeamsAppPermissionPolicy -Identity ($_.Identity) -PrivateCatalogAppsType AllowedAppList -PrivateCatalogApps @()}'
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.TEAMS.5.3v1 Compliant - AllowedAppList
+        Preconditions:
+          - Command: 'Get-CsTeamsAppPermissionPolicy | % {Set-CsTeamsAppPermissionPolicy -Identity ($_.Identity) -PrivateCatalogAppsType BlockedAppList -PrivateCatalogApps @()}'
+        Postconditions: []
+        ExpectedResult: true
   - PolicyId: MS.TEAMS.6.1v1
     TestDriver: RunScuba
     Tests:
-    - Postconditions: []
+    - TestDescription: MS.TEAMS.6.1v1 Compliant - Custom Implementation
+      Preconditions: []
+      Postconditions: []
+      IsCustomImplementation: true
       ExpectedResult: false
-      Preconditions:
-      - Command: Set-CsTenantFederationConfiguration
-        Splat:
-          AllowPublicUsers: true
-      TestDescription: AllowPublicUsers
-    - Postconditions: []
-      ExpectedResult: true
-      Preconditions:
-      - Command: Set-CsTenantFederationConfiguration
-        Splat:
-          AllowPublicUsers: false
-      TestDescription: Not AllowPublicUsers
+    - TestDescription: MS.TEAMS.6.2v1 Compliant - Custom Implementation
+      Preconditions: []
+      Postconditions: []
+      IsCustomImplementation: true
+      ExpectedResult: false
   - PolicyId: MS.TEAMS.7.1v1
     TestDriver: RunScuba
     Tests:
-    - Postconditions: []
-      ExpectedResult: false
-      Preconditions:
-      - Command: Set-CsTeamsClientConfiguration
-        Splat:
-          AllowEmailIntoChannel: true
-      TestDescription: AllowEmailIntoChannel
-    - Postconditions: []
-      ExpectedResult: true
-      Preconditions:
-      - Command: Set-CsTeamsClientConfiguration
-        Splat:
-          AllowEmailIntoChannel: false
-      TestDescription: Not AllowEmailIntoChannel
-  - PolicyId: MS.TEAMS.8.1v1
-    TestDriver: RunScuba
-    Tests:
-    - Postconditions: []
-      ExpectedResult: true
-      Preconditions:
-      - Command: Set-CsTeamsAppPermissionPolicy
-        Splat:
-          DefaultCatalogAppsType: BlockedAppList
-          Identity: Global
-      TestDescription: BlockedAppList
-    - Postconditions: []
-      ExpectedResult: false
-      Preconditions:
-      - Command: Set-CsTeamsAppPermissionPolicy
-        Splat:
-          DefaultCatalogAppsType: AllowedAppList
-          Identity: Global
-      TestDescription: AllowedAppList
-  - PolicyId: MS.TEAMS.8.2v1
-    TestDriver: RunScuba
-    Tests:
-    - Postconditions: []
-      ExpectedResult: false
-      Preconditions:
-      - Command: Set-CsTeamsAppPermissionPolicy
-        Splat:
-          Identity: Global
-          GlobalCatalogAppsType: BlockedAppList
-          PrivateCatalogAppsType: BlockedAppList
-      TestDescription: GlobalCatalogAppsType:Block; PrivateCatalogAppsType:Block
-    - Postconditions: []
-      ExpectedResult: false
-      Preconditions:
-      - Command: Set-CsTeamsAppPermissionPolicy
-        Splat:
-          Identity: Global
-          GlobalCatalogAppsType: AllowedAppList
-          PrivateCatalogAppsType: BlockedAppList
-      TestDescription: GlobalCatalogAppsType:Allow; PrivateCatalogAppsType:Block
-    - Postconditions: []
-      ExpectedResult: false
-      Preconditions:
-      - Command: Set-CsTeamsAppPermissionPolicy
-        Splat:
-          Identity: Global
-          GlobalCatalogAppsType: BlockedAppList
-          PrivateCatalogAppsType: AllowedAppList
-      TestDescription: GlobalCatalogAppsType:Block; PrivateCatalogAppsType:Allow
-    - Postconditions: []
-      ExpectedResult: true
-      Preconditions:
-      - Command: Set-CsTeamsAppPermissionPolicy
-        Splat:
-          Identity: Global
-          GlobalCatalogAppsType: AllowedAppList
-          PrivateCatalogAppsType: AllowedAppList
-      TestDescription: GlobalCatalogAppsType:Allow; PrivateCatalogAppsType:Allow
-  - PolicyId: MS.TEAMS.8.3v1
-    TestDriver: RunScuba
-    Tests:
-    - TestDescription: Not Checked
+    - TestDescription: MS.TEAMS.7.1v1 Compliant - Custom Implementation
       Preconditions: []
       Postconditions: []
-      IsNotChecked: true
+      IsCustomImplementation: true
       ExpectedResult: false
-  - PolicyId: MS.TEAMS.9.1v1
-    TestDriver: RunScuba
-    Tests:
-    - Postconditions: []
-      ExpectedResult: false
-      Preconditions:
-      - Command: Set-CsTeamsMeetingPolicy
-        Splat:
-          AllowCloudRecording: true
-          Identity: Global
-      TestDescription: AllowCloudRecording
-    - Postconditions: []
-      ExpectedResult: true
-      Preconditions:
-      - Command: Set-CsTeamsMeetingPolicy
-        Splat:
-          AllowCloudRecording: false
-          Identity: Global
-      TestDescription: Not AllowCloudRecording
-  - PolicyId: MS.TEAMS.9.3v1
-    TestDriver: RunScuba
-    Tests:
-    - Postconditions: []
-      ExpectedResult: false
-      Preconditions:
-      - Command: Set-CsTeamsMeetingPolicy
-        Splat:
-          AllowRecordingStorageOutsideRegion: true
-          Identity: Global
-          AllowCloudRecording: true
-      TestDescription: AllowCloudRecording:true; AllowRecordingStorageOutsideRegion:true
-    - Postconditions: []
-      ExpectedResult: true
-      Preconditions:
-      - Command: Set-CsTeamsMeetingPolicy
-        Splat:
-          AllowRecordingStorageOutsideRegion: false
-          Identity: Global
-          AllowCloudRecording: true
-      TestDescription: AllowCloudRecording:true; AllowRecordingStorageOutsideRegion:false
-    - Postconditions: []
-      ExpectedResult: true
-      Preconditions:
-      - Command: Set-CsTeamsMeetingPolicy
-        Splat:
-          AllowRecordingStorageOutsideRegion: true
-          Identity: Global
-          AllowCloudRecording: false
-      TestDescription: AllowCloudRecording:false; AllowRecordingStorageOutsideRegion:true
-    - Postconditions: []
-      ExpectedResult: true
-      Preconditions:
-      - Command: Set-CsTeamsMeetingPolicy
-        Splat:
-          AllowRecordingStorageOutsideRegion: false
-          Identity: Global
-          AllowCloudRecording: false
-      TestDescription: AllowCloudRecording:false; AllowRecordingStorageOutsideRegion:false
-  - PolicyId: MS.TEAMS.10.1v1
-    TestDriver: RunScuba
-    Tests:
-    - Postconditions: []
-      ExpectedResult: false
-      Preconditions:
-      - Command: Set-CsTeamsMeetingBroadcastPolicy
-        Splat:
-          BroadcastRecordingMode: AlwaysEnabled
-          Identity: Global
-      TestDescription: BroadcastRecordingMode:AlwaysEnabled
-    - Postconditions: []
-      ExpectedResult: false
-      Preconditions:
-      - Command: Set-CsTeamsMeetingBroadcastPolicy
-        Splat:
-          BroadcastRecordingMode: AlwaysDisabled
-          Identity: Global
-      TestDescription: BroadcastRecordingMode:AlwaysDisabled
-    - Postconditions: []
-      ExpectedResult: true
-      Preconditions:
-      - Command: Set-CsTeamsMeetingBroadcastPolicy
-        Splat:
-          BroadcastRecordingMode: UserOverride
-          Identity: Global
-      TestDescription: BroadcastRecordingMode:UserOverride
-  - PolicyId: MS.TEAMS.11.1v1
-    TestDriver: RunScuba
-    Tests:
-    - TestDescription: Custom Implementation
+    - TestDescription: MS.TEAMS.7.2v1 Compliant - Custom Implementation
       Preconditions: []
       Postconditions: []
       IsCustomImplementation: true
       ExpectedResult: false    
-  - PolicyId: MS.TEAMS.11.2v1
+  - PolicyId: MS.TEAMS.8.1v1
     TestDriver: RunScuba
     Tests:
-    - IsCustomImplementation: true
-      Postconditions: []
-      ExpectedResult: false
+    - TestDescription: MS.TEAMS.8.1v1 Compliant - Custom Implementation
       Preconditions: []
-      TestDescription: Custom Implementation
-  - PolicyId: MS.TEAMS.11.4v1
-    TestDriver: RunScuba
-    Tests:
-    - IsCustomImplementation: true
       Postconditions: []
+      IsCustomImplementation: true
       ExpectedResult: false
+    - TestDescription: MS.TEAMS.8.2v1 Compliant - Custom Implementation
       Preconditions: []
-      TestDescription: Custom Implementation
-  - PolicyId: MS.TEAMS.12.1v1
-    TestDriver: RunScuba
-    Tests:
-    - IsCustomImplementation: true
       Postconditions: []
-      ExpectedResult: false
-      Preconditions: []
-      TestDescription: Custom Implementation
-  - PolicyId: MS.TEAMS.12.2v1
-    TestDriver: RunScuba
-    Tests:
-    - IsCustomImplementation: true
-      Postconditions: []
-      ExpectedResult: false
-      Preconditions: []
-      TestDescription: Custom Implementation
-  - PolicyId: MS.TEAMS.13.1v1
-    TestDriver: RunScuba
-    Tests:
-    - IsCustomImplementation: true
-      Postconditions: []
-      ExpectedResult: false
-      Preconditions: []
-      TestDescription: Custom Implementation
-  - PolicyId: MS.TEAMS.13.2v1
-    TestDriver: RunScuba
-    Tests:
-    - IsCustomImplementation: true
-      Postconditions: []
-      ExpectedResult: false
-      Preconditions: []
-      TestDescription: Custom Implementation
-  - PolicyId: MS.TEAMS.13.3v1 
-    TestDriver: RunScuba
-    Tests:
-    - IsCustomImplementation: true
-      Postconditions: []
-      ExpectedResult: false
-      Preconditions: []
-      TestDescription: Custom Implementation
-
+      IsCustomImplementation: true
+      ExpectedResult: false  
