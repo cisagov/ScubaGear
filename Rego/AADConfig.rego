@@ -705,12 +705,12 @@ tests[{
 #   For example, if a policy checks for count(PrivilegedRoleWithoutExpirationPeriod) == 0 and that normally means compliant, when a
 #   tenant does not have the license, a count of 0 does not mean compliant because 0 is the result of not having the Rules element
 #   in the JSON.
-DoPIMRoleRulesExist {
-    _ = input.privileged_roles[_]["Rules"]
-}
+# DoPIMRoleRulesExist {
+#     _ = input.privileged_roles[_]["Rules"]
+# }
 
-default check_if_role_rules_exist := false
-check_if_role_rules_exist := DoPIMRoleRulesExist
+# default check_if_role_rules_exist := false
+# check_if_role_rules_exist := DoPIMRoleRulesExist
 
 #
 # MS.AAD.7.1v1
@@ -858,7 +858,7 @@ tests[{
     "RequirementMet" : Status
 }] {
     ApprovalNotRequired := "Global Administrator" in RolesWithoutApprovalRequired
-    Conditions := [count(Aad2P2Licenses) > 0, ApprovalNotRequired == false, check_if_role_rules_exist]
+    Conditions := [count(Aad2P2Licenses) > 0, ApprovalNotRequired == false]
     Status := count([Condition | Condition = Conditions[_]; Condition == false]) == 0
 }
 #--
@@ -894,7 +894,7 @@ tests[{
 }] {
     DescriptionString := "role(s) without notification e-mail configured for role assignments found"
     RolesWithoutAssignmentAlerts := RolesWithoutActiveAssignmentAlerts | RolesWithoutEligibleAssignmentAlerts
-    Conditions := [count(Aad2P2Licenses) > 0, count(RolesWithoutAssignmentAlerts) == 0, check_if_role_rules_exist]
+    Conditions := [count(Aad2P2Licenses) > 0, count(RolesWithoutAssignmentAlerts) == 0]
     Status := count([Condition | Condition = Conditions[_]; Condition == false]) == 0
 }
 #--
@@ -921,7 +921,7 @@ tests[{
     "RequirementMet" : Status
 }] {
     GlobalAdminNotMonitored := "Global Administrator" in AdminsWithoutActivationAlert
-    Conditions := [count(Aad2P2Licenses) > 0, GlobalAdminNotMonitored == false, check_if_role_rules_exist]
+    Conditions := [count(Aad2P2Licenses) > 0, GlobalAdminNotMonitored == false]
     Status := count([Condition | Condition = Conditions[_]; Condition == false]) == 0
 }
 #--
