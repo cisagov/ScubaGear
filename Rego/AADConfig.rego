@@ -206,7 +206,8 @@ tests[{
     "RequirementMet" : Status
 }] {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
-    Status := count(BlockHighRisk) > 0
+    Conditions := [count(Aad2P2Licenses) > 0, count(BlockHighRisk) > 0]
+    Status := count([Condition | Condition = Conditions[_]; Condition == false]) == 0
 }
 #--
 
@@ -260,7 +261,8 @@ tests[{
     "RequirementMet" : Status
 }] {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
-    Status := count(SignInBlocked) > 0
+    Conditions := [count(Aad2P2Licenses) > 0, count(SignInBlocked) > 0]
+    Status := count([Condition | Condition = Conditions[_]; Condition == false]) == 0
 }
 #--
 
@@ -798,11 +800,6 @@ PrivilegedRolesWithoutExpirationPeriod[Role.DisplayName] {
     PrivilegedRoleExclusions(Role, "MS.AAD.7.4v1") == true
 }
 
-# PrivilegedRolesWithoutExpirationPeriod[Role.DisplayName] {
-#     count(Aad2P2Licenses) == 0
-#     False
-# }
-
 tests[{
     "PolicyId" : "MS.AAD.7.4v1",
     "Criticality" : "Shall",
@@ -812,22 +809,9 @@ tests[{
     "RequirementMet" : Status
 }] {
     DescriptionString := "role(s) that contain users with permanent active assignment"
-    count(Aad2P2Licenses) > 0
-    Status := count(PrivilegedRolesWithoutExpirationPeriod) == 0 
+    Conditions := [count(Aad2P2Licenses) > 0, count(PrivilegedRolesWithoutExpirationPeriod) == 0]
+    Status := count([Condition | Condition = Conditions[_]; Condition == false]) == 0
 }
-
-tests[{
-    "PolicyId" : "MS.AAD.7.4v1",
-    "Criticality" : "Shall",
-    "Commandlet" : ["Get-MgBetaSubscribedSku"],
-    "ActualValue" : false,
-    "ReportDetails" : ReportDetailsArrayLicenseWarning(PrivilegedRolesWithoutExpirationPeriod, DescriptionString),
-    "RequirementMet" : false
-}] {
-    DescriptionString := "role(s) that contain users with permanent active assignment"
-    count(Aad2P2Licenses) == 0 
-}
-#--
 
 #
 # MS.AAD.7.5v1
@@ -848,7 +832,7 @@ tests[{
     "RequirementMet" : Status
 }] {
     DescriptionString := "role(s) assigned to users outside of PIM"
-    Conditions := [count(RolesAssignedOutsidePim) == 0, check_if_role_rules_exist]
+    Conditions := [count(Aad2P2Licenses) > 0, count(RolesAssignedOutsidePim) == 0, check_if_role_rules_exist]
     Status := count([Condition | Condition = Conditions[_]; Condition == false]) == 0
 }
 #--
@@ -874,7 +858,7 @@ tests[{
     "RequirementMet" : Status
 }] {
     ApprovalNotRequired := "Global Administrator" in RolesWithoutApprovalRequired
-    Conditions := [ApprovalNotRequired == false, check_if_role_rules_exist]
+    Conditions := [count(Aad2P2Licenses) > 0, ApprovalNotRequired == false, check_if_role_rules_exist]
     Status := count([Condition | Condition = Conditions[_]; Condition == false]) == 0
 }
 #--
@@ -910,7 +894,7 @@ tests[{
 }] {
     DescriptionString := "role(s) without notification e-mail configured for role assignments found"
     RolesWithoutAssignmentAlerts := RolesWithoutActiveAssignmentAlerts | RolesWithoutEligibleAssignmentAlerts
-    Conditions := [count(RolesWithoutAssignmentAlerts) == 0, check_if_role_rules_exist]
+    Conditions := [count(Aad2P2Licenses) > 0, count(RolesWithoutAssignmentAlerts) == 0, check_if_role_rules_exist]
     Status := count([Condition | Condition = Conditions[_]; Condition == false]) == 0
 }
 #--
@@ -937,7 +921,7 @@ tests[{
     "RequirementMet" : Status
 }] {
     GlobalAdminNotMonitored := "Global Administrator" in AdminsWithoutActivationAlert
-    Conditions := [GlobalAdminNotMonitored == false, check_if_role_rules_exist]
+    Conditions := [count(Aad2P2Licenses) > 0, GlobalAdminNotMonitored == false, check_if_role_rules_exist]
     Status := count([Condition | Condition = Conditions[_]; Condition == false]) == 0
 }
 #--
@@ -955,7 +939,7 @@ tests[{
 }] {
     DescriptionString := "role(s) without notification e-mail configured for role activations found"
     NonGlobalAdminsWithoutActivationAlert = AdminsWithoutActivationAlert - {"Global Administrator"}
-    Conditions := [count(NonGlobalAdminsWithoutActivationAlert) == 0, check_if_role_rules_exist]
+    Conditions := [count(Aad2P2Licenses) > 0, count(NonGlobalAdminsWithoutActivationAlert) == 0, check_if_role_rules_exist]
     Status := count([Condition | Condition = Conditions[_]; Condition == false]) == 0
 }
 #--
