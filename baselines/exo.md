@@ -255,7 +255,7 @@ required by BOD 18-01 for federal, executive branch, departments and agencies.
 - _Last modified:_ June 2023
 
 #### MS.EXO.4.3v1
-The DMARC point of contact for aggregate reports SHALL include <reports@dmarc.cyber.dhs.gov>.
+The DMARC point of contact for aggregate reports SHALL include `reports@dmarc.cyber.dhs.gov`.
 
 <!--Policy: MS.EXO.4.3v1; Criticality: SHALL -->
 - _Rationale:_ Email spoofing attempts are not inherently visible to domain
