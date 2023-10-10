@@ -412,7 +412,7 @@ function Get-ScubaDmarcRecords {
         }
         $DMARCRecords += [PSCustomObject]@{
             "domain" = $DomainName;
-            "rdata" = $Response.Answers;
+            "rdata" = @($Response.Answers);
             "log" = $LogEntries;
         }
     }

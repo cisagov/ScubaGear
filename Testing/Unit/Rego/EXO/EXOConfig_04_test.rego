@@ -269,6 +269,31 @@ test_DMARCReport_Incorrect_V2 if {
     RuleOutput[0].ReportDetails == "1 of 1 agency domain(s) found in violation: test.name"
 }
 
+test_DMARCReport_Incorrect_V3 if {
+    PolicyId := "MS.EXO.4.3v1"
+    # empty rdata
+    Output := tests with input as {
+        "dmarc_records": [
+            {
+                "rdata" : [],
+                "domain" : "test.name"
+            }
+        ],
+        "spf_records": [
+            {
+                "rdata" : ["spf1 "],
+                "domain" : "test.name"
+            }
+        ]
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "1 of 1 agency domain(s) found in violation: test.name"
+}
+
 #
 # Policy 4
 #--
@@ -441,6 +466,39 @@ test_POC_Incorrect_V5 if {
             },
             {
                 "rdata" : ["v=DMARC1; p=reject; pct=100; rua=mailto:reports@dmarc.cyber.dhs.gov; ruf=test@exo.com"],
+                "domain" : "example.com"
+            }
+        ],
+        "spf_records": [
+            {
+                "rdata" : ["spf1 "],
+                "domain" : "test.name"
+            },
+            {
+                "rdata" : ["spf1 "],
+                "domain" : "example.com"
+            }
+        ]
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "1 of 2 agency domain(s) found in violation: example.com"
+}
+
+test_POC_Incorrect_V5 if {
+    PolicyId := "MS.EXO.4.4v1"
+    # 2 domains 1 domain failed DNS query. Empty rdata
+    Output := tests with input as {
+        "dmarc_records": [
+            {
+                "rdata" : ["v=DMARC1; p=reject; pct=100; rua=mailto:reports@dmarc.cyber.dhs.gov, test@test.name ruf=test2@test.name"],
+                "domain" : "test.name"
+            },
+            {
+                "rdata" : [],
                 "domain" : "example.com"
             }
         ],

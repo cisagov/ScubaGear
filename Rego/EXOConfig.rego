@@ -109,7 +109,7 @@ tests[{
 
 #
 # MS.EXO.4.1v1
-#--g
+#--
 DomainsWithoutDmarc[DmarcRecord.domain] {
     DmarcRecord := input.dmarc_records[_]
     ValidAnswers := [Answer | Answer := DmarcRecord.rdata[_]; startswith(Answer, "v=DMARC1;")]
@@ -156,10 +156,16 @@ tests[{
 #--
 DomainsWithoutDHSContact[DmarcRecord.domain] {
     DmarcRecord := input.dmarc_records[_]
-    DmarcFields := split(DmarcRecord.rdata[_], ";")
+    Rdata := DmarcRecord.rdata[_]
+    DmarcFields := split(Rdata, ";")
     RuaFields := [Rua | Rua := DmarcFields[_]; contains(Rua, "rua=")]
     ValidAnswers := [Answer | Answer := RuaFields[_]; contains(Answer, "mailto:reports@dmarc.cyber.dhs.gov")]
     count(ValidAnswers) == 0
+}
+
+DomainsWithoutDHSContact[DmarcRecord.domain] {
+    DmarcRecord := input.dmarc_records[_]
+    count(DmarcRecord.rdata) == 0 # failed dns query
 }
 
 tests[{
@@ -190,6 +196,11 @@ DomainsWithoutAgencyContact[DmarcRecord.domain] {
     RufCountAcceptable := count([Answer | Answer := RufFields[_]; count(split(Answer, "@")) > 1]) >= 1
     Conditions := [RuaCountAcceptable, RufCountAcceptable]
     count([Condition | Condition := Conditions[_]; Condition == false]) > 0
+}
+
+DomainsWithoutAgencyContact[DmarcRecord.domain] {
+    DmarcRecord := input.dmarc_records[_]
+    count(DmarcRecord.rdata) == 0 # failed dns query
 }
 
 tests[{
