@@ -429,3 +429,36 @@ test_POC_Incorrect_V4 if {
     not RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "1 of 2 agency domain(s) found in violation: example.com"
 }
+
+test_POC_Incorrect_V5 if {
+    PolicyId := "MS.EXO.4.4v1"
+    # 2 domains 1 fails rua # of email policy requirement
+    Output := tests with input as {
+        "dmarc_records": [
+            {
+                "rdata" : ["v=DMARC1; p=reject; pct=100; rua=mailto:reports@dmarc.cyber.dhs.gov, test@test.name ruf=test2@test.name"],
+                "domain" : "test.name"
+            },
+            {
+                "rdata" : ["v=DMARC1; p=reject; pct=100; rua=mailto:reports@dmarc.cyber.dhs.gov; ruf=test@exo.com"],
+                "domain" : "example.com"
+            }
+        ],
+        "spf_records": [
+            {
+                "rdata" : ["spf1 "],
+                "domain" : "test.name"
+            },
+            {
+                "rdata" : ["spf1 "],
+                "domain" : "example.com"
+            }
+        ]
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "1 of 2 agency domain(s) found in violation: example.com"
+}

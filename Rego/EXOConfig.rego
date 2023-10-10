@@ -19,7 +19,7 @@ ReportDetailsArray(Status, Array1, Array2) = Detail if {
     Detail := Description(Fraction, "agency domain(s) found in violation:", String)
 }
 
-AllDomains := {Domain.domain | Domain = input.spf_records[_]}
+AllDomains := {Domain.domain | Domain := input.spf_records[_]}
 
 #
 # MS.EXO.1.1v1
@@ -65,7 +65,7 @@ tests[{
 #--
 DomainsWithoutSpf[DNSResponse.domain] {
     DNSResponse := input.spf_records[_]
-    SpfRecords := {Record | Record = DNSResponse.rdata[_]; startswith(Record, "v=spf1 ")}
+    SpfRecords := {Record | Record := DNSResponse.rdata[_]; startswith(Record, "v=spf1 ")}
     count(SpfRecords) == 0
 }
 
@@ -109,7 +109,7 @@ tests[{
 
 #
 # MS.EXO.4.1v1
-#--
+#--g
 DomainsWithoutDmarc[DmarcRecord.domain] {
     DmarcRecord := input.dmarc_records[_]
     ValidAnswers := [Answer | Answer := DmarcRecord.rdata[_]; startswith(Answer, "v=DMARC1;")]
@@ -180,16 +180,16 @@ tests[{
 #--
 DomainsWithoutAgencyContact[DmarcRecord.domain] {
     DmarcRecord := input.dmarc_records[_]
-    Rdata = DmarcRecord.rdata[_]
+    Rdata := DmarcRecord.rdata[_]
     DmarcFields := split(Rdata, ";")
     RuaFields := [Rua | Rua := DmarcFields[_]; contains(Rua, "rua=")]
     RufFields := [Ruf | Ruf := DmarcFields[_]; contains(Ruf, "ruf=")]
     # 2 or more emails including reports@dmarc.cyber.dhs.gov checked by policy 4.3
-    RuaCountAcceptable := count([Answer | Answer := RuaFields[_]; count(split(Answer, "@")) >= 2]) >= 1
+    RuaCountAcceptable := count([Answer | Answer := RuaFields[_]; count(split(Answer, "@")) > 2]) >= 1
     # 1 or more emails
-    RufCountAcceptable := count([Answer | Answer := RufFields[_]; count(split(Answer, "@")) >= 1]) >= 1
+    RufCountAcceptable := count([Answer | Answer := RufFields[_]; count(split(Answer, "@")) > 1]) >= 1
     Conditions := [RuaCountAcceptable, RufCountAcceptable]
-    count([Condition | Condition = Conditions[_]; Condition == false]) > 0
+    count([Condition | Condition := Conditions[_]; Condition == false]) > 0
 }
 
 tests[{
@@ -232,7 +232,7 @@ tests[{
 
 SharingPolicyContactsAllowedAllDomains[SharingPolicy.Name] {
     SharingPolicy := input.sharing_policy[_]
-    Domains = SharingPolicy.Domains[_]
+    Domains := SharingPolicy.Domains[_]
     contains(Domains, "*")
     contains(Domains, "Contacts")
 }
@@ -257,7 +257,7 @@ tests[{
 
 SharingPolicyCalendarAllowedAllDomains[SharingPolicy.Name] {
     SharingPolicy := input.sharing_policy[_]
-    Domains = SharingPolicy.Domains[_]
+    Domains := SharingPolicy.Domains[_]
     contains(Domains, "*")
     contains(Domains, "Calendar")
 }
@@ -283,15 +283,15 @@ tests[{
     "PolicyId" : "MS.EXO.7.1v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-TransportRule"],
-    "ActualValue" : [Rule.FromScope | Rule = Rules[_]],
+    "ActualValue" : [Rule.FromScope | Rule := Rules[_]],
     "ReportDetails" : ReportDetailsString(Status, ErrorMessage),
     "RequirementMet" : Status
 }] {
     Rules := input.transport_rule
     ErrorMessage := "No transport rule found that applies warnings to emails received from outside the organization"
-    EnabledRules := [rule | rule = Rules[_]; rule.State == "Enabled"; rule.Mode == "Enforce"; count(rule.PrependSubject) >=1]
-    Conditions := [IsCorrectScope | IsCorrectScope = EnabledRules[_].FromScope == "NotInOrganization"]
-    Status := count([Condition | Condition = Conditions[_]; Condition == true]) > 0
+    EnabledRules := [rule | rule := Rules[_]; rule.State == "Enabled"; rule.Mode == "Enforce"; count(rule.PrependSubject) >=1]
+    Conditions := [IsCorrectScope | IsCorrectScope := EnabledRules[_].FromScope == "NotInOrganization"]
+    Status := count([Condition | Condition := Conditions[_]; Condition == true]) > 0
 }
 #--
 
@@ -307,7 +307,7 @@ tests[{
     "ReportDetails" : DefenderMirrorDetails(PolicyId),
     "RequirementMet" : false
 }] {
-    PolicyId = "MS.EXO.8.1v1"
+    PolicyId := "MS.EXO.8.1v1"
     true
 }
 #--
@@ -324,7 +324,7 @@ tests[{
     "ReportDetails" : DefenderMirrorDetails(PolicyId),
     "RequirementMet" : false
 }] {
-    PolicyId = "MS.EXO.8.2v1"
+    PolicyId := "MS.EXO.8.2v1"
     true
 }
 #--
@@ -341,7 +341,7 @@ tests[{
     "ReportDetails" : DefenderMirrorDetails(PolicyId),
     "RequirementMet" : false
 }] {
-    PolicyId = "MS.EXO.9.1v1"
+    PolicyId := "MS.EXO.9.1v1"
     true
 }
 #--
@@ -358,7 +358,7 @@ tests[{
     "ReportDetails" : DefenderMirrorDetails(PolicyId),
     "RequirementMet" : false
 }] {
-    PolicyId = "MS.EXO.9.2v1"
+    PolicyId := "MS.EXO.9.2v1"
     true
 }
 #--
@@ -375,7 +375,7 @@ tests[{
     "ReportDetails" : DefenderMirrorDetails(PolicyId),
     "RequirementMet" : false
 }] {
-    PolicyId = "MS.EXO.9.3v1"
+    PolicyId := "MS.EXO.9.3v1"
     true
 }
 #--
@@ -392,7 +392,7 @@ tests[{
     "ReportDetails" : DefenderMirrorDetails(PolicyId),
     "RequirementMet" : false
 }] {
-    PolicyId = "MS.EXO.10.1v1"
+    PolicyId := "MS.EXO.10.1v1"
     true
 }
 #--
@@ -409,7 +409,7 @@ tests[{
     "ReportDetails" : DefenderMirrorDetails(PolicyId),
     "RequirementMet" : false
 }] {
-    PolicyId = "MS.EXO.10.2v1"
+    PolicyId := "MS.EXO.10.2v1"
     true
 }
 #--
@@ -426,7 +426,7 @@ tests[{
     "ReportDetails" : DefenderMirrorDetails(PolicyId),
     "RequirementMet" : false
 }] {
-    PolicyId = "MS.EXO.10.3v1"
+    PolicyId := "MS.EXO.10.3v1"
     true
 }
 #--
@@ -443,7 +443,7 @@ tests[{
     "ReportDetails" : DefenderMirrorDetails(PolicyId),
     "RequirementMet" : false
 }] {
-    PolicyId = "MS.EXO.11.1v1"
+    PolicyId := "MS.EXO.11.1v1"
     true
 }
 #--
@@ -460,7 +460,7 @@ tests[{
     "ReportDetails" : DefenderMirrorDetails(PolicyId),
     "RequirementMet" : false
 }] {
-    PolicyId = "MS.EXO.11.2v1"
+    PolicyId := "MS.EXO.11.2v1"
     true
 }
 #--
@@ -477,7 +477,7 @@ tests[{
     "ReportDetails" : DefenderMirrorDetails(PolicyId),
     "RequirementMet" : false
 }] {
-    PolicyId = "MS.EXO.11.3v1"
+    PolicyId := "MS.EXO.11.3v1"
     true
 }
 #--
@@ -560,7 +560,7 @@ tests[{
     "ReportDetails" : DefenderMirrorDetails(PolicyId),
     "RequirementMet" : false
 }] {
-    PolicyId = "MS.EXO.14.1v1"
+    PolicyId := "MS.EXO.14.1v1"
     true
 }
 #--
@@ -577,7 +577,7 @@ tests[{
     "ReportDetails" : DefenderMirrorDetails(PolicyId),
     "RequirementMet" : false
 }] {
-    PolicyId = "MS.EXO.14.2v1"
+    PolicyId := "MS.EXO.14.2v1"
     true
 }
 #--
@@ -594,7 +594,7 @@ tests[{
     "ReportDetails" : DefenderMirrorDetails(PolicyId),
     "RequirementMet" : false
 }] {
-    PolicyId = "MS.EXO.14.3v1"
+    PolicyId := "MS.EXO.14.3v1"
     true
 }
 #--
@@ -611,7 +611,7 @@ tests[{
     "ReportDetails" : DefenderMirrorDetails(PolicyId),
     "RequirementMet" : false
 }] {
-    PolicyId = "MS.EXO.15.1v1"
+    PolicyId := "MS.EXO.15.1v1"
     true
 }
 #--
@@ -628,7 +628,7 @@ tests[{
     "ReportDetails" : DefenderMirrorDetails(PolicyId),
     "RequirementMet" : false
 }] {
-    PolicyId = "MS.EXO.15.2v1"
+    PolicyId := "MS.EXO.15.2v1"
     true
 }
 #--
@@ -645,7 +645,7 @@ tests[{
     "ReportDetails" : DefenderMirrorDetails(PolicyId),
     "RequirementMet" : false
 }] {
-    PolicyId = "MS.EXO.15.3v1"
+    PolicyId := "MS.EXO.15.3v1"
     true
 }
 #--
@@ -662,7 +662,7 @@ tests[{
     "ReportDetails" : DefenderMirrorDetails(PolicyId),
     "RequirementMet" : false
 }] {
-    PolicyId = "MS.EXO.16.1v1"
+    PolicyId := "MS.EXO.16.1v1"
     true
 }
 #--
@@ -679,7 +679,7 @@ tests[{
     "ReportDetails" : DefenderMirrorDetails(PolicyId),
     "RequirementMet" : false
 }] {
-    PolicyId = "MS.EXO.16.2v1"
+    PolicyId := "MS.EXO.16.2v1"
     true
 }
 #--
@@ -696,7 +696,7 @@ tests[{
     "ReportDetails" : DefenderMirrorDetails(PolicyId),
     "RequirementMet" : false
 }] {
-    PolicyId = "MS.EXO.17.1v1"
+    PolicyId := "MS.EXO.17.1v1"
     true
 
 }
@@ -714,7 +714,7 @@ tests[{
     "ReportDetails" : DefenderMirrorDetails(PolicyId),
     "RequirementMet" : false
 }] {
-    PolicyId = "MS.EXO.17.2v1"
+    PolicyId := "MS.EXO.17.2v1"
     true
 }
 #--
@@ -731,7 +731,7 @@ tests[{
     "ReportDetails" : DefenderMirrorDetails(PolicyId),
     "RequirementMet" : false
 }] {
-    PolicyId = "MS.EXO.17.3v1"
+    PolicyId := "MS.EXO.17.3v1"
     true
 }
 #--
