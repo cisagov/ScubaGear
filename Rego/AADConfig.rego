@@ -694,24 +694,6 @@ tests[{
 # MS.AAD.7 #
 ############
 
-#################################
-# Helper functions for policies #
-#################################
-
-#   DoPIMRoleRulesExist will return true when the JSON privileged_roles.Rules element exists and false when it does not.
-#   This was created to add special logic for the scenario where the Microsoft Entra ID P2 is missing and therefore
-#   the JSON Rules element will not exist in that case because there is no PIM service.
-#   This is necessary to avoid false negatives when a policy checks for zero instances of a specific condition.
-#   For example, if a policy checks for count(PrivilegedRoleWithoutExpirationPeriod) == 0 and that normally means compliant, when a
-#   tenant does not have the license, a count of 0 does not mean compliant because 0 is the result of not having the Rules element
-#   in the JSON.
-# DoPIMRoleRulesExist {
-#     _ = input.privileged_roles[_]["Rules"]
-# }
-
-# default check_if_role_rules_exist := false
-# check_if_role_rules_exist := DoPIMRoleRulesExist
-
 #
 # MS.AAD.7.1v1
 #--
