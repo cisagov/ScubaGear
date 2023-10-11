@@ -444,6 +444,7 @@ SensitiveRules[{
     Policy := input.dlp_compliance_policies[_]
     Rules.ParentPolicyName == Policy.Name
     Policy.Enabled == true
+    Policy.Mode == "Enable"
 }
 
 SensitiveRules[{
@@ -463,6 +464,8 @@ SensitiveRules[{
     Policy := input.dlp_compliance_policies[_]
     Rules.ParentPolicyName == Policy.Name
     Policy.Enabled == true
+    Policy.Mode == "Enable"
+
     # Trim converted end-of-line "rn" delimters and convert single quotes to
     # double for unmarshalling
     RuleText := replace(replace(Rules.AdvancedRule, "rn", ""), "'", "\"")
