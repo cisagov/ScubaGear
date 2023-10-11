@@ -43,14 +43,6 @@ InModuleScope 'RunRego' {
             }
             Invoke-Rego @RegoParams | Should -Not -Be $null
         }
-        It 'Runs the OneDrive Rego on a Provider JSON and returns a TestResults object' {
-            $Product = 'onedrive'
-            $RegoParams += @{
-                'RegoFile'    = Join-Path -Path $PSScriptRoot -ChildPath "../../../../Rego/$($ArgToProd[$Product])Config.rego";
-                'PackageName' = $Product;
-            }
-            Invoke-Rego @RegoParams | Should -Not -Be $null
-        }
         It 'Runs the PowerPlatform Rego on a Provider JSON and returns a TestResults object' {
             $Product = 'powerplatform'
             $RegoParams += @{

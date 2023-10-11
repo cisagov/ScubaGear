@@ -14,7 +14,7 @@
     .EXAMPLE
         .\RunUnitTests.ps1 -p teams,sharepoint
         Runs all tests for the specified products. Products must be specified with the -p parameter.
-        Valid product names are: aad, defender, exo, onedrive, powerplatform, sharepoint, and teams.
+        Valid product names are: aad, defender, exo, powerplatform, sharepoint, and teams.
 
     .EXAMPLE
         .\RunUnitTests.ps1 -p aad -c 1
@@ -31,7 +31,7 @@
 [CmdletBinding()]
 param (
     [Parameter()]
-    [ValidateSet('AAD','Defender','EXO','OneDrive','PowerPlatform','Sharepoint','Teams')]
+    [ValidateSet('AAD','Defender','EXO','PowerPlatform','Sharepoint','Teams')]
     [string[]]$p = "",
     [Parameter()]
     [string[]]$c = "",
@@ -197,7 +197,7 @@ if ($v.IsPresent) {
     $Flag = "-v"
 }
 if($pEmpty -and $cEmpty -and $tEmpty) {
-    $p = @('AAD','Defender','EXO','OneDrive','PowerPlatform','Sharepoint','Teams')
+    $p = @('AAD','Defender','EXO','PowerPlatform','Sharepoint','Teams')
     Invoke-Product -Flag $Flag
 }
 elseif((-not $pEmpty) -and (-not $cEmpty) -and (-not $tEmpty)) {
