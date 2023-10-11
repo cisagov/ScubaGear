@@ -426,7 +426,7 @@ tests[{
 #--
 PoliciesBlockingDefaultApps[Policy.Identity] {
 	Policy := input.app_policies[_]
-	Policy.DefaultCatalogAppsType != "BlockedAppList"
+	Policy.DefaultCatalogAppsType == "BlockedAppList"
 }
 
 tests[{
@@ -448,7 +448,7 @@ tests[{
 #--
 PoliciesAllowingGlobalApps[Policy.Identity] {
 	Policy := input.app_policies[_]
-	Policy.GlobalCatalogAppsType != "BlockedAppList"
+	Policy.GlobalCatalogAppsType == "BlockedAppList"
 }
 
 tests[{
@@ -471,7 +471,7 @@ tests[{
 # 
 PoliciesAllowingCustomApps[Policy.Identity] {
 	Policy := input.app_policies[_]
-	Policy.PrivateCatalogAppsType != "BlockedAppList"
+	Policy.PrivateCatalogAppsType == "BlockedAppList"
 }
 tests[{
 	"PolicyId" : "MS.TEAMS.5.3v1",
