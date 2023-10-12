@@ -1,11 +1,11 @@
 ################
-# Teams Baseline 
+# Teams Baseline
 ################
 
 #--
 # Reference: Secure Baseline file, teams.md
 #--
-# This file implements controls/policies documented in the secure baseline.  The tests.PolicyId 
+# This file implements controls/policies documented in the secure baseline.  The tests.PolicyId
 # (e.g., MS.TEAMS.1.1v1) aligns this files to the secure baseline control.
 package teams
 import future.keywords
@@ -13,12 +13,12 @@ import data.report.utils.Format
 import data.report.utils.ReportDetailsBoolean
 import data.report.utils.Description
 
-ReportDetailsArray(Status, Array, String1) =  Detail if {
+ReportDetailsArray(Status, Array, String1) := Detail if {
     Status == true
     Detail := "Requirement met"
 }
 
-ReportDetailsArray(Status, Array, String1) = Detail if {
+ReportDetailsArray(Status, Array, String1) := Detail if {
 	Status == false
 	String2 := concat(", ", Array)
     Detail := Description(Format(Array), String1, String2)
@@ -74,19 +74,19 @@ tests[{
 #--
 # MS.TEAMS.1.3v1
 #--
-ReportDetails1_3(Policy) = Description if {
+ReportDetails1_3(Policy) := Description if {
 	Policy.AutoAdmittedUsers != "Everyone"
 	Policy.AllowPSTNUsersToBypassLobby == false
 	Description := "Requirement met"
 }
 
-ReportDetails1_3(Policy) = Description if {
+ReportDetails1_3(Policy) := Description if {
 	Policy.AutoAdmittedUsers != "Everyone"
 	Policy.AllowPSTNUsersToBypassLobby == true
 	Description := "Requirement not met: Dial-in users are enabled to bypass the lobby"
 }
 
-ReportDetails1_3(Policy) = Description if {
+ReportDetails1_3(Policy) := Description if {
 	Policy.AutoAdmittedUsers == "Everyone"
 	Description := "Requirement not met: All users are admitted automatically"
 }
@@ -358,18 +358,18 @@ ConfigsAllowingEmail[Policy.Identity] {
     Policy.AllowEmailIntoChannel == true
 }
 
-ReportDetails4_1(IsGCC, IsEnabled) = Description if {
+ReportDetails4_1(IsGCC, IsEnabled) := Description if {
 	IsGCC == true
 	Description := "N/A: Feature is unavailable in GCC environments"
 }
 
-ReportDetails4_1(IsGCC, IsEnabled) = Description if {
+ReportDetails4_1(IsGCC, IsEnabled) := Description if {
 	IsGCC == false
 	IsEnabled == true
 	Description := "Requirement met"
 }
 
-ReportDetails4_1(IsGCC, IsEnabled) = Description if {
+ReportDetails4_1(IsGCC, IsEnabled) := Description if {
 	IsGCC == false
 	IsEnabled == false
 	Description := "Requirement not met"
@@ -385,7 +385,7 @@ tests[{
 }] {
 	# According to Get-CsTeamsClientConfiguration, is team email integration enabled?
     IsEnabled := count(ConfigsAllowingEmail) == 0
-	# What is the tenant type according to Get-CsTenant? 
+	# What is the tenant type according to Get-CsTenant?
     TenantConfig := input.teams_tenant_info[_]
 	AssignedPlans := concat(", ", TenantConfig.AssignedPlan)
     GCCConditions := [contains(AssignedPlans, "GCC"), contains(AssignedPlans, "DOD")]
@@ -457,7 +457,7 @@ tests[{
 #--
 # MS.TEAMS.5.3v1
 #--
-# 
+#
 PoliciesAllowingCustomApps[Policy.Identity] {
 	Policy := input.app_policies[_]
 	Policy.PrivateCatalogAppsType == "BlockedAppList"

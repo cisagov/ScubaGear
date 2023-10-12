@@ -72,18 +72,18 @@ tests[{
 
 # At this time we are unable to test for approved security groups
 # because we have yet to find the setting to check
-Domainlist(Policy) = Description if {
+Domainlist(Policy) := Description if {
     Policy.SharingCapability == 0
     Description := "Requirement met: external sharing is set to Only People In Organization"
 }
 
-Domainlist(Policy) = Description if {
+Domainlist(Policy) := Description if {
     Policy.SharingCapability != 0
     Policy.SharingDomainRestrictionMode == 1
     Description := "Requirement met: Note that we currently only check for approved external domains. Approved security groups are currently not being checked, see the baseline policy for instructions on a manual check"
 }
 
-Domainlist(Policy) = Description if {
+Domainlist(Policy) := Description if {
     Policy.SharingCapability != 0
     Policy.SharingDomainRestrictionMode != 1
     Description := "Requirement not met: Note that we currently only check for approved external domains. Approved security groups are currently not being checked, see the baseline policy for instructions on a manual check"
@@ -173,40 +173,40 @@ tests[{
 # MS.SHAREPOINT.3.1v1
 #--
 
-ExternalUserExpireInDays(Policy) = [ErrMsg, Status] if {
+ExternalUserExpireInDays(Policy) := [ErrMsg, Status] if {
     Policy.SharingCapability = 0
     ErrMsg := ""
     Status := true
 }
 
-ExternalUserExpireInDays(Policy) = [ErrMsg, Status] if {
+ExternalUserExpireInDays(Policy) := [ErrMsg, Status] if {
     Policy.SharingCapability = 3
     ErrMsg := ""
     Status := true
 }
 
-ExternalUserExpireInDays(Policy) = [ErrMsg, Status] if {
+ExternalUserExpireInDays(Policy) := [ErrMsg, Status] if {
     Policy.SharingCapability == 1
     Policy.RequireAnonymousLinksExpireInDays <= 30
     ErrMsg := ""
     Status := true
 }
 
-ExternalUserExpireInDays(Policy) = [ErrMsg, Status] if {
+ExternalUserExpireInDays(Policy) := [ErrMsg, Status] if {
     Policy.SharingCapability == 2
     Policy.RequireAnonymousLinksExpireInDays <= 30
     ErrMsg := ""
     Status := true
 }
 
-ExternalUserExpireInDays(Policy) = [ErrMsg, Status] if {
+ExternalUserExpireInDays(Policy) := [ErrMsg, Status] if {
     Policy.SharingCapability == 1
     Policy.RequireAnonymousLinksExpireInDays > 30
     ErrMsg := "Requirement not met: External Sharing is set to New and Existing Guests and expiration date is not 30 days or less"
     Status := false
 }
 
-ExternalUserExpireInDays(Policy) = [ErrMsg, Status] if {
+ExternalUserExpireInDays(Policy) := [ErrMsg, Status] if {
     Policy.SharingCapability == 2
     Policy.RequireAnonymousLinksExpireInDays > 30
     ErrMsg := "Requirement not met: External Sharing is set to Anyone and expiration date is not 30 days or less"
@@ -229,25 +229,25 @@ tests[{
 #
 # MS.SHAREPOINT.3.2v1
 
-FileAndFolderPermission(Policy) = Description if {
+FileAndFolderPermission(Policy) := Description if {
     Policy.FileAnonymousLinkType == 1
     Policy.FolderAnonymousLinkType == 1
 	Description := "Requirement met"
 }
 
-FileAndFolderPermission(Policy) = Description if {
+FileAndFolderPermission(Policy) := Description if {
     Policy.FileAnonymousLinkType == 2
     Policy.FolderAnonymousLinkType == 2
 	Description := "Requirement not met: both files and folders are not limited to view for Anyone"
 }
 
-FileAndFolderPermission(Policy) = Description if {
+FileAndFolderPermission(Policy) := Description if {
     Policy.FileAnonymousLinkType == 1
     Policy.FolderAnonymousLinkType == 2
 	Description := "Requirement not met: folders are not limited to view for Anyone"
 }
 
-FileAndFolderPermission(Policy) = Description if {
+FileAndFolderPermission(Policy) := Description if {
     Policy.FileAnonymousLinkType == 2
     Policy.FolderAnonymousLinkType == 1
 	Description := "Requirement not met: files are not limited to view for Anyone"
@@ -284,13 +284,13 @@ tests[{
 # MS.SHAREPOINT.3.3v1
 #--
 
-ExpirationTimersVerificationCode(Policy) = [ErrMsg, Status] if {
+ExpirationTimersVerificationCode(Policy) := [ErrMsg, Status] if {
     Policy.SharingCapability == 0
     ErrMsg := ""
     Status := true
 }
 
-ExpirationTimersVerificationCode(Policy) = [ErrMsg, Status] if {
+ExpirationTimersVerificationCode(Policy) := [ErrMsg, Status] if {
     Policy.SharingCapability != 0
     Policy.EmailAttestationRequired == true
     Policy.EmailAttestationReAuthDays <= 30
@@ -298,7 +298,7 @@ ExpirationTimersVerificationCode(Policy) = [ErrMsg, Status] if {
     Status := true
 }
 
-ExpirationTimersVerificationCode(Policy) = [ErrMsg, Status] if {
+ExpirationTimersVerificationCode(Policy) := [ErrMsg, Status] if {
     Policy.SharingCapability != 0
     Policy.EmailAttestationRequired == false
     Policy.EmailAttestationReAuthDays <= 30
@@ -306,7 +306,7 @@ ExpirationTimersVerificationCode(Policy) = [ErrMsg, Status] if {
     Status := false
 }
 
-ExpirationTimersVerificationCode(Policy) = [ErrMsg, Status] if {
+ExpirationTimersVerificationCode(Policy) := [ErrMsg, Status] if {
     Policy.SharingCapability != 0
     Policy.EmailAttestationRequired == true
     Policy.EmailAttestationReAuthDays > 30
@@ -314,7 +314,7 @@ ExpirationTimersVerificationCode(Policy) = [ErrMsg, Status] if {
     Status := false
 }
 
-ExpirationTimersVerificationCode(Policy) = [ErrMsg, Status] if {
+ExpirationTimersVerificationCode(Policy) := [ErrMsg, Status] if {
     Policy.SharingCapability != 0
     Policy.EmailAttestationRequired == false
     Policy.EmailAttestationReAuthDays > 30

@@ -444,7 +444,7 @@ InfoTypeMatches(Rule) := ContentTypes if {
 }
 
 SensitiveInfoTypes(PolicyName) := MatchingInfoTypes if {
-    InfoTypes := {  
+    InfoTypes := {
                     "U.S. Social Security Number (SSN)",
                     "U.S. Individual Taxpayer Identification Number (ITIN)",
                     "Credit Card Number"
@@ -648,13 +648,13 @@ error_policies contains "OneDrive" if count(Policies.OneDrive) == 0
 error_policies contains "Teams" if count(Policies.Teams) == 0
 error_policies contains "Devices" if count(Policies.Devices) == 0
 
-DefenderErrorMessage4_2() := ErrorMessage if {
+DefenderErrorMessage4_2 := ErrorMessage if {
     count(SensitiveInfoPolicies) > 0
     error_policy := "No enabled policy found that applies to:"
     ErrorMessage := concat(" ", [error_policy, concat(", ", error_policies)])
 }
 
-DefenderErrorMessage4_2() := ErrorMessage if {
+DefenderErrorMessage4_2 := ErrorMessage if {
     count(SensitiveInfoPolicies) == 0
     ErrorMessage := "No DLP policy matching all types found for evaluation."
 }
@@ -710,7 +710,7 @@ tests[{
 }] {
     Rules := SensitiveRulesNotBlocking
     ErrorMessage := DefenderErrorMessage4_3(Rules)
-    Conditions := [ count(Rules) == 0, 
+    Conditions := [ count(Rules) == 0,
                     count(SensitiveInfoPolicies) > 0 ]
     Status := count([Condition | Condition := Conditions[_]; Condition == true ]) == 2
 }
@@ -747,7 +747,7 @@ tests[{
 }] {
     Rules := SensitiveRulesNotNotifying
     ErrorMessage := DefenderErrorMessage4_4(Rules)
-    Conditions := [ count(Rules) == 0, 
+    Conditions := [ count(Rules) == 0,
                     count(SensitiveInfoPolicies) > 0 ]
     Status := count([Condition | Condition := Conditions[_]; Condition == true ]) == 2
 }

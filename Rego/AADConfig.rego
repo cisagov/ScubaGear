@@ -11,26 +11,26 @@ import data.policy.utils.Count
 # The report formatting functions below are generic and used throughout AAD #
 #############################################################################
 
-Description(String1, String2, String3) =  trim(concat(" ", [String1, String2, String3]), " ")
+Description(String1, String2, String3) := trim(concat(" ", [String1, String2, String3]), " ")
 
-ReportDetailsArray(Array, String) = Description(Format(Array), String, "")
+ReportDetailsArray(Array, String) := Description(Format(Array), String, "")
 
 # Set to the maximum number of array items to be
 # printed in the report details section
 ReportArrayMaxCount := 20
 
-ReportFullDetailsArray(Array, String) = Details {
+ReportFullDetailsArray(Array, String) := Details {
     count(Array) == 0
     Details := ReportDetailsArray(Array, String)
 }
 
-ReportFullDetailsArray(Array, String) = Details {
+ReportFullDetailsArray(Array, String) := Details {
     count(Array) > 0
     count(Array) <= ReportArrayMaxCount
     Details := Description(Format(Array), concat(":<br/>", [String, concat(", ", Array)]), "")
 }
 
-ReportFullDetailsArray(Array, String) = Details {
+ReportFullDetailsArray(Array, String) := Details {
     count(Array) > ReportArrayMaxCount
     List := [ x | x := Array[_] ]
 
@@ -52,39 +52,39 @@ Aad2P2Licenses[ServicePlan.ServicePlanId] {
 
 P2WarningString := "**NOTE: Your tenant does not have a Microsoft Entra ID P2 license, which is required for this feature**"
 
-ReportDetailsArrayLicenseWarningCap(Array, String) = Description if {
+ReportDetailsArrayLicenseWarningCap(Array, String) := Description if {
   count(Aad2P2Licenses) > 0
   Description :=  concat(". ", [ReportFullDetailsArray(Array, String), CapLink])
 }
 
-ReportDetailsArrayLicenseWarningCap(_, _) = Description if {
+ReportDetailsArrayLicenseWarningCap(_, _) := Description if {
   count(Aad2P2Licenses) == 0
   Description := P2WarningString
 }
 
-ReportDetailsArrayLicenseWarning(Array, String) = Description if {
+ReportDetailsArrayLicenseWarning(Array, String) := Description if {
   count(Aad2P2Licenses) > 0
   Description :=  ReportFullDetailsArray(Array, String)
 }
 
-ReportDetailsArrayLicenseWarning(_, _) = Description if {
+ReportDetailsArrayLicenseWarning(_, _) := Description if {
   count(Aad2P2Licenses) == 0
   Description := P2WarningString
 }
 
-ReportDetailsBooleanLicenseWarning(Status) = Description if {
+ReportDetailsBooleanLicenseWarning(Status) := Description if {
     count(Aad2P2Licenses) > 0
     Status == true
     Description := "Requirement met"
 }
 
-ReportDetailsBooleanLicenseWarning(Status) = Description if {
+ReportDetailsBooleanLicenseWarning(Status) := Description if {
     count(Aad2P2Licenses) > 0
     Status == false
     Description := "Requirement not met"
 }
 
-ReportDetailsBooleanLicenseWarning(_) = Description if {
+ReportDetailsBooleanLicenseWarning(_) := Description if {
     count(Aad2P2Licenses) == 0
     Description := P2WarningString
 }
@@ -935,10 +935,15 @@ tests[{
 #--
 # must hardcode the ID. See
 # https://docs.microsoft.com/en-us/azure/active-directory/enterprise-users/users-restrict-guest-permissions
-LevelAsString(Id) := "Restricted access" if {Id == "2af84b1e-32c8-42b7-82bc-daa82404023b"}
-LevelAsString(Id) := "Limited access" if {Id == "10dae51f-b6af-4016-8d66-8c2a99b929b3"}
-LevelAsString(Id) := "Same as member users" if {Id == "a0b1b346-4d3e-4e8b-98f8-753987be4970"}
-LevelAsString(Id) := "Unknown" if {not Id in ["2af84b1e-32c8-42b7-82bc-daa82404023b", "10dae51f-b6af-4016-8d66-8c2a99b929b3", "a0b1b346-4d3e-4e8b-98f8-753987be4970"]}
+# pattern matching on function args: https://docs.styra.com/regal/rules/idiomatic/equals-pattern-matching
+LevelAsString("2af84b1e-32c8-42b7-82bc-daa82404023b") := "Restricted access"
+LevelAsString("10dae51f-b6af-4016-8d66-8c2a99b929b3") := "Limited access"
+LevelAsString("a0b1b346-4d3e-4e8b-98f8-753987be4970") := "Same as member users"
+LevelAsString(Id) := "Unknown" if {not Id in [
+    "2af84b1e-32c8-42b7-82bc-daa82404023b",
+    "10dae51f-b6af-4016-8d66-8c2a99b929b3",
+    "a0b1b346-4d3e-4e8b-98f8-753987be4970",
+]}
 
 AuthPoliciesBadRoleId[Policy.Id] {
     Policy = input.authorization_policies[_]

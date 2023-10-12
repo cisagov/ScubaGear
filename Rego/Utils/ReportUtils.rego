@@ -2,34 +2,26 @@ package report.utils
 import future.keywords
 
 #
-BaselineVersion() := moduleVersion if {
-    not input.module_version
-    moduleVersion := "main"
-}
+default BaselineVersion := "main"
 
-BaselineVersion() := moduleVersion if {
-    moduleVersion := input.module_version
-}
+BaselineVersion := input.module_version
 
-#baselineVersion := "3.0.0." # Baseline version is pinned to a module version
-ScubaBaseUrl := sprintf("https://github.com/cisagov/ScubaGear/blob/%v/baselines/", [BaselineVersion()])
+# baselineVersion := "3.0.0." # Baseline version is pinned to a module version
+ScubaBaseUrl := sprintf("https://github.com/cisagov/ScubaGear/blob/%v/baselines/", [BaselineVersion])
 
 ################
 # Helper functions for this file
 ################
 
-PolicyAnchor(PolicyId) := anchor if {
-    anchor := sprintf("#%v", [replace(lower(PolicyId), ".", "")])
-}
+PolicyAnchor(PolicyId) := sprintf("#%v", [replace(lower(PolicyId), ".", "")])
 
 PolicyProduct(PolicyId) := product if {
     dotIndexes := indexof_n(PolicyId, ".")
     product := lower(substring(PolicyId, 3, dotIndexes[1]-dotIndexes[0]-1))
 }
 
-PolicyLink(PolicyId) := link if {
-    link := sprintf("<a href=\"%v%v.md%v\" target=\"_blank\">Secure Configuration Baseline policy</a>", [ScubaBaseUrl, PolicyProduct(PolicyId), PolicyAnchor(PolicyId)])
-}
+PolicyLink(PolicyId) := sprintf("<a href=\"%v%v.md%v\" target=\"_blank\">Secure Configuration Baseline policy</a>", [ScubaBaseUrl, PolicyProduct(PolicyId), PolicyAnchor(PolicyId)])
+
 
 ################
 # The report formatting functions below are generic and used throughout the policies #
@@ -50,8 +42,8 @@ DefenderMirrorDetails(PolicyId) := details if {
 Format(Array) := format_int(count(Array), 10)
 
 #
-ReportDetailsBoolean(Status) := "Requirement met" if {Status == true}
-ReportDetailsBoolean(Status) := "Requirement not met" if {Status == false}
+ReportDetailsBoolean(true) := "Requirement met"
+ReportDetailsBoolean(false) := "Requirement not met"
 
 #
 Description(String1, String2, String3) := trim(concat(" ", [String1, concat(" ", [String2, String3])]), " ")

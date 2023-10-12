@@ -1,0 +1,98 @@
+
+# Regal linter configuration
+# All rules documented here:
+# https://docs.styra.com/regal/category/rules
+rules:
+  bugs:
+    # https://docs.styra.com/regal/rules/bugs/constant-condition
+    constant-condition:
+      # Many rule bodies containing only `true`. This is
+      # redundant, as that's the implied rule body when
+      # none is provided. It's harmless, but should be
+      # fixed anyway so real issues aren't missed.
+      level: ignore
+  custom:
+    # https://docs.styra.com/regal/rules/custom/naming-convention
+    naming-convention:
+      # Codifying the conventions used in this project.
+      # By all means, change this to be less restrictive
+      # if you wish.
+      level: error
+      conventions:
+        - pattern: '^[A-Z]+[a-zA-Z0-9_]+$|^tests$|^test_|^check_|^error_'
+          targets:
+            - rule
+        - pattern: '^[A-Z]+[a-zA-Z0-9_]+$'
+          targets:
+            - function
+        - pattern: '^[a-z\.]+$'
+          targets:
+            - package
+  idiomatic:
+    # https://docs.styra.com/regal/rules/idiomatic/no-defined-entrypoint
+    no-defined-entrypoint:
+      # This is a good practice for documentation, and
+      # compilation to Wasm/IR, but not a requirement.
+      # Safe to ignore.
+      level: ignore
+  imports:
+    implicit-future-keywords:
+      # This rule is on it's way out anyway, as future
+      # versions of OPA will make these keywords standard.
+      level: ignore
+    # https://docs.styra.com/regal/rules/imports/prefer-package-imports
+    prefer-package-imports:
+      # Mostly just a style preference, motivated by how
+      # it generally makes it more clear where a reference
+      # originates from.
+      level: ignore
+  style:
+    # https://docs.styra.com/regal/rules/style/external-reference
+    external-reference:
+      # This rule is quite opinionated / style preference
+      # safe to ignore.
+      level: ignore
+    # https://docs.styra.com/regal/rules/style/file-length
+    file-length:
+      level: ignore
+    # https://docs.styra.com/regal/rules/style/line-length
+    line-length:
+      # Most of these seem fixable by concatenating strings
+      # and by using the non-breakable-word-threshold option
+      # for when that doesn't work.
+      level: ignore
+    # https://docs.styra.com/regal/rules/style/no-whitespace-comment
+    no-whitespace-comment:
+      # This repo is actually good about this, but frequently
+      # uses '#--' as a delimeter of sorts. That should be OK,
+      # and the next version of Regal will allow for exceptions
+      # like this: https://github.com/StyraInc/regal/issues/379
+      level: ignore
+    # https://docs.styra.com/regal/rules/style/opa-fmt
+    opa-fmt:
+      level: ignore
+    # https://docs.styra.com/regal/rules/style/prefer-some-in-iteration
+    prefer-some-in-iteration:
+      level: ignore
+    # https://docs.styra.com/regal/rules/style/prefer-snake-case
+    prefer-snake-case:
+      # This is the default style preference for Rego, but since
+      # the style of this project better matches the domain it is
+      # modeling, we'll ignore this rule in favor of the custom
+      # naming-convention rule defined above.
+      level: ignore
+    # https://docs.styra.com/regal/rules/style/rule-length
+    rule-length:
+      level: ignore
+    # https://docs.styra.com/regal/rules/style/todo-comment
+    todo-comment:
+      level: ignore
+  testing:
+    # https://docs.styra.com/regal/rules/testing/identically-named-tests
+    identically-named-tests:
+      # Only a few of these — woulde be easy to fix
+      level: ignore
+    # https://docs.styra.com/regal/rules/testing/test-outside-test-package
+    test-outside-test-package:
+      # This is just a style preference
+      level: ignore
