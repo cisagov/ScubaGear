@@ -11,7 +11,7 @@ test_DefaultCatalogAppsType_Correct_V1 if {
         "app_policies": [
             {
                 "Identity": "Global",
-                "DefaultCatalogAppsType": "BlockedAppList"
+                "DefaultCatalogAppsType": "AllowedAppList"
             }
         ]
     }
@@ -30,7 +30,7 @@ test_DefaultCatalogAppsType_Correct_V2 if {
         "app_policies": [
             {
                 "Identity": "Tag:TestPolicy",
-                "DefaultCatalogAppsType": "BlockedAppList"
+                "DefaultCatalogAppsType": "AllowedAppList"
             }
         ]
     }
@@ -49,7 +49,7 @@ test_DefaultCatalogAppsType_Incorrect_V1 if {
         "app_policies": [
             {
                 "Identity": "Global",
-                "DefaultCatalogAppsType": "AllowedAppList"
+                "DefaultCatalogAppsType": "BlockedAppList"
             }
         ]
     }
@@ -68,7 +68,7 @@ test_DefaultCatalogAppsType_Incorrect_V2 if {
         "app_policies": [
             {
                 "Identity": "Tag:TestPolicy",
-                "DefaultCatalogAppsType": "AllowedAppList"
+                "DefaultCatalogAppsType": "BlockedAppList"
             }
         ]
     }
@@ -87,15 +87,15 @@ test_DefaultCatalogAppsType_Multiple if {
         "app_policies": [
             {
                 "Identity": "Global",
-                "DefaultCatalogAppsType": "BlockedAppList"
+                "DefaultCatalogAppsType": "AllowedAppList"
             },
             {
                 "Identity": "Tag:TestPolicy1",
-                "DefaultCatalogAppsType": "AllowedAppList"
+                "DefaultCatalogAppsType": "BlockedAppList"
             },
             {
                 "Identity": "Tag:TestPolicy2",
-                "DefaultCatalogAppsType": "AllowedAppList"
+                "DefaultCatalogAppsType": "BlockedAppList"
             }
         ]
     }
@@ -120,7 +120,7 @@ test_GlobalCatalogAppsType_Correct_V1 if {
         "app_policies": [
             {
                 "Identity": "Global",
-                "GlobalCatalogAppsType": "BlockedAppList"
+                "GlobalCatalogAppsType": "AllowedAppList"
             }
         ]
     }
@@ -139,7 +139,7 @@ test_GlobalCatalogAppsType_Correct_V2 if {
         "app_policies": [
             {
                 "Identity": "Tag:TestPolicy",
-                "GlobalCatalogAppsType": "BlockedAppList"
+                "GlobalCatalogAppsType": "AllowedAppList"
             }
         ]
     }
@@ -158,7 +158,7 @@ test_GlobalCatalogAppsType_Incorrect_V1 if {
         "app_policies": [
             {
                 "Identity": "Global",
-                "GlobalCatalogAppsType": "AllowedAppList"
+                "GlobalCatalogAppsType": "BlockedAppList"
             }
         ]
     }
@@ -177,7 +177,7 @@ test_GlobalCatalogAppsType_Incorrect_V2 if {
         "app_policies": [
             {
                 "Identity": "Tag:TestPolicy",
-                "GlobalCatalogAppsType": "AllowedAppList"
+                "GlobalCatalogAppsType": "BlockedAppList"
             }
         ]
     }
@@ -196,15 +196,15 @@ test_GlobalCatalogAppsType_Multiple if {
         "app_policies": [
             {
                 "Identity": "Global",
-                "GlobalCatalogAppsType": "AllowedAppList"
-            },
-            {
-                "Identity": "Tag:TestPolicy1",
                 "GlobalCatalogAppsType": "BlockedAppList"
             },
             {
-                "Identity": "Tag:TestPolicy2",
+                "Identity": "Tag:TestPolicy1",
                 "GlobalCatalogAppsType": "AllowedAppList"
+            },
+            {
+                "Identity": "Tag:TestPolicy2",
+                "GlobalCatalogAppsType": "BlockedAppList"
             }
         ]
     }
@@ -229,7 +229,7 @@ test_PrivateCatalogAppsType_Correct_V1 if {
         "app_policies": [
             {
                 "Identity": "Global",
-                "PrivateCatalogAppsType": "BlockedAppList"
+                "PrivateCatalogAppsType": "AllowedAppList"
             }
         ]
     }
@@ -248,7 +248,7 @@ test_PrivateCatalogAppsType_Correct_V2 if {
         "app_policies": [
             {
                 "Identity": "Tag:TestPolicy",
-                "PrivateCatalogAppsType": "BlockedAppList"
+                "PrivateCatalogAppsType": "AllowedAppList"
             }
         ]
     }
@@ -267,7 +267,7 @@ test_PrivateCatalogAppsType_Incorrect_V1 if {
         "app_policies": [
             {
                 "Identity": "Global",
-                "PrivateCatalogAppsType": "AllowedAppList"
+                "PrivateCatalogAppsType": "BlockedAppList"
             }
         ]
     }
@@ -286,7 +286,7 @@ test_PrivateCatalogAppsType_Incorrect_V2 if {
         "app_policies": [
             {
                 "Identity": "Tag:TestPolicy",
-                "PrivateCatalogAppsType": "AllowedAppList"
+                "PrivateCatalogAppsType": "BlockedAppList"
             }
         ]
     }
@@ -305,15 +305,15 @@ test_PrivateCatalogAppsType_Multiple if {
         "app_policies": [
             {
                 "Identity": "Global",
-                "PrivateCatalogAppsType": "AllowedAppList"
-            },
-            {
-                "Identity": "Tag:TestPolicy1",
                 "PrivateCatalogAppsType": "BlockedAppList"
             },
             {
-                "Identity": "Tag:TestPolicy2",
+                "Identity": "Tag:TestPolicy1",
                 "PrivateCatalogAppsType": "AllowedAppList"
+            },
+            {
+                "Identity": "Tag:TestPolicy2",
+                "PrivateCatalogAppsType": "BlockedAppList"
             }
         ]
     }
