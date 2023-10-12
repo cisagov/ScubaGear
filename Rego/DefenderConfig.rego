@@ -432,8 +432,8 @@ SensitiveRules[{
     "NotifyUserType" : Rules.NotifyUserType,
     "ContentNames" : ContentNames
 }] {
-	Rules := input.dlp_compliance_rules[_]
-	Rules.Disabled == false
+    Rules := input.dlp_compliance_rules[_]
+    Rules.Disabled == false
     Rules.IsAdvancedRule == false
     ContentNames := [Content.name | Content = Rules.ContentContainsSensitiveInformation[_]]
     Conditions := [ "U.S. Social Security Number (SSN)" in ContentNames,
@@ -449,15 +449,15 @@ SensitiveRules[{
 
 SensitiveRules[{
     "Name" : Rules.Name,
-	"ParentPolicyName" : Rules.ParentPolicyName,
-	"BlockAccess" : Rules.BlockAccess,
-	"BlockAccessScope" : Rules.BlockAccessScope,
-	"NotifyUser" : Rules.NotifyUser,
-	"NotifyUserType" : Rules.NotifyUserType,
+    "ParentPolicyName" : Rules.ParentPolicyName,
+    "BlockAccess" : Rules.BlockAccess,
+    "BlockAccessScope" : Rules.BlockAccessScope,
+    "NotifyUser" : Rules.NotifyUser,
+    "NotifyUserType" : Rules.NotifyUserType,
     "ContentNames" : ContentNames
 }] {
-	Rules := input.dlp_compliance_rules[_]
-	Rules.Disabled == false
+    Rules := input.dlp_compliance_rules[_]
+    Rules.Disabled == false
     Rules.IsAdvancedRule == true
     Rules.AdvancedRule
 
@@ -473,7 +473,7 @@ SensitiveRules[{
     ContentNames := regex.find_n(`(U.S. Social Security Number \(SSN\))|(U.S. Individual Taxpayer Identification Number \(ITIN\))|(Credit Card Number)`,
                                  RuleText, -1)
 
-	Conditions := [ contains(RuleText, "U.S. Social Security Number (SSN)"),
+    Conditions := [ contains(RuleText, "U.S. Social Security Number (SSN)"),
                     contains(RuleText, "U.S. Individual Taxpayer Identification Number (ITIN)"),
                     contains(RuleText, "Credit Card Number")]
 
