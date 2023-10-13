@@ -423,7 +423,7 @@ test_AllowPSTNUsersToBypassLobby_Incorrect if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement not met"
+    RuleOutput[0].ReportDetails == "1 meeting policy(ies) found that either allow everyone or dial-in users to bypass lobby: Tag:CustomPolicy"
 }
 
 #--
