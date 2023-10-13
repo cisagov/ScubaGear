@@ -1,0 +1,27 @@
+Description: Test Config for MS.DEFENDER.1.4v1 Compliant Matching Domain
+ProductNames:
+  - defender
+M365Environment: commercial
+OPAPath: .
+LogIn: false
+DisconnectOnExit: false
+OutPath: .
+OutFolderName: M365BaselineConformance
+OutProviderFileName: ProviderSettingsExport
+OutRegoFileName: TestResults
+OutReportName: BaselineReports
+Defender:
+  MS.DEFENDER.1.4v1:
+    SensitiveAccounts:
+      IncludedUsers:
+        -
+      IncludedGroups:
+        -
+      IncludedDomains:
+        - badpeople.r.us
+      ExcludedUsers:
+        -
+      ExcludedGroups:
+        -
+      ExcludedDomains:
+        -

@@ -86,6 +86,22 @@ function LoadProviderExport() {
   $ProviderExport
 }
 
+function Write-ScubaConfig() {
+  <#
+    .SYNOPSIS
+      Private helper function to write scuba config to a file.
+  #>
+  param(
+      [Parameter(Mandatory = $true)]
+      [ValidateNotNullOrEmpty()]
+      [hashtable]
+      $Config
+  )
+
+  $ScubaTestConfigPath = Join-Path -Path "C:\Temp" -ChildPath "ScubaTestConfig.json"
+  Set-Content -Path $ScubaTestConfigPath -Value ($Config | ConvertTo-Json ) -Force
+}
+
 function PublishProviderExport() {
   <#
     .SYNOPSIS
