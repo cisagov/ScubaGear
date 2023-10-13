@@ -1,0 +1,24 @@
+ProductName: defender
+TestPlan:
+  - PolicyId: MS.DEFENDER.1.3v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.DEFENDER.1.3v1 Non-compliant - No defender license
+        Preconditions: []
+        Postconditions: []
+        ExpectedResult: false
+  - PolicyId: MS.DEFENDER.1.5v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.DEFENDER.1.5v1 Non-compliant - No defender license
+        Preconditions: []
+        Postconditions: []
+        ExpectedResult: false
+  - PolicyId: MS.DEFENDER.3.1v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.DEFENDER.3.1v1 - No defender license
+        Preconditions: []
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false        

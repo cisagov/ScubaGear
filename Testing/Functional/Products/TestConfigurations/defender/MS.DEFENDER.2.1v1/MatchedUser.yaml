@@ -1,0 +1,15 @@
+Description: Test Config for MS.DEFENDER.2.1v1 Compliant Matching User
+ProductNames:
+  - defender
+OPAPath: .
+LogIn: false
+DisconnectOnExit: false
+OutPath: .
+OutFolderName: M365BaselineConformance
+OutProviderFileName: ProviderSettingsExport
+OutRegoFileName: TestResults
+OutReportName: BaselineReports
+Defender:
+  MS.DEFENDER.2.1v1:
+    SensitiveUsers:
+      - AgencyUserGlobalReader;agencyuserglobalreader@y2zj1.onmicrosoft.com
