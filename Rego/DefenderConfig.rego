@@ -634,7 +634,7 @@ SensitiveRulesNotBlocking[Rule.Name] {
 
 SensitiveRulesNotBlocking[Rule.Name] {
     Rule := SensitiveRules[_]
-    Rule.BlockAccess                              
+    Rule.BlockAccess
     Policy := input.dlp_compliance_policies[_]
     Rule.ParentPolicyName == Policy.Name
     count(error_rules) == 0
