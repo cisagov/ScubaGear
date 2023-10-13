@@ -644,34 +644,34 @@ TestPlan:
     Tests:
       - TestDescription: MS.DEFENDER.5.1v1 Compliant case
         Preconditions:
-        - Command: Set-ProtectionAlert
-          Splat:
-            Identity: "Suspicious email sending patterns detected"
-            Disabled: false
-        - Command: Set-ProtectionAlert
-          Splat:
-            Identity: "Suspicious Email Forwarding Activity"
-            Disabled: false
-        - Command: Set-ProtectionAlert
-          Splat:
-            Identity: "Messages have been delayed"
-            Disabled: false
-        - Command: Set-ProtectionAlert
-          Splat:
-            Identity: "Tenant restricted from sending unprovisioned email"
-            Disabled: false
-        - Command: Set-ProtectionAlert
-          Splat:
-            Identity: "User restricted from sending email"
-            Disabled: false
-        - Command: Set-ProtectionAlert
-          Splat:
-            Identity: "A potentially malicious URL click was detected"
-            Disabled: false
-        - Command: Set-ProtectionAlert
-          Splat:
-            Identity: "Suspicious connector activity"
-            Disabled: false
+          - Command: Set-ProtectionAlert
+            Splat:
+              Identity: "Suspicious email sending patterns detected"
+              Disabled: false
+          - Command: Set-ProtectionAlert
+            Splat:
+              Identity: "Suspicious Email Forwarding Activity"
+              Disabled: false
+          - Command: Set-ProtectionAlert
+            Splat:
+              Identity: "Messages have been delayed"
+              Disabled: false
+          - Command: Set-ProtectionAlert
+            Splat:
+              Identity: "Tenant restricted from sending unprovisioned email"
+              Disabled: false
+          - Command: Set-ProtectionAlert
+            Splat:
+              Identity: "User restricted from sending email"
+              Disabled: false
+          - Command: Set-ProtectionAlert
+            Splat:
+              Identity: "A potentially malicious URL click was detected"
+              Disabled: false
+          - Command: Set-ProtectionAlert
+            Splat:
+              Identity: "Suspicious connector activity"
+              Disabled: false
         Postconditions: []
         ExpectedResult: true
 
