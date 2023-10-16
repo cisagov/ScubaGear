@@ -633,6 +633,16 @@ SensitiveRulesNotBlocking[Rule.Name] {
     startswith(Policy.Mode, "TestWith") == true
 }
 
+SensitiveRulesNotBlocking[Rule.Name] {
+    Rule := SensitiveRules[_]
+    Rule.BlockAccess                              
+    Policy := input.dlp_compliance_policies[_]
+    Rule.ParentPolicyName == Policy.Name
+    count(error_rules) == 0
+    Rule.BlockAccessScope != "All"
+}
+
+
 tests[{
     "PolicyId" : "MS.DEFENDER.4.3v1",
     "Criticality" : "Should",
