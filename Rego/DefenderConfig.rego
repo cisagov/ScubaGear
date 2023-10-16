@@ -435,7 +435,7 @@ SensitiveRules[{
     Rules := input.dlp_compliance_rules[_]
     Rules.Disabled == false
     Rules.IsAdvancedRule == false
-    ContentNames := [Content.name | Content = Rules.ContentContainsSensitiveInformation[_]]
+    ContentNames := [Content.name | Content := Rules.ContentContainsSensitiveInformation[_]]
     Conditions := [ "U.S. Social Security Number (SSN)" in ContentNames,
                     "U.S. Individual Taxpayer Identification Number (ITIN)" in ContentNames,
                     "Credit Card Number" in ContentNames]
