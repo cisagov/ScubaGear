@@ -577,7 +577,7 @@ DevicesPolicies[{
     "Locations" : Policy.EndpointDlpLocation,
     "Workload" : Policy.Workload
     }] {
-    SensitivePolicies := {Rule.ParentPolicyName | Rule = SensitiveRules[_]}
+    SensitivePolicies := {Rule.ParentPolicyName | Rule := SensitiveRules[_]}
     Policy := input.dlp_compliance_policies[_]
     Policy.Name in SensitivePolicies
     "All" in Policy.EndpointDlpLocation
