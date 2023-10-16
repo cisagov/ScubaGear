@@ -9,10 +9,10 @@ test_AuditDisabled_Correct if {
     PolicyId := "MS.EXO.13.1v1"
 
     Output := tests with input as {
-        "org_config": 
+        "org_config":
         [
             {
-                "AuditDisabled" : false, 
+                "AuditDisabled" : false,
                 "Identity" : "Test name",
                 "Name":"A"
             }
@@ -20,7 +20,7 @@ test_AuditDisabled_Correct if {
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-    
+
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "Requirement met"
@@ -32,15 +32,15 @@ test_AuditDisabled_Incorrect if {
     Output := tests with input as {
         "org_config": [
             {
-                "AuditDisabled" : true, 
-                "Identity" : "Test name", 
+                "AuditDisabled" : true,
+                "Identity" : "Test name",
                 "Name" : "A"
             }
         ]
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
- 
+
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "Requirement not met"

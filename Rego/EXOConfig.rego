@@ -1,6 +1,7 @@
 package exo
 import future.keywords
 import data.report.utils.NotCheckedDetails
+import data.report.utils.DefenderMirrorDetails
 import data.report.utils.Format
 import data.report.utils.ReportDetailsBoolean
 import data.report.utils.Description
@@ -18,13 +19,7 @@ ReportDetailsArray(Status, Array1, Array2) = Detail if {
     Detail := Description(Fraction, "agency domain(s) found in violation:", String)
 }
 
-AllDomains := {Domain.domain | Domain = input.spf_records[_]}
-
-CustomDomains[Domain.domain] {
-    Domain = input.spf_records[_]
-    not endswith( Domain.domain, "onmicrosoft.com")
-}
-
+AllDomains := {Domain.domain | Domain := input.spf_records[_]}
 
 #
 # MS.EXO.1.1v1
@@ -70,7 +65,7 @@ tests[{
 #--
 DomainsWithoutSpf[DNSResponse.domain] {
     DNSResponse := input.spf_records[_]
-    SpfRecords := {Record | Record = DNSResponse.rdata[_]; startswith(Record, "v=spf1 ")}
+    SpfRecords := {Record | Record := DNSResponse.rdata[_]; startswith(Record, "v=spf1 ")}
     count(SpfRecords) == 0
 }
 
@@ -104,10 +99,10 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-DkimSigningConfig", "Get-ScubaDkimRecords", "Get-AcceptedDomain"],
     "ActualValue" : [input.dkim_records, input.dkim_config],
-    "ReportDetails" : ReportDetailsArray(Status, DomainsWithoutDkim, CustomDomains),
+    "ReportDetails" : ReportDetailsArray(Status, DomainsWithoutDkim, AllDomains),
     "RequirementMet" : Status
 }] {
-    DomainsWithoutDkim := CustomDomains - DomainsWithDkim
+    DomainsWithoutDkim := AllDomains - DomainsWithDkim
     Status := count(DomainsWithoutDkim) == 0
 }
 #--
@@ -161,8 +156,16 @@ tests[{
 #--
 DomainsWithoutDHSContact[DmarcRecord.domain] {
     DmarcRecord := input.dmarc_records[_]
-    ValidAnswers := [Answer | Answer := DmarcRecord.rdata[_]; contains(Answer, "mailto:reports@dmarc.cyber.dhs.gov")]
+    Rdata := DmarcRecord.rdata[_]
+    DmarcFields := split(Rdata, ";")
+    RuaFields := [Rua | Rua := DmarcFields[_]; contains(Rua, "rua=")]
+    ValidAnswers := [Answer | Answer := RuaFields[_]; contains(Answer, "mailto:reports@dmarc.cyber.dhs.gov")]
     count(ValidAnswers) == 0
+}
+
+DomainsWithoutDHSContact[DmarcRecord.domain] {
+    DmarcRecord := input.dmarc_records[_]
+    count(DmarcRecord.rdata) == 0 # failed dns query
 }
 
 tests[{
@@ -183,8 +186,21 @@ tests[{
 #--
 DomainsWithoutAgencyContact[DmarcRecord.domain] {
     DmarcRecord := input.dmarc_records[_]
-    EnoughContacts := [Answer | Answer := DmarcRecord.rdata[_]; count(split(Answer, "@")) >= 3]
-    count(EnoughContacts) == 0
+    Rdata := DmarcRecord.rdata[_]
+    DmarcFields := split(Rdata, ";")
+    RuaFields := [Rua | Rua := DmarcFields[_]; contains(Rua, "rua=")]
+    RufFields := [Ruf | Ruf := DmarcFields[_]; contains(Ruf, "ruf=")]
+    # 2 or more emails including reports@dmarc.cyber.dhs.gov checked by policy 4.3
+    RuaCountAcceptable := count([Answer | Answer := RuaFields[_]; count(split(Answer, "@")) > 2]) >= 1
+    # 1 or more emails
+    RufCountAcceptable := count([Answer | Answer := RufFields[_]; count(split(Answer, "@")) > 1]) >= 1
+    Conditions := [RuaCountAcceptable, RufCountAcceptable]
+    count([Condition | Condition := Conditions[_]; Condition == false]) > 0
+}
+
+DomainsWithoutAgencyContact[DmarcRecord.domain] {
+    DmarcRecord := input.dmarc_records[_]
+    count(DmarcRecord.rdata) == 0 # failed dns query
 }
 
 tests[{
@@ -221,18 +237,16 @@ tests[{
 }
 #--
 
-# Are both the tests supposed to be the same?
-
 #
 # MS.EXO.6.1v1
 #--
 
-SharingPolicyAllowedSharing[SharingPolicy.Name] {
+SharingPolicyContactsAllowedAllDomains[SharingPolicy.Name] {
     SharingPolicy := input.sharing_policy[_]
-    InList := "*" in SharingPolicy.Domains
-    InList == true
+    Domains := SharingPolicy.Domains[_]
+    contains(Domains, "*")
+    contains(Domains, "Contacts")
 }
-
 
 tests[{
     "PolicyId" : "MS.EXO.6.1v1",
@@ -242,15 +256,22 @@ tests[{
     "ReportDetails" : ReportDetailsString(Status, ErrorMessage),
     "RequirementMet" : Status
 }] {
-    ErrorMessage := "Wildcard domain (\"*\") in shared domains list, enabling sharing with all domains by default"
-
-    Status := count(SharingPolicyAllowedSharing) == 0
+    ContactsSharingPolicies := SharingPolicyContactsAllowedAllDomains
+    ErrorMessage := Description(Format(ContactsSharingPolicies), "sharing polic(ies) are sharing contacts folders with all domains by default:", concat(", ", ContactsSharingPolicies))
+    Status := count(ContactsSharingPolicies) == 0
 }
 #--
 
 #
 # MS.EXO.6.2v1
 #--
+
+SharingPolicyCalendarAllowedAllDomains[SharingPolicy.Name] {
+    SharingPolicy := input.sharing_policy[_]
+    Domains := SharingPolicy.Domains[_]
+    contains(Domains, "*")
+    contains(Domains, "Calendar")
+}
 
 tests[{
     "PolicyId" : "MS.EXO.6.2v1",
@@ -260,8 +281,9 @@ tests[{
     "ReportDetails" : ReportDetailsString(Status, ErrorMessage),
     "RequirementMet" : Status
 }] {
-    ErrorMessage := "Wildcard domain (\"*\") in shared domains list, enabling sharing with all domains by default"
-    Status := count(SharingPolicyAllowedSharing) == 0
+    CalendarSharingPolicies := SharingPolicyCalendarAllowedAllDomains
+    ErrorMessage := Description(Format(CalendarSharingPolicies), "sharing polic(ies) are sharing calendar details with all domains by default:", concat(", ", CalendarSharingPolicies))
+    Status := count(CalendarSharingPolicies) == 0
 }
 #--
 
@@ -272,15 +294,15 @@ tests[{
     "PolicyId" : "MS.EXO.7.1v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-TransportRule"],
-    "ActualValue" : [Rule.FromScope | Rule = Rules[_]],
+    "ActualValue" : [Rule.FromScope | Rule := Rules[_]],
     "ReportDetails" : ReportDetailsString(Status, ErrorMessage),
     "RequirementMet" : Status
 }] {
     Rules := input.transport_rule
     ErrorMessage := "No transport rule found that applies warnings to emails received from outside the organization"
-    EnabledRules := [rule | rule = Rules[_]; rule.State == "Enabled"; rule.Mode == "Enforce"]
-    Conditions := [IsCorrectScope | IsCorrectScope = EnabledRules[_].FromScope == "NotInOrganization"]
-    Status := count([Condition | Condition = Conditions[_]; Condition == true]) > 0
+    EnabledRules := [rule | rule := Rules[_]; rule.State == "Enabled"; rule.Mode == "Enforce"; count(rule.PrependSubject) >=1]
+    Conditions := [IsCorrectScope | IsCorrectScope := EnabledRules[_].FromScope == "NotInOrganization"]
+    Status := count([Condition | Condition := Conditions[_]; Condition == true]) > 0
 }
 #--
 
@@ -289,13 +311,14 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "PolicyId" : "MS.EXO.8.1v1",
+    "PolicyId" : PolicyId,
     "Criticality" : "Shall/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
+    "ReportDetails" : DefenderMirrorDetails(PolicyId),
     "RequirementMet" : false
 }] {
+    PolicyId := "MS.EXO.8.1v1"
     true
 }
 #--
@@ -305,13 +328,14 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "PolicyId" : "MS.EXO.8.2v1",
+    "PolicyId" : PolicyId,
     "Criticality" : "Shall/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
+    "ReportDetails" : DefenderMirrorDetails(PolicyId),
     "RequirementMet" : false
 }] {
+    PolicyId := "MS.EXO.8.2v1"
     true
 }
 #--
@@ -321,13 +345,14 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "PolicyId" : "MS.EXO.9.1v1",
+    "PolicyId" : PolicyId,
     "Criticality" : "Shall/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
+    "ReportDetails" : DefenderMirrorDetails(PolicyId),
     "RequirementMet" : false
 }] {
+    PolicyId := "MS.EXO.9.1v1"
     true
 }
 #--
@@ -337,13 +362,14 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "PolicyId" : "MS.EXO.9.2v1",
+    "PolicyId" : PolicyId,
     "Criticality" : "Should/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
+    "ReportDetails" : DefenderMirrorDetails(PolicyId),
     "RequirementMet" : false
 }] {
+    PolicyId := "MS.EXO.9.2v1"
     true
 }
 #--
@@ -353,13 +379,14 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "PolicyId" : "MS.EXO.9.3v1",
+    "PolicyId" : PolicyId,
     "Criticality" : "Shall/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
+    "ReportDetails" : DefenderMirrorDetails(PolicyId),
     "RequirementMet" : false
 }] {
+    PolicyId := "MS.EXO.9.3v1"
     true
 }
 #--
@@ -369,13 +396,14 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "PolicyId" : "MS.EXO.10.1v1",
+    "PolicyId" : PolicyId,
     "Criticality" : "Shall/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
+    "ReportDetails" : DefenderMirrorDetails(PolicyId),
     "RequirementMet" : false
 }] {
+    PolicyId := "MS.EXO.10.1v1"
     true
 }
 #--
@@ -385,13 +413,14 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "PolicyId" : "MS.EXO.10.2v1",
+    "PolicyId" : PolicyId,
     "Criticality" : "Shall/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
+    "ReportDetails" : DefenderMirrorDetails(PolicyId),
     "RequirementMet" : false
 }] {
+    PolicyId := "MS.EXO.10.2v1"
     true
 }
 #--
@@ -401,13 +430,14 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "PolicyId" : "MS.EXO.10.3v1",
+    "PolicyId" : PolicyId,
     "Criticality" : "Should/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
+    "ReportDetails" : DefenderMirrorDetails(PolicyId),
     "RequirementMet" : false
 }] {
+    PolicyId := "MS.EXO.10.3v1"
     true
 }
 #--
@@ -417,13 +447,14 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "PolicyId" : "MS.EXO.11.1v1",
+    "PolicyId" : PolicyId,
     "Criticality" : "Should/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
+    "ReportDetails" : DefenderMirrorDetails(PolicyId),
     "RequirementMet" : false
 }] {
+    PolicyId := "MS.EXO.11.1v1"
     true
 }
 #--
@@ -433,13 +464,14 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "PolicyId" : "MS.EXO.11.2v1",
+    "PolicyId" : PolicyId,
     "Criticality" : "Should/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
+    "ReportDetails" : DefenderMirrorDetails(PolicyId),
     "RequirementMet" : false
 }] {
+    PolicyId := "MS.EXO.11.2v1"
     true
 }
 #--
@@ -449,13 +481,14 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "PolicyId" : "MS.EXO.11.3v1",
+    "PolicyId" : PolicyId,
     "Criticality" : "Should/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
+    "ReportDetails" : DefenderMirrorDetails(PolicyId),
     "RequirementMet" : false
 }] {
+    PolicyId := "MS.EXO.11.3v1"
     true
 }
 #--
@@ -477,8 +510,9 @@ tests[{
     "ReportDetails" : ReportDetailsString(Status, ErrorMessage),
     "RequirementMet" : Status
 }]{
-    ErrorMessage := "Allow-list is in use"
-    Status := count(ConnFiltersWithIPAllowList) == 0
+    ConnFilterPolicies := ConnFiltersWithIPAllowList
+    ErrorMessage := Description(Format(ConnFilterPolicies), "connection filter polic(ies) with an IP allowlist:", concat(", ", ConnFilterPolicies))
+    Status := count(ConnFilterPolicies) == 0
 }
 #--
 
@@ -496,10 +530,12 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-HostedConnectionFilterPolicy"],
     "ActualValue" : input.conn_filter,
-    "ReportDetails" : ReportDetailsBoolean(Status),
+    "ReportDetails" : ReportDetailsString(Status, ErrorMessage),
     "RequirementMet" : Status
 }]{
-    Status := count(ConnFiltersWithSafeList) == 0
+    ConnFilterPolicies := ConnFiltersWithSafeList
+    ErrorMessage := Description(Format(ConnFilterPolicies), "connection filter polic(ies) with a safe list:", concat(", ", ConnFilterPolicies))
+    Status := count(ConnFilterPolicies) == 0
 }
 #--
 
@@ -528,13 +564,14 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "PolicyId" : "MS.EXO.14.1v1",
+    "PolicyId" : PolicyId,
     "Criticality" : "Shall/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
+    "ReportDetails" : DefenderMirrorDetails(PolicyId),
     "RequirementMet" : false
 }] {
+    PolicyId := "MS.EXO.14.1v1"
     true
 }
 #--
@@ -544,13 +581,14 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "PolicyId" : "MS.EXO.14.2v1",
+    "PolicyId" : PolicyId,
     "Criticality" : "Shall/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
+    "ReportDetails" : DefenderMirrorDetails(PolicyId),
     "RequirementMet" : false
 }] {
+    PolicyId := "MS.EXO.14.2v1"
     true
 }
 #--
@@ -560,13 +598,14 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "PolicyId" : "MS.EXO.14.3v1",
+    "PolicyId" : PolicyId,
     "Criticality" : "Shall/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
+    "ReportDetails" : DefenderMirrorDetails(PolicyId),
     "RequirementMet" : false
 }] {
+    PolicyId := "MS.EXO.14.3v1"
     true
 }
 #--
@@ -576,13 +615,14 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "PolicyId" : "MS.EXO.15.1v1",
+    "PolicyId" : PolicyId,
     "Criticality" : "Should/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
+    "ReportDetails" : DefenderMirrorDetails(PolicyId),
     "RequirementMet" : false
 }] {
+    PolicyId := "MS.EXO.15.1v1"
     true
 }
 #--
@@ -592,13 +632,14 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "PolicyId" : "MS.EXO.15.2v1",
+    "PolicyId" : PolicyId,
     "Criticality" : "Should/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
+    "ReportDetails" : DefenderMirrorDetails(PolicyId),
     "RequirementMet" : false
 }] {
+    PolicyId := "MS.EXO.15.2v1"
     true
 }
 #--
@@ -608,13 +649,14 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "PolicyId" : "MS.EXO.15.3v1",
+    "PolicyId" : PolicyId,
     "Criticality" : "Should/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
+    "ReportDetails" : DefenderMirrorDetails(PolicyId),
     "RequirementMet" : false
 }] {
+    PolicyId := "MS.EXO.15.3v1"
     true
 }
 #--
@@ -624,13 +666,14 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "PolicyId" : "MS.EXO.16.1v1",
+    "PolicyId" : PolicyId,
     "Criticality" : "Shall/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
+    "ReportDetails" : DefenderMirrorDetails(PolicyId),
     "RequirementMet" : false
 }] {
+    PolicyId := "MS.EXO.16.1v1"
     true
 }
 #--
@@ -640,13 +683,14 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "PolicyId" : "MS.EXO.16.2v1",
+    "PolicyId" : PolicyId,
     "Criticality" : "Should/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
+    "ReportDetails" : DefenderMirrorDetails(PolicyId),
     "RequirementMet" : false
 }] {
+    PolicyId := "MS.EXO.16.2v1"
     true
 }
 #--
@@ -656,14 +700,16 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "PolicyId" : "MS.EXO.17.1v1",
+    "PolicyId" : PolicyId,
     "Criticality" : "Shall/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
+    "ReportDetails" : DefenderMirrorDetails(PolicyId),
     "RequirementMet" : false
 }] {
+    PolicyId := "MS.EXO.17.1v1"
     true
+
 }
 #--
 
@@ -672,13 +718,14 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "PolicyId" : "MS.EXO.17.2v1",
+    "PolicyId" : PolicyId,
     "Criticality" : "Shall/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
+    "ReportDetails" : DefenderMirrorDetails(PolicyId),
     "RequirementMet" : false
 }] {
+    PolicyId := "MS.EXO.17.2v1"
     true
 }
 #--
@@ -688,13 +735,14 @@ tests[{
 #--
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests[{
-    "PolicyId" : "MS.EXO.17.3v1",
+    "PolicyId" : PolicyId,
     "Criticality" : "Shall/3rd Party",
     "Commandlet" : [],
     "ActualValue" : [],
-    "ReportDetails" : "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
+    "ReportDetails" : DefenderMirrorDetails(PolicyId),
     "RequirementMet" : false
 }] {
+    PolicyId := "MS.EXO.17.3v1"
     true
 }
 #--
