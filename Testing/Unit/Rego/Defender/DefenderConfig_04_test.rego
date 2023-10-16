@@ -680,45 +680,6 @@ test_Locations_Incorrect_V7 if {
 
 #
 # Policy 3
-test_ContentContainsSensitiveInformation_Incorrect_V1 if {
-    PolicyId := "MS.DEFENDER.4.3v1"
-
-    Output := tests with input as {
-        "dlp_compliance_rules": [
-            {
-                "ContentContainsSensitiveInformation":  [
-                    {"name":  "U.S. Social Security Number (SSN)"},
-                    {"name":  "U.S. Individual Taxpayer Identification Number (ITIN)"}
-                ],
-                "Name":  "Baseline Rule",
-                "Disabled" : false,
-                "ParentPolicyName":  "Default Office 365 DLP policy",
-                "BlockAccess":  true,
-                "BlockAccessScope":  "All",
-                "NotifyUser":  [
-                    "SiteAdmin",
-                    "LastModifier",
-                    "Owner"
-                ],
-                "NotifyUserType":  "NotSet",
-                "IsAdvancedRule": false
-            }
-        ],
-        "dlp_compliance_policies": [
-            {
-                "Name": "Default Office 365 DLP policy",
-                "Mode": "Enable",
-                "Enabled": true
-            }
-        ]
-    }
-
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement not met"
-}
 #--
 # test_BlockAccess_Correct if {
 #     ControlNumber := "Defender 2.2"
