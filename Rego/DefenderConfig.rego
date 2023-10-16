@@ -629,18 +629,9 @@ SensitiveRulesNotBlocking[Rule.Name] {
     Rule := SensitiveRules[_]
     Policy := input.dlp_compliance_policies[_]
     Rule.ParentPolicyName == Policy.Name
+    Rule.BlockAccess
     startswith(Policy.Mode, "TestWith") == true
 }
-
-SensitiveRulesNotBlocking[Rule.Name] {
-    Rule := SensitiveRules[_]
-    Rule.BlockAccess
-    Policy := input.dlp_compliance_policies[_]
-    Rule.ParentPolicyName == Policy.Name
-    count(error_rules) == 0
-    Rule.BlockAccessScope != "All"
-}
-
 
 tests[{
     "PolicyId" : "MS.DEFENDER.4.3v1",
@@ -662,7 +653,6 @@ tests[{
 # Step 4: ensure that some user is notified in the event of a DLP violation
 SensitiveRulesNotNotifying[Rule.Name] {
     Rule := SensitiveRules[_]
-    count(error_rules) == 0
     count(Rule.NotifyUser) == 0
 }
 
