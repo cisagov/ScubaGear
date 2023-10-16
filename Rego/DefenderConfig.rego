@@ -459,7 +459,6 @@ SensitiveRules[{
     Rules := input.dlp_compliance_rules[_]
     Rules.Disabled == false
     Rules.IsAdvancedRule == true
-    Rules.AdvancedRule
 
     Policy := input.dlp_compliance_policies[_]
     Rules.ParentPolicyName == Policy.Name
