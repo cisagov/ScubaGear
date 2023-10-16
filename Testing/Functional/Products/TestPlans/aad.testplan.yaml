@@ -123,6 +123,7 @@ TestPlan:
     TestDriver: RunCached
     Tests:
       - TestDescription: MS.AAD.3.2v1 Non-Compliant case - Report Only
+        ### This test disables the standard non-specific MFA policy from the tenant
         Preconditions:
           - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
@@ -132,6 +133,7 @@ TestPlan:
         Postconditions: []
         ExpectedResult: false        
       - TestDescription: MS.AAD.3.2v1 Compliant case - Non specific MFA method is enforced
+        ### This test enables the standard non-specific MFA policy from the tenant - should already be enabled but just in case
         Preconditions:
           - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
@@ -140,7 +142,8 @@ TestPlan:
                 State: enabled  
         Postconditions: []
         ExpectedResult: true
-      - TestDescription: MS.AAD.3.2v1 Compliant case - Phishing-resistant MFA is enforced so automatically pass
+      - TestDescription: MS.AAD.3.2v1 Compliant case - Phishing-resistant MFA is enforced so automatically pass even when non-specific MFA is disabled
+        ### This test creates a phishing-resistant MFA policy and disables the standard non-specific MFA policy from the tenant
         Preconditions:
           - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
@@ -206,10 +209,11 @@ TestPlan:
     TestDriver: RunCached
     Tests:
       - TestDescription: MS.AAD.3.6v1 Non-Compliant case - Bad Authentication Strength included
+        ### This test injects an authentication strength of password,sms which is non-compliant
         Preconditions:
           - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
-              displayName: Live - Automated Test 1 - DO NOT MODIFY
+              displayName: Automated Test 1 - DO NOT MODIFY
               updates:
                 State: enabled  
                 Conditions.Applications.IncludeApplications: 
@@ -231,10 +235,11 @@ TestPlan:
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.AAD.3.6v1 Compliant case
+        ### This test creates a phishing-resistant MFA policy and applies it to the required roles
         Preconditions:
           - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
-              displayName: Live - Automated Test 1 - DO NOT MODIFY
+              displayName: Automated Test 1 - DO NOT MODIFY
               updates:
                 State: enabled  
                 Conditions.Applications.IncludeApplications: 
