@@ -1,12 +1,19 @@
 ProductName: powerplatform
 TestPlan:
-- PolicyId: MS.POWERPLATFORM.1.1v1
+  - PolicyId: MS.POWERPLATFORM.1.1v1
     TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.POWERPLATFORM.1.1v1 Non-compliant - Sandbox Enviornment Creation Restricted To Admins
+      - TestDescription: MS.POWERPLATFORM.1.1v1 Compliant case - Disables environment creation by nonadmin users
         Preconditions:
           - Command: Set-TenantSettings
             Splat:
-              Settings: @{ DisableEnvironmentCreationByNonAdminUsers = $false }
+              RequestBody: '@{ DisableEnvironmentCreationByNonAdminUsers = $true }'
         Postconditions: []
-        ExpectedResult: false
+        ExpectedResult: true
+      - TestDescription: MS.POWERPLATFORM.1.1v1 Non-Compliant case - Allows environment creation by nonadmin users
+        Preconditions:
+          - Command: Set-TenantSettings
+            Splat:
+              RequestBody: '@{ DisableEnvironmentCreationByNonAdminUsers = $false }'
+        Postconditions: []
+        ExpectedResult: true
