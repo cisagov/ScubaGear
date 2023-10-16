@@ -716,7 +716,7 @@ test_ContentContainsSensitiveInformation_Incorrect_V1 if {
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
+    Not RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "1 rule(s) found that do(es) not block access or associated policy not set to enforce block action: Baseline Rule"
 }
 #--
