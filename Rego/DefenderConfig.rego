@@ -477,7 +477,7 @@ SensitiveRules[{
                     contains(RuleText, "U.S. Individual Taxpayer Identification Number (ITIN)"),
                     contains(RuleText, "Credit Card Number")]
 
-    count([Condition | Condition = Conditions[_]; Condition == true]) > 0
+    count([Condition | Condition := Conditions[_]; Condition == true]) > 0
 }
 
 # Step 1: Ensure that there is coverage for SSNs, ITINs, and credit cards
