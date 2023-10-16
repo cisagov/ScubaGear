@@ -512,7 +512,7 @@ tests[{
     "Commandlet" : ["Get-DlpComplianceRule"],
     "ActualValue" : Rules,
     "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
-    "RequirementMet" : Status,
+    "RequirementMet" : Status
 }] {
     error_rule := "No matching rules found for:"
     ErrorMessage := concat(" ",  [error_rule, concat(", ", error_rules)])
@@ -604,7 +604,7 @@ tests[{
     "Commandlet": ["Get-DLPCompliancePolicy"],
     "ActualValue": Policies,
     "ReportDetails": CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
-    "RequirementMet": Status,
+    "RequirementMet": Status
 }] {
     error_policy := "No enabled policy found that applies to:"
     ErrorMessage := concat(" ", [error_policy, concat(", ", error_policies)])
