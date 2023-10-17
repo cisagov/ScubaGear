@@ -713,7 +713,7 @@ tests[{
     ErrorMessage := DefenderErrorMessage43(Rules)
     Conditions := [count(Rules) == 0, count(SensitiveInfoPolicies) > 0]
     Status := count([Condition | Condition := Conditions[_];
-                     Condition == true ]) == 2
+                                    Condition == true ]) == 2
 }
 #--
 
@@ -724,7 +724,7 @@ tests[{
 SensitiveRulesNotNotifying[Rule.Name] {
     Rule := SensitiveRules[_]
     count(SensitiveInfoPolicies) > 0
-    Rule in SensitiveInfoPolicies
+    Rule.ParentPolicyName in SensitiveInfoPolicies
     count(Rule.NotifyUser) == 0
 }
 
@@ -750,7 +750,7 @@ tests[{
     ErrorMessage := DefenderErrorMessage44(Rules)
     Conditions := [count(Rules) == 0, count(SensitiveInfoPolicies) > 0]
     Status := count([Condition | Condition := Conditions[_];
-                     Condition == true ]) == 2
+                                    Condition == true ]) == 2
 }
 #--
 
