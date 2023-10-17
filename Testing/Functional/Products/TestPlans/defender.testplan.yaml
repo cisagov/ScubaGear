@@ -1,526 +1,196 @@
 ProductName: defender
 TestPlan:
-  - PolicyId: MS.DEFENDER.1.1v1
+  - PolicyId: MS.DEFENDER.1.2v1
     TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.DEFENDER.1.1v1 Non-compliant -- EOP Disabled, ATP Disabled for both STd & Strict
+      - TestDescription: MS.DEFENDER.1.2v1 Non-compliant - std&strict SentTo Non-null, SentToMemberOf Non-null, RecipientDomainIs Non-null
         Preconditions:
-          - Command: Disable-EOPProtectionPolicyRule
-            Splat:
-              Identity: Standard Preset Security Policy
-              Confirm: false
-          - Command: Disable-ATPProtectionPolicyRule
-            Splat:
-              Identity: Standard Preset Security Policy
-              Confirm: false
-          - Command: Disable-EOPProtectionPolicyRule
-            Splat:
-              Identity: Strict Preset Security Policy
-              Confirm: false
-          - Command: Disable-ATPProtectionPolicyRule
+          - Command: 'Set-EOPProtectionPolicyRule -Identity "Standard Preset Security Policy" -SentTo (Get-MailUser)[0].UserPrincipalName -SentToMemberOf (Get-UnifiedGroup)[0].alias -RecipientDomainIs badpeople.r.us -Confirm:$false'
+          - Command: 'Set-EOPProtectionPolicyRule -Identity "Strict Preset Security Policy" -SentTo (Get-MailUser)[0].UserPrincipalName -SentToMemberOf (Get-UnifiedGroup)[0].alias -RecipientDomainIs badpeople.r.us -Confirm:$false'
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.1.2v1 Compliant - Std Non-null Strict Null
+        Preconditions:
+          - Command: 'Set-EOPProtectionPolicyRule -Identity "Standard Preset Security Policy" -SentTo (Get-MailUser)[0].UserPrincipalName -SentToMemberOf (Get-UnifiedGroup)[0].alias -RecipientDomainIs badpeople.r.us -Confirm:$false'
+          - Command: Set-EOPProtectionPolicyRule
             Splat:
               Identity: Strict Preset Security Policy
+              SentTo: null
+              SentToMemberOf: null
+              RecipientDomainIs: null
               Confirm: false
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.DEFENDER.1.1v1 Non-compliant -- Std EOP Disabled, ATP Disabled; Strict EOP Disabled, ATP Enabled
+      - TestDescription: MS.DEFENDER.1.2v1 Compliant - Std Null Strict Non-null
         Preconditions:
-          - Command: Disable-EOPProtectionPolicyRule
+          - Command: Set-EOPProtectionPolicyRule
             Splat:
               Identity: Standard Preset Security Policy
+              SentTo: null
+              SentToMemberOf: null
+              RecipientDomainIs: null
               Confirm: false
-          - Command: Disable-ATPProtectionPolicyRule
-            Splat:
-              Identity: Standard Preset Security Policy
-              Confirm: false
-          - Command: Disable-EOPProtectionPolicyRule
-            Splat:
-              Identity: Strict Preset Security Policy
-              Confirm: false
-          - Command: Enable-ATPProtectionPolicyRule
-            Splat:
-              Identity: Strict Preset Security Policy
-              Confirm: false
-        Postconditions: []
-        ExpectedResult: false
-      - TestDescription: MS.DEFENDER.1.1v1 Non-compliant -- Std EOP Disabled, ATP Disabled; Strict EOP Enabled, ATP Disabled
-        Preconditions:
-          - Command: Disable-EOPProtectionPolicyRule
-            Splat:
-              Identity: Standard Preset Security Policy
-              Confirm: false
-          - Command: Disable-ATPProtectionPolicyRule
-            Splat:
-              Identity: Standard Preset Security Policy
-              Confirm: false
-              Confirm: false
-          - Command: Enable-EOPProtectionPolicyRule
-            Splat:
-              Identity: Strict Preset Security Policy
-              Confirm: false
-          - Command: Disable-ATPProtectionPolicyRule
-            Splat:
-              Identity: Strict Preset Security Policy
-              Confirm: false
-        Postconditions: []
-        ExpectedResult: false
-      - TestDescription: MS.DEFENDER.1.1v1 Non-compliant -- Std EOP Disabled, ATP Disabled; Strict EOP Enabled, ATP Enabled
-        Preconditions:
-          - Command: Disable-EOPProtectionPolicyRule
-            Splat:
-              Identity: Standard Preset Security Policy
-              Confirm: false
-          - Command: Disable-ATPProtectionPolicyRule
-            Splat:
-              Identity: Standard Preset Security Policy
-              Confirm: false
-              Confirm: false
-          - Command: Enable-EOPProtectionPolicyRule
-            Splat:
-              Identity: Strict Preset Security Policy
-              Confirm: false
-          - Command: Enable-ATPProtectionPolicyRule
-            Splat:
-              Identity: Strict Preset Security Policy
-              Confirm: false
-        Postconditions: []
-        ExpectedResult: false
-      - TestDescription: MS.DEFENDER.1.1v1 Non-compliant -- Std EOP Disabled, ATP Enabled; Strict EOP Disabled, ATP Disabled
-        Preconditions:
-          - Command: Disable-EOPProtectionPolicyRule
-            Splat:
-              Identity: Standard Preset Security Policy
-              Confirm: false
-          - Command: Enable-ATPProtectionPolicyRule
-            Splat:
-              Identity: Standard Preset Security Policy
-              Confirm: false
-          - Command: Disable-EOPProtectionPolicyRule
-            Splat:
-              Identity: Strict Preset Security Policy
-              Confirm: false
-          - Command: Disable-ATPProtectionPolicyRule
-            Splat:
-              Identity: Strict Preset Security Policy
-              Confirm: false
-        Postconditions: []
-        ExpectedResult: false
-      - TestDescription: MS.DEFENDER.1.1v1 Compliant -- Std EOP Disabled, ATP Enabled; Strict EOP Disabled, ATP Enabled
-        Preconditions:
-          - Command: Disable-EOPProtectionPolicyRule
-            Splat:
-              Identity: Standard Preset Security Policy
-              Confirm: false
-          - Command: Enable-ATPProtectionPolicyRule
-            Splat:
-              Identity: Standard Preset Security Policy
-              Confirm: false
-          - Command: Disable-EOPProtectionPolicyRule
-            Splat:
-              Identity: Strict Preset Security Policy
-              Confirm: false
-          - Command: Enable-ATPProtectionPolicyRule
-            Splat:
-              Identity: Strict Preset Security Policy
-              Confirm: true
-        Postconditions: []
-        ExpectedResult: false
-      - TestDescription: MS.DEFENDER.1.1v1 Compliant -- Std EOP Disabled, ATP Enabled; Strict EOP Enabled, ATP Disabled
-        Preconditions:
-          - Command: Disable-EOPProtectionPolicyRule
-            Splat:
-              Identity: Standard Preset Security Policy
-              Confirm: false
-          - Command: Enable-ATPProtectionPolicyRule
-            Splat:
-              Identity: Standard Preset Security Policy
-              Confirm: false
-          - Command: Enable-EOPProtectionPolicyRule
-            Splat:
-              Identity: Strict Preset Security Policy
-              Confirm: false
-          - Command: Disable-ATPProtectionPolicyRule
-            Splat:
-              Identity: Strict Preset Security Policy
-              Confirm: true
-        Postconditions: []
-        ExpectedResult: false
-      - TestDescription: MS.DEFENDER.1.1v1 Compliant -- Std EOP Disabled, ATP Enabled; Strict EOP Enabled, ATP Enabled
-        Preconditions:
-          - Command: Disable-EOPProtectionPolicyRule
-            Splat:
-              Identity: Standard Preset Security Policy
-              Confirm: false
-          - Command: Enable-ATPProtectionPolicyRule
-            Splat:
-              Identity: Standard Preset Security Policy
-              Confirm: false
-          - Command: Enable-EOPProtectionPolicyRule
-            Splat:
-              Identity: Strict Preset Security Policy
-              Confirm: false
-          - Command: Enable-ATPProtectionPolicyRule
-            Splat:
-              Identity: Strict Preset Security Policy
-              Confirm: false
+          - Command: 'Set-EOPProtectionPolicyRule -Identity "Strict Preset Security Policy" -SentTo (Get-MailUser)[0].UserPrincipalName -SentToMemberOf (Get-UnifiedGroup)[0].alias -RecipientDomainIs badpeople.r.us -Confirm:$false'
         Postconditions: []
         ExpectedResult: true
-      - TestDescription: MS.DEFENDER.1.1v1 Non-compliant -- Std EOP Enabled, ATP Disabled; Strict EOP Disabled, ATP Disabled
+      - TestDescription: MS.DEFENDER.1.2v1 Compliant - std&strict SentTo Null, SentToMemberOf Null, RecipientDomainIs Null
         Preconditions:
-          - Command: Enable-EOPProtectionPolicyRule
+          - Command: Set-EOPProtectionPolicyRule
             Splat:
               Identity: Standard Preset Security Policy
-              Confirm: false
-          - Command: Disable-ATPProtectionPolicyRule
-            Splat:
-              Identity: Standard Preset Security Policy
-              Confirm: false
-          - Command: Disable-EOPProtectionPolicyRule
-            Splat:
-              Identity: Strict Preset Security Policy
-              Confirm: false
-          - Command: Disable-ATPProtectionPolicyRule
-            Splat:
-              Identity: Strict Preset Security Policy
-              Confirm: false
-        Postconditions: []
-        ExpectedResult: false
-      - TestDescription: MS.DEFENDER.1.1v1 Compliant -- Std EOP Enabled, ATP Disabled; Strict EOP Disabled, ATP Enabled
-        Preconditions:
-          - Command: Enable-EOPProtectionPolicyRule
-            Splat:
-              Identity: Standard Preset Security Policy
-              Confirm: false
-          - Command: Disable-ATPProtectionPolicyRule
-            Splat:
-              Identity: Standard Preset Security Policy
-              Confirm: false
-          - Command: Disable-EOPProtectionPolicyRule
-            Splat:
-              Identity: Strict Preset Security Policy
-              Confirm: false
-          - Command: Enable-ATPProtectionPolicyRule
-            Splat:
-              Identity: Strict Preset Security Policy
-              Confirm: true
-        Postconditions: []
-        ExpectedResult: false
-      - TestDescription: MS.DEFENDER.1.1v1 Compliant -- Std EOP Enabled, ATP Disabled; Strict EOP Enabled, ATP Disabled
-        Preconditions:
-          - Command: Enable-EOPProtectionPolicyRule
-            Splat:
-              Identity: Standard Preset Security Policy
-              Confirm: false
-          - Command: Disable-ATPProtectionPolicyRule
-            Splat:
-              Identity: Standard Preset Security Policy
+              SentTo: null
+              SentToMemberOf: null
+              RecipientDomainIs: null
               Confirm: false
           - Command: Enable-EOPProtectionPolicyRule
             Splat:
               Identity: Strict Preset Security Policy
-              Confirm: false
-          - Command: Disable-ATPProtectionPolicyRule
-            Splat:
-              Identity: Strict Preset Security Policy
-              Confirm: true
-        Postconditions: []
-        ExpectedResult: false
-      - TestDescription: MS.DEFENDER.1.1v1 Compliant -- Std EOP Enabled, ATP Disabled; Strict EOP Enabled, ATP Enabled
-        Preconditions:
-          - Command: Enable-EOPProtectionPolicyRule
-            Splat:
-              Identity: Standard Preset Security Policy
-              Confirm: false
-          - Command: Disable-ATPProtectionPolicyRule
-            Splat:
-              Identity: Standard Preset Security Policy
-              Confirm: false
-          - Command: Enable-EOPProtectionPolicyRule
-            Splat:
-              Identity: Strict Preset Security Policy
-              Confirm: false
-          - Command: Enable-ATPProtectionPolicyRule
-            Splat:
-              Identity: Strict Preset Security Policy
-              Confirm: true
-        Postconditions: []
-        ExpectedResult: false
-      - TestDescription: MS.DEFENDER.1.1v1 Non-compliant -- Std EOP Enabled, ATP Enabled; Strict EOP Disabled, ATP Disabled
-        Preconditions:
-          - Command: Enable-EOPProtectionPolicyRule
-            Splat:
-              Identity: Standard Preset Security Policy
-              Confirm: false
-          - Command: Enable-ATPProtectionPolicyRule
-            Splat:
-              Identity: Standard Preset Security Policy
-              Confirm: false
-          - Command: Disable-EOPProtectionPolicyRule
-            Splat:
-              Identity: Strict Preset Security Policy
-              Confirm: false
-          - Command: Disable-ATPProtectionPolicyRule
-            Splat:
-              Identity: Strict Preset Security Policy
-              Confirm: false
-        Postconditions: []
-        ExpectedResult: false
-      - TestDescription: MS.DEFENDER.1.1v1 Compliant -- Std EOP Enabled, ATP Enabled; Strict EOP Disabled, ATP Enabled
-        Preconditions:
-          - Command: Enable-EOPProtectionPolicyRule
-            Splat:
-              Identity: Standard Preset Security Policy
-              Confirm: false
-          - Command: Enable-ATPProtectionPolicyRule
-            Splat:
-              Identity: Standard Preset Security Policy
-              Confirm: false
-          - Command: Disable-EOPProtectionPolicyRule
-            Splat:
-              Identity: Strict Preset Security Policy
-              Confirm: false
-          - Command: Enable-ATPProtectionPolicyRule
-            Splat:
-              Identity: Strict Preset Security Policy
-              Confirm: true
-        Postconditions: []
-        ExpectedResult: false
-      - TestDescription: MS.DEFENDER.1.1v1 Compliant -- Std EOP Enable, ATP Enable; Strict EOP Enable, ATP Disabled
-        Preconditions:
-          - Command: Enable-EOPProtectionPolicyRule
-            Splat:
-              Identity: Standard Preset Security Policy
-              Confirm: false
-          - Command: Enable-ATPProtectionPolicyRule
-            Splat:
-              Identity: Standard Preset Security Policy
-              Confirm: false
-          - Command: Enable-EOPProtectionPolicyRule
-            Splat:
-              Identity: Strict Preset Security Policy
-              Confirm: false
-          - Command: Disable-ATPProtectionPolicyRule
-            Splat:
-              Identity: Strict Preset Security Policy
-              Confirm: false
-        Postconditions: []
-        ExpectedResult: true
-      - TestDescription: MS.DEFENDER.1.1v1 Compliant -- Std EOP Enabled, ATP Enabled; Strict EOP Enable, ATP Enabled
-        Preconditions:
-          - Command: Enable-EOPProtectionPolicyRule
-            Splat:
-              Identity: Standard Preset Security Policy
-              Confirm: false
-          - Command: Enable-ATPProtectionPolicyRule
-            Splat:
-              Identity: Standard Preset Security Policy
-              Confirm: false
-          - Command: Enable-EOPProtectionPolicyRule
-            Splat:
-              Identity: Strict Preset Security Policy
-              Confirm: false
-          - Command: Enable-ATPProtectionPolicyRule
-            Splat:
-              Identity: Strict Preset Security Policy
+              SentTo: null
+              SentToMemberOf: null
+              RecipientDomainIs: null
               Confirm: false
         Postconditions: []
         ExpectedResult: true
 
-  # - PolicyId: MS.DEFENDER.1.2v1
-  #   TestDriver: RunScuba
-  #   Tests:
-  #     - TestDescription: MS.DEFENDER.1.2v1 Non-compliant - std&strict SentTo Non-null, SentToMemberOf Non-null, RecipientDomainIs Non-null
-  #       Preconditions:
-  #         - Command: 'Set-EOPProtectionPolicyRule -Identity "Standard Preset Security Policy" -SentTo (Get-MailUser)[0].UserPrincipalName -SentToMemberOf (Get-UnifiedGroup)[0].alias -RecipientDomainIs badpeople.r.us -Confirm:$false'
-  #         - Command: 'Set-EOPProtectionPolicyRule -Identity "Strict Preset Security Policy" -SentTo (Get-MailUser)[0].UserPrincipalName -SentToMemberOf (Get-UnifiedGroup)[0].alias -RecipientDomainIs badpeople.r.us -Confirm:$false'
-  #       Postconditions: []
-  #       ExpectedResult: false
-  #     - TestDescription: MS.DEFENDER.1.2v1 Compliant - std&strict SentTo Null, SentToMemberOf Null, RecipientDomainIs Null
-  #       Preconditions:
-  #         - Command: Set-EOPProtectionPolicyRule
-  #           Splat:
-  #             Identity: Standard Preset Security Policy
-  #             SentTo: null
-  #             SentToMemberOf: null
-  #             RecipientDomainIs: null
-  #             Confirm: false
-  #         - Command: Set-EOPProtectionPolicyRule
-  #           Splat:
-  #             Identity: Strict Preset Security Policy
-  #             SentTo: null
-  #             SentToMemberOf: null
-  #             RecipientDomainIs: null
-  #             Confirm: false
-  #       Postconditions: []
-  #       ExpectedResult: true
+  - PolicyId: MS.DEFENDER.1.4v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.DEFENDER.1.4v1 Non-compliant Strict Preset Security Policy Disabled
+        Preconditions:
+          - Command: Disable-EOPProtectionPolicyRule
+            Splat:
+              Identity: Standard Preset Security Policy
+              Confirm: false
+          - Command: Disable-ATPProtectionPolicyRule
+            Splat:
+              Identity: Standard Preset Security Policy
+              Confirm: false
+          - Command: Enable-EOPProtectionPolicyRule
+            Splat:
+              Identity: Strict Preset Security Policy
+              Confirm: false
+          - Command: Enable-ATPProtectionPolicyRule
+            Splat:
+              Identity: Strict Preset Security Policy
+              Confirm: false
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.1.4v1 Non-compliant Mismatched Recipient Domains
+        ConfigFileName: MismatchedRecipientDomain.yaml
+        Preconditions:
+          - Command: Enable-EOPProtectionPolicyRule
+            Splat:
+              Identity: Strict Preset Security Policy
+              Confirm: false
+          - Command: 'Set-EOPProtectionPolicyRule -Identity "Strict Preset Security Policy" -SentTo (Get-MailUser)[0].UserPrincipalName -SentToMemberOf (Get-UnifiedGroup)[0].alias -RecipientDomainIs badpeople.r.us -Confirm:$false'
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.1.4v1 Non-compliant Mismatched User
+        ConfigFileName: MismatchedUser.yaml
+        Preconditions:
+          - Command: Enable-EOPProtectionPolicyRule
+            Splat:
+              Identity: Strict Preset Security Policy
+              Confirm: false
+          - Command: 'Set-EOPProtectionPolicyRule -Identity "Strict Preset Security Policy" -SentTo (Get-MailUser)[0].UserPrincipalName -SentToMemberOf (Get-UnifiedGroup)[0].alias -RecipientDomainIs badpeople.r.us -Confirm:$false'
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.1.4v1 Non-compliant Mismatched Group
+        ConfigFileName: MismatchedGroup.yaml
+        Preconditions:
+          - Command: Enable-EOPProtectionPolicyRule
+            Splat:
+              Identity: Strict Preset Security Policy
+              Confirm: false
+          - Command: 'Set-EOPProtectionPolicyRule -Identity "Strict Preset Security Policy" -SentTo (Get-MailUser)[0].UserPrincipalName -SentToMemberOf (Get-UnifiedGroup)[0].alias -RecipientDomainIs badpeople.r.us -Confirm:$false'
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.1.4v1 Compliant Matched Recipient Domains
+        ConfigFileName: MatchedRecipientDomain.yaml
+        Preconditions:
+          - Command: Enable-EOPProtectionPolicyRule
+            Splat:
+              Identity: Strict Preset Security Policy
+              Confirm: false
+          - Command: Set-EOPProtectionPolicyRule
+            Splat:
+              Identity: Strict Preset Security Policy
+              SentTo: null
+              SentToMemberOf: null
+              RecipientDomainIs:
+                - badpeople.r.us
+              Confirm: false
+        Postconditions: []
+        ExpectedResult: true
 
-  # - PolicyId: MS.DEFENDER.1.3v1
-  #   TestDriver: RunScuba
-  #   Tests:
-  #     - TestDescription: MS.DEFENDER.1.3v1 Non-compliant -- std&strict SentTo Non-null, SentToMemberOf Non-null, RecipientDomainIs Non-null
-  #       Preconditions:
-  #         - Command: 'Set-ATPProtectionPolicyRule -Identity "Standard Preset Security Policy" -SentTo (Get-MailUser)[0].UserPrincipalName -SentToMemberOf (Get-UnifiedGroup)[0].alias -RecipientDomainIs badpeople.r.us -Confirm:$false'
-  #         - Command: 'Set-ATPProtectionPolicyRule -Identity "Strict Preset Security Policy" -SentTo (Get-MailUser)[0].UserPrincipalName -SentToMemberOf (Get-UnifiedGroup)[0].alias -RecipientDomainIs badpeople.r.us -Confirm:$false'
-  #       Postconditions: []
-  #       ExpectedResult: false
-  #     - TestDescription: MS.DEFENDER.1.3v1 Compliant -- std&strict SentTo Null, SentToMemberOf Null, RecipientDomainIs Null
-  #       Preconditions:
-  #         - Command: Set-ATPProtectionPolicyRule
-  #           Splat:
-  #             Identity: Standard Preset Security Policy
-  #             SentTo: null
-  #             SentToMemberOf: null
-  #             RecipientDomainIs: null
-  #             Confirm: false
-  #         - Command: Set-ATPProtectionPolicyRule
-  #           Splat:
-  #             Identity: Strict Preset Security Policy
-  #             SentTo: null
-  #             SentToMemberOf: null
-  #             RecipientDomainIs: null
-  #             Confirm: false
-  #       Postconditions: []
-  #       ExpectedResult: true
+  - PolicyId: MS.DEFENDER.2.1v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.DEFENDER.2.1v1 Non-compliant - Sensitive user not listed
+        ConfigFileName: MismatchedUser.yaml
+        Preconditions:
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedUsersToProtect $null}'
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedUsersToProtect $null}'
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.2.1v1 Non-compliant - Sensitive user partial coverage
+        ConfigFileName: MatchedUser.yaml
+        Preconditions:
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedUsersToProtect "AgencyUserGlobalReader;AgencyUserGlobalReader@y2zj1.onmicrosoft.com"}'
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedUsersToProtect $null}'
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.2.1v1 Compliant - All Listed sensitive users (mix-cased) are protected
+        ConfigFileName: MatchedWithMixedCase.yaml
+        Preconditions:
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedUsersToProtect "AgencyUserGlobalReader;AgencyUserGlobalReader@y2zj1.onmicrosoft.com"}'
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedUsersToProtect "AgencyUserGlobalReader;AgencyUserGlobalReader@y2zj1.onmicrosoft.com"}'
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.DEFENDER.2.1v1 Compliant - All Listed sensitive users are protected
+        ConfigFileName: MatchedUser.yaml
+        Preconditions:
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedUsersToProtect "AgencyUserGlobalReader;AgencyUserGlobalReader@y2zj1.onmicrosoft.com"}'
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedUsersToProtect "AgencyUserGlobalReader;AgencyUserGlobalReader@y2zj1.onmicrosoft.com"}'
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.DEFENDER.2.1v1 Compliant - No sensitive users identified but all users covered
+        Preconditions:
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedUsersToProtect "AgencyUserGlobalReader;AgencyUserGlobalReader@y2zj1.onmicrosoft.com"}'
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedUsersToProtect "AgencyUserGlobalReader;AgencyUserGlobalReader@y2zj1.onmicrosoft.com"}'
+        Postconditions: []
+        ExpectedResult: true
 
-  # - PolicyId: MS.DEFENDER.1.4v1
-  #   TestDriver: RunScuba
-  #   Tests:
-  #     - TestDescription: MS.DEFENDER.1.4v1 Non-compliant Strict Preset Security Policy Disabled
-  #       Preconditions:
-  #         - Command: Disable-EOPProtectionPolicyRule
-  #           Splat:
-  #             Identity: Strict Preset Security Policy
-  #             Confirm: false
-  #       Postconditions: []
-  #       ExpectedResult: false
-  #     - TestDescription: MS.DEFENDER.1.4v1 Non-compliant Mismatched Recipient Domains
-  #       ConfigFileName: MismatchedRecipientDomain.yaml
-  #       Preconditions:
-  #         - Command: Enable-EOPProtectionPolicyRule
-  #           Splat:
-  #             Identity: Strict Preset Security Policy
-  #             Confirm: false
-  #         - Command: 'Set-EOPProtectionPolicyRule -Identity "Strict Preset Security Policy" -SentTo (Get-MailUser)[0].UserPrincipalName -SentToMemberOf (Get-UnifiedGroup)[0].alias -RecipientDomainIs badpeople.r.us -Confirm:$false'
-  #       Postconditions: []
-  #       ExpectedResult: false
-  #     - TestDescription: MS.DEFENDER.1.4v1 Compliant Matched Recipient Domains
-  #       ConfigFileName: MatchedRecipientDomain.yaml
-  #       Preconditions:
-  #         - Command: Enable-EOPProtectionPolicyRule
-  #           Splat:
-  #             Identity: Strict Preset Security Policy
-  #             Confirm: false
-  #         - Command: Set-EOPProtectionPolicyRule
-  #           Splat:
-  #             Identity: Strict Preset Security Policy
-  #             SentTo: null
-  #             SentToMemberOf: null
-  #             RecipientDomainIs:
-  #               - badpeople.r.us
-  #             Confirm: false
-  #       Postconditions: []
-  #       ExpectedResult: true
-
-  # - PolicyId: MS.DEFENDER.1.5v1
-  #   TestDriver: RunScuba
-  #   Tests:
-  #     - TestDescription: MS.DEFENDER.1.5v1 Non-compliant Strict Preset Security Policy Disabled
-  #       Preconditions:
-  #         - Command: Disable-ATPProtectionPolicyRule
-  #           Splat:
-  #             Identity: Strict Preset Security Policy
-  #             Confirm: false
-  #       Postconditions: []
-  #       ExpectedResult: false
-  #     - TestDescription: MS.DEFENDER.1.5v1 Non-compliant Mismatched Recipient Domains
-  #       ConfigFileName: MismatchedRecipientDomain.yaml
-  #       Preconditions:
-  #         - Command: Enable-ATPProtectionPolicyRule
-  #           Splat:
-  #             Identity: Strict Preset Security Policy
-  #             Confirm: false
-  #         - Command: 'Set-ATPProtectionPolicyRule -Identity "Strict Preset Security Policy" -SentTo (Get-MailUser)[0].UserPrincipalName -SentToMemberOf (Get-UnifiedGroup)[0].alias -RecipientDomainIs badpeople.r.us -Confirm:$false'
-  #       Postconditions: []
-  #       ExpectedResult: false
-  #     - TestDescription: MS.DEFENDER.1.5v1 Compliant Matched Recipient Domains
-  #       ConfigFileName: MatchedRecipientDomain.yaml
-  #       Preconditions:
-  #         - Command: Enable-ATPProtectionPolicyRule
-  #           Splat:
-  #             Identity: Strict Preset Security Policy
-  #             Confirm: false
-  #         - Command: 'Set-ATPProtectionPolicyRule -Identity "Strict Preset Security Policy" -SentTo `0 -SentToMemberOf `0 -RecipientDomainIs badpeople.r.us -Confirm:$false'
-  #       Postconditions: []
-  #       ExpectedResult: true
-
-  # - PolicyId: MS.DEFENDER.2.1v1
-  #   TestDriver: RunScuba
-  #   Tests:
-  #     - TestDescription: MS.DEFENDER.2.1v1 Non-compliant - Sensitive user not listed
-  #       ConfigFileName: MismatchedUser.yaml
-  #       Preconditions:
-  #         - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedUsersToProtect $null}'
-  #         - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedUsersToProtect $null}'
-  #       Postconditions: []
-  #       ExpectedResult: false
-  #     - TestDescription: MS.DEFENDER.2.1v1 Non-compliant - Sensitive user partial coverage
-  #       ConfigFileName: MatchedUser.yaml
-  #       Preconditions:
-  #         - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedUsersToProtect "AgencyUserGlobalReader;AgencyUserGlobalReader@y2zj1.onmicrosoft.com"}'
-  #         - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedUsersToProtect $null}'
-  #       Postconditions: []
-  #       ExpectedResult: false
-  #     - TestDescription: MS.DEFENDER.2.1v1 Compliant - All Listed sensitive users (mix-cased) are protected
-  #       ConfigFileName: MatchedWithMixedCase.yaml
-  #       Preconditions:
-  #         - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedUsersToProtect "AgencyUserGlobalReader;AgencyUserGlobalReader@y2zj1.onmicrosoft.co"}'
-  #         - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedUsersToProtect "AgencyUserGlobalReader;AgencyUserGlobalReader@y2zj1.onmicrosoft.co"}'
-  #       Postconditions: []
-  #       ExpectedResult: true
-  #     - TestDescription: MS.DEFENDER.2.1v1 Compliant - All Listed sensitive users are protected
-  #       ConfigFileName: MatchedUser.yaml
-  #       Preconditions:
-  #         - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedUsersToProtect "AgencyUserGlobalReader;AgencyUserGlobalReader@y2zj1.onmicrosoft.com"}'
-  #         - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedUsersToProtect "AgencyUserGlobalReader;AgencyUserGlobalReader@y2zj1.onmicrosoft.com"}'
-  #       Postconditions: []
-  #       ExpectedResult: true
-  #     - TestDescription: MS.DEFENDER.2.1v1 Compliant - No sensitive users identified but all users covered
-  #       Preconditions:
-  #         - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedUsersToProtect "AgencyUserGlobalReader;AgencyUserGlobalReader@y2zj1.onmicrosoft.com"}'
-  #         - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedUsersToProtect "AgencyUserGlobalReader;AgencyUserGlobalReader@y2zj1.onmicrosoft.com"}'
-  #       Postconditions: []
-  #       ExpectedResult: true
-
-  # - PolicyId: MS.DEFENDER.2.2v1
-  #   TestDriver: RunScuba
-  #   Tests:
-  #     - TestDescription: MS.DEFENDER.2.2v1 Non-compliant - Agency domain not listed
-  #       ConfigFileName: AgencyDomainList.yaml
-  #       Preconditions:
-  #         - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainToProtect $null}'
-  #         - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainToProtect $null}'
-  #       Postconditions: []
-  #       ExpectedResult: false
-  #     - TestDescription: MS.DEFENDER.2.2v1 Non-compliant - Agency domain partial coverage
-  #       ConfigFileName: AgencyDomainList.yaml
-  #       Preconditions:
-  #         - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainToProtect "goodguys.com"}'
-  #         - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainToProtect $null}'
-  #       Postconditions: []
-  #       ExpectedResult: false
-  #     - TestDescription: MS.DEFENDER.2.2v1 Compliant - All Listed are protected
-  #       ConfigFileName: AgencyDomainList.yaml
-  #       Preconditions:
-  #         - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainToProtect "goodguys.com"}'
-  #         - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainToProtect "goodguys.com"}'
-  #       Postconditions: []
-  #       ExpectedResult: true
-  #     - TestDescription: MS.DEFENDER.2.2v1 Compliant - All domains No list
-  #       Preconditions:
-  #         - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainToProtect $null}'
-  #         - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainToProtect $null}'
-  #       Postconditions: []
-  #       ExpectedResult: true
+  - PolicyId: MS.DEFENDER.2.2v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.DEFENDER.2.2v1 Non-compliant - Agency domain not listed
+        ConfigFileName: AgencyDomainList.yaml
+        Preconditions:
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect $null}'
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect $null}'
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.2.2v1 Non-compliant - Agency domain partial coverage
+        ConfigFileName: AgencyDomainList.yaml
+        Preconditions:
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect "goodguys.com"}'
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect $null}'
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.2.2v1 Non-compliant - All domains No list
+        Preconditions:
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect $null}'
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect $null}'
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.2.2v1 Compliant - All Listed are protected
+        ConfigFileName: AgencyDomainList.yaml
+        Preconditions:
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect "goodguys.com"}'
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect "goodguys.com"}'
+        Postconditions: []
+        ExpectedResult: true
 
   - PolicyId: MS.DEFENDER.2.3v1
     TestDriver: RunScuba
@@ -528,98 +198,78 @@ TestPlan:
       - TestDescription: MS.DEFENDER.2.3v1 Non-compliant - Agency domain not listed
         ConfigFileName: PartnerDomainList.yaml
         Preconditions:
-          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainToProtect $null}'
-          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainToProtect $null}'
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect $null}'
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect $null}'
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.DEFENDER.2.3v1 Non-compliant - Agency domain partial coverage
         ConfigFileName: PartnerDomainList.yaml
         Preconditions:
-          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainToProtect "goodparnter.com"}'
-          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainToProtect $null}'
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect "goodparnter.com"}'
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect $null}'
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.DEFENDER.2.3v1 Compliant - All Listed are protected
         ConfigFileName: PartnerDomainList.yaml
         Preconditions:
-          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainToProtect "goodparnter.com"}'
-          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainToProtect "goodparnter.com"}'
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect "goodparnter.com"}'
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect "goodparnter.com"}'
         Postconditions: []
         ExpectedResult: true
       - TestDescription: MS.DEFENDER.2.3v1 Compliant - All domains No list
         Preconditions:
-          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainToProtect $null}'
-          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainToProtect $null}'
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect $null}'
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect $null}'
         Postconditions: []
         ExpectedResult: true
 
-  # - PolicyId: MS.DEFENDER.3.1v1
-  #   TestDriver: RunScuba
-  #   Tests:
-  #     - TestDescription: MS.DEFENDER.3.1v1 Protection disabled
-  #       Preconditions:
-  #         - Command: Set-AtpPolicyForO365
-  #           Splat:
-  #             Identity: Default
-  #             EnableATPForSPOTeamsODB: false
-  #       Postconditions: []
-  #       ExpectedResult: false
-  #     - TestDescription: MS.DEFENDER.3.1v1 Protection enabled
-  #       Preconditions:
-  #         - Command: Set-AtpPolicyForO365
-  #           Splat:
-  #             Identity: Default
-  #             EnableATPForSPOTeamsODB: true
-  #       Postconditions: []
-  #       ExpectedResult: true
+  - PolicyId: MS.DEFENDER.4.1v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.DEFENDER.4.1v1 Compliant case
+        Preconditions:
+          - Command: Set-DlpComplianceRule
+            Splat:
+              displayName: MS.DEFENDER.4.1v1 A custom policy SHALL be configured to protect PII and sensitive information
+              updates:
+        Postconditions: []
+        ExpectedResult: true
 
-  # - PolicyId: MS.DEFENDER.4.1v1
-  #   TestDriver: RunScuba
-  #   Tests:
-  #     - TestDescription: MS.DEFENDER.4.1v1 Compliant case
-  #       Preconditions:
-  #         - Command:Set-DlpComplianceRule
-  #           Splat:
-  #             displayName: MS.DEFENDER.4.1v1 A custom policy SHALL be configured to protect PII and sensitive information
-  #             updates:
-  #       Postconditions: []
-  #       ExpectedResult: true
+  - PolicyId: MS.DEFENDER.4.2v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.DEFENDER.4.2v1 Compliant case
+        Preconditions:
+          - Command: Set-DlpComplianceRule
+            Splat:
+              displayName: MS.DEFENDER.4.2v1 The custom policy SHOULD be applied to Exchange, OneDrive, SharePoint, Teams chat, and Devices
+              updates:
+        Postconditions: []
+        ExpectedResult: true
 
-  # - PolicyId: MS.DEFENDER.4.2v1
-  #   TestDriver: RunScuba
-  #   Tests:
-  #     - TestDescription: MS.DEFENDER.4.2v1 Compliant case
-  #       Preconditions:
-  #         - Command: Set-DlpComplianceRule
-  #           Splat:
-  #             displayName: MS.DEFENDER.4.2v1 The custom policy SHOULD be applied to Exchange, OneDrive, SharePoint, Teams chat, and Devices
-  #             updates:
-  #       Postconditions: []
-  #       ExpectedResult: true
+  - PolicyId: MS.DEFENDER.4.3v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.DEFENDER.4.3v1 Compliant case
+        Preconditions:
+          - Command: Set-DlpComplianceRule
+            Splat:
+              displayName: MS.DEFENDER.4.3v1 custom policy SHOULD be set to block sharing sensitive information with everyone
+              updates:
+        Postconditions: []
+        ExpectedResult: true
 
-  # - PolicyId: MS.DEFENDER.4.3v1
-  #   TestDriver: RunScuba
-  #   Tests:
-  #     - TestDescription: MS.DEFENDER.4.3v1 Compliant case
-  #       Preconditions:
-  #         - Command: Set-DlpComplianceRule
-  #           Splat:
-  #             displayName: MS.DEFENDER.4.3v1 custom policy SHOULD be set to block sharing sensitive information with everyone
-  #             updates:
-  #       Postconditions: []
-  #       ExpectedResult: true
-
-  # - PolicyId: MS.DEFENDER.4.4v1
-  #   TestDriver: RunScuba
-  #   Tests:
-  #     - TestDescription: MS.DEFENDER.4.4v1 Compliant case
-  #       Preconditions:
-  #         - Command: Set-DlpComplianceRule
-  #           Splat:
-  #             displayName: MS.DEFENDER.4.4v1 Notifications to inform users SHOULD be enabled
-  #             updates:
-  #       Postconditions: []
-  #       ExpectedResult: true
+  - PolicyId: MS.DEFENDER.4.4v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.DEFENDER.4.4v1 Compliant case
+        Preconditions:
+          - Command: Set-DlpComplianceRule
+            Splat:
+              displayName: MS.DEFENDER.4.4v1 Notifications to inform users SHOULD be enabled
+              updates:
+        Postconditions: []
+        ExpectedResult: true
 
   - PolicyId: MS.DEFENDER.4.5v1
     TestDriver: RunScuba
@@ -674,7 +324,7 @@ TestPlan:
             Disabled: false
         Postconditions: []
         ExpectedResult: true
-      - TestDescription: MS.DEFENDER.5.1v1 Non-Compliant case: "Suspicious email sending patterns detected"
+      - TestDescription: MS.DEFENDER.5.1v1 Non-Compliant case - "Suspicious email sending patterns detected"
         Preconditions:
         - Command: Set-ProtectionAlert
           Splat:
@@ -682,7 +332,7 @@ TestPlan:
             Disabled: true
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.DEFENDER.5.1v1 Non-Compliant case: "Suspicious Email Forwarding Activity"
+      - TestDescription: MS.DEFENDER.5.1v1 Non-Compliant case - "Suspicious Email Forwarding Activity"
         Preconditions:
         - Command: Set-ProtectionAlert
           Splat:
@@ -694,7 +344,7 @@ TestPlan:
             Disabled: true
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.DEFENDER.5.1v1 Non-Compliant case: "Messages have been delayed"
+      - TestDescription: MS.DEFENDER.5.1v1 Non-Compliant case - "Messages have been delayed"
         Preconditions:
         - Command: Set-ProtectionAlert
           Splat:
@@ -706,7 +356,7 @@ TestPlan:
             Disabled: true
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.DEFENDER.5.1v1 Non-Compliant case: "Tenant restricted from sending unprovisioned email"
+      - TestDescription: MS.DEFENDER.5.1v1 Non-Compliant case - "Tenant restricted from sending unprovisioned email"
         Preconditions:
         - Command: Set-ProtectionAlert
           Splat:
@@ -718,7 +368,7 @@ TestPlan:
             Disabled: true
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.DEFENDER.5.1v1 Non-Compliant case: "User restricted from sending email"
+      - TestDescription: MS.DEFENDER.5.1v1 Non-Compliant case - "User restricted from sending email"
         Preconditions:
         - Command: Set-ProtectionAlert
           Splat:
@@ -730,7 +380,7 @@ TestPlan:
             Disabled: true
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.DEFENDER.5.1v1 Non-Compliant case: "A potentially malicious URL click was detected"
+      - TestDescription: MS.DEFENDER.5.1v1 Non-Compliant case - "A potentially malicious URL click was detected"
         Preconditions:
         - Command: Set-ProtectionAlert
           Splat:
@@ -742,7 +392,7 @@ TestPlan:
             Disabled: true
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.DEFENDER.5.1v1 Non-Compliant case: "Suspicious connector activity"
+      - TestDescription: MS.DEFENDER.5.1v1 Non-Compliant case - "Suspicious connector activity"
         Preconditions:
         - Command: Set-ProtectionAlert
           Splat:
