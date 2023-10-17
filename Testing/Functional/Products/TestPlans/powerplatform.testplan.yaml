@@ -3,17 +3,34 @@ TestPlan:
   - PolicyId: MS.POWERPLATFORM.1.1v1
     TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.POWERPLATFORM.1.1v1 Compliant case - Disables environment creation by nonadmin users
+      - TestDescription: MS.POWERPLATFORM.1.1v1 Compliant case - Restricts production/sandbox environment creation to admin users
         Preconditions:
           - Command: Set-TenantSettings
             Splat:
               RequestBody: '@{ DisableEnvironmentCreationByNonAdminUsers = $true }'
         Postconditions: []
         ExpectedResult: true
-      - TestDescription: MS.POWERPLATFORM.1.1v1 Non-Compliant case - Allows environment creation by nonadmin users
+      - TestDescription: MS.POWERPLATFORM.1.1v1 Non-Compliant case - Allows production/sandbox environment creation by nonadmin users
         Preconditions:
           - Command: Set-TenantSettings
             Splat:
               RequestBody: '@{ DisableEnvironmentCreationByNonAdminUsers = $false }'
+        Postconditions: []
+        ExpectedResult: true
+  - PolicyId: MS.POWERPLATFORM.1.2v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.POWERPLATFORM.1.2v1 Compliant case - Restricts trial environment creation to admin users
+        Preconditions:
+          - Command: Set-TenantSettings
+            Splat:
+              RequestBody: '@{ DisableTrialEnvironmentCreationByNonAdminUsers = $true }'
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.POWERPLATFORM.1.2v1 Non-Compliant case - Allows trial environment creation by nonadmin users
+        Preconditions:
+          - Command: Set-TenantSettings
+            Splat:
+              RequestBody: '@{ DisableTrialEnvironmentCreationByNonAdminUsers = $false }'
         Postconditions: []
         ExpectedResult: true
