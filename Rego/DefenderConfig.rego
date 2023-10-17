@@ -445,16 +445,20 @@ InfoTypeMatches(Rule) := ContentTypes if {
 }
 
 SensitiveInfoTypes(PolicyName) := MatchingInfoTypes if {
-    Rule := input.dlp_compliance_rules[_]
-    Rule.Disabled == false
-    Rule.ParentPolicyName == PolicyName
-
     InfoTypes := {  "U.S. Social Security Number (SSN)",
                     "U.S. Individual Taxpayer Identification Number (ITIN)",
                     "Credit Card Number"
                 }
 
-    MatchingInfoTypes := InfoTypes & InfoTypeMatches(Rule)
+    ContentTypeSets := { Types | Rule := input.dlp_compliance_rules[_]
+                                    Rule.Disabled == false
+                                    Rule.ParentPolicyName == PolicyName
+                                    Types := InfoTypeMatches(Rule)
+                       }
+    # Flatten set of sets of content types
+    ContentTypes := union(ContentTypeSets)
+
+    MatchingInfoTypes := InfoTypes & ContentTypes
 }
 
 # Return set of policy names that contain all sensitive info types in rules
@@ -720,6 +724,7 @@ tests[{
 SensitiveRulesNotNotifying[Rule.Name] {
     Rule := SensitiveRules[_]
     count(SensitiveInfoPolicies) > 0
+    Rule in SensitiveInfoPolicies
     count(Rule.NotifyUser) == 0
 }
 
