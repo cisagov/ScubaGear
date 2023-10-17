@@ -1083,7 +1083,7 @@ test_NotifyUser_Incorrect_V1 if {
 }
 
 # Sensitive policy enabled, no users set to notify
-test_NotifyUser_Incorrect_V1 if {
+test_NotifyUser_Incorrect_V2 if {
     PolicyId := "MS.DEFENDER.4.4v1"
 
     Output := tests with input as {
