@@ -1,22 +1,26 @@
 ProductName: aad
 TestPlan:
   - PolicyId: MS.AAD.1.1v1
-    TestDriver: RunScuba
+    TestDriver: RunCached
     Tests:
       - TestDescription: MS.AAD.1.1v1 Non-Compliant case - missing client app type exchangeActiveSync
         Preconditions:
-          - Command: UpdateConditionalAccessPolicyByName
+          - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
               displayName: MS.AAD.1.1v1 Legacy authentication SHALL be blocked
               updates: 
                 state: enabled
                 Conditions:
                   Applications:
-                    IncludeApplications:
-                      - All
+                    IncludeApplications: ["All"]
+                    ExcludeApplications: []
                   Users:
-                    IncludeUsers:
-                      - All
+                    IncludeUsers: ["All"]
+                    ExcludeUsers: []
+                    IncludeGroups: []
+                    ExcludeGroups: []
+                    IncludeRoles: []
+                    ExcludeRoles: []
                   ClientAppTypes:
                     - other
                 GrantControls:
@@ -24,20 +28,24 @@ TestPlan:
                     - block
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.AAD.1.1v1 Non-Compliant case - not blocked (requires an approved Application)
+      - TestDescription: MS.AAD.1.1v1 Non-Compliant case - insteading of blocking access, requires an approved application
         Preconditions:
-          - Command: UpdateConditionalAccessPolicyByName
+          - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
               displayName: MS.AAD.1.1v1 Legacy authentication SHALL be blocked
               updates: 
                 state: enabled
                 Conditions:
                   Applications:
-                    IncludeApplications:
-                      - All
+                    IncludeApplications: ["All"]
+                    ExcludeApplications: []
                   Users:
-                    IncludeUsers:
-                      - All
+                    IncludeUsers: ["All"]
+                    ExcludeUsers: []
+                    IncludeGroups: []
+                    ExcludeGroups: []
+                    IncludeRoles: []
+                    ExcludeRoles: []
                   ClientAppTypes:
                     - other
                 GrantControls:
@@ -47,18 +55,22 @@ TestPlan:
         ExpectedResult: false        
       - TestDescription: MS.AAD.1.1v1 Compliant case
         Preconditions:
-          - Command: UpdateConditionalAccessPolicyByName
+          - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
               displayName: MS.AAD.1.1v1 Legacy authentication SHALL be blocked
               updates:
                 state: enabled
                 Conditions:
                   Applications:
-                    IncludeApplications:
-                      - All
+                    IncludeApplications: ["All"]
+                    ExcludeApplications: []
                   Users:
-                    IncludeUsers:
-                      - All
+                    IncludeUsers: ["All"]
+                    ExcludeUsers: []
+                    IncludeGroups: []
+                    ExcludeGroups: []
+                    IncludeRoles: []
+                    ExcludeRoles: []
                   ClientAppTypes:
                     - other
                     - exchangeActiveSync
@@ -87,11 +99,17 @@ TestPlan:
               displayName: Automated Test 1 - DO NOT MODIFY
               updates:
                 State: enabled  
-                Conditions.Applications.IncludeApplications: 
-                  - "All"
-                Conditions.Applications.ExcludeApplications: [] 
-                Conditions.Users.IncludeUsers:
-                  - "All"
+                Conditions:
+                  Users:
+                    IncludeUsers: ["All"]
+                    ExcludeUsers: []
+                    IncludeGroups: []
+                    ExcludeGroups: []
+                    IncludeRoles: []
+                    ExcludeRoles: []
+                  Applications:
+                    IncludeApplications: ["All"]
+                    ExcludeApplications: []
                 GrantControls.AuthenticationStrength.AllowedCombinations:    
                   - "windowsHelloForBusiness"
                   - "fido2"
@@ -107,11 +125,17 @@ TestPlan:
               displayName: Automated Test 1 - DO NOT MODIFY
               updates:
                 State: enabled  
-                Conditions.Applications.IncludeApplications: 
-                  - "All"
-                Conditions.Applications.ExcludeApplications: [] 
-                Conditions.Users.IncludeUsers:
-                  - "All"
+                Conditions:
+                  Users:
+                    IncludeUsers: ["All"]
+                    ExcludeUsers: []
+                    IncludeGroups: []
+                    ExcludeGroups: []
+                    IncludeRoles: []
+                    ExcludeRoles: []
+                  Applications:
+                    IncludeApplications: ["All"]
+                    ExcludeApplications: []
                 GrantControls.AuthenticationStrength.AllowedCombinations:    
                   - "windowsHelloForBusiness"
                   - "fido2"
@@ -150,11 +174,17 @@ TestPlan:
               displayName: Automated Test 1 - DO NOT MODIFY
               updates:
                 State: enabled  
-                Conditions.Applications.IncludeApplications: 
-                  - "All"
-                Conditions.Applications.ExcludeApplications: [] 
-                Conditions.Users.IncludeUsers:
-                  - "All"
+                Conditions:
+                  Users:
+                    IncludeUsers: ["All"]
+                    ExcludeUsers: []
+                    IncludeGroups: []
+                    ExcludeGroups: []
+                    IncludeRoles: []
+                    ExcludeRoles: []
+                  Applications:
+                    IncludeApplications: ["All"]
+                    ExcludeApplications: []
                 GrantControls.AuthenticationStrength.AllowedCombinations:    
                   - "windowsHelloForBusiness"
                   - "fido2"
@@ -215,18 +245,26 @@ TestPlan:
             Splat:
               displayName: Automated Test 1 - DO NOT MODIFY
               updates:
-                State: enabled  
-                Conditions.Applications.IncludeApplications: 
-                  - "All"
-                Conditions.Users.IncludeRoles:
-                  - "158c047a-c907-4556-b7ef-446551a6b5f7"
-                  - "62e90394-69f5-4237-9190-012177145e10"
-                  - "8ac3fc64-6eca-42ea-9e69-59f4c7b60eb2"
-                  - "e8611ab8-c189-46e8-94e1-60213ab1f814"
-                  - "f28a1f50-f6e7-4571-818b-6a12f2af6b6c"
-                  - "fe930be7-5e62-47db-91af-98c3a49a38b1"
-                  - "29232cdf-9323-42fd-ade2-1d097af3e4de"
-                  - "9b895d92-2cd3-44c7-9d02-a6ac2d5ea5c3"
+                State: enabled
+                Conditions:
+                  Users:
+                    IncludeUsers: []
+                    ExcludeUsers: []
+                    IncludeRoles:
+                      - "158c047a-c907-4556-b7ef-446551a6b5f7"
+                      - "62e90394-69f5-4237-9190-012177145e10"
+                      - "8ac3fc64-6eca-42ea-9e69-59f4c7b60eb2"
+                      - "e8611ab8-c189-46e8-94e1-60213ab1f814"
+                      - "f28a1f50-f6e7-4571-818b-6a12f2af6b6c"
+                      - "fe930be7-5e62-47db-91af-98c3a49a38b1"
+                      - "29232cdf-9323-42fd-ade2-1d097af3e4de"
+                      - "9b895d92-2cd3-44c7-9d02-a6ac2d5ea5c3"
+                    IncludeGroups: []
+                    ExcludeGroups: []
+                    ExcludeRoles: []
+                  Applications:
+                    IncludeApplications: ["All"]
+                    ExcludeApplications: []
                 GrantControls.AuthenticationStrength.AllowedCombinations:    
                   - "windowsHelloForBusiness"
                   - "fido2"
@@ -242,17 +280,25 @@ TestPlan:
               displayName: Automated Test 1 - DO NOT MODIFY
               updates:
                 State: enabled  
-                Conditions.Applications.IncludeApplications: 
-                  - "All"
-                Conditions.Users.IncludeRoles:
-                  - "158c047a-c907-4556-b7ef-446551a6b5f7"
-                  - "62e90394-69f5-4237-9190-012177145e10"
-                  - "8ac3fc64-6eca-42ea-9e69-59f4c7b60eb2"
-                  - "e8611ab8-c189-46e8-94e1-60213ab1f814"
-                  - "f28a1f50-f6e7-4571-818b-6a12f2af6b6c"
-                  - "fe930be7-5e62-47db-91af-98c3a49a38b1"
-                  - "29232cdf-9323-42fd-ade2-1d097af3e4de"
-                  - "9b895d92-2cd3-44c7-9d02-a6ac2d5ea5c3"
+                Conditions:
+                  Users:
+                    IncludeUsers: []
+                    ExcludeUsers: []
+                    IncludeRoles:
+                      - "158c047a-c907-4556-b7ef-446551a6b5f7"
+                      - "62e90394-69f5-4237-9190-012177145e10"
+                      - "8ac3fc64-6eca-42ea-9e69-59f4c7b60eb2"
+                      - "e8611ab8-c189-46e8-94e1-60213ab1f814"
+                      - "f28a1f50-f6e7-4571-818b-6a12f2af6b6c"
+                      - "fe930be7-5e62-47db-91af-98c3a49a38b1"
+                      - "29232cdf-9323-42fd-ade2-1d097af3e4de"
+                      - "9b895d92-2cd3-44c7-9d02-a6ac2d5ea5c3"
+                    IncludeGroups: []
+                    ExcludeGroups: []
+                    ExcludeRoles: []
+                  Applications:
+                    IncludeApplications: ["All"]
+                    ExcludeApplications: []
                 GrantControls.AuthenticationStrength.AllowedCombinations:    
                   - "windowsHelloForBusiness"
                   - "fido2"
@@ -274,13 +320,20 @@ TestPlan:
                   - "compliantDevice"
                   - "domainJoinedDevice"
                 GrantControls.Operator: AND
-                Conditions.Users.IncludeUsers:
-                  - "e897fa07-cfcc-4aeb-9b61-afbf173fb9df" 
-                Conditions.Applications.IncludeApplications:
-                  - "All"         
+                Conditions:
+                  Users:
+                    IncludeUsers: ["e897fa07-cfcc-4aeb-9b61-afbf173fb9df"]
+                    ExcludeUsers: []
+                    IncludeRoles: []
+                    IncludeGroups: []
+                    ExcludeGroups: []
+                    ExcludeRoles: []
+                  Applications:
+                    IncludeApplications: ["All"]
+                    ExcludeApplications: []
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.AAD.3.7v1 Compliant case - require both compliant and domain joined device
+      - TestDescription: MS.AAD.3.7v1 Compliant case - require both compliant and domain joined device for everyone
         Preconditions:
           - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
@@ -291,13 +344,20 @@ TestPlan:
                   - "compliantDevice"
                   - "domainJoinedDevice"
                 GrantControls.Operator: AND
-                Conditions.Users.IncludeUsers:
-                  - "All" 
-                Conditions.Applications.IncludeApplications:
-                  - "All"         
+                Conditions:
+                  Users:
+                    IncludeUsers: ["All"]
+                    ExcludeUsers: []
+                    IncludeRoles: []
+                    IncludeGroups: []
+                    ExcludeGroups: []
+                    ExcludeRoles: []
+                  Applications:
+                    IncludeApplications: ["All"]
+                    ExcludeApplications: []
         Postconditions: []
         ExpectedResult: true
-      - TestDescription: MS.AAD.3.7v1 Compliant case - compliant Device required
+      - TestDescription: MS.AAD.3.7v1 Compliant case - only compliant Device required
         Preconditions:
           - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
@@ -307,13 +367,20 @@ TestPlan:
                 GrantControls.BuiltInControls: 
                   - "compliantDevice"
                 GrantControls.Operator: OR
-                Conditions.Users.IncludeUsers:
-                  - "All" 
-                Conditions.Applications.IncludeApplications:
-                  - "All"         
+                Conditions:
+                  Users:
+                    IncludeUsers: ["All"]
+                    ExcludeUsers: []
+                    IncludeRoles: []
+                    IncludeGroups: []
+                    ExcludeGroups: []
+                    ExcludeRoles: []
+                  Applications:
+                    IncludeApplications: ["All"]
+                    ExcludeApplications: []
         Postconditions: []
         ExpectedResult: true
-      - TestDescription: MS.AAD.3.7v1 Compliant case - domain Joined Device required
+      - TestDescription: MS.AAD.3.7v1 Compliant case - only domain Joined Device required
         Preconditions:
           - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
@@ -323,10 +390,17 @@ TestPlan:
                 GrantControls.BuiltInControls: 
                   - "domainJoinedDevice"
                 GrantControls.Operator: OR
-                Conditions.Users.IncludeUsers:
-                  - "All" 
-                Conditions.Applications.IncludeApplications:
-                  - "All"         
+                Conditions:
+                  Users:
+                    IncludeUsers: ["All"]
+                    ExcludeUsers: []
+                    IncludeRoles: []
+                    IncludeGroups: []
+                    ExcludeGroups: []
+                    ExcludeRoles: []
+                  Applications:
+                    IncludeApplications: ["All"]
+                    ExcludeApplications: []
         Postconditions: []
         ExpectedResult: true    
       - TestDescription: MS.AAD.3.7v1 Compliant case - compliant or domain joined device required
@@ -340,10 +414,17 @@ TestPlan:
                   - "compliantDevice"
                   - "domainJoinedDevice"
                 GrantControls.Operator: OR
-                Conditions.Users.IncludeUsers:
-                  - "All" 
-                Conditions.Applications.IncludeApplications:
-                  - "All"         
+                Conditions:
+                  Users:
+                    IncludeUsers: ["All"]
+                    ExcludeUsers: []
+                    IncludeRoles: []
+                    IncludeGroups: []
+                    ExcludeGroups: []
+                    ExcludeRoles: []
+                  Applications:
+                    IncludeApplications: ["All"]
+                    ExcludeApplications: []
         Postconditions: []
         ExpectedResult: true
 
@@ -361,10 +442,18 @@ TestPlan:
                   - "compliantDevice"
                   - "domainJoinedDevice"
                 GrantControls.Operator: OR
-                Conditions.Applications.IncludeUserActions:
-                  - "urn:user:registersecurityinfo"
-                Conditions.Users.IncludeUsers:
-                  - "d4ff2a72-7c1f-4690-b61d-aaaa6976bca3"  
+                Conditions:
+                  Users:
+                    IncludeUsers: ["d4ff2a72-7c1f-4690-b61d-aaaa6976bca3"]
+                    ExcludeUsers: []
+                    IncludeRoles: []
+                    IncludeGroups: []
+                    ExcludeGroups: []
+                    ExcludeRoles: []
+                  Applications:
+                    IncludeApplications: []
+                    ExcludeApplications: []
+                    IncludeUserActions: ["urn:user:registersecurityinfo"] 
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.AAD.3.8v1 Compliant case - Compliant or domain managed device to register MFA
@@ -378,10 +467,18 @@ TestPlan:
                   - "compliantDevice"
                   - "domainJoinedDevice"
                 GrantControls.Operator: OR
-                Conditions.Applications.IncludeUserActions:
-                  - "urn:user:registersecurityinfo"
-                Conditions.Users.IncludeUsers:
-                  - "All"  
+                Conditions:
+                  Users:
+                    IncludeUsers: ["All"]
+                    ExcludeUsers: []
+                    IncludeRoles: []
+                    IncludeGroups: []
+                    ExcludeGroups: []
+                    ExcludeRoles: []
+                  Applications:
+                    IncludeApplications: []
+                    ExcludeApplications: []
+                    IncludeUserActions: ["urn:user:registersecurityinfo"]
         Postconditions: []
         ExpectedResult: true
   
