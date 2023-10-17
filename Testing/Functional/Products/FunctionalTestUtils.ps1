@@ -265,6 +265,7 @@ function UpdateCachedConditionalAccessPolicyByName{
     .NOTES
       If more than one conditional access policy has the same DisplayName then only the first is updated.
   #>
+  [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'DisplayName', Justification = 'Variable is used in ScriptBlock')]
   [CmdletBinding()]
   param (
       [Parameter(Mandatory = $true)]
@@ -284,9 +285,10 @@ function UpdateCachedConditionalAccessPolicyByName{
   $ProviderExport = LoadProviderExport($OutputFolder)
 
   $ConditionalAccessPolicies = $ProviderExport.conditional_access_policies
-  $Index = [array]::indexof($ConditionalAccessPolicies.DisplayName, $DisplayName)
+  $Index = $ConditionalAccessPolicies.indexof($($ConditionalAccessPolicies.Where{$_.DisplayName -eq $DisplayName}))
 
-  $Updates.Keys | ForEach-Object{
+  if (-1 -ne $Index){
+    $Updates.Keys | ForEach-Object{
       try {
           $Update = $Updates.Item($_)
           $Policy = $ConditionalAccessPolicies[$Index]
@@ -295,10 +297,13 @@ function UpdateCachedConditionalAccessPolicyByName{
       catch {
           Write-Error "Exception:  UpdateCachedConditionalAccessPolicyByName failed"
       }
+    }
+
+    PublishProviderExport -OutputFolder $OutputFolder -Export $ProviderExport
   }
-
-  PublishProviderExport -OutputFolder $OutputFolder -Export $ProviderExport
-
+  else {
+    throw "Could not find CAP: $DisplayName"
+  }
 }
 
 function LoadTestResults() {
