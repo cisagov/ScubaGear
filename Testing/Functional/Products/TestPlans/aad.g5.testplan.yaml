@@ -1,46 +1,106 @@
 ProductName: aad
 TestPlan:
   - PolicyId: MS.AAD.2.1v1
-    TestDriver: RunScuba
+    TestDriver: RunCached
     Tests:
-      - TestDescription: MS.AAD.2.1v1 Non-Compliant case - policy set to Report Only
+      - TestDescription: MS.AAD.2.1v1 Non-Compliant case - low risk users are blocked
         Preconditions:
-          - Command: UpdateConditionalAccessPolicyByName
+          - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
               displayName: MS.AAD.2.1v1 Users detected as high risk SHALL be blocked
               updates: 
-                state: enabledForReportingButNotEnforced
+                State: enabled
+                Conditions:
+                  Users:
+                    IncludeUsers: ["All"]
+                    ExcludeUsers: []
+                    IncludeGroups: []
+                    ExcludeGroups: []
+                    IncludeRoles: []
+                    ExcludeRoles: []
+                  Applications:
+                    IncludeApplications: ["All"]
+                    ExcludeApplications: []
+                  UserRiskLevels: ["low"]
+                GrantControls:
+                  BuiltInControls:
+                    - block
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.AAD.2.1v1 Compliant case
+      - TestDescription: MS.AAD.2.1v1 Compliant case - high risk users are blocked
         Preconditions:
-          - Command: UpdateConditionalAccessPolicyByName
+          - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
               displayName: MS.AAD.2.1v1 Users detected as high risk SHALL be blocked
               updates:
-                state: enabled
+                State: enabled
+                Conditions:
+                  Users:
+                    IncludeUsers: ["All"]
+                    ExcludeUsers: []
+                    IncludeGroups: []
+                    ExcludeGroups: []
+                    IncludeRoles: []
+                    ExcludeRoles: []
+                  Applications:
+                    IncludeApplications: ["All"]
+                    ExcludeApplications: []
+                  UserRiskLevels: ["high"]
+                GrantControls:
+                  BuiltInControls:
+                    - block
         Postconditions: [] 
         ExpectedResult: true
   
   - PolicyId: MS.AAD.2.3v1
-    TestDriver: RunScuba
+    TestDriver: RunCached
     Tests:
-      - TestDescription: MS.AAD.2.3v1 Non-Compliant case - Report Only 
+      - TestDescription: MS.AAD.2.3v1 Non-Compliant case - low risk sign ins are blocked 
         Preconditions:
-          - Command: UpdateConditionalAccessPolicyByName
+          - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
               displayName: MS.AAD.2.3v1 Sign-ins detected as high risk SHALL be blocked
               updates:
-                state: enabledForReportingButNotEnforced
+                State: enabled
+                Conditions:
+                  Users:
+                    IncludeUsers: ["All"]
+                    ExcludeUsers: []
+                    IncludeGroups: []
+                    ExcludeGroups: []
+                    IncludeRoles: []
+                    ExcludeRoles: []
+                  Applications:
+                    IncludeApplications: ["All"]
+                    ExcludeApplications: []
+                  SignInRiskLevels: ["low"]
+                GrantControls:
+                  BuiltInControls:
+                    - block
         Postconditions: [] 
         ExpectedResult: false
-      - TestDescription: MS.AAD.2.3v1 Compliant case - Default
+      - TestDescription: MS.AAD.2.3v1 Compliant case - high risk sign ins are blocked
         Preconditions:
-          - Command: UpdateConditionalAccessPolicyByName
+          - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
               displayName: MS.AAD.2.3v1 Sign-ins detected as high risk SHALL be blocked
               updates:
-                state: enabled
+                State: enabled
+                Conditions:
+                  Users:
+                    IncludeUsers: ["All"]
+                    ExcludeUsers: []
+                    IncludeGroups: []
+                    ExcludeGroups: []
+                    IncludeRoles: []
+                    ExcludeRoles: []
+                  Applications:
+                    IncludeApplications: ["All"]
+                    ExcludeApplications: []
+                  SignInRiskLevels: ["high"]
+                GrantControls:
+                  BuiltInControls:
+                    - block
         Postconditions: []
         ExpectedResult: true
   
