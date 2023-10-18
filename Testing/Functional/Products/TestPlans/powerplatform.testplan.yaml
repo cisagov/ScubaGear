@@ -50,6 +50,14 @@ TestPlan:
         Postconditions: []
         ExpectedResult: true
 #2.2
+  - PolicyId: MS.POWERPLATFORM.2.2v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.POWERPLATFORM.2.2v1 Not Checked
+        Preconditions: []
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false
 #3.1
   - PolicyId: MS.POWERPLATFORM.3.2v1
     TestDriver: RunScuba
