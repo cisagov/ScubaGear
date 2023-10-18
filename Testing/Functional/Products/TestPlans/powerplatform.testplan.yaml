@@ -17,52 +17,7 @@ TestPlan:
               RequestBody: '@{ DisableEnvironmentCreationByNonAdminUsers = $false }'
         Postconditions: []
         ExpectedResult: true
-  - PolicyId: MS.POWERPLATFORM.2.1v1
-    TestDriver: RunScuba
-    Tests:
-      - TestDescription: MS.POWERPLATFORM.2.1v1 Non-compliant - no DLP policy in default environment
-        Preconditions:
-          - Command: 'Remove-DlpPolicy -PolicyName "<guid from dlp policy created above>"'
-        Postconditions: []
-        ExpectedResult: false
-      - TestDescription: MS.POWERPLATFORM.2.1v1 Compliant - create DLP policy in default environment
-        Preconditions:
-          - Command: 'New-AdminDlpPolicy -DisplayName "DLP" -EnvironmentName Default-<guid>'
-        Postconditions: []
-        ExpectedResult: true
-  - PolicyId: MS.POWERPLATFORM.3.2v1
-    TestDriver: RunScuba
-    Tests:
-      - TestDescription: MS.POWERPLATFORM.3.2v1 Not Checked
-        Preconditions: []
-        Postconditions: []
-        IsNotChecked: true
-        ExpectedResult: false
-  - PolicyId: MS.POWERPLATFORM.4.1v1
-    TestDriver: RunScuba
-    Tests:
-      - TestDescription: MS.POWERPLATFORM.4.1v1 Not Checked
-        Preconditions: []
-        Postconditions: []
-        IsNotChecked: true
-        ExpectedResult: false
-  - PolicyId: MS.POWERPLATFORM.5.1v1
-    TestDriver: RunScuba
-    Tests:
-      - TestDescription: MS.POWERPLATFORM.5.1v1 Compliant - Create Power Pages sites Restricted To Admins
-        Preconditions:
-          - Command: Set-TenantSettings
-            Splat:
-              Settings: '@{ DisableEnvironmentCreationByNonAdminUsers = $true }'
-        Postconditions: []
-        ExpectedResult: true
-      - TestDescription: MS.POWERPLATFORM.1.5v1 Non-compliant - Create Power Pages sites not Restricted To Admins
-        Preconditions:
-          - Command: Set-TenantSettings
-            Splat:
-              Settings: '@{ DisablePortalsCreationByNonAdminUsers = $false }'
-        Postconditions: []
-        ExpectedResult: false
+
   - PolicyId: MS.POWERPLATFORM.1.2v1
     TestDriver: RunScuba
     Tests:
@@ -80,3 +35,54 @@ TestPlan:
               RequestBody: '@{ DisableTrialEnvironmentCreationByNonAdminUsers = $false }'
         Postconditions: []
         ExpectedResult: true
+
+  - PolicyId: MS.POWERPLATFORM.2.1v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.POWERPLATFORM.2.1v1 Non-compliant - no DLP policy in default environment
+        Preconditions:
+          - Command: 'Remove-DlpPolicy -PolicyName "<guid from dlp policy created above>"'
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.POWERPLATFORM.2.1v1 Compliant - create DLP policy in default environment
+        Preconditions:
+          - Command: 'New-AdminDlpPolicy -DisplayName "DLP" -EnvironmentName Default-<guid>'
+        Postconditions: []
+        ExpectedResult: true
+#2.2
+#3.1
+  - PolicyId: MS.POWERPLATFORM.3.2v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.POWERPLATFORM.3.2v1 Not Checked
+        Preconditions: []
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false
+
+  - PolicyId: MS.POWERPLATFORM.4.1v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.POWERPLATFORM.4.1v1 Not Checked
+        Preconditions: []
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false
+
+  - PolicyId: MS.POWERPLATFORM.5.1v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.POWERPLATFORM.5.1v1 Compliant - Create Power Pages sites Restricted To Admins
+        Preconditions:
+          - Command: Set-TenantSettings
+            Splat:
+              Settings: '@{ DisableEnvironmentCreationByNonAdminUsers = $true }'
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.POWERPLATFORM.1.5v1 Non-compliant - Create Power Pages sites not Restricted To Admins
+        Preconditions:
+          - Command: Set-TenantSettings
+            Splat:
+              Settings: '@{ DisablePortalsCreationByNonAdminUsers = $false }'
+        Postconditions: []
+        ExpectedResult: false
