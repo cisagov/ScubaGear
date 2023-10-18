@@ -59,6 +59,25 @@ TestPlan:
         IsNotChecked: true
         ExpectedResult: false
 #3.1
+  - PolicyId: MS.POWERPLATFORM.3.1v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.POWERPLATFORM.3.1v1 Non-Compliant case - Power Platform tenant isolation is NOT enabled
+        Preconditions:
+          - Command: Set-PowerAppTenantIsolationPolicy
+            Splat:
+              TenantId: 'ca08493a-c9c8-4db0-a9e8-d3b4bafac269'
+              TenantIsolationPolicy: '@{tenantId=ca08493a-c9c8-4db0-a9e8-d3b4bafac269; isDisabled=True; allowedTenants=System.Object[]}'
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.POWERPLATFORM.3.1v1 Compliant case - Power Platform tenant isolation is enabled.
+        Preconditions:
+          - Command: Set-PowerAppTenantIsolationPolicy
+            Splat:
+              TenantId: 'ca08493a-c9c8-4db0-a9e8-d3b4bafac269'
+              TenantIsolationPolicy: '@{tenantId=ca08493a-c9c8-4db0-a9e8-d3b4bafac269; isDisabled=False; allowedTenants=System.Object[]}'
+        Postconditions: []
+        ExpectedResult: true
   - PolicyId: MS.POWERPLATFORM.3.2v1
     TestDriver: RunScuba
     Tests:
