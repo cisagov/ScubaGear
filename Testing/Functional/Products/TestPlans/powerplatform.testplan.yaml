@@ -115,13 +115,15 @@ TestPlan:
         Preconditions:
           - Command: Set-TenantSettings
             Splat:
-              Settings: '@{ DisablePortalsCreationByNonAdminUsers = $false }'
+              RequestBody:
+                DisablePortalsCreationByNonAdminUsers : false
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.POWERPLATFORM.5.1v1 Compliant - Create Power Pages sites Restricted To Admins
         Preconditions:
           - Command: Set-TenantSettings
             Splat:
-              Settings: '@{ DisableEnvironmentCreationByNonAdminUsers = $true }'
+              RequestBody:
+                DisablePortalsCreationByNonAdminUsers : true
         Postconditions: []
         ExpectedResult: true
