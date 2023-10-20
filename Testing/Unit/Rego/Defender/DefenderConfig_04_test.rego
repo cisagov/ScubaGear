@@ -249,6 +249,88 @@ test_ContentContainsSensitiveInformation_Incorrect_V4 if {
     RuleOutput[0].ReportDetails == "No matching rules found for: Credit Card Number, U.S. Individual Taxpayer Identification Number (ITIN), U.S. Social Security Number (SSN)"
 }
 
+test_ContentContainsSensitiveInformation_Incorrect_V5 if {
+    PolicyId := "MS.DEFENDER.4.1v1"
+
+    Output := tests with input as {
+        "dlp_compliance_rules": [
+            {
+                "ContentContainsSensitiveInformation":  [
+                    {"name":  "U.S. Social Security Number (SSN)"},
+                    {"name":  "U.S. Individual Taxpayer Identification Number (ITIN)"},
+                    {"name":  "Credit Card Number"}
+                ],
+                "Name":  "Baseline Rule",
+                "Disabled" : false,
+                "ParentPolicyName":  "Default Office 365 DLP policy",
+                "BlockAccess":  true,
+                "BlockAccessScope":  "All",
+                "NotifyUser":  [
+                    "SiteAdmin",
+                    "LastModifier",
+                    "Owner"
+                ],
+                "NotifyUserType":  "NotSet",
+                "IsAdvancedRule": false
+            }
+        ],
+        "dlp_compliance_policies": [
+            {
+                "Name": "Default Office 365 DLP policy",
+                "Mode": "Enable",
+                "Enabled": false
+            }
+        ]
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "No matching rules found for: Credit Card Number, U.S. Individual Taxpayer Identification Number (ITIN), U.S. Social Security Number (SSN)"
+}
+
+test_ContentContainsSensitiveInformation_Incorrect_V6 if {
+    PolicyId := "MS.DEFENDER.4.1v1"
+
+    Output := tests with input as {
+        "dlp_compliance_rules": [
+            {
+                "ContentContainsSensitiveInformation":  [
+                    {"name":  "U.S. Social Security Number (SSN)"},
+                    {"name":  "U.S. Individual Taxpayer Identification Number (ITIN)"},
+                    {"name":  "Credit Card Number"}
+                ],
+                "Name":  "Baseline Rule",
+                "Disabled" : false,
+                "ParentPolicyName":  "Default Office 365 DLP policy",
+                "BlockAccess":  true,
+                "BlockAccessScope":  "All",
+                "NotifyUser":  [
+                    "SiteAdmin",
+                    "LastModifier",
+                    "Owner"
+                ],
+                "NotifyUserType":  "NotSet",
+                "IsAdvancedRule": false
+            }
+        ],
+        "dlp_compliance_policies": [
+            {
+                "Name": "Default Office 365 DLP policy",
+                "Mode": "TestWithNotifications",
+                "Enabled": true
+            }
+        ]
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "No matching rules found for: Credit Card Number, U.S. Individual Taxpayer Identification Number (ITIN), U.S. Social Security Number (SSN)"
+}
+
 #
 # Policy 2
 #--
@@ -679,6 +761,54 @@ test_Locations_Incorrect_V7 if {
     RuleOutput[0].ReportDetails == "No DLP policy matching all types found for evaluation."
 }
 
+# Policy exists but set to TestWithNotifications rather than Enable
+test_Locations_Incorrect_V8 if {
+    PolicyId := "MS.DEFENDER.4.2v1"
+
+    Output := tests with input as {
+        "dlp_compliance_rules": [
+            {
+                "ContentContainsSensitiveInformation":  [
+                    {"name":  "U.S. Individual Taxpayer Identification Number (ITIN)"},
+                    {"name":  "Credit Card Number"},
+                    {"name":  "U.S. Social Security Number (SSN)"}
+                ],
+                "Name":  "Baseline Rule",
+                "Disabled" : false,
+                "ParentPolicyName":  "Default Office 365 DLP policy",
+                "BlockAccess":  true,
+                "BlockAccessScope":  "All",
+                "NotifyUser":  [
+                    "SiteAdmin",
+                    "LastModifier",
+                    "Owner"
+                ],
+                "NotifyUserType":  "NotSet",
+                "IsAdvancedRule": false
+            }
+        ],
+        "dlp_compliance_policies": [
+            {
+                "ExchangeLocation":  ["All"],
+                "SharePointLocation":  ["All"],
+                "TeamsLocation":  ["All"],
+                "EndpointDlpLocation":  ["All"],
+                "OneDriveLocation":  ["All"],
+                "Workload":  "Exchange, SharePoint, OneDriveForBusiness, Teams, EndpointDevices",
+                "Name":  "Default Office 365 DLP policy",
+                "Mode": "TestWithNotifications",
+                "Enabled": true
+            }
+        ]
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "No DLP policy matching all types found for evaluation."
+}
+
 #
 # Policy 3
 
@@ -943,6 +1073,47 @@ test_BlockAccess_Incorrect_V5 if {
                 "Name": "ITIN specific policy",
                 "Mode": "Enable",
                 "Enabled": true
+            }
+        ]
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "No DLP policy matching all types found for evaluation."
+}
+
+test_BlockAccess_Incorrect_V6 if {
+    PolicyId := "MS.DEFENDER.4.3v1"
+
+    Output := tests with input as {
+        "dlp_compliance_rules": [
+            {
+                "ContentContainsSensitiveInformation":  [
+                    {"name":  "U.S. Social Security Number (SSN)"},
+                    {"name":  "U.S. Individual Taxpayer Identification Number (ITIN)"},
+                    {"name":  "Credit Card Number"}
+                ],
+                "Name":  "Baseline Rule",
+                "Disabled" : false,
+                "ParentPolicyName":  "Default Office 365 DLP policy",
+                "BlockAccess":  true,
+                "BlockAccessScope":  "All",
+                "NotifyUser":  [
+                    "SiteAdmin",
+                    "LastModifier",
+                    "Owner"
+                ],
+                "NotifyUserType":  "NotSet",
+                "IsAdvancedRule": false
+            }
+        ],
+        "dlp_compliance_policies": [
+            {
+                "Name": "Default Office 365 DLP policy",
+                "Mode": "Enable",
+                "Enabled": false
             }
         ]
     }
