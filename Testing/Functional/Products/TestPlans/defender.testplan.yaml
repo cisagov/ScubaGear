@@ -336,80 +336,80 @@ TestPlan:
             Disabled: false
         Postconditions: []
         ExpectedResult: true
-      - TestDescription: MS.DEFENDER.5.1v1 Non-Compliant case - "Suspicious email sending patterns detected"
-        Preconditions:
-        - Command: Set-ProtectionAlert
-          Splat:
-            Identity: "Suspicious email sending patterns detected"
-            Disabled: true
-        Postconditions: []
-        ExpectedResult: false
-      # - TestDescription: MS.DEFENDER.5.1v1 Non-Compliant case - "Suspicious Email Forwarding Activity"
+      # - TestDescription: MS.DEFENDER.5.1v1 Non-Compliant case - "Suspicious email sending patterns detected"
       #   Preconditions:
       #   - Command: Set-ProtectionAlert
       #     Splat:
       #       Identity: "Suspicious email sending patterns detected"
+      #       Disabled: true
+      #   Postconditions:
+      #   - Command: Set-ProtectionAlert
+      #     Splat:
+      #       Identity: "Suspicious email sending patterns detected"
       #       Disabled: false
+      #   ExpectedResult: false
+      # - TestDescription: MS.DEFENDER.5.1v1 Non-Compliant case - "Suspicious Email Forwarding Activity"
+      #   Preconditions:
       #   - Command: Set-ProtectionAlert
       #     Splat:
       #       Identity: "Suspicious Email Forwarding Activity"
       #       Disabled: true
-      #   Postconditions: []
+      #   Postconditions:
+      #   - Command: Set-ProtectionAlert
+      #     Splat:
+      #       Identity: "Suspicious Email Forwarding Activity"
+      #       Disabled: false
       #   ExpectedResult: false
       # - TestDescription: MS.DEFENDER.5.1v1 Non-Compliant case - "Messages have been delayed"
       #   Preconditions:
       #   - Command: Set-ProtectionAlert
       #     Splat:
-      #       Identity: "Suspicious Email Forwarding Activity"
-      #       Disabled: false
+      #       Identity: "Messages have been delayed"
+      #       Disabled: true
+      #   Postconditions:
       #   - Command: Set-ProtectionAlert
       #     Splat:
       #       Identity: "Messages have been delayed"
-      #       Disabled: true
-      #   Postconditions: []
+      #       Disabled: false
       #   ExpectedResult: false
       # - TestDescription: MS.DEFENDER.5.1v1 Non-Compliant case - "Tenant restricted from sending unprovisioned email"
       #   Preconditions:
       #   - Command: Set-ProtectionAlert
       #     Splat:
-      #       Identity: "Messages have been delayed"
-      #       Disabled: false
+      #       Identity: "Tenant restricted from sending unprovisioned email"
+      #       Disabled: true
+      #   Postconditions:
       #   - Command: Set-ProtectionAlert
       #     Splat:
       #       Identity: "Tenant restricted from sending unprovisioned email"
-      #       Disabled: true
-      #   Postconditions: []
+      #       Disabled: false
       #   ExpectedResult: false
       # - TestDescription: MS.DEFENDER.5.1v1 Non-Compliant case - "User restricted from sending email"
       #   Preconditions:
       #   - Command: Set-ProtectionAlert
       #     Splat:
-      #       Identity: "Tenant restricted from sending unprovisioned email"
-      #       Disabled: false
+      #       Identity: "User restricted from sending email"
+      #       Disabled: true
+      #   Postconditions:
       #   - Command: Set-ProtectionAlert
       #     Splat:
       #       Identity: "User restricted from sending email"
-      #       Disabled: true
-      #   Postconditions: []
+      #       Disabled: false
       #   ExpectedResult: false
       # - TestDescription: MS.DEFENDER.5.1v1 Non-Compliant case - "A potentially malicious URL click was detected"
       #   Preconditions:
       #   - Command: Set-ProtectionAlert
       #     Splat:
-      #       Identity: "User restricted from sending email"
-      #       Disabled: false
+      #       Identity: "A potentially malicious URL click was detected"
+      #       Disabled: true
+      #   Postconditions:
       #   - Command: Set-ProtectionAlert
       #     Splat:
       #       Identity: "A potentially malicious URL click was detected"
-      #       Disabled: true
-      #   Postconditions: []
+      #       Disabled: false
       #   ExpectedResult: false
       # - TestDescription: MS.DEFENDER.5.1v1 Non-Compliant case - "Suspicious connector activity"
       #   Preconditions:
-      #   - Command: Set-ProtectionAlert
-      #     Splat:
-      #       Identity: "A potentially malicious URL click was detected"
-      #       Disabled: false
       #   - Command: Set-ProtectionAlert
       #     Splat:
       #       Identity: "Suspicious connector activity"
