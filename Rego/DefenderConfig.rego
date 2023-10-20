@@ -424,7 +424,7 @@ tests[{
 # Return set of content info types in basic rules
 InfoTypeMatches(Rule) := ContentTypes if {
     Rule.IsAdvancedRule == false
-    ContentTypes := {Content.name | Content = Rule.ContentContainsSensitiveInformation[_]}
+    ContentTypes := {Content.name | Content := Rule.ContentContainsSensitiveInformation[_]}
 }
 
 # Return set of content info types in advanced rules
@@ -433,22 +433,22 @@ InfoTypeMatches(Rule) := ContentTypes if {
     RuleText := replace(replace(Rule.AdvancedRule, "rn", ""), "'", "\"")
 
     # Split string to keep line length intact
-    TypesRegex := concat("", [`(U.S. Social Security Number \(SSN\))|`,
+    TypesRegex := concat("",[
+                                `(U.S. Social Security Number \(SSN\))|`,
                                 `(U.S. Individual Taxpayer Identification `,
                                 `Number \(ITIN\))|`,
                                 `(Credit Card Number)`
                             ]
                         )
-    ContentNames := regex.find_n(TypesRegex, RuleText, -1)
-
-    ContentTypes := { name | name := ContentNames[_] }
+    ContentTypes := { name | some name in regex.find_n(TypesRegex, RuleText, -1) }
 }
 
 SensitiveInfoTypes(PolicyName) := MatchingInfoTypes if {
-    InfoTypes := {  "U.S. Social Security Number (SSN)",
+    InfoTypes := {  
+                    "U.S. Social Security Number (SSN)",
                     "U.S. Individual Taxpayer Identification Number (ITIN)",
                     "Credit Card Number"
-                }
+                 }
 
     ContentTypeSets := { Types | Rule := input.dlp_compliance_rules[_]
                                     Rule.Disabled == false
@@ -456,9 +456,7 @@ SensitiveInfoTypes(PolicyName) := MatchingInfoTypes if {
                                     Types := InfoTypeMatches(Rule)
                        }
     # Flatten set of sets of content types
-    ContentTypes := union(ContentTypeSets)
-
-    MatchingInfoTypes := InfoTypes & ContentTypes
+    MatchingInfoTypes := InfoTypes & union(ContentTypeSets)
 }
 
 # Return set of policy names that contain all sensitive info types in rules
@@ -470,10 +468,10 @@ SensitiveInfoPolicies[Policy.Name] {
 
     Conditions := [ "U.S. Social Security Number (SSN)" in InfoTypes,
                     "U.S. Individual Taxpayer Identification Number (ITIN)" in InfoTypes,
-                    "Credit Card Number" in InfoTypes]
+                    "Credit Card Number" in InfoTypes ]
 
-    count([Condition | Condition = Conditions[_]; Condition == true]) == 3
-    Policy.Enabled = true
+    count([Condition | Condition := Conditions[_]; Condition == true]) == 3
+    Policy.Enabled == true
     Policy.Mode == "Enable"
 }
 
@@ -668,10 +666,9 @@ tests[{
     "RequirementMet": Status
 }] {
     ErrorMessage := DefenderErrorMessage42
-    Conditions := [count(error_policies) == 0,
-                   count(SensitiveInfoPolicies) > 0]
-    Status := count([Condition | Condition := Conditions[_];
-                     Condition == true ]) == 2
+    Conditions := [ count(error_policies) == 0,
+                    count(SensitiveInfoPolicies) > 0 ]
+    Status := count([Condition | Condition := Conditions[_]; Condition == true ]) == 2
 }
 
 #
@@ -711,9 +708,9 @@ tests[{
 }] {
     Rules := SensitiveRulesNotBlocking
     ErrorMessage := DefenderErrorMessage43(Rules)
-    Conditions := [count(Rules) == 0, count(SensitiveInfoPolicies) > 0]
-    Status := count([Condition | Condition := Conditions[_];
-                                    Condition == true ]) == 2
+    Conditions := [ count(Rules) == 0, 
+                    count(SensitiveInfoPolicies) > 0 ]
+    Status := count([Condition | Condition := Conditions[_]; Condition == true ]) == 2
 }
 #--
 
@@ -748,9 +745,9 @@ tests[{
 }] {
     Rules := SensitiveRulesNotNotifying
     ErrorMessage := DefenderErrorMessage44(Rules)
-    Conditions := [count(Rules) == 0, count(SensitiveInfoPolicies) > 0]
-    Status := count([Condition | Condition := Conditions[_];
-                                    Condition == true ]) == 2
+    Conditions := [ count(Rules) == 0, 
+                    count(SensitiveInfoPolicies) > 0 ]
+    Status := count([Condition | Condition := Conditions[_]; Condition == true ]) == 2
 }
 #--
 
