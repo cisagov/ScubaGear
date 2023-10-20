@@ -7,14 +7,16 @@ TestPlan:
         Preconditions:
           - Command: Set-TenantSettings
             Splat:
-              RequestBody: '@{ DisableEnvironmentCreationByNonAdminUsers = $false }'
+              RequestBody:
+                DisableEnvironmentCreationByNonAdminUsers: false
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.POWERPLATFORM.1.1v1 Compliant case - Restricts production/sandbox environment creation to admin users
         Preconditions:
           - Command: Set-TenantSettings
             Splat:
-              RequestBody: '@{ DisableEnvironmentCreationByNonAdminUsers = $true }'
+              RequestBody:
+                DisableEnvironmentCreationByNonAdminUsers: true
         Postconditions: []
         ExpectedResult: true
 
@@ -25,14 +27,16 @@ TestPlan:
         Preconditions:
           - Command: Set-TenantSettings
             Splat:
-              RequestBody: '@{ DisableTrialEnvironmentCreationByNonAdminUsers = $false }'
+              RequestBody:
+                DisableTrialEnvironmentCreationByNonAdminUsers: false
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.POWERPLATFORM.1.2v1 Compliant case - Restricts trial environment creation to admin users
         Preconditions:
           - Command: Set-TenantSettings
             Splat:
-              RequestBody: '@{ DisableTrialEnvironmentCreationByNonAdminUsers = $true }'
+              RequestBody:
+                DisableTrialEnvironmentCreationByNonAdminUsers: true
         Postconditions: []
         ExpectedResult: true
 
