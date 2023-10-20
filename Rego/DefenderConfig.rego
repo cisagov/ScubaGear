@@ -421,6 +421,62 @@ tests[{
 # MS.DEFENDER.4.1v1
 #--
 
+# Return set of content info types in basic rules
+InfoTypeMatches(Rule) := ContentTypes if {
+    Rule.IsAdvancedRule == false
+    ContentTypes := {Content.name | Content := Rule.ContentContainsSensitiveInformation[_]}
+}
+
+# Return set of content info types in advanced rules
+InfoTypeMatches(Rule) := ContentTypes if {
+    Rule.IsAdvancedRule == true
+    RuleText := replace(replace(Rule.AdvancedRule, "rn", ""), "'", "\"")
+
+    # Split string to keep line length intact
+    TypesRegex := concat("",[
+                                `(U.S. Social Security Number \(SSN\))|`,
+                                `(U.S. Individual Taxpayer Identification `,
+                                `Number \(ITIN\))|`,
+                                `(Credit Card Number)`
+                            ]
+                        )
+    ContentTypes := { name | some name in regex.find_n(TypesRegex, RuleText, -1) }
+}
+
+SensitiveInfoTypes(PolicyName) := MatchingInfoTypes if {
+    InfoTypes := {  
+                    "U.S. Social Security Number (SSN)",
+                    "U.S. Individual Taxpayer Identification Number (ITIN)",
+                    "Credit Card Number"
+                 }
+
+    ContentTypeSets := { Types |
+        some Rule in input.dlp_compliance_rules
+        Rule.Disabled == false
+        Rule.ParentPolicyName == PolicyName
+        Types := InfoTypeMatches(Rule)
+    }
+
+    # Flatten set of sets of content types
+    MatchingInfoTypes := InfoTypes & union(ContentTypeSets)
+}
+
+# Return set of policy names that contain all sensitive info types in rules
+SensitiveInfoPolicies[Policy.Name] {
+    Policy := input.dlp_compliance_policies[_]
+
+    # Inspect rules for sensitive info types
+    InfoTypes := SensitiveInfoTypes(Policy.Name)
+
+    Conditions := [ "U.S. Social Security Number (SSN)" in InfoTypes,
+                    "U.S. Individual Taxpayer Identification Number (ITIN)" in InfoTypes,
+                    "Credit Card Number" in InfoTypes ]
+
+    count([Condition | Condition := Conditions[_]; Condition == true]) == 3
+    Policy.Enabled == true
+    Policy.Mode == "Enable"
+}
+
 # Determine the set of rules that pertain to SSNs, ITINs, or credit card numbers.
 # Used in multiple bullet points below
 SensitiveRules[{
@@ -469,8 +525,7 @@ SensitiveRules[{
     # double for unmarshalling
     RuleText := replace(replace(Rules.AdvancedRule, "rn", ""), "'", "\"")
 
-    ContentNames := regex.find_n(`(U.S. Social Security Number \(SSN\))|(U.S. Individual Taxpayer Identification Number \(ITIN\))|(Credit Card Number)`,
-                                 RuleText, -1)
+    ContentNames := InfoTypeMatches(Rules)
 
     Conditions := [ contains(RuleText, "U.S. Social Security Number (SSN)"),
                     contains(RuleText, "U.S. Individual Taxpayer Identification Number (ITIN)"),
@@ -515,7 +570,8 @@ tests[{
 }] {
     error_rule := "No matching rules found for:"
     ErrorMessage := concat(" ",  [error_rule, concat(", ", error_rules)])
-    Status := count(error_rules) == 0
+
+    Status := count(SensitiveInfoPolicies) > 0
 }
 
 #
@@ -528,9 +584,8 @@ ExchangePolicies[{
     "Locations" : Policy.ExchangeLocation,
     "Workload" : Policy.Workload
 }] {
-    SensitivePolicies := {Rule.ParentPolicyName | Rule = SensitiveRules[_]}
     Policy := input.dlp_compliance_policies[_]
-    Policy.Name in SensitivePolicies
+    Policy.Name in SensitiveInfoPolicies
     "All" in Policy.ExchangeLocation
     contains(Policy.Workload, "Exchange")
 }
@@ -540,9 +595,8 @@ SharePointPolicies[{
     "Locations" : Policy.SharePointLocation,
     "Workload" : Policy.Workload
 }] {
-    SensitivePolicies := {Rule.ParentPolicyName | Rule = SensitiveRules[_]}
     Policy := input.dlp_compliance_policies[_]
-    Policy.Name in SensitivePolicies
+    Policy.Name in SensitiveInfoPolicies
     "All" in Policy.SharePointLocation
     contains(Policy.Workload, "SharePoint")
 }
@@ -552,9 +606,8 @@ OneDrivePolicies[{
     "Locations" : Policy.OneDriveLocation,
     "Workload" : Policy.Workload
 }] {
-    SensitivePolicies := {Rule.ParentPolicyName | Rule = SensitiveRules[_]}
     Policy := input.dlp_compliance_policies[_]
-    Policy.Name in SensitivePolicies
+    Policy.Name in SensitiveInfoPolicies
     "All" in Policy.OneDriveLocation
     contains(Policy.Workload, "OneDriveForBusiness")
 }
@@ -564,9 +617,8 @@ TeamsPolicies[{
     "Locations" : Policy.TeamsLocation,
     "Workload" : Policy.Workload
     }] {
-    SensitivePolicies := {Rule.ParentPolicyName | Rule = SensitiveRules[_]}
     Policy := input.dlp_compliance_policies[_]
-    Policy.Name in SensitivePolicies
+    Policy.Name in SensitiveInfoPolicies
     "All" in Policy.TeamsLocation
     contains(Policy.Workload, "Teams")
 }
@@ -576,9 +628,8 @@ DevicesPolicies[{
     "Locations" : Policy.EndpointDlpLocation,
     "Workload" : Policy.Workload
     }] {
-    SensitivePolicies := {Rule.ParentPolicyName | Rule := SensitiveRules[_]}
     Policy := input.dlp_compliance_policies[_]
-    Policy.Name in SensitivePolicies
+    Policy.Name in SensitiveInfoPolicies
     "All" in Policy.EndpointDlpLocation
     contains(Policy.Workload, "EndpointDevices")
 }
@@ -597,6 +648,17 @@ error_policies contains "OneDrive" if count(Policies.OneDrive) == 0
 error_policies contains "Teams" if count(Policies.Teams) == 0
 error_policies contains "Devices" if count(Policies.Devices) == 0
 
+DefenderErrorMessage4_2() := ErrorMessage if {
+    count(SensitiveInfoPolicies) > 0
+    error_policy := "No enabled policy found that applies to:"
+    ErrorMessage := concat(" ", [error_policy, concat(", ", error_policies)])
+}
+
+DefenderErrorMessage4_2() := ErrorMessage if {
+    count(SensitiveInfoPolicies) == 0
+    ErrorMessage := "No DLP policy matching all types found for evaluation."
+}
+
 tests[{
     "PolicyId": "MS.DEFENDER.4.2v1",
     "Criticality": "Should",
@@ -605,9 +667,10 @@ tests[{
     "ReportDetails": CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
     "RequirementMet": Status
 }] {
-    error_policy := "No enabled policy found that applies to:"
-    ErrorMessage := concat(" ", [error_policy, concat(", ", error_policies)])
-    Status := count(error_policies) == 0
+    ErrorMessage := DefenderErrorMessage4_2
+    Conditions := [ count(error_policies) == 0,
+                    count(SensitiveInfoPolicies) > 0 ]
+    Status := count([Condition | Condition := Conditions[_]; Condition == true ]) == 2
 }
 
 #
@@ -617,42 +680,39 @@ tests[{
 SensitiveRulesNotBlocking[Rule.Name] {
     Rule := SensitiveRules[_]
     not Rule.BlockAccess
-    Policy := input.dlp_compliance_policies[_]
-    Rule.ParentPolicyName == Policy.Name
-    Policy.Mode == "Enable"
+    Rule.ParentPolicyName in SensitiveInfoPolicies
 }
 
-# Covers rules set to block, but inside policies set to
-# "TestWithNotifications" or "TestWithoutNotifications" that won't enforce the block
 SensitiveRulesNotBlocking[Rule.Name] {
     Rule := SensitiveRules[_]
-    Policy := input.dlp_compliance_policies[_]
-    Rule.ParentPolicyName == Policy.Name
     Rule.BlockAccess
-    startswith(Policy.Mode, "TestWith") == true
-}
-
-SensitiveRulesNotBlocking[Rule.Name] {
-    Rule := SensitiveRules[_]
-    Rule.BlockAccess                              
-    Policy := input.dlp_compliance_policies[_]
-    Rule.ParentPolicyName == Policy.Name
-    count(error_rules) == 0
+    Rule.ParentPolicyName in SensitiveInfoPolicies
     Rule.BlockAccessScope != "All"
 }
 
+DefenderErrorMessage4_3(Rules) := GenerateArrayString(Rules, ErrorMessage) if {
+    count(SensitiveInfoPolicies) > 0
+    ErrorMessage := "rule(s) found that do(es) not block access or associated policy not set to enforce block action:"
+}
+
+DefenderErrorMessage4_3(Rules) := ErrorMessage if {
+    count(SensitiveInfoPolicies) == 0
+    ErrorMessage := "No DLP policy matching all types found for evaluation."
+}
 
 tests[{
     "PolicyId" : "MS.DEFENDER.4.3v1",
     "Criticality" : "Should",
     "Commandlet" : ["Get-DlpComplianceRule"],
     "ActualValue" : Rules,
-    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), GenerateArrayString(Rules, ErrorMessage)),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
     "RequirementMet" : Status
 }] {
     Rules := SensitiveRulesNotBlocking
-    ErrorMessage := "rule(s) found that do(es) not block access or associated policy not set to enforce block action:"
-    Status := count(Rules) == 0
+    ErrorMessage := DefenderErrorMessage4_3(Rules)
+    Conditions := [ count(Rules) == 0, 
+                    count(SensitiveInfoPolicies) > 0 ]
+    Status := count([Condition | Condition := Conditions[_]; Condition == true ]) == 2
 }
 #--
 
@@ -662,7 +722,19 @@ tests[{
 # Step 4: ensure that some user is notified in the event of a DLP violation
 SensitiveRulesNotNotifying[Rule.Name] {
     Rule := SensitiveRules[_]
+    count(SensitiveInfoPolicies) > 0
+    Rule.ParentPolicyName in SensitiveInfoPolicies
     count(Rule.NotifyUser) == 0
+}
+
+DefenderErrorMessage4_4(Rules) := GenerateArrayString(Rules, ErrorMessage) if {
+    count(SensitiveInfoPolicies) > 0
+    ErrorMessage := "rule(s) found that do(es) not notify at least one user:"
+}
+
+DefenderErrorMessage4_4(Rules) := ErrorMessage if {
+    count(SensitiveInfoPolicies) == 0
+    ErrorMessage := "No DLP policy matching all types found for evaluation."
 }
 
 tests[{
@@ -670,12 +742,14 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-DlpComplianceRule"],
     "ActualValue" : Rules,
-    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), GenerateArrayString(Rules, ErrorMessage)),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
     "RequirementMet" : Status
 }] {
     Rules := SensitiveRulesNotNotifying
-    ErrorMessage := "rule(s) found that do(es) not notify at least one user:"
-    Status := count(Rules) == 0
+    ErrorMessage := DefenderErrorMessage4_4(Rules)
+    Conditions := [ count(Rules) == 0, 
+                    count(SensitiveInfoPolicies) > 0 ]
+    Status := count([Condition | Condition := Conditions[_]; Condition == true ]) == 2
 }
 #--
 
