@@ -450,11 +450,13 @@ SensitiveInfoTypes(PolicyName) := MatchingInfoTypes if {
                     "Credit Card Number"
                  }
 
-    ContentTypeSets := { Types | Rule := input.dlp_compliance_rules[_]
-                                    Rule.Disabled == false
-                                    Rule.ParentPolicyName == PolicyName
-                                    Types := InfoTypeMatches(Rule)
-                       }
+    ContentTypeSets := { Types |
+        some Rule in input.dlp_compliance_rules
+        Rule.Disabled == false
+        Rule.ParentPolicyName == PolicyName
+        Types := InfoTypeMatches(Rule)
+    }
+
     # Flatten set of sets of content types
     MatchingInfoTypes := InfoTypes & union(ContentTypeSets)
 }
@@ -646,13 +648,13 @@ error_policies contains "OneDrive" if count(Policies.OneDrive) == 0
 error_policies contains "Teams" if count(Policies.Teams) == 0
 error_policies contains "Devices" if count(Policies.Devices) == 0
 
-DefenderErrorMessage42() := ErrorMessage if {
+DefenderErrorMessage4_2() := ErrorMessage if {
     count(SensitiveInfoPolicies) > 0
     error_policy := "No enabled policy found that applies to:"
     ErrorMessage := concat(" ", [error_policy, concat(", ", error_policies)])
 }
 
-DefenderErrorMessage42() := ErrorMessage if {
+DefenderErrorMessage4_2() := ErrorMessage if {
     count(SensitiveInfoPolicies) == 0
     ErrorMessage := "No DLP policy matching all types found for evaluation."
 }
@@ -665,7 +667,7 @@ tests[{
     "ReportDetails": CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
     "RequirementMet": Status
 }] {
-    ErrorMessage := DefenderErrorMessage42
+    ErrorMessage := DefenderErrorMessage4_2
     Conditions := [ count(error_policies) == 0,
                     count(SensitiveInfoPolicies) > 0 ]
     Status := count([Condition | Condition := Conditions[_]; Condition == true ]) == 2
@@ -688,12 +690,12 @@ SensitiveRulesNotBlocking[Rule.Name] {
     Rule.BlockAccessScope != "All"
 }
 
-DefenderErrorMessage43(Rules) := GenerateArrayString(Rules, ErrorMessage) if {
+DefenderErrorMessage4_3(Rules) := GenerateArrayString(Rules, ErrorMessage) if {
     count(SensitiveInfoPolicies) > 0
     ErrorMessage := "rule(s) found that do(es) not block access or associated policy not set to enforce block action:"
 }
 
-DefenderErrorMessage43(Rules) := ErrorMessage if {
+DefenderErrorMessage4_3(Rules) := ErrorMessage if {
     count(SensitiveInfoPolicies) == 0
     ErrorMessage := "No DLP policy matching all types found for evaluation."
 }
@@ -707,7 +709,7 @@ tests[{
     "RequirementMet" : Status
 }] {
     Rules := SensitiveRulesNotBlocking
-    ErrorMessage := DefenderErrorMessage43(Rules)
+    ErrorMessage := DefenderErrorMessage4_3(Rules)
     Conditions := [ count(Rules) == 0, 
                     count(SensitiveInfoPolicies) > 0 ]
     Status := count([Condition | Condition := Conditions[_]; Condition == true ]) == 2
@@ -725,12 +727,12 @@ SensitiveRulesNotNotifying[Rule.Name] {
     count(Rule.NotifyUser) == 0
 }
 
-DefenderErrorMessage44(Rules) := GenerateArrayString(Rules, ErrorMessage) if {
+DefenderErrorMessage4_4(Rules) := GenerateArrayString(Rules, ErrorMessage) if {
     count(SensitiveInfoPolicies) > 0
     ErrorMessage := "rule(s) found that do(es) not notify at least one user:"
 }
 
-DefenderErrorMessage44(Rules) := ErrorMessage if {
+DefenderErrorMessage4_4(Rules) := ErrorMessage if {
     count(SensitiveInfoPolicies) == 0
     ErrorMessage := "No DLP policy matching all types found for evaluation."
 }
@@ -744,7 +746,7 @@ tests[{
     "RequirementMet" : Status
 }] {
     Rules := SensitiveRulesNotNotifying
-    ErrorMessage := DefenderErrorMessage44(Rules)
+    ErrorMessage := DefenderErrorMessage4_4(Rules)
     Conditions := [ count(Rules) == 0, 
                     count(SensitiveInfoPolicies) > 0 ]
     Status := count([Condition | Condition := Conditions[_]; Condition == true ]) == 2
