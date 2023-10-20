@@ -391,7 +391,7 @@ To disable SMTP AUTH for the organization:
 
 3. Make sure the setting **Turn off SMTP AUTH protocol for your organization** is checked.
 
-To enable SMTP AUTH on a per-mailbox basis:
+(optional) As an exception, to allow SMTP AUTH for a specific mailbox:
 
 1. Sign in to the **Microsoft 365 admin center** and go to **Users > Active users**.
 
