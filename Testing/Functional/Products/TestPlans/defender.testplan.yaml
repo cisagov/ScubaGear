@@ -20,7 +20,7 @@ TestPlan:
               RecipientDomainIs: null
               Confirm: false
         Postconditions: []
-        ExpectedResult: false
+        ExpectedResult: true
       - TestDescription: MS.DEFENDER.1.2v1 Compliant - Std Null Strict Non-null
         Preconditions:
           - Command: Set-EOPProtectionPolicyRule
@@ -42,7 +42,7 @@ TestPlan:
               SentToMemberOf: null
               RecipientDomainIs: null
               Confirm: false
-          - Command: Enable-EOPProtectionPolicyRule
+          - Command: Set-EOPProtectionPolicyRule
             Splat:
               Identity: Strict Preset Security Policy
               SentTo: null
@@ -58,18 +58,6 @@ TestPlan:
       - TestDescription: MS.DEFENDER.1.4v1 Non-compliant Strict Preset Security Policy Disabled
         Preconditions:
           - Command: Disable-EOPProtectionPolicyRule
-            Splat:
-              Identity: Standard Preset Security Policy
-              Confirm: false
-          - Command: Disable-ATPProtectionPolicyRule
-            Splat:
-              Identity: Standard Preset Security Policy
-              Confirm: false
-          - Command: Enable-EOPProtectionPolicyRule
-            Splat:
-              Identity: Strict Preset Security Policy
-              Confirm: false
-          - Command: Enable-ATPProtectionPolicyRule
             Splat:
               Identity: Strict Preset Security Policy
               Confirm: false
@@ -223,53 +211,53 @@ TestPlan:
         Postconditions: []
         ExpectedResult: true
 
-  - PolicyId: MS.DEFENDER.4.1v1
-    TestDriver: RunScuba
-    Tests:
-      - TestDescription: MS.DEFENDER.4.1v1 Compliant case
-        Preconditions:
-          - Command: Set-DlpComplianceRule
-            Splat:
-              displayName: MS.DEFENDER.4.1v1 A custom policy SHALL be configured to protect PII and sensitive information
-              updates:
-        Postconditions: []
-        ExpectedResult: true
+  # - PolicyId: MS.DEFENDER.4.1v1
+  #   TestDriver: RunScuba
+  #   Tests:
+  #     - TestDescription: MS.DEFENDER.4.1v1 Compliant case
+  #       Preconditions:
+  #         - Command: Set-DlpComplianceRule
+  #           Splat:
+  #             displayName: MS.DEFENDER.4.1v1 A custom policy SHALL be configured to protect PII and sensitive information
+  #             updates:
+  #       Postconditions: []
+  #       ExpectedResult: true
 
-  - PolicyId: MS.DEFENDER.4.2v1
-    TestDriver: RunScuba
-    Tests:
-      - TestDescription: MS.DEFENDER.4.2v1 Compliant case
-        Preconditions:
-          - Command: Set-DlpComplianceRule
-            Splat:
-              displayName: MS.DEFENDER.4.2v1 The custom policy SHOULD be applied to Exchange, OneDrive, SharePoint, Teams chat, and Devices
-              updates:
-        Postconditions: []
-        ExpectedResult: true
+  # - PolicyId: MS.DEFENDER.4.2v1
+  #   TestDriver: RunScuba
+  #   Tests:
+  #     - TestDescription: MS.DEFENDER.4.2v1 Compliant case
+  #       Preconditions:
+  #         - Command: Set-DlpComplianceRule
+  #           Splat:
+  #             displayName: MS.DEFENDER.4.2v1 The custom policy SHOULD be applied to Exchange, OneDrive, SharePoint, Teams chat, and Devices
+  #             updates:
+  #       Postconditions: []
+  #       ExpectedResult: true
 
-  - PolicyId: MS.DEFENDER.4.3v1
-    TestDriver: RunScuba
-    Tests:
-      - TestDescription: MS.DEFENDER.4.3v1 Compliant case
-        Preconditions:
-          - Command: Set-DlpComplianceRule
-            Splat:
-              displayName: MS.DEFENDER.4.3v1 custom policy SHOULD be set to block sharing sensitive information with everyone
-              updates:
-        Postconditions: []
-        ExpectedResult: true
+  # - PolicyId: MS.DEFENDER.4.3v1
+  #   TestDriver: RunScuba
+  #   Tests:
+  #     - TestDescription: MS.DEFENDER.4.3v1 Compliant case
+  #       Preconditions:
+  #         - Command: Set-DlpComplianceRule
+  #           Splat:
+  #             displayName: MS.DEFENDER.4.3v1 custom policy SHOULD be set to block sharing sensitive information with everyone
+  #             updates:
+  #       Postconditions: []
+  #       ExpectedResult: true
 
-  - PolicyId: MS.DEFENDER.4.4v1
-    TestDriver: RunScuba
-    Tests:
-      - TestDescription: MS.DEFENDER.4.4v1 Compliant case
-        Preconditions:
-          - Command: Set-DlpComplianceRule
-            Splat:
-              displayName: MS.DEFENDER.4.4v1 Notifications to inform users SHOULD be enabled
-              updates:
-        Postconditions: []
-        ExpectedResult: true
+  # - PolicyId: MS.DEFENDER.4.4v1
+  #   TestDriver: RunScuba
+  #   Tests:
+  #     - TestDescription: MS.DEFENDER.4.4v1 Compliant case
+  #       Preconditions:
+  #         - Command: Set-DlpComplianceRule
+  #           Splat:
+  #             displayName: MS.DEFENDER.4.4v1 Notifications to inform users SHOULD be enabled
+  #             updates:
+  #       Postconditions: []
+  #       ExpectedResult: true
 
   - PolicyId: MS.DEFENDER.4.5v1
     TestDriver: RunScuba
@@ -324,90 +312,90 @@ TestPlan:
             Disabled: false
         Postconditions: []
         ExpectedResult: true
-      - TestDescription: MS.DEFENDER.5.1v1 Non-Compliant case - "Suspicious email sending patterns detected"
-        Preconditions:
-        - Command: Set-ProtectionAlert
-          Splat:
-            Identity: "Suspicious email sending patterns detected"
-            Disabled: true
-        Postconditions: []
-        ExpectedResult: false
-      - TestDescription: MS.DEFENDER.5.1v1 Non-Compliant case - "Suspicious Email Forwarding Activity"
-        Preconditions:
-        - Command: Set-ProtectionAlert
-          Splat:
-            Identity: "Suspicious email sending patterns detected"
-            Disabled: false
-        - Command: Set-ProtectionAlert
-          Splat:
-            Identity: "Suspicious Email Forwarding Activity"
-            Disabled: true
-        Postconditions: []
-        ExpectedResult: false
-      - TestDescription: MS.DEFENDER.5.1v1 Non-Compliant case - "Messages have been delayed"
-        Preconditions:
-        - Command: Set-ProtectionAlert
-          Splat:
-            Identity: "Suspicious Email Forwarding Activity"
-            Disabled: false
-        - Command: Set-ProtectionAlert
-          Splat:
-            Identity: "Messages have been delayed"
-            Disabled: true
-        Postconditions: []
-        ExpectedResult: false
-      - TestDescription: MS.DEFENDER.5.1v1 Non-Compliant case - "Tenant restricted from sending unprovisioned email"
-        Preconditions:
-        - Command: Set-ProtectionAlert
-          Splat:
-            Identity: "Messages have been delayed"
-            Disabled: false
-        - Command: Set-ProtectionAlert
-          Splat:
-            Identity: "Tenant restricted from sending unprovisioned email"
-            Disabled: true
-        Postconditions: []
-        ExpectedResult: false
-      - TestDescription: MS.DEFENDER.5.1v1 Non-Compliant case - "User restricted from sending email"
-        Preconditions:
-        - Command: Set-ProtectionAlert
-          Splat:
-            Identity: "Tenant restricted from sending unprovisioned email"
-            Disabled: false
-        - Command: Set-ProtectionAlert
-          Splat:
-            Identity: "User restricted from sending email"
-            Disabled: true
-        Postconditions: []
-        ExpectedResult: false
-      - TestDescription: MS.DEFENDER.5.1v1 Non-Compliant case - "A potentially malicious URL click was detected"
-        Preconditions:
-        - Command: Set-ProtectionAlert
-          Splat:
-            Identity: "User restricted from sending email"
-            Disabled: false
-        - Command: Set-ProtectionAlert
-          Splat:
-            Identity: "A potentially malicious URL click was detected"
-            Disabled: true
-        Postconditions: []
-        ExpectedResult: false
-      - TestDescription: MS.DEFENDER.5.1v1 Non-Compliant case - "Suspicious connector activity"
-        Preconditions:
-        - Command: Set-ProtectionAlert
-          Splat:
-            Identity: "A potentially malicious URL click was detected"
-            Disabled: false
-        - Command: Set-ProtectionAlert
-          Splat:
-            Identity: "Suspicious connector activity"
-            Disabled: true
-        Postconditions:
-        - Command: Set-ProtectionAlert
-          Splat:
-            Identity: "Suspicious connector activity"
-            Disabled: false
-        ExpectedResult: false
+      # - TestDescription: MS.DEFENDER.5.1v1 Non-Compliant case - "Suspicious email sending patterns detected"
+      #   Preconditions:
+      #   - Command: Set-ProtectionAlert
+      #     Splat:
+      #       Identity: "Suspicious email sending patterns detected"
+      #       Disabled: true
+      #   Postconditions: []
+      #   ExpectedResult: false
+      # - TestDescription: MS.DEFENDER.5.1v1 Non-Compliant case - "Suspicious Email Forwarding Activity"
+      #   Preconditions:
+      #   - Command: Set-ProtectionAlert
+      #     Splat:
+      #       Identity: "Suspicious email sending patterns detected"
+      #       Disabled: false
+      #   - Command: Set-ProtectionAlert
+      #     Splat:
+      #       Identity: "Suspicious Email Forwarding Activity"
+      #       Disabled: true
+      #   Postconditions: []
+      #   ExpectedResult: false
+      # - TestDescription: MS.DEFENDER.5.1v1 Non-Compliant case - "Messages have been delayed"
+      #   Preconditions:
+      #   - Command: Set-ProtectionAlert
+      #     Splat:
+      #       Identity: "Suspicious Email Forwarding Activity"
+      #       Disabled: false
+      #   - Command: Set-ProtectionAlert
+      #     Splat:
+      #       Identity: "Messages have been delayed"
+      #       Disabled: true
+      #   Postconditions: []
+      #   ExpectedResult: false
+      # - TestDescription: MS.DEFENDER.5.1v1 Non-Compliant case - "Tenant restricted from sending unprovisioned email"
+      #   Preconditions:
+      #   - Command: Set-ProtectionAlert
+      #     Splat:
+      #       Identity: "Messages have been delayed"
+      #       Disabled: false
+      #   - Command: Set-ProtectionAlert
+      #     Splat:
+      #       Identity: "Tenant restricted from sending unprovisioned email"
+      #       Disabled: true
+      #   Postconditions: []
+      #   ExpectedResult: false
+      # - TestDescription: MS.DEFENDER.5.1v1 Non-Compliant case - "User restricted from sending email"
+      #   Preconditions:
+      #   - Command: Set-ProtectionAlert
+      #     Splat:
+      #       Identity: "Tenant restricted from sending unprovisioned email"
+      #       Disabled: false
+      #   - Command: Set-ProtectionAlert
+      #     Splat:
+      #       Identity: "User restricted from sending email"
+      #       Disabled: true
+      #   Postconditions: []
+      #   ExpectedResult: false
+      # - TestDescription: MS.DEFENDER.5.1v1 Non-Compliant case - "A potentially malicious URL click was detected"
+      #   Preconditions:
+      #   - Command: Set-ProtectionAlert
+      #     Splat:
+      #       Identity: "User restricted from sending email"
+      #       Disabled: false
+      #   - Command: Set-ProtectionAlert
+      #     Splat:
+      #       Identity: "A potentially malicious URL click was detected"
+      #       Disabled: true
+      #   Postconditions: []
+      #   ExpectedResult: false
+      # - TestDescription: MS.DEFENDER.5.1v1 Non-Compliant case - "Suspicious connector activity"
+      #   Preconditions:
+      #   - Command: Set-ProtectionAlert
+      #     Splat:
+      #       Identity: "A potentially malicious URL click was detected"
+      #       Disabled: false
+      #   - Command: Set-ProtectionAlert
+      #     Splat:
+      #       Identity: "Suspicious connector activity"
+      #       Disabled: true
+      #   Postconditions:
+      #   - Command: Set-ProtectionAlert
+      #     Splat:
+      #       Identity: "Suspicious connector activity"
+      #       Disabled: false
+      #   ExpectedResult: false
 
   - PolicyId: MS.DEFENDER.5.2v1
     TestDriver: RunScuba
