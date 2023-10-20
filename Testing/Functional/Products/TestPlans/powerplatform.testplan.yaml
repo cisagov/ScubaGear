@@ -55,7 +55,7 @@ TestPlan:
           - Command: 'New-AdminDlpPolicy -DisplayName "DLP" -EnvironmentName $defenv.EnvironmentName'
         Postconditions: []
         ExpectedResult: true
-#2.2
+
   - PolicyId: MS.POWERPLATFORM.2.2v1
     TestDriver: RunScuba
     Tests:
@@ -64,7 +64,7 @@ TestPlan:
         Postconditions: []
         IsNotChecked: true
         ExpectedResult: false
-#3.1
+
   - PolicyId: MS.POWERPLATFORM.3.1v1
     TestDriver: RunScuba
     Tests:
@@ -90,6 +90,7 @@ TestPlan:
               TenantIsolationPolicy: '$iso'
         Postconditions: []
         ExpectedResult: true
+
   - PolicyId: MS.POWERPLATFORM.3.2v1
     TestDriver: RunScuba
     Tests:
