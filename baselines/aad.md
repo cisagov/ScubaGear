@@ -448,7 +448,7 @@ Group owners SHALL NOT be allowed to consent to applications.
 
 1.  In **Azure Active Directory** under **Manage**, select **Enterprise Applications.**
 
-2. Under **Security**, select **Consent and permissions.**
+2. Under **Security**, select **Consent and permissions.** Then select **User Consent Settings.**
 
 3. Under **User consent for applications**, select **Do not allow user consent.**
 
