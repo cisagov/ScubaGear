@@ -11,10 +11,10 @@ test_AutoForwardEnabled_Correct if {
     Output := tests with input as {
         "remote_domains": [
             {
-                "AutoForwardEnabled" : false, 
+                "AutoForwardEnabled" : false,
                 "DomainName" : "Test name"
             }
-        ]    
+        ]
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
@@ -30,10 +30,10 @@ test_AutoForwardEnabled_Incorrect_V1 if {
     Output := tests with input as {
         "remote_domains": [
             {
-                "AutoForwardEnabled" : true, 
+                "AutoForwardEnabled" : true,
                 "DomainName" : "Test name"
             }
-        ]    
+        ]
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
@@ -49,14 +49,14 @@ test_AutoForwardEnabled_Incorrect_V2 if {
     Output := tests with input as {
         "remote_domains": [
             {
-                "AutoForwardEnabled" : true, 
+                "AutoForwardEnabled" : true,
                 "DomainName" : "Test name"
             },
             {
-                "AutoForwardEnabled" : true, 
+                "AutoForwardEnabled" : true,
                 "DomainName" : "Test name 2"
             }
-        ]    
+        ]
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
@@ -72,18 +72,18 @@ test_AutoForwardEnabled_Incorrect_V3 if {
     Output := tests with input as {
         "remote_domains": [
             {
-                "AutoForwardEnabled" : true, 
+                "AutoForwardEnabled" : true,
                 "DomainName" : "Test name"
             },
             {
-                "AutoForwardEnabled" : true, 
+                "AutoForwardEnabled" : true,
                 "DomainName" : "Test name 2"
             },
             {
-                "AutoForwardEnabled" : false, 
+                "AutoForwardEnabled" : false,
                 "DomainName" : "Test name 3"
             }
-        ]    
+        ]
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]

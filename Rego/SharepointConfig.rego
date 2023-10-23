@@ -70,16 +70,36 @@ tests[{
 # SharingDomainRestrictionMode == 1 Checked
 # SharingAllowedDomainList == "domains" Domain list
 
+# At this time we are unable to test for approved security groups
+# because we have yet to find the setting to check
+Domainlist(Policy) = Description if {
+    Policy.SharingCapability == 0
+    Description := "Requirement met: external sharing is set to Only People In Organization"
+}
+
+Domainlist(Policy) = Description if {
+    Policy.SharingCapability != 0
+    Policy.SharingDomainRestrictionMode == 1
+    Description := "Requirement met: Note that we currently only check for approved external domains. Approved security groups are currently not being checked, see the baseline policy for instructions on a manual check"
+}
+
+Domainlist(Policy) = Description if {
+    Policy.SharingCapability != 0
+    Policy.SharingDomainRestrictionMode != 1
+    Description := "Requirement not met: Note that we currently only check for approved external domains. Approved security groups are currently not being checked, see the baseline policy for instructions on a manual check"
+}
+
 tests[{
     "PolicyId" : "MS.SHAREPOINT.1.3v1",
-    "Criticality" : "Should",
+    "Criticality" : "Shall",
     "Commandlet" : ["Get-SPOTenant", "Get-PnPTenant"],
-    "ActualValue" : [Policy.SharingDomainRestrictionMode],
-    "ReportDetails" : ReportDetailsBoolean(Status),
+    "ActualValue" : [Policy.SharingDomainRestrictionMode, Policy.SharingCapability],
+    "ReportDetails" : Domainlist(Policy),
     "RequirementMet" : Status
 }] {
     Policy := input.SPO_tenant[_]
-    Status := Policy.SharingDomainRestrictionMode == 1
+    Conditions := [Policy.SharingCapability == 0, Policy.SharingDomainRestrictionMode == 1]
+    Status := count([Condition | Condition = Conditions[_]; Condition == true]) == 1
 }
 #--
 
@@ -87,36 +107,18 @@ tests[{
 # MS.SHAREPOINT.1.4v1
 #--
 
-# At this time we are unable to test for approved security groups
-# because we have yet to find the setting to check
 
 tests[{
-    "PolicyId" : PolicyId,
-    "Criticality" : "Should/Not-Implemented",
-    "Commandlet" : [],
-    "ActualValue" : [],
-    "ReportDetails" : NotCheckedDetails(PolicyId),
-    "RequirementMet" : false
-}] {
-    PolicyId := "MS.SHAREPOINT.1.4v1"
-    true
-}
-#--
-
-#
-# MS.SHAREPOINT.1.5v1
-#--
-
-tests[{
-    "PolicyId" : "MS.SHAREPOINT.1.5v1",
-    "Criticality" : "Should",
+    "PolicyId" : "MS.SHAREPOINT.1.4v1",
+    "Criticality" : "Shall",
     "Commandlet" : ["Get-SPOTenant", "Get-PnPTenant"],
-    "ActualValue" : [Policy.RequireAcceptingAccountMatchInvitedAccount],
+    "ActualValue" : [Policy.RequireAcceptingAccountMatchInvitedAccount, Policy.SharingCapability],
     "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 }] {
     Policy := input.SPO_tenant[_]
-    Status := Policy.RequireAcceptingAccountMatchInvitedAccount == true
+    Conditions := [Policy.SharingCapability == 0, Policy.RequireAcceptingAccountMatchInvitedAccount == true]
+    Status := count([Condition | Condition = Conditions[_]; Condition == true]) == 1
 }
 #--
 
