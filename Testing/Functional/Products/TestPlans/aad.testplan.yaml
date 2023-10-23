@@ -793,50 +793,50 @@ TestPlan:
         ExpectedResult: true
 
   - PolicyId: MS.AAD.8.1v1
-    TestDriver: RunScuba
+    TestDriver: RunCached
     Tests:
       - TestDescription: MS.AAD.8.1v1 Non-Compliant - Guest users have the same access as members
         Preconditions: 
-          - Command: Update-MgBetaPolicyAuthorizationPolicy
+          - Command: UpdateProviderExport
             Splat:
-              AuthorizationPolicyId: authorizationPolicy
-              GuestUserRoleId: "a0b1b346-4d3e-4e8b-98f8-753987be4970"
+              updates:
+                authorization_policies[0].GuestUserRoleId: "a0b1b346-4d3e-4e8b-98f8-753987be4970"
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.AAD.8.1v1 Compliant - Guest user access is restricted
         Preconditions: 
-          - Command: Update-MgBetaPolicyAuthorizationPolicy
+          - Command: UpdateProviderExport
             Splat:
-              AuthorizationPolicyId: authorizationPolicy
-              GuestUserRoleId: "2af84b1e-32c8-42b7-82bc-daa82404023b"
+              updates:
+                authorization_policies[0].GuestUserRoleId: "2af84b1e-32c8-42b7-82bc-daa82404023b"
         Postconditions: []
         ExpectedResult: true
       - TestDescription: MS.AAD.8.1v1 Compliant - Guest users have limited access
         Preconditions: 
-          - Command: Update-MgBetaPolicyAuthorizationPolicy
+          - Command: UpdateProviderExport
             Splat:
-              AuthorizationPolicyId: authorizationPolicy
-              GuestUserRoleId: "10dae51f-b6af-4016-8d66-8c2a99b929b3"
+              updates:
+                authorization_policies[0].GuestUserRoleId: "10dae51f-b6af-4016-8d66-8c2a99b929b3"
         Postconditions: []
         ExpectedResult: true
 
   - PolicyId: MS.AAD.8.2v1
-    TestDriver: RunScuba
+    TestDriver: RunCached
     Tests:
       - TestDescription: MS.AAD.8.2v1 Non-Compliant - Anyone in the organization can invite guest users
         Preconditions:
-          - Command: Update-MgBetaPolicyAuthorizationPolicy
+          - Command: UpdateProviderExport
             Splat:
-              AuthorizationPolicyId: authorizationPolicy
-              AllowInvitesFrom: everyone
+              updates:
+                authorization_policies[0].AllowInvitesFrom: "everyone"
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.AAD.8.2v1 Compliant - Only users assigned to specific admin roles can invite guest users
         Preconditions:
-          - Command: Update-MgBetaPolicyAuthorizationPolicy
+          - Command: UpdateProviderExport
             Splat:
-              AuthorizationPolicyId: authorizationPolicy
-              AllowInvitesFrom: adminsAndGuestInviters
+                updates:
+                  authorization_policies[0].AllowInvitesFrom: "adminsAndGuestInviters"
         Postconditions: []
         ExpectedResult: true
 
