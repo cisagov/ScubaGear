@@ -370,12 +370,12 @@ TestPlan:
     Tests:
       - TestDescription: MS.TEAMS.5.3v1 Non-compliant - BlockedAppList
         Preconditions:
-          - Command: 'Get-CsTeamsAppPermissionPolicy | % {Set-CsTeamsAppPermissionPolicy -Identity ($_.Identity) -PrivateCatalogAppsType AllowedAppList -PrivateCatalogApps @()}'
+          - Command: 'Get-CsTeamsAppPermissionPolicy | % {Set-CsTeamsAppPermissionPolicy -Identity ($_.Identity) -PrivateCatalogAppsType BlockedAppList -PrivateCatalogApps @()}'
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.TEAMS.5.3v1 Compliant - AllowedAppList
         Preconditions:
-          - Command: 'Get-CsTeamsAppPermissionPolicy | % {Set-CsTeamsAppPermissionPolicy -Identity ($_.Identity) -PrivateCatalogAppsType BlockedAppList -PrivateCatalogApps @()}'
+          - Command: 'Get-CsTeamsAppPermissionPolicy | % {Set-CsTeamsAppPermissionPolicy -Identity ($_.Identity) -PrivateCatalogAppsType AllowedAppList -PrivateCatalogApps @()}'
         Postconditions: []
         ExpectedResult: true
   - PolicyId: MS.TEAMS.6.1v1
