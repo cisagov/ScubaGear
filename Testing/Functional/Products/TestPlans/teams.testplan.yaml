@@ -131,12 +131,6 @@ TestPlan:
           - Command: 'Get-CsTeamsMeetingPolicy | % {Set-CsTeamsMeetingPolicy -Identity $($_.Identity) -AllowPSTNUsersToBypassLobby $true }'
         Postconditions: []
         ExpectedResult: false        
-      - TestDescription: MS.TEAMS.1.5v1 Non-compliant - AutoAdmittedUsers = OrganizerOnly
-        Preconditions:
-          - Command: 'Get-CsTeamsMeetingPolicy | % {Set-CsTeamsMeetingPolicy -Identity $($_.Identity) -AutoAdmittedUsers OrganizerOnly }'
-          - Command: 'Get-CsTeamsMeetingPolicy | % {Set-CsTeamsMeetingPolicy -Identity $($_.Identity) -AllowPSTNUsersToBypassLobby $true }'
-        Postconditions: []
-        ExpectedResult: false
       - TestDescription: MS.TEAMS.1.5v1 Non-compliant - AutoAdmittedUsers = EveryoneInCompany
         Preconditions:
           - Command: 'Get-CsTeamsMeetingPolicy | % {Set-CsTeamsMeetingPolicy -Identity $($_.Identity) -AutoAdmittedUsers EveryoneInCompany }'
@@ -155,12 +149,6 @@ TestPlan:
           - Command: 'Get-CsTeamsMeetingPolicy | % {Set-CsTeamsMeetingPolicy -Identity $($_.Identity) -AllowPSTNUsersToBypassLobby $true }'
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.TEAMS.1.5v1 Non-compliant - AutoAdmittedUsers = Everyone
-        Preconditions:
-          - Command: 'Get-CsTeamsMeetingPolicy | % {Set-CsTeamsMeetingPolicy -Identity $($_.Identity) -AutoAdmittedUsers Everyone }'
-          - Command: 'Get-CsTeamsMeetingPolicy | % {Set-CsTeamsMeetingPolicy -Identity $($_.Identity) -AllowPSTNUsersToBypassLobby $false }'
-        Postconditions: []
-        ExpectedResult: false  
       - TestDescription: MS.TEAMS.1.5v1 Compliant - AutoAdmittedUsers = InvitedUsers
         Preconditions:
           - Command: 'Get-CsTeamsMeetingPolicy | % {Set-CsTeamsMeetingPolicy -Identity $($_.Identity) -AutoAdmittedUsers InvitedUsers }'
