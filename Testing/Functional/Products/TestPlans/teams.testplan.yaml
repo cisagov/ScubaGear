@@ -344,12 +344,12 @@ TestPlan:
     Tests:
       - TestDescription: MS.TEAMS.5.1v1 Non-compliant - BlockedAppList
         Preconditions:
-          - Command: 'Get-CsTeamsAppPermissionPolicy | % {Set-CsTeamsAppPermissionPolicy -Identity ($_.Identity) -DefaultCatalogAppsType AllowedAppList -DefaultCatalogApps @()}'
+          - Command: 'Get-CsTeamsAppPermissionPolicy | % {Set-CsTeamsAppPermissionPolicy -Identity ($_.Identity) -DefaultCatalogAppsType BlockedAppList -DefaultCatalogApps @()}'
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.TEAMS.5.1v1 Compliant - AllowedAppList
         Preconditions:
-          - Command: 'Get-CsTeamsAppPermissionPolicy | % {Set-CsTeamsAppPermissionPolicy -Identity ($_.Identity) -DefaultCatalogAppsType BlockedAppList -DefaultCatalogApps @()}'
+          - Command: 'Get-CsTeamsAppPermissionPolicy | % {Set-CsTeamsAppPermissionPolicy -Identity ($_.Identity) -DefaultCatalogAppsType AllowedAppList -DefaultCatalogApps @()}'
         Postconditions: []
         ExpectedResult: true
   - PolicyId: MS.TEAMS.5.2v1
