@@ -172,7 +172,7 @@ TestPlan:
           - Command: 'Get-CsTeamsMeetingPolicy | % {Set-CsTeamsMeetingPolicy -Identity $($_.Identity) -AutoAdmittedUsers EveryoneInSameAndFederatedCompany }'
           - Command: 'Get-CsTeamsMeetingPolicy | % {Set-CsTeamsMeetingPolicy -Identity $($_.Identity) -AllowPSTNUsersToBypassLobby $false }'
         Postconditions: []
-        ExpectedResult: false
+        ExpectedResult: true
       - TestDescription: MS.TEAMS.1.5v1 Compliant - AutoAdmittedUsers = EveryoneInCompanyExcludingGuests
         Preconditions:
           - Command: 'Get-CsTeamsMeetingPolicy | % {Set-CsTeamsMeetingPolicy -Identity $($_.Identity) -AutoAdmittedUsers EveryoneInCompanyExcludingGuests }'
