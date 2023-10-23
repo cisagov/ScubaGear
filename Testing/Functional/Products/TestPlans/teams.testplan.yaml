@@ -53,7 +53,7 @@ TestPlan:
               Identity: Global
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.TEAMS.1.3v1 Compliant - Dialin not bypass lobbyEveryone not auto admitted user
+      - TestDescription: MS.TEAMS.1.3v1 Compliant - Dialin not bypass lobby Everyone not auto admitted user
         Preconditions:
           - Command: Set-CsTeamsMeetingPolicy
             Splat:
