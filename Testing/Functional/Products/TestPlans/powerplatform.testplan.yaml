@@ -61,7 +61,7 @@ TestPlan:
         Preconditions: []
         Postconditions: []
         IsNotChecked: true
-        ExpectedResult: false
+        ExpectedResult: true
 
   - PolicyId: MS.POWERPLATFORM.3.1v1
     TestDriver: RunScuba
