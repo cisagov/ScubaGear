@@ -4,7 +4,7 @@ import future.keywords
 #
 BaselineVersion() := moduleVersion if {
     not input.module_version
-    moduleVersion := "main" 
+    moduleVersion := "main"
 }
 
 BaselineVersion() := moduleVersion if {
@@ -40,9 +40,14 @@ NotCheckedDetails(PolicyId) := details if {
     link := PolicyLink(PolicyId)
     details := sprintf("Not currently checked automatically. See %v for instructions on manual check", [link])
 }
- 
-#  
-Format(Array) := format_int(count(Array), 10) 
+
+DefenderMirrorDetails(PolicyId) := details if {
+    link := PolicyLink(PolicyId)
+    details := sprintf("A custom product can be used to fulfill this policy requirement. Use a 3rd party assessment tool or manually review to ensure compliance. See %v for instructions on manual check. If you are using Defender for Office 365 to implement this policy, ensure that you are running ScubaGear with defender included in the ProductNames parameter for an automated check. Then, review the corresponding Defender for Office 365 policy that fulfills the requirements of this EXO policy.", [link])
+}
+
+#
+Format(Array) := format_int(count(Array), 10)
 
 #
 ReportDetailsBoolean(Status) := "Requirement met" if {Status == true}

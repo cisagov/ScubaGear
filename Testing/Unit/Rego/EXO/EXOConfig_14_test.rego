@@ -1,20 +1,20 @@
 package exo
 import future.keywords
-
+import data.report.utils.DefenderMirrorDetails
 
 #
 # Policy 1
 #--
 test_3rdParty_Correct_V1 if {
     PolicyId := "MS.EXO.14.1v1"
-    
+
     Output := tests with input as { }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check"
+    RuleOutput[0].ReportDetails == DefenderMirrorDetails(PolicyId)
 }
 
 #
@@ -22,14 +22,14 @@ test_3rdParty_Correct_V1 if {
 #--
 test_3rdParty_Correct_V2 if {
     PolicyId := "MS.EXO.14.2v1"
-    
+
     Output := tests with input as { }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check"
+    RuleOutput[0].ReportDetails == DefenderMirrorDetails(PolicyId)
 }
 
 #
@@ -37,12 +37,12 @@ test_3rdParty_Correct_V2 if {
 #--
 test_3rdParty_Correct_V3 if {
     PolicyId := "MS.EXO.14.3v1"
-    
+
     Output := tests with input as { }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check"
+    RuleOutput[0].ReportDetails == DefenderMirrorDetails(PolicyId)
 }
