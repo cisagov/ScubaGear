@@ -45,14 +45,12 @@ TestPlan:
     Tests:
       - TestDescription: MS.POWERPLATFORM.2.1v1 Non-compliant - no DLP policy in default environment
         Preconditions:
-          - Command: '$guid = (Get-AdminPowerAppEnvironment -Default).EnvironmentName | Select-String -Pattern "[{]?[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}[}]?$" -AllMatches | Select-Object -ExpandProperty Matches | Select-Object -ExpandProperty Value'
-          - Command: 'Remove-DlpPolicy -PolicyName "guid"'
+          - Command: '(Get-DlpPolicy).value | Where {$_.environments.name -eq (Get-AdminPowerAppEnvironment -Default).EnvironmentName} | Select-Object @{Name="PolicyName"; Expression={$_.name}} | Remove-DlpPolicy'
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.POWERPLATFORM.2.1v1 Compliant - create DLP policy in default environment
         Preconditions:
-          - Command: '$defenv = Get-AdminPowerAppEnvironment -Default'
-          - Command: 'New-AdminDlpPolicy -DisplayName "DLP" -EnvironmentName $defenv.EnvironmentName'
+          - Command: 'New-AdminDlpPolicy -DisplayName "DLP functional test" -EnvironmentName ((Get-AdminPowerAppEnvironment -Default).EnvironmentName)'
         Postconditions: []
         ExpectedResult: true
 
