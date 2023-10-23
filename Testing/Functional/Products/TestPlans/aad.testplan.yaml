@@ -492,104 +492,99 @@ TestPlan:
         ExpectedResult: false
 
   - PolicyId: MS.AAD.5.1v1
-    TestDriver: RunScuba
+    TestDriver: RunCached
     Tests:
       - TestDescription: MS.AAD.5.1v1 Non-Compliant case - Allow users to register apps 
         Preconditions:
-          - Command: Update-MgBetaPolicyAuthorizationPolicy
+          - Command: UpdateProviderExport
             Splat:
-              AuthorizationPolicyId: authorizationPolicy
-              DefaultUserRolePermissions:
-                AllowedToCreateApps: true
+              updates:
+                authorization_policies[0].DefaultUserRolePermissions.AllowedToCreateApps: true
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.AAD.5.1v1 Compliant case - Do NOT allow users to register apps 
         Preconditions:
-          - Command: Update-MgBetaPolicyAuthorizationPolicy
+          - Command: UpdateProviderExport
             Splat:
-              AuthorizationPolicyId: authorizationPolicy
-              DefaultUserRolePermissions:
-                AllowedToCreateApps: false
+              updates:
+                authorization_policies[0].DefaultUserRolePermissions.AllowedToCreateApps: false
         Postconditions: []
         ExpectedResult: true  
 
   - PolicyId: MS.AAD.5.2v1
-    TestDriver: RunScuba
+    TestDriver: RunCached
     Tests:
       - TestDescription: MS.AAD.5.2v1 Non-Compliant case - Allow users to consent to apps
         Preconditions:
-          - Command: Update-MgBetaPolicyAuthorizationPolicy
+          - Command: UpdateProviderExport
             Splat:
-              AuthorizationPolicyId: authorizationPolicy
-              PermissionGrantPolicyIdsAssignedToDefaultUserRole:
-                - ManagePermissionGrantsForSelf.microsoft-user-default-legacy
+              updates:
+                authorization_policies[0].PermissionGrantPolicyIdsAssignedToDefaultUserRole:
+                  - ManagePermissionGrantsForSelf.microsoft-user-default-legacy
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.AAD.5.2v1 Compliant case - Do NOT allow users to consent to apps
         Preconditions:
-          - Command: Update-MgBetaPolicyAuthorizationPolicy
+          - Command: UpdateProviderExport
             Splat:
-              AuthorizationPolicyId: authorizationPolicy
-              PermissionGrantPolicyIdsAssignedToDefaultUserRole: []
+              updates:
+                authorization_policies[0].PermissionGrantPolicyIdsAssignedToDefaultUserRole: []
         Postconditions: []
         ExpectedResult: true
 
-  ########## Come back to this one when we figure out the problem with the Cmdlet error - Crutch will try Beta version
-  # - PolicyId: MS.AAD.5.3v1
-  #   TestDriver: RunScuba
-  #   Tests:
-  #     - TestDescription: MS.AAD.5.3v1 Non-Compliant case - No Admin Consent workflow configured
-  #       Preconditions:
-  #         - Command: Update-MgPolicyAdminConsentRequestPolicy
-  #           Splat:
-  #             IsEnabled: false
-  #       Postconditions: []
-  #       ExpectedResult: false
-      # - TestDescription: MS.AAD.5.3v1 Compliant case - Admin Consent workflow is configured
-      #   Preconditions:
-      #     - Command: Update-MgPolicyAdminConsentRequestPolicy
-      #       Splat:
-      #         IsEnabled: true
-      #   Postconditions: []
-      #   ExpectedResult: true
-  
+  - PolicyId: MS.AAD.5.3v1
+    TestDriver: RunCached
+    Tests:
+      - TestDescription: MS.AAD.5.3v1 Non-Compliant case - No Admin Consent workflow configured
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                admin_consent_policies[0].IsEnabled: false
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.AAD.5.3v1 Compliant case - Admin Consent workflow is configured
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                admin_consent_policies[0].IsEnabled: true
+        Postconditions: []
+        ExpectedResult: true
+
   - PolicyId: MS.AAD.5.4v1
-    TestDriver: RunScuba
+    TestDriver: RunCached
     Tests:
       - TestDescription: MS.AAD.5.4v1 Non-Compliant - Allow group owners to consent to apps
         Preconditions: 
-          - Command: UpdateDirectorySettingByName
+          - Command: UpdateProviderExport
             Splat:
-              DisplayName: Consent Policy Settings
-              Updates:
-                BodyParameter:
-                  Values:
-                    - Name: EnableGroupSpecificConsent
-                      Value: 'true'
-                    - Name: BlockUserConsentForRiskyApps
-                      Value: 'false'  
-                    - Name: EnableAdminConsentRequests
-                      Value: 'false'
-                    - Name: ConstrainGroupSpecificConsentToMembersOfGroupId
-                      Value: ""  
+              updates:
+                directory_settings[0].Values:
+                  - Name: EnableGroupSpecificConsent
+                    Value: "true"
+                  - Name: BlockUserConsentForRiskyApps
+                    Value: "false"  
+                  - Name: EnableAdminConsentRequests
+                    Value: "false"
+                  - Name: ConstrainGroupSpecificConsentToMembersOfGroupId
+                    Value: ""  
         Postconditions: []
         ExpectedResult: false    
       - TestDescription: MS.AAD.5.4v1 Compliant - Do NOT allow group owners to consent to apps
         Preconditions: 
-          - Command: UpdateDirectorySettingByName
+          - Command: UpdateProviderExport
             Splat:
-              DisplayName: Consent Policy Settings
-              Updates:
-                BodyParameter:
-                  Values:
-                    - Name: EnableGroupSpecificConsent
-                      Value: 'false'
-                    - Name: BlockUserConsentForRiskyApps
-                      Value: 'false'  
-                    - Name: EnableAdminConsentRequests
-                      Value: 'false'
-                    - Name: ConstrainGroupSpecificConsentToMembersOfGroupId
-                      Value: ""  
+              updates:
+                directory_settings[0].Values:
+                  - Name: EnableGroupSpecificConsent
+                    Value: "false"
+                  - Name: BlockUserConsentForRiskyApps
+                    Value: "false"  
+                  - Name: EnableAdminConsentRequests
+                    Value: "false"
+                  - Name: ConstrainGroupSpecificConsentToMembersOfGroupId
+                    Value: ""  
         Postconditions: []
         ExpectedResult: true
 
