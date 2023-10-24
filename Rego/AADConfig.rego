@@ -541,7 +541,7 @@ tests[{
 #
 # MS.AAD.5.1v1
 #--
-AuthPoliciesBad_2_6[Policy.Id] {
+AuthPoliciesBad_5_1[Policy.Id] {
     Policy = input.authorization_policies[_]
     Policy.DefaultUserRolePermissions.AllowedToCreateApps == true
 }
@@ -561,7 +561,7 @@ tests[{
     "ReportDetails" : ReportFullDetailsArray(BadPolicies, DescriptionString),
     "RequirementMet" : Status
 }] {
-    BadPolicies := AuthPoliciesBad_2_6
+    BadPolicies := AuthPoliciesBad_5_1
     Status := count(BadPolicies) == 0
     DescriptionString := "authorization policies found that allow non-admin users to register third-party applications"
 }
