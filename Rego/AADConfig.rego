@@ -841,7 +841,7 @@ tests[{
 }] {
     ApprovalNotRequired := "Global Administrator" in RolesWithoutApprovalRequired
     Conditions := [count(Aad2P2Licenses) > 0, ApprovalNotRequired == false]
-    Status := count([Condition | Condition = Conditions[_]; Condition == false]) == 0
+    Status := count([Condition | Condition := Conditions[_]; Condition == false]) == 0
 }
 #--
 
