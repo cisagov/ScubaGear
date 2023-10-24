@@ -815,7 +815,7 @@ tests[{
 }] {
     DescriptionString := "role(s) assigned to users outside of PIM"
     Conditions := [count(Aad2P2Licenses) > 0, count(RolesAssignedOutsidePim) == 0]
-    Status := count([Condition | Condition = Conditions[_]; Condition == false]) == 0
+    Status := count([Condition | Condition := Conditions[_]; Condition == false]) == 0
 }
 #--
 
