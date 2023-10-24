@@ -207,7 +207,7 @@ tests[{
 }] {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
     Conditions := [count(Aad2P2Licenses) > 0, count(BlockHighRisk) > 0]
-    Status := count([Condition | Condition = Conditions[_]; Condition == false]) == 0
+    Status := count([Condition | Condition := Conditions[_]; Condition == false]) == 0
 }
 #--
 
@@ -262,7 +262,7 @@ tests[{
 }] {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
     Conditions := [count(Aad2P2Licenses) > 0, count(SignInBlocked) > 0]
-    Status := count([Condition | Condition = Conditions[_]; Condition == false]) == 0
+    Status := count([Condition | Condition := Conditions[_]; Condition == false]) == 0
 }
 #--
 
@@ -792,7 +792,7 @@ tests[{
 }] {
     DescriptionString := "role(s) that contain users with permanent active assignment"
     Conditions := [count(Aad2P2Licenses) > 0, count(PrivilegedRolesWithoutExpirationPeriod) == 0]
-    Status := count([Condition | Condition = Conditions[_]; Condition == false]) == 0
+    Status := count([Condition | Condition := Conditions[_]; Condition == false]) == 0
 }
 
 #
@@ -815,7 +815,7 @@ tests[{
 }] {
     DescriptionString := "role(s) assigned to users outside of PIM"
     Conditions := [count(Aad2P2Licenses) > 0, count(RolesAssignedOutsidePim) == 0]
-    Status := count([Condition | Condition = Conditions[_]; Condition == false]) == 0
+    Status := count([Condition | Condition := Conditions[_]; Condition == false]) == 0
 }
 #--
 
@@ -841,7 +841,7 @@ tests[{
 }] {
     ApprovalNotRequired := "Global Administrator" in RolesWithoutApprovalRequired
     Conditions := [count(Aad2P2Licenses) > 0, ApprovalNotRequired == false]
-    Status := count([Condition | Condition = Conditions[_]; Condition == false]) == 0
+    Status := count([Condition | Condition := Conditions[_]; Condition == false]) == 0
 }
 #--
 
@@ -877,7 +877,7 @@ tests[{
     DescriptionString := "role(s) without notification e-mail configured for role assignments found"
     RolesWithoutAssignmentAlerts := RolesWithoutActiveAssignmentAlerts | RolesWithoutEligibleAssignmentAlerts
     Conditions := [count(Aad2P2Licenses) > 0, count(RolesWithoutAssignmentAlerts) == 0]
-    Status := count([Condition | Condition = Conditions[_]; Condition == false]) == 0
+    Status := count([Condition | Condition := Conditions[_]; Condition == false]) == 0
 }
 #--
 
@@ -904,7 +904,7 @@ tests[{
 }] {
     GlobalAdminNotMonitored := "Global Administrator" in AdminsWithoutActivationAlert
     Conditions := [count(Aad2P2Licenses) > 0, GlobalAdminNotMonitored == false]
-    Status := count([Condition | Condition = Conditions[_]; Condition == false]) == 0
+    Status := count([Condition | Condition := Conditions[_]; Condition == false]) == 0
 }
 #--
 
@@ -922,7 +922,7 @@ tests[{
     DescriptionString := "role(s) without notification e-mail configured for role activations found"
     NonGlobalAdminsWithoutActivationAlert = AdminsWithoutActivationAlert - {"Global Administrator"}
     Conditions := [count(Aad2P2Licenses) > 0, count(NonGlobalAdminsWithoutActivationAlert) == 0]
-    Status := count([Condition | Condition = Conditions[_]; Condition == false]) == 0
+    Status := count([Condition | Condition := Conditions[_]; Condition == false]) == 0
 }
 #--
 

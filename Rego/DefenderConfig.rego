@@ -296,10 +296,18 @@ ImpersonationProtectionErrorMsg(StrictImpersonationProtection, StandardImpersona
     StandardImpersonationProtection.Result == false
 }
 
-ImpersonationProtectionErrorMsg(StrictImpersonationProtection, StandardImpersonationProtection, _) := Description if {
+ImpersonationProtectionErrorMsg(StrictImpersonationProtection, StandardImpersonationProtection, AccountType) := Description if {
+    Description := "No agency domains defined for impersonation protection assessment. See configuration file documentation for details on how to define."
+    StrictImpersonationProtection.Result == true
+    StandardImpersonationProtection.Result == true
+    AccountType == "agency domains"
+}
+
+ImpersonationProtectionErrorMsg(StrictImpersonationProtection, StandardImpersonationProtection, AccountType) := Description if {
     Description := ""
     StrictImpersonationProtection.Result == true
     StandardImpersonationProtection.Result == true
+    AccountType != "agency domains"
 }
 
 tests[{
@@ -330,33 +338,30 @@ tests[{
 # MS.DEFENDER.2.2v1
 #--
 
-# TODO: update this policy to match emerald baseline
-# The following check is from pre-emerald 2.5 second bullet,
-# which is similar but needs some adjustments.
-
-ProtectedOrgDomainsPolicies[{
-    "Name" : Policy.Name,
-    "OrgDomains" : Policy.EnableOrganizationDomainsProtection,
-    "Action" : Policy.TargetedDomainProtectionAction
-}] {
-    Policy := input.anti_phish_policies[_]
-    Policy.Enabled # filter out the disabled policies
-    Policy.EnableTargetedDomainsProtection # filter out the policies that don't have domain impersonation protection enabled
-    Policy.EnableOrganizationDomainsProtection # filter out the policies that don't protect org domains
-}
-
-# assert that at least one of the enabled policies includes
+# Assert that at least one of the enabled policies includes
 # protection for the org's own domains
 tests[{
     "PolicyId" : "MS.DEFENDER.2.2v1",
     "Criticality" : "Should",
     "Commandlet" : ["Get-AntiPhishPolicy"],
-    "ActualValue" : Policies,
-    "ReportDetails" : ReportDetailsBoolean(Status),
+    "ActualValue" : [StrictImpersonationProtection.Policy, StandardImpersonationProtection.Policy],
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
     "RequirementMet" : Status
 }] {
-    Policies := ProtectedOrgDomainsPolicies
-    Status := count(Policies) > 0
+    Policies := input.anti_phish_policies
+    FilterKey := "EnableTargetedDomainsProtection"
+    AccountKey := "TargetedDomainsToProtect"
+    ActionKey := "TargetedDomainProtectionAction"
+    ProtectedConfig := ImpersonationProtectionConfig("MS.DEFENDER.2.2v1", "AgencyDomains")
+    StrictImpersonationProtection := ImpersonationProtection(Policies, "Strict Preset Security Policy", ProtectedConfig, FilterKey, AccountKey, ActionKey)
+    StandardImpersonationProtection := ImpersonationProtection(Policies, "Standard Preset Security Policy", ProtectedConfig, FilterKey, AccountKey, ActionKey)
+    ErrorMessage := ImpersonationProtectionErrorMsg(StrictImpersonationProtection, StandardImpersonationProtection, "agency domains")
+    Conditions := [
+        StrictImpersonationProtection.Result == true,
+        StandardImpersonationProtection.Result == true,
+        count(ProtectedConfig) > 0
+    ]
+    Status := count([x | x := Conditions[_]; x == false]) == 0
 }
 #--
 
@@ -416,6 +421,62 @@ tests[{
 # MS.DEFENDER.4.1v1
 #--
 
+# Return set of content info types in basic rules
+InfoTypeMatches(Rule) := ContentTypes if {
+    Rule.IsAdvancedRule == false
+    ContentTypes := {Content.name | Content := Rule.ContentContainsSensitiveInformation[_]}
+}
+
+# Return set of content info types in advanced rules
+InfoTypeMatches(Rule) := ContentTypes if {
+    Rule.IsAdvancedRule == true
+    RuleText := replace(replace(Rule.AdvancedRule, "rn", ""), "'", "\"")
+
+    # Split string to keep line length intact
+    TypesRegex := concat("",[
+                                `(U.S. Social Security Number \(SSN\))|`,
+                                `(U.S. Individual Taxpayer Identification `,
+                                `Number \(ITIN\))|`,
+                                `(Credit Card Number)`
+                            ]
+                        )
+    ContentTypes := { name | some name in regex.find_n(TypesRegex, RuleText, -1) }
+}
+
+SensitiveInfoTypes(PolicyName) := MatchingInfoTypes if {
+    InfoTypes := {  
+                    "U.S. Social Security Number (SSN)",
+                    "U.S. Individual Taxpayer Identification Number (ITIN)",
+                    "Credit Card Number"
+                 }
+
+    ContentTypeSets := { Types |
+        some Rule in input.dlp_compliance_rules
+        Rule.Disabled == false
+        Rule.ParentPolicyName == PolicyName
+        Types := InfoTypeMatches(Rule)
+    }
+
+    # Flatten set of sets of content types
+    MatchingInfoTypes := InfoTypes & union(ContentTypeSets)
+}
+
+# Return set of policy names that contain all sensitive info types in rules
+SensitiveInfoPolicies[Policy.Name] {
+    Policy := input.dlp_compliance_policies[_]
+
+    # Inspect rules for sensitive info types
+    InfoTypes := SensitiveInfoTypes(Policy.Name)
+
+    Conditions := [ "U.S. Social Security Number (SSN)" in InfoTypes,
+                    "U.S. Individual Taxpayer Identification Number (ITIN)" in InfoTypes,
+                    "Credit Card Number" in InfoTypes ]
+
+    count([Condition | Condition := Conditions[_]; Condition == true]) == 3
+    Policy.Enabled == true
+    Policy.Mode == "Enable"
+}
+
 # Determine the set of rules that pertain to SSNs, ITINs, or credit card numbers.
 # Used in multiple bullet points below
 SensitiveRules[{
@@ -429,7 +490,8 @@ SensitiveRules[{
 }] {
     Rules := input.dlp_compliance_rules[_]
     Rules.Disabled == false
-    ContentNames := [Content.name | Content = Rules.ContentContainsSensitiveInformation[_]]
+    Rules.IsAdvancedRule == false
+    ContentNames := [Content.name | Content := Rules.ContentContainsSensitiveInformation[_]]
     Conditions := [ "U.S. Social Security Number (SSN)" in ContentNames,
                     "U.S. Individual Taxpayer Identification Number (ITIN)" in ContentNames,
                     "Credit Card Number" in ContentNames]
@@ -438,6 +500,38 @@ SensitiveRules[{
     Policy := input.dlp_compliance_policies[_]
     Rules.ParentPolicyName == Policy.Name
     Policy.Enabled == true
+    Policy.Mode == "Enable"
+}
+
+SensitiveRules[{
+    "Name" : Rules.Name,
+    "ParentPolicyName" : Rules.ParentPolicyName,
+    "BlockAccess" : Rules.BlockAccess,
+    "BlockAccessScope" : Rules.BlockAccessScope,
+    "NotifyUser" : Rules.NotifyUser,
+    "NotifyUserType" : Rules.NotifyUserType,
+    "ContentNames" : ContentNames
+}] {
+    Rules := input.dlp_compliance_rules[_]
+    Rules.Disabled == false
+    Rules.IsAdvancedRule == true
+
+    Policy := input.dlp_compliance_policies[_]
+    Rules.ParentPolicyName == Policy.Name
+    Policy.Enabled == true
+    Policy.Mode == "Enable"
+
+    # Trim converted end-of-line "rn" delimters and convert single quotes to
+    # double for unmarshalling
+    RuleText := replace(replace(Rules.AdvancedRule, "rn", ""), "'", "\"")
+
+    ContentNames := InfoTypeMatches(Rules)
+
+    Conditions := [ contains(RuleText, "U.S. Social Security Number (SSN)"),
+                    contains(RuleText, "U.S. Individual Taxpayer Identification Number (ITIN)"),
+                    contains(RuleText, "Credit Card Number")]
+
+    count([Condition | Condition := Conditions[_]; Condition == true]) > 0
 }
 
 # Step 1: Ensure that there is coverage for SSNs, ITINs, and credit cards
@@ -456,10 +550,17 @@ CardRules[Rule.Name] {
     "Credit Card Number" in Rule.ContentNames
 }
 
+Rules := {
+    "SSN" : SSNRules,
+    "ITIN" : ITINRules,
+    "Credit_Card" : CardRules
+}
+
+error_rules contains "U.S. Social Security Number (SSN)" if count(Rules.SSN) == 0
+error_rules contains "U.S. Individual Taxpayer Identification Number (ITIN)" if count(Rules.ITIN) == 0
+error_rules contains "Credit Card Number" if count(Rules.Credit_Card) == 0
+
 tests[{
-    #TODO: Appears this policy is broken into 3 parts in code and only 1 in baseline
-    # Combine this and the following two that are commented out into a single test
-    #"Requirement" : "A custom policy SHALL be configured to protect PII and sensitive information, as defined by the agency: U.S. Social Security Number (SSN)",
     "PolicyId" : "MS.DEFENDER.4.1v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-DlpComplianceRule"],
@@ -467,39 +568,11 @@ tests[{
     "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
     "RequirementMet" : Status
 }] {
-    Rules := SSNRules
-    ErrorMessage := "No matching rule found for U.S. Social Security Number (SSN)"
-    Status := count(Rules) > 0
+    error_rule := "No matching rules found for:"
+    ErrorMessage := concat(" ",  [error_rule, concat(", ", error_rules)])
+
+    Status := count(SensitiveInfoPolicies) > 0
 }
-
-# tests[{
-#     "Requirement" : "A custom policy SHALL be configured to protect PII and sensitive information, as defined by the agency: U.S. Individual Taxpayer Identification Number (ITIN)",
-#     "Control" : "Defender 2.2",
-#     "Criticality" : "Shall",
-#     "Commandlet" : ["Get-DlpComplianceRule"],
-#     "ActualValue" : Rules,
-#     "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
-#     "RequirementMet" : Status
-# }] {
-#     Rules := ITINRules
-#     ErrorMessage := "No matching rule found for U.S. Individual Taxpayer Identification Number (ITIN)"
-#     Status := count(Rules) > 0
-# }
-
-# tests[{
-#     "Requirement" : "A custom policy SHALL be configured to protect PII and sensitive information, as defined by the agency: Credit Card Number",
-#     "Control" : "Defender 2.2",
-#     "Criticality" : "Shall",
-#     "Commandlet" : ["Get-DlpComplianceRule"],
-#     "ActualValue" : Rules,
-#     "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
-#     "RequirementMet" : Status
-# }] {
-#     Rules := CardRules
-#     ErrorMessage := "No matching rule found for Credit Card Number"
-#     Status := count(Rules) > 0
-# }
-#--
 
 #
 # MS.DEFENDER.4.2v1
@@ -511,9 +584,8 @@ ExchangePolicies[{
     "Locations" : Policy.ExchangeLocation,
     "Workload" : Policy.Workload
 }] {
-    SensitivePolicies := {Rule.ParentPolicyName | Rule = SensitiveRules[_]}
     Policy := input.dlp_compliance_policies[_]
-    Policy.Name in SensitivePolicies
+    Policy.Name in SensitiveInfoPolicies
     "All" in Policy.ExchangeLocation
     contains(Policy.Workload, "Exchange")
 }
@@ -523,9 +595,8 @@ SharePointPolicies[{
     "Locations" : Policy.SharePointLocation,
     "Workload" : Policy.Workload
 }] {
-    SensitivePolicies := {Rule.ParentPolicyName | Rule = SensitiveRules[_]}
     Policy := input.dlp_compliance_policies[_]
-    Policy.Name in SensitivePolicies
+    Policy.Name in SensitiveInfoPolicies
     "All" in Policy.SharePointLocation
     contains(Policy.Workload, "SharePoint")
 }
@@ -535,11 +606,10 @@ OneDrivePolicies[{
     "Locations" : Policy.OneDriveLocation,
     "Workload" : Policy.Workload
 }] {
-    SensitivePolicies := {Rule.ParentPolicyName | Rule = SensitiveRules[_]}
     Policy := input.dlp_compliance_policies[_]
-    Policy.Name in SensitivePolicies
+    Policy.Name in SensitiveInfoPolicies
     "All" in Policy.OneDriveLocation
-    contains(Policy.Workload, "OneDrivePoint") # Is this supposed to be OneDrivePoint or OneDrive?
+    contains(Policy.Workload, "OneDriveForBusiness")
 }
 
 TeamsPolicies[{
@@ -547,71 +617,61 @@ TeamsPolicies[{
     "Locations" : Policy.TeamsLocation,
     "Workload" : Policy.Workload
     }] {
-    SensitivePolicies := {Rule.ParentPolicyName | Rule = SensitiveRules[_]}
     Policy := input.dlp_compliance_policies[_]
-    Policy.Name in SensitivePolicies
+    Policy.Name in SensitiveInfoPolicies
     "All" in Policy.TeamsLocation
     contains(Policy.Workload, "Teams")
 }
 
-tests[{
-    # TODO: Appears this policy is broken into 4 parts in code and only 1 in baseline
-    # Combine this test and the following 3 commented out tests into a single test
-    #"Requirement" : "The custom policy SHOULD be applied in Exchange",
-    "PolicyId" : "MS.DEFENDER.4.2v1",
-    "Criticality" : "Should",
-    "Commandlet" : ["Get-DLPCompliancePolicy"],
-    "ActualValue" : Policies,
-    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
-    "RequirementMet" : Status
-}] {
-    Policies := ExchangePolicies
-    ErrorMessage := "No policy found that applies to Exchange."
-    Status := count(Policies) > 0
+DevicesPolicies[{
+    "Name" : Policy.Name,
+    "Locations" : Policy.EndpointDlpLocation,
+    "Workload" : Policy.Workload
+    }] {
+    Policy := input.dlp_compliance_policies[_]
+    Policy.Name in SensitiveInfoPolicies
+    "All" in Policy.EndpointDlpLocation
+    contains(Policy.Workload, "EndpointDevices")
 }
 
-# tests[{
-#     "Requirement" : "The custom policy SHOULD be applied in SharePoint",
-#     "Control" : "Defender 2.2",
-#     "Criticality" : "Should",
-#     "Commandlet" : ["Get-DLPCompliancePolicy"],
-#     "ActualValue" : Policies,
-#     "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
-#     "RequirementMet" : Status
-# }] {
-#     Policies := SharePointPolicies
-#     ErrorMessage := "No policy found that applies to SharePoint."
-#     Status := count(Policies) > 0
-# }
+Policies := {
+    "Exchange": ExchangePolicies,
+    "SharePoint": SharePointPolicies,
+    "OneDrive": OneDrivePolicies,
+    "Teams": TeamsPolicies,
+    "Devices": DevicesPolicies
+}
 
-# tests[{
-#     "Requirement" : "The custom policy SHOULD be applied in OneDrive",
-#     "Control" : "Defender 2.2",
-#     "Criticality" : "Should",
-#     "Commandlet" : ["Get-DLPCompliancePolicy"],
-#     "ActualValue" : Policies,
-#     "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
-#     "RequirementMet" : Status
-# }] {
-#     Policies := OneDrivePolicies
-#     ErrorMessage := "No policy found that applies to OneDrive."
-#     Status := count(Policies) > 0
-# }
+error_policies contains "Exchange" if count(Policies.Exchange) == 0
+error_policies contains "SharePoint" if count(Policies.SharePoint) == 0
+error_policies contains "OneDrive" if count(Policies.OneDrive) == 0
+error_policies contains "Teams" if count(Policies.Teams) == 0
+error_policies contains "Devices" if count(Policies.Devices) == 0
 
-# tests[{
-#     "Requirement" : "The custom policy SHOULD be applied in Teams",
-#     "Control" : "Defender 2.2",
-#     "Criticality" : "Should",
-#     "Commandlet" : ["Get-DLPCompliancePolicy"],
-#     "ActualValue" : Policies,
-#     "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
-#     "RequirementMet" : Status
-# }] {
-#     Policies := TeamsPolicies
-#     ErrorMessage := "No policy found that applies to Teams."
-#     Status := count(Policies) > 0
-# }
-#--
+DefenderErrorMessage4_2() := ErrorMessage if {
+    count(SensitiveInfoPolicies) > 0
+    error_policy := "No enabled policy found that applies to:"
+    ErrorMessage := concat(" ", [error_policy, concat(", ", error_policies)])
+}
+
+DefenderErrorMessage4_2() := ErrorMessage if {
+    count(SensitiveInfoPolicies) == 0
+    ErrorMessage := "No DLP policy matching all types found for evaluation."
+}
+
+tests[{
+    "PolicyId": "MS.DEFENDER.4.2v1",
+    "Criticality": "Should",
+    "Commandlet": ["Get-DLPCompliancePolicy"],
+    "ActualValue": Policies,
+    "ReportDetails": CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
+    "RequirementMet": Status
+}] {
+    ErrorMessage := DefenderErrorMessage4_2
+    Conditions := [ count(error_policies) == 0,
+                    count(SensitiveInfoPolicies) > 0 ]
+    Status := count([Condition | Condition := Conditions[_]; Condition == true ]) == 2
+}
 
 #
 # MS.DEFENDER.4.3v1
@@ -620,19 +680,24 @@ tests[{
 SensitiveRulesNotBlocking[Rule.Name] {
     Rule := SensitiveRules[_]
     not Rule.BlockAccess
-    Policy := input.dlp_compliance_policies[_]
-    Rule.ParentPolicyName == Policy.Name
-    Policy.Mode == "Enable"
+    Rule.ParentPolicyName in SensitiveInfoPolicies
 }
 
-# Covers rules set to block, but inside policies set to
-# "TestWithNotifications" or "TestWithoutNotifications" that won't enforce the block
 SensitiveRulesNotBlocking[Rule.Name] {
     Rule := SensitiveRules[_]
-    Policy := input.dlp_compliance_policies[_]
-    Rule.ParentPolicyName == Policy.Name
     Rule.BlockAccess
-    startswith(Policy.Mode, "TestWith") == true
+    Rule.ParentPolicyName in SensitiveInfoPolicies
+    Rule.BlockAccessScope != "All"
+}
+
+DefenderErrorMessage4_3(Rules) := GenerateArrayString(Rules, ErrorMessage) if {
+    count(SensitiveInfoPolicies) > 0
+    ErrorMessage := "rule(s) found that do(es) not block access or associated policy not set to enforce block action:"
+}
+
+DefenderErrorMessage4_3(Rules) := ErrorMessage if {
+    count(SensitiveInfoPolicies) == 0
+    ErrorMessage := "No DLP policy matching all types found for evaluation."
 }
 
 tests[{
@@ -640,12 +705,14 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-DlpComplianceRule"],
     "ActualValue" : Rules,
-    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), GenerateArrayString(Rules, ErrorMessage)),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
     "RequirementMet" : Status
 }] {
     Rules := SensitiveRulesNotBlocking
-    ErrorMessage := "rule(s) found that do(es) not block access or associated policy not set to enforce block action:"
-    Status := count(Rules) == 0
+    ErrorMessage := DefenderErrorMessage4_3(Rules)
+    Conditions := [ count(Rules) == 0, 
+                    count(SensitiveInfoPolicies) > 0 ]
+    Status := count([Condition | Condition := Conditions[_]; Condition == true ]) == 2
 }
 #--
 
@@ -655,7 +722,19 @@ tests[{
 # Step 4: ensure that some user is notified in the event of a DLP violation
 SensitiveRulesNotNotifying[Rule.Name] {
     Rule := SensitiveRules[_]
+    count(SensitiveInfoPolicies) > 0
+    Rule.ParentPolicyName in SensitiveInfoPolicies
     count(Rule.NotifyUser) == 0
+}
+
+DefenderErrorMessage4_4(Rules) := GenerateArrayString(Rules, ErrorMessage) if {
+    count(SensitiveInfoPolicies) > 0
+    ErrorMessage := "rule(s) found that do(es) not notify at least one user:"
+}
+
+DefenderErrorMessage4_4(Rules) := ErrorMessage if {
+    count(SensitiveInfoPolicies) == 0
+    ErrorMessage := "No DLP policy matching all types found for evaluation."
 }
 
 tests[{
@@ -663,12 +742,14 @@ tests[{
     "Criticality" : "Should",
     "Commandlet" : ["Get-DlpComplianceRule"],
     "ActualValue" : Rules,
-    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), GenerateArrayString(Rules, ErrorMessage)),
+    "ReportDetails" : CustomizeError(ReportDetailsBoolean(Status), ErrorMessage),
     "RequirementMet" : Status
 }] {
     Rules := SensitiveRulesNotNotifying
-    ErrorMessage := "rule(s) found that do(es) not notify at least one user:"
-    Status := count(Rules) == 0
+    ErrorMessage := DefenderErrorMessage4_4(Rules)
+    Conditions := [ count(Rules) == 0, 
+                    count(SensitiveInfoPolicies) > 0 ]
+    Status := count([Condition | Condition := Conditions[_]; Condition == true ]) == 2
 }
 #--
 

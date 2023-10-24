@@ -182,14 +182,12 @@ DomainKeys Identified Mail (DKIM) allows digital signatures to be added
 to email messages in the message header, providing a layer of both
 authenticity and integrity to emails. As with SPF, DKIM relies on DNS
 records, thus, its deployment depends on how an agency manages its DNS.
-DKIM is enabled for your tenant's default domain (e.g., onmicrosoft.com
-domains), but it must be manually enabled for custom domains. Exchange
-Online Protection (EOP) features include DKIM signing capabilities.
+Exchange Online Protection (EOP) features include DKIM signing capabilities.
 
 ### Policies
 
 #### MS.EXO.3.1v1
-DKIM SHOULD be enabled for any custom domain.
+DKIM SHOULD be enabled for all domains.
 
 <!--Policy: MS.EXO.3.1v1; Criticality: SHOULD -->
 - _Rationale:_ An adversary may modify the `FROM` field
@@ -257,7 +255,7 @@ required by BOD 18-01 for federal, executive branch, departments and agencies.
 - _Last modified:_ June 2023
 
 #### MS.EXO.4.3v1
-The DMARC point of contact for aggregate reports SHALL include <reports@dmarc.cyber.dhs.gov>.
+The DMARC point of contact for aggregate reports SHALL include `reports@dmarc.cyber.dhs.gov`.
 
 <!--Policy: MS.EXO.4.3v1; Criticality: SHALL -->
 - _Rationale:_ Email spoofing attempts are not inherently visible to domain
@@ -393,7 +391,7 @@ To disable SMTP AUTH for the organization:
 
 3. Make sure the setting **Turn off SMTP AUTH protocol for your organization** is checked.
 
-To enable SMTP AUTH on a per-mailbox basis:
+(optional) As an exception, to allow SMTP AUTH for a specific mailbox:
 
 1. Sign in to the **Microsoft 365 admin center** and go to **Users > Active users**.
 
@@ -468,19 +466,6 @@ To restrict sharing calendar details with all domains:
 
 1. Refer to step 5 in [MS.EXO.6.1v1 instructions](#msexo61v1-instructions) to implement
 this policy.
-
-2. Additionally, sign in to the **Microsoft 365 admin center**.
-
-3. On the left-hand menu, select **Show All** and then **Settings**.
-
-4. Under **Settings**, select **Org settings**.
-
-5. From the list of **Services**, select **Calendar**.
-
-6. Make sure the **Let your users share their calendars with people outside of
-   your organization who have Office 365 or Exchange** is unchecked.
-
-7. If the settings has changed, click **Save**.
 
 ## 7. External Sender Warnings
 
