@@ -262,7 +262,7 @@ tests[{
 }] {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
     Conditions := [count(Aad2P2Licenses) > 0, count(SignInBlocked) > 0]
-    Status := count([Condition | Condition = Conditions[_]; Condition == false]) == 0
+    Status := count([Condition | Condition := Conditions[_]; Condition == false]) == 0
 }
 #--
 
