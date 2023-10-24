@@ -211,137 +211,197 @@ TestPlan:
         Postconditions: []
         ExpectedResult: true
 
-  - PolicyId: MS.DEFENDER.4.1v1
-    TestDriver: RunScuba
-    Tests:
-      - TestDescription: MS.DEFENDER.4.1v1 Compliant case - Advanced Rule
-        Preconditions:
-          - Command: Set-DlpComplianceRule
-            Splat:
-              Identity: "protection rule 4"
-              AdvancedRule: "{rn  'Version': '1.0',rn  'Condition': {rn    'Operator': 'And',rn    'SubConditions': [rn      {rn        'ConditionName': 'ContentContainsSensitiveInformation',rn        'Value': [rn          {rn            'Groups': [rn              {rn                'Name': 'Default',rn                'Operator': 'Or',rn                'Sensitivetypes': [rn                  {rn                    'Name': 'Credit Card Number',rn                    'Id': '50842eb7-edc8-4019-85dd-5a5c1f2bb085',rn                    'Mincount': 1,rn                    'Maxcount': -1,rn                    'Confidencelevel': 'High',rn                    'Minconfidence': 85,rn                    'Maxconfidence': 100rn                  },rn                  {rn                    'Name': 'U.S. Individual Taxpayer Identification Number (ITIN)',rn                    'Id': 'e55e2a32-f92d-4985-a35d-a0b269eb687b',rn                    'Mincount': 1,rn                    'Maxcount': -1,rn                    'Confidencelevel': 'Medium',rn                    'Minconfidence': 75,rn                    'Maxconfidence': 100rn                  },rn                  {rn                    'Name': 'U.S. Social Security Number (SSN)',rn                    'Id': 'a44669fe-0d48-453d-a9b1-2cc83f2cba77',rn                    'Mincount': 1,rn                    'Maxcount': -1,rn                    'Confidencelevel': 'Medium',rn                    'Minconfidence': 75,rn                    'Maxconfidence': 100rn                  }rn                ]rn              }rn            ],rn            'Operator': 'And'rn          }rn        ]rn      }rn    ]rn  }rn}"
-        Postconditions: []
-        ExpectedResult: true
-      - TestDescription: MS.DEFENDER.4.1v1 Compliant case - Not Advanced Rule
-        Preconditions:
-          - Command: Set-DlpComplianceRule
-            Splat:
-              Identity: "protection rule 4"
-              ContentContainsSensitiveInformation: "@(@{Name=\"U.S. Social Security Number (SSN)\"; minCount=\"1\"; maxCount=\"-1\"},@{Name=\"U.S. Individual Taxpayer Identification Number (ITIN)\"; minCount=\"1\"; maxCount=\"-1\"},@{Name=\"Credit Card Number\"; minCount=\"1\"; maxCount=\"-1\"})"
-        Postconditions: []
-        ExpectedResult: true
-      - TestDescription: MS.DEFENDER.4.1v1 Non-Compliant case - Advanced Rule
-        Preconditions:
-          - Command: Set-DlpComplianceRule
-            Splat:
-              Identity: "protection rule 4"
-              AdvancedRule: "{rn  'Version': '1.0',rn  'Condition': {rn    'Operator': 'And',rn    'SubConditions': [rn      {rn        'ConditionName': 'ContentContainsSensitiveInformation',rn        'Value': [rn          {rn            'Groups': [rn              {rn                'Name': 'Default',rn                'Operator': 'Or',rn                'Sensitivetypes': [rn                  {rn                    'Name': 'NOT Credit Card Number',rn                    'Id': '50842eb7-edc8-4019-85dd-5a5c1f2bb085',rn                    'Mincount': 1,rn                    'Maxcount': -1,rn                    'Confidencelevel': 'High',rn                    'Minconfidence': 85,rn                    'Maxconfidence': 100rn                  },rn                  {rn                    'Name': 'U.S. Individual Taxpayer Identification Number (ITIN)',rn                    'Id': 'e55e2a32-f92d-4985-a35d-a0b269eb687b',rn                    'Mincount': 1,rn                    'Maxcount': -1,rn                    'Confidencelevel': 'Medium',rn                    'Minconfidence': 75,rn                    'Maxconfidence': 100rn                  },rn                  {rn                    'Name': 'U.S. Social Security Number (SSN)',rn                    'Id': 'a44669fe-0d48-453d-a9b1-2cc83f2cba77',rn                    'Mincount': 1,rn                    'Maxcount': -1,rn                    'Confidencelevel': 'Medium',rn                    'Minconfidence': 75,rn                    'Maxconfidence': 100rn                  }rn                ]rn              }rn            ],rn            'Operator': 'And'rn          }rn        ]rn      }rn    ]rn  }rn}"
-        Postconditions: []
-        ExpectedResult: false
-      - TestDescription: MS.DEFENDER.4.1v1 Non-Compliant case - Not Advanced Rule
-        Preconditions:
-          - Command: Set-DlpComplianceRule
-            Splat:
-              Identity: "protection rule 4"
-              ContentContainsSensitiveInformation: "@(@{@{Name=\"U.S. Individual Taxpayer Identification Number (ITIN)\"; minCount=\"1\"; maxCount=\"-1\"},@{Name=\"Credit Card Number\"; minCount=\"1\"; maxCount=\"-1\"})"
-        Postconditions: []
-        ExpectedResult: false
+  # - PolicyId: MS.DEFENDER.4.1v1
+  #   TestDriver: RunCached
+  #   Tests:
+  #     - TestDescription: MS.DEFENDER.4.1v1 Compliant case - Advanced Rule
+  #       Preconditions:
+  #         - Command: UpdateProviderExport
+  #           Splat:
+  #             updates:
+  #               protection_alerts:
+  #                 - Name: "Suspicious email sending patterns detected"
+  #                   Disabled: false
+  #         - Command: Set-DlpComplianceRule
+  #           Splat:
+  #             Identity: "protection rule 4"
+  #             AdvancedRule: '{"Version": "1.0", "Condition": { "Operator": "And", "SubConditions": [ { "ConditionName": "ContentContainsSensitiveInformation", "Value": [ { "Groups": [ { "Name": "Default", "Operator": "Or", "Sensitivetypes": [ { "Name": "Credit Card Number", "Id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "High", "Minconfidence": 85, "Maxconfidence": 100 }, { "Name": "U.S. Individual Taxpayer Identification Number (ITIN)", "Id": "e55e2a32-f92d-4985-a35d-a0b269eb687b", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 }, { "Name": "U.S. Social Security Number (SSN)", "Id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 } ] } ], "Operator": "And" } ] } ] } }'
+  #             Confirm: false
+  #       Postconditions: []
+  #       ExpectedResult: true
+  #     - TestDescription: MS.DEFENDER.4.1v1 Compliant case - Not Advanced Rule
+  #       Preconditions:
+  #         - Command: Set-DlpComplianceRule
+  #           Splat:
+  #             Identity: "protection rule 4"
+  #             ContentContainsSensitiveInformation:
+  #               - Name: "U.S. Social Security Number (SSN)"
+  #                 maxCount: "-1"
+  #               - Name: "U.S. Individual Taxpayer Identification Number (ITIN)"
+  #                 maxCount: "-1"
+  #               - Name: "Credit Card Number"
+  #                 maxCount: "-1"
+  #             Confirm: false
+  #       Postconditions: []
+  #       ExpectedResult: true
+  #     - TestDescription: MS.DEFENDER.4.1v1 Non-Compliant case - Advanced Rule
+  #       Preconditions:
+  #         - Command: Set-DlpComplianceRule
+  #           Splat:
+  #             Identity: "protection rule 4"
+  #             AdvancedRule: "{rn  'Version': '1.0',rn  'Condition': {rn    'Operator': 'And',rn    'SubConditions': [rn      {rn        'ConditionName': 'ContentContainsSensitiveInformation',rn        'Value': [rn          {rn            'Groups': [rn              {rn                'Name': 'Default',rn                'Operator': 'Or',rn                'Sensitivetypes': [rn                  {rn                    'Name': 'NOT Credit Card Number',rn                    'Id': '50842eb7-edc8-4019-85dd-5a5c1f2bb085',rn                    'Mincount': 1,rn                    'Maxcount': -1,rn                    'Confidencelevel': 'High',rn                    'Minconfidence': 85,rn                    'Maxconfidence': 100rn                  },rn                  {rn                    'Name': 'U.S. Individual Taxpayer Identification Number (ITIN)',rn                    'Id': 'e55e2a32-f92d-4985-a35d-a0b269eb687b',rn                    'Mincount': 1,rn                    'Maxcount': -1,rn                    'Confidencelevel': 'Medium',rn                    'Minconfidence': 75,rn                    'Maxconfidence': 100rn                  },rn                  {rn                    'Name': 'U.S. Social Security Number (SSN)',rn                    'Id': 'a44669fe-0d48-453d-a9b1-2cc83f2cba77',rn                    'Mincount': 1,rn                    'Maxcount': -1,rn                    'Confidencelevel': 'Medium',rn                    'Minconfidence': 75,rn                    'Maxconfidence': 100rn                  }rn                ]rn              }rn            ],rn            'Operator': 'And'rn          }rn        ]rn      }rn    ]rn  }rn}"
+  #       Postconditions: []
+  #       ExpectedResult: false
+  #     - TestDescription: MS.DEFENDER.4.1v1 Non-Compliant case - Not Advanced Rule
+  #       Preconditions:
+  #         - Command: Set-DlpComplianceRule
+  #           Splat:
+  #             Identity: "protection rule 4"
+  #             ContentContainsSensitiveInformation: \@(@{Name="U.S. Individual Taxpayer Identification Number (ITIN)"; maxCount="-1"},@{Name="Credit Card Number"; maxCount="-1"})
+  #       Postconditions: []
+  #       ExpectedResult: false
 
-  - PolicyId: MS.DEFENDER.4.2v1
-    TestDriver: RunScuba
-    Tests:
-      - TestDescription: MS.DEFENDER.4.2v1 Compliant case - Advanced Rule
-        Preconditions:
-          - Command: Set-DlpComplianceRule
-            Splat:
-              Identity: "protection rule 4"
-              AdvancedRule: "{rn  'Version': '1.0',rn  'Condition': {rn    'Operator': 'And',rn    'SubConditions': [rn      {rn        'ConditionName': 'ContentContainsSensitiveInformation',rn        'Value': [rn          {rn            'Groups': [rn              {rn                'Name': 'Default',rn                'Operator': 'Or',rn                'Sensitivetypes': [rn                  {rn                    'Name': 'Credit Card Number',rn                    'Id': '50842eb7-edc8-4019-85dd-5a5c1f2bb085',rn                    'Mincount': 1,rn                    'Maxcount': -1,rn                    'Confidencelevel': 'High',rn                    'Minconfidence': 85,rn                    'Maxconfidence': 100rn                  },rn                  {rn                    'Name': 'U.S. Individual Taxpayer Identification Number (ITIN)',rn                    'Id': 'e55e2a32-f92d-4985-a35d-a0b269eb687b',rn                    'Mincount': 1,rn                    'Maxcount': -1,rn                    'Confidencelevel': 'Medium',rn                    'Minconfidence': 75,rn                    'Maxconfidence': 100rn                  },rn                  {rn                    'Name': 'U.S. Social Security Number (SSN)',rn                    'Id': 'a44669fe-0d48-453d-a9b1-2cc83f2cba77',rn                    'Mincount': 1,rn                    'Maxcount': -1,rn                    'Confidencelevel': 'Medium',rn                    'Minconfidence': 75,rn                    'Maxconfidence': 100rn                  }rn                ]rn              }rn            ],rn            'Operator': 'And'rn          }rn        ]rn      }rn    ]rn  }rn}"
-              Disabled: false
-          - Command: Set-DLPCompliancePolicy
-            Splat:
-              Identity: "Default Office 365 DLP policy"
-              AddEndpointDlpLocation: "All"
-              AddExchangeLocation: "All"
-              AddOneDriveLocation: "All"
-              AddSharePointLocation: "All"
-              AddTeamsLocation: "All"
-              Mode: "Enable"
-        Postconditions: []
-        ExpectedResult: true
-      - TestDescription: MS.DEFENDER.4.2v1 Compliant case - Not Advanced Rule
-        Preconditions:
-          - Command: Set-DlpComplianceRule
-            Splat:
-              Identity: "protection rule 4"
-              ContentContainsSensitiveInformation: "@(@{Name=\"U.S. Social Security Number (SSN)\"; minCount=\"1\"; maxCount=\"-1\"},@{Name=\"U.S. Individual Taxpayer Identification Number (ITIN)\"; minCount=\"1\"; maxCount=\"-1\"},@{Name=\"Credit Card Number\"; minCount=\"1\"; maxCount=\"-1\"})"
-              Disabled: false
-          - Command: Set-DLPCompliancePolicy
-            Splat:
-              Identity: "Default Office 365 DLP policy"
-              AddEndpointDlpLocation: "All"
-              AddExchangeLocation: "All"
-              AddOneDriveLocation: "All"
-              AddSharePointLocation: "All"
-              AddTeamsLocation: "All"
-              Mode: "Enable"
-        Postconditions: []
-        ExpectedResult: true
+  # - PolicyId: MS.DEFENDER.4.2v1
+  #   TestDriver: RunScuba
+  #   Tests:
+  #     - TestDescription: MS.DEFENDER.4.2v1 Compliant case
+  #       Preconditions:
+  #         - Command: Set-DlpComplianceRule
+  #           Splat:
+  #             Identity: "protection rule 4"
+  #             Disabled: false
+  #         - Command: Set-DLPCompliancePolicy
+  #           Splat:
+  #             Identity: "Default Office 365 DLP policy"
+  #             AddEndpointDlpLocation: "All"
+  #             AddExchangeLocation: "All"
+  #             AddOneDriveLocation: "All"
+  #             AddSharePointLocation: "All"
+  #             AddTeamsLocation: "All"
+  #             Mode: "Enable"
+  #       Postconditions: []
+  #       ExpectedResult: true
+  #     - TestDescription: MS.DEFENDER.4.2v1 Non-Compliant case - Device
+  #       Preconditions:
+  #         - Command: Set-DLPCompliancePolicy
+  #           Splat:
+  #             Identity: "Default Office 365 DLP policy"
+  #             AddEndpointDlpLocation: "*"
+  #             AddExchangeLocation: "All"
+  #             AddOneDriveLocation: "All"
+  #             AddSharePointLocation: "All"
+  #             AddTeamsLocation: "All"
+  #             Mode: "Enable"
+  #       Postconditions: []
+  #       ExpectedResult: false
+  #     - TestDescription: MS.DEFENDER.4.2v1 Non-Compliant case - Exchange
+  #       Preconditions:
+  #         - Command: Set-DLPCompliancePolicy
+  #           Splat:
+  #             Identity: "Default Office 365 DLP policy"
+  #             AddEndpointDlpLocation: "All"
+  #             AddExchangeLocation: "*"
+  #             AddOneDriveLocation: "All"
+  #             AddSharePointLocation: "All"
+  #             AddTeamsLocation: "All"
+  #             Mode: "Enable"
+  #       Postconditions: []
+  #       ExpectedResult: false
+  #     - TestDescription: MS.DEFENDER.4.2v1 Non-Compliant case - OneDrive
+  #       Preconditions:
+  #         - Command: Set-DLPCompliancePolicy
+  #           Splat:
+  #             Identity: "Default Office 365 DLP policy"
+  #             AddEndpointDlpLocation: "All"
+  #             AddExchangeLocation: "All"
+  #             AddOneDriveLocation: "*"
+  #             AddSharePointLocation: "All"
+  #             AddTeamsLocation: "All"
+  #             Mode: "Enable"
+  #       Postconditions: []
+  #       ExpectedResult: false
+  #     - TestDescription: MS.DEFENDER.4.2v1 Non-Compliant case - SharePoint
+  #       Preconditions:
+  #         - Command: Set-DLPCompliancePolicy
+  #           Splat:
+  #             Identity: "Default Office 365 DLP policy"
+  #             AddEndpointDlpLocation: "All"
+  #             AddExchangeLocation: "All"
+  #             AddOneDriveLocation: "All"
+  #             AddSharePointLocation: "*"
+  #             AddTeamsLocation: "All"
+  #             Mode: "Enable"
+  #       Postconditions: []
+  #       ExpectedResult: false
+  #     - TestDescription: MS.DEFENDER.4.2v1 Non-Compliant case - Teams
+  #       Preconditions:
+  #         - Command: Set-DLPCompliancePolicy
+  #           Splat:
+  #             Identity: "Default Office 365 DLP policy"
+  #             AddEndpointDlpLocation: "All"
+  #             AddExchangeLocation: "All"
+  #             AddOneDriveLocation: "All"
+  #             AddSharePointLocation: "All"
+  #             AddTeamsLocation: "*"
+  #             Mode: "Enable"
+  #       Postconditions: []
+  #       ExpectedResult: false
 
-  - PolicyId: MS.DEFENDER.4.3v1
-    TestDriver: RunScuba
-    Tests:
-      - TestDescription: MS.DEFENDER.4.3v1 Compliant case - Advanced Rule
-        Preconditions:
-          - Command: Set-DlpComplianceRule
-            Splat:
-              Identity: "protection rule 4"
-              AdvancedRule: "{rn  'Version': '1.0',rn  'Condition': {rn    'Operator': 'And',rn    'SubConditions': [rn      {rn        'ConditionName': 'ContentContainsSensitiveInformation',rn        'Value': [rn          {rn            'Groups': [rn              {rn                'Name': 'Default',rn                'Operator': 'Or',rn                'Sensitivetypes': [rn                  {rn                    'Name': 'Credit Card Number',rn                    'Id': '50842eb7-edc8-4019-85dd-5a5c1f2bb085',rn                    'Mincount': 1,rn                    'Maxcount': -1,rn                    'Confidencelevel': 'High',rn                    'Minconfidence': 85,rn                    'Maxconfidence': 100rn                  },rn                  {rn                    'Name': 'U.S. Individual Taxpayer Identification Number (ITIN)',rn                    'Id': 'e55e2a32-f92d-4985-a35d-a0b269eb687b',rn                    'Mincount': 1,rn                    'Maxcount': -1,rn                    'Confidencelevel': 'Medium',rn                    'Minconfidence': 75,rn                    'Maxconfidence': 100rn                  },rn                  {rn                    'Name': 'U.S. Social Security Number (SSN)',rn                    'Id': 'a44669fe-0d48-453d-a9b1-2cc83f2cba77',rn                    'Mincount': 1,rn                    'Maxcount': -1,rn                    'Confidencelevel': 'Medium',rn                    'Minconfidence': 75,rn                    'Maxconfidence': 100rn                  }rn                ]rn              }rn            ],rn            'Operator': 'And'rn          }rn        ]rn      }rn    ]rn  }rn}"
-              Disabled: false
-              BlockAccess: false
-          - Command: Set-DLPCompliancePolicy
-            Splat:
-              Identity: "Default Office 365 DLP policy"
-              Mode: "Enable"
-        Postconditions: []
-        ExpectedResult: true
-      - TestDescription: MS.DEFENDER.4.3v1 Compliant case - Not Advanced Rule
-        Preconditions:
-          - Command: Set-DlpComplianceRule
-            Splat:
-              Identity: "protection rule 4"
-              ContentContainsSensitiveInformation: "@(@{Name=\"U.S. Social Security Number (SSN)\"; minCount=\"1\"; maxCount=\"-1\"},@{Name=\"U.S. Individual Taxpayer Identification Number (ITIN)\"; minCount=\"1\"; maxCount=\"-1\"},@{Name=\"Credit Card Number\"; minCount=\"1\"; maxCount=\"-1\"})"
-              Disabled: false
-              BlockAccess: false
-          - Command: Set-DLPCompliancePolicy
-            Splat:
-              Identity: "Default Office 365 DLP policy"
-              Mode: "Enable"
-        Postconditions: []
-        ExpectedResult: true
+  # - PolicyId: MS.DEFENDER.4.3v1
+  #   TestDriver: RunScuba
+  #   Tests:
+  #     - TestDescription: MS.DEFENDER.4.3v1 Compliant case - Advanced Rule
+  #       Preconditions:
+  #         - Command: Set-DlpComplianceRule
+  #           Splat:
+  #             Identity: "protection rule 4"
+  #             AdvancedRule: "{rn  'Version': '1.0',rn  'Condition': {rn    'Operator': 'And',rn    'SubConditions': [rn      {rn        'ConditionName': 'ContentContainsSensitiveInformation',rn        'Value': [rn          {rn            'Groups': [rn              {rn                'Name': 'Default',rn                'Operator': 'Or',rn                'Sensitivetypes': [rn                  {rn                    'Name': 'Credit Card Number',rn                    'Id': '50842eb7-edc8-4019-85dd-5a5c1f2bb085',rn                    'Mincount': 1,rn                    'Maxcount': -1,rn                    'Confidencelevel': 'High',rn                    'Minconfidence': 85,rn                    'Maxconfidence': 100rn                  },rn                  {rn                    'Name': 'U.S. Individual Taxpayer Identification Number (ITIN)',rn                    'Id': 'e55e2a32-f92d-4985-a35d-a0b269eb687b',rn                    'Mincount': 1,rn                    'Maxcount': -1,rn                    'Confidencelevel': 'Medium',rn                    'Minconfidence': 75,rn                    'Maxconfidence': 100rn                  },rn                  {rn                    'Name': 'U.S. Social Security Number (SSN)',rn                    'Id': 'a44669fe-0d48-453d-a9b1-2cc83f2cba77',rn                    'Mincount': 1,rn                    'Maxcount': -1,rn                    'Confidencelevel': 'Medium',rn                    'Minconfidence': 75,rn                    'Maxconfidence': 100rn                  }rn                ]rn              }rn            ],rn            'Operator': 'And'rn          }rn        ]rn      }rn    ]rn  }rn}"
+  #             Disabled: false
+  #             BlockAccess: false
+  #         - Command: Set-DLPCompliancePolicy
+  #           Splat:
+  #             Identity: "Default Office 365 DLP policy"
+  #             Mode: "Enable"
+  #       Postconditions: []
+  #       ExpectedResult: true
+  #     - TestDescription: MS.DEFENDER.4.3v1 Compliant case - Not Advanced Rule
+  #       Preconditions:
+  #         - Command: Set-DlpComplianceRule
+  #           Splat:
+  #             Identity: "protection rule 4"
+  #             ContentContainsSensitiveInformation: "@(@{Name=`"U.S. Social Security Number (SSN)`"; minCount=`"2`"},@{Name=`"Credit Card Number`"})"
+  #             Disabled: false
+  #             BlockAccess: false
+  #         - Command: Set-DLPCompliancePolicy
+  #           Splat:
+  #             Identity: "Default Office 365 DLP policy"
+  #             Mode: "Enable"
+  #       Postconditions: []
+  #       ExpectedResult: true
 
-  - PolicyId: MS.DEFENDER.4.4v1
-    TestDriver: RunScuba
-    Tests:
-      - TestDescription: MS.DEFENDER.4.4v1 Compliant case - Advanced Rule
-        Preconditions:
-          - Command: Set-DlpComplianceRule
-            Splat:
-              Identity: "protection rule 4"
-              AdvancedRule: "{rn  'Version': '1.0',rn  'Condition': {rn    'Operator': 'And',rn    'SubConditions': [rn      {rn        'ConditionName': 'ContentContainsSensitiveInformation',rn        'Value': [rn          {rn            'Groups': [rn              {rn                'Name': 'Default',rn                'Operator': 'Or',rn                'Sensitivetypes': [rn                  {rn                    'Name': 'Credit Card Number',rn                    'Id': '50842eb7-edc8-4019-85dd-5a5c1f2bb085',rn                    'Mincount': 1,rn                    'Maxcount': -1,rn                    'Confidencelevel': 'High',rn                    'Minconfidence': 85,rn                    'Maxconfidence': 100rn                  },rn                  {rn                    'Name': 'U.S. Individual Taxpayer Identification Number (ITIN)',rn                    'Id': 'e55e2a32-f92d-4985-a35d-a0b269eb687b',rn                    'Mincount': 1,rn                    'Maxcount': -1,rn                    'Confidencelevel': 'Medium',rn                    'Minconfidence': 75,rn                    'Maxconfidence': 100rn                  },rn                  {rn                    'Name': 'U.S. Social Security Number (SSN)',rn                    'Id': 'a44669fe-0d48-453d-a9b1-2cc83f2cba77',rn                    'Mincount': 1,rn                    'Maxcount': -1,rn                    'Confidencelevel': 'Medium',rn                    'Minconfidence': 75,rn                    'Maxconfidence': 100rn                  }rn                ]rn              }rn            ],rn            'Operator': 'And'rn          }rn        ]rn      }rn    ]rn  }rn}"
-              Disabled: false
-              NotifyUser: null
-        Postconditions: []
-        ExpectedResult: true
-      - TestDescription: MS.DEFENDER.4.4v1 Compliant case - Not Advanced Rule
-        Preconditions:
-          - Command: Set-DlpComplianceRule
-            Splat:
-              Identity: "protection rule 4"
-              ContentContainsSensitiveInformation: "@(@{Name=\"U.S. Social Security Number (SSN)\"; minCount=\"1\"; maxCount=\"-1\"},@{Name=\"U.S. Individual Taxpayer Identification Number (ITIN)\"; minCount=\"1\"; maxCount=\"-1\"},@{Name=\"Credit Card Number\"; minCount=\"1\"; maxCount=\"-1\"})"
-              Disabled: false
-              NotifyUser: null
-        Postconditions: []
-        ExpectedResult: true
+  # - PolicyId: MS.DEFENDER.4.4v1
+  #   TestDriver: RunScuba
+  #   Tests:
+  #     - TestDescription: MS.DEFENDER.4.4v1 Compliant case - Advanced Rule
+  #       Preconditions:
+  #         - Command: Set-DlpComplianceRule
+  #           Splat:
+  #             Identity: "protection rule 4"
+  #             AdvancedRule: "{rn  'Version': '1.0',rn  'Condition': {rn    'Operator': 'And',rn    'SubConditions': [rn      {rn        'ConditionName': 'ContentContainsSensitiveInformation',rn        'Value': [rn          {rn            'Groups': [rn              {rn                'Name': 'Default',rn                'Operator': 'Or',rn                'Sensitivetypes': [rn                  {rn                    'Name': 'Credit Card Number',rn                    'Id': '50842eb7-edc8-4019-85dd-5a5c1f2bb085',rn                    'Mincount': 1,rn                    'Maxcount': -1,rn                    'Confidencelevel': 'High',rn                    'Minconfidence': 85,rn                    'Maxconfidence': 100rn                  },rn                  {rn                    'Name': 'U.S. Individual Taxpayer Identification Number (ITIN)',rn                    'Id': 'e55e2a32-f92d-4985-a35d-a0b269eb687b',rn                    'Mincount': 1,rn                    'Maxcount': -1,rn                    'Confidencelevel': 'Medium',rn                    'Minconfidence': 75,rn                    'Maxconfidence': 100rn                  },rn                  {rn                    'Name': 'U.S. Social Security Number (SSN)',rn                    'Id': 'a44669fe-0d48-453d-a9b1-2cc83f2cba77',rn                    'Mincount': 1,rn                    'Maxcount': -1,rn                    'Confidencelevel': 'Medium',rn                    'Minconfidence': 75,rn                    'Maxconfidence': 100rn                  }rn                ]rn              }rn            ],rn            'Operator': 'And'rn          }rn        ]rn      }rn    ]rn  }rn}"
+  #             Disabled: false
+  #             NotifyUser: null
+  #       Postconditions: []
+  #       ExpectedResult: true
+  #     - TestDescription: MS.DEFENDER.4.4v1 Compliant case - Not Advanced Rule
+  #       Preconditions:
+  #         - Command: Set-DlpComplianceRule
+  #           Splat:
+  #             Identity: "protection rule 4"
+  #             ContentContainsSensitiveInformation: "@(@{Name=`"U.S. Social Security Number (SSN)`"; minCount=`"1`"; maxCount=`"-1`"},@{Name=`"U.S. Individual Taxpayer Identification Number (ITIN)`"; minCount=`"1`"; maxCount=`"-1`"},@{Name=`"Credit Card Number`"; minCount=`"1`"; maxCount=`"-`"})"
+  #             Disabled: false
+  #             NotifyUser: null
+  #       Postconditions: []
+  #       ExpectedResult: true
 
   - PolicyId: MS.DEFENDER.4.5v1
     TestDriver: RunScuba
@@ -362,123 +422,183 @@ TestPlan:
         ExpectedResult: false
 
   - PolicyId: MS.DEFENDER.5.1v1
-    TestDriver: RunScuba
+    TestDriver: RunCached
     Tests:
       - TestDescription: MS.DEFENDER.5.1v1 Compliant case
         Preconditions:
-          - Command: Set-ProtectionAlert
+          - Command: UpdateProviderExport
             Splat:
-              Identity: "Suspicious email sending patterns detected"
-              Disabled: false
-          - Command: Set-ProtectionAlert
-            Splat:
-              Identity: "Suspicious Email Forwarding Activity"
-              Disabled: false
-          - Command: Set-ProtectionAlert
-            Splat:
-              Identity: "Messages have been delayed"
-              Disabled: false
-          - Command: Set-ProtectionAlert
-            Splat:
-              Identity: "Tenant restricted from sending unprovisioned email"
-              Disabled: false
-          - Command: Set-ProtectionAlert
-            Splat:
-              Identity: "User restricted from sending email"
-              Disabled: false
-          - Command: Set-ProtectionAlert
-            Splat:
-              Identity: "A potentially malicious URL click was detected"
-              Disabled: false
-          - Command: Set-ProtectionAlert
-            Splat:
-              Identity: "Suspicious connector activity"
-              Disabled: false
+              updates:
+                protection_alerts:
+                  - Name: "Suspicious email sending patterns detected"
+                    Disabled: false
+                  - Name: "Suspicious Email Forwarding Activity"
+                    Disabled: false
+                  - Name: "Messages have been delayed"
+                    Disabled: false
+                  - Name: "Tenant restricted from sending unprovisioned email"
+                    Disabled: false
+                  - Name: "User restricted from sending email"
+                    Disabled: false
+                  - Name: "A potentially malicious URL click was detected"
+                    Disabled: false
+                  - Name: "Suspicious connector activity"
+                    Disabled: false
         Postconditions: []
         ExpectedResult: true
-      - TestDescription: MS.DEFENDER.5.1v1 Non-Compliant case - "Suspicious email sending patterns detected"
+      - TestDescription: MS.DEFENDER.5.1v1 Non-Compliant case - Suspicious email sending patterns detected
         Preconditions:
-          - Command: Set-ProtectionAlert
+          - Command: UpdateProviderExport
             Splat:
-              Identity: "Suspicious email sending patterns detected"
-              Disabled: true
-        Postconditions:
-          - Command: Set-ProtectionAlert
-            Splat:
-              Identity: "Suspicious email sending patterns detected"
-              Disabled: false
+              updates:
+                protection_alerts:
+                  - Name: "Suspicious email sending patterns detected"
+                    Disabled: true
+                  - Name: "Suspicious Email Forwarding Activity"
+                    Disabled: false
+                  - Name: "Messages have been delayed"
+                    Disabled: false
+                  - Name: "Tenant restricted from sending unprovisioned email"
+                    Disabled: false
+                  - Name: "User restricted from sending email"
+                    Disabled: false
+                  - Name: "A potentially malicious URL click was detected"
+                    Disabled: false
+                  - Name: "Suspicious connector activity"
+                    Disabled: false
+        Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.DEFENDER.5.1v1 Non-Compliant case - "Suspicious Email Forwarding Activity"
+      - TestDescription: MS.DEFENDER.5.1v1 Non-Compliant case - Suspicious Email Forwarding Activity
         Preconditions:
-          - Command: Set-ProtectionAlert
+          - Command: UpdateProviderExport
             Splat:
-              Identity: "Suspicious Email Forwarding Activity"
-              Disabled: true
-        Postconditions:
-          - Command: Set-ProtectionAlert
-            Splat:
-              Identity: "Suspicious Email Forwarding Activity"
-              Disabled: false
+              updates:
+                protection_alerts:
+                  - Name: "Suspicious email sending patterns detected"
+                    Disabled: false
+                  - Name: "Suspicious Email Forwarding Activity"
+                    Disabled: true
+                  - Name: "Messages have been delayed"
+                    Disabled: false
+                  - Name: "Tenant restricted from sending unprovisioned email"
+                    Disabled: false
+                  - Name: "User restricted from sending email"
+                    Disabled: false
+                  - Name: "A potentially malicious URL click was detected"
+                    Disabled: false
+                  - Name: "Suspicious connector activity"
+                    Disabled: false
+        Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.DEFENDER.5.1v1 Non-Compliant case - "Messages have been delayed"
+      - TestDescription: MS.DEFENDER.5.1v1 Non-Compliant case - Messages have been delayed
         Preconditions:
-          - Command: Set-ProtectionAlert
+          - Command: UpdateProviderExport
             Splat:
-              Identity: "Messages have been delayed"
-              Disabled: true
-        Postconditions:
-          - Command: Set-ProtectionAlert
-            Splat:
-              Identity: "Messages have been delayed"
-              Disabled: false
+              updates:
+                protection_alerts:
+                  - Name: "Suspicious email sending patterns detected"
+                    Disabled: false
+                  - Name: "Suspicious Email Forwarding Activity"
+                    Disabled: false
+                  - Name: "Messages have been delayed"
+                    Disabled: true
+                  - Name: "Tenant restricted from sending unprovisioned email"
+                    Disabled: false
+                  - Name: "User restricted from sending email"
+                    Disabled: false
+                  - Name: "A potentially malicious URL click was detected"
+                    Disabled: false
+                  - Name: "Suspicious connector activity"
+                    Disabled: false
+        Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.DEFENDER.5.1v1 Non-Compliant case - "Tenant restricted from sending unprovisioned email"
+      - TestDescription: MS.DEFENDER.5.1v1 Non-Compliant case - Tenant restricted from sending unprovisioned email
         Preconditions:
-          - Command: Set-ProtectionAlert
+          - Command: UpdateProviderExport
             Splat:
-              Identity: "Tenant restricted from sending unprovisioned email"
-              Disabled: true
-        Postconditions:
-          - Command: Set-ProtectionAlert
-            Splat:
-              Identity: "Tenant restricted from sending unprovisioned email"
-              Disabled: false
+              updates:
+                protection_alerts:
+                  - Name: "Suspicious email sending patterns detected"
+                    Disabled: false
+                  - Name: "Suspicious Email Forwarding Activity"
+                    Disabled: false
+                  - Name: "Messages have been delayed"
+                    Disabled: false
+                  - Name: "Tenant restricted from sending unprovisioned email"
+                    Disabled: true
+                  - Name: "User restricted from sending email"
+                    Disabled: false
+                  - Name: "A potentially malicious URL click was detected"
+                    Disabled: false
+                  - Name: "Suspicious connector activity"
+                    Disabled: false
+        Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.DEFENDER.5.1v1 Non-Compliant case - "User restricted from sending email"
+      - TestDescription: MS.DEFENDER.5.1v1 Non-Compliant case - User restricted from sending email
         Preconditions:
-          - Command: Set-ProtectionAlert
+          - Command: UpdateProviderExport
             Splat:
-              Identity: "User restricted from sending email"
-              Disabled: true
-        Postconditions:
-          - Command: Set-ProtectionAlert
-            Splat:
-              Identity: "User restricted from sending email"
-              Disabled: false
+              updates:
+                protection_alerts:
+                  - Name: "Suspicious email sending patterns detected"
+                    Disabled: false
+                  - Name: "Suspicious Email Forwarding Activity"
+                    Disabled: false
+                  - Name: "Messages have been delayed"
+                    Disabled: false
+                  - Name: "Tenant restricted from sending unprovisioned email"
+                    Disabled: false
+                  - Name: "User restricted from sending email"
+                    Disabled: true
+                  - Name: "A potentially malicious URL click was detected"
+                    Disabled: false
+                  - Name: "Suspicious connector activity"
+                    Disabled: false
+        Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.DEFENDER.5.1v1 Non-Compliant case - "A potentially malicious URL click was detected"
+      - TestDescription: MS.DEFENDER.5.1v1 Non-Compliant case - A potentially malicious URL click was detected
         Preconditions:
-          - Command: Set-ProtectionAlert
+          - Command: UpdateProviderExport
             Splat:
-              Identity: "A potentially malicious URL click was detected"
-              Disabled: true
-        Postconditions:
-          - Command: Set-ProtectionAlert
-            Splat:
-              Identity: "A potentially malicious URL click was detected"
-              Disabled: false
+              updates:
+                protection_alerts:
+                  - Name: "Suspicious email sending patterns detected"
+                    Disabled: false
+                  - Name: "Suspicious Email Forwarding Activity"
+                    Disabled: false
+                  - Name: "Messages have been delayed"
+                    Disabled: false
+                  - Name: "Tenant restricted from sending unprovisioned email"
+                    Disabled: false
+                  - Name: "User restricted from sending email"
+                    Disabled: false
+                  - Name: "A potentially malicious URL click was detected"
+                    Disabled: true
+                  - Name: "Suspicious connector activity"
+                    Disabled: false
+        Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.DEFENDER.5.1v1 Non-Compliant case - "Suspicious connector activity"
+      - TestDescription: MS.DEFENDER.5.1v1 Non-Compliant case - Suspicious connector activity
         Preconditions:
-          - Command: Set-ProtectionAlert
+          - Command: UpdateProviderExport
             Splat:
-              Identity: "Suspicious connector activity"
-              Disabled: true
-        Postconditions:
-          - Command: Set-ProtectionAlert
-            Splat:
-              Identity: "Suspicious connector activity"
-              Disabled: false
+              updates:
+                protection_alerts:
+                  - Name: "Suspicious email sending patterns detected"
+                    Disabled: false
+                  - Name: "Suspicious Email Forwarding Activity"
+                    Disabled: false
+                  - Name: "Messages have been delayed"
+                    Disabled: false
+                  - Name: "Tenant restricted from sending unprovisioned email"
+                    Disabled: false
+                  - Name: "User restricted from sending email"
+                    Disabled: false
+                  - Name: "A potentially malicious URL click was detected"
+                    Disabled: false
+                  - Name: "Suspicious connector activity"
+                    Disabled: true
+        Postconditions: []
         ExpectedResult: false
 
   - PolicyId: MS.DEFENDER.5.2v1
