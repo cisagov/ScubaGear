@@ -28,11 +28,7 @@ TestPlan:
                     - block
         Postconditions: []
         ExpectedResult: false
-<<<<<<< HEAD
-      - TestDescription: MS.AAD.1.1v1 Non-Compliant case - insteading of blocking access, requires an approved application
-=======
       - TestDescription: MS.AAD.1.1v1 Non-Compliant case - instead of blocking access, requires an approved application
->>>>>>> 1c5cd76db67dfcaf9e98e122b8f891ec2ae34c85
         Preconditions:
           - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
