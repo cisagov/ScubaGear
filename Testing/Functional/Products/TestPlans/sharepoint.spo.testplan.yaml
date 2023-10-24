@@ -1,6 +1,7 @@
 ProductName: sharepoint
 Description: This test plan is for use with a user login.  It will use SharePoint Online Service module as primary provided setting export tool.
 TestPlan:
+
   - PolicyId: MS.SHAREPOINT.1.1v1
     TestDriver: RunScuba
     Tests:
@@ -32,6 +33,7 @@ TestPlan:
               SharingCapability: Disabled
         Postconditions: []
         ExpectedResult: true
+
   - PolicyId: MS.SHAREPOINT.1.2v1
     TestDriver: RunScuba
     Tests:
@@ -67,6 +69,7 @@ TestPlan:
           - Command: 'Set-SPOSite -Identity $(Get-SpoSite -Filter "Url -like ''-my.sharepoint.''") -SharingCapability ExistingExternalUserSharingOnly'
         Postconditions: []
         ExpectedResult: true
+
   - PolicyId: MS.SHAREPOINT.1.3v1
     TestDriver: RunScuba
     Tests:
@@ -101,6 +104,7 @@ TestPlan:
         Postconditions: []
         IsNotChecked: true
         ExpectedResult: false
+
   - PolicyId: MS.SHAREPOINT.2.1v1
     TestDriver: RunScuba
     Tests:
@@ -134,6 +138,7 @@ TestPlan:
               DefaultSharingLinkType: Direct
         Postconditions: []
         ExpectedResult: true
+
   - PolicyId: MS.SHAREPOINT.2.2v1
     TestDriver: RunScuba
     Tests:
@@ -151,6 +156,7 @@ TestPlan:
               DefaultLinkPermission: View
         Postconditions: []
         ExpectedResult: true
+
   - PolicyId: MS.SHAREPOINT.3.1v1
     TestDriver: RunScuba
     Tests:
@@ -203,6 +209,7 @@ TestPlan:
               SharingCapability: Disabled
         Postconditions: []
         ExpectedResult: true
+
   - PolicyId: MS.SHAREPOINT.3.2v1
     TestDriver: RunScuba
     Tests:
@@ -242,6 +249,7 @@ TestPlan:
               FolderAnonymousLinkType: View
         Postconditions: []
         ExpectedResult: true
+
   - PolicyId: MS.SHAREPOINT.3.3v1
     TestDriver: RunScuba
     Tests:
@@ -331,5 +339,28 @@ TestPlan:
           - Command: Set-SPOTenant
             Splat:
               SharingCapability: Disabled
+        Postconditions: []
+        ExpectedResult: true
+
+  - PolicyId: MS.SHAREPOINT.4.1v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.AAD.4.1v1 Not Checked
+        Preconditions: []
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false
+
+  - PolicyId: MS.SHAREPOINT.4.2v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.SHAREPOINT.4.2v1 Non-compliant DenyAddAndCustomizePages disabled
+        Preconditions:
+          - Command: '$Site=[System.Uri]((Get-SPOSite)[0].Url);Set-SPOSite -Identity "$($Site.Scheme)://$($Site.Authority)" -DenyAddAndCustomizePages:$false'
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.SHAREPOINT.4.2v1 Compliant DenyAddAndCustomizePages enabled
+        Preconditions:
+          - Command: '$Site=[System.Uri]((Get-SPOSite)[0].Url);Set-SPOSite -Identity "$($Site.Scheme)://$($Site.Authority)" -DenyAddAndCustomizePages:$true'
         Postconditions: []
         ExpectedResult: true
