@@ -1,0 +1,19 @@
+ProductName: teams
+TestPlan:
+  - PolicyId: MS.TEAMS.4.1v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.TEAMS.4.1v1 Compliant - AllowEmailIntoChannel (gcc, dod)
+        Preconditions:
+          - Command: Set-CsTeamsClientConfiguration
+            Splat:
+              AllowEmailIntoChannel: true
+        Postconditions: []
+        ExpectedResult: true        
+      - TestDescription: MS.TEAMS.4.1v1 Compliant - Not AllowEmailIntoChannel (gcc, dod)
+        Preconditions:
+          - Command: Set-CsTeamsClientConfiguration
+            Splat:
+              AllowEmailIntoChannel: false
+        Postconditions: []
+        ExpectedResult: true        
