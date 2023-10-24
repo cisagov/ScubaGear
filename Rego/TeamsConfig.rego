@@ -150,36 +150,25 @@ tests[{
 #--
 # MS.TEAMS.1.5v1
 #--
-ReportDetails1_5(Policy) = Description if {
-	Policy.AutoAdmittedUsers != "Everyone"
-	Policy.AllowPSTNUsersToBypassLobby == false
-	Description := "Requirement met"
-}
 
-ReportDetails1_5(Policy) = Description if {
-	Policy.AutoAdmittedUsers != "Everyone"
+MeetingsAllowingPSTNBypass[Policy.Identity] {
+	Policy := input.meeting_policies[_]
 	Policy.AllowPSTNUsersToBypassLobby == true
-	Description := "Requirement not met: Dial-in users are enabled to bypass the lobby"
-}
-
-ReportDetails1_5(Policy) = Description if {
-	Policy.AutoAdmittedUsers == "Everyone"
-	Description := "Requirement not met: All users are admitted automatically"
 }
 
 tests[{
 	"PolicyId" : "MS.TEAMS.1.5v1",
 	"Criticality" : "Should",
 	"Commandlet" : ["Get-CsTeamsMeetingPolicy"],
-	"ActualValue" : [Policy.AutoAdmittedUsers, Policy.AllowPSTNUsersToBypassLobby],
-	"ReportDetails" : ReportDetails1_5(Policy),
+	"ActualValue" : Policies,
+	"ReportDetails" : ReportDetailsArray(Status, Policies, String),
 	"RequirementMet" : Status
 }] {
-	Policy := input.meeting_policies[_]
-	# This control applies to all policies including custom, so no filter
-	Conditions := [Policy.AutoAdmittedUsers != "Everyone", Policy.AllowPSTNUsersToBypassLobby == false]
-    Status := count([Condition | Condition = Conditions[_]; Condition == false]) == 0
+	Policies := MeetingsAllowingPSTNBypass
+	String := "meeting policy(ies) found that either allow everyone or dial-in users to bypass lobby:"
+	Status := count(Policies) == 0
 }
+
 
 tests[{
 	"PolicyId" : "MS.TEAMS.1.5v1",
@@ -426,7 +415,7 @@ tests[{
 #--
 PoliciesBlockingDefaultApps[Policy.Identity] {
 	Policy := input.app_policies[_]
-	Policy.DefaultCatalogAppsType != "BlockedAppList"
+	Policy.DefaultCatalogAppsType == "BlockedAppList"
 }
 
 tests[{
@@ -448,7 +437,7 @@ tests[{
 #--
 PoliciesAllowingGlobalApps[Policy.Identity] {
 	Policy := input.app_policies[_]
-	Policy.GlobalCatalogAppsType != "BlockedAppList"
+	Policy.GlobalCatalogAppsType == "BlockedAppList"
 }
 
 tests[{
@@ -471,7 +460,7 @@ tests[{
 # 
 PoliciesAllowingCustomApps[Policy.Identity] {
 	Policy := input.app_policies[_]
-	Policy.PrivateCatalogAppsType != "BlockedAppList"
+	Policy.PrivateCatalogAppsType == "BlockedAppList"
 }
 tests[{
 	"PolicyId" : "MS.TEAMS.5.3v1",
