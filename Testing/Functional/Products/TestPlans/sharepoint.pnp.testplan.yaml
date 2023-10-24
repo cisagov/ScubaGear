@@ -46,38 +46,68 @@ TestPlan:
   - PolicyId: MS.SHAREPOINT.1.3v1
     TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.SHAREPOINT.1.3v1 Non-compliant - SharingDomainRestrictionMode = None
+      - TestDescription: MS.SHAREPOINT.1.3v1 Non-compliant - SharingCapability Not Disabled SharingDomainRestrictionMode = BlockList
         Preconditions:
           - Command: Set-PnPTenant
             Splat:
-              SharingDomainRestrictionMode: None
-        Postconditions: []
-        ExpectedResult: false
-      - TestDescription: MS.SHAREPOINT.1.3v1 Non-compliant - SharingDomainRestrictionMode = BlockList
-        Preconditions:
-          - Command: Set-PnPTenant
-            Splat:
+              SharingCapability: ExternalUserSharingOnly
               SharingDomainRestrictionMode: BlockList
               SharingBlockedDomainList: nefarious.com evil.is.us
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.SHAREPOINT.1.3v1 Compliant - SharingDomainRestrictionMode = AllowList
+      - TestDescription: MS.SHAREPOINT.1.3v1 Compliant -  SharingCapability Not Disabled SharingDomainRestrictionMode = AllowList
         Preconditions:
           - Command: Set-PnPTenant
             Splat:
+              SharingCapability: ExternalUserSharingOnly
               SharingDomainRestrictionMode: AllowList
               SharingAllowedDomainList: good.org admirable.us
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.SHAREPOINT.1.3v1 Compliant - SharingCapability = Disabled
+        Preconditions:
+          - Command: Set-PnPTenant
+            Splat:
+              SharingCapability: Disabled
+              SharingDomainRestrictionMode: None
         Postconditions: []
         ExpectedResult: true
 
   - PolicyId: MS.SHAREPOINT.1.4v1
     TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.SHAREPOINT.1.4v1 Not Checked
-        Preconditions: []
+      - TestDescription: MS.SHAREPOINT.1.4v1 Non-compliant - SharingCapability Not Disabled RequireAcceptingAccountMatchInvitedAccount = false
+        Preconditions:
+          - Command: Set-PnPTenant
+            Splat:
+              SharingCapability: ExternalUserSharingOnly
+              RequireAcceptingAccountMatchInvitedAccount: false
         Postconditions: []
-        IsNotChecked: true
         ExpectedResult: false
+      - TestDescription: MS.SHAREPOINT.1.4v1 Compliant - SharingCapability Disabled RequireAcceptingAccountMatchInvitedAccount = false
+        Preconditions:
+          - Command: Set-PnPTenant
+            Splat:
+              SharingCapability: Disabled
+              RequireAcceptingAccountMatchInvitedAccount: false
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.SHAREPOINT.1.4v1 Compliant - SharingCapability Disabled RequireAcceptingAccountMatchInvitedAccount = true
+        Preconditions:
+          - Command: Set-PnPTenant
+            Splat:
+              SharingCapability: Disabled
+              RequireAcceptingAccountMatchInvitedAccount: true
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.SHAREPOINT.1.4v1 Compliant - SharingCapability Not Disabled RequireAcceptingAccountMatchInvitedAccount = true
+        Preconditions:
+          - Command: Set-PnPTenant
+            Splat:
+              SharingCapability: ExternalUserSharingOnly
+              RequireAcceptingAccountMatchInvitedAccount: true
+        Postconditions: []
+        ExpectedResult: true
 
   - PolicyId: MS.SHAREPOINT.2.1v1
     TestDriver: RunScuba
