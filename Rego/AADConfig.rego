@@ -904,7 +904,7 @@ tests[{
 }] {
     GlobalAdminNotMonitored := "Global Administrator" in AdminsWithoutActivationAlert
     Conditions := [count(Aad2P2Licenses) > 0, GlobalAdminNotMonitored == false]
-    Status := count([Condition | Condition = Conditions[_]; Condition == false]) == 0
+    Status := count([Condition | Condition := Conditions[_]; Condition == false]) == 0
 }
 #--
 
