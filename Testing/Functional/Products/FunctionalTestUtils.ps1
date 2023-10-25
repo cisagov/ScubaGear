@@ -265,7 +265,6 @@ function UpdateCachedConditionalAccessPolicyByName{
     .NOTES
       If more than one conditional access policy has the same DisplayName then only the first is updated.
   #>
-  [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'DisplayName', Justification = 'Variable is used in ScriptBlock')]
   [CmdletBinding()]
   param (
       [Parameter(Mandatory = $true)]
