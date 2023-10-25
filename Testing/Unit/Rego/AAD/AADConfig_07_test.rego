@@ -301,7 +301,7 @@ test_AdditionalProperties_Correct_V3 if {
     RuleOutput[0].ReportDetails == "0 role(s) that contain users with permanent active assignment"
 }
 
-test_AdditionalProperties_Correct_V4 if {
+test_AdditionalProperties_LicenseMissing_V1 if {
     PolicyId := "MS.AAD.7.4v1"
 
     Output := tests with input as {
@@ -340,8 +340,8 @@ test_AdditionalProperties_Correct_V4 if {
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "**NOTE: Your tenant does not have an Azure AD Premium P2 license, which is required for this feature**"
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "**NOTE: Your tenant does not have a Microsoft Entra ID P2 license, which is required for this feature**"
 }
 
 test_AdditionalProperties_Incorrect_V1 if {
