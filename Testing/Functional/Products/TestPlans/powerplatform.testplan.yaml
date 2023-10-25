@@ -98,7 +98,7 @@ TestPlan:
   - PolicyId: MS.POWERPLATFORM.5.1v1
     TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.POWERPLATFORM.1.5v1 Non-compliant - Create Power Pages sites not Restricted To Admins
+      - TestDescription: MS.POWERPLATFORM.5.1v1 Non-compliant - Create Power Pages sites not Restricted To Admins
         Preconditions:
           - Command: Set-TenantSettings
             Splat:
