@@ -406,6 +406,31 @@ test_meeting_policies_Correct if {
     RuleOutput[0].ReportDetails == "Requirement met"
 }
 
+test_OneGoodOneBadPolicy_Incorrect if {
+    PolicyId := "MS.TEAMS.1.5v1"
+
+    Output := tests with input as {
+        "meeting_policies": [
+            {
+                "Identity": "Tag:CustomPolicy",
+                "AutoAdmittedUsers": "EveryoneInCompany",
+                "AllowPSTNUsersToBypassLobby": true
+            },
+            {
+                "Identity": "Tag:CustomPolicy",
+                "AutoAdmittedUsers": "EveryoneInCompany",
+                "AllowPSTNUsersToBypassLobby": false
+            }
+        ]
+    }
+
+    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    not RuleOutput[0].RequirementMet
+    RuleOutput[0].ReportDetails == "1 meeting policy(ies) found that either allow everyone or dial-in users to bypass lobby: Tag:CustomPolicy"
+}
+
 test_AllowPSTNUsersToBypassLobby_Incorrect if {
     PolicyId := "MS.TEAMS.1.5v1"
 

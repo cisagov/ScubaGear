@@ -1,0 +1,138 @@
+ProductName: powerplatform
+TestPlan:
+  - PolicyId: MS.POWERPLATFORM.1.1v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.POWERPLATFORM.1.1v1 Non-Compliant case - Allows production/sandbox environment creation by nonadmin users
+        Preconditions:
+          - Command: Set-TenantSettings
+            Splat:
+              RequestBody:
+                DisableEnvironmentCreationByNonAdminUsers: false
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.POWERPLATFORM.1.1v1 Compliant case - Restricts production/sandbox environment creation to admin users
+        Preconditions:
+          - Command: Set-TenantSettings
+            Splat:
+              RequestBody:
+                DisableEnvironmentCreationByNonAdminUsers: true
+        Postconditions: []
+        ExpectedResult: true
+
+  - PolicyId: MS.POWERPLATFORM.1.2v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.POWERPLATFORM.1.2v1 Non-Compliant case - Allows trial environment creation by nonadmin users
+        Preconditions:
+          - Command: Set-TenantSettings
+            Splat:
+              RequestBody:
+                DisableTrialEnvironmentCreationByNonAdminUsers: false
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.POWERPLATFORM.1.2v1 Compliant case - Restricts trial environment creation to admin users
+        Preconditions:
+          - Command: Set-TenantSettings
+            Splat:
+              RequestBody:
+                DisableTrialEnvironmentCreationByNonAdminUsers: true
+        Postconditions: []
+        ExpectedResult: true
+
+  - PolicyId: MS.POWERPLATFORM.2.1v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.POWERPLATFORM.2.1v1 Non-compliant - no DLP policy in default environment
+        Preconditions:
+          - Command: '(Get-DlpPolicy).value | Where {$_.environments.name -eq (Get-AdminPowerAppEnvironment -Default).EnvironmentName} | Select-Object @{Name="PolicyName"; Expression={$_.name}} | Remove-DlpPolicy'
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.POWERPLATFORM.2.1v1 Compliant - create DLP policy in default environment
+        Preconditions:
+          - Command: 'New-AdminDlpPolicy -DisplayName "DLP functional test" -EnvironmentName ((Get-AdminPowerAppEnvironment -Default).EnvironmentName)'
+        Postconditions: []
+        ExpectedResult: true
+
+  - PolicyId: MS.POWERPLATFORM.2.2v1
+    TestDriver: RunCached
+    Tests:
+      - TestDescription: MS.POWERPLATFORM.2.2v1 Non-compliant - subsequent environments without DLP policies
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                dlp_policies:
+                  - value:
+                    - environments:
+                      - name: "Default-ca08493a-c9c8-4db0-a9e8-d3b4bafac269"
+                environment_list:
+                  - EnvironmentName: "Default-ca08493a-c9c8-4db0-a9e8-d3b4bafac269"
+                  - EnvironmentName:  "Test1"
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.POWERPLATFORM.2.2v1 Compliant - has DLP policies
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                dlp_policies:
+                  - value:
+                    - environments:
+                      - name: "Default-ca08493a-c9c8-4db0-a9e8-d3b4bafac269"
+                environment_list:
+                  - EnvironmentName: "Default-ca08493a-c9c8-4db0-a9e8-d3b4bafac269"
+        Postconditions: []
+        ExpectedResult: true
+
+  - PolicyId: MS.POWERPLATFORM.3.1v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.POWERPLATFORM.3.1v1 Non-Compliant case - Power Platform tenant isolation is NOT enabled
+        Preconditions:
+          - Command: '$guid = (Get-AdminPowerAppEnvironment -Default).EnvironmentName | Select-String -Pattern "[{]?[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}[}]?$" -AllMatches | Select-Object -ExpandProperty Matches | Select-Object -ExpandProperty Value; $iso = Get-PowerAppTenantIsolationPolicy -TenantId $guid; $iso.psobject.properties.value.isDisabled = $true; Set-PowerAppTenantIsolationPolicy -TenantId $guid -TenantIsolationPolicy $iso'
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.POWERPLATFORM.3.1v1 Compliant case - Power Platform tenant isolation is enabled.
+        Preconditions:
+          - Command: '$guid = (Get-AdminPowerAppEnvironment -Default).EnvironmentName | Select-String -Pattern "[{]?[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}[}]?$" -AllMatches | Select-Object -ExpandProperty Matches | Select-Object -ExpandProperty Value; $iso = Get-PowerAppTenantIsolationPolicy -TenantId $guid; $iso.psobject.properties.value.isDisabled = $false; Set-PowerAppTenantIsolationPolicy -TenantId $guid -TenantIsolationPolicy $iso'
+        Postconditions: []
+        ExpectedResult: true
+
+  - PolicyId: MS.POWERPLATFORM.3.2v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.POWERPLATFORM.3.2v1 Not Checked
+        Preconditions: []
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false
+
+  - PolicyId: MS.POWERPLATFORM.4.1v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.POWERPLATFORM.4.1v1 Not Checked
+        Preconditions: []
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false
+
+  - PolicyId: MS.POWERPLATFORM.5.1v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.POWERPLATFORM.5.1v1 Non-compliant - Create Power Pages sites not Restricted To Admins
+        Preconditions:
+          - Command: Set-TenantSettings
+            Splat:
+              RequestBody:
+                DisablePortalsCreationByNonAdminUsers : false
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.POWERPLATFORM.5.1v1 Compliant - Create Power Pages sites Restricted To Admins
+        Preconditions:
+          - Command: Set-TenantSettings
+            Splat:
+              RequestBody:
+                DisablePortalsCreationByNonAdminUsers : true
+        Postconditions: []
+        ExpectedResult: true

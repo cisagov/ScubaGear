@@ -42,7 +42,7 @@ ReportFullDetailsArray(Array, String) = Details {
 CapLink := "<a href='#caps'>View all CA policies</a>."
 
 ##############################################################################################################
-# The report formatting functions below are for policies that check the required Azure AD Premium P2 license #
+# The report formatting functions below are for policies that check the required Microsoft Entra ID P2 license #
 ##############################################################################################################
 
 Aad2P2Licenses[ServicePlan.ServicePlanId] {
@@ -50,7 +50,7 @@ Aad2P2Licenses[ServicePlan.ServicePlanId] {
     ServicePlan.ServicePlanName == "AAD_PREMIUM_P2"
 }
 
-P2WarningString := "**NOTE: Your tenant does not have an Azure AD Premium P2 license, which is required for this feature**"
+P2WarningString := "**NOTE: Your tenant does not have a Microsoft Entra ID P2 license, which is required for this feature**"
 
 ReportDetailsArrayLicenseWarningCap(Array, String) = Description if {
   count(Aad2P2Licenses) > 0
@@ -206,7 +206,8 @@ tests[{
     "RequirementMet" : Status
 }] {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
-    Status := count(BlockHighRisk) > 0
+    Conditions := [count(Aad2P2Licenses) > 0, count(BlockHighRisk) > 0]
+    Status := count([Condition | Condition := Conditions[_]; Condition == false]) == 0
 }
 #--
 
@@ -260,7 +261,8 @@ tests[{
     "RequirementMet" : Status
 }] {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
-    Status := count(SignInBlocked) > 0
+    Conditions := [count(Aad2P2Licenses) > 0, count(SignInBlocked) > 0]
+    Status := count([Condition | Condition := Conditions[_]; Condition == false]) == 0
 }
 #--
 
@@ -539,7 +541,7 @@ tests[{
 #
 # MS.AAD.5.1v1
 #--
-AuthPoliciesBad_2_6[Policy.Id] {
+AuthPoliciesBad_5_1[Policy.Id] {
     Policy = input.authorization_policies[_]
     Policy.DefaultUserRolePermissions.AllowedToCreateApps == true
 }
@@ -559,7 +561,7 @@ tests[{
     "ReportDetails" : ReportFullDetailsArray(BadPolicies, DescriptionString),
     "RequirementMet" : Status
 }] {
-    BadPolicies := AuthPoliciesBad_2_6
+    BadPolicies := AuthPoliciesBad_5_1
     Status := count(BadPolicies) == 0
     DescriptionString := "authorization policies found that allow non-admin users to register third-party applications"
 }
@@ -692,24 +694,6 @@ tests[{
 # MS.AAD.7 #
 ############
 
-#################################
-# Helper functions for policies #
-#################################
-
-#   DoPIMRoleRulesExist will return true when the JSON privileged_roles.Rules element exists and false when it does not.
-#   This was created to add special logic for the scenario where the Azure AD premium P2 license is missing and therefore
-#   the JSON Rules element will not exist in that case because there is no PIM service.
-#   This is necessary to avoid false negatives when a policy checks for zero instances of a specific condition.
-#   For example, if a policy checks for count(PrivilegedRoleWithoutExpirationPeriod) == 0 and that normally means compliant, when a
-#   tenant does not have the license, a count of 0 does not mean compliant because 0 is the result of not having the Rules element
-#   in the JSON.
-DoPIMRoleRulesExist {
-    _ = input.privileged_roles[_]["Rules"]
-}
-
-default check_if_role_rules_exist := false
-check_if_role_rules_exist := DoPIMRoleRulesExist
-
 #
 # MS.AAD.7.1v1
 #--
@@ -795,7 +779,6 @@ PrivilegedRoleExclusions(PrivilegedRole, PolicyID) := true if {
 
 PrivilegedRolesWithoutExpirationPeriod[Role.DisplayName] {
     Role := input.privileged_roles[_]
-
     PrivilegedRoleExclusions(Role, "MS.AAD.7.4v1") == true
 }
 
@@ -808,9 +791,9 @@ tests[{
     "RequirementMet" : Status
 }] {
     DescriptionString := "role(s) that contain users with permanent active assignment"
-    Status := count(PrivilegedRolesWithoutExpirationPeriod) == 0
+    Conditions := [count(Aad2P2Licenses) > 0, count(PrivilegedRolesWithoutExpirationPeriod) == 0]
+    Status := count([Condition | Condition := Conditions[_]; Condition == false]) == 0
 }
-#--
 
 #
 # MS.AAD.7.5v1
@@ -831,8 +814,8 @@ tests[{
     "RequirementMet" : Status
 }] {
     DescriptionString := "role(s) assigned to users outside of PIM"
-    Conditions := [count(RolesAssignedOutsidePim) == 0, check_if_role_rules_exist]
-    Status := count([Condition | Condition = Conditions[_]; Condition == false]) == 0
+    Conditions := [count(Aad2P2Licenses) > 0, count(RolesAssignedOutsidePim) == 0]
+    Status := count([Condition | Condition := Conditions[_]; Condition == false]) == 0
 }
 #--
 
@@ -850,15 +833,15 @@ RolesWithoutApprovalRequired[RoleName] {
 
 tests[{
     "PolicyId" : "MS.AAD.7.6v1",
-    "Criticality" : "Should",
+    "Criticality" : "Shall",
     "Commandlet" : ["Get-MgBetaSubscribedSku", "Get-PrivilegedRole"],
     "ActualValue" : RolesWithoutApprovalRequired,
     "ReportDetails" : ReportDetailsBooleanLicenseWarning(Status),
     "RequirementMet" : Status
 }] {
     ApprovalNotRequired := "Global Administrator" in RolesWithoutApprovalRequired
-    Conditions := [ApprovalNotRequired == false, check_if_role_rules_exist]
-    Status := count([Condition | Condition = Conditions[_]; Condition == false]) == 0
+    Conditions := [count(Aad2P2Licenses) > 0, ApprovalNotRequired == false]
+    Status := count([Condition | Condition := Conditions[_]; Condition == false]) == 0
 }
 #--
 
@@ -893,8 +876,8 @@ tests[{
 }] {
     DescriptionString := "role(s) without notification e-mail configured for role assignments found"
     RolesWithoutAssignmentAlerts := RolesWithoutActiveAssignmentAlerts | RolesWithoutEligibleAssignmentAlerts
-    Conditions := [count(RolesWithoutAssignmentAlerts) == 0, check_if_role_rules_exist]
-    Status := count([Condition | Condition = Conditions[_]; Condition == false]) == 0
+    Conditions := [count(Aad2P2Licenses) > 0, count(RolesWithoutAssignmentAlerts) == 0]
+    Status := count([Condition | Condition := Conditions[_]; Condition == false]) == 0
 }
 #--
 
@@ -920,8 +903,8 @@ tests[{
     "RequirementMet" : Status
 }] {
     GlobalAdminNotMonitored := "Global Administrator" in AdminsWithoutActivationAlert
-    Conditions := [GlobalAdminNotMonitored == false, check_if_role_rules_exist]
-    Status := count([Condition | Condition = Conditions[_]; Condition == false]) == 0
+    Conditions := [count(Aad2P2Licenses) > 0, GlobalAdminNotMonitored == false]
+    Status := count([Condition | Condition := Conditions[_]; Condition == false]) == 0
 }
 #--
 
@@ -938,8 +921,8 @@ tests[{
 }] {
     DescriptionString := "role(s) without notification e-mail configured for role activations found"
     NonGlobalAdminsWithoutActivationAlert = AdminsWithoutActivationAlert - {"Global Administrator"}
-    Conditions := [count(NonGlobalAdminsWithoutActivationAlert) == 0, check_if_role_rules_exist]
-    Status := count([Condition | Condition = Conditions[_]; Condition == false]) == 0
+    Conditions := [count(Aad2P2Licenses) > 0, count(NonGlobalAdminsWithoutActivationAlert) == 0]
+    Status := count([Condition | Condition := Conditions[_]; Condition == false]) == 0
 }
 #--
 
