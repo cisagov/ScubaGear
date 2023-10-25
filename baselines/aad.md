@@ -122,7 +122,7 @@ Sign-ins detected as high risk SHALL be blocked.
 
 ### License Requirements
 
-- Requires an AAD P2 license
+- Requires a Microsoft Entra ID P2 license
 
 ### Implementation
 
@@ -448,7 +448,7 @@ Group owners SHALL NOT be allowed to consent to applications.
 
 1.  In **Azure Active Directory** under **Manage**, select **Enterprise Applications.**
 
-2. Under **Security**, select **Consent and permissions.**
+2. Under **Security**, select **Consent and permissions.** Then select **User Consent Settings.**
 
 3. Under **User consent for applications**, select **Do not allow user consent.**
 
@@ -600,7 +600,7 @@ User activation of other highly privileged roles SHOULD trigger an alert.
 
 - Azure AD PIM or an equivalent third-party PAM service.
 
-- Azure AD PIM requires an AAD P2 license.
+- Azure AD PIM requires a Microsoft Entra ID P2 license.
 
 ### Implementation
 
