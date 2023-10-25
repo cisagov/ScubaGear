@@ -233,6 +233,7 @@ Describe "Policy Checks for <ProductName>"{
             It "Check test case results" -Tag $PolicyId {
 
                 #Check intermediate output
+                ($PolicyResultObj.RequirementMet).Count | Should -BeExactly 1 -Because "only expect a single result for a policy"
                 $PolicyResultObj.RequirementMet | Should -Be $ExpectedResult
 
                 $Details = $PolicyResultObj.ReportDetails
