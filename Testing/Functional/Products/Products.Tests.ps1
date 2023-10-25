@@ -87,7 +87,13 @@ param (
     [Parameter(Mandatory = $false)]
     [ValidateNotNullOrEmpty()]
     [string]
-    $M365Environment = 'gcc'
+    $M365Environment = 'gcc',
+    [Parameter(ParameterSetName = 'Auto')]
+    [Parameter(ParameterSetName = 'Manual')]
+    [Parameter(Mandatory = $false)]
+    [ValidateNotNull()]
+    [string]
+    $Variant = [string]::Empty
 )
 
 $ScubaModulePath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules"
@@ -98,7 +104,13 @@ Import-Module $ConnectionModule
 Import-Module Selenium
 
 BeforeDiscovery{
-    $TestPlanPath = Join-Path -Path $PSScriptRoot -ChildPath "TestPlans/$ProductName.testplan.yaml"
+    if ($Variant) {
+        $TestPlanFileName = "TestPlans/$ProductName.$Variant.testplan.yaml"
+    }
+    else {
+        $TestPlanFileName = "TestPlans/$ProductName.testplan.yaml"
+    }
+    $TestPlanPath = Join-Path -Path $PSScriptRoot -ChildPath $TestPlanFileName
     Test-Path -Path $TestPlanPath -PathType Leaf
 
     $YamlString = Get-Content -Path $TestPlanPath | Out-String
@@ -122,7 +134,6 @@ BeforeDiscovery{
         }
 
         if (-Not [string]::IsNullOrEmpty($AppId)){
-            Write-Debug "Auto Connect to Tenant"
             $ServicePrincipalParams = @{CertThumbprintParams = @{
                 CertificateThumbprint = $Thumbprint;
                 AppID = $AppId;
@@ -265,6 +276,7 @@ Describe "Policy Checks for <ProductName>"{
             It "Check test case results" -Tag $PolicyId {
 
                 #Check intermediate output
+                ($PolicyResultObj.RequirementMet).Count | Should -BeExactly 1 -Because "only expect a single result for a policy"
                 $PolicyResultObj.RequirementMet | Should -Be $ExpectedResult
 
                 $Details = $PolicyResultObj.ReportDetails
