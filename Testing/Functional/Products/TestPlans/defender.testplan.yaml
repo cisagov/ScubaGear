@@ -197,17 +197,17 @@ TestPlan:
           - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect $null}'
         Postconditions: []
         ExpectedResult: false
+      - TestDescription: MS.DEFENDER.2.3v1 Non-compliant - All domains No list of domains in config
+        Preconditions:
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect $null}'
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect $null}'
+        Postconditions: []
+        ExpectedResult: false
       - TestDescription: MS.DEFENDER.2.3v1 Compliant - All Listed are protected
         ConfigFileName: PartnerDomainList.yaml
         Preconditions:
           - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect "goodparnter.com"}'
           - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect "goodparnter.com"}'
-        Postconditions: []
-        ExpectedResult: true
-      - TestDescription: MS.DEFENDER.2.3v1 Compliant - All domains No list
-        Preconditions:
-          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect $null}'
-          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect $null}'
         Postconditions: []
         ExpectedResult: true
 

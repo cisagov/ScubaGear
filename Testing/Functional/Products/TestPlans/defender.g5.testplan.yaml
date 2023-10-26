@@ -120,9 +120,9 @@ TestPlan:
           - Command: Enable-ATPProtectionPolicyRule
             Splat:
               Identity: Strict Preset Security Policy
-              Confirm: true
+              Confirm: false
         Postconditions: []
-        ExpectedResult: false
+        ExpectedResult: true
       - TestDescription: MS.DEFENDER.1.1v1 Compliant -- Std EOP Disabled, ATP Enabled; Strict EOP Enabled, ATP Disabled
         Preconditions:
           - Command: Disable-EOPProtectionPolicyRule
@@ -140,9 +140,9 @@ TestPlan:
           - Command: Disable-ATPProtectionPolicyRule
             Splat:
               Identity: Strict Preset Security Policy
-              Confirm: true
+              Confirm: false
         Postconditions: []
-        ExpectedResult: false
+        ExpectedResult: true
       - TestDescription: MS.DEFENDER.1.1v1 Compliant -- Std EOP Disabled, ATP Enabled; Strict EOP Enabled, ATP Enabled
         Preconditions:
           - Command: Disable-EOPProtectionPolicyRule
@@ -200,9 +200,9 @@ TestPlan:
           - Command: Enable-ATPProtectionPolicyRule
             Splat:
               Identity: Strict Preset Security Policy
-              Confirm: true
+              Confirm: false
         Postconditions: []
-        ExpectedResult: false
+        ExpectedResult: true
       - TestDescription: MS.DEFENDER.1.1v1 Compliant -- Std EOP Enabled, ATP Disabled; Strict EOP Enabled, ATP Disabled
         Preconditions:
           - Command: Enable-EOPProtectionPolicyRule
@@ -220,9 +220,9 @@ TestPlan:
           - Command: Disable-ATPProtectionPolicyRule
             Splat:
               Identity: Strict Preset Security Policy
-              Confirm: true
+              Confirm: false
         Postconditions: []
-        ExpectedResult: false
+        ExpectedResult: true
       - TestDescription: MS.DEFENDER.1.1v1 Compliant -- Std EOP Enabled, ATP Disabled; Strict EOP Enabled, ATP Enabled
         Preconditions:
           - Command: Enable-EOPProtectionPolicyRule
@@ -240,9 +240,9 @@ TestPlan:
           - Command: Enable-ATPProtectionPolicyRule
             Splat:
               Identity: Strict Preset Security Policy
-              Confirm: true
+              Confirm: false
         Postconditions: []
-        ExpectedResult: false
+        ExpectedResult: true
       - TestDescription: MS.DEFENDER.1.1v1 Non-compliant -- Std EOP Enabled, ATP Enabled; Strict EOP Disabled, ATP Disabled
         Preconditions:
           - Command: Enable-EOPProtectionPolicyRule
@@ -280,9 +280,9 @@ TestPlan:
           - Command: Enable-ATPProtectionPolicyRule
             Splat:
               Identity: Strict Preset Security Policy
-              Confirm: true
+              Confirm: false
         Postconditions: []
-        ExpectedResult: false
+        ExpectedResult: true
       - TestDescription: MS.DEFENDER.1.1v1 Compliant -- Std EOP Enable, ATP Enable; Strict EOP Enable, ATP Disabled
         Preconditions:
           - Command: Enable-EOPProtectionPolicyRule
@@ -380,7 +380,7 @@ TestPlan:
             Splat:
               Identity: Strict Preset Security Policy
               Confirm: false
-          - Command: 'Set-ATPProtectionPolicyRule -Identity "Strict Preset Security Policy" -SentTo `0 -SentToMemberOf `0 -RecipientDomainIs badpeople.r.us -Confirm:$false'
+          - Command: 'Set-ATPProtectionPolicyRule -Identity "Strict Preset Security Policy" -SentTo $null -SentToMemberOf $null -RecipientDomainIs badpeople.r.us -Confirm:$false'
         Postconditions: []
         ExpectedResult: true
 
