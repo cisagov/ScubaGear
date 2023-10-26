@@ -110,7 +110,7 @@ Sensitive accounts SHALL be added to Defender for Office 365 Protection in the s
 
 ### License Requirements
 
-- N/A
+- Defender for Office 365 capabilities require Defender for Office 365 Plan 1 or 2. These are included with E5 and G5 and are available as add-ons for E3 and G3.
 
 ### Implementation
 
