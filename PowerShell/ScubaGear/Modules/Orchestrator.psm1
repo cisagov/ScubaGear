@@ -187,7 +187,7 @@ function Invoke-SCuBA {
         [ValidateNotNullOrEmpty()]
         [ValidateScript({
             if (-Not ($_ | Test-Path)){
-                throw "SCuBA configuration file or folder does not exist."
+                throw "SCuBA configuration file or folder does not exist. $_"
             }
             if (-Not ($_ | Test-Path -PathType Leaf)){
                 throw "SCuBA configuration Path argument must be a file."
@@ -202,6 +202,7 @@ function Invoke-SCuBA {
         [switch]
         $DarkMode,
 
+        [Parameter(Mandatory = $false, ParameterSetName = 'Configuration')]
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [switch]
         $Quiet
@@ -249,6 +250,12 @@ function Invoke-SCuBA {
             }
             else {
                 $ScubaConfig = [ScubaConfig]::GetInstance().Configuration
+            }
+
+            if ($ScubaConfig.AppID){
+                $PSBoundParameters.Add("AppID", $ScubaConfig.AppID)
+                $PSBoundParameters.Add("CertificateThumbprint", $ScubaConfig.CertificateThumbprint)
+                $PSBoundParameters.Add("Organization", $ScubaConfig.Organization)
             }
         }
 
