@@ -118,7 +118,7 @@ tests[{
 }] {
     Policy := input.SPO_tenant[_]
     Conditions := [Policy.SharingCapability == 0, Policy.RequireAcceptingAccountMatchInvitedAccount == true]
-    Status := count([Condition | Condition = Conditions[_]; Condition == true]) == 1
+    Status := count([Condition | Condition = Conditions[_]; Condition == true]) >= 1
 }
 #--
 
