@@ -1,0 +1,1491 @@
+ProductName: defender
+TestPlan:
+  - PolicyId: MS.DEFENDER.1.2v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.DEFENDER.1.2v1 Non-compliant - std&strict SentTo Non-null, SentToMemberOf Non-null, RecipientDomainIs Non-null
+        Preconditions:
+          - Command: 'Set-EOPProtectionPolicyRule -Identity "Standard Preset Security Policy" -SentTo (Get-MailUser)[0].UserPrincipalName -SentToMemberOf (Get-UnifiedGroup)[0].alias -RecipientDomainIs badpeople.r.us -Confirm:$false'
+          - Command: 'Set-EOPProtectionPolicyRule -Identity "Strict Preset Security Policy" -SentTo (Get-MailUser)[0].UserPrincipalName -SentToMemberOf (Get-UnifiedGroup)[0].alias -RecipientDomainIs badpeople.r.us -Confirm:$false'
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.1.2v1 Compliant - Std Non-null Strict Null
+        Preconditions:
+          - Command: 'Set-EOPProtectionPolicyRule -Identity "Standard Preset Security Policy" -SentTo (Get-MailUser)[0].UserPrincipalName -SentToMemberOf (Get-UnifiedGroup)[0].alias -RecipientDomainIs badpeople.r.us -Confirm:$false'
+          - Command: Set-EOPProtectionPolicyRule
+            Splat:
+              Identity: Strict Preset Security Policy
+              SentTo: null
+              SentToMemberOf: null
+              RecipientDomainIs: null
+              Confirm: false
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.DEFENDER.1.2v1 Compliant - Std Null Strict Non-null
+        Preconditions:
+          - Command: Set-EOPProtectionPolicyRule
+            Splat:
+              Identity: Standard Preset Security Policy
+              SentTo: null
+              SentToMemberOf: null
+              RecipientDomainIs: null
+              Confirm: false
+          - Command: 'Set-EOPProtectionPolicyRule -Identity "Strict Preset Security Policy" -SentTo (Get-MailUser)[0].UserPrincipalName -SentToMemberOf (Get-UnifiedGroup)[0].alias -RecipientDomainIs badpeople.r.us -Confirm:$false'
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.DEFENDER.1.2v1 Compliant - std&strict SentTo Null, SentToMemberOf Null, RecipientDomainIs Null
+        Preconditions:
+          - Command: Set-EOPProtectionPolicyRule
+            Splat:
+              Identity: Standard Preset Security Policy
+              SentTo: null
+              SentToMemberOf: null
+              RecipientDomainIs: null
+              Confirm: false
+          - Command: Set-EOPProtectionPolicyRule
+            Splat:
+              Identity: Strict Preset Security Policy
+              SentTo: null
+              SentToMemberOf: null
+              RecipientDomainIs: null
+              Confirm: false
+        Postconditions: []
+        ExpectedResult: true
+
+  - PolicyId: MS.DEFENDER.1.4v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.DEFENDER.1.4v1 Non-compliant Strict Preset Security Policy Disabled
+        Preconditions:
+          - Command: Disable-EOPProtectionPolicyRule
+            Splat:
+              Identity: Strict Preset Security Policy
+              Confirm: false
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.1.4v1 Non-compliant Mismatched Recipient Domains
+        ConfigFileName: MismatchedRecipientDomain.yaml
+        Preconditions:
+          - Command: Enable-EOPProtectionPolicyRule
+            Splat:
+              Identity: Strict Preset Security Policy
+              Confirm: false
+          - Command: 'Set-EOPProtectionPolicyRule -Identity "Strict Preset Security Policy" -SentTo (Get-MailUser)[0].UserPrincipalName -SentToMemberOf (Get-UnifiedGroup)[0].alias -RecipientDomainIs badpeople.r.us -Confirm:$false'
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.1.4v1 Non-compliant Mismatched User
+        ConfigFileName: MismatchedUser.yaml
+        Preconditions:
+          - Command: Enable-EOPProtectionPolicyRule
+            Splat:
+              Identity: Strict Preset Security Policy
+              Confirm: false
+          - Command: 'Set-EOPProtectionPolicyRule -Identity "Strict Preset Security Policy" -SentTo (Get-MailUser)[0].UserPrincipalName -SentToMemberOf (Get-UnifiedGroup)[0].alias -RecipientDomainIs badpeople.r.us -Confirm:$false'
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.1.4v1 Non-compliant Mismatched Group
+        ConfigFileName: MismatchedGroup.yaml
+        Preconditions:
+          - Command: Enable-EOPProtectionPolicyRule
+            Splat:
+              Identity: Strict Preset Security Policy
+              Confirm: false
+          - Command: 'Set-EOPProtectionPolicyRule -Identity "Strict Preset Security Policy" -SentTo (Get-MailUser)[0].UserPrincipalName -SentToMemberOf (Get-UnifiedGroup)[0].alias -RecipientDomainIs badpeople.r.us -Confirm:$false'
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.1.4v1 Compliant Matched Recipient Domains
+        ConfigFileName: MatchedRecipientDomain.yaml
+        Preconditions:
+          - Command: Enable-EOPProtectionPolicyRule
+            Splat:
+              Identity: Strict Preset Security Policy
+              Confirm: false
+          - Command: Set-EOPProtectionPolicyRule
+            Splat:
+              Identity: Strict Preset Security Policy
+              SentTo: null
+              SentToMemberOf: null
+              RecipientDomainIs:
+                - badpeople.r.us
+              Confirm: false
+        Postconditions: []
+        ExpectedResult: true
+
+  - PolicyId: MS.DEFENDER.2.1v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.DEFENDER.2.1v1 Non-compliant - Sensitive user not listed
+        ConfigFileName: MismatchedUser.yaml
+        Preconditions:
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedUsersToProtect $null}'
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedUsersToProtect $null}'
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.2.1v1 Non-compliant - Sensitive user partial coverage
+        ConfigFileName: MatchedUser.yaml
+        Preconditions:
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedUsersToProtect "AgencyUserGlobalReader;AgencyUserGlobalReader@y2zj1.onmicrosoft.com"}'
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedUsersToProtect $null}'
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.2.1v1 Compliant - All Listed sensitive users (mix-cased) are protected
+        ConfigFileName: MatchedWithMixedCase.yaml
+        Preconditions:
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedUsersToProtect "AgencyUserGlobalReader;AgencyUserGlobalReader@y2zj1.onmicrosoft.com"}'
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedUsersToProtect "AgencyUserGlobalReader;AgencyUserGlobalReader@y2zj1.onmicrosoft.com"}'
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.DEFENDER.2.1v1 Compliant - All Listed sensitive users are protected
+        ConfigFileName: MatchedUser.yaml
+        Preconditions:
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedUsersToProtect "AgencyUserGlobalReader;AgencyUserGlobalReader@y2zj1.onmicrosoft.com"}'
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedUsersToProtect "AgencyUserGlobalReader;AgencyUserGlobalReader@y2zj1.onmicrosoft.com"}'
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.DEFENDER.2.1v1 Compliant - No sensitive users identified but all users covered
+        Preconditions:
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedUsersToProtect "AgencyUserGlobalReader;AgencyUserGlobalReader@y2zj1.onmicrosoft.com"}'
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedUsersToProtect "AgencyUserGlobalReader;AgencyUserGlobalReader@y2zj1.onmicrosoft.com"}'
+        Postconditions: []
+        ExpectedResult: true
+
+  - PolicyId: MS.DEFENDER.2.2v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.DEFENDER.2.2v1 Non-compliant - Agency domain not listed
+        ConfigFileName: AgencyDomainList.yaml
+        Preconditions:
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect $null}'
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect $null}'
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.2.2v1 Non-compliant - Agency domain partial coverage
+        ConfigFileName: AgencyDomainList.yaml
+        Preconditions:
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect "goodguys.com"}'
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect $null}'
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.2.2v1 Non-compliant - All domains No list
+        Preconditions:
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect $null}'
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect $null}'
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.2.2v1 Compliant - All Listed are protected
+        ConfigFileName: AgencyDomainList.yaml
+        Preconditions:
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect "goodguys.com"}'
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect "goodguys.com"}'
+        Postconditions: []
+        ExpectedResult: true
+
+  - PolicyId: MS.DEFENDER.2.3v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.DEFENDER.2.3v1 Non-compliant - Agency domain not listed
+        ConfigFileName: PartnerDomainList.yaml
+        Preconditions:
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect $null}'
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect $null}'
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.2.3v1 Non-compliant - Agency domain partial coverage
+        ConfigFileName: PartnerDomainList.yaml
+        Preconditions:
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect "goodparnter.com"}'
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect $null}'
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.2.3v1 Non-compliant - All domains No list of domains in config
+        Preconditions:
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect $null}'
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect $null}'
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.2.3v1 Compliant - All Listed are protected
+        ConfigFileName: PartnerDomainList.yaml
+        Preconditions:
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect "goodparnter.com"}'
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect "goodparnter.com"}'
+        Postconditions: []
+        ExpectedResult: true
+
+  - PolicyId: MS.DEFENDER.4.1v1
+    TestDriver: RunCached
+    Tests:
+      - TestDescription: MS.DEFENDER.4.1v1 Compliant case - Advanced Rule
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                dlp_compliance_policies:
+                  - Name: "Default Office 365 DLP policy"
+                    Enabled: true
+                    Mode: "Enable"
+                dlp_compliance_rules:
+                  - Name: "Test Rule"
+                    ParentPolicyName: "Default Office 365 DLP policy"
+                    ContentContainsSensitiveInformation: null
+                    AdvancedRule: '{"Version": "1.0", "Condition": { "Operator": "And", "SubConditions": [ { "ConditionName": "ContentContainsSensitiveInformation", "Value": [ { "Groups": [ { "Name": "Default", "Operator": "Or", "Sensitivetypes": [ { "Name": "Credit Card Number", "Id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "High", "Minconfidence": 85, "Maxconfidence": 100 }, { "Name": "U.S. Individual Taxpayer Identification Number (ITIN)", "Id": "e55e2a32-f92d-4985-a35d-a0b269eb687b", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 }, { "Name": "U.S. Social Security Number (SSN)", "Id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 } ] } ], "Operator": "And" } ] } ] } }'
+                    IsAdvancedRule: true
+                    Disabled: false
+                    BlockAccess: true
+                    BlockAccessScope: "All"
+                    NotifyUser: ["SiteAdmin", "LastModifier", "Owner"]
+                    NotifyUserType: "NotSet"
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.DEFENDER.4.1v1 Compliant case - Not Advanced Rule
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                dlp_compliance_policies:
+                  - Name: "Default Office 365 DLP policy"
+                    Enabled: true
+                    Mode: "Enable"
+                dlp_compliance_rules:
+                  - Name: "Test Rule"
+                    ParentPolicyName: "Default Office 365 DLP policy"
+                    ContentContainsSensitiveInformation:
+                      - name: "U.S. Social Security Number (SSN)"
+                        maxCount: "-1"
+                      - name: "U.S. Individual Taxpayer Identification Number (ITIN)"
+                        maxCount: "-1"
+                      - name: "Credit Card Number"
+                        maxCount: "-1"
+                    AdvancedRule: '{"Version": "1.0", "Condition": { "Operator": "And", "SubConditions": [ { "ConditionName": "ContentContainsSensitiveInformation", "Value": [ { "Groups": [ { "Name": "Default", "Operator": "Or", "Sensitivetypes": [ { "Name": "Credit Card Number", "Id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "High", "Minconfidence": 85, "Maxconfidence": 100 }, { "Name": "U.S. Individual Taxpayer Identification Number (ITIN)", "Id": "e55e2a32-f92d-4985-a35d-a0b269eb687b", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 }, { "Name": "U.S. Social Security Number (SSN)", "Id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 } ] } ], "Operator": "And" } ] } ] } }'
+                    IsAdvancedRule: false
+                    Disabled: false
+                    BlockAccess: true
+                    BlockAccessScope: "All"
+                    NotifyUser: ["SiteAdmin", "LastModifier", "Owner"]
+                    NotifyUserType: "NotSet"
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.DEFENDER.4.1v1 Non-Compliant case - Advanced Rule, Disabled
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                dlp_compliance_policies:
+                  - Name: "Default Office 365 DLP policy"
+                    Enabled: true
+                    Mode: "Enable"
+                dlp_compliance_rules:
+                  - Name: "Test Rule"
+                    ParentPolicyName: "Default Office 365 DLP policy"
+                    ContentContainsSensitiveInformation: null
+                    AdvancedRule: '{"Version": "1.0", "Condition": { "Operator": "And", "SubConditions": [ { "ConditionName": "ContentContainsSensitiveInformation", "Value": [ { "Groups": [ { "Name": "Default", "Operator": "Or", "Sensitivetypes": [ { "Name": "Credit Card Number", "Id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "High", "Minconfidence": 85, "Maxconfidence": 100 }, { "Name": "U.S. Individual Taxpayer Identification Number (ITIN)", "Id": "e55e2a32-f92d-4985-a35d-a0b269eb687b", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 }, { "Name": "U.S. Social Security Number (SSN)", "Id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 } ] } ], "Operator": "And" } ] } ] } }'
+                    IsAdvancedRule: true
+                    Disabled: true
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.4.1v1 Non-Compliant case - Not Advanced Rule, Disabled
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                dlp_compliance_policies:
+                  - Name: "Default Office 365 DLP policy"
+                    Enabled: true
+                    Mode: "Enable"
+                dlp_compliance_rules:
+                  - Name: "Test Rule"
+                    ParentPolicyName: "Default Office 365 DLP policy"
+                    ContentContainsSensitiveInformation:
+                      - name: "U.S. Social Security Number (SSN)"
+                        maxCount: "-1"
+                      - name: "U.S. Individual Taxpayer Identification Number (ITIN)"
+                        maxCount: "-1"
+                      - name: "Credit Card Number"
+                        maxCount: "-1"
+                    AdvancedRule: '{"Version": "1.0", "Condition": { "Operator": "And", "SubConditions": [ { "ConditionName": "ContentContainsSensitiveInformation", "Value": [ { "Groups": [ { "Name": "Default", "Operator": "Or", "Sensitivetypes": [ { "Name": "Credit Card Number", "Id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "High", "Minconfidence": 85, "Maxconfidence": 100 }, { "Name": "U.S. Individual Taxpayer Identification Number (ITIN)", "Id": "e55e2a32-f92d-4985-a35d-a0b269eb687b", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 }, { "Name": "U.S. Social Security Number (SSN)", "Id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 } ] } ], "Operator": "And" } ] } ] } }'
+                    IsAdvancedRule: false
+                    Disabled: true
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.4.1v1 Non-Compliant case - Advanced Rule, Enabled
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                dlp_compliance_policies:
+                  - Name: "Default Office 365 DLP policy"
+                    Enabled: false
+                    Mode: "Enable"
+                dlp_compliance_rules:
+                  - Name: "Test Rule"
+                    ParentPolicyName: "Default Office 365 DLP policy"
+                    ContentContainsSensitiveInformation: null
+                    AdvancedRule: '{"Version": "1.0", "Condition": { "Operator": "And", "SubConditions": [ { "ConditionName": "ContentContainsSensitiveInformation", "Value": [ { "Groups": [ { "Name": "Default", "Operator": "Or", "Sensitivetypes": [ { "Name": "Credit Card Number", "Id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "High", "Minconfidence": 85, "Maxconfidence": 100 }, { "Name": "U.S. Individual Taxpayer Identification Number (ITIN)", "Id": "e55e2a32-f92d-4985-a35d-a0b269eb687b", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 }, { "Name": "U.S. Social Security Number (SSN)", "Id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 } ] } ], "Operator": "And" } ] } ] } }'
+                    IsAdvancedRule: true
+                    Disabled: false
+                    BlockAccess: true
+                    BlockAccessScope: "All"
+                    NotifyUser: ["SiteAdmin", "LastModifier", "Owner"]
+                    NotifyUserType: "NotSet"
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.4.1v1 Non-Compliant case - Not Advanced Rule, Enabled
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                dlp_compliance_policies:
+                  - Name: "Default Office 365 DLP policy"
+                    Enabled: false
+                    Mode: "Enable"
+                dlp_compliance_rules:
+                  - Name: "Test Rule"
+                    ParentPolicyName: "Default Office 365 DLP policy"
+                    ContentContainsSensitiveInformation:
+                      - name: "U.S. Social Security Number (SSN)"
+                        maxCount: "-1"
+                      - name: "U.S. Individual Taxpayer Identification Number (ITIN)"
+                        maxCount: "-1"
+                      - name: "Credit Card Number"
+                        maxCount: "-1"
+                    AdvancedRule: '{"Version": "1.0", "Condition": { "Operator": "And", "SubConditions": [ { "ConditionName": "ContentContainsSensitiveInformation", "Value": [ { "Groups": [ { "Name": "Default", "Operator": "Or", "Sensitivetypes": [ { "Name": "Credit Card Number", "Id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "High", "Minconfidence": 85, "Maxconfidence": 100 }, { "Name": "U.S. Individual Taxpayer Identification Number (ITIN)", "Id": "e55e2a32-f92d-4985-a35d-a0b269eb687b", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 }, { "Name": "U.S. Social Security Number (SSN)", "Id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 } ] } ], "Operator": "And" } ] } ] } }'
+                    IsAdvancedRule: false
+                    Disabled: false
+                    BlockAccess: true
+                    BlockAccessScope: "All"
+                    NotifyUser: ["SiteAdmin", "LastModifier", "Owner"]
+                    NotifyUserType: "NotSet"
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.4.1v1 Non-Compliant case - Advanced Rule, Mode
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                dlp_compliance_policies:
+                  - Name: "Default Office 365 DLP policy"
+                    Enabled: true
+                    Mode: "Disable"
+                dlp_compliance_rules:
+                  - Name: "Test Rule"
+                    ParentPolicyName: "Default Office 365 DLP policy"
+                    ContentContainsSensitiveInformation: null
+                    AdvancedRule: '{"Version": "1.0", "Condition": { "Operator": "And", "SubConditions": [ { "ConditionName": "ContentContainsSensitiveInformation", "Value": [ { "Groups": [ { "Name": "Default", "Operator": "Or", "Sensitivetypes": [ { "Name": "Credit Card Number", "Id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "High", "Minconfidence": 85, "Maxconfidence": 100 }, { "Name": "U.S. Individual Taxpayer Identification Number (ITIN)", "Id": "e55e2a32-f92d-4985-a35d-a0b269eb687b", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 }, { "Name": "U.S. Social Security Number (SSN)", "Id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 } ] } ], "Operator": "And" } ] } ] } }'
+                    IsAdvancedRule: true
+                    Disabled: false
+                    BlockAccess: true
+                    BlockAccessScope: "All"
+                    NotifyUser: ["SiteAdmin", "LastModifier", "Owner"]
+                    NotifyUserType: "NotSet"
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.4.1v1 Non-Compliant case - Not Advanced Rule, Mode
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                dlp_compliance_policies:
+                  - Name: "Default Office 365 DLP policy"
+                    Enabled: true
+                    Mode: "Disable"
+                dlp_compliance_rules:
+                  - Name: "Test Rule"
+                    ParentPolicyName: "Default Office 365 DLP policy"
+                    ContentContainsSensitiveInformation:
+                      - name: "U.S. Social Security Number (SSN)"
+                        maxCount: "-1"
+                      - name: "U.S. Individual Taxpayer Identification Number (ITIN)"
+                        maxCount: "-1"
+                      - name: "Credit Card Number"
+                        maxCount: "-1"
+                    AdvancedRule: '{"Version": "1.0", "Condition": { "Operator": "And", "SubConditions": [ { "ConditionName": "ContentContainsSensitiveInformation", "Value": [ { "Groups": [ { "Name": "Default", "Operator": "Or", "Sensitivetypes": [ { "Name": "Credit Card Number", "Id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "High", "Minconfidence": 85, "Maxconfidence": 100 }, { "Name": "U.S. Individual Taxpayer Identification Number (ITIN)", "Id": "e55e2a32-f92d-4985-a35d-a0b269eb687b", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 }, { "Name": "U.S. Social Security Number (SSN)", "Id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 } ] } ], "Operator": "And" } ] } ] } }'
+                    IsAdvancedRule: false
+                    Disabled: false
+                    BlockAccess: true
+                    BlockAccessScope: "All"
+                    NotifyUser: ["SiteAdmin", "LastModifier", "Owner"]
+                    NotifyUserType: "NotSet"
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.4.1v1 Non-Compliant case - Advanced Rule, Missing U.S. Social Security Number (SSN)
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                dlp_compliance_policies:
+                  - Name: "Default Office 365 DLP policy"
+                    Enabled: true
+                    Mode: "Enable"
+                dlp_compliance_rules:
+                  - Name: "Test Rule"
+                    ParentPolicyName: "Default Office 365 DLP policy"
+                    ContentContainsSensitiveInformation: null
+                    AdvancedRule: '{"Version": "1.0", "Condition": { "Operator": "And", "SubConditions": [ { "ConditionName": "ContentContainsSensitiveInformation", "Value": [ { "Groups": [ { "Name": "Default", "Operator": "Or", "Sensitivetypes": [ { "Name": "Credit Card Number", "Id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "High", "Minconfidence": 85, "Maxconfidence": 100 }, { "Name": "U.S. Individual Taxpayer Identification Number (ITIN)", "Id": "e55e2a32-f92d-4985-a35d-a0b269eb687b", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 } ] } ], "Operator": "And" } ] } ] } }'
+                    IsAdvancedRule: true
+                    Disabled: false
+                    BlockAccess: true
+                    BlockAccessScope: "All"
+                    NotifyUser: ["SiteAdmin", "LastModifier", "Owner"]
+                    NotifyUserType: "NotSet"
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.4.1v1 Non-Compliant case - Not Advanced Rule, Missing U.S. Social Security Number (SSN)
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                dlp_compliance_policies:
+                  - Name: "Default Office 365 DLP policy"
+                    Enabled: true
+                    Mode: "Enable"
+                dlp_compliance_rules:
+                  - Name: "Test Rule"
+                    ParentPolicyName: "Default Office 365 DLP policy"
+                    ContentContainsSensitiveInformation:
+                      - name: "U.S. Individual Taxpayer Identification Number (ITIN)"
+                        maxCount: "-1"
+                      - name: "Credit Card Number"
+                        maxCount: "-1"
+                    AdvancedRule: '{"Version": "1.0", "Condition": { "Operator": "And", "SubConditions": [ { "ConditionName": "ContentContainsSensitiveInformation", "Value": [ { "Groups": [ { "Name": "Default", "Operator": "Or", "Sensitivetypes": [ { "Name": "Credit Card Number", "Id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "High", "Minconfidence": 85, "Maxconfidence": 100 }, { "Name": "U.S. Individual Taxpayer Identification Number (ITIN)", "Id": "e55e2a32-f92d-4985-a35d-a0b269eb687b", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 }, { "Name": "U.S. Social Security Number (SSN)", "Id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 } ] } ], "Operator": "And" } ] } ] } }'
+                    IsAdvancedRule: false
+                    Disabled: false
+                    BlockAccess: true
+                    BlockAccessScope: "All"
+                    NotifyUser: ["SiteAdmin", "LastModifier", "Owner"]
+                    NotifyUserType: "NotSet"
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.4.1v1 Non-Compliant case - Advanced Rule, Missing U.S. Individual Taxpayer Identification Number (ITIN)
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                dlp_compliance_policies:
+                  - Name: "Default Office 365 DLP policy"
+                    Enabled: true
+                    Mode: "Enable"
+                dlp_compliance_rules:
+                  - Name: "Test Rule"
+                    ParentPolicyName: "Default Office 365 DLP policy"
+                    ContentContainsSensitiveInformation: null
+                    AdvancedRule: '{"Version": "1.0", "Condition": { "Operator": "And", "SubConditions": [ { "ConditionName": "ContentContainsSensitiveInformation", "Value": [ { "Groups": [ { "Name": "Default", "Operator": "Or", "Sensitivetypes": [ { "Name": "Credit Card Number", "Id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "High", "Minconfidence": 85, "Maxconfidence": 100 }, { "Name": "U.S. Social Security Number (SSN)", "Id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 } ] } ], "Operator": "And" } ] } ] } }'
+                    IsAdvancedRule: true
+                    Disabled: false
+                    BlockAccess: true
+                    BlockAccessScope: "All"
+                    NotifyUser: ["SiteAdmin", "LastModifier", "Owner"]
+                    NotifyUserType: "NotSet"
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.4.1v1 Non-Compliant case - Not Advanced Rule, Missing U.S. Individual Taxpayer Identification Number (ITIN)
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                dlp_compliance_policies:
+                  - Name: "Default Office 365 DLP policy"
+                    Enabled: true
+                    Mode: "Enable"
+                dlp_compliance_rules:
+                  - Name: "Test Rule"
+                    ParentPolicyName: "Default Office 365 DLP policy"
+                    ContentContainsSensitiveInformation:
+                      - name: "U.S. Social Security Number (SSN)"
+                        maxCount: "-1"
+                      - name: "Credit Card Number"
+                        maxCount: "-1"
+                    AdvancedRule: '{"Version": "1.0", "Condition": { "Operator": "And", "SubConditions": [ { "ConditionName": "ContentContainsSensitiveInformation", "Value": [ { "Groups": [ { "Name": "Default", "Operator": "Or", "Sensitivetypes": [ { "Name": "Credit Card Number", "Id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "High", "Minconfidence": 85, "Maxconfidence": 100 }, { "Name": "U.S. Individual Taxpayer Identification Number (ITIN)", "Id": "e55e2a32-f92d-4985-a35d-a0b269eb687b", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 }, { "Name": "U.S. Social Security Number (SSN)", "Id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 } ] } ], "Operator": "And" } ] } ] } }'
+                    IsAdvancedRule: false
+                    Disabled: false
+                    BlockAccess: true
+                    BlockAccessScope: "All"
+                    NotifyUser: ["SiteAdmin", "LastModifier", "Owner"]
+                    NotifyUserType: "NotSet"
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.4.1v1 Non-Compliant case - Advanced Rule, Missing Credit Card
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                dlp_compliance_policies:
+                  - Name: "Default Office 365 DLP policy"
+                    Enabled: true
+                    Mode: "Enable"
+                dlp_compliance_rules:
+                  - Name: "Test Rule"
+                    ParentPolicyName: "Default Office 365 DLP policy"
+                    ContentContainsSensitiveInformation: null
+                    AdvancedRule: '{"Version": "1.0", "Condition": { "Operator": "And", "SubConditions": [ { "ConditionName": "ContentContainsSensitiveInformation", "Value": [ { "Groups": [ { "Name": "Default", "Operator": "Or", "Sensitivetypes": [ { "Name": "U.S. Individual Taxpayer Identification Number (ITIN)", "Id": "e55e2a32-f92d-4985-a35d-a0b269eb687b", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 }, { "Name": "U.S. Social Security Number (SSN)", "Id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 } ] } ], "Operator": "And" } ] } ] } }'
+                    IsAdvancedRule: true
+                    Disabled: false
+                    BlockAccess: true
+                    BlockAccessScope: "All"
+                    NotifyUser: ["SiteAdmin", "LastModifier", "Owner"]
+                    NotifyUserType: "NotSet"
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.4.1v1 Non-Compliant case - Not Advanced Rule, Missing Credit Card
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                dlp_compliance_policies:
+                  - Name: "Default Office 365 DLP policy"
+                    Enabled: true
+                    Mode: "Enable"
+                dlp_compliance_rules:
+                  - Name: "Test Rule"
+                    ParentPolicyName: "Default Office 365 DLP policy"
+                    ContentContainsSensitiveInformation:
+                      - name: "U.S. Social Security Number (SSN)"
+                        maxCount: "-1"
+                      - name: "U.S. Individual Taxpayer Identification Number (ITIN)"
+                        maxCount: "-1"
+                    AdvancedRule: '{"Version": "1.0", "Condition": { "Operator": "And", "SubConditions": [ { "ConditionName": "ContentContainsSensitiveInformation", "Value": [ { "Groups": [ { "Name": "Default", "Operator": "Or", "Sensitivetypes": [ { "Name": "Credit Card Number", "Id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "High", "Minconfidence": 85, "Maxconfidence": 100 }, { "Name": "U.S. Individual Taxpayer Identification Number (ITIN)", "Id": "e55e2a32-f92d-4985-a35d-a0b269eb687b", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 }, { "Name": "U.S. Social Security Number (SSN)", "Id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 } ] } ], "Operator": "And" } ] } ] } }'
+                    IsAdvancedRule: false
+                    Disabled: false
+                    BlockAccess: true
+                    BlockAccessScope: "All"
+                    NotifyUser: ["SiteAdmin", "LastModifier", "Owner"]
+                    NotifyUserType: "NotSet"
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.4.1v1 Non-Compliant case - Advanced Rule, ParentPolicyName
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                dlp_compliance_policies:
+                  - Name: "Default Office 365 DLP policy"
+                    Enabled: true
+                    Mode: "Enable"
+                dlp_compliance_rules:
+                  - Name: "Test Rule"
+                    ParentPolicyName: "Different Default Office 365 DLP policy"
+                    ContentContainsSensitiveInformation: null
+                    AdvancedRule: '{"Version": "1.0", "Condition": { "Operator": "And", "SubConditions": [ { "ConditionName": "ContentContainsSensitiveInformation", "Value": [ { "Groups": [ { "Name": "Default", "Operator": "Or", "Sensitivetypes": [ { "Name": "Credit Card Number", "Id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "High", "Minconfidence": 85, "Maxconfidence": 100 }, { "Name": "U.S. Individual Taxpayer Identification Number (ITIN)", "Id": "e55e2a32-f92d-4985-a35d-a0b269eb687b", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 }, { "Name": "U.S. Social Security Number (SSN)", "Id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 } ] } ], "Operator": "And" } ] } ] } }'
+                    IsAdvancedRule: true
+                    Disabled: false
+                    BlockAccess: true
+                    BlockAccessScope: "All"
+                    NotifyUser: ["SiteAdmin", "LastModifier", "Owner"]
+                    NotifyUserType: "NotSet"
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.4.1v1 Non-Compliant case - Not Advanced Rule, ParentPolicyName
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                dlp_compliance_policies:
+                  - Name: "Default Office 365 DLP policy"
+                    Enabled: true
+                    Mode: "Enable"
+                dlp_compliance_rules:
+                  - Name: "Test Rule"
+                    ParentPolicyName: "Different Default Office 365 DLP policy"
+                    ContentContainsSensitiveInformation:
+                      - name: "U.S. Social Security Number (SSN)"
+                        maxCount: "-1"
+                      - name: "U.S. Individual Taxpayer Identification Number (ITIN)"
+                        maxCount: "-1"
+                      - name: "Credit Card Number"
+                        maxCount: "-1"
+                    AdvancedRule: '{"Version": "1.0", "Condition": { "Operator": "And", "SubConditions": [ { "ConditionName": "ContentContainsSensitiveInformation", "Value": [ { "Groups": [ { "Name": "Default", "Operator": "Or", "Sensitivetypes": [ { "Name": "Credit Card Number", "Id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "High", "Minconfidence": 85, "Maxconfidence": 100 }, { "Name": "U.S. Individual Taxpayer Identification Number (ITIN)", "Id": "e55e2a32-f92d-4985-a35d-a0b269eb687b", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 }, { "Name": "U.S. Social Security Number (SSN)", "Id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 } ] } ], "Operator": "And" } ] } ] } }'
+                    IsAdvancedRule: false
+                    Disabled: false
+                    BlockAccess: true
+                    BlockAccessScope: "All"
+                    NotifyUser: ["SiteAdmin", "LastModifier", "Owner"]
+                    NotifyUserType: "NotSet"
+        Postconditions: []
+        ExpectedResult: false
+
+  - PolicyId: MS.DEFENDER.4.2v1
+    TestDriver: RunCached
+    Tests:
+      - TestDescription: MS.DEFENDER.4.2v1 Compliant case - Advanced Rule
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                dlp_compliance_policies:
+                  - Name: "Default Office 365 DLP policy"
+                    Enabled: true
+                    Mode: "Enable"
+                    ExchangeLocation: ["All"]
+                    SharePointLocation: ["All"]
+                    TeamsLocation: ["All"]
+                    EndpointDlpLocation: ["All"]
+                    OneDriveLocation: ["All"]
+                    Workload: "Exchange, SharePoint, OneDriveForBusiness, Teams, EndpointDevices"
+                dlp_compliance_rules:
+                  - Name: "Test Rule"
+                    ParentPolicyName: "Default Office 365 DLP policy"
+                    ContentContainsSensitiveInformation: null
+                    AdvancedRule: '{"Version": "1.0", "Condition": { "Operator": "And", "SubConditions": [ { "ConditionName": "ContentContainsSensitiveInformation", "Value": [ { "Groups": [ { "Name": "Default", "Operator": "Or", "Sensitivetypes": [ { "Name": "Credit Card Number", "Id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "High", "Minconfidence": 85, "Maxconfidence": 100 }, { "Name": "U.S. Individual Taxpayer Identification Number (ITIN)", "Id": "e55e2a32-f92d-4985-a35d-a0b269eb687b", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 }, { "Name": "U.S. Social Security Number (SSN)", "Id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 } ] } ], "Operator": "And" } ] } ] } }'
+                    IsAdvancedRule: true
+                    Disabled: false
+                    BlockAccess: true
+                    BlockAccessScope: "All"
+                    NotifyUser: ["SiteAdmin", "LastModifier", "Owner"]
+                    NotifyUserType: "NotSet"
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.DEFENDER.4.2v1 Compliant case - Not Advanced Rule
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                dlp_compliance_policies:
+                  - Name: "Default Office 365 DLP policy"
+                    Enabled: true
+                    Mode: "Enable"
+                    ExchangeLocation: ["All"]
+                    SharePointLocation: ["All"]
+                    TeamsLocation: ["All"]
+                    EndpointDlpLocation: ["All"]
+                    OneDriveLocation: ["All"]
+                    Workload: "Exchange, SharePoint, OneDriveForBusiness, Teams, EndpointDevices"
+                dlp_compliance_rules:
+                  - Name: "Test Rule"
+                    ParentPolicyName: "Default Office 365 DLP policy"
+                    ContentContainsSensitiveInformation:
+                      - name: "U.S. Social Security Number (SSN)"
+                        maxCount: "-1"
+                      - name: "U.S. Individual Taxpayer Identification Number (ITIN)"
+                        maxCount: "-1"
+                      - name: "Credit Card Number"
+                        maxCount: "-1"
+                    AdvancedRule: '{"Version": "1.0", "Condition": { "Operator": "And", "SubConditions": [ { "ConditionName": "ContentContainsSensitiveInformation", "Value": [ { "Groups": [ { "Name": "Default", "Operator": "Or", "Sensitivetypes": [ { "Name": "Credit Card Number", "Id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "High", "Minconfidence": 85, "Maxconfidence": 100 }, { "Name": "U.S. Individual Taxpayer Identification Number (ITIN)", "Id": "e55e2a32-f92d-4985-a35d-a0b269eb687b", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 }, { "Name": "U.S. Social Security Number (SSN)", "Id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 } ] } ], "Operator": "And" } ] } ] } }'
+                    IsAdvancedRule: false
+                    Disabled: false
+                    BlockAccess: true
+                    BlockAccessScope: "All"
+                    NotifyUser: ["SiteAdmin", "LastModifier", "Owner"]
+                    NotifyUserType: "NotSet"
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.DEFENDER.4.2v1 Non-Compliant case - Advanced Rule, ExchangeLocation
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                dlp_compliance_policies:
+                  - Name: "Default Office 365 DLP policy"
+                    Enabled: true
+                    Mode: "Enable"
+                    ExchangeLocation: []
+                    SharePointLocation: ["All"]
+                    TeamsLocation: ["All"]
+                    EndpointDlpLocation: ["All"]
+                    OneDriveLocation: ["All"]
+                    Workload: "Exchange, SharePoint, OneDriveForBusiness, Teams, EndpointDevices"
+                dlp_compliance_rules:
+                  - Name: "Test Rule"
+                    ParentPolicyName: "Default Office 365 DLP policy"
+                    ContentContainsSensitiveInformation: null
+                    AdvancedRule: '{"Version": "1.0", "Condition": { "Operator": "And", "SubConditions": [ { "ConditionName": "ContentContainsSensitiveInformation", "Value": [ { "Groups": [ { "Name": "Default", "Operator": "Or", "Sensitivetypes": [ { "Name": "Credit Card Number", "Id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "High", "Minconfidence": 85, "Maxconfidence": 100 }, { "Name": "U.S. Individual Taxpayer Identification Number (ITIN)", "Id": "e55e2a32-f92d-4985-a35d-a0b269eb687b", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 }, { "Name": "U.S. Social Security Number (SSN)", "Id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 } ] } ], "Operator": "And" } ] } ] } }'
+                    IsAdvancedRule: true
+                    Disabled: false
+                    BlockAccess: true
+                    BlockAccessScope: "All"
+                    NotifyUser: ["SiteAdmin", "LastModifier", "Owner"]
+                    NotifyUserType: "NotSet"
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.4.2v1 Non-Compliant case - Not Advanced Rule, ExchangeLocation
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                dlp_compliance_policies:
+                  - Name: "Default Office 365 DLP policy"
+                    Enabled: true
+                    Mode: "Enable"
+                    ExchangeLocation: []
+                    SharePointLocation: ["All"]
+                    TeamsLocation: ["All"]
+                    EndpointDlpLocation: ["All"]
+                    OneDriveLocation: ["All"]
+                    Workload: "Exchange, SharePoint, OneDriveForBusiness, Teams, EndpointDevices"
+                dlp_compliance_rules:
+                  - Name: "Test Rule"
+                    ParentPolicyName: "Default Office 365 DLP policy"
+                    ContentContainsSensitiveInformation:
+                      - name: "U.S. Social Security Number (SSN)"
+                        maxCount: "-1"
+                      - name: "U.S. Individual Taxpayer Identification Number (ITIN)"
+                        maxCount: "-1"
+                      - name: "Credit Card Number"
+                        maxCount: "-1"
+                    AdvancedRule: '{"Version": "1.0", "Condition": { "Operator": "And", "SubConditions": [ { "ConditionName": "ContentContainsSensitiveInformation", "Value": [ { "Groups": [ { "Name": "Default", "Operator": "Or", "Sensitivetypes": [ { "Name": "Credit Card Number", "Id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "High", "Minconfidence": 85, "Maxconfidence": 100 }, { "Name": "U.S. Individual Taxpayer Identification Number (ITIN)", "Id": "e55e2a32-f92d-4985-a35d-a0b269eb687b", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 }, { "Name": "U.S. Social Security Number (SSN)", "Id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 } ] } ], "Operator": "And" } ] } ] } }'
+                    IsAdvancedRule: false
+                    Disabled: false
+                    BlockAccess: true
+                    BlockAccessScope: "All"
+                    NotifyUser: ["SiteAdmin", "LastModifier", "Owner"]
+                    NotifyUserType: "NotSet"
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.4.2v1 Non-Compliant case - Advanced Rule, SharePointLocation
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                dlp_compliance_policies:
+                  - Name: "Default Office 365 DLP policy"
+                    Enabled: true
+                    Mode: "Enable"
+                    ExchangeLocation: ["All"]
+                    SharePointLocation: []
+                    TeamsLocation: ["All"]
+                    EndpointDlpLocation: ["All"]
+                    OneDriveLocation: ["All"]
+                    Workload: "Exchange, SharePoint, OneDriveForBusiness, Teams, EndpointDevices"
+                dlp_compliance_rules:
+                  - Name: "Test Rule"
+                    ParentPolicyName: "Default Office 365 DLP policy"
+                    ContentContainsSensitiveInformation: null
+                    AdvancedRule: '{"Version": "1.0", "Condition": { "Operator": "And", "SubConditions": [ { "ConditionName": "ContentContainsSensitiveInformation", "Value": [ { "Groups": [ { "Name": "Default", "Operator": "Or", "Sensitivetypes": [ { "Name": "Credit Card Number", "Id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "High", "Minconfidence": 85, "Maxconfidence": 100 }, { "Name": "U.S. Individual Taxpayer Identification Number (ITIN)", "Id": "e55e2a32-f92d-4985-a35d-a0b269eb687b", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 }, { "Name": "U.S. Social Security Number (SSN)", "Id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 } ] } ], "Operator": "And" } ] } ] } }'
+                    IsAdvancedRule: true
+                    Disabled: false
+                    BlockAccess: true
+                    BlockAccessScope: "All"
+                    NotifyUser: ["SiteAdmin", "LastModifier", "Owner"]
+                    NotifyUserType: "NotSet"
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.4.2v1 Non-Compliant case - Not Advanced Rule, SharePointLocation
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                dlp_compliance_policies:
+                  - Name: "Default Office 365 DLP policy"
+                    Enabled: true
+                    Mode: "Enable"
+                    ExchangeLocation: ["All"]
+                    SharePointLocation: []
+                    TeamsLocation: ["All"]
+                    EndpointDlpLocation: ["All"]
+                    OneDriveLocation: ["All"]
+                    Workload: "Exchange, SharePoint, OneDriveForBusiness, Teams, EndpointDevices"
+                dlp_compliance_rules:
+                  - Name: "Test Rule"
+                    ParentPolicyName: "Default Office 365 DLP policy"
+                    ContentContainsSensitiveInformation:
+                      - name: "U.S. Social Security Number (SSN)"
+                        maxCount: "-1"
+                      - name: "U.S. Individual Taxpayer Identification Number (ITIN)"
+                        maxCount: "-1"
+                      - name: "Credit Card Number"
+                        maxCount: "-1"
+                    AdvancedRule: '{"Version": "1.0", "Condition": { "Operator": "And", "SubConditions": [ { "ConditionName": "ContentContainsSensitiveInformation", "Value": [ { "Groups": [ { "Name": "Default", "Operator": "Or", "Sensitivetypes": [ { "Name": "Credit Card Number", "Id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "High", "Minconfidence": 85, "Maxconfidence": 100 }, { "Name": "U.S. Individual Taxpayer Identification Number (ITIN)", "Id": "e55e2a32-f92d-4985-a35d-a0b269eb687b", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 }, { "Name": "U.S. Social Security Number (SSN)", "Id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 } ] } ], "Operator": "And" } ] } ] } }'
+                    IsAdvancedRule: false
+                    Disabled: false
+                    BlockAccess: true
+                    BlockAccessScope: "All"
+                    NotifyUser: ["SiteAdmin", "LastModifier", "Owner"]
+                    NotifyUserType: "NotSet"
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.4.2v1 Non-Compliant case - Advanced Rule, TeamsLocation
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                dlp_compliance_policies:
+                  - Name: "Default Office 365 DLP policy"
+                    Enabled: true
+                    Mode: "Enable"
+                    ExchangeLocation: ["All"]
+                    SharePointLocation: ["All"]
+                    TeamsLocation: []
+                    EndpointDlpLocation: ["All"]
+                    OneDriveLocation: ["All"]
+                    Workload: "Exchange, SharePoint, OneDriveForBusiness, Teams, EndpointDevices"
+                dlp_compliance_rules:
+                  - Name: "Test Rule"
+                    ParentPolicyName: "Default Office 365 DLP policy"
+                    ContentContainsSensitiveInformation: null
+                    AdvancedRule: '{"Version": "1.0", "Condition": { "Operator": "And", "SubConditions": [ { "ConditionName": "ContentContainsSensitiveInformation", "Value": [ { "Groups": [ { "Name": "Default", "Operator": "Or", "Sensitivetypes": [ { "Name": "Credit Card Number", "Id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "High", "Minconfidence": 85, "Maxconfidence": 100 }, { "Name": "U.S. Individual Taxpayer Identification Number (ITIN)", "Id": "e55e2a32-f92d-4985-a35d-a0b269eb687b", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 }, { "Name": "U.S. Social Security Number (SSN)", "Id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 } ] } ], "Operator": "And" } ] } ] } }'
+                    IsAdvancedRule: true
+                    Disabled: false
+                    BlockAccess: true
+                    BlockAccessScope: "All"
+                    NotifyUser: ["SiteAdmin", "LastModifier", "Owner"]
+                    NotifyUserType: "NotSet"
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.4.2v1 Non-Compliant case - Not Advanced Rule, TeamsLocation
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                dlp_compliance_policies:
+                  - Name: "Default Office 365 DLP policy"
+                    Enabled: true
+                    Mode: "Enable"
+                    ExchangeLocation: ["All"]
+                    SharePointLocation: ["All"]
+                    TeamsLocation: []
+                    EndpointDlpLocation: ["All"]
+                    OneDriveLocation: ["All"]
+                    Workload: "Exchange, SharePoint, OneDriveForBusiness, Teams, EndpointDevices"
+                dlp_compliance_rules:
+                  - Name: "Test Rule"
+                    ParentPolicyName: "Default Office 365 DLP policy"
+                    ContentContainsSensitiveInformation:
+                      - name: "U.S. Social Security Number (SSN)"
+                        maxCount: "-1"
+                      - name: "U.S. Individual Taxpayer Identification Number (ITIN)"
+                        maxCount: "-1"
+                      - name: "Credit Card Number"
+                        maxCount: "-1"
+                    AdvancedRule: '{"Version": "1.0", "Condition": { "Operator": "And", "SubConditions": [ { "ConditionName": "ContentContainsSensitiveInformation", "Value": [ { "Groups": [ { "Name": "Default", "Operator": "Or", "Sensitivetypes": [ { "Name": "Credit Card Number", "Id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "High", "Minconfidence": 85, "Maxconfidence": 100 }, { "Name": "U.S. Individual Taxpayer Identification Number (ITIN)", "Id": "e55e2a32-f92d-4985-a35d-a0b269eb687b", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 }, { "Name": "U.S. Social Security Number (SSN)", "Id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 } ] } ], "Operator": "And" } ] } ] } }'
+                    IsAdvancedRule: false
+                    Disabled: false
+                    BlockAccess: true
+                    BlockAccessScope: "All"
+                    NotifyUser: ["SiteAdmin", "LastModifier", "Owner"]
+                    NotifyUserType: "NotSet"
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.4.2v1 Non-Compliant case - Advanced Rule, EndpointDlpLocation
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                dlp_compliance_policies:
+                  - Name: "Default Office 365 DLP policy"
+                    Enabled: true
+                    Mode: "Enable"
+                    ExchangeLocation: ["All"]
+                    SharePointLocation: ["All"]
+                    TeamsLocation: ["All"]
+                    EndpointDlpLocation: []
+                    OneDriveLocation: ["All"]
+                    Workload: "Exchange, SharePoint, OneDriveForBusiness, Teams, EndpointDevices"
+                dlp_compliance_rules:
+                  - Name: "Test Rule"
+                    ParentPolicyName: "Default Office 365 DLP policy"
+                    ContentContainsSensitiveInformation: null
+                    AdvancedRule: '{"Version": "1.0", "Condition": { "Operator": "And", "SubConditions": [ { "ConditionName": "ContentContainsSensitiveInformation", "Value": [ { "Groups": [ { "Name": "Default", "Operator": "Or", "Sensitivetypes": [ { "Name": "Credit Card Number", "Id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "High", "Minconfidence": 85, "Maxconfidence": 100 }, { "Name": "U.S. Individual Taxpayer Identification Number (ITIN)", "Id": "e55e2a32-f92d-4985-a35d-a0b269eb687b", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 }, { "Name": "U.S. Social Security Number (SSN)", "Id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 } ] } ], "Operator": "And" } ] } ] } }'
+                    IsAdvancedRule: true
+                    Disabled: false
+                    BlockAccess: true
+                    BlockAccessScope: "All"
+                    NotifyUser: ["SiteAdmin", "LastModifier", "Owner"]
+                    NotifyUserType: "NotSet"
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.4.2v1 Non-Compliant case - Not Advanced Rule, EndpointDlpLocation
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                dlp_compliance_policies:
+                  - Name: "Default Office 365 DLP policy"
+                    Enabled: true
+                    Mode: "Enable"
+                    ExchangeLocation: ["All"]
+                    SharePointLocation: ["All"]
+                    TeamsLocation: ["All"]
+                    EndpointDlpLocation: []
+                    OneDriveLocation: ["All"]
+                    Workload: "Exchange, SharePoint, OneDriveForBusiness, Teams, EndpointDevices"
+                dlp_compliance_rules:
+                  - Name: "Test Rule"
+                    ParentPolicyName: "Default Office 365 DLP policy"
+                    ContentContainsSensitiveInformation:
+                      - name: "U.S. Social Security Number (SSN)"
+                        maxCount: "-1"
+                      - name: "U.S. Individual Taxpayer Identification Number (ITIN)"
+                        maxCount: "-1"
+                      - name: "Credit Card Number"
+                        maxCount: "-1"
+                    AdvancedRule: '{"Version": "1.0", "Condition": { "Operator": "And", "SubConditions": [ { "ConditionName": "ContentContainsSensitiveInformation", "Value": [ { "Groups": [ { "Name": "Default", "Operator": "Or", "Sensitivetypes": [ { "Name": "Credit Card Number", "Id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "High", "Minconfidence": 85, "Maxconfidence": 100 }, { "Name": "U.S. Individual Taxpayer Identification Number (ITIN)", "Id": "e55e2a32-f92d-4985-a35d-a0b269eb687b", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 }, { "Name": "U.S. Social Security Number (SSN)", "Id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 } ] } ], "Operator": "And" } ] } ] } }'
+                    IsAdvancedRule: false
+                    Disabled: false
+                    BlockAccess: true
+                    BlockAccessScope: "All"
+                    NotifyUser: ["SiteAdmin", "LastModifier", "Owner"]
+                    NotifyUserType: "NotSet"
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.4.2v1 Non-Compliant case - Advanced Rule, OneDriveLocation
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                dlp_compliance_policies:
+                  - Name: "Default Office 365 DLP policy"
+                    Enabled: true
+                    Mode: "Enable"
+                    ExchangeLocation: ["All"]
+                    SharePointLocation: ["All"]
+                    TeamsLocation: ["All"]
+                    EndpointDlpLocation: ["All"]
+                    OneDriveLocation: []
+                    Workload: "Exchange, SharePoint, OneDriveForBusiness, Teams, EndpointDevices"
+                dlp_compliance_rules:
+                  - Name: "Test Rule"
+                    ParentPolicyName: "Default Office 365 DLP policy"
+                    ContentContainsSensitiveInformation: null
+                    AdvancedRule: '{"Version": "1.0", "Condition": { "Operator": "And", "SubConditions": [ { "ConditionName": "ContentContainsSensitiveInformation", "Value": [ { "Groups": [ { "Name": "Default", "Operator": "Or", "Sensitivetypes": [ { "Name": "Credit Card Number", "Id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "High", "Minconfidence": 85, "Maxconfidence": 100 }, { "Name": "U.S. Individual Taxpayer Identification Number (ITIN)", "Id": "e55e2a32-f92d-4985-a35d-a0b269eb687b", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 }, { "Name": "U.S. Social Security Number (SSN)", "Id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 } ] } ], "Operator": "And" } ] } ] } }'
+                    IsAdvancedRule: true
+                    Disabled: false
+                    BlockAccess: true
+                    BlockAccessScope: "All"
+                    NotifyUser: ["SiteAdmin", "LastModifier", "Owner"]
+                    NotifyUserType: "NotSet"
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.4.2v1 Non-Compliant case - Not Advanced Rule, OneDriveLocation
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                dlp_compliance_policies:
+                  - Name: "Default Office 365 DLP policy"
+                    Enabled: true
+                    Mode: "Enable"
+                    ExchangeLocation: ["All"]
+                    SharePointLocation: ["All"]
+                    TeamsLocation: ["All"]
+                    EndpointDlpLocation: ["All"]
+                    OneDriveLocation: []
+                    Workload: "Exchange, SharePoint, OneDriveForBusiness, Teams, EndpointDevices"
+                dlp_compliance_rules:
+                  - Name: "Test Rule"
+                    ParentPolicyName: "Default Office 365 DLP policy"
+                    ContentContainsSensitiveInformation:
+                      - name: "U.S. Social Security Number (SSN)"
+                        maxCount: "-1"
+                      - name: "U.S. Individual Taxpayer Identification Number (ITIN)"
+                        maxCount: "-1"
+                      - name: "Credit Card Number"
+                        maxCount: "-1"
+                    AdvancedRule: '{"Version": "1.0", "Condition": { "Operator": "And", "SubConditions": [ { "ConditionName": "ContentContainsSensitiveInformation", "Value": [ { "Groups": [ { "Name": "Default", "Operator": "Or", "Sensitivetypes": [ { "Name": "Credit Card Number", "Id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "High", "Minconfidence": 85, "Maxconfidence": 100 }, { "Name": "U.S. Individual Taxpayer Identification Number (ITIN)", "Id": "e55e2a32-f92d-4985-a35d-a0b269eb687b", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 }, { "Name": "U.S. Social Security Number (SSN)", "Id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 } ] } ], "Operator": "And" } ] } ] } }'
+                    IsAdvancedRule: false
+                    Disabled: false
+                    BlockAccess: true
+                    BlockAccessScope: "All"
+                    NotifyUser: ["SiteAdmin", "LastModifier", "Owner"]
+                    NotifyUserType: "NotSet"
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.4.2v1 Non-Compliant case - Advanced Rule, Workload
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                dlp_compliance_policies:
+                  - Name: "Default Office 365 DLP policy"
+                    Enabled: true
+                    Mode: "Enable"
+                    ExchangeLocation: ["All"]
+                    SharePointLocation: ["All"]
+                    TeamsLocation: ["All"]
+                    EndpointDlpLocation: ["All"]
+                    OneDriveLocation: ["All"]
+                    Workload: "SharePoint, OneDriveForBusiness, Teams, EndpointDevices"
+                dlp_compliance_rules:
+                  - Name: "Test Rule"
+                    ParentPolicyName: "Default Office 365 DLP policy"
+                    ContentContainsSensitiveInformation: null
+                    AdvancedRule: '{"Version": "1.0", "Condition": { "Operator": "And", "SubConditions": [ { "ConditionName": "ContentContainsSensitiveInformation", "Value": [ { "Groups": [ { "Name": "Default", "Operator": "Or", "Sensitivetypes": [ { "Name": "Credit Card Number", "Id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "High", "Minconfidence": 85, "Maxconfidence": 100 }, { "Name": "U.S. Individual Taxpayer Identification Number (ITIN)", "Id": "e55e2a32-f92d-4985-a35d-a0b269eb687b", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 }, { "Name": "U.S. Social Security Number (SSN)", "Id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 } ] } ], "Operator": "And" } ] } ] } }'
+                    IsAdvancedRule: true
+                    Disabled: false
+                    BlockAccess: true
+                    BlockAccessScope: "All"
+                    NotifyUser: ["SiteAdmin", "LastModifier", "Owner"]
+                    NotifyUserType: "NotSet"
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.4.2v1 Non-Compliant case - Not Advanced Rule, Workload
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                dlp_compliance_policies:
+                  - Name: "Default Office 365 DLP policy"
+                    Enabled: true
+                    Mode: "Enable"
+                    ExchangeLocation: ["All"]
+                    SharePointLocation: ["All"]
+                    TeamsLocation: ["All"]
+                    EndpointDlpLocation: ["All"]
+                    OneDriveLocation: ["All"]
+                    Workload: "SharePoint, OneDriveForBusiness, Teams, EndpointDevices"
+                dlp_compliance_rules:
+                  - Name: "Test Rule"
+                    ParentPolicyName: "Default Office 365 DLP policy"
+                    ContentContainsSensitiveInformation:
+                      - name: "U.S. Social Security Number (SSN)"
+                        maxCount: "-1"
+                      - name: "U.S. Individual Taxpayer Identification Number (ITIN)"
+                        maxCount: "-1"
+                      - name: "Credit Card Number"
+                        maxCount: "-1"
+                    AdvancedRule: '{"Version": "1.0", "Condition": { "Operator": "And", "SubConditions": [ { "ConditionName": "ContentContainsSensitiveInformation", "Value": [ { "Groups": [ { "Name": "Default", "Operator": "Or", "Sensitivetypes": [ { "Name": "Credit Card Number", "Id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "High", "Minconfidence": 85, "Maxconfidence": 100 }, { "Name": "U.S. Individual Taxpayer Identification Number (ITIN)", "Id": "e55e2a32-f92d-4985-a35d-a0b269eb687b", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 }, { "Name": "U.S. Social Security Number (SSN)", "Id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 } ] } ], "Operator": "And" } ] } ] } }'
+                    IsAdvancedRule: false
+                    Disabled: false
+                    BlockAccess: true
+                    BlockAccessScope: "All"
+                    NotifyUser: ["SiteAdmin", "LastModifier", "Owner"]
+                    NotifyUserType: "NotSet"
+        Postconditions: []
+        ExpectedResult: false
+
+  - PolicyId: MS.DEFENDER.4.3v1
+    TestDriver: RunCached
+    Tests:
+      - TestDescription: MS.DEFENDER.4.3v1 Compliant case - Advanced Rule
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                dlp_compliance_policies:
+                  - Name: "Default Office 365 DLP policy"
+                    Enabled: true
+                    Mode: "Enable"
+                dlp_compliance_rules:
+                  - Name: "Test Rule"
+                    ParentPolicyName: "Default Office 365 DLP policy"
+                    ContentContainsSensitiveInformation: null
+                    AdvancedRule: '{"Version": "1.0", "Condition": { "Operator": "And", "SubConditions": [ { "ConditionName": "ContentContainsSensitiveInformation", "Value": [ { "Groups": [ { "Name": "Default", "Operator": "Or", "Sensitivetypes": [ { "Name": "Credit Card Number", "Id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "High", "Minconfidence": 85, "Maxconfidence": 100 }, { "Name": "U.S. Individual Taxpayer Identification Number (ITIN)", "Id": "e55e2a32-f92d-4985-a35d-a0b269eb687b", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 }, { "Name": "U.S. Social Security Number (SSN)", "Id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 } ] } ], "Operator": "And" } ] } ] } }'
+                    IsAdvancedRule: true
+                    Disabled: false
+                    BlockAccess: true
+                    BlockAccessScope: "All"
+                    NotifyUser: ["SiteAdmin", "LastModifier", "Owner"]
+                    NotifyUserType: "NotSet"
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.DEFENDER.4.3v1 Compliant case - Not Advanced Rule
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                dlp_compliance_policies:
+                  - Name: "Default Office 365 DLP policy"
+                    Enabled: true
+                    Mode: "Enable"
+                dlp_compliance_rules:
+                  - Name: "Test Rule"
+                    ParentPolicyName: "Default Office 365 DLP policy"
+                    ContentContainsSensitiveInformation:
+                      - name: "U.S. Social Security Number (SSN)"
+                        maxCount: "-1"
+                      - name: "U.S. Individual Taxpayer Identification Number (ITIN)"
+                        maxCount: "-1"
+                      - name: "Credit Card Number"
+                        maxCount: "-1"
+                    AdvancedRule: '{"Version": "1.0", "Condition": { "Operator": "And", "SubConditions": [ { "ConditionName": "ContentContainsSensitiveInformation", "Value": [ { "Groups": [ { "Name": "Default", "Operator": "Or", "Sensitivetypes": [ { "Name": "Credit Card Number", "Id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "High", "Minconfidence": 85, "Maxconfidence": 100 }, { "Name": "U.S. Individual Taxpayer Identification Number (ITIN)", "Id": "e55e2a32-f92d-4985-a35d-a0b269eb687b", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 }, { "Name": "U.S. Social Security Number (SSN)", "Id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 } ] } ], "Operator": "And" } ] } ] } }'
+                    IsAdvancedRule: false
+                    Disabled: false
+                    BlockAccess: true
+                    BlockAccessScope: "All"
+                    NotifyUser: ["SiteAdmin", "LastModifier", "Owner"]
+                    NotifyUserType: "NotSet"
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.DEFENDER.4.3v1 Non-Compliant case - Advanced Rule, BlockAccess
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                dlp_compliance_policies:
+                  - Name: "Default Office 365 DLP policy"
+                    Enabled: true
+                    Mode: "Enable"
+                dlp_compliance_rules:
+                  - Name: "Test Rule"
+                    ParentPolicyName: "Default Office 365 DLP policy"
+                    ContentContainsSensitiveInformation: null
+                    AdvancedRule: '{"Version": "1.0", "Condition": { "Operator": "And", "SubConditions": [ { "ConditionName": "ContentContainsSensitiveInformation", "Value": [ { "Groups": [ { "Name": "Default", "Operator": "Or", "Sensitivetypes": [ { "Name": "Credit Card Number", "Id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "High", "Minconfidence": 85, "Maxconfidence": 100 }, { "Name": "U.S. Individual Taxpayer Identification Number (ITIN)", "Id": "e55e2a32-f92d-4985-a35d-a0b269eb687b", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 }, { "Name": "U.S. Social Security Number (SSN)", "Id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 } ] } ], "Operator": "And" } ] } ] } }'
+                    IsAdvancedRule: true
+                    Disabled: false
+                    BlockAccess: false
+                    BlockAccessScope: "All"
+                    NotifyUser: ["SiteAdmin", "LastModifier", "Owner"]
+                    NotifyUserType: "NotSet"
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.4.3v1 Non-Compliant case - Not Advanced Rule, BlockAccess
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                dlp_compliance_policies:
+                  - Name: "Default Office 365 DLP policy"
+                    Enabled: true
+                    Mode: "Enable"
+                dlp_compliance_rules:
+                  - Name: "Test Rule"
+                    ParentPolicyName: "Default Office 365 DLP policy"
+                    ContentContainsSensitiveInformation:
+                      - name: "U.S. Social Security Number (SSN)"
+                        maxCount: "-1"
+                      - name: "U.S. Individual Taxpayer Identification Number (ITIN)"
+                        maxCount: "-1"
+                      - name: "Credit Card Number"
+                        maxCount: "-1"
+                    AdvancedRule: '{"Version": "1.0", "Condition": { "Operator": "And", "SubConditions": [ { "ConditionName": "ContentContainsSensitiveInformation", "Value": [ { "Groups": [ { "Name": "Default", "Operator": "Or", "Sensitivetypes": [ { "Name": "Credit Card Number", "Id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "High", "Minconfidence": 85, "Maxconfidence": 100 }, { "Name": "U.S. Individual Taxpayer Identification Number (ITIN)", "Id": "e55e2a32-f92d-4985-a35d-a0b269eb687b", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 }, { "Name": "U.S. Social Security Number (SSN)", "Id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 } ] } ], "Operator": "And" } ] } ] } }'
+                    IsAdvancedRule: false
+                    Disabled: false
+                    BlockAccess: false
+                    BlockAccessScope: "All"
+                    NotifyUser: ["SiteAdmin", "LastModifier", "Owner"]
+                    NotifyUserType: "NotSet"
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.4.3v1 Non-Compliant case - Advanced Rule, BlockAccessScope PerUser
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                dlp_compliance_policies:
+                  - Name: "Default Office 365 DLP policy"
+                    Enabled: true
+                    Mode: "Enable"
+                dlp_compliance_rules:
+                  - Name: "Test Rule"
+                    ParentPolicyName: "Default Office 365 DLP policy"
+                    ContentContainsSensitiveInformation: null
+                    AdvancedRule: '{"Version": "1.0", "Condition": { "Operator": "And", "SubConditions": [ { "ConditionName": "ContentContainsSensitiveInformation", "Value": [ { "Groups": [ { "Name": "Default", "Operator": "Or", "Sensitivetypes": [ { "Name": "Credit Card Number", "Id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "High", "Minconfidence": 85, "Maxconfidence": 100 }, { "Name": "U.S. Individual Taxpayer Identification Number (ITIN)", "Id": "e55e2a32-f92d-4985-a35d-a0b269eb687b", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 }, { "Name": "U.S. Social Security Number (SSN)", "Id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 } ] } ], "Operator": "And" } ] } ] } }'
+                    IsAdvancedRule: true
+                    Disabled: false
+                    BlockAccess: true
+                    BlockAccessScope: "PerUser"
+                    NotifyUser: ["SiteAdmin", "LastModifier", "Owner"]
+                    NotifyUserType: "NotSet"
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.4.3v1 Non-Compliant case - Not Advanced Rule PerUser
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                dlp_compliance_policies:
+                  - Name: "Default Office 365 DLP policy"
+                    Enabled: true
+                    Mode: "Enable"
+                dlp_compliance_rules:
+                  - Name: "Test Rule"
+                    ParentPolicyName: "Default Office 365 DLP policy"
+                    ContentContainsSensitiveInformation:
+                      - name: "U.S. Social Security Number (SSN)"
+                        maxCount: "-1"
+                      - name: "U.S. Individual Taxpayer Identification Number (ITIN)"
+                        maxCount: "-1"
+                      - name: "Credit Card Number"
+                        maxCount: "-1"
+                    AdvancedRule: '{"Version": "1.0", "Condition": { "Operator": "And", "SubConditions": [ { "ConditionName": "ContentContainsSensitiveInformation", "Value": [ { "Groups": [ { "Name": "Default", "Operator": "Or", "Sensitivetypes": [ { "Name": "Credit Card Number", "Id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "High", "Minconfidence": 85, "Maxconfidence": 100 }, { "Name": "U.S. Individual Taxpayer Identification Number (ITIN)", "Id": "e55e2a32-f92d-4985-a35d-a0b269eb687b", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 }, { "Name": "U.S. Social Security Number (SSN)", "Id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 } ] } ], "Operator": "And" } ] } ] } }'
+                    IsAdvancedRule: false
+                    Disabled: false
+                    BlockAccess: true
+                    BlockAccessScope: "PerUser"
+                    NotifyUser: ["SiteAdmin", "LastModifier", "Owner"]
+                    NotifyUserType: "NotSet"
+        Postconditions: []
+        ExpectedResult: false
+
+  - PolicyId: MS.DEFENDER.4.4v1
+    TestDriver: RunCached
+    Tests:
+      - TestDescription: MS.DEFENDER.4.4v1 Compliant case - Advanced Rule
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                dlp_compliance_policies:
+                  - Name: "Default Office 365 DLP policy"
+                    Enabled: true
+                    Mode: "Enable"
+                dlp_compliance_rules:
+                  - Name: "Test Rule"
+                    ParentPolicyName: "Default Office 365 DLP policy"
+                    ContentContainsSensitiveInformation: null
+                    AdvancedRule: '{"Version": "1.0", "Condition": { "Operator": "And", "SubConditions": [ { "ConditionName": "ContentContainsSensitiveInformation", "Value": [ { "Groups": [ { "Name": "Default", "Operator": "Or", "Sensitivetypes": [ { "Name": "Credit Card Number", "Id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "High", "Minconfidence": 85, "Maxconfidence": 100 }, { "Name": "U.S. Individual Taxpayer Identification Number (ITIN)", "Id": "e55e2a32-f92d-4985-a35d-a0b269eb687b", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 }, { "Name": "U.S. Social Security Number (SSN)", "Id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 } ] } ], "Operator": "And" } ] } ] } }'
+                    IsAdvancedRule: true
+                    Disabled: false
+                    BlockAccess: true
+                    BlockAccessScope: "All"
+                    NotifyUser: ["SiteAdmin"]
+                    NotifyUserType: "NotSet"
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.DEFENDER.4.4v1 Compliant case - Not Advanced Rule
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                dlp_compliance_policies:
+                  - Name: "Default Office 365 DLP policy"
+                    Enabled: true
+                    Mode: "Enable"
+                dlp_compliance_rules:
+                  - Name: "Test Rule"
+                    ParentPolicyName: "Default Office 365 DLP policy"
+                    ContentContainsSensitiveInformation:
+                      - name: "U.S. Social Security Number (SSN)"
+                        maxCount: "-1"
+                      - name: "U.S. Individual Taxpayer Identification Number (ITIN)"
+                        maxCount: "-1"
+                      - name: "Credit Card Number"
+                        maxCount: "-1"
+                    AdvancedRule: '{"Version": "1.0", "Condition": { "Operator": "And", "SubConditions": [ { "ConditionName": "ContentContainsSensitiveInformation", "Value": [ { "Groups": [ { "Name": "Default", "Operator": "Or", "Sensitivetypes": [ { "Name": "Credit Card Number", "Id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "High", "Minconfidence": 85, "Maxconfidence": 100 }, { "Name": "U.S. Individual Taxpayer Identification Number (ITIN)", "Id": "e55e2a32-f92d-4985-a35d-a0b269eb687b", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 }, { "Name": "U.S. Social Security Number (SSN)", "Id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 } ] } ], "Operator": "And" } ] } ] } }'
+                    IsAdvancedRule: false
+                    Disabled: false
+                    BlockAccess: true
+                    BlockAccessScope: "All"
+                    NotifyUser: ["SiteAdmin"]
+                    NotifyUserType: "NotSet"
+        Postconditions: []
+        ExpectedResult: true
+
+  - PolicyId: MS.DEFENDER.4.5v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.DEFENDER.4.5v1 Not Checked
+        Preconditions: []
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false
+
+  - PolicyId: MS.DEFENDER.4.6v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.DEFENDER.4.6v1 Not Checked
+        Preconditions: []
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false
+
+  - PolicyId: MS.DEFENDER.5.1v1
+    TestDriver: RunCached
+    Tests:
+      - TestDescription: MS.DEFENDER.5.1v1 Compliant case
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                protection_alerts:
+                  - Name: "Suspicious email sending patterns detected"
+                    Disabled: false
+                  - Name: "Suspicious Email Forwarding Activity"
+                    Disabled: false
+                  - Name: "Messages have been delayed"
+                    Disabled: false
+                  - Name: "Tenant restricted from sending unprovisioned email"
+                    Disabled: false
+                  - Name: "User restricted from sending email"
+                    Disabled: false
+                  - Name: "A potentially malicious URL click was detected"
+                    Disabled: false
+                  - Name: "Suspicious connector activity"
+                    Disabled: false
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.DEFENDER.5.1v1 Non-Compliant case - Suspicious email sending patterns detected
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                protection_alerts:
+                  - Name: "Suspicious email sending patterns detected"
+                    Disabled: true
+                  - Name: "Suspicious Email Forwarding Activity"
+                    Disabled: false
+                  - Name: "Messages have been delayed"
+                    Disabled: false
+                  - Name: "Tenant restricted from sending unprovisioned email"
+                    Disabled: false
+                  - Name: "User restricted from sending email"
+                    Disabled: false
+                  - Name: "A potentially malicious URL click was detected"
+                    Disabled: false
+                  - Name: "Suspicious connector activity"
+                    Disabled: false
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.5.1v1 Non-Compliant case - Suspicious Email Forwarding Activity
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                protection_alerts:
+                  - Name: "Suspicious email sending patterns detected"
+                    Disabled: false
+                  - Name: "Suspicious Email Forwarding Activity"
+                    Disabled: true
+                  - Name: "Messages have been delayed"
+                    Disabled: false
+                  - Name: "Tenant restricted from sending unprovisioned email"
+                    Disabled: false
+                  - Name: "User restricted from sending email"
+                    Disabled: false
+                  - Name: "A potentially malicious URL click was detected"
+                    Disabled: false
+                  - Name: "Suspicious connector activity"
+                    Disabled: false
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.5.1v1 Non-Compliant case - Messages have been delayed
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                protection_alerts:
+                  - Name: "Suspicious email sending patterns detected"
+                    Disabled: false
+                  - Name: "Suspicious Email Forwarding Activity"
+                    Disabled: false
+                  - Name: "Messages have been delayed"
+                    Disabled: true
+                  - Name: "Tenant restricted from sending unprovisioned email"
+                    Disabled: false
+                  - Name: "User restricted from sending email"
+                    Disabled: false
+                  - Name: "A potentially malicious URL click was detected"
+                    Disabled: false
+                  - Name: "Suspicious connector activity"
+                    Disabled: false
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.5.1v1 Non-Compliant case - Tenant restricted from sending unprovisioned email
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                protection_alerts:
+                  - Name: "Suspicious email sending patterns detected"
+                    Disabled: false
+                  - Name: "Suspicious Email Forwarding Activity"
+                    Disabled: false
+                  - Name: "Messages have been delayed"
+                    Disabled: false
+                  - Name: "Tenant restricted from sending unprovisioned email"
+                    Disabled: true
+                  - Name: "User restricted from sending email"
+                    Disabled: false
+                  - Name: "A potentially malicious URL click was detected"
+                    Disabled: false
+                  - Name: "Suspicious connector activity"
+                    Disabled: false
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.5.1v1 Non-Compliant case - User restricted from sending email
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                protection_alerts:
+                  - Name: "Suspicious email sending patterns detected"
+                    Disabled: false
+                  - Name: "Suspicious Email Forwarding Activity"
+                    Disabled: false
+                  - Name: "Messages have been delayed"
+                    Disabled: false
+                  - Name: "Tenant restricted from sending unprovisioned email"
+                    Disabled: false
+                  - Name: "User restricted from sending email"
+                    Disabled: true
+                  - Name: "A potentially malicious URL click was detected"
+                    Disabled: false
+                  - Name: "Suspicious connector activity"
+                    Disabled: false
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.5.1v1 Non-Compliant case - A potentially malicious URL click was detected
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                protection_alerts:
+                  - Name: "Suspicious email sending patterns detected"
+                    Disabled: false
+                  - Name: "Suspicious Email Forwarding Activity"
+                    Disabled: false
+                  - Name: "Messages have been delayed"
+                    Disabled: false
+                  - Name: "Tenant restricted from sending unprovisioned email"
+                    Disabled: false
+                  - Name: "User restricted from sending email"
+                    Disabled: false
+                  - Name: "A potentially malicious URL click was detected"
+                    Disabled: true
+                  - Name: "Suspicious connector activity"
+                    Disabled: false
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.5.1v1 Non-Compliant case - Suspicious connector activity
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                protection_alerts:
+                  - Name: "Suspicious email sending patterns detected"
+                    Disabled: false
+                  - Name: "Suspicious Email Forwarding Activity"
+                    Disabled: false
+                  - Name: "Messages have been delayed"
+                    Disabled: false
+                  - Name: "Tenant restricted from sending unprovisioned email"
+                    Disabled: false
+                  - Name: "User restricted from sending email"
+                    Disabled: false
+                  - Name: "A potentially malicious URL click was detected"
+                    Disabled: false
+                  - Name: "Suspicious connector activity"
+                    Disabled: true
+        Postconditions: []
+        ExpectedResult: false
+
+  - PolicyId: MS.DEFENDER.5.2v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.DEFENDER.5.2v1 Not Checked
+        Preconditions: []
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false
+
+  - PolicyId: MS.DEFENDER.6.1v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.DEFENDER.6.1v1 Compliant case
+        Preconditions:
+          - Command: Set-AdminAuditLogConfig
+            Splat:
+              UnifiedAuditLogIngestionEnabled: true
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.DEFENDER.6.1v1 Not-Compliant case
+        Preconditions:
+          - Command: Set-AdminAuditLogConfig
+            Splat:
+              UnifiedAuditLogIngestionEnabled: false
+        Postconditions: []
+        ExpectedResult: false
+
+  - PolicyId: MS.DEFENDER.6.2v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.DEFENDER.6.2v1 Not Checked
+        Preconditions: []
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false
+
+  - PolicyId: MS.DEFENDER.6.3v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.DEFENDER.6.3v1 Not Checked
+        Preconditions: []
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false

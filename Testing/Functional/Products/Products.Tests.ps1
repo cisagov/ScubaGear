@@ -128,6 +128,13 @@ BeforeDiscovery{
         AppId = $AppId
         TenantDomain = $TenantDomain
     }{
+        if ($ProductName -eq "defender"){
+            $ProductNames = @($ProductName, "exo")
+        }
+        else {
+            $ProductNames = @($ProductName)
+        }
+
         if (-Not [string]::IsNullOrEmpty($AppId)){
             $ServicePrincipalParams = @{CertThumbprintParams = @{
                 CertificateThumbprint = $Thumbprint;
@@ -135,10 +142,11 @@ BeforeDiscovery{
                 Organization = $TenantDomain;
             }}
 
-            Connect-Tenant -ProductNames $ProductName -M365Environment $M365Environment -ServicePrincipalParams $ServicePrincipalParams
+            Connect-Tenant -ProductNames $ProductNames -M365Environment $M365Environment -ServicePrincipalParams $ServicePrincipalParams
         }
         else {
-            Connect-Tenant -ProductNames $ProductName -M365Environment $M365Environment
+            Write-Debug "Manual Connect to Tenant"
+            Connect-Tenant -ProductNames $ProductNames -M365Environment $M365Environment
         }
     }
 }
@@ -191,8 +199,8 @@ BeforeAll{
                 $ScriptBlock.Invoke()
             }
             catch {
-                Write-Error "Exception: SetConditions failed."
-                Write-Error "$_"
+                Write-Error "Exception: SetConditions failed. $_"
+
             }
         }
     }
@@ -211,7 +219,32 @@ BeforeAll{
 Describe "Policy Checks for <ProductName>"{
     Context "Start tests for policy <PolicyId>" -ForEach $TestPlan{
         BeforeEach{
-            if ('RunScuba' -eq $TestDriver){
+
+            if ($ConfigFileName -and ('RunScuba' -eq $TestDriver)){
+                $FullPath = Join-Path -Path $PSScriptRoot -ChildPath "TestConfigurations/$ProductName/$PolicyId/$ConfigFileName"
+
+                $ScubaConfig = Get-Content -Path $FullPath | ConvertFrom-Yaml
+
+                if ($AppId){
+                    $ScubaConfig.CertificateThumbprint = $Thumbprint
+                    $ScubaConfig.AppID = $AppId
+                    $ScubaConfig.Organization = $TenantDomain
+                }
+
+                $ScubaConfig.M365Environment = $M365Environment
+
+                $TestConfigPath = "$TestDrive\$ProductName\$PolicyId"
+                $TestConfigFilePath = Join-Path -Path $TestConfigPath -ChildPath $ConfigFileName
+
+                if (-not (Test-Path -Path $TestConfigPath -PathType Container)){
+                    New-Item -Path $TestConfigPath -ItemType Directory
+                }
+
+                Set-Content -Path $TestConfigFilePath -Value ($ScubaConfig | ConvertTo-Yaml)
+                SetConditions -Conditions $Preconditions.ToArray()
+                Invoke-SCuBA -ConfigFilePath $TestConfigFilePath -Quiet
+            }
+            elseif ('RunScuba' -eq $TestDriver){
                 Write-Debug "Driver: RunScuba"
                 SetConditions -Conditions $Preconditions.ToArray()
                 RunScuba
