@@ -72,7 +72,7 @@ TestPlan:
                 dkim_config:
                   - Domain: bogus1.customdomain.com
                     Enabled: true
-                  - domain: bogus2.onmicrosoft.com
+                  - Domain: bogus2.onmicrosoft.com
                     Enabled: true
                 dkim_records:
                   - domain: bogus2.onmicrosoft.com
@@ -92,7 +92,7 @@ TestPlan:
                 dkim_config:
                   - Domain: bogus1.customdomain.com
                     Enabled: true
-                  - domain: bogus2.onmicrosoft.com
+                  - Domain: bogus2.onmicrosoft.com
                     Enabled: true
                 dkim_records:
                   - domain: bogus1.customdomain.com
