@@ -1,0 +1,76 @@
+ProductName: defender
+TestPlan:
+  - PolicyId: MS.DEFENDER.1.1v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.DEFENDER.1.1v1 Non-compliant - Std EOP Disabled, Strict EOP Disabled
+        Preconditions:
+          - Command: Disable-EOPProtectionPolicyRule
+            Splat:
+              Identity: Standard Preset Security Policy
+              Confirm: false
+          - Command: Disable-EOPProtectionPolicyRule
+            Splat:
+              Identity: Strict Preset Security Policy
+              Confirm: false
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.1.1v1 Non-compliant -- Std EOP Disabled, Strict EOP Enabled
+        Preconditions:
+          - Command: Disable-EOPProtectionPolicyRule
+            Splat:
+              Identity: Standard Preset Security Policy
+              Confirm: false
+          - Command: Enable-EOPProtectionPolicyRule
+            Splat:
+              Identity: Strict Preset Security Policy
+              Confirm: false
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.1.1v1 Non-compliant -- Std EOP Enabled, Strict EOP Disabled
+        Preconditions:
+          - Command: Enable-EOPProtectionPolicyRule
+            Splat:
+              Identity: Standard Preset Security Policy
+              Confirm: false
+          - Command: Disable-EOPProtectionPolicyRule
+            Splat:
+              Identity: Strict Preset Security Policy
+              Confirm: false
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.1.1v1 Compliant -- Std EOP Enabled Strict EOP Enable
+        Preconditions:
+          - Command: Enable-EOPProtectionPolicyRule
+            Splat:
+              Identity: Standard Preset Security Policy
+              Confirm: false
+          - Command: Enable-EOPProtectionPolicyRule
+            Splat:
+              Identity: Strict Preset Security Policy
+              Confirm: false
+        Postconditions: []
+        ExpectedResult: true
+
+  - PolicyId: MS.DEFENDER.1.3v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.DEFENDER.1.3v1 Non-compliant - No defender license
+        Preconditions: []
+        Postconditions: []
+        ExpectedResult: false
+  - PolicyId: MS.DEFENDER.1.5v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.DEFENDER.1.5v1 Non-compliant - No defender license
+        Preconditions: []
+        Postconditions: []
+        ExpectedResult: false
+  - PolicyId: MS.DEFENDER.3.1v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.DEFENDER.3.1v1 Non-compliant - No defender license
+        Preconditions: []
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false        
