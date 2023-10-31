@@ -150,10 +150,9 @@ The following API permissions are required for Microsoft Graph Powershell:
 - RoleManagement.Read.Directory
 - User.Read.All
 - UserAuthenticationMethod.Read.All
-- SecurityEvents.Read.All
 
-### Application Service Principal Permissions & Setup
-The minimum API permissions & user roles for each product that need to be assigned to the application are listed in the table below.
+### Service Principal Application Permissions & Setup
+The minimum API permissions & user roles for each product that need to be assigned to a service principal application for ScubaGear app-only authentication are listed in the table below.
 
 | Product                  | API Permissions                                      | Azure AD Roles                   |
 |--------------------------|------------------------------------------------------|----------------------------------|
@@ -163,22 +162,23 @@ The minimum API permissions & user roles for each product that need to be assign
 |                          | UserAuthenticationMethod.Read.All                    |                                  |
 | Defender for Office 365  | Exchange.ManageAsApp                                 | Global Reader                    |
 | Exchange Online          | Exchange.ManageAsApp                                 | Global Reader                    |
-| Power Platform           |                                                      | Power Platform Administrator     |
-| SharePoint Online        | Site.FullControl.All                                 | Global Reader                    |
+| Power Platform           | [See Power Platform App Registration]()                                              |                                  |
+| SharePoint Online        | Sites.FullControl.All                                 | Global Reader                    |
 | Microsoft Teams          |                                                      | Global Reader                    |
 
 This [video](https://www.youtube.com/watch?v=GyF8HV_35GA) provides a good tutorial for creating an application manually in the Azure Portal. Augment the API permissions and replace the role assignment instructions in the video with the permissions listed above.
 
-**Power Platform**
-For Power Platform, the application must be [manually registered to Power Platform via interactive authentication with a administrative account](https://learn.microsoft.com/en-us/power-platform/admin/powershell-create-service-principal#registering-an-admin-management-application).
+#### Power Platform APP Registration
+
+For Power Platform, the application must be [manually registered to Power Platform via interactive authentication with a administrative account](https://learn.microsoft.com/en-us/power-platform/admin/powershell-create-service-principal#registering-an-admin-management-application). See [Limitations of Service Principals](https://learn.microsoft.com/en-us/power-platform/admin/powershell-create-service-principal#limitations-of-service-principals) for how applications are treated within Power Platform.
 ```powershell
 Add-PowerAppsAccount -Endpoint prod -TenantID $tenantId # use -Endpoint usgov for gcc tenants
-New-PowerAppManagementApp -ApplicationId $appId # Must be run from a Power Platform Administrator or Global Adminstrator account
+New-PowerAppManagementApp -ApplicationId $appId # Must be run from a Power Platform Administrator or Global Administrator account
 ```
 
 **Certificate store notes**
 - Power Platform has a [hardcoded expectation](https://github.com/microsoft/Microsoft365DSC/issues/2781) that the certificate is located in "Cert:\CurrentUser\My".
-- MS Graph seems to also have an expectation that the certificate at least be located in one of the local client's certificate store(s).
+- MS Graph has an expectation that the certificate at least be located in one of the local client's certificate store(s).
 
 > **Notes**: Only authentication via `CertificateThumbprint` is currently supported. We will also be supporting automated app registration in a later release.
 
