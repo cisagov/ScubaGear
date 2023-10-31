@@ -162,8 +162,8 @@ The minimum API permissions & user roles for each product that need to be assign
 |                          | UserAuthenticationMethod.Read.All                    |                                  |
 | Defender for Office 365  | Exchange.ManageAsApp                                 | Global Reader                    |
 | Exchange Online          | Exchange.ManageAsApp                                 | Global Reader                    |
-| Power Platform           | [See Power Platform App Registration](#power-platform-app-registration)                                              |                                  |
-| SharePoint Online        | Sites.FullControl.All                                 | Global Reader                    |
+| Power Platform           | [See Power Platform App Registration](#power-platform-app-registration)                                                |                                  |
+| SharePoint Online        | Sites.FullControl.All, Directory.Read.All            |                                  |
 | Microsoft Teams          |                                                      | Global Reader                    |
 
 This [video](https://www.youtube.com/watch?v=GyF8HV_35GA) provides a good tutorial for creating an application manually in the Azure Portal. Augment the API permissions and replace the role assignment instructions in the video with the permissions listed above.
