@@ -162,7 +162,7 @@ The minimum API permissions & user roles for each product that need to be assign
 |                          | UserAuthenticationMethod.Read.All                    |                                  |
 | Defender for Office 365  | Exchange.ManageAsApp                                 | Global Reader                    |
 | Exchange Online          | Exchange.ManageAsApp                                 | Global Reader                    |
-| Power Platform           | [See Power Platform App Registration]()                                              |                                  |
+| Power Platform           | [See Power Platform App Registration](#power-platform-app-registration)                                              |                                  |
 | SharePoint Online        | Sites.FullControl.All                                 | Global Reader                    |
 | Microsoft Teams          |                                                      | Global Reader                    |
 
@@ -177,7 +177,7 @@ New-PowerAppManagementApp -ApplicationId $appId # Must be run from a Power Platf
 ```
 
 **Certificate store notes**
-- Power Platform has a [hardcoded expectation](https://github.com/microsoft/Microsoft365DSC/issues/2781) that the certificate is located in "Cert:\CurrentUser\My".
+- Power Platform has a [hardcoded expectation](https://github.com/microsoft/Microsoft365DSC/issues/2781) that the certificate is located in `Cert:\CurrentUser\My`.
 - MS Graph has an expectation that the certificate at least be located in one of the local client's certificate store(s).
 
 > **Notes**: Only authentication via `CertificateThumbprint` is currently supported. We will also be supporting automated app registration in a later release.
