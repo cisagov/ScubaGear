@@ -149,7 +149,6 @@ The following API permissions are required for Microsoft Graph Powershell:
 - Policy.Read.All
 - RoleManagement.Read.Directory
 - User.Read.All
-- UserAuthenticationMethod.Read.All
 
 ### Service Principal Application Permissions & Setup
 The minimum API permissions & user roles for each product that need to be assigned to a service principal application for ScubaGear app-only authentication are listed in the table below.
@@ -159,7 +158,7 @@ The minimum API permissions & user roles for each product that need to be assign
 | Azure Active Directory   | Directory.Read.All, GroupMember.Read.All,            |                                  |
 |                          | Organization.Read.All, Policy.Read.All,              |                                  |
 |                          | RoleManagement.Read.Directory, User.Read.All,        |                                  |
-|                          | UserAuthenticationMethod.Read.All                    |                                  |
+|                          |                    |                                  |
 | Defender for Office 365  | Exchange.ManageAsApp                                 | Global Reader                    |
 | Exchange Online          | Exchange.ManageAsApp                                 | Global Reader                    |
 | Power Platform           | [See Power Platform App Registration](#power-platform-app-registration)                                                |                                  |
