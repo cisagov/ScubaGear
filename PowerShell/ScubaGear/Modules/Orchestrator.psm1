@@ -522,7 +522,7 @@ function Invoke-ProviderList {
 
         $BaselineSettingsExport = @"
         {
-                "baseline_version": "0.1",
+                "baseline_version": "1",
                 "module_version": "$ModuleVersion",
                 "date": "$($CurrentDate) $($TimeZone)",
                 "tenant_details": $($TenantDetails),
