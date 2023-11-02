@@ -517,12 +517,13 @@ information by restricted apps and unwanted Bluetooth applications.
 17. Under this action, select **Block Everyone**.
 
 18. Under **User notifications**, turn on **Use notifications to inform your users and help educate them on the proper use of sensitive info**.
+19. Under **Microsoft 365 services**, a section that appears after user notifications are turned on, check the box next to **Notify users in Office 365 service with a policy tip**.
 
-19. Click **Save**, then **Next**.
+20. Click **Save**, then **Next**.
 
-20. Select **Turn it on right away**, then click **Next**.
+21. Select **Turn it on right away**, then click **Next**.
 
-21. Click **Submit**.
+22. Click **Submit**.
 
 #### MS.DEFENDER.4.2v1 instructions:
 
