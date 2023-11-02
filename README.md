@@ -2,10 +2,6 @@
   <ul>
     <summary><h1 style="display: inline-block;">ScubaGear</h1></summary>
   </ul>
-    <ul>
-        <a href="https://github.com/cisagov/ScubaGear/releases" alt="ScubaGoggles version #">
-        <img src="https://img.shields.io/badge/ScubaGear-v1.0.0-%2343AA3F?labelColor=%23005288" /></a>
-  </ul>
 </div>
 <h2 style="margin:0;">M365 Secure Configuration Baseline Assessment Tool </h2>
 
