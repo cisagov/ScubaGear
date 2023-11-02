@@ -1,9 +1,4 @@
-<div style="margin:0;" id="user-content-toc">
-  <ul>
-    <summary><h1 style="display: inline-block;">ScubaGear</h1></summary>
-  </ul>
-</div>
-<h2 style="margin:0;">M365 Secure Configuration Baseline Assessment Tool </h2>
+<h1 style="margin:0;">ScubaGear </h1>
 
 Developed by CISA, this assessment tool verifies that an M365 tenant’s configuration conforms to the policies described in the Secure Cloud Business Applications ([SCuBA](https://cisa.gov/scuba)) Minimum Viable Secure Configuration Baseline [documents](https://github.com/cisagov/ScubaGear/tree/main/baselines).
 
