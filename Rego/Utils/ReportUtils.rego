@@ -49,7 +49,7 @@ ReportDetailsBoolean(false) := "Requirement not met"
 Description(String1, String2, String3) := trim(concat(" ", [String1, concat(" ", [String2, String3])]), " ")
 
 #
-ReportDetailsString(Status, String) :=  Detail if {
+ReportDetailsString(Status, _) :=  Detail if {
     Status == true
     Detail := "Requirement met"
 }
