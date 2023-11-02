@@ -59,7 +59,6 @@ function Connect-Tenant {
                        'User.Read.All',
                        'Policy.Read.All',
                        'Organization.Read.All',
-                       'UserAuthenticationMethod.Read.All',
                        'RoleManagement.Read.Directory',
                        'GroupMember.Read.All',
                        'Directory.Read.All'
