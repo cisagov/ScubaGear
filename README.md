@@ -1,8 +1,39 @@
-# ScubaGear M365 Secure Configuration Baseline Assessment Tool
+<div style="margin:0;" id="user-content-toc">
+  <ul>
+    <summary><h1 style="display: inline-block;">ScubaGear</h1></summary>
+  </ul>
+    <ul>
+        <a href="https://github.com/cisagov/ScubaGear/releases" alt="ScubaGoggles version #">
+        <img src="https://img.shields.io/badge/ScubaGear-v1.0.0-%2343AA3F?labelColor=%23005288" /></a>
+  </ul>
+</div>
+<h2 style="margin:0;">M365 Secure Configuration Baseline Assessment Tool </h2>
+
 Developed by CISA, this assessment tool verifies that an M365 tenant’s configuration conforms to the policies described in the Secure Cloud Business Applications ([SCuBA](https://cisa.gov/scuba)) Minimum Viable Secure Configuration Baseline [documents](https://github.com/cisagov/ScubaGear/tree/main/baselines).
 
 > **Warning**
 > This tool is in an alpha state and in active development. At this time, outputs could be incorrect and should be reviewed carefully.
+
+## Table of Contents
+- [M365 Product License Assumptions](#m365-product-license-assumptions)
+- [Installation](#installation)
+  - [Downloading Repository](#downloading-repository)
+  - [Installing the required PowerShell Modules](#installing-the-required-powershell-modules)
+  - [PowerShell Execution Policies](#powershell-execution-policies)
+  - [Download the required OPA executable](#download-the-required-opa-executable)
+- [Usage](#usage)
+  - [Examples](#example-1-run-an-assessment-against-all-products-except-powerplatform)
+  - [Parameter Definitions](#parameter-definitions)
+  - [AAD Conditional Access Policy Exemptions](#aad-conditional-access-policy-exemptions)
+  - [Viewing the Report](#viewing-the-report)
+- [Required Permissions](#required-permissions)
+  - [User Permissions](#user-permissions)
+  - [Microsoft Graph Powershell SDK permissions](#microsoft-graph-powershell-sdk-permissions)
+  - [Service Principal Application Permissions & Setup](#service-principal-application-permissions--setup)
+- [Architecture](#architecture)
+- [Repository Organization](#repository-organization)
+- [Troubleshooting](#troubleshooting)
+- [Project License](#project-license)
 
 ## M365 Product License Assumptions
 This tool was tested against tenants that have an M365 E3 or G3 and E5 or G5 license bundle. It may still function for tenants that do not have one of these bundles.
@@ -13,7 +44,8 @@ Some of the policy checks in the baseline rely on the following licenses which a
 
 If a tenant does not have the licenses listed above, the report will display a non-compliant output for those policies.
 
-> **Note**: GCC-High/DOD endpoints are included, but have not been tested. Please open an issue if you encounter bugs. GCC-High testing in progress.
+> **Note**
+> DOD endpoints are included, but have not been tested. Please open an issue if you encounter bugs.
 
 ## Installation
 ### Downloading Repository
@@ -24,7 +56,7 @@ To download ScubaGear:
 3. Extract the folder in the zip file.
 
 ### Installing the required PowerShell Modules
-> **Note**: Only PowerShell 5.1 is currently supported. PowerShell 7 may work, but has not been tested. PowerShell 7 will be added in a future release.
+> **Note**: Only PowerShell 5.1 is currently supported. PowerShell 7 may work, but has not been tested. PowerShell 7 support will be added in a future release.
 
 To import the module, open a new PowerShell 5.1 terminal and navigate to the repository folder.
 
@@ -34,6 +66,13 @@ Then run:
 .\Setup.ps1 #Installs the required modules
 Import-Module -Name .\PowerShell\ScubaGear #Imports the tool into your session
 ```
+
+### PowerShell Execution Policies
+
+On Windows Servers, the default [execution policy](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.security/set-executionpolicy?view=powershell-5.1) is `RemoteSigned`, which will allow ScubaGear to run after the publisher (CISA) is agreed to once.
+
+On Windows Clients, the default execution policy is `Restricted`.  In this case, `Set-ExecutionPolicy RemoteSigned` should be invoked to permit ScubaGear to run.
+
 ### Download the required OPA executable
 > **Note**: OPA executable download script is called by default when running SetUp.ps1. OPA.ps1 can also be run by itself to download the executable.
 In the event of an unsuccessful download, users can manually download the OPA executable with the following steps:
@@ -104,6 +143,51 @@ Get-Help -Name Invoke-SCuBA -Full
 - **$OPAPath** refers to the folder location of the Open Policy Agent (OPA) policy engine executable file. By default the OPA policy engine executable embedded with this project is located in the project's root folder `"./"` and for most cases this value will not need to be modified. To execute the tool using a version of the OPA policy engine located in another folder, customize the variable value with the full path to the folder containing the OPA policy engine executable file.
 
 - **$OutPath** refers to the folder path where the output JSON and the HTML report will be created. Defaults to the same directory where the script is executed.  This parameter is only necessary if an alternate report folder path is desired.  The folder will be created if it does not exist.
+
+### AAD Conditional Access Policy Exemptions
+The ScubaGear ConfigFilePath command line option allows users to define custom variables for use in policy assessments against the AAD baseline.  These custom variables are used to exempt specific user and group exclusions from conditional access policy checks that normally would not pass if exclusions are present.  These parameters support operational use cases for having backup or break glass account exclusions to global user policies without failing best practices.  Any exemptions and their risks should be carefully considered and documented as part of an organization's cybersecurity risk management program process and practices.
+
+**YAML AAD Configuration File Syntax and Examples**
+
+**Aad** defines the AAD specific variables to specify user, group, and role exclusions that are documented exemptions to select conditional access policies (CAP) in the AAD configuration policy baselines. Users, groups, and roles are specified by their respective Universally Unique Identifier (UUID) in the tenant. This variable set is only needed if the agency has documented CAP exemptions.
+
+**CapExclusions** - Supports both a Users and Groups list with each entry representing the UUID of a user or group that is approved by the agency to be included in a conditional access policy assignment exclusion. Adding an entry to this variable will prevent ScubaGear from failing the policy assessment due to the presence of the users and groups in an exclusion.
+
+CapExclusions can be defined in the following policy namespaces:
+
+- MS.AAD.1.1v1
+- MS.AAD.2.1v1
+- MS.AAD.2.3v1
+- MS.AAD.3.2v1
+- MS.AAD.3.3v1
+- MS.AAD.3.7v1
+- MS.AAD.3.8v1
+
+**RoleExclusions** - Supports both a Users and Groups list with each entry representing the UUID of a user or group that is approved by the agency to be included in a role assignment. Adding an entry to this variable will prevent ScubaGear from failing the policy assessment due to the presence of a role assignment for those users and groups.
+
+RoleExclusions can be defined in the following policy namespaces:
+
+- MS.AAD.7.4v1
+
+The example below illustrates the syntax for defining user, group, and role exemptions to select policies.  The syntax allows the use of a YAML anchor and alias to simplify formatting policies having the same documented exemptions. Items surrounded by chevrons are to be supplied by the user.
+
+        Aad:
+          MS.AAD.1.1v1: &CommonExclusions
+            CapExclusions:
+              Users:
+                - <Exempted User 1 UUID>
+                - <Exempted User 2 UUID>
+              Groups:
+                - <Exempted Group 1 UUID>
+          MS.AAD.2.1v1:  *CommonExclusions
+          MS.AAD.2.3v1:  *CommonExclusions
+          MS.AAD.3.2v1:  *CommonExclusions
+          MS.AAD.7.4v1:
+            RoleExclusions:
+              Users:
+                - <Exempted User 3 UUID>
+              Groups:
+                - <Exempted Group 2 UUID>
 
 ### Viewing the Report
 The HTML report should open in your browser once the script completes. If it does not, navigate to the output folder and open the BaselineReports.html file using your browser. The result files generated from the tool are also saved to the output folder.
@@ -180,51 +264,6 @@ New-PowerAppManagementApp -ApplicationId $appId # Must be run from a Power Platf
 
 > **Notes**: Only authentication via `CertificateThumbprint` is currently supported. We will also be supporting automated app registration in a later release.
 
-### AAD Conditional Access Policy Exemptions
-The ScubaGear ConfigFilePath command line option allows users to define custom variables for use in policy assessments against the AAD baseline.  These custom variables are used to exempt specific user and group exclusions from conditional access policy checks that normally would not pass if exclusions are present.  These parameters support operational use cases for having backup or break glass account exclusions to global user policies without failing best practices.  Any exemptions and their risks should be carefully considered and documented as part of an organization's cybersecurity risk management program process and practices.
-
-**YAML AAD Configuration File Syntax and Examples**
-
-**Aad** defines the AAD specific variables to specify user, group, and role exclusions that are documented exemptions to select conditional access policies (CAP) in the AAD configuration policy baselines. Users, groups, and roles are specified by their respective Universally Unique Identifier (UUID) in the tenant. This variable set is only needed if the agency has documented CAP exemptions.
-
-**CapExclusions** - Supports both a Users and Groups list with each entry representing the UUID of a user or group that is approved by the agency to be included in a conditional access policy assignment exclusion. Adding an entry to this variable will prevent ScubaGear from failing the policy assessment due to the presence of the users and groups in an exclusion.
-
-CapExclusions can be defined in the following policy namespaces:
-
-- MS.AAD.1.1v1
-- MS.AAD.2.1v1
-- MS.AAD.2.3v1
-- MS.AAD.3.2v1
-- MS.AAD.3.3v1
-- MS.AAD.3.7v1
-- MS.AAD.3.8v1
-
-**RoleExclusions** - Supports both a Users and Groups list with each entry representing the UUID of a user or group that is approved by the agency to be included in a role assignment. Adding an entry to this variable will prevent ScubaGear from failing the policy assessment due to the presence of a role assignment for those users and groups.
-
-RoleExclusions can be defined in the following policy namespaces:
-
-- MS.AAD.7.4v1
-
-The example below illustrates the syntax for defining user, group, and role exemptions to select policies.  The syntax allows the use of a YAML anchor and alias to simplify formatting policies having the same documented exemptions. Items surrounded by chevrons are to be supplied by the user.
-
-        Aad:
-          MS.AAD.1.1v1: &CommonExclusions
-            CapExclusions:
-              Users:
-                - <Exempted User 1 UUID>
-                - <Exempted User 2 UUID>
-              Groups:
-                - <Exempted Group 1 UUID>
-          MS.AAD.2.1v1:  *CommonExclusions
-          MS.AAD.2.3v1:  *CommonExclusions
-          MS.AAD.3.2v1:  *CommonExclusions
-          MS.AAD.7.4v1:
-            RoleExclusions:
-              Users:
-                - <Exempted User 3 UUID>
-              Groups:
-                - <Exempted Group 2 UUID>
-
 ## Architecture
 ![SCuBA Architecture diagram](/images/scuba-architecture.png)
 The tool employs a three-step process:
@@ -236,11 +275,6 @@ The tool employs a three-step process:
 - `PowerShell` contains the code used to export the configuration settings from the M365 tenant and orchestrate the entire process from export through evaluation to report. The main PowerShell module manifest `SCuBA.psd1` is located in the PowerShell folder.
 - `Rego` holds the `.rego` files. Each Rego file audits against the desired state for each product, per the SCuBA M365 secure configuration baseline documents.
 - `Testing` contains code that is used during the development process to unit test Rego policies.
-
-## Project License
-
-Unless otherwise noted, this project is distributed under the Creative Commons Zero license. With developer approval, contributions may be submitted with an alternate compatible license. If accepted, those contributions will be listed herein with the appropriate license.
-
 
 ## Troubleshooting
 
@@ -296,13 +330,10 @@ If these conditions are not met, the tool will generate an incorrect report outp
 
 ![Power Platform missing license](images/pplatformmissinglicense.PNG)
 
-
-
-
 ### Microsoft Graph Errors
 
 #### Infinite AAD Signin Loop
-While running the tool, AAD signin prompts sometimes get stuck in a loop. This is likely an issue with the connection to Microsoft Graph.
+While running the tool, AAD sign in prompts sometimes get stuck in a loop. This is likely an issue with the connection to Microsoft Graph.
 
 To fix the loop, run:
 ```PowerShell
@@ -374,8 +405,6 @@ ScubaGear requires a number of PowerShell modules to function.  A user or develo
 
 >PowerShellGet 2.x has a known issue uninstalling modules installed on a OneDrive path that may result in an "Access to the cloud file is denied" error.  Installing PSGet 3.0, currently in beta, will allow the script to successfully uninstall such modules or you can remove the modules files from OneDrive manually.
 
-### PowerShell Execution Policies
+## Project License
 
-On Windows Servers, the default [execution policy](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.security/set-executionpolicy?view=powershell-5.1) is `RemoteSigned`, which will allow ScubaGear to run after the publisher (CISA) is agreed to once.
-
-On Windows Clients, the default execution policy is `Restricted`.  In this case, `Set-ExecutionPolicy RemoteSigned` should be invoked to permit ScubaGear to run.
+Unless otherwise noted, this project is distributed under the Creative Commons Zero license. With developer approval, contributions may be submitted with an alternate compatible license. If accepted, those contributions will be listed herein with the appropriate license.
