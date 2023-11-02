@@ -7,8 +7,8 @@ Developed by CISA, ScubaGear is an assessment tool verifies that an M365 tenantâ
 - [Installation](#installation)
   - [Downloading Repository](#downloading-repository)
   - [Installing the required PowerShell Modules](#installing-the-required-powershell-modules)
-  - [PowerShell Execution Policies](#powershell-execution-policies)
   - [Download the required OPA executable](#download-the-required-opa-executable)
+  - [PowerShell Execution Policies](#powershell-execution-policies)
 - [Usage](#usage)
   - [Examples](#example-1-run-an-assessment-against-all-products-except-powerplatform)
   - [Parameter Definitions](#parameter-definitions)
@@ -55,14 +55,9 @@ Then run:
 Import-Module -Name .\PowerShell\ScubaGear #Imports the tool into your session
 ```
 
-### PowerShell Execution Policies
-
-On Windows Servers, the default [execution policy](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.security/set-executionpolicy?view=powershell-5.1) is `RemoteSigned`, which will allow ScubaGear to run after the publisher (CISA) is agreed to once.
-
-On Windows Clients, the default execution policy is `Restricted`.  In this case, `Set-ExecutionPolicy RemoteSigned` should be invoked to permit ScubaGear to run.
-
 ### Download the required OPA executable
-> **Note**: OPA executable download script is called by default when running SetUp.ps1. OPA.ps1 can also be run by itself to download the executable.
+> **Note**
+> The `OPA.ps1` executable download script is called by default when running `SetUp.ps1`. `OPA.ps1` can also be run by itself to download the executable.
 In the event of an unsuccessful download, users can manually download the OPA executable with the following steps:
 1. Go to OPA download site (https://www.openpolicyagent.org/docs/latest/#running-opa)
 2. Check the acceptable OPA version (Currently v0.42.1) for Scuba and select the corresponding version on top left of the website
@@ -72,8 +67,14 @@ In the event of an unsuccessful download, users can manually download the OPA ex
 .\opa_windows_amd64.exe version
 ```
 
+### PowerShell Execution Policies
+
+On Windows Servers, the default [execution policy](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.security/set-executionpolicy?view=powershell-5.1) is `RemoteSigned`, which will allow ScubaGear to run after the publisher (CISA) is agreed to once.
+
+On Windows Clients, the default execution policy is `Restricted`.  In this case, `Set-ExecutionPolicy RemoteSigned` should be invoked to permit ScubaGear to run.
+
 > **Note**
-> Starting with release 0.3.0, ScubaGear is signed by a commonly trusted CA.  Depending on the [PowerShell execution policy](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_execution_policies?view=powershell-5.1) of the system running ScubaGear, different steps may be required before running ScubaGear.  See [PowerShell Execution Policies](#powershell-execution-policies) for more details.
+> Starting with release 0.3.0, ScubaGear is signed by a commonly trusted CA.  Depending on the [PowerShell execution policy](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_execution_policies?view=powershell-5.1) of the system running ScubaGear, different steps may be required before running ScubaGear.
 
 ## Usage
 ScubaGear can be invoked interactively or non-interactively. The interactive authentication mode will prompt the user for credentials via Microsoft's popup windows. Non-interactive mode is for invoking ScubaGear using an Azure AD application service principal and supports running the tool in automated scenarios such as pipelines or scheduled jobs. Examples 1-3 provide examples for running with interactive mode and example 4 provides an example for running in non-interactive mode.
