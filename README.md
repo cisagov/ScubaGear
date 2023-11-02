@@ -11,9 +11,6 @@
 
 Developed by CISA, this assessment tool verifies that an M365 tenant’s configuration conforms to the policies described in the Secure Cloud Business Applications ([SCuBA](https://cisa.gov/scuba)) Minimum Viable Secure Configuration Baseline [documents](https://github.com/cisagov/ScubaGear/tree/main/baselines).
 
-> **Warning**
-> This tool is in an alpha state and in active development. At this time, outputs could be incorrect and should be reviewed carefully.
-
 ## Table of Contents
 - [M365 Product License Assumptions](#m365-product-license-assumptions)
 - [Installation](#installation)
