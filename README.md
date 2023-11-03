@@ -4,7 +4,7 @@
         <img src="https://img.shields.io/badge/ScubaGear-v1.0.0-%2343AA4F?labelColor=%23005288" /></a>
 </p>
 
-Developed by CISA, ScubaGear is an assessment tool that verifies a M365 tenant’s configuration conforms to the policies described in the Secure Cloud Business Applications ([SCuBA](https://cisa.gov/scuba)) Minimum Viable Secure Configuration Baseline [documents](https://github.com/cisagov/ScubaGear/tree/main/baselines).
+Developed by CISA, ScubaGear is an assessment tool that verifies a Microsoft 365 (M365) tenant’s configuration conforms to the policies described in the Secure Cloud Business Applications ([SCuBA](https://cisa.gov/scuba)) Minimum Viable Secure Configuration Baseline [documents](https://github.com/cisagov/ScubaGear/tree/main/baselines).
 
 ## Table of Contents
 - [M365 Product License Assumptions](#m365-product-license-assumptions)
@@ -47,6 +47,7 @@ If a tenant does not have the licenses listed above, the report will display a n
 > DOD endpoints are included, but have not been tested. Please open an issue if you encounter bugs.
 
 ## Getting Started
+
 ### Download the Latest Release
 To download ScubaGear:
 
@@ -67,7 +68,7 @@ Import-Module -Name .\PowerShell\ScubaGear #Imports the tool into your session
 ```
 
 ### Download the Required OPA executable
-> **Note**
+> **Important**
 > The `OPA.ps1` executable download script is called by default when running `SetUp.ps1`. `OPA.ps1` can also be run by itself to download the executable.
 In the event of an unsuccessful download, users can manually download the OPA executable with the following steps:
 1. Go to OPA download site (https://www.openpolicyagent.org/docs/latest/#running-opa)
@@ -112,7 +113,6 @@ Get-Help -Name Invoke-SCuBA -Full
 ```
 
 ### Parameter Definitions
-
 - **$ConfigFilePath** is an optional parameter that refers to the path to a configuration file that the tool parses for input parameters when executing ScubaGear. ScubaGear supports either a YAML or JSON formatted configuration file. A sample configuration file is included in [sample-config-files/aad-config.yaml](./sample-config-files/aad-config.yaml). The syntax defines:
   - Use of Pascal case convention for variable names consistent with parameters on the command line
   - A global namespace for values to be used across baselines and products (i.e., GlobalVars)
@@ -167,7 +167,7 @@ RoleExclusions can be defined in the following policy namespaces:
 
 - MS.AAD.7.4v1
 
-The example below illustrates the syntax for defining user, group, and role exemptions to select policies.  The syntax allows the use of a YAML anchor and alias to simplify formatting policies having the same documented exemptions. Items surrounded by chevrons are to be supplied by the user.
+The example below illustrates the syntax for defining user, group, and role exemptions to select policies. The syntax allows the use of a YAML anchor and alias to simplify formatting policies having the same documented exemptions. Items surrounded by chevrons are to be supplied by the user.
 
         Aad:
           MS.AAD.1.1v1: &CommonExclusions
@@ -410,7 +410,7 @@ Data gathered by the script includes:
   * JSON and CSV-formatted M365 baseline test results
 
 #### Removing installed modules
-ScubaGear requires a number of PowerShell modules to function.  A user or developer, however, may wish to remove these PowerShell modules for testing or for cleanup after ScubaGear has been run.  The `UninstallModules.ps1` script will remove the latest version of the modules required by ScubaGear and installed by the associated `Setup.ps1` script.  The script does not take any options and can be as follows:
+ScubaGear requires a number of PowerShell modules to function. A user or developer, however, may wish to remove these PowerShell modules for testing or for cleanup after ScubaGear has been run.  The `UninstallModules.ps1` script will remove the latest version of the modules required by ScubaGear and installed by the associated `Setup.ps1` script. The script does not take any options and can be as follows:
 
 ```powershell
 .\UninstallModules.ps1
@@ -419,5 +419,4 @@ ScubaGear requires a number of PowerShell modules to function.  A user or develo
 >PowerShellGet 2.x has a known issue uninstalling modules installed on a OneDrive path that may result in an "Access to the cloud file is denied" error.  Installing PSGet 3.0, currently in beta, will allow the script to successfully uninstall such modules or you can remove the modules files from OneDrive manually.
 
 ## Project License
-
 Unless otherwise noted, this project is distributed under the Creative Commons Zero license. With developer approval, contributions may be submitted with an alternate compatible license. If accepted, those contributions will be listed herein with the appropriate license.
