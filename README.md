@@ -56,7 +56,8 @@ To download ScubaGear:
 3. Extract the folder in the zip file.
 
 ### Installing the Required PowerShell Modules
-> **Note**: Only PowerShell 5.1 is currently supported. PowerShell 7 may work, but has not been tested. Full PowerShell 7 support will be added in a future release.
+> **Note**
+>  Only PowerShell 5.1 is currently supported. PowerShell 7 may work, but has not been tested. Full PowerShell 7 support will be added in a future release.
 
 To import the module, open a new PowerShell 5.1 terminal and navigate to the repository folder.
 
