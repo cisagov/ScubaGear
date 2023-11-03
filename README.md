@@ -1,10 +1,10 @@
 # ScubaGear
 <p>
-        <a href="https://github.com/cisagov/ScubaGear/releases" alt="ScubaGoggles version #">
+        <a href="https://github.com/cisagov/ScubaGear/releases" alt="ScubaGear version #">
         <img src="https://img.shields.io/badge/ScubaGear-v1.0.0-%2343AA3F?labelColor=%23005288" /></a>
 </p>
 
-Developed by CISA, ScubaGear is an assessment tool verifies that an M365 tenant’s configuration conforms to the policies described in the Secure Cloud Business Applications ([SCuBA](https://cisa.gov/scuba)) Minimum Viable Secure Configuration Baseline [documents](https://github.com/cisagov/ScubaGear/tree/main/baselines).
+Developed by CISA, ScubaGear is an assessment tool that verifies that an M365 tenant’s configuration conforms to the policies described in the Secure Cloud Business Applications ([SCuBA](https://cisa.gov/scuba)) Minimum Viable Secure Configuration Baseline [documents](https://github.com/cisagov/ScubaGear/tree/main/baselines).
 
 ## Table of Contents
 - [M365 Product License Assumptions](#m365-product-license-assumptions)
@@ -25,6 +25,13 @@ Developed by CISA, ScubaGear is an assessment tool verifies that an M365 tenant�
 - [Architecture](#architecture)
 - [Repository Organization](#repository-organization)
 - [Troubleshooting](#troubleshooting)
+  - [Executing against multiple tenants](#executing-against-multiple-tenants)
+  - [Errors connecting to Defender](#errors-connecting-to-defender)
+  - [Exchange Online maximum connections error](#exchange-online-maximum-connections-error)
+  - [Power Platform Errors](#power-platform-errors)
+  - [Microsoft Graph Errors](#microsoft-graph-errors)
+  - [Running the Tool Behind Some Proxies](#running-the-tool-behind-some-proxies)
+  - [Utility Scripts](#utility-scripts)
 - [Project License](#project-license)
 
 ## M365 Product License Assumptions
@@ -48,7 +55,7 @@ To download ScubaGear:
 3. Extract the folder in the zip file.
 
 ### Installing the required PowerShell Modules
-> **Note**: Only PowerShell 5.1 is currently supported. PowerShell 7 may work, but has not been tested. PowerShell 7 support will be added in a future release.
+> **Note**: Only PowerShell 5.1 is currently supported. PowerShell 7 may work, but has not been tested. Full PowerShell 7 support will be added in a future release.
 
 To import the module, open a new PowerShell 5.1 terminal and navigate to the repository folder.
 
@@ -64,7 +71,7 @@ Import-Module -Name .\PowerShell\ScubaGear #Imports the tool into your session
 > The `OPA.ps1` executable download script is called by default when running `SetUp.ps1`. `OPA.ps1` can also be run by itself to download the executable.
 In the event of an unsuccessful download, users can manually download the OPA executable with the following steps:
 1. Go to OPA download site (https://www.openpolicyagent.org/docs/latest/#running-opa)
-2. Check the acceptable OPA version (Currently v0.42.1) for Scuba and select the corresponding version on top left of the website
+2. Check the acceptable OPA version (Currently v0.42.1) for ScubaGear and select the corresponding version on top left of the website
 3. Navigate to the menu on left side of the screen: Introduction - Running OPA - Download OPA
 4. Locate the downloaded file, add the file to the root directory of this repository, open PowerShell, and use the following command to check the downloaded OPA version
 ```powershell
@@ -72,10 +79,9 @@ In the event of an unsuccessful download, users can manually download the OPA ex
 ```
 
 ### PowerShell Execution Policies
-
 On Windows Servers, the default [execution policy](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.security/set-executionpolicy?view=powershell-5.1) is `RemoteSigned`, which will allow ScubaGear to run after the publisher (CISA) is agreed to once.
 
-On Windows Clients, the default execution policy is `Restricted`.  In this case, `Set-ExecutionPolicy RemoteSigned` should be invoked to permit ScubaGear to run.
+On Windows Clients, the default execution policy is `Restricted`. In this case, `Set-ExecutionPolicy RemoteSigned` should be invoked to permit ScubaGear to run.
 
 > **Note**
 > Starting with release 0.3.0, ScubaGear is signed by a commonly trusted CA.  Depending on the [PowerShell execution policy](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_execution_policies?view=powershell-5.1) of the system running ScubaGear, different steps may be required before running ScubaGear.
@@ -132,7 +138,6 @@ Get-Help -Name Invoke-SCuBA -Full
     - For M365 Government Commercial Cloud High tenants enter the value `gcchigh`.
     - For M365 Department of Defense tenants enter the value `dod`.
 
-
 - **$OPAPath** refers to the folder location of the Open Policy Agent (OPA) policy engine executable file. By default the OPA policy engine executable embedded with this project is located in the project's root folder `"./"` and for most cases this value will not need to be modified. To execute the tool using a version of the OPA policy engine located in another folder, customize the variable value with the full path to the folder containing the OPA policy engine executable file.
 
 - **$OutPath** refers to the folder path where the output JSON and the HTML report will be created. Defaults to the same directory where the script is executed.  This parameter is only necessary if an alternate report folder path is desired.  The folder will be created if it does not exist.
@@ -183,7 +188,7 @@ The example below illustrates the syntax for defining user, group, and role exem
                 - <Exempted Group 2 UUID>
 
 ### Viewing the Report
-The HTML report should open in your browser once the script completes. If it does not, navigate to the output folder and open the BaselineReports.html file using your browser. The result files generated from the tool are also saved to the output folder.
+The HTML report should open in your browser once the script completes. If it does not, navigate to the output folder and open the `BaselineReports.html` file using your browser. The result files generated from the tool are also saved to the output folder.
 
 ## Required Permissions
 When executing the tool interactively, there are two types of permissions that are required:
@@ -265,7 +270,7 @@ The tool employs a three-step process:
 3. **Format & Report**. Package the data output by the OPA policy engine into a human-friendly HTML report.
 
 ## Repository Organization
-- `PowerShell` contains the code used to export the configuration settings from the M365 tenant and orchestrate the entire process from export through evaluation to report. The main PowerShell module manifest `SCuBA.psd1` is located in the PowerShell folder.
+- `PowerShell` contains the code used to export the configuration settings from the M365 tenant and orchestrate the entire process from export through evaluation to report. The main PowerShell module manifest `ScubaGear.psd1` is located in the `PowerShell/ScubaGear` folder.
 - `Rego` holds the `.rego` files. Each Rego file audits against the desired state for each product, per the SCuBA M365 secure configuration baseline documents.
 - `Testing` contains code that is used during the development process to unit test Rego policies.
 
@@ -292,7 +297,7 @@ https://docs.microsoft.com/en-us/powershell/exchange/exchange-online-powershell-
 Create Powershell Session is failed using OAuth
 ```
 
-If you see this error message it means that basic authentication needs to be enabled on the client computer running the automation scripts. The automation relies on the Microsoft Security & Compliance PowerShell environment for Defender information. Security & Compliance PowerShell connections, unlike other services used by the ExchangeOnlineManagement module, required basic authentication to be enabled on the local machine for versions of ExchangeOnlineManagement prior to Version 3. As of June 2023, Microsoft has [deprecated Remote PowerShell for Exchange Online and Security & Compliance PowerShell](https://techcommunity.microsoft.com/t5/exchange-team-blog/announcing-deprecation-of-remote-powershell-rps-protocol-in/ba-p/3695597). To resolve this error, you should run the .\SetUp.ps1 script to install the latest compatible ExchangeOnlineManagement module.
+If you see this error message it means that you are running a version of the ExchangeOnlineManagement PowerShell module less than Version 3.2. The automation relies on the Microsoft Security & Compliance PowerShell environment for Defender information. Security & Compliance PowerShell connections, unlike other services used by the ExchangeOnlineManagement module, used to required basic authentication to be enabled. As of June 2023, Microsoft has [deprecated Remote PowerShell for Exchange Online and Security & Compliance PowerShell](https://techcommunity.microsoft.com/t5/exchange-team-blog/announcing-deprecation-of-remote-powershell-rps-protocol-in/ba-p/3695597). To resolve this error, you should run the `.\SetUp.ps1` script to install the latest ExchangeOnlineManagement module version.
 
 ### Exchange Online maximum connections error
 If when running the tool against Exchange Online, you see the error below in the Powershell window, follow the instructions in this section.
@@ -314,18 +319,33 @@ or alternatively run `Disconnect-SCuBATenant` exported by the ScubaGear module.
 Disconnect-SCuBATenant
 ```
 
-### Power Platform empty policy in report
+### Power Platform errors
 In order for the tool to properly assess the Power Platform product, one of the following conditions must be met:
-* The tenant includes the `Power Apps for Office 365` license AND the user running the tool has the `Power Platform Administrator` role assigned
-*  The user running the tool has the `Global Administrator` role
+* The tenant includes the `Power Apps for Office 365` license AND the user running the tool has the `Power Platform Administrator` role assigned.
+*  The user running the tool has the `Global Administrator` role.
 
-If these conditions are not met, the tool will generate an incorrect report output. The development team is working on a fix to address this bug that will be included in the next release. The screenshot below shows an example of this error for Power Platform policy 2.3. When a user with the required license and role runs the tool, it will produce a correct report.
+In addition to those conditions, the correct `$M365Environment` parameter value must be passed into the `Invoke-SCuBA` otherwise an error will be thrown like the one shown below.
 
-![Power Platform missing license](images/pplatformmissinglicense.PNG)
+```
+Invoke-ProviderList : Error with the PowerPlatform Provider. See the exception message for more details: "Power Platform Provider ERROR: The M365Environment parameter value is not set correctly which WILL cause the Power Platform report to display incorrect values.                                                                                                 ---------------------------------------                                                                     M365Environment Parameter value: commercial
+        Your tenant's OpenId-Configuration: tenant_region_scope: NA, tenant_region_sub_scope: GCC
+        ---------------------------------------
+        Rerun ScubaGear with the correct M365Environment parameter value
+        by looking at your tenant's OpenId-Configuration displayed above and
+        contrast it with the mapped values in the table below
+        M365Environment => OpenId-Configuration
+        ---------------------------------------
+        commercial: tenant_region_scope:NA, tenant_region_sub_scope:
+        gcc: tenant_region_scope:NA, tenant_region_sub_scope: GCC
+        gcchigh : tenant_region_scope:USGov, tenant_region_sub_scope: DODCON
+        dod: tenant_region_scope:USGov, tenant_region_sub_scope: DOD
+        ---------------------------------------
+        Example Rerun for gcc tenants: Invoke-Scuba -M365Environment gcc
+```
 
 ### Microsoft Graph Errors
 
-#### Infinite AAD Signin Loop
+#### Infinite AAD Sign in Loop
 While running the tool, AAD sign in prompts sometimes get stuck in a loop. This is likely an issue with the connection to Microsoft Graph.
 
 To fix the loop, run:
@@ -348,7 +368,7 @@ After deleting the `.graph` folder in your home directory, re-run the tool and t
 This indicates that the authentication module is at a version level that conflicts with the MS Graph modules used by the tool. Follow the instructions in the Installation section and execute the Setup script again. This will ensure that the module versions get synchronized with dependencies and then execute the tool again.
 
 
-### Running the Script Behind Some Proxies
+### Running the Tool Behind Some Proxies
 If you receive connection or network proxy errors, try running:
 ```powershell
 $Wcl=New-Object System.Net.WebClient
