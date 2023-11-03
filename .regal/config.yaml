@@ -10,7 +10,7 @@ rules:
       # redundant, as that's the implied rule body when
       # none is provided. It's harmless, but should be
       # fixed anyway so real issues aren't missed.
-      level: ignore
+      level: warning
   custom:
     # https://docs.styra.com/regal/rules/custom/naming-convention
     naming-convention:
@@ -60,11 +60,11 @@ rules:
       # Most of these seem fixable by concatenating strings
       # and by using the non-breakable-word-threshold option
       # for when that doesn't work.
-      level: ignore
+      level: warning
     # https://docs.styra.com/regal/rules/style/no-whitespace-comment
     no-whitespace-comment:
       # This repo is actually good about this, but frequently
-      # uses '#--' as a delimeter of sorts. That should be OK,
+      # uses '#--' as a delimiter of sorts. That should be OK,
       # and the next version of Regal will allow for exceptions
       # like this: https://github.com/StyraInc/regal/issues/379
       level: ignore
@@ -73,7 +73,7 @@ rules:
       level: ignore
     # https://docs.styra.com/regal/rules/style/prefer-some-in-iteration
     prefer-some-in-iteration:
-      level: ignore
+      level: warning
     # https://docs.styra.com/regal/rules/style/prefer-snake-case
     prefer-snake-case:
       # This is the default style preference for Rego, but since
@@ -90,8 +90,8 @@ rules:
   testing:
     # https://docs.styra.com/regal/rules/testing/identically-named-tests
     identically-named-tests:
-      # Only a few of these — woulde be easy to fix
-      level: ignore
+      # Only a few of these — would be easy to fix
+      level: warning
     # https://docs.styra.com/regal/rules/testing/test-outside-test-package
     test-outside-test-package:
       # This is just a style preference
