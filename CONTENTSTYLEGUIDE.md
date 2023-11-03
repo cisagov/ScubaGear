@@ -10,7 +10,7 @@ Use menu icon on the top left corner of this document to get to a specific secti
 
 - Our style guide aims for simplicity. Guidelines should be easy to apply to a range of scenarios.
 - Decisions aren’t about what’s right or wrong according to the rules, but about what’s best practice and improves readability. We're flexible and open to change while maintaining consistency.
-- When making a style or structure decision, we consider the readability, maintainability and ability for consitancy in a range of situations.
+- When making a style or structure decision, we consider the readability, maintainability and ability for consistency in a range of situations.
 - When a question specific to help documentation isn’t covered by the style guide, we think it through using these principles, then make a decision and bring it up in the next meeting for deliberation.
 
 ## OPA Rego
@@ -75,30 +75,25 @@ The first one directs the user to the baseline document for manual checking. The
 
 ```
 # At this time we are unable to test for X because of Y
-tests[{
-    "PolicyId" : PolicyId,
-    "Criticality" : "Shall/Not-Implemented",
-    "Commandlet" : [],
-    "ActualValue" : [],
-    "ReportDetails" : NotCheckedDetails(PolicyId),
-    "RequirementMet" : false
-}] {
-    PolicyId := "MS.<Product>.<Control Group #>.<Control #>v<Version #>"
-    true
+tests contains {
+    "PolicyId": "MS.<Product>.<Policy #>.<Bulletpoint #>v<Version #>",
+    "Criticality": "Should/Not-Implemented",
+    "Commandlet": [],
+    "ActualValue": [],
+    "ReportDetails": NotCheckedDetails("MS.<Product>.<Policy #>.<Bulletpoint #>v<Version #>"),
+    "RequirementMet": false,
 }
 ```
 
 ```
 # At this time we are unable to test for X because of Y
-tests[{
-    "PolicyId" : "MS.<Product>.<Policy #>.<Bulletpoint #>v<Version #>",
-    "Criticality" : "Shall/3rd Party",
-    "Commandlet" : [],
-    "ActualValue" : [],
-    "ReportDetails" : "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
-    "RequirementMet" : false
-}] {
-    true
+tests contains {
+    "PolicyId": "MS.<Product>.<Policy #>.<Bulletpoint #>v<Version #>",
+    "Criticality": "Shall/3rd Party",
+    "Commandlet": [],
+    "ActualValue": [],
+    "ReportDetails": DefenderMirrorDetails("MS.<Product>.<Policy #>.<Bulletpoint #>v<Version #>"),
+    "RequirementMet": false,
 }
 ```
 #### Testing
@@ -126,7 +121,7 @@ test_3rdParty_Correct_V1 if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check"
+    RuleOutput[0].ReportDetails == DefenderMirrorDetails(PolicyId)
 }
 ```
 
@@ -244,7 +239,7 @@ tests[{
 
 ### Booleans
 
-In the interest of consistency across policy tests and human readability of the test, boolean-valued variables should be set via a comparison test against a boolean constant (true/false).
+In the interest of consistency across policy tests and human readability of the test, boolean-valued variables should be set via a comparison test against a boolean constant (true/false) for variables.
 
 #### Correct
 
@@ -281,7 +276,7 @@ tests[{
     ...
 }] {
     ExampleVar := input.ExampleVar
-    Status := ExampleVar # Mising == true
+    Status := ExampleVar # Missing == true
 }
 
 tests[{
@@ -292,58 +287,106 @@ tests[{
 }
 ```
 
-### Taking input
+Because methods can return undefined, use `not` instead of false comparison when dealing with booleans. `not` will still pass if the you want the false result, i.e. `== false`, but will also pass if the result is undefined. This is important because the default keyword does not work for methods, only variables. So you write your methods for the true cases & treat false/undefined results as failing cases.
 
-We will always store the input in a variable first thing. It can sometimes be easier to only use `input.ExampleVar` repeatedly, but for consistancy this is best practice. the `[_]` is added to the end for when you are anticipating an array, so the program has to loop through the input. There are other ways to take in input, but OPA Documents states `input.VariableName` is recommended. As such we will only use this method for consistancy. If there is a problem, it can be taken up on a case by case basis for disscussion.
+#### Correct
+
 
 ```
-tests[{
+ExampleVariable contains SomeVariable.DisplayName if {
+    some X
+    SomeVariable := input.example_key[X]
+    not is_null(SomeVariable.OnPremisesImmutableId)
+}
+```
+
+#### Incorrect
+
+```
+ExampleVariable contains SomeVariable.DisplayName if {
+    some X
+    SomeVariable := input.example_key[X]
+    is_null(SomeVariable.OnPremisesImmutableId) == false
+}
+```
+
+Opa will use implicit true in some cases. For example, if the variable contained a true/false boolean, you did not need `== true` to check if the boolean contained is true. This is also true in method returns. Opa assumes methods return true/false & if not specified, will return true. For readability purposes, we enforce explicitly stating `:= true`.
+
+#### Correct
+```
+ExampleMethod(Variable) := true if {
+    count({x | some x in Variable}) == 0
+}
+```
+
+#### Incorrect
+
+```
+ExampleMethod(Variable) if {
+    count({x | some x in Variable}) == 0
+}
+```
+
+### Taking input
+
+We will always store the input in a variable first thing. It can sometimes be easier to only use `input.ExampleVar` repeatedly, but for consistency this is best practice. the `some var in` is added to the end for when you are anticipating an array, so the program has to loop through the input. There are other ways to take in input, but OPA Documents states `input.VariableName` is recommended. As such we will only use this method for consistency. If there is a problem, it can be taken up on a case by case basis for discussion.
+
+```
+tests contains {
     ...
-}] {
-    ExampleVar := input.ExampleVar[_]
+} if {
+    some ExampleVar in input.example_var
     Status := "Example" in ExampleVar
 }
 
-tests[{
+tests contains {
     ...
-}] {
-    ExampleVar := input.ExampleVar
+} if {
+    some ExampleVar in input.example_var[_].nested_var
+    Status := "Example" in ExampleVar
+}
+
+tests contains {
+    ...
+} if {
+    ExampleVar := input.example_var
     Status := ExampleVar == true
 }
 ```
 
 ### ActualValue
 
-It can be tempting to put the status variable in the ActualValue spot when you are anticipating a boolean. DON'T! For consistancy and as best practice put `ExampleVar.ExampleSetting`.
+It can be tempting to put the status variable in the ActualValue spot when you are anticipating a boolean. DON'T! For consistency and as best practice put `ExampleVar.ExampleSetting`.
 
 #### InCorrect
 ```
-tests[{
+tests contains {
     "PolicyId" : "MS.<Product>.<Policy #>.<Bulletpoint #>v<Version #>",,
     "Criticality" : "Should",
     "Commandlet" : "Example-Command",
     "ActualValue" : Status,
     "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
-}] {
-    ExampleVar := input.ExampleVar
+} if {
+    ExampleVar := input.example_var
     Status := ExampleVar == true
 }
 ```
 
 #### Correct
 ```
-tests[{
+tests contains {
     "PolicyId" : "MS.<Product>.<Policy #>.<Bulletpoint #>v<Version #>",,
     "Criticality" : "Should",
     "Commandlet" : "Example-Command",
     "ActualValue" : ExampleVar.ExampleSetting,
     "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
-}] {
-    ExampleVar := input.ExampleVar
+} if {
+    ExampleVar := input.example_var
     Status := ExampleVar == true
 }
 ```
+
 ## PowerShell
 [PoshCode's The PowerShell Best Practices and Style Guide](https://github.com/PoshCode/PowerShellPracticeAndStyle)
