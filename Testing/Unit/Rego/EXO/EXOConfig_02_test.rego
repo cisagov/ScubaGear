@@ -1,8 +1,8 @@
 package exo_test
 import future.keywords
 import data.exo
-import data.report.utils.NotCheckedDetails
-import data.report.utils.ReportDetailsBoolean
+import data.utils.report.NotCheckedDetails
+import data.utils.report.ReportDetailsBoolean
 
 
 CorrectTestResult(PolicyId, Output, ReportDetailString) := true if {

@@ -1,7 +1,7 @@
 package exo_test
 import future.keywords
 import data.exo
-import data.report.utils.DefenderMirrorDetails
+import data.utils.report.DefenderMirrorDetails
 
 
 CorrectTestResult(PolicyId, Output, ReportDetailString) := true if {

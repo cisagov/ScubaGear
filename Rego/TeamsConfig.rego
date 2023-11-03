@@ -1,9 +1,9 @@
 package teams
 import future.keywords
-import data.report.utils.Format
-import data.report.utils.ReportDetailsBoolean
-import data.report.utils.Description
-import data.report.utils.DefenderMirrorDetails
+import data.utils.report.Format
+import data.utils.report.ReportDetailsBoolean
+import data.utils.report.Description
+import data.utils.report.DefenderMirrorDetails
 
 ReportDetailsArray(true, _, _) := PASS if {}
 

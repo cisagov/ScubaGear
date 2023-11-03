@@ -1,11 +1,11 @@
 package aad
 import future.keywords
-import data.report.utils.NotCheckedDetails
-import data.report.utils.Format
-import data.report.utils.ReportDetailsBoolean
-import data.policy.utils.IsEmptyContainer
-import data.policy.utils.Contains
-import data.policy.utils.Count
+import data.utils.report.NotCheckedDetails
+import data.utils.report.Format
+import data.utils.report.ReportDetailsBoolean
+import data.utils.policy.IsEmptyContainer
+import data.utils.policy.Contains
+import data.utils.policy.Count
 
 #############
 # Constants #

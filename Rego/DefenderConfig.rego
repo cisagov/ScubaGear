@@ -1,12 +1,12 @@
 package defender
 import future.keywords
-import data.report.utils.NotCheckedDetails
-import data.report.utils.ReportDetailsBoolean
-import data.defender.utils.SensitiveAccounts
-import data.defender.utils.SensitiveAccountsConfig
-import data.defender.utils.SensitiveAccountsSetting
-import data.defender.utils.ImpersonationProtection
-import data.defender.utils.ImpersonationProtectionConfig
+import data.utils.report.NotCheckedDetails
+import data.utils.report.ReportDetailsBoolean
+import data.utils.defender.SensitiveAccounts
+import data.utils.defender.SensitiveAccountsConfig
+import data.utils.defender.SensitiveAccountsSetting
+import data.utils.defender.ImpersonationProtection
+import data.utils.defender.ImpersonationProtectionConfig
 
 
 #############

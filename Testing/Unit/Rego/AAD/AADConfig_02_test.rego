@@ -1,7 +1,7 @@
 package aad_test
 import future.keywords
 import data.aad
-import data.report.utils.NotCheckedDetails
+import data.utils.report.NotCheckedDetails
 
 
 CorrectTestResult(PolicyId, Output, ReportDetailString) := true if {

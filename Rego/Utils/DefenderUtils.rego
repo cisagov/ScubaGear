@@ -1,4 +1,4 @@
-package defender.utils
+package utils.defender
 import future.keywords
 
 ##########################################
@@ -7,49 +7,50 @@ import future.keywords
 
 # Gets Sensitive Account Filter specification from SCuBA config input
 SensitiveAccountsConfig(PolicyID) := {
-    "IncludedUsers" : IncludedUsers,
-    "ExcludedUsers" : ExcludedUsers,
-    "IncludedGroups" : IncludedGroups,
-    "ExcludedGroups" : ExcludedGroups,
-    "IncludedDomains" : IncludedDomains,
-    "ExcludedDomains" : ExcludedDomains
-} {
+    "IncludedUsers": IncludedUsers,
+    "ExcludedUsers": ExcludedUsers,
+    "IncludedGroups": IncludedGroups,
+    "ExcludedGroups": ExcludedGroups,
+    "IncludedDomains": IncludedDomains,
+    "ExcludedDomains": ExcludedDomains
+} if {
     SensitiveAccounts := input.scuba_config.Defender[PolicyID].SensitiveAccounts
-    IncludedUsers := { trim_space(x) | some x in SensitiveAccounts.IncludedUsers; x != null }
-    ExcludedUsers := { trim_space(x) | some x in SensitiveAccounts.ExcludedUsers; x != null }
-    IncludedGroups := { trim_space(x) | some x in SensitiveAccounts.IncludedGroups; x != null }
-    ExcludedGroups := { trim_space(x) | some x in SensitiveAccounts.ExcludedGroups; x != null }
-    IncludedDomains := { trim_space(x) | some x in SensitiveAccounts.IncludedDomains; x != null }
-    ExcludedDomains := { trim_space(x) | some x in SensitiveAccounts.ExcludedDomains; x != null }
+    IncludedUsers := {trim_space(x) | some x in SensitiveAccounts.IncludedUsers; x != null}
+    ExcludedUsers := {trim_space(x) | some x in SensitiveAccounts.ExcludedUsers; x != null}
+    IncludedGroups := {trim_space(x) | some x in SensitiveAccounts.IncludedGroups; x != null}
+    ExcludedGroups := {trim_space(x) | some x in SensitiveAccounts.ExcludedGroups; x != null}
+    IncludedDomains := {trim_space(x) | some x in SensitiveAccounts.IncludedDomains; x != null}
+    ExcludedDomains := {trim_space(x) | some x in SensitiveAccounts.ExcludedDomains; x != null}
 } else := {
-    "IncludedUsers" : set(),
-    "ExcludedUsers" : set(),
-    "IncludedGroups" : set(),
-    "ExcludedGroups" : set(),
-    "IncludedDomains" : set(),
-    "ExcludedDomains" : set()
+    "IncludedUsers": set(),
+    "ExcludedUsers": set(),
+    "IncludedGroups": set(),
+    "ExcludedGroups": set(),
+    "IncludedDomains": set(),
+    "ExcludedDomains": set()
 }
 
 # Gets Sensitive Account Filter specified in policy input
 SensitiveAccountsSetting(Policies) := {
-    "IncludedUsers" : IncludedUsers,
-    "ExcludedUsers" : ExcludedUsers,
-    "IncludedGroups" : IncludedGroups,
-    "ExcludedGroups" : ExcludedGroups,
-    "IncludedDomains" : IncludedDomains,
-    "ExcludedDomains" : ExcludedDomains,
-    "Policy" : Policy[0]
-} {
-    Policy := [ Policy | Policy := Policies[_]; Policy.Identity == "Strict Preset Security Policy"; Policy.State == "Enabled" ]
-    IncludedUsers := { x | x := Policy[0].SentTo[_] }
-    ExcludedUsers := { x | x := Policy[0].ExceptIfSentTo[_] }
-    IncludedGroups := { x | x := Policy[0].SentToMemberOf[_] }
-    ExcludedGroups := { x | x := Policy[0].ExceptIfSentToMemberOf[_] }
-    IncludedDomains := { x | x := Policy[0].RecipientDomainIs[_] }
-    ExcludedDomains := { x | x := Policy[0].ExceptIfRecipientDomainIs[_] }
+    "IncludedUsers": IncludedUsers,
+    "ExcludedUsers": ExcludedUsers,
+    "IncludedGroups": IncludedGroups,
+    "ExcludedGroups": ExcludedGroups,
+    "IncludedDomains": IncludedDomains,
+    "ExcludedDomains": ExcludedDomains,
+    "Policy": Policy[0]
+} if {
+    Policy := [Policy | some Policy in Policies; Policy.Identity == "Strict Preset Security Policy"; Policy.State == "Enabled"]
+    IncludedUsers := {x | some x in Policy[0].SentTo}
+    ExcludedUsers := {x | some x in Policy[0].ExceptIfSentTo}
+    IncludedGroups := {x | some x in Policy[0].SentToMemberOf}
+    ExcludedGroups := {x | some x in Policy[0].ExceptIfSentToMemberOf}
+    IncludedDomains := {x | some x in Policy[0].RecipientDomainIs}
+    ExcludedDomains := {x | some x in Policy[0].ExceptIfRecipientDomainIs}
 }
 
 default SensitiveAccounts(_, _) := false
+
 ### Case 1 - No Strict Policy assignment ###
 # Is there a Strict Policy present, if not always fail
 SensitiveAccounts(SensitiveAccountsSetting, _) := false if {
@@ -58,7 +59,7 @@ SensitiveAccounts(SensitiveAccountsSetting, _) := false if {
 
 ### Case 2 ###
 # Is there a Strict Policy present and no assignment conditions or exceptions, all users included. Always pass
-SensitiveAccounts(SensitiveAccountsSetting, _) := true if {
+SensitiveAccounts(SensitiveAccountsSetting, _) if {
     count(SensitiveAccountsSetting.Policy) > 0
     SensitiveAccountsSetting.Policy.Conditions == null
     SensitiveAccountsSetting.Policy.Exceptions == null
@@ -74,22 +75,15 @@ SensitiveAccounts(SensitiveAccountsSetting, SensitiveAccountsConfig) := false if
         SensitiveAccountsSetting.Policy.Conditions == null,
         SensitiveAccountsSetting.Policy.Exceptions == null
     ]
-    count([x | x := ConditionsAbsent[_]; x == false]) > 0
+    count([Condition | some Condition in ConditionsAbsent; Condition == false]) > 0
 
     # No config is defined
-    count(
-        SensitiveAccountsConfig.IncludedUsers   |
-        SensitiveAccountsConfig.ExcludedUsers   |
-        SensitiveAccountsConfig.IncludedGroups  |
-        SensitiveAccountsConfig.ExcludedGroups  |
-        SensitiveAccountsConfig.IncludedDomains |
-        SensitiveAccountsConfig.ExcludedDomains
-        ) == 0
+    count(((((SensitiveAccountsConfig.IncludedUsers | SensitiveAccountsConfig.ExcludedUsers) | SensitiveAccountsConfig.IncludedGroups) | SensitiveAccountsConfig.ExcludedGroups) | SensitiveAccountsConfig.IncludedDomains) | SensitiveAccountsConfig.ExcludedDomains) == 0
 }
 
 ### Case 4 ###
 # When settings and config are present, do they match?
-SensitiveAccounts(SensitiveAccountsSetting, SensitiveAccountsConfig) := true if {
+SensitiveAccounts(SensitiveAccountsSetting, SensitiveAccountsConfig) if {
     count(SensitiveAccountsSetting.Policy) > 0
 
     # Policy filter includes one or more conditions or exclusions
@@ -97,17 +91,10 @@ SensitiveAccounts(SensitiveAccountsSetting, SensitiveAccountsConfig) := true if 
         SensitiveAccountsSetting.Policy.Conditions == null,
         SensitiveAccountsSetting.Policy.Exceptions == null
     ]
-    count([x | x := ConditionsAbsent[_]; x == false]) > 0
+    count([Condition | some Condition in ConditionsAbsent; Condition == false]) > 0
 
     # Config is defined
-    count(
-        SensitiveAccountsConfig.IncludedUsers   |
-        SensitiveAccountsConfig.ExcludedUsers   |
-        SensitiveAccountsConfig.IncludedGroups  |
-        SensitiveAccountsConfig.ExcludedGroups  |
-        SensitiveAccountsConfig.IncludedDomains |
-        SensitiveAccountsConfig.ExcludedDomains
-        ) > 0
+    count(((((SensitiveAccountsConfig.IncludedUsers | SensitiveAccountsConfig.ExcludedUsers) | SensitiveAccountsConfig.IncludedGroups) | SensitiveAccountsConfig.ExcludedGroups) | SensitiveAccountsConfig.IncludedDomains) | SensitiveAccountsConfig.ExcludedDomains) > 0
 
     # All filter and config file settings mismatches
     Mismatches := [
@@ -118,7 +105,7 @@ SensitiveAccounts(SensitiveAccountsSetting, SensitiveAccountsConfig) := true if 
         SensitiveAccountsSetting.ExcludedGroups == SensitiveAccountsConfig.ExcludedGroups,
         SensitiveAccountsSetting.ExcludedDomains == SensitiveAccountsConfig.ExcludedDomains
     ]
-    count([x | x := Mismatches[_]; x == false]) == 0
+    count([Mismatch | some Mismatch in Mismatches; Mismatch == false]) == 0
 }
 
 ##############################################
@@ -127,7 +114,8 @@ SensitiveAccounts(SensitiveAccountsSetting, SensitiveAccountsConfig) := true if 
 
 ImpersonationProtectionSetting(Policies, IdentityString, KeyValue) := Policy[0] if {
     Policy := [
-        Policy | some Policy in Policies
+    Policy |
+        some Policy in Policies
         regex.match(IdentityString, Policy.Identity) == true
         Policy.Enabled == true
         Policy[KeyValue] == true
@@ -136,7 +124,7 @@ ImpersonationProtectionSetting(Policies, IdentityString, KeyValue) := Policy[0] 
 
 ImpersonationProtectionConfig(PolicyID, AccountKey) := IncludedAccounts if {
     SensitiveAccounts := input.scuba_config.Defender[PolicyID]
-    IncludedAccounts := { lower(trim_space(x)) | some x in SensitiveAccounts[AccountKey]; x != null }
+    IncludedAccounts := {lower(trim_space(x)) | some x in SensitiveAccounts[AccountKey]; x != null}
 } else := set()
 
 ImpersonationProtection(Policies, IdentityString, IncludedAccounts, FilterKey, AccountKey, ActionKey) := {
@@ -150,14 +138,14 @@ ImpersonationProtection(Policies, IdentityString, IncludedAccounts, FilterKey, A
     Policy := ImpersonationProtectionSetting(Policies, IdentityString, FilterKey)
     count(Policy) > 0
 
-    PolicyProtectedAccounts := { lower(x) | some x in Policy[AccountKey] }
+    PolicyProtectedAccounts := {lower(x) | some x in Policy[AccountKey]}
     count(IncludedAccounts - PolicyProtectedAccounts) == 0
 
     Conditions := [
         (count(IncludedAccounts) > 0) == (count(PolicyProtectedAccounts) > 0),
         (count(IncludedAccounts) == 0) == (count(PolicyProtectedAccounts) == 0)
     ]
-    count([x | x := Conditions[_]; x == true]) > 0
+    count([Condition | some Condition in Conditions; Condition == true]) > 0
 } else := {
     "Result": false,
     "Policy": {

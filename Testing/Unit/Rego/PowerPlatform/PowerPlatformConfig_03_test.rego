@@ -1,8 +1,8 @@
 package powerplatform_test
 import future.keywords
 import data.powerplatform
-import data.report.utils.ReportDetailsBoolean
-import data.report.utils.NotCheckedDetails
+import data.utils.report.ReportDetailsBoolean
+import data.utils.report.NotCheckedDetails
 
 
 CorrectTestResult(PolicyId, Output, ReportDetailString) := true if {

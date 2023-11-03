@@ -1,10 +1,10 @@
 package powerplatform
 import future.keywords
-import data.report.utils.NotCheckedDetails
-import data.report.utils.Format
-import data.report.utils.ReportDetailsBoolean
-import data.report.utils.Description
-import data.report.utils.ReportDetailsString
+import data.utils.report.NotCheckedDetails
+import data.utils.report.Format
+import data.utils.report.ReportDetailsBoolean
+import data.utils.report.Description
+import data.utils.report.ReportDetailsString
 
 ReportDetailsArray(true, _, _) := ReportDetailsBoolean(true) if {}
 
