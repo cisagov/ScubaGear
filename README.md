@@ -8,10 +8,10 @@ Developed by CISA, ScubaGear is an assessment tool that verifies that an M365 te
 
 ## Table of Contents
 - [M365 Product License Assumptions](#m365-product-license-assumptions)
-- [Installation](#installation)
-  - [Downloading Repository](#downloading-repository)
-  - [Installing the required PowerShell Modules](#installing-the-required-powershell-modules)
-  - [Download the required OPA executable](#download-the-required-opa-executable)
+- [Getting Started](#getting-started)
+  - [Download the Latest Release](#download-the-latest-release)
+  - [Installing the Required PowerShell Modules](#installing-the-required-powershell-modules)
+  - [Download the Required OPA executable](#download-the-required-opa-executable)
   - [PowerShell Execution Policies](#powershell-execution-policies)
 - [Usage](#usage)
   - [Examples](#example-1-run-an-assessment-against-all-products-except-powerplatform)
@@ -46,15 +46,15 @@ If a tenant does not have the licenses listed above, the report will display a n
 > **Note**
 > DOD endpoints are included, but have not been tested. Please open an issue if you encounter bugs.
 
-## Installation
-### Downloading Repository
+## Getting Started
+### Download the Latest Release
 To download ScubaGear:
 
 1. Click [here](https://github.com/cisagov/ScubaGear/releases/latest) to see the latest release.
 2. Click `ScubaGear-v1-0-0.zip` (or latest version) to download the release.
 3. Extract the folder in the zip file.
 
-### Installing the required PowerShell Modules
+### Installing the Required PowerShell Modules
 > **Note**: Only PowerShell 5.1 is currently supported. PowerShell 7 may work, but has not been tested. Full PowerShell 7 support will be added in a future release.
 
 To import the module, open a new PowerShell 5.1 terminal and navigate to the repository folder.
@@ -66,7 +66,7 @@ Then run:
 Import-Module -Name .\PowerShell\ScubaGear #Imports the tool into your session
 ```
 
-### Download the required OPA executable
+### Download the Required OPA executable
 > **Note**
 > The `OPA.ps1` executable download script is called by default when running `SetUp.ps1`. `OPA.ps1` can also be run by itself to download the executable.
 In the event of an unsuccessful download, users can manually download the OPA executable with the following steps:
