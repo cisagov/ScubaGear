@@ -1,10 +1,10 @@
 # ScubaGear
 <p>
         <a href="https://github.com/cisagov/ScubaGear/releases" alt="ScubaGear version #">
-        <img src="https://img.shields.io/badge/ScubaGear-v1.0.0-%2343AA3F?labelColor=%23005288" /></a>
+        <img src="https://img.shields.io/badge/ScubaGear-v1.0.0-%2343AA4F?labelColor=%23005288" /></a>
 </p>
 
-Developed by CISA, ScubaGear is an assessment tool that verifies that an M365 tenant’s configuration conforms to the policies described in the Secure Cloud Business Applications ([SCuBA](https://cisa.gov/scuba)) Minimum Viable Secure Configuration Baseline [documents](https://github.com/cisagov/ScubaGear/tree/main/baselines).
+Developed by CISA, ScubaGear is an assessment tool that verifies a M365 tenant’s configuration conforms to the policies described in the Secure Cloud Business Applications ([SCuBA](https://cisa.gov/scuba)) Minimum Viable Secure Configuration Baseline [documents](https://github.com/cisagov/ScubaGear/tree/main/baselines).
 
 ## Table of Contents
 - [M365 Product License Assumptions](#m365-product-license-assumptions)
@@ -130,9 +130,9 @@ Get-Help -Name Invoke-SCuBA -Full
   - Exchange Online: **exo**
   - Power Platform: **powerplatform**
   - SharePoint Online and OneDrive for Business: **sharepoint**
-  - Teams: **teams**
+  - Microsoft Teams: **teams**
 
-- **$M365Environment** parameter is used to authenticate to the various M365 commercial/ government environments. Valid values include `commercial`, `gcc`, `gcchigh`, or `dod`.     Default value is `commercial`.
+- **$M365Environment** parameter is used to authenticate to the various M365 commercial/ government environments. Valid values include `commercial`, `gcc`, `gcchigh`, or `dod`. Default value is `commercial`.
     - For M365 tenants that are non-government environments enter the value `commercial`.
     - For M365 Government Commercial Cloud tenants with G3/G5 licenses enter the value `gcc`.
     - For M365 Government Commercial Cloud High tenants enter the value `gcchigh`.
@@ -140,10 +140,10 @@ Get-Help -Name Invoke-SCuBA -Full
 
 - **$OPAPath** refers to the folder location of the Open Policy Agent (OPA) policy engine executable file. By default the OPA policy engine executable embedded with this project is located in the project's root folder `"./"` and for most cases this value will not need to be modified. To execute the tool using a version of the OPA policy engine located in another folder, customize the variable value with the full path to the folder containing the OPA policy engine executable file.
 
-- **$OutPath** refers to the folder path where the output JSON and the HTML report will be created. Defaults to the same directory where the script is executed.  This parameter is only necessary if an alternate report folder path is desired.  The folder will be created if it does not exist.
+- **$OutPath** refers to the folder path where the output JSON and the HTML report will be created. Defaults to the same directory where the script is executed. This parameter is only necessary if an alternate report folder path is desired. The folder will be created if it does not exist.
 
 ### AAD Conditional Access Policy Exemptions
-The ScubaGear ConfigFilePath command line option allows users to define custom variables for use in policy assessments against the AAD baseline.  These custom variables are used to exempt specific user and group exclusions from conditional access policy checks that normally would not pass if exclusions are present.  These parameters support operational use cases for having backup or break glass account exclusions to global user policies without failing best practices.  Any exemptions and their risks should be carefully considered and documented as part of an organization's cybersecurity risk management program process and practices.
+The ScubaGear `-ConfigFilePath` command line option allows users to define custom variables for use in policy assessments against the AAD baseline. These custom variables are used to exempt specific user and group exclusions from conditional access policy checks that normally would not pass if exclusions are present. These parameters support operational use cases for having backup or break glass account exclusions to global user policies without failing best practices. Any exemptions and their risks should be carefully considered and documented as part of an organization's cybersecurity risk management program process and practices.
 
 **YAML AAD Configuration File Syntax and Examples**
 
@@ -195,6 +195,7 @@ When executing the tool interactively, there are two types of permissions that a
 - User Permissions (which are associated with Azure AD roles assigned to a user)
 - Application Permissions (which are assigned to the MS Graph PowerShell application in Azure AD).
 
+When executing the tool via app-only authentication a slightly different set of User and Application Permissions are required to be assigned directly to the Service Principal application.
 
 ### User Permissions
 The minimum user roles needed for each product are described in the table below.
@@ -204,12 +205,11 @@ The minimum user roles needed for each product are described in the table below.
 |   Product               |             Role                                                                    |
 |-------------------------|:-----------------------------------------------------------------------------------:|
 | Azure Active Directory  |  Global Reader                                                                      |
-| Teams                   |  Global Reader (or Teams Administrator)                                                                |
-| Exchange Online         |  Global Reader (or Exchange Administrator)                                                             |
 | Defender for Office 365 |  Global Reader (or Exchange Administrator)                                                             |
+| Exchange Online         |  Global Reader (or Exchange Administrator)                                                             |
 | Power Platform          |  Power Platform Administrator and a "Power Apps for Office 365" license             |
 | Sharepoint Online       |  SharePoint Administrator                                                           |
-
+| Microsoft Teams                   |  Global Reader (or Teams Administrator)                                                                |
 - **Note**: Users with the Global Administrator role always have the necessary user permissions to run the tool.
 
 
@@ -235,7 +235,7 @@ The following API permissions are required for Microsoft Graph Powershell:
 ### Service Principal Application Permissions & Setup
 The minimum API permissions & user roles for each product that need to be assigned to a service principal application for ScubaGear app-only authentication are listed in the table below.
 
-| Product                  | API Permissions                                      | Azure AD Roles                   |
+| Product                  | API Permissions                                      | Role                   |
 |--------------------------|------------------------------------------------------|----------------------------------|
 | Azure Active Directory   | Directory.Read.All, GroupMember.Read.All,            |                                  |
 |                          | Organization.Read.All, Policy.Read.All,              |                                  |
@@ -260,7 +260,7 @@ New-PowerAppManagementApp -ApplicationId $appId # Must be run from a Power Platf
 - Power Platform has a [hardcoded expectation](https://github.com/microsoft/Microsoft365DSC/issues/2781) that the certificate is located in `Cert:\CurrentUser\My`.
 - MS Graph has an expectation that the certificate at least be located in one of the local client's certificate store(s).
 
-> **Notes**: Only authentication via `CertificateThumbprint` is currently supported. We will also be supporting automated app registration in a later release.
+> **Notes**: Only authentication via `CertificateThumbprint` is currently supported. We will be supporting automated app registration in a later release.
 
 ## Architecture
 ![SCuBA Architecture diagram](/images/scuba-architecture.png)
@@ -279,9 +279,9 @@ The tool employs a three-step process:
 ### Executing against multiple tenants
 ScubaGear creates connections to several M365 services. If running against multiple tenants, it is necessary to disconnect those sessions.
 
-`Invoke-SCuBA` includes the `-DisconnectOnExit` parameter to disconnect each of connection upon exit.  To disconnect sessions after a run, use `Disconnect-SCuBATenant`.  The cmdlet disconnects from Azure Active Directory (via MS Graph API), Defender, Exchange Online, Power Platform, SharePoint Online, and Microsoft Teams.
+`Invoke-SCuBA` includes the `-DisconnectOnExit` parameter to disconnect each of connection upon exit.  To disconnect sessions after a run, use `Disconnect-SCuBATenant`. The cmdlet disconnects from Azure Active Directory (via MS Graph API), Defender, Exchange Online, Power Platform, SharePoint Online, and Microsoft Teams.
 
-```PowerShell
+```powershell
 Disconnect-SCuBATenant
 ```
 > The cmdlet will attempt to disconnect from all services regardless of current session state.  Only connections established within the current PowerShell session will be disconnected and removed.  Services that are already disconnected will not generate an error.
@@ -297,12 +297,12 @@ https://docs.microsoft.com/en-us/powershell/exchange/exchange-online-powershell-
 Create Powershell Session is failed using OAuth
 ```
 
-If you see this error message it means that you are running a version of the ExchangeOnlineManagement PowerShell module less than Version 3.2. The automation relies on the Microsoft Security & Compliance PowerShell environment for Defender information. Security & Compliance PowerShell connections, unlike other services used by the ExchangeOnlineManagement module, used to required basic authentication to be enabled. As of June 2023, Microsoft has [deprecated Remote PowerShell for Exchange Online and Security & Compliance PowerShell](https://techcommunity.microsoft.com/t5/exchange-team-blog/announcing-deprecation-of-remote-powershell-rps-protocol-in/ba-p/3695597). To resolve this error, you should run the `.\SetUp.ps1` script to install the latest ExchangeOnlineManagement module version.
+If you see this error message it means that you are running a version of the ExchangeOnlineManagement PowerShell module less than Version 3.2. The automation relies on the Microsoft Security & Compliance PowerShell environment for Defender information. Security & Compliance PowerShell connections, unlike other services used by the ExchangeOnlineManagement module, once required basic authentication to be enabled. As of June 2023, Microsoft has [deprecated Remote PowerShell for Exchange Online and Security & Compliance PowerShell](https://techcommunity.microsoft.com/t5/exchange-team-blog/announcing-deprecation-of-remote-powershell-rps-protocol-in/ba-p/3695597). To resolve this error, you should run the `.\SetUp.ps1` script to install the latest ExchangeOnlineManagement module version.
 
 ### Exchange Online maximum connections error
 If when running the tool against Exchange Online, you see the error below in the Powershell window, follow the instructions in this section.
 
-```PowerShell
+```powershell
 New-ExoPSSession : Processing data from remote server outlook.office365.com failed with the
 following error message: [AuthZRequestId=8feccdea-493c-4c12-85dd-d185232cc0be][FailureCategory=A
 uthZ-AuthorizationException] Fail to create a runspace because you have exceeded the maximum
@@ -310,12 +310,12 @@ number of connections allowed : 3
 ```
 
 If you see the error above run the command below in Powershell:
-```PowerShell
+```powershell
 Disconnect-ExchangeOnline
 ```
 
 or alternatively run `Disconnect-SCuBATenant` exported by the ScubaGear module.
-```PowerShell
+```powershell
 Disconnect-SCuBATenant
 ```
 
@@ -326,7 +326,7 @@ In order for the tool to properly assess the Power Platform product, one of the 
 
 In addition to those conditions, the correct `$M365Environment` parameter value must be passed into the `Invoke-SCuBA` otherwise an error will be thrown like the one shown below.
 
-```
+```powershell
 Invoke-ProviderList : Error with the PowerPlatform Provider. See the exception message for more details: "Power Platform Provider ERROR: The M365Environment parameter value is not set correctly which WILL cause the Power Platform report to display incorrect values.                                                                                                 ---------------------------------------                                                                     M365Environment Parameter value: commercial
         Your tenant's OpenId-Configuration: tenant_region_scope: NA, tenant_region_sub_scope: GCC
         ---------------------------------------
@@ -349,7 +349,7 @@ Invoke-ProviderList : Error with the PowerPlatform Provider. See the exception m
 While running the tool, AAD sign in prompts sometimes get stuck in a loop. This is likely an issue with the connection to Microsoft Graph.
 
 To fix the loop, run:
-```PowerShell
+```powershell
 Disconnect-MgGraph
 ```
 Then run the tool again.
@@ -382,21 +382,21 @@ The ScubaGear repository includes several utility scripts to help with troublesh
 If a user receives errors and needs additional support diagnosing issues, the `ScubaGearSupport.ps1` script can be run to gather information about their system environment and previous tool output.
 The script gathers this information into a single ZIP formatted archive to allow for easy sharing with developers or other support staff to assist in troubleshooting. Since the script does gather report output, do keep in mind that the resulting archive may contain details about the associated M365 environment and its settings.
 
-The script can be run with no arguments and will only collect environment information for troubleshooting.  If the `IncludeReports` parameter is provided, it will contain the most recent report from the default `Reports` folder.
+The script can be run with no arguments and will only collect environment information for troubleshooting. If the `IncludeReports` parameter is provided, it will contain the most recent report from the default `Reports` folder.
 
-```PowerShell
+```powershell
 .\ScubaGearSupport.ps1
 ```
 
 An alternate report path can be specified via the `ReportPath` parameter.
 
-```PowerShell
+```powershell
 .\ScubaGearSupport.ps1 -ReportPath C:\ScubaGear\Reports
 ```
 
 Finally, the script can optionally include all previous reports rather than the most recent one by adding the `AllReports` option.
 
-```PowerShell
+```powershell
 .\ScubaGearSupport.ps1 -AllReports
 ```
 
@@ -412,7 +412,7 @@ Data gathered by the script includes:
 #### Removing installed modules
 ScubaGear requires a number of PowerShell modules to function.  A user or developer, however, may wish to remove these PowerShell modules for testing or for cleanup after ScubaGear has been run.  The `UninstallModules.ps1` script will remove the latest version of the modules required by ScubaGear and installed by the associated `Setup.ps1` script.  The script does not take any options and can be as follows:
 
-```PowerShell
+```powershell
 .\UninstallModules.ps1
 ```
 
