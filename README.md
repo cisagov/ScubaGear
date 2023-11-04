@@ -211,7 +211,8 @@ The minimum user roles needed for each product are described in the table below.
 | Power Platform          |  Power Platform Administrator and a "Power Apps for Office 365" license             |
 | Sharepoint Online       |  SharePoint Administrator                                                           |
 | Microsoft Teams                   |  Global Reader (or Teams Administrator)                                                                |
-- **Note**: Users with the Global Administrator role always have the necessary user permissions to run the tool.
+> **Note**
+> Users with the Global Administrator role always have the necessary user permissions to run the tool.
 
 
 ### Microsoft Graph Powershell SDK permissions
@@ -260,7 +261,7 @@ New-PowerAppManagementApp -ApplicationId $appId # Must be run from a Power Platf
 - Power Platform has a [hardcoded expectation](https://github.com/microsoft/Microsoft365DSC/issues/2781) that the certificate is located in `Cert:\CurrentUser\My`.
 - MS Graph has an expectation that the certificate at least be located in one of the local client's certificate store(s).
 
-> **Notes**: Only authentication via `CertificateThumbprint` is currently supported. We will be supporting automated app registration in a later release.
+> **Additional Notes**: Only authentication via `CertificateThumbprint` is currently supported. We will be supporting automated app registration in a later release.
 
 ## Architecture
 ![SCuBA Architecture diagram](/images/scuba-architecture.png)
