@@ -31,7 +31,7 @@ tests contains {
     "Commandlet": ["Get-SPOTenant", "Get-PnPTenant"],
     "ActualValue": [SharingCapability],
     "ReportDetails": ReportDetailsBoolean(Status),
-    "RequirementMet": Status,
+    "RequirementMet": Status
 } if {
     SharingCapability := TENANTPOLICY.SharingCapability
     Conditions := [SharingCapability == 0, SharingCapability == 3]
@@ -50,7 +50,7 @@ tests contains {
     "Commandlet": ["Get-SPOTenant", "Get-PnPTenant"],
     "ActualValue": [OneDriveSharingCapability],
     "ReportDetails": ReportDetailsBoolean(Status),
-    "RequirementMet": Status,
+    "RequirementMet": Status
 } if {
     input.OneDrive_PnP_Flag == false
     OneDriveSharingCapability := TENANTPOLICY.OneDriveSharingCapability
@@ -64,7 +64,7 @@ tests contains {
     "Commandlet": [],
     "ActualValue": [],
     "ReportDetails": NotCheckedDetails(PolicyId),
-    "RequirementMet": false,
+    "RequirementMet": false
 } if {
     PolicyId := "MS.SHAREPOINT.1.2v1"
     input.OneDrive_PnP_Flag == true
@@ -110,7 +110,7 @@ tests contains {
     "Commandlet": ["Get-SPOTenant", "Get-PnPTenant"],
     "ActualValue": [TENANTPOLICY.SharingDomainRestrictionMode, TENANTPOLICY.SharingCapability],
     "ReportDetails": Domainlist(TENANTPOLICY),
-    "RequirementMet": Status,
+    "RequirementMet": Status
 } if {
     Conditions := [TENANTPOLICY.SharingCapability == 0, TENANTPOLICY.SharingDomainRestrictionMode == 1]
     Status := count([Condition | some Condition in Conditions; Condition == true]) == 1
@@ -128,7 +128,7 @@ tests contains {
     "Commandlet": ["Get-SPOTenant", "Get-PnPTenant"],
     "ActualValue": [TENANTPOLICY.RequireAcceptingAccountMatchInvitedAccount, TENANTPOLICY.SharingCapability],
     "ReportDetails": ReportDetailsBoolean(Status),
-    "RequirementMet": Status,
+    "RequirementMet": Status
 } if {
     Conditions := [TENANTPOLICY.SharingCapability == 0, TENANTPOLICY.RequireAcceptingAccountMatchInvitedAccount == true]
     Status := count([Condition | some Condition in Conditions; Condition == true]) >= 1
@@ -153,7 +153,7 @@ tests contains {
     "Commandlet": ["Get-SPOTenant", "Get-PnPTenant"],
     "ActualValue": [TENANTPOLICY.DefaultSharingLinkType],
     "ReportDetails": ReportDetailsBoolean(Status),
-    "RequirementMet": Status,
+    "RequirementMet": Status
 } if {
     Status := TENANTPOLICY.DefaultSharingLinkType == 1
 }
@@ -173,7 +173,7 @@ tests contains {
     "Commandlet": ["Get-SPOTenant", "Get-PnPTenant"],
     "ActualValue": [TENANTPOLICY.DefaultLinkPermission],
     "ReportDetails": ReportDetailsBoolean(Status),
-    "RequirementMet": Status,
+    "RequirementMet": Status
 } if {
     Status := TENANTPOLICY.DefaultLinkPermission == 1
 }
@@ -217,7 +217,7 @@ tests contains {
     "Commandlet": ["Get-SPOTenant", "Get-PnPTenant"],
     "ActualValue": [TENANTPOLICY.SharingCapability, TENANTPOLICY.RequireAnonymousLinksExpireInDays],
     "ReportDetails": ReportDetailsString(Status, ErrMsg),
-    "RequirementMet": Status,
+    "RequirementMet": Status
 } if {
     [ErrMsg, Status] := ExternalUserExpireInDays(TENANTPOLICY)
 }
@@ -241,7 +241,7 @@ tests contains {
     "Commandlet": ["Get-SPOTenant", "Get-PnPTenant"],
     "ActualValue": [FileLinkType, FolderLinkType],
     "ReportDetails": FileAndFolderPermission(FileLinkType, FolderLinkType),
-    "RequirementMet": Status,
+    "RequirementMet": Status
 } if {
     input.OneDrive_PnP_Flag == false
     FileLinkType := TENANTPOLICY.FileAnonymousLinkType
@@ -256,7 +256,7 @@ tests contains {
     "Commandlet": [],
     "ActualValue": [],
     "ReportDetails": NotCheckedDetails(PolicyId),
-    "RequirementMet": false,
+    "RequirementMet": false
 } if {
     PolicyId := "MS.SHAREPOINT.3.2v1"
     input.OneDrive_PnP_Flag == true
@@ -305,7 +305,7 @@ tests contains {
     "Commandlet": ["Get-SPOTenant", "Get-PnPTenant"],
     "ActualValue": [TENANTPOLICY.SharingCapability, TENANTPOLICY.EmailAttestationRequired, TENANTPOLICY.EmailAttestationReAuthDays],
     "ReportDetails": ReportDetailsString(Status, ErrMsg),
-    "RequirementMet": Status,
+    "RequirementMet": Status
 } if {
     [ErrMsg, Status] := ExpirationTimersVerificationCode(TENANTPOLICY)
 }
@@ -326,7 +326,7 @@ tests contains {
     "Commandlet": [],
     "ActualValue": [],
     "ReportDetails": NotCheckedDetails("MS.SHAREPOINT.4.1v1"),
-    "RequirementMet": false,
+    "RequirementMet": false
 }
 
 #--
@@ -344,7 +344,7 @@ tests contains {
     "Commandlet": ["Get-SPOSite", "Get-PnPTenantSite"],
     "ActualValue": [SitePolicy.DenyAddAndCustomizePages],
     "ReportDetails": ReportDetailsBoolean(Status),
-    "RequirementMet": Status,
+    "RequirementMet": Status
 } if {
     some SitePolicy in input.SPO_site
     Status := SitePolicy.DenyAddAndCustomizePages == 2
