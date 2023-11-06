@@ -9,8 +9,11 @@ import data.report.utils.ReportDetailsString
 #############
 
 TENANTPOLICY := input.SPO_tenant[_]
+
 FAIL := ReportDetailsBoolean(false)
+
 PASS := ReportDetailsBoolean(true)
+
 FilterArray(Conditions, Boolean) := [Condition | some Condition in Conditions; Condition == Boolean]
 
 ###################
