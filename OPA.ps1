@@ -24,10 +24,9 @@ param(
 
 # Constants
 $MINVERSION = [version] '0.42.1'
-$INSTALLURL = "https://openpolicyagent.org/downloads/v$($ExpectedVersion)/$OPAExe"
 
 # Download opa rego exe
-function Get-OPAExecutable {
+function Get-OPAFile {
     param (
         [Parameter(Mandatory)]
         [ValidateNotNullOrEmpty()]
@@ -40,11 +39,12 @@ function Get-OPAExecutable {
         [string]$ExpectedVersion
     )
 
-    $OutFile=(Join-Path (Get-Location).Path $INSTALLURL.SubString($INSTALLURL.LastIndexOf('/')))
+    $InstallUrl = "https://openpolicyagent.org/downloads/v$($ExpectedVersion)/$OPAExe"
+    $OutFile=(Join-Path (Get-Location).Path $InstallUrl.SubString($InstallUrl.LastIndexOf('/')))
 
     try {
         $WebClient = New-Object System.Net.WebClient
-        $WebClient.DownloadFile($INSTALLURL, $OutFile)
+        $WebClient.DownloadFile($InstallUrl, $OutFile)
         Write-Information -MessageData "Installed the specified version of ${OPAExe}: ${ExpectedVersion}." | Out-Host
     }
     catch {
@@ -57,8 +57,30 @@ function Get-OPAExecutable {
 }
 
 function Get-ExeHash {
-    $Request = Invoke-WebRequest $INSTALLURL
-    $Hash = (Get-FileHash -InputStream $Request.RawContentStream -Algorithm SHA256).Hash
+    param (
+        [Parameter(Mandatory)]
+        [ValidateNotNullOrEmpty()]
+        [Alias('opa')]
+        [string]$OPAExe
+    )
+
+    $InstallUrl = "https://openpolicyagent.org/downloads/v$($ExpectedVersion)/$OPAExe.sha256"
+    $OutFile=(Join-Path (Get-Location).Path $InstallUrl.SubString($InstallUrl.LastIndexOf('/')))
+
+    try {
+        $WebClient = New-Object System.Net.WebClient
+        $WebClient.DownloadFile($InstallUrl, $OutFile)
+    }
+    catch {
+        $Error[0] | Format-List -Property * -Force | Out-Host
+        Write-Error "Unable to download OPA SHA256 hash for verification" | Out-Host
+    }
+    finally {
+        $WebClient.Dispose()
+    }
+
+    $Hash = ($(Get-Content $OutFile -raw) -split " ")[0]
+    Remove-Item $OutFile
 
     return $Hash
 }
@@ -76,7 +98,7 @@ function Confirm-OPAHash {
         [string]$ExpectedVersion
     )
 
-    if ((Get-FileHash .\$OPAExe -Algorithm SHA256 ).Hash -ne $(Get-ExeHash)) {
+    if ((Get-FileHash .\$OPAExe -Algorithm SHA256 ).Hash -ne $(Get-ExeHash -opa $OPAExe)) {
         return $false, "SHA256 verification failed, retry download or install manually. See README under 'Download the required OPA executable' for instructions."
     }
 
@@ -95,7 +117,7 @@ function Install-OPA {
         [Alias('version')]
         [string]$ExpectedVersion
     )
-    Get-OPAExecutable -opa $OPAExe -version $ExpectedVersion
+    Get-OPAFile -opa $OPAExe -version $ExpectedVersion
     $Result = Confirm-OPAHash -opa $OPAExe -version $ExpectedVersion
     $Result[1] | Out-Host
 }
