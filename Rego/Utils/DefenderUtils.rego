@@ -60,7 +60,7 @@ SensitiveAccounts(SensitiveAccountsSetting, _) := false if {
 
 ### Case 2 ###
 # Is there a Strict Policy present and no assignment conditions or exceptions, all users included. Always pass
-SensitiveAccounts(SensitiveAccountsSetting, _) if {
+SensitiveAccounts(SensitiveAccountsSetting, _) := true if {
     count(SensitiveAccountsSetting.Policy) > 0
     SensitiveAccountsSetting.Policy.Conditions == null
     SensitiveAccountsSetting.Policy.Exceptions == null
@@ -90,7 +90,7 @@ SensitiveAccounts(SensitiveAccountsSetting, SensitiveAccountsConfig) := false if
 
 ### Case 4 ###
 # When settings and config are present, do they match?
-SensitiveAccounts(SensitiveAccountsSetting, SensitiveAccountsConfig) if {
+SensitiveAccounts(SensitiveAccountsSetting, SensitiveAccountsConfig) := true if {
     count(SensitiveAccountsSetting.Policy) > 0
 
     # Policy filter includes one or more conditions or exclusions
@@ -126,14 +126,14 @@ SensitiveAccounts(SensitiveAccountsSetting, SensitiveAccountsConfig) if {
 ##############################################
 
 # Get enabled policy that matches the string & key value
-ImpersonationProtectionSetting(Policies, IdentityString, KeyValue) := Policy[0] if {
+ImpersonationProtectionSetting(Policies, IdentityString, KeyValue) := Policy if {
     Policy := [
     Policy |
         some Policy in Policies
         regex.match(IdentityString, Policy.Identity) == true
         Policy.Enabled == true
         Policy[KeyValue] == true
-    ]
+    ][0]
 } else := set()
 
 # Get the user configuration for specified policy
