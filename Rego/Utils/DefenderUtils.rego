@@ -78,7 +78,13 @@ SensitiveAccounts(SensitiveAccountsSetting, SensitiveAccountsConfig) := false if
     count([Condition | some Condition in ConditionsAbsent; Condition == false]) > 0
 
     # No config is defined
-    count(((((SensitiveAccountsConfig.IncludedUsers | SensitiveAccountsConfig.ExcludedUsers) | SensitiveAccountsConfig.IncludedGroups) | SensitiveAccountsConfig.ExcludedGroups) | SensitiveAccountsConfig.IncludedDomains) | SensitiveAccountsConfig.ExcludedDomains) == 0
+    count(
+        SensitiveAccountsConfig.IncludedUsers |
+        SensitiveAccountsConfig.ExcludedUsers |
+        SensitiveAccountsConfig.IncludedGroups |
+        SensitiveAccountsConfig.ExcludedGroups |
+        SensitiveAccountsConfig.IncludedDomains |
+        SensitiveAccountsConfig.ExcludedDomains) == 0
 }
 
 ### Case 4 ###
@@ -94,7 +100,13 @@ SensitiveAccounts(SensitiveAccountsSetting, SensitiveAccountsConfig) if {
     count([Condition | some Condition in ConditionsAbsent; Condition == false]) > 0
 
     # Config is defined
-    count(((((SensitiveAccountsConfig.IncludedUsers | SensitiveAccountsConfig.ExcludedUsers) | SensitiveAccountsConfig.IncludedGroups) | SensitiveAccountsConfig.ExcludedGroups) | SensitiveAccountsConfig.IncludedDomains) | SensitiveAccountsConfig.ExcludedDomains) > 0
+    count(
+        SensitiveAccountsConfig.IncludedUsers |
+        SensitiveAccountsConfig.ExcludedUsers |
+        SensitiveAccountsConfig.IncludedGroups |
+        SensitiveAccountsConfig.ExcludedGroups |
+        SensitiveAccountsConfig.IncludedDomains |
+        SensitiveAccountsConfig.ExcludedDomains) > 0
 
     # All filter and config file settings mismatches
     Mismatches := [
