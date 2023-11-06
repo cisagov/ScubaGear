@@ -83,7 +83,7 @@ rules:
       level: ignore
     # https://docs.styra.com/regal/rules/style/rule-length
     rule-length:
-      level: ignore
+      level: warning
     # https://docs.styra.com/regal/rules/style/todo-comment
     todo-comment:
       level: ignore
@@ -95,4 +95,4 @@ rules:
     # https://docs.styra.com/regal/rules/testing/test-outside-test-package
     test-outside-test-package:
       # This is just a style preference
-      level: ignore
+      level: warning
