@@ -1,8 +1,9 @@
 package aad
 import future.keywords
 import data.utils.report.NotCheckedDetails
-import data.utils.report.Format
+import data.utils.report.FormatArray
 import data.utils.report.ReportDetailsBoolean
+import data.utils.report.Description
 import data.utils.policy.IsEmptyContainer
 import data.utils.policy.Contains
 import data.utils.policy.Count
@@ -29,9 +30,7 @@ MEMBERUSER := "a0b1b346-4d3e-4e8b-98f8-753987be4970"
 # The report formatting functions below are generic and used throughout AAD #
 #############################################################################
 
-Description(String1, String2, String3) := trim(concat(" ", [String1, String2, String3]), " ")
-
-ReportDetailsArray(Array, String) := Description(Format(Array), String, "")
+ReportDetailsArray(Array, String) := Description([FormatArray(Array), String])
 
 ReportFullDetailsArray(Array, String) := ReportDetailsArray(Array, String) if {
     count(Array) == 0
@@ -40,7 +39,7 @@ ReportFullDetailsArray(Array, String) := ReportDetailsArray(Array, String) if {
 ReportFullDetailsArray(Array, String) := Details if {
     count(Array) > 0
     count(Array) <= REPORTARRAYMAXCOUNT
-    Details := Description(Format(Array), concat(":<br/>", [String, concat(", ", Array)]), "")
+    Details := Description([FormatArray(Array), concat(":<br/>", [String, concat(", ", Array)])])
 }
 
 ReportFullDetailsArray(Array, String) := Details if {
@@ -49,7 +48,7 @@ ReportFullDetailsArray(Array, String) := Details if {
 
     TruncationWarning := "...<br/>Note: The list of matching items has been truncated.  Full details are available in the JSON results."
     TruncatedList := concat(", ", array.slice(List, 0, REPORTARRAYMAXCOUNT))
-    Details := Description(Format(Array), concat(":<br/>", [String, TruncatedList]), TruncationWarning)
+    Details := Description([FormatArray(Array), concat(":<br/>", [String, TruncatedList]), TruncationWarning])
 }
 
 ##############################################################################################################

@@ -2,7 +2,7 @@ package exo
 import future.keywords
 import data.utils.report.NotCheckedDetails
 import data.utils.report.DefenderMirrorDetails
-import data.utils.report.Format
+import data.utils.report.FormatArray
 import data.utils.report.ReportDetailsBoolean
 import data.utils.report.Description
 import data.utils.report.ReportDetailsString
@@ -10,9 +10,9 @@ import data.utils.report.ReportDetailsString
 ReportDetailsArray(true, _, _) := ReportDetailsBoolean(true) if {}
 
 ReportDetailsArray(false, NumeratorArr, DenominatorArr) := ReportStr if {
-    FractionStr := concat(" of ", [Format(NumeratorArr), Format(DenominatorArr)])
+    FractionStr := concat(" of ", [FormatArray(NumeratorArr), FormatArray(DenominatorArr)])
     NumeratorStr := concat(", ", NumeratorArr)
-    ReportStr := Description(FractionStr, "agency domain(s) found in violation:", NumeratorStr)
+    ReportStr := Description([FractionStr, "agency domain(s) found in violation:", NumeratorStr])
 }
 
 FilterArray(Conditions, Boolean) := [Condition | some Condition in Conditions; Condition == Boolean]
@@ -47,7 +47,7 @@ tests contains {
 } if {
     Domains := RemoteDomainsAllowingForwarding
     ErrString := "remote domain(s) that allows automatic forwarding:"
-    ErrMessage := Description(Format(Domains), ErrString , concat(", ", Domains))
+    ErrMessage := Description([FormatArray(Domains), ErrString , concat(", ", Domains)])
     Status := count(Domains) == 0
 }
 #--
@@ -362,7 +362,7 @@ tests contains {
 } if {
     ContactsSharingPolicies := SharingPolicyContactsAllowedAllDomains
     ErrString := "sharing polic(ies) are sharing contacts folders with all domains by default:"
-    ErrMessage := Description(Format(ContactsSharingPolicies), ErrString , concat(", ", ContactsSharingPolicies))
+    ErrMessage := Description([FormatArray(ContactsSharingPolicies), ErrString , concat(", ", ContactsSharingPolicies)])
     Status := count(ContactsSharingPolicies) == 0
 }
 #--
@@ -391,7 +391,7 @@ tests contains {
 } if {
     CalendarSharingPolicies := SharingPolicyCalendarAllowedAllDomains
     ErrString := "sharing polic(ies) are sharing calendar details with all domains by default:"
-    ErrMessage := Description(Format(CalendarSharingPolicies), ErrString , concat(", ", CalendarSharingPolicies))
+    ErrMessage := Description([FormatArray(CalendarSharingPolicies), ErrString , concat(", ", CalendarSharingPolicies)])
     Status := count(CalendarSharingPolicies) == 0
 }
 #--
@@ -641,7 +641,7 @@ tests contains {
 } if {
     ConnFilterPolicies := ConnFiltersWithIPAllowList
     ErrString := "connection filter polic(ies) with an IP allowlist:"
-    ErrMessage := Description(Format(ConnFilterPolicies), ErrString , concat(", ", ConnFilterPolicies))
+    ErrMessage := Description([FormatArray(ConnFilterPolicies), ErrString , concat(", ", ConnFilterPolicies)])
     Status := count(ConnFilterPolicies) == 0
 }
 #--
@@ -668,7 +668,7 @@ tests contains {
 } if {
     ConnFilterPolicies := ConnFiltersWithSafeList
     ErrString := "connection filter polic(ies) with a safe list:"
-    ErrMessage := Description(Format(ConnFilterPolicies), ErrString , concat(", ", ConnFilterPolicies))
+    ErrMessage := Description([FormatArray(ConnFilterPolicies), ErrString , concat(", ", ConnFilterPolicies)])
     Status := count(ConnFilterPolicies) == 0
 }
 #--

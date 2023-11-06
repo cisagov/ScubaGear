@@ -1,6 +1,7 @@
 package utils.policy
 import future.keywords
 
+# Checks if set/array is null or empty
 IsEmptyContainer(null) := true
 
 IsEmptyContainer(container) := true if {
@@ -8,6 +9,7 @@ IsEmptyContainer(container) := true if {
     count(Temp) == 0
 } else := false
 
+# Check if "All" is in the array
 IsAllUsers(null) := false
 
 IsAllUsers(array) := true if {
@@ -15,6 +17,7 @@ IsAllUsers(array) := true if {
     "All" in array
 } else := false
 
+# Check if string is in array
 Contains(null, _) := false
 
 Contains(array, item) := true if {
@@ -22,6 +25,7 @@ Contains(array, item) := true if {
     item in array
 } else := false
 
+# Returns size of set/array
 Count(null) := 0
 
 Count(Container) := count(Container) if {

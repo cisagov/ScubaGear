@@ -1,7 +1,7 @@
 package sharepoint_test
 import future.keywords
 import data.sharepoint
-import data.report.utils.ReportDetailsBoolean
+import data.utils.report.ReportDetailsBoolean
 
 
 CorrectTestResult(PolicyId, Output, ReportDetailString) := true if {

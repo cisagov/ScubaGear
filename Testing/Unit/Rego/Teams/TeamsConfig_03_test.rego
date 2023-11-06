@@ -1,7 +1,7 @@
 package teams_test
 import future.keywords
 import data.teams
-import data.report.utils.ReportDetailsBoolean
+import data.utils.report.ReportDetailsBoolean
 
 
 CorrectTestResult(PolicyId, Output, ReportDetailString) := true if {

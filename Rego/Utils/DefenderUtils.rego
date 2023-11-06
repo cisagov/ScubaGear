@@ -6,6 +6,7 @@ import future.keywords
 ##########################################
 
 # Gets Sensitive Account Filter specification from SCuBA config input
+# and handle case where config does not exist
 SensitiveAccountsConfig(PolicyID) := {
     "IncludedUsers": IncludedUsers,
     "ExcludedUsers": ExcludedUsers,
@@ -77,7 +78,7 @@ SensitiveAccounts(SensitiveAccountsSetting, SensitiveAccountsConfig) := false if
     ]
     count([Condition | some Condition in ConditionsAbsent; Condition == false]) > 0
 
-    # No config is defined
+    # No config is defined (unify all sets & check if empty)
     count(
         SensitiveAccountsConfig.IncludedUsers |
         SensitiveAccountsConfig.ExcludedUsers |
@@ -99,7 +100,7 @@ SensitiveAccounts(SensitiveAccountsSetting, SensitiveAccountsConfig) if {
     ]
     count([Condition | some Condition in ConditionsAbsent; Condition == false]) > 0
 
-    # Config is defined
+    # Config is defined (unify all sets & check if not empty)
     count(
         SensitiveAccountsConfig.IncludedUsers |
         SensitiveAccountsConfig.ExcludedUsers |
@@ -124,6 +125,7 @@ SensitiveAccounts(SensitiveAccountsSetting, SensitiveAccountsConfig) if {
 # Impersonation protection support functions #
 ##############################################
 
+# Get enabled policy that matches the string & key value
 ImpersonationProtectionSetting(Policies, IdentityString, KeyValue) := Policy[0] if {
     Policy := [
     Policy |
@@ -134,11 +136,13 @@ ImpersonationProtectionSetting(Policies, IdentityString, KeyValue) := Policy[0] 
     ]
 } else := set()
 
+# Get the user configuration for specified policy
 ImpersonationProtectionConfig(PolicyID, AccountKey) := IncludedAccounts if {
     SensitiveAccounts := input.scuba_config.Defender[PolicyID]
     IncludedAccounts := {lower(trim_space(x)) | some x in SensitiveAccounts[AccountKey]; x != null}
 } else := set()
 
+# Check impersonation protection is set for specified policy & accounts
 ImpersonationProtection(Policies, IdentityString, IncludedAccounts, FilterKey, AccountKey, ActionKey) := {
     "Result": true,
     "Policy": {
