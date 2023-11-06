@@ -45,7 +45,7 @@ function Get-OPAExecutable {
     try {
         $WebClient = New-Object System.Net.WebClient
         $WebClient.DownloadFile($INSTALLURL, $OutFile)
-        Write-Information -MessageData "Installed the specified version of ${OPAExe} version ${ExpectedVersion}." | Out-Host
+        Write-Information -MessageData "Installed the specified version of ${OPAExe}: ${ExpectedVersion}." | Out-Host
     }
     catch {
         $Error[0] | Format-List -Property * -Force | Out-Host
@@ -76,10 +76,7 @@ function Confirm-OPAHash {
         [string]$ExpectedVersion
     )
 
-    # Hash checks
-    # $ExpectedHash ="5D71028FED935DC98B9D69369D42D2C03CE84A7720D61ED777E10AAE7528F399"
-    $ExpectedHash = Get-ExeHash
-    if ((Get-FileHash .\opa_windows_amd64.exe -Algorithm SHA256 ).Hash -ne $ExpectedHash) {
+    if ((Get-FileHash .\$OPAExe -Algorithm SHA256 ).Hash -ne $(Get-ExeHash)) {
         return $false, "SHA256 verification failed, retry download or install manually. See README under 'Download the required OPA executable' for instructions."
     }
 
@@ -111,6 +108,7 @@ $ErrorActionPreference = "Stop"
 if($ExpectedVersion -lt $MINVERSION) {
     throw "Version parameter entered, ${ExpectedVersion}, must be greater than ${MINVERSION}"
 }
+
 if(Test-Path -Path $OPAExe -PathType Leaf) {
     $Result = Confirm-OPAHash -opa $OPAExe -version $ExpectedVersion
 
