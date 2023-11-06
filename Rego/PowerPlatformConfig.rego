@@ -10,6 +10,8 @@ ReportDetailsArray(true, _, _) := ReportDetailsBoolean(true) if {}
 
 ReportDetailsArray(false, Array, String) := Description(Format(Array), String, concat(", ", Array)) if {}
 
+FilterArray(Conditions, Boolean) := [Condition | some Condition in Conditions; Condition == Boolean]
+
 
 ######################
 # MS.POWERPLATFORM.1 #
@@ -91,8 +93,7 @@ tests contains {
 DefaultEnvPolicies contains {"PolicyName": Policies.displayName} if {
     some Policies in input.dlp_policies[_].value
     some Env in Policies.environments
-    TenantId := input.tenant_id
-    Env.name == concat("-", ["Default", TenantId])
+    Env.name == concat("-", ["Default", input.tenant_id])
 }
 
 # Note: there is only one default environment per tenant and it cannot be deleted or backed up
@@ -135,6 +136,7 @@ tests contains {
     some DLPPolicies in input.dlp_policies
     count(DLPPolicies.value) > 0
     ErrorMessage := "Subsequent environments without DLP policies:"
+
     # finds the environments with no policies applied to them
     EnvWithoutPolicies := AllEnvironments - EnvWithPolicies
     Status := count(EnvWithoutPolicies) == 0
@@ -183,8 +185,11 @@ tests contains {
 ConnectorSet contains Connector.id if {
     some Policies in input.dlp_policies[_].value
     some Group in Policies.connectorGroups
-    Conditions := [Group.classification == "General", Group.classification == "Confidential"]
-    count([Condition | some Condition in Conditions; Condition == true]) > 0
+    Conditions := [
+        Group.classification == "General",
+        Group.classification == "Confidential"
+    ]
+    count(FilterArray(Conditions, true)) > 0
     some Connector in Group.connectors
 
     # Filter: only include policies that meet all the requirements
