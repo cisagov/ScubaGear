@@ -31,7 +31,12 @@ param(
 
     [Parameter(HelpMessage = 'Do not download OPA')]
     [switch]
-    $NoOPA
+    $NoOPA,
+
+    [Parameter(Mandatory = $false, HelpMessage = 'The version of OPA Rego to be downloaded, must be in "x.x.x" format')]
+    [Alias('version')]
+    [version]
+    $ExpectedVersion = '0.42.1'
 )
 
 # Set preferences for writing messages
@@ -118,7 +123,7 @@ if ($NoOPA -eq $true) {
 else {
     try {
         $ScriptDir = Split-Path -Path $MyInvocation.MyCommand.Definition -Parent
-        . $ScriptDir\OPA.ps1
+        . $ScriptDir\OPA.ps1 -version $ExpectedVersion -name "opa_windows_amd64.exe"
     }
     catch {
         $Error[0] | Format-List -Property * -Force | Out-Host
