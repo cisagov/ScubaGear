@@ -91,7 +91,7 @@ test_OneDriveSharingCapability_Correct_V1 if {
                 "OneDriveSharingCapability" : 0
             }
         ],
-        "OneDrive_PnP_Flag": false   
+        "OneDrive_PnP_Flag": false
 
     }
 
@@ -111,7 +111,7 @@ test_OneDriveSharingCapability_Correct_V2 if {
                 "OneDriveSharingCapability" : 3
             }
         ],
-        "OneDrive_PnP_Flag": false   
+        "OneDrive_PnP_Flag": false
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
@@ -130,7 +130,7 @@ test_UsingServicePrincipal if {
                 "OneDriveSharingCapability" : 3
             }
         ],
-        "OneDrive_PnP_Flag": true   
+        "OneDrive_PnP_Flag": true
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
@@ -150,7 +150,7 @@ test_OneDriveSharingCapability_Incorrect_V1 if {
                 "OneDriveSharingCapability" : 1
             }
         ],
-        "OneDrive_PnP_Flag": false   
+        "OneDrive_PnP_Flag": false
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
@@ -169,7 +169,7 @@ test_OneDriveSharingCapability_Incorrect_V2 if {
                 "OneDriveSharingCapability" : 2
             }
         ],
-        "OneDrive_PnP_Flag": false   
+        "OneDrive_PnP_Flag": false
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
@@ -218,7 +218,7 @@ test_SharingDomainRestrictionMode_Correct_V2 if {
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement met: Note that we currently only check for approved external domains. Approved security groups are currently not being checked, see the baseline policy for instructions on a manual check"
+    RuleOutput[0].ReportDetails == "Requirement met: Note that we currently only check for approved external domains. Approved security groups are currently not being checked, see the baseline policy for instructions on a manual check."
 }
 
 test_SharingDomainRestrictionMode_Incorrect if {
@@ -237,7 +237,7 @@ test_SharingDomainRestrictionMode_Incorrect if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails =="Requirement not met: Note that we currently only check for approved external domains. Approved security groups are currently not being checked, see the baseline policy for instructions on a manual check"
+    RuleOutput[0].ReportDetails =="Requirement not met: Note that we currently only check for approved external domains. Approved security groups are currently not being checked, see the baseline policy for instructions on a manual check."
 }
 #--
 
