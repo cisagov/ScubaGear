@@ -14,6 +14,8 @@ ReportDetailsArray(false, Array1, Array2) := Description(Fraction, "agency domai
     String := concat(", ", Array1)
 }
 
+FilterArray(Conditions, Boolean) := [Condition | some Condition in Conditions; Condition == Boolean]
+
 # this should be allowed https://github.com/StyraInc/regal/issues/415
 # regal ignore:prefer-set-or-object-rule
 AllDomains := {Domain.domain | some Domain in input.spf_records}
@@ -197,8 +199,11 @@ DomainsWithoutAgencyContact contains DmarcRecord.domain if {
 
     # 1 or more emails
     RufCountAcceptable := count([Answer | some Answer in RufFields; count(split(Answer, "@")) > 1]) >= 1
-    Conditions := [RuaCountAcceptable, RufCountAcceptable]
-    count([Condition | some Condition in Conditions; Condition == false]) > 0
+    Conditions := [
+        RuaCountAcceptable,
+        RufCountAcceptable
+    ]
+    count(FilterArray(Conditions, false)) > 0
 }
 
 DomainsWithoutAgencyContact contains DmarcRecord.domain if {
@@ -309,9 +314,14 @@ tests contains {
 } if {
     Rules := input.transport_rule
     ErrMessage := "No transport rule found that applies warnings to emails received from outside the organization"
-    EnabledRules := [rule | some rule in Rules; rule.State == "Enabled"; rule.Mode == "Enforce"; count(rule.PrependSubject) >= 1]
+    EnabledRules := [
+        Rule | some Rule in Rules;
+        Rule.State == "Enabled";
+        Rule.Mode == "Enforce";
+        count(Rule.PrependSubject) >= 1
+    ]
     Conditions := [IsCorrectScope | IsCorrectScope := EnabledRules[_].FromScope == "NotInOrganization"]
-    Status := count([Condition | some Condition in Conditions; Condition == true]) > 0
+    Status := count(FilterArray(Conditions, true)) > 0
 }
 
 #--
