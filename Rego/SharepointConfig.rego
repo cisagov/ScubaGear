@@ -11,6 +11,7 @@ import data.report.utils.ReportDetailsString
 TENANTPOLICY := input.SPO_tenant[_]
 FAIL := ReportDetailsBoolean(false)
 PASS := ReportDetailsBoolean(true)
+FilterArray(Conditions, Boolean) := [Condition | some Condition in Conditions; Condition == Boolean]
 
 ###################
 # MS.SHAREPOINT.1 #
@@ -34,8 +35,11 @@ tests contains {
     "RequirementMet": Status
 } if {
     SharingCapability := TENANTPOLICY.SharingCapability
-    Conditions := [SharingCapability == 0, SharingCapability == 3]
-    Status := count([Condition | some Condition in Conditions; Condition == true]) == 1
+    Conditions := [
+        SharingCapability == 0,
+        SharingCapability == 3
+    ]
+    Status := count(FilterArray(Conditions, true)) == 1
 }
 
 #--
@@ -54,8 +58,11 @@ tests contains {
 } if {
     input.OneDrive_PnP_Flag == false
     OneDriveSharingCapability := TENANTPOLICY.OneDriveSharingCapability
-    Conditions := [OneDriveSharingCapability == 0, OneDriveSharingCapability == 3]
-    Status := count([Condition | some Condition in Conditions; Condition == true]) == 1
+    Conditions := [
+        OneDriveSharingCapability == 0,
+        OneDriveSharingCapability == 3
+    ]
+    Status := count(FilterArray(Conditions, true)) == 1
 }
 
 tests contains {
@@ -112,8 +119,11 @@ tests contains {
     "ReportDetails": Domainlist(TENANTPOLICY),
     "RequirementMet": Status
 } if {
-    Conditions := [TENANTPOLICY.SharingCapability == 0, TENANTPOLICY.SharingDomainRestrictionMode == 1]
-    Status := count([Condition | some Condition in Conditions; Condition == true]) == 1
+    Conditions := [
+        TENANTPOLICY.SharingCapability == 0,
+        TENANTPOLICY.SharingDomainRestrictionMode == 1
+    ]
+    Status := count(FilterArray(Conditions, true)) == 1
 }
 
 #--
@@ -130,8 +140,11 @@ tests contains {
     "ReportDetails": ReportDetailsBoolean(Status),
     "RequirementMet": Status
 } if {
-    Conditions := [TENANTPOLICY.SharingCapability == 0, TENANTPOLICY.RequireAcceptingAccountMatchInvitedAccount == true]
-    Status := count([Condition | some Condition in Conditions; Condition == true]) >= 1
+    Conditions := [
+        TENANTPOLICY.SharingCapability == 0,
+        TENANTPOLICY.RequireAcceptingAccountMatchInvitedAccount == true
+    ]
+    Status := count(FilterArray(Conditions, true)) >= 1
 }
 
 #--
@@ -187,13 +200,19 @@ tests contains {
 #--
 
 ExternalUserExpireInDays(TenantPolicy) := ["", true] if {
-    Conditions := [TenantPolicy.SharingCapability == 0, TenantPolicy.SharingCapability == 3]
-    count([Condition | some Condition in Conditions; Condition == true]) > 0
+    Conditions := [
+        TenantPolicy.SharingCapability == 0,
+        TenantPolicy.SharingCapability == 3
+    ]
+    count(FilterArray(Conditions, true)) > 0
 }
 
 ExternalUserExpireInDays(TenantPolicy) := ["", true] if {
-    Conditions := [TenantPolicy.SharingCapability == 1, TenantPolicy.SharingCapability == 2]
-    count([Condition | some Condition in Conditions; Condition == true]) > 0
+    Conditions := [
+        TenantPolicy.SharingCapability == 1,
+        TenantPolicy.SharingCapability == 2
+    ]
+    count(FilterArray(Conditions, true)) > 0
     TenantPolicy.RequireAnonymousLinksExpireInDays <= 30
 }
 
@@ -246,8 +265,11 @@ tests contains {
     input.OneDrive_PnP_Flag == false
     FileLinkType := TENANTPOLICY.FileAnonymousLinkType
     FolderLinkType := TENANTPOLICY.FolderAnonymousLinkType
-    Conditions := [FileLinkType == 2, FolderLinkType == 2]
-    Status := count([Condition | some Condition in Conditions; Condition == true]) == 0
+    Conditions := [
+        FileLinkType == 2,
+        FolderLinkType == 2
+    ]
+    Status := count(FilterArray(Conditions, true)) == 0
 }
 
 tests contains {
@@ -303,10 +325,13 @@ tests contains {
     "PolicyId": "MS.SHAREPOINT.3.3v1",
     "Criticality": "Should",
     "Commandlet": ["Get-SPOTenant", "Get-PnPTenant"],
-    "ActualValue": [TENANTPOLICY.SharingCapability, TENANTPOLICY.EmailAttestationRequired, TENANTPOLICY.EmailAttestationReAuthDays],
+    "ActualValue": [SharingCapability, EmailAttestationRequired, EmailAttestationReAuthDays],
     "ReportDetails": ReportDetailsString(Status, ErrMsg),
     "RequirementMet": Status
 } if {
+    SharingCapability := TENANTPOLICY.SharingCapability
+    EmailAttestationRequired := TENANTPOLICY.EmailAttestationRequired
+    EmailAttestationReAuthDays := TENANTPOLICY.EmailAttestationReAuthDays
     [ErrMsg, Status] := ExpirationTimersVerificationCode(TENANTPOLICY)
 }
 
