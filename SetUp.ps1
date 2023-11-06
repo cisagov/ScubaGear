@@ -116,7 +116,6 @@ if ($NoOPA -eq $true) {
     Write-Debug "Skipping Download for OPA.`n"
 }
 else {
-    # $DebugPreference = 'Continue'
     try {
         $ScriptDir = Split-Path -Path $MyInvocation.MyCommand.Definition -Parent
         . $ScriptDir\OPA.ps1
