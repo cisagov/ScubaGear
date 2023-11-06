@@ -38,15 +38,15 @@ SensitiveAccountsSetting(Policies) := {
     "ExcludedGroups": ExcludedGroups,
     "IncludedDomains": IncludedDomains,
     "ExcludedDomains": ExcludedDomains,
-    "Policy": Policy[0]
+    "Policy": Policy
 } if {
-    Policy := [Policy | some Policy in Policies; Policy.Identity == "Strict Preset Security Policy"; Policy.State == "Enabled"]
-    IncludedUsers := {x | some x in Policy[0].SentTo}
-    ExcludedUsers := {x | some x in Policy[0].ExceptIfSentTo}
-    IncludedGroups := {x | some x in Policy[0].SentToMemberOf}
-    ExcludedGroups := {x | some x in Policy[0].ExceptIfSentToMemberOf}
-    IncludedDomains := {x | some x in Policy[0].RecipientDomainIs}
-    ExcludedDomains := {x | some x in Policy[0].ExceptIfRecipientDomainIs}
+    Policy := [Policy | some Policy in Policies; Policy.Identity == "Strict Preset Security Policy"; Policy.State == "Enabled"][0]
+    IncludedUsers := {x | some x in Policy.SentTo}
+    ExcludedUsers := {x | some x in Policy.ExceptIfSentTo}
+    IncludedGroups := {x | some x in Policy.SentToMemberOf}
+    ExcludedGroups := {x | some x in Policy.ExceptIfSentToMemberOf}
+    IncludedDomains := {x | some x in Policy.RecipientDomainIs}
+    ExcludedDomains := {x | some x in Policy.ExceptIfRecipientDomainIs}
 }
 
 default SensitiveAccounts(_, _) := false
