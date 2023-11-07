@@ -1,23 +1,32 @@
-################
-# Teams Baseline
-################
-
-#--
-# Reference: Secure Baseline file, teams.md
-#--
-# This file implements controls/policies documented in the secure baseline.  The tests.PolicyId
-# (e.g., MS.TEAMS.1.1v1) aligns this files to the secure baseline control.
 package teams
 import future.keywords
 import data.report.utils.Format
 import data.report.utils.ReportDetailsBoolean
 import data.report.utils.Description
 
-ReportDetailsArray(true, _, _) := ReportDetailsBoolean(true) if {}
+ReportDetailsArray(true, _, _) := PASS if {}
 
 ReportDetailsArray(false, Array, String) := Description(Format(Array), String, concat(", ", Array)) if {}
 
-ThirdPartyCheck := "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of ScubaGear. Otherwise, use a 3rd party tool OR manually check"
+FilterArray(Conditions, Boolean) := [Condition | some Condition in Conditions; Condition == Boolean]
+
+FAIL := ReportDetailsBoolean(false)
+
+PASS := ReportDetailsBoolean(true)
+
+ThirdPartyArray := [
+    "Custom implementation allowed.",
+    "If you are using Defender to fulfill this requirement,",
+    "run the Defender version of ScubaGear.",
+    "Otherwise, use a 3rd party tool OR manually check."
+]
+
+THIRDPARTYSTRING := concat(" ", ThirdPartyArray)
+
+
+##############
+# MS.TEAMS.1 #
+##############
 
 #--
 # MS.TEAMS.1.1v1
@@ -71,7 +80,7 @@ tests contains {
 #--
 # MS.TEAMS.1.3v1
 #--
-ReportDetails1_3(Policy) := ReportDetailsBoolean(true) if {
+ReportDetails1_3(Policy) := PASS if {
     Policy.AutoAdmittedUsers != "Everyone"
     Policy.AllowPSTNUsersToBypassLobby == false
 }
@@ -79,12 +88,12 @@ ReportDetails1_3(Policy) := ReportDetailsBoolean(true) if {
 ReportDetails1_3(Policy) := Description if {
     Policy.AutoAdmittedUsers != "Everyone"
     Policy.AllowPSTNUsersToBypassLobby == true
-    Description := concat(": ", [ReportDetailsBoolean(false), "Dial-in users are enabled to bypass the lobby"])
+    Description := concat(": ", [FAIL, "Dial-in users are enabled to bypass the lobby"])
 }
 
 ReportDetails1_3(Policy) := Description if {
     Policy.AutoAdmittedUsers == "Everyone"
-    Description := concat(": ", [ReportDetailsBoolean(false), "All users are admitted automatically"])
+    Description := concat(": ", [FAIL, "All users are admitted automatically"])
 }
 
 tests contains {
@@ -99,8 +108,11 @@ tests contains {
 
     # This control specifically states that non-global policies MAY be different, so filter for the global policy
     Policy.Identity == "Global"
-    Conditions := [Policy.AutoAdmittedUsers != "Everyone", Policy.AllowPSTNUsersToBypassLobby == false]
-    Status := count([Condition | some Condition in Conditions; Condition == false]) == 0
+    Conditions := [
+        Policy.AutoAdmittedUsers != "Everyone",
+        Policy.AllowPSTNUsersToBypassLobby == false
+    ]
+    Status := count(FilterArray(Conditions, false)) == 0
 }
 
 tests contains {
@@ -131,7 +143,11 @@ tests contains {
 
     # This control specifically states that non-global policies MAY be different, so filter for the global policy
     Policy.Identity == "Global"
-    AllowedUsers := ["EveryoneInCompany", "EveryoneInSameAndFederatedCompany", "EveryoneInCompanyExcludingGuests"]
+    AllowedUsers := [
+        "EveryoneInCompany",
+        "EveryoneInSameAndFederatedCompany",
+        "EveryoneInCompanyExcludingGuests"
+    ]
     Status := Policy.AutoAdmittedUsers in AllowedUsers
 }
 
@@ -194,7 +210,9 @@ tests contains {
     "RequirementMet": Status
 } if {
     some Policy in input.meeting_policies
-    Policy.Identity == "Global" # Filter: this control only applies to the Global policy
+
+    # Filter: this control only applies to the Global policy
+    Policy.Identity == "Global"
     Status := Policy.AllowCloudRecording == false
 }
 
@@ -223,7 +241,9 @@ tests contains {
     "RequirementMet": Status
 } if {
     some Policy in input.broadcast_policies
-    Policy.Identity == "Global" # Filter: this control only applies to the Global policy
+
+    # Filter: this control only applies to the Global policy
+    Policy.Identity == "Global"
     Status := Policy.BroadcastRecordingMode == "UserOverride"
 }
 
@@ -240,6 +260,11 @@ tests contains {
 }
 
 #--
+
+
+##############
+# MS.TEAMS.2 #
+##############
 
 #--
 # MS.TEAMS.2.1v1
@@ -332,6 +357,11 @@ tests contains {
 
 #--
 
+
+##############
+# MS.TEAMS.3 #
+##############
+
 #--
 # MS.TEAMS.3.1v1
 #--
@@ -355,20 +385,44 @@ tests contains {
 
 #--
 
+
+##############
+# MS.TEAMS.4 #
+##############
+
 #--
 # MS.TEAMS.4.1v1
 #--
+# According to Get-CsTeamsClientConfiguration, is team email integration enabled?
 ConfigsAllowingEmail contains Policy.Identity if {
     some Policy in input.client_configuration
     Policy.AllowEmailIntoChannel == true
 }
 
+AssignedPlans := concat(", ", TenantConfig.AssignedPlan) if {
+    some TenantConfig in input.teams_tenant_info
+}
+
+# What is the tenant type according to Get-CsTenant?
+TenantType := true if {
+    GCCConditions := [
+        contains(AssignedPlans, "GCC"),
+        contains(AssignedPlans, "DOD")
+    ]
+    count(FilterArray(GCCConditions, true)) > 0
+} else := false
+
+
 ReportDetails4_1(true, _) := "N/A: Feature is unavailable in GCC environments" if {}
 
-ReportDetails4_1(false, true) := ReportDetailsBoolean(true) if {}
+ReportDetails4_1(false, true) := PASS if {}
 
-ReportDetails4_1(false, false) := ReportDetailsBoolean(false) if {}
+ReportDetails4_1(false, false) := FAIL if {}
 
+# As long as either:
+#     1) Get-CsTeamsClientConfiguration reports email integration is disabled or
+#     2) Get-CsTenant reports this as a gov tenant
+# this test should pass.
 tests contains {
     "PolicyId": "MS.TEAMS.4.1v1",
     "Criticality": "Shall",
@@ -377,21 +431,13 @@ tests contains {
     "ReportDetails": ReportDetails4_1(IsGCC, IsEnabled),
     "RequirementMet": Status
 } if {
-    # According to Get-CsTeamsClientConfiguration, is team email integration enabled?
     IsEnabled := count(ConfigsAllowingEmail) == 0
-
-    # What is the tenant type according to Get-CsTenant?
-    some TenantConfig in input.teams_tenant_info
-    AssignedPlans := concat(", ", TenantConfig.AssignedPlan)
-    GCCConditions := [contains(AssignedPlans, "GCC"), contains(AssignedPlans, "DOD")]
-    IsGCC := count([Condition | some Condition in GCCConditions; Condition == true]) > 0
-
-    # As long as either:
-    #     1) Get-CsTeamsClientConfiguration reports email integration is disabled or
-    #     2) Get-CsTenant reports this as a gov tenant
-    # this test should pass.
-    Conditions := [IsEnabled, IsGCC]
-    Status := count([Condition | some Condition in Conditions; Condition == true]) > 0
+    IsGCC := TenantType
+    Conditions := [
+        IsEnabled,
+        IsGCC
+    ]
+    Status := count(FilterArray(Conditions, true)) > 0
 }
 
 tests contains {
@@ -406,6 +452,11 @@ tests contains {
 }
 
 #--
+
+
+##############
+# MS.TEAMS.5 #
+##############
 
 #--
 # MS.TEAMS.5.1v1
@@ -477,6 +528,11 @@ tests contains {
 
 #--
 
+
+##############
+# MS.TEAMS.6 #
+##############
+
 #--
 # MS.TEAMS.6.1v1
 #--
@@ -486,7 +542,7 @@ tests contains {
     "Criticality": "Shall/3rd Party",
     "Commandlet": [],
     "ActualValue": [],
-    "ReportDetails": ThirdPartyCheck,
+    "ReportDetails": THIRDPARTYSTRING,
     "RequirementMet": false
 }
 
@@ -501,11 +557,16 @@ tests contains {
     "Criticality": "Should/3rd Party",
     "Commandlet": [],
     "ActualValue": [],
-    "ReportDetails": ThirdPartyCheck,
+    "ReportDetails": THIRDPARTYSTRING,
     "RequirementMet": false
 }
 
 #--
+
+
+##############
+# MS.TEAMS.7 #
+##############
 
 #--
 # MS.TEAMS.7.1v1
@@ -516,7 +577,7 @@ tests contains {
     "Criticality": "Should/3rd Party",
     "Commandlet": [],
     "ActualValue": [],
-    "ReportDetails": ThirdPartyCheck,
+    "ReportDetails": THIRDPARTYSTRING,
     "RequirementMet": false
 }
 
@@ -531,11 +592,16 @@ tests contains {
     "Criticality": "Should/3rd Party",
     "Commandlet": [],
     "ActualValue": [],
-    "ReportDetails": ThirdPartyCheck,
+    "ReportDetails": THIRDPARTYSTRING,
     "RequirementMet": false
 }
 
 #--
+
+
+##############
+# MS.TEAMS.8 #
+##############
 
 #--
 # MS.TEAMS.8.1v1
@@ -546,7 +612,7 @@ tests contains {
     "Criticality": "Should/3rd Party",
     "Commandlet": [],
     "ActualValue": [],
-    "ReportDetails": ThirdPartyCheck,
+    "ReportDetails": THIRDPARTYSTRING,
     "RequirementMet": false
 }
 
@@ -561,7 +627,7 @@ tests contains {
     "Criticality": "Should/3rd Party",
     "Commandlet": [],
     "ActualValue": [],
-    "ReportDetails": ThirdPartyCheck,
+    "ReportDetails": THIRDPARTYSTRING,
     "RequirementMet": false
 }
 
