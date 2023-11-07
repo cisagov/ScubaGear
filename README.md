@@ -274,7 +274,7 @@ The tool employs a three-step process:
 - `PowerShell` contains the code used to export the configuration settings from the M365 tenant and orchestrate the entire process from export through evaluation to report. The main PowerShell module manifest `ScubaGear.psd1` is located in the `PowerShell/ScubaGear` folder.
 - `Rego` holds the `.rego` files. Each Rego file audits against the desired state for each product, per the SCuBA M365 secure configuration baseline documents.
 - `baselines` contains the SCuBA M365 secure configuration baseline documents in Markdown format.
-- `Testing` contains code that is used during the development process to unit test Rego policies.
+- `Testing` contains code that is used during the development process to test ScubaGear's PowerShell and Rego code.
 
 ## Troubleshooting
 
