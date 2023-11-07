@@ -267,12 +267,13 @@ New-PowerAppManagementApp -ApplicationId $appId # Must be run from a Power Platf
 ![SCuBA Architecture diagram](/images/scuba-architecture.png)
 The tool employs a three-step process:
 1. **Extract & Export**. In this step, we utilize the various PowerShell modules authored by Microsoft to export and serialize all the relevant settings into JSON.
-2. **Test & Record**. Compare the exported settings from the previous step with the configuration prescribed in the baselines. This is done using [OPA Rego](https://www.openpolicyagent.org/docs/latest/policy-language/#what-is-rego), a declarative query language for defining policy. OPA provides a ready-to-use policy engine executable and version v0.42.0 is already included in this repository. The code for the ScubaGear tool was tested against the included version of OPA. To use a later version of the OPA policy engine, follow the instructions listed [here](https://www.openpolicyagent.org/docs/latest/#running-opa) and customize the `$OPAPath` variable described in the Usage section above.
+2. **Test & Record**. Compare the exported settings from the previous step with the configuration prescribed in the baselines. This is done using [OPA Rego](https://www.openpolicyagent.org/docs/latest/policy-language/#what-is-rego), a declarative query language for defining policy. OPA provides a ready-to-use policy engine executable and version v0.42.0 is the minimum tested version the ScubaGear tool was tested against. To use a later version of the OPA policy engine, follow the instructions listed [here](https://www.openpolicyagent.org/docs/latest/#running-opa) and customize the `$OPAPath` variable described in the Usage section above.
 3. **Format & Report**. Package the data output by the OPA policy engine into a human-friendly HTML report.
 
 ## Repository Organization
 - `PowerShell` contains the code used to export the configuration settings from the M365 tenant and orchestrate the entire process from export through evaluation to report. The main PowerShell module manifest `ScubaGear.psd1` is located in the `PowerShell/ScubaGear` folder.
 - `Rego` holds the `.rego` files. Each Rego file audits against the desired state for each product, per the SCuBA M365 secure configuration baseline documents.
+- `baselines` contains the SCuBA M365 secure configuration baseline documents in Markdown format.
 - `Testing` contains code that is used during the development process to unit test Rego policies.
 
 ## Troubleshooting
