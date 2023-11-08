@@ -189,7 +189,7 @@ The example below illustrates the syntax for defining user, group, and role exem
                 - <Exempted Group 2 UUID>
 
 ### Viewing the Report
-The HTML report should open in your browser once the script completes. If it does not, navigate to the output folder and open the `BaselineReports.html` file using your browser. The result files generated from the tool are also saved to the output folder.
+The HTML report should open in your browser once the script completes. If it does not, navigate to the `output` folder and open the `BaselineReports.html` file using your browser. The result files generated from the tool are also saved to the `output` folder.
 
 ## Required Permissions
 When executing the tool interactively, there are two types of permissions that are required:
