@@ -1,29 +1,32 @@
+**`TLP:CLEAR`**
+
 # CISA M365 Security Configuration Baseline for Defender
 
-Microsoft 365 Defender is a cloud-based enterprise defense suite that
+Microsoft 365 (M365) Defender is a cloud-based enterprise defense suite that
 coordinates prevention, detection, investigation, and response. This set
 of tools and features are used to detect many types of attacks.
 
-This baseline focuses on the features of Defender for Office 365 and
-some settings are in fact configured in the Microsoft Purview
+This baseline focuses on the features of Defender for Office 365, but
+some settings are actually configured in the Microsoft Purview
 compliance portal. However, for simplicity, both the
-Microsoft 365 Defender and Microsoft Purview compliance portal
+M365 Defender and Microsoft Purview compliance portal
 items are contained in this baseline.
 
 Generally, use of Microsoft Defender is not required by the baselines of
 the core M365 products (Exchange Online, Teams, etc.). However, some of
 the controls in the core baselines require the use of a dedicated
-security tool, such as Defender. This baseline should not be a
-requirement to use Defender, but instead, as guidance for how these
-requirements could be met using Defender, should an agency elect to use
+security tool, such as Defender. This baseline does not require use of
+Defender. Rather, it serves as a guide should an agency elect to use
 Defender as their tool of choice.
 
-In addition to these controls, agencies should consider using a Cloud
-Access Security Broker to secure their environments as they adopt zero
+In addition to these controls, agencies should consider using a cloud
+access security broker to secure their environments as they adopt zero
 trust principles.
 
+> This document is marked TLP:CLEAR. Recipients may share this information without restriction. Information is subject to standard copyright rules. For more information on the Traffic Light Protocol, see https://www.cisa.gov/tlp.
+
 ## License Compliance and Copyright
-Portions of this document are adapted from documents in Microsoft’s [Microsoft 365](https://github.com/MicrosoftDocs/microsoft-365-docs/blob/public/LICENSE) and [Azure](https://github.com/MicrosoftDocs/azure-docs/blob/main/LICENSE) GitHub repositories. The respective documents are subject to copyright and are adapted under the terms of the Creative Commons Attribution 4.0 International license. Source documents are linked throughout this document. The United States Government has adapted selections of these documents to develop innovative and scalable configuration standards to strengthen the security of widely used cloud-based software services.
+Portions of this document are adapted from documents in Microsoft’s [M365](https://github.com/MicrosoftDocs/microsoft-365-docs/blob/public/LICENSE) and [Azure](https://github.com/MicrosoftDocs/azure-docs/blob/main/LICENSE) GitHub repositories. The respective documents are subject to copyright and are adapted under the terms of the Creative Commons Attribution 4.0 International license. Sources are linked throughout this document. The United States government has adapted selections of these documents to develop innovative and scalable configuration standards to strengthen the security of widely used cloud-based software services.
 
 ## Assumptions
 The agency has identified a set of user accounts that are considered sensitive accounts.  See [Key Terminology](#key-terminology) for a detailed description of sensitive accounts.
@@ -31,23 +34,23 @@ The agency has identified a set of user accounts that are considered sensitive a
 The **License Requirements** sections of this document assume the organization is using an [M365 E3](https://www.microsoft.com/en-us/microsoft-365/compare-microsoft-365-enterprise-plans) or [G3](https://www.microsoft.com/en-us/microsoft-365/government) license level at a minimum. Therefore, only licenses not included in E3/G3 are listed.
 
 ## Key Terminology
-The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [RFC 2119](https://datatracker.ietf.org/doc/html/rfc2119).
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [Request For Comments 2119](https://datatracker.ietf.org/doc/html/rfc2119).
 
 The following are key terms and descriptions used in this document.
 
 **Sensitive Accounts** – This term denotes a set of user accounts that have
-access to sensitive and high value information.  As a result, these accounts
+access to sensitive and high-value information. As a result, these accounts
 may be at a higher risk of being targeted.
 
 # Baseline Policies
 
 ## 1. Preset Security Profiles
 
-Microsoft Defender defines two [preset security
+Microsoft Defender defines three [preset security
 profiles](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/preset-security-policies?view=o365-worldwide):
-standard and strict. These preset policies are informed by observations Microsoft made, and are designed to strike the balance between usability and security. They allow administrators to enable the full feature set of Defender by simply adding users to the policies rather than manually configuring each setting.
+built-in protection, standard, and strict. These preset policies are informed by Microsoft's observations, and are designed to strike the balance between usability and security. They allow administrators to enable the full feature set of Defender by simply adding users to the policies rather than manually configuring each setting.
 
-Within the preset policies, users can be enrolled in [Exchange Online Protection](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/eop-about?view=o365-worldwide) and [Defender for Office 365 protection](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/microsoft-defender-for-office-365-product-overview?view=o365-worldwide). Additionally, preset policies support configuration of [Impersonation Protection](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/anti-phishing-policies-about?view=o365-worldwide#impersonation-settings-in-anti-phishing-policies-in-microsoft-defender-for-office-365).
+Within the standard and strict preset policies, users can be enrolled in [Exchange Online Protection](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/eop-about?view=o365-worldwide) and [Defender for Office 365 protection](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/microsoft-defender-for-office-365-product-overview?view=o365-worldwide). Additionally, preset policies support configuration of [impersonation protection](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/anti-phishing-policies-about?view=o365-worldwide#impersonation-settings-in-anti-phishing-policies-in-microsoft-defender-for-office-365).
 
 ### Policies
 #### MS.DEFENDER.1.1v1
@@ -827,3 +830,5 @@ The cross-agency collaboration and partnerships developed during this initiative
 - U.S. Small Business Administration (SBA)
 - U.S. Census Bureau (USCB)
 - U.S. Geological Survey (USGS)
+
+**`TLP:CLEAR`**
