@@ -1,26 +1,27 @@
+**`TLP:CLEAR`**
+
 # CISA M365 Security Configuration Baseline for Power BI
 
-Power BI is the Software as a Service (SaaS) offering from Microsoft that facilitates self-service business intelligence dashboards, reports, datasets, and visualizations. Power BI can connect to multiple, different data sources, combine and shape data from those connections, then create reports and dashboards to share with others. This Secure Configuration Baseline (SCB) provides specific policies to strengthen Power BI security.
+Power BI is the software as a service (SaaS) product from Microsoft that facilitates self-service business intelligence dashboards, reports, datasets, and visualizations. Power BI can connect to multiple different data sources, combine and shape data from those connections, then create reports and dashboards to share with others. This secure configuration baseline (SCB) provides specific policies to strengthen Power BI security.
 
 The Secure Cloud Business Applications (SCuBA) project run by the Cybersecurity and Infrastructure Security Agency (CISA) provides guidance and capabilities to secure federal civilian executive branch (FCEB) agencies’ cloud business application environments and protect federal information that is created, accessed, shared, and stored in those environments. 
 
-The CISA SCuBA SCBs for M365 help secure federal information assets stored within M365 cloud business application environments through consistent, effective, and manageable security configurations. CISA created baselines tailored to the federal government’s threats and risk tolerance with the knowledge that every organization has different threat models and risk tolerance. Non-governmental organizations may also find value in applying these baselines to reduce risks.
+The CISA SCuBA SCBs for Microsoft 365 (M365) help secure federal information assets stored within M365 cloud business application environments through consistent, effective, and manageable security configurations. CISA created baselines tailored to the federal government’s threats and risk tolerance with the knowledge that every organization has different threat models and risk tolerance. Non-governmental organizations may also find value in applying these baselines to reduce risks.
 
 The information in this document is being provided “as is” for INFORMATIONAL PURPOSES ONLY. CISA does not endorse any commercial product or service, including any subjects of analysis. Any reference to specific commercial entities or commercial products, processes, or services by service mark, trademark, manufacturer, or otherwise, does not constitute or imply endorsement, recommendation, or favoritism by CISA.
 
 ## License Compliance and Copyright 
-Portions of this document are adapted from documents in Microsoft’s [Microsoft 365](https://github.com/MicrosoftDocs/microsoft-365-docs/blob/public/LICENSE) and [Azure](https://github.com/MicrosoftDocs/azure-docs/blob/main/LICENSE) GitHub repositories. The respective documents are subject to copyright and are adapted under the terms of the Creative Commons Attribution 4.0 International license. Source documents are linked throughout this document. The United States Government has adapted selections of these documents to develop innovative and scalable configuration standards to strengthen the security of widely used cloud-based software services.
+Portions of this document are adapted from documents in Microsoft’s [Microsoft 365](https://github.com/MicrosoftDocs/microsoft-365-docs/blob/public/LICENSE) and [Azure](https://github.com/MicrosoftDocs/azure-docs/blob/main/LICENSE) GitHub repositories. The respective documents are subject to copyright and are adapted under the terms of the Creative Commons Attribution 4.0 International license. Source documents are linked throughout this document. The United States government has adapted selections of these documents to develop innovative and scalable configuration standards to strengthen the security of widely used cloud-based software services.
 
 ## Assumptions
 The **License Requirements** sections of this document assume the organization is using an [M365 E3](https://www.microsoft.com/en-us/microsoft-365/compare-microsoft-365-enterprise-plans) or [G3](https://www.microsoft.com/en-us/microsoft-365/government) license level at a minimum. Therefore, only licenses not included in E3/G3 are listed.
 
 
-Agencies using Power BI have a data classification scheme in place for
+Agencies using Power BI **may**?? have a data classification scheme in place for
   the data entering Power BI.
 
 - Agencies may connect more than one data source to their Power BI
-  tenant.
-
+  tenant. **deleted new line**??
 - All data sources use a secure connection for data transfer to and from
   the Power BI tenant; the agency disallows non-secure connections.
 
@@ -44,9 +45,9 @@ across Microsoft documentation):
 
 ## 1. Publish to Web
 
-Power BI has a capability to publish reports and content to the web.
+Power BI has a capability to publish reports and content to the web. **(WHY HRD CR??)**
 This capability creates a publicly accessible web URL that does not
-require authentication or status as an Azure AD user to view it. While this
+require authentication or status as an **Azure AD**?? user to view it. While this
 may be needed for a specific use case or collaboration scenario, it is a
 best practice to keep this setting off by default to prevent unintended
 and potentially sensitive data exposure.
@@ -58,9 +59,9 @@ publish data to the web.
 
 ### Policies
 #### MS.POWERBI.1.1v1
-The Publish to Web feature SHOULD be disabled unless the agency mission requires the capability.
+The **Publish to Web** feature SHOULD be disabled unless the agency mission requires the capability.
 
-- _Rationale:_ Having a publicly accessible web URL means there is no way to control who is viewing information. By following this policy there will be no sensitive information published to the public web that could be accessed by a malicious actor.
+- _Rationale:_ Having a publicly accessible web URL means there is no way to control who is viewing information. By following this policy there will be no sensitive information published to the public web that could be accessed by a malicious actor. **Make change**??
 - _Last modified:_ June 2023
 
 ### Resources
@@ -73,14 +74,14 @@ The Publish to Web feature SHOULD be disabled unless the agency mission requires
 
 ### License Requirements
 
-- N/A
+- Not applicable (N/A)
 
 
 ### Implementation 
 #### MS.POWERBI.1.1v1 instructions:
 
 1. Navigate to the **PowerBI Admin Portal**
-
+**spacing**??
 2. Click on **Tenant Settings**
 
 3. Scroll to **Export and sharing settings**
@@ -809,4 +810,6 @@ disabling public internet access.
 - Instead of enabling service principals for the entire agency,
   implement for a dedicated security group.
 
-**Note**: This policy is only applicable if the setting **Allow service principals to use Power BI APIs** is enabled
+**Note**: This policy is only applicable if the setting **Allow service principals to use Power BI APIs** is enabled.
+
+**`TLP:CLEAR`**
