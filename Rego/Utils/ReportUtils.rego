@@ -7,7 +7,7 @@ default BaselineVersion := "main"
 BaselineVersion := input.module_version
 
 # baselineVersion := "3.0.0." # Baseline version is pinned to a module version
-ScubaBaseUrl := sprintf("https://github.com/cisagov/ScubaGear/blob/%v/baselines/", [BaselineVersion])
+ScubaBaseUrl := sprintf("https://github.com/cisagov/ScubaGear/blob/v%v/baselines/", [BaselineVersion])
 
 ################
 # Helper functions for this file
