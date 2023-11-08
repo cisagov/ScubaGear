@@ -64,36 +64,36 @@ The standard and strict preset security policies SHALL be enabled.
 All users SHALL be added to Exchange Online Protection in either the standard or strict preset security policy.
 
 <!--Policy: MS.DEFENDER.1.2v1; Criticality: SHALL -->
-- _Rationale:_ Important user protections are provided by Exchange Online Protection, including anti-spam, anti-malware, and anti-phishing protections. By using the preset policies, administrators can easily ensure all new and existing users automatically have secure defaults applied.
+- _Rationale:_ Important user protections are provided by EOP, including anti-spam, anti-malware, and anti-phishing protections. By using the preset policies, administrators can easily ensure all new and existing users have secure defaults applied automatically.
 - _Last modified:_ June 2023
 - _Note:_
-  - Specific user accounts, except for sensitive accounts, MAY be exempt from the preset policies, provided they are added to one or more custom policies offering comparable protection. These specific users might need flexibility not offered by the preset policies. Those users' accounts should be added to a custom policy conforming as closely as possible to the settings used by the preset policies. See the **Resources** section for more details on configuring policies.
+  - Specific user accounts, except for sensitive accounts, MAY be exempt from the preset policies, provided they are added to one or more custom policies offering comparable protection. These users might need flexibility not offered by the preset policies. Their accounts should be added to a custom policy conforming as closely as possible to the settings used by the preset policies. See the **Resources** section for more details on configuring policies.
   - The standard and strict preset security policies must be enabled to protect users.
 
 #### MS.DEFENDER.1.3v1
-All users SHALL be added to Defender for Office 365 Protection in either the standard or strict preset security policy.
+All users SHALL be added to Defender for Office 365 protection in either the standard or strict preset security policy.
 
 <!--Policy: MS.DEFENDER.1.3v1; Criticality: SHALL -->
-- _Rationale:_ Important user protections are provided by Defender for Office 365 Protection, including safe attachments and safe links. By using the preset policies, administrators can easily ensure all new and existing users automatically have secure defaults applied.  
+- _Rationale:_ Important user protections are provided by Defender for Office 365 protection, including safe attachments and safe links. By using the preset policies, administrators can easily ensure all new and existing users have secure defaults applied automatically.
 - _Last modified:_ June 2023
 - _Note:_
-  - Specific user accounts, except for sensitive accounts, MAY be exempt from the preset policies, provided they are added to one or more custom policies offering comparable protection. These specific users might need flexibility not offered by the preset policies. Those users' accounts should be added to a custom policy conforming as closely as possible to the settings used by the preset policies. See the **Resources** section for more details on configuring policies.
+  - Specific user accounts, except for sensitive accounts, MAY be exempt from the preset policies, provided they are added to one or more custom policies offering comparable protection. These users might need flexibility not offered by the preset policies. Their accounts should be added to a custom policy conforming as closely as possible to the settings used by the preset policies. See the **Resources** section for more details on configuring policies.
   - The standard and strict preset security policies must be enabled to protect users.
 
 #### MS.DEFENDER.1.4v1
-Sensitive accounts SHALL be added to Exchange Online Protection in the strict preset security policy.
+Sensitive accounts SHALL be added to EOP in the strict preset security policy.
 
 <!--Policy: MS.DEFENDER.1.4v1; Criticality: SHALL -->
-- _Rationale:_ Unauthorized access to a sensitive account may result in greater harm than a standard user account. Adding sensitive accounts to the strict preset security policy, with its increased protections, better mitigates their increased risk to email threats.
+- _Rationale:_ Unauthorized access to a sensitive account may result in greater harm than a standard user account. Adding sensitive accounts to the strict preset security policy, with its increased protections, better mitigates their elevated risk to email threats.
 - _Last modified:_ June 2023
 - _Note:_ The strict preset security policy must be enabled to protect
           accounts.
 
 #### MS.DEFENDER.1.5v1
-Sensitive accounts SHALL be added to Defender for Office 365 Protection in the strict preset security policy.
+Sensitive accounts SHALL be added to Defender for Office 365 protection in the strict preset security policy.
 
 <!--Policy: MS.DEFENDER.1.5v1; Criticality: SHALL -->
-- _Rationale:_ Unauthorized access to a sensitive account may result in greater harm than a standard user account. Adding sensitive accounts to the strict preset security policy, with its increased protections, better mitigates their increased risk.
+- _Rationale:_ Unauthorized access to a sensitive account may result in greater harm than to a standard user account. Adding sensitive accounts to the strict preset security policy, with its increased protections, better mitigates their elevated risk.
 - _Last modified:_ June 2023
 - _Note:_ The strict preset security policy must be enabled to protect
           accounts.
@@ -127,7 +127,7 @@ Sensitive accounts SHALL be added to Defender for Office 365 Protection in the s
 6. Under **Strict protection**, slide the toggle switch to the right so the text next to the toggle reads **Strict protection is on**.
 
 Note: If the toggle slider in step 5 is grayed out, click on **Manage protection settings**
-instead and configure the policy settings according to [Use the Microsoft 365 Defender portal to assign Standard and Strict preset security policies to users \| Microsoft Learn](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/preset-security-policies?view=o365-worldwide#use-the-microsoft-365-defender-portal-to-assign-standard-and-strict-preset-security-policies-to-users) to enable each preset security policy.
+instead and configure the policy settings according to [Use the Microsoft 365 Defender portal to assign Standard and Strict preset security policies to users \| Microsoft Learn](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/preset-security-policies?view=o365-worldwide#use-the-microsoft-365-defender-portal-to-assign-standard-and-strict-preset-security-policies-to-users).
 
 #### MS.DEFENDER.1.2v1 instructions:
 
@@ -138,7 +138,7 @@ instead and configure the policy settings according to [Use the Microsoft 365 De
 5. Select **Manage protection settings** under either **Standard protection**
    or **Strict protection**.
 6. On the **Apply Exchange Online Protection** page, select **All recipients**.
-7. (optional) Under **Exclude these recipients**, add **Users** and **Groups**
+7. (Optional) Under **Exclude these recipients**, add **Users** and **Groups**
    to be exempted from the preset policies.
 8. Select **Next** on each page until the **Review and confirm your changes** page.
 9. On the **Review and confirm your changes** page, select **Confirm**.
@@ -153,7 +153,7 @@ instead and configure the policy settings according to [Use the Microsoft 365 De
    protection settings**.
 6. Select **Next** until you reach the **Apply Defender for Office 365 protection** page.
 7. On the **Apply Defender for Office 365 protection** page, select **All recipients**.
-8. (optional) Under **Exclude these recipients**, add **Users** and **Groups**
+8. (Optional) Under **Exclude these recipients**, add **Users** and **Groups**
    to be exempted from the preset policies.
 9. Select **Next** on each page until the **Review and confirm your changes** page.
 10. On the **Review and confirm your changes** page, select **Confirm**.
@@ -181,11 +181,11 @@ instead and configure the policy settings according to [Use the Microsoft 365 De
 6. Select **Next** until you reach the **Apply Defender for Office 365 protection** page.
 7. On the **Apply Defender for Office 365 protection** page, select
    **Specific recipients** or **Previously selected recipients** if sensitive
-   accounts were already set on the Exchange Online protections page.
+   accounts were already set on the EOP page.
 8. If adding sensitive accounts separately via **Specific recipients**, add all
    sensitive accounts via the **User** and **Group** boxes using the names of
    mailboxes, users, contacts, M365 groups, and distribution groups.
-9. (optional) Under **Exclude these recipients**, add **Users** and **Groups**
+9. (Optional) Under **Exclude these recipients**, add **Users** and **Groups**
    to be exempted from the preset policies.
 10. Select **Next** on each page until the **Review and confirm your changes** page.
 11. On the **Review and confirm your changes** page, select **Confirm**.
@@ -201,7 +201,7 @@ impersonation attempt, the email is quarantined.
 User impersonation protection SHOULD be enabled for sensitive accounts in both the standard and strict preset policies.
 
 <!--Policy: MS.DEFENDER.2.1v1; Criticality: SHOULD -->
-- _Rationale:_ User impersonation, especially of users with access to sensitive or high value information and resources, has the potential to result in serious harm. Impersonation protection mitigates this risk. By configuring impersonation protection in both preset policies, administrators ensure all email recipients are protected from impersonated emails, regardless of whether they are added to the standard or strict policy.
+- _Rationale:_ User impersonation, especially of users with access to sensitive or high-value information and resources, has the potential to result in serious harm. Impersonation protection mitigates this risk. By configuring impersonation protection in both preset policies, administrators ensure all email recipients are protected from impersonated emails, regardless of whether they are added to the standard or strict policy.
 - _Last modified:_ June 2023
 - _Note:_ The standard and strict preset security policies must be enabled to
           protect accounts.
@@ -210,7 +210,7 @@ User impersonation protection SHOULD be enabled for sensitive accounts in both t
 Domain impersonation protection SHOULD be enabled for domains owned by the agency in both the standard and strict preset policies.
 
 <!--Policy: MS.DEFENDER.2.2v1; Criticality: SHOULD -->
-- _Rationale:_ By configuring domain impersonation protection for all agency domains, the risk of a user being deceived by a look-alike domain may be reduced. By configuring impersonation protection in both preset policies, administrators ensure all email recipients are protected from impersonated emails, regardless of whether they are added to the standard or strict policy.
+- _Rationale:_ Configuring domain impersonation protection for all agency domains reduces the risk of a user being deceived by a look-alike domain. By configuring impersonation protection in both preset policies, administrators ensure all email recipients are protected from impersonated emails, regardless of whether they are added to the standard or strict policy.
 - _Last modified:_ June 2023
 - _Note:_ The standard and strict preset security policies must be enabled to
           protect agency domains.
@@ -219,7 +219,7 @@ Domain impersonation protection SHOULD be enabled for domains owned by the agenc
 Domain impersonation protection SHOULD be added for important partners in both the standard and strict preset policies.
 
 <!--Policy: MS.DEFENDER.2.3v1; Criticality: SHOULD -->
-- _Rationale:_ By configuring domain impersonation protection for domains owned by important partners, the risk of a user being deceived by a look-alike domain may be reduced. By configuring impersonation protection in both preset policies, administrators ensure that all email recipients are protected from impersonated emails, regardless of whether they are added to the standard or strict policy.
+- _Rationale:_ Configuring domain impersonation protection for domains owned by important partners reduces the risk of a user being deceived by a look-alike domain. By configuring impersonation protection in both preset policies, administrators ensure that all email recipients are protected from impersonated emails, regardless of whether they are added to the standard or strict policy.
 - _Last modified:_ June 2023
 - _Note:_ The standard and strict preset security policies must be enabled to
           protect partner domains.
@@ -233,12 +233,12 @@ Domain impersonation protection SHOULD be added for important partners in both t
 
 - Impersonation protection and advanced phishing thresholds require
   Defender for Office 365 Plan 1 or 2. These are included with E5 and G5
-  and are available as add-ons for E3 and G3. As of April 25, 2023
+  and are available as add-ons for E3 and G3. As of April 25, 2023,
   anti-phishing for user and domain impersonation and spoof intelligence
-  are not yet available in GCC High and DoD (see [Platform features \|
+  are not yet available in M365 Government Community Cloud (GCC High) and Department of Defense (DoD) environments. See [Platform features \|
   Microsoft
   Learn](https://learn.microsoft.com/en-us/office365/servicedescriptions/office-365-platform-service-description/office-365-us-government/office-365-us-government#platform-features)
-  for current offerings).
+  for current offerings.
 
 ### Implementation
 
@@ -255,7 +255,7 @@ Domain impersonation protection SHOULD be added for important partners in both t
 7. On the **Protected custom users** page, add a name and valid email address for each
    sensitive account and click **Add** after each.
 8. Select **Next** until you reach the **Trusted senders and domains** page.
-9. (optional) Add specific email addresses here to not flag as impersonation
+9. (Optional) Add specific email addresses here to not flag as impersonation
    when sending messages and prevent false positives. Click **Add** after each.
 10. Select **Next** on each page until the **Review and confirm your changes** page.
 11. On the **Review and confirm your changes** page, select **Confirm**.
@@ -273,7 +273,7 @@ Domain impersonation protection SHOULD be added for important partners in both t
 7. On the **Protected custom domains** page, add each agency domain
    and click **Add** after each.
 8. Select **Next** until you reach the **Trusted senders and domains** page.
-9. (optional) Add specific domains here to not flag as impersonation when
+9. (Optional) Add specific domains here to not flag as impersonation when
    sending messages and prevent false positives. Click **Add** after each.
 10. Select **Next** on each page until the **Review and confirm your changes** page.
 11. On the **Review and confirm your changes** page, select **Confirm**.
