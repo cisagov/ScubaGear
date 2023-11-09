@@ -6,7 +6,7 @@ Microsoft Exchange Online gives users easy access to their email and supports or
 Many admin controls for Exchange Online are found in the **Exchange admin center**.
 However, several of the security features for Exchange Online are shared between Microsoft
 products and are configured in either the **Microsoft 365 Defender portal**
-or **Microsoft 365 Purview compliance portal**. Generally
+or **Microsoft Purview compliance portal**. Generally
 speaking, the use of Microsoft Defender is not strictly required for
 this baseline. When noted, alternative products may be used in lieu of
 Defender, on the condition that they fulfill these required baseline
@@ -30,7 +30,7 @@ and
 GitHub repositories. The respective documents are subject to copyright
 and are adapted under the terms of the Creative Commons Attribution 4.0
 International license. Source documents are linked throughout this
-document. The United States Government has adapted selections of these
+document. The United States government has adapted selections of these
 documents to develop innovative and scalable configuration standards to
 strengthen the security of widely used cloud-based software services.
 
@@ -78,7 +78,7 @@ internal forwarding.
 
 ### License Requirements
 
-- N/A
+- Not applicable (N/A)
 
 ### Implementation
 
@@ -96,7 +96,7 @@ To disallow automatic forwarding to external domains:
 5.  Clear the checkbox next to **Allow automatic forwarding**, then
     click **Save**.
 
-6.  Return to **Remote domains** and repeat steps 4-5 for each
+6.  Return to **Remote domains** and repeat steps 4 and 5 for each
     additional remote domain in the list.
 
 ## 2. Sender Policy Framework
@@ -106,7 +106,7 @@ administrators to specify which IP addresses are explicitly approved to
 send email on behalf of the domain, facilitating detection of spoofed
 emails. SPF is not configured through the Exchange admin center, but
 rather via Domain Name System (DNS) records hosted by the agency’s
-domain. Thus, the exact steps needed to set up SPF varies from agency to
+domain. Thus, the exact steps needed to set up SPF vary from agency to
 agency, but Microsoft’s documentation provides some helpful starting
 points.
 
@@ -145,7 +145,7 @@ agency, facilitating phishing attacks. Publishing an SPF policy for each agency 
 
 ### License Requirements
 
-- N/A
+- Not applicable (N/A)
 
 ### Implementation
 
@@ -218,7 +218,7 @@ recipients to detect spoofed emails and verify the integrity of email content.
 
 ### License Requirements
 
-- N/A
+- Not applicable (N/A)
 
 ### Implementation
 
@@ -299,7 +299,7 @@ to spoof their domains.
 
 ### License Requirements
 
-- N/A
+- Not applicable (N/A)
 
 ### Implementation
 
@@ -379,7 +379,7 @@ per-mailbox basis when necessary.
 
 ### License Requirements
 
-- N/A
+- Not applicable (N/A)
 
 ### Implementation
 
@@ -445,7 +445,7 @@ for legitimate use as needed.
 
 ### License Requirements
 
-- N/A
+- Not applicable (N/A)
 
 ### Implementation
 
@@ -502,7 +502,7 @@ have expected to be sent from an internal sender.
 
 ### License Requirements
 
-- N/A
+- Not applicable (N/A)
 
 ### Implementation
 
@@ -580,7 +580,7 @@ The DLP solution SHALL protect PII and sensitive information, as defined by the 
 
 ### License Requirements
 
-- N/A
+- Not applicable (N/A)
 
 ### Implementation
 
@@ -645,7 +645,7 @@ organization, to be made in accordance with their risk tolerance.
 
 ### License Requirements
 
-- N/A
+- Not applicable (N/A)
 
 ### Implementation
 
@@ -725,7 +725,7 @@ containing malware in any given user's mailbox can be reduced.
 
 ### License Requirements
 
-- N/A
+- Not applicable (N/A)
 
 ### Implementation
 
@@ -898,7 +898,7 @@ specific senders.
 
 ### License Requirements
 
-- N/A
+- Not applicable (N/A)
 
 ### Implementation
 
@@ -976,7 +976,7 @@ Mailbox auditing SHALL be enabled.
 
 ### License Requirements
 
-- N/A
+- Not applicable (N/A)
 
 ### Implementation
 
@@ -1055,7 +1055,7 @@ potentially unknown users to bypass spam protections.
 
 ### License Requirements
 
-- N/A
+- Not applicable (N/A)
 
 ### Implementation
 
@@ -1144,7 +1144,7 @@ User click tracking SHOULD be enabled.
 
 ### License Requirements
 
-- N/A
+- Not applicable (N/A)
 
 ### Implementation
 
@@ -1234,7 +1234,7 @@ The alerts SHOULD be sent to a monitored address or incorporated into a SIEM.
 
 ### License Requirements
 
-- N/A
+- Not applicable (N/A)
 
 ### Implementation
 
@@ -1375,13 +1375,13 @@ The SCBs were informed by materials produced by the following organizations:
 - Mandiant
 - Microsoft
 - U.S. Defense Information Systems Agency (DISA)
-- U.S. National Institute of Standards (NIST)
+- U.S. National Institute of Standards and Technology (NIST)
 - U.S. Office of Management and Budget (OMB)
 
 The cross-agency collaboration and partnerships developed during this initiative serve as an example for solving complex problems faced by the federal government. CISA also thanks the Cybersecurity Innovation Tiger Team (CITT) for its leadership and the following federal agencies that provided input during the development of the baselines:
 
 - Consumer Financial Protection Bureau (CFPB)
-- Department of the Interior (DOI)
+- U.S. Department of the Interior (DOI)
 - National Aeronautics and Space Administration (NASA)
 - U.S. Office of Personnel Management (OPM)
 - U.S. Small Business Administration (SBA)
