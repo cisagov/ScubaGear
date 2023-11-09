@@ -157,8 +157,10 @@ CapExclusions can be defined in the following policy namespaces:
 - MS.AAD.1.1v1
 - MS.AAD.2.1v1
 - MS.AAD.2.3v1
+- MS.AAD.3.1v1
 - MS.AAD.3.2v1
 - MS.AAD.3.3v1
+- MS.AAD.3.6v1
 - MS.AAD.3.7v1
 - MS.AAD.3.8v1
 
@@ -208,7 +210,7 @@ The minimum user roles needed for each product are described in the table below.
 | Azure Active Directory  |  Global Reader                                                                      |
 | Defender for Office 365 |  Global Reader (or Exchange Administrator)                                                             |
 | Exchange Online         |  Global Reader (or Exchange Administrator)                                                             |
-| Power Platform          |  Power Platform Administrator and a "Power Apps for Office 365" license             |
+| Power Platform          |  Power Platform Administrator with a "Power Apps for Office 365" license             |
 | Sharepoint Online       |  SharePoint Administrator                                                           |
 | Microsoft Teams                   |  Global Reader (or Teams Administrator)                                                                |
 > **Note**
