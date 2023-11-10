@@ -22,8 +22,8 @@ jobs:
       uses: actions/checkout@v3
       # Let's start simple: Verify file exists
     - name: Check for file
-      if: (!(Test-Path Testing/Functional/Products/Products.Tests.ps1 -PathType Leaf))
-      uses: actions/github-script@v3
-      with:
-        script: |
+      run: |
+        if (!(Test-Path Testing/Functional/Products/Products.Tests.ps1 -PathType Leaf))
+        {
           core.setFailed('Product test file not found.')
+        }
