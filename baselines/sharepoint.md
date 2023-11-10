@@ -1,16 +1,18 @@
 # CISA M365 Security Configuration Baseline for SharePoint Online and OneDrive
 
-SharePoint Online is a web-based collaboration and document management platform. It is primarily used to collaborate on documents and communicate information in project teams. OneDrive is a cloud-based file storage system primarily used to store a user's personal files but it can also be used to share documents with others. This Secure Configuration Baseline (SCB) provides specific policies to strengthen the security of both of these services.
+SharePoint Online is a web-based collaboration and document management platform. It is primarily used to collaborate on documents and communicate information in projects. OneDrive is a cloud-based file storage system primarily used to store a user's personal files, but it can also be used to share documents with others. This secure configuration baseline (SCB) provides specific policies to strengthen the security of both services.
 
-The Secure Cloud Business Applications (SCuBA) project run by the Cybersecurity and Infrastructure Security Agency (CISA) provides guidance and capabilities to secure federal civilian executive branch (FCEB) agencies’ cloud business application environments and protect federal information that is created, accessed, shared, and stored in those environments. 
+The Secure Cloud Business Applications (SCuBA) project run by the Cybersecurity and Infrastructure Security Agency (CISA) provides guidance and capabilities to secure federal civilian executive branch (FCEB) agencies’ cloud business application environments and protect federal information that is created, accessed, shared, and stored in those environments.
 
-The CISA SCuBA SCBs for M365 help secure federal information assets stored within M365 cloud business application environments through consistent, effective, and manageable security configurations. CISA created baselines tailored to the federal government’s threats and risk tolerance with the knowledge that every organization has different threat models and risk tolerance. Non-governmental organizations may also find value in applying these baselines to reduce risks.
+The CISA SCuBA SCBs for Microsoft 365 (M365) helps secure federal information assets stored within M365 cloud business application environments through consistent, effective, and manageable security configurations. CISA created baselines tailored to the federal government’s threats and risk tolerance with the knowledge that every organization has different threat models and risk tolerance. Non-governmental organizations may also find value in applying these baselines to reduce risks.
 
-The information in this document is being provided “as is” for INFORMATIONAL PURPOSES ONLY. CISA does not endorse any commercial product or service, including any subjects of analysis. Any reference to specific commercial entities or commercial products, processes, or services by service mark, trademark, manufacturer, or otherwise, does not constitute or imply endorsement, recommendation, or favoritism by CISA.
+The information in this document is being provided “as is” for INFORMATIONAL PURPOSES ONLY. CISA does not endorse any commercial product or service, including any subjects of analysis. Any reference to specific commercial entities or commercial products, processes, or services by service mark, trademark, manufacturer, or otherwise does not constitute or imply endorsement, recommendation, or favoritism by CISA.
+
+> This document is marked TLP:CLEAR. Recipients may share this information without restriction. Information is subject to standard copyright rules. For more information on the Traffic Light Protocol, see https://www.cisa.gov/tlp.
 
 ## License Compliance and Copyright
 
-Portions of this document are adapted from documents in Microsoft’s [Microsoft 365](https://github.com/MicrosoftDocs/microsoft-365-docs/blob/public/LICENSE) and [Azure](https://github.com/MicrosoftDocs/azure-docs/blob/main/LICENSE) GitHub repositories. The respective documents are subject to copyright and are adapted under the terms of the Creative Commons Attribution 4.0 International license. Source documents are linked throughout this document. The United States Government has adapted selections of these documents to develop innovative and scalable configuration standards to strengthen the security of widely used cloud-based software services.
+Portions of this document are adapted from documents in Microsoft’s [M365](https://github.com/MicrosoftDocs/microsoft-365-docs/blob/public/LICENSE) and [Azure](https://github.com/MicrosoftDocs/azure-docs/blob/main/LICENSE) GitHub repositories. The respective documents are subject to copyright and are adapted under the terms of the Creative Commons Attribution 4.0 International license. Source documents are linked throughout this document. The United States government has adapted selections of these documents to develop innovative and scalable configuration standards to strengthen the security of widely used cloud-based software services.
 
 ## Assumptions
 The **License Requirements** sections of this document assume the organization is using an [M365 E3](https://www.microsoft.com/en-us/microsoft-365/compare-microsoft-365-enterprise-plans) or [G3](https://www.microsoft.com/en-us/microsoft-365/government) license level at a minimum. Therefore, only licenses not included in E3/G3 are listed.
@@ -41,7 +43,7 @@ External sharing for OneDrive SHALL be limited to Existing Guests or Only People
 - _Last modified:_ June 2023
 
 #### MS.SHAREPOINT.1.3v1
-External sharing SHALL be restricted to approved external domains and/or users in approved security groups per interagency collaboration needs. 
+External sharing SHALL be restricted to approved external domains and/or users in approved security groups per interagency collaboration needs.
 
 <!--Policy: MS.SHAREPOINT.1.3v1; Criticality: SHALL -->
 - _Rationale:_ By limiting sharing to domains or approved security groups used for interagency collaboration purposes, administrators prevent sharing with unknown organizations and individuals.
@@ -178,7 +180,7 @@ File and folder default sharing permissions SHALL be set to View only.
 
 ## 3. Securing Anyone Links and Verification Code Users
 
-Sharing files with external users via the usage of Anyone links or Verification codes is strongly discouraged because it provides access to data within a tenant with weak or no authentication. If these features are used, this section provides some access restrictions that could provide limited security risk mitigations. 
+Sharing files with external users via the usage of Anyone links or Verification codes is strongly discouraged because it provides access to data within a tenant with weak or no authentication. If these features are used, this section provides some access restrictions that could provide limited security risk mitigations.
 
 **Note**: The settings in this section are only applicable if an agency is using Anyone links or verification code sharing. See each policy below for details.
 
@@ -334,7 +336,7 @@ Cybersecurity*](https://www.federalregister.gov/documents/2021/05/17/2021-10460/
 - The MITRE Corporation
 - Sandia National Laboratories (Sandia)
 
-The SCBs were informed by materials produced by the following organizations: 
+The SCBs were informed by materials produced by the following organizations:
 
 
 - Center for Internet Security (CIS)
