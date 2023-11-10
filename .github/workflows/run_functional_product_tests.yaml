@@ -15,3 +15,4 @@ jobs:
       # Let's start simple: Just cat the file
     - name: View test file
       run: cat Testing/Functional/Products/Products.Tests.ps1
+      
