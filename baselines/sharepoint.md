@@ -1,3 +1,4 @@
+**`TLP:CLEAR`**
 # CISA M365 Security Configuration Baseline for SharePoint Online and OneDrive
 
 SharePoint Online is a web-based collaboration and document management platform. It is primarily used to collaborate on documents and communicate information in projects. OneDrive is a cloud-based file storage system primarily used to store a user's personal files, but it can also be used to share documents with others. This secure configuration baseline (SCB) provides specific policies to strengthen the security of both services.
@@ -29,14 +30,14 @@ This section helps reduce security risks related to sharing files with users ext
 
 ### Policies
 #### MS.SHAREPOINT.1.1v1
-External sharing for SharePoint SHALL be limited to Existing Guests or Only People in your Organization.
+External sharing for SharePoint SHALL be limited to **Existing guests** or **Only People in your organization**.
 
 <!--Policy: MS.SHAREPOINT.1.1v1; Criticality: SHALL -->
 - _Rationale:_ Sharing information outside the organization via SharePoint increases the risk of unauthorized access. By limiting external sharing, administrators decrease the risk of access to information.
 - _Last modified:_ June 2023
 
 #### MS.SHAREPOINT.1.2v1
-External sharing for OneDrive SHALL be limited to Existing Guests or Only People in your Organization.
+External sharing for OneDrive SHALL be limited to **Existing guests** or **Only People in your organization**.
 
 <!--Policy: MS.SHAREPOINT.1.2v1; Criticality: SHALL -->
 - _Rationale:_ Sharing files outside the organization via OneDrive increases the risk of unauthorized access. By limiting external sharing, administrators decrease the risk of unauthorized unauthorized access to information.
@@ -48,7 +49,7 @@ External sharing SHALL be restricted to approved external domains and/or users i
 <!--Policy: MS.SHAREPOINT.1.3v1; Criticality: SHALL -->
 - _Rationale:_ By limiting sharing to domains or approved security groups used for interagency collaboration purposes, administrators prevent sharing with unknown organizations and individuals.
 - _Last modified:_ June 2023
-- _Note:_ This policy is only applicable if the external sharing slider on the admin page is set to any value other than Only People in your Organization.
+- _Note:_ This policy is only applicable if the external sharing slider on the admin page is set to any value other than **Only People in your organization**.
 
 #### MS.SHAREPOINT.1.4v1
 Guest access SHALL be limited to the email the invitation was sent to.
@@ -56,7 +57,7 @@ Guest access SHALL be limited to the email the invitation was sent to.
 <!--Policy: MS.SHAREPOINT.1.4v1; Criticality: SHALL -->
 - _Rationale:_ Email invitations allow external guests to access shared information. By requiring guests to sign in using the same account where the invite was sent, administrators ensure only the intended guest can use the invite.
 - _Last modified:_ June 2023
-- _Note:_ This policy is only applicable if the external sharing slider on the admin page is set to any value other than Only People in your Organization.
+- _Note:_ This policy is only applicable if the external sharing slider on the admin page is set to any value other than **Only People in your organization**.
 
 ### Resources
 
@@ -70,17 +71,17 @@ Guest access SHALL be limited to the email the invitation was sent to.
 
 ### Implementation
 
-#### MS.SHAREPOINT.1.1v1 instructions:
+#### MS.SHAREPOINT.1.1v1 Instructions
 
 1. Sign in to the **SharePoint admin center**.
 
 2.  Select **Policies** \> **Sharing**.
 
-3.  Adjust external sharing slider for SharePoint to **Existing Guests** or **Only people in your organization**.
+3.  Adjust external sharing slider for SharePoint to **Existing guests** or **Only people in your organization**.
 
 4. Select **Save**.
 
-#### MS.SHAREPOINT.1.2v1 instructions:
+#### MS.SHAREPOINT.1.2v1 Instructions
 
 
 1.  Sign in to the **SharePoint admin center**.
@@ -91,7 +92,7 @@ Guest access SHALL be limited to the email the invitation was sent to.
 
 4. Select **Save**.
 
-#### MS.SHAREPOINT.1.3v1 instructions:
+#### MS.SHAREPOINT.1.3v1 Instructions
 
 Note: If SharePoint external sharing is set to its most restrictive setting of "Only people in your organization", then no external sharing is allowed and no implementation changes are required for this policy item.
 
@@ -109,11 +110,11 @@ Note: If SharePoint external sharing is set to its most restrictive setting of "
 
 7.  Select **Manage security groups**
 
-8. Add each approved security group - members of these groups will be allowed to share files externally
+8. Add each approved security group. Members of these groups will be allowed to share files externally.
 
 9.  Select **Save**.
 
-#### MS.SHAREPOINT.1.4v1 instructions:
+#### MS.SHAREPOINT.1.4v1 Instructions
 
 Note: If SharePoint external sharing is set to its most restrictive setting of "Only people in your organization", then no external sharing is allowed and no implementation changes are required for this policy item.
 
