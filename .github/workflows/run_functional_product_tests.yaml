@@ -15,14 +15,14 @@ jobs:
     name: Hello World Test
     runs-on: windows-latest
     defaults:
-          run:
-            shell: powershell 
+      run:
+        shell: powershell 
     steps:
     - name: Checkout repo code
       uses: actions/checkout@v3
       # Let's start simple: Verify file exists
     - name: Check for file
-      if: !(Test-Path Testing/Functional/Products/Products.Tests.ps1 -PathType Leaf)
+      if: (!(Test-Path Testing/Functional/Products/Products.Tests.ps1 -PathType Leaf))
       uses: actions/github-script@v3
       with:
         script: |
