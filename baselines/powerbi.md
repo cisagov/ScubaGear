@@ -4,23 +4,21 @@ Power BI is the Software as a Service (SaaS) offering from Microsoft that facili
 
 The Secure Cloud Business Applications (SCuBA) project run by the Cybersecurity and Infrastructure Security Agency (CISA) provides guidance and capabilities to secure federal civilian executive branch (FCEB) agencies’ cloud business application environments and protect federal information that is created, accessed, shared, and stored in those environments. 
 
-The CISA SCuBA SCBs for M365 help secure federal information assets stored within M365 cloud business application environments through consistent, effective, and manageable security configurations. CISA created baselines tailored to the federal government’s threats and risk tolerance with the knowledge that every organization has different threat models and risk tolerance. Non-governmental organizations may also find value in applying these baselines to reduce risks.
+The CISA SCuBA SCBs for Microsoft 365 (M365) help secure federal information assets stored within M365 cloud business application environments through consistent, effective, and manageable security configurations. CISA created baselines tailored to the federal government’s threats and risk tolerance with the knowledge that every organization has different threat models and risk tolerance. Non-governmental organizations may also find value in applying these baselines to reduce risks.
 
 The information in this document is being provided “as is” for INFORMATIONAL PURPOSES ONLY. CISA does not endorse any commercial product or service, including any subjects of analysis. Any reference to specific commercial entities or commercial products, processes, or services by service mark, trademark, manufacturer, or otherwise, does not constitute or imply endorsement, recommendation, or favoritism by CISA.
 
 ## License Compliance and Copyright 
-Portions of this document are adapted from documents in Microsoft’s [Microsoft 365](https://github.com/MicrosoftDocs/microsoft-365-docs/blob/public/LICENSE) and [Azure](https://github.com/MicrosoftDocs/azure-docs/blob/main/LICENSE) GitHub repositories. The respective documents are subject to copyright and are adapted under the terms of the Creative Commons Attribution 4.0 International license. Source documents are linked throughout this document. The United States Government has adapted selections of these documents to develop innovative and scalable configuration standards to strengthen the security of widely used cloud-based software services.
+Portions of this document are adapted from documents in Microsoft’s [M365](https://github.com/MicrosoftDocs/microsoft-365-docs/blob/public/LICENSE) and [Azure](https://github.com/MicrosoftDocs/azure-docs/blob/main/LICENSE) GitHub repositories. The respective documents are subject to copyright and are adapted under the terms of the Creative Commons Attribution 4.0 International license. Source documents are linked throughout this document. The United States Government has adapted selections of these documents to develop innovative and scalable configuration standards to strengthen the security of widely used cloud-based software services.
 
 ## Assumptions
 The **License Requirements** sections of this document assume the organization is using an [M365 E3](https://www.microsoft.com/en-us/microsoft-365/compare-microsoft-365-enterprise-plans) or [G3](https://www.microsoft.com/en-us/microsoft-365/government) license level at a minimum. Therefore, only licenses not included in E3/G3 are listed.
 
-
-Agencies using Power BI have a data classification scheme in place for
+Agencies using Power BI may have a data classification scheme in place for
   the data entering Power BI.
 
 - Agencies may connect more than one data source to their Power BI
   tenant.
-
 - All data sources use a secure connection for data transfer to and from
   the Power BI tenant; the agency disallows non-secure connections.
 
@@ -28,22 +26,20 @@ Agencies using Power BI have a data classification scheme in place for
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [RFC 2119](https://datatracker.ietf.org/doc/html/rfc2119).
 
 Access to PowerBI can be controlled by the user type. In this baseline,
-the types of users are defined as follows (Note: these terms vary in use
-across Microsoft documentation):
+the types of users are defined as follows:
 
-1.  **Internal users**: members of the agency’s M365 tenant.
-2.  **External users**: members of a different M365 tenant.
-3.  **Business to Business (B2B) guest users**: external users that are
+1.  **Internal users**: Members of the agency’s M365 tenant.
+2.  **External users**: Members of a different M365 tenant.
+3.  **Business to business (B2B) guest users**: External users that are
   formally invited to view and/or edit Power BI workspace content and
-  are added to the agency’s AAD as guest users. These users authenticate
+  are added to the agency’s Azure Active Directory (Azure AD) as guest users. These users authenticate
   with their home organization/tenant and are granted access to Power BI
-  content by virtue of being listed as guest users in the tenant’s AAD.
+  content by virtue of being listed as guest users in the tenant’s Azure AD.
 
+Note: these terms vary in use across Microsoft documentation.
 
 # Baseline Policies
-
 ## 1. Publish to Web
-
 Power BI has a capability to publish reports and content to the web.
 This capability creates a publicly accessible web URL that does not
 require authentication or status as an Azure AD user to view it. While this
@@ -58,26 +54,23 @@ publish data to the web.
 
 ### Policies
 #### MS.POWERBI.1.1v1
-The Publish to Web feature SHOULD be disabled unless the agency mission requires the capability.
+The **Publish to Web** feature SHOULD be disabled unless the agency mission requires the capability.
 
-- _Rationale:_ Having a publicly accessible web URL means there is no way to control who is viewing information. By following this policy there will be no sensitive information published to the public web that could be accessed by a malicious actor.
+- _Rationale:_ A publicly accessible web URL can be accessed by everyone, including malicious actors. This policy limits information available on the public web that is not specifically permitted to be published. 
 - _Last modified:_ June 2023
 
 ### Resources
-
-- [Power BI Tenant settings \| Microsoft
+- [Power BI tenant settings \| Microsoft
   Learn](https://learn.microsoft.com/en-us/power-bi/admin/service-admin-portal-about-tenant-settings)
 
 - [Power BI Security Baseline v2.0 \| Microsoft benchmarks GitHub
   repo](https://github.com/MicrosoftDocs/SecurityBenchmarks/blob/master/Azure%20Offer%20Security%20Baselines/2.0/power-bi-security-baseline-v2.0.xlsx)
 
 ### License Requirements
-
 - N/A
 
-
 ### Implementation 
-#### MS.POWERBI.1.1v1 instructions:
+#### MS.POWERBI.1.1v1 Instructions
 
 1. Navigate to the **PowerBI Admin Portal**
 
@@ -85,33 +78,33 @@ The Publish to Web feature SHOULD be disabled unless the agency mission requires
 
 3. Scroll to **Export and sharing settings**
 
-4. Click **Publish to web** set to **Disabled**
+4. Click **Publish to web** and set to **Disabled**
 
 ## 2. Power BI Guest Access
-
 This section provides policies helping reduce guest user access risks related to Power BI data and resources. An agency with externally shareable Power BI resources and data must consider its unique risk tolerance when granting access to guest users.
 
 ### Policies
 #### MS.POWERBI.2.1v1
 Guest user access to the Power BI tenant SHOULD be disabled unless the agency mission requires the capability.
 
-- _Rationale:_ By disabling Power BI external access, this helps keep guest users from accessing potentially risky data/APIs. If an agency needs to allow guest access, it can be limited to users in specific security groups to help limit risk.
+- _Rationale:_ Disabling external access to Power BI helps keep guest users from accessing 
+ potentially risky data and application programming interfaces (APIs). If an agency needs to allow guest access, this can be limited to users in specific security groups to curb risk.
 - _Last modified:_ June 2023
 
 ### Resources
-
-- [Power BI Tenant settings \| Microsoft
+- [Power BI tenant settings \| Microsoft
   Learn](https://learn.microsoft.com/en-us/power-bi/admin/service-admin-portal-about-tenant-settings)
 
 - [Power BI Security Baseline v2.0 \| Microsoft benchmarks GitHub
   repo](https://github.com/MicrosoftDocs/SecurityBenchmarks/blob/master/Azure%20Offer%20Security%20Baselines/2.0/power-bi-security-baseline-v2.0.xlsx)
 
 ### License Requirements
-
 - N/A
 
 ### Implementation
-#### MS.POWERBI.2.1v1 instructions:
+
+#### MS.POWERBI.2.1v1 Instructions
+
 **TO DISABLE COMPLETELY**
 1. Navigate to the **PowerBI Admin Portal**
 
@@ -133,24 +126,20 @@ Guest user access to the Power BI tenant SHOULD be disabled unless the agency mi
 5. Select the security group(s) you want to have access to the PowerBI tenant. **Note**: you may need to create a security group for this specific case.
 
 ## 3. Power BI External Invitations
-
-This section provides policies helping reduce guest user invitation risks related to Power BI data and resources.
-The settings in this section control whether Power BI allows inviting external users to
-the agency’s organization through Power BI’s sharing workflows and
+This section provides policies that help reduce guest user invitation risks related to Power BI data and resources. The settings in this section control whether Power BI allows inviting external users to the agency’s organization through Power BI’s sharing workflows and
 experiences. After an external user accepts the invite, they become an
-AAD B2B guest user in the organization. They will then appear in user
+Azure AD B2B guest user in the organization. They will then appear in user
 pickers throughout the Power BI user experience.
 
 ### Policies
 #### MS.POWERBI.3.1v1
-The Invite external users to your organization feature SHOULD be disabled unless agency mission requires the capability.
+The **Invite external users to your organization** feature SHOULD be disabled unless agency mission requires the capability.
 
-- _Rationale:_ Disabling this feature keeps internal users from inviting guest users. Therefore guest users can be limited from accessing potentially risky data/APIs. If an agency needs to allow guest access, the invitation feature can be limited to users in specific security groups to help limit risk.
+- _Rationale:_ Disabling this feature prevents internal users from inviting guest users, limiting guest users’ access to potentially risky data/APIs. If an agency needs to allow guest access, the invitation feature can be limited to users in specific security groups to curb risk.
 - _Last modified:_ June 2023
 - _Note:_ If this feature is disabled, existing guest users in the tenant continue to have access to Power BI items they already had access to and continue to be listed in user picker experiences. After it is disabled, an external user who is not already a guest user cannot be added to the tenant through Power BI.
 
 ### Resources
-
 - [Power BI Tenant settings \| Microsoft
   Docs](https://learn.microsoft.com/en-us/power-bi/admin/service-admin-portal-about-tenant-settings)
 
@@ -162,31 +151,25 @@ The Invite external users to your organization feature SHOULD be disabled unless
   repo](https://github.com/MicrosoftDocs/SecurityBenchmarks/blob/master/Azure%20Offer%20Security%20Baselines/2.0/power-bi-security-baseline-v2.0.xlsx)
 
 ### License Requirements
-
 - N/A
 
-
 ### Implementation
-#### MS.POWERBI.3.1v1 instructions:
+#### MS.POWERBI.3.1v1 Instructions
+
 **TO DISABLE COMPLETELY**
+
 1. Navigate to the **PowerBI Admin Portal**
-
 2. Click on **Tenant Settings**
-
 3. Scroll to **Export and sharing settings**
-
 4. Click on **Invite external users to your organization** and set to **Disabled**
 
 **TO ENABLE WITH SECURITY GROUP(S)**
+
 1. Navigate to the **PowerBI Admin Portal**
-
 2. Click on **Tenant Settings**
-
 3. Scroll to **Export and sharing settings**
-
 4. Click on **Invite external users to your organization** and set to **Enabled**
-
-5. Select the security group(s) needed. **Note**: You may need to make a specific security group(s)
+5. Select the security group(s) needed. **Note**: You may need to make a specific security group(s).
 
 ## 4. Power BI Service Principals
 
@@ -203,13 +186,10 @@ properly assigned access policies and regularly reviewed access
 permissions.
 
 **Several high-level use cases for service principals:**
-
 - There will be some cases where it is not possible to access
   a data source using service principals in Power BI. (e.g., Azure Table Storage).
-
 - A user’s service principal for accessing the Power BI Service (e.g.,
   app.powerbi.com, app.powerbigov.us).
-
 - Power BI Embedded and other users of the Power BI REST APIs to
   interact with PBI content.
 
@@ -225,7 +205,6 @@ Service Principals creating and using profiles SHOULD be restricted to specific 
 - _Last modified:_ June 2023
 
 ### Resources
-
 - [Automate Premium workspace and dataset tasks with service principal
   \| Microsoft
   Learn](https://learn.microsoft.com/en-us/power-bi/enterprise/service-premium-service-principal)
@@ -250,12 +229,10 @@ Service Principals creating and using profiles SHOULD be restricted to specific 
   Learn](https://learn.microsoft.com/en-us/security/benchmark/azure/baselines/power-bi-security-baseline)
 
 ### License Requirements
-
 - N/A
-
-
+  
 ### Implementation
-#### MS.POWERBI.4.1v1 instructions:
+#### MS.POWERBI.4.1v1 Instructions
 1. Navigate to the **PowerBI Admin Portal**
 
 2. Click on **Tenant settings**
@@ -264,7 +241,6 @@ Service Principals creating and using profiles SHOULD be restricted to specific 
 
 4. Click on **Allow service principals to use Power BI APIs** set to **Enabled**.
 Choose a specific security group allowed to use service principles for the APIs.
-
 
 #### MS.POWERBI.4.2v1 instructions:
 1. Navigate to the **PowerBI Admin Portal**
@@ -276,9 +252,7 @@ Choose a specific security group allowed to use service principles for the APIs.
 4. Then, click on **Allow service principals to create and use profiles** set to **Enabled**.
 Choose a specific security group allowed to use service principles to create and use profiles
 
-
 ## 5. Power BI ResourceKey Authentication
-
 
 This setting pertains to the security and development of Power BI
 embedded content. The Power BI tenant states “For extra security,
@@ -289,7 +263,7 @@ authentication to the blocked state.
 For streaming datasets created using the Power BI service user
 interface, the dataset owner receives a URL including a resource
 key. This key authorizes the requestor to push data into the dataset
-without using an AAD OAuth bearer token, so please keep in mind the
+without using an Azure AD OAuth bearer token, so please keep in mind the
 implications of having a secret key in the URL when working with this
 type of dataset and method.
 
@@ -298,12 +272,11 @@ to streaming and PUSH datasets using the API with a Resource-Key.
 However, if developers have an approved need to leverage this feature,
 an exception to the policy can be investigated.
 
-
 ### Policies
 #### MS.POWERBI.5.1v1
 ResourceKey Authentication SHOULD be blocked unless a specific use case (e.g., streaming and/or PUSH datasets) merits its use. <!--- remove the examples in the policy statement? -->
 
-- _Rationale:_ By allowing resource keys someone can move data without AAD OAuth bearer token, causing possibly malicious or junk data to be stored. By disabling this, there is less risk an unauthorized individual will make changes. 
+- _Rationale:_ By allowing resource keys someone can move data without Azure AD OAuth bearer token, causing possibly malicious or junk data to be stored. By disabling this, there is less risk an unauthorized individual will make changes. 
 - _Last modified:_ June 2023
 
 ### Resources
@@ -317,7 +290,6 @@ ResourceKey Authentication SHOULD be blocked unless a specific use case (e.g., s
 ### License Requirements
 
 - N/A
-
 
 ### Implementation
 #### MS.POWERBI.5.1v1 instructions:
@@ -340,7 +312,6 @@ visuals should only be enabled if the author and source are trusted, or
 after a code review of the Python/R script(s) in question is conducted
 and deems the scripts free of security risks.
 
-
 ### Policies
 #### MS.POWERBI.6.1v1
 R and Python interactions SHOULD be disabled.
@@ -356,7 +327,6 @@ R and Python interactions SHOULD be disabled.
 ### License Requirements
 
 - N/A
-
 
 ### Implementation
 #### MS.POWERBI.6.1v1 instructions:
@@ -390,6 +360,7 @@ Sensitivity labels SHOULD be enabled for Power BI and employed for sensitive dat
 
 - _Rationale:_ Without sensitivity labels it is possible for someone to open a document unknowingly, potentially reading information they are not supposed to access. This policy will help organize and classify data making it easier to keep data out of the wrong hands.   
 - _Last modified:_ June 2023
+
 ### Resources
 
 - [Enable sensitivity labels in Power BI \| Microsoft
@@ -428,9 +399,8 @@ Sensitivity labels SHOULD be enabled for Power BI and employed for sensitive dat
   policies](https://learn.microsoft.com/en-us/purview/create-sensitivity-labels)
   for detail.
 
-
 ### Implementation 
-#### MS.POWERBI.7.1v1 instructions:
+#### MS.POWERBI.7.1v1 Instructions
 1. Navigate to the **PowerBI Admin Portal**
 
 2. Click on **Tenant settings**
@@ -456,13 +426,12 @@ Cybersecurity*](https://www.federalregister.gov/documents/2021/05/17/2021-10460/
 
 The SCBs were informed by materials produced by the following organizations: 
 
-
 - Center for Internet Security (CIS)
 - Internet Engineering Task Force (IETF)
 - Mandiant
 - Microsoft
 - U.S. Defense Information Systems Agency (DISA)
-- U.S. National Institute of Standards (NIST)
+- U.S. National Institute of Standards and Technology (NIST)
 - U.S. Office of Management and Budget (OMB)
 
 The cross-agency collaboration and partnerships developed during this initiative serve as an example for solving complex problems faced by the federal government. CISA also thanks the Cybersecurity Innovation Tiger Team (CITT) for its leadership and the following federal agencies that provided input during the development of the baselines:
@@ -476,25 +445,20 @@ The cross-agency collaboration and partnerships developed during this initiative
 - U.S. Geological Survey (USGS)
 
 # Appendix A: Implementation Considerations
-
 ## Information Protection Considerations
 
 Several best practices and approaches are available to protect sensitive
 data in Power BI.
 
 - Leverage sensitivity labels via Microsoft Information Protection.
-
 - Power BI allows service users to bring their own key to protect data
   at rest.
-
 - Customers have the option to keep data sources on-premises and
   leverage Direct Query or Live Connect with an on-premises data gateway
   to minimize data exposure to the cloud service.
-
 - Implement Row Level Security in Power BI datasets.
 
 **Implementation Steps:**
-
 **Apply sensitivity labels from data sources to their data in Power BI**
 
 When this setting is enabled, Power BI datasets that connect to
@@ -504,12 +468,9 @@ Power BI. For details about sensitivity label inheritance from data
 sources, see Sensitivity label inheritance from data sources (preview).
 
 ***To enable sensitivity label inheritance from data sources:***
-
 1.  Navigate to the Power BI tenant settings.
-
 2. Select **Information protection** -\> **Apply sensitivity labels
     from data sources to their data in Power BI (preview).**
-
 3. Enable **Restrict content with protected labels from being shared
     via link with everyone in your agency**.
 
@@ -809,4 +770,4 @@ disabling public internet access.
 - Instead of enabling service principals for the entire agency,
   implement for a dedicated security group.
 
-**Note**: This policy is only applicable if the setting **Allow service principals to use Power BI APIs** is enabled
+**Note**: This policy is only applicable if the setting **Allow service principals to use Power BI APIs** is enabled.
