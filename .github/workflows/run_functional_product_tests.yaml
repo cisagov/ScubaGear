@@ -23,7 +23,7 @@ jobs:
       # Let's start simple: Verify file exists
     - name: Check for file
       run: |
-        if (!(Test-Path Testing/Functional/Products/Products.Tests.ps1 -PathType Leaf))
+        if (!(Test-Path Testing/Functional/Products/ProductsX.Tests.ps1 -PathType Leaf))
         {
           core.setFailed('Product test file not found.')
         }
