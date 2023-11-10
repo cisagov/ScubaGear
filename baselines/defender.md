@@ -81,7 +81,7 @@ All users SHALL be added to Defender for Office 365 protection in either the sta
   - The standard and strict preset security policies must be enabled to protect users.
 
 #### MS.DEFENDER.1.4v1
-Sensitive accounts SHALL be added to EOP in the strict preset security policy.
+Sensitive accounts SHALL be added to Exchange Online Protection in the strict preset security policy.
 
 <!--Policy: MS.DEFENDER.1.4v1; Criticality: SHALL -->
 - _Rationale:_ Unauthorized access to a sensitive account may result in greater harm than a standard user account. Adding sensitive accounts to the strict preset security policy, with its increased protections, better mitigates their elevated risk to email threats.
