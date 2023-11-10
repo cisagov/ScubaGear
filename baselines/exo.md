@@ -730,7 +730,7 @@ Any product meeting the requirements outlined in this baseline policy may be
 used. If the agency uses Microsoft Defender, see the following
 implementation steps for
 [enabling preset security policies](./defender.md#implementation), which
-includes zero-hour auto purge (ZAP) to retroactively detect malware in messages
+include zero-hour auto purge (ZAP) to retroactively detect malware in messages
 already delivered to mailboxes and removes them.
 
 ## 11. Phishing Protections
@@ -814,14 +814,14 @@ Any product meeting the requirements outlined in this baseline policy may be
 used. If the agency uses Microsoft Defender, see the following
 implementation steps for
 [enabling preset security policies](./defender.md#msdefender12v1) which
-includes user safety tips to warn users.
+include user safety tips to warn users.
 
 #### MS.EXO.11.3v1 Instructions:
 Any product meeting the requirements outlined in this baseline policy may be
 used. If the agency uses Microsoft Defender, see the following
 implementation steps for
 [enabling preset security policies](./defender.md#msdefender13v1) which
-includes mailbox intelligence for detecting phishing attacks using AI.
+include mailbox intelligence for detecting phishing attacks using AI.
 
 ## 12. IP Allow Lists
 
@@ -1037,7 +1037,7 @@ Any product meeting the requirements outlined in this baseline policy may be
 used. If the agency uses Microsoft Defender, see the following
 implementation steps for
 [enabling preset security policies](./defender.md#msdefender12v1), which
-includes spam filtering.
+include spam filtering.
 
 #### MS.EXO.14.2v1 Instructions:
 
@@ -1045,7 +1045,7 @@ Any product meeting the requirements outlined in this baseline policy may be
 used. If the agency uses Microsoft Defender, see the following
 implementation steps for
 [enabling preset security policies](./defender.md#msdefender12v1), which
-includes spam filtering that moves high confidence spam to either the junk
+include spam filtering that moves high confidence spam to either the junk
  or quarantine folder.
 
 #### MS.EXO.14.3v1 Instructions:
@@ -1143,7 +1143,7 @@ Any product meeting the requirements outlined in this baseline policy may be
 used. If the agency uses Microsoft Defender for Office 365, see the following
 implementation steps for
 [enabling preset security policies](./defender.md#msdefender13v1), which
-includes Safe Links click protections to track user clicks on links in email.
+include Safe Links click protections to track user clicks on links in email.
 
 ## 16. Alerts
 
@@ -1185,12 +1185,12 @@ At a minimum, the following alerts SHALL be enabled:
 <!--Policy: MS.EXO.16.1v1; Criticality: SHALL -->
 - _Rationale:_ Potentially malicious or service impacting events may go
   undetected without a means of detecting these events.  Setting up a mechanism
-  to alert administrators to the list of events above draws attention to them
+  to alert administrators to events listed above draws attention to them
   to ensure any impact to users and the agency are minimized.
 - _Last modified:_ June 2023
 
 #### MS.EXO.16.2v1
-The alerts SHOULD be sent to a monitored address or incorporated into a SIEM.
+The alerts SHOULD be sent to a monitored address or incorporated into a security information and event management (SIEM) system.
 
 <!--Policy: MS.EXO.16.2v1; Criticality: SHOULD -->
 - _Rationale:_ Suspicious or malicious events, if not resolved promptly, may
@@ -1233,7 +1233,7 @@ threat detection activity.
 By default, Microsoft retains the audit logs for 180 days. Activity by
 users with E5 licenses assigned is retained for one year.
 
-However, in accordance with OMB M-21-31, _Improving the Federal Government’s
+However, in accordance with Office of Management and Budget (OMB) Memorandum 21-31, _Improving the Federal Government’s
 Investigative and Remediation Capabilities Related to Cybersecurity Incidents_,
 Microsoft 365 audit logs are to be retained at least 12 months in active
 storage and an additional 18 months in cold storage. This can be accomplished
@@ -1331,8 +1331,7 @@ for additional guidance.
 In addition to acknowledging the important contributions of a diverse
 team of Cybersecurity and Infrastructure Security Agency (CISA) experts,
 CISA thanks the following federal agencies and private sector
-organizations that provided input during the development of the Secure
-Business Cloud Application’s security configuration baselines in
+organizations that provided input during the development of the SCuBA security configuration baselines in
 response to Section 3 of [Executive Order (EO) 14028, *Improving the
 Nation’s
 Cybersecurity*](https://www.federalregister.gov/documents/2021/05/17/2021-10460/improving-the-nations-cybersecurity):
