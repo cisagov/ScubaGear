@@ -12,10 +12,18 @@ on:
 
 jobs:
   hello-world-test:
-    runs-on: ubuntu-latest
+    name: Hello World Test
+    runs-on: windows-latest
+    defaults:
+          run:
+            shell: powershell 
     steps:
     - name: Checkout repo code
       uses: actions/checkout@v3
-      # Let's start simple: Just cat the file
-    - name: View test file
-      run: cat Testing/Functional/Products/Products.Tests.ps1
+      # Let's start simple: Verify file exists
+    - name: Check for file
+      run: |
+        if(!(Test-Path Testing/Functional/Products/Products.Tests.ps1 -PathType Leaf)
+        {
+          Write-Warning "Missing product test file"
+        }
