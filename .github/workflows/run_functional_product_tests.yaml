@@ -1,3 +1,6 @@
+# Author: James Garriss
+# Purpose: Run the product functional tests every night
+
 name: Nightly Product Functional Tests
 
 # Run this workflow at midnight 
@@ -25,5 +28,6 @@ jobs:
       run: |
         if (!(Test-Path Testing/Functional/Products/ProductsX.Tests.ps1 -PathType Leaf))
         {
-          core.setFailed('Product test file not found.')
+          Write-Error('Product test file not found.')
+          exit 1
         }
