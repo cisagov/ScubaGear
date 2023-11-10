@@ -135,17 +135,17 @@ This section provides policies to set the scope and permissions for sharing link
 ### Policies
 
 #### MS.SHAREPOINT.2.1v1
-File and folder default sharing scope SHALL be set to Specific People (only the people the user specifies).
+File and folder default sharing scope SHALL be set to **Specific people (only the people the user specifies)**.
 
 <!--Policy: MS.SHAREPOINT.2.1v1; Criticality: SHALL -->
 - _Rationale:_ By making the default sharing the most restrictive, administrators prevent accidentally sharing information too broadly.
 - _Last modified:_ June 2023
 
 #### MS.SHAREPOINT.2.2v1
-File and folder default sharing permissions SHALL be set to View only.
+File and folder default sharing permissions SHALL be set to **View**.
 
 <!--Policy: MS.SHAREPOINT.2.2v1; Criticality: SHALL -->
-- _Rationale:_ Edit access to files and folders could allow a user to make unauthorized changes.  By restricting default permissions to View only, administrators prevent unintended or malicious modification.
+- _Rationale:_ Edit access to files and folders could allow a user to make unauthorized changes.  By restricting default permissions to **View**, administrators prevent unintended or malicious modification.
 - _Last modified:_ June 2023
 
 ### Resources
@@ -159,7 +159,7 @@ File and folder default sharing permissions SHALL be set to View only.
 
 ### Implementation
 
-#### MS.SHAREPOINT.2.1v1 instructions:
+#### MS.SHAREPOINT.2.1v1 Instructions
 
 1.  Sign in to the **SharePoint admin center**.
 
@@ -169,13 +169,13 @@ File and folder default sharing permissions SHALL be set to View only.
 
 4.  Select **Save**
 
-#### MS.SHAREPOINT.2.2v1 instructions:
+#### MS.SHAREPOINT.2.2v1 Instructions
 
 1.  Sign in to the **SharePoint admin center**.
 
 2. Select **Policies** \> **Sharing**.
 
-3. Under **File and folder links**, set the permission that's selected by default for sharing links to **View**.
+3. Under **File and folder links**, set the permission that is selected by default for sharing links to **View**.
 
 4. Select **Save**.
 
