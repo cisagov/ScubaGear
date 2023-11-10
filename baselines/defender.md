@@ -34,11 +34,11 @@ The agency has identified a set of user accounts that are considered sensitive a
 The **License Requirements** sections of this document assume the organization is using an [M365 E3](https://www.microsoft.com/en-us/microsoft-365/compare-microsoft-365-enterprise-plans) or [G3](https://www.microsoft.com/en-us/microsoft-365/government) license level at a minimum. Therefore, only licenses not included in E3/G3 are listed.
 
 ## Key Terminology
-The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [Request For Comments 2119](https://datatracker.ietf.org/doc/html/rfc2119).
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [RFC 2119](https://datatracker.ietf.org/doc/html/rfc2119).
 
 The following are key terms and descriptions used in this document.
 
-**Sensitive Accounts** – This term denotes a set of user accounts that have
+**Sensitive Accounts**: This term denotes a set of user accounts that have
 access to sensitive and high-value information. As a result, these accounts
 may be at a higher risk of being targeted.
 
@@ -67,7 +67,7 @@ All users SHALL be added to Exchange Online Protection in either the standard or
 - _Rationale:_ Important user protections are provided by EOP, including anti-spam, anti-malware, and anti-phishing protections. By using the preset policies, administrators can easily ensure all new and existing users have secure defaults applied automatically.
 - _Last modified:_ June 2023
 - _Note:_
-  - Specific user accounts, except for sensitive accounts, MAY be exempt from the preset policies, provided they are added to one or more custom policies offering comparable protection. These users might need flexibility not offered by the preset policies. Their accounts should be added to a custom policy conforming as closely as possible to the settings used by the preset policies. See the **Resources** section for more details on configuring policies.
+  - Specific user accounts, except for sensitive accounts, MAY be exempt from the preset policies, provided they are added to one or more custom policies offering comparable protection. These users might need flexibility not offered by the preset policies. Their accounts should be added to a custom policy conforming, as closely as possible to the settings used by the preset policies. See the **Resources** section for more details on configuring policies.
   - The standard and strict preset security policies must be enabled to protect users.
 
 #### MS.DEFENDER.1.3v1
@@ -117,7 +117,7 @@ Sensitive accounts SHALL be added to Defender for Office 365 protection in the s
 
 ### Implementation
 
-#### MS.DEFENDER.1.1v1 instructions:
+#### MS.DEFENDER.1.1v1 Instructions:
 
 1. Sign in to **Microsoft 365 Defender**.
 2. In the left-hand menu, go to **Email & Collaboration** > **Policies & Rules**.
@@ -129,7 +129,7 @@ Sensitive accounts SHALL be added to Defender for Office 365 protection in the s
 Note: If the toggle slider in step 5 is grayed out, click on **Manage protection settings**
 instead and configure the policy settings according to [Use the Microsoft 365 Defender portal to assign Standard and Strict preset security policies to users \| Microsoft Learn](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/preset-security-policies?view=o365-worldwide#use-the-microsoft-365-defender-portal-to-assign-standard-and-strict-preset-security-policies-to-users).
 
-#### MS.DEFENDER.1.2v1 instructions:
+#### MS.DEFENDER.1.2v1 Instructions:
 
 1. Sign in to **Microsoft 365 Defender**.
 2. In the left-hand menu, go to **Email & Collaboration** > **Policies & Rules**.
@@ -143,7 +143,7 @@ instead and configure the policy settings according to [Use the Microsoft 365 De
 8. Select **Next** on each page until the **Review and confirm your changes** page.
 9. On the **Review and confirm your changes** page, select **Confirm**.
 
-#### MS.DEFENDER.1.3v1 instructions:
+#### MS.DEFENDER.1.3v1 Instructions:
 
 1. Sign in to **Microsoft 365 Defender**.
 2. In the left-hand menu, go to **Email & Collaboration** > **Policies & Rules**.
@@ -158,7 +158,7 @@ instead and configure the policy settings according to [Use the Microsoft 365 De
 9. Select **Next** on each page until the **Review and confirm your changes** page.
 10. On the **Review and confirm your changes** page, select **Confirm**.
 
-#### MS.DEFENDER.1.4v1 instructions:
+#### MS.DEFENDER.1.4v1 Instructions:
 
 1. Sign in to **Microsoft 365 Defender**.
 2. In the left-hand menu, go to **Email & Collaboration** > **Policies & Rules**.
@@ -171,7 +171,7 @@ instead and configure the policy settings according to [Use the Microsoft 365 De
 8. Select **Next** on each page until the **Review and confirm your changes** page.
 9. On the **Review and confirm your changes** page, select **Confirm**.
 
-#### MS.DEFENDER.1.5v1 instructions:
+#### MS.DEFENDER.1.5v1 Instructions:
 
 1. Sign in to **Microsoft 365 Defender**.
 2. In the left-hand menu, go to **Email & Collaboration** > **Policies & Rules**.
@@ -242,7 +242,7 @@ Domain impersonation protection SHOULD be added for important partners in both t
 
 ### Implementation
 
-#### MS.DEFENDER.2.1v1 instructions:
+#### MS.DEFENDER.2.1v1 Instructions:
 
 1. Sign in to **Microsoft 365 Defender**.
 2. In the left-hand menu, go to **Email & Collaboration** > **Policies & Rules**.
@@ -260,7 +260,7 @@ Domain impersonation protection SHOULD be added for important partners in both t
 10. Select **Next** on each page until the **Review and confirm your changes** page.
 11. On the **Review and confirm your changes** page, select **Confirm**.
 
-#### MS.DEFENDER.2.2v1 instructions:
+#### MS.DEFENDER.2.2v1 Instructions:
 
 1. Sign in to **Microsoft 365 Defender**.
 2. In the left-hand menu, go to **Email & Collaboration** > **Policies & Rules**.
@@ -278,7 +278,7 @@ Domain impersonation protection SHOULD be added for important partners in both t
 10. Select **Next** on each page until the **Review and confirm your changes** page.
 11. On the **Review and confirm your changes** page, select **Confirm**.
 
-#### MS.DEFENDER.2.3v1 instructions:
+#### MS.DEFENDER.2.3v1 Instructions:
 
 1. Sign in to **Microsoft 365 Defender**.
 2. In the left-hand menu, go to **Email & Collaboration** > **Policies & Rules**.
@@ -308,7 +308,7 @@ action is needed to enable it for other products.
 Safe attachments SHOULD be enabled for SharePoint, OneDrive, and Microsoft Teams.
 
 <!--Policy: MS.DEFENDER.3.1v1; Criticality: SHOULD -->
-- _Rationale:_ Users clicking malicious links makes them vulnerable to attacks. However, this danger is not limited to links in emails. Other Microsoft products, such as Microsoft Teams, can be used to present users with malicious links. As such, it is important to protect users on these other Microsoft products as well.
+- _Rationale:_ Clicking malicious links makes users vulnerable to attacks, and this danger is not limited to links in emails. Other Microsoft products, such as Microsoft Teams, can be used to present users with malicious links. As such, it is important to protect users on these other Microsoft products as well.
 - _Last modified:_ June 2023
 
 ### Resources
@@ -327,6 +327,7 @@ Safe attachments SHOULD be enabled for SharePoint, OneDrive, and Microsoft Teams
 
 ### Implementation
 
+#### MS.DEFENDER.3.1v1 Instructions:
 To enable Safe Attachments for SharePoint, OneDrive, and Microsoft
 Teams, follow the instructions listed at [Turn on Safe Attachments for
 SharePoint, OneDrive, and Microsoft Teams \| Microsoft
@@ -347,9 +348,9 @@ Learn](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-secur
 
 ## 4. Data Loss Prevention
 
-There are several approaches to secure sensitive information, such
+There are several approaches to securing sensitive information, such
 as warning users, encryption, or blocking attempts to share. The
-agency’s data loss prevention (DLP) policy will dictate what agency
+agency’s data loss prevention (DLP) policy dictates what agency
 information is sensitive, such as personally identifiable information
 (PII), and how that information is handled. Defender can detect
 sensitive information and associates a default confidence level with
@@ -362,14 +363,14 @@ their environment and needs.
 ### Policies
 #### MS.DEFENDER.4.1v1
 A custom policy SHALL be configured to protect PII and sensitive information,
-as defined by the agency. At a minimum, credit card numbers, Taxpayer
-Identification Numbers (TIN), and Social Security numbers (SSN) SHALL be
-blocked.
+as defined by the agency. At a minimum, credit card numbers, U.S. Individual
+Taxpayer Identification Numbers (ITIN), and U.S. Social Security numbers (SSN)
+SHALL be blocked.
 
 <!--Policy: MS.DEFENDER.4.1v1; Criticality: SHALL -->
 - _Rationale:_ Users may inadvertently share sensitive information with
-               others who should not have access to it. Data loss prevention
-               policies provide a way for agencies to detect and prevent
+               others who should not have access to it. DLP policies
+               provide a way for agencies to detect and prevent
                unauthorized disclosures.
 - _Last modified:_ June 2023
 
@@ -378,10 +379,9 @@ The custom policy SHOULD be applied to Exchange, OneDrive, SharePoint, Teams cha
 and Devices.
 
 <!--Policy: MS.DEFENDER.4.2v1; Criticality: SHOULD -->
-- _Rationale:_ Unauthorized disclosures may happen through Microsoft 365
-               services or endpoint devices.  Data loss prevention
-               policies should cover all affected locations to be
-               effective.
+- _Rationale:_ Unauthorized disclosures may happen through M365 services
+               or endpoint devices.  DLP policies should cover all
+               affected locations to be effective.
 - _Last modified:_ June 2023
 - _Note:_ The custom policy referenced here is the same policy
           configured in [MS.DEFENDER.4.1v1](#msdefender41v1).
@@ -401,7 +401,7 @@ Notifications to inform users and help educate them on the proper use of sensiti
 
 <!--Policy: MS.DEFENDER.4.141; Criticality: SHOULD -->
 - _Rationale:_ Some users may not be aware of agency policies on
-               properly using sensitive information. Enabling
+               proper use of sensitive information. Enabling
                notifications provides positive feedback to users when
                accessing sensitive information.
 - _Last modified:_ June 2023
@@ -412,8 +412,8 @@ Notifications to inform users and help educate them on the proper use of sensiti
 A list of apps that are restricted from accessing files protected by DLP policy SHOULD be defined.
 
 <!--Policy: MS.DEFENDER.4.5v1; Criticality: SHOULD -->
-- _Rationale:_ Some applications may inappropriately share accessed files
-               or not conform to agency policies for access to sensitive
+- _Rationale:_ Some apps may inappropriately share accessed files or not
+               conform to agency policies for access to sensitive
                information. Defining a list of those apps makes it
                possible to use DLP policies to restrict those apps' access
                to sensitive information on endpoints using Defender.
@@ -427,7 +427,8 @@ information by restricted apps and unwanted Bluetooth applications.
 - _Rationale:_ Some applications may inappropriately share accessed files
                or not conform to agency policies for access to sensitive
                information. Defining a DLP policy with an action to block
-               access from restricted apps and unwanted Bluetooth applications, prevents unauthorized disclosure by those
+               access from restricted apps and unwanted Bluetooth
+               applications prevents unauthorized disclosure by those
                programs.
 - _Last modified:_ June 2023
 - _Note:_
@@ -468,7 +469,7 @@ information by restricted apps and unwanted Bluetooth applications.
 
 ### Implementation
 
-#### MS.DEFENDER.4.1v1 instructions:
+#### MS.DEFENDER.4.1v1 Instructions:
 
 1. Sign in to the **Microsoft Purview compliance portal**.
 
@@ -502,13 +503,13 @@ information by restricted apps and unwanted Bluetooth applications.
 
 12. Click **Add**, then **Sensitive info types**.
 
-13. Add info types that protect information sensitive to the agency.
+13. Add information types that protect information sensitive to the agency.
     At a minimum, the agency should protect:
 
     - Credit card numbers
-    - U.S. Individual Taxpayer Identification Numbers (TIN)
+    - U.S. Individual Taxpayer Identification Numbers (ITIN)
     - U.S. Social Security Numbers (SSN)
-    - All agency defined PII and sensitive information
+    - All agency-defined PII and sensitive information
 
 14. Click **Add**.
 
@@ -520,6 +521,7 @@ information by restricted apps and unwanted Bluetooth applications.
 17. Under this action, select **Block Everyone**.
 
 18. Under **User notifications**, turn on **Use notifications to inform your users and help educate them on the proper use of sensitive info**.
+
 19. Under **Microsoft 365 services**, a section that appears after user notifications are turned on, check the box next to **Notify users in Office 365 service with a policy tip**.
 
 20. Click **Save**, then **Next**.
@@ -528,24 +530,24 @@ information by restricted apps and unwanted Bluetooth applications.
 
 22. Click **Submit**.
 
-#### MS.DEFENDER.4.2v1 instructions:
+#### MS.DEFENDER.4.2v1 Instructions:
 
-1. See [MS.DEFENDER.4.1v1 instructions](#msdefender41v1-instructions) for
-   details to enforce DLP policy in specific M365 service locations.
+1. See [MS.DEFENDER.4.1v1 instructions](#msdefender41v1-instructions) step 8
+   for details on enforcing DLP policy in specific M365 service locations.
 
-#### MS.DEFENDER.4.3v1 instructions:
+#### MS.DEFENDER.4.3v1 Instructions:
 
-1. See [MS.DEFENDER.4.1v1 instructions](#msdefender41v1-instructions) for
-   details to configure the DLP policy to block sharing sensitive
+1. See [MS.DEFENDER.4.1v1 instructions](#msdefender41v1-instructions) steps
+   15-17 for details on configuring DLP policy to block sharing sensitive
    information with everyone.
 
-#### MS.DEFENDER.4.4v1 instructions:
+#### MS.DEFENDER.4.4v1 Instructions:
 
-1. See [MS.DEFENDER.4.1v1 instructions](#msdefender41v1-instructions) for
-   details to  configure the DLP policy to notify users when accessing
+1. See [MS.DEFENDER.4.1v1 instructions](#msdefender41v1-instructions) steps
+   18-19 for details on configuring DLP policy to notify users when accessing
    sensitive information.
 
-#### MS.DEFENDER.4.5v1 instructions:
+#### MS.DEFENDER.4.5v1 Instructions:
 
 1. Sign in to the **Microsoft Purview compliance portal**.
 
@@ -567,7 +569,7 @@ information by restricted apps and unwanted Bluetooth applications.
 9. Enter an app and executable name to disallow said app from
    accessing protected files, and log the incident.
 
-#### MS.DEFENDER.4.6v1 instructions:
+#### MS.DEFENDER.4.6v1 Instructions:
 
 If restricted app and unwanted Bluetooth app restrictions are desired,
 associated devices must be onboarded with Defender for Endpoint
@@ -623,14 +625,14 @@ real-time insight into possible security incidents. Guidance on specific alerts 
 At a minimum, the alerts required by the _CISA M365 Security Configuration Baseline for Exchange Online_ SHALL be enabled.
 
 <!--Policy: MS.DEFENDER.5.1v1; Criticality: SHALL -->
-- _Rationale:_ Potentially malicious or service impacting events may go undetected without a means of detecting these events. Setting up a mechanism to alert administrators to the list of events linked above draws attention to them to minimize any impact to users and the agency.
+- _Rationale:_ Potentially malicious or service-impacting events may go undetected without a means of detecting these events. Setting up a mechanism to alert administrators to the list of events linked above draws attention to them to minimize any impact to users and the agency.
 - _Last modified:_ June 2023
 
 #### MS.DEFENDER.5.2v1
 The alerts SHOULD be sent to a monitored address or incorporated into a SIEM.
 
 <!--Policy: MS.DEFENDER.5.2v1; Criticality: SHOULD -->
-- _Rationale:_ Suspicious or malicious events, if not resolved promptly, may have a greater impact to users and the agency. Sending alerts to a monitored email address or Security Event and Information Management (SIEM) system helps ensure it is acted upon in a timely manner to limit overall impact.
+- _Rationale:_ Suspicious or malicious events, if not resolved promptly, may have a greater impact to users and the agency. Sending alerts to a monitored email address or Security Information and Event Management (SIEM) system helps ensure events are acted upon in a timely manner to limit overall impact.
 - _Last modified:_ June 2023
 
 ### Resources
@@ -644,7 +646,7 @@ The alerts SHOULD be sent to a monitored address or incorporated into a SIEM.
 
 ### Implementation
 
-#### MS.DEFENDER.5.1v1 instructions:
+#### MS.DEFENDER.5.1v1 Instructions:
 
 1. Sign in to **Microsoft 365 Defender**.
 
@@ -661,7 +663,7 @@ The alerts SHOULD be sent to a monitored address or incorporated into a SIEM.
 6. Select the **Enable selected policies** action from the **Bulk actions**
    menu.
 
-#### MS.DEFENDER.5.2v1 instructions:
+#### MS.DEFENDER.5.2v1 Instructions:
 
 For each enabled alert, to add one or more email recipients:
 
@@ -681,7 +683,7 @@ For each enabled alert, to add one or more email recipients:
 
 8. Click **Next**.
 
-9. On the Review page, click **Submit** to save the notification settings.
+9. On the **Review** page, click **Submit** to save the notification settings.
 
 ## 6. Audit Logging
 
@@ -692,13 +694,13 @@ threat detection activity.
 By default, Microsoft retains the audit logs for 180 days. Activity
 by users with E5 licenses is logged for one year.
 
-However, in accordance with OMB M-21-31, _Improving the Federal Government’s
-Investigative and Remediation Capabilities Related to Cybersecurity Incidents_,
-Microsoft 365 audit logs are to be retained for at least 12 months in active
-storage and an additional 18 months in cold storage. This can be accomplished
-either by offloading the logs out of the cloud environment, or natively through
-Microsoft by creating an [audit log retention
-policy](https://learn.microsoft.com/en-us/purview/audit-log-retention-policies?view=o365-worldwide#create-an-audit-log-retention-policy).
+However, in accordance with Office of Management and Budget (OMB) Memorandum
+21-31, _Improving the Federal Government’s Investigative and Remediation
+Capabilities Related to Cybersecurity Incidents_, M365 audit logs are to be
+retained for at least 12 months in active storage and an additional 18 months
+in cold storage. This can be accomplished either by offloading the logs out of
+the cloud environment or natively through Microsoft by creating an [audit log
+retention policy](https://learn.microsoft.com/en-us/purview/audit-log-retention-policies?view=o365-worldwide#create-an-audit-log-retention-policy).
 
 OMB M-21-13 requires Advanced Audit Features be configured in M365.
 Advanced Audit, now Microsoft Purview Audit (Premium), adds additional event
@@ -731,7 +733,7 @@ Audit logs SHALL be maintained for at least the minimum duration dictated by OMB
 <!--Policy: MS.DEFENDER.6.3v1; Criticality: SHALL -->
 - _Rationale:_ Audit logs may no longer be available when needed if they are not retained for a sufficient time. Increased log retention time gives an agency the necessary visibility to investigate incidents that occurred some time ago.
 - _Last modified:_ June 2023
-- _Note_: Purview Audit (Premium) provides a default audit log retention policy
+- _Note_: Purview Audit (Premium) provides a default audit log retention policy,
           retaining Exchange Online, SharePoint Online, OneDrive for
           Business, and Azure Active Directory audit records for one year.
           Additional record types require custom audit retention policies.
@@ -753,7 +755,7 @@ Related to Cybersecurity Incidents \| Office of Management and
 - [Search the audit log in the compliance center \| Microsoft
   Learn](https://learn.microsoft.com/en-us/purview/audit-log-search?view=o365-worldwide)
 
-- [Audited Activities \| Microsoft
+- [Audited log activities \| Microsoft
   Learn](https://learn.microsoft.com/en-us/purview/audit-log-activities)
 
 - [Expanding cloud logging to give customers deeper security visibility \|
@@ -773,7 +775,7 @@ Related to Cybersecurity Incidents \| Office of Management and
 
 ### Implementation
 
-#### MS.DEFENDER.6.1v1 instructions:
+#### MS.DEFENDER.6.1v1 Instructions:
 
 To enable auditing via the Microsoft Purview compliance portal:
 
@@ -786,14 +788,13 @@ administrator to start recording user and admin activity.
 
 4. Click the **Start recording user and admin activity**.
 
-#### MS.DEFENDER.6.2v1 instructions:
+#### MS.DEFENDER.6.2v1 Instructions:
 To set up Microsoft Purview Audit (Premium), see [Set up Microsoft Purview Audit (Premium) \|
 Microsoft
 Learn.](https://learn.microsoft.com/en-us/purview/audit-premium-setup?view=o365-worldwide)
 
-#### MS.DEFENDER.6.3v1 instructions:
-To create one or more custom audit retention policies if the default retention policy is not sufficient for agency needs, follow the instructions
-listed in [Create an audit log retention policy](https://learn.microsoft.com/en-us/purview/audit-log-retention-policies?view=o365-worldwide#create-an-audit-log-retention-policy).
+#### MS.DEFENDER.6.3v1 Instructions:
+To create one or more custom audit retention policies, if the default retention policy is not sufficient for agency needs, follow [Create an audit log retention policy](https://learn.microsoft.com/en-us/purview/audit-log-retention-policies?view=o365-worldwide#create-an-audit-log-retention-policy).
 Ensure the duration selected in the retention policies is at least one year,
 in accordance with OMB M-21-31.
 
@@ -803,8 +804,8 @@ In addition to acknowledging the important contributions of a diverse
 team of Cybersecurity and Infrastructure Security Agency (CISA) experts,
 CISA thanks the following federal agencies and private sector
 organizations that provided input during the development of the Secure
-Business Cloud Application’s security configuration baselines in
-response to Section 3 of [Executive Order (EO) 14028, *Improving the
+Cloud Business Application’s security configuration baselines in
+response to Section 3 of [Executive Order 14028, *Improving the
 Nation’s
 Cybersecurity*](https://www.federalregister.gov/documents/2021/05/17/2021-10460/improving-the-nations-cybersecurity):
 
@@ -818,13 +819,13 @@ The SCBs were informed by materials produced by the following organizations:
 - Mandiant
 - Microsoft
 - U.S. Defense Information Systems Agency (DISA)
-- U.S. National Institute of Standards (NIST)
+- U.S. National Institute of Standards and Technology (NIST)
 - U.S. Office of Management and Budget (OMB)
 
 The cross-agency collaboration and partnerships developed during this initiative serve as an example for solving complex problems faced by the federal government. CISA also thanks the Cybersecurity Innovation Tiger Team (CITT) for its leadership and the following federal agencies that provided input during the development of the baselines:
 
 - Consumer Financial Protection Bureau (CFPB)
-- Department of the Interior (DOI)
+- U.S. Department of the Interior (DOI)
 - National Aeronautics and Space Administration (NASA)
 - U.S. Office of Personnel Management (OPM)
 - U.S. Small Business Administration (SBA)
