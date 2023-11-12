@@ -82,43 +82,42 @@ base, follow [these instructions](https://learn.microsoft.com/en-us/azure/active
 
 ## 2. Risk Based Policies
 
-This section provides policies that reduce security risks related to user accounts that may have been compromised. These policies use a combination of AAD Identity Protection and AAD Conditional Access. AAD Identity Protection uses numerous signals to detect the risk level for each user or sign-in to determine if an account may have been compromised.
+This section provides policies that reduce security risks related to potentially compromised user accounts. These policies combine Azure AD Identity Protection and Azure AD Conditional Access. Azure AD Identity Protection uses numerous signals to detect the risk level for each user or sign-in and determine if an account may have been compromised.
 
-- _Additional mitigations to reduce risks associated with the authentication of Workload Identities:_ Although not covered in this baseline due to the need for an additional non-standard license, Microsoft provides support for mitigating risks related to workload identities (AAD applications or service principals). Agencies should strongly consider implementing this feature because workload identities present many of the same risks as interactive user access and are commonly used in modern systems. Follow [these instructions](https://learn.microsoft.com/en-us/azure/active-directory/conditional-access/workload-identity) to apply conditional access policies to workload identities.
+- _Additional mitigations to reduce risks associated with the authentication of workload identities:_ Although not covered in this baseline due to the need for an additional non-standard license, Microsoft provides support for mitigating risks related to workload identities (Azure AD applications or service principals). Agencies should strongly consider implementing this feature because workload identities present many of the same risks as interactive user access and are commonly used in modern systems. CISA urges organizations to [apply Conditional Access policies to workload identities](https://learn.microsoft.com/en-us/entra/identity/conditional-access/workload-identity).
 
-- _Note:_ The term ["high risk"](https://learn.microsoft.com/en-us/azure/active-directory/identity-protection/concept-identity-protection-risks) in the context of this section denotes the risk level applied by the AAD Identity Protection service to a user account or sign-in event. See the Resources section for a link to a detailed description of AAD Identity Protection risk and the factors comprising it.
+- _Note:_ Note: In this section, the term ["high risk"](https://learn.microsoft.com/en-us/entra/id-protection/concept-identity-protection-risks) denotes the risk level applied by the Azure AD Identity Protection service to a user account or sign-in event.
 
 ### Policies
 #### MS.AAD.2.1v1
 Users detected as high risk SHALL be blocked.
 
 <!--Policy: MS.AAD.2.1v1; Criticality: SHALL -->
-- _Rationale:_ By blocking users determined as high risk, compromised accounts can be prevented from accessing the tenant.
+- _Rationale:_ Blocking high-risk users may prevent compromised accounts from accessing the tenant.
 - _Last modified:_ June 2023
-- _Note:_ Users who are determined as high risk by AAD Identity Protection can be blocked from accessing the system via an AAD Conditional Access policy. A high risk user will be blocked until an administrator remediates their account.
+- _Note:_ Users identified as high risk by Azure AD Identity Protection can be blocked from accessing the system via an Azure AD Conditional Access policy. A high-risk user will be blocked until an administrator remediates their account.
 
 #### MS.AAD.2.2v1
 A notification SHOULD be sent to the administrator when high-risk users are detected.
 
 <!--Policy: MS.AAD.2.2v1; Criticality: SHOULD -->
-- _Rationale:_ By alerting an administrator when high risk detections are made, the admin can monitor the event and remediate the risk. This helps the organization proactively respond to cyber intrusions as they occur.
+- _Rationale:_ Notification enables the admin to monitor the event and remediate the risk. This helps the organization proactively respond to cyber intrusions as they occur.
 - _Last modified:_ June 2023
 
 #### MS.AAD.2.3v1
 Sign-ins detected as high risk SHALL be blocked.
 
 <!--Policy: MS.AAD.2.3v1; Criticality: SHALL -->
-- _Rationale:_ By blocking sign-ins categorized as high risk, compromised accounts can be prevented from accessing the tenant.
+- _Rationale:_ This prevents compromised accounts from accessing the tenant.
 - _Last modified:_ June 2023
 
 ### Resources
 
-- [What are risk detections?](https://learn.microsoft.com/en-us/azure/active-directory/identity-protection/concept-identity-protection-risks)
+- [What are risk detections?](https://learn.microsoft.com/en-us/entra/id-protection/concept-identity-protection-risks)
 
-- [Simulating risk detections in Identity Protection](https://learn.microsoft.com/en-us/azure/active-directory/identity-protection/howto-identity-protection-simulate-risk)
+- [Simulating risk detections in Identity Protection](https://learn.microsoft.com/en-us/entra/id-protection/howto-identity-protection-simulate-risk)
 
-- [User experiences with Azure AD Identity Protection](https://learn.microsoft.com/en-us/azure/active-directory/identity-protection/concept-identity-protection-user-experience)
-  (Examples of how these policies are applied in practice)
+- [User experiences with Microsoft Entra Identity Protection](https://learn.microsoft.com/en-us/entra/id-protection/concept-identity-protection-user-experience)
 
 ### License Requirements
 
@@ -126,7 +125,7 @@ Sign-ins detected as high risk SHALL be blocked.
 
 ### Implementation
 
-####  MS.AAD.2.1v1 instructions:
+####  MS.AAD.2.1v1 Instructions
 
 1.  Create a conditional access policy blocking users categorized as high risk by the Identity Protection service. Configure the following policy settings in the new conditional access policy as per the values below:
 
@@ -140,13 +139,13 @@ Sign-ins detected as high risk SHALL be blocked.
   Access controls > Grant > <b>Block Access</b>
 </pre>
 
-#### MS.AAD.2.2v1 instructions:
+#### MS.AAD.2.2v1 Instructions
 
-1.  Follow the instructions in the [Configure users at risk detected alerts](https://learn.microsoft.com/en-us/azure/active-directory/identity-protection/howto-identity-protection-configure-notifications#configure-users-at-risk-detected-alerts) section to configure Azure AD Identity Protection to email a regularly monitored security mailbox when a user account is determined to be high risk.
+1.  [Configure Azure AD Identity Protection to send a regularly monitored security mailbox email notification](https://learn.microsoft.com/en-us/entra/id-protection/howto-identity-protection-configure-notifications#configure-users-at-risk-detected-alerts) when user accounts are determined to be high risk.
 
-#### MS.AAD.2.3v1 instructions:
+#### MS.AAD.2.3v1 Instructions
 
-1.  Create a conditional access policy blocking sign-ins determined to be high risk by the Identity Protection service. Configure the following policy settings in the new conditional access policy as per the values below:
+1.  Create a Conditional Access policy blocking sign-ins determined high risk by the Identity Protection service. Configure the following policy settings in the new Conditional Access policy as per the values below:
 
 <pre>
   Users > Include > <b>All users</b>
