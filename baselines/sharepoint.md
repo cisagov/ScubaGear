@@ -181,34 +181,34 @@ File and folder default sharing permissions SHALL be set to **View**.
 
 ## 3. Securing Anyone Links and Verification Code Users
 
-Sharing files with external users via the usage of Anyone links or Verification codes is strongly discouraged because it provides access to data within a tenant with weak or no authentication. If these features are used, this section provides some access restrictions that could provide limited security risk mitigations.
+Sharing files with external users via the usage of **Anyone links** or **Verification codes** is strongly discouraged because it provides access to data within a tenant with weak or no authentication. If these features are used, this section details some access restrictions that could provide limited security risk mitigations.
 
-**Note**: The settings in this section are only applicable if an agency is using Anyone links or verification code sharing. See each policy below for details.
+**Note**: The settings in this section are only applicable if an agency is using **Anyone links** or **Verification code** sharing. See each policy below for details.
 
 ### Policies
 #### MS.SHAREPOINT.3.1v1
-Expiration days for anyone links SHALL be set to 30 days or less.
+Expiration days for **Anyone links** SHALL be set to 30 days or less.
 
 <!--Policy: MS.SHAREPOINT.3.1v1; Criticality: SHALL -->
-- _Rationale:_ Anyone links may be used to provide access to information for a short period of time. Without expiration, however, access is indefinite. By setting expiration timers for anyone links, administrators prevent unintended sustained access to information.
+- _Rationale:_ Links may be used to provide access to information for a short period of time. Without expiration, however, access is indefinite. By setting expiration timers for links, administrators prevent unintended sustained access to information.
 - _Last modified:_ June 2023
-- _Note:_ This policy is only applicable if the external sharing slider on the admin center sharing page is set to Anyone.
+- _Note:_ This policy is only applicable if the external sharing slider on the admin center sharing page is set to **Anyone**.
 
 #### MS.SHAREPOINT.3.2v1
-The allowable file and folder permissions for anyone links SHALL be set to View only.
+The allowable file and folder permissions for links SHALL be set to **View** only.
 
 <!--Policy: MS.SHAREPOINT.3.1v1; Criticality: SHALL -->
-- _Rationale:_ Unauthorized changes to files can be made if permissions allow editing by anyone.  By restricting permissions on anyone links to View only, administrators prevent anonymous file changes.
+- _Rationale:_ Unauthorized changes to files can be made if permissions allow editing by anyone.  By restricting permissions on links to **View** only, administrators prevent anonymous file changes.
 - _Last modified:_ June 2023
-- _Note:_ This policy is only applicable if the external sharing slider on the admin center sharing page is set to Anyone.
+- _Note:_ This policy is only applicable if the external sharing slider on the admin center sharing page is set to **Anyone**.
 
 #### MS.SHAREPOINT.3.3v1
 Reauthentication days for people who use a verification code SHALL be set to 30 days or less.
 
 <!--Policy: MS.SHAREPOINT.3.1v1; Criticality: SHALL -->
-- _Rationale:_ A verification code may be given out to provide access to information for a short period of time. Without expiration, however, access is indefinite. By setting expiration timers for verification code access, administrators prevent  unintended sustained access to information.
+- _Rationale:_ A verification code may be given out to provide access to information for a short period of time. By setting expiration timers for verification code access, administrators prevent  unintended sustained access to information.
 - _Last modified:_ June 2023
-- _Note:_ This policy is only applicable if the external sharing slider on the admin center sharing page is set to Anyone or New and Existing Guests.
+- _Note:_ This policy is only applicable if the external sharing slider on the admin center sharing page is set to **Anyone** or **New and existing guests**.
 
 ### License Requirements
 
@@ -221,7 +221,7 @@ Reauthentication days for people who use a verification code SHALL be set to 30 
 
 ### Implementation
 
-#### MS.SHAREPOINT.3.1v1 instructions:
+#### MS.SHAREPOINT.3.1v1 Instructions
 
 1.  Sign in to the **SharePoint admin center**.
 
@@ -235,7 +235,7 @@ Reauthentication days for people who use a verification code SHALL be set to 30 
 
 6.  Select **Save**.
 
-#### MS.SHAREPOINT.3.2v1 instructions:
+#### MS.SHAREPOINT.3.2v1 Instructions
 
 1.  Sign in to the **SharePoint admin center**.
 
@@ -251,7 +251,7 @@ Reauthentication days for people who use a verification code SHALL be set to 30 
 
 7.  Select **Save**.
 
-#### MS.SHAREPOINT.3.3v1 instructions:
+#### MS.SHAREPOINT.3.3v1 Instructions
 
 1.  Sign in to the **SharePoint admin center**.
 
@@ -269,18 +269,20 @@ Reauthentication days for people who use a verification code SHALL be set to 30 
 
 This section provides policies for restricting custom scripts execution.
 
+### Policies
+
 #### MS.SHAREPOINT.4.1v1
 Users SHALL be prevented from running custom scripts on personal sites (aka OneDrive).
 
 <!--Policy: MS.SHAREPOINT.4.1v1; Criticality: SHALL -->
-- _Rationale:_ Scripts in OneDrive folders run in the context of the user visiting the site and have access to everything the user can access. By preventing custom scripts on personal sites, administrators block a path for potentially malicious code execution.
+- _Rationale:_ Scripts in OneDrive folders run in the context of user visiting the site and have access to everything users can access. By preventing custom scripts on personal sites, administrators block a path for potentially malicious code execution.
 - _Last modified:_ June 2023
 
 #### MS.SHAREPOINT.4.2v1
 Users SHALL be prevented from running custom scripts on self-service created sites.
 
 <!--Policy: MS.SHAREPOINT.4.2v1; Criticality: SHALL -->
-- _Rationale:_ Scripts on SharePoint sites run in the context of the user visiting the site and have access to everything the user can access. By preventing custom scripts on self-service created sites, administrators block a path for potentially malicious code execution.
+- _Rationale:_ Scripts on SharePoint sites run in the context of users visiting the site and therefore provide access to everything users can access. By preventing custom scripts on self-service created sites, administrators block a path for potentially malicious code execution.
 - _Last modified:_ June 2023
 
 ### Resources
@@ -294,7 +296,7 @@ Users SHALL be prevented from running custom scripts on self-service created sit
 
 ### Implementation
 
-#### MS.SHAREPOINT.4.1v1 instructions:
+#### MS.SHAREPOINT.4.1v1 Instructions
 
 1.  Sign in to the **SharePoint admin center**.
 
@@ -306,9 +308,9 @@ Users SHALL be prevented from running custom scripts on self-service created sit
 
 5.  Select **Prevent users from running custom script on personal sites**.
 
-6.  Select **Ok**.
+6.  Select **OK**.
 
-#### MS.SHAREPOINT.4.2v1 instructions:
+#### MS.SHAREPOINT.4.2v1 Instructions
 
 1.  Sign in to the **SharePoint admin center**.
 
@@ -320,7 +322,7 @@ Users SHALL be prevented from running custom scripts on self-service created sit
 
 5.  Select **Prevent users from running custom script on self-service created sites**.
 
-6.  Select **Ok**.
+6.  Select **OK**.
 
 
 # Acknowledgements
