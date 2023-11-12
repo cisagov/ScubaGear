@@ -57,13 +57,14 @@ This section provides policies that reduce security risks related to legacy auth
 ### Policies
 #### MS.AAD.1.1v1
 Legacy authentication SHALL be blocked.
+
 <!--Policy: MS.AAD.1.1v1; Criticality: SHALL -->
-- _Rationale:_ The security risk of allowing legacy authentication protocols is they do not support multi-factor authentication (MFA). By blocking legacy protocols the impact of user credential theft is minimized.
+- _Rationale:_ The security risk of allowing legacy authentication protocols is they do not support MFA. Blocking legacy protocols reduces the impact of user credential theft.
 - _Last modified:_ June 2023
 
 ### Resources
 
-- [Conditional Access: Block Legacy Authentication](https://learn.microsoft.com/en-us/azure/active-directory/conditional-access/howto-conditional-access-policy-block-legacy)
+- [Common Conditional Access policy: Block legacy authentication](https://learn.microsoft.com/en-us/entra/identity/conditional-access/howto-conditional-access-policy-block-legacy)
 
 - [Five steps to securing your identity infrastructure](https://learn.microsoft.com/en-us/azure/security/fundamentals/steps-secure-identity)
 
@@ -73,12 +74,11 @@ Legacy authentication SHALL be blocked.
 
 ### Implementation
 
-#### MS.AAD.1.1v1 instructions:
+#### MS.AAD.1.1v1 Instructions
 
-1.  Before blocking legacy authentication across the entire application
-base, follow [these instructions](https://learn.microsoft.com/en-us/azure/active-directory/conditional-access/block-legacy-authentication#identify-legacy-authentication-use) to determine if any of the agency’s existing applications are presently using legacy authentication.
+- [Determine if an agency’s existing applications use legacy authentication](https://learn.microsoft.com/en-us/entra/identity/conditional-access/block-legacy-authentication#identify-legacy-authentication-use) before blocking legacy authentication across the entire application base.
 
-2.  Follow [the instructions on this page](https://learn.microsoft.com/en-us/azure/active-directory/conditional-access/howto-conditional-access-policy-block-legacy) to create a conditional access policy blocking legacy authentication.
+- Create a [Conditional Access policy to block legacy authentication](https://learn.microsoft.com/en-us/entra/identity/conditional-access/howto-conditional-access-policy-block-legacy).
 
 ## 2. Risk Based Policies
 
