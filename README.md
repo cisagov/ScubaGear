@@ -4,7 +4,7 @@
         <img src="https://img.shields.io/badge/ScubaGear-v1.0.0-%2328B953?labelColor=%23005288" /></a>
 </p>
 
-Developed by CISA, ScubaGear is an assessment tool that verifies a Microsoft 365 (M365) tenant’s configuration conforms to the policies described in the Secure Cloud Business Applications ([SCuBA](https://cisa.gov/scuba)) Minimum Viable Secure Configuration Baseline [documents](https://github.com/cisagov/ScubaGear/tree/main/baselines).
+Developed by CISA, ScubaGear is an assessment tool that verifies a Microsoft 365 (M365) tenant’s configuration conforms to the policies described in the Secure Cloud Business Applications ([SCuBA](https://cisa.gov/scuba)) Security Configuration Baseline [documents](https://github.com/cisagov/ScubaGear/tree/main/baselines).
 
 ## Table of Contents
 - [M365 Product License Assumptions](#m365-product-license-assumptions)
@@ -14,6 +14,7 @@ Developed by CISA, ScubaGear is an assessment tool that verifies a Microsoft 365
   - [Download the Required OPA executable](#download-the-required-opa-executable)
   - [PowerShell Execution Policies](#powershell-execution-policies)
 - [Usage](#usage)
+  - [Importing the Module](#importing-the-module)
   - [Examples](#example-1-run-an-assessment-against-all-products-except-powerplatform)
   - [Parameter Definitions](#parameter-definitions)
   - [AAD Conditional Access Policy Exemptions](#aad-conditional-access-policy-exemptions)
@@ -59,13 +60,12 @@ To download ScubaGear:
 > **Note**
 >  Only PowerShell 5.1 is currently supported. PowerShell 7 may work, but has not been tested. Full PowerShell 7 support will be added in a future release.
 
-To import the module, open a new PowerShell 5.1 terminal and navigate to the repository folder.
+To install the module dependencies, open a new PowerShell 5.1 terminal and navigate to the repository folder.
 
 Then run:
 
 ```powershell
-.\Setup.ps1 #Installs the required modules
-Import-Module -Name .\PowerShell\ScubaGear #Imports the tool into your session
+.\Setup.ps1 # Installs the required modules
 ```
 
 ### Download the Required OPA executable
@@ -81,15 +81,21 @@ In the event of an unsuccessful download, users can manually download the OPA ex
 ```
 
 ### PowerShell Execution Policies
-On Windows Servers, the default [execution policy](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.security/set-executionpolicy?view=powershell-5.1) is `RemoteSigned`, which will allow ScubaGear to run after the publisher (CISA) is agreed to once.
+Starting with release 0.3.0, ScubaGear is signed by a commonly trusted CA. On Windows Servers, the default [execution policy](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.security/set-executionpolicy?view=powershell-5.1) is `RemoteSigned`, which will allow ScubaGear to run after the publisher (CISA) is agreed to once.
 
 On Windows Clients, the default execution policy is `Restricted`. In this case, `Set-ExecutionPolicy RemoteSigned` should be invoked to permit ScubaGear to run.
 
-> **Note**
-> Starting with release 0.3.0, ScubaGear is signed by a commonly trusted CA.  Depending on the [PowerShell execution policy](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_execution_policies?view=powershell-5.1) of the system running ScubaGear, different steps may be required before running ScubaGear.
-
 ## Usage
 ScubaGear can be invoked interactively or non-interactively. See [Required Permissions](#required-permissions) for the permissions needed to execute the tool in either mode. The interactive authentication mode will prompt the user for credentials via Microsoft's popup windows. Non-interactive mode is for invoking ScubaGear using an Azure AD application service principal and supports running the tool in automated scenarios such as pipelines or scheduled jobs. Examples 1-3 provide examples for running with interactive mode and example 4 provides an example for running in non-interactive mode.
+
+### Importing the module
+ScubaGear currently must be imported into each new PowerShell terminal session to execute.
+To import the module, open a new PowerShell 5.1 terminal and navigate to the repository folder.
+
+Then run:
+```powershell
+Import-Module -Name .\PowerShell\ScubaGear # Imports the module into your session
+```
 
 ### Example 1: Run an assessment against all products (except PowerPlatform)
 ```powershell
