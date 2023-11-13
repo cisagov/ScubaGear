@@ -90,7 +90,7 @@ ScubaGear can be invoked interactively or non-interactively. See [Required Permi
 
 ### Importing the module
 ScubaGear currently must be imported into each new PowerShell terminal session to execute.
-To import the module, in a PowerShell 5.1 terminal and navigate to the repository folder.
+To import the module, navigate to the repository folder in a PowerShell 5.1 terminal.
 
 Then run:
 ```powershell
