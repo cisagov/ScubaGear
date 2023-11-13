@@ -28,7 +28,8 @@ FilterArray(Conditions, Boolean) := [Condition | some Condition in Conditions; C
 # SharingCapability == 3 Existing Guests
 # SharingCapability == 1 New and Existing Guests
 # SharingCapability == 2 Anyone
-
+# If SharingCapability is set to Only People In Organization
+# OR Existing Guests, the policy should pass.
 tests contains {
     "PolicyId": "MS.SHAREPOINT.1.1v1",
     "Criticality": "Should",
@@ -54,6 +55,12 @@ tests contains {
 # MS.SHAREPOINT.1.2v1
 #--
 
+# OneDriveSharingCapability == 0 Only People In Organization
+# OneDriveSharingCapability == 3 Existing Guests
+# OneDriveSharingCapability == 1 New and Existing Guests
+# OneDriveSharingCapability == 2 Anyone
+# If OneDriveSharingCapability is set to Only People In Organization
+# OR Existing Guests, the policy should pass.
 tests contains {
     "PolicyId": "MS.SHAREPOINT.1.2v1",
     "Criticality": "Should",
@@ -120,6 +127,9 @@ Domainlist(TenantPolicy) := concat(": ", [FAIL, NOTESTRING]) if {
     TenantPolicy.SharingDomainRestrictionMode != 1
 }
 
+# If SharingCapability is set to Only People In Organization
+# OR Sharing Domain Restriction Mode is enabled,
+# the policy should pass.
 tests contains {
     "PolicyId": "MS.SHAREPOINT.1.3v1",
     "Criticality": "Shall",
@@ -147,6 +157,9 @@ tests contains {
 # MS.SHAREPOINT.1.4v1
 #--
 
+# If SharingCapability is set to Only People In Organization
+# OR require account login to be the one on the invite enabled,
+# the policy should pass.
 tests contains {
     "PolicyId": "MS.SHAREPOINT.1.4v1",
     "Criticality": "Shall",
@@ -180,7 +193,7 @@ tests contains {
 
 # DefaultSharingLinkType == 1 for Specific People
 # DefaultSharingLinkType == 2 for Only people in your organization
-
+# Default Sharing Link should be set to specific people
 tests contains {
     "PolicyId": "MS.SHAREPOINT.2.1v1",
     "Criticality": "Shall",
@@ -203,7 +216,7 @@ tests contains {
 
 # SPO_tenant - DefaultLinkPermission
 # 1 view 2 edit
-
+# Default link permission should be set to view
 tests contains {
     "PolicyId": "MS.SHAREPOINT.2.2v1",
     "Criticality": "Shall",
@@ -226,35 +239,38 @@ tests contains {
 # MS.SHAREPOINT.3.1v1
 #--
 
+# If SharingCapability is set to Only People In Organization
+# OR Existing Guests, the policy should pass.
 ExternalUserExpireInDays(TenantPolicy) := ["", true] if {
     Conditions := [
         TenantPolicy.SharingCapability == 0,
         TenantPolicy.SharingCapability == 3
     ]
-    count(FilterArray(Conditions, true)) > 0
+    count(FilterArray(Conditions, true)) == 1
 }
 
-ExternalUserExpireInDays(TenantPolicy) := ["", true] if {
+# If SharingCapability is set to New and Existing Guests
+# OR Anyone, AND anonymous links are set to expire
+# in 30 days or less, the policy should pass, else fail.
+# The error message is concatanated by 2 steps to insert the
+# result of ReportBoolean in front, & the setting in the middle.
+SHARINGCAPABILITY := "New and Existing Guests" if TENANTPOLICY.SharingCapability == 1
+
+SHARINGCAPABILITY := "Anyone" if TENANTPOLICY.SharingCapability == 2
+
+ERRSTRING := concat(" ", [
+    "External Sharing is set to",
+    SHARINGCAPABILITY,
+    "and expiration date is not 30 days or less"
+    ])
+
+ExternalUserExpireInDays(TenantPolicy) := [concat(": ", [FAIL, ERRSTRING]), Status] if {
     Conditions := [
         TenantPolicy.SharingCapability == 1,
         TenantPolicy.SharingCapability == 2
     ]
     count(FilterArray(Conditions, true)) > 0
-    TenantPolicy.RequireAnonymousLinksExpireInDays <= 30
-}
-
-ExternalUserExpireInDays(TenantPolicy) := [ErrMsg, false] if {
-    TenantPolicy.SharingCapability == 1
-    TenantPolicy.RequireAnonymousLinksExpireInDays > 30
-    ErrString := "External Sharing is set to New and Existing Guests and expiration date is not 30 days or less"
-    ErrMsg := concat(": ", [FAIL, ErrString])
-}
-
-ExternalUserExpireInDays(TenantPolicy) := [ErrMsg, false] if {
-    TenantPolicy.SharingCapability == 2
-    TenantPolicy.RequireAnonymousLinksExpireInDays > 30
-    ErrString := "External Sharing is set to Anyone and expiration date is not 30 days or less"
-    ErrMsg := concat(": ", [FAIL, ErrString])
+    Status := TenantPolicy.RequireAnonymousLinksExpireInDays <= 30
 }
 
 tests contains {
@@ -409,7 +425,6 @@ tests contains {
 
 # 1 == Allow users to run custom script on self-service created sites
 # 2 == Prevent users from running custom script on self-service created sites
-
 tests contains {
     "PolicyId": "MS.SHAREPOINT.4.2v1",
     "Criticality": "Shall",
