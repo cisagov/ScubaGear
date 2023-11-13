@@ -295,6 +295,7 @@ tests contains {
 #
 # MS.SHAREPOINT.3.2v1
 
+# Create Repot Detatils string based on File link type & Folder link type
 PERMISSIONSTRING := "are not limited to view for Anyone"
 
 FileAndFolderPermission(1, 1) := PASS if {}
@@ -305,6 +306,7 @@ FileAndFolderPermission(1, 2) := concat(": ", [FAIL, concat(" ", ["folders", PER
 
 FileAndFolderPermission(2, 1) := concat(": ", [FAIL, concat(" ", ["files", PERMISSIONSTRING])]) if {}
 
+# Both link types must be 2 & OneDrive_PnP_Flag must be false for policy to pass
 tests contains {
     "PolicyId": "MS.SHAREPOINT.3.2v1",
     "Criticality": "Should",
@@ -349,16 +351,21 @@ tests contains {
 
 VERIFICATIONSTRING := "Expiration timer for 'People who use a verification code' NOT"
 
+# If Sharing set to Only People In Org, pass
 ExpirationTimersVerificationCode(TenantPolicy) := ["", true] if {
     TenantPolicy.SharingCapability == 0
 }
 
+# If Sharing NOT set to Only People In Org, reathentication enabled,
+# & reauth sent to <= 30 days, pass
 ExpirationTimersVerificationCode(TenantPolicy) := ["", true] if {
     TenantPolicy.SharingCapability != 0
     TenantPolicy.EmailAttestationRequired == true
     TenantPolicy.EmailAttestationReAuthDays <= 30
 }
 
+# If Sharing NOT set to Only People In Org & reathentication disbled,
+# fail
 ExpirationTimersVerificationCode(TenantPolicy) := [ErrMsg, false] if {
     TenantPolicy.SharingCapability != 0
     TenantPolicy.EmailAttestationRequired == false
@@ -366,6 +373,7 @@ ExpirationTimersVerificationCode(TenantPolicy) := [ErrMsg, false] if {
     ErrMsg := concat(": ", [FAIL, concat(" ", [VERIFICATIONSTRING, "enabled"])])
 }
 
+# If Sharing NOT set to Only People In Org & reauth sent to > 30 days, fail
 ExpirationTimersVerificationCode(TenantPolicy) := [ErrMsg, false] if {
     TenantPolicy.SharingCapability != 0
     TenantPolicy.EmailAttestationRequired == true
@@ -373,6 +381,8 @@ ExpirationTimersVerificationCode(TenantPolicy) := [ErrMsg, false] if {
     ErrMsg := concat(": ", [FAIL, concat(" ", [VERIFICATIONSTRING, "set to 30 days"])])
 }
 
+# If Sharing NOT set to Only People In Org, reathentication disabled,
+# & reauth sent to > 30 days, fail
 ExpirationTimersVerificationCode(TenantPolicy) := [ErrMsg, false] if {
     TenantPolicy.SharingCapability != 0
     TenantPolicy.EmailAttestationRequired == false
