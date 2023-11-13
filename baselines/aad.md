@@ -712,20 +712,20 @@ Performing a manual review of highly privileged users per the instructions below
 
 ## 8. Guest User Access
 
-This section provides policies that help reduce security risks related to integrating M365 guest users. A guest user is a specific type of external user who belongs to a separate organization but can access files, meetings, Teams and other data in the target tenant. It is common to invite guest users to a tenant for cross-agency collaboration purposes.
+This section provides policies that help reduce security risks related to integrating M365 guest users. A guest user is a specific type of external user who belongs to a separate organization but can access files, meetings, Teams, and other data in the target tenant. It is common to invite guest users to a tenant for cross-agency collaboration purposes.
 
 #### MS.AAD.8.1v1
 Guest users SHOULD have limited or restricted access to Azure AD directory objects.
 
 <!--Policy: MS.AAD.8.1v1; Criticality: SHOULD -->
-- _Rationale:_ Limiting the amount of information about objects available to guest users in the tenant, reduces the malicious reconnaissance exposure should a guest account become compromised or be created by an adversary.
+- _Rationale:_ Limiting the amount of object information available to guest users in the tenant, reduces malicious reconnaissance exposure, should a guest account become compromised or be created by an adversary.
 - _Last modified:_ June 2023
 
 #### MS.AAD.8.2v1
 Only users with the Guest Inviter role SHOULD be able to invite guest users.
 
 <!--Policy: MS.AAD.8.2v1; Criticality: SHOULD -->
-- _Rationale:_ By only allowing an authorized group of individuals to invite external users to create accounts in the tenant, an agency can enforce a guest user account approval process, reducing the risk of unauthorized accounts being created.
+- _Rationale:_ By only allowing an authorized group of individuals to invite external users to create accounts in the tenant, an agency can enforce a guest user account approval process, reducing the risk of unauthorized account creation.
 - _Last modified:_ June 2023
 
 #### MS.AAD.8.3v1
@@ -737,9 +737,9 @@ Guest invites SHOULD only be allowed to specific external domains that have been
 
 ### Resources
 
-- [Configure external collaboration settings](https://learn.microsoft.com/en-us/azure/active-directory/external-identities/external-collaboration-settings-configure)
+- [Configure external collaboration settings](https://learn.microsoft.com/en-us/entra/external-id/external-collaboration-settings-configure)
 
-- [Compare member and guest default permissions](https://learn.microsoft.com/en-us/azure/active-directory/fundamentals/users-default-permissions#compare-member-and-guest-default-permissions)
+- [Compare member and guest default permissions](https://learn.microsoft.com/en-us/entra/fundamentals/users-default-permissions#compare-member-and-guest-default-permissions)
 
 ### License Requirements
 
@@ -747,7 +747,7 @@ Guest invites SHOULD only be allowed to specific external domains that have been
 
 ### Implementation
 
-#### MS.AAD.8.1v1 instructions:
+#### MS.AAD.8.1v1 Instructions
 
 1. In **Azure Active Directory** select **External Identities > External collaboration settings**.
 
@@ -755,7 +755,7 @@ Guest invites SHOULD only be allowed to specific external domains that have been
 
 3. Click **Save**.
 
-#### MS.AAD.8.2v1 instructions:
+#### MS.AAD.8.2v1 Instructions
 
 1. In **Azure Active Directory** select **External Identities > External collaboration settings**.
 
@@ -763,7 +763,7 @@ Guest invites SHOULD only be allowed to specific external domains that have been
 
 3. Click **Save**.
 
-#### MS.AAD.8.3v1 instructions:
+#### MS.AAD.8.3v1 Instructions
 
 1. In **Azure Active Directory** select **External Identities > External collaboration settings**.
 
@@ -777,20 +777,12 @@ Guest invites SHOULD only be allowed to specific external domains that have been
 
 # Acknowledgements
 
-In addition to acknowledging the important contributions of a diverse
-team of Cybersecurity and Infrastructure Security Agency (CISA) experts,
-CISA thanks the following federal agencies and private sector
-organizations that provided input during the development of the Secure
-Business Cloud Application’s security configuration baselines in
-response to Section 3 of [Executive Order (EO) 14028, *Improving the
-Nation’s
-Cybersecurity*](https://www.federalregister.gov/documents/2021/05/17/2021-10460/improving-the-nations-cybersecurity):
+In addition to acknowledging the important contributions of a diverse team of Cybersecurity and Infrastructure Security Agency (CISA) experts, CISA thanks the following federal agencies and private sector organizations that provided input during the development of the Secure Business Cloud Application’s security configuration baselines in response to Section 3 of [Executive Order (EO) 14028, *Improving the Nation’s Cybersecurity*](https://www.federalregister.gov/documents/2021/05/17/2021-10460/improving-the-nations-cybersecurity):
 
 - The MITRE Corporation
 - Sandia National Laboratories (Sandia)
 
 The SCBs were informed by materials produced by the following organizations:
-
 
 - Center for Internet Security (CIS)
 - Internet Engineering Task Force (IETF)
@@ -809,7 +801,6 @@ The cross-agency collaboration and partnerships developed during this initiative
 - U.S. Small Business Administration (SBA)
 - U.S. Census Bureau (USCB)
 - U.S. Geological Survey (USGS)
-
 
 # Appendix A: Hybrid Azure AD Guidance
 
