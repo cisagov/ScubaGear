@@ -65,7 +65,7 @@ To install the module dependencies, open a new PowerShell 5.1 terminal and navig
 Then run:
 
 ```powershell
-.\Setup.ps1 # Installs the required modules
+.\SetUp.ps1 # Installs the required modules
 ```
 
 ### Download the Required OPA executable
