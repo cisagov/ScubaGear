@@ -8,8 +8,6 @@ import data.report.utils.ReportDetailsString
 # Constants #
 #############
 
-TENANTPOLICY := input.SPO_tenant[_]
-
 FAIL := ReportDetailsBoolean(false)
 
 PASS := ReportDetailsBoolean(true)
@@ -41,7 +39,8 @@ tests contains {
     "ReportDetails": ReportDetailsBoolean(Status),
     "RequirementMet": Status
 } if {
-    SharingCapability := TENANTPOLICY.SharingCapability
+    some TenantPolicy in input.SPO_tenant
+    SharingCapability := TenantPolicy.SharingCapability
     Conditions := [
         SharingCapability == 0,
         SharingCapability == 3
@@ -72,7 +71,8 @@ tests contains {
     "ReportDetails": ReportDetailsBoolean(Status),
     "RequirementMet": Status
 } if {
-    OneDriveSharingCapability := TENANTPOLICY.OneDriveSharingCapability
+    some TenantPolicy in input.SPO_tenant
+    OneDriveSharingCapability := TenantPolicy.OneDriveSharingCapability
     input.OneDrive_PnP_Flag == false
     Conditions := [
         OneDriveSharingCapability == 0,
@@ -138,15 +138,16 @@ tests contains {
         "Get-PnPTenant"
     ],
     "ActualValue": [
-        TENANTPOLICY.SharingDomainRestrictionMode,
-        TENANTPOLICY.SharingCapability
+        TenantPolicy.SharingDomainRestrictionMode,
+        TenantPolicy.SharingCapability
     ],
-    "ReportDetails": Domainlist(TENANTPOLICY),
+    "ReportDetails": Domainlist(TenantPolicy),
     "RequirementMet": Status
 } if {
+    some TenantPolicy in input.SPO_tenant
     Conditions := [
-        TENANTPOLICY.SharingCapability == 0,
-        TENANTPOLICY.SharingDomainRestrictionMode == 1
+        TenantPolicy.SharingCapability == 0,
+        TenantPolicy.SharingDomainRestrictionMode == 1
     ]
     Status := count(FilterArray(Conditions, true)) == 1
 }
@@ -168,15 +169,16 @@ tests contains {
         "Get-PnPTenant"
     ],
     "ActualValue": [
-        TENANTPOLICY.RequireAcceptingAccountMatchInvitedAccount,
-        TENANTPOLICY.SharingCapability
+        TenantPolicy.RequireAcceptingAccountMatchInvitedAccount,
+        TenantPolicy.SharingCapability
     ],
     "ReportDetails": ReportDetailsBoolean(Status),
     "RequirementMet": Status
 } if {
+    some TenantPolicy in input.SPO_tenant
     Conditions := [
-        TENANTPOLICY.SharingCapability == 0,
-        TENANTPOLICY.RequireAcceptingAccountMatchInvitedAccount == true
+        TenantPolicy.SharingCapability == 0,
+        TenantPolicy.RequireAcceptingAccountMatchInvitedAccount == true
     ]
     Status := count(FilterArray(Conditions, true)) >= 1
 }
@@ -201,11 +203,12 @@ tests contains {
         "Get-SPOTenant",
         "Get-PnPTenant"
     ],
-    "ActualValue": [TENANTPOLICY.DefaultSharingLinkType],
+    "ActualValue": [TenantPolicy.DefaultSharingLinkType],
     "ReportDetails": ReportDetailsBoolean(Status),
     "RequirementMet": Status
 } if {
-    Status := TENANTPOLICY.DefaultSharingLinkType == 1
+    some TenantPolicy in input.SPO_tenant
+    Status := TenantPolicy.DefaultSharingLinkType == 1
 }
 
 #--
@@ -224,11 +227,12 @@ tests contains {
         "Get-SPOTenant",
         "Get-PnPTenant"
     ],
-    "ActualValue": [TENANTPOLICY.DefaultLinkPermission],
+    "ActualValue": [TenantPolicy.DefaultLinkPermission],
     "ReportDetails": ReportDetailsBoolean(Status),
     "RequirementMet": Status
 } if {
-    Status := TENANTPOLICY.DefaultLinkPermission == 1
+    some TenantPolicy in input.SPO_tenant
+    Status := TenantPolicy.DefaultLinkPermission == 1
 }
 
 ###################
@@ -254,9 +258,9 @@ ExternalUserExpireInDays(TenantPolicy) := ["", true] if {
 # in 30 days or less, the policy should pass, else fail.
 # The error message is concatanated by 2 steps to insert the
 # result of ReportBoolean in front, & the setting in the middle.
-SHARINGCAPABILITY := "New and Existing Guests" if TENANTPOLICY.SharingCapability == 1
+SHARINGCAPABILITY := "New and Existing Guests" if input.SPO_tenant[_].SharingCapability == 1
 
-SHARINGCAPABILITY := "Anyone" if TENANTPOLICY.SharingCapability == 2
+SHARINGCAPABILITY := "Anyone" if input.SPO_tenant[_].SharingCapability == 2
 
 ERRSTRING := concat(" ", [
     "External Sharing is set to",
@@ -281,13 +285,14 @@ tests contains {
         "Get-PnPTenant"
     ],
     "ActualValue": [
-        TENANTPOLICY.SharingCapability,
-        TENANTPOLICY.RequireAnonymousLinksExpireInDays
+        TenantPolicy.SharingCapability,
+        TenantPolicy.RequireAnonymousLinksExpireInDays
     ],
     "ReportDetails": ReportDetailsString(Status, ErrMsg),
     "RequirementMet": Status
 } if {
-    [ErrMsg, Status] := ExternalUserExpireInDays(TENANTPOLICY)
+    some TenantPolicy in input.SPO_tenant
+    [ErrMsg, Status] := ExternalUserExpireInDays(TenantPolicy)
 }
 
 #--
@@ -321,8 +326,9 @@ tests contains {
     "ReportDetails": FileAndFolderPermission(FileLinkType, FolderLinkType),
     "RequirementMet": Status
 } if {
-    FileLinkType := TENANTPOLICY.FileAnonymousLinkType
-    FolderLinkType := TENANTPOLICY.FolderAnonymousLinkType
+    some TenantPolicy in input.SPO_tenant
+    FileLinkType := TenantPolicy.FileAnonymousLinkType
+    FolderLinkType := TenantPolicy.FolderAnonymousLinkType
     input.OneDrive_PnP_Flag == false
     Conditions := [
         FileLinkType == 2,
@@ -398,14 +404,15 @@ tests contains {
         "Get-PnPTenant"
     ],
     "ActualValue": [
-        TENANTPOLICY.SharingCapability,
-        TENANTPOLICY.EmailAttestationRequired,
-        TENANTPOLICY.EmailAttestationReAuthDays
+        TenantPolicy.SharingCapability,
+        TenantPolicy.EmailAttestationRequired,
+        TenantPolicy.EmailAttestationReAuthDays
     ],
     "ReportDetails": ReportDetailsString(Status, ErrMsg),
     "RequirementMet": Status
 } if {
-    [ErrMsg, Status] := ExpirationTimersVerificationCode(TENANTPOLICY)
+    some TenantPolicy in input.SPO_tenant
+    [ErrMsg, Status] := ExpirationTimersVerificationCode(TenantPolicy)
 }
 
 ###################
