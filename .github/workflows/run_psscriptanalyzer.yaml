@@ -23,7 +23,7 @@ jobs:
       pull-requests: write
     steps:
     - uses: actions/checkout@v2
-    - name: lint
+    - name: Run static code checker
       uses: docker://devblackops/github-action-psscriptanalyzer:2.4.0
       with:
         repoToken: ${{ secrets.GITHUB_TOKEN }}
