@@ -343,46 +343,31 @@ This section provides policies to reduce security risks related to the lack of s
 
 ### Policies
 #### MS.AAD.4.1v1
-Security logs SHALL be sent to the agency's Security Operations Center for monitoring.
+Security logs SHALL be sent to the agency's security operations center for monitoring.
 
 <!--Policy: MS.AAD.4.1v1; Criticality: SHALL -->
-- _Rationale:_ The security risk of not having visibility into cyber attacks is reduced by collecting the logs into the agency's centralized security detection infrastructure. Thus, security events can be audited, queried, and available for incident response.
+- _Rationale:_ The security risk of not having visibility into cyber attacks is reduced by collecting logs in the agency’s centralized security detection infrastructure. This makes security events available for auditing, query, and incident response.
 - _Last modified:_ June 2023
-- _Note:_ The following logs (configured in Azure AD diagnostic settings), are required: `AuditLogs, SignInLogs, RiskyUsers, UserRiskEvents, NonInteractiveUserSignInLogs, ServicePrincipalSignInLogs, ADFSSignInLogs, RiskyServicePrincipals, ServicePrincipalRiskEvents, EnrichedOffice365AuditLogs, MicrosoftGraphActivityLogs`. If managed identities are used for Azure resources, also send the `ManagedIdentitySignInLogs` log type. If the Azure AD Provisioning Service is used to provision users to Software as a Service (SaaS) apps or other systems, also send the `ProvisioningLogs` log type.
-- _Note:_ It is also recommended to send the logs to the CISA CLAW system so agencies can benefit from the security detection capabilities offered there. Contact CISA at cyberliason@cisa.dhs.gov to request integration instructions.
+- _Note:_ The following logs (configured in Azure AD diagnostic settings), are required: `AuditLogs, SignInLogs, RiskyUsers, UserRiskEvents, NonInteractiveUserSignInLogs, ServicePrincipalSignInLogs, ADFSSignInLogs, RiskyServicePrincipals, ServicePrincipalRiskEvents, EnrichedOffice365AuditLogs, MicrosoftGraphActivityLogs`. If managed identities are used for Azure resources, also send the `ManagedIdentitySignInLogs` log type. If the Azure AD Provisioning Service is used to provision users to software-as-a-service (SaaS) apps or other systems, also send the `ProvisioningLogs` log type.
+- _Note:_ Agencies can benefit from security detection capabilities offered by the CISA Cloud Log Aggregation Warehouse (CLAW) system. Agencies are urged to send the logs to CLAW. Contact CISA at cyberliason@cisa.dhs.gov to request integration instructions.
 
 ### Resources
 
-- [Everything you wanted to know about Security and Audit Logging in
-  Office 365](https://thecloudtechnologist.com/2021/10/15/everything-you-wanted-to-know-about-security-and-audit-logging-in-office-365/)
+- [Everything you wanted to know about Security and Audit Logging in Office 365](https://thecloudtechnologist.com/2021/10/15/everything-you-wanted-to-know-about-security-and-audit-logging-in-office-365/)
 
-- [What are Azure Active Directory sign-in logs?](https://learn.microsoft.com/en-us/azure/active-directory/reports-monitoring/concept-all-sign-ins)
+- [What are Microsoft Entra sign-in logs??](https://learn.microsoft.com/en-us/entra/identity/monitoring-health/concept-sign-ins)
 
-- [National Cybersecurity Protection System-Cloud Interface Reference
-  Architecture Volume
-  One: General Guidance](https://www.cisa.gov/sites/default/files/publications/NCPS%20Cloud%20Interface%20RA%20Volume%20One%20%282021-05-14%29.pdf)
+- [National Cybersecurity Protection System-Cloud Interface Reference Architecture Volume One: General Guidance](https://www.cisa.gov/sites/default/files/publications/NCPS%20Cloud%20Interface%20RA%20Volume%20One%20%282021-05-14%29.pdf)
 
 ### License Requirements
 
-- An Azure subscription is required to send logs to an external system, such as the agency's Security Information and Event Management (SIEM).
+- An Azure subscription may be required to send logs to an external system, such as the agency's Security Information and Event Management (SIEM).
 
 ### Implementation
 
-#### MS.AAD.4.1v1 instructions:
+#### MS.AAD.4.1v1 Instructions
 
-[Follow these instructions](https://learn.microsoft.com/en-us/azure/active-directory/reports-monitoring/quickstart-azure-monitor-route-logs-to-storage-account)
-to configure sending the logs to an Azure storage account:
-
-1.  From the **Diagnostic settings** page, click **Add diagnostic**
-    setting.
-
-2.  Select the specific logs mentioned in the previous policy section.
-
-3.  Under **Destination Details,** select the **Archive to a storage
-    account** check box and select the storage account
-    specifically created to host security logs.
-
-4.  In the **Retention** field enter “365” days.
+Follow the configuration instructions unique to the products and integration patterns at your organization to send the security logs to the security operations center for monitoring. 
 
 ## 5. Application Registration and Consent
 
