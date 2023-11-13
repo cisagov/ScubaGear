@@ -404,13 +404,14 @@ AssignedPlans := concat(", ", TenantConfig.AssignedPlan) if {
 }
 
 # What is the tenant type according to Get-CsTenant?
+default TenantType := false
 TenantType := true if {
     GCCConditions := [
         contains(AssignedPlans, "GCC"),
         contains(AssignedPlans, "DOD")
     ]
     count(FilterArray(GCCConditions, true)) > 0
-} else := false
+}
 
 
 ReportDetails4_1(true, _) := "N/A: Feature is unavailable in GCC environments" if {}
