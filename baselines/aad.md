@@ -161,12 +161,12 @@ Sign-ins detected as high risk SHALL be blocked.
 
 This section provides policies that help reduce security risks related to user authentication and registration.
 
-Per [OMB memorandum M-22-09](https://www.whitehouse.gov/wp-content/uploads/2022/01/M-22-09.pdf), MFA is required and it must be phishing-resistant. Since there may be gaps in enforcing phishing-resistant MFA for all users for various reasons, we provide additional backup security policies to mitigate the risks associated with lesser forms of MFA. One example of this is policy MS.AAD.3.2v1 below which enforces MFA but does not stipulate the specific MFA method. That said, phishing-resistant MFA is the overarching requirement.
+Phishing-resistant MFA is required per [Office of Management and Budget Memorandum 22-09](https://www.whitehouse.gov/wp-content/uploads/2022/01/M-22-09.pdf), but for a variety of reasons, implementing it for all users may be challenging. This section provides additional backup security policies to mitigate risk associated with lesser forms of MFA. For example, Policy MS.AAD.3.2v1 below enforces MFA without stipulating the specific MFA method.
 
 <img src="/images/aad-mfa.png"
-alt="Weak MFA (SMS/Voice) Stronger MFA (Push Notifications, Software OTP, Hardware Token OTP) Strongest MFA (FIDO2, PIV, Windows Hello)" />
+alt="Weak MFA methods are SMS and Voice. Stronger MFA are Authenticator Push Notifications, Authenticator Phone Sign-in, Software Tokens OTP, and Hardware Tokens OTP. Strongest MFA methods are FIDO2 (preferred), Windows Hello (preferred), Azure AD Certificate Based Authentication (preferred) and federated PIV card." />
 
-Figure 1: Depiction of MFA methods from weakest to strongest. _Adapted from [MS Build Page](https://learn.microsoft.com/en-us/azure/active-directory/authentication/concept-authentication-methods)_
+Figure 1: Depiction of MFA methods from weakest to strongest. _Adapted from [Microsoft Page](https://learn.microsoft.com/en-us/entra/identity/authentication/concept-authentication-methods)_
 
 ### Policies
 #### MS.AAD.3.1v1
@@ -174,21 +174,23 @@ Phishing-resistant MFA SHALL be enforced for all users.
 
 **Preferred phishing-resistant methods**
 
-The methods **AAD Certificate-Based Authentication (CBA)**, **FIDO2 Security Key** and **Windows Hello for Business** are the recommended options since they offer forms of MFA with the least weaknesses. AAD CBA supports Federal PIV cards when they authenticate directly to Azure AD.
+The methods **AAD Certificate-Based Authentication (CBA)**, **FIDO2 Security Key** and **Windows Hello for Business** are the recommended options since they offer forms of MFA with the least weaknesses. Azure AD CBA supports federal PIV cards when they authenticate directly to Azure AD.
 
 **Non-preferred phishing-resistant methods**
 
-The **Federal PIV card (federated from agency on-premises Active Directory Federation Services or other identity provider)** option, although technically phishing-resistant presents significant risks if the on-premises authentication infrastructure (e.g., Active Directory Federation Services) is compromised. Therefore, federated PIV is not a preferred option and agencies should migrate to the options listed in the preferred section above. If an agency does use an on-premises PIV authentication and federate to AAD, reference the [guidance at this link](https://playbooks.idmanagement.gov/piv/network/group/) to enforce PIV logon via AD group policy.
+The **Federal PIV card (federated from agency on-premises Active Directory Federation Services or other identity provider)** option is technically resistant to phishing, but it presents significant risks if the on-premises authentication infrastructure (e.g., AD Federation Service) is compromised. Therefore, federated PIV card is not a preferred option. Agencies should migrate away from the federal PIV card to the options listed above in the preferred phishing-resistant methods section.
+
+If on-premises PIV authentication and federation to Azure AD is used, [enforce PIV logon via AD group policy](https://www.idmanagement.gov/implement/scl-windows/).
 
 <!--Policy: MS.AAD.3.1v1; Criticality: SHALL -->
-- _Rationale:_ Allowing weaker forms of MFA does not protect against sophisticated phishing attacks. By enforcing methods resistant to phishing, those risks are minimized.
+- _Rationale:_ Weaker forms of MFA do not protect against sophisticated phishing attacks. By enforcing methods resistant to phishing, those risks are minimized.
 - _Last modified:_ June 2023
 
 #### MS.AAD.3.2v1
 If phishing-resistant MFA has not been enforced, an alternative MFA method SHALL be enforced for all users.
 
 <!--Policy: MS.AAD.3.2v1; Criticality: SHALL -->
-- _Rationale:_ This is a stopgap security policy to help protect the tenant if phishing-resistant MFA has not been enforced. This policy requires that MFA is enforced, thus reducing the risks of single form authentication.
+- _Rationale:_ This is a stopgap security policy to help protect the tenant if phishing-resistant MFA has not been enforced. This policy requires MFA enforcement, thus reducing single-form authentication risk.
 - _Last modified:_ June 2023
 - _Note:_ If a conditional access policy has been created enforcing phishing-resistant MFA, then this policy is not necessary. This policy does not dictate the specific MFA method.
 
@@ -196,22 +198,21 @@ If phishing-resistant MFA has not been enforced, an alternative MFA method SHALL
 If phishing-resistant MFA has not been enforced and Microsoft Authenticator is enabled, it SHALL be configured to show login context information.
 
 <!--Policy: MS.AAD.3.3v1; Criticality: SHALL -->
-- _Rationale:_ This is a stopgap security policy to help protect the tenant if phishing-resistant MFA has not been enforced and Microsoft Authenticator is being used. This policy helps improve the security of Microsoft Authenticator by showing the user context information, which helps reduce MFA phishing compromises.
+- _Rationale:_ This stopgap security policy helps protect the tenant when phishing-resistant MFA has not been enforced and Microsoft Authenticator is used. This policy helps improve the security of Microsoft Authenticator by showing user context information, which helps reduce MFA phishing compromises.
 - _Last modified:_ June 2023
 
 #### MS.AAD.3.4v1
 The Authentication Methods Manage Migration feature SHALL be set to Migration Complete.
 
 <!--Policy: MS.AAD.3.4v1; Criticality: SHALL -->
-- _Rationale:_ By configuring the Manage Migration feature to Migration Complete, we ensure the tenant has disabled the legacy authentication methods screen. The MFA and Self-Service Password Reset (SSPR) authentication methods are both managed from a central admin page, thereby reducing administrative complexity and
-the chances of security misconfigurations.
+- _Rationale:_ To ensure the tenant has disabled the legacy authentication methods screen configure the Manage Migration feature to Migration Complete. The MFA and Self-Service Password Reset (SSPR) authentication methods are both managed from a central admin page, thereby reducing administrative complexity and potential security misconfigurations.
 - _Last modified:_ June 2023
 
 #### MS.AAD.3.5v1
 The authentication methods SMS, Voice Call, and Email One-Time Passcode (OTP) SHALL be disabled.
 
 <!--Policy: MS.AAD.3.5v1; Criticality: SHALL -->
-- _Rationale:_ This policy helps reduce the possibility for users to  register and authenticate with the weakest authenticators, forcing users to use stronger MFA methods.
+- _Rationale:_ SMS, voice call, and email OTP are the weakest authenticators. This policy forces users to use stronger MFA methods.
 - _Last modified:_ June 2023
 - _Note:_ This policy is only applicable if the tenant has their Manage Migration feature set to Migration Complete.
 
@@ -227,39 +228,39 @@ Phishing-resistant MFA SHALL be required for highly privileged roles.
 Managed devices SHOULD be required for authentication.
 
 <!--Policy: MS.AAD.3.7v1; Criticality: SHOULD -->
-- _Rationale:_ The security risk of an adversary authenticating to the tenant from their own device is reduced by requiring a managed device to authenticate. Managed devices are under the provisioning and control of the agency. [OMB-22-09] (https://www.whitehouse.gov/wp-content/uploads/2022/01/M-22-09.pdf) specifically states, "When authorizing users to access resources, agencies must consider at least one device-level signal alongside identity information about the authenticated user."
+- _Rationale:_ The security risk of an adversary authenticating to the tenant from their own device is reduced by requiring a managed device to authenticate. Managed devices are under the provisioning and control of the agency. [OMB-22-09] (https://www.whitehouse.gov/wp-content/uploads/2022/01/M-22-09.pdf) states, "When authorizing users to access resources, agencies must consider at least one device-level signal alongside identity information about the authenticated user."
 - _Last modified:_ June 2023
 
 #### MS.AAD.3.8v1
 Managed Devices SHOULD be required to register MFA.
 
 <!--Policy: MS.AAD.3.8v1; Criticality: SHOULD -->
-- _Rationale:_ The security risk of an adversary using stolen user credentials and then registering their own MFA devices to access the tenant is reduced by requiring a managed device to perform registration actions. Thus, the adversary cannot perform the registration from their own unmanaged device, as managed devices are under the provisioning and control of the agency.
+- _Rationale:_ Reduce risk of an adversary using stolen user credentials and then registering their own MFA device to access the tenant by requiring a managed device provisioned and controlled by the agency to perform registration actions. This prevents the adversary from using their own unmanaged device to perform the registration.
 - _Last modified:_ June 2023
 
 ### Resources
 
-- [What authentication and verification methods are available in Azure Active Directory?](https://learn.microsoft.com/en-us/azure/active-directory/authentication/concept-authentication-methods)
+- [What authentication and verification methods are available in Microsoft Entra ID?](https://learn.microsoft.com/en-us/entra/identity/authentication/concept-authentication-methods)
 
-- [How to use additional context in Microsoft Authenticator notifications Authentication methods policy](https://learn.microsoft.com/en-us/azure/active-directory/authentication/how-to-mfa-additional-context#enable-additional-context-in-the-portal)
+- [How to use additional context in Microsoft Authenticator notifications - Authentication methods policy](https://learn.microsoft.com/en-us/entra/identity/authentication/how-to-mfa-additional-context#enable-additional-context-in-the-portal)
 
-- [M-22-09 Federal Zero Trust Strategy](https://www.whitehouse.gov/wp-content/uploads/2022/01/M-22-09.pdf)
+- [M-22-09 Federal Zero Trust Architecture Strategy](https://www.whitehouse.gov/wp-content/uploads/2022/01/M-22-09.pdf)
 
-- [Configure hybrid Azure AD join](https://learn.microsoft.com/en-us/azure/active-directory/devices/howto-hybrid-azure-ad-join)
+- [Configure Microsoft Entra hybrid join](https://learn.microsoft.com/en-us/entra/identity/devices/how-to-hybrid-join)
 
-- [Azure AD joined devices](https://learn.microsoft.com/en-us/azure/active-directory/devices/concept-azure-ad-join)
+- [Microsoft Entra joined devices](https://learn.microsoft.com/en-us/entra/identity/devices/concept-directory-join)
 
-- [Set up enrollment for Windows devices (for Intune)](https://learn.microsoft.com/en-us/mem/intune/enrollment/windows-enroll)
+- [Set up automatic enrollment for Windows devices (for Intune)](https://learn.microsoft.com/en-us/mem/intune/enrollment/windows-enroll)
 
 ### License Requirements
 
-- Microsoft Intune (if implementing the authentication policies for the device to be managed).
+- Policies related to managed devices require Microsoft Intune.
 
 ### Implementation
 
-#### MS.AAD.3.1v1 instructions:
+#### MS.AAD.3.1v1 Instructions
 
-1. Create a conditional access policy enforcing phishing-resistant MFA for all users.  Configure the following policy settings in the new conditional access policy, per the values below:
+1. Create a conditional access policy enforcing phishing-resistant MFA for all users. Configure the following policy settings in the new conditional access policy, per the values below:
 
 <pre>
   Users > Include > <b>All users</b>
@@ -269,9 +270,9 @@ Managed Devices SHOULD be required to register MFA.
   Access controls > Grant > Grant Access > Require authentication strength > <b>Phishing-resistant MFA</b>
 </pre>
 
-#### MS.AAD.3.2v1 instructions:
+#### MS.AAD.3.2v1 Instructions
 
-1. If phishing-resistant MFA has not been enforced for all users yet, create a conditional access policy that enforces MFA but does not dictate the MFA method.  Configure the following policy settings in the new conditional access policy as per the values below:
+1. If phishing-resistant MFA has not been enforced for all users yet, create a conditional access policy that enforces MFA but does not dictate MFA method. Configure the following policy settings in the new conditional access policy, per the values below:
 
 <pre>
   Users > Include > <b>All users</b>
@@ -281,8 +282,8 @@ Managed Devices SHOULD be required to register MFA.
   Access controls > Grant > Grant Access > <b>Require multifactor authentication</b>
 </pre>
 
-#### MS.AAD.3.3v1 instructions:
-If phishing-resistant MFA has not been deployed yet and Microsoft Authenticator is in use, configure Authenticator to display context information to users when they login.
+#### MS.AAD.3.3v1 Instructions
+If phishing-resistant MFA has not been deployed yet and Microsoft Authenticator is in use, configure Authenticator to display context information to users when they log in.
 
 1. In **Azure Active Directory**, click **Security > Authentication methods > Microsoft Authenticator**.
 2. Click the **Configure** tab.
@@ -292,15 +293,15 @@ If phishing-resistant MFA has not been deployed yet and Microsoft Authenticator 
 6. Select **Save**
 
 
-#### MS.AAD.3.4v1 instructions:
-1. Go through the process of migrating from the legacy AAD MFA and Self-Service Password Reset (SSPR) administration pages to the new unified Authentication Methods policy page. Follow [these instructions ](https://learn.microsoft.com/en-us/azure/active-directory/authentication/how-to-authentication-methods-manage).
-2. Once ready to finish the migration, follow [these instructions ](https://learn.microsoft.com/en-us/azure/active-directory/authentication/how-to-authentication-methods-manage#finish-the-migration) and set the **Manage Migration** option to **Migration Complete**.
+#### MS.AAD.3.4v1 Instructions
+1. Go through the process of [migrating from the legacy Azure AD MFA and Self-Service Password Reset (SSPR) administration pages to the new unified Authentication Methods policy page](https://learn.microsoft.com/en-us/entra/identity/authentication/how-to-authentication-methods-manage).
+2. Once ready to finish the migration, [set the **Manage Migration** option to **Migration Complete**](https://learn.microsoft.com/en-us/entra/identity/authentication/how-to-authentication-methods-manage#finish-the-migration).
 
-#### MS.AAD.3.5v1 instructions:
+#### MS.AAD.3.5v1 Instructions:
 1. In **Azure Active Directory**, click **Security > Authentication methods**
 2. Click on the **SMS**, **Voice Call**, and **Email OTP** authentication methods and disable each of them. Their statuses should be **Enabled > No** on the **Authentication methods > Policies** page.
 
-#### MS.AAD.3.6v1 instructions:
+#### MS.AAD.3.6v1 Instructions
 
 1. Create a conditional access policy enforcing phishing-resistant MFA for highly privileged roles.  Configure the following policy settings in the new conditional access policy, per the values below:
 
@@ -312,19 +313,19 @@ If phishing-resistant MFA has not been deployed yet and Microsoft Authenticator 
   Access controls > Grant > Grant Access > Require authentication strength > <b>Phishing-resistant MFA</b>
 </pre>
 
-#### MS.AAD.3.7v1 instructions:
+#### MS.AAD.3.7v1 Instructions
 
-1. Create a conditional access policy requiring a user's device to be either hybrid Azure AD joined or compliant during authentication. Configure the following policy settings in the new conditional access policy, per the values below:
+1. Create a conditional access policy requiring a user's device to be either Microsoft Entra hybrid joined or compliant during authentication. Configure the following policy settings in the new conditional access policy, per the values below:
 
 <pre>
   Users > Include > <b>All users</b>
 
   Target resources > Cloud apps > <b>All cloud apps</b>
 
-  Access controls > Grant > Grant Access > <b>Require device to be marked as compliant</b> and <b>Require Hybrid Azure AD joined device</b> > For multiple controls > <b>Require one of the selected controls</b>
+  Access controls > Grant > Grant Access > <b>Require device to be marked as compliant</b> and <b>Require Microsoft Entra hybrid joined device</b> > For multiple controls > <b>Require one of the selected controls</b>
 </pre>
 
-#### MS.AAD.3.8v1 instructions:
+#### MS.AAD.3.8v1 Instructions
 
 1. Create a conditional access policy requiring a user to be on a managed device when registering for MFA. Configure the following policy settings in the new conditional access policy, per the values below:
 
@@ -333,7 +334,7 @@ If phishing-resistant MFA has not been deployed yet and Microsoft Authenticator 
 
   Target resources > User actions > <b>Register security information</b>
 
-  Access controls > Grant > Grant Access > <b>Require device to be marked as compliant</b> and <b>Require Hybrid Azure AD joined device</b> > For multiple controls > <b>Require one of the selected controls</b>
+  Access controls > Grant > Grant Access > <b>Require device to be marked as compliant</b> and <b>Require Microsoft Entra hybrid joined device</b> > For multiple controls > <b>Require one of the selected controls</b>
 </pre>
 
 ## 4. Centralized Log Collection
