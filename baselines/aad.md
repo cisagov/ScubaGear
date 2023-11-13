@@ -371,21 +371,21 @@ Follow the configuration instructions unique to the products and integration pat
 
 ## 5. Application Registration and Consent
 
-This section provides policies that help reduce security risks related to non-privileged users adding malicious applications or service principals to the tenant. Malicious applications can perform many of the same operations as interactive users and can access data "on behalf of" compromised users. These policies apply to custom-developed applications and applications published by third-party vendors.
+This section provides policies that help reduce security risk of malicious applications or service principals added to the tenant by non-privileged users. Malicious applications can perform many of the same operations as interactive users and can access data on behalf of compromised users. These policies apply to custom-developed applications and applications published by third-party vendors.
 
 ### Policies
 #### MS.AAD.5.1v1
 Only administrators SHALL be allowed to register applications.
 
 <!--Policy: MS.AAD.5.1v1; Criticality: SHALL -->
-- _Rationale:_ Application access to the tenant presents a heightened security risk compared to interactive user access, because applications are typically not subject to critical security protections such as MFA policies and others. Ensuring only specific privileged users can register applications reduces the risks of unauthorized users installing malicious applications into the tenant.
+- _Rationale:_ Application access for the tenant presents a heightened security risk compared to interactive user access because applications are typically not subject to critical security protections, such as MFA policies. Reduce risk of unauthorized users installing malicious applications into the tenant by ensuring that only specific privileged users can register applications.
 - _Last modified:_ June 2023
 
 #### MS.AAD.5.2v1
 Only administrators SHALL be allowed to consent to applications.
 
 <!--Policy: MS.AAD.5.2v1; Criticality: SHALL -->
-- _Rationale:_ Ensuring only specific privileged users can consent to applications reduces the risks of users giving insecure applications access to their data via [consent grant attacks](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/detect-and-remediate-illicit-consent-grants?view=o365-worldwide).
+- _Rationale:_ Limiting applications consent to only specific privileged users reduces risk of users giving insecure applications access to their data via [consent grant attacks](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/detect-and-remediate-illicit-consent-grants?view=o365-worldwide).
 - _Last modified:_ June 2023
 
 #### MS.AAD.5.3v1
@@ -399,19 +399,16 @@ An admin consent workflow SHALL be configured for applications.
 Group owners SHALL NOT be allowed to consent to applications.
 
 <!--Policy: MS.AAD.5.4v1; Criticality: SHALL -->
-- _Rationale:_ In M365 group and team owners can consent to applications accessing data in the tenant. By requiring consent requests to go through an approval consent workflow, the risks of exposure to malicious applications is reduced.
+- _Rationale:_ In M365, group owners and team owners can consent to applications accessing data in the tenant. By requiring consent requests to go through an approval workflow, risk of exposure to malicious applications is reduced.
 - _Last modified:_ June 2023
 
 ### Resources
 
-- [Restrict Application Registration for Non-Privileged
-  Users](https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/ActiveDirectory/users-can-register-applications.html)
+- [Restrict Application Registration for Non-Privileged Users](https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/ActiveDirectory/users-can-register-applications.html)
 
-- [Enforce Administrators to Provide Consent for Apps Before
-  Use](https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/ActiveDirectory/users-can-consent-to-apps-accessing-company-data-on-their-behalf.html)
+- [Enforce Administrators to Provide Consent for Apps Before Use](https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/ActiveDirectory/users-can-consent-to-apps-accessing-company-data-on-their-behalf.html)
 
-- [Configure the admin consent
-  workflow](https://learn.microsoft.com/en-us/azure/active-directory/manage-apps/configure-admin-consent-workflow)
+- [Configure the admin consent workflow](https://learn.microsoft.com/en-us/entra/identity/enterprise-apps/configure-admin-consent-workflow)
 
 ### License Requirements
 
@@ -419,7 +416,7 @@ Group owners SHALL NOT be allowed to consent to applications.
 
 ### Implementation
 
-#### MS.AAD.5.1v1 instructions:
+#### MS.AAD.5.1v1 Instructions
 
 1.  In **Azure Active Directory**, under **Manage**, select **Users**.
 
@@ -429,7 +426,7 @@ Group owners SHALL NOT be allowed to consent to applications.
 
 4. Click **Save**.
 
-#### MS.AAD.5.2v1 instructions:
+#### MS.AAD.5.2v1 Instructions
 
 1.  In **Azure Active Directory** under **Manage**, select **Enterprise Applications.**
 
@@ -439,9 +436,9 @@ Group owners SHALL NOT be allowed to consent to applications.
 
 4. Click **Save**.
 
-#### MS.AAD.5.3v1 instructions:
+#### MS.AAD.5.3v1 Instructions
 
-1.  In **Azure Active Directory** create a new Azure AD Group that contains admin users responsible for reviewing and adjudicating application consent requests. Users in this group will be notified when users request consent for new applications.
+1.  In **Azure Active Directory** create a new Azure AD Group that contains admin users responsible for reviewing and adjudicating application consent requests. Group members will be notified when users request consent for new applications.
 
 2. Then in **Azure Active Directory** under **Manage**, select **Enterprise Applications.**
 
@@ -449,11 +446,11 @@ Group owners SHALL NOT be allowed to consent to applications.
 
 4. Under **Admin consent requests** > **Users can request admin consent to apps they are unable to consent to** select **Yes**.
 
-5. Under **Who can review admin consent requests**, select the group created in step 1 responsible for reviewing and adjudicating app requests.
+5. Under **Who can review admin consent requests**, select the group responsible for reviewing and adjudicating app requests (created in step one above).
 
 6. Click **Save**.
 
-#### MS.AAD.5.4v1 instructions:
+#### MS.AAD.5.4v1 Instructions
 
 1.  In **Azure Active Directory** under **Manage**, select **Enterprise Applications.**
 
