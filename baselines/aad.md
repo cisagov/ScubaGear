@@ -1,6 +1,6 @@
 # CISA M365 Security Configuration Baseline for Azure Active Directory
 
-Azure Active Directory (AAD) is a cloud-based identity and access control service that provides security and functional capabilities to Microsoft 365. This Secure Configuration Baseline (SCB) provides specific policies to help secure AAD.
+Azure Active Directory (Azure AD) is a cloud-based identity and access control service that provides security and functional capabilities to Microsoft 365. This Secure Configuration Baseline (SCB) provides specific policies to help secure Azure AD.
 
 The Secure Cloud Business Applications (SCuBA) project run by the Cybersecurity and Infrastructure Security Agency (CISA) provides guidance and capabilities to secure federal civilian executive branch (FCEB) agencies’ cloud business application environments and protect federal information that is created, accessed, shared, and stored in those environments.
 
@@ -14,7 +14,7 @@ Portions of this document are adapted from documents in Microsoft’s [Microsoft
 ## Assumptions
 The **License Requirements** sections of this document assume the organization is using an [M365 E3](https://www.microsoft.com/en-us/microsoft-365/compare-microsoft-365-enterprise-plans) or [G3](https://www.microsoft.com/en-us/microsoft-365/government) license level at a minimum. Therefore, only licenses not included in E3/G3 are listed.
 
-Some of the policies in this baseline may link to Microsoft instruction pages which assume that an agency has created emergency access accounts in AAD and [implemented strong security measures](https://learn.microsoft.com/en-us/azure/active-directory/roles/security-emergency-access#create-emergency-access-accounts) to protect the credentials of those accounts.
+Some of the policies in this baseline may link to Microsoft instruction pages which assume that an agency has created emergency access accounts in Azure AD and [implemented strong security measures](https://learn.microsoft.com/en-us/azure/active-directory/roles/security-emergency-access#create-emergency-access-accounts) to protect the credentials of those accounts.
 
 ## Key Terminology
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [RFC 2119](https://datatracker.ietf.org/doc/html/rfc2119).
@@ -30,7 +30,7 @@ master user directory but federates access to the cloud Microsoft 365
 
 ## Highly Privileged Roles
 
-This section provides a list of what CISA considers highly privileged [built-in roles in Azure Active Directory](https://learn.microsoft.com/en-us/azure/active-directory/roles/permissions-reference). This list is referenced in numerous baseline policies throughout this document. Agencies should consider this reference as a minimum list and can apply the respective baseline policies to additional AAD roles as necessary.
+This section provides a list of what CISA considers highly privileged [built-in roles in Azure Active Directory](https://learn.microsoft.com/en-us/azure/active-directory/roles/permissions-reference). This list is referenced in numerous baseline policies throughout this document. Agencies should consider this reference as a minimum list and can apply the respective baseline policies to additional Azure AD roles as necessary.
 
 - Global Administrator
 - Privileged Role Administrator
@@ -43,7 +43,7 @@ This section provides a list of what CISA considers highly privileged [built-in 
 
 ## Conditional Access Policies
 
-Numerous policies in this baseline rely on AAD Conditional Access. Conditional Access is a feature that allows administrators to limit access to resources using conditions such as user or group membership, device, IP location, and real-time risk detection. This section provides guidance and tools when implementing baseline policies which rely on AAD Conditional Access.
+Numerous policies in this baseline rely on Azure AD Conditional Access. Conditional Access is a feature that allows administrators to limit access to resources using conditions such as user or group membership, device, IP location, and real-time risk detection. This section provides guidance and tools when implementing baseline policies which rely on Azure AD Conditional Access.
 
 As described in Microsoft’s literature related to conditional access policies, CISA recommends initially setting a policy to
 **Report-only** when it is created and then performing thorough hands-on
@@ -176,7 +176,7 @@ Phishing-resistant MFA SHALL be enforced for all users.
 
 **Preferred phishing-resistant methods**
 
-The methods **AAD Certificate-Based Authentication (CBA)**, **FIDO2 Security Key** and **Windows Hello for Business** are the recommended options since they offer forms of MFA with the least weaknesses. Azure AD CBA supports federal PIV cards when they authenticate directly to Azure AD.
+The methods **Azure AD Certificate-Based Authentication (CBA)**, **FIDO2 Security Key** and **Windows Hello for Business** are the recommended options since they offer forms of MFA with the least weaknesses. Azure AD CBA supports federal PIV cards when they authenticate directly to Azure AD.
 
 **Non-preferred phishing-resistant methods**
 
@@ -619,7 +619,7 @@ Performing a manual review of highly privileged users per the instructions below
 
 3. Select the **Global administrator role.**
 
-4. Under **Manage**, select **Assignments.** If you have AAD PIM, repeat the steps below for both the **Eligible** and the **Active** assignments. If a group is listed, you will need to determine the members of the group and perform the steps for each group member.
+4. Under **Manage**, select **Assignments.** If you have Azure AD PIM, repeat the steps below for both the **Eligible** and the **Active** assignments. If a group is listed, you will need to determine the members of the group and perform the steps for each group member.
 
 5. For each highly privileged user, execute the Powershell code below but replace the `username@somedomain.com` with the principal name of the user who is specific to your environment. You can get the data value from the **Principal name** field displayed in the Azure Active Directory portal.
 
@@ -628,7 +628,7 @@ Performing a manual review of highly privileged users per the instructions below
     Get-MgBetaUser -Filter "userPrincipalName eq 'username@somedomain.com'" | FL
     ```
 
-6. Review the output field named **OnPremisesImmutableId**. If this field has a data value, it means that this specific user is not cloud-only. If the user is not cloud-only, create a cloud-only account for that user, assign the user to their respective roles and then remove the account that is not cloud-only from AAD.
+6. Review the output field named **OnPremisesImmutableId**. If this field has a data value, it means that this specific user is not cloud-only. If the user is not cloud-only, create a cloud-only account for that user, assign the user to their respective roles and then remove the account that is not cloud-only from Azure AD.
 
 #### MS.AAD.7.4v1 instructions:
 
@@ -648,9 +648,9 @@ Performing a manual review of highly privileged users per the instructions below
 
 3. Select the **Global administrator role.**
 
-4. Under **Manage**, select **Assignments.** Repeat the steps below for both the **Eligible** and the **Active** AAD PIM assignments.
+4. Under **Manage**, select **Assignments.** Repeat the steps below for both the **Eligible** and the **Active** Azure AD PIM assignments.
 
-5. For each user or group listed, examine the value in the **Start time** column. If it contains a value of **-**, this indicates the respective user/group was assigned to that role outside of AAD PIM. If the role was assigned outside of Azure AD PIM, delete the assignment and recreate it using Azure AD PIM.
+5. For each user or group listed, examine the value in the **Start time** column. If it contains a value of **-**, this indicates the respective user/group was assigned to that role outside of Azure AD PIM. If the role was assigned outside of Azure AD PIM, delete the assignment and recreate it using Azure AD PIM.
 
 
 #### MS.AAD.7.6v1 instructions:
@@ -661,7 +661,7 @@ Performing a manual review of highly privileged users per the instructions below
 
 3. Assign the users responsible for reviewing approval requests to the new **Privileged Escalation Approvers** group via the [PIM for Groups feature](https://learn.microsoft.com/en-us/entra/id-governance/privileged-identity-management/concept-pim-for-groups).
 
-4. In **AAD Privileged Identity Management (PIM)**, under **Manage**, select **Azure AD roles**.
+4. In **Azure AD Privileged Identity Management (PIM)**, under **Manage**, select **Azure AD roles**.
 
 5. Under **Manage**, select **Roles**.
 
@@ -674,7 +674,7 @@ Performing a manual review of highly privileged users per the instructions below
 
 #### MS.AAD.7.7v1 instructions:
 
-1.  In **AAD Privileged Identity Management (PIM)**, under **Manage**, select **Azure AD roles.**
+1.  In **Azure AD Privileged Identity Management (PIM)**, under **Manage**, select **Azure AD roles.**
 
 2. Under **Manage**, select **Roles**. Perform the steps below for each highly privileged role. We reference the Global Administrator role as an example.
 
@@ -692,7 +692,7 @@ Performing a manual review of highly privileged users per the instructions below
 
 #### MS.AAD.7.8v1 instructions:
 
-1. In **AAD Privileged Identity Management (PIM)**, under **Manage**, select **Azure AD roles.**
+1. In **Azure AD Privileged Identity Management (PIM)**, under **Manage**, select **Azure AD roles.**
 
 2. Under **Manage**, select **Roles**.
 
