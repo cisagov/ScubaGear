@@ -1,3 +1,4 @@
+**`TLP:CLEAR`**
 # CISA M365 Security Configuration Baseline for Teams
 
 Microsoft Teams is a cloud-based text and live chat workspace in Microsoft 365 (M365) that supports video calls, chat messaging, screen sharing, and file sharing. This secure configuration baseline (SCB) provides specific policies to strengthen Microsoft Teams' security.
@@ -7,6 +8,8 @@ The Secure Cloud Business Applications (SCuBA) project run by the Cybersecurity 
 The CISA SCuBA SCBs for M365 help secure federal information assets stored within M365 cloud business application environments through consistent, effective, and manageable security configurations. CISA created baselines tailored to the federal government’s threats and risk tolerance with the knowledge that every organization has different threat models and risk tolerance. Non-governmental organizations may also find value in applying these baselines to reduce risks.
 
 The information in this document is provided “as is” for INFORMATIONAL PURPOSES ONLY. CISA does not endorse any commercial product or service, including any subjects of analysis. Any reference to specific commercial entities or commercial products, processes, or services by service mark, trademark, manufacturer, or otherwise does not constitute or imply endorsement, recommendation, or favoritism by CISA.
+
+> This document is marked TLP:CLEAR. Recipients may share this information without restriction. Information is subject to standard copyright rules. For more information on the Traffic Light Protocol, see https://www.cisa.gov/tlp.
 
 ## License Compliance and Copyright 
 Portions of this document are adapted from documents in Microsoft’s [M365](https://github.com/MicrosoftDocs/microsoft-365-docs/blob/public/LICENSE) and [
@@ -760,3 +763,5 @@ record meetings:
 7.  Assign the users who need the ability to record to this policy.
 
 8.  Select **Apply**.
+
+**`TLP:CLEAR`**
