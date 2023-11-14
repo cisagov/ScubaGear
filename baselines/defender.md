@@ -25,14 +25,14 @@ trust principles.
 
 The Secure Cloud Business Applications (SCuBA) project run by the Cybersecurity
 and Infrastructure Security Agency (CISA) provides guidance and capabilities to
-secure federal civilian executive branch (FCEB) agencies’ cloud business
+secure federal civilian executive branch (FCEB) agencies' cloud business
 application environments and protect federal information that is created,
 accessed, shared, and stored in those environments.
 
 The CISA SCuBA SCBs for M365 help secure federal information assets stored within
 M365 cloud business application environments through consistent, effective, and
 manageable security configurations. CISA created baselines tailored to the federal
-government’s threats and risk tolerance with the knowledge that every organization
+government's threats and risk tolerance with the knowledge that every organization
 has different threat models and risk tolerance. Non-governmental organizations may
 also find value in applying these baselines to reduce risks.
 
@@ -46,7 +46,7 @@ by CISA.
 > This document is marked TLP:CLEAR. Recipients may share this information without restriction. Information is subject to standard copyright rules. For more information on the Traffic Light Protocol, see https://www.cisa.gov/tlp.
 
 ## License Compliance and Copyright
-Portions of this document are adapted from documents in Microsoft’s [M365](https://github.com/MicrosoftDocs/microsoft-365-docs/blob/public/LICENSE) and [Azure](https://github.com/MicrosoftDocs/azure-docs/blob/main/LICENSE) GitHub repositories. The respective documents are subject to copyright and are adapted under the terms of the Creative Commons Attribution 4.0 International license. Sources are linked throughout this document. The United States government has adapted selections of these documents to develop innovative and scalable configuration standards to strengthen the security of widely used cloud-based software services.
+Portions of this document are adapted from documents in Microsoft's [M365](https://github.com/MicrosoftDocs/microsoft-365-docs/blob/public/LICENSE) and [Azure](https://github.com/MicrosoftDocs/azure-docs/blob/main/LICENSE) GitHub repositories. The respective documents are subject to copyright and are adapted under the terms of the Creative Commons Attribution 4.0 International license. Sources are linked throughout this document. The United States government has adapted selections of these documents to develop innovative and scalable configuration standards to strengthen the security of widely used cloud-based software services.
 
 ## Assumptions
 The agency has identified a set of user accounts that are considered sensitive accounts.  See [Key Terminology](#key-terminology) for a detailed description of sensitive accounts.
@@ -370,7 +370,7 @@ Learn](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-secur
 
 There are several approaches to securing sensitive information, such
 as warning users, encryption, or blocking attempts to share. The
-agency’s data loss prevention (DLP) policy dictates what agency
+agency's data loss prevention (DLP) policy dictates what agency
 information is sensitive, such as personally identifiable information
 (PII), and how that information is handled. Defender can detect
 sensitive information and associates a default confidence level with
@@ -715,7 +715,7 @@ By default, Microsoft retains the audit logs for 180 days. Activity
 by users with E5 licenses is logged for one year.
 
 However, in accordance with Office of Management and Budget (OMB) Memorandum
-21-31, _Improving the Federal Government’s Investigative and Remediation
+21-31, _Improving the Federal Government's Investigative and Remediation
 Capabilities Related to Cybersecurity Incidents_, M365 audit logs are to be
 retained for at least 12 months in active storage and an additional 18 months
 in cold storage. This can be accomplished either by offloading the logs out of
@@ -762,7 +762,7 @@ Audit logs SHALL be maintained for at least the minimum duration dictated by OMB
 
 ### Resources
 
-- [OMB M-21-31, Improving the Federal Government’s Investigative and Remediation Capabilities
+- [OMB M-21-31, Improving the Federal Government's Investigative and Remediation Capabilities
 Related to Cybersecurity Incidents \| Office of Management and
   Budget](https://www.whitehouse.gov/wp-content/uploads/2021/08/M-21-31-Improving-the-Federal-Governments-Investigative-and-Remediation-Capabilities-Related-to-Cybersecurity-Incidents.pdf)
 
@@ -824,9 +824,9 @@ In addition to acknowledging the important contributions of a diverse
 team of Cybersecurity and Infrastructure Security Agency (CISA) experts,
 CISA thanks the following federal agencies and private sector
 organizations that provided input during the development of the Secure
-Cloud Business Application’s security configuration baselines in
+Cloud Business Application's security configuration baselines in
 response to Section 3 of [Executive Order 14028, *Improving the
-Nation’s
+Nation's
 Cybersecurity*](https://www.federalregister.gov/documents/2021/05/17/2021-10460/improving-the-nations-cybersecurity):
 
 - The MITRE Corporation
