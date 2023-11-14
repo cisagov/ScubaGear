@@ -1,4 +1,5 @@
 **`TLP:CLEAR`**
+
 # CISA M365 Security Configuration Baseline for Exchange Online
 
 Microsoft Exchange Online gives users easy access to their email and supports organizational meetings, contacts, and calendars. This Secure Configuration Baseline (SCB) provides specific policies to strengthen Exchange Online security.
@@ -23,13 +24,12 @@ The information in this document is provided “as is” for INFORMATIONAL PURPO
 ## License Compliance and Copyright
 
 Portions of this document are adapted from documents in Microsoft’s
-[Microsoft
-365](https://github.com/MicrosoftDocs/microsoft-365-docs/blob/public/LICENSE)
+[M365](https://github.com/MicrosoftDocs/microsoft-365-docs/blob/public/LICENSE)
 and
 [Azure](https://github.com/MicrosoftDocs/azure-docs/blob/main/LICENSE)
 GitHub repositories. The respective documents are subject to copyright
 and are adapted under the terms of the Creative Commons Attribution 4.0
-International license. Source documents are linked throughout this
+International license. Sources are linked throughout this
 document. The United States government has adapted selections of these
 documents to develop innovative and scalable configuration standards to
 strengthen the security of widely used cloud-based software services.
@@ -82,7 +82,7 @@ internal forwarding.
 
 ### Implementation
 
-#### MS.EXO.1.1v1 Instructions:
+#### MS.EXO.1.1v1 Instructions
 To disallow automatic forwarding to external domains:
 
 1.  Sign in to the **Exchange admin center**.
@@ -149,12 +149,12 @@ agency, facilitating phishing attacks. Publishing an SPF policy for each agency 
 
 ### Implementation
 
-#### MS.EXO.2.1v1 Instructions:
+#### MS.EXO.2.1v1 Instructions
 Identify any approved senders specific to your agency.
 Additionally, see [External DNS records required for SPF](https://learn.microsoft.com/en-us/microsoft-365/enterprise/external-domain-name-system-records?view=o365-worldwide#external-dns-records-required-for-spf) for
 inclusions required for Microsoft to send email on behalf of your domain.
 
-#### MS.EXO.2.2v1 Instructions:
+#### MS.EXO.2.2v1 Instructions
 SPF is not configured through the Exchange admin center, but rather via
 DNS records hosted by the agency’s domain. Thus, the exact steps needed
 to set up SPF varies from agency to agency. See [Add or edit an SPF TXT record to help prevent email spam (Outlook, Exchange Online) \| Microsoft Learn](https://learn.microsoft.com/en-us/microsoft-365/admin/get-help-with-domains/create-dns-records-at-any-dns-hosting-provider?view=o365-worldwide#add-or-edit-an-spf-txt-record-to-help-prevent-email-spam-outlook-exchange-online) for more details.
@@ -222,7 +222,7 @@ recipients to detect spoofed emails and verify the integrity of email content.
 
 ### Implementation
 
-#### MS.EXO.3.1v1 Instructions:
+#### MS.EXO.3.1v1 Instructions
 1. To enable DKIM, follow the instructions listed on [Steps to Create,
 enable and disable DKIM from Microsoft 365 Defender portal \| Microsoft
 Learn](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/email-authentication-dkim-configure?view=o365-worldwide#steps-to-create-enable-and-disable-dkim-from-microsoft-365-defender-portal).
@@ -299,7 +299,7 @@ to spoof their domains.
 
 ### Implementation
 
-#### MS.EXO.4.1v1 Instructions::
+#### MS.EXO.4.1v1 Instructions:
 DMARC is not configured through the Exchange admin center, but rather via
 DNS records hosted by the agency’s domain. As such, implementation varies
 depending on how an agency manages its DNS records. See [Form the DMARC TXT record for your domain \| Microsoft
@@ -326,14 +326,14 @@ SPF/DKIM checks are to be rejected and aggregate reports sent to
 reports@dmarc.cyber.dhs.gov and reports@example.com. Failure reports will be
 sent to reports@example.com.
 
-#### MS.EXO.4.2v1 Instructions::
+#### MS.EXO.4.2v1 Instructions:
 See [MS.EXO.4.1v1 instructions](#msexo41v1-instructions) for an overview of how to publish and check a DMARC record. Ensure the record published includes `p=reject`.
 
-#### MS.EXO.4.3v1 Instructions::
+#### MS.EXO.4.3v1 Instructions:
 See [MS.EXO.4.1v1 instructions](#msexo41v1-instructions) for an overview of how to publish and check a DMARC record. Ensure the record published includes <reports@dmarc.cyber.dhs.gov>
 as one of the emails for the RUA field.
 
-#### MS.EXO.4.4v1 Instructions::
+#### MS.EXO.4.4v1 Instructions:
 See [MS.EXO.4.1v1 instructions](#msexo41v1-instructions) for an overview of how to publish and check a DMARC record. Ensure the record published includes:
 - A point of contact specific to your agency in the RUA field.
 - <reports@dmarc.cyber.dhs.gov> as one of the emails in the RUA field.
@@ -379,7 +379,7 @@ per-mailbox basis when necessary.
 
 ### Implementation
 
-#### MS.EXO.5.1v1 Instructions::
+#### MS.EXO.5.1v1 Instructions:
 
 To disable SMTP AUTH for the organization:
 
@@ -442,7 +442,7 @@ for legitimate use as needed.
 
 ### Implementation
 
-#### MS.EXO.6.1v1 Instructions::
+#### MS.EXO.6.1v1 Instructions:
 To restrict sharing with all domains:
 
 1. Sign in to the **Exchange admin center**.
@@ -455,7 +455,7 @@ To restrict sharing with all domains:
 
 5. For all sharing rules under all existing policies, ensure **Sharing with all domains** is not selected.
 
-#### MS.EXO.6.2v1 Instructions:
+#### MS.EXO.6.2v1 Instructions
 
 To restrict sharing calendar details with all domains:
 
@@ -494,7 +494,7 @@ External sender warnings SHALL be implemented.
 
 ### Implementation
 
-#### MS.EXO.7.1v1 Instructions:
+#### MS.EXO.7.1v1 Instructions
 To create a mail flow rule to produce external sender warnings:
 
 1.  Sign in to the **Exchange admin center**.
@@ -634,21 +634,21 @@ organization, to be made in accordance with their risk tolerance.
 
 ### Implementation
 
-#### MS.EXO.9.1v1 Instructions:
+#### MS.EXO.9.1v1 Instructions
 Any product meeting the requirements outlined in this baseline policy may be
 used. If the agency uses Microsoft Defender, see the following
 implementation steps for
 [enabling preset security policies](./defender.md#implementation), which
 include email filtering based on attachment file type.
 
-#### MS.EXO.9.2v1 Instructions:
+#### MS.EXO.9.2v1 Instructions
 Any product meeting the requirements outlined in this baseline policy may be
 used. If the agency uses Microsoft Defender, see the following
 implementation steps for
 [enabling preset security policies](./defender.md#implementation), which
 attempt to determine the true file type and assess the file extension.
 
-#### MS.EXO.9.3v1 Instructions:
+#### MS.EXO.9.3v1 Instructions
 Any product meeting the requirements outlined in this baseline policy may be
 used. If the agency uses Microsoft Defender, see the following
 implementation steps for
@@ -711,21 +711,21 @@ Email scanning SHALL be capable of reviewing emails after delivery.
 
 ### Implementation
 
-#### MS.EXO.10.1v1 Instructions:
+#### MS.EXO.10.1v1 Instructions
 Any product meeting the requirements outlined in this baseline policy may be
 used. If the agency uses Microsoft Defender, see the following
 implementation steps for
 [enabling preset security policies](./defender.md#implementation), which
 include anti-malware protection.
 
-#### MS.EXO.10.2v1 Instructions:
+#### MS.EXO.10.2v1 Instructions
 Any product meeting the requirements outlined in this baseline policy may be
 used. If the agency uses Microsoft Defender, see the following
 implementation steps for
 [enabling preset security policies](./defender.md#implementation), which
 include anti-malware protection to quarantine malware in email.
 
-#### MS.EXO.10.3v1 Instructions:
+#### MS.EXO.10.3v1 Instructions
 Any product meeting the requirements outlined in this baseline policy may be
 used. If the agency uses Microsoft Defender, see the following
 implementation steps for
@@ -803,20 +803,20 @@ The phishing protection solution SHOULD include an AI-based phishing detection t
 
 ### Implementation
 
-#### MS.EXO.11.1v1 Instructions:
+#### MS.EXO.11.1v1 Instructions
 Any product meeting the requirements outlined in this baseline policy may be
 used. If the agency uses Microsoft Defender, see the following
 implementation steps for
 [enabling impersonation protection](./defender.md#msdefender21v1-instructions).
 
-#### MS.EXO.11.2v1 Instructions:
+#### MS.EXO.11.2v1 Instructions
 Any product meeting the requirements outlined in this baseline policy may be
 used. If the agency uses Microsoft Defender, see the following
 implementation steps for
 [enabling preset security policies](./defender.md#msdefender12v1) which
 include user safety tips to warn users.
 
-#### MS.EXO.11.3v1 Instructions:
+#### MS.EXO.11.3v1 Instructions
 Any product meeting the requirements outlined in this baseline policy may be
 used. If the agency uses Microsoft Defender, see the following
 implementation steps for
@@ -876,7 +876,7 @@ specific senders.
 
 ### Implementation
 
-#### MS.EXO.12.1v1 Instructions:
+#### MS.EXO.12.1v1 Instructions
 To modify the connection filters, follow the instructions found in [Use
 the Microsoft 365 Defender portal to modify the default connection
 filter
@@ -899,7 +899,7 @@ policy](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-secu
 
 8. Ensure **Turn on safe list** is not selected.
 
-#### MS.EXO.12.2v1 Instructions:
+#### MS.EXO.12.2v1 Instructions
 
 1. Sign in to **Microsoft 365 Defender portal**.
 
@@ -953,7 +953,7 @@ Mailbox auditing SHALL be enabled.
 
 ### Implementation
 
-#### MS.EXO.13.1v1 Instructions:
+#### MS.EXO.13.1v1 Instructions
 
 Mailbox auditing can be managed from the Exchange Online PowerShell.
 Follow the instructions listed on [Manage mailbox auditing in Office
@@ -1031,7 +1031,7 @@ potentially unknown users to bypass spam protections.
 
 ### Implementation
 
-#### MS.EXO.14.1v1 Instructions:
+#### MS.EXO.14.1v1 Instructions
 
 Any product meeting the requirements outlined in this baseline policy may be
 used. If the agency uses Microsoft Defender, see the following
@@ -1039,7 +1039,7 @@ implementation steps for
 [enabling preset security policies](./defender.md#msdefender12v1), which
 include spam filtering.
 
-#### MS.EXO.14.2v1 Instructions:
+#### MS.EXO.14.2v1 Instructions
 
 Any product meeting the requirements outlined in this baseline policy may be
 used. If the agency uses Microsoft Defender, see the following
@@ -1048,7 +1048,7 @@ implementation steps for
 include spam filtering that moves high confidence spam to either the junk
  or quarantine folder.
 
-#### MS.EXO.14.3v1 Instructions:
+#### MS.EXO.14.3v1 Instructions
 
 Any product meeting the requirements outlined in this baseline policy may be
 used. If the agency uses Microsoft Defender, see the following
@@ -1060,7 +1060,7 @@ include any allowed sender domains by default.
 
 Several technologies exist for protecting users from malicious links
 included in emails. For example, Microsoft Defender accomplishes this by
-prepending
+prepending:
 
 `https://*.safelinks.protection.outlook.com/?url=`
 
@@ -1120,7 +1120,7 @@ User click tracking SHOULD be enabled.
 
 ### Implementation
 
-#### MS.EXO.15.1v1 Instructions:
+#### MS.EXO.15.1v1 Instructions
 
 Any product meeting the requirements outlined in this baseline policy may be
 used. If the agency uses Microsoft Defender for Office 365, see the following
@@ -1129,7 +1129,7 @@ implementation steps for
 include Safe Links protections to scan URLs in email messages against a list
 of known, malicious links.
 
-#### MS.EXO.15.2v1 Instructions:
+#### MS.EXO.15.2v1 Instructions
 
 Any product meeting the requirements outlined in this baseline policy may be
 used. If the agency uses Microsoft Defender for Office 365, see the following
@@ -1137,7 +1137,7 @@ implementation steps for
 [enabling preset security policies](./defender.md#msdefender13v1), which
 include Safe Links protections to scan links to files for malware.
 
-#### MS.EXO.15.3v1 Instructions:
+#### MS.EXO.15.3v1 Instructions
 
 Any product meeting the requirements outlined in this baseline policy may be
 used. If the agency uses Microsoft Defender for Office 365, see the following
@@ -1194,9 +1194,9 @@ The alerts SHOULD be sent to a monitored address or incorporated into a security
 
 <!--Policy: MS.EXO.16.2v1; Criticality: SHOULD -->
 - _Rationale:_ Suspicious or malicious events, if not resolved promptly, may
-  have a greater impact to users and the agency.  Sending alerts to a
-  monitored email address or security information and event management (SIEM)
-  system helps ensure it is acted upon in a timely manner to limit overall
+  have a greater impact to users and the agency. Sending alerts to a
+  monitored email address or SIEM system helps ensure these suspicious or
+  malicious events are acted upon in a timely manner to limit overall
   impact.
 - _Last modified:_ June 2023
 
@@ -1210,14 +1210,14 @@ The alerts SHOULD be sent to a monitored address or incorporated into a security
 
 ### Implementation
 
-#### MS.EXO.16.1v1 Instructions:
+#### MS.EXO.16.1v1 Instructions
 
 Any product meeting the requirements outlined in this baseline policy may be
 used. If the agency uses Microsoft 365 alert policies, see the following implementation steps for
 [enabling alerts](./defender.md#msdefender51v1-instructions) for additional
 guidance.
 
-#### MS.EXO.16.2v1 Instructions:
+#### MS.EXO.16.2v1 Instructions
 
 Any product meeting the requirements outlined in this baseline policy may be
 used. If the agency uses Microsoft 365 alert policies, see the following implementation steps to
@@ -1227,7 +1227,7 @@ for additional guidance.
 ## 17. Audit Logging
 
 User activity from M365 services is captured in the organization's unified
-audit log.  These logs are essential for conducting incident response and
+audit log. These logs are essential for conducting incident response and
 threat detection activity.
 
 By default, Microsoft retains the audit logs for 180 days. Activity by
@@ -1259,7 +1259,7 @@ Microsoft Purview Audit (Standard) logging SHALL be enabled.
 
 <!--Policy: MS.EXO.17.1v1; Criticality: SHALL -->
 - _Rationale:_ Responding to incidents without detailed information about
-activities that took place slows response actions.  Enabling Microsoft
+activities that took place slows response actions. Enabling Microsoft
 Purview Audit (Standard) helps ensure agencies have visibility into user
 actions. Furthermore, Microsoft Purview Audit (Standard) is required for
 government agencies by OMB M-21-31 (referred to therein by its former
@@ -1271,14 +1271,14 @@ Microsoft Purview Audit (Premium) logging SHALL be enabled.
 
 <!--Policy: MS.EXO.17.2v1; Criticality: SHALL -->
 - _Rationale:_ Standard logging may not include relevant details necessary for
-visibility into user actions during an incident.  Enabling Microsoft Purview Audit
+visibility into user actions during an incident. Enabling Microsoft Purview Audit
 (Premium) captures additional event types not included with Standard.
 Furthermore, it is required for government agencies by OMB M-21-13 (referred to therein by its former name, Unified Audit Logs w/Advanced Features).
 - _Last modified:_ June 2023
 - _Note:_ At the time of this writing, Microsoft has announced upcoming changes
           to its Purview Audit service that include making audit events
           currently available in Purview Audit (Premium) available to Purview
-          Audit (Standard) subscribers.  After rollout of changes are complete,
+          Audit (Standard) subscribers. After rollout of changes are complete,
           Purview (Standard) may be sufficient for agencies to meet basic
           logging requirements.
 
@@ -1311,17 +1311,17 @@ Audit Logs in the Cloud Azure log category.
 
 ### Implementation
 
-#### MS.EXO.17.1v1 Instructions:
+#### MS.EXO.17.1v1 Instructions
 See the following implementation steps for enabling [Microsoft Purview
 (Standard)](./defender.md#msdefender61v1-instructions) for additional
 guidance.
 
-#### MS.EXO.17.1v2 Instructions:
+#### MS.EXO.17.1v2 Instructions
 See the following implementation steps for enabling [Microsoft Purview
 (Premium)](./defender.md#msdefender62v1-instructions) for additional
 guidance.
 
-#### MS.EXO.17.1v3 Instructions:
+#### MS.EXO.17.1v3 Instructions
 See the following implementation steps to
 [create an audit retention policy](./defender.md#msdefender62v1-instructions)
 for additional guidance.
@@ -1331,8 +1331,9 @@ for additional guidance.
 In addition to acknowledging the important contributions of a diverse
 team of Cybersecurity and Infrastructure Security Agency (CISA) experts,
 CISA thanks the following federal agencies and private sector
-organizations that provided input during the development of the SCuBA security configuration baselines in
-response to Section 3 of [Executive Order (EO) 14028, *Improving the
+organizations that provided input during the development of the Secure
+Cloud Business Application’s security configuration baselines in
+response to Section 3 of [Executive Order 14028, *Improving the
 Nation’s
 Cybersecurity*](https://www.federalregister.gov/documents/2021/05/17/2021-10460/improving-the-nations-cybersecurity):
 
