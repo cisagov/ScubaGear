@@ -25,12 +25,12 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 The following are key terms and descriptions used in this document.
 
-**Hybrid Azure Active Directory (AD)** – This term denotes the scenario
+**Hybrid Azure Active Directory (AD)**: This term denotes the scenario
 when an organization has an on-premises AD domain that contains the
 master user directory but federates access to the cloud Microsoft 365
 (M365) Azure AD tenant.
 
-**Resource Tenant & Home Tenant** – In scenarios where guest users are involved the **resource tenant** hosts the M365 target resources that the guest user is accessing. The **home tenant** is the one that hosts the guest user's identity.
+**Resource Tenant & Home Tenant**: In scenarios where guest users are involved the **resource tenant** hosts the M365 target resources that the guest user is accessing. The **home tenant** is the one that hosts the guest user's identity.
 
 ## Highly Privileged Roles
 
@@ -49,10 +49,7 @@ This section provides a list of what CISA considers highly privileged [built-in 
 
 Numerous policies in this baseline rely on Azure AD Conditional Access. Conditional Access is a feature that allows administrators to limit access to resources using conditions such as user or group membership, device, IP location, and real-time risk detection. This section provides guidance and tools when implementing baseline policies which rely on Azure AD Conditional Access.
 
-As described in Microsoft’s literature related to conditional access policies, CISA recommends initially setting a policy to
-**Report-only** when it is created and then performing thorough hands-on
-testing to ensure that there are no unintended consequences before
-toggling the policy from **Report-only** to **On**. The policy will only be enforced when it is set to **On**. One tool that can assist with running test simulations is the [What If tool](https://learn.microsoft.com/en-us/azure/active-directory/conditional-access/what-if-tool). Microsoft also describes [Conditional Access insights and reporting features](https://learn.microsoft.com/en-us/azure/active-directory/conditional-access/howto-conditional-access-insights-reporting) that can assist with testing.
+As described in Microsoft’s literature related to conditional access policies, CISA recommends initially setting a policy to **Report-only** when it is created and then performing thorough hands-on testing to ensure that there are no unintended consequences before toggling the policy from **Report-only** to **On**. The policy will only be enforced when it is set to **On**. One tool that can assist with running test simulations is the [What If tool](https://learn.microsoft.com/en-us/azure/active-directory/conditional-access/what-if-tool). Microsoft also describes [Conditional Access insights and reporting features](https://learn.microsoft.com/en-us/azure/active-directory/conditional-access/howto-conditional-access-insights-reporting) that can assist with testing.
 
 # Baseline Policies
 
