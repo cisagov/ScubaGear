@@ -89,7 +89,7 @@ This section provides policies that reduce security risks related to potentially
 
 - _Additional mitigations to reduce risks associated with the authentication of workload identities:_ Although not covered in this baseline due to the need for an additional non-standard license, Microsoft provides support for mitigating risks related to workload identities (Azure AD applications or service principals). Agencies should strongly consider implementing this feature because workload identities present many of the same risks as interactive user access and are commonly used in modern systems. CISA urges organizations to [apply Conditional Access policies to workload identities](https://learn.microsoft.com/en-us/entra/identity/conditional-access/workload-identity).
 
-- _Note:_ Note: In this section, the term ["high risk"](https://learn.microsoft.com/en-us/entra/id-protection/concept-identity-protection-risks) denotes the risk level applied by the Azure AD Identity Protection service to a user account or sign-in event.
+- _Note:_ In this section, the term ["high risk"](https://learn.microsoft.com/en-us/entra/id-protection/concept-identity-protection-risks) denotes the risk level applied by the Azure AD Identity Protection service to a user account or sign-in event.
 
 ### Policies
 #### MS.AAD.2.1v1
