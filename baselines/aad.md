@@ -299,7 +299,7 @@ If phishing-resistant MFA has not been deployed yet and Microsoft Authenticator 
 1. Go through the process of [migrating from the legacy Azure AD MFA and Self-Service Password Reset (SSPR) administration pages to the new unified Authentication Methods policy page](https://learn.microsoft.com/en-us/entra/identity/authentication/how-to-authentication-methods-manage).
 2. Once ready to finish the migration, [set the **Manage Migration** option to **Migration Complete**](https://learn.microsoft.com/en-us/entra/identity/authentication/how-to-authentication-methods-manage#finish-the-migration).
 
-#### MS.AAD.3.5v1 Instructions:
+#### MS.AAD.3.5v1 Instructions
 1. In **Azure Active Directory**, click **Security > Authentication methods**
 2. Click on the **SMS**, **Voice Call**, and **Email OTP** authentication methods and disable each of them. Their statuses should be **Enabled > No** on the **Authentication methods > Policies** page.
 
@@ -586,7 +586,7 @@ User activation of other highly privileged roles SHOULD trigger an alert.
 
 The following implementation instructions that reference the Azure AD PIM service will vary if using a third-party PAM system instead. Additionally, the implementation instructions associated with assigning roles to users will be revised in an upcoming release to incorporate functionality provided by the Azure AD [PIM for Groups](https://learn.microsoft.com/en-us/entra/id-governance/privileged-identity-management/concept-pim-for-groups) feature.
 
-#### MS.AAD.7.1v1 instructions:
+#### MS.AAD.7.1v1 Instructions
 
 1. In **Azure Active Directory** select **Roles and administrators.**
 
@@ -598,7 +598,7 @@ The following implementation instructions that reference the Azure AD PIM servic
 
 5.  If you have Azure AD PIM, count the number of users in both the **Eligible assignments** and **Active assignments** tabs. There should be a total of two to eight users across both tabs (not individually). Do not count the same username twice. If any groups are listed, count the number of users who are members of the group and include it in the total count.
 
-#### MS.AAD.7.2v1 instructions:
+#### MS.AAD.7.2v1 Instructions
 
 1.  In **Azure Active Directory** select **Security.**
 
@@ -610,7 +610,7 @@ The following implementation instructions that reference the Azure AD PIM servic
 
 5.  Review the **current score** value and compare it to the **max score**. If the current score is not the maximum value and the status is not **Completed**, you must perform the improvement actions. If that is the case, follow the detailed action steps and check the score again after 48 hours to ensure compliance.
 
-#### MS.AAD.7.3v1 instructions:
+#### MS.AAD.7.3v1 Instructions
 Performing a manual review of highly privileged users per the instructions below to determine which ones are not cloud-only is labor intensive; we recommend running the ScubaGear tool instead. ScubaGear will provide a list of the highly privileged users that are not cloud-only.
 
 1. Perform the steps below for each highly privileged role. We reference the Global Administrator role as an example.
@@ -630,7 +630,7 @@ Performing a manual review of highly privileged users per the instructions below
 
 6. Review the output field named **OnPremisesImmutableId**. If this field has a data value, it means that this specific user is not cloud-only. If the user is not cloud-only, create a cloud-only account for that user, assign the user to their respective roles and then remove the account that is not cloud-only from Azure AD.
 
-#### MS.AAD.7.4v1 instructions:
+#### MS.AAD.7.4v1 Instructions
 
 1. In **Azure Active Directory** select **Roles and administrators**. Perform the steps below for each highly privileged role. We reference the Global Administrator role as an example.
 
@@ -640,7 +640,7 @@ Performing a manual review of highly privileged users per the instructions below
 
 4. Verify there are no users or groups with a value of **Permanent** in the **End time** column. If there are any, recreate those assignments to have an expiration date using Azure AD PIM or an alternative PAM system. The only exception to this policy is emergency access accounts and service accounts requiring perpetual active assignments. See policy MS.AAD.7.4v1 note section for details.
 
-#### MS.AAD.7.5v1 instructions:
+#### MS.AAD.7.5v1 Instructions
 
 1. Perform the steps below for each highly privileged role. We reference the Global Administrator role as an example.
 
@@ -653,7 +653,7 @@ Performing a manual review of highly privileged users per the instructions below
 5. For each user or group listed, examine the value in the **Start time** column. If it contains a value of **-**, this indicates the respective user/group was assigned to that role outside of Azure AD PIM. If the role was assigned outside of Azure AD PIM, delete the assignment and recreate it using Azure AD PIM.
 
 
-#### MS.AAD.7.6v1 instructions:
+#### MS.AAD.7.6v1 Instructions
 
 1. In **Azure Active Directory** create a new group named **Privileged Escalation Approvers**. This group will contain users that will receive role activation approval requests and approve or deny them.
 
@@ -672,7 +672,7 @@ Performing a manual review of highly privileged users per the instructions below
   5.  Click **Select approvers** and select the group **Privileged Escalation Approvers**, and then click **Select**.
   6.  Click **Update**.
 
-#### MS.AAD.7.7v1 instructions:
+#### MS.AAD.7.7v1 Instructions
 
 1.  In **Azure AD Privileged Identity Management (PIM)**, under **Manage**, select **Azure AD roles.**
 
@@ -690,7 +690,7 @@ Performing a manual review of highly privileged users per the instructions below
 
 8. Click **Update**.
 
-#### MS.AAD.7.8v1 instructions:
+#### MS.AAD.7.8v1 Instructions
 
 1. In **Azure AD Privileged Identity Management (PIM)**, under **Manage**, select **Azure AD roles.**
 
@@ -706,7 +706,7 @@ Performing a manual review of highly privileged users per the instructions below
 
 7. Click **Update**.
 
-#### MS.AAD.7.9v1 instructions:
+#### MS.AAD.7.9v1 Instructions
 
  1. Follow the same instructions as MS.AAD.7.8v1 for each of the highly privileged roles (other than Global Administrator) but enter a security monitoring mailbox different from the one used to monitor Global Administrator activations.
 
