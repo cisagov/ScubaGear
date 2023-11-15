@@ -519,7 +519,7 @@ Agencies SHOULD only allow installation of custom apps approved by the agency.
 
 4.  Select **Teams apps** > **Permission policies**.
 
-5.  Select **Global (org-wide default)**.
+5.  Select **Global (Org-wide default)**.
 
 6.  Set **Custom apps** to **Block all apps**, unless specific apps have
     been approved by the agency, in which case select **Allow specific apps and block all others**.
