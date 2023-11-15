@@ -167,7 +167,7 @@ To configure settings for anonymous users:
 
 2.	Select **Meetings** > **Meeting policies**.
 
-3.	Select the **Global (org-wide default)** policy.
+3.	Select the **Global (Org-wide default)** policy.
 
 4.	Under the **Meeting join & lobby** section, ensure **Who can bypass the lobby** is **not** set to **Everyone**. Bypassing the lobby should be set to **People in my org**, though other options may be used if needed.
 
