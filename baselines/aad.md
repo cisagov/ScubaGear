@@ -44,7 +44,7 @@ This section provides a list of what CISA considers highly privileged [built-in 
 - Hybrid Identity Administrator
 - Application Administrator
 - Cloud Application Administrator
-
+Throughout this document, this list of highly privileged roles is referenced in numerous baseline policies. Agencies should consider this list a foundational reference and apply respective baseline policies to additional Azure AD roles as necessary.
 ## Conditional Access Policies
 
 Numerous policies in this baseline rely on Azure AD Conditional Access. Conditional Access is a feature that allows administrators to limit access to resources using conditions such as user or group membership, device, IP location, and real-time risk detection. This section provides guidance and tools when implementing baseline policies which rely on Azure AD Conditional Access.
