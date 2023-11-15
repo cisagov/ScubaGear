@@ -216,7 +216,7 @@ To configure settings for anonymous users:
 
 2.  Select **Meetings** > **Live events policies**.
 
-3.  Select **Global (org-wide default)** policy.
+3.  Select **Global (Org-wide default)** policy.
 
 4.  Set **Record an event** to **Organizer can record**.
 
