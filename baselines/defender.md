@@ -419,7 +419,7 @@ The action for the custom policy SHOULD be set to block sharing sensitive inform
 #### MS.DEFENDER.4.4v1
 Notifications to inform users and help educate them on the proper use of sensitive information SHOULD be enabled in the custom policy.
 
-<!--Policy: MS.DEFENDER.4.141; Criticality: SHOULD -->
+<!--Policy: MS.DEFENDER.4.4v1; Criticality: SHOULD -->
 - _Rationale:_ Some users may not be aware of agency policies on
                proper use of sensitive information. Enabling
                notifications provides positive feedback to users when
@@ -444,7 +444,7 @@ The custom policy SHOULD include an action to block access to sensitive
 information by restricted apps and unwanted Bluetooth applications.
 
 <!--Policy: MS.DEFENDER.4.6v1; Criticality: SHOULD -->
-- _Rationale:_ Some applications may inappropriately share accessed files
+- _Rationale:_ Some apps may inappropriately share accessed files
                or not conform to agency policies for access to sensitive
                information. Defining a DLP policy with an action to block
                access from restricted apps and unwanted Bluetooth
@@ -775,7 +775,7 @@ Related to Cybersecurity Incidents \| Office of Management and
 - [Search the audit log in the compliance center \| Microsoft
   Learn](https://learn.microsoft.com/en-us/purview/audit-log-search?view=o365-worldwide)
 
-- [Audited log activities \| Microsoft
+- [Audit log activities \| Microsoft
   Learn](https://learn.microsoft.com/en-us/purview/audit-log-activities)
 
 - [Expanding cloud logging to give customers deeper security visibility \|
