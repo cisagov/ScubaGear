@@ -19,21 +19,17 @@ $OPAExe = "opa_windows_amd64.exe"
 $InstallUrl = "https://openpolicyagent.org/downloads/v$($ExpectedVersion)/$OPAExe"
 $OutFile=(Join-Path (Get-Location).Path $InstallUrl.SubString($InstallUrl.LastIndexOf('/')))
 $ExpectedHash ="5D71028FED935DC98B9D69369D42D2C03CE84A7720D61ED777E10AAE7528F399"
-
+$Display = "Downloading OPA executable"
 # Download files
 try {
-    Write-Information "Downloading $InstallUrl"
-    $WebClient = New-Object System.Net.WebClient
-    $WebClient.DownloadFile($InstallUrl, $OutFile)
+    Start-BitsTransfer -Source $InstallUrl -Destination $OutFile -DisplayName $Display
     Write-Information ""
     Write-Information "`nDownload of `"$OutFile`" finished."
 }
 catch {
     Write-Error "An error has occurred: Unable to download OPA executable. To try manually downloading, see details in README under 'Download the required OPA executable'"
 }
-finally {
-    $WebClient.Dispose()
-}
+
 
 # Hash checks
 if ((Get-FileHash .\opa_windows_amd64.exe).Hash -eq $ExpectedHash)
