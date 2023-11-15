@@ -2,7 +2,7 @@
 
 # CISA M365 Security Configuration Baseline for Exchange Online
 
-Microsoft Exchange Online gives users easy access to their email and supports organizational meetings, contacts, and calendars. This Secure Configuration Baseline (SCB) provides specific policies to strengthen Exchange Online security.
+Microsoft 365 (M365) Exchange Online is a cloud-based messaging platform that gives users easy access to their email and supports organizational meetings, contacts, and calendars. This Secure Configuration Baseline (SCB) provides specific policies to strengthen Exchange Online security.
 
 Many admin controls for Exchange Online are found in the **Exchange admin center**.
 However, several of the security features for Exchange Online are shared between Microsoft
@@ -40,7 +40,7 @@ The **License Requirements** sections of this document assume the
 organization is using an [M365
 E3](https://www.microsoft.com/en-us/microsoft-365/compare-microsoft-365-enterprise-plans)
 or [G3](https://www.microsoft.com/en-us/microsoft-365/government)
-license level. Therefore, only licenses not included in E3/G3 are
+license level at a minimum. Therefore, only licenses not included in E3/G3 are
 listed.
 
 ## Key Terminology
