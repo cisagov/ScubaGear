@@ -76,7 +76,7 @@ Anonymous users and dial-in callers SHOULD NOT be admitted automatically.
 <!--Policy: MS.TEAMS.1.3v1; Criticality: SHOULD -->
 - _Rationale:_ Automatically allowing admittance to anonymous and dial-in users diminishes control of meeting participation and invites potential data breach. This policy reduces that risk by requiring all anonymous and dial-in users to wait in a lobby until admitted by an authorized meeting participant. If the agency has a use case to admit members of specific trusted organizations and/or B2B guests automatically, custom policies may be created and assigned to authorized meeting organizers.  
 - _Last modified:_ July 2023
-- _Note:_ This policy applies to the Global (org-wide default) meeting policy. Custom meeting policies MAY be created to allow specific users more flexibility. For example, B2B guest users and trusted partner members may be admitted automatically into meetings organized by authorized users.
+- _Note:_ This policy applies to the Global (Org-wide default) meeting policy. Custom meeting policies MAY be created to allow specific users more flexibility. For example, B2B guest users and trusted partner members may be admitted automatically into meetings organized by authorized users.
 
 #### MS.TEAMS.1.4v1
 Internal users SHOULD be admitted automatically.
