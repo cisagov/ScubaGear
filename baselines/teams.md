@@ -68,7 +68,7 @@ Anonymous users SHALL NOT be enabled to start meetings.
 <!--Policy: MS.TEAMS.1.2v1; Criticality: SHALL -->
 - _Rationale:_ For agencies that implemented custom policies providing more flexibility to some users to automatically admit "everyone" to a meeting - this policy provides protection from anonymous users starting meeting to scrape internal contacts.
 - _Last modified:_ July 2023
-- _Note:_ This policy applies to the Global (org-wide default) meeting policy, and custom meeting policies if they exist.
+- _Note:_ This policy applies to the Global (Org-wide default) meeting policy, and custom meeting policies if they exist.
 
 #### MS.TEAMS.1.3v1
 Anonymous users and dial-in callers SHOULD NOT be admitted automatically.
