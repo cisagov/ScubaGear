@@ -60,7 +60,7 @@ External meeting participants SHOULD NOT be enabled to request control of shared
 <!--Policy: MS.TEAMS.1.1v1; Criticality: SHOULD -->
 - _Rationale:_ An external participant with control of a shared screen could potentially perform unauthorized actions on the shared screen. This policy reduces that risk by removing an external participant's ability to request control. However, if an agency has a legitimate use case to grant this control, it may be done on a case-by-case basis.
 - _Last modified:_ July 2023
-- _Note:_ This policy applies to the Global (org-wide default) meeting policy, as well as custom meeting policies.
+- _Note:_ This policy applies to the Global (Org-wide default) meeting policy, as well as custom meeting policies.
 
 #### MS.TEAMS.1.2v1
 Anonymous users SHALL NOT be enabled to start meetings.
