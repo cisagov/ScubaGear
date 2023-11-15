@@ -2,7 +2,7 @@
 
 # CISA M365 Security Configuration Baseline for Power Platform
 
-Microsoft Power Platform is a group of applications comprised of alow-code application development toolkit, business intelligence software, a custom chat bot creator, and app connectivity software.  This Secure Configuration Baseline (SCB) provides specific policies to help secure Power Platform security.
+Microsoft Power Platform is a cloud-based enterprise group of applications comprised of alow-code application development toolkit, business intelligence software, a custom chat bot creator, and app connectivity software.  This Secure Configuration Baseline (SCB) provides specific policies to help secure Power Platform security.
 
 The Secure Cloud Business Applications (SCuBA) project run by the Cybersecurity and Infrastructure Security Agency (CISA) provides guidance and capabilities to secure federal civilian executive branch (FCEB) agencies’ cloud business application environments and protect federal information that is created, accessed, shared, and stored in those environments. 
 
