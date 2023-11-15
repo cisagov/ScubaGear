@@ -139,7 +139,7 @@ control of the shared desktop or window in the meeting:
 
 2.  Select **Meetings** > **Meeting policies**.
 
-3.  Select the **Global (org-wide default)** policy.
+3.  Select the **Global (Org-wide default)** policy.
 
 4.  Under the **Content sharing** section, set **External
     participants can give or request control** to **Off**.
