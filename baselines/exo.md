@@ -797,7 +797,7 @@ The phishing protection solution SHOULD include an AI-based phishing detection t
 ### License Requirements
 
 - If using Defender for Office 365 for impersonation protection and advanced
-  phishing thresholds, Defender for Office 365 Plan 1 or 2 is required. These are included with E5 and G5 and are available as add-ons for E3 and G3. As of July 14, 2023, anti-phishing for user and domain impersonation and spoof intelligence are not yet available in M365 Government Community Cloud High (GCC High) and M365 Department of Defense (DOD). See [Platform
+  phishing thresholds, Defender for Office 365 Plan 1 or 2 is required. These are included with E5 and G5 and are available as add-ons for E3 and G3. As of November 14, 2023, anti-phishing for user and domain impersonation and spoof intelligence are not yet available in M365 Government Community Cloud High (GCC High) and M365 Department of Defense (DOD). See [Platform
   features \| Microsoft Docs](https://docs.microsoft.com/en-us/office365/servicedescriptions/office-365-platform-service-description/office-365-us-government/office-365-us-government#platform-features)
   for current offerings.
 
