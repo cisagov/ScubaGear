@@ -92,7 +92,7 @@ Dial-in users SHOULD NOT be enabled to bypass the lobby.
 <!--Policy: MS.TEAMS.1.5v1; Criticality: SHOULD -->
 - _Rationale:_ Automatically admitting dial-in users reduces control over who can participate in a meeting and increases potential for data breaches. This policy reduces the risk by requiring all dial-in users to wait in a lobby until they are admitted by an authorized meeting participant.
 - _Last modified:_ July 2023
-- _Note:_ This policy applies to the Global (org-wide default) meeting policy, as well as custom meeting policies.  
+- _Note:_ This policy applies to the Global (Org-wide default) meeting policy, as well as custom meeting policies.  
 
 #### MS.TEAMS.1.6v1
 Meeting recording SHOULD be disabled.
