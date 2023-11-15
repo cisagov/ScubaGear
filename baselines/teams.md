@@ -155,7 +155,7 @@ To configure settings for anonymous users:
 
 2.	Select **Meetings** > **Meeting policies**.
 
-3.	Select the **Global (org-wide default)** policy.
+3.	Select the **Global (Org-wide default)** policy.
 
 4.	Under the **Meeting join & lobby** section, set **Anonymous users and dial-in callers can start a meeting** to **Off**.
 
