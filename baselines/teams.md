@@ -84,7 +84,7 @@ Internal users SHOULD be admitted automatically.
 <!--Policy: MS.TEAMS.1.4v1; Criticality: SHOULD -->
 - _Rationale:_ Requiring internal users to wait in the lobby for explicit admission can lead to admission fatigue. This policy enables internal users to be automatically admitted to the meeting through global policy.  
 - _Last modified:_ July 2023
-- _Note:_ This policy applies to the Global (org-wide default) meeting policy. Custom meeting policies MAY be created to allow specific users more flexibility.
+- _Note:_ This policy applies to the Global (Org-wide default) meeting policy. Custom meeting policies MAY be created to allow specific users more flexibility.
 
 #### MS.TEAMS.1.5v1
 Dial-in users SHOULD NOT be enabled to bypass the lobby.
