@@ -1,18 +1,18 @@
 **`TLP:CLEAR`**
 # CISA M365 Security Configuration Baseline for Teams
 
-Microsoft Teams is a cloud-based text and live chat workspace in Microsoft 365 (M365) that supports video calls, chat messaging, screen sharing, and file sharing. This secure configuration baseline (SCB) provides specific policies to strengthen Microsoft Teams' security.
+Microsoft 365 (M365) Teams is a cloud-based text and live chat workspace that supports video calls, chat messaging, screen sharing, and file sharing. This secure configuration baseline (SCB) provides specific policies to strengthen Microsoft Teams' security.
 
 The Secure Cloud Business Applications (SCuBA) project run by the Cybersecurity and Infrastructure Security Agency (CISA) provides guidance and capabilities to secure federal civilian executive branch (FCEB) agencies' cloud business application environments and protect federal information that is created, accessed, shared, and stored in those environments.
 
-The CISA SCuBA SCBs for M365 help secure federal information assets stored within M365 cloud business application environments through consistent, effective, and manageable security configurations. CISA created baselines tailored to the federal government’s threats and risk tolerance with the knowledge that every organization has different threat models and risk tolerance. Non-governmental organizations may also find value in applying these baselines to reduce risks.
+The CISA SCuBA SCBs for M365 help secure federal information assets stored within M365 cloud business application environments through consistent, effective, and manageable security configurations. CISA created baselines tailored to the federal government's threats and risk tolerance with the knowledge that every organization has different threat models and risk tolerance. Non-governmental organizations may also find value in applying these baselines to reduce risks.
 
 The information in this document is provided "as is" for INFORMATIONAL PURPOSES ONLY. CISA does not endorse any commercial product or service, including any subjects of analysis. Any reference to specific commercial entities or commercial products, processes, or services by service mark, trademark, manufacturer, or otherwise does not constitute or imply endorsement, recommendation, or favoritism by CISA.
 
 > This document is marked TLP:CLEAR. Recipients may share this information without restriction. Information is subject to standard copyright rules. For more information on the Traffic Light Protocol, see https://www.cisa.gov/tlp.
 
 ## License Compliance and Copyright 
-Portions of this document are adapted from documents in Microsoft’s [M365](https://github.com/MicrosoftDocs/microsoft-365-docs/blob/public/LICENSE) and [
+Portions of this document are adapted from documents in Microsoft's [M365](https://github.com/MicrosoftDocs/microsoft-365-docs/blob/public/LICENSE) and [
   Azure](https://github.com/MicrosoftDocs/azure-docs/blob/main/LICENSE) GitHub repositories. The respective documents are subject to copyright and are adapted under the terms of the Creative Commons Attribution 4.0 International license. Source documents are linked throughout this document. The United States government has adapted selections of these documents to develop innovative and scalable configuration standards to strengthen the security of widely used cloud-based software services.
 
 ## Assumptions
@@ -24,22 +24,22 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 Access to Teams can be controlled by the user type. In this baseline,
 the types of users are defined as follows:
 
-1.  **Internal users**: Members of the agency’s M365 tenant.
+1.  **Internal users**: Members of the agency's M365 tenant.
 
 2.  **External users**: Members of a different M365 tenant.
 
 3.  **Business to Business (B2B) guest users**: External users who are
     formally invited to collaborate with the team and added to the
-    agency’s Azure Active Directory (Azure AD) as guest users. These users
+    agency's Azure Active Directory (Azure AD) as guest users. These users
     authenticate with their home organization/tenant and are granted
     access to the team by virtue of being listed as guest users on the
-    tenant’s Azure AD.
+    tenant's Azure AD.
 
 4.  **Unmanaged users**: Users who are not members of any M365 tenant or
     organization (e.g., personal Microsoft accounts).
 
 5.  **Anonymous users**: Teams users joining calls who are not
-    authenticated through the agency’s tenant; these users include unmanaged
+    authenticated through the agency's tenant; these users include unmanaged
     users, external users (except for B2B guests), and true anonymous
     users (i.e., users who are not logged in to any Microsoft or
     organization account, such as dial-in users[^1]).
@@ -98,7 +98,7 @@ Dial-in users SHOULD NOT be enabled to bypass the lobby.
 Meeting recording SHOULD be disabled.
 
 <!--Policy: MS.TEAMS.1.6v1; Criticality: SHOULD -->
-- _Rationale:_ Allowing any user to record a Teams meeting or group call may lead to unauthorized disclosure of shared information, including audio, video, and shared screens. By disabling the meeting recording setting in the Global (org-wide default) meeting policy, an agency limits information exposure.
+- _Rationale:_ Allowing any user to record a Teams meeting or group call may lead to unauthorized disclosure of shared information, including audio, video, and shared screens. By disabling the meeting recording setting in the Global (Org-wide default) meeting policy, an agency limits information exposure.
 - _Last modified:_ July 2023
 - _Note:_ This policy applies to the Global (Org-wide default) meeting policy, as well as custom meeting policies. Custom policies MAY be created to allow more flexibility for specific users.
 
@@ -201,7 +201,7 @@ To configure settings for anonymous users:
 
 2.  Select **Meetings** > **Meeting policies**.
 
-3.  Select the **Global (org-wide default)** policy.
+3.  Select the **Global (Org-wide default)** policy.
 
 4.  Under the **Recording & transcription** section, set **Meeting
     recording** to **Off**.
@@ -540,8 +540,8 @@ compliance portal. Agencies may select any service that fits their needs and mee
 the requirements outlined in this baseline setting. The DLP solution selected by an agency
 should offer services comparable to those offered by Microsoft.
 
-Though using Microsoft’s DLP solution is not strictly
-required, guidance for configuring Microsoft’s DLP solution can be found in following section of the CISA M365 Security Configuration Baseline for Defender for Office 365.
+Though using Microsoft's DLP solution is not strictly
+required, guidance for configuring Microsoft's DLP solution can be found in following section of the CISA M365 Security Configuration Baseline for Defender for Office 365.
 
 - [Data Loss Prevention \| CISA M365 Security Configuration Baseline for Defender for Office 365](./defender.md#4-data-loss-prevention)
 
@@ -705,9 +705,9 @@ In addition to acknowledging the important contributions of a diverse
 team of Cybersecurity and Infrastructure Security Agency (CISA) experts,
 CISA thanks the following federal agencies and private sector
 organizations that provided input during the development of the Secure
-Cloud Business Application’s security configuration baselines in
+Cloud Business Application's security configuration baselines in
 response to Section 3 of [Executive Order 14028, *Improving the
-Nation’s
+Nation's
 Cybersecurity*](https://www.federalregister.gov/documents/2021/05/17/2021-10460/improving-the-nations-cybersecurity):
 
 - The MITRE Corporation
