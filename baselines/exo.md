@@ -13,17 +13,17 @@ this baseline. When noted, alternative products may be used in lieu of
 Defender, on the condition that they fulfill these required baseline
 settings.
 
-CISA’s Secure Cloud Business Applications (SCuBA) project provides guidance and capabilities to secure federal civilian executive branch (FCEB) agencies’ cloud business application environments and protect federal information that is created, accessed, shared, and stored in those environments.
+CISA's Secure Cloud Business Applications (SCuBA) project provides guidance and capabilities to secure federal civilian executive branch (FCEB) agencies' cloud business application environments and protect federal information that is created, accessed, shared, and stored in those environments.
 
-The CISA SCuBA security configuration baselines for M365 help secure federal information assets stored within M365 cloud business application environments through consistent, effective, and manageable security configurations. CISA created baselines tailored to the federal government’s threats and risk tolerance with the knowledge that every organization has different threat models and risk tolerance. Non-governmental organizations may also find value in applying these baselines to reduce risks.
+The CISA SCuBA security configuration baselines for M365 help secure federal information assets stored within M365 cloud business application environments through consistent, effective, and manageable security configurations. CISA created baselines tailored to the federal government's threats and risk tolerance with the knowledge that every organization has different threat models and risk tolerance. Non-governmental organizations may also find value in applying these baselines to reduce risks.
 
-The information in this document is provided “as is” for INFORMATIONAL PURPOSES ONLY. CISA does not endorse any commercial product or service, including any subjects of analysis. Any reference to specific commercial entities or commercial products, processes, or services by service mark, trademark, manufacturer, or otherwise, does not constitute or imply endorsement, recommendation, or favoritism by CISA.
+The information in this document is provided "as is" for INFORMATIONAL PURPOSES ONLY. CISA does not endorse any commercial product or service, including any subjects of analysis. Any reference to specific commercial entities or commercial products, processes, or services by service mark, trademark, manufacturer, or otherwise, does not constitute or imply endorsement, recommendation, or favoritism by CISA.
 
 > This document is marked TLP:CLEAR. Recipients may share this information without restriction. Information is subject to standard copyright rules. For more information on the Traffic Light Protocol, see https://www.cisa.gov/tlp.
 
 ## License Compliance and Copyright
 
-Portions of this document are adapted from documents in Microsoft’s
+Portions of this document are adapted from documents in Microsoft's
 [M365](https://github.com/MicrosoftDocs/microsoft-365-docs/blob/public/LICENSE)
 and
 [Azure](https://github.com/MicrosoftDocs/azure-docs/blob/main/LICENSE)
@@ -105,9 +105,9 @@ The Sender Policy Framework (SPF) is a mechanism allowing domain
 administrators to specify which IP addresses are explicitly approved to
 send email on behalf of the domain, facilitating detection of spoofed
 emails. SPF is not configured through the Exchange admin center, but
-rather via Domain Name System (DNS) records hosted by the agency’s
+rather via Domain Name System (DNS) records hosted by the agency's
 domain. Thus, the exact steps needed to set up SPF vary from agency to
-agency, but Microsoft’s documentation provides some helpful starting
+agency, but Microsoft's documentation provides some helpful starting
 points.
 
 ### Policies
@@ -125,7 +125,7 @@ An SPF policy SHALL be published for each domain, designating only these address
 <!--Policy: MS.EXO.2.2v1; Criticality: SHALL -->
 - _Rationale:_ An adversary may modify the `FROM` field
 of an email such that it appears to be a legitimate email sent by an
-agency, facilitating phishing attacks. Publishing an SPF policy for each agency domain mitigates forged `FROM` fields by providing a means for recipients to detect emails spoofed in this way.  SPF is required for FCEB departments and agencies by Binding Operational Directive (BOD) 18-01, “Enhance Email and Web Security”.
+agency, facilitating phishing attacks. Publishing an SPF policy for each agency domain mitigates forged `FROM` fields by providing a means for recipients to detect emails spoofed in this way.  SPF is required for FCEB departments and agencies by Binding Operational Directive (BOD) 18-01, "Enhance Email and Web Security".
 - _Last modified:_ June 2023
 
 ### Resources
@@ -156,7 +156,7 @@ inclusions required for Microsoft to send email on behalf of your domain.
 
 #### MS.EXO.2.2v1 Instructions
 SPF is not configured through the Exchange admin center, but rather via
-DNS records hosted by the agency’s domain. Thus, the exact steps needed
+DNS records hosted by the agency's domain. Thus, the exact steps needed
 to set up SPF varies from agency to agency. See [Add or edit an SPF TXT record to help prevent email spam (Outlook, Exchange Online) \| Microsoft Learn](https://learn.microsoft.com/en-us/microsoft-365/admin/get-help-with-domains/create-dns-records-at-any-dns-hosting-provider?view=o365-worldwide#add-or-edit-an-spf-txt-record-to-help-prevent-email-spam-outlook-exchange-online) for more details.
 
 To test your SPF configuration, consider using a web-based tool, such as
@@ -301,7 +301,7 @@ to spoof their domains.
 
 #### MS.EXO.4.1v1 Instructions:
 DMARC is not configured through the Exchange admin center, but rather via
-DNS records hosted by the agency’s domain. As such, implementation varies
+DNS records hosted by the agency's domain. As such, implementation varies
 depending on how an agency manages its DNS records. See [Form the DMARC TXT record for your domain \| Microsoft
 Learn](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/email-authentication-dmarc-configure?view=o365-worldwide#step-4-form-the-dmarc-txt-record-for-your-domain)
 for Microsoft guidance.
@@ -464,7 +464,7 @@ this policy.
 
 ## 7. External Sender Warnings
 
-Mail flow rules allow incoming email modification, such that email from external users can be easily identified (e.g., by prepending the subject line with “\[External\]”).
+Mail flow rules allow incoming email modification, such that email from external users can be easily identified (e.g., by prepending the subject line with "\[External\]").
 
 ### Policies
 
@@ -514,7 +514,7 @@ To create a mail flow rule to produce external sender warnings:
 8.  Under **Do the following…,** select **Prepend the subject of the message with…**.
 
 9.  Under **specify subject prefix**, enter a message such as
-    “\[External\]” (without the quotation marks), then click **OK**.
+    "\[External\]" (without the quotation marks), then click **OK**.
 
 10. Click **Next**.
 
@@ -541,8 +541,8 @@ compliance portal. Agencies may select any service that fits their needs and mee
 the requirements outlined in this baseline setting. The DLP solution selected by an agency
 should offer services comparable to those offered by Microsoft.
 
-Though use of Microsoft’s DLP solution is not strictly
-required, guidance for configuring Microsoft’s DLP solution can be found in the following section of the CISA M365 Security Configuration Baseline for Defender for Office 365.
+Though use of Microsoft's DLP solution is not strictly
+required, guidance for configuring Microsoft's DLP solution can be found in the following section of the CISA M365 Security Configuration Baseline for Defender for Office 365.
 
 - [Data Loss Prevention \| CISA M365 Security Configuration Baseline for Defender for Office 365](./defender.md#4-data-loss-prevention)
 
@@ -588,7 +588,7 @@ Microsoft Defender for this purpose is not required. However,
 the solution selected by an agency should offer services comparable to
 those offered by Microsoft.
 
-Though using Microsoft Defender’s solution is not strictly required for
+Though using Microsoft Defender's solution is not strictly required for
 this purpose, guidance for configuring the Common Attachment Filter in
 Microsoft Defender can be found in the follow section of the CISA M365 Security Configuration Baseline for Defender for Office 365.
 
@@ -698,7 +698,7 @@ users cannot interact with those emails.
 Email scanning SHALL be capable of reviewing emails after delivery.
 
 <!--Policy: MS.EXO.10.3v1; Criticality: SHALL -->
-- _Rationale:_ As known malware signatures are updated, it is possible for an email to be retroactively identified as containing malware after delivery. By scanning emails, the number of malware-infected in users’ mailboxes can be reduced.
+- _Rationale:_ As known malware signatures are updated, it is possible for an email to be retroactively identified as containing malware after delivery. By scanning emails, the number of malware-infected in users' mailboxes can be reduced.
 - _Last modified:_ June 2023
 
 ### Resources
@@ -738,7 +738,7 @@ already delivered to mailboxes and removes them.
 Several techniques exist for protecting against phishing attacks,
 including the following:
 
-- Impersonation protection checks, wherein a tool compares the sender’s
+- Impersonation protection checks, wherein a tool compares the sender's
   address to the addresses of known senders to flag look-alike
   addresses, such as `user@exmple.com` and `user@example.com`.
 
@@ -833,7 +833,7 @@ enforcement](https://learn.microsoft.com/en-us/microsoft-365/security/office-365
 
 IP block lists ensure mail from listed IP addresses is always blocked. Although we have no specific guidance on which IP addresses to add, block lists can be used to block mail from known spammers.
 
-IP safe lists are dynamic lists of “known, good senders,” which Microsoft sources from various third-party subscriptions. As with senders in the allow list, emails from these senders bypass important security mechanisms.
+IP safe lists are dynamic lists of "known, good senders," which Microsoft sources from various third-party subscriptions. As with senders in the allow list, emails from these senders bypass important security mechanisms.
 
 ### Policies
 
@@ -1233,7 +1233,7 @@ threat detection activity.
 By default, Microsoft retains the audit logs for 180 days. Activity by
 users with E5 licenses assigned is retained for one year.
 
-However, in accordance with Office of Management and Budget (OMB) Memorandum 21-31, _Improving the Federal Government’s
+However, in accordance with Office of Management and Budget (OMB) Memorandum 21-31, _Improving the Federal Government's
 Investigative and Remediation Capabilities Related to Cybersecurity Incidents_,
 Microsoft 365 audit logs are to be retained at least 12 months in active
 storage and an additional 18 months in cold storage. This can be accomplished
@@ -1332,9 +1332,9 @@ In addition to acknowledging the important contributions of a diverse
 team of Cybersecurity and Infrastructure Security Agency (CISA) experts,
 CISA thanks the following federal agencies and private sector
 organizations that provided input during the development of the Secure
-Cloud Business Application’s security configuration baselines in
+Cloud Business Application's security configuration baselines in
 response to Section 3 of [Executive Order 14028, *Improving the
-Nation’s
+Nation's
 Cybersecurity*](https://www.federalregister.gov/documents/2021/05/17/2021-10460/improving-the-nations-cybersecurity):
 
 - The MITRE Corporation
