@@ -305,7 +305,7 @@ current canvas apps and model-driven apps at the Power Platform environment leve
 ###  Policies
 
 #### MS.POWERPLATFORM.4.1v1
-CSP SHALL be enforced for model-driven and canvas Power Apps.
+Content Security Policy SHALL be enforced for model-driven and canvas Power Apps.
 
 <!--Policy: MS.POWERPLATFORM.4.1v1; Criticality: SHALL -->
 - _Rationale:_ Adds CSP as a defense mechanism for Power Apps against common website attacks.
