@@ -44,7 +44,7 @@ Some of the policy checks in the baseline rely on the following licenses which a
 
 If a tenant does not have the licenses listed above, the report will display a non-compliant output for those policies.
 
-> ![NOTE]
+> [!NOTE]
 > DOD endpoints are included, but have not been tested. Please open an issue if you encounter bugs.
 
 ## Getting Started
@@ -57,7 +57,7 @@ To download ScubaGear:
 3. Extract the folder in the zip file.
 
 ### Installing the Required PowerShell Modules
-> ![NOTE]
+> [!NOTE]
 >  Only PowerShell 5.1 is currently supported. PowerShell 7 may work, but has not been tested. Full PowerShell 7 support will be added in a future release.
 
 To install the module dependencies, open a new PowerShell 5.1 terminal and navigate to the repository folder.
@@ -69,7 +69,7 @@ Then run:
 ```
 
 ### Download the Required OPA executable
-> ![IMPORTANT]
+> [!IMPORTANT]
 > The `OPA.ps1` executable download script is called by default when running `SetUp.ps1`. `OPA.ps1` can also be run by itself to download the executable.
 In the event of an unsuccessful download, users can manually download the OPA executable with the following steps:
 1. Go to OPA download site (https://www.openpolicyagent.org/docs/latest/#running-opa)
@@ -219,7 +219,7 @@ The minimum user roles needed for each product are described in the table below.
 | Power Platform          |  Power Platform Administrator with a "Power Apps for Office 365" license             |
 | Sharepoint Online       |  SharePoint Administrator                                                           |
 | Microsoft Teams                   |  Global Reader (or Teams Administrator)                                                                |
-> ![NOTE]
+> [!NOTE]
 > Users with the Global Administrator role always have the necessary user permissions to run the tool.
 
 
@@ -230,7 +230,7 @@ The process to configure the application permissions is sometimes referred to as
 
 Microsoft Graph is used, because Azure AD PowerShell is being deprecated.
 
-> ![NOTE]
+> [!NOTE]
 > Microsoft Graph PowerShell SDK appears as "unverified" on the AAD application consent screen. This is a [known issue](https://github.com/microsoftgraph/msgraph-sdk-powershell/issues/482).
 
 The following API permissions are required for Microsoft Graph Powershell:
