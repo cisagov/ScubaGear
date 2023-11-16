@@ -28,7 +28,7 @@ The **License Requirements** sections of this document assume the organization i
 
 ## Key Terminology
 
-The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [RFC 2119](https://datatracker.ietf.org/doc/html/rfc2119).
+The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in [RFC 2119](https://datatracker.ietf.org/doc/html/rfc2119).
 
 The following section summarizes the various Power Platform applications referenced in this baseline:
 
@@ -375,7 +375,7 @@ Discover the valid endpoint parameter [here](https://learn.microsoft.com/en-us/p
 3. Then run the following PowerShell command to disable the creation of Power Pages sites by non-administrative users.
 
     ```
-    Set-TenantSettings -RequestBody @{ "disablePortalsCreationByNonAdminUsers" = $true }
+    Set-TenantSettings -RequestBody @{ “disablePortalsCreationByNonAdminUsers” = $true }
     ```
 
 # Acknowledgements
