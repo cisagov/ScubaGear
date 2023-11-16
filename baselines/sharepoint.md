@@ -5,7 +5,7 @@ Microsoft 365 (M365) SharePoint Online is a web-based collaboration and document
 
 The Secure Cloud Business Applications (SCuBA) project run by the Cybersecurity and Infrastructure Security Agency (CISA) provides guidance and capabilities to secure federal civilian executive branch (FCEB) agencies’ cloud business application environments and protect federal information that is created, accessed, shared, and stored in those environments.
 
-The CISA SCuBA SCBs for Microsoft 365 (M365) helps secure federal information assets stored within M365 cloud business application environments through consistent, effective, and manageable security configurations. CISA created baselines tailored to the federal government’s threats and risk tolerance with the knowledge that every organization has different threat models and risk tolerance. Non-governmental organizations may also find value in applying these baselines to reduce risks.
+The CISA SCuBA SCBs for M365 helps secure federal information assets stored within M365 cloud business application environments through consistent, effective, and manageable security configurations. CISA created baselines tailored to the federal government’s threats and risk tolerance with the knowledge that every organization has different threat models and risk tolerance. Non-governmental organizations may also find value in applying these baselines to reduce risks.
 
 The information in this document is being provided “as is” for INFORMATIONAL PURPOSES ONLY. CISA does not endorse any commercial product or service, including any subjects of analysis. Any reference to specific commercial entities or commercial products, processes, or services by service mark, trademark, manufacturer, or otherwise does not constitute or imply endorsement, recommendation, or favoritism by CISA.
 
@@ -340,7 +340,6 @@ Cybersecurity*](https://www.federalregister.gov/documents/2021/05/17/2021-10460/
 - Sandia National Laboratories (Sandia)
 
 The SCBs were informed by materials produced by the following organizations:
-
 
 - Center for Internet Security (CIS)
 - Internet Engineering Task Force (IETF)
