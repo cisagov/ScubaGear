@@ -2,7 +2,7 @@
 
 # CISA M365 Security Configuration Baseline for Azure Active Directory
 
-Azure Active Directory (Azure AD) is a cloud-based identity and access control service that provides security and functional capabilities to Microsoft 365. This Secure Configuration Baseline (SCB) provides specific policies to help secure Azure AD.
+Microsoft 365 (M365) Azure Active Directory (Azure AD) is a cloud-based identity and access control service that provides security and functional capabilities. This Secure Configuration Baseline (SCB) provides specific policies to help secure Azure AD.
 
 The Secure Cloud Business Applications (SCuBA) project run by the Cybersecurity and Infrastructure Security Agency (CISA) provides guidance and capabilities to secure federal civilian executive branch (FCEB) agencies’ cloud business application environments and protect federal information that is created, accessed, shared, and stored in those environments.
 
@@ -27,7 +27,7 @@ The following are key terms and descriptions used in this document.
 
 **Hybrid Azure Active Directory (AD)**: This term denotes the scenario
 when an organization has an on-premises AD domain that contains the
-master user directory but federates access to the cloud Microsoft 365
+master user directory but federates access to the cloud M365
 (M365) Azure AD tenant.
 
 **Resource Tenant & Home Tenant**: In scenarios where guest users are involved the **resource tenant** hosts the M365 target resources that the guest user is accessing. The **home tenant** is the one that hosts the guest user's identity.
@@ -49,7 +49,7 @@ This section provides a list of what CISA considers highly privileged [built-in 
 
 Numerous policies in this baseline rely on Azure AD Conditional Access. Conditional Access is a feature that allows administrators to limit access to resources using conditions such as user or group membership, device, IP location, and real-time risk detection. This section provides guidance and tools when implementing baseline policies which rely on Azure AD Conditional Access.
 
-As described in Microsoft’s literature related to conditional access policies, CISA recommends initially setting a policy to **Report-only** when it is created and then performing thorough hands-on testing to ensure that there are no unintended consequences before toggling the policy from **Report-only** to **On**. The policy will only be enforced when it is set to **On**. One tool that can assist with running test simulations is the [What If tool](https://learn.microsoft.com/en-us/azure/active-directory/conditional-access/what-if-tool). Microsoft also describes [Conditional Access insights and reporting features](https://learn.microsoft.com/en-us/azure/active-directory/conditional-access/howto-conditional-access-insights-reporting) that can assist with testing.
+As described in Microsoft’s literature related to conditional access policies, CISA recommends initially setting a policy to **Report-only** when it is created and then performing thorough hands-on testing to ensure that there are no unintended consequences before toggling the policy from **Report-only** to **On**. The policy will only be enforced when it is set to **On**. One tool that can assist with running test simulations is the [What If tool](https://learn.microsoft.com/en-us/azure/active-directory/conditional-access/what-if-tool). Microsoft also describes [Conditional Access insights and reporting](https://learn.microsoft.com/en-us/azure/active-directory/conditional-access/howto-conditional-access-insights-reporting) that can assist with testing.
 
 # Baseline Policies
 
@@ -231,7 +231,7 @@ Phishing-resistant MFA SHALL be required for highly privileged roles.
 Managed devices SHOULD be required for authentication.
 
 <!--Policy: MS.AAD.3.7v1; Criticality: SHOULD -->
-- _Rationale:_ The security risk of an adversary authenticating to the tenant from their own device is reduced by requiring a managed device to authenticate. Managed devices are under the provisioning and control of the agency. [OMB-22-09] (https://www.whitehouse.gov/wp-content/uploads/2022/01/M-22-09.pdf) states, "When authorizing users to access resources, agencies must consider at least one device-level signal alongside identity information about the authenticated user."
+- _Rationale:_ The security risk of an adversary authenticating to the tenant from their own device is reduced by requiring a managed device to authenticate. Managed devices are under the provisioning and control of the agency. [OMB-22-09](https://www.whitehouse.gov/wp-content/uploads/2022/01/M-22-09.pdf) states, "When authorizing users to access resources, agencies must consider at least one device-level signal alongside identity information about the authenticated user."
 - _Last modified:_ June 2023
 
 #### MS.AAD.3.8v1
@@ -622,7 +622,7 @@ Performing a manual review of highly privileged users per the instructions below
 
 4. Under **Manage**, select **Assignments.** If you have Azure AD PIM, repeat the steps below for both the **Eligible** and the **Active** assignments. If a group is listed, you will need to determine the members of the group and perform the steps for each group member.
 
-5. For each highly privileged user, execute the Powershell code below but replace the `username@somedomain.com` with the principal name of the user who is specific to your environment. You can get the data value from the **Principal name** field displayed in the Azure Active Directory portal.
+5. For each highly privileged user, execute the Powershell code below but replace the `username@somedomain.com` with the principal name of the user who is specific to your environment. You can get the data value from the **Principal name** field displayed in the Azure AD portal.
 
     ```
     Connect-MgGraph
