@@ -382,10 +382,7 @@ their environment and needs.
 
 ### Policies
 #### MS.DEFENDER.4.1v1
-A custom policy SHALL be configured to protect PII and sensitive information,
-as defined by the agency. At a minimum, credit card numbers, U.S. Individual
-Taxpayer Identification Numbers (ITIN), and U.S. Social Security numbers (SSN)
-SHALL be blocked.
+A custom policy SHALL be configured to protect PII and sensitive information, as defined by the agency. At a minimum, credit card numbers, U.S. Individual Taxpayer Identification Numbers (ITIN), and U.S. Social Security numbers (SSN) SHALL be blocked.
 
 <!--Policy: MS.DEFENDER.4.1v1; Criticality: SHALL -->
 - _Rationale:_ Users may inadvertently share sensitive information with
@@ -395,8 +392,7 @@ SHALL be blocked.
 - _Last modified:_ June 2023
 
 #### MS.DEFENDER.4.2v1
-The custom policy SHOULD be applied to Exchange, OneDrive, SharePoint, Teams chat,
-and Devices.
+The custom policy SHOULD be applied to Exchange, OneDrive, SharePoint, Teams chat, and Devices.
 
 <!--Policy: MS.DEFENDER.4.2v1; Criticality: SHOULD -->
 - _Rationale:_ Unauthorized disclosures may happen through M365 services
@@ -642,7 +638,7 @@ real-time insight into possible security incidents. Guidance on specific alerts 
 
 ### Policies
 #### MS.DEFENDER.5.1v1
-At a minimum, the alerts required by the _CISA M365 Security Configuration Baseline for Exchange Online_ SHALL be enabled.
+At a minimum, the alerts required by the CISA M365 Security Configuration Baseline for Exchange Online SHALL be enabled.
 
 <!--Policy: MS.DEFENDER.5.1v1; Criticality: SHALL -->
 - _Rationale:_ Potentially malicious or service-impacting events may go undetected without a means of detecting these events. Setting up a mechanism to alert administrators to the list of events linked above draws attention to them to minimize any impact to users and the agency.
