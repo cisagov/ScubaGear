@@ -8,8 +8,7 @@ The Secure Cloud Business Applications (SCuBA) project run by the Cybersecurity 
 
 The CISA SCuBA SCBs for M365 help secure federal information assets stored within M365 cloud business application environments through consistent, effective, and manageable security configurations. CISA created baselines tailored to the federal government’s threats and risk tolerance with the knowledge that every organization has different threat models and risk tolerance. Non-governmental organizations may also find value in applying these baselines to reduce risks.
 
-The information in this document is provided “as is” for INFORMATIONAL PURPOSES
-ONLY. CISA does not endorse any commercial product or service, including any
+The information in this document is provided "as is" for INFORMATIONAL PURPOSES ONLY. CISA does not endorse any commercial product or service, including any
 subjects of analysis. Any reference to specific commercial entities or commercial
 products, processes, or services by service mark, trademark, manufacturer, or
 otherwise does not constitute or imply endorsement, recommendation, or favoritism
@@ -28,7 +27,11 @@ The **License Requirements** sections of this document assume the organization i
 
 ## Key Terminology
 
-The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in [RFC 2119](https://datatracker.ietf.org/doc/html/rfc2119).
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
+"SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be
+interpreted as described in
+[RFC 2119](https://datatracker.ietf.org/doc/html/rfc2119).
+
 
 The following section summarizes the various Power Platform applications referenced in this baseline:
 
