@@ -28,7 +28,7 @@ The following are key terms and descriptions used in this document.
 **Hybrid Azure Active Directory (AD)**: This term denotes the scenario
 when an organization has an on-premises AD domain that contains the
 master user directory but federates access to the cloud M365
-(M365) Azure AD tenant.
+Azure AD tenant.
 
 **Resource Tenant & Home Tenant**: In scenarios where guest users are involved the **resource tenant** hosts the M365 target resources that the guest user is accessing. The **home tenant** is the one that hosts the guest user's identity.
 
