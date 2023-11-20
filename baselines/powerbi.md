@@ -511,7 +511,7 @@ the agency.
   labels in Power BI. Azure Information Protection can be purchased
   either standalone or through one of the Microsoft licensing suites.
   See [Azure Information Protection
-  service](https://azure.microsoft.com/services/information-protection/) description for
+  service](https://learn.microsoft.com/en-us/office365/servicedescriptions/azure-information-protection) description for
   details.
 
 - Azure Information Protection sensitivity labels need to be migrated to
