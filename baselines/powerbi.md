@@ -38,7 +38,7 @@ the types of users are defined as follows:
   are added to the agency's Azure Active Directory (Azure AD) as guest users. These users authenticate with their home organization/tenant and are granted access to Power BI
   content by virtue of being listed as guest users in the tenant's Azure AD.
 
-> [!Note]
+> Note:
 > These terms vary in use across Microsoft documentation.
 
 # Baseline Policies
@@ -132,7 +132,7 @@ To Enable with Security Group(s):
 4. Click on **Allow Azure Active Directory guest users to edit and manage content in the organization** and set to **Enabled**
 
 5. Select the security group(s) you want to have access to the PowerBI tenant.
-> [!Note]
+> Note:
 > You may need to make a specific security group(s)
 
 ## 3. Power BI External Invitations
@@ -150,7 +150,7 @@ The Invite external users to your organization feature SHOULD be disabled unless
 
 - _Rationale:_ Disabling this feature keeps internal users from inviting guest users. Therefore guest users can be limited from accessing potentially risky data/APIs. If an agency needs to allow guest access, the invitation feature can be limited to users in specific security groups to help limit risk.
 - _Last modified:_ June 2023
-> [!Note]
+> Note:
 > If this feature is disabled, existing guest users in the tenant continue to have access to Power BI items they already had access to and continue to be listed in user picker experiences. After it is disabled, an external user who is not already a guest user cannot be added to the tenant through Power BI.
 
 ### Resources
@@ -191,7 +191,7 @@ To enable with security groups:
 4. Click on **Invite external users to your organization** and set to **Enabled**
 
 5. Select the security group(s) needed.
-> [!Note]
+> Note:
 > You may need to make a specific security group(s)
 
 ## 4. Power BI Service Principals
@@ -360,7 +360,7 @@ dashboards, datasets, and dataflows guards sensitive content against
 unauthorized data access and leakage. This can also guard against
 unwanted aggregation and commingling.
 
-> [!Note]
+> Note:
 > At this baseline's time of writing, data loss prevention (DLP)
 profiles are in preview status for Power BI. Once released for general
 availability and government, DLP profiles represent another available
@@ -600,7 +600,7 @@ encrypting or accessing Power BI in a Key Vault, assign proper access
 policies to the vault, and regularly review access permissions.
 
 For regulatory or other compliance reasons, some agencies may need to
-use (BYOK), which is supported by Power BI. By default,
+use BYOK, which is supported by Power BI. By default,
 Power BI uses Microsoft-managed keys to encrypt the data. In Power BI
 Premium, users can use their own keys for data at-rest imported
 into a dataset. See [Data source and storage
@@ -742,7 +742,7 @@ public access to Power BI datasets.
 
 **High-Level Implementation Steps**
 
-> [!Note]
+> Note:
 > It is imperative that the VNET and VM are configured before
 disabling public internet access.
 
@@ -773,7 +773,7 @@ disabling public internet access.
 
 - Evaluate whether certificates or secrets are a more secure option for
   the implementation.
-  > [!Note]
+  > Note:
   > That Microsoft recommends certificates over secrets.
 
 - Use the principle of least privilege in implementing service
@@ -783,7 +783,7 @@ disabling public internet access.
 - Instead of enabling service principals for the entire agency,
   implement for a dedicated security group.
 
-> [!Note]
+> Note:
 > This policy is only applicable if the setting **Allow service principals to use Power BI APIs** is enabled.
 
 **`TLP:CLEAR`**
