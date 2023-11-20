@@ -133,7 +133,7 @@ To Enable with Security Group(s):
 
 5. Select the security group(s) you want to have access to the PowerBI tenant.
 > [!Note]
-> You may need to create a security group for this specific case.
+> You may need to make a specific security group(s)
 
 ## 3. Power BI External Invitations
 
