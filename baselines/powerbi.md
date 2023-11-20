@@ -29,8 +29,7 @@ Agencies using Power BI may have a data classification scheme in place for
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [RFC 2119](https://datatracker.ietf.org/doc/html/rfc2119).
 
 Access to PowerBI can be controlled by the user type. In this baseline,
-the types of users are defined as follows (Note: these terms vary in use
-across Microsoft documentation):
+the types of users are defined as follows:
 
 1.  **Internal users**: Members of the agency's M365 tenant.
 2.  **External users**: Members of a different M365 tenant.
@@ -39,7 +38,8 @@ across Microsoft documentation):
   are added to the agency's Azure Active Directory (Azure AD) as guest users. These users authenticate with their home organization/tenant and are granted access to Power BI
   content by virtue of being listed as guest users in the tenant's Azure AD.
 
-Note: These terms vary in use across Microsoft documentation.
+> [!Note]
+> These terms vary in use across Microsoft documentation.
 
 # Baseline Policies
 
@@ -131,7 +131,9 @@ To Enable with Security Group(s):
 
 4. Click on **Allow Azure Active Directory guest users to edit and manage content in the organization** and set to **Enabled**
 
-5. Select the security group(s) you want to have access to the PowerBI tenant. **Note**: you may need to create a security group for this specific case.
+5. Select the security group(s) you want to have access to the PowerBI tenant.
+> [!Note]
+> You may need to create a security group for this specific case.
 
 ## 3. Power BI External Invitations
 
@@ -148,7 +150,8 @@ The Invite external users to your organization feature SHOULD be disabled unless
 
 - _Rationale:_ Disabling this feature keeps internal users from inviting guest users. Therefore guest users can be limited from accessing potentially risky data/APIs. If an agency needs to allow guest access, the invitation feature can be limited to users in specific security groups to help limit risk.
 - _Last modified:_ June 2023
-- _Note:_ If this feature is disabled, existing guest users in the tenant continue to have access to Power BI items they already had access to and continue to be listed in user picker experiences. After it is disabled, an external user who is not already a guest user cannot be added to the tenant through Power BI.
+> [!Note]
+> If this feature is disabled, existing guest users in the tenant continue to have access to Power BI items they already had access to and continue to be listed in user picker experiences. After it is disabled, an external user who is not already a guest user cannot be added to the tenant through Power BI.
 
 ### Resources
 
@@ -187,7 +190,9 @@ To enable with security groups:
 
 4. Click on **Invite external users to your organization** and set to **Enabled**
 
-5. Select the security group(s) needed. **Note**: You may need to make a specific security group(s)
+5. Select the security group(s) needed.
+> [!Note]
+> You may need to make a specific security group(s)
 
 ## 4. Power BI Service Principals
 
@@ -355,7 +360,8 @@ dashboards, datasets, and dataflows guards sensitive content against
 unauthorized data access and leakage. This can also guard against
 unwanted aggregation and commingling.
 
-**Note**: At this baseline's time of writing, data loss prevention (DLP)
+> [!Note]
+> At this baseline's time of writing, data loss prevention (DLP)
 profiles are in preview status for Power BI. Once released for general
 availability and government, DLP profiles represent another available
 tool for securing power Power BI datasets. Refer to the *Defender for
@@ -736,7 +742,8 @@ public access to Power BI datasets.
 
 **High-Level Implementation Steps**
 
-Note: It is imperative that the VNET and VM are configured before
+> [!Note]
+> It is imperative that the VNET and VM are configured before
 disabling public internet access.
 
 1.  Enable private endpoints for Power BI.
@@ -766,7 +773,8 @@ disabling public internet access.
 
 - Evaluate whether certificates or secrets are a more secure option for
   the implementation.
-  Note that Microsoft recommends certificates over secrets.
+  > [!Note]
+  > That Microsoft recommends certificates over secrets.
 
 - Use the principle of least privilege in implementing service
   principals; only provide the ability to create app registrations to
@@ -775,6 +783,7 @@ disabling public internet access.
 - Instead of enabling service principals for the entire agency,
   implement for a dedicated security group.
 
-**Note**: This policy is only applicable if the setting **Allow service principals to use Power BI APIs** is enabled.
+> [!Note]
+> This policy is only applicable if the setting **Allow service principals to use Power BI APIs** is enabled.
 
 **`TLP:CLEAR`**
