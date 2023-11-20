@@ -30,14 +30,14 @@ This section helps reduce security risks related to sharing files with users ext
 
 ### Policies
 #### MS.SHAREPOINT.1.1v1
-External sharing for SharePoint SHALL be limited to **Existing guests** or **Only People in your organization**.
+External sharing for SharePoint SHALL be limited to Existing guests or Only People in your organization.
 
 <!--Policy: MS.SHAREPOINT.1.1v1; Criticality: SHALL -->
 - _Rationale:_ Sharing information outside the organization via SharePoint increases the risk of unauthorized access. By limiting external sharing, administrators decrease the risk of access to information.
 - _Last modified:_ June 2023
 
 #### MS.SHAREPOINT.1.2v1
-External sharing for OneDrive SHALL be limited to **Existing guests** or **Only People in your organization**.
+External sharing for OneDrive SHALL be limited to Existing guests or Only People in your organization.
 
 <!--Policy: MS.SHAREPOINT.1.2v1; Criticality: SHALL -->
 - _Rationale:_ Sharing files outside the organization via OneDrive increases the risk of unauthorized access. By limiting external sharing, administrators decrease the risk of unauthorized unauthorized access to information.
@@ -135,14 +135,14 @@ This section provides policies to set the scope and permissions for sharing link
 ### Policies
 
 #### MS.SHAREPOINT.2.1v1
-File and folder default sharing scope SHALL be set to **Specific people (only the people the user specifies)**.
+File and folder default sharing scope SHALL be set to Specific people (only the people the user specifies).
 
 <!--Policy: MS.SHAREPOINT.2.1v1; Criticality: SHALL -->
 - _Rationale:_ By making the default sharing the most restrictive, administrators prevent accidentally sharing information too broadly.
 - _Last modified:_ June 2023
 
 #### MS.SHAREPOINT.2.2v1
-File and folder default sharing permissions SHALL be set to **View**.
+File and folder default sharing permissions SHALL be set to View.
 
 <!--Policy: MS.SHAREPOINT.2.2v1; Criticality: SHALL -->
 - _Rationale:_ Edit access to files and folders could allow a user to make unauthorized changes.  By restricting default permissions to **View**, administrators prevent unintended or malicious modification.
@@ -187,7 +187,7 @@ Sharing files with external users via the usage of **Anyone links** or **Verific
 
 ### Policies
 #### MS.SHAREPOINT.3.1v1
-Expiration days for **Anyone links** SHALL be set to 30 days or less.
+Expiration days for Anyone links SHALL be set to 30 days or less.
 
 <!--Policy: MS.SHAREPOINT.3.1v1; Criticality: SHALL -->
 - _Rationale:_ Links may be used to provide access to information for a short period of time. Without expiration, however, access is indefinite. By setting expiration timers for links, administrators prevent unintended sustained access to information.
@@ -195,7 +195,7 @@ Expiration days for **Anyone links** SHALL be set to 30 days or less.
 - _Note:_ This policy is only applicable if the external sharing slider on the admin center sharing page is set to **Anyone**.
 
 #### MS.SHAREPOINT.3.2v1
-The allowable file and folder permissions for links SHALL be set to **View** only.
+The allowable file and folder permissions for links SHALL be set to View only.
 
 <!--Policy: MS.SHAREPOINT.3.1v1; Criticality: SHALL -->
 - _Rationale:_ Unauthorized changes to files can be made if permissions allow editing by anyone.  By restricting permissions on links to **View** only, administrators prevent anonymous file changes.
