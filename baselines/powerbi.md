@@ -137,11 +137,11 @@ To Enable with Security Group(s):
 
 ## 3. Power BI External Invitations
 
-This section provides policies helping reduce guest user invitation risks related to Power BI data and resources.
+This section provides policies that help reduce guest user invitation risks related to Power BI data and resources.
 The settings in this section control whether Power BI allows inviting external users to
 the agency's organization through Power BI's sharing workflows and
 experiences. After an external user accepts the invite, they become an
-AAD B2B guest user in the organization. They will then appear in user
+Azure AD B2B guest user in the organization. They will then appear in user
 pickers throughout the Power BI user experience.
 
 ### Policies
@@ -391,7 +391,7 @@ Sensitivity labels SHOULD be enabled for Power BI and employed for sensitive dat
 ### License Requirements
 
 - Azure Information Protection Premium P1 or Premium P2 license is required to apply or view
-  Microsoft Information Protection sensitivity labels in Power BI. Azure Information Protection can be purchased either standalone or through one of the Microsoft licensing suites. See  [Azure Information Protection
+  Microsoft Information Protection sensitivity labels in Power BI. Azure Information Protection can be purchased either standalone or through one of the Microsoft licensing suites. See [Azure Information Protection
   service description](https://azure.microsoft.com/services/information-protection/) for
   details.
 
@@ -400,7 +400,7 @@ Sensitivity labels SHOULD be enabled for Power BI and employed for sensitive dat
   used in Power BI.
 
 - To apply labels to Power BI content and files, a user must
-  have a Power BI Pro or Premium Per User (PPU) license in addition to
+  have a Power BI Pro or Premium Per User (PPU) license, in addition to
   one of the previously mentioned Azure Information Protection licenses.
 
 - Before enabling sensitivity labels on the agency's tenant, ensure sensitivity labels have been defined and published for relevant
@@ -470,9 +470,9 @@ data in Power BI:
   leverage Direct Query or Live Connect with an on-premises data gateway
   to minimize data exposure to the cloud service.
 
-- Implement Row Level Security in Power BI datasets.
+- Implement row-level security in Power BI datasets.
 
-**Implementation Steps:**
+**Implementation Steps**
 
 **Apply sensitivity labels from data sources to their data in Power BI**
 
@@ -501,7 +501,7 @@ content markings. For example, the agency may have a "Highly
 Confidential" label that includes encryption and applies a "Highly
 Confidential" watermark to content with this label. When this
 tenant setting is enabled and a report has a sensitivity label with
-protection settings, then users can't create sharing links for people in
+protection settings, then users cannot create sharing links for people in
 the agency.
 
 **Information Protection Prerequisites Specific to Power BI**
@@ -659,7 +659,7 @@ configuration steps are as follows:
     Follow detailed steps in Microsoft's [Bring your own encryption keys for Power BI](https://learn.microsoft.com/en-us/power-bi/enterprise/service-encryption-byok)
     from Microsoft.
 
-**Related Resources:**
+**Related Resources**
 
 - [Bring your own encryption keys for Power BI \| Microsoft
  Learn](https://learn.microsoft.com/en-us/power-bi/enterprise/service-encryption-byok)
@@ -694,7 +694,7 @@ export method, such as export to Excel, PowerPoint, or PDF, download to
 .pbix, and Save (Desktop). In this case, only authorized users will be
 able to open protected files.
 
-**Copy and Paste Visuals:**
+**Copy and Paste Visuals**
 
 Power BI can allow users to copy and paste visuals from Power BI reports
 as static images into external applications. This could represent a data
@@ -702,7 +702,7 @@ security risk in some contexts. The agency must evaluate whether this
 represents risk for its data artifacts and whether to turn this off in
 the Export and Sharing Settings.
 
-**Related Resources:**
+**Related Resources**
 
 - [Sensitivity labels in Power BI \| Microsoft
   Learn](https://learn.microsoft.com/en-us/power-bi/enterprise/service-security-sensitivity-label-overview)
@@ -713,7 +713,7 @@ the Export and Sharing Settings.
 - [Power BI Governance – Why you should consider disabling Export to
   Excel](https://data-marc.com/2020/04/13/power-bi-governance-why-you-should-consider-to-disable-export-to-excel/)
 
-**Implementation settings:**
+**Implementation settings**
 
 1.  In the **Power BI tenant** settings, under **Export and sharing
     settings**, administrators can opt to toggle off both **Export reports as
@@ -762,14 +762,14 @@ disabling public internet access.
 
 8. Disable public access for Power BI.
 
-**Related Resources:**
+**Related Resources**
 
 - [Private endpoints for secure access to Power BI  \| Microsoft
   Learn](https://learn.microsoft.com/en-us/power-bi/enterprise/service-security-private-links)
 
 - [Azure security baseline for Power BI](https://learn.microsoft.com/en-us/security/benchmark/azure/baselines/power-bi-security-baseline)
 
-## Best Practices for Service Principals:
+## Best Practices for Service Principals
 
 - Evaluate whether certificates or secrets are a more secure option for
   the implementation.
