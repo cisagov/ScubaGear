@@ -256,7 +256,7 @@ required by BOD 18-01 for FCEB departments and agencies.
 - _Last modified:_ June 2023
 
 #### MS.EXO.4.3v1
-The DMARC point of contact for aggregate reports SHALL include `reports@dmarc.cyber.dhs.gov`.
+The DMARC point of contact for aggregate reports SHALL include reports@dmarc.cyber.dhs.gov.
 
 <!--Policy: MS.EXO.4.3v1; Criticality: SHALL -->
 - _Rationale:_ Email spoofing attempts are not inherently visible to domain
@@ -1283,7 +1283,7 @@ Furthermore, it is required for government agencies by OMB M-21-13 (referred to 
           logging requirements.
 
 #### MS.EXO.17.3v1
-Audit logs SHALL be maintained for at least the minimum duration dictated by [OMB M-21-31 (Appendix C)](https://www.whitehouse.gov/wp-content/uploads/2021/08/M-21-31-Improving-the-Federal-Governments-Investigative-and-Remediation-Capabilities-Related-to-Cybersecurity-Incidents.pdf).
+Audit logs SHALL be maintained for at least the minimum duration dictated by OMB M-21-31 (Appendix C).
 
 <!--Policy: MS.EXO.17.3v1; Criticality: SHALL -->
 - _Rationale:_ Audit logs may no longer be available when needed if they
