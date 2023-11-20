@@ -2,7 +2,7 @@
 
 # CISA M365 Security Configuration Baseline for Power BI
 
-Power BI is the software as a service (SaaS) product from Microsoft that facilitates self-service business intelligence dashboards, reports, datasets, and visualizations. Power BI can connect to multiple different data sources, combine and shape data from those connections, then create reports and dashboards to share with others. This Secure Configuration Baseline (SCB) provides specific policies to strengthen Power BI security.
+Microsoft 365 (M365) Power BI is a cloud-based product that facilitates self-service business intelligence dashboards, reports, datasets, and visualizations. Power BI can connect to multiple different data sources, combine and shape data from those connections, then create reports and dashboards to share with others. This Secure Configuration Baseline (SCB) provides specific policies to strengthen Power BI security.
 
 The Secure Cloud Business Applications (SCuBA) project run by the Cybersecurity and Infrastructure Security Agency (CISA) provides guidance and capabilities to secure federal civilian executive branch (FCEB) agencies' cloud business application environments and protect federal information that is created, accessed, shared, and stored in those environments.
 
@@ -11,7 +11,7 @@ The CISA SCuBA SCBs for M365 help secure federal information assets stored withi
 The information in this document is being provided "as is" for INFORMATIONAL PURPOSES ONLY. CISA does not endorse any commercial product or service, including any subjects of analysis. Any reference to specific commercial entities or commercial products, processes, or services by service mark, trademark, manufacturer, or otherwise, does not constitute or imply endorsement, recommendation, or favoritism by CISA.
 
 ## License Compliance and Copyright
-Portions of this document are adapted from documents in Microsoft's [M365](https://github.com/MicrosoftDocs/microsoft-365-docs/blob/public/LICENSE) and [Azure](https://github.com/MicrosoftDocs/azure-docs/blob/main/LICENSE) GitHub repositories. The respective documents are subject to copyright and are adapted under the terms of the Creative Commons Attribution 4.0 International license. Source documents are linked throughout this document. The United States government has adapted selections of these documents to develop innovative and scalable configuration standards to strengthen the security of widely used cloud-based software services.
+Portions of this document are adapted from documents in Microsoft's [M365](https://github.com/MicrosoftDocs/microsoft-365-docs/blob/public/LICENSE) and [Azure](https://github.com/MicrosoftDocs/azure-docs/blob/main/LICENSE) GitHub repositories. The respective documents are subject to copyright and are adapted under the terms of the Creative Commons Attribution 4.0 International license. Sources are linked throughout this document. The United States government has adapted selections of these documents to develop innovative and scalable configuration standards to strengthen the security of widely used cloud-based software services.
 
 ## Assumptions
 The **License Requirements** sections of this document assume the organization is using an [M365 E3](https://www.microsoft.com/en-us/microsoft-365/compare-microsoft-365-enterprise-plans) or [G3](https://www.microsoft.com/en-us/microsoft-365/government) license level at a minimum. Therefore, only licenses not included in E3/G3 are listed.
@@ -586,7 +586,7 @@ should be completed in the following order.
 
 ## Source Code and Credential Security Considerations
 
-Exposure of secrets via collaboration spaces is a security concern when
+Exposing secrets via collaboration spaces is a security concern when
 using Power BI.
 
 For Power BI embedded applications, it is recommended to implement a
@@ -597,12 +597,12 @@ such as Azure key vault.
 
 Store encryption keys or service principal credentials used for
 encrypting or accessing Power BI in a Key Vault, assign proper access
-policies to the vault and regularly review access permissions.
+policies to the vault, and regularly review access permissions.
 
 For regulatory or other compliance reasons, some agencies may need to
-(BYOK), which is supported by Power BI. By default,
+use (BYOK), which is supported by Power BI. By default,
 Power BI uses Microsoft-managed keys to encrypt the data. In Power BI
-Premium, users can use their own keys for data at-rest that is imported
+Premium, users can use their own keys for data at-rest imported
 into a dataset. See [Data source and storage
 considerations](https://learn.microsoft.com/en-us/power-bi/enterprise/service-encryption-byok#data-source-and-storage-considerations)
 for more information.
@@ -624,14 +624,14 @@ for more information.
 
 - If BYOK is deemed to be a requirement:
 
-- Power BI Premium is required for BYOK.
+  - Power BI Premium is required for BYOK.
 
-- To use BYOK, the Power BI tenant admin must upload data to the Power
+  - To use BYOK, the Power BI tenant admin must upload data to the Power
   BI service from a Power BI Desktop (PBIX) file.
 
-- RSA keys must be 4096-bit.
+  - RSA keys must be 4096-bit.
 
-- Enable BYOK in the tenant.
+  - Enable BYOK in the tenant.
 
 **BYOK Implementation High-Level Steps**
 
