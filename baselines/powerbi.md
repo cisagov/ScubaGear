@@ -774,7 +774,7 @@ disabling public internet access.
 - Evaluate whether certificates or secrets are a more secure option for
   the implementation.
   > Note:
-  > That Microsoft recommends certificates over secrets.
+  > Microsoft recommends certificates over secrets.
 
 - Use the principle of least privilege in implementing service
   principals; only provide the ability to create app registrations to
