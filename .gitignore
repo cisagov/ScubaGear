@@ -23,6 +23,9 @@
 # IDE
 /.vscode
 
+# MacOS
+**/.DS_Store
+
 # Reports
 **/M365BaselineConformance*
 /Testing/Functional/Reports*
