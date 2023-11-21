@@ -59,6 +59,7 @@ function Connect-DefenderHelper {
     )
     $IPPSParams = @{
         'ErrorAction' = 'Stop';
+        'ShowBanner' = $false;
     }
     switch ($M365Environment) {
         "gcchigh" {
