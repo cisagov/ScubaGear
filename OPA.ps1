@@ -1,4 +1,3 @@
-#Requires -Version 5.1
 <#
     .SYNOPSIS
         This script installs the required OPA executable used by the
@@ -39,7 +38,7 @@ try {
         $downloadedBytes = $downloadedBytes + $count
         Write-Progress -activity "Downloading file '$($InstallUrl.split('/') | Select-Object -Last 1)'" -status "Downloaded ($([System.Math]::Floor($downloadedBytes/1024))K of $($totalLength)K): " -PercentComplete ((([System.Math]::Floor($downloadedBytes/1024)) / $totalLength)  * 100)
     }
-    Write-Progress -activity "Finished downloading file '$($InstallUrl.split('/') | Select-Object -Last 1)'" 
+    Write-Progress -activity "Finished downloading file '$($InstallUrl.split('/') | Select-Object -Last 1)'"
 }
 catch {
     Write-Error "An error has occurred: Unable to download OPA executable. To try manually downloading, see details in README under 'Download the required OPA executable'"
