@@ -35,6 +35,7 @@ THIRDPARTYSTRING := concat(" ", THIRDPARTYARRAY)
 #--
 # MS.TEAMS.1.1v1
 #--
+
 # The english translation of the following is:
 # Iterate through all meeting policies. For each, check if AllowExternalParticipantGiveRequestControl
 # is true. If so, save the policy Identity to the "meetings_allowing_control" list.
@@ -301,6 +302,7 @@ tests contains {
 #
 # MS.TEAMS.2.2v1
 #--
+
 # There are two relevant settings:
 #    - AllowTeamsConsumer: Is contact to or from unmanaged users allowed at all?
 #    - AllowTeamsConsumerInbound: Are unamanged users able to initiate contact?
@@ -399,6 +401,7 @@ tests contains {
 #--
 # MS.TEAMS.4.1v1
 #--
+
 # According to Get-CsTeamsClientConfiguration, is team email integration enabled?
 ConfigsAllowingEmail contains Policy.Identity if {
     some Policy in input.client_configuration
@@ -543,6 +546,7 @@ tests contains {
 #--
 # MS.TEAMS.6.1v1
 #--
+
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests contains {
     "PolicyId": "MS.TEAMS.6.1v1",
@@ -558,6 +562,7 @@ tests contains {
 #--
 # MS.TEAMS.6.2v1
 #--
+
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests contains {
     "PolicyId": "MS.TEAMS.6.2v1",
@@ -578,6 +583,7 @@ tests contains {
 #--
 # MS.TEAMS.7.1v1
 #--
+
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests contains {
     "PolicyId": "MS.TEAMS.7.1v1",
@@ -593,6 +599,7 @@ tests contains {
 #--
 # MS.TEAMS.7.2v1
 #--
+
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests contains {
     "PolicyId": "MS.TEAMS.7.2v1",
@@ -613,6 +620,7 @@ tests contains {
 #--
 # MS.TEAMS.8.1v1
 #--
+
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests contains {
     "PolicyId": "MS.TEAMS.8.1v1",
@@ -628,6 +636,7 @@ tests contains {
 #--
 # MS.TEAMS.8.2v1
 #--
+
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests contains {
     "PolicyId": "MS.TEAMS.8.2v1",
