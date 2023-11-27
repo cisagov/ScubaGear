@@ -61,6 +61,7 @@ publish data to the web.
 #### MS.POWERBI.1.1v1
 The Publish to Web feature SHOULD be disabled unless the agency mission requires the capability.
 
+<!--Policy: MS.POWERBI.1.1v1; Criticality: SHOULD -->
 - _Rationale:_ A publicly accessible web URL can be accessed by everyone, including malicious actors. This policy limits information available on the public web that is not specifically allowed to be published.
 - _Last modified:_ June 2023
 
@@ -96,6 +97,7 @@ This section provides policies helping reduce guest user access risks related to
 #### MS.POWERBI.2.1v1
 Guest user access to the Power BI tenant SHOULD be disabled unless the agency mission requires the capability.
 
+<!--Policy: MS.POWERBI.2.1v1; Criticality: SHOULD -->
 - _Rationale:_ Disabling external access to Power BI helps keep guest users from accessing potentially risky data and application programming interfaces (APIs). If an agency needs to allow guest access, this can be limited to users in specific security groups to curb risk.
 - _Last modified:_ June 2023
 
@@ -148,6 +150,7 @@ pickers throughout the Power BI user experience.
 #### MS.POWERBI.3.1v1
 The Invite external users to your organization feature SHOULD be disabled unless agency mission requires the capability.
 
+<!--Policy: MS.POWERBI.3.1v1; Criticality: SHOULD -->
 - _Rationale:_ Disabling this feature keeps internal users from inviting guest users. Therefore guest users can be limited from accessing potentially risky data/APIs. If an agency needs to allow guest access, the invitation feature can be limited to users in specific security groups to help limit risk.
 - _Last modified:_ June 2023
 > Note:
@@ -209,11 +212,15 @@ Several high-level use cases for service principals:
 ### Policies
 #### MS.POWERBI.4.1v1
 Service principals with access to APIs SHOULD be restricted to specific security groups.
+
+<!--Policy: MS.POWERBI.4.1v1; Criticality: SHOULD -->
 - _Rationale:_ With unrestricted service principals, unwanted access to APIs is possible. Allowing service principals through security groups, and only where necessary, mitigates this risk.
 - _Last modified:_ June 2023
 
 #### MS.POWERBI.4.2v1
 Service principals creating and using profiles SHOULD be restricted to specific security groups.
+
+<!--Policy: MS.POWERBI.4.2v1; Criticality: SHOULD -->
 - _Rationale:_ With unrestricted service principals creating/using profiles, there is risk of an unauthorized user using a profile with more permissions than they have. Allowing service principals through security groups will mitigate that risk.
 - _Last modified:_ June 2023
 
@@ -287,6 +294,8 @@ This setting applies to streaming and PUSH datasets. If ResourceKey-based authen
 ### Policies
 #### MS.POWERBI.5.1v1
 ResourceKey-based authentication SHOULD be blocked unless a specific use case (e.g., streaming and/or PUSH datasets) merits its use.
+
+<!--Policy: MS.POWERBI.5.1v1; Criticality: SHOULD -->
 - _Rationale:_ If resource keys are allowed, someone can move data without Azure AD OAuth bearer token, causing possibly malicious or junk data to be stored. Disabling resource keys reduces risk that an unauthorized individual will make changes.
 - _Last modified:_ June 2023
 
@@ -328,6 +337,8 @@ and the scripts are deemed free of security risks.
 ### Policies
 #### MS.POWERBI.6.1v1
 Python and R interactions SHOULD be disabled.
+
+<!--Policy: MS.POWERBI.6.1v1; Criticality: SHOULD -->
 - _Rationale:_ External code poses a security and privacy risk as there is no good way to regulate what is done with the data or integrations. Disabling this will reduce the risk of a data leak or malicious actor.
 - _Last modified:_ June 2023
 
@@ -372,6 +383,7 @@ DLP.
 #### MS.POWERBI.7.1v1
 Sensitivity labels SHOULD be enabled for Power BI and employed for sensitive data per enterprise data protection policies.
 
+<!--Policy: MS.POWERBI.7.1v1; Criticality: SHOULD -->
 - _Rationale:_ A document without sensitivity labels may be opened unknowingly, potentially exposing data to someone who is not supposed to have access to it. This policy will help organize and classify data, making it easier to keep data out of the wrong hands.
 - _Last modified:_ June 2023
 ### Resources
