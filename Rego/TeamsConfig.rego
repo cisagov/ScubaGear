@@ -10,18 +10,22 @@ ReportDetailsArray(false, Array, String) := Description(Format(Array), String, c
 
 FilterArray(Conditions, Boolean) := [Condition | some Condition in Conditions; Condition == Boolean]
 
+#############
+# Constants #
+#############
+
 FAIL := ReportDetailsBoolean(false)
 
 PASS := ReportDetailsBoolean(true)
 
-ThirdPartyArray := [
+THIRDPARTYARRAY := [
     "Custom implementation allowed.",
     "If you are using Defender to fulfill this requirement,",
     "run the Defender version of ScubaGear.",
     "Otherwise, use a 3rd party tool OR manually check."
 ]
 
-THIRDPARTYSTRING := concat(" ", ThirdPartyArray)
+THIRDPARTYSTRING := concat(" ", THIRDPARTYARRAY)
 
 
 ##############
@@ -106,7 +110,8 @@ tests contains {
 } if {
     some Policy in input.meeting_policies
 
-    # This control specifically states that non-global policies MAY be different, so filter for the global policy
+    # This control specifically states that non-global policies MAY be different,
+    # so filter for the global policy
     Policy.Identity == "Global"
     Conditions := [
         Policy.AutoAdmittedUsers != "Everyone",
@@ -141,7 +146,8 @@ tests contains {
 } if {
     some Policy in input.meeting_policies
 
-    # This control specifically states that non-global policies MAY be different, so filter for the global policy
+    # This control specifically states that non-global policies MAY be different,
+    # so filter for the global policy
     Policy.Identity == "Global"
     AllowedUsers := [
         "EveryoneInCompany",
@@ -181,7 +187,7 @@ tests contains {
     "RequirementMet": Status
 } if {
     Policies := MeetingsAllowingPSTNBypass
-    String := "meeting policy(ies) found that either allow everyone or dial-in users to bypass lobby:"
+    String := "meeting policy(ies) found that allow everyone or dial-in users to bypass lobby:"
     Status := count(Policies) == 0
 }
 

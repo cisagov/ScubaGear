@@ -10,7 +10,7 @@ test_ExternalParticipantControl_Correct_V1 if {
     Output := tests with input as {
         "meeting_policies": [
             {
-                "Identity": "Global", 
+                "Identity": "Global",
                 "AllowExternalParticipantGiveRequestControl" : false
             }
         ]
@@ -28,7 +28,7 @@ test_ExternalParticipantControl_Correct_V2 if {
     Output := tests with input as {
     "meeting_policies": [
         {
-            "Identity": "Tag:FirstCustomPolicy", 
+            "Identity": "Tag:FirstCustomPolicy",
             "AllowExternalParticipantGiveRequestControl" : false
         }
     ]
@@ -46,12 +46,12 @@ test_ExternalParticipantControl_Incorrect_V1 if {
     Output := tests with input as {
         "meeting_policies": [
             {
-                "Identity": "Global", 
+                "Identity": "Global",
                 "AllowExternalParticipantGiveRequestControl" : true
             }
         ]
     }
-    
+
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
@@ -64,7 +64,7 @@ test_ExternalParticipantControl_Incorrect_V2 if {
     Output := tests with input as {
         "meeting_policies": [
             {
-                "Identity": "Tag:FirstCustomPolicy", 
+                "Identity": "Tag:FirstCustomPolicy",
                 "AllowExternalParticipantGiveRequestControl" : true
             }
         ]
@@ -82,22 +82,22 @@ test_ExternalParticipantControl_MultiplePolicies if {
     Output := tests with input as {
         "meeting_policies": [
             {
-                "Identity": "Global", 
+                "Identity": "Global",
                 "AllowExternalParticipantGiveRequestControl" : true
             },
             {
-                "Identity": "Tag:FirstCustomPolicy", 
+                "Identity": "Tag:FirstCustomPolicy",
                 "AllowExternalParticipantGiveRequestControl" : false
             },
             {
-                "Identity": "Tag:SecondCustomPolicy", 
+                "Identity": "Tag:SecondCustomPolicy",
                 "AllowExternalParticipantGiveRequestControl" : true
             }
-        ] 
+        ]
     }
-    
+
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-    
+
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
     startswith(RuleOutput[0].ReportDetails, "2 meeting policy(ies) found that allows external control: ")
@@ -111,11 +111,11 @@ test_ExternalParticipantControl_MultiplePolicies if {
 #--
 test_AnonymousMeetingStart_Correct_V1 if {
     PolicyId := "MS.TEAMS.1.2v1"
-    
+
     Output := tests with input as {
         "meeting_policies": [
             {
-                "Identity": "Global", 
+                "Identity": "Global",
                 "AllowAnonymousUsersToStartMeeting" : false
             }
         ]
@@ -134,7 +134,7 @@ test_AnonymousMeetingStart_Correct_V2 if {
     Output := tests with input as {
         "meeting_policies": [
             {
-                "Identity": "Tag:FirstCustomPolicy", 
+                "Identity": "Tag:FirstCustomPolicy",
                 "AllowAnonymousUsersToStartMeeting" : false
             }
         ]
@@ -153,7 +153,7 @@ test_AnonymousMeetingStart_Incorrect_V1 if {
     Output := tests with input as {
         "meeting_policies": [
             {
-                "Identity": "Global", 
+                "Identity": "Global",
                 "AllowAnonymousUsersToStartMeeting" : true
             }
         ]
@@ -172,7 +172,7 @@ test_AnonymousMeetingStart_Incorrect_V2 if {
     Output := tests with input as {
         "meeting_policies": [
             {
-                "Identity": "Tag:FirstCustomPolicy", 
+                "Identity": "Tag:FirstCustomPolicy",
                 "AllowAnonymousUsersToStartMeeting" : true
             }
         ]
@@ -191,22 +191,22 @@ test_AnonymousMeetingStart_MultiplePolicies if {
     Output := tests with input as {
         "meeting_policies": [
             {
-                "Identity": "Global", 
+                "Identity": "Global",
                 "AllowAnonymousUsersToStartMeeting" : true
             },
             {
-                "Identity": "Tag:FirstCustomPolicy", 
+                "Identity": "Tag:FirstCustomPolicy",
                 "AllowAnonymousUsersToStartMeeting" : false
             },
             {
-                "Identity": "Tag:SecondCustomPolicy", 
+                "Identity": "Tag:SecondCustomPolicy",
                 "AllowAnonymousUsersToStartMeeting" : true
             }
-        ] 
+        ]
     }
-    
+
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-    
+
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
     startswith(RuleOutput[0].ReportDetails, "2 meeting policy(ies) found that allows anonymous users to start meetings: ")
@@ -313,7 +313,7 @@ test_AutoAdmittedUsers_Correct_V1 if {
     Output := tests with input as {
         "meeting_policies": [
             {
-                "Identity": "Global", 
+                "Identity": "Global",
                 "AutoAdmittedUsers" : "EveryoneInSameAndFederatedCompany"
             }
         ]
@@ -332,7 +332,7 @@ test_AutoAdmittedUsers_Correct_V2 if {
     Output := tests with input as {
         "meeting_policies": [
             {
-                "Identity": "Global", 
+                "Identity": "Global",
                 "AutoAdmittedUsers" : "EveryoneInCompanyExcludingGuests"
             }
         ]
@@ -351,7 +351,7 @@ test_AutoAdmittedUsers_Incorrect_V2 if {
     Output := tests with input as {
         "meeting_policies": [
             {
-                "Identity": "Global", 
+                "Identity": "Global",
                 "AutoAdmittedUsers" : "OrganizerOnly"
             }
         ]
@@ -370,14 +370,14 @@ test_AutoAdmittedUsers_Incorrect_V3 if {
     Output := tests with input as {
         "meeting_policies": [
             {
-                "Identity": "Global", 
+                "Identity": "Global",
                 "AutoAdmittedUsers" : "InvitedUsers"
             }
         ]
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-    
+
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "Requirement not met"
@@ -428,7 +428,7 @@ test_OneGoodOneBadPolicy_Incorrect if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "1 meeting policy(ies) found that either allow everyone or dial-in users to bypass lobby: Tag:CustomPolicy"
+    RuleOutput[0].ReportDetails == "1 meeting policy(ies) found that allow everyone or dial-in users to bypass lobby: Tag:CustomPolicy"
 }
 
 test_AllowPSTNUsersToBypassLobby_Incorrect if {
@@ -448,7 +448,7 @@ test_AllowPSTNUsersToBypassLobby_Incorrect if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "1 meeting policy(ies) found that either allow everyone or dial-in users to bypass lobby: Tag:CustomPolicy"
+    RuleOutput[0].ReportDetails == "1 meeting policy(ies) found that allow everyone or dial-in users to bypass lobby: Tag:CustomPolicy"
 }
 
 #--
@@ -521,7 +521,7 @@ test_AllowCloudRecording_Multiple if {
 #--
 test_BroadcastRecordingMode_Correct if {
     PolicyId := "MS.TEAMS.1.7v1"
-   
+
     Output := tests with input as {
         "broadcast_policies": [
             {
@@ -540,7 +540,7 @@ test_BroadcastRecordingMode_Correct if {
 
 test_BroadcastRecordingMode_Incorrect if {
     PolicyId := "MS.TEAMS.1.7v1"
-   
+
     Output := tests with input as {
         "broadcast_policies": [
             {
@@ -549,9 +549,9 @@ test_BroadcastRecordingMode_Incorrect if {
             }
         ]
     }
-   
+
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-    
+
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "Requirement not met"
