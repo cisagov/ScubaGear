@@ -20,6 +20,8 @@ FilterArray(Conditions, Boolean) := [Condition | some Condition in Conditions; C
 #
 # MS.POWERPLATFORM.1.1v1
 #--
+
+# Pass if disableEnvironmentCreationByNonAdminUsers is true
 tests contains {
     "PolicyId": "MS.POWERPLATFORM.1.1v1",
     "Criticality": "Shall",
@@ -32,10 +34,7 @@ tests contains {
     Status := EnvironmentCreation.disableEnvironmentCreationByNonAdminUsers == true
 }
 
-#--
-
-# MS.POWERPLATFORM.1.1v1
-#--
+# Edge case where pulling configuration from tenant fails
 tests contains {
     "PolicyId": "MS.POWERPLATFORM.1.1v1",
     "Criticality": "Shall",
@@ -52,6 +51,7 @@ tests contains {
 #
 # MS.POWERPLATFORM.1.2v1
 #--
+# Pass if disableTrialEnvironmentCreationByNonAdminUsers is true
 tests contains {
     "PolicyId": "MS.POWERPLATFORM.1.2v1",
     "Criticality": "Shall",
@@ -64,11 +64,7 @@ tests contains {
     Status := EnvironmentCreation.disableTrialEnvironmentCreationByNonAdminUsers == true
 }
 
-#--
-
-#
-# MS.POWERPLATFORM.1.2v1
-#--
+# Edge case where pulling configuration from tenant fails
 tests contains {
     "PolicyId": "MS.POWERPLATFORM.1.2v1",
     "Criticality": "Shall",
@@ -90,6 +86,10 @@ tests contains {
 #
 # MS.POWERPLATFORM.2.1v1
 #--
+
+# The english translation of the following is:
+# Iterate through all policies. For each, check if the enviorment the policy applies to
+# is the default enviorment. If so, save the policy name to the DefaultEnvPolicies list.
 DefaultEnvPolicies contains {"PolicyName": Policies.displayName} if {
     some Policies in input.dlp_policies[_].value
     some Env in Policies.environments
@@ -97,6 +97,7 @@ DefaultEnvPolicies contains {"PolicyName": Policies.displayName} if {
 }
 
 # Note: there is only one default environment per tenant and it cannot be deleted or backed up
+# Pass if at least one policy applies to the default enviorment
 tests contains {
     "PolicyId": "MS.POWERPLATFORM.2.1v1",
     "Criticality": "Shall",
@@ -114,6 +115,7 @@ tests contains {
 #
 # MS.POWERPLATFORM.2.2v1
 #--
+
 # gets the list of all tenant environments
 AllEnvironments contains EnvironmentList.EnvironmentName if {
     some EnvironmentList in input.environment_list
@@ -125,6 +127,7 @@ EnvWithPolicies contains Env.name if {
     some Env in Policies.environments
 }
 
+# Pass if all envoirments have a policy applied to them
 tests contains {
     "PolicyId": "MS.POWERPLATFORM.2.2v1",
     "Criticality": "Should",
@@ -142,11 +145,7 @@ tests contains {
     Status := count(EnvWithoutPolicies) == 0
 }
 
-#--
-
-#
-# MS.POWERPLATFORM.2.2v1
-#--
+# Edge case where no policies are found
 tests contains {
     "PolicyId": "MS.POWERPLATFORM.2.2v1",
     "Criticality": "Should",
@@ -159,11 +158,7 @@ tests contains {
     count(DLPPolicies.value) <= 0
 }
 
-#--
-
-#
-# MS.POWERPLATFORM.2.2v1
-#--
+# Edge case where pulling configuration from tenant fails
 tests contains {
     "PolicyId": "MS.POWERPLATFORM.2.2v1",
     "Criticality": "Should",
@@ -180,6 +175,7 @@ tests contains {
 #
 # MS.POWERPLATFORM.2.3v1
 #--
+
 # gets the set of connectors that are allowed in the default environment
 # general and confidential groups refer to business and non-business
 ConnectorSet contains Connector.id if {
@@ -227,6 +223,7 @@ AllowedInBaseline := {
     "/providers/Microsoft.PowerApps/apis/shared_yammer"
 }
 
+# Pass if all connectors besides the ones allowed are blocked
 tests contains {
     "PolicyId": "MS.POWERPLATFORM.2.3v1",
     "Criticality": "Should",
@@ -242,11 +239,7 @@ tests contains {
     Status := count(RogueConnectors) == 0
 }
 
-#--
-
-#
-# MS.POWERPLATFORM.2.3v1
-#--
+# Edge case where no policies are found
 tests contains {
     "PolicyId": "MS.POWERPLATFORM.2.3v1",
     "Criticality": "Should",
@@ -259,17 +252,13 @@ tests contains {
     count(DLPPolicies.value) <= 0
 }
 
-#--
-
-#
-# MS.POWERPLATFORM.2.3v1
-#--
+# Edge case where pulling configuration from tenant fails
 tests contains {
     "PolicyId": "MS.POWERPLATFORM.2.3v1",
     "Criticality": "Should",
     "Commandlet": ["Get-DlpPolicy"],
-    "ActualValue": "PowerShell error",
-    "ReportDetails": "PowerShell error",
+    "ActualValue": "PowerShell Error",
+    "ReportDetails": "PowerShell Error",
     "RequirementMet": false
 } if {
     count(input.dlp_policies) <= 0
@@ -286,6 +275,8 @@ tests contains {
 #
 # MS.POWERPLATFORM.3.1v1
 #--
+
+# Pass if isDisabled is false
 tests contains {
     "PolicyId": "MS.POWERPLATFORM.3.1v1",
     "Criticality": "Shall",
@@ -298,11 +289,7 @@ tests contains {
     Status := TenantIsolation.properties.isDisabled == false
 }
 
-#--
-
-#
-# MS.POWERPLATFORM.3.1v1
-#--
+# Edge case where pulling configuration from tenant fails
 tests contains {
     "PolicyId": "MS.POWERPLATFORM.3.1v1",
     "Criticality": "Shall",
@@ -319,6 +306,7 @@ tests contains {
 #
 # MS.POWERPLATFORM.3.2v1
 #--
+
 # At this time we are unable to test for X because of Y
 tests contains {
     "PolicyId": "MS.POWERPLATFORM.3.2v1",
@@ -339,6 +327,7 @@ tests contains {
 #
 # MS.POWERPLATFORM.4.1v1
 #--
+
 # At this time we are unable to test for X because of Y
 tests contains {
     "PolicyId": "MS.POWERPLATFORM.4.1v1",
@@ -359,7 +348,8 @@ tests contains {
 #
 # MS.POWERPLATFORM.5.1v1
 #--
-#
+
+# Pass if disablePortalsCreationByNonAdminUsers is true
 tests contains {
     "PolicyId": "MS.POWERPLATFORM.5.1v1",
     "Criticality": "Should",
