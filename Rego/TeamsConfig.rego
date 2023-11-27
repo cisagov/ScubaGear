@@ -38,12 +38,13 @@ THIRDPARTYSTRING := concat(" ", THIRDPARTYARRAY)
 
 # The english translation of the following is:
 # Iterate through all meeting policies. For each, check if AllowExternalParticipantGiveRequestControl
-# is true. If so, save the policy Identity to the "meetings_allowing_control" list.
+# is true. If so, save the policy Identity to the MeetingsAllowingExternalControl list.
 MeetingsAllowingExternalControl contains Policy.Identity if {
     some Policy in input.meeting_policies
     Policy.AllowExternalParticipantGiveRequestControl == true
 }
 
+# Pass if MeetingsAllowingExternalControl does not have any policies saved.
 tests contains {
     "PolicyId": "MS.TEAMS.1.1v1",
     "Criticality": "Should",
@@ -62,11 +63,16 @@ tests contains {
 #--
 # MS.TEAMS.1.2v1
 #--
+
+# The english translation of the following is:
+# Iterate through all meeting policies. For each, check if AllowAnonymousUsersToStartMeeting
+# is true. If so, save the policy Identity to the MeetingsAllowingAnonStart list.
 MeetingsAllowingAnonStart contains Policy.Identity if {
     some Policy in input.meeting_policies
     Policy.AllowAnonymousUsersToStartMeeting == true
 }
 
+# Pass if MeetingsAllowingAnonStart does not have any policies saved.
 tests contains {
     "PolicyId": "MS.TEAMS.1.2v1",
     "Criticality": "Shall",
@@ -85,6 +91,8 @@ tests contains {
 #--
 # MS.TEAMS.1.3v1
 #--
+
+# Create the descriptive error message if policy should fail
 ReportDetails1_3(Policy) := PASS if {
     Policy.AutoAdmittedUsers != "Everyone"
     Policy.AllowPSTNUsersToBypassLobby == false
@@ -101,6 +109,8 @@ ReportDetails1_3(Policy) := Description if {
     Description := concat(": ", [FAIL, "All users are admitted automatically"])
 }
 
+# If AutoAdmittedUsers != Everyone &
+# AllowPSTNUsersToBypassLobby == false, then policy should pass
 tests contains {
     "PolicyId": "MS.TEAMS.1.3v1",
     "Criticality": "Should",
@@ -112,7 +122,7 @@ tests contains {
     some Policy in input.meeting_policies
 
     # This control specifically states that non-global policies MAY be different,
-    # so filter for the global policy
+    # so filter for the global policy only
     Policy.Identity == "Global"
     Conditions := [
         Policy.AutoAdmittedUsers != "Everyone",
@@ -121,6 +131,7 @@ tests contains {
     Status := count(FilterArray(Conditions, false)) == 0
 }
 
+# Edge case where pulling configuration from tenant fails
 tests contains {
     "PolicyId": "MS.TEAMS.1.3v1",
     "Criticality": "Should",
@@ -137,6 +148,8 @@ tests contains {
 #--
 # MS.TEAMS.1.4v1
 #--
+
+# Pass if AutoAdmittedUsers is one of the allowed settings
 tests contains {
     "PolicyId": "MS.TEAMS.1.4v1",
     "Criticality": "Should",
@@ -158,6 +171,7 @@ tests contains {
     Status := Policy.AutoAdmittedUsers in AllowedUsers
 }
 
+# Edge case where pulling configuration from tenant fails
 tests contains {
     "PolicyId": "MS.TEAMS.1.4v1",
     "Criticality": "Should",
@@ -174,11 +188,16 @@ tests contains {
 #--
 # MS.TEAMS.1.5v1
 #--
+
+# The english translation of the following is:
+# Iterate through all meeting policies. For each, check if AllowPSTNUsersToBypassLobby
+# is true. If so, save the policy Identity to the MeetingsAllowingPSTNBypass list.
 MeetingsAllowingPSTNBypass contains Policy.Identity if {
     some Policy in input.meeting_policies
     Policy.AllowPSTNUsersToBypassLobby == true
 }
 
+# Pass if MeetingsAllowingPSTNBypass does not have any policies saved.
 tests contains {
     "PolicyId": "MS.TEAMS.1.5v1",
     "Criticality": "Should",
@@ -192,6 +211,7 @@ tests contains {
     Status := count(Policies) == 0
 }
 
+# Edge case where pulling configuration from tenant fails
 tests contains {
     "PolicyId": "MS.TEAMS.1.5v1",
     "Criticality": "Should",
@@ -208,6 +228,8 @@ tests contains {
 #--
 # MS.TEAMS.1.6v1
 #--
+
+# Pass if AllowCloudRecording == false for global policy
 tests contains {
     "PolicyId": "MS.TEAMS.1.6v1",
     "Criticality": "Should",
@@ -223,6 +245,7 @@ tests contains {
     Status := Policy.AllowCloudRecording == false
 }
 
+# Edge case where pulling configuration from tenant fails
 tests contains {
     "PolicyId": "MS.TEAMS.1.6v1",
     "Criticality": "Should",
@@ -239,6 +262,8 @@ tests contains {
 #--
 # MS.TEAMS.1.7v1
 #--
+
+# Pass if BroadcastRecordingMode is set to UserOverride for global policy
 tests contains {
     "PolicyId": "MS.TEAMS.1.7v1",
     "Criticality": "Should",
@@ -254,7 +279,7 @@ tests contains {
     Status := Policy.BroadcastRecordingMode == "UserOverride"
 }
 
-#
+# Edge case where pulling configuration from tenant fails
 tests contains {
     "PolicyId": "MS.TEAMS.1.7v1",
     "Criticality": "Should",
@@ -276,6 +301,10 @@ tests contains {
 #--
 # MS.TEAMS.2.1v1
 #--
+
+# The english translation of the following is:
+# Iterate through all meeting policies. For each, check if AllowFederatedUsers
+# is true & no AllowedDomains. If so, save the policy Identity to the ExternalAccessConfig list.
 ExternalAccessConfig contains Policy.Identity if {
     some Policy in input.federation_configuration
 
@@ -284,6 +313,7 @@ ExternalAccessConfig contains Policy.Identity if {
     count(Policy.AllowedDomains) == 0
 }
 
+# Pass if ExternalAccessConfig does not have any policies saved.
 tests contains {
     "PolicyId": "MS.TEAMS.2.1v1",
     "Criticality": "Shall",
@@ -327,6 +357,7 @@ FederationConfiguration contains Policy.Identity if {
     Policy.AllowTeamsConsumer == true
 }
 
+# Pass if FederationConfiguration does not have any policies saved.
 tests contains {
     "PolicyId": "MS.TEAMS.2.2v1",
     "Criticality": "Shall",
@@ -345,11 +376,16 @@ tests contains {
 #--
 # MS.TEAMS.2.3v1
 #--
+
+# The english translation of the following is:
+# Iterate through all meeting policies. For each, check if AllowTeamsConsumer
+# is true. If so, save the policy Identity to the InternalCannotEnable list.
 InternalCannotEnable contains Policy.Identity if {
     some Policy in input.federation_configuration
     Policy.AllowTeamsConsumer == true
 }
 
+# Pass if InternalCannotEnable does not have any policies saved.
 tests contains {
     "PolicyId": "MS.TEAMS.2.3v1",
     "Criticality": "Should",
@@ -373,11 +409,16 @@ tests contains {
 #--
 # MS.TEAMS.3.1v1
 #--
+
+# The english translation of the following is:
+# Iterate through all meeting policies. For each, check if AllowPublicUsers
+# is true. If so, save the policy Identity to the SkypeBlocConfig list.
 SkypeBlocConfig contains Policy.Identity if {
     some Policy in input.federation_configuration
     Policy.AllowPublicUsers == true
 }
 
+# Pass if SkypeBlocConfig does not have any policies saved.
 tests contains {
     "PolicyId": "MS.TEAMS.3.1v1",
     "Criticality": "Shall",
@@ -402,17 +443,21 @@ tests contains {
 # MS.TEAMS.4.1v1
 #--
 
-# According to Get-CsTeamsClientConfiguration, is team email integration enabled?
+# The english translation of the following is:
+# Iterate through all meeting policies. For each, check if AllowEmailIntoChannel
+# is true. If so, save the policy Identity to the ConfigsAllowingEmail list.
 ConfigsAllowingEmail contains Policy.Identity if {
     some Policy in input.client_configuration
     Policy.AllowEmailIntoChannel == true
 }
 
+# Concat the AssignedPlan for each tenant in one comma seperated string
 AssignedPlans := concat(", ", TenantConfig.AssignedPlan) if {
     some TenantConfig in input.teams_tenant_info
 }
 
-# What is the tenant type according to Get-CsTenant?
+# If AssignedPlan (one of the tenant configs) contain the string
+# "GCC" and/or "DOD", return true, else return false
 default TenantType := false
 TenantType := true if {
     GCCConditions := [
@@ -422,7 +467,7 @@ TenantType := true if {
     count(FilterArray(GCCConditions, true)) > 0
 }
 
-
+# Create descriptive report string based on what passed variables equal
 ReportDetails4_1(true, _) := "N/A: Feature is unavailable in GCC environments" if {}
 
 ReportDetails4_1(false, true) := PASS if {}
@@ -450,6 +495,7 @@ tests contains {
     Status := count(FilterArray(Conditions, true)) > 0
 }
 
+# Edge case where pulling configuration from tenant fails
 tests contains {
     "PolicyId": "MS.TEAMS.4.1v1",
     "Criticality": "Shall",
@@ -471,11 +517,16 @@ tests contains {
 #--
 # MS.TEAMS.5.1v1
 #--
+
+# The english translation of the following is:
+# Iterate through all meeting policies. For each, check if DefaultCatalogAppsType
+# is BlockedAppList. If so, save the policy Identity to the PoliciesBlockingDefaultApps list.
 PoliciesBlockingDefaultApps contains Policy.Identity if {
     some Policy in input.app_policies
     Policy.DefaultCatalogAppsType == "BlockedAppList"
 }
 
+# Pass if PoliciesBlockingDefaultApps does not have any policies saved.
 tests contains {
     "PolicyId": "MS.TEAMS.5.1v1",
     "Criticality": "Should",
@@ -494,11 +545,16 @@ tests contains {
 #--
 # MS.TEAMS.5.2v1
 #--
+
+# The english translation of the following is:
+# Iterate through all meeting policies. For each, check if GlobalCatalogAppsType
+# is BlockedAppList. If so, save the policy Identity to the PoliciesAllowingGlobalApps list.
 PoliciesAllowingGlobalApps contains Policy.Identity if {
     some Policy in input.app_policies
     Policy.GlobalCatalogAppsType == "BlockedAppList"
 }
 
+# Pass if PoliciesAllowingGlobalApps does not have any policies saved.
 tests contains {
     "PolicyId": "MS.TEAMS.5.2v1",
     "Criticality": "Should",
@@ -518,11 +574,16 @@ tests contains {
 # MS.TEAMS.5.3v1
 #--
 #
+
+# The english translation of the following is:
+# Iterate through all meeting policies. For each, check if PrivateCatalogAppsType
+# is BlockedAppList. If so, save the policy Identity to the PoliciesAllowingCustomApps list.
 PoliciesAllowingCustomApps contains Policy.Identity if {
     some Policy in input.app_policies
     Policy.PrivateCatalogAppsType == "BlockedAppList"
 }
 
+# Pass if PoliciesAllowingCustomApps does not have any policies saved.
 tests contains {
     "PolicyId": "MS.TEAMS.5.3v1",
     "Criticality": "Should",
