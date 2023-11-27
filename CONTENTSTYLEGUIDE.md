@@ -15,7 +15,7 @@ Use menu icon on the top left corner of this document to get to a specific secti
 
 ## OPA Rego
 
-Because there isn't a standard style guide for the Rego language, we are creating one from scratch. For consistency, we will be using many of the same style rules as PowerShell. There are also a few best practice rules that this program will follow. These best practices were deliberated on and chosen to enhance readability. We recognize that the code is in a constant state of improvement, so the best practices are subject to change.
+OPA has a style guide [Styra](https://github.com/StyraInc/rego-style-guide), that we are adopting, except where our guide specifically notes an exception (for example, variable name case).  At least, I believe that's the direction we have gone. For consistency, we will be using many of the same style rules as PowerShell. There are also a few best practice rules that this program will follow. These best practices were deliberated on and chosen to enhance readability. We recognize that the code is in a constant state of improvement, so the best practices are subject to change. Also note the use of Regal linter is highly encourage for style formatting.
 
 ### Test Cases
 
