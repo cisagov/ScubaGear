@@ -76,11 +76,11 @@ The first one directs the user to the baseline document for manual checking. The
 ```
 # At this time we are unable to test for X because of Y
 tests contains {
-    "PolicyId": "MS.<Product>.<Policy #>.<Bulletpoint #>v<Version #>",
+    "PolicyId": "MS.<Product>.<Policy Group #>.<Policy #>v<Version #>",
     "Criticality": "Should/Not-Implemented",
     "Commandlet": [],
     "ActualValue": [],
-    "ReportDetails": NotCheckedDetails("MS.<Product>.<Policy #>.<Bulletpoint #>v<Version #>"),
+    "ReportDetails": NotCheckedDetails("MS.<Product>.<Policy Group #>.<Policy #>v<Version #>"),
     "RequirementMet": false,
 }
 ```
