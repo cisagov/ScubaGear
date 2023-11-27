@@ -133,7 +133,7 @@ test_AnonymousLinkType_Correct if {
                 "FolderAnonymousLinkType" : 1
             }
         ],
-        "OneDrive_PnP_Flag": false   
+        "OneDrive_PnP_Flag": false
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
@@ -153,7 +153,7 @@ test_AnonymousLinkType_Incorrect_V1 if {
                 "FolderAnonymousLinkType" : 2
             }
         ],
-        "OneDrive_PnP_Flag": false   
+        "OneDrive_PnP_Flag": false
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
@@ -173,7 +173,7 @@ test_AnonymousLinkType_Incorrect_V2 if {
                 "FolderAnonymousLinkType" : 2
             }
         ],
-        "OneDrive_PnP_Flag": false   
+        "OneDrive_PnP_Flag": false
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
@@ -193,7 +193,7 @@ test_AnonymousLinkType_Incorrect_V3 if {
                 "FolderAnonymousLinkType" : 1
             }
         ],
-        "OneDrive_PnP_Flag": false   
+        "OneDrive_PnP_Flag": false
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
@@ -213,7 +213,7 @@ test_UsingServicePrincipal if {
                 "FolderAnonymousLinkType" : 1
             }
         ],
-        "OneDrive_PnP_Flag": true   
+        "OneDrive_PnP_Flag": true
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
@@ -304,7 +304,7 @@ test_Multi_Incorrect_V1 if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement not met: Expiration timer for 'People who use a verification code' NOT enabled and set to greater 30 days"
+    RuleOutput[0].ReportDetails == "Requirement not met: Expiration timer for 'People who use a verification code' NOT enabled and set to >30 days"
 }
 
 test_EmailAttestationRequired_Incorrect_V2 if {

@@ -26,15 +26,13 @@ FilterArray(Conditions, Boolean) := [Condition | some Condition in Conditions; C
 # SharingCapability == 3 Existing Guests
 # SharingCapability == 1 New and Existing Guests
 # SharingCapability == 2 Anyone
+
 # If SharingCapability is set to Only People In Organization
 # OR Existing Guests, the policy should pass.
 tests contains {
     "PolicyId": "MS.SHAREPOINT.1.1v1",
     "Criticality": "Should",
-    "Commandlet": [
-        "Get-SPOTenant",
-        "Get-PnPTenant"
-    ],
+    "Commandlet": ["Get-SPOTenant", "Get-PnPTenant"],
     "ActualValue": [SharingCapability],
     "ReportDetails": ReportDetailsBoolean(Status),
     "RequirementMet": Status
@@ -58,15 +56,13 @@ tests contains {
 # OneDriveSharingCapability == 3 Existing Guests
 # OneDriveSharingCapability == 1 New and Existing Guests
 # OneDriveSharingCapability == 2 Anyone
+
 # If OneDriveSharingCapability is set to Only People In Organization
 # OR Existing Guests, the policy should pass.
 tests contains {
     "PolicyId": "MS.SHAREPOINT.1.2v1",
     "Criticality": "Should",
-    "Commandlet": [
-        "Get-SPOTenant",
-        "Get-PnPTenant"
-    ],
+    "Commandlet": ["Get-SPOTenant", "Get-PnPTenant"],
     "ActualValue": [OneDriveSharingCapability],
     "ReportDetails": ReportDetailsBoolean(Status),
     "RequirementMet": Status
@@ -133,10 +129,7 @@ Domainlist(TenantPolicy) := concat(": ", [FAIL, NOTESTRING]) if {
 tests contains {
     "PolicyId": "MS.SHAREPOINT.1.3v1",
     "Criticality": "Shall",
-    "Commandlet": [
-        "Get-SPOTenant",
-        "Get-PnPTenant"
-    ],
+    "Commandlet": ["Get-SPOTenant", "Get-PnPTenant"],
     "ActualValue": [
         TenantPolicy.SharingDomainRestrictionMode,
         TenantPolicy.SharingCapability
@@ -164,10 +157,7 @@ tests contains {
 tests contains {
     "PolicyId": "MS.SHAREPOINT.1.4v1",
     "Criticality": "Shall",
-    "Commandlet": [
-        "Get-SPOTenant",
-        "Get-PnPTenant"
-    ],
+    "Commandlet": ["Get-SPOTenant", "Get-PnPTenant"],
     "ActualValue": [
         TenantPolicy.RequireAcceptingAccountMatchInvitedAccount,
         TenantPolicy.SharingCapability
@@ -199,10 +189,7 @@ tests contains {
 tests contains {
     "PolicyId": "MS.SHAREPOINT.2.1v1",
     "Criticality": "Shall",
-    "Commandlet": [
-        "Get-SPOTenant",
-        "Get-PnPTenant"
-    ],
+    "Commandlet": ["Get-SPOTenant", "Get-PnPTenant"],
     "ActualValue": [TenantPolicy.DefaultSharingLinkType],
     "ReportDetails": ReportDetailsBoolean(Status),
     "RequirementMet": Status
@@ -217,16 +204,14 @@ tests contains {
 # MS.SHAREPOINT.2.2v1
 #--
 
-# SPO_tenant - DefaultLinkPermission
-# 1 view 2 edit
+# DefaultLinkPermission == 1 view
+# DefaultLinkPermission == 2 edit
+
 # Default link permission should be set to view
 tests contains {
     "PolicyId": "MS.SHAREPOINT.2.2v1",
     "Criticality": "Shall",
-    "Commandlet": [
-        "Get-SPOTenant",
-        "Get-PnPTenant"
-    ],
+    "Commandlet": ["Get-SPOTenant", "Get-PnPTenant"],
     "ActualValue": [TenantPolicy.DefaultLinkPermission],
     "ReportDetails": ReportDetailsBoolean(Status),
     "RequirementMet": Status
@@ -280,10 +265,7 @@ ExternalUserExpireInDays(TenantPolicy) := [concat(": ", [FAIL, ERRSTRING]), Stat
 tests contains {
     "PolicyId": "MS.SHAREPOINT.3.1v1",
     "Criticality": "Should",
-    "Commandlet": [
-        "Get-SPOTenant",
-        "Get-PnPTenant"
-    ],
+    "Commandlet": ["Get-SPOTenant", "Get-PnPTenant"],
     "ActualValue": [
         TenantPolicy.SharingCapability,
         TenantPolicy.RequireAnonymousLinksExpireInDays
@@ -305,24 +287,27 @@ PERMISSIONSTRING := "are not limited to view for Anyone"
 
 FileAndFolderPermission(1, 1) := PASS if {}
 
-FileAndFolderPermission(2, 2) := concat(": ", [FAIL, concat(" ", ["both files and folders", PERMISSIONSTRING])]) if {}
+FileAndFolderPermission(2, 2) := concat(": ", [
+        FAIL,
+        concat(" ", ["both files and folders", PERMISSIONSTRING])
+    ]) if {}
 
-FileAndFolderPermission(1, 2) := concat(": ", [FAIL, concat(" ", ["folders", PERMISSIONSTRING])]) if {}
+FileAndFolderPermission(1, 2) := concat(": ", [
+        FAIL,
+        concat(" ", ["folders", PERMISSIONSTRING])
+    ]) if {}
 
-FileAndFolderPermission(2, 1) := concat(": ", [FAIL, concat(" ", ["files", PERMISSIONSTRING])]) if {}
+FileAndFolderPermission(2, 1) := concat(": ", [
+        FAIL,
+        concat(" ", ["files", PERMISSIONSTRING])
+    ]) if {}
 
 # Both link types must be 2 & OneDrive_PnP_Flag must be false for policy to pass
 tests contains {
     "PolicyId": "MS.SHAREPOINT.3.2v1",
     "Criticality": "Should",
-    "Commandlet": [
-        "Get-SPOTenant",
-        "Get-PnPTenant"
-    ],
-    "ActualValue": [
-        FileLinkType,
-        FolderLinkType
-    ],
+    "Commandlet": ["Get-SPOTenant", "Get-PnPTenant"],
+    "ActualValue": [FileLinkType, FolderLinkType],
     "ReportDetails": FileAndFolderPermission(FileLinkType, FolderLinkType),
     "RequirementMet": Status
 } if {
@@ -393,16 +378,13 @@ ExpirationTimersVerificationCode(TenantPolicy) := [ErrMsg, false] if {
     TenantPolicy.SharingCapability != 0
     TenantPolicy.EmailAttestationRequired == false
     TenantPolicy.EmailAttestationReAuthDays > 30
-    ErrMsg := concat(": ", [FAIL, concat(" ", [VERIFICATIONSTRING, "enabled and set to greater 30 days"])])
+    ErrMsg := concat(": ", [FAIL, concat(" ", [VERIFICATIONSTRING, "enabled and set to >30 days"])])
 }
 
 tests contains {
     "PolicyId": "MS.SHAREPOINT.3.3v1",
     "Criticality": "Should",
-    "Commandlet": [
-        "Get-SPOTenant",
-        "Get-PnPTenant"
-    ],
+    "Commandlet": ["Get-SPOTenant", "Get-PnPTenant"],
     "ActualValue": [
         TenantPolicy.SharingCapability,
         TenantPolicy.EmailAttestationRequired,
@@ -445,10 +427,7 @@ tests contains {
 tests contains {
     "PolicyId": "MS.SHAREPOINT.4.2v1",
     "Criticality": "Shall",
-    "Commandlet": [
-        "Get-SPOSite",
-        "Get-PnPTenantSite"
-    ],
+    "Commandlet": ["Get-SPOSite", "Get-PnPTenantSite"],
     "ActualValue": [SitePolicy.DenyAddAndCustomizePages],
     "ReportDetails": ReportDetailsBoolean(Status),
     "RequirementMet": Status
