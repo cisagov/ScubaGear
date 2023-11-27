@@ -60,6 +60,7 @@ rules:
       # Most of these seem fixable by concatenating strings
       # and by using the non-breakable-word-threshold option
       # for when that doesn't work.
+      non-breakable-word-threshold: 100
       level: warning
     # https://docs.styra.com/regal/rules/style/no-whitespace-comment
     no-whitespace-comment:
