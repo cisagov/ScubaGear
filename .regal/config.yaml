@@ -85,6 +85,8 @@ rules:
     # https://docs.styra.com/regal/rules/style/rule-length
     rule-length:
       level: warning
+      max-rule-length: 30
+      count-comments: false      
     # https://docs.styra.com/regal/rules/style/todo-comment
     todo-comment:
       level: ignore
