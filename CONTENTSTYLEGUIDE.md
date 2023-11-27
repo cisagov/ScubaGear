@@ -1,6 +1,6 @@
 # Content style guide for SCuBA <!-- omit in toc -->
 
-Welcome to the content style guide for ScubaGear
+Welcome to the content style guide for ScubaGear!
 
 These guidelines are specific to style rules for PowerShell and OPA Rego code. For general style questions or guidance on topics not covered here, ask or go with best guess and bring up at a later meeting.
 
