@@ -88,11 +88,11 @@ tests contains {
 ```
 # At this time we are unable to test for X because of Y
 tests contains {
-    "PolicyId": "MS.<Product>.<Policy #>.<Bulletpoint #>v<Version #>",
+    "PolicyId": "MS.<Product>.<Policy Group #>.<Policy #>v<Version #>,
     "Criticality": "Shall/3rd Party",
     "Commandlet": [],
     "ActualValue": [],
-    "ReportDetails": DefenderMirrorDetails("MS.<Product>.<Policy #>.<Bulletpoint #>v<Version #>"),
+    "ReportDetails": DefenderMirrorDetails("MS.<Product>.<Policy Group #>.<Policy #>v<Version #>"),
     "RequirementMet": false,
 }
 ```
