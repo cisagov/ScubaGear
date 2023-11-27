@@ -22,7 +22,7 @@ jobs:
       issues: write
       pull-requests: write
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Run static code checker
       uses: docker://devblackops/github-action-psscriptanalyzer:2.4.0
       with:
