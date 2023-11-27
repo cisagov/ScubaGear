@@ -15,7 +15,7 @@ Use menu icon on the top left corner of this document to get to a specific secti
 
 ## OPA Rego
 
-OPA has a style guide [Styra](https://github.com/StyraInc/rego-style-guide), that we are adopting, except where our guide specifically notes an exception (for example, variable name case). For consistency, we will be using many of the same style rules as PowerShell. There are also a few best practice rules that this program will follow. These best practices were deliberated on and chosen to enhance readability. We recognize that the code is in a constant state of improvement, so the best practices are subject to change. Also note the use of Regal linter is highly encourage for style formatting.
+The project is adopting the following public Rego [style guide](https://github.com/StyraInc/rego-style-guide), except where our guide specifically notes an exception (e.g., variable name case). For consistency, we will be using many of the same style rules as PowerShell. There are also a few best practice rules that this project will follow. These best practices were chosen to enhance readability. We recognize that the code is in a constant state of improvement, so the best practices are subject to change. The project is also integrating the [Regal](https://github.com/StyraInc/regal) linter into its automated checks to promote style guide adherence.
 
 ### Test Cases
 
