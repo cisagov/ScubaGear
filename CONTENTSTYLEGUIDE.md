@@ -358,7 +358,7 @@ tests contains {
 
 It can be tempting to put the status variable in the ActualValue spot when you are anticipating a boolean. DON'T! For consistency and as best practice put `ExampleVar.ExampleSetting`.
 
-#### InCorrect
+#### Incorrect
 ```
 tests contains {
     "PolicyId" : "MS.<Product>.<Policy Group #>.<Policy #>v<Version #>",,
