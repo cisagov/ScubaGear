@@ -115,7 +115,10 @@ tests contains {
     "PolicyId": "MS.TEAMS.1.3v1",
     "Criticality": "Should",
     "Commandlet": ["Get-CsTeamsMeetingPolicy"],
-    "ActualValue": [Policy.AutoAdmittedUsers, Policy.AllowPSTNUsersToBypassLobby],
+    "ActualValue": [
+        Policy.AutoAdmittedUsers,
+        Policy.AllowPSTNUsersToBypassLobby
+    ],
     "ReportDetails": ReportDetails1_3(Policy),
     "RequirementMet": Status
 } if {
@@ -482,7 +485,10 @@ tests contains {
     "PolicyId": "MS.TEAMS.4.1v1",
     "Criticality": "Shall",
     "Commandlet": ["Get-CsTeamsClientConfiguration", "Get-CsTenant"],
-    "ActualValue": {"ClientConfig": input.client_configuration, "AssignedPlans": AssignedPlans},
+    "ActualValue": {
+        "ClientConfig": input.client_configuration,
+        "AssignedPlans": AssignedPlans
+    },
     "ReportDetails": ReportDetails4_1(IsGCC, IsEnabled),
     "RequirementMet": Status
 } if {
