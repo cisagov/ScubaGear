@@ -10,6 +10,7 @@ rules:
       # none is provided. It's harmless, but should be
       # fixed anyway so real issues aren't missed.
       level: warning
+      level: warning
   custom:
     # https://docs.styra.scom/regal/rules/custom/naming-convention
     naming-convention:
@@ -61,9 +62,12 @@ rules:
       # for when that doesn't work.
       non-breakable-word-threshold: 100
       level: warning
+      non-breakable-word-threshold: 100
+      level: warning
     # https://docs.styra.com/regal/rules/style/no-whitespace-comment
     no-whitespace-comment:
       # This repo is actually good about this, but frequently
+      # uses '#--' as a delimiter of sorts. That should be OK,
       # uses '#--' as a delimiter of sorts. That should be OK,
       # and the next version of Regal will allow for exceptions
       # like this: https://github.com/StyraInc/regal/issues/379
@@ -73,6 +77,7 @@ rules:
       level: ignore
     # https://docs.styra.com/regal/rules/style/prefer-some-in-iteration
     prefer-some-in-iteration:
+      level: warning
       level: warning
     # https://docs.styra.com/regal/rules/style/prefer-snake-case
     prefer-snake-case:
@@ -85,7 +90,7 @@ rules:
     rule-length:
       level: warning
       max-rule-length: 30
-      count-comments: false
+      count-comments: false      
     # https://docs.styra.com/regal/rules/style/todo-comment
     todo-comment:
       level: ignore
@@ -94,7 +99,10 @@ rules:
     identically-named-tests:
       # Only a few of these — would be easy to fix
       level: warning
+      # Only a few of these — would be easy to fix
+      level: warning
     # https://docs.styra.com/regal/rules/testing/test-outside-test-package
     test-outside-test-package:
       # This is just a style preference
+      level: warning
       level: warning
