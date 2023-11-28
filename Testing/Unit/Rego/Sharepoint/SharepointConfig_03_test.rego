@@ -1,5 +1,6 @@
-package sharepoint
+package sharepoint_test
 import future.keywords
+import data.sharepoint
 import data.report.utils.NotCheckedDetails
 
 #
@@ -8,7 +9,7 @@ import data.report.utils.NotCheckedDetails
 test_ExternalUserExpireInDays_Correct_V1 if {
     PolicyId := "MS.SHAREPOINT.3.1v1"
 
-    Output := tests with input as {
+    Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
                 "SharingCapability" : 0,
@@ -27,7 +28,7 @@ test_ExternalUserExpireInDays_Correct_V1 if {
 test_ExternalUserExpireInDays_Correct_V2 if {
     PolicyId := "MS.SHAREPOINT.3.1v1"
 
-    Output := tests with input as {
+    Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
                 "SharingCapability" : 3,
@@ -46,7 +47,7 @@ test_ExternalUserExpireInDays_Correct_V2 if {
 test_ExternalUserExpireInDays_Correct_V3 if {
     PolicyId := "MS.SHAREPOINT.3.1v1"
 
-    Output := tests with input as {
+    Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
                 "SharingCapability" : 1,
@@ -65,7 +66,7 @@ test_ExternalUserExpireInDays_Correct_V3 if {
 test_ExternalUserExpireInDays_Correct_V4 if {
     PolicyId := "MS.SHAREPOINT.3.1v1"
 
-    Output := tests with input as {
+    Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
                 "SharingCapability" : 2,
@@ -84,7 +85,7 @@ test_ExternalUserExpireInDays_Correct_V4 if {
 test_ExternalUserExpireInDays_Incorrect if {
     PolicyId := "MS.SHAREPOINT.3.1v1"
 
-    Output := tests with input as {
+    Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
                 "SharingCapability" : 1,
@@ -103,7 +104,7 @@ test_ExternalUserExpireInDays_Incorrect if {
 test_ExternalUserExpireInDays_Incorrect_V2 if {
     PolicyId := "MS.SHAREPOINT.3.1v1"
 
-    Output := tests with input as {
+    Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
                 "SharingCapability" : 2,
@@ -126,7 +127,7 @@ test_ExternalUserExpireInDays_Incorrect_V2 if {
 test_AnonymousLinkType_Correct if {
     PolicyId := "MS.SHAREPOINT.3.2v1"
 
-    Output := tests with input as {
+    Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
                 "FileAnonymousLinkType" : 1,
@@ -146,7 +147,7 @@ test_AnonymousLinkType_Correct if {
 test_AnonymousLinkType_Incorrect_V1 if {
     PolicyId := "MS.SHAREPOINT.3.2v1"
 
-    Output := tests with input as {
+    Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
                 "FileAnonymousLinkType" : 2,
@@ -166,7 +167,7 @@ test_AnonymousLinkType_Incorrect_V1 if {
 test_AnonymousLinkType_Incorrect_V2 if {
     PolicyId := "MS.SHAREPOINT.3.2v1"
 
-    Output := tests with input as {
+    Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
                 "FileAnonymousLinkType" : 1,
@@ -186,7 +187,7 @@ test_AnonymousLinkType_Incorrect_V2 if {
 test_AnonymousLinkType_Incorrect_V3 if {
     PolicyId := "MS.SHAREPOINT.3.2v1"
 
-    Output := tests with input as {
+    Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
                 "FileAnonymousLinkType" : 2,
@@ -206,7 +207,7 @@ test_AnonymousLinkType_Incorrect_V3 if {
 test_UsingServicePrincipal if {
     PolicyId := "MS.SHAREPOINT.3.2v1"
 
-    Output := tests with input as {
+    Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
                 "FileAnonymousLinkType" : 2,
@@ -230,7 +231,7 @@ test_UsingServicePrincipal if {
 test_SharingCapability_Correct if {
     PolicyId := "MS.SHAREPOINT.3.3v1"
 
-    Output := tests with input as {
+    Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
                 "SharingCapability" : 0,
@@ -250,7 +251,7 @@ test_SharingCapability_Correct if {
 test_SharingCapability_Correct_V4 if {
     PolicyId := "MS.SHAREPOINT.3.3v1"
 
-    Output := tests with input as {
+    Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
                 "SharingCapability" : 1,
@@ -270,7 +271,7 @@ test_SharingCapability_Correct_V4 if {
 test_EmailAttestationReAuthDays_Correct if {
     PolicyId := "MS.SHAREPOINT.3.3v1"
 
-    Output := tests with input as {
+    Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
                 "SharingCapability" : 1,
@@ -290,7 +291,7 @@ test_EmailAttestationReAuthDays_Correct if {
 test_Multi_Incorrect_V1 if {
     PolicyId := "MS.SHAREPOINT.3.3v1"
 
-    Output := tests with input as {
+    Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
                 "SharingCapability" : 1,
@@ -310,7 +311,7 @@ test_Multi_Incorrect_V1 if {
 test_EmailAttestationRequired_Incorrect_V2 if {
     PolicyId := "MS.SHAREPOINT.3.3v1"
 
-    Output := tests with input as {
+    Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
                 "SharingCapability" : 1,
@@ -330,7 +331,7 @@ test_EmailAttestationRequired_Incorrect_V2 if {
 test_EmailAttestationReAuthDays_Incorrect_V3 if {
     PolicyId := "MS.SHAREPOINT.3.3v1"
 
-    Output := tests with input as {
+    Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
                 "SharingCapability" : 1,

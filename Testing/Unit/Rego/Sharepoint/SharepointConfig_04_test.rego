@@ -1,5 +1,6 @@
-package sharepoint
+package sharepoint_test
 import future.keywords
+import data.sharepoint
 import data.report.utils.NotCheckedDetails
 
 
@@ -9,7 +10,7 @@ import data.report.utils.NotCheckedDetails
 test_NotImplemented_Correct if {
     PolicyId := "MS.SHAREPOINT.4.1v1"
 
-    Output := tests with input as { }
+    Output := sharepoint.tests with input as { }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
@@ -25,7 +26,7 @@ test_NotImplemented_Correct if {
 test_DenyAddAndCustomizePages_Correct if {
     PolicyId := "MS.SHAREPOINT.4.2v1"
 
-    Output := tests with input as {
+    Output := sharepoint.tests with input as {
         "SPO_site": [
             {
                 "DenyAddAndCustomizePages" : 2
@@ -43,7 +44,7 @@ test_DenyAddAndCustomizePages_Correct if {
 test_DenyAddAndCustomizePages_Incorrect if {
     PolicyId := "MS.SHAREPOINT.4.2v1"
 
-    Output := tests with input as {
+    Output := sharepoint.tests with input as {
         "SPO_site": [
             {
                 "DenyAddAndCustomizePages" : 1

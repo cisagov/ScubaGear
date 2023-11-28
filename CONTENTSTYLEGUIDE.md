@@ -25,7 +25,7 @@ Test names will use the syntax `test_mainVar_In/correct_*V#` to support brevity 
 test_ExampleVar_Correct_V1 if {
     PolicyId := "MS.<Product>.<Policy Group #>.<Policy #>v<Version #>"
 
-    Output := tests with input as {
+    Output := <Product>.tests with input as {
         "example_policies" : [
             {
                 "Example3" : "ExampleString",
@@ -48,7 +48,7 @@ test_ExampleVar_Correct_V2 if {
 test_ExampleVar_Incorrect if {
     PolicyId := "MS.<Product>.<Policy Group #>.<Policy #>v<Version #>"
 
-    Output := tests with input as {
+    Output := <Product>.tests with input as {
         "example_policies" : [
             {
                 "Example3" : "ExampleString",
@@ -102,7 +102,7 @@ tests contains {
 test_NotImplemented_Correct if {
     PolicyId := "MS.<Product>.<Policy Group #>.<Policy #>v<Version #>"
 
-    Output := tests with input as { }
+    Output := <Product>.tests with input as { }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
@@ -115,7 +115,7 @@ test_NotImplemented_Correct if {
 test_3rdParty_Correct_V1 if {
     PolicyId := "MS.<Product>.<Policy Group #>.<Policy #>v<Version #>"
 
-    Output := tests with input as { }
+    Output := <Product>.tests with input as { }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
@@ -141,7 +141,7 @@ One True Brace - requires that every braceable statement should have the opening
 test_Example_Correct if {
     PolicyId := "MS.<Product>.<Policy Group #>.<Policy #>v<Version #>"
 
-    Output := tests with input as {
+    Output := <Product>.tests with input as {
         "example_tag" : {
             "ExampleVar" : false
         }
@@ -164,24 +164,24 @@ Indentation will be set at 4 spaces, make sure your Tabs == 4 spaces. We are wor
 1) A blank line between each major variable: references & rules
 
 ```
-Example[Example.Id] {
+Example contains Example.Id if {
     Example := input.ExampleVar[_]
     Example.State == "Enabled"
 }
 
-tests[{
+tests contains {
     "PolicyId" : "MS.<Product>.<Policy Group #>.<Policy #>v<Version #>",
     "Criticality" : "Shall",
     "Commandlet" : "Example-Command",
     "ActualValue" : ExampleVar.ExampleSetting,
     "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
-}] {
+} if {
     ExampleVar := input.ExampleVar
     Status := ExampleVar == 15
 }
 
-tests[{
+tests {
     "PolicyId" : "MS.<Product>.<Policy Group #>.<Policy #>v<Version #>",,
 ...
 ```
@@ -189,14 +189,14 @@ tests[{
 2) Two blank lines between subsections
 
 ```
-tests[{
+tests contains {
     "PolicyId" : "MS.<Product>.<Policy Group #>.<Policy #>v<Version #>",,
     "Criticality" : "Should",
     "Commandlet" : "Example-Command",
     "ActualValue" : ExampleVar.ExampleSetting,
     "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
-}] {
+} if {
     ExampleVar := input.ExampleVar
     Status := ExampleVar == 15
 }
@@ -244,26 +244,26 @@ In the interest of consistency across policy tests and human readability of the 
 #### Correct
 
 ```
-tests[{
+tests contains {
     "PolicyId" : "MS.<Product>.<Policy Group #>.<Policy #>v<Version #>",,
     "Criticality" : "Should",
     "Commandlet" : "Example-Command",
     "ActualValue" : ExampleVar.ExampleSetting,
     "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
-}] {
+} if {
     ExampleVar := input.ExampleVar
     Status := ExampleVar == true
 }
 
-tests[{
+tests contains {
     "PolicyId" : "MS.<Product>.<Policy Group #>.<Policy #>v<Version #>",,
     "Criticality" : "Should",
     "Commandlet" : "Example-Command",
     "ActualValue" : ExampleVar.ExampleSetting,
     "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
-}] {
+} if {
     ExampleVar := input.ExampleVar
     Status := ExampleVar == false
 }
@@ -272,16 +272,16 @@ tests[{
 #### Incorrect
 
 ```
-tests[{
+tests contains {
     ...
-}] {
+} if {
     ExampleVar := input.ExampleVar
     Status := ExampleVar # Missing == true
 }
 
-tests[{
+tests contains {
     ...
-}] {
+} if {
     ExampleVar := input.ExampleVar
     Status := ExampleVar == false
 }

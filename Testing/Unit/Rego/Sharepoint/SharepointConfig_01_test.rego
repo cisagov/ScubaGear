@@ -1,5 +1,6 @@
-package sharepoint
+package sharepoint_test
 import future.keywords
+import data.sharepoint
 import data.report.utils.NotCheckedDetails
 
 
@@ -9,7 +10,7 @@ import data.report.utils.NotCheckedDetails
 test_SharingCapability_Correct_V1 if {
     PolicyId := "MS.SHAREPOINT.1.1v1"
 
-    Output := tests with input as {
+    Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
                 "SharingCapability" : 0
@@ -27,7 +28,7 @@ test_SharingCapability_Correct_V1 if {
 test_SharingCapability_Correct_V2 if {
     PolicyId := "MS.SHAREPOINT.1.1v1"
 
-    Output := tests with input as {
+    Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
                 "SharingCapability" : 3
@@ -45,7 +46,7 @@ test_SharingCapability_Correct_V2 if {
 test_SharingCapability_Incorrect_V1 if {
     PolicyId := "MS.SHAREPOINT.1.1v1"
 
-    Output := tests with input as {
+    Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
                 "SharingCapability" : 1
@@ -63,7 +64,7 @@ test_SharingCapability_Incorrect_V1 if {
 test_SharingCapability_Incorrect_V2 if {
     PolicyId := "MS.SHAREPOINT.1.1v1"
 
-    Output := tests with input as {
+    Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
                 "SharingCapability" : 2
@@ -85,7 +86,7 @@ test_SharingCapability_Incorrect_V2 if {
 test_OneDriveSharingCapability_Correct_V1 if {
     PolicyId := "MS.SHAREPOINT.1.2v1"
 
-    Output := tests with input as {
+    Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
                 "OneDriveSharingCapability" : 0
@@ -105,7 +106,7 @@ test_OneDriveSharingCapability_Correct_V1 if {
 test_OneDriveSharingCapability_Correct_V2 if {
     PolicyId := "MS.SHAREPOINT.1.2v1"
 
-    Output := tests with input as {
+    Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
                 "OneDriveSharingCapability" : 3
@@ -124,7 +125,7 @@ test_OneDriveSharingCapability_Correct_V2 if {
 test_UsingServicePrincipal if {
     PolicyId := "MS.SHAREPOINT.1.2v1"
 
-    Output := tests with input as {
+    Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
                 "OneDriveSharingCapability" : 3
@@ -144,7 +145,7 @@ test_UsingServicePrincipal if {
 test_OneDriveSharingCapability_Incorrect_V1 if {
     PolicyId := "MS.SHAREPOINT.1.2v1"
 
-    Output := tests with input as {
+    Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
                 "OneDriveSharingCapability" : 1
@@ -163,7 +164,7 @@ test_OneDriveSharingCapability_Incorrect_V1 if {
 test_OneDriveSharingCapability_Incorrect_V2 if {
     PolicyId := "MS.SHAREPOINT.1.2v1"
 
-    Output := tests with input as {
+    Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
                 "OneDriveSharingCapability" : 2
@@ -186,7 +187,7 @@ test_OneDriveSharingCapability_Incorrect_V2 if {
 test_SharingDomainRestrictionMode_Correct_V1 if {
     PolicyId := "MS.SHAREPOINT.1.3v1"
 
-    Output := tests with input as {
+    Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
                 "SharingCapability" : 0,
@@ -205,7 +206,7 @@ test_SharingDomainRestrictionMode_Correct_V1 if {
 test_SharingDomainRestrictionMode_Correct_V2 if {
     PolicyId := "MS.SHAREPOINT.1.3v1"
 
-    Output := tests with input as {
+    Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
                 "SharingCapability" : 1,
@@ -224,7 +225,7 @@ test_SharingDomainRestrictionMode_Correct_V2 if {
 test_SharingDomainRestrictionMode_Incorrect if {
     PolicyId := "MS.SHAREPOINT.1.3v1"
 
-    Output := tests with input as {
+    Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
                 "SharingCapability" : 1,
@@ -247,7 +248,7 @@ test_SharingDomainRestrictionMode_Incorrect if {
 test_SameAccount_Correct_V1 if {
     PolicyId := "MS.SHAREPOINT.1.4v1"
 
-    Output := tests with input as {
+    Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
                 "SharingCapability" : 0,
@@ -266,7 +267,7 @@ test_SameAccount_Correct_V1 if {
 test_SameAccount_Correct_V3 if {
     PolicyId := "MS.SHAREPOINT.1.4v1"
 
-    Output := tests with input as {
+    Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
                 "SharingCapability" : 0,
@@ -285,7 +286,7 @@ test_SameAccount_Correct_V3 if {
 test_SameAccount_Correct_V2 if {
     PolicyId := "MS.SHAREPOINT.1.4v1"
 
-    Output := tests with input as {
+    Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
                 "SharingCapability" : 1,
@@ -304,7 +305,7 @@ test_SameAccount_Correct_V2 if {
 test_SameAccount_Incorrect if {
     PolicyId := "MS.SHAREPOINT.1.4v1"
 
-    Output := tests with input as {
+    Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
                 "SharingCapability" : 1,

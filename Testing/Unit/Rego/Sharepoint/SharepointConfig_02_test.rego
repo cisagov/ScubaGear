@@ -1,5 +1,6 @@
-package sharepoint
+package sharepoint_test
 import future.keywords
+import data.sharepoint
 
 
 #
@@ -8,7 +9,7 @@ import future.keywords
 test_DefaultSharingLinkType_Correct if {
     PolicyId := "MS.SHAREPOINT.2.1v1"
 
-    Output := tests with input as {
+    Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
                 "DefaultSharingLinkType" : 1
@@ -26,7 +27,7 @@ test_DefaultSharingLinkType_Correct if {
 test_DefaultSharingLinkType_Incorrect if {
     PolicyId := "MS.SHAREPOINT.2.1v1"
 
-    Output := tests with input as {
+    Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
                 "DefaultSharingLinkType" : 2
@@ -48,7 +49,7 @@ test_DefaultSharingLinkType_Incorrect if {
 test_DefaultLinkPermission_Correct if {
     PolicyId := "MS.SHAREPOINT.2.2v1"
 
-    Output := tests with input as {
+    Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
                 "DefaultLinkPermission" : 1
@@ -66,7 +67,7 @@ test_DefaultLinkPermission_Correct if {
 test_DefaultLinkPermission_Incorrect if {
     PolicyId := "MS.SHAREPOINT.2.2v1"
 
-    Output := tests with input as {
+    Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
                 "DefaultLinkPermission" : 2
