@@ -1,5 +1,7 @@
-package aad
+package aad_test
 import future.keywords
+import data.aad
+
 
 #
 # MS.AAD.5.1v1
@@ -7,7 +9,7 @@ import future.keywords
 test_AllowedToCreateApps_Correct if {
     PolicyId := "MS.AAD.5.1v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "authorization_policies" : [
             {
                 "DefaultUserRolePermissions" : {
@@ -28,7 +30,7 @@ test_AllowedToCreateApps_Correct if {
 test_AllowedToCreateApps_Incorrect_V1 if {
     PolicyId := "MS.AAD.5.1v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "authorization_policies" : [
             {
                 "DefaultUserRolePermissions" : {
@@ -49,7 +51,7 @@ test_AllowedToCreateApps_Incorrect_V1 if {
 test_AllowedToCreateApps_Incorrect_V2 if {
     PolicyId := "MS.AAD.5.1v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "authorization_policies" : [
             {
                 "DefaultUserRolePermissions" : {
@@ -80,7 +82,7 @@ test_AllowedToCreateApps_Incorrect_V2 if {
 test_PermissionGrantPolicyIdsAssignedToDefaultUserRole_Correct if {
     PolicyId := "MS.AAD.5.2v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "authorization_policies" : [
             {
                 "PermissionGrantPolicyIdsAssignedToDefaultUserRole" : [],
@@ -99,7 +101,7 @@ test_PermissionGrantPolicyIdsAssignedToDefaultUserRole_Correct if {
 test_PermissionGrantPolicyIdsAssignedToDefaultUserRole_Incorrect_V1 if {
     PolicyId := "MS.AAD.5.2v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "authorization_policies" : [
             {
                 "PermissionGrantPolicyIdsAssignedToDefaultUserRole" : ["Test user"],
@@ -118,7 +120,7 @@ test_PermissionGrantPolicyIdsAssignedToDefaultUserRole_Incorrect_V1 if {
 test_PermissionGrantPolicyIdsAssignedToDefaultUserRole_Incorrect_V2 if {
     PolicyId := "MS.AAD.5.2v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "authorization_policies" : [
             {
                 "PermissionGrantPolicyIdsAssignedToDefaultUserRole" : [],
@@ -145,7 +147,7 @@ test_PermissionGrantPolicyIdsAssignedToDefaultUserRole_Incorrect_V2 if {
 test_IsEnabled_Correct if {
     PolicyId := "MS.AAD.5.3v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "admin_consent_policies" : [
             {
                 "IsEnabled" : true,
@@ -164,7 +166,7 @@ test_IsEnabled_Correct if {
 test_IsEnabled_Incorrect if {
     PolicyId := "MS.AAD.5.3v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "admin_consent_policies" : [
             {
                 "IsEnabled" : false,
@@ -187,7 +189,7 @@ test_IsEnabled_Incorrect if {
 test_Value_Correct_Lowercase if {
     PolicyId := "MS.AAD.5.4v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "directory_settings" : [
             {
                 "DisplayName" : "Setting display name",
@@ -211,7 +213,7 @@ test_Value_Correct_Lowercase if {
 test_Value_Correct_Uppercase if {
     PolicyId := "MS.AAD.5.4v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "directory_settings" : [
             {
                 "DisplayName" : "Setting display name",
@@ -235,7 +237,7 @@ test_Value_Correct_Uppercase if {
 test_Value_Incorrect_Lowercase if {
     PolicyId := "MS.AAD.5.4v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "directory_settings" : [
             {
                 "DisplayName" : "Setting display name",
@@ -259,7 +261,7 @@ test_Value_Incorrect_Lowercase if {
 test_Value_Incorrect_Uppercase if {
     PolicyId := "MS.AAD.5.4v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "directory_settings" : [
             {
                 "DisplayName" : "Setting display name",

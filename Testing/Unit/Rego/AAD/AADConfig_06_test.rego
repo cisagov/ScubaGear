@@ -1,5 +1,6 @@
-package aad
+package aad_test
 import future.keywords
+import data.aad
 import data.report.utils.NotCheckedDetails
 
 
@@ -9,7 +10,7 @@ import data.report.utils.NotCheckedDetails
 test_NotImplemented_Correct if {
     PolicyId := "MS.AAD.6.1v1"
 
-    Output := tests with input as { }
+    Output := aad.tests with input as { }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 

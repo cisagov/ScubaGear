@@ -1,13 +1,16 @@
-package aad
+package aad_test
 import future.keywords
+import data.aad
 import data.report.utils.NotCheckedDetails
+
+
 #
 # MS.AAD.7.1v1
 #--
 test_PrivilegedUsers_Correct if {
     PolicyId := "MS.AAD.7.1v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "privileged_users" : {
             "User1" : {
                 "DisplayName" : "Test Name1",
@@ -30,7 +33,7 @@ test_PrivilegedUsers_Correct if {
 test_PrivilegedUsers_Incorrect_V1 if {
     PolicyId := "MS.AAD.7.1v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "privileged_users" : {
             "User1" : {
                 "DisplayName" : "Test Name1",
@@ -49,7 +52,7 @@ test_PrivilegedUsers_Incorrect_V1 if {
 test_PrivilegedUsers_Incorrect_V2 if {
     PolicyId := "MS.AAD.7.1v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "privileged_users" : {
             "User1" : {
                 "DisplayName" : "Test Name1",
@@ -102,7 +105,7 @@ test_PrivilegedUsers_Incorrect_V2 if {
 test_NotImplemented_Correct if {
     PolicyId := "MS.AAD.7.2v1"
 
-    Output := tests with input as { }
+    Output := aad.tests with input as { }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
@@ -116,7 +119,7 @@ test_NotImplemented_Correct if {
 test_OnPremisesImmutableId_Correct if {
     PolicyId := "MS.AAD.7.3v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "privileged_users" : {
             "User1" : {
                 "DisplayName" : "Alice",
@@ -126,7 +129,7 @@ test_OnPremisesImmutableId_Correct if {
             "User2" : {
                 "DisplayName" : "Bob",
                 "OnPremisesImmutableId" : null,
-               "roles" : ["Global Administrator"]
+                "roles" : ["Global Administrator"]
             }
         }
     }
@@ -140,7 +143,7 @@ test_OnPremisesImmutableId_Correct if {
 test_OnPremisesImmutableId_Incorrect_V1 if {
     PolicyId := "MS.AAD.7.3v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "privileged_users" : {
             "User1" : {
                 "DisplayName" : "Alice",
@@ -160,7 +163,7 @@ test_OnPremisesImmutableId_Incorrect_V1 if {
 test_OnPremisesImmutableId_Incorrect_V2 if {
     PolicyId := "MS.AAD.7.3v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "privileged_users" : {
             "User1" : {
                 "DisplayName" : "Alice",
@@ -188,7 +191,7 @@ test_OnPremisesImmutableId_Incorrect_V2 if {
 test_AdditionalProperties_Correct_V1 if {
     PolicyId := "MS.AAD.7.4v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "privileged_roles" : [
             {
                 "DisplayName" : "Global Administrator",
@@ -220,7 +223,7 @@ test_AdditionalProperties_Correct_V1 if {
 test_AdditionalProperties_Correct_V2 if {
     PolicyId := "MS.AAD.7.4v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "privileged_roles" : [
             {
                 "DisplayName" : "Global Administrator",
@@ -262,7 +265,7 @@ test_AdditionalProperties_Correct_V2 if {
 test_AdditionalProperties_Correct_V3 if {
     PolicyId := "MS.AAD.7.4v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "privileged_roles" : [
             {
                 "DisplayName" : "Global Administrator",
@@ -304,7 +307,7 @@ test_AdditionalProperties_Correct_V3 if {
 test_AdditionalProperties_LicenseMissing_V1 if {
     PolicyId := "MS.AAD.7.4v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "privileged_roles" : [
             {
                 "DisplayName" : "Global Administrator",
@@ -347,7 +350,7 @@ test_AdditionalProperties_LicenseMissing_V1 if {
 test_AdditionalProperties_Incorrect_V1 if {
     PolicyId := "MS.AAD.7.4v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "privileged_roles" : [
             {
                 "DisplayName" : "Global Administrator",
@@ -379,7 +382,7 @@ test_AdditionalProperties_Incorrect_V1 if {
 test_AdditionalProperties_Incorrect_V2 if {
     PolicyId := "MS.AAD.7.4v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "privileged_roles" : [
             {
                 "DisplayName" : "Global Administrator",
@@ -420,7 +423,7 @@ test_AdditionalProperties_Incorrect_V2 if {
 test_AdditionalProperties_Incorrect_V3 if {
     PolicyId := "MS.AAD.7.4v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "privileged_roles" : [
             {
                 "DisplayName" : "Global Administrator",
@@ -461,7 +464,7 @@ test_AdditionalProperties_Incorrect_V3 if {
 test_AdditionalProperties_Incorrect_V4 if {
     PolicyId := "MS.AAD.7.4v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "privileged_roles" : [
             {
                 "DisplayName" : "Global Administrator",
@@ -506,7 +509,7 @@ test_AdditionalProperties_Incorrect_V4 if {
 test_AdditionalProperties_Incorrect_V5 if {
     PolicyId := "MS.AAD.7.4v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "privileged_roles" : [
             {
                 "DisplayName" : "Global Administrator",
@@ -548,7 +551,7 @@ test_AdditionalProperties_Incorrect_V5 if {
 test_AdditionalProperties_Incorrect_V6 if {
     PolicyId := "MS.AAD.7.4v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "privileged_roles" : [
             {
                 "DisplayName" : "Global Administrator",
@@ -599,7 +602,7 @@ test_AdditionalProperties_Incorrect_V6 if {
 test_AdditionalProperties_Incorrect_V7 if {
     PolicyId := "MS.AAD.7.4v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "privileged_roles" : [
             {
                 "DisplayName" : "Global Administrator",
@@ -650,7 +653,7 @@ test_AdditionalProperties_Incorrect_V7 if {
 test_AdditionalProperties_Incorrect_V8 if {
     PolicyId := "MS.AAD.7.4v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "privileged_roles" : [
             {
                 "DisplayName" : "Global Administrator",
@@ -705,7 +708,7 @@ test_AdditionalProperties_Incorrect_V8 if {
 test_AdditionalProperties_Incorrect_V9 if {
     PolicyId := "MS.AAD.7.4v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "privileged_roles" : [
             {
                 "DisplayName" : "Global Administrator",
@@ -755,7 +758,7 @@ test_AdditionalProperties_Incorrect_V9 if {
 test_AdditionalProperties_Incorrect_V10 if {
     PolicyId := "MS.AAD.7.4v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "privileged_roles" : [
             {
                 "DisplayName" : "Global Administrator",
@@ -797,7 +800,7 @@ test_AdditionalProperties_Incorrect_V10 if {
 test_AdditionalProperties_Incorrect_V11 if {
     PolicyId := "MS.AAD.7.4v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "privileged_roles" : [
             {
                 "DisplayName" : "Global Administrator",
@@ -848,7 +851,7 @@ test_AdditionalProperties_Incorrect_V11 if {
 test_AdditionalProperties_Incorrect_V12 if {
     PolicyId := "MS.AAD.7.4v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "privileged_roles" : [
             {
                 "DisplayName" : "Global Administrator",
@@ -899,7 +902,7 @@ test_AdditionalProperties_Incorrect_V12 if {
 test_AdditionalProperties_Incorrect_V13 if {
     PolicyId := "MS.AAD.7.4v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "privileged_roles" : [
             {
                 "DisplayName" : "Global Administrator",
@@ -954,7 +957,7 @@ test_AdditionalProperties_Incorrect_V13 if {
 test_AdditionalProperties_Incorrect_V14 if {
     PolicyId := "MS.AAD.7.4v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "privileged_roles" : [
             {
                 "DisplayName" : "Global Administrator",
@@ -1009,7 +1012,7 @@ test_AdditionalProperties_Incorrect_V14 if {
 test_Assignments_Correct if {
     PolicyId := "MS.AAD.7.5v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "privileged_roles" : [
             {
                 "DisplayName" : "Global Administrator",
@@ -1049,7 +1052,7 @@ test_Assignments_Correct if {
 test_Assignments_Incorrect if {
     PolicyId := "MS.AAD.7.5v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "privileged_roles" : [
             {
                 "DisplayName" : "Global Administrator",
@@ -1093,7 +1096,7 @@ test_Assignments_Incorrect if {
 test_AdditionalProperties_Correct_V2 if {
     PolicyId := "MS.AAD.7.6v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "privileged_roles" : [
             {
                 "DisplayName" : "Global Administrator",
@@ -1129,7 +1132,7 @@ test_AdditionalProperties_Correct_V2 if {
 test_AdditionalProperties_Correct_V3 if {
     PolicyId := "MS.AAD.7.6v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "privileged_roles" : [
             {
                 "DisplayName" : "Global Administrator",
@@ -1178,7 +1181,7 @@ test_AdditionalProperties_Correct_V3 if {
 test_AdditionalProperties_Incorrect_V3 if {
     PolicyId := "MS.AAD.7.6v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "privileged_roles" : [
             {
                 "DisplayName" : "Global Administrator",
@@ -1218,7 +1221,7 @@ test_AdditionalProperties_Incorrect_V3 if {
 test_notificationRecipients_Correct if {
     PolicyId := "MS.AAD.7.7v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "privileged_roles" : [
             {
                 "RoleTemplateId" : "1D2EE3F0-90D3-4764-8AF8-BE81FE9D4D71",
@@ -1259,7 +1262,7 @@ test_notificationRecipients_Correct if {
 test_notificationRecipients_Incorrect_V1 if {
     PolicyId := "MS.AAD.7.7v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "privileged_roles" : [
             {
                 "RoleTemplateId" : "1D2EE3F0-90D3-4764-8AF8-BE81FE9D4D71",
@@ -1300,7 +1303,7 @@ test_notificationRecipients_Incorrect_V1 if {
 test_notificationRecipients_Incorrect_V2 if {
     PolicyId := "MS.AAD.7.7v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "privileged_roles" : [
             {
                 "RoleTemplateId" : "1D2EE3F0-90D3-4764-8AF8-BE81FE9D4D71",
@@ -1341,7 +1344,7 @@ test_notificationRecipients_Incorrect_V2 if {
 test_notificationRecipients_Incorrect_V3 if {
     PolicyId := "MS.AAD.7.7v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "privileged_roles" : [
             {
                 "RoleTemplateId" : "1D2EE3F0-90D3-4764-8AF8-BE81FE9D4D71",
@@ -1386,7 +1389,7 @@ test_notificationRecipients_Incorrect_V3 if {
 test_Id_Correct_V1 if {
     PolicyId := "MS.AAD.7.8v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "privileged_roles" : [
             {
                 "RoleTemplateId" : "1D2EE3F0-90D3-4764-8AF8-BE81FE9D4D71",
@@ -1422,7 +1425,7 @@ test_Id_Correct_V1 if {
 test_Id_Correct_V2 if {
     PolicyId := "MS.AAD.7.8v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "privileged_roles" : [
             {
                 "RoleTemplateId" : "1D2EE3F0-90D3-4764-8AF8-BE81FE9D4D71",
@@ -1458,7 +1461,7 @@ test_Id_Correct_V2 if {
 test_Id_Incorrect if {
     PolicyId := "MS.AAD.7.8v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "privileged_roles" : [
             {
                 "RoleTemplateId" : "1D2EE3F0-90D3-4764-8AF8-BE81FE9D4D71",
@@ -1499,7 +1502,7 @@ test_Id_Incorrect if {
 test_DisplayName_Correct if {
     PolicyId := "MS.AAD.7.9v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "privileged_roles" : [
             {
                 "RoleTemplateId" : "1D2EE3F0-90D3-4764-8AF8-BE81FE9D4D71",
@@ -1535,7 +1538,7 @@ test_DisplayName_Correct if {
 test_DisplayName_Incorrect if {
     PolicyId := "MS.AAD.7.9v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "privileged_roles" : [
             {
                 "RoleTemplateId" : "1D2EE3F0-90D3-4764-8AF8-BE81FE9D4D71",

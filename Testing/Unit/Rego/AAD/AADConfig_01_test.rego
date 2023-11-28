@@ -1,5 +1,6 @@
-package aad
+package aad_test
 import future.keywords
+import data.aad
 
 
 #
@@ -8,7 +9,7 @@ import future.keywords
 test_NoExclusionsConditions_Correct if {
     PolicyId := "MS.AAD.1.1v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "conditional_access_policies" : [
             {
                 "Conditions" : {
@@ -42,7 +43,7 @@ test_NoExclusionsConditions_Correct if {
 test_NoExclusionsIncludeApplications_Incorrect if {
     PolicyId := "MS.AAD.1.1v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "conditional_access_policies" : [
             {
                 "Conditions" : {
@@ -75,7 +76,7 @@ test_NoExclusionsIncludeApplications_Incorrect if {
 test_NoExclusionsIncludeUsers_Incorrect if {
     PolicyId := "MS.AAD.1.1v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "conditional_access_policies" : [
             {
                 "Conditions" : {
@@ -108,7 +109,7 @@ test_NoExclusionsIncludeUsers_Incorrect if {
 test_NoExclusionsExcludeUsers_Incorrect if {
     PolicyId := "MS.AAD.1.1v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "conditional_access_policies" : [
             {
                 "Conditions" : {
@@ -141,7 +142,7 @@ test_NoExclusionsExcludeUsers_Incorrect if {
 test_NoExclusionsExcludeGroups_Incorrect if {
     PolicyId := "MS.AAD.1.1v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "conditional_access_policies" : [
             {
                 "Conditions" : {
@@ -174,7 +175,7 @@ test_NoExclusionsExcludeGroups_Incorrect if {
 test_NoExclusionsClientAppTypes_Incorrect if {
     PolicyId := "MS.AAD.1.1v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "conditional_access_policies" : [
             {
                 "Conditions" : {
@@ -207,7 +208,7 @@ test_NoExclusionsClientAppTypes_Incorrect if {
 test_NoExclusionsBuiltInControls_Incorrect if {
     PolicyId := "MS.AAD.1.1v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "conditional_access_policies" : [
             {
                 "Conditions" : {
@@ -240,7 +241,7 @@ test_NoExclusionsBuiltInControls_Incorrect if {
 test_NoExclusionsState_Incorrect if {
     PolicyId := "MS.AAD.1.1v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "conditional_access_policies" : [
             {
                 "Conditions" : {
@@ -274,7 +275,7 @@ test_NoExclusionsState_Incorrect if {
 test_NoExclusionsExemptUsers_Correct if {
     PolicyId := "MS.AAD.1.1v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "conditional_access_policies" : [
             {
                 "Conditions" : {
@@ -318,7 +319,7 @@ test_NoExclusionsExemptUsers_Correct if {
 test_UserExclusionsConditions_Correct if {
     PolicyId := "MS.AAD.1.1v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "conditional_access_policies" : [
             {
                 "Conditions" : {
@@ -362,7 +363,7 @@ test_UserExclusionsConditions_Correct if {
 test_MultiUserExclusionsConditions_Correct if {
     PolicyId := "MS.AAD.1.1v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "conditional_access_policies" : [
             {
                 "Conditions" : {
@@ -406,7 +407,7 @@ test_MultiUserExclusionsConditions_Correct if {
 test_UserExclusionNoExempt_Incorrect if {
     PolicyId := "MS.AAD.1.1v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "conditional_access_policies" : [
             {
                 "Conditions" : {
@@ -439,7 +440,7 @@ test_UserExclusionNoExempt_Incorrect if {
 test_UserExclusionsSingleExempt_Incorrect if {
     PolicyId := "MS.AAD.1.1v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "conditional_access_policies" : [
             {
                 "Conditions" : {
@@ -483,7 +484,7 @@ test_UserExclusionsSingleExempt_Incorrect if {
 test_UserExclusionsNoExempt_Incorrect if {
     PolicyId := "MS.AAD.1.1v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "conditional_access_policies" : [
             {
                 "Conditions" : {
@@ -526,7 +527,7 @@ test_UserExclusionsNoExempt_Incorrect if {
 test_UserExclusionsIncludeApplications_Incorrect if {
     PolicyId := "MS.AAD.1.1v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "conditional_access_policies" : [
             {
                 "Conditions" : {
@@ -569,7 +570,7 @@ test_UserExclusionsIncludeApplications_Incorrect if {
 test_UserExclusionsIncludeUsers_Incorrect if {
     PolicyId := "MS.AAD.1.1v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "conditional_access_policies" : [
             {
                 "Conditions" : {
@@ -612,7 +613,7 @@ test_UserExclusionsIncludeUsers_Incorrect if {
 test_UserExclusionsExcludeGroups_Incorrect if {
     PolicyId := "MS.AAD.1.1v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "conditional_access_policies" : [
             {
                 "Conditions" : {
@@ -655,7 +656,7 @@ test_UserExclusionsExcludeGroups_Incorrect if {
 test_UserExclusionsClientAppTypes_Incorrect if {
     PolicyId := "MS.AAD.1.1v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "conditional_access_policies" : [
             {
                 "Conditions" : {
@@ -698,7 +699,7 @@ test_UserExclusionsClientAppTypes_Incorrect if {
 test_UserExclusionsBuiltInControls_Incorrect if {
     PolicyId := "MS.AAD.1.1v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "conditional_access_policies" : [
             {
                 "Conditions" : {
@@ -741,7 +742,7 @@ test_UserExclusionsBuiltInControls_Incorrect if {
 test_UserExclusionsState_Incorrect if {
     PolicyId := "MS.AAD.1.1v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "conditional_access_policies" : [
             {
                 "Conditions" : {
@@ -785,7 +786,7 @@ test_UserExclusionsState_Incorrect if {
 test_NoExclusionsExemptGroups_Correct if {
     PolicyId := "MS.AAD.1.1v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "conditional_access_policies" : [
             {
                 "Conditions" : {
@@ -829,7 +830,7 @@ test_NoExclusionsExemptGroups_Correct if {
 test_GroupExclusionNoExempt_Incorrect if {
     PolicyId := "MS.AAD.1.1v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "conditional_access_policies" : [
             {
                 "Conditions" : {
@@ -873,7 +874,7 @@ test_GroupExclusionNoExempt_Incorrect if {
 test_GroupExclusionsNoExempt_Incorrect if {
     PolicyId := "MS.AAD.1.1v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "conditional_access_policies" : [
             {
                 "Conditions" : {
@@ -916,7 +917,7 @@ test_GroupExclusionsNoExempt_Incorrect if {
 test_GroupExclusionsSingleExempt_Incorrect if {
     PolicyId := "MS.AAD.1.1v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "conditional_access_policies" : [
             {
                 "Conditions" : {
@@ -959,7 +960,7 @@ test_GroupExclusionsSingleExempt_Incorrect if {
 test_GroupExclusionConditions_Correct if {
     PolicyId := "MS.AAD.1.1v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "conditional_access_policies" : [
             {
                 "Conditions" : {
@@ -1003,7 +1004,7 @@ test_GroupExclusionConditions_Correct if {
 test_MultiGroupExclusionsConditions_Correct if {
     PolicyId := "MS.AAD.1.1v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "conditional_access_policies" : [
             {
                 "Conditions" : {
@@ -1048,7 +1049,7 @@ test_MultiGroupExclusionsConditions_Correct if {
 test_UserGroupExclusionConditions_Correct if {
     PolicyId := "MS.AAD.1.1v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "conditional_access_policies" : [
             {
                 "Conditions" : {
@@ -1092,7 +1093,7 @@ test_UserGroupExclusionConditions_Correct if {
 test_UserGroupExclusionNoExempt_Incorrect if {
     PolicyId := "MS.AAD.1.1v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "conditional_access_policies" : [
             {
                 "Conditions" : {
@@ -1126,7 +1127,7 @@ test_UserGroupExclusionNoExempt_Incorrect if {
 test_UserGroupExclusionUserExemptOnly_Incorrect if {
     PolicyId := "MS.AAD.1.1v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "conditional_access_policies" : [
             {
                 "Conditions" : {
@@ -1170,7 +1171,7 @@ test_UserGroupExclusionUserExemptOnly_Incorrect if {
 test_UserGroupExclusionGroupExemptOnly_Incorrect if {
     PolicyId := "MS.AAD.1.1v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "conditional_access_policies" : [
             {
                 "Conditions" : {
@@ -1214,7 +1215,7 @@ test_UserGroupExclusionGroupExemptOnly_Incorrect if {
 test_UserGroupExclusionTooFewUserExempts_Incorrect if {
     PolicyId := "MS.AAD.1.1v1"
 
-    Output := tests with input as {
+    Output := aad.tests with input as {
         "conditional_access_policies" : [
             {
                 "Conditions" : {
