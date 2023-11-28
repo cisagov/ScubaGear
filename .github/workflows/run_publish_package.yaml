@@ -35,7 +35,6 @@ jobs:
         run: |
           Find-Module -Name ScubaGear -Repository $env:GalleryName
           Install-Module -Name ScubaGear
-          Import-Module -Name ScubaGear
-          $Version = Invoke-SCuBA -Version
-          $Version -like "SCuBA Gear v*" 
+  Call-Smoke-Test:
+    uses: repo/.github/workflows/run_smoke_test.yaml
 
