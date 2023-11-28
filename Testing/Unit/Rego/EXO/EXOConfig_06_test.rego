@@ -1,5 +1,6 @@
-package exo
+package exo_test
 import future.keywords
+import data.exo
 
 
 #
@@ -8,7 +9,7 @@ import future.keywords
 test_Domains_Contacts_Correct if {
     PolicyId := "MS.EXO.6.1v1"
 
-    Output := tests with input as {
+    Output := exo.tests with input as {
         "sharing_policy": [
             {
                 "Domains" : [
@@ -30,7 +31,7 @@ test_Domains_Contacts_Correct if {
 test_Domains_Contacts_Incorrect if {
     PolicyId := "MS.EXO.6.1v1"
 
-    Output := tests with input as {
+    Output := exo.tests with input as {
         "sharing_policy": [
             {
                 "Domains" : [
@@ -60,7 +61,7 @@ test_Domains_Contacts_Incorrect if {
 test_Domains_Calendar_Correct if {
     PolicyId := "MS.EXO.6.2v1"
 
-    Output := tests with input as {
+    Output := exo.tests with input as {
         "sharing_policy": [
             {
                 "Domains" : [
@@ -82,7 +83,7 @@ test_Domains_Calendar_Correct if {
 test_Domains_Calendar_Incorrect if {
     PolicyId := "MS.EXO.6.2v1"
 
-    Output := tests with input as {
+    Output := exo.tests with input as {
         "sharing_policy": [
             {
                 "Domains" : [

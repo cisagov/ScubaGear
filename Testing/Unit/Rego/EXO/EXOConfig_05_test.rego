@@ -1,5 +1,6 @@
-package exo
+package exo_test
 import future.keywords
+import data.exo
 
 
 #
@@ -8,7 +9,7 @@ import future.keywords
 test_SmtpClientAuthenticationDisabled_Correct if {
     PolicyId := "MS.EXO.5.1v1"
 
-    Output := tests with input as {
+    Output := exo.tests with input as {
         "transport_config":
         [
             {
@@ -28,7 +29,7 @@ test_SmtpClientAuthenticationDisabled_Correct if {
 test_SmtpClientAuthenticationDisabled_Incorrect if {
     PolicyId := "MS.EXO.5.1v1"
 
-    Output := tests with input as {
+    Output := exo.tests with input as {
         "transport_config": [
             {
                 "SmtpClientAuthenticationDisabled" : false,

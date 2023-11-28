@@ -1,5 +1,6 @@
-package exo
+package exo_test
 import future.keywords
+import data.exo
 
 
 #
@@ -8,7 +9,7 @@ import future.keywords
 test_AuditDisabled_Correct if {
     PolicyId := "MS.EXO.13.1v1"
 
-    Output := tests with input as {
+    Output := exo.tests with input as {
         "org_config":
         [
             {
@@ -29,7 +30,7 @@ test_AuditDisabled_Correct if {
 test_AuditDisabled_Incorrect if {
     PolicyId := "MS.EXO.13.1v1"
 
-    Output := tests with input as {
+    Output := exo.tests with input as {
         "org_config": [
             {
                 "AuditDisabled" : true,

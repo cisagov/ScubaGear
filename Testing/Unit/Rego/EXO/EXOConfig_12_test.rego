@@ -1,5 +1,6 @@
-package exo
+package exo_test
 import future.keywords
+import data.exo
 
 
 #
@@ -8,7 +9,7 @@ import future.keywords
 test_IPAllowList_Correct_V1 if {
     PolicyId := "MS.EXO.12.1v1"
 
-    Output := tests with input as {
+    Output := exo.tests with input as {
         "conn_filter": [
             {
                 "IPAllowList" : [],
@@ -28,7 +29,7 @@ test_IPAllowList_Correct_V1 if {
 test_IPAllowList_Correct_V2 if {
     PolicyId := "MS.EXO.12.1v1"
 
-    Output := tests with input as {
+    Output := exo.tests with input as {
         "conn_filter":
         [
             {
@@ -49,7 +50,7 @@ test_IPAllowList_Correct_V2 if {
 test_IPAllowList_Incorrect if {
     PolicyId := "MS.EXO.12.1v1"
 
-    Output := tests with input as {
+    Output := exo.tests with input as {
         "conn_filter": [
             {
                 "IPAllowList" : ["trust.me.please"],
@@ -72,7 +73,7 @@ test_IPAllowList_Incorrect if {
 test_EnableSafeList_Correct_V1 if {
     PolicyId := "MS.EXO.12.2v1"
 
-    Output := tests with input as {
+    Output := exo.tests with input as {
         "conn_filter": [
             {
                 "IPAllowList" : [],
@@ -92,7 +93,7 @@ test_EnableSafeList_Correct_V1 if {
 test_EnableSafeList_Incorrect_V1 if {
     PolicyId := "MS.EXO.12.2v1"
 
-    Output := tests with input as {
+    Output := exo.tests with input as {
         "conn_filter": [
             {
                 "IPAllowList" : [],
@@ -112,7 +113,7 @@ test_EnableSafeList_Incorrect_V1 if {
 test_EnableSafeList_Correct_V2 if {
     PolicyId := "MS.EXO.12.2v1"
 
-    Output := tests with input as {
+    Output := exo.tests with input as {
         "conn_filter": [
             {
                 "IPAllowList" : ["this.shouldnt.matter"],

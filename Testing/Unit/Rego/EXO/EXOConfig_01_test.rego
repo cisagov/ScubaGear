@@ -1,5 +1,6 @@
-package exo
+package exo_test
 import future.keywords
+import data.exo
 
 
 #
@@ -8,7 +9,7 @@ import future.keywords
 test_AutoForwardEnabled_Correct if {
     PolicyId := "MS.EXO.1.1v1"
 
-    Output := tests with input as {
+    Output := exo.tests with input as {
         "remote_domains": [
             {
                 "AutoForwardEnabled" : false,
@@ -27,7 +28,7 @@ test_AutoForwardEnabled_Correct if {
 test_AutoForwardEnabled_Incorrect_V1 if {
     PolicyId := "MS.EXO.1.1v1"
 
-    Output := tests with input as {
+    Output := exo.tests with input as {
         "remote_domains": [
             {
                 "AutoForwardEnabled" : true,
@@ -46,7 +47,7 @@ test_AutoForwardEnabled_Incorrect_V1 if {
 test_AutoForwardEnabled_Incorrect_V2 if {
     PolicyId := "MS.EXO.1.1v1"
 
-    Output := tests with input as {
+    Output := exo.tests with input as {
         "remote_domains": [
             {
                 "AutoForwardEnabled" : true,
@@ -69,7 +70,7 @@ test_AutoForwardEnabled_Incorrect_V2 if {
 test_AutoForwardEnabled_Incorrect_V3 if {
     PolicyId := "MS.EXO.1.1v1"
 
-    Output := tests with input as {
+    Output := exo.tests with input as {
         "remote_domains": [
             {
                 "AutoForwardEnabled" : true,

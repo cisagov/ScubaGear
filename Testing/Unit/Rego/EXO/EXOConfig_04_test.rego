@@ -1,5 +1,6 @@
-package exo
+package exo_test
 import future.keywords
+import data.exo
 
 
 #
@@ -8,10 +9,10 @@ import future.keywords
 test_Rdata_Correct if {
     PolicyId := "MS.EXO.4.1v1"
 
-    Output := tests with input as {
+    Output := exo.tests with input as {
         "dmarc_records":[
             {
-                "rdata" : ["v=DMARC1; p=reject; pct=100; rua=mailto:DMARC@hq.dhs.gov, mailto:reports@dmarc.cyber.dhs.gov"], 
+                "rdata" : ["v=DMARC1; p=reject; pct=100; rua=mailto:DMARC@hq.dhs.gov, mailto:reports@dmarc.cyber.dhs.gov"],
                 "domain" : "test.name"
             }
         ],
@@ -33,7 +34,7 @@ test_Rdata_Correct if {
 test_Rdata_Incorrect if {
     PolicyId := "MS.EXO.4.1v1"
 
-    Output := tests with input as {
+    Output := exo.tests with input as {
         "dmarc_records":[
             {
                 "rdata" : [],
@@ -58,7 +59,7 @@ test_Rdata_Incorrect if {
 test_Rdata_Incorrect_V2 if {
     PolicyId := "MS.EXO.4.1v1"
 
-    Output := tests with input as {
+    Output := exo.tests with input as {
         "dmarc_records":[
             {
                 "rdata" : ["v=DMARC1"],
@@ -83,10 +84,10 @@ test_Rdata_Incorrect_V2 if {
 test_Rdata_Incorrect_V3 if {
     PolicyId := "MS.EXO.4.1v1"
 
-    Output := tests with input as {
+    Output := exo.tests with input as {
         "dmarc_records": [
             {
-                "rdata" : ["v=DMARC1; p=reject; pct=100; rua=mailto:DMARC@hq.dhs.gov, mailto:reports@dmarc.cyber.dhs.gov"], 
+                "rdata" : ["v=DMARC1; p=reject; pct=100; rua=mailto:DMARC@hq.dhs.gov, mailto:reports@dmarc.cyber.dhs.gov"],
                 "domain" : "test.name"
             },
             {
@@ -119,10 +120,10 @@ test_Rdata_Incorrect_V3 if {
 test_Rdata_Correct_V2 if {
     PolicyId := "MS.EXO.4.2v1"
 
-    Output := tests with input as {
+    Output := exo.tests with input as {
         "dmarc_records": [
             {
-                "rdata" : ["v=DMARC1; p=reject; pct=100; rua=mailto:DMARC@hq.dhs.gov, mailto:reports@dmarc.cyber.dhs.gov"], 
+                "rdata" : ["v=DMARC1; p=reject; pct=100; rua=mailto:DMARC@hq.dhs.gov, mailto:reports@dmarc.cyber.dhs.gov"],
                 "domain" : "test.name"
             }
         ],
@@ -144,10 +145,10 @@ test_Rdata_Correct_V2 if {
 test_Rdata_Incorrect_V4 if {
     PolicyId := "MS.EXO.4.2v1"
 
-    Output := tests with input as {
+    Output := exo.tests with input as {
         "dmarc_records": [
             {
-                "rdata" : ["v=DMARC1; p=none; mailto:reports@dmarc.cyber.dhs.gov mailto:jsmith@dhs.gov mailto:jsomething@dhs.gov"], 
+                "rdata" : ["v=DMARC1; p=none; mailto:reports@dmarc.cyber.dhs.gov mailto:jsmith@dhs.gov mailto:jsomething@dhs.gov"],
                 "domain" : "test.name"
             }
         ],
@@ -169,10 +170,10 @@ test_Rdata_Incorrect_V4 if {
 test_Rdata_Incorrect_V5 if {
     PolicyId := "MS.EXO.4.2v1"
 
-    Output := tests with input as {
+    Output := exo.tests with input as {
         "dmarc_records": [
             {
-                "rdata" : ["v=DMARC1; mailto:reports@dmarc.cyber.dhs.gov mailto:jsmith@dhs.gov mailto:jsomething@dhs.gov"], 
+                "rdata" : ["v=DMARC1; mailto:reports@dmarc.cyber.dhs.gov mailto:jsmith@dhs.gov mailto:jsomething@dhs.gov"],
                 "domain" : "test.name"
             }
         ],
@@ -197,10 +198,10 @@ test_Rdata_Incorrect_V5 if {
 test_DMARCReport_Correct_V1 if {
     PolicyId := "MS.EXO.4.3v1"
 
-    Output := tests with input as {
+    Output := exo.tests with input as {
         "dmarc_records": [
             {
-                "rdata" : ["v=DMARC1; p=reject; pct=100; rua=mailto:DMARC@hq.dhs.gov, mailto:reports@dmarc.cyber.dhs.gov"], 
+                "rdata" : ["v=DMARC1; p=reject; pct=100; rua=mailto:DMARC@hq.dhs.gov, mailto:reports@dmarc.cyber.dhs.gov"],
                 "domain" : "test.name"
             }
         ],
@@ -222,7 +223,7 @@ test_DMARCReport_Correct_V1 if {
 test_DMARCReport_Incorrect_V1 if {
     PolicyId := "MS.EXO.4.3v1"
 
-    Output := tests with input as {
+    Output := exo.tests with input as {
         "dmarc_records": [
             {
                 "rdata" : ["v=DMARC1; p=reject; pct=100;"],
@@ -247,10 +248,10 @@ test_DMARCReport_Incorrect_V1 if {
 test_DMARCReport_Incorrect_V2 if {
     PolicyId := "MS.EXO.4.3v1"
 
-    Output := tests with input as {
+    Output := exo.tests with input as {
         "dmarc_records": [
             {
-                "rdata" : ["v=DMARC1; p=reject; pct=100; rua=mailto:reports@wrong.address"], 
+                "rdata" : ["v=DMARC1; p=reject; pct=100; rua=mailto:reports@wrong.address"],
                 "domain" : "test.name"
             }
         ],
@@ -272,7 +273,7 @@ test_DMARCReport_Incorrect_V2 if {
 test_DMARCReport_Incorrect_V3 if {
     PolicyId := "MS.EXO.4.3v1"
     # empty rdata
-    Output := tests with input as {
+    Output := exo.tests with input as {
         "dmarc_records": [
             {
                 "rdata" : [],
@@ -300,10 +301,10 @@ test_DMARCReport_Incorrect_V3 if {
 test_POC_Correct_V1 if {
     PolicyId := "MS.EXO.4.4v1"
     # 2 emails in rua= and 1 in ruf
-    Output := tests with input as {
+    Output := exo.tests with input as {
         "dmarc_records": [
             {
-                "rdata" : ["v=DMARC1; p=reject; pct=100; rua=mailto:DMARC@hq.dhs.gov, mailto:reports@dmarc.cyber.dhs.gov; ruf=agencyemail@hq.dhs.gov"], 
+                "rdata" : ["v=DMARC1; p=reject; pct=100; rua=mailto:DMARC@hq.dhs.gov, mailto:reports@dmarc.cyber.dhs.gov; ruf=agencyemail@hq.dhs.gov"],
                 "domain" : "test.name"
             }
         ],
@@ -325,10 +326,10 @@ test_POC_Correct_V1 if {
 test_POC_Correct_V1 if {
     PolicyId := "MS.EXO.4.4v1"
     # 2+ emails in rua= and 1+ in ruf
-    Output := tests with input as {
+    Output := exo.tests with input as {
         "dmarc_records": [
             {
-                "rdata" : ["v=DMARC1; p=reject; pct=100; rua=mailto:DMARC@hq.dhs.gov, mailto:reports@dmarc.cyber.dhs.gov, mailto:test@example.com; ruf=agencyemail@hq.dhs.gov, test@test.com"], 
+                "rdata" : ["v=DMARC1; p=reject; pct=100; rua=mailto:DMARC@hq.dhs.gov, mailto:reports@dmarc.cyber.dhs.gov, mailto:test@example.com; ruf=agencyemail@hq.dhs.gov, test@test.com"],
                 "domain" : "test.name"
             }
         ],
@@ -350,7 +351,7 @@ test_POC_Correct_V1 if {
 test_POC_Incorrect_V1 if {
     PolicyId := "MS.EXO.4.4v1"
     # Only 1 rua
-    Output := tests with input as {
+    Output := exo.tests with input as {
         "dmarc_records": [
             {
                 "rdata" : ["v=DMARC1; p=reject; pct=100; rua=mailto:reports@dmarc.cyber.dhs.gov"],
@@ -375,7 +376,7 @@ test_POC_Incorrect_V1 if {
 test_POC_Incorrect_V2 if {
     PolicyId := "MS.EXO.4.4v1"
     # Only 2 emails in rua no ruf
-    Output := tests with input as {
+    Output := exo.tests with input as {
         "dmarc_records": [
             {
                 "rdata" : ["v=DMARC1; p=reject; pct=100; rua=mailto:reports@dmarc.cyber.dhs.gov, test@exo.com"],
@@ -400,7 +401,7 @@ test_POC_Incorrect_V2 if {
 test_POC_Incorrect_V3 if {
     PolicyId := "MS.EXO.4.4v1"
     # Only 1 ruf no rua
-    Output := tests with input as {
+    Output := exo.tests with input as {
         "dmarc_records": [
             {
                 "rdata" : ["v=DMARC1; p=reject; pct=100; rua=test@exo.com"],
@@ -425,7 +426,7 @@ test_POC_Incorrect_V3 if {
 test_POC_Incorrect_V4 if {
     PolicyId := "MS.EXO.4.4v1"
     # 2 domains 1 fails rua/ruf number
-    Output := tests with input as {
+    Output := exo.tests with input as {
         "dmarc_records": [
             {
                 "rdata" : ["v=DMARC1; p=reject; pct=100; rua=mailto:reports@dmarc.cyber.dhs.gov, test@test.name ruf=test2@test.name"],
@@ -458,7 +459,7 @@ test_POC_Incorrect_V4 if {
 test_POC_Incorrect_V5 if {
     PolicyId := "MS.EXO.4.4v1"
     # 2 domains 1 fails rua # of email policy requirement
-    Output := tests with input as {
+    Output := exo.tests with input as {
         "dmarc_records": [
             {
                 "rdata" : ["v=DMARC1; p=reject; pct=100; rua=mailto:reports@dmarc.cyber.dhs.gov, test@test.name ruf=test2@test.name"],
@@ -491,7 +492,7 @@ test_POC_Incorrect_V5 if {
 test_POC_Incorrect_V5 if {
     PolicyId := "MS.EXO.4.4v1"
     # 2 domains 1 domain failed DNS query. Empty rdata
-    Output := tests with input as {
+    Output := exo.tests with input as {
         "dmarc_records": [
             {
                 "rdata" : ["v=DMARC1; p=reject; pct=100; rua=mailto:reports@dmarc.cyber.dhs.gov, test@test.name ruf=test2@test.name"],

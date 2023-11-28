@@ -1,5 +1,6 @@
-package exo
+package exo_test
 import future.keywords
+import data.exo
 import data.report.utils.DefenderMirrorDetails
 
 #
@@ -8,7 +9,7 @@ import data.report.utils.DefenderMirrorDetails
 test_3rdParty_Correct_V1 if {
     PolicyId := "MS.EXO.8.1v1"
 
-    Output := tests with input as { }
+    Output := exo.tests with input as { }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
@@ -22,7 +23,7 @@ test_3rdParty_Correct_V1 if {
 #--
 test_3rdParty_Correct_V2 if {
     PolicyId := "MS.EXO.8.2v1"
-    Output := tests with input as { }
+    Output := exo.tests with input as { }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
