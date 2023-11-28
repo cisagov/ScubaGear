@@ -7,6 +7,14 @@ import data.policy.utils.IsEmptyContainer
 import data.policy.utils.Contains
 import data.policy.utils.Count
 
+#############
+# Constants #
+#############
+
+# Set to the maximum number of array items to be
+# printed in the report details section
+REPORTARRAYMAXCOUNT := 20
+
 #############################################################################
 # The report formatting functions below are generic and used throughout AAD #
 #############################################################################
@@ -15,26 +23,22 @@ Description(String1, String2, String3) := trim(concat(" ", [String1, String2, St
 
 ReportDetailsArray(Array, String) := Description(Format(Array), String, "")
 
-# Set to the maximum number of array items to be
-# printed in the report details section
-ReportArrayMaxCount := 20
-
 ReportFullDetailsArray(Array, String) := ReportDetailsArray(Array, String) if {
     count(Array) == 0
 }
 
 ReportFullDetailsArray(Array, String) := Details if {
     count(Array) > 0
-    count(Array) <= ReportArrayMaxCount
+    count(Array) <= REPORTARRAYMAXCOUNT
     Details := Description(Format(Array), concat(":<br/>", [String, concat(", ", Array)]), "")
 }
 
 ReportFullDetailsArray(Array, String) := Details if {
-    count(Array) > ReportArrayMaxCount
+    count(Array) > REPORTARRAYMAXCOUNT
     List := [x | some x in Array]
 
     TruncationWarning := "...<br/>Note: The list of matching items has been truncated.  Full details are available in the JSON results."
-    TruncatedList := concat(", ", array.slice(List, 0, ReportArrayMaxCount))
+    TruncatedList := concat(", ", array.slice(List, 0, REPORTARRAYMAXCOUNT))
     Details := Description(Format(Array), concat(":<br/>", [String, TruncatedList]), TruncationWarning)
 }
 
