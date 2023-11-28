@@ -24,7 +24,7 @@ jobs:
         run: |
           $PSGalleryPath = 'D:\PrivateGallery'
           New-Item -Path $PSGalleryPath -ItemType Directory
-          $Splat = @{ Name = $GalleryName, SourceLocation = $PSGalleryPath, PublishLocation = $PSGalleryPath, InstallationPolicy = 'Trusted' }
+          $Splat = @{ Name = $GalleryName; SourceLocation = $PSGalleryPath; PublishLocation = $PSGalleryPath; InstallationPolicy = 'Trusted' }
           Register-PSRepository @Splat 
       - name: Publish ScubaGear Module 
         shell: powershell
@@ -35,4 +35,4 @@ jobs:
         run: |
           Find-Module -Name ScubaGear -Repository $GalleryName
           Install-Module -Name ScubaGear
-          
+
