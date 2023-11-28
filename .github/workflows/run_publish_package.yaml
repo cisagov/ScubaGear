@@ -29,9 +29,7 @@ jobs:
       - name: Publish ScubaGear Module 
         shell: powershell
         run: |
-          ls .
-          ls repo 
-          Publish-Module -Path repo\ScubaGear\PowerShell\ScubaGear\ -Repository $env:GalleryName
+          Publish-Module -Path repo\PowerShell\ScubaGear\ -Repository $env:GalleryName
       - name: Test Module Publish
         shell: powershell
         run: |
