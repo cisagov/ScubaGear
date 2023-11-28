@@ -1,5 +1,6 @@
-package powerplatform
+package powerplatform_test
 import future.keywords
+import data.powerplatform
 
 #
 # Policy 1
@@ -7,7 +8,7 @@ import future.keywords
 test_disablePortalCreationByNonAdminUsers_Correct if {
     PolicyId := "MS.POWERPLATFORM.5.1v1"
 
-    Output := tests with input as {
+    Output := powerplatform.tests with input as {
         "environment_creation": [{
             "disablePortalsCreationByNonAdminUsers" : true
         }]
@@ -23,7 +24,7 @@ test_disablePortalCreationByNonAdminUsers_Correct if {
 test_disablePortalCreationByNonAdminUsers_Incorrect if {
     PolicyId := "MS.POWERPLATFORM.5.1v1"
 
-    Output := tests with input as {
+    Output := powerplatform.tests with input as {
         "environment_creation": [{
             "disablePortalsCreationByNonAdminUsers" : false
         }]

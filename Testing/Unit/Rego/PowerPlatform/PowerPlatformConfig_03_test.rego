@@ -1,5 +1,6 @@
-package powerplatform
+package powerplatform_test
 import future.keywords
+import data.powerplatform
 import data.report.utils.NotCheckedDetails
 
 #
@@ -8,11 +9,11 @@ import data.report.utils.NotCheckedDetails
 test_isDisabled_Correct if {
     PolicyId := "MS.POWERPLATFORM.3.1v1"
 
-    Output := tests with input as {
+    Output := powerplatform.tests with input as {
         "tenant_isolation": [{
             "properties" : {
                 "isDisabled" : false
-            } 
+            }
         }]
     }
 
@@ -26,11 +27,11 @@ test_isDisabled_Correct if {
 test_isDisabled_Incorrect if {
     PolicyId := "MS.POWERPLATFORM.3.1v1"
 
-    Output := tests with input as {
+    Output := powerplatform.tests with input as {
         "tenant_isolation": [{
             "properties" : {
                 "isDisabled" : true
-            } 
+            }
         }]
     }
 
@@ -47,7 +48,7 @@ test_isDisabled_Incorrect if {
 test_NotImplemented_Correct if {
     PolicyId := "MS.POWERPLATFORM.3.2v1"
 
-    Output := tests with input as { }
+    Output := powerplatform.tests with input as { }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 

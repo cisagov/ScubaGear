@@ -1,5 +1,6 @@
-package powerplatform
+package powerplatform_test
 import future.keywords
+import data.powerplatform
 
 
 #
@@ -8,7 +9,7 @@ import future.keywords
 test_name_Correct if {
     PolicyId := "MS.POWERPLATFORM.2.1v1"
 
-    Output := tests with input as {
+    Output := powerplatform.tests with input as {
         "tenant_id": "Test Id",
         "dlp_policies": [{
             "value":  [{
@@ -30,7 +31,7 @@ test_name_Correct if {
 test_name_Incorrect if {
     PolicyId := "MS.POWERPLATFORM.2.1v1"
 
-    Output := tests with input as {
+    Output := powerplatform.tests with input as {
         "tenant_id": "Test Id",
         "dlp_policies": [{
             "value":  [{
@@ -55,7 +56,7 @@ test_name_Incorrect if {
 test_environment_list_Correct if {
     PolicyId := "MS.POWERPLATFORM.2.2v1"
 
-    Output := tests with input as {
+    Output := powerplatform.tests with input as {
         "dlp_policies": [{
             "value":  [{
                 "displayName":  "Block Third-Party Connectors",
@@ -79,7 +80,7 @@ test_environment_list_Correct if {
 test_environment_list_Incorrect if {
     PolicyId := "MS.POWERPLATFORM.2.2v1"
 
-    Output := tests with input as {
+    Output := powerplatform.tests with input as {
         "dlp_policies": [{
             "value":  [{
                 "displayName":  "Block Third-Party Connectors",
@@ -111,7 +112,7 @@ test_environment_list_Incorrect if {
 test_classification_Correct_V1 if {
     PolicyId := "MS.POWERPLATFORM.2.3v1"
 
-    Output := tests with input as {
+    Output := powerplatform.tests with input as {
         "tenant_id": "Test Id",
         "dlp_policies": [{
             "value":  [{
@@ -138,7 +139,7 @@ test_classification_Correct_V1 if {
 test_classification_Correct_V2 if {
     PolicyId := "MS.POWERPLATFORM.2.3v1"
 
-    Output := tests with input as {
+    Output := powerplatform.tests with input as {
         "tenant_id": "Test Id",
         "dlp_policies": [{
             "value":  [{
@@ -165,7 +166,7 @@ test_classification_Correct_V2 if {
 test_connectorGroups_Correct if {
     PolicyId := "MS.POWERPLATFORM.2.3v1"
 
-    Output := tests with input as {
+    Output := powerplatform.tests with input as {
         "tenant_id": "Test Id",
         "dlp_policies": [{
             "value":  [{
@@ -198,7 +199,7 @@ test_connectorGroups_Correct if {
 test_classification_Incorrect_V1 if {
     PolicyId := "MS.POWERPLATFORM.2.3v1"
 
-    Output := tests with input as {
+    Output := powerplatform.tests with input as {
         "tenant_id": "Test Id",
         "dlp_policies": [{
             "value":  [{
@@ -225,7 +226,7 @@ test_classification_Incorrect_V1 if {
 test_classification_Incorrect_V2 if {
     PolicyId := "MS.POWERPLATFORM.2.3v1"
 
-    Output := tests with input as {
+    Output := powerplatform.tests with input as {
         "tenant_id": "Test Id",
         "dlp_policies": [{
             "value":  [{
@@ -252,7 +253,7 @@ test_classification_Incorrect_V2 if {
 test_connectorGroups_Incorrect if {
     PolicyId := "MS.POWERPLATFORM.2.3v1"
 
-    Output := tests with input as {
+    Output := powerplatform.tests with input as {
         "tenant_id": "Test Id",
         "dlp_policies": [{
             "value":  [{
