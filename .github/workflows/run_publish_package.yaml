@@ -1,0 +1,24 @@
+on: 
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/run_publish_package.yaml"
+    branches:
+      - "package-*"
+
+name: Smoke Test
+
+jobs:
+  Run-Smoke-Test:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: repo
+      - name: Publish PowerShell Module
+        uses: natescherer/publish-powershell-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          target: packages
+          path: repo/PowerShell/ScubaGear/ScubaGear.psd1
