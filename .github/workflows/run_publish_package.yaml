@@ -1,0 +1,41 @@
+on: 
+  schedule:
+    - cron: "0 0 * * *"
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/run_publish_package.yaml"
+
+name: Publish Package
+
+env:
+  GalleryName: PrivateScubaGearGallery
+
+jobs:
+  Publish-Private-Package:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: src
+      - name: Register private PowerShell package repository
+        shell: powershell
+        run: |
+          $PSGalleryPath = 'D:\PrivateGallery'
+          New-Item -Path $PSGalleryPath -ItemType Directory
+          $Splat = @{ Name = $env:GalleryName; SourceLocation = $PSGalleryPath; PublishLocation = $PSGalleryPath; InstallationPolicy = 'Trusted' }
+          Register-PSRepository @Splat 
+      - name: Publish ScubaGear Module 
+        shell: powershell
+        run: |
+          Publish-Module -Path src\PowerShell\ScubaGear\ -Repository $env:GalleryName
+      - name: Test Module Publish
+        shell: powershell
+        run: |
+          Find-Module -Name ScubaGear -Repository $env:GalleryName
+          Install-Module -Name ScubaGear
+          Import-Module -Name ScubaGear
+          $Version = Invoke-SCuBA -Version
+          $Version -like "SCuBA Gear v*" 
+
