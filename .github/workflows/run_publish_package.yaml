@@ -6,7 +6,10 @@ on:
     branches:
       - "package-*"
 
-name: Smoke Test
+name: Publish Package
+
+env:
+  GalleryName: PrivateScubaGearGallery
 
 jobs:
   Run-Smoke-Test:
@@ -16,9 +19,20 @@ jobs:
         uses: actions/checkout@v4
         with:
           path: repo
-      - name: Publish PowerShell Module
-        uses: natescherer/publish-powershell-action@v1
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          target: packages
-          path: repo/PowerShell/ScubaGear/ScubaGear.psd1
+      - name: Register private PowerShell package repository
+        shell: powershell
+        run: |
+          $PSGalleryPath = 'D:\PrivateGallery'
+          New-Item -Path $PSGalleryPath -ItemType Directory
+          $Splat = @{ Name = $GalleryName, SourceLocation = $PSGalleryPath, PublishLocation = $PSGalleryPath, InstallationPolicy = 'Trusted' }
+          Register-PSRepository @Splat 
+      - name: Publish ScubaGear Module 
+        shell: powershell
+        run: |
+          Publish-Module -Path repo\ScubaGear\PowerShell\ScubaGear\ -Repository $GalleryName
+      - name: Test Module Publish
+        shell: powershell
+        run: |
+          Find-Module -Name ScubaGear -Repository $GalleryName
+          Install-Module -Name ScubaGear
+          
