@@ -1,5 +1,6 @@
-package defender
+package defender_test
 import future.keywords
+import data.defender
 
 #
 # Policy 1
@@ -8,7 +9,7 @@ import future.keywords
 #     ControlNumber := "Defender 2.8"
 #     Requirement := "Safe attachments SHOULD be enabled for SharePoint, OneDrive, and Microsoft Teams"
 
-#     Output := tests with input as {
+#     Output := defender.tests with input as {
 #         "atp_policy_for_o365" : [
 #             {
 #                 "EnableATPForSPOTeamsODB" : true,
@@ -29,7 +30,7 @@ import future.keywords
 #     ControlNumber := "Defender 2.8"
 #     Requirement := "Safe attachments SHOULD be enabled for SharePoint, OneDrive, and Microsoft Teams"
 
-#     Output := tests with input as {
+#     Output := defender.tests with input as {
 #         "atp_policy_for_o365" : [
 #             {
 #                 "EnableATPForSPOTeamsODB" : false,

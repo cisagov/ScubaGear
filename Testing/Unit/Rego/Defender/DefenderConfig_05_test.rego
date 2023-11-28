@@ -1,5 +1,6 @@
-package defender
+package defender_test
 import future.keywords
+import data.defender
 
 # TODO: Policy Id(s) needs to be resolved
 #
@@ -9,7 +10,7 @@ import future.keywords
 #     ControlNumber := "Defender 2.9"
 #     Requirement := "At a minimum, the alerts required by the Exchange Online Minimum Viable Secure Configuration Baseline SHALL be enabled"
 
-#     Output := tests with input as {
+#     Output := defender.tests with input as {
 #         "protection_alerts": [
 #             {
 #                 "Name": "Suspicious email sending patterns detected",
@@ -63,7 +64,7 @@ import future.keywords
 #     ControlNumber := "Defender 2.9"
 #     Requirement := "At a minimum, the alerts required by the Exchange Online Minimum Viable Secure Configuration Baseline SHALL be enabled"
 
-#     Output := tests with input as {
+#     Output := defender.tests with input as {
 #         "protection_alerts": [
 #             {
 #                 "Name": "Suspicious email sending patterns detected",
@@ -103,7 +104,7 @@ import future.keywords
 #             },
 #             {
 #                 "Name": "Successful exact data match upload", # Not required
-#                 "Disabled": false 
+#                 "Disabled": false
 #             },
 #         ]
 #     }
@@ -119,7 +120,7 @@ import future.keywords
 #     ControlNumber := "Defender 2.9"
 #     Requirement := "At a minimum, the alerts required by the Exchange Online Minimum Viable Secure Configuration Baseline SHALL be enabled"
 
-#     Output := tests with input as {
+#     Output := defender.tests with input as {
 #         "protection_alerts": [
 #             {
 #                 "Name": "Suspicious email sending patterns detected",
@@ -172,7 +173,7 @@ import future.keywords
 #     ControlNumber := "Defender 2.9"
 #     Requirement := "At a minimum, the alerts required by the Exchange Online Minimum Viable Secure Configuration Baseline SHALL be enabled"
 
-#     Output := tests with input as {
+#     Output := defender.tests with input as {
 #         "protection_alerts": [
 #             {
 #                 "Name": "Unusual increase in email reported as phish",
@@ -224,7 +225,7 @@ import future.keywords
 #     PolicyId := "MS.DEFENDER.TBD"
 #     Requirement := "The alerts SHOULD be sent to a monitored address or incorporated into a SIEM"
 
-#     Output := tests with input as { }
+#     Output := defender.tests with input as { }
 
 #     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
 

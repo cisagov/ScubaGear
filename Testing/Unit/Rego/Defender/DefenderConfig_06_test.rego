@@ -1,5 +1,6 @@
-package defender
+package defender_test
 import future.keywords
+import data.defender
 import data.report.utils.NotCheckedDetails
 
 #
@@ -8,7 +9,7 @@ import data.report.utils.NotCheckedDetails
 test_AdminAuditLogEnabled_Correct if {
     PolicyId := "MS.DEFENDER.6.1v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "admin_audit_log_config": [{
             "Identity": "Admin Audit Log Settings",
             "UnifiedAuditLogIngestionEnabled" : true
@@ -25,7 +26,7 @@ test_AdminAuditLogEnabled_Correct if {
 test_AdminAuditLogEnabled_Incorrect if {
     PolicyId := "MS.DEFENDER.6.1v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "admin_audit_log_config": [{
             "Identity": "Admin Audit Log Settings",
             "UnifiedAuditLogIngestionEnabled" : false
@@ -45,7 +46,7 @@ test_AdminAuditLogEnabled_Incorrect if {
 test_NotImplemented_Correct_V1 if {
     PolicyId := "MS.DEFENDER.6.2v1"
 
-    Output := tests with input as { }
+    Output := defender.tests with input as { }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
@@ -60,7 +61,7 @@ test_NotImplemented_Correct_V1 if {
 test_NotImplemented_Correct_V2 if {
     PolicyId := "MS.DEFENDER.6.3v1"
 
-    Output := tests with input as { }
+    Output := defender.tests with input as { }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 

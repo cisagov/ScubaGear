@@ -1,5 +1,6 @@
-package defender
+package defender_test
 import future.keywords
+import data.defender
 
 #
 # Policy 1
@@ -8,7 +9,7 @@ import future.keywords
 test_TargetedUsers_Correct_V1 if {
     PolicyId := "MS.DEFENDER.2.1v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "anti_phish_policies": [
             {
                 "Identity" : "Standard Preset Security Policy1659535429826",
@@ -53,7 +54,7 @@ test_TargetedUsers_Correct_V1 if {
 test_TargetedUsers_Correct_V2 if {
     PolicyId := "MS.DEFENDER.2.1v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "anti_phish_policies": [
             {
                 "Identity" : "Standard Preset Security Policy1659535429826",
@@ -97,7 +98,7 @@ test_TargetedUsers_Correct_V2 if {
 test_TargetedUsers_Correct_V3 if {
     PolicyId := "MS.DEFENDER.2.1v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "anti_phish_policies": [
             {
                 "Identity" : "Standard Preset Security Policy1659535429826",
@@ -142,7 +143,7 @@ test_TargetedUsers_Correct_V3 if {
 test_TargetedUsers_Incorrect_V1 if {
     PolicyId := "MS.DEFENDER.2.1v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "anti_phish_policies": [
             {
                 "Identity" : "Strict Preset Security Policy1659535429826",
@@ -177,7 +178,7 @@ test_TargetedUsers_Incorrect_V1 if {
 test_TargetedUsers_Incorrect_V2 if {
     PolicyId := "MS.DEFENDER.2.1v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "anti_phish_policies": [
             {
                 "Identity" : "Standard Preset Security Policy1659535429826",
@@ -212,7 +213,7 @@ test_TargetedUsers_Incorrect_V2 if {
 test_TargetedUsers_Incorrect_V3 if {
     PolicyId := "MS.DEFENDER.2.1v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "anti_phish_policies": [
             {
                 "Identity" : "Some Preset Security Policy1659535429826",
@@ -247,7 +248,7 @@ test_TargetedUsers_Incorrect_V3 if {
 test_TargetedUsers_Incorrect_V4 if {
     PolicyId := "MS.DEFENDER.2.1v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "anti_phish_policies": [
             {
                 "Identity" : "Standard Preset Security Policy1659535429826",
@@ -292,7 +293,7 @@ test_TargetedUsers_Incorrect_V4 if {
 test_TargetedUsers_Incorrect_V5 if {
     PolicyId := "MS.DEFENDER.2.1v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "anti_phish_policies": [
             {
                 "Identity" : "Standard Preset Security Policy1659535429826",
@@ -337,7 +338,7 @@ test_TargetedUsers_Incorrect_V5 if {
 test_TargetedUsers_Incorrect_V6 if {
     PolicyId := "MS.DEFENDER.2.1v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "anti_phish_policies": [
             {
                 "Identity" : "Standard Preset Security Policy1659535429826",
@@ -384,7 +385,7 @@ test_TargetedUsers_Incorrect_V6 if {
 test_AgencyDomains_Correct_V1 if {
     PolicyId := "MS.DEFENDER.2.2v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "anti_phish_policies": [
             {
                 "Identity" : "Standard Preset Security Policy1659535429826",
@@ -429,7 +430,7 @@ test_AgencyDomains_Correct_V1 if {
 test_AgencyDomains_Correct_V2 if {
     PolicyId := "MS.DEFENDER.2.2v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "anti_phish_policies": [
             {
                 "Identity" : "Standard Preset Security Policy1659535429826",
@@ -473,7 +474,7 @@ test_AgencyDomains_Correct_V2 if {
 test_AgencyDomains_Incorrect_V1 if {
     PolicyId := "MS.DEFENDER.2.2v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "anti_phish_policies": [
             {
                 "Identity" : "Strict Preset Security Policy1659535429826",
@@ -508,7 +509,7 @@ test_AgencyDomains_Incorrect_V1 if {
 test_AgencyDomains_Incorrect_V2 if {
     PolicyId := "MS.DEFENDER.2.2v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "anti_phish_policies": [
             {
                 "Identity" : "Standard Preset Security Policy1659535429826",
@@ -543,7 +544,7 @@ test_AgencyDomains_Incorrect_V2 if {
 test_AgencyDomains_Incorrect_V3 if {
     PolicyId := "MS.DEFENDER.2.2v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "anti_phish_policies": [
             {
                 "Identity" : "Some Preset Security Policy1659535429826",
@@ -578,7 +579,7 @@ test_AgencyDomains_Incorrect_V3 if {
 test_AgencyDomains_Incorrect_V4 if {
     PolicyId := "MS.DEFENDER.2.2v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "anti_phish_policies": [
             {
                 "Identity" : "Standard Preset Security Policy1659535429826",
@@ -623,7 +624,7 @@ test_AgencyDomains_Incorrect_V4 if {
 test_AgencyDomains_Incorrect_V5 if {
     PolicyId := "MS.DEFENDER.2.2v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "anti_phish_policies": [
             {
                 "Identity" : "Standard Preset Security Policy1659535429826",
@@ -668,7 +669,7 @@ test_AgencyDomains_Incorrect_V5 if {
 test_AgencyDomains_Incorrect_V6 if {
     PolicyId := "MS.DEFENDER.2.2v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "anti_phish_policies": [
             {
                 "Identity" : "Standard Preset Security Policy1659535429826",
@@ -712,7 +713,7 @@ test_AgencyDomains_Incorrect_V6 if {
 test_AgencyDomains_Incorrect_V7 if {
     PolicyId := "MS.DEFENDER.2.2v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "anti_phish_policies": [
             {
                 "Identity" : "Standard Preset Security Policy1659535429826",
@@ -753,7 +754,7 @@ test_AgencyDomains_Incorrect_V7 if {
 test_AgencyDomains_Incorrect_V8 if {
     PolicyId := "MS.DEFENDER.2.2v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "anti_phish_policies": [
             {
                 "Identity" : "Standard Preset Security Policy1659535429826",
@@ -791,7 +792,7 @@ test_AgencyDomains_Incorrect_V8 if {
 test_CustomDomains_Correct_V1 if {
     PolicyId := "MS.DEFENDER.2.3v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "anti_phish_policies": [
             {
                 "Identity" : "Standard Preset Security Policy1659535429826",
@@ -836,7 +837,7 @@ test_CustomDomains_Correct_V1 if {
 test_CustomDomains_Correct_V2 if {
     PolicyId := "MS.DEFENDER.2.3v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "anti_phish_policies": [
             {
                 "Identity" : "Standard Preset Security Policy1659535429826",
@@ -880,7 +881,7 @@ test_CustomDomains_Correct_V2 if {
 test_CustomDomains_Correct_V3 if {
     PolicyId := "MS.DEFENDER.2.3v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "anti_phish_policies": [
             {
                 "Identity" : "Standard Preset Security Policy1659535429826",
@@ -925,7 +926,7 @@ test_CustomDomains_Correct_V3 if {
 test_CustomDomains_Correct_V4 if {
     PolicyId := "MS.DEFENDER.2.3v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "anti_phish_policies": [
             {
                 "Identity" : "Standard Preset Security Policy1659535429826",
@@ -960,7 +961,7 @@ test_CustomDomains_Correct_V4 if {
 test_CustomDomains_Incorrect_V1 if {
     PolicyId := "MS.DEFENDER.2.3v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "anti_phish_policies": [
             {
                 "Identity" : "Strict Preset Security Policy1659535429826",
@@ -995,7 +996,7 @@ test_CustomDomains_Incorrect_V1 if {
 test_CustomDomains_Incorrect_V2 if {
     PolicyId := "MS.DEFENDER.2.3v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "anti_phish_policies": [
             {
                 "Identity" : "Standard Preset Security Policy1659535429826",
@@ -1030,7 +1031,7 @@ test_CustomDomains_Incorrect_V2 if {
 test_CustomDomains_Incorrect_V3 if {
     PolicyId := "MS.DEFENDER.2.3v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "anti_phish_policies": [
             {
                 "Identity" : "Some Preset Security Policy1659535429826",
@@ -1065,7 +1066,7 @@ test_CustomDomains_Incorrect_V3 if {
 test_CustomDomains_Incorrect_V4 if {
     PolicyId := "MS.DEFENDER.2.3v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "anti_phish_policies": [
             {
                 "Identity" : "Standard Preset Security Policy1659535429826",
@@ -1110,7 +1111,7 @@ test_CustomDomains_Incorrect_V4 if {
 test_CustomDomains_Incorrect_V5 if {
     PolicyId := "MS.DEFENDER.2.3v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "anti_phish_policies": [
             {
                 "Identity" : "Standard Preset Security Policy1659535429826",
@@ -1155,7 +1156,7 @@ test_CustomDomains_Incorrect_V5 if {
 test_CustomDomains_Incorrect_V6 if {
     PolicyId := "MS.DEFENDER.2.3v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "anti_phish_policies": [
             {
                 "Identity" : "Standard Preset Security Policy1659535429826",
@@ -1199,7 +1200,7 @@ test_CustomDomains_Incorrect_V6 if {
 test_CustomDomains_Incorrect_V7 if {
     PolicyId := "MS.DEFENDER.2.3v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "anti_phish_policies": [
             {
                 "Identity" : "Standard Preset Security Policy1659535429826",

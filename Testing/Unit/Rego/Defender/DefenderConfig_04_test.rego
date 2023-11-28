@@ -1,5 +1,6 @@
-package defender
+package defender_test
 import future.keywords
+import data.defender
 import data.report.utils.NotCheckedDetails
 
 # TODO: Policy Id(s) needs to be resolved
@@ -10,7 +11,7 @@ import data.report.utils.NotCheckedDetails
 test_ContentContainsSensitiveInformation_Correct_V1 if {
     PolicyId := "MS.DEFENDER.4.1v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "dlp_compliance_rules": [
             {
                 "ContentContainsSensitiveInformation":  [
@@ -51,7 +52,7 @@ test_ContentContainsSensitiveInformation_Correct_V1 if {
 test_AdvancedRule_Correct_V2 if {
     PolicyId := "MS.DEFENDER.4.1v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "dlp_compliance_rules": [
             {
                 "ContentContainsSensitiveInformation":  null,
@@ -95,7 +96,7 @@ test_AdvancedRule_Correct_V2 if {
 test_ContentContainsSensitiveInformation_Incorrect_V1 if {
     PolicyId := "MS.DEFENDER.4.1v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "dlp_compliance_rules": [
             {
                 "ContentContainsSensitiveInformation":  [
@@ -135,7 +136,7 @@ test_ContentContainsSensitiveInformation_Incorrect_V1 if {
 test_ContentContainsSensitiveInformation_Incorrect_V2 if {
     PolicyId := "MS.DEFENDER.4.1v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "dlp_compliance_rules": [
             {
                 "ContentContainsSensitiveInformation":  [
@@ -175,7 +176,7 @@ test_ContentContainsSensitiveInformation_Incorrect_V2 if {
 test_ContentContainsSensitiveInformation_Incorrect_V3 if {
     PolicyId := "MS.DEFENDER.4.1v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "dlp_compliance_rules": [
             {
                 "ContentContainsSensitiveInformation":  [
@@ -215,7 +216,7 @@ test_ContentContainsSensitiveInformation_Incorrect_V3 if {
 test_ContentContainsSensitiveInformation_Incorrect_V4 if {
     PolicyId := "MS.DEFENDER.4.1v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "dlp_compliance_rules": [
             {
                 "ContentContainsSensitiveInformation":  [],
@@ -252,7 +253,7 @@ test_ContentContainsSensitiveInformation_Incorrect_V4 if {
 test_ContentContainsSensitiveInformation_Incorrect_V5 if {
     PolicyId := "MS.DEFENDER.4.1v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "dlp_compliance_rules": [
             {
                 "ContentContainsSensitiveInformation":  [
@@ -293,7 +294,7 @@ test_ContentContainsSensitiveInformation_Incorrect_V5 if {
 test_ContentContainsSensitiveInformation_Incorrect_V6 if {
     PolicyId := "MS.DEFENDER.4.1v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "dlp_compliance_rules": [
             {
                 "ContentContainsSensitiveInformation":  [
@@ -337,7 +338,7 @@ test_ContentContainsSensitiveInformation_Incorrect_V6 if {
 test_Locations_Correct_V1 if {
     PolicyId := "MS.DEFENDER.4.2v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "dlp_compliance_rules": [
             {
                 "ContentContainsSensitiveInformation":  [
@@ -384,7 +385,7 @@ test_Locations_Correct_V1 if {
 test_Locations_Correct_V2 if {
     PolicyId := "MS.DEFENDER.4.2v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "dlp_compliance_rules": [
             {
                 "ContentContainsSensitiveInformation":  null,
@@ -429,7 +430,7 @@ test_Locations_Correct_V2 if {
 test_Locations_Incorrect_V1 if {
     PolicyId := "MS.DEFENDER.4.2v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "dlp_compliance_rules": [
             {
                 "ContentContainsSensitiveInformation":  [
@@ -477,7 +478,7 @@ test_Locations_Incorrect_V1 if {
 test_Locations_Incorrect_V2 if {
     PolicyId := "MS.DEFENDER.4.2v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "dlp_compliance_rules": [
             {
                 "ContentContainsSensitiveInformation":  [
@@ -525,7 +526,7 @@ test_Locations_Incorrect_V2 if {
 test_Locations_Incorrect_V3 if {
     PolicyId := "MS.DEFENDER.4.2v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "dlp_compliance_rules": [
             {
                 "ContentContainsSensitiveInformation":  [
@@ -573,7 +574,7 @@ test_Locations_Incorrect_V3 if {
 test_Locations_Incorrect_V4 if {
     PolicyId := "MS.DEFENDER.4.2v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "dlp_compliance_rules": [
             {
                 "ContentContainsSensitiveInformation":  [
@@ -621,7 +622,7 @@ test_Locations_Incorrect_V4 if {
 test_Locations_Incorrect_V5 if {
     PolicyId := "MS.DEFENDER.4.2v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "dlp_compliance_rules": [
             {
                 "ContentContainsSensitiveInformation":  [
@@ -669,7 +670,7 @@ test_Locations_Incorrect_V5 if {
 test_Locations_Incorrect_V6 if {
     PolicyId := "MS.DEFENDER.4.2v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "dlp_compliance_rules": [
             {
                 "ContentContainsSensitiveInformation":  [
@@ -717,7 +718,7 @@ test_Locations_Incorrect_V6 if {
 test_Locations_Incorrect_V7 if {
     PolicyId := "MS.DEFENDER.4.2v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "dlp_compliance_rules": [
             {
                 "ContentContainsSensitiveInformation":  [
@@ -765,7 +766,7 @@ test_Locations_Incorrect_V7 if {
 test_Locations_Incorrect_V8 if {
     PolicyId := "MS.DEFENDER.4.2v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "dlp_compliance_rules": [
             {
                 "ContentContainsSensitiveInformation":  [
@@ -816,7 +817,7 @@ test_Locations_Incorrect_V8 if {
 test_BlockAccess_Correct_V1 if {
     PolicyId := "MS.DEFENDER.4.3v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "dlp_compliance_rules": [
             {
                 "ContentContainsSensitiveInformation":  [
@@ -858,7 +859,7 @@ test_BlockAccess_Correct_V1 if {
 test_BlockAccess_Incorrect_V1 if {
     PolicyId := "MS.DEFENDER.4.3v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "dlp_compliance_rules": [
             {
                 "ContentContainsSensitiveInformation":  [
@@ -900,7 +901,7 @@ test_BlockAccess_Incorrect_V1 if {
 test_BlockAccess_Incorrect_V2 if {
     PolicyId := "MS.DEFENDER.4.3v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "dlp_compliance_rules": [
             {
                 "ContentContainsSensitiveInformation":  [
@@ -942,7 +943,7 @@ test_BlockAccess_Incorrect_V2 if {
 test_BlockAccess_Incorrect_V3 if {
     PolicyId := "MS.DEFENDER.4.3v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "dlp_compliance_rules": [
             {
                 "ContentContainsSensitiveInformation":  [
@@ -984,7 +985,7 @@ test_BlockAccess_Incorrect_V3 if {
 test_BlockAccess_Incorrect_V4 if {
     PolicyId := "MS.DEFENDER.4.3v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "dlp_compliance_rules": [
             {
                 "ContentContainsSensitiveInformation":  [
@@ -1025,7 +1026,7 @@ test_BlockAccess_Incorrect_V4 if {
 test_BlockAccess_Incorrect_V5 if {
     PolicyId := "MS.DEFENDER.4.3v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "dlp_compliance_rules": [
             {
                 "ContentContainsSensitiveInformation":  [
@@ -1087,7 +1088,7 @@ test_BlockAccess_Incorrect_V5 if {
 test_BlockAccess_Incorrect_V6 if {
     PolicyId := "MS.DEFENDER.4.3v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "dlp_compliance_rules": [
             {
                 "ContentContainsSensitiveInformation":  [
@@ -1133,7 +1134,7 @@ test_BlockAccess_Incorrect_V6 if {
 test_NotifyUser_Correct_V1 if {
     PolicyId := "MS.DEFENDER.4.4v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "dlp_compliance_rules": [
             {
                 "ContentContainsSensitiveInformation":  [
@@ -1173,7 +1174,7 @@ test_NotifyUser_Correct_V1 if {
 test_NotifyUser_Correct_V2 if {
     PolicyId := "MS.DEFENDER.4.4v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "dlp_compliance_rules": [
             {
                 "ContentContainsSensitiveInformation":  [
@@ -1215,7 +1216,7 @@ test_NotifyUser_Correct_V2 if {
 test_NotifyUser_Incorrect_V1 if {
     PolicyId := "MS.DEFENDER.4.4v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "dlp_compliance_rules": [
             {
                 "ContentContainsSensitiveInformation":  [
@@ -1257,7 +1258,7 @@ test_NotifyUser_Incorrect_V1 if {
 test_NotifyUser_Incorrect_V2 if {
     PolicyId := "MS.DEFENDER.4.4v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "dlp_compliance_rules": [
             {
                 "ContentContainsSensitiveInformation":  [
@@ -1297,7 +1298,7 @@ test_NotifyUser_Incorrect_V2 if {
 test_NotImplemented_Correct_V1 if {
     PolicyId := "MS.DEFENDER.4.5v1"
 
-    Output := tests with input as { }
+    Output := defender.tests with input as { }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
@@ -1312,7 +1313,7 @@ test_NotImplemented_Correct_V1 if {
 test_NotImplemented_Correct_V2 if {
     PolicyId := "MS.DEFENDER.4.6v1"
 
-    Output := tests with input as { }
+    Output := defender.tests with input as { }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 

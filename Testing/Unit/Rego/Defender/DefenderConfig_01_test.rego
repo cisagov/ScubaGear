@@ -1,5 +1,6 @@
-package defender
+package defender_test
 import future.keywords
+import data.defender
 
 #
 # Policy 1
@@ -7,7 +8,7 @@ import future.keywords
 test_Enabled_Correct_V1 if {
     PolicyId := "MS.DEFENDER.1.1v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "protection_policy_rules" : [
             {
                 "Identity" : "Standard Preset Security Policy",
@@ -41,7 +42,7 @@ test_Enabled_Correct_V1 if {
 test_Enabled_Correct_V2 if {
     PolicyId := "MS.DEFENDER.1.1v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "protection_policy_rules" : [
             {
                 "Identity" : "Standard Preset Security Policy",
@@ -66,7 +67,7 @@ test_Enabled_Correct_V2 if {
 test_Enabled_Correct_V3 if {
     PolicyId := "MS.DEFENDER.1.1v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "protection_policy_rules" : [],
         "atp_policy_rules" : [
             {
@@ -91,7 +92,7 @@ test_Enabled_Correct_V3 if {
 test_Enabled_Incorrect_V1 if {
     PolicyId := "MS.DEFENDER.1.1v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "protection_policy_rules" : [],
         "atp_policy_rules" : [],
         "defender_license": true
@@ -106,7 +107,7 @@ test_Enabled_Incorrect_V1 if {
 test_Enabled_Incorrect_V2 if {
     PolicyId := "MS.DEFENDER.1.1v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "protection_policy_rules" : [
             {
                 "Identity" : "Standard Preset Security Policy",
@@ -127,7 +128,7 @@ test_Enabled_Incorrect_V2 if {
 test_Enabled_Incorrect_V3 if {
     PolicyId := "MS.DEFENDER.1.1v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "protection_policy_rules" : [
             {
                 "Identity" : "Standard Preset Security Policy",
@@ -148,7 +149,7 @@ test_Enabled_Incorrect_V3 if {
 test_Enabled_Incorrect_V4 if {
     PolicyId := "MS.DEFENDER.1.1v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "protection_policy_rules" : [
             {
                 "Identity" : "Standard Preset Security Policy",
@@ -176,7 +177,7 @@ test_Enabled_Incorrect_V4 if {
 test_AllEOP_Correct_V1 if {
     PolicyId := "MS.DEFENDER.1.2v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "protection_policy_rules" : [
             {
                 "Identity" : "Standard Preset Security Policy",
@@ -198,7 +199,7 @@ test_AllEOP_Correct_V1 if {
 test_AllEOP_Correct_V2 if {
     PolicyId := "MS.DEFENDER.1.2v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "protection_policy_rules" : [
             {
                 "Identity" : "Strict Preset Security Policy",
@@ -220,7 +221,7 @@ test_AllEOP_Correct_V2 if {
 test_AllEOP_Correct_V3 if {
     PolicyId := "MS.DEFENDER.1.2v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "protection_policy_rules" : [
             {
                 "Identity" : "Standard Preset Security Policy",
@@ -248,7 +249,7 @@ test_AllEOP_Correct_V3 if {
 test_AllEOP_Incorrect_V1 if {
     PolicyId := "MS.DEFENDER.1.2v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "protection_policy_rules" : []
     }
 
@@ -262,7 +263,7 @@ test_AllEOP_Incorrect_V1 if {
 test_AllEOP_Incorrect_V2 if {
     PolicyId := "MS.DEFENDER.1.2v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "protection_policy_rules" : [
             {
                 "Identity" : "Strict Preset Security Policy",
@@ -284,7 +285,7 @@ test_AllEOP_Incorrect_V2 if {
 test_AllEOP_Incorrect_V3 if {
     PolicyId := "MS.DEFENDER.1.2v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "protection_policy_rules" : [
             {
                 "Identity" : "Strict Preset Security Policy",
@@ -316,7 +317,7 @@ test_AllEOP_Incorrect_V3 if {
 test_AllDefender_Correct_V1 if {
     PolicyId := "MS.DEFENDER.1.3v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "atp_policy_rules" : [
             {
                 "Identity" : "Standard Preset Security Policy",
@@ -338,7 +339,7 @@ test_AllDefender_Correct_V1 if {
 test_AllDefender_Correct_V2 if {
     PolicyId := "MS.DEFENDER.1.3v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "atp_policy_rules" : [
             {
                 "Identity" : "Strict Preset Security Policy",
@@ -360,7 +361,7 @@ test_AllDefender_Correct_V2 if {
 test_AllDefender_Correct_V3 if {
     PolicyId := "MS.DEFENDER.1.3v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "atp_policy_rules" : [
             {
                 "Identity" : "Standard Preset Security Policy",
@@ -388,7 +389,7 @@ test_AllDefender_Correct_V3 if {
 test_AllDefender_Incorrect_V1 if {
     PolicyId := "MS.DEFENDER.1.3v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "atp_policy_rules" : [],
         "defender_license": true
     }
@@ -403,7 +404,7 @@ test_AllDefender_Incorrect_V1 if {
 test_AllDefender_Incorrect_V2 if {
     PolicyId := "MS.DEFENDER.1.3v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "atp_policy_rules" : [
             {
                 "Identity" : "Strict Preset Security Policy",
@@ -425,7 +426,7 @@ test_AllDefender_Incorrect_V2 if {
 test_AllDefender_Incorrect_V3 if {
     PolicyId := "MS.DEFENDER.1.3v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "atp_policy_rules" : [
             {
                 "Identity" : "Strict Preset Security Policy",
@@ -453,7 +454,7 @@ test_AllDefender_Incorrect_V3 if {
 test_AllDefender_Incorrect_V4 if {
     PolicyId := "MS.DEFENDER.1.3v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "atp_policy_rules" : [],
         "defender_license": false
     }
@@ -471,7 +472,7 @@ test_AllDefender_Incorrect_V4 if {
 test_SensitiveEOP_Correct_V1 if {
     PolicyId := "MS.DEFENDER.1.4v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "protection_policy_rules" : [
             {
                 "Identity" : "Strict Preset Security Policy",
@@ -513,7 +514,7 @@ test_SensitiveEOP_Correct_V1 if {
 test_SensitiveEOP_Correct_V2 if {
     PolicyId := "MS.DEFENDER.1.4v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "protection_policy_rules" : [
             {
                 "Identity" : "Strict Preset Security Policy",
@@ -549,7 +550,7 @@ test_SensitiveEOP_Correct_V2 if {
 test_SensitiveEOP_Correct_V3 if {
     PolicyId := "MS.DEFENDER.1.4v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "protection_policy_rules" : [
             {
                 "Identity" : "Strict Preset Security Policy",
@@ -592,7 +593,7 @@ test_SensitiveEOP_Correct_V3 if {
 test_SensitiveEOP_Correct_V4 if {
     PolicyId := "MS.DEFENDER.1.4v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "protection_policy_rules" : [
             {
                 "Identity" : "Strict Preset Security Policy",
@@ -637,7 +638,7 @@ test_SensitiveEOP_Correct_V4 if {
 test_SensitiveEOP_Correct_V5 if {
     PolicyId := "MS.DEFENDER.1.4v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "protection_policy_rules" : [
             {
                 "Identity" : "Strict Preset Security Policy",
@@ -680,7 +681,7 @@ test_SensitiveEOP_Correct_V5 if {
 test_SensitiveEOP_Correct_V6 if {
     PolicyId := "MS.DEFENDER.1.4v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "protection_policy_rules" : [
             {
                 "Identity" : "Strict Preset Security Policy",
@@ -725,7 +726,7 @@ test_SensitiveEOP_Correct_V6 if {
 test_SensitiveEOP_Correct_V7 if {
     PolicyId := "MS.DEFENDER.1.4v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "protection_policy_rules" : [
             {
                 "Identity" : "Strict Preset Security Policy",
@@ -768,7 +769,7 @@ test_SensitiveEOP_Correct_V7 if {
 test_SensitiveEOP_Correct_V8 if {
     PolicyId := "MS.DEFENDER.1.4v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "protection_policy_rules" : [
             {
                 "Identity" : "Strict Preset Security Policy",
@@ -813,7 +814,7 @@ test_SensitiveEOP_Correct_V8 if {
 test_SensitiveEOP_Correct_V9 if {
     PolicyId := "MS.DEFENDER.1.4v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "protection_policy_rules" : [
             {
                 "Identity" : "Strict Preset Security Policy",
@@ -856,7 +857,7 @@ test_SensitiveEOP_Correct_V9 if {
 test_SensitiveEOP_Correct_V10 if {
     PolicyId := "MS.DEFENDER.1.4v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "protection_policy_rules" : [
             {
                 "Identity" : "Strict Preset Security Policy",
@@ -901,7 +902,7 @@ test_SensitiveEOP_Correct_V10 if {
 test_SensitiveEOP_Correct_V11 if {
     PolicyId := "MS.DEFENDER.1.4v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "protection_policy_rules" : [
             {
                 "Identity" : "Strict Preset Security Policy",
@@ -944,7 +945,7 @@ test_SensitiveEOP_Correct_V11 if {
 test_SensitiveEOP_Correct_V12 if {
     PolicyId := "MS.DEFENDER.1.4v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "protection_policy_rules" : [
             {
                 "Identity" : "Strict Preset Security Policy",
@@ -989,7 +990,7 @@ test_SensitiveEOP_Correct_V12 if {
 test_SensitiveEOP_Correct_V13 if {
     PolicyId := "MS.DEFENDER.1.4v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "protection_policy_rules" : [
             {
                 "Identity" : "Strict Preset Security Policy",
@@ -1032,7 +1033,7 @@ test_SensitiveEOP_Correct_V13 if {
 test_SensitiveEOP_Correct_V14 if {
     PolicyId := "MS.DEFENDER.1.4v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "protection_policy_rules" : [
             {
                 "Identity" : "Strict Preset Security Policy",
@@ -1077,7 +1078,7 @@ test_SensitiveEOP_Correct_V14 if {
 test_SensitiveEOP_Correct_V15 if {
     PolicyId := "MS.DEFENDER.1.4v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "protection_policy_rules" : [
             {
                 "Identity" : "Strict Preset Security Policy",
@@ -1127,7 +1128,7 @@ test_SensitiveEOP_Correct_V15 if {
 test_SensitiveEOP_Correct_V16 if {
     PolicyId := "MS.DEFENDER.1.4v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "protection_policy_rules" : [
             {
                 "Identity" : "Strict Preset Security Policy",
@@ -1177,7 +1178,7 @@ test_SensitiveEOP_Correct_V16 if {
 test_SensitiveEOP_Correct_V17 if {
     PolicyId := "MS.DEFENDER.1.4v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "protection_policy_rules" : [
             {
                 "Identity" : "Strict Preset Security Policy",
@@ -1227,7 +1228,7 @@ test_SensitiveEOP_Correct_V17 if {
 test_SensitiveEOP_Correct_V18 if {
     PolicyId := "MS.DEFENDER.1.4v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "protection_policy_rules" : [
             {
                 "Identity" : "Strict Preset Security Policy",
@@ -1282,7 +1283,7 @@ test_SensitiveEOP_Correct_V18 if {
 test_SensitiveEOP_Correct_V19 if {
     PolicyId := "MS.DEFENDER.1.4v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "protection_policy_rules" : [
             {
                 "Identity" : "Strict Preset Security Policy",
@@ -1337,7 +1338,7 @@ test_SensitiveEOP_Correct_V19 if {
 test_SensitiveEOP_Correct_V20 if {
     PolicyId := "MS.DEFENDER.1.4v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "protection_policy_rules" : [
             {
                 "Identity" : "Strict Preset Security Policy",
@@ -1392,7 +1393,7 @@ test_SensitiveEOP_Correct_V20 if {
 test_SensitiveEOP_Correct_V21 if {
     PolicyId := "MS.DEFENDER.1.4v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "protection_policy_rules" : [
             {
                 "Identity" : "Strict Preset Security Policy",
@@ -1447,7 +1448,7 @@ test_SensitiveEOP_Correct_V21 if {
 test_SensitiveEOP_Correct_V22 if {
     PolicyId := "MS.DEFENDER.1.4v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "protection_policy_rules" : [
             {
                 "Identity" : "Strict Preset Security Policy",
@@ -1502,7 +1503,7 @@ test_SensitiveEOP_Correct_V22 if {
 test_SensitiveEOP_Correct_V23 if {
     PolicyId := "MS.DEFENDER.1.4v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "protection_policy_rules" : [
             {
                 "Identity" : "Strict Preset Security Policy",
@@ -1557,7 +1558,7 @@ test_SensitiveEOP_Correct_V23 if {
 test_SensitiveEOP_Correct_V24 if {
     PolicyId := "MS.DEFENDER.1.4v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "protection_policy_rules" : [
             {
                 "Identity" : "Strict Preset Security Policy",
@@ -1627,7 +1628,7 @@ test_SensitiveEOP_Correct_V24 if {
 test_SensitiveEOP_Incorrect_V1 if {
     PolicyId := "MS.DEFENDER.1.4v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "protection_policy_rules" : [
             {
                 "Identity" : "Strict Preset Security Policy",
@@ -1663,7 +1664,7 @@ test_SensitiveEOP_Incorrect_V1 if {
 test_SensitiveEOP_Incorrect_V1 if {
     PolicyId := "MS.DEFENDER.1.4v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "protection_policy_rules" : [
             {
                 "Identity" : "Standard Preset Security Policy",
@@ -1699,7 +1700,7 @@ test_SensitiveEOP_Incorrect_V1 if {
 test_SensitiveEOP_Incorrect_V3 if {
     PolicyId := "MS.DEFENDER.1.4v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "protection_policy_rules" : [
             {}
         ],
@@ -1724,7 +1725,7 @@ test_SensitiveEOP_Incorrect_V3 if {
 test_SensitiveEOP_Incorrect_V4 if {
     PolicyId := "MS.DEFENDER.1.4v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "protection_policy_rules" : [
             {
                 "Identity" : "Strict Preset Security Policy",
@@ -1763,7 +1764,7 @@ test_SensitiveEOP_Incorrect_V4 if {
 test_SensitiveEOP_Incorrect_V5 if {
     PolicyId := "MS.DEFENDER.1.4v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "protection_policy_rules" : [
             {
                 "Identity" : "Strict Preset Security Policy",
@@ -1825,7 +1826,7 @@ test_SensitiveEOP_Incorrect_V5 if {
 test_SensitiveATP_Correct_V1 if {
     PolicyId := "MS.DEFENDER.1.5v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "atp_policy_rules" : [
             {
                 "Identity" : "Strict Preset Security Policy",
@@ -1867,7 +1868,7 @@ test_SensitiveATP_Correct_V1 if {
 test_SensitiveATP_Correct_V2 if {
     PolicyId := "MS.DEFENDER.1.5v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "atp_policy_rules" : [
             {
                 "Identity" : "Strict Preset Security Policy",
@@ -1903,7 +1904,7 @@ test_SensitiveATP_Correct_V2 if {
 test_SensitiveATP_Correct_V3 if {
     PolicyId := "MS.DEFENDER.1.5v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "atp_policy_rules" : [
             {
                 "Identity" : "Strict Preset Security Policy",
@@ -1946,7 +1947,7 @@ test_SensitiveATP_Correct_V3 if {
 test_SensitiveATP_Correct_V4 if {
     PolicyId := "MS.DEFENDER.1.5v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "atp_policy_rules" : [
             {
                 "Identity" : "Strict Preset Security Policy",
@@ -1991,7 +1992,7 @@ test_SensitiveATP_Correct_V4 if {
 test_SensitiveATP_Correct_V5 if {
     PolicyId := "MS.DEFENDER.1.5v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "atp_policy_rules" : [
             {
                 "Identity" : "Strict Preset Security Policy",
@@ -2034,7 +2035,7 @@ test_SensitiveATP_Correct_V5 if {
 test_SensitiveATP_Correct_V6 if {
     PolicyId := "MS.DEFENDER.1.5v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "atp_policy_rules" : [
             {
                 "Identity" : "Strict Preset Security Policy",
@@ -2079,7 +2080,7 @@ test_SensitiveATP_Correct_V6 if {
 test_SensitiveATP_Correct_V7 if {
     PolicyId := "MS.DEFENDER.1.5v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "atp_policy_rules" : [
             {
                 "Identity" : "Strict Preset Security Policy",
@@ -2122,7 +2123,7 @@ test_SensitiveATP_Correct_V7 if {
 test_SensitiveATP_Correct_V8 if {
     PolicyId := "MS.DEFENDER.1.5v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "atp_policy_rules" : [
             {
                 "Identity" : "Strict Preset Security Policy",
@@ -2167,7 +2168,7 @@ test_SensitiveATP_Correct_V8 if {
 test_SensitiveATP_Correct_V9 if {
     PolicyId := "MS.DEFENDER.1.5v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "atp_policy_rules" : [
             {
                 "Identity" : "Strict Preset Security Policy",
@@ -2210,7 +2211,7 @@ test_SensitiveATP_Correct_V9 if {
 test_SensitiveATP_Correct_V10 if {
     PolicyId := "MS.DEFENDER.1.5v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "atp_policy_rules" : [
             {
                 "Identity" : "Strict Preset Security Policy",
@@ -2255,7 +2256,7 @@ test_SensitiveATP_Correct_V10 if {
 test_SensitiveATP_Correct_V11 if {
     PolicyId := "MS.DEFENDER.1.5v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "atp_policy_rules" : [
             {
                 "Identity" : "Strict Preset Security Policy",
@@ -2298,7 +2299,7 @@ test_SensitiveATP_Correct_V11 if {
 test_SensitiveATP_Correct_V12 if {
     PolicyId := "MS.DEFENDER.1.5v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "atp_policy_rules" : [
             {
                 "Identity" : "Strict Preset Security Policy",
@@ -2343,7 +2344,7 @@ test_SensitiveATP_Correct_V12 if {
 test_SensitiveATP_Correct_V13 if {
     PolicyId := "MS.DEFENDER.1.5v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "atp_policy_rules" : [
             {
                 "Identity" : "Strict Preset Security Policy",
@@ -2386,7 +2387,7 @@ test_SensitiveATP_Correct_V13 if {
 test_SensitiveATP_Correct_V14 if {
     PolicyId := "MS.DEFENDER.1.5v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "atp_policy_rules" : [
             {
                 "Identity" : "Strict Preset Security Policy",
@@ -2431,7 +2432,7 @@ test_SensitiveATP_Correct_V14 if {
 test_SensitiveATP_Correct_V15 if {
     PolicyId := "MS.DEFENDER.1.5v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "atp_policy_rules" : [
             {
                 "Identity" : "Strict Preset Security Policy",
@@ -2481,7 +2482,7 @@ test_SensitiveATP_Correct_V15 if {
 test_SensitiveATP_Correct_V16 if {
     PolicyId := "MS.DEFENDER.1.5v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "atp_policy_rules" : [
             {
                 "Identity" : "Strict Preset Security Policy",
@@ -2531,7 +2532,7 @@ test_SensitiveATP_Correct_V16 if {
 test_SensitiveATP_Correct_V17 if {
     PolicyId := "MS.DEFENDER.1.5v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "atp_policy_rules" : [
             {
                 "Identity" : "Strict Preset Security Policy",
@@ -2581,7 +2582,7 @@ test_SensitiveATP_Correct_V17 if {
 test_SensitiveATP_Correct_V18 if {
     PolicyId := "MS.DEFENDER.1.5v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "atp_policy_rules" : [
             {
                 "Identity" : "Strict Preset Security Policy",
@@ -2636,7 +2637,7 @@ test_SensitiveATP_Correct_V18 if {
 test_SensitiveATP_Correct_V19 if {
     PolicyId := "MS.DEFENDER.1.5v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "atp_policy_rules" : [
             {
                 "Identity" : "Strict Preset Security Policy",
@@ -2691,7 +2692,7 @@ test_SensitiveATP_Correct_V19 if {
 test_SensitiveATP_Correct_V20 if {
     PolicyId := "MS.DEFENDER.1.5v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "atp_policy_rules" : [
             {
                 "Identity" : "Strict Preset Security Policy",
@@ -2746,7 +2747,7 @@ test_SensitiveATP_Correct_V20 if {
 test_SensitiveATP_Correct_V21 if {
     PolicyId := "MS.DEFENDER.1.5v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "atp_policy_rules" : [
             {
                 "Identity" : "Strict Preset Security Policy",
@@ -2801,7 +2802,7 @@ test_SensitiveATP_Correct_V21 if {
 test_SensitiveATP_Correct_V22 if {
     PolicyId := "MS.DEFENDER.1.5v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "atp_policy_rules" : [
             {
                 "Identity" : "Strict Preset Security Policy",
@@ -2856,7 +2857,7 @@ test_SensitiveATP_Correct_V22 if {
 test_SensitiveATP_Correct_V23 if {
     PolicyId := "MS.DEFENDER.1.5v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "atp_policy_rules" : [
             {
                 "Identity" : "Strict Preset Security Policy",
@@ -2911,7 +2912,7 @@ test_SensitiveATP_Correct_V23 if {
 test_SensitiveATP_Correct_V24 if {
     PolicyId := "MS.DEFENDER.1.5v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "atp_policy_rules" : [
             {
                 "Identity" : "Strict Preset Security Policy",
@@ -2981,7 +2982,7 @@ test_SensitiveATP_Correct_V24 if {
 test_SensitiveATP_Incorrect_V1 if {
     PolicyId := "MS.DEFENDER.1.5v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "atp_policy_rules" : [
             {
                 "Identity" : "Strict Preset Security Policy",
@@ -3017,7 +3018,7 @@ test_SensitiveATP_Incorrect_V1 if {
 test_SensitiveATP_Incorrect_V1 if {
     PolicyId := "MS.DEFENDER.1.5v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "atp_policy_rules" : [
             {
                 "Identity" : "Standard Preset Security Policy",
@@ -3053,7 +3054,7 @@ test_SensitiveATP_Incorrect_V1 if {
 test_SensitiveATP_Incorrect_V3 if {
     PolicyId := "MS.DEFENDER.1.5v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "atp_policy_rules" : [
             {}
         ],
@@ -3078,7 +3079,7 @@ test_SensitiveATP_Incorrect_V3 if {
 test_SensitiveATP_Incorrect_V4 if {
     PolicyId := "MS.DEFENDER.1.5v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "atp_policy_rules" : [
             {
                 "Identity" : "Strict Preset Security Policy",
@@ -3117,7 +3118,7 @@ test_SensitiveATP_Incorrect_V4 if {
 test_SensitiveATP_Incorrect_V5 if {
     PolicyId := "MS.DEFENDER.1.5v1"
 
-    Output := tests with input as {
+    Output := defender.tests with input as {
         "atp_policy_rules" : [
             {
                 "Identity" : "Strict Preset Security Policy",
