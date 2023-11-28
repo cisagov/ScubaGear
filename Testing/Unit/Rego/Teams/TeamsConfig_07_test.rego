@@ -1,5 +1,6 @@
-package teams
+package teams_test
 import future.keywords
+import data.teams
 
 #--
 # Policy MS.TEAMS.7.1v1
@@ -7,7 +8,7 @@ import future.keywords
 test_3rdParty_Correct_V1 if {
     PolicyId := "MS.TEAMS.7.1v1"
 
-    Output := tests with input as { }
+    Output := teams.tests with input as { }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
@@ -22,7 +23,7 @@ test_3rdParty_Correct_V1 if {
 test_3rdParty_Correct_V2 if {
     PolicyId := "MS.TEAMS.7.2v1"
 
-    Output := tests with input as { }
+    Output := teams.tests with input as { }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 

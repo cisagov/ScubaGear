@@ -1,5 +1,6 @@
-package teams
+package teams_test
 import future.keywords
+import data.teams
 
 
 #--
@@ -7,7 +8,7 @@ import future.keywords
 #--
 test_ExternalParticipantControl_Correct_V1 if {
     PolicyId := "MS.TEAMS.1.1v1"
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "meeting_policies": [
             {
                 "Identity": "Global",
@@ -25,7 +26,7 @@ test_ExternalParticipantControl_Correct_V1 if {
 
 test_ExternalParticipantControl_Correct_V2 if {
     PolicyId := "MS.TEAMS.1.1v1"
-    Output := tests with input as {
+    Output := teams.tests with input as {
     "meeting_policies": [
         {
             "Identity": "Tag:FirstCustomPolicy",
@@ -43,7 +44,7 @@ test_ExternalParticipantControl_Correct_V2 if {
 
 test_ExternalParticipantControl_Incorrect_V1 if {
     PolicyId := "MS.TEAMS.1.1v1"
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "meeting_policies": [
             {
                 "Identity": "Global",
@@ -61,7 +62,7 @@ test_ExternalParticipantControl_Incorrect_V1 if {
 
 test_ExternalParticipantControl_Incorrect_V2 if {
     PolicyId := "MS.TEAMS.1.1v1"
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "meeting_policies": [
             {
                 "Identity": "Tag:FirstCustomPolicy",
@@ -79,7 +80,7 @@ test_ExternalParticipantControl_Incorrect_V2 if {
 
 test_ExternalParticipantControl_MultiplePolicies if {
     PolicyId := "MS.TEAMS.1.1v1"
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "meeting_policies": [
             {
                 "Identity": "Global",
@@ -112,7 +113,7 @@ test_ExternalParticipantControl_MultiplePolicies if {
 test_AnonymousMeetingStart_Correct_V1 if {
     PolicyId := "MS.TEAMS.1.2v1"
 
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "meeting_policies": [
             {
                 "Identity": "Global",
@@ -131,7 +132,7 @@ test_AnonymousMeetingStart_Correct_V1 if {
 test_AnonymousMeetingStart_Correct_V2 if {
     PolicyId := "MS.TEAMS.1.2v1"
 
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "meeting_policies": [
             {
                 "Identity": "Tag:FirstCustomPolicy",
@@ -150,7 +151,7 @@ test_AnonymousMeetingStart_Correct_V2 if {
 test_AnonymousMeetingStart_Incorrect_V1 if {
     PolicyId := "MS.TEAMS.1.2v1"
 
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "meeting_policies": [
             {
                 "Identity": "Global",
@@ -169,7 +170,7 @@ test_AnonymousMeetingStart_Incorrect_V1 if {
 test_AnonymousMeetingStart_Incorrect_V2 if {
     PolicyId := "MS.TEAMS.1.2v1"
 
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "meeting_policies": [
             {
                 "Identity": "Tag:FirstCustomPolicy",
@@ -188,7 +189,7 @@ test_AnonymousMeetingStart_Incorrect_V2 if {
 test_AnonymousMeetingStart_MultiplePolicies if {
     PolicyId := "MS.TEAMS.1.2v1"
 
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "meeting_policies": [
             {
                 "Identity": "Global",
@@ -221,7 +222,7 @@ test_AnonymousMeetingStart_MultiplePolicies if {
 test_meeting_policies_Correct if {
     PolicyId := "MS.TEAMS.1.3v1"
 
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "meeting_policies": [
             {
                 "Identity": "Global",
@@ -241,7 +242,7 @@ test_meeting_policies_Correct if {
 test_AllowPSTNUsersToBypassLobby_Incorrect if {
     PolicyId := "MS.TEAMS.1.3v1"
 
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "meeting_policies": [
             {
                 "Identity": "Global",
@@ -261,7 +262,7 @@ test_AllowPSTNUsersToBypassLobby_Incorrect if {
 test_AutoAdmittedUsers_Incorrect if {
     PolicyId := "MS.TEAMS.1.3v1"
 
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "meeting_policies": [
             {
                 "Identity": "Global",
@@ -282,7 +283,7 @@ test_AutoAdmittedUsers_Incorrect if {
 test_Multiple_Correct if {
     PolicyId := "MS.TEAMS.1.3v1"
 
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "meeting_policies": [
             {
                 "Identity": "Global",
@@ -310,7 +311,7 @@ test_Multiple_Correct if {
 test_AutoAdmittedUsers_Correct_V1 if {
     PolicyId := "MS.TEAMS.1.4v1"
 
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "meeting_policies": [
             {
                 "Identity": "Global",
@@ -329,7 +330,7 @@ test_AutoAdmittedUsers_Correct_V1 if {
 test_AutoAdmittedUsers_Correct_V2 if {
     PolicyId := "MS.TEAMS.1.4v1"
 
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "meeting_policies": [
             {
                 "Identity": "Global",
@@ -348,7 +349,7 @@ test_AutoAdmittedUsers_Correct_V2 if {
 test_AutoAdmittedUsers_Incorrect_V2 if {
     PolicyId := "MS.TEAMS.1.4v1"
 
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "meeting_policies": [
             {
                 "Identity": "Global",
@@ -367,7 +368,7 @@ test_AutoAdmittedUsers_Incorrect_V2 if {
 test_AutoAdmittedUsers_Incorrect_V3 if {
     PolicyId := "MS.TEAMS.1.4v1"
 
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "meeting_policies": [
             {
                 "Identity": "Global",
@@ -389,7 +390,7 @@ test_AutoAdmittedUsers_Incorrect_V3 if {
 test_meeting_policies_Correct if {
     PolicyId := "MS.TEAMS.1.5v1"
 
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "meeting_policies": [
             {
                 "Identity": "Tag:CustomPolicy",
@@ -409,7 +410,7 @@ test_meeting_policies_Correct if {
 test_OneGoodOneBadPolicy_Incorrect if {
     PolicyId := "MS.TEAMS.1.5v1"
 
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "meeting_policies": [
             {
                 "Identity": "Tag:CustomPolicy",
@@ -434,7 +435,7 @@ test_OneGoodOneBadPolicy_Incorrect if {
 test_AllowPSTNUsersToBypassLobby_Incorrect if {
     PolicyId := "MS.TEAMS.1.5v1"
 
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "meeting_policies": [
             {
                 "Identity": "Tag:CustomPolicy",
@@ -457,7 +458,7 @@ test_AllowPSTNUsersToBypassLobby_Incorrect if {
 test_AllowCloudRecording_Correct if {
     PolicyId := "MS.TEAMS.1.6v1"
 
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "meeting_policies": [
             {
                 "Identity": "Global",
@@ -476,7 +477,7 @@ test_AllowCloudRecording_Correct if {
 test_AllowCloudRecording_Incorrect if {
     PolicyId := "MS.TEAMS.1.6v1"
 
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "meeting_policies": [
             {
                 "Identity": "Global",
@@ -495,7 +496,7 @@ test_AllowCloudRecording_Incorrect if {
 test_AllowCloudRecording_Multiple if {
     PolicyId := "MS.TEAMS.1.6v1"
 
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "meeting_policies": [
             {
                 "Identity": "Global",
@@ -522,7 +523,7 @@ test_AllowCloudRecording_Multiple if {
 test_BroadcastRecordingMode_Correct if {
     PolicyId := "MS.TEAMS.1.7v1"
 
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "broadcast_policies": [
             {
                 "Identity": "Global",
@@ -541,7 +542,7 @@ test_BroadcastRecordingMode_Correct if {
 test_BroadcastRecordingMode_Incorrect if {
     PolicyId := "MS.TEAMS.1.7v1"
 
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "broadcast_policies": [
             {
                 "Identity": "Global",
@@ -561,7 +562,7 @@ test_BroadcastRecordingMode_Incorrect if {
 test_BroadcastRecordingMode_Multiple if {
     PolicyId := "MS.TEAMS.1.7v1"
 
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "broadcast_policies": [
             {
                 "Identity": "Global",

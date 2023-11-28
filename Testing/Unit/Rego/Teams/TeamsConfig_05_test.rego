@@ -1,5 +1,6 @@
-package teams
+package teams_test
 import future.keywords
+import data.teams
 
 #--
 # MS.TEAMS.5.1v1
@@ -7,7 +8,7 @@ import future.keywords
 test_DefaultCatalogAppsType_Correct_V1 if {
     PolicyId := "MS.TEAMS.5.1v1"
 
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "app_policies": [
             {
                 "Identity": "Global",
@@ -26,7 +27,7 @@ test_DefaultCatalogAppsType_Correct_V1 if {
 test_DefaultCatalogAppsType_Correct_V2 if {
     PolicyId := "MS.TEAMS.5.1v1"
 
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "app_policies": [
             {
                 "Identity": "Tag:TestPolicy",
@@ -45,7 +46,7 @@ test_DefaultCatalogAppsType_Correct_V2 if {
 test_DefaultCatalogAppsType_Incorrect_V1 if {
     PolicyId := "MS.TEAMS.5.1v1"
 
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "app_policies": [
             {
                 "Identity": "Global",
@@ -64,7 +65,7 @@ test_DefaultCatalogAppsType_Incorrect_V1 if {
 test_DefaultCatalogAppsType_Incorrect_V2 if {
     PolicyId := "MS.TEAMS.5.1v1"
 
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "app_policies": [
             {
                 "Identity": "Tag:TestPolicy",
@@ -83,7 +84,7 @@ test_DefaultCatalogAppsType_Incorrect_V2 if {
 test_DefaultCatalogAppsType_Multiple if {
     PolicyId := "MS.TEAMS.5.1v1"
 
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "app_policies": [
             {
                 "Identity": "Global",
@@ -116,7 +117,7 @@ test_DefaultCatalogAppsType_Multiple if {
 test_GlobalCatalogAppsType_Correct_V1 if {
     PolicyId := "MS.TEAMS.5.2v1"
 
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "app_policies": [
             {
                 "Identity": "Global",
@@ -135,7 +136,7 @@ test_GlobalCatalogAppsType_Correct_V1 if {
 test_GlobalCatalogAppsType_Correct_V2 if {
     PolicyId := "MS.TEAMS.5.2v1"
 
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "app_policies": [
             {
                 "Identity": "Tag:TestPolicy",
@@ -154,7 +155,7 @@ test_GlobalCatalogAppsType_Correct_V2 if {
 test_GlobalCatalogAppsType_Incorrect_V1 if {
     PolicyId := "MS.TEAMS.5.2v1"
 
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "app_policies": [
             {
                 "Identity": "Global",
@@ -173,7 +174,7 @@ test_GlobalCatalogAppsType_Incorrect_V1 if {
 test_GlobalCatalogAppsType_Incorrect_V2 if {
     PolicyId := "MS.TEAMS.5.2v1"
 
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "app_policies": [
             {
                 "Identity": "Tag:TestPolicy",
@@ -192,7 +193,7 @@ test_GlobalCatalogAppsType_Incorrect_V2 if {
 test_GlobalCatalogAppsType_Multiple if {
     PolicyId := "MS.TEAMS.5.2v1"
 
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "app_policies": [
             {
                 "Identity": "Global",
@@ -225,7 +226,7 @@ test_GlobalCatalogAppsType_Multiple if {
 test_PrivateCatalogAppsType_Correct_V1 if {
     PolicyId := "MS.TEAMS.5.3v1"
 
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "app_policies": [
             {
                 "Identity": "Global",
@@ -244,7 +245,7 @@ test_PrivateCatalogAppsType_Correct_V1 if {
 test_PrivateCatalogAppsType_Correct_V2 if {
     PolicyId := "MS.TEAMS.5.3v1"
 
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "app_policies": [
             {
                 "Identity": "Tag:TestPolicy",
@@ -263,7 +264,7 @@ test_PrivateCatalogAppsType_Correct_V2 if {
 test_PrivateCatalogAppsType_Incorrect_V1 if {
     PolicyId := "MS.TEAMS.5.3v1"
 
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "app_policies": [
             {
                 "Identity": "Global",
@@ -282,7 +283,7 @@ test_PrivateCatalogAppsType_Incorrect_V1 if {
 test_PrivateCatalogAppsType_Incorrect_V2 if {
     PolicyId := "MS.TEAMS.5.3v1"
 
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "app_policies": [
             {
                 "Identity": "Tag:TestPolicy",
@@ -301,7 +302,7 @@ test_PrivateCatalogAppsType_Incorrect_V2 if {
 test_PrivateCatalogAppsType_Multiple if {
     PolicyId := "MS.TEAMS.5.3v1"
 
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "app_policies": [
             {
                 "Identity": "Global",

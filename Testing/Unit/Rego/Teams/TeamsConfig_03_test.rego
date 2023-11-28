@@ -1,5 +1,6 @@
-package teams
+package teams_test
 import future.keywords
+import data.teams
 
 
 #--
@@ -8,7 +9,7 @@ import future.keywords
 test_AllowPublicUsers_Correct if {
     PolicyId := "MS.TEAMS.3.1v1"
 
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "federation_configuration": [
             {
                 "Identity": "Global",
@@ -18,7 +19,7 @@ test_AllowPublicUsers_Correct if {
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-    
+
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "Requirement met"
@@ -27,7 +28,7 @@ test_AllowPublicUsers_Correct if {
 test_AllowPublicUsers_InCorrect if {
     PolicyId := "MS.TEAMS.3.1v1"
 
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "federation_configuration": [
             {
                 "Identity": "Global",
@@ -46,7 +47,7 @@ test_AllowPublicUsers_InCorrect if {
 test_AllowPublicUsers_Correct_multi if {
     PolicyId := "MS.TEAMS.3.1v1"
 
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "federation_configuration": [
             {
                 "Identity": "Global",
@@ -60,7 +61,7 @@ test_AllowPublicUsers_Correct_multi if {
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-    
+
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "Requirement met"
@@ -69,7 +70,7 @@ test_AllowPublicUsers_Correct_multi if {
 test_AllowPublicUsers_InCorrect_multi if {
     PolicyId := "MS.TEAMS.3.1v1"
 
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "federation_configuration": [
             {
                 "Identity": "Global",

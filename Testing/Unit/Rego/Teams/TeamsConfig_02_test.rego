@@ -1,5 +1,6 @@
-package teams
+package teams_test
 import future.keywords
+import data.teams
 
 
 #--
@@ -8,7 +9,7 @@ import future.keywords
 test_AllowFederatedUsers_Correct_V1 if {
     PolicyId := "MS.TEAMS.2.1v1"
 
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "federation_configuration": [
             {
                 "Identity": "Global",
@@ -28,7 +29,7 @@ test_AllowFederatedUsers_Correct_V1 if {
 test_AllowFederatedUsers_Correct_V2 if {
     PolicyId := "MS.TEAMS.2.1v1"
 
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "federation_configuration": [
             {
                 "Identity": "Global",
@@ -43,7 +44,7 @@ test_AllowFederatedUsers_Correct_V2 if {
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-    
+
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "Requirement met"
@@ -52,7 +53,7 @@ test_AllowFederatedUsers_Correct_V2 if {
 test_AllowedDomains_Correct if {
     PolicyId := "MS.TEAMS.2.1v1"
 
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "federation_configuration":[
             {
                 "Identity": "Global",
@@ -76,7 +77,7 @@ test_AllowedDomains_Correct if {
 test_AllowedDomains_Incorrect if {
     PolicyId := "MS.TEAMS.2.1v1"
 
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "federation_configuration": [
             {
                 "Identity": "Global",
@@ -96,7 +97,7 @@ test_AllowedDomains_Incorrect if {
 test_AllowFederatedUsers_Correct_V1_multi if {
     PolicyId := "MS.TEAMS.2.1v1"
 
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "federation_configuration": [
             {
                 "Identity": "Global",
@@ -107,7 +108,7 @@ test_AllowFederatedUsers_Correct_V1_multi if {
                 "Identity": "Tag:AllOn",
                 "AllowFederatedUsers" : false,
                 "AllowedDomains": []
-            }            
+            }
         ]
     }
 
@@ -121,7 +122,7 @@ test_AllowFederatedUsers_Correct_V1_multi if {
 test_AllowFederatedUsers_Correct_V2_multi if {
     PolicyId := "MS.TEAMS.2.1v1"
 
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "federation_configuration": [
             {
                 "Identity": "Global",
@@ -145,7 +146,7 @@ test_AllowFederatedUsers_Correct_V2_multi if {
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-    
+
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "Requirement met"
@@ -155,7 +156,7 @@ test_AllowFederatedUsers_Correct_V2_multi if {
 test_AllowedDomains_Correct_multi if {
     PolicyId := "MS.TEAMS.2.1v1"
 
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "federation_configuration":[
             {
                 "Identity": "Global",
@@ -174,7 +175,7 @@ test_AllowedDomains_Correct_multi if {
                         "AllowedDomain": ["Domain=test365.cisa.dhs.gov"]
                     }
                 ]
-            }            
+            }
         ]
     }
 
@@ -188,7 +189,7 @@ test_AllowedDomains_Correct_multi if {
 test_AllowedDomains_Incorrect_multi if {
     PolicyId := "MS.TEAMS.2.1v1"
 
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "federation_configuration":[
             {
                 "Identity": "Global",
@@ -199,24 +200,24 @@ test_AllowedDomains_Incorrect_multi if {
                 "Identity": "Tag:AllOn",
                 "AllowFederatedUsers" : true,
                 "AllowedDomains": []
-            }   
+            }
         ]
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-    
+
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "2 meeting policy(ies) that allow external access across all domains: Global, Tag:AllOn"
 }
 
 #--
-# Policy MS.TEAMS.2.2v1 
+# Policy MS.TEAMS.2.2v1
 #--
 test_AllowTeamsConsumerInbound_Correct_V1 if {
     PolicyId := "MS.TEAMS.2.2v1"
 
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "federation_configuration": [
             {
                 "Identity": "Global",
@@ -236,7 +237,7 @@ test_AllowTeamsConsumerInbound_Correct_V1 if {
 test_AllowTeamsConsumerInbound_Correct_V1_multi if {
     PolicyId := "MS.TEAMS.2.2v1"
 
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "federation_configuration": [
             {
                 "Identity": "Global",
@@ -261,7 +262,7 @@ test_AllowTeamsConsumerInbound_Correct_V1_multi if {
 test_AllowTeamsConsumerInbound_Correct_V2 if {
     PolicyId := "MS.TEAMS.2.2v1"
 
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "federation_configuration": [
             {
                 "Identity": "Global",
@@ -281,7 +282,7 @@ test_AllowTeamsConsumerInbound_Correct_V2 if {
 test_AllowTeamsConsumerInbound_Correct_V2_multi if {
     PolicyId := "MS.TEAMS.2.2v1"
 
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "federation_configuration": [
             {
                 "Identity": "Global",
@@ -306,7 +307,7 @@ test_AllowTeamsConsumerInbound_Correct_V2_multi if {
 test_AllowTeamsConsumer_Incorrect if {
     PolicyId := "MS.TEAMS.2.2v1"
 
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "federation_configuration": [
             {
                 "Identity": "Global",
@@ -326,7 +327,7 @@ test_AllowTeamsConsumer_Incorrect if {
 test_AllowTeamsConsumer_Incorrect_multi if {
     PolicyId := "MS.TEAMS.2.2v1"
 
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "federation_configuration": [
             {
                 "Identity": "Global",
@@ -351,7 +352,7 @@ test_AllowTeamsConsumer_Incorrect_multi if {
 test_AllowTeamsConsumer_Incorrect if {
     PolicyId := "MS.TEAMS.2.2v1"
 
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "federation_configuration": [
             {
                 "Identity": "Global",
@@ -371,7 +372,7 @@ test_AllowTeamsConsumer_Incorrect if {
 test_AllowTeamsConsumer_Incorrect_multi if {
     PolicyId := "MS.TEAMS.2.2v1"
 
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "federation_configuration": [
             {
                 "Identity": "Global",
@@ -393,12 +394,12 @@ test_AllowTeamsConsumer_Incorrect_multi if {
     RuleOutput[0].ReportDetails == "Requirement met"
 }
 #--
-# Policy MS.TEAMS.2.3v1 
+# Policy MS.TEAMS.2.3v1
 #--
 test_AllowTeamsConsumer_Correct if {
     PolicyId := "MS.TEAMS.2.3v1"
 
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "federation_configuration": [
             {
                 "Identity": "Global",
@@ -409,7 +410,7 @@ test_AllowTeamsConsumer_Correct if {
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-    
+
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "Requirement met"
@@ -418,7 +419,7 @@ test_AllowTeamsConsumer_Correct if {
 test_AllowTeamsConsumer_Correct_multi if {
     PolicyId := "MS.TEAMS.2.3v1"
 
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "federation_configuration": [
             {
                 "Identity": "Global",
@@ -434,7 +435,7 @@ test_AllowTeamsConsumer_Correct_multi if {
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-    
+
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "Requirement met"
@@ -442,8 +443,8 @@ test_AllowTeamsConsumer_Correct_multi if {
 
 test_AllowTeamsConsumer_Incorrect if {
     PolicyId := "MS.TEAMS.2.3v1"
-    
-    Output := tests with input as {
+
+    Output := teams.tests with input as {
         "federation_configuration": [
             {
                 "Identity": "Global",
@@ -462,8 +463,8 @@ test_AllowTeamsConsumer_Incorrect if {
 
 test_AllowTeamsConsumer_Incorrect_multi if {
     PolicyId := "MS.TEAMS.2.3v1"
-    
-    Output := tests with input as {
+
+    Output := teams.tests with input as {
         "federation_configuration": [
             {
                 "Identity": "Global",
