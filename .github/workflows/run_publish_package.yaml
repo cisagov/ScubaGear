@@ -36,5 +36,5 @@ jobs:
           Find-Module -Name ScubaGear -Repository $env:GalleryName
           Install-Module -Name ScubaGear
   Call-Smoke-Test:
-    uses: ./.github/workflows/run_smoke_test.yaml@${{github.sha}}
+    uses: ./.github/workflows/run_smoke_test.yaml
 
