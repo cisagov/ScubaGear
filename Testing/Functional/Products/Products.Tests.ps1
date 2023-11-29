@@ -242,6 +242,9 @@ Describe "Policy Checks for <ProductName>"{
 
                 Set-Content -Path $TestConfigFilePath -Value ($ScubaConfig | ConvertTo-Yaml)
                 SetConditions -Conditions $Preconditions.ToArray()
+                Write-Host "##########################"
+                Write-Host $Preconditions
+                Write-Host "##########################"
                 Invoke-SCuBA -ConfigFilePath $TestConfigFilePath -Quiet
             }
             elseif ('RunScuba' -eq $TestDriver){

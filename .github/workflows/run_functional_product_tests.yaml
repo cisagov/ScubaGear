@@ -14,8 +14,8 @@ on:
     - '652-add-nightly-product-functional-testing'
 
 jobs:
-  hello-world-test:
-    name: Hello World Test
+  sharepoint-test:
+    name: SharePoint Test
     runs-on: windows-latest
     defaults:
       run:
@@ -23,11 +23,6 @@ jobs:
     steps:
     - name: Checkout repo code
       uses: actions/checkout@v3
-      # Let's start simple: Verify file exists
     - name: Check for file
       run: |
-        if (!(Test-Path Testing/Functional/Products/Products.Tests.ps1 -PathType Leaf))
-        {
-          Write-Warning('Product test file not found.')
-          exit 1
-        }
+        .\Testing\Functional\Products\Tests\sharepoint-commercial.ps1 FD6219CFBF937830616E43DF9C81BCF7D22FE03F
