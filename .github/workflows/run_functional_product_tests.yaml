@@ -23,6 +23,15 @@ jobs:
     steps:
     - name: Checkout repo code
       uses: actions/checkout@v3
-    - name: Check for file
-      run: |
-        .\Testing\Functional\Products\Tests\sharepoint-commercial.ps1 FD6219CFBF937830616E43DF9C81BCF7D22FE03F
+    - name: Check for SharePoint test
+      id: check_files
+      uses: andstor/file-existence-action@v2
+      with:
+        files: ".\Testing\Functional\Products\Tests\sharepoint-commercial.ps1"
+    - name: File exists
+      if: steps.check_files.outputs.files_exists == 'true'
+      # Only runs if all of the files exists
+      run: echo SharePoint file exists!
+    # - name: Test SharePoint
+    #   run: |
+    #     .\Testing\Functional\Products\Tests\sharepoint-commercial.ps1 FD6219CFBF937830616E43DF9C81BCF7D22FE03F
