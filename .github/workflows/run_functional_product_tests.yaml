@@ -34,6 +34,8 @@ jobs:
       run: Write-Host "SharePoint file exists!"
     - name: Setup
       run: "./SetUp.ps1"
+    - nmae: Install Selenium
+      run: "./Testing/Functional/SmokeTest/UpdateSelenium.ps1"
     - name: Test SharePoint
       run: |
         .\Testing\Functional\Products\Tests\sharepoint-commercial.ps1 FD6219CFBF937830616E43DF9C81BCF7D22FE03F
