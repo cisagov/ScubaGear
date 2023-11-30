@@ -155,7 +155,6 @@ tests contains {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
     Status := count(LegacyAuthentication) > 0
 }
-
 #--
 
 ############
@@ -197,7 +196,6 @@ tests contains {
     Conditions := [count(Aad2P2Licenses) > 0, count(BlockHighRisk) > 0]
     Status := count([Condition | some Condition in Conditions; Condition == false]) == 0
 }
-
 #--
 
 #
@@ -212,7 +210,6 @@ tests contains {
     "ReportDetails": NotCheckedDetails("MS.AAD.2.2v1"),
     "RequirementMet": false
 }
-
 #--
 
 #
@@ -250,7 +247,6 @@ tests contains {
     Conditions := [count(Aad2P2Licenses) > 0, count(SignInBlocked) > 0]
     Status := count([Condition | some Condition in Conditions; Condition == false]) == 0
 }
-
 #--
 
 ############
@@ -290,7 +286,6 @@ tests contains {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
     Status := count(MS_AAD_3_1v1_CAP) > 0
 }
-
 #--
 
 #
@@ -331,7 +326,6 @@ tests contains {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
     Status := count(AlternativeMFA) > 0
 }
-
 #--
 
 #
@@ -364,7 +358,6 @@ tests contains {
     PolicyId := "MS.AAD.3.3v1"
     count(MS_AAD_3_1v1_CAP) == 0
 }
-
 #--
 
 #
@@ -382,7 +375,6 @@ tests contains {
     some Policy in input.authentication_method
     Status := Policy.PolicyMigrationState == "migrationComplete"
 }
-
 #--
 
 #
@@ -398,7 +390,6 @@ tests contains {
     "ReportDetails": NotCheckedDetails("MS.AAD.3.5v1"),
     "RequirementMet": false
 }
-
 #--
 
 #
@@ -444,7 +435,6 @@ tests contains {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
     Status := count(PhishingResistantMFA) > 0
 }
-
 #--
 
 #
@@ -475,7 +465,6 @@ tests contains {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
     Status := count(ManagedDeviceAuth) > 0
 }
-
 #--
 
 #
@@ -509,7 +498,6 @@ tests contains {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
     Status := count(RequireManagedDeviceMFA) > 0
 }
-
 #--
 
 ############
@@ -528,7 +516,6 @@ tests contains {
     "ReportDetails": NotCheckedDetails("MS.AAD.4.1v1"),
     "RequirementMet": false
 }
-
 #--
 
 ############
@@ -562,7 +549,6 @@ tests contains {
     Status := count(BadPolicies) == 0
     DescriptionString := "authorization policies found that allow non-admin users to register third-party applications"
 }
-
 #--
 
 #
@@ -592,7 +578,6 @@ tests contains {
     Status := count(BadPolicies) == 0
     DescriptionString := "authorization policies found that allow non-admin users to consent to third-party applications"
 }
-
 #--
 
 #
@@ -621,7 +606,6 @@ tests contains {
     BadPolicies := BadConsentPolicies
     Status := count(BadPolicies) == 0
 }
-
 #--
 
 #
@@ -666,7 +650,6 @@ tests contains {
     Conditions := [count(BadConsentSettings) == 0, count(GoodConsentSettings) > 0]
     Status := count([Condition | some Condition in Conditions; Condition == false]) == 0
 }
-
 #--
 
 ############
@@ -685,7 +668,6 @@ tests contains {
     "ReportDetails": NotCheckedDetails("MS.AAD.6.1v1"),
     "RequirementMet": false
 }
-
 #--
 
 ############
@@ -713,7 +695,6 @@ tests contains {
     Conditions := [count(GlobalAdmins) <= 8, count(GlobalAdmins) >= 2]
     Status := count([Condition | some Condition in Conditions; Condition == false]) == 0
 }
-
 #--
 
 # MS.AAD.7.2v1
@@ -727,7 +708,6 @@ tests contains {
     "ReportDetails": NotCheckedDetails("MS.AAD.7.2v1"),
     "RequirementMet": false
 }
-
 #--
 
 #
@@ -751,7 +731,6 @@ tests contains {
     Status := count(FederatedAdmins) == 0
     AdminNames := concat(", ", FederatedAdmins)
 }
-
 #--
 
 #
@@ -816,7 +795,6 @@ tests contains {
     Conditions := [count(Aad2P2Licenses) > 0, count(RolesAssignedOutsidePim) == 0]
     Status := count([Condition | some Condition in Conditions; Condition == false]) == 0
 }
-
 #--
 
 #
@@ -844,7 +822,6 @@ tests contains {
     Conditions := [count(Aad2P2Licenses) > 0, ApprovalNotRequired == false]
     Status := count([Condition | some Condition in Conditions; Condition == false]) == 0
 }
-
 #--
 
 #
@@ -883,7 +860,6 @@ tests contains {
     Conditions := [count(Aad2P2Licenses) > 0, count(RolesWithoutAssignmentAlerts) == 0]
     Status := count([Condition | some Condition in Conditions; Condition == false]) == 0
 }
-
 #--
 
 #
@@ -912,7 +888,6 @@ tests contains {
     Conditions := [count(Aad2P2Licenses) > 0, GlobalAdminNotMonitored == false]
     Status := count([Condition | some Condition in Conditions; Condition == false]) == 0
 }
-
 #--
 
 #
@@ -931,7 +906,6 @@ tests contains {
     Conditions := [count(Aad2P2Licenses) > 0, count(NonGlobalAdminsWithoutActivationAlert) == 0]
     Status := count([Condition | some Condition in Conditions; Condition == false]) == 0
 }
-
 #--
 
 ############
@@ -987,7 +961,6 @@ tests contains {
     Status := count(BadPolicies) == 0
     ReportDetail := concat("", ["Permission level set to ", concat(", ", RoleIdByPolicy)])
 }
-
 #--
 
 #
@@ -1021,7 +994,6 @@ tests contains {
     Status := count(BadPolicies) == 0
     ReportDetail := concat("", ["Permission level set to ", concat(", ", AllowInvitesByPolicy)])
 }
-
 #--
 
 #
@@ -1036,5 +1008,4 @@ tests contains {
     "ReportDetails": NotCheckedDetails("MS.AAD.8.3v1"),
     "RequirementMet": false
 }
-
 #--
