@@ -3,6 +3,7 @@ import future.keywords
 import data.powerplatform
 import data.report.utils.NotCheckedDetails
 
+
 #
 # Policy 1
 #--
@@ -41,6 +42,7 @@ test_isDisabled_Incorrect if {
     not RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "Requirement not met"
 }
+#--
 
 #
 # Policy 2
@@ -56,3 +58,4 @@ test_NotImplemented_Correct if {
     not RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == NotCheckedDetails(PolicyId)
 }
+#--

@@ -37,6 +37,7 @@ test_disableProductionEnvironmentCreationByNonAdminUsers_Incorrect if {
     not RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "Requirement not met"
 }
+#--
 
 #
 # Policy 2
@@ -72,3 +73,4 @@ test_disableTrialEnvironmentCreationByNonAdminUsers_Incorrect if {
     not RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "Requirement not met"
 }
+#--

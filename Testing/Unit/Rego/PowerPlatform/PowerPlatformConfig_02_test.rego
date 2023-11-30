@@ -49,6 +49,7 @@ test_name_Incorrect if {
     not RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "No policy found that applies to default environment"
 }
+#--
 
 #
 # Policy 2
@@ -105,6 +106,7 @@ test_environment_list_Incorrect if {
     not RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "1 Subsequent environments without DLP policies: Test1"
 }
+#--
 
 #
 # Policy 3
@@ -282,3 +284,4 @@ test_connectorGroups_Incorrect if {
     not RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "1 Connectors are allowed that should be blocked: HttpWebhook"
 }
+#--

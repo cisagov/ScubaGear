@@ -45,7 +45,6 @@ tests contains {
 } if {
     count(input.environment_creation) <= 0
 }
-
 #--
 
 #
@@ -75,7 +74,6 @@ tests contains {
 } if {
     count(input.environment_creation) <= 0
 }
-
 #--
 
 
@@ -109,7 +107,6 @@ tests contains {
     ErrorMessage := "No policy found that applies to default environment"
     Status := count(DefaultEnvPolicies) > 0
 }
-
 #--
 
 #
@@ -169,7 +166,6 @@ tests contains {
 } if {
     count(input.dlp_policies) <= 0
 }
-
 #--
 
 #
@@ -263,7 +259,6 @@ tests contains {
 } if {
     count(input.dlp_policies) <= 0
 }
-
 #--
 
 
@@ -300,7 +295,6 @@ tests contains {
 } if {
     count(input.tenant_isolation) <= 0
 }
-
 #--
 
 #
@@ -316,7 +310,6 @@ tests contains {
     "ReportDetails": NotCheckedDetails("MS.POWERPLATFORM.3.2v1"),
     "RequirementMet": false
 }
-
 #--
 
 
@@ -337,7 +330,6 @@ tests contains {
     "ReportDetails": NotCheckedDetails("MS.POWERPLATFORM.4.1v1"),
     "RequirementMet": false
 }
-
 #--
 
 
@@ -361,5 +353,4 @@ tests contains {
     some EnvironmentCreation in input.environment_creation
     Status := EnvironmentCreation.disablePortalsCreationByNonAdminUsers == true
 }
-
 #--

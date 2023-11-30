@@ -2,6 +2,7 @@ package powerplatform_test
 import future.keywords
 import data.powerplatform
 
+
 #
 # Policy 1
 #--
@@ -36,3 +37,4 @@ test_disablePortalCreationByNonAdminUsers_Incorrect if {
     not RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "Requirement not met"
 }
+#--
