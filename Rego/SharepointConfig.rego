@@ -45,7 +45,6 @@ tests contains {
     ]
     Status := count(FilterArray(Conditions, true)) == 1
 }
-
 #--
 
 #
@@ -88,7 +87,6 @@ tests contains {
     PolicyId := "MS.SHAREPOINT.1.2v1"
     input.OneDrive_PnP_Flag == true
 }
-
 #--
 
 #
@@ -144,7 +142,6 @@ tests contains {
     ]
     Status := count(FilterArray(Conditions, true)) == 1
 }
-
 #--
 
 #
@@ -172,7 +169,6 @@ tests contains {
     ]
     Status := count(FilterArray(Conditions, true)) >= 1
 }
-
 #--
 
 ###################
@@ -197,7 +193,6 @@ tests contains {
     some TenantPolicy in input.SPO_tenant
     Status := TenantPolicy.DefaultSharingLinkType == 1
 }
-
 #--
 
 #
@@ -276,7 +271,6 @@ tests contains {
     some TenantPolicy in input.SPO_tenant
     [ErrMsg, Status] := ExternalUserExpireInDays(TenantPolicy)
 }
-
 #--
 
 #
@@ -333,7 +327,6 @@ tests contains {
     PolicyId := "MS.SHAREPOINT.3.2v1"
     input.OneDrive_PnP_Flag == true
 }
-
 #--
 
 #
@@ -415,7 +408,6 @@ tests contains {
     "ReportDetails": NotCheckedDetails("MS.SHAREPOINT.4.1v1"),
     "RequirementMet": false
 }
-
 #--
 
 #
@@ -435,5 +427,4 @@ tests contains {
     some SitePolicy in input.SPO_site
     Status := SitePolicy.DenyAddAndCustomizePages == 2
 }
-
 #--
