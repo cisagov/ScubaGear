@@ -57,7 +57,6 @@ tests contains {
     String := "meeting policy(ies) found that allows external control:"
     Status := count(Policies) == 0
 }
-
 #--
 
 #--
@@ -85,7 +84,6 @@ tests contains {
     String := "meeting policy(ies) found that allows anonymous users to start meetings:"
     Status := count(Policies) == 0
 }
-
 #--
 
 #--
@@ -145,7 +143,6 @@ tests contains {
 } if {
     count(input.meeting_policies) == 0
 }
-
 #--
 
 #--
@@ -185,7 +182,6 @@ tests contains {
 } if {
     count(input.meeting_policies) == 0
 }
-
 #--
 
 #--
@@ -225,7 +221,6 @@ tests contains {
 } if {
     count(input.meeting_policies) == 0
 }
-
 #--
 
 #--
@@ -259,7 +254,6 @@ tests contains {
 } if {
     count(input.meeting_policies) == 0
 }
-
 #--
 
 #--
@@ -293,7 +287,6 @@ tests contains {
 } if {
     count(input.broadcast_policies) == 0
 }
-
 #--
 
 
@@ -329,7 +322,6 @@ tests contains {
     String := "meeting policy(ies) that allow external access across all domains:"
     Status := count(Policies) == 0
 }
-
 #--
 
 #
@@ -373,7 +365,6 @@ tests contains {
     String := "Configuration allowed unmanaged users to initiate contact with internal user across domains:"
     Status := count(Policies) == 0
 }
-
 #--
 
 #--
@@ -401,7 +392,6 @@ tests contains {
     String := "Internal users are enabled to initiate contact with unmanaged users across domains:"
     Status := count(Policies) == 0
 }
-
 #--
 
 
@@ -434,7 +424,6 @@ tests contains {
     String := "domains that allows contact with Skype users:"
     Status := count(Policies) == 0
 }
-
 #--
 
 
@@ -512,7 +501,6 @@ tests contains {
 } if {
     count(input.teams_tenant_info) == 0
 }
-
 #--
 
 
@@ -545,7 +533,6 @@ tests contains {
     String := "meeting policy(ies) found that does not restrict installation of Microsoft Apps by default:"
     Status := count(Policies) == 0
 }
-
 #--
 
 #--
@@ -573,7 +560,6 @@ tests contains {
     String := "meeting policy(ies) found that does not restrict installation of third-party apps by default:"
     Status := count(Policies) == 0
 }
-
 #--
 
 #--
@@ -602,7 +588,6 @@ tests contains {
     String := "meeting policy(ies) found that does not restrict installation of custom apps by default:"
     Status := count(Policies) == 0
 }
-
 #--
 
 
@@ -623,7 +608,6 @@ tests contains {
     "ReportDetails": THIRDPARTYSTRING,
     "RequirementMet": false
 }
-
 #--
 
 #--
@@ -639,7 +623,6 @@ tests contains {
     "ReportDetails": THIRDPARTYSTRING,
     "RequirementMet": false
 }
-
 #--
 
 
@@ -660,7 +643,6 @@ tests contains {
     "ReportDetails": THIRDPARTYSTRING,
     "RequirementMet": false
 }
-
 #--
 
 #--
@@ -676,7 +658,6 @@ tests contains {
     "ReportDetails": THIRDPARTYSTRING,
     "RequirementMet": false
 }
-
 #--
 
 
@@ -697,7 +678,6 @@ tests contains {
     "ReportDetails": THIRDPARTYSTRING,
     "RequirementMet": false
 }
-
 #--
 
 #--
@@ -713,5 +693,4 @@ tests contains {
     "ReportDetails": THIRDPARTYSTRING,
     "RequirementMet": false
 }
-
 #--
