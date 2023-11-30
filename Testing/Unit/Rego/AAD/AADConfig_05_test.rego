@@ -10,17 +10,17 @@ test_AllowedToCreateApps_Correct if {
     PolicyId := "MS.AAD.5.1v1"
 
     Output := aad.tests with input as {
-        "authorization_policies" : [
+        "authorization_policies": [
             {
-                "DefaultUserRolePermissions" : {
-                    "AllowedToCreateApps" : false
+                "DefaultUserRolePermissions": {
+                    "AllowedToCreateApps": false
                 },
-                "Id" : "authorizationPolicy"
+                "Id": "authorizationPolicy"
             }
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -31,17 +31,17 @@ test_AllowedToCreateApps_Incorrect_V1 if {
     PolicyId := "MS.AAD.5.1v1"
 
     Output := aad.tests with input as {
-        "authorization_policies" : [
+        "authorization_policies": [
             {
-                "DefaultUserRolePermissions" : {
-                    "AllowedToCreateApps" : true
+                "DefaultUserRolePermissions": {
+                    "AllowedToCreateApps": true
                 },
-                "Id" : "Bad policy"
+                "Id": "Bad policy"
             }
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -52,23 +52,23 @@ test_AllowedToCreateApps_Incorrect_V2 if {
     PolicyId := "MS.AAD.5.1v1"
 
     Output := aad.tests with input as {
-        "authorization_policies" : [
+        "authorization_policies": [
             {
-                "DefaultUserRolePermissions" : {
-                    "AllowedToCreateApps" : true
+                "DefaultUserRolePermissions": {
+                    "AllowedToCreateApps": true
                 },
-                "Id" : "Bad policy"
+                "Id": "Bad policy"
             },
             {
-                "DefaultUserRolePermissions" : {
-                    "AllowedToCreateApps" : false
+                "DefaultUserRolePermissions": {
+                    "AllowedToCreateApps": false
                 },
-                "Id" : "Good policy"
+                "Id": "Good policy"
             }
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -83,15 +83,15 @@ test_PermissionGrantPolicyIdsAssignedToDefaultUserRole_Correct if {
     PolicyId := "MS.AAD.5.2v1"
 
     Output := aad.tests with input as {
-        "authorization_policies" : [
+        "authorization_policies": [
             {
-                "PermissionGrantPolicyIdsAssignedToDefaultUserRole" : [],
-                "Id" : "authorizationPolicy"
+                "PermissionGrantPolicyIdsAssignedToDefaultUserRole": [],
+                "Id": "authorizationPolicy"
             }
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -102,15 +102,17 @@ test_PermissionGrantPolicyIdsAssignedToDefaultUserRole_Incorrect_V1 if {
     PolicyId := "MS.AAD.5.2v1"
 
     Output := aad.tests with input as {
-        "authorization_policies" : [
+        "authorization_policies": [
             {
-                "PermissionGrantPolicyIdsAssignedToDefaultUserRole" : ["Test user"],
-                "Id" : "authorizationPolicy"
+                "PermissionGrantPolicyIdsAssignedToDefaultUserRole": [
+                    "Test user"
+                ],
+                "Id": "authorizationPolicy"
             }
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -121,19 +123,21 @@ test_PermissionGrantPolicyIdsAssignedToDefaultUserRole_Incorrect_V2 if {
     PolicyId := "MS.AAD.5.2v1"
 
     Output := aad.tests with input as {
-        "authorization_policies" : [
+        "authorization_policies": [
             {
-                "PermissionGrantPolicyIdsAssignedToDefaultUserRole" : [],
-                "Id" : "Good policy"
+                "PermissionGrantPolicyIdsAssignedToDefaultUserRole": [],
+                "Id": "Good policy"
             },
             {
-                "PermissionGrantPolicyIdsAssignedToDefaultUserRole" : ["Test user"],
-                "Id" : "Bad policy"
+                "PermissionGrantPolicyIdsAssignedToDefaultUserRole": [
+                    "Test user"
+                ],
+                "Id": "Bad policy"
             }
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -148,15 +152,15 @@ test_IsEnabled_Correct if {
     PolicyId := "MS.AAD.5.3v1"
 
     Output := aad.tests with input as {
-        "admin_consent_policies" : [
+        "admin_consent_policies": [
             {
-                "IsEnabled" : true,
-                "Id" : "policy ID"
+                "IsEnabled": true,
+                "Id": "policy ID"
             }
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -167,15 +171,15 @@ test_IsEnabled_Incorrect if {
     PolicyId := "MS.AAD.5.3v1"
 
     Output := aad.tests with input as {
-        "admin_consent_policies" : [
+        "admin_consent_policies": [
             {
-                "IsEnabled" : false,
-                "Id" : null
+                "IsEnabled": false,
+                "Id": null
             }
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -190,20 +194,20 @@ test_Value_Correct_Lowercase if {
     PolicyId := "MS.AAD.5.4v1"
 
     Output := aad.tests with input as {
-        "directory_settings" : [
+        "directory_settings": [
             {
-                "DisplayName" : "Setting display name",
-                "Values" : [
+                "DisplayName": "Setting display name",
+                "Values": [
                     {
-                        "Name" : "EnableGroupSpecificConsent",
-                        "Value" : "false"
+                        "Name": "EnableGroupSpecificConsent",
+                        "Value": "false"
                     }
                 ]
             }
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -214,20 +218,20 @@ test_Value_Correct_Uppercase if {
     PolicyId := "MS.AAD.5.4v1"
 
     Output := aad.tests with input as {
-        "directory_settings" : [
+        "directory_settings": [
             {
-                "DisplayName" : "Setting display name",
-                "Values" : [
+                "DisplayName": "Setting display name",
+                "Values": [
                     {
-                        "Name" : "EnableGroupSpecificConsent",
-                        "Value" : "False"
+                        "Name": "EnableGroupSpecificConsent",
+                        "Value": "False"
                     }
                 ]
             }
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet
@@ -238,20 +242,20 @@ test_Value_Incorrect_Lowercase if {
     PolicyId := "MS.AAD.5.4v1"
 
     Output := aad.tests with input as {
-        "directory_settings" : [
+        "directory_settings": [
             {
-                "DisplayName" : "Setting display name",
-                "Values" : [
+                "DisplayName": "Setting display name",
+                "Values": [
                     {
-                        "Name" : "EnableGroupSpecificConsent",
-                        "Value" : "true"
+                        "Name": "EnableGroupSpecificConsent",
+                        "Value": "true"
                     }
                 ]
             }
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
@@ -262,20 +266,20 @@ test_Value_Incorrect_Uppercase if {
     PolicyId := "MS.AAD.5.4v1"
 
     Output := aad.tests with input as {
-        "directory_settings" : [
+        "directory_settings": [
             {
-                "DisplayName" : "Setting display name",
-                "Values" : [
+                "DisplayName": "Setting display name",
+                "Values": [
                     {
-                        "Name" : "EnableGroupSpecificConsent",
-                        "Value" : "True"
+                        "Name": "EnableGroupSpecificConsent",
+                        "Value": "True"
                     }
                 ]
             }
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
