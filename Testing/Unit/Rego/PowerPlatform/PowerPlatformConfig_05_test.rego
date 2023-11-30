@@ -10,15 +10,17 @@ test_disablePortalCreationByNonAdminUsers_Correct if {
     PolicyId := "MS.POWERPLATFORM.5.1v1"
 
     Output := powerplatform.tests with input as {
-        "environment_creation": [{
-            "disablePortalsCreationByNonAdminUsers" : true
-        }]
+        "environment_creation": [
+            {
+                "disablePortalsCreationByNonAdminUsers": true
+            }
+        ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
+    RuleOutput[0].RequirementMet == true
     RuleOutput[0].ReportDetails == "Requirement met"
 }
 
@@ -26,15 +28,17 @@ test_disablePortalCreationByNonAdminUsers_Incorrect if {
     PolicyId := "MS.POWERPLATFORM.5.1v1"
 
     Output := powerplatform.tests with input as {
-        "environment_creation": [{
-            "disablePortalsCreationByNonAdminUsers" : false
-        }]
+        "environment_creation": [
+            {
+                "disablePortalsCreationByNonAdminUsers": false
+            }
+        ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
+    RuleOutput[0].RequirementMet == false
     RuleOutput[0].ReportDetails == "Requirement not met"
 }
 #--

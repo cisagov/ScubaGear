@@ -10,15 +10,17 @@ test_disableProductionEnvironmentCreationByNonAdminUsers_Correct if {
     PolicyId := "MS.POWERPLATFORM.1.1v1"
 
     Output := powerplatform.tests with input as {
-        "environment_creation": [{
-            "disableEnvironmentCreationByNonAdminUsers" : true
-        }]
+        "environment_creation": [
+            {
+                "disableEnvironmentCreationByNonAdminUsers": true
+            }
+        ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
+    RuleOutput[0].RequirementMet == true
     RuleOutput[0].ReportDetails == "Requirement met"
 }
 
@@ -26,15 +28,17 @@ test_disableProductionEnvironmentCreationByNonAdminUsers_Incorrect if {
     PolicyId := "MS.POWERPLATFORM.1.1v1"
 
     Output := powerplatform.tests with input as {
-        "environment_creation": [{
-            "disableEnvironmentCreationByNonAdminUsers" : false
-        }]
+        "environment_creation": [
+            {
+                "disableEnvironmentCreationByNonAdminUsers": false
+            }
+        ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
+    RuleOutput[0].RequirementMet == false
     RuleOutput[0].ReportDetails == "Requirement not met"
 }
 #--
@@ -46,15 +50,17 @@ test_disableTrialEnvironmentCreationByNonAdminUsers_Correct if {
     PolicyId := "MS.POWERPLATFORM.1.2v1"
 
     Output := powerplatform.tests with input as {
-        "environment_creation": [{
-            "disableTrialEnvironmentCreationByNonAdminUsers" : true
-        }]
+        "environment_creation": [
+            {
+                "disableTrialEnvironmentCreationByNonAdminUsers": true
+            }
+        ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
+    RuleOutput[0].RequirementMet == true
     RuleOutput[0].ReportDetails == "Requirement met"
 }
 
@@ -62,15 +68,17 @@ test_disableTrialEnvironmentCreationByNonAdminUsers_Incorrect if {
     PolicyId := "MS.POWERPLATFORM.1.2v1"
 
     Output := powerplatform.tests with input as {
-        "environment_creation": [{
-            "disableTrialEnvironmentCreationByNonAdminUsers" : false
-        }]
+        "environment_creation": [
+            {
+                "disableTrialEnvironmentCreationByNonAdminUsers": false
+            }
+        ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
+    RuleOutput[0].RequirementMet == false
     RuleOutput[0].ReportDetails == "Requirement not met"
 }
 #--
