@@ -17,10 +17,10 @@ test_DefaultSharingLinkType_Correct if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
+    RuleOutput[0].RequirementMet == true
     RuleOutput[0].ReportDetails == "Requirement met"
 }
 
@@ -35,10 +35,10 @@ test_DefaultSharingLinkType_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
+    RuleOutput[0].RequirementMet == false
     RuleOutput[0].ReportDetails == "Requirement not met"
 }
 #--
@@ -57,10 +57,10 @@ test_DefaultLinkPermission_Correct if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
+    RuleOutput[0].RequirementMet == true
     RuleOutput[0].ReportDetails == "Requirement met"
 }
 
@@ -75,10 +75,10 @@ test_DefaultLinkPermission_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
+    RuleOutput[0].RequirementMet == false
     RuleOutput[0].ReportDetails == "Requirement not met"
 }
 #--

@@ -18,10 +18,10 @@ test_SharingCapability_Correct_V1 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
+    RuleOutput[0].RequirementMet == true
     RuleOutput[0].ReportDetails == "Requirement met"
 }
 
@@ -36,10 +36,10 @@ test_SharingCapability_Correct_V2 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
+    RuleOutput[0].RequirementMet == true
     RuleOutput[0].ReportDetails == "Requirement met"
 }
 
@@ -54,10 +54,10 @@ test_SharingCapability_Incorrect_V1 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
+    RuleOutput[0].RequirementMet == false
     RuleOutput[0].ReportDetails == "Requirement not met"
 }
 
@@ -72,10 +72,10 @@ test_SharingCapability_Incorrect_V2 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
+    RuleOutput[0].RequirementMet == false
     RuleOutput[0].ReportDetails == "Requirement not met"
 }
 #--
@@ -96,10 +96,10 @@ test_OneDriveSharingCapability_Correct_V1 if {
 
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
+    RuleOutput[0].RequirementMet == true
     RuleOutput[0].ReportDetails == "Requirement met"
 }
 
@@ -115,10 +115,10 @@ test_OneDriveSharingCapability_Correct_V2 if {
         "OneDrive_PnP_Flag": false
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
+    RuleOutput[0].RequirementMet == true
     RuleOutput[0].ReportDetails == "Requirement met"
 }
 
@@ -134,10 +134,10 @@ test_UsingServicePrincipal if {
         "OneDrive_PnP_Flag": true
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
+    RuleOutput[0].RequirementMet == false
     RuleOutput[0].Criticality == "Should/Not-Implemented"
     RuleOutput[0].ReportDetails == NotCheckedDetails(PolicyId)
 }
@@ -154,10 +154,10 @@ test_OneDriveSharingCapability_Incorrect_V1 if {
         "OneDrive_PnP_Flag": false
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
+    RuleOutput[0].RequirementMet == false
     RuleOutput[0].ReportDetails == "Requirement not met"
 }
 
@@ -173,10 +173,10 @@ test_OneDriveSharingCapability_Incorrect_V2 if {
         "OneDrive_PnP_Flag": false
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
+    RuleOutput[0].RequirementMet == false
     RuleOutput[0].ReportDetails == "Requirement not met"
 }
 #--
@@ -196,10 +196,10 @@ test_SharingDomainRestrictionMode_Correct_V1 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
+    RuleOutput[0].RequirementMet == true
     RuleOutput[0].ReportDetails == "Requirement met: external sharing is set to Only People In Organization"
 }
 
@@ -215,10 +215,10 @@ test_SharingDomainRestrictionMode_Correct_V2 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
+    RuleOutput[0].RequirementMet == true
     RuleOutput[0].ReportDetails == "Requirement met: Note that we currently only check for approved external domains. Approved security groups are currently not being checked, see the baseline policy for instructions on a manual check."
 }
 
@@ -234,10 +234,10 @@ test_SharingDomainRestrictionMode_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
+    RuleOutput[0].RequirementMet == false
     RuleOutput[0].ReportDetails =="Requirement not met: Note that we currently only check for approved external domains. Approved security groups are currently not being checked, see the baseline policy for instructions on a manual check."
 }
 #--
@@ -257,10 +257,10 @@ test_SameAccount_Correct_V1 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
+    RuleOutput[0].RequirementMet == true
     RuleOutput[0].ReportDetails == "Requirement met"
 }
 
@@ -276,10 +276,10 @@ test_SameAccount_Correct_V3 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
+    RuleOutput[0].RequirementMet == true
     RuleOutput[0].ReportDetails == "Requirement met"
 }
 
@@ -295,10 +295,10 @@ test_SameAccount_Correct_V2 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
+    RuleOutput[0].RequirementMet == true
     RuleOutput[0].ReportDetails == "Requirement met"
 }
 
@@ -314,10 +314,10 @@ test_SameAccount_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
+    RuleOutput[0].RequirementMet == false
     RuleOutput[0].ReportDetails == "Requirement not met"
 }
 #--

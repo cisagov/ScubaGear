@@ -12,10 +12,10 @@ test_NotImplemented_Correct if {
 
     Output := sharepoint.tests with input as { }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
+    RuleOutput[0].RequirementMet == false
     RuleOutput[0].ReportDetails == NotCheckedDetails(PolicyId)
 }
 #--
@@ -34,10 +34,10 @@ test_DenyAddAndCustomizePages_Correct if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
+    RuleOutput[0].RequirementMet == true
     RuleOutput[0].ReportDetails == "Requirement met"
 }
 
@@ -52,10 +52,10 @@ test_DenyAddAndCustomizePages_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
+    RuleOutput[0].RequirementMet == false
     RuleOutput[0].ReportDetails == "Requirement not met"
 }
 #--

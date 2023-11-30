@@ -18,10 +18,10 @@ test_ExternalUserExpireInDays_Correct_V1 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
+    RuleOutput[0].RequirementMet == true
     RuleOutput[0].ReportDetails == "Requirement met"
 }
 
@@ -37,10 +37,10 @@ test_ExternalUserExpireInDays_Correct_V2 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
+    RuleOutput[0].RequirementMet == true
     RuleOutput[0].ReportDetails == "Requirement met"
 }
 
@@ -56,10 +56,10 @@ test_ExternalUserExpireInDays_Correct_V3 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
+    RuleOutput[0].RequirementMet == true
     RuleOutput[0].ReportDetails == "Requirement met"
 }
 
@@ -75,10 +75,10 @@ test_ExternalUserExpireInDays_Correct_V4 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
+    RuleOutput[0].RequirementMet == true
     RuleOutput[0].ReportDetails == "Requirement met"
 }
 
@@ -94,10 +94,10 @@ test_ExternalUserExpireInDays_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
+    RuleOutput[0].RequirementMet == false
     RuleOutput[0].ReportDetails == "Requirement not met: External Sharing is set to New and Existing Guests and expiration date is not 30 days or less"
 }
 
@@ -113,10 +113,10 @@ test_ExternalUserExpireInDays_Incorrect_V2 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
+    RuleOutput[0].RequirementMet == false
     RuleOutput[0].ReportDetails == "Requirement not met: External Sharing is set to Anyone and expiration date is not 30 days or less"
 }
 #--
@@ -137,10 +137,10 @@ test_AnonymousLinkType_Correct if {
         "OneDrive_PnP_Flag": false
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
+    RuleOutput[0].RequirementMet == true
     RuleOutput[0].ReportDetails == "Requirement met"
 }
 
@@ -157,10 +157,10 @@ test_AnonymousLinkType_Incorrect_V1 if {
         "OneDrive_PnP_Flag": false
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
+    RuleOutput[0].RequirementMet == false
     RuleOutput[0].ReportDetails == "Requirement not met: both files and folders are not limited to view for Anyone"
 }
 
@@ -177,10 +177,10 @@ test_AnonymousLinkType_Incorrect_V2 if {
         "OneDrive_PnP_Flag": false
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
+    RuleOutput[0].RequirementMet == false
     RuleOutput[0].ReportDetails == "Requirement not met: folders are not limited to view for Anyone"
 }
 
@@ -197,10 +197,10 @@ test_AnonymousLinkType_Incorrect_V3 if {
         "OneDrive_PnP_Flag": false
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
+    RuleOutput[0].RequirementMet == false
     RuleOutput[0].ReportDetails == "Requirement not met: files are not limited to view for Anyone"
 }
 
@@ -217,10 +217,10 @@ test_UsingServicePrincipal if {
         "OneDrive_PnP_Flag": true
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
+    RuleOutput[0].RequirementMet == false
     RuleOutput[0].Criticality == "Should/Not-Implemented"
     RuleOutput[0].ReportDetails == NotCheckedDetails(PolicyId)
 }
@@ -241,10 +241,10 @@ test_SharingCapability_Correct if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
+    RuleOutput[0].RequirementMet == true
     RuleOutput[0].ReportDetails == "Requirement met"
 }
 
@@ -261,10 +261,10 @@ test_SharingCapability_Correct_V4 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
+    RuleOutput[0].RequirementMet == true
     RuleOutput[0].ReportDetails == "Requirement met"
 }
 
@@ -281,10 +281,10 @@ test_EmailAttestationReAuthDays_Correct if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
+    RuleOutput[0].RequirementMet == true
     RuleOutput[0].ReportDetails == "Requirement met"
 }
 
@@ -301,10 +301,10 @@ test_Multi_Incorrect_V1 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
+    RuleOutput[0].RequirementMet == false
     RuleOutput[0].ReportDetails == "Requirement not met: Expiration timer for 'People who use a verification code' NOT enabled and set to >30 days"
 }
 
@@ -321,10 +321,10 @@ test_EmailAttestationRequired_Incorrect_V2 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
+    RuleOutput[0].RequirementMet == false
     RuleOutput[0].ReportDetails == "Requirement not met: Expiration timer for 'People who use a verification code' NOT enabled"
 }
 
@@ -341,10 +341,10 @@ test_EmailAttestationReAuthDays_Incorrect_V3 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
+    RuleOutput[0].RequirementMet == false
     RuleOutput[0].ReportDetails == "Requirement not met: Expiration timer for 'People who use a verification code' NOT set to 30 days"
 }
 #--

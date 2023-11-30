@@ -37,7 +37,7 @@ test_ExampleVar_Correct_V1 if {
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
+    RuleOutput[0].RequirementMet == true
     RuleOutput[0].ReportDetails == "Example output"
 }
 
@@ -60,7 +60,7 @@ test_ExampleVar_Incorrect if {
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
+    RuleOutput[0].RequirementMet == false
     RuleOutput[0].ReportDetails == "Example output"
 }
 ```
@@ -107,7 +107,7 @@ test_NotImplemented_Correct if {
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
+    RuleOutput[0].RequirementMet == false
     RuleOutput[0].ReportDetails == NotCheckedDetails(PolicyId)
 }
 ```
@@ -120,7 +120,7 @@ test_3rdParty_Correct_V1 if {
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
+    RuleOutput[0].RequirementMet == false
     RuleOutput[0].ReportDetails == DefenderMirrorDetails(PolicyId)
 }
 ```
@@ -150,7 +150,7 @@ test_Example_Correct if {
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
+    RuleOutput[0].RequirementMet == true
     RuleOutput[0].ReportDetails == "Requirement met"
 }
 ```
