@@ -93,3 +93,4 @@ test_AutoForwardEnabled_Incorrect_V3 if {
     not RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "2 remote domain(s) that allows automatic forwarding: Test name, Test name 2"
 }
+#--

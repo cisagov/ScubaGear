@@ -66,6 +66,7 @@ test_IPAllowList_Incorrect if {
     not RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "1 connection filter polic(ies) with an IP allowlist: A"
 }
+#--
 
 #
 # Policy 2
@@ -129,3 +130,4 @@ test_EnableSafeList_Correct_V2 if {
     RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "Requirement met"
 }
+#--

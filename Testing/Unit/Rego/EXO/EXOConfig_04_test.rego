@@ -113,6 +113,7 @@ test_Rdata_Incorrect_V3 if {
     not RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "1 of 2 agency domain(s) found in violation: bad.name"
 }
+#--
 
 #
 # Policy 2
@@ -191,6 +192,7 @@ test_Rdata_Incorrect_V5 if {
     not RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "1 of 1 agency domain(s) found in violation: test.name"
 }
+#--
 
 #
 # Policy 3
@@ -294,6 +296,7 @@ test_DMARCReport_Incorrect_V3 if {
     not RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "1 of 1 agency domain(s) found in violation: test.name"
 }
+#--
 
 #
 # Policy 4
@@ -521,3 +524,4 @@ test_POC_Incorrect_V5 if {
     not RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "1 of 2 agency domain(s) found in violation: example.com"
 }
+#--

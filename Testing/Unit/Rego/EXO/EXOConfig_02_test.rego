@@ -3,6 +3,7 @@ import future.keywords
 import data.exo
 import data.report.utils.NotCheckedDetails
 
+
 #
 # Policy 1
 #--
@@ -17,6 +18,7 @@ test_NotImplemented_Correct if {
     not RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == NotCheckedDetails(PolicyId)
 }
+#--
 
 #
 # Policy 2
@@ -187,3 +189,4 @@ test_Rdata_Multiple_Incorrect if {
     not RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "1 of 1 agency domain(s) found in violation: bad.com"
 }
+#--

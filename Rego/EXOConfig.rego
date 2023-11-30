@@ -55,7 +55,6 @@ tests contains {
     ErrMessage := Description(Format(Domains), ErrString , concat(", ", Domains))
     Status := count(Domains) == 0
 }
-
 #--
 
 
@@ -76,7 +75,6 @@ tests contains {
     "ReportDetails": NotCheckedDetails("MS.EXO.2.1v1"),
     "RequirementMet": false
 }
-
 #--
 
 #
@@ -106,7 +104,6 @@ tests contains {
     Domains := DomainsWithoutSpf
     Status := count(Domains) == 0
 }
-
 #--
 
 
@@ -151,7 +148,6 @@ tests contains {
     DomainsWithoutDkim := ALLDOMAINS - DomainsWithDkim
     Status := count(DomainsWithoutDkim) == 0
 }
-
 #--
 
 
@@ -186,7 +182,6 @@ tests contains {
     Domains := DomainsWithoutDmarc
     Status := count(Domains) == 0
 }
-
 #--
 
 #
@@ -216,7 +211,6 @@ tests contains {
     Domains := DomainsWithoutPreject
     Status := count(Domains) == 0
 }
-
 #--
 
 #
@@ -257,7 +251,6 @@ tests contains {
     Domains := DomainsWithoutDHSContact
     Status := count(Domains) == 0
 }
-
 #--
 
 #
@@ -314,7 +307,6 @@ tests contains {
     Domains := DomainsWithoutAgencyContact
     Status := count(Domains) == 0
 }
-
 #--
 
 
@@ -344,7 +336,6 @@ tests contains {
 } if {
     Status := count(SmtpClientAuthEnabled) == 0
 }
-
 #--
 
 
@@ -379,7 +370,6 @@ tests contains {
     ErrMessage := Description(Format(ContactsSharingPolicies), ErrString , concat(", ", ContactsSharingPolicies))
     Status := count(ContactsSharingPolicies) == 0
 }
-
 #--
 
 #
@@ -409,7 +399,6 @@ tests contains {
     ErrMessage := Description(Format(CalendarSharingPolicies), ErrString , concat(", ", CalendarSharingPolicies))
     Status := count(CalendarSharingPolicies) == 0
 }
-
 #--
 
 
@@ -444,7 +433,6 @@ tests contains {
     Conditions := [ (Rule.FromScope == "NotInOrganization") | some Rule in EnabledRules]
     Status := count(FilterArray(Conditions, true)) > 0
 }
-
 #--
 
 
@@ -465,7 +453,6 @@ tests contains {
     "ReportDetails": DefenderMirrorDetails("MS.EXO.8.1v1"),
     "RequirementMet": false
 }
-
 #--
 
 #
@@ -481,7 +468,6 @@ tests contains {
     "ReportDetails": DefenderMirrorDetails("MS.EXO.8.2v1"),
     "RequirementMet": false
 }
-
 #--
 
 
@@ -502,7 +488,6 @@ tests contains {
     "ReportDetails": DefenderMirrorDetails("MS.EXO.9.1v1"),
     "RequirementMet": false
 }
-
 #--
 
 #
@@ -518,7 +503,6 @@ tests contains {
     "ReportDetails": DefenderMirrorDetails("MS.EXO.9.2v1"),
     "RequirementMet": false
 }
-
 #--
 
 #
@@ -534,7 +518,6 @@ tests contains {
     "ReportDetails": DefenderMirrorDetails("MS.EXO.9.3v1"),
     "RequirementMet": false
 }
-
 #--
 
 
@@ -555,7 +538,6 @@ tests contains {
     "ReportDetails": DefenderMirrorDetails("MS.EXO.10.1v1"),
     "RequirementMet": false
 }
-
 #--
 
 #
@@ -571,7 +553,6 @@ tests contains {
     "ReportDetails": DefenderMirrorDetails("MS.EXO.10.2v1"),
     "RequirementMet": false
 }
-
 #--
 
 #
@@ -587,7 +568,6 @@ tests contains {
     "ReportDetails": DefenderMirrorDetails("MS.EXO.10.3v1"),
     "RequirementMet": false
 }
-
 #--
 
 
@@ -608,7 +588,6 @@ tests contains {
     "ReportDetails": DefenderMirrorDetails("MS.EXO.11.1v1"),
     "RequirementMet": false
 }
-
 #--
 
 #
@@ -624,7 +603,6 @@ tests contains {
     "ReportDetails": DefenderMirrorDetails("MS.EXO.11.2v1"),
     "RequirementMet": false
 }
-
 #--
 
 #
@@ -640,7 +618,6 @@ tests contains {
     "ReportDetails": DefenderMirrorDetails("MS.EXO.11.3v1"),
     "RequirementMet": false
 }
-
 #--
 
 
@@ -672,7 +649,6 @@ tests contains {
     ErrMessage := Description(Format(ConnFilterPolicies), ErrString , concat(", ", ConnFilterPolicies))
     Status := count(ConnFilterPolicies) == 0
 }
-
 #--
 
 #
@@ -700,7 +676,6 @@ tests contains {
     ErrMessage := Description(Format(ConnFilterPolicies), ErrString , concat(", ", ConnFilterPolicies))
     Status := count(ConnFilterPolicies) == 0
 }
-
 #--
 
 
@@ -729,7 +704,6 @@ tests contains {
 } if {
     Status := count(AuditDisabled) == 0
 }
-
 #--
 
 
@@ -750,7 +724,6 @@ tests contains {
     "ReportDetails": DefenderMirrorDetails("MS.EXO.14.1v1"),
     "RequirementMet": false
 }
-
 #--
 
 #
@@ -766,7 +739,6 @@ tests contains {
     "ReportDetails": DefenderMirrorDetails("MS.EXO.14.2v1"),
     "RequirementMet": false
 }
-
 #--
 
 #
@@ -782,7 +754,6 @@ tests contains {
     "ReportDetails": DefenderMirrorDetails("MS.EXO.14.3v1"),
     "RequirementMet": false
 }
-
 #--
 
 
@@ -803,7 +774,6 @@ tests contains {
     "ReportDetails": DefenderMirrorDetails("MS.EXO.15.1v1"),
     "RequirementMet": false
 }
-
 #--
 
 #
@@ -819,7 +789,6 @@ tests contains {
     "ReportDetails": DefenderMirrorDetails("MS.EXO.15.2v1"),
     "RequirementMet": false
 }
-
 #--
 
 #
@@ -835,7 +804,6 @@ tests contains {
     "ReportDetails": DefenderMirrorDetails("MS.EXO.15.3v1"),
     "RequirementMet": false
 }
-
 #--
 
 
@@ -856,7 +824,6 @@ tests contains {
     "ReportDetails": DefenderMirrorDetails("MS.EXO.16.1v1"),
     "RequirementMet": false
 }
-
 #--
 
 #
@@ -872,7 +839,6 @@ tests contains {
     "ReportDetails": DefenderMirrorDetails("MS.EXO.16.2v1"),
     "RequirementMet": false
 }
-
 #--
 
 
@@ -893,7 +859,6 @@ tests contains {
     "ReportDetails": DefenderMirrorDetails("MS.EXO.17.1v1"),
     "RequirementMet": false
 }
-
 #--
 
 #
@@ -909,7 +874,6 @@ tests contains {
     "ReportDetails": DefenderMirrorDetails("MS.EXO.17.2v1"),
     "RequirementMet": false
 }
-
 #--
 
 #
@@ -925,5 +889,4 @@ tests contains {
     "ReportDetails": DefenderMirrorDetails("MS.EXO.17.3v1"),
     "RequirementMet": false
 }
-
 #--

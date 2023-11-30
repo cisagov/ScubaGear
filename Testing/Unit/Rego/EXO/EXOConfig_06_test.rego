@@ -101,3 +101,4 @@ test_Domains_Calendar_Incorrect if {
     not RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "1 sharing polic(ies) are sharing calendar details with all domains by default: A"
 }
+#--

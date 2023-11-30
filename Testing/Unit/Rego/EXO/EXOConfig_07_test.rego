@@ -242,3 +242,4 @@ test_PrependSubject_IncorrectV2 if {
     not RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "No transport rule found that applies warnings to emails received from outside the organization"
 }
+#--

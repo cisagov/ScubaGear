@@ -44,3 +44,4 @@ test_SmtpClientAuthenticationDisabled_Incorrect if {
     not RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "Requirement not met"
 }
+#--
