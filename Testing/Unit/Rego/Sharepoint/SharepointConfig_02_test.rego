@@ -12,7 +12,7 @@ test_DefaultSharingLinkType_Correct if {
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
-                "DefaultSharingLinkType" : 1
+                "DefaultSharingLinkType": 1
             }
         ]
     }
@@ -30,7 +30,7 @@ test_DefaultSharingLinkType_Incorrect if {
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
-                "DefaultSharingLinkType" : 2
+                "DefaultSharingLinkType": 2
             }
         ]
     }
@@ -52,7 +52,7 @@ test_DefaultLinkPermission_Correct if {
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
-                "DefaultLinkPermission" : 1
+                "DefaultLinkPermission": 1
             }
         ]
     }
@@ -70,7 +70,7 @@ test_DefaultLinkPermission_Incorrect if {
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
-                "DefaultLinkPermission" : 2
+                "DefaultLinkPermission": 2
             }
         ]
     }

@@ -29,7 +29,7 @@ test_DenyAddAndCustomizePages_Correct if {
     Output := sharepoint.tests with input as {
         "SPO_site": [
             {
-                "DenyAddAndCustomizePages" : 2
+                "DenyAddAndCustomizePages": 2
             }
         ]
     }
@@ -47,7 +47,7 @@ test_DenyAddAndCustomizePages_Incorrect if {
     Output := sharepoint.tests with input as {
         "SPO_site": [
             {
-                "DenyAddAndCustomizePages" : 1
+                "DenyAddAndCustomizePages": 1
             }
         ]
     }

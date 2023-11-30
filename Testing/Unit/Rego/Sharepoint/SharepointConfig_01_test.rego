@@ -13,7 +13,7 @@ test_SharingCapability_Correct_V1 if {
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
-                "SharingCapability" : 0
+                "SharingCapability": 0
             }
         ]
     }
@@ -31,7 +31,7 @@ test_SharingCapability_Correct_V2 if {
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
-                "SharingCapability" : 3
+                "SharingCapability": 3
             }
         ]
     }
@@ -49,7 +49,7 @@ test_SharingCapability_Incorrect_V1 if {
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
-                "SharingCapability" : 1
+                "SharingCapability": 1
             }
         ]
     }
@@ -67,7 +67,7 @@ test_SharingCapability_Incorrect_V2 if {
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
-                "SharingCapability" : 2
+                "SharingCapability": 2
             }
         ]
     }
@@ -89,11 +89,10 @@ test_OneDriveSharingCapability_Correct_V1 if {
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
-                "OneDriveSharingCapability" : 0
+                "OneDriveSharingCapability": 0
             }
         ],
         "OneDrive_PnP_Flag": false
-
     }
 
     RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
@@ -109,7 +108,7 @@ test_OneDriveSharingCapability_Correct_V2 if {
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
-                "OneDriveSharingCapability" : 3
+                "OneDriveSharingCapability": 3
             }
         ],
         "OneDrive_PnP_Flag": false
@@ -128,7 +127,7 @@ test_UsingServicePrincipal if {
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
-                "OneDriveSharingCapability" : 3
+                "OneDriveSharingCapability": 3
             }
         ],
         "OneDrive_PnP_Flag": true
@@ -148,7 +147,7 @@ test_OneDriveSharingCapability_Incorrect_V1 if {
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
-                "OneDriveSharingCapability" : 1
+                "OneDriveSharingCapability": 1
             }
         ],
         "OneDrive_PnP_Flag": false
@@ -167,7 +166,7 @@ test_OneDriveSharingCapability_Incorrect_V2 if {
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
-                "OneDriveSharingCapability" : 2
+                "OneDriveSharingCapability": 2
             }
         ],
         "OneDrive_PnP_Flag": false
@@ -190,8 +189,8 @@ test_SharingDomainRestrictionMode_Correct_V1 if {
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
-                "SharingCapability" : 0,
-                "SharingDomainRestrictionMode" : 0
+                "SharingCapability": 0,
+                "SharingDomainRestrictionMode": 0
             }
         ]
     }
@@ -209,8 +208,8 @@ test_SharingDomainRestrictionMode_Correct_V2 if {
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
-                "SharingCapability" : 1,
-                "SharingDomainRestrictionMode" : 1
+                "SharingCapability": 1,
+                "SharingDomainRestrictionMode": 1
             }
         ]
     }
@@ -228,8 +227,8 @@ test_SharingDomainRestrictionMode_Incorrect if {
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
-                "SharingCapability" : 1,
-                "SharingDomainRestrictionMode" : 0
+                "SharingCapability": 1,
+                "SharingDomainRestrictionMode": 0
             }
         ]
     }
@@ -251,8 +250,8 @@ test_SameAccount_Correct_V1 if {
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
-                "SharingCapability" : 0,
-                "RequireAcceptingAccountMatchInvitedAccount" : false
+                "SharingCapability": 0,
+                "RequireAcceptingAccountMatchInvitedAccount": false
             }
         ]
     }
@@ -270,8 +269,8 @@ test_SameAccount_Correct_V3 if {
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
-                "SharingCapability" : 0,
-                "RequireAcceptingAccountMatchInvitedAccount" : true
+                "SharingCapability": 0,
+                "RequireAcceptingAccountMatchInvitedAccount": true
             }
         ]
     }
@@ -289,8 +288,8 @@ test_SameAccount_Correct_V2 if {
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
-                "SharingCapability" : 1,
-                "RequireAcceptingAccountMatchInvitedAccount" : true
+                "SharingCapability": 1,
+                "RequireAcceptingAccountMatchInvitedAccount": true
             }
         ]
     }
@@ -308,8 +307,8 @@ test_SameAccount_Incorrect if {
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
-                "SharingCapability" : 1,
-                "RequireAcceptingAccountMatchInvitedAccount" : false
+                "SharingCapability": 1,
+                "RequireAcceptingAccountMatchInvitedAccount": false
             }
         ]
     }

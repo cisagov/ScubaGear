@@ -12,7 +12,7 @@ test_ExternalUserExpireInDays_Correct_V1 if {
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
-                "SharingCapability" : 0,
+                "SharingCapability": 0,
                 "RequireAnonymousLinksExpireInDays": 30
             }
         ]
@@ -31,7 +31,7 @@ test_ExternalUserExpireInDays_Correct_V2 if {
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
-                "SharingCapability" : 3,
+                "SharingCapability": 3,
                 "RequireAnonymousLinksExpireInDays": 30
             }
         ]
@@ -50,7 +50,7 @@ test_ExternalUserExpireInDays_Correct_V3 if {
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
-                "SharingCapability" : 1,
+                "SharingCapability": 1,
                 "RequireAnonymousLinksExpireInDays": 29
             }
         ]
@@ -69,7 +69,7 @@ test_ExternalUserExpireInDays_Correct_V4 if {
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
-                "SharingCapability" : 2,
+                "SharingCapability": 2,
                 "RequireAnonymousLinksExpireInDays": 29
             }
         ]
@@ -88,7 +88,7 @@ test_ExternalUserExpireInDays_Incorrect if {
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
-                "SharingCapability" : 1,
+                "SharingCapability": 1,
                 "RequireAnonymousLinksExpireInDays": 31
             }
         ]
@@ -107,7 +107,7 @@ test_ExternalUserExpireInDays_Incorrect_V2 if {
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
-                "SharingCapability" : 2,
+                "SharingCapability": 2,
                 "RequireAnonymousLinksExpireInDays": 31
             }
         ]
@@ -130,8 +130,8 @@ test_AnonymousLinkType_Correct if {
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
-                "FileAnonymousLinkType" : 1,
-                "FolderAnonymousLinkType" : 1
+                "FileAnonymousLinkType": 1,
+                "FolderAnonymousLinkType": 1
             }
         ],
         "OneDrive_PnP_Flag": false
@@ -150,8 +150,8 @@ test_AnonymousLinkType_Incorrect_V1 if {
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
-                "FileAnonymousLinkType" : 2,
-                "FolderAnonymousLinkType" : 2
+                "FileAnonymousLinkType": 2,
+                "FolderAnonymousLinkType": 2
             }
         ],
         "OneDrive_PnP_Flag": false
@@ -170,8 +170,8 @@ test_AnonymousLinkType_Incorrect_V2 if {
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
-                "FileAnonymousLinkType" : 1,
-                "FolderAnonymousLinkType" : 2
+                "FileAnonymousLinkType": 1,
+                "FolderAnonymousLinkType": 2
             }
         ],
         "OneDrive_PnP_Flag": false
@@ -190,8 +190,8 @@ test_AnonymousLinkType_Incorrect_V3 if {
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
-                "FileAnonymousLinkType" : 2,
-                "FolderAnonymousLinkType" : 1
+                "FileAnonymousLinkType": 2,
+                "FolderAnonymousLinkType": 1
             }
         ],
         "OneDrive_PnP_Flag": false
@@ -210,8 +210,8 @@ test_UsingServicePrincipal if {
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
-                "FileAnonymousLinkType" : 2,
-                "FolderAnonymousLinkType" : 1
+                "FileAnonymousLinkType": 2,
+                "FolderAnonymousLinkType": 1
             }
         ],
         "OneDrive_PnP_Flag": true
@@ -234,8 +234,8 @@ test_SharingCapability_Correct if {
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
-                "SharingCapability" : 0,
-                "EmailAttestationRequired" : true,
+                "SharingCapability": 0,
+                "EmailAttestationRequired": true,
                 "EmailAttestationReAuthDays": 30
             }
         ]
@@ -254,8 +254,8 @@ test_SharingCapability_Correct_V4 if {
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
-                "SharingCapability" : 1,
-                "EmailAttestationRequired" : true,
+                "SharingCapability": 1,
+                "EmailAttestationRequired": true,
                 "EmailAttestationReAuthDays": 30
             }
         ]
@@ -274,8 +274,8 @@ test_EmailAttestationReAuthDays_Correct if {
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
-                "SharingCapability" : 1,
-                "EmailAttestationRequired" : true,
+                "SharingCapability": 1,
+                "EmailAttestationRequired": true,
                 "EmailAttestationReAuthDays": 29
             }
         ]
@@ -294,8 +294,8 @@ test_Multi_Incorrect_V1 if {
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
-                "SharingCapability" : 1,
-                "EmailAttestationRequired" : false,
+                "SharingCapability": 1,
+                "EmailAttestationRequired": false,
                 "EmailAttestationReAuthDays": 31
             }
         ]
@@ -314,8 +314,8 @@ test_EmailAttestationRequired_Incorrect_V2 if {
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
-                "SharingCapability" : 1,
-                "EmailAttestationRequired" : false,
+                "SharingCapability": 1,
+                "EmailAttestationRequired": false,
                 "EmailAttestationReAuthDays": 29
             }
         ]
@@ -334,8 +334,8 @@ test_EmailAttestationReAuthDays_Incorrect_V3 if {
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
-                "SharingCapability" : 1,
-                "EmailAttestationRequired" : true,
+                "SharingCapability": 1,
+                "EmailAttestationRequired": true,
                 "EmailAttestationReAuthDays": 31
             }
         ]
