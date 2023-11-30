@@ -32,7 +32,7 @@ THIRDPARTYSTRING := concat(" ", THIRDPARTYARRAY)
 # MS.TEAMS.1 #
 ##############
 
-#--
+#
 # MS.TEAMS.1.1v1
 #--
 
@@ -59,7 +59,7 @@ tests contains {
 }
 #--
 
-#--
+#
 # MS.TEAMS.1.2v1
 #--
 
@@ -86,7 +86,7 @@ tests contains {
 }
 #--
 
-#--
+#
 # MS.TEAMS.1.3v1
 #--
 
@@ -145,7 +145,7 @@ tests contains {
 }
 #--
 
-#--
+#
 # MS.TEAMS.1.4v1
 #--
 
@@ -184,7 +184,7 @@ tests contains {
 }
 #--
 
-#--
+#
 # MS.TEAMS.1.5v1
 #--
 
@@ -223,7 +223,7 @@ tests contains {
 }
 #--
 
-#--
+#
 # MS.TEAMS.1.6v1
 #--
 
@@ -256,7 +256,7 @@ tests contains {
 }
 #--
 
-#--
+#
 # MS.TEAMS.1.7v1
 #--
 
@@ -294,7 +294,7 @@ tests contains {
 # MS.TEAMS.2 #
 ##############
 
-#--
+#
 # MS.TEAMS.2.1v1
 #--
 
@@ -367,7 +367,7 @@ tests contains {
 }
 #--
 
-#--
+#
 # MS.TEAMS.2.3v1
 #--
 
@@ -399,7 +399,7 @@ tests contains {
 # MS.TEAMS.3 #
 ##############
 
-#--
+#
 # MS.TEAMS.3.1v1
 #--
 
@@ -431,7 +431,7 @@ tests contains {
 # MS.TEAMS.4 #
 ##############
 
-#--
+#
 # MS.TEAMS.4.1v1
 #--
 
@@ -508,7 +508,7 @@ tests contains {
 # MS.TEAMS.5 #
 ##############
 
-#--
+#
 # MS.TEAMS.5.1v1
 #--
 
@@ -535,7 +535,7 @@ tests contains {
 }
 #--
 
-#--
+#
 # MS.TEAMS.5.2v1
 #--
 
@@ -562,7 +562,7 @@ tests contains {
 }
 #--
 
-#--
+#
 # MS.TEAMS.5.3v1
 #--
 #
@@ -595,7 +595,7 @@ tests contains {
 # MS.TEAMS.6 #
 ##############
 
-#--
+#
 # MS.TEAMS.6.1v1
 #--
 
@@ -610,7 +610,7 @@ tests contains {
 }
 #--
 
-#--
+#
 # MS.TEAMS.6.2v1
 #--
 
@@ -630,7 +630,7 @@ tests contains {
 # MS.TEAMS.7 #
 ##############
 
-#--
+#
 # MS.TEAMS.7.1v1
 #--
 
@@ -645,7 +645,7 @@ tests contains {
 }
 #--
 
-#--
+#
 # MS.TEAMS.7.2v1
 #--
 
@@ -665,7 +665,7 @@ tests contains {
 # MS.TEAMS.8 #
 ##############
 
-#--
+#
 # MS.TEAMS.8.1v1
 #--
 
@@ -680,7 +680,7 @@ tests contains {
 }
 #--
 
-#--
+#
 # MS.TEAMS.8.2v1
 #--
 

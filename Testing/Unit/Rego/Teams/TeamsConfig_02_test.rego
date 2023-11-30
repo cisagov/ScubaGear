@@ -3,7 +3,7 @@ import future.keywords
 import data.teams
 
 
-#--
+#
 # Policy MS.TEAMS.2.1v1
 #--
 test_AllowFederatedUsers_Correct_V1 if {
@@ -210,8 +210,9 @@ test_AllowedDomains_Incorrect_multi if {
     not RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "2 meeting policy(ies) that allow external access across all domains: Global, Tag:AllOn"
 }
-
 #--
+
+#
 # Policy MS.TEAMS.2.2v1
 #--
 test_AllowTeamsConsumerInbound_Correct_V1 if {
@@ -394,6 +395,8 @@ test_AllowTeamsConsumer_Incorrect_multi if {
     RuleOutput[0].ReportDetails == "Requirement met"
 }
 #--
+
+#
 # Policy MS.TEAMS.2.3v1
 #--
 test_AllowTeamsConsumer_Correct if {
@@ -485,4 +488,4 @@ test_AllowTeamsConsumer_Incorrect_multi if {
     not RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "2 Internal users are enabled to initiate contact with unmanaged users across domains: Global, Tag:AllOn"
 }
-
+#--

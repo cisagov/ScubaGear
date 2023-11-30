@@ -3,7 +3,7 @@ import future.keywords
 import data.teams
 
 
-#--
+#
 # Policy MS.TEAMS.3.1v1
 #--
 test_AllowPublicUsers_Correct if {
@@ -89,3 +89,4 @@ test_AllowPublicUsers_InCorrect_multi if {
     not RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "2 domains that allows contact with Skype users: Global, Tag:AllOn"
 }
+#--

@@ -3,7 +3,7 @@ import future.keywords
 import data.teams
 
 
-#--
+#
 # Policy MS.TEAMS.1.1v1
 #--
 test_ExternalParticipantControl_Correct_V1 if {
@@ -106,8 +106,9 @@ test_ExternalParticipantControl_MultiplePolicies if {
     # hence the "contains" instead of a simple "=="
     contains(RuleOutput[0].ReportDetails, "Tag:SecondCustomPolicy")
 }
-
 #--
+
+#
 # Policy MS.TEAMS.1.2v1
 #--
 test_AnonymousMeetingStart_Correct_V1 if {
@@ -215,8 +216,9 @@ test_AnonymousMeetingStart_MultiplePolicies if {
     # hence the "contains" instead of a simple "=="
     contains(RuleOutput[0].ReportDetails, "Tag:SecondCustomPolicy")
 }
-
 #--
+
+#
 # Policy MS.TEAMS.1.3v1
 #--
 test_meeting_policies_Correct if {
@@ -304,8 +306,9 @@ test_Multiple_Correct if {
     RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "Requirement met"
 }
-
 #--
+
+#
 # Policy MS.TEAMS.1.4v1
 #--
 test_AutoAdmittedUsers_Correct_V1 if {
@@ -383,8 +386,9 @@ test_AutoAdmittedUsers_Incorrect_V3 if {
     not RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "Requirement not met"
 }
-
 #--
+
+#
 # Policy MS.TEAMS.1.5v1
 #--
 test_meeting_policies_Correct if {
@@ -451,8 +455,9 @@ test_AllowPSTNUsersToBypassLobby_Incorrect if {
     not RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "1 meeting policy(ies) found that allow everyone or dial-in users to bypass lobby: Tag:CustomPolicy"
 }
-
 #--
+
+#
 # Policy MS.TEAMS.1.6v1
 #--
 test_AllowCloudRecording_Correct if {
@@ -516,8 +521,9 @@ test_AllowCloudRecording_Multiple if {
     RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "Requirement met"
 }
-
 #--
+
+#
 # Policy MS.TEAMS.1.7v1
 #--
 test_BroadcastRecordingMode_Correct if {
@@ -581,3 +587,4 @@ test_BroadcastRecordingMode_Multiple if {
     RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "Requirement met"
 }
+#--

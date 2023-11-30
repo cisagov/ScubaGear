@@ -3,7 +3,7 @@ import future.keywords
 import data.teams
 
 
-#--
+#
 # Policy MS.TEAMS.4.1v1
 #--
 test_AllowEmailIntoChannel_Correct_V1 if {
@@ -309,3 +309,4 @@ test_AllowEmailIntoChannel_Correct_V4_multi if {
     RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "N/A: Feature is unavailable in GCC environments"
 }
+#--

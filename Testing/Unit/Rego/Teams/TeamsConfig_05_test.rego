@@ -2,7 +2,8 @@ package teams_test
 import future.keywords
 import data.teams
 
-#--
+
+#
 # MS.TEAMS.5.1v1
 #--
 test_DefaultCatalogAppsType_Correct_V1 if {
@@ -111,7 +112,7 @@ test_DefaultCatalogAppsType_Multiple if {
 }
 #--
 
-#--
+#
 # MS.TEAMS.5.2v1
 #--
 test_GlobalCatalogAppsType_Correct_V1 if {
@@ -220,7 +221,7 @@ test_GlobalCatalogAppsType_Multiple if {
 }
 #--
 
-#--
+#
 # MS.TEAMS.5.3v1
 #--
 test_PrivateCatalogAppsType_Correct_V1 if {
