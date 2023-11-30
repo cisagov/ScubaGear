@@ -12,6 +12,15 @@ FAIL := ReportDetailsBoolean(false)
 
 PASS := ReportDetailsBoolean(true)
 
+# Values in json for slider sharepoint/onedrive sharing settings
+ONLYPEOPLEINORG := 0
+
+EXISTINGGUESTS := 3
+
+NEWANDEXISTINGGUESTS := 1
+
+ANYONE := 2
+
 FilterArray(Conditions, Boolean) := [Condition | some Condition in Conditions; Condition == Boolean]
 
 ###################
@@ -21,11 +30,6 @@ FilterArray(Conditions, Boolean) := [Condition | some Condition in Conditions; C
 #
 # MS.SHAREPOINT.1.1v1
 #--
-
-# SharingCapability == 0 Only People In Organization
-# SharingCapability == 3 Existing Guests
-# SharingCapability == 1 New and Existing Guests
-# SharingCapability == 2 Anyone
 
 # If SharingCapability is set to Only People In Organization
 # OR Existing Guests, the policy should pass.
@@ -40,8 +44,8 @@ tests contains {
     some TenantPolicy in input.SPO_tenant
     SharingCapability := TenantPolicy.SharingCapability
     Conditions := [
-        SharingCapability == 0,
-        SharingCapability == 3
+        SharingCapability == ONLYPEOPLEINORG,
+        SharingCapability == EXISTINGGUESTS
     ]
     Status := count(FilterArray(Conditions, true)) == 1
 }
@@ -50,11 +54,6 @@ tests contains {
 #
 # MS.SHAREPOINT.1.2v1
 #--
-
-# OneDriveSharingCapability == 0 Only People In Organization
-# OneDriveSharingCapability == 3 Existing Guests
-# OneDriveSharingCapability == 1 New and Existing Guests
-# OneDriveSharingCapability == 2 Anyone
 
 # If OneDriveSharingCapability is set to Only People In Organization
 # OR Existing Guests, the policy should pass.
@@ -70,8 +69,8 @@ tests contains {
     OneDriveSharingCapability := TenantPolicy.OneDriveSharingCapability
     input.OneDrive_PnP_Flag == false
     Conditions := [
-        OneDriveSharingCapability == 0,
-        OneDriveSharingCapability == 3
+        OneDriveSharingCapability == ONLYPEOPLEINORG,
+        OneDriveSharingCapability == EXISTINGGUESTS
     ]
     Status := count(FilterArray(Conditions, true)) == 1
 }
@@ -107,17 +106,17 @@ NoteArray := [
 NOTESTRING := concat(" ", NoteArray)
 
 Domainlist(TenantPolicy) := Description if {
-    TenantPolicy.SharingCapability == 0
+    TenantPolicy.SharingCapability == ONLYPEOPLEINORG
     Description := "Requirement met: external sharing is set to Only People In Organization"
 }
 
 Domainlist(TenantPolicy) := concat(": ", [PASS, NOTESTRING]) if {
-    TenantPolicy.SharingCapability != 0
+    TenantPolicy.SharingCapability != ONLYPEOPLEINORG
     TenantPolicy.SharingDomainRestrictionMode == 1
 }
 
 Domainlist(TenantPolicy) := concat(": ", [FAIL, NOTESTRING]) if {
-    TenantPolicy.SharingCapability != 0
+    TenantPolicy.SharingCapability != ONLYPEOPLEINORG
     TenantPolicy.SharingDomainRestrictionMode != 1
 }
 
@@ -137,7 +136,7 @@ tests contains {
 } if {
     some TenantPolicy in input.SPO_tenant
     Conditions := [
-        TenantPolicy.SharingCapability == 0,
+        TenantPolicy.SharingCapability == ONLYPEOPLEINORG,
         TenantPolicy.SharingDomainRestrictionMode == 1
     ]
     Status := count(FilterArray(Conditions, true)) == 1
@@ -164,7 +163,7 @@ tests contains {
 } if {
     some TenantPolicy in input.SPO_tenant
     Conditions := [
-        TenantPolicy.SharingCapability == 0,
+        TenantPolicy.SharingCapability == ONLYPEOPLEINORG,
         TenantPolicy.RequireAcceptingAccountMatchInvitedAccount == true
     ]
     Status := count(FilterArray(Conditions, true)) >= 1
@@ -227,8 +226,8 @@ tests contains {
 # OR Existing Guests, the policy should pass.
 ExternalUserExpireInDays(TenantPolicy) := ["", true] if {
     Conditions := [
-        TenantPolicy.SharingCapability == 0,
-        TenantPolicy.SharingCapability == 3
+        TenantPolicy.SharingCapability == ONLYPEOPLEINORG,
+        TenantPolicy.SharingCapability == EXISTINGGUESTS
     ]
     count(FilterArray(Conditions, true)) == 1
 }
@@ -238,9 +237,10 @@ ExternalUserExpireInDays(TenantPolicy) := ["", true] if {
 # in 30 days or less, the policy should pass, else fail.
 # The error message is concatanated by 2 steps to insert the
 # result of ReportBoolean in front, & the setting in the middle.
-SHARINGCAPABILITY := "New and Existing Guests" if input.SPO_tenant[_].SharingCapability == 1
+SHARINGCAPABILITY := "New and Existing Guests" if
+    input.SPO_tenant[_].SharingCapability == NEWANDEXISTINGGUESTS
 
-SHARINGCAPABILITY := "Anyone" if input.SPO_tenant[_].SharingCapability == 2
+SHARINGCAPABILITY := "Anyone" if input.SPO_tenant[_].SharingCapability == ANYONE
 
 ERRSTRING := concat(" ", [
     "External Sharing is set to",
@@ -250,8 +250,8 @@ ERRSTRING := concat(" ", [
 
 ExternalUserExpireInDays(TenantPolicy) := [concat(": ", [FAIL, ERRSTRING]), Status] if {
     Conditions := [
-        TenantPolicy.SharingCapability == 1,
-        TenantPolicy.SharingCapability == 2
+        TenantPolicy.SharingCapability == NEWANDEXISTINGGUESTS,
+        TenantPolicy.SharingCapability == ANYONE
     ]
     count(FilterArray(Conditions, true)) > 0
     Status := TenantPolicy.RequireAnonymousLinksExpireInDays <= 30
@@ -337,13 +337,13 @@ VERIFICATIONSTRING := "Expiration timer for 'People who use a verification code'
 
 # If Sharing set to Only People In Org, pass
 ExpirationTimersVerificationCode(TenantPolicy) := ["", true] if {
-    TenantPolicy.SharingCapability == 0
+    TenantPolicy.SharingCapability == ONLYPEOPLEINORG
 }
 
 # If Sharing NOT set to Only People In Org, reathentication enabled,
 # & reauth sent to <= 30 days, pass
 ExpirationTimersVerificationCode(TenantPolicy) := ["", true] if {
-    TenantPolicy.SharingCapability != 0
+    TenantPolicy.SharingCapability != ONLYPEOPLEINORG
     TenantPolicy.EmailAttestationRequired == true
     TenantPolicy.EmailAttestationReAuthDays <= 30
 }
@@ -351,7 +351,7 @@ ExpirationTimersVerificationCode(TenantPolicy) := ["", true] if {
 # If Sharing NOT set to Only People In Org & reathentication disbled,
 # fail
 ExpirationTimersVerificationCode(TenantPolicy) := [ErrMsg, false] if {
-    TenantPolicy.SharingCapability != 0
+    TenantPolicy.SharingCapability != ONLYPEOPLEINORG
     TenantPolicy.EmailAttestationRequired == false
     TenantPolicy.EmailAttestationReAuthDays <= 30
     ErrMsg := concat(": ", [FAIL, concat(" ", [VERIFICATIONSTRING, "enabled"])])
@@ -359,7 +359,7 @@ ExpirationTimersVerificationCode(TenantPolicy) := [ErrMsg, false] if {
 
 # If Sharing NOT set to Only People In Org & reauth sent to > 30 days, fail
 ExpirationTimersVerificationCode(TenantPolicy) := [ErrMsg, false] if {
-    TenantPolicy.SharingCapability != 0
+    TenantPolicy.SharingCapability != ONLYPEOPLEINORG
     TenantPolicy.EmailAttestationRequired == true
     TenantPolicy.EmailAttestationReAuthDays > 30
     ErrMsg := concat(": ", [FAIL, concat(" ", [VERIFICATIONSTRING, "set to 30 days"])])
@@ -368,7 +368,7 @@ ExpirationTimersVerificationCode(TenantPolicy) := [ErrMsg, false] if {
 # If Sharing NOT set to Only People In Org, reathentication disabled,
 # & reauth sent to > 30 days, fail
 ExpirationTimersVerificationCode(TenantPolicy) := [ErrMsg, false] if {
-    TenantPolicy.SharingCapability != 0
+    TenantPolicy.SharingCapability != ONLYPEOPLEINORG
     TenantPolicy.EmailAttestationRequired == false
     TenantPolicy.EmailAttestationReAuthDays > 30
     ErrMsg := concat(": ", [FAIL, concat(" ", [VERIFICATIONSTRING, "enabled and set to >30 days"])])
