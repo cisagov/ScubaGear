@@ -213,6 +213,7 @@ tests contains {
     some TenantPolicy in input.SPO_tenant
     Status := TenantPolicy.DefaultLinkPermission == 1
 }
+#--
 
 ###################
 # MS.SHAREPOINT.3 #
@@ -275,6 +276,7 @@ tests contains {
 
 #
 # MS.SHAREPOINT.3.2v1
+#--
 
 # Create Repot Detatils string based on File link type & Folder link type
 PERMISSIONSTRING := "are not limited to view for Anyone"
@@ -389,6 +391,7 @@ tests contains {
     some TenantPolicy in input.SPO_tenant
     [ErrMsg, Status] := ExpirationTimersVerificationCode(TenantPolicy)
 }
+#--
 
 ###################
 # MS.SHAREPOINT.4 #
