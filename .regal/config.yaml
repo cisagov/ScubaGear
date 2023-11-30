@@ -28,6 +28,9 @@ rules:
         - pattern: '^[a-z\.]+$'
           targets:
             - package
+        - pattern: '^[a-z\.]+_test$'
+          targets:
+            - package
   idiomatic:
     # https://docs.styra.com/regal/rules/idiomatic/no-defined-entrypoint
     no-defined-entrypoint:
@@ -86,7 +89,7 @@ rules:
     rule-length:
       level: warning
       max-rule-length: 30
-      count-comments: false      
+      count-comments: false
     # https://docs.styra.com/regal/rules/style/todo-comment
     todo-comment:
       level: ignore
