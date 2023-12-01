@@ -21,21 +21,11 @@ jobs:
       run:
         shell: powershell 
     steps:
-    - name: Checkout repo code
+    - name: Checkout Repo
       uses: actions/checkout@v3
-    - name: Check for SharePoint test
-      id: check_files
-      uses: andstor/file-existence-action@v2
-      with:
-        files: "./Testing/Functional/Products/Tests/sharepoint-commercial.ps1"
-    - name: File exists
-      if: steps.check_files.outputs.files_exists == 'true'
-      # Only runs if all of the files exists
-      run: Write-Host "SharePoint file exists!"
-    - name: Setup
+    - name: Run Setup
       run: "./SetUp.ps1"
     - name: Install Selenium
       run: "./Testing/Functional/SmokeTest/UpdateSelenium.ps1"
     - name: Test SharePoint
-      run: |
-        .\Testing\Functional\Products\Tests\sharepoint-commercial.ps1 FD6219CFBF937830616E43DF9C81BCF7D22FE03F
+      run: ".\Testing\Functional\Products\Tests\sharepoint-commercial.ps1 FD6219CFBF937830616E43DF9C81BCF7D22FE03F"
