@@ -22,12 +22,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          path: src
-      - name: latest-tag 
-        uses: actions-ecosystem/action-get-latest-tag@v1
-        id: LatestTag 
-        with:
-          semver_only: true   
+          path: src  
       - name: Load Deploy Utilities
         run: . src/utils/DeployUtils.ps1  
       - name: Register private PowerShell package repository
