@@ -34,7 +34,7 @@ jobs:
           $DebugPreference = "Continue" 
           New-PrivateGallery -GalleryName $env:GalleryName -Trusted
 
-          Publish-ScubaGearModule -Path PowerShell/ScubaGear -Repository $env:GalleryName -ModuleVersion '1.0.0'
+          Publish-ScubaGearModule -ModulePath PowerShell/ScubaGear -GalleryName $env:GalleryName -ModuleVersion '1.0.0'
       - name: Test Module Publish
         run: |
           Invoke-Pester src/Testing/Functional/BuildTest/ModuleBuildTests.ps1 
