@@ -38,7 +38,7 @@ jobs:
       - name: Test Module Publish
         run: |
           echo "${{ steps.latest-tag.outputs.tag}}"
-          echo "${{ GITHUB_CONTEXT }}"
+          echo "${{ $env:GITHUB_CONTEXT }}"
   # Call-Smoke-Test:
   #   needs: Publish-Private-Package
   #   uses: ./.github/workflows/run_smoke_test.yaml
