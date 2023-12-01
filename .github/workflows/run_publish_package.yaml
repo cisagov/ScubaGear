@@ -25,11 +25,12 @@ jobs:
           path: src  
       - name: Publish ScubaGear module to private repository
         run: |
+          cd src
           $sha = $(git rev-parse --short HEAD)
           $sha
-          . src/utils/DeployUtils.ps1  
+          . utils/DeployUtils.ps1  
           New-PrivateGallery -GalleryName $env:GalleryName -Trusted
-          Publish-ScubaGearModule -Path src/PowerShell/ScubaGear -Repository $env:GalleryName -ModuleVersion '1.0.0'
+          Publish-ScubaGearModule -Path PowerShell/ScubaGear -Repository $env:GalleryName -ModuleVersion '1.0.0'
       - name: Test Module Publish
         run: |
           Invoke-Pester src/Testing/Functional/BuildTest/ModuleBuildTests.ps1 
