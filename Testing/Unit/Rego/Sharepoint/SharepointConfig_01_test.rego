@@ -180,8 +180,6 @@ test_SharingDomainRestrictionMode_Correct_V2 if {
 }
 
 test_SharingDomainRestrictionMode_Incorrect if {
-    PolicyId := "MS.SHAREPOINT.1.3v1"
-
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
