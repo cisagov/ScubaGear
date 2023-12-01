@@ -173,6 +173,7 @@ function IsRegistered{
         $RepoName = 'PrivateScubaGearGallery'
     )
 
+    Write-Debug "Looking for $RepoName local repository"
     $Repo = Get-PSRepository -Name $RepoName 2> $null
     return $null -ne $Repo
 }
