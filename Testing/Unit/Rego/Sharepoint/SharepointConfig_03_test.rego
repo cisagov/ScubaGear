@@ -1,15 +1,34 @@
 package sharepoint_test
 import future.keywords
 import data.sharepoint
+import data.report.utils.ReportDetailsBoolean
 import data.report.utils.NotCheckedDetails
 
+
+CorrectTestResult(PolicyId, Output, ReportDetailString) := true if {
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet == true
+    RuleOutput[0].ReportDetails == ReportDetailString
+} else := false
+
+IncorrectTestResult(PolicyId, Output, ReportDetailString) := true if {
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet == false
+    RuleOutput[0].ReportDetails == ReportDetailString
+} else := false
+
+FAIL := ReportDetailsBoolean(false)
+
+PASS := ReportDetailsBoolean(true)
 
 #
 # MS.SHAREPOINT.3.1v1
 #--
 test_ExternalUserExpireInDays_Correct_V1 if {
-    PolicyId := "MS.SHAREPOINT.3.1v1"
-
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
@@ -19,16 +38,10 @@ test_ExternalUserExpireInDays_Correct_V1 if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == true
-    RuleOutput[0].ReportDetails == "Requirement met"
+    CorrectTestResult("MS.SHAREPOINT.3.1v1", Output, PASS) == true
 }
 
 test_ExternalUserExpireInDays_Correct_V2 if {
-    PolicyId := "MS.SHAREPOINT.3.1v1"
-
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
@@ -38,16 +51,10 @@ test_ExternalUserExpireInDays_Correct_V2 if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == true
-    RuleOutput[0].ReportDetails == "Requirement met"
+    CorrectTestResult("MS.SHAREPOINT.3.1v1", Output, PASS) == true
 }
 
 test_ExternalUserExpireInDays_Correct_V3 if {
-    PolicyId := "MS.SHAREPOINT.3.1v1"
-
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
@@ -57,16 +64,10 @@ test_ExternalUserExpireInDays_Correct_V3 if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == true
-    RuleOutput[0].ReportDetails == "Requirement met"
+    CorrectTestResult("MS.SHAREPOINT.3.1v1", Output, PASS) == true
 }
 
 test_ExternalUserExpireInDays_Correct_V4 if {
-    PolicyId := "MS.SHAREPOINT.3.1v1"
-
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
@@ -76,16 +77,10 @@ test_ExternalUserExpireInDays_Correct_V4 if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == true
-    RuleOutput[0].ReportDetails == "Requirement met"
+    CorrectTestResult("MS.SHAREPOINT.3.1v1", Output, PASS) == true
 }
 
 test_ExternalUserExpireInDays_Incorrect if {
-    PolicyId := "MS.SHAREPOINT.3.1v1"
-
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
@@ -95,16 +90,11 @@ test_ExternalUserExpireInDays_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == false
-    RuleOutput[0].ReportDetails == "Requirement not met: External Sharing is set to New and Existing Guests and expiration date is not 30 days or less"
+    ReportDetailString := "Requirement not met: External Sharing is set to New and Existing Guests and expiration date is not 30 days or less"
+    IncorrectTestResult("MS.SHAREPOINT.3.1v1", Output, ReportDetailString) == true
 }
 
 test_ExternalUserExpireInDays_Incorrect_V2 if {
-    PolicyId := "MS.SHAREPOINT.3.1v1"
-
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
@@ -114,11 +104,8 @@ test_ExternalUserExpireInDays_Incorrect_V2 if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == false
-    RuleOutput[0].ReportDetails == "Requirement not met: External Sharing is set to Anyone and expiration date is not 30 days or less"
+    ReportDetailString := "Requirement not met: External Sharing is set to Anyone and expiration date is not 30 days or less"
+    IncorrectTestResult("MS.SHAREPOINT.3.1v1", Output, ReportDetailString) == true
 }
 #--
 
@@ -126,8 +113,6 @@ test_ExternalUserExpireInDays_Incorrect_V2 if {
 # MS.SHAREPOINT.3.2v1
 #--
 test_AnonymousLinkType_Correct if {
-    PolicyId := "MS.SHAREPOINT.3.2v1"
-
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
@@ -138,16 +123,10 @@ test_AnonymousLinkType_Correct if {
         "OneDrive_PnP_Flag": false
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == true
-    RuleOutput[0].ReportDetails == "Requirement met"
+    CorrectTestResult("MS.SHAREPOINT.3.2v1", Output, PASS) == true
 }
 
 test_AnonymousLinkType_Incorrect_V1 if {
-    PolicyId := "MS.SHAREPOINT.3.2v1"
-
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
@@ -158,16 +137,11 @@ test_AnonymousLinkType_Incorrect_V1 if {
         "OneDrive_PnP_Flag": false
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == false
-    RuleOutput[0].ReportDetails == "Requirement not met: both files and folders are not limited to view for Anyone"
+    ReportDetailString := "Requirement not met: both files and folders are not limited to view for Anyone"
+    IncorrectTestResult("MS.SHAREPOINT.3.2v1", Output, ReportDetailString) == true
 }
 
 test_AnonymousLinkType_Incorrect_V2 if {
-    PolicyId := "MS.SHAREPOINT.3.2v1"
-
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
@@ -178,16 +152,11 @@ test_AnonymousLinkType_Incorrect_V2 if {
         "OneDrive_PnP_Flag": false
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == false
-    RuleOutput[0].ReportDetails == "Requirement not met: folders are not limited to view for Anyone"
+    ReportDetailString := "Requirement not met: folders are not limited to view for Anyone"
+    IncorrectTestResult("MS.SHAREPOINT.3.2v1", Output, ReportDetailString) == true
 }
 
 test_AnonymousLinkType_Incorrect_V3 if {
-    PolicyId := "MS.SHAREPOINT.3.2v1"
-
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
@@ -198,11 +167,8 @@ test_AnonymousLinkType_Incorrect_V3 if {
         "OneDrive_PnP_Flag": false
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == false
-    RuleOutput[0].ReportDetails == "Requirement not met: files are not limited to view for Anyone"
+    ReportDetailString := "Requirement not met: files are not limited to view for Anyone"
+    IncorrectTestResult("MS.SHAREPOINT.3.2v1", Output, ReportDetailString) == true
 }
 
 test_UsingServicePrincipal if {
@@ -218,20 +184,13 @@ test_UsingServicePrincipal if {
         "OneDrive_PnP_Flag": true
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == false
-    RuleOutput[0].Criticality == "Should/Not-Implemented"
-    RuleOutput[0].ReportDetails == NotCheckedDetails(PolicyId)
+    IncorrectTestResult(PolicyId, Output, NotCheckedDetails(PolicyId)) == true
 }
 
 #
 # MS.SHAREPOINT.3.3v1
 #--
 test_SharingCapability_Correct if {
-    PolicyId := "MS.SHAREPOINT.3.3v1"
-
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
@@ -242,16 +201,10 @@ test_SharingCapability_Correct if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == true
-    RuleOutput[0].ReportDetails == "Requirement met"
+    CorrectTestResult("MS.SHAREPOINT.3.3v1", Output, PASS) == true
 }
 
 test_SharingCapability_Correct_V4 if {
-    PolicyId := "MS.SHAREPOINT.3.3v1"
-
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
@@ -262,16 +215,10 @@ test_SharingCapability_Correct_V4 if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == true
-    RuleOutput[0].ReportDetails == "Requirement met"
+    CorrectTestResult("MS.SHAREPOINT.3.3v1", Output, PASS) == true
 }
 
 test_EmailAttestationReAuthDays_Correct if {
-    PolicyId := "MS.SHAREPOINT.3.3v1"
-
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
@@ -282,16 +229,10 @@ test_EmailAttestationReAuthDays_Correct if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == true
-    RuleOutput[0].ReportDetails == "Requirement met"
+    CorrectTestResult("MS.SHAREPOINT.3.3v1", Output, PASS) == true
 }
 
 test_Multi_Incorrect_V1 if {
-    PolicyId := "MS.SHAREPOINT.3.3v1"
-
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
@@ -302,16 +243,11 @@ test_Multi_Incorrect_V1 if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == false
-    RuleOutput[0].ReportDetails == "Requirement not met: Expiration timer for 'People who use a verification code' NOT enabled and set to >30 days"
+    ReportDetailString := "Requirement not met: Expiration timer for 'People who use a verification code' NOT enabled and set to >30 days"
+    IncorrectTestResult("MS.SHAREPOINT.3.3v1", Output, ReportDetailString) == true
 }
 
 test_EmailAttestationRequired_Incorrect_V2 if {
-    PolicyId := "MS.SHAREPOINT.3.3v1"
-
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
@@ -322,16 +258,11 @@ test_EmailAttestationRequired_Incorrect_V2 if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == false
-    RuleOutput[0].ReportDetails == "Requirement not met: Expiration timer for 'People who use a verification code' NOT enabled"
+    ReportDetailString := "Requirement not met: Expiration timer for 'People who use a verification code' NOT enabled"
+    IncorrectTestResult("MS.SHAREPOINT.3.3v1", Output, ReportDetailString) == true
 }
 
 test_EmailAttestationReAuthDays_Incorrect_V3 if {
-    PolicyId := "MS.SHAREPOINT.3.3v1"
-
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
@@ -342,10 +273,7 @@ test_EmailAttestationReAuthDays_Incorrect_V3 if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == false
-    RuleOutput[0].ReportDetails == "Requirement not met: Expiration timer for 'People who use a verification code' NOT set to 30 days"
+    ReportDetailString := "Requirement not met: Expiration timer for 'People who use a verification code' NOT set to 30 days"
+    IncorrectTestResult("MS.SHAREPOINT.3.3v1", Output, ReportDetailString) == true
 }
 #--

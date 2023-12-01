@@ -1,15 +1,34 @@
 package sharepoint_test
 import future.keywords
 import data.sharepoint
+import data.report.utils.ReportDetailsBoolean
 import data.report.utils.NotCheckedDetails
 
+
+CorrectTestResult(PolicyId, Output, ReportDetailString) := true if {
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet == true
+    RuleOutput[0].ReportDetails == ReportDetailString
+} else := false
+
+IncorrectTestResult(PolicyId, Output, ReportDetailString) := true if {
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet == false
+    RuleOutput[0].ReportDetails == ReportDetailString
+} else := false
+
+FAIL := ReportDetailsBoolean(false)
+
+PASS := ReportDetailsBoolean(true)
 
 #
 # MS.SHAREPOINT.1.1v1
 #--
 test_SharingCapability_Correct_V1 if {
-    PolicyId := "MS.SHAREPOINT.1.1v1"
-
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
@@ -18,16 +37,10 @@ test_SharingCapability_Correct_V1 if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == true
-    RuleOutput[0].ReportDetails == "Requirement met"
+    CorrectTestResult("MS.SHAREPOINT.1.1v1", Output, PASS) == true
 }
 
 test_SharingCapability_Correct_V2 if {
-    PolicyId := "MS.SHAREPOINT.1.1v1"
-
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
@@ -36,16 +49,10 @@ test_SharingCapability_Correct_V2 if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == true
-    RuleOutput[0].ReportDetails == "Requirement met"
+    CorrectTestResult("MS.SHAREPOINT.1.1v1", Output, PASS) == true
 }
 
 test_SharingCapability_Incorrect_V1 if {
-    PolicyId := "MS.SHAREPOINT.1.1v1"
-
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
@@ -54,16 +61,10 @@ test_SharingCapability_Incorrect_V1 if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == false
-    RuleOutput[0].ReportDetails == "Requirement not met"
+    IncorrectTestResult("MS.SHAREPOINT.1.1v1", Output, FAIL) == true
 }
 
 test_SharingCapability_Incorrect_V2 if {
-    PolicyId := "MS.SHAREPOINT.1.1v1"
-
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
@@ -72,11 +73,7 @@ test_SharingCapability_Incorrect_V2 if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == false
-    RuleOutput[0].ReportDetails == "Requirement not met"
+    IncorrectTestResult("MS.SHAREPOINT.1.1v1", Output, FAIL) == true
 }
 #--
 
@@ -84,8 +81,6 @@ test_SharingCapability_Incorrect_V2 if {
 # MS.SHAREPOINT.1.2v1
 #--
 test_OneDriveSharingCapability_Correct_V1 if {
-    PolicyId := "MS.SHAREPOINT.1.2v1"
-
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
@@ -95,16 +90,10 @@ test_OneDriveSharingCapability_Correct_V1 if {
         "OneDrive_PnP_Flag": false
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == true
-    RuleOutput[0].ReportDetails == "Requirement met"
+    CorrectTestResult("MS.SHAREPOINT.1.2v1", Output, PASS) == true
 }
 
 test_OneDriveSharingCapability_Correct_V2 if {
-    PolicyId := "MS.SHAREPOINT.1.2v1"
-
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
@@ -114,11 +103,7 @@ test_OneDriveSharingCapability_Correct_V2 if {
         "OneDrive_PnP_Flag": false
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == true
-    RuleOutput[0].ReportDetails == "Requirement met"
+    CorrectTestResult("MS.SHAREPOINT.1.2v1", Output, PASS) == true
 }
 
 test_UsingServicePrincipal if {
@@ -133,17 +118,10 @@ test_UsingServicePrincipal if {
         "OneDrive_PnP_Flag": true
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == false
-    RuleOutput[0].Criticality == "Should/Not-Implemented"
-    RuleOutput[0].ReportDetails == NotCheckedDetails(PolicyId)
+    IncorrectTestResult(PolicyId, Output, NotCheckedDetails(PolicyId)) == true
 }
 
 test_OneDriveSharingCapability_Incorrect_V1 if {
-    PolicyId := "MS.SHAREPOINT.1.2v1"
-
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
@@ -153,16 +131,10 @@ test_OneDriveSharingCapability_Incorrect_V1 if {
         "OneDrive_PnP_Flag": false
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == false
-    RuleOutput[0].ReportDetails == "Requirement not met"
+    IncorrectTestResult("MS.SHAREPOINT.1.2v1", Output, FAIL) == true
 }
 
 test_OneDriveSharingCapability_Incorrect_V2 if {
-    PolicyId := "MS.SHAREPOINT.1.2v1"
-
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
@@ -172,11 +144,7 @@ test_OneDriveSharingCapability_Incorrect_V2 if {
         "OneDrive_PnP_Flag": false
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == false
-    RuleOutput[0].ReportDetails == "Requirement not met"
+    IncorrectTestResult("MS.SHAREPOINT.1.2v1", Output, FAIL) == true
 }
 #--
 
@@ -184,8 +152,6 @@ test_OneDriveSharingCapability_Incorrect_V2 if {
 # MS.SHAREPOINT.1.3v1
 #--
 test_SharingDomainRestrictionMode_Correct_V1 if {
-    PolicyId := "MS.SHAREPOINT.1.3v1"
-
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
@@ -195,16 +161,11 @@ test_SharingDomainRestrictionMode_Correct_V1 if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == true
-    RuleOutput[0].ReportDetails == "Requirement met: external sharing is set to Only People In Organization"
+    ReportDetailString := "Requirement met: external sharing is set to Only People In Organization"
+    CorrectTestResult("MS.SHAREPOINT.1.3v1", Output, ReportDetailString) == true
 }
 
 test_SharingDomainRestrictionMode_Correct_V2 if {
-    PolicyId := "MS.SHAREPOINT.1.3v1"
-
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
@@ -214,11 +175,8 @@ test_SharingDomainRestrictionMode_Correct_V2 if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == true
-    RuleOutput[0].ReportDetails == "Requirement met: Note that we currently only check for approved external domains. Approved security groups are currently not being checked, see the baseline policy for instructions on a manual check."
+    ReportDetailString := "Requirement met: Note that we currently only check for approved external domains. Approved security groups are currently not being checked, see the baseline policy for instructions on a manual check."
+    CorrectTestResult("MS.SHAREPOINT.1.3v1", Output, ReportDetailString) == true
 }
 
 test_SharingDomainRestrictionMode_Incorrect if {
@@ -233,11 +191,8 @@ test_SharingDomainRestrictionMode_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == false
-    RuleOutput[0].ReportDetails =="Requirement not met: Note that we currently only check for approved external domains. Approved security groups are currently not being checked, see the baseline policy for instructions on a manual check."
+    ReportDetailString :="Requirement not met: Note that we currently only check for approved external domains. Approved security groups are currently not being checked, see the baseline policy for instructions on a manual check."
+    IncorrectTestResult("MS.SHAREPOINT.1.3v1", Output, ReportDetailString) == true
 }
 #--
 
@@ -245,8 +200,6 @@ test_SharingDomainRestrictionMode_Incorrect if {
 # MS.SHAREPOINT.1.4v1
 #--
 test_SameAccount_Correct_V1 if {
-    PolicyId := "MS.SHAREPOINT.1.4v1"
-
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
@@ -256,16 +209,10 @@ test_SameAccount_Correct_V1 if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == true
-    RuleOutput[0].ReportDetails == "Requirement met"
+    CorrectTestResult("MS.SHAREPOINT.1.4v1", Output, PASS) == true
 }
 
 test_SameAccount_Correct_V3 if {
-    PolicyId := "MS.SHAREPOINT.1.4v1"
-
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
@@ -275,16 +222,10 @@ test_SameAccount_Correct_V3 if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == true
-    RuleOutput[0].ReportDetails == "Requirement met"
+    CorrectTestResult("MS.SHAREPOINT.1.4v1", Output, PASS) == true
 }
 
 test_SameAccount_Correct_V2 if {
-    PolicyId := "MS.SHAREPOINT.1.4v1"
-
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
@@ -294,16 +235,10 @@ test_SameAccount_Correct_V2 if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == true
-    RuleOutput[0].ReportDetails == "Requirement met"
+    CorrectTestResult("MS.SHAREPOINT.1.4v1", Output, PASS) == true
 }
 
 test_SameAccount_Incorrect if {
-    PolicyId := "MS.SHAREPOINT.1.4v1"
-
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
@@ -313,10 +248,6 @@ test_SameAccount_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == false
-    RuleOutput[0].ReportDetails == "Requirement not met"
+    IncorrectTestResult("MS.SHAREPOINT.1.4v1", Output, FAIL) == true
 }
 #--

@@ -23,8 +23,6 @@ Test names will use the syntax `test_mainVar_In/correct_*V#` to support brevity 
 
 ```
 test_ExampleVar_Correct_V1 if {
-    PolicyId := "MS.<Product>.<Policy Group #>.<Policy #>v<Version #>"
-
     Output := <Product>.tests with input as {
         "example_policies" : [
             {
@@ -34,11 +32,7 @@ test_ExampleVar_Correct_V1 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == true
-    RuleOutput[0].ReportDetails == "Example output"
+    CorrectTestResult("MS.<Product>.<Policy Group #>.<Policy #>v<Version #>", Output, "ReportDetailString") == true
 }
 
 test_ExampleVar_Correct_V2 if {
@@ -46,8 +40,6 @@ test_ExampleVar_Correct_V2 if {
 }
 
 test_ExampleVar_Incorrect if {
-    PolicyId := "MS.<Product>.<Policy Group #>.<Policy #>v<Version #>"
-
     Output := <Product>.tests with input as {
         "example_policies" : [
             {
@@ -57,11 +49,7 @@ test_ExampleVar_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == false
-    RuleOutput[0].ReportDetails == "Example output"
+    IncorrectTestResult("MS.<Product>.<Policy Group #>.<Policy #>v<Version #>", Output, "ReportDetailString") == true
 }
 ```
 
@@ -104,11 +92,7 @@ test_NotImplemented_Correct if {
 
     Output := <Product>.tests with input as { }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == false
-    RuleOutput[0].ReportDetails == NotCheckedDetails(PolicyId)
+    IncorrectTestResult(PolicyId, Output, NotCheckedDetails(PolicyId)) == true
 }
 ```
 ```
@@ -117,11 +101,7 @@ test_3rdParty_Correct_V1 if {
 
     Output := <Product>.tests with input as { }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == false
-    RuleOutput[0].ReportDetails == DefenderMirrorDetails(PolicyId)
+    IncorrectTestResult(PolicyId, Output, DefenderMirrorDetails(PolicyId)) == true
 }
 ```
 
@@ -139,19 +119,13 @@ One True Brace - requires that every braceable statement should have the opening
 
 ```
 test_Example_Correct if {
-    PolicyId := "MS.<Product>.<Policy Group #>.<Policy #>v<Version #>"
-
     Output := <Product>.tests with input as {
         "example_tag" : {
             "ExampleVar" : false
         }
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == true
-    RuleOutput[0].ReportDetails == "Requirement met"
+    CorrectTestResult("MS.<Product>.<Policy Group #>.<Policy #>v<Version #>", Output, "ReportDetailString") == true
 }
 ```
 

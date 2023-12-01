@@ -1,8 +1,29 @@
 package sharepoint_test
 import future.keywords
 import data.sharepoint
+import data.report.utils.ReportDetailsBoolean
 import data.report.utils.NotCheckedDetails
 
+
+CorrectTestResult(PolicyId, Output, ReportDetailString) := true if {
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet == true
+    RuleOutput[0].ReportDetails == ReportDetailString
+} else := false
+
+IncorrectTestResult(PolicyId, Output, ReportDetailString) := true if {
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet == false
+    RuleOutput[0].ReportDetails == ReportDetailString
+} else := false
+
+FAIL := ReportDetailsBoolean(false)
+
+PASS := ReportDetailsBoolean(true)
 
 #
 # MS.SHAREPOINT.4.1v1
@@ -12,11 +33,7 @@ test_NotImplemented_Correct if {
 
     Output := sharepoint.tests with input as { }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == false
-    RuleOutput[0].ReportDetails == NotCheckedDetails(PolicyId)
+    IncorrectTestResult(PolicyId, Output, NotCheckedDetails(PolicyId)) == true
 }
 #--
 
@@ -24,8 +41,6 @@ test_NotImplemented_Correct if {
 # MS.SHAREPOINT.4.2v1
 #--
 test_DenyAddAndCustomizePages_Correct if {
-    PolicyId := "MS.SHAREPOINT.4.2v1"
-
     Output := sharepoint.tests with input as {
         "SPO_site": [
             {
@@ -34,16 +49,10 @@ test_DenyAddAndCustomizePages_Correct if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == true
-    RuleOutput[0].ReportDetails == "Requirement met"
+    CorrectTestResult("MS.SHAREPOINT.4.2v1", Output, PASS) == true
 }
 
 test_DenyAddAndCustomizePages_Incorrect if {
-    PolicyId := "MS.SHAREPOINT.4.2v1"
-
     Output := sharepoint.tests with input as {
         "SPO_site": [
             {
@@ -52,10 +61,6 @@ test_DenyAddAndCustomizePages_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == false
-    RuleOutput[0].ReportDetails == "Requirement not met"
+    IncorrectTestResult("MS.SHAREPOINT.4.2v1", Output, FAIL) == true
 }
 #--
