@@ -11,7 +11,6 @@ name: Publish Package
 env:
   GalleryName: PrivateScubaGearGallery
   ModuleName: ScubaGear
-  GITHUB_CONTEXT: ${{ toJson(github) }}
 
 jobs:
   Publish-Private-Package:
@@ -34,11 +33,12 @@ jobs:
       - name: Register private PowerShell package repository
         run: New-PrivateGallery -GalleryName $env:GalleryName -Trusted
       - name: Publish ScubaGear Module 
-        run: Publish-Module -Path src/PowerShell/ScubaGear -Repository $env:GalleryName
+        run: Publish-ScubaGearModule -Path src/PowerShell/ScubaGear -Repository $env:GalleryName -ModuleVersion '1.0.0'
       - name: Test Module Publish
         run: |
+          sha = $(git rev-parse --short HEAD)
           echo "${{ steps.latest-tag.outputs.tag}}"
-          echo "${{ $env:GITHUB_CONTEXT }}"
+          echo "${{ sha }}"
   # Call-Smoke-Test:
   #   needs: Publish-Private-Package
   #   uses: ./.github/workflows/run_smoke_test.yaml
