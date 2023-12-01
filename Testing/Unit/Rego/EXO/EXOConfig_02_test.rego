@@ -12,10 +12,10 @@ test_NotImplemented_Correct if {
 
     Output := exo.tests with input as { }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
+    RuleOutput[0].RequirementMet == false
     RuleOutput[0].ReportDetails == NotCheckedDetails(PolicyId)
 }
 #--
@@ -29,17 +29,19 @@ test_Rdata_Correct if {
     Output := exo.tests with input as {
         "spf_records": [
             {
-                "rdata" : ["v=spf1 "],
-                "domain" : "Test name"
+                "rdata": [
+                    "v=spf1 "
+                ],
+                "domain": "Test name"
             }
         ]
     }
 
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
+    RuleOutput[0].RequirementMet == true
     RuleOutput[0].ReportDetails == "Requirement met"
 }
 
@@ -49,16 +51,18 @@ test_Rdata_Correct_V2 if {
     Output := exo.tests with input as {
         "spf_records": [
             {
-                "rdata" : ["v=spf1 something"],
-                "domain" : "Test name"
+                "rdata": [
+                    "v=spf1 something"
+                ],
+                "domain": "Test name"
             }
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
+    RuleOutput[0].RequirementMet == true
     RuleOutput[0].ReportDetails == "Requirement met"
 }
 
@@ -68,16 +72,18 @@ test_Rdata_Incorrect if {
     Output := exo.tests with input as {
         "spf_records": [
             {
-                "rdata" : ["spf1 "],
-                "domain" : "Test name"
+                "rdata": [
+                    "spf1 "
+                ],
+                "domain": "Test name"
             }
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
+    RuleOutput[0].RequirementMet == false
     RuleOutput[0].ReportDetails == "1 of 1 agency domain(s) found in violation: Test name"
 }
 
@@ -87,16 +93,18 @@ test_Rdata_Incorrect_V2 if {
     Output := exo.tests with input as {
         "spf_records": [
             {
-                "rdata" : [""],
-                "domain" : "Test name"
+                "rdata": [
+                    ""
+                ],
+                "domain": "Test name"
             }
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
+    RuleOutput[0].RequirementMet == false
     RuleOutput[0].ReportDetails == "1 of 1 agency domain(s) found in violation: Test name"
 }
 
@@ -106,24 +114,30 @@ test_Rdata_Incorrect_V3 if {
     Output := exo.tests with input as {
         "spf_records": [
             {
-                "rdata" : ["v=spf1 "],
-                "domain" : "good.com"
+                "rdata": [
+                    "v=spf1 "
+                ],
+                "domain": "good.com"
             },
             {
-                "rdata" : [""],
-                "domain" : "bad.com"
+                "rdata": [
+                    ""
+                ],
+                "domain": "bad.com"
             },
             {
-                "rdata" : [""],
-                "domain" : "2bad.com"
+                "rdata": [
+                    ""
+                ],
+                "domain": "2bad.com"
             }
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
+    RuleOutput[0].RequirementMet == false
     contains(RuleOutput[0].ReportDetails, "2 of 3 agency domain(s) found in violation: ")
     startswith(RuleOutput[0].ReportDetails, "2 of 3 agency domain(s) found in violation: ")
     contains(RuleOutput[0].ReportDetails, "bad.com") # I'm not sure
@@ -139,16 +153,19 @@ test_Rdata_Multiple_Correct_V1 if {
     Output := exo.tests with input as {
         "spf_records": [
             {
-                "rdata" : ["v=spf1 ", "extra stuff that shouldn't matter"],
-                "domain" : "good.com"
-            },
+                "rdata": [
+                    "v=spf1 ",
+                    "extra stuff that shouldn't matter"
+                ],
+                "domain": "good.com"
+            }
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
+    RuleOutput[0].RequirementMet == true
     RuleOutput[0].ReportDetails == "Requirement met"
 }
 
@@ -158,16 +175,19 @@ test_Rdata_Multiple_Correct_V2 if {
     Output := exo.tests with input as {
         "spf_records": [
             {
-                "rdata" : ["extra stuff that shouldn't matter", "v=spf1 "],
-                "domain" : "good.com"
-            },
+                "rdata": [
+                    "extra stuff that shouldn't matter",
+                    "v=spf1 "
+                ],
+                "domain": "good.com"
+            }
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
+    RuleOutput[0].RequirementMet == true
     RuleOutput[0].ReportDetails == "Requirement met"
 }
 
@@ -177,16 +197,19 @@ test_Rdata_Multiple_Incorrect if {
     Output := exo.tests with input as {
         "spf_records": [
             {
-                "rdata" : ["extra stuff that shouldn't matter", "hello world"],
-                "domain" : "bad.com"
-            },
+                "rdata": [
+                    "extra stuff that shouldn't matter",
+                    "hello world"
+                ],
+                "domain": "bad.com"
+            }
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
+    RuleOutput[0].RequirementMet == false
     RuleOutput[0].ReportDetails == "1 of 1 agency domain(s) found in violation: bad.com"
 }
 #--

@@ -12,38 +12,38 @@ test_IPAllowList_Correct_V1 if {
     Output := exo.tests with input as {
         "conn_filter": [
             {
-                "IPAllowList" : [],
+                "IPAllowList": [],
                 "EnableSafeList": false,
-                "Name":"A"
+                "Name": "A"
             }
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
+    RuleOutput[0].RequirementMet == true
     RuleOutput[0].ReportDetails == "Requirement met"
 }
 
+# it shouldn't matter that safe list is enabled
 test_IPAllowList_Correct_V2 if {
     PolicyId := "MS.EXO.12.1v1"
 
     Output := exo.tests with input as {
-        "conn_filter":
-        [
+        "conn_filter": [
             {
-                "IPAllowList" : [],
+                "IPAllowList": [],
                 "EnableSafeList": true,
-                "Name":"A"
-            } # it shouldn't matter that safe list is enabled
+                "Name": "A"
+            }
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
+    RuleOutput[0].RequirementMet == true
     RuleOutput[0].ReportDetails == "Requirement met"
 }
 
@@ -53,17 +53,19 @@ test_IPAllowList_Incorrect if {
     Output := exo.tests with input as {
         "conn_filter": [
             {
-                "IPAllowList" : ["trust.me.please"],
+                "IPAllowList": [
+                    "trust.me.please"
+                ],
                 "EnableSafeList": false,
-                "Name" : "A"
+                "Name": "A"
             }
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
+    RuleOutput[0].RequirementMet == false
     RuleOutput[0].ReportDetails == "1 connection filter polic(ies) with an IP allowlist: A"
 }
 #--
@@ -77,17 +79,17 @@ test_EnableSafeList_Correct_V1 if {
     Output := exo.tests with input as {
         "conn_filter": [
             {
-                "IPAllowList" : [],
+                "IPAllowList": [],
                 "EnableSafeList": false,
-                "Name":"A"
+                "Name": "A"
             }
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
+    RuleOutput[0].RequirementMet == true
     RuleOutput[0].ReportDetails == "Requirement met"
 }
 
@@ -97,17 +99,17 @@ test_EnableSafeList_Incorrect_V1 if {
     Output := exo.tests with input as {
         "conn_filter": [
             {
-                "IPAllowList" : [],
+                "IPAllowList": [],
                 "EnableSafeList": true,
-                "Name" : "A"
+                "Name": "A"
             }
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
+    RuleOutput[0].RequirementMet == false
     RuleOutput[0].ReportDetails == "1 connection filter polic(ies) with a safe list: A"
 }
 
@@ -117,17 +119,19 @@ test_EnableSafeList_Correct_V2 if {
     Output := exo.tests with input as {
         "conn_filter": [
             {
-                "IPAllowList" : ["this.shouldnt.matter"],
+                "IPAllowList": [
+                    "this.shouldnt.matter"
+                ],
                 "EnableSafeList": false,
-                "Name":"A"
+                "Name": "A"
             }
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
+    RuleOutput[0].RequirementMet == true
     RuleOutput[0].ReportDetails == "Requirement met"
 }
 #--

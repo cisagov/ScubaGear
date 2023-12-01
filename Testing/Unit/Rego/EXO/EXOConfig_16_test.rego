@@ -12,10 +12,10 @@ test_3rdParty_Correct_V1 if {
 
     Output := exo.tests with input as { }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
+    RuleOutput[0].RequirementMet == false
     RuleOutput[0].ReportDetails == DefenderMirrorDetails(PolicyId)
 }
 #--
@@ -28,10 +28,10 @@ test_3rdParty_Correct_V2 if {
 
     Output := exo.tests with input as { }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
+    RuleOutput[0].RequirementMet == false
     RuleOutput[0].ReportDetails == DefenderMirrorDetails(PolicyId)
 }
 #--
