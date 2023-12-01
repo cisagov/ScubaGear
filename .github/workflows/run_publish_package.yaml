@@ -50,7 +50,7 @@ jobs:
           }
           $Config = New-PesterConfiguration -Hashtable $PesterConfig 
           Invoke-Pester -Configuration $Config 
-  # Call-Smoke-Test:
-  #   needs: Publish-Private-Package
-  #   uses: ./.github/workflows/run_smoke_test.yaml
+  Call-Smoke-Test:
+    needs: Publish-Private-Package
+    uses: ./.github/workflows/run_smoke_test.yaml
 
