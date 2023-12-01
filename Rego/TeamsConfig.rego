@@ -19,14 +19,14 @@ FAIL := ReportDetailsBoolean(false)
 
 PASS := ReportDetailsBoolean(true)
 
-THIRDPARTYARRAY := [
-    "Custom implementation allowed.",
-    "If you are using Defender to fulfill this requirement,",
-    "run the Defender version of ScubaGear.",
-    "Otherwise, use a 3rd party tool OR manually check."
-]
+# THIRDPARTYARRAY := [
+#     "Custom implementation allowed.",
+#     "If you are using Defender to fulfill this requirement,",
+#     "run the Defender version of ScubaGear.",
+#     "Otherwise, use a 3rd party tool OR manually check."
+# ]
 
-THIRDPARTYSTRING := concat(" ", THIRDPARTYARRAY)
+# THIRDPARTYSTRING := concat(" ", THIRDPARTYARRAY)
 
 
 ##############
