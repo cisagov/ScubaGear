@@ -52,7 +52,7 @@ jobs:
           Invoke-Pester -Configuration $Config 
       - name: Check Scuba Version 
         run: |
-          Imstall-Module -Name ScubaGear
+          Install-Module -Name ScubaGear
           Import-Module -Name ScubaGear
           Invoke-SCuBA -Version
 
