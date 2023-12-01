@@ -10,6 +10,8 @@ name: Publish Package
 
 env:
   GalleryName: PrivateScubaGearGallery
+  ModuleName: ScubaGear
+  GITHUB_CONTEXT: ${{ toJson(github) }}
 
 jobs:
   Publish-Private-Package:
@@ -36,7 +38,7 @@ jobs:
       - name: Test Module Publish
         run: |
           echo "${{ steps.latest-tag.outputs.tag}}"
-          echo "${{ GITHUB_SHA}}"
+          echo "${{ GITHUB_CONTEXT }}"
   # Call-Smoke-Test:
   #   needs: Publish-Private-Package
   #   uses: ./.github/workflows/run_smoke_test.yaml
