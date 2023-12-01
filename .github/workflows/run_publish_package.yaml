@@ -23,17 +23,16 @@ jobs:
         uses: actions/checkout@v4
         with:
           path: src  
-      - name: Load Deploy Utilities
-        run: . src/utils/DeployUtils.ps1  
-      - name: Register private PowerShell package repository
-        run: New-PrivateGallery -GalleryName $env:GalleryName -Trusted
-      - name: Publish ScubaGear Module 
-        run: Publish-ScubaGearModule -Path src/PowerShell/ScubaGear -Repository $env:GalleryName -ModuleVersion '1.0.0'
-      - name: Test Module Publish
+      - name: Publish ScubaGear module to private repository
         run: |
           $sha = $(git rev-parse --short HEAD)
-          echo "${{ steps.latest-tag.outputs.tag}}"
-          echo "$Sha"
+          $sha
+          . src/utils/DeployUtils.ps1  
+          New-PrivateGallery -GalleryName $env:GalleryName -Trusted
+          Publish-ScubaGearModule -Path src/PowerShell/ScubaGear -Repository $env:GalleryName -ModuleVersion '1.0.0'
+      - name: Test Module Publish
+        run: |
+          Invoke-Pester src/Testing/Functional/BuildTest/ModuleBuildTests.ps1 
   # Call-Smoke-Test:
   #   needs: Publish-Private-Package
   #   uses: ./.github/workflows/run_smoke_test.yaml
