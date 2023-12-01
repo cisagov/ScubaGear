@@ -3,6 +3,7 @@ import future.keywords
 import data.report.utils.Format
 import data.report.utils.ReportDetailsBoolean
 import data.report.utils.Description
+import data.report.utils.DefenderMirrorDetails
 
 ReportDetailsArray(true, _, _) := PASS if {}
 
@@ -605,7 +606,7 @@ tests contains {
     "Criticality": "Shall/3rd Party",
     "Commandlet": [],
     "ActualValue": [],
-    "ReportDetails": THIRDPARTYSTRING,
+    "ReportDetails": DefenderMirrorDetails("MS.TEAMS.6.1v1"),
     "RequirementMet": false
 }
 #--
@@ -620,7 +621,7 @@ tests contains {
     "Criticality": "Should/3rd Party",
     "Commandlet": [],
     "ActualValue": [],
-    "ReportDetails": THIRDPARTYSTRING,
+    "ReportDetails": DefenderMirrorDetails("MS.TEAMS.6.2v1"),
     "RequirementMet": false
 }
 #--
@@ -640,7 +641,7 @@ tests contains {
     "Criticality": "Should/3rd Party",
     "Commandlet": [],
     "ActualValue": [],
-    "ReportDetails": THIRDPARTYSTRING,
+    "ReportDetails": DefenderMirrorDetails("MS.TEAMS.7.1v1"),
     "RequirementMet": false
 }
 #--
@@ -655,7 +656,7 @@ tests contains {
     "Criticality": "Should/3rd Party",
     "Commandlet": [],
     "ActualValue": [],
-    "ReportDetails": THIRDPARTYSTRING,
+    "ReportDetails": DefenderMirrorDetails("MS.TEAMS.7.2v1"),
     "RequirementMet": false
 }
 #--
@@ -675,7 +676,7 @@ tests contains {
     "Criticality": "Should/3rd Party",
     "Commandlet": [],
     "ActualValue": [],
-    "ReportDetails": THIRDPARTYSTRING,
+    "ReportDetails": DefenderMirrorDetails("MS.TEAMS.8.1v1"),
     "RequirementMet": false
 }
 #--
@@ -690,7 +691,7 @@ tests contains {
     "Criticality": "Should/3rd Party",
     "Commandlet": [],
     "ActualValue": [],
-    "ReportDetails": THIRDPARTYSTRING,
+    "ReportDetails": DefenderMirrorDetails("MS.TEAMS.8.2v1"),
     "RequirementMet": false
 }
 #--
