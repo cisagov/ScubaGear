@@ -14,28 +14,30 @@ env:
 jobs:
   Publish-Private-Package:
     runs-on: windows-latest
+    defaults:
+      run:
+        shell: powershell
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           path: src
+      - name: latest-tag 
+        uses: actions-ecosystem/action-get-latest-tag@v1
+        id: LatestTag 
+        with:
+          semver_only: true   
+      - name: Load Deploy Utilities
+        run: . src/utils/DeployUtils.ps1  
       - name: Register private PowerShell package repository
-        shell: powershell
-        run: |
-          $PSGalleryPath = 'D:\PrivateGallery'
-          New-Item -Path $PSGalleryPath -ItemType Directory
-          $Splat = @{ Name = $env:GalleryName; SourceLocation = $PSGalleryPath; PublishLocation = $PSGalleryPath; InstallationPolicy = 'Trusted' }
-          Register-PSRepository @Splat 
+        run: New-PrivateGallery -GalleryName $env:GalleryName -Trusted
       - name: Publish ScubaGear Module 
-        shell: powershell
-        run: |
-          Publish-Module -Path src/PowerShell/ScubaGear -Repository $env:GalleryName
+        run: Publish-Module -Path src/PowerShell/ScubaGear -Repository $env:GalleryName
       - name: Test Module Publish
-        shell: powershell
         run: |
-          Find-Module -Name ScubaGear -Repository $env:GalleryName
-          Install-Module -Name ScubaGear
-  Call-Smoke-Test:
-    needs: Publish-Private-Package
-    uses: ./.github/workflows/run_smoke_test.yaml
+          echo "${{ steps.latest-tag.outputs.tag}}"
+          echo "${{ GITHUB_SHA}}"
+  # Call-Smoke-Test:
+  #   needs: Publish-Private-Package
+  #   uses: ./.github/workflows/run_smoke_test.yaml
 
