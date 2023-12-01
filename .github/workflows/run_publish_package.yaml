@@ -37,7 +37,19 @@ jobs:
           Publish-ScubaGearModule -ModulePath PowerShell/ScubaGear -GalleryName $env:GalleryName -ModuleVersion '1.0.0'
       - name: Test Module Publish
         run: |
-          Invoke-Pester src/Testing/Functional/BuildTest/ModuleBuildTests.ps1 
+          Get-Location
+          $TestContainers = @()
+          $TestContainers += New-PesterContainer -Path "src/Testing/Functional/BuildTest" -Data @{ ModuleVersion = "1.0.0" }
+          $PesterConfig = @{
+            Run = @{
+              Container = $TestContainers
+            }
+            Output = @{
+              Verbosity = 'Detailed'
+            }
+          }
+          $Config = New-PesterConfiguration -Hashtable $PesterConfig 
+          Invoke-Pester -Configuration $Config 
   # Call-Smoke-Test:
   #   needs: Publish-Private-Package
   #   uses: ./.github/workflows/run_smoke_test.yaml
