@@ -25,7 +25,7 @@ jobs:
           path: src  
       - name: Publish ScubaGear module to private repository
         run: |
-          $PSVersionTable
+          Get-PSRepository | fl
           cd src
           $sha = $(git rev-parse --short HEAD)
           $sha
