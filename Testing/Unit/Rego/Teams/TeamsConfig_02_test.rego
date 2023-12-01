@@ -30,7 +30,7 @@ test_AllowFederatedUsers_Correct_V1 if {
         "federation_configuration": [
             {
                 "Identity": "Global",
-                "AllowFederatedUsers" : false,
+                "AllowFederatedUsers": false,
                 "AllowedDomains": []
             }
         ]
@@ -44,10 +44,12 @@ test_AllowFederatedUsers_Correct_V2 if {
         "federation_configuration": [
             {
                 "Identity": "Global",
-                "AllowFederatedUsers" : false,
+                "AllowFederatedUsers": false,
                 "AllowedDomains": [
                     {
-                        "AllowedDomain": ["Domain=test365.cisa.dhs.gov"]
+                        "AllowedDomain": [
+                            "Domain=test365.cisa.dhs.gov"
+                        ]
                     }
                 ]
             }
@@ -59,13 +61,15 @@ test_AllowFederatedUsers_Correct_V2 if {
 
 test_AllowedDomains_Correct if {
     Output := teams.tests with input as {
-        "federation_configuration":[
+        "federation_configuration": [
             {
                 "Identity": "Global",
-                "AllowFederatedUsers" : true,
+                "AllowFederatedUsers": true,
                 "AllowedDomains": [
                     {
-                        "AllowedDomain": ["Domain=test365.cisa.dhs.gov"]
+                        "AllowedDomain": [
+                            "Domain=test365.cisa.dhs.gov"
+                        ]
                     }
                 ]
             }
@@ -80,7 +84,7 @@ test_AllowedDomains_Incorrect if {
         "federation_configuration": [
             {
                 "Identity": "Global",
-                "AllowFederatedUsers" : true,
+                "AllowFederatedUsers": true,
                 "AllowedDomains": []
             }
         ]
@@ -95,12 +99,12 @@ test_AllowFederatedUsers_Correct_V1_multi if {
         "federation_configuration": [
             {
                 "Identity": "Global",
-                "AllowFederatedUsers" : false,
+                "AllowFederatedUsers": false,
                 "AllowedDomains": []
             },
             {
                 "Identity": "Tag:AllOn",
-                "AllowFederatedUsers" : false,
+                "AllowFederatedUsers": false,
                 "AllowedDomains": []
             }
         ]
@@ -114,19 +118,23 @@ test_AllowFederatedUsers_Correct_V2_multi if {
         "federation_configuration": [
             {
                 "Identity": "Global",
-                "AllowFederatedUsers" : false,
+                "AllowFederatedUsers": false,
                 "AllowedDomains": [
                     {
-                        "AllowedDomain": ["Domain=test365.cisa.dhs.gov"]
+                        "AllowedDomain": [
+                            "Domain=test365.cisa.dhs.gov"
+                        ]
                     }
                 ]
             },
             {
                 "Identity": "Tag:AllOn",
-                "AllowFederatedUsers" : false,
+                "AllowFederatedUsers": false,
                 "AllowedDomains": [
                     {
-                        "AllowedDomain": ["Domain=test365.cisa.dhs.gov"]
+                        "AllowedDomain": [
+                            "Domain=test365.cisa.dhs.gov"
+                        ]
                     }
                 ]
             }
@@ -139,22 +147,26 @@ test_AllowFederatedUsers_Correct_V2_multi if {
 
 test_AllowedDomains_Correct_multi if {
     Output := teams.tests with input as {
-        "federation_configuration":[
+        "federation_configuration": [
             {
                 "Identity": "Global",
-                "AllowFederatedUsers" : true,
+                "AllowFederatedUsers": true,
                 "AllowedDomains": [
                     {
-                        "AllowedDomain": ["Domain=test365.cisa.dhs.gov"]
+                        "AllowedDomain": [
+                            "Domain=test365.cisa.dhs.gov"
+                        ]
                     }
                 ]
             },
             {
                 "Identity": "Tag:AllOn",
-                "AllowFederatedUsers" : true,
+                "AllowFederatedUsers": true,
                 "AllowedDomains": [
                     {
-                        "AllowedDomain": ["Domain=test365.cisa.dhs.gov"]
+                        "AllowedDomain": [
+                            "Domain=test365.cisa.dhs.gov"
+                        ]
                     }
                 ]
             }
@@ -166,15 +178,15 @@ test_AllowedDomains_Correct_multi if {
 
 test_AllowedDomains_Incorrect_multi if {
     Output := teams.tests with input as {
-        "federation_configuration":[
+        "federation_configuration": [
             {
                 "Identity": "Global",
-                "AllowFederatedUsers" : true,
+                "AllowFederatedUsers": true,
                 "AllowedDomains": []
             },
             {
                 "Identity": "Tag:AllOn",
-                "AllowFederatedUsers" : true,
+                "AllowFederatedUsers": true,
                 "AllowedDomains": []
             }
         ]
@@ -193,7 +205,7 @@ test_AllowTeamsConsumerInbound_Correct_V1 if {
         "federation_configuration": [
             {
                 "Identity": "Global",
-                "AllowTeamsConsumer" : false,
+                "AllowTeamsConsumer": false,
                 "AllowTeamsConsumerInbound": false
             }
         ]
@@ -207,12 +219,12 @@ test_AllowTeamsConsumerInbound_Correct_V1_multi if {
         "federation_configuration": [
             {
                 "Identity": "Global",
-                "AllowTeamsConsumer" : false,
+                "AllowTeamsConsumer": false,
                 "AllowTeamsConsumerInbound": false
             },
             {
                 "Identity": "Tag:AllOn",
-                "AllowTeamsConsumer" : false,
+                "AllowTeamsConsumer": false,
                 "AllowTeamsConsumerInbound": false
             }
         ]
@@ -226,7 +238,7 @@ test_AllowTeamsConsumerInbound_Correct_V2 if {
         "federation_configuration": [
             {
                 "Identity": "Global",
-                "AllowTeamsConsumer" : false,
+                "AllowTeamsConsumer": false,
                 "AllowTeamsConsumerInbound": true
             }
         ]
@@ -240,12 +252,12 @@ test_AllowTeamsConsumerInbound_Correct_V2_multi if {
         "federation_configuration": [
             {
                 "Identity": "Global",
-                "AllowTeamsConsumer" : false,
+                "AllowTeamsConsumer": false,
                 "AllowTeamsConsumerInbound": true
             },
             {
                 "Identity": "Tag:AllOn",
-                "AllowTeamsConsumer" : false,
+                "AllowTeamsConsumer": false,
                 "AllowTeamsConsumerInbound": true
             }
         ]
@@ -259,7 +271,7 @@ test_AllowTeamsConsumer_Incorrect if {
         "federation_configuration": [
             {
                 "Identity": "Global",
-                "AllowTeamsConsumer" : true,
+                "AllowTeamsConsumer": true,
                 "AllowTeamsConsumerInbound": true
             }
         ]
@@ -274,12 +286,12 @@ test_AllowTeamsConsumer_Incorrect_multi if {
         "federation_configuration": [
             {
                 "Identity": "Global",
-                "AllowTeamsConsumer" : true,
+                "AllowTeamsConsumer": true,
                 "AllowTeamsConsumerInbound": true
             },
             {
                 "Identity": "Tag:AllOn",
-                "AllowTeamsConsumer" : true,
+                "AllowTeamsConsumer": true,
                 "AllowTeamsConsumerInbound": true
             }
         ]
@@ -294,7 +306,7 @@ test_AllowTeamsConsumer_Correct if {
         "federation_configuration": [
             {
                 "Identity": "Global",
-                "AllowTeamsConsumer" : true,
+                "AllowTeamsConsumer": true,
                 "AllowTeamsConsumerInbound": false
             }
         ]
@@ -308,12 +320,12 @@ test_AllowTeamsConsumer_Correct_multi if {
         "federation_configuration": [
             {
                 "Identity": "Global",
-                "AllowTeamsConsumer" : true,
+                "AllowTeamsConsumer": true,
                 "AllowTeamsConsumerInbound": false
             },
             {
                 "Identity": "Tag:AllOn",
-                "AllowTeamsConsumer" : true,
+                "AllowTeamsConsumer": true,
                 "AllowTeamsConsumerInbound": false
             }
         ]
@@ -331,7 +343,7 @@ test_AllowTeamsConsumer_Correct if {
         "federation_configuration": [
             {
                 "Identity": "Global",
-                "AllowTeamsConsumer" : false,
+                "AllowTeamsConsumer": false,
                 "AllowTeamsConsumerInbound": false # the value here doesn't matter for this control
             }
         ]
@@ -345,12 +357,12 @@ test_AllowTeamsConsumer_Correct_multi if {
         "federation_configuration": [
             {
                 "Identity": "Global",
-                "AllowTeamsConsumer" : false,
+                "AllowTeamsConsumer": false,
                 "AllowTeamsConsumerInbound": false # the value here doesn't matter for this control
             },
             {
                 "Identity": "Tag:AllOn",
-                "AllowTeamsConsumer" : false,
+                "AllowTeamsConsumer": false,
                 "AllowTeamsConsumerInbound": false # the value here doesn't matter for this control
             }
         ]
@@ -364,7 +376,7 @@ test_AllowTeamsConsumer_Incorrect if {
         "federation_configuration": [
             {
                 "Identity": "Global",
-                "AllowTeamsConsumer" : true,
+                "AllowTeamsConsumer": true,
                 "AllowTeamsConsumerInbound": false # the value here doesn't matter for this control
             }
         ]
@@ -379,12 +391,12 @@ test_AllowTeamsConsumer_Incorrect_multi if {
         "federation_configuration": [
             {
                 "Identity": "Global",
-                "AllowTeamsConsumer" : true,
+                "AllowTeamsConsumer": true,
                 "AllowTeamsConsumerInbound": false # the value here doesn't matter for this control
             },
             {
                 "Identity": "Tag:AllOn",
-                "AllowTeamsConsumer" : true,
+                "AllowTeamsConsumer": true,
                 "AllowTeamsConsumerInbound": false # the value here doesn't matter for this control
             }
         ]

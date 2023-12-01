@@ -32,7 +32,7 @@ test_ExternalParticipantControl_Correct_V1 if {
         "meeting_policies": [
             {
                 "Identity": "Global",
-                "AllowExternalParticipantGiveRequestControl" : false
+                "AllowExternalParticipantGiveRequestControl": false
             }
         ]
     }
@@ -42,12 +42,12 @@ test_ExternalParticipantControl_Correct_V1 if {
 
 test_ExternalParticipantControl_Correct_V2 if {
     Output := teams.tests with input as {
-    "meeting_policies": [
-        {
-            "Identity": "Tag:FirstCustomPolicy",
-            "AllowExternalParticipantGiveRequestControl" : false
-        }
-    ]
+        "meeting_policies": [
+            {
+                "Identity": "Tag:FirstCustomPolicy",
+                "AllowExternalParticipantGiveRequestControl": false
+            }
+        ]
     }
 
     CorrectTestResult("MS.TEAMS.1.1v1", Output, PASS) == true
@@ -58,7 +58,7 @@ test_ExternalParticipantControl_Incorrect_V1 if {
         "meeting_policies": [
             {
                 "Identity": "Global",
-                "AllowExternalParticipantGiveRequestControl" : true
+                "AllowExternalParticipantGiveRequestControl": true
             }
         ]
     }
@@ -72,7 +72,7 @@ test_ExternalParticipantControl_Incorrect_V2 if {
         "meeting_policies": [
             {
                 "Identity": "Tag:FirstCustomPolicy",
-                "AllowExternalParticipantGiveRequestControl" : true
+                "AllowExternalParticipantGiveRequestControl": true
             }
         ]
     }
@@ -87,15 +87,15 @@ test_ExternalParticipantControl_MultiplePolicies if {
         "meeting_policies": [
             {
                 "Identity": "Global",
-                "AllowExternalParticipantGiveRequestControl" : true
+                "AllowExternalParticipantGiveRequestControl": true
             },
             {
                 "Identity": "Tag:FirstCustomPolicy",
-                "AllowExternalParticipantGiveRequestControl" : false
+                "AllowExternalParticipantGiveRequestControl": false
             },
             {
                 "Identity": "Tag:SecondCustomPolicy",
-                "AllowExternalParticipantGiveRequestControl" : true
+                "AllowExternalParticipantGiveRequestControl": true
             }
         ]
     }
@@ -120,7 +120,7 @@ test_AnonymousMeetingStart_Correct_V1 if {
         "meeting_policies": [
             {
                 "Identity": "Global",
-                "AllowAnonymousUsersToStartMeeting" : false
+                "AllowAnonymousUsersToStartMeeting": false
             }
         ]
     }
@@ -133,7 +133,7 @@ test_AnonymousMeetingStart_Correct_V2 if {
         "meeting_policies": [
             {
                 "Identity": "Tag:FirstCustomPolicy",
-                "AllowAnonymousUsersToStartMeeting" : false
+                "AllowAnonymousUsersToStartMeeting": false
             }
         ]
     }
@@ -146,7 +146,7 @@ test_AnonymousMeetingStart_Incorrect_V1 if {
         "meeting_policies": [
             {
                 "Identity": "Global",
-                "AllowAnonymousUsersToStartMeeting" : true
+                "AllowAnonymousUsersToStartMeeting": true
             }
         ]
     }
@@ -160,7 +160,7 @@ test_AnonymousMeetingStart_Incorrect_V2 if {
         "meeting_policies": [
             {
                 "Identity": "Tag:FirstCustomPolicy",
-                "AllowAnonymousUsersToStartMeeting" : true
+                "AllowAnonymousUsersToStartMeeting": true
             }
         ]
     }
@@ -176,15 +176,15 @@ test_AnonymousMeetingStart_MultiplePolicies if {
         "meeting_policies": [
             {
                 "Identity": "Global",
-                "AllowAnonymousUsersToStartMeeting" : true
+                "AllowAnonymousUsersToStartMeeting": true
             },
             {
                 "Identity": "Tag:FirstCustomPolicy",
-                "AllowAnonymousUsersToStartMeeting" : false
+                "AllowAnonymousUsersToStartMeeting": false
             },
             {
                 "Identity": "Tag:SecondCustomPolicy",
-                "AllowAnonymousUsersToStartMeeting" : true
+                "AllowAnonymousUsersToStartMeeting": true
             }
         ]
     }
@@ -277,7 +277,7 @@ test_AutoAdmittedUsers_Correct_V1 if {
         "meeting_policies": [
             {
                 "Identity": "Global",
-                "AutoAdmittedUsers" : "EveryoneInSameAndFederatedCompany"
+                "AutoAdmittedUsers": "EveryoneInSameAndFederatedCompany"
             }
         ]
     }
@@ -290,7 +290,7 @@ test_AutoAdmittedUsers_Correct_V2 if {
         "meeting_policies": [
             {
                 "Identity": "Global",
-                "AutoAdmittedUsers" : "EveryoneInCompanyExcludingGuests"
+                "AutoAdmittedUsers": "EveryoneInCompanyExcludingGuests"
             }
         ]
     }
@@ -303,7 +303,7 @@ test_AutoAdmittedUsers_Incorrect_V2 if {
         "meeting_policies": [
             {
                 "Identity": "Global",
-                "AutoAdmittedUsers" : "OrganizerOnly"
+                "AutoAdmittedUsers": "OrganizerOnly"
             }
         ]
     }
@@ -316,7 +316,7 @@ test_AutoAdmittedUsers_Incorrect_V3 if {
         "meeting_policies": [
             {
                 "Identity": "Global",
-                "AutoAdmittedUsers" : "InvitedUsers"
+                "AutoAdmittedUsers": "InvitedUsers"
             }
         ]
     }
@@ -456,7 +456,7 @@ test_BroadcastRecordingMode_Incorrect if {
     IncorrectTestResult("MS.TEAMS.1.7v1", Output, FAIL) == true
 }
 
-
+# Ignores non global identities
 test_BroadcastRecordingMode_Multiple if {
     Output := teams.tests with input as {
         "broadcast_policies": [
@@ -465,7 +465,7 @@ test_BroadcastRecordingMode_Multiple if {
                 "BroadcastRecordingMode": "UserOverride"
             },
             {
-                "Identity": "Tag:TestPolicy", # Should be ignored
+                "Identity": "Tag:TestPolicy",
                 "BroadcastRecordingMode": "AlwaysRecord"
             }
         ]

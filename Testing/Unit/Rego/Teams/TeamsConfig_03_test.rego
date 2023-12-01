@@ -30,7 +30,7 @@ test_AllowPublicUsers_Correct if {
         "federation_configuration": [
             {
                 "Identity": "Global",
-                "AllowPublicUsers" : false
+                "AllowPublicUsers": false
             }
         ]
     }
@@ -43,7 +43,7 @@ test_AllowPublicUsers_Incorrect if {
         "federation_configuration": [
             {
                 "Identity": "Global",
-                "AllowPublicUsers" : true
+                "AllowPublicUsers": true
             }
         ]
     }
@@ -57,11 +57,11 @@ test_AllowPublicUsers_Correct_multi if {
         "federation_configuration": [
             {
                 "Identity": "Global",
-                "AllowPublicUsers" : false
+                "AllowPublicUsers": false
             },
             {
                 "Identity": "Tag:AllOn",
-                "AllowPublicUsers" : false
+                "AllowPublicUsers": false
             }
         ]
     }
@@ -74,11 +74,11 @@ test_AllowPublicUsers_Incorrect_multi if {
         "federation_configuration": [
             {
                 "Identity": "Global",
-                "AllowPublicUsers" : true
+                "AllowPublicUsers": true
             },
             {
                 "Identity": "Tag:AllOn",
-                "AllowPublicUsers" : true
+                "AllowPublicUsers": true
             }
         ]
     }
