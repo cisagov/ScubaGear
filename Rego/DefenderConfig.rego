@@ -8,6 +8,7 @@ import data.defender.utils.SensitiveAccountsSetting
 import data.defender.utils.ImpersonationProtection
 import data.defender.utils.ImpersonationProtectionConfig
 
+
 # Example usage and output:
 # GenerateArrayString([1,2], "numbers found:") ->
 # 2 numbers found: 1, 2
@@ -96,7 +97,6 @@ tests contains {
     Conditions := [IsStandardEnabled, IsStrictEnabled]
     Status := count([Condition | some Condition in Conditions; Condition == false]) == 0
 }
-
 #--
 
 #
@@ -142,7 +142,6 @@ tests contains {
     Conditions := [IsStandardAll, IsStrictAll]
     Status := count([Condition | some Condition in Conditions; Condition == true]) > 0
 }
-
 #--
 
 #
@@ -168,7 +167,6 @@ tests contains {
     Conditions := [IsStandardAll, IsStrictAll]
     Status := count([Condition | some Condition in Conditions; Condition == true]) > 0
 }
-
 #--
 
 #
@@ -193,7 +191,6 @@ tests contains {
 } if {
     Status := count(ProtectionPolicyForSensitiveIDs) == 1
 }
-
 #--
 
 #
@@ -218,7 +215,6 @@ tests contains {
 } if {
     Status := count(ATPPolicyForSensitiveIDs) == 1
 }
-
 #--
 
 #
@@ -268,7 +264,6 @@ tests contains {
     ]
     Status := count([x | some x in Conditions; x == false]) == 0
 }
-
 #--
 
 #
@@ -300,7 +295,6 @@ tests contains {
     ]
     Status := count([x | some x in Conditions; x == false]) == 0
 }
-
 #--
 
 #
@@ -328,7 +322,6 @@ tests contains {
     ]
     Status := count([x | some x in Conditions; x == false]) == 0
 }
-
 #--
 
 #
@@ -355,7 +348,6 @@ tests contains {
     Policies := ATPPolicies
     Status := count(Policies) > 0
 }
-
 #--
 
 #
@@ -540,7 +532,6 @@ tests contains {
     ]
     Status := count([Condition | some Condition in Conditions; Condition == true]) == 2
 }
-
 #--
 
 #
@@ -579,7 +570,6 @@ tests contains {
     ]
     Status := count([Condition | some Condition in Conditions; Condition == true]) == 2
 }
-
 #--
 
 #
@@ -594,7 +584,6 @@ tests contains {
     "ReportDetails": NotCheckedDetails("MS.DEFENDER.4.5v1"),
     "RequirementMet": false
 }
-
 #--
 
 #
@@ -609,7 +598,6 @@ tests contains {
     "ReportDetails": NotCheckedDetails("MS.DEFENDER.4.6v1"),
     "RequirementMet": false
 }
-
 #--
 
 #
@@ -643,7 +631,6 @@ tests contains {
     ErrorMessage := "disabled required alert(s) found:"
     Status := count(MissingAlerts) == 0
 }
-
 #--
 
 #
@@ -658,7 +645,6 @@ tests contains {
     "ReportDetails": NotCheckedDetails("MS.DEFENDER.5.2v1"),
     "RequirementMet": false
 }
-
 #--
 
 #
@@ -683,7 +669,6 @@ tests contains {
 } if {
     Status := count(CorrectLogConfigs) >= 1
 }
-
 #--
 
 #
@@ -700,7 +685,6 @@ tests contains {
     "ReportDetails": NotCheckedDetails("MS.DEFENDER.6.2v1"),
     "RequirementMet": false
 }
-
 #--
 
 #
@@ -718,5 +702,4 @@ tests contains {
     "ReportDetails": NotCheckedDetails("MS.DEFENDER.6.3v1"),
     "RequirementMet": false
 }
-
 #--

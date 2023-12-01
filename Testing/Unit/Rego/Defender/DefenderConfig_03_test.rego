@@ -2,6 +2,7 @@ package defender_test
 import future.keywords
 import data.defender
 
+
 #
 # Policy 1
 #--
@@ -46,3 +47,4 @@ import data.defender
 #     not RuleOutput[0].RequirementMet
 #     RuleOutput[0].ReportDetails == "Requirement not met"
 # }
+#--

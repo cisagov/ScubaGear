@@ -2,6 +2,7 @@ package defender_test
 import future.keywords
 import data.defender
 
+
 # TODO: Policy Id(s) needs to be resolved
 #
 # Policy 1
@@ -233,3 +234,4 @@ import data.defender
 #     not RuleOutput[0].RequirementMet
 #     RuleOutput[0].ReportDetails == NotCheckedDetails(PolicyId)
 # }
+#--

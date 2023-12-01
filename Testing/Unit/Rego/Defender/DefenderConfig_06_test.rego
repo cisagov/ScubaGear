@@ -3,6 +3,7 @@ import future.keywords
 import data.defender
 import data.report.utils.NotCheckedDetails
 
+
 #
 # Policy 1
 #--
@@ -69,3 +70,4 @@ test_NotImplemented_Correct_V2 if {
     not RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == NotCheckedDetails(PolicyId)
 }
+#--

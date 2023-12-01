@@ -2,6 +2,7 @@ package defender_test
 import future.keywords
 import data.defender
 
+
 #
 # Policy 1
 #--
@@ -1237,3 +1238,4 @@ test_CustomDomains_Incorrect_V7 if {
     not RuleOutput[0].RequirementMet
     RuleOutput[0].ReportDetails == "Not all partner domains are included for targeted protection in Strict or Standard policy."
 }
+#--
