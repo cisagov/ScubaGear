@@ -36,9 +36,9 @@ jobs:
         run: Publish-ScubaGearModule -Path src/PowerShell/ScubaGear -Repository $env:GalleryName -ModuleVersion '1.0.0'
       - name: Test Module Publish
         run: |
-          sha = $(git rev-parse --short HEAD)
+          $sha = $(git rev-parse --short HEAD)
           echo "${{ steps.latest-tag.outputs.tag}}"
-          echo "${{ sha }}"
+          echo "$Sha"
   # Call-Smoke-Test:
   #   needs: Publish-Private-Package
   #   uses: ./.github/workflows/run_smoke_test.yaml
