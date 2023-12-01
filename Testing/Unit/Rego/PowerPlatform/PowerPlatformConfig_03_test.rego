@@ -1,15 +1,34 @@
 package powerplatform_test
 import future.keywords
 import data.powerplatform
+import data.report.utils.ReportDetailsBoolean
 import data.report.utils.NotCheckedDetails
 
+
+CorrectTestResult(PolicyId, Output, ReportDetailString) := true if {
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet == true
+    RuleOutput[0].ReportDetails == ReportDetailString
+} else := false
+
+IncorrectTestResult(PolicyId, Output, ReportDetailString) := true if {
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet == false
+    RuleOutput[0].ReportDetails == ReportDetailString
+} else := false
+
+FAIL := ReportDetailsBoolean(false)
+
+PASS := ReportDetailsBoolean(true)
 
 #
 # Policy 1
 #--
 test_isDisabled_Correct if {
-    PolicyId := "MS.POWERPLATFORM.3.1v1"
-
     Output := powerplatform.tests with input as {
         "tenant_isolation": [
             {
@@ -20,16 +39,10 @@ test_isDisabled_Correct if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == true
-    RuleOutput[0].ReportDetails == "Requirement met"
+    CorrectTestResult("MS.POWERPLATFORM.3.1v1", Output, PASS) == true
 }
 
 test_isDisabled_Incorrect if {
-    PolicyId := "MS.POWERPLATFORM.3.1v1"
-
     Output := powerplatform.tests with input as {
         "tenant_isolation": [
             {
@@ -40,11 +53,7 @@ test_isDisabled_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == false
-    RuleOutput[0].ReportDetails == "Requirement not met"
+    IncorrectTestResult("MS.POWERPLATFORM.3.1v1", Output, FAIL) == true
 }
 #--
 
@@ -56,10 +65,6 @@ test_NotImplemented_Correct if {
 
     Output := powerplatform.tests with input as { }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == false
-    RuleOutput[0].ReportDetails == NotCheckedDetails(PolicyId)
+    IncorrectTestResult(PolicyId, Output, NotCheckedDetails(PolicyId)) == true
 }
 #--
