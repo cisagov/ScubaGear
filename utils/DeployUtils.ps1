@@ -178,10 +178,11 @@ function IsRegistered{
     Write-Debug "Looking for $RepoName local repository"
 
     try{
-        $Repo = Get-PSRepository -Name $RepoName 2> $null
+        $Repo = Get-PSRepository -Name $RepoName
     }
     catch {
         Write-Error "In catch of IsRegistered"
+        return $false
     }
 
     return $null -ne $Repo
