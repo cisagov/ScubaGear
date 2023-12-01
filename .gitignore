@@ -8,6 +8,7 @@
 *.xml
 *.cer
 *.exe
+*.cat
 /M365/*.xml
 /PowerShell/output
 /PowerShell/example
