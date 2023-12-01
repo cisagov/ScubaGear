@@ -35,14 +35,16 @@ function New-PrivateGallery {
 
     New-Item -Path $GalleryPath -ItemType Directory
 
-    $Splat = @{
-        Name = $GalleryName
-        SourceLocation = $GalleryPath
-        PublishLocation = $GalleryPath
-        InstallationPolicy = if ($Trusted) {'Trusted'} else {'Untrusted'}
-    }
-
     if (-not (IsRegistered -RepoName $GalleryName)){
+        Write-Debug "Attempting to register $GalleryName repository"
+
+        $Splat = @{
+            Name = $GalleryName
+            SourceLocation = $GalleryPath
+            PublishLocation = $GalleryPath
+            InstallationPolicy = if ($Trusted) {'Trusted'} else {'Untrusted'}
+        }
+
         Register-PSRepository @Splat
     }
     else {

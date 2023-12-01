@@ -25,11 +25,11 @@ jobs:
           path: src  
       - name: Publish ScubaGear module to private repository
         run: |
-          $DebugPreference = "Continue"
           cd src
           $sha = $(git rev-parse --short HEAD)
           $sha
-          . utils/DeployUtils.ps1  
+          . utils/DeployUtils.ps1 
+          $DebugPreference = "Continue" 
           New-PrivateGallery -GalleryName $env:GalleryName -Trusted
 
           Publish-ScubaGearModule -Path PowerShell/ScubaGear -Repository $env:GalleryName -ModuleVersion '1.0.0'
