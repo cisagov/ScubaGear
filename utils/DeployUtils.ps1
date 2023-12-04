@@ -86,7 +86,7 @@ function Build-ScubaModule{
         [string]
         $ModulePath,
         [Parameter(Mandatory=$true)]
-        [Version]
+        [string]
         $ModuleVersion
     )
     $Leaf = Split-Path -Path $ModulePath -Leaf
@@ -110,7 +110,7 @@ function ConfigureScubaGearModule{
         [ValidateScript({Test-Path -Path $_ -PathType Container})]
         $ModulePath,
         [Parameter(Mandatory=$true)]
-        [Version]
+        [string]
         $ModuleVersion
     )
     #TODO: Add any module configuration needed (e.g., adjust Module Version)
