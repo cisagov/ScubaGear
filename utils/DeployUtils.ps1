@@ -61,10 +61,7 @@ function Publish-ScubaGearModule{
         [Parameter(Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
         [string]
-        $GalleryName = 'PrivateScubaGearGallery',
-        [Parameter(Mandatory=$true)]
-        [string]
-        $ModuleVersion
+        $GalleryName = 'PrivateScubaGearGallery'
     )
 
     $ModuleBuildPath = Build-ScubaModule -ModulePath $ModulePath -ModuleVersion $ModuleVersion
@@ -84,10 +81,7 @@ function Build-ScubaModule{
         [Parameter(Mandatory=$true)]
         [ValidateScript({Test-Path -Path $_ -PathType Container})]
         [string]
-        $ModulePath,
-        [Parameter(Mandatory=$true)]
-        [string]
-        $ModuleVersion
+        $ModulePath
     )
     $Leaf = Split-Path -Path $ModulePath -Leaf
     $ModuleBuildPath = Join-Path -Path $env:TEMP -ChildPath $Leaf
@@ -97,7 +91,7 @@ function Build-ScubaModule{
     }
 
     Copy-Item $ModulePath -Destination $env:TEMP -Recurse
-    if (-not (ConfigureScubaGearModule -ModulePath $ModuleBuildPath -ModuleVersion $ModuleVersion)){
+    if (-not (ConfigureScubaGearModule -ModulePath $ModuleBuildPath)){
         Write-Error "Failed to configure scuba module for publishing."
     }
 
@@ -108,13 +102,13 @@ function ConfigureScubaGearModule{
     param (
         [Parameter(Mandatory=$true)]
         [ValidateScript({Test-Path -Path $_ -PathType Container})]
-        $ModulePath,
-        [Parameter(Mandatory=$true)]
-        [string]
-        $ModuleVersion
+        $ModulePath
     )
     #TODO: Add any module configuration needed (e.g., adjust Module Version)
     $ManifestPath = Join-Path -Path $ModulePath -ChildPath "ScubaGear.psd1"
+    $CurrentModuleVersion = (Import-PowerShellDataFile $ManifestPath).ModuleVersion
+    $TimeStamp = Get-Date  -Format ddMMyyyHHmmss
+    $ModuleVersion = "${$CurrentModuleVersion.$TimeStmap}"
     $ManifestUpdates = @{
         Path = $ManifestPath
         ModuleVersion = $ModuleVersion
