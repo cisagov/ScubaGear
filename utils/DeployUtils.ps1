@@ -61,10 +61,14 @@ function Publish-ScubaGearModule{
         [Parameter(Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
         [string]
-        $GalleryName = 'PrivateScubaGearGallery'
+        $GalleryName = 'PrivateScubaGearGallery',
+        [Parameter(Mandatory=$false)]
+        [AllowEmptyString()]
+        [string]
+        $OverrideModuleVersion = ""
     )
 
-    $ModuleBuildPath = Build-ScubaModule -ModulePath $ModulePath
+    $ModuleBuildPath = Build-ScubaModule -ModulePath $ModulePath -OverrideModuleVersion $OverrideModuleVersion
 
     if (SignScubaGearModule -ModulePath $ModuleBuildPath){
         Publish-Module -Path $ModuleBuildPath -Repository $GalleryName
@@ -79,7 +83,11 @@ function Build-ScubaModule{
         [Parameter(Mandatory=$true)]
         [ValidateScript({Test-Path -Path $_ -PathType Container})]
         [string]
-        $ModulePath
+        $ModulePath,
+        [Parameter(Mandatory=$false)]
+        [AllowEmptyString()]
+        [string]
+        $OverrideModuleVersion = ""
     )
     $Leaf = Split-Path -Path $ModulePath -Leaf
     $ModuleBuildPath = Join-Path -Path $env:TEMP -ChildPath $Leaf
@@ -89,7 +97,7 @@ function Build-ScubaModule{
     }
 
     Copy-Item $ModulePath -Destination $env:TEMP -Recurse
-    if (-not (ConfigureScubaGearModule -ModulePath $ModuleBuildPath)){
+    if (-not (ConfigureScubaGearModule -ModulePath $ModuleBuildPath -OverrideModuleVersion $OverrideModuleVersion)){
         Write-Error "Failed to configure scuba module for publishing."
     }
 
@@ -100,13 +108,23 @@ function ConfigureScubaGearModule{
     param (
         [Parameter(Mandatory=$true)]
         [ValidateScript({Test-Path -Path $_ -PathType Container})]
-        $ModulePath
+        $ModulePath,
+        [Parameter(Mandatory=$false)]
+        [AllowEmptyString()]
+        [string]
+        $OverrideModuleVersion = ""
     )
     #TODO: Add any module configuration needed (e.g., adjust Module Version)
+
     $ManifestPath = Join-Path -Path $ModulePath -ChildPath "ScubaGear.psd1"
-    $CurrentModuleVersion = (Import-PowerShellDataFile $ManifestPath).ModuleVersion
-    $TimeStamp = [int32](Get-Date -UFormat %s)
-    $ModuleVersion = "$CurrentModuleVersion.$TimeStamp"
+    $ModuleVersion = $OverrideModuleVersion
+
+    if ([string]::IsNullOrEmpty($OverrideModuleVersion)){
+        $CurrentModuleVersion = (Import-PowerShellDataFile $ManifestPath).ModuleVersion
+        $TimeStamp = [int32](Get-Date -UFormat %s)
+        $ModuleVersion = "$CurrentModuleVersion.$TimeStamp"
+    }
+
     $ManifestUpdates = @{
         Path = $ManifestPath
         ModuleVersion = $ModuleVersion
@@ -162,6 +180,7 @@ function New-CodeSigningCertificate{
 }
 
 function GetCodeSigningCertificate{
+    #TODO:  Replace with official signing certificate
     Get-ChildItem Cert:\CurrentUser\My -CodeSigningCert | Where-Object { $_.HasPrivateKey -and ($_.NotAfter -gt (Get-Date))}
 }
 
