@@ -2,17 +2,17 @@
 
 function New-PrivateGallery {
     <#
-    .Description
-    Creates a new private package repository (i.e., gallery) on local file system
-    .Parameter GalleryPath
-    Path for directory to use for private gallery
-    .Parameter GalleryName
-    Name of the private gallery
-    .Parameter Trusted
-    Indicates if private gallery is registered as a trusted gallery
-    .Example
-    New-PrivateGallery -Trusted
-    Create new private, trusted gallery using default name and location
+        .Description
+        Creates a new private package repository (i.e., gallery) on local file system
+        .Parameter GalleryPath
+        Path for directory to use for private gallery
+        .Parameter GalleryName
+        Name of the private gallery
+        .Parameter Trusted
+        Indicates if private gallery is registered as a trusted gallery
+        .Example
+        New-PrivateGallery -Trusted
+        Create new private, trusted gallery using default name and location
     #>
     param (
         [Parameter(Mandatory=$false)]
@@ -53,6 +53,16 @@ function New-PrivateGallery {
 }
 
 function Publish-ScubaGearModule{
+    <#
+        .Description
+        Publish ScubaGear module to private package repository
+        .Parameter ModulePath
+        Path to module root directory
+        .Parameter GalleryName
+        Name of the private package repository (i.e., gallery)
+        .Parameter OverrideModuleVersion
+        Optional module version.  If provided it will use as module version. Otherwise, the current version from the manifest with a revision number is added instead.
+    #>
     param (
         [Parameter(Mandatory=$true)]
         [ValidateScript({Test-Path -Path $_ -PathType Container})]
@@ -79,6 +89,10 @@ function Publish-ScubaGearModule{
 }
 
 function Build-ScubaModule{
+    <#
+        .NOTES
+        Internal helper function
+    #>
     param (
         [Parameter(Mandatory=$true)]
         [ValidateScript({Test-Path -Path $_ -PathType Container})]
@@ -105,6 +119,10 @@ function Build-ScubaModule{
 }
 
 function ConfigureScubaGearModule{
+    <#
+        .NOTES
+        Internal helper function
+    #>
     param (
         [Parameter(Mandatory=$true)]
         [ValidateScript({Test-Path -Path $_ -PathType Container})]
@@ -144,6 +162,10 @@ function ConfigureScubaGearModule{
 }
 
 function SignScubaGearModule{
+    <#
+        .NOTES
+        Internal helper function
+    #>
     param (
         [Parameter(Mandatory=$true)]
         [ValidateScript({Test-Path -Path $_})]
@@ -176,15 +198,27 @@ function SignScubaGearModule{
 }
 
 function New-CodeSigningCertificate{
+    <#
+        .NOTES
+        Internal helper function
+    #>
     New-SelfSignedCertificate -DnsName cisa.gov -Type CodeSigning -CertStoreLocation Cert:\CurrentUser\My
 }
 
 function GetCodeSigningCertificate{
+    <#
+        .NOTES
+        Internal helper function
+    #>
     #TODO:  Replace with official signing certificate
     Get-ChildItem Cert:\CurrentUser\My -CodeSigningCert | Where-Object { $_.HasPrivateKey -and ($_.NotAfter -gt (Get-Date))}
 }
 
 function IsRegistered{
+    <#
+        .NOTES
+        Internal helper function
+    #>
     param (
         [Parameter(Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
