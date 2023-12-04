@@ -29,7 +29,6 @@ jobs:
         run: |
           cd src
           . utils/DeployUtils.ps1 
-          $DebugPreference = "Continue" 
           New-PrivateGallery -GalleryName $env:GalleryName -Trusted
           New-CodeSigningCertificate
           Publish-ScubaGearModule -ModulePath PowerShell/ScubaGear -GalleryName $env:GalleryName
