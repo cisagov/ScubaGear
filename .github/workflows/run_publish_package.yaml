@@ -6,6 +6,7 @@ on:
     paths:
       - ".github/workflows/run_publish_package.yaml"
       - "utils/DeployUtils.ps1"
+      - "Testing/Functional/BuildTest/ModuleBuild.Tests.ps1"
 
 name: Publish Package
 
