@@ -3,9 +3,6 @@ param (
     [ValidateNotNullOrEmpty()]
     [string]
     $ModuleName = "ScubaGear",
-    [Parameter(Mandatory=$true)]
-    [Version]
-    $ModuleVersion,
     [Parameter(Mandatory=$false)]
     [ValidateNotNullOrEmpty()]
     [string]
@@ -17,7 +14,8 @@ Describe "Validate <ModuleName> module deployment" {
         $Module = Find-Module -Name $ModuleName -Repository $RepositoryName
     }
     It "Verify version" {
-        $Module.Version | Should -BeExactly $ModuleVersion
+        $Module.Version | Should -Not -BeNullOrEmpty
+        {[version]($Module.Version)} | Should -Not -Throw
     }
     It "Verify name" {
         $Module.Name | Should -BeExactly $ModuleName

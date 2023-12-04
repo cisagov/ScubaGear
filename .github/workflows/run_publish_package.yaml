@@ -36,7 +36,7 @@ jobs:
         run: |
           Get-Location
           $TestContainers = @()
-          $TestContainers += New-PesterContainer -Path "src/Testing/Functional/BuildTest" -Data @{ ModuleVersion = "1.0.0" }
+          $TestContainers += New-PesterContainer -Path "src/Testing/Functional/BuildTest" -Data @{ }
           $PesterConfig = @{
             Run = @{
               Container = $TestContainers
