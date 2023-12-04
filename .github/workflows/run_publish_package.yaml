@@ -34,7 +34,7 @@ jobs:
           $DebugPreference = "Continue" 
           New-PrivateGallery -GalleryName $env:GalleryName -Trusted
           New-CodeSigningCertificate
-          Publish-ScubaGearModule -ModulePath PowerShell/ScubaGear -GalleryName $env:GalleryName -ModuleVersion '1.0.0'
+          Publish-ScubaGearModule -ModulePath PowerShell/ScubaGear -GalleryName $env:GalleryName -ModuleVersion "1.0.0.$sha"
       - name: Test Module Publish
         run: |
           Get-Location
