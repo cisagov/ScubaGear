@@ -125,8 +125,12 @@ function ConfigureScubaGearModule{
 
     Update-ModuleManifest @ManifestUpdates
 
-    Write-Debug "called ConfigureScubaGearModule with $ModulePath"
-    return $true
+    $CurrentErrorActionPreference = $ErrorActionPreference
+    $ErrorActionPreference = "SilentlyContinue"
+    $Result = Test-ModuleManifest -Path $ManifestPath
+    $ErrorActionPreference = $CurrentErrorActionPreference
+
+    return $null -ne $Result
 }
 
 function SignScubaGearModule{
@@ -146,14 +150,16 @@ function SignScubaGearModule{
         $HashAlgorithm = 'SHA256'
     )
     #TODO: Add code signing
-    Write-Debug "called SignScubaGearModule with $ModulePath"
-    $CatalogPath = Join-Path -Path $ModulePath -ChildPath "ScubaGear.cat"
+    $CatalogFileName = 'ScubaGear.cat'
+    $CatalogPath = Join-Path -Path $ModulePath -ChildPath $CatalogFileName
     $Cert = Invoke-Command $GetCertificate
-    Get-ChildItem $ModulePath -Include *.psd1,*psm1 -Recurse |
+
+    # Digitally sign scripts, manifest, and modules
+    Get-ChildItem $ModulePath -Include *.psd1,*psm1,*.ps1 -Recurse |
     Set-AuthenticodeSignature -Certificate $Cert -TimeStampServer $TimeStampServer -HashAlgorithm $HashAlgorithm
-    New-FileCatalog -Path $ModulePath -CatalogFilePath $CatalogPath -CatalogVersion 2.0
-    Get-ChildItem $CatalogPath -EA 0 |
-    Set-AuthenticodeSignature -Certificate $Cert -TimestampServer $TimeStampServer -HashAlgorithm $HashAlgorithm
+
+    New-FileCatalog -Path $ModulePath -CatalogFilePath $CatalogPath -CatalogVersion 2.0 -Verbose
+    Set-AuthenticodeSignature -FilePath $CatalogPath -Certificate $Cert -TimestampServer $TimeStampServer -HashAlgorithm $HashAlgorithm
 
     $TestResult = Test-FileCatalog -CatalogFilePath $CatalogPath
     return 'Valid' -eq $TestResult.Status
