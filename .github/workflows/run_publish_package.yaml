@@ -34,7 +34,7 @@ jobs:
           $DebugPreference = "Continue" 
           New-PrivateGallery -GalleryName $env:GalleryName -Trusted
           New-CodeSigningCertificate
-          Publish-ScubaGearModule -ModulePath PowerShell/ScubaGear -GalleryName $env:GalleryName -ModuleVersion "1.0.0.$sha"
+          Publish-ScubaGearModule -ModulePath PowerShell/ScubaGear -GalleryName $env:GalleryName -ModuleVersion "1.0.0-$sha"
       - name: Test Module Publish
         run: |
           Get-Location
@@ -52,7 +52,7 @@ jobs:
           Invoke-Pester -Configuration $Config 
       - name: Check Scuba Version 
         run: |
-          Install-Module -Name ScubaGear
+          Install-Module -Name ScubaGear -SkipPublisherCheck
           Import-Module -Name ScubaGear
           Invoke-SCuBA -Version
 
