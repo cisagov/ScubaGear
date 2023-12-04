@@ -26,6 +26,7 @@ jobs:
           path: src  
       - name: Publish ScubaGear module to private repository
         run: |
+          cd src
           . utils/DeployUtils.ps1 
           $DebugPreference = "Continue" 
           New-PrivateGallery -GalleryName $env:GalleryName -Trusted
