@@ -1,14 +1,34 @@
 package exo_test
 import future.keywords
 import data.exo
+import data.report.utils.ReportDetailsBoolean
+
+
+CorrectTestResult(PolicyId, Output, ReportDetailString) := true if {
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet == true
+    RuleOutput[0].ReportDetails == ReportDetailString
+} else := false
+
+IncorrectTestResult(PolicyId, Output, ReportDetailString) := true if {
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet == false
+    RuleOutput[0].ReportDetails == ReportDetailString
+} else := false
+
+FAIL := ReportDetailsBoolean(false)
+
+PASS := ReportDetailsBoolean(true)
 
 
 #
 # Policy 1
 #--
 test_SmtpClientAuthenticationDisabled_Correct if {
-    PolicyId := "MS.EXO.5.1v1"
-
     Output := exo.tests with input as {
         "transport_config": [
             {
@@ -18,16 +38,10 @@ test_SmtpClientAuthenticationDisabled_Correct if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == true
-    RuleOutput[0].ReportDetails == "Requirement met"
+    CorrectTestResult("MS.EXO.5.1v1", Output, PASS) == true
 }
 
 test_SmtpClientAuthenticationDisabled_Incorrect if {
-    PolicyId := "MS.EXO.5.1v1"
-
     Output := exo.tests with input as {
         "transport_config": [
             {
@@ -37,10 +51,6 @@ test_SmtpClientAuthenticationDisabled_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == false
-    RuleOutput[0].ReportDetails == "Requirement not met"
+    IncorrectTestResult("MS.EXO.5.1v1", Output, FAIL) == true
 }
 #--

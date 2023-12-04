@@ -2,6 +2,26 @@ package exo_test
 import future.keywords
 import data.exo
 import data.report.utils.NotCheckedDetails
+import data.report.utils.ReportDetailsBoolean
+
+
+CorrectTestResult(PolicyId, Output, ReportDetailString) := true if {
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet == true
+    RuleOutput[0].ReportDetails == ReportDetailString
+} else := false
+
+IncorrectTestResult(PolicyId, Output, ReportDetailString) := true if {
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet == false
+    RuleOutput[0].ReportDetails == ReportDetailString
+} else := false
+
+PASS := ReportDetailsBoolean(true)
 
 
 #
@@ -12,20 +32,15 @@ test_NotImplemented_Correct if {
 
     Output := exo.tests with input as { }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == false
-    RuleOutput[0].ReportDetails == NotCheckedDetails(PolicyId)
+    ReportDetailString := NotCheckedDetails(PolicyId)
+    IncorrectTestResult(PolicyId, Output, ReportDetailString) == true
 }
 #--
 
 #
 # Policy 2
 #--
-test_Rdata_Correct if {
-    PolicyId := "MS.EXO.2.2v1"
-
+test_Rdata_Correct_V1 if {
     Output := exo.tests with input as {
         "spf_records": [
             {
@@ -38,16 +53,10 @@ test_Rdata_Correct if {
     }
 
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == true
-    RuleOutput[0].ReportDetails == "Requirement met"
+    CorrectTestResult("MS.EXO.2.2v1", Output, PASS) == true
 }
 
 test_Rdata_Correct_V2 if {
-    PolicyId := "MS.EXO.2.2v1"
-
     Output := exo.tests with input as {
         "spf_records": [
             {
@@ -59,16 +68,10 @@ test_Rdata_Correct_V2 if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == true
-    RuleOutput[0].ReportDetails == "Requirement met"
+    CorrectTestResult("MS.EXO.2.2v1", Output, PASS) == true
 }
 
-test_Rdata_Incorrect if {
-    PolicyId := "MS.EXO.2.2v1"
-
+test_Rdata_Incorrect_V1 if {
     Output := exo.tests with input as {
         "spf_records": [
             {
@@ -80,16 +83,11 @@ test_Rdata_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == false
-    RuleOutput[0].ReportDetails == "1 of 1 agency domain(s) found in violation: Test name"
+    ReportDetailString := "1 of 1 agency domain(s) found in violation: Test name"
+    IncorrectTestResult("MS.EXO.2.2v1", Output, ReportDetailString) == true
 }
 
 test_Rdata_Incorrect_V2 if {
-    PolicyId := "MS.EXO.2.2v1"
-
     Output := exo.tests with input as {
         "spf_records": [
             {
@@ -101,11 +99,8 @@ test_Rdata_Incorrect_V2 if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == false
-    RuleOutput[0].ReportDetails == "1 of 1 agency domain(s) found in violation: Test name"
+    ReportDetailString := "1 of 1 agency domain(s) found in violation: Test name"
+    IncorrectTestResult("MS.EXO.2.2v1", Output, ReportDetailString) == true
 }
 
 test_Rdata_Incorrect_V3 if {
@@ -148,8 +143,6 @@ test_Rdata_Incorrect_V3 if {
 }
 
 test_Rdata_Multiple_Correct_V1 if {
-    PolicyId := "MS.EXO.2.2v1"
-
     Output := exo.tests with input as {
         "spf_records": [
             {
@@ -162,16 +155,10 @@ test_Rdata_Multiple_Correct_V1 if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == true
-    RuleOutput[0].ReportDetails == "Requirement met"
+    CorrectTestResult("MS.EXO.2.2v1", Output, PASS) == true
 }
 
 test_Rdata_Multiple_Correct_V2 if {
-    PolicyId := "MS.EXO.2.2v1"
-
     Output := exo.tests with input as {
         "spf_records": [
             {
@@ -184,16 +171,10 @@ test_Rdata_Multiple_Correct_V2 if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == true
-    RuleOutput[0].ReportDetails == "Requirement met"
+    CorrectTestResult("MS.EXO.2.2v1", Output, PASS) == true
 }
 
 test_Rdata_Multiple_Incorrect if {
-    PolicyId := "MS.EXO.2.2v1"
-
     Output := exo.tests with input as {
         "spf_records": [
             {
@@ -206,10 +187,7 @@ test_Rdata_Multiple_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == false
-    RuleOutput[0].ReportDetails == "1 of 1 agency domain(s) found in violation: bad.com"
+    ReportDetailString := "1 of 1 agency domain(s) found in violation: bad.com"
+    IncorrectTestResult("MS.EXO.2.2v1", Output, ReportDetailString) == true
 }
 #--

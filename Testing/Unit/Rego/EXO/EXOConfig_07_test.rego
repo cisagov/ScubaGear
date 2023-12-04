@@ -1,14 +1,32 @@
 package exo_test
 import future.keywords
 import data.exo
+import data.report.utils.ReportDetailsBoolean
+
+
+CorrectTestResult(PolicyId, Output, ReportDetailString) := true if {
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet == true
+    RuleOutput[0].ReportDetails == ReportDetailString
+} else := false
+
+IncorrectTestResult(PolicyId, Output, ReportDetailString) := true if {
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet == false
+    RuleOutput[0].ReportDetails == ReportDetailString
+} else := false
+
+PASS := ReportDetailsBoolean(true)
 
 
 #
 # Policy 1
 #--
 test_FromScope_Correct if {
-    PolicyId := "MS.EXO.7.1v1"
-
     Output := exo.tests with input as {
         "transport_rule": [
             {
@@ -20,16 +38,10 @@ test_FromScope_Correct if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == true
-    RuleOutput[0].ReportDetails == "Requirement met"
+    CorrectTestResult("MS.EXO.7.1v1", Output, PASS) == true
 }
 
-test_FromScope_IncorrectV1 if {
-    PolicyId := "MS.EXO.7.1v1"
-
+test_FromScope_Incorrect_V1 if {
     Output := exo.tests with input as {
         "transport_rule": [
             {
@@ -41,16 +53,11 @@ test_FromScope_IncorrectV1 if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == false
-    RuleOutput[0].ReportDetails == "No transport rule found that applies warnings to emails received from outside the organization"
+    ReportDetailString := "No transport rule found that applies warnings to emails received from outside the organization"
+    IncorrectTestResult("MS.EXO.7.1v1", Output, ReportDetailString) == true
 }
 
-test_FromScope_IncorrectV2 if {
-    PolicyId := "MS.EXO.7.1v1"
-
+test_FromScope_Incorrect_V2 if {
     Output := exo.tests with input as {
         "transport_rule": [
             {
@@ -62,16 +69,11 @@ test_FromScope_IncorrectV2 if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == false
-    RuleOutput[0].ReportDetails == "No transport rule found that applies warnings to emails received from outside the organization"
+    ReportDetailString := "No transport rule found that applies warnings to emails received from outside the organization"
+    IncorrectTestResult("MS.EXO.7.1v1", Output, ReportDetailString) == true
 }
 
-test_FromScope_IncorrectV3 if {
-    PolicyId := "MS.EXO.7.1v1"
-
+test_FromScope_Incorrect_V3 if {
     Output := exo.tests with input as {
         "transport_rule": [
             {
@@ -83,16 +85,11 @@ test_FromScope_IncorrectV3 if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == false
-    RuleOutput[0].ReportDetails == "No transport rule found that applies warnings to emails received from outside the organization"
+    ReportDetailString := "No transport rule found that applies warnings to emails received from outside the organization"
+    IncorrectTestResult("MS.EXO.7.1v1", Output, ReportDetailString) == true
 }
 
-test_FromScope_IncorrectV4 if {
-    PolicyId := "MS.EXO.7.1v1"
-
+test_FromScope_Incorrect_V4 if {
     Output := exo.tests with input as {
         "transport_rule": [
             {
@@ -104,16 +101,11 @@ test_FromScope_IncorrectV4 if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == false
-    RuleOutput[0].ReportDetails == "No transport rule found that applies warnings to emails received from outside the organization"
+    ReportDetailString := "No transport rule found that applies warnings to emails received from outside the organization"
+    IncorrectTestResult("MS.EXO.7.1v1", Output, ReportDetailString) == true
 }
 
 test_FromScope_Multiple_Correct if {
-    PolicyId := "MS.EXO.7.1v1"
-
     Output := exo.tests with input as {
         "transport_rule": [
             {
@@ -143,16 +135,10 @@ test_FromScope_Multiple_Correct if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == true
-    RuleOutput[0].ReportDetails == "Requirement met"
+    CorrectTestResult("MS.EXO.7.1v1", Output, PASS) == true
 }
 
 test_FromScope_Multiple_Incorrect if {
-    PolicyId := "MS.EXO.7.1v1"
-
     Output := exo.tests with input as {
         "transport_rule": [
             {
@@ -194,16 +180,11 @@ test_FromScope_Multiple_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == false
-    RuleOutput[0].ReportDetails == "No transport rule found that applies warnings to emails received from outside the organization"
+    ReportDetailString := "No transport rule found that applies warnings to emails received from outside the organization"
+    IncorrectTestResult("MS.EXO.7.1v1", Output, ReportDetailString) == true
 }
 
 test_PrependSubject_IncorrectV1 if {
-    PolicyId := "MS.EXO.7.1v1"
-
     Output := exo.tests with input as {
         "transport_rule": [
             {
@@ -215,16 +196,11 @@ test_PrependSubject_IncorrectV1 if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == false
-    RuleOutput[0].ReportDetails == "No transport rule found that applies warnings to emails received from outside the organization"
+    ReportDetailString := "No transport rule found that applies warnings to emails received from outside the organization"
+    IncorrectTestResult("MS.EXO.7.1v1", Output, ReportDetailString) == true
 }
 
 test_PrependSubject_IncorrectV2 if {
-    PolicyId := "MS.EXO.7.1v1"
-
     Output := exo.tests with input as {
         "transport_rule": [
             {
@@ -236,10 +212,7 @@ test_PrependSubject_IncorrectV2 if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == false
-    RuleOutput[0].ReportDetails == "No transport rule found that applies warnings to emails received from outside the organization"
+    ReportDetailString := "No transport rule found that applies warnings to emails received from outside the organization"
+    IncorrectTestResult("MS.EXO.7.1v1", Output, ReportDetailString) == true
 }
 #--

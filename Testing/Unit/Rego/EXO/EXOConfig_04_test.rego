@@ -1,14 +1,32 @@
 package exo_test
 import future.keywords
 import data.exo
+import data.report.utils.ReportDetailsBoolean
+
+
+CorrectTestResult(PolicyId, Output, ReportDetailString) := true if {
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet == true
+    RuleOutput[0].ReportDetails == ReportDetailString
+} else := false
+
+IncorrectTestResult(PolicyId, Output, ReportDetailString) := true if {
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet == false
+    RuleOutput[0].ReportDetails == ReportDetailString
+} else := false
+
+PASS := ReportDetailsBoolean(true)
 
 
 #
 # Policy 1
 #--
 test_Rdata_Correct if {
-    PolicyId := "MS.EXO.4.1v1"
-
     Output := exo.tests with input as {
         "dmarc_records": [
             {
@@ -28,16 +46,10 @@ test_Rdata_Correct if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == true
-    RuleOutput[0].ReportDetails == "Requirement met"
+    CorrectTestResult("MS.EXO.4.1v1", Output, PASS) == true
 }
 
-test_Rdata_Incorrect if {
-    PolicyId := "MS.EXO.4.1v1"
-
+test_Rdata_Incorrect_V1 if {
     Output := exo.tests with input as {
         "dmarc_records": [
             {
@@ -55,16 +67,11 @@ test_Rdata_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == false
-    RuleOutput[0].ReportDetails == "1 of 1 agency domain(s) found in violation: test.name"
+    ReportDetailString := "1 of 1 agency domain(s) found in violation: test.name"
+    IncorrectTestResult("MS.EXO.4.1v1", Output, ReportDetailString) == true
 }
 
 test_Rdata_Incorrect_V2 if {
-    PolicyId := "MS.EXO.4.1v1"
-
     Output := exo.tests with input as {
         "dmarc_records": [
             {
@@ -84,16 +91,11 @@ test_Rdata_Incorrect_V2 if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == false
-    RuleOutput[0].ReportDetails == "1 of 1 agency domain(s) found in violation: test.name"
+    ReportDetailString := "1 of 1 agency domain(s) found in violation: test.name"
+    IncorrectTestResult("MS.EXO.4.1v1", Output, ReportDetailString) == true
 }
 
 test_Rdata_Incorrect_V3 if {
-    PolicyId := "MS.EXO.4.1v1"
-
     Output := exo.tests with input as {
         "dmarc_records": [
             {
@@ -123,11 +125,8 @@ test_Rdata_Incorrect_V3 if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == false
-    RuleOutput[0].ReportDetails == "1 of 2 agency domain(s) found in violation: bad.name"
+    ReportDetailString := "1 of 2 agency domain(s) found in violation: bad.name"
+    IncorrectTestResult("MS.EXO.4.1v1", Output, ReportDetailString) == true
 }
 #--
 
@@ -135,8 +134,6 @@ test_Rdata_Incorrect_V3 if {
 # Policy 2
 #--
 test_Rdata_Correct_V2 if {
-    PolicyId := "MS.EXO.4.2v1"
-
     Output := exo.tests with input as {
         "dmarc_records": [
             {
@@ -156,16 +153,10 @@ test_Rdata_Correct_V2 if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == true
-    RuleOutput[0].ReportDetails == "Requirement met"
+    CorrectTestResult("MS.EXO.4.2v1", Output, PASS) == true
 }
 
 test_Rdata_Incorrect_V4 if {
-    PolicyId := "MS.EXO.4.2v1"
-
     Output := exo.tests with input as {
         "dmarc_records": [
             {
@@ -185,16 +176,11 @@ test_Rdata_Incorrect_V4 if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == false
-    RuleOutput[0].ReportDetails == "1 of 1 agency domain(s) found in violation: test.name"
+    ReportDetailString := "1 of 1 agency domain(s) found in violation: test.name"
+    IncorrectTestResult("MS.EXO.4.2v1", Output, ReportDetailString) == true
 }
 
 test_Rdata_Incorrect_V5 if {
-    PolicyId := "MS.EXO.4.2v1"
-
     Output := exo.tests with input as {
         "dmarc_records": [
             {
@@ -214,11 +200,8 @@ test_Rdata_Incorrect_V5 if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == false
-    RuleOutput[0].ReportDetails == "1 of 1 agency domain(s) found in violation: test.name"
+    ReportDetailString := "1 of 1 agency domain(s) found in violation: test.name"
+    IncorrectTestResult("MS.EXO.4.2v1", Output, ReportDetailString) == true
 }
 #--
 
@@ -226,8 +209,6 @@ test_Rdata_Incorrect_V5 if {
 # Policy 3
 #--
 test_DMARCReport_Correct_V1 if {
-    PolicyId := "MS.EXO.4.3v1"
-
     Output := exo.tests with input as {
         "dmarc_records": [
             {
@@ -247,16 +228,10 @@ test_DMARCReport_Correct_V1 if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == true
-    RuleOutput[0].ReportDetails == "Requirement met"
+    CorrectTestResult("MS.EXO.4.3v1", Output, PASS) == true
 }
 
 test_DMARCReport_Incorrect_V1 if {
-    PolicyId := "MS.EXO.4.3v1"
-
     Output := exo.tests with input as {
         "dmarc_records": [
             {
@@ -276,16 +251,11 @@ test_DMARCReport_Incorrect_V1 if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == false
-    RuleOutput[0].ReportDetails == "1 of 1 agency domain(s) found in violation: test.name"
+    ReportDetailString := "1 of 1 agency domain(s) found in violation: test.name"
+    IncorrectTestResult("MS.EXO.4.3v1", Output, ReportDetailString) == true
 }
 
 test_DMARCReport_Incorrect_V2 if {
-    PolicyId := "MS.EXO.4.3v1"
-
     Output := exo.tests with input as {
         "dmarc_records": [
             {
@@ -305,17 +275,12 @@ test_DMARCReport_Incorrect_V2 if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == false
-    RuleOutput[0].ReportDetails == "1 of 1 agency domain(s) found in violation: test.name"
+    ReportDetailString := "1 of 1 agency domain(s) found in violation: test.name"
+    IncorrectTestResult("MS.EXO.4.3v1", Output, ReportDetailString) == true
 }
 
 # empty rdata
 test_DMARCReport_Incorrect_V3 if {
-    PolicyId := "MS.EXO.4.3v1"
-
     Output := exo.tests with input as {
         "dmarc_records": [
             {
@@ -333,11 +298,8 @@ test_DMARCReport_Incorrect_V3 if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == false
-    RuleOutput[0].ReportDetails == "1 of 1 agency domain(s) found in violation: test.name"
+    ReportDetailString := "1 of 1 agency domain(s) found in violation: test.name"
+    IncorrectTestResult("MS.EXO.4.3v1", Output, ReportDetailString) == true
 }
 #--
 
@@ -347,8 +309,6 @@ test_DMARCReport_Incorrect_V3 if {
 
 # 2 emails in rua= and 1 in ruf
 test_POC_Correct_V1 if {
-    PolicyId := "MS.EXO.4.4v1"
-
     Output := exo.tests with input as {
         "dmarc_records": [
             {
@@ -368,17 +328,11 @@ test_POC_Correct_V1 if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == true
-    RuleOutput[0].ReportDetails == "Requirement met"
+    CorrectTestResult("MS.EXO.4.4v1", Output, PASS) == true
 }
 
 # 2+ emails in rua= and 1+ in ruf
 test_POC_Correct_V1 if {
-    PolicyId := "MS.EXO.4.4v1"
-
     Output := exo.tests with input as {
         "dmarc_records": [
             {
@@ -398,17 +352,11 @@ test_POC_Correct_V1 if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == true
-    RuleOutput[0].ReportDetails == "Requirement met"
+    CorrectTestResult("MS.EXO.4.4v1", Output, PASS) == true
 }
 
 # Only 1 rua
 test_POC_Incorrect_V1 if {
-    PolicyId := "MS.EXO.4.4v1"
-
     Output := exo.tests with input as {
         "dmarc_records": [
             {
@@ -428,17 +376,12 @@ test_POC_Incorrect_V1 if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == false
-    RuleOutput[0].ReportDetails == "1 of 1 agency domain(s) found in violation: test.name"
+    ReportDetailString := "1 of 1 agency domain(s) found in violation: test.name"
+    IncorrectTestResult("MS.EXO.4.4v1", Output, ReportDetailString) == true
 }
 
 # Only 2 emails in rua no ruf
 test_POC_Incorrect_V2 if {
-    PolicyId := "MS.EXO.4.4v1"
-
     Output := exo.tests with input as {
         "dmarc_records": [
             {
@@ -458,17 +401,12 @@ test_POC_Incorrect_V2 if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == false
-    RuleOutput[0].ReportDetails == "1 of 1 agency domain(s) found in violation: test.name"
+    ReportDetailString := "1 of 1 agency domain(s) found in violation: test.name"
+    IncorrectTestResult("MS.EXO.4.4v1", Output, ReportDetailString) == true
 }
 
 # Only 1 ruf no rua
 test_POC_Incorrect_V3 if {
-    PolicyId := "MS.EXO.4.4v1"
-
     Output := exo.tests with input as {
         "dmarc_records": [
             {
@@ -488,17 +426,12 @@ test_POC_Incorrect_V3 if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == false
-    RuleOutput[0].ReportDetails == "1 of 1 agency domain(s) found in violation: test.name"
+    ReportDetailString := "1 of 1 agency domain(s) found in violation: test.name"
+    IncorrectTestResult("MS.EXO.4.4v1", Output, ReportDetailString) == true
 }
 
 # 2 domains 1 fails rua/ruf number
 test_POC_Incorrect_V4 if {
-    PolicyId := "MS.EXO.4.4v1"
-
     Output := exo.tests with input as {
         "dmarc_records": [
             {
@@ -530,17 +463,12 @@ test_POC_Incorrect_V4 if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == false
-    RuleOutput[0].ReportDetails == "1 of 2 agency domain(s) found in violation: example.com"
+    ReportDetailString := "1 of 2 agency domain(s) found in violation: example.com"
+    IncorrectTestResult("MS.EXO.4.4v1", Output, ReportDetailString) == true
 }
 
 # 2 domains 1 fails rua # of email policy requirement
 test_POC_Incorrect_V5 if {
-    PolicyId := "MS.EXO.4.4v1"
-
     Output := exo.tests with input as {
         "dmarc_records": [
             {
@@ -572,17 +500,12 @@ test_POC_Incorrect_V5 if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == false
-    RuleOutput[0].ReportDetails == "1 of 2 agency domain(s) found in violation: example.com"
+    ReportDetailString := "1 of 2 agency domain(s) found in violation: example.com"
+    IncorrectTestResult("MS.EXO.4.4v1", Output, ReportDetailString) == true
 }
 
 # 2 domains 1 domain failed DNS query. Empty rdata
-test_POC_Incorrect_V5 if {
-    PolicyId := "MS.EXO.4.4v1"
-
+test_POC_Incorrect_V6 if {
     Output := exo.tests with input as {
         "dmarc_records": [
             {
@@ -612,10 +535,7 @@ test_POC_Incorrect_V5 if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == false
-    RuleOutput[0].ReportDetails == "1 of 2 agency domain(s) found in violation: example.com"
+    ReportDetailString := "1 of 2 agency domain(s) found in violation: example.com"
+    IncorrectTestResult("MS.EXO.4.4v1", Output, ReportDetailString) == true
 }
 #--

@@ -1,14 +1,32 @@
 package exo_test
 import future.keywords
 import data.exo
+import data.report.utils.ReportDetailsBoolean
+
+
+CorrectTestResult(PolicyId, Output, ReportDetailString) := true if {
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet == true
+    RuleOutput[0].ReportDetails == ReportDetailString
+} else := false
+
+IncorrectTestResult(PolicyId, Output, ReportDetailString) := true if {
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet == false
+    RuleOutput[0].ReportDetails == ReportDetailString
+} else := false
+
+PASS := ReportDetailsBoolean(true)
 
 
 #
 # Policy 1
 #--
 test_Enabled_Correct_V1 if {
-    PolicyId := "MS.EXO.3.1v1"
-
     Output := exo.tests with input as {
         "dkim_config": [
             {
@@ -34,17 +52,11 @@ test_Enabled_Correct_V1 if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == true
-    RuleOutput[0].ReportDetails == "Requirement met"
+    CorrectTestResult("MS.EXO.3.1v1", Output, PASS) == true
 }
 
 # Test with correct default domain
 test_Enabled_Correct_V2 if {
-    PolicyId := "MS.EXO.3.1v1"
-
     Output := exo.tests with input as {
         "dkim_config": [
             {
@@ -86,17 +98,11 @@ test_Enabled_Correct_V2 if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == true
-    RuleOutput[0].ReportDetails == "Requirement met"
+    CorrectTestResult("MS.EXO.3.1v1", Output, PASS) == true
 }
 
 # Test for multiple custom domains
 test_Enabled_Correct_V3 if {
-    PolicyId := "MS.EXO.3.1v1"
-
     Output := exo.tests with input as {
         "dkim_config": [
             {
@@ -138,17 +144,11 @@ test_Enabled_Correct_V3 if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == true
-    RuleOutput[0].ReportDetails == "Requirement met"
+    CorrectTestResult("MS.EXO.3.1v1", Output, PASS) == true
 }
 
 # Test for no custom domains, just the default domain
 test_Enabled_Correct_V4 if {
-    PolicyId := "MS.EXO.3.1v1"
-
     Output := exo.tests with input as {
         "dkim_config": [
             {
@@ -174,16 +174,10 @@ test_Enabled_Correct_V4 if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == true
-    RuleOutput[0].ReportDetails == "Requirement met"
+    CorrectTestResult("MS.EXO.3.1v1", Output, PASS) == true
 }
 
 test_Enabled_Incorrect if {
-    PolicyId := "MS.EXO.3.1v1"
-
     Output := exo.tests with input as {
         "dkim_config": [
             {
@@ -209,16 +203,11 @@ test_Enabled_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == false
-    RuleOutput[0].ReportDetails == "1 of 1 agency domain(s) found in violation: test.name"
+    ReportDetailString := "1 of 1 agency domain(s) found in violation: test.name"
+    IncorrectTestResult("MS.EXO.3.1v1", Output, ReportDetailString) == true
 }
 
-test_Rdata_Incorrect if {
-    PolicyId := "MS.EXO.3.1v1"
-
+test_Rdata_Incorrect_V1 if {
     Output := exo.tests with input as {
         "dkim_config": [
             {
@@ -242,16 +231,11 @@ test_Rdata_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == false
-    RuleOutput[0].ReportDetails == "1 of 1 agency domain(s) found in violation: test.name"
+    ReportDetailString := "1 of 1 agency domain(s) found in violation: test.name"
+    IncorrectTestResult("MS.EXO.3.1v1", Output, ReportDetailString) == true
 }
 
 test_Rdata_Incorrect_V2 if {
-    PolicyId := "MS.EXO.3.1v1"
-
     Output := exo.tests with input as {
         "dkim_config": [
             {
@@ -277,16 +261,11 @@ test_Rdata_Incorrect_V2 if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == false
-    RuleOutput[0].ReportDetails == "1 of 1 agency domain(s) found in violation: test.name"
+    ReportDetailString := "1 of 1 agency domain(s) found in violation: test.name"
+    IncorrectTestResult("MS.EXO.3.1v1", Output, ReportDetailString) == true
 }
 
 test_Enabled_Incorrect_V3 if {
-    PolicyId := "MS.EXO.3.1v1"
-
     Output := exo.tests with input as {
         "dkim_config": [
             {
@@ -328,17 +307,12 @@ test_Enabled_Incorrect_V3 if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == false
-    RuleOutput[0].ReportDetails == "1 of 2 agency domain(s) found in violation: test2.name"
+    ReportDetailString := "1 of 2 agency domain(s) found in violation: test2.name"
+    IncorrectTestResult("MS.EXO.3.1v1", Output, ReportDetailString) == true
 }
 
 # Test with incorrect default domain
 test_Enabled_Incorrect_V4 if {
-    PolicyId := "MS.EXO.3.1v1"
-
     Output := exo.tests with input as {
         "dkim_config": [
             {
@@ -378,10 +352,7 @@ test_Enabled_Incorrect_V4 if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == false
-    RuleOutput[0].ReportDetails == "1 of 2 agency domain(s) found in violation: example.onmicrosoft.com"
+    ReportDetailString := "1 of 2 agency domain(s) found in violation: example.onmicrosoft.com"
+    IncorrectTestResult("MS.EXO.3.1v1", Output, ReportDetailString) == true
 }
 #--
