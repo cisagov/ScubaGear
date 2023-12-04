@@ -193,14 +193,14 @@ function IsRegistered{
     )
 
     Write-Debug "Looking for $RepoName local repository"
+    $Registered = $false
 
     try{
-        $Repo = Get-PSRepository -Name $RepoName
+        $Registered = (Get-PSRepository).Name -contains $RepoName
     }
     catch {
-        Write-Error "In catch of IsRegistered"
-        return $false
+        Write-Error "Failed to check IsRegistered: $_"
     }
 
-    return $null -ne $Repo
+    return $Registered
 }
