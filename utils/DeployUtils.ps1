@@ -64,9 +64,7 @@ function Publish-ScubaGearModule{
         $GalleryName = 'PrivateScubaGearGallery'
     )
 
-    $ModuleBuildPath = Build-ScubaModule -ModulePath $ModulePath -ModuleVersion $ModuleVersion
-
-    Write-Host "Build Path: $ModuleBuildPath"
+    $ModuleBuildPath = Build-ScubaModule -ModulePath $ModulePath
 
     if (SignScubaGearModule -ModulePath $ModuleBuildPath){
         Publish-Module -Path $ModuleBuildPath -Repository $GalleryName
@@ -108,7 +106,7 @@ function ConfigureScubaGearModule{
     $ManifestPath = Join-Path -Path $ModulePath -ChildPath "ScubaGear.psd1"
     $CurrentModuleVersion = (Import-PowerShellDataFile $ManifestPath).ModuleVersion
     $TimeStamp = Get-Date  -Format ddMMyyyHHmmss
-    $ModuleVersion = "${$CurrentModuleVersion.$TimeStmap}"
+    $ModuleVersion = "$CurrentModuleVersion.$TimeStamp"
     $ManifestUpdates = @{
         Path = $ManifestPath
         ModuleVersion = $ModuleVersion
