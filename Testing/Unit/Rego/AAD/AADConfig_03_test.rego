@@ -5,12 +5,31 @@ import data.report.utils.NotCheckedDetails
 import data.report.utils.ReportDetailsBoolean
 
 
+CorrectTestResult(PolicyId, Output, ReportDetailString) := true if {
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet == true
+    RuleOutput[0].ReportDetails == ReportDetailString
+} else := false
+
+IncorrectTestResult(PolicyId, Output, ReportDetailString) := true if {
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet == false
+    RuleOutput[0].ReportDetails == ReportDetailString
+} else := false
+
+FAIL := ReportDetailsBoolean(false)
+
+PASS := ReportDetailsBoolean(true)
+
+
 #
 # MS.AAD.3.1v1
 #--
 test_PhishingResistantAllMFA_Correct if {
-    PolicyId := "MS.AAD.3.1v1"
-
     Output := aad.tests with input as {
         "conditional_access_policies": [
             {
@@ -45,16 +64,11 @@ test_PhishingResistantAllMFA_Correct if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "1 conditional access policy(s) found that meet(s) all requirements:<br/>Test name. <a href='#caps'>View all CA policies</a>."
+    ReportDetailString := "1 conditional access policy(s) found that meet(s) all requirements:<br/>Test name. <a href='#caps'>View all CA policies</a>."
+    CorrectTestResult("MS.AAD.3.1v1", Output, ReportDetailString) == true
 }
 
 test_PhishingResistantSingleMFA_Correct if {
-    PolicyId := "MS.AAD.3.1v1"
-
     Output := aad.tests with input as {
         "conditional_access_policies": [
             {
@@ -87,16 +101,11 @@ test_PhishingResistantSingleMFA_Correct if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "1 conditional access policy(s) found that meet(s) all requirements:<br/>Test name. <a href='#caps'>View all CA policies</a>."
+    ReportDetailString := "1 conditional access policy(s) found that meet(s) all requirements:<br/>Test name. <a href='#caps'>View all CA policies</a>."
+    CorrectTestResult("MS.AAD.3.1v1", Output, ReportDetailString) == true
 }
 
 test_PhishingResistantExtraMFA_Incorrect if {
-    PolicyId := "MS.AAD.3.1v1"
-
     Output := aad.tests with input as {
         "conditional_access_policies": [
             {
@@ -130,16 +139,11 @@ test_PhishingResistantExtraMFA_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    ReportDetailString := "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    IncorrectTestResult("MS.AAD.3.1v1", Output, ReportDetailString) == true
 }
 
 test_PhishingResistantNoneMFA_Incorrect if {
-    PolicyId := "MS.AAD.3.1v1"
-
     Output := aad.tests with input as {
         "conditional_access_policies": [
             {
@@ -170,16 +174,11 @@ test_PhishingResistantNoneMFA_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    #RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    ReportDetailString := "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    IncorrectTestResult("MS.AAD.3.1v1", Output, ReportDetailString) == true
 }
 
 test_PhishingResistantMFAExcludeApp_Incorrect if {
-    PolicyId := "MS.AAD.3.1v1"
-
     Output := aad.tests with input as {
         "conditional_access_policies": [
             {
@@ -216,16 +215,11 @@ test_PhishingResistantMFAExcludeApp_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    ReportDetailString := "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    IncorrectTestResult("MS.AAD.3.1v1", Output, ReportDetailString) == true
 }
 
 test_PhishingResistantMFAExcludeUser_Incorrect if {
-    PolicyId := "MS.AAD.3.1v1"
-
     Output := aad.tests with input as {
         "conditional_access_policies": [
             {
@@ -262,16 +256,11 @@ test_PhishingResistantMFAExcludeUser_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    ReportDetailString := "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    IncorrectTestResult("MS.AAD.3.1v1", Output, ReportDetailString) == true
 }
 
 test_PhishingResistantMFAExcludeGroup_Incorrect if {
-    PolicyId := "MS.AAD.3.1v1"
-
     Output := aad.tests with input as {
         "conditional_access_policies": [
             {
@@ -308,11 +297,8 @@ test_PhishingResistantMFAExcludeGroup_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    ReportDetailString := "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    IncorrectTestResult("MS.AAD.3.1v1", Output, ReportDetailString) == true
 }
 #--
 
@@ -320,8 +306,6 @@ test_PhishingResistantMFAExcludeGroup_Incorrect if {
 # MS.AAD.3.2v1
 #--
 test_NoExclusionsConditions_Correct if {
-    PolicyId := "MS.AAD.3.2v1"
-
     Output := aad.tests with input as {
         "conditional_access_policies": [
             {
@@ -351,16 +335,11 @@ test_NoExclusionsConditions_Correct if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "1 conditional access policy(s) found that meet(s) all requirements:<br/>Test name. <a href='#caps'>View all CA policies</a>."
+    ReportDetailString := "1 conditional access policy(s) found that meet(s) all requirements:<br/>Test name. <a href='#caps'>View all CA policies</a>."
+    CorrectTestResult("MS.AAD.3.2v1", Output, ReportDetailString) == true
 }
 
 test_3_1_Passes_3_2_Fails_Correct if {
-    PolicyId := "MS.AAD.3.2v1"
-
     Output := aad.tests with input as {
         "conditional_access_policies": [
             {
@@ -419,16 +398,11 @@ test_3_1_Passes_3_2_Fails_Correct if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "1 conditional access policy(s) found that meet(s) all requirements:<br/>Test name. <a href='#caps'>View all CA policies</a>."
+    ReportDetailString := "1 conditional access policy(s) found that meet(s) all requirements:<br/>Test name. <a href='#caps'>View all CA policies</a>."
+    CorrectTestResult("MS.AAD.3.2v1", Output, ReportDetailString) == true
 }
 
 test_3_1_Fails_3_2_Passes_Correct if {
-    PolicyId := "MS.AAD.3.2v1"
-
     Output := aad.tests with input as {
         "conditional_access_policies": [
             {
@@ -488,16 +462,11 @@ test_3_1_Fails_3_2_Passes_Correct if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "1 conditional access policy(s) found that meet(s) all requirements:<br/>Test name. <a href='#caps'>View all CA policies</a>."
+    ReportDetailString := "1 conditional access policy(s) found that meet(s) all requirements:<br/>Test name. <a href='#caps'>View all CA policies</a>."
+    CorrectTestResult("MS.AAD.3.2v1", Output, ReportDetailString) == true
 }
 
 test_NoExclusionsExemptUsers_Correct if {
-    PolicyId := "MS.AAD.3.2v1"
-
     Output := aad.tests with input as {
         "conditional_access_policies": [
             {
@@ -539,16 +508,11 @@ test_NoExclusionsExemptUsers_Correct if {
         }
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "1 conditional access policy(s) found that meet(s) all requirements:<br/>Test name. <a href='#caps'>View all CA policies</a>."
+    ReportDetailString := "1 conditional access policy(s) found that meet(s) all requirements:<br/>Test name. <a href='#caps'>View all CA policies</a>."
+    CorrectTestResult("MS.AAD.3.2v1", Output, ReportDetailString) == true
 }
 
 test_NoExclusionsExemptGroups_Correct if {
-    PolicyId := "MS.AAD.3.2v1"
-
     Output := aad.tests with input as {
         "conditional_access_policies": [
             {
@@ -590,17 +554,12 @@ test_NoExclusionsExemptGroups_Correct if {
         }
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "1 conditional access policy(s) found that meet(s) all requirements:<br/>Test name. <a href='#caps'>View all CA policies</a>."
+    ReportDetailString := "1 conditional access policy(s) found that meet(s) all requirements:<br/>Test name. <a href='#caps'>View all CA policies</a>."
+    CorrectTestResult("MS.AAD.3.2v1", Output, ReportDetailString) == true
 }
 
 # User exclusions test
 test_UserExclusionNoExempt_Incorrect if {
-    PolicyId := "MS.AAD.3.2v1"
-
     Output := aad.tests with input as {
         "conditional_access_policies": [
             {
@@ -632,16 +591,11 @@ test_UserExclusionNoExempt_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    ReportDetailString := "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    IncorrectTestResult("MS.AAD.3.2v1", Output, ReportDetailString) == true
 }
 
 test_UserExclusionConditions_Correct if {
-    PolicyId := "MS.AAD.3.2v1"
-
     Output := aad.tests with input as {
         "conditional_access_policies": [
             {
@@ -685,16 +639,11 @@ test_UserExclusionConditions_Correct if {
         }
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "1 conditional access policy(s) found that meet(s) all requirements:<br/>Test name. <a href='#caps'>View all CA policies</a>."
+    ReportDetailString := "1 conditional access policy(s) found that meet(s) all requirements:<br/>Test name. <a href='#caps'>View all CA policies</a>."
+    CorrectTestResult("MS.AAD.3.2v1", Output, ReportDetailString) == true
 }
 
 test_UserExclusionsNoExempt_Incorrect if {
-    PolicyId := "MS.AAD.3.2v1"
-
     Output := aad.tests with input as {
         "conditional_access_policies": [
             {
@@ -727,16 +676,11 @@ test_UserExclusionsNoExempt_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    ReportDetailString := "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    IncorrectTestResult("MS.AAD.3.2v1", Output, ReportDetailString) == true
 }
 
 test_UserExclusionsSingleExempt_Incorrect if {
-    PolicyId := "MS.AAD.3.2v1"
-
     Output := aad.tests with input as {
         "conditional_access_policies": [
             {
@@ -781,16 +725,11 @@ test_UserExclusionsSingleExempt_Incorrect if {
         }
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    ReportDetailString := "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    IncorrectTestResult("MS.AAD.3.2v1", Output, ReportDetailString) == true
 }
 
 test_MultiUserExclusionsConditions_Correct if {
-    PolicyId := "MS.AAD.3.2v1"
-
     Output := aad.tests with input as {
         "conditional_access_policies": [
             {
@@ -836,17 +775,12 @@ test_MultiUserExclusionsConditions_Correct if {
         }
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "1 conditional access policy(s) found that meet(s) all requirements:<br/>Test name. <a href='#caps'>View all CA policies</a>."
+    ReportDetailString := "1 conditional access policy(s) found that meet(s) all requirements:<br/>Test name. <a href='#caps'>View all CA policies</a>."
+    CorrectTestResult("MS.AAD.3.2v1", Output, ReportDetailString) == true
 }
 
 # Group Exclusion tests
 test_GroupExclusionNoExempt_Incorrect if {
-    PolicyId := "MS.AAD.3.2v1"
-
     Output := aad.tests with input as {
         "conditional_access_policies": [
             {
@@ -878,16 +812,11 @@ test_GroupExclusionNoExempt_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    ReportDetailString := "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    IncorrectTestResult("MS.AAD.3.2v1", Output, ReportDetailString) == true
 }
 
 test_GroupExclusionsConditions_Correct if {
-    PolicyId := "MS.AAD.3.2v1"
-
     Output := aad.tests with input as {
         "conditional_access_policies": [
             {
@@ -931,16 +860,11 @@ test_GroupExclusionsConditions_Correct if {
         }
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "1 conditional access policy(s) found that meet(s) all requirements:<br/>Test name. <a href='#caps'>View all CA policies</a>."
+    ReportDetailString := "1 conditional access policy(s) found that meet(s) all requirements:<br/>Test name. <a href='#caps'>View all CA policies</a>."
+    CorrectTestResult("MS.AAD.3.2v1", Output, ReportDetailString) == true
 }
 
 test_GroupExclusionsNoExempt_Incorrect if {
-    PolicyId := "MS.AAD.3.2v1"
-
     Output := aad.tests with input as {
         "conditional_access_policies": [
             {
@@ -973,16 +897,11 @@ test_GroupExclusionsNoExempt_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    ReportDetailString := "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    IncorrectTestResult("MS.AAD.3.2v1", Output, ReportDetailString) == true
 }
 
 test_GroupExclusionsSingleExempt_Incorrect if {
-    PolicyId := "MS.AAD.3.2v1"
-
     Output := aad.tests with input as {
         "conditional_access_policies": [
             {
@@ -1027,16 +946,11 @@ test_GroupExclusionsSingleExempt_Incorrect if {
         }
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    ReportDetailString := "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    IncorrectTestResult("MS.AAD.3.2v1", Output, ReportDetailString) == true
 }
 
 test_MultiGroupExclusionsConditions_Correct if {
-    PolicyId := "MS.AAD.3.2v1"
-
     Output := aad.tests with input as {
         "conditional_access_policies": [
             {
@@ -1082,17 +996,12 @@ test_MultiGroupExclusionsConditions_Correct if {
         }
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "1 conditional access policy(s) found that meet(s) all requirements:<br/>Test name. <a href='#caps'>View all CA policies</a>."
+    ReportDetailString := "1 conditional access policy(s) found that meet(s) all requirements:<br/>Test name. <a href='#caps'>View all CA policies</a>."
+    CorrectTestResult("MS.AAD.3.2v1", Output, ReportDetailString) == true
 }
 
 # User and group exclusions tests
 test_UserGroupExclusionConditions_Correct if {
-    PolicyId := "MS.AAD.3.2v1"
-
     Output := aad.tests with input as {
         "conditional_access_policies": [
             {
@@ -1140,16 +1049,11 @@ test_UserGroupExclusionConditions_Correct if {
         }
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "1 conditional access policy(s) found that meet(s) all requirements:<br/>Test name. <a href='#caps'>View all CA policies</a>."
+    ReportDetailString := "1 conditional access policy(s) found that meet(s) all requirements:<br/>Test name. <a href='#caps'>View all CA policies</a>."
+    CorrectTestResult("MS.AAD.3.2v1", Output, ReportDetailString) == true
 }
 
 test_UserGroupExclusionNoExempt_Incorrect if {
-    PolicyId := "MS.AAD.3.2v1"
-
     Output := aad.tests with input as {
         "conditional_access_policies": [
             {
@@ -1183,16 +1087,11 @@ test_UserGroupExclusionNoExempt_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    ReportDetailString := "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    IncorrectTestResult("MS.AAD.3.2v1", Output, ReportDetailString) == true
 }
 
 test_UserGroupExclusionUserExemptOnly_Incorrect if {
-    PolicyId := "MS.AAD.3.2v1"
-
     Output := aad.tests with input as {
         "conditional_access_policies": [
             {
@@ -1238,16 +1137,11 @@ test_UserGroupExclusionUserExemptOnly_Incorrect if {
         }
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    ReportDetailString := "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    IncorrectTestResult("MS.AAD.3.2v1", Output, ReportDetailString) == true
 }
 
 test_UserGroupExclusionGroupExemptOnly_Incorrect if {
-    PolicyId := "MS.AAD.3.2v1"
-
     Output := aad.tests with input as {
         "conditional_access_policies": [
             {
@@ -1293,16 +1187,11 @@ test_UserGroupExclusionGroupExemptOnly_Incorrect if {
         }
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    ReportDetailString := "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    IncorrectTestResult("MS.AAD.3.2v1", Output, ReportDetailString) == true
 }
 
 test_UserGroupExclusionTooFewUserExempts_Incorrect if {
-    PolicyId := "MS.AAD.3.2v1"
-
     Output := aad.tests with input as {
         "conditional_access_policies": [
             {
@@ -1351,17 +1240,12 @@ test_UserGroupExclusionTooFewUserExempts_Incorrect if {
         }
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    ReportDetailString := "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    IncorrectTestResult("MS.AAD.3.2v1", Output, ReportDetailString) == true
 }
 
 # Other conditions
 test_ConditionalAccessPolicies_Correct_V1 if {
-    PolicyId := "MS.AAD.3.2v1"
-
     Output := aad.tests with input as {
         "conditional_access_policies": [
             {
@@ -1391,16 +1275,11 @@ test_ConditionalAccessPolicies_Correct_V1 if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "1 conditional access policy(s) found that meet(s) all requirements:<br/>Test Policy require MFA for All Users. <a href='#caps'>View all CA policies</a>."
+    ReportDetailString := "1 conditional access policy(s) found that meet(s) all requirements:<br/>Test Policy require MFA for All Users. <a href='#caps'>View all CA policies</a>."
+    CorrectTestResult("MS.AAD.3.2v1", Output, ReportDetailString) == true
 }
 
 test_IncludeApplications_Incorrect_V1 if {
-    PolicyId := "MS.AAD.3.2v1"
-
     Output := aad.tests with input as {
         "conditional_access_policies": [
             {
@@ -1430,16 +1309,11 @@ test_IncludeApplications_Incorrect_V1 if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    ReportDetailString := "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    IncorrectTestResult("MS.AAD.3.2v1", Output, ReportDetailString) == true
 }
 
 test_IncludeUsers_Incorrect_V1 if {
-    PolicyId := "MS.AAD.3.2v1"
-
     Output := aad.tests with input as {
         "conditional_access_policies": [
             {
@@ -1469,16 +1343,11 @@ test_IncludeUsers_Incorrect_V1 if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    ReportDetailString := "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    IncorrectTestResult("MS.AAD.3.2v1", Output, ReportDetailString) == true
 }
 
 test_ExcludeUsers_Incorrect if {
-    PolicyId := "MS.AAD.3.2v1"
-
     Output := aad.tests with input as {
         "conditional_access_policies": [
             {
@@ -1510,16 +1379,11 @@ test_ExcludeUsers_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    ReportDetailString := "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    IncorrectTestResult("MS.AAD.3.2v1", Output, ReportDetailString) == true
 }
 
 test_ExcludeGroups_Incorrect if {
-    PolicyId := "MS.AAD.3.2v1"
-
     Output := aad.tests with input as {
         "conditional_access_policies": [
             {
@@ -1551,16 +1415,11 @@ test_ExcludeGroups_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    ReportDetailString := "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    IncorrectTestResult("MS.AAD.3.2v1", Output, ReportDetailString) == true
 }
 
 test_ExcludeRoles_Incorrect_V1 if {
-    PolicyId := "MS.AAD.3.2v1"
-
     Output := aad.tests with input as {
         "conditional_access_policies": [
             {
@@ -1592,16 +1451,11 @@ test_ExcludeRoles_Incorrect_V1 if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    ReportDetailString := "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    IncorrectTestResult("MS.AAD.3.2v1", Output, ReportDetailString) == true
 }
 
 test_BuiltInControls_Incorrect_V1 if {
-    PolicyId := "MS.AAD.3.2v1"
-
     Output := aad.tests with input as {
         "conditional_access_policies": [
             {
@@ -1631,16 +1485,11 @@ test_BuiltInControls_Incorrect_V1 if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    ReportDetailString := "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    IncorrectTestResult("MS.AAD.3.2v1", Output, ReportDetailString) == true
 }
 
 test_State_Incorrect_V1 if {
-    PolicyId := "MS.AAD.3.2v1"
-
     Output := aad.tests with input as {
         "conditional_access_policies": [
             {
@@ -1670,11 +1519,8 @@ test_State_Incorrect_V1 if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    ReportDetailString := "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    IncorrectTestResult("MS.AAD.3.2v1", Output, ReportDetailString) == true
 }
 #--
 
@@ -1682,8 +1528,6 @@ test_State_Incorrect_V1 if {
 # MS.AAD.3.3v1
 #--
 test_3_1_passes_and_satisfies_3_3 if{
-    PolicyId := "MS.AAD.3.3v1"
-
     Output := aad.tests with input as {
         "conditional_access_policies": [
             {
@@ -1718,56 +1562,17 @@ test_3_1_passes_and_satisfies_3_3 if{
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "1 conditional access policy(s) found that meet(s) all requirements:<br/>Test Policy. <a href='#caps'>View all CA policies</a>."
-
+    ReportDetailString := "1 conditional access policy(s) found that meet(s) all requirements:<br/>Test Policy. <a href='#caps'>View all CA policies</a>."
+    CorrectTestResult("MS.AAD.3.3v1", Output, ReportDetailString) == true
 }
 
 test_NotImplemented_Correct_V2 if {
     PolicyId := "MS.AAD.3.3v1"
 
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ],
-                        "ExcludeApplications": []
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ],
-                        "ExcludeUsers": [],
-                        "ExcludeGroups": [],
-                        "ExcludeRoles": []
-                    }
-                },
-                "GrantControls": {
-                    "AuthenticationStrength": {
-                        "AllowedCombinations": [
-                            "windowsHelloForBusiness",
-                            "fido2",
-                            "Super strength"
-                        ]
-                    }
-                },
-                "State": "enabled",
-                "DisplayName": "Test Policy"
-            }
-        ]
-    }
+    Output := aad.tests with input as { }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == NotCheckedDetails(PolicyId)
+    ReportDetailString := NotCheckedDetails(PolicyId)
+    IncorrectTestResult(PolicyId, Output, ReportDetailString) == true
 }
 #--
 
@@ -1775,8 +1580,6 @@ test_NotImplemented_Correct_V2 if {
 # MS.AAD.3.4v1
 #--
 test_Migrated_Correct if {
-    PolicyId := "MS.AAD.3.4v1"
-
     Output := aad.tests with input as {
         "authentication_method": [
             {
@@ -1785,16 +1588,10 @@ test_Migrated_Correct if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == ReportDetailsBoolean(true)
+    CorrectTestResult("MS.AAD.3.4v1", Output, PASS) == true
 }
 
 test_Migrated_Incorrect if {
-    PolicyId := "MS.AAD.3.4v1"
-
     Output := aad.tests with input as {
         "authentication_method": [
             {
@@ -1803,11 +1600,7 @@ test_Migrated_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == ReportDetailsBoolean(false)
+    IncorrectTestResult("MS.AAD.3.4v1", Output, FAIL) == true
 }
 #--
 
@@ -1819,11 +1612,8 @@ test_NotImplemented_Correct_V4 if {
 
     Output := aad.tests with input as { }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == NotCheckedDetails(PolicyId)
+    ReportDetailString := NotCheckedDetails(PolicyId)
+    IncorrectTestResult(PolicyId, Output, ReportDetailString) == true
 }
 #--
 
@@ -1831,8 +1621,6 @@ test_NotImplemented_Correct_V4 if {
 # MS.AAD.3.6v1
 #--
 test_ConditionalAccessPolicies_Correct_all_strengths if {
-    PolicyId := "MS.AAD.3.6v1"
-
     Output := aad.tests with input as {
         "conditional_access_policies": [
             {
@@ -1876,16 +1664,11 @@ test_ConditionalAccessPolicies_Correct_all_strengths if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "1 conditional access policy(s) found that meet(s) all requirements:<br/>MFA required for all highly Privileged Roles Policy. <a href='#caps'>View all CA policies</a>."
+    ReportDetailString := "1 conditional access policy(s) found that meet(s) all requirements:<br/>MFA required for all highly Privileged Roles Policy. <a href='#caps'>View all CA policies</a>."
+    CorrectTestResult("MS.AAD.3.6v1", Output, ReportDetailString) == true
 }
 
 test_ConditionalAccessPolicies_Correct_windowsHelloForBusiness_only if {
-    PolicyId := "MS.AAD.3.6v1"
-
     Output := aad.tests with input as {
         "conditional_access_policies": [
             {
@@ -1927,16 +1710,11 @@ test_ConditionalAccessPolicies_Correct_windowsHelloForBusiness_only if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "1 conditional access policy(s) found that meet(s) all requirements:<br/>MFA required for all highly Privileged Roles Policy. <a href='#caps'>View all CA policies</a>."
+    ReportDetailString := "1 conditional access policy(s) found that meet(s) all requirements:<br/>MFA required for all highly Privileged Roles Policy. <a href='#caps'>View all CA policies</a>."
+    CorrectTestResult("MS.AAD.3.6v1", Output, ReportDetailString) == true
 }
 
 test_ConditionalAccessPolicies_Correct_fido2_only if {
-    PolicyId := "MS.AAD.3.6v1"
-
     Output := aad.tests with input as {
         "conditional_access_policies": [
             {
@@ -1978,16 +1756,11 @@ test_ConditionalAccessPolicies_Correct_fido2_only if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "1 conditional access policy(s) found that meet(s) all requirements:<br/>MFA required for all highly Privileged Roles Policy. <a href='#caps'>View all CA policies</a>."
+    ReportDetailString := "1 conditional access policy(s) found that meet(s) all requirements:<br/>MFA required for all highly Privileged Roles Policy. <a href='#caps'>View all CA policies</a>."
+    CorrectTestResult("MS.AAD.3.6v1", Output, ReportDetailString) == true
 }
 
 test_ConditionalAccessPolicies_Correct_x509_only if {
-    PolicyId := "MS.AAD.3.6v1"
-
     Output := aad.tests with input as {
         "conditional_access_policies": [
             {
@@ -2029,16 +1802,11 @@ test_ConditionalAccessPolicies_Correct_x509_only if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "1 conditional access policy(s) found that meet(s) all requirements:<br/>MFA required for all highly Privileged Roles Policy. <a href='#caps'>View all CA policies</a>."
+    ReportDetailString := "1 conditional access policy(s) found that meet(s) all requirements:<br/>MFA required for all highly Privileged Roles Policy. <a href='#caps'>View all CA policies</a>."
+    CorrectTestResult("MS.AAD.3.6v1", Output, ReportDetailString) == true
 }
 
 test_ConditionalAccessPolicies_Incorrect_not_all_apps if {
-    PolicyId := "MS.AAD.3.6v1"
-
     Output := aad.tests with input as {
         "conditional_access_policies": [
             {
@@ -2080,16 +1848,11 @@ test_ConditionalAccessPolicies_Incorrect_not_all_apps if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    ReportDetailString := "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    IncorrectTestResult("MS.AAD.3.6v1", Output, ReportDetailString) == true
 }
 
 test_BuiltInControls_Incorrect_No_Authentication_Strenght if {
-    PolicyId := "MS.AAD.3.6v1"
-
     Output := aad.tests with input as {
         "conditional_access_policies": [
             {
@@ -2132,16 +1895,11 @@ test_BuiltInControls_Incorrect_No_Authentication_Strenght if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    ReportDetailString := "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    IncorrectTestResult("MS.AAD.3.6v1", Output, ReportDetailString) == true
 }
 
 test_ConditionalAccessPolicies_Incorrect_disabled if {
-    PolicyId := "MS.AAD.3.6v1"
-
     Output := aad.tests with input as {
         "conditional_access_policies": [
             {
@@ -2185,16 +1943,11 @@ test_ConditionalAccessPolicies_Incorrect_disabled if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    ReportDetailString := "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    IncorrectTestResult("MS.AAD.3.6v1", Output, ReportDetailString) == true
 }
 
 test_ConditionalAccessPolicies_Incorrect_Covered_Roles if {
-    PolicyId := "MS.AAD.3.6v1"
-
     Output := aad.tests with input as {
         "conditional_access_policies": [
             {
@@ -2237,16 +1990,11 @@ test_ConditionalAccessPolicies_Incorrect_Covered_Roles if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    ReportDetailString := "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    IncorrectTestResult("MS.AAD.3.6v1", Output, ReportDetailString) == true
 }
 
 test_ConditionalAccessPolicies_Incorrect_Wrong_Roles if {
-    PolicyId := "MS.AAD.3.6v1"
-
     Output := aad.tests with input as {
         "conditional_access_policies": [
             {
@@ -2285,16 +2033,11 @@ test_ConditionalAccessPolicies_Incorrect_Wrong_Roles if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    ReportDetailString := "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    IncorrectTestResult("MS.AAD.3.6v1", Output, ReportDetailString) == true
 }
 
 test_ExcludeRoles_Incorrect_V2 if {
-    PolicyId := "MS.AAD.3.6v1"
-
     Output := aad.tests with input as {
         "conditional_access_policies": [
             {
@@ -2340,11 +2083,8 @@ test_ExcludeRoles_Incorrect_V2 if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    ReportDetailString := "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    IncorrectTestResult("MS.AAD.3.6v1", Output, ReportDetailString) == true
 }
 #--
 
@@ -2352,8 +2092,6 @@ test_ExcludeRoles_Incorrect_V2 if {
 # MS.AAD.3.7v1
 #--
 test_ConditionalAccessPolicies_Correct_V3 if {
-    PolicyId := "MS.AAD.3.7v1"
-
     Output := aad.tests with input as {
         "conditional_access_policies": [
             {
@@ -2380,16 +2118,11 @@ test_ConditionalAccessPolicies_Correct_V3 if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "1 conditional access policy(s) found that meet(s) all requirements:<br/>AD Joined Device Authentication Policy. <a href='#caps'>View all CA policies</a>."
+    ReportDetailString := "1 conditional access policy(s) found that meet(s) all requirements:<br/>AD Joined Device Authentication Policy. <a href='#caps'>View all CA policies</a>."
+    CorrectTestResult("MS.AAD.3.7v1", Output, ReportDetailString) == true
 }
 
 test_BuiltInControls_Correct if {
-    PolicyId := "MS.AAD.3.7v1"
-
     Output := aad.tests with input as {
         "conditional_access_policies": [
             {
@@ -2416,16 +2149,11 @@ test_BuiltInControls_Correct if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "1 conditional access policy(s) found that meet(s) all requirements:<br/>AD Joined Device Authentication Policy. <a href='#caps'>View all CA policies</a>."
+    ReportDetailString := "1 conditional access policy(s) found that meet(s) all requirements:<br/>AD Joined Device Authentication Policy. <a href='#caps'>View all CA policies</a>."
+    CorrectTestResult("MS.AAD.3.7v1", Output, ReportDetailString) == true
 }
 
 test_IncludeApplications_Incorrect_V3 if {
-    PolicyId := "MS.AAD.3.7v1"
-
     Output := aad.tests with input as {
         "conditional_access_policies": [
             {
@@ -2452,16 +2180,11 @@ test_IncludeApplications_Incorrect_V3 if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    ReportDetailString := "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    IncorrectTestResult("MS.AAD.3.7v1", Output, ReportDetailString) == true
 }
 
 test_IncludeUsers_Incorrect_V2 if {
-    PolicyId := "MS.AAD.3.7v1"
-
     Output := aad.tests with input as {
         "conditional_access_policies": [
             {
@@ -2488,16 +2211,11 @@ test_IncludeUsers_Incorrect_V2 if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    ReportDetailString := "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    IncorrectTestResult("MS.AAD.3.7v1", Output, ReportDetailString) == true
 }
 
 test_BuiltInControls_Incorrect_V3 if {
-    PolicyId := "MS.AAD.3.7v1"
-
     Output := aad.tests with input as {
         "conditional_access_policies": [
             {
@@ -2524,16 +2242,11 @@ test_BuiltInControls_Incorrect_V3 if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    ReportDetailString := "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    IncorrectTestResult("MS.AAD.3.7v1", Output, ReportDetailString) == true
 }
 
 test_State_Incorrect_V3 if {
-    PolicyId := "MS.AAD.3.7v1"
-
     Output := aad.tests with input as {
         "conditional_access_policies": [
             {
@@ -2560,11 +2273,8 @@ test_State_Incorrect_V3 if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    ReportDetailString := "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    IncorrectTestResult("MS.AAD.3.7v1", Output, ReportDetailString) == true
 }
 #--
 
@@ -2665,7 +2375,7 @@ test_ExcludeUserCorrect_V1 if {
     contains(RuleOutput[0].ReportDetails, "conditional access policy(s) found that meet(s) all requirements:")
 }
 
-test_ExcludeGroupCorrect_V1 if {
+test_ExcludeGroup_Correct_V1 if {
     PolicyId := "MS.AAD.3.8v1"
 
     Output := aad.tests with input as {
@@ -2770,7 +2480,7 @@ test_ExcludeUserIncorrect_V1 if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    ReportDetailString := "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
 }
 
 test_ExcludeGroupIncorrect_V1 if {
@@ -2824,12 +2534,10 @@ test_ExcludeGroupIncorrect_V1 if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    ReportDetailString := "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
 }
 
 test_InCorrect_ReportOnly if {
-    PolicyId := "MS.AAD.3.8v1"
-
     Output := aad.tests with input as {
         "conditional_access_policies": [
             {
@@ -2860,11 +2568,8 @@ test_InCorrect_ReportOnly if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    ReportDetailString := "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    IncorrectTestResult("MS.AAD.3.8v1", Output, ReportDetailString) == true
 }
 
 test_Correct_OnlyCompliantDevice if {
@@ -2946,8 +2651,6 @@ test_Correct_OnlyDomainJoinedDevice if {
 }
 
 test_InCorrect_EmptyGrantControls if {
-    PolicyId := "MS.AAD.3.8v1"
-
     Output := aad.tests with input as {
         "conditional_access_policies": [
             {
@@ -2975,24 +2678,16 @@ test_InCorrect_EmptyGrantControls if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    ReportDetailString := "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    IncorrectTestResult("MS.AAD.3.8v1", Output, ReportDetailString) == true
 }
 
 test_InCorrect_No_Policy if {
-    PolicyId := "MS.AAD.3.8v1"
-
     Output := aad.tests with input as {
         "conditional_access_policies": []
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    ReportDetailString := "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    IncorrectTestResult("MS.AAD.3.8v1", Output, ReportDetailString) == true
 }
 #--
