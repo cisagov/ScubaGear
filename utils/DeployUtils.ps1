@@ -105,7 +105,7 @@ function ConfigureScubaGearModule{
     #TODO: Add any module configuration needed (e.g., adjust Module Version)
     $ManifestPath = Join-Path -Path $ModulePath -ChildPath "ScubaGear.psd1"
     $CurrentModuleVersion = (Import-PowerShellDataFile $ManifestPath).ModuleVersion
-    $TimeStamp = Get-Date  -Format ddMMyyyHHmmss
+    $TimeStamp = [int32](Get-Date -UFormat %s)
     $ModuleVersion = "$CurrentModuleVersion.$TimeStamp"
     $ManifestUpdates = @{
         Path = $ManifestPath
