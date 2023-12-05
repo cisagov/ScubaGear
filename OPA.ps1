@@ -7,6 +7,17 @@
     .EXAMPLE
         .\OPA.ps1
 #>
+param (
+    [Parameter(Mandatory=$false)]
+    [ValidateScript({Test-Path -Path $_ -PathType Container})]
+    [string]
+    $ScubaParentDirectory = $env:USERPROFILE
+)
+
+$ScubaHiddenHome = Join-Path -Path $ScubaParentDirectory -ChildPath '.scubagear'
+$ScubaTools = Join-Path -Path $ScubaHiddenHome -ChildPath 'Tools'
+New-Item -ItemType Directory -Force -Path $ScubaTools
+
 
 [CmdletBinding()]
 param(

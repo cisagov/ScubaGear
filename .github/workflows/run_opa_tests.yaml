@@ -16,6 +16,8 @@ on:
   pull_request_review:
     types: [submitted]
 
+env:
+  MODULE_ROOT: PowerShell/ScubaGear
 jobs:
   Run-OPA-Tests:
     runs-on: ubuntu-latest
@@ -29,10 +31,10 @@ jobs:
         version: latest
 
     - name: Run OPA Check
-      run: opa check Rego Testing/Unit/Rego --strict
+      run: opa check ${{ env.MODULE_ROOT }}/Rego ${{ env.MODULE_ROOT }}/Testing/Unit/Rego --strict
 
     - name: Run OPA Tests
-      run: opa test Rego/*.rego Rego/Utils/*.rego Testing/Unit/Rego/**/*.rego -v
+      run: opa test ${{ env.MODULE_ROOT }}/Rego/*.rego ${{ env.MODULE_ROOT }}/Rego/Utils/*.rego ${{ env.MODULE_ROOT }}/Testing/Unit/Rego/**/*.rego -v
 
     - name: Setup Regal
       uses: StyraInc/setup-regal@v0.2.0
@@ -40,4 +42,4 @@ jobs:
         version: v0.11.0
 
     - name: Run Regal Lint
-      run: regal lint --format github Rego Testing
+      run: regal lint --format github ${{ env.MODULE_ROOT }}/Rego ${{ env.MODULE_ROOT }}/Testing

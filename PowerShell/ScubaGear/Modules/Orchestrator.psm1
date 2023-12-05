@@ -125,7 +125,7 @@ function Invoke-SCuBA {
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateScript({Test-Path -PathType Container $_})]
         [string]
-        $OPAPath = (Join-Path -Path $PSScriptRoot -ChildPath "..\..\.."),
+        $OPAPath = (Join-Path -Path $env:USERPROFILE -ChildPath ".scubagear\Tools"),
 
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
@@ -258,9 +258,6 @@ function Invoke-SCuBA {
                 $PSBoundParameters.Add("Organization", $ScubaConfig.Organization)
             }
         }
-
-        # The equivalent of ..\..
-        $ParentPath = Split-Path $(Split-Path $ParentPath -Parent) -Parent
 
         # Creates the output folder
         $Date = Get-Date -ErrorAction 'Stop'
