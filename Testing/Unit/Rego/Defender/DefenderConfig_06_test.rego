@@ -11,10 +11,12 @@ test_AdminAuditLogEnabled_Correct if {
     PolicyId := "MS.DEFENDER.6.1v1"
 
     Output := defender.tests with input as {
-        "admin_audit_log_config": [{
-            "Identity": "Admin Audit Log Settings",
-            "UnifiedAuditLogIngestionEnabled" : true
-        }]
+        "admin_audit_log_config": [
+            {
+                "Identity": "Admin Audit Log Settings",
+                "UnifiedAuditLogIngestionEnabled": true
+            }
+        ]
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
@@ -28,10 +30,12 @@ test_AdminAuditLogEnabled_Incorrect if {
     PolicyId := "MS.DEFENDER.6.1v1"
 
     Output := defender.tests with input as {
-        "admin_audit_log_config": [{
-            "Identity": "Admin Audit Log Settings",
-            "UnifiedAuditLogIngestionEnabled" : false
-        }]
+        "admin_audit_log_config": [
+            {
+                "Identity": "Admin Audit Log Settings",
+                "UnifiedAuditLogIngestionEnabled": false
+            }
+        ]
     }
 
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
