@@ -14,7 +14,7 @@ param(
     [Parameter(Mandatory = $false, HelpMessage = 'The version of OPA Rego to be downloaded, must be in "x.x.x" format')]
     [Alias('version')]
     [version]
-    $ExpectedVersion = '0.58.0',
+    $ExpectedVersion = '0.59.0',
 
     [Parameter(Mandatory = $false, HelpMessage = 'The file name that the opa executable is to be saved as')]
     [Alias('name')]
@@ -23,7 +23,7 @@ param(
 )
 
 # Constants
-$MINVERSION = [version] '0.42.1'
+$ACCEPTABLEVERSIONS = [version] '0.42.1','0.42.2','0.43.1','0.44.0','0.45.0','0.46.3','0.47.4','0.48.0','0.49.2','0.50.2','0.51.0','0.52.0','0.53.1','0.54.0','0.55.0','0.56.0','0.57.1','0.58.0','0.59.0'
 
 # Download opa rego exe
 function Get-OPAFile {
@@ -39,7 +39,7 @@ function Get-OPAFile {
         [string]$ExpectedVersion
     )
 
-    $InstallUrl = "https://openpolicyagent.org/downloads/v$($ExpectedVersion)/$OPAExe"
+    $InstallUrl = "https://openpolicyagent.org/downloads/v$($ExpectedVersion)/opa_windows_amd64.exe"
     $OutFile=(Join-Path (Get-Location).Path $InstallUrl.SubString($InstallUrl.LastIndexOf('/')))
 
     try {
@@ -127,8 +127,8 @@ $DebugPreference = "Continue"
 $InformationPreference = "Continue"
 $ErrorActionPreference = "Stop"
 
-if($ExpectedVersion -lt $MINVERSION) {
-    throw "Version parameter entered, ${ExpectedVersion}, must be greater than ${MINVERSION}"
+if(-not $ACCEPTABLEVERSIONS.Contains($ExpectedVersion)) {
+    throw "Version parameter entered, ${ExpectedVersion}, is not in the list of acceptable versions: ${ACCEPTABLEVERSIONS}"
 }
 
 if(Test-Path -Path $OPAExe -PathType Leaf) {
