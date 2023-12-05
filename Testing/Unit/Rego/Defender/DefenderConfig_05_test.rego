@@ -2,14 +2,34 @@ package defender_test
 import future.keywords
 import data.defender
 import data.report.utils.NotCheckedDetails
+import data.report.utils.ReportDetailsBoolean
+
+
+CorrectTestResult(PolicyId, Output, ReportDetailString) := true if {
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet == true
+    RuleOutput[0].ReportDetails == ReportDetailString
+} else := false
+
+IncorrectTestResult(PolicyId, Output, ReportDetailString) := true if {
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet == false
+    RuleOutput[0].ReportDetails == ReportDetailString
+} else := false
+
+FAIL := ReportDetailsBoolean(false)
+
+PASS := ReportDetailsBoolean(true)
 
 
 #
 # Policy 1
 #--
 test_Disabled_Correct_V1 if {
-    PolicyId := "MS.DEFENDER.5.1v1"
-
     Output := defender.tests with input as {
         "protection_alerts": [
             {
@@ -51,16 +71,10 @@ test_Disabled_Correct_V1 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement met"
+    CorrectTestResult("MS.DEFENDER.5.1v1", Output, PASS) == true
 }
 
 test_Disabled_Correct_V2 if {
-    PolicyId := "MS.DEFENDER.5.1v1"
-
     Output := defender.tests with input as {
         "protection_alerts": [
             {
@@ -106,16 +120,10 @@ test_Disabled_Correct_V2 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement met"
+    CorrectTestResult("MS.DEFENDER.5.1v1", Output, PASS) == true
 }
 
-test_Disabled_Inorrect_V1 if {
-    PolicyId := "MS.DEFENDER.5.1v1"
-
+test_Disabled_Incorrect_V1 if {
     Output := defender.tests with input as {
         "protection_alerts": [
             {
@@ -157,16 +165,11 @@ test_Disabled_Inorrect_V1 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "1 disabled required alert(s) found: Suspicious email sending patterns detected"
+    ReportDetailString := "1 disabled required alert(s) found: Suspicious email sending patterns detected"
+    IncorrectTestResult("MS.DEFENDER.5.1v1", Output, ReportDetailString) == true
 }
 
-test_Disabled_Inorrect_V2 if {
-    PolicyId := "MS.DEFENDER.5.1v1"
-
+test_Disabled_Incorrect_V2 if {
     Output := defender.tests with input as {
         "protection_alerts": [
             {
@@ -204,11 +207,8 @@ test_Disabled_Inorrect_V2 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "1 disabled required alert(s) found: Suspicious email sending patterns detected"
+    ReportDetailString := "1 disabled required alert(s) found: Suspicious email sending patterns detected"
+    IncorrectTestResult("MS.DEFENDER.5.1v1", Output, ReportDetailString) == true
 }
 #--
 
@@ -220,10 +220,7 @@ test_NotImplemented_Correct_V2 if {
 
     Output := defender.tests with input as { }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == NotCheckedDetails(PolicyId)
+    ReportDetailString := NotCheckedDetails(PolicyId)
+    IncorrectTestResult(PolicyId, Output, ReportDetailString) == true
 }
 #--

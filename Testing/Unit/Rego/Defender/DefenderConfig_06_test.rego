@@ -1,15 +1,35 @@
 package defender_test
 import future.keywords
 import data.defender
+import data.report.utils.ReportDetailsBoolean
 import data.report.utils.NotCheckedDetails
+
+
+CorrectTestResult(PolicyId, Output, ReportDetailString) := true if {
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet == true
+    RuleOutput[0].ReportDetails == ReportDetailString
+} else := false
+
+IncorrectTestResult(PolicyId, Output, ReportDetailString) := true if {
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet == false
+    RuleOutput[0].ReportDetails == ReportDetailString
+} else := false
+
+FAIL := ReportDetailsBoolean(false)
+
+PASS := ReportDetailsBoolean(true)
 
 
 #
 # Policy 1
 #--
 test_AdminAuditLogEnabled_Correct if {
-    PolicyId := "MS.DEFENDER.6.1v1"
-
     Output := defender.tests with input as {
         "admin_audit_log_config": [
             {
@@ -19,16 +39,10 @@ test_AdminAuditLogEnabled_Correct if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement met"
+    CorrectTestResult("MS.DEFENDER.6.1v1", Output, PASS) == true
 }
 
 test_AdminAuditLogEnabled_Incorrect if {
-    PolicyId := "MS.DEFENDER.6.1v1"
-
     Output := defender.tests with input as {
         "admin_audit_log_config": [
             {
@@ -38,11 +52,7 @@ test_AdminAuditLogEnabled_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement not met"
+    IncorrectTestResult("MS.DEFENDER.6.1v1", Output, FAIL) == true
 }
 
 #
@@ -53,11 +63,8 @@ test_NotImplemented_Correct_V1 if {
 
     Output := defender.tests with input as { }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == NotCheckedDetails(PolicyId)
+    ReportDetailString := NotCheckedDetails(PolicyId)
+    IncorrectTestResult(PolicyId, Output, ReportDetailString) == true
 }
 
 #
@@ -68,10 +75,7 @@ test_NotImplemented_Correct_V2 if {
 
     Output := defender.tests with input as { }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == NotCheckedDetails(PolicyId)
+    ReportDetailString := NotCheckedDetails(PolicyId)
+    IncorrectTestResult(PolicyId, Output, ReportDetailString) == true
 }
 #--

@@ -2,14 +2,32 @@ package defender_test
 import future.keywords
 import data.defender
 import data.report.utils.NotCheckedDetails
+import data.report.utils.ReportDetailsBoolean
+
+
+CorrectTestResult(PolicyId, Output, ReportDetailString) := true if {
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet == true
+    RuleOutput[0].ReportDetails == ReportDetailString
+} else := false
+
+IncorrectTestResult(PolicyId, Output, ReportDetailString) := true if {
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet == false
+    RuleOutput[0].ReportDetails == ReportDetailString
+} else := false
+
+PASS := ReportDetailsBoolean(true)
 
 
 #
 # Policy 1
 #--
 test_ContentContainsSensitiveInformation_Correct_V1 if {
-    PolicyId := "MS.DEFENDER.4.1v1"
-
     Output := defender.tests with input as {
         "dlp_compliance_rules": [
             {
@@ -47,16 +65,10 @@ test_ContentContainsSensitiveInformation_Correct_V1 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement met"
+    CorrectTestResult("MS.DEFENDER.4.1v1", Output, PASS) == true
 }
 
 test_AdvancedRule_Correct_V2 if {
-    PolicyId := "MS.DEFENDER.4.1v1"
-
     Output := defender.tests with input as {
         "dlp_compliance_rules": [
             {
@@ -101,16 +113,10 @@ test_AdvancedRule_Correct_V2 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement met"
+    CorrectTestResult("MS.DEFENDER.4.1v1", Output, PASS) == true
 }
 
 test_ContentContainsSensitiveInformation_Incorrect_V1 if {
-    PolicyId := "MS.DEFENDER.4.1v1"
-
     Output := defender.tests with input as {
         "dlp_compliance_rules": [
             {
@@ -145,16 +151,11 @@ test_ContentContainsSensitiveInformation_Incorrect_V1 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "No matching rules found for: U.S. Social Security Number (SSN)"
+    ReportDetailString := "No matching rules found for: U.S. Social Security Number (SSN)"
+    IncorrectTestResult("MS.DEFENDER.4.1v1", Output, ReportDetailString) == true
 }
 
 test_ContentContainsSensitiveInformation_Incorrect_V2 if {
-    PolicyId := "MS.DEFENDER.4.1v1"
-
     Output := defender.tests with input as {
         "dlp_compliance_rules": [
             {
@@ -189,16 +190,11 @@ test_ContentContainsSensitiveInformation_Incorrect_V2 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "No matching rules found for: U.S. Individual Taxpayer Identification Number (ITIN)"
+    ReportDetailString := "No matching rules found for: U.S. Individual Taxpayer Identification Number (ITIN)"
+    IncorrectTestResult("MS.DEFENDER.4.1v1", Output, ReportDetailString) == true
 }
 
 test_ContentContainsSensitiveInformation_Incorrect_V3 if {
-    PolicyId := "MS.DEFENDER.4.1v1"
-
     Output := defender.tests with input as {
         "dlp_compliance_rules": [
             {
@@ -233,16 +229,11 @@ test_ContentContainsSensitiveInformation_Incorrect_V3 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "No matching rules found for: Credit Card Number"
+    ReportDetailString := "No matching rules found for: Credit Card Number"
+    IncorrectTestResult("MS.DEFENDER.4.1v1", Output, ReportDetailString) == true
 }
 
 test_ContentContainsSensitiveInformation_Incorrect_V4 if {
-    PolicyId := "MS.DEFENDER.4.1v1"
-
     Output := defender.tests with input as {
         "dlp_compliance_rules": [
             {
@@ -270,16 +261,11 @@ test_ContentContainsSensitiveInformation_Incorrect_V4 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "No matching rules found for: Credit Card Number, U.S. Individual Taxpayer Identification Number (ITIN), U.S. Social Security Number (SSN)"
+    ReportDetailString := "No matching rules found for: Credit Card Number, U.S. Individual Taxpayer Identification Number (ITIN), U.S. Social Security Number (SSN)"
+    IncorrectTestResult("MS.DEFENDER.4.1v1", Output, ReportDetailString) == true
 }
 
 test_ContentContainsSensitiveInformation_Incorrect_V5 if {
-    PolicyId := "MS.DEFENDER.4.1v1"
-
     Output := defender.tests with input as {
         "dlp_compliance_rules": [
             {
@@ -317,16 +303,11 @@ test_ContentContainsSensitiveInformation_Incorrect_V5 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "No matching rules found for: Credit Card Number, U.S. Individual Taxpayer Identification Number (ITIN), U.S. Social Security Number (SSN)"
+    ReportDetailString := "No matching rules found for: Credit Card Number, U.S. Individual Taxpayer Identification Number (ITIN), U.S. Social Security Number (SSN)"
+    IncorrectTestResult("MS.DEFENDER.4.1v1", Output, ReportDetailString) == true
 }
 
 test_ContentContainsSensitiveInformation_Incorrect_V6 if {
-    PolicyId := "MS.DEFENDER.4.1v1"
-
     Output := defender.tests with input as {
         "dlp_compliance_rules": [
             {
@@ -364,19 +345,14 @@ test_ContentContainsSensitiveInformation_Incorrect_V6 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "No matching rules found for: Credit Card Number, U.S. Individual Taxpayer Identification Number (ITIN), U.S. Social Security Number (SSN)"
+    ReportDetailString := "No matching rules found for: Credit Card Number, U.S. Individual Taxpayer Identification Number (ITIN), U.S. Social Security Number (SSN)"
+    IncorrectTestResult("MS.DEFENDER.4.1v1", Output, ReportDetailString) == true
 }
 
 #
 # Policy 2
 #--
 test_Locations_Correct_V1 if {
-    PolicyId := "MS.DEFENDER.4.2v1"
-
     Output := defender.tests with input as {
         "dlp_compliance_rules": [
             {
@@ -430,16 +406,10 @@ test_Locations_Correct_V1 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement met"
+    CorrectTestResult("MS.DEFENDER.4.2v1", Output, PASS) == true
 }
 
 test_Locations_Correct_V2 if {
-    PolicyId := "MS.DEFENDER.4.2v1"
-
     Output := defender.tests with input as {
         "dlp_compliance_rules": [
             {
@@ -484,17 +454,11 @@ test_Locations_Correct_V2 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement met"
+    CorrectTestResult("MS.DEFENDER.4.2v1", Output, PASS) == true
 }
 
 # Policy exists, but Exchange location is null
 test_Locations_Incorrect_V1 if {
-    PolicyId := "MS.DEFENDER.4.2v1"
-
     Output := defender.tests with input as {
         "dlp_compliance_rules": [
             {
@@ -548,17 +512,12 @@ test_Locations_Incorrect_V1 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "No enabled policy found that applies to: Exchange"
+    ReportDetailString := "No enabled policy found that applies to: Exchange"
+    IncorrectTestResult("MS.DEFENDER.4.2v1", Output, ReportDetailString) == true
 }
 
 # Policy exists, but SharePoint is not included
 test_Locations_Incorrect_V2 if {
-    PolicyId := "MS.DEFENDER.4.2v1"
-
     Output := defender.tests with input as {
         "dlp_compliance_rules": [
             {
@@ -612,17 +571,12 @@ test_Locations_Incorrect_V2 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "No enabled policy found that applies to: SharePoint"
+    ReportDetailString := "No enabled policy found that applies to: SharePoint"
+    IncorrectTestResult("MS.DEFENDER.4.2v1", Output, ReportDetailString) == true
 }
 
 # Policy exists, but OneDrive location not included
 test_Locations_Incorrect_V3 if {
-    PolicyId := "MS.DEFENDER.4.2v1"
-
     Output := defender.tests with input as {
         "dlp_compliance_rules": [
             {
@@ -676,17 +630,12 @@ test_Locations_Incorrect_V3 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "No enabled policy found that applies to: OneDrive"
+    ReportDetailString := "No enabled policy found that applies to: OneDrive"
+    IncorrectTestResult("MS.DEFENDER.4.2v1", Output, ReportDetailString) == true
 }
 
 # Policy exists, but OneDrive location not included
 test_Locations_Incorrect_V4 if {
-    PolicyId := "MS.DEFENDER.4.2v1"
-
     Output := defender.tests with input as {
         "dlp_compliance_rules": [
             {
@@ -740,17 +689,12 @@ test_Locations_Incorrect_V4 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "No enabled policy found that applies to: Teams"
+    ReportDetailString := "No enabled policy found that applies to: Teams"
+    IncorrectTestResult("MS.DEFENDER.4.2v1", Output, ReportDetailString) == true
 }
 
 # Policy exists, but Devices location not included
 test_Locations_Incorrect_V5 if {
-    PolicyId := "MS.DEFENDER.4.2v1"
-
     Output := defender.tests with input as {
         "dlp_compliance_rules": [
             {
@@ -804,17 +748,12 @@ test_Locations_Incorrect_V5 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "No enabled policy found that applies to: Devices"
+    ReportDetailString := "No enabled policy found that applies to: Devices"
+    IncorrectTestResult("MS.DEFENDER.4.2v1", Output, ReportDetailString) == true
 }
 
 # Policy exists, but is not enabled
 test_Locations_Incorrect_V6 if {
-    PolicyId := "MS.DEFENDER.4.2v1"
-
     Output := defender.tests with input as {
         "dlp_compliance_rules": [
             {
@@ -868,17 +807,12 @@ test_Locations_Incorrect_V6 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "No DLP policy matching all types found for evaluation."
+    ReportDetailString := "No DLP policy matching all types found for evaluation."
+    IncorrectTestResult("MS.DEFENDER.4.2v1", Output, ReportDetailString) == true
 }
 
 # Policy exists and is enabled, but block rules are disabled
 test_Locations_Incorrect_V7 if {
-    PolicyId := "MS.DEFENDER.4.2v1"
-
     Output := defender.tests with input as {
         "dlp_compliance_rules": [
             {
@@ -932,17 +866,12 @@ test_Locations_Incorrect_V7 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "No DLP policy matching all types found for evaluation."
+    ReportDetailString := "No DLP policy matching all types found for evaluation."
+    IncorrectTestResult("MS.DEFENDER.4.2v1", Output, ReportDetailString) == true
 }
 
 # Policy exists but set to TestWithNotifications rather than Enable
 test_Locations_Incorrect_V8 if {
-    PolicyId := "MS.DEFENDER.4.2v1"
-
     Output := defender.tests with input as {
         "dlp_compliance_rules": [
             {
@@ -996,11 +925,8 @@ test_Locations_Incorrect_V8 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "No DLP policy matching all types found for evaluation."
+    ReportDetailString := "No DLP policy matching all types found for evaluation."
+    IncorrectTestResult("MS.DEFENDER.4.2v1", Output, ReportDetailString) == true
 }
 
 #
@@ -1008,8 +934,6 @@ test_Locations_Incorrect_V8 if {
 
 # All sensitive rules present and blocking
 test_BlockAccess_Correct_V1 if {
-    PolicyId := "MS.DEFENDER.4.3v1"
-
     Output := defender.tests with input as {
         "dlp_compliance_rules": [
             {
@@ -1047,17 +971,11 @@ test_BlockAccess_Correct_V1 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement met"
+    CorrectTestResult("MS.DEFENDER.4.3v1", Output, PASS) == true
 }
 
 # Sensitive rules present, but not blocking
 test_BlockAccess_Incorrect_V1 if {
-    PolicyId := "MS.DEFENDER.4.3v1"
-
     Output := defender.tests with input as {
         "dlp_compliance_rules": [
             {
@@ -1095,17 +1013,12 @@ test_BlockAccess_Incorrect_V1 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "1 rule(s) found that do(es) not block access or associated policy not set to enforce block action: Baseline Rule"
+    ReportDetailString := "1 rule(s) found that do(es) not block access or associated policy not set to enforce block action: Baseline Rule"
+    IncorrectTestResult("MS.DEFENDER.4.3v1", Output, ReportDetailString) == true
 }
 
 # Sensitive rules present and blocking, but only to people outside org
 test_BlockAccess_Incorrect_V2 if {
-    PolicyId := "MS.DEFENDER.4.3v1"
-
     Output := defender.tests with input as {
         "dlp_compliance_rules": [
             {
@@ -1143,17 +1056,12 @@ test_BlockAccess_Incorrect_V2 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "1 rule(s) found that do(es) not block access or associated policy not set to enforce block action: Baseline Rule"
+    ReportDetailString := "1 rule(s) found that do(es) not block access or associated policy not set to enforce block action: Baseline Rule"
+    IncorrectTestResult("MS.DEFENDER.4.3v1", Output, ReportDetailString) == true
 }
 
 # Sensitive rules present and blocking, but policy set to test
 test_BlockAccess_Incorrect_V3 if {
-    PolicyId := "MS.DEFENDER.4.3v1"
-
     Output := defender.tests with input as {
         "dlp_compliance_rules": [
             {
@@ -1191,17 +1099,12 @@ test_BlockAccess_Incorrect_V3 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "No DLP policy matching all types found for evaluation."
+    ReportDetailString := "No DLP policy matching all types found for evaluation."
+    IncorrectTestResult("MS.DEFENDER.4.3v1", Output, ReportDetailString) == true
 }
 
 # All rules are blocking, but don't contain all sensitive types
 test_BlockAccess_Incorrect_V4 if {
-    PolicyId := "MS.DEFENDER.4.3v1"
-
     Output := defender.tests with input as {
         "dlp_compliance_rules": [
             {
@@ -1236,17 +1139,12 @@ test_BlockAccess_Incorrect_V4 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "No DLP policy matching all types found for evaluation."
+    ReportDetailString := "No DLP policy matching all types found for evaluation."
+    IncorrectTestResult("MS.DEFENDER.4.3v1", Output, ReportDetailString) == true
 }
 
 # Multiple policies combined that contain all sensitive rules blocking
 test_BlockAccess_Incorrect_V5 if {
-    PolicyId := "MS.DEFENDER.4.3v1"
-
     Output := defender.tests with input as {
         "dlp_compliance_rules": [
             {
@@ -1305,16 +1203,11 @@ test_BlockAccess_Incorrect_V5 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "No DLP policy matching all types found for evaluation."
+    ReportDetailString := "No DLP policy matching all types found for evaluation."
+    IncorrectTestResult("MS.DEFENDER.4.3v1", Output, ReportDetailString) == true
 }
 
 test_BlockAccess_Incorrect_V6 if {
-    PolicyId := "MS.DEFENDER.4.3v1"
-
     Output := defender.tests with input as {
         "dlp_compliance_rules": [
             {
@@ -1352,11 +1245,8 @@ test_BlockAccess_Incorrect_V6 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "No DLP policy matching all types found for evaluation."
+    ReportDetailString := "No DLP policy matching all types found for evaluation."
+    IncorrectTestResult("MS.DEFENDER.4.3v1", Output, ReportDetailString) == true
 }
 
 #
@@ -1365,8 +1255,6 @@ test_BlockAccess_Incorrect_V6 if {
 
 # Sensitive policy present, and set to notify site admin
 test_NotifyUser_Correct_V1 if {
-    PolicyId := "MS.DEFENDER.4.4v1"
-
     Output := defender.tests with input as {
         "dlp_compliance_rules": [
             {
@@ -1402,17 +1290,11 @@ test_NotifyUser_Correct_V1 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement met"
+    CorrectTestResult("MS.DEFENDER.4.4v1", Output, PASS) == true
 }
 
 # Sensitive policy present, and set to notify multiple users
 test_NotifyUser_Correct_V2 if {
-    PolicyId := "MS.DEFENDER.4.4v1"
-
     Output := defender.tests with input as {
         "dlp_compliance_rules": [
             {
@@ -1450,17 +1332,11 @@ test_NotifyUser_Correct_V2 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement met"
+    CorrectTestResult("MS.DEFENDER.4.4v1", Output, PASS) == true
 }
 
 # Sensitive policy not enabled
 test_NotifyUser_Incorrect_V1 if {
-    PolicyId := "MS.DEFENDER.4.4v1"
-
     Output := defender.tests with input as {
         "dlp_compliance_rules": [
             {
@@ -1498,17 +1374,12 @@ test_NotifyUser_Incorrect_V1 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "No DLP policy matching all types found for evaluation."
+    ReportDetailString := "No DLP policy matching all types found for evaluation."
+    IncorrectTestResult("MS.DEFENDER.4.4v1", Output, ReportDetailString) == true
 }
 
 # Sensitive policy enabled, no users set to notify
 test_NotifyUser_Incorrect_V2 if {
-    PolicyId := "MS.DEFENDER.4.4v1"
-
     Output := defender.tests with input as {
         "dlp_compliance_rules": [
             {
@@ -1542,11 +1413,8 @@ test_NotifyUser_Incorrect_V2 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "1 rule(s) found that do(es) not notify at least one user: Baseline Rule"
+    ReportDetailString := "1 rule(s) found that do(es) not notify at least one user: Baseline Rule"
+    IncorrectTestResult("MS.DEFENDER.4.4v1", Output, ReportDetailString) == true
 }
 
 #
@@ -1557,11 +1425,8 @@ test_NotImplemented_Correct_V1 if {
 
     Output := defender.tests with input as { }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == NotCheckedDetails(PolicyId)
+    ReportDetailString := NotCheckedDetails(PolicyId)
+    IncorrectTestResult(PolicyId, Output, ReportDetailString) == true
 }
 
 #
@@ -1572,10 +1437,7 @@ test_NotImplemented_Correct_V2 if {
 
     Output := defender.tests with input as { }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == NotCheckedDetails(PolicyId)
+    ReportDetailString := NotCheckedDetails(PolicyId)
+    IncorrectTestResult(PolicyId, Output, ReportDetailString) == true
 }
 #--

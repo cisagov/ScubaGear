@@ -1,6 +1,26 @@
 package defender_test
 import future.keywords
 import data.defender
+import data.report.utils.ReportDetailsBoolean
+
+
+CorrectTestResult(PolicyId, Output, ReportDetailString) := true if {
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet == true
+    RuleOutput[0].ReportDetails == ReportDetailString
+} else := false
+
+IncorrectTestResult(PolicyId, Output, ReportDetailString) := true if {
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet == false
+    RuleOutput[0].ReportDetails == ReportDetailString
+} else := false
+
+PASS := ReportDetailsBoolean(true)
 
 
 #
@@ -8,8 +28,6 @@ import data.defender
 #--
 
 test_TargetedUsers_Correct_V1 if {
-    PolicyId := "MS.DEFENDER.2.1v1"
-
     Output := defender.tests with input as {
         "anti_phish_policies": [
             {
@@ -45,16 +63,10 @@ test_TargetedUsers_Correct_V1 if {
         }
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement met"
+    CorrectTestResult("MS.DEFENDER.2.1v1", Output, PASS) == true
 }
 
 test_TargetedUsers_Correct_V2 if {
-    PolicyId := "MS.DEFENDER.2.1v1"
-
     Output := defender.tests with input as {
         "anti_phish_policies": [
             {
@@ -89,16 +101,10 @@ test_TargetedUsers_Correct_V2 if {
         }
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement met"
+    CorrectTestResult("MS.DEFENDER.2.1v1", Output, PASS) == true
 }
 
 test_TargetedUsers_Correct_V3 if {
-    PolicyId := "MS.DEFENDER.2.1v1"
-
     Output := defender.tests with input as {
         "anti_phish_policies": [
             {
@@ -134,16 +140,10 @@ test_TargetedUsers_Correct_V3 if {
         }
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement met"
+    CorrectTestResult("MS.DEFENDER.2.1v1", Output, PASS) == true
 }
 
 test_TargetedUsers_Incorrect_V1 if {
-    PolicyId := "MS.DEFENDER.2.1v1"
-
     Output := defender.tests with input as {
         "anti_phish_policies": [
             {
@@ -169,16 +169,11 @@ test_TargetedUsers_Incorrect_V1 if {
         }
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Not all sensitive users are included for targeted protection in Standard policy."
+    ReportDetailString := "Not all sensitive users are included for targeted protection in Standard policy."
+    IncorrectTestResult("MS.DEFENDER.2.1v1", Output, ReportDetailString) == true
 }
 
 test_TargetedUsers_Incorrect_V2 if {
-    PolicyId := "MS.DEFENDER.2.1v1"
-
     Output := defender.tests with input as {
         "anti_phish_policies": [
             {
@@ -204,16 +199,11 @@ test_TargetedUsers_Incorrect_V2 if {
         }
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Not all sensitive users are included for targeted protection in Strict policy."
+    ReportDetailString := "Not all sensitive users are included for targeted protection in Strict policy."
+    IncorrectTestResult("MS.DEFENDER.2.1v1", Output, ReportDetailString) == true
 }
 
 test_TargetedUsers_Incorrect_V3 if {
-    PolicyId := "MS.DEFENDER.2.1v1"
-
     Output := defender.tests with input as {
         "anti_phish_policies": [
             {
@@ -239,16 +229,11 @@ test_TargetedUsers_Incorrect_V3 if {
         }
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Not all sensitive users are included for targeted protection in Strict or Standard policy."
+    ReportDetailString := "Not all sensitive users are included for targeted protection in Strict or Standard policy."
+    IncorrectTestResult("MS.DEFENDER.2.1v1", Output, ReportDetailString) == true
 }
 
 test_TargetedUsers_Incorrect_V4 if {
-    PolicyId := "MS.DEFENDER.2.1v1"
-
     Output := defender.tests with input as {
         "anti_phish_policies": [
             {
@@ -284,16 +269,11 @@ test_TargetedUsers_Incorrect_V4 if {
         }
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Not all sensitive users are included for targeted protection in Standard policy."
+    ReportDetailString := "Not all sensitive users are included for targeted protection in Standard policy."
+    IncorrectTestResult("MS.DEFENDER.2.1v1", Output, ReportDetailString) == true
 }
 
 test_TargetedUsers_Incorrect_V5 if {
-    PolicyId := "MS.DEFENDER.2.1v1"
-
     Output := defender.tests with input as {
         "anti_phish_policies": [
             {
@@ -329,16 +309,11 @@ test_TargetedUsers_Incorrect_V5 if {
         }
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Not all sensitive users are included for targeted protection in Standard policy."
+    ReportDetailString := "Not all sensitive users are included for targeted protection in Standard policy."
+    IncorrectTestResult("MS.DEFENDER.2.1v1", Output, ReportDetailString) == true
 }
 
 test_TargetedUsers_Incorrect_V6 if {
-    PolicyId := "MS.DEFENDER.2.1v1"
-
     Output := defender.tests with input as {
         "anti_phish_policies": [
             {
@@ -373,19 +348,15 @@ test_TargetedUsers_Incorrect_V6 if {
         }
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Not all sensitive users are included for targeted protection in Strict policy."
+    ReportDetailString := "Not all sensitive users are included for targeted protection in Strict policy."
+    IncorrectTestResult("MS.DEFENDER.2.1v1", Output, ReportDetailString) == true
 }
+#--
 
 #
 # Policy 2
 #--
 test_AgencyDomains_Correct_V1 if {
-    PolicyId := "MS.DEFENDER.2.2v1"
-
     Output := defender.tests with input as {
         "anti_phish_policies": [
             {
@@ -421,16 +392,10 @@ test_AgencyDomains_Correct_V1 if {
         }
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement met"
+    CorrectTestResult("MS.DEFENDER.2.2v1", Output, PASS) == true
 }
 
 test_AgencyDomains_Correct_V2 if {
-    PolicyId := "MS.DEFENDER.2.2v1"
-
     Output := defender.tests with input as {
         "anti_phish_policies": [
             {
@@ -465,16 +430,10 @@ test_AgencyDomains_Correct_V2 if {
         }
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement met"
+    CorrectTestResult("MS.DEFENDER.2.2v1", Output, PASS) == true
 }
 
 test_AgencyDomains_Incorrect_V1 if {
-    PolicyId := "MS.DEFENDER.2.2v1"
-
     Output := defender.tests with input as {
         "anti_phish_policies": [
             {
@@ -500,16 +459,11 @@ test_AgencyDomains_Incorrect_V1 if {
         }
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Not all agency domains are included for targeted protection in Standard policy."
+    ReportDetailString := "Not all agency domains are included for targeted protection in Standard policy."
+    IncorrectTestResult("MS.DEFENDER.2.2v1", Output, ReportDetailString) == true
 }
 
 test_AgencyDomains_Incorrect_V2 if {
-    PolicyId := "MS.DEFENDER.2.2v1"
-
     Output := defender.tests with input as {
         "anti_phish_policies": [
             {
@@ -535,16 +489,11 @@ test_AgencyDomains_Incorrect_V2 if {
         }
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Not all agency domains are included for targeted protection in Strict policy."
+    ReportDetailString := "Not all agency domains are included for targeted protection in Strict policy."
+    IncorrectTestResult("MS.DEFENDER.2.2v1", Output, ReportDetailString) == true
 }
 
 test_AgencyDomains_Incorrect_V3 if {
-    PolicyId := "MS.DEFENDER.2.2v1"
-
     Output := defender.tests with input as {
         "anti_phish_policies": [
             {
@@ -570,16 +519,11 @@ test_AgencyDomains_Incorrect_V3 if {
         }
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Not all agency domains are included for targeted protection in Strict or Standard policy."
+    ReportDetailString := "Not all agency domains are included for targeted protection in Strict or Standard policy."
+    IncorrectTestResult("MS.DEFENDER.2.2v1", Output, ReportDetailString) == true
 }
 
 test_AgencyDomains_Incorrect_V4 if {
-    PolicyId := "MS.DEFENDER.2.2v1"
-
     Output := defender.tests with input as {
         "anti_phish_policies": [
             {
@@ -615,16 +559,11 @@ test_AgencyDomains_Incorrect_V4 if {
         }
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Not all agency domains are included for targeted protection in Standard policy."
+    ReportDetailString := "Not all agency domains are included for targeted protection in Standard policy."
+    IncorrectTestResult("MS.DEFENDER.2.2v1", Output, ReportDetailString) == true
 }
 
 test_AgencyDomains_Incorrect_V5 if {
-    PolicyId := "MS.DEFENDER.2.2v1"
-
     Output := defender.tests with input as {
         "anti_phish_policies": [
             {
@@ -660,16 +599,11 @@ test_AgencyDomains_Incorrect_V5 if {
         }
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Not all agency domains are included for targeted protection in Standard policy."
+    ReportDetailString := "Not all agency domains are included for targeted protection in Standard policy."
+    IncorrectTestResult("MS.DEFENDER.2.2v1", Output, ReportDetailString) == true
 }
 
 test_AgencyDomains_Incorrect_V6 if {
-    PolicyId := "MS.DEFENDER.2.2v1"
-
     Output := defender.tests with input as {
         "anti_phish_policies": [
             {
@@ -704,16 +638,11 @@ test_AgencyDomains_Incorrect_V6 if {
         }
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Not all agency domains are included for targeted protection in Strict policy."
+    ReportDetailString := "Not all agency domains are included for targeted protection in Strict policy."
+    IncorrectTestResult("MS.DEFENDER.2.2v1", Output, ReportDetailString) == true
 }
 
 test_AgencyDomains_Incorrect_V7 if {
-    PolicyId := "MS.DEFENDER.2.2v1"
-
     Output := defender.tests with input as {
         "anti_phish_policies": [
             {
@@ -744,16 +673,11 @@ test_AgencyDomains_Incorrect_V7 if {
         }
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Not all agency domains are included for targeted protection in Strict or Standard policy."
+    ReportDetailString := "Not all agency domains are included for targeted protection in Strict or Standard policy."
+    IncorrectTestResult("MS.DEFENDER.2.2v1", Output, ReportDetailString) == true
 }
 
 test_AgencyDomains_Incorrect_V8 if {
-    PolicyId := "MS.DEFENDER.2.2v1"
-
     Output := defender.tests with input as {
         "anti_phish_policies": [
             {
@@ -778,19 +702,15 @@ test_AgencyDomains_Incorrect_V8 if {
         }
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "No agency domains defined for impersonation protection assessment. See configuration file documentation for details on how to define."
+    ReportDetailString := "No agency domains defined for impersonation protection assessment. See configuration file documentation for details on how to define."
+    IncorrectTestResult("MS.DEFENDER.2.2v1", Output, ReportDetailString) == true
 }
+#--
 
 #
 # Policy 3
 #--
 test_CustomDomains_Correct_V1 if {
-    PolicyId := "MS.DEFENDER.2.3v1"
-
     Output := defender.tests with input as {
         "anti_phish_policies": [
             {
@@ -826,16 +746,10 @@ test_CustomDomains_Correct_V1 if {
         }
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement met"
+    CorrectTestResult("MS.DEFENDER.2.3v1", Output, PASS) == true
 }
 
 test_CustomDomains_Correct_V2 if {
-    PolicyId := "MS.DEFENDER.2.3v1"
-
     Output := defender.tests with input as {
         "anti_phish_policies": [
             {
@@ -870,16 +784,10 @@ test_CustomDomains_Correct_V2 if {
         }
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement met"
+    CorrectTestResult("MS.DEFENDER.2.3v1", Output, PASS) == true
 }
 
 test_CustomDomains_Correct_V3 if {
-    PolicyId := "MS.DEFENDER.2.3v1"
-
     Output := defender.tests with input as {
         "anti_phish_policies": [
             {
@@ -915,16 +823,10 @@ test_CustomDomains_Correct_V3 if {
         }
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement met"
+    CorrectTestResult("MS.DEFENDER.2.3v1", Output, PASS) == true
 }
 
 test_CustomDomains_Correct_V4 if {
-    PolicyId := "MS.DEFENDER.2.3v1"
-
     Output := defender.tests with input as {
         "anti_phish_policies": [
             {
@@ -949,16 +851,10 @@ test_CustomDomains_Correct_V4 if {
         }
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement met"
+    CorrectTestResult("MS.DEFENDER.2.3v1", Output, PASS) == true
 }
 
 test_CustomDomains_Incorrect_V1 if {
-    PolicyId := "MS.DEFENDER.2.3v1"
-
     Output := defender.tests with input as {
         "anti_phish_policies": [
             {
@@ -984,16 +880,11 @@ test_CustomDomains_Incorrect_V1 if {
         }
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Not all partner domains are included for targeted protection in Standard policy."
+    ReportDetailString := "Not all partner domains are included for targeted protection in Standard policy."
+    IncorrectTestResult("MS.DEFENDER.2.3v1", Output, ReportDetailString) == true
 }
 
 test_CustomDomains_Incorrect_V2 if {
-    PolicyId := "MS.DEFENDER.2.3v1"
-
     Output := defender.tests with input as {
         "anti_phish_policies": [
             {
@@ -1019,16 +910,11 @@ test_CustomDomains_Incorrect_V2 if {
         }
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Not all partner domains are included for targeted protection in Strict policy."
+    ReportDetailString := "Not all partner domains are included for targeted protection in Strict policy."
+    IncorrectTestResult("MS.DEFENDER.2.3v1", Output, ReportDetailString) == true
 }
 
 test_CustomDomains_Incorrect_V3 if {
-    PolicyId := "MS.DEFENDER.2.3v1"
-
     Output := defender.tests with input as {
         "anti_phish_policies": [
             {
@@ -1054,16 +940,11 @@ test_CustomDomains_Incorrect_V3 if {
         }
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Not all partner domains are included for targeted protection in Strict or Standard policy."
+    ReportDetailString := "Not all partner domains are included for targeted protection in Strict or Standard policy."
+    IncorrectTestResult("MS.DEFENDER.2.3v1", Output, ReportDetailString) == true
 }
 
 test_CustomDomains_Incorrect_V4 if {
-    PolicyId := "MS.DEFENDER.2.3v1"
-
     Output := defender.tests with input as {
         "anti_phish_policies": [
             {
@@ -1099,16 +980,11 @@ test_CustomDomains_Incorrect_V4 if {
         }
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Not all partner domains are included for targeted protection in Standard policy."
+    ReportDetailString := "Not all partner domains are included for targeted protection in Standard policy."
+    IncorrectTestResult("MS.DEFENDER.2.3v1", Output, ReportDetailString) == true
 }
 
 test_CustomDomains_Incorrect_V5 if {
-    PolicyId := "MS.DEFENDER.2.3v1"
-
     Output := defender.tests with input as {
         "anti_phish_policies": [
             {
@@ -1144,16 +1020,11 @@ test_CustomDomains_Incorrect_V5 if {
         }
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Not all partner domains are included for targeted protection in Standard policy."
+    ReportDetailString := "Not all partner domains are included for targeted protection in Standard policy."
+    IncorrectTestResult("MS.DEFENDER.2.3v1", Output, ReportDetailString) == true
 }
 
 test_CustomDomains_Incorrect_V6 if {
-    PolicyId := "MS.DEFENDER.2.3v1"
-
     Output := defender.tests with input as {
         "anti_phish_policies": [
             {
@@ -1188,16 +1059,11 @@ test_CustomDomains_Incorrect_V6 if {
         }
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Not all partner domains are included for targeted protection in Strict policy."
+    ReportDetailString := "Not all partner domains are included for targeted protection in Strict policy."
+    IncorrectTestResult("MS.DEFENDER.2.3v1", Output, ReportDetailString) == true
 }
 
 test_CustomDomains_Incorrect_V7 if {
-    PolicyId := "MS.DEFENDER.2.3v1"
-
     Output := defender.tests with input as {
         "anti_phish_policies": [
             {
@@ -1228,10 +1094,7 @@ test_CustomDomains_Incorrect_V7 if {
         }
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Not all partner domains are included for targeted protection in Strict or Standard policy."
+    ReportDetailString := "Not all partner domains are included for targeted protection in Strict or Standard policy."
+    IncorrectTestResult("MS.DEFENDER.2.3v1", Output, ReportDetailString) == true
 }
 #--
