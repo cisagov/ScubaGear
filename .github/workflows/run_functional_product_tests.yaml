@@ -34,7 +34,7 @@ jobs:
     # - name: Update Selenium
     #   run: "./Testing/Functional/SmokeTest/UpdateSelenium.ps1"
     - name: Look for cert dir
-      run: ls -al /etc/ssl/certs
+      run: ls /etc/ssl/certs
     # - name: Check for cert file
     #   run: cat /etc/ssl/certs/ca-certificates.crt
     # This test won't run until certs are figured out.
