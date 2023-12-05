@@ -21,4 +21,6 @@ jobs:
       uses: actions/checkout@v4
     - name: Docker Pull
       run: docker pull oxsecurity/megalinter
+    - name: Docker Run
+      run: docker run --rm -v /var/run/docker.sock:/var/run/docker.sock:rw -v $(pwd):/tmp/lint:rw oxsecurity/megalinter:v7
       
