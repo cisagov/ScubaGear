@@ -1,0 +1,11 @@
+# Config file for Mega-Linter
+# Mega-Linter can automatically fix problems.
+# For now, just report.
+APPLY_FIXES: none
+
+# All linters are enabled by default
+# Can add specific linters.
+ENABLE_LINTERS:
+- POWERSHELL_POWERSHELL
+# Or can block specific linters:
+# BLOCK_LINTERS
