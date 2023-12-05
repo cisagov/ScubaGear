@@ -119,7 +119,7 @@ function Get-EXOTenantDetail {
             $Uri = "https://login.microsoftonline$($TLD)/$($DomainName)/.well-known/openid-configuration"
         }
         try {
-            $Content = (Invoke-WebRequest -Uri $Uri  -ErrorAction "Stop").Content
+            $Content = (Invoke-WebRequest -Uri $Uri -UseBasicParsing -ErrorAction "Stop").Content
             $TenantId = (ConvertFrom-Json $Content).token_endpoint.Split("/")[3]
         }
         catch {
@@ -226,7 +226,7 @@ function Invoke-RobustDnsTxt {
             $TryNumber += 1
             try {
                 $Uri = "https://1.1.1.1/dns-query?name=$($Qname)&type=txt"
-                $RawResponse = $(Invoke-WebRequest -H @{"accept"="application/dns-json"} -Uri $Uri -ErrorAction Stop).RawContent
+                $RawResponse = $(Invoke-WebRequest -H @{"accept"="application/dns-json"} -Uri $Uri -UseBasicParsing -ErrorAction Stop).RawContent
                 $ResponseLines = $RawResponse -Split "`n"
                 $LastLine = $ResponseLines[$ResponseLines.Length - 1]
                 $ResponseBody = ConvertFrom-Json $LastLine
