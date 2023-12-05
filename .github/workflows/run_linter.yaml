@@ -1,0 +1,24 @@
+# Author: James Garriss
+# Purpose: Run the linter against the PowerShell code (and others)
+
+name: Lint Check
+
+# Run whenever code is checked in
+on:
+  push:
+    branches:
+    - '700-add-powershell-linter'
+
+jobs:
+  lint-check:
+    name: Mega-Lint Check
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+    - name: Checkout Repo
+      uses: actions/checkout@v4
+    - name: Docker Pull
+      run: docker pull oxsecurity/megalinter
+      
