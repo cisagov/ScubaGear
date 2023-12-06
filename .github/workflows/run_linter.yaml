@@ -26,7 +26,11 @@ jobs:
       uses: oxsecurity/megalinter@v7
     - name: Setup YAML Config File
       run: cp Mega-Linter/.mega-linter-yaml.yml .mega-linter.yml
-      if: always() # Run even if previous linting failed
+      if: always() 
+    - name: Setup YAML Lint File
+      run: cp Mega-Linter/.yamllint.yml .yamllint.yml
+      if: always() 
     - name: Lint YAML
       uses: oxsecurity/megalinter@v7
-      if: always() # Run even if previous linting failed
+      if: always() 
+    # TODO add any other desired linters here...
