@@ -76,10 +76,12 @@ $RunCachedParams = New-Object -Type PSObject -Property $CachedParams
 
 # Loads and executes parameters from a Configuration file
 if ($PSCmdlet.ParameterSetName -eq 'Configuration'){
+#change [ScubaConfig]
     if (-Not ([ScubaConfig]::GetInstance().LoadConfig($ConfigFilePath))){
         Write-Error -Message "The config file failed to load: $ConfigFilePath"
     }
     else {
+#change [ScubaConfig]
         $RunCachedParams = [ScubaConfig]::GetInstance().Configuration
     }
 }
