@@ -29,10 +29,12 @@ jobs:
       - name: Setup YAML Config File
         run: cp MegaLinter/.mega-linter-yaml.yml .mega-linter.yml
         if: always()
+      - name: Check Config File
+        run: cat .mega-linter.yml
       - name: Setup YAML Lint File
         run: cp MegaLinter/.yamllint.yml .yamllint.yml
         if: always()
       - name: Lint YAML
         uses: oxsecurity/megalinter@v7
         if: always()
-      # TODO add any other desired linters here...
+        # TODO add any other desired linters here...
