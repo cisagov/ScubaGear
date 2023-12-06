@@ -28,3 +28,4 @@ jobs:
       run: cp Mega-Linter/.mega-linter-yaml.yml .mega-linter.yml
     - name: Lint YAML
       uses: oxsecurity/megalinter@v7
+      if: always() # Run even if previous linting failed
