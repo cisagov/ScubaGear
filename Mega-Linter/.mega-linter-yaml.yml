@@ -1,0 +1,6 @@
+# Config file for Mega-Linter
+# YAML
+
+ENABLE_LINTERS:
+- YAML_YAMLLINT
+FILTER_REGEX_INCLUDE: (PowerShell/*)
