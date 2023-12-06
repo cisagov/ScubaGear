@@ -154,7 +154,8 @@ $InformationPreference = "Continue"
 $ErrorActionPreference = "Stop"
 
 if(-not $ACCEPTABLEVERSIONS.Contains($ExpectedVersion)) {
-    throw "Version parameter entered, ${ExpectedVersion}, is not in the list of acceptable versions: ${ACCEPTABLEVERSIONS}"
+    $AcceptableVersionsString = $ACCETABLEVERSIONS -join "`r`n" | Out-String
+    throw "Version parameter entered, ${ExpectedVersion}, is not in the list of acceptable versions. Acceptable versions are:`r`n${AcceptableVersionsString}"
 }
 
 $Filename = $FILENAME.$OperatingSystem
