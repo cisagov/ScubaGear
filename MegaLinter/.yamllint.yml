@@ -8,5 +8,6 @@ rules:
     max: 500
   comments:
     min-spaces-from-content: 1 # Used to follow prettier standard: https://github.com/prettier/prettier/pull/10926
-  # don't bother me with these rules
+  # Don't bother me with these rules
   document-start: disable
+  truthy: disable
