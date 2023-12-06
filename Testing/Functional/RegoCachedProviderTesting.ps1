@@ -80,7 +80,7 @@ if ($PSCmdlet.ParameterSetName -eq 'Configuration'){
         Write-Error -Message "The config file failed to load: $ConfigFilePath"
     }
     else {
-        $ScubaConfig = [ScubaConfig]::GetInstance().Configuration
+        $RunCachedParams = [ScubaConfig]::GetInstance().Configuration
     }
 }
 
