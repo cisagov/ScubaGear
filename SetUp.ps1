@@ -35,8 +35,14 @@ param(
 
     [Parameter(Mandatory = $false, HelpMessage = 'The version of OPA Rego to be downloaded, must be in "x.x.x" format')]
     [Alias('version')]
-    [version]
-    $ExpectedVersion = '0.42.1'
+    [string]
+    $ExpectedVersion = '0.42.1',
+
+    [Parameter(Mandatory = $false, HelpMessage = 'The operating system the program is running on')]
+    [ValidateSet('Windows','Mac','Linux')]
+    [Alias('os')]
+    [string]
+    $OperatingSystem  = "Windows"
 )
 
 # Set preferences for writing messages
@@ -123,7 +129,7 @@ if ($NoOPA -eq $true) {
 else {
     try {
         $ScriptDir = Split-Path -Path $MyInvocation.MyCommand.Definition -Parent
-        . $ScriptDir\OPA.ps1 -version $ExpectedVersion -name "opa_windows_amd64.exe"
+        . $ScriptDir\OPA.ps1 -version $ExpectedVersion -os $OperatingSystem
     }
     catch {
         $Error[0] | Format-List -Property * -Force | Out-Host
