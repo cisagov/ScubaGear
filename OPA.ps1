@@ -121,7 +121,7 @@ function Confirm-OPAHash {
         return $false, "SHA256 verification failed, retry download or install manually. See README under 'Download the required OPA executable' for instructions."
     }
 
-    return $true, "Downloaded OPA version `"$ExpectedVersion`" SHA256 verified successfully`n"
+    return $true, "Downloaded OPA version ($ExpectedVersion) SHA256 verified successfully`n"
 }
 
 function Install-OPA {
