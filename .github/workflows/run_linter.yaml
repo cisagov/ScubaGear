@@ -6,9 +6,6 @@ name: Lint Check
 # Run whenever code is checked in
 on:
   push:
-    # TODO remove "branches"
-    branches:
-      - '700-add-powershell-linter'
 
 jobs:
   lint-check:
