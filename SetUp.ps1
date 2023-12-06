@@ -42,7 +42,12 @@ param(
     [ValidateSet('Windows','MacOS','Linux')]
     [Alias('os')]
     [string]
-    $OperatingSystem  = "Windows"
+    $OperatingSystem  = "Windows",
+
+    [Parameter(Mandatory = $false, HelpMessage = 'The file name that the opa executable is to be saved as')]
+    [Alias('name')]
+    [string]
+    $OPAExe = ""
 )
 
 # Set preferences for writing messages
@@ -129,7 +134,7 @@ if ($NoOPA -eq $true) {
 else {
     try {
         $ScriptDir = Split-Path -Path $MyInvocation.MyCommand.Definition -Parent
-        . $ScriptDir\OPA.ps1 -version $ExpectedVersion -os $OperatingSystem
+        . $ScriptDir\OPA.ps1 -name $OPAExe -version $ExpectedVersion -os $OperatingSystem
     }
     catch {
         $Error[0] | Format-List -Property * -Force | Out-Host
