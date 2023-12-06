@@ -21,7 +21,7 @@ param(
     [string]
     $OPAExe = "",
 
-    [Parameter(Mandatory = $false, HelpMessage = 'The file name that the opa executable is to be saved as')]
+    [Parameter(Mandatory = $false, HelpMessage = 'The operating system the program is running on')]
     [ValidateSet('Windows','Mac','Linux')]
     [Alias('os')]
     [string]
