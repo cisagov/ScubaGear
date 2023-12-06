@@ -21,7 +21,7 @@ jobs:
     - name: Checkout Repo
       uses: actions/checkout@v4
     - name: Setup Config File
-      run: Copy-Item Mega-Linter/.mega-linter-powershell.yml .mega-linter.yml
+      run: cp Mega-Linter/.mega-linter-powershell.yml .mega-linter.yml
     # - name: Docker Pull
     #   run: docker pull oxsecurity/megalinter
     # - name: Docker Run
