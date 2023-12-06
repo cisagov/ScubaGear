@@ -40,12 +40,29 @@ param (
     [ValidateSet($true, $false)]
     [boolean]
     $Quiet = $True # Supress report poping up after run
+
+    [Parameter(Mandatory = $true, ParameterSetName = 'Configuration')]
+    [ValidateNotNullOrEmpty()]
+    [ValidateScript({
+        if (-Not ($_ | Test-Path)){
+            throw "SCuBA configuration file or folder does not exist. $_"
+        }
+        if (-Not ($_ | Test-Path -PathType Leaf)){
+            throw "SCuBA configuration Path argument must be a file."
+        }
+        return $true
+    })]
+    [System.IO.FileInfo]
+    $ConfigFilePath,
+
+    [Parameter(Mandatory = $false, ParameterSetName = 'Configuration')]
+    [switch]
 )
 
 $M365Environment = "gcc"
 $OPAPath = "./" # Path to OPA Executable
 
-$RunCachedParams = @{
+$CachedParams = @{
     'ExportProvider' = $ExportProvider;
     'Login' = $Login;
     'ProductNames' = $ProductNames;
@@ -53,6 +70,18 @@ $RunCachedParams = @{
     'OPAPath' = $OPAPath;
     'OutPath' = $OutPath;
     'Quiet' = $Quiet;
+}
+
+$RunCachedParams = New-Object -Type PSObject -Property $CachedParams
+
+# Loads and executes parameters from a Configuration file
+if ($PSCmdlet.ParameterSetName -eq 'Configuration'){
+    if (-Not ([ScubaConfig]::GetInstance().LoadConfig($ConfigFilePath))){
+        Write-Error -Message "The config file failed to load: $ConfigFilePath"
+    }
+    else {
+        $ScubaConfig = [ScubaConfig]::GetInstance().Configuration
+    }
 }
 
 Set-Location $(Split-Path -Path $PSScriptRoot | Split-Path)
