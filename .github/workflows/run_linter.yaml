@@ -8,7 +8,7 @@ on:
   push:
     # TODO remove "branches"
     branches:
-    - '700-add-powershell-linter'
+      - '700-add-powershell-linter'
 
 jobs:
   lint-check:
@@ -18,21 +18,21 @@ jobs:
       run:
         shell: bash
     steps:
-    - name: Checkout Repo
-      uses: actions/checkout@v4
-    - name: Setup PowerShell Config File
-      run: cp MegaLinter/.mega-linter-powershell.yml .mega-linter.yml
-    - name: Check Config File
-      run: cat .mega-linter.yml
-    - name: Lint PowerShell
-      uses: oxsecurity/megalinter/flavors/dotnet@v7
-    # - name: Setup YAML Config File
-    #   run: cp MegaLinter/.mega-linter-yaml.yml .mega-linter.yml
-    #   if: always() 
-    # - name: Setup YAML Lint File
-    #   run: cp MegaLinter/.yamllint.yml .yamllint.yml
-    #   if: always() 
-    # - name: Lint YAML
-    #   uses: oxsecurity/megalinter@v7
-    #   if: always() 
-    # TODO add any other desired linters here...
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+      - name: Setup PowerShell Config File
+        run: cp MegaLinter/.mega-linter-powershell.yml .mega-linter.yml
+      - name: Check Config File
+        run: cat .mega-linter.yml
+      - name: Lint PowerShell
+        uses: oxsecurity/megalinter/flavors/dotnet@v7
+      - name: Setup YAML Config File
+        run: cp MegaLinter/.mega-linter-yaml.yml .mega-linter.yml
+        if: always()
+      - name: Setup YAML Lint File
+        run: cp MegaLinter/.yamllint.yml .yamllint.yml
+        if: always()
+      - name: Lint YAML
+        uses: oxsecurity/megalinter@v7
+        if: always()
+      # TODO add any other desired linters here...
