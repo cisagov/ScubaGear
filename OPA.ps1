@@ -58,7 +58,7 @@ function Get-OPAFile {
     try {
         $WebClient = New-Object System.Net.WebClient
         $WebClient.DownloadFile($InstallUrl, $OutFile)
-        Write-Information -MessageData "Installed the specified version of ${Filename}: ${ExpectedVersion}." | Out-Host
+        Write-Information -MessageData "Installed the specified OPA version (${ExpectedVersion}) to ${OPAExe}" | Out-Host
     }
     catch {
         $Error[0] | Format-List -Property * -Force | Out-Host
