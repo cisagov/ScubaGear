@@ -12,7 +12,7 @@ on:
 
 jobs:
   lint-check:
-    name: Mega-Lint Check
+    name: MegaLint Check
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -21,14 +21,14 @@ jobs:
     - name: Checkout Repo
       uses: actions/checkout@v4
     - name: Setup PowerShell Config File
-      run: cp Mega-Linter/.mega-linter-powershell.yml .mega-linter.yml
+      run: cp MegaLinter/.mega-linter-powershell.yml .mega-linter.yml
     - name: Lint PowerShell
       uses: oxsecurity/megalinter@v7
     - name: Setup YAML Config File
-      run: cp Mega-Linter/.mega-linter-yaml.yml .mega-linter.yml
+      run: cp MegaLinter/.mega-linter-yaml.yml .mega-linter.yml
       if: always() 
     - name: Setup YAML Lint File
-      run: cp Mega-Linter/.yamllint.yml .yamllint.yml
+      run: cp MegaLinter/.yamllint.yml .yamllint.yml
       if: always() 
     - name: Lint YAML
       uses: oxsecurity/megalinter@v7
