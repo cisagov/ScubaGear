@@ -22,16 +22,16 @@ jobs:
     permissions:
       contents: write
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          path: repo
-      - name: Sign Scripts
-        shell: pwsh
-        run: |
-          $ErrorActionPreference = "Stop"
-          $PSDefaultParameterValues['*:ErrorAction']='Stop'
-          Set-StrictMode -Version Latest
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        path: repo
+    - name: Sign Scripts
+      shell: pwsh
+      run: |
+        $ErrorActionPreference = "Stop"
+        $PSDefaultParameterValues['*:ErrorAction']='Stop'
+        Set-StrictMode -Version Latest
 
           New-Item -ItemType directory -Path certificate
           Set-Content -Path certificate\cert.txt -Value $env:CODESIGN_PFX
