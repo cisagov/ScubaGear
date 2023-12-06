@@ -20,11 +20,11 @@ jobs:
     steps:
     - name: Checkout Repo
       uses: actions/checkout@v4
-    - name: Setup Config File
+    - name: Setup PowerShell Config File
       run: cp Mega-Linter/.mega-linter-powershell.yml .mega-linter.yml
-    # - name: Docker Pull
-    #   run: docker pull oxsecurity/megalinter
-    # - name: Docker Run
-    #   run: docker run --rm -v /var/run/docker.sock:/var/run/docker.sock:rw -v $(pwd):/tmp/lint:rw oxsecurity/megalinter:v7
     - name: Lint PowerShell
+      uses: oxsecurity/megalinter@v7
+    - name: Setup YAML Config File
+      run: cp Mega-Linter/.mega-linter-yaml.yml .mega-linter.yml
+    - name: Lint YAML
       uses: oxsecurity/megalinter@v7
