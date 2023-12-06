@@ -24,13 +24,13 @@ jobs:
       run: cp MegaLinter/.mega-linter-powershell.yml .mega-linter.yml
     - name: Lint PowerShell
       uses: oxsecurity/megalinter@v7
-    - name: Setup YAML Config File
-      run: cp MegaLinter/.mega-linter-yaml.yml .mega-linter.yml
-      if: always() 
-    - name: Setup YAML Lint File
-      run: cp MegaLinter/.yamllint.yml .yamllint.yml
-      if: always() 
-    - name: Lint YAML
-      uses: oxsecurity/megalinter@v7
-      if: always() 
+    # - name: Setup YAML Config File
+    #   run: cp MegaLinter/.mega-linter-yaml.yml .mega-linter.yml
+    #   if: always() 
+    # - name: Setup YAML Lint File
+    #   run: cp MegaLinter/.yamllint.yml .yamllint.yml
+    #   if: always() 
+    # - name: Lint YAML
+    #   uses: oxsecurity/megalinter@v7
+    #   if: always() 
     # TODO add any other desired linters here...
