@@ -3,7 +3,7 @@
  # mocked CommandTracker class
 #>
 
-$ProviderPath = "../../../../../PowerShell/ScubaGear/Modules/Providers"
+$ProviderPath = "../../../../../Modules/Providers"
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "$($ProviderPath)/ExportSharePointProvider.psm1") -Force
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "$($ProviderPath)/ProviderHelpers/CommandTracker.psm1") -Force
 

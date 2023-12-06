@@ -1,5 +1,5 @@
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../../../../PowerShell/ScubaGear/Modules/Connection/Connection.psm1") -Function 'Connect-Tenant' -Force
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../../../../PowerShell/ScubaGear/Modules/Connection/ConnectHelpers.psm1") -Force
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../../../../Modules/Connection/Connection.psm1") -Function 'Connect-Tenant' -Force
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../../../../Modules/Connection/ConnectHelpers.psm1") -Force
 
 InModuleScope Connection {
     Describe -Tag 'Connection' -Name "Connect-Tenant" -ForEach @(

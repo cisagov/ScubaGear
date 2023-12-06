@@ -1,5 +1,5 @@
 BeforeAll {
-    $ClassPath = (Join-Path -Path $PSScriptRoot -ChildPath "./../../../../../PowerShell/ScubaGear/Modules/Providers/ProviderHelpers/AADConditionalAccessHelper.psm1")
+    $ClassPath = (Join-Path -Path $PSScriptRoot -ChildPath "./../../../../../Modules/Providers/ProviderHelpers/AADConditionalAccessHelper.psm1")
     Import-Module $ClassPath
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'CapHelper')]
     $CapHelper = Get-CapTracker

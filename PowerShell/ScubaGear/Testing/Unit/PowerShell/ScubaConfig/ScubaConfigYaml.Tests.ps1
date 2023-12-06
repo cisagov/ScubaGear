@@ -1,4 +1,4 @@
-using module '..\..\..\..\PowerShell\ScubaGear\Modules\ScubaConfig\ScubaConfig.psm1'
+using module '..\..\..\..\Modules\ScubaConfig\ScubaConfig.psm1'
 
 InModuleScope ScubaConfig {
     Describe -tag "Utils" -name 'ScubaConfigYaml' {

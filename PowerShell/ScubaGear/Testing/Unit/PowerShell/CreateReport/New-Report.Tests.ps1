@@ -1,4 +1,4 @@
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath '../../../../PowerShell/ScubaGear/Modules/CreateReport')
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath '../../../../Modules/CreateReport')
 
 InModuleScope CreateReport {
     Describe -Tag CreateReport -Name 'New-Report' {

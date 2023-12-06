@@ -1,4 +1,4 @@
-$ProviderPath = '../../../../../PowerShell/ScubaGear/Modules/Providers'
+$ProviderPath = '../../../../../Modules/Providers'
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "$($ProviderPath)/ExportAADProvider.psm1") -Function 'Get-PrivilegedRole' -Force
 
 InModuleScope ExportAADProvider {

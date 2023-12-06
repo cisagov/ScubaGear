@@ -1,4 +1,4 @@
-$OrchestratorPath = '../../../../PowerShell/ScubaGear/Modules/Orchestrator.psm1'
+$OrchestratorPath = '../../../../Modules/Orchestrator.psm1'
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath $OrchestratorPath) -Function Remove-Resources
 
 Describe -Tag 'Orchestrator' -Name 'Remove-Resources' {

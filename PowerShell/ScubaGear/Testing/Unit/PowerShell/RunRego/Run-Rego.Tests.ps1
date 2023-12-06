@@ -1,4 +1,4 @@
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath '../../../../PowerShell/ScubaGear/Modules/RunRego') -Force
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath '../../../../Modules/RunRego')
 
 InModuleScope 'RunRego' {
     Describe -Tag 'RunRego' -Name 'Invoke-Rego' {
@@ -26,7 +26,7 @@ InModuleScope 'RunRego' {
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'RegoParams')]
             $RegoParams = @{
                 'InputFile' = Join-Path -Path $PSScriptRoot -ChildPath "./RunRegoStubs/ProviderSettingsExport.json";
-                'OPAPath'   = Join-Path -Path $PSScriptRoot -ChildPath "../../../../";
+                'OPAPath'   = Join-Path -Path $env:USERPROFILE -ChildPath ".scubagear/Tools";
             }
         }
         It "Runs the <ProductName> Rego on a Provider JSON and returns a TestResults object" -ForEach @(
