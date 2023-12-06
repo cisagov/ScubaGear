@@ -170,8 +170,13 @@ if(Test-Path -Path $OPAExe -PathType Leaf) {
         Write-Debug "${OPAExe}: ${ExpectedVersion} already has latest installed."
     }
     else {
-        Write-Information "SHA256 verification failed, downloading new executable" | Out-Host
-        Install-OPA -out $OPAExe -version $ExpectedVersion -name $Filename
+        if($OPAExe -eq $Filename) {
+            Write-Information "SHA256 verification failed, downloading new executable" | Out-Host
+            Install-OPA -out $OPAExe -version $ExpectedVersion -name $Filename
+        }
+        else {
+            Write-Warning "SHA256 verification failed, please confirm file name is correct & remove old file before running script" | Out-Host
+        }
     }
 }
 else {
