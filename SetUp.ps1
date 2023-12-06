@@ -39,7 +39,7 @@ param(
     $ExpectedVersion = '0.42.1',
 
     [Parameter(Mandatory = $false, HelpMessage = 'The operating system the program is running on')]
-    [ValidateSet('Windows','Mac','Linux')]
+    [ValidateSet('Windows','MacOS','Linux')]
     [Alias('os')]
     [string]
     $OperatingSystem  = "Windows"
