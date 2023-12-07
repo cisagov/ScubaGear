@@ -391,6 +391,7 @@ test_AllDefender_Incorrect_V4 if {
     ReportDetailString := "Requirement not met **NOTE: Either you do not have sufficient permissions or your tenant does not have a license for Microsoft Defender for Office 365 Plan 1, which is required for this feature.**"
     IncorrectTestResult("MS.DEFENDER.1.3v1", Output, ReportDetailString) == true
 }
+#--
 
 #
 # Policy 4

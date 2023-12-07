@@ -26,7 +26,6 @@ PASS := ReportDetailsBoolean(true)
 #
 # Policy 1
 #--
-
 test_TargetedUsers_Correct_V1 if {
     Output := defender.tests with input as {
         "anti_phish_policies": [

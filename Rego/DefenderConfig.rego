@@ -35,6 +35,13 @@ ApplyLicenseWarning(_) := concat("", [ReportDetailsBoolean(false), LicenseWarnin
     LicenseWarning := " **NOTE: Either you do not have sufficient permissions or your tenant does not have a license for Microsoft Defender for Office 365 Plan 1, which is required for this feature.**"
 }
 
+FilterArray(Conditions, Boolean) := [Condition | some Condition in Conditions; Condition == Boolean]
+
+
+#################
+# MS.DEFENDER.1 #
+#################
+
 #
 # MS.DEFENDER.1.1v1
 #--
@@ -76,26 +83,29 @@ tests contains {
     "PolicyId": "MS.DEFENDER.1.1v1",
     "Criticality": "Shall",
     "Commandlet": ["Get-EOPProtectionPolicyRule", "Get-ATPProtectionPolicyRule"],
-    "ActualValue": {"StandardPresetState": IsStandardEnabled, "StrictPresetState": IsStrictEnabled},
-    "ReportDetails": ReportDetails1_1(IsStandardEnabled, IsStrictEnabled),
+    "ActualValue": {"StandardPresetState": Conditions[0], "StrictPresetState": Conditions[1]},
+    "ReportDetails": ReportDetails1_1(Conditions[0], Conditions[1]),
     "RequirementMet": Status
 } if {
     EOPPolicies := input.protection_policy_rules
-    IsStandardEOPEnabled := GetEnabledPolicies(EOPPolicies, "Standard Preset Security Policy")
-    IsStrictEOPEnabled := GetEnabledPolicies(EOPPolicies, "Strict Preset Security Policy")
-
     ATPPolicies := input.atp_policy_rules
-    IsStandardATPEnabled := GetEnabledPolicies(ATPPolicies, "Standard Preset Security Policy")
-    IsStrictATPEnabled := GetEnabledPolicies(ATPPolicies, "Strict Preset Security Policy")
 
-    StandardConditions := [IsStandardEOPEnabled, IsStandardATPEnabled]
-    IsStandardEnabled := count([Condition | some Condition in StandardConditions; Condition == true]) > 0
+    StandardConditions := [
+        GetEnabledPolicies(EOPPolicies, "Standard Preset Security Policy"),
+        GetEnabledPolicies(ATPPolicies, "Standard Preset Security Policy")
+    ]
 
-    StrictConditions := [IsStrictEOPEnabled, IsStrictATPEnabled]
-    IsStrictEnabled := count([Condition | some Condition in StrictConditions; Condition == true]) > 0
+    StrictConditions := [
+        GetEnabledPolicies(EOPPolicies, "Strict Preset Security Policy"),
+        GetEnabledPolicies(ATPPolicies, "Strict Preset Security Policy")
+    ]
 
-    Conditions := [IsStandardEnabled, IsStrictEnabled]
-    Status := count([Condition | some Condition in Conditions; Condition == false]) == 0
+    Conditions := [
+        count(FilterArray(StandardConditions, true)) > 0,
+        count(FilterArray(StrictConditions, true)) > 0
+    ]
+
+    Status := count(FilterArray(Conditions, false)) == 0
 }
 #--
 
@@ -132,15 +142,16 @@ tests contains {
     "PolicyId": "MS.DEFENDER.1.2v1",
     "Criticality": "Shall",
     "Commandlet": ["Get-EOPProtectionPolicyRule"],
-    "ActualValue": {"StandardSetToAll": IsStandardAll, "StrictSetToAll": IsStrictAll},
+    "ActualValue": {"StandardSetToAll": Conditions[0], "StrictSetToAll": Conditions[1]},
     "ReportDetails": ReportDetailsBoolean(Status),
     "RequirementMet": Status
 } if {
     Policies := input.protection_policy_rules
-    IsStandardAll := AllRecipient(Policies, "Standard Preset Security Policy")
-    IsStrictAll := AllRecipient(Policies, "Strict Preset Security Policy")
-    Conditions := [IsStandardAll, IsStrictAll]
-    Status := count([Condition | some Condition in Conditions; Condition == true]) > 0
+    Conditions := [
+        AllRecipient(Policies, "Standard Preset Security Policy"),
+        AllRecipient(Policies, "Strict Preset Security Policy")
+    ]
+    Status := count(FilterArray(Conditions, true)) > 0
 }
 #--
 
@@ -154,7 +165,7 @@ tests contains {
     "PolicyId": "MS.DEFENDER.1.3v1",
     "Criticality": "Shall",
     "Commandlet": ["Get-ATPProtectionPolicyRule"],
-    "ActualValue": {"StandardSetToAll": IsStandardAll, "StrictSetToAll": IsStrictAll},
+    "ActualValue": {"StandardSetToAll": Conditions[0], "StrictSetToAll": Conditions[1]},
     "ReportDetails": ApplyLicenseWarning(Status),
     "RequirementMet": Status
 } if {
@@ -162,10 +173,11 @@ tests contains {
     # different commandlet.
 
     Policies := input.atp_policy_rules
-    IsStandardAll := AllRecipient(Policies, "Standard Preset Security Policy")
-    IsStrictAll := AllRecipient(Policies, "Strict Preset Security Policy")
-    Conditions := [IsStandardAll, IsStrictAll]
-    Status := count([Condition | some Condition in Conditions; Condition == true]) > 0
+    Conditions := [
+        AllRecipient(Policies, "Standard Preset Security Policy"),
+        AllRecipient(Policies, "Strict Preset Security Policy")
+    ]
+    Status := count(FilterArray(Conditions, true)) > 0
 }
 #--
 
@@ -255,14 +267,16 @@ tests contains {
     AccountKey := "TargetedUsersToProtect"
     ActionKey := "TargetedUserProtectionAction"
     ProtectedConfig := ImpersonationProtectionConfig("MS.DEFENDER.2.1v1", "SensitiveUsers")
-    StrictIP := ImpersonationProtection(Policies, "Strict Preset Security Policy", ProtectedConfig, FilterKey, AccountKey, ActionKey)
-    StandardIP := ImpersonationProtection(Policies, "Standard Preset Security Policy", ProtectedConfig, FilterKey, AccountKey, ActionKey)
+    StrictIP := ImpersonationProtection(
+        Policies, "Strict Preset Security Policy",
+        ProtectedConfig, FilterKey, AccountKey, ActionKey
+    )
+    StandardIP := ImpersonationProtection(
+        Policies, "Standard Preset Security Policy",
+        ProtectedConfig, FilterKey, AccountKey, ActionKey
+    )
     ErrorMessage := ImpersonationProtectionErrorMsg(StrictIP.Result, StandardIP.Result, "sensitive users")
-    Conditions := [
-        StrictIP.Result == true,
-        StandardIP.Result == true
-    ]
-    Status := count([x | some x in Conditions; x == false]) == 0
+    Status := count(FilterArray([StrictIP.Result == true, StandardIP.Result == true], false)) == 0
 }
 #--
 
@@ -285,15 +299,21 @@ tests contains {
     AccountKey := "TargetedDomainsToProtect"
     ActionKey := "TargetedDomainProtectionAction"
     ProtectedConfig := ImpersonationProtectionConfig("MS.DEFENDER.2.2v1", "AgencyDomains")
-    StrictIP := ImpersonationProtection(Policies, "Strict Preset Security Policy", ProtectedConfig, FilterKey, AccountKey, ActionKey)
-    StandardIP := ImpersonationProtection(Policies, "Standard Preset Security Policy", ProtectedConfig, FilterKey, AccountKey, ActionKey)
+    StrictIP := ImpersonationProtection(
+        Policies, "Strict Preset Security Policy",
+        ProtectedConfig, FilterKey, AccountKey, ActionKey
+    )
+    StandardIP := ImpersonationProtection(
+        Policies, "Standard Preset Security Policy",
+        ProtectedConfig, FilterKey, AccountKey, ActionKey
+    )
     ErrorMessage := ImpersonationProtectionErrorMsg(StrictIP.Result, StandardIP.Result, "agency domains")
     Conditions := [
         StrictIP.Result == true,
         StandardIP.Result == true,
         count(ProtectedConfig) > 0
     ]
-    Status := count([x | some x in Conditions; x == false]) == 0
+    Status := count(FilterArray(Conditions, false)) == 0
 }
 #--
 
@@ -313,14 +333,16 @@ tests contains {
     AccountKey := "TargetedDomainsToProtect"
     ActionKey := "TargetedDomainProtectionAction"
     ProtectedConfig := ImpersonationProtectionConfig("MS.DEFENDER.2.3v1", "PartnerDomains")
-    StrictIP := ImpersonationProtection(Policies, "Strict Preset Security Policy", ProtectedConfig, FilterKey, AccountKey, ActionKey)
-    StandardIP := ImpersonationProtection(Policies, "Standard Preset Security Policy", ProtectedConfig, FilterKey, AccountKey, ActionKey)
+    StrictIP := ImpersonationProtection(
+        Policies, "Strict Preset Security Policy",
+        ProtectedConfig, FilterKey, AccountKey, ActionKey
+    )
+    StandardIP := ImpersonationProtection(
+        Policies, "Standard Preset Security Policy",
+        ProtectedConfig, FilterKey, AccountKey, ActionKey
+    )
     ErrorMessage := ImpersonationProtectionErrorMsg(StrictIP.Result, StandardIP.Result, "partner domains")
-    Conditions := [
-        StrictIP.Result == true,
-        StandardIP.Result == true
-    ]
-    Status := count([x | some x in Conditions; x == false]) == 0
+    Status := count(FilterArray([StrictIP.Result == true, StandardIP.Result == true], false)) == 0
 }
 #--
 
@@ -487,7 +509,7 @@ tests contains {
         count(error_policies) == 0,
         count(PoliciesWithFullProtection) > 0,
     ]
-    Status := count([Condition | some Condition in Conditions; Condition == true]) == 2
+    Status := count(FilterArray(Conditions, true)) == 2
 }
 
 #
@@ -530,7 +552,7 @@ tests contains {
         count(Rules) == 0,
         count(PoliciesWithFullProtection) > 0,
     ]
-    Status := count([Condition | some Condition in Conditions; Condition == true]) == 2
+    Status := count(FilterArray(Conditions, true)) == 2
 }
 #--
 
@@ -568,7 +590,7 @@ tests contains {
         count(Rules) == 0,
         count(PoliciesWithFullProtection) > 0,
     ]
-    Status := count([Condition | some Condition in Conditions; Condition == true]) == 2
+    Status := count(FilterArray(Conditions, true)) == 2
 }
 #--
 

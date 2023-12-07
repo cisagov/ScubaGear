@@ -348,6 +348,7 @@ test_ContentContainsSensitiveInformation_Incorrect_V6 if {
     ReportDetailString := "No matching rules found for: Credit Card Number, U.S. Individual Taxpayer Identification Number (ITIN), U.S. Social Security Number (SSN)"
     IncorrectTestResult("MS.DEFENDER.4.1v1", Output, ReportDetailString) == true
 }
+#--
 
 #
 # Policy 2
@@ -928,9 +929,11 @@ test_Locations_Incorrect_V8 if {
     ReportDetailString := "No DLP policy matching all types found for evaluation."
     IncorrectTestResult("MS.DEFENDER.4.2v1", Output, ReportDetailString) == true
 }
+#--
 
 #
 # Policy 3
+#--
 
 # All sensitive rules present and blocking
 test_BlockAccess_Correct_V1 if {
@@ -1248,6 +1251,7 @@ test_BlockAccess_Incorrect_V6 if {
     ReportDetailString := "No DLP policy matching all types found for evaluation."
     IncorrectTestResult("MS.DEFENDER.4.3v1", Output, ReportDetailString) == true
 }
+#--
 
 #
 # Policy 4
@@ -1416,6 +1420,7 @@ test_NotifyUser_Incorrect_V2 if {
     ReportDetailString := "1 rule(s) found that do(es) not notify at least one user: Baseline Rule"
     IncorrectTestResult("MS.DEFENDER.4.4v1", Output, ReportDetailString) == true
 }
+#--
 
 #
 # Policy 5
@@ -1428,6 +1433,7 @@ test_NotImplemented_Correct_V1 if {
     ReportDetailString := NotCheckedDetails(PolicyId)
     IncorrectTestResult(PolicyId, Output, ReportDetailString) == true
 }
+#--
 
 #
 # Policy 6

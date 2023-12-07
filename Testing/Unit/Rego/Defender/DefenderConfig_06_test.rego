@@ -54,6 +54,7 @@ test_AdminAuditLogEnabled_Incorrect if {
 
     IncorrectTestResult("MS.DEFENDER.6.1v1", Output, FAIL) == true
 }
+#--
 
 #
 # Policy 2
@@ -66,6 +67,7 @@ test_NotImplemented_Correct_V1 if {
     ReportDetailString := NotCheckedDetails(PolicyId)
     IncorrectTestResult(PolicyId, Output, ReportDetailString) == true
 }
+#--
 
 #
 # Policy 3
