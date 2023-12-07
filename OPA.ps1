@@ -55,8 +55,8 @@ function Get-OPAFile {
     $OutFile=(Join-Path (Get-Location).Path $OPAExe)
 
     try {
-        $Display = "Downloading OPA executable"
-        Start-BitsTransfer -Source $InstallUrl -Destination $OutFile -DisplayName $Display
+        $WebClient = New-Object System.Net.WebClient
+        $WebClient.DownloadFile($InstallUrl, $OutFile)
         Write-Information -MessageData "Installed the specified OPA version (${ExpectedVersion}) to ${OPAExe}" | Out-Host
     }
     catch {
