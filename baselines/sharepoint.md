@@ -7,8 +7,6 @@ The Secure Cloud Business Applications (SCuBA) project run by the Cybersecurity 
 
 The CISA SCuBA SCBs for M365 secure federal information assets stored within M365 cloud business application environments through consistent, effective, and manageable security configurations. CISA created baselines tailored to the federal government’s threats and risk tolerance with the knowledge that every organization has different threat models and risk tolerance. Non-governmental organizations may also find value in applying these baselines to reduce risks.
 
-The information in this document is being provided “as is” for INFORMATIONAL PURPOSES ONLY. CISA does not endorse any commercial product or service, including any subjects of analysis. Any reference to specific commercial entities or commercial products, processes, or services by service mark, trademark, manufacturer, or otherwise does not constitute or imply endorsement, recommendation, or favoritism by CISA.
-
 > This document is marked TLP:CLEAR. Recipients may share this information without restriction. Information is subject to standard copyright rules. For more information on the Traffic Light Protocol, see https://www.cisa.gov/tlp.
 
 ## License Compliance and Copyright
@@ -47,7 +45,7 @@ External sharing for OneDrive SHALL be limited to Existing guests or Only People
 External sharing SHALL be restricted to approved external domains and/or users in approved security groups per interagency collaboration needs.
 
 <!--Policy: MS.SHAREPOINT.1.3v1; Criticality: SHALL -->
-- _Rationale:_ By limiting sharing to domains or approved security groups used for interagency collaboration purposes, administrators prevent sharing with unknown organizations and individuals.
+- _Rationale:_ By limiting sharing to domains or approved security groups used for interagency collaboration purposes, administrators help prevent sharing with unknown organizations and individuals.
 - _Last modified:_ June 2023
 - _Note:_ This policy is only applicable if the external sharing slider on the admin page is set to any value other than **Only People in your organization**.
 
@@ -55,7 +53,7 @@ External sharing SHALL be restricted to approved external domains and/or users i
 Guest access SHALL be limited to the email the invitation was sent to.
 
 <!--Policy: MS.SHAREPOINT.1.4v1; Criticality: SHALL -->
-- _Rationale:_ Email invitations allow external guests to access shared information. By requiring guests to sign in using the same account where the invite was sent, administrators ensure only the intended guest can use the invite.
+- _Rationale:_ Email invitations allow external guests to access shared information. By requiring guests to sign in using the same account where the invite was sent, administrators help ensure only the intended guest can use the invite.
 - _Last modified:_ June 2023
 - _Note:_ This policy is only applicable if the external sharing slider on the admin page is set to any value other than **Only People in your organization**.
 
