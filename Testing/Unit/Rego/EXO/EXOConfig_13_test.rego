@@ -43,8 +43,6 @@ test_AuditDisabled_Correct if {
 }
 
 test_AuditDisabled_Incorrect if {
-    PolicyId := "MS.EXO.13.1v1"
-
     Output := exo.tests with input as {
         "org_config": [
             {
