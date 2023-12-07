@@ -31,7 +31,23 @@ param(
 
     [Parameter(HelpMessage = 'Do not download OPA')]
     [switch]
-    $NoOPA
+    $NoOPA,
+
+    [Parameter(Mandatory = $false, HelpMessage = 'The version of OPA Rego to be downloaded, must be in "x.x.x" format')]
+    [Alias('version')]
+    [string]
+    $ExpectedVersion = '0.42.1',
+
+    [Parameter(Mandatory = $false, HelpMessage = 'The operating system the program is running on')]
+    [ValidateSet('Windows','MacOS','Linux')]
+    [Alias('os')]
+    [string]
+    $OperatingSystem  = "Windows",
+
+    [Parameter(Mandatory = $false, HelpMessage = 'The file name that the opa executable is to be saved as')]
+    [Alias('name')]
+    [string]
+    $OPAExe = ""
 )
 
 # Set preferences for writing messages
@@ -52,7 +68,7 @@ $Stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
 
 $RequiredModulesPath = Join-Path -Path $PSScriptRoot -ChildPath "PowerShell\ScubaGear\RequiredVersions.ps1"
 if (Test-Path -Path $RequiredModulesPath) {
-  . $RequiredModulesPath
+    . $RequiredModulesPath
 }
 
 if ($ModuleList) {
@@ -63,9 +79,8 @@ if ($ModuleList) {
         MaximumVersion = [version] '2.99.99999'
     } + $ModuleList
 }
-else
-{
-   throw "Required modules list is required."
+else {
+    throw "Required modules list is required."
 }
 
 foreach ($Module in $ModuleList) {
@@ -77,7 +92,7 @@ foreach ($Module in $ModuleList) {
         $LatestVersion = [Version](Find-Module -Name $ModuleName -MinimumVersion $Module.ModuleVersion -MaximumVersion $Module.MaximumVersion).Version
 
         if ($HighestInstalledVersion -ge $LatestVersion) {
-            Write-Debug "${ModuleName}:${HighestInstalledVersion} already has latest installed."
+            Write-Debug "${ModuleName}: ${HighestInstalledVersion} already has latest installed."
 
             if ($Force -eq $true) {
                 Install-Module -Name $ModuleName `
@@ -85,12 +100,12 @@ foreach ($Module in $ModuleList) {
                     -AllowClobber `
                     -Scope CurrentUser `
                     -MaximumVersion $Module.MaximumVersion
-                Write-Information -MessageData "Re-installing module to latest acceptable version: ${ModuleName}"
+                Write-Information -MessageData "Re-installing module to latest acceptable version: ${ModuleName}."
             }
         }
         else {
             if ($SkipUpdate -eq $true) {
-                Write-Debug "Skipping update for ${ModuleName}:${HighestInstalledVersion} to newer version ${LatestVersion}."
+                Write-Debug "Skipping update for ${ModuleName}: ${HighestInstalledVersion} to newer version ${LatestVersion}."
             }
             else {
                 Install-Module -Name $ModuleName `
@@ -99,7 +114,7 @@ foreach ($Module in $ModuleList) {
                     -Scope CurrentUser `
                     -MaximumVersion $Module.MaximumVersion
                 $MaxInstalledVersion = (Get-Module -ListAvailable -Name $ModuleName | Sort-Object Version -Descending | Select-Object Version -First 1).Version
-                Write-Information -MessageData " ${ModuleName}:${HighestInstalledVersion} updated to version ${MaxInstalledVersion}."
+                Write-Information -MessageData "${ModuleName}: ${HighestInstalledVersion} updated to version ${MaxInstalledVersion}."
             }
         }
     }
@@ -109,28 +124,27 @@ foreach ($Module in $ModuleList) {
             -Scope CurrentUser `
             -MaximumVersion $Module.MaximumVersion
             $MaxInstalledVersion = (Get-Module -ListAvailable -Name $ModuleName | Sort-Object Version -Descending | Select-Object Version -First 1).Version
-        Write-Information -MessageData "Installed the latest acceptable version of ${ModuleName} version ${MaxInstalledVersion}"
+        Write-Information -MessageData "Installed the latest acceptable version of ${ModuleName}: ${MaxInstalledVersion}."
     }
 }
 
 if ($NoOPA -eq $true) {
-    Write-Debug "Skipping Download for OPA."
+    Write-Debug "Skipping Download for OPA.`n"
 }
 else {
-    $DebugPreference = 'Continue'
     try {
-    $ScriptDir = Split-Path -Path $MyInvocation.MyCommand.Definition -Parent
-    . $ScriptDir\OPA.ps1
+        $ScriptDir = Split-Path -Path $MyInvocation.MyCommand.Definition -Parent
+        . $ScriptDir\OPA.ps1 -name $OPAExe -version $ExpectedVersion -os $OperatingSystem
     }
     catch {
-        Write-Error "An error occurred: cannot call OPA download script"
+        $Error[0] | Format-List -Property * -Force | Out-Host
     }
 }
 
 # Stop the clock and report total elapsed time
 $Stopwatch.stop()
 
-Write-Debug "ScubaGear setup time elapsed:  $([math]::Round($stopwatch.Elapsed.TotalSeconds,0)) seconds."
+Write-Debug "ScubaGear setup time elapsed: $([math]::Round($stopwatch.Elapsed.TotalSeconds,0)) seconds."
 
 $DebugPreference = "SilentlyContinue"
 $InformationPreference = "SilentlyContinue"
