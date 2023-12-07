@@ -14,4 +14,4 @@ Each linter can also be configured, typically to ignore undesired checks.  How t
 
 ### yamllint
 
-yamllint is a linter for YAML that is configured by a `.yamllint.yml` file that must be int he root directory.  It uses the disable value to disable undesired checks (e.g., `document-start: disable`).  Much like the MegaLinter config file, the yamllint config file is copies from the `/MegaLinter` subdirectory to the root directory by the GitHub Action workflow.
+yamllint is a linter for YAML that is configured by a `.yamllint.yml` file that must be in the root directory.  It uses the disable value to disable undesired checks (e.g., `document-start: disable`).  Much like the MegaLinter config file, the yamllint config file is copies from the `/MegaLinter` subdirectory to the root directory by the GitHub Action workflow.
