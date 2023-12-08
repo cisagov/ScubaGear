@@ -25,7 +25,7 @@ jobs:
       uses: actions/checkout@v4
     - name: Decode Base64
       run: |
-        [System.Text.Encoding]::ASCII.GetString([System.Convert]::FromBase64String($env:PfxBase64)) | Out-File -Encoding Byte ./key.pfx
+        [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($env:PfxBase64)) | Out-File -Encoding utf8 ./key.pfx
       env:
         PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
     - run: dir
