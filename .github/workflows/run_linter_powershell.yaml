@@ -7,14 +7,18 @@ name: Lint Check for PowerShell
 on:
   push:
     paths:
-      - '**.ps1'
-      - '**.psm1'
-      - '**.psd1'
-      - '**.pssc'
-      - '**.psrc'
-      - '**.ps1xml'
-      - '**.cdxml'
+      - '**.yaml'
+      - '**.yaml'
   workflow_dispatch:
+
+      # - '**.ps1'
+      # - '**.psm1'
+      # - '**.psd1'
+      # - '**.pssc'
+      # - '**.psrc'
+      # - '**.ps1xml'
+      # - '**.cdxml'
+
 
 jobs:
   powershell-lint-check:
