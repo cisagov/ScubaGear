@@ -1,29 +1,16 @@
 # Author: James Garriss
-# Purpose: Run the linter against the PowerShell code (and others)
-# Additional linters can be added as new jobs as desired.
+# Purpose: Run the linter against YAML files
 
-name: Lint Check
+name: Lint Check for YAML
 
-# Run whenever code is checked in
+# Run whenever YAML files are  checked in
 on:
   push:
+    - '**.yaml'
+    - '**.yaml'
   workflow_dispatch:
 
 jobs:
-  powershell-lint-check:
-    name: MegaLint PowerShell Check
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: bash
-    steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v4
-      - name: Setup Config File
-        run: cp MegaLinter/.mega-linter-powershell.yml .mega-linter.yml
-      - name: Lint PowerShell
-        uses: oxsecurity/megalinter/flavors/dotnet@v7.6.0
-
   yaml-lint-check:
     name: MegaLint YAML Check
     runs-on: ubuntu-latest

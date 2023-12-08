@@ -1,0 +1,31 @@
+# Author: James Garriss
+# Purpose: Run the linter against the PowerShell code
+
+name: Lint Check for PowerShell
+
+# Run whenever PowerShell files are checked in
+on:
+  push:
+    - '**.ps1'
+    - '**.psm1'
+    - '**.psd1'
+    - '**.pssc'
+    - '**.psrc'
+    - '**.ps1xml'
+    - '**.cdxml'
+  workflow_dispatch:
+
+jobs:
+  powershell-lint-check:
+    name: MegaLint PowerShell Check
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+      - name: Setup Config File
+        run: cp MegaLinter/.mega-linter-powershell.yml .mega-linter.yml
+      - name: Lint PowerShell
+        uses: oxsecurity/megalinter/flavors/dotnet@v7.6.0
