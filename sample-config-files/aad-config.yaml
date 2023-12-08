@@ -17,7 +17,7 @@ Description: |
   - Namespace for each policy item within a product for variables related only to one policy item (i.e., Aad.Policy2_1)
   - Use of YAML anchors and aliases following DRY (Don't Repeat Yourself) principle for repeated values and sections
 ProductNames:
-- aad
+  - aad
 M365Environment: commercial
 OPAPath: .
 LogIn: true
@@ -27,10 +27,10 @@ OutFolderName: M365BaselineConformance
 OutProviderFileName: ProviderSettingsExport
 OutRegoFileName: TestResults
 OutReportName: BaselineReports
-GlobalVars:  # For cross product variables
+GlobalVars: # For cross product variables
   AllProductVar: value_example
 Aad:
-# All AAD specific variables go here
+  # All AAD specific variables go here
   MS.AAD.1.1v1: &CommonExclusions
     CapExclusions:
       Users:
@@ -38,10 +38,10 @@ Aad:
       Groups:
         - 08adb07a-956f-450e-b41c-81e92e3db2c4
         - 8454f405-3b29-4102-b888-315c4e3de2d0
-  MS.AAD.2.1v1:  *CommonExclusions
-  MS.AAD.2.3v1:  *CommonExclusions
-  MS.AAD.3.1v1:  *CommonExclusions
-  MS.AAD.3.2v1:  *CommonExclusions
+  MS.AAD.2.1v1: *CommonExclusions
+  MS.AAD.2.3v1: *CommonExclusions
+  MS.AAD.3.1v1: *CommonExclusions
+  MS.AAD.3.2v1: *CommonExclusions
   MS.AAD.7.4v1: &CommonRoleExclusions
     RoleExclusions:
       Users:
