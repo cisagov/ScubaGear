@@ -5,12 +5,12 @@ TestPlan:
     Tests:
       - TestDescription: MS.EXO.1.1v1 Non-Compliant case - domains have auto forwarding Enabled
         Preconditions:
-          - Command: 'Get-RemoteDomain | Where {$_.AutoForwardEnabled -eq $false} | Set-RemoteDomain -AutoForwardEnabled $true'
+          - Command: "Get-RemoteDomain | Where {$_.AutoForwardEnabled -eq $false} | Set-RemoteDomain -AutoForwardEnabled $true"
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.EXO.1.1v1 Compliant case - domains have auto forwarding Disabled
         Preconditions:
-          - Command: 'Get-RemoteDomain | Where {$_.AutoForwardEnabled -eq $true} | Set-RemoteDomain -AutoForwardEnabled $false'
+          - Command: "Get-RemoteDomain | Where {$_.AutoForwardEnabled -eq $true} | Set-RemoteDomain -AutoForwardEnabled $false"
         Postconditions: []
         ExpectedResult: true
 
@@ -403,12 +403,12 @@ TestPlan:
     Tests:
       - TestDescription: MS.EXO.12.1v1 Non-Compliant case - IP allow list is created
         Preconditions:
-          - Command: 'Get-HostedConnectionFilterPolicy | Set-HostedConnectionFilterPolicy -IPAllowList 192.168.1.10,192.168.1.23'
+          - Command: "Get-HostedConnectionFilterPolicy | Set-HostedConnectionFilterPolicy -IPAllowList 192.168.1.10,192.168.1.23"
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.EXO.12.1v1 Compliant case - IP allow list is empty
         Preconditions:
-          - Command: 'Get-HostedConnectionFilterPolicy | Set-HostedConnectionFilterPolicy -IPAllowList @{}'
+          - Command: "Get-HostedConnectionFilterPolicy | Set-HostedConnectionFilterPolicy -IPAllowList @{}"
         Postconditions: []
         ExpectedResult: true
 
@@ -417,12 +417,12 @@ TestPlan:
     Tests:
       - TestDescription: MS.EXO.12.2v1 Non-Compliant case - Safe lists are Enabled
         Preconditions:
-          - Command: 'Get-HostedConnectionFilterPolicy | Set-HostedConnectionFilterPolicy -EnableSafeList: $true'
+          - Command: "Get-HostedConnectionFilterPolicy | Set-HostedConnectionFilterPolicy -EnableSafeList: $true"
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.EXO.12.2v1 Non-Compliant case - Safe lists are Disabled
         Preconditions:
-          - Command: 'Get-HostedConnectionFilterPolicy | Set-HostedConnectionFilterPolicy -EnableSafeList: $false'
+          - Command: "Get-HostedConnectionFilterPolicy | Set-HostedConnectionFilterPolicy -EnableSafeList: $false"
         Postconditions: []
         ExpectedResult: true
 

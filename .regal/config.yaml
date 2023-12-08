@@ -11,7 +11,7 @@ rules:
       # fixed anyway so real issues aren't missed.
       level: ignore
   custom:
-    # https://docs.styra.com/regal/rules/custom/naming-convention
+    # https://docs.styra.scom/regal/rules/custom/naming-convention
     naming-convention:
       # Codifying the conventions used in this project.
       # By all means, change this to be less restrictive
