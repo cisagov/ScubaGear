@@ -30,7 +30,7 @@ jobs:
     - name: Checkout Repo
       uses: actions/checkout@v4
     - name: Create Base64 File
-      run: New-Item -Path ./'key-base64.txt -ItemType File
+      run: New-Item -Path ./key-base64.txt -ItemType File
     - name: Copy Base64 to File
       run: Out-File -FilePath $PfxBase64Filename -InputObject $PfxBase64 -Encoding ASCII
     - run: dir
