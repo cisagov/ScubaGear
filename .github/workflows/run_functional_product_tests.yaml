@@ -23,19 +23,10 @@ jobs:
     steps:
     - name: Checkout Repo
       uses: actions/checkout@v4
-    # - name: Create Base64 File
-    #   run: New-Item -Path ./key-base64.txt -ItemType File
-    # - name: Copy Base64 to File
-    #   run: Out-File -FilePath ./key-base64.txt -InputObject $env:PfxBase64 -Encoding ASCII
-    #   env:
-    #     PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
     - name: Decode Base64 File
-      run: [Text.Encoding]::Utf8.GetString([Convert]::FromBase64String($env:PfxBase64)) | Out-File -Encoding "ASCII" ./key.pfx
-    # [System.Text.Encoding]::ASCII.GetString([System.Convert]::FromBase64String($data)) | Out-File -Encoding "ASCII" ./key.pfx
+      run: [Text.Encoding]::Utf8.GetString([Convert]::FromBase64String($env:PfxBase64)) | Out-File -Encoding ASCII ./key.pfx
       env:
         PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
-    # - name: Import Cert into Store
-    # run: "Import-Certificate -FilePath .\key.cer -CertStoreLocation Cert:\CurrentUser\Root"
     - run: dir
     - name: Import PFX into Store
       run: Import-PfxCertificate -Password (ConvertTo-SecureString -String $env:PfxPassword -AsPlainText -Force) -CertStoreLocation Cert:\LocalMachine\Root -FilePath ./key.pfx
@@ -43,6 +34,16 @@ jobs:
         PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
     - run: dir
     - run: Get-Content ./key.pfx
+    # - name: Create Base64 File
+    #   run: New-Item -Path ./key-base64.txt -ItemType File
+    # - name: Copy Base64 to File
+    #   run: Out-File -FilePath ./key-base64.txt -InputObject $env:PfxBase64 -Encoding ASCII
+    #   env:
+    #     PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
+    # [System.Text.Encoding]::ASCII.GetString([System.Convert]::FromBase64String($data)) | Out-File -Encoding "ASCII" ./key.pfx
+    # - name: Import Cert into Store
+    # run: "Import-Certificate -FilePath .\key.cer -CertStoreLocation Cert:\CurrentUser\Root"
+    #
     # - name: Run Setup
     #   run: "./SetUp.ps1"
     # - name: Install Selenium
