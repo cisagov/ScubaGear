@@ -26,7 +26,11 @@ jobs:
     - name: Create Base64 File
       run: New-Item -Path ./key-base64.txt -ItemType File
     - name: Copy Base64 to File
-      run: Out-File -FilePath ./key-base64.txt -InputObject $PfxBase64 -Encoding ASCII
+      run: |
+        Write-Host '>>>'
+        Write-Host $PfxBase64
+        Write-Host '<<<'
+        Out-File -FilePath ./key-base64.txt -InputObject $PfxBase64 -Encoding ASCII
       env:
         PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
     - run: dir
