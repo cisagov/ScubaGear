@@ -31,7 +31,7 @@ jobs:
         Write-Host $PfxBase64
         Write-Host '<<<'
         Out-File -FilePath ./key-base64.txt -InputObject $PfxBase64 -Encoding ASCII
-      env:
+      with:
         PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
     - run: dir
     - run: Get-Content ./key-base64.txt
