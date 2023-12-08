@@ -14,10 +14,10 @@ on:
     - '652-add-nightly-product-functional-testing'
 
 env:
-  PfxBase64:    ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
-  PfxPassword:  ${{ secrets.NIGHTLY_TEST_BUILD_PW }} 
-  PfxBase64Filename:  ./key-base64.txt
-  PfxFilename:         ./key.pfx
+  PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
+  PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }} 
+  PfxBase64Filename: 'key-base64.txt'
+  PfxFilename: 'key.pfx'
 
 jobs:
   sharepoint-test:
@@ -30,7 +30,7 @@ jobs:
     - name: Checkout Repo
       uses: actions/checkout@v4
     - name: Create Base64 File
-      run: "Out-File -FilePath $PfxBase64Filename -InputObject $PfxBase64 -Encoding ASCII"
+      run: Out-File -FilePath $PfxBase64Filename -InputObject $PfxBase64 -Encoding ASCII
     - run: dir
     - run: Get-Content $PfxFilename
     - name: Decode Base64 File
