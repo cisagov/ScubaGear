@@ -23,16 +23,22 @@ jobs:
     steps:
     - name: Checkout Repo
       uses: actions/checkout@v4
-    - name: Create Base64 File
-      run: New-Item -Path ./key-base64.txt -ItemType File
-    - name: Copy Base64 to File
-      run: Out-File -FilePath ./key-base64.txt -InputObject $env:PfxBase64 -Encoding ASCII
-      env:
-        PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
+    # - name: Create Base64 File
+    #   run: New-Item -Path ./key-base64.txt -ItemType File
+    # - name: Copy Base64 to File
+    #   run: Out-File -FilePath ./key-base64.txt -InputObject $env:PfxBase64 -Encoding ASCII
+    #   env:
+    #     PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
     - name: Decode Base64 File
       run: |
         $data = Get-Content ./key-base64.txt
-        [System.Text.Encoding]::ASCII.GetString([System.Convert]::FromBase64String($data)) | Out-File -Encoding "ASCII" ./key.pfx
+        Write-Host '>>>'
+        Write-Host $data
+        Write-Host '<<<'
+      # [System.Text.Encoding]::ASCII.GetString([System.Convert]::FromBase64String($data)) | Out-File -Encoding "ASCII" ./key.pfx
+        [Text.Encoding]::Utf8.GetString([Convert]::FromBase64String($data)) | Out-File -Encoding "ASCII" ./key.pfx
+      env:
+        PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
     # - name: Import Cert into Store
       # run: "Import-Certificate -FilePath .\key.cer -CertStoreLocation Cert:\CurrentUser\Root"
     - name: Import PFX into Store
