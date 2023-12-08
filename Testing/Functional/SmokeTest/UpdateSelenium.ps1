@@ -81,9 +81,11 @@ function DownLoadDriver{
         Invoke-WebRequest $DownloadUrl -OutFile "$DriverTempPath\chromeNewDriver.zip" 2>&1 | Out-Null
 
         Expand-Archive "$DriverTempPath\chromeNewDriver.zip" -DestinationPath $DriverTempPath -Force
+
         if (Test-Path "$($WebDriversPath)\chromedriver.exe") {
             Remove-Item -Path "$($WebDriversPath)\chromedriver.exe" -Force
         }
+
         Move-Item "$DriverTempPath\chromedriver-win64\chromedriver.exe" -Destination  "$($WebDriversPath)\chromedriver.exe" -Force
     }
     catch {
@@ -131,7 +133,8 @@ if (Confirm-NeedForUpdate $chromeVersion $localDriverVersion){
     }
 
     # clean-up
-    Remove-Item "$DriverTempPath\chromeNewDriver.zip" -Force
-    Remove-Item $DriverTempPath\ -Recurse -Force
+    if (Test-Path -Path $DriverTempPath){
+        Remove-Item $DriverTempPath -Recurse -Force
+    }
 }
 #endregion MAIN SCRIPT
