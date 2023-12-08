@@ -23,10 +23,6 @@ jobs:
   sharepoint-test:
     name: SharePoint Test
     runs-on: windows-latest
-    # env:
-      # This is the key necessary to auth to the products for testing
-      # TODO put REAL name of secret here
-      # SCUBA_GITHUB_AUTOMATION_CREDS: ${{ secrets.SCUBA_GITHUB_AUTOMATION_CREDS }}
     defaults:
       run:
         shell: powershell 
