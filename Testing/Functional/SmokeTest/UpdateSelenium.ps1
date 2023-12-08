@@ -60,6 +60,41 @@ function Confirm-NeedForUpdate{
     return ([System.Version]$v2).Major -lt ([System.Version]$v1).Major
 }
 
+function DownLoadDriver{
+    param(
+        [Parameter(Mandatory=$true)]
+        [Uri]
+        $DownloadUrl,
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $WebDriversPath
+    )
+
+    Write-Debug -Message "Dowloading $DownloadUrl"
+    $DriverTempPath = Join-Path -Path $PSScriptRoot -ChildPath "chromeNewDriver"
+
+    if (-not (Test-Path -Path $DriverTempPath -PathType Container)){
+        New-Item -ItemType Directory -Path $DriverTempPath
+    }
+
+    try {
+        Invoke-WebRequest $DownloadUrl -OutFile "$DriverTempPath\chromeNewDriver.zip" 2>&1 | Out-Null
+
+        Expand-Archive "$DriverTempPath\chromeNewDriver.zip" -DestinationPath $DriverTempPath -Force
+        if (Test-Path "$($WebDriversPath)\chromedriver.exe") {
+            Remove-Item -Path "$($WebDriversPath)\chromedriver.exe" -Force
+        }
+        Move-Item "$DriverTempPath\chromedriver-win64\chromedriver.exe" -Destination  "$($WebDriversPath)\chromedriver.exe" -Force
+    }
+    catch {
+        Write-Error "Failed to get web driver for use with Selenium.`n  $_"
+        return $false
+    }
+
+    return $true
+}
+
 $DebugPreference = 'Continue'
 #$DebugPreference = 'SilentlyContinue'
 
@@ -83,20 +118,12 @@ if (Confirm-NeedForUpdate $chromeVersion $localDriverVersion){
         Where-Object {$_.Platform -eq 'win64'}
     $DownloadUrl = $Download.Url
 
-    Write-Debug -Message "Dowloading $DownloadUrl"
-    $DriverTempPath = Join-Path -Path $PSScriptRoot -ChildPath "chromeNewDriver"
+    $DownloadSuccessful = $false
+    $MaxRetry = 3
 
-    if (-not (Test-Path -Path $DriverTempPath -PathType Container)){
-        New-Item -ItemType Directory -Path $DriverTempPath
+    while((-not $DownloadSuccessful) -and (0 -gt $MaxRetry--)){
+        $DownloadSuccessful = DownloadDriver -DownloadUrl $DownloadUrl -WebDriversPath $webDriversPath
     }
-
-    Invoke-WebRequest $DownloadUrl -OutFile "$DriverTempPath\chromeNewDriver.zip"
-
-    Expand-Archive "$DriverTempPath\chromeNewDriver.zip" -DestinationPath $DriverTempPath -Force
-    if (Test-Path "$($webDriversPath)\chromedriver.exe") {
-        Remove-Item -Path "$($webDriversPath)\chromedriver.exe" -Force
-    }
-    Move-Item "$DriverTempPath\chromedriver-win64\chromedriver.exe" -Destination  "$($webDriversPath)\chromedriver.exe" -Force
 
     # clean-up
     Remove-Item "$DriverTempPath\chromeNewDriver.zip" -Force
