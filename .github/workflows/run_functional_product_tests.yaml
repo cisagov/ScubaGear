@@ -36,12 +36,10 @@ jobs:
       run: Import-PfxCertificate -Password (ConvertTo-SecureString -String $env:PfxPassword -AsPlainText -Force) -CertStoreLocation Cert:\LocalMachine\Root -FilePath ./key.pfx
       env:
         PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
-    #
-    # - name: Run Setup
-    #   run: "./SetUp.ps1"
-    # - name: Install Selenium
-    #   run: "Install-Module -Name Selenium -RequiredVersion 3.0.1"
-    # - name: Update Selenium
-    #   run: "./Testing/Functional/SmokeTest/UpdateSelenium.ps1"
-    # - name: Test SharePoint
-    #   run: "./Testing/Functional/Products/Tests/CallProductTests.ps1"
+    - name: Setup for Scuba
+      run: |
+        ./SetUp.ps1
+        Install-Module -Name Selenium -RequiredVersion 3.0.1
+        ./Testing/Functional/SmokeTest/UpdateSelenium.ps1
+    - name: Test SharePoint
+      run: ./Testing/Functional/Products/Tests/CallProductTests.ps1
