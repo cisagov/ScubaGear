@@ -1,8 +1,18 @@
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath '../../../../PowerShell/ScubaGear/Modules/RunRego')
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath '../../../../PowerShell/ScubaGear/Modules/RunRego') -Force
 
 InModuleScope 'RunRego' {
     Describe -Tag 'RunRego' -Name 'Invoke-Rego' {
         BeforeAll {
+            #Mock -ModuleName RunRego Invoke-ExternalCmd -ParameterFilter { $LiteranlPath -contains 'opa_windows_amd64.exe'} -MockWith { '[]'}
+            $DummyTestResults = @"
+            [
+                {
+                    "RequirementMet":  false
+                }
+            ]
+"@
+            Mock -ModuleName RunRego Invoke-ExternalCmd -MockWith { return $DummyTestResults}
+
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'ArgToProd')]
             $ArgToProd = @{
                 teams         = "Teams";
@@ -19,53 +29,20 @@ InModuleScope 'RunRego' {
                 'OPAPath'   = Join-Path -Path $PSScriptRoot -ChildPath "../../../../";
             }
         }
-        It 'Runs the AAD Rego on a Provider JSON and returns a TestResults object' {
-            $Product = 'aad'
+        It "Runs the <ProductName> Rego on a Provider JSON and returns a TestResults object" -ForEach @(
+            @{ProductName = 'aad'},
+            @{ProductName = 'defender'},
+            @{ProductName = 'exo'},
+            @{ProductName = 'powerplatform'},
+            @{ProductName = 'sharepoint'},
+            @{ProductName = 'teams'}
+        ){
             $RegoParams += @{
-                'RegoFile'    = Join-Path -Path $PSScriptRoot -ChildPath "../../../../Rego/$($ArgToProd[$Product])Config.rego";
-                'PackageName' = $Product;
+                'RegoFile'    = Join-Path -Path $PSScriptRoot -ChildPath "../../../../Rego/$($ArgToProd[$ProductName])Config.rego";
+                'PackageName' = $ProductName;
             }
-            Invoke-Rego @RegoParams | Should -Not -Be $null
-        }
-        It 'Runs the Defender Rego on a Provider JSON and returns a TestResults object' {
-            $Product = 'defender'
-            $RegoParams += @{
-                'RegoFile'    = Join-Path -Path $PSScriptRoot -ChildPath "../../../../Rego/$($ArgToProd[$Product])Config.rego";
-                'PackageName' = $Product;
-            }
-            Invoke-Rego @RegoParams | Should -Not -Be $null
-        }
-        It 'Runs the EXO Rego on a Provider JSON and returns a TestResults object' {
-            $Product = 'exo'
-            $RegoParams += @{
-                'RegoFile'    = Join-Path -Path $PSScriptRoot -ChildPath "../../../../Rego/$($ArgToProd[$Product])Config.rego";
-                'PackageName' = $Product;
-            }
-            Invoke-Rego @RegoParams | Should -Not -Be $null
-        }
-        It 'Runs the PowerPlatform Rego on a Provider JSON and returns a TestResults object' {
-            $Product = 'powerplatform'
-            $RegoParams += @{
-                'RegoFile'    = Join-Path -Path $PSScriptRoot -ChildPath "../../../../Rego/$($ArgToProd[$Product])Config.rego";
-                'PackageName' = $Product;
-            }
-            Invoke-Rego @RegoParams | Should -Not -Be $null
-        }
-        It 'Runs the SharePoint Rego on a Provider JSON and returns a TestResults object' {
-            $Product = 'sharepoint'
-            $RegoParams += @{
-                'RegoFile'    = Join-Path -Path $PSScriptRoot -ChildPath "../../../../Rego/$($ArgToProd[$Product])Config.rego";
-                'PackageName' = $Product;
-            }
-            Invoke-Rego @RegoParams | Should -Not -Be $null
-        }
-        It 'Runs the Teams Rego on a Provider JSON and returns a TestResults object' {
-            $Product = 'teams'
-            $RegoParams += @{
-                'RegoFile'    = Join-Path -Path $PSScriptRoot -ChildPath "../../../../Rego/$($ArgToProd[$Product])Config.rego";
-                'PackageName' = $Product;
-            }
-            Invoke-Rego @RegoParams | Should -Not -Be $null
+            $TestResults = Invoke-Rego @RegoParams
+            $TestResults[0].RequirementMet | Should -BeExactly $false
         }
     }
 }

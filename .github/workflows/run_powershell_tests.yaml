@@ -29,5 +29,4 @@ jobs:
       if: '!cancelled()'
       shell: powershell
       run: |
-        ./SetUp.ps1
         Invoke-Pester -Output 'Detailed' -Path './Testing/Unit/PowerShell'
