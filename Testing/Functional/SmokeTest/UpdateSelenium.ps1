@@ -68,15 +68,14 @@ function DownLoadDriver{
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [string]
-        $WebDriversPath
+        $WebDriversPath,
+        [Parameter(Mandatory=$true)]
+        [ValidateScript({Test-Path -Path $_ -PathType Container})]
+        [string]
+        $DriverTempPath
     )
 
     Write-Debug -Message "Dowloading $DownloadUrl"
-    $DriverTempPath = Join-Path -Path $PSScriptRoot -ChildPath "chromeNewDriver"
-
-    if (-not (Test-Path -Path $DriverTempPath -PathType Container)){
-        New-Item -ItemType Directory -Path $DriverTempPath
-    }
 
     try {
         Invoke-WebRequest $DownloadUrl -OutFile "$DriverTempPath\chromeNewDriver.zip" 2>&1 | Out-Null
@@ -118,11 +117,17 @@ if (Confirm-NeedForUpdate $chromeVersion $localDriverVersion){
         Where-Object {$_.Platform -eq 'win64'}
     $DownloadUrl = $Download.Url
 
+    $DriverTempPath = Join-Path -Path $PSScriptRoot -ChildPath "chromeNewDriver"
+
+    if (-not (Test-Path -Path $DriverTempPath -PathType Container)){
+        New-Item -ItemType Directory -Path $DriverTempPath
+    }
+
     $DownloadSuccessful = $false
     $MaxRetry = 3
 
     while((-not $DownloadSuccessful) -and (0 -gt $MaxRetry--)){
-        $DownloadSuccessful = DownloadDriver -DownloadUrl $DownloadUrl -WebDriversPath $webDriversPath
+        $DownloadSuccessful = DownloadDriver -DownloadUrl $DownloadUrl -WebDriversPath $webDriversPath -DriverTempPath $DriverTempPath
     }
 
     # clean-up
