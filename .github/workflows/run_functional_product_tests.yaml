@@ -14,10 +14,10 @@ on:
     - '652-add-nightly-product-functional-testing'
 
 env:
-  pfx-base64:    ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
-  pfx-password:  ${{ secrets.NIGHTLY_TEST_BUILD_PW }} 
-  pfx-base64-filename:  ./key-base64.txt
-  pfx-filename:         ./key.pfx
+  PfxBase64:    ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
+  PfxPassword:  ${{ secrets.NIGHTLY_TEST_BUILD_PW }} 
+  PfxBase64Filename:  ./key-base64.txt
+  PfxFilename:         ./key.pfx
 
 jobs:
   sharepoint-test:
@@ -30,19 +30,19 @@ jobs:
     - name: Checkout Repo
       uses: actions/checkout@v4
     - name: Create Base64 File
-      run: "Out-File -FilePath $pfx-base64-filename -InputObject $pfx-base64 -Encoding ASCII"
+      run: "Out-File -FilePath $PfxBase64Filename -InputObject $PfxBase64 -Encoding ASCII"
     - run: dir
-    - run: Get-Content $pfx-filename
+    - run: Get-Content $PfxFilename
     - name: Decode Base64 File
       run: |
-        $data = Get-Content $pfx-base64-filename
-        [System.Text.Encoding]::ASCII.GetString([System.Convert]::FromBase64String($data)) | Out-File -Encoding "ASCII" $pfx-filename
+        $data = Get-Content $PfxBase64Filename
+        [System.Text.Encoding]::ASCII.GetString([System.Convert]::FromBase64String($data)) | Out-File -Encoding "ASCII" $PfxFilename
     # - name: Import Cert into Store
       # run: "Import-Certificate -FilePath .\key.cer -CertStoreLocation Cert:\CurrentUser\Root"
     - name: Import PFX into Store
-      run: Import-PfxCertificate -Password (ConvertTo-SecureString -String $pfx-password -AsPlainText -Force) -CertStoreLocation Cert:\LocalMachine\Root -FilePath $pfx-filename
+      run: Import-PfxCertificate -Password (ConvertTo-SecureString -String $PfxPassword -AsPlainText -Force) -CertStoreLocation Cert:\LocalMachine\Root -FilePath $PfxFilename
     - run: dir
-    - run: Get-Content $pfx-filename
+    - run: Get-Content $PfxFilename
     # - name: Run Setup
     #   run: "./SetUp.ps1"
     # - name: Install Selenium
