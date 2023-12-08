@@ -26,15 +26,9 @@ jobs:
     - name: Create Base64 File
       run: New-Item -Path ./key-base64.txt -ItemType File
     - name: Copy Base64 to File
-      run: |
-        Write-Host '>>>'
-        Write-Host $env:PfxBase64
-        Write-Host '<<<'
-        Out-File -FilePath ./key-base64.txt -InputObject $env:PfxBase64 -Encoding ASCII
+      run: Out-File -FilePath ./key-base64.txt -InputObject $env:PfxBase64 -Encoding ASCII
       env:
         PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
-    - run: dir
-    - run: Get-Content ./key-base64.txt
     - name: Decode Base64 File
       run: |
         $data = Get-Content ./key-base64.txt
@@ -42,7 +36,7 @@ jobs:
     # - name: Import Cert into Store
       # run: "Import-Certificate -FilePath .\key.cer -CertStoreLocation Cert:\CurrentUser\Root"
     - name: Import PFX into Store
-      run: Import-PfxCertificate -Password (ConvertTo-SecureString -String $PfxPassword -AsPlainText -Force) -CertStoreLocation Cert:\LocalMachine\Root -FilePath ./key.pfx
+      run: Import-PfxCertificate -Password (ConvertTo-SecureString -String $env:PfxPassword -AsPlainText -Force) -CertStoreLocation Cert:\LocalMachine\Root -FilePath ./key.pfx
       env:
         PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
     - run: dir
