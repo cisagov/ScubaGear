@@ -1,5 +1,5 @@
 name: Run PS Linter
-on: 
+on:
   push:
     paths:
       - "**.ps1"
@@ -22,13 +22,13 @@ jobs:
       issues: write
       pull-requests: write
     steps:
-    - uses: actions/checkout@v2
-    - name: Run static code checker
-      uses: docker://devblackops/github-action-psscriptanalyzer:2.4.0
-      with:
-        repoToken: ${{ secrets.GITHUB_TOKEN }}
-        settingsPath: PSScriptAnalyzerSettings.psd1
-        failOnErrors: true
-        failOnWarnings: true
-        failOnInfos: true
-        sendComment: true
+      - uses: actions/checkout@v2
+      - name: Run static code checker
+        uses: docker://devblackops/github-action-psscriptanalyzer:2.4.0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          settingsPath: PSScriptAnalyzerSettings.psd1
+          failOnErrors: true
+          failOnWarnings: true
+          failOnInfos: true
+          sendComment: true

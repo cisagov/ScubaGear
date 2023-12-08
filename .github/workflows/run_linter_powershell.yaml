@@ -9,16 +9,12 @@ on:
     paths:
       - '**.ps1'
       - '**.psm1'
+      - '**.psd1'
+      - '**.pssc'
+      - '**.psrc'
+      - '**.ps1xml'
+      - '**.cdxml'
   workflow_dispatch:
-
-      # - '**.ps1'
-      # - '**.psm1'
-      # - '**.psd1'
-      # - '**.pssc'
-      # - '**.psrc'
-      # - '**.ps1xml'
-      # - '**.cdxml'
-
 
 jobs:
   powershell-lint-check:
