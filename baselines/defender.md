@@ -40,7 +40,7 @@ ONLY. CISA does not endorse any commercial product or service, including any
 subjects of analysis. Any reference to specific commercial entities or commercial
 products, processes, or services by service mark, trademark, manufacturer, or
 otherwise does not constitute or imply endorsement, recommendation, or favoritism
-by CISA. This document does not address, ensure compliance with, or supersede any law, regulation, or other authority.  Entities are responsible for complying with any recordkeeping, privacy, and other laws that may apply to the use of technology.  This document is not intended to, and does not, create any right or benefit for anyone against the United States, its departments, agencies, or entities, its officers, employees, or agents, or any other person.
+by CISA. This document does not address, ensure compliance with, or supersede any law, regulation, or other authority. Entities are responsible for complying with any recordkeeping, privacy, and other laws that may apply to the use of technology. This document is not intended to, and does not, create any right or benefit for anyone against the United States, its departments, agencies, or entities, its officers, employees, or agents, or any other person.
 
 > This document is marked TLP:CLEAR. Recipients may share this information without restriction. Information is subject to standard copyright rules. For more information on the Traffic Light Protocol, see https://www.cisa.gov/tlp.
 
@@ -48,7 +48,7 @@ by CISA. This document does not address, ensure compliance with, or supersede an
 Portions of this document are adapted from documents in Microsoft's [M365](https://github.com/MicrosoftDocs/microsoft-365-docs/blob/public/LICENSE) and [Azure](https://github.com/MicrosoftDocs/azure-docs/blob/main/LICENSE) GitHub repositories. The respective documents are subject to copyright and are adapted under the terms of the Creative Commons Attribution 4.0 International license. Sources are linked throughout this document. The United States government has adapted selections of these documents to develop innovative and scalable configuration standards to strengthen the security of widely used cloud-based software services.
 
 ## Assumptions
-The agency has identified a set of user accounts that are considered sensitive accounts.  See [Key Terminology](#key-terminology) for a detailed description of sensitive accounts.
+The agency has identified a set of user accounts that are considered sensitive accounts. See [Key Terminology](#key-terminology) for a detailed description of sensitive accounts.
 
 The **License Requirements** sections of this document assume the organization is using an [M365 E3](https://www.microsoft.com/en-us/microsoft-365/compare-microsoft-365-enterprise-plans) or [G3](https://www.microsoft.com/en-us/microsoft-365/government) license level at a minimum. Therefore, only licenses not included in E3/G3 are listed.
 
@@ -397,7 +397,7 @@ The custom policy SHOULD be applied to Exchange, OneDrive, SharePoint, Teams cha
 
 <!--Policy: MS.DEFENDER.4.2v1; Criticality: SHOULD -->
 - _Rationale:_ Unauthorized disclosures may happen through M365 services
-               or endpoint devices.  DLP policies should cover all
+               or endpoint devices. DLP policies should cover all
                affected locations to be effective.
 - _Last modified:_ June 2023
 - _Note:_ The custom policy referenced here is the same policy
@@ -740,7 +740,7 @@ Microsoft Purview Audit (Premium) logging SHALL be enabled for ALL users.
 - _Note:_ At the time of this writing, Microsoft has announced upcoming changes
           to its Purview Audit service that include making audit events
           currently available in Purview Audit (Premium) available to Purview
-          Audit (Standard) subscribers.  After rollout of changes are complete,
+          Audit (Standard) subscribers. After rollout of changes are complete,
           Purview (Standard) may be sufficient for agencies to meet basic
           logging requirements.
 
