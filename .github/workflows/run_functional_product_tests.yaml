@@ -35,8 +35,8 @@ jobs:
         Write-Host '>>>'
         Write-Host $data
         Write-Host '<<<'
-      # [System.Text.Encoding]::ASCII.GetString([System.Convert]::FromBase64String($data)) | Out-File -Encoding "ASCII" ./key.pfx
         [Text.Encoding]::Utf8.GetString([Convert]::FromBase64String($data)) | Out-File -Encoding "ASCII" ./key.pfx
+      # [System.Text.Encoding]::ASCII.GetString([System.Convert]::FromBase64String($data)) | Out-File -Encoding "ASCII" ./key.pfx
       env:
         PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
     # - name: Import Cert into Store
