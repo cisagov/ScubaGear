@@ -287,7 +287,7 @@ An inbound/outbound connection allowlist SHOULD be configured.
 3.  Set the slider in the center of the screen to **On** then click **Save**
     on the bottom of the screen.
 
-#### MS.POWERPLATFORM.3.2v1 instructions:
+#### MS.POWERPLATFORM.3.2v1 Instructions
 1.  Follow steps **1 and 2** in **MS.POWERPLATFORM.3.1v1 instructions** to
 arrive at the same page.
 
