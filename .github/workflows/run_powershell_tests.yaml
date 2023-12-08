@@ -22,12 +22,12 @@ jobs:
   Run-PowerShell-Tests:
     runs-on: windows-latest
     steps:
-    - name: Check out repository code
-      uses: actions/checkout@v3
+      - name: Check out repository code
+        uses: actions/checkout@v3
 
-    - name: Run Pester Tests
-      if: '!cancelled()'
-      shell: powershell
-      run: |
-        ./SetUp.ps1
-        Invoke-Pester -Output 'Detailed' -Path './Testing/Unit/PowerShell'
+      - name: Run Pester Tests
+        if: "!cancelled()"
+        shell: powershell
+        run: |
+          ./SetUp.ps1
+          Invoke-Pester -Output 'Detailed' -Path './Testing/Unit/PowerShell'
