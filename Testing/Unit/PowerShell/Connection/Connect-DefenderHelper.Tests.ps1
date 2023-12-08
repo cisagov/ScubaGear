@@ -3,7 +3,7 @@ Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../../../../PowerShell/
 InModuleScope ConnectHelpers {
     Describe -Tag 'Connection' -Name 'Connect-DefenderHelper' {
         BeforeAll {
-            Mock -ModuleName ConnectHelpers -CommandName Connect-IPPSSession -MockWith {}
+            Mock -CommandName Connect-IPPSSession -MockWith {}
         }
         context 'Without Service Principal'{
             It 'Invalid M365nvironment parameter' {
