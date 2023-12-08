@@ -6,13 +6,14 @@ name: Lint Check for PowerShell
 # Run whenever PowerShell files are checked in
 on:
   push:
-    - '**.ps1'
-    - '**.psm1'
-    - '**.psd1'
-    - '**.pssc'
-    - '**.psrc'
-    - '**.ps1xml'
-    - '**.cdxml'
+    paths:
+      - '**.ps1'
+      - '**.psm1'
+      - '**.psd1'
+      - '**.pssc'
+      - '**.psrc'
+      - '**.ps1xml'
+      - '**.cdxml'
   workflow_dispatch:
 
 jobs:
