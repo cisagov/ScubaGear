@@ -7,8 +7,8 @@ name: Lint Check for PowerShell
 on:
   push:
     paths:
-      - '**.yaml'
-      - '**.yaml'
+      - '**.ps1'
+      - '**.psm1'
   workflow_dispatch:
 
       # - '**.ps1'

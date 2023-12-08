@@ -7,7 +7,7 @@ name: Lint Check for YAML
 on:
   push:
     paths:
-      - '**.yaml'
+      - '**.yml'
       - '**.yaml'
   workflow_dispatch:
 
