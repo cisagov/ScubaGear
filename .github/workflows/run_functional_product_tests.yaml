@@ -24,7 +24,7 @@ jobs:
     - name: Checkout Repo
       uses: actions/checkout@v4
     - name: Decode Base64 File
-      run: [Text.Encoding]::Utf8.GetString([Convert]::FromBase64String($env:PfxBase64)) | Out-File -Encoding ASCII ./key.pfx
+      run: [System.Text.Encoding]::Utf8.GetString([System.Convert]::FromBase64String($env:PfxBase64)) | Out-File -Encoding "ASCII" ./key.pfx
       env:
         PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
     - run: dir
