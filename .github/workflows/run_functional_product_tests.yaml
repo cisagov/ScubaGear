@@ -13,12 +13,6 @@ on:
     branches:
     - '652-add-nightly-product-functional-testing'
 
-env:
-  PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
-  PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }} 
-  PfxBase64Filename: 'key-base64.txt'
-  PfxFilename: 'key.pfx'
-
 jobs:
   sharepoint-test:
     name: SharePoint Test
@@ -32,19 +26,23 @@ jobs:
     - name: Create Base64 File
       run: New-Item -Path ./key-base64.txt -ItemType File
     - name: Copy Base64 to File
-      run: Out-File -FilePath $PfxBase64Filename -InputObject $PfxBase64 -Encoding ASCII
+      run: Out-File -FilePath ./key-base64.txt -InputObject $PfxBase64 -Encoding ASCII
+      env:
+        PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
     - run: dir
-    - run: Get-Content $PfxFilename
+    - run: Get-Content ./key-base64.txt
     - name: Decode Base64 File
       run: |
-        $data = Get-Content $PfxBase64Filename
-        [System.Text.Encoding]::ASCII.GetString([System.Convert]::FromBase64String($data)) | Out-File -Encoding "ASCII" $PfxFilename
+        $data = Get-Content ./key-base64.txt
+        [System.Text.Encoding]::ASCII.GetString([System.Convert]::FromBase64String($data)) | Out-File -Encoding "ASCII" ./key.pfx
     # - name: Import Cert into Store
       # run: "Import-Certificate -FilePath .\key.cer -CertStoreLocation Cert:\CurrentUser\Root"
     - name: Import PFX into Store
-      run: Import-PfxCertificate -Password (ConvertTo-SecureString -String $PfxPassword -AsPlainText -Force) -CertStoreLocation Cert:\LocalMachine\Root -FilePath $PfxFilename
+      run: Import-PfxCertificate -Password (ConvertTo-SecureString -String $PfxPassword -AsPlainText -Force) -CertStoreLocation Cert:\LocalMachine\Root -FilePath ./key.pfx
+      env:
+        PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
     - run: dir
-    - run: Get-Content $PfxFilename
+    - run: Get-Content ./key.pfx
     # - name: Run Setup
     #   run: "./SetUp.ps1"
     # - name: Install Selenium
