@@ -23,10 +23,10 @@ jobs:
     steps:
     - name: Checkout Repo
       uses: actions/checkout@v4
-    # - name: Decode Base64 File
-    #   run: [System.Text.Encoding]::Utf8.GetString([System.Convert]::FromBase64String($env:PfxBase64)) | Out-File -Encoding "ASCII" ./key.pfx
-    #   env:
-    #     PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
+    - name: Decode Base64 File
+      run: [System.Text.Encoding]::Utf8.GetString([System.Convert]::FromBase64String($env:PfxBase64)) | Out-File -Encoding "ASCII" ./key.pfx
+      env:
+        PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
     # - run: dir
     # - name: Import PFX into Store
     #   run: Import-PfxCertificate -Password (ConvertTo-SecureString -String $env:PfxPassword -AsPlainText -Force) -CertStoreLocation Cert:\LocalMachine\Root -FilePath ./key.pfx
