@@ -68,8 +68,6 @@ $chromeVersion = (Get-Item (Get-ItemProperty $chromeRegistryPath).'(Default)').V
 Write-Debug -Message "Chrome driver version(registery):  $chromeVersion"
 
 # check which driver versions are installed
-Write-Debug "Where is chrome driver path?"
-Write-Debug $chromeDriverPath
 $localDriverVersion = Get-LocalDriverVersion -pathToDriver $chromeDriverPath
 
 if (Confirm-NeedForUpdate $chromeVersion $localDriverVersion){

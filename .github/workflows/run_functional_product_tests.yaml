@@ -13,6 +13,12 @@ on:
     branches:
     - '652-add-nightly-product-functional-testing'
 
+env:
+  pfx-base64:    ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
+  pfx-password:  ${{ secrets.NIGHTLY_TEST_BUILD_PW }} 
+  pfx-base64-filename:  ./key-base64.txt
+  pfx-filename:         ./key.pfx
+
 jobs:
   sharepoint-test:
     name: SharePoint Test
@@ -22,12 +28,24 @@ jobs:
         shell: powershell 
     steps:
     - name: Checkout Repo
-      uses: actions/checkout@v3
-    - name: Run Setup
-      run: "./SetUp.ps1"
-    - name: Install Selenium
-      run: "Install-Module -Name Selenium -RequiredVersion 3.0.1"
-    - name: Update Selenium
-      run: "./Testing/Functional/SmokeTest/UpdateSelenium.ps1"
-    - name: Test SharePoint
-      run: "./Testing/Functional/Products/Tests/sharepoint-commercial.ps1 FD6219CFBF937830616E43DF9C81BCF7D22FE03F"
+      uses: actions/checkout@v4
+    - name: Create Base64 File
+      run: "Out-File -FilePath $pfx-base64-filename -InputObject $pfx-base64 -Encoding ASCII"
+    - name: Decode Base64 File
+      run: |
+        $data = Get-Content $pfx-base64-filename
+        [System.Text.Encoding]::ASCII.GetString([System.Convert]::FromBase64String($data)) | Out-File -Encoding "ASCII" $pfx-filename
+    # - name: Import Cert into Store
+      # run: "Import-Certificate -FilePath .\key.cer -CertStoreLocation Cert:\CurrentUser\Root"
+    - name: Import PFX into Store
+      run: Import-PfxCertificate -Password (ConvertTo-SecureString -String $pfx-password -AsPlainText -Force) -CertStoreLocation Cert:\LocalMachine\Root -FilePath $pfx-filename
+    - run: dir
+    - run: Get-Content $pfx-filename
+    # - name: Run Setup
+    #   run: "./SetUp.ps1"
+    # - name: Install Selenium
+    #   run: "Install-Module -Name Selenium -RequiredVersion 3.0.1"
+    # - name: Update Selenium
+    #   run: "./Testing/Functional/SmokeTest/UpdateSelenium.ps1"
+    # - name: Test SharePoint
+    #   run: "./Testing/Functional/Products/Tests/CallProductTests.ps1"
