@@ -30,12 +30,7 @@ jobs:
     #   env:
     #     PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
     - name: Decode Base64 File
-      run: |
-        $data = Get-Content ./key-base64.txt
-        Write-Host '>>>'
-        Write-Host $data
-        Write-Host '<<<'
-        [Text.Encoding]::Utf8.GetString([Convert]::FromBase64String($data)) | Out-File -Encoding "ASCII" ./key.pfx
+      run: [Text.Encoding]::Utf8.GetString([Convert]::FromBase64String($env:PfxBase64)) | Out-File -Encoding "ASCII" ./key.pfx
       # [System.Text.Encoding]::ASCII.GetString([System.Convert]::FromBase64String($data)) | Out-File -Encoding "ASCII" ./key.pfx
       env:
         PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
