@@ -327,14 +327,14 @@ reports@dmarc.cyber.dhs.gov and reports@example.com. Failure reports will be
 sent to reports@example.com.
 
 #### MS.EXO.4.2v1 Instructions
-See [MS.EXO.4.1v1 instructions](#msexo41v1-instructions) for an overview of how to publish and check a DMARC record. Ensure the record published includes `p=reject`.
+See [MS.EXO.4.1v1 Instructions](#msexo41v1-instructions) for an overview of how to publish and check a DMARC record. Ensure the record published includes `p=reject`.
 
 #### MS.EXO.4.3v1 Instructions
-See [MS.EXO.4.1v1 instructions](#msexo41v1-instructions) for an overview of how to publish and check a DMARC record. Ensure the record published includes <reports@dmarc.cyber.dhs.gov>
+See [MS.EXO.4.1v1 Instructions](#msexo41v1-instructions) for an overview of how to publish and check a DMARC record. Ensure the record published includes <reports@dmarc.cyber.dhs.gov>
 as one of the emails for the RUA field.
 
 #### MS.EXO.4.4v1 Instructions
-See [MS.EXO.4.1v1 instructions](#msexo41v1-instructions) for an overview of how to publish and check a DMARC record. Ensure the record published includes:
+See [MS.EXO.4.1v1 Instructions](#msexo41v1-instructions) for an overview of how to publish and check a DMARC record. Ensure the record published includes:
 - A point of contact specific to your agency in the RUA field.
 - <reports@dmarc.cyber.dhs.gov> as one of the emails in the RUA field.
 - One or more agency-defined points of contact in the RUF field.
@@ -459,7 +459,7 @@ To restrict sharing with all domains:
 
 To restrict sharing calendar details with all domains:
 
-1. Refer to step 5 in [MS.EXO.6.1v1 instructions](#msexo61v1-instructions) to implement
+1. Refer to step 5 in [MS.EXO.6.1v1 Instructions](#msexo61v1-instructions) to implement
 this policy.
 
 ## 7. External Sender Warnings
@@ -572,10 +572,10 @@ The DLP solution SHALL protect personally identifiable information (PII) and sen
 
 ### Implementation
 
-#### MS.EXO.8.1v1 instructions
+#### MS.EXO.8.1v1 Instructions
 Any product meeting the requirements outlined in this baseline policy may be used. If the agency uses Microsoft Defender, see the following implementation steps for [DLP](./defender.md#implementation-3) for additional guidance.
 
-#### MS.EXO.8.2v1 instructions
+#### MS.EXO.8.2v1 Instructions
 Any product meeting the requirements outlined in this baseline policy may be used. If the agency uses Microsoft Defender, see the following implementation steps for [protecting PII](./defender.md#msdefender41v1-instructions) for additional guidance.
 
 ## 9. Attachment File Type
