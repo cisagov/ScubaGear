@@ -24,24 +24,23 @@ jobs:
     steps:
     - name: Checkout Repo
       uses: actions/checkout@v4
-    - name: Create PFX
-      run: |
-        New-Item -ItemType file -Path ./key.txt
-        dir
-        Set-Content -Path ./key.txt -Value $env:PfxBase64
-        certutil -decode ./key.txt ./key.pfx
-      env:
-        PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
-    - name: Import PFX
-      run: Import-PfxCertificate -Password (ConvertTo-SecureString -String $env:PfxPassword -AsPlainText -Force) -CertStoreLocation Cert:\LocalMachine\Root -FilePath ./key.pfx
-      env:
-        PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
-    - name: Setup for Scuba
-      run: ./SetUp.ps1
-    - name: Install Selenium
-      run: Install-Module -Name Selenium -RequiredVersion 3.0.1
-    - name: Update Selenium
-      run: ./Testing/Functional/SmokeTest/UpdateSelenium.ps1
-    - run: dir
+    # - name: Create PFX
+    #   run: |
+    #     New-Item -ItemType file -Path ./key.txt
+    #     dir
+    #     Set-Content -Path ./key.txt -Value $env:PfxBase64
+    #     certutil -decode ./key.txt ./key.pfx
+    #   env:
+    #     PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
+    # - name: Import PFX
+    #   run: Import-PfxCertificate -Password (ConvertTo-SecureString -String $env:PfxPassword -AsPlainText -Force) -CertStoreLocation Cert:\LocalMachine\Root -FilePath ./key.pfx
+    #   env:
+    #     PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
+    # - name: Setup for Scuba
+    #   run: ./SetUp.ps1
+    # - name: Install Selenium
+    #   run: Install-Module -Name Selenium -RequiredVersion 3.0.1
+    # - name: Update Selenium
+    #   run: ./Testing/Functional/SmokeTest/UpdateSelenium.ps1
     - name: Test SharePoint
       run: ./Testing/Functional/Products/Tests/CallProductTests.ps1
