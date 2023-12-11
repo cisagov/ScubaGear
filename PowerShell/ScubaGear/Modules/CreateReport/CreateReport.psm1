@@ -93,7 +93,6 @@ function New-Report {
         foreach ($Control in $BaselineGroup.Controls){
             # test report details make an intercept function to
             $Test = $TestResults | Where-Object -Property PolicyId -eq $Control.Id
-            #$Test.ReportRequirement = Replace-Text -Replace $Test.ReportRequirement
 
             if ($null -ne $Test){
                 $MissingCommands = @()
