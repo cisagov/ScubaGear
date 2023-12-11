@@ -95,7 +95,7 @@ This section provides policies that reduce security risks related to potentially
 
 ### Policies
 #### MS.AAD.2.1v1
-Users detected as high risk SHALL be blocked.
+Users detected as high risk _SHALL_ be blocked.
 
 <!--Policy: MS.AAD.2.1v1; Criticality: SHALL -->
 - _Rationale:_ Blocking high-risk users may prevent compromised accounts from accessing the tenant.
@@ -366,7 +366,7 @@ Security logs SHALL be sent to the agency's security operations center for monit
 
 #### MS.AAD.4.1v1 Instructions
 
-Follow the configuration instructions unique to the products and integration patterns at your organization to send the security logs to the security operations center for monitoring. 
+Follow the configuration instructions unique to the products and integration patterns at your organization to send the security logs to the security operations center for monitoring.
 
 ## 5. Application Registration and Consent
 
@@ -524,7 +524,7 @@ Permanent active role assignments SHALL NOT be allowed for highly privileged rol
 - _Rationale:_ Instead of giving users permanent assignments to privileged roles, provisioning access just in time lessens exposure if those accounts become compromised. In Azure AD PIM or an alternative PAM system, just in time access can be provisioned by assigning users to roles as eligible instead of perpetually active.
 - _Last modified:_ June 2023
 - _Note:_ Exceptions to this policy are:
-  - Emergency access accounts that need perpetual access to the tenant in the rare event of system degradation or other scenarios. 
+  - Emergency access accounts that need perpetual access to the tenant in the rare event of system degradation or other scenarios.
   - Some types of service accounts that require a user account with privileged roles; since these accounts are used by software programs, they cannot perform role activation.
 
 #### MS.AAD.7.5v1
