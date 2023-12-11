@@ -421,39 +421,6 @@ Sensitivity labels SHOULD be enabled for Power BI and employed for sensitive dat
 4. Click on **Allow users to apply sensitivity labels for content** and set to **Enabled**
    Define who can apply and change sensitivity labels in Power BI assets.
 
-# Acknowledgements
-
-In addition to acknowledging the important contributions of a diverse
-team of Cybersecurity and Infrastructure Security Agency (CISA) experts,
-CISA thanks the following federal agencies and private sector
-organizations that provided input during the development of the Secure
-Cloud Business Application's security configuration baselines in
-response to Section 3 of [Executive Order (EO) 14028, *Improving the
-Nation's
-Cybersecurity*](https://www.federalregister.gov/documents/2021/05/17/2021-10460/improving-the-nations-cybersecurity):
-
-- The MITRE Corporation
-- Sandia National Laboratories (Sandia)
-
-The SCBs were informed by materials produced by the following organizations:
-- Center for Internet Security (CIS)
-- Internet Engineering Task Force (IETF)
-- Mandiant
-- Microsoft
-- U.S. Defense Information Systems Agency (DISA)
-- U.S. National Institute of Standards and Technology (NIST)
-- U.S. Office of Management and Budget (OMB)
-
-The cross-agency collaboration and partnerships developed during this initiative serve as an example for solving complex problems faced by the federal government. CISA also thanks the Cybersecurity Innovation Tiger Team (CITT) for its leadership and the following federal agencies that provided input during the development of the baselines:
-
-- Consumer Financial Protection Bureau (CFPB)
-- U.S. Department of the Interior (DOI)
-- National Aeronautics and Space Administration (NASA)
-- U.S. Office of Personnel Management (OPM)
-- U.S. Small Business Administration (SBA)
-- U.S. Census Bureau (USCB)
-- U.S. Geological Survey (USGS)
-
 # Appendix A: Implementation Considerations
 
 ## Information Protection Considerations
