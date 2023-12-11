@@ -8,7 +8,7 @@
 $thisDir = Get-Location
 Write-Output 'thisDir'
 Write-Output $thisDir
-$testScriptDir = Join-Path -Path $thisDir -ChildPath ..
+$testScriptDir = Split-Path -Parent $thisDir
 Write-Output 'testScriptDir'
 Write-Output $testScriptDir
 $testDataDir = Join-Path -Path $testScriptDir -ChildPath TestData
