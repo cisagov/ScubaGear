@@ -91,8 +91,9 @@ function New-Report {
         $Fragment = @()
 
         foreach ($Control in $BaselineGroup.Controls){
-
+            # test report details make an intercept function to
             $Test = $TestResults | Where-Object -Property PolicyId -eq $Control.Id
+            #$Test.ReportRequirement = Replace-Text -Replace $Test.ReportRequirement
 
             if ($null -ne $Test){
                 $MissingCommands = @()
@@ -265,7 +266,6 @@ function Import-SecureBaseline{
 
                 # Iterate over matched policy ids found
                 foreach ($LineNumber in $LineNumbers) {
-
                     $Value = [System.Net.WebUtility]::HtmlEncode($Value)
                     $Id = [string]$MdLines[$LineNumber].Substring(5)
 
@@ -290,6 +290,8 @@ function Import-SecureBaseline{
                             $Value = "Error - The baseline policy text is malformed. Description should start immediately after Policy Id."
                             Write-Error "Expected description for $Id to start on line $($LineNumber+$LineAdvance)"
                         }
+                        # Italics substitution
+                        $Value = $Value.Replace("_", "<i>")
 
                         # Processing multiline description.
                         # TODO: Improve processing GitHub issue #526
