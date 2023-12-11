@@ -6,16 +6,16 @@
 
 # Setup directories
 $thisDir = Get-Location
-Write-Debug 'thisDir ' 
+Write-Debug 'thisDir'
 Write-Debug $thisDir
 $testScriptDir = Join-Path -Path $thisDir -ChildPath ..
-Write-Debug 'testScriptDir '
+Write-Debug 'testScriptDir'
 Write-Debug $testScriptDir
-$testDataDir = Join-Path -Path $testScriptDir --ChildPath TestData
-Write-Debug 'testDataDir '
+$testDataDir = Join-Path -Path $testScriptDir -ChildPath TestData
+Write-Debug 'testDataDir'
 Write-Debug $testDataDir
-$testDataFile = Join-Path -Path $testDataDir --ChildPath sharepoint-commercial-data.pson
-Write-Debug 'testDataFile '
+$testDataFile = Join-Path -Path $testDataDir -ChildPath sharepoint-commercial-data.pson
+Write-Debug 'testDataFile'
 Write-Debug $testDataFile
 
 # TODO: Eventually this hardcoded file should be replaced by reading all the .pson
