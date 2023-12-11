@@ -13,7 +13,7 @@ import data.report.utils.Format
 import data.report.utils.ReportDetailsBoolean
 import data.report.utils.Description
 
-ReportDetailsArray(Status, Array, String1) := Detail if {
+ReportDetailsArray(Status, _, _) := Detail if {
     Status == true
     Detail := "Requirement met"
 }
@@ -358,7 +358,7 @@ ConfigsAllowingEmail[Policy.Identity] {
     Policy.AllowEmailIntoChannel == true
 }
 
-ReportDetails4_1(IsGCC, IsEnabled) := Description if {
+ReportDetails4_1(IsGCC, _) := Description if {
 	IsGCC == true
 	Description := "N/A: Feature is unavailable in GCC environments"
 }
