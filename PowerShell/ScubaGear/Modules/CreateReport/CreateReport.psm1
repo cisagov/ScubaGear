@@ -290,8 +290,8 @@ function Import-SecureBaseline{
                             $Value = "Error - The baseline policy text is malformed. Description should start immediately after Policy Id."
                             Write-Error "Expected description for $Id to start on line $($LineNumber+$LineAdvance)"
                         }
-                        # Italics substitution
-                        $Value = $Value.Replace("_", "<i>")
+                        # Description italics substitution
+                        $Value = $Value -replace '(_)(.*?)(_)', '<i>${2}</i>'
 
                         # Processing multiline description.
                         # TODO: Improve processing GitHub issue #526
