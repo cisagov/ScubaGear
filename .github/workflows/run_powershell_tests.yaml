@@ -29,5 +29,5 @@ jobs:
       if: '!cancelled()'
       shell: powershell
       run: |
-        ./SetUp.ps1
+        ./SetUp.ps1 -NoOpa
         Invoke-Pester -Output 'Detailed' -Path './Testing/Unit/PowerShell'
