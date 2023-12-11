@@ -6,14 +6,14 @@
 
 # Setup directories
 $thisDir = Get-Location
-Write-Debug 'thisDir'
-Write-Debug $thisDir
+Write-Host 'thisDir'
+Write-Host $thisDir
 $testScriptDir = Join-Path -Path $thisDir -ChildPath ..
-Write-Debug 'testScriptDir'
-Write-Debug $testScriptDir
+Write-Output 'testScriptDir'
+Write-Output $testScriptDir
 $testDataDir = Join-Path -Path $testScriptDir -ChildPath TestData
-Write-Debug 'testDataDir'
-Write-Debug $testDataDir
+Write-Information 'testDataDir'
+Write-Information $testDataDir
 # $testDataFile = Join-Path -Path $testDataDir -ChildPath sharepoint-commercial-data.pson
 # Write-Debug 'testDataFile'
 # Write-Debug $testDataFile
