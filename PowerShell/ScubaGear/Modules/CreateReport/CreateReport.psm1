@@ -91,7 +91,7 @@ function New-Report {
         $Fragment = @()
 
         foreach ($Control in $BaselineGroup.Controls){
-            # test report details make an intercept function to
+
             $Test = $TestResults | Where-Object -Property PolicyId -eq $Control.Id
 
             if ($null -ne $Test){
