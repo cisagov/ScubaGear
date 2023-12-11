@@ -7,7 +7,7 @@
 # Setup directories
 $thisDir = Get-Location
 Write-Output 'thisDir'
-Write-Outputt $thisDir
+Write-Output $thisDir
 $testScriptDir = Join-Path -Path $thisDir -ChildPath ..
 Write-Output 'testScriptDir'
 Write-Output $testScriptDir
