@@ -46,6 +46,7 @@ FilterArray(Conditions, Boolean) := [Condition | some Condition in Conditions; C
 # MS.DEFENDER.1.1v1
 #--
 
+# Return string based on boolean result of Standard & Strict conditions
 ReportDetails1_1(true, true) := ReportDetailsBoolean(true) if {}
 
 ReportDetails1_1(false, true) := "Standard preset policy is disabled" if {}
@@ -54,6 +55,8 @@ ReportDetails1_1(true, false) := "Strict preset policy is disabled" if {}
 
 ReportDetails1_1(false, false) := "Standard and Strict preset policies are both disabled" if {}
 
+# Parse through all items in Policies, if item identity is the one
+# we want & state is enabled, save item. Return number of items saved.
 GetEnabledPolicies(Policies, Identity) := count([Policy |
     some Policy in Policies
     Policy.Identity == Identity
@@ -114,6 +117,9 @@ tests contains {
 #--
 
 # TODO check exclusions
+# Parse through all items in Policies, if item identity is the one
+# we want & Users (SentTo) + Groups (SentToMemberOf) + Domains (RecipientDomainIs) are null,
+# save item. Return number of items saved.
 AllRecipient(Policies, Identity) := count([Policy |
     some Policy in Policies
     Policy.Identity == Identity
@@ -160,7 +166,8 @@ tests contains {
 #--
 
 # TODO check exclusions
-
+# See MS.DEFENDER.1.2v1, the same logic applies, just with a
+# different commandlet.
 tests contains {
     "PolicyId": "MS.DEFENDER.1.3v1",
     "Criticality": "Shall",
@@ -169,9 +176,6 @@ tests contains {
     "ReportDetails": ApplyLicenseWarning(Status),
     "RequirementMet": Status
 } if {
-    # See MS.DEFENDER.1.2v1, the same logic applies, just with a
-    # different commandlet.
-
     Policies := input.atp_policy_rules
     Conditions := [
         AllRecipient(Policies, "Standard Preset Security Policy"),
@@ -185,6 +189,8 @@ tests contains {
 # MS.DEFENDER.1.4v1
 #--
 
+# Calls function in util file to find policies that protect
+# sensitive accounts.
 ProtectionPolicyForSensitiveIDs contains Policies if {
     Policies := input.protection_policy_rules
     AccountsSetting := SensitiveAccountsSetting(Policies)
@@ -209,6 +215,8 @@ tests contains {
 # MS.DEFENDER.1.5v1
 #--
 
+# Calls function in util file to find policies that protect
+# sensitive accounts.
 ATPPolicyForSensitiveIDs contains Policies if {
     Policies := input.atp_policy_rules
     AccountsSetting := SensitiveAccountsSetting(Policies)
@@ -229,10 +237,16 @@ tests contains {
 }
 #--
 
+
+#################
+# MS.DEFENDER.2 #
+#################
+
 #
 # MS.DEFENDER.2.1v1
 #--
 
+# General report details function for impersonation protection
 ImpersonationProtectionErrorMsg(false, true, AccountType) := Description if {
     String := concat(" ", ["Not all", AccountType])
     Description := concat(" ", [String, "are included for targeted protection in Strict policy."])
@@ -248,12 +262,17 @@ ImpersonationProtectionErrorMsg(false, false, AccountType) := Description if {
     Description := concat(" ", [String, "are included for targeted protection in Strict or Standard policy."])
 }
 
-ImpersonationProtectionErrorMsg(true, true, "agency domains") := "No agency domains defined for impersonation protection assessment. See configuration file documentation for details on how to define."
+ImpersonationProtectionErrorMsg(true, true, "agency domains") := concat(" ", [
+    "No agency domains defined for impersonation protection assessment.",
+    "See configuration file documentation for details on how to define."
+])
 
 ImpersonationProtectionErrorMsg(true, true, AccountType) := "" if {
     AccountType != "agency domains"
 }
 
+# Calls function in util file to check if impersonation
+# protection is active for strict & standard policies.
 tests contains {
     "PolicyId": "MS.DEFENDER.2.1v1",
     "Criticality": "Should",
@@ -320,6 +339,9 @@ tests contains {
 #
 # MS.DEFENDER.2.3v1
 #--
+
+# Calls function in util file to check if impersonation
+# protection is active for strict & standard policies.
 tests contains {
     "PolicyId": "MS.DEFENDER.2.3v1",
     "Criticality": "Should",
@@ -346,6 +368,11 @@ tests contains {
 }
 #--
 
+
+#################
+# MS.DEFENDER.3 #
+#################
+
 #
 # MS.DEFENDER.3.1v1
 #--
@@ -359,6 +386,7 @@ ATPPolicies contains {
     Policy.EnableATPForSPOTeamsODB == true
 }
 
+# Pass if at least one policy exists
 tests contains {
     "PolicyId": "MS.DEFENDER.3.1v1",
     "Criticality": "Should",
@@ -372,6 +400,11 @@ tests contains {
 }
 #--
 
+
+#################
+# MS.DEFENDER.4 #
+#################
+
 #
 # MS.DEFENDER.4.1v1
 #--
@@ -382,12 +415,21 @@ SensitiveContent := [
 ]
 
 # Return set of content info types in basic rules
+# Advanced rule must be set to false
+# Parse through array & save the name (e.x. "Credit Card Number")
+# Return all saved names in basic rules
 InfoTypeMatches(Rule) := ContentTypes if {
     Rule.IsAdvancedRule == false
     ContentTypes := {Content.name | some Content in Rule.ContentContainsSensitiveInformation}
 }
 
 # Return set of content info types in advanced rules
+# Advanced rule must be set to true
+# Use replace function to remove "rn" & replace ' with "
+# Use concat to make the regex expression as a raw string
+# Search Advanced rule that has had chars replaced in for
+# sensitive content & save the names that are found
+# Return all saved names
 InfoTypeMatches(Rule) := ContentTypes if {
     Rule.IsAdvancedRule == true
     RuleText := replace(replace(Rule.AdvancedRule, "rn", ""), "'", "\"")
@@ -404,6 +446,8 @@ InfoTypeMatches(Rule) := ContentTypes if {
 
 # Determine the set of rules that pertain to SSNs, ITINs, or credit card numbers.
 # Used in multiple bullet points below
+# If policy is not disabled, grab the content names (e.x. "Credit Card Number")
+# Find the parent policy & if parent policy is enabled, save.
 SensitiveRules contains {
     "Name": Rules.Name,
     "ParentPolicyName": Rules.ParentPolicyName,
@@ -424,20 +468,34 @@ SensitiveRules contains {
     Policy.Mode == "Enable"
 }
 
-PoliciesWithFullProtection := [X | some X in SensitiveRules; count({X | some X in SensitiveContent} - X.ContentNames) == 0]
+# For each item in SensitiveRules, check if all contents in
+# SensitiveContent is protected. For example, a rule may have
+# 3 contents it is protecting but missing the protection for
+# credit cards so it would fail & not be saved in PoliciesWithFullProtection.
+# Each policy that protects SSN, ITIN, & credit cards is saved in
+# PoliciesWithFullProtection.
+PoliciesWithFullProtection := [
+    SensitiveRule | some SensitiveRule in SensitiveRules;
+    count({Item | some Item in SensitiveContent} - SensitiveRule.ContentNames) == 0
+]
 
+# Save the rules that protect an individual content type (for actual value)
 Rules := {
     "SSN": [Rule.Name | some Rule in SensitiveRules; SensitiveContent[0] in Rule.ContentNames],
     "ITIN": [Rule.Name | some Rule in SensitiveRules; SensitiveContent[1] in Rule.ContentNames],
     "Credit_Card": [Rule.Name | some Rule in SensitiveRules; SensitiveContent[2] in Rule.ContentNames]
 }
 
+# Build the error message if a particular content is not protected by
+# any policies.
 error_rules contains SensitiveContent[0] if count(Rules.SSN) == 0
 
 error_rules contains SensitiveContent[1] if count(Rules.ITIN) == 0
 
 error_rules contains SensitiveContent[2] if count(Rules.Credit_Card) == 0
 
+# If error_rules contains any value, then some sensitive content
+# is not protected by any policy & check should fail.
 tests contains {
     "PolicyId": "MS.DEFENDER.4.1v1",
     "Criticality": "Shall",
@@ -455,7 +513,11 @@ tests contains {
 #
 # MS.DEFENDER.4.2v1
 #--
+
 # Step 2: determine the set of sensitive policies that apply to EXO, Teams, etc.
+# Check if policy protects all sensitive content (SSN, ITIN, Credit Card).
+# If policy also indicates all for the M365 Product & is in the workload, return
+# policy info, else an empty set.
 ProductEnableSensitiveProtection(Name, Location) := {
     "Name": Policy.Name,
     "Locations": Policy[Location],
@@ -476,6 +538,8 @@ Policies := {
     "Devices": ProductEnableSensitiveProtection("EndpointDevices", "EndpointDlpLocation"),
 }
 
+# Build the error message if all sensitive content is not protected by
+# any policies for the M365 product.
 error_policies contains "Exchange" if count(Policies.Exchange) == 0
 
 error_policies contains "SharePoint" if count(Policies.SharePoint) == 0
@@ -486,6 +550,7 @@ error_policies contains "Teams" if count(Policies.Teams) == 0
 
 error_policies contains "Devices" if count(Policies.Devices) == 0
 
+# Create the Report details message for policy
 DefenderErrorMessage4_2 := ErrorMessage if {
     count(PoliciesWithFullProtection) > 0
     error_policy := "No enabled policy found that applies to:"
@@ -497,6 +562,10 @@ DefenderErrorMessage4_2 := ErrorMessage if {
     ErrorMessage := "No DLP policy matching all types found for evaluation."
 }
 
+# If error_policies contains any value, then some M365 product does not
+# have a policy protectig all sensitive content & check should fail.
+# Check should also fail if there are no policies that protect all sensitive
+# content.
 tests contains {
     "PolicyId": "MS.DEFENDER.4.2v1",
     "Criticality": "Should",
@@ -515,7 +584,10 @@ tests contains {
 #
 # MS.DEFENDER.4.3v1
 #--
+
 # Step 3: Ensure that the action for the rules is set to block
+# Save the rule name if BlockAccess is false OR BlockAccess
+# is true & scope is not set to "ALL".
 SensitiveRulesNotBlocking contains Rule.Name if {
     some Rule in PoliciesWithFullProtection
     Rule.BlockAccess == false
@@ -529,6 +601,7 @@ SensitiveRulesNotBlocking contains Rule.Name if {
     Rule.BlockAccessScope != "All"
 }
 
+# Create the Report details message for policy
 DefenderErrorMessage4_3(Rules) := GenerateArrayString(Rules, ErrorMessage) if {
     count(PoliciesWithFullProtection) > 0
     ErrorMessage := "rule(s) found that do(es) not block access or associated policy not set to enforce block action:"
@@ -539,6 +612,9 @@ DefenderErrorMessage4_3(_) := ErrorMessage if {
     ErrorMessage := "No DLP policy matching all types found for evaluation."
 }
 
+# if there is any policy that protects all sensitive content &
+# does not block access, the check should fail. The check should
+# also fail if there are no policies that protect all sensitive content.
 tests contains {
     "PolicyId": "MS.DEFENDER.4.3v1",
     "Criticality": "Should",
@@ -559,7 +635,10 @@ tests contains {
 #
 # MS.DEFENDER.4.4v1
 #--
+
 # Step 4: ensure that some user is notified in the event of a DLP violation
+# Save policies that protect all sensitive content & do not have a user
+# to notify,
 SensitiveRulesNotNotifying contains Rule.Name if {
     some Rule in PoliciesWithFullProtection
     count(SensitiveRules) > 0
@@ -567,6 +646,7 @@ SensitiveRulesNotNotifying contains Rule.Name if {
     count(Rule.NotifyUser) == 0
 }
 
+# Create the Report details message for policy
 DefenderErrorMessage4_4(Rules) := GenerateArrayString(Rules, ErrorMessage) if {
     count(PoliciesWithFullProtection) > 0
     ErrorMessage := "rule(s) found that do(es) not notify at least one user:"
@@ -577,6 +657,9 @@ DefenderErrorMessage4_4(_) := ErrorMessage if {
     ErrorMessage := "No DLP policy matching all types found for evaluation."
 }
 
+# if there is any policy that protects all sensitive content &
+# does not have a user to notify, the check should fail. The check should
+# also fail if there are no policies that protect all sensitive content.
 tests contains {
     "PolicyId": "MS.DEFENDER.4.4v1",
     "Criticality": "Should",
@@ -597,6 +680,7 @@ tests contains {
 #
 # MS.DEFENDER.4.5v1
 #--
+
 # At this time we are unable to test for X because of Y
 tests contains {
     "PolicyId": "MS.DEFENDER.4.5v1",
@@ -611,6 +695,7 @@ tests contains {
 #
 # MS.DEFENDER.4.6v1
 #--
+
 # At this time we are unable to test for X because of Y
 tests contains {
     "PolicyId": "MS.DEFENDER.4.6v1",
@@ -622,9 +707,15 @@ tests contains {
 }
 #--
 
+
+#################
+# MS.DEFENDER.5 #
+#################
+
 #
 # MS.DEFENDER.5.1v1
 #--
+
 # At a minimum, the alerts required by the EXO baseline SHALL be enabled.
 RequiredAlerts := {
     "Suspicious email sending patterns detected",
@@ -636,11 +727,13 @@ RequiredAlerts := {
     "Suspicious connector activity"
 }
 
+# Save the names of all alerts that are enabled
 EnabledAlerts contains Alert.Name if {
     some Alert in input.protection_alerts
     Alert.Disabled == false
 }
 
+# If any of the required alerts are not enabled, the check should fail
 tests contains {
     "PolicyId": "MS.DEFENDER.5.1v1",
     "Criticality": "Shall",
@@ -658,6 +751,7 @@ tests contains {
 #
 # MS.DEFENDER.5.2v1
 #--
+
 # SIEM incorporation cannot be checked programmatically
 tests contains {
     "PolicyId": "MS.DEFENDER.5.2v1",
@@ -669,10 +763,16 @@ tests contains {
 }
 #--
 
+
+#################
+# MS.DEFENDER.6 #
+#################
+
 #
 # MS.DEFENDER.6.1v1
 #--
 
+# Save the identity of audit logs that have logging enabled
 CorrectLogConfigs contains {
     "Identity": AuditLog.Identity,
     "UnifiedAuditLogIngestionEnabled": AuditLog.UnifiedAuditLogIngestionEnabled,
@@ -681,6 +781,7 @@ CorrectLogConfigs contains {
     AuditLog.UnifiedAuditLogIngestionEnabled == true
 }
 
+# The test should pass if at least one log exists
 tests contains {
     "PolicyId": "MS.DEFENDER.6.1v1",
     "Criticality": "Shall",
@@ -696,6 +797,7 @@ tests contains {
 #
 # MS.DEFENDER.6.2v1
 #--
+
 # Turns out audit logging is non-trivial to implement and test for.
 # Would require looping through all users. See discussion in GitHub
 # issue #200.
@@ -712,6 +814,7 @@ tests contains {
 #
 # MS.DEFENDER.6.3v1
 #--
+
 # Dictated by OMB M-21-31: 12 months in hot storage and 18 months in cold
 # It is not required to maintain these logs in the M365 cloud environment;
 # doing so would require an additional add-on SKU.
