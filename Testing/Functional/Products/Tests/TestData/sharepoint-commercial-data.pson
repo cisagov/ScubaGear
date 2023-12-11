@@ -1,0 +1,9 @@
+@{
+    Thumbprint = 'FD6219CFBF937830616E43DF9C81BCF7D22FE03F'
+    TenantDomain = 'y2zj1.onmicrosoft.com'
+    TenantDisplayName = 'y2zj1'
+    AppId = 'db791fde-1ff0-493f-be3d-03d9ba6cb087'
+    ProductName = 'sharepoint'
+    Variant = 'pnp'
+    M365Environment = 'commercial'
+}
