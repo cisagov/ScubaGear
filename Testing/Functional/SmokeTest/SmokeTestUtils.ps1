@@ -75,12 +75,10 @@ function Install-SmokeTestExternalDependencies{
     .EXAMPLE
     Install-SmokeTestExternalDependencies
     #>
-    #Workaround till update to version 2.0+
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'PNPPOWERSHELL_UPDATECHECK',
         Justification = 'Variable defined outside this scope')]
     $PNPPOWERSHELL_UPDATECHECK = 'Off'
-    Install-Module -Name "PnP.PowerShell" -RequiredVersion 1.12 -Force
-    ./SetUp.ps1 -SkipUpdate
+    ./SetUp.ps1
 
     #Import Selenium and update drivers
     Install-Module Selenium
