@@ -1,6 +1,5 @@
 # Author: James Garriss
 # Purpose: Run the product functional tests every night
-#
 
 name: Nightly Product Functional Tests
 
@@ -33,7 +32,6 @@ jobs:
       env:
         PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
     - name: Import PFX
-      # run: Import-PfxCertificate -Password (ConvertTo-SecureString -String $env:PfxPassword -AsPlainText -Force) -CertStoreLocation Cert:\LocalMachine\Root -FilePath ./key.pfx
       run: Import-PfxCertificate -Password (ConvertTo-SecureString -String $env:PfxPassword -AsPlainText -Force) -CertStoreLocation Cert:\CurrentUser\My -FilePath ./key.pfx
       env:
         PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
