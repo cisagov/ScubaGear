@@ -7,11 +7,14 @@
 # Setup directories
 $thisDir = Get-Location
 $testScriptDir = Join-Path -Path $thisDir -ChildPath ..
+$testDataDir = Join-Path -Path $testScriptDir --ChildPath TestData
+$testDataFile = Join-Path -Path $testDataDir --ChildPath sharepoint-commercial-data.pson
+Write-Host '>' $testDataFile
 
 # TODO: Eventually this hardcoded file should be replaced by reading all the .pson
 #       files in the TestData folder.  Instead of just a hashtable of params, it
 #       will be an array of hashtables.
-$params = Import-PowerShellDataFile .\TestData\sharepoint-commercial-data.pson
+$params = Import-PowerShellDataFile $testDataFile
 
 # Create an array of test containers
 $testContainers = @()
