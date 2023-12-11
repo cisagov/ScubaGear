@@ -299,7 +299,7 @@ to spoof their domains.
 
 ### Implementation
 
-#### MS.EXO.4.1v1 Instructions:
+#### MS.EXO.4.1v1 Instructions
 DMARC is not configured through the Exchange admin center, but rather via
 DNS records hosted by the agency's domain. As such, implementation varies
 depending on how an agency manages its DNS records. See [Form the DMARC TXT record for your domain \| Microsoft
@@ -326,14 +326,14 @@ SPF/DKIM checks are to be rejected and aggregate reports sent to
 reports@dmarc.cyber.dhs.gov and reports@example.com. Failure reports will be
 sent to reports@example.com.
 
-#### MS.EXO.4.2v1 Instructions:
+#### MS.EXO.4.2v1 Instructions
 See [MS.EXO.4.1v1 instructions](#msexo41v1-instructions) for an overview of how to publish and check a DMARC record. Ensure the record published includes `p=reject`.
 
-#### MS.EXO.4.3v1 Instructions:
+#### MS.EXO.4.3v1 Instructions
 See [MS.EXO.4.1v1 instructions](#msexo41v1-instructions) for an overview of how to publish and check a DMARC record. Ensure the record published includes <reports@dmarc.cyber.dhs.gov>
 as one of the emails for the RUA field.
 
-#### MS.EXO.4.4v1 Instructions:
+#### MS.EXO.4.4v1 Instructions
 See [MS.EXO.4.1v1 instructions](#msexo41v1-instructions) for an overview of how to publish and check a DMARC record. Ensure the record published includes:
 - A point of contact specific to your agency in the RUA field.
 - <reports@dmarc.cyber.dhs.gov> as one of the emails in the RUA field.
@@ -379,7 +379,7 @@ per-mailbox basis when necessary.
 
 ### Implementation
 
-#### MS.EXO.5.1v1 Instructions:
+#### MS.EXO.5.1v1 Instructions
 
 To disable SMTP AUTH for the organization:
 
@@ -442,7 +442,7 @@ for legitimate use as needed.
 
 ### Implementation
 
-#### MS.EXO.6.1v1 Instructions:
+#### MS.EXO.6.1v1 Instructions
 To restrict sharing with all domains:
 
 1. Sign in to the **Exchange admin center**.
