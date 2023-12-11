@@ -375,7 +375,7 @@ test_AdditionalProperties_LicenseMissing_V1 if {
 
     count(RuleOutput) == 1
     not RuleOutput[0].RequirementMet
-    ReportDetailString := "**NOTE: Your tenant does not have a Microsoft Entra ID P2 license, which is required for this feature**"
+    RuleOutput[0].ReportDetails == "**NOTE: Your tenant does not have a Microsoft Entra ID P2 license, which is required for this feature**"
 }
 
 test_AdditionalProperties_Incorrect_V1 if {
