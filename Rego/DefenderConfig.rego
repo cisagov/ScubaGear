@@ -9,6 +9,14 @@ import data.defender.utils.ImpersonationProtection
 import data.defender.utils.ImpersonationProtectionConfig
 
 
+#############
+# Constants #
+#############
+
+FAIL := ReportDetailsBoolean(false)
+
+PASS := ReportDetailsBoolean(true)
+
 # Example usage and output:
 # GenerateArrayString([1,2], "numbers found:") ->
 # 2 numbers found: 1, 2
@@ -18,7 +26,7 @@ GenerateArrayString(Array, CustomString) := Output if {
     Output := trim(concat(" ", [Length, concat(" ", [CustomString, ArrayString])]), " ")
 }
 
-CustomizeError(true, _) := ReportDetailsBoolean(true) if {}
+CustomizeError(true, _) := PASS if {}
 
 CustomizeError(false, CustomString) := CustomString if {}
 
@@ -30,7 +38,7 @@ ApplyLicenseWarning(Status) := ReportDetailsBoolean(Status) if {
 
 # If a defender license is not present, assume failure and
 # replace the message with the warning
-ApplyLicenseWarning(_) := concat("", [ReportDetailsBoolean(false), LicenseWarning]) if {
+ApplyLicenseWarning(_) := concat("", [FAIL, LicenseWarning]) if {
     input.defender_license == false
     LicenseWarning := " **NOTE: Either you do not have sufficient permissions or your tenant does not have a license for Microsoft Defender for Office 365 Plan 1, which is required for this feature.**"
 }
@@ -47,7 +55,7 @@ FilterArray(Conditions, Boolean) := [Condition | some Condition in Conditions; C
 #--
 
 # Return string based on boolean result of Standard & Strict conditions
-ReportDetails1_1(true, true) := ReportDetailsBoolean(true) if {}
+ReportDetails1_1(true, true) := PASS if {}
 
 ReportDetails1_1(false, true) := "Standard preset policy is disabled" if {}
 
