@@ -14,9 +14,9 @@ Write-Debug $testScriptDir
 $testDataDir = Join-Path -Path $testScriptDir -ChildPath TestData
 Write-Debug 'testDataDir'
 Write-Debug $testDataDir
-$testDataFile = Join-Path -Path $testDataDir -ChildPath sharepoint-commercial-data.pson
-Write-Debug 'testDataFile'
-Write-Debug $testDataFile
+# $testDataFile = Join-Path -Path $testDataDir -ChildPath sharepoint-commercial-data.pson
+# Write-Debug 'testDataFile'
+# Write-Debug $testDataFile
 
 # TODO: Eventually this hardcoded file should be replaced by reading all the .pson
 #       files in the TestData folder.  Instead of just a hashtable of params, it
