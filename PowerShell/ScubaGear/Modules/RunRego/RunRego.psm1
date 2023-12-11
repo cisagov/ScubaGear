@@ -43,12 +43,24 @@ function Invoke-Rego {
         $RegoFileObject = Get-Item $RegoFile
         $ScubaUtils = Join-Path -Path $RegoFileObject.DirectoryName -ChildPath "Utils"
         $CmdArgs = @("eval", "data.$PackageName.tests", "-i", $InputFile, "-d", $RegoFile, "-d", $ScubaUtils, "-f", "values")
-        $TestResults = $(& $Cmd @CmdArgs) | Out-String -ErrorAction 'Stop' | ConvertFrom-Json -ErrorAction 'Stop'
+        $TestResults = Invoke-ExternalCmd -LiteralPath $Cmd -PassThruArgs $CmdArgs | Out-String -ErrorAction 'Stop' | ConvertFrom-Json -ErrorAction 'Stop'
         $TestResults
     }
     catch {
         throw "Error calling the OPA executable: $($_)"
     }
+}
+
+function Invoke-ExternalCmd{
+    param(
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]$LiteralPath,
+        [Parameter(ValueFromRemainingArguments=$true)]
+        $PassThruArgs
+    )
+
+    & $LiteralPath $PassThruArgs
 }
 
 Export-ModuleMember -Function @(
