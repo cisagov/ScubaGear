@@ -18,4 +18,4 @@ $testContainers = @()
 $testContainers += New-PesterContainer -Path $testScriptDir -Data $params
 
 # # Invoke Pester for each test container
-# Invoke-Pester -Container $testContainers -Output Detailed
+Invoke-Pester -Container $testContainers -Output Detailed
