@@ -11,7 +11,7 @@ Write-Debug $thisDir
 $testScriptDir = Join-Path -Path $thisDir -ChildPath ..
 Write-Debug 'testScriptDir '
 Write-Debug $testScriptDir
-$testDataDir = Join-Path -Path $testScriptDir --ChildPath ./TestData
+$testDataDir = Join-Path -Path $testScriptDir --ChildPath TestData
 Write-Debug 'testDataDir '
 Write-Debug $testDataDir
 $testDataFile = Join-Path -Path $testDataDir --ChildPath sharepoint-commercial-data.pson
