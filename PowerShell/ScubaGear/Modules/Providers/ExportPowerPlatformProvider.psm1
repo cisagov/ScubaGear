@@ -51,7 +51,7 @@ function Export-PowerPlatformProvider {
             }
         }
         $Uri = "https://login.microsoftonline$($TLD)/$($TenantDomain)/.well-known/openid-configuration"
-        $TenantIdConfig = (Invoke-WebRequest -Uri $Uri  -ErrorAction "Stop").Content
+        $TenantIdConfig = (Invoke-WebRequest -Uri $Uri -UseBasicParsing -ErrorAction "Stop").Content
     }
     catch {
         $EnvCheckWarning = @"

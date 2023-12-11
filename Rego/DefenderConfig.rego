@@ -41,7 +41,7 @@ GenerateArrayString(Array, CustomString) := Output if {
     Output := trim(concat(" ", [Length, concat(" ", [CustomString, ArrayString])]), " ")
 }
 
-CustomizeError(Message, CustomString) := Message if {
+CustomizeError(Message, _) := Message if {
     # If the message reports success, don't apply the custom
     # error message
     Message == ReportDetailsBoolean(true)
@@ -59,7 +59,7 @@ ApplyLicenseWarning(Message) := Message if {
     input.defender_license == true
 }
 
-ApplyLicenseWarning(Message) := concat("", [ReportDetailsBoolean(false), LicenseWarning]) if {
+ApplyLicenseWarning(_) := concat("", [ReportDetailsBoolean(false), LicenseWarning]) if {
     # If a defender license is not present, assume failure and
     # replace the message with the warning
     input.defender_license == false
@@ -695,7 +695,7 @@ DefenderErrorMessage4_3(Rules) := GenerateArrayString(Rules, ErrorMessage) if {
     ErrorMessage := "rule(s) found that do(es) not block access or associated policy not set to enforce block action:"
 }
 
-DefenderErrorMessage4_3(Rules) := ErrorMessage if {
+DefenderErrorMessage4_3(_) := ErrorMessage if {
     count(SensitiveInfoPolicies) == 0
     ErrorMessage := "No DLP policy matching all types found for evaluation."
 }
@@ -732,7 +732,7 @@ DefenderErrorMessage4_4(Rules) := GenerateArrayString(Rules, ErrorMessage) if {
     ErrorMessage := "rule(s) found that do(es) not notify at least one user:"
 }
 
-DefenderErrorMessage4_4(Rules) := ErrorMessage if {
+DefenderErrorMessage4_4(_) := ErrorMessage if {
     count(SensitiveInfoPolicies) == 0
     ErrorMessage := "No DLP policy matching all types found for evaluation."
 }

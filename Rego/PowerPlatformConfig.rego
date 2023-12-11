@@ -6,7 +6,7 @@ import data.report.utils.ReportDetailsBoolean
 import data.report.utils.Description
 import data.report.utils.ReportDetailsString
 
-ReportDetailsArray(Status, Array, String1) :=  Detail if {
+ReportDetailsArray(Status, _, _) :=  Detail if {
     Status == true
     Detail := "Requirement met"
 }

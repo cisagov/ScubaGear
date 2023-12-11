@@ -7,51 +7,179 @@
     .EXAMPLE
         .\OPA.ps1
 #>
+
+[CmdletBinding()]
+param(
+    [Parameter(Mandatory = $false, HelpMessage = 'The version of OPA Rego to be downloaded, must be in "x.x.x" format')]
+    [Alias('version')]
+    [string]
+    $ExpectedVersion = '0.42.1',
+
+    [Parameter(Mandatory = $false, HelpMessage = 'The file name that the opa executable is to be saved as')]
+    [Alias('name')]
+    [string]
+    $OPAExe = "",
+
+    [Parameter(Mandatory = $false, HelpMessage = 'The operating system the program is running on')]
+    [ValidateSet('Windows','MacOS','Linux')]
+    [Alias('os')]
+    [string]
+    $OperatingSystem  = "Windows"
+)
+
+# Constants
+$ACCEPTABLEVERSIONS = '0.42.1','0.42.2','0.43.1','0.44.0','0.45.0','0.46.3','0.47.4','0.48.0','0.49.2','0.50.2',
+                        '0.51.0','0.52.0','0.53.1','0.54.0','0.55.0','0.56.0','0.57.1','0.58.0','0.59.0'
+$FILENAME = @{ Windows = "opa_windows_amd64.exe"; Mac = "opa_darwin_amd64"; Linux = "opa_linux_amd64_static"}
+
+# Download opa rego exe
+function Get-OPAFile {
+    param (
+        [Parameter(Mandatory)]
+        [ValidateNotNullOrEmpty()]
+        [Alias('out')]
+        [string]$OPAExe,
+
+        [Parameter(Mandatory)]
+        [ValidateNotNullOrEmpty()]
+        [Alias('version')]
+        [string]$ExpectedVersion,
+
+        [Parameter(Mandatory)]
+        [ValidateNotNullOrEmpty()]
+        [Alias('name')]
+        [string]$Filename
+    )
+
+    $InstallUrl = "https://openpolicyagent.org/downloads/v$($ExpectedVersion)/$($Filename)"
+    $OutFile=(Join-Path (Get-Location).Path $OPAExe)
+
+    try {
+        $Display = "Downloading OPA executable"
+        Start-BitsTransfer -Source $InstallUrl -Destination $OutFile -DisplayName $Display
+        Write-Information -MessageData "Installed the specified OPA version (${ExpectedVersion}) to ${OPAExe}" | Out-Host
+    }
+    catch {
+        $Error[0] | Format-List -Property * -Force | Out-Host
+        Write-Error "Unable to download OPA executable. To try manually downloading, see details in README under 'Download the required OPA executable'" | Out-Host
+    }
+    finally {
+        $WebClient.Dispose()
+    }
+}
+
+function Get-ExeHash {
+    param (
+        [Parameter(Mandatory)]
+        [ValidateNotNullOrEmpty()]
+        [Alias('name')]
+        [string]$Filename
+    )
+
+    $InstallUrl = "https://openpolicyagent.org/downloads/v$($ExpectedVersion)/$($Filename).sha256"
+    $OutFile=(Join-Path (Get-Location).Path $InstallUrl.SubString($InstallUrl.LastIndexOf('/')))
+
+    try {
+        $WebClient = New-Object System.Net.WebClient
+        $WebClient.DownloadFile($InstallUrl, $OutFile)
+    }
+    catch {
+        $Error[0] | Format-List -Property * -Force | Out-Host
+        Write-Error "Unable to download OPA SHA256 hash for verification" | Out-Host
+    }
+    finally {
+        $WebClient.Dispose()
+    }
+
+    $Hash = ($(Get-Content $OutFile -raw) -split " ")[0]
+    Remove-Item $OutFile
+
+    return $Hash
+}
+
+function Confirm-OPAHash {
+    param (
+        [Parameter(Mandatory)]
+        [ValidateNotNullOrEmpty()]
+        [Alias('out')]
+        [string]$OPAExe,
+
+        [Parameter(Mandatory)]
+        [ValidateNotNullOrEmpty()]
+        [Alias('version')]
+        [string]$ExpectedVersion,
+
+        [Parameter(Mandatory)]
+        [ValidateNotNullOrEmpty()]
+        [Alias('name')]
+        [string]
+        $Filename
+    )
+
+    if ((Get-FileHash .\$OPAExe -Algorithm SHA256 ).Hash -ne $(Get-ExeHash -name $Filename)) {
+        return $false, "SHA256 verification failed, retry download or install manually. See README under 'Download the required OPA executable' for instructions."
+    }
+
+    return $true, "Downloaded OPA version ($ExpectedVersion) SHA256 verified successfully`n"
+}
+
+function Install-OPA {
+    param (
+        [Parameter(Mandatory)]
+        [ValidateNotNullOrEmpty()]
+        [Alias('out')]
+        [string]$OPAExe,
+
+        [Parameter(Mandatory)]
+        [ValidateNotNullOrEmpty()]
+        [Alias('version')]
+        [string]$ExpectedVersion,
+
+        [Parameter(Mandatory)]
+        [ValidateNotNullOrEmpty()]
+        [Alias('name')]
+        [string]
+        $Filename
+    )
+
+    Get-OPAFile -out $OPAExe -version $ExpectedVersion -name $Filename
+    $Result = Confirm-OPAHash -out $OPAExe -version $ExpectedVersion -name $Filename
+    $Result[1] | Out-Host
+}
+
 # Set prefernces for writing messages
 $DebugPreference = "Continue"
 $InformationPreference = "Continue"
 $ErrorActionPreference = "Stop"
 
-# Set expected version and OutFile path
-$ExpectedVersion = "0.42.1"
-$OPAExe = "opa_windows_amd64.exe"
-$InstallUrl = "https://openpolicyagent.org/downloads/v$($ExpectedVersion)/$OPAExe"
-$OutFile=(Join-Path (Get-Location).Path $InstallUrl.SubString($InstallUrl.LastIndexOf('/')))
-$ExpectedHash ="5D71028FED935DC98B9D69369D42D2C03CE84A7720D61ED777E10AAE7528F399"
-$Display = "Downloading OPA executable"
-
-# Download files
-try {
-    Start-BitsTransfer -Source $InstallUrl -Destination $OutFile -DisplayName $Display
-    Write-Information ""
-    Write-Information "`nDownload of `"$OutFile`" finished."
-catch {
-    $msg = $Error[0].Exception.Message
-    Write-Error "Unable to download OPA executable. To try manually downloading, see details in README under 'Download the required OPA executable'. Error: $msg"
+if(-not $ACCEPTABLEVERSIONS.Contains($ExpectedVersion)) {
+    $AcceptableVersionsString = $ACCETABLEVERSIONS -join "`r`n" | Out-String
+    throw "Version parameter entered, ${ExpectedVersion}, is not in the list of acceptable versions. Acceptable versions are:`r`n${AcceptableVersionsString}"
 }
 
-# Hash checks
-if ((Get-FileHash .\opa_windows_amd64.exe).Hash -eq $ExpectedHash)
-    {
-    Write-Information "SHA256 verified successfully"
+$Filename = $FILENAME.$OperatingSystem
+if($OPAExe -eq "") {
+    $OPAExe = $Filename
+}
+
+if(Test-Path -Path $OPAExe -PathType Leaf) {
+    $Result = Confirm-OPAHash -out $OPAExe -version $ExpectedVersion -name $Filename
+
+    if($Result[0]) {
+        Write-Debug "${OPAExe}: ${ExpectedVersion} already has latest installed."
     }
-else {
-    Write-Information "SHA256 verification failed, retry download or install manually. See README under 'Download the required OPA executable' for instructions."
-}
-# Version checks
-Try {
-    $OPAArgs = @('version')
-    $InstalledVersion= $(& "./$($OPAExe)" @OPAArgs) | Select-Object -First 1
-    if ($InstalledVersion -eq "Version: $($ExpectedVersion)")
-        {
-        Write-Information "`Downloaded OPA version` `"$InstalledVersion`" meets the ScubaGear requirement"
-        }
     else {
-        Write-Information "`Downloaded OPA version` `"$InstalledVersion`" does not meet the ScubaGear requirement of` `"$ExpectedVersion`""
+        if($OPAExe -eq $Filename) {
+            Write-Information "SHA256 verification failed, downloading new executable" | Out-Host
+            Install-OPA -out $OPAExe -version $ExpectedVersion -name $Filename
+        }
+        else {
+            Write-Warning "SHA256 verification failed, please confirm file name is correct & remove old file before running script" | Out-Host
+        }
     }
 }
-catch {
-    Write-Error "Unable to verify the current OPA version: please see details on manual installation in the README under 'Download the required OPA executable'"
+else {
+    Install-OPA -out $OPAExe -version $ExpectedVersion -name $Filename
 }
 
 $DebugPreference = "SilientlyContinue"
