@@ -10,8 +10,6 @@ on:
   - cron: '0 4 * * 1-5'
   workflow_dispatch: 
   push:
-    branches:
-    - '652-add-nightly-product-functional-testing'
 
 jobs:
   sharepoint-test:
