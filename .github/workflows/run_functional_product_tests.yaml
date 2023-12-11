@@ -37,9 +37,11 @@ jobs:
       env:
         PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
     - name: Setup for Scuba
-      run: |
-        ./SetUp.ps1
-        Install-Module -Name Selenium -RequiredVersion 3.0.1
-        ./Testing/Functional/SmokeTest/UpdateSelenium.ps1
+      run: ./SetUp.ps1
+    - name: Install Selenium
+      run: Install-Module -Name Selenium -RequiredVersion 3.0.1
+    - name: Update Selenium
+      run: ./Testing/Functional/SmokeTest/UpdateSelenium.ps1
+    - run: dir
     - name: Test SharePoint
       run: ./Testing/Functional/Products/Tests/CallProductTests.ps1
