@@ -3,9 +3,11 @@ import future.keywords
 import data.report.utils.Format
 import data.report.utils.ReportDetailsBoolean
 import data.report.utils.Description
-import data.report.utils.DefenderMirrorDetails
 
-ReportDetailsArray(true, _, _) := PASS if {}
+ReportDetailsArray(Status, _, _) := Detail if {
+    Status == true
+    Detail := "Requirement met"
+}
 
 ReportDetailsArray(false, Array, String) := Description(Format(Array), String, concat(", ", Array)) if {}
 
@@ -429,24 +431,10 @@ ConfigsAllowingEmail contains Policy.Identity if {
     Policy.AllowEmailIntoChannel == true
 }
 
-# Concat the AssignedPlan for each tenant in one comma separated string
-AssignedPlans := concat(", ", TenantConfig.AssignedPlan) if {
-    some TenantConfig in input.teams_tenant_info
+ReportDetails4_1(IsGCC, _) := Description if {
+	IsGCC == true
+	Description := "N/A: Feature is unavailable in GCC environments"
 }
-
-# If AssignedPlan (one of the tenant configs) contain the string
-# "GCC" and/or "DOD", return true, else return false
-default IsUSGovTenantRegion := false
-IsUSGovTenantRegion := true if {
-    GCCConditions := [
-        contains(AssignedPlans, "GCC"),
-        contains(AssignedPlans, "DOD")
-    ]
-    count(FilterArray(GCCConditions, true)) > 0
-}
-
-# Create descriptive report string based on what passed variables equal
-ReportDetails4_1(true, _) := "N/A: Feature is unavailable in GCC environments" if {}
 
 ReportDetails4_1(false, true) := PASS if {}
 

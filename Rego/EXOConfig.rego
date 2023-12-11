@@ -7,7 +7,10 @@ import data.report.utils.ReportDetailsBoolean
 import data.report.utils.Description
 import data.report.utils.ReportDetailsString
 
-ReportDetailsArray(true, _, _) := ReportDetailsBoolean(true) if {}
+ReportDetailsArray(Status, _, _) := Detail if {
+    Status == true
+    Detail := "Requirement met"
+}
 
 ReportDetailsArray(false, NumeratorArr, DenominatorArr) := ReportStr if {
     FractionStr := concat(" of ", [Format(NumeratorArr), Format(DenominatorArr)])
