@@ -17,14 +17,9 @@ ReportDetailsArray(false, NumeratorArr, DenominatorArr) := ReportStr if {
 
 FilterArray(Conditions, Boolean) := [Condition | some Condition in Conditions; Condition == Boolean]
 
-
-#############
-# Constants #
-#############
-
 # this should be allowed https://github.com/StyraInc/regal/issues/415
 # regal ignore:prefer-set-or-object-rule
-ALLDOMAINS := {Domain.domain | some Domain in input.spf_records}
+AllDomains := {Domain.domain | some Domain in input.spf_records}
 
 
 ############
@@ -98,7 +93,7 @@ tests contains {
         "Get-AcceptedDomain"
     ],
     "ActualValue": Domains,
-    "ReportDetails": ReportDetailsArray(Status, Domains, ALLDOMAINS),
+    "ReportDetails": ReportDetailsArray(Status, Domains, AllDomains),
     "RequirementMet": Status
 } if {
     Domains := DomainsWithoutSpf
@@ -141,11 +136,11 @@ tests contains {
         input.dkim_records,
         input.dkim_config
     ],
-    "ReportDetails": ReportDetailsArray(Status, DomainsWithoutDkim, ALLDOMAINS),
+    "ReportDetails": ReportDetailsArray(Status, DomainsWithoutDkim, AllDomains),
     "RequirementMet": Status
 } if {
     # Get domains that are not in DomainsWithDkim array
-    DomainsWithoutDkim := ALLDOMAINS - DomainsWithDkim
+    DomainsWithoutDkim := AllDomains - DomainsWithDkim
     Status := count(DomainsWithoutDkim) == 0
 }
 #--
@@ -176,7 +171,7 @@ tests contains {
         "Get-AcceptedDomain"
     ],
     "ActualValue": input.dmarc_records,
-    "ReportDetails": ReportDetailsArray(Status, Domains, ALLDOMAINS),
+    "ReportDetails": ReportDetailsArray(Status, Domains, AllDomains),
     "RequirementMet": Status
 } if {
     Domains := DomainsWithoutDmarc
@@ -205,7 +200,7 @@ tests contains {
         "Get-AcceptedDomain"
     ],
     "ActualValue": input.dmarc_records,
-    "ReportDetails": ReportDetailsArray(Status, Domains, ALLDOMAINS),
+    "ReportDetails": ReportDetailsArray(Status, Domains, AllDomains),
     "RequirementMet": Status
 } if {
     Domains := DomainsWithoutPreject
@@ -245,7 +240,7 @@ tests contains {
         "Get-AcceptedDomain"
     ],
     "ActualValue": input.dmarc_records,
-    "ReportDetails": ReportDetailsArray(Status, Domains, ALLDOMAINS),
+    "ReportDetails": ReportDetailsArray(Status, Domains, AllDomains),
     "RequirementMet": Status
 } if {
     Domains := DomainsWithoutDHSContact
@@ -301,7 +296,7 @@ tests contains {
         "Get-AcceptedDomain"
     ],
     "ActualValue": input.dmarc_records,
-    "ReportDetails": ReportDetailsArray(Status, Domains, ALLDOMAINS),
+    "ReportDetails": ReportDetailsArray(Status, Domains, AllDomains),
     "RequirementMet": Status
 } if {
     Domains := DomainsWithoutAgencyContact
