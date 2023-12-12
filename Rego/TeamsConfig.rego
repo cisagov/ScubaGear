@@ -436,8 +436,8 @@ AssignedPlans := concat(", ", TenantConfig.AssignedPlan) if {
 
 # If AssignedPlan (one of the tenant configs) contain the string
 # "GCC" and/or "DOD", return true, else return false
-default TenantType := false
-TenantType := true if {
+default IsUSGovTenantRegion := false
+IsUSGovTenantRegion := true if {
     GCCConditions := [
         contains(AssignedPlans, "GCC"),
         contains(AssignedPlans, "DOD")
@@ -468,7 +468,7 @@ tests contains {
     "RequirementMet": Status
 } if {
     IsEnabled := count(ConfigsAllowingEmail) == 0
-    IsGCC := TenantType
+    IsGCC := IsUSGovTenantRegion
     Conditions := [
         IsEnabled,
         IsGCC
