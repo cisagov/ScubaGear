@@ -85,9 +85,8 @@ tests contains {
 # MS.POWERPLATFORM.2.1v1
 #--
 
-# The english translation of the following is:
-# Iterate through all policies. For each, check if the enviorment the policy applies to
-# is the default enviorment. If so, save the policy name to the DefaultEnvPolicies list.
+# Iterate through all policies. For each, check if the environment the policy applies to
+# is the default environment. If so, save the policy name to the DefaultEnvPolicies list.
 DefaultEnvPolicies contains {"PolicyName": Policies.displayName} if {
     some Policies in input.dlp_policies[_].value
     some Env in Policies.environments
@@ -95,7 +94,7 @@ DefaultEnvPolicies contains {"PolicyName": Policies.displayName} if {
 }
 
 # Note: there is only one default environment per tenant and it cannot be deleted or backed up
-# Pass if at least one policy applies to the default enviorment
+# Pass if at least one policy applies to the default environment
 tests contains {
     "PolicyId": "MS.POWERPLATFORM.2.1v1",
     "Criticality": "Shall",
