@@ -549,18 +549,18 @@ information by restricted apps and unwanted Bluetooth applications.
 
 #### MS.DEFENDER.4.2v1 Instructions
 
-See [MS.DEFENDER.4.1v1 instructions](#msdefender41v1-instructions) step 8
+See [MS.DEFENDER.4.1v1 Instructions](#msdefender41v1-instructions) step 8
    for details on enforcing DLP policy in specific M365 service locations.
 
 #### MS.DEFENDER.4.3v1 Instructions
 
-See [MS.DEFENDER.4.1v1 instructions](#msdefender41v1-instructions) steps
+See [MS.DEFENDER.4.1v1 Instructions](#msdefender41v1-instructions) steps
    15-17 for details on configuring DLP policy to block sharing sensitive
    information with everyone.
 
 #### MS.DEFENDER.4.4v1 Instructions
 
-See [MS.DEFENDER.4.1v1 instructions](#msdefender41v1-instructions) steps
+See [MS.DEFENDER.4.1v1 Instructions](#msdefender41v1-instructions) steps
    18-19 for details on configuring DLP policy to notify users when accessing
    sensitive information.
 
@@ -599,7 +599,7 @@ before the instructions below can be completed.
 3. Select **Policies** from the top of the page.
 
 4. Find the custom DLP policy configured under
-   [MS.DEFENDER.4.1v1 instructions](#msdefender41v1-instructions) in the list
+   [MS.DEFENDER.4.1v1 Instructions](#msdefender41v1-instructions) in the list
    and click the Policy name to select.
 
 5. Select **Edit Policy**.
