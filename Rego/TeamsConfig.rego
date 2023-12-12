@@ -19,14 +19,6 @@ FAIL := ReportDetailsBoolean(false)
 
 PASS := ReportDetailsBoolean(true)
 
-# THIRDPARTYARRAY := [
-#     "Custom implementation allowed.",
-#     "If you are using Defender to fulfill this requirement,",
-#     "run the Defender version of ScubaGear.",
-#     "Otherwise, use a 3rd party tool OR manually check."
-# ]
-
-# THIRDPARTYSTRING := concat(" ", THIRDPARTYARRAY)
 
 
 ##############
@@ -37,7 +29,6 @@ PASS := ReportDetailsBoolean(true)
 # MS.TEAMS.1.1v1
 #--
 
-# The english translation of the following is:
 # Iterate through all meeting policies. For each, check if AllowExternalParticipantGiveRequestControl
 # is true. If so, save the policy Identity to the MeetingsAllowingExternalControl list.
 MeetingsAllowingExternalControl contains Policy.Identity if {
@@ -64,7 +55,6 @@ tests contains {
 # MS.TEAMS.1.2v1
 #--
 
-# The english translation of the following is:
 # Iterate through all meeting policies. For each, check if AllowAnonymousUsersToStartMeeting
 # is true. If so, save the policy Identity to the MeetingsAllowingAnonStart list.
 MeetingsAllowingAnonStart contains Policy.Identity if {
@@ -189,7 +179,6 @@ tests contains {
 # MS.TEAMS.1.5v1
 #--
 
-# The english translation of the following is:
 # Iterate through all meeting policies. For each, check if AllowPSTNUsersToBypassLobby
 # is true. If so, save the policy Identity to the MeetingsAllowingPSTNBypass list.
 MeetingsAllowingPSTNBypass contains Policy.Identity if {
@@ -299,7 +288,6 @@ tests contains {
 # MS.TEAMS.2.1v1
 #--
 
-# The english translation of the following is:
 # Iterate through all meeting policies. For each, check if AllowFederatedUsers
 # is true & no AllowedDomains. If so, save the policy Identity to the ExternalAccessConfig list.
 ExternalAccessConfig contains Policy.Identity if {
@@ -372,7 +360,6 @@ tests contains {
 # MS.TEAMS.2.3v1
 #--
 
-# The english translation of the following is:
 # Iterate through all meeting policies. For each, check if AllowTeamsConsumer
 # is true. If so, save the policy Identity to the InternalCannotEnable list.
 InternalCannotEnable contains Policy.Identity if {
@@ -404,7 +391,6 @@ tests contains {
 # MS.TEAMS.3.1v1
 #--
 
-# The english translation of the following is:
 # Iterate through all meeting policies. For each, check if AllowPublicUsers
 # is true. If so, save the policy Identity to the SkypeBlocConfig list.
 SkypeBlocConfig contains Policy.Identity if {
@@ -436,7 +422,6 @@ tests contains {
 # MS.TEAMS.4.1v1
 #--
 
-# The english translation of the following is:
 # Iterate through all meeting policies. For each, check if AllowEmailIntoChannel
 # is true. If so, save the policy Identity to the ConfigsAllowingEmail list.
 ConfigsAllowingEmail contains Policy.Identity if {
@@ -444,7 +429,7 @@ ConfigsAllowingEmail contains Policy.Identity if {
     Policy.AllowEmailIntoChannel == true
 }
 
-# Concat the AssignedPlan for each tenant in one comma seperated string
+# Concat the AssignedPlan for each tenant in one comma separated string
 AssignedPlans := concat(", ", TenantConfig.AssignedPlan) if {
     some TenantConfig in input.teams_tenant_info
 }
@@ -513,7 +498,6 @@ tests contains {
 # MS.TEAMS.5.1v1
 #--
 
-# The english translation of the following is:
 # Iterate through all meeting policies. For each, check if DefaultCatalogAppsType
 # is BlockedAppList. If so, save the policy Identity to the PoliciesBlockingDefaultApps list.
 PoliciesBlockingDefaultApps contains Policy.Identity if {
@@ -540,7 +524,6 @@ tests contains {
 # MS.TEAMS.5.2v1
 #--
 
-# The english translation of the following is:
 # Iterate through all meeting policies. For each, check if GlobalCatalogAppsType
 # is BlockedAppList. If so, save the policy Identity to the PoliciesAllowingGlobalApps list.
 PoliciesAllowingGlobalApps contains Policy.Identity if {
@@ -568,7 +551,6 @@ tests contains {
 #--
 #
 
-# The english translation of the following is:
 # Iterate through all meeting policies. For each, check if PrivateCatalogAppsType
 # is BlockedAppList. If so, save the policy Identity to the PoliciesAllowingCustomApps list.
 PoliciesAllowingCustomApps contains Policy.Identity if {
