@@ -527,16 +527,16 @@ tests contains {
 # If policy also indicates all for the M365 Product & is in the workload, return
 # policy info, else an empty set.
 ProductEnableSensitiveProtection(Name, Location) := {
-    "Name": Policy.Name,
-    "Locations": Policy[Location],
-    "Workload": Policy.Workload
-} if {
-    some Policy in input.dlp_compliance_policies
-    some PolicyWithProtection in PoliciesWithFullProtection
-    Policy.Name in PolicyWithProtection
-    "All" in Policy[Location]
+    {
+        "Name": Policy.Name,
+        "Locations": Policy[Location],
+        "Workload": Policy.Workload
+    } | some Policy in input.dlp_compliance_policies;
+    some PolicyWithProtection in PoliciesWithFullProtection;
+    Policy.Name in PolicyWithProtection;
+    "All" in Policy[Location];
     contains(Policy.Workload, Name)
-} else := set()
+}
 
 Policies := {
     "Exchange": ProductEnableSensitiveProtection("Exchange", "ExchangeLocation"),

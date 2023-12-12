@@ -458,6 +458,109 @@ test_Locations_Correct_V2 if {
     CorrectTestResult("MS.DEFENDER.4.2v1", Output, PASS) == true
 }
 
+test_Locations_Correct_V3 if {
+    Output := defender.tests with input as {
+        "dlp_compliance_rules": [
+            {
+                "ContentContainsSensitiveInformation": [
+                    {
+                        "name": "U.S. Individual Taxpayer Identification Number (ITIN)"
+                    },
+                    {
+                        "name": "Credit Card Number"
+                    },
+                    {
+                        "name": "U.S. Social Security Number (SSN)"
+                    }
+                ],
+                "Name": "Baseline Rule",
+                "Disabled": false,
+                "ParentPolicyName": "Default Office 365 DLP policy",
+                "BlockAccess": true,
+                "BlockAccessScope": "All",
+                "NotifyUser": [
+                    "SiteAdmin",
+                    "LastModifier",
+                    "Owner"
+                ],
+                "NotifyUserType": "NotSet",
+                "IsAdvancedRule": false
+            },
+            {
+                "ContentContainsSensitiveInformation": [
+                    {
+                        "name": "U.S. Individual Taxpayer Identification Number (ITIN)"
+                    },
+                    {
+                        "name": "Credit Card Number"
+                    },
+                    {
+                        "name": "U.S. Social Security Number (SSN)"
+                    }
+                ],
+                "Name": "Baseline Rule 2",
+                "Disabled": false,
+                "ParentPolicyName": "Some Office 365 DLP policy",
+                "BlockAccess": true,
+                "BlockAccessScope": "All",
+                "NotifyUser": [
+                    "SiteAdmin",
+                    "LastModifier",
+                    "Owner"
+                ],
+                "NotifyUserType": "NotSet",
+                "IsAdvancedRule": false
+            }
+        ],
+        "dlp_compliance_policies": [
+            {
+                "ExchangeLocation": [
+                    "All"
+                ],
+                "SharePointLocation": [
+                    "All"
+                ],
+                "TeamsLocation": [
+                    "All"
+                ],
+                "EndpointDlpLocation": [
+                    "All"
+                ],
+                "OneDriveLocation": [
+                    "All"
+                ],
+                "Workload": "Exchange, SharePoint, OneDriveForBusiness, Teams, EndpointDevices",
+                "Name": "Default Office 365 DLP policy",
+                "Mode": "Enable",
+                "Enabled": true
+            },
+            {
+                "ExchangeLocation": [
+                    "All"
+                ],
+                "SharePointLocation": [
+                    "All"
+                ],
+                "TeamsLocation": [
+                    "All"
+                ],
+                "EndpointDlpLocation": [
+                    "All"
+                ],
+                "OneDriveLocation": [
+                    "All"
+                ],
+                "Workload": "Exchange, SharePoint, OneDriveForBusiness, Teams, EndpointDevices",
+                "Name": "Some Office 365 DLP policy",
+                "Mode": "Enable",
+                "Enabled": true
+            }
+        ]
+    }
+
+    CorrectTestResult("MS.DEFENDER.4.2v1", Output, PASS) == true
+}
+
 # Policy exists, but Exchange location is null
 test_Locations_Incorrect_V1 if {
     Output := defender.tests with input as {
