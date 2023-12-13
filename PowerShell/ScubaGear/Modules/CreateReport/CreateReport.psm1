@@ -282,6 +282,7 @@ function Import-SecureBaseline{
                     $MaxLineSearch = 20;
                     $Value = ([string]$MdLines[$LineNumber+$LineAdvance]).Trim()
                     $IsMalformedDescription = $false
+                    $IsList = $false
 
                     try {
                         if ([string]::IsNullOrWhiteSpace($Value)){
@@ -301,8 +302,20 @@ function Import-SecureBaseline{
                                 # Reached Criticality comment so policy description is complete.
                                 break
                             }
+
+                            # Policy description contains a list assuming list is denoted by a colon character.
+                            if ($Value[-1] -eq ":") {
+                                $isList = $true
+                            }
+
                             if (-not [string]::IsNullOrWhiteSpace([string]$MdLines[$LineNumber+$LineAdvance])) {
-                                $Value += "`n" + ([string]$MdLines[$LineNumber+$LineAdvance]).Trim()
+                                # List case, use newline character between value text
+                                if ($isList) {
+                                    $Value += "`n" + ([string]$MdLines[$LineNumber+$LineAdvance]).Trim()
+                                }
+                                else { # Value ending with newline char, use whitespace character between value text
+                                    $Value += " " + ([string]$MdLines[$LineNumber+$LineAdvance]).Trim()
+                                }
                             }
 
                             if ($LineAdvance -gt $MaxLineSearch){
