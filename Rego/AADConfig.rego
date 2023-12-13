@@ -19,6 +19,12 @@ FAIL := ReportDetailsBoolean(false)
 
 PASS := ReportDetailsBoolean(true)
 
+RESTRICTEDACCESS := "2af84b1e-32c8-42b7-82bc-daa82404023b"
+
+LIMITEDACCESS := "10dae51f-b6af-4016-8d66-8c2a99b929b3"
+
+MEMBERUSER := "a0b1b346-4d3e-4e8b-98f8-753987be4970"
+
 #############################################################################
 # The report formatting functions below are generic and used throughout AAD #
 #############################################################################
@@ -754,8 +760,7 @@ tests contains {
 
 # Save all users that have the Global Admin role
 GlobalAdmins contains User.DisplayName if {
-    some id
-    User := input.privileged_users[id]
+    some User in input.privileged_users
     "Global Administrator" in User.roles
 }
 
@@ -799,8 +804,7 @@ tests contains {
 # Save privileged users that do not have cloud
 # only accounts
 FederatedAdmins contains User.DisplayName if {
-    some id
-    User := input.privileged_users[id]
+    some User in input.privileged_users
     not is_null(User.OnPremisesImmutableId)
 }
 
@@ -1054,9 +1058,9 @@ LevelAsString("10dae51f-b6af-4016-8d66-8c2a99b929b3") := "Limited access"
 LevelAsString("a0b1b346-4d3e-4e8b-98f8-753987be4970") := "Same as member users"
 
 LevelAsString(Id) := "Unknown" if not Id in [
-    "2af84b1e-32c8-42b7-82bc-daa82404023b",
-    "10dae51f-b6af-4016-8d66-8c2a99b929b3",
-    "a0b1b346-4d3e-4e8b-98f8-753987be4970"
+    RESTRICTEDACCESS,
+    LIMITEDACCESS,
+    MEMBERUSER
 ]
 
 # save the policy ids that do not have the specified
@@ -1064,8 +1068,8 @@ LevelAsString(Id) := "Unknown" if not Id in [
 AuthPoliciesBadRoleId contains Policy.Id if {
     some Policy in input.authorization_policies
     not Policy.GuestUserRoleId in [
-        "10dae51f-b6af-4016-8d66-8c2a99b929b3",
-        "2af84b1e-32c8-42b7-82bc-daa82404023b"
+        LIMITEDACCESS,
+        RESTRICTEDACCESS
     ]
 }
 
