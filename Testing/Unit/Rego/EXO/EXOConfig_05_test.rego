@@ -1,45 +1,56 @@
-package exo
+package exo_test
 import future.keywords
+import data.exo
+import data.report.utils.ReportDetailsBoolean
+
+
+CorrectTestResult(PolicyId, Output, ReportDetailString) := true if {
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet == true
+    RuleOutput[0].ReportDetails == ReportDetailString
+} else := false
+
+IncorrectTestResult(PolicyId, Output, ReportDetailString) := true if {
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet == false
+    RuleOutput[0].ReportDetails == ReportDetailString
+} else := false
+
+FAIL := ReportDetailsBoolean(false)
+
+PASS := ReportDetailsBoolean(true)
 
 
 #
 # Policy 1
 #--
 test_SmtpClientAuthenticationDisabled_Correct if {
-    PolicyId := "MS.EXO.5.1v1"
-
-    Output := tests with input as {
-        "transport_config":
-        [
-            {
-                "SmtpClientAuthenticationDisabled" : true,
-                "Name":"A"
-            },
-        ]
-    }
-
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement met"
-}
-
-test_SmtpClientAuthenticationDisabled_Incorrect if {
-    PolicyId := "MS.EXO.5.1v1"
-
-    Output := tests with input as {
+    Output := exo.tests with input as {
         "transport_config": [
             {
-                "SmtpClientAuthenticationDisabled" : false,
-                "Name" : "A"
+                "SmtpClientAuthenticationDisabled": true,
+                "Name": "A"
             }
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement not met"
+    CorrectTestResult("MS.EXO.5.1v1", Output, PASS) == true
 }
+
+test_SmtpClientAuthenticationDisabled_Incorrect if {
+    Output := exo.tests with input as {
+        "transport_config": [
+            {
+                "SmtpClientAuthenticationDisabled": false,
+                "Name": "A"
+            }
+        ]
+    }
+
+    IncorrectTestResult("MS.EXO.5.1v1", Output, FAIL) == true
+}
+#--
