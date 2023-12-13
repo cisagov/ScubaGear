@@ -78,7 +78,7 @@ function DownLoadDriver{
     Write-Debug -Message "Downloading $DownloadUrl"
 
     try {
-        Invoke-WebRequest $DownloadUrl -OutFile "$DriverTempPath\chromeNewDriver.zip" 2>&1 | Out-Null
+        Invoke-WebRequest $DownloadUrl -OutFile "$DriverTempPath\chromeNewDriver.zip" -ErrorAction 'Stop' 2>&1 | Out-Null
 
         Expand-Archive "$DriverTempPath\chromeNewDriver.zip" -DestinationPath $DriverTempPath -Force
 
