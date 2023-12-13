@@ -1,227 +1,211 @@
-package teams
+package teams_test
 import future.keywords
+import data.teams
+import data.report.utils.ReportDetailsBoolean
 
 
-#--
+CorrectTestResult(PolicyId, Output, ReportDetailString) := true if {
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet == true
+    RuleOutput[0].ReportDetails == ReportDetailString
+} else := false
+
+IncorrectTestResult(PolicyId, Output, ReportDetailString) := true if {
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet == false
+    RuleOutput[0].ReportDetails == ReportDetailString
+} else := false
+
+FAIL := ReportDetailsBoolean(false)
+
+PASS := ReportDetailsBoolean(true)
+
+#
 # Policy MS.TEAMS.1.1v1
 #--
 test_ExternalParticipantControl_Correct_V1 if {
-    PolicyId := "MS.TEAMS.1.1v1"
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "meeting_policies": [
             {
-                "Identity": "Global", 
-                "AllowExternalParticipantGiveRequestControl" : false
+                "Identity": "Global",
+                "AllowExternalParticipantGiveRequestControl": false
             }
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement met"
+    CorrectTestResult("MS.TEAMS.1.1v1", Output, PASS) == true
 }
 
 test_ExternalParticipantControl_Correct_V2 if {
-    PolicyId := "MS.TEAMS.1.1v1"
-    Output := tests with input as {
-    "meeting_policies": [
-        {
-            "Identity": "Tag:FirstCustomPolicy", 
-            "AllowExternalParticipantGiveRequestControl" : false
-        }
-    ]
+    Output := teams.tests with input as {
+        "meeting_policies": [
+            {
+                "Identity": "Tag:FirstCustomPolicy",
+                "AllowExternalParticipantGiveRequestControl": false
+            }
+        ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement met"
+    CorrectTestResult("MS.TEAMS.1.1v1", Output, PASS) == true
 }
 
 test_ExternalParticipantControl_Incorrect_V1 if {
-    PolicyId := "MS.TEAMS.1.1v1"
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "meeting_policies": [
             {
-                "Identity": "Global", 
-                "AllowExternalParticipantGiveRequestControl" : true
+                "Identity": "Global",
+                "AllowExternalParticipantGiveRequestControl": true
             }
         ]
     }
-    
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
 
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "1 meeting policy(ies) found that allows external control: Global"
+    ReportDetailString := "1 meeting policy(ies) found that allows external control: Global"
+    IncorrectTestResult("MS.TEAMS.1.1v1", Output, ReportDetailString) == true
 }
 
 test_ExternalParticipantControl_Incorrect_V2 if {
-    PolicyId := "MS.TEAMS.1.1v1"
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "meeting_policies": [
             {
-                "Identity": "Tag:FirstCustomPolicy", 
-                "AllowExternalParticipantGiveRequestControl" : true
+                "Identity": "Tag:FirstCustomPolicy",
+                "AllowExternalParticipantGiveRequestControl": true
             }
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "1 meeting policy(ies) found that allows external control: Tag:FirstCustomPolicy"
+    ReportDetailString := "1 meeting policy(ies) found that allows external control: Tag:FirstCustomPolicy"
+    IncorrectTestResult("MS.TEAMS.1.1v1", Output, ReportDetailString) == true
 }
 
 test_ExternalParticipantControl_MultiplePolicies if {
     PolicyId := "MS.TEAMS.1.1v1"
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "meeting_policies": [
             {
-                "Identity": "Global", 
-                "AllowExternalParticipantGiveRequestControl" : true
+                "Identity": "Global",
+                "AllowExternalParticipantGiveRequestControl": true
             },
             {
-                "Identity": "Tag:FirstCustomPolicy", 
-                "AllowExternalParticipantGiveRequestControl" : false
+                "Identity": "Tag:FirstCustomPolicy",
+                "AllowExternalParticipantGiveRequestControl": false
             },
             {
-                "Identity": "Tag:SecondCustomPolicy", 
-                "AllowExternalParticipantGiveRequestControl" : true
+                "Identity": "Tag:SecondCustomPolicy",
+                "AllowExternalParticipantGiveRequestControl": true
             }
-        ] 
+        ]
     }
-    
+
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-    
+
     count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
+    RuleOutput[0].RequirementMet == false
     startswith(RuleOutput[0].ReportDetails, "2 meeting policy(ies) found that allows external control: ")
-    contains(RuleOutput[0].ReportDetails, "Global") # Not sure if we can assume the order these will appear in,
+    # Not sure if we can assume the order these will appear in,
     # hence the "contains" instead of a simple "=="
+    contains(RuleOutput[0].ReportDetails, "Global")
     contains(RuleOutput[0].ReportDetails, "Tag:SecondCustomPolicy")
 }
-
 #--
+
+#
 # Policy MS.TEAMS.1.2v1
 #--
 test_AnonymousMeetingStart_Correct_V1 if {
-    PolicyId := "MS.TEAMS.1.2v1"
-    
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "meeting_policies": [
             {
-                "Identity": "Global", 
-                "AllowAnonymousUsersToStartMeeting" : false
+                "Identity": "Global",
+                "AllowAnonymousUsersToStartMeeting": false
             }
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement met"
+    CorrectTestResult("MS.TEAMS.1.2v1", Output, PASS) == true
 }
 
 test_AnonymousMeetingStart_Correct_V2 if {
-    PolicyId := "MS.TEAMS.1.2v1"
-
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "meeting_policies": [
             {
-                "Identity": "Tag:FirstCustomPolicy", 
-                "AllowAnonymousUsersToStartMeeting" : false
+                "Identity": "Tag:FirstCustomPolicy",
+                "AllowAnonymousUsersToStartMeeting": false
             }
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement met"
+    CorrectTestResult("MS.TEAMS.1.2v1", Output, PASS) == true
 }
 
 test_AnonymousMeetingStart_Incorrect_V1 if {
-    PolicyId := "MS.TEAMS.1.2v1"
-
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "meeting_policies": [
             {
-                "Identity": "Global", 
-                "AllowAnonymousUsersToStartMeeting" : true
+                "Identity": "Global",
+                "AllowAnonymousUsersToStartMeeting": true
             }
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "1 meeting policy(ies) found that allows anonymous users to start meetings: Global"
+    ReportDetailString := "1 meeting policy(ies) found that allows anonymous users to start meetings: Global"
+    IncorrectTestResult("MS.TEAMS.1.2v1", Output, ReportDetailString) == true
 }
 
 test_AnonymousMeetingStart_Incorrect_V2 if {
-    PolicyId := "MS.TEAMS.1.2v1"
-
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "meeting_policies": [
             {
-                "Identity": "Tag:FirstCustomPolicy", 
-                "AllowAnonymousUsersToStartMeeting" : true
+                "Identity": "Tag:FirstCustomPolicy",
+                "AllowAnonymousUsersToStartMeeting": true
             }
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "1 meeting policy(ies) found that allows anonymous users to start meetings: Tag:FirstCustomPolicy"
+    ReportDetailString := "1 meeting policy(ies) found that allows anonymous users to start meetings: Tag:FirstCustomPolicy"
+    IncorrectTestResult("MS.TEAMS.1.2v1", Output, ReportDetailString) == true
 }
 
 test_AnonymousMeetingStart_MultiplePolicies if {
     PolicyId := "MS.TEAMS.1.2v1"
 
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "meeting_policies": [
             {
-                "Identity": "Global", 
-                "AllowAnonymousUsersToStartMeeting" : true
+                "Identity": "Global",
+                "AllowAnonymousUsersToStartMeeting": true
             },
             {
-                "Identity": "Tag:FirstCustomPolicy", 
-                "AllowAnonymousUsersToStartMeeting" : false
+                "Identity": "Tag:FirstCustomPolicy",
+                "AllowAnonymousUsersToStartMeeting": false
             },
             {
-                "Identity": "Tag:SecondCustomPolicy", 
-                "AllowAnonymousUsersToStartMeeting" : true
+                "Identity": "Tag:SecondCustomPolicy",
+                "AllowAnonymousUsersToStartMeeting": true
             }
-        ] 
+        ]
     }
-    
+
     RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-    
+
     count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
+    RuleOutput[0].RequirementMet == false
     startswith(RuleOutput[0].ReportDetails, "2 meeting policy(ies) found that allows anonymous users to start meetings: ")
-    contains(RuleOutput[0].ReportDetails, "Global") # Not sure if we can assume the order these will appear in,
+    # Not sure if we can assume the order these will appear in,
     # hence the "contains" instead of a simple "=="
+    contains(RuleOutput[0].ReportDetails, "Global")
     contains(RuleOutput[0].ReportDetails, "Tag:SecondCustomPolicy")
 }
-
 #--
+
+#
 # Policy MS.TEAMS.1.3v1
 #--
 test_meeting_policies_Correct if {
-    PolicyId := "MS.TEAMS.1.3v1"
-
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "meeting_policies": [
             {
                 "Identity": "Global",
@@ -231,17 +215,11 @@ test_meeting_policies_Correct if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement met"
+    CorrectTestResult("MS.TEAMS.1.3v1", Output, PASS) == true
 }
 
 test_AllowPSTNUsersToBypassLobby_Incorrect if {
-    PolicyId := "MS.TEAMS.1.3v1"
-
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "meeting_policies": [
             {
                 "Identity": "Global",
@@ -251,17 +229,12 @@ test_AllowPSTNUsersToBypassLobby_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement not met: Dial-in users are enabled to bypass the lobby"
+    ReportDetailString := "Requirement not met: Dial-in users are enabled to bypass the lobby"
+    IncorrectTestResult("MS.TEAMS.1.3v1", Output, ReportDetailString) == true
 }
 
 test_AutoAdmittedUsers_Incorrect if {
-    PolicyId := "MS.TEAMS.1.3v1"
-
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "meeting_policies": [
             {
                 "Identity": "Global",
@@ -271,18 +244,13 @@ test_AutoAdmittedUsers_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement not met: All users are admitted automatically"
+    ReportDetailString := "Requirement not met: All users are admitted automatically"
+    IncorrectTestResult("MS.TEAMS.1.3v1", Output, ReportDetailString) == true
 }
 
 # It shouldn't matter that the custom policy is incorrect as this policy only applies to the Global policy
 test_Multiple_Correct if {
-    PolicyId := "MS.TEAMS.1.3v1"
-
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "meeting_policies": [
             {
                 "Identity": "Global",
@@ -297,99 +265,71 @@ test_Multiple_Correct if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement met"
+    CorrectTestResult("MS.TEAMS.1.3v1", Output, PASS) == true
 }
-
 #--
+
+#
 # Policy MS.TEAMS.1.4v1
 #--
 test_AutoAdmittedUsers_Correct_V1 if {
-    PolicyId := "MS.TEAMS.1.4v1"
-
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "meeting_policies": [
             {
-                "Identity": "Global", 
-                "AutoAdmittedUsers" : "EveryoneInSameAndFederatedCompany"
+                "Identity": "Global",
+                "AutoAdmittedUsers": "EveryoneInSameAndFederatedCompany"
             }
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement met"
+    CorrectTestResult("MS.TEAMS.1.4v1", Output, PASS) == true
 }
 
 test_AutoAdmittedUsers_Correct_V2 if {
-    PolicyId := "MS.TEAMS.1.4v1"
-
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "meeting_policies": [
             {
-                "Identity": "Global", 
-                "AutoAdmittedUsers" : "EveryoneInCompanyExcludingGuests"
+                "Identity": "Global",
+                "AutoAdmittedUsers": "EveryoneInCompanyExcludingGuests"
             }
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement met"
+    CorrectTestResult("MS.TEAMS.1.4v1", Output, PASS) == true
 }
 
 test_AutoAdmittedUsers_Incorrect_V2 if {
-    PolicyId := "MS.TEAMS.1.4v1"
-
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "meeting_policies": [
             {
-                "Identity": "Global", 
-                "AutoAdmittedUsers" : "OrganizerOnly"
+                "Identity": "Global",
+                "AutoAdmittedUsers": "OrganizerOnly"
             }
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement not met"
+    IncorrectTestResult("MS.TEAMS.1.4v1", Output, FAIL) == true
 }
 
 test_AutoAdmittedUsers_Incorrect_V3 if {
-    PolicyId := "MS.TEAMS.1.4v1"
-
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "meeting_policies": [
             {
-                "Identity": "Global", 
-                "AutoAdmittedUsers" : "InvitedUsers"
+                "Identity": "Global",
+                "AutoAdmittedUsers": "InvitedUsers"
             }
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-    
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement not met"
+    IncorrectTestResult("MS.TEAMS.1.4v1", Output, FAIL) == true
 }
-
 #--
+
+#
 # Policy MS.TEAMS.1.5v1
 #--
 test_meeting_policies_Correct if {
-    PolicyId := "MS.TEAMS.1.5v1"
-
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "meeting_policies": [
             {
                 "Identity": "Tag:CustomPolicy",
@@ -399,17 +339,11 @@ test_meeting_policies_Correct if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement met"
+    CorrectTestResult("MS.TEAMS.1.5v1", Output, PASS) == true
 }
 
 test_OneGoodOneBadPolicy_Incorrect if {
-    PolicyId := "MS.TEAMS.1.5v1"
-
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "meeting_policies": [
             {
                 "Identity": "Tag:CustomPolicy",
@@ -424,17 +358,12 @@ test_OneGoodOneBadPolicy_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "1 meeting policy(ies) found that either allow everyone or dial-in users to bypass lobby: Tag:CustomPolicy"
+    ReportDetailString := "1 meeting policy(ies) found that allow everyone or dial-in users to bypass lobby: Tag:CustomPolicy"
+    IncorrectTestResult("MS.TEAMS.1.5v1", Output, ReportDetailString) == true
 }
 
 test_AllowPSTNUsersToBypassLobby_Incorrect if {
-    PolicyId := "MS.TEAMS.1.5v1"
-
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "meeting_policies": [
             {
                 "Identity": "Tag:CustomPolicy",
@@ -444,20 +373,16 @@ test_AllowPSTNUsersToBypassLobby_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "1 meeting policy(ies) found that either allow everyone or dial-in users to bypass lobby: Tag:CustomPolicy"
+    ReportDetailString := "1 meeting policy(ies) found that allow everyone or dial-in users to bypass lobby: Tag:CustomPolicy"
+    IncorrectTestResult("MS.TEAMS.1.5v1", Output, ReportDetailString) == true
 }
-
 #--
+
+#
 # Policy MS.TEAMS.1.6v1
 #--
 test_AllowCloudRecording_Correct if {
-    PolicyId := "MS.TEAMS.1.6v1"
-
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "meeting_policies": [
             {
                 "Identity": "Global",
@@ -466,17 +391,11 @@ test_AllowCloudRecording_Correct if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement met"
+    CorrectTestResult("MS.TEAMS.1.6v1", Output, PASS) == true
 }
 
 test_AllowCloudRecording_Incorrect if {
-    PolicyId := "MS.TEAMS.1.6v1"
-
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "meeting_policies": [
             {
                 "Identity": "Global",
@@ -485,17 +404,13 @@ test_AllowCloudRecording_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement not met"
+    IncorrectTestResult("MS.TEAMS.1.6v1", Output, FAIL) == true
 }
 
+# This baseline only applies to the Global policy,
+# so no failure will be produced for the non-global policies
 test_AllowCloudRecording_Multiple if {
-    PolicyId := "MS.TEAMS.1.6v1"
-
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "meeting_policies": [
             {
                 "Identity": "Global",
@@ -503,26 +418,20 @@ test_AllowCloudRecording_Multiple if {
             },
             {
                 "Identity": "Tag:TestPolicy",
-                "AllowCloudRecording": true # This baseline only applies to the Global policy,
-                # so no failure will be produced for the non-global policies
+                "AllowCloudRecording": true
             }
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement met"
+    CorrectTestResult("MS.TEAMS.1.6v1", Output, PASS) == true
 }
-
 #--
+
+#
 # Policy MS.TEAMS.1.7v1
 #--
 test_BroadcastRecordingMode_Correct if {
-    PolicyId := "MS.TEAMS.1.7v1"
-   
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "broadcast_policies": [
             {
                 "Identity": "Global",
@@ -531,17 +440,11 @@ test_BroadcastRecordingMode_Correct if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement met"
+    CorrectTestResult("MS.TEAMS.1.7v1", Output, PASS) == true
 }
 
 test_BroadcastRecordingMode_Incorrect if {
-    PolicyId := "MS.TEAMS.1.7v1"
-   
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "broadcast_policies": [
             {
                 "Identity": "Global",
@@ -549,34 +452,25 @@ test_BroadcastRecordingMode_Incorrect if {
             }
         ]
     }
-   
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-    
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement not met"
+
+    IncorrectTestResult("MS.TEAMS.1.7v1", Output, FAIL) == true
 }
 
-
+# Ignores non global identities
 test_BroadcastRecordingMode_Multiple if {
-    PolicyId := "MS.TEAMS.1.7v1"
-
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "broadcast_policies": [
             {
                 "Identity": "Global",
                 "BroadcastRecordingMode": "UserOverride"
             },
             {
-                "Identity": "Tag:TestPolicy", # Should be ignored
+                "Identity": "Tag:TestPolicy",
                 "BroadcastRecordingMode": "AlwaysRecord"
             }
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement met"
+    CorrectTestResult("MS.TEAMS.1.7v1", Output, PASS) == true
 }
+#--
