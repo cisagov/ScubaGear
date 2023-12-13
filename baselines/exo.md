@@ -17,7 +17,7 @@ The Secure Cloud Business Applications (SCuBA) project run by the Cybersecurity 
 
 The CISA SCuBA SCBs for M365 help secure federal information assets stored within M365 cloud business application environments through consistent, effective, and manageable security configurations. CISA created baselines tailored to the federal government's threats and risk tolerance with the knowledge that every organization has different threat models and risk tolerance. Non-governmental organizations may also find value in applying these baselines to reduce risks.
 
-The information in this document is provided "as is" for INFORMATIONAL PURPOSES ONLY. CISA does not endorse any commercial product or service, including any subjects of analysis. Any reference to specific commercial entities or commercial products, processes, or services by service mark, trademark, manufacturer, or otherwise, does not constitute or imply endorsement, recommendation, or favoritism by CISA.
+The information in this document is provided "as is" for INFORMATIONAL PURPOSES ONLY. CISA does not endorse any commercial product or service, including any subjects of analysis. Any reference to specific commercial entities or commercial products, processes, or services by service mark, trademark, manufacturer, or otherwise, does not constitute or imply endorsement, recommendation, or favoritism by CISA. This document does not address, ensure compliance with, or supersede any law, regulation, or other authority. Entities are responsible for complying with any recordkeeping, privacy, and other laws that may apply to the use of technology. This document is not intended to, and does not, create any right or benefit for anyone against the United States, its departments, agencies, or entities, its officers, employees, or agents, or any other person.
 
 > This document is marked TLP:CLEAR. Recipients may share this information without restriction. Information is subject to standard copyright rules. For more information on the Traffic Light Protocol, see https://www.cisa.gov/tlp.
 
@@ -116,7 +116,7 @@ points.
 A list of approved IP addresses for sending mail SHALL be maintained.
 
 <!--Policy: MS.EXO.2.1v1; Criticality: SHALL -->
-- _Rationale:_ Failing to maintain an accurate list of authorized IP addresses may result in spoofed email messages or failure to deliver legitimate messages when SPF is enabled. Maintaining such a list ensures that unauthorized servers sending spoofed messages can be detected, and permits message delivery from legitimate senders.
+- _Rationale:_ Failing to maintain an accurate list of authorized IP addresses may result in spoofed email messages or failure to deliver legitimate messages when SPF is enabled. Maintaining such a list helps ensure that unauthorized servers sending spoofed messages can be detected, and permits message delivery from legitimate senders.
 - _Last modified:_ June 2023
 
 #### MS.EXO.2.2v1
@@ -183,7 +183,7 @@ of SPF record syntax.
 DomainKeys Identified Mail (DKIM) allows digital signatures to be added
 to email messages in the message header, providing a layer of both
 authenticity and integrity to emails. As with SPF, DKIM relies on DNS
-records, thus, its deployment depends on how an agency manages its DNS.
+records; thus, its deployment depends on how an agency manages its DNS.
 Exchange Online Protection (EOP) features include DKIM signing capabilities.
 
 ### Policies
@@ -229,7 +229,7 @@ Learn](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-secur
 
 ## 4. Domain-Based Message Authentication, Reporting, and Conformance (DMARC)
 Domain-based Message Authentication, Reporting, and Conformance (DMARC)
-works with SPF and DKIM to authenticate mail senders and ensure
+works with SPF and DKIM to authenticate mail senders and helps ensure
 destination email systems can validate messages sent from your domain.
 DMARC helps receiving mail systems determine what to do with messages
 sent from your domain that fail SPF and DKIM checks.
@@ -299,7 +299,7 @@ to spoof their domains.
 
 ### Implementation
 
-#### MS.EXO.4.1v1 Instructions:
+#### MS.EXO.4.1v1 Instructions
 DMARC is not configured through the Exchange admin center, but rather via
 DNS records hosted by the agency's domain. As such, implementation varies
 depending on how an agency manages its DNS records. See [Form the DMARC TXT record for your domain \| Microsoft
@@ -326,15 +326,15 @@ SPF/DKIM checks are to be rejected and aggregate reports sent to
 reports@dmarc.cyber.dhs.gov and reports@example.com. Failure reports will be
 sent to reports@example.com.
 
-#### MS.EXO.4.2v1 Instructions:
-See [MS.EXO.4.1v1 instructions](#msexo41v1-instructions) for an overview of how to publish and check a DMARC record. Ensure the record published includes `p=reject`.
+#### MS.EXO.4.2v1 Instructions
+See [MS.EXO.4.1v1 Instructions](#msexo41v1-instructions) for an overview of how to publish and check a DMARC record. Ensure the record published includes `p=reject`.
 
-#### MS.EXO.4.3v1 Instructions:
-See [MS.EXO.4.1v1 instructions](#msexo41v1-instructions) for an overview of how to publish and check a DMARC record. Ensure the record published includes <reports@dmarc.cyber.dhs.gov>
+#### MS.EXO.4.3v1 Instructions
+See [MS.EXO.4.1v1 Instructions](#msexo41v1-instructions) for an overview of how to publish and check a DMARC record. Ensure the record published includes <reports@dmarc.cyber.dhs.gov>
 as one of the emails for the RUA field.
 
-#### MS.EXO.4.4v1 Instructions:
-See [MS.EXO.4.1v1 instructions](#msexo41v1-instructions) for an overview of how to publish and check a DMARC record. Ensure the record published includes:
+#### MS.EXO.4.4v1 Instructions
+See [MS.EXO.4.1v1 Instructions](#msexo41v1-instructions) for an overview of how to publish and check a DMARC record. Ensure the record published includes:
 - A point of contact specific to your agency in the RUA field.
 - <reports@dmarc.cyber.dhs.gov> as one of the emails in the RUA field.
 - One or more agency-defined points of contact in the RUF field.
@@ -379,7 +379,7 @@ per-mailbox basis when necessary.
 
 ### Implementation
 
-#### MS.EXO.5.1v1 Instructions:
+#### MS.EXO.5.1v1 Instructions
 
 To disable SMTP AUTH for the organization:
 
@@ -442,7 +442,7 @@ for legitimate use as needed.
 
 ### Implementation
 
-#### MS.EXO.6.1v1 Instructions:
+#### MS.EXO.6.1v1 Instructions
 To restrict sharing with all domains:
 
 1. Sign in to the **Exchange admin center**.
@@ -459,7 +459,7 @@ To restrict sharing with all domains:
 
 To restrict sharing calendar details with all domains:
 
-1. Refer to step 5 in [MS.EXO.6.1v1 instructions](#msexo61v1-instructions) to implement
+1. Refer to step 5 in [MS.EXO.6.1v1 Instructions](#msexo61v1-instructions) to implement
 this policy.
 
 ## 7. External Sender Warnings
@@ -572,10 +572,10 @@ The DLP solution SHALL protect personally identifiable information (PII) and sen
 
 ### Implementation
 
-#### MS.EXO.8.1v1 instructions
+#### MS.EXO.8.1v1 Instructions
 Any product meeting the requirements outlined in this baseline policy may be used. If the agency uses Microsoft Defender, see the following implementation steps for [DLP](./defender.md#implementation-3) for additional guidance.
 
-#### MS.EXO.8.2v1 instructions
+#### MS.EXO.8.2v1 Instructions
 Any product meeting the requirements outlined in this baseline policy may be used. If the agency uses Microsoft Defender, see the following implementation steps for [protecting PII](./defender.md#msdefender41v1-instructions) for additional guidance.
 
 ## 9. Attachment File Type
@@ -690,7 +690,7 @@ Emails identified as containing malware SHALL be quarantined or dropped.
 
 <!--Policy: MS.EXO.10.2v1; Criticality: SHALL -->
 - _Rationale:_ Email can be used as a mechanism for delivering malware.
-Preventing emails with known malware from reaching user mailboxes ensures
+Preventing emails with known malware from reaching user mailboxes helps ensure
 users cannot interact with those emails.
 - _Last modified:_ June 2023
 
@@ -826,12 +826,12 @@ include mailbox intelligence for detecting phishing attacks using AI.
 ## 12. IP Allow Lists
 
 Microsoft Defender supports creating IP allow lists intended
-to ensure emails from *specific* senders are not blocked. However,
+to prevent blocking emails from *specific* senders. However,
 as a result, emails from these senders bypass important security
 mechanisms, such as spam filtering, SPF, DKIM, DMARC, and [FROM address
 enforcement](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/anti-phishing-from-email-address-validation?view=o365-worldwide#override-from-address-enforcement).
 
-IP block lists ensure mail from listed IP addresses is always blocked. Although we have no specific guidance on which IP addresses to add, block lists can be used to block mail from known spammers.
+IP block lists block email from listed IP addresses. Although we have no specific guidance on which IP addresses to add, block lists can be used to block mail from known spammers.
 
 IP safe lists are dynamic lists of "known, good senders," which Microsoft sources from various third-party subscriptions. As with senders in the allow list, emails from these senders bypass important security mechanisms.
 
@@ -925,8 +925,7 @@ discover illicit access to Exchange Online. As a feature of Exchange
 Online, mailbox auditing is enabled by default for all organizations.
 Microsoft defines a default audit policy that logs certain actions
 performed by administrators, delegates, and owners. While mailbox auditing is enabled by default,
-this policy ensures it has not been inadvertently disabled.
-
+this policy helps avoid inadvertent disabling.
 ### Policies
 
 #### MS.EXO.13.1v1
@@ -1184,9 +1183,9 @@ At a minimum, the following alerts SHALL be enabled:
 
 <!--Policy: MS.EXO.16.1v1; Criticality: SHALL -->
 - _Rationale:_ Potentially malicious or service impacting events may go
-  undetected without a means of detecting these events.  Setting up a mechanism
+  undetected without a means of detecting these events. Setting up a mechanism
   to alert administrators to events listed above draws attention to them
-  to ensure any impact to users and the agency are minimized.
+  to help minimize impact to users and the agency.
 - _Last modified:_ June 2023
 
 #### MS.EXO.16.2v1
@@ -1325,39 +1324,5 @@ guidance.
 See the following implementation steps to
 [create an audit retention policy](./defender.md#msdefender62v1-instructions)
 for additional guidance.
-
-# Acknowledgements
-
-In addition to acknowledging the important contributions of a diverse
-team of Cybersecurity and Infrastructure Security Agency (CISA) experts,
-CISA thanks the following federal agencies and private sector
-organizations that provided input during the development of the Secure
-Cloud Business Application's security configuration baselines in
-response to Section 3 of [Executive Order 14028, *Improving the
-Nation's
-Cybersecurity*](https://www.federalregister.gov/documents/2021/05/17/2021-10460/improving-the-nations-cybersecurity):
-
-- The MITRE Corporation
-- Sandia National Laboratories (Sandia)
-
-The SCBs were informed by materials produced by the following organizations:
-
-- Center for Internet Security (CIS)
-- Internet Engineering Task Force (IETF)
-- Mandiant
-- Microsoft
-- U.S. Defense Information Systems Agency (DISA)
-- U.S. National Institute of Standards and Technology (NIST)
-- U.S. Office of Management and Budget (OMB)
-
-The cross-agency collaboration and partnerships developed during this initiative serve as an example for solving complex problems faced by the federal government. CISA also thanks the Cybersecurity Innovation Tiger Team (CITT) for its leadership and the following federal agencies that provided input during the development of the baselines:
-
-- Consumer Financial Protection Bureau (CFPB)
-- U.S. Department of the Interior (DOI)
-- National Aeronautics and Space Administration (NASA)
-- U.S. Office of Personnel Management (OPM)
-- U.S. Small Business Administration (SBA)
-- U.S. Census Bureau (USCB)
-- U.S. Geological Survey (USGS)
 
 **`TLP:CLEAR`**
