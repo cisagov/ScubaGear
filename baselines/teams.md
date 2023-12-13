@@ -7,7 +7,8 @@ The Secure Cloud Business Applications (SCuBA) project run by the Cybersecurity 
 
 The CISA SCuBA SCBs for M365 help secure federal information assets stored within M365 cloud business application environments through consistent, effective, and manageable security configurations. CISA created baselines tailored to the federal government's threats and risk tolerance with the knowledge that every organization has different threat models and risk tolerance. Non-governmental organizations may also find value in applying these baselines to reduce risks.
 
-The information in this document is provided "as is" for INFORMATIONAL PURPOSES ONLY. CISA does not endorse any commercial product or service, including any subjects of analysis. Any reference to specific commercial entities or commercial products, processes, or services by service mark, trademark, manufacturer, or otherwise does not constitute or imply endorsement, recommendation, or favoritism by CISA.
+The information in this document is provided "as is" for INFORMATIONAL PURPOSES ONLY. CISA does not endorse any commercial product or service, including any subjects of analysis. Any reference to specific commercial entities or commercial products, processes, or services by service mark, trademark, manufacturer, or otherwise does not constitute or imply endorsement, recommendation, or favoritism by CISA. This document does not address, ensure compliance with, or supersede any law, regulation, or other authority. Entities are responsible for complying with any recordkeeping, privacy, and other laws that may apply to the use of technology. This document is not intended to, and does not, create any right or benefit for anyone against the United States, its departments, agencies, or entities, its officers, employees, or agents, or any other person.
+
 
 > This document is marked TLP:CLEAR. Recipients may share this information without restriction. Information is subject to standard copyright rules. For more information on the Traffic Light Protocol, see https://www.cisa.gov/tlp.
 
@@ -132,7 +133,7 @@ Learn](https://learn.microsoft.com/en-us/microsoftteams/teams-live-events/live-e
 
 #### MS.TEAMS.1.1v1 Instructions
 
-To ensure external participants do not have the ability to request
+To help ensure external participants do not have the ability to request
 control of the shared desktop or window in the meeting:
 
 1.  Sign in to the **Microsoft Teams admin center**.
@@ -337,7 +338,7 @@ To enable external access for only specific domains:
 
 ## 3. Skype Users
 
-This section helps reduce security risks related to contact with Skype users. Microsoft is officially retiring Skype for Business Online and wants to ensure customers have the required information and resources to plan and execute a successful upgrade to Teams. Below are the decommissioning dates by product:
+This section helps reduce security risks related to contact with Skype users. Microsoft is officially retiring Skype for Business Online and wants to give customers information and resources to plan and execute a successful upgrade to Teams. Below are the decommissioning dates by product:
 
 - Skype for Business Online: July 31, 2021
 - Skype for Business 2015: April 11, 2023
@@ -439,7 +440,7 @@ Agencies SHOULD only allow installation of Microsoft apps approved by the agency
 Agencies SHOULD only allow installation of third-party apps approved by the agency.
 
 <!--Policy: MS.TEAMS.5.2v1; Criticality: SHOULD -->
-- _Rationale:_ Allowing Teams integration with third-party apps can expose the agency to potential vulnerabilities present in an app not managed by the agency. By only allowing specific apps approved by the agency and blocking all others, the agency will limit its exposure to third-party app vulnerabilities.
+- _Rationale:_ Allowing Teams integration with third-party apps can expose the agency to potential vulnerabilities present in an app not managed by the agency. By allowing only specific apps approved by the agency and blocking all others, the agency can limit its exposure to third-party app vulnerabilities.
 - _Last modified:_ July 2023
 - _Note:_ This policy applies to the Global (Org-wide default) policy, all custom policies if they exist, and the org-wide settings. Custom policies MAY be created to allow more flexibility for specific users. Third-party apps are not available in GCC, GCC High, or DoD regions.
 
@@ -447,7 +448,7 @@ Agencies SHOULD only allow installation of third-party apps approved by the agen
 Agencies SHOULD only allow installation of custom apps approved by the agency.
 
 <!--Policy: MS.TEAMS.5.3v1; Criticality: SHOULD -->
-- _Rationale:_ Allowing custom apps integration can expose the agency to potential vulnerabilities present in an app not managed by the agency. By only allowing specific apps approved by the agency and blocking all others, the agency will limit its exposure to custom app vulnerabilities.
+- _Rationale:_ Allowing custom apps integration can expose the agency to potential vulnerabilities present in an app not managed by the agency. By allowing only specific apps approved by the agency and blocking all others, the agency can limit its exposure to custom app vulnerabilities.
 - _Last modified:_ July 2023
 - _Note:_ This policy applies to the Global (Org-wide default) policy, all custom policies if they exist, and the org-wide settings. Custom policies MAY be created to allow more flexibility for specific users. Custom apps are not available in GCC, GCC High, or DoD regions.
 
@@ -668,7 +669,7 @@ If the agency uses Microsoft Defender to meet this baseline policy group, see th
 URL comparison with a blocklist SHOULD be enabled.
 
 <!--Policy: MS.TEAMS.8.1v1; Criticality: SHOULD -->
-- _Rationale:_ Users may be directed to malicious websites via links in Teams. Blocking access to known malicious URLs can prevent users from accessing known malicious websites.
+- _Rationale:_ Users may be directed to malicious websites via links in Teams. Blocking access to known malicious URLs can help prevent users from accessing known malicious websites.
 - _Last modified:_ July 2023
 
 #### MS.TEAMS.8.2v1
@@ -699,40 +700,6 @@ Any product meeting the requirements outlined in this baseline policy may be use
 
 Any product meeting the requirements outlined in this baseline policy may be used. If the agency uses Microsoft Defender, see the following implementation steps for [standard or strict preset security policy](defender.md#msdefender13v1-instructions) for additional guidance.
 
-# Acknowledgements
-
-In addition to acknowledging the important contributions of a diverse
-team of Cybersecurity and Infrastructure Security Agency (CISA) experts,
-CISA thanks the following federal agencies and private sector
-organizations that provided input during the development of the Secure
-Cloud Business Application's security configuration baselines in
-response to Section 3 of [Executive Order 14028, *Improving the
-Nation's
-Cybersecurity*](https://www.federalregister.gov/documents/2021/05/17/2021-10460/improving-the-nations-cybersecurity):
-
-- The MITRE Corporation
-- Sandia National Laboratories (Sandia)
-
-The SCBs were informed by materials produced by the following organizations: 
-
-
-- Center for Internet Security (CIS)
-- Internet Engineering Task Force (IETF)
-- Mandiant
-- Microsoft
-- U.S. Defense Information Systems Agency (DISA)
-- U.S. National Institute of Standards (NIST)
-- U.S. Office of Management and Budget (OMB)
-
-The cross-agency collaboration and partnerships developed during this initiative serve as an example for solving complex problems faced by the federal government. CISA also thanks the Cybersecurity Innovation Tiger Team (CITT) for its leadership and the following federal agencies that provided input during the development of the baselines:
-
-- Consumer Financial Protection Bureau (CFPB)
-- Department of the Interior (DOI)
-- National Aeronautics and Space Administration (NASA)
-- U.S. Office of Personnel Management (OPM)
-- U.S. Small Business Administration (SBA)
-- U.S. Census Bureau (USCB)
-- U.S. Geological Survey (USGS)
 
 [^1]: Note that B2B guest users and all anonymous users except for
     external users appear in Teams calls as _John Doe (Guest)_. To avoid
