@@ -1,6 +1,25 @@
-package exo
+package exo_test
 import future.keywords
+import data.exo
 import data.report.utils.DefenderMirrorDetails
+
+
+CorrectTestResult(PolicyId, Output, ReportDetailString) := true if {
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet == true
+    RuleOutput[0].ReportDetails == ReportDetailString
+} else := false
+
+IncorrectTestResult(PolicyId, Output, ReportDetailString) := true if {
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet == false
+    RuleOutput[0].ReportDetails == ReportDetailString
+} else := false
+
 
 #
 # Policy 1
@@ -8,26 +27,22 @@ import data.report.utils.DefenderMirrorDetails
 test_3rdParty_Correct_V1 if {
     PolicyId := "MS.EXO.16.1v1"
 
-    Output := tests with input as { }
+    Output := exo.tests with input as { }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == DefenderMirrorDetails(PolicyId)
+    ReportDetailString := DefenderMirrorDetails(PolicyId)
+    IncorrectTestResult(PolicyId, Output, ReportDetailString) == true
 }
+#--
 
 #
 # Policy 2
 #--
 test_3rdParty_Correct_V2 if {
-    PolicyId := "MS.EXO.16.1v1"
+    PolicyId := "MS.EXO.16.2v1"
 
-    Output := tests with input as { }
+    Output := exo.tests with input as { }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == DefenderMirrorDetails(PolicyId)
+    ReportDetailString := DefenderMirrorDetails(PolicyId)
+    IncorrectTestResult(PolicyId, Output, ReportDetailString) == true
 }
+#--

@@ -1,94 +1,95 @@
-package exo
+package exo_test
 import future.keywords
+import data.exo
+import data.report.utils.ReportDetailsBoolean
+
+
+CorrectTestResult(PolicyId, Output, ReportDetailString) := true if {
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet == true
+    RuleOutput[0].ReportDetails == ReportDetailString
+} else := false
+
+IncorrectTestResult(PolicyId, Output, ReportDetailString) := true if {
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet == false
+    RuleOutput[0].ReportDetails == ReportDetailString
+} else := false
+
+PASS := ReportDetailsBoolean(true)
 
 
 #
 # Policy 1
 #--
 test_AutoForwardEnabled_Correct if {
-    PolicyId := "MS.EXO.1.1v1"
-
-    Output := tests with input as {
+    Output := exo.tests with input as {
         "remote_domains": [
             {
-                "AutoForwardEnabled" : false,
-                "DomainName" : "Test name"
+                "AutoForwardEnabled": false,
+                "DomainName": "Test name"
             }
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement met"
+    CorrectTestResult("MS.EXO.1.1v1", Output, PASS) == true
 }
 
 test_AutoForwardEnabled_Incorrect_V1 if {
-    PolicyId := "MS.EXO.1.1v1"
-
-    Output := tests with input as {
+    Output := exo.tests with input as {
         "remote_domains": [
             {
-                "AutoForwardEnabled" : true,
-                "DomainName" : "Test name"
+                "AutoForwardEnabled": true,
+                "DomainName": "Test name"
             }
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "1 remote domain(s) that allows automatic forwarding: Test name"
+    ReportDetailString := "1 remote domain(s) that allows automatic forwarding: Test name"
+    IncorrectTestResult("MS.EXO.1.1v1", Output, ReportDetailString) == true
 }
 
 test_AutoForwardEnabled_Incorrect_V2 if {
-    PolicyId := "MS.EXO.1.1v1"
-
-    Output := tests with input as {
+    Output := exo.tests with input as {
         "remote_domains": [
             {
-                "AutoForwardEnabled" : true,
-                "DomainName" : "Test name"
+                "AutoForwardEnabled": true,
+                "DomainName": "Test name"
             },
             {
-                "AutoForwardEnabled" : true,
-                "DomainName" : "Test name 2"
+                "AutoForwardEnabled": true,
+                "DomainName": "Test name 2"
             }
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "2 remote domain(s) that allows automatic forwarding: Test name, Test name 2"
+    ReportDetailString := "2 remote domain(s) that allows automatic forwarding: Test name, Test name 2"
+    IncorrectTestResult("MS.EXO.1.1v1", Output, ReportDetailString) == true
 }
 
 test_AutoForwardEnabled_Incorrect_V3 if {
-    PolicyId := "MS.EXO.1.1v1"
-
-    Output := tests with input as {
+    Output := exo.tests with input as {
         "remote_domains": [
             {
-                "AutoForwardEnabled" : true,
-                "DomainName" : "Test name"
+                "AutoForwardEnabled": true,
+                "DomainName": "Test name"
             },
             {
-                "AutoForwardEnabled" : true,
-                "DomainName" : "Test name 2"
+                "AutoForwardEnabled": true,
+                "DomainName": "Test name 2"
             },
             {
-                "AutoForwardEnabled" : false,
-                "DomainName" : "Test name 3"
+                "AutoForwardEnabled": false,
+                "DomainName": "Test name 3"
             }
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "2 remote domain(s) that allows automatic forwarding: Test name, Test name 2"
+    ReportDetailString := "2 remote domain(s) that allows automatic forwarding: Test name, Test name 2"
+    IncorrectTestResult("MS.EXO.1.1v1", Output, ReportDetailString) == true
 }
+#--
