@@ -1,7 +1,29 @@
-package sharepoint
+package sharepoint_test
 import future.keywords
+import data.sharepoint
+import data.report.utils.ReportDetailsBoolean
 import data.report.utils.NotCheckedDetails
 
+
+CorrectTestResult(PolicyId, Output, ReportDetailString) := true if {
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet == true
+    RuleOutput[0].ReportDetails == ReportDetailString
+} else := false
+
+IncorrectTestResult(PolicyId, Output, ReportDetailString) := true if {
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet == false
+    RuleOutput[0].ReportDetails == ReportDetailString
+} else := false
+
+FAIL := ReportDetailsBoolean(false)
+
+PASS := ReportDetailsBoolean(true)
 
 #
 # MS.SHAREPOINT.4.1v1
@@ -9,13 +31,9 @@ import data.report.utils.NotCheckedDetails
 test_NotImplemented_Correct if {
     PolicyId := "MS.SHAREPOINT.4.1v1"
 
-    Output := tests with input as { }
+    Output := sharepoint.tests with input as { }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == NotCheckedDetails(PolicyId)
+    IncorrectTestResult(PolicyId, Output, NotCheckedDetails(PolicyId)) == true
 }
 #--
 
@@ -23,38 +41,26 @@ test_NotImplemented_Correct if {
 # MS.SHAREPOINT.4.2v1
 #--
 test_DenyAddAndCustomizePages_Correct if {
-    PolicyId := "MS.SHAREPOINT.4.2v1"
-
-    Output := tests with input as {
+    Output := sharepoint.tests with input as {
         "SPO_site": [
             {
-                "DenyAddAndCustomizePages" : 2
+                "DenyAddAndCustomizePages": 2
             }
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement met"
+    CorrectTestResult("MS.SHAREPOINT.4.2v1", Output, PASS) == true
 }
 
 test_DenyAddAndCustomizePages_Incorrect if {
-    PolicyId := "MS.SHAREPOINT.4.2v1"
-
-    Output := tests with input as {
+    Output := sharepoint.tests with input as {
         "SPO_site": [
             {
-                "DenyAddAndCustomizePages" : 1
+                "DenyAddAndCustomizePages": 1
             }
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement not met"
+    IncorrectTestResult("MS.SHAREPOINT.4.2v1", Output, FAIL) == true
 }
 #--

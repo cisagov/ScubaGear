@@ -24,7 +24,7 @@ rules:
         - pattern: "^[A-Z]+[a-zA-Z0-9_]+$"
           targets:
             - function
-        - pattern: '^[a-z\.]+$'
+        - pattern: '^[a-z\.]+$|^[a-z\.]+_test$'
           targets:
             - package
   idiomatic:
@@ -85,7 +85,7 @@ rules:
     rule-length:
       level: warning
       max-rule-length: 30
-      count-comments: false      
+      count-comments: false
     # https://docs.styra.com/regal/rules/style/todo-comment
     todo-comment:
       level: ignore
