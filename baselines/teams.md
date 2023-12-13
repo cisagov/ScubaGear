@@ -338,7 +338,7 @@ To enable external access for only specific domains:
 
 ## 3. Skype Users
 
-This section helps reduce security risks related to contact with Skype users. Microsoft is officially retiring Skype for Business Online and wants to give  customers information and resources to plan and execute a successful upgrade to Teams. Below are the decommissioning dates by product:
+This section helps reduce security risks related to contact with Skype users. Microsoft is officially retiring Skype for Business Online and wants to give customers information and resources to plan and execute a successful upgrade to Teams. Below are the decommissioning dates by product:
 
 - Skype for Business Online: July 31, 2021
 - Skype for Business 2015: April 11, 2023
