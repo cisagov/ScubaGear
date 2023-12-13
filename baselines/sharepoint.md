@@ -5,9 +5,9 @@ Microsoft 365 (M365) SharePoint Online is a web-based collaboration and document
 
 The Secure Cloud Business Applications (SCuBA) project run by the Cybersecurity and Infrastructure Security Agency (CISA) provides guidance and capabilities to secure federal civilian executive branch (FCEB) agencies’ cloud business application environments and protect federal information that is created, accessed, shared, and stored in those environments.
 
-The CISA SCuBA SCBs for M365 secure federal information assets stored within M365 cloud business application environments through consistent, effective, and manageable security configurations. CISA created baselines tailored to the federal government’s threats and risk tolerance with the knowledge that every organization has different threat models and risk tolerance. Non-governmental organizations may also find value in applying these baselines to reduce risks.
+The CISA SCuBA SCBs for M365 help secure federal information assets stored within M365 cloud business application environments through consistent, effective, and manageable security configurations. CISA created baselines tailored to the federal government's threats and risk tolerance with the knowledge that every organization has different threat models and risk tolerance. Non-governmental organizations may also find value in applying these baselines to reduce risks.
 
-The information in this document is being provided “as is” for INFORMATIONAL PURPOSES ONLY. CISA does not endorse any commercial product or service, including any subjects of analysis. Any reference to specific commercial entities or commercial products, processes, or services by service mark, trademark, manufacturer, or otherwise does not constitute or imply endorsement, recommendation, or favoritism by CISA.
+The information in this document is provided "as is" for INFORMATIONAL PURPOSES ONLY. CISA does not endorse any commercial product or service, including any subjects of analysis. Any reference to specific commercial entities or commercial products, processes, or services by service mark, trademark, manufacturer, or otherwise, does not constitute or imply endorsement, recommendation, or favoritism by CISA. This document does not address, ensure compliance with, or supersede any law, regulation, or other authority. Entities are responsible for complying with any recordkeeping, privacy, and other laws that may apply to the use of technology. This document is not intended to, and does not, create any right or benefit for anyone against the United States, its departments, agencies, or entities, its officers, employees, or agents, or any other person.
 
 > This document is marked TLP:CLEAR. Recipients may share this information without restriction. Information is subject to standard copyright rules. For more information on the Traffic Light Protocol, see https://www.cisa.gov/tlp.
 
@@ -47,7 +47,7 @@ External sharing for OneDrive SHALL be limited to Existing guests or Only People
 External sharing SHALL be restricted to approved external domains and/or users in approved security groups per interagency collaboration needs.
 
 <!--Policy: MS.SHAREPOINT.1.3v1; Criticality: SHALL -->
-- _Rationale:_ By limiting sharing to domains or approved security groups used for interagency collaboration purposes, administrators prevent sharing with unknown organizations and individuals.
+- _Rationale:_ By limiting sharing to domains or approved security groups used for interagency collaboration purposes, administrators help prevent sharing with unknown organizations and individuals.
 - _Last modified:_ June 2023
 - _Note:_ This policy is only applicable if the external sharing slider on the admin page is set to any value other than **Only People in your organization**.
 
@@ -55,7 +55,7 @@ External sharing SHALL be restricted to approved external domains and/or users i
 Guest access SHALL be limited to the email the invitation was sent to.
 
 <!--Policy: MS.SHAREPOINT.1.4v1; Criticality: SHALL -->
-- _Rationale:_ Email invitations allow external guests to access shared information. By requiring guests to sign in using the same account where the invite was sent, administrators ensure only the intended guest can use the invite.
+- _Rationale:_ Email invitations allow external guests to access shared information. By requiring guests to sign in using the same account where the invite was sent, administrators help ensure only the intended guest can use the invite.
 - _Last modified:_ June 2023
 - _Note:_ This policy is only applicable if the external sharing slider on the admin page is set to any value other than **Only People in your organization**.
 
@@ -323,38 +323,3 @@ Users SHALL be prevented from running custom scripts on self-service created sit
 5.  Select **Prevent users from running custom script on self-service created sites**.
 
 6.  Select **OK**.
-
-
-# Acknowledgements
-
-In addition to acknowledging the important contributions of a diverse
-team of Cybersecurity and Infrastructure Security Agency (CISA) experts,
-CISA thanks the following federal agencies and private sector
-organizations that provided input during the development of the Secure
-Cloud Business Application’s security configuration baselines in
-response to Section 3 of [Executive Order 14028, *Improving the
-Nation’s
-Cybersecurity*](https://www.federalregister.gov/documents/2021/05/17/2021-10460/improving-the-nations-cybersecurity):
-
-- The MITRE Corporation
-- Sandia National Laboratories (Sandia)
-
-The SCBs were informed by materials produced by the following organizations:
-
-- Center for Internet Security (CIS)
-- Internet Engineering Task Force (IETF)
-- Mandiant
-- Microsoft
-- U.S. Defense Information Systems Agency (DISA)
-- U.S. National Institute of Standards and Technology (NIST)
-- U.S. Office of Management and Budget (OMB)
-
-The cross-agency collaboration and partnerships developed during this initiative serve as an example for solving complex problems faced by the federal government. CISA also thanks the Cybersecurity Innovation Tiger Team (CITT) for its leadership and the following federal agencies that provided input during the development of the baselines:
-
-- Consumer Financial Protection Bureau (CFPB)
-- U.S. Department of the Interior (DOI)
-- National Aeronautics and Space Administration (NASA)
-- U.S. Office of Personnel Management (OPM)
-- U.S. Small Business Administration (SBA)
-- U.S. Census Bureau (USCB)
-- U.S. Geological Survey (USGS)
