@@ -123,7 +123,7 @@ The ability to create trial environments SHALL be restricted to admins.
     **Only specific admins.**
 
 #### MS.POWERPLATFORM.1.2v1 Instructions
-1.  Follow the instructions the MS.POWERPLATFORM.1.1v1 instructions up to step **3**.
+1.  Follow the MS.POWERPLATFORM.1.1v1 instructions up to step **3**.
 
 2.  Under **Who can create trial environments**, select **Only specific admins.**
 
