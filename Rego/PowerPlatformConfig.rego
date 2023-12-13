@@ -1,16 +1,10 @@
 package powerplatform
 import future.keywords
 import data.utils.report.NotCheckedDetails
-import data.utils.report.FormatArray
-import data.utils.report.ReportDetailsBoolean
-import data.utils.report.Description
 import data.utils.report.ReportDetailsString
-
-ReportDetailsArray(true, _, _) := ReportDetailsBoolean(true) if {}
-
-ReportDetailsArray(false, Array, String) := Description([FormatArray(Array), String, concat(", ", Array)]) if {}
-
-FilterArray(Conditions, Boolean) := [Condition | some Condition in Conditions; Condition == Boolean]
+import data.utils.report.ReportDetailsBoolean
+import data.utils.policy.ReportDetailsArray
+import data.utils.policy.FilterArray
 
 
 ######################

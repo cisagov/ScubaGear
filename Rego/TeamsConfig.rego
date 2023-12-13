@@ -1,15 +1,10 @@
 package teams
 import future.keywords
-import data.utils.report.FormatArray
 import data.utils.report.ReportDetailsBoolean
-import data.utils.report.Description
 import data.utils.report.DefenderMirrorDetails
+import data.utils.policy.ReportDetailsArray
+import data.utils.policy.FilterArray
 
-ReportDetailsArray(true, _, _) := PASS if {}
-
-ReportDetailsArray(false, Array, String) := Description([FormatArray(Array), String, concat(", ", Array)]) if {}
-
-FilterArray(Conditions, Boolean) := [Condition | some Condition in Conditions; Condition == Boolean]
 
 #############
 # Constants #

@@ -3,6 +3,8 @@ import future.keywords
 import data.utils.report.NotCheckedDetails
 import data.utils.report.ReportDetailsBoolean
 import data.utils.report.ReportDetailsString
+import data.utils.policy.FilterArray
+
 
 #############
 # Constants #
@@ -21,7 +23,6 @@ NEWANDEXISTINGGUESTS := 1
 
 ANYONE := 2
 
-FilterArray(Conditions, Boolean) := [Condition | some Condition in Conditions; Condition == Boolean]
 
 ###################
 # MS.SHAREPOINT.1 #
