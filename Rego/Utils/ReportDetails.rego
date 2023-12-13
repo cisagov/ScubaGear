@@ -22,7 +22,10 @@ PolicyProduct(PolicyId) := Product if {
     Product := lower(substring(PolicyId, 3, (DotIndexes[1] - DotIndexes[0]) - 1))
 }
 
-PolicyLink(PolicyId) := sprintf("<a href=\"%v%v.md%v\" target=\"_blank\">Secure Configuration Baseline policy</a>", [SCUBABASEURL, PolicyProduct(PolicyId), PolicyAnchor(PolicyId)])
+PolicyLink(PolicyId) := sprintf(
+    "<a href=\"%v%v.md%v\" target=\"_blank\">Secure Configuration Baseline policy</a>",
+    [SCUBABASEURL, PolicyProduct(PolicyId), PolicyAnchor(PolicyId)]
+)
 
 ###############################
 # Generic Reporting Functions #
@@ -42,7 +45,8 @@ DefenderMirrorDetails(PolicyId) := Details if {
         "See %v for instructions on manual check.",
         "If you are using Defender for Office 365 to implement this policy,",
         "ensure that when running ScubaGear defender is in the ProductNames parameter.",
-        "Then, review the corresponding Defender for Office 365 policy that fulfills the requirements of this EXO policy."
+        "Then, review the corresponding Defender for Office 365 policy that fulfills",
+        "the requirements of this EXO policy."
     ]
 
     Details := sprintf(concat(" ", String), [Link])

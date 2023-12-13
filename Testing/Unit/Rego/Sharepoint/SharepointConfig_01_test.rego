@@ -158,7 +158,11 @@ test_SharingDomainRestrictionMode_Correct_V2 if {
         ]
     }
 
-    ReportDetailString := "Requirement met: Note that we currently only check for approved external domains. Approved security groups are currently not being checked, see the baseline policy for instructions on a manual check."
+    ReportDetailString := concat(" ", [
+        "Requirement met: Note that we currently only check for approved external domains.",
+        "Approved security groups are currently not being checked,",
+        "see the baseline policy for instructions on a manual check."
+    ])
     CorrectTestResult("MS.SHAREPOINT.1.3v1", Output, ReportDetailString) == true
 }
 
@@ -172,7 +176,11 @@ test_SharingDomainRestrictionMode_Incorrect if {
         ]
     }
 
-    ReportDetailString :="Requirement not met: Note that we currently only check for approved external domains. Approved security groups are currently not being checked, see the baseline policy for instructions on a manual check."
+    ReportDetailString := concat(" ", [
+        "Requirement not met: Note that we currently only check for approved external domains.",
+        "Approved security groups are currently not being checked,",
+        "see the baseline policy for instructions on a manual check."
+    ])
     IncorrectTestResult("MS.SHAREPOINT.1.3v1", Output, ReportDetailString) == true
 }
 #--
