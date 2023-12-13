@@ -90,7 +90,7 @@ rules:
     rule-length:
       level: warning
       max-rule-length: 30
-      count-comments: false      
+      count-comments: false
     # https://docs.styra.com/regal/rules/style/todo-comment
     todo-comment:
       level: ignore
