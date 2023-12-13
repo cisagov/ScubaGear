@@ -1,47 +1,58 @@
-package defender
+package defender_test
 import future.keywords
+import data.defender
+import data.report.utils.ReportDetailsBoolean
+
+
+CorrectTestResult(PolicyId, Output, ReportDetailString) := true if {
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet == true
+    RuleOutput[0].ReportDetails == ReportDetailString
+} else := false
+
+IncorrectTestResult(PolicyId, Output, ReportDetailString) := true if {
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet == false
+    RuleOutput[0].ReportDetails == ReportDetailString
+} else := false
+
+FAIL := ReportDetailsBoolean(false)
+
+PASS := ReportDetailsBoolean(true)
+
 
 #
 # Policy 1
 #--
-# test_Spot_Correct if {
-#     ControlNumber := "Defender 2.8"
-#     Requirement := "Safe attachments SHOULD be enabled for SharePoint, OneDrive, and Microsoft Teams"
+test_Spot_Correct if {
+    Output := defender.tests with input as {
+        "atp_policy_for_o365": [
+            {
+                "EnableATPForSPOTeamsODB": true,
+                "Identity": "Default"
+            }
+        ],
+        "defender_license": true
+    }
 
-#     Output := tests with input as {
-#         "atp_policy_for_o365" : [
-#             {
-#                 "EnableATPForSPOTeamsODB" : true,
-#                 "Identity" : "Default"
-#             }
-#         ],
-#         "defender_license" : true
-#     }
+    CorrectTestResult("MS.DEFENDER.3.1v1", Output, PASS) == true
+}
 
-#     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
+test_Spot_Incorrect if {
+    Output := defender.tests with input as {
+        "atp_policy_for_o365": [
+            {
+                "EnableATPForSPOTeamsODB": false,
+                "Identity": "Default"
+            }
+        ],
+        "defender_license": true
+    }
 
-#     count(RuleOutput) == 1
-#     RuleOutput[0].RequirementMet
-#     RuleOutput[0].ReportDetails == "Requirement met"
-# }
-
-# test_Spot_Incorrect if {
-#     ControlNumber := "Defender 2.8"
-#     Requirement := "Safe attachments SHOULD be enabled for SharePoint, OneDrive, and Microsoft Teams"
-
-#     Output := tests with input as {
-#         "atp_policy_for_o365" : [
-#             {
-#                 "EnableATPForSPOTeamsODB" : false,
-#                 "Identity" : "Default"
-#             }
-#         ],
-#         "defender_license" : true
-#     }
-
-#     RuleOutput := [Result | Result = Output[_]; Result.Control == ControlNumber; Result.Requirement == Requirement]
-
-#     count(RuleOutput) == 1
-#     not RuleOutput[0].RequirementMet
-#     RuleOutput[0].ReportDetails == "Requirement not met"
-# }
+    IncorrectTestResult("MS.DEFENDER.3.1v1", Output, FAIL) == true
+}
+#--
