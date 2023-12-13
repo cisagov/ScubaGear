@@ -13,11 +13,10 @@ M365 Defender and Microsoft Purview compliance portal
 items are contained in this baseline.
 
 Generally, use of Microsoft Defender is not required by the baselines of
-the core M365 products (Exchange Online, Teams, etc.). However, some of
-the controls in the core baselines require the use of a dedicated
-security tool, such as Defender. This baseline does not require use of
-Defender. Rather, it serves as a guide should an agency elect to use
-Defender as their tool of choice.
+the core M365 products (Exchange Online, Teams, etc.). This baseline serves as
+a guide should an agency elect to use Defender as their tool of choice. Please
+note that some of the controls in the core baselines require the use of a
+dedicated security tool, such as Defender.
 
 In addition to these controls, agencies should consider using a cloud
 access security broker to secure their environments as they adopt zero
@@ -41,7 +40,7 @@ ONLY. CISA does not endorse any commercial product or service, including any
 subjects of analysis. Any reference to specific commercial entities or commercial
 products, processes, or services by service mark, trademark, manufacturer, or
 otherwise does not constitute or imply endorsement, recommendation, or favoritism
-by CISA.
+by CISA. This document does not address, ensure compliance with, or supersede any law, regulation, or other authority. Entities are responsible for complying with any recordkeeping, privacy, and other laws that may apply to the use of technology. This document is not intended to, and does not, create any right or benefit for anyone against the United States, its departments, agencies, or entities, its officers, employees, or agents, or any other person.
 
 > This document is marked TLP:CLEAR. Recipients may share this information without restriction. Information is subject to standard copyright rules. For more information on the Traffic Light Protocol, see https://www.cisa.gov/tlp.
 
@@ -49,7 +48,7 @@ by CISA.
 Portions of this document are adapted from documents in Microsoft's [M365](https://github.com/MicrosoftDocs/microsoft-365-docs/blob/public/LICENSE) and [Azure](https://github.com/MicrosoftDocs/azure-docs/blob/main/LICENSE) GitHub repositories. The respective documents are subject to copyright and are adapted under the terms of the Creative Commons Attribution 4.0 International license. Sources are linked throughout this document. The United States government has adapted selections of these documents to develop innovative and scalable configuration standards to strengthen the security of widely used cloud-based software services.
 
 ## Assumptions
-The agency has identified a set of user accounts that are considered sensitive accounts.  See [Key Terminology](#key-terminology) for a detailed description of sensitive accounts.
+The agency has identified a set of user accounts that are considered sensitive accounts. See [Key Terminology](#key-terminology) for a detailed description of sensitive accounts.
 
 The **License Requirements** sections of this document assume the organization is using an [M365 E3](https://www.microsoft.com/en-us/microsoft-365/compare-microsoft-365-enterprise-plans) or [G3](https://www.microsoft.com/en-us/microsoft-365/government) license level at a minimum. Therefore, only licenses not included in E3/G3 are listed.
 
@@ -77,28 +76,30 @@ Within the standard and strict preset policies, users can be enrolled in [Exchan
 The standard and strict preset security policies SHALL be enabled.
 
 <!--Policy: MS.DEFENDER.1.1v1; Criticality: SHALL -->
-- _Rationale:_ Defender includes a large number of features and settings to protect users against threats. Using the preset security policies, administrators can easily ensure all new and existing users automatically have secure defaults applied.
+- _Rationale:_ Defender includes a large number of features and settings to protect users against threats. Using the preset security policies, administrators can help ensure all new and existing users automatically have secure defaults applied.
 - _Last modified:_ June 2023
 
 #### MS.DEFENDER.1.2v1
 All users SHALL be added to Exchange Online Protection in either the standard or strict preset security policy.
 
 <!--Policy: MS.DEFENDER.1.2v1; Criticality: SHALL -->
-- _Rationale:_ Important user protections are provided by EOP, including anti-spam, anti-malware, and anti-phishing protections. By using the preset policies, administrators can easily ensure all new and existing users have secure defaults applied automatically.
+- _Rationale:_ Important user protections are provided by EOP, including anti-spam, anti-malware, and anti-phishing protections. By using the preset policies, administrators can help ensure all new and existing users have secure defaults applied automatically.
 - _Last modified:_ June 2023
 - _Note:_
+  - The standard and strict preset security policies must be enabled as directed
+    by [MS.DEFENDER.1.1v1](#msdefender11v1) for protections to be applied.
   - Specific user accounts, except for sensitive accounts, MAY be exempt from the preset policies, provided they are added to one or more custom policies offering comparable protection. These users might need flexibility not offered by the preset policies. Their accounts should be added to a custom policy conforming, as closely as possible to the settings used by the preset policies. See the **Resources** section for more details on configuring policies.
-  - The standard and strict preset security policies must be enabled to protect users.
 
 #### MS.DEFENDER.1.3v1
 All users SHALL be added to Defender for Office 365 protection in either the standard or strict preset security policy.
 
 <!--Policy: MS.DEFENDER.1.3v1; Criticality: SHALL -->
-- _Rationale:_ Important user protections are provided by Defender for Office 365 protection, including safe attachments and safe links. By using the preset policies, administrators can easily ensure all new and existing users have secure defaults applied automatically.
+- _Rationale:_ Important user protections are provided by Defender for Office 365 protection, including safe attachments and safe links. By using the preset policies, administrators can help ensure all new and existing users have secure defaults applied automatically.
 - _Last modified:_ June 2023
 - _Note:_
+  - The standard and strict preset security policies must be enabled as directed
+    by [MS.DEFENDER.1.1v1](#msdefender11v1) for protections to be applied.
   - Specific user accounts, except for sensitive accounts, MAY be exempt from the preset policies, provided they are added to one or more custom policies offering comparable protection. These users might need flexibility not offered by the preset policies. Their accounts should be added to a custom policy conforming as closely as possible to the settings used by the preset policies. See the **Resources** section for more details on configuring policies.
-  - The standard and strict preset security policies must be enabled to protect users.
 
 #### MS.DEFENDER.1.4v1
 Sensitive accounts SHALL be added to Exchange Online Protection in the strict preset security policy.
@@ -107,7 +108,7 @@ Sensitive accounts SHALL be added to Exchange Online Protection in the strict pr
 - _Rationale:_ Unauthorized access to a sensitive account may result in greater harm than a standard user account. Adding sensitive accounts to the strict preset security policy, with its increased protections, better mitigates their elevated risk to email threats.
 - _Last modified:_ June 2023
 - _Note:_ The strict preset security policy must be enabled to protect
-          accounts.
+          sensitive accounts.
 
 #### MS.DEFENDER.1.5v1
 Sensitive accounts SHALL be added to Defender for Office 365 protection in the strict preset security policy.
@@ -116,7 +117,7 @@ Sensitive accounts SHALL be added to Defender for Office 365 protection in the s
 - _Rationale:_ Unauthorized access to a sensitive account may result in greater harm than to a standard user account. Adding sensitive accounts to the strict preset security policy, with its increased protections, better mitigates their elevated risk.
 - _Last modified:_ June 2023
 - _Note:_ The strict preset security policy must be enabled to protect
-          accounts.
+          sensitive accounts.
 
 ### Resources
 
@@ -221,7 +222,7 @@ impersonation attempt, the email is quarantined.
 User impersonation protection SHOULD be enabled for sensitive accounts in both the standard and strict preset policies.
 
 <!--Policy: MS.DEFENDER.2.1v1; Criticality: SHOULD -->
-- _Rationale:_ User impersonation, especially of users with access to sensitive or high-value information and resources, has the potential to result in serious harm. Impersonation protection mitigates this risk. By configuring impersonation protection in both preset policies, administrators ensure all email recipients are protected from impersonated emails, regardless of whether they are added to the standard or strict policy.
+- _Rationale:_ User impersonation, especially of users with access to sensitive or high-value information and resources, has the potential to result in serious harm. Impersonation protection mitigates this risk. By configuring impersonation protection in both preset policies, administrators can help protect email recipients from impersonated emails, regardless of whether they are added to the standard or strict policy.
 - _Last modified:_ June 2023
 - _Note:_ The standard and strict preset security policies must be enabled to
           protect accounts.
@@ -230,7 +231,7 @@ User impersonation protection SHOULD be enabled for sensitive accounts in both t
 Domain impersonation protection SHOULD be enabled for domains owned by the agency in both the standard and strict preset policies.
 
 <!--Policy: MS.DEFENDER.2.2v1; Criticality: SHOULD -->
-- _Rationale:_ Configuring domain impersonation protection for all agency domains reduces the risk of a user being deceived by a look-alike domain. By configuring impersonation protection in both preset policies, administrators ensure all email recipients are protected from impersonated emails, regardless of whether they are added to the standard or strict policy.
+- _Rationale:_ Configuring domain impersonation protection for all agency domains reduces the risk of a user being deceived by a look-alike domain. By configuring impersonation protection in both preset policies, administrators can help protect email recipients from impersonated emails, regardless of whether they are added to the standard or strict policy.
 - _Last modified:_ June 2023
 - _Note:_ The standard and strict preset security policies must be enabled to
           protect agency domains.
@@ -239,7 +240,7 @@ Domain impersonation protection SHOULD be enabled for domains owned by the agenc
 Domain impersonation protection SHOULD be added for important partners in both the standard and strict preset policies.
 
 <!--Policy: MS.DEFENDER.2.3v1; Criticality: SHOULD -->
-- _Rationale:_ Configuring domain impersonation protection for domains owned by important partners reduces the risk of a user being deceived by a look-alike domain. By configuring impersonation protection in both preset policies, administrators ensure that all email recipients are protected from impersonated emails, regardless of whether they are added to the standard or strict policy.
+- _Rationale:_ Configuring domain impersonation protection for domains owned by important partners reduces the risk of a user being deceived by a look-alike domain. By configuring impersonation protection in both preset policies, administrators can help protect email recipients from impersonated emails, regardless of whether they are added to the standard or strict policy.
 - _Last modified:_ June 2023
 - _Note:_ The standard and strict preset security policies must be enabled to
           protect partner domains.
@@ -369,10 +370,10 @@ Learn](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-secur
 ## 4. Data Loss Prevention
 
 There are several approaches to securing sensitive information, such
-as warning users, encryption, or blocking attempts to share. The
-agency's data loss prevention (DLP) policy dictates what agency
-information is sensitive, such as personally identifiable information
-(PII), and how that information is handled. Defender can detect
+as warning users, encryption, or blocking attempts to share. Agency
+policies for sensitive information, such as personally identifiable
+information (PII), should dictate how that information is handled and
+inform associated data loss prevention (DLP) policies. Defender can detect
 sensitive information and associates a default confidence level with
 this detection based on the sensitive information type matched.
 Confidence levels are used to reduce false positives in detecting access
@@ -396,7 +397,7 @@ The custom policy SHOULD be applied to Exchange, OneDrive, SharePoint, Teams cha
 
 <!--Policy: MS.DEFENDER.4.2v1; Criticality: SHOULD -->
 - _Rationale:_ Unauthorized disclosures may happen through M365 services
-               or endpoint devices.  DLP policies should cover all
+               or endpoint devices. DLP policies should cover all
                affected locations to be effective.
 - _Last modified:_ June 2023
 - _Note:_ The custom policy referenced here is the same policy
@@ -548,18 +549,18 @@ information by restricted apps and unwanted Bluetooth applications.
 
 #### MS.DEFENDER.4.2v1 Instructions
 
-See [MS.DEFENDER.4.1v1 instructions](#msdefender41v1-instructions) step 8
+See [MS.DEFENDER.4.1v1 Instructions](#msdefender41v1-instructions) step 8
    for details on enforcing DLP policy in specific M365 service locations.
 
 #### MS.DEFENDER.4.3v1 Instructions
 
-See [MS.DEFENDER.4.1v1 instructions](#msdefender41v1-instructions) steps
+See [MS.DEFENDER.4.1v1 Instructions](#msdefender41v1-instructions) steps
    15-17 for details on configuring DLP policy to block sharing sensitive
    information with everyone.
 
 #### MS.DEFENDER.4.4v1 Instructions
 
-See [MS.DEFENDER.4.1v1 instructions](#msdefender41v1-instructions) steps
+See [MS.DEFENDER.4.1v1 Instructions](#msdefender41v1-instructions) steps
    18-19 for details on configuring DLP policy to notify users when accessing
    sensitive information.
 
@@ -598,7 +599,7 @@ before the instructions below can be completed.
 3. Select **Policies** from the top of the page.
 
 4. Find the custom DLP policy configured under
-   [MS.DEFENDER.4.1v1 instructions](#msdefender41v1-instructions) in the list
+   [MS.DEFENDER.4.1v1 Instructions](#msdefender41v1-instructions) in the list
    and click the Policy name to select.
 
 5. Select **Edit Policy**.
@@ -739,7 +740,7 @@ Microsoft Purview Audit (Premium) logging SHALL be enabled for ALL users.
 - _Note:_ At the time of this writing, Microsoft has announced upcoming changes
           to its Purview Audit service that include making audit events
           currently available in Purview Audit (Premium) available to Purview
-          Audit (Standard) subscribers.  After rollout of changes are complete,
+          Audit (Standard) subscribers. After rollout of changes are complete,
           Purview (Standard) may be sufficient for agencies to meet basic
           logging requirements.
 
@@ -813,39 +814,5 @@ Learn.](https://learn.microsoft.com/en-us/purview/audit-premium-setup?view=o365-
 To create one or more custom audit retention policies, if the default retention policy is not sufficient for agency needs, follow [Create an audit log retention policy](https://learn.microsoft.com/en-us/purview/audit-log-retention-policies?view=o365-worldwide#create-an-audit-log-retention-policy) instructions.
 Ensure the duration selected in the retention policies is at least one year,
 in accordance with OMB M-21-31.
-
-# Acknowledgements
-
-In addition to acknowledging the important contributions of a diverse
-team of Cybersecurity and Infrastructure Security Agency (CISA) experts,
-CISA thanks the following federal agencies and private sector
-organizations that provided input during the development of the Secure
-Cloud Business Application's security configuration baselines in
-response to Section 3 of [Executive Order 14028, *Improving the
-Nation's
-Cybersecurity*](https://www.federalregister.gov/documents/2021/05/17/2021-10460/improving-the-nations-cybersecurity):
-
-- The MITRE Corporation
-- Sandia National Laboratories (Sandia)
-
-The SCBs were informed by materials produced by the following organizations:
-
-- Center for Internet Security (CIS)
-- Internet Engineering Task Force (IETF)
-- Mandiant
-- Microsoft
-- U.S. Defense Information Systems Agency (DISA)
-- U.S. National Institute of Standards and Technology (NIST)
-- U.S. Office of Management and Budget (OMB)
-
-The cross-agency collaboration and partnerships developed during this initiative serve as an example for solving complex problems faced by the federal government. CISA also thanks the Cybersecurity Innovation Tiger Team (CITT) for its leadership and the following federal agencies that provided input during the development of the baselines:
-
-- Consumer Financial Protection Bureau (CFPB)
-- U.S. Department of the Interior (DOI)
-- National Aeronautics and Space Administration (NASA)
-- U.S. Office of Personnel Management (OPM)
-- U.S. Small Business Administration (SBA)
-- U.S. Census Bureau (USCB)
-- U.S. Geological Survey (USGS)
 
 **`TLP:CLEAR`**
