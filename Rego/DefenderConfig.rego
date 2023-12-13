@@ -26,11 +26,7 @@ GenerateArrayString(Array, CustomString) := Output if {
     Output := trim(concat(" ", [Length, concat(" ", [CustomString, ArrayString])]), " ")
 }
 
-CustomizeError(Message, _) := Message if {
-    # If the message reports success, don't apply the custom
-    # error message
-    Message == ReportDetailsBoolean(true)
-}
+CustomizeError(true, _) := PASS if {}
 
 CustomizeError(false, CustomString) := CustomString if {}
 
@@ -40,9 +36,9 @@ ApplyLicenseWarning(Status) := ReportDetailsBoolean(Status) if {
     input.defender_license == true
 }
 
-ApplyLicenseWarning(_) := concat("", [ReportDetailsBoolean(false), LicenseWarning]) if {
-    # If a defender license is not present, assume failure and
-    # replace the message with the warning
+# If a defender license is not present, assume failure and
+# replace the message with the warning
+ApplyLicenseWarning(_) := concat("", [FAIL, LicenseWarning]) if {
     input.defender_license == false
     LicenseWarning := " **NOTE: Either you do not have sufficient permissions or your tenant does not have a license for Microsoft Defender for Office 365 Plan 1, which is required for this feature.**"
 }
@@ -620,7 +616,7 @@ DefenderErrorMessage4_3(Rules) := GenerateArrayString(Rules, ErrorMessage) if {
 }
 
 DefenderErrorMessage4_3(_) := ErrorMessage if {
-    count(SensitiveInfoPolicies) == 0
+    count(PoliciesWithFullProtection) == 0
     ErrorMessage := "No DLP policy matching all types found for evaluation."
 }
 
@@ -665,7 +661,7 @@ DefenderErrorMessage4_4(Rules) := GenerateArrayString(Rules, ErrorMessage) if {
 }
 
 DefenderErrorMessage4_4(_) := ErrorMessage if {
-    count(SensitiveInfoPolicies) == 0
+    count(PoliciesWithFullProtection) == 0
     ErrorMessage := "No DLP policy matching all types found for evaluation."
 }
 
