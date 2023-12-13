@@ -290,8 +290,6 @@ function Import-SecureBaseline{
                             $Value = "Error - The baseline policy text is malformed. Description should start immediately after Policy Id."
                             Write-Error "Expected description for $Id to start on line $($LineNumber+$LineAdvance)"
                         }
-                        # Description italics substitution
-                        $Value = $Value -replace '(_)(.*?)(_)', '<i>${2}</i>'
 
                         # Processing multiline description.
                         # TODO: Improve processing GitHub issue #526
@@ -312,9 +310,11 @@ function Import-SecureBaseline{
                                 # List case, use newline character between value text
                                 if ($isList) {
                                     $Value += "`n" + ([string]$MdLines[$LineNumber+$LineAdvance]).Trim()
+                                    #Write-Host $LineAdvance + $Value -BackgroundColor Blue
                                 }
                                 else { # Value ending with newline char, use whitespace character between value text
                                     $Value += " " + ([string]$MdLines[$LineNumber+$LineAdvance]).Trim()
+                                    #Write-Host $LineAdvance + $Value -BackgroundColor Green
                                 }
                             }
 
@@ -323,6 +323,9 @@ function Import-SecureBaseline{
                                 break
                             }
                         }
+
+                        # Description italics substitution
+                        $Value = Resolve-HTMLMarkdown -OriginalString $Value -HTMLReplace "Italic"
 
                         $Group.Controls += @{"Id"=$Id; "Value"=$Value; "Deleted"=$Deleted; MalformedDescription=$IsMalformedDescription}
                     }
@@ -363,6 +366,28 @@ function New-MarkdownAnchor{
     else {
         $InvalidGroupNumber = New-Object System.ArgumentException "$GroupNumber is not valid"
         throw $InvalidGroupNumber
+    }
+}
+
+function Resolve-HTMLMarkdown{
+    param (
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $OriginalString,
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $HTMLReplace
+    )
+
+    # Replace markdown with italics substitution
+    # NOTE: This could eventually be a switch case function for other types of html subsitutions in markdown
+    if ($HTMLReplace.ToLower() -match "italic") {
+        $ResolvedString = $OriginalString -replace '(_)(.*?)(_)', '<i>${2}</i>'
+        return $ResolvedString
+    } else {
+        return $OriginalString
     }
 }
 
