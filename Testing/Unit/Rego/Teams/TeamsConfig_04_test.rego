@@ -1,14 +1,34 @@
-package teams
+package teams_test
 import future.keywords
+import data.teams
+import data.report.utils.ReportDetailsBoolean
 
 
-#--
+CorrectTestResult(PolicyId, Output, ReportDetailString) := true if {
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet == true
+    RuleOutput[0].ReportDetails == ReportDetailString
+} else := false
+
+IncorrectTestResult(PolicyId, Output, ReportDetailString) := true if {
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].RequirementMet == false
+    RuleOutput[0].ReportDetails == ReportDetailString
+} else := false
+
+FAIL := ReportDetailsBoolean(false)
+
+PASS := ReportDetailsBoolean(true)
+
+#
 # Policy MS.TEAMS.4.1v1
 #--
 test_AllowEmailIntoChannel_Correct_V1 if {
-    PolicyId := "MS.TEAMS.4.1v1"
-
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "client_configuration": [
             {
                 "Identity": "Global",
@@ -26,17 +46,11 @@ test_AllowEmailIntoChannel_Correct_V1 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement met"
+    CorrectTestResult("MS.TEAMS.4.1v1", Output, PASS) == true
 }
 
 test_AllowEmailIntoChannel_Correct_V1_multi if {
-    PolicyId := "MS.TEAMS.4.1v1"
-
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "client_configuration": [
             {
                 "Identity": "Global",
@@ -58,17 +72,11 @@ test_AllowEmailIntoChannel_Correct_V1_multi if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement met"
+    CorrectTestResult("MS.TEAMS.4.1v1", Output, PASS) == true
 }
 
 test_AllowEmailIntoChannel_Incorrect if {
-    PolicyId := "MS.TEAMS.4.1v1"
-
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "client_configuration": [
             {
                 "Identity": "Global",
@@ -86,17 +94,11 @@ test_AllowEmailIntoChannel_Incorrect if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement not met"
+    IncorrectTestResult("MS.TEAMS.4.1v1", Output, FAIL) == true
 }
 
 test_AllowEmailIntoChannel_Incorrect_multi if {
-    PolicyId := "MS.TEAMS.4.1v1"
-
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "client_configuration": [
             {
                 "Identity": "Global",
@@ -118,17 +120,11 @@ test_AllowEmailIntoChannel_Incorrect_multi if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "Requirement not met"
+    IncorrectTestResult("MS.TEAMS.4.1v1", Output, FAIL) == true
 }
 
 test_AllowEmailIntoChannel_Correct_V2 if {
-    PolicyId := "MS.TEAMS.4.1v1"
-
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "client_configuration": [
             {
                 "Identity": "Global",
@@ -146,17 +142,12 @@ test_AllowEmailIntoChannel_Correct_V2 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "N/A: Feature is unavailable in GCC environments"
+    ReportDetailString := "N/A: Feature is unavailable in GCC environments"
+    CorrectTestResult("MS.TEAMS.4.1v1", Output, ReportDetailString) == true
 }
 
 test_AllowEmailIntoChannel_Correct_V2_multi if {
-    PolicyId := "MS.TEAMS.4.1v1"
-
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "client_configuration": [
             {
                 "Identity": "Global",
@@ -178,17 +169,12 @@ test_AllowEmailIntoChannel_Correct_V2_multi if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "N/A: Feature is unavailable in GCC environments"
+    ReportDetailString := "N/A: Feature is unavailable in GCC environments"
+    CorrectTestResult("MS.TEAMS.4.1v1", Output, ReportDetailString) == true
 }
 
 test_AllowEmailIntoChannel_Correct_V3 if {
-    PolicyId := "MS.TEAMS.4.1v1"
-
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "client_configuration": [
             {
                 "Identity": "Global",
@@ -206,17 +192,12 @@ test_AllowEmailIntoChannel_Correct_V3 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "N/A: Feature is unavailable in GCC environments"
+    ReportDetailString := "N/A: Feature is unavailable in GCC environments"
+    CorrectTestResult("MS.TEAMS.4.1v1", Output, ReportDetailString) == true
 }
 
 test_AllowEmailIntoChannel_Correct_V3_multi if {
-    PolicyId := "MS.TEAMS.4.1v1"
-
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "client_configuration": [
             {
                 "Identity": "Global",
@@ -238,17 +219,12 @@ test_AllowEmailIntoChannel_Correct_V3_multi if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "N/A: Feature is unavailable in GCC environments"
+    ReportDetailString := "N/A: Feature is unavailable in GCC environments"
+    CorrectTestResult("MS.TEAMS.4.1v1", Output, ReportDetailString) == true
 }
 
 test_AllowEmailIntoChannel_Correct_V4 if {
-    PolicyId := "MS.TEAMS.4.1v1"
-
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "client_configuration": [
             {
                 "Identity": "Global",
@@ -270,17 +246,12 @@ test_AllowEmailIntoChannel_Correct_V4 if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "N/A: Feature is unavailable in GCC environments"
+    ReportDetailString := "N/A: Feature is unavailable in GCC environments"
+    CorrectTestResult("MS.TEAMS.4.1v1", Output, ReportDetailString) == true
 }
 
 test_AllowEmailIntoChannel_Correct_V4_multi if {
-    PolicyId := "MS.TEAMS.4.1v1"
-
-    Output := tests with input as {
+    Output := teams.tests with input as {
         "client_configuration": [
             {
                 "Identity": "Global",
@@ -302,9 +273,7 @@ test_AllowEmailIntoChannel_Correct_V4_multi if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "N/A: Feature is unavailable in GCC environments"
+    ReportDetailString := "N/A: Feature is unavailable in GCC environments"
+    CorrectTestResult("MS.TEAMS.4.1v1", Output, ReportDetailString) == true
 }
+#--
