@@ -36,7 +36,7 @@ jobs:
       run: |
         $thumbprint = Get-PfxCertificate -FilePath ./key.pfx -Password (ConvertTo-SecureString -String $env:PfxPassword -AsPlainText -Force)
         Write-Debug "The thumbprint is "
-        Write-Debug $thumbprint
+        Write-Output $thumbprint
       shell: pwsh
       env:
         PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
