@@ -4,10 +4,10 @@
 name: Nightly Product Functional Tests
 
 # Run this workflow at midnight 
-# on every Mon to Fri (b/c GMT -5)
+# on every Sun to Thr (b/c GMT -5)
 on:
   schedule:
-  - cron: '0 4 * * 1-5'
+  - cron: '0 4 * * 0-4'
   workflow_dispatch: 
   push:
 
@@ -36,7 +36,7 @@ jobs:
     - name: Setup for Scuba
       run: ./SetUp.ps1
     - name: Install Selenium
-      run: Install-Module -Name Selenium -RequiredVersion 3.0.1
+      run: Install-Module -Name Selenium
     - name: Update Selenium
       run: ./Testing/Functional/SmokeTest/UpdateSelenium.ps1
     - name: Test SharePoint
