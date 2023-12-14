@@ -36,28 +36,24 @@ PolicyLink(PolicyId) := sprintf(
 ###############################
 
 # Not Implemented Report Details methods
-NotCheckedDetails(PolicyId) := Details if {
-    Details := sprintf(
-        "Not currently checked automatically. See %v for instructions on manual check",
-        [PolicyLink(PolicyId)]
-    )
-}
+NotCheckedDetails(PolicyId) := Details := sprintf(
+    "Not currently checked automatically. See %v for instructions on manual check",
+    [PolicyLink(PolicyId)]
+)
 
 # 3rd Party Not Implemented Report Details method
-DefenderMirrorDetails(PolicyId) := Details if {
-    Details := sprintf(
-        concat(" ", [
-        "A custom product can be used to fulfill this policy requirement.",
-        "If custom product is used, a 3rd party assessment tool or manually review is needed to ensure compliance.",
-        "See %v for instructions on manual check.",
-        "If you are using Defender for Office 365 to implement this policy,",
-        "ensure that when running ScubaGear defender is in the ProductNames parameter.",
-        "Then, review the corresponding Defender for Office 365 policy that fulfills",
-        "the requirements of this policy."
-        ]),
-        [PolicyLink(PolicyId)]
-    )
-}
+DefenderMirrorDetails(PolicyId) := Details := sprintf(
+    concat(" ", [
+    "A custom product can be used to fulfill this policy requirement.",
+    "If custom product is used, a 3rd party assessment tool or manually review is needed to ensure compliance.",
+    "See %v for instructions on manual check.",
+    "If you are using Defender for Office 365 to implement this policy,",
+    "ensure that when running ScubaGear defender is in the ProductNames parameter.",
+    "Then, review the corresponding Defender for Office 365 policy that fulfills",
+    "the requirements of this policy."
+    ]),
+    [PolicyLink(PolicyId)]
+)
 
 # Reporting methods passed Status
 ReportDetailsBoolean(true) := "Requirement met"
