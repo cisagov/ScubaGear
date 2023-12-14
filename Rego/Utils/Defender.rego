@@ -1,8 +1,10 @@
 package utils.defender
 import future.keywords
 import data.utils.report.ReportDetailsBoolean
+import data.utils.report.Description
 import data.utils.policy.FAIL
 import data.utils.policy.PASS
+import data.utils.policy.ConvertToSet
 
 ##########################################
 # User/Group Exclusion support functions #
@@ -44,13 +46,17 @@ SensitiveAccountsSetting(Policies) := {
     "ExcludedDomains": ExcludedDomains,
     "Policy": Policy
 } if {
-    Policy := [Policy | some Policy in Policies; Policy.Identity == "Strict Preset Security Policy"; Policy.State == "Enabled"][0]
-    IncludedUsers := {x | some x in Policy.SentTo}
-    ExcludedUsers := {x | some x in Policy.ExceptIfSentTo}
-    IncludedGroups := {x | some x in Policy.SentToMemberOf}
-    ExcludedGroups := {x | some x in Policy.ExceptIfSentToMemberOf}
-    IncludedDomains := {x | some x in Policy.RecipientDomainIs}
-    ExcludedDomains := {x | some x in Policy.ExceptIfRecipientDomainIs}
+    Policy := [
+        Policy | some Policy in Policies;
+        Policy.Identity == "Strict Preset Security Policy";
+        Policy.State == "Enabled"
+    ][0]
+    IncludedUsers := ConvertToSet(Policy.SentTo)
+    ExcludedUsers := ConvertToSet(Policy.ExceptIfSentTo)
+    IncludedGroups := ConvertToSet(Policy.SentToMemberOf)
+    ExcludedGroups := ConvertToSet(Policy.ExceptIfSentToMemberOf)
+    IncludedDomains := ConvertToSet(Policy.RecipientDomainIs)
+    ExcludedDomains := ConvertToSet(Policy.ExceptIfRecipientDomainIs)
 }
 
 default SensitiveAccounts(_, _) := false
@@ -142,7 +148,10 @@ ImpersonationProtectionSetting(Policies, IdentityString, KeyValue) := Policy if 
 # Get the user configuration for specified policy
 ImpersonationProtectionConfig(PolicyID, AccountKey) := IncludedAccounts if {
     SensitiveAccounts := input.scuba_config.Defender[PolicyID]
-    IncludedAccounts := {lower(trim_space(x)) | some x in SensitiveAccounts[AccountKey]; x != null}
+    IncludedAccounts := {
+        lower(trim_space(x)) | some x in SensitiveAccounts[AccountKey];
+        x != null
+    }
 } else := set()
 
 # Check impersonation protection is set for specified policy & accounts
@@ -174,22 +183,9 @@ ImpersonationProtection(Policies, IdentityString, IncludedAccounts, FilterKey, A
     }
 }
 
-################
-# Refactor Out #
-################
-
-# Example usage and output:
-# GenerateArrayString([1,2], "numbers found:") ->
-# 2 numbers found: 1, 2
-GenerateArrayString(Array, CustomString) := Output if {
-    Length := format_int(count(Array), 10)
-    ArrayString := concat(", ", Array)
-    Output := trim(concat(" ", [Length, concat(" ", [CustomString, ArrayString])]), " ")
-}
-
-CustomizeError(true, _) := PASS if {}
-
-CustomizeError(false, CustomString) := CustomString if {}
+#############################################
+# Specific Defender Report Details Function #
+#############################################
 
 # If a defender license is present, don't apply the warning
 # and leave the message unchanged
@@ -201,5 +197,9 @@ ApplyLicenseWarning(Status) := ReportDetailsBoolean(Status) if {
 # replace the message with the warning
 ApplyLicenseWarning(_) := concat("", [FAIL, LicenseWarning]) if {
     input.defender_license == false
-    LicenseWarning := " **NOTE: Either you do not have sufficient permissions or your tenant does not have a license for Microsoft Defender for Office 365 Plan 1, which is required for this feature.**"
+    LicenseWarning := concat(" ", [
+        " **NOTE: Either you do not have sufficient permissions or",
+        "your tenant does not have a license for Microsoft Defender",
+        "for Office 365 Plan 1, which is required for this feature.**"
+    ])
 }

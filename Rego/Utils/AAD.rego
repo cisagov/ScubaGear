@@ -10,13 +10,17 @@ import data.utils.policy.FAIL
 import data.utils.policy.PASS
 
 
+#############
+# Constants #
+#############
+
 # Set to the maximum number of array items to be
 # printed in the report details section
 REPORTARRAYMAXCOUNT := 20
 
-#############################################################################
-# The report formatting functions below are generic and used throughout AAD #
-#############################################################################
+########################################
+# Specific AAD Report Details Function #
+########################################
 
 ReportFullDetailsArray(Array, String) := Description([ArraySizeStr(Array), String]) if {
     count(Array) == 0
@@ -50,9 +54,9 @@ ReportFullDetailsArray(Array, String) := Details if {
     ])
 }
 
-##############################################################################################################
-# The report formatting functions below are for policies that check the required Microsoft Entra ID P2 license #
-##############################################################################################################
+#################################################################################
+# Report Detail Functions for check that required Microsoft Entra ID P2 license #
+#################################################################################
 
 Aad2P2Licenses contains ServicePlan.ServicePlanId if {
     some ServicePlan in input.service_plans
@@ -125,9 +129,9 @@ GroupExclusionsFullyExempt(Policy, PolicyID) := true if {
 }
 
 
-########################
-# Refactored Functions #
-########################
+#########################
+# General AAD Functions #
+#########################
 
 # Return true if policy matches all conditions:
 # All for include users & applications,

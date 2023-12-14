@@ -1,5 +1,6 @@
 package utils.report
 import future.keywords
+import data.utils.policy.PASS
 
 
 #############
@@ -64,26 +65,17 @@ ReportDetailsBoolean(true) := "Requirement met"
 ReportDetailsBoolean(false) := "Requirement not met"
 
 # Returns specified string if Status is false (good for error msg)
-ReportDetailsString(true, _) := ReportDetailsBoolean(true) if {}
+ReportDetailsString(true, _) := PASS if {}
 
 ReportDetailsString(false, String) := String if {}
 
 # Returns string constructed from array if Status is false (good for error msg)
-ReportDetailsArray(true, _, _) := ReportDetailsBoolean(true) if {}
+ReportDetailsArray(true, _, _) := PASS if {}
 
 ReportDetailsArray(false, Array, String) := Description([
     ArraySizeStr(Array),
     String,
-    concat(", ", Array)]) if {}
-
-# Returns string constructed from array if Status is false (good for error msg)
-#
-ReportDetailsArrayOutOf(true, _, _) := ReportDetailsBoolean(true) if {}
-
-ReportDetailsArrayOutOf(false, NumeratorArr, DenominatorArr) := Description([
-    concat(" of ", [ArraySizeStr(NumeratorArr), ArraySizeStr(DenominatorArr)]),
-    "agency domain(s) found in violation:",
-    concat(", ", NumeratorArr)
+    concat(", ", Array)
 ]) if {}
 
 

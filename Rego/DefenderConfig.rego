@@ -2,6 +2,8 @@ package defender
 import future.keywords
 import data.utils.report.NotCheckedDetails
 import data.utils.report.ReportDetailsBoolean
+import data.utils.report.ReportDetailsString
+import data.utils.report.ReportDetailsArray
 import data.utils.defender.SensitiveAccounts
 import data.utils.defender.SensitiveAccountsConfig
 import data.utils.defender.SensitiveAccountsSetting
@@ -10,8 +12,6 @@ import data.utils.defender.ImpersonationProtectionConfig
 import data.utils.policy.FAIL
 import data.utils.policy.PASS
 import data.utils.policy.FilterArray
-import data.utils.defender.GenerateArrayString
-import data.utils.defender.CustomizeError
 import data.utils.defender.ApplyLicenseWarning
 
 
@@ -255,7 +255,7 @@ tests contains {
     "Criticality": "Should",
     "Commandlet": ["Get-AntiPhishPolicy"],
     "ActualValue": [StrictIP.Policy, StandardIP.Policy],
-    "ReportDetails": CustomizeError(Status, ErrorMessage),
+    "ReportDetails": ReportDetailsString(Status, ErrorMessage),
     "RequirementMet": Status
 } if {
     Policies := input.anti_phish_policies
@@ -287,7 +287,7 @@ tests contains {
     "Criticality": "Should",
     "Commandlet": ["Get-AntiPhishPolicy"],
     "ActualValue": [StrictIP.Policy, StandardIP.Policy],
-    "ReportDetails": CustomizeError(Status, ErrorMessage),
+    "ReportDetails": ReportDetailsString(Status, ErrorMessage),
     "RequirementMet": Status
 } if {
     Policies := input.anti_phish_policies
@@ -324,7 +324,7 @@ tests contains {
     "Criticality": "Should",
     "Commandlet": ["Get-AntiPhishPolicy"],
     "ActualValue": [StrictIP.Policy, StandardIP.Policy],
-    "ReportDetails": CustomizeError(Status, ErrorMessage),
+    "ReportDetails": ReportDetailsString(Status, ErrorMessage),
     "RequirementMet": Status
 } if {
     Policies := input.anti_phish_policies
@@ -478,7 +478,7 @@ tests contains {
     "Criticality": "Shall",
     "Commandlet": ["Get-DlpComplianceRule"],
     "ActualValue": Rules,
-    "ReportDetails": CustomizeError(Status, ErrorMessage),
+    "ReportDetails": ReportDetailsString(Status, ErrorMessage),
     "RequirementMet": Status
 } if {
     error_rule := "No matching rules found for:"
@@ -548,7 +548,7 @@ tests contains {
     "Criticality": "Should",
     "Commandlet": ["Get-DLPCompliancePolicy"],
     "ActualValue": Policies,
-    "ReportDetails": CustomizeError(Status, DefenderErrorMessage4_2),
+    "ReportDetails": ReportDetailsString(Status, DefenderErrorMessage4_2),
     "RequirementMet": Status
 } if {
     Conditions := [
@@ -579,7 +579,7 @@ SensitiveRulesNotBlocking contains Rule.Name if {
 }
 
 # Create the Report details message for policy
-DefenderErrorMessage4_3(Rules) := GenerateArrayString(Rules, ErrorMessage) if {
+DefenderErrorMessage4_3(Rules) := ReportDetailsArray(false, Rules, ErrorMessage) if {
     count(PoliciesWithFullProtection) > 0
     ErrorMessage := "rule(s) found that do(es) not block access or associated policy not set to enforce block action:"
 }
@@ -597,7 +597,7 @@ tests contains {
     "Criticality": "Should",
     "Commandlet": ["Get-DlpComplianceRule"],
     "ActualValue": Rules,
-    "ReportDetails": CustomizeError(Status, DefenderErrorMessage4_3(Rules)),
+    "ReportDetails": ReportDetailsString(Status, DefenderErrorMessage4_3(Rules)),
     "RequirementMet": Status
 } if {
     Rules := SensitiveRulesNotBlocking
@@ -624,7 +624,7 @@ SensitiveRulesNotNotifying contains Rule.Name if {
 }
 
 # Create the Report details message for policy
-DefenderErrorMessage4_4(Rules) := GenerateArrayString(Rules, ErrorMessage) if {
+DefenderErrorMessage4_4(Rules) := ReportDetailsArray(false, Rules, ErrorMessage) if {
     count(PoliciesWithFullProtection) > 0
     ErrorMessage := "rule(s) found that do(es) not notify at least one user:"
 }
@@ -642,7 +642,7 @@ tests contains {
     "Criticality": "Should",
     "Commandlet": ["Get-DlpComplianceRule"],
     "ActualValue": Rules,
-    "ReportDetails": CustomizeError(Status, DefenderErrorMessage4_4(Rules)),
+    "ReportDetails": ReportDetailsString(Status, DefenderErrorMessage4_4(Rules)),
     "RequirementMet": Status
 } if {
     Rules := SensitiveRulesNotNotifying
@@ -716,7 +716,7 @@ tests contains {
     "Criticality": "Shall",
     "Commandlet": ["Get-ProtectionAlert"],
     "ActualValue": MissingAlerts,
-    "ReportDetails": CustomizeError(Status, GenerateArrayString(MissingAlerts, ErrorMessage)),
+    "ReportDetails": ReportDetailsString(Status, ReportDetailsArray(false, MissingAlerts, ErrorMessage)),
     "RequirementMet": Status
 } if {
     MissingAlerts := RequiredAlerts - EnabledAlerts
