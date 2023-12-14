@@ -6,12 +6,12 @@ on:
       - "main"
   pull_request_review:
     types: [submitted]
-  push:
-    paths:
-      - ".github/workflows/run_smoke_test.yaml"
-    branches:
-      - "main"
-      - "*smoke*"
+  push:  # TODO uncomment
+    # paths:
+    #   - ".github/workflows/run_smoke_test.yaml"
+    # branches:
+    #   - "main"
+    #   - "*smoke*"
 
 name: Smoke Test
 
