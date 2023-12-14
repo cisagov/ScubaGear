@@ -1,8 +1,8 @@
 package exo_test
 import future.keywords
 import data.exo
-import data.utils.policy.TestResult
-import data.utils.policy.PASS
+import data.utils.key.TestResult
+import data.utils.key.PASS
 
 
 #

@@ -1,7 +1,7 @@
 package aad_test
 import future.keywords
 import data.aad
-import data.utils.policy.TestResult
+import data.utils.key.TestResult
 
 
 #

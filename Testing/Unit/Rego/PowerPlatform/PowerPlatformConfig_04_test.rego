@@ -2,7 +2,7 @@ package powerplatform_test
 import future.keywords
 import data.powerplatform
 import data.utils.report.NotCheckedDetails
-import data.utils.policy.TestResult
+import data.utils.key.TestResult
 
 
 #

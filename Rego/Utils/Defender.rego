@@ -2,9 +2,9 @@ package utils.defender
 import future.keywords
 import data.utils.report.ReportDetailsBoolean
 import data.utils.report.Description
-import data.utils.policy.FAIL
-import data.utils.policy.PASS
-import data.utils.policy.ConvertToSet
+import data.utils.key.FAIL
+import data.utils.key.PASS
+import data.utils.key.ConvertToSet
 
 ##########################################
 # User/Group Exclusion support functions #

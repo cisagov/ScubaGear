@@ -2,7 +2,7 @@ package exo_test
 import future.keywords
 import data.exo
 import data.utils.report.DefenderMirrorDetails
-import data.utils.policy.TestResult
+import data.utils.key.TestResult
 
 
 #

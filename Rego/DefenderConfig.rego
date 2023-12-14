@@ -4,14 +4,14 @@ import data.utils.report.NotCheckedDetails
 import data.utils.report.ReportDetailsBoolean
 import data.utils.report.ReportDetailsString
 import data.utils.report.ReportDetailsArray
+import data.utils.key.FAIL
+import data.utils.key.PASS
+import data.utils.key.FilterArray
 import data.utils.defender.SensitiveAccounts
 import data.utils.defender.SensitiveAccountsConfig
 import data.utils.defender.SensitiveAccountsSetting
 import data.utils.defender.ImpersonationProtection
 import data.utils.defender.ImpersonationProtectionConfig
-import data.utils.policy.FAIL
-import data.utils.policy.PASS
-import data.utils.policy.FilterArray
 import data.utils.defender.ApplyLicenseWarning
 
 

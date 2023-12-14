@@ -7,7 +7,7 @@ import data.utils.report.ReportDetailsBoolean
 import data.utils.report.Description
 import data.utils.report.ReportDetailsString
 import data.utils.report.ReportDetailsArray
-import data.utils.policy.FilterArray
+import data.utils.key.FilterArray
 
 
 # this should be allowed https://github.com/StyraInc/regal/issues/415

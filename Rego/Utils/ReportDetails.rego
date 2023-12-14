@@ -1,6 +1,6 @@
 package utils.report
 import future.keywords
-import data.utils.policy.PASS
+import data.utils.key.PASS
 
 
 #############

@@ -2,7 +2,7 @@ package teams_test
 import future.keywords
 import data.teams
 import data.utils.report.DefenderMirrorDetails
-import data.utils.policy.TestResult
+import data.utils.key.TestResult
 
 
 #
