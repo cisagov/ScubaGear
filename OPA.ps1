@@ -132,11 +132,6 @@ function Confirm-OPAHash {
     param (
         [Parameter(Mandatory)]
         [ValidateNotNullOrEmpty()]
-        [Alias('out')]
-        [string]$OPAExe,
-
-        [Parameter(Mandatory)]
-        [ValidateNotNullOrEmpty()]
         [Alias('version')]
         [string]$ExpectedVersion,
 
