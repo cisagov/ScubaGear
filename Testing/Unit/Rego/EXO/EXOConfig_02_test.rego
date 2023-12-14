@@ -66,7 +66,7 @@ test_Rdata_Incorrect_V1 if {
         ]
     }
 
-    ReportDetailString := "1 of 1 agency domain(s) found in violation: Test name"
+    ReportDetailString := "1 agency domain(s) found in violation: Test name"
     TestResult("MS.EXO.2.2v1", Output, ReportDetailString, false) == true
 }
 
@@ -82,10 +82,12 @@ test_Rdata_Incorrect_V2 if {
         ]
     }
 
-    ReportDetailString := "1 of 1 agency domain(s) found in violation: Test name"
+    ReportDetailString := "1 agency domain(s) found in violation: Test name"
     TestResult("MS.EXO.2.2v1", Output, ReportDetailString, false) == true
 }
 
+# if we can make any assumptions about the order these domains
+# will be printed in, hence the "contains" operator instead of ==
 test_Rdata_Incorrect_V3 if {
     Output := exo.tests with input as {
         "spf_records": [
@@ -110,11 +112,8 @@ test_Rdata_Incorrect_V3 if {
         ]
     }
 
-    # if we can make any assumptions about the order these domains
-    # will be printed in, hence the "contains" operator instead of ==
     ReportDetailArrayStrs := [
-        "2 of 3 agency domain(s) found in violation: ",
-        "2 of 3 agency domain(s) found in violation: ",
+        "2 agency domain(s) found in violation: ",
         "bad.com", # I'm not sure
         "2bad.com"
     ]
@@ -166,7 +165,7 @@ test_Rdata_Multiple_Incorrect if {
         ]
     }
 
-    ReportDetailString := "1 of 1 agency domain(s) found in violation: bad.com"
+    ReportDetailString := "1 agency domain(s) found in violation: bad.com"
     TestResult("MS.EXO.2.2v1", Output, ReportDetailString, false) == true
 }
 #--

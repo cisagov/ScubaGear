@@ -185,7 +185,7 @@ test_Enabled_Incorrect if {
         ]
     }
 
-    ReportDetailString := "1 of 1 agency domain(s) found in violation: test.name"
+    ReportDetailString := "1 agency domain(s) found in violation: test.name"
     TestResult("MS.EXO.3.1v1", Output, ReportDetailString, false) == true
 }
 
@@ -213,7 +213,7 @@ test_Rdata_Incorrect_V1 if {
         ]
     }
 
-    ReportDetailString := "1 of 1 agency domain(s) found in violation: test.name"
+    ReportDetailString := "1 agency domain(s) found in violation: test.name"
     TestResult("MS.EXO.3.1v1", Output, ReportDetailString, false) == true
 }
 
@@ -243,7 +243,7 @@ test_Rdata_Incorrect_V2 if {
         ]
     }
 
-    ReportDetailString := "1 of 1 agency domain(s) found in violation: test.name"
+    ReportDetailString := "1 agency domain(s) found in violation: test.name"
     TestResult("MS.EXO.3.1v1", Output, ReportDetailString, false) == true
 }
 
@@ -289,7 +289,7 @@ test_Enabled_Incorrect_V3 if {
         ]
     }
 
-    ReportDetailString := "1 of 2 agency domain(s) found in violation: test2.name"
+    ReportDetailString := "1 agency domain(s) found in violation: test2.name"
     TestResult("MS.EXO.3.1v1", Output, ReportDetailString, false) == true
 }
 
@@ -334,7 +334,7 @@ test_Enabled_Incorrect_V4 if {
         ]
     }
 
-    ReportDetailString := "1 of 2 agency domain(s) found in violation: example.onmicrosoft.com"
+    ReportDetailString := "1 agency domain(s) found in violation: example.onmicrosoft.com"
     TestResult("MS.EXO.3.1v1", Output, ReportDetailString, false) == true
 }
 #--

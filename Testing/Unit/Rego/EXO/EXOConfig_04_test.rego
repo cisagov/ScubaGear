@@ -49,7 +49,7 @@ test_Rdata_Incorrect_V1 if {
         ]
     }
 
-    ReportDetailString := "1 of 1 agency domain(s) found in violation: test.name"
+    ReportDetailString := "1 agency domain(s) found in violation: test.name"
     TestResult("MS.EXO.4.1v1", Output, ReportDetailString, false) == true
 }
 
@@ -73,7 +73,7 @@ test_Rdata_Incorrect_V2 if {
         ]
     }
 
-    ReportDetailString := "1 of 1 agency domain(s) found in violation: test.name"
+    ReportDetailString := "1 agency domain(s) found in violation: test.name"
     TestResult("MS.EXO.4.1v1", Output, ReportDetailString, false) == true
 }
 
@@ -107,7 +107,7 @@ test_Rdata_Incorrect_V3 if {
         ]
     }
 
-    ReportDetailString := "1 of 2 agency domain(s) found in violation: bad.name"
+    ReportDetailString := "1 agency domain(s) found in violation: bad.name"
     TestResult("MS.EXO.4.1v1", Output, ReportDetailString, false) == true
 }
 #--
@@ -158,7 +158,7 @@ test_Rdata_Incorrect_V4 if {
         ]
     }
 
-    ReportDetailString := "1 of 1 agency domain(s) found in violation: test.name"
+    ReportDetailString := "1 agency domain(s) found in violation: test.name"
     TestResult("MS.EXO.4.2v1", Output, ReportDetailString, false) == true
 }
 
@@ -182,7 +182,7 @@ test_Rdata_Incorrect_V5 if {
         ]
     }
 
-    ReportDetailString := "1 of 1 agency domain(s) found in violation: test.name"
+    ReportDetailString := "1 agency domain(s) found in violation: test.name"
     TestResult("MS.EXO.4.2v1", Output, ReportDetailString, false) == true
 }
 #--
@@ -233,7 +233,7 @@ test_DMARCReport_Incorrect_V1 if {
         ]
     }
 
-    ReportDetailString := "1 of 1 agency domain(s) found in violation: test.name"
+    ReportDetailString := "1 agency domain(s) found in violation: test.name"
     TestResult("MS.EXO.4.3v1", Output, ReportDetailString, false) == true
 }
 
@@ -257,7 +257,7 @@ test_DMARCReport_Incorrect_V2 if {
         ]
     }
 
-    ReportDetailString := "1 of 1 agency domain(s) found in violation: test.name"
+    ReportDetailString := "1 agency domain(s) found in violation: test.name"
     TestResult("MS.EXO.4.3v1", Output, ReportDetailString, false) == true
 }
 
@@ -280,7 +280,7 @@ test_DMARCReport_Incorrect_V3 if {
         ]
     }
 
-    ReportDetailString := "1 of 1 agency domain(s) found in violation: test.name"
+    ReportDetailString := "1 agency domain(s) found in violation: test.name"
     TestResult("MS.EXO.4.3v1", Output, ReportDetailString, false) == true
 }
 #--
@@ -358,7 +358,7 @@ test_POC_Incorrect_V1 if {
         ]
     }
 
-    ReportDetailString := "1 of 1 agency domain(s) found in violation: test.name"
+    ReportDetailString := "1 agency domain(s) found in violation: test.name"
     TestResult("MS.EXO.4.4v1", Output, ReportDetailString, false) == true
 }
 
@@ -383,7 +383,7 @@ test_POC_Incorrect_V2 if {
         ]
     }
 
-    ReportDetailString := "1 of 1 agency domain(s) found in violation: test.name"
+    ReportDetailString := "1 agency domain(s) found in violation: test.name"
     TestResult("MS.EXO.4.4v1", Output, ReportDetailString, false) == true
 }
 
@@ -408,7 +408,7 @@ test_POC_Incorrect_V3 if {
         ]
     }
 
-    ReportDetailString := "1 of 1 agency domain(s) found in violation: test.name"
+    ReportDetailString := "1 agency domain(s) found in violation: test.name"
     TestResult("MS.EXO.4.4v1", Output, ReportDetailString, false) == true
 }
 
@@ -445,7 +445,7 @@ test_POC_Incorrect_V4 if {
         ]
     }
 
-    ReportDetailString := "1 of 2 agency domain(s) found in violation: example.com"
+    ReportDetailString := "1 agency domain(s) found in violation: example.com"
     TestResult("MS.EXO.4.4v1", Output, ReportDetailString, false) == true
 }
 
@@ -482,7 +482,7 @@ test_POC_Incorrect_V5 if {
         ]
     }
 
-    ReportDetailString := "1 of 2 agency domain(s) found in violation: example.com"
+    ReportDetailString := "1 agency domain(s) found in violation: example.com"
     TestResult("MS.EXO.4.4v1", Output, ReportDetailString, false) == true
 }
 
@@ -517,7 +517,7 @@ test_POC_Incorrect_V6 if {
         ]
     }
 
-    ReportDetailString := "1 of 2 agency domain(s) found in violation: example.com"
+    ReportDetailString := "1 agency domain(s) found in violation: example.com"
     TestResult("MS.EXO.4.4v1", Output, ReportDetailString, false) == true
 }
 #--

@@ -70,6 +70,9 @@ TestResultContains(PolicyId, Output, ReportDetailArrayStrings, RequirementMet) :
 
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet == RequirementMet
-    some String in ReportDetailArrayStrings
-    contains(RuleOutput[0].ReportDetails, String) == true
+    Conditions :=  [
+        (contains(RuleOutput[0].ReportDetails, String) == true) |
+        some String in ReportDetailArrayStrings
+    ]
+    count(FilterArray(Conditions, false)) == 0
 } else := false

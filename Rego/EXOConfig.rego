@@ -6,21 +6,13 @@ import data.utils.report.ArraySizeStr
 import data.utils.report.ReportDetailsBoolean
 import data.utils.report.Description
 import data.utils.report.ReportDetailsString
-import data.utils.report.ReportDetailsArrayOutOf
+import data.utils.report.ReportDetailsArray
 import data.utils.policy.FilterArray
 
 
 # this should be allowed https://github.com/StyraInc/regal/issues/415
 # regal ignore:prefer-set-or-object-rule
 AllDomains := {Domain.domain | some Domain in input.spf_records}
-
-# ReportDetailsArray(true, _, _) := ReportDetailsBoolean(true) if {}
-
-# ReportDetailsArray(false, NumeratorArr, DenominatorArr) := ReportStr if {
-#     FractionStr := concat(" of ", [ArraySizeStr(NumeratorArr), ArraySizeStr(DenominatorArr)])
-#     NumeratorStr := concat(", ", NumeratorArr)
-#     ReportStr := Description([FractionStr, "agency domain(s) found in violation:", NumeratorStr])
-# }
 
 
 ############
@@ -91,7 +83,7 @@ tests contains {
     "Criticality": "Shall",
     "Commandlet": ["Get-ScubaSpfRecords", "Get-AcceptedDomain"],
     "ActualValue": Domains,
-    "ReportDetails": ReportDetailsArrayOutOf(Status, Domains, AllDomains),
+    "ReportDetails": ReportDetailsArray(Status, Domains, "agency domain(s) found in violation:"), #ReportDetailsArray(Status, Domains, AllDomains),
     "RequirementMet": Status
 } if {
     Domains := DomainsWithoutSpf
@@ -130,11 +122,8 @@ tests contains {
         "Get-ScubaDkimRecords",
         "Get-AcceptedDomain"
     ],
-    "ActualValue": [
-        input.dkim_records,
-        input.dkim_config
-    ],
-    "ReportDetails": ReportDetailsArrayOutOf(Status, DomainsWithoutDkim, AllDomains),
+    "ActualValue": [input.dkim_records, input.dkim_config],
+    "ReportDetails": ReportDetailsArray(Status, DomainsWithoutDkim, "agency domain(s) found in violation:"), #ReportDetailsArray(Status, DomainsWithoutDkim, AllDomains),
     "RequirementMet": Status
 } if {
     # Get domains that are not in DomainsWithDkim array
@@ -169,7 +158,7 @@ tests contains {
         "Get-AcceptedDomain"
     ],
     "ActualValue": input.dmarc_records,
-    "ReportDetails": ReportDetailsArrayOutOf(Status, Domains, AllDomains),
+    "ReportDetails": ReportDetailsArray(Status, Domains, "agency domain(s) found in violation:"), #ReportDetailsArray(Status, Domains, AllDomains),
     "RequirementMet": Status
 } if {
     Domains := DomainsWithoutDmarc
@@ -198,7 +187,7 @@ tests contains {
         "Get-AcceptedDomain"
     ],
     "ActualValue": input.dmarc_records,
-    "ReportDetails": ReportDetailsArrayOutOf(Status, Domains, AllDomains),
+    "ReportDetails": ReportDetailsArray(Status, Domains, "agency domain(s) found in violation:"), #ReportDetailsArray(Status, Domains, AllDomains),
     "RequirementMet": Status
 } if {
     Domains := DomainsWithoutPreject
@@ -238,7 +227,7 @@ tests contains {
         "Get-AcceptedDomain"
     ],
     "ActualValue": input.dmarc_records,
-    "ReportDetails": ReportDetailsArrayOutOf(Status, Domains, AllDomains),
+    "ReportDetails": ReportDetailsArray(Status, Domains, "agency domain(s) found in violation:"), #ReportDetailsArray(Status, Domains, AllDomains),
     "RequirementMet": Status
 } if {
     Domains := DomainsWithoutDHSContact
@@ -294,7 +283,7 @@ tests contains {
         "Get-AcceptedDomain"
     ],
     "ActualValue": input.dmarc_records,
-    "ReportDetails": ReportDetailsArrayOutOf(Status, Domains, AllDomains),
+    "ReportDetails": ReportDetailsArray(Status, Domains, "agency domain(s) found in violation:"), #ReportDetailsArray(Status, Domains, AllDomains),
     "RequirementMet": Status
 } if {
     Domains := DomainsWithoutAgencyContact
