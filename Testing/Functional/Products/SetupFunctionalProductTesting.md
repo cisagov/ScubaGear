@@ -14,7 +14,7 @@ The second is to add your certificate to the service principal.  Send the certif
 
 ## Powershell 5.1
 
-ScubaGear runs on an outdated version of Powershell, version 5.1.  To run this version in Windows 10, search for "powershell" (not "pwsh"), and run it as administrator.  Run all commands in this shell.
+ScubaGear runs on Powershell 5.1.  To run this version in Windows 10, search for "powershell" (not "pwsh"), and run it as administrator.  Run all commands in this shell.
 
 ## Pester
 
