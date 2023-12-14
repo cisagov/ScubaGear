@@ -1,3 +1,5 @@
+using module '..\..\PowerShell\ScubaGear\Modules\ScubaConfig\ScubaConfig.psm1'
+
 #
 # For Rego testing with a static provider JSON.
 # When pure Rego testing it makes sense to export the provider only once.
@@ -11,37 +13,40 @@
 
 # Set $true for the first run of this script
 # then set this to be $false each subsequent run
+[CmdletBinding(DefaultParameterSetName='Default')]
 param (
-    [Parameter(Mandatory = $false)]
+    [Parameter(Mandatory = $false, ParameterSetName = 'Default')]
+    [Parameter(Mandatory = $false, ParameterSetName = 'Configuration')]
     [ValidateNotNullOrEmpty()]
     [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", "onedrive", '*', IgnoreCase = $false)]
     [string[]]
     $ProductNames = '*', # The specific products that you want the tool to assess.
 
-    [Parameter(Mandatory = $false)]
+    [Parameter(Mandatory = $false, ParameterSetName = 'Default')]
     [ValidateNotNullOrEmpty()]
     [string]
     $OutPath = ".\Testing\Functional\Reports", # output directory
 
-    [Parameter(Mandatory = $false)]
+    [Parameter(Mandatory = $false, ParameterSetName = 'Default')]
     [ValidateNotNullOrEmpty()]
     [ValidateSet($true, $false)]
     [boolean]
     $LogIn = $false, # Set $true to authenticate yourself to a tenant or if you are already authenticated set to $false to avoid reauthentication
 
-    [Parameter(Mandatory = $false)]
+    [Parameter(Mandatory = $false, ParameterSetName = 'Default')]
     [ValidateNotNullOrEmpty()]
     [ValidateSet($true, $false)]
     [boolean]
     $ExportProvider = $true,
 
-    [Parameter(Mandatory = $false)]
+    [Parameter(Mandatory = $false, ParameterSetName = 'Default')]
+    [Parameter(Mandatory = $false, ParameterSetName = 'Configuration')]
     [ValidateNotNullOrEmpty()]
     [ValidateSet($true, $false)]
     [boolean]
-    $Quiet = $True # Supress report poping up after run
+    $Quiet = $True, # Supress report poping up after run
 
-    [Parameter(Mandatory = $true, ParameterSetName = 'Configuration')]
+    [Parameter(Mandatory = $false, ParameterSetName = 'Configuration')]
     [ValidateNotNullOrEmpty()]
     [ValidateScript({
         if (-Not ($_ | Test-Path)){
@@ -53,36 +58,41 @@ param (
         return $true
     })]
     [System.IO.FileInfo]
-    $ConfigFilePath,
-
-    [Parameter(Mandatory = $false, ParameterSetName = 'Configuration')]
-    [switch]
+    $ConfigFilePath
 )
 
 $M365Environment = "gcc"
 $OPAPath = "./" # Path to OPA Executable
 
-$CachedParams = @{
-    'ExportProvider' = $ExportProvider;
-    'Login' = $Login;
-    'ProductNames' = $ProductNames;
-    'M365Environment' = $M365Environment;
-    'OPAPath' = $OPAPath;
-    'OutPath' = $OutPath;
-    'Quiet' = $Quiet;
+if ($PSCmdlet.ParameterSetName -eq 'Default'){
+    $RunCachedParams = @{
+        'ExportProvider' = $ExportProvider;
+        'Login' = $Login;
+        'ProductNames' = $ProductNames;
+        'M365Environment' = $M365Environment;
+        'OPAPath' = $OPAPath;
+        'OutPath' = $OutPath;
+        'Quiet' = $Quiet;
+    }
 }
-
-$RunCachedParams = New-Object -Type PSObject -Property $CachedParams
 
 # Loads and executes parameters from a Configuration file
 if ($PSCmdlet.ParameterSetName -eq 'Configuration'){
-#change [ScubaConfig]
     if (-Not ([ScubaConfig]::GetInstance().LoadConfig($ConfigFilePath))){
         Write-Error -Message "The config file failed to load: $ConfigFilePath"
     }
     else {
-#change [ScubaConfig]
-        $RunCachedParams = [ScubaConfig]::GetInstance().Configuration
+        $ScubaConfig = [ScubaConfig]::GetInstance().Configuration
+    }
+
+    $RunCachedParams = @{
+        'ExportProvider' = $ExportProvider;
+        'Login' = $ScubaConfig.Login;
+        'ProductNames' = $ScubaConfig.ProductNames;
+        'M365Environment' = $ScubaConfig.M365Environment;
+        'OPAPath' = $ScubaConfig.OPAPath;
+        'OutPath' = $ScubaConfig.OutPath;
+        'Quiet' = $Quiet;
     }
 }
 
