@@ -7,7 +7,7 @@ import data.utils.key.PASS
 
 
 #
-# Policy 1
+# Policy MS.POWERPLATFORM.1.1v1
 #--
 test_disableProductionEnvironmentCreationByNonAdminUsers_Correct if {
     Output := powerplatform.tests with input as {
@@ -35,7 +35,7 @@ test_disableProductionEnvironmentCreationByNonAdminUsers_Incorrect if {
 #--
 
 #
-# Policy 2
+# Policy MS.POWERPLATFORM.1.2v1
 #--
 test_disableTrialEnvironmentCreationByNonAdminUsers_Correct if {
     Output := powerplatform.tests with input as {

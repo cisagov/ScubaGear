@@ -8,7 +8,7 @@ import data.utils.key.PASS
 
 
 #
-# MS.SHAREPOINT.1.1v1
+# Policy MS.SHAREPOINT.1.1v1
 #--
 test_SharingCapability_Correct_V1 if {
     Output := sharepoint.tests with input as {
@@ -60,7 +60,7 @@ test_SharingCapability_Incorrect_V2 if {
 #--
 
 #
-# MS.SHAREPOINT.1.2v1
+# Policy MS.SHAREPOINT.1.2v1
 #--
 test_OneDriveSharingCapability_Correct_V1 if {
     Output := sharepoint.tests with input as {
@@ -131,7 +131,7 @@ test_OneDriveSharingCapability_Incorrect_V2 if {
 #--
 
 #
-# MS.SHAREPOINT.1.3v1
+# Policy MS.SHAREPOINT.1.3v1
 #--
 test_SharingDomainRestrictionMode_Correct_V1 if {
     Output := sharepoint.tests with input as {
@@ -185,7 +185,7 @@ test_SharingDomainRestrictionMode_Incorrect if {
 #--
 
 #
-# MS.SHAREPOINT.1.4v1
+# Policy MS.SHAREPOINT.1.4v1
 #--
 test_SameAccount_Correct_V1 if {
     Output := sharepoint.tests with input as {

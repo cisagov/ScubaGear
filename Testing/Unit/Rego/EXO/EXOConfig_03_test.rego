@@ -6,7 +6,7 @@ import data.utils.key.PASS
 
 
 #
-# Policy 1
+# Policy MS.EXO.3.1v1
 #--
 test_Enabled_Correct_V1 if {
     Output := exo.tests with input as {

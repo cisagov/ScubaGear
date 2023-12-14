@@ -7,7 +7,7 @@ import data.utils.key.PASS
 
 
 #
-# MS.SHAREPOINT.3.1v1
+# Policy MS.SHAREPOINT.3.1v1
 #--
 test_ExternalUserExpireInDays_Correct_V1 if {
     Output := sharepoint.tests with input as {
@@ -97,7 +97,7 @@ test_ExternalUserExpireInDays_Incorrect_V2 if {
 #--
 
 #
-# MS.SHAREPOINT.3.2v1
+# Policy MS.SHAREPOINT.3.2v1
 #--
 test_AnonymousLinkType_Correct if {
     Output := sharepoint.tests with input as {
@@ -175,7 +175,7 @@ test_UsingServicePrincipal if {
 }
 
 #
-# MS.SHAREPOINT.3.3v1
+# Policy MS.SHAREPOINT.3.3v1
 #--
 test_SharingCapability_Correct if {
     Output := sharepoint.tests with input as {

@@ -8,7 +8,7 @@ import data.utils.key.PASS
 
 
 #
-# Policy 1
+# Policy MS.DEFENDER.6.1v1
 #--
 test_AdminAuditLogEnabled_Correct if {
     Output := defender.tests with input as {
@@ -38,7 +38,7 @@ test_AdminAuditLogEnabled_Incorrect if {
 #--
 
 #
-# Policy 2
+# Policy MS.DEFENDER.6.2v1
 #--
 test_NotImplemented_Correct_V1 if {
     PolicyId := "MS.DEFENDER.6.2v1"
@@ -51,7 +51,7 @@ test_NotImplemented_Correct_V1 if {
 #--
 
 #
-# Policy 3
+# Policy MS.DEFENDER.6.3v1
 #--
 test_NotImplemented_Correct_V2 if {
     PolicyId := "MS.DEFENDER.6.3v1"

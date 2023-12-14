@@ -6,7 +6,7 @@ import data.utils.key.TestResult
 
 
 #
-# Policy 1
+# Policy MS.EXO.15.1v1
 #--
 test_3rdParty_Correct_V1 if {
     PolicyId := "MS.EXO.15.1v1"
@@ -19,7 +19,7 @@ test_3rdParty_Correct_V1 if {
 #--
 
 #
-# Policy 2
+# Policy MS.EXO.15.2v1
 #--
 test_3rdParty_Correct_V2 if {
     PolicyId := "MS.EXO.15.2v1"
@@ -32,7 +32,7 @@ test_3rdParty_Correct_V2 if {
 #--
 
 #
-# Policy 3
+# Policy MS.EXO.15.3v1
 #--
 test_3rdParty_Correct_V3 if {
     PolicyId := "MS.EXO.15.3v1"

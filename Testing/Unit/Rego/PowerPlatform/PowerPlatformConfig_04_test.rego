@@ -6,7 +6,7 @@ import data.utils.key.TestResult
 
 
 #
-# Policy 1
+# Policy MS.POWERPLATFORM.4.1v1
 #--
 test_NotImplemented_Correct if {
     PolicyId := "MS.POWERPLATFORM.4.1v1"

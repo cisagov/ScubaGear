@@ -6,7 +6,7 @@ import data.utils.key.TestResult
 
 
 #
-# MS.AAD.2.1v1
+# Policy MS.AAD.2.1v1
 #--
 test_NoExclusionsConditions_Correct_V1 if {
     Output := aad.tests with input as {
@@ -1482,7 +1482,7 @@ test_ServicePlans_Incorrect if {
 #--
 
 #
-# MS.AAD.2.2v1
+# Policy MS.AAD.2.2v1
 #--
 test_NotImplemented_Correct if {
     PolicyId := "MS.AAD.2.2v1"
@@ -1495,7 +1495,7 @@ test_NotImplemented_Correct if {
 #--
 
 #
-# MS.AAD.2.3v1
+# Policy MS.AAD.2.3v1
 #--
 test_NoExclusionsConditions_Correct_V2 if {
     Output := aad.tests with input as {

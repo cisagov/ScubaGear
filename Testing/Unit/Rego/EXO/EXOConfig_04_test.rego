@@ -6,7 +6,7 @@ import data.utils.key.PASS
 
 
 #
-# Policy 1
+# Policy MS.EXO.4.1v1
 #--
 test_Rdata_Correct if {
     Output := exo.tests with input as {
@@ -113,7 +113,7 @@ test_Rdata_Incorrect_V3 if {
 #--
 
 #
-# Policy 2
+# Policy MS.EXO.4.2v1
 #--
 test_Rdata_Correct_V2 if {
     Output := exo.tests with input as {
@@ -188,7 +188,7 @@ test_Rdata_Incorrect_V5 if {
 #--
 
 #
-# Policy 3
+# Policy MS.EXO.4.3v1
 #--
 test_DMARCReport_Correct_V1 if {
     Output := exo.tests with input as {
@@ -286,7 +286,7 @@ test_DMARCReport_Incorrect_V3 if {
 #--
 
 #
-# Policy 4
+# Policy MS.EXO.4.4v1
 #--
 
 # 2 emails in rua= and 1 in ruf

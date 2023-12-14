@@ -7,7 +7,7 @@ import data.utils.key.PASS
 
 
 #
-# MS.TEAMS.5.1v1
+# Policy MS.TEAMS.5.1v1
 #--
 test_DefaultCatalogAppsType_Correct_V1 if {
     Output := teams.tests with input as {
@@ -91,7 +91,7 @@ test_DefaultCatalogAppsType_Multiple if {
 #--
 
 #
-# MS.TEAMS.5.2v1
+# Policy MS.TEAMS.5.2v1
 #--
 test_GlobalCatalogAppsType_Correct_V1 if {
     Output := teams.tests with input as {
@@ -175,7 +175,7 @@ test_GlobalCatalogAppsType_Multiple if {
 #--
 
 #
-# MS.TEAMS.5.3v1
+# Policy MS.TEAMS.5.3v1
 #--
 test_PrivateCatalogAppsType_Correct_V1 if {
     Output := teams.tests with input as {

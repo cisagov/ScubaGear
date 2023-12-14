@@ -7,7 +7,7 @@ import data.utils.key.PASS
 
 
 #
-# MS.AAD.5.1v1
+# Policy MS.AAD.5.1v1
 #--
 test_AllowedToCreateApps_Correct if {
     Output := aad.tests with input as {
@@ -65,7 +65,7 @@ test_AllowedToCreateApps_Incorrect_V2 if {
 #--
 
 #
-# MS.AAD.5.2v1
+# Policy MS.AAD.5.2v1
 #--
 test_PermissionGrantPolicyIdsAssignedToDefaultUserRole_Correct if {
     Output := aad.tests with input as {
@@ -119,7 +119,7 @@ test_PermissionGrantPolicyIdsAssignedToDefaultUserRole_Incorrect_V2 if {
 #--
 
 #
-# MS.AAD.5.3v1
+# Policy MS.AAD.5.3v1
 #--
 test_IsEnabled_Correct if {
     Output := aad.tests with input as {
@@ -149,7 +149,7 @@ test_IsEnabled_Incorrect if {
 #--
 
 #
-# MS.AAD.5.4v1
+# Policy MS.AAD.5.4v1
 #--
 test_Value_Correct_Lowercase if {
     Output := aad.tests with input as {

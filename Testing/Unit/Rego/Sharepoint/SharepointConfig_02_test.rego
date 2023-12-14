@@ -7,7 +7,7 @@ import data.utils.key.PASS
 
 
 #
-# MS.SHAREPOINT.2.1v1
+# Policy MS.SHAREPOINT.2.1v1
 #--
 test_DefaultSharingLinkType_Correct if {
     Output := sharepoint.tests with input as {
@@ -35,7 +35,7 @@ test_DefaultSharingLinkType_Incorrect if {
 #--
 
 #
-# MS.SHAREPOINT.2.2v1
+# Policy MS.SHAREPOINT.2.2v1
 #--
 test_DefaultLinkPermission_Correct if {
     Output := sharepoint.tests with input as {

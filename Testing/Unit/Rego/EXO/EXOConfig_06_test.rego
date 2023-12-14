@@ -6,7 +6,7 @@ import data.utils.key.PASS
 
 
 #
-# Policy 1
+# Policy MS.EXO.6.1v1
 #--
 test_Domains_Contacts_Correct if {
     Output := exo.tests with input as {
@@ -47,7 +47,7 @@ test_Domains_Contacts_Incorrect if {
 }
 
 #
-# Policy 2
+# Policy MS.EXO.6.2v1
 #--
 test_Domains_Calendar_Correct if {
     Output := exo.tests with input as {

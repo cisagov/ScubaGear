@@ -7,7 +7,7 @@ import data.utils.key.PASS
 
 
 #
-# Policy 1
+# Policy MS.DEFENDER.4.1v1
 #--
 test_ContentContainsSensitiveInformation_Correct_V1 if {
     Output := defender.tests with input as {
@@ -333,7 +333,7 @@ test_ContentContainsSensitiveInformation_Incorrect_V6 if {
 #--
 
 #
-# Policy 2
+# Policy MS.DEFENDER.4.2v1
 #--
 test_Locations_Correct_V1 if {
     Output := defender.tests with input as {
@@ -1017,7 +1017,7 @@ test_Locations_Incorrect_V8 if {
 #--
 
 #
-# Policy 3
+# Policy MS.DEFENDER.4.3v1
 #--
 
 # All sensitive rules present and blocking
@@ -1339,7 +1339,7 @@ test_BlockAccess_Incorrect_V6 if {
 #--
 
 #
-# Policy 4
+# Policy MS.DEFENDER.4.4v1
 #--
 
 # Sensitive policy present, and set to notify site admin
@@ -1508,7 +1508,7 @@ test_NotifyUser_Incorrect_V2 if {
 #--
 
 #
-# Policy 5
+# Policy MS.DEFENDER.4.5v1
 #--
 test_NotImplemented_Correct_V1 if {
     PolicyId := "MS.DEFENDER.4.5v1"
@@ -1521,7 +1521,7 @@ test_NotImplemented_Correct_V1 if {
 #--
 
 #
-# Policy 6
+# Policy MS.DEFENDER.4.6v1
 #--
 test_NotImplemented_Correct_V2 if {
     PolicyId := "MS.DEFENDER.4.6v1"

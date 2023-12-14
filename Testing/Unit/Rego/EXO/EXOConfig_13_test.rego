@@ -7,7 +7,7 @@ import data.utils.key.PASS
 
 
 #
-# Policy 1
+# Policy MS.EXO.13.1v1
 #--
 test_AuditDisabled_Correct if {
     Output := exo.tests with input as {

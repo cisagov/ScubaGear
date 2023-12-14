@@ -8,7 +8,7 @@ import data.utils.key.PASS
 
 
 #
-# MS.SHAREPOINT.4.1v1
+# Policy MS.SHAREPOINT.4.1v1
 #--
 test_NotImplemented_Correct if {
     PolicyId := "MS.SHAREPOINT.4.1v1"
@@ -20,7 +20,7 @@ test_NotImplemented_Correct if {
 #--
 
 #
-# MS.SHAREPOINT.4.2v1
+# Policy MS.SHAREPOINT.4.2v1
 #--
 test_DenyAddAndCustomizePages_Correct if {
     Output := sharepoint.tests with input as {

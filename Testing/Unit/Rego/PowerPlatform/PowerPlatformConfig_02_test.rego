@@ -6,7 +6,7 @@ import data.utils.key.PASS
 
 
 #
-# Policy 1
+# Policy MS.POWERPLATFORM.2.1v1
 #--
 test_name_Correct if {
     Output := powerplatform.tests with input as {
@@ -55,7 +55,7 @@ test_name_Incorrect if {
 #--
 
 #
-# Policy 2
+# Policy MS.POWERPLATFORM.2.2v1
 #--
 test_environment_list_Correct if {
     Output := powerplatform.tests with input as {
@@ -115,7 +115,7 @@ test_environment_list_Incorrect if {
 #--
 
 #
-# Policy 3
+# Policy MS.POWERPLATFORM.2.3v1
 #--
 test_classification_Correct_V1 if {
     Output := powerplatform.tests with input as {

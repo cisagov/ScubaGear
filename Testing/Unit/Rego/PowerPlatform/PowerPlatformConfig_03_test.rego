@@ -8,7 +8,7 @@ import data.utils.key.PASS
 
 
 #
-# Policy 1
+# Policy MS.POWERPLATFORM.3.1v1
 #--
 test_isDisabled_Correct if {
     Output := powerplatform.tests with input as {
@@ -40,7 +40,7 @@ test_isDisabled_Incorrect if {
 #--
 
 #
-# Policy 2
+# Policy MS.POWERPLATFORM.3.2v1
 #--
 test_NotImplemented_Correct if {
     PolicyId := "MS.POWERPLATFORM.3.2v1"

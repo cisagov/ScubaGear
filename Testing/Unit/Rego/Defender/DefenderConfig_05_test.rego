@@ -8,7 +8,7 @@ import data.utils.key.PASS
 
 
 #
-# Policy 1
+# Policy MS.DEFENDER.5.1v1
 #--
 test_Disabled_Correct_V1 if {
     Output := defender.tests with input as {
@@ -194,7 +194,7 @@ test_Disabled_Incorrect_V2 if {
 #--
 
 #
-# Policy 2
+# Policy MS.DEFENDER.5.2v1
 #--
 test_NotImplemented_Correct_V2 if {
     PolicyId := "MS.DEFENDER.5.2v1"

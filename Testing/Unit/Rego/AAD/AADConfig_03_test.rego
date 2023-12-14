@@ -9,7 +9,7 @@ import data.utils.key.PASS
 
 
 #
-# MS.AAD.3.1v1
+# Policy MS.AAD.3.1v1
 #--
 test_PhishingResistantAllMFA_Correct if {
     Output := aad.tests with input as {
@@ -285,7 +285,7 @@ test_PhishingResistantMFAExcludeGroup_Incorrect if {
 #--
 
 #
-# MS.AAD.3.2v1
+# Policy MS.AAD.3.2v1
 #--
 test_NoExclusionsConditions_Correct if {
     Output := aad.tests with input as {
@@ -1507,7 +1507,7 @@ test_State_Incorrect_V1 if {
 #--
 
 #
-# MS.AAD.3.3v1
+# Policy MS.AAD.3.3v1
 #--
 test_3_1_passes_and_satisfies_3_3 if{
     Output := aad.tests with input as {
@@ -1559,7 +1559,7 @@ test_NotImplemented_Correct_V2 if {
 #--
 
 #
-# MS.AAD.3.4v1
+# Policy MS.AAD.3.4v1
 #--
 test_Migrated_Correct if {
     Output := aad.tests with input as {
@@ -1587,7 +1587,7 @@ test_Migrated_Incorrect if {
 #--
 
 #
-# MS.AAD.3.5v1
+# Policy MS.AAD.3.5v1
 #--
 test_NotImplemented_Correct_V4 if {
     PolicyId := "MS.AAD.3.5v1"
@@ -1600,7 +1600,7 @@ test_NotImplemented_Correct_V4 if {
 #--
 
 #
-# MS.AAD.3.6v1
+# Policy MS.AAD.3.6v1
 #--
 test_ConditionalAccessPolicies_Correct_all_strengths if {
     Output := aad.tests with input as {
@@ -2071,7 +2071,7 @@ test_ExcludeRoles_Incorrect_V2 if {
 #--
 
 #
-# MS.AAD.3.7v1
+# Policy MS.AAD.3.7v1
 #--
 test_ConditionalAccessPolicies_Correct_V3 if {
     Output := aad.tests with input as {
@@ -2261,7 +2261,7 @@ test_State_Incorrect_V3 if {
 #--
 
 #
-# MS.AAD.3.8v1
+# Policy MS.AAD.3.8v1
 #--
 test_Correct_V1 if {
     Output := aad.tests with input as {

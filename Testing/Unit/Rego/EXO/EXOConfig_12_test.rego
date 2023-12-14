@@ -6,7 +6,7 @@ import data.utils.key.PASS
 
 
 #
-# Policy 1
+# Policy MS.EXO.12.1v1
 #--
 test_IPAllowList_Correct_V1 if {
     Output := exo.tests with input as {
@@ -56,7 +56,7 @@ test_IPAllowList_Incorrect if {
 #--
 
 #
-# Policy 2
+# Policy MS.EXO.12.2v1
 #--
 test_EnableSafeList_Correct_V1 if {
     Output := exo.tests with input as {

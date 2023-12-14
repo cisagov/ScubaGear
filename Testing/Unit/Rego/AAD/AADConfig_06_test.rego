@@ -6,7 +6,7 @@ import data.utils.key.TestResult
 
 
 #
-# MS.AAD.6.1v1
+# Policy MS.AAD.6.1v1
 #--
 test_NotImplemented_Correct if {
     PolicyId := "MS.AAD.6.1v1"

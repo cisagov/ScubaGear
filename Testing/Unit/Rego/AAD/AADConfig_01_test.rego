@@ -5,7 +5,7 @@ import data.utils.key.TestResult
 
 
 #
-# MS.AAD.1.1v1
+# Policy MS.AAD.1.1v1
 #--
 test_NoExclusionsConditions_Correct if {
     Output := aad.tests with input as {
@@ -305,7 +305,7 @@ test_NoExclusionsState_Incorrect if {
     TestResult("MS.AAD.1.1v1", Output, ReportDetailString, false) == true
 }
 
-# tests for user exclusions and no group exclusions #
+# tests for user exclusions and no group exclusions
 test_NoExclusionsExemptUsers_Correct if {
     Output := aad.tests with input as {
         "conditional_access_policies": [
@@ -909,7 +909,7 @@ test_UserExclusionsState_Incorrect if {
     TestResult("MS.AAD.1.1v1", Output, ReportDetailString, false) == true
 }
 
-# tests for group exclusions and no user exclusions #
+# tests for group exclusions and no user exclusions
 test_NoExclusionsExemptGroups_Correct if {
     Output := aad.tests with input as {
         "conditional_access_policies": [
@@ -1218,7 +1218,7 @@ test_MultiGroupExclusionsConditions_Correct if {
     TestResult("MS.AAD.1.1v1", Output, ReportDetailString, true) == true
 }
 
-# tests when both group and user exclusions present #
+# tests when both group and user exclusions present
 test_UserGroupExclusionConditions_Correct if {
     Output := aad.tests with input as {
         "conditional_access_policies": [

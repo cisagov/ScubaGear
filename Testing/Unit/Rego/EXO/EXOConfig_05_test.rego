@@ -7,7 +7,7 @@ import data.utils.key.PASS
 
 
 #
-# Policy 1
+# Policy MS.EXO.5.1v1
 #--
 test_SmtpClientAuthenticationDisabled_Correct if {
     Output := exo.tests with input as {

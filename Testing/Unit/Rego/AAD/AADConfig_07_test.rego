@@ -8,7 +8,7 @@ import data.utils.key.PASS
 
 
 #
-# MS.AAD.7.1v1
+# Policy MS.AAD.7.1v1
 #--
 test_PrivilegedUsers_Correct if {
     Output := aad.tests with input as {
@@ -117,7 +117,7 @@ test_PrivilegedUsers_Incorrect_V2 if {
 #--
 
 #--
-# MS.AAD.7.2v1
+# Policy MS.AAD.7.2v1
 #--
 test_NotImplemented_Correct if {
     PolicyId := "MS.AAD.7.2v1"
@@ -130,7 +130,7 @@ test_NotImplemented_Correct if {
 #--
 
 #--
-# MS.AAD.7.3v1
+# Policy MS.AAD.7.3v1
 #--
 test_OnPremisesImmutableId_Correct if {
     Output := aad.tests with input as {
@@ -201,7 +201,7 @@ test_OnPremisesImmutableId_Incorrect_V2 if {
 }
 #--
 
-# MS.AAD.7.4v1
+# Policy MS.AAD.7.4v1
 #--
 test_AdditionalProperties_Correct_V1 if {
     Output := aad.tests with input as {
@@ -993,7 +993,7 @@ test_AdditionalProperties_Incorrect_V14 if {
 #--
 
 #
-# MS.AAD.7.5v1
+# Policy MS.AAD.7.5v1
 #--
 test_Assignments_Correct if {
     Output := aad.tests with input as {
@@ -1071,7 +1071,7 @@ test_Assignments_Incorrect if {
 #--
 
 #
-# MS.AAD.7.6v1
+# Policy MS.AAD.7.6v1
 #--
 test_AdditionalProperties_Correct_V2 if {
     Output := aad.tests with input as {
@@ -1184,7 +1184,7 @@ test_AdditionalProperties_Incorrect_V3 if {
 #--
 
 #
-# MS.AAD.7.7v1
+# Policy MS.AAD.7.7v1
 #--
 test_notificationRecipients_Correct if {
     Output := aad.tests with input as {
@@ -1348,7 +1348,7 @@ test_notificationRecipients_Incorrect_V3 if {
 #--
 
 #
-# MS.AAD.7.8v1
+# Policy MS.AAD.7.8v1
 #--
 test_Id_Correct_V1 if {
     Output := aad.tests with input as {
@@ -1452,7 +1452,7 @@ test_Id_Incorrect if {
 #--
 
 #
-# MS.AAD.7.9v1
+# Policy MS.AAD.7.9v1
 #--
 
 test_DisplayName_Correct if {

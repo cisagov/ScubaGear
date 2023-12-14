@@ -6,7 +6,7 @@ import data.utils.key.PASS
 
 
 #
-# Policy 1
+# Policy MS.DEFENDER.2.1v1
 #--
 test_TargetedUsers_Correct_V1 if {
     Output := defender.tests with input as {
@@ -335,7 +335,7 @@ test_TargetedUsers_Incorrect_V6 if {
 #--
 
 #
-# Policy 2
+# Policy MS.DEFENDER.2.2v1
 #--
 test_AgencyDomains_Correct_V1 if {
     Output := defender.tests with input as {
@@ -689,7 +689,7 @@ test_AgencyDomains_Incorrect_V8 if {
 #--
 
 #
-# Policy 3
+# Policy MS.DEFENDER.2.3v1
 #--
 test_CustomDomains_Correct_V1 if {
     Output := defender.tests with input as {

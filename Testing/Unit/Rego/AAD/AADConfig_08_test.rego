@@ -6,7 +6,7 @@ import data.utils.key.TestResult
 
 
 #
-# MS.AAD.8.1v1
+# Policy MS.AAD.8.1v1
 #--
 test_GuestUserRoleId_Correct_V1 if {
     Output := aad.tests with input as {
@@ -84,7 +84,7 @@ test_GuestUserRoleId_Incorrect_V3 if {
 #--
 
 #
-# MS.AAD.8.2v1
+# Policy MS.AAD.8.2v1
 #--
 test_AllowInvitesFrom_Correct if {
     Output := aad.tests with input as {
@@ -116,7 +116,7 @@ test_AllowInvitesFrom_Incorrect if {
 #--
 
 #
-# MS.AAD.8.3v1
+# Policy MS.AAD.8.3v1
 #--
 test_NotImplemented_Correct if {
     PolicyId := "MS.AAD.8.3v1"

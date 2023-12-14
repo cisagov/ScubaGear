@@ -6,7 +6,7 @@ import data.utils.key.PASS
 
 
 #
-# Policy 1
+# Policy MS.EXO.1.1v1
 #--
 test_AutoForwardEnabled_Correct if {
     Output := exo.tests with input as {

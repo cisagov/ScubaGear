@@ -7,7 +7,7 @@ import data.utils.key.PASS
 
 
 #
-# Policy 1
+# Policy MS.DEFENDER.1.1v1
 #--
 test_Enabled_Correct_V1 if {
     Output := defender.tests with input as {
@@ -140,7 +140,7 @@ test_Enabled_Incorrect_V4 if {
 #--
 
 #
-# Policy 2
+# Policy MS.DEFENDER.1.2v1
 #--
 test_AllEOP_Correct_V1 if {
     Output := defender.tests with input as {
@@ -252,7 +252,7 @@ test_AllEOP_Incorrect_V3 if {
 #--
 
 #
-# Policy 3
+# Policy MS.DEFENDER.1.3v1
 #--
 test_AllDefender_Correct_V1 if {
     Output := defender.tests with input as {
@@ -375,7 +375,7 @@ test_AllDefender_Incorrect_V4 if {
 #--
 
 #
-# Policy 4
+# Policy MS.DEFENDER.1.4v1
 #--
 test_SensitiveEOP_Correct_V1 if {
     Output := defender.tests with input as {
@@ -1551,7 +1551,7 @@ test_SensitiveEOP_Incorrect_V5 if {
 #--
 
 #
-# Policy 5
+# Policy MS.DEFENDER.1.5v1
 #--
 test_SensitiveATP_Correct_V1 if {
     Output := defender.tests with input as {

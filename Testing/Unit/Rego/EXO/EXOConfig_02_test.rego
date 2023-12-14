@@ -8,7 +8,7 @@ import data.utils.key.PASS
 
 
 #
-# Policy 1
+# Policy MS.EXO.2.1v1
 #--
 test_NotImplemented_Correct if {
     PolicyId := "MS.EXO.2.1v1"
@@ -21,7 +21,7 @@ test_NotImplemented_Correct if {
 #--
 
 #
-# Policy 2
+# Policy MS.EXO.2.2v1
 #--
 test_Rdata_Correct_V1 if {
     Output := exo.tests with input as {
