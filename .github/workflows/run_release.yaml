@@ -1,5 +1,4 @@
 on:
-  push: # TODO remove 
   workflow_dispatch:
     inputs:
       releaseName:
