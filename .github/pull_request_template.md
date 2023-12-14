@@ -39,7 +39,8 @@ Uncomment this section if a screenshot is needed.
 - [ ] *All* future TODOs are captured in issues, which are referenced
       in code comments
 - [ ] These code changes follow the ScubaGear [content style guide](https://github.com/cisagov/ScubaGear/blob/main/CONTENTSTYLEGUIDE.md).
-- [ ] All relevant type-of-change labels have been added.
+- [ ] All relevant type-of-change labels have been added
+- [ ] All relevant project fields have been set
 - [ ] All relevant repo and/or project documentation has been updated
       to reflect the changes in this PR
 - [ ] Tests have been added and/or modified to cover the changes in this PR
