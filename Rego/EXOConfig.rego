@@ -83,7 +83,7 @@ tests contains {
     "Criticality": "Shall",
     "Commandlet": ["Get-ScubaSpfRecords", "Get-AcceptedDomain"],
     "ActualValue": Domains,
-    "ReportDetails": ReportDetailsArray(Status, Domains, "agency domain(s) found in violation:"), #ReportDetailsArray(Status, Domains, AllDomains),
+    "ReportDetails": ReportDetailsArray(Status, Domains, "agency domain(s) found in violation:"),
     "RequirementMet": Status
 } if {
     Domains := DomainsWithoutSpf
@@ -123,7 +123,7 @@ tests contains {
         "Get-AcceptedDomain"
     ],
     "ActualValue": [input.dkim_records, input.dkim_config],
-    "ReportDetails": ReportDetailsArray(Status, DomainsWithoutDkim, "agency domain(s) found in violation:"), #ReportDetailsArray(Status, DomainsWithoutDkim, AllDomains),
+    "ReportDetails": ReportDetailsArray(Status, DomainsWithoutDkim, "agency domain(s) found in violation:"),
     "RequirementMet": Status
 } if {
     # Get domains that are not in DomainsWithDkim array
@@ -158,7 +158,7 @@ tests contains {
         "Get-AcceptedDomain"
     ],
     "ActualValue": input.dmarc_records,
-    "ReportDetails": ReportDetailsArray(Status, Domains, "agency domain(s) found in violation:"), #ReportDetailsArray(Status, Domains, AllDomains),
+    "ReportDetails": ReportDetailsArray(Status, Domains, "agency domain(s) found in violation:"),
     "RequirementMet": Status
 } if {
     Domains := DomainsWithoutDmarc
@@ -187,7 +187,7 @@ tests contains {
         "Get-AcceptedDomain"
     ],
     "ActualValue": input.dmarc_records,
-    "ReportDetails": ReportDetailsArray(Status, Domains, "agency domain(s) found in violation:"), #ReportDetailsArray(Status, Domains, AllDomains),
+    "ReportDetails": ReportDetailsArray(Status, Domains, "agency domain(s) found in violation:"),
     "RequirementMet": Status
 } if {
     Domains := DomainsWithoutPreject
@@ -227,7 +227,7 @@ tests contains {
         "Get-AcceptedDomain"
     ],
     "ActualValue": input.dmarc_records,
-    "ReportDetails": ReportDetailsArray(Status, Domains, "agency domain(s) found in violation:"), #ReportDetailsArray(Status, Domains, AllDomains),
+    "ReportDetails": ReportDetailsArray(Status, Domains, "agency domain(s) found in violation:"),
     "RequirementMet": Status
 } if {
     Domains := DomainsWithoutDHSContact
@@ -283,7 +283,7 @@ tests contains {
         "Get-AcceptedDomain"
     ],
     "ActualValue": input.dmarc_records,
-    "ReportDetails": ReportDetailsArray(Status, Domains, "agency domain(s) found in violation:"), #ReportDetailsArray(Status, Domains, AllDomains),
+    "ReportDetails": ReportDetailsArray(Status, Domains, "agency domain(s) found in violation:"),
     "RequirementMet": Status
 } if {
     Domains := DomainsWithoutAgencyContact
@@ -349,7 +349,11 @@ tests contains {
 } if {
     ContactsSharingPolicies := SharingPolicyContactsAllowedAllDomains
     ErrString := "sharing polic(ies) are sharing contacts folders with all domains by default:"
-    ErrMessage := Description([ArraySizeStr(ContactsSharingPolicies), ErrString , concat(", ", ContactsSharingPolicies)])
+    ErrMessage := Description([
+        ArraySizeStr(ContactsSharingPolicies),
+        ErrString ,
+        concat(", ", ContactsSharingPolicies)
+    ])
     Status := count(ContactsSharingPolicies) == 0
 }
 #--
@@ -378,7 +382,11 @@ tests contains {
 } if {
     CalendarSharingPolicies := SharingPolicyCalendarAllowedAllDomains
     ErrString := "sharing polic(ies) are sharing calendar details with all domains by default:"
-    ErrMessage := Description([ArraySizeStr(CalendarSharingPolicies), ErrString , concat(", ", CalendarSharingPolicies)])
+    ErrMessage := Description([
+        ArraySizeStr(CalendarSharingPolicies),
+        ErrString ,
+        concat(", ", CalendarSharingPolicies)
+    ])
     Status := count(CalendarSharingPolicies) == 0
 }
 #--

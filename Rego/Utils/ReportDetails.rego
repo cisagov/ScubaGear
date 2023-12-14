@@ -36,13 +36,13 @@ PolicyLink(PolicyId) := sprintf(
 ###############################
 
 # Not Implemented Report Details methods
-NotCheckedDetails(PolicyId) := Details := sprintf(
+NotCheckedDetails(PolicyId) := sprintf(
     "Not currently checked automatically. See %v for instructions on manual check",
     [PolicyLink(PolicyId)]
 )
 
 # 3rd Party Not Implemented Report Details method
-DefenderMirrorDetails(PolicyId) := Details := sprintf(
+DefenderMirrorDetails(PolicyId) := sprintf(
     concat(" ", [
     "A custom product can be used to fulfill this policy requirement.",
     "If custom product is used, a 3rd party assessment tool or manually review is needed to ensure compliance.",
