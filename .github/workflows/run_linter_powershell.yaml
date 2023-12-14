@@ -5,18 +5,18 @@ name: Lint Check for PowerShell
 
 # Run whenever PowerShell files are checked in
 on:
-  push:
-    paths:
-      - '**.ps1'
-      - '**.psm1'
-      - '**.psd1'
-      - '**.pssc'
-      - '**.psrc'
-      - '**.ps1xml'
-      - '**.cdxml'
-    branches:
-      - 700-add-powershell-linter
-  workflow_dispatch:
+  push:  # TODO uncomment
+  #   paths:
+  #     - '**.ps1'
+  #     - '**.psm1'
+  #     - '**.psd1'
+  #     - '**.pssc'
+  #     - '**.psrc'
+  #     - '**.ps1xml'
+  #     - '**.cdxml'
+  #   branches:
+  #     - 700-add-powershell-linter
+  # workflow_dispatch:
 
 jobs:
   powershell-lint-check:
