@@ -2,8 +2,8 @@ package exo_test
 import future.keywords
 import data.exo
 import data.utils.report.NotCheckedDetails
-import data.utils.policy.CorrectTestResult
-import data.utils.policy.IncorrectTestResult
+import data.utils.policy.TestResult
+import data.utils.policy.TestResultContains
 import data.utils.policy.PASS
 
 
@@ -16,7 +16,7 @@ test_NotImplemented_Correct if {
     Output := exo.tests with input as { }
 
     ReportDetailString := NotCheckedDetails(PolicyId)
-    IncorrectTestResult(PolicyId, Output, ReportDetailString) == true
+    TestResult(PolicyId, Output, ReportDetailString, false) == true
 }
 #--
 
@@ -36,7 +36,7 @@ test_Rdata_Correct_V1 if {
     }
 
 
-    CorrectTestResult("MS.EXO.2.2v1", Output, PASS) == true
+    TestResult("MS.EXO.2.2v1", Output, PASS, true) == true
 }
 
 test_Rdata_Correct_V2 if {
@@ -51,7 +51,7 @@ test_Rdata_Correct_V2 if {
         ]
     }
 
-    CorrectTestResult("MS.EXO.2.2v1", Output, PASS) == true
+    TestResult("MS.EXO.2.2v1", Output, PASS, true) == true
 }
 
 test_Rdata_Incorrect_V1 if {
@@ -67,7 +67,7 @@ test_Rdata_Incorrect_V1 if {
     }
 
     ReportDetailString := "1 of 1 agency domain(s) found in violation: Test name"
-    IncorrectTestResult("MS.EXO.2.2v1", Output, ReportDetailString) == true
+    TestResult("MS.EXO.2.2v1", Output, ReportDetailString, false) == true
 }
 
 test_Rdata_Incorrect_V2 if {
@@ -83,12 +83,10 @@ test_Rdata_Incorrect_V2 if {
     }
 
     ReportDetailString := "1 of 1 agency domain(s) found in violation: Test name"
-    IncorrectTestResult("MS.EXO.2.2v1", Output, ReportDetailString) == true
+    TestResult("MS.EXO.2.2v1", Output, ReportDetailString, false) == true
 }
 
 test_Rdata_Incorrect_V3 if {
-    PolicyId := "MS.EXO.2.2v1"
-
     Output := exo.tests with input as {
         "spf_records": [
             {
@@ -112,17 +110,15 @@ test_Rdata_Incorrect_V3 if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == false
-    contains(RuleOutput[0].ReportDetails, "2 of 3 agency domain(s) found in violation: ")
-    startswith(RuleOutput[0].ReportDetails, "2 of 3 agency domain(s) found in violation: ")
-    contains(RuleOutput[0].ReportDetails, "bad.com") # I'm not sure
-
     # if we can make any assumptions about the order these domains
     # will be printed in, hence the "contains" operator instead of ==
-    contains(RuleOutput[0].ReportDetails, "2bad.com")
+    ReportDetailArrayStrs := [
+        "2 of 3 agency domain(s) found in violation: ",
+        "2 of 3 agency domain(s) found in violation: ",
+        "bad.com", # I'm not sure
+        "2bad.com"
+    ]
+    TestResultContains("MS.EXO.2.2v1", Output, ReportDetailArrayStrs, false) == true
 }
 
 test_Rdata_Multiple_Correct_V1 if {
@@ -138,7 +134,7 @@ test_Rdata_Multiple_Correct_V1 if {
         ]
     }
 
-    CorrectTestResult("MS.EXO.2.2v1", Output, PASS) == true
+    TestResult("MS.EXO.2.2v1", Output, PASS, true) == true
 }
 
 test_Rdata_Multiple_Correct_V2 if {
@@ -154,7 +150,7 @@ test_Rdata_Multiple_Correct_V2 if {
         ]
     }
 
-    CorrectTestResult("MS.EXO.2.2v1", Output, PASS) == true
+    TestResult("MS.EXO.2.2v1", Output, PASS, true) == true
 }
 
 test_Rdata_Multiple_Incorrect if {
@@ -171,6 +167,6 @@ test_Rdata_Multiple_Incorrect if {
     }
 
     ReportDetailString := "1 of 1 agency domain(s) found in violation: bad.com"
-    IncorrectTestResult("MS.EXO.2.2v1", Output, ReportDetailString) == true
+    TestResult("MS.EXO.2.2v1", Output, ReportDetailString, false) == true
 }
 #--

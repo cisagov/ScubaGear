@@ -1,8 +1,7 @@
 package teams_test
 import future.keywords
 import data.teams
-import data.utils.policy.CorrectTestResult
-import data.utils.policy.IncorrectTestResult
+import data.utils.policy.TestResult
 import data.utils.policy.FAIL
 import data.utils.policy.PASS
 
@@ -29,7 +28,7 @@ test_AllowEmailIntoChannel_Correct_V1 if {
         ]
     }
 
-    CorrectTestResult("MS.TEAMS.4.1v1", Output, PASS) == true
+    TestResult("MS.TEAMS.4.1v1", Output, PASS, true) == true
 }
 
 test_AllowEmailIntoChannel_Correct_V1_multi if {
@@ -55,7 +54,7 @@ test_AllowEmailIntoChannel_Correct_V1_multi if {
         ]
     }
 
-    CorrectTestResult("MS.TEAMS.4.1v1", Output, PASS) == true
+    TestResult("MS.TEAMS.4.1v1", Output, PASS, true) == true
 }
 
 test_AllowEmailIntoChannel_Incorrect if {
@@ -77,7 +76,7 @@ test_AllowEmailIntoChannel_Incorrect if {
         ]
     }
 
-    IncorrectTestResult("MS.TEAMS.4.1v1", Output, FAIL) == true
+    TestResult("MS.TEAMS.4.1v1", Output, FAIL, false) == true
 }
 
 test_AllowEmailIntoChannel_Incorrect_multi if {
@@ -103,7 +102,7 @@ test_AllowEmailIntoChannel_Incorrect_multi if {
         ]
     }
 
-    IncorrectTestResult("MS.TEAMS.4.1v1", Output, FAIL) == true
+    TestResult("MS.TEAMS.4.1v1", Output, FAIL, false) == true
 }
 
 test_AllowEmailIntoChannel_Correct_V2 if {
@@ -126,7 +125,7 @@ test_AllowEmailIntoChannel_Correct_V2 if {
     }
 
     ReportDetailString := "N/A: Feature is unavailable in GCC environments"
-    CorrectTestResult("MS.TEAMS.4.1v1", Output, ReportDetailString) == true
+    TestResult("MS.TEAMS.4.1v1", Output, ReportDetailString, true) == true
 }
 
 test_AllowEmailIntoChannel_Correct_V2_multi if {
@@ -153,7 +152,7 @@ test_AllowEmailIntoChannel_Correct_V2_multi if {
     }
 
     ReportDetailString := "N/A: Feature is unavailable in GCC environments"
-    CorrectTestResult("MS.TEAMS.4.1v1", Output, ReportDetailString) == true
+    TestResult("MS.TEAMS.4.1v1", Output, ReportDetailString, true) == true
 }
 
 test_AllowEmailIntoChannel_Correct_V3 if {
@@ -176,7 +175,7 @@ test_AllowEmailIntoChannel_Correct_V3 if {
     }
 
     ReportDetailString := "N/A: Feature is unavailable in GCC environments"
-    CorrectTestResult("MS.TEAMS.4.1v1", Output, ReportDetailString) == true
+    TestResult("MS.TEAMS.4.1v1", Output, ReportDetailString, true) == true
 }
 
 test_AllowEmailIntoChannel_Correct_V3_multi if {
@@ -203,7 +202,7 @@ test_AllowEmailIntoChannel_Correct_V3_multi if {
     }
 
     ReportDetailString := "N/A: Feature is unavailable in GCC environments"
-    CorrectTestResult("MS.TEAMS.4.1v1", Output, ReportDetailString) == true
+    TestResult("MS.TEAMS.4.1v1", Output, ReportDetailString, true) == true
 }
 
 test_AllowEmailIntoChannel_Correct_V4 if {
@@ -230,7 +229,7 @@ test_AllowEmailIntoChannel_Correct_V4 if {
     }
 
     ReportDetailString := "N/A: Feature is unavailable in GCC environments"
-    CorrectTestResult("MS.TEAMS.4.1v1", Output, ReportDetailString) == true
+    TestResult("MS.TEAMS.4.1v1", Output, ReportDetailString, true) == true
 }
 
 test_AllowEmailIntoChannel_Correct_V4_multi if {
@@ -257,6 +256,6 @@ test_AllowEmailIntoChannel_Correct_V4_multi if {
     }
 
     ReportDetailString := "N/A: Feature is unavailable in GCC environments"
-    CorrectTestResult("MS.TEAMS.4.1v1", Output, ReportDetailString) == true
+    TestResult("MS.TEAMS.4.1v1", Output, ReportDetailString, true) == true
 }
 #--

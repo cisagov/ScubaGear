@@ -1,8 +1,7 @@
 package exo_test
 import future.keywords
 import data.exo
-import data.utils.policy.CorrectTestResult
-import data.utils.policy.IncorrectTestResult
+import data.utils.policy.TestResult
 import data.utils.policy.PASS
 
 
@@ -29,7 +28,7 @@ test_Rdata_Correct if {
         ]
     }
 
-    CorrectTestResult("MS.EXO.4.1v1", Output, PASS) == true
+    TestResult("MS.EXO.4.1v1", Output, PASS, true) == true
 }
 
 test_Rdata_Incorrect_V1 if {
@@ -51,7 +50,7 @@ test_Rdata_Incorrect_V1 if {
     }
 
     ReportDetailString := "1 of 1 agency domain(s) found in violation: test.name"
-    IncorrectTestResult("MS.EXO.4.1v1", Output, ReportDetailString) == true
+    TestResult("MS.EXO.4.1v1", Output, ReportDetailString, false) == true
 }
 
 test_Rdata_Incorrect_V2 if {
@@ -75,7 +74,7 @@ test_Rdata_Incorrect_V2 if {
     }
 
     ReportDetailString := "1 of 1 agency domain(s) found in violation: test.name"
-    IncorrectTestResult("MS.EXO.4.1v1", Output, ReportDetailString) == true
+    TestResult("MS.EXO.4.1v1", Output, ReportDetailString, false) == true
 }
 
 test_Rdata_Incorrect_V3 if {
@@ -109,7 +108,7 @@ test_Rdata_Incorrect_V3 if {
     }
 
     ReportDetailString := "1 of 2 agency domain(s) found in violation: bad.name"
-    IncorrectTestResult("MS.EXO.4.1v1", Output, ReportDetailString) == true
+    TestResult("MS.EXO.4.1v1", Output, ReportDetailString, false) == true
 }
 #--
 
@@ -136,7 +135,7 @@ test_Rdata_Correct_V2 if {
         ]
     }
 
-    CorrectTestResult("MS.EXO.4.2v1", Output, PASS) == true
+    TestResult("MS.EXO.4.2v1", Output, PASS, true) == true
 }
 
 test_Rdata_Incorrect_V4 if {
@@ -160,7 +159,7 @@ test_Rdata_Incorrect_V4 if {
     }
 
     ReportDetailString := "1 of 1 agency domain(s) found in violation: test.name"
-    IncorrectTestResult("MS.EXO.4.2v1", Output, ReportDetailString) == true
+    TestResult("MS.EXO.4.2v1", Output, ReportDetailString, false) == true
 }
 
 test_Rdata_Incorrect_V5 if {
@@ -184,7 +183,7 @@ test_Rdata_Incorrect_V5 if {
     }
 
     ReportDetailString := "1 of 1 agency domain(s) found in violation: test.name"
-    IncorrectTestResult("MS.EXO.4.2v1", Output, ReportDetailString) == true
+    TestResult("MS.EXO.4.2v1", Output, ReportDetailString, false) == true
 }
 #--
 
@@ -211,7 +210,7 @@ test_DMARCReport_Correct_V1 if {
         ]
     }
 
-    CorrectTestResult("MS.EXO.4.3v1", Output, PASS) == true
+    TestResult("MS.EXO.4.3v1", Output, PASS, true) == true
 }
 
 test_DMARCReport_Incorrect_V1 if {
@@ -235,7 +234,7 @@ test_DMARCReport_Incorrect_V1 if {
     }
 
     ReportDetailString := "1 of 1 agency domain(s) found in violation: test.name"
-    IncorrectTestResult("MS.EXO.4.3v1", Output, ReportDetailString) == true
+    TestResult("MS.EXO.4.3v1", Output, ReportDetailString, false) == true
 }
 
 test_DMARCReport_Incorrect_V2 if {
@@ -259,7 +258,7 @@ test_DMARCReport_Incorrect_V2 if {
     }
 
     ReportDetailString := "1 of 1 agency domain(s) found in violation: test.name"
-    IncorrectTestResult("MS.EXO.4.3v1", Output, ReportDetailString) == true
+    TestResult("MS.EXO.4.3v1", Output, ReportDetailString, false) == true
 }
 
 # empty rdata
@@ -282,7 +281,7 @@ test_DMARCReport_Incorrect_V3 if {
     }
 
     ReportDetailString := "1 of 1 agency domain(s) found in violation: test.name"
-    IncorrectTestResult("MS.EXO.4.3v1", Output, ReportDetailString) == true
+    TestResult("MS.EXO.4.3v1", Output, ReportDetailString, false) == true
 }
 #--
 
@@ -311,7 +310,7 @@ test_POC_Correct_V1 if {
         ]
     }
 
-    CorrectTestResult("MS.EXO.4.4v1", Output, PASS) == true
+    TestResult("MS.EXO.4.4v1", Output, PASS, true) == true
 }
 
 # 2+ emails in rua= and 1+ in ruf
@@ -335,7 +334,7 @@ test_POC_Correct_V1 if {
         ]
     }
 
-    CorrectTestResult("MS.EXO.4.4v1", Output, PASS) == true
+    TestResult("MS.EXO.4.4v1", Output, PASS, true) == true
 }
 
 # Only 1 rua
@@ -360,7 +359,7 @@ test_POC_Incorrect_V1 if {
     }
 
     ReportDetailString := "1 of 1 agency domain(s) found in violation: test.name"
-    IncorrectTestResult("MS.EXO.4.4v1", Output, ReportDetailString) == true
+    TestResult("MS.EXO.4.4v1", Output, ReportDetailString, false) == true
 }
 
 # Only 2 emails in rua no ruf
@@ -385,7 +384,7 @@ test_POC_Incorrect_V2 if {
     }
 
     ReportDetailString := "1 of 1 agency domain(s) found in violation: test.name"
-    IncorrectTestResult("MS.EXO.4.4v1", Output, ReportDetailString) == true
+    TestResult("MS.EXO.4.4v1", Output, ReportDetailString, false) == true
 }
 
 # Only 1 ruf no rua
@@ -410,7 +409,7 @@ test_POC_Incorrect_V3 if {
     }
 
     ReportDetailString := "1 of 1 agency domain(s) found in violation: test.name"
-    IncorrectTestResult("MS.EXO.4.4v1", Output, ReportDetailString) == true
+    TestResult("MS.EXO.4.4v1", Output, ReportDetailString, false) == true
 }
 
 # 2 domains 1 fails rua/ruf number
@@ -447,7 +446,7 @@ test_POC_Incorrect_V4 if {
     }
 
     ReportDetailString := "1 of 2 agency domain(s) found in violation: example.com"
-    IncorrectTestResult("MS.EXO.4.4v1", Output, ReportDetailString) == true
+    TestResult("MS.EXO.4.4v1", Output, ReportDetailString, false) == true
 }
 
 # 2 domains 1 fails rua # of email policy requirement
@@ -484,7 +483,7 @@ test_POC_Incorrect_V5 if {
     }
 
     ReportDetailString := "1 of 2 agency domain(s) found in violation: example.com"
-    IncorrectTestResult("MS.EXO.4.4v1", Output, ReportDetailString) == true
+    TestResult("MS.EXO.4.4v1", Output, ReportDetailString, false) == true
 }
 
 # 2 domains 1 domain failed DNS query. Empty rdata
@@ -519,6 +518,6 @@ test_POC_Incorrect_V6 if {
     }
 
     ReportDetailString := "1 of 2 agency domain(s) found in violation: example.com"
-    IncorrectTestResult("MS.EXO.4.4v1", Output, ReportDetailString) == true
+    TestResult("MS.EXO.4.4v1", Output, ReportDetailString, false) == true
 }
 #--

@@ -1,8 +1,7 @@
 package exo_test
 import future.keywords
 import data.exo
-import data.utils.policy.CorrectTestResult
-import data.utils.policy.IncorrectTestResult
+import data.utils.policy.TestResult
 import data.utils.policy.PASS
 
 
@@ -21,7 +20,7 @@ test_FromScope_Correct if {
         ]
     }
 
-    CorrectTestResult("MS.EXO.7.1v1", Output, PASS) == true
+    TestResult("MS.EXO.7.1v1", Output, PASS, true) == true
 }
 
 test_FromScope_Incorrect_V1 if {
@@ -37,7 +36,7 @@ test_FromScope_Incorrect_V1 if {
     }
 
     ReportDetailString := "No transport rule found that applies warnings to emails received from outside the organization"
-    IncorrectTestResult("MS.EXO.7.1v1", Output, ReportDetailString) == true
+    TestResult("MS.EXO.7.1v1", Output, ReportDetailString, false) == true
 }
 
 test_FromScope_Incorrect_V2 if {
@@ -53,7 +52,7 @@ test_FromScope_Incorrect_V2 if {
     }
 
     ReportDetailString := "No transport rule found that applies warnings to emails received from outside the organization"
-    IncorrectTestResult("MS.EXO.7.1v1", Output, ReportDetailString) == true
+    TestResult("MS.EXO.7.1v1", Output, ReportDetailString, false) == true
 }
 
 test_FromScope_Incorrect_V3 if {
@@ -69,7 +68,7 @@ test_FromScope_Incorrect_V3 if {
     }
 
     ReportDetailString := "No transport rule found that applies warnings to emails received from outside the organization"
-    IncorrectTestResult("MS.EXO.7.1v1", Output, ReportDetailString) == true
+    TestResult("MS.EXO.7.1v1", Output, ReportDetailString, false) == true
 }
 
 test_FromScope_Incorrect_V4 if {
@@ -85,7 +84,7 @@ test_FromScope_Incorrect_V4 if {
     }
 
     ReportDetailString := "No transport rule found that applies warnings to emails received from outside the organization"
-    IncorrectTestResult("MS.EXO.7.1v1", Output, ReportDetailString) == true
+    TestResult("MS.EXO.7.1v1", Output, ReportDetailString, false) == true
 }
 
 test_FromScope_Multiple_Correct if {
@@ -118,7 +117,7 @@ test_FromScope_Multiple_Correct if {
         ]
     }
 
-    CorrectTestResult("MS.EXO.7.1v1", Output, PASS) == true
+    TestResult("MS.EXO.7.1v1", Output, PASS, true) == true
 }
 
 test_FromScope_Multiple_Incorrect if {
@@ -164,7 +163,7 @@ test_FromScope_Multiple_Incorrect if {
     }
 
     ReportDetailString := "No transport rule found that applies warnings to emails received from outside the organization"
-    IncorrectTestResult("MS.EXO.7.1v1", Output, ReportDetailString) == true
+    TestResult("MS.EXO.7.1v1", Output, ReportDetailString, false) == true
 }
 
 test_PrependSubject_IncorrectV1 if {
@@ -180,7 +179,7 @@ test_PrependSubject_IncorrectV1 if {
     }
 
     ReportDetailString := "No transport rule found that applies warnings to emails received from outside the organization"
-    IncorrectTestResult("MS.EXO.7.1v1", Output, ReportDetailString) == true
+    TestResult("MS.EXO.7.1v1", Output, ReportDetailString, false) == true
 }
 
 test_PrependSubject_IncorrectV2 if {
@@ -196,6 +195,6 @@ test_PrependSubject_IncorrectV2 if {
     }
 
     ReportDetailString := "No transport rule found that applies warnings to emails received from outside the organization"
-    IncorrectTestResult("MS.EXO.7.1v1", Output, ReportDetailString) == true
+    TestResult("MS.EXO.7.1v1", Output, ReportDetailString, false) == true
 }
 #--

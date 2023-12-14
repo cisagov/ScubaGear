@@ -1,8 +1,7 @@
 package sharepoint_test
 import future.keywords
 import data.sharepoint
-import data.utils.policy.CorrectTestResult
-import data.utils.policy.IncorrectTestResult
+import data.utils.policy.TestResult
 import data.utils.policy.FAIL
 import data.utils.policy.PASS
 
@@ -19,7 +18,7 @@ test_DefaultSharingLinkType_Correct if {
         ]
     }
 
-    CorrectTestResult("MS.SHAREPOINT.2.1v1", Output, PASS) == true
+    TestResult("MS.SHAREPOINT.2.1v1", Output, PASS, true) == true
 }
 
 test_DefaultSharingLinkType_Incorrect if {
@@ -31,7 +30,7 @@ test_DefaultSharingLinkType_Incorrect if {
         ]
     }
 
-    IncorrectTestResult("MS.SHAREPOINT.2.1v1", Output, FAIL) == true
+    TestResult("MS.SHAREPOINT.2.1v1", Output, FAIL, false) == true
 }
 #--
 
@@ -47,7 +46,7 @@ test_DefaultLinkPermission_Correct if {
         ]
     }
 
-    CorrectTestResult("MS.SHAREPOINT.2.2v1", Output, PASS) == true
+    TestResult("MS.SHAREPOINT.2.2v1", Output, PASS, true) == true
 }
 
 test_DefaultLinkPermission_Incorrect if {
@@ -59,6 +58,6 @@ test_DefaultLinkPermission_Incorrect if {
         ]
     }
 
-    IncorrectTestResult("MS.SHAREPOINT.2.2v1", Output, FAIL) == true
+    TestResult("MS.SHAREPOINT.2.2v1", Output, FAIL, false) == true
 }
 #--

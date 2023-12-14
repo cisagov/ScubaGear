@@ -1,8 +1,7 @@
 package powerplatform_test
 import future.keywords
 import data.powerplatform
-import data.utils.policy.CorrectTestResult
-import data.utils.policy.IncorrectTestResult
+import data.utils.policy.TestResult
 import data.utils.policy.FAIL
 import data.utils.policy.PASS
 
@@ -19,7 +18,7 @@ test_disableProductionEnvironmentCreationByNonAdminUsers_Correct if {
         ]
     }
 
-    CorrectTestResult("MS.POWERPLATFORM.1.1v1", Output, PASS) == true
+    TestResult("MS.POWERPLATFORM.1.1v1", Output, PASS, true) == true
 }
 
 test_disableProductionEnvironmentCreationByNonAdminUsers_Incorrect if {
@@ -31,7 +30,7 @@ test_disableProductionEnvironmentCreationByNonAdminUsers_Incorrect if {
         ]
     }
 
-    IncorrectTestResult("MS.POWERPLATFORM.1.1v1", Output, FAIL) == true
+    TestResult("MS.POWERPLATFORM.1.1v1", Output, FAIL, false) == true
 }
 #--
 
@@ -47,7 +46,7 @@ test_disableTrialEnvironmentCreationByNonAdminUsers_Correct if {
         ]
     }
 
-    CorrectTestResult("MS.POWERPLATFORM.1.2v1", Output, PASS) == true
+    TestResult("MS.POWERPLATFORM.1.2v1", Output, PASS, true) == true
 }
 
 test_disableTrialEnvironmentCreationByNonAdminUsers_Incorrect if {
@@ -59,6 +58,6 @@ test_disableTrialEnvironmentCreationByNonAdminUsers_Incorrect if {
         ]
     }
 
-    IncorrectTestResult("MS.POWERPLATFORM.1.2v1", Output, FAIL) == true
+    TestResult("MS.POWERPLATFORM.1.2v1", Output, FAIL, false) == true
 }
 #--

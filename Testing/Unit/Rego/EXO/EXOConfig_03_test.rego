@@ -1,8 +1,7 @@
 package exo_test
 import future.keywords
 import data.exo
-import data.utils.policy.CorrectTestResult
-import data.utils.policy.IncorrectTestResult
+import data.utils.policy.TestResult
 import data.utils.policy.PASS
 
 
@@ -35,7 +34,7 @@ test_Enabled_Correct_V1 if {
         ]
     }
 
-    CorrectTestResult("MS.EXO.3.1v1", Output, PASS) == true
+    TestResult("MS.EXO.3.1v1", Output, PASS, true) == true
 }
 
 # Test with correct default domain
@@ -81,7 +80,7 @@ test_Enabled_Correct_V2 if {
         ]
     }
 
-    CorrectTestResult("MS.EXO.3.1v1", Output, PASS) == true
+    TestResult("MS.EXO.3.1v1", Output, PASS, true) == true
 }
 
 # Test for multiple custom domains
@@ -127,7 +126,7 @@ test_Enabled_Correct_V3 if {
         ]
     }
 
-    CorrectTestResult("MS.EXO.3.1v1", Output, PASS) == true
+    TestResult("MS.EXO.3.1v1", Output, PASS, true) == true
 }
 
 # Test for no custom domains, just the default domain
@@ -157,7 +156,7 @@ test_Enabled_Correct_V4 if {
         ]
     }
 
-    CorrectTestResult("MS.EXO.3.1v1", Output, PASS) == true
+    TestResult("MS.EXO.3.1v1", Output, PASS, true) == true
 }
 
 test_Enabled_Incorrect if {
@@ -187,7 +186,7 @@ test_Enabled_Incorrect if {
     }
 
     ReportDetailString := "1 of 1 agency domain(s) found in violation: test.name"
-    IncorrectTestResult("MS.EXO.3.1v1", Output, ReportDetailString) == true
+    TestResult("MS.EXO.3.1v1", Output, ReportDetailString, false) == true
 }
 
 test_Rdata_Incorrect_V1 if {
@@ -215,7 +214,7 @@ test_Rdata_Incorrect_V1 if {
     }
 
     ReportDetailString := "1 of 1 agency domain(s) found in violation: test.name"
-    IncorrectTestResult("MS.EXO.3.1v1", Output, ReportDetailString) == true
+    TestResult("MS.EXO.3.1v1", Output, ReportDetailString, false) == true
 }
 
 test_Rdata_Incorrect_V2 if {
@@ -245,7 +244,7 @@ test_Rdata_Incorrect_V2 if {
     }
 
     ReportDetailString := "1 of 1 agency domain(s) found in violation: test.name"
-    IncorrectTestResult("MS.EXO.3.1v1", Output, ReportDetailString) == true
+    TestResult("MS.EXO.3.1v1", Output, ReportDetailString, false) == true
 }
 
 test_Enabled_Incorrect_V3 if {
@@ -291,7 +290,7 @@ test_Enabled_Incorrect_V3 if {
     }
 
     ReportDetailString := "1 of 2 agency domain(s) found in violation: test2.name"
-    IncorrectTestResult("MS.EXO.3.1v1", Output, ReportDetailString) == true
+    TestResult("MS.EXO.3.1v1", Output, ReportDetailString, false) == true
 }
 
 # Test with incorrect default domain
@@ -336,6 +335,6 @@ test_Enabled_Incorrect_V4 if {
     }
 
     ReportDetailString := "1 of 2 agency domain(s) found in violation: example.onmicrosoft.com"
-    IncorrectTestResult("MS.EXO.3.1v1", Output, ReportDetailString) == true
+    TestResult("MS.EXO.3.1v1", Output, ReportDetailString, false) == true
 }
 #--

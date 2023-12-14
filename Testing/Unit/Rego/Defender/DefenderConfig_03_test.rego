@@ -1,8 +1,7 @@
 package defender_test
 import future.keywords
 import data.defender
-import data.utils.policy.CorrectTestResult
-import data.utils.policy.IncorrectTestResult
+import data.utils.policy.TestResult
 import data.utils.policy.FAIL
 import data.utils.policy.PASS
 
@@ -21,7 +20,7 @@ test_Spot_Correct if {
         "defender_license": true
     }
 
-    CorrectTestResult("MS.DEFENDER.3.1v1", Output, PASS) == true
+    TestResult("MS.DEFENDER.3.1v1", Output, PASS, true) == true
 }
 
 test_Spot_Incorrect if {
@@ -35,6 +34,6 @@ test_Spot_Incorrect if {
         "defender_license": true
     }
 
-    IncorrectTestResult("MS.DEFENDER.3.1v1", Output, FAIL) == true
+    TestResult("MS.DEFENDER.3.1v1", Output, FAIL, false) == true
 }
 #--

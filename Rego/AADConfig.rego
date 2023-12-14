@@ -1,7 +1,6 @@
 package aad
 import future.keywords
 import data.utils.report.NotCheckedDetails
-import data.utils.report.FormatArray
 import data.utils.report.ReportDetailsBoolean
 import data.utils.report.Description
 import data.utils.policy.IsEmptyContainer
@@ -16,8 +15,8 @@ import data.utils.aad.GroupExclusionsFullyExempt
 import data.utils.aad.ReportFullDetailsArray
 import data.utils.aad.ReportDetailsArrayLicenseWarningCap
 import data.utils.aad.HasAcceptableMFA
-import data.utils.aad.ConvertToSetWithKey
-import data.utils.aad.ConvertToSet
+import data.utils.policy.ConvertToSetWithKey
+import data.utils.policy.ConvertToSet
 import data.utils.aad.ReportDetailsArrayLicenseWarning
 import data.utils.aad.ReportDetailsBooleanLicenseWarning
 import data.utils.aad.CapLink

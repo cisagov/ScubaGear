@@ -2,7 +2,7 @@ package teams
 import future.keywords
 import data.utils.report.ReportDetailsBoolean
 import data.utils.report.DefenderMirrorDetails
-import data.utils.policy.ReportDetailsArray
+import data.utils.report.ReportDetailsArray
 import data.utils.policy.FilterArray
 import data.utils.policy.FAIL
 import data.utils.policy.PASS

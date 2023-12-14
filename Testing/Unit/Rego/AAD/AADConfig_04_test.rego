@@ -2,7 +2,7 @@ package aad_test
 import future.keywords
 import data.aad
 import data.utils.report.NotCheckedDetails
-import data.utils.policy.IncorrectTestResult
+import data.utils.policy.TestResult
 
 
 #
@@ -14,6 +14,6 @@ test_NotImplemented_Correct if {
     Output := aad.tests with input as { }
 
     ReportDetailString := NotCheckedDetails(PolicyId)
-    IncorrectTestResult(PolicyId, Output, ReportDetailString) == true
+    TestResult(PolicyId, Output, ReportDetailString, false) == true
 }
 #--

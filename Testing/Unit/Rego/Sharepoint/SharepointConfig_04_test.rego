@@ -2,8 +2,7 @@ package sharepoint_test
 import future.keywords
 import data.sharepoint
 import data.utils.report.NotCheckedDetails
-import data.utils.policy.CorrectTestResult
-import data.utils.policy.IncorrectTestResult
+import data.utils.policy.TestResult
 import data.utils.policy.FAIL
 import data.utils.policy.PASS
 
@@ -16,7 +15,7 @@ test_NotImplemented_Correct if {
 
     Output := sharepoint.tests with input as { }
 
-    IncorrectTestResult(PolicyId, Output, NotCheckedDetails(PolicyId)) == true
+    TestResult(PolicyId, Output, NotCheckedDetails(PolicyId), false) == true
 }
 #--
 
@@ -32,7 +31,7 @@ test_DenyAddAndCustomizePages_Correct if {
         ]
     }
 
-    CorrectTestResult("MS.SHAREPOINT.4.2v1", Output, PASS) == true
+    TestResult("MS.SHAREPOINT.4.2v1", Output, PASS, true) == true
 }
 
 test_DenyAddAndCustomizePages_Incorrect if {
@@ -44,6 +43,6 @@ test_DenyAddAndCustomizePages_Incorrect if {
         ]
     }
 
-    IncorrectTestResult("MS.SHAREPOINT.4.2v1", Output, FAIL) == true
+    TestResult("MS.SHAREPOINT.4.2v1", Output, FAIL, false) == true
 }
 #--

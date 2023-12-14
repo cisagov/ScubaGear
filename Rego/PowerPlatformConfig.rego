@@ -3,7 +3,7 @@ import future.keywords
 import data.utils.report.NotCheckedDetails
 import data.utils.report.ReportDetailsString
 import data.utils.report.ReportDetailsBoolean
-import data.utils.policy.ReportDetailsArray
+import data.utils.report.ReportDetailsArray
 import data.utils.policy.FilterArray
 
 

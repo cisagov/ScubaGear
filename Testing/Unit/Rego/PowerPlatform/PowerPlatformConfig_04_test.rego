@@ -2,7 +2,7 @@ package powerplatform_test
 import future.keywords
 import data.powerplatform
 import data.utils.report.NotCheckedDetails
-import data.utils.policy.IncorrectTestResult
+import data.utils.policy.TestResult
 
 
 #
@@ -13,6 +13,6 @@ test_NotImplemented_Correct if {
 
     Output := powerplatform.tests with input as { }
 
-    IncorrectTestResult(PolicyId, Output, NotCheckedDetails(PolicyId)) == true
+    TestResult(PolicyId, Output, NotCheckedDetails(PolicyId), false) == true
 }
 #--

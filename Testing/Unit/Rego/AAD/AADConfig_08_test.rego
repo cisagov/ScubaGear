@@ -2,8 +2,7 @@ package aad_test
 import future.keywords
 import data.aad
 import data.utils.report.NotCheckedDetails
-import data.utils.policy.CorrectTestResult
-import data.utils.policy.IncorrectTestResult
+import data.utils.policy.TestResult
 
 
 #
@@ -20,7 +19,7 @@ test_GuestUserRoleId_Correct_V1 if {
     }
 
     ReportDetailString := "Permission level set to \"Restricted access\" (authorizationPolicy)"
-    CorrectTestResult("MS.AAD.8.1v1", Output, ReportDetailString) == true
+    TestResult("MS.AAD.8.1v1", Output, ReportDetailString, true) == true
 }
 
 test_GuestUserRoleId_Correct_V2 if {
@@ -34,7 +33,7 @@ test_GuestUserRoleId_Correct_V2 if {
     }
 
     ReportDetailString := "Permission level set to \"Limited access\" (authorizationPolicy)"
-    CorrectTestResult("MS.AAD.8.1v1", Output, ReportDetailString) == true
+    TestResult("MS.AAD.8.1v1", Output, ReportDetailString, true) == true
 }
 
 test_GuestUserRoleId_Incorrect_V1 if {
@@ -48,7 +47,7 @@ test_GuestUserRoleId_Incorrect_V1 if {
     }
 
     ReportDetailString := "Permission level set to \"Same as member users\" (authorizationPolicy)"
-    IncorrectTestResult("MS.AAD.8.1v1", Output, ReportDetailString) == true
+    TestResult("MS.AAD.8.1v1", Output, ReportDetailString, false) == true
 }
 
 test_GuestUserRoleId_Incorrect_V2 if {
@@ -62,7 +61,7 @@ test_GuestUserRoleId_Incorrect_V2 if {
     }
 
     ReportDetailString := "Permission level set to \"Unknown\" (authorizationPolicy)"
-    IncorrectTestResult("MS.AAD.8.1v1", Output, ReportDetailString) == true
+    TestResult("MS.AAD.8.1v1", Output, ReportDetailString, false) == true
 }
 
 test_GuestUserRoleId_Incorrect_V3 if {
@@ -80,7 +79,7 @@ test_GuestUserRoleId_Incorrect_V3 if {
     }
 
     ReportDetailString := "Permission level set to \"Restricted access\" (policy 2), \"Unknown\" (policy 1)"
-    IncorrectTestResult("MS.AAD.8.1v1", Output, ReportDetailString) == true
+    TestResult("MS.AAD.8.1v1", Output, ReportDetailString, false) == true
 }
 #--
 
@@ -98,7 +97,7 @@ test_AllowInvitesFrom_Correct if {
     }
 
     ReportDetailString := "Permission level set to \"adminsAndGuestInviters\" (authorizationPolicy)"
-    CorrectTestResult("MS.AAD.8.2v1", Output, ReportDetailString) == true
+    TestResult("MS.AAD.8.2v1", Output, ReportDetailString, true) == true
 }
 
 test_AllowInvitesFrom_Incorrect if {
@@ -112,7 +111,7 @@ test_AllowInvitesFrom_Incorrect if {
     }
 
     ReportDetailString := "Permission level set to \"Bad value\" (authorizationPolicy)"
-    IncorrectTestResult("MS.AAD.8.2v1", Output, ReportDetailString) == true
+    TestResult("MS.AAD.8.2v1", Output, ReportDetailString, false) == true
 }
 #--
 
@@ -125,6 +124,6 @@ test_NotImplemented_Correct if {
     Output := aad.tests with input as { }
 
     ReportDetailString := NotCheckedDetails(PolicyId)
-    IncorrectTestResult(PolicyId, Output, ReportDetailString) == true
+    TestResult(PolicyId, Output, ReportDetailString, false) == true
 }
 #--

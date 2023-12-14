@@ -1,8 +1,7 @@
 package teams_test
 import future.keywords
 import data.teams
-import data.utils.policy.CorrectTestResult
-import data.utils.policy.IncorrectTestResult
+import data.utils.policy.TestResult
 import data.utils.policy.PASS
 
 
@@ -19,7 +18,7 @@ test_AllowPublicUsers_Correct if {
         ]
     }
 
-    CorrectTestResult("MS.TEAMS.3.1v1", Output, PASS) == true
+    TestResult("MS.TEAMS.3.1v1", Output, PASS, true) == true
 }
 
 test_AllowPublicUsers_Incorrect if {
@@ -33,7 +32,7 @@ test_AllowPublicUsers_Incorrect if {
     }
 
     ReportDetailString := "1 domains that allows contact with Skype users: Global"
-    IncorrectTestResult("MS.TEAMS.3.1v1", Output, ReportDetailString) == true
+    TestResult("MS.TEAMS.3.1v1", Output, ReportDetailString, false) == true
 }
 
 test_AllowPublicUsers_Correct_multi if {
@@ -50,7 +49,7 @@ test_AllowPublicUsers_Correct_multi if {
         ]
     }
 
-    CorrectTestResult("MS.TEAMS.3.1v1", Output, PASS) == true
+    TestResult("MS.TEAMS.3.1v1", Output, PASS, true) == true
 }
 
 test_AllowPublicUsers_Incorrect_multi if {
@@ -68,6 +67,6 @@ test_AllowPublicUsers_Incorrect_multi if {
     }
 
     ReportDetailString := "2 domains that allows contact with Skype users: Global, Tag:AllOn"
-    IncorrectTestResult("MS.TEAMS.3.1v1", Output, ReportDetailString) == true
+    TestResult("MS.TEAMS.3.1v1", Output, ReportDetailString, false) == true
 }
 #--

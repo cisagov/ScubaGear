@@ -1,8 +1,7 @@
 package defender_test
 import future.keywords
 import data.defender
-import data.utils.policy.CorrectTestResult
-import data.utils.policy.IncorrectTestResult
+import data.utils.policy.TestResult
 import data.utils.policy.PASS
 
 
@@ -45,7 +44,7 @@ test_TargetedUsers_Correct_V1 if {
         }
     }
 
-    CorrectTestResult("MS.DEFENDER.2.1v1", Output, PASS) == true
+    TestResult("MS.DEFENDER.2.1v1", Output, PASS, true) == true
 }
 
 test_TargetedUsers_Correct_V2 if {
@@ -83,7 +82,7 @@ test_TargetedUsers_Correct_V2 if {
         }
     }
 
-    CorrectTestResult("MS.DEFENDER.2.1v1", Output, PASS) == true
+    TestResult("MS.DEFENDER.2.1v1", Output, PASS, true) == true
 }
 
 test_TargetedUsers_Correct_V3 if {
@@ -122,7 +121,7 @@ test_TargetedUsers_Correct_V3 if {
         }
     }
 
-    CorrectTestResult("MS.DEFENDER.2.1v1", Output, PASS) == true
+    TestResult("MS.DEFENDER.2.1v1", Output, PASS, true) == true
 }
 
 test_TargetedUsers_Incorrect_V1 if {
@@ -152,7 +151,7 @@ test_TargetedUsers_Incorrect_V1 if {
     }
 
     ReportDetailString := "Not all sensitive users are included for targeted protection in Standard policy."
-    IncorrectTestResult("MS.DEFENDER.2.1v1", Output, ReportDetailString) == true
+    TestResult("MS.DEFENDER.2.1v1", Output, ReportDetailString, false) == true
 }
 
 test_TargetedUsers_Incorrect_V2 if {
@@ -182,7 +181,7 @@ test_TargetedUsers_Incorrect_V2 if {
     }
 
     ReportDetailString := "Not all sensitive users are included for targeted protection in Strict policy."
-    IncorrectTestResult("MS.DEFENDER.2.1v1", Output, ReportDetailString) == true
+    TestResult("MS.DEFENDER.2.1v1", Output, ReportDetailString, false) == true
 }
 
 test_TargetedUsers_Incorrect_V3 if {
@@ -212,7 +211,7 @@ test_TargetedUsers_Incorrect_V3 if {
     }
 
     ReportDetailString := "Not all sensitive users are included for targeted protection in Strict or Standard policy."
-    IncorrectTestResult("MS.DEFENDER.2.1v1", Output, ReportDetailString) == true
+    TestResult("MS.DEFENDER.2.1v1", Output, ReportDetailString, false) == true
 }
 
 test_TargetedUsers_Incorrect_V4 if {
@@ -252,7 +251,7 @@ test_TargetedUsers_Incorrect_V4 if {
     }
 
     ReportDetailString := "Not all sensitive users are included for targeted protection in Standard policy."
-    IncorrectTestResult("MS.DEFENDER.2.1v1", Output, ReportDetailString) == true
+    TestResult("MS.DEFENDER.2.1v1", Output, ReportDetailString, false) == true
 }
 
 test_TargetedUsers_Incorrect_V5 if {
@@ -292,7 +291,7 @@ test_TargetedUsers_Incorrect_V5 if {
     }
 
     ReportDetailString := "Not all sensitive users are included for targeted protection in Standard policy."
-    IncorrectTestResult("MS.DEFENDER.2.1v1", Output, ReportDetailString) == true
+    TestResult("MS.DEFENDER.2.1v1", Output, ReportDetailString, false) == true
 }
 
 test_TargetedUsers_Incorrect_V6 if {
@@ -331,7 +330,7 @@ test_TargetedUsers_Incorrect_V6 if {
     }
 
     ReportDetailString := "Not all sensitive users are included for targeted protection in Strict policy."
-    IncorrectTestResult("MS.DEFENDER.2.1v1", Output, ReportDetailString) == true
+    TestResult("MS.DEFENDER.2.1v1", Output, ReportDetailString, false) == true
 }
 #--
 
@@ -374,7 +373,7 @@ test_AgencyDomains_Correct_V1 if {
         }
     }
 
-    CorrectTestResult("MS.DEFENDER.2.2v1", Output, PASS) == true
+    TestResult("MS.DEFENDER.2.2v1", Output, PASS, true) == true
 }
 
 test_AgencyDomains_Correct_V2 if {
@@ -412,7 +411,7 @@ test_AgencyDomains_Correct_V2 if {
         }
     }
 
-    CorrectTestResult("MS.DEFENDER.2.2v1", Output, PASS) == true
+    TestResult("MS.DEFENDER.2.2v1", Output, PASS, true) == true
 }
 
 test_AgencyDomains_Incorrect_V1 if {
@@ -442,7 +441,7 @@ test_AgencyDomains_Incorrect_V1 if {
     }
 
     ReportDetailString := "Not all agency domains are included for targeted protection in Standard policy."
-    IncorrectTestResult("MS.DEFENDER.2.2v1", Output, ReportDetailString) == true
+    TestResult("MS.DEFENDER.2.2v1", Output, ReportDetailString, false) == true
 }
 
 test_AgencyDomains_Incorrect_V2 if {
@@ -472,7 +471,7 @@ test_AgencyDomains_Incorrect_V2 if {
     }
 
     ReportDetailString := "Not all agency domains are included for targeted protection in Strict policy."
-    IncorrectTestResult("MS.DEFENDER.2.2v1", Output, ReportDetailString) == true
+    TestResult("MS.DEFENDER.2.2v1", Output, ReportDetailString, false) == true
 }
 
 test_AgencyDomains_Incorrect_V3 if {
@@ -502,7 +501,7 @@ test_AgencyDomains_Incorrect_V3 if {
     }
 
     ReportDetailString := "Not all agency domains are included for targeted protection in Strict or Standard policy."
-    IncorrectTestResult("MS.DEFENDER.2.2v1", Output, ReportDetailString) == true
+    TestResult("MS.DEFENDER.2.2v1", Output, ReportDetailString, false) == true
 }
 
 test_AgencyDomains_Incorrect_V4 if {
@@ -542,7 +541,7 @@ test_AgencyDomains_Incorrect_V4 if {
     }
 
     ReportDetailString := "Not all agency domains are included for targeted protection in Standard policy."
-    IncorrectTestResult("MS.DEFENDER.2.2v1", Output, ReportDetailString) == true
+    TestResult("MS.DEFENDER.2.2v1", Output, ReportDetailString, false) == true
 }
 
 test_AgencyDomains_Incorrect_V5 if {
@@ -582,7 +581,7 @@ test_AgencyDomains_Incorrect_V5 if {
     }
 
     ReportDetailString := "Not all agency domains are included for targeted protection in Standard policy."
-    IncorrectTestResult("MS.DEFENDER.2.2v1", Output, ReportDetailString) == true
+    TestResult("MS.DEFENDER.2.2v1", Output, ReportDetailString, false) == true
 }
 
 test_AgencyDomains_Incorrect_V6 if {
@@ -621,7 +620,7 @@ test_AgencyDomains_Incorrect_V6 if {
     }
 
     ReportDetailString := "Not all agency domains are included for targeted protection in Strict policy."
-    IncorrectTestResult("MS.DEFENDER.2.2v1", Output, ReportDetailString) == true
+    TestResult("MS.DEFENDER.2.2v1", Output, ReportDetailString, false) == true
 }
 
 test_AgencyDomains_Incorrect_V7 if {
@@ -656,7 +655,7 @@ test_AgencyDomains_Incorrect_V7 if {
     }
 
     ReportDetailString := "Not all agency domains are included for targeted protection in Strict or Standard policy."
-    IncorrectTestResult("MS.DEFENDER.2.2v1", Output, ReportDetailString) == true
+    TestResult("MS.DEFENDER.2.2v1", Output, ReportDetailString, false) == true
 }
 
 test_AgencyDomains_Incorrect_V8 if {
@@ -685,7 +684,7 @@ test_AgencyDomains_Incorrect_V8 if {
     }
 
     ReportDetailString := "No agency domains defined for impersonation protection assessment. See configuration file documentation for details on how to define."
-    IncorrectTestResult("MS.DEFENDER.2.2v1", Output, ReportDetailString) == true
+    TestResult("MS.DEFENDER.2.2v1", Output, ReportDetailString, false) == true
 }
 #--
 
@@ -728,7 +727,7 @@ test_CustomDomains_Correct_V1 if {
         }
     }
 
-    CorrectTestResult("MS.DEFENDER.2.3v1", Output, PASS) == true
+    TestResult("MS.DEFENDER.2.3v1", Output, PASS, true) == true
 }
 
 test_CustomDomains_Correct_V2 if {
@@ -766,7 +765,7 @@ test_CustomDomains_Correct_V2 if {
         }
     }
 
-    CorrectTestResult("MS.DEFENDER.2.3v1", Output, PASS) == true
+    TestResult("MS.DEFENDER.2.3v1", Output, PASS, true) == true
 }
 
 test_CustomDomains_Correct_V3 if {
@@ -805,7 +804,7 @@ test_CustomDomains_Correct_V3 if {
         }
     }
 
-    CorrectTestResult("MS.DEFENDER.2.3v1", Output, PASS) == true
+    TestResult("MS.DEFENDER.2.3v1", Output, PASS, true) == true
 }
 
 test_CustomDomains_Correct_V4 if {
@@ -833,7 +832,7 @@ test_CustomDomains_Correct_V4 if {
         }
     }
 
-    CorrectTestResult("MS.DEFENDER.2.3v1", Output, PASS) == true
+    TestResult("MS.DEFENDER.2.3v1", Output, PASS, true) == true
 }
 
 test_CustomDomains_Incorrect_V1 if {
@@ -863,7 +862,7 @@ test_CustomDomains_Incorrect_V1 if {
     }
 
     ReportDetailString := "Not all partner domains are included for targeted protection in Standard policy."
-    IncorrectTestResult("MS.DEFENDER.2.3v1", Output, ReportDetailString) == true
+    TestResult("MS.DEFENDER.2.3v1", Output, ReportDetailString, false) == true
 }
 
 test_CustomDomains_Incorrect_V2 if {
@@ -893,7 +892,7 @@ test_CustomDomains_Incorrect_V2 if {
     }
 
     ReportDetailString := "Not all partner domains are included for targeted protection in Strict policy."
-    IncorrectTestResult("MS.DEFENDER.2.3v1", Output, ReportDetailString) == true
+    TestResult("MS.DEFENDER.2.3v1", Output, ReportDetailString, false) == true
 }
 
 test_CustomDomains_Incorrect_V3 if {
@@ -923,7 +922,7 @@ test_CustomDomains_Incorrect_V3 if {
     }
 
     ReportDetailString := "Not all partner domains are included for targeted protection in Strict or Standard policy."
-    IncorrectTestResult("MS.DEFENDER.2.3v1", Output, ReportDetailString) == true
+    TestResult("MS.DEFENDER.2.3v1", Output, ReportDetailString, false) == true
 }
 
 test_CustomDomains_Incorrect_V4 if {
@@ -963,7 +962,7 @@ test_CustomDomains_Incorrect_V4 if {
     }
 
     ReportDetailString := "Not all partner domains are included for targeted protection in Standard policy."
-    IncorrectTestResult("MS.DEFENDER.2.3v1", Output, ReportDetailString) == true
+    TestResult("MS.DEFENDER.2.3v1", Output, ReportDetailString, false) == true
 }
 
 test_CustomDomains_Incorrect_V5 if {
@@ -1003,7 +1002,7 @@ test_CustomDomains_Incorrect_V5 if {
     }
 
     ReportDetailString := "Not all partner domains are included for targeted protection in Standard policy."
-    IncorrectTestResult("MS.DEFENDER.2.3v1", Output, ReportDetailString) == true
+    TestResult("MS.DEFENDER.2.3v1", Output, ReportDetailString, false) == true
 }
 
 test_CustomDomains_Incorrect_V6 if {
@@ -1042,7 +1041,7 @@ test_CustomDomains_Incorrect_V6 if {
     }
 
     ReportDetailString := "Not all partner domains are included for targeted protection in Strict policy."
-    IncorrectTestResult("MS.DEFENDER.2.3v1", Output, ReportDetailString) == true
+    TestResult("MS.DEFENDER.2.3v1", Output, ReportDetailString, false) == true
 }
 
 test_CustomDomains_Incorrect_V7 if {
@@ -1077,6 +1076,6 @@ test_CustomDomains_Incorrect_V7 if {
     }
 
     ReportDetailString := "Not all partner domains are included for targeted protection in Strict or Standard policy."
-    IncorrectTestResult("MS.DEFENDER.2.3v1", Output, ReportDetailString) == true
+    TestResult("MS.DEFENDER.2.3v1", Output, ReportDetailString, false) == true
 }
 #--

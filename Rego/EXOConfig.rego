@@ -2,10 +2,11 @@ package exo
 import future.keywords
 import data.utils.report.NotCheckedDetails
 import data.utils.report.DefenderMirrorDetails
-import data.utils.report.FormatArray
+import data.utils.report.ArraySizeStr
 import data.utils.report.ReportDetailsBoolean
 import data.utils.report.Description
 import data.utils.report.ReportDetailsString
+import data.utils.report.ReportDetailsArrayOutOf
 import data.utils.policy.FilterArray
 
 
@@ -13,13 +14,13 @@ import data.utils.policy.FilterArray
 # regal ignore:prefer-set-or-object-rule
 AllDomains := {Domain.domain | some Domain in input.spf_records}
 
-ReportDetailsArray(true, _, _) := ReportDetailsBoolean(true) if {}
+# ReportDetailsArray(true, _, _) := ReportDetailsBoolean(true) if {}
 
-ReportDetailsArray(false, NumeratorArr, DenominatorArr) := ReportStr if {
-    FractionStr := concat(" of ", [FormatArray(NumeratorArr), FormatArray(DenominatorArr)])
-    NumeratorStr := concat(", ", NumeratorArr)
-    ReportStr := Description([FractionStr, "agency domain(s) found in violation:", NumeratorStr])
-}
+# ReportDetailsArray(false, NumeratorArr, DenominatorArr) := ReportStr if {
+#     FractionStr := concat(" of ", [ArraySizeStr(NumeratorArr), ArraySizeStr(DenominatorArr)])
+#     NumeratorStr := concat(", ", NumeratorArr)
+#     ReportStr := Description([FractionStr, "agency domain(s) found in violation:", NumeratorStr])
+# }
 
 
 ############
@@ -47,7 +48,7 @@ tests contains {
 } if {
     Domains := RemoteDomainsAllowingForwarding
     ErrString := "remote domain(s) that allows automatic forwarding:"
-    ErrMessage := Description([FormatArray(Domains), ErrString , concat(", ", Domains)])
+    ErrMessage := Description([ArraySizeStr(Domains), ErrString , concat(", ", Domains)])
     Status := count(Domains) == 0
 }
 #--
@@ -90,7 +91,7 @@ tests contains {
     "Criticality": "Shall",
     "Commandlet": ["Get-ScubaSpfRecords", "Get-AcceptedDomain"],
     "ActualValue": Domains,
-    "ReportDetails": ReportDetailsArray(Status, Domains, AllDomains),
+    "ReportDetails": ReportDetailsArrayOutOf(Status, Domains, AllDomains),
     "RequirementMet": Status
 } if {
     Domains := DomainsWithoutSpf
@@ -133,7 +134,7 @@ tests contains {
         input.dkim_records,
         input.dkim_config
     ],
-    "ReportDetails": ReportDetailsArray(Status, DomainsWithoutDkim, AllDomains),
+    "ReportDetails": ReportDetailsArrayOutOf(Status, DomainsWithoutDkim, AllDomains),
     "RequirementMet": Status
 } if {
     # Get domains that are not in DomainsWithDkim array
@@ -168,7 +169,7 @@ tests contains {
         "Get-AcceptedDomain"
     ],
     "ActualValue": input.dmarc_records,
-    "ReportDetails": ReportDetailsArray(Status, Domains, AllDomains),
+    "ReportDetails": ReportDetailsArrayOutOf(Status, Domains, AllDomains),
     "RequirementMet": Status
 } if {
     Domains := DomainsWithoutDmarc
@@ -197,7 +198,7 @@ tests contains {
         "Get-AcceptedDomain"
     ],
     "ActualValue": input.dmarc_records,
-    "ReportDetails": ReportDetailsArray(Status, Domains, AllDomains),
+    "ReportDetails": ReportDetailsArrayOutOf(Status, Domains, AllDomains),
     "RequirementMet": Status
 } if {
     Domains := DomainsWithoutPreject
@@ -237,7 +238,7 @@ tests contains {
         "Get-AcceptedDomain"
     ],
     "ActualValue": input.dmarc_records,
-    "ReportDetails": ReportDetailsArray(Status, Domains, AllDomains),
+    "ReportDetails": ReportDetailsArrayOutOf(Status, Domains, AllDomains),
     "RequirementMet": Status
 } if {
     Domains := DomainsWithoutDHSContact
@@ -293,7 +294,7 @@ tests contains {
         "Get-AcceptedDomain"
     ],
     "ActualValue": input.dmarc_records,
-    "ReportDetails": ReportDetailsArray(Status, Domains, AllDomains),
+    "ReportDetails": ReportDetailsArrayOutOf(Status, Domains, AllDomains),
     "RequirementMet": Status
 } if {
     Domains := DomainsWithoutAgencyContact
@@ -359,7 +360,7 @@ tests contains {
 } if {
     ContactsSharingPolicies := SharingPolicyContactsAllowedAllDomains
     ErrString := "sharing polic(ies) are sharing contacts folders with all domains by default:"
-    ErrMessage := Description([FormatArray(ContactsSharingPolicies), ErrString , concat(", ", ContactsSharingPolicies)])
+    ErrMessage := Description([ArraySizeStr(ContactsSharingPolicies), ErrString , concat(", ", ContactsSharingPolicies)])
     Status := count(ContactsSharingPolicies) == 0
 }
 #--
@@ -388,7 +389,7 @@ tests contains {
 } if {
     CalendarSharingPolicies := SharingPolicyCalendarAllowedAllDomains
     ErrString := "sharing polic(ies) are sharing calendar details with all domains by default:"
-    ErrMessage := Description([FormatArray(CalendarSharingPolicies), ErrString , concat(", ", CalendarSharingPolicies)])
+    ErrMessage := Description([ArraySizeStr(CalendarSharingPolicies), ErrString , concat(", ", CalendarSharingPolicies)])
     Status := count(CalendarSharingPolicies) == 0
 }
 #--
@@ -638,7 +639,7 @@ tests contains {
 } if {
     ConnFilterPolicies := ConnFiltersWithIPAllowList
     ErrString := "connection filter polic(ies) with an IP allowlist:"
-    ErrMessage := Description([FormatArray(ConnFilterPolicies), ErrString , concat(", ", ConnFilterPolicies)])
+    ErrMessage := Description([ArraySizeStr(ConnFilterPolicies), ErrString , concat(", ", ConnFilterPolicies)])
     Status := count(ConnFilterPolicies) == 0
 }
 #--
@@ -665,7 +666,7 @@ tests contains {
 } if {
     ConnFilterPolicies := ConnFiltersWithSafeList
     ErrString := "connection filter polic(ies) with a safe list:"
-    ErrMessage := Description([FormatArray(ConnFilterPolicies), ErrString , concat(", ", ConnFilterPolicies)])
+    ErrMessage := Description([ArraySizeStr(ConnFilterPolicies), ErrString , concat(", ", ConnFilterPolicies)])
     Status := count(ConnFilterPolicies) == 0
 }
 #--

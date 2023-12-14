@@ -1,8 +1,7 @@
 package exo_test
 import future.keywords
 import data.exo
-import data.utils.policy.CorrectTestResult
-import data.utils.policy.IncorrectTestResult
+import data.utils.policy.TestResult
 import data.utils.policy.FAIL
 import data.utils.policy.PASS
 
@@ -20,7 +19,7 @@ test_SmtpClientAuthenticationDisabled_Correct if {
         ]
     }
 
-    CorrectTestResult("MS.EXO.5.1v1", Output, PASS) == true
+    TestResult("MS.EXO.5.1v1", Output, PASS, true) == true
 }
 
 test_SmtpClientAuthenticationDisabled_Incorrect if {
@@ -33,6 +32,6 @@ test_SmtpClientAuthenticationDisabled_Incorrect if {
         ]
     }
 
-    IncorrectTestResult("MS.EXO.5.1v1", Output, FAIL) == true
+    TestResult("MS.EXO.5.1v1", Output, FAIL, false) == true
 }
 #--

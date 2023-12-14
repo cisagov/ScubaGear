@@ -2,8 +2,7 @@ package defender_test
 import future.keywords
 import data.defender
 import data.utils.report.NotCheckedDetails
-import data.utils.policy.CorrectTestResult
-import data.utils.policy.IncorrectTestResult
+import data.utils.policy.TestResult
 import data.utils.policy.FAIL
 import data.utils.policy.PASS
 
@@ -21,7 +20,7 @@ test_AdminAuditLogEnabled_Correct if {
         ]
     }
 
-    CorrectTestResult("MS.DEFENDER.6.1v1", Output, PASS) == true
+    TestResult("MS.DEFENDER.6.1v1", Output, PASS, true) == true
 }
 
 test_AdminAuditLogEnabled_Incorrect if {
@@ -34,7 +33,7 @@ test_AdminAuditLogEnabled_Incorrect if {
         ]
     }
 
-    IncorrectTestResult("MS.DEFENDER.6.1v1", Output, FAIL) == true
+    TestResult("MS.DEFENDER.6.1v1", Output, FAIL, false) == true
 }
 #--
 
@@ -47,7 +46,7 @@ test_NotImplemented_Correct_V1 if {
     Output := defender.tests with input as { }
 
     ReportDetailString := NotCheckedDetails(PolicyId)
-    IncorrectTestResult(PolicyId, Output, ReportDetailString) == true
+    TestResult(PolicyId, Output, ReportDetailString, false) == true
 }
 #--
 
@@ -60,6 +59,6 @@ test_NotImplemented_Correct_V2 if {
     Output := defender.tests with input as { }
 
     ReportDetailString := NotCheckedDetails(PolicyId)
-    IncorrectTestResult(PolicyId, Output, ReportDetailString) == true
+    TestResult(PolicyId, Output, ReportDetailString, false) == true
 }
 #--

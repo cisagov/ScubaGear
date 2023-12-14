@@ -2,8 +2,7 @@ package defender_test
 import future.keywords
 import data.defender
 import data.utils.report.NotCheckedDetails
-import data.utils.policy.CorrectTestResult
-import data.utils.policy.IncorrectTestResult
+import data.utils.policy.TestResult
 import data.utils.policy.FAIL
 import data.utils.policy.PASS
 
@@ -53,7 +52,7 @@ test_Disabled_Correct_V1 if {
         ]
     }
 
-    CorrectTestResult("MS.DEFENDER.5.1v1", Output, PASS) == true
+    TestResult("MS.DEFENDER.5.1v1", Output, PASS, true) == true
 }
 
 test_Disabled_Correct_V2 if {
@@ -102,7 +101,7 @@ test_Disabled_Correct_V2 if {
         ]
     }
 
-    CorrectTestResult("MS.DEFENDER.5.1v1", Output, PASS) == true
+    TestResult("MS.DEFENDER.5.1v1", Output, PASS, true) == true
 }
 
 test_Disabled_Incorrect_V1 if {
@@ -148,7 +147,7 @@ test_Disabled_Incorrect_V1 if {
     }
 
     ReportDetailString := "1 disabled required alert(s) found: Suspicious email sending patterns detected"
-    IncorrectTestResult("MS.DEFENDER.5.1v1", Output, ReportDetailString) == true
+    TestResult("MS.DEFENDER.5.1v1", Output, ReportDetailString, false) == true
 }
 
 test_Disabled_Incorrect_V2 if {
@@ -190,7 +189,7 @@ test_Disabled_Incorrect_V2 if {
     }
 
     ReportDetailString := "1 disabled required alert(s) found: Suspicious email sending patterns detected"
-    IncorrectTestResult("MS.DEFENDER.5.1v1", Output, ReportDetailString) == true
+    TestResult("MS.DEFENDER.5.1v1", Output, ReportDetailString, false) == true
 }
 #--
 
@@ -203,6 +202,6 @@ test_NotImplemented_Correct_V2 if {
     Output := defender.tests with input as { }
 
     ReportDetailString := NotCheckedDetails(PolicyId)
-    IncorrectTestResult(PolicyId, Output, ReportDetailString) == true
+    TestResult(PolicyId, Output, ReportDetailString, false) == true
 }
 #--

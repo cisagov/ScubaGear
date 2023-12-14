@@ -1,62 +1,75 @@
 package utils.policy
 import future.keywords
-import data.utils.report.FormatArray
 import data.utils.report.ReportDetailsBoolean
-import data.utils.report.Description
+
+
+#############
+# Constants #
+#############
+
+# Used so often, converted to a constant
+FAIL := ReportDetailsBoolean(false)
+
+PASS := ReportDetailsBoolean(true)
+
+
+####################
+# Helper Functions #
+####################
 
 # Checks if set/array is null or empty
 IsEmptyContainer(null) := true
 
 IsEmptyContainer(container) := true if {
-    Temp := {Item | some Item in container}
-    count(Temp) == 0
-} else := false
-
-# Check if "All" is in the array
-IsAllUsers(null) := false
-
-IsAllUsers(array) := true if {
-    not IsEmptyContainer(array)
-    "All" in array
+    count({Item | some Item in container}) == 0
 } else := false
 
 # Check if string is in array
 Contains(null, _) := false
 
 Contains(array, item) := true if {
-    not IsEmptyContainer(array)
     item in array
 } else := false
 
 # Returns size of set/array
 Count(null) := 0
 
-Count(Container) := count(Container) if {
-    not IsEmptyContainer(Container)
-} else := 0
+Count(Container) := count(Container)
 
-ReportDetailsArray(true, _, _) := ReportDetailsBoolean(true) if {}
-
-ReportDetailsArray(false, Array, String) := Description([FormatArray(Array), String, concat(", ", Array)]) if {}
-
+# Returns all conditions that match passed value (true/false)
+# Commonly used for OR/Any conditions
 FilterArray(Conditions, Boolean) := [Condition | some Condition in Conditions; Condition == Boolean]
 
-CorrectTestResult(PolicyId, Output, ReportDetailString) := true if {
+# Return set of values pulled from array
+ConvertToSet(Items) := NewSet if {
+    NewSet := {Item | some Item in Items}
+} else := set()
+
+# Return set of values pulled from array with additional key
+ConvertToSetWithKey(Items, Key) := NewSet if {
+    NewSet := {Item[Key] | some Item in Items}
+} else := set()
+
+
+###########
+# Testing #
+###########
+
+# Basic test that has anticipated string for Report Details
+TestResult(PolicyId, Output, ReportDetailString, RequirementMet) := true if {
     RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == true
+    RuleOutput[0].RequirementMet == RequirementMet
     RuleOutput[0].ReportDetails == ReportDetailString
 } else := false
 
-IncorrectTestResult(PolicyId, Output, ReportDetailString) := true if {
+# Test that has multiple strings with an unknown order for Report Details
+TestResultContains(PolicyId, Output, ReportDetailArrayStrings, RequirementMet) := true if {
     RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
     count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == false
-    RuleOutput[0].ReportDetails == ReportDetailString
+    RuleOutput[0].RequirementMet == RequirementMet
+    some String in ReportDetailArrayStrings
+    contains(RuleOutput[0].ReportDetails, String) == true
 } else := false
-
-FAIL := ReportDetailsBoolean(false)
-
-PASS := ReportDetailsBoolean(true)

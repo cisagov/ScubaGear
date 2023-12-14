@@ -1,8 +1,7 @@
 package aad_test
 import future.keywords
 import data.aad
-import data.utils.policy.CorrectTestResult
-import data.utils.policy.IncorrectTestResult
+import data.utils.policy.TestResult
 import data.utils.policy.FAIL
 import data.utils.policy.PASS
 
@@ -23,7 +22,7 @@ test_AllowedToCreateApps_Correct if {
     }
 
     ReportDetailString := "0 authorization policies found that allow non-admin users to register third-party applications"
-    CorrectTestResult("MS.AAD.5.1v1", Output, ReportDetailString) == true
+    TestResult("MS.AAD.5.1v1", Output, ReportDetailString, true) == true
 }
 
 test_AllowedToCreateApps_Incorrect_V1 if {
@@ -39,7 +38,7 @@ test_AllowedToCreateApps_Incorrect_V1 if {
     }
 
     ReportDetailString := "1 authorization policies found that allow non-admin users to register third-party applications:<br/>Bad policy"
-    IncorrectTestResult("MS.AAD.5.1v1", Output, ReportDetailString) == true
+    TestResult("MS.AAD.5.1v1", Output, ReportDetailString, false) == true
 }
 
 test_AllowedToCreateApps_Incorrect_V2 if {
@@ -61,7 +60,7 @@ test_AllowedToCreateApps_Incorrect_V2 if {
     }
 
     ReportDetailString := "1 authorization policies found that allow non-admin users to register third-party applications:<br/>Bad policy"
-    IncorrectTestResult("MS.AAD.5.1v1", Output, ReportDetailString) == true
+    TestResult("MS.AAD.5.1v1", Output, ReportDetailString, false) == true
 }
 #--
 
@@ -79,7 +78,7 @@ test_PermissionGrantPolicyIdsAssignedToDefaultUserRole_Correct if {
     }
 
     ReportDetailString := "0 authorization policies found that allow non-admin users to consent to third-party applications"
-    CorrectTestResult("MS.AAD.5.2v1", Output, ReportDetailString) == true
+    TestResult("MS.AAD.5.2v1", Output, ReportDetailString, true) == true
 }
 
 test_PermissionGrantPolicyIdsAssignedToDefaultUserRole_Incorrect_V1 if {
@@ -95,7 +94,7 @@ test_PermissionGrantPolicyIdsAssignedToDefaultUserRole_Incorrect_V1 if {
     }
 
     ReportDetailString := "1 authorization policies found that allow non-admin users to consent to third-party applications:<br/>authorizationPolicy"
-    IncorrectTestResult("MS.AAD.5.2v1", Output, ReportDetailString) == true
+    TestResult("MS.AAD.5.2v1", Output, ReportDetailString, false) == true
 }
 
 test_PermissionGrantPolicyIdsAssignedToDefaultUserRole_Incorrect_V2 if {
@@ -115,7 +114,7 @@ test_PermissionGrantPolicyIdsAssignedToDefaultUserRole_Incorrect_V2 if {
     }
 
     ReportDetailString := "1 authorization policies found that allow non-admin users to consent to third-party applications:<br/>Bad policy"
-    IncorrectTestResult("MS.AAD.5.2v1", Output, ReportDetailString) == true
+    TestResult("MS.AAD.5.2v1", Output, ReportDetailString, false) == true
 }
 #--
 
@@ -132,7 +131,7 @@ test_IsEnabled_Correct if {
         ]
     }
 
-    CorrectTestResult("MS.AAD.5.3v1", Output, PASS) == true
+    TestResult("MS.AAD.5.3v1", Output, PASS, true) == true
 }
 
 test_IsEnabled_Incorrect if {
@@ -145,7 +144,7 @@ test_IsEnabled_Incorrect if {
         ]
     }
 
-    IncorrectTestResult("MS.AAD.5.3v1", Output, FAIL) == true
+    TestResult("MS.AAD.5.3v1", Output, FAIL, false) == true
 }
 #--
 
@@ -167,7 +166,7 @@ test_Value_Correct_Lowercase if {
         ]
     }
 
-    CorrectTestResult("MS.AAD.5.4v1", Output, PASS) == true
+    TestResult("MS.AAD.5.4v1", Output, PASS, true) == true
 }
 
 test_Value_Correct_Uppercase if {
@@ -185,7 +184,7 @@ test_Value_Correct_Uppercase if {
         ]
     }
 
-    CorrectTestResult("MS.AAD.5.4v1", Output, PASS) == true
+    TestResult("MS.AAD.5.4v1", Output, PASS, true) == true
 }
 
 test_Value_Incorrect_Lowercase if {
@@ -203,7 +202,7 @@ test_Value_Incorrect_Lowercase if {
         ]
     }
 
-    IncorrectTestResult("MS.AAD.5.4v1", Output, FAIL) == true
+    TestResult("MS.AAD.5.4v1", Output, FAIL, false) == true
 }
 
 test_Value_Incorrect_Uppercase if {
@@ -221,6 +220,6 @@ test_Value_Incorrect_Uppercase if {
         ]
     }
 
-    IncorrectTestResult("MS.AAD.5.4v1", Output, FAIL) == true
+    TestResult("MS.AAD.5.4v1", Output, FAIL, false) == true
 }
 #--
