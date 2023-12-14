@@ -1,6 +1,7 @@
 # Content style guide for SCuBA <!-- omit in toc -->
 
 Welcome to the content style guide for ScubaGear!
+Welcome to the content style guide for ScubaGear!
 
 These guidelines are specific to style rules for PowerShell and OPA Rego code. For general style questions or guidance on topics not covered here, ask or go with best guess and bring up at a later meeting.
 
@@ -11,10 +12,12 @@ Use menu icon on the top left corner of this document to get to a specific secti
 - Our style guide aims for simplicity. Guidelines should be easy to apply to a range of scenarios.
 - Decisions aren’t about what’s right or wrong according to the rules, but about what’s best practice and improves readability. We're flexible and open to change while maintaining consistency.
 - When making a style or structure decision, we consider the readability, maintainability and ability for consistency in a range of situations.
+- When making a style or structure decision, we consider the readability, maintainability and ability for consistency in a range of situations.
 - When a question specific to help documentation isn’t covered by the style guide, we think it through using these principles, then make a decision and bring it up in the next meeting for deliberation.
 
 ## OPA Rego
 
+The project is adopting the following public Rego [style guide](https://docs.styra.com/opa/rego-style-guide), except where our guide specifically notes an exception (e.g., variable name case). For consistency, we will be using many of the same style rules as PowerShell. There are also a few best practice rules that this project will follow. These best practices were chosen to enhance readability. We recognize that the code is in a constant state of improvement, so the best practices are subject to change. The project is also integrating the [Regal](https://github.com/StyraInc/regal) linter into its automated checks to promote style guide adherence.
 The project is adopting the following public Rego [style guide](https://docs.styra.com/opa/rego-style-guide), except where our guide specifically notes an exception (e.g., variable name case). For consistency, we will be using many of the same style rules as PowerShell. There are also a few best practice rules that this project will follow. These best practices were chosen to enhance readability. We recognize that the code is in a constant state of improvement, so the best practices are subject to change. The project is also integrating the [Regal](https://github.com/StyraInc/regal) linter into its automated checks to promote style guide adherence.
 
 ### Test Cases
@@ -74,6 +77,7 @@ test_ExampleVar_UnknownReportString_Incorrect if {
 ### Not Implemented
 
 If the policy is untestable at this time, use the templates below.
+If the policy is untestable at this time, use the templates below.
 
 #### Config
 
@@ -81,6 +85,13 @@ The first one directs the user to the baseline document for manual checking. The
 
 ```
 # At this time we are unable to test for X because of Y
+tests contains {
+    "PolicyId": "MS.<Product>.<Policy Group #>.<Policy #>v<Version #>",
+    "Criticality": "Should/Not-Implemented",
+    "Commandlet": [],
+    "ActualValue": [],
+    "ReportDetails": NotCheckedDetails("MS.<Product>.<Policy Group #>.<Policy #>v<Version #>"),
+    "RequirementMet": false,
 tests contains {
     "PolicyId": "MS.<Product>.<Policy Group #>.<Policy #>v<Version #>",
     "Criticality": "Should/Not-Implemented",
@@ -100,12 +111,20 @@ tests contains {
     "ActualValue": [],
     "ReportDetails": DefenderMirrorDetails("MS.<Product>.<Policy Group #>.<Policy #>v<Version #>"),
     "RequirementMet": false,
+tests contains {
+    "PolicyId": "MS.<Product>.<Policy Group #>.<Policy #>v<Version #>,
+    "Criticality": "Shall/3rd Party",
+    "Commandlet": [],
+    "ActualValue": [],
+    "ReportDetails": DefenderMirrorDetails("MS.<Product>.<Policy Group #>.<Policy #>v<Version #>"),
+    "RequirementMet": false,
 }
 ```
 #### Testing
 
 ```
 test_NotImplemented_Correct if {
+    PolicyId := "MS.<Product>.<Policy Group #>.<Policy #>v<Version #>"
     PolicyId := "MS.<Product>.<Policy Group #>.<Policy #>v<Version #>"
 
     Output := <Product>.tests with input as { }
@@ -115,6 +134,7 @@ test_NotImplemented_Correct if {
 ```
 ```
 test_3rdParty_Correct_V1 if {
+    PolicyId := "MS.<Product>.<Policy Group #>.<Policy #>v<Version #>"
     PolicyId := "MS.<Product>.<Policy Group #>.<Policy #>v<Version #>"
 
     Output := <Product>.tests with input as { }

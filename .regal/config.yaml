@@ -11,6 +11,7 @@ rules:
       # none is provided. It's harmless, but should be
       # fixed anyway so real issues aren't missed.
       level: warning
+      level: warning
   custom:
     # https://docs.styra.com/regal/rules/custom/naming-convention
     naming-convention:
@@ -63,6 +64,8 @@ rules:
       max-line-length: 120
       non-breakable-word-threshold: 100
       level: warning
+      non-breakable-word-threshold: 100
+      level: warning
     # https://docs.styra.com/regal/rules/style/no-whitespace-comment
     no-whitespace-comment:
       # This repo is actually good about this, but frequently
@@ -76,6 +79,7 @@ rules:
     # https://docs.styra.com/regal/rules/style/prefer-some-in-iteration
     prefer-some-in-iteration:
       level: warning
+      level: warning
     # https://docs.styra.com/regal/rules/style/prefer-snake-case
     prefer-snake-case:
       # This is the default style preference for Rego, but since
@@ -85,6 +89,9 @@ rules:
       level: ignore
     # https://docs.styra.com/regal/rules/style/rule-length
     rule-length:
+      level: warning
+      max-rule-length: 30
+      count-comments: false
       level: warning
       # On the larger size for unit tests
       # Some json inputs are too big
@@ -98,7 +105,10 @@ rules:
     identically-named-tests:
       # Only a few of these — would be easy to fix
       level: warning
+      # Only a few of these — would be easy to fix
+      level: warning
     # https://docs.styra.com/regal/rules/testing/test-outside-test-package
     test-outside-test-package:
       # This is just a style preference
+      level: warning
       level: warning
