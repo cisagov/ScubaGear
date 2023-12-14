@@ -27,6 +27,6 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v4
       - name: Setup Config File
-        run: cp MegaLinter/.mega-linter-powershell.yml .mega-linter.yml
+        run: cp Testing/Linting/MegaLinter/.mega-linter-powershell.yml .mega-linter.yml
       - name: Lint PowerShell
         uses: oxsecurity/megalinter/flavors/dotnet@v7.6.0

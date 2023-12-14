@@ -22,10 +22,10 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v4
       - name: Setup Config File
-        run: cp MegaLinter/.mega-linter-yaml.yml .mega-linter.yml
+        run: cp Testing/Lintin/MegaLinter/.mega-linter-yaml.yml .mega-linter.yml
         if: always()
       - name: Setup Lint File
-        run: cp MegaLinter/.yamllint.yml .yamllint.yml
+        run: cp Testing/Lintin/MegaLinter/.yamllint.yml .yamllint.yml
         if: always()
       - name: Lint YAML
         uses: oxsecurity/megalinter/flavors/ci_light@v7.6.0
