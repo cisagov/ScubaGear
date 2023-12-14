@@ -2,15 +2,7 @@ package aad_test
 import future.keywords
 import data.aad
 import data.utils.report.NotCheckedDetails
-
-
-IncorrectTestResult(PolicyId, Output, ReportDetailString) := true if {
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == false
-    RuleOutput[0].ReportDetails == ReportDetailString
-} else := false
+import data.utils.policy.IncorrectTestResult
 
 
 #

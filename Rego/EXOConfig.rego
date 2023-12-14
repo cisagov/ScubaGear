@@ -6,6 +6,12 @@ import data.utils.report.FormatArray
 import data.utils.report.ReportDetailsBoolean
 import data.utils.report.Description
 import data.utils.report.ReportDetailsString
+import data.utils.policy.FilterArray
+
+
+# this should be allowed https://github.com/StyraInc/regal/issues/415
+# regal ignore:prefer-set-or-object-rule
+AllDomains := {Domain.domain | some Domain in input.spf_records}
 
 ReportDetailsArray(true, _, _) := ReportDetailsBoolean(true) if {}
 
@@ -14,12 +20,6 @@ ReportDetailsArray(false, NumeratorArr, DenominatorArr) := ReportStr if {
     NumeratorStr := concat(", ", NumeratorArr)
     ReportStr := Description([FractionStr, "agency domain(s) found in violation:", NumeratorStr])
 }
-
-FilterArray(Conditions, Boolean) := [Condition | some Condition in Conditions; Condition == Boolean]
-
-# this should be allowed https://github.com/StyraInc/regal/issues/415
-# regal ignore:prefer-set-or-object-rule
-AllDomains := {Domain.domain | some Domain in input.spf_records}
 
 
 ############
@@ -88,10 +88,7 @@ DomainsWithoutSpf contains DNSResponse.domain if {
 tests contains {
     "PolicyId": "MS.EXO.2.2v1",
     "Criticality": "Shall",
-    "Commandlet": [
-        "Get-ScubaSpfRecords",
-        "Get-AcceptedDomain"
-    ],
+    "Commandlet": ["Get-ScubaSpfRecords", "Get-AcceptedDomain"],
     "ActualValue": Domains,
     "ReportDetails": ReportDetailsArray(Status, Domains, AllDomains),
     "RequirementMet": Status

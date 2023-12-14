@@ -4,15 +4,13 @@ import data.utils.report.NotCheckedDetails
 import data.utils.report.ReportDetailsBoolean
 import data.utils.report.ReportDetailsString
 import data.utils.policy.FilterArray
+import data.utils.policy.FAIL
+import data.utils.policy.PASS
 
 
 #############
 # Constants #
 #############
-
-FAIL := ReportDetailsBoolean(false)
-
-PASS := ReportDetailsBoolean(true)
 
 # Values in json for slider sharepoint/onedrive sharing settings
 ONLYPEOPLEINORG := 0

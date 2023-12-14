@@ -7,43 +7,12 @@ import data.utils.defender.SensitiveAccountsConfig
 import data.utils.defender.SensitiveAccountsSetting
 import data.utils.defender.ImpersonationProtection
 import data.utils.defender.ImpersonationProtectionConfig
-
-
-#############
-# Constants #
-#############
-
-FAIL := ReportDetailsBoolean(false)
-
-PASS := ReportDetailsBoolean(true)
-
-# Example usage and output:
-# GenerateArrayString([1,2], "numbers found:") ->
-# 2 numbers found: 1, 2
-GenerateArrayString(Array, CustomString) := Output if {
-    Length := format_int(count(Array), 10)
-    ArrayString := concat(", ", Array)
-    Output := trim(concat(" ", [Length, concat(" ", [CustomString, ArrayString])]), " ")
-}
-
-CustomizeError(true, _) := PASS if {}
-
-CustomizeError(false, CustomString) := CustomString if {}
-
-# If a defender license is present, don't apply the warning
-# and leave the message unchanged
-ApplyLicenseWarning(Status) := ReportDetailsBoolean(Status) if {
-    input.defender_license == true
-}
-
-# If a defender license is not present, assume failure and
-# replace the message with the warning
-ApplyLicenseWarning(_) := concat("", [FAIL, LicenseWarning]) if {
-    input.defender_license == false
-    LicenseWarning := " **NOTE: Either you do not have sufficient permissions or your tenant does not have a license for Microsoft Defender for Office 365 Plan 1, which is required for this feature.**"
-}
-
-FilterArray(Conditions, Boolean) := [Condition | some Condition in Conditions; Condition == Boolean]
+import data.utils.policy.FAIL
+import data.utils.policy.PASS
+import data.utils.policy.FilterArray
+import data.utils.defender.GenerateArrayString
+import data.utils.defender.CustomizeError
+import data.utils.defender.ApplyLicenseWarning
 
 
 #################

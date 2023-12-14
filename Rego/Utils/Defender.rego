@@ -1,5 +1,8 @@
 package utils.defender
 import future.keywords
+import data.utils.report.ReportDetailsBoolean
+import data.utils.policy.FAIL
+import data.utils.policy.PASS
 
 ##########################################
 # User/Group Exclusion support functions #
@@ -169,4 +172,34 @@ ImpersonationProtection(Policies, IdentityString, IncludedAccounts, FilterKey, A
         "Accounts": set(),
         "Action": ""
     }
+}
+
+################
+# Refactor Out #
+################
+
+# Example usage and output:
+# GenerateArrayString([1,2], "numbers found:") ->
+# 2 numbers found: 1, 2
+GenerateArrayString(Array, CustomString) := Output if {
+    Length := format_int(count(Array), 10)
+    ArrayString := concat(", ", Array)
+    Output := trim(concat(" ", [Length, concat(" ", [CustomString, ArrayString])]), " ")
+}
+
+CustomizeError(true, _) := PASS if {}
+
+CustomizeError(false, CustomString) := CustomString if {}
+
+# If a defender license is present, don't apply the warning
+# and leave the message unchanged
+ApplyLicenseWarning(Status) := ReportDetailsBoolean(Status) if {
+    input.defender_license == true
+}
+
+# If a defender license is not present, assume failure and
+# replace the message with the warning
+ApplyLicenseWarning(_) := concat("", [FAIL, LicenseWarning]) if {
+    input.defender_license == false
+    LicenseWarning := " **NOTE: Either you do not have sufficient permissions or your tenant does not have a license for Microsoft Defender for Office 365 Plan 1, which is required for this feature.**"
 }
