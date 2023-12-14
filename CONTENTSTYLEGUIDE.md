@@ -32,7 +32,7 @@ test_ExampleVar_Correct_V1 if {
         ]
     }
 
-    CorrectTestResult("MS.<Product>.<Policy Group #>.<Policy #>v<Version #>", Output, "ReportDetailString") == true
+    TestResult("MS.<Product>.<Policy Group #>.<Policy #>v<Version #>", Output, "ReportDetailString", true) == true
 }
 
 test_ExampleVar_Correct_V2 if {
@@ -49,7 +49,25 @@ test_ExampleVar_Incorrect if {
         ]
     }
 
-    IncorrectTestResult("MS.<Product>.<Policy Group #>.<Policy #>v<Version #>", Output, "ReportDetailString") == true
+    TestResult("MS.<Product>.<Policy Group #>.<Policy #>v<Version #>", Output, "ReportDetailString", false) == true
+}
+
+test_ExampleVar_UnknownReportString_Incorrect if {
+    Output := <Product>.tests with input as {
+        "example_policies" : [
+            {
+                "Example3" : "ExampleString",
+                "Example2" : true
+            }
+        ]
+    }
+
+    ReportDetailArrayStrs := [
+        "Part of string",
+        "Second part",
+        "Third part"
+    ]
+    TestResultContains("MS.<Product>.<Policy Group #>.<Policy #>v<Version #>", Output, ReportDetailArrayStrs, false) == true
 }
 ```
 
@@ -92,7 +110,7 @@ test_NotImplemented_Correct if {
 
     Output := <Product>.tests with input as { }
 
-    IncorrectTestResult(PolicyId, Output, NotCheckedDetails(PolicyId)) == true
+    TestResult(PolicyId, Output, NotCheckedDetails(PolicyId), false) == true
 }
 ```
 ```
@@ -101,7 +119,7 @@ test_3rdParty_Correct_V1 if {
 
     Output := <Product>.tests with input as { }
 
-    IncorrectTestResult(PolicyId, Output, DefenderMirrorDetails(PolicyId)) == true
+    TestResult(PolicyId, Output, DefenderMirrorDetails(PolicyId), false) == true
 }
 ```
 
@@ -125,7 +143,7 @@ test_Example_Correct if {
         }
     }
 
-    CorrectTestResult("MS.<Product>.<Policy Group #>.<Policy #>v<Version #>", Output, "ReportDetailString") == true
+    TestResult("MS.<Product>.<Policy Group #>.<Policy #>v<Version #>", Output, "ReportDetailString", true) == true
 }
 ```
 
