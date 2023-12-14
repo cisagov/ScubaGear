@@ -7,8 +7,26 @@
     .EXAMPLE
         .\OPA.ps1
 #>
-param (
-    [Parameter(Mandatory=$false)]
+
+[CmdletBinding()]
+param(
+    [Parameter(Mandatory = $false, HelpMessage = 'The version of OPA Rego to be downloaded, must be in "x.x.x" format')]
+    [Alias('version')]
+    [string]
+    $ExpectedVersion = '0.42.1',
+
+    [Parameter(Mandatory = $false, HelpMessage = 'The file name that the opa executable is to be saved as')]
+    [Alias('name')]
+    [string]
+    $OPAExe = "",
+
+    [Parameter(Mandatory = $false, HelpMessage = 'The operating system the program is running on')]
+    [ValidateSet('Windows','MacOS','Linux')]
+    [Alias('os')]
+    [string]
+    $OperatingSystem  = "Windows",
+
+    [Parameter(Mandatory=$true)]
     [ValidateScript({Test-Path -Path $_ -PathType Container})]
     [string]
     $ScubaParentDirectory = $env:USERPROFILE

@@ -42,17 +42,29 @@ param (
     [Parameter(Mandatory=$false)]
     [ValidateScript({Test-Path -Path $_ -PathType Container})]
     [string]
-    $ScubaParentDirectory = $env:USERPROFILE
+    $ScubaParentDirectory = $env:USERPROFILE,
+    [Parameter(Mandatory=$false)]
+    [switch]
+    $RunAsInstalled
 )
 
 $ScubaHiddenHome = Join-Path -Path $ScubaParentDirectory -ChildPath '.scubagear'
 $ScubaTools = Join-Path -Path $ScubaHiddenHome -ChildPath 'Tools'
 $OPAExe = Join-Path -Path $ScubaTools -ChildPath 'opa_windows_amd64.exe'
-$ModulePath = Split-Path (Get-Module -Name ScubaGear).Path -Parent
-
 $ScriptName = $MyInvocation.MyCommand
-$RegoUnitTestPath = Join-Path -Path $ModulePath -ChildPath "Testing\Unit\Rego"
-$RegoPolicyPath = Join-Path -Path $ModulePath -ChildPath "Rego"
+$RootPath = Join-Path -Path $PSScriptRoot -ChildPath '../PowerShell/ScubaGear'
+
+if ($RunAsInstalled){
+    if ($null -ne (Get-Module -Name ScubaGear)){
+        $RootPath = Split-Path (Get-Module -Name ScubaGear).Path -Parent
+    }
+    else {
+        Write-Error "ScubaGear is not installed.  You cannot use RunAsInstalled switch." -ErrorAction 'Stop'
+    }
+}
+
+$RegoUnitTestPath = Join-Path -Path $RootPath -ChildPath "Testing\Unit\Rego"
+$RegoPolicyPath = Join-Path -Path $RootPath -ChildPath "Rego"
 
 function Get-ErrorMsg {
     [CmdletBinding()]

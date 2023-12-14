@@ -47,7 +47,12 @@ param(
     [Parameter(Mandatory = $false, HelpMessage = 'The file name that the opa executable is to be saved as')]
     [Alias('name')]
     [string]
-    $OPAExe = ""
+    $OPAExe = "",
+
+    [Parameter(Mandatory=$false)]
+    [ValidateScript({Test-Path -Path $_ -PathType Container})]
+    [string]
+    $ScubaParentDirectory = $env:USERPROFILE
 )
 
 # Set preferences for writing messages
@@ -128,13 +133,18 @@ foreach ($Module in $ModuleList) {
     }
 }
 
+## Setup Scuba Home
+$ScubaHiddenHome = Join-Path -Path $ScubaParentDirectory -ChildPath '.scubagear'
+$ScubaToolsDirectory = Join-Path -Path $ScubaHiddenHome -ChildPath 'Tools'
+New-Item -ItemType Directory -Force -Path $ScubaToolsDirectory
+
 if ($NoOPA -eq $true) {
     Write-Debug "Skipping Download for OPA.`n"
 }
 else {
     try {
         $ScriptDir = Split-Path -Path $MyInvocation.MyCommand.Definition -Parent
-        . $ScriptDir\OPA.ps1 -name $OPAExe -version $ExpectedVersion -os $OperatingSystem
+        . $ScriptDir\OPA.ps1 -name $OPAExe -version $ExpectedVersion -os $OperatingSystem -ScubaToolsDirectory $ScubaToolsDirectory
     }
     catch {
         $Error[0] | Format-List -Property * -Force | Out-Host
