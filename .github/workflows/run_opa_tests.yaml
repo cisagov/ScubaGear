@@ -20,8 +20,8 @@ jobs:
   Run-OPA-Tests:
     runs-on: ubuntu-latest
     steps:
-    - name: Check out repository code
-      uses: actions/checkout@v4
+      - name: Check out repository code
+        uses: actions/checkout@v4
 
       - name: Setup OPA
         uses: open-policy-agent/setup-opa@v2
