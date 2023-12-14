@@ -2,12 +2,9 @@ package aad
 import future.keywords
 import data.utils.report.NotCheckedDetails
 import data.utils.report.ReportDetailsBoolean
-import data.utils.report.Description
 import data.utils.key.IsEmptyContainer
 import data.utils.key.Contains
 import data.utils.key.Count
-import data.utils.key.FAIL
-import data.utils.key.PASS
 import data.utils.key.FilterArray
 import data.utils.key.ConvertToSetWithKey
 import data.utils.key.ConvertToSet

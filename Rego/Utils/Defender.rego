@@ -1,9 +1,7 @@
 package utils.defender
 import future.keywords
 import data.utils.report.ReportDetailsBoolean
-import data.utils.report.Description
 import data.utils.key.FAIL
-import data.utils.key.PASS
 import data.utils.key.ConvertToSet
 
 ##########################################
