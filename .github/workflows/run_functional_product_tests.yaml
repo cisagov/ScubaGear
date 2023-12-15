@@ -32,30 +32,27 @@ jobs:
       run: Import-PfxCertificate -Password (ConvertTo-SecureString -String $env:PfxPassword -AsPlainText -Force) -CertStoreLocation Cert:\CurrentUser\My -FilePath ./key.pfx
       env:
         PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
-    - name: Get Thumbprint
-      id: thumbprint
+    # - name: Get Thumbprint
+    #   id: thumbprint
+    #   run: |
+    #     $thumbprint = Get-PfxCertificate -FilePath ./key.pfx -Password (ConvertTo-SecureString -String $env:PfxPassword -AsPlainText -Force)
+    #     Write-Output "THUMBPRINT_VALUE=$thumbprint" >> $GITHUB_OUTPUT
+    #     echo "THUMBPRINT_VALUE2=$thumbprint" >> $GITHUB_OUTPUT
+    #   shell: pwsh
+    #   env:
+    #     PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
+    - name: Setup for Scuba
+      run: ./SetUp.ps1
+    - name: Install Selenium
+      run: Install-Module -Name Selenium
+    - name: Update Selenium
+      run: ./Testing/Functional/SmokeTest/UpdateSelenium.ps1
+    - name: Test SharePoint
       run: |
         $thumbprint = Get-PfxCertificate -FilePath ./key.pfx -Password (ConvertTo-SecureString -String $env:PfxPassword -AsPlainText -Force)
-        Write-Output "THUMBPRINT_VALUE=$thumbprint" >> $GITHUB_OUTPUT
-        echo "THUMBPRINT_VALUE2=$thumbprint" >> $GITHUB_OUTPUT
+        Write-Debug "The thumbprint is "
+        Write-Output $thumbprint
+        ./Testing/Functional/Products/Tests/CallProductTests.ps1
       shell: pwsh
       env:
         PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
-    - name: Accept Thumbprint Test
-      run: |
-        Write-Debug "The thumbprint is "
-        $thumbprint = "${{ steps.thumbprint.outputs.THUMBPRINT_VALUE }}"
-        Write-Output $thumbprint
-        $thumbprint2 = "${{ steps.thumbprint.outputs.THUMBPRINT_VALUE2 }}"
-        Write-Output $thumbprint2
-    # - name: Setup for Scuba
-    #   run: ./SetUp.ps1
-    # - name: Install Selenium
-    #   run: Install-Module -Name Selenium
-    # - name: Update Selenium
-    #   run: ./Testing/Functional/SmokeTest/UpdateSelenium.ps1
-    # - name: Test SharePoint
-    #   run: |
-    #     Write-Debug "The thumbprint is "
-    #     Write-Output ${{ steps.thumbprint.outputs.THUMBPRINT_VALUE }}
-    #     ./Testing/Functional/Products/Tests/CallProductTests.ps1
