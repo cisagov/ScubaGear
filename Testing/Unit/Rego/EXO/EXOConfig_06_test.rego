@@ -43,7 +43,8 @@ test_Domains_Contacts_Incorrect if {
     # print(count(RuleOutput)==1)
     # notror := RuleOutput[0].RequirementMet
     # trace(notror)
-    # ReportDetailString := "Wildcard domain (\"*\") in shared domains list, enabling sharing will all domains by default"
+    # ReportDetailString :=
+    #    "Wildcard domain (\"*\") in shared domains list, enabling sharing will all domains by default"
     # print(RuleOutput[0].ReportDetails == ReportDetailString)
 }
 

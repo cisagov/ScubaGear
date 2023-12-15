@@ -1102,7 +1102,7 @@ test_Assignments_Incorrect if {
 #
 # Policy MS.AAD.7.6v1
 #--
-test_AdditionalProperties_Correct_V2 if {
+test_AdditionalProperties_Correct_V4 if {
     Output := aad.tests with input as {
         "privileged_roles": [
             {
@@ -1134,7 +1134,7 @@ test_AdditionalProperties_Correct_V2 if {
     TestResult("MS.AAD.7.6v1", Output, PASS, true) == true
 }
 
-test_AdditionalProperties_Correct_V3 if {
+test_AdditionalProperties_Correct_V5 if {
     Output := aad.tests with input as {
         "privileged_roles": [
             {
@@ -1179,7 +1179,7 @@ test_AdditionalProperties_Correct_V3 if {
     TestResult("MS.AAD.7.6v1", Output, PASS, true) == true
 }
 
-test_AdditionalProperties_Incorrect_V3 if {
+test_AdditionalProperties_Incorrect_V15 if {
     Output := aad.tests with input as {
         "privileged_roles": [
             {

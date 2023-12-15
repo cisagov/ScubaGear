@@ -144,7 +144,8 @@ test_AnonymousMeetingStart_Incorrect_V2 if {
         ]
     }
 
-    ReportDetailStr := "1 meeting policy(ies) found that allows anonymous users to start meetings: Tag:FirstCustomPolicy"
+    ReportDetailStr :=
+        "1 meeting policy(ies) found that allows anonymous users to start meetings: Tag:FirstCustomPolicy"
     TestResult("MS.TEAMS.1.2v1", Output, ReportDetailStr, false) == true
 }
 
@@ -192,7 +193,7 @@ test_meeting_policies_Correct_V1 if {
     TestResult("MS.TEAMS.1.3v1", Output, PASS, true) == true
 }
 
-test_AllowPSTNUsersToBypassLobby_Incorrect if {
+test_AllowPSTNUsersToBypassLobby_Incorrect_V1 if {
     Output := teams.tests with input as {
         "meeting_policies": [
             {
@@ -332,11 +333,12 @@ test_OneGoodOneBadPolicy_Incorrect if {
         ]
     }
 
-    ReportDetailStr := "1 meeting policy(ies) found that allow everyone or dial-in users to bypass lobby: Tag:CustomPolicy"
+    ReportDetailStr :=
+        "1 meeting policy(ies) found that allow everyone or dial-in users to bypass lobby: Tag:CustomPolicy"
     TestResult("MS.TEAMS.1.5v1", Output, ReportDetailStr, false) == true
 }
 
-test_AllowPSTNUsersToBypassLobby_Incorrect if {
+test_AllowPSTNUsersToBypassLobby_Incorrect_V2 if {
     Output := teams.tests with input as {
         "meeting_policies": [
             {
@@ -347,7 +349,8 @@ test_AllowPSTNUsersToBypassLobby_Incorrect if {
         ]
     }
 
-    ReportDetailStr := "1 meeting policy(ies) found that allow everyone or dial-in users to bypass lobby: Tag:CustomPolicy"
+    ReportDetailStr :=
+        "1 meeting policy(ies) found that allow everyone or dial-in users to bypass lobby: Tag:CustomPolicy"
     TestResult("MS.TEAMS.1.5v1", Output, ReportDetailStr, false) == true
 }
 #--

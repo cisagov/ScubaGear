@@ -454,6 +454,7 @@ test_Locations_Correct_V2 if {
     TestResult("MS.DEFENDER.4.2v1", Output, PASS, true) == true
 }
 
+# IGNORE Max Rule Length linter warning
 test_Locations_Correct_V3 if {
     Output := defender.tests with input as {
         "dlp_compliance_rules": [
