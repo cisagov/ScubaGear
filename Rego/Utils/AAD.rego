@@ -18,10 +18,18 @@ import data.utils.key.PASS
 # printed in the report details section
 REPORTARRAYMAXCOUNT := 20
 
+# License warning string
+P2WARNINGSTR := "**NOTE: Your tenant does not have a Microsoft Entra ID P2 license, which is required for this feature**"
+
+CAPLINK := "<a href='#caps'>View all CA policies</a>."
+
 ########################################
 # Specific AAD Report Details Function #
 ########################################
 
+# Function returns the string that indicates the number of fails & each item that fails.
+# If the number of items is greater than our REPORTARRAYMAXCOUNT, the item list is
+# truncated for readability purposes.
 ReportFullDetailsArray(Array, String) := Description([ArraySizeStr(Array), String]) if {
     count(Array) == 0
 }
@@ -63,19 +71,21 @@ Aad2P2Licenses contains ServicePlan.ServicePlanId if {
     ServicePlan.ServicePlanName == "AAD_PREMIUM_P2"
 }
 
-P2WarningString := "**NOTE: Your tenant does not have a Microsoft Entra ID P2 license, which is required for this feature**"
-
-CapLink := "<a href='#caps'>View all CA policies</a>."
-
+# Returns license warning if license not present as results may be wrong,
+# Othewise returns report string with link to table at bottom of report
 ReportDetailsArrayLicenseWarningCap(Array, String) := Description if {
     count(Aad2P2Licenses) > 0
-    Description := concat(". ", [ReportFullDetailsArray(Array, String), CapLink])
-} else := P2WarningString
+    Description := concat(". ", [ReportFullDetailsArray(Array, String), CAPLINK])
+} else := P2WARNINGSTR
 
+# Returns license warning if license not present as results may be wrong,
+# Othewise returns report string
 ReportDetailsArrayLicenseWarning(Array, String) := ReportFullDetailsArray(Array, String) if {
     count(Aad2P2Licenses) > 0
-} else := P2WarningString
+} else := P2WARNINGSTR
 
+# Returns license warning if license not present as results may be wrong,
+# Othewise returns basic report string
 ReportDetailsBooleanLicenseWarning(true) := PASS if {
     count(Aad2P2Licenses) > 0
 }
@@ -84,7 +94,7 @@ ReportDetailsBooleanLicenseWarning(false) := FAIL if {
     count(Aad2P2Licenses) > 0
 }
 
-ReportDetailsBooleanLicenseWarning(_) := P2WarningString if {
+ReportDetailsBooleanLicenseWarning(_) := P2WARNINGSTR if {
     count(Aad2P2Licenses) == 0
 }
 

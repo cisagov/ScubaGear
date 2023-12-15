@@ -8,16 +8,16 @@ import data.utils.key.Count
 import data.utils.key.FilterArray
 import data.utils.key.ConvertToSetWithKey
 import data.utils.key.ConvertToSet
-import data.utils.aad.PolicyConditionsMatch
-import data.utils.aad.UserExclusionsFullyExempt
-import data.utils.aad.GroupExclusionsFullyExempt
 import data.utils.aad.ReportFullDetailsArray
 import data.utils.aad.ReportDetailsArrayLicenseWarningCap
-import data.utils.aad.HasAcceptableMFA
 import data.utils.aad.ReportDetailsArrayLicenseWarning
 import data.utils.aad.ReportDetailsBooleanLicenseWarning
-import data.utils.aad.CapLink
+import data.utils.aad.UserExclusionsFullyExempt
+import data.utils.aad.GroupExclusionsFullyExempt
 import data.utils.aad.Aad2P2Licenses
+import data.utils.aad.HasAcceptableMFA
+import data.utils.aad.PolicyConditionsMatch
+import data.utils.aad.CAPLINK
 
 
 #############
@@ -61,7 +61,7 @@ tests contains {
     "Criticality": "Shall",
     "Commandlet": ["Get-MgBetaIdentityConditionalAccessPolicy"],
     "ActualValue": LegacyAuthentication,
-    "ReportDetails": concat(". ", [ReportFullDetailsArray(LegacyAuthentication, DescriptionString), CapLink]),
+    "ReportDetails": concat(". ", [ReportFullDetailsArray(LegacyAuthentication, DescriptionString), CAPLINK]),
     "RequirementMet": Status
 } if {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
@@ -195,7 +195,7 @@ tests contains {
     "Criticality": "Shall",
     "Commandlet": ["Get-MgBetaIdentityConditionalAccessPolicy"],
     "ActualValue": MFAPolicies,
-    "ReportDetails": concat(". ", [ReportFullDetailsArray(MFAPolicies, DescriptionString), CapLink]),
+    "ReportDetails": concat(". ", [ReportFullDetailsArray(MFAPolicies, DescriptionString), CAPLINK]),
     "RequirementMet": Status
 } if {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
@@ -233,7 +233,7 @@ tests contains {
     "Criticality": "Shall",
     "Commandlet": ["Get-MgBetaIdentityConditionalAccessPolicy"],
     "ActualValue": AlternativeMFA,
-    "ReportDetails": concat(". ", [ReportFullDetailsArray(AlternativeMFA, DescriptionString), CapLink]),
+    "ReportDetails": concat(". ", [ReportFullDetailsArray(AlternativeMFA, DescriptionString), CAPLINK]),
     "RequirementMet": Status
 } if {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
@@ -253,7 +253,7 @@ tests contains {
     "Criticality": "Shall",
     "Commandlet": ["Get-MgBetaIdentityConditionalAccessPolicy"],
     "ActualValue": MFAPolicies,
-    "ReportDetails": concat(". ", [ReportFullDetailsArray(MFAPolicies, DescriptionString), CapLink]),
+    "ReportDetails": concat(". ", [ReportFullDetailsArray(MFAPolicies, DescriptionString), CAPLINK]),
     "RequirementMet": Status
 } if {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
@@ -345,7 +345,7 @@ tests contains {
     "Criticality": "Shall",
     "Commandlet": ["Get-MgBetaSubscribedSku", "Get-PrivilegedRole", "Get-MgBetaIdentityConditionalAccessPolicy"],
     "ActualValue": PhishingResistantMFA,
-    "ReportDetails": concat(". ", [ReportFullDetailsArray(PhishingResistantMFA, DescriptionString), CapLink]),
+    "ReportDetails": concat(". ", [ReportFullDetailsArray(PhishingResistantMFA, DescriptionString), CAPLINK]),
     "RequirementMet": Status
 } if {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
@@ -379,7 +379,7 @@ tests contains {
     "Criticality": "Should",
     "Commandlet": ["Get-MgBetaIdentityConditionalAccessPolicy"],
     "ActualValue": ManagedDeviceAuth,
-    "ReportDetails": concat(". ", [ReportFullDetailsArray(ManagedDeviceAuth, DescriptionString), CapLink]),
+    "ReportDetails": concat(". ", [ReportFullDetailsArray(ManagedDeviceAuth, DescriptionString), CAPLINK]),
     "RequirementMet": Status
 } if {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
@@ -417,7 +417,7 @@ tests contains {
     "Criticality": "Should",
     "Commandlet": ["Get-MgBetaIdentityConditionalAccessPolicy"],
     "ActualValue": RequireManagedDeviceMFA,
-    "ReportDetails": concat(". ", [ReportFullDetailsArray(RequireManagedDeviceMFA, DescriptionString), CapLink]),
+    "ReportDetails": concat(". ", [ReportFullDetailsArray(RequireManagedDeviceMFA, DescriptionString), CAPLINK]),
     "RequirementMet": Status
 } if {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
