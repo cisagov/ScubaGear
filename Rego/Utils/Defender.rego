@@ -193,10 +193,10 @@ ApplyLicenseWarning(Status) := ReportDetailsBoolean(Status) if {
 
 # If a defender license is not present, assume failure and
 # replace the message with the warning
-ApplyLicenseWarning(_) := concat("", [FAIL, LicenseWarning]) if {
+ApplyLicenseWarning(_) := concat(" ", [FAIL, LicenseWarning]) if {
     input.defender_license == false
     LicenseWarning := concat(" ", [
-        " **NOTE: Either you do not have sufficient permissions or",
+        "**NOTE: Either you do not have sufficient permissions or",
         "your tenant does not have a license for Microsoft Defender",
         "for Office 365 Plan 1, which is required for this feature.**"
     ])

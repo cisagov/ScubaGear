@@ -50,6 +50,7 @@ test_ContentContainsSensitiveInformation_Correct_V1 if {
     TestResult("MS.DEFENDER.4.1v1", Output, PASS, true) == true
 }
 
+# IGNORE line length linter warning
 test_AdvancedRule_Correct_V2 if {
     Output := defender.tests with input as {
         "dlp_compliance_rules": [
@@ -243,7 +244,11 @@ test_ContentContainsSensitiveInformation_Incorrect_V4 if {
         ]
     }
 
-    ReportDetailString := "No matching rules found for: Credit Card Number, U.S. Individual Taxpayer Identification Number (ITIN), U.S. Social Security Number (SSN)"
+    ReportDetailString := concat(" ", [
+        "No matching rules found for: Credit Card Number,",
+        "U.S. Individual Taxpayer Identification Number (ITIN), U.S. Social Security Number (SSN)"
+    ])
+
     TestResult("MS.DEFENDER.4.1v1", Output, ReportDetailString, false) == true
 }
 
@@ -285,7 +290,11 @@ test_ContentContainsSensitiveInformation_Incorrect_V5 if {
         ]
     }
 
-    ReportDetailString := "No matching rules found for: Credit Card Number, U.S. Individual Taxpayer Identification Number (ITIN), U.S. Social Security Number (SSN)"
+    ReportDetailString := concat(" ", [
+        "No matching rules found for: Credit Card Number,",
+        "U.S. Individual Taxpayer Identification Number (ITIN), U.S. Social Security Number (SSN)"
+    ])
+
     TestResult("MS.DEFENDER.4.1v1", Output, ReportDetailString, false) == true
 }
 
@@ -327,7 +336,11 @@ test_ContentContainsSensitiveInformation_Incorrect_V6 if {
         ]
     }
 
-    ReportDetailString := "No matching rules found for: Credit Card Number, U.S. Individual Taxpayer Identification Number (ITIN), U.S. Social Security Number (SSN)"
+    ReportDetailString := concat(" ", [
+        "No matching rules found for: Credit Card Number,",
+        "U.S. Individual Taxpayer Identification Number (ITIN), U.S. Social Security Number (SSN)"
+    ])
+
     TestResult("MS.DEFENDER.4.1v1", Output, ReportDetailString, false) == true
 }
 #--
@@ -392,6 +405,7 @@ test_Locations_Correct_V1 if {
     TestResult("MS.DEFENDER.4.2v1", Output, PASS, true) == true
 }
 
+# IGNORE line length linter warning
 test_Locations_Correct_V2 if {
     Output := defender.tests with input as {
         "dlp_compliance_rules": [
@@ -1101,7 +1115,11 @@ test_BlockAccess_Incorrect_V1 if {
         ]
     }
 
-    ReportDetailString := "1 rule(s) found that do(es) not block access or associated policy not set to enforce block action: Baseline Rule"
+    ReportDetailString := concat(" ", [
+        "1 rule(s) found that do(es) not block access or",
+        "associated policy not set to enforce block action: Baseline Rule"
+    ])
+
     TestResult("MS.DEFENDER.4.3v1", Output, ReportDetailString, false) == true
 }
 
@@ -1144,7 +1162,11 @@ test_BlockAccess_Incorrect_V2 if {
         ]
     }
 
-    ReportDetailString := "1 rule(s) found that do(es) not block access or associated policy not set to enforce block action: Baseline Rule"
+    ReportDetailString := concat(" ", [
+        "1 rule(s) found that do(es) not block access or associated policy not set to enforce block action:",
+        "Baseline Rule"
+    ])
+
     TestResult("MS.DEFENDER.4.3v1", Output, ReportDetailString, false) == true
 }
 

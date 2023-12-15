@@ -82,6 +82,7 @@ tests contains {
 # Iterate through all policies. For each, check if the environment the policy applies to
 # is the default environment. If so, save the policy name to the DefaultEnvPolicies list.
 DefaultEnvPolicies contains {"PolicyName": Policies.displayName} if {
+    # IGNORE prefer-some-in-iteration linter warning
     some Policies in input.dlp_policies[_].value
     some Env in Policies.environments
     Env.name == concat("-", ["Default", input.tenant_id])
@@ -113,6 +114,7 @@ AllEnvironments contains EnvironmentList.EnvironmentName if {
 
 # gets the list of all environments with policies applied to them
 EnvWithPolicies contains Env.name if {
+    # IGNORE prefer-some-in-iteration linter warning
     some Policies in input.dlp_policies[_].value
     some Env in Policies.environments
 }
@@ -168,6 +170,7 @@ tests contains {
 # gets the set of connectors that are allowed in the default environment
 # general and confidential groups refer to business and non-business
 ConnectorSet contains Connector.id if {
+    # IGNORE prefer-some-in-iteration linter warning
     some Policies in input.dlp_policies[_].value
     some Group in Policies.connectorGroups
     Conditions := [

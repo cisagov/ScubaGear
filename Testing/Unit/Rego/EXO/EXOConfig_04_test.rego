@@ -49,8 +49,8 @@ test_Rdata_Incorrect_V1 if {
         ]
     }
 
-    ReportDetailString := "1 agency domain(s) found in violation: test.name"
-    TestResult("MS.EXO.4.1v1", Output, ReportDetailString, false) == true
+    ReportDetailStr := "1 agency domain(s) found in violation: test.name"
+    TestResult("MS.EXO.4.1v1", Output, ReportDetailStr, false) == true
 }
 
 test_Rdata_Incorrect_V2 if {
@@ -73,8 +73,8 @@ test_Rdata_Incorrect_V2 if {
         ]
     }
 
-    ReportDetailString := "1 agency domain(s) found in violation: test.name"
-    TestResult("MS.EXO.4.1v1", Output, ReportDetailString, false) == true
+    ReportDetailStr := "1 agency domain(s) found in violation: test.name"
+    TestResult("MS.EXO.4.1v1", Output, ReportDetailStr, false) == true
 }
 
 test_Rdata_Incorrect_V3 if {
@@ -107,8 +107,8 @@ test_Rdata_Incorrect_V3 if {
         ]
     }
 
-    ReportDetailString := "1 agency domain(s) found in violation: bad.name"
-    TestResult("MS.EXO.4.1v1", Output, ReportDetailString, false) == true
+    ReportDetailStr := "1 agency domain(s) found in violation: bad.name"
+    TestResult("MS.EXO.4.1v1", Output, ReportDetailStr, false) == true
 }
 #--
 
@@ -138,6 +138,7 @@ test_Rdata_Correct_V2 if {
     TestResult("MS.EXO.4.2v1", Output, PASS, true) == true
 }
 
+# IGNORE line length linter warning
 test_Rdata_Incorrect_V4 if {
     Output := exo.tests with input as {
         "dmarc_records": [
@@ -158,8 +159,8 @@ test_Rdata_Incorrect_V4 if {
         ]
     }
 
-    ReportDetailString := "1 agency domain(s) found in violation: test.name"
-    TestResult("MS.EXO.4.2v1", Output, ReportDetailString, false) == true
+    ReportDetailStr := "1 agency domain(s) found in violation: test.name"
+    TestResult("MS.EXO.4.2v1", Output, ReportDetailStr, false) == true
 }
 
 test_Rdata_Incorrect_V5 if {
@@ -182,8 +183,8 @@ test_Rdata_Incorrect_V5 if {
         ]
     }
 
-    ReportDetailString := "1 agency domain(s) found in violation: test.name"
-    TestResult("MS.EXO.4.2v1", Output, ReportDetailString, false) == true
+    ReportDetailStr := "1 agency domain(s) found in violation: test.name"
+    TestResult("MS.EXO.4.2v1", Output, ReportDetailStr, false) == true
 }
 #--
 
@@ -233,8 +234,8 @@ test_DMARCReport_Incorrect_V1 if {
         ]
     }
 
-    ReportDetailString := "1 agency domain(s) found in violation: test.name"
-    TestResult("MS.EXO.4.3v1", Output, ReportDetailString, false) == true
+    ReportDetailStr := "1 agency domain(s) found in violation: test.name"
+    TestResult("MS.EXO.4.3v1", Output, ReportDetailStr, false) == true
 }
 
 test_DMARCReport_Incorrect_V2 if {
@@ -257,8 +258,8 @@ test_DMARCReport_Incorrect_V2 if {
         ]
     }
 
-    ReportDetailString := "1 agency domain(s) found in violation: test.name"
-    TestResult("MS.EXO.4.3v1", Output, ReportDetailString, false) == true
+    ReportDetailStr := "1 agency domain(s) found in violation: test.name"
+    TestResult("MS.EXO.4.3v1", Output, ReportDetailStr, false) == true
 }
 
 # empty rdata
@@ -280,8 +281,8 @@ test_DMARCReport_Incorrect_V3 if {
         ]
     }
 
-    ReportDetailString := "1 agency domain(s) found in violation: test.name"
-    TestResult("MS.EXO.4.3v1", Output, ReportDetailString, false) == true
+    ReportDetailStr := "1 agency domain(s) found in violation: test.name"
+    TestResult("MS.EXO.4.3v1", Output, ReportDetailStr, false) == true
 }
 #--
 
@@ -290,6 +291,7 @@ test_DMARCReport_Incorrect_V3 if {
 #--
 
 # 2 emails in rua= and 1 in ruf
+# IGNORE line length linter warning
 test_POC_Correct_V1 if {
     Output := exo.tests with input as {
         "dmarc_records": [
@@ -314,7 +316,8 @@ test_POC_Correct_V1 if {
 }
 
 # 2+ emails in rua= and 1+ in ruf
-test_POC_Correct_V1 if {
+# IGNORE line length linter warning
+test_POC_Correct_V2 if {
     Output := exo.tests with input as {
         "dmarc_records": [
             {
@@ -358,8 +361,8 @@ test_POC_Incorrect_V1 if {
         ]
     }
 
-    ReportDetailString := "1 agency domain(s) found in violation: test.name"
-    TestResult("MS.EXO.4.4v1", Output, ReportDetailString, false) == true
+    ReportDetailStr := "1 agency domain(s) found in violation: test.name"
+    TestResult("MS.EXO.4.4v1", Output, ReportDetailStr, false) == true
 }
 
 # Only 2 emails in rua no ruf
@@ -383,8 +386,8 @@ test_POC_Incorrect_V2 if {
         ]
     }
 
-    ReportDetailString := "1 agency domain(s) found in violation: test.name"
-    TestResult("MS.EXO.4.4v1", Output, ReportDetailString, false) == true
+    ReportDetailStr := "1 agency domain(s) found in violation: test.name"
+    TestResult("MS.EXO.4.4v1", Output, ReportDetailStr, false) == true
 }
 
 # Only 1 ruf no rua
@@ -408,11 +411,12 @@ test_POC_Incorrect_V3 if {
         ]
     }
 
-    ReportDetailString := "1 agency domain(s) found in violation: test.name"
-    TestResult("MS.EXO.4.4v1", Output, ReportDetailString, false) == true
+    ReportDetailStr := "1 agency domain(s) found in violation: test.name"
+    TestResult("MS.EXO.4.4v1", Output, ReportDetailStr, false) == true
 }
 
 # 2 domains 1 fails rua/ruf number
+# IGNORE line length linter warning
 test_POC_Incorrect_V4 if {
     Output := exo.tests with input as {
         "dmarc_records": [
@@ -445,11 +449,12 @@ test_POC_Incorrect_V4 if {
         ]
     }
 
-    ReportDetailString := "1 agency domain(s) found in violation: example.com"
-    TestResult("MS.EXO.4.4v1", Output, ReportDetailString, false) == true
+    ReportDetailStr := "1 agency domain(s) found in violation: example.com"
+    TestResult("MS.EXO.4.4v1", Output, ReportDetailStr, false) == true
 }
 
 # 2 domains 1 fails rua # of email policy requirement
+# IGNORE line length linter warning
 test_POC_Incorrect_V5 if {
     Output := exo.tests with input as {
         "dmarc_records": [
@@ -482,11 +487,12 @@ test_POC_Incorrect_V5 if {
         ]
     }
 
-    ReportDetailString := "1 agency domain(s) found in violation: example.com"
-    TestResult("MS.EXO.4.4v1", Output, ReportDetailString, false) == true
+    ReportDetailStr := "1 agency domain(s) found in violation: example.com"
+    TestResult("MS.EXO.4.4v1", Output, ReportDetailStr, false) == true
 }
 
 # 2 domains 1 domain failed DNS query. Empty rdata
+# IGNORE line length linter warning
 test_POC_Incorrect_V6 if {
     Output := exo.tests with input as {
         "dmarc_records": [
@@ -517,7 +523,7 @@ test_POC_Incorrect_V6 if {
         ]
     }
 
-    ReportDetailString := "1 agency domain(s) found in violation: example.com"
-    TestResult("MS.EXO.4.4v1", Output, ReportDetailString, false) == true
+    ReportDetailStr := "1 agency domain(s) found in violation: example.com"
+    TestResult("MS.EXO.4.4v1", Output, ReportDetailStr, false) == true
 }
 #--

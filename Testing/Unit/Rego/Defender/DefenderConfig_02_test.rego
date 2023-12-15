@@ -683,7 +683,10 @@ test_AgencyDomains_Incorrect_V8 if {
         }
     }
 
-    ReportDetailString := "No agency domains defined for impersonation protection assessment. See configuration file documentation for details on how to define."
+    ReportDetailString := concat(" ", [
+        "No agency domains defined for impersonation protection assessment.",
+        "See configuration file documentation for details on how to define."
+    ])
     TestResult("MS.DEFENDER.2.2v1", Output, ReportDetailString, false) == true
 }
 #--

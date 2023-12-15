@@ -88,10 +88,9 @@ test_ExternalUserExpireInDays_Incorrect_V2 if {
         ]
     }
 
-    ReportDetailString := concat(" ", [
-        "Requirement not met: External Sharing is set to Anyone",
-        "and expiration date is not 30 days or less"
-    ])
+    ReportDetailString :=
+        "Requirement not met: External Sharing is set to Anyone and expiration date is not 30 days or less"
+
     TestResult("MS.SHAREPOINT.3.1v1", Output, ReportDetailString, false) == true
 }
 #--
@@ -230,10 +229,9 @@ test_Multi_Incorrect_V1 if {
         ]
     }
 
-    ReportDetailString := concat(" ", [
-        "Requirement not met: Expiration timer for",
-        "'People who use a verification code' NOT enabled and set to >30 days"
-    ])
+    ReportDetailString :=
+        "Requirement not met: Expiration timer for 'People who use a verification code' NOT enabled and set to >30 days"
+
     TestResult("MS.SHAREPOINT.3.3v1", Output, ReportDetailString, false) == true
 }
 
@@ -263,10 +261,9 @@ test_EmailAttestationReAuthDays_Incorrect_V3 if {
         ]
     }
 
-    ReportDetailString := concat(" ", [
-        "Requirement not met: Expiration timer for",
-        "'People who use a verification code' NOT set to 30 days"
-    ])
+    ReportDetailString :=
+        "Requirement not met: Expiration timer for 'People who use a verification code' NOT set to 30 days"
+
     TestResult("MS.SHAREPOINT.3.3v1", Output, ReportDetailString, false) == true
 }
 #--

@@ -19,7 +19,8 @@ import data.utils.key.PASS
 REPORTARRAYMAXCOUNT := 20
 
 # License warning string
-P2WARNINGSTR := "**NOTE: Your tenant does not have a Microsoft Entra ID P2 license, which is required for this feature**"
+P2WARNINGSTR :=
+    "**NOTE: Your tenant does not have a Microsoft Entra ID P2 license, which is required for this feature**"
 
 CAPLINK := "<a href='#caps'>View all CA policies</a>."
 
@@ -46,10 +47,9 @@ ReportFullDetailsArray(Array, String) := Details if {
 ReportFullDetailsArray(Array, String) := Details if {
     count(Array) > REPORTARRAYMAXCOUNT
 
-    TruncationWarning := concat(" ", [
-        "...<br/>Note: The list of matching items has been truncated.",
-        "Full details are available in the JSON results."
-    ])
+    TruncationWarning :=
+        "...<br/>Note: The list of matching items has been truncated. Full details are available in the JSON results."
+
     TruncatedList := concat(", ", array.slice(
         [x | some x in Array],
         0,

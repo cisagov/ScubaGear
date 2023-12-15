@@ -21,8 +21,8 @@ test_AllowedToCreateApps_Correct if {
         ]
     }
 
-    ReportDetailString := "0 authorization policies found that allow non-admin users to register third-party applications"
-    TestResult("MS.AAD.5.1v1", Output, ReportDetailString, true) == true
+    ReportDetailStr := "0 authorization policies found that allow non-admin users to register third-party applications"
+    TestResult("MS.AAD.5.1v1", Output, ReportDetailStr, true) == true
 }
 
 test_AllowedToCreateApps_Incorrect_V1 if {
@@ -37,8 +37,8 @@ test_AllowedToCreateApps_Incorrect_V1 if {
         ]
     }
 
-    ReportDetailString := "1 authorization policies found that allow non-admin users to register third-party applications:<br/>Bad policy"
-    TestResult("MS.AAD.5.1v1", Output, ReportDetailString, false) == true
+    ReportDetailStr := "1 authorization policies found that allow non-admin users to register third-party applications:<br/>Bad policy"
+    TestResult("MS.AAD.5.1v1", Output, ReportDetailStr, false) == true
 }
 
 test_AllowedToCreateApps_Incorrect_V2 if {
@@ -59,8 +59,8 @@ test_AllowedToCreateApps_Incorrect_V2 if {
         ]
     }
 
-    ReportDetailString := "1 authorization policies found that allow non-admin users to register third-party applications:<br/>Bad policy"
-    TestResult("MS.AAD.5.1v1", Output, ReportDetailString, false) == true
+    ReportDetailStr := "1 authorization policies found that allow non-admin users to register third-party applications:<br/>Bad policy"
+    TestResult("MS.AAD.5.1v1", Output, ReportDetailStr, false) == true
 }
 #--
 
@@ -77,8 +77,8 @@ test_PermissionGrantPolicyIdsAssignedToDefaultUserRole_Correct if {
         ]
     }
 
-    ReportDetailString := "0 authorization policies found that allow non-admin users to consent to third-party applications"
-    TestResult("MS.AAD.5.2v1", Output, ReportDetailString, true) == true
+    ReportDetailStr := "0 authorization policies found that allow non-admin users to consent to third-party applications"
+    TestResult("MS.AAD.5.2v1", Output, ReportDetailStr, true) == true
 }
 
 test_PermissionGrantPolicyIdsAssignedToDefaultUserRole_Incorrect_V1 if {
@@ -93,8 +93,8 @@ test_PermissionGrantPolicyIdsAssignedToDefaultUserRole_Incorrect_V1 if {
         ]
     }
 
-    ReportDetailString := "1 authorization policies found that allow non-admin users to consent to third-party applications:<br/>authorizationPolicy"
-    TestResult("MS.AAD.5.2v1", Output, ReportDetailString, false) == true
+    ReportDetailStr := "1 authorization policies found that allow non-admin users to consent to third-party applications:<br/>authorizationPolicy"
+    TestResult("MS.AAD.5.2v1", Output, ReportDetailStr, false) == true
 }
 
 test_PermissionGrantPolicyIdsAssignedToDefaultUserRole_Incorrect_V2 if {
@@ -113,8 +113,8 @@ test_PermissionGrantPolicyIdsAssignedToDefaultUserRole_Incorrect_V2 if {
         ]
     }
 
-    ReportDetailString := "1 authorization policies found that allow non-admin users to consent to third-party applications:<br/>Bad policy"
-    TestResult("MS.AAD.5.2v1", Output, ReportDetailString, false) == true
+    ReportDetailStr := "1 authorization policies found that allow non-admin users to consent to third-party applications:<br/>Bad policy"
+    TestResult("MS.AAD.5.2v1", Output, ReportDetailStr, false) == true
 }
 #--
 

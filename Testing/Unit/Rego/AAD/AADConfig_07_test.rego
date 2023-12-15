@@ -111,7 +111,11 @@ test_PrivilegedUsers_Incorrect_V2 if {
         }
     }
 
-    ReportDetailString := "9 global admin(s) found:<br/>Test Name1, Test Name2, Test Name3, Test Name4, Test Name5, Test Name6, Test Name7, Test Name8, Test Name9"
+    ReportDetailString := concat(" ", [
+        "9 global admin(s) found:<br/>Test Name1, Test Name2, Test Name3,",
+        "Test Name4, Test Name5, Test Name6, Test Name7, Test Name8, Test Name9"
+    ])
+
     TestResult("MS.AAD.7.1v1", Output, ReportDetailString, false) == true
 }
 #--
@@ -350,7 +354,8 @@ test_AdditionalProperties_LicenseMissing_V1 if {
         }
     }
 
-    ReportDetailString := "**NOTE: Your tenant does not have a Microsoft Entra ID P2 license, which is required for this feature**"
+    ReportDetailString :=
+        "**NOTE: Your tenant does not have a Microsoft Entra ID P2 license, which is required for this feature**"
     TestResult("MS.AAD.7.4v1", Output, ReportDetailString, false) == true
 }
 
@@ -455,7 +460,11 @@ test_AdditionalProperties_Incorrect_V3 if {
         ]
     }
 
-    ReportDetailString := "2 role(s) that contain users with permanent active assignment:<br/>Application Administrator, Global Administrator"
+    ReportDetailString := concat("", [
+        "2 role(s) that contain users with permanent active assignment:",
+        "<br/>Application Administrator, Global Administrator"
+    ])
+
     TestResult("MS.AAD.7.4v1", Output, ReportDetailString, false) == true
 }
 
@@ -497,7 +506,11 @@ test_AdditionalProperties_Incorrect_V4 if {
         ]
     }
 
-    ReportDetailString := "2 role(s) that contain users with permanent active assignment:<br/>Application Administrator, Global Administrator"
+    ReportDetailString := concat("", [
+        "2 role(s) that contain users with permanent active assignment:",
+        "<br/>Application Administrator, Global Administrator"
+    ])
+
     TestResult("MS.AAD.7.4v1", Output, ReportDetailString, false) == true
 }
 
@@ -638,7 +651,11 @@ test_AdditionalProperties_Incorrect_V7 if {
         }
     }
 
-    ReportDetailString := "2 role(s) that contain users with permanent active assignment:<br/>Application Administrator, Global Administrator"
+    ReportDetailString := concat("", [
+        "2 role(s) that contain users with permanent active assignment:",
+        "<br/>Application Administrator, Global Administrator"
+    ])
+
     TestResult("MS.AAD.7.4v1", Output, ReportDetailString, false) == true
 }
 
@@ -692,7 +709,11 @@ test_AdditionalProperties_Incorrect_V8 if {
         }
     }
 
-    ReportDetailString := "2 role(s) that contain users with permanent active assignment:<br/>Application Administrator, Global Administrator"
+    ReportDetailString := concat("", [
+        "2 role(s) that contain users with permanent active assignment:",
+        "<br/>Application Administrator, Global Administrator"
+    ])
+
     TestResult("MS.AAD.7.4v1", Output, ReportDetailString, false) == true
 }
 
@@ -883,7 +904,11 @@ test_AdditionalProperties_Incorrect_V12 if {
         }
     }
 
-    ReportDetailString := "2 role(s) that contain users with permanent active assignment:<br/>Application Administrator, Global Administrator"
+    ReportDetailString := concat("", [
+        "2 role(s) that contain users with permanent active assignment:",
+        "<br/>Application Administrator, Global Administrator"
+    ])
+
     TestResult("MS.AAD.7.4v1", Output, ReportDetailString, false) == true
 }
 
@@ -937,7 +962,11 @@ test_AdditionalProperties_Incorrect_V13 if {
         }
     }
 
-    ReportDetailString := "2 role(s) that contain users with permanent active assignment:<br/>Application Administrator, Global Administrator"
+    ReportDetailString := concat("", [
+        "2 role(s) that contain users with permanent active assignment:",
+        "<br/>Application Administrator, Global Administrator"
+    ])
+
     TestResult("MS.AAD.7.4v1", Output, ReportDetailString, false) == true
 }
 
@@ -1264,7 +1293,8 @@ test_notificationRecipients_Incorrect_V1 if {
         ]
     }
 
-    ReportDetailString := "1 role(s) without notification e-mail configured for role assignments found:<br/>Global Administrator"
+    ReportDetailString :=
+        "1 role(s) without notification e-mail configured for role assignments found:<br/>Global Administrator"
     TestResult("MS.AAD.7.7v1", Output, ReportDetailString, false) == true
 }
 
@@ -1304,7 +1334,8 @@ test_notificationRecipients_Incorrect_V2 if {
         ]
     }
 
-    ReportDetailString := "1 role(s) without notification e-mail configured for role assignments found:<br/>Global Administrator"
+    ReportDetailString :=
+        "1 role(s) without notification e-mail configured for role assignments found:<br/>Global Administrator"
     TestResult("MS.AAD.7.7v1", Output, ReportDetailString, false) == true
 }
 
@@ -1342,7 +1373,8 @@ test_notificationRecipients_Incorrect_V3 if {
         ]
     }
 
-    ReportDetailString := "1 role(s) without notification e-mail configured for role assignments found:<br/>Global Administrator"
+    ReportDetailString :=
+        "1 role(s) without notification e-mail configured for role assignments found:<br/>Global Administrator"
     TestResult("MS.AAD.7.7v1", Output, ReportDetailString, false) == true
 }
 #--
@@ -1517,7 +1549,8 @@ test_DisplayName_Incorrect if {
         ]
     }
 
-    ReportDetailString := "1 role(s) without notification e-mail configured for role activations found:<br/>Cloud Administrator"
+    ReportDetailString :=
+        "1 role(s) without notification e-mail configured for role activations found:<br/>Cloud Administrator"
     TestResult("MS.AAD.7.9v1", Output, ReportDetailString, false) == true
 }
 #--

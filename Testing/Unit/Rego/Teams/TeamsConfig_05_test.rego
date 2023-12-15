@@ -45,8 +45,10 @@ test_DefaultCatalogAppsType_Incorrect_V1 if {
         ]
     }
 
-    ReportDetailString := "1 meeting policy(ies) found that does not restrict installation of Microsoft Apps by default: Global"
-    TestResult("MS.TEAMS.5.1v1", Output, ReportDetailString, false) == true
+    ReportDetailStr :=
+    "1 meeting policy(ies) found that does not restrict installation of Microsoft Apps by default: Global"
+
+    TestResult("MS.TEAMS.5.1v1", Output, ReportDetailStr, false) == true
 }
 
 test_DefaultCatalogAppsType_Incorrect_V2 if {
@@ -59,8 +61,10 @@ test_DefaultCatalogAppsType_Incorrect_V2 if {
         ]
     }
 
-    ReportDetailString := "1 meeting policy(ies) found that does not restrict installation of Microsoft Apps by default: Tag:TestPolicy"
-    TestResult("MS.TEAMS.5.1v1", Output, ReportDetailString, false) == true
+    ReportDetailStr :=
+    "1 meeting policy(ies) found that does not restrict installation of Microsoft Apps by default: Tag:TestPolicy"
+
+    TestResult("MS.TEAMS.5.1v1", Output, ReportDetailStr, false) == true
 }
 
 test_DefaultCatalogAppsType_Multiple if {
@@ -129,8 +133,10 @@ test_GlobalCatalogAppsType_Incorrect_V1 if {
         ]
     }
 
-    ReportDetailString := "1 meeting policy(ies) found that does not restrict installation of third-party apps by default: Global"
-    TestResult("MS.TEAMS.5.2v1", Output, ReportDetailString, false) == true
+    ReportDetailStr :=
+    "1 meeting policy(ies) found that does not restrict installation of third-party apps by default: Global"
+
+    TestResult("MS.TEAMS.5.2v1", Output, ReportDetailStr, false) == true
 }
 
 test_GlobalCatalogAppsType_Incorrect_V2 if {
@@ -143,8 +149,10 @@ test_GlobalCatalogAppsType_Incorrect_V2 if {
         ]
     }
 
-    ReportDetailString := "1 meeting policy(ies) found that does not restrict installation of third-party apps by default: Tag:TestPolicy"
-    TestResult("MS.TEAMS.5.2v1", Output, ReportDetailString, false) == true
+    ReportDetailStr :=
+    "1 meeting policy(ies) found that does not restrict installation of third-party apps by default: Tag:TestPolicy"
+
+    TestResult("MS.TEAMS.5.2v1", Output, ReportDetailStr, false) == true
 }
 
 test_GlobalCatalogAppsType_Multiple if {
@@ -213,8 +221,10 @@ test_PrivateCatalogAppsType_Incorrect_V1 if {
         ]
     }
 
-    ReportDetailString := "1 meeting policy(ies) found that does not restrict installation of custom apps by default: Global"
-    TestResult("MS.TEAMS.5.3v1", Output, ReportDetailString, false) == true
+    ReportDetailStr :=
+    "1 meeting policy(ies) found that does not restrict installation of custom apps by default: Global"
+
+    TestResult("MS.TEAMS.5.3v1", Output, ReportDetailStr, false) == true
 }
 
 test_PrivateCatalogAppsType_Incorrect_V2 if {
@@ -227,8 +237,10 @@ test_PrivateCatalogAppsType_Incorrect_V2 if {
         ]
     }
 
-    ReportDetailString := "1 meeting policy(ies) found that does not restrict installation of custom apps by default: Tag:TestPolicy"
-    TestResult("MS.TEAMS.5.3v1", Output, ReportDetailString, false) == true
+    ReportDetailStr :=
+    "1 meeting policy(ies) found that does not restrict installation of custom apps by default: Tag:TestPolicy"
+
+    TestResult("MS.TEAMS.5.3v1", Output, ReportDetailStr, false) == true
 }
 
 test_PrivateCatalogAppsType_Multiple if {

@@ -506,12 +506,12 @@ tests contains {
     "Criticality": "Shall",
     "Commandlet": ["Get-MgBetaPolicyAuthorizationPolicy"],
     "ActualValue": {"all_grant_policy_values": AllDefaultGrantPolicies},
-    "ReportDetails": ReportFullDetailsArray(BadPolicies, DescriptionString),
+    "ReportDetails": ReportFullDetailsArray(BadPolicies, DescriptionStr),
     "RequirementMet": Status
 } if {
     BadPolicies := BadDefaultGrantPolicies
     Status := count(BadPolicies) == 0
-    DescriptionString := "authorization policies found that allow non-admin users to consent to third-party applications"
+    DescriptionStr := "authorization policies found that allow non-admin users to consent to third-party applications"
 }
 #--
 
