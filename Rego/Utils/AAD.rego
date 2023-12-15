@@ -109,8 +109,8 @@ default UserExclusionsFullyExempt(_, _) := false
 # baseline policy item.  Undefined if no exclusions AND no exemptions.
 UserExclusionsFullyExempt(Policy, PolicyID) := true if {
     ExemptedUsers := input.scuba_config.Aad[PolicyID].CapExclusions.Users
-    ExcludedUsers := {x | some x in Policy.Conditions.Users.ExcludeUsers}
-    AllowedExcludedUsers := {y | some y in ExemptedUsers}
+    ExcludedUsers := ConvertToSet(Policy.Conditions.Users.ExcludeUsers)
+    AllowedExcludedUsers := ConvertToSet(ExemptedUsers)
     count(ExcludedUsers - AllowedExcludedUsers) == 0
 }
 
@@ -127,8 +127,8 @@ default GroupExclusionsFullyExempt(_, _) := false
 # baseline policy item.  Undefined if no exclusions AND no exemptions.
 GroupExclusionsFullyExempt(Policy, PolicyID) := true if {
     ExemptedGroups := input.scuba_config.Aad[PolicyID].CapExclusions.Groups
-    ExcludedGroups := {x | some x in Policy.Conditions.Users.ExcludeGroups}
-    AllowedExcludedGroups := {y | some y in ExemptedGroups}
+    ExcludedGroups := ConvertToSet(Policy.Conditions.Users.ExcludeGroups)
+    AllowedExcludedGroups := ConvertToSet(ExemptedGroups)
     count(ExcludedGroups - AllowedExcludedGroups) == 0
 }
 

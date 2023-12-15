@@ -3,6 +3,7 @@ import future.keywords
 import data.utils.report.ReportDetailsBoolean
 import data.utils.key.FAIL
 import data.utils.key.ConvertToSet
+import data.utils.key.FilterArray
 
 ##########################################
 # User/Group Exclusion support functions #
@@ -83,7 +84,7 @@ SensitiveAccounts(SensitiveAccountsSetting, SensitiveAccountsConfig) := false if
         SensitiveAccountsSetting.Policy.Conditions == null,
         SensitiveAccountsSetting.Policy.Exceptions == null
     ]
-    count([Condition | some Condition in ConditionsAbsent; Condition == false]) > 0
+    count(FilterArray(ConditionsAbsent, false)) > 0
 
     # No config is defined (unify all sets & check if empty)
     count(
@@ -105,7 +106,7 @@ SensitiveAccounts(SensitiveAccountsSetting, SensitiveAccountsConfig) := true if 
         SensitiveAccountsSetting.Policy.Conditions == null,
         SensitiveAccountsSetting.Policy.Exceptions == null
     ]
-    count([Condition | some Condition in ConditionsAbsent; Condition == false]) > 0
+    count(FilterArray(ConditionsAbsent, false)) > 0
 
     # Config is defined (unify all sets & check if not empty)
     count(
@@ -125,7 +126,7 @@ SensitiveAccounts(SensitiveAccountsSetting, SensitiveAccountsConfig) := true if 
         SensitiveAccountsSetting.ExcludedGroups == SensitiveAccountsConfig.ExcludedGroups,
         SensitiveAccountsSetting.ExcludedDomains == SensitiveAccountsConfig.ExcludedDomains
     ]
-    count([Mismatch | some Mismatch in Mismatches; Mismatch == false]) == 0
+    count(FilterArray(Mismatches, false)) == 0
 }
 
 ##############################################
@@ -171,7 +172,7 @@ ImpersonationProtection(Policies, IdentityString, IncludedAccounts, FilterKey, A
         (count(IncludedAccounts) > 0) == (count(PolicyProtectedAccounts) > 0),
         (count(IncludedAccounts) == 0) == (count(PolicyProtectedAccounts) == 0)
     ]
-    count([Condition | some Condition in Conditions; Condition == true]) > 0
+    count(FilterArray(Conditions, true)) > 0
 } else := {
     "Result": false,
     "Policy": {
