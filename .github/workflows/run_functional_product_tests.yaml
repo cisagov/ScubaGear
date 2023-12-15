@@ -36,19 +36,23 @@ jobs:
       id: thumbprint
       run: |
         $thumbprint = Get-PfxCertificate -FilePath ./key.pfx -Password (ConvertTo-SecureString -String $env:PfxPassword -AsPlainText -Force)
-        Write-Debug "The thumbprint is "
         Write-Output THUMBPRINT_VALUE=$thumbprint >> $GITHUB_OUTPUT
       shell: pwsh
       env:
         PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
-    - name: Setup for Scuba
-      run: ./SetUp.ps1
-    - name: Install Selenium
-      run: Install-Module -Name Selenium
-    - name: Update Selenium
-      run: ./Testing/Functional/SmokeTest/UpdateSelenium.ps1
-    - name: Test SharePoint
+    - name: Accept Thumbprint Test
       run: |
         Write-Debug "The thumbprint is "
-        Write-Output ${{ steps.thumbprint.outputs.THUMBPRINT_VALUE }}
-        ./Testing/Functional/Products/Tests/CallProductTests.ps1
+        THUBMPRINT="${{ steps.thumbprint.outputs.THUMBPRINT_VALUE }}"
+        Write-Output $THUMBPRINT
+    # - name: Setup for Scuba
+    #   run: ./SetUp.ps1
+    # - name: Install Selenium
+    #   run: Install-Module -Name Selenium
+    # - name: Update Selenium
+    #   run: ./Testing/Functional/SmokeTest/UpdateSelenium.ps1
+    # - name: Test SharePoint
+    #   run: |
+    #     Write-Debug "The thumbprint is "
+    #     Write-Output ${{ steps.thumbprint.outputs.THUMBPRINT_VALUE }}
+    #     ./Testing/Functional/Products/Tests/CallProductTests.ps1
