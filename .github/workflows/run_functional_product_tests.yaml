@@ -36,8 +36,11 @@ jobs:
       id: thumbprint
       run: |
         $thumbprint = Get-PfxCertificate -FilePath ./key.pfx -Password (ConvertTo-SecureString -String $env:PfxPassword -AsPlainText -Force)
-        Write-Output "THUMBPRINT_VALUE=$thumbprint" >> "$GITHUB_OUTPUT"
-        echo "THUMBPRINT_VALUE2=$thumbprint" >> "$GITHUB_OUTPUT"
+        Write-Output "The thumbprint is "
+        Write-Output 
+        Write-Output "Type of thumbprint "
+        Write-Output $thumbprint.GetType().fullname
+        Write-Output THUMBPRINT_VALUE=$thumbprint.thumbprint >> $GITHUB_OUTPUT
       shell: pwsh
       env:
         PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
