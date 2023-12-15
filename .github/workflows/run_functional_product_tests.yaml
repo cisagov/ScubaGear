@@ -36,7 +36,8 @@ jobs:
       id: thumbprint
       run: |
         $thumbprint = Get-PfxCertificate -FilePath ./key.pfx -Password (ConvertTo-SecureString -String $env:PfxPassword -AsPlainText -Force)
-        Write-Output THUMBPRINT_VALUE=$thumbprint >> $GITHUB_OUTPUT
+        Write-Output "THUMBPRINT_VALUE=$thumbprint" >> $GITHUB_OUTPUT
+        echo "THUMBPRINT_VALUE2=$thumbprint" >> $GITHUB_OUTPUT
       shell: pwsh
       env:
         PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
@@ -45,6 +46,8 @@ jobs:
         Write-Debug "The thumbprint is "
         $thumbprint = "${{ steps.thumbprint.outputs.THUMBPRINT_VALUE }}"
         Write-Output $thumbprint
+        $thumbprint2 = "${{ steps.thumbprint.outputs.THUMBPRINT_VALUE2 }}"
+        Write-Output $thumbprint2
     # - name: Setup for Scuba
     #   run: ./SetUp.ps1
     # - name: Install Selenium
