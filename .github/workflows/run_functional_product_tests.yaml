@@ -9,7 +9,6 @@ on:
   schedule:
   - cron: '0 4 * * 0-4'
   workflow_dispatch: 
-  push:
 
 jobs:
   sharepoint-test:
