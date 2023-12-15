@@ -47,4 +47,7 @@ jobs:
     - name: Update Selenium
       run: ./Testing/Functional/SmokeTest/UpdateSelenium.ps1
     - name: Test SharePoint
-      run: ./Testing/Functional/Products/Tests/CallProductTests.ps1
+      run: |
+        Write-Debug "The thumbprint is "
+        Write-Output $thumbprint
+        ./Testing/Functional/Products/Tests/CallProductTests.ps1
