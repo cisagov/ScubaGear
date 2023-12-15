@@ -43,8 +43,8 @@ jobs:
     - name: Accept Thumbprint Test
       run: |
         Write-Debug "The thumbprint is "
-        THUBMPRINT="${{ steps.thumbprint.outputs.THUMBPRINT_VALUE }}"
-        Write-Output $THUMBPRINT
+        $thumbprint = "${{ steps.thumbprint.outputs.THUMBPRINT_VALUE }}"
+        Write-Output $thumbprint
     # - name: Setup for Scuba
     #   run: ./SetUp.ps1
     # - name: Install Selenium
