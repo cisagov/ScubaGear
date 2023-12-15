@@ -380,5 +380,20 @@ tests contains {
 }
 ```
 
+### Linter Warnings
+
+For the most part warnings can & should be fixed. However, there are times where the fix would make the code more
+convoluted & difficult to maintain/understand. Rarely, but possibly it is just not possible to fix. In these cases,
+add a comment indicating to ignore the specific linter warning
+
+#### Example
+```
+ExampleArray contains OtherVar.name if {
+    # IGNORE prefer-some-in-iteration linter warning
+    some Var in input.some_key[_].value
+    some OtherVar in Var.example_key
+}
+```
+
 ## PowerShell
 [PoshCode's The PowerShell Best Practices and Style Guide](https://github.com/PoshCode/PowerShellPracticeAndStyle)
