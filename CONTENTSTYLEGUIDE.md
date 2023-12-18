@@ -389,7 +389,7 @@ add a comment indicating to ignore the specific linter warning
 #### Example
 ```
 ExampleArray contains OtherVar.name if {
-    # IGNORE prefer-some-in-iteration linter warning
+    # regal ignore:<rule_name>
     some Var in input.some_key[_].value
     some OtherVar in Var.example_key
 }
