@@ -1,30 +1,12 @@
 package exo_test
 import future.keywords
 import data.exo
-import data.report.utils.ReportDetailsBoolean
-
-
-CorrectTestResult(PolicyId, Output, ReportDetailString) := true if {
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == true
-    RuleOutput[0].ReportDetails == ReportDetailString
-} else := false
-
-IncorrectTestResult(PolicyId, Output, ReportDetailString) := true if {
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == false
-    RuleOutput[0].ReportDetails == ReportDetailString
-} else := false
-
-PASS := ReportDetailsBoolean(true)
+import data.utils.key.TestResult
+import data.utils.key.PASS
 
 
 #
-# Policy 1
+# Policy MS.EXO.12.1v1
 #--
 test_IPAllowList_Correct_V1 if {
     Output := exo.tests with input as {
@@ -37,7 +19,7 @@ test_IPAllowList_Correct_V1 if {
         ]
     }
 
-    CorrectTestResult("MS.EXO.12.1v1", Output, PASS) == true
+    TestResult("MS.EXO.12.1v1", Output, PASS, true) == true
 }
 
 # it shouldn't matter that safe list is enabled
@@ -52,7 +34,7 @@ test_IPAllowList_Correct_V2 if {
         ]
     }
 
-    CorrectTestResult("MS.EXO.12.1v1", Output, PASS) == true
+    TestResult("MS.EXO.12.1v1", Output, PASS, true) == true
 }
 
 test_IPAllowList_Incorrect if {
@@ -69,12 +51,12 @@ test_IPAllowList_Incorrect if {
     }
 
     ReportDetailString := "1 connection filter polic(ies) with an IP allowlist: A"
-    IncorrectTestResult("MS.EXO.12.1v1", Output, ReportDetailString) == true
+    TestResult("MS.EXO.12.1v1", Output, ReportDetailString, false) == true
 }
 #--
 
 #
-# Policy 2
+# Policy MS.EXO.12.2v1
 #--
 test_EnableSafeList_Correct_V1 if {
     Output := exo.tests with input as {
@@ -87,7 +69,7 @@ test_EnableSafeList_Correct_V1 if {
         ]
     }
 
-    CorrectTestResult("MS.EXO.12.2v1", Output, PASS) == true
+    TestResult("MS.EXO.12.2v1", Output, PASS, true) == true
 }
 
 test_EnableSafeList_Incorrect_V1 if {
@@ -102,7 +84,7 @@ test_EnableSafeList_Incorrect_V1 if {
     }
 
     ReportDetailString := "1 connection filter polic(ies) with a safe list: A"
-    IncorrectTestResult("MS.EXO.12.2v1", Output, ReportDetailString) == true
+    TestResult("MS.EXO.12.2v1", Output, ReportDetailString, false) == true
 }
 
 test_EnableSafeList_Correct_V2 if {
@@ -118,6 +100,6 @@ test_EnableSafeList_Correct_V2 if {
         ]
     }
 
-    CorrectTestResult("MS.EXO.12.2v1", Output, PASS) == true
+    TestResult("MS.EXO.12.2v1", Output, PASS, true) == true
 }
 #--

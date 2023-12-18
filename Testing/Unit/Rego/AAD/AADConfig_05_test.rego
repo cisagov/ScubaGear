@@ -1,32 +1,13 @@
 package aad_test
 import future.keywords
 import data.aad
-import data.report.utils.ReportDetailsBoolean
-
-
-CorrectTestResult(PolicyId, Output, ReportDetailString) := true if {
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == true
-    RuleOutput[0].ReportDetails == ReportDetailString
-} else := false
-
-IncorrectTestResult(PolicyId, Output, ReportDetailString) := true if {
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == false
-    RuleOutput[0].ReportDetails == ReportDetailString
-} else := false
-
-FAIL := ReportDetailsBoolean(false)
-
-PASS := ReportDetailsBoolean(true)
+import data.utils.key.TestResult
+import data.utils.key.FAIL
+import data.utils.key.PASS
 
 
 #
-# MS.AAD.5.1v1
+# Policy MS.AAD.5.1v1
 #--
 test_AllowedToCreateApps_Correct if {
     Output := aad.tests with input as {
@@ -40,8 +21,8 @@ test_AllowedToCreateApps_Correct if {
         ]
     }
 
-    ReportDetailString := "0 authorization policies found that allow non-admin users to register third-party applications"
-    CorrectTestResult("MS.AAD.5.1v1", Output, ReportDetailString) == true
+    ReportDetailStr := "0 authorization policies found that allow non-admin users to register third-party applications"
+    TestResult("MS.AAD.5.1v1", Output, ReportDetailStr, true) == true
 }
 
 test_AllowedToCreateApps_Incorrect_V1 if {
@@ -56,8 +37,12 @@ test_AllowedToCreateApps_Incorrect_V1 if {
         ]
     }
 
-    ReportDetailString := "1 authorization policies found that allow non-admin users to register third-party applications:<br/>Bad policy"
-    IncorrectTestResult("MS.AAD.5.1v1", Output, ReportDetailString) == true
+    ReportDetailStr := concat("", [
+        "1 authorization policies found that allow non-admin users to register third-party applications:",
+        "<br/>Bad policy"
+    ])
+
+    TestResult("MS.AAD.5.1v1", Output, ReportDetailStr, false) == true
 }
 
 test_AllowedToCreateApps_Incorrect_V2 if {
@@ -78,13 +63,17 @@ test_AllowedToCreateApps_Incorrect_V2 if {
         ]
     }
 
-    ReportDetailString := "1 authorization policies found that allow non-admin users to register third-party applications:<br/>Bad policy"
-    IncorrectTestResult("MS.AAD.5.1v1", Output, ReportDetailString) == true
+    ReportDetailStr := concat("", [
+        "1 authorization policies found that allow non-admin users to register third-party applications:",
+        "<br/>Bad policy"
+    ])
+
+    TestResult("MS.AAD.5.1v1", Output, ReportDetailStr, false) == true
 }
 #--
 
 #
-# MS.AAD.5.2v1
+# Policy MS.AAD.5.2v1
 #--
 test_PermissionGrantPolicyIdsAssignedToDefaultUserRole_Correct if {
     Output := aad.tests with input as {
@@ -96,8 +85,9 @@ test_PermissionGrantPolicyIdsAssignedToDefaultUserRole_Correct if {
         ]
     }
 
-    ReportDetailString := "0 authorization policies found that allow non-admin users to consent to third-party applications"
-    CorrectTestResult("MS.AAD.5.2v1", Output, ReportDetailString) == true
+    ReportDetailStr :=
+        "0 authorization policies found that allow non-admin users to consent to third-party applications"
+    TestResult("MS.AAD.5.2v1", Output, ReportDetailStr, true) == true
 }
 
 test_PermissionGrantPolicyIdsAssignedToDefaultUserRole_Incorrect_V1 if {
@@ -112,8 +102,12 @@ test_PermissionGrantPolicyIdsAssignedToDefaultUserRole_Incorrect_V1 if {
         ]
     }
 
-    ReportDetailString := "1 authorization policies found that allow non-admin users to consent to third-party applications:<br/>authorizationPolicy"
-    IncorrectTestResult("MS.AAD.5.2v1", Output, ReportDetailString) == true
+    ReportDetailStr := concat("", [
+        "1 authorization policies found that allow non-admin users to consent to third-party applications:",
+        "<br/>authorizationPolicy"
+    ])
+
+    TestResult("MS.AAD.5.2v1", Output, ReportDetailStr, false) == true
 }
 
 test_PermissionGrantPolicyIdsAssignedToDefaultUserRole_Incorrect_V2 if {
@@ -132,13 +126,17 @@ test_PermissionGrantPolicyIdsAssignedToDefaultUserRole_Incorrect_V2 if {
         ]
     }
 
-    ReportDetailString := "1 authorization policies found that allow non-admin users to consent to third-party applications:<br/>Bad policy"
-    IncorrectTestResult("MS.AAD.5.2v1", Output, ReportDetailString) == true
+    ReportDetailStr := concat("", [
+        "1 authorization policies found that allow non-admin users to consent to third-party applications:",
+        "<br/>Bad policy"
+    ])
+
+    TestResult("MS.AAD.5.2v1", Output, ReportDetailStr, false) == true
 }
 #--
 
 #
-# MS.AAD.5.3v1
+# Policy MS.AAD.5.3v1
 #--
 test_IsEnabled_Correct if {
     Output := aad.tests with input as {
@@ -150,7 +148,7 @@ test_IsEnabled_Correct if {
         ]
     }
 
-    CorrectTestResult("MS.AAD.5.3v1", Output, PASS) == true
+    TestResult("MS.AAD.5.3v1", Output, PASS, true) == true
 }
 
 test_IsEnabled_Incorrect if {
@@ -163,12 +161,12 @@ test_IsEnabled_Incorrect if {
         ]
     }
 
-    IncorrectTestResult("MS.AAD.5.3v1", Output, FAIL) == true
+    TestResult("MS.AAD.5.3v1", Output, FAIL, false) == true
 }
 #--
 
 #
-# MS.AAD.5.4v1
+# Policy MS.AAD.5.4v1
 #--
 test_Value_Correct_Lowercase if {
     Output := aad.tests with input as {
@@ -185,7 +183,7 @@ test_Value_Correct_Lowercase if {
         ]
     }
 
-    CorrectTestResult("MS.AAD.5.4v1", Output, PASS) == true
+    TestResult("MS.AAD.5.4v1", Output, PASS, true) == true
 }
 
 test_Value_Correct_Uppercase if {
@@ -203,7 +201,7 @@ test_Value_Correct_Uppercase if {
         ]
     }
 
-    CorrectTestResult("MS.AAD.5.4v1", Output, PASS) == true
+    TestResult("MS.AAD.5.4v1", Output, PASS, true) == true
 }
 
 test_Value_Incorrect_Lowercase if {
@@ -221,7 +219,7 @@ test_Value_Incorrect_Lowercase if {
         ]
     }
 
-    IncorrectTestResult("MS.AAD.5.4v1", Output, FAIL) == true
+    TestResult("MS.AAD.5.4v1", Output, FAIL, false) == true
 }
 
 test_Value_Incorrect_Uppercase if {
@@ -239,6 +237,6 @@ test_Value_Incorrect_Uppercase if {
         ]
     }
 
-    IncorrectTestResult("MS.AAD.5.4v1", Output, FAIL) == true
+    TestResult("MS.AAD.5.4v1", Output, FAIL, false) == true
 }
 #--

@@ -1,32 +1,13 @@
 package defender_test
 import future.keywords
 import data.defender
-import data.report.utils.ReportDetailsBoolean
-
-
-CorrectTestResult(PolicyId, Output, ReportDetailString) := true if {
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == true
-    RuleOutput[0].ReportDetails == ReportDetailString
-} else := false
-
-IncorrectTestResult(PolicyId, Output, ReportDetailString) := true if {
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == false
-    RuleOutput[0].ReportDetails == ReportDetailString
-} else := false
-
-FAIL := ReportDetailsBoolean(false)
-
-PASS := ReportDetailsBoolean(true)
+import data.utils.key.TestResult
+import data.utils.key.FAIL
+import data.utils.key.PASS
 
 
 #
-# Policy 1
+# Policy MS.DEFENDER.1.1v1
 #--
 test_Enabled_Correct_V1 if {
     Output := defender.tests with input as {
@@ -53,7 +34,7 @@ test_Enabled_Correct_V1 if {
         "defender_license": true
     }
 
-    CorrectTestResult("MS.DEFENDER.1.1v1", Output, PASS) == true
+    TestResult("MS.DEFENDER.1.1v1", Output, PASS, true) == true
 }
 
 test_Enabled_Correct_V2 if {
@@ -72,7 +53,7 @@ test_Enabled_Correct_V2 if {
         "defender_license": true
     }
 
-    CorrectTestResult("MS.DEFENDER.1.1v1", Output, PASS) == true
+    TestResult("MS.DEFENDER.1.1v1", Output, PASS, true) == true
 }
 
 test_Enabled_Correct_V3 if {
@@ -91,7 +72,7 @@ test_Enabled_Correct_V3 if {
         "defender_license": true
     }
 
-    CorrectTestResult("MS.DEFENDER.1.1v1", Output, PASS) == true
+    TestResult("MS.DEFENDER.1.1v1", Output, PASS, true) == true
 }
 
 test_Enabled_Incorrect_V1 if {
@@ -102,7 +83,7 @@ test_Enabled_Incorrect_V1 if {
     }
 
     ReportDetailString := "Standard and Strict preset policies are both disabled"
-    IncorrectTestResult("MS.DEFENDER.1.1v1", Output, ReportDetailString) == true
+    TestResult("MS.DEFENDER.1.1v1", Output, ReportDetailString, false) == true
 }
 
 test_Enabled_Incorrect_V2 if {
@@ -118,7 +99,7 @@ test_Enabled_Incorrect_V2 if {
     }
 
     ReportDetailString := "Standard and Strict preset policies are both disabled"
-    IncorrectTestResult("MS.DEFENDER.1.1v1", Output, ReportDetailString) == true
+    TestResult("MS.DEFENDER.1.1v1", Output, ReportDetailString, false) == true
 }
 
 test_Enabled_Incorrect_V3 if {
@@ -134,7 +115,7 @@ test_Enabled_Incorrect_V3 if {
     }
 
     ReportDetailString := "Strict preset policy is disabled"
-    IncorrectTestResult("MS.DEFENDER.1.1v1", Output, ReportDetailString) == true
+    TestResult("MS.DEFENDER.1.1v1", Output, ReportDetailString, false) == true
 }
 
 test_Enabled_Incorrect_V4 if {
@@ -154,12 +135,12 @@ test_Enabled_Incorrect_V4 if {
     }
 
     ReportDetailString := "Standard and Strict preset policies are both disabled"
-    IncorrectTestResult("MS.DEFENDER.1.1v1", Output, ReportDetailString) == true
+    TestResult("MS.DEFENDER.1.1v1", Output, ReportDetailString, false) == true
 }
 #--
 
 #
-# Policy 2
+# Policy MS.DEFENDER.1.2v1
 #--
 test_AllEOP_Correct_V1 if {
     Output := defender.tests with input as {
@@ -174,7 +155,7 @@ test_AllEOP_Correct_V1 if {
         "defender_license": true
     }
 
-    CorrectTestResult("MS.DEFENDER.1.2v1", Output, PASS) == true
+    TestResult("MS.DEFENDER.1.2v1", Output, PASS, true) == true
 }
 
 test_AllEOP_Correct_V2 if {
@@ -190,7 +171,7 @@ test_AllEOP_Correct_V2 if {
         "defender_license": true
     }
 
-    CorrectTestResult("MS.DEFENDER.1.2v1", Output, PASS) == true
+    TestResult("MS.DEFENDER.1.2v1", Output, PASS, true) == true
 }
 
 test_AllEOP_Correct_V3 if {
@@ -214,7 +195,7 @@ test_AllEOP_Correct_V3 if {
         "defender_license": true
     }
 
-    CorrectTestResult("MS.DEFENDER.1.2v1", Output, PASS) == true
+    TestResult("MS.DEFENDER.1.2v1", Output, PASS, true) == true
 }
 
 test_AllEOP_Incorrect_V1 if {
@@ -222,7 +203,7 @@ test_AllEOP_Incorrect_V1 if {
         "protection_policy_rules": []
     }
 
-    IncorrectTestResult("MS.DEFENDER.1.2v1", Output, FAIL) == true
+    TestResult("MS.DEFENDER.1.2v1", Output, FAIL, false) == true
 }
 
 test_AllEOP_Incorrect_V2 if {
@@ -240,7 +221,7 @@ test_AllEOP_Incorrect_V2 if {
         "defender_license": true
     }
 
-    IncorrectTestResult("MS.DEFENDER.1.2v1", Output, FAIL) == true
+    TestResult("MS.DEFENDER.1.2v1", Output, FAIL, false) == true
 }
 
 test_AllEOP_Incorrect_V3 if {
@@ -266,12 +247,12 @@ test_AllEOP_Incorrect_V3 if {
         "defender_license": true
     }
 
-    IncorrectTestResult("MS.DEFENDER.1.2v1", Output, FAIL) == true
+    TestResult("MS.DEFENDER.1.2v1", Output, FAIL, false) == true
 }
 #--
 
 #
-# Policy 3
+# Policy MS.DEFENDER.1.3v1
 #--
 test_AllDefender_Correct_V1 if {
     Output := defender.tests with input as {
@@ -286,7 +267,7 @@ test_AllDefender_Correct_V1 if {
         "defender_license": true
     }
 
-    CorrectTestResult("MS.DEFENDER.1.3v1", Output, PASS) == true
+    TestResult("MS.DEFENDER.1.3v1", Output, PASS, true) == true
 }
 
 test_AllDefender_Correct_V2 if {
@@ -302,7 +283,7 @@ test_AllDefender_Correct_V2 if {
         "defender_license": true
     }
 
-    CorrectTestResult("MS.DEFENDER.1.3v1", Output, PASS) == true
+    TestResult("MS.DEFENDER.1.3v1", Output, PASS, true) == true
 }
 
 test_AllDefender_Correct_V3 if {
@@ -326,7 +307,7 @@ test_AllDefender_Correct_V3 if {
         "defender_license": true
     }
 
-    CorrectTestResult("MS.DEFENDER.1.3v1", Output, PASS) == true
+    TestResult("MS.DEFENDER.1.3v1", Output, PASS, true) == true
 }
 
 test_AllDefender_Incorrect_V1 if {
@@ -335,7 +316,7 @@ test_AllDefender_Incorrect_V1 if {
         "defender_license": true
     }
 
-    IncorrectTestResult("MS.DEFENDER.1.3v1", Output, FAIL) == true
+    TestResult("MS.DEFENDER.1.3v1", Output, FAIL, false) == true
 }
 
 test_AllDefender_Incorrect_V2 if {
@@ -353,7 +334,7 @@ test_AllDefender_Incorrect_V2 if {
         "defender_license": true
     }
 
-    IncorrectTestResult("MS.DEFENDER.1.3v1", Output, FAIL) == true
+    TestResult("MS.DEFENDER.1.3v1", Output, FAIL, false) == true
 }
 
 test_AllDefender_Incorrect_V3 if {
@@ -379,7 +360,7 @@ test_AllDefender_Incorrect_V3 if {
         "defender_license": true
     }
 
-    IncorrectTestResult("MS.DEFENDER.1.3v1", Output, FAIL) == true
+    TestResult("MS.DEFENDER.1.3v1", Output, FAIL, false) == true
 }
 
 test_AllDefender_Incorrect_V4 if {
@@ -388,13 +369,18 @@ test_AllDefender_Incorrect_V4 if {
         "defender_license": false
     }
 
-    ReportDetailString := "Requirement not met **NOTE: Either you do not have sufficient permissions or your tenant does not have a license for Microsoft Defender for Office 365 Plan 1, which is required for this feature.**"
-    IncorrectTestResult("MS.DEFENDER.1.3v1", Output, ReportDetailString) == true
+    ReportDetailString := concat(" ", [
+        "Requirement not met **NOTE: Either you do not have sufficient permissions or",
+        "your tenant does not have a license for Microsoft Defender for Office 365 Plan 1,",
+        "which is required for this feature.**"
+    ])
+
+    TestResult("MS.DEFENDER.1.3v1", Output, ReportDetailString, false) == true
 }
 #--
 
 #
-# Policy 4
+# Policy MS.DEFENDER.1.4v1
 #--
 test_SensitiveEOP_Correct_V1 if {
     Output := defender.tests with input as {
@@ -429,7 +415,7 @@ test_SensitiveEOP_Correct_V1 if {
         "defender_license": true
     }
 
-    CorrectTestResult("MS.DEFENDER.1.4v1", Output, PASS) == true
+    TestResult("MS.DEFENDER.1.4v1", Output, PASS, true) == true
 }
 
 test_SensitiveEOP_Correct_V2 if {
@@ -458,7 +444,7 @@ test_SensitiveEOP_Correct_V2 if {
         "defender_license": true
     }
 
-    CorrectTestResult("MS.DEFENDER.1.4v1", Output, PASS) == true
+    TestResult("MS.DEFENDER.1.4v1", Output, PASS, true) == true
 }
 
 test_SensitiveEOP_Correct_V3 if {
@@ -495,7 +481,7 @@ test_SensitiveEOP_Correct_V3 if {
         "defender_license": true
     }
 
-    CorrectTestResult("MS.DEFENDER.1.4v1", Output, PASS) == true
+    TestResult("MS.DEFENDER.1.4v1", Output, PASS, true) == true
 }
 
 test_SensitiveEOP_Correct_V4 if {
@@ -534,7 +520,7 @@ test_SensitiveEOP_Correct_V4 if {
         "defender_license": true
     }
 
-    CorrectTestResult("MS.DEFENDER.1.4v1", Output, PASS) == true
+    TestResult("MS.DEFENDER.1.4v1", Output, PASS, true) == true
 }
 
 test_SensitiveEOP_Correct_V5 if {
@@ -571,7 +557,7 @@ test_SensitiveEOP_Correct_V5 if {
         "defender_license": true
     }
 
-    CorrectTestResult("MS.DEFENDER.1.4v1", Output, PASS) == true
+    TestResult("MS.DEFENDER.1.4v1", Output, PASS, true) == true
 }
 
 test_SensitiveEOP_Correct_V6 if {
@@ -610,7 +596,7 @@ test_SensitiveEOP_Correct_V6 if {
         "defender_license": true
     }
 
-    CorrectTestResult("MS.DEFENDER.1.4v1", Output, PASS) == true
+    TestResult("MS.DEFENDER.1.4v1", Output, PASS, true) == true
 }
 
 test_SensitiveEOP_Correct_V7 if {
@@ -647,7 +633,7 @@ test_SensitiveEOP_Correct_V7 if {
         "defender_license": true
     }
 
-    CorrectTestResult("MS.DEFENDER.1.4v1", Output, PASS) == true
+    TestResult("MS.DEFENDER.1.4v1", Output, PASS, true) == true
 }
 
 test_SensitiveEOP_Correct_V8 if {
@@ -686,7 +672,7 @@ test_SensitiveEOP_Correct_V8 if {
         "defender_license": true
     }
 
-    CorrectTestResult("MS.DEFENDER.1.4v1", Output, PASS) == true
+    TestResult("MS.DEFENDER.1.4v1", Output, PASS, true) == true
 }
 
 test_SensitiveEOP_Correct_V9 if {
@@ -723,7 +709,7 @@ test_SensitiveEOP_Correct_V9 if {
         "defender_license": true
     }
 
-    CorrectTestResult("MS.DEFENDER.1.4v1", Output, PASS) == true
+    TestResult("MS.DEFENDER.1.4v1", Output, PASS, true) == true
 }
 
 test_SensitiveEOP_Correct_V10 if {
@@ -762,7 +748,7 @@ test_SensitiveEOP_Correct_V10 if {
         "defender_license": true
     }
 
-    CorrectTestResult("MS.DEFENDER.1.4v1", Output, PASS) == true
+    TestResult("MS.DEFENDER.1.4v1", Output, PASS, true) == true
 }
 
 test_SensitiveEOP_Correct_V11 if {
@@ -799,7 +785,7 @@ test_SensitiveEOP_Correct_V11 if {
         "defender_license": true
     }
 
-    CorrectTestResult("MS.DEFENDER.1.4v1", Output, PASS) == true
+    TestResult("MS.DEFENDER.1.4v1", Output, PASS, true) == true
 }
 
 test_SensitiveEOP_Correct_V12 if {
@@ -838,7 +824,7 @@ test_SensitiveEOP_Correct_V12 if {
         "defender_license": true
     }
 
-    CorrectTestResult("MS.DEFENDER.1.4v1", Output, PASS) == true
+    TestResult("MS.DEFENDER.1.4v1", Output, PASS, true) == true
 }
 
 test_SensitiveEOP_Correct_V13 if {
@@ -875,7 +861,7 @@ test_SensitiveEOP_Correct_V13 if {
         "defender_license": true
     }
 
-    CorrectTestResult("MS.DEFENDER.1.4v1", Output, PASS) == true
+    TestResult("MS.DEFENDER.1.4v1", Output, PASS, true) == true
 }
 
 test_SensitiveEOP_Correct_V14 if {
@@ -914,7 +900,7 @@ test_SensitiveEOP_Correct_V14 if {
         "defender_license": true
     }
 
-    CorrectTestResult("MS.DEFENDER.1.4v1", Output, PASS) == true
+    TestResult("MS.DEFENDER.1.4v1", Output, PASS, true) == true
 }
 
 test_SensitiveEOP_Correct_V15 if {
@@ -958,7 +944,7 @@ test_SensitiveEOP_Correct_V15 if {
         "defender_license": true
     }
 
-    CorrectTestResult("MS.DEFENDER.1.4v1", Output, PASS) == true
+    TestResult("MS.DEFENDER.1.4v1", Output, PASS, true) == true
 }
 
 test_SensitiveEOP_Correct_V16 if {
@@ -1002,7 +988,7 @@ test_SensitiveEOP_Correct_V16 if {
         "defender_license": true
     }
 
-    CorrectTestResult("MS.DEFENDER.1.4v1", Output, PASS) == true
+    TestResult("MS.DEFENDER.1.4v1", Output, PASS, true) == true
 }
 
 test_SensitiveEOP_Correct_V17 if {
@@ -1046,7 +1032,7 @@ test_SensitiveEOP_Correct_V17 if {
         "defender_license": true
     }
 
-    CorrectTestResult("MS.DEFENDER.1.4v1", Output, PASS) == true
+    TestResult("MS.DEFENDER.1.4v1", Output, PASS, true) == true
 }
 
 test_SensitiveEOP_Correct_V18 if {
@@ -1095,7 +1081,7 @@ test_SensitiveEOP_Correct_V18 if {
         "defender_license": true
     }
 
-    CorrectTestResult("MS.DEFENDER.1.4v1", Output, PASS) == true
+    TestResult("MS.DEFENDER.1.4v1", Output, PASS, true) == true
 }
 
 test_SensitiveEOP_Correct_V19 if {
@@ -1144,7 +1130,7 @@ test_SensitiveEOP_Correct_V19 if {
         "defender_license": true
     }
 
-    CorrectTestResult("MS.DEFENDER.1.4v1", Output, PASS) == true
+    TestResult("MS.DEFENDER.1.4v1", Output, PASS, true) == true
 }
 
 test_SensitiveEOP_Correct_V20 if {
@@ -1193,7 +1179,7 @@ test_SensitiveEOP_Correct_V20 if {
         "defender_license": true
     }
 
-    CorrectTestResult("MS.DEFENDER.1.4v1", Output, PASS) == true
+    TestResult("MS.DEFENDER.1.4v1", Output, PASS, true) == true
 }
 
 test_SensitiveEOP_Correct_V21 if {
@@ -1242,7 +1228,7 @@ test_SensitiveEOP_Correct_V21 if {
         "defender_license": true
     }
 
-    CorrectTestResult("MS.DEFENDER.1.4v1", Output, PASS) == true
+    TestResult("MS.DEFENDER.1.4v1", Output, PASS, true) == true
 }
 
 test_SensitiveEOP_Correct_V22 if {
@@ -1291,7 +1277,7 @@ test_SensitiveEOP_Correct_V22 if {
         "defender_license": true
     }
 
-    CorrectTestResult("MS.DEFENDER.1.4v1", Output, PASS) == true
+    TestResult("MS.DEFENDER.1.4v1", Output, PASS, true) == true
 }
 
 test_SensitiveEOP_Correct_V23 if {
@@ -1340,7 +1326,7 @@ test_SensitiveEOP_Correct_V23 if {
         "defender_license": true
     }
 
-    CorrectTestResult("MS.DEFENDER.1.4v1", Output, PASS) == true
+    TestResult("MS.DEFENDER.1.4v1", Output, PASS, true) == true
 }
 
 test_SensitiveEOP_Correct_V24 if {
@@ -1404,7 +1390,7 @@ test_SensitiveEOP_Correct_V24 if {
         "defender_license": true
     }
 
-    CorrectTestResult("MS.DEFENDER.1.4v1", Output, PASS) == true
+    TestResult("MS.DEFENDER.1.4v1", Output, PASS, true) == true
 }
 
 test_SensitiveEOP_Incorrect_V1 if {
@@ -1433,7 +1419,7 @@ test_SensitiveEOP_Incorrect_V1 if {
         "defender_license": true
     }
 
-    IncorrectTestResult("MS.DEFENDER.1.4v1", Output, FAIL) == true
+    TestResult("MS.DEFENDER.1.4v1", Output, FAIL, false) == true
 }
 
 test_SensitiveEOP_Incorrect_V2 if {
@@ -1462,7 +1448,7 @@ test_SensitiveEOP_Incorrect_V2 if {
         "defender_license": true
     }
 
-    IncorrectTestResult("MS.DEFENDER.1.4v1", Output, FAIL) == true
+    TestResult("MS.DEFENDER.1.4v1", Output, FAIL, false) == true
 }
 
 test_SensitiveEOP_Incorrect_V3 if {
@@ -1480,7 +1466,7 @@ test_SensitiveEOP_Incorrect_V3 if {
         "defender_license": true
     }
 
-    IncorrectTestResult("MS.DEFENDER.1.4v1", Output, FAIL) == true
+    TestResult("MS.DEFENDER.1.4v1", Output, FAIL, false) == true
 }
 
 test_SensitiveEOP_Incorrect_V4 if {
@@ -1513,7 +1499,7 @@ test_SensitiveEOP_Incorrect_V4 if {
         "defender_license": true
     }
 
-    IncorrectTestResult("MS.DEFENDER.1.4v1", Output, FAIL) == true
+    TestResult("MS.DEFENDER.1.4v1", Output, FAIL, false) == true
 }
 
 test_SensitiveEOP_Incorrect_V5 if {
@@ -1565,12 +1551,12 @@ test_SensitiveEOP_Incorrect_V5 if {
         "defender_license": true
     }
 
-    IncorrectTestResult("MS.DEFENDER.1.4v1", Output, FAIL) == true
+    TestResult("MS.DEFENDER.1.4v1", Output, FAIL, false) == true
 }
 #--
 
 #
-# Policy 5
+# Policy MS.DEFENDER.1.5v1
 #--
 test_SensitiveATP_Correct_V1 if {
     Output := defender.tests with input as {
@@ -1605,7 +1591,7 @@ test_SensitiveATP_Correct_V1 if {
         "defender_license": true
     }
 
-    CorrectTestResult("MS.DEFENDER.1.5v1", Output, PASS) == true
+    TestResult("MS.DEFENDER.1.5v1", Output, PASS, true) == true
 }
 
 test_SensitiveATP_Correct_V2 if {
@@ -1634,7 +1620,7 @@ test_SensitiveATP_Correct_V2 if {
         "defender_license": true
     }
 
-    CorrectTestResult("MS.DEFENDER.1.5v1", Output, PASS) == true
+    TestResult("MS.DEFENDER.1.5v1", Output, PASS, true) == true
 }
 
 test_SensitiveATP_Correct_V3 if {
@@ -1671,7 +1657,7 @@ test_SensitiveATP_Correct_V3 if {
         "defender_license": true
     }
 
-    CorrectTestResult("MS.DEFENDER.1.5v1", Output, PASS) == true
+    TestResult("MS.DEFENDER.1.5v1", Output, PASS, true) == true
 }
 
 test_SensitiveATP_Correct_V4 if {
@@ -1710,7 +1696,7 @@ test_SensitiveATP_Correct_V4 if {
         "defender_license": true
     }
 
-    CorrectTestResult("MS.DEFENDER.1.5v1", Output, PASS) == true
+    TestResult("MS.DEFENDER.1.5v1", Output, PASS, true) == true
 }
 
 test_SensitiveATP_Correct_V5 if {
@@ -1747,7 +1733,7 @@ test_SensitiveATP_Correct_V5 if {
         "defender_license": true
     }
 
-    CorrectTestResult("MS.DEFENDER.1.5v1", Output, PASS) == true
+    TestResult("MS.DEFENDER.1.5v1", Output, PASS, true) == true
 }
 
 test_SensitiveATP_Correct_V6 if {
@@ -1786,7 +1772,7 @@ test_SensitiveATP_Correct_V6 if {
         "defender_license": true
     }
 
-    CorrectTestResult("MS.DEFENDER.1.5v1", Output, PASS) == true
+    TestResult("MS.DEFENDER.1.5v1", Output, PASS, true) == true
 }
 
 test_SensitiveATP_Correct_V7 if {
@@ -1823,7 +1809,7 @@ test_SensitiveATP_Correct_V7 if {
         "defender_license": true
     }
 
-    CorrectTestResult("MS.DEFENDER.1.5v1", Output, PASS) == true
+    TestResult("MS.DEFENDER.1.5v1", Output, PASS, true) == true
 }
 
 test_SensitiveATP_Correct_V8 if {
@@ -1862,7 +1848,7 @@ test_SensitiveATP_Correct_V8 if {
         "defender_license": true
     }
 
-    CorrectTestResult("MS.DEFENDER.1.5v1", Output, PASS) == true
+    TestResult("MS.DEFENDER.1.5v1", Output, PASS, true) == true
 }
 
 test_SensitiveATP_Correct_V9 if {
@@ -1899,7 +1885,7 @@ test_SensitiveATP_Correct_V9 if {
         "defender_license": true
     }
 
-    CorrectTestResult("MS.DEFENDER.1.5v1", Output, PASS) == true
+    TestResult("MS.DEFENDER.1.5v1", Output, PASS, true) == true
 }
 
 test_SensitiveATP_Correct_V10 if {
@@ -1938,7 +1924,7 @@ test_SensitiveATP_Correct_V10 if {
         "defender_license": true
     }
 
-    CorrectTestResult("MS.DEFENDER.1.5v1", Output, PASS) == true
+    TestResult("MS.DEFENDER.1.5v1", Output, PASS, true) == true
 }
 
 test_SensitiveATP_Correct_V11 if {
@@ -1975,7 +1961,7 @@ test_SensitiveATP_Correct_V11 if {
         "defender_license": true
     }
 
-    CorrectTestResult("MS.DEFENDER.1.5v1", Output, PASS) == true
+    TestResult("MS.DEFENDER.1.5v1", Output, PASS, true) == true
 }
 
 test_SensitiveATP_Correct_V12 if {
@@ -2014,7 +2000,7 @@ test_SensitiveATP_Correct_V12 if {
         "defender_license": true
     }
 
-    CorrectTestResult("MS.DEFENDER.1.5v1", Output, PASS) == true
+    TestResult("MS.DEFENDER.1.5v1", Output, PASS, true) == true
 }
 
 test_SensitiveATP_Correct_V13 if {
@@ -2051,7 +2037,7 @@ test_SensitiveATP_Correct_V13 if {
         "defender_license": true
     }
 
-    CorrectTestResult("MS.DEFENDER.1.5v1", Output, PASS) == true
+    TestResult("MS.DEFENDER.1.5v1", Output, PASS, true) == true
 }
 
 test_SensitiveATP_Correct_V14 if {
@@ -2090,7 +2076,7 @@ test_SensitiveATP_Correct_V14 if {
         "defender_license": true
     }
 
-    CorrectTestResult("MS.DEFENDER.1.5v1", Output, PASS) == true
+    TestResult("MS.DEFENDER.1.5v1", Output, PASS, true) == true
 }
 
 test_SensitiveATP_Correct_V15 if {
@@ -2134,7 +2120,7 @@ test_SensitiveATP_Correct_V15 if {
         "defender_license": true
     }
 
-    CorrectTestResult("MS.DEFENDER.1.5v1", Output, PASS) == true
+    TestResult("MS.DEFENDER.1.5v1", Output, PASS, true) == true
 }
 
 test_SensitiveATP_Correct_V16 if {
@@ -2178,7 +2164,7 @@ test_SensitiveATP_Correct_V16 if {
         "defender_license": true
     }
 
-    CorrectTestResult("MS.DEFENDER.1.5v1", Output, PASS) == true
+    TestResult("MS.DEFENDER.1.5v1", Output, PASS, true) == true
 }
 
 test_SensitiveATP_Correct_V17 if {
@@ -2222,7 +2208,7 @@ test_SensitiveATP_Correct_V17 if {
         "defender_license": true
     }
 
-    CorrectTestResult("MS.DEFENDER.1.5v1", Output, PASS) == true
+    TestResult("MS.DEFENDER.1.5v1", Output, PASS, true) == true
 }
 
 test_SensitiveATP_Correct_V18 if {
@@ -2271,7 +2257,7 @@ test_SensitiveATP_Correct_V18 if {
         "defender_license": true
     }
 
-    CorrectTestResult("MS.DEFENDER.1.5v1", Output, PASS) == true
+    TestResult("MS.DEFENDER.1.5v1", Output, PASS, true) == true
 }
 
 test_SensitiveATP_Correct_V19 if {
@@ -2320,7 +2306,7 @@ test_SensitiveATP_Correct_V19 if {
         "defender_license": true
     }
 
-    CorrectTestResult("MS.DEFENDER.1.5v1", Output, PASS) == true
+    TestResult("MS.DEFENDER.1.5v1", Output, PASS, true) == true
 }
 
 test_SensitiveATP_Correct_V20 if {
@@ -2369,7 +2355,7 @@ test_SensitiveATP_Correct_V20 if {
         "defender_license": true
     }
 
-    CorrectTestResult("MS.DEFENDER.1.5v1", Output, PASS) == true
+    TestResult("MS.DEFENDER.1.5v1", Output, PASS, true) == true
 }
 
 test_SensitiveATP_Correct_V21 if {
@@ -2418,7 +2404,7 @@ test_SensitiveATP_Correct_V21 if {
         "defender_license": true
     }
 
-    CorrectTestResult("MS.DEFENDER.1.5v1", Output, PASS) == true
+    TestResult("MS.DEFENDER.1.5v1", Output, PASS, true) == true
 }
 
 test_SensitiveATP_Correct_V22 if {
@@ -2467,7 +2453,7 @@ test_SensitiveATP_Correct_V22 if {
         "defender_license": true
     }
 
-    CorrectTestResult("MS.DEFENDER.1.5v1", Output, PASS) == true
+    TestResult("MS.DEFENDER.1.5v1", Output, PASS, true) == true
 }
 
 test_SensitiveATP_Correct_V23 if {
@@ -2516,7 +2502,7 @@ test_SensitiveATP_Correct_V23 if {
         "defender_license": true
     }
 
-    CorrectTestResult("MS.DEFENDER.1.5v1", Output, PASS) == true
+    TestResult("MS.DEFENDER.1.5v1", Output, PASS, true) == true
 }
 
 test_SensitiveATP_Correct_V24 if {
@@ -2580,7 +2566,7 @@ test_SensitiveATP_Correct_V24 if {
         "defender_license": true
     }
 
-    CorrectTestResult("MS.DEFENDER.1.5v1", Output, PASS) == true
+    TestResult("MS.DEFENDER.1.5v1", Output, PASS, true) == true
 }
 
 test_SensitiveATP_Incorrect_V1 if {
@@ -2609,7 +2595,7 @@ test_SensitiveATP_Incorrect_V1 if {
         "defender_license": true
     }
 
-    IncorrectTestResult("MS.DEFENDER.1.5v1", Output, FAIL) == true
+    TestResult("MS.DEFENDER.1.5v1", Output, FAIL, false) == true
 }
 
 test_SensitiveATP_Incorrect_V2 if {
@@ -2638,7 +2624,7 @@ test_SensitiveATP_Incorrect_V2 if {
         "defender_license": true
     }
 
-    IncorrectTestResult("MS.DEFENDER.1.5v1", Output, FAIL) == true
+    TestResult("MS.DEFENDER.1.5v1", Output, FAIL, false) == true
 }
 
 test_SensitiveATP_Incorrect_V3 if {
@@ -2656,7 +2642,7 @@ test_SensitiveATP_Incorrect_V3 if {
         "defender_license": true
     }
 
-    IncorrectTestResult("MS.DEFENDER.1.5v1", Output, FAIL) == true
+    TestResult("MS.DEFENDER.1.5v1", Output, FAIL, false) == true
 }
 
 test_SensitiveATP_Incorrect_V4 if {
@@ -2689,7 +2675,7 @@ test_SensitiveATP_Incorrect_V4 if {
         "defender_license": true
     }
 
-    IncorrectTestResult("MS.DEFENDER.1.5v1", Output, FAIL) == true
+    TestResult("MS.DEFENDER.1.5v1", Output, FAIL, false) == true
 }
 
 test_SensitiveATP_Incorrect_V5 if {
@@ -2741,6 +2727,6 @@ test_SensitiveATP_Incorrect_V5 if {
         "defender_license": true
     }
 
-    IncorrectTestResult("MS.DEFENDER.1.5v1", Output, FAIL) == true
+    TestResult("MS.DEFENDER.1.5v1", Output, FAIL, false) == true
 }
 #--

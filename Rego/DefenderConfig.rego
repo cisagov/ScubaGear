@@ -1,49 +1,17 @@
 package defender
 import future.keywords
-import data.report.utils.NotCheckedDetails
-import data.report.utils.ReportDetailsBoolean
-import data.defender.utils.SensitiveAccounts
-import data.defender.utils.SensitiveAccountsConfig
-import data.defender.utils.SensitiveAccountsSetting
-import data.defender.utils.ImpersonationProtection
-import data.defender.utils.ImpersonationProtectionConfig
-
-
-#############
-# Constants #
-#############
-
-FAIL := ReportDetailsBoolean(false)
-
-PASS := ReportDetailsBoolean(true)
-
-# Example usage and output:
-# GenerateArrayString([1,2], "numbers found:") ->
-# 2 numbers found: 1, 2
-GenerateArrayString(Array, CustomString) := Output if {
-    Length := format_int(count(Array), 10)
-    ArrayString := concat(", ", Array)
-    Output := trim(concat(" ", [Length, concat(" ", [CustomString, ArrayString])]), " ")
-}
-
-CustomizeError(true, _) := PASS if {}
-
-CustomizeError(false, CustomString) := CustomString if {}
-
-# If a defender license is present, don't apply the warning
-# and leave the message unchanged
-ApplyLicenseWarning(Status) := ReportDetailsBoolean(Status) if {
-    input.defender_license == true
-}
-
-# If a defender license is not present, assume failure and
-# replace the message with the warning
-ApplyLicenseWarning(_) := concat("", [FAIL, LicenseWarning]) if {
-    input.defender_license == false
-    LicenseWarning := " **NOTE: Either you do not have sufficient permissions or your tenant does not have a license for Microsoft Defender for Office 365 Plan 1, which is required for this feature.**"
-}
-
-FilterArray(Conditions, Boolean) := [Condition | some Condition in Conditions; Condition == Boolean]
+import data.utils.report.NotCheckedDetails
+import data.utils.report.ReportDetailsBoolean
+import data.utils.report.ReportDetailsString
+import data.utils.report.ReportDetailsArray
+import data.utils.key.PASS
+import data.utils.key.FilterArray
+import data.utils.defender.SensitiveAccounts
+import data.utils.defender.SensitiveAccountsConfig
+import data.utils.defender.SensitiveAccountsSetting
+import data.utils.defender.ImpersonationProtection
+import data.utils.defender.ImpersonationProtectionConfig
+import data.utils.defender.ApplyLicenseWarning
 
 
 #################
@@ -286,7 +254,7 @@ tests contains {
     "Criticality": "Should",
     "Commandlet": ["Get-AntiPhishPolicy"],
     "ActualValue": [StrictIP.Policy, StandardIP.Policy],
-    "ReportDetails": CustomizeError(Status, ErrorMessage),
+    "ReportDetails": ReportDetailsString(Status, ErrorMessage),
     "RequirementMet": Status
 } if {
     Policies := input.anti_phish_policies
@@ -318,7 +286,7 @@ tests contains {
     "Criticality": "Should",
     "Commandlet": ["Get-AntiPhishPolicy"],
     "ActualValue": [StrictIP.Policy, StandardIP.Policy],
-    "ReportDetails": CustomizeError(Status, ErrorMessage),
+    "ReportDetails": ReportDetailsString(Status, ErrorMessage),
     "RequirementMet": Status
 } if {
     Policies := input.anti_phish_policies
@@ -355,7 +323,7 @@ tests contains {
     "Criticality": "Should",
     "Commandlet": ["Get-AntiPhishPolicy"],
     "ActualValue": [StrictIP.Policy, StandardIP.Policy],
-    "ReportDetails": CustomizeError(Status, ErrorMessage),
+    "ReportDetails": ReportDetailsString(Status, ErrorMessage),
     "RequirementMet": Status
 } if {
     Policies := input.anti_phish_policies
@@ -509,7 +477,7 @@ tests contains {
     "Criticality": "Shall",
     "Commandlet": ["Get-DlpComplianceRule"],
     "ActualValue": Rules,
-    "ReportDetails": CustomizeError(Status, ErrorMessage),
+    "ReportDetails": ReportDetailsString(Status, ErrorMessage),
     "RequirementMet": Status
 } if {
     error_rule := "No matching rules found for:"
@@ -579,7 +547,7 @@ tests contains {
     "Criticality": "Should",
     "Commandlet": ["Get-DLPCompliancePolicy"],
     "ActualValue": Policies,
-    "ReportDetails": CustomizeError(Status, DefenderErrorMessage4_2),
+    "ReportDetails": ReportDetailsString(Status, DefenderErrorMessage4_2),
     "RequirementMet": Status
 } if {
     Conditions := [
@@ -610,7 +578,7 @@ SensitiveRulesNotBlocking contains Rule.Name if {
 }
 
 # Create the Report details message for policy
-DefenderErrorMessage4_3(Rules) := GenerateArrayString(Rules, ErrorMessage) if {
+DefenderErrorMessage4_3(Rules) := ReportDetailsArray(false, Rules, ErrorMessage) if {
     count(PoliciesWithFullProtection) > 0
     ErrorMessage := "rule(s) found that do(es) not block access or associated policy not set to enforce block action:"
 }
@@ -628,7 +596,7 @@ tests contains {
     "Criticality": "Should",
     "Commandlet": ["Get-DlpComplianceRule"],
     "ActualValue": Rules,
-    "ReportDetails": CustomizeError(Status, DefenderErrorMessage4_3(Rules)),
+    "ReportDetails": ReportDetailsString(Status, DefenderErrorMessage4_3(Rules)),
     "RequirementMet": Status
 } if {
     Rules := SensitiveRulesNotBlocking
@@ -655,7 +623,7 @@ SensitiveRulesNotNotifying contains Rule.Name if {
 }
 
 # Create the Report details message for policy
-DefenderErrorMessage4_4(Rules) := GenerateArrayString(Rules, ErrorMessage) if {
+DefenderErrorMessage4_4(Rules) := ReportDetailsArray(false, Rules, ErrorMessage) if {
     count(PoliciesWithFullProtection) > 0
     ErrorMessage := "rule(s) found that do(es) not notify at least one user:"
 }
@@ -673,7 +641,7 @@ tests contains {
     "Criticality": "Should",
     "Commandlet": ["Get-DlpComplianceRule"],
     "ActualValue": Rules,
-    "ReportDetails": CustomizeError(Status, DefenderErrorMessage4_4(Rules)),
+    "ReportDetails": ReportDetailsString(Status, DefenderErrorMessage4_4(Rules)),
     "RequirementMet": Status
 } if {
     Rules := SensitiveRulesNotNotifying
@@ -747,7 +715,7 @@ tests contains {
     "Criticality": "Shall",
     "Commandlet": ["Get-ProtectionAlert"],
     "ActualValue": MissingAlerts,
-    "ReportDetails": CustomizeError(Status, GenerateArrayString(MissingAlerts, ErrorMessage)),
+    "ReportDetails": ReportDetailsString(Status, ReportDetailsArray(false, MissingAlerts, ErrorMessage)),
     "RequirementMet": Status
 } if {
     MissingAlerts := RequiredAlerts - EnabledAlerts
