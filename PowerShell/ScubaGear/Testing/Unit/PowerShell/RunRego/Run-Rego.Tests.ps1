@@ -1,48 +1,27 @@
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath '../../../../Modules/RunRego')
 
 InModuleScope 'RunRego' {
-    Describe -Tag 'RunRego' -Name 'Invoke-Rego' {
+    Describe -Tag 'RunRego' -Name 'Invoke-Rego' -ForEach @(
+        @{Product = 'aad'; Arg = 'AAD'},
+        @{Product = 'defender'; Arg = 'Defender'},
+        @{Product = 'exo'; Arg = 'EXO'},
+        @{Product = 'powerplatform'; Arg = 'PowerPlatform'},
+        @{Product = 'sharepoint'; Arg = 'SharePoint'},
+        @{Product = 'teams'; Arg = 'Teams'}
+    ){
         BeforeAll {
-            #Mock -ModuleName RunRego Invoke-ExternalCmd -ParameterFilter { $LiteranlPath -contains 'opa_windows_amd64.exe'} -MockWith { '[]'}
-            $DummyTestResults = @"
-            [
-                {
-                    "RequirementMet":  false
-                }
-            ]
-"@
-            Mock -ModuleName RunRego Invoke-ExternalCmd -MockWith { return $DummyTestResults}
-
-            [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'ArgToProd')]
-            $ArgToProd = @{
-                teams         = "Teams";
-                exo           = "EXO";
-                defender      = "Defender";
-                aad           = "AAD";
-                powerplatform = "PowerPlatform";
-                sharepoint    = "SharePoint";
-                onedrive      = "OneDrive";
-            }
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'RegoParams')]
             $RegoParams = @{
                 'InputFile' = Join-Path -Path $PSScriptRoot -ChildPath "./RunRegoStubs/ProviderSettingsExport.json";
                 'OPAPath'   = Join-Path -Path $env:USERPROFILE -ChildPath ".scubagear/Tools";
             }
         }
-        It "Runs the <ProductName> Rego on a Provider JSON and returns a TestResults object" -ForEach @(
-            @{ProductName = 'aad'},
-            @{ProductName = 'defender'},
-            @{ProductName = 'exo'},
-            @{ProductName = 'powerplatform'},
-            @{ProductName = 'sharepoint'},
-            @{ProductName = 'teams'}
-        ){
+        It 'Runs the <Arg> Rego on a Provider JSON and returns a TestResults object' {
             $RegoParams += @{
-                'RegoFile'    = Join-Path -Path $PSScriptRoot -ChildPath "../../../../Rego/$($ArgToProd[$ProductName])Config.rego";
-                'PackageName' = $ProductName;
+                'RegoFile'    = Join-Path -Path $PSScriptRoot -ChildPath "../../../../Rego/$($Arg)Config.rego";
+                'PackageName' = $Product;
             }
-            $TestResults = Invoke-Rego @RegoParams
-            $TestResults[0].RequirementMet | Should -BeExactly $false
+            Invoke-Rego @RegoParams | Should -Not -Be $null
         }
     }
 }
