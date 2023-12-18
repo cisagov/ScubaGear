@@ -382,9 +382,8 @@ tests contains {
 
 ### Linter Warnings
 
-For the most part warnings can & should be fixed. However, there are times where the fix would make the code more
-convoluted & difficult to maintain/understand. Rarely, but possibly it is just not possible to fix. In these cases,
-add a comment indicating to ignore the specific linter warning
+For the most part warnings can and should be fixed. However, there are times where the fix would make the code more difficult to maintain and understand. In these rare cases,
+add a comment indicating to ignore the specific linter warning.
 
 #### Example
 ```
