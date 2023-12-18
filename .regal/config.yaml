@@ -87,7 +87,7 @@ rules:
     rule-length:
       level: warning
       # On the larger size for unit tests
-      # Some input jsons are to big
+      # Some json inputs are too big
       max-rule-length: 75
       count-comments: false
     # https://docs.styra.com/regal/rules/style/todo-comment
