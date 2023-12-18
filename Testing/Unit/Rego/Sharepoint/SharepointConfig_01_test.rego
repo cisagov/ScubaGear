@@ -1,32 +1,14 @@
 package sharepoint_test
 import future.keywords
 import data.sharepoint
-import data.report.utils.ReportDetailsBoolean
-import data.report.utils.NotCheckedDetails
+import data.utils.report.NotCheckedDetails
+import data.utils.key.TestResult
+import data.utils.key.FAIL
+import data.utils.key.PASS
 
-
-CorrectTestResult(PolicyId, Output, ReportDetailString) := true if {
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == true
-    RuleOutput[0].ReportDetails == ReportDetailString
-} else := false
-
-IncorrectTestResult(PolicyId, Output, ReportDetailString) := true if {
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == false
-    RuleOutput[0].ReportDetails == ReportDetailString
-} else := false
-
-FAIL := ReportDetailsBoolean(false)
-
-PASS := ReportDetailsBoolean(true)
 
 #
-# MS.SHAREPOINT.1.1v1
+# Policy MS.SHAREPOINT.1.1v1
 #--
 test_SharingCapability_Correct_V1 if {
     Output := sharepoint.tests with input as {
@@ -37,7 +19,7 @@ test_SharingCapability_Correct_V1 if {
         ]
     }
 
-    CorrectTestResult("MS.SHAREPOINT.1.1v1", Output, PASS) == true
+    TestResult("MS.SHAREPOINT.1.1v1", Output, PASS, true) == true
 }
 
 test_SharingCapability_Correct_V2 if {
@@ -49,7 +31,7 @@ test_SharingCapability_Correct_V2 if {
         ]
     }
 
-    CorrectTestResult("MS.SHAREPOINT.1.1v1", Output, PASS) == true
+    TestResult("MS.SHAREPOINT.1.1v1", Output, PASS, true) == true
 }
 
 test_SharingCapability_Incorrect_V1 if {
@@ -61,7 +43,7 @@ test_SharingCapability_Incorrect_V1 if {
         ]
     }
 
-    IncorrectTestResult("MS.SHAREPOINT.1.1v1", Output, FAIL) == true
+    TestResult("MS.SHAREPOINT.1.1v1", Output, FAIL, false) == true
 }
 
 test_SharingCapability_Incorrect_V2 if {
@@ -73,12 +55,12 @@ test_SharingCapability_Incorrect_V2 if {
         ]
     }
 
-    IncorrectTestResult("MS.SHAREPOINT.1.1v1", Output, FAIL) == true
+    TestResult("MS.SHAREPOINT.1.1v1", Output, FAIL, false) == true
 }
 #--
 
 #
-# MS.SHAREPOINT.1.2v1
+# Policy MS.SHAREPOINT.1.2v1
 #--
 test_OneDriveSharingCapability_Correct_V1 if {
     Output := sharepoint.tests with input as {
@@ -90,7 +72,7 @@ test_OneDriveSharingCapability_Correct_V1 if {
         "OneDrive_PnP_Flag": false
     }
 
-    CorrectTestResult("MS.SHAREPOINT.1.2v1", Output, PASS) == true
+    TestResult("MS.SHAREPOINT.1.2v1", Output, PASS, true) == true
 }
 
 test_OneDriveSharingCapability_Correct_V2 if {
@@ -103,7 +85,7 @@ test_OneDriveSharingCapability_Correct_V2 if {
         "OneDrive_PnP_Flag": false
     }
 
-    CorrectTestResult("MS.SHAREPOINT.1.2v1", Output, PASS) == true
+    TestResult("MS.SHAREPOINT.1.2v1", Output, PASS, true) == true
 }
 
 test_UsingServicePrincipal if {
@@ -118,7 +100,7 @@ test_UsingServicePrincipal if {
         "OneDrive_PnP_Flag": true
     }
 
-    IncorrectTestResult(PolicyId, Output, NotCheckedDetails(PolicyId)) == true
+    TestResult(PolicyId, Output, NotCheckedDetails(PolicyId), false) == true
 }
 
 test_OneDriveSharingCapability_Incorrect_V1 if {
@@ -131,7 +113,7 @@ test_OneDriveSharingCapability_Incorrect_V1 if {
         "OneDrive_PnP_Flag": false
     }
 
-    IncorrectTestResult("MS.SHAREPOINT.1.2v1", Output, FAIL) == true
+    TestResult("MS.SHAREPOINT.1.2v1", Output, FAIL, false) == true
 }
 
 test_OneDriveSharingCapability_Incorrect_V2 if {
@@ -144,12 +126,12 @@ test_OneDriveSharingCapability_Incorrect_V2 if {
         "OneDrive_PnP_Flag": false
     }
 
-    IncorrectTestResult("MS.SHAREPOINT.1.2v1", Output, FAIL) == true
+    TestResult("MS.SHAREPOINT.1.2v1", Output, FAIL, false) == true
 }
 #--
 
 #
-# MS.SHAREPOINT.1.3v1
+# Policy MS.SHAREPOINT.1.3v1
 #--
 test_SharingDomainRestrictionMode_Correct_V1 if {
     Output := sharepoint.tests with input as {
@@ -162,7 +144,7 @@ test_SharingDomainRestrictionMode_Correct_V1 if {
     }
 
     ReportDetailString := "Requirement met: external sharing is set to Only People In Organization"
-    CorrectTestResult("MS.SHAREPOINT.1.3v1", Output, ReportDetailString) == true
+    TestResult("MS.SHAREPOINT.1.3v1", Output, ReportDetailString, true) == true
 }
 
 test_SharingDomainRestrictionMode_Correct_V2 if {
@@ -175,8 +157,12 @@ test_SharingDomainRestrictionMode_Correct_V2 if {
         ]
     }
 
-    ReportDetailString := "Requirement met: Note that we currently only check for approved external domains. Approved security groups are currently not being checked, see the baseline policy for instructions on a manual check."
-    CorrectTestResult("MS.SHAREPOINT.1.3v1", Output, ReportDetailString) == true
+    ReportDetailString := concat(" ", [
+        "Requirement met: Note that we currently only check for approved external domains.",
+        "Approved security groups are currently not being checked,",
+        "see the baseline policy for instructions on a manual check."
+    ])
+    TestResult("MS.SHAREPOINT.1.3v1", Output, ReportDetailString, true) == true
 }
 
 test_SharingDomainRestrictionMode_Incorrect if {
@@ -189,13 +175,17 @@ test_SharingDomainRestrictionMode_Incorrect if {
         ]
     }
 
-    ReportDetailString :="Requirement not met: Note that we currently only check for approved external domains. Approved security groups are currently not being checked, see the baseline policy for instructions on a manual check."
-    IncorrectTestResult("MS.SHAREPOINT.1.3v1", Output, ReportDetailString) == true
+    ReportDetailString := concat(" ", [
+        "Requirement not met: Note that we currently only check for approved external domains.",
+        "Approved security groups are currently not being checked,",
+        "see the baseline policy for instructions on a manual check."
+    ])
+    TestResult("MS.SHAREPOINT.1.3v1", Output, ReportDetailString, false) == true
 }
 #--
 
 #
-# MS.SHAREPOINT.1.4v1
+# Policy MS.SHAREPOINT.1.4v1
 #--
 test_SameAccount_Correct_V1 if {
     Output := sharepoint.tests with input as {
@@ -207,7 +197,7 @@ test_SameAccount_Correct_V1 if {
         ]
     }
 
-    CorrectTestResult("MS.SHAREPOINT.1.4v1", Output, PASS) == true
+    TestResult("MS.SHAREPOINT.1.4v1", Output, PASS, true) == true
 }
 
 test_SameAccount_Correct_V3 if {
@@ -220,7 +210,7 @@ test_SameAccount_Correct_V3 if {
         ]
     }
 
-    CorrectTestResult("MS.SHAREPOINT.1.4v1", Output, PASS) == true
+    TestResult("MS.SHAREPOINT.1.4v1", Output, PASS, true) == true
 }
 
 test_SameAccount_Correct_V2 if {
@@ -233,7 +223,7 @@ test_SameAccount_Correct_V2 if {
         ]
     }
 
-    CorrectTestResult("MS.SHAREPOINT.1.4v1", Output, PASS) == true
+    TestResult("MS.SHAREPOINT.1.4v1", Output, PASS, true) == true
 }
 
 test_SameAccount_Incorrect if {
@@ -246,6 +236,6 @@ test_SameAccount_Incorrect if {
         ]
     }
 
-    IncorrectTestResult("MS.SHAREPOINT.1.4v1", Output, FAIL) == true
+    TestResult("MS.SHAREPOINT.1.4v1", Output, FAIL, false) == true
 }
 #--

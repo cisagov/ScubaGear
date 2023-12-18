@@ -1,23 +1,28 @@
 package aad
 import future.keywords
-import data.report.utils.NotCheckedDetails
-import data.report.utils.Format
-import data.report.utils.ReportDetailsBoolean
-import data.policy.utils.IsEmptyContainer
-import data.policy.utils.Contains
-import data.policy.utils.Count
+import data.utils.report.NotCheckedDetails
+import data.utils.report.ReportDetailsBoolean
+import data.utils.key.IsEmptyContainer
+import data.utils.key.Contains
+import data.utils.key.Count
+import data.utils.key.FilterArray
+import data.utils.key.ConvertToSetWithKey
+import data.utils.key.ConvertToSet
+import data.utils.aad.ReportFullDetailsArray
+import data.utils.aad.ReportDetailsArrayLicenseWarningCap
+import data.utils.aad.ReportDetailsArrayLicenseWarning
+import data.utils.aad.ReportDetailsBooleanLicenseWarning
+import data.utils.aad.UserExclusionsFullyExempt
+import data.utils.aad.GroupExclusionsFullyExempt
+import data.utils.aad.Aad2P2Licenses
+import data.utils.aad.HasAcceptableMFA
+import data.utils.aad.PolicyConditionsMatch
+import data.utils.aad.CAPLINK
+
 
 #############
 # Constants #
 #############
-
-# Set to the maximum number of array items to be
-# printed in the report details section
-REPORTARRAYMAXCOUNT := 20
-
-FAIL := ReportDetailsBoolean(false)
-
-PASS := ReportDetailsBoolean(true)
 
 RESTRICTEDACCESS := "2af84b1e-32c8-42b7-82bc-daa82404023b"
 
@@ -25,142 +30,6 @@ LIMITEDACCESS := "10dae51f-b6af-4016-8d66-8c2a99b929b3"
 
 MEMBERUSER := "a0b1b346-4d3e-4e8b-98f8-753987be4970"
 
-#############################################################################
-# The report formatting functions below are generic and used throughout AAD #
-#############################################################################
-
-Description(String1, String2, String3) := trim(concat(" ", [String1, String2, String3]), " ")
-
-ReportDetailsArray(Array, String) := Description(Format(Array), String, "")
-
-ReportFullDetailsArray(Array, String) := ReportDetailsArray(Array, String) if {
-    count(Array) == 0
-}
-
-ReportFullDetailsArray(Array, String) := Details if {
-    count(Array) > 0
-    count(Array) <= REPORTARRAYMAXCOUNT
-    Details := Description(Format(Array), concat(":<br/>", [String, concat(", ", Array)]), "")
-}
-
-ReportFullDetailsArray(Array, String) := Details if {
-    count(Array) > REPORTARRAYMAXCOUNT
-    List := [x | some x in Array]
-
-    TruncationWarning := "...<br/>Note: The list of matching items has been truncated.  Full details are available in the JSON results."
-    TruncatedList := concat(", ", array.slice(List, 0, REPORTARRAYMAXCOUNT))
-    Details := Description(Format(Array), concat(":<br/>", [String, TruncatedList]), TruncationWarning)
-}
-
-##############################################################################################################
-# The report formatting functions below are for policies that check the required Microsoft Entra ID P2 license #
-##############################################################################################################
-
-Aad2P2Licenses contains ServicePlan.ServicePlanId if {
-    some ServicePlan in input.service_plans
-    ServicePlan.ServicePlanName == "AAD_PREMIUM_P2"
-}
-
-P2WarningString := "**NOTE: Your tenant does not have a Microsoft Entra ID P2 license, which is required for this feature**"
-
-CapLink := "<a href='#caps'>View all CA policies</a>."
-
-ReportDetailsArrayLicenseWarningCap(Array, String) := Description if {
-    count(Aad2P2Licenses) > 0
-    Description := concat(". ", [ReportFullDetailsArray(Array, String), CapLink])
-} else := P2WarningString
-
-ReportDetailsArrayLicenseWarning(Array, String) := ReportFullDetailsArray(Array, String) if {
-    count(Aad2P2Licenses) > 0
-} else := P2WarningString
-
-ReportDetailsBooleanLicenseWarning(true) := PASS if {
-    count(Aad2P2Licenses) > 0
-}
-
-ReportDetailsBooleanLicenseWarning(false) := FAIL if {
-    count(Aad2P2Licenses) > 0
-}
-
-ReportDetailsBooleanLicenseWarning(_) := P2WarningString if {
-    count(Aad2P2Licenses) == 0
-}
-
-##########################################
-# User/Group Exclusion support functions #
-##########################################
-
-default UserExclusionsFullyExempt(_, _) := false
-
-# Returns true when all user exclusions present in the conditional
-# access policy are exempted in matching config variable for the
-# baseline policy item.  Undefined if no exclusions AND no exemptions.
-UserExclusionsFullyExempt(Policy, PolicyID) := true if {
-    ExemptedUsers := input.scuba_config.Aad[PolicyID].CapExclusions.Users
-    ExcludedUsers := {x | some x in Policy.Conditions.Users.ExcludeUsers}
-    AllowedExcludedUsers := {y | some y in ExemptedUsers}
-    count(ExcludedUsers - AllowedExcludedUsers) == 0
-}
-
-# Returns true when user inputs are not defined or user exclusion lists are empty
-UserExclusionsFullyExempt(Policy, PolicyID) := true if {
-    count({x | some x in Policy.Conditions.Users.ExcludeUsers}) == 0
-    count({y | y := input.scuba_config.Aad[PolicyID].CapExclusions.Users}) == 0
-}
-
-default GroupExclusionsFullyExempt(_, _) := false
-
-# Returns true when all group exclusions present in the conditional
-# access policy are exempted in matching config variable for the
-# baseline policy item.  Undefined if no exclusions AND no exemptions.
-GroupExclusionsFullyExempt(Policy, PolicyID) := true if {
-    ExemptedGroups := input.scuba_config.Aad[PolicyID].CapExclusions.Groups
-    ExcludedGroups := {x | some x in Policy.Conditions.Users.ExcludeGroups}
-    AllowedExcludedGroups := {y | some y in ExemptedGroups}
-    count(ExcludedGroups - AllowedExcludedGroups) == 0
-}
-
-# Returns true when user inputs are not defined or group exclusion lists are empty
-GroupExclusionsFullyExempt(Policy, PolicyID) := true if {
-    count({x | some x in Policy.Conditions.Users.ExcludeGroups}) == 0
-    count({y | y := input.scuba_config.Aad[PolicyID].CapExclusions.Groups}) == 0
-}
-
-########################
-# Refactored Functions #
-########################
-
-# Return true if policy matches all conditions:
-# All for include users & applications,
-# block for built in controls, enabled,
-# & NO excluded roles.
-PolicyConditionsMatch(Policy) := true if {
-    Contains(Policy.Conditions.Users.IncludeUsers, "All") == true
-    Contains(Policy.Conditions.Applications.IncludeApplications, "All") == true
-    Policy.State == "enabled"
-    IsEmptyContainer(Policy.Conditions.Users.ExcludeRoles) == true
-} else := false
-
-# Save the Allowed MFA items as a set, check if there are any MFA
-# items allowed besides the acceptable ones & if there is at least
-# 1 MFA item allowed. Return true
-HasAcceptableMFA(Policy) := true if {
-    # Strength must be at least one of acceptable with no unacceptable strengths
-    Strengths := ConvertToSet(Policy.GrantControls.AuthenticationStrength.AllowedCombinations)
-    AcceptableMFA := {"windowsHelloForBusiness", "fido2", "x509CertificateMultiFactor"}
-    Count(Strengths - AcceptableMFA) == 0
-    Count(Strengths) > 0
-} else := false
-
-ConvertToSet(Items) := NewSet if {
-    NewSet := {Item | some Item in Items}
-} else := set()
-
-ConvertToSetWithKey(Items, Key) := NewSet if {
-    NewSet := {Item[Key] | some Item in Items}
-} else := set()
-
-FilterArray(Conditions, Boolean) := [Condition | some Condition in Conditions; Condition == Boolean]
 
 ############
 # MS.AAD.1 #
@@ -192,7 +61,7 @@ tests contains {
     "Criticality": "Shall",
     "Commandlet": ["Get-MgBetaIdentityConditionalAccessPolicy"],
     "ActualValue": LegacyAuthentication,
-    "ReportDetails": concat(". ", [ReportFullDetailsArray(LegacyAuthentication, DescriptionString), CapLink]),
+    "ReportDetails": concat(". ", [ReportFullDetailsArray(LegacyAuthentication, DescriptionString), CAPLINK]),
     "RequirementMet": Status
 } if {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
@@ -326,7 +195,7 @@ tests contains {
     "Criticality": "Shall",
     "Commandlet": ["Get-MgBetaIdentityConditionalAccessPolicy"],
     "ActualValue": MFAPolicies,
-    "ReportDetails": concat(". ", [ReportFullDetailsArray(MFAPolicies, DescriptionString), CapLink]),
+    "ReportDetails": concat(". ", [ReportFullDetailsArray(MFAPolicies, DescriptionString), CAPLINK]),
     "RequirementMet": Status
 } if {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
@@ -364,7 +233,7 @@ tests contains {
     "Criticality": "Shall",
     "Commandlet": ["Get-MgBetaIdentityConditionalAccessPolicy"],
     "ActualValue": AlternativeMFA,
-    "ReportDetails": concat(". ", [ReportFullDetailsArray(AlternativeMFA, DescriptionString), CapLink]),
+    "ReportDetails": concat(". ", [ReportFullDetailsArray(AlternativeMFA, DescriptionString), CAPLINK]),
     "RequirementMet": Status
 } if {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
@@ -384,7 +253,7 @@ tests contains {
     "Criticality": "Shall",
     "Commandlet": ["Get-MgBetaIdentityConditionalAccessPolicy"],
     "ActualValue": MFAPolicies,
-    "ReportDetails": concat(". ", [ReportFullDetailsArray(MFAPolicies, DescriptionString), CapLink]),
+    "ReportDetails": concat(". ", [ReportFullDetailsArray(MFAPolicies, DescriptionString), CAPLINK]),
     "RequirementMet": Status
 } if {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
@@ -476,7 +345,7 @@ tests contains {
     "Criticality": "Shall",
     "Commandlet": ["Get-MgBetaSubscribedSku", "Get-PrivilegedRole", "Get-MgBetaIdentityConditionalAccessPolicy"],
     "ActualValue": PhishingResistantMFA,
-    "ReportDetails": concat(". ", [ReportFullDetailsArray(PhishingResistantMFA, DescriptionString), CapLink]),
+    "ReportDetails": concat(". ", [ReportFullDetailsArray(PhishingResistantMFA, DescriptionString), CAPLINK]),
     "RequirementMet": Status
 } if {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
@@ -510,7 +379,7 @@ tests contains {
     "Criticality": "Should",
     "Commandlet": ["Get-MgBetaIdentityConditionalAccessPolicy"],
     "ActualValue": ManagedDeviceAuth,
-    "ReportDetails": concat(". ", [ReportFullDetailsArray(ManagedDeviceAuth, DescriptionString), CapLink]),
+    "ReportDetails": concat(". ", [ReportFullDetailsArray(ManagedDeviceAuth, DescriptionString), CAPLINK]),
     "RequirementMet": Status
 } if {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
@@ -548,7 +417,7 @@ tests contains {
     "Criticality": "Should",
     "Commandlet": ["Get-MgBetaIdentityConditionalAccessPolicy"],
     "ActualValue": RequireManagedDeviceMFA,
-    "ReportDetails": concat(". ", [ReportFullDetailsArray(RequireManagedDeviceMFA, DescriptionString), CapLink]),
+    "ReportDetails": concat(". ", [ReportFullDetailsArray(RequireManagedDeviceMFA, DescriptionString), CAPLINK]),
     "RequirementMet": Status
 } if {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
@@ -637,12 +506,12 @@ tests contains {
     "Criticality": "Shall",
     "Commandlet": ["Get-MgBetaPolicyAuthorizationPolicy"],
     "ActualValue": {"all_grant_policy_values": AllDefaultGrantPolicies},
-    "ReportDetails": ReportFullDetailsArray(BadPolicies, DescriptionString),
+    "ReportDetails": ReportFullDetailsArray(BadPolicies, DescriptionStr),
     "RequirementMet": Status
 } if {
     BadPolicies := BadDefaultGrantPolicies
     Status := count(BadPolicies) == 0
-    DescriptionString := "authorization policies found that allow non-admin users to consent to third-party applications"
+    DescriptionStr := "authorization policies found that allow non-admin users to consent to third-party applications"
 }
 #--
 

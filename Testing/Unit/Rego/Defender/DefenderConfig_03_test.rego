@@ -1,32 +1,13 @@
 package defender_test
 import future.keywords
 import data.defender
-import data.report.utils.ReportDetailsBoolean
-
-
-CorrectTestResult(PolicyId, Output, ReportDetailString) := true if {
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == true
-    RuleOutput[0].ReportDetails == ReportDetailString
-} else := false
-
-IncorrectTestResult(PolicyId, Output, ReportDetailString) := true if {
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == false
-    RuleOutput[0].ReportDetails == ReportDetailString
-} else := false
-
-FAIL := ReportDetailsBoolean(false)
-
-PASS := ReportDetailsBoolean(true)
+import data.utils.key.TestResult
+import data.utils.key.FAIL
+import data.utils.key.PASS
 
 
 #
-# Policy 1
+# Policy MS.DEFENDER.3.1v1
 #--
 test_Spot_Correct if {
     Output := defender.tests with input as {
@@ -39,7 +20,7 @@ test_Spot_Correct if {
         "defender_license": true
     }
 
-    CorrectTestResult("MS.DEFENDER.3.1v1", Output, PASS) == true
+    TestResult("MS.DEFENDER.3.1v1", Output, PASS, true) == true
 }
 
 test_Spot_Incorrect if {
@@ -53,6 +34,6 @@ test_Spot_Incorrect if {
         "defender_license": true
     }
 
-    IncorrectTestResult("MS.DEFENDER.3.1v1", Output, FAIL) == true
+    TestResult("MS.DEFENDER.3.1v1", Output, FAIL, false) == true
 }
 #--

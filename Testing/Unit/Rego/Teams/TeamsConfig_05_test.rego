@@ -1,29 +1,13 @@
 package teams_test
 import future.keywords
 import data.teams
-import data.report.utils.ReportDetailsBoolean
+import data.utils.key.TestResult
+import data.utils.key.TestResultContains
+import data.utils.key.PASS
 
-
-CorrectTestResult(PolicyId, Output, ReportDetailString) := true if {
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == true
-    RuleOutput[0].ReportDetails == ReportDetailString
-} else := false
-
-IncorrectTestResult(PolicyId, Output, ReportDetailString) := true if {
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == false
-    RuleOutput[0].ReportDetails == ReportDetailString
-} else := false
-
-PASS := ReportDetailsBoolean(true)
 
 #
-# MS.TEAMS.5.1v1
+# Policy MS.TEAMS.5.1v1
 #--
 test_DefaultCatalogAppsType_Correct_V1 if {
     Output := teams.tests with input as {
@@ -35,7 +19,7 @@ test_DefaultCatalogAppsType_Correct_V1 if {
         ]
     }
 
-    CorrectTestResult("MS.TEAMS.5.1v1", Output, PASS) == true
+    TestResult("MS.TEAMS.5.1v1", Output, PASS, true) == true
 }
 
 test_DefaultCatalogAppsType_Correct_V2 if {
@@ -48,7 +32,7 @@ test_DefaultCatalogAppsType_Correct_V2 if {
         ]
     }
 
-    CorrectTestResult("MS.TEAMS.5.1v1", Output, PASS) == true
+    TestResult("MS.TEAMS.5.1v1", Output, PASS, true) == true
 }
 
 test_DefaultCatalogAppsType_Incorrect_V1 if {
@@ -61,8 +45,10 @@ test_DefaultCatalogAppsType_Incorrect_V1 if {
         ]
     }
 
-    ReportDetailString := "1 meeting policy(ies) found that does not restrict installation of Microsoft Apps by default: Global"
-    IncorrectTestResult("MS.TEAMS.5.1v1", Output, ReportDetailString) == true
+    ReportDetailStr :=
+    "1 meeting policy(ies) found that does not restrict installation of Microsoft Apps by default: Global"
+
+    TestResult("MS.TEAMS.5.1v1", Output, ReportDetailStr, false) == true
 }
 
 test_DefaultCatalogAppsType_Incorrect_V2 if {
@@ -75,13 +61,13 @@ test_DefaultCatalogAppsType_Incorrect_V2 if {
         ]
     }
 
-    ReportDetailString := "1 meeting policy(ies) found that does not restrict installation of Microsoft Apps by default: Tag:TestPolicy"
-    IncorrectTestResult("MS.TEAMS.5.1v1", Output, ReportDetailString) == true
+    ReportDetailStr :=
+    "1 meeting policy(ies) found that does not restrict installation of Microsoft Apps by default: Tag:TestPolicy"
+
+    TestResult("MS.TEAMS.5.1v1", Output, ReportDetailStr, false) == true
 }
 
 test_DefaultCatalogAppsType_Multiple if {
-    PolicyId := "MS.TEAMS.5.1v1"
-
     Output := teams.tests with input as {
         "app_policies": [
             {
@@ -99,18 +85,17 @@ test_DefaultCatalogAppsType_Multiple if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == false
-    startswith(RuleOutput[0].ReportDetails, "2 meeting policy(ies) found that does not restrict installation of Microsoft Apps by default: ")
-    contains(RuleOutput[0].ReportDetails, "Tag:TestPolicy1")
-    contains(RuleOutput[0].ReportDetails, "Tag:TestPolicy2")
+    ReportDetailArrayStrs := [
+        "2 meeting policy(ies) found that does not restrict installation of Microsoft Apps by default: ",
+        "Tag:TestPolicy1",
+        "Tag:TestPolicy2"
+    ]
+    TestResultContains("MS.TEAMS.5.1v1", Output, ReportDetailArrayStrs, false) == true
 }
 #--
 
 #
-# MS.TEAMS.5.2v1
+# Policy MS.TEAMS.5.2v1
 #--
 test_GlobalCatalogAppsType_Correct_V1 if {
     Output := teams.tests with input as {
@@ -122,7 +107,7 @@ test_GlobalCatalogAppsType_Correct_V1 if {
         ]
     }
 
-    CorrectTestResult("MS.TEAMS.5.2v1", Output, PASS) == true
+    TestResult("MS.TEAMS.5.2v1", Output, PASS, true) == true
 }
 
 test_GlobalCatalogAppsType_Correct_V2 if {
@@ -135,7 +120,7 @@ test_GlobalCatalogAppsType_Correct_V2 if {
         ]
     }
 
-    CorrectTestResult("MS.TEAMS.5.2v1", Output, PASS) == true
+    TestResult("MS.TEAMS.5.2v1", Output, PASS, true) == true
 }
 
 test_GlobalCatalogAppsType_Incorrect_V1 if {
@@ -148,8 +133,10 @@ test_GlobalCatalogAppsType_Incorrect_V1 if {
         ]
     }
 
-    ReportDetailString := "1 meeting policy(ies) found that does not restrict installation of third-party apps by default: Global"
-    IncorrectTestResult("MS.TEAMS.5.2v1", Output, ReportDetailString) == true
+    ReportDetailStr :=
+    "1 meeting policy(ies) found that does not restrict installation of third-party apps by default: Global"
+
+    TestResult("MS.TEAMS.5.2v1", Output, ReportDetailStr, false) == true
 }
 
 test_GlobalCatalogAppsType_Incorrect_V2 if {
@@ -162,13 +149,13 @@ test_GlobalCatalogAppsType_Incorrect_V2 if {
         ]
     }
 
-    ReportDetailString := "1 meeting policy(ies) found that does not restrict installation of third-party apps by default: Tag:TestPolicy"
-    IncorrectTestResult("MS.TEAMS.5.2v1", Output, ReportDetailString) == true
+    ReportDetailStr :=
+    "1 meeting policy(ies) found that does not restrict installation of third-party apps by default: Tag:TestPolicy"
+
+    TestResult("MS.TEAMS.5.2v1", Output, ReportDetailStr, false) == true
 }
 
 test_GlobalCatalogAppsType_Multiple if {
-    PolicyId := "MS.TEAMS.5.2v1"
-
     Output := teams.tests with input as {
         "app_policies": [
             {
@@ -186,18 +173,17 @@ test_GlobalCatalogAppsType_Multiple if {
         ]
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == false
-    startswith(RuleOutput[0].ReportDetails, "2 meeting policy(ies) found that does not restrict installation of third-party apps by default: ")
-    contains(RuleOutput[0].ReportDetails, "Global")
-    contains(RuleOutput[0].ReportDetails, "Tag:TestPolicy2")
+    ReportDetailArrayStrs := [
+        "2 meeting policy(ies) found that does not restrict installation of third-party apps by default: ",
+        "Global",
+        "Tag:TestPolicy2"
+    ]
+    TestResultContains("MS.TEAMS.5.2v1", Output, ReportDetailArrayStrs, false) == true
 }
 #--
 
 #
-# MS.TEAMS.5.3v1
+# Policy MS.TEAMS.5.3v1
 #--
 test_PrivateCatalogAppsType_Correct_V1 if {
     Output := teams.tests with input as {
@@ -209,7 +195,7 @@ test_PrivateCatalogAppsType_Correct_V1 if {
         ]
     }
 
-    CorrectTestResult("MS.TEAMS.5.3v1", Output, PASS) == true
+    TestResult("MS.TEAMS.5.3v1", Output, PASS, true) == true
 }
 
 test_PrivateCatalogAppsType_Correct_V2 if {
@@ -222,7 +208,7 @@ test_PrivateCatalogAppsType_Correct_V2 if {
         ]
     }
 
-    CorrectTestResult("MS.TEAMS.5.3v1", Output, PASS) == true
+    TestResult("MS.TEAMS.5.3v1", Output, PASS, true) == true
 }
 
 test_PrivateCatalogAppsType_Incorrect_V1 if {
@@ -235,8 +221,10 @@ test_PrivateCatalogAppsType_Incorrect_V1 if {
         ]
     }
 
-    ReportDetailString := "1 meeting policy(ies) found that does not restrict installation of custom apps by default: Global"
-    IncorrectTestResult("MS.TEAMS.5.3v1", Output, ReportDetailString) == true
+    ReportDetailStr :=
+    "1 meeting policy(ies) found that does not restrict installation of custom apps by default: Global"
+
+    TestResult("MS.TEAMS.5.3v1", Output, ReportDetailStr, false) == true
 }
 
 test_PrivateCatalogAppsType_Incorrect_V2 if {
@@ -249,13 +237,13 @@ test_PrivateCatalogAppsType_Incorrect_V2 if {
         ]
     }
 
-    ReportDetailString := "1 meeting policy(ies) found that does not restrict installation of custom apps by default: Tag:TestPolicy"
-    IncorrectTestResult("MS.TEAMS.5.3v1", Output, ReportDetailString) == true
+    ReportDetailStr :=
+    "1 meeting policy(ies) found that does not restrict installation of custom apps by default: Tag:TestPolicy"
+
+    TestResult("MS.TEAMS.5.3v1", Output, ReportDetailStr, false) == true
 }
 
 test_PrivateCatalogAppsType_Multiple if {
-    PolicyId := "MS.TEAMS.5.3v1"
-
     Output := teams.tests with input as {
         "app_policies": [
             {
@@ -273,12 +261,11 @@ test_PrivateCatalogAppsType_Multiple if {
         ]
     }
 
-    RuleOutput := [Result | Result = Output[_]; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == false
-    startswith(RuleOutput[0].ReportDetails, "2 meeting policy(ies) found that does not restrict installation of custom apps by default: ")
-    contains(RuleOutput[0].ReportDetails, "Global")
-    contains(RuleOutput[0].ReportDetails, "Tag:TestPolicy2")
+    ReportDetailArrayStrs := [
+        "2 meeting policy(ies) found that does not restrict installation of custom apps by default: ",
+        "Global",
+        "Tag:TestPolicy2"
+    ]
+    TestResultContains("MS.TEAMS.5.3v1", Output, ReportDetailArrayStrs, false) == true
 }
 #--

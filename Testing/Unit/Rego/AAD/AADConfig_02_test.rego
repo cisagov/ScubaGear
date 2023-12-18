@@ -1,28 +1,12 @@
 package aad_test
 import future.keywords
 import data.aad
-import data.report.utils.NotCheckedDetails
-
-
-CorrectTestResult(PolicyId, Output, ReportDetailString) := true if {
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == true
-    RuleOutput[0].ReportDetails == ReportDetailString
-} else := false
-
-IncorrectTestResult(PolicyId, Output, ReportDetailString) := true if {
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == false
-    RuleOutput[0].ReportDetails == ReportDetailString
-} else := false
+import data.utils.report.NotCheckedDetails
+import data.utils.key.TestResult
 
 
 #
-# MS.AAD.2.1v1
+# Policy MS.AAD.2.1v1
 #--
 test_NoExclusionsConditions_Correct_V1 if {
     Output := aad.tests with input as {
@@ -67,8 +51,12 @@ test_NoExclusionsConditions_Correct_V1 if {
         ]
     }
 
-    ReportDetailString := "1 conditional access policy(s) found that meet(s) all requirements:<br/>Test name. <a href='#caps'>View all CA policies</a>."
-    CorrectTestResult("MS.AAD.2.1v1", Output, ReportDetailString) == true
+    ReportDetailStr := concat("", [
+        "1 conditional access policy(s) found that meet(s) all requirements:",
+        "<br/>Test name. <a href='#caps'>View all CA policies</a>."
+    ])
+
+    TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, true) == true
 }
 
 test_NoExclusionsExemptUsers_Correct_V1 if {
@@ -126,8 +114,12 @@ test_NoExclusionsExemptUsers_Correct_V1 if {
         }
     }
 
-    ReportDetailString := "1 conditional access policy(s) found that meet(s) all requirements:<br/>Test name. <a href='#caps'>View all CA policies</a>."
-    CorrectTestResult("MS.AAD.2.1v1", Output, ReportDetailString) == true
+    ReportDetailStr := concat("", [
+        "1 conditional access policy(s) found that meet(s) all requirements:",
+        "<br/>Test name. <a href='#caps'>View all CA policies</a>."
+    ])
+
+    TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, true) == true
 }
 
 test_NoExclusionsExemptGroups_Correct_V1 if {
@@ -185,8 +177,12 @@ test_NoExclusionsExemptGroups_Correct_V1 if {
         }
     }
 
-    ReportDetailString := "1 conditional access policy(s) found that meet(s) all requirements:<br/>Test name. <a href='#caps'>View all CA policies</a>."
-    CorrectTestResult("MS.AAD.2.1v1", Output, ReportDetailString) == true
+    ReportDetailStr := concat("", [
+        "1 conditional access policy(s) found that meet(s) all requirements:",
+        "<br/>Test name. <a href='#caps'>View all CA policies</a>."
+    ])
+
+    TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, true) == true
 }
 
 # User exclusions test
@@ -235,8 +231,9 @@ test_UserExclusionNoExempt_Incorrect_V1 if {
         ]
     }
 
-    ReportDetailString := "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    IncorrectTestResult("MS.AAD.2.1v1", Output, ReportDetailString) == true
+    ReportDetailStr :=
+        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, false) == true
 }
 
 test_UserExclusionConditions_Correct_V1 if {
@@ -296,8 +293,12 @@ test_UserExclusionConditions_Correct_V1 if {
         }
     }
 
-    ReportDetailString := "1 conditional access policy(s) found that meet(s) all requirements:<br/>Test name. <a href='#caps'>View all CA policies</a>."
-    CorrectTestResult("MS.AAD.2.1v1", Output, ReportDetailString) == true
+    ReportDetailStr := concat("", [
+        "1 conditional access policy(s) found that meet(s) all requirements:",
+        "<br/>Test name. <a href='#caps'>View all CA policies</a>."
+    ])
+
+    TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, true) == true
 }
 
 test_UserExclusionsNoExempt_Incorrect_V1 if {
@@ -346,8 +347,9 @@ test_UserExclusionsNoExempt_Incorrect_V1 if {
         ]
     }
 
-    ReportDetailString := "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    IncorrectTestResult("MS.AAD.2.1v1", Output, ReportDetailString) == true
+    ReportDetailStr :=
+        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, false) == true
 }
 
 test_UserExclusionsSingleExempt_Incorrect_V1 if {
@@ -408,8 +410,9 @@ test_UserExclusionsSingleExempt_Incorrect_V1 if {
         }
     }
 
-    ReportDetailString := "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    IncorrectTestResult("MS.AAD.2.1v1", Output, ReportDetailString) == true
+    ReportDetailStr :=
+        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, false) == true
 }
 
 test_MultiUserExclusionsConditions_Correct_V1 if {
@@ -471,8 +474,12 @@ test_MultiUserExclusionsConditions_Correct_V1 if {
         }
     }
 
-    ReportDetailString := "1 conditional access policy(s) found that meet(s) all requirements:<br/>Test name. <a href='#caps'>View all CA policies</a>."
-    CorrectTestResult("MS.AAD.2.1v1", Output, ReportDetailString) == true
+    ReportDetailStr := concat("", [
+        "1 conditional access policy(s) found that meet(s) all requirements:",
+        "<br/>Test name. <a href='#caps'>View all CA policies</a>."
+    ])
+
+    TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, true) == true
 }
 
 # Group Exclusion tests #
@@ -521,8 +528,9 @@ test_GroupExclusionNoExempt_Incorrect_V1 if {
         ]
     }
 
-    ReportDetailString := "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    IncorrectTestResult("MS.AAD.2.1v1", Output, ReportDetailString) == true
+    ReportDetailStr :=
+        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, false) == true
 }
 
 test_GroupExclusionsConditions_Correct_V1 if {
@@ -582,8 +590,12 @@ test_GroupExclusionsConditions_Correct_V1 if {
         }
     }
 
-    ReportDetailString := "1 conditional access policy(s) found that meet(s) all requirements:<br/>Test name. <a href='#caps'>View all CA policies</a>."
-    CorrectTestResult("MS.AAD.2.1v1", Output, ReportDetailString) == true
+    ReportDetailStr := concat("", [
+        "1 conditional access policy(s) found that meet(s) all requirements:",
+        "<br/>Test name. <a href='#caps'>View all CA policies</a>."
+    ])
+
+    TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, true) == true
 }
 
 test_GroupExclusionsNoExempt_Incorrect_V1 if {
@@ -632,8 +644,9 @@ test_GroupExclusionsNoExempt_Incorrect_V1 if {
         ]
     }
 
-    ReportDetailString := "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    IncorrectTestResult("MS.AAD.2.1v1", Output, ReportDetailString) == true
+    ReportDetailStr :=
+    "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, false) == true
 }
 
 test_GroupExclusionsSingleExempt_Incorrect_V1 if {
@@ -694,8 +707,9 @@ test_GroupExclusionsSingleExempt_Incorrect_V1 if {
         }
     }
 
-    ReportDetailString := "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    IncorrectTestResult("MS.AAD.2.1v1", Output, ReportDetailString) == true
+    ReportDetailStr :=
+    "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, false) == true
 }
 
 test_MultiGroupExclusionsConditions_Correct_V1 if {
@@ -757,8 +771,11 @@ test_MultiGroupExclusionsConditions_Correct_V1 if {
         }
     }
 
-    ReportDetailString := "1 conditional access policy(s) found that meet(s) all requirements:<br/>Test name. <a href='#caps'>View all CA policies</a>."
-    CorrectTestResult("MS.AAD.2.1v1", Output, ReportDetailString) == true
+    ReportDetailStr := concat("", [
+        "1 conditional access policy(s) found that meet(s) all requirements:",
+        "<br/>Test name. <a href='#caps'>View all CA policies</a>."
+    ])
+    TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, true) == true
 }
 
 # User and group exclusions tests
@@ -823,8 +840,11 @@ test_UserGroupExclusionConditions_Correct_V1 if {
         }
     }
 
-    ReportDetailString := "1 conditional access policy(s) found that meet(s) all requirements:<br/>Test name. <a href='#caps'>View all CA policies</a>."
-    CorrectTestResult("MS.AAD.2.1v1", Output, ReportDetailString) == true
+    ReportDetailStr := concat("", [
+        "1 conditional access policy(s) found that meet(s) all requirements:",
+        "<br/>Test name. <a href='#caps'>View all CA policies</a>."
+    ])
+    TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, true) == true
 }
 
 test_UserGroupExclusionNoExempt_Incorrect_V1 if {
@@ -874,8 +894,9 @@ test_UserGroupExclusionNoExempt_Incorrect_V1 if {
         ]
     }
 
-    ReportDetailString := "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    IncorrectTestResult("MS.AAD.2.1v1", Output, ReportDetailString) == true
+    ReportDetailStr :=
+        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, false) == true
 }
 
 test_UserGroupExclusionUserExemptOnly_Incorrect_V1 if {
@@ -937,8 +958,9 @@ test_UserGroupExclusionUserExemptOnly_Incorrect_V1 if {
         }
     }
 
-    ReportDetailString := "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    IncorrectTestResult("MS.AAD.2.1v1", Output, ReportDetailString) == true
+    ReportDetailStr :=
+        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, false) == true
 }
 
 test_UserGroupExclusionGroupExemptOnly_Incorrect_V1 if {
@@ -1000,8 +1022,9 @@ test_UserGroupExclusionGroupExemptOnly_Incorrect_V1 if {
         }
     }
 
-    ReportDetailString := "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    IncorrectTestResult("MS.AAD.2.1v1", Output, ReportDetailString) == true
+    ReportDetailStr :=
+        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, false) == true
 }
 
 test_UserGroupExclusionTooFewUserExempts_Incorrect_V1 if {
@@ -1066,8 +1089,9 @@ test_UserGroupExclusionTooFewUserExempts_Incorrect_V1 if {
         }
     }
 
-    ReportDetailString := "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    IncorrectTestResult("MS.AAD.2.1v1", Output, ReportDetailString) == true
+    ReportDetailStr :=
+        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, false) == true
 }
 
 # Other Conditions tests
@@ -1114,8 +1138,9 @@ test_IncludeApplications_Incorrect_V1 if {
         ]
     }
 
-    ReportDetailString := "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    IncorrectTestResult("MS.AAD.2.1v1", Output, ReportDetailString) == true
+    ReportDetailStr :=
+        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, false) == true
 }
 
 test_IncludeUsers_Incorrect_V1 if {
@@ -1161,8 +1186,9 @@ test_IncludeUsers_Incorrect_V1 if {
         ]
     }
 
-    ReportDetailString := "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    IncorrectTestResult("MS.AAD.2.1v1", Output, ReportDetailString) == true
+    ReportDetailStr :=
+        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, false) == true
 }
 
 test_ExcludeUsers_Incorrect_V1 if {
@@ -1210,8 +1236,9 @@ test_ExcludeUsers_Incorrect_V1 if {
         ]
     }
 
-    ReportDetailString := "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    IncorrectTestResult("MS.AAD.2.1v1", Output, ReportDetailString) == true
+    ReportDetailStr :=
+        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, false) == true
 }
 
 test_ExcludeGroups_Incorrect_V1 if {
@@ -1259,8 +1286,9 @@ test_ExcludeGroups_Incorrect_V1 if {
         ]
     }
 
-    ReportDetailString := "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    IncorrectTestResult("MS.AAD.2.1v1", Output, ReportDetailString) == true
+    ReportDetailStr :=
+        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, false) == true
 }
 
 test_ExcludeRoles_Incorrect_V1 if {
@@ -1308,8 +1336,9 @@ test_ExcludeRoles_Incorrect_V1 if {
         ]
     }
 
-    ReportDetailString := "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    IncorrectTestResult("MS.AAD.2.1v1", Output, ReportDetailString) == true
+    ReportDetailStr :=
+        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, false) == true
 }
 
 test_BuiltInControls_Incorrect_V1 if {
@@ -1355,8 +1384,9 @@ test_BuiltInControls_Incorrect_V1 if {
         ]
     }
 
-    ReportDetailString := "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    IncorrectTestResult("MS.AAD.2.1v1", Output, ReportDetailString) == true
+    ReportDetailStr :=
+        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, false) == true
 }
 
 test_State_Incorrect_V1 if {
@@ -1402,8 +1432,9 @@ test_State_Incorrect_V1 if {
         ]
     }
 
-    ReportDetailString := "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    IncorrectTestResult("MS.AAD.2.1v1", Output, ReportDetailString) == true
+    ReportDetailStr :=
+        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, false) == true
 }
 
 test_UserRiskLevels_Incorrect if {
@@ -1449,8 +1480,9 @@ test_UserRiskLevels_Incorrect if {
         ]
     }
 
-    ReportDetailString := "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    IncorrectTestResult("MS.AAD.2.1v1", Output, ReportDetailString) == true
+    ReportDetailStr :=
+        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, false) == true
 }
 
 test_ServicePlans_Incorrect if {
@@ -1492,26 +1524,27 @@ test_ServicePlans_Incorrect if {
         ]
     }
 
-    ReportDetailString := "**NOTE: Your tenant does not have a Microsoft Entra ID P2 license, which is required for this feature**"
-    IncorrectTestResult("MS.AAD.2.1v1", Output, ReportDetailString) == true
+    ReportDetailStr :=
+        "**NOTE: Your tenant does not have a Microsoft Entra ID P2 license, which is required for this feature**"
+    TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, false) == true
 }
 #--
 
 #
-# MS.AAD.2.2v1
+# Policy MS.AAD.2.2v1
 #--
 test_NotImplemented_Correct if {
     PolicyId := "MS.AAD.2.2v1"
 
     Output := aad.tests with input as { }
 
-    ReportDetailString := NotCheckedDetails(PolicyId)
-    IncorrectTestResult(PolicyId, Output, ReportDetailString) == true
+    ReportDetailStr := NotCheckedDetails(PolicyId)
+    TestResult(PolicyId, Output, ReportDetailStr, false) == true
 }
 #--
 
 #
-# MS.AAD.2.3v1
+# Policy MS.AAD.2.3v1
 #--
 test_NoExclusionsConditions_Correct_V2 if {
     Output := aad.tests with input as {
@@ -1556,8 +1589,12 @@ test_NoExclusionsConditions_Correct_V2 if {
         ]
     }
 
-    ReportDetailString := "1 conditional access policy(s) found that meet(s) all requirements:<br/>Test name. <a href='#caps'>View all CA policies</a>."
-    CorrectTestResult("MS.AAD.2.3v1", Output, ReportDetailString) == true
+    ReportDetailStr := concat("", [
+        "1 conditional access policy(s) found that meet(s) all requirements:",
+        "<br/>Test name. <a href='#caps'>View all CA policies</a>."
+    ])
+
+    TestResult("MS.AAD.2.3v1", Output, ReportDetailStr, true) == true
 }
 
 test_NoExclusionsExemptUsers_Correct_V2 if {
@@ -1615,8 +1652,12 @@ test_NoExclusionsExemptUsers_Correct_V2 if {
         }
     }
 
-    ReportDetailString := "1 conditional access policy(s) found that meet(s) all requirements:<br/>Test name. <a href='#caps'>View all CA policies</a>."
-    CorrectTestResult("MS.AAD.2.3v1", Output, ReportDetailString) == true
+    ReportDetailStr := concat("", [
+        "1 conditional access policy(s) found that meet(s) all requirements:",
+        "<br/>Test name. <a href='#caps'>View all CA policies</a>."
+    ])
+
+    TestResult("MS.AAD.2.3v1", Output, ReportDetailStr, true) == true
 }
 
 test_NoExclusionsExemptGroups_Correct_V2 if {
@@ -1674,8 +1715,12 @@ test_NoExclusionsExemptGroups_Correct_V2 if {
         }
     }
 
-    ReportDetailString := "1 conditional access policy(s) found that meet(s) all requirements:<br/>Test name. <a href='#caps'>View all CA policies</a>."
-    CorrectTestResult("MS.AAD.2.3v1", Output, ReportDetailString) == true
+    ReportDetailStr := concat("", [
+        "1 conditional access policy(s) found that meet(s) all requirements:",
+        "<br/>Test name. <a href='#caps'>View all CA policies</a>."
+    ])
+
+    TestResult("MS.AAD.2.3v1", Output, ReportDetailStr, true) == true
 }
 
 # User exclusions test
@@ -1724,8 +1769,9 @@ test_UserExclusionNoExempt_Incorrect_V2 if {
         ]
     }
 
-    ReportDetailString := "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    IncorrectTestResult("MS.AAD.2.3v1", Output, ReportDetailString) == true
+    ReportDetailStr :=
+        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    TestResult("MS.AAD.2.3v1", Output, ReportDetailStr, false) == true
 }
 
 test_UserExclusionConditions_Correct_V2 if {
@@ -1785,8 +1831,12 @@ test_UserExclusionConditions_Correct_V2 if {
         }
     }
 
-    ReportDetailString := "1 conditional access policy(s) found that meet(s) all requirements:<br/>Test name. <a href='#caps'>View all CA policies</a>."
-    CorrectTestResult("MS.AAD.2.3v1", Output, ReportDetailString) == true
+    ReportDetailStr := concat("", [
+        "1 conditional access policy(s) found that meet(s) all requirements:",
+        "<br/>Test name. <a href='#caps'>View all CA policies</a>."
+    ])
+
+    TestResult("MS.AAD.2.3v1", Output, ReportDetailStr, true) == true
 }
 
 test_UserExclusionsNoExempt_Incorrect_V2 if {
@@ -1835,8 +1885,9 @@ test_UserExclusionsNoExempt_Incorrect_V2 if {
         ]
     }
 
-    ReportDetailString := "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    IncorrectTestResult("MS.AAD.2.3v1", Output, ReportDetailString) == true
+    ReportDetailStr :=
+        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    TestResult("MS.AAD.2.3v1", Output, ReportDetailStr, false) == true
 }
 
 test_UserExclusionsSingleExempt_Incorrect_V2 if {
@@ -1897,8 +1948,9 @@ test_UserExclusionsSingleExempt_Incorrect_V2 if {
         }
     }
 
-    ReportDetailString := "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    IncorrectTestResult("MS.AAD.2.3v1", Output, ReportDetailString) == true
+    ReportDetailStr :=
+        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    TestResult("MS.AAD.2.3v1", Output, ReportDetailStr, false) == true
 }
 
 test_MultiUserExclusionsConditions_Correct_V2 if {
@@ -1960,8 +2012,12 @@ test_MultiUserExclusionsConditions_Correct_V2 if {
         }
     }
 
-    ReportDetailString := "1 conditional access policy(s) found that meet(s) all requirements:<br/>Test name. <a href='#caps'>View all CA policies</a>."
-    CorrectTestResult("MS.AAD.2.3v1", Output, ReportDetailString) == true
+    ReportDetailStr := concat("", [
+        "1 conditional access policy(s) found that meet(s) all requirements:",
+        "<br/>Test name. <a href='#caps'>View all CA policies</a>."
+    ])
+
+    TestResult("MS.AAD.2.3v1", Output, ReportDetailStr, true) == true
 }
 
 # Group Exclusion tests
@@ -2010,8 +2066,9 @@ test_GroupExclusionNoExempt_Incorrect_V2 if {
         ]
     }
 
-    ReportDetailString := "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    IncorrectTestResult("MS.AAD.2.3v1", Output, ReportDetailString) == true
+    ReportDetailStr :=
+        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    TestResult("MS.AAD.2.3v1", Output, ReportDetailStr, false) == true
 }
 
 test_GroupExclusionsConditions_Correct_V2 if {
@@ -2071,8 +2128,12 @@ test_GroupExclusionsConditions_Correct_V2 if {
         }
     }
 
-    ReportDetailString := "1 conditional access policy(s) found that meet(s) all requirements:<br/>Test name. <a href='#caps'>View all CA policies</a>."
-    CorrectTestResult("MS.AAD.2.3v1", Output, ReportDetailString) == true
+    ReportDetailStr := concat("", [
+        "1 conditional access policy(s) found that meet(s) all requirements:",
+        "<br/>Test name. <a href='#caps'>View all CA policies</a>."
+    ])
+
+    TestResult("MS.AAD.2.3v1", Output, ReportDetailStr, true) == true
 }
 
 test_GroupExclusionsNoExempt_Incorrect_V2 if {
@@ -2121,8 +2182,9 @@ test_GroupExclusionsNoExempt_Incorrect_V2 if {
         ]
     }
 
-    ReportDetailString := "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    IncorrectTestResult("MS.AAD.2.3v1", Output, ReportDetailString) == true
+    ReportDetailStr :=
+        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    TestResult("MS.AAD.2.3v1", Output, ReportDetailStr, false) == true
 }
 
 test_GroupExclusionsSingleExempt_Incorrect_V2 if {
@@ -2183,8 +2245,9 @@ test_GroupExclusionsSingleExempt_Incorrect_V2 if {
         }
     }
 
-    ReportDetailString := "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    IncorrectTestResult("MS.AAD.2.3v1", Output, ReportDetailString) == true
+    ReportDetailStr :=
+        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    TestResult("MS.AAD.2.3v1", Output, ReportDetailStr, false) == true
 }
 
 test_MultiGroupExclusionsConditions_Correct_V2 if {
@@ -2246,8 +2309,12 @@ test_MultiGroupExclusionsConditions_Correct_V2 if {
         }
     }
 
-    ReportDetailString := "1 conditional access policy(s) found that meet(s) all requirements:<br/>Test name. <a href='#caps'>View all CA policies</a>."
-    CorrectTestResult("MS.AAD.2.3v1", Output, ReportDetailString) == true
+    ReportDetailStr := concat("", [
+        "1 conditional access policy(s) found that meet(s) all requirements:",
+        "<br/>Test name. <a href='#caps'>View all CA policies</a>."
+    ])
+
+    TestResult("MS.AAD.2.3v1", Output, ReportDetailStr, true) == true
 }
 
 # User and group exclusions tests
@@ -2312,8 +2379,12 @@ test_UserGroupExclusionConditions_Correct_V2 if {
         }
     }
 
-    ReportDetailString := "1 conditional access policy(s) found that meet(s) all requirements:<br/>Test name. <a href='#caps'>View all CA policies</a>."
-    CorrectTestResult("MS.AAD.2.3v1", Output, ReportDetailString) == true
+    ReportDetailStr := concat("", [
+        "1 conditional access policy(s) found that meet(s) all requirements:",
+        "<br/>Test name. <a href='#caps'>View all CA policies</a>."
+    ])
+
+    TestResult("MS.AAD.2.3v1", Output, ReportDetailStr, true) == true
 }
 
 test_UserGroupExclusionNoExempt_Incorrect_V2 if {
@@ -2363,8 +2434,9 @@ test_UserGroupExclusionNoExempt_Incorrect_V2 if {
         ]
     }
 
-    ReportDetailString := "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    IncorrectTestResult("MS.AAD.2.3v1", Output, ReportDetailString) == true
+    ReportDetailStr :=
+        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    TestResult("MS.AAD.2.3v1", Output, ReportDetailStr, false) == true
 }
 
 test_UserGroupExclusionUserExemptOnly_Incorrect_V2 if {
@@ -2426,8 +2498,9 @@ test_UserGroupExclusionUserExemptOnly_Incorrect_V2 if {
         }
     }
 
-    ReportDetailString := "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    IncorrectTestResult("MS.AAD.2.3v1", Output, ReportDetailString) == true
+    ReportDetailStr :=
+        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    TestResult("MS.AAD.2.3v1", Output, ReportDetailStr, false) == true
 }
 
 test_UserGroupExclusionGroupExemptOnly_Incorrect_V2 if {
@@ -2489,8 +2562,9 @@ test_UserGroupExclusionGroupExemptOnly_Incorrect_V2 if {
         }
     }
 
-    ReportDetailString := "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    IncorrectTestResult("MS.AAD.2.3v1", Output, ReportDetailString) == true
+    ReportDetailStr :=
+        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    TestResult("MS.AAD.2.3v1", Output, ReportDetailStr, false) == true
 }
 
 test_UserGroupExclusionTooFewUserExempts_Incorrect_V2 if {
@@ -2555,8 +2629,9 @@ test_UserGroupExclusionTooFewUserExempts_Incorrect_V2 if {
         }
     }
 
-    ReportDetailString := "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    IncorrectTestResult("MS.AAD.2.3v1", Output, ReportDetailString) == true
+    ReportDetailStr :=
+        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    TestResult("MS.AAD.2.3v1", Output, ReportDetailStr, false) == true
 }
 
 # Other Conditions
@@ -2603,8 +2678,12 @@ test_Conditions_Correct if {
         ]
     }
 
-    ReportDetailString := "1 conditional access policy(s) found that meet(s) all requirements:<br/>Test name. <a href='#caps'>View all CA policies</a>."
-    CorrectTestResult("MS.AAD.2.3v1", Output, ReportDetailString) == true
+    ReportDetailStr := concat("", [
+        "1 conditional access policy(s) found that meet(s) all requirements:",
+        "<br/>Test name. <a href='#caps'>View all CA policies</a>."
+    ])
+
+    TestResult("MS.AAD.2.3v1", Output, ReportDetailStr, true) == true
 }
 
 test_IncludeApplications_Incorrect_V2 if {
@@ -2650,8 +2729,9 @@ test_IncludeApplications_Incorrect_V2 if {
         ]
     }
 
-    ReportDetailString := "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    IncorrectTestResult("MS.AAD.2.3v1", Output, ReportDetailString) == true
+    ReportDetailStr :=
+        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    TestResult("MS.AAD.2.3v1", Output, ReportDetailStr, false) == true
 }
 
 test_IncludeUsers_Incorrect_V2 if {
@@ -2697,8 +2777,9 @@ test_IncludeUsers_Incorrect_V2 if {
         ]
     }
 
-    ReportDetailString := "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    IncorrectTestResult("MS.AAD.2.3v1", Output, ReportDetailString) == true
+    ReportDetailStr :=
+        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    TestResult("MS.AAD.2.3v1", Output, ReportDetailStr, false) == true
 }
 
 test_ExcludeUsers_Incorrect_V2 if {
@@ -2746,8 +2827,9 @@ test_ExcludeUsers_Incorrect_V2 if {
         ]
     }
 
-    ReportDetailString := "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    IncorrectTestResult("MS.AAD.2.3v1", Output, ReportDetailString) == true
+    ReportDetailStr :=
+        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    TestResult("MS.AAD.2.3v1", Output, ReportDetailStr, false) == true
 }
 
 test_ExcludeGroups_Incorrect_V2 if {
@@ -2795,8 +2877,9 @@ test_ExcludeGroups_Incorrect_V2 if {
         ]
     }
 
-    ReportDetailString := "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    IncorrectTestResult("MS.AAD.2.3v1", Output, ReportDetailString) == true
+    ReportDetailStr :=
+        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    TestResult("MS.AAD.2.3v1", Output, ReportDetailStr, false) == true
 }
 
 test_ExcludeRoles_Incorrect_V2 if {
@@ -2844,8 +2927,9 @@ test_ExcludeRoles_Incorrect_V2 if {
         ]
     }
 
-    ReportDetailString := "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    IncorrectTestResult("MS.AAD.2.3v1", Output, ReportDetailString) == true
+    ReportDetailStr :=
+        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    TestResult("MS.AAD.2.3v1", Output, ReportDetailStr, false) == true
 }
 
 test_SignInRiskLevels_Incorrect if {
@@ -2891,8 +2975,9 @@ test_SignInRiskLevels_Incorrect if {
         ]
     }
 
-    ReportDetailString := "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    IncorrectTestResult("MS.AAD.2.3v1", Output, ReportDetailString) == true
+    ReportDetailStr :=
+        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    TestResult("MS.AAD.2.3v1", Output, ReportDetailStr, false) == true
 }
 
 test_BuiltInControls_Incorrect_V2 if {
@@ -2938,8 +3023,9 @@ test_BuiltInControls_Incorrect_V2 if {
         ]
     }
 
-    ReportDetailString := "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    IncorrectTestResult("MS.AAD.2.3v1", Output, ReportDetailString) == true
+    ReportDetailStr :=
+        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    TestResult("MS.AAD.2.3v1", Output, ReportDetailStr, false) == true
 }
 
 test_State_Incorrect_V2 if {
@@ -2985,7 +3071,8 @@ test_State_Incorrect_V2 if {
         ]
     }
 
-    ReportDetailString := "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    IncorrectTestResult("MS.AAD.2.3v1", Output, ReportDetailString) == true
+    ReportDetailStr :=
+        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    TestResult("MS.AAD.2.3v1", Output, ReportDetailStr, false) == true
 }
 #--

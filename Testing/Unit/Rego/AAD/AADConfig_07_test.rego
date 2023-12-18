@@ -1,33 +1,14 @@
 package aad_test
 import future.keywords
 import data.aad
-import data.report.utils.NotCheckedDetails
-import data.report.utils.ReportDetailsBoolean
-
-
-CorrectTestResult(PolicyId, Output, ReportDetailString) := true if {
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == true
-    RuleOutput[0].ReportDetails == ReportDetailString
-} else := false
-
-IncorrectTestResult(PolicyId, Output, ReportDetailString) := true if {
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == false
-    RuleOutput[0].ReportDetails == ReportDetailString
-} else := false
-
-FAIL := ReportDetailsBoolean(false)
-
-PASS := ReportDetailsBoolean(true)
+import data.utils.report.NotCheckedDetails
+import data.utils.key.TestResult
+import data.utils.key.FAIL
+import data.utils.key.PASS
 
 
 #
-# MS.AAD.7.1v1
+# Policy MS.AAD.7.1v1
 #--
 test_PrivilegedUsers_Correct if {
     Output := aad.tests with input as {
@@ -49,7 +30,7 @@ test_PrivilegedUsers_Correct if {
     }
 
     ReportDetailString := "2 global admin(s) found:<br/>Test Name1, Test Name2"
-    CorrectTestResult("MS.AAD.7.1v1", Output, ReportDetailString) == true
+    TestResult("MS.AAD.7.1v1", Output, ReportDetailString, true) == true
 }
 
 test_PrivilegedUsers_Incorrect_V1 if {
@@ -66,7 +47,7 @@ test_PrivilegedUsers_Incorrect_V1 if {
     }
 
     ReportDetailString := "1 global admin(s) found:<br/>Test Name1"
-    IncorrectTestResult("MS.AAD.7.1v1", Output, ReportDetailString) == true
+    TestResult("MS.AAD.7.1v1", Output, ReportDetailString, false) == true
 }
 
 test_PrivilegedUsers_Incorrect_V2 if {
@@ -130,13 +111,17 @@ test_PrivilegedUsers_Incorrect_V2 if {
         }
     }
 
-    ReportDetailString := "9 global admin(s) found:<br/>Test Name1, Test Name2, Test Name3, Test Name4, Test Name5, Test Name6, Test Name7, Test Name8, Test Name9"
-    IncorrectTestResult("MS.AAD.7.1v1", Output, ReportDetailString) == true
+    ReportDetailString := concat(" ", [
+        "9 global admin(s) found:<br/>Test Name1, Test Name2, Test Name3,",
+        "Test Name4, Test Name5, Test Name6, Test Name7, Test Name8, Test Name9"
+    ])
+
+    TestResult("MS.AAD.7.1v1", Output, ReportDetailString, false) == true
 }
 #--
 
 #--
-# MS.AAD.7.2v1
+# Policy MS.AAD.7.2v1
 #--
 test_NotImplemented_Correct if {
     PolicyId := "MS.AAD.7.2v1"
@@ -144,12 +129,12 @@ test_NotImplemented_Correct if {
     Output := aad.tests with input as { }
 
     ReportDetailString := NotCheckedDetails(PolicyId)
-    IncorrectTestResult(PolicyId, Output, ReportDetailString) == true
+    TestResult(PolicyId, Output, ReportDetailString, false) == true
 }
 #--
 
 #--
-# MS.AAD.7.3v1
+# Policy MS.AAD.7.3v1
 #--
 test_OnPremisesImmutableId_Correct if {
     Output := aad.tests with input as {
@@ -173,7 +158,7 @@ test_OnPremisesImmutableId_Correct if {
     }
 
     ReportDetailString := "0 admin(s) that are not cloud-only found"
-    CorrectTestResult("MS.AAD.7.3v1", Output, ReportDetailString) == true
+    TestResult("MS.AAD.7.3v1", Output, ReportDetailString, true) == true
 }
 
 test_OnPremisesImmutableId_Incorrect_V1 if {
@@ -191,7 +176,7 @@ test_OnPremisesImmutableId_Incorrect_V1 if {
     }
 
     ReportDetailString := "1 admin(s) that are not cloud-only found:<br/>Alice"
-    IncorrectTestResult("MS.AAD.7.3v1", Output, ReportDetailString) == true
+    TestResult("MS.AAD.7.3v1", Output, ReportDetailString, false) == true
 }
 
 test_OnPremisesImmutableId_Incorrect_V2 if {
@@ -216,11 +201,11 @@ test_OnPremisesImmutableId_Incorrect_V2 if {
     }
 
     ReportDetailString := "1 admin(s) that are not cloud-only found:<br/>Alice"
-    IncorrectTestResult("MS.AAD.7.3v1", Output, ReportDetailString) == true
+    TestResult("MS.AAD.7.3v1", Output, ReportDetailString, false) == true
 }
 #--
 
-# MS.AAD.7.4v1
+# Policy MS.AAD.7.4v1
 #--
 test_AdditionalProperties_Correct_V1 if {
     Output := aad.tests with input as {
@@ -248,7 +233,7 @@ test_AdditionalProperties_Correct_V1 if {
     }
 
     ReportDetailString := "0 role(s) that contain users with permanent active assignment"
-    CorrectTestResult("MS.AAD.7.4v1", Output, ReportDetailString) == true
+    TestResult("MS.AAD.7.4v1", Output, ReportDetailString, true) == true
 }
 
 test_AdditionalProperties_Correct_V2 if {
@@ -289,7 +274,7 @@ test_AdditionalProperties_Correct_V2 if {
     }
 
     ReportDetailString := "0 role(s) that contain users with permanent active assignment"
-    CorrectTestResult("MS.AAD.7.4v1", Output, ReportDetailString) == true
+    TestResult("MS.AAD.7.4v1", Output, ReportDetailString, true) == true
 }
 
 test_AdditionalProperties_Correct_V3 if {
@@ -330,12 +315,10 @@ test_AdditionalProperties_Correct_V3 if {
     }
 
     ReportDetailString := "0 role(s) that contain users with permanent active assignment"
-    CorrectTestResult("MS.AAD.7.4v1", Output, ReportDetailString) == true
+    TestResult("MS.AAD.7.4v1", Output, ReportDetailString, true) == true
 }
 
 test_AdditionalProperties_LicenseMissing_V1 if {
-    PolicyId := "MS.AAD.7.4v1"
-
     Output := aad.tests with input as {
         "privileged_roles": [
             {
@@ -371,11 +354,9 @@ test_AdditionalProperties_LicenseMissing_V1 if {
         }
     }
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
-    count(RuleOutput) == 1
-    not RuleOutput[0].RequirementMet
-    RuleOutput[0].ReportDetails == "**NOTE: Your tenant does not have a Microsoft Entra ID P2 license, which is required for this feature**"
+    ReportDetailString :=
+        "**NOTE: Your tenant does not have a Microsoft Entra ID P2 license, which is required for this feature**"
+    TestResult("MS.AAD.7.4v1", Output, ReportDetailString, false) == true
 }
 
 test_AdditionalProperties_Incorrect_V1 if {
@@ -404,7 +385,7 @@ test_AdditionalProperties_Incorrect_V1 if {
     }
 
     ReportDetailString := "1 role(s) that contain users with permanent active assignment:<br/>Global Administrator"
-    IncorrectTestResult("MS.AAD.7.4v1", Output, ReportDetailString) == true
+    TestResult("MS.AAD.7.4v1", Output, ReportDetailString, false) == true
 }
 
 test_AdditionalProperties_Incorrect_V2 if {
@@ -442,7 +423,7 @@ test_AdditionalProperties_Incorrect_V2 if {
     }
 
     ReportDetailString := "1 role(s) that contain users with permanent active assignment:<br/>Global Administrator"
-    IncorrectTestResult("MS.AAD.7.4v1", Output, ReportDetailString) == true
+    TestResult("MS.AAD.7.4v1", Output, ReportDetailString, false) == true
 }
 
 test_AdditionalProperties_Incorrect_V3 if {
@@ -479,8 +460,12 @@ test_AdditionalProperties_Incorrect_V3 if {
         ]
     }
 
-    ReportDetailString := "2 role(s) that contain users with permanent active assignment:<br/>Application Administrator, Global Administrator"
-    IncorrectTestResult("MS.AAD.7.4v1", Output, ReportDetailString) == true
+    ReportDetailString := concat("", [
+        "2 role(s) that contain users with permanent active assignment:",
+        "<br/>Application Administrator, Global Administrator"
+    ])
+
+    TestResult("MS.AAD.7.4v1", Output, ReportDetailString, false) == true
 }
 
 test_AdditionalProperties_Incorrect_V4 if {
@@ -521,8 +506,12 @@ test_AdditionalProperties_Incorrect_V4 if {
         ]
     }
 
-    ReportDetailString := "2 role(s) that contain users with permanent active assignment:<br/>Application Administrator, Global Administrator"
-    IncorrectTestResult("MS.AAD.7.4v1", Output, ReportDetailString) == true
+    ReportDetailString := concat("", [
+        "2 role(s) that contain users with permanent active assignment:",
+        "<br/>Application Administrator, Global Administrator"
+    ])
+
+    TestResult("MS.AAD.7.4v1", Output, ReportDetailString, false) == true
 }
 
 test_AdditionalProperties_Incorrect_V5 if {
@@ -563,7 +552,7 @@ test_AdditionalProperties_Incorrect_V5 if {
     }
 
     ReportDetailString := "1 role(s) that contain users with permanent active assignment:<br/>Global Administrator"
-    IncorrectTestResult("MS.AAD.7.4v1", Output, ReportDetailString) == true
+    TestResult("MS.AAD.7.4v1", Output, ReportDetailString, false) == true
 }
 
 test_AdditionalProperties_Incorrect_V6 if {
@@ -613,7 +602,7 @@ test_AdditionalProperties_Incorrect_V6 if {
     }
 
     ReportDetailString := "1 role(s) that contain users with permanent active assignment:<br/>Global Administrator"
-    IncorrectTestResult("MS.AAD.7.4v1", Output, ReportDetailString) == true
+    TestResult("MS.AAD.7.4v1", Output, ReportDetailString, false) == true
 }
 
 test_AdditionalProperties_Incorrect_V7 if {
@@ -662,8 +651,12 @@ test_AdditionalProperties_Incorrect_V7 if {
         }
     }
 
-    ReportDetailString := "2 role(s) that contain users with permanent active assignment:<br/>Application Administrator, Global Administrator"
-    IncorrectTestResult("MS.AAD.7.4v1", Output, ReportDetailString) == true
+    ReportDetailString := concat("", [
+        "2 role(s) that contain users with permanent active assignment:",
+        "<br/>Application Administrator, Global Administrator"
+    ])
+
+    TestResult("MS.AAD.7.4v1", Output, ReportDetailString, false) == true
 }
 
 test_AdditionalProperties_Incorrect_V8 if {
@@ -716,8 +709,12 @@ test_AdditionalProperties_Incorrect_V8 if {
         }
     }
 
-    ReportDetailString := "2 role(s) that contain users with permanent active assignment:<br/>Application Administrator, Global Administrator"
-    IncorrectTestResult("MS.AAD.7.4v1", Output, ReportDetailString) == true
+    ReportDetailString := concat("", [
+        "2 role(s) that contain users with permanent active assignment:",
+        "<br/>Application Administrator, Global Administrator"
+    ])
+
+    TestResult("MS.AAD.7.4v1", Output, ReportDetailString, false) == true
 }
 
 test_AdditionalProperties_Incorrect_V9 if {
@@ -767,7 +764,7 @@ test_AdditionalProperties_Incorrect_V9 if {
     }
 
     ReportDetailString := "1 role(s) that contain users with permanent active assignment:<br/>Global Administrator"
-    IncorrectTestResult("MS.AAD.7.4v1", Output, ReportDetailString) == true
+    TestResult("MS.AAD.7.4v1", Output, ReportDetailString, false) == true
 }
 
 test_AdditionalProperties_Incorrect_V10 if {
@@ -808,7 +805,7 @@ test_AdditionalProperties_Incorrect_V10 if {
     }
 
     ReportDetailString := "1 role(s) that contain users with permanent active assignment:<br/>Global Administrator"
-    IncorrectTestResult("MS.AAD.7.4v1", Output, ReportDetailString) == true
+    TestResult("MS.AAD.7.4v1", Output, ReportDetailString, false) == true
 }
 
 test_AdditionalProperties_Incorrect_V11 if {
@@ -858,7 +855,7 @@ test_AdditionalProperties_Incorrect_V11 if {
     }
 
     ReportDetailString := "1 role(s) that contain users with permanent active assignment:<br/>Global Administrator"
-    IncorrectTestResult("MS.AAD.7.4v1", Output, ReportDetailString) == true
+    TestResult("MS.AAD.7.4v1", Output, ReportDetailString, false) == true
 }
 
 test_AdditionalProperties_Incorrect_V12 if {
@@ -907,8 +904,12 @@ test_AdditionalProperties_Incorrect_V12 if {
         }
     }
 
-    ReportDetailString := "2 role(s) that contain users with permanent active assignment:<br/>Application Administrator, Global Administrator"
-    IncorrectTestResult("MS.AAD.7.4v1", Output, ReportDetailString) == true
+    ReportDetailString := concat("", [
+        "2 role(s) that contain users with permanent active assignment:",
+        "<br/>Application Administrator, Global Administrator"
+    ])
+
+    TestResult("MS.AAD.7.4v1", Output, ReportDetailString, false) == true
 }
 
 test_AdditionalProperties_Incorrect_V13 if {
@@ -961,8 +962,12 @@ test_AdditionalProperties_Incorrect_V13 if {
         }
     }
 
-    ReportDetailString := "2 role(s) that contain users with permanent active assignment:<br/>Application Administrator, Global Administrator"
-    IncorrectTestResult("MS.AAD.7.4v1", Output, ReportDetailString) == true
+    ReportDetailString := concat("", [
+        "2 role(s) that contain users with permanent active assignment:",
+        "<br/>Application Administrator, Global Administrator"
+    ])
+
+    TestResult("MS.AAD.7.4v1", Output, ReportDetailString, false) == true
 }
 
 test_AdditionalProperties_Incorrect_V14 if {
@@ -1012,12 +1017,12 @@ test_AdditionalProperties_Incorrect_V14 if {
     }
 
     ReportDetailString := "1 role(s) that contain users with permanent active assignment:<br/>Global Administrator"
-    IncorrectTestResult("MS.AAD.7.4v1", Output, ReportDetailString) == true
+    TestResult("MS.AAD.7.4v1", Output, ReportDetailString, false) == true
 }
 #--
 
 #
-# MS.AAD.7.5v1
+# Policy MS.AAD.7.5v1
 #--
 test_Assignments_Correct if {
     Output := aad.tests with input as {
@@ -1053,7 +1058,7 @@ test_Assignments_Correct if {
     }
 
     ReportDetailString := "0 role(s) assigned to users outside of PIM"
-    CorrectTestResult("MS.AAD.7.5v1", Output, ReportDetailString) == true
+    TestResult("MS.AAD.7.5v1", Output, ReportDetailString, true) == true
 }
 
 test_Assignments_Incorrect if {
@@ -1090,14 +1095,14 @@ test_Assignments_Incorrect if {
     }
 
     ReportDetailString := "1 role(s) assigned to users outside of PIM:<br/>Global Administrator"
-    IncorrectTestResult("MS.AAD.7.5v1", Output, ReportDetailString) == true
+    TestResult("MS.AAD.7.5v1", Output, ReportDetailString, false) == true
 }
 #--
 
 #
-# MS.AAD.7.6v1
+# Policy MS.AAD.7.6v1
 #--
-test_AdditionalProperties_Correct_V2 if {
+test_AdditionalProperties_Correct_V4 if {
     Output := aad.tests with input as {
         "privileged_roles": [
             {
@@ -1126,10 +1131,10 @@ test_AdditionalProperties_Correct_V2 if {
         ]
     }
 
-    CorrectTestResult("MS.AAD.7.6v1", Output, PASS) == true
+    TestResult("MS.AAD.7.6v1", Output, PASS, true) == true
 }
 
-test_AdditionalProperties_Correct_V3 if {
+test_AdditionalProperties_Correct_V5 if {
     Output := aad.tests with input as {
         "privileged_roles": [
             {
@@ -1171,10 +1176,10 @@ test_AdditionalProperties_Correct_V3 if {
         ]
     }
 
-    CorrectTestResult("MS.AAD.7.6v1", Output, PASS) == true
+    TestResult("MS.AAD.7.6v1", Output, PASS, true) == true
 }
 
-test_AdditionalProperties_Incorrect_V3 if {
+test_AdditionalProperties_Incorrect_V15 if {
     Output := aad.tests with input as {
         "privileged_roles": [
             {
@@ -1203,12 +1208,12 @@ test_AdditionalProperties_Incorrect_V3 if {
         ]
     }
 
-    IncorrectTestResult("MS.AAD.7.6v1", Output, FAIL) == true
+    TestResult("MS.AAD.7.6v1", Output, FAIL, false) == true
 }
 #--
 
 #
-# MS.AAD.7.7v1
+# Policy MS.AAD.7.7v1
 #--
 test_notificationRecipients_Correct if {
     Output := aad.tests with input as {
@@ -1249,7 +1254,7 @@ test_notificationRecipients_Correct if {
     }
 
     ReportDetailString := "0 role(s) without notification e-mail configured for role assignments found"
-    CorrectTestResult("MS.AAD.7.7v1", Output, ReportDetailString) == true
+    TestResult("MS.AAD.7.7v1", Output, ReportDetailString, true) == true
 }
 
 test_notificationRecipients_Incorrect_V1 if {
@@ -1288,8 +1293,9 @@ test_notificationRecipients_Incorrect_V1 if {
         ]
     }
 
-    ReportDetailString := "1 role(s) without notification e-mail configured for role assignments found:<br/>Global Administrator"
-    IncorrectTestResult("MS.AAD.7.7v1", Output, ReportDetailString) == true
+    ReportDetailString :=
+        "1 role(s) without notification e-mail configured for role assignments found:<br/>Global Administrator"
+    TestResult("MS.AAD.7.7v1", Output, ReportDetailString, false) == true
 }
 
 test_notificationRecipients_Incorrect_V2 if {
@@ -1328,8 +1334,9 @@ test_notificationRecipients_Incorrect_V2 if {
         ]
     }
 
-    ReportDetailString := "1 role(s) without notification e-mail configured for role assignments found:<br/>Global Administrator"
-    IncorrectTestResult("MS.AAD.7.7v1", Output, ReportDetailString) == true
+    ReportDetailString :=
+        "1 role(s) without notification e-mail configured for role assignments found:<br/>Global Administrator"
+    TestResult("MS.AAD.7.7v1", Output, ReportDetailString, false) == true
 }
 
 test_notificationRecipients_Incorrect_V3 if {
@@ -1366,13 +1373,14 @@ test_notificationRecipients_Incorrect_V3 if {
         ]
     }
 
-    ReportDetailString := "1 role(s) without notification e-mail configured for role assignments found:<br/>Global Administrator"
-    IncorrectTestResult("MS.AAD.7.7v1", Output, ReportDetailString) == true
+    ReportDetailString :=
+        "1 role(s) without notification e-mail configured for role assignments found:<br/>Global Administrator"
+    TestResult("MS.AAD.7.7v1", Output, ReportDetailString, false) == true
 }
 #--
 
 #
-# MS.AAD.7.8v1
+# Policy MS.AAD.7.8v1
 #--
 test_Id_Correct_V1 if {
     Output := aad.tests with input as {
@@ -1405,7 +1413,7 @@ test_Id_Correct_V1 if {
         ]
     }
 
-    CorrectTestResult("MS.AAD.7.8v1", Output, PASS) == true
+    TestResult("MS.AAD.7.8v1", Output, PASS, true) == true
 }
 
 test_Id_Correct_V2 if {
@@ -1439,7 +1447,7 @@ test_Id_Correct_V2 if {
         ]
     }
 
-    CorrectTestResult("MS.AAD.7.8v1", Output, PASS) == true
+    TestResult("MS.AAD.7.8v1", Output, PASS, true) == true
 }
 
 test_Id_Incorrect if {
@@ -1471,12 +1479,12 @@ test_Id_Incorrect if {
         ]
     }
 
-    IncorrectTestResult("MS.AAD.7.8v1", Output, FAIL) == true
+    TestResult("MS.AAD.7.8v1", Output, FAIL, false) == true
 }
 #--
 
 #
-# MS.AAD.7.9v1
+# Policy MS.AAD.7.9v1
 #--
 
 test_DisplayName_Correct if {
@@ -1509,7 +1517,7 @@ test_DisplayName_Correct if {
     }
 
     ReportDetailString := "0 role(s) without notification e-mail configured for role activations found"
-    CorrectTestResult("MS.AAD.7.9v1", Output, ReportDetailString) == true
+    TestResult("MS.AAD.7.9v1", Output, ReportDetailString, true) == true
 }
 
 test_DisplayName_Incorrect if {
@@ -1541,7 +1549,8 @@ test_DisplayName_Incorrect if {
         ]
     }
 
-    ReportDetailString := "1 role(s) without notification e-mail configured for role activations found:<br/>Cloud Administrator"
-    IncorrectTestResult("MS.AAD.7.9v1", Output, ReportDetailString) == true
+    ReportDetailString :=
+        "1 role(s) without notification e-mail configured for role activations found:<br/>Cloud Administrator"
+    TestResult("MS.AAD.7.9v1", Output, ReportDetailString, false) == true
 }
 #--

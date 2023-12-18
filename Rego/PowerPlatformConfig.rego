@@ -1,16 +1,10 @@
 package powerplatform
 import future.keywords
-import data.report.utils.NotCheckedDetails
-import data.report.utils.Format
-import data.report.utils.ReportDetailsBoolean
-import data.report.utils.Description
-import data.report.utils.ReportDetailsString
-
-ReportDetailsArray(true, _, _) := ReportDetailsBoolean(true) if {}
-
-ReportDetailsArray(false, Array, String) := Description(Format(Array), String, concat(", ", Array)) if {}
-
-FilterArray(Conditions, Boolean) := [Condition | some Condition in Conditions; Condition == Boolean]
+import data.utils.report.NotCheckedDetails
+import data.utils.report.ReportDetailsString
+import data.utils.report.ReportDetailsBoolean
+import data.utils.report.ReportDetailsArray
+import data.utils.key.FilterArray
 
 
 ######################
@@ -88,6 +82,7 @@ tests contains {
 # Iterate through all policies. For each, check if the environment the policy applies to
 # is the default environment. If so, save the policy name to the DefaultEnvPolicies list.
 DefaultEnvPolicies contains {"PolicyName": Policies.displayName} if {
+    # regal ignore:prefer-some-in-iteration
     some Policies in input.dlp_policies[_].value
     some Env in Policies.environments
     Env.name == concat("-", ["Default", input.tenant_id])
@@ -119,6 +114,7 @@ AllEnvironments contains EnvironmentList.EnvironmentName if {
 
 # gets the list of all environments with policies applied to them
 EnvWithPolicies contains Env.name if {
+    # regal ignore:prefer-some-in-iteration
     some Policies in input.dlp_policies[_].value
     some Env in Policies.environments
 }
@@ -174,6 +170,7 @@ tests contains {
 # gets the set of connectors that are allowed in the default environment
 # general and confidential groups refer to business and non-business
 ConnectorSet contains Connector.id if {
+    # regal ignore:prefer-some-in-iteration
     some Policies in input.dlp_policies[_].value
     some Group in Policies.connectorGroups
     Conditions := [

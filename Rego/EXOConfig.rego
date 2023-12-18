@@ -1,21 +1,14 @@
 package exo
 import future.keywords
-import data.report.utils.NotCheckedDetails
-import data.report.utils.DefenderMirrorDetails
-import data.report.utils.Format
-import data.report.utils.ReportDetailsBoolean
-import data.report.utils.Description
-import data.report.utils.ReportDetailsString
+import data.utils.report.NotCheckedDetails
+import data.utils.report.DefenderMirrorDetails
+import data.utils.report.ArraySizeStr
+import data.utils.report.ReportDetailsBoolean
+import data.utils.report.Description
+import data.utils.report.ReportDetailsString
+import data.utils.report.ReportDetailsArray
+import data.utils.key.FilterArray
 
-ReportDetailsArray(true, _, _) := ReportDetailsBoolean(true) if {}
-
-ReportDetailsArray(false, NumeratorArr, DenominatorArr) := ReportStr if {
-    FractionStr := concat(" of ", [Format(NumeratorArr), Format(DenominatorArr)])
-    NumeratorStr := concat(", ", NumeratorArr)
-    ReportStr := Description(FractionStr, "agency domain(s) found in violation:", NumeratorStr)
-}
-
-FilterArray(Conditions, Boolean) := [Condition | some Condition in Conditions; Condition == Boolean]
 
 # this should be allowed https://github.com/StyraInc/regal/issues/415
 # regal ignore:prefer-set-or-object-rule
@@ -47,7 +40,7 @@ tests contains {
 } if {
     Domains := RemoteDomainsAllowingForwarding
     ErrString := "remote domain(s) that allows automatic forwarding:"
-    ErrMessage := Description(Format(Domains), ErrString , concat(", ", Domains))
+    ErrMessage := Description([ArraySizeStr(Domains), ErrString , concat(", ", Domains)])
     Status := count(Domains) == 0
 }
 #--
@@ -88,12 +81,9 @@ DomainsWithoutSpf contains DNSResponse.domain if {
 tests contains {
     "PolicyId": "MS.EXO.2.2v1",
     "Criticality": "Shall",
-    "Commandlet": [
-        "Get-ScubaSpfRecords",
-        "Get-AcceptedDomain"
-    ],
+    "Commandlet": ["Get-ScubaSpfRecords", "Get-AcceptedDomain"],
     "ActualValue": Domains,
-    "ReportDetails": ReportDetailsArray(Status, Domains, AllDomains),
+    "ReportDetails": ReportDetailsArray(Status, Domains, "agency domain(s) found in violation:"),
     "RequirementMet": Status
 } if {
     Domains := DomainsWithoutSpf
@@ -132,11 +122,8 @@ tests contains {
         "Get-ScubaDkimRecords",
         "Get-AcceptedDomain"
     ],
-    "ActualValue": [
-        input.dkim_records,
-        input.dkim_config
-    ],
-    "ReportDetails": ReportDetailsArray(Status, DomainsWithoutDkim, AllDomains),
+    "ActualValue": [input.dkim_records, input.dkim_config],
+    "ReportDetails": ReportDetailsArray(Status, DomainsWithoutDkim, "agency domain(s) found in violation:"),
     "RequirementMet": Status
 } if {
     # Get domains that are not in DomainsWithDkim array
@@ -171,7 +158,7 @@ tests contains {
         "Get-AcceptedDomain"
     ],
     "ActualValue": input.dmarc_records,
-    "ReportDetails": ReportDetailsArray(Status, Domains, AllDomains),
+    "ReportDetails": ReportDetailsArray(Status, Domains, "agency domain(s) found in violation:"),
     "RequirementMet": Status
 } if {
     Domains := DomainsWithoutDmarc
@@ -200,7 +187,7 @@ tests contains {
         "Get-AcceptedDomain"
     ],
     "ActualValue": input.dmarc_records,
-    "ReportDetails": ReportDetailsArray(Status, Domains, AllDomains),
+    "ReportDetails": ReportDetailsArray(Status, Domains, "agency domain(s) found in violation:"),
     "RequirementMet": Status
 } if {
     Domains := DomainsWithoutPreject
@@ -240,7 +227,7 @@ tests contains {
         "Get-AcceptedDomain"
     ],
     "ActualValue": input.dmarc_records,
-    "ReportDetails": ReportDetailsArray(Status, Domains, AllDomains),
+    "ReportDetails": ReportDetailsArray(Status, Domains, "agency domain(s) found in violation:"),
     "RequirementMet": Status
 } if {
     Domains := DomainsWithoutDHSContact
@@ -296,7 +283,7 @@ tests contains {
         "Get-AcceptedDomain"
     ],
     "ActualValue": input.dmarc_records,
-    "ReportDetails": ReportDetailsArray(Status, Domains, AllDomains),
+    "ReportDetails": ReportDetailsArray(Status, Domains, "agency domain(s) found in violation:"),
     "RequirementMet": Status
 } if {
     Domains := DomainsWithoutAgencyContact
@@ -362,7 +349,11 @@ tests contains {
 } if {
     ContactsSharingPolicies := SharingPolicyContactsAllowedAllDomains
     ErrString := "sharing polic(ies) are sharing contacts folders with all domains by default:"
-    ErrMessage := Description(Format(ContactsSharingPolicies), ErrString , concat(", ", ContactsSharingPolicies))
+    ErrMessage := Description([
+        ArraySizeStr(ContactsSharingPolicies),
+        ErrString ,
+        concat(", ", ContactsSharingPolicies)
+    ])
     Status := count(ContactsSharingPolicies) == 0
 }
 #--
@@ -391,7 +382,11 @@ tests contains {
 } if {
     CalendarSharingPolicies := SharingPolicyCalendarAllowedAllDomains
     ErrString := "sharing polic(ies) are sharing calendar details with all domains by default:"
-    ErrMessage := Description(Format(CalendarSharingPolicies), ErrString , concat(", ", CalendarSharingPolicies))
+    ErrMessage := Description([
+        ArraySizeStr(CalendarSharingPolicies),
+        ErrString ,
+        concat(", ", CalendarSharingPolicies)
+    ])
     Status := count(CalendarSharingPolicies) == 0
 }
 #--
@@ -641,7 +636,7 @@ tests contains {
 } if {
     ConnFilterPolicies := ConnFiltersWithIPAllowList
     ErrString := "connection filter polic(ies) with an IP allowlist:"
-    ErrMessage := Description(Format(ConnFilterPolicies), ErrString , concat(", ", ConnFilterPolicies))
+    ErrMessage := Description([ArraySizeStr(ConnFilterPolicies), ErrString , concat(", ", ConnFilterPolicies)])
     Status := count(ConnFilterPolicies) == 0
 }
 #--
@@ -668,7 +663,7 @@ tests contains {
 } if {
     ConnFilterPolicies := ConnFiltersWithSafeList
     ErrString := "connection filter polic(ies) with a safe list:"
-    ErrMessage := Description(Format(ConnFilterPolicies), ErrString , concat(", ", ConnFilterPolicies))
+    ErrMessage := Description([ArraySizeStr(ConnFilterPolicies), ErrString , concat(", ", ConnFilterPolicies)])
     Status := count(ConnFilterPolicies) == 0
 }
 #--

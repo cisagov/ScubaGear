@@ -1,16 +1,16 @@
 package sharepoint
 import future.keywords
-import data.report.utils.NotCheckedDetails
-import data.report.utils.ReportDetailsBoolean
-import data.report.utils.ReportDetailsString
+import data.utils.report.NotCheckedDetails
+import data.utils.report.ReportDetailsBoolean
+import data.utils.report.ReportDetailsString
+import data.utils.key.FilterArray
+import data.utils.key.FAIL
+import data.utils.key.PASS
+
 
 #############
 # Constants #
 #############
-
-FAIL := ReportDetailsBoolean(false)
-
-PASS := ReportDetailsBoolean(true)
 
 # Values in json for slider sharepoint/onedrive sharing settings
 ONLYPEOPLEINORG := 0
@@ -21,7 +21,6 @@ NEWANDEXISTINGGUESTS := 1
 
 ANYONE := 2
 
-FilterArray(Conditions, Boolean) := [Condition | some Condition in Conditions; Condition == Boolean]
 
 ###################
 # MS.SHAREPOINT.1 #
@@ -239,9 +238,12 @@ ExternalUserExpireInDays(TenantPolicy) := ["", true] if {
 # The error message is concatanated by 2 steps to insert the
 # result of ReportBoolean in front, & the setting in the middle.
 SHARINGCAPABILITY := "New and Existing Guests" if
+    # regal ignore:prefer-some-in-iteration
     input.SPO_tenant[_].SharingCapability == NEWANDEXISTINGGUESTS
 
-SHARINGCAPABILITY := "Anyone" if input.SPO_tenant[_].SharingCapability == ANYONE
+SHARINGCAPABILITY := "Anyone" if
+    # regal ignore:prefer-some-in-iteration
+    input.SPO_tenant[_].SharingCapability == ANYONE
 
 ERRSTRING := concat(" ", [
     "External Sharing is set to",

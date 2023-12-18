@@ -1,24 +1,11 @@
 package teams
 import future.keywords
-import data.report.utils.Format
-import data.report.utils.ReportDetailsBoolean
-import data.report.utils.Description
-import data.report.utils.DefenderMirrorDetails
-
-ReportDetailsArray(true, _, _) := PASS if {}
-
-ReportDetailsArray(false, Array, String) := Description(Format(Array), String, concat(", ", Array)) if {}
-
-FilterArray(Conditions, Boolean) := [Condition | some Condition in Conditions; Condition == Boolean]
-
-#############
-# Constants #
-#############
-
-FAIL := ReportDetailsBoolean(false)
-
-PASS := ReportDetailsBoolean(true)
-
+import data.utils.report.ReportDetailsBoolean
+import data.utils.report.DefenderMirrorDetails
+import data.utils.report.ReportDetailsArray
+import data.utils.key.FilterArray
+import data.utils.key.FAIL
+import data.utils.key.PASS
 
 
 ##############
