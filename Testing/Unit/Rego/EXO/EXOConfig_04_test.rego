@@ -138,7 +138,7 @@ test_Rdata_Correct_V2 if {
     TestResult("MS.EXO.4.2v1", Output, PASS, true) == true
 }
 
-# IGNORE line length linter warning
+# regal ignore:line-length
 test_Rdata_Incorrect_V4 if {
     Output := exo.tests with input as {
         "dmarc_records": [
@@ -291,7 +291,7 @@ test_DMARCReport_Incorrect_V3 if {
 #--
 
 # 2 emails in rua= and 1 in ruf
-# IGNORE line length linter warning
+# regal ignore:line-length
 test_POC_Correct_V1 if {
     Output := exo.tests with input as {
         "dmarc_records": [
@@ -316,7 +316,7 @@ test_POC_Correct_V1 if {
 }
 
 # 2+ emails in rua= and 1+ in ruf
-# IGNORE line length linter warning
+# regal ignore:line-length
 test_POC_Correct_V2 if {
     Output := exo.tests with input as {
         "dmarc_records": [
@@ -416,7 +416,7 @@ test_POC_Incorrect_V3 if {
 }
 
 # 2 domains 1 fails rua/ruf number
-# IGNORE line length linter warning
+# regal ignore:line-length
 test_POC_Incorrect_V4 if {
     Output := exo.tests with input as {
         "dmarc_records": [
@@ -454,7 +454,7 @@ test_POC_Incorrect_V4 if {
 }
 
 # 2 domains 1 fails rua # of email policy requirement
-# IGNORE line length linter warning
+# regal ignore:line-length
 test_POC_Incorrect_V5 if {
     Output := exo.tests with input as {
         "dmarc_records": [
@@ -492,7 +492,7 @@ test_POC_Incorrect_V5 if {
 }
 
 # 2 domains 1 domain failed DNS query. Empty rdata
-# IGNORE line length linter warning
+# regal ignore:line-length
 test_POC_Incorrect_V6 if {
     Output := exo.tests with input as {
         "dmarc_records": [
