@@ -138,12 +138,12 @@ test_Rdata_Correct_V2 if {
     TestResult("MS.EXO.4.2v1", Output, PASS, true) == true
 }
 
-# regal ignore:line-length
 test_Rdata_Incorrect_V4 if {
     Output := exo.tests with input as {
         "dmarc_records": [
             {
                 "rdata": [
+                    # regal ignore:line-length
                     "v=DMARC1; p=none; mailto:reports@dmarc.cyber.dhs.gov mailto:jsmith@dhs.gov mailto:jsomething@dhs.gov"
                 ],
                 "domain": "test.name"
@@ -291,12 +291,12 @@ test_DMARCReport_Incorrect_V3 if {
 #--
 
 # 2 emails in rua= and 1 in ruf
-# regal ignore:line-length
 test_POC_Correct_V1 if {
     Output := exo.tests with input as {
         "dmarc_records": [
             {
                 "rdata": [
+                    # regal ignore:line-length
                     "v=DMARC1; p=reject; pct=100; rua=mailto:DMARC@hq.dhs.gov, mailto:reports@dmarc.cyber.dhs.gov; ruf=agencyemail@hq.dhs.gov"
                 ],
                 "domain": "test.name"
@@ -316,12 +316,12 @@ test_POC_Correct_V1 if {
 }
 
 # 2+ emails in rua= and 1+ in ruf
-# regal ignore:line-length
 test_POC_Correct_V2 if {
     Output := exo.tests with input as {
         "dmarc_records": [
             {
                 "rdata": [
+                    # regal ignore:line-length
                     "v=DMARC1; p=reject; pct=100; rua=mailto:DMARC@hq.dhs.gov, mailto:reports@dmarc.cyber.dhs.gov, mailto:test@example.com; ruf=agencyemail@hq.dhs.gov, test@test.com"
                 ],
                 "domain": "test.name"
@@ -416,12 +416,12 @@ test_POC_Incorrect_V3 if {
 }
 
 # 2 domains 1 fails rua/ruf number
-# regal ignore:line-length
 test_POC_Incorrect_V4 if {
     Output := exo.tests with input as {
         "dmarc_records": [
             {
                 "rdata": [
+                    # regal ignore:line-length
                     "v=DMARC1; p=reject; pct=100; rua=mailto:reports@dmarc.cyber.dhs.gov, test@test.name ruf=test2@test.name"
                 ],
                 "domain": "test.name"
@@ -454,12 +454,12 @@ test_POC_Incorrect_V4 if {
 }
 
 # 2 domains 1 fails rua # of email policy requirement
-# regal ignore:line-length
 test_POC_Incorrect_V5 if {
     Output := exo.tests with input as {
         "dmarc_records": [
             {
                 "rdata": [
+                    # regal ignore:line-length
                     "v=DMARC1; p=reject; pct=100; rua=mailto:reports@dmarc.cyber.dhs.gov, test@test.name ruf=test2@test.name"
                 ],
                 "domain": "test.name"
@@ -492,12 +492,12 @@ test_POC_Incorrect_V5 if {
 }
 
 # 2 domains 1 domain failed DNS query. Empty rdata
-# regal ignore:line-length
 test_POC_Incorrect_V6 if {
     Output := exo.tests with input as {
         "dmarc_records": [
             {
                 "rdata": [
+                    # regal ignore:line-length
                     "v=DMARC1; p=reject; pct=100; rua=mailto:reports@dmarc.cyber.dhs.gov, test@test.name ruf=test2@test.name"
                 ],
                 "domain": "test.name"

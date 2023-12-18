@@ -237,12 +237,13 @@ ExternalUserExpireInDays(TenantPolicy) := ["", true] if {
 # in 30 days or less, the policy should pass, else fail.
 # The error message is concatanated by 2 steps to insert the
 # result of ReportBoolean in front, & the setting in the middle.
-# IGNORE prefer-some-in-iteration linter warning
 SHARINGCAPABILITY := "New and Existing Guests" if
+    # regal ignore:prefer-some-in-iteration
     input.SPO_tenant[_].SharingCapability == NEWANDEXISTINGGUESTS
 
-# IGNORE prefer-some-in-iteration linter warning
-SHARINGCAPABILITY := "Anyone" if input.SPO_tenant[_].SharingCapability == ANYONE
+SHARINGCAPABILITY := "Anyone" if
+    # regal ignore:prefer-some-in-iteration
+    input.SPO_tenant[_].SharingCapability == ANYONE
 
 ERRSTRING := concat(" ", [
     "External Sharing is set to",

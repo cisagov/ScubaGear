@@ -50,7 +50,6 @@ test_ContentContainsSensitiveInformation_Correct_V1 if {
     TestResult("MS.DEFENDER.4.1v1", Output, PASS, true) == true
 }
 
-# IGNORE line length linter warning
 test_AdvancedRule_Correct_V2 if {
     Output := defender.tests with input as {
         "dlp_compliance_rules": [
@@ -68,6 +67,7 @@ test_AdvancedRule_Correct_V2 if {
                 ],
                 "NotifyUserType": "NotSet",
                 "IsAdvancedRule": true,
+                # regal ignore:line-length
                 "AdvancedRule": "{rn  'Version': '1.0',rn  'Condition': {rn    'Operator': 'And',rn    'SubConditions': [rn      {rn        'ConditionName': 'ContentContainsSensitiveInformation',rn        'Value': [rn          {rn            'Groups': [rn              {rn                'Name': 'Default',rn                'Operator': 'Or',rn                'Sensitivetypes': [rn                  {rn                    'Name': 'Credit Card Number',rn                    'Id': '50842eb7-edc8-4019-85dd-5a5c1f2bb085',rn                    'Mincount': 1,rn                    'Maxcount': -1,rn                    'Confidencelevel': 'High',rn                    'Minconfidence': 85,rn                    'Maxconfidence': 100rn                  },rn                  {rn                    'Name': 'U.S. Individual Taxpayer Identification Number (ITIN)',rn                    'Id': 'e55e2a32-f92d-4985-a35d-a0b269eb687b',rn                    'Mincount': 1,rn                    'Maxcount': -1,rn                    'Confidencelevel': 'Medium',rn                    'Minconfidence': 75,rn                    'Maxconfidence': 100rn                  },rn                  {rn                    'Name': 'U.S. Social Security Number (SSN)',rn                    'Id': 'a44669fe-0d48-453d-a9b1-2cc83f2cba77',rn                    'Mincount': 1,rn                    'Maxcount': -1,rn                    'Confidencelevel': 'Medium',rn                    'Minconfidence': 75,rn                    'Maxconfidence': 100rn                  }rn                ]rn              }rn            ],rn            'Operator': 'And'rn          }rn        ]rn      }rn    ]rn  }rn}"
             }
         ],
@@ -405,7 +405,6 @@ test_Locations_Correct_V1 if {
     TestResult("MS.DEFENDER.4.2v1", Output, PASS, true) == true
 }
 
-# IGNORE line length linter warning
 test_Locations_Correct_V2 if {
     Output := defender.tests with input as {
         "dlp_compliance_rules": [
@@ -423,6 +422,7 @@ test_Locations_Correct_V2 if {
                 ],
                 "NotifyUserType": "NotSet",
                 "IsAdvancedRule": true,
+                # regal ignore:line-length
                 "AdvancedRule": "{rn  'Version': '1.0',rn  'Condition': {rn    'Operator': 'And',rn    'SubConditions': [rn      {rn        'ConditionName': 'ContentContainsSensitiveInformation',rn        'Value': [rn          {rn            'Groups': [rn              {rn                'Name': 'Default',rn                'Operator': 'Or',rn                'Sensitivetypes': [rn                  {rn                    'Name': 'Credit Card Number',rn                    'Id': '50842eb7-edc8-4019-85dd-5a5c1f2bb085',rn                    'Mincount': 1,rn                    'Maxcount': -1,rn                    'Confidencelevel': 'High',rn                    'Minconfidence': 85,rn                    'Maxconfidence': 100rn                  },rn                  {rn                    'Name': 'U.S. Individual Taxpayer Identification Number (ITIN)',rn                    'Id': 'e55e2a32-f92d-4985-a35d-a0b269eb687b',rn                    'Mincount': 1,rn                    'Maxcount': -1,rn                    'Confidencelevel': 'Medium',rn                    'Minconfidence': 75,rn                    'Maxconfidence': 100rn                  },rn                  {rn                    'Name': 'U.S. Social Security Number (SSN)',rn                    'Id': 'a44669fe-0d48-453d-a9b1-2cc83f2cba77',rn                    'Mincount': 1,rn                    'Maxcount': -1,rn                    'Confidencelevel': 'Medium',rn                    'Minconfidence': 75,rn                    'Maxconfidence': 100rn                  }rn                ]rn              }rn            ],rn            'Operator': 'And'rn          }rn        ]rn      }rn    ]rn  }rn}"
             }
         ],
@@ -454,7 +454,7 @@ test_Locations_Correct_V2 if {
     TestResult("MS.DEFENDER.4.2v1", Output, PASS, true) == true
 }
 
-# IGNORE Max Rule Length linter warning
+# regal ignore:max-rule-length
 test_Locations_Correct_V3 if {
     Output := defender.tests with input as {
         "dlp_compliance_rules": [
