@@ -14,8 +14,6 @@ on:
       - '**.psrc'
       - '**.ps1xml'
       - '**.cdxml'
-    branches:
-      - 700-add-powershell-linter
   workflow_dispatch:
 
 jobs:
