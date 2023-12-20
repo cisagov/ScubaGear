@@ -23,10 +23,7 @@ jobs:
         uses: actions/checkout@v4
       - name: Setup Config File
         run: cp Testing/Linting/MegaLinter/.mega-linter-yaml.yml .mega-linter.yml
-        if: always()
       - name: Setup Lint File
         run: cp Testing/Linting/MegaLinter/.yamllint.yml .yamllint.yml
-        if: always()
       - name: Lint YAML
         uses: oxsecurity/megalinter/flavors/ci_light@v7.6.0
-        if: always()
