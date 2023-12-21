@@ -6,15 +6,17 @@ name: Lint Check for PowerShell
 # Run whenever PowerShell files are checked in
 on:
   push:
-    paths:
-      - '**.ps1'
-      - '**.psm1'
-      - '**.psd1'
-      - '**.pssc'
-      - '**.psrc'
-      - '**.ps1xml'
-      - '**.cdxml'
-  workflow_dispatch:
+    branches:
+      - "700-1-add-powershell-linter"
+  #   paths:
+  #     - '**.ps1'
+  #     - '**.psm1'
+  #     - '**.psd1'
+  #     - '**.pssc'
+  #     - '**.psrc'
+  #     - '**.ps1xml'
+  #     - '**.cdxml'
+  # workflow_dispatch:
 
 jobs:
   powershell-lint-check:
@@ -29,4 +31,4 @@ jobs:
       - name: Setup Config File
         run: cp Testing/Linting/MegaLinter/.mega-linter-powershell.yml .mega-linter.yml
       - name: Lint PowerShell
-        uses: oxsecurity/megalinter/flavors/dotnet@v7.6.0
+        uses: oxsecurity/megalinter/flavors/dotnet@latest
