@@ -29,23 +29,24 @@ Uncomment this section if a screenshot is needed.
 ## ✅ Pre-approval checklist ##
 
 <!-- Remove any of the following that do not apply. -->
-<!-- Draft PRs should have one or more unchecked boxes. -->
+<!-- Draft PRs may have one or more unchecked boxes. -->
 <!-- If you're unsure about any of these, don't hesitate to ask. -->
 <!-- We're here to help! -->
 
-- [ ] This PR has an informative and human-readable title
-- [ ] PR is targeting the correct parent branch for merge
+- [ ] This PR has an informative and human-readable title.
+- [ ] PR targets the correct parent branch (e.g., main or release-name) for merge.
 - [ ] Changes are limited to a single goal - *eschew scope creep!*
-- [ ] *All* future TODOs are captured in issues, which are referenced
-      in code comments
+- [ ] Changes are sized such that they do not touch excessive number of files.
+- [ ] *All* future TODOs are captured in issues, which are referenced in code comments.
 - [ ] These code changes follow the ScubaGear [content style guide](https://github.com/cisagov/ScubaGear/blob/main/CONTENTSTYLEGUIDE.md).
-- [ ] All relevant type-of-change labels have been added
-- [ ] All relevant project fields have been set
-- [ ] All relevant repo and/or project documentation has been updated
-      to reflect the changes in this PR
-- [ ] Tests have been added and/or modified to cover the changes in this PR
-- [ ] All new and existing tests pass
-- [ ] All automated checks pass
+- [ ] Related issues these changes resolve are linked preferably via [closing keywords](https://docs.github.com/en/issues/tracking-your-work-with-issues/linking-a-pull-request-to-an-issue#linking-a-pull-request-to-an-issue-using-a-keyword).
+- [ ] All relevant type-of-change labels added.
+- [ ] All relevant project fields are set.
+- [ ] All relevant repo and/or project documentation updated to reflect these changes.
+- [ ] Unit tests added/updated to cover PowerShell and Rego changes.
+- [ ] Functional tests added/updated to cover PowerShell and Rego changes.
+- [ ] All new and existing tests passed
+- [ ] All automated checks passed (e.g., linting, static analysis, smoke test)
 
 ## ✅ Pre-merge checklist ##
 
@@ -53,11 +54,17 @@ Uncomment this section if a screenshot is needed.
 <!-- These boxes should remain unchecked until the pull request has been -->
 <!-- approved. -->
 
-- [ ] Rebase feature branch against changes from parent branch, as needed
-- [ ] Merge coordinator notified via PR comment
+- [ ] PR passed smoke test check.
+- [ ] Feature branch has been rebased against changes from parent branch, as needed
+
+  Use `Rebase branch` button below or use [this](https://www.digitalocean.com/community/tutorials/how-to-rebase-and-update-a-pull-request) reference to rebase from the command line.
+- [ ] Resolved all merge conflicts on branch
+- [ ] Notified merge coordinator that PR is ready for merge via comment mention
 
 ## ✅ Post-merge checklist ##
 
 <!-- Remove any of the following that do not apply. -->
-
-- [ ] Verify that all checks pass on parent branch after merge
+<!-- These boxes should remain unchecked until the pull request has been -->
+<!-- approved. This section is for the merge coordinator to complete. -->
+- [ ] Feature branch deleted after merge to clean up repository.
+- [ ] Verified that all checks pass on parent branch (e.g., main or release-name) after merge.
