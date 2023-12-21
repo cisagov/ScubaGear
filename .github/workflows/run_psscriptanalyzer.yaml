@@ -22,7 +22,7 @@ on:
   # workflow_dispatch:
 
 jobs:
-  lint:
+  basic-lint:
     name: PS Script Analyzer Check
     runs-on: ubuntu-latest
     # permissions:
@@ -41,3 +41,17 @@ jobs:
           # failOnWarnings: true
           # failOnInfos: true
           # sendComment: true
+  docker-lint:
+    name: PS Script Analyzer Check using Docker
+    runs-on: ubuntu-latest
+    # permissions:
+    #   contents: read
+    #   issues: write
+    #   pull-requests: write
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+      - name: Lint PowerShell
+        uses: docker://devblackops/github-action-psscriptanalyzer:latest
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
