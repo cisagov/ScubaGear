@@ -32,7 +32,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Run static code checker
-        uses: docker://devblackops/github-action-psscriptanalyzer:2.4.0
+        # uses: docker://devblackops/github-action-psscriptanalyzer:2.4.0
+        uses: devblackops/github-action-psscriptanalyzer@master
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
           # settingsPath: PSScriptAnalyzerSettings.psd1
