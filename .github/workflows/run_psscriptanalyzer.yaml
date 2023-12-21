@@ -2,8 +2,8 @@ name: Run PS Linter
 
 on:
   push:
-  branches:
-    - "759-consolidate-redundant-ps-linting"
+    branches:
+      - "759-consolidate-redundant-ps-linting"
   #   paths:
   #     - "**.ps1"
   #     - "**.psm1"
