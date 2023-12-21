@@ -23,16 +23,16 @@ on:
 
 jobs:
   lint:
-    name: Run PS Linter
+    name: PS Script Analyzer Check
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      issues: write
-      pull-requests: write
+    # permissions:
+    #   contents: read
+    #   issues: write
+    #   pull-requests: write
     steps:
-      - uses: actions/checkout@v4
-      - name: Run static code checker
-        # uses: docker://devblackops/github-action-psscriptanalyzer:2.4.0
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+      - name: Lint PowerShell
         uses: devblackops/github-action-psscriptanalyzer@master
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
