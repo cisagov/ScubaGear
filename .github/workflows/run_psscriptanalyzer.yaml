@@ -4,9 +4,14 @@ on:
   push:
     branches:
       - "759-consolidate-redundant-ps-linting"
-  #   paths:
-  #     - "**.ps1"
-  #     - "**.psm1"
+    paths:
+      - '**.ps1'
+      - '**.psm1'
+      - '**.psd1'
+      - '**.pssc'
+      - '**.psrc'
+      - '**.ps1xml'
+      - '**.cdxml'
   # pull_request:
   #   types: [opened, reopened]
   #   branches:
@@ -14,7 +19,7 @@ on:
   #   paths:
   #     - "**.ps1"
   #     - "**.psm1"
-  # workflow_dispatch:
+  workflow_dispatch:
 
 jobs:
   lint:
