@@ -36,7 +36,7 @@ param(
     [Parameter(Mandatory = $false, HelpMessage = 'The version of OPA Rego to be downloaded, must be in "x.x.x" format')]
     [Alias('version')]
     [string]
-    $ExpectedVersion = '0.42.1',
+    $ExpectedVersion = '0.59.0',
 
     [Parameter(Mandatory = $false, HelpMessage = 'The operating system the program is running on')]
     [ValidateSet('Windows','MacOS','Linux')]
