@@ -8,15 +8,15 @@ on:
   push:
     branches:
       - "759-consolidate-redundant-ps-linting"
-    paths:
-      - '**.ps1'
-      - '**.psm1'
-      - '**.psd1'
-      - '**.pssc'
-      - '**.psrc'
-      - '**.ps1xml'
-      - '**.cdxml'
-  workflow_dispatch:
+  #   paths:
+  #     - '**.ps1'
+  #     - '**.psm1'
+  #     - '**.psd1'
+  #     - '**.pssc'
+  #     - '**.psrc'
+  #     - '**.ps1xml'
+  #     - '**.cdxml'
+  # workflow_dispatch:
 
 jobs:
   powershell-lint-check:
