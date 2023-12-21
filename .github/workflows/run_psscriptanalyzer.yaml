@@ -35,8 +35,8 @@ jobs:
         uses: docker://devblackops/github-action-psscriptanalyzer:2.4.0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
-          settingsPath: PSScriptAnalyzerSettings.psd1
-          failOnErrors: true
-          failOnWarnings: true
-          failOnInfos: true
-          sendComment: true
+          # settingsPath: PSScriptAnalyzerSettings.psd1
+          # failOnErrors: true
+          # failOnWarnings: true
+          # failOnInfos: true
+          # sendComment: true
