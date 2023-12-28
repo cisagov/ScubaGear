@@ -12,7 +12,7 @@ $params = $args[0]
 Write-Host "Params"
 Write-Host $params
 Write-Host $params.GetType()
-$params2 = ConvertFrom-StringData -StringData $params
+$params2 = Invoke-Expression $params
 Write-Host "Params2"
 Write-Host $params2
 Write-Host $params2.GetType()
