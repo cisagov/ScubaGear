@@ -8,15 +8,10 @@
 # The hashtable with the params.
 # TODO: For now, this is a hashtable.  Eventually it will need to be an array of hashtables,
 #       one for each product/tenant tested.
-$params = $args[0]
+$params = Invoke-Expression $args[0]
 Write-Host "Params"
 Write-Host $params
 Write-Host $params.GetType()
-$params2 = Invoke-Expression $params
-Write-Host "Params2"
-Write-Host $params2
-Write-Host $params2.GetType()
-
 
 # The thumbprint of the cert used to access the product.
 $thumbprint = $args[1]
