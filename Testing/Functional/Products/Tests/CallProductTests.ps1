@@ -9,9 +9,13 @@
 # TODO: For now, this is a hashtable.  Eventually it will need to be an array of hashtables,
 #       one for each product/tenant tested.
 $params = $args[0]
+Write-Debug "Params"
+Write-Debug $params
 
 # The thumbprint of the cert used to access the product.
 $thumbprint = $args[1]
+Write-Debug "Thumbprint"
+Write-Debug $thumbprint
 
 # TODO: Remove these and get params from the args.
 # $testDataFile = 'Testing/Functional/Products/Tests/TestData/sharepoint-commercial-data.pson'
