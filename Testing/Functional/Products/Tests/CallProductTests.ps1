@@ -9,7 +9,10 @@
 # TODO: For now, this is a hashtable.  Eventually it will need to be an array of hashtables,
 #       one for each product/tenant tested.
 # $params = Invoke-Expression $args[0]
-$params = [hashtable]::Create($args[0])
+# $params = [hashtable]::Create($args[0])
+
+
+$params = $args[0] -replace '@{' -replace '}' -replace ';',"`n" -replace "'" | ConvertFrom-StringData
 Write-Host "Params"
 Write-Host $params
 Write-Host $params.GetType()
