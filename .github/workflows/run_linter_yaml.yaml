@@ -1,4 +1,3 @@
-# Author: James Garriss
 # Purpose: Run the linter against YAML files
 
 name: Lint Check for YAML
@@ -7,8 +6,8 @@ name: Lint Check for YAML
 on:
   push:
     paths:
-      - '**.yml'
-      - '**.yaml'
+      - "**.yml"
+      - "**.yaml"
   workflow_dispatch:
 
 jobs:
