@@ -11,11 +11,13 @@
 $params = $args[0]
 Write-Host "Params"
 Write-Host $params
+Write-Host $params.GetType()
 
 # The thumbprint of the cert used to access the product.
 $thumbprint = $args[1]
 Write-Host "Thumbprint"
 Write-Host $thumbprint
+Write-Host $thumbprint.GetType()
 
 # TODO: Remove these and get params from the args.
 # $testDataFile = 'Testing/Functional/Products/Tests/TestData/sharepoint-commercial-data.pson'
