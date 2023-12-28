@@ -20,7 +20,7 @@ ScubaGear runs on Powershell 5.1.  To run this version in Windows 10, search for
 
 "Pester is a testing and mocking framework for PowerShell." ([Pester Quick Start](https://pester.dev/docs/quick-start))
 
-Install Pester by running this command as administrator:
+Install an updated Pester module by running this command as administrator:
 
 ```
 Install-Module -Name Pester -Force -SkipPublisherCheck

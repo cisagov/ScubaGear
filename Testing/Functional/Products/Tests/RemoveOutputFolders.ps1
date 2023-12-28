@@ -1,6 +1,4 @@
-# James Garriss
-# Dec 2023
-# The purpose of this script is to delete all the temp folder created by running ScubaGear.
+# The purpose of this script is to delete all the temp folders created by running ScubaGear.
 
 $thisDir = Get-Location
 

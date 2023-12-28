@@ -1,5 +1,3 @@
-# James Garriss
-# Dec 2023
 # The purpose of this script is to enable a GitHub Action workflow to
 # run the functional tests for all the products.
 # NOTE: At the moment it only does this for one product, Sharepoint.  Others
