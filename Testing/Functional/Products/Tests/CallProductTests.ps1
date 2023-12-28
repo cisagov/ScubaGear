@@ -21,7 +21,7 @@ Write-Host $thumbprint.GetType()
 
 # TODO: Remove these and get params from the args.
 # $testDataFile = 'Testing/Functional/Products/Tests/TestData/sharepoint-commercial-data.pson'
-# $testScriptDir = 'Testing/Functional/Products'
+$testScriptDir = 'Testing/Functional/Products'
 # $params = Import-PowerShellDataFile $testDataFile
 # Write-Host "Params"
 # Write-Host $params
@@ -31,6 +31,8 @@ Write-Host $thumbprint.GetType()
 # TODO: When params becomes an array of hashtables, this will need to be added to each
 #       hashtable in the array.
 $params["Thumbprint"] = $thumbprint
+
+
 
 # Create an array of test containers
 $testContainers = @()
