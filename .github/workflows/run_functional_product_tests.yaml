@@ -28,7 +28,8 @@ jobs:
       env:
         PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
     - name: Import PFX
-      run: Import-PfxCertificate -Password (ConvertTo-SecureString -String $env:PfxPassword -AsPlainText -Force) -CertStoreLocation Cert:\CurrentUser\My -FilePath ./key.pfx
+      # Pipe to Out-Null to hide the thumbprint
+      run: Import-PfxCertificate -Password (ConvertTo-SecureString -String $env:PfxPassword -AsPlainText -Force) -CertStoreLocation Cert:\CurrentUser\My -FilePath ./key.pfx | Out-Null
       env:
         PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
     - name: Get Thumbprint

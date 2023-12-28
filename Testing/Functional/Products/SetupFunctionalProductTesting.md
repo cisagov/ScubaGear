@@ -8,7 +8,7 @@ This testing needs to be run on a Windows computer or VM.
 
 ## Credentials
 
-Two things are needed in order to authenticate to the various services that are being tested.  The first is a personal certificate.  Ask Nanda for the documentation on how to create a ScubaGear personal certificate.  Follow the instructions and note the value of the thumbprint.
+Two things are needed in order to authenticate to the various services that are being tested.  The first is a personal certificate.  Ask onboarding coordinator for the documentation on how to create a ScubaGear personal certificate.  Follow the instructions and note the value of the thumbprint.
 
 The second is to add your certificate to the service principal.  Send the certificate and the thumbprint to Nanda, and he will add it to the service principal and provide the id (aka the App ID).
 
