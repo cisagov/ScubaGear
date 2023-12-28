@@ -56,4 +56,4 @@ jobs:
         $thumbprint = "${{ steps.thumbprint.outputs.THUMBPRINT }}"
         ./Testing/Functional/Products/Tests/CallProductTests.ps1 $params $thumbprint
       env:
-        TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMSS }}
+        TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
