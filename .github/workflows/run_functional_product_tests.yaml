@@ -49,7 +49,7 @@ jobs:
         Write-Output $params
         Write-Debug $params
       env:
-        TestParams: ${{ secrets.TEST_PARAMS }}
+        TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
     - name: Setup for Scuba
       run: ./SetUp.ps1
     - name: Install Selenium
@@ -62,4 +62,4 @@ jobs:
         $thumbprint = "${{ steps.thumbprint.outputs.THUMBPRINT }}"
         ./Testing/Functional/Products/Tests/CallProductTests.ps1 $env:TestParams $thumbprint
       env:
-        TestParams: ${{ secrets.TEST_PARAMS }}
+        TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMSS }}
