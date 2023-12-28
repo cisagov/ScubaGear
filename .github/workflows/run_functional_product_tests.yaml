@@ -1,4 +1,3 @@
-# Author: James Garriss
 # Purpose: Run the product functional tests every night
 
 name: Nightly Product Functional Tests
@@ -43,6 +42,14 @@ jobs:
       shell: pwsh
       env:
         PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
+    - name: Get Params
+      id: params
+      run: |
+        $params = $env:TestParams
+        Write-Output $params
+        Write-Debug $params
+      env:
+        TestParams: ${{ secrets.TEST_PARAMS }}
     - name: Setup for Scuba
       run: ./SetUp.ps1
     - name: Install Selenium
@@ -53,4 +60,6 @@ jobs:
       run: |
         # Read thumbprint from previous job.
         $thumbprint = "${{ steps.thumbprint.outputs.THUMBPRINT }}"
-        ./Testing/Functional/Products/Tests/CallProductTests.ps1 $thumbprint
+        ./Testing/Functional/Products/Tests/CallProductTests.ps1 $env:TestParams $thumbprint
+      env:
+        TestParams: ${{ secrets.TEST_PARAMS }}

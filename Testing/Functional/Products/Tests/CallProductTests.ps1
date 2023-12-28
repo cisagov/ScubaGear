@@ -3,22 +3,23 @@
 # NOTE: At the moment it only does this for one product, Sharepoint.  Others
 #       will be added.
 # To run this script, call it from the root of the repo, like so:
-# ./Testing/Functional/Products/Tests/CallProductTests.ps1 <value of thumbprint>
+# ./Testing/Functional/Products/Tests/CallProductTests.ps1 <params as a hashtable> <value of thumbprint>
+
+# The hashtable with the params.
+# TODO: For now, this is a hashtable.  Eventually it will need to be an array of hashtables,
+#       one for each product/tenant tested.
+$params = $args[0]
 
 # The thumbprint of the cert used to access the product.
-$thumbprint = $args[0]
+$thumbprint = $args[1]
 
-# Setup directories
-$testDataFile = 'Testing/Functional/Products/Tests/TestData/sharepoint-commercial-data.pson'
-$testScriptDir = 'Testing/Functional/Products'
-
-# TODO: Eventually this hardcoded file should be replaced by reading all the .pson
-#       files in the TestData folder.  Instead of just a hashtable of params, it
-#       will be an array of hashtables of params.
-$params = Import-PowerShellDataFile $testDataFile
+# TODO: Remove these and get params from the args.
+# $testDataFile = 'Testing/Functional/Products/Tests/TestData/sharepoint-commercial-data.pson'
+# $testScriptDir = 'Testing/Functional/Products'
+# $params = Import-PowerShellDataFile $testDataFile
 
 # Add thumbprint to hashtable
-# TODO: When the hardcoded file is replaced, this will need to be added to each
+# TODO: When params becomes an array of hashtables, this will need to be added to each
 #       hashtable in the array.
 $params["Thumbprint"] = $thumbprint
 
