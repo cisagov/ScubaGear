@@ -8,10 +8,10 @@
 # The hashtable with the params.
 # TODO: For now, this is a hashtable.  Eventually it will need to be an array of hashtables,
 #       one for each product/tenant tested.
-$params = $args[0]
-Write-Host "Params"
-Write-Host $params
-Write-Host $params.GetType()
+# $params = $args[0]
+# Write-Host "Params"
+# Write-Host $params
+# Write-Host $params.GetType()
 
 # The thumbprint of the cert used to access the product.
 $thumbprint = $args[1]
@@ -20,9 +20,12 @@ Write-Host $thumbprint
 Write-Host $thumbprint.GetType()
 
 # TODO: Remove these and get params from the args.
-# $testDataFile = 'Testing/Functional/Products/Tests/TestData/sharepoint-commercial-data.pson'
-# $testScriptDir = 'Testing/Functional/Products'
-# $params = Import-PowerShellDataFile $testDataFile
+$testDataFile = 'Testing/Functional/Products/Tests/TestData/sharepoint-commercial-data.pson'
+$testScriptDir = 'Testing/Functional/Products'
+$params = Import-PowerShellDataFile $testDataFile
+Write-Host "Params"
+Write-Host $params
+Write-Host $params.GetType()
 
 # Add thumbprint to hashtable
 # TODO: When params becomes an array of hashtables, this will need to be added to each
