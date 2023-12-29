@@ -3,16 +3,14 @@
 # NOTE: At the moment it only does this for one product, Sharepoint.  Others
 #       will be added.
 
-# The hashtable with the params.
-# TODO: For now, this is a hashtable.  Eventually it will need to be an array of hashtables,
-#       one for each product/tenant tested.
-param(
-    [Parameter(Mandatory)]
-    [hashtable]$params
-)
 
-# The thumbprint of the cert used to access the product.
 param(
+    # The hashtable with the params.
+    # TODO: For now, this is a hashtable.  Eventually it will need to be an array of hashtables,
+    #       one for each product/tenant tested.
+    [Parameter(Mandatory)]
+    [hashtable]$params,
+    # The thumbprint of the cert used to access the product.
     [Parameter(Mandatory)]
     [string]$thumbprint
 )
