@@ -53,7 +53,7 @@ jobs:
         # Read the params from the secret
         $paramsAsString = $env:TestParams
         # GitHub secrets are only strings, even when formatted as a hashtables.  To fix:
-        $paramsAsHashTable = $args[0] -replace '@{' -replace '}' -replace ';',"`n" -replace "'" | ConvertFrom-StringData
+        $paramsAsHashTable = $paramsAsString -replace '@{' -replace '}' -replace ';',"`n" -replace "'" | ConvertFrom-StringData
         # Read thumbprint from previous job.
         $thumbprint = "${{ steps.thumbprint.outputs.THUMBPRINT }}"
         ./Testing/Functional/Products/Tests/CallProductTests.ps1 -params $paramsAsHashTable -thumbprint $thumbprint
