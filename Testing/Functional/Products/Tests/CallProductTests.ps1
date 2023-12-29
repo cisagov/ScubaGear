@@ -8,13 +8,13 @@
 #       one for each product/tenant tested.
 param(
     [Parameter(Mandatory)]
-    [hashtable[]]$params
+    [hashtable]$params
 )
 
 # The thumbprint of the cert used to access the product.
 param(
     [Parameter(Mandatory)]
-    [string[]]$thumbprint
+    [string]$thumbprint
 )
 
 Write-Host "Params"
