@@ -6,11 +6,24 @@
 # The hashtable with the params.
 # TODO: For now, this is a hashtable.  Eventually it will need to be an array of hashtables,
 #       one for each product/tenant tested.
-# The replace and convert commands are used to convert the string (from the GitHub secret) into a hashtable.
-$params = $args[0] -replace '@{' -replace '}' -replace ';',"`n" -replace "'" | ConvertFrom-StringData
+param(
+    [Parameter(Mandatory)]
+    [hashtable[]]$params
+)
 
 # The thumbprint of the cert used to access the product.
-$thumbprint = $args[1]
+param(
+    [Parameter(Mandatory)]
+    [string[]]$thumbprint
+)
+
+Write-Host "Params"
+Write-Host $params
+Write-Host $params.GetType()
+
+Write-Host "Thumbprint"
+Write-Host $thumbprint
+Write-Host $thumbprint.GetType()
 
 $testScriptDir = 'Testing/Functional/Products'
 
