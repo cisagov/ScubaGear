@@ -2,7 +2,8 @@
 # run the functional tests for all the products.
 # NOTE: At the moment it only does this for one product, Sharepoint.  Others
 #       will be added.
-
+# To run this script, call it from the root of the repo, like so:
+# ./Testing/Functional/Products/Tests/CallProductTests.ps1 <params> <thumbprint>
 
 param(
     # The hashtable with the params.
@@ -14,14 +15,6 @@ param(
     [Parameter(Mandatory)]
     [string]$thumbprint
 )
-
-Write-Host "Params"
-Write-Host $params
-Write-Host $params.GetType()
-
-Write-Host "Thumbprint"
-Write-Host $thumbprint
-Write-Host $thumbprint.GetType()
 
 $testScriptDir = 'Testing/Functional/Products'
 
