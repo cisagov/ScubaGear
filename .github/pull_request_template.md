@@ -45,8 +45,8 @@ Uncomment this section if a screenshot is needed.
 - [ ] All relevant repo and/or project documentation updated to reflect these changes.
 - [ ] Unit tests added/updated to cover PowerShell and Rego changes.
 - [ ] Functional tests added/updated to cover PowerShell and Rego changes.
-- [ ] All new and existing tests passed
-- [ ] All automated checks passed (e.g., linting, static analysis, smoke test)
+- [ ] All relevant functional tests passed.
+- [ ] All automated checks (e.g., linting, static analysis, unit/smoke tests) passed.
 
 ## ✅ Pre-merge checklist ##
 
