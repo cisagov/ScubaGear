@@ -13,8 +13,6 @@ on:
       - "**.psrc"
       - "**.ps1xml"
       - "**.cdxml"
-  pull_request:
-    types: [opened, reopened]
   workflow_dispatch:
 
 jobs:
