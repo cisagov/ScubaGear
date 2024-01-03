@@ -7,8 +7,6 @@
     At the moment this script is only used for one product, Sharepoint.  Others will be added over time.
 #>
 
-
-
 param(
     # The hashtable with the params.
     # TODO: For now, this is a hashtable.  Eventually it will need to be an array of hashtables,
