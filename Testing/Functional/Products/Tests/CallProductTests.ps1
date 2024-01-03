@@ -1,9 +1,14 @@
-# The purpose of this script is to enable a GitHub Action workflow to
-# run the functional tests for all the products.
-# NOTE: At the moment it only does this for one product, Sharepoint.  Others
-#       will be added.
-# To run this script, call it from the root of the repo, like so:
-# ./Testing/Functional/Products/Tests/CallProductTests.ps1 <params> <thumbprint>
+<#
+    .Purpose
+    The purpose of this script is to enable a GitHub Action workflow to run the functional tests for all the products.
+    .Execution
+    To run this script, call it from the root of the repo, like so:
+    ./Testing/Functional/Products/Tests/CallProductTests.ps1 <params> <thumbprint>
+#>
+
+# NOTE:
+# At the moment this script is only used for one product, Sharepoint.  Others
+# will be added over time.
 
 param(
     # The hashtable with the params.
