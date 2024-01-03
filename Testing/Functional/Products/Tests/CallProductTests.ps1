@@ -1,7 +1,7 @@
 <#
-    .Purpose
+    .SYNOPSIS
     The purpose of this script is to enable a GitHub Action workflow to run the functional tests for all the products.
-    .Execution
+    .EXAMPLE
     To run this script, call it from the root of the repo, like so:
     ./Testing/Functional/Products/Tests/CallProductTests.ps1 <params> <thumbprint>
 #>

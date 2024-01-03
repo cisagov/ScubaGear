@@ -1,5 +1,5 @@
 <#
-    .Purpose
+    .SYNOPSIS
     The purpose of this script is to delete all the temp folders created by running ScubaGear.
 #>
 
