@@ -24,7 +24,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          path: src  
+          path: src
       - name: Publish ScubaGear module to private repository
         run: |
           cd src
