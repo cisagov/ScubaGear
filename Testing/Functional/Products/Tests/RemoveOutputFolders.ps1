@@ -1,6 +1,6 @@
 <#
     .SYNOPSIS
-    The purpose of this script is to delete all the temp folders created by running ScubaGear.
+    The purpose of this script is to delete all the temp folders created by running ScubaGear.  This is useful when testing ScubaGear manually.
 #>
 
 $thisDir = Get-Location

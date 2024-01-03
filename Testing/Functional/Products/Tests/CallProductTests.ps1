@@ -15,9 +15,11 @@ param(
     # TODO: For now, this is a hashtable.  Eventually it will need to be an array of hashtables,
     #       one for each product/tenant tested.
     [Parameter(Mandatory)]
+    [ValidateNotNullOrEmpty()]
     [hashtable]$params,
     # The thumbprint of the cert used to access the product.
     [Parameter(Mandatory)]
+    [ValidateNotNullOrEmpty()]
     [string]$thumbprint
 )
 
