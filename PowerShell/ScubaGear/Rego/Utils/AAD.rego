@@ -164,3 +164,18 @@ HasAcceptableMFA(Policy) := true if {
     Count(Strengths - AcceptableMFA) == 0
     Count(Strengths) > 0
 } else := false
+
+
+############################################################################
+# The report formatting functions below are for the MS.AAD.6.1v1 policy    #
+############################################################################
+
+DomainReportDetails(Status, _, _) := Description if {
+    Status == true
+    Description := "Requirement met"
+}
+
+DomainReportDetails(Status, Array, DescriptionString) := Description if {
+    Status == false
+    Description := ReportFullDetailsArray(Array, DescriptionString)
+}
