@@ -182,6 +182,6 @@ else {
     Install-OPA -out $OPAExe -version $ExpectedVersion -name $Filename
 }
 
-$DebugPreference = "SilientlyContinue"
-$InformationPreference = "SilientlyContinue"
+$DebugPreference = "SilentlyContinue"
+$InformationPreference = "SilentlyContinue"
 $ErrorActionPreference = "Continue"
