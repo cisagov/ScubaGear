@@ -636,7 +636,7 @@ tests contains {
     # Then check if at least 1 or more domains with user passwords set to expire exist
     DescriptionString := "domain(s) failed"
     Conditions := [count(UserPasswordsSetToExpire) == 0, count(UserPasswordsSetToNotExpire) > 0]
-    Status := count([Condition | some Condition in Conditions; Condition == false]) == 0
+    Status := count(FilterArray(Conditions, false)) == 0
 }
 #--
 

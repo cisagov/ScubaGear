@@ -174,7 +174,7 @@ HasAcceptableMFA(Policy) := true if {
 
 DomainReportDetails(Status, _, _) := Description if {
     Status == true
-    Description := "Requirement met"
+    Description := PASS
 }
 
 DomainReportDetails(Status, Array, DescriptionString) := Description if {
