@@ -2,14 +2,12 @@ package aad_test
 import future.keywords
 import data.aad
 import data.utils.key.TestResult
+import data.utils.aad.INT_MAX
 
 
 #
 # Policy MS.AAD.6.1v1
 #--
-
-# User passwords are set to not expire if they equal INT_MAX
-INT_MAX := 2147483647
 
 test_PasswordValidityPeriodInDays_Correct if {
     Output := aad.tests with input as { 

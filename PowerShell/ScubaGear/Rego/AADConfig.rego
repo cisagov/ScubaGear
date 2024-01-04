@@ -19,6 +19,7 @@ import data.utils.aad.HasAcceptableMFA
 import data.utils.aad.PolicyConditionsMatch
 import data.utils.aad.CAPLINK
 import data.utils.aad.DomainReportDetails
+import data.utils.aad.INT_MAX
 
 
 #############
@@ -611,8 +612,6 @@ tests contains {
 #--
 
 # User passwords are set to not expire if they equal INT_MAX
-INT_MAX := 2147483647
-
 UserPasswordsSetToNotExpire contains Domain.Id if {
     some Domain in input.domain_settings
     Domain.PasswordValidityPeriodInDays == INT_MAX

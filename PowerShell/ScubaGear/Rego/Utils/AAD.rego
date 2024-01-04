@@ -24,6 +24,8 @@ P2WARNINGSTR :=
 
 CAPLINK := "<a href='#caps'>View all CA policies</a>."
 
+INT_MAX := 2147483647
+
 ########################################
 # Specific AAD Report Details Function #
 ########################################
