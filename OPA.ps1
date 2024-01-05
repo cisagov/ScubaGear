@@ -30,7 +30,7 @@ param(
 # Constants
 $ACCEPTABLEVERSIONS = '0.42.1','0.42.2','0.43.1','0.44.0','0.45.0','0.46.3','0.47.4','0.48.0','0.49.2','0.50.2',
                         '0.51.0','0.52.0','0.53.1','0.54.0','0.55.0','0.56.0','0.57.1','0.58.0','0.59.0'
-$FILENAME = @{ Windows = "opa_windows_amd64.exe"; Mac = "opa_darwin_amd64"; Linux = "opa_linux_amd64_static"}
+$FILENAME = @{ Windows = "opa_windows_amd64.exe"; MacOS = "opa_darwin_amd64"; Linux = "opa_linux_amd64_static"}
 
 # Download opa rego exe
 function Get-OPAFile {
