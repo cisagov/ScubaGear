@@ -56,15 +56,12 @@ function Get-OPAFile {
 
     try {
         $Display = "Downloading OPA executable"
-        Start-BitsTransfer -Source $InstallUrl -Destination $OutFile -DisplayName $Display
+        Start-BitsTransfer -Source $InstallUrl -Destination $OutFile -DisplayName $Display -MaxDownloadTime 300
         Write-Information -MessageData "Installed the specified OPA version (${ExpectedVersion}) to ${OPAExe}" | Out-Host
     }
     catch {
         $Error[0] | Format-List -Property * -Force | Out-Host
-        Write-Error "Unable to download OPA executable. To try manually downloading, see details in README under 'Download the required OPA executable'" | Out-Host
-    }
-    finally {
-        $WebClient.Dispose()
+        throw "Unable to download OPA executable. To try manually downloading, see details in README under 'Download the required OPA executable'" | Out-Host
     }
 }
 
@@ -73,7 +70,12 @@ function Get-ExeHash {
         [Parameter(Mandatory)]
         [ValidateNotNullOrEmpty()]
         [Alias('name')]
-        [string]$Filename
+        [string]$Filename,
+
+        [Parameter(Mandatory)]
+        [ValidateNotNullOrEmpty()]
+        [Alias('version')]
+        [string]$ExpectedVersion
     )
 
     $InstallUrl = "https://openpolicyagent.org/downloads/v$($ExpectedVersion)/$($Filename).sha256"
@@ -116,7 +118,7 @@ function Confirm-OPAHash {
         $Filename
     )
 
-    if ((Get-FileHash .\$OPAExe -Algorithm SHA256 ).Hash -ne $(Get-ExeHash -name $Filename)) {
+    if ((Get-FileHash .\$OPAExe -Algorithm SHA256 ).Hash -ne $(Get-ExeHash -name $Filename -version $ExpectedVersion)) {
         return $false, "SHA256 verification failed, retry download or install manually. See README under 'Download the required OPA executable' for instructions."
     }
 
