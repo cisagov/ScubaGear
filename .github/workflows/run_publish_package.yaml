@@ -1,0 +1,56 @@
+on: 
+  schedule:
+    - cron: "0 0 * * *"
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/run_publish_package.yaml"
+      - "utils/DeployUtils.ps1"
+      - "Testing/Functional/BuildTest/ModuleBuild.Tests.ps1"
+
+name: Publish Package
+
+env:
+  GalleryName: PrivateScubaGearGallery
+  ModuleName: ScubaGear
+
+jobs:
+  Publish-Private-Package:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: powershell
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: src
+      - name: Publish ScubaGear module to private repository
+        run: |
+          cd src
+          . utils/DeployUtils.ps1 
+          New-PrivateGallery -GalleryName $env:GalleryName -Trusted
+          New-CodeSigningCertificate
+          Publish-ScubaGearModule -ModulePath PowerShell/ScubaGear -GalleryName $env:GalleryName
+      - name: Test Module Publish
+        run: |
+          Get-Location
+          $TestContainers = @()
+          $TestContainers += New-PesterContainer -Path "src/Testing/Functional/BuildTest" -Data @{ }
+          $PesterConfig = @{
+            Run = @{
+              Container = $TestContainers
+            }
+            Output = @{
+              Verbosity = 'Detailed'
+            }
+          }
+          $Config = New-PesterConfiguration -Hashtable $PesterConfig 
+          Invoke-Pester -Configuration $Config 
+      - name: Check Scuba Version 
+        run: |
+          src/SetUp.ps1 -NoOPA
+          Install-Module -Name ScubaGear -SkipPublisherCheck
+          Import-Module -Name ScubaGear
+          Invoke-SCuBA -Version
+
