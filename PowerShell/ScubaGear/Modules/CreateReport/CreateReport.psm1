@@ -310,11 +310,9 @@ function Import-SecureBaseline{
                                 # List case, use newline character between value text
                                 if ($isList) {
                                     $Value += "`n" + ([string]$MdLines[$LineNumber+$LineAdvance]).Trim()
-                                    #Write-Host $LineAdvance + $Value -BackgroundColor Blue
                                 }
                                 else { # Value ending with newline char, use whitespace character between value text
                                     $Value += " " + ([string]$MdLines[$LineNumber+$LineAdvance]).Trim()
-                                    #Write-Host $LineAdvance + $Value -BackgroundColor Green
                                 }
                             }
 
@@ -325,7 +323,10 @@ function Import-SecureBaseline{
                         }
 
                         # Description italics substitution
-                        $Value = Resolve-HTMLMarkdown -OriginalString $Value -HTMLReplace "Italic"
+                        $Value = Resolve-HTMLMarkdown -OriginalString $Value -HTMLReplace "italic"
+
+                        # Description bold substitution
+                        $Value = Resolve-HTMLMarkdown -OriginalString $Value -HTMLReplace "bold"
 
                         $Group.Controls += @{"Id"=$Id; "Value"=$Value; "Deleted"=$Deleted; MalformedDescription=$IsMalformedDescription}
                     }
@@ -382,13 +383,12 @@ function Resolve-HTMLMarkdown{
     )
 
     # Replace markdown with italics substitution
-    # NOTE: This could eventually be a switch case function for other types of html subsitutions in markdown
     if ($HTMLReplace.ToLower() -match "italic") {
         $ResolvedString = $OriginalString -replace '(_)(.*?)(_)', '<i>${2}</i>'
         return $ResolvedString
     } elseif($HTMLReplace.ToLower() -match "bold") {
         $ResolvedString = $OriginalString -replace '(**)(.*?)(**)', '<b>${2}</b>'
-        return $ResolvedString    
+        return $ResolvedString
     } else {
         return $OriginalString
     }
