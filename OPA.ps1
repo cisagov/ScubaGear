@@ -24,7 +24,12 @@ param(
     [ValidateSet('Windows','MacOS','Linux')]
     [Alias('os')]
     [string]
-    $OperatingSystem  = "Windows"
+    $OperatingSystem  = "Windows",
+
+    [Parameter(Mandatory=$true)]
+    [ValidateScript({Test-Path -Path $_ -PathType Container})]
+    [string]
+    $ScubaParentDirectory = $env:USERPROFILE
 )
 
 # Constants
@@ -52,12 +57,12 @@ function Get-OPAFile {
     )
 
     $InstallUrl = "https://openpolicyagent.org/downloads/v$($ExpectedVersion)/$($Filename)"
-    $OutFile=(Join-Path (Get-Location).Path $OPAExe)
+    $OutFile = ( Join-Path $ScubaTools $OPAExe ) #(Join-Path (Get-Location).Path $OPAExe)
 
     try {
         $Display = "Downloading OPA executable"
         Start-BitsTransfer -Source $InstallUrl -Destination $OutFile -DisplayName $Display -MaxDownloadTime 300
-        Write-Information -MessageData "Installed the specified OPA version (${ExpectedVersion}) to ${OPAExe}" | Out-Host
+        Write-Information -MessageData "Installed the specified OPA version (${ExpectedVersion}) to ${OutFile}" | Out-Host
     }
     catch {
         $Error[0] | Format-List -Property * -Force | Out-Host
@@ -79,7 +84,7 @@ function Get-ExeHash {
     )
 
     $InstallUrl = "https://openpolicyagent.org/downloads/v$($ExpectedVersion)/$($Filename).sha256"
-    $OutFile=(Join-Path (Get-Location).Path $InstallUrl.SubString($InstallUrl.LastIndexOf('/')))
+    $OutFile = (Join-Path (Get-Location).Path $InstallUrl.SubString($InstallUrl.LastIndexOf('/')))
 
     try {
         $WebClient = New-Object System.Net.WebClient
@@ -118,7 +123,7 @@ function Confirm-OPAHash {
         $Filename
     )
 
-    if ((Get-FileHash .\$OPAExe -Algorithm SHA256 ).Hash -ne $(Get-ExeHash -name $Filename -version $ExpectedVersion)) {
+    if ((Get-FileHash ( Join-Path $ScubaTools $OPAExe ) -Algorithm SHA256 ).Hash -ne $(Get-ExeHash -name $Filename -version $ExpectedVersion)) {
         return $false, "SHA256 verification failed, retry download or install manually. See README under 'Download the required OPA executable' for instructions."
     }
 
@@ -154,6 +159,13 @@ $DebugPreference = "Continue"
 $InformationPreference = "Continue"
 $ErrorActionPreference = "Stop"
 
+$ScubaHiddenHome = Join-Path -Path $ScubaParentDirectory -ChildPath '.scubagear'
+$ScubaTools = Join-Path -Path $ScubaHiddenHome -ChildPath 'Tools'
+if((Test-Path -Path $ScubaTools) -eq $false) {
+    New-Item -ItemType Directory -Force -Path $ScubaTools
+    Write-Output "" | Out-Host
+}
+
 if(-not $ACCEPTABLEVERSIONS.Contains($ExpectedVersion)) {
     $AcceptableVersionsString = $ACCETABLEVERSIONS -join "`r`n" | Out-String
     throw "Version parameter entered, ${ExpectedVersion}, is not in the list of acceptable versions. Acceptable versions are:`r`n${AcceptableVersionsString}"
@@ -164,7 +176,7 @@ if($OPAExe -eq "") {
     $OPAExe = $Filename
 }
 
-if(Test-Path -Path $OPAExe -PathType Leaf) {
+if(Test-Path -Path ( Join-Path $ScubaTools $OPAExe) -PathType Leaf) {
     $Result = Confirm-OPAHash -out $OPAExe -version $ExpectedVersion -name $Filename
 
     if($Result[0]) {
