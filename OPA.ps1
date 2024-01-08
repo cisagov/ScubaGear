@@ -30,7 +30,7 @@ param(
 # Constants
 $ACCEPTABLEVERSIONS = '0.42.1','0.42.2','0.43.1','0.44.0','0.45.0','0.46.3','0.47.4','0.48.0','0.49.2','0.50.2',
                         '0.51.0','0.52.0','0.53.1','0.54.0','0.55.0','0.56.0','0.57.1','0.58.0','0.59.0'
-$FILENAME = @{ Windows = "opa_windows_amd64.exe"; Mac = "opa_darwin_amd64"; Linux = "opa_linux_amd64_static"}
+$FILENAME = @{ Windows = "opa_windows_amd64.exe"; MacOS = "opa_darwin_amd64"; Linux = "opa_linux_amd64_static"}
 
 # Download opa rego exe
 function Get-OPAFile {
@@ -56,15 +56,12 @@ function Get-OPAFile {
 
     try {
         $Display = "Downloading OPA executable"
-        Start-BitsTransfer -Source $InstallUrl -Destination $OutFile -DisplayName $Display
+        Start-BitsTransfer -Source $InstallUrl -Destination $OutFile -DisplayName $Display -MaxDownloadTime 300
         Write-Information -MessageData "Installed the specified OPA version (${ExpectedVersion}) to ${OPAExe}" | Out-Host
     }
     catch {
         $Error[0] | Format-List -Property * -Force | Out-Host
-        Write-Error "Unable to download OPA executable. To try manually downloading, see details in README under 'Download the required OPA executable'" | Out-Host
-    }
-    finally {
-        $WebClient.Dispose()
+        throw "Unable to download OPA executable. To try manually downloading, see details in README under 'Download the required OPA executable'" | Out-Host
     }
 }
 
@@ -73,7 +70,12 @@ function Get-ExeHash {
         [Parameter(Mandatory)]
         [ValidateNotNullOrEmpty()]
         [Alias('name')]
-        [string]$Filename
+        [string]$Filename,
+
+        [Parameter(Mandatory)]
+        [ValidateNotNullOrEmpty()]
+        [Alias('version')]
+        [string]$ExpectedVersion
     )
 
     $InstallUrl = "https://openpolicyagent.org/downloads/v$($ExpectedVersion)/$($Filename).sha256"
@@ -116,7 +118,7 @@ function Confirm-OPAHash {
         $Filename
     )
 
-    if ((Get-FileHash .\$OPAExe -Algorithm SHA256 ).Hash -ne $(Get-ExeHash -name $Filename)) {
+    if ((Get-FileHash .\$OPAExe -Algorithm SHA256 ).Hash -ne $(Get-ExeHash -name $Filename -version $ExpectedVersion)) {
         return $false, "SHA256 verification failed, retry download or install manually. See README under 'Download the required OPA executable' for instructions."
     }
 
@@ -182,6 +184,6 @@ else {
     Install-OPA -out $OPAExe -version $ExpectedVersion -name $Filename
 }
 
-$DebugPreference = "SilientlyContinue"
-$InformationPreference = "SilientlyContinue"
+$DebugPreference = "SilentlyContinue"
+$InformationPreference = "SilentlyContinue"
 $ErrorActionPreference = "Continue"
