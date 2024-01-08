@@ -148,6 +148,42 @@ function Get-EXOTenantDetail {
     }
 }
 
+# A $script:scoped variable used to indicate the preferred DoH server.
+# Initialize to empty string to indicate that we don't yet know the
+# preferred server. Will be set when the Select-DohServer function is
+# called.
+$DohServer = ""
+
+function Select-DohServer {
+    <#
+    .Description
+    Iterates through several DoH servers. Returns the first successful server. If none are successful, returns $null.
+    .Functionality
+    Internal
+    #>
+    $DoHServers = @("cloudflare-dns.com", "[2606:4700:4700::1111]", "1.1.1.1")
+    $PreferredServer = $null
+    foreach ($Server in $DoHServers) {
+        try {
+            # Attempt to resolve a.root-servers.net over DoH. The domain chosen is somewhat
+            # arbitrary, as we don't care what the answer is, only if the query succeeds/fails.
+            # a.root-servers.net, the address of one of the DNS root servers, was chosen as a
+            # benign, highly-available domain.
+            $Uri = "https://$($Server)/dns-query?name=a.root-servers.net"
+            Invoke-WebRequest -Headers @{"accept"="application/dns-json"} -Uri $Uri `
+                -TimeoutSec 2 -UseBasicParsing -ErrorAction "Stop" | Out-Null
+            # No error was thrown, return this server
+            $PreferredServer = $Server
+            break
+        }
+        catch {
+            # This server didn't work, try the next one
+            continue
+        }
+    }
+    $PreferredServer
+}
+
 function Invoke-RobustDnsTxt {
     <#
     .Description
@@ -186,7 +222,11 @@ function Invoke-RobustDnsTxt {
             if ($Response.Strings.Length -gt 0) {
                 # We got our answer, so break out of the retry loop and set $Success to $true, no
                 # need to retry the traditional query or retry with DoH.
-                $LogEntries += @{"query_name"=$Qname; "query_method"="traditional"; "query_result"="Query returned $($Response.Strings.Length) txt records"}
+                $LogEntries += @{
+                    "query_name"=$Qname;
+                    "query_method"="traditional";
+                    "query_result"="Query returned $($Response.Strings.Length) txt records"
+                }
                 $Answers += $Response.Strings
                 $Success = $true
                 break
@@ -197,7 +237,11 @@ function Invoke-RobustDnsTxt {
                 # this was not a transient failure. Don't set $Success to $true though, as we want to
                 # retry this query from a public resolver, in case the internal DNS server returns a
                 # different answer than what is served to the public (i.e., split horizon DNS).
-                $LogEntries += @{"query_name"=$Qname; "query_method"="traditional"; "query_result"="Query returned 0 txt records"}
+                $LogEntries += @{
+                    "query_name"=$Qname;
+                    "query_method"="traditional";
+                    "query_result"="Query returned 0 txt records"
+                }
                 $TradEmptyOrNx = $true
                 break
             }
@@ -208,54 +252,90 @@ function Invoke-RobustDnsTxt {
                 # a transient failure. Don't set $Success to $true though, as we want to retry this
                 # query from a public resolver, in case the internal DNS server returns a different
                 # answer than what is served to the public (i.e., split horizon DNS).
-                $LogEntries += @{"query_name"=$Qname; "query_method"="traditional"; "query_result"="Query returned NXDomain"}
+                $LogEntries += @{
+                    "query_name"=$Qname;
+                    "query_method"="traditional";
+                    "query_result"="Query returned NXDomain"
+                }
                 $TradEmptyOrNx = $true
                 break
             }
             else {
                 # The query failed, possibly a transient failure. Retry if we haven't reached $MaxsTries.
-                $LogEntries += @{"query_name"=$Qname; "query_method"="traditional"; "query_result"="Query resulted in exception, $($_.FullyQualifiedErrorId)"}
+                $LogEntries += @{
+                    "query_name"=$Qname;
+                    "query_method"="traditional";
+                    "query_result"="Query resulted in exception, $($_.FullyQualifiedErrorId)"
+                }
             }
         }
     }
 
     if (-not $Success) {
         # The traditional DNS query(ies) failed. Retry with DoH
-        $TryNumber = 0
-        while ($TryNumber -lt $MaxTries) {
-            $TryNumber += 1
-            try {
-                $Uri = "https://1.1.1.1/dns-query?name=$($Qname)&type=txt"
-                $RawResponse = $(Invoke-WebRequest -H @{"accept"="application/dns-json"} -Uri $Uri -UseBasicParsing -ErrorAction Stop).RawContent
-                $ResponseLines = $RawResponse -Split "`n"
-                $LastLine = $ResponseLines[$ResponseLines.Length - 1]
-                $ResponseBody = ConvertFrom-Json $LastLine
-                if ($ResponseBody.Status -eq 0) {
-                    # 0 indicates there was no error
-                    $LogEntries += @{"query_name"=$Qname; "query_method"="DoH"; "query_result"="Query returned $($ResponseBody.Answer.data.Length) txt records"}
-                    $Answers += ($ResponseBody.Answer.data | ForEach-Object {$_.Replace('"', '')})
-                    $Success = $true
-                    break
+        if ($script:DohServer -eq "") {
+            # We haven't determined if DoH is available yet, select the first server that works
+            $script:DohServer = Select-DohServer
+        }
+        if ($null -eq $script:DohServer) {
+            # None of the DoH servers are accessible
+            $LogEntries += @{"query_name"=$Qname; "query_method"="DoH"; "query_result"="NA, DoH servers unreachable"}
+        }
+        else {
+            # DoH is available, query for the domain
+            $TryNumber = 0
+            while ($TryNumber -lt $MaxTries) {
+                $TryNumber += 1
+                try {
+                    $Uri = "https://$($script:DohServer)/dns-query?name=$($Qname)&type=txt"
+                    $Headers = @{"accept"="application/dns-json"}
+                    $RawResponse = $(Invoke-WebRequest -Headers $Headers -Uri $Uri -UseBasicParsing -ErrorAction "Stop").RawContent
+                    $ResponseLines = $RawResponse -Split "`n"
+                    $LastLine = $ResponseLines[$ResponseLines.Length - 1]
+                    $ResponseBody = ConvertFrom-Json $LastLine
+                    if ($ResponseBody.Status -eq 0) {
+                        # 0 indicates there was no error
+                        $LogEntries += @{
+                            "query_name"=$Qname;
+                            "query_method"="DoH";
+                            "query_result"="Query returned $($ResponseBody.Answer.data.Length) txt records"
+                        }
+                        $Answers += ($ResponseBody.Answer.data | ForEach-Object {$_.Replace('"', '')})
+                        $Success = $true
+                        break
+                    }
+                    elseif ($ResponseBody.Status -eq 3) {
+                        # 3 indicates NXDomain. The DNS query succeeded, but the domain did not exist.
+                        # Set $Success to $true, because event though the domain does not exist, the
+                        # query succeeded, and this came from an external resolver so split horizon is
+                        # not an issue here.
+                        $LogEntries += @{
+                            "query_name"=$Qname;
+                            "query_method"="DoH";
+                            "query_result"="Query returned NXDomain"
+                        }
+                        $Success = $true
+                        break
+                    }
+                    else {
+                        # The remainder of the response codes indicate that the query did not succeed.
+                        # Retry if we haven't reached $MaxTries.
+                        $LogEntries += @{
+                            "query_name"=$Qname;
+                            "query_method"="DoH";
+                            "query_result"="Query returned response code $($ResponseBody.Status)"
+                        }
+                    }
                 }
-                elseif ($ResponseBody.Status -eq 3) {
-                    # 3 indicates NXDomain. The DNS query succeeded, but the domain did not exist.
-                    # Set $Success to $true, because event though the domain does not exist, the
-                    # query succeeded, and this came from an external resolver so split horizon is
-                    # not an issue here.
-                    $LogEntries += @{"query_name"=$Qname; "query_method"="DoH"; "query_result"="Query returned NXDomain"}
-                    $Success = $true
-                    break
+                catch {
+                    # The DoH query failed, likely due to a network issue. Retry if we haven't reached
+                    # $MaxTries.
+                    $LogEntries += @{
+                        "query_name"=$Qname;
+                        "query_method"="DoH";
+                        "query_result"="Query resulted in exception, $($_.FullyQualifiedErrorId)"
+                    }
                 }
-                else {
-                    # The remainder of the response codes indicate that the query did not succeed.
-                    # Retry if we haven't reached $MaxTries.
-                    $LogEntries += @{"query_name"=$Qname; "query_method"="DoH"; "query_result"="Query returned response code $($ResponseBody.Status)"}
-                }
-            }
-            catch {
-                # The DoH query failed, likely due to a network issue. Retry if we haven't reached
-                # $MaxTries.
-                $LogEntries += @{"query_name"=$Qname; "query_method"="DoH"; "query_result"="Query resulted in exception, $($_.FullyQualifiedErrorId)"}
             }
         }
     }
