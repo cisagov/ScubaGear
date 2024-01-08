@@ -38,11 +38,34 @@ param (
     [Parameter()]
     [string[]]$t = "",
     [Parameter()]
-    [switch]$v
+    [switch]$v,
+    [Parameter(Mandatory=$false)]
+    [ValidateScript({Test-Path -Path $_ -PathType Container})]
+    [string]
+    $ScubaParentDirectory = $env:USERPROFILE,
+    [Parameter(Mandatory=$false)]
+    [switch]
+    $RunAsInstalled
 )
 
+$ScubaHiddenHome = Join-Path -Path $ScubaParentDirectory -ChildPath '.scubagear'
+$ScubaTools = Join-Path -Path $ScubaHiddenHome -ChildPath 'Tools'
+$OPAExe = Join-Path -Path $ScubaTools -ChildPath 'opa_windows_amd64.exe'
 $ScriptName = $MyInvocation.MyCommand
-$FilePath = ".\Unit\Rego"
+$RootPath = Join-Path -Path $PSScriptRoot -ChildPath '../PowerShell/ScubaGear'
+
+if ($RunAsInstalled){
+    if ($null -ne (Get-Module -Name ScubaGear)){
+        $RootPath = Split-Path (Get-Module -Name ScubaGear).Path -Parent
+    }
+    else {
+        Write-Error "ScubaGear is not installed.  You cannot use RunAsInstalled switch." -ErrorAction 'Stop'
+    }
+}
+
+$RegoUnitTestPath = Join-Path -Path $RootPath -ChildPath "Testing\Unit\Rego"
+$RegoPolicyPath = Join-Path -Path $RootPath -ChildPath "Rego"
+
 function Get-ErrorMsg {
     [CmdletBinding()]
     param (
@@ -88,8 +111,8 @@ function Invoke-Product {
 
     foreach($Product in $p) {
         Write-Output "`n==== Testing $Product ===="
-        $Directory = Join-Path -Path $FilePath -ChildPath $Product
-        ..\opa_windows_amd64.exe test ..\Rego\ $Directory $Flag
+        $Directory = Join-Path -Path $RegoUnitTestPath -ChildPath $Product
+        & $OPAExe test $RegoPolicyPath $Directory $Flag
     }
     Write-Output ""
 }
@@ -124,7 +147,7 @@ function Invoke-ControlGroupItem {
         $Result = Get-ControlGroup $ControlGroup
         if($Result[0]){
             $ControlGroup = $Result[1]
-            $Filename = Get-ChildItem $(Join-Path -Path $FilePath -ChildPath $Product) |
+            $Filename = Get-ChildItem $(Join-Path -Path $RegoUnitTestPath -ChildPath $Product) |
             Where-Object {$_.Name -like "*$ControlGroup*" }
 
             if ($null -eq $Filename){
@@ -133,7 +156,7 @@ function Invoke-ControlGroupItem {
 
             elseif(Test-Path -Path $Filename.Fullname -PathType Leaf) {
                 Write-Output "`nTesting Control Group $ControlGroup"
-                ..\opa_windows_amd64.exe test ..\Rego\ .\$($Filename.Fullname) $Flag
+                ..\opa_windows_amd64.exe test $RegoPolicyPath .\$($Filename.Fullname) $Flag
             }
             else {
                 Get-ErrorMsg FileIOError, $Filename
@@ -160,7 +183,7 @@ function Invoke-TestName {
     $Result = Get-ControlGroup $ControlGroup
     if($Result[0]){
         $ControlGroup = $Result[1]
-        $Filename = Get-ChildItem $(Join-Path -Path $FilePath -ChildPath $Product) |
+        $Filename = Get-ChildItem $(Join-Path -Path $RegoUnitTestPath -ChildPath $Product) |
         Where-Object {$_.Name -like "*$ControlGroup*" }
 
         if(Test-Path -Path $Filename.Fullname -PathType Leaf) {
@@ -171,7 +194,7 @@ function Invoke-TestName {
 
                 if ($Match){
                     Write-Output "`nTesting $Test"
-                    ..\opa_windows_amd64.exe test ..\Rego\ .\$($Filename.Fullname) -r $Test $Flag
+                    ..\opa_windows_amd64.exe test $RegoPolicyPath .\$($Filename.Fullname) -r $Test $Flag
                 }
                 else{
                     Write-Warning "`nNOT FOUND: $Test in $Filename"

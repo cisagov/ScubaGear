@@ -47,7 +47,12 @@ param(
     [Parameter(Mandatory = $false, HelpMessage = 'The file name that the opa executable is to be saved as')]
     [Alias('name')]
     [string]
-    $OPAExe = ""
+    $OPAExe = "",
+
+    [Parameter(Mandatory=$false)]
+    [ValidateScript({Test-Path -Path $_ -PathType Container})]
+    [string]
+    $ScubaParentDirectory = $env:USERPROFILE
 )
 
 # Set preferences for writing messages
@@ -134,7 +139,7 @@ if ($NoOPA -eq $true) {
 else {
     try {
         $ScriptDir = Split-Path -Path $MyInvocation.MyCommand.Definition -Parent
-        . $ScriptDir\OPA.ps1 -name $OPAExe -version $ExpectedVersion -os $OperatingSystem
+        . $ScriptDir\OPA.ps1 -name $OPAExe -version $ExpectedVersion -os $OperatingSystem -ScubaParentDirectory $ScubaParentDirectory
     }
     catch {
         $Error[0] | Format-List -Property * -Force | Out-Host
