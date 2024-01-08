@@ -1,4 +1,3 @@
-# Author: James Garriss
 # Purpose: Run the linter against the PowerShell code
 
 name: Lint Check for PowerShell
@@ -7,13 +6,13 @@ name: Lint Check for PowerShell
 on:
   push:
     paths:
-      - '**.ps1'
-      - '**.psm1'
-      - '**.psd1'
-      - '**.pssc'
-      - '**.psrc'
-      - '**.ps1xml'
-      - '**.cdxml'
+      - "**.ps1"
+      - "**.psm1"
+      - "**.psd1"
+      - "**.pssc"
+      - "**.psrc"
+      - "**.ps1xml"
+      - "**.cdxml"
   workflow_dispatch:
 
 jobs:
