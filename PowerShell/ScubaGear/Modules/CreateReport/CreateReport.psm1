@@ -386,6 +386,9 @@ function Resolve-HTMLMarkdown{
     if ($HTMLReplace.ToLower() -match "italic") {
         $ResolvedString = $OriginalString -replace '(_)(.*?)(_)', '<i>${2}</i>'
         return $ResolvedString
+    } elseif($HTMLReplace.ToLower() -match "bold") {
+        $ResolvedString = $OriginalString -replace '(**)(.*?)(**)', '<b>${2}</b>'
+        return $ResolvedString    
     } else {
         return $OriginalString
     }
