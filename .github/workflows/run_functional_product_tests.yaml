@@ -18,6 +18,7 @@ jobs:
       run:
         shell: powershell
     steps:
+      # Test me
       - name: Checkout Repo
         uses: actions/checkout@v4
       # - name: Create PFX
