@@ -161,6 +161,29 @@ function ConfigureScubaGearModule{
     return $null -ne $Result
 }
 
+function CreateFileList{
+    param(
+        [Parameter(Mandatry=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $SourcePath,
+        [Parameter(Mandatry=$false)]
+        [AllowEmptyCollection()]
+        [array]
+        $Files = @(),
+        [Parameter(Mandatry=$false)]
+        [AllowEmptyCollection()]
+        [array]
+        $Extensions = @()
+    )
+
+    $Files = Get-ChildItem -Recurse -Path $SourcePath -Include $Extensions
+    $Files += Get-ChildItem -Recurse -Path $SourcePath -Include $Files
+    $FileList = New-TemporaryFile
+    $Files.Path | Out-File -FilePath $FileList.Path -Encoding utf8 -Force
+    return $FileList
+}
+
 function SignScubaGearModule{
     <#
         .NOTES
@@ -168,49 +191,81 @@ function SignScubaGearModule{
     #>
     param (
         [Parameter(Mandatory=$true)]
+        [ValidateScript({[uri]::IsWellFormedUriString($_, 'Absolute') -and ([uri] $_).Scheme -in 'https'})]
+        [System.Uri]
+        $AzureKeyVaultUrl,
+        [Parameter(Mandatry=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $CertificateName,
+        [Parameter(Mandatry=$true)]
+        [ValidateNotNullOrEmpty()]
+        [System.Guid]
+        $ClientId,
+        [Parameter(Mandatry=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $ClientSecret,
+        [Parameter(Mandatry=$true)]
+        [ValidateNotNullOrEmpty()]
+        [System.Guid]
+        $TenantId,
+        [Parameter(Mandatory=$true)]
         [ValidateScript({Test-Path -Path $_})]
         $ModulePath,
         [Parameter(Mandatory=$false)]
-        [scriptblock]
-        $GetCertificate = $function:GetCodeSigningCertificate,
-        [Parameter(Mandatory=$false)]
         [ValidateScript({[uri]::IsWellFormedUriString($_, 'Absolute') -and ([uri] $_).Scheme -in 'http','https'})]
-        $TimeStampServer = 'http://timestamp.digicert.com',
-        [Parameter(Mandatory=$false)]
-        [ValidateSet('SHA256')]
-        [string]
-        $HashAlgorithm = 'SHA256'
+        $TimeStampServer = 'http://timestamp.digicert.com'
     )
     $CatalogFileName = 'ScubaGear.cat'
     $CatalogPath = Join-Path -Path $ModulePath -ChildPath $CatalogFileName
-    $Cert = Invoke-Command $GetCertificate
 
     # Digitally sign scripts, manifest, and modules
-    Get-ChildItem $ModulePath -Include *.psd1,*psm1,*.ps1 -Recurse |
-    Set-AuthenticodeSignature -Certificate $Cert -TimeStampServer $TimeStampServer -HashAlgorithm $HashAlgorithm
+    $FileList = CreateFileList -SourcePath $ModulePath -Extensions ".ps1,.psm1,.psd1" -OutputFileList $FileList
 
+    $SignArguments = @(
+        'sign',
+        '-coe',
+        '-v',
+        '-fd',"sha256",
+        '-kvu',$AzureKeyVaultUrl,
+        '-kvi',$ClientId,
+        '-kvt',$TenantId, 
+        '-kvs',$ClientSecret,
+        '-kvc',$CertificateName,
+        '-ifl',$FileList         
+    )
+    Start-CodeSign `
+        -AzureKeyVaultUrl $AzureKeyVaultUrl `
+        -AzureKeyVaultClientId $ClientId `
+        -AzureKeyValutClientSecret $ClientSecret `
+        -AzureKeyVaultTenantId $TenantId `
+        -AzureKeyVaultCertificate $CertificateName `
+        -InputFileList $FileList `
+        -TimestampUtl $TimeStampServer
+
+    $ToolPath = (Get-Command AzureSignTool).Path    
+    powershell -Command "& $ToolPath $SignArguments"    
+
+    # Create and sign catalog    
     New-FileCatalog -Path $ModulePath -CatalogFilePath $CatalogPath -CatalogVersion 2.0 -Verbose
-    Set-AuthenticodeSignature -FilePath $CatalogPath -Certificate $Cert -TimestampServer $TimeStampServer -HashAlgorithm $HashAlgorithm
+    $CatalogList = CreateFileList -SourcePath $ModulePath -Files @($CatalogPath) -OutputFileList $FileList
 
+    $SignArguments = @(
+        'sign',
+        '-coe',
+        '-v',
+        '-fd',"sha256",
+        '-kvu',$AzureKeyVaultUrl,
+        '-kvi',$ClientId,
+        '-kvt',$TenantId, 
+        '-kvs',$ClientSecret,
+        '-kvc',$CertificateName,
+        '-ifl',$CatalogList        
+    )
+    
     $TestResult = Test-FileCatalog -CatalogFilePath $CatalogPath
     return 'Valid' -eq $TestResult.Status
-}
-
-function New-CodeSigningCertificate{
-    <#
-        .NOTES
-        Internal helper function
-    #>
-    New-SelfSignedCertificate -DnsName cisa.gov -Type CodeSigning -CertStoreLocation Cert:\CurrentUser\My
-}
-
-function GetCodeSigningCertificate{
-    <#
-        .NOTES
-        Internal helper function
-    #>
-    #TODO:  Replace with official signing certificate
-    Get-ChildItem Cert:\CurrentUser\My -CodeSigningCert | Where-Object { $_.HasPrivateKey -and ($_.NotAfter -gt (Get-Date))}
 }
 
 function IsRegistered{
