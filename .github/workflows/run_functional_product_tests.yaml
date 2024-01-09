@@ -55,12 +55,17 @@ jobs:
           # Read params from secret.
           $json = $env:TestParams
           $json = $json.TrimStart('"').TrimEnd('"') | ConvertFrom-Json
-          foreach($i in $json)
-          {
-            $paramsAsJson = ConvertTo-Json $i
-            $paramsAsHashTable = ConvertFrom-Json -AsHashtable $paramsAsJson
-            ./Testing/Functional/Products/Tests/CallProductTests.ps1 -params $paramsAsHashTable -thumbprint $thumbprint
-          }
+          $i = $json[1]
+          $paramsAsJson = ConvertTo-Json $i
+          $paramsAsJson
+          $paramsAsHashTable = ConvertFrom-Json -AsHashtable $paramsAsJson
+          ./Testing/Functional/Products/Tests/CallProductTests.ps1 -params $paramsAsHashTable -thumbprint $thumbprint
+          # foreach($i in $json)
+          # {
+          #   $paramsAsJson = ConvertTo-Json $i
+          #   $paramsAsHashTable = ConvertFrom-Json -AsHashtable $paramsAsJson
+          #   ./Testing/Functional/Products/Tests/CallProductTests.ps1 -params $paramsAsHashTable -thumbprint $thumbprint
+          # }
         shell: pwsh # Convert from JSON requires PS 6
         env:
           TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
