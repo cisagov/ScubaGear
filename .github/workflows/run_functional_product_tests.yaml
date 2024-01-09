@@ -55,7 +55,7 @@ jobs:
           # Read params from secret.
           $json = $env:TestParams
           $json = $json.TrimStart('"').TrimEnd('"') | ConvertFrom-Json
-          $i = $json[1]
+          $i = $json[0]
           $paramsAsJson = ConvertTo-Json $i
           $paramsAsJson
           $paramsAsHashTable = ConvertFrom-Json -AsHashtable $paramsAsJson
