@@ -53,9 +53,10 @@ jobs:
           $paramsAsString = $env:TestParams
           foreach($i in $paramsAsString)
           {
-            $params = ConvertFrom-Json -AsHashtable $i
-            Write-Host $params.GetType()
-            Write-Output "${key}: ${value}"
+            echo "hello"
+            # $params = ConvertFrom-Json -AsHashtable $i
+            # Write-Host $params.GetType()
+            # Write-Output "${key}: ${value}"
           }
         shell: pwsh # Convert from JSON requires PS 6
         env:
