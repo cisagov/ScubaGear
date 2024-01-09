@@ -61,7 +61,7 @@ jobs:
             $paramsHash = ConvertFrom-Json -AsHashtable $paramsJson
             foreach ($key in $paramsHash.Keys)
             {
-              $value = paramsHash[$key]
+              $value = $paramsHash[$key]
               Write-Host "${key}: ${value}"
             }
           }
