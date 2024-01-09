@@ -62,12 +62,16 @@ jobs:
           # Read thumbprint from previous job.
           $thumbprint = "${{ steps.thumbprint.outputs.THUMBPRINT }}"
           # Read params from previous job.
-          $paramsAsString = "${{ steps.params.outputs.PARAMS }}"
-          foreach($i in $paramsAsString)
+          $json = "${{ steps.params.outputs.PARAMS }}" | ConvertFrom-Json
+          foreach($i in $json)
           {
-            $params = ConvertFrom-Json -AsHashtable $i
-            echo $params.GetType()
-            echo "${key}: ${value}"
+            $paramsJson = ConvertTo-Json $i
+            $paramsHash = ConvertFrom-Json -AsHashtable $paramsJson
+            foreach ($key in $paramsHash.Keys)
+            {
+              $value = paramsHash[$key]
+              Write-Host "${key}: ${value}"
+            }
           }
         shell: pwsh # Convert from JSON requires PS 6
         
