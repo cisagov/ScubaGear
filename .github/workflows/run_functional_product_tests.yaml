@@ -53,6 +53,7 @@ jobs:
         run: |
           # Read the params from the secret
           $paramsAsString = $env:TestParams
+          $paramsAsString
           # Pass params to later job.
           echo PARAMS=$paramsAsString >> $env:GITHUB_OUTPUT
         env:
@@ -63,15 +64,16 @@ jobs:
           $thumbprint = "${{ steps.thumbprint.outputs.THUMBPRINT }}"
           # Read params from previous job.
           $json = "${{ steps.params.outputs.PARAMS }}" | ConvertFrom-Json
-          foreach($i in $json)
-          {
-            $paramsJson = ConvertTo-Json $i
-            $paramsHash = ConvertFrom-Json -AsHashtable $paramsJson
-            foreach ($key in $paramsHash.Keys)
-            {
-              $value = paramsHash[$key]
-              Write-Host "${key}: ${value}"
-            }
-          }
+          $json
+          # foreach($i in $json)
+          # {
+          #   $paramsJson = ConvertTo-Json $i
+          #   $paramsHash = ConvertFrom-Json -AsHashtable $paramsJson
+          #   foreach ($key in $paramsHash.Keys)
+          #   {
+          #     $value = paramsHash[$key]
+          #     Write-Host "${key}: ${value}"
+          #   }
+          # }
         shell: pwsh # Convert from JSON requires PS 6
         
