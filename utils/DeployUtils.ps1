@@ -181,7 +181,6 @@ function SignScubaGearModule{
         [string]
         $HashAlgorithm = 'SHA256'
     )
-    #TODO: Add code signing
     $CatalogFileName = 'ScubaGear.cat'
     $CatalogPath = Join-Path -Path $ModulePath -ChildPath $CatalogFileName
     $Cert = Invoke-Command $GetCertificate
