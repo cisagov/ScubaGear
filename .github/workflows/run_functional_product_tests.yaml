@@ -51,13 +51,6 @@ jobs:
       - name: Test Products
         run: |
           $paramsAsString = $env:TestParams
-          foreach($i in $paramsAsString)
-          {
-            echo "hello"
-            # $params = ConvertFrom-Json -AsHashtable $i
-            # Write-Host $params.GetType()
-            # Write-Output "${key}: ${value}"
-          }
         shell: pwsh # Convert from JSON requires PS 6
         env:
           TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
