@@ -50,6 +50,13 @@ jobs:
         run: ./Testing/Functional/SmokeTest/UpdateSelenium.ps1
       - name: Test Products
         run: |
+          # Read the params from the secret
           $paramsAsString = $env:TestParams
+          foreach($i in $paramsAsString)
+          {
+            $params = ConvertFrom-Json -AsHashtable $i
+            Write-Host $params.GetType()
+            Write-Output "${key}: ${value}"
+          }
         env:
           TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
