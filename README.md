@@ -7,33 +7,44 @@
 Developed by CISA, ScubaGear is an assessment tool that verifies a Microsoft 365 (M365) tenant’s configuration conforms to the policies described in the Secure Cloud Business Applications ([SCuBA](https://cisa.gov/scuba)) Security Configuration Baseline [documents](https://github.com/cisagov/ScubaGear/tree/main/baselines).
 
 ## Table of Contents
-- [M365 Product License Assumptions](#m365-product-license-assumptions)
-- [Getting Started](#getting-started)
-  - [Download the Latest Release](#download-the-latest-release)
-  - [Installing the Required PowerShell Modules](#installing-the-required-powershell-modules)
-  - [Download the Required OPA executable](#download-the-required-opa-executable)
-  - [PowerShell Execution Policies](#powershell-execution-policies)
-- [Usage](#usage)
-  - [Importing the Module](#importing-the-module)
-  - [Examples](#example-1-run-an-assessment-against-all-products-except-powerplatform)
-  - [Parameter Definitions](#parameter-definitions)
-  - [AAD Conditional Access Policy Exemptions](#aad-conditional-access-policy-exemptions)
-  - [Viewing the Report](#viewing-the-report)
-- [Required Permissions](#required-permissions)
-  - [User Permissions](#user-permissions)
-  - [Microsoft Graph Powershell SDK permissions](#microsoft-graph-powershell-sdk-permissions)
-  - [Service Principal Application Permissions & Setup](#service-principal-application-permissions--setup)
-- [Architecture](#architecture)
-- [Repository Organization](#repository-organization)
-- [Troubleshooting](#troubleshooting)
-  - [Executing against multiple tenants](#executing-against-multiple-tenants)
-  - [Errors connecting to Defender](#errors-connecting-to-defender)
-  - [Exchange Online maximum connections error](#exchange-online-maximum-connections-error)
-  - [Power Platform Errors](#power-platform-errors)
-  - [Microsoft Graph Errors](#microsoft-graph-errors)
-  - [Running the Tool Behind Some Proxies](#running-the-tool-behind-some-proxies)
-  - [Utility Scripts](#utility-scripts)
-- [Project License](#project-license)
+- [ScubaGear](#scubagear)
+  - [Table of Contents](#table-of-contents)
+  - [M365 Product License Assumptions](#m365-product-license-assumptions)
+  - [Getting Started](#getting-started)
+    - [Download the Latest Release](#download-the-latest-release)
+    - [Installing the Required PowerShell Modules](#installing-the-required-powershell-modules)
+    - [Download the Required OPA executable](#download-the-required-opa-executable)
+    - [PowerShell Execution Policies](#powershell-execution-policies)
+  - [Usage](#usage)
+    - [Importing the module](#importing-the-module)
+    - [Example 1: Run an assessment against all products (except PowerPlatform)](#example-1-run-an-assessment-against-all-products-except-powerplatform)
+    - [Example 2: Run an assessment against Azure Active Directory with custom report output location](#example-2-run-an-assessment-against-azure-active-directory-with-custom-report-output-location)
+    - [Example 3: Run assessments against multiple products](#example-3-run-assessments-against-multiple-products)
+    - [Example 4: Run assessments non-interactively using an application service principal and authenticating via CertificateThumbprint](#example-4-run-assessments-non-interactively-using-an-application-service-principal-and-authenticating-via-certificatethumbprint)
+    - [Parameter Definitions](#parameter-definitions)
+    - [AAD Conditional Access Policy Exemptions](#aad-conditional-access-policy-exemptions)
+    - [Viewing the Report](#viewing-the-report)
+  - [Required Permissions](#required-permissions)
+    - [User Permissions](#user-permissions)
+    - [Microsoft Graph Powershell SDK permissions](#microsoft-graph-powershell-sdk-permissions)
+    - [Service Principal Application Permissions \& Setup](#service-principal-application-permissions--setup)
+      - [Power Platform App Registration](#power-platform-app-registration)
+  - [Architecture](#architecture)
+  - [Repository Organization](#repository-organization)
+  - [Troubleshooting](#troubleshooting)
+    - [Executing against multiple tenants](#executing-against-multiple-tenants)
+    - [Errors connecting to Defender](#errors-connecting-to-defender)
+    - [Exchange Online maximum connections error](#exchange-online-maximum-connections-error)
+    - [Power Platform errors](#power-platform-errors)
+    - [Microsoft Graph Errors](#microsoft-graph-errors)
+      - [Infinite AAD Sign in Loop](#infinite-aad-sign-in-loop)
+      - [Error `Connect-MgGraph : Key not valid for use in specified state.`](#error-connect-mggraph--key-not-valid-for-use-in-specified-state)
+      - [Error `Could not load file or assembly 'Microsoft.Graph.Authentication'`](#error-could-not-load-file-or-assembly-microsoftgraphauthentication)
+    - [Running the Tool Behind Some Proxies](#running-the-tool-behind-some-proxies)
+    - [Utility Scripts](#utility-scripts)
+      - [ScubaGear Support](#scubagear-support)
+      - [Removing installed modules](#removing-installed-modules)
+  - [Project License](#project-license)
 
 ## M365 Product License Assumptions
 This tool was tested against tenants that have an M365 E3 or G3 and E5 or G5 license bundle. It may still function for tenants that do not have one of these bundles.
@@ -127,7 +138,8 @@ Get-Help -Name Invoke-SCuBA -Full
   - Namespace for each policy item within a product for variables related only to one policy item (i.e., MS.AAD.2.1v1)
   - Use of YAML anchors and aliases following Don't Repeat Yourself (DRY) principle for repeated values and sections
 
-  When using the configuration file option, all non-default parameters must be specified in the file. ScubaGear does not allow other command line options with `-ConfigFilePath`. The file path defaults to the same directory where the script is executed. The file path must point to a valid configuration file. It can be either a relative or absolute path. The file can be used to specify both standard tool parameters as well as custom parameters used by the Azure Active Directory (AAD) product assessment. See [AAD Conditional Access Policy Exemptions](#aad-conditional-access-policy-exemptions) for more details.
+If -ConfigFilePath is specified, default values will be provided for parameters that are not explicitly put in the config file.   These default values are provided explicitly in the config file template to help guide the user, but they may be omitted from the file.   Command line values options can now be provided with the -ConfigFilePath. This should reduce the number of config files needed.  Examples might be switching the M365 environment variable from commercial to gcc, switching the tenant used or supplying credentials so they do not need to be resident in the config file (which would facilitate sharing). The file path defaults to the same directory where the script is executed. The file path must point to a valid configuration file. It can be either a relative or absolute path. The file can be used to specify both standard tool parameters as well as custom parameters used by the Azure Active Directory (AAD) product assessment. See [AAD Conditional Access Policy Exemptions](#aad-conditional-access-policy-exemptions) for more details.
+  
 
 - **$LogIn** is a `$true` or `$false` variable that if set to `$true` will prompt the user to provide credentials to establish a connection to the specified M365 products in the **$ProductNames** variable. For most use cases, leave this variable to be `$true`. A connection is established in the current PowerShell terminal session with the first authentication. To run another verification in the same PowerShell session,  set this variable to be `$false` to bypass the need to authenticate again in the same session. Defender will ask for authentication even if this variable is set to `$false`
 

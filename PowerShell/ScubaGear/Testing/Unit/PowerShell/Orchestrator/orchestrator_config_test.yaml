@@ -1,0 +1,23 @@
+Description: YAML Configuration file for unit test of ConfigFilePath overrides
+ProductNames:
+- teams
+- exo
+- defender
+- aad
+- sharepoint
+M365Environment: commercial
+OPAPath: .
+LogIn: true
+DisconnectOnExit: false
+OutPath: .
+OutFolderName: M365BaselineConformance
+OutProviderFileName: ProviderSettingsExport
+OutRegoFileName: TestResults
+OutReportName: BaselineReports
+AnObject:
+  name: MyObjectName
+
+# Dummy parameters for credentials
+Organization: sub.domain.com
+AppID:  7892dfe467aef9023bead7812fe56763
+CertificateThumbprint:  8A673F1087453ABC89423B2DA9387CEFA9BE3452
