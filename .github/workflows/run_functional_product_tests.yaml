@@ -51,6 +51,6 @@ jobs:
       - name: Test Products
         run: |
           $paramsAsString = $env:TestParams
-        shell: pwsh # Convert from JSON requires PS 6
+        # shell: pwsh # Convert from JSON requires PS 6
         env:
           TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
