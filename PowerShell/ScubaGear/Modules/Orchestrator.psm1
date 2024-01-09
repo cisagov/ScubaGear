@@ -258,7 +258,7 @@ function Invoke-SCuBA {
         if ($PSCmdlet.ParameterSetName -eq 'Report'){
 
             $ProvidedParameters = @{
-                'ProductNames' = $ProductNames | Sort-Object
+                'ProductNames' = $ProductNames | Sort-Object -Unique
                 'M365Environment' = $M365Environment
                 'OPAPath' = $OPAPath
                 'LogIn' = $LogIn
