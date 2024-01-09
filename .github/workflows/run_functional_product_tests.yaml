@@ -18,9 +18,9 @@ jobs:
       run:
         shell: powershell
     steps:
-      # Test me
       - name: Checkout Repo
         uses: actions/checkout@v4
+      - run: "echo test"
       # - name: Create PFX
       #   run: |
       #     New-Item -ItemType file -Path ./key.txt
