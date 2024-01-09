@@ -11,8 +11,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  sharepoint-test:
-    name: SharePoint Test
+  product-tests:
+    name: Product Tests
     runs-on: windows-latest
     defaults:
       run:
