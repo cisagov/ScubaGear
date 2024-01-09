@@ -14,8 +14,8 @@ OutFolderName: M365BaselineConformance
 OutProviderFileName: ProviderSettingsExport
 OutRegoFileName: TestResults
 OutReportName: BaselineReports
-AnObject:
-  name: MyObjectName
+# AnObject:
+#   name: MyObjectName
 
 # Dummy parameters for credentials
 Organization: sub.domain.com
