@@ -27,21 +27,21 @@ jobs:
           certutil -decode ./key.txt ./key.pfx
         env:
           PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
-      - name: Import PFX
-        # Pipe to Out-Null to hide the thumbprint
-        run: Import-PfxCertificate -Password (ConvertTo-SecureString -String $env:PfxPassword -AsPlainText -Force) -CertStoreLocation Cert:\CurrentUser\My -FilePath ./key.pfx | Out-Null
-        env:
-          PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
-      - name: Get Thumbprint
-        id: thumbprint
-        run: |
-          $x509 = Get-PfxCertificate -FilePath ./key.pfx -Password (ConvertTo-SecureString -String $env:PfxPassword -AsPlainText -Force)
-          $Thumbprint = $x509.ThumbPrint
-          # Pass thumbprint to later job.
-          echo THUMBPRINT=$Thumbprint >> $env:GITHUB_OUTPUT
-        shell: pwsh # Password requires PS 6
-        env:
-          PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
+      # - name: Import PFX
+      #   # Pipe to Out-Null to hide the thumbprint
+      #   run: Import-PfxCertificate -Password (ConvertTo-SecureString -String $env:PfxPassword -AsPlainText -Force) -CertStoreLocation Cert:\CurrentUser\My -FilePath ./key.pfx | Out-Null
+      #   env:
+      #     PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
+      # - name: Get Thumbprint
+      #   id: thumbprint
+      #   run: |
+      #     $x509 = Get-PfxCertificate -FilePath ./key.pfx -Password (ConvertTo-SecureString -String $env:PfxPassword -AsPlainText -Force)
+      #     $Thumbprint = $x509.ThumbPrint
+      #     # Pass thumbprint to later job.
+      #     echo THUMBPRINT=$Thumbprint >> $env:GITHUB_OUTPUT
+      #   shell: pwsh # Password requires PS 6
+      #   env:
+      #     PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
       # - name: Setup for Scuba
       #   run: ./SetUp.ps1
       # - name: Install Selenium
