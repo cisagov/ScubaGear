@@ -27,62 +27,48 @@ jobs:
       id-token: write
       contents: write
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          path: repo
-      - name: OIDC Login to Azure Public Cloud with AzPowershell (enableAzPSSession true)
-        uses: azure/login@v1
-        with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          enable-AzPSSession: true       
-      - name: Sign Module
-        uses: azure/powershell@v1
-        env:
-          KEY_VAULT_INFO: ${{ secrets.SCUBA_KEY_VAULT_DEV}}
-        with:
-          inlineScript: |
-            $DebugPreference='Continue'
-            dotnet --version
-            dotnet tool install --global AzureSignTool --version 4.0.1
-            Write-Output ${env:KEY_VAULT_INFO} 
-            $KeyVaultInfo = ${env:KEY_VAULT_INFO} | ConvertFrom-Json
-            . repo/utils/DeployUtils.ps1
-            # Remove non-release files
-            Remove-Item -Recurse -Force repo -Include .git*
-            SignScubaGearModule `
-              -AzureKeyVaultUrl $($KeyVaultInfo.KeyVault.URL) `
-              -CertificateName $($KeyVaultInfo.KeyVault.CertificateName) `
-              -ModulePath 'repo'
-            Move-Item  -Path repo -Destination "ScubaGear-${env:RELEASE_VERSION}" -Force
-            Compress-Archive -Path "ScubaGear-${env:RELEASE_VERSION}" -DestinationPath "ScubaGear-${env:RELEASE_VERSION}.zip"
-          azPSVersion: "latest"
-      - name: release
-        uses: softprops/action-gh-release@v1
-        id: create_release
-        with:
-          draft: true
-          prerelease: false
-          name: ${{ inputs.releaseName }}
-          tag_name: v${{ inputs.version }}
-          files: ScubaGear-${{ inputs.version }}.zip
-          generate_release_notes: true
-          fail_on_unmatched_files: true
-      - name: Download release
-        uses: dsaltares/fetch-gh-release-asset@1.1.1
-        if: ${{ inputs.runQuickCheck }}
-        with:
-          version: ${{ steps.create_release.outputs.id}}
-          file: "ScubaGear-${{ inputs.version }}.zip"
-      - name: Quick check release
-        if: ${{ inputs.runQuickCheck }}
-        shell: powershell
-        run: |
-          Expand-Archive -Path "ScubaGear-${{ inputs.version }}.zip"
-          Get-ChildItem 
-          Set-Location -Path "ScubaGear-${{ inputs.version }}"
-          .\SetUp.ps1
-          Import-Module -Name .\PowerShell\ScubaGear\ScubaGear.psd1
-          Invoke-SCuBA -Version
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        path: repo
+    - name: Show DotNet Version
+      shell: pwsh
+      run: dotnet --version
+    - name: Sign Scripts
+      shell: pwsh
+      run: |
+        $ErrorActionPreference = "Stop"
+        $PSDefaultParameterValues['*:ErrorAction']='Stop'
+        Set-StrictMode -Version Latest
+
+        New-Item -ItemType directory -Path certificate
+        Set-Content -Path certificate\cert.txt -Value $env:CODESIGN_PFX
+        certutil -decode certificate\cert.txt certificate\cert.pfx
+
+        $cert = Get-PfxCertificate -FilePath certificate\cert.pfx -Password (ConvertTo-SecureString -String $env:CODESIGN_PW -Force -AsPlainText)
+
+        Get-ChildItem -Recurse -Path repo -Include **.ps1,**.psm1,**.psd1 | ForEach-Object {
+          $path = $_.FullName
+          Set-AuthenticodeSignature -Certificate $cert -FilePath $path -TimestampServer "http://timestamp.digicert.com/" -IncludeChain NotRoot -HashAlgorithm SHA256
+          # Delay for 4 seconds to avoid exceeding rate limits (1000 / 5 minutes, 100 / 5 seconds)
+          Start-Sleep -Seconds 4
+        }
+
+        Remove-Item -Recurse -Force certificate
+        Remove-Item -Recurse -Force repo -Include .git*
+
+        Move-Item  -Path repo -Destination "ScubaGear-${env:RELEASE_VERSION}" -Force
+        Compress-Archive -Path "ScubaGear-${env:RELEASE_VERSION}" -DestinationPath "ScubaGear-${env:RELEASE_VERSION}.zip"
+
+        Get-ChildItem -Path . | Write-Output
+    - name: release
+      uses: softprops/action-gh-release@v1
+      id: create_release
+      with:
+        draft: true
+        prerelease: false
+        name: ${{ inputs.releaseName }}
+        tag_name: v${{ inputs.version }}
+        files: ScubaGear-${{ inputs.version }}.zip
+        generate_release_notes: true
+        fail_on_unmatched_files: true
