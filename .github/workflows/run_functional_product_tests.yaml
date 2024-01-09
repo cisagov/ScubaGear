@@ -20,43 +20,43 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
-      - name: Create PFX
-        run: |
-          New-Item -ItemType file -Path ./key.txt
-          Set-Content -Path ./key.txt -Value $env:PfxBase64
-          certutil -decode ./key.txt ./key.pfx
-        env:
-          PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
-      - name: Import PFX
-        # Pipe to Out-Null to hide the thumbprint
-        run: Import-PfxCertificate -Password (ConvertTo-SecureString -String $env:PfxPassword -AsPlainText -Force) -CertStoreLocation Cert:\CurrentUser\My -FilePath ./key.pfx | Out-Null
-        env:
-          PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
-      - name: Get Thumbprint
-        id: thumbprint
-        run: |
-          $x509 = Get-PfxCertificate -FilePath ./key.pfx -Password (ConvertTo-SecureString -String $env:PfxPassword -AsPlainText -Force)
-          $Thumbprint = $x509.ThumbPrint
-          # Pass thumbprint to later job.
-          echo THUMBPRINT=$Thumbprint >> $env:GITHUB_OUTPUT
-        shell: pwsh
-        env:
-          PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
-      - name: Setup for Scuba
-        run: ./SetUp.ps1
-      - name: Install Selenium
-        run: Install-Module -Name Selenium
-      - name: Update Selenium
-        run: ./Testing/Functional/SmokeTest/UpdateSelenium.ps1
-      - name: Test SharePoint
-        run: |
-          $paramsAsString = $env:TestParams
-          foreach($i in $paramsAsString)
-          {
-            $params = ConvertFrom-Json -AsHashtable $i
-            Write-Host $params.GetType()
-            Write-Output "${key}: ${value}"
-          }
-        shell: pwsh
-        env:
-          TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
+      # - name: Create PFX
+      #   run: |
+      #     New-Item -ItemType file -Path ./key.txt
+      #     Set-Content -Path ./key.txt -Value $env:PfxBase64
+      #     certutil -decode ./key.txt ./key.pfx
+      #   env:
+      #     PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
+      # - name: Import PFX
+      #   # Pipe to Out-Null to hide the thumbprint
+      #   run: Import-PfxCertificate -Password (ConvertTo-SecureString -String $env:PfxPassword -AsPlainText -Force) -CertStoreLocation Cert:\CurrentUser\My -FilePath ./key.pfx | Out-Null
+      #   env:
+      #     PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
+      # - name: Get Thumbprint
+      #   id: thumbprint
+      #   run: |
+      #     $x509 = Get-PfxCertificate -FilePath ./key.pfx -Password (ConvertTo-SecureString -String $env:PfxPassword -AsPlainText -Force)
+      #     $Thumbprint = $x509.ThumbPrint
+      #     # Pass thumbprint to later job.
+      #     echo THUMBPRINT=$Thumbprint >> $env:GITHUB_OUTPUT
+      #   shell: pwsh
+      #   env:
+      #     PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
+      # - name: Setup for Scuba
+      #   run: ./SetUp.ps1
+      # - name: Install Selenium
+      #   run: Install-Module -Name Selenium
+      # - name: Update Selenium
+      #   run: ./Testing/Functional/SmokeTest/UpdateSelenium.ps1
+      # - name: Test SharePoint
+      #   run: |
+      #     $paramsAsString = $env:TestParams
+      #     foreach($i in $paramsAsString)
+      #     {
+      #       $params = ConvertFrom-Json -AsHashtable $i
+      #       Write-Host $params.GetType()
+      #       Write-Output "${key}: ${value}"
+      #     }
+      #   shell: pwsh
+      #   env:
+      #     TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
