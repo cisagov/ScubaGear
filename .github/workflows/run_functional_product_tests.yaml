@@ -48,9 +48,9 @@ jobs:
         run: Install-Module -Name Selenium
       - name: Update Selenium
         run: ./Testing/Functional/SmokeTest/UpdateSelenium.ps1
-      - name: Test Products
-        run: |
-          $paramsAsString = $env:TestParams
-        # shell: pwsh # Convert from JSON requires PS 6
-        env:
-          TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
+      # - name: Test Products
+      #   run: |
+      #     $paramsAsString = $env:TestParams
+      #   # shell: pwsh # Convert from JSON requires PS 6
+      #   env:
+      #     TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
