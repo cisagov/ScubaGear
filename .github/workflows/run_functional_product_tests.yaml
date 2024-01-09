@@ -42,12 +42,12 @@ jobs:
         shell: pwsh # Password requires PS 6
         env:
           PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
-      # - name: Setup for Scuba
-      #   run: ./SetUp.ps1
-      # - name: Install Selenium
-      #   run: Install-Module -Name Selenium
-      # - name: Update Selenium
-      #   run: ./Testing/Functional/SmokeTest/UpdateSelenium.ps1
+      - name: Setup for Scuba
+        run: ./SetUp.ps1
+      - name: Install Selenium
+        run: Install-Module -Name Selenium
+      - name: Update Selenium
+        run: ./Testing/Functional/SmokeTest/UpdateSelenium.ps1
       - name: Test Products
         run: |
           # Read thumbprint from previous job.
@@ -57,13 +57,9 @@ jobs:
           $json = $json.TrimStart('"').TrimEnd('"') | ConvertFrom-Json
           foreach($i in $json)
           {
-            $paramsJson = ConvertTo-Json $i
-            $paramsHash = ConvertFrom-Json -AsHashtable $paramsJson
-            foreach ($key in $paramsHash.Keys)
-            {
-              $value = $paramsHash[$key]
-              Write-Host "${key}: ${value}"
-            }
+            $paramsAsJson = ConvertTo-Json $i
+            $paramsAsHashTable = ConvertFrom-Json -AsHashtable $paramsAsJson
+            ./Testing/Functional/Products/Tests/CallProductTests.ps1 -params $paramsAsHashTable -thumbprint $thumbprint
           }
         shell: pwsh # Convert from JSON requires PS 6
         env:
