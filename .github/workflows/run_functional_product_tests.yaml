@@ -62,7 +62,8 @@ jobs:
           # Read thumbprint from previous job.
           $thumbprint = "${{ steps.thumbprint.outputs.THUMBPRINT }}"
           # Read params from previous job.
-          $json = "${{ steps.params.outputs.PARAMS }}" -replace "^\"", "'" -replace "\"$", "'" | ConvertFrom-Json
+          $json = "${{ steps.params.outputs.PARAMS }}"
+          $json = $json.TrimStart('"').TrimEnd('"') | ConvertFrom-Json
           $json
           # foreach($i in $json)
           # {
