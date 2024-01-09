@@ -1,4 +1,5 @@
 on:
+on:
   workflow_dispatch:
     inputs:
       releaseName:
@@ -22,53 +23,23 @@ jobs:
     runs-on: windows-latest
     environment: Development
     env:
+      SCUBA_CODE_SIGNING_CREDS: ${{ secrets.SCUBA_CODE_SIGNING_CREDS }}
+      CODESIGN_PW: ${{ secrets.CODESIGN_PW }}
+      CODESIGN_PFX: ${{ secrets.CODESIGN_PFX }}
       RELEASE_VERSION: ${{ inputs.version }}
     permissions:
       id-token: write
       contents: write
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-      with:
-        path: repo
-    - name: Show DotNet Version
-      shell: pwsh
-      run: dotnet --version
-    - name: Sign Scripts
-      shell: pwsh
-      run: |
-        $ErrorActionPreference = "Stop"
-        $PSDefaultParameterValues['*:ErrorAction']='Stop'
-        Set-StrictMode -Version Latest
+      - name: Install AzureSignTool
+        shell: pwsh
+        run: |
+          dotnet --version
+          dotnet tool install --global AzureSignTool --version 4.0.1
+          $CREDS = $env:SCUBA_CODE_SIGNING_CREDS | ConvertFrom-Json
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: repo
+      - name:     
 
-        New-Item -ItemType directory -Path certificate
-        Set-Content -Path certificate\cert.txt -Value $env:CODESIGN_PFX
-        certutil -decode certificate\cert.txt certificate\cert.pfx
-
-        $cert = Get-PfxCertificate -FilePath certificate\cert.pfx -Password (ConvertTo-SecureString -String $env:CODESIGN_PW -Force -AsPlainText)
-
-        Get-ChildItem -Recurse -Path repo -Include **.ps1,**.psm1,**.psd1 | ForEach-Object {
-          $path = $_.FullName
-          Set-AuthenticodeSignature -Certificate $cert -FilePath $path -TimestampServer "http://timestamp.digicert.com/" -IncludeChain NotRoot -HashAlgorithm SHA256
-          # Delay for 4 seconds to avoid exceeding rate limits (1000 / 5 minutes, 100 / 5 seconds)
-          Start-Sleep -Seconds 4
-        }
-
-        Remove-Item -Recurse -Force certificate
-        Remove-Item -Recurse -Force repo -Include .git*
-
-        Move-Item  -Path repo -Destination "ScubaGear-${env:RELEASE_VERSION}" -Force
-        Compress-Archive -Path "ScubaGear-${env:RELEASE_VERSION}" -DestinationPath "ScubaGear-${env:RELEASE_VERSION}.zip"
-
-        Get-ChildItem -Path . | Write-Output
-    - name: release
-      uses: softprops/action-gh-release@v1
-      id: create_release
-      with:
-        draft: true
-        prerelease: false
-        name: ${{ inputs.releaseName }}
-        tag_name: v${{ inputs.version }}
-        files: ScubaGear-${{ inputs.version }}.zip
-        generate_release_notes: true
-        fail_on_unmatched_files: true

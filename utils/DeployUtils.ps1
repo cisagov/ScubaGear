@@ -162,40 +162,29 @@ function ConfigureScubaGearModule{
 }
 
 function CreateFileList{
-    <#
-    .NOTES
-    Internal function 
-    #>
     param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatry=$true)]
         [ValidateNotNullOrEmpty()]
         [string]
         $SourcePath,
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatry=$false)]
         [AllowEmptyCollection()]
         [array]
-        $LiteralFilePaths = @(),
-        [Parameter(Mandatory=$false)]
+        $Files = @(),
+        [Parameter(Mandatry=$false)]
         [AllowEmptyCollection()]
         [array]
         $Extensions = @()
     )
 
-    $FileNames = @()
-
-    if ($Extensions.Count -gt 0){
-        $FileNames += Get-ChildItem -Recurse -Path $SourcePath -Include $Extensions
-    }
-    
-    Write-Debug "Found $($FileNames.Count) files to sign" 
-
+    $Files = Get-ChildItem -Recurse -Path $SourcePath -Include $Extensions
+    $Files += Get-ChildItem -Recurse -Path $SourcePath -Include $Files
     $FileList = New-TemporaryFile
-    $FileNames.FullName | Out-File -FilePath $($FileList.FullName) -Encoding utf8 -Force
-    Write-Debug "Files: $(Get-Content $FileList)"
-    return $FileList.FullName
+    $Files.Path | Out-File -FilePath $FileList.Path -Encoding utf8 -Force
+    return $FileList
 }
 
-function CallAzureSignTool{
+function SignScubaGearModule{
     <#
     .NOTES
     Internal function 
@@ -205,75 +194,24 @@ function CallAzureSignTool{
         [ValidateScript({[uri]::IsWellFormedUriString($_, 'Absolute') -and ([uri] $_).Scheme -in 'https'})]
         [System.Uri]
         $AzureKeyVaultUrl,
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatry=$true)]
         [ValidateNotNullOrEmpty()]
         [string]
         $CertificateName,
+        [Parameter(Mandatry=$true)]
+        [ValidateNotNullOrEmpty()]
+        [System.Guid]
+        $ClientId,
+        [Parameter(Mandatry=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $ClientSecret,
+        [Parameter(Mandatry=$true)]
+        [ValidateNotNullOrEmpty()]
+        [System.Guid]
+        $TenantId,
         [Parameter(Mandatory=$true)]
         [ValidateScript({Test-Path -Path $_})]
-        $ModulePath,
-        [Parameter(Mandatory=$false)]
-        [ValidateScript({[uri]::IsWellFormedUriString($_, 'Absolute') -and ([uri] $_).Scheme -in 'http','https'})]
-        $TimeStampServer = 'http://timestamp.digicert.com',
-        [Parameter(Mandatory=$true)]
-        [ValidateScript({Test-Path -Path $_ -PathType Leaf})]
-        $FileList
-    )
-
-    $SignArguments = @(
-        'sign',
-        '-coe',
-        '-fd',"sha256",
-        '-tr', $TimeStampServer,
-        '-kvu',$AzureKeyVaultUrl,
-        '-kvc',$CertificateName,
-        '-kvm'
-        '-ifl',$FileList         
-    )
-
-    Write-Debug "Calling AzureSignTool: $SignArguments"
-
-    $ToolPath = (Get-Command AzureSignTool).Path  
-    & $ToolPath $SignArguments     
-}
-function SignScubaGearModule{
-    <#
-    .SYNOPSIS
-    Code sign the specified module
-    .Description
-    This function individually signs PowerShell artifacts (i.e., *.ps1, *.pms1) and creates a 
-    signed catalog of the entire module using a certificate housed in an Azure key vault.
-    .Parameter AzureKeyVaultUrl
-    The URL of the key vault with the code signing certificate
-    .Parameter CertificateName
-    The name of the code signing certificate
-    .Parameter ModulePath
-    The root path of the module to be signed
-    .Parameter TimeStampServer
-    Time server to use to timestamp the artifacts
-    .NOTES
-    There appears to be limited or at least difficult to find documentation on how to properly sign a PowerShell
-    module to be published to PSGallery.
-    https://learn.microsoft.com/en-us/powershell/gallery/concepts/publishing-guidelines?view=powershellget-3.x show
-    general guidance.
-
-    There is anecdotal evidence to sign all PowerShell artifacts (ps1, psm1, and pdsd1) in additional to a signed catalog For example,
-    Microsoft.PowerApps.PowerShell (v1.0.34) and see both *.psd1 and *.psm1 files are signed and a catalog provided.
-
-    There are a number of Non-authoritive references such as below showing all ps1, psm1, and psd1 being signed first then cataloged.
-    https://github.com/dell/OpenManage-PowerShell-Modules/blob/main/Sign-Module.ps1
-    #>
-    param (
-        [Parameter(Mandatory=$true)]
-        [ValidateScript({[uri]::IsWellFormedUriString($_, 'Absolute') -and ([uri] $_).Scheme -in 'https'})]
-        [System.Uri]
-        $AzureKeyVaultUrl,
-        [Parameter(Mandatory=$true)]
-        [ValidateNotNullOrEmpty()]
-        [string]
-        $CertificateName,
-        [Parameter(Mandatory=$true)]
-        [ValidateScript({Test-Path -Path $_ -PathType Container})]
         $ModulePath,
         [Parameter(Mandatory=$false)]
         [ValidateScript({[uri]::IsWellFormedUriString($_, 'Absolute') -and ([uri] $_).Scheme -in 'http','https'})]
@@ -282,18 +220,52 @@ function SignScubaGearModule{
     $CatalogFileName = 'ScubaGear.cat'
     $CatalogPath = Join-Path -Path $ModulePath -ChildPath $CatalogFileName
 
-    if (Test-Path -Path $CatalogPath -PathType Leaf){
-        Remove-Item -Path $CatalogPath -Force
-    }    
+    # Digitally sign scripts, manifest, and modules
+    $FileList = CreateFileList -SourcePath $ModulePath -Extensions ".ps1,.psm1,.psd1" -OutputFileList $FileList
 
-    $CatalogPath = New-FileCatalog -Path $ModulePath -CatalogFilePath $CatalogPath -CatalogVersion 2.0
-    $CatalogList = New-TemporaryFile
-    $CatalogPath.FullName | Out-File -FilePath $CatalogList -Encoding utf8 -Force
+    $SignArguments = @(
+        'sign',
+        '-coe',
+        '-v',
+        '-fd',"sha256",
+        '-kvu',$AzureKeyVaultUrl,
+        '-kvi',$ClientId,
+        '-kvt',$TenantId, 
+        '-kvs',$ClientSecret,
+        '-kvc',$CertificateName,
+        '-ifl',$FileList         
+    )
+    Start-CodeSign `
+        -AzureKeyVaultUrl $AzureKeyVaultUrl `
+        -AzureKeyVaultClientId $ClientId `
+        -AzureKeyValutClientSecret $ClientSecret `
+        -AzureKeyVaultTenantId $TenantId `
+        -AzureKeyVaultCertificate $CertificateName `
+        -InputFileList $FileList `
+        -TimestampUtl $TimeStampServer
 
-    CallAzureSignTool @PSBoundParameters -FileList $CatalogList
+    $ToolPath = (Get-Command AzureSignTool).Path    
+    powershell -Command "& $ToolPath $SignArguments"    
 
+    # Create and sign catalog    
+    New-FileCatalog -Path $ModulePath -CatalogFilePath $CatalogPath -CatalogVersion 2.0 -Verbose
+    $CatalogList = CreateFileList -SourcePath $ModulePath -Files @($CatalogPath) -OutputFileList $FileList
+
+    $SignArguments = @(
+        'sign',
+        '-coe',
+        '-v',
+        '-fd',"sha256",
+        '-kvu',$AzureKeyVaultUrl,
+        '-kvi',$ClientId,
+        '-kvt',$TenantId, 
+        '-kvs',$ClientSecret,
+        '-kvc',$CertificateName,
+        '-ifl',$CatalogList        
+    )
+    
     $TestResult = Test-FileCatalog -CatalogFilePath $CatalogPath
-    return 'Valid' -eq $TestResult
+    return 'Valid' -eq $TestResult.Status
 }
 
 function IsRegistered{
