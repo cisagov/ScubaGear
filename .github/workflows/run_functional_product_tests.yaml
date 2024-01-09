@@ -58,5 +58,6 @@ jobs:
             Write-Host $params.GetType()
             Write-Output "${key}: ${value}"
           }
+        shell: pwsh # Convert from JSON requires PS 6
         env:
           TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
