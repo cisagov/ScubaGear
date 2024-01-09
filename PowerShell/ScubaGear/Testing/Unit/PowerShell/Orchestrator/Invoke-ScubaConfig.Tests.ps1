@@ -1,6 +1,6 @@
-$OrchestratorPath = '../../../../PowerShell/ScubaGear/Modules/Orchestrator.psm1'
-$ScubaConfigPath = '../../../../PowerShell/ScubaGear/Modules/ScubaConfig/ScubaConfig.psm1'
-$ConnectionPath = '../../../../PowerShell/ScubaGear/Modules/Connection/Connection.psm1'
+$OrchestratorPath = '../../../../Modules/Orchestrator.psm1'
+$ScubaConfigPath = '../../../../Modules/ScubaConfig/ScubaConfig.psm1'
+$ConnectionPath = '../../../../Modules/Connection/Connection.psm1'
 
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath $OrchestratorPath) -Function 'Invoke-SCuBA' -Force
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath $ScubaConfigPath)
@@ -73,6 +73,7 @@ InModuleScope Orchestrator {
             It "Verify overide parameter ""<parameter>"" with value ""<value>""" -ForEach @(
                 @{ Parameter = "M365Environment";       Value = "gcc"                           }
                 @{ Parameter = "ProductNames";          Value = "teams"                         }
+                @{ Parameter = "ProductNames";          Value = @("teams","aad")                }
                 @{ Parameter = "OPAPath";               Value = ".."                            }
                 @{ Parameter = "Login";                 Value = $false                          }
                 @{ Parameter = "DisconnectOnExit";      Value = $true                           }
