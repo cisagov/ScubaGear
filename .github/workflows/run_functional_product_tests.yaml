@@ -48,21 +48,22 @@ jobs:
       #   run: Install-Module -Name Selenium
       # - name: Update Selenium
       #   run: ./Testing/Functional/SmokeTest/UpdateSelenium.ps1
-      - name: Get Params
-        id: params
-        run: |
-          # Read the params from the secret
-          $paramsAsString = $env:TestParams
-          # Pass params to later job.
-          echo PARAMS=$paramsAsString >> $env:GITHUB_OUTPUT
-        env:
-          TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
+      # - name: Get Params
+      #   id: params
+      #   run: |
+      #     # Read the params from the secret
+      #     $paramsAsString = $env:TestParams
+      #     # Pass params to later job.
+      #     echo PARAMS=$paramsAsString >> $env:GITHUB_OUTPUT
+      #   env:
+      #     TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
       - name: Test Products
         run: |
           # Read thumbprint from previous job.
           $thumbprint = "${{ steps.thumbprint.outputs.THUMBPRINT }}"
           # Read params from previous job.
-          $json = "${{ steps.params.outputs.PARAMS }}"
+          # $json = "${{ steps.params.outputs.PARAMS }}"
+          $json = $env:TestParams
           $json = $json.TrimStart('"').TrimEnd('"') | ConvertFrom-Json
           $json
           # foreach($i in $json)
@@ -76,4 +77,5 @@ jobs:
           #   }
           # }
         shell: pwsh # Convert from JSON requires PS 6
-        
+        env:
+          TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
