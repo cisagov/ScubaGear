@@ -52,22 +52,24 @@ jobs:
         id: params
         run: |
           # Read the params from the secret
-          $paramsAsString = $env:TestParams
-          # Pass params to later job.
-          echo PARAMS=$Parmas >> $env:GITHUB_OUTPUT
-        env:
-          TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
-      - name: Test Products
-        run: |
-          # Read thumbprint from previous job.
-          $thumbprint = "${{ steps.thumbprint.outputs.THUMBPRINT }}"
-          # Read params from previous job.
-          $allparams = "${{ steps.params.outputs.PARAMS }}"
-          foreach($i in $allparams)
-          {
-            $params = ConvertFrom-Json -AsHashtable $i
-            echo $params.GetType()
-            echo "${key}: ${value}"
-          }
-        shell: pwsh # Convert from JSON requires PS 6
+          # $paramsAsString = $env:TestParams
+          $paramsAsString = '[  {    "TenantDomain": "y2zj1.onmicrosoft.com",    "TenantDisplayName": "y2zj1",    "AppId": "db791fde-1ff0-493f-be3d-03d9ba6cb087",    "ProductName": "sharepoint",    "Variant": "pnp",    "M365Environment": "commercial"  },  {    "TenantDomain": "y2zj1.onmicrosoft.com",    "TenantDisplayName": "y2zj1",    "AppId": "db791fde-1ff0-493f-be3d-03d9ba6cb087",    "ProductName": "teams",    "Variant": "pnp",    "M365Environment": "commercial"  }]'
+          echo $paramsAsString
+      #     # Pass params to later job.
+      #     echo PARAMS=$paramsAsString >> $env:GITHUB_OUTPUT
+      #   env:
+      #     TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
+      # - name: Test Products
+      #   run: |
+      #     # Read thumbprint from previous job.
+      #     $thumbprint = "${{ steps.thumbprint.outputs.THUMBPRINT }}"
+      #     # Read params from previous job.
+      #     $allparams = "${{ steps.params.outputs.PARAMS }}"
+      #     foreach($i in $allparams)
+      #     {
+      #       $params = ConvertFrom-Json -AsHashtable $i
+      #       echo $params.GetType()
+      #       echo "${key}: ${value}"
+      #     }
+      #   shell: pwsh # Convert from JSON requires PS 6
         
