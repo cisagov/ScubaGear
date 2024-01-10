@@ -221,10 +221,12 @@ function CallAzureSignTool{
         '-fd',"sha256",
         '-kvu',$AzureKeyVaultUrl,
         '-kvc',$CertificateName,
-        '-kvm',$true,
+        '-kvm'
         '-ifl',$FileList         
     )
 
+    Write-Debug "Calling AzureSignTool: $SignArguments"
+    
     $ToolPath = (Get-Command AzureSignTool).Path  
     powershell -Command "& $ToolPath $SignArguments"      
 }
