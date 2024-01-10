@@ -247,7 +247,7 @@ function SignScubaGearModule{
         [string]
         $CertificateName,
         [Parameter(Mandatory=$true)]
-        [ValidateScript({Test-Path -Path $_})]
+        [ValidateScript({Test-Path -Path $_ -PathType Container})]
         $ModulePath,
         [Parameter(Mandatory=$false)]
         [ValidateScript({[uri]::IsWellFormedUriString($_, 'Absolute') -and ([uri] $_).Scheme -in 'http','https'})]
@@ -265,8 +265,8 @@ function SignScubaGearModule{
         Remove-Item -Path $CatalogPath -Force
     }    
 
-    New-FileCatalog -Path $ModulePath -CatalogFilePath $CatalogPath -CatalogVersion 2.0
-    $CatalogList = CreateFileList -SourcePath $ModulePath -LiteralFilePaths @($CatalogPath)
+    $CatalogPath = New-FileCatalog -Path $ModulePath -CatalogFilePath $CatalogPath -CatalogVersion 2.0
+    $CatalogList = CreateFileList -SourcePath $ModulePath -LiteralFilePaths @($($CatalogPath.FullName))
 
     CallAzureSignTool @PSBoundParameters -FileList $CatalogList
 
