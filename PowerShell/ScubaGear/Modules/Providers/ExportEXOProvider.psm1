@@ -214,7 +214,7 @@ function Invoke-RobustDnsTxt {
 
     $TryNumber = 0
     $Success = $false
-    $TradEmptyOrNx = $false
+    $TradEmpty = $false
     while ($TryNumber -lt $MaxTries) {
         $TryNumber += 1
         try {
@@ -242,22 +242,20 @@ function Invoke-RobustDnsTxt {
                     "query_method"="traditional";
                     "query_result"="Query returned 0 txt records"
                 }
-                $TradEmptyOrNx = $true
+                $TradEmpty = $true
                 break
             }
         }
         catch {
             if ($_.FullyQualifiedErrorId -eq "DNS_ERROR_RCODE_NAME_ERROR,Microsoft.DnsClient.Commands.ResolveDnsName") {
-                # The server returned NXDomain, no need to retry the traditional query, this was not
-                # a transient failure. Don't set $Success to $true though, as we want to retry this
-                # query from a public resolver, in case the internal DNS server returns a different
-                # answer than what is served to the public (i.e., split horizon DNS).
+                # The server returned NXDomain, no need to retry the traditional query or retry with
+                # DoH, this was not a transient failure. Break out of loop and set $Success to $true
                 $LogEntries += @{
                     "query_name"=$Qname;
                     "query_method"="traditional";
                     "query_result"="Query returned NXDomain"
                 }
-                $TradEmptyOrNx = $true
+                $Success = $True
                 break
             }
             else {
@@ -341,15 +339,15 @@ function Invoke-RobustDnsTxt {
     }
 
     # There are three possible outcomes of this function:
-    # - Full confidence: we know conclusively that the domain exists or not, either via an answer
-    # from traditional DNS, an answer from DoH, or NXDomain from DoH.
-    # - Medium confidence: domain likely doesn't exist, but there is some doubt (NXDomain from
+    # - Full confidence: we know conclusively that the domain exists or not, either via a non-empty
+    # answer from traditional DNS or an answer from DoH.
+    # - Medium confidence: domain likely doesn't exist, but there is some doubt (empty answer from
     # traditonal DNS and DoH failed).
     # No confidence: all queries failed. Throw an exception in this case.
     if ($Success) {
         @{"Answers" = $Answers; "HighConfidence" = $true; "LogEntries" = $LogEntries}
     }
-    elseif ($TradEmptyOrNx) {
+    elseif ($TradEmpty) {
         @{"Answers" = $Answers; "HighConfidence" = $false; "LogEntries" = $LogEntries}
     }
     else {
@@ -390,7 +388,7 @@ function Get-ScubaSpfRecords {
     }
 
     if ($NLowConf -gt 0) {
-        Write-Warning "Get-ScubaSpfRecords: for $($NLowConf) domain(s), the tradtional DNS queries returned either NXDomain or an empty answer section and the DoH queries failed. Will assume SPF not configured, but can't guarantee that failure isn't due to something like split horizon DNS. See ProviderSettingsExport.json under 'spf_records' for more details."
+        Write-Warning "Get-ScubaSpfRecords: for $($NLowConf) domain(s), the tradtional DNS queries returned an empty answer section and the DoH queries failed. Will assume SPF not configured, but can't guarantee that failure isn't due to something like split horizon DNS. See ProviderSettingsExport.json under 'spf_records' for more details."
     }
     $DnsLog += $Response.LogEntries
     $SPFRecords
@@ -447,7 +445,7 @@ function Get-ScubaDkimRecords {
     }
 
     if ($NLowConf -gt 0) {
-        Write-Warning "Get-ScubaDkimRecords: for $($NLowConf) domain(s), the tradtional DNS queries returned either NXDomain or an empty answer section and the DoH queries failed. Will assume DKIM not configured, but can't guarantee that failure isn't due to something like split horizon DNS. See ProviderSettingsExport.json under 'dkim_records' for more details."
+        Write-Warning "Get-ScubaDkimRecords: for $($NLowConf) domain(s), the tradtional DNS queries returned an empty answer section and the DoH queries failed. Will assume DKIM not configured, but can't guarantee that failure isn't due to something like split horizon DNS. See ProviderSettingsExport.json under 'dkim_records' for more details."
     }
     $DKIMRecords
 }
@@ -498,7 +496,7 @@ function Get-ScubaDmarcRecords {
     }
 
     if ($NLowConf -gt 0) {
-        Write-Warning "Get-ScubaDmarcRecords: for $($NLowConf) domain(s), the tradtional DNS queries returned either NXDomain or an empty answer section and the DoH queries failed. Will assume DMARC not configured, but can't guarantee that failure isn't due to something like split horizon DNS. See ProviderSettingsExport.json under 'dmarc_records' for more details."
+        Write-Warning "Get-ScubaDmarcRecords: for $($NLowConf) domain(s), the tradtional DNS queries returned an empty answer section and the DoH queries failed. Will assume DMARC not configured, but can't guarantee that failure isn't due to something like split horizon DNS. See ProviderSettingsExport.json under 'dmarc_records' for more details."
     }
     $DMARCRecords
 }
