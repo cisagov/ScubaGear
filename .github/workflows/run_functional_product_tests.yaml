@@ -78,6 +78,11 @@ jobs:
           $thumbprint = "${{ steps.getthumbprint.outputs.THUMBPRINT }}"
           # Read params from previous job.
           $params = "${{ steps.getparams.outputs.PARAMS }}"
+          echo "params type:"
+          echo $params.getType()
+          echo "params value:"
+          $params
+          echo "=================="
           $paramsAsArray = @()
           $paramsAsArray = $params.TrimStart('"').TrimEnd('"')
           echo "paramsAsArray type:"
