@@ -57,7 +57,10 @@ jobs:
             $paramsAsHashTable = ConvertFrom-Json -AsHashtable $paramsAsJson
             $paramsAsArray += $paramsAsHashTable
           }
-          # $paramsAsArray          
+          echo "paramsAsArray type:"
+          echo $paramsAsArray.getType()
+          echo "paramsAsArray value:"
+          $paramsAsArray        
           # Pass thumbprint to later job.
           echo PARAMS=$paramsAsArray >> $env:GITHUB_OUTPUT
         shell: pwsh # ConvertFrom-Json requires PS 6+
