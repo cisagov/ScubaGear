@@ -51,7 +51,7 @@ jobs:
             SignScubaGearModule `
               -AzureKeyVaultUrl https://githubautomationvault.vault.azure.net/ `
               -CertificateName ScubaCodeSigning-Dev `
-              -ModulePath 'repo'
+              -ModulePath repo\PowerShell\ScubaGear
           azPSVersion: "latest"
       - name: release
         shell: pwsh
