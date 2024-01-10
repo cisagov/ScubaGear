@@ -20,7 +20,7 @@ name: Build and Sign Release
 jobs:
   build-and-deploy:
     runs-on: windows-latest
-    #environment: CodeSigning
+    environment: Development
     env:
       SCUBA_CODE_SIGNING_CREDS: ${{ secrets.SCUBA_CODE_SIGNING_CREDS }}
       CODESIGN_PW: ${{ secrets.CODESIGN_PW }}
