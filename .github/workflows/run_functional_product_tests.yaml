@@ -78,13 +78,9 @@ jobs:
           $thumbprint = "${{ steps.getthumbprint.outputs.THUMBPRINT }}"
           # Read params from previous job.
           $params = "${{ steps.getparams.outputs.PARAMS }}"
-          echo "params type:"
-          echo $params.getType()
-          echo "params value:"
-          Write-Host $params
-          echo "=================="
           $paramsAsArray = @()
-          $paramsAsArray = $params.TrimStart('"').TrimEnd('"')
+          # $paramsAsArray = $params.TrimStart('"').TrimEnd('"')
+          $paramsAsArray = $params -replace '@{' -replace '}' -replace ';',"`n" -replace "'" | ConvertFrom-StringData
           echo "paramsAsArray type:"
           echo $paramsAsArray.getType()
           echo "paramsAsArray value:"
