@@ -170,7 +170,7 @@ function CreateFileList{
         [Parameter(Mandatory=$false)]
         [AllowEmptyCollection()]
         [array]
-        $Files = @(),
+        $LiteralFilePaths = @(),
         [Parameter(Mandatory=$false)]
         [AllowEmptyCollection()]
         [array]
@@ -184,7 +184,7 @@ function CreateFileList{
     }
     
     if ($Files.Count -gt 0){
-        $FileNames += Get-ChildItem -Recurse -Path $SourcePath -Include $Files
+        $FileNames += Get-ChildItem -Recurse -LiteralPath $LiteralFilePaths
     }
     
     Write-Debug "Found $($FileNames.Count) files to sign" 
@@ -265,7 +265,7 @@ function SignScubaGearModule{
     }    
 
     New-FileCatalog -Path $ModulePath -CatalogFilePath $CatalogPath -CatalogVersion 2.0
-    $CatalogList = CreateFileList -SourcePath $ModulePath -Files @(CatalogFileName)
+    $CatalogList = CreateFileList -SourcePath $ModulePath -LiteralFilePaths @(CatalogPath)
 
     CallAzureSignTool @PSBoundParameters -FileList $CatalogList
 
