@@ -75,8 +75,8 @@ jobs:
           $thumbprint = "${{ steps.thumbprint.outputs.THUMBPRINT }}"
           # Read params from previous job.
           $paramsAsArray = "${{ steps.params.outputs.PARAMS }}"
-          $paramsAsArray
           foreach ($paramsAsHashTable in $paramsAsArray)
           {
-            # ./Testing/Functional/Products/Tests/CallProductTests.ps1 -params $paramsAsHashTable -thumbprint $thumbprint
+            $paramsAsHashTable
+            ./Testing/Functional/Products/Tests/CallProductTests.ps1 -params $paramsAsHashTable -thumbprint $thumbprint
           }
