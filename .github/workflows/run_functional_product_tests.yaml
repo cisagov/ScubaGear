@@ -48,7 +48,8 @@ jobs:
           # Read params from secret.
           $json = $env:TestParams
           $json = $json.TrimStart('"').TrimEnd('"') | ConvertFrom-Json
-          [hashtable[]]$paramsAsArray
+          #[hashtable[]]$paramsAsArray
+          $paramsAsArray = @()
           foreach($i in $json)
           {
             $paramsAsJson = ConvertTo-Json $i
@@ -75,6 +76,7 @@ jobs:
           # Read params from previous job.
           $params = "${{ steps.params.outputs.PARAMS }}"
           $params
+          # Foreach ($HashTable in $HashTableArray)
           # ./Testing/Functional/Products/Tests/CallProductTests.ps1 -params $paramsAsHashTable -thumbprint $thumbprint
           # foreach($i in $json)
           # {
