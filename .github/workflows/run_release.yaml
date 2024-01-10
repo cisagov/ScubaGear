@@ -18,10 +18,6 @@ on:
 
 name: Build and Sign Release
 
-permissions:
-  id-token: write
-  contents: read
-
 jobs:
   build-and-deploy:
     runs-on: windows-latest
@@ -38,11 +34,6 @@ jobs:
       id-token: write
       contents: write
     steps:
-      - name: Install AzureSignTool
-        shell: pwsh
-        run: |
-          dotnet --version
-          dotnet tool install --global AzureSignTool --version 4.0.1
       - name: Checkout
         uses: actions/checkout@v4
         with:
@@ -55,20 +46,24 @@ jobs:
           subscription-id: $env:secrets.AZURE_SUBSCRIPTION_ID
           enable-AzPSSession: true          
       - name: Sign Module
-        shell: pwsh
-        run: |
-          $CREDS = $env:SCUBA_CODE_SIGNING_CREDS | ConvertFrom-Json
-          if (${{ inputs.useDevCredentials }} -eq 'true'){
-            $CREDS = $CREDS.Development
-          }
-          else {
-            $CREDS = $CREDS.Production
-          }
-          . repo/utils/DeployUtils.ps1
-          SignScubaGearModule `
-            -AzureKeyVaultUrl $($CREDS.KeyVault.URL) `
-            -CertificateName $($CREDS.KeyVault.Certificate) `
-            -ModulePath 'repo'
+        uses: azure/powershell@v1
+        with:
+          inlineScript: |
+            dotnet --version
+            dotnet tool install --global AzureSignTool --version 4.0.1
+            $CREDS = $env:SCUBA_CODE_SIGNING_CREDS | ConvertFrom-Json
+            if (${{ inputs.useDevCredentials }} -eq 'true'){
+              $CREDS = $CREDS.Development
+            }
+            else {
+              $CREDS = $CREDS.Production
+            }
+            . repo/utils/DeployUtils.ps1
+            SignScubaGearModule `
+              -AzureKeyVaultUrl $($CREDS.KeyVault.URL) `
+              -CertificateName $($CREDS.KeyVault.Certificate) `
+              -ModulePath 'repo'
+          azPSVersion: "latest"
       - name: release
         shell: pwsh
         run: |
