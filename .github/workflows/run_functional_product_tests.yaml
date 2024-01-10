@@ -77,14 +77,16 @@ jobs:
           $paramsAsArray = @()
           $paramsAsArray = "${{ steps.getparams.outputs.PARAMS }}"
           echo "paramsAsArray type:"
-          $paramsAsArray.getType()
+          echo $paramsAsArray.getType()
           echo "paramsAsArray value:"
           $paramsAsArray
+          echo "-------------------"
           foreach ($paramsAsHashTable in $paramsAsArray)
           {
             echo "paramsAsHashTable type:"
-            $paramsAsHashTable.getType()
+            echo $paramsAsHashTable.getType()
             echo "paramsAsHasTable value:"
-            $paramsAsHashTable
+            echo $paramsAsHashTable
             # ./Testing/Functional/Products/Tests/CallProductTests.ps1 -params $paramsAsHashTable -thumbprint $thumbprint
+            echo ">>>>"
           }
