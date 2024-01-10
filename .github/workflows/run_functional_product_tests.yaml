@@ -60,9 +60,15 @@ jobs:
           echo "paramsAsArray type:"
           echo $paramsAsArray.getType()
           echo "paramsAsArray value:"
-          $paramsAsArray        
+          $paramsAsArray  
+          echo "----------"
+          $outstring = Out-String -InputObject $paramsAsArray   
+          echo "outstring type:"
+          echo $outstring.getType()
+          echo "outstring value:"
+          $outstring     
           # Pass thumbprint to later job.
-          echo PARAMS=$paramsAsArray >> $env:GITHUB_OUTPUT
+          echo PARAMS=$outstring >> $env:GITHUB_OUTPUT
         shell: pwsh # ConvertFrom-Json requires PS 6+
         env:
           TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
@@ -72,26 +78,27 @@ jobs:
       #   run: Install-Module -Name Selenium
       # - name: Update Selenium
       #   run: ./Testing/Functional/SmokeTest/UpdateSelenium.ps1
-      - name: Test Products
-        run: |
-          # Read thumbprint from previous job.
-          $thumbprint = "${{ steps.getthumbprint.outputs.THUMBPRINT }}"
-          # Read params from previous job.
-          $params = "${{ steps.getparams.outputs.PARAMS }}"
-          $paramsAsArray = @()
-          # $paramsAsArray = $params.TrimStart('"').TrimEnd('"')
-          $paramsAsArray = $params -replace '@{' -replace '}' -replace ';',"`n" -replace "'" | ConvertFrom-StringData
-          echo "paramsAsArray type:"
-          echo $paramsAsArray.getType()
-          echo "paramsAsArray value:"
-          Write-Host $paramsAsArray
-          echo "-------------------"
-          foreach ($paramsAsHashTable in $paramsAsArray)
-          {
-            echo "paramsAsHashTable type:"
-            echo $paramsAsHashTable.getType()
-            echo "paramsAsHasTable value:"
-            echo $paramsAsHashTable
-            # ./Testing/Functional/Products/Tests/CallProductTests.ps1 -params $paramsAsHashTable -thumbprint $thumbprint
-            echo ">>>>"
-          }
+      # - name: Test Products
+      #   run: |
+      #     # Read thumbprint from previous job.
+      #     $thumbprint = "${{ steps.getthumbprint.outputs.THUMBPRINT }}"
+      #     # Read params from previous job.
+      #     $params = "${{ steps.getparams.outputs.PARAMS }}"
+      #     $params = $params.TrimStart('"').TrimEnd('"')
+      #     $paramsAsArray = @()
+      #     $paramsAsArray = $params.TrimStart('"').TrimEnd('"')
+      #     $paramsAsArray = $params -replace '@{' -replace '}' -replace ';',"`n" -replace "'" | ConvertFrom-StringData
+      #     echo "paramsAsArray type:"
+      #     echo $paramsAsArray.getType()
+      #     echo "paramsAsArray value:"
+      #     Write-Host $paramsAsArray
+      #     echo "-------------------"
+      #     foreach ($paramsAsHashTable in $paramsAsArray)
+      #     {
+      #       echo "paramsAsHashTable type:"
+      #       echo $paramsAsHashTable.getType()
+      #       echo "paramsAsHasTable value:"
+      #       echo $paramsAsHashTable
+      #       # ./Testing/Functional/Products/Tests/CallProductTests.ps1 -params $paramsAsHashTable -thumbprint $thumbprint
+      #       echo ">>>>"
+      #     }
