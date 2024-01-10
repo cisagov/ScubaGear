@@ -192,7 +192,6 @@ function CreateFileList{
 }
 
 function CallAzureSignTool{
-    [CmdletBinding(DefaultParameterSetName='ManagedIdentity')]
     param (
         [Parameter(Mandatory=$true)]
         [ValidateScript({[uri]::IsWellFormedUriString($_, 'Absolute') -and ([uri] $_).Scheme -in 'https'})]
@@ -202,27 +201,12 @@ function CallAzureSignTool{
         [ValidateNotNullOrEmpty()]
         [string]
         $CertificateName,
-        [Parameter(Mandatory=$true, ParameterSetName = 'ServicePrincipal')]
-        [ValidateNotNullOrEmpty()]
-        [System.Guid]
-        $ClientId,
-        [Parameter(Mandatory=$true, ParameterSetName = 'ServicePrincipal')]
-        [ValidateNotNullOrEmpty()]
-        [string]
-        $ClientSecret,
-        [Parameter(Mandatory=$true, ParameterSetName = 'ServicePrincipal')]
-        [ValidateNotNullOrEmpty()]
-        [System.Guid]
-        $TenantId,
         [Parameter(Mandatory=$true)]
         [ValidateScript({Test-Path -Path $_})]
         $ModulePath,
         [Parameter(Mandatory=$false)]
         [ValidateScript({[uri]::IsWellFormedUriString($_, 'Absolute') -and ([uri] $_).Scheme -in 'http','https'})]
         $TimeStampServer = 'http://timestamp.digicert.com',
-        [Parameter(Mandatory=$false, ParameterSetName = 'ManagedIdentity')]
-        [switch]
-        $UseManagedIdentity,
         [Parameter(Mandatory=$true)]
         [ValidateScript({Test-Path -Path $_ -PathType Leaf})]
         $FileList
@@ -263,7 +247,6 @@ function SignScubaGearModule{
         .NOTES
         Internal helper function
     #>
-    [CmdletBinding(DefaultParameterSetName='ManagedIdentity')]
     param (
         [Parameter(Mandatory=$true)]
         [ValidateScript({[uri]::IsWellFormedUriString($_, 'Absolute') -and ([uri] $_).Scheme -in 'https'})]
@@ -273,27 +256,12 @@ function SignScubaGearModule{
         [ValidateNotNullOrEmpty()]
         [string]
         $CertificateName,
-        [Parameter(Mandatory=$true, ParameterSetName = 'ServicePrincipal')]
-        [ValidateNotNullOrEmpty()]
-        [System.Guid]
-        $ClientId,
-        [Parameter(Mandatory=$true, ParameterSetName = 'ServicePrincipal')]
-        [ValidateNotNullOrEmpty()]
-        [string]
-        $ClientSecret,
-        [Parameter(Mandatory=$true, ParameterSetName = 'ServicePrincipal')]
-        [ValidateNotNullOrEmpty()]
-        [System.Guid]
-        $TenantId,
         [Parameter(Mandatory=$true)]
         [ValidateScript({Test-Path -Path $_})]
         $ModulePath,
         [Parameter(Mandatory=$false)]
         [ValidateScript({[uri]::IsWellFormedUriString($_, 'Absolute') -and ([uri] $_).Scheme -in 'http','https'})]
-        $TimeStampServer = 'http://timestamp.digicert.com',
-        [Parameter(Mandatory=$false, ParameterSetName = 'ManagedIdentity')]
-        [switch]
-        $UseManagedIdentity
+        $TimeStampServer = 'http://timestamp.digicert.com'
     )
     $CatalogFileName = 'ScubaGear.cat'
     $CatalogPath = Join-Path -Path $ModulePath -ChildPath $CatalogFileName
@@ -341,4 +309,3 @@ function IsRegistered{
 
     return $Registered
 }
-
