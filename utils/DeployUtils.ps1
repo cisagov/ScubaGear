@@ -177,8 +177,10 @@ function CreateFileList{
         $Extensions = @()
     )
 
+    $FileNames = @()
+
     if ($Extensions.Count -gt 0){
-        $FileNames = Get-ChildItem -Recurse -Path $SourcePath -Include $Extensions
+        $FileNames += Get-ChildItem -Recurse -Path $SourcePath -Include $Extensions
     }
     
     if ($Files.Count -gt 0){
@@ -188,6 +190,7 @@ function CreateFileList{
     Write-Debug "Found $($FileNames.Count) files to sign" 
     $FileList = New-TemporaryFile
     $FileNames.FullName | Out-File -FilePath $($FileList.FullName) -Encoding utf8 -Force
+    Write-Debug "Files: $(Get-Content $FileList)"
     return $FileList.FullName
 }
 
