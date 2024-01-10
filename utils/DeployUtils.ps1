@@ -188,6 +188,7 @@ function CreateFileList{
     }
     
     Write-Debug "Found $($FileNames.Count) files to sign" 
+
     $FileList = New-TemporaryFile
     $FileNames.FullName | Out-File -FilePath $($FileList.FullName) -Encoding utf8 -Force
     Write-Debug "Files: $(Get-Content $FileList)"
@@ -226,7 +227,7 @@ function CallAzureSignTool{
     )
 
     Write-Debug "Calling AzureSignTool: $SignArguments"
-    
+
     $ToolPath = (Get-Command AzureSignTool).Path  
     powershell -Command "& $ToolPath $SignArguments"      
 }
@@ -256,7 +257,6 @@ function SignScubaGearModule{
 
     # Digitally sign scripts, manifest, and modules
     $FileList = CreateFileList -SourcePath $ModulePath -Extensions "*.ps1","*.psm1","*.psd1"
-
     CallAzureSignTool @PSBoundParameters -FileList $FileList
 
     # Create and sign catalog
@@ -265,7 +265,7 @@ function SignScubaGearModule{
     }    
 
     New-FileCatalog -Path $ModulePath -CatalogFilePath $CatalogPath -CatalogVersion 2.0
-    $CatalogList = CreateFileList -SourcePath $ModulePath -Files @($CatalogPath)
+    $CatalogList = CreateFileList -SourcePath $ModulePath -Files @(CatalogFileName)
 
     CallAzureSignTool @PSBoundParameters -FileList $CatalogList
 
