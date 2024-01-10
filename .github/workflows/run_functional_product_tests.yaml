@@ -76,10 +76,15 @@ jobs:
           # Read params from previous job.
           $paramsAsArray = @()
           $paramsAsArray = "${{ steps.getparams.outputs.PARAMS }}"
+          echo "paramsAsArray type:"
           $paramsAsArray.getType()
+          echo "paramsAsArray value:"
+          $paramsAsArray
           foreach ($paramsAsHashTable in $paramsAsArray)
           {
+            echo "paramsAsHashTable type:"
             $paramsAsHashTable.getType()
+            echo "paramsAsHasTable value:"
             $paramsAsHashTable
             # ./Testing/Functional/Products/Tests/CallProductTests.ps1 -params $paramsAsHashTable -thumbprint $thumbprint
           }
