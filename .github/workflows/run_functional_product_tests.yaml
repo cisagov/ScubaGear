@@ -39,7 +39,7 @@ jobs:
           $Thumbprint = $x509.ThumbPrint
           # Pass thumbprint to later job.
           echo THUMBPRINT=$Thumbprint >> $env:GITHUB_OUTPUT
-        shell: pwsh # Password requires PS 6
+        shell: pwsh # -Password flag requires PS 6+
         env:
           PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
       - name: Get Params
@@ -54,7 +54,7 @@ jobs:
           $paramsAsHashTable = ConvertFrom-Json -AsHashtable $paramsAsJson
           # Pass thumbprint to later job.
           echo PARAMS=$paramsAsHashTable >> $env:GITHUB_OUTPUT
-        shell: pwsh # Convert from JSON requires PS 6
+        shell: pwsh # ConvertFrom-Json requires PS 6+
         env:
           TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
       # - name: Setup for Scuba
@@ -69,7 +69,7 @@ jobs:
           $thumbprint = "${{ steps.thumbprint.outputs.THUMBPRINT }}"
           # Read params from previous job.
           $params = "${{ steps.params.outputs.PARAMS }}"
-          echo $params
+          $params
           # ./Testing/Functional/Products/Tests/CallProductTests.ps1 -params $paramsAsHashTable -thumbprint $thumbprint
           # foreach($i in $json)
           # {
@@ -77,4 +77,3 @@ jobs:
           #   $paramsAsHashTable = ConvertFrom-Json -AsHashtable $paramsAsJson
           #   ./Testing/Functional/Products/Tests/CallProductTests.ps1 -params $paramsAsHashTable -thumbprint $thumbprint
           # }
-        
