@@ -163,24 +163,31 @@ function ConfigureScubaGearModule{
 
 function CreateFileList{
     param(
-        [Parameter(Mandatry=$true)]
+        [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [string]
         $SourcePath,
-        [Parameter(Mandatry=$false)]
+        [Parameter(Mandatory=$false)]
         [AllowEmptyCollection()]
         [array]
         $Files = @(),
-        [Parameter(Mandatry=$false)]
+        [Parameter(Mandatory=$false)]
         [AllowEmptyCollection()]
         [array]
         $Extensions = @()
     )
 
-    $Files = Get-ChildItem -Recurse -Path $SourcePath -Include $Extensions
-    $Files += Get-ChildItem -Recurse -Path $SourcePath -Include $Files
+    if ($Extensions.Count -gt 0){
+        $FileNames = Get-ChildItem -Recurse -Path $SourcePath -Include $Extensions
+    }
+    
+    if ($Files.Count -gt 0){
+        $FileNames += Get-ChildItem -Recurse -Path $SourcePath -Include $Files
+    }
+    
+    Write-Debug "Found $($FileNames.Count) files to sign" 
     $FileList = New-TemporaryFile
-    $Files.Path | Out-File -FilePath $FileList.Path -Encoding utf8 -Force
+    $FileNames.FullName | Out-File -FilePath $($FileList.FullName) -Encoding utf8 -Force
     return $FileList
 }
 
@@ -194,19 +201,19 @@ function SignScubaGearModule{
         [ValidateScript({[uri]::IsWellFormedUriString($_, 'Absolute') -and ([uri] $_).Scheme -in 'https'})]
         [System.Uri]
         $AzureKeyVaultUrl,
-        [Parameter(Mandatry=$true)]
+        [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [string]
         $CertificateName,
-        [Parameter(Mandatry=$true)]
+        [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [System.Guid]
         $ClientId,
-        [Parameter(Mandatry=$true)]
+        [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [string]
         $ClientSecret,
-        [Parameter(Mandatry=$true)]
+        [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [System.Guid]
         $TenantId,
@@ -221,12 +228,12 @@ function SignScubaGearModule{
     $CatalogPath = Join-Path -Path $ModulePath -ChildPath $CatalogFileName
 
     # Digitally sign scripts, manifest, and modules
-    $FileList = CreateFileList -SourcePath $ModulePath -Extensions ".ps1,.psm1,.psd1" -OutputFileList $FileList
+    $FileList = CreateFileList -SourcePath $ModulePath -Extensions "*.ps1","*.psm1","*.psd1"
+    $FileList
 
     $SignArguments = @(
         'sign',
         '-coe',
-        '-v',
         '-fd',"sha256",
         '-kvu',$AzureKeyVaultUrl,
         '-kvi',$ClientId,
@@ -235,21 +242,19 @@ function SignScubaGearModule{
         '-kvc',$CertificateName,
         '-ifl',$FileList         
     )
-    Start-CodeSign `
-        -AzureKeyVaultUrl $AzureKeyVaultUrl `
-        -AzureKeyVaultClientId $ClientId `
-        -AzureKeyValutClientSecret $ClientSecret `
-        -AzureKeyVaultTenantId $TenantId `
-        -AzureKeyVaultCertificate $CertificateName `
-        -InputFileList $FileList `
-        -TimestampUtl $TimeStampServer
 
-    $ToolPath = (Get-Command AzureSignTool).Path    
+    $ToolPath = (Get-Command AzureSignTool).Path  
+    Write-Debug "AzureSignTool path is $ToolPath"
+    Write-Debug "Args: $SignArguments[0]"
     powershell -Command "& $ToolPath $SignArguments"    
 
-    # Create and sign catalog    
-    New-FileCatalog -Path $ModulePath -CatalogFilePath $CatalogPath -CatalogVersion 2.0 -Verbose
-    $CatalogList = CreateFileList -SourcePath $ModulePath -Files @($CatalogPath) -OutputFileList $FileList
+    # Create and sign catalog
+    if (Test-Path $CatalogPath){
+        Remove-Item -Path $CatalogPath -Force
+    }    
+
+    New-FileCatalog -Path $ModulePath -CatalogFilePath $CatalogPath -CatalogVersion 2.0
+    $CatalogList = CreateFileList -SourcePath $ModulePath -Files @($CatalogPath)
 
     $SignArguments = @(
         'sign',
@@ -263,9 +268,9 @@ function SignScubaGearModule{
         '-kvc',$CertificateName,
         '-ifl',$CatalogList        
     )
-    
+
     $TestResult = Test-FileCatalog -CatalogFilePath $CatalogPath
-    return 'Valid' -eq $TestResult.Status
+    return 'Valid' -eq $TestResult
 }
 
 function IsRegistered{
@@ -292,3 +297,36 @@ function IsRegistered{
 
     return $Registered
 }
+# SIG # Begin signature block
+# MIIFugYJKoZIhvcNAQcCoIIFqzCCBacCAQExDzANBglghkgBZQMEAgEFADB5Bgor
+# BgEEAYI3AgEEoGswaTA0BgorBgEEAYI3AgEeMCYCAwEAAAQQH8w7YFlLCE63JNLG
+# KX7zUQIBAAIBAAIBAAIBAAIBADAxMA0GCWCGSAFlAwQCAQUABCAcxMbVvohURJla
+# UPnhjCRaMW6HJ5XmYbAKqssGf9KMh6CCAy0wggMpMIICEaADAgECAhAb+gKPfqFf
+# sUTnulp6jFEzMA0GCSqGSIb3DQEBCwUAMB0xGzAZBgNVBAMMEnNjdWJhZ2Vhci5j
+# aXNhLmdvdjAeFw0yNDAxMDgxNDQzMzZaFw0yNTAxMDgxNTAzMzZaMB0xGzAZBgNV
+# BAMMEnNjdWJhZ2Vhci5jaXNhLmdvdjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCC
+# AQoCggEBALE10sE9jb6S6Hd0wiS6G8jSGlQ1tnKThTA6gVDRLghrpuoScseOigW0
+# KFkjE4cEdTwDEzyUxvE2QTj2lpcyqDJgTiysfpn6TNSmimNTqjpa4E4o/WQ0g9by
+# EhhJolIpdKBX1yilHz5wq/4Mj03H3sqkiMtiq6bhr3TAFrIDBP9YMYsEpwEBW7m2
+# Dp8dZNyv33mDw6F/VIhY2PhqtC6o4rQZCz+gRAFCuFF6D0HlysDeL6uM7LBu1HFo
+# uJrEGyWBSq0jwWwa8RPXf5MrL4hXRS6gvlGwwuhWZVNNM8dPdOT6hkCSpZP/8Xd3
+# 5ZPK2i0F2KONwYMip7hirloCV0XwNBUCAwEAAaNlMGMwDgYDVR0PAQH/BAQDAgeA
+# MBMGA1UdJQQMMAoGCCsGAQUFBwMDMB0GA1UdEQQWMBSCEnNjdWJhZ2Vhci5jaXNh
+# LmdvdjAdBgNVHQ4EFgQUKj3c8f+aaBhBR5q/CzA5P+GzYo8wDQYJKoZIhvcNAQEL
+# BQADggEBAK7+sBDSCaVUd0YNUoU0Y9Plp8879mri1hXM2cxpCyvUrOEB0ej28ckp
+# lRTA4n4oBIZ7x6p2ZH+XrQOcz+CzbjtuQ3u0nDAEr8bq8Z2kl8DuNS1b/nJKwgtT
+# EaAhvPwDO3FXwS8Ohh/BmX84/zPbrPWfjyzAfjUnwRH8qy0xJc8mcjADiO5DcTEw
+# B20Ev4G8FVwUuGDODWQsudwSeYUO02rqFqwIeI5anOO3fesj70blyatNNEVfrKih
+# yvPDK4d9uSJD7Dvq3by5FtH1ooHihU0pNFphfLufg20bvLHpxJtMnR8v3V+UTs6G
+# /hHUdnsmHZHpipFGj0+JJD2tig4T+BkxggHjMIIB3wIBATAxMB0xGzAZBgNVBAMM
+# EnNjdWJhZ2Vhci5jaXNhLmdvdgIQG/oCj36hX7FE57paeoxRMzANBglghkgBZQME
+# AgEFAKCBhDAYBgorBgEEAYI3AgEMMQowCKACgAChAoAAMBkGCSqGSIb3DQEJAzEM
+# BgorBgEEAYI3AgEEMBwGCisGAQQBgjcCAQsxDjAMBgorBgEEAYI3AgEVMC8GCSqG
+# SIb3DQEJBDEiBCAT7MuwCf/BbJ+C0V7XsNsX9VjINf5F0GXBMAIwLbZrfzANBgkq
+# hkiG9w0BAQEFAASCAQBAYl6vK/AjUgSK/HXWy7vsDw+GbAcsjOPrsJ4GkvpdJ5ye
+# mKZ9XyMibM0lJ5J0chBW87+kpzk4qEwbIrBljPKXwmQqembhiXs4jkkwfjTu2zuq
+# yP0W0cwO/3mZQhsQUA48+kU/YjJB3MjTa3adi360LeOF3yrRee1PQ4VQKBzmrMbW
+# 82NHYFlJiI6hgMs2v4TBmGFWEbkiVN+PstYSzvOXFR9dv6wC/Q6FfVnCP5URIan6
+# Z/YUyRMXXPx2HMgeJpPamtMDnTC3jdf4ZBOpCjf78j00IHwiZxKc15ljwyfeGFyO
+# kHasj0RyK0oHjhA7l9g7RQSKgCjVENLX24VUePb/
+# SIG # End signature block
