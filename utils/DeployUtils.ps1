@@ -163,24 +163,31 @@ function ConfigureScubaGearModule{
 
 function CreateFileList{
     param(
-        [Parameter(Mandatry=$true)]
+        [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [string]
         $SourcePath,
-        [Parameter(Mandatry=$false)]
+        [Parameter(Mandatory=$false)]
         [AllowEmptyCollection()]
         [array]
         $Files = @(),
-        [Parameter(Mandatry=$false)]
+        [Parameter(Mandatory=$false)]
         [AllowEmptyCollection()]
         [array]
         $Extensions = @()
     )
 
-    $Files = Get-ChildItem -Recurse -Path $SourcePath -Include $Extensions
-    $Files += Get-ChildItem -Recurse -Path $SourcePath -Include $Files
+    if ($Extensions.Count -gt 0){
+        $FileNames = Get-ChildItem -Recurse -Path $SourcePath -Include $Extensions
+    }
+    
+    if ($Files.Count -gt 0){
+        $FileNames += Get-ChildItem -Recurse -Path $SourcePath -Include $Files
+    }
+    
+    Write-Debug "Found $($FileNames.Count) files to sign" 
     $FileList = New-TemporaryFile
-    $Files.Path | Out-File -FilePath $FileList.Path -Encoding utf8 -Force
+    $FileNames.FullName | Out-File -FilePath $($FileList.FullName) -Encoding utf8 -Force
     return $FileList
 }
 
@@ -194,19 +201,19 @@ function SignScubaGearModule{
         [ValidateScript({[uri]::IsWellFormedUriString($_, 'Absolute') -and ([uri] $_).Scheme -in 'https'})]
         [System.Uri]
         $AzureKeyVaultUrl,
-        [Parameter(Mandatry=$true)]
+        [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [string]
         $CertificateName,
-        [Parameter(Mandatry=$true)]
+        [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [System.Guid]
         $ClientId,
-        [Parameter(Mandatry=$true)]
+        [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [string]
         $ClientSecret,
-        [Parameter(Mandatry=$true)]
+        [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [System.Guid]
         $TenantId,
@@ -221,12 +228,12 @@ function SignScubaGearModule{
     $CatalogPath = Join-Path -Path $ModulePath -ChildPath $CatalogFileName
 
     # Digitally sign scripts, manifest, and modules
-    $FileList = CreateFileList -SourcePath $ModulePath -Extensions ".ps1,.psm1,.psd1" -OutputFileList $FileList
+    $FileList = CreateFileList -SourcePath $ModulePath -Extensions "*.ps1","*.psm1","*.psd1"
+    $FileList
 
     $SignArguments = @(
         'sign',
         '-coe',
-        '-v',
         '-fd',"sha256",
         '-kvu',$AzureKeyVaultUrl,
         '-kvi',$ClientId,
@@ -235,21 +242,19 @@ function SignScubaGearModule{
         '-kvc',$CertificateName,
         '-ifl',$FileList         
     )
-    Start-CodeSign `
-        -AzureKeyVaultUrl $AzureKeyVaultUrl `
-        -AzureKeyVaultClientId $ClientId `
-        -AzureKeyValutClientSecret $ClientSecret `
-        -AzureKeyVaultTenantId $TenantId `
-        -AzureKeyVaultCertificate $CertificateName `
-        -InputFileList $FileList `
-        -TimestampUtl $TimeStampServer
 
-    $ToolPath = (Get-Command AzureSignTool).Path    
+    $ToolPath = (Get-Command AzureSignTool).Path  
+    Write-Debug "AzureSignTool path is $ToolPath"
+    Write-Debug "Args: $SignArguments[0]"
     powershell -Command "& $ToolPath $SignArguments"    
 
-    # Create and sign catalog    
-    New-FileCatalog -Path $ModulePath -CatalogFilePath $CatalogPath -CatalogVersion 2.0 -Verbose
-    $CatalogList = CreateFileList -SourcePath $ModulePath -Files @($CatalogPath) -OutputFileList $FileList
+    # Create and sign catalog
+    if (Test-Path $CatalogPath){
+        Remove-Item -Path $CatalogPath -Force
+    }    
+
+    New-FileCatalog -Path $ModulePath -CatalogFilePath $CatalogPath -CatalogVersion 2.0
+    $CatalogList = CreateFileList -SourcePath $ModulePath -Files @($CatalogPath)
 
     $SignArguments = @(
         'sign',
@@ -263,9 +268,9 @@ function SignScubaGearModule{
         '-kvc',$CertificateName,
         '-ifl',$CatalogList        
     )
-    
+
     $TestResult = Test-FileCatalog -CatalogFilePath $CatalogPath
-    return 'Valid' -eq $TestResult.Status
+    return 'Valid' -eq $TestResult
 }
 
 function IsRegistered{
@@ -292,3 +297,4 @@ function IsRegistered{
 
     return $Registered
 }
+
