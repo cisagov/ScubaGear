@@ -43,9 +43,7 @@ jobs:
       - name: Sign Module
         shell: pwsh
         run: |
-          $env:SCUBA_CODE_SIGNING_CREDS
-          $CREDS = $env:SCUBA_CODE_SIGNING_CREDS 
-          $CREDS
+          $CREDS = $env:SCUBA_CODE_SIGNING_CREDS | ConvertFrom-Json
           if (${{ inputs.useDevCredentials }} -eq 'true'){
             $CREDS = $CREDS.Development
           }
