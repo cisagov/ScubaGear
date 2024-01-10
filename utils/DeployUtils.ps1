@@ -191,11 +191,8 @@ function CreateFileList{
     return $FileList
 }
 
-function SignScubaGearModule{
-    <#
-    .NOTES
-    Internal function 
-    #>
+function CallAzureSignTool{
+    [CmdletBinding(DefaultParameterSetName='ManagedIdentity')]
     param (
         [Parameter(Mandatory=$true)]
         [ValidateScript({[uri]::IsWellFormedUriString($_, 'Absolute') -and ([uri] $_).Scheme -in 'https'})]
@@ -205,15 +202,15 @@ function SignScubaGearModule{
         [ValidateNotNullOrEmpty()]
         [string]
         $CertificateName,
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$true, ParameterSetName = 'ServicePrincipal')]
         [ValidateNotNullOrEmpty()]
         [System.Guid]
         $ClientId,
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$true, ParameterSetName = 'ServicePrincipal')]
         [ValidateNotNullOrEmpty()]
         [string]
         $ClientSecret,
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$true, ParameterSetName = 'ServicePrincipal')]
         [ValidateNotNullOrEmpty()]
         [System.Guid]
         $TenantId,
@@ -222,31 +219,89 @@ function SignScubaGearModule{
         $ModulePath,
         [Parameter(Mandatory=$false)]
         [ValidateScript({[uri]::IsWellFormedUriString($_, 'Absolute') -and ([uri] $_).Scheme -in 'http','https'})]
-        $TimeStampServer = 'http://timestamp.digicert.com'
+        $TimeStampServer = 'http://timestamp.digicert.com',
+        [Parameter(Mandatory=$false, ParameterSetName = 'ManagedIdentity')]
+        [switch]
+        $UseManagedIdentity,
+        [Parameter(Mandatory=$true)]
+        [ValidateScript({Test-Path -Path $_ -PathType Leaf})]
+        $FileList
     )
-    $CatalogFileName = 'ScubaGear.cat'
-    $CatalogPath = Join-Path -Path $ModulePath -ChildPath $CatalogFileName
-
-    # Digitally sign scripts, manifest, and modules
-    $FileList = CreateFileList -SourcePath $ModulePath -Extensions "*.ps1","*.psm1","*.psd1"
-    $FileList
 
     $SignArguments = @(
         'sign',
         '-coe',
         '-fd',"sha256",
         '-kvu',$AzureKeyVaultUrl,
-        '-kvi',$ClientId,
-        '-kvt',$TenantId, 
-        '-kvs',$ClientSecret,
         '-kvc',$CertificateName,
         '-ifl',$FileList         
     )
 
+    if ($PSCmdlet.ParameterSetName -eq 'ManagedIdentity'){
+        $SignArguments += @(
+            '-kvm',$true
+        )
+    }
+    elseif ($PSCmdlet.ParameterSetName -eq 'ServicePrincipal'){
+        $SignArguments += @(
+            '-kvi',$ClientId,
+            '-kvt',$TenantId, 
+            '-kvs',$ClientSecret
+        )
+    }
+    else {
+        Write-Error "Unexpected Credentials used."
+    }
+
     $ToolPath = (Get-Command AzureSignTool).Path  
     Write-Debug "AzureSignTool path is $ToolPath"
     Write-Debug "Args: $SignArguments[0]"
-    powershell -Command "& $ToolPath $SignArguments"    
+    powershell -Command "& $ToolPath $SignArguments"      
+}
+function SignScubaGearModule{
+    <#
+        .NOTES
+        Internal helper function
+    #>
+    [CmdletBinding(DefaultParameterSetName='ManagedIdentity')]
+    param (
+        [Parameter(Mandatory=$true)]
+        [ValidateScript({[uri]::IsWellFormedUriString($_, 'Absolute') -and ([uri] $_).Scheme -in 'https'})]
+        [System.Uri]
+        $AzureKeyVaultUrl,
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $CertificateName,
+        [Parameter(Mandatory=$true, ParameterSetName = 'ServicePrincipal')]
+        [ValidateNotNullOrEmpty()]
+        [System.Guid]
+        $ClientId,
+        [Parameter(Mandatory=$true, ParameterSetName = 'ServicePrincipal')]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $ClientSecret,
+        [Parameter(Mandatory=$true, ParameterSetName = 'ServicePrincipal')]
+        [ValidateNotNullOrEmpty()]
+        [System.Guid]
+        $TenantId,
+        [Parameter(Mandatory=$true)]
+        [ValidateScript({Test-Path -Path $_})]
+        $ModulePath,
+        [Parameter(Mandatory=$false)]
+        [ValidateScript({[uri]::IsWellFormedUriString($_, 'Absolute') -and ([uri] $_).Scheme -in 'http','https'})]
+        $TimeStampServer = 'http://timestamp.digicert.com',
+        [Parameter(Mandatory=$false, ParameterSetName = 'ManagedIdentity')]
+        [switch]
+        $UseManagedIdentity
+    )
+    $CatalogFileName = 'ScubaGear.cat'
+    $CatalogPath = Join-Path -Path $ModulePath -ChildPath $CatalogFileName
+
+    # Digitally sign scripts, manifest, and modules
+    $FileList = CreateFileList -SourcePath $ModulePath -Extensions "*.ps1","*.psm1","*.psd1"
+
+    CallAzureSignTool @PSBoundParameters -FileList $FileList
 
     # Create and sign catalog
     if (Test-Path $CatalogPath){
@@ -256,18 +311,7 @@ function SignScubaGearModule{
     New-FileCatalog -Path $ModulePath -CatalogFilePath $CatalogPath -CatalogVersion 2.0
     $CatalogList = CreateFileList -SourcePath $ModulePath -Files @($CatalogPath)
 
-    $SignArguments = @(
-        'sign',
-        '-coe',
-        '-v',
-        '-fd',"sha256",
-        '-kvu',$AzureKeyVaultUrl,
-        '-kvi',$ClientId,
-        '-kvt',$TenantId, 
-        '-kvs',$ClientSecret,
-        '-kvc',$CertificateName,
-        '-ifl',$CatalogList        
-    )
+    CallAzureSignTool @PSBoundParameters -FileList $CatalogList
 
     $TestResult = Test-FileCatalog -CatalogFilePath $CatalogPath
     return 'Valid' -eq $TestResult

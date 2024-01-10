@@ -10,8 +10,8 @@ on:
         description: "Release Version (e.g., 1.2.4)"
         required: true
         type: string
-      runQuickCheck:
-        description: "Run a quick check of release"
+      useDevCredentials:
+        description: "Use development instead of production credentials"
         required: false
         type: boolean
         default: true
@@ -41,5 +41,26 @@ jobs:
         uses: actions/checkout@v4
         with:
           path: repo
-      - name:     
+      - name: Sign Module
+        shell: pwsh
+        run: |
+          $CREDS = $env:SCUBA_CODE_SIGNING_CREDS | ConvertFrom-Json
+          if (${{ inputs.useDevCredentials }} -eq 'true'){
+            $CREDS = $CREDS.Development
+          }
+          else {
+            $CREDS = $CREDS.Production
+          }
+          . repo/utils/DeployUtils.ps1
+          SignScubaGearModule `
+            -AzureKeyVaultUrl $($CREDS.KeyVault.URL) `
+            -CertificateName $($CREDS.KeyVault.Certificate) `
+            -ClientId $($CREDS.ServicePrincipal.ClientId) `
+            -ClientSecret $($CREDS.ServicePrincipal.Secret) `
+            -TenantId $($CREDS.ServicePrincipal.TenantId) `
+            -ModulePath 'repo'
+      - name: release
+        shell: bash
+        run: |
+          echo "TODO"
 
