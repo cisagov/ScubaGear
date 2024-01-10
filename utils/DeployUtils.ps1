@@ -220,6 +220,7 @@ function CallAzureSignTool{
         'sign',
         '-coe',
         '-fd',"sha256",
+        '-tr', $TimeStampServer,
         '-kvu',$AzureKeyVaultUrl,
         '-kvc',$CertificateName,
         '-kvm'
@@ -265,7 +266,7 @@ function SignScubaGearModule{
     }    
 
     New-FileCatalog -Path $ModulePath -CatalogFilePath $CatalogPath -CatalogVersion 2.0
-    $CatalogList = CreateFileList -SourcePath $ModulePath -LiteralFilePaths @(CatalogPath)
+    $CatalogList = CreateFileList -SourcePath $ModulePath -LiteralFilePaths @($CatalogPath)
 
     CallAzureSignTool @PSBoundParameters -FileList $CatalogList
 
