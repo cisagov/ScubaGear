@@ -81,14 +81,14 @@ jobs:
           echo "params type:"
           echo $params.getType()
           echo "params value:"
-          $params
+          Write-Host $params
           echo "=================="
           $paramsAsArray = @()
           $paramsAsArray = $params.TrimStart('"').TrimEnd('"')
           echo "paramsAsArray type:"
           echo $paramsAsArray.getType()
           echo "paramsAsArray value:"
-          $paramsAsArray
+          Write-Host $paramsAsArray
           echo "-------------------"
           foreach ($paramsAsHashTable in $paramsAsArray)
           {
