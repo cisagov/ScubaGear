@@ -218,28 +218,11 @@ function CallAzureSignTool{
         '-fd',"sha256",
         '-kvu',$AzureKeyVaultUrl,
         '-kvc',$CertificateName,
+        '-kvm',$true,
         '-ifl',$FileList         
     )
 
-    if ($PSCmdlet.ParameterSetName -eq 'ManagedIdentity'){
-        $SignArguments += @(
-            '-kvm',$true
-        )
-    }
-    elseif ($PSCmdlet.ParameterSetName -eq 'ServicePrincipal'){
-        $SignArguments += @(
-            '-kvi',$ClientId,
-            '-kvt',$TenantId, 
-            '-kvs',$ClientSecret
-        )
-    }
-    else {
-        Write-Error "Unexpected Credentials used."
-    }
-
     $ToolPath = (Get-Command AzureSignTool).Path  
-    Write-Debug "AzureSignTool path is $ToolPath"
-    Write-Debug "Args: $SignArguments[0]"
     powershell -Command "& $ToolPath $SignArguments"      
 }
 function SignScubaGearModule{
