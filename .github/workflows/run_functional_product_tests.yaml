@@ -48,7 +48,7 @@ jobs:
           # Read params from secret.
           $json = $env:TestParams
           $json = $json.TrimStart('"').TrimEnd('"') | ConvertFrom-Json
-          [String[]]$paramsAsArray
+          [hashtable[]]$paramsAsArray
           foreach($i in $json)
           {
             $paramsAsJson = ConvertTo-Json $i
