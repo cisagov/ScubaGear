@@ -44,7 +44,8 @@ jobs:
         shell: pwsh
         run: |
           $env:SCUBA_CODE_SIGNING_CREDS
-          $CREDS = $env:SCUBA_CODE_SIGNING_CREDS | ConvertFrom-Json
+          $CREDS = $env:SCUBA_CODE_SIGNING_CREDS 
+          $CREDS
           if (${{ inputs.useDevCredentials }} -eq 'true'){
             $CREDS = $CREDS.Development
           }
