@@ -63,12 +63,12 @@ jobs:
         shell: pwsh # ConvertFrom-Json requires PS 6+
         env:
           TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
-      # - name: Setup for Scuba
-      #   run: ./SetUp.ps1
-      # - name: Install Selenium
-      #   run: Install-Module -Name Selenium
-      # - name: Update Selenium
-      #   run: ./Testing/Functional/SmokeTest/UpdateSelenium.ps1
+      - name: Setup for Scuba
+        run: ./SetUp.ps1
+      - name: Install Selenium
+        run: Install-Module -Name Selenium
+      - name: Update Selenium
+        run: ./Testing/Functional/SmokeTest/UpdateSelenium.ps1
       - name: Test Products
         run: |
           # Read thumbprint from previous job.
@@ -78,12 +78,5 @@ jobs:
           $paramsAsArray
           foreach ($paramsAsHashTable in $paramsAsArray)
           {
-            $paramsAsHashTable
+            # ./Testing/Functional/Products/Tests/CallProductTests.ps1 -params $paramsAsHashTable -thumbprint $thumbprint
           }
-          # ./Testing/Functional/Products/Tests/CallProductTests.ps1 -params $paramsAsHashTable -thumbprint $thumbprint
-          # foreach($i in $json)
-          # {
-          #   $paramsAsJson = ConvertTo-Json $i
-          #   $paramsAsHashTable = ConvertFrom-Json -AsHashtable $paramsAsJson
-          #   ./Testing/Functional/Products/Tests/CallProductTests.ps1 -params $paramsAsHashTable -thumbprint $thumbprint
-          # }
