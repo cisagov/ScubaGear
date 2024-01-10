@@ -183,10 +183,6 @@ function CreateFileList{
         $FileNames += Get-ChildItem -Recurse -Path $SourcePath -Include $Extensions
     }
     
-    if ($Files.Count -gt 0){
-        $FileNames += Get-ChildItem -Recurse -LiteralPath $LiteralFilePaths
-    }
-    
     Write-Debug "Found $($FileNames.Count) files to sign" 
 
     $FileList = New-TemporaryFile
@@ -253,8 +249,7 @@ function SignScubaGearModule{
         [ValidateScript({[uri]::IsWellFormedUriString($_, 'Absolute') -and ([uri] $_).Scheme -in 'http','https'})]
         $TimeStampServer = 'http://timestamp.digicert.com'
     )
-    $CatalogFileName = 'ScubaGear.cat'
-    $CatalogPath = Join-Path -Path $ModulePath -ChildPath $CatalogFileName
+    
 
     # Digitally sign scripts, manifest, and modules
     $FileList = CreateFileList -SourcePath $ModulePath -Extensions "*.ps1","*.psm1","*.psd1"
@@ -265,8 +260,11 @@ function SignScubaGearModule{
         Remove-Item -Path $CatalogPath -Force
     }    
 
+    $CatalogFileName = 'ScubaGear.cat'
+    $CatalogPath = Join-Path -Path $ModulePath -ChildPath $CatalogFileName
     $CatalogPath = New-FileCatalog -Path $ModulePath -CatalogFilePath $CatalogPath -CatalogVersion 2.0
-    $CatalogList = CreateFileList -SourcePath $ModulePath -LiteralFilePaths @($($CatalogPath.FullName))
+    $CatalogList = New-TemporaryFile
+    $CatalogPath.FullName | Out-File -FilePath $CatalogList -Encoding utf8 -Force
 
     CallAzureSignTool @PSBoundParameters -FileList $CatalogList
 
