@@ -36,7 +36,6 @@ jobs:
         run: |
           dotnet --version
           dotnet tool install --global AzureSignTool --version 4.0.1
-          $CREDS = $env:SCUBA_CODE_SIGNING_CREDS | ConvertFrom-Json
       - name: Checkout
         uses: actions/checkout@v4
         with:
