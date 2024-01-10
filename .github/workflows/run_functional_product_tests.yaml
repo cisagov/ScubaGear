@@ -42,36 +42,6 @@ jobs:
         shell: pwsh # -Password flag requires PS 6+
         env:
           PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
-      # - name: Get Params
-      #   id: getparams
-      #   run: |
-      #     # Read params from secret.
-      #     $json = $env:TestParams
-      #     $json = $json.TrimStart('"').TrimEnd('"') | ConvertFrom-Json
-      #     #[hashtable[]]$paramsAsArray
-      #     $paramsAsArray = @()
-      #     foreach($i in $json)
-      #     {
-      #       $paramsAsJson = ConvertTo-Json $i
-      #       # $paramsAsJson
-      #       $paramsAsHashTable = ConvertFrom-Json -AsHashtable $paramsAsJson
-      #       $paramsAsArray += $paramsAsHashTable
-      #     }
-      #     echo "paramsAsArray type:"
-      #     echo $paramsAsArray.getType()
-      #     echo "paramsAsArray value:"
-      #     $paramsAsArray  
-      #     echo "----------"
-      #     $outstring = Out-String -InputObject $paramsAsArray   
-      #     echo "outstring type:"
-      #     echo $outstring.getType()
-      #     echo "outstring value:"
-      #     Write-Host $outstring     
-      #     # Pass thumbprint to later job.
-      #     # echo PARAMS=$outstring >> $env:GITHUB_OUTPUT
-      #   shell: pwsh # ConvertFrom-Json requires PS 6+
-      #   env:
-      #     TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
       - name: Setup for Scuba
         run: ./SetUp.ps1
       - name: Install Selenium
@@ -84,21 +54,24 @@ jobs:
           $thumbprint = "${{ steps.getthumbprint.outputs.THUMBPRINT }}"
           # Read params from secret.
           $secretValue = $env:TestParams
-          # Clean up extra spaces
+          # Remove any extra spaces
           $secretValue = $secretValue.replace(' ','')
+          # Split into test plans
           $outerArray = $secretValue.split("|")
           foreach ($i in $outerArray) 
           {
             $paramsAsHashTable = @{}
+            # Split into individual key-value parameters
             $innerArray = $i.split(",")
             foreach ($j in $innerArray)
             {
+              # Split the key and value
               $keyvalue = $j.split("=")
               $paramsAsHashTable.Add($keyvalue[0], $keyvalue[1])
             }
-            $paramsAsHashTable
+            $paramsAsHashTable # Debug
             ./Testing/Functional/Products/Tests/CallProductTests.ps1 -params $paramsAsHashTable -thumbprint $thumbprint
-            echo "---"
+            echo "---" # Debug
           }
         env:
           TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
