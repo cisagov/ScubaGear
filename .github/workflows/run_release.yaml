@@ -24,12 +24,7 @@ jobs:
     environment: Development
     env:
       SCUBA_CODE_SIGNING_CREDS: ${{ secrets.SCUBA_CODE_SIGNING_CREDS }}
-      CODESIGN_PW: ${{ secrets.CODESIGN_PW }}
-      CODESIGN_PFX: ${{ secrets.CODESIGN_PFX }}
       RELEASE_VERSION: ${{ inputs.version }}
-      AZURE_CLIENT_ID: 013a0852-8e4d-419e-8571-e9305844095d
-      AZURE_TENANT_ID: 3c19c757-3b55-411f-b03f-2bcc514a598d
-      AZURE_SUBSCRIPTION_ID: 1c838bbe-dea0-42ce-a0a8-13e997b65bde
     permissions:
       id-token: write
       contents: write
@@ -41,9 +36,9 @@ jobs:
       - name: OIDC Login to Azure Public Cloud with AzPowershell (enableAzPSSession true)
         uses: azure/login@v1
         with:
-          client-id: $env:AZURE_CLIENT_ID
-          tenant-id: $env:secrets.AZURE_TENANT_ID
-          subscription-id: $env:secrets.AZURE_SUBSCRIPTION_ID
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           enable-AzPSSession: true          
       - name: Sign Module
         uses: azure/powershell@v1
