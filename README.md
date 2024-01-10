@@ -250,6 +250,7 @@ The minimum API permissions & user roles for each product that need to be assign
 | Azure Active Directory   | Directory.Read.All, GroupMember.Read.All,            |                                  |
 |                          | Organization.Read.All, Policy.Read.All,              |                                  |
 |                          | RoleManagement.Read.Directory, User.Read.All         |                                  |
+|                          | PrivilegedEligibilitySchedule.Read.AzureADGroup         |                                  |
 | Defender for Office 365  | Exchange.ManageAsApp                                 | Global Reader                    |
 | Exchange Online          | Exchange.ManageAsApp                                 | Global Reader                    |
 | Power Platform           | [See Power Platform App Registration](#power-platform-app-registration)|                |
