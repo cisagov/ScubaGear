@@ -192,7 +192,6 @@ function CreateFileList{
 }
 
 function CallAzureSignTool{
-    [CmdletBinding(DefaultParameterSetName='ManagedIdentity')]
     param (
         [Parameter(Mandatory=$true)]
         [ValidateScript({[uri]::IsWellFormedUriString($_, 'Absolute') -and ([uri] $_).Scheme -in 'https'})]
@@ -202,27 +201,12 @@ function CallAzureSignTool{
         [ValidateNotNullOrEmpty()]
         [string]
         $CertificateName,
-        [Parameter(Mandatory=$true, ParameterSetName = 'ServicePrincipal')]
-        [ValidateNotNullOrEmpty()]
-        [System.Guid]
-        $ClientId,
-        [Parameter(Mandatory=$true, ParameterSetName = 'ServicePrincipal')]
-        [ValidateNotNullOrEmpty()]
-        [string]
-        $ClientSecret,
-        [Parameter(Mandatory=$true, ParameterSetName = 'ServicePrincipal')]
-        [ValidateNotNullOrEmpty()]
-        [System.Guid]
-        $TenantId,
         [Parameter(Mandatory=$true)]
         [ValidateScript({Test-Path -Path $_})]
         $ModulePath,
         [Parameter(Mandatory=$false)]
         [ValidateScript({[uri]::IsWellFormedUriString($_, 'Absolute') -and ([uri] $_).Scheme -in 'http','https'})]
         $TimeStampServer = 'http://timestamp.digicert.com',
-        [Parameter(Mandatory=$false, ParameterSetName = 'ManagedIdentity')]
-        [switch]
-        $UseManagedIdentity,
         [Parameter(Mandatory=$true)]
         [ValidateScript({Test-Path -Path $_ -PathType Leaf})]
         $FileList
@@ -263,7 +247,6 @@ function SignScubaGearModule{
         .NOTES
         Internal helper function
     #>
-    [CmdletBinding(DefaultParameterSetName='ManagedIdentity')]
     param (
         [Parameter(Mandatory=$true)]
         [ValidateScript({[uri]::IsWellFormedUriString($_, 'Absolute') -and ([uri] $_).Scheme -in 'https'})]
@@ -273,27 +256,12 @@ function SignScubaGearModule{
         [ValidateNotNullOrEmpty()]
         [string]
         $CertificateName,
-        [Parameter(Mandatory=$true, ParameterSetName = 'ServicePrincipal')]
-        [ValidateNotNullOrEmpty()]
-        [System.Guid]
-        $ClientId,
-        [Parameter(Mandatory=$true, ParameterSetName = 'ServicePrincipal')]
-        [ValidateNotNullOrEmpty()]
-        [string]
-        $ClientSecret,
-        [Parameter(Mandatory=$true, ParameterSetName = 'ServicePrincipal')]
-        [ValidateNotNullOrEmpty()]
-        [System.Guid]
-        $TenantId,
         [Parameter(Mandatory=$true)]
         [ValidateScript({Test-Path -Path $_})]
         $ModulePath,
         [Parameter(Mandatory=$false)]
         [ValidateScript({[uri]::IsWellFormedUriString($_, 'Absolute') -and ([uri] $_).Scheme -in 'http','https'})]
-        $TimeStampServer = 'http://timestamp.digicert.com',
-        [Parameter(Mandatory=$false, ParameterSetName = 'ManagedIdentity')]
-        [switch]
-        $UseManagedIdentity
+        $TimeStampServer = 'http://timestamp.digicert.com'
     )
     $CatalogFileName = 'ScubaGear.cat'
     $CatalogPath = Join-Path -Path $ModulePath -ChildPath $CatalogFileName
@@ -341,36 +309,3 @@ function IsRegistered{
 
     return $Registered
 }
-# SIG # Begin signature block
-# MIIFugYJKoZIhvcNAQcCoIIFqzCCBacCAQExDzANBglghkgBZQMEAgEFADB5Bgor
-# BgEEAYI3AgEEoGswaTA0BgorBgEEAYI3AgEeMCYCAwEAAAQQH8w7YFlLCE63JNLG
-# KX7zUQIBAAIBAAIBAAIBAAIBADAxMA0GCWCGSAFlAwQCAQUABCAcxMbVvohURJla
-# UPnhjCRaMW6HJ5XmYbAKqssGf9KMh6CCAy0wggMpMIICEaADAgECAhAb+gKPfqFf
-# sUTnulp6jFEzMA0GCSqGSIb3DQEBCwUAMB0xGzAZBgNVBAMMEnNjdWJhZ2Vhci5j
-# aXNhLmdvdjAeFw0yNDAxMDgxNDQzMzZaFw0yNTAxMDgxNTAzMzZaMB0xGzAZBgNV
-# BAMMEnNjdWJhZ2Vhci5jaXNhLmdvdjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCC
-# AQoCggEBALE10sE9jb6S6Hd0wiS6G8jSGlQ1tnKThTA6gVDRLghrpuoScseOigW0
-# KFkjE4cEdTwDEzyUxvE2QTj2lpcyqDJgTiysfpn6TNSmimNTqjpa4E4o/WQ0g9by
-# EhhJolIpdKBX1yilHz5wq/4Mj03H3sqkiMtiq6bhr3TAFrIDBP9YMYsEpwEBW7m2
-# Dp8dZNyv33mDw6F/VIhY2PhqtC6o4rQZCz+gRAFCuFF6D0HlysDeL6uM7LBu1HFo
-# uJrEGyWBSq0jwWwa8RPXf5MrL4hXRS6gvlGwwuhWZVNNM8dPdOT6hkCSpZP/8Xd3
-# 5ZPK2i0F2KONwYMip7hirloCV0XwNBUCAwEAAaNlMGMwDgYDVR0PAQH/BAQDAgeA
-# MBMGA1UdJQQMMAoGCCsGAQUFBwMDMB0GA1UdEQQWMBSCEnNjdWJhZ2Vhci5jaXNh
-# LmdvdjAdBgNVHQ4EFgQUKj3c8f+aaBhBR5q/CzA5P+GzYo8wDQYJKoZIhvcNAQEL
-# BQADggEBAK7+sBDSCaVUd0YNUoU0Y9Plp8879mri1hXM2cxpCyvUrOEB0ej28ckp
-# lRTA4n4oBIZ7x6p2ZH+XrQOcz+CzbjtuQ3u0nDAEr8bq8Z2kl8DuNS1b/nJKwgtT
-# EaAhvPwDO3FXwS8Ohh/BmX84/zPbrPWfjyzAfjUnwRH8qy0xJc8mcjADiO5DcTEw
-# B20Ev4G8FVwUuGDODWQsudwSeYUO02rqFqwIeI5anOO3fesj70blyatNNEVfrKih
-# yvPDK4d9uSJD7Dvq3by5FtH1ooHihU0pNFphfLufg20bvLHpxJtMnR8v3V+UTs6G
-# /hHUdnsmHZHpipFGj0+JJD2tig4T+BkxggHjMIIB3wIBATAxMB0xGzAZBgNVBAMM
-# EnNjdWJhZ2Vhci5jaXNhLmdvdgIQG/oCj36hX7FE57paeoxRMzANBglghkgBZQME
-# AgEFAKCBhDAYBgorBgEEAYI3AgEMMQowCKACgAChAoAAMBkGCSqGSIb3DQEJAzEM
-# BgorBgEEAYI3AgEEMBwGCisGAQQBgjcCAQsxDjAMBgorBgEEAYI3AgEVMC8GCSqG
-# SIb3DQEJBDEiBCAT7MuwCf/BbJ+C0V7XsNsX9VjINf5F0GXBMAIwLbZrfzANBgkq
-# hkiG9w0BAQEFAASCAQBAYl6vK/AjUgSK/HXWy7vsDw+GbAcsjOPrsJ4GkvpdJ5ye
-# mKZ9XyMibM0lJ5J0chBW87+kpzk4qEwbIrBljPKXwmQqembhiXs4jkkwfjTu2zuq
-# yP0W0cwO/3mZQhsQUA48+kU/YjJB3MjTa3adi360LeOF3yrRee1PQ4VQKBzmrMbW
-# 82NHYFlJiI6hgMs2v4TBmGFWEbkiVN+PstYSzvOXFR9dv6wC/Q6FfVnCP5URIan6
-# Z/YUyRMXXPx2HMgeJpPamtMDnTC3jdf4ZBOpCjf78j00IHwiZxKc15ljwyfeGFyO
-# kHasj0RyK0oHjhA7l9g7RQSKgCjVENLX24VUePb/
-# SIG # End signature block

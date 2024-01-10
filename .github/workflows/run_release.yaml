@@ -15,14 +15,24 @@ on:
         type: boolean
         default: true
 
+name: Build and Sign Release
+
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   build-and-deploy:
     runs-on: windows-latest
+    #environment: CodeSigning
     env:
       SCUBA_CODE_SIGNING_CREDS: ${{ secrets.SCUBA_CODE_SIGNING_CREDS }}
       CODESIGN_PW: ${{ secrets.CODESIGN_PW }}
       CODESIGN_PFX: ${{ secrets.CODESIGN_PFX }}
       RELEASE_VERSION: ${{ inputs.version }}
+      AZURE_CLIENT_ID: 013a0852-8e4d-419e-8571-e9305844095d
+      AZURE_TENANT_ID: 3c19c757-3b55-411f-b03f-2bcc514a598d
+      AZURE_SUBSCRIPTION_ID: 1c838bbe-dea0-42ce-a0a8-13e997b65bde
     permissions:
       contents: write
     steps:
@@ -35,6 +45,13 @@ jobs:
         uses: actions/checkout@v4
         with:
           path: repo
+      - name: OIDC Login to Azure Public Cloud with AzPowershell (enableAzPSSession true)
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }} 
+          enable-AzPSSession: true          
       - name: Sign Module
         shell: pwsh
         run: |
@@ -49,12 +66,9 @@ jobs:
           SignScubaGearModule `
             -AzureKeyVaultUrl $($CREDS.KeyVault.URL) `
             -CertificateName $($CREDS.KeyVault.Certificate) `
-            -ClientId $($CREDS.ServicePrincipal.ClientId) `
-            -ClientSecret $($CREDS.ServicePrincipal.Secret) `
-            -TenantId $($CREDS.ServicePrincipal.TenantId) `
             -ModulePath 'repo'
       - name: release
-        shell: bash
+        shell: pwsh
         run: |
-          echo "TODO"
+          Get-Content -Path repo\PowerShell\ScubaGear\RequiredVersions.ps1
 
