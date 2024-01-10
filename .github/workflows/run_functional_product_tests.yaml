@@ -66,9 +66,9 @@ jobs:
           echo "outstring type:"
           echo $outstring.getType()
           echo "outstring value:"
-          $outstring     
+          Write-Host $outstring     
           # Pass thumbprint to later job.
-          echo PARAMS=$outstring >> $env:GITHUB_OUTPUT
+          # echo PARAMS=$outstring >> $env:GITHUB_OUTPUT
         shell: pwsh # ConvertFrom-Json requires PS 6+
         env:
           TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
