@@ -188,7 +188,7 @@ function CreateFileList{
     Write-Debug "Found $($FileNames.Count) files to sign" 
     $FileList = New-TemporaryFile
     $FileNames.FullName | Out-File -FilePath $($FileList.FullName) -Encoding utf8 -Force
-    return $FileList
+    return $FileList.FullName
 }
 
 function CallAzureSignTool{
