@@ -48,12 +48,17 @@ jobs:
           # Read params from secret.
           $json = $env:TestParams
           $json = $json.TrimStart('"').TrimEnd('"') | ConvertFrom-Json
-          $i = $json[0]
-          $paramsAsJson = ConvertTo-Json $i
-          $paramsAsJson
-          $paramsAsHashTable = ConvertFrom-Json -AsHashtable $paramsAsJson
+          [String[]]$paramsAsArray
+          foreach($i in $json)
+          {
+            $paramsAsJson = ConvertTo-Json $i
+            $paramsAsJson
+            $paramsAsHashTable = ConvertFrom-Json -AsHashtable $paramsAsJson
+            $paramsAsArray += $paramsAsHashTable
+          }
+          $paramsAsArray          
           # Pass thumbprint to later job.
-          echo PARAMS=$paramsAsHashTable >> $env:GITHUB_OUTPUT
+          echo PARAMS=$paramsAsArray >> $env:GITHUB_OUTPUT
         shell: pwsh # ConvertFrom-Json requires PS 6+
         env:
           TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
