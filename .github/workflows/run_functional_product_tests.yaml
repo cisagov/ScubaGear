@@ -53,11 +53,11 @@ jobs:
           foreach($i in $json)
           {
             $paramsAsJson = ConvertTo-Json $i
-            $paramsAsJson
+            # $paramsAsJson
             $paramsAsHashTable = ConvertFrom-Json -AsHashtable $paramsAsJson
             $paramsAsArray += $paramsAsHashTable
           }
-          $paramsAsArray          
+          # $paramsAsArray          
           # Pass thumbprint to later job.
           echo PARAMS=$paramsAsArray >> $env:GITHUB_OUTPUT
         shell: pwsh # ConvertFrom-Json requires PS 6+
@@ -74,9 +74,12 @@ jobs:
           # Read thumbprint from previous job.
           $thumbprint = "${{ steps.thumbprint.outputs.THUMBPRINT }}"
           # Read params from previous job.
-          $params = "${{ steps.params.outputs.PARAMS }}"
-          $params
-          # Foreach ($HashTable in $HashTableArray)
+          $paramsAsArray = "${{ steps.params.outputs.PARAMS }}"
+          $paramsAsArray
+          foreach ($paramsAsHashTable in $paramsAsArray)
+          {
+            $paramsAsHashTable
+          }
           # ./Testing/Functional/Products/Tests/CallProductTests.ps1 -params $paramsAsHashTable -thumbprint $thumbprint
           # foreach($i in $json)
           # {
