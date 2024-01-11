@@ -562,7 +562,7 @@ function Invoke-RunRego {
 
         [ValidateNotNullOrEmpty()]
         [string]
-        $OPAPath = $PSScriptRoot,
+        $OPAPath = (Join-Path -Path $env:USERPROFILE -ChildPath ".scubagear\Tools"),
 
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
@@ -1226,7 +1226,7 @@ function Invoke-RunCached {
         [ValidateScript({Test-Path -PathType Container $_})]
         [ValidateNotNullOrEmpty()]
         [string]
-        $OPAPath = (Join-Path -Path $PSScriptRoot -ChildPath "..\..\.."),
+        $OPAPath = (Join-Path -Path $env:USERPROFILE -ChildPath ".scubagear\Tools"),
 
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
