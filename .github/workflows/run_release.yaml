@@ -70,7 +70,7 @@ jobs:
           generate_release_notes: true
           fail_on_unmatched_files: true
       - name: Download release
-        uses: robinraju/release-downloader@1.8
+        uses: robinraju/release-downloader@v1.8
         with:
           releaseId: ${{ steps.create_release.outputs.id}}
           fileName: ScubaGear-${{ inputs.version }}.zip
