@@ -15,6 +15,11 @@ on:
         required: false
         type: boolean
         default: true
+      runQuickCheck:
+        description: "Run a quick check of release"
+        required: false
+        type: boolean
+        default: true
 
 name: Build and Sign Release
 
@@ -71,15 +76,17 @@ jobs:
           fail_on_unmatched_files: true
       - name: Download release
         uses: dsaltares/fetch-gh-release-asset@1.1.1
+        if: ${{ inputs.runQuickCheck }}
         with:
           version: ${{ steps.create_release.outputs.id}}
           file: "ScubaGear-${{ inputs.version }}.zip"
       - name: Quick check release
+        if: ${{ inputs.runQuickCheck }}
         shell: powershell
         run: |
           Expand-Archive -Path "ScubaGear-${{ inputs.version }}.zip" 
           Get-ChildItem 
           Set-Location -Path "ScubaGear-${{ inputs.version }}"
           .\SetUp.ps1 
-          Import-Module -Name PowerShell/ScubaGear
+          Import-Module -Name .\PowerShell\ScubaGear\ScubaGear.psd1
           Invoke-SCuBA -Version 
