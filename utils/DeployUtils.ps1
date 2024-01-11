@@ -256,11 +256,10 @@ function SignScubaGearModule{
     CallAzureSignTool @PSBoundParameters -FileList $FileList
 
     # Create and sign catalog
-
     $CatalogFileName = 'ScubaGear.cat'
     $CatalogPath = Join-Path -Path $ModulePath -ChildPath $CatalogFileName
-    
-    if (Test-Path $CatalogPath){
+
+    if (Test-Path -Path $CatalogPath -PathType Leaf){
         Remove-Item -Path $CatalogPath -Force
     }    
 
