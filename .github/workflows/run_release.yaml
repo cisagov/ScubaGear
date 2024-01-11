@@ -27,7 +27,6 @@ jobs:
     runs-on: windows-latest
     environment: Development
     env:
-      SCUBA_CODE_SIGNING_CREDS: ${{ secrets.SCUBA_CODE_SIGNING_CREDS }}
       RELEASE_VERSION: ${{ inputs.version }}
     permissions:
       id-token: write
