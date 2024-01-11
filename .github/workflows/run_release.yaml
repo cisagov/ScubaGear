@@ -37,7 +37,7 @@ jobs:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          enable-AzPSSession: true          
+          enable-AzPSSession: true       
       - name: Sign Module
         uses: azure/powershell@v1
         with:
@@ -47,7 +47,7 @@ jobs:
             dotnet tool install --global AzureSignTool --version 4.0.1
             #TODO: Add Key Vault info to environment secret (Issue #790)
             . repo/utils/DeployUtils.ps1
-            # Remove non-release files 
+            # Remove non-release files
             Remove-Item -Recurse -Force repo -Include .git*
             SignScubaGearModule `
               -AzureKeyVaultUrl https://githubautomationvault.vault.azure.net/ `
@@ -77,9 +77,9 @@ jobs:
         if: ${{ inputs.runQuickCheck }}
         shell: powershell
         run: |
-          Expand-Archive -Path "ScubaGear-${{ inputs.version }}.zip" 
+          Expand-Archive -Path "ScubaGear-${{ inputs.version }}.zip"
           Get-ChildItem 
           Set-Location -Path "ScubaGear-${{ inputs.version }}"
-          .\SetUp.ps1 
+          .\SetUp.ps1
           Import-Module -Name .\PowerShell\ScubaGear\ScubaGear.psd1
-          Invoke-SCuBA -Version 
+          Invoke-SCuBA -Version
