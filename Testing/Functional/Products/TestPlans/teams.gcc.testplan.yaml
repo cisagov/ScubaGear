@@ -9,11 +9,11 @@ TestPlan:
             Splat:
               AllowEmailIntoChannel: true
         Postconditions: []
-        ExpectedResult: true        
+        ExpectedResult: true
       - TestDescription: MS.TEAMS.4.1v1 Compliant - Not AllowEmailIntoChannel (gcc, dod)
         Preconditions:
           - Command: Set-CsTeamsClientConfiguration
             Splat:
               AllowEmailIntoChannel: false
         Postconditions: []
-        ExpectedResult: true        
+        ExpectedResult: true

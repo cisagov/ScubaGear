@@ -1,4 +1,6 @@
-on: 
+name: Build and Sign Release
+
+on:
   workflow_dispatch:
     inputs:
       releaseName:
@@ -9,8 +11,6 @@ on:
         description: "Release Version (e.g., 1.2.4)"
         required: true
         type: string
-
-name: Build and Sign Release
 
 jobs:
   build-and-deploy:

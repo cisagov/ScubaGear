@@ -64,11 +64,11 @@ TestPlan:
               updates:
                 dlp_policies:
                   - value:
-                    - environments:
-                      - name: "Default-ca08493a-c9c8-4db0-a9e8-d3b4bafac269"
+                      - environments:
+                          - name: "Default-ca08493a-c9c8-4db0-a9e8-d3b4bafac269"
                 environment_list:
                   - EnvironmentName: "Default-ca08493a-c9c8-4db0-a9e8-d3b4bafac269"
-                  - EnvironmentName:  "Test1"
+                  - EnvironmentName: "Test1"
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.POWERPLATFORM.2.2v1 Compliant - has DLP policies
@@ -78,8 +78,8 @@ TestPlan:
               updates:
                 dlp_policies:
                   - value:
-                    - environments:
-                      - name: "Default-ca08493a-c9c8-4db0-a9e8-d3b4bafac269"
+                      - environments:
+                          - name: "Default-ca08493a-c9c8-4db0-a9e8-d3b4bafac269"
                 environment_list:
                   - EnvironmentName: "Default-ca08493a-c9c8-4db0-a9e8-d3b4bafac269"
         Postconditions: []
@@ -125,7 +125,7 @@ TestPlan:
           - Command: Set-TenantSettings
             Splat:
               RequestBody:
-                DisablePortalsCreationByNonAdminUsers : false
+                DisablePortalsCreationByNonAdminUsers: false
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.POWERPLATFORM.5.1v1 Compliant - Create Power Pages sites Restricted To Admins
@@ -133,6 +133,6 @@ TestPlan:
           - Command: Set-TenantSettings
             Splat:
               RequestBody:
-                DisablePortalsCreationByNonAdminUsers : true
+                DisablePortalsCreationByNonAdminUsers: true
         Postconditions: []
         ExpectedResult: true

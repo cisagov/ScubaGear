@@ -28,7 +28,7 @@ jobs:
       - name: Publish ScubaGear module to private repository
         run: |
           cd src
-          . utils/DeployUtils.ps1 
+          . utils/DeployUtils.ps1
           New-PrivateGallery -GalleryName $env:GalleryName -Trusted
           New-CodeSigningCertificate
           Publish-ScubaGearModule -ModulePath PowerShell/ScubaGear -GalleryName $env:GalleryName
@@ -45,7 +45,7 @@ jobs:
               Verbosity = 'Detailed'
             }
           }
-          $Config = New-PesterConfiguration -Hashtable $PesterConfig 
+          $Config = New-PesterConfiguration -Hashtable $PesterConfig
           Invoke-Pester -Configuration $Config
       - name: Check Scuba Version
         run: |

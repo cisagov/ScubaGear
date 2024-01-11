@@ -1,4 +1,4 @@
-on: 
+on:
   workflow_call:
   workflow_dispatch:
   pull_request:
@@ -6,7 +6,7 @@ on:
     branches:
       - "main"
   pull_request_review:
-      types: [submitted]  
+      types: [submitted]
   push:
     paths:
       - ".github/workflows/run_smoke_test.yaml"
@@ -23,9 +23,9 @@ jobs:
       SCUBA_GITHUB_AUTOMATION_CREDS: ${{ secrets.SCUBA_GITHUB_AUTOMATION_CREDS }}
     defaults:
           run:
-            shell: powershell 
+            shell: powershell
     permissions:
-      contents: read 
+      contents: read
     steps:
     - name: Checkout repo code
       uses: actions/checkout@v4
