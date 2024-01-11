@@ -7,7 +7,7 @@ name: Nightly Product Functional Tests
 on:
   push: # temp addition for testing
   schedule:
-  - cron: '0 4 * * 0-4'
+    - cron: '0 4 * * 0-4'
   workflow_dispatch:
 
 jobs:
@@ -58,15 +58,14 @@ jobs:
           $allParams = $allParams.replace(' ','')
           # Split into test plans
           $testPlansParams = $allParams.split("|")
-          foreach ($plan in $testPlansParams) 
+          foreach ($plan in $testPlansParams)
           {
-            # The params are passed as a hash table
             $paramsAsHashTable = @{}
             # Split into individual parameters
             $paramPairs = $plan.split(",")
             foreach ($pair in $paramPairs)
             {
-              # Split the key and value
+              # Split the key from the value
               $keyAndValue = $pair.split("=")
               $paramsAsHashTable.Add($keyAndValue[0], $keyAndValue[1])
             }
