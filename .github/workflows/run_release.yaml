@@ -80,6 +80,6 @@ jobs:
           Expand-Archive -Path "ScubaGear-${{ inputs.version }}.zip" 
           Get-ChildItem 
           Set-Location -Path "ScubaGear-${{ inputs.version }}"
-          Setup.ps1 
+          .\SetUp.ps1 
           Import-Module -Name PowerShell/ScubaGear
           Invoke-SCuBA -Version 
