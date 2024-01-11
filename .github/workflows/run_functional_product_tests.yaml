@@ -53,25 +53,24 @@ jobs:
           # Read thumbprint from previous job.
           $thumbprint = "${{ steps.getthumbprint.outputs.THUMBPRINT }}"
           # Read params from secret.
-          $secretValue = $env:TestParams
+          $allParams = $env:TestParams
           # Remove any extra spaces
-          $secretValue = $secretValue.replace(' ','')
+          $allParams = $allParams.replace(' ','')
           # Split into test plans
-          $outerArray = $secretValue.split("|")
-          foreach ($i in $outerArray) 
+          $testPlansParams = $allParams.split("|")
+          foreach ($plan in $testPlansParams) 
           {
+            # The params are passed as a hash table
             $paramsAsHashTable = @{}
-            # Split into individual key-value parameters
-            $innerArray = $i.split(",")
-            foreach ($j in $innerArray)
+            # Split into individual parameters
+            $paramPairs = $plan.split(",")
+            foreach ($pair in $paramPairs)
             {
               # Split the key and value
-              $keyvalue = $j.split("=")
-              $paramsAsHashTable.Add($keyvalue[0], $keyvalue[1])
+              $keyAndValue = $pair.split("=")
+              $paramsAsHashTable.Add($keyAndValue[0], $keyAndValue[1])
             }
-            $paramsAsHashTable # Debug
             ./Testing/Functional/Products/Tests/CallProductTests.ps1 -params $paramsAsHashTable -thumbprint $thumbprint
-            echo "---" # Debug
           }
         env:
           TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
