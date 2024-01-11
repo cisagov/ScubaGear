@@ -69,13 +69,18 @@ jobs:
           files: ScubaGear-${{ inputs.version }}.zip
           generate_release_notes: true
           fail_on_unmatched_files: true
+      - name: Download release
+        uses: robinraju/release-downloader@1.8
+        with:
+          releaseId: ${{ steps.create_release.outputs.id}}
+          fileName: ScubaGear-${{ inputs.version }}.zip
+          zipBall: true   
       - name: Quick check release
         shell: powershell
         run: |
-          Invoke-WebRequest -URI ${{ steps.create_release.outputs.url}} -Outfile Release.zip 
-          Expand-Archive -Path Release.zip 
-          Set-Location -Path Release
+          Expand-Archive -Path ScubaGear-${{ inputs.version }}.zip 
           Get-ChildItem 
+          Set-Location -Path ScubaGear-${{ inputs.version }}
           Setup.ps1 
           Import-Module -Name PowerShell/SchubaGear
           Invoke-SCuBA -Version 
