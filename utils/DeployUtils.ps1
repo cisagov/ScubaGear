@@ -162,6 +162,10 @@ function ConfigureScubaGearModule{
 }
 
 function CreateFileList{
+    <#
+    .NOTES
+    Internal function 
+    #>
     param(
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
@@ -192,6 +196,10 @@ function CreateFileList{
 }
 
 function CallAzureSignTool{
+    <#
+    .NOTES
+    Internal function 
+    #>
     param (
         [Parameter(Mandatory=$true)]
         [ValidateScript({[uri]::IsWellFormedUriString($_, 'Absolute') -and ([uri] $_).Scheme -in 'https'})]
@@ -230,8 +238,19 @@ function CallAzureSignTool{
 }
 function SignScubaGearModule{
     <#
-        .NOTES
-        Internal helper function
+    .SYNOPSIS
+    Code sign the specified module
+    .Description
+    This function individually signs PowerShell artifacts (i.e., *.ps1, *.pms1) and creates a 
+    signed catalog of the entire module using a certificate housed in an Azure key vault.
+    .Parameter AzureKeyVaultUrl
+    The URL of the key vault with the code signing certificate
+    .Parameter CertificateName
+    The name of the code signing certificate
+    .Parameter ModulePath
+    The root path of the module to be signed
+    .Parameter TimeStampServer
+    Time server to use to timestamp the artifacts
     #>
     param (
         [Parameter(Mandatory=$true)]
