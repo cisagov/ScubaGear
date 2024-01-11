@@ -1298,9 +1298,6 @@ function Invoke-RunCached {
                 $ProductNames = "teams", "exo", "defender", "aad", "sharepoint", "powerplatform"
             }
 
-            # The equivalent of ..\..
-            $ParentPath = Split-Path $(Split-Path $ParentPath -Parent) -Parent
-
             # Create outpath if $Outpath does not exist
             if(-not (Test-Path -PathType "container" $OutPath))
             {
