@@ -7,15 +7,15 @@ TestPlan:
         Preconditions: []
         Postconditions: []
         ExpectedResult: false
-  
+
   - PolicyId: MS.AAD.2.3v1
     TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.AAD.2.3v1 No P2 license case 
+      - TestDescription: MS.AAD.2.3v1 No P2 license case
         Preconditions: []
-        Postconditions: [] 
+        Postconditions: []
         ExpectedResult: false
-  
+
   - PolicyId: MS.AAD.7.4v1
     TestDriver: RunScuba
     Tests:
@@ -23,7 +23,7 @@ TestPlan:
         Preconditions: []
         Postconditions: []
         ExpectedResult: false
-  
+
   - PolicyId: MS.AAD.7.5v1
     TestDriver: RunScuba
     Tests:
@@ -55,7 +55,7 @@ TestPlan:
         Preconditions: []
         Postconditions: []
         ExpectedResult: false
-  
+
   - PolicyId: MS.AAD.7.9v1
     TestDriver: RunScuba
     Tests:
