@@ -259,6 +259,7 @@ function Invoke-SCuBA {
 
         # Loads and executes parameters from a Configuration file
         if ($PSCmdlet.ParameterSetName -eq 'Configuration'){
+            [ScubaConfig]::ResetInstance()
             if (-Not ([ScubaConfig]::GetInstance().LoadConfig($ConfigFilePath))){
                 Write-Error -Message "The config file failed to load: $ConfigFilePath"
             }
