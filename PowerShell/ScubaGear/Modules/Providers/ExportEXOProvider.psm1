@@ -8,6 +8,7 @@ function Export-EXOProvider {
     #>
 
     [CmdletBinding()]
+    [OutputType([String])]
     param()
 
     # Manually importing the module name here to bypass cmdlet name conflicts
@@ -26,18 +27,18 @@ function Export-EXOProvider {
     MS.EXO.2.1v1 SPF
     #>
     $domains = $Tracker.TryCommand("Get-AcceptedDomain")
-    $SPFRecords = ConvertTo-Json @($Tracker.TryCommand("Get-ScubaSpfRecords", @{"Domains"=$domains})) -Depth 3
+    $SPFRecords = ConvertTo-Json @($Tracker.TryCommand("Get-ScubaSpfRecord", @{"Domains"=$domains})) -Depth 3
 
     <#
     MS.EXO.3.1v1 DKIM
     #>
     $DKIMConfig = ConvertTo-Json @($Tracker.TryCommand("Get-DkimSigningConfig"))
-    $DKIMRecords = ConvertTo-Json @($Tracker.TryCommand("Get-ScubaDkimRecords", @{"Domains"=$domains})) -Depth 3
+    $DKIMRecords = ConvertTo-Json @($Tracker.TryCommand("Get-ScubaDkimRecord", @{"Domains"=$domains})) -Depth 3
 
     <#
     MS.EXO.4.1v1 DMARC
     #>
-    $DMARCRecords = ConvertTo-Json @($Tracker.TryCommand("Get-ScubaDmarcRecords", @{"Domains"=$domains})) -Depth 3
+    $DMARCRecords = ConvertTo-Json @($Tracker.TryCommand("Get-ScubaDmarcRecord", @{"Domains"=$domains})) -Depth 3
 
     <#
     MS.EXO.5.1v1
@@ -198,6 +199,7 @@ function Invoke-RobustDnsTxt {
     Internal
     #>
     [CmdletBinding()]
+    [OutputType([System.Collections.Hashtable])]
     param (
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
@@ -356,7 +358,7 @@ function Invoke-RobustDnsTxt {
     }
 }
 
-function Get-ScubaSpfRecords {
+function Get-ScubaSpfRecord {
     <#
     .Description
     Gets the SPF records for each domain in $Domains
@@ -388,13 +390,13 @@ function Get-ScubaSpfRecords {
     }
 
     if ($NLowConf -gt 0) {
-        Write-Warning "Get-ScubaSpfRecords: for $($NLowConf) domain(s), the tradtional DNS queries returned an empty answer section and the DoH queries failed. Will assume SPF not configured, but can't guarantee that failure isn't due to something like split horizon DNS. See ProviderSettingsExport.json under 'spf_records' for more details."
+        Write-Warning "Get-ScubaSpfRecord: for $($NLowConf) domain(s), the tradtional DNS queries returned an empty answer section and the DoH queries failed. Will assume SPF not configured, but can't guarantee that failure isn't due to something like split horizon DNS. See ProviderSettingsExport.json under 'spf_records' for more details."
     }
     $DnsLog += $Response.LogEntries
     $SPFRecords
 }
 
-function Get-ScubaDkimRecords {
+function Get-ScubaDkimRecord {
     <#
     .Description
     Gets the DKIM records for each domain in $Domains
@@ -445,12 +447,12 @@ function Get-ScubaDkimRecords {
     }
 
     if ($NLowConf -gt 0) {
-        Write-Warning "Get-ScubaDkimRecords: for $($NLowConf) domain(s), the tradtional DNS queries returned an empty answer section and the DoH queries failed. Will assume DKIM not configured, but can't guarantee that failure isn't due to something like split horizon DNS. See ProviderSettingsExport.json under 'dkim_records' for more details."
+        Write-Warning "Get-ScubaDkimRecord: for $($NLowConf) domain(s), the tradtional DNS queries returned an empty answer section and the DoH queries failed. Will assume DKIM not configured, but can't guarantee that failure isn't due to something like split horizon DNS. See ProviderSettingsExport.json under 'dkim_records' for more details."
     }
     $DKIMRecords
 }
 
-function Get-ScubaDmarcRecords {
+function Get-ScubaDmarcRecord {
     <#
     .Description
     Gets the DMARC records for each domain in $Domains
@@ -496,7 +498,7 @@ function Get-ScubaDmarcRecords {
     }
 
     if ($NLowConf -gt 0) {
-        Write-Warning "Get-ScubaDmarcRecords: for $($NLowConf) domain(s), the tradtional DNS queries returned an empty answer section and the DoH queries failed. Will assume DMARC not configured, but can't guarantee that failure isn't due to something like split horizon DNS. See ProviderSettingsExport.json under 'dmarc_records' for more details."
+        Write-Warning "Get-ScubaDmarcRecord: for $($NLowConf) domain(s), the tradtional DNS queries returned an empty answer section and the DoH queries failed. Will assume DMARC not configured, but can't guarantee that failure isn't due to something like split horizon DNS. See ProviderSettingsExport.json under 'dmarc_records' for more details."
     }
     $DMARCRecords
 }
