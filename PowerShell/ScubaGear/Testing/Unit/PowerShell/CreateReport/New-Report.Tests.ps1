@@ -51,7 +51,7 @@ InModuleScope CreateReport {
             $CreateReportParams += @{
                 'BaselineName'    = $ArgToProd[$Product];
                 'FullName'        = $ProdToFullName[$Product];
-                'SecureBaselines' = Import-SecureBaseline -ProductNames $Product
+                'SecureBaselines' = Import-SecureBaseline -ProductNames $Product -BaselinePath (Join-Path -Path $PSScriptRoot -ChildPath "..\..\..\..\baselines" -Resolve)
             }
 
             { New-Report @CreateReportParams } | Should -Not -Throw
