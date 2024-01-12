@@ -40,12 +40,15 @@ jobs:
           enable-AzPSSession: true       
       - name: Sign Module
         uses: azure/powershell@v1
+        env:
+          KEY_VAULT_INFO: ${{ secrets.SCUBA_KEY_VAULT_DEV}}
         with:
           inlineScript: |
             $DebugPreference='Continue'
             dotnet --version
             dotnet tool install --global AzureSignTool --version 4.0.1
-            $KeyVaultInfo = "${{ secrets.SCUBA_KEY_VAULT_DEV}}" | ConvertFrom-Json
+            Write-Output ${env:KEY_VAULT_INFO} 
+            $KeyVaultInfo = ${env:KEY_VAULT_INFO} | ConvertFrom-Json
             . repo/utils/DeployUtils.ps1
             # Remove non-release files
             Remove-Item -Recurse -Force repo -Include .git*
