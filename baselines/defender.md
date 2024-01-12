@@ -639,7 +639,7 @@ real-time insight into possible security incidents. Guidance on specific alerts 
 
 ### Policies
 #### MS.DEFENDER.5.1v1
-At a minimum, the alerts required by the _CISA M365 Security Configuration Baseline for Exchange Online_ SHALL be enabled.
+At a minimum, the alerts required by the CISA M365 Security Configuration Baseline for Exchange Online SHALL be enabled.
 
 <!--Policy: MS.DEFENDER.5.1v1; Criticality: SHALL -->
 - _Rationale:_ Potentially malicious or service-impacting events may go undetected without a means of detecting these events. Setting up a mechanism to alert administrators to the list of events linked above draws attention to them to minimize any impact to users and the agency.
