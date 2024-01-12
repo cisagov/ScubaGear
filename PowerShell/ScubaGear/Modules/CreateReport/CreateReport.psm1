@@ -237,7 +237,7 @@ function Import-SecureBaseline{
         [Parameter(Mandatory = $false)]
         [ValidateScript({Test-Path -PathType Container $_})]
         [string]
-        $BaselinePath = (Join-Path -Path $PSScriptRoot -ChildPath "..\..\..\..\baselines\")
+        $BaselinePath = (Join-Path -Path $PSScriptRoot -ChildPath "..\..\baselines\")
     )
     $Output = @{}
 
