@@ -8,21 +8,20 @@ This script installs the required web driver needed for the current Chrome Brows
 .PARAMETER rootRegistry
 The root location in registry to check version of currently installed apps
 
-.PARAMETER chromeRegistryPath
-The direct registry location for Chrome (to check version)
-
 .PARAMETER webDriversPath
 The local path for all web drivers
 
-.PARAMETER chromeDriverPath
-The direct Chrome driver path
+.EXAMPLE
+Import-Module Selenium
+$WebDriverPath = Join-Path -Path (Get-Module -Name Selenium).ModuleBase -ChildPath 'assemblies'
+.\UpdateSelenium.ps1 -WebDriversPath $WebDriverPath
+
 #>
 param (
-    $registryRoot        = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths",
-    $chromeRegistryPath  = "$registryRoot\chrome.exe",
-    $webDriversPath      = "C:\Program Files\WindowsPowerShell\Modules\Selenium\3.0.1\assemblies",
-    $chromeDriverPath    = "$($webDriversPath)\chromedriver.exe"
+    $RegistryRoot = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths",
+    $WebDriversPath = "C:\Program Files\WindowsPowerShell\Modules\Selenium\3.0.1\assemblies"
 )
+
 function Get-LocalDriverVersion{
     param(
         $PathToDriver                                               # direct path to the driver
@@ -96,15 +95,15 @@ function DownLoadDriver{
     return $true
 }
 
-$DebugPreference = 'Continue'
-#$DebugPreference = 'SilentlyContinue'
+$ChromeRegistryPath  = "$RegistryRoot\chrome.exe"
+$ChromeDriverPath    = "$WebDriversPath\chromedriver.exe"
 
 # firstly check which browser versions are installed (from registry)
-$chromeVersion = (Get-Item (Get-ItemProperty $chromeRegistryPath).'(Default)').VersionInfo.ProductVersion -as [System.Version]
-Write-Debug -Message "Chrome driver version(registery):  $chromeVersion"
+$chromeVersion = (Get-Item (Get-ItemProperty $ChromeRegistryPath).'(Default)').VersionInfo.ProductVersion -as [System.Version]
+Write-Debug -Message "Current installed Chrome driver version(registery):  $chromeVersion"
 
 # check which driver versions are installed
-$localDriverVersion = Get-LocalDriverVersion -pathToDriver $chromeDriverPath
+$localDriverVersion = Get-LocalDriverVersion -pathToDriver $ChromeDriverPath
 
 if (Confirm-NeedForUpdate $chromeVersion $localDriverVersion){
     Write-Debug -Message "Need to update chrome driver from $localDriverVersion to $chromeVersion"
@@ -122,13 +121,14 @@ if (Confirm-NeedForUpdate $chromeVersion $localDriverVersion){
     $DriverTempPath = Join-Path -Path $PSScriptRoot -ChildPath "chromeNewDriver"
 
     if (-not (Test-Path -Path $DriverTempPath -PathType Container)){
-        New-Item -ItemType Directory -Path $DriverTempPath
+        New-Item -ItemType Directory -Path $DriverTempPath | Out-Null
     }
 
     $DownloadSuccessful = $false
     $MaxRetry = 3
 
-    while((-not $DownloadSuccessful) -and (0 -gt $MaxRetry--)){
+    while((-not $DownloadSuccessful) -and ($MaxRetry-- -gt 0)){
+        Write-Debug "Attempting to download new driver version $chromeVersion"
         $DownloadSuccessful = DownloadDriver -DownloadUrl $DownloadUrl -WebDriversPath $webDriversPath -DriverTempPath $DriverTempPath
     }
 
