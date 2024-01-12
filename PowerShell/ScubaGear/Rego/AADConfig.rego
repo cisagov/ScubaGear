@@ -702,7 +702,7 @@ default PrivilegedRoleExclusions(_, _) := false
 # for users & groups. If there are users with permenant assignment
 # return true if all users + groups are in the config.
 PrivilegedRoleExclusions(PrivilegedRole, PolicyID) := true if {
-    PrivilegedRoleAssignedPrincipals := {x.PrincipalId | some x in PrivilegedRole.Assignments; x.EndDateTime == null}
+    PrivilegedRoleAssignedPrincipals := {x.PrincipalId | some x in PrivilegedRole.Assignments; x.endDateTime == null}
 
     AllowedPrivilegedRoleUsers := {y | some y in input.scuba_config.Aad[PolicyID].RoleExclusions.Users; y != null}
     AllowedPrivilegedRoleGroups := {y | some y in input.scuba_config.Aad[PolicyID].RoleExclusions.Groups; y != null}
@@ -713,7 +713,7 @@ PrivilegedRoleExclusions(PrivilegedRole, PolicyID) := true if {
 
 # if no users with permenant assignment & config empty, return true
 PrivilegedRoleExclusions(PrivilegedRole, PolicyID) := true if {
-    count({x.PrincipalId | some x in PrivilegedRole.Assignments; x.EndDateTime == null}) > 0
+    count({x.PrincipalId | some x in PrivilegedRole.Assignments; x.endDateTime == null}) > 0
     count({y | some y in input.scuba_config.Aad[PolicyID].RoleExclusions.Users; y != null}) == 0
     count({y | some y in input.scuba_config.Aad[PolicyID].RoleExclusions.Groups; y != null}) == 0
 }
@@ -748,8 +748,7 @@ tests contains {
 # Get all privileged roles that do not have a start date
 RolesAssignedOutsidePim contains Role.DisplayName if {
     some Role in input.privileged_roles
-    NoStartAssignments := {is_null(X.StartDateTime) | some X in Role.Assignments}
-
+    NoStartAssignments := {is_null(X.startDateTime) | some X in Role.Assignments}
     count(FilterArray(NoStartAssignments, true)) > 0
 }
 

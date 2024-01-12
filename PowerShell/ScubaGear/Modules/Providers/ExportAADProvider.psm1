@@ -220,16 +220,18 @@ function Get-PrivilegedUser {
     # Process the Eligible role assignments if the premium license for PIM is there
     if ($TenantHasPremiumLicense) {
         # Get a list of all the users and groups that have Eligible assignments
-        $AllPIMRoleAssignments = Get-MgBetaRoleManagementDirectoryRoleEligibilityScheduleInstance -All -ErrorAction Stop
+        # $AllPIMRoleAssignments = Get-MgBetaRoleManagementDirectoryRoleEligibilityScheduleInstance -All -ErrorAction Stop
+        $TempPIMRoleAssignments = Invoke-MgGraphRequest -Uri 'https://graph.microsoft.com/beta/roleManagement/directory/roleEligibilityScheduleInstances' -ErrorAction Stop
+        $AllPIMRoleAssignments = $TempPIMRoleAssignments["value"]
 
         # Add to the list of privileged users based on Eligible assignments
         foreach ($Role in $AADRoles) {
             $PrivRoleId = $Role.RoleTemplateId
             # Get a list of all the users and groups Eligible assigned to this role
-            $PIMRoleAssignments = $AllPIMRoleAssignments | Where-Object { $_.RoleDefinitionId -eq $PrivRoleId }
+            $PIMRoleAssignments = $AllPIMRoleAssignments | Where-Object { $_.roleDefinitionId -eq $PrivRoleId }
 
             foreach ($PIMRoleAssignment in $PIMRoleAssignments) {
-                $UserObjectId = $PIMRoleAssignment.PrincipalId
+                $UserObjectId = $PIMRoleAssignment.principalId
                 try {
                     $UserType = "user"
 
@@ -294,7 +296,9 @@ function Get-PrivilegedRole {
         $RolePolicyAssignments = Get-MgBetaPolicyRoleManagementPolicyAssignment -All -ErrorAction Stop -Filter "scopeId eq '/' and scopeType eq 'Directory'"
 
         # Get ALL the roles and users actively assigned to them
-        $AllRoleAssignments = Get-MgBetaRoleManagementDirectoryRoleAssignmentScheduleInstance -All -ErrorAction Stop
+        # $AllRoleAssignments = Get-MgBetaRoleManagementDirectoryRoleAssignmentScheduleInstance -All -ErrorAction Stop
+        $TempRoleAssignments = Invoke-MgGraphRequest -Uri 'https://graph.microsoft.com/beta/roleManagement/directory/roleAssignmentScheduleInstances' -ErrorAction Stop
+        $AllRoleAssignments = $TempRoleAssignments["value"]
 
         foreach ($Role in $AADRoles) {
             $RolePolicies = @()
@@ -315,7 +319,7 @@ function Get-PrivilegedRole {
             }
 
             # Get a list of the users / groups assigned to this role
-            $RoleAssignments = @($AllRoleAssignments | Where-Object { $_.RoleDefinitionId -eq $RoleTemplateId })
+            $RoleAssignments = @($AllRoleAssignments | Where-Object { $_.roleDefinitionId -eq $roleTemplateId })
 
             # Store the data that we retrieved in the Role object that will be returned from this function
             $Role | Add-Member -Name "Rules" -Value $RolePolicies -MemberType NoteProperty
