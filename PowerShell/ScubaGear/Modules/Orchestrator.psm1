@@ -562,7 +562,7 @@ function Invoke-RunRego {
 
         [ValidateNotNullOrEmpty()]
         [string]
-        $OPAPath = $PSScriptRoot,
+        $OPAPath = (Join-Path -Path $env:USERPROFILE -ChildPath ".scubagear\Tools"),
 
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
@@ -1226,7 +1226,7 @@ function Invoke-RunCached {
         [ValidateScript({Test-Path -PathType Container $_})]
         [ValidateNotNullOrEmpty()]
         [string]
-        $OPAPath = (Join-Path -Path $PSScriptRoot -ChildPath "..\..\.."),
+        $OPAPath = (Join-Path -Path $env:USERPROFILE -ChildPath ".scubagear\Tools"),
 
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
@@ -1297,9 +1297,6 @@ function Invoke-RunCached {
             if ($ProductNames -eq '*'){
                 $ProductNames = "teams", "exo", "defender", "aad", "sharepoint", "powerplatform"
             }
-
-            # The equivalent of ..\..
-            $ParentPath = Split-Path $(Split-Path $ParentPath -Parent) -Parent
 
             # Create outpath if $Outpath does not exist
             if(-not (Test-Path -PathType "container" $OutPath))
