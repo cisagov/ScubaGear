@@ -251,6 +251,17 @@ function SignScubaGearModule{
     The root path of the module to be signed
     .Parameter TimeStampServer
     Time server to use to timestamp the artifacts
+    .NOTES
+    There appears to be limited or at least difficult to find documentation on how to properly sign a PowerShell
+    module to be published to PSGallery.
+    https://learn.microsoft.com/en-us/powershell/gallery/concepts/publishing-guidelines?view=powershellget-3.x show
+    general guidance.
+
+    There is anecdotal evidence to sign all PowerShell artifacts (ps1, psm1, and pdsd1) in additional to a signed catalog For example,
+    Microsoft.PowerApps.PowerShell (v1.0.34) and see both *.psd1 and *.psm1 files are signed and a catalog provided.
+
+    There are a number of Non-authoritive references such as below showing all ps1, psm1, and psd1 being signed first then cataloged.
+    https://github.com/dell/OpenManage-PowerShell-Modules/blob/main/Sign-Module.ps1
     #>
     param (
         [Parameter(Mandatory=$true)]
