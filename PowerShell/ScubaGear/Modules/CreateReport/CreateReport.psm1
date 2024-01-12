@@ -387,7 +387,7 @@ function Resolve-HTMLMarkdown{
         $ResolvedString = $OriginalString -replace '(_)(.*?)(_)', '<i>${2}</i>'
         return $ResolvedString
     } elseif($HTMLReplace.ToLower() -match "bold") {
-        $ResolvedString = $OriginalString -replace '(**)(.*?)(**)', '<b>${2}</b>'
+        $ResolvedString = $OriginalString -replace '(\*\*)(.*?)(\*\*)', '<b>${2}</b>'
         return $ResolvedString
     } else {
         return $OriginalString
