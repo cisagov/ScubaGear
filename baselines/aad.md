@@ -95,7 +95,7 @@ This section provides policies that reduce security risks related to potentially
 
 ### Policies
 #### MS.AAD.2.1v1
-Users detected as high risk _SHALL_ be blocked.
+Users detected as high risk SHALL be blocked.
 
 <!--Policy: MS.AAD.2.1v1; Criticality: SHALL -->
 - _Rationale:_ Blocking high-risk users may prevent compromised accounts from accessing the tenant.
