@@ -234,7 +234,7 @@ function CallAzureSignTool{
     Write-Debug "Calling AzureSignTool: $SignArguments"
 
     $ToolPath = (Get-Command AzureSignTool).Path  
-    powershell -Command "& $ToolPath $SignArguments"      
+    & $ToolPath $SignArguments     
 }
 function SignScubaGearModule{
     <#
