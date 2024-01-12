@@ -1118,14 +1118,12 @@ function Import-Resources {
             $ModulePath = Join-Path -Path $ProvidersPath -ChildPath $Provider -ErrorAction 'Stop'
             Import-Module $ModulePath
         }
-        $ConnectionPath = Join-Path -Path $PSScriptRoot -ChildPath "Connection" -ErrorAction 'Stop'
-        $RegoPath = Join-Path -Path $PSScriptRoot -ChildPath "RunRego" -ErrorAction 'Stop'
-        $ReporterPath = Join-Path -Path $PSScriptRoot -ChildPath "CreateReport" -ErrorAction 'Stop'
-        $ScubaConfigPath = Join-Path -Path $PSScriptRoot -ChildPath "ScubaConfig" -ErrorAction 'Stop'
-        Import-Module $ConnectionPath
-        Import-Module $RegoPath
-        Import-Module $ReporterPath
-        Import-Module $ScubaConfigPath
+
+        @('Connection', 'RunRego', 'CreateReport', 'ScubaConfig', 'Support') | ForEach-Object {
+            $ModulePath = Join-Path -Path $PSScriptRoot -ChildPath $_ -ErrorAction 'Stop'
+            Write-Debug "Importing $_ module"
+            Import-Module -Name $ModulePath
+        }
     }
     catch {
         $ImportResourcesErrorMessage = "Fatal Error involving importing PowerShell modules. `
