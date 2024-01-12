@@ -697,14 +697,28 @@ tests contains {
 # MS.AAD.7.2v1
 #--
 
+# Save all users that have the Global Admin role
+NotGlobalAdmins contains User.DisplayName if {
+    some User in input.privileged_users
+    not "Global Administrator" in User.roles
+}
+
+SecureScore(GlobalAdmins, NotGlobalAdmins) := Description if {
+    count(NotGlobalAdmins) > 0
+    x := count(GlobalAdmins)/count(NotGlobalAdmins)*100
+    Description := concat(" ", ["Secure Score:", format_int(x,10)])
+} else := "No privileged users that are NOT Global Admin; Secure Score cannot be calculated at this time."
+
 # At this time we are unable to test for 7.2v1
 tests contains {
     "PolicyId": "MS.AAD.7.2v1",
-    "Criticality": "Shall/Not-Implemented",
-    "Commandlet": [],
-    "ActualValue": [],
-    "ReportDetails": NotCheckedDetails("MS.AAD.7.2v1"),
-    "RequirementMet": false
+    "Criticality" : "Shall",
+    "Commandlet" : ["Get-MgBetaSubscribedSku", "Get-PrivilegedUser"],
+    "ActualValue" : GlobalAdmins,
+    "ReportDetails" : concat(": ", [ReportDetailsBoolean(Status), SecureScore(GlobalAdmins,NotGlobalAdmins)]),
+    "RequirementMet" : Status
+} if {
+    Status := count(GlobalAdmins) <= count(NotGlobalAdmins)
 }
 #--
 
