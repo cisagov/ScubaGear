@@ -14,6 +14,7 @@ function New-PrivateGallery {
     New-PrivateGallery -Trusted
     Create new private, trusted gallery using default name and location
     #>
+    [CmdletBinding(SupportsShouldProcess)]
     param (
         [Parameter(Mandatory=$false)]
         [ValidateScript({Test-Path -Path $_ -IsValid})]
@@ -172,17 +173,13 @@ function ConfigureScubaGearModule{
 function CreateFileList{
     <#
     .NOTES
-    Internal function 
+    Internal function
     #>
     param(
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [string]
         $SourcePath,
-        [Parameter(Mandatory=$false)]
-        [AllowEmptyCollection()]
-        [array]
-        $LiteralFilePaths = @(),
         [Parameter(Mandatory=$false)]
         [AllowEmptyCollection()]
         [array]
@@ -194,8 +191,8 @@ function CreateFileList{
     if ($Extensions.Count -gt 0){
         $FileNames += Get-ChildItem -Recurse -Path $SourcePath -Include $Extensions
     }
-    
-    Write-Debug "Found $($FileNames.Count) files to sign" 
+
+    Write-Debug "Found $($FileNames.Count) files to sign"
 
     $FileList = New-TemporaryFile
     $FileNames.FullName | Out-File -FilePath $($FileList.FullName) -Encoding utf8 -Force
@@ -206,7 +203,7 @@ function CreateFileList{
 function CallAzureSignTool{
     <#
     .NOTES
-    Internal function 
+    Internal function
     #>
     param (
         [Parameter(Mandatory=$true)]
@@ -217,9 +214,6 @@ function CallAzureSignTool{
         [ValidateNotNullOrEmpty()]
         [string]
         $CertificateName,
-        [Parameter(Mandatory=$true)]
-        [ValidateScript({Test-Path -Path $_})]
-        $ModulePath,
         [Parameter(Mandatory=$false)]
         [ValidateScript({[uri]::IsWellFormedUriString($_, 'Absolute') -and ([uri] $_).Scheme -in 'http','https'})]
         $TimeStampServer = 'http://timestamp.digicert.com',
@@ -236,20 +230,20 @@ function CallAzureSignTool{
         '-kvu',$AzureKeyVaultUrl,
         '-kvc',$CertificateName,
         '-kvm'
-        '-ifl',$FileList         
+        '-ifl',$FileList     
     )
 
     Write-Debug "Calling AzureSignTool: $SignArguments"
 
-    $ToolPath = (Get-Command AzureSignTool).Path  
-    & $ToolPath $SignArguments     
+    $ToolPath = (Get-Command AzureSignTool).Path
+    & $ToolPath $SignArguments
 }
 function SignScubaGearModule{
     <#
     .SYNOPSIS
     Code sign the specified module
     .Description
-    This function individually signs PowerShell artifacts (i.e., *.ps1, *.pms1) and creates a 
+    This function individually signs PowerShell artifacts (i.e., *.ps1, *.pms1) and creates a
     signed catalog of the entire module using a certificate housed in an Azure key vault.
     .Parameter AzureKeyVaultUrl
     The URL of the key vault with the code signing certificate
@@ -287,7 +281,7 @@ function SignScubaGearModule{
         [ValidateScript({[uri]::IsWellFormedUriString($_, 'Absolute') -and ([uri] $_).Scheme -in 'http','https'})]
         $TimeStampServer = 'http://timestamp.digicert.com'
     )
-    
+
 
     # Digitally sign scripts, manifest, and modules
     $FileList = CreateFileList -SourcePath $ModulePath -Extensions "*.ps1","*.psm1","*.psd1"
@@ -299,7 +293,7 @@ function SignScubaGearModule{
 
     if (Test-Path -Path $CatalogPath -PathType Leaf){
         Remove-Item -Path $CatalogPath -Force
-    }    
+    } 
 
     $CatalogPath = New-FileCatalog -Path $ModulePath -CatalogFilePath $CatalogPath -CatalogVersion 2.0
     $CatalogList = New-TemporaryFile
