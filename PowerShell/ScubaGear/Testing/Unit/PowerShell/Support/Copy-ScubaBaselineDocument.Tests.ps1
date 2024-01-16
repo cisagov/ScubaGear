@@ -38,7 +38,7 @@ InModuleScope Support {
             $PreviousCreateTime = [System.DateTime](Get-Item -Path (Join-Path -Path $SecureBaselineCopyFolder -ChildPath 'aad.md')).CreationTime
             Test-Path -Path $SecureBaselineCopyFolder -PathType Container | Should -BeTrue
             {Copy-ScubaBaselineDocument -Destination $SecureBaselineCopyFolder} |
-                Should -Not -Throw
+                Should -Throw -ExpectedMessage "Access to the path * is denied."
             $CurrentCreateTime = [System.DateTime](Get-Item -Path (Join-Path -Path $SecureBaselineCopyFolder -ChildPath 'aad.md')).CreationTime
             $PreviousCreateTime -eq $CurrentCreateTime | Should -BeTrue
         }
@@ -46,7 +46,7 @@ InModuleScope Support {
             $PreviousCreateTime = [System.DateTime](Get-Item -Path (Join-Path -Path $SecureBaselineCopyFolder -ChildPath 'aad.md')).CreationTime
             Test-Path -Path $SecureBaselineCopyFolder -PathType Container | Should -BeTrue
             {Copy-ScubaBaselineDocument -Destination $SecureBaselineCopyFolder -Force} |
-                Should -Not -Throw    
+                Should -Not -Throw
             $CurrentCreateTime = [System.DateTime](Get-Item -Path (Join-Path -Path $SecureBaselineCopyFolder -ChildPath 'aad.md')).CreationTime
             ($CurrentCreateTime -ge $PreviousCreateTime) | Should -BeTrue -Because "$($CurrentCreateTime) vs $($PreviousCreateTime)"
         }
