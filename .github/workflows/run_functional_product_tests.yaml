@@ -49,21 +49,24 @@ jobs:
       - name: Update Selenium
         run: ./Testing/Functional/SmokeTest/UpdateSelenium.ps1
       - name: Test Products
+        # The testing params are stored as a string in a CSV-like format.
+        # Pipes separate products, and commas separate key/value pairs.
+        # key1=value1,key2=value2|key3=value3,key4=value4...
+        # This job parses the keys and values and converts them to a hashtable.
         run: |
           # Read thumbprint from previous job.
           $thumbprint = "${{ steps.getthumbprint.outputs.THUMBPRINT }}"
-          # Read params from secret.
-          $allParams = $env:TestParams
+          $params = $env:TestParams
           # Remove any extra spaces
-          $allParams = $allParams.replace(' ','')
-          # Split into test plans
-          $testPlansParams = $allParams.split("|")
-          foreach ($plan in $testPlansParams)
+          $params = $params.replace(' ','')
+          # Split into products
+          $products = $params.split("|")
+          foreach ($product in $products)
           {
             $paramsAsHashTable = @{}
-            # Split into individual parameters
-            $paramPairs = $plan.split(",")
-            foreach ($pair in $paramPairs)
+            # Split into pairs
+            $pairs = $product.split(",")
+            foreach ($pair in $pairs)
             {
               # Split the key from the value
               $keyAndValue = $pair.split("=")
