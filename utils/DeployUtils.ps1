@@ -230,7 +230,7 @@ function CallAzureSignTool{
         '-kvu',$AzureKeyVaultUrl,
         '-kvc',$CertificateName,
         '-kvm'
-        '-ifl',$FileList     
+        '-ifl',$FileList
     )
 
     Write-Debug "Calling AzureSignTool: $SignArguments"
@@ -297,7 +297,7 @@ function SignScubaGearModule{
 
     if (Test-Path -Path $CatalogPath -PathType Leaf){
         Remove-Item -Path $CatalogPath -Force
-    } 
+    }
 
     $CatalogPath = New-FileCatalog -Path $ModulePath -CatalogFilePath $CatalogPath -CatalogVersion 2.0
     $CatalogList = New-TemporaryFile
