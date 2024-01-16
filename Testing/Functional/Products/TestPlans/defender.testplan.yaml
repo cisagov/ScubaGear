@@ -5,12 +5,15 @@ TestPlan:
     Tests:
       - TestDescription: MS.DEFENDER.1.2v1 Non-compliant - std&strict SentTo Non-null, SentToMemberOf Non-null, RecipientDomainIs Non-null
         Preconditions:
+          # yamllint disable-line rule:line-length
           - Command: 'Set-EOPProtectionPolicyRule -Identity "Standard Preset Security Policy" -SentTo (Get-MailUser)[0].UserPrincipalName -SentToMemberOf (Get-UnifiedGroup)[0].alias -RecipientDomainIs badpeople.r.us -Confirm:$false'
+          # yamllint disable-line rule:line-length
           - Command: 'Set-EOPProtectionPolicyRule -Identity "Strict Preset Security Policy" -SentTo (Get-MailUser)[0].UserPrincipalName -SentToMemberOf (Get-UnifiedGroup)[0].alias -RecipientDomainIs badpeople.r.us -Confirm:$false'
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.DEFENDER.1.2v1 Compliant - Std Non-null Strict Null
         Preconditions:
+          # yamllint disable-line rule:line-length
           - Command: 'Set-EOPProtectionPolicyRule -Identity "Standard Preset Security Policy" -SentTo (Get-MailUser)[0].UserPrincipalName -SentToMemberOf (Get-UnifiedGroup)[0].alias -RecipientDomainIs badpeople.r.us -Confirm:$false'
           - Command: Set-EOPProtectionPolicyRule
             Splat:
@@ -30,6 +33,7 @@ TestPlan:
               SentToMemberOf: null
               RecipientDomainIs: null
               Confirm: false
+          # yamllint disable-line rule:line-length
           - Command: 'Set-EOPProtectionPolicyRule -Identity "Strict Preset Security Policy" -SentTo (Get-MailUser)[0].UserPrincipalName -SentToMemberOf (Get-UnifiedGroup)[0].alias -RecipientDomainIs badpeople.r.us -Confirm:$false'
         Postconditions: []
         ExpectedResult: true
@@ -70,6 +74,7 @@ TestPlan:
             Splat:
               Identity: Strict Preset Security Policy
               Confirm: false
+          # yamllint disable-line rule:line-length
           - Command: 'Set-EOPProtectionPolicyRule -Identity "Strict Preset Security Policy" -SentTo (Get-MailUser)[0].UserPrincipalName -SentToMemberOf (Get-UnifiedGroup)[0].alias -RecipientDomainIs badpeople.r.us -Confirm:$false'
         Postconditions: []
         ExpectedResult: false
@@ -80,6 +85,7 @@ TestPlan:
             Splat:
               Identity: Strict Preset Security Policy
               Confirm: false
+          # yamllint disable-line rule:line-length
           - Command: 'Set-EOPProtectionPolicyRule -Identity "Strict Preset Security Policy" -SentTo (Get-MailUser)[0].UserPrincipalName -SentToMemberOf (Get-UnifiedGroup)[0].alias -RecipientDomainIs badpeople.r.us -Confirm:$false'
         Postconditions: []
         ExpectedResult: false
@@ -90,6 +96,7 @@ TestPlan:
             Splat:
               Identity: Strict Preset Security Policy
               Confirm: false
+          # yamllint disable-line rule:line-length
           - Command: 'Set-EOPProtectionPolicyRule -Identity "Strict Preset Security Policy" -SentTo (Get-MailUser)[0].UserPrincipalName -SentToMemberOf (Get-UnifiedGroup)[0].alias -RecipientDomainIs badpeople.r.us -Confirm:$false'
         Postconditions: []
         ExpectedResult: false
@@ -117,34 +124,44 @@ TestPlan:
       - TestDescription: MS.DEFENDER.2.1v1 Non-compliant - Sensitive user not listed
         ConfigFileName: MismatchedUser.yaml
         Preconditions:
+          # yamllint disable-line rule:line-length
           - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedUsersToProtect $null}'
+          # yamllint disable-line rule:line-length
           - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedUsersToProtect $null}'
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.DEFENDER.2.1v1 Non-compliant - Sensitive user partial coverage
         ConfigFileName: MatchedUser.yaml
         Preconditions:
+          # yamllint disable-line rule:line-length
           - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedUsersToProtect "AgencyUserGlobalReader;AgencyUserGlobalReader@y2zj1.onmicrosoft.com"}'
+          # yamllint disable-line rule:line-length
           - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedUsersToProtect $null}'
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.DEFENDER.2.1v1 Compliant - All Listed sensitive users (mix-cased) are protected
         ConfigFileName: MatchedWithMixedCase.yaml
         Preconditions:
+          # yamllint disable-line rule:line-length
           - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedUsersToProtect "AgencyUserGlobalReader;AgencyUserGlobalReader@y2zj1.onmicrosoft.com"}'
+          # yamllint disable-line rule:line-length
           - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedUsersToProtect "AgencyUserGlobalReader;AgencyUserGlobalReader@y2zj1.onmicrosoft.com"}'
         Postconditions: []
         ExpectedResult: true
       - TestDescription: MS.DEFENDER.2.1v1 Compliant - All Listed sensitive users are protected
         ConfigFileName: MatchedUser.yaml
         Preconditions:
+          # yamllint disable-line rule:line-length
           - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedUsersToProtect "AgencyUserGlobalReader;AgencyUserGlobalReader@y2zj1.onmicrosoft.com"}'
+          # yamllint disable-line rule:line-length
           - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedUsersToProtect "AgencyUserGlobalReader;AgencyUserGlobalReader@y2zj1.onmicrosoft.com"}'
         Postconditions: []
         ExpectedResult: true
       - TestDescription: MS.DEFENDER.2.1v1 Compliant - No sensitive users identified but all users covered
         Preconditions:
+          # yamllint disable-line rule:line-length
           - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedUsersToProtect "AgencyUserGlobalReader;AgencyUserGlobalReader@y2zj1.onmicrosoft.com"}'
+          # yamllint disable-line rule:line-length
           - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedUsersToProtect "AgencyUserGlobalReader;AgencyUserGlobalReader@y2zj1.onmicrosoft.com"}'
         Postconditions: []
         ExpectedResult: true
@@ -155,27 +172,35 @@ TestPlan:
       - TestDescription: MS.DEFENDER.2.2v1 Non-compliant - Agency domain not listed
         ConfigFileName: AgencyDomainList.yaml
         Preconditions:
+          # yamllint disable-line rule:line-length
           - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect $null}'
+          # yamllint disable-line rule:line-length
           - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect $null}'
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.DEFENDER.2.2v1 Non-compliant - Agency domain partial coverage
         ConfigFileName: AgencyDomainList.yaml
         Preconditions:
+          # yamllint disable-line rule:line-length
           - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect "goodguys.com"}'
+          # yamllint disable-line rule:line-length
           - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect $null}'
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.DEFENDER.2.2v1 Non-compliant - All domains No list
         Preconditions:
+          # yamllint disable-line rule:line-length
           - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect $null}'
+          # yamllint disable-line rule:line-length
           - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect $null}'
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.DEFENDER.2.2v1 Compliant - All Listed are protected
         ConfigFileName: AgencyDomainList.yaml
         Preconditions:
+          # yamllint disable-line rule:line-length
           - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect "goodguys.com"}'
+          # yamllint disable-line rule:line-length
           - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect "goodguys.com"}'
         Postconditions: []
         ExpectedResult: true
@@ -186,27 +211,35 @@ TestPlan:
       - TestDescription: MS.DEFENDER.2.3v1 Non-compliant - Agency domain not listed
         ConfigFileName: PartnerDomainList.yaml
         Preconditions:
+          # yamllint disable-line rule:line-length
           - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect $null}'
+          # yamllint disable-line rule:line-length
           - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect $null}'
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.DEFENDER.2.3v1 Non-compliant - Agency domain partial coverage
         ConfigFileName: PartnerDomainList.yaml
         Preconditions:
+          # yamllint disable-line rule:line-length
           - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect "goodparnter.com"}'
+          # yamllint disable-line rule:line-length
           - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect $null}'
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.DEFENDER.2.3v1 Non-compliant - All domains No list of domains in config
         Preconditions:
+          # yamllint disable-line rule:line-length
           - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect $null}'
+          # yamllint disable-line rule:line-length
           - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect $null}'
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.DEFENDER.2.3v1 Compliant - All Listed are protected
         ConfigFileName: PartnerDomainList.yaml
         Preconditions:
+          # yamllint disable-line rule:line-length
           - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect "goodparnter.com"}'
+          # yamllint disable-line rule:line-length
           - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect "goodparnter.com"}'
         Postconditions: []
         ExpectedResult: true
@@ -227,6 +260,7 @@ TestPlan:
                   - Name: "Test Rule"
                     ParentPolicyName: "Default Office 365 DLP policy"
                     ContentContainsSensitiveInformation: null
+                    # yamllint disable-line rule:line-length
                     AdvancedRule: '{"Version": "1.0", "Condition": { "Operator": "And", "SubConditions": [ { "ConditionName": "ContentContainsSensitiveInformation", "Value": [ { "Groups": [ { "Name": "Default", "Operator": "Or", "Sensitivetypes": [ { "Name": "Credit Card Number", "Id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "High", "Minconfidence": 85, "Maxconfidence": 100 }, { "Name": "U.S. Individual Taxpayer Identification Number (ITIN)", "Id": "e55e2a32-f92d-4985-a35d-a0b269eb687b", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 }, { "Name": "U.S. Social Security Number (SSN)", "Id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 } ] } ], "Operator": "And" } ] } ] } }'
                     IsAdvancedRule: true
                     Disabled: false
@@ -255,6 +289,7 @@ TestPlan:
                         maxCount: "-1"
                       - name: "Credit Card Number"
                         maxCount: "-1"
+                    # yamllint disable-line rule:line-length
                     AdvancedRule: '{"Version": "1.0", "Condition": { "Operator": "And", "SubConditions": [ { "ConditionName": "ContentContainsSensitiveInformation", "Value": [ { "Groups": [ { "Name": "Default", "Operator": "Or", "Sensitivetypes": [ { "Name": "Credit Card Number", "Id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "High", "Minconfidence": 85, "Maxconfidence": 100 }, { "Name": "U.S. Individual Taxpayer Identification Number (ITIN)", "Id": "e55e2a32-f92d-4985-a35d-a0b269eb687b", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 }, { "Name": "U.S. Social Security Number (SSN)", "Id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 } ] } ], "Operator": "And" } ] } ] } }'
                     IsAdvancedRule: false
                     Disabled: false
@@ -277,6 +312,7 @@ TestPlan:
                   - Name: "Test Rule"
                     ParentPolicyName: "Default Office 365 DLP policy"
                     ContentContainsSensitiveInformation: null
+                    # yamllint disable-line rule:line-length
                     AdvancedRule: '{"Version": "1.0", "Condition": { "Operator": "And", "SubConditions": [ { "ConditionName": "ContentContainsSensitiveInformation", "Value": [ { "Groups": [ { "Name": "Default", "Operator": "Or", "Sensitivetypes": [ { "Name": "Credit Card Number", "Id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "High", "Minconfidence": 85, "Maxconfidence": 100 }, { "Name": "U.S. Individual Taxpayer Identification Number (ITIN)", "Id": "e55e2a32-f92d-4985-a35d-a0b269eb687b", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 }, { "Name": "U.S. Social Security Number (SSN)", "Id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 } ] } ], "Operator": "And" } ] } ] } }'
                     IsAdvancedRule: true
                     Disabled: true
@@ -301,6 +337,7 @@ TestPlan:
                         maxCount: "-1"
                       - name: "Credit Card Number"
                         maxCount: "-1"
+                    # yamllint disable-line rule:line-length
                     AdvancedRule: '{"Version": "1.0", "Condition": { "Operator": "And", "SubConditions": [ { "ConditionName": "ContentContainsSensitiveInformation", "Value": [ { "Groups": [ { "Name": "Default", "Operator": "Or", "Sensitivetypes": [ { "Name": "Credit Card Number", "Id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "High", "Minconfidence": 85, "Maxconfidence": 100 }, { "Name": "U.S. Individual Taxpayer Identification Number (ITIN)", "Id": "e55e2a32-f92d-4985-a35d-a0b269eb687b", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 }, { "Name": "U.S. Social Security Number (SSN)", "Id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 } ] } ], "Operator": "And" } ] } ] } }'
                     IsAdvancedRule: false
                     Disabled: true
@@ -319,6 +356,7 @@ TestPlan:
                   - Name: "Test Rule"
                     ParentPolicyName: "Default Office 365 DLP policy"
                     ContentContainsSensitiveInformation: null
+                    # yamllint disable-line rule:line-length
                     AdvancedRule: '{"Version": "1.0", "Condition": { "Operator": "And", "SubConditions": [ { "ConditionName": "ContentContainsSensitiveInformation", "Value": [ { "Groups": [ { "Name": "Default", "Operator": "Or", "Sensitivetypes": [ { "Name": "Credit Card Number", "Id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "High", "Minconfidence": 85, "Maxconfidence": 100 }, { "Name": "U.S. Individual Taxpayer Identification Number (ITIN)", "Id": "e55e2a32-f92d-4985-a35d-a0b269eb687b", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 }, { "Name": "U.S. Social Security Number (SSN)", "Id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 } ] } ], "Operator": "And" } ] } ] } }'
                     IsAdvancedRule: true
                     Disabled: false
@@ -347,6 +385,7 @@ TestPlan:
                         maxCount: "-1"
                       - name: "Credit Card Number"
                         maxCount: "-1"
+                    # yamllint disable-line rule:line-length
                     AdvancedRule: '{"Version": "1.0", "Condition": { "Operator": "And", "SubConditions": [ { "ConditionName": "ContentContainsSensitiveInformation", "Value": [ { "Groups": [ { "Name": "Default", "Operator": "Or", "Sensitivetypes": [ { "Name": "Credit Card Number", "Id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "High", "Minconfidence": 85, "Maxconfidence": 100 }, { "Name": "U.S. Individual Taxpayer Identification Number (ITIN)", "Id": "e55e2a32-f92d-4985-a35d-a0b269eb687b", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 }, { "Name": "U.S. Social Security Number (SSN)", "Id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 } ] } ], "Operator": "And" } ] } ] } }'
                     IsAdvancedRule: false
                     Disabled: false
@@ -369,6 +408,7 @@ TestPlan:
                   - Name: "Test Rule"
                     ParentPolicyName: "Default Office 365 DLP policy"
                     ContentContainsSensitiveInformation: null
+                    # yamllint disable-line rule:line-length
                     AdvancedRule: '{"Version": "1.0", "Condition": { "Operator": "And", "SubConditions": [ { "ConditionName": "ContentContainsSensitiveInformation", "Value": [ { "Groups": [ { "Name": "Default", "Operator": "Or", "Sensitivetypes": [ { "Name": "Credit Card Number", "Id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "High", "Minconfidence": 85, "Maxconfidence": 100 }, { "Name": "U.S. Individual Taxpayer Identification Number (ITIN)", "Id": "e55e2a32-f92d-4985-a35d-a0b269eb687b", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 }, { "Name": "U.S. Social Security Number (SSN)", "Id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 } ] } ], "Operator": "And" } ] } ] } }'
                     IsAdvancedRule: true
                     Disabled: false
@@ -397,6 +437,7 @@ TestPlan:
                         maxCount: "-1"
                       - name: "Credit Card Number"
                         maxCount: "-1"
+                    # yamllint disable-line rule:line-length
                     AdvancedRule: '{"Version": "1.0", "Condition": { "Operator": "And", "SubConditions": [ { "ConditionName": "ContentContainsSensitiveInformation", "Value": [ { "Groups": [ { "Name": "Default", "Operator": "Or", "Sensitivetypes": [ { "Name": "Credit Card Number", "Id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "High", "Minconfidence": 85, "Maxconfidence": 100 }, { "Name": "U.S. Individual Taxpayer Identification Number (ITIN)", "Id": "e55e2a32-f92d-4985-a35d-a0b269eb687b", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 }, { "Name": "U.S. Social Security Number (SSN)", "Id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 } ] } ], "Operator": "And" } ] } ] } }'
                     IsAdvancedRule: false
                     Disabled: false
@@ -419,6 +460,7 @@ TestPlan:
                   - Name: "Test Rule"
                     ParentPolicyName: "Default Office 365 DLP policy"
                     ContentContainsSensitiveInformation: null
+                    # yamllint disable-line rule:line-length
                     AdvancedRule: '{"Version": "1.0", "Condition": { "Operator": "And", "SubConditions": [ { "ConditionName": "ContentContainsSensitiveInformation", "Value": [ { "Groups": [ { "Name": "Default", "Operator": "Or", "Sensitivetypes": [ { "Name": "Credit Card Number", "Id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "High", "Minconfidence": 85, "Maxconfidence": 100 }, { "Name": "U.S. Individual Taxpayer Identification Number (ITIN)", "Id": "e55e2a32-f92d-4985-a35d-a0b269eb687b", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 } ] } ], "Operator": "And" } ] } ] } }'
                     IsAdvancedRule: true
                     Disabled: false
@@ -445,6 +487,7 @@ TestPlan:
                         maxCount: "-1"
                       - name: "Credit Card Number"
                         maxCount: "-1"
+                    # yamllint disable-line rule:line-length
                     AdvancedRule: '{"Version": "1.0", "Condition": { "Operator": "And", "SubConditions": [ { "ConditionName": "ContentContainsSensitiveInformation", "Value": [ { "Groups": [ { "Name": "Default", "Operator": "Or", "Sensitivetypes": [ { "Name": "Credit Card Number", "Id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "High", "Minconfidence": 85, "Maxconfidence": 100 }, { "Name": "U.S. Individual Taxpayer Identification Number (ITIN)", "Id": "e55e2a32-f92d-4985-a35d-a0b269eb687b", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 }, { "Name": "U.S. Social Security Number (SSN)", "Id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 } ] } ], "Operator": "And" } ] } ] } }'
                     IsAdvancedRule: false
                     Disabled: false
@@ -467,6 +510,7 @@ TestPlan:
                   - Name: "Test Rule"
                     ParentPolicyName: "Default Office 365 DLP policy"
                     ContentContainsSensitiveInformation: null
+                    # yamllint disable-line rule:line-length
                     AdvancedRule: '{"Version": "1.0", "Condition": { "Operator": "And", "SubConditions": [ { "ConditionName": "ContentContainsSensitiveInformation", "Value": [ { "Groups": [ { "Name": "Default", "Operator": "Or", "Sensitivetypes": [ { "Name": "Credit Card Number", "Id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "High", "Minconfidence": 85, "Maxconfidence": 100 }, { "Name": "U.S. Social Security Number (SSN)", "Id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 } ] } ], "Operator": "And" } ] } ] } }'
                     IsAdvancedRule: true
                     Disabled: false
@@ -493,6 +537,7 @@ TestPlan:
                         maxCount: "-1"
                       - name: "Credit Card Number"
                         maxCount: "-1"
+                    # yamllint disable-line rule:line-length
                     AdvancedRule: '{"Version": "1.0", "Condition": { "Operator": "And", "SubConditions": [ { "ConditionName": "ContentContainsSensitiveInformation", "Value": [ { "Groups": [ { "Name": "Default", "Operator": "Or", "Sensitivetypes": [ { "Name": "Credit Card Number", "Id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "High", "Minconfidence": 85, "Maxconfidence": 100 }, { "Name": "U.S. Individual Taxpayer Identification Number (ITIN)", "Id": "e55e2a32-f92d-4985-a35d-a0b269eb687b", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 }, { "Name": "U.S. Social Security Number (SSN)", "Id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 } ] } ], "Operator": "And" } ] } ] } }'
                     IsAdvancedRule: false
                     Disabled: false
@@ -515,6 +560,7 @@ TestPlan:
                   - Name: "Test Rule"
                     ParentPolicyName: "Default Office 365 DLP policy"
                     ContentContainsSensitiveInformation: null
+                    # yamllint disable-line rule:line-length
                     AdvancedRule: '{"Version": "1.0", "Condition": { "Operator": "And", "SubConditions": [ { "ConditionName": "ContentContainsSensitiveInformation", "Value": [ { "Groups": [ { "Name": "Default", "Operator": "Or", "Sensitivetypes": [ { "Name": "U.S. Individual Taxpayer Identification Number (ITIN)", "Id": "e55e2a32-f92d-4985-a35d-a0b269eb687b", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 }, { "Name": "U.S. Social Security Number (SSN)", "Id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 } ] } ], "Operator": "And" } ] } ] } }'
                     IsAdvancedRule: true
                     Disabled: false
@@ -541,6 +587,7 @@ TestPlan:
                         maxCount: "-1"
                       - name: "U.S. Individual Taxpayer Identification Number (ITIN)"
                         maxCount: "-1"
+                    # yamllint disable-line rule:line-length
                     AdvancedRule: '{"Version": "1.0", "Condition": { "Operator": "And", "SubConditions": [ { "ConditionName": "ContentContainsSensitiveInformation", "Value": [ { "Groups": [ { "Name": "Default", "Operator": "Or", "Sensitivetypes": [ { "Name": "Credit Card Number", "Id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "High", "Minconfidence": 85, "Maxconfidence": 100 }, { "Name": "U.S. Individual Taxpayer Identification Number (ITIN)", "Id": "e55e2a32-f92d-4985-a35d-a0b269eb687b", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 }, { "Name": "U.S. Social Security Number (SSN)", "Id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 } ] } ], "Operator": "And" } ] } ] } }'
                     IsAdvancedRule: false
                     Disabled: false
@@ -563,6 +610,7 @@ TestPlan:
                   - Name: "Test Rule"
                     ParentPolicyName: "Different Default Office 365 DLP policy"
                     ContentContainsSensitiveInformation: null
+                    # yamllint disable-line rule:line-length
                     AdvancedRule: '{"Version": "1.0", "Condition": { "Operator": "And", "SubConditions": [ { "ConditionName": "ContentContainsSensitiveInformation", "Value": [ { "Groups": [ { "Name": "Default", "Operator": "Or", "Sensitivetypes": [ { "Name": "Credit Card Number", "Id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "High", "Minconfidence": 85, "Maxconfidence": 100 }, { "Name": "U.S. Individual Taxpayer Identification Number (ITIN)", "Id": "e55e2a32-f92d-4985-a35d-a0b269eb687b", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 }, { "Name": "U.S. Social Security Number (SSN)", "Id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 } ] } ], "Operator": "And" } ] } ] } }'
                     IsAdvancedRule: true
                     Disabled: false
@@ -591,6 +639,7 @@ TestPlan:
                         maxCount: "-1"
                       - name: "Credit Card Number"
                         maxCount: "-1"
+                    # yamllint disable-line rule:line-length
                     AdvancedRule: '{"Version": "1.0", "Condition": { "Operator": "And", "SubConditions": [ { "ConditionName": "ContentContainsSensitiveInformation", "Value": [ { "Groups": [ { "Name": "Default", "Operator": "Or", "Sensitivetypes": [ { "Name": "Credit Card Number", "Id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "High", "Minconfidence": 85, "Maxconfidence": 100 }, { "Name": "U.S. Individual Taxpayer Identification Number (ITIN)", "Id": "e55e2a32-f92d-4985-a35d-a0b269eb687b", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 }, { "Name": "U.S. Social Security Number (SSN)", "Id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 } ] } ], "Operator": "And" } ] } ] } }'
                     IsAdvancedRule: false
                     Disabled: false
@@ -623,6 +672,7 @@ TestPlan:
                   - Name: "Test Rule"
                     ParentPolicyName: "Default Office 365 DLP policy"
                     ContentContainsSensitiveInformation: null
+                    # yamllint disable-line rule:line-length
                     AdvancedRule: '{"Version": "1.0", "Condition": { "Operator": "And", "SubConditions": [ { "ConditionName": "ContentContainsSensitiveInformation", "Value": [ { "Groups": [ { "Name": "Default", "Operator": "Or", "Sensitivetypes": [ { "Name": "Credit Card Number", "Id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "High", "Minconfidence": 85, "Maxconfidence": 100 }, { "Name": "U.S. Individual Taxpayer Identification Number (ITIN)", "Id": "e55e2a32-f92d-4985-a35d-a0b269eb687b", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 }, { "Name": "U.S. Social Security Number (SSN)", "Id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 } ] } ], "Operator": "And" } ] } ] } }'
                     IsAdvancedRule: true
                     Disabled: false
@@ -657,6 +707,7 @@ TestPlan:
                         maxCount: "-1"
                       - name: "Credit Card Number"
                         maxCount: "-1"
+                    # yamllint disable-line rule:line-length
                     AdvancedRule: '{"Version": "1.0", "Condition": { "Operator": "And", "SubConditions": [ { "ConditionName": "ContentContainsSensitiveInformation", "Value": [ { "Groups": [ { "Name": "Default", "Operator": "Or", "Sensitivetypes": [ { "Name": "Credit Card Number", "Id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "High", "Minconfidence": 85, "Maxconfidence": 100 }, { "Name": "U.S. Individual Taxpayer Identification Number (ITIN)", "Id": "e55e2a32-f92d-4985-a35d-a0b269eb687b", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 }, { "Name": "U.S. Social Security Number (SSN)", "Id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 } ] } ], "Operator": "And" } ] } ] } }'
                     IsAdvancedRule: false
                     Disabled: false
@@ -685,6 +736,7 @@ TestPlan:
                   - Name: "Test Rule"
                     ParentPolicyName: "Default Office 365 DLP policy"
                     ContentContainsSensitiveInformation: null
+                    # yamllint disable-line rule:line-length
                     AdvancedRule: '{"Version": "1.0", "Condition": { "Operator": "And", "SubConditions": [ { "ConditionName": "ContentContainsSensitiveInformation", "Value": [ { "Groups": [ { "Name": "Default", "Operator": "Or", "Sensitivetypes": [ { "Name": "Credit Card Number", "Id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "High", "Minconfidence": 85, "Maxconfidence": 100 }, { "Name": "U.S. Individual Taxpayer Identification Number (ITIN)", "Id": "e55e2a32-f92d-4985-a35d-a0b269eb687b", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 }, { "Name": "U.S. Social Security Number (SSN)", "Id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 } ] } ], "Operator": "And" } ] } ] } }'
                     IsAdvancedRule: true
                     Disabled: false
@@ -719,6 +771,7 @@ TestPlan:
                         maxCount: "-1"
                       - name: "Credit Card Number"
                         maxCount: "-1"
+                    # yamllint disable-line rule:line-length
                     AdvancedRule: '{"Version": "1.0", "Condition": { "Operator": "And", "SubConditions": [ { "ConditionName": "ContentContainsSensitiveInformation", "Value": [ { "Groups": [ { "Name": "Default", "Operator": "Or", "Sensitivetypes": [ { "Name": "Credit Card Number", "Id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "High", "Minconfidence": 85, "Maxconfidence": 100 }, { "Name": "U.S. Individual Taxpayer Identification Number (ITIN)", "Id": "e55e2a32-f92d-4985-a35d-a0b269eb687b", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 }, { "Name": "U.S. Social Security Number (SSN)", "Id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 } ] } ], "Operator": "And" } ] } ] } }'
                     IsAdvancedRule: false
                     Disabled: false
@@ -747,6 +800,7 @@ TestPlan:
                   - Name: "Test Rule"
                     ParentPolicyName: "Default Office 365 DLP policy"
                     ContentContainsSensitiveInformation: null
+                    # yamllint disable-line rule:line-length
                     AdvancedRule: '{"Version": "1.0", "Condition": { "Operator": "And", "SubConditions": [ { "ConditionName": "ContentContainsSensitiveInformation", "Value": [ { "Groups": [ { "Name": "Default", "Operator": "Or", "Sensitivetypes": [ { "Name": "Credit Card Number", "Id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "High", "Minconfidence": 85, "Maxconfidence": 100 }, { "Name": "U.S. Individual Taxpayer Identification Number (ITIN)", "Id": "e55e2a32-f92d-4985-a35d-a0b269eb687b", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 }, { "Name": "U.S. Social Security Number (SSN)", "Id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 } ] } ], "Operator": "And" } ] } ] } }'
                     IsAdvancedRule: true
                     Disabled: false
@@ -781,6 +835,7 @@ TestPlan:
                         maxCount: "-1"
                       - name: "Credit Card Number"
                         maxCount: "-1"
+                    # yamllint disable-line rule:line-length
                     AdvancedRule: '{"Version": "1.0", "Condition": { "Operator": "And", "SubConditions": [ { "ConditionName": "ContentContainsSensitiveInformation", "Value": [ { "Groups": [ { "Name": "Default", "Operator": "Or", "Sensitivetypes": [ { "Name": "Credit Card Number", "Id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "High", "Minconfidence": 85, "Maxconfidence": 100 }, { "Name": "U.S. Individual Taxpayer Identification Number (ITIN)", "Id": "e55e2a32-f92d-4985-a35d-a0b269eb687b", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 }, { "Name": "U.S. Social Security Number (SSN)", "Id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 } ] } ], "Operator": "And" } ] } ] } }'
                     IsAdvancedRule: false
                     Disabled: false
@@ -809,6 +864,7 @@ TestPlan:
                   - Name: "Test Rule"
                     ParentPolicyName: "Default Office 365 DLP policy"
                     ContentContainsSensitiveInformation: null
+                    # yamllint disable-line rule:line-length
                     AdvancedRule: '{"Version": "1.0", "Condition": { "Operator": "And", "SubConditions": [ { "ConditionName": "ContentContainsSensitiveInformation", "Value": [ { "Groups": [ { "Name": "Default", "Operator": "Or", "Sensitivetypes": [ { "Name": "Credit Card Number", "Id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "High", "Minconfidence": 85, "Maxconfidence": 100 }, { "Name": "U.S. Individual Taxpayer Identification Number (ITIN)", "Id": "e55e2a32-f92d-4985-a35d-a0b269eb687b", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 }, { "Name": "U.S. Social Security Number (SSN)", "Id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 } ] } ], "Operator": "And" } ] } ] } }'
                     IsAdvancedRule: true
                     Disabled: false
@@ -843,6 +899,7 @@ TestPlan:
                         maxCount: "-1"
                       - name: "Credit Card Number"
                         maxCount: "-1"
+                    # yamllint disable-line rule:line-length
                     AdvancedRule: '{"Version": "1.0", "Condition": { "Operator": "And", "SubConditions": [ { "ConditionName": "ContentContainsSensitiveInformation", "Value": [ { "Groups": [ { "Name": "Default", "Operator": "Or", "Sensitivetypes": [ { "Name": "Credit Card Number", "Id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "High", "Minconfidence": 85, "Maxconfidence": 100 }, { "Name": "U.S. Individual Taxpayer Identification Number (ITIN)", "Id": "e55e2a32-f92d-4985-a35d-a0b269eb687b", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 }, { "Name": "U.S. Social Security Number (SSN)", "Id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 } ] } ], "Operator": "And" } ] } ] } }'
                     IsAdvancedRule: false
                     Disabled: false
@@ -871,6 +928,7 @@ TestPlan:
                   - Name: "Test Rule"
                     ParentPolicyName: "Default Office 365 DLP policy"
                     ContentContainsSensitiveInformation: null
+                    # yamllint disable-line rule:line-length
                     AdvancedRule: '{"Version": "1.0", "Condition": { "Operator": "And", "SubConditions": [ { "ConditionName": "ContentContainsSensitiveInformation", "Value": [ { "Groups": [ { "Name": "Default", "Operator": "Or", "Sensitivetypes": [ { "Name": "Credit Card Number", "Id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "High", "Minconfidence": 85, "Maxconfidence": 100 }, { "Name": "U.S. Individual Taxpayer Identification Number (ITIN)", "Id": "e55e2a32-f92d-4985-a35d-a0b269eb687b", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 }, { "Name": "U.S. Social Security Number (SSN)", "Id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 } ] } ], "Operator": "And" } ] } ] } }'
                     IsAdvancedRule: true
                     Disabled: false
@@ -905,6 +963,7 @@ TestPlan:
                         maxCount: "-1"
                       - name: "Credit Card Number"
                         maxCount: "-1"
+                    # yamllint disable-line rule:line-length
                     AdvancedRule: '{"Version": "1.0", "Condition": { "Operator": "And", "SubConditions": [ { "ConditionName": "ContentContainsSensitiveInformation", "Value": [ { "Groups": [ { "Name": "Default", "Operator": "Or", "Sensitivetypes": [ { "Name": "Credit Card Number", "Id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "High", "Minconfidence": 85, "Maxconfidence": 100 }, { "Name": "U.S. Individual Taxpayer Identification Number (ITIN)", "Id": "e55e2a32-f92d-4985-a35d-a0b269eb687b", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 }, { "Name": "U.S. Social Security Number (SSN)", "Id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 } ] } ], "Operator": "And" } ] } ] } }'
                     IsAdvancedRule: false
                     Disabled: false
@@ -933,6 +992,7 @@ TestPlan:
                   - Name: "Test Rule"
                     ParentPolicyName: "Default Office 365 DLP policy"
                     ContentContainsSensitiveInformation: null
+                    # yamllint disable-line rule:line-length
                     AdvancedRule: '{"Version": "1.0", "Condition": { "Operator": "And", "SubConditions": [ { "ConditionName": "ContentContainsSensitiveInformation", "Value": [ { "Groups": [ { "Name": "Default", "Operator": "Or", "Sensitivetypes": [ { "Name": "Credit Card Number", "Id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "High", "Minconfidence": 85, "Maxconfidence": 100 }, { "Name": "U.S. Individual Taxpayer Identification Number (ITIN)", "Id": "e55e2a32-f92d-4985-a35d-a0b269eb687b", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 }, { "Name": "U.S. Social Security Number (SSN)", "Id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 } ] } ], "Operator": "And" } ] } ] } }'
                     IsAdvancedRule: true
                     Disabled: false
@@ -967,6 +1027,7 @@ TestPlan:
                         maxCount: "-1"
                       - name: "Credit Card Number"
                         maxCount: "-1"
+                    # yamllint disable-line rule:line-length
                     AdvancedRule: '{"Version": "1.0", "Condition": { "Operator": "And", "SubConditions": [ { "ConditionName": "ContentContainsSensitiveInformation", "Value": [ { "Groups": [ { "Name": "Default", "Operator": "Or", "Sensitivetypes": [ { "Name": "Credit Card Number", "Id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "High", "Minconfidence": 85, "Maxconfidence": 100 }, { "Name": "U.S. Individual Taxpayer Identification Number (ITIN)", "Id": "e55e2a32-f92d-4985-a35d-a0b269eb687b", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 }, { "Name": "U.S. Social Security Number (SSN)", "Id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 } ] } ], "Operator": "And" } ] } ] } }'
                     IsAdvancedRule: false
                     Disabled: false
@@ -995,6 +1056,7 @@ TestPlan:
                   - Name: "Test Rule"
                     ParentPolicyName: "Default Office 365 DLP policy"
                     ContentContainsSensitiveInformation: null
+                    # yamllint disable-line rule:line-length
                     AdvancedRule: '{"Version": "1.0", "Condition": { "Operator": "And", "SubConditions": [ { "ConditionName": "ContentContainsSensitiveInformation", "Value": [ { "Groups": [ { "Name": "Default", "Operator": "Or", "Sensitivetypes": [ { "Name": "Credit Card Number", "Id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "High", "Minconfidence": 85, "Maxconfidence": 100 }, { "Name": "U.S. Individual Taxpayer Identification Number (ITIN)", "Id": "e55e2a32-f92d-4985-a35d-a0b269eb687b", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 }, { "Name": "U.S. Social Security Number (SSN)", "Id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 } ] } ], "Operator": "And" } ] } ] } }'
                     IsAdvancedRule: true
                     Disabled: false
@@ -1029,6 +1091,7 @@ TestPlan:
                         maxCount: "-1"
                       - name: "Credit Card Number"
                         maxCount: "-1"
+                    # yamllint disable-line rule:line-length
                     AdvancedRule: '{"Version": "1.0", "Condition": { "Operator": "And", "SubConditions": [ { "ConditionName": "ContentContainsSensitiveInformation", "Value": [ { "Groups": [ { "Name": "Default", "Operator": "Or", "Sensitivetypes": [ { "Name": "Credit Card Number", "Id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "High", "Minconfidence": 85, "Maxconfidence": 100 }, { "Name": "U.S. Individual Taxpayer Identification Number (ITIN)", "Id": "e55e2a32-f92d-4985-a35d-a0b269eb687b", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 }, { "Name": "U.S. Social Security Number (SSN)", "Id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 } ] } ], "Operator": "And" } ] } ] } }'
                     IsAdvancedRule: false
                     Disabled: false
@@ -1055,6 +1118,7 @@ TestPlan:
                   - Name: "Test Rule"
                     ParentPolicyName: "Default Office 365 DLP policy"
                     ContentContainsSensitiveInformation: null
+                    # yamllint disable-line rule:line-length
                     AdvancedRule: '{"Version": "1.0", "Condition": { "Operator": "And", "SubConditions": [ { "ConditionName": "ContentContainsSensitiveInformation", "Value": [ { "Groups": [ { "Name": "Default", "Operator": "Or", "Sensitivetypes": [ { "Name": "Credit Card Number", "Id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "High", "Minconfidence": 85, "Maxconfidence": 100 }, { "Name": "U.S. Individual Taxpayer Identification Number (ITIN)", "Id": "e55e2a32-f92d-4985-a35d-a0b269eb687b", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 }, { "Name": "U.S. Social Security Number (SSN)", "Id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 } ] } ], "Operator": "And" } ] } ] } }'
                     IsAdvancedRule: true
                     Disabled: false
@@ -1083,6 +1147,7 @@ TestPlan:
                         maxCount: "-1"
                       - name: "Credit Card Number"
                         maxCount: "-1"
+                    # yamllint disable-line rule:line-length
                     AdvancedRule: '{"Version": "1.0", "Condition": { "Operator": "And", "SubConditions": [ { "ConditionName": "ContentContainsSensitiveInformation", "Value": [ { "Groups": [ { "Name": "Default", "Operator": "Or", "Sensitivetypes": [ { "Name": "Credit Card Number", "Id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "High", "Minconfidence": 85, "Maxconfidence": 100 }, { "Name": "U.S. Individual Taxpayer Identification Number (ITIN)", "Id": "e55e2a32-f92d-4985-a35d-a0b269eb687b", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 }, { "Name": "U.S. Social Security Number (SSN)", "Id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 } ] } ], "Operator": "And" } ] } ] } }'
                     IsAdvancedRule: false
                     Disabled: false
@@ -1105,6 +1170,7 @@ TestPlan:
                   - Name: "Test Rule"
                     ParentPolicyName: "Default Office 365 DLP policy"
                     ContentContainsSensitiveInformation: null
+                    # yamllint disable-line rule:line-length
                     AdvancedRule: '{"Version": "1.0", "Condition": { "Operator": "And", "SubConditions": [ { "ConditionName": "ContentContainsSensitiveInformation", "Value": [ { "Groups": [ { "Name": "Default", "Operator": "Or", "Sensitivetypes": [ { "Name": "Credit Card Number", "Id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "High", "Minconfidence": 85, "Maxconfidence": 100 }, { "Name": "U.S. Individual Taxpayer Identification Number (ITIN)", "Id": "e55e2a32-f92d-4985-a35d-a0b269eb687b", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 }, { "Name": "U.S. Social Security Number (SSN)", "Id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 } ] } ], "Operator": "And" } ] } ] } }'
                     IsAdvancedRule: true
                     Disabled: false
@@ -1133,6 +1199,7 @@ TestPlan:
                         maxCount: "-1"
                       - name: "Credit Card Number"
                         maxCount: "-1"
+                    # yamllint disable-line rule:line-length
                     AdvancedRule: '{"Version": "1.0", "Condition": { "Operator": "And", "SubConditions": [ { "ConditionName": "ContentContainsSensitiveInformation", "Value": [ { "Groups": [ { "Name": "Default", "Operator": "Or", "Sensitivetypes": [ { "Name": "Credit Card Number", "Id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "High", "Minconfidence": 85, "Maxconfidence": 100 }, { "Name": "U.S. Individual Taxpayer Identification Number (ITIN)", "Id": "e55e2a32-f92d-4985-a35d-a0b269eb687b", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 }, { "Name": "U.S. Social Security Number (SSN)", "Id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 } ] } ], "Operator": "And" } ] } ] } }'
                     IsAdvancedRule: false
                     Disabled: false
@@ -1155,6 +1222,7 @@ TestPlan:
                   - Name: "Test Rule"
                     ParentPolicyName: "Default Office 365 DLP policy"
                     ContentContainsSensitiveInformation: null
+                    # yamllint disable-line rule:line-length
                     AdvancedRule: '{"Version": "1.0", "Condition": { "Operator": "And", "SubConditions": [ { "ConditionName": "ContentContainsSensitiveInformation", "Value": [ { "Groups": [ { "Name": "Default", "Operator": "Or", "Sensitivetypes": [ { "Name": "Credit Card Number", "Id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "High", "Minconfidence": 85, "Maxconfidence": 100 }, { "Name": "U.S. Individual Taxpayer Identification Number (ITIN)", "Id": "e55e2a32-f92d-4985-a35d-a0b269eb687b", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 }, { "Name": "U.S. Social Security Number (SSN)", "Id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 } ] } ], "Operator": "And" } ] } ] } }'
                     IsAdvancedRule: true
                     Disabled: false
@@ -1183,6 +1251,7 @@ TestPlan:
                         maxCount: "-1"
                       - name: "Credit Card Number"
                         maxCount: "-1"
+                    # yamllint disable-line rule:line-length
                     AdvancedRule: '{"Version": "1.0", "Condition": { "Operator": "And", "SubConditions": [ { "ConditionName": "ContentContainsSensitiveInformation", "Value": [ { "Groups": [ { "Name": "Default", "Operator": "Or", "Sensitivetypes": [ { "Name": "Credit Card Number", "Id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "High", "Minconfidence": 85, "Maxconfidence": 100 }, { "Name": "U.S. Individual Taxpayer Identification Number (ITIN)", "Id": "e55e2a32-f92d-4985-a35d-a0b269eb687b", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 }, { "Name": "U.S. Social Security Number (SSN)", "Id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 } ] } ], "Operator": "And" } ] } ] } }'
                     IsAdvancedRule: false
                     Disabled: false
@@ -1209,6 +1278,7 @@ TestPlan:
                   - Name: "Test Rule"
                     ParentPolicyName: "Default Office 365 DLP policy"
                     ContentContainsSensitiveInformation: null
+                    # yamllint disable-line rule:line-length
                     AdvancedRule: '{"Version": "1.0", "Condition": { "Operator": "And", "SubConditions": [ { "ConditionName": "ContentContainsSensitiveInformation", "Value": [ { "Groups": [ { "Name": "Default", "Operator": "Or", "Sensitivetypes": [ { "Name": "Credit Card Number", "Id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "High", "Minconfidence": 85, "Maxconfidence": 100 }, { "Name": "U.S. Individual Taxpayer Identification Number (ITIN)", "Id": "e55e2a32-f92d-4985-a35d-a0b269eb687b", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 }, { "Name": "U.S. Social Security Number (SSN)", "Id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 } ] } ], "Operator": "And" } ] } ] } }'
                     IsAdvancedRule: true
                     Disabled: false
@@ -1237,6 +1307,7 @@ TestPlan:
                         maxCount: "-1"
                       - name: "Credit Card Number"
                         maxCount: "-1"
+                    # yamllint disable-line rule:line-length
                     AdvancedRule: '{"Version": "1.0", "Condition": { "Operator": "And", "SubConditions": [ { "ConditionName": "ContentContainsSensitiveInformation", "Value": [ { "Groups": [ { "Name": "Default", "Operator": "Or", "Sensitivetypes": [ { "Name": "Credit Card Number", "Id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "High", "Minconfidence": 85, "Maxconfidence": 100 }, { "Name": "U.S. Individual Taxpayer Identification Number (ITIN)", "Id": "e55e2a32-f92d-4985-a35d-a0b269eb687b", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 }, { "Name": "U.S. Social Security Number (SSN)", "Id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77", "Mincount": 1, "Maxcount": -1, "Confidencelevel": "Medium", "Minconfidence": 75, "Maxconfidence": 100 } ] } ], "Operator": "And" } ] } ] } }'
                     IsAdvancedRule: false
                     Disabled: false

@@ -402,4 +402,4 @@ TestPlan:
               Identity: Default
               EnableATPForSPOTeamsODB: true
         Postconditions: []
-        ExpectedResult: true       
+        ExpectedResult: true
