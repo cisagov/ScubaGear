@@ -28,7 +28,7 @@ function Copy-ScubaBaselineDocument {
     @("teams", "exo", "defender", "aad", "powerplatform", "sharepoint") | ForEach-Object {
         $SourceFileName = Join-Path -Path $PSScriptRoot -ChildPath "..\..\baselines\$_.md"
         $TargetFileName = Join-Path -Path $Destination -ChildPath "$_.md"
-        Copy-Item -Path $SourceFileName -Destination $Destination -Force:$Force 2> $null
+        Copy-Item -Path $SourceFileName -Destination $Destination -Force:($true -eq $Force) 2> $null
         Set-ItemProperty -Path $TargetFileName -Name IsReadOnly -Value $true
     }
 }
