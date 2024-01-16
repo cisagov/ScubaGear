@@ -58,8 +58,8 @@ jobs:
               -AzureKeyVaultUrl $($KeyVaultInfo.KeyVault.URL) `
               -CertificateName $($KeyVaultInfo.KeyVault.CertificateName) `
               -ModulePath PowerShell/ScubaGear `
-              -GalleryName $env:GalleryName           
-          azPSVersion: "latest"          
+              -GalleryName $env:GalleryName
+          azPSVersion: "latest"
       - name: Test Module Publish
         run: |
           Get-Location
