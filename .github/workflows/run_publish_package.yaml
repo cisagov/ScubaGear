@@ -36,7 +36,7 @@ jobs:
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           enable-AzPSSession: true
       - name: Create temporary private gallery
-        run: New-PrivateGallery -GalleryName $env:GalleryName -Trusted 
+        run: New-PrivateGallery -GalleryName $env:GalleryName -Trusted
       - name: Sign and publish module to private gallery
         uses: azure/powershell@v1
         env:
@@ -58,8 +58,8 @@ jobs:
               -AzureKeyVaultUrl $($KeyVaultInfo.KeyVault.URL) `
               -CertificateName $($KeyVaultInfo.KeyVault.CertificateName) `
               -ModulePath PowerShell/ScubaGear `
-              -GalleryName $env:GalleryName              
-          azPSVersion: "latest"                 
+              -GalleryName $env:GalleryName           
+          azPSVersion: "latest"          
       - name: Test Module Publish
         run: |
           Get-Location
