@@ -55,14 +55,10 @@ jobs:
             $KeyVaultInfo = ${env:KEY_VAULT_INFO} | ConvertFrom-Json
             # Remove non-release files
             Remove-Item -Recurse -Force repo -Include .git*
-            SignScubaGearModule `
-              -AzureKeyVaultUrl $($KeyVaultInfo.KeyVault.URL) `
-              -CertificateName $($KeyVaultInfo.KeyVault.CertificateName) `
-              -ModulePath repo/PowerShell/ScubaGear
             Publish-ScubaGearModule `
               -AzureKeyVaultUrl $($KeyVaultInfo.KeyVault.URL) `
               -CertificateName $($KeyVaultInfo.KeyVault.CertificateName) `
-              -ModulePath repo/owerShell/ScubaGear `
+              -ModulePath repo/PowerShell/ScubaGear `
               -GalleryName $env:GalleryName
           azPSVersion: "latest"
       - name: Test Module Publish
