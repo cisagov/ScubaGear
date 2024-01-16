@@ -10,7 +10,10 @@ function Copy-ScubaBaselineDocument {
     Copy-ScubaBaselineDocument
     .Functionality
     Public
+    .NOTES
+    SuppressMessage for PSReviewUnusedParameter due to linter bug. Open issue to remove if/when fixed. 
     #>
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', '')]
     param (
         [Parameter(Mandatory = $false)]
         [ValidateScript({Test-Path -Path $_ -IsValid})]
