@@ -65,6 +65,14 @@ function Publish-ScubaGearModule{
     #>
     param (
         [Parameter(Mandatory=$true)]
+        [ValidateScript({[uri]::IsWellFormedUriString($_, 'Absolute') -and ([uri] $_).Scheme -in 'https'})]
+        [System.Uri]
+        $AzureKeyVaultUrl,
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $CertificateName,
+        [Parameter(Mandatory=$true)]
         [ValidateScript({Test-Path -Path $_ -PathType Container})]
         [string]
         $ModulePath,
@@ -80,7 +88,7 @@ function Publish-ScubaGearModule{
 
     $ModuleBuildPath = Build-ScubaModule -ModulePath $ModulePath -OverrideModuleVersion $OverrideModuleVersion
 
-    if (SignScubaGearModule -ModulePath $ModuleBuildPath){
+    if (SignScubaGearModule -AzureKeyVaultUrl $AzureKeyVaultUrl -CertificateName $CertificateName -ModulePath $ModuleBuildPath){
         Publish-Module -Path $ModuleBuildPath -Repository $GalleryName
     }
     else {

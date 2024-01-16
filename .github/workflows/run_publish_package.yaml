@@ -8,7 +8,6 @@ on:
     paths:
       - ".github/workflows/run_publish_package.yaml"
       - "utils/DeployUtils.ps1"
-      - "Testing/Functional/BuildTest/ModuleBuild.Tests.ps1"
 
 env:
   GalleryName: PrivateScubaGearGallery
@@ -17,6 +16,7 @@ env:
 jobs:
   Publish-Private-Package:
     runs-on: windows-latest
+    environment: Development
     defaults:
       run:
         shell: powershell
@@ -24,19 +24,44 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          path: src
-      - name: Publish ScubaGear module to private repository
-        run: |
-          cd src
-          . utils/DeployUtils.ps1
-          New-PrivateGallery -GalleryName $env:GalleryName -Trusted
-          New-CodeSigningCertificate
-          Publish-ScubaGearModule -ModulePath PowerShell/ScubaGear -GalleryName $env:GalleryName
+          path: repo
+      - name: OIDC Login to Azure Public Cloud with AzPowershell (enableAzPSSession true)
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          enable-AzPSSession: true
+      - name: Create temporary private gallery
+        run: New-PrivateGallery -GalleryName $env:GalleryName -Trusted 
+      - name: Sign and publish module to private gallery
+        uses: azure/powershell@v1
+        env:
+          KEY_VAULT_INFO: ${{ secrets.SCUBA_KEY_VAULT_DEV}}
+        with:
+          inlineScript: |
+            dotnet --version
+            dotnet tool install --global AzureSignTool --version 4.0.1
+            $KeyVaultInfo = ${env:KEY_VAULT_INFO} | ConvertFrom-Json
+            cd repo
+            . utils/DeployUtils.ps1
+            # Remove non-release files
+            Remove-Item -Recurse -Force repo -Include .git*
+            SignScubaGearModule `
+              -AzureKeyVaultUrl $($KeyVaultInfo.KeyVault.URL) `
+              -CertificateName $($KeyVaultInfo.KeyVault.CertificateName) `
+              -ModulePath 'repo'
+            Publish-ScubaGearModule `
+              -AzureKeyVaultUrl $($KeyVaultInfo.KeyVault.URL) `
+              -CertificateName $($KeyVaultInfo.KeyVault.CertificateName) `
+              -ModulePath PowerShell/ScubaGear `
+              -GalleryName $env:GalleryName              
+          azPSVersion: "latest"                 
       - name: Test Module Publish
         run: |
           Get-Location
           $TestContainers = @()
-          $TestContainers += New-PesterContainer -Path "src/Testing/Functional/BuildTest" -Data @{ }
+          $TestContainers += New-PesterContainer -Path "repo/Testing/Functional/BuildTest" -Data @{ }
           $PesterConfig = @{
             Run = @{
               Container = $TestContainers
@@ -49,7 +74,7 @@ jobs:
           Invoke-Pester -Configuration $Config
       - name: Check Scuba Version
         run: |
-          src/SetUp.ps1 -NoOPA
+          repo/SetUp.ps1 -NoOPA
           Install-Module -Name ScubaGear -SkipPublisherCheck
           Import-Module -Name ScubaGear
           Invoke-SCuBA -Version
