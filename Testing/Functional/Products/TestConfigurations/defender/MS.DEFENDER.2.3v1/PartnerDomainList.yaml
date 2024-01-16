@@ -1,4 +1,4 @@
-Description: Test Config for MS.DEFENDER.2.3v1 
+Description: Test Config for MS.DEFENDER.2.3v1
 ProductNames:
   - defender
 OPAPath: .

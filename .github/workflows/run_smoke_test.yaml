@@ -1,4 +1,6 @@
-on: 
+name: Smoke Test
+
+on:
   workflow_call:
   workflow_dispatch:
   pull_request:
@@ -6,7 +8,7 @@ on:
     branches:
       - "main"
   pull_request_review:
-      types: [submitted]  
+    types: [submitted]
   push:
     paths:
       - ".github/workflows/run_smoke_test.yaml"
@@ -14,64 +16,62 @@ on:
       - "main"
       - "*smoke*"
 
-name: Smoke Test
-
 jobs:
   Run-Smoke-Test:
     runs-on: windows-latest
     env:
       SCUBA_GITHUB_AUTOMATION_CREDS: ${{ secrets.SCUBA_GITHUB_AUTOMATION_CREDS }}
     defaults:
-          run:
-            shell: powershell 
+      run:
+        shell: powershell
     permissions:
-      contents: read 
+      contents: read
     steps:
-    - name: Checkout repo code
-      uses: actions/checkout@v4
+      - name: Checkout repo code
+        uses: actions/checkout@v4
 
-    - name: Execute ScubaGear and Check Outputs
-      run: |
-        . Testing/Functional/SmokeTest/SmokeTestUtils.ps1
+      - name: Execute ScubaGear and Check Outputs
+        run: |
+          . Testing/Functional/SmokeTest/SmokeTestUtils.ps1
 
-        ##### Install all the dependencies
-        Install-SmokeTestExternalDependencies
+          ##### Install all the dependencies
+          Install-SmokeTestExternalDependencies
 
-        # ScubaGear currently requires the provisioning of a certificate for using a ServicePrinicpal, rather than
-        # using Workload Identity Federation, which would ordinarily be preferred for calling Microsoft APIs from
-        # GitHub actions.
-        $AUTOMATION_CREDS = $env:SCUBA_GITHUB_AUTOMATION_CREDS | ConvertFrom-Json
-        $TestTenants = $AUTOMATION_CREDS.TestTenants
-        Write-Output "Identified $($TestTenants.Count) Test Tenants"
+          # ScubaGear currently requires the provisioning of a certificate for using a ServicePrinicpal, rather than
+          # using Workload Identity Federation, which would ordinarily be preferred for calling Microsoft APIs from
+          # GitHub actions.
+          $AUTOMATION_CREDS = $env:SCUBA_GITHUB_AUTOMATION_CREDS | ConvertFrom-Json
+          $TestTenants = $AUTOMATION_CREDS.TestTenants
+          Write-Output "Identified $($TestTenants.Count) Test Tenants"
 
-        $TestContainers = @()
-        ForEach ($TestTenantObj in $TestTenants){
-          $Properties = Get-Member -InputObject $TestTenantObj -MemberType NoteProperty
-          $TestTenant = $TestTenantObj | Select-Object -ExpandProperty $Properties.Name
-          $OrgName = $TestTenant.DisplayName
-          $DomainName = $TestTenant.DomainName
-          $AppId = $TestTenant.AppId
-          $PlainTextPassword = $TestTenant.CertificatePassword
-          $CertPwd = ConvertTo-SecureString -String $PlainTextPassword -Force -AsPlainText
-          $M365Env = $TestTenant.M365Env
-          try {
-            $Result = New-ServicePrincipalCertificate `
-              -EncodedCertificate $TestTenant.CertificateB64 `
-              -CertificatePassword $CertPwd
-            $Thumbprint = $Result[-1]
+          $TestContainers = @()
+          ForEach ($TestTenantObj in $TestTenants){
+            $Properties = Get-Member -InputObject $TestTenantObj -MemberType NoteProperty
+            $TestTenant = $TestTenantObj | Select-Object -ExpandProperty $Properties.Name
+            $OrgName = $TestTenant.DisplayName
+            $DomainName = $TestTenant.DomainName
+            $AppId = $TestTenant.AppId
+            $PlainTextPassword = $TestTenant.CertificatePassword
+            $CertPwd = ConvertTo-SecureString -String $PlainTextPassword -Force -AsPlainText
+            $M365Env = $TestTenant.M365Env
+            try {
+              $Result = New-ServicePrincipalCertificate `
+                -EncodedCertificate $TestTenant.CertificateB64 `
+                -CertificatePassword $CertPwd
+              $Thumbprint = $Result[-1]
+            }
+            catch {
+              Write-Output "Failed to install certificate for $OrgName"
+            }
+
+            $TestContainers += New-PesterContainer `
+              -Path "Testing/Functional/SmokeTest/SmokeTest001.Tests.ps1" `
+              -Data @{ Thumbprint = $Thumbprint; Organization = $DomainName; AppId = $AppId; M365Environment = $M365Env }
+            $TestContainers += New-PesterContainer `
+              -Path "Testing/Functional/SmokeTest/SmokeTest002.Tests.ps1" `
+              -Data @{ OrganizationDomain = $DomainName; OrganizationName = $OrgName }
           }
-          catch {
-            Write-Output "Failed to install certificate for $OrgName"
-          }
 
-          $TestContainers += New-PesterContainer `
-            -Path "Testing/Functional/SmokeTest/SmokeTest001.Tests.ps1" `
-            -Data @{ Thumbprint = $Thumbprint; Organization = $DomainName; AppId = $AppId; M365Environment = $M365Env }
-          $TestContainers += New-PesterContainer `
-            -Path "Testing/Functional/SmokeTest/SmokeTest002.Tests.ps1" `
-            -Data @{ OrganizationDomain = $DomainName; OrganizationName = $OrgName }
-        }
+          Invoke-Pester -Container $TestContainers -Output Detailed
 
-        Invoke-Pester -Container $TestContainers -Output Detailed
-
-        Remove-MyCertificates
+          Remove-MyCertificates

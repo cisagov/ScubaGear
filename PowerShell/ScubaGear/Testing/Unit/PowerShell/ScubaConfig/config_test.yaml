@@ -1,11 +1,11 @@
 Description: YAML Configuration file for unit test in SCuBA
 ProductNames:
-- teams
-- exo
-- defender
-- aad
-- sharepoint
-- onedrive
+  - teams
+  - exo
+  - defender
+  - aad
+  - sharepoint
+  - onedrive
 M365Environment: commercial
 OPAPath: .
 LogIn: true
