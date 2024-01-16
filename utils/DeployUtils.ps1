@@ -285,7 +285,11 @@ function SignScubaGearModule{
 
     # Digitally sign scripts, manifest, and modules
     $FileList = CreateFileList -SourcePath $ModulePath -Extensions "*.ps1","*.psm1","*.psd1"
-    CallAzureSignTool @PSBoundParameters -FileList $FileList
+    CallAzureSignTool `
+      -AzureKeyVaultUrl $AzureKeyVaultUrl `
+      -CertificateName $CertificateName `
+      -TimeStampServer $TimeStampServer `
+      -FileList $FileList
 
     # Create and sign catalog
     $CatalogFileName = 'ScubaGear.cat'
@@ -299,7 +303,11 @@ function SignScubaGearModule{
     $CatalogList = New-TemporaryFile
     $CatalogPath.FullName | Out-File -FilePath $CatalogList -Encoding utf8 -Force
 
-    CallAzureSignTool @PSBoundParameters -FileList $CatalogList
+    CallAzureSignTool `
+      -AzureKeyVaultUrl $AzureKeyVaultUrl `
+      -CertificateName $CertificateName `
+      -TimeStampServer $TimeStampServer `
+      -FileList $CatalogList
 
     $TestResult = Test-FileCatalog -CatalogFilePath $CatalogPath
     return 'Valid' -eq $TestResult
