@@ -50,7 +50,7 @@ jobs:
           KEY_VAULT_INFO: ${{ secrets.SCUBA_KEY_VAULT_DEV}}
         with:
           inlineScript: |
-            pwd
+            Write-Output "$(pwd)"
             . repo/utils/DeployUtils.ps1
             $KeyVaultInfo = ${env:KEY_VAULT_INFO} | ConvertFrom-Json
             # Remove non-release files
@@ -58,11 +58,11 @@ jobs:
             SignScubaGearModule `
               -AzureKeyVaultUrl $($KeyVaultInfo.KeyVault.URL) `
               -CertificateName $($KeyVaultInfo.KeyVault.CertificateName) `
-              -ModulePath 'repo'
+              -ModulePath repo/PowerShell/ScubaGear
             Publish-ScubaGearModule `
               -AzureKeyVaultUrl $($KeyVaultInfo.KeyVault.URL) `
               -CertificateName $($KeyVaultInfo.KeyVault.CertificateName) `
-              -ModulePath PowerShell/ScubaGear `
+              -ModulePath repo/owerShell/ScubaGear `
               -GalleryName $env:GalleryName
           azPSVersion: "latest"
       - name: Test Module Publish
