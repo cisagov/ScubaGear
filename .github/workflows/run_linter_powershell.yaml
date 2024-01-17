@@ -27,5 +27,7 @@ jobs:
         uses: actions/checkout@v4
       - name: Setup Config File
         run: cp Testing/Linting/MegaLinter/.mega-linter-powershell.yml .mega-linter.yml
+      - name: Setup PSScriptAnalyzer settings
+        run: cp Testing/Linting/MegaLinter/.powershell-psscriptanalyzer.psd1 .powershell-psscriptanalyzer.psd1
       - name: Lint PowerShell
         uses: oxsecurity/megalinter/flavors/dotnet@latest

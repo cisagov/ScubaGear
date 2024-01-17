@@ -31,4 +31,4 @@ jobs:
       - name: Execute markdown checks
         run: |
           $PSVersionTable
-          Invoke-Pester Testing\Unit\PowerShell\CreateReport -Output Detailed
+          Invoke-Pester PowerShell\ScubaGear\Testing\Unit\PowerShell\CreateReport -Output Detailed
