@@ -4,7 +4,8 @@ $ConnectionPath = '../../../../Modules/Connection/Connection.psm1'
 
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath $OrchestratorPath) -Force
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath $ScubaConfigPath) -Force
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath $ConnectionPath) -Function Disconnect-SCuBATenant
+#Import-Module (Join-Path -Path $PSScriptRoot -ChildPath $ConnectionPath) -Function Disconnect-SCuBATenant
+Import-Module ('C:/Users/kpalmer/git/ScubaGear/PowerShell/ScubaGear/Modules/Connection/Connection.psm1') -Function Disconnect-SCuBATenant
 
 InModuleScope Orchestrator {
     Describe -Tag 'Orchestrator' -Name 'Invoke-Scuba with Config' {
@@ -16,7 +17,9 @@ InModuleScope Orchestrator {
             Mock -ModuleName Orchestrator Invoke-ProviderList {}
             Mock -ModuleName Orchestrator Invoke-RunRego {}
             Mock -ModuleName Orchestrator Invoke-ReportCreation {}
-            Mock -ModuleName Orchestrator Disconnect-SCuBATenant {}
+            # Local function is added here to enable external module to run with top level Pester-Tests
+            Function Disconnect-SCuBATenant {}
+            Mock -ModuleName Connection Disconnect-SCuBATenant {}
             Mock -CommandName New-Item {}
             Mock -CommandName Copy-Item {}
         }
@@ -126,6 +129,7 @@ InModuleScope Orchestrator {
 
             It "Verify credentials passed in that are not in config file" {
                 Invoke-Scuba @SplatParamsCreds
+                # $ConfTestCreds.AppID | Should -Not -BeExactly $ScubaConfRef.AppID
                 $ConfTestCreds = [ScubaConfig]::GetInstance().Configuration
                 if ( (Compare-Object @($ScubaConfRef.keys) @($ConfTestCreds.keys)))
                 {
