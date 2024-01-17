@@ -62,7 +62,7 @@ param (
 )
 
 $M365Environment = "gcc"
-$OPAPath = "./" # Path to OPA Executable
+$OPAPath = (Join-Path -Path $env:USERPROFILE -ChildPath ".scubagear\Tools")# Path to OPA Executable
 
 if ($PSCmdlet.ParameterSetName -eq 'Default'){
     $RunCachedParams = @{
