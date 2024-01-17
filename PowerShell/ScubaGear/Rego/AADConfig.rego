@@ -18,6 +18,8 @@ import data.utils.aad.Aad2P2Licenses
 import data.utils.aad.HasAcceptableMFA
 import data.utils.aad.PolicyConditionsMatch
 import data.utils.aad.CAPLINK
+import data.utils.aad.DomainReportDetails
+import data.utils.aad.INT_MAX
 
 
 #############
@@ -600,6 +602,7 @@ tests contains {
 }
 #--
 
+
 ############
 # MS.AAD.6 #
 ############
@@ -608,16 +611,35 @@ tests contains {
 # MS.AAD.6.1v1
 #--
 
-# At this time we are unable to test for X because of Y
+# User passwords are set to not expire if they equal INT_MAX
+UserPasswordsSetToNotExpire contains Domain.Id if {
+    some Domain in input.domain_settings
+    Domain.PasswordValidityPeriodInDays == INT_MAX
+    Domain.IsVerified == true
+}
+
+UserPasswordsSetToExpire contains Domain.Id if {
+    some Domain in input.domain_settings
+    Domain.PasswordValidityPeriodInDays != INT_MAX
+    Domain.IsVerified == true
+}
+
 tests contains {
     "PolicyId": "MS.AAD.6.1v1",
-    "Criticality": "Shall/Not-Implemented",
-    "Commandlet": [],
-    "ActualValue": [],
-    "ReportDetails": NotCheckedDetails("MS.AAD.6.1v1"),
-    "RequirementMet": false
+    "Criticality": "Shall",
+    "Commandlet": [ "Get-MgBetaDomain" ],
+    "ActualValue": { UserPasswordsSetToExpire, UserPasswordsSetToNotExpire },
+    "ReportDetails": DomainReportDetails(Status, UserPasswordsSetToExpire, DescriptionString),
+    "RequirementMet": Status
+} if {
+    # For the rule to pass, the user passwords for all domains shall not expire
+    # Then check if at least 1 or more domains with user passwords set to expire exist
+    DescriptionString := "domain(s) failed"
+    Conditions := [count(UserPasswordsSetToExpire) == 0, count(UserPasswordsSetToNotExpire) > 0]
+    Status := count(FilterArray(Conditions, false)) == 0
 }
 #--
+
 
 ############
 # MS.AAD.7 #
