@@ -38,7 +38,7 @@ class ScubaConfig {
         }
 
         if (-Not $this.Configuration.OPAPath){
-            $this.Configuration.OPAPath = (Join-Path -Path $PSScriptRoot -ChildPath "..\..\..")
+            $this.Configuration.OPAPath =(Join-Path -Path $env:USERPROFILE -ChildPath ".scubagear\Tools")
         }
 
         if (-Not $this.Configuration.LogIn){
