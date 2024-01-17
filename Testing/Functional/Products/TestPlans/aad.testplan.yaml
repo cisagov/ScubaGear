@@ -593,10 +593,10 @@ TestPlan:
     TestDriver: RunCached
     Tests:
       - TestDescription: MS.AAD.6.1v1 Compliant case - User passwords for all domains are set to not expire
-        Preconditions: 
+        Preconditions:
           - Command: UpdateProviderExport
-            Splat: 
-              updates: 
+            Splat:
+              updates:
                 domain_settings:
                   - Id: test.url.com
                     PasswordValidityPeriodInDays: 2147483647
@@ -610,10 +610,10 @@ TestPlan:
         Postconditions: []
         ExpectedResult: true
       - TestDescription: MS.AAD.6.1v1 Non-Compliant case - User passwords for some domains are set to expire
-        Preconditions: 
+        Preconditions:
           - Command: UpdateProviderExport
-            Splat: 
-              updates: 
+            Splat:
+              updates:
                 domain_settings:
                   - Id: test.url.com
                     PasswordValidityPeriodInDays: 0
@@ -627,10 +627,10 @@ TestPlan:
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.AAD.6.1v1 Compliant case - User passwords shall be verified
-        Preconditions: 
+        Preconditions:
           - Command: UpdateProviderExport
-            Splat: 
-              updates: 
+            Splat:
+              updates:
                 domain_settings:
                   - Id: test.url.com
                     PasswordValidityPeriodInDays: 0
