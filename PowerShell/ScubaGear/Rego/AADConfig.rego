@@ -702,7 +702,7 @@ default PrivilegedRoleExclusions(_, _) := false
 # for users & groups. If there are users with permenant assignment
 # return true if all users + groups are in the config.
 PrivilegedRoleExclusions(PrivilegedRole, PolicyID) := true if {
-    PrivilegedRoleAssignedPrincipals := {x.PrincipalId | some x in PrivilegedRole.Assignments; x.endDateTime == null}
+    PrivilegedRoleAssignedPrincipals := {x.principalId | some x in PrivilegedRole.Assignments; is_null(x.endDateTime)}
 
     AllowedPrivilegedRoleUsers := {y | some y in input.scuba_config.Aad[PolicyID].RoleExclusions.Users; y != null}
     AllowedPrivilegedRoleGroups := {y | some y in input.scuba_config.Aad[PolicyID].RoleExclusions.Groups; y != null}
@@ -713,7 +713,7 @@ PrivilegedRoleExclusions(PrivilegedRole, PolicyID) := true if {
 
 # if no users with permenant assignment & config empty, return true
 PrivilegedRoleExclusions(PrivilegedRole, PolicyID) := true if {
-    count({x.PrincipalId | some x in PrivilegedRole.Assignments; x.endDateTime == null}) > 0
+    count({x.principalId | some x in PrivilegedRole.Assignments; is_null(x.endDateTime)}) > 0
     count({y | some y in input.scuba_config.Aad[PolicyID].RoleExclusions.Users; y != null}) == 0
     count({y | some y in input.scuba_config.Aad[PolicyID].RoleExclusions.Groups; y != null}) == 0
 }
