@@ -66,10 +66,10 @@ InModuleScope Orchestrator {
                         foreach ($key in $ConfTest.keys )
                         {
                             if ( $key -eq $Modkey ) {
-                                $isDifferentValue = (( Compare-Object  $ModValue $ConfTest.$key ) -ne $none )
+                                $isDifferentValue = ( $null -ne (Compare-Object  $ModValue $ConfTest.$key ))
                             }
                             else {
-                                $isDifferentValue =  (( Compare-Object  $ScubaConfRef.$key $ConfTest.$key ) -ne $none )<# Action when all if and elseif conditions are false #>
+                                $isDifferentValue =  ( $null -ne ( Compare-Object  $ScubaConfRef.$key $ConfTest.$key ))<# Action when all if and elseif conditions are false #>
                             }
                         }
                         if ( $IsDifferentValue )
@@ -95,7 +95,7 @@ InModuleScope Orchestrator {
                     }
                     foreach ($key in $ConfTestCreds.keys )
                     {
-                         if (( Compare-Object  $ConfTestCreds.$key  $ScubaConfRef.$key ) -ne $none )
+                         if ( $null -ne ( Compare-Object  $ConfTestCreds.$key  $ScubaConfRef.$key ))
                          {
                             $pass = $false
                          }
