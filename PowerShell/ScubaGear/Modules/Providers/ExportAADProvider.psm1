@@ -315,7 +315,7 @@ function Get-PrivilegedUser {
                         $PIMEligibleUserId = $GroupMember.PrincipalId
 
                         # If the user's data has not been fetched from graph, go get it
-                        if (-Not $PrivilegedUsers.ContainsKey($PIMEligibleUserId)) {
+                        if (-not $PrivilegedUsers.ContainsKey($PIMEligibleUserId)) {
                             $AADUser = Get-MgBetaUser -ErrorAction Stop -UserId $PIMEligibleUserId
                             $PrivilegedUsers[$PIMEligibleUserId] = @{"DisplayName"=$AADUser.DisplayName; "OnPremisesImmutableId"=$AADUser.OnPremisesImmutableId; "roles"=@()}
                         }
