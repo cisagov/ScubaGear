@@ -4,7 +4,8 @@ $ConnectionPath = '../../../../Modules/Connection/Connection.psm1'
 
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath $OrchestratorPath) -Force
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath $ScubaConfigPath) -Force
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath $ConnectionPath) -Function Disconnect-SCuBATenant
+#Import-Module (Join-Path -Path $PSScriptRoot -ChildPath $ConnectionPath) -Function Disconnect-SCuBATenant
+Import-Module ('C:/Users/kpalmer/git/ScubaGear/PowerShell/ScubaGear/Modules/Connection/Connection.psm1') -Function Disconnect-SCuBATenant
 
 InModuleScope Orchestrator {
     Describe -Tag 'Orchestrator' -Name 'Invoke-Scuba with Config' {
