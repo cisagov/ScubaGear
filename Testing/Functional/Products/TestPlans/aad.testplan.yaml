@@ -590,13 +590,59 @@ TestPlan:
         ExpectedResult: true
 
   - PolicyId: MS.AAD.6.1v1
-    TestDriver: RunScuba
+    TestDriver: RunCached
     Tests:
-      - TestDescription: MS.AAD.6.1v1 Not Checked
-        Preconditions: []
+      - TestDescription: MS.AAD.6.1v1 Compliant case - User passwords for all domains are set to not expire
+        Preconditions: 
+          - Command: UpdateProviderExport
+            Splat: 
+              updates: 
+                domain_settings:
+                  - Id: test.url.com
+                    PasswordValidityPeriodInDays: 2147483647
+                    IsVerified: true
+                  - Id: test1.url.com
+                    PasswordValidityPeriodInDays: 2147483647
+                    IsVerified: true
+                  - Id: test2.url.com
+                    PasswordValidityPeriodInDays: 2147483647
+                    IsVerified: true
         Postconditions: []
-        IsNotChecked: true
+        ExpectedResult: true
+      - TestDescription: MS.AAD.6.1v1 Non-Compliant case - User passwords for some domains are set to expire
+        Preconditions: 
+          - Command: UpdateProviderExport
+            Splat: 
+              updates: 
+                domain_settings:
+                  - Id: test.url.com
+                    PasswordValidityPeriodInDays: 0
+                    IsVerified: true
+                  - Id: test1.url.com
+                    PasswordValidityPeriodInDays: 0
+                    IsVerified: true
+                  - Id: test2.url.com
+                    PasswordValidityPeriodInDays: 2147483647
+                    IsVerified: true
+        Postconditions: []
         ExpectedResult: false
+      - TestDescription: MS.AAD.6.1v1 Compliant case - User passwords shall be verified
+        Preconditions: 
+          - Command: UpdateProviderExport
+            Splat: 
+              updates: 
+                domain_settings:
+                  - Id: test.url.com
+                    PasswordValidityPeriodInDays: 0
+                    IsVerified: null
+                  - Id: test1.url.com
+                    PasswordValidityPeriodInDays: 0
+                    IsVerified: false
+                  - Id: test2.url.com
+                    PasswordValidityPeriodInDays: 2147483647
+                    IsVerified: true
+        Postconditions: []
+        ExpectedResult: true
 
   - PolicyId: MS.AAD.7.1v1
     TestDriver: RunCached

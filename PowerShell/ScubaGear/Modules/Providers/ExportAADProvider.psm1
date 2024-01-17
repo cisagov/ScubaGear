@@ -101,6 +101,9 @@ function Export-AADProvider {
     # Read the properties and relationships of an authentication method policy
     $AuthenticationMethodPolicy = ConvertTo-Json @($Tracker.TryCommand("Get-MgBetaPolicyAuthenticationMethodPolicy"))
 
+    # 6.1
+    $DomainSettings = ConvertTo-Json @($Tracker.TryCommand("Get-MgBetaDomain"))
+
     $SuccessfulCommands = ConvertTo-Json @($Tracker.GetSuccessfulCommands())
     $UnSuccessfulCommands = ConvertTo-Json @($Tracker.GetUnSuccessfulCommands())
 
@@ -115,6 +118,7 @@ function Export-AADProvider {
     "service_plans": $ServicePlans,
     "directory_settings": $DirectorySettings,
     "authentication_method": $AuthenticationMethodPolicy,
+    "domain_settings": $DomainSettings,
     "aad_successful_commands": $SuccessfulCommands,
     "aad_unsuccessful_commands": $UnSuccessfulCommands,
 "@
