@@ -1,16 +1,15 @@
 $OrchestratorPath = '../../../../Modules/Orchestrator.psm1'
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath $OrchestratorPath) -Function 'Invoke-ReportCreation' -Force
+$CreateReportPath = '../../../../Modules/CreateReport/CreateReport.psm1'
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath $OrchestratorPath) -Function Invoke-ReportCreation -Force
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath $CreateReportPath) -Function New-Report, Import-SecureBaseline -Force
 
 InModuleScope Orchestrator {
     Describe -Tag 'Orchestrator' -Name 'Invoke-ReportCreation' {
         BeforeAll {
-            function New-Report {}
             Mock -ModuleName Orchestrator New-Report {}
-            function Pluralize {}
             Mock -ModuleName Orchestrator Pluralize {}
-            function Import-SecureBaseline{}
             Mock -ModuleName Orchestrator Import-SecureBaseline {
-                return @()
+                @{}
             }
             Mock -CommandName Write-Progress {}
             Mock -CommandName Join-Path { "." }
