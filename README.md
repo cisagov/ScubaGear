@@ -134,8 +134,8 @@ Get-Help -Name Invoke-SCuBA -Full
   - Per product namespace for values related to that specific product (i.e., Aad, SharePoint)
   - Namespace for each policy item within a product for variables related only to one policy item (i.e., MS.AAD.2.1v1)
   - Use of YAML anchors and aliases following Don't Repeat Yourself (DRY) principle for repeated values and sections
-
-If -ConfigFilePath is specified, default values will be provided for parameters that are not explicitly put in the config file.   These default values are provided explicitly in the config file template to help guide the user, but they may be omitted from the file.   Command line values options can now be provided with the -ConfigFilePath. This should reduce the number of config files needed.  Examples might be switching the M365 environment variable from commercial to gcc, switching the tenant used or supplying credentials so they do not need to be resident in the config file (which would facilitate sharing). The file path defaults to the same directory where the script is executed. The file path must point to a valid configuration file. It can be either a relative or absolute path. The file can be used to specify both standard tool parameters as well as custom parameters used by the Azure Active Directory (AAD) product assessment. See [AAD Conditional Access Policy Exemptions](#aad-conditional-access-policy-exemptions) for more details.
+  
+  If -ConfigFilePath is specified, default values will be provided for parameters that are not explicitly put in the config file.   These default values are provided explicitly in the config file template to help guide the user, but they may be omitted from the file.   Command line values options can now be provided with the -ConfigFilePath. This should reduce the number of config files needed.  Examples might be switching the M365 environment variable from commercial to gcc, switching the tenant used or supplying credentials so they do not need to be resident in the config file (which would facilitate sharing). The file path defaults to the same directory where the script is executed. The file path must point to a valid configuration file. It can be either a relative or absolute path. The file can be used to specify both standard tool parameters as well as custom parameters used by the Azure Active Directory (AAD) product assessment. See [See Scuba-Config Parameter Configuration File Syntax and Examples](#invoke-scuba-parameter-configuration-file-syntax-and-examples) and [AAD Conditional Access Policy Exemptions](#aad-conditional-access-policy-exemptions) for more details.
   
 
 - **$LogIn** is a `$true` or `$false` variable that if set to `$true` will prompt the user to provide credentials to establish a connection to the specified M365 products in the **$ProductNames** variable. For most use cases, leave this variable to be `$true`. A connection is established in the current PowerShell terminal session with the first authentication. To run another verification in the same PowerShell session,  set this variable to be `$false` to bypass the need to authenticate again in the same session. Defender will ask for authentication even if this variable is set to `$false`
@@ -157,6 +157,105 @@ If -ConfigFilePath is specified, default values will be provided for parameters 
 - **$OPAPath** refers to the folder location of the Open Policy Agent (OPA) policy engine executable file. By default the OPA policy engine executable embedded with this project is located in the project's root folder `"./"` and for most cases this value will not need to be modified. To execute the tool using a version of the OPA policy engine located in another folder, customize the variable value with the full path to the folder containing the OPA policy engine executable file.
 
 - **$OutPath** refers to the folder path where the output JSON and the HTML report will be created. Defaults to the same directory where the script is executed. This parameter is only necessary if an alternate report folder path is desired. The folder will be created if it does not exist.
+
+### Invoke-SCuBA Parameter Configuration File Syntax and Examples
+Most of the `Invoke-SCuBA` parameters supplied on the comment line can be placed into
+a configuration file with the path specified by `-ConfigFilePath` parameter. It should be noted that the following parameters are support only on the command line
+- ConfigFilePath
+- Version
+- DarkMode
+- Quiet
+
+All authentication parameters must be supplied on the command line if a non-interactive login is desired. 
+
+All of the configuration file examples referenced below are in the sample-config-files directory and the examples assume a Invoke-SCuBA is run in that directory.  Each example
+shows the sample config file name and a command line example with it
+
+All authentication parameters shown are samples only.  THe user must supply correct parameters
+
+**Minimal Use** : config file `minimal_config.yaml`
+Minimal use is typically specifying a product name  and an M365 environment variable.  In this example product is entered a a single value
+```
+Description: YAML Minimal Config file ( one product )
+ProductNames: teams
+M365Environment: commercial
+```
+Command line 
+`Invoke-SCuBA -ConfigFilePath minimal_config.yaml`
+
+Command line with override of M365Environment
+```
+Invoke-SCuBA -M365Environment gcc -ConfigFilePath minimal_config.yaml
+```
+
+**Typical Use** : config file `typical_config.yaml`
+Multiple products (can be specified in a list) and an M365 environment variable.  Note that unneeded values are commented out.
+```
+Description: YAML Typical Config ( multiple products )
+ProductNames:
+- teams
+# - exo
+# - defender
+- aad
+# - sharepoint
+M365Environment: commercial
+```
+Command line with Auth Parameters
+```
+Invoke-SCuBA -Organization abcdef.organization.com `
+             -AppID 0123456789abcdef01234566789abcde `
+             -CertificateThumbprint: fedcba9876543210fedcba9876543210fedcba98 `
+             -ConfigFilePath typical_config.yaml
+```
+**Credential Use** : config file `creds_config.yaml`
+Credentials can be supplied in the config file.  However the file is not encrypted so
+appropriate protection should be considered.
+```
+Description: YAML Configuration file with credentials ( invalid ones )
+ProductNames:
+- teams
+# - exo
+# - defender
+- aad
+# - sharepoint
+M365Environment: commercial
+Organization: abcdef.organization.com
+AppID:  0123456789abcdef01234566789abcde
+CertificateThumbprint: fedcba9876543210fedcba9876543210fedcba98
+```
+Command line with override of product names
+```
+Invoke-SCuBA -ProductNames  defender -ConfigFilePath typical_config.yaml
+```
+
+**Full Use**: config file `full_config.yaml`
+This example shows all of the parameters supported by ScubaConfig specified in the config
+file.  Any one of these parameters may be commented out.  If not specified ( or commented out ).  ScubaConfig will supply the default value for it unless overridden on the command line.  This default value does not apply to authentication parameters.
+```
+Description: YAML Configuration file with all parameters
+ProductNames:
+- teams
+- exo
+- defender
+- aad
+- sharepoint
+M365Environment: commercial
+OPAPath: .
+LogIn: true
+DisconnectOnExit: false
+OutPath: .
+OutFolderName: M365BaselineConformance
+OutProviderFileName: ProviderSettingsExport
+OutRegoFileName: TestResults
+OutReportName: BaselineReports
+Organization: abcdef.organization.com
+AppID:  0123456789abcdef01234566789abcde
+CertificateThumbprint: fedcba9876543210fedcba9876543210fedcba98
+```
+Command line invocation (no overrides )
+```
+Invoke-SCuBA  -ConfigFilePath full_config.yaml
+```
 
 ### AAD Conditional Access Policy Exemptions
 The ScubaGear `-ConfigFilePath` command line option allows users to define custom variables for use in policy assessments against the AAD baseline. These custom variables are used to exempt specific user and group exclusions from conditional access policy checks that normally would not pass if exclusions are present. These parameters support operational use cases for having backup or "break glass" account exclusions to global user policies without failing best practices. Any exemptions and their risks should be carefully considered and documented as part of an organization's cybersecurity risk management program process and practices.
