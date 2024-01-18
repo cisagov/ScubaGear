@@ -24,10 +24,10 @@ InModuleScope Orchestrator {
         }
         Context 'Testing Invoke-Scuba with -ConfigFilePath arg and parameter override' {
             BeforeAll {
-            
+
                 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'SplatParamsRef')]
 
-                # Set up the reference comparison withunmodified parameters by reading the hash from the config file
+                # Set up the reference comparison with unmodified parameters by reading the hash from the config file
                 $ConfigFile = ( Join-Path -Path $PSScriptRoot  -ChildPath "orchestrator_config_test.yaml" )
                 $Content = Get-Content -Raw -Path $ConfigFile
                 $ScubaConfRef = $Content | ConvertFrom-Yaml
@@ -36,8 +36,8 @@ InModuleScope Orchestrator {
                     ConfigFilePath = $ConfigFile
                 }
 
-                # Set up the splat params to refernce a config file without authentication parameters
-                # but supply then expicitly as arguments.  Use the authentication values from the refrence above
+                # Set up the splat params to reference a config file without authentication parameters
+                # but supply then explicitly as arguments.  Use the authentication values from the reference above
 
                 $ConfigFileNoCreds = ( Join-Path -Path $PSScriptRoot  -ChildPath "orchestrator_config_test_no_creds.yaml" )
                 $SplatParamsCreds = @{
@@ -53,7 +53,7 @@ InModuleScope Orchestrator {
                     $SplatParams = $SplatParamsRef.Clone()
                     $SplatParams[$ModKey] = $ModValue
                     Invoke-Scuba @SplatParams
-                    # The values setup by the override are propegated by the orchestrator
+                    # The values setup by the override are propagated by the orchestrator
                     # into the Scuba config singleton
                     $ConfTest = [ScubaConfig]::GetInstance().Configuration
                     $pass = $true
@@ -81,15 +81,15 @@ InModuleScope Orchestrator {
                         return $pass
                     }
                 }
-                
-                # Credentiasl test:  pass the credetails as an argument combined with a
+
+                # Credentials test:  pass the credentials as an argument combined with a
                 # config file that does not have them
                 function CredsTest() {
                     $pass = $true
                     Invoke-Scuba @SplatParamsCreds
                     $ConfTestCreds = [ScubaConfig]::GetInstance().Configuration
 
-                    # Scuba config should now have the resultes with auth params
+                    # Scuba config should now have the results with auth params
                     # Verify that all values are present and match
                     if ( (Compare-Object @($ScubaTestCreds.keys) @($ScubaConfRef.keys)))
                     {
@@ -97,16 +97,16 @@ InModuleScope Orchestrator {
                     }
                     foreach ($key in $ConfTestCreds.keys )
                     {
-                         if ( $null -ne ( Compare-Object  $ConfTestCreds.$key  $ScubaConfRef.$key ))
-                         {
+                        if ( $null -ne ( Compare-Object  $ConfTestCreds.$key  $ScubaConfRef.$key ))
+                        {
                             $pass = $false
-                         }
+                        }
                     }
                     return $pass
                 }
             }
 
-            It "Verify overide parameter ""<parameter>"" with value ""<value>""" -ForEach @(
+            It "Verify override parameter ""<parameter>"" with value ""<value>""" -ForEach @(
                 @{ Parameter = "M365Environment";       Value = "gcc"                           }
                 @{ Parameter = "M365Environment";       Value = "commercial"                    }
                 @{ Parameter = "ProductNames";          Value = "teams"                         }
@@ -132,7 +132,7 @@ InModuleScope Orchestrator {
                 $ConfTestCreds = [ScubaConfig]::GetInstance().Configuration
                 if ( (Compare-Object @($ScubaConfRef.keys) @($ConfTestCreds.keys)))
                 {
-                    CredsTest | Shoud -Be $true
+                    CredsTest | Should -Be $true
                 }
 
             }
