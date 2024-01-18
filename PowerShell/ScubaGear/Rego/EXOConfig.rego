@@ -81,7 +81,7 @@ DomainsWithoutSpf contains DNSResponse.domain if {
 tests contains {
     "PolicyId": "MS.EXO.2.2v1",
     "Criticality": "Shall",
-    "Commandlet": ["Get-ScubaSpfRecords", "Get-AcceptedDomain"],
+    "Commandlet": ["Get-ScubaSpfRecord", "Get-AcceptedDomain"],
     "ActualValue": Domains,
     "ReportDetails": ReportDetailsArray(Status, Domains, "agency domain(s) found in violation:"),
     "RequirementMet": Status
@@ -119,7 +119,7 @@ tests contains {
     "Criticality": "Should",
     "Commandlet": [
         "Get-DkimSigningConfig",
-        "Get-ScubaDkimRecords",
+        "Get-ScubaDkimRecord",
         "Get-AcceptedDomain"
     ],
     "ActualValue": [input.dkim_records, input.dkim_config],
@@ -154,7 +154,7 @@ tests contains {
     "PolicyId": "MS.EXO.4.1v1",
     "Criticality": "Shall",
     "Commandlet": [
-        "Get-ScubaDmarcRecords",
+        "Get-ScubaDmarcRecord",
         "Get-AcceptedDomain"
     ],
     "ActualValue": input.dmarc_records,
@@ -183,7 +183,7 @@ tests contains {
     "PolicyId": "MS.EXO.4.2v1",
     "Criticality": "Shall",
     "Commandlet": [
-        "Get-ScubaDmarcRecords",
+        "Get-ScubaDmarcRecord",
         "Get-AcceptedDomain"
     ],
     "ActualValue": input.dmarc_records,
@@ -223,7 +223,7 @@ tests contains {
     "PolicyId": "MS.EXO.4.3v1",
     "Criticality": "Shall",
     "Commandlet": [
-        "Get-ScubaDmarcRecords",
+        "Get-ScubaDmarcRecord",
         "Get-AcceptedDomain"
     ],
     "ActualValue": input.dmarc_records,
@@ -279,7 +279,7 @@ tests contains {
     "PolicyId": "MS.EXO.4.4v1",
     "Criticality": "Should",
     "Commandlet": [
-        "Get-ScubaDmarcRecords",
+        "Get-ScubaDmarcRecord",
         "Get-AcceptedDomain"
     ],
     "ActualValue": input.dmarc_records,
