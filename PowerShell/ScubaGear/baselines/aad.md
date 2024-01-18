@@ -571,6 +571,8 @@ User activation of other highly privileged roles SHOULD trigger an alert.
 
 - [Assign Microsoft Entra roles in Privileged Identity Management](https://learn.microsoft.com/en-us/entra/id-governance/privileged-identity-management/pim-how-to-add-role-to-user)
 
+- [Privileged Identity Management (PIM) for Groups](https://learn.microsoft.com/en-us/entra/id-governance/privileged-identity-management/concept-pim-for-groups)
+
 - [Approve or deny requests for Microsoft Entra roles in Privileged Identity Management](https://learn.microsoft.com/en-us/entra/id-governance/privileged-identity-management/pim-approval-workflow)
 
 - [Configure security alerts for Microsoft Entra roles in Privileged Identity Management](https://learn.microsoft.com/en-us/entra/id-governance/privileged-identity-management/pim-how-to-configure-security-alerts)
@@ -581,9 +583,14 @@ User activation of other highly privileged roles SHOULD trigger an alert.
 
 ### Implementation
 
-The following implementation instructions that reference the Azure AD PIM service will vary if using a third-party PAM system instead. Additionally, the implementation instructions associated with assigning roles to users will be revised in an upcoming release to incorporate functionality provided by the Azure AD [PIM for Groups](https://learn.microsoft.com/en-us/entra/id-governance/privileged-identity-management/concept-pim-for-groups) feature.
+The following implementation instructions that reference the Azure AD PIM service will vary if using a third-party PAM system instead. 
+The Azure AD PIM service provides two methods for assigning role permissions to users and this section provides instructions that cover both methods. The methods differ with respect to how a user activates their roles. 
+- **Method 1 (PIM for Roles)**: Using this approach a user must activate each role they are assigned to one by one. For example, if a user was assigned to three roles and needed to use all three roles concurrently, the user would need to perform three activations.
+- **Method 2 (PIM for Groups)**: Using this approach a user activates their membership in a group. The group itself is assigned to one or more roles. When a user activates their membership in a group that is assigned to multiple roles, the user receives each of the roles at the time of activation and does not need to active each role one by one.
 
 #### MS.AAD.7.1v1 Instructions
+
+When performing these instructions do not count the same username twice. Once you finish counting go to the **Final Count** section.
 
 1. In **Azure Active Directory** select **Roles and administrators.**
 
@@ -591,9 +598,24 @@ The following implementation instructions that reference the Azure AD PIM servic
 
 3. Under **Manage**, select **Assignments.**
 
-4. Validate that between two to eight users are listed.
+If you have Azure AD PIM proceed to step 5.
 
-5.  If you have Azure AD PIM, count the number of users in both the **Eligible assignments** and **Active assignments** tabs. There should be a total of two to eight users across both tabs (not individually). Do not count the same username twice. If any groups are listed, count the number of users who are members of the group and include it in the total count.
+4. Count the number of users assigned to the role. If any groups are listed you must count how many users are members of those groups and include that number in the overall count.
+
+If you have Azure AD PIM, perform the next steps:
+
+5. Count the number of users assigned to the role in both the **Eligible assignments** and **Active assignments** tabs. If any groups are listed proceed to step 6. 
+
+Perform the next steps for each group that is listed in either the **Eligible assignments** or **Active assignments** tabs:
+
+6. You must determine if the group is enrolled in PIM for Groups. In **Azure AD Privileged Identity Management (PIM)**, under **Manage**, select **Groups**. If the group is listed, then that group is enrolled in PIM for Groups so proceed to step 8.
+
+7. If the group being reviewed is not listed in PIM for Groups, then open the group in the Azure AD Groups page and count the number of members. Add the number of members to the overall count.
+
+8. If the group is listed in PIM for Groups, then select the group in PIM for Groups to open its properties. Once the group's page is open, then select **Manage** > **Assignments**. Count the number of users assigned to the PIM group in both the **Eligible assignments** and **Active assignments** tabs and add that to the overall count.
+
+**Final Count**:
+There should be a total of two to eight users assigned to the role, including any direct user to role assignments and assignments via group membership.
 
 #### MS.AAD.7.2v1 Instructions
 
