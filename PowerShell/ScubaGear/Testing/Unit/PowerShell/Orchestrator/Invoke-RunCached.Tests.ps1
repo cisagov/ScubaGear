@@ -4,7 +4,9 @@ Import-Module (Join-Path -Path $PSScriptRoot -ChildPath $OrchestratorPath) -Func
 InModuleScope Orchestrator {
     Describe -Tag 'Orchestrator' -Name 'Invoke-RunCached' {
         BeforeAll {
+            function Remove-Resources {}
             Mock -ModuleName Orchestrator Remove-Resources {}
+            function Import-Resources {}
             Mock -ModuleName Orchestrator Import-Resources {}
             function Invoke-Connection {}
             Mock -ModuleName Orchestrator Invoke-Connection { @() }
