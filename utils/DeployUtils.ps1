@@ -2,18 +2,19 @@
 
 function New-PrivateGallery {
     <#
-        .Description
-        Creates a new private package repository (i.e., gallery) on local file system
-        .Parameter GalleryPath
-        Path for directory to use for private gallery
-        .Parameter GalleryName
-        Name of the private gallery
-        .Parameter Trusted
-        Indicates if private gallery is registered as a trusted gallery
-        .Example
-        New-PrivateGallery -Trusted
-        Create new private, trusted gallery using default name and location
+    .Description
+    Creates a new private package repository (i.e., gallery) on local file system
+    .Parameter GalleryPath
+    Path for directory to use for private gallery
+    .Parameter GalleryName
+    Name of the private gallery
+    .Parameter Trusted
+    Indicates if private gallery is registered as a trusted gallery
+    .Example
+    New-PrivateGallery -Trusted
+    Create new private, trusted gallery using default name and location
     #>
+    [CmdletBinding(SupportsShouldProcess)]
     param (
         [Parameter(Mandatory=$false)]
         [ValidateScript({Test-Path -Path $_ -IsValid})]
@@ -54,16 +55,24 @@ function New-PrivateGallery {
 
 function Publish-ScubaGearModule{
     <#
-        .Description
-        Publish ScubaGear module to private package repository
-        .Parameter ModulePath
-        Path to module root directory
-        .Parameter GalleryName
-        Name of the private package repository (i.e., gallery)
-        .Parameter OverrideModuleVersion
-        Optional module version.  If provided it will use as module version. Otherwise, the current version from the manifest with a revision number is added instead.
+    .Description
+    Publish ScubaGear module to private package repository
+    .Parameter ModulePath
+    Path to module root directory
+    .Parameter GalleryName
+    Name of the private package repository (i.e., gallery)
+    .Parameter OverrideModuleVersion
+    Optional module version.  If provided it will use as module version. Otherwise, the current version from the manifest with a revision number is added instead.
     #>
     param (
+        [Parameter(Mandatory=$true)]
+        [ValidateScript({[uri]::IsWellFormedUriString($_, 'Absolute') -and ([uri] $_).Scheme -in 'https'})]
+        [System.Uri]
+        $AzureKeyVaultUrl,
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $CertificateName,
         [Parameter(Mandatory=$true)]
         [ValidateScript({Test-Path -Path $_ -PathType Container})]
         [string]
@@ -80,7 +89,7 @@ function Publish-ScubaGearModule{
 
     $ModuleBuildPath = Build-ScubaModule -ModulePath $ModulePath -OverrideModuleVersion $OverrideModuleVersion
 
-    if (SignScubaGearModule -ModulePath $ModuleBuildPath){
+    if (SignScubaGearModule -AzureKeyVaultUrl $AzureKeyVaultUrl -CertificateName $CertificateName -ModulePath $ModuleBuildPath){
         Publish-Module -Path $ModuleBuildPath -Repository $GalleryName
     }
     else {
@@ -90,8 +99,8 @@ function Publish-ScubaGearModule{
 
 function Build-ScubaModule{
     <#
-        .NOTES
-        Internal helper function
+    .NOTES
+    Internal helper function
     #>
     param (
         [Parameter(Mandatory=$true)]
@@ -120,8 +129,8 @@ function Build-ScubaModule{
 
 function ConfigureScubaGearModule{
     <#
-        .NOTES
-        Internal helper function
+    .NOTES
+    Internal helper function
     #>
     param (
         [Parameter(Mandatory=$true)]
@@ -161,63 +170,153 @@ function ConfigureScubaGearModule{
     return $null -ne $Result
 }
 
-function SignScubaGearModule{
+function CreateFileList{
     <#
-        .NOTES
-        Internal helper function
+    .NOTES
+    Internal function
+    #>
+    param(
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $SourcePath,
+        [Parameter(Mandatory=$false)]
+        [AllowEmptyCollection()]
+        [array]
+        $Extensions = @()
+    )
+
+    $FileNames = @()
+
+    if ($Extensions.Count -gt 0){
+        $FileNames += Get-ChildItem -Recurse -Path $SourcePath -Include $Extensions
+    }
+
+    Write-Debug "Found $($FileNames.Count) files to sign"
+
+    $FileList = New-TemporaryFile
+    $FileNames.FullName | Out-File -FilePath $($FileList.FullName) -Encoding utf8 -Force
+    Write-Debug "Files: $(Get-Content $FileList)"
+    return $FileList.FullName
+}
+
+function CallAzureSignTool{
+    <#
+    .NOTES
+    Internal function
     #>
     param (
         [Parameter(Mandatory=$true)]
-        [ValidateScript({Test-Path -Path $_})]
-        $ModulePath,
-        [Parameter(Mandatory=$false)]
-        [scriptblock]
-        $GetCertificate = $function:GetCodeSigningCertificate,
+        [ValidateScript({[uri]::IsWellFormedUriString($_, 'Absolute') -and ([uri] $_).Scheme -in 'https'})]
+        [System.Uri]
+        $AzureKeyVaultUrl,
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $CertificateName,
         [Parameter(Mandatory=$false)]
         [ValidateScript({[uri]::IsWellFormedUriString($_, 'Absolute') -and ([uri] $_).Scheme -in 'http','https'})]
         $TimeStampServer = 'http://timestamp.digicert.com',
-        [Parameter(Mandatory=$false)]
-        [ValidateSet('SHA256')]
-        [string]
-        $HashAlgorithm = 'SHA256'
+        [Parameter(Mandatory=$true)]
+        [ValidateScript({Test-Path -Path $_ -PathType Leaf})]
+        $FileList
     )
-    #TODO: Add code signing
-    $CatalogFileName = 'ScubaGear.cat'
-    $CatalogPath = Join-Path -Path $ModulePath -ChildPath $CatalogFileName
-    $Cert = Invoke-Command $GetCertificate
+
+    $SignArguments = @(
+        'sign',
+        '-coe',
+        '-fd',"sha256",
+        '-tr', $TimeStampServer,
+        '-kvu',$AzureKeyVaultUrl,
+        '-kvc',$CertificateName,
+        '-kvm'
+        '-ifl',$FileList
+    )
+
+    Write-Debug "Calling AzureSignTool: $SignArguments"
+
+    $ToolPath = (Get-Command AzureSignTool).Path
+    & $ToolPath $SignArguments
+}
+function SignScubaGearModule{
+    <#
+    .SYNOPSIS
+    Code sign the specified module
+    .Description
+    This function individually signs PowerShell artifacts (i.e., *.ps1, *.pms1) and creates a
+    signed catalog of the entire module using a certificate housed in an Azure key vault.
+    .Parameter AzureKeyVaultUrl
+    The URL of the key vault with the code signing certificate
+    .Parameter CertificateName
+    The name of the code signing certificate
+    .Parameter ModulePath
+    The root path of the module to be signed
+    .Parameter TimeStampServer
+    Time server to use to timestamp the artifacts
+    .NOTES
+    There appears to be limited or at least difficult to find documentation on how to properly sign a PowerShell
+    module to be published to PSGallery.
+    https://learn.microsoft.com/en-us/powershell/gallery/concepts/publishing-guidelines?view=powershellget-3.x show
+    general guidance.
+
+    There is anecdotal evidence to sign all PowerShell artifacts (ps1, psm1, and pdsd1) in additional to a signed catalog For example,
+    Microsoft.PowerApps.PowerShell (v1.0.34) and see both *.psd1 and *.psm1 files are signed and a catalog provided.
+
+    There are a number of Non-authoritive references such as below showing all ps1, psm1, and psd1 being signed first then cataloged.
+    https://github.com/dell/OpenManage-PowerShell-Modules/blob/main/Sign-Module.ps1
+    #>
+    param (
+        [Parameter(Mandatory=$true)]
+        [ValidateScript({[uri]::IsWellFormedUriString($_, 'Absolute') -and ([uri] $_).Scheme -in 'https'})]
+        [System.Uri]
+        $AzureKeyVaultUrl,
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $CertificateName,
+        [Parameter(Mandatory=$true)]
+        [ValidateScript({Test-Path -Path $_ -PathType Container})]
+        $ModulePath,
+        [Parameter(Mandatory=$false)]
+        [ValidateScript({[uri]::IsWellFormedUriString($_, 'Absolute') -and ([uri] $_).Scheme -in 'http','https'})]
+        $TimeStampServer = 'http://timestamp.digicert.com'
+    )
+
 
     # Digitally sign scripts, manifest, and modules
-    Get-ChildItem $ModulePath -Include *.psd1,*psm1,*.ps1 -Recurse |
-    Set-AuthenticodeSignature -Certificate $Cert -TimeStampServer $TimeStampServer -HashAlgorithm $HashAlgorithm
+    $FileList = CreateFileList -SourcePath $ModulePath -Extensions "*.ps1","*.psm1","*.psd1"
+    CallAzureSignTool `
+      -AzureKeyVaultUrl $AzureKeyVaultUrl `
+      -CertificateName $CertificateName `
+      -TimeStampServer $TimeStampServer `
+      -FileList $FileList
 
-    New-FileCatalog -Path $ModulePath -CatalogFilePath $CatalogPath -CatalogVersion 2.0 -Verbose
-    Set-AuthenticodeSignature -FilePath $CatalogPath -Certificate $Cert -TimestampServer $TimeStampServer -HashAlgorithm $HashAlgorithm
+    # Create and sign catalog
+    $CatalogFileName = 'ScubaGear.cat'
+    $CatalogPath = Join-Path -Path $ModulePath -ChildPath $CatalogFileName
+
+    if (Test-Path -Path $CatalogPath -PathType Leaf){
+        Remove-Item -Path $CatalogPath -Force
+    }
+
+    $CatalogPath = New-FileCatalog -Path $ModulePath -CatalogFilePath $CatalogPath -CatalogVersion 2.0
+    $CatalogList = New-TemporaryFile
+    $CatalogPath.FullName | Out-File -FilePath $CatalogList -Encoding utf8 -Force
+
+    CallAzureSignTool `
+      -AzureKeyVaultUrl $AzureKeyVaultUrl `
+      -CertificateName $CertificateName `
+      -TimeStampServer $TimeStampServer `
+      -FileList $CatalogList
 
     $TestResult = Test-FileCatalog -CatalogFilePath $CatalogPath
-    return 'Valid' -eq $TestResult.Status
-}
-
-function New-CodeSigningCertificate{
-    <#
-        .NOTES
-        Internal helper function
-    #>
-    New-SelfSignedCertificate -DnsName cisa.gov -Type CodeSigning -CertStoreLocation Cert:\CurrentUser\My
-}
-
-function GetCodeSigningCertificate{
-    <#
-        .NOTES
-        Internal helper function
-    #>
-    #TODO:  Replace with official signing certificate
-    Get-ChildItem Cert:\CurrentUser\My -CodeSigningCert | Where-Object { $_.HasPrivateKey -and ($_.NotAfter -gt (Get-Date))}
+    return 'Valid' -eq $TestResult
 }
 
 function IsRegistered{
     <#
-        .NOTES
-        Internal helper function
+    .NOTES
+    Internal helper function
     #>
     param (
         [Parameter(Mandatory=$false)]
