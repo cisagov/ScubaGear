@@ -584,9 +584,6 @@ User activation of other highly privileged roles SHOULD trigger an alert.
 ### Implementation
 
 The following implementation instructions that reference the Azure AD PIM service will vary if using a third-party PAM system instead. 
-The Azure AD PIM service provides two methods for assigning role permissions to users and this section provides instructions that cover both methods. The methods differ with respect to how a user activates their roles. 
-- **Method 1 (PIM for Roles)**: Using this approach a user must activate each role they are assigned to one by one. For example, if a user was assigned to three roles and needed to use all three roles concurrently, the user would need to perform three activations.
-- **Method 2 (PIM for Groups)**: Using this approach a user activates their membership in a group. The group itself is assigned to one or more roles. When a user activates their membership in a group that is assigned to multiple roles, the user receives each of the roles at the time of activation and does not need to active each role one by one.
 
 #### MS.AAD.7.1v1 Instructions
 
