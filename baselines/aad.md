@@ -590,7 +590,7 @@ The Azure AD PIM service provides two methods for assigning role permissions to 
 
 #### MS.AAD.7.1v1 Instructions
 
-When performing these instructions do not count the same username twice. Once you finish counting go to the **Final Count** section.
+When performing these instructions count each distinct username only once. Do not double count. Once you finish counting go to the **Final Count** section.
 
 1. In **Azure Active Directory** select **Roles and administrators.**
 
@@ -600,19 +600,11 @@ When performing these instructions do not count the same username twice. Once yo
 
 If you have Azure AD PIM proceed to step 5.
 
-4. Count the number of users assigned to the role. If any groups are listed you must count how many users are members of those groups and include that number in the overall count.
+4. Count the number of users assigned to the role. If any groups are listed then count how many users are members of those groups and include that number in the overall count. Proceed to the **Final Count** section.
 
-If you have Azure AD PIM, perform the next steps:
+If you have Azure AD PIM, perform the steps below:
 
-5. Count the number of users assigned to the role in both the **Eligible assignments** and **Active assignments** tabs. If any groups are listed proceed to step 6. 
-
-Perform the next steps for each group that is listed in either the **Eligible assignments** or **Active assignments** tabs:
-
-6. You must determine if the group is enrolled in PIM for Groups. In **Azure AD Privileged Identity Management (PIM)**, under **Manage**, select **Groups**. If the group is listed, then that group is enrolled in PIM for Groups so proceed to step 8.
-
-7. If the group being reviewed is not listed in PIM for Groups, then open the group in the Azure AD Groups page and count the number of members. Add the number of members to the overall count.
-
-8. If the group is listed in PIM for Groups, then select the group in PIM for Groups to open its properties. Once the group's page is open, then select **Manage** > **Assignments**. Count the number of users assigned to the PIM group in both the **Eligible assignments** and **Active assignments** tabs and add that to the overall count.
+5. Count the number of users assigned to the role in both the **Eligible assignments** and **Active assignments** tabs. If a group is listed, count the number of members of the group. If a group is enrolled in PIM for Groups, count the number of members of the group from the PIM for Groups portal page and ensure to count both the **Eligible** and the **Active** assignments. 
 
 **Final Count**:
 There should be a total of two to eight users assigned to the role, including any direct user to role assignments and assignments via group membership.
@@ -638,7 +630,7 @@ Performing a manual review of highly privileged users per the instructions below
 
 3. Select the **Global administrator role.**
 
-4. Under **Manage**, select **Assignments.** If you have Azure AD PIM, repeat the steps below for both the **Eligible** and the **Active** assignments. If a group is listed, you will need to determine the members of the group and perform the steps for each group member. If a group is enrolled in PIM for Groups, determine the members of the group from the PIM for Groups portal page and ensure to repeat the steps below for both the **Eligible** and the **Active** assignments.
+4. Under **Manage**, select **Assignments.** If you have Azure AD PIM, repeat the steps below for both the **Eligible** and the **Active** assignments. If a group is listed, determine the members of the group and perform the steps for each group member. If a group is enrolled in PIM for Groups, determine the members of the group from the PIM for Groups portal page and ensure to repeat the steps below for both the **Eligible** and the **Active** assignments.
 
 5. For each highly privileged user, execute the Powershell code below but replace the `username@somedomain.com` with the principal name of the user who is specific to your environment. You can get the data value from the **Principal name** field displayed in the Azure AD portal.
 
