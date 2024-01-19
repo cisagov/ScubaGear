@@ -135,7 +135,7 @@ Get-Help -Name Invoke-SCuBA -Full
   - Namespace for each policy item within a product for variables related only to one policy item (i.e., MS.AAD.2.1v1)
   - Use of YAML anchors and aliases following Don't Repeat Yourself (DRY) principle for repeated values and sections
   
-  If -ConfigFilePath is specified, default values will be provided for parameters that are not explicitly put in the config file.   These default values are provided explicitly in the config file template to help guide the user, but they may be omitted from the file.   Command line values options can now be provided with the -ConfigFilePath. This should reduce the number of config files needed.  Examples might be switching the M365 environment variable from commercial to gcc, switching the tenant used or supplying credentials so they do not need to be resident in the config file (which would facilitate sharing). The file path defaults to the same directory where the script is executed. The file path must point to a valid configuration file. It can be either a relative or absolute path. The file can be used to specify both standard tool parameters as well as custom parameters used by the Azure Active Directory (AAD) product assessment. See [See Scuba-Config Parameter Configuration File Syntax and Examples](#invoke-scuba-parameter-configuration-file-syntax-and-examples) and [AAD Conditional Access Policy Exemptions](#aad-conditional-access-policy-exemptions) for more details.
+  If a -ConfigFilePath is specified, default values will be provided for parameters that are not explicitly put in the config file. These default values are provided explicitly in the config file template to guide the user, but they can be omitted from the file. Command line values options can now be provided with the -ConfigFilePath. This should reduce the number of config files needed. Examples might be: switching the M365 environment variable from commercial to gcc, switching the tenant used, or supplying credentials so they do not need to be in the config file (to facilitate sharing). The config file path defaults to the same directory where the script is executed. The file path must point to a valid configuration file with a relative or absolute path. The file can be used to specify both standard tool parameters as well as custom parameters used by the Azure Active Directory (AAD) product assessment. See [See Scuba-Config Parameter Configuration File Syntax and Examples](#invoke-scuba-parameter-configuration-file-syntax-and-examples) and [AAD Conditional Access Policy Exemptions](#aad-conditional-access-policy-exemptions) for more details.
   
 
 - **$LogIn** is a `$true` or `$false` variable that if set to `$true` will prompt the user to provide credentials to establish a connection to the specified M365 products in the **$ProductNames** variable. For most use cases, leave this variable to be `$true`. A connection is established in the current PowerShell terminal session with the first authentication. To run another verification in the same PowerShell session,  set this variable to be `$false` to bypass the need to authenticate again in the same session. Defender will ask for authentication even if this variable is set to `$false`
@@ -160,7 +160,7 @@ Get-Help -Name Invoke-SCuBA -Full
 
 ### Invoke-SCuBA Parameter Configuration File Syntax and Examples
 Most of the `Invoke-SCuBA` parameters supplied on the comment line can be placed into
-a configuration file with the path specified by `-ConfigFilePath` parameter. It should be noted that the following parameters are support only on the command line
+a configuration file with the path specified by `-ConfigFilePath` parameter. It should be noted that the following parameters are supported only on the command line.
 - ConfigFilePath
 - Version
 - DarkMode
@@ -168,13 +168,13 @@ a configuration file with the path specified by `-ConfigFilePath` parameter. It 
 
 All authentication parameters must be supplied on the command line if a non-interactive login is desired. 
 
-All of the configuration file examples referenced below are in the sample-config-files directory and the examples assume a Invoke-SCuBA is run in that directory.  Each example
-shows the sample config file name and a command line example with it
+All of the configuration file examples referenced below are in the sample-config-files directory and the examples assume a Invoke-SCuBA is run in that directory. Each example
+shows the sample config file name and a command line example with it.
 
-All authentication parameters shown are samples only.  THe user must supply correct parameters
+All authentication parameters shown are samples only. The user must supply correct parameters.
 
 **Minimal Use** : config file `minimal_config.yaml`
-Minimal use is typically specifying a product name  and an M365 environment variable.  In this example product is entered a a single value
+Minimal use is typically specifying a product name and an M365 environment variable. In this example product is entered a a single value.
 ```
 Description: YAML Minimal Config file ( one product )
 ProductNames: teams
@@ -189,7 +189,7 @@ Invoke-SCuBA -M365Environment gcc -ConfigFilePath minimal_config.yaml
 ```
 
 **Typical Use** : config file `typical_config.yaml`
-Multiple products (can be specified in a list) and an M365 environment variable.  Note that unneeded values are commented out.
+Multiple products (can be specified in a list) and an M365 environment variable. Note that unneeded values are commented out.
 ```
 Description: YAML Typical Config ( multiple products )
 ProductNames:
@@ -208,7 +208,7 @@ Invoke-SCuBA -Organization abcdef.organization.com `
              -ConfigFilePath typical_config.yaml
 ```
 **Credential Use** : config file `creds_config.yaml`
-Credentials can be supplied in the config file.  However the file is not encrypted so
+Credentials can be supplied in the config file. However the file is not encrypted so
 appropriate protection should be considered.
 ```
 Description: YAML Configuration file with credentials ( invalid ones )
@@ -230,7 +230,7 @@ Invoke-SCuBA -ProductNames  defender -ConfigFilePath typical_config.yaml
 
 **Full Use**: config file `full_config.yaml`
 This example shows all of the parameters supported by ScubaConfig specified in the config
-file.  Any one of these parameters may be commented out.  If not specified ( or commented out ).  ScubaConfig will supply the default value for it unless overridden on the command line.  This default value does not apply to authentication parameters.
+file. Any one of these parameters may be commented out. If not specified ( or commented out ). ScubaConfig will supply the default value for it unless overridden on the command line. This default value does not apply to authentication parameters.
 ```
 Description: YAML Configuration file with all parameters
 ProductNames:
