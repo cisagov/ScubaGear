@@ -704,11 +704,12 @@ NotGlobalAdmins contains User.DisplayName if {
 }
 
 #calculate secure score as ratio of priv users with global admin role to priv users without global admin role
-SecureScore(GlobalAdmins, NotGlobalAdmins) := Description if {
+LeastPrivilegeScore(GlobalAdmins, NotGlobalAdmins) := Description if {
     count(NotGlobalAdmins) > 0
     x := count(GlobalAdmins)/count(NotGlobalAdmins)*100
-    Description := concat(" ", ["Secure Score:", format_int(x,10)])
-} else := "No privileged users that are NOT Global Admin; Secure Score cannot be calculated at this time."
+    Description := concat(" ", ["Least Privilege Score:", format_int(x,10)])
+} else := "No privileged users that are NOT Global Admin; Least Privilege Score cannot be calculated at this time."
+
 
 # Pass if secure score is <= 1, fail if secure score is > 1, flag if secure score is undefined
 tests contains {
@@ -716,10 +717,10 @@ tests contains {
     "Criticality" : "Shall",
     "Commandlet" : ["Get-MgBetaSubscribedSku", "Get-PrivilegedUser"],
     "ActualValue" : GlobalAdmins,
-    "ReportDetails" : concat(": ", [ReportDetailsBoolean(Status), SecureScore(GlobalAdmins,NotGlobalAdmins)]),
+    "ReportDetails" : concat(": ", [ReportDetailsBoolean(Status), LeastPrivilegeScore(GlobalAdmins,NotGlobalAdmins)]),
     "RequirementMet" : Status
 } if {
-    Status := count(GlobalAdmins) <= count(NotGlobalAdmins)
+    Status := count(GlobalAdmins) < count(NotGlobalAdmins)
 }
 #--
 

@@ -123,8 +123,42 @@ test_PrivilegedUsers_Incorrect_V2 if {
 #--
 # Policy MS.AAD.7.2v1
 #--
-
+#Correct because the ratio of global admins to non global admins is less than 1
 test_SecureScore_Correct_V1 if {
+    Output := aad.tests with input as {
+        "privileged_users": {
+            "User1": {
+                "DisplayName": "Test Name1",
+                "roles": [
+                    "Privileged Role Administrator",
+                    "Global Administrator"
+                ]
+            },
+            "User2": {
+                "DisplayName": "Test Name2",
+                "roles": [
+                    "Privileged Role Administrator"
+                ]
+            },
+            "User3": {
+                "DisplayName": "Test Name3",
+                "roles": [
+                    "Privileged Role Administrator"
+                ]
+            }
+        }
+    }
+
+    ReportDetailStr := "Requirement met: Least Privilege Score: 50"
+
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == "MS.AAD.7.2v1"]
+    print(RuleOutput)
+
+    TestResult("MS.AAD.7.2v1", Output, ReportDetailStr, true) == true
+}
+
+#Incorrect because the ratio of global admins to non global admins is equal to 1
+test_SecureScore_Incorrect_V1 if {
     Output := aad.tests with input as {
         "privileged_users": {
             "User1": {
@@ -143,11 +177,47 @@ test_SecureScore_Correct_V1 if {
         }
     }
 
-      ReportDetailStr := concat("", [
-        "secure score"
-    ])
+    ReportDetailStr := "Requirement not met: Least Privilege Score: 100"
 
-    TestResult("MS.AAD.7.2v1", PASS, ReportDetailStr, true) == true
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == "MS.AAD.7.2v1"]
+    print(RuleOutput)
+
+    TestResult("MS.AAD.7.2v1", Output, ReportDetailStr, false) == true
+}
+
+#Incorrect because the ratio of global admins to non global admins is more than 1
+test_SecureScore_Incorrect_V1 if {
+    Output := aad.tests with input as {
+        "privileged_users": {
+            "User1": {
+                "DisplayName": "Test Name1",
+                "roles": [
+                    "Privileged Role Administrator",
+                    "Global Administrator"
+                ]
+            },
+            "User2": {
+                "DisplayName": "Test Name2",
+                "roles": [
+                    "Privileged Role Administrator",
+                    "Global Administrator"
+                ]
+            },
+            "User3": {
+                "DisplayName": "Test Name2",
+                "roles": [
+                    "Privileged Role Administrator"
+                ]
+            }
+        }
+    }
+
+    ReportDetailStr := "Requirement not met: Least Privilege Score: 200"
+
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == "MS.AAD.7.2v1"]
+    print(RuleOutput)
+
+    TestResult("MS.AAD.7.2v1", Output, ReportDetailStr, false) == true
 }
 
 #--
