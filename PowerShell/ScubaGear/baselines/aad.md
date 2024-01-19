@@ -610,15 +610,19 @@ There should be a total of two to eight users assigned to the role, including an
 
 #### MS.AAD.7.2v1 Instructions
 
-1.  In **Azure Active Directory** select **Security.**
+This section involves performing a calculation based on the ratio below:
 
-2.  Under **Manage**, select **Identity Secure Score.**
+- X = (Number of users assigned to the Global Administrator role) / (Number of users assigned to other highly privileged roles)
 
-3.  Click the **Columns** button and select all the available columns and click **Apply.**
+- The tenant is compliant if the value of X is less than or equal to 1.
 
-4.  Review the score for the action named **Use least privileged administrative roles.**
+When performing these instructions count each distinct username only once. Do not double count.
 
-5.  Review the **current score** value and compare it to the **max score**. If the current score is not the maximum value and the status is not **Completed**, you must perform the improvement actions. If that is the case, follow the detailed action steps and check the score again after 48 hours to ensure compliance.
+1. Follow the instructions for policy MS.AAD.7.1v1 above to get a count of users assigned to the Global Administrator role.
+
+2. Follow the instructions for policy MS.AAD.7.1v1 above but get a count of users assigned to the other highly privileged roles (not Global Administrator). If a user is assigned to both Global Administrator and other roles, only count that user for the Global Administrator assignment (i.e. the numerator in the calculation above).
+
+3. Divide the value from step 2 from the value from step 1 to calculate X. If X is less than or equal to 1 then the tenant is compliant.
 
 #### MS.AAD.7.3v1 Instructions
 
