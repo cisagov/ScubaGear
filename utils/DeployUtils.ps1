@@ -160,12 +160,17 @@ function ConfigureScubaGearModule{
         Tags = 'CISA', 'Microsoft 365', 'O365', 'Microsoft Entra Id', 'Configuration', 'Exchange', 'Report', 'Security', 'SharePoint', 'Defender', 'Teams', 'PowerPlatform', 'OneDrive'
     }
 
-    Update-ModuleManifest @ManifestUpdates
-
-    $CurrentErrorActionPreference = $ErrorActionPreference
-    $ErrorActionPreference = "SilentlyContinue"
-    $Result = Test-ModuleManifest -Path $ManifestPath
-    $ErrorActionPreference = $CurrentErrorActionPreference
+    try {
+        Update-ModuleManifest @ManifestUpdates
+        $CurrentErrorActionPreference = $ErrorActionPreference
+        $ErrorActionPreference = "SilentlyContinue"
+        $Result = Test-ModuleManifest -Path $ManifestPath
+        $ErrorActionPreference = $CurrentErrorActionPreference
+    }
+    catch {
+        Write-Error "Manifest is not valid"
+        $Result = $null
+    }
 
     return $null -ne $Result
 }
