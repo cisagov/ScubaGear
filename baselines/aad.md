@@ -638,7 +638,7 @@ Performing a manual review of highly privileged users per the instructions below
 
 3. Select the **Global administrator role.**
 
-4. Under **Manage**, select **Assignments.** If you have Azure AD PIM, repeat the steps below for both the **Eligible** and the **Active** assignments. If a group is listed, you will need to determine the members of the group and perform the steps for each group member.
+4. Under **Manage**, select **Assignments.** If you have Azure AD PIM, repeat the steps below for both the **Eligible** and the **Active** assignments. If a group is listed, you will need to determine the members of the group and perform the steps for each group member. If a group is enrolled in PIM for Groups, determine the members of the group from the PIM for Groups portal page and ensure to repeat the steps below for both the **Eligible** and the **Active** assignments.
 
 5. For each highly privileged user, execute the Powershell code below but replace the `username@somedomain.com` with the principal name of the user who is specific to your environment. You can get the data value from the **Principal name** field displayed in the Azure AD portal.
 
@@ -647,7 +647,7 @@ Performing a manual review of highly privileged users per the instructions below
     Get-MgBetaUser -Filter "userPrincipalName eq 'username@somedomain.com'" | FL
     ```
 
-6. Review the output field named **OnPremisesImmutableId**. If this field has a data value, it means that this specific user is not cloud-only. If the user is not cloud-only, create a cloud-only account for that user, assign the user to their respective roles and then remove the account that is not cloud-only from Azure AD.
+6. Review the output field named **OnPremisesImmutableId**. If this field contains a data value, it means that this specific user is not cloud-only. If the user is not cloud-only, create a cloud-only account for that user, assign the user to their respective roles and then remove the account that is not cloud-only from Azure AD.
 
 #### MS.AAD.7.4v1 Instructions
 
@@ -657,7 +657,12 @@ Performing a manual review of highly privileged users per the instructions below
 
 3. Under **Manage**, select **Assignments** and click the **Active assignments** tab.
 
-4. Verify there are no users or groups with a value of **Permanent** in the **End time** column. If there are any, recreate those assignments to have an expiration date using Azure AD PIM or an alternative PAM system. The only exception to this policy is emergency access accounts and service accounts requiring perpetual active assignments. See policy MS.AAD.7.4v1 note section for details.
+4. Verify there are no users or groups with a value of **Permanent** in the **End time** column. If there are any, recreate those assignments to have an expiration date using Azure AD PIM or an alternative PAM system. If a group is identified and it is enrolled in PIM for Groups, see the exception cases below for details.
+
+Exception cases:
+- Emergency access accounts that require perpetual active assignment.
+- Service accounts that require perpetual active assignment.
+- If using PIM for Groups, a group that is enrolled in PIM is allowed to have a perpetual active assignment to a role because activation is handled by PIM for Groups.
 
 #### MS.AAD.7.5v1 Instructions
 
@@ -667,10 +672,9 @@ Performing a manual review of highly privileged users per the instructions below
 
 3. Select the **Global administrator role.**
 
-4. Under **Manage**, select **Assignments.** Repeat the steps below for both the **Eligible** and the **Active** Azure AD PIM assignments.
+4. Under **Manage**, select **Assignments.** and click the **Active assignments** tab.
 
 5. For each user or group listed, examine the value in the **Start time** column. If it contains a value of **-**, this indicates the respective user/group was assigned to that role outside of Azure AD PIM. If the role was assigned outside of Azure AD PIM, delete the assignment and recreate it using Azure AD PIM.
-
 
 #### MS.AAD.7.6v1 Instructions
 
