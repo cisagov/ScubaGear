@@ -86,10 +86,6 @@ function Export-EXOProvider {
     "exo_unsuccessful_commands": $UnSuccessfulCommands,
 "@
 
-    # We need to remove the backslash characters from the
-    # json, otherwise rego gets mad.
-    $json = $json.replace("\`"", "'")
-    $json = $json.replace("\", "")
     $json
 }
 

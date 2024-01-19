@@ -203,10 +203,6 @@ $($_)
     "powerplatform_unsuccessful_commands": $PowerPlatformUnSuccessfulCommands,
 "@
 
-    # We need to remove the backslash characters from the
-    # json, otherwise rego gets mad.
-    $json = $json.replace("\`"", "'")
-    $json = $json.replace("\", "")
     $json = $json -replace "[^\x00-\x7f]","" # remove all characters that are not utf-8
     $json
 }

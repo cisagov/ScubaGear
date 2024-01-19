@@ -528,8 +528,14 @@ function Invoke-ProviderList {
                 $ProviderJSON
         }
 "@
-            $BaselineSettingsExport = $BaselineSettingsExport.replace("\`"", "'")
-            $BaselineSettingsExport = $BaselineSettingsExport.replace("\", "")
+
+            # Strip the character sequences that Rego tries to interpret as escape sequences,
+            # resulting in the error "unable to parse input: yaml: line x: found unknown escape character"
+            # "\/", ex: "\/Date(1705651200000)\/"
+            $BaselineSettingsExport = $BaselineSettingsExport.replace("\/", "")
+            # "\B", ex: "Removed an entry in Tenant Allow\Block List"
+            $BaselineSettingsExport = $BaselineSettingsExport.replace("\B", "/B")
+
             $FinalPath = Join-Path -Path $OutFolderPath -ChildPath "$($OutProviderFileName).json" -ErrorAction 'Stop'
             $BaselineSettingsExport | Set-Content -Path $FinalPath -Encoding $(Get-FileEncoding) -ErrorAction 'Stop'
             $ProdProviderFailed
