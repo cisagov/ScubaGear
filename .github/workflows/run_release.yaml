@@ -1,5 +1,4 @@
 on:
-on:
   workflow_dispatch:
     inputs:
       releaseName:
