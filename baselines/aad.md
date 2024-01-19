@@ -585,6 +585,8 @@ User activation of other highly privileged roles SHOULD trigger an alert.
 
 The following implementation instructions that reference the Azure AD PIM service will vary if using a third-party PAM system instead. 
 
+Many of the manual steps described per the instructions in this section are labor intensive. We recommend running the ScubaGear tool instead.
+
 #### MS.AAD.7.1v1 Instructions
 
 When performing these instructions count each distinct username only once. Do not double count. Once you finish counting go to the **Final Count** section.
@@ -619,7 +621,6 @@ There should be a total of two to eight users assigned to the role, including an
 5.  Review the **current score** value and compare it to the **max score**. If the current score is not the maximum value and the status is not **Completed**, you must perform the improvement actions. If that is the case, follow the detailed action steps and check the score again after 48 hours to ensure compliance.
 
 #### MS.AAD.7.3v1 Instructions
-Performing a manual review of highly privileged users per the instructions below to determine which ones are not cloud-only is labor intensive; we recommend running the ScubaGear tool instead. ScubaGear will provide a list of the highly privileged users that are not cloud-only.
 
 1. Perform the steps below for each highly privileged role. We reference the Global Administrator role as an example.
 
