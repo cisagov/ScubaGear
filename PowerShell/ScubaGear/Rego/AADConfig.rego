@@ -697,19 +697,20 @@ tests contains {
 # MS.AAD.7.2v1
 #--
 
-# Save all users that have the Global Admin role
+# Save all users that don't have Global Admin role
 NotGlobalAdmins contains User.DisplayName if {
     some User in input.privileged_users
     not "Global Administrator" in User.roles
 }
 
+#calculate secure score as ratio of priv users with global admin role to priv users without global admin role
 SecureScore(GlobalAdmins, NotGlobalAdmins) := Description if {
     count(NotGlobalAdmins) > 0
     x := count(GlobalAdmins)/count(NotGlobalAdmins)*100
     Description := concat(" ", ["Secure Score:", format_int(x,10)])
 } else := "No privileged users that are NOT Global Admin; Secure Score cannot be calculated at this time."
 
-# At this time we are unable to test for 7.2v1
+# Pass if secure score is <= 1, fail if secure score is > 1, flag if secure score is undefined
 tests contains {
     "PolicyId": "MS.AAD.7.2v1",
     "Criticality" : "Shall",

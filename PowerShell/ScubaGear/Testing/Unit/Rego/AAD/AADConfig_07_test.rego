@@ -123,15 +123,32 @@ test_PrivilegedUsers_Incorrect_V2 if {
 #--
 # Policy MS.AAD.7.2v1
 #--
-test_NotImplemented_Correct if {
-    PolicyId := "MS.AAD.7.2v1"
 
-    Output := aad.tests with input as { }
+test_SecureScore_Correct_V1 if {
+    Output := aad.tests with input as {
+        "privileged_users": {
+            "User1": {
+                "DisplayName": "Test Name1",
+                "roles": [
+                    "Privileged Role Administrator",
+                    "Global Administrator"
+                ]
+            },
+            "User2": {
+                "DisplayName": "Test Name2",
+                "roles": [
+                    "Privileged Role Administrator"
+                ]
+            }
+        }
+    }
 
-    ReportDetailString := NotCheckedDetails(PolicyId)
-    TestResult(PolicyId, Output, ReportDetailString, false) == true
+      ReportDetailStr := concat("", [
+        "secure score"
+    ])
+
+    TestResult("MS.AAD.7.2v1", PASS, ReportDetailStr, true) == true
 }
-#--
 
 #--
 # Policy MS.AAD.7.3v1
