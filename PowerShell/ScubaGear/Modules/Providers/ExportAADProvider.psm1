@@ -90,7 +90,7 @@ function Export-AADProvider {
     $ServicePlans = ConvertTo-Json -Depth 3 @($ServicePlans)
 
     #Obtains license information for tenant
-    $LicenseInfo = $Tracker.TryCommand("Get-MgBetaSubscribedSku") | Select-Object -Property Sku*, ConsumedUnits -ExpandProperty PrepaidUnits | ConvertTo-Json
+    $LicenseInfo = $Tracker.TryCommand("Get-MgBetaSubscribedSku") | Select-Object -Property Sku*, ConsumedUnits, PrepaidUnits | ConvertTo-Json -Depth 3
 
     # 5.1, 5.2, 8.1 & 8.3
     $AuthZPolicies = ConvertTo-Json @($Tracker.TryCommand("Get-MgBetaPolicyAuthorizationPolicy"))
