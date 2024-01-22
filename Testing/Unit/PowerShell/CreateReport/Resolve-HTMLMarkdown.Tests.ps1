@@ -31,8 +31,10 @@ InModuleScope CreateReport {
             @{ OriginalString = "**A test string.**"; HTMLReplace = "bold"; HTMLTranslation = "<b>(.*?)</b>"}
         ){
             $ResolvedString = Resolve-HTMLMarkdown -OriginalString $OriginalString -HTMLReplace $HTMLReplace
-            #$ResolvedString.StartsWith("#$GoupNumber") | Should -BeTrue
-            $ResolvedString -Contains $HTMLTranslation | Should -BeTrue
+            $ResolvedString -Match $HTMLTranslation | Should -BeTrue
         }
     }
-}
+    AfterAll {
+        Remove-Module CreateReport -ErrorAction SilentlyContinue
+        }
+    }
