@@ -110,7 +110,6 @@ function Export-AADProvider {
     $SuccessfulCommands = ConvertTo-Json @($Tracker.GetSuccessfulCommands())
     $UnSuccessfulCommands = ConvertTo-Json @($Tracker.GetUnSuccessfulCommands())
 
-
     # Note the spacing and the last comma in the json is important
     $json = @"
     "conditional_access_policies": $AllPolicies,
@@ -125,7 +124,7 @@ function Export-AADProvider {
     "domain_settings": $DomainSettings,
     "aad_successful_commands": $SuccessfulCommands,
     "aad_unsuccessful_commands": $UnSuccessfulCommands,
-    "Licensing Information": $LicenseInfo,
+    "licensing_information": $LicenseInfo,
 "@
 
     $json
