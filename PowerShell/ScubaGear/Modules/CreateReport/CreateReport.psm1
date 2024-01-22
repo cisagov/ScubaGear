@@ -390,6 +390,8 @@ function Resolve-HTMLMarkdown{
         $ResolvedString = $OriginalString -replace '(\*\*)(.*?)(\*\*)', '<b>${2}</b>'
         return $ResolvedString
     } else {
+        $InvalidHTMLReplace = New-Object System.ArgumentException "$HTMLReplace is not valid"
+        throw $InvalidHTMLReplace
         return $OriginalString
     }
 }
