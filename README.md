@@ -4,9 +4,10 @@
         <img src="https://img.shields.io/badge/ScubaGear-v1.0.0-%2328B953?labelColor=%23005288" /></a>
 </p>
 
-Developed by CISA, ScubaGear is an assessment tool that verifies a Microsoft 365 (M365) tenant’s configuration conforms to the policies described in the Secure Cloud Business Applications ([SCuBA](https://cisa.gov/scuba)) Security Configuration Baseline [documents](https://github.com/cisagov/ScubaGear/tree/main/baselines).
+Developed by CISA, ScubaGear is an assessment tool that verifies a Microsoft 365 (M365) tenant’s configuration conforms to the policies described in the Secure Cloud Business Applications ([SCuBA](https://cisa.gov/scuba)) Security Configuration Baseline [documents](https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines).
 
-## Table of Contents <!-- omit in toc -->
+## Table of Contents
+- [Table of Contents](#table-of-contents)
 - [M365 Product License Assumptions](#m365-product-license-assumptions)
 - [Getting Started](#getting-started)
   - [Download the Latest Release](#download-the-latest-release)
@@ -43,6 +44,7 @@ Developed by CISA, ScubaGear is an assessment tool that verifies a Microsoft 365
     - [ScubaGear Support](#scubagear-support)
     - [Removing installed modules](#removing-installed-modules)
 - [Project License](#project-license)
+
 ## M365 Product License Assumptions
 This tool was tested against tenants that have an M365 E3 or G3 and E5 or G5 license bundle. It may still function for tenants that do not have one of these bundles.
 
