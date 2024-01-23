@@ -675,6 +675,11 @@ GlobalAdmins contains User.DisplayName if {
     "Global Administrator" in User.roles
 }
 
+GlobalAdminConditions := [
+        count(GlobalAdmins) <= 8,
+        count(GlobalAdmins) >= 2
+]
+
 # Pass if there are at least 2, but no more than 8
 # users with Global Admin role.
 tests contains {
@@ -686,11 +691,11 @@ tests contains {
     "RequirementMet": Status
 } if {
     DescriptionString := "global admin(s) found"
-    Conditions := [
-        count(GlobalAdmins) <= 8,
-        count(GlobalAdmins) >= 2
-    ]
-    Status := count(FilterArray(Conditions, false)) == 0
+  #  Conditions := [
+  #      count(GlobalAdmins) <= 8,
+  #      count(GlobalAdmins) >= 2
+   # ]
+    Status := count(FilterArray(GlobalAdminConditions, false)) == 0
 }
 #--
 
@@ -703,15 +708,18 @@ NotGlobalAdmins contains User.DisplayName if {
     not "Global Administrator" in User.roles
 }
 
-#calculate secure score as ratio of priv users with global admin role to priv users without global admin role
+#calculate least privilege score as ratio of priv users with global admin role to priv users without global admin role
 LeastPrivilegeScore(GlobalAdmins, NotGlobalAdmins) := Description if {
+    count(GlobalAdmins) > 8
+    Description := "Too many Global Admins to support calculation of Least Privilege Score"
+} else if {
     count(NotGlobalAdmins) > 0
     x := count(GlobalAdmins)/count(NotGlobalAdmins)*100
     Description := concat(" ", ["Least Privilege Score:", format_int(x,10)])
-} else := "No privileged users that are NOT Global Admin; Least Privilege Score cannot be calculated at this time."
+} else := "No privileged users that are NOT Global Admin; Least Privilege Score = 100%."
 
 
-# Pass if secure score is <= 1, fail if secure score is > 1, flag if secure score is undefined
+# Pass if secure score is < 1, fail if secure score is => 1
 tests contains {
     "PolicyId": "MS.AAD.7.2v1",
     "Criticality" : "Shall",
@@ -720,7 +728,14 @@ tests contains {
     "ReportDetails" : concat(": ", [ReportDetailsBoolean(Status), LeastPrivilegeScore(GlobalAdmins,NotGlobalAdmins)]),
     "RequirementMet" : Status
 } if {
-    Status := count(GlobalAdmins) < count(NotGlobalAdmins)
+    #Status := (count(GlobalAdmins) < count(NotGlobalAdmins)) && (count(FilterArray(GlobalAdminConditions, false)) == 0)
+    #DescriptionString := "global admin(s) found"
+    Conditions := [
+        count(GlobalAdmins) <= 8,
+        count(GlobalAdmins) >= 2,
+        count(GlobalAdmins) < count(NotGlobalAdmins)
+    ]
+    Status := count(FilterArray(Conditions, false)) == 0
 }
 #--
 
