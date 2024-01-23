@@ -1,14 +1,12 @@
 $OrchestratorPath = '../../../../Modules/Orchestrator.psm1'
-$ScubaConfigPath = '../../../../Modules/ScubaConfig/ScubaConfig.psm1'
-$ConnectionPath = '../../../../Modules/Connection/Connection.psm1'
-
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath $OrchestratorPath) -Force
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath $ScubaConfigPath) -Force
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath $ConnectionPath) -Function Disconnect-SCuBATenant -Force
 
 InModuleScope Orchestrator {
     Context  "Parameter override test"{
         BeforeAll{
+            $ConnectionPath = '../../../../Modules/Connection/Connection.psm1'
+            Import-Module (Join-Path -Path $PSScriptRoot -ChildPath $ConnectionPath) -Function Disconnect-SCuBATenant -Force
+
             function SetupMocks{
                 $script:TestSplat = @{}
                 Mock -ModuleName Orchestrator Remove-Resources {}
