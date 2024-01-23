@@ -18,8 +18,10 @@ $WebDriverPath = Join-Path -Path (Get-Module -Name Selenium).ModuleBase -ChildPa
 
 #>
 param (
-    $RegistryRoot = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths",
-    $WebDriversPath = "C:\Program Files\WindowsPowerShell\Modules\Selenium\3.0.1\assemblies"
+    [Parameter(Mandatory=$false)]
+    [ValidateScript({Test-Path -Path $_ -PathType Container})]
+    [string]
+    $RegistryRoot = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths"
 )
 
 function Get-LocalDriverVersion{
@@ -95,6 +97,8 @@ function DownLoadDriver{
     return $true
 }
 
+$SeleniumPath = (Get-Module -ListAvailable -Name Selenium).Path
+$WebDriversPath = (Get-Item $SeleniumPath).DirectoryName + "\assemblies"
 $ChromeRegistryPath  = "$RegistryRoot\chrome.exe"
 $ChromeDriverPath    = "$WebDriversPath\chromedriver.exe"
 
