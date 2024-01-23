@@ -44,7 +44,7 @@ InModuleScope -ModuleName ExportAADProvider {
                             }
                             "Get-MgBetaUserCount" {
                                 $this.SuccessfulCommands += $Command
-                                return 25
+                                return [pscustomobject]@{}
                             }
                             "Get-PrivilegedUser" {
                                 $this.SuccessfulCommands += $Command
