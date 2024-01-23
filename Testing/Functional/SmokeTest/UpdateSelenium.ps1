@@ -100,7 +100,7 @@ $ChromeDriverPath    = "$WebDriversPath\chromedriver.exe"
 
 # firstly check which browser versions are installed (from registry)
 $chromeVersion = (Get-Item (Get-ItemProperty $ChromeRegistryPath).'(Default)').VersionInfo.ProductVersion -as [System.Version]
-Write-Debug -Message "Current installed Chrome driver version(registery):  $chromeVersion"
+Write-Debug -Message "Current installed Chrome driver version(registry):  $chromeVersion"
 
 # check which driver versions are installed
 $localDriverVersion = Get-LocalDriverVersion -pathToDriver $ChromeDriverPath
