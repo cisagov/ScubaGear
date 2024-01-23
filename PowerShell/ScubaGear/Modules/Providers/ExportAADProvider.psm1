@@ -89,8 +89,9 @@ function Export-AADProvider {
     }
     $ServicePlans = ConvertTo-Json -Depth 3 @($ServicePlans)
 
-    #Obtains license information for tenant
+    #Obtains license information for tenant and total number of active users
     $LicenseInfo = $Tracker.TryCommand("Get-MgBetaSubscribedSku") | Select-Object -Property Sku*, ConsumedUnits, PrepaidUnits | ConvertTo-Json -Depth 3
+    $ActiveUsers = Get-MgBetaUserCount -ConsistencyLevel eventual
 
     # 5.1, 5.2, 8.1 & 8.3
     $AuthZPolicies = ConvertTo-Json @($Tracker.TryCommand("Get-MgBetaPolicyAuthorizationPolicy"))
@@ -123,6 +124,7 @@ function Export-AADProvider {
     "authentication_method": $AuthenticationMethodPolicy,
     "domain_settings": $DomainSettings,
     "licensing_information": $LicenseInfo,
+    "active_users": $ActiveUsers,
     "aad_successful_commands": $SuccessfulCommands,
     "aad_unsuccessful_commands": $UnSuccessfulCommands,
 "@
