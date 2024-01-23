@@ -32,7 +32,19 @@ InModuleScope -ModuleName ExportAADProvider {
                                         }
                                     )
                                     ServicePlanName = 'AAD_PREMIUM_P2'
+                                    SkuPartNumber = 'AAD_Tester'
+                                    SkuId = '00000-00000-00000-00000'
+                                    ConsumedUnits = 5
+                                    PrepaidUnits = @{
+                                        Enabled = 10
+                                        Suspended = 0
+                                        Warning = 0
+                                    }
                                 }
+                            }
+                            "Get-MgBetaUserCount" {
+                                $this.SuccessfulCommands += $Command
+                                return 25
                             }
                             "Get-PrivilegedUser" {
                                 $this.SuccessfulCommands += $Command
