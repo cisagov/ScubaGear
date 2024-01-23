@@ -727,8 +727,10 @@ GetScoreDescription := ScoreDescription if {
 LeastPrivilegeScore(GlobalAdmins, NotGlobalAdmins) := Description if {
     count(FilterArray(GlobalAdminConditions, false)) == 1
     Description := "Policy MS.AAD.7.1 failed so Least Privilege Score is not meaningful"
+    print("Description", Description)
 } else {
    Description := GetScoreDescription
+   print("Description", Description)
 }
 
 # Pass if 7.1 passed and Least Privilege Score < 1, fail if 7.1 failed or Least Privilege score is >= 1
