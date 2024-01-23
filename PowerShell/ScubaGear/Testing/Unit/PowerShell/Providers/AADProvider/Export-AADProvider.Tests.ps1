@@ -42,10 +42,10 @@ InModuleScope -ModuleName ExportAADProvider {
                                     }
                                 }
                             }
-                            "Get-MgBetaUserCount" {
-                                $this.SuccessfulCommands += $Command
-                                return [pscustomobject]@{}
-                            }
+                            # "Get-MgBetaUserCount" {
+                            #     $this.SuccessfulCommands += $Command
+                            #     return [pscustomobject]@{}
+                            # }
                             "Get-PrivilegedUser" {
                                 $this.SuccessfulCommands += $Command
                                 return [pscustomobject]@{}
