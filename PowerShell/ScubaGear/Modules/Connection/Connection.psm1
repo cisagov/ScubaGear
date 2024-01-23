@@ -196,6 +196,7 @@ function Connect-Tenant {
                                ClientId = $ServicePrincipalParams.CertThumbprintParams.AppID;
                                Tenant  = $ServicePrincipalParams.CertThumbprintParams.Organization; # Organization Domain is actually required here.
                            }
+                           $env:PNPPOWERSHELL_UPDATECHECK = "false"  # disable PnP update banner
                            Connect-PnPOnline @PnPParams | Out-Null
                        }
                        else {
