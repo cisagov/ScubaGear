@@ -100,7 +100,7 @@ InModuleScope Orchestrator {
                 ){
                     $script:TestSplat[$Parameter] | Should -BeExactly $Value -Because "got $($script:TestSplat[$Parameter])"
             }
-        } 
+        }
     }
 }
 AfterAll {
