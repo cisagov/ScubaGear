@@ -7,139 +7,103 @@ Import-Module (Join-Path -Path $PSScriptRoot -ChildPath $ScubaConfigPath) -Force
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath $ConnectionPath) -Function Disconnect-SCuBATenant
 
 InModuleScope Orchestrator {
-    Describe -Tag 'Orchestrator' -Name 'Invoke-Scuba with Config' {
-        BeforeAll {
-            Mock -ModuleName Orchestrator Remove-Resources {}
-            Mock -ModuleName Orchestrator Import-Resources {}
-            Mock -ModuleName Orchestrator Invoke-Connection { @() }
-            Mock -ModuleName Orchestrator Get-TenantDetail { '{"DisplayName": "displayName"}' }
-            Mock -ModuleName Orchestrator Invoke-ProviderList {}
-            Mock -ModuleName Orchestrator Invoke-RunRego {}
-            Mock -ModuleName Orchestrator Invoke-ReportCreation {}
-            # Local function is added here to enable external module to run with top level Pester-Tests
-            Function Disconnect-SCuBATenant {}
-            Mock -ModuleName Connection Disconnect-SCuBATenant {}
-            Mock -CommandName New-Item {}
-            Mock -CommandName Copy-Item {}
+    Context  "Parameter override test"{
+        BeforeAll{
+            function SetupMocks{
+                $script:TestSplat = @{}
+                Mock -ModuleName Orchestrator Remove-Resources {}
+                Mock -ModuleName Orchestrator Import-Resources {}
+                Mock -ModuleName Orchestrator Invoke-Connection {
+                    $script:TestSplat.Add('LogIn', $LogIn)
+                }
+                Mock -ModuleName Orchestrator Get-TenantDetail { '{"DisplayName": "displayName"}' }
+                Mock -ModuleName Orchestrator Invoke-ProviderList {
+                    $script:TestSplat.Add('AppID', $BoundParameters.AppID)
+                    $script:TestSplat.Add('Organization', $BoundParameters.Organization)
+                    $script:TestSplat.Add('CertificateThumbprint', $BoundParameters.CertificateThumbprint)
+                }
+                Mock -ModuleName Orchestrator Invoke-RunRego {
+                    $script:TestSplat.Add('OPAPath', $OPAPath)
+                    $script:TestSplat.Add('OutProviderFileName', $OutProviderFileName)
+                    $script:TestSplat.Add('OutRegoFileName', $OutRegoFileName)
+                }
+                Mock -ModuleName Orchestrator Invoke-ReportCreation {
+                    $script:TestSplat.Add('ProductNames', $ProductNames)
+                    $script:TestSplat.Add('M365Environment', $M365Environment)
+                    $script:TestSplat.Add('OutPath', $ScubaConfig.OutPath)
+                    $script:TestSplat.Add('OutFolderName', $ScubaConfig.OutFolderName)
+                    $script:TestSplat.Add('OutReportName', $ScubaConfig.OutReportName)
+                }
+                Mock -ModuleName Orchestrator Disconnect-SCuBATenant {
+                    $script:TestSplat.Add('DisconnectOnExit', $DisconnectOnExit)
+                }
+                Mock -CommandName New-Item {}
+                Mock -CommandName Copy-Item {}
+            }
         }
-        Context 'Testing Invoke-Scuba with -ConfigFilePath arg and parameter override' {
+
+        Describe -Tag 'Orchestrator' -Name 'Invoke-Scuba config with no command line override' {
             BeforeAll {
-
-                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'SplatParamsRef')]
-
-                # Set up the reference comparison with unmodified parameters by reading the hash from the config file
-                $ConfigFile = ( Join-Path -Path $PSScriptRoot  -ChildPath "orchestrator_config_test.yaml" )
-                $Content = Get-Content -Raw -Path $ConfigFile
-                $ScubaConfRef = $Content | ConvertFrom-Yaml
-                # Set up the splat params to point to this file ( this will be cloned and modified for overrides )
-                $SplatParamsRef = @{
-                    ConfigFilePath = $ConfigFile
-                }
-
-                # Set up the splat params to reference a config file without authentication parameters
-                # but supply then explicitly as arguments.  Use the authentication values from the reference above
-
-                $ConfigFileNoCreds = ( Join-Path -Path $PSScriptRoot  -ChildPath "orchestrator_config_test_no_creds.yaml" )
-                $SplatParamsCreds = @{
-                    ConfigFilePath = $ConfigFileNoCreds
-                    Organization = $ScubaConfRef.Organization
-                    AppID = $ScubaConfRef.AppID
-                    CertificateThumbprint = $ScubaConfRef.CertificateThumbprint
-                }
-
-                # General function to to compare overrides
-                function OverrideTest( $ModKey, $ModValue) {
-                    # Add the modified parameter as passed in parameter
-                    $SplatParams = $SplatParamsRef.Clone()
-                    $SplatParams[$ModKey] = $ModValue
-                    Invoke-Scuba @SplatParams
-                    # The values setup by the override are propagated by the orchestrator
-                    # into the Scuba config singleton
-                    $ConfTest = [ScubaConfig]::GetInstance().Configuration
-                    $pass = $true
-                    if ( (Compare-Object @($ScubaConfRef.keys) @($ConfTest.keys)))
-                    {
-                        $pass = $false
-                    }
-                    else
-                    {
-                        # Test all values to be sure that the override parameter matches modified value
-                        # The other values should be the same
-                        foreach ($key in $ConfTest.keys )
-                        {
-                            if ( $key -eq $Modkey ) {
-                                $isDifferentValue = ( $null -ne (Compare-Object  $ModValue $ConfTest.$key ))
-                            }
-                            else {
-                                $isDifferentValue =  ( $null -ne ( Compare-Object  $ScubaConfRef.$key $ConfTest.$key ))<# Action when all if and elseif conditions are false #>
-                            }
-                        }
-                        if ( $IsDifferentValue )
-                        {
-                            $pass=$false
-                        }
-                        return $pass
-                    }
-                }
-
-                # Credentials test:  pass the credentials as an argument combined with a
-                # config file that does not have them
-                function CredsTest() {
-                    $pass = $true
-                    Invoke-Scuba @SplatParamsCreds
-                    $ConfTestCreds = [ScubaConfig]::GetInstance().Configuration
-
-                    # Scuba config should now have the results with auth params
-                    # Verify that all values are present and match
-                    if ( (Compare-Object @($ScubaTestCreds.keys) @($ScubaConfRef.keys)))
-                    {
-                        $pass = $false
-                    }
-                    foreach ($key in $ConfTestCreds.keys )
-                    {
-                        if ( $null -ne ( Compare-Object  $ConfTestCreds.$key  $ScubaConfRef.$key ))
-                        {
-                            $pass = $false
-                        }
-                    }
-                    return $pass
-                }
+                SetupMocks
+                Invoke-SCuBA -ConfigFilePath (Join-Path -Path $PSScriptRoot -ChildPath "orchestrator_config_test.yaml")
             }
 
-            It "Verify override parameter ""<parameter>"" with value ""<value>""" -ForEach @(
-                @{ Parameter = "M365Environment";       Value = "gcc"                           }
-                @{ Parameter = "M365Environment";       Value = "commercial"                    }
-                @{ Parameter = "ProductNames";          Value = "teams"                         }
-                @{ Parameter = "ProductNames";          Value = @("teams","aad")                }
-                @{ Parameter = "OPAPath";               Value = ".."                            }
-                @{ Parameter = "Login";                 Value = $false                          }
-                @{ Parameter = "DisconnectOnExit";      Value = $true                           }
-                @{ Parameter = "OutPath";               Value = ".."                           }
-                @{ Parameter = "OutFolderName";         Value = "M365BaselineConformance_mod"   }
-                @{ Parameter = "OutProviderFileName";   Value = "ProviderSettingsExport_mod"    }
-                @{ Parameter = "OutRegoFileName";       Value = "TestResults_mod"               }
-                @{ Parameter = "OutReportName";         Value = "BaselineReports_mod"           }
-                @{ Parameter = "Organization";          Value = "mod.sub.domain.com"            }
-                @{ Parameter = "AppID";                 Value = "0123456789badbad"              }
-                @{ Parameter = "CertificateThumbprint"; Value = "BADBAD9786543210"              }
+            It "Verify parameter ""<parameter>"" with value ""<value>""" -ForEach @(
+                @{ Parameter = "M365Environment";       Value = "commercial"           },
+                @{ Parameter = "ProductNames";          Value = @("teams")             },
+                @{ Parameter = "OPAPath";               Value = "."                    },
+                @{ Parameter = "LogIn";                 Value = $true                  },
+                @{ Parameter = "OutPath";               Value = ".."                   },
+                @{ Parameter = "OutFolderName";         Value = "ScubaReports"         },
+                @{ Parameter = "OutProviderFileName";   Value = "TenantSettingsExport" },
+                @{ Parameter = "OutRegoFileName";       Value = "ScubaTestResults"     },
+                @{ Parameter = "OutReportName";         Value = "ScubaReports"         },
+                @{ Parameter = "Organization";          Value = "sub.domain.com"       },
+                @{ Parameter = "AppID";                 Value = "7892dfe467aef9023be"  },
+                @{ Parameter = "CertificateThumbprint"; Value = "8A673F1087453ABC894"  }
                 ){
-                    OverrideTest $Parameter $Value | Should -Be $true
+                    $script:TestSplat[$Parameter] | Should -BeExactly $Value -Because "got $($script:TestSplat[$Parameter])"
             }
-
-            It "Verify credentials passed in that are not in config file" {
-                Invoke-Scuba @SplatParamsCreds
-                # $ConfTestCreds.AppID | Should -Not -BeExactly $ScubaConfRef.AppID
-                $ConfTestCreds = [ScubaConfig]::GetInstance().Configuration
-                if ( (Compare-Object @($ScubaConfRef.keys) @($ConfTestCreds.keys)))
-                {
-                    CredsTest | Should -Be $true
-                }
-
-            }
-
         }
+        Describe -Tag 'Orchestrator' -Name 'Invoke-Scuba config with command line override' {
+            BeforeAll {
+                SetupMocks
+                Invoke-SCuBA `
+                  -M365Environment "gcc" `
+                  -ProductNames "aad" `
+                  -OPAPath $env:TEMP `
+                  -LogIn:$false `
+                  -OutPath $env:TEMP `
+                  -OutFolderName "MyReports" `
+                  -OutProviderFileName "MySettingsExport" `
+                  -OutRegoFileName "RegoResults" `
+                  -OutReportName "MyReport" `
+                  -Organization "good.four.us" `
+                  -AppID "1212121212121212121" `
+                  -CertificateThumbprint "AB123456789ABCDEF01" `
+                  -ConfigFilePath (Join-Path -Path $PSScriptRoot -ChildPath "orchestrator_config_test.yaml")
+            }
+
+            It "Verify parameter ""<parameter>"" with value ""<value>""" -ForEach @(
+                @{ Parameter = "M365Environment";       Value = "gcc"                  },
+                @{ Parameter = "ProductNames";          Value = @("aad")               },
+                @{ Parameter = "OPAPath";               Value = $env:TEMP              },
+                @{ Parameter = "LogIn";                 Value = $false                 },
+                @{ Parameter = "OutPath";               Value = $env:TEMP              },
+                @{ Parameter = "OutFolderName";         Value = "MyReports"            },
+                @{ Parameter = "OutProviderFileName";   Value = "MySettingsExport"     },
+                @{ Parameter = "OutRegoFileName";       Value = "RegoResults"          },
+                @{ Parameter = "OutReportName";         Value = "MyReport"             },
+                @{ Parameter = "Organization";          Value = "good.four.us"         },
+                @{ Parameter = "AppID";                 Value = "1212121212121212121"  },
+                @{ Parameter = "CertificateThumbprint"; Value = "AB123456789ABCDEF01"  }
+                ){
+                    $script:TestSplat[$Parameter] | Should -BeExactly $Value -Because "got $($script:TestSplat[$Parameter])"
+            }
+        } 
     }
 }
 AfterAll {
     Remove-Module Orchestrator -ErrorAction SilentlyContinue
+    Remove-Module Connection -ErrorAction SilentlyContinue
 }
