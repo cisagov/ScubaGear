@@ -157,15 +157,20 @@ function ConfigureScubaGearModule{
         ModuleVersion = $ModuleVersion
         ProjectUri = "https://github.com/cisagov/ScubaGear"
         LicenseUri = "https://github.com/cisagov/ScubaGear/blob/main/LICENSE"
-        Tags = 'CISA', 'AzureAD', 'Cloud', 'Configuration', 'Exchange', 'Report', 'Security', 'SharePoint', 'Defender', 'Teams', 'PowerPlatform'
+        Tags = 'CISA', 'Microsoft 365', 'O365', 'Microsoft Entra Id', 'Configuration', 'Exchange', 'Report', 'Security', 'SharePoint', 'Defender', 'Teams', 'PowerPlatform', 'OneDrive'
     }
 
-    Update-ModuleManifest @ManifestUpdates
-
-    $CurrentErrorActionPreference = $ErrorActionPreference
-    $ErrorActionPreference = "SilentlyContinue"
-    $Result = Test-ModuleManifest -Path $ManifestPath
-    $ErrorActionPreference = $CurrentErrorActionPreference
+    try {
+        Update-ModuleManifest @ManifestUpdates
+        $CurrentErrorActionPreference = $ErrorActionPreference
+        $ErrorActionPreference = "SilentlyContinue"
+        $Result = Test-ModuleManifest -Path $ManifestPath
+        $ErrorActionPreference = $CurrentErrorActionPreference
+    }
+    catch {
+        Write-Error "Manifest is not valid"
+        $Result = $null
+    }
 
     return $null -ne $Result
 }
