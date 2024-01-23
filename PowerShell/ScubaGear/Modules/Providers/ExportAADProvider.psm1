@@ -203,7 +203,7 @@ function Get-PrivilegedUser {
                 }
                 # If the current role has not already been added to the user's roles array then add the role
                 if ($PrivilegedUsers[$User.Id].roles -notcontains $Role.DisplayName) {
-                    $PrivilegedUsers[$User.Id].roles += $Role.DisplayName   
+                    $PrivilegedUsers[$User.Id].roles += $Role.DisplayName
                 }
             }
 
