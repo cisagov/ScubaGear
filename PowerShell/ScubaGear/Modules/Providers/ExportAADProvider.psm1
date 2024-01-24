@@ -123,7 +123,7 @@ function Export-AADProvider {
     "directory_settings": $DirectorySettings,
     "authentication_method": $AuthenticationMethodPolicy,
     "domain_settings": $DomainSettings,
-    "licensing_information": $LicenseInfo,
+    "license_information": $LicenseInfo,
     "user_count": $UserCount,
     "aad_successful_commands": $SuccessfulCommands,
     "aad_unsuccessful_commands": $UnSuccessfulCommands,
