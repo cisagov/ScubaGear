@@ -11,6 +11,7 @@ Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "$($ProviderPath)/Provid
 InModuleScope -ModuleName ExportAADProvider {
     Describe -Tag 'ExportAADProvider' -Name "Export-AADProvider" {
         BeforeAll {
+            Mock -Module "ExportAADProvider" Get-MgBetaUserCount { 10 }
             class MockCommandTracker {
                 [string[]]$SuccessfulCommands = @()
                 [string[]]$UnSuccessfulCommands = @()
@@ -63,6 +64,14 @@ InModuleScope -ModuleName ExportAADProvider {
                                 return [pscustomobject]@{}
                             }
                             "Get-MgBetaPolicyAdminConsentRequestPolicy" {
+                                $this.SuccessfulCommands += $Command
+                                return [pscustomobject]@{}
+                            }
+                            "Get-MgBetaPolicyAuthenticationMethodPolicy" {
+                                $this.SuccessfulCommands += $Command
+                                return [pscustomobject]@{}
+                            }
+                            "Get-MgBetaDomain"{
                                 $this.SuccessfulCommands += $Command
                                 return [pscustomobject]@{}
                             }
