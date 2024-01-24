@@ -83,6 +83,10 @@ InModuleScope Orchestrator {
                 }
                 {Invoke-Scuba @SplatParams} | Should -Not -Throw
             }
+            It 'Should only run each baseline once if provider names contains duplicates' {
+                {Invoke-Scuba -ProductNames aad,aad} | Should -Not -Throw
+		Assert-MockCalled Invoke-ReportCreation -ParameterFilter {$ProductNames -eq 'aad'}
+            }
         }
         Context 'Service Principal provided'{
             It 'All items given as not null or empty'{
