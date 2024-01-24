@@ -5,9 +5,8 @@ InModuleScope ScubaConfig {
         context 'JSON Configuration' {
             BeforeEach{
                 [ScubaConfig]::ResetInstance()
-                $ScubaConfigTestFile = Join-Path -Path $PSScriptRoot -ChildPath config_test_duplicate_provider.json
                 $Config = [ScubaConfig]::GetInstance()
-		$Config.LoadConfig($ScubaConfigTestFile)
+		$Config.Configuration.ProductNames = @('aad', 'aad')
             }
             It 'Should not contain duplicate product names'{
                 $Config.Configuration.ProductNames | Should -BeExactly @('aad')
