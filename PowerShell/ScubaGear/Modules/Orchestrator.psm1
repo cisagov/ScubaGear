@@ -284,14 +284,14 @@ function Invoke-SCuBA {
                 }
             }
 
-            # New the bound parameters contain the following
+            # Now the bound parameters contain the following
             # 1) Non Authentication Parameters explicitly passed in
             # 2) Authentication parameters ( passed in or from the config file as per code above )
             #
-            # So to provide for a command line override of config values just set the correspoding
-            # config value from the bound parametersrs to override.  Thsi is redundant copy for
+            # So to provide for a command line override of config values just set the corresponding
+            # config value from the bound parameters to override.  This is redundant copy for
             # the authentication parameters ( but keeps the logic simpler)
-            # We do not allow ConfigFilePath to be copied as it will be propegated to the
+            # We do not allow ConfigFilePath to be copied as it will be propagated to the
             # config module by reference and causes issues
             #
             foreach ( $value in $PSBoundParameters.keys ) {
