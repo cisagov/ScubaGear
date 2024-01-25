@@ -11,7 +11,7 @@ default BASELINEVERSION := "main"
 
 BASELINEVERSION := input.module_version
 
-SCUBABASEURL := sprintf("https://github.com/cisagov/ScubaGear/blob/%v/baselines/", [BASELINEVERSION])
+SCUBABASEURL := sprintf("https://github.com/cisagov/ScubaGear/blob/%v/PowerShell/ScubaGear/baselines/", [BASELINEVERSION])
 
 
 ########################
