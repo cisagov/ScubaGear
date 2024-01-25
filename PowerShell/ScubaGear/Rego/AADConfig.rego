@@ -729,7 +729,6 @@ tests contains {
         count(GlobalAdmins) <= count(NotGlobalAdmins)
     ]
     Status := count(FilterArray(Conditions, false)) == 0
-    print("Status:", Status)
 }
 #--
 

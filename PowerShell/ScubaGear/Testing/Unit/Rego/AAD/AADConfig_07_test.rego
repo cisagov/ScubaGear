@@ -204,9 +204,6 @@ test_SecureScore_Incorrect_V1 if {
 
     ReportDetailStr := "Requirement met: Least Privilege Score = 100%"
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == "MS.AAD.7.2v1"]
-    print(RuleOutput)
-
     TestResult("MS.AAD.7.2v1", Output, ReportDetailStr, true) == true
 }
 
@@ -238,9 +235,6 @@ test_SecureScore_Incorrect_V2 if {
     }
 
     ReportDetailStr := "Requirement not met: Least Privilege Score = 200%"
-
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == "MS.AAD.7.2v1"]
-    print(RuleOutput)
 
     TestResult("MS.AAD.7.2v1", Output, ReportDetailStr, false) == true
 }
