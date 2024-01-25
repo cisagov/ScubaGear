@@ -110,29 +110,34 @@ function Invoke-SCuBA {
     #>
     [CmdletBinding(DefaultParameterSetName='Report')]
     param (
+        [Parameter(Mandatory = $false, ParameterSetName = 'Configuration')]
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
         [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
         [string[]]
         $ProductNames = @("teams", "exo", "defender", "aad", "sharepoint"),
 
+        [Parameter(Mandatory = $false, ParameterSetName = 'Configuration')]
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $false)]
         [ValidateNotNullOrEmpty()]
         [string]
         $M365Environment = "commercial",
 
+        [Parameter(Mandatory = $false, ParameterSetName = 'Configuration')]
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateScript({Test-Path -PathType Container $_})]
         [string]
         $OPAPath = (Join-Path -Path $env:USERPROFILE -ChildPath ".scubagear\Tools"),
 
+        [Parameter(Mandatory = $false, ParameterSetName = 'Configuration')]
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
         [ValidateSet($true, $false)]
         [boolean]
         $LogIn = $true,
 
+        [Parameter(Mandatory = $false, ParameterSetName = 'Configuration')]
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
         [switch]
@@ -143,41 +148,49 @@ function Invoke-SCuBA {
         [switch]
         $Version,
 
+        [Parameter(Mandatory = $false, ParameterSetName = 'Configuration')]
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
         [string]
         $AppID,
 
+        [Parameter(Mandatory = $false, ParameterSetName = 'Configuration')]
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
         [string]
         $CertificateThumbprint,
 
+        [Parameter(Mandatory = $false, ParameterSetName = 'Configuration')]
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
         [string]
         $Organization,
 
+        [Parameter(Mandatory = $false, ParameterSetName = 'Configuration')]
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
         [string]
         $OutPath = '.',
 
+        [Parameter(Mandatory = $false, ParameterSetName = 'Configuration')]
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
         [string]
         $OutFolderName = "M365BaselineConformance",
 
+        [Parameter(Mandatory = $false, ParameterSetName = 'Configuration')]
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
         [string]
         $OutProviderFileName = "ProviderSettingsExport",
 
+        [Parameter(Mandatory = $false, ParameterSetName = 'Configuration')]
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
         [string]
         $OutRegoFileName = "TestResults",
 
+        [Parameter(Mandatory = $false, ParameterSetName = 'Configuration')]
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
         [string]
@@ -197,6 +210,7 @@ function Invoke-SCuBA {
         [System.IO.FileInfo]
         $ConfigFilePath,
 
+        [Parameter(Mandatory = $false, ParameterSetName = 'Configuration')]
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
         [switch]
@@ -245,6 +259,7 @@ function Invoke-SCuBA {
 
         # Loads and executes parameters from a Configuration file
         if ($PSCmdlet.ParameterSetName -eq 'Configuration'){
+            [ScubaConfig]::ResetInstance()
             if (-Not ([ScubaConfig]::GetInstance().LoadConfig($ConfigFilePath))){
                 Write-Error -Message "The config file failed to load: $ConfigFilePath"
             }
@@ -252,10 +267,38 @@ function Invoke-SCuBA {
                 $ScubaConfig = [ScubaConfig]::GetInstance().Configuration
             }
 
-            if ($ScubaConfig.AppID){
-                $PSBoundParameters.Add("AppID", $ScubaConfig.AppID)
-                $PSBoundParameters.Add("CertificateThumbprint", $ScubaConfig.CertificateThumbprint)
-                $PSBoundParameters.Add("Organization", $ScubaConfig.Organization)
+            # Authentications parameters use below
+            $SPparams = 'AppID', 'CertificateThumbprint', 'Organization'
+
+            # Bound parameters indicate a parameter has been passed in.
+            # However authentication parameters are special and are not handled within
+            # the config module (since you can't make a default).  If an authentication
+            # parameter is set in the config file but not supplied on the command line
+            # set the Bound parameters value which make it appear as if it was supplied on the
+            # command line
+
+            foreach ( $value in $SPparams )
+            {
+                if  ( $ScubaConfig[$value] -and  (-not  $PSBoundParameters[$value] )) {
+                    $PSBoundParameters.Add($value, $ScubaConfig[$value])
+                }
+            }
+
+            # Now the bound parameters contain the following
+            # 1) Non Authentication Parameters explicitly passed in
+            # 2) Authentication parameters ( passed in or from the config file as per code above )
+            #
+            # So to provide for a command line override of config values just set the corresponding
+            # config value from the bound parameters to override.  This is redundant copy for
+            # the authentication parameters ( but keeps the logic simpler)
+            # We do not allow ConfigFilePath to be copied as it will be propagated to the
+            # config module by reference and causes issues
+            #
+            foreach ( $value in $PSBoundParameters.keys ) {
+                if ( $value -ne "ConfigFilePath" )
+                {
+                    $ScubaConfig[$value] = $PSBoundParameters[$value]
+                }
             }
         }
 

@@ -1,0 +1,17 @@
+Description: YAML Configuration file for unit test of ConfigFilePath overrides
+ProductNames:
+  - teams
+M365Environment: commercial
+OPAPath: .
+LogIn: true
+DisconnectOnExit: false
+OutPath: ..
+OutFolderName: ScubaReports
+OutProviderFileName: TenantSettingsExport
+OutRegoFileName: ScubaTestResults
+OutReportName: ScubaReports
+
+# Test parameters for credentials
+Organization: sub.domain.com
+AppID: 7892dfe467aef9023be
+CertificateThumbprint: 8A673F1087453ABC894
