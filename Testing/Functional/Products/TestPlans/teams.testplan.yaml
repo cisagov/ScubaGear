@@ -78,7 +78,11 @@ TestPlan:
         ExpectedResult: false
       - TestDescription: MS.TEAMS.1.4v1 Non-compliant - AutoAdmittedUsers = Everyone
         Preconditions:
-          - Command: Set-CsTeamsMeetingPolicy
+        - Command: Set-CsTeamsMeetingPolicy
+            Splat:
+              Identity: Global
+              AllowPSTNUsersToBypassLobby: true
+        - Command: Set-CsTeamsMeetingPolicy
             Splat:
               Identity: Global
               AutoAdmittedUsers: EveryOne
