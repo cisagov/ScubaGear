@@ -91,7 +91,14 @@ function Export-AADProvider {
 
     #Obtains license information for tenant and total number of active users
     $LicenseInfo = $Tracker.TryCommand("Get-MgBetaSubscribedSku") | Select-Object -Property Sku*, ConsumedUnits, PrepaidUnits | ConvertTo-Json -Depth 3
-    $UserCount = $Tracker.TryCommand("Get-MgBetaUserCount", @{"ConsistencyLevel"='eventual'})
+    try {
+        # Checking to ensure an exception isn't thrown by this command
+        $UserCount = $Tracker.TryCommand("Get-MgBetaUserCount", @{"ConsistencyLevel"='eventual'})
+    }
+    catch {
+        Write-Warning "Error obtaining users count, invalid json returned."
+        $UserCount = "[]"
+    }
 
     # 5.1, 5.2, 8.1 & 8.3
     $AuthZPolicies = ConvertTo-Json @($Tracker.TryCommand("Get-MgBetaPolicyAuthorizationPolicy"))
