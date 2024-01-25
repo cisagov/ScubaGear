@@ -95,9 +95,9 @@ function Export-AADProvider {
     # Checking to ensure command runs successfully
     $UserCount = $Tracker.TryCommand("Get-MgBetaUserCount", @{"ConsistencyLevel"='eventual'})  
 
-    if(-Not $UserCount -is [int]) {  
-        $UserCount = "NaN"  
-    }  
+    if(-Not $UserCount -is [int]) {
+        $UserCount = "NaN"
+    }
 
     # 5.1, 5.2, 8.1 & 8.3
     $AuthZPolicies = ConvertTo-Json @($Tracker.TryCommand("Get-MgBetaPolicyAuthorizationPolicy"))
