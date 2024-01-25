@@ -8,7 +8,6 @@
     .PARAMETER RepositoryName
     Name of the private repository
     .EXAMPLE
-    Get-Location
     $TestContainers = @()
     $TestContainers += New-PesterContainer -Path "src/Testing/Functional/BuildTest" -Data @{ }
     $PesterConfig = @{

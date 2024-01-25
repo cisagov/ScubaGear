@@ -384,7 +384,7 @@ function Resolve-HTMLMarkdown{
 
     # Replace markdown with italics substitution
     if ($HTMLReplace.ToLower() -match "italic") {
-        $ResolvedString = $OriginalString -replace '(_)(.*?)(_)', '<i>${2}</i>'
+        $ResolvedString = $OriginalString -replace '(_)([^\v][^_]*[^\v])?(_)', '<i>${2}</i>'
         return $ResolvedString
     } elseif($HTMLReplace.ToLower() -match "bold") {
         $ResolvedString = $OriginalString -replace '(\*\*)(.*?)(\*\*)', '<b>${2}</b>'
