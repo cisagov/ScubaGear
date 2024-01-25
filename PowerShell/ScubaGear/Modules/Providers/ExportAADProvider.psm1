@@ -91,7 +91,7 @@ function Export-AADProvider {
 
     #Obtains license information for tenant and total number of active users
     $LicenseInfo = $Tracker.TryCommand("Get-MgBetaSubscribedSku") | Select-Object -Property Sku*, ConsumedUnits, PrepaidUnits | ConvertTo-Json -Depth 3
-    $UserCount = Get-MgBetaUserCount -ConsistencyLevel eventual
+    $UserCount = $Tracker.TryCommand("Get-MgBetaUserCount", @{"ConsistencyLevel"='eventual'})
 
     # 5.1, 5.2, 8.1 & 8.3
     $AuthZPolicies = ConvertTo-Json @($Tracker.TryCommand("Get-MgBetaPolicyAuthorizationPolicy"))
