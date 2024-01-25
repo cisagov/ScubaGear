@@ -196,25 +196,56 @@ function Get-PrivilegedUser {
             $Objecttype = $User.AdditionalProperties."@odata.type" -replace "#microsoft.graph."
 
             if ($Objecttype -eq "user") {
+                # If the user's data has not been fetched from graph, go get it
                 if (-Not $PrivilegedUsers.ContainsKey($User.Id)) {
                     $AADUser = Get-MgBetaUser -ErrorAction Stop -UserId $User.Id
                     $PrivilegedUsers[$AADUser.Id] = @{"DisplayName"=$AADUser.DisplayName; "OnPremisesImmutableId"=$AADUser.OnPremisesImmutableId; "roles"=@()}
                 }
-                $PrivilegedUsers[$User.Id].roles += $Role.DisplayName
+                # If the current role has not already been added to the user's roles array then add the role
+                if ($PrivilegedUsers[$User.Id].roles -notcontains $Role.DisplayName) {
+                    $PrivilegedUsers[$User.Id].roles += $Role.DisplayName
+                }
             }
 
             elseif ($Objecttype -eq "group") {
                 # In this context $User.Id is a group identifier
-                $GroupMembers = Get-MgBetaGroupMember -All -ErrorAction Stop -GroupId $User.Id
+                $GroupId = $User.Id
+                # Get all of the group members that are Active assigned to the current role
+                $GroupMembers = Get-MgBetaGroupMember -All -ErrorAction Stop -GroupId $GroupId
 
                 foreach ($GroupMember in $GroupMembers) {
                     $Membertype = $GroupMember.AdditionalProperties."@odata.type" -replace "#microsoft.graph."
                     if ($Membertype -eq "user") {
+                        # If the user's data has not been fetched from graph, go get it
                         if (-Not $PrivilegedUsers.ContainsKey($GroupMember.Id)) {
                             $AADUser = Get-MgBetaUser -ErrorAction Stop -UserId $GroupMember.Id
                             $PrivilegedUsers[$AADUser.Id] = @{"DisplayName"=$AADUser.DisplayName; "OnPremisesImmutableId"=$AADUser.OnPremisesImmutableId; "roles"=@()}
                         }
-                        $PrivilegedUsers[$GroupMember.Id].roles += $Role.DisplayName
+                        # If the current role has not already been added to the user's roles array then add the role
+                        if ($PrivilegedUsers[$GroupMember.Id].roles -notcontains $Role.DisplayName) {
+                            $PrivilegedUsers[$GroupMember.Id].roles += $Role.DisplayName
+                        }
+                    }
+                }
+
+                # If the premium license for PIM is there, process the users that are "member" of the PIM group as Eligible
+                if ($TenantHasPremiumLicense) {
+                    # Get the users that are assigned to the PIM group as Eligible members
+                    $PIMGroupMembers = Get-MgBetaIdentityGovernancePrivilegedAccessGroupEligibilityScheduleInstance -All -ErrorAction Stop -Filter "groupId eq '$GroupId'"
+                    foreach ($GroupMember in $PIMGroupMembers) {
+                        # If the user is not a member of the PIM group (i.e. they are an owner) then skip them
+                        if ($GroupMember.AccessId -ne "member") { continue }
+                        $PIMEligibleUserId = $GroupMember.PrincipalId
+
+                        # If the user's data has not been fetched from graph, go get it
+                        if (-not $PrivilegedUsers.ContainsKey($PIMEligibleUserId)) {
+                            $AADUser = Get-MgBetaUser -ErrorAction Stop -UserId $PIMEligibleUserId
+                            $PrivilegedUsers[$PIMEligibleUserId] = @{"DisplayName"=$AADUser.DisplayName; "OnPremisesImmutableId"=$AADUser.OnPremisesImmutableId; "roles"=@()}
+                        }
+                        # If the current role has not already been added to the user's roles array then add the role
+                        if ($PrivilegedUsers[$PIMEligibleUserId].roles -notcontains $Role.DisplayName) {
+                            $PrivilegedUsers[$PIMEligibleUserId].roles += $Role.DisplayName
+                        }
                     }
                 }
             }
@@ -237,11 +268,15 @@ function Get-PrivilegedUser {
                 try {
                     $UserType = "user"
 
+                    # If the user's data has not been fetched from graph, go get it
                     if (-Not $PrivilegedUsers.ContainsKey($UserObjectId)) {
                         $AADUser = Get-MgBetaUser -ErrorAction Stop -Filter "Id eq '$UserObjectId'"
                         $PrivilegedUsers[$AADUser.Id] = @{"DisplayName"=$AADUser.DisplayName; "OnPremisesImmutableId"=$AADUser.OnPremisesImmutableId; "roles"=@()}
                     }
-                    $PrivilegedUsers[$UserObjectId].roles += $Role.DisplayName
+                    # If the current role has not already been added to the user's roles array then add the role
+                    if ($PrivilegedUsers[$UserObjectId].roles -notcontains $Role.DisplayName) {
+                        $PrivilegedUsers[$UserObjectId].roles += $Role.DisplayName
+                    }
                 }
                 # Catch the specific error which indicates Get-MgBetaUser does not find the user, therefore it is a group
                 catch {
@@ -253,17 +288,40 @@ function Get-PrivilegedUser {
                     }
                 }
 
-                # This if statement handles when the object eligible assigned is a Group
+                # This if statement handles when the object eligible assigned to the current role is a Group
                 if ($UserType -eq "group") {
+                    # Process the the users that are directly assigned to the group (not through PIM groups)
                     $GroupMembers = Get-MgBetaGroupMember -All -ErrorAction Stop -GroupId $UserObjectId
                     foreach ($GroupMember in $GroupMembers) {
                         $Membertype = $GroupMember.AdditionalProperties."@odata.type" -replace "#microsoft.graph."
                         if ($Membertype -eq "user") {
+                            # If the user's data has not been fetched from graph, go get it
                             if (-Not $PrivilegedUsers.ContainsKey($GroupMember.Id)) {
                                 $AADUser = Get-MgBetaUser -ErrorAction Stop -UserId $GroupMember.Id
                                 $PrivilegedUsers[$AADUser.Id] = @{"DisplayName"=$AADUser.DisplayName; "OnPremisesImmutableId"=$AADUser.OnPremisesImmutableId; "roles"=@()}
                             }
-                            $PrivilegedUsers[$GroupMember.Id].roles += $Role.DisplayName
+                            # If the current role has not already been added to the user's roles array then add the role
+                            if ($PrivilegedUsers[$GroupMember.Id].roles -notcontains $Role.DisplayName) {
+                                $PrivilegedUsers[$GroupMember.Id].roles += $Role.DisplayName
+                            }
+                        }
+                    }
+
+                    # Get the users that are assigned to the PIM group as Eligible members
+                    $PIMGroupMembers = Get-MgBetaIdentityGovernancePrivilegedAccessGroupEligibilityScheduleInstance -All -ErrorAction Stop -Filter "groupId eq '$UserObjectId'"
+                    foreach ($GroupMember in $PIMGroupMembers) {
+                        # If the user is not a member of the PIM group (i.e. they are an owner) then skip them
+                        if ($GroupMember.AccessId -ne "member") { continue }
+                        $PIMEligibleUserId = $GroupMember.PrincipalId
+
+                        # If the user's data has not been fetched from graph, go get it
+                        if (-not $PrivilegedUsers.ContainsKey($PIMEligibleUserId)) {
+                            $AADUser = Get-MgBetaUser -ErrorAction Stop -UserId $PIMEligibleUserId
+                            $PrivilegedUsers[$PIMEligibleUserId] = @{"DisplayName"=$AADUser.DisplayName; "OnPremisesImmutableId"=$AADUser.OnPremisesImmutableId; "roles"=@()}
+                        }
+                        # If the current role has not already been added to the user's roles array then add the role
+                        if ($PrivilegedUsers[$PIMEligibleUserId].roles -notcontains $Role.DisplayName) {
+                            $PrivilegedUsers[$PIMEligibleUserId].roles += $Role.DisplayName
                         }
                     }
                 }
@@ -329,3 +387,4 @@ function Get-PrivilegedRole {
 
     $AADRoles
 }
+
