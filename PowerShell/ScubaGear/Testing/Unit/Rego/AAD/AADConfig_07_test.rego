@@ -163,9 +163,6 @@ test_SecureScore_Correct_V1 if {
 
     ReportDetailStr := "Requirement met: Least Privilege Score = 66%"
 
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == "MS.AAD.7.2v1"]
-    print(RuleOutput)
-
     TestResult("MS.AAD.7.2v1", Output, ReportDetailStr, true) == true
 }
 
