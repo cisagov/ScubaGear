@@ -726,7 +726,7 @@ tests contains {
 } if {
     Conditions := [
         count(FilterArray(GlobalAdminConditions, false)) == 0,
-        count(GlobalAdmins) < count(NotGlobalAdmins)
+        count(GlobalAdmins) <= count(NotGlobalAdmins)
     ]
     Status := count(FilterArray(Conditions, false)) == 0
     print("Status:", Status)

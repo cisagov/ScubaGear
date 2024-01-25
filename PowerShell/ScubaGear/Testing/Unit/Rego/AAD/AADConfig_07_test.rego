@@ -169,7 +169,7 @@ test_SecureScore_Correct_V1 if {
     TestResult("MS.AAD.7.2v1", Output, ReportDetailStr, true) == true
 }
 
-#Incorrect because the ratio of global admins to non global admins is equal to 1
+#Correct because the ratio of global admins to non global admins is equal to 1
 test_SecureScore_Incorrect_V1 if {
     Output := aad.tests with input as {
         "privileged_users": {
@@ -202,12 +202,12 @@ test_SecureScore_Incorrect_V1 if {
         }
     }
 
-    ReportDetailStr := "Requirement not met: Least Privilege Score = 100%"
+    ReportDetailStr := "Requirement met: Least Privilege Score = 100%"
 
     RuleOutput := [Result | some Result in Output; Result.PolicyId == "MS.AAD.7.2v1"]
     print(RuleOutput)
 
-    TestResult("MS.AAD.7.2v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.AAD.7.2v1", Output, ReportDetailStr, true) == true
 }
 
 #Incorrect because the ratio of global admins to non global admins is more than 1
