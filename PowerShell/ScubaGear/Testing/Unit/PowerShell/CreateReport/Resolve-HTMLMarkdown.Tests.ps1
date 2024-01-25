@@ -22,7 +22,7 @@ InModuleScope CreateReport {
         It "Bad html replacement string" {
             {Resolve-HTMLMarkdown -OriginalString "A valid string" -HTMLReplace "underline"} |
                 Should -Throw -ExceptionType ArgumentException
-         }
+        }
     }
 
     Describe -tag "Resolve-HTMLMarkdown" -name 'Test resolve HTML Markdown in baseline descriptions' {
