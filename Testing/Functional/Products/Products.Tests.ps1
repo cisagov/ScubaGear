@@ -285,11 +285,11 @@ Describe "Policy Checks for <ProductName>"{
                 $Details | Should -Not -BeNullOrEmpty -Because "expect details, $Details"
 
                 if ($IsNotChecked){
-                    $Details | Should -Match 'Not currently checked automatically.'
+                    $Details | Should -Match 'This product does not currently have the capability to check compliance for this policy.+'
                 }
 
                 if ($IsCustomImplementation){
-                    $Details | Should -Match 'Custom implementation allowed.'
+                    $Details | Should -Match 'A custom product can be used to fulfill this policy requirement.+'
                 }
 
                 # Check final HTML output
@@ -354,11 +354,11 @@ Describe "Policy Checks for <ProductName>"{
 
                                     if ($IsCustomImplementation){
                                         $RowData[2].text | Should -BeLikeExactly "N/A" -Because "custom policies should not have results. [$Msg]"
-                                        $RowData[4].text | Should -Match 'Custom implementation allowed.'
+                                        $RowData[4].text | Should -Match 'A custom product can be used to fulfill this policy requirement.+'
                                     }
                                     elseif ($IsNotChecked){
                                         $RowData[2].text | Should -BeLikeExactly "N/A" -Because "custom policies should not have results. [$Msg]"
-                                        $RowData[4].text | Should -Match 'Not currently checked automatically.'
+                                        $RowData[4].text | Should -Match 'This product does not currently have the capability to check compliance for this policy.+'
                                     }
                                     elseif ($true -eq $ExpectedResult) {
                                         $RowData[2].text | Should -BeLikeExactly "Pass" -Because "expected policy to pass. [$Msg]"

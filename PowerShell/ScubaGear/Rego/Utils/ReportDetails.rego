@@ -11,8 +11,7 @@ default BASELINEVERSION := "main"
 
 BASELINEVERSION := input.module_version
 
-SCUBABASEURL := sprintf("https://github.com/cisagov/ScubaGear/blob/%v/PowerShell/ScubaGear/baselines/", [BASELINEVERSION])
-
+SCUBABASEURL := sprintf("https://github.com/cisagov/ScubaGear/blob/v%v/PowerShell/ScubaGear/baselines/", [BASELINEVERSION])
 
 ########################
 # Not Implemented Link #
@@ -37,20 +36,23 @@ PolicyLink(PolicyId) := sprintf(
 
 # Not Implemented Report Details methods
 NotCheckedDetails(PolicyId) := sprintf(
-    "Not currently checked automatically. See %v for instructions on manual check",
+    concat(" ", [
+    "This product does not currently have the capability to check compliance for this policy.",
+    "See %v for instructions on manual check"
+    ]),
     [PolicyLink(PolicyId)]
 )
 
-# 3rd Party Not Implemented Report Details method
+# 3rd Party Report Details method
 DefenderMirrorDetails(PolicyId) := sprintf(
     concat(" ", [
     "A custom product can be used to fulfill this policy requirement.",
-    "If custom product is used, a 3rd party assessment tool or manually review is needed to ensure compliance.",
-    "See %v for instructions on manual check.",
+    "If a custom product is used, a 3rd party assessment tool or manually review is needed to ensure compliance.",
     "If you are using Defender for Office 365 to implement this policy,",
     "ensure that when running ScubaGear defender is in the ProductNames parameter.",
-    "Then, review the corresponding Defender for Office 365 policy that fulfills",
-    "the requirements of this policy."
+    "Then, manually review the corresponding Defender for Office 365 policy that fulfills",
+    "the requirements of this policy.",
+    "See %v for instructions on manual check."
     ]),
     [PolicyLink(PolicyId)]
 )
