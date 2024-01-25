@@ -569,7 +569,7 @@ See [MS.DEFENDER.4.1v1 Instructions](#msdefender41v1-instructions) steps
 1. Sign in to the **Microsoft Purview compliance portal**.
 
 2. Under **Solutions**, select **Data loss prevention**.
-  
+
 3. Go to **Endpoint DLP Settings**.
 
 4. Go to **Restricted apps and app groups**.

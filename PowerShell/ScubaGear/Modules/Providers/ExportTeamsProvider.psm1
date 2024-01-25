@@ -34,10 +34,6 @@ function Export-TeamsProvider {
     "teams_unsuccessful_commands": $TeamsUnSuccessfulCommands,
 "@
 
-    # We need to remove the backslash characters from the
-    # json, otherwise rego gets mad.
-    $json = $json.replace("\`"", "'")
-    $json = $json.replace("\", "")
     $json
 }
 
