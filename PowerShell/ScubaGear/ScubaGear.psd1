@@ -12,7 +12,7 @@
 RootModule = './ScubaGear.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.0.0'
+ModuleVersion = '1.1.0'
 
 # Supported PSEditions
 CompatiblePSEditions = 'Desktop'
@@ -27,7 +27,7 @@ Author = 'CISA'
 CompanyName = 'Cybersecurity and Infrastructure Security Agency'
 
 # Copyright statement for this module
-Copyright = '(c) 2023 CISA. All rights reserved.'
+Copyright = '(c) 2023-2024 CISA. All rights reserved.'
 
 # Description of the functionality provided by this module
 Description = @"
