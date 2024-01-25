@@ -1,5 +1,5 @@
-$CreateReportModulePath = Join-Path -Path $PSScriptRoot -ChildPath "../../../../PowerShell/ScubaGear/Modules/CreateReport/CreateReport.psm1"
-Import-Module $CreateReportModulePath
+$CreateReportModulePath = Join-Path -Path $PSScriptRoot -ChildPath "../../../../Modules/CreateReport/CreateReport.psm1"
+Import-Module $CreateReportModulePath -Force
 
 InModuleScope CreateReport {
     Describe -Tag "Resolve-HTMLMarkdown" -name "Parameter error handling" {
@@ -27,11 +27,11 @@ InModuleScope CreateReport {
 
     Describe -tag "Resolve-HTMLMarkdown" -name 'Test resolve HTML Markdown in baseline descriptions' {
         It "Test Valid html markdown resolution: <OriginalString> <HTMLReplace>" -ForEach @(
-            @{ OriginalString = "__A test string.__"; HTMLReplace = "italic"; HTMLTranslation = "<i>(.*?)</i>"},
-            @{ OriginalString = "**A test string.**"; HTMLReplace = "bold"; HTMLTranslation = "<b>(.*?)</b>"}
+            @{ OriginalString = "_A test string._"; HTMLReplace = "italic"; HTMLTranslation = "<i>A test string.</i>"},
+            @{ OriginalString = "**A test string.**"; HTMLReplace = "bold"; HTMLTranslation = "<b>A test string.</b>"}
         ){
             $ResolvedString = Resolve-HTMLMarkdown -OriginalString $OriginalString -HTMLReplace $HTMLReplace
-            $ResolvedString -Match $HTMLTranslation | Should -BeTrue
+            $ResolvedString -eq $HTMLTranslation | Should -BeTrue
         }
     }
     AfterAll {
