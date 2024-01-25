@@ -1,5 +1,4 @@
 # ScubaGear <!-- omit in toc -->
-# ScubaGear <!-- omit in toc -->
 <p>
         <a href="https://github.com/cisagov/ScubaGear/releases" alt="ScubaGear version #">
         <img src="https://img.shields.io/badge/ScubaGear-v1.0.0-%2328B953?labelColor=%23005288" /></a>
@@ -9,45 +8,7 @@ Developed by CISA, ScubaGear is an assessment tool that verifies a Microsoft 365
 
 ## Table of Contents
 - [Table of Contents](#table-of-contents)
-- [M365 Product License Assumptions](#m365-product-license-assumptions)
-- [Getting Started](#getting-started)
-  - [Download the Latest Release](#download-the-latest-release)
-  - [Installing the Required PowerShell Modules](#installing-the-required-powershell-modules)
-  - [Download the Required OPA executable](#download-the-required-opa-executable)
-  - [PowerShell Execution Policies](#powershell-execution-policies)
-- [Usage](#usage)
-  - [Importing the module](#importing-the-module)
-  - [Example 1: Run an assessment against all products (except PowerPlatform)](#example-1-run-an-assessment-against-all-products-except-powerplatform)
-  - [Example 2: Run an assessment against Azure Active Directory with custom report output location](#example-2-run-an-assessment-against-azure-active-directory-with-custom-report-output-location)
-  - [Example 3: Run assessments against multiple products](#example-3-run-assessments-against-multiple-products)
-  - [Example 4: Run assessments non-interactively using an application service principal and authenticating via CertificateThumbprint](#example-4-run-assessments-non-interactively-using-an-application-service-principal-and-authenticating-via-certificatethumbprint)
-  - [Parameter Definitions](#parameter-definitions)
-  - [AAD Conditional Access Policy Exemptions](#aad-conditional-access-policy-exemptions)
-  - [Viewing the Report](#viewing-the-report)
-- [Required Permissions](#required-permissions)
-  - [User Permissions](#user-permissions)
-  - [Microsoft Graph Powershell SDK permissions](#microsoft-graph-powershell-sdk-permissions)
-  - [Service Principal Application Permissions \& Setup](#service-principal-application-permissions--setup)
-    - [Power Platform App Registration](#power-platform-app-registration)
-- [Architecture](#architecture)
-- [Repository Organization](#repository-organization)
-- [Troubleshooting](#troubleshooting)
-  - [Executing against multiple tenants](#executing-against-multiple-tenants)
-  - [Errors connecting to Defender](#errors-connecting-to-defender)
-  - [Exchange Online maximum connections error](#exchange-online-maximum-connections-error)
-  - [Power Platform errors](#power-platform-errors)
-  - [Microsoft Graph Errors](#microsoft-graph-errors)
-    - [Infinite AAD Sign in Loop](#infinite-aad-sign-in-loop)
-    - [Error `Connect-MgGraph : Key not valid for use in specified state.`](#error-connect-mggraph--key-not-valid-for-use-in-specified-state)
-    - [Error `Could not load file or assembly 'Microsoft.Graph.Authentication'`](#error-could-not-load-file-or-assembly-microsoftgraphauthentication)
-  - [Running the Tool Behind Some Proxies](#running-the-tool-behind-some-proxies)
-  - [Utility Scripts](#utility-scripts)
-    - [ScubaGear Support](#scubagear-support)
-    - [Removing installed modules](#removing-installed-modules)
-- [Project License](#project-license)
-
 ## Table of Contents <!-- omit in toc -->
-- [Table of Contents](#table-of-contents)
 - [M365 Product License Assumptions](#m365-product-license-assumptions)
 - [Getting Started](#getting-started)
   - [Download the Latest Release](#download-the-latest-release)
