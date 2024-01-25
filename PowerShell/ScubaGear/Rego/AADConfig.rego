@@ -705,10 +705,11 @@ NotGlobalAdmins contains User.DisplayName if {
     not "Global Administrator" in User.roles
 }
 
+default GetScoreDescription := "No privileged users that are NOT Global Admin; Least Privilege Score = 100%"
 GetScoreDescription := concat("", ["Least Privilege Score = ", format_int(x,10), "%"]) if {
     count(NotGlobalAdmins) > 0
     x := count(GlobalAdmins)/count(NotGlobalAdmins)*100
-} else := "No privileged users that are NOT Global Admin; Least Privilege Score = 100%"
+}
 
 #calculate least privilege score as ratio of priv users with global admin role to priv users without global admin role
 LeastPrivilegeScore := "Policy MS.AAD.7.1 failed so Least Privilege Score is not meaningful" if {
