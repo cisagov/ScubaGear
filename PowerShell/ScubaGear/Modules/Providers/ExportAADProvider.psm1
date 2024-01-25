@@ -93,7 +93,7 @@ function Export-AADProvider {
     $LicenseInfo = $Tracker.TryCommand("Get-MgBetaSubscribedSku") | Select-Object -Property Sku*, ConsumedUnits, PrepaidUnits | ConvertTo-Json -Depth 3
 
     # Checking to ensure command runs successfully
-    $UserCount = $Tracker.TryCommand("Get-MgBetaUserCount", @{"ConsistencyLevel"='eventual'})  
+    $UserCount = $Tracker.TryCommand("Get-MgBetaUserCount", @{"ConsistencyLevel"='eventual'})
 
     if(-Not $UserCount -is [int]) {
         $UserCount = "NaN"
