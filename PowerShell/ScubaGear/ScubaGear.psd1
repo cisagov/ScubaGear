@@ -27,7 +27,7 @@ Author = 'CISA'
 CompanyName = 'Cybersecurity and Infrastructure Security Agency'
 
 # Copyright statement for this module
-Copyright = '(c) 2023-2024 CISA. All rights reserved.'
+Copyright = '(c) 2022-2024 CISA. All rights reserved.'
 
 # Description of the functionality provided by this module
 Description = @"
