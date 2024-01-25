@@ -265,7 +265,6 @@ function Import-SecureBaseline{
 
                 # Iterate over matched policy ids found
                 foreach ($LineNumber in $LineNumbers) {
-
                     $Value = [System.Net.WebUtility]::HtmlEncode($Value)
                     $Id = [string]$MdLines[$LineNumber].Substring(5)
 
@@ -283,6 +282,7 @@ function Import-SecureBaseline{
                     $MaxLineSearch = 20;
                     $Value = ([string]$MdLines[$LineNumber+$LineAdvance]).Trim()
                     $IsMalformedDescription = $false
+                    $IsList = $false
 
                     try {
                         if ([string]::IsNullOrWhiteSpace($Value)){
@@ -300,8 +300,20 @@ function Import-SecureBaseline{
                                 # Reached Criticality comment so policy description is complete.
                                 break
                             }
+
+                            # Policy description contains a list assuming list is denoted by a colon character.
+                            if ($Value[-1] -eq ":") {
+                                $isList = $true
+                            }
+
                             if (-not [string]::IsNullOrWhiteSpace([string]$MdLines[$LineNumber+$LineAdvance])) {
-                                $Value += "`n" + ([string]$MdLines[$LineNumber+$LineAdvance]).Trim()
+                                # List case, use newline character between value text
+                                if ($isList) {
+                                    $Value += "`n" + ([string]$MdLines[$LineNumber+$LineAdvance]).Trim()
+                                }
+                                else { # Value ending with newline char, use whitespace character between value text
+                                    $Value += " " + ([string]$MdLines[$LineNumber+$LineAdvance]).Trim()
+                                }
                             }
 
                             if ($LineAdvance -gt $MaxLineSearch){
@@ -309,6 +321,12 @@ function Import-SecureBaseline{
                                 break
                             }
                         }
+
+                        # Description italics substitution
+                        $Value = Resolve-HTMLMarkdown -OriginalString $Value -HTMLReplace "italic"
+
+                        # Description bold substitution
+                        $Value = Resolve-HTMLMarkdown -OriginalString $Value -HTMLReplace "bold"
 
                         $Group.Controls += @{"Id"=$Id; "Value"=$Value; "Deleted"=$Deleted; MalformedDescription=$IsMalformedDescription}
                     }
@@ -349,6 +367,32 @@ function New-MarkdownAnchor{
     else {
         $InvalidGroupNumber = New-Object System.ArgumentException "$GroupNumber is not valid"
         throw $InvalidGroupNumber
+    }
+}
+
+function Resolve-HTMLMarkdown{
+    param (
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $OriginalString,
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $HTMLReplace
+    )
+
+    # Replace markdown with italics substitution
+    if ($HTMLReplace.ToLower() -match "italic") {
+        $ResolvedString = $OriginalString -replace '(_)([^\v][^_]*[^\v])?(_)', '<i>${2}</i>'
+        return $ResolvedString
+    } elseif($HTMLReplace.ToLower() -match "bold") {
+        $ResolvedString = $OriginalString -replace '(\*\*)(.*?)(\*\*)', '<b>${2}</b>'
+        return $ResolvedString
+    } else {
+        $InvalidHTMLReplace = New-Object System.ArgumentException "$HTMLReplace is not valid"
+        throw $InvalidHTMLReplace
+        return $OriginalString
     }
 }
 
