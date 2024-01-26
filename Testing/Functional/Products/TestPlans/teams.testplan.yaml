@@ -93,6 +93,10 @@ TestPlan:
           - Command: Set-CsTeamsMeetingPolicy
             Splat:
               Identity: Global
+              AllowPSTNUsersToBypassLobby: false
+          - Command: Set-CsTeamsMeetingPolicy
+            Splat:
+              Identity: Global
               AutoAdmittedUsers: OrganizerOnly
         Postconditions: []
         ExpectedResult: false
