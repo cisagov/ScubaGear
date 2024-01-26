@@ -14,6 +14,6 @@ OutFolderName: M365BaselineConformance
 OutProviderFileName: ProviderSettingsExport
 OutRegoFileName: TestResults
 OutReportName: BaselineReports
-Organization: abcdef.organization.com
+Organization: abcdef.example.com
 AppID: 0123456789abcdef01234566789abcde
 CertificateThumbprint: fedcba9876543210fedcba9876543210fedcba98

@@ -6,6 +6,6 @@ ProductNames:
   - aad
   # - sharepoint
 M365Environment: commercial
-Organization: abcdef.organization.com
+Organization: abcdef.example.com
 AppID: 0123456789abcdef01234566789abcde
 CertificateThumbprint: fedcba9876543210fedcba9876543210fedcba98

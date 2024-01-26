@@ -170,28 +170,17 @@ a configuration file with the path specified by `-ConfigFilePath` parameter. It 
 
 All authentication parameters must be supplied on the command line if a non-interactive login is desired. 
 
-All of the configuration file examples referenced below are in the sample-config-files directory and the examples assume a Invoke-SCuBA is run in that directory. Each example
+All of the configuration file examples referenced below are in the [sample-config-files](./sample-config-files) directory and the examples assume a Invoke-SCuBA is run in that directory. Each example
 shows the sample config file name and a command line example with it.
 
-All authentication parameters shown are samples only. The user must supply correct parameters.
+The authentication parameter values shown below are examples only. The user must supply parameter values appropriate for their tenant and principal.
 
-**Minimal Use** : config file `minimal_config.yaml`
-Minimal use is typically specifying a product name and an M365 environment variable. In this example product is entered a a single value.
-```
-Description: YAML Minimal Config file ( one product )
-ProductNames: teams
-M365Environment: commercial
-```
-Command line 
-`Invoke-SCuBA -ConfigFilePath minimal_config.yaml`
-
-Command line with override of M365Environment
-```
-Invoke-SCuBA -M365Environment gcc -ConfigFilePath minimal_config.yaml
+**Basic Use** : config file `basic_config.yaml`
+Basic use specifies a product name and an M365 environment variable. In this example product is entered a a single value.
 ```
 
 **Typical Use** : config file `typical_config.yaml`
-Multiple products (can be specified in a list) and an M365 environment variable. Note that unneeded values are commented out.
+Typical use includes multiple products, specified as a list, and an M365 environment variable. Note that additional product values are commented out and will not be included, but are retained in the config file to easily add them back later.
 ```
 Description: YAML Typical Config ( multiple products )
 ProductNames:
@@ -204,14 +193,13 @@ M365Environment: commercial
 ```
 Command line with Auth Parameters
 ```
-Invoke-SCuBA -Organization abcdef.organization.com `
+Invoke-SCuBA -Organization abcdef.example.com `
              -AppID 0123456789abcdef01234566789abcde `
              -CertificateThumbprint: fedcba9876543210fedcba9876543210fedcba98 `
              -ConfigFilePath typical_config.yaml
 ```
 **Credential Use** : config file `creds_config.yaml`
-Credentials can be supplied in the config file. However the file is not encrypted so
-appropriate protection should be considered.
+Credentials, in the form of a service principal AppID and certificate thumbprint ID can be supplied in the config file. While these credentials alone do not provide access without the associated private key, appropriate protection should be considered if including them in a configuration file.
 ```
 Description: YAML Configuration file with credentials ( invalid ones )
 ProductNames:
@@ -221,7 +209,7 @@ ProductNames:
 - aad
 # - sharepoint
 M365Environment: commercial
-Organization: abcdef.organization.com
+Organization: abcdef.example.com
 AppID:  0123456789abcdef01234566789abcde
 CertificateThumbprint: fedcba9876543210fedcba9876543210fedcba98
 ```
@@ -231,8 +219,7 @@ Invoke-SCuBA -ProductNames  defender -ConfigFilePath typical_config.yaml
 ```
 
 **Full Use**: config file `full_config.yaml`
-This example shows all of the parameters supported by ScubaConfig specified in the config
-file. Any one of these parameters may be commented out. If not specified ( or commented out ). ScubaConfig will supply the default value for it unless overridden on the command line. This default value does not apply to authentication parameters.
+Full use shows all of the global parameters supported by ScubaConfig specified in the config file. Any one of these parameters may be commented out. If not specified or commented out, ScubaConfig will supply the default value instead unless overridden on the command line. This default value does not apply to authentication parameters.
 ```
 Description: YAML Configuration file with all parameters
 ProductNames:
@@ -250,7 +237,7 @@ OutFolderName: M365BaselineConformance
 OutProviderFileName: ProviderSettingsExport
 OutRegoFileName: TestResults
 OutReportName: BaselineReports
-Organization: abcdef.organization.com
+Organization: abcdef.example.com
 AppID:  0123456789abcdef01234566789abcde
 CertificateThumbprint: fedcba9876543210fedcba9876543210fedcba98
 ```
