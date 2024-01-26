@@ -20,6 +20,7 @@ Developed by CISA, ScubaGear is an assessment tool that verifies a Microsoft 365
   - [Example 3: Run assessments against multiple products](#example-3-run-assessments-against-multiple-products)
   - [Example 4: Run assessments non-interactively using an application service principal and authenticating via CertificateThumbprint](#example-4-run-assessments-non-interactively-using-an-application-service-principal-and-authenticating-via-certificatethumbprint)
   - [Parameter Definitions](#parameter-definitions)
+  - [Parameter Configuration File Syntax and Examples](#parameter-configuration-file-syntax-and-examples)
   - [AAD Conditional Access Policy Exemptions](#aad-conditional-access-policy-exemptions)
   - [Viewing the Report](#viewing-the-report)
 - [Required Permissions](#required-permissions)
@@ -43,6 +44,7 @@ Developed by CISA, ScubaGear is an assessment tool that verifies a Microsoft 365
     - [ScubaGear Support](#scubagear-support)
     - [Removing installed modules](#removing-installed-modules)
 - [Project License](#project-license)
+
 ## M365 Product License Assumptions
 This tool was tested against tenants that have an M365 E3 or G3 and E5 or G5 license bundle. It may still function for tenants that do not have one of these bundles.
 
@@ -158,7 +160,7 @@ Get-Help -Name Invoke-SCuBA -Full
 
 - **$OutPath** refers to the folder path where the output JSON and the HTML report will be created. Defaults to the same directory where the script is executed. This parameter is only necessary if an alternate report folder path is desired. The folder will be created if it does not exist.
 
-### Invoke-SCuBA Parameter Configuration File Syntax and Examples
+### Parameter Configuration File Syntax and Examples
 Most of the `Invoke-SCuBA` parameters supplied on the comment line can be placed into
 a configuration file with the path specified by `-ConfigFilePath` parameter. It should be noted that the following parameters are supported only on the command line.
 - ConfigFilePath
