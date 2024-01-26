@@ -178,6 +178,17 @@ The authentication parameter values shown below are examples only. The user must
 **Basic Use** : config file `basic_config.yaml`
 Basic use specifies a product name and an M365 environment variable. In this example product is entered a a single value.
 ```
+Description: YAML Minimal Config file ( one product )
+ProductNames: teams
+M365Environment: commercial
+```
+Command line 
+`Invoke-SCuBA -ConfigFilePath minimal_config.yaml`
+
+Command line with override of M365Environment
+```
+Invoke-SCuBA -M365Environment gcc -ConfigFilePath minimal_config.yaml
+```
 
 **Typical Use** : config file `typical_config.yaml`
 Typical use includes multiple products, specified as a list, and an M365 environment variable. Note that additional product values are commented out and will not be included, but are retained in the config file to easily add them back later.
