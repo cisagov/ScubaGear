@@ -68,14 +68,6 @@ TestPlan:
   - PolicyId: MS.TEAMS.1.4v1
     TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.TEAMS.1.4v1 Non-compliant - AutoAdmittedUsers = InvitedUsers
-        Preconditions:
-          - Command: Set-CsTeamsMeetingPolicy
-            Splat:
-              Identity: Global
-              AutoAdmittedUsers: InvitedUsers
-        Postconditions: []
-        ExpectedResult: false
       - TestDescription: MS.TEAMS.1.4v1 Non-compliant - AutoAdmittedUsers is Everyone
         Preconditions:
           - Command: Set-CsTeamsMeetingPolicy
@@ -86,6 +78,14 @@ TestPlan:
             Splat:
               Identity: Global
               AutoAdmittedUsers: EveryOne
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.TEAMS.1.4v1 Non-compliant - AutoAdmittedUsers = InvitedUsers
+        Preconditions:
+          - Command: Set-CsTeamsMeetingPolicy
+            Splat:
+              Identity: Global
+              AutoAdmittedUsers: InvitedUsers
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.TEAMS.1.4v1 Non-compliant - AutoAdmittedUsers = OrganizerOnly
