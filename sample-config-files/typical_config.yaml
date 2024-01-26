@@ -1,4 +1,4 @@
-Description: YAML Minimal Typical Configuration File ( multiple products )
+Description: YAML Typical Configuration File ( multiple products )
 ProductNames:
   - teams
   # - exo

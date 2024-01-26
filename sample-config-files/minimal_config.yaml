@@ -1,3 +1,3 @@
-Description: YAML Minimal Configuration file ( one product )
+Description: YAML Basic Configuration file ( one product )
 ProductNames: teams
-M365Environment: commercial
+M365Environment: gcc
