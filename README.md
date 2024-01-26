@@ -20,7 +20,7 @@ Developed by CISA, ScubaGear is an assessment tool that verifies a Microsoft 365
   - [Example 3: Run assessments against multiple products](#example-3-run-assessments-against-multiple-products)
   - [Example 4: Run assessments non-interactively using an application service principal and authenticating via CertificateThumbprint](#example-4-run-assessments-non-interactively-using-an-application-service-principal-and-authenticating-via-certificatethumbprint)
   - [Parameter Definitions](#parameter-definitions)
-  - [Parameter Configuration File Syntax and Examples](#parameter-configuration-file-syntax-and-examples)
+  - [ScubaGear Configuration File Syntax and Examples](#scubagear-configuration-file-syntax-and-examples)
   - [AAD Conditional Access Policy Exemptions](#aad-conditional-access-policy-exemptions)
   - [Viewing the Report](#viewing-the-report)
 - [Required Permissions](#required-permissions)
@@ -160,25 +160,24 @@ Get-Help -Name Invoke-SCuBA -Full
 
 - **$OutPath** refers to the folder path where the output JSON and the HTML report will be created. Defaults to the same directory where the script is executed. This parameter is only necessary if an alternate report folder path is desired. The folder will be created if it does not exist.
 
-### Parameter Configuration File Syntax and Examples
-Most of the `Invoke-SCuBA` parameters supplied on the comment line can be placed into
-a configuration file with the path specified by `-ConfigFilePath` parameter. It should be noted that the following parameters are supported only on the command line.
+### ScubaGear Configuration File Syntax and Examples
+Most of the `Invoke-SCuBA` cmdlet parameters can be placed into a configuration file with the path specified by the `-ConfigFilePath` parameter. Please note the following parameters are supported only on the command line.
+
 - ConfigFilePath
 - Version
 - DarkMode
 - Quiet
 
-All authentication parameters must be supplied on the command line if a non-interactive login is desired. 
+Each authentication parameter must be supplied either the command line or in the config file if a non-interactive login is supplied.  An authentication parameter may be present in both, but the command line will always take precedence. The parameters can be split between the config file and the command line.
 
-All of the configuration file examples referenced below are in the [sample-config-files](./sample-config-files) directory and the examples assume a Invoke-SCuBA is run in that directory. Each example
-shows the sample config file name and a command line example with it.
+All of the configuration file examples referenced below are in the [sample-config-files](./sample-config-files) directory and the examples assume a Invoke-SCuBA is run in that directory. Each example shows the sample config file name and a command line example with it.
 
 The authentication parameter values shown below are examples only. The user must supply parameter values appropriate for their tenant and principal.
 
 **Basic Use** : config file `basic_config.yaml`
 Basic use specifies a product name and an M365 environment variable. In this example product is entered a a single value.
 ```
-Description: YAML Minimal Config file ( one product )
+Description: YAML Basic Config file ( one product )
 ProductNames: teams
 M365Environment: commercial
 ```
