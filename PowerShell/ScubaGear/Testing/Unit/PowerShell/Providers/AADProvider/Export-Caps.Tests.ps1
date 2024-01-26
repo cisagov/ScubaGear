@@ -436,6 +436,12 @@ Describe "GetAccessControls" {
         $Controls | Should -Be "Allow access but require multifactor authentication"
     }
 
+    It "handles requiring terms of use" {
+        $Cap.GrantControls.TermsOfUse = @("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")
+        $Controls = $($CapHelper.GetAccessControls($Cap))
+        $Controls | Should -Be "Allow access but require terms of use"
+    }
+
     It "handles requiring multiple controls in AND mode" {
         $Cap.GrantControls.BuiltInControls = @("mfa", "compliantDevice", "domainJoinedDevice",
             "approvedApplication", "compliantApplication", "passwordChange")

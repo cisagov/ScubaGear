@@ -380,7 +380,7 @@ class CapHelper {
         $Missing = @()
         $Missing += $this.GetMissingKeys($Cap, @("GrantControls"))
         $Missing += $this.GetMissingKeys($Cap.GrantControls, @("AuthenticationStrength",
-        "BuiltInControls", "CustomAuthenticationFactors", "Operator"))
+        "BuiltInControls", "CustomAuthenticationFactors", "Operator", "TermsOfUse"))
         $Missing += $this.GetMissingKeys($Cap.GrantControls.AuthenticationStrength, @("DisplayName"))
         if ($Missing.Length -gt 0) {
             Write-Warning "Conditional access policy structure not as expected. The following keys are missing: $($Missing -Join ', ')"
@@ -397,6 +397,10 @@ class CapHelper {
                 $GrantControls = @($Cap.GrantControls.BuiltInControls | ForEach-Object {$this.GrantControlStrings[$_]})
                 if ($null -ne $Cap.GrantControls.AuthenticationStrength.DisplayName) {
                     $GrantControls += "authentication strength ($($Cap.GrantControls.AuthenticationStrength.DisplayName))"
+                }
+
+                if ($Cap.GrantControls.TermsOfUse.Length -gt 0) {
+                    $GrantControls += "terms of use"
                 }
 
                 $Output = "Allow access but require $($GrantControls -Join ', ')"
