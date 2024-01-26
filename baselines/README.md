@@ -1,0 +1,1 @@
+The baselines have been moved into the ScubaGear powershell module for easier distribution. For reference to the baselines, please go [here](https://github.com/cisagov/ScubaGear/tree/v1.0.0/PowerShell/ScubaGear/baselines)
