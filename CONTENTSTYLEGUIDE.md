@@ -396,3 +396,38 @@ ExampleArray contains OtherVar.name if {
 
 ## PowerShell
 [PoshCode's The PowerShell Best Practices and Style Guide](https://github.com/PoshCode/PowerShellPracticeAndStyle)
+
+## README Formatting
+This section is for standardizing how to format the README and it's table of contents (toc) for legibility.
+The formatting guidelines described below takes the VSCode [Markdown All in One](https://marketplace.visualstudio.com/items?itemName=yzhang.markdown-all-in-one) extension into account as the extension will auto-format the README for user. However, the extension is not required for ScubaGear development.
+
+To keep the table of contents in the README as a compact resource for users to.
+see the section they're looking for, please follow the guidelines below.
+
+### Character Limit
+If the section header is at a level 2 or level 3 i.e.`## Getting Started` `### Download the Latest Release` keep the section header to at most around 55 characters.
+
+This is to limit text stretching in the toc in the README.
+
+### Omit the Section Headers Including and Above the Table of Contents
+Add the ` <!-- omit in toc -->` comment to the `## Table of Contents` and `# ScubaGear` headers.
+
+**Example**
+```
+ # ScubaGear <!-- omit in toc -->
+```
+These sections are located above the table of contents and are thus unnecessary.
+The comment will prevent the Markdown All in One and perhaps extension from auto formatting the README.
+If your README extension or plugin allows so, add in a configuration item to also ignore auto inserting sections into the toc that have this comment.
+
+This should already be implemented in the current README but, this guideline is to reinforce the decision.
+
+### Omit the Section Headers Level 4 and Below
+If the section header is a level 4+ header i.e `#### Power Platform App Registration` add a omit comment.
+
+**Example**
+```
+#### Power Platform App Registration <!-- omit in toc -->
+```
+This is to prevent the depth of the table of contents in the README from becoming too deep.
+Deeply nested sections disrupt legibility of the TOC and should be avoided.
