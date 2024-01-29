@@ -79,7 +79,7 @@ Describe "Smoke Test: Generate Output" {
         ){
             Test-Path -Path "./$OutputFolder/$Item" -PathType $ItemType |
                 Should -Be $true
-        } 
+        }
     }
     Context "Verify exported functions for ScubaGear module" {
         BeforeAll{
@@ -119,7 +119,7 @@ Describe "Smoke Test: Generate Output" {
         )},
         @{Command='Copy-ScubaSampleReport'; CopiedFiles=@(
             (Join-Path -Path $env:USERPROFILE -ChildPath "ScubaGear/samples/reports/BaselineReports.html")
-        )}  
+        )}
     ){
         It "Validate call to <Command>" {
             {& $Command -Force} | Should -Not -Throw
