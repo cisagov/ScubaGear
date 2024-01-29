@@ -17,8 +17,6 @@ jobs:
         if: "!cancelled()"
         shell: powershell
         run: |
-          Get-Location
-          Test-Path -Path ./PowerShell/ScubaGear/ScubaGear.psd1 -PathType Leaf
           Import-Module -Name ./PowerShell/ScubaGear/ScubaGear.psd1
           Initialize-SCuBA
           Invoke-Pester -Output 'Detailed' -Path 'PowerShell/ScubaGear/Testing/Unit/PowerShell'

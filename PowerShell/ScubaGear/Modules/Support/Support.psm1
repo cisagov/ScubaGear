@@ -71,7 +71,7 @@ function Initialize-SCuBA {
         [string]
         $OPAExe = "",
 
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatory=$false, HelpMessage = 'Directory to contain ScubaGear artifacts. Defaults to <home>.')]
         [ValidateScript({Test-Path -Path $_ -PathType Container})]
         [string]
         $ScubaParentDirectory = $env:USERPROFILE
@@ -214,7 +214,7 @@ function Install-OPA {
         [string]
         $OperatingSystem  = "Windows",
 
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatory=$false, HelpMessage = 'Directory to contain ScubaGear artifacts. Defaults to <home>.')]
         [ValidateScript({Test-Path -Path $_ -PathType Container})]
         [string]
         $ScubaParentDirectory = $env:USERPROFILE
@@ -404,12 +404,15 @@ function InstallOPA {
 function Debug-SCuBA {
     [CmdletBinding()]
     param (
+        [Parameter(Mandatory=$false, , HelpMessage = 'Directory to contain debug report')]
         [string]
         $ReportPath = "$($($(Get-Item $PSScriptRoot).Parent).FullName)\Reports",
 
+        [Parameter(Mandatory=$false, HelpMessage = 'Include ScubaGear report on tenant configuration?')]
         [switch]
         $IncludeReports  = $false,
 
+        [Parameter(Mandatory=$false, HelpMessage = 'Include all available ScubaGear report on tenant configuration?')]
         [switch]
         $AllReports = $false
     )
