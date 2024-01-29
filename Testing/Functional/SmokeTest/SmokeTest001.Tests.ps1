@@ -79,10 +79,12 @@ Describe "Smoke Test: Generate Output" {
         ){
             Test-Path -Path "./$OutputFolder/$Item" -PathType $ItemType |
                 Should -Be $true
-        }    
+        } 
     }
     Context "Verify exported functions for ScubaGear module" {
         BeforeAll{
+            [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'ScubaGearExportedFunctions',
+            Justification = 'Variable is used in another scope')]
             $ScubaGearExportedFunctions = @(
                 'Disconnect-SCuBATenant',
                 'Invoke-RunCached',
@@ -91,6 +93,8 @@ Describe "Smoke Test: Generate Output" {
                 'Copy-ScubaSampleConfigFile',
                 'Copy-ScubaSampleReport'
             )
+            [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'ExportedCommands',
+            Justification = 'Variable is used in another scope')]
             $ExportedCommands = (Get-Module -Name ScubaGear).ExportedCommands
         }
         It "Is <_> exported?" -ForEach $ScubaGearExportedFunctions {
@@ -115,7 +119,7 @@ Describe "Smoke Test: Generate Output" {
         )},
         @{Command='Copy-ScubaSampleReport'; CopiedFiles=@(
             (Join-Path -Path $env:USERPROFILE -ChildPath "ScubaGear/samples/reports/BaselineReports.html")
-        )}      
+        )}  
     ){
         It "Validate call to <Command>" {
             {& $Command -Force} | Should -Not -Throw
