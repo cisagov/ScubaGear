@@ -1,4 +1,19 @@
+<#
+.SYNOPSIS
+  This class stores Scuba config data loaded from a file.
+.DESCRIPTION
+  This class is designed to function as a singleton. The singleton instance
+  is cached on the ScubaConfig type itself. In the context of tests, it is
+  important to call .ResetInstance before and after tests as needed to
+  ensure any preexisting configs are not inadvertantly used for the test,
+  or left in place after the test is finished.
+.EXAMPLE
+  $Config = [ScubaConfig]::GetInstance()
+  [ScubaConfig]::ResetInstance()
+  [ScubaConfig]::LoadConfig($SomePath)
+#>
 class ScubaConfig {
+
     hidden static [ScubaConfig]$_Instance = [ScubaConfig]::new()
     hidden static [Boolean]$_IsLoaded = $false
 
