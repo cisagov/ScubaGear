@@ -37,6 +37,21 @@ function Copy-ScubaBaselineDocument {
 }
 
 function Initialize-SCuBA {
+    <#
+    .SYNOPSIS
+        This script installs the required Powershell modules used by the
+        assessment tool
+    .DESCRIPTION
+        Installs the modules required to support SCuBAGear.  If the Force
+        switch is set then any existing module will be re-installed even if
+        already at latest version. If the SkipUpdate switch is set then any
+        existing module will not be updated to th latest version.
+    .EXAMPLE
+        Initialize-SCuBA
+    .NOTES
+        Executing the script with no switches set will install the latest
+        version of a module if not already installed.
+    #>    
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $false, HelpMessage = 'Installs a given module and overrides warning messages about module installation conflicts. If a module with the same name already exists on the computer, Force allows for multiple versions to be installed. If there is an existing module with the same name and version, Force overwrites that version')]
@@ -76,21 +91,6 @@ function Initialize-SCuBA {
         [string]
         $ScubaParentDirectory = $env:USERPROFILE
     )
-    <#
-    .SYNOPSIS
-        This script installs the required Powershell modules used by the
-        assessment tool
-    .DESCRIPTION
-        Installs the modules required to support SCuBAGear.  If the Force
-        switch is set then any existing module will be re-installed even if
-        already at latest version. If the SkipUpdate switch is set then any
-        existing module will not be updated to th latest version.
-    .EXAMPLE
-        Initialize-SCuBA
-    .NOTES
-        Executing the script with no switches set will install the latest
-        version of a module if not already installed.
-    #>
 
     # Set preferences for writing messages
     $PreferenceStack = New-Object -TypeName System.Collections.Stack
@@ -196,6 +196,15 @@ function Initialize-SCuBA {
 }
 
 function Install-OPA {
+    <#
+    .SYNOPSIS
+        This script installs the required OPA executable used by the
+        assessment tool
+    .DESCRIPTION
+        Installs the OPA executable required to support SCuBAGear.
+    .EXAMPLE
+        Install-OPA
+    #>
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $false, HelpMessage = 'The version of OPA Rego to be downloaded, must be in "x.x.x" format')]
@@ -402,20 +411,6 @@ function InstallOPA {
 }
 
 function Debug-SCuBA {
-    [CmdletBinding()]
-    param (
-        [Parameter(Mandatory=$false, HelpMessage = 'Directory to contain debug report')]
-        [string]
-        $ReportPath = "$($($(Get-Item $PSScriptRoot).Parent).FullName)\Reports",
-
-        [Parameter(Mandatory=$false, HelpMessage = 'Include ScubaGear report on tenant configuration?')]
-        [switch]
-        $IncludeReports  = $false,
-
-        [Parameter(Mandatory=$false, HelpMessage = 'Include all available ScubaGear report on tenant configuration?')]
-        [switch]
-        $AllReports = $false
-    )
     <#
         .SYNOPSIS
             Gather diagnostic information from previous run(s) into a single
@@ -430,7 +425,21 @@ function Debug-SCuBA {
             Executing the script with no switches will cause it to create an archive
             of the latest SCuBAGear run report and result files in the current working
             directory.
-    #>
+    #>    
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory=$false, HelpMessage = 'Directory to contain debug report')]
+        [string]
+        $ReportPath = "$($($(Get-Item $PSScriptRoot).Parent).FullName)\Reports",
+
+        [Parameter(Mandatory=$false, HelpMessage = 'Include ScubaGear report on tenant configuration?')]
+        [switch]
+        $IncludeReports  = $false,
+
+        [Parameter(Mandatory=$false, HelpMessage = 'Include all available ScubaGear report on tenant configuration?')]
+        [switch]
+        $AllReports = $false
+    )
 
     $PreferenceStack = New-Object -TypeName System.Collections.Stack
     $PreferenceStack.Push($DebugPreference)
