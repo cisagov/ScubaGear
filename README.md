@@ -75,12 +75,12 @@ To install the module dependencies, open a new PowerShell 5.1 terminal and navig
 Then run:
 
 ```powershell
-.\SetUp.ps1 # Installs the required modules
+Import-Module -Name .\PowerShell\ScubaGear # Imports module and minimum required dependencies
 ```
 
 ### Download the Required OPA executable
 > [!IMPORTANT]
-> The `OPA.ps1` executable download script is called by default when running `SetUp.ps1`. `OPA.ps1` can also be run by itself to download the executable.
+> The `Install-OPA` cmdlet is called by default when running `Initialize-SCuBA`. The `Install-OPA` cmdlet can also be run by itself to download the executable.
 In the event of an unsuccessful download, users can manually download the OPA executable with the following steps:
 1. Go to OPA download site (https://www.openpolicyagent.org/docs/latest/#running-opa)
 2. Check the acceptable OPA version (Currently v0.61.0) for ScubaGear and select the corresponding version on top left of the website
