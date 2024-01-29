@@ -404,7 +404,7 @@ function InstallOPA {
 function Debug-SCuBA {
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory=$false, , HelpMessage = 'Directory to contain debug report')]
+        [Parameter(Mandatory=$false, HelpMessage = 'Directory to contain debug report')]
         [string]
         $ReportPath = "$($($(Get-Item $PSScriptRoot).Parent).FullName)\Reports",
 
