@@ -17,8 +17,8 @@ jobs:
         if: "!cancelled()"
         shell: powershell
         run: |
-          #TODO:  Remove initialize from this script. UT should not depend on importing module
           Get-Location
-          Import-Module PowerShell/ScubaGear
+          Test-Path -Path ./PowerShell/ScubaGear/ScubaGear.psd1 -PathType Leaf
+          Import-Module -Name ./PowerShell/ScubaGear/ScubaGear.psd1
           Initialize-SCuBA
           Invoke-Pester -Output 'Detailed' -Path 'PowerShell/ScubaGear/Testing/Unit/PowerShell'
