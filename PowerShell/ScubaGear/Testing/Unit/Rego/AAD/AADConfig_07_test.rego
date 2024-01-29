@@ -236,6 +236,41 @@ test_SecureScore_Incorrect_V2 if {
     TestResult("MS.AAD.7.2v1", Output, ReportDetailStr, false) == true
 }
 
+#Incorrect because the ratio of global admins to non global admins is undefined (all are global admins)
+test_SecureScore_Incorrect_V3 if {
+    Output := aad.tests with input as {
+        "privileged_users": {
+            "User1": {
+                "DisplayName": "Test Name1",
+                "roles": [
+                    "Privileged Role Administrator",
+                    "Global Administrator"
+                ]
+            },
+            "User2": {
+                "DisplayName": "Test Name2",
+                "roles": [
+                    "Privileged Role Administrator",
+                    "Global Administrator"
+                ]
+            },
+            "User3": {
+                "DisplayName": "Test Name2",
+                "roles": [
+                    "Privileged Role Administrator",
+                    "Global Administrator"
+                ]
+            }
+        }
+    }
+
+    ReportDetailStr := "Requirement not met: No privileged users that are NOT Global Admin; Least Privilege Score is undefined"
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == "MS.AAD.7.2v1"]
+
+    print(RuleOutput)
+    TestResult("MS.AAD.7.2v1", Output, ReportDetailStr, false) == true
+}
+
 #--
 # Policy MS.AAD.7.3v1
 #--

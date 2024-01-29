@@ -705,7 +705,7 @@ NotGlobalAdmins contains User.DisplayName if {
     not "Global Administrator" in User.roles
 }
 
-default GetScoreDescription := "No privileged users that are NOT Global Admin; Least Privilege Score = 100%"
+default GetScoreDescription := "No privileged users that are NOT Global Admin; Least Privilege Score is undefined"
 GetScoreDescription := concat("", ["Least Privilege Score = ", format_int(x,10), "%"]) if {
     count(NotGlobalAdmins) > 0
     x := count(GlobalAdmins)/count(NotGlobalAdmins)*100
