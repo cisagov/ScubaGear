@@ -16,7 +16,11 @@ if (!$ModuleList){
    throw "Required modules list is required."
 }
 
+Import-Module -Name ./Modules/Support/Support.psm1
+Initialize-SCuBA -SkipUpdate -NoOPA
+
 foreach ($Module in $ModuleList) {
+    Write-Debug "Evaluating module: $($Module.ModuleName)"
     $InstalledModuleVersions = Get-Module -ListAvailable -Name $($Module.ModuleName)
     $FoundAcceptableVersion = $false
 
