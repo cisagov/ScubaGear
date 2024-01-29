@@ -842,6 +842,7 @@ function Invoke-ReportCreation {
                 $PassesSummary = "<div class='summary pass'>$($Report.Passes) tests passed</div>"
                 $WarningsSummary = "<div class='summary'></div>"
                 $FailuresSummary = "<div class='summary'></div>"
+                $BaselineURL = "<a href= `"https://github.com/cisagov/ScubaGear/blob/v$($ModuleVersion)/baselines`" target=`"_blank`"><h3 style=`"width: 100px;`">Baseline Documents</h3></a>"
                 $ManualSummary = "<div class='summary'></div>"
                 $ErrorSummary = "<div class='summary'></div>"
 
@@ -885,6 +886,7 @@ function Invoke-ReportCreation {
             $ReportHTML = $ReportHTML.Replace("{TENANT_DETAILS}", $TenantMetaData)
             $ReportHTML = $ReportHTML.Replace("{TABLES}", $Fragment)
             $ReportHTML = $ReportHTML.Replace("{MODULE_VERSION}", "v$ModuleVersion")
+            $ReportHTML = $ReportHTML.Replace("{BASELINE_URL}", $BaselineURL)
 
             $CssPath = Join-Path -Path $ReporterPath -ChildPath "styles" -ErrorAction 'Stop'
             $MainCSS = (Get-Content $(Join-Path -Path $CssPath -ChildPath "main.css") -ErrorAction 'Stop') -Join "`n"
