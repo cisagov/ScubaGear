@@ -20,6 +20,7 @@ Developed by CISA, ScubaGear is an assessment tool that verifies a Microsoft 365
   - [Example 3: Run assessments against multiple products](#example-3-run-assessments-against-multiple-products)
   - [Example 4: Run assessments non-interactively using an application service principal and authenticating via CertificateThumbprint](#example-4-run-assessments-non-interactively-using-an-application-service-principal-and-authenticating-via-certificatethumbprint)
   - [Parameter Definitions](#parameter-definitions)
+  - [ScubaGear Configuration File Syntax and Examples](#scubagear-configuration-file-syntax-and-examples)
   - [AAD Conditional Access Policy Exemptions](#aad-conditional-access-policy-exemptions)
   - [Viewing the Report](#viewing-the-report)
 - [Required Permissions](#required-permissions)
@@ -43,6 +44,7 @@ Developed by CISA, ScubaGear is an assessment tool that verifies a Microsoft 365
     - [ScubaGear Support](#scubagear-support)
     - [Removing installed modules](#removing-installed-modules)
 - [Project License](#project-license)
+
 ## M365 Product License Assumptions
 This tool was tested against tenants that have an M365 E3 or G3 and E5 or G5 license bundle. It may still function for tenants that do not have one of these bundles.
 
@@ -134,8 +136,7 @@ Get-Help -Name Invoke-SCuBA -Full
   - Per product namespace for values related to that specific product (i.e., Aad, SharePoint)
   - Namespace for each policy item within a product for variables related only to one policy item (i.e., MS.AAD.2.1v1)
   - Use of YAML anchors and aliases following Don't Repeat Yourself (DRY) principle for repeated values and sections
-
-If -ConfigFilePath is specified, default values will be provided for parameters that are not explicitly put in the config file.   These default values are provided explicitly in the config file template to help guide the user, but they may be omitted from the file.   Command line values options can now be provided with the -ConfigFilePath. This should reduce the number of config files needed.  Examples might be switching the M365 environment variable from commercial to gcc, switching the tenant used or supplying credentials so they do not need to be resident in the config file (which would facilitate sharing). The file path defaults to the same directory where the script is executed. The file path must point to a valid configuration file. It can be either a relative or absolute path. The file can be used to specify both standard tool parameters as well as custom parameters used by the Azure Active Directory (AAD) product assessment. See [AAD Conditional Access Policy Exemptions](#aad-conditional-access-policy-exemptions) for more details.
+    If a -ConfigFilePath is specified, default values will be used for parameters that are not added to the config file. These default values are shown in the full config file template to guide the user, but they can be omitted if desired. Other command line parameters can also be used with the -ConfigFilePath. This should reduce the number of config files needed. Examples might be: using `-M365Environment` to override `commercial` config value to `gcc`, switching the tenant being targeted, or supplying credential references so they do not need to be in the config file. Smaller config files can facilitate sharing among admins.  The config file path defaults to the same directory where the script is executed. `ConfigFilePath` accepts both absolute and relative file paths. The file can be used to specify command line parameters and policy-specific parameters used by the Azure Active Directory (AAD) and Defender product assessments. See [See ScubaGear Configuration File Syntax and Examples](#scubagear-configuration-file-syntax-and-examples) and [AAD Conditional Access Policy Exemptions](#aad-conditional-access-policy-exemptions) for more details.
   
 
 - **$LogIn** is a `$true` or `$false` variable that if set to `$true` will prompt the user to provide credentials to establish a connection to the specified M365 products in the **$ProductNames** variable. For most use cases, leave this variable to be `$true`. A connection is established in the current PowerShell terminal session with the first authentication. To run another verification in the same PowerShell session,  set this variable to be `$false` to bypass the need to authenticate again in the same session. Defender will ask for authentication even if this variable is set to `$false`
@@ -157,6 +158,102 @@ If -ConfigFilePath is specified, default values will be provided for parameters 
 - **$OPAPath** refers to the folder location of the Open Policy Agent (OPA) policy engine executable file. By default the OPA policy engine executable embedded with this project is located in the project's root folder `"./"` and for most cases this value will not need to be modified. To execute the tool using a version of the OPA policy engine located in another folder, customize the variable value with the full path to the folder containing the OPA policy engine executable file.
 
 - **$OutPath** refers to the folder path where the output JSON and the HTML report will be created. Defaults to the same directory where the script is executed. This parameter is only necessary if an alternate report folder path is desired. The folder will be created if it does not exist.
+
+### ScubaGear Configuration File Syntax and Examples
+Most of the `Invoke-SCuBA` cmdlet parameters can be placed into a configuration file with the path specified by the `-ConfigFilePath` parameter. Please note the following parameters are supported only on the command line.
+
+- ConfigFilePath
+- Version
+- DarkMode
+- Quiet
+
+Each authentication parameter must be supplied either the command line or in the config file if a non-interactive login is supplied.  An authentication parameter may be present in both, but the command line will always take precedence. The parameters can be split between the config file and the command line.
+
+All of the configuration file examples referenced below are in the [sample-config-files](./sample-config-files) directory and the examples assume a Invoke-SCuBA is run in that directory. Each example shows the sample config file name and a command line example with it.
+
+The authentication parameter values shown below are examples only. The user must supply parameter values appropriate for their tenant and principal.
+
+**Basic Use** : config file `basic_config.yaml`
+Basic use specifies a product name and an M365 environment variable. In this example product is entered a a single value.
+```
+Description: YAML Basic Config file ( one product )
+ProductNames: teams
+M365Environment: commercial
+```
+Command line 
+`Invoke-SCuBA -ConfigFilePath minimal_config.yaml`
+
+Command line with override of M365Environment
+```
+Invoke-SCuBA -M365Environment gcc -ConfigFilePath minimal_config.yaml
+```
+
+**Typical Use** : config file `typical_config.yaml`
+Typical use includes multiple products, specified as a list, and an M365 environment variable. Note that additional product values are commented out and will not be included, but are retained in the config file to easily add them back later.
+```
+Description: YAML Typical Config ( multiple products )
+ProductNames:
+- teams
+# - exo
+# - defender
+- aad
+# - sharepoint
+M365Environment: commercial
+```
+Command line with Auth Parameters
+```
+Invoke-SCuBA -Organization abcdef.example.com `
+             -AppID 0123456789abcdef01234566789abcde `
+             -CertificateThumbprint: fedcba9876543210fedcba9876543210fedcba98 `
+             -ConfigFilePath typical_config.yaml
+```
+**Credential Use** : config file `creds_config.yaml`
+Credentials, in the form of a service principal AppID and certificate thumbprint ID can be supplied in the config file. While these credentials alone do not provide access without the associated private key, appropriate protection should be considered if including them in a configuration file.
+```
+Description: YAML Configuration file with credentials ( invalid ones )
+ProductNames:
+- teams
+# - exo
+# - defender
+- aad
+# - sharepoint
+M365Environment: commercial
+Organization: abcdef.example.com
+AppID:  0123456789abcdef01234566789abcde
+CertificateThumbprint: fedcba9876543210fedcba9876543210fedcba98
+```
+Command line with override of product names
+```
+Invoke-SCuBA -ProductNames  defender -ConfigFilePath typical_config.yaml
+```
+
+**Full Use**: config file `full_config.yaml`
+Full use shows all of the global parameters supported by ScubaConfig specified in the config file. Any one of these parameters may be commented out. If not specified or commented out, ScubaConfig will supply the default value instead unless overridden on the command line. This default value does not apply to authentication parameters.
+```
+Description: YAML Configuration file with all parameters
+ProductNames:
+- teams
+- exo
+- defender
+- aad
+- sharepoint
+M365Environment: commercial
+OPAPath: .
+LogIn: true
+DisconnectOnExit: false
+OutPath: .
+OutFolderName: M365BaselineConformance
+OutProviderFileName: ProviderSettingsExport
+OutRegoFileName: TestResults
+OutReportName: BaselineReports
+Organization: abcdef.example.com
+AppID:  0123456789abcdef01234566789abcde
+CertificateThumbprint: fedcba9876543210fedcba9876543210fedcba98
+```
+Command line invocation (no overrides )
+```
+Invoke-SCuBA  -ConfigFilePath full_config.yaml
+```
 
 ### AAD Conditional Access Policy Exemptions
 The ScubaGear `-ConfigFilePath` command line option allows users to define custom variables for use in policy assessments against the AAD baseline. These custom variables are used to exempt specific user and group exclusions from conditional access policy checks that normally would not pass if exclusions are present. These parameters support operational use cases for having backup or "break glass" account exclusions to global user policies without failing best practices. Any exemptions and their risks should be carefully considered and documented as part of an organization's cybersecurity risk management program process and practices.
