@@ -80,6 +80,9 @@ FunctionsToExport = @(
     'Invoke-RunCached',
     'Disconnect-SCuBATenant',
     'Copy-ScubaBaselineDocument',
+    'Install-OPA',
+    'Initialize-SCuBA',
+    'Debug-SCuBA',
     'Copy-ScubaSampleReport',
     'Copy-ScubaSampleConfigFile'
 )
