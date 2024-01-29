@@ -183,7 +183,11 @@ function New-Report {
     $ReportHTMLPath = Join-Path -Path $ReporterPath -ChildPath "IndividualReport"
     $ReportHTML = (Get-Content $(Join-Path -Path $ReportHTMLPath -ChildPath "IndividualReport.html")) -Join "`n"
     $ReportHTML = $ReportHTML.Replace("{TITLE}", $Title)
-    $BaselineURL = "<a href=`"$($ScubaGitHubUrl)/blob/v$($SettingsExport.module_version)/PowerShell/ScubaGear/baselines/$($BaselineName.ToLower()).md`" target=`"_blank`"><h3 style=`"width: 100px;`">Baseline Documents</h3></a>"
+    if ($SettingsExport.module_version -match "(0\.\d\.\d|1.0.0)") {
+        $BaselineURL = "<a href=`"$($ScubaGitHubUrl)/blob/v$($SettingsExport.module_version)/baselines/$($BaselineName.ToLower()).md`" target=`"_blank`"><h3 style=`"width: 100px;`">Baseline Documents</h3></a>"
+    } else {
+        $BaselineURL = "<a href=`"$($ScubaGitHubUrl)/blob/v$($SettingsExport.module_version)/PowerShell/ScubaGear/baselines/$($BaselineName.ToLower()).md`" target=`"_blank`"><h3 style=`"width: 100px;`">Baseline Documents</h3></a>"
+    }
     $ReportHTML = $ReportHTML.Replace("{BASELINE_URL}", $BaselineURL)
 
     # Handle AAD-specific reporting
