@@ -17,4 +17,7 @@ jobs:
         if: "!cancelled()"
         shell: powershell
         run: |
+          #TODO:  Remove initialize from this script. UT should not depend on importing module
+          Import-Module PowerShell\ScubaGear\ScubaGear.psd1
+          Initialize-SCuBA
           Invoke-Pester -Output 'Detailed' -Path 'PowerShell/ScubaGear/Testing/Unit/PowerShell'
