@@ -130,7 +130,7 @@ function Export-AADProvider {
     "authentication_method": $AuthenticationMethodPolicy,
     "domain_settings": $DomainSettings,
     "license_information": $LicenseInfo,
-    "user_count": $UserCount,
+    "total_user_count": $UserCount,
     "aad_successful_commands": $SuccessfulCommands,
     "aad_unsuccessful_commands": $UnSuccessfulCommands,
 "@
