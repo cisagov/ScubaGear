@@ -265,9 +265,7 @@ test_SecureScore_Incorrect_V3 if {
     }
 
     ReportDetailStr := "Requirement not met: No privileged users that are NOT Global Admin; Least Privilege Score is undefined"
-    RuleOutput := [Result | some Result in Output; Result.PolicyId == "MS.AAD.7.2v1"]
 
-    print(RuleOutput)
     TestResult("MS.AAD.7.2v1", Output, ReportDetailStr, false) == true
 }
 
