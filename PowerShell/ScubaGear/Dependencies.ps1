@@ -16,7 +16,8 @@ if (!$ModuleList){
    throw "Required modules list is required."
 }
 
-Import-Module -Name ./Modules/Support/Support.psm1
+$SupportModulesPath = Join-Path -Path $PSScriptRoot -ChildPath "Support.psm1"
+Import-Module -Name $SupportModulesPath
 Initialize-SCuBA -SkipUpdate -NoOPA
 
 foreach ($Module in $ModuleList) {
