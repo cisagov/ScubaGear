@@ -675,7 +675,7 @@ GlobalAdmins contains User.DisplayName if {
     "Global Administrator" in User.roles
 }
 
-#Set conditions under which this policy will pass
+# Set conditions under which this policy will pass
 GlobalAdminConditions := [
     count(GlobalAdmins) <= 8,
     count(GlobalAdmins) >= 2
@@ -695,7 +695,7 @@ tests contains {
     Status := count(FilterArray(GlobalAdminConditions, false)) == 0
 }
 #--
-
+#
 # MS.AAD.7.2v1
 #--
 
