@@ -55,7 +55,7 @@ jobs:
         # This job parses the keys and values and converts them to a hashtable.
         run: |
           Import-Module -Name .\PowerShell\ScubaGear\ScubaGear.psd1
-          Install-OPA 
+          Install-OPA
           # Read thumbprint from previous job.
           $thumbprint = "${{ steps.getthumbprint.outputs.THUMBPRINT }}"
           $params = $env:TestParams
