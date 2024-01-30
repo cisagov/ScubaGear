@@ -675,7 +675,7 @@ GlobalAdmins contains User.DisplayName if {
     "Global Administrator" in User.roles
 }
 
-# Set conditions under which this policy will pass
+#Set conditions under which this policy will pass
 GlobalAdminConditions := [
     count(GlobalAdmins) <= 8,
     count(GlobalAdmins) >= 2
@@ -695,7 +695,7 @@ tests contains {
     Status := count(FilterArray(GlobalAdminConditions, false)) == 0
 }
 #--
-#
+
 # MS.AAD.7.2v1
 #--
 
@@ -705,7 +705,7 @@ NotGlobalAdmins contains User.DisplayName if {
     not "Global Administrator" in User.roles
 }
 
-default GetScoreDescription := "No privileged users that are NOT Global Admin; Least Privilege Score is undefined"
+default GetScoreDescription := "All privileged users are Global Admin"
 GetScoreDescription := concat("", ["Least Privilege Score = ", format_int(x,10), "%"]) if {
     count(NotGlobalAdmins) > 0
     x := count(GlobalAdmins)/count(NotGlobalAdmins)*100

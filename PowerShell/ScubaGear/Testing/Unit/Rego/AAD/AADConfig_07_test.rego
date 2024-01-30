@@ -264,7 +264,7 @@ test_SecureScore_Incorrect_V3 if {
         }
     }
 
-    ReportDetailStr := "Requirement not met: No privileged users that are NOT Global Admin; Least Privilege Score is undefined"
+    ReportDetailStr := "Requirement not met: All privileged users are Global Admin"
 
     TestResult("MS.AAD.7.2v1", Output, ReportDetailStr, false) == true
 }
