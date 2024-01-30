@@ -676,11 +676,11 @@ GlobalAdmins contains User.DisplayName if {
 }
 
 #Set conditions under which this policy will pass
+default IsGlobalAdminCountGood := false
 IsGlobalAdminCountGood := true if {
     count(GlobalAdmins) <= 8
     count(GlobalAdmins) >= 2
-} else := false
-
+}
 
 # Pass if there are at least 2, but no more than 8
 # users with Global Admin role.
@@ -713,7 +713,7 @@ GetScoreDescription := concat("", ["Least Privilege Score = ", format_int(x,10),
 }
 
 #calculate least privilege score as ratio of priv users with global admin role to priv users without global admin role
-LeastPrivilegeScore := "Policy MS.AAD.7.1 failed so Least Privilege Score is not meaningful" if {
+LeastPrivilegeScore := "Policy MS.AAD.7.1 failed so score not computed" if {
     IsGlobalAdminCountGood == false
 } else := GetScoreDescription
 
