@@ -571,6 +571,8 @@ User activation of other highly privileged roles SHOULD trigger an alert.
 
 - [Assign Microsoft Entra roles in Privileged Identity Management](https://learn.microsoft.com/en-us/entra/id-governance/privileged-identity-management/pim-how-to-add-role-to-user)
 
+- [Privileged Identity Management (PIM) for Groups](https://learn.microsoft.com/en-us/entra/id-governance/privileged-identity-management/concept-pim-for-groups)
+
 - [Approve or deny requests for Microsoft Entra roles in Privileged Identity Management](https://learn.microsoft.com/en-us/entra/id-governance/privileged-identity-management/pim-approval-workflow)
 
 - [Configure security alerts for Microsoft Entra roles in Privileged Identity Management](https://learn.microsoft.com/en-us/entra/id-governance/privileged-identity-management/pim-how-to-configure-security-alerts)
@@ -581,51 +583,42 @@ User activation of other highly privileged roles SHOULD trigger an alert.
 
 ### Implementation
 
-The following implementation instructions that reference the Azure AD PIM service will vary if using a third-party PAM system instead. Additionally, the implementation instructions associated with assigning roles to users will be revised in an upcoming release to incorporate functionality provided by the Azure AD [PIM for Groups](https://learn.microsoft.com/en-us/entra/id-governance/privileged-identity-management/concept-pim-for-groups) feature.
+The following implementation instructions that reference the Azure AD PIM service will vary if using a third-party PAM system instead. 
 
 #### MS.AAD.7.1v1 Instructions
 
-1. In **Azure Active Directory** select **Roles and administrators.**
+When counting the number of users assigned to the Global Administrator role, count each user only once.
 
-2. Select the **Global administrator role.**
+1. In **Azure Active Directory** count the number of users assigned to the **Global Administrator** role. Count users that are assigned directly to the role and users assigned via group membership. If you have Azure AD PIM, count both the **Eligible assignments** and **Active assignments**. If any of the groups assigned to Global Administrator are enrolled in PIM for Groups, also count the number of group members from the PIM for Groups portal **Eligible** assignments.
 
-3. Under **Manage**, select **Assignments.**
-
-4. Validate that between two to eight users are listed.
-
-5.  If you have Azure AD PIM, count the number of users in both the **Eligible assignments** and **Active assignments** tabs. There should be a total of two to eight users across both tabs (not individually). Do not count the same username twice. If any groups are listed, count the number of users who are members of the group and include it in the total count.
+2. Validate that there are a total of two to eight users assigned to the Global Administrator role.
 
 #### MS.AAD.7.2v1 Instructions
 
-1.  In **Azure Active Directory** select **Security.**
+This policy is based on the ratio below:
 
-2.  Under **Manage**, select **Identity Secure Score.**
+`X = (Number of users assigned to the Global Administrator role) / (Number of users assigned to other highly privileged roles)`
 
-3.  Click the **Columns** button and select all the available columns and click **Apply.**
+1. Follow the instructions for policy MS.AAD.7.1v1 above to get a count of users assigned to the Global Administrator role.
 
-4.  Review the score for the action named **Use least privileged administrative roles.**
+2. Follow the instructions for policy MS.AAD.7.1v1 above but get a count of users assigned to the other highly privileged roles (not Global Administrator). If a user is assigned to both Global Administrator and other roles, only count that user for the Global Administrator assignment.
 
-5.  Review the **current score** value and compare it to the **max score**. If the current score is not the maximum value and the status is not **Completed**, you must perform the improvement actions. If that is the case, follow the detailed action steps and check the score again after 48 hours to ensure compliance.
+3. Divide the value from step 2 from the value from step 1 to calculate X. If X is less than or equal to 1 then the tenant is compliant with the policy.
 
 #### MS.AAD.7.3v1 Instructions
-Performing a manual review of highly privileged users per the instructions below to determine which ones are not cloud-only is labor intensive; we recommend running the ScubaGear tool instead. ScubaGear will provide a list of the highly privileged users that are not cloud-only.
 
 1. Perform the steps below for each highly privileged role. We reference the Global Administrator role as an example.
 
-2. In **Azure Active Directory** select **Roles and administrators.**
+2. Create a list of all the users assigned to the **Global Administrator** role. Include users that are assigned directly to the role and users assigned via group membership. If you have Azure AD PIM, include both the **Eligible assignments** and **Active assignments**. If any of the groups assigned to Global Administrator are enrolled in PIM for Groups, also include group members from the PIM for Groups portal **Eligible** assignments.
 
-3. Select the **Global administrator role.**
-
-4. Under **Manage**, select **Assignments.** If you have Azure AD PIM, repeat the steps below for both the **Eligible** and the **Active** assignments. If a group is listed, you will need to determine the members of the group and perform the steps for each group member.
-
-5. For each highly privileged user, execute the Powershell code below but replace the `username@somedomain.com` with the principal name of the user who is specific to your environment. You can get the data value from the **Principal name** field displayed in the Azure AD portal.
+3. For each highly privileged user in the list, execute the Powershell code below but replace the `username@somedomain.com` with the principal name of the user who is specific to your environment. You can get the data value from the **Principal name** field displayed in the Azure AD portal.
 
     ```
     Connect-MgGraph
     Get-MgBetaUser -Filter "userPrincipalName eq 'username@somedomain.com'" | FL
     ```
 
-6. Review the output field named **OnPremisesImmutableId**. If this field has a data value, it means that this specific user is not cloud-only. If the user is not cloud-only, create a cloud-only account for that user, assign the user to their respective roles and then remove the account that is not cloud-only from Azure AD.
+6. Review the output field named **OnPremisesImmutableId**. If this field contains a data value, it means that the  user is not cloud-only. If the user is not cloud-only, create a cloud-only account for that user, assign the user to their respective roles and then remove the account that is not cloud-only from Azure AD.
 
 #### MS.AAD.7.4v1 Instructions
 
@@ -635,7 +628,12 @@ Performing a manual review of highly privileged users per the instructions below
 
 3. Under **Manage**, select **Assignments** and click the **Active assignments** tab.
 
-4. Verify there are no users or groups with a value of **Permanent** in the **End time** column. If there are any, recreate those assignments to have an expiration date using Azure AD PIM or an alternative PAM system. The only exception to this policy is emergency access accounts and service accounts requiring perpetual active assignments. See policy MS.AAD.7.4v1 note section for details.
+4. Verify there are no users or groups with a value of **Permanent** in the **End time** column. If there are any, recreate those assignments to have an expiration date using Azure AD PIM or an alternative PAM system. If a group is identified and it is enrolled in PIM for Groups, see the exception cases below for details.
+
+Exception cases:
+- Emergency access accounts that require perpetual active assignment.
+- Service accounts that require perpetual active assignment.
+- If using PIM for Groups, a group that is enrolled in PIM is allowed to have a perpetual active assignment to a role because activation is handled by PIM for Groups.
 
 #### MS.AAD.7.5v1 Instructions
 
@@ -645,10 +643,9 @@ Performing a manual review of highly privileged users per the instructions below
 
 3. Select the **Global administrator role.**
 
-4. Under **Manage**, select **Assignments.** Repeat the steps below for both the **Eligible** and the **Active** Azure AD PIM assignments.
+4. Under **Manage**, select **Assignments.** and click the **Active assignments** tab.
 
 5. For each user or group listed, examine the value in the **Start time** column. If it contains a value of **-**, this indicates the respective user/group was assigned to that role outside of Azure AD PIM. If the role was assigned outside of Azure AD PIM, delete the assignment and recreate it using Azure AD PIM.
-
 
 #### MS.AAD.7.6v1 Instructions
 
