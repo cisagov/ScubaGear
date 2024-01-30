@@ -60,7 +60,7 @@ jobs:
               -CertificateName $($KeyVaultInfo.KeyVault.CertificateName) `
               -ModulePath repo/PowerShell/ScubaGear `
               -GalleryName $env:GalleryName
-          azPSVersion: "latest"       
+          azPSVersion: "latest"
       - name: Test Module Publish
         run: |
           Get-Location
@@ -100,12 +100,12 @@ jobs:
               -GalleryName $env:GalleryName `
               -OverrideModuleVersion '9.9.9' `
               -Prerelease 'alpha'
-          azPSVersion: "latest"   
+          azPSVersion: "latest"
       - name: Check Scuba Version
         run: |
           $ScubaModules = Find-Module -Name ScubaGear -AllVersions -AllowPrerelease
           ($ScubaModules).Version
-          if ($ScubaModules.Count -eq 2) { 
+          if ($ScubaModules.Count -eq 2) {
             Exit 0
           }
           else {
