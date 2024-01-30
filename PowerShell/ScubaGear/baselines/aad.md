@@ -585,8 +585,6 @@ User activation of other highly privileged roles SHOULD trigger an alert.
 
 The following implementation instructions that reference the Azure AD PIM service will vary if using a third-party PAM system instead. 
 
-Many of the manual steps described per the instructions in this section are labor intensive. We recommend running the ScubaGear tool instead.
-
 #### MS.AAD.7.1v1 Instructions
 
 When counting the number of users assigned to the Global Administrator role, count each user only once.
