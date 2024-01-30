@@ -97,7 +97,7 @@ jobs:
               -AzureKeyVaultUrl $($KeyVaultInfo.KeyVault.URL) `
               -CertificateName $($KeyVaultInfo.KeyVault.CertificateName) `
               -ModulePath repo/PowerShell/ScubaGear `
-              -GalleryName $env:GalleryName '
+              -GalleryName $env:GalleryName `
               -OverrideModuleVersion '9.9.9' `
               -Prerelease 'alpha'
           azPSVersion: "latest"   
