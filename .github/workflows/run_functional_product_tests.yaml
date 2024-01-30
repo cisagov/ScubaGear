@@ -43,7 +43,7 @@ jobs:
           PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
 
       - name: Install Selenium
-        run: Install-Module -Name Selenium -Scope CurrentUser -Force
+        run: Install-Module -Name Selenium -RequiredVersion 3.0.1
       - name: Update Selenium
         run: |
           $PSVersionTable
