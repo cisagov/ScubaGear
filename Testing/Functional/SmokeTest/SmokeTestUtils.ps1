@@ -81,6 +81,6 @@ function Install-SmokeTestExternalDependencies{
 
     #Import Selenium and update drivers
     Install-Module -Name Selenium -Scope CurrentUser -Force
-    Import-Module -Name Selenium -Scope CurrentUser -Force
+    Import-Module -Name Selenium -Force
     Testing/Functional/SmokeTest/UpdateSelenium.ps1
 }

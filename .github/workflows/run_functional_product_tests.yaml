@@ -46,7 +46,7 @@ jobs:
         run: Install-Module -Name Selenium -Scope CurrentUser -Force
       - name: Update Selenium
         run: |
-          Import-Module -Name Selenium -Scope CurrentUser -Force
+          Import-Module -Name Selenium -Force
           ./Testing/Functional/SmokeTest/UpdateSelenium.ps1
       - name: Test Products
         # The testing params are stored as a string in a CSV-like format.
