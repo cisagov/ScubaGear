@@ -122,7 +122,7 @@ test_PrivilegedUsers_Incorrect_V2 if {
 #--
 # Policy MS.AAD.7.2v1
 #--
-#Correct because the ratio of global admins to non global admins is less than 1
+# Correct because the ratio of global admins to non global admins is less than 1
 test_SecureScore_Correct_V1 if {
     Output := aad.tests with input as {
         "privileged_users": {
@@ -166,7 +166,7 @@ test_SecureScore_Correct_V1 if {
     TestResult("MS.AAD.7.2v1", Output, ReportDetailStr, true) == true
 }
 
-#Correct because the ratio of global admins to non global admins is equal to 1
+# Correct because the ratio of global admins to non global admins is equal to 1
 test_SecureScore_Incorrect_V1 if {
     Output := aad.tests with input as {
         "privileged_users": {
@@ -204,7 +204,7 @@ test_SecureScore_Incorrect_V1 if {
     TestResult("MS.AAD.7.2v1", Output, ReportDetailStr, true) == true
 }
 
-#Incorrect because the ratio of global admins to non global admins is more than 1
+# Incorrect because the ratio of global admins to non global admins is more than 1
 test_SecureScore_Incorrect_V2 if {
     Output := aad.tests with input as {
         "privileged_users": {
@@ -236,7 +236,7 @@ test_SecureScore_Incorrect_V2 if {
     TestResult("MS.AAD.7.2v1", Output, ReportDetailStr, false) == true
 }
 
-#Incorrect because the ratio of global admins to non global admins is undefined (all are global admins)
+# Incorrect because the ratio of global admins to non global admins is undefined (all are global admins)
 test_SecureScore_Incorrect_V3 if {
     Output := aad.tests with input as {
         "privileged_users": {
