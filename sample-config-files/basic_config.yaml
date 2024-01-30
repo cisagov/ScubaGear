@@ -1,0 +1,3 @@
+Description: YAML Basic Configuration file ( one product )
+ProductNames: teams
+M365Environment: gcc

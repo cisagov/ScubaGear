@@ -1315,12 +1315,12 @@ See the following implementation steps for enabling [Microsoft Purview
 (Standard)](./defender.md#msdefender61v1-instructions) for additional
 guidance.
 
-#### MS.EXO.17.1v2 Instructions
+#### MS.EXO.17.2v1 Instructions
 See the following implementation steps for enabling [Microsoft Purview
 (Premium)](./defender.md#msdefender62v1-instructions) for additional
 guidance.
 
-#### MS.EXO.17.1v3 Instructions
+#### MS.EXO.17.3v1 Instructions
 See the following implementation steps to
 [create an audit retention policy](./defender.md#msdefender62v1-instructions)
 for additional guidance.
