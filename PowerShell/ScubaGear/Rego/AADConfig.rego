@@ -676,10 +676,11 @@ GlobalAdmins contains User.DisplayName if {
 }
 
 #Set conditions under which this policy will pass
-GlobalAdminConditions := [
-    count(GlobalAdmins) <= 8,
+IsGlobalAdminCountGood := true if {
+    count(GlobalAdmins) <= 8
     count(GlobalAdmins) >= 2
-]
+} else := false
+
 
 # Pass if there are at least 2, but no more than 8
 # users with Global Admin role.
@@ -692,7 +693,7 @@ tests contains {
     "RequirementMet": Status
 } if {
     DescriptionString := "global admin(s) found"
-    Status := count(FilterArray(GlobalAdminConditions, false)) == 0
+    Status := IsGlobalAdminCountGood
 }
 #--
 
@@ -713,7 +714,7 @@ GetScoreDescription := concat("", ["Least Privilege Score = ", format_int(x,10),
 
 #calculate least privilege score as ratio of priv users with global admin role to priv users without global admin role
 LeastPrivilegeScore := "Policy MS.AAD.7.1 failed so Least Privilege Score is not meaningful" if {
-    count(FilterArray(GlobalAdminConditions, false)) != 0
+    IsGlobalAdminCountGood == false
 } else := GetScoreDescription
 
 # Pass if 7.1 passed and Least Privilege Score < 1, fail if 7.1 failed or Least Privilege score is >= 1
@@ -726,7 +727,7 @@ tests contains {
     "RequirementMet" : Status
 } if {
     Conditions := [
-        count(FilterArray(GlobalAdminConditions, false)) == 0,
+        IsGlobalAdminCountGood,
         count(GlobalAdmins) <= count(NotGlobalAdmins)
     ]
     Status := count(FilterArray(Conditions, false)) == 0
