@@ -51,7 +51,7 @@ function Initialize-SCuBA {
     .NOTES
         Executing the script with no switches set will install the latest
         version of a module if not already installed.
-    #>    
+    #> 
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $false, HelpMessage = 'Installs a given module and overrides warning messages about module installation conflicts. If a module with the same name already exists on the computer, Force allows for multiple versions to be installed. If there is an existing module with the same name and version, Force overwrites that version')]
@@ -425,7 +425,7 @@ function Debug-SCuBA {
             Executing the script with no switches will cause it to create an archive
             of the latest SCuBAGear run report and result files in the current working
             directory.
-    #>    
+    #>
     [CmdletBinding()]
     param (
         [Parameter(Mandatory=$false, HelpMessage = 'Directory to contain debug report')]
