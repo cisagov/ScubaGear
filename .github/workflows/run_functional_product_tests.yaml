@@ -41,8 +41,7 @@ jobs:
         shell: pwsh # -Password flag requires PS 6+
         env:
           PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
-      - name: Setup for Scuba
-        run: ./SetUp.ps1
+
       - name: Install Selenium
         run: Install-Module -Name Selenium
       - name: Update Selenium

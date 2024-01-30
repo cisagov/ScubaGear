@@ -78,7 +78,6 @@ function Install-SmokeTestExternalDependencies{
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'PNPPOWERSHELL_UPDATECHECK',
         Justification = 'Variable defined outside this scope')]
     $PNPPOWERSHELL_UPDATECHECK = 'Off'
-    ./SetUp.ps1
 
     #Import Selenium and update drivers
     Install-Module Selenium
