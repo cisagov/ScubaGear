@@ -76,7 +76,7 @@ Context "Unit Test for ConfigureScubaGearModule" {
             $Version | Should -BeExactly "3.0.1"
         }
     }
-    
+
     Describe -Name 'Update manifest with prerelease' {
         BeforeAll {
             . (Join-Path -Path $PSScriptRoot -ChildPath '..\..\..\..\..\..\utils\DeployUtils.ps1')

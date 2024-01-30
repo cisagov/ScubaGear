@@ -86,12 +86,9 @@ function Publish-ScubaGearModule{
         [string]
         $OverrideModuleVersion = "",
         [Parameter(Mandatory=$false)]
-        [switch]
-        $IsPrerelease,
-        [Parameter(Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
         [string]
-        $PrereleaseTag
+        $PrereleaseTag = ""
     )
 
     $BuildSplat = @{
@@ -99,8 +96,8 @@ function Publish-ScubaGearModule{
         OverrideModuleVersion = $OverrideModuleVersion
     }
 
-    if ($IsPrerelease){
-        $BuildSplat.Add('PrereleaseTag', $PrerelaseTag)
+    if (-Not [string]::IsNullOrEmpty($PrereleaseTag)){
+        $BuildSplat.Add('PrereleaseTag', $PrereleaseTag)
     }
     $ModuleBuildPath = Build-ScubaModule @BuildSplat
 
@@ -139,7 +136,7 @@ function Build-ScubaModule{
     }
 
     Copy-Item $ModulePath -Destination $env:TEMP -Recurse
-    if (-not (ConfigureScubaGearModule -ModulePath $ModuleBuildPath -OverrideModuleVersion $OverrideModuleVersion)){
+    if (-not (ConfigureScubaGearModule -ModulePath $ModuleBuildPath -OverrideModuleVersion $OverrideModuleVersion -PrereleaseTag $PrereleaseTag)){
         Write-Error "Failed to configure scuba module for publishing."
     }
 
