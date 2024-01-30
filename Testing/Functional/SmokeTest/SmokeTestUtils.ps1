@@ -80,6 +80,6 @@ function Install-SmokeTestExternalDependencies{
     $PNPPOWERSHELL_UPDATECHECK = 'Off'
 
     #Import Selenium and update drivers
-    Install-Module Selenium
+    Install-Module Selenium -Scope CurrentUser -Force
     Testing/Functional/SmokeTest/UpdateSelenium.ps1
 }
