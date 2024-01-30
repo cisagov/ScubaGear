@@ -589,59 +589,38 @@ Many of the manual steps described per the instructions in this section are labo
 
 #### MS.AAD.7.1v1 Instructions
 
-When performing these instructions count each distinct username only once. Do not double count. Once you finish counting go to the **Final Count** section.
+When counting the number of users assigned to the Global Administrator role, count each user only once.
 
-1. In **Azure Active Directory** select **Roles and administrators.**
+1. In **Azure Active Directory** count the number of users assigned to the **Global Administrator** role. Count users that are assigned directly to the role and users assigned via group membership. If you have Azure AD PIM, count both the **Eligible assignments** and **Active assignments**. If any of the groups assigned to Global Administrator are enrolled in PIM for Groups, also count the number of group members from the PIM for Groups portal **Eligible** assignments.
 
-2. Select the **Global administrator role.**
-
-3. Under **Manage**, select **Assignments.**
-
-If you have Azure AD PIM proceed to step 5.
-
-4. Count the number of users assigned to the role. If any groups are listed then count how many users are members of those groups and include that number in the overall count. Proceed to the **Final Count** section.
-
-If you have Azure AD PIM, perform the steps below:
-
-5. Count the number of users assigned to the role in both the **Eligible assignments** and **Active assignments** tabs. If a group is listed, count the number of members of the group. If a group is enrolled in PIM for Groups, count the number of members of the group from the PIM for Groups portal page and ensure to count both the **Eligible** and the **Active** assignments. 
-
-**Final Count**:
-There should be a total of two to eight users assigned to the role, including any direct user to role assignments and assignments via group membership.
+2. Validate that there are a total of two to eight users assigned to the Global Administrator role.
 
 #### MS.AAD.7.2v1 Instructions
 
-This section involves performing a calculation based on the ratio below:
+This policy is based on the ratio below:
 
-- X = (Number of users assigned to the Global Administrator role) / (Number of users assigned to other highly privileged roles)
-
-- The tenant is compliant if the value of X is less than or equal to 1.
-
-When performing these instructions count each distinct username only once. Do not double count.
+`X = (Number of users assigned to the Global Administrator role) / (Number of users assigned to other highly privileged roles)`
 
 1. Follow the instructions for policy MS.AAD.7.1v1 above to get a count of users assigned to the Global Administrator role.
 
-2. Follow the instructions for policy MS.AAD.7.1v1 above but get a count of users assigned to the other highly privileged roles (not Global Administrator). If a user is assigned to both Global Administrator and other roles, only count that user for the Global Administrator assignment (i.e. the numerator in the calculation above).
+2. Follow the instructions for policy MS.AAD.7.1v1 above but get a count of users assigned to the other highly privileged roles (not Global Administrator). If a user is assigned to both Global Administrator and other roles, only count that user for the Global Administrator assignment.
 
-3. Divide the value from step 2 from the value from step 1 to calculate X. If X is less than or equal to 1 then the tenant is compliant.
+3. Divide the value from step 2 from the value from step 1 to calculate X. If X is less than or equal to 1 then the tenant is compliant with the policy.
 
 #### MS.AAD.7.3v1 Instructions
 
 1. Perform the steps below for each highly privileged role. We reference the Global Administrator role as an example.
 
-2. In **Azure Active Directory** select **Roles and administrators.**
+2. Create a list of all the users assigned to the **Global Administrator** role. Include users that are assigned directly to the role and users assigned via group membership. If you have Azure AD PIM, include both the **Eligible assignments** and **Active assignments**. If any of the groups assigned to Global Administrator are enrolled in PIM for Groups, also include group members from the PIM for Groups portal **Eligible** assignments.
 
-3. Select the **Global administrator role.**
-
-4. Under **Manage**, select **Assignments.** If you have Azure AD PIM, repeat the steps below for both the **Eligible** and the **Active** assignments. If a group is listed, determine the members of the group and perform the steps for each group member. If a group is enrolled in PIM for Groups, determine the members of the group from the PIM for Groups portal page and ensure to repeat the steps below for both the **Eligible** and the **Active** assignments.
-
-5. For each highly privileged user, execute the Powershell code below but replace the `username@somedomain.com` with the principal name of the user who is specific to your environment. You can get the data value from the **Principal name** field displayed in the Azure AD portal.
+3. For each highly privileged user in the list, execute the Powershell code below but replace the `username@somedomain.com` with the principal name of the user who is specific to your environment. You can get the data value from the **Principal name** field displayed in the Azure AD portal.
 
     ```
     Connect-MgGraph
     Get-MgBetaUser -Filter "userPrincipalName eq 'username@somedomain.com'" | FL
     ```
 
-6. Review the output field named **OnPremisesImmutableId**. If this field contains a data value, it means that this specific user is not cloud-only. If the user is not cloud-only, create a cloud-only account for that user, assign the user to their respective roles and then remove the account that is not cloud-only from Azure AD.
+6. Review the output field named **OnPremisesImmutableId**. If this field contains a data value, it means that the  user is not cloud-only. If the user is not cloud-only, create a cloud-only account for that user, assign the user to their respective roles and then remove the account that is not cloud-only from Azure AD.
 
 #### MS.AAD.7.4v1 Instructions
 
