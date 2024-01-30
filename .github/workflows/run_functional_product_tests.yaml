@@ -46,6 +46,7 @@ jobs:
         run: Install-Module -Name Selenium -Scope CurrentUser -Force
       - name: Update Selenium
         run: |
+          $PSVersionTable
           Import-Module -Name Selenium -Force
           ./Testing/Functional/SmokeTest/UpdateSelenium.ps1
       - name: Test Products
@@ -54,6 +55,7 @@ jobs:
         # key1=value1,key2=value2|key3=value3,key4=value4...
         # This job parses the keys and values and converts them to a hashtable.
         run: |
+          $PSVersionTable
           Import-Module -Name .\PowerShell\ScubaGear\ScubaGear.psd1
           Install-OPA
           # Read thumbprint from previous job.
