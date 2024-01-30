@@ -41,7 +41,7 @@ jobs:
       - name: Sign Module
         uses: azure/powershell@v1
         env:
-          KEY_VAULT_INFO: ${{ secrets.SCUBA_KEY_VAULT_DEV}}
+          KEY_VAULT_INFO: ${{ secrets.SCUBA_KEY_VAULT_PROD}}
         with:
           inlineScript: |
             dotnet --version
