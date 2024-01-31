@@ -170,7 +170,7 @@ jobs:
       - name: Key Vault via CLI
         uses: azure/CLI@v1
         with:
-          azcliversion: 2.30.0
+          azcliversion: 2.56.0
           inlineScript: |
             az show account
       - name: Retrieve NuGetAPIKey from Key Vault
