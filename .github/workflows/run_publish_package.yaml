@@ -68,7 +68,7 @@ jobs:
       contents: write
     defaults:
       run:
-        shell: powershell
+        shell: pwsh
     outputs:
       apiKey:  ${{ steps.GetSecret.outputs.apiKey}}   
     steps:
@@ -84,9 +84,9 @@ jobs:
         with:
           inlineScript: |
             az version
-            api_key=$(az keyvault secret show --id 'https://scubagearkeyvault.vault.azure.net/secrets/ScubaGear-PSGAllery-API-Key' --query value -o tsv)
-            echo "::add-mask::$api_key"
-            echo "apiKey=$api_key" >> $GITHUB_OUTPUT
+            $api_key=$(az keyvault secret show --id 'https://scubagearkeyvault.vault.azure.net/secrets/ScubaGear-PSGAllery-API-Key' --query value -o tsv)
+            echo "apiKey=$api_key"
+            echo "apiKey=$api_key" >> $env:GITHUB_OUTPUT
 
   Publish-Private-Package:
     if: github.event.schedule == '23 0 * * *'
