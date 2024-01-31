@@ -58,6 +58,30 @@ jobs:
         with:
           path: repo
 
+  GetAPIKey:
+    if: github.event_name == 'workflow_dispatch'
+    needs: [ReleasePrep]
+    runs-on: ubuntu-latest
+    environment: Development
+    permissions:
+      id-token: write
+      contents: write
+    defaults:
+      run:
+        shell: powershell
+    steps:
+      - name: Login
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      - name: AZ CLI
+        uses: azure/CLI@v1
+        with:
+          inlineScript: |
+            az show account
+
   Publish-Private-Package:
     if: github.event.schedule == '23 0 * * *'
     needs: [ReleasePrep]
@@ -147,7 +171,7 @@ jobs:
 
   Publish-To-PSGallery:
     if: github.event_name == 'workflow_dispatch'
-    needs: [ReleasePrep]
+    needs: [ReleasePrep, GetAPIKey]
     runs-on: windows-latest
     environment: Development
     permissions:
@@ -167,12 +191,6 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           enable-AzPSSession: true
-      - name: Key Vault via CLI
-        uses: azure/CLI@v1
-        with:
-          azcliversion: 2.56.0
-          inlineScript: |
-            az show account
       - name: Retrieve NuGetAPIKey from Key Vault
         uses: Azure/get-keyvault-secrets@v1
         with:
