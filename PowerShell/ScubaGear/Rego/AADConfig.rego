@@ -712,7 +712,7 @@ GetScoreDescription := concat("", ["Least Privilege Score = ", format_int(x,10),
     x := count(GlobalAdmins)/count(NotGlobalAdmins)*100
 }
 
-#calculate least privilege score as ratio of priv users with global admin role to priv users without global admin role
+# calculate least privilege score as ratio of priv users with global admin role to priv users without global admin role
 LeastPrivilegeScore := "Policy MS.AAD.7.1 failed so score not computed" if {
     IsGlobalAdminCountGood == false
 } else := GetScoreDescription
