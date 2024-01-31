@@ -45,10 +45,13 @@ jobs:
       - name: Install Selenium & Update Wed Drivers
         run: |
           Install-Module -Name Selenium -RequiredVersion 3.0.1 -Scope CurrentUser -Force
-          Import-Module -Name Selenium -Force
+          Import-Module -Name "C:\Users\runneradmin\Documents\WindowsPowerShell\Modules\Selenium\3.0.1\Selenium.psd1" -Force
           ./Testing/Functional/SmokeTest/UpdateSelenium.ps1
+          $Driver = Start-SEChrome -Headless
+          $Uri = (Get-Item .\sample-report\BaselineReports.html).FullName
+          Open-SeUrl $Uri -Driver $Driver
+          Get-SeElement -Driver $Driver -By TagName 'table'
           (Get-Module Selenium)|fl
-          Remove-Module -Name Selenium -Force
       - name: Test Products
         # The testing params are stored as a string in a CSV-like format.
         # Pipes separate products, and commas separate key/value pairs.
