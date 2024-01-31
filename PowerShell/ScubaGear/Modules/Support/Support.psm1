@@ -51,7 +51,7 @@ function Initialize-SCuBA {
     .NOTES
         Executing the script with no switches set will install the latest
         version of a module if not already installed.
-    #> 
+    #>
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $false, HelpMessage = 'Installs a given module and overrides warning messages about module installation conflicts. If a module with the same name already exists on the computer, Force allows for multiple versions to be installed. If there is an existing module with the same name and version, Force overwrites that version')]
