@@ -158,7 +158,7 @@ jobs:
         shell: powershell
     steps:
       - name: Retrieve NuGetAPIKey from Key Vault
-        uses: Azure/get-keyvault-secret@v1
+        uses: Azure/get-keyvault-secrets@v1
         with:
           keyvault: ${{ needs.Release-Prep.outputs.KeyVaultUrl}}
           secrets: 'ScubaGear-PSGAllery-API-Key'
