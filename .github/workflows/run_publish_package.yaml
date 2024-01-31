@@ -28,7 +28,7 @@ env:
   ModuleName: ScubaGear
 
 jobs:
-  Release-Prep:
+  ReleasePrep:
     runs-on: windows-latest
     environment: Development
     permissions:
@@ -46,10 +46,8 @@ jobs:
           KEY_VAULT_INFO: ${{ secrets.SCUBA_KEY_VAULT_DEV}}
         run: |
           $KeyVaultInfo = ${env:KEY_VAULT_INFO} | ConvertFrom-Json
-          echo "KeyVaultUrl=$($KeyVaultInfo.KeyVault.URL)"
-          echo "KeyVaultUrl=$($KeyVaultInfo.KeyVault.URL)" >> "$GITHUB_OUTPUT"
-          echo "KeyVaultCertificateName=$($KeyVaultInfo.KeyVault.CertificateName)"
-          echo "KeyVaultCertificateName=$($KeyVaultInfo.KeyVault.CertificateName)" >> "$GITHUB_OUTPUT"
+          echo "KeyVaultUrl=$($KeyVaultInfo.KeyVault.URL)" >> $env:GITHUB_OUTPUT
+          echo "KeyVaultCertificateName=$($KeyVaultInfo.KeyVault.CertificateName)" >> $env:GITHUB_OUTPUT
         id: "key_vault_info"
       - name: Install Azure Signing Tool
         run: |
@@ -62,7 +60,7 @@ jobs:
 
   Publish-Private-Package:
     if: github.event.schedule == '23 0 * * *'
-    needs: [Release-Prep]
+    needs: [ReleasePrep]
     runs-on: windows-latest
     environment: Development
     permissions:
@@ -92,8 +90,8 @@ jobs:
             # Remove non-release files
             Remove-Item -Recurse -Force repo -Include .git*
             Publish-ScubaGearModule `
-              -AzureKeyVaultUrl ${{ needs.Release-Prep.outputs.KeyVaultUrl}} `
-              -CertificateName ${{ needs.Release-Prep.outputs.KeyVaultCertificateName}} `
+              -AzureKeyVaultUrl ${{ needs.ReleasePrep.outputs.KeyVaultUrl}} `
+              -CertificateName ${{ needs.ReleasePrep.outputs.KeyVaultCertificateName}} `
               -ModulePath repo/PowerShell/ScubaGear `
               -GalleryName $env:GalleryName
           azPSVersion: "latest"
@@ -149,7 +147,7 @@ jobs:
 
   Publish-To-PSGallery:
     if: github.event_name == 'workflow_dispatch'
-    needs: [Release-Prep]
+    needs: [ReleasePrep]
     runs-on: windows-latest
     environment: Development
     permissions:
@@ -161,7 +159,7 @@ jobs:
     steps:
       - name: Debug check 
         run: |
-          echo "${{ needs.Release-Prep.outputs.KeyVaultUrl }}"
+          echo ${{ needs.ReleasePrep.outputs.KeyVaultUrl }}
       - name: OIDC Login to Azure Public Cloud with AzPowershell (enableAzPSSession true)
         uses: azure/login@v1
         with:
@@ -172,7 +170,7 @@ jobs:
       - name: Retrieve NuGetAPIKey from Key Vault
         uses: Azure/get-keyvault-secrets@v1
         with:
-          keyvault: ${{ needs.Release-Prep.outputs.KeyVaultUrl }}
+          keyvault: ${{ needs.ReleasePrep.outputs.KeyVaultUrl }}
           secrets: 'ScubaGear-PSGAllery-API-Key'
         id: KeyVaultSecrets
       - name: Sign and publish module to private gallery
@@ -183,17 +181,17 @@ jobs:
             # Remove non-release files
             Remove-Item -Recurse -Force repo -Include .git*
             $PublishSplat = @{
-              AzureKeyVaultUrl = "${{ needs.Release-Prep.outputs.KeyVaultUrl}}"" `
-              CertificateName = "${{ needs.Release-Prep.outputs.KeyVaultCertificateName}}" `
+              AzureKeyVaultUrl = ${{ needs.ReleasePrep.outputs.KeyVaultUrl}} `
+              CertificateName = ${{ needs.ReleasePrep.outputs.KeyVaultCertificateName}} `
               ModulePath = repo/PowerShell/ScubaGear
               GalleryName = 'PSGallery'
-              NuGetApiKey = "${{ steps.KeyVaultSecrets.outputs.ScubaGear-PSGAllery-API-Key}}"
+              NuGetApiKey = ${{ steps.KeyVaultSecrets.outputs.ScubaGear-PSGAllery-API-Key}}
             }
             if (${{ inputs.IsPrerelease }}){
-              $PublishSplat.Add('NuGetApiKey', "${{ inputs.PrereleaseTag }}")
+              $PublishSplat.Add('NuGetApiKey', ${{ inputs.PrereleaseTag }})
             }
             if (${{ inputs.OverrideModuleVersion}} -ne $null){
-              $PublishSplat.Add('OverrideModuleVersion', "${{ inputs.OverrideModuleVersion }}")
+              $PublishSplat.Add('OverrideModuleVersion', ${{ inputs.OverrideModuleVersion }})
             }
             Publish-ScubaGearModule @PublishSplat
           azPSVersion: "latest"
