@@ -83,4 +83,5 @@ function Install-SmokeTestExternalDependencies{
     Install-Module -Name Selenium -Scope CurrentUser -Force
     Import-Module -Name Selenium -Force
     Testing/Functional/SmokeTest/UpdateSelenium.ps1
+    Remove-Module -Name Selenium
 }

@@ -39,6 +39,9 @@ jobs:
           Import-Module -Name .\PowerShell\ScubaGear\ScubaGear.psd1
           Install-OPA
 
+          # Workaround for Selenium. Loading psm1 instead of psd1
+          Import-Module -Name (Get-Module -Name Selenium -ListAvailable).Path -Force
+
           # ScubaGear currently requires the provisioning of a certificate for using a ServicePrinicpal, rather than
           # using Workload Identity Federation, which would ordinarily be preferred for calling Microsoft APIs from
           # GitHub actions.
