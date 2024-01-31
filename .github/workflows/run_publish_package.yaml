@@ -84,7 +84,7 @@ jobs:
         with:
           inlineScript: |
             az version
-            $api_key = az keyvault secret show --id 'https://scubagearkeyvault.vault.azure.net/secrets/ScubaGear-PSGAllery-API-Key' --query value -o tsv
+            $api_key = ${az keyvault secret show --id 'https://scubagearkeyvault.vault.azure.net/secrets/ScubaGear-PSGAllery-API-Key' --query value -o tsv}
             echo "$api_key"
             echo "apiKey=$api_key"
             echo "apiKey=$api_key" >> $env:GITHUB_OUTPUT
