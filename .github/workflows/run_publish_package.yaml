@@ -47,9 +47,9 @@ jobs:
         run: |
           $KeyVaultInfo = ${env:KEY_VAULT_INFO} | ConvertFrom-Json
           echo "KeyVaultUrl=$($KeyVaultInfo.KeyVault.URL)"
-          echo "KeyVaultUrl=$($KeyVaultInfo.KeyVault.URL)" >> $GITHUB_OUTPUT
+          echo "KeyVaultUrl=$($KeyVaultInfo.KeyVault.URL)" >> "$GITHUB_OUTPUT"
           echo "KeyVaultCertificateName=$($KeyVaultInfo.KeyVault.CertificateName)"
-          echo "KeyVaultCertificateName=$($KeyVaultInfo.KeyVault.CertificateName)" >> $GITHUB_OUTPUT
+          echo "KeyVaultCertificateName=$($KeyVaultInfo.KeyVault.CertificateName)" >> "$GITHUB_OUTPUT"
         id: "key_vault_info"
       - name: Install Azure Signing Tool
         run: |
