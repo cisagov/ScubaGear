@@ -84,8 +84,9 @@ jobs:
         with:
           inlineScript: |
             az version
-            Secret=$(az keyvault secret show --id 'https://scubagearkeyvault.vault.azure.net/secrets/ScubaGear-PSGAllery-API-Key' --query value)
-            echo "apiKey=$Secret" >> "$GITHUB_OUTPUT"
+            api_key=$(az keyvault secret show --id 'https://scubagearkeyvault.vault.azure.net/secrets/ScubaGear-PSGAllery-API-Key' --query value -o tsv)
+            echo "::add-mask::$api_key"
+            echo "apiKey=$api_key" >> $GITHUB_OUTPUT
 
   Publish-Private-Package:
     if: github.event.schedule == '23 0 * * *'
