@@ -161,7 +161,10 @@ test_SecureScore_Correct_V1 if {
         }
     }
 
-    ReportDetailStr := "Requirement met: Least Privilege Score = 0.66"
+    ReportDetailStr := "Requirement met: Least Privilege Score = 0.66 (should be 1 or less)"
+
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == "MS.AAD.7.2v1"]
+  print(RuleOutput)
 
     TestResult("MS.AAD.7.2v1", Output, ReportDetailStr, true) == true
 }
@@ -199,7 +202,10 @@ test_SecureScore_Incorrect_V1 if {
         }
     }
 
-    ReportDetailStr := "Requirement met: Least Privilege Score = 1"
+    ReportDetailStr := "Requirement met: Least Privilege Score = 1 (should be 1 or less)"
+
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == "MS.AAD.7.2v1"]
+  print(RuleOutput)
 
     TestResult("MS.AAD.7.2v1", Output, ReportDetailStr, true) == true
 }
@@ -231,7 +237,10 @@ test_SecureScore_Incorrect_V2 if {
         }
     }
 
-    ReportDetailStr := "Requirement not met: Least Privilege Score = 2"
+    ReportDetailStr := "Requirement not met: Least Privilege Score = 2 (should be 1 or less)"
+
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == "MS.AAD.7.2v1"]
+  print(RuleOutput)
 
     TestResult("MS.AAD.7.2v1", Output, ReportDetailStr, false) == true
 }
