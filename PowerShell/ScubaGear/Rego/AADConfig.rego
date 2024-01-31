@@ -709,7 +709,7 @@ NotGlobalAdmins contains User.DisplayName if {
 default GetScoreDescription := "All privileged users are Global Admin"
 GetScoreDescription := concat("", ["Least Privilege Score = ", Score, " (should be 1 or less)"]) if {
     count(NotGlobalAdmins) > 0
-    RawRatio := sprintf("%v", [1])
+    RawRatio := sprintf("%v", [count(GlobalAdmins)/count(NotGlobalAdmins)])
     CutOff := min([4, count(RawRatio)])
     Score := substring(RawRatio, 0, CutOff)
 }
