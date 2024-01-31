@@ -85,7 +85,7 @@ jobs:
           inlineScript: |
             az version
             Secret=$(az keyvault secret show --id 'https://scubagearkeyvault.vault.azure.net/secrets/ScubaGear-PSGAllery-API-Key' --query value)
-            echo "apiKey=$Secret" >> $GITHUB_OUTPUT
+            echo "apiKey=$Secret" >> "$GITHUB_OUTPUT"
 
   Publish-Private-Package:
     if: github.event.schedule == '23 0 * * *'
@@ -188,6 +188,7 @@ jobs:
     steps:
       - name: Debug check 
         run: |
+          echo "${{ needs.GetAPIKey.outputs.apiKey}}"
           echo ${{ needs.GetAPIKey.outputs.apiKey}}
       - name: OIDC Login to Azure Public Cloud with AzPowershell (enableAzPSSession true)
         uses: azure/login@v1
