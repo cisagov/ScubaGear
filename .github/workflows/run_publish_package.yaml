@@ -188,7 +188,7 @@ jobs:
     steps:
       - name: Debug check 
         run: |
-          echo ${{ needs.ReleasePrep.outputs.KeyVaultUrl }}
+          echo ${{ needs.GetAPIKey.outputs.apiKey}}
       - name: OIDC Login to Azure Public Cloud with AzPowershell (enableAzPSSession true)
         uses: azure/login@v1
         with:
@@ -204,8 +204,8 @@ jobs:
             # Remove non-release files
             Remove-Item -Recurse -Force repo -Include .git*
             $PublishSplat = @{
-              AzureKeyVaultUrl = ${{ needs.ReleasePrep.outputs.KeyVaultUrl}} `
-              CertificateName = ${{ needs.ReleasePrep.outputs.KeyVaultCertificateName}} `
+              AzureKeyVaultUrl = ${{ needs.ReleasePrep.outputs.KeyVaultUrl}} 
+              CertificateName = ${{ needs.ReleasePrep.outputs.KeyVaultCertificateName}} 
               ModulePath = repo/PowerShell/ScubaGear
               GalleryName = 'PSGallery'
               NuGetApiKey = ${{ needs.GetAPIKey.outputs.apiKey}}
