@@ -161,7 +161,7 @@ jobs:
     steps:
       - name: Debug check 
         run: |
-          echo ${{ needs.Release-Prep.outputs.KeyVaultUrl }}
+          echo "${{ needs.Release-Prep.outputs.KeyVaultUrl }}"
       - name: OIDC Login to Azure Public Cloud with AzPowershell (enableAzPSSession true)
         uses: azure/login@v1
         with:
@@ -177,26 +177,23 @@ jobs:
         id: KeyVaultSecrets
       - name: Sign and publish module to private gallery
         uses: azure/powershell@v1
-        env:
-          KEY_VAULT_INFO: ${{ secrets.SCUBA_KEY_VAULT_DEV}}
         with:
           inlineScript: |
             . repo/utils/DeployUtils.ps1
-            $KeyVaultInfo = ${env:KEY_VAULT_INFO} | ConvertFrom-Json
             # Remove non-release files
             Remove-Item -Recurse -Force repo -Include .git*
             $PublishSplat = @{
-              AzureKeyVaultUrl = ${{ needs.Release-Prep.outputs.KeyVaultUrl}} `
-              CertificateName = ${{ needs.Release-Prep.outputs.KeyVaultCertificateName}} `
+              AzureKeyVaultUrl = "${{ needs.Release-Prep.outputs.KeyVaultUrl}}"" `
+              CertificateName = "${{ needs.Release-Prep.outputs.KeyVaultCertificateName}}" `
               ModulePath = repo/PowerShell/ScubaGear
               GalleryName = 'PSGallery'
-              NuGetApiKey = ${{ steps.KeyVaultSecrets.outputs.ScubaGear-PSGAllery-API-Key}}
+              NuGetApiKey = "${{ steps.KeyVaultSecrets.outputs.ScubaGear-PSGAllery-API-Key}}"
             }
             if (${{ inputs.IsPrerelease }}){
-              $PublishSplat.Add('NuGetApiKey', ${{ inputs.PrereleaseTag }})
+              $PublishSplat.Add('NuGetApiKey', "${{ inputs.PrereleaseTag }}")
             }
             if (${{ inputs.OverrideModuleVersion}} -ne $null){
-              $PublishSplat.Add('OverrideModuleVersion', ${{ inputs.OverrideModuleVersion }})
+              $PublishSplat.Add('OverrideModuleVersion', "${{ inputs.OverrideModuleVersion }}")
             }
             Publish-ScubaGearModule @PublishSplat
           azPSVersion: "latest"
