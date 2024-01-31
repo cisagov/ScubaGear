@@ -80,7 +80,7 @@ jobs:
         uses: azure/CLI@v1
         with:
           inlineScript: |
-            az show account
+            az account show
 
   Publish-Private-Package:
     if: github.event.schedule == '23 0 * * *'
