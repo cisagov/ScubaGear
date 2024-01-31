@@ -69,6 +69,8 @@ jobs:
     defaults:
       run:
         shell: powershell
+    outputs:
+      apiKey:  ${{ steps.GetApiKey.outputs.APIKEY}}   
     steps:
       - name: Login
         uses: azure/login@v1
@@ -77,10 +79,12 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
       - name: AZ CLI
+        id: GetApiKey
         uses: azure/CLI@v1
         with:
           inlineScript: |
-            az account show
+            $Secret = (az keyvault secret show --id "https://scubagearkeyvault.vault.azure.net/secrets/ScubaGear-PSGAllery-API-Key" | ConvertFrom-Json).Value
+            echo "apiKey=$Secret" >> $env:GITHUB_OUTPUT
 
   Publish-Private-Package:
     if: github.event.schedule == '23 0 * * *'
@@ -191,12 +195,6 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           enable-AzPSSession: true
-      - name: Retrieve NuGetAPIKey from Key Vault
-        uses: Azure/get-keyvault-secrets@v1
-        with:
-          keyvault: ${{ needs.ReleasePrep.outputs.KeyVaultUrl }}
-          secrets: 'ScubaGear-PSGAllery-API-Key'
-        id: KeyVaultSecrets
       - name: Sign and publish module to private gallery
         uses: azure/powershell@v1
         with:
@@ -209,7 +207,7 @@ jobs:
               CertificateName = ${{ needs.ReleasePrep.outputs.KeyVaultCertificateName}} `
               ModulePath = repo/PowerShell/ScubaGear
               GalleryName = 'PSGallery'
-              NuGetApiKey = ${{ steps.KeyVaultSecrets.outputs.ScubaGear-PSGAllery-API-Key}}
+              NuGetApiKey = ${{ needs.GetAPIKey.outputs.apiKey}}
             }
             if (${{ inputs.IsPrerelease }}){
               $PublishSplat.Add('NuGetApiKey', ${{ inputs.PrereleaseTag }})
