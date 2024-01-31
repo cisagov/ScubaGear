@@ -70,7 +70,7 @@ jobs:
       run:
         shell: powershell
     outputs:
-      apiKey:  ${{ steps.GetApiKey.outputs.APIKEY}}   
+      apiKey:  ${{ steps.GetSecret.outputs.apiKey}}   
     steps:
       - name: Login
         uses: azure/login@v1
@@ -79,7 +79,7 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
       - name: AZ CLI
-        id: GetApiKey
+        id: GetSecret
         uses: azure/CLI@v1
         with:
           inlineScript: |
