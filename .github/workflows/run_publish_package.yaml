@@ -167,6 +167,12 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           enable-AzPSSession: true
+      - name: Key Vault via CLI
+        uses: azure/CLI@v1
+        with:
+          azcliversion: 2.30.0
+          inlineScript: |
+            az show account
       - name: Retrieve NuGetAPIKey from Key Vault
         uses: Azure/get-keyvault-secrets@v1
         with:
