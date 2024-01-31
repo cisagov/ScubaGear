@@ -84,7 +84,8 @@ jobs:
         with:
           inlineScript: |
             az version
-            $Secret = (az keyvault secret show --id "https://scubagearkeyvault.vault.azure.net/secrets/ScubaGear-PSGAllery-API-Key" | ConvertFrom-Json).Value
+            $SecretInfo = az keyvault secret show --id 'https://scubagearkeyvault.vault.azure.net/secrets/ScubaGear-PSGAllery-API-Key' | ConvertFrom-Json
+            $Secret = $SecretInfo.Value
             echo "apiKey=$Secret" >> $env:GITHUB_OUTPUT
 
   Publish-Private-Package:
