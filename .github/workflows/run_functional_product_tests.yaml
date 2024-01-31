@@ -57,7 +57,7 @@ jobs:
           Import-Module -Name .\PowerShell\ScubaGear\ScubaGear.psd1
           Install-OPA
           # Workaround for Selenium
-          Import-Module -Name (Get-Module -Name Selenium).Path -Force
+          Import-Module -Name (Get-Module -Name Selenium -ListAvailable).Path -Force
           Start-SEChrome -Headless
           # Read thumbprint from previous job.
           $thumbprint = "${{ steps.getthumbprint.outputs.THUMBPRINT }}"
