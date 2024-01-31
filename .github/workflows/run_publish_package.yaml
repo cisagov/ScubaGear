@@ -46,7 +46,9 @@ jobs:
           KEY_VAULT_INFO: ${{ secrets.SCUBA_KEY_VAULT_DEV}}
         run: |
           $KeyVaultInfo = ${env:KEY_VAULT_INFO} | ConvertFrom-Json
+          echo "KeyVaultUrl=$($KeyVaultInfo.KeyVault.URL)"
           echo "KeyVaultUrl=$($KeyVaultInfo.KeyVault.URL)" >> $GITHUB_OUTPUT
+          echo "KeyVaultCertificateName=$($KeyVaultInfo.KeyVault.CertificateName)"
           echo "KeyVaultCertificateName=$($KeyVaultInfo.KeyVault.CertificateName)" >> $GITHUB_OUTPUT
         id: "key_vault_info"
       - name: Install Azure Signing Tool
@@ -157,6 +159,9 @@ jobs:
       run:
         shell: powershell
     steps:
+      - name: Debug check 
+        run: |
+          echo ${{ needs.Release-Prep.outputs.KeyVaultUrl }}
       - name: OIDC Login to Azure Public Cloud with AzPowershell (enableAzPSSession true)
         uses: azure/login@v1
         with:
@@ -167,7 +172,7 @@ jobs:
       - name: Retrieve NuGetAPIKey from Key Vault
         uses: Azure/get-keyvault-secrets@v1
         with:
-          keyvault: ${{ needs.Release-Prep.outputs.KeyVaultUrl}}
+          keyvault: ${{ needs.Release-Prep.outputs.KeyVaultUrl }}
           secrets: 'ScubaGear-PSGAllery-API-Key'
         id: KeyVaultSecrets
       - name: Sign and publish module to private gallery
