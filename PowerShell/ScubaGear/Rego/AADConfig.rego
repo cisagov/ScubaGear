@@ -707,9 +707,11 @@ NotGlobalAdmins contains User.DisplayName if {
 }
 
 default GetScoreDescription := "All privileged users are Global Admin"
-GetScoreDescription := concat("", ["Least Privilege Score = ", format_int(x,10), "%"]) if {
+GetScoreDescription := concat("", ["Least Privilege Score = ", Score]) if {
     count(NotGlobalAdmins) > 0
-    x := count(GlobalAdmins)/count(NotGlobalAdmins)*100
+    RawRatio := sprintf("%v", [count(GlobalAdmins)/count(NotGlobalAdmins)])
+    CutOff := min([4, count(RawRatio)])
+    Score := substring(RawRatio, 0, CutOff)
 }
 
 # calculate least privilege score as ratio of priv users with global admin role to priv users without global admin role

@@ -161,7 +161,7 @@ test_SecureScore_Correct_V1 if {
         }
     }
 
-    ReportDetailStr := "Requirement met: Least Privilege Score = 66%"
+    ReportDetailStr := "Requirement met: Least Privilege Score = 0.66"
 
     TestResult("MS.AAD.7.2v1", Output, ReportDetailStr, true) == true
 }
@@ -199,7 +199,7 @@ test_SecureScore_Incorrect_V1 if {
         }
     }
 
-    ReportDetailStr := "Requirement met: Least Privilege Score = 100%"
+    ReportDetailStr := "Requirement met: Least Privilege Score = 1"
 
     TestResult("MS.AAD.7.2v1", Output, ReportDetailStr, true) == true
 }
@@ -231,7 +231,7 @@ test_SecureScore_Incorrect_V2 if {
         }
     }
 
-    ReportDetailStr := "Requirement not met: Least Privilege Score = 200%"
+    ReportDetailStr := "Requirement not met: Least Privilege Score = 2"
 
     TestResult("MS.AAD.7.2v1", Output, ReportDetailStr, false) == true
 }
