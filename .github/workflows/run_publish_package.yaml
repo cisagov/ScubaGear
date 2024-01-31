@@ -43,7 +43,7 @@ jobs:
     steps:
       - name: Get Key Vault info
         env:
-          KEY_VAULT_INFO: ${{ secrets.SCUBA_KEY_VAULT_DEV}}
+          KEY_VAULT_INFO: ${{ secrets.SCUBA_KEY_VAULT_PROD}}
         run: |
           $KeyVaultInfo = ${env:KEY_VAULT_INFO} | ConvertFrom-Json
           echo "KeyVaultUrl=$($KeyVaultInfo.KeyVault.URL)" >> $env:GITHUB_OUTPUT
