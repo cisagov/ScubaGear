@@ -42,7 +42,7 @@ jobs:
         env:
           PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
 
-      - name: Install Selenium
+      - name: Install Selenium & Update Wed Drivers
         run: |
           Install-Module -Name Selenium -RequiredVersion 3.0.1 -Scope CurrentUser -Force
           Import-Module -Name Selenium -Force
@@ -54,7 +54,6 @@ jobs:
         # key1=value1,key2=value2|key3=value3,key4=value4...
         # This job parses the keys and values and converts them to a hashtable.
         run: |
-          $PSVersionTable
           Import-Module -Name .\PowerShell\ScubaGear\ScubaGear.psd1
           Install-OPA
           # Read thumbprint from previous job.
