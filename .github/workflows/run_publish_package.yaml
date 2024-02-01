@@ -58,34 +58,6 @@ jobs:
         with:
           path: repo
 
-  GetAPIKey:
-    if: github.event_name == 'workflow_dispatch'
-    needs: [ReleasePrep]
-    runs-on: windows-latest
-    environment: Development
-    permissions:
-      id-token: write
-      contents: write
-    defaults:
-      run:
-        shell: powershell  
-    outputs:
-      apiKey:  ${{ steps.GetSecret.outputs.apiKey}}   
-    steps:
-      - name: Login to Azure
-        uses: azure/login@v1
-        with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      - name: Get API key from vault
-        id: GetSecret
-        run: |
-            az version
-            $apiKeyPlainText = az keyvault secret show --id 'https://scubagearkeyvault.vault.azure.net/secrets/ScubaGear-PSGAllery-API-Key' --query value -o tsv
-            $apiKeyEncrypted = ConvertTo-SecureString -String $apiKeyPlainText -AsPlainText -Force
-            echo "apiKey=$apiKeyEncrypted" >> $env:GITHUB_OUTPUT
-
   Publish-Private-Package:
     if: github.event.schedule == '23 0 * * *'
     needs: [ReleasePrep]
@@ -175,7 +147,7 @@ jobs:
 
   Publish-To-PSGallery:
     if: github.event_name == 'workflow_dispatch'
-    needs: [ReleasePrep, GetAPIKey]
+    needs: [ReleasePrep]
     runs-on: windows-latest
     environment: Development
     permissions:
@@ -185,11 +157,6 @@ jobs:
       run:
         shell: powershell
     steps:
-      - name: Debug check 
-        run: |
-          echo "${{ needs.GetAPIKey.outputs.apiKey}}"
-          $PlainText = ConvertFrom-SecureString -SecureString ${{ needs.GetAPIKey.outputs.apiKey}}
-          echo $PlainText
       - name: OIDC Login to Azure Public Cloud with AzPowershell (enableAzPSSession true)
         uses: azure/login@v1
         with:
@@ -197,28 +164,32 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           enable-AzPSSession: true
-      - name: Sign and publish module to private gallery
-        uses: azure/powershell@v1
+      - name: Login to Azure
+        uses: azure/login@v1
         with:
-          inlineScript: |
-            . repo/utils/DeployUtils.ps1
-            # Remove non-release files
-            Remove-Item -Recurse -Force repo -Include .git*
-            $PublishSplat = @{
-              AzureKeyVaultUrl = ${{ needs.ReleasePrep.outputs.KeyVaultUrl}} 
-              CertificateName = ${{ needs.ReleasePrep.outputs.KeyVaultCertificateName}} 
-              ModulePath = repo/PowerShell/ScubaGear
-              GalleryName = 'PSGallery'
-              NuGetApiKey = ${{ needs.GetAPIKey.outputs.apiKey}}
-            }
-            if (${{ inputs.IsPrerelease }}){
-              $PublishSplat.Add('NuGetApiKey', ${{ inputs.PrereleaseTag }})
-            }
-            if (${{ inputs.OverrideModuleVersion}} -ne $null){
-              $PublishSplat.Add('OverrideModuleVersion', ${{ inputs.OverrideModuleVersion }})
-            }
-            Publish-ScubaGearModule @PublishSplat
-          azPSVersion: "latest"
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      - name: Sign and publish module to private gallery
+        run: |
+          . repo/utils/DeployUtils.ps1
+          # Remove non-release files
+          Remove-Item -Recurse -Force repo -Include .git*
+          $ApiKey = az keyvault secret show --id "${{ needs.ReleasePrep.outputs.KeyVaultUrl}}/secrets/ScubaGear-PSGAllery-API-Key" --query value -o tsv
+          $PublishSplat = @{
+            AzureKeyVaultUrl = ${{ needs.ReleasePrep.outputs.KeyVaultUrl}} 
+            CertificateName = ${{ needs.ReleasePrep.outputs.KeyVaultCertificateName}} 
+            ModulePath = repo/PowerShell/ScubaGear
+            GalleryName = 'PSGallery'
+            NuGetApiKey = $ApiKey
+          }
+          if (${{ inputs.IsPrerelease }}){
+            $PublishSplat.Add('NuGetApiKey', ${{ inputs.PrereleaseTag }})
+          }
+          if (${{ inputs.OverrideModuleVersion}} -ne $null){
+            $PublishSplat.Add('OverrideModuleVersion', ${{ inputs.OverrideModuleVersion }})
+          }
+          Publish-ScubaGearModule @PublishSplat
       - name: Check Scuba Version
         run: |
           repo/SetUp.ps1 -NoOPA
