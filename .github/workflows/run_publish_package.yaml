@@ -183,11 +183,11 @@ jobs:
             GalleryName = 'PSGallery'
             NuGetApiKey = $ApiKey
           }
-          if ('true' -eq ${{ inputs.IsPrerelease }}){
+          if ('true' -eq "${{ inputs.IsPrerelease }}"){
             $PublishSplat.Add('PreleaseTag', ${{ inputs.PrereleaseTag }})
           }
           if ([string]::NullOrEmpty("${{ inputs.OverrideModuleVersion }}"){
-            $PublishSplat.Add('OverrideModuleVersion', ${{ inputs.OverrideModuleVersion }})
+            $PublishSplat.Add('OverrideModuleVersion', "${{ inputs.OverrideModuleVersion }}")
           }
           Publish-ScubaGearModule @PublishSplat
       - name: Check Scuba Version
