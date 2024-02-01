@@ -195,7 +195,7 @@ jobs:
           if ('true' -eq '${{ inputs.IsPrerelease }}'){
             $PublishSplat.Add('PreleaseTag', '${{ inputs.PrereleaseTag }}')
           }
-          if ([string]::NullOrEmpty('${{ inputs.OverrideModuleVersion }}')){
+          if (-Not [string]::IsNullOrEmpty('${{ inputs.OverrideModuleVersion }}')){
             $PublishSplat.Add('OverrideModuleVersion', '${{ inputs.OverrideModuleVersion }}')
           }
           Publish-ScubaGearModule @PublishSplat
