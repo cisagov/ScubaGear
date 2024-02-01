@@ -82,10 +82,9 @@ jobs:
         id: GetSecret
         run: |
             az version
-            $api_key = az keyvault secret show --id 'https://scubagearkeyvault.vault.azure.net/secrets/ScubaGear-PSGAllery-API-Key' --query value -o tsv
-            echo "$api_key"
-            echo "apiKey=$api_key"
-            echo "apiKey=$api_key" >> $env:GITHUB_OUTPUT
+            $apiKeyPlainText = az keyvault secret show --id 'https://scubagearkeyvault.vault.azure.net/secrets/ScubaGear-PSGAllery-API-Key' --query value -o tsv
+            $apiKeyEncrypted = ConvertTo-SecureString -String $apiKeyPlainText -AsPlainText -Force
+            echo "apiKey=$apiKeyEncrypted" >> $env:GITHUB_OUTPUT
 
   Publish-Private-Package:
     if: github.event.schedule == '23 0 * * *'
@@ -189,7 +188,8 @@ jobs:
       - name: Debug check 
         run: |
           echo "${{ needs.GetAPIKey.outputs.apiKey}}"
-          echo ${{ needs.GetAPIKey.outputs.apiKey}}
+          $PlainText = ConvertFrom-SecureString -SecureString ${{ needs.GetAPIKey.outputs.apiKey}}
+          echo $PlainText
       - name: OIDC Login to Azure Public Cloud with AzPowershell (enableAzPSSession true)
         uses: azure/login@v1
         with:
