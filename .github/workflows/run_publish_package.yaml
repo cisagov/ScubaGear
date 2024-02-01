@@ -175,18 +175,18 @@ jobs:
           . repo/utils/DeployUtils.ps1
           # Remove non-release files
           Remove-Item -Recurse -Force repo -Include .git*
-          $ApiKey = az keyvault secret show --id "${{ needs.ReleasePrep.outputs.KeyVaultUrl}}/secrets/ScubaGear-PSGAllery-API-Key" --query value -o tsv
+          $ApiKey = az keyvault secret show --id "${{ needs.ReleasePrep.outputs.KeyVaultUrl }}/secrets/ScubaGear-PSGAllery-API-Key" --query value -o tsv
           $PublishSplat = @{
-            AzureKeyVaultUrl = ${{ needs.ReleasePrep.outputs.KeyVaultUrl}} 
-            CertificateName = ${{ needs.ReleasePrep.outputs.KeyVaultCertificateName}} 
+            AzureKeyVaultUrl = ${{ needs.ReleasePrep.outputs.KeyVaultUrl }} 
+            CertificateName = ${{ needs.ReleasePrep.outputs.KeyVaultCertificateName }} 
             ModulePath = repo/PowerShell/ScubaGear
             GalleryName = 'PSGallery'
             NuGetApiKey = $ApiKey
           }
-          if (${{ inputs.IsPrerelease }}){
-            $PublishSplat.Add('NuGetApiKey', ${{ inputs.PrereleaseTag }})
+          if ('true' -eq ${{ inputs.IsPrerelease }}){
+            $PublishSplat.Add('PreleaseTag', ${{ inputs.PrereleaseTag }})
           }
-          if (${{ inputs.OverrideModuleVersion}} -ne $null){
+          if ([string]::NullOrEmpty("${{ inputs.OverrideModuleVersion }}"){
             $PublishSplat.Add('OverrideModuleVersion', ${{ inputs.OverrideModuleVersion }})
           }
           Publish-ScubaGearModule @PublishSplat
