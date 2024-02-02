@@ -20,6 +20,6 @@ jobs:
   syntax:
     name: Syntax
     uses: cisagov/ScubaGear/.github/workflows/run_markdown_check.yaml@825-create-initial-software-dev-pipeline
-    needs: lint
+    needs: [lint-yaml, lint-powershell]
   # unit:
   #   needs: [lint, syntax]
