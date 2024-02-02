@@ -2,6 +2,7 @@ name: Run PowerShell Tests
 on:
   # Run tests on each commit, newly opened/reopened PR, and
   # PR review submission (e.g. approval)
+  workflow_call:
   workflow_dispatch:
   push:
     paths:
