@@ -12,10 +12,14 @@ on:
 
 jobs:
   lint-yaml:
+    name: Lint
     uses: cisagov/ScubaGear/.github/workflows/run_linter_yaml.yaml@825-create-initial-software-dev-pipeline
   lint-powershell:
+    name: Lint
     uses: cisagov/ScubaGear/.github/workflows/run_linter_powershell.yaml@825-create-initial-software-dev-pipeline
-  # syntax:
-  #   needs: lint
+  syntax:
+    name: Syntax
+    uses: cisagov/ScubaGear/.github/workflows/run_markdown_check.yaml@825-create-initial-software-dev-pipeline
+    needs: lint
   # unit:
   #   needs: [lint, syntax]

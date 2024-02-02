@@ -1,4 +1,7 @@
+name: Markdown Check
+
 on:
+  workflow_call:
   workflow_dispatch:
   pull_request:
     types: [opened, reopened]
@@ -14,8 +17,6 @@ on:
     paths:
       - "baselines/*.md"
       - ".github/workflows/run_markdown_check.yaml"
-
-name: Markdown Check
 
 jobs:
   Run-Markdown-Check:
