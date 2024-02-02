@@ -6,14 +6,15 @@ name: CI/CD Pipeline
 on:
   push:
     branches:
-    - 825-create-initial-software-dev-pipeline
+      - 825-create-initial-software-dev-pipeline
   pull_request:
   workflow_dispatch:
 
 jobs:
-  lint:
-    name: Lint  
+  lint-yaml:
     uses: cisagov/ScubaGear/.github/workflows/run_linter_yaml.yaml@825-create-initial-software-dev-pipeline
+  lint-powershell:
+    uses: cisagov/ScubaGear/.github/workflows/run_linter_powershell.yaml@825-create-initial-software-dev-pipeline
   # syntax:
   #   needs: lint
   # unit:
