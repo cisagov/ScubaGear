@@ -4,7 +4,6 @@
 name:  CI/CD Pipeline
 
 on:
-  workflow_call:
   push:
   pull_request:
   workflow_dispatch:

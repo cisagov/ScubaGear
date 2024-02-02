@@ -8,6 +8,7 @@ on:
     paths:
       - "**.yml"
       - "**.yaml"
+  workflow_call:
   workflow_dispatch:
 
 jobs:
