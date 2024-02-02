@@ -18,8 +18,7 @@ class ScubaConfig {
     }
 
     hidden [void]ClearConfiguration(){
-        Get-Member -InputObject ($this.Configuration) -Type properties |
-          ForEach-Object { $this.Configuration.PSObject.Properties.Remove($_.name)}
+        $this.Configuration = $null
     }
 
     hidden [Guid]$Uuid = [Guid]::NewGuid()
@@ -27,10 +26,18 @@ class ScubaConfig {
 
     hidden [void]SetParameterDefaults(){
         if (-Not $this.Configuration.ProductNames){
-            $this.Configuration.ProductNames = "teams", "exo", "defender", "aad", "sharepoint", "powerplatform" | Sort-Object
+            $this.Configuration.ProductNames = @("aad", "defender", "exo", "sharepoint", "teams")
         }
         else{
-            $this.Configuration.ProductNames = $this.Configuration.ProductNames | Sort-Object
+            # Transform ProductNames into list of all products if it contains wildcard 
+            if ($this.Configuration.ProductNames.Contains('*')){
+                $this.Configuration.ProductNames = "aad", "defender", "exo", "powerplatform", "sharepoint", "teams"
+                Write-Debug "Setting ProductNames to all products because of wildcard"
+            }
+            else{
+                $this.Configuration.ProductNames = $this.Configuration.ProductNames | Sort-Object
+            }
+            
         }
 
         if (-Not $this.Configuration.M365Environment){
