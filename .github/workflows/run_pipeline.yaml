@@ -1,0 +1,18 @@
+# Purpose:  Run the CI/CD pipeline that tests, packages, and publishes ScubaGear.
+# Note:  This pipeline is a work in progress.  At the moment, it is only doing linting, syntax checking, and unit testing.
+
+name:  CI/CD Pipeline
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  lint:
+    name: Lint
+    uses: cisagov/ScubaGear/.github/workflows/run_linter_yaml.yaml@main
+  # syntax:
+  #   needs: lint
+  # unit:
+  #   needs: [lint, syntax]
