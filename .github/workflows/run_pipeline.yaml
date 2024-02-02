@@ -25,3 +25,7 @@ jobs:
     name: Unit
     uses: cisagov/ScubaGear/.github/workflows/run_powershell_tests.yaml@825-create-initial-software-dev-pipeline
     needs: syntax
+  unit-opa:
+    name: Unit
+    uses: cisagov/ScubaGear/.github/workflows/run_opa_tests.yaml@825-create-initial-software-dev-pipeline
+    needs: syntax
