@@ -1,4 +1,3 @@
 Description: YAML Configuration file for unit test of ConfigFilePath overrides ProductNames with wildcard
 ProductNames:
   - '*'
-

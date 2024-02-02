@@ -29,7 +29,7 @@ class ScubaConfig {
             $this.Configuration.ProductNames = @("aad", "defender", "exo", "sharepoint", "teams")
         }
         else{
-            # Transform ProductNames into list of all products if it contains wildcard 
+            # Transform ProductNames into list of all products if it contains wildcard
             if ($this.Configuration.ProductNames.Contains('*')){
                 $this.Configuration.ProductNames = "aad", "defender", "exo", "powerplatform", "sharepoint", "teams"
                 Write-Debug "Setting ProductNames to all products because of wildcard"
@@ -37,7 +37,6 @@ class ScubaConfig {
             else{
                 $this.Configuration.ProductNames = $this.Configuration.ProductNames | Sort-Object
             }
-            
         }
 
         if (-Not $this.Configuration.M365Environment){
