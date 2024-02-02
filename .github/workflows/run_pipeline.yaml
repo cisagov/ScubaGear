@@ -4,10 +4,6 @@
 name: CI/CD Pipeline
 
 on:
-  push:
-    branches:
-      - 825-create-initial-software-dev-pipeline
-  pull_request:
   workflow_dispatch:
 
 jobs:
