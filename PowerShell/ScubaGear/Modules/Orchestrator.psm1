@@ -239,7 +239,7 @@ function Invoke-SCuBA {
             }
 
             $ProvidedParameters = @{
-                'ProductNames' = $ProductNames | Sort-Object
+                'ProductNames' = $ProductNames | Sort-Object -Unique
                 'M365Environment' = $M365Environment
                 'OPAPath' = $OPAPath
                 'LogIn' = $LogIn
@@ -1353,7 +1353,7 @@ function Invoke-RunCached {
                 New-Item -ItemType "Directory" -Path $OutPath | Out-Null
             }
             $OutFolderPath = $OutPath
-            $ProductNames = $ProductNames | Sort-Object
+            $ProductNames = $ProductNames | Sort-Object -Unique
 
             Remove-Resources
             Import-Resources # Imports Providers, RunRego, CreateReport, Connection

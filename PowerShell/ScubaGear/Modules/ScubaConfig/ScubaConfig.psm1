@@ -30,7 +30,7 @@ class ScubaConfig {
             $this.Configuration.ProductNames = "teams", "exo", "defender", "aad", "sharepoint", "powerplatform" | Sort-Object
         }
         else{
-            $this.Configuration.ProductNames = $this.Configuration.ProductNames | Sort-Object
+            $this.Configuration.ProductNames = $this.Configuration.ProductNames | Sort-Object -Unique
         }
 
         if (-Not $this.Configuration.M365Environment){
