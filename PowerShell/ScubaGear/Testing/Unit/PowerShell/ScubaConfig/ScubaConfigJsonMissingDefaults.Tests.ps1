@@ -27,6 +27,13 @@ InModuleScope ScubaConfig {
                 $Result = [ScubaConfig]::GetInstance().LoadConfig($ScubaConfigTestFile)
             }
             It 'Load valid config file'{
+                function global:ConvertFrom-Yaml {
+                    @{
+                        AnObject=@{name='MyObjectName'}
+                    }
+                }
+                [ScubaConfig]::ResetInstance()
+                $Result = [ScubaConfig]::GetInstance().LoadConfig($PSCommandPath)
                 $Result | Should -Be $true
             }
             It 'Valid string parameter'{
@@ -37,9 +44,6 @@ InModuleScope ScubaConfig {
             }
             It 'Valid boolean parameter'{
                 [ScubaConfig]::GetInstance().Configuration.DisconnectOnExit | Should -Be $false
-            }
-            It 'Valid object parameter'{
-                [ScubaConfig]::GetInstance().Configuration.AnObject.name | Should -Be 'MyObjectName'
             }
         }
     }

@@ -1,9 +1,13 @@
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../../../../Modules/Connection/ConnectHelpers.psm1") -Function 'Connect-DefenderHelper' -Force
+BeforeDiscovery {
+    $ModuleRootPath = Join-Path -Path $PSScriptRoot -ChildPath '..\..\..\..\Modules\Connection' -Resolve
+    Import-Module (Join-Path -Path $ModuleRootPath -ChildPath 'ConnectHelpers.psm1') -Function 'Connect-DefenderHelper' -Force
+    Write-Debug $ModuleRootPath    
+}
 
 InModuleScope ConnectHelpers {
     Describe -Tag 'Connection' -Name 'Connect-DefenderHelper' {
         BeforeAll {
-            Mock -CommandName Connect-IPPSSession -MockWith {}
+            Mock Connect-IPPSSession {}
         }
         context 'Without Service Principal'{
             It 'Invalid M365nvironment parameter' {

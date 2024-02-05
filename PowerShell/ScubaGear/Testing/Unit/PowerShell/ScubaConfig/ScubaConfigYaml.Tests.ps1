@@ -15,13 +15,16 @@ InModuleScope ScubaConfig {
             }
         }
         context 'YAML Configuration' {
-            BeforeAll {
-                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'ScubaConfigTestFile')]
-                $ScubaConfigTestFile = Join-Path -Path $PSScriptRoot -ChildPath config_test.yaml
-                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'Result')]
-                $Result = [ScubaConfig]::GetInstance().LoadConfig($ScubaConfigTestFile)
-            }
             It 'Valid config file'{
+                mock global:ConvertFrom-Yaml {
+                    @{
+                        ProductNames="teams", "exo", "defender", "aad", "powerplatform", "sharepoint"
+                        AnObject=@{name='MyObjectName'}
+                        M365Environment='commercial'
+                    }
+                }
+                [ScubaConfig]::ResetInstance()
+                $Result = [ScubaConfig]::GetInstance().LoadConfig($PSCommandPath)
                 $Result | Should -Be $true
             }
             It 'Valid string parameter'{

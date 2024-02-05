@@ -29,16 +29,25 @@ InModuleScope ScubaConfig {
                 Mock -ModuleName ScubaConfig Get-ScubaDefault {"."}
             }
             It 'Load valid config file'{
+                function global:ConvertFrom-Yaml {
+                    @{
+                        ProductNames="teams", "exo", "defender", "aad", "powerplatform", "sharepoint"
+                        AnObject=@{name='MyObjectName'}
+                        M365Environment='commercial'
+                    }
+                }
+                [ScubaConfig]::ResetInstance()
+                $Result = [ScubaConfig]::GetInstance().LoadConfig($PSCommandPath)
                 $Result | Should -Be $true
             }
             It 'Valid string parameter'{
                 [ScubaConfig]::GetInstance().Configuration.M365Environment | Should -Be 'commercial'
             }
             It 'Valid array parameter'{
-                [ScubaConfig]::GetInstance().Configuration.ProductNames | Should -Contain 'aad'
+                [ScubaConfig]::GetInstance().Configuration.ProductNames.Count | Should -BeExactly 6
             }
             It 'Product names sorted'{
-                [ScubaConfig]::GetInstance().Configuration.ProductNames[0] | Should -BeExactly 'aad'
+                [ScubaConfig]::GetInstance().Configuration.ProductNames[0] | Should -BeExactly 'aad' -Because "$([ScubaConfig]::GetInstance().Configuration.ProductNames[0])"
             }
             It 'Valid boolean parameter'{
                 [ScubaConfig]::GetInstance().Configuration.DisconnectOnExit | Should -Be $false

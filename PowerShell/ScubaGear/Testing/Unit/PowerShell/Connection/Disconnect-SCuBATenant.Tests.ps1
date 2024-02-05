@@ -1,14 +1,16 @@
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../../../../Modules/Connection/Connection.psm1") -Function 'Disconnect-SCuBATenant' -Force
+BeforeDiscovery {
+    $ModuleRootPath = Join-Path -Path $PSScriptRoot -ChildPath '..\..\..\..\Modules\Connection' -Resolve
+    Import-Module (Join-Path -Path $ModuleRootPath -ChildPath 'Connection.psm1') -Function 'Disconnect-SCuBATenant' -Force
+}
 
 InModuleScope Connection {
     Describe -Tag 'Connection' -Name 'Disconnect-SCuBATenant' {
         BeforeAll {
-            Mock Disconnect-MgGraph -MockWith {}
-            Mock Disconnect-ExchangeOnline -MockWith {}
-            Mock Disconnect-SPOService -MockWith {}
-            Mock Disconnect-PnPOnline -MockWith {}
-            Mock Remove-PowerAppsAccount -MockWith {}
-            Mock Disconnect-MicrosoftTeams -MockWith {}
+            Mock Disconnect-MgGraph {}
+            Mock Disconnect-ExchangeOnline {}
+            Mock Disconnect-SPOService {}
+            Mock Remove-PowerAppsAccount {}
+            Mock Disconnect-MicrosoftTeams {}
             Mock -CommandName Write-Progress {}
         }
         It 'Disconnects from Microsoft Graph' {

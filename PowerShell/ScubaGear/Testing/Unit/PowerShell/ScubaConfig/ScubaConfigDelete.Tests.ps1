@@ -3,12 +3,17 @@ using module '..\..\..\..\Modules\ScubaConfig\ScubaConfig.psm1'
 InModuleScope ScubaConfig {
     Describe -tag "Utils" -name 'ScubaConfigDelete' {
         context 'Delete configuration' {
-            BeforeEach{
+            BeforeAll{
                 [ScubaConfig]::ResetInstance()
             }
             It 'Valid config file'{
-                $ScubaConfigTestFile = Join-Path -Path $PSScriptRoot -ChildPath config_test.yaml
-                $Result = [ScubaConfig]::GetInstance().LoadConfig($ScubaConfigTestFile)
+                function global:ConvertFrom-Yaml {
+                    @{
+                        ProductNames=@("teams", "exo", "defender", "aad", "powerplatform", "sharepoint")
+                        AnObject=@{name='MyObjectName'}
+                    }
+                }
+                $Result = [ScubaConfig]::GetInstance().LoadConfig($PSCommandPath)
                 $Result | Should -Be $true
             }
             It '6 Product names'{
@@ -29,9 +34,17 @@ InModuleScope ScubaConfig {
                 $Result | Should -Be $true
                 [ScubaConfig]::GetInstance().Configuration.MissingObject.name | Should -BeNullOrEmpty
             }
+            It 'Reset Instance'{
+                [ScubaConfig]::ResetInstance()
+            }
             It 'A different valid config file'{
-                $ScubaConfigTestFile = Join-Path -Path $PSScriptRoot -ChildPath config_test_missing_defaults.json
-                $Result = [ScubaConfig]::GetInstance().LoadConfig($ScubaConfigTestFile)
+                function global:ConvertFrom-Yaml {
+                    @{
+                        ProductNames=@("teams")
+                        MissingObject=@{name='MyMissingObjectName'}
+                    }
+                }
+                $Result = [ScubaConfig]::GetInstance().LoadConfig($PSCommandPath)
                 $Result | Should -Be $true
             }
             It '1 Product names'{
