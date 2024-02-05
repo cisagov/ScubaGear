@@ -4,6 +4,7 @@ Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "$($ProviderPath)/Export
 InModuleScope ExportPowerPlatformProvider {
     Describe -Tag 'PowerPlatformProvider' -Name "Get-PowerPlatformTenantDetail" {
         BeforeAll {
+            Mock Import-Module {}
             # empty stub required for mocked cmdlets called directly in the provider
             function Get-TenantDetailsFromGraph {}
             Mock -ModuleName ExportPowerPlatformProvider Get-TenantDetailsFromGraph {
