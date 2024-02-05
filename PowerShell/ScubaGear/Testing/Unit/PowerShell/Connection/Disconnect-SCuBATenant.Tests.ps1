@@ -6,11 +6,16 @@ BeforeDiscovery {
 InModuleScope Connection {
     Describe -Tag 'Connection' -Name 'Disconnect-SCuBATenant' {
         BeforeAll {
+            function Disconnect-MgGraph {throw 'this will be mocked'}
             Mock -ModuleName Connection Disconnect-MgGraph {}
+            function Disconnect-ExchangeOnline {throw 'this will be mocked'}
             Mock -ModuleName Connection Disconnect-ExchangeOnline {}
-            Mock Disconnect-SPOService {}
-            Mock Remove-PowerAppsAccount {}
-            Mock Disconnect-MicrosoftTeams {}
+            function Disconnect-SPOService {throw 'this will be mocked'}
+            Mock -ModuleName Connection Disconnect-SPOService {}
+            function Remove-PowerAppsAccount {throw 'this will be mocked'}
+            Mock  -ModuleName Connection Remove-PowerAppsAccount {}
+            function Disconnect-MicrosoftTeams {throw 'this will be mocked'}
+            Mock  -ModuleName Connection Disconnect-MicrosoftTeams {}
             Mock -CommandName Write-Progress {}
         }
         It 'Disconnects from Microsoft Graph' {
