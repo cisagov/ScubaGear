@@ -1,7 +1,7 @@
 BeforeDiscovery {
     $ModuleRootPath = Join-Path -Path $PSScriptRoot -ChildPath '..\..\..\..\Modules\Connection' -Resolve
     Import-Module (Join-Path -Path $ModuleRootPath -ChildPath 'ConnectHelpers.psm1') -Function 'Connect-EXOHelper' -Force
-    Write-Debug $ModuleRootPath    
+    Write-Debug $ModuleRootPath
 }
 
 InModuleScope ConnectHelpers {
@@ -12,10 +12,10 @@ InModuleScope ConnectHelpers {
         @{Endpoint = 'dod'}
     ){
         BeforeAll {
-            Mock Connect-ExchangeOnline {}
+            function Connect-ExchangeOnline {}
         }
         It 'When connecting interactively to <Endpoint> endpoint, connects to Exchange Online' {
-            Connect-EXOHelper -M365Environment $Endpoint 
+            Connect-EXOHelper -M365Environment $Endpoint
             Should -Invoke -CommandName Connect-ExchangeOnline -Times 1
         }
     }

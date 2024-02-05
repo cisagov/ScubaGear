@@ -7,7 +7,7 @@ InModuleScope Connection {
     Describe -Tag 'Connection' -Name 'Disconnect-SCuBATenant' {
         BeforeAll {
             Mock Disconnect-MgGraph {}
-            Mock Disconnect-ExchangeOnline {}
+            function Disconnect-ExchangeOnline {}
             Mock Disconnect-SPOService {}
             Mock Remove-PowerAppsAccount {}
             Mock Disconnect-MicrosoftTeams {}
