@@ -6,7 +6,7 @@ BeforeDiscovery {
 InModuleScope ConnectHelpers {
     Describe -Tag 'Connection' -Name 'Connect-DefenderHelper' {
         BeforeAll {
-            function Connect-IPPSSession {}
+            Mock -ModuleName ConnectHelpers Connect-IPPSSession {}
         }
         context 'Without Service Principal'{
             It 'Invalid M365nvironment parameter' {
@@ -14,15 +14,15 @@ InModuleScope ConnectHelpers {
             }
             It 'Invokes for commercial environment' {
                 Connect-DefenderHelper -M365Environment 'commercial'
-                Should -Invoke -CommandName Connect-IPPSSession -Times 1 -ParameterFilter {$ErrorAction -eq 'Stop' -And $CertificateThumbprint -eq $null}
+                Should -Invoke -ModuleName ConnectHelpers -CommandName Connect-IPPSSession -Times 1 -ParameterFilter {$ErrorAction -eq 'Stop' -And $CertificateThumbprint -eq $null}
             }
             It 'Invokes for gcc enviorment' {
                 Connect-DefenderHelper -M365Environment 'gcc'
-                Should -Invoke -CommandName Connect-IPPSSession -Times 1 -ParameterFilter {$ErrorAction -eq 'Stop' -And $CertificateThumbprint -eq $null}
+                Should -Invoke -ModuleName ConnectHelpers -CommandName Connect-IPPSSession -Times 1 -ParameterFilter {$ErrorAction -eq 'Stop' -And $CertificateThumbprint -eq $null}
             }
             It 'Invokes for gcchigh environment' {
                 Connect-DefenderHelper -M365Environment 'gcchigh'
-                Should -Invoke -CommandName Connect-IPPSSession -Times 1 `
+                Should -Invoke -ModuleName ConnectHelpers -CommandName Connect-IPPSSession -Times 1 `
                 -ParameterFilter {
                     $ErrorAction -eq 'Stop' -And
                     $CertificateThumbprint -eq $null -And
@@ -32,7 +32,7 @@ InModuleScope ConnectHelpers {
             }
             It 'Invokes for dod environment' {
                 Connect-DefenderHelper -M365Environment 'dod'
-                Should -Invoke -CommandName Connect-IPPSSession -Times 1 `
+                Should -Invoke -ModuleName ConnectHelpers -CommandName Connect-IPPSSession -Times 1 `
                 -ParameterFilter {
                     $ErrorAction -eq 'Stop' -And
                     $CertificateThumbprint -eq $null -And
@@ -51,7 +51,7 @@ InModuleScope ConnectHelpers {
                     }
                 }
                 Connect-DefenderHelper -M365Environment 'commercial' -ServicePrincipalParams $sp
-                Should -Invoke -CommandName Connect-IPPSSession -Times 1 -ParameterFilter {$ErrorAction -eq 'Stop' -And   $CertificateThumbprint -eq 'A thumbprint'}
+                Should -Invoke -ModuleName ConnectHelpers -CommandName Connect-IPPSSession -Times 1 -ParameterFilter {$ErrorAction -eq 'Stop' -And   $CertificateThumbprint -eq 'A thumbprint'}
             }
         }
     }

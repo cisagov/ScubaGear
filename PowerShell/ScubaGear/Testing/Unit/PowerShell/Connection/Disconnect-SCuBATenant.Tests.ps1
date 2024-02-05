@@ -6,8 +6,8 @@ BeforeDiscovery {
 InModuleScope Connection {
     Describe -Tag 'Connection' -Name 'Disconnect-SCuBATenant' {
         BeforeAll {
-            Mock Disconnect-MgGraph {}
-            function Disconnect-ExchangeOnline {}
+            Mock -ModuleName Connection Disconnect-MgGraph {}
+            Mock -ModuleName Connection Disconnect-ExchangeOnline {}
             Mock Disconnect-SPOService {}
             Mock Remove-PowerAppsAccount {}
             Mock Disconnect-MicrosoftTeams {}
@@ -15,11 +15,11 @@ InModuleScope Connection {
         }
         It 'Disconnects from Microsoft Graph' {
             Disconnect-SCuBATenant -ProductNames 'aad'
-            Should -Invoke -CommandName Disconnect-MgGraph -Times 1 -Exactly
+            Should -Invoke -ModuleName Connection -CommandName Disconnect-MgGraph -Times 1 -Exactly
         }
         It 'Disconnects from Exchange Online' {
             Disconnect-SCuBATenant -ProductNames 'exo'
-            Should -Invoke -CommandName Disconnect-ExchangeOnline -Times 1 -Exactly
+            Should -Invoke -ModuleName Connection -CommandName Disconnect-ExchangeOnline -Times 1 -Exactly
         }
         It 'Disconnects from Defender (Exchange Online and Security & Compliance)' {
             {Disconnect-SCuBATenant -ProductNames 'defender'} | Should -Not -Throw

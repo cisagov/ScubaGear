@@ -12,11 +12,11 @@ InModuleScope ConnectHelpers {
         @{Endpoint = 'dod'}
     ){
         BeforeAll {
-            function Connect-ExchangeOnline {}
+            Mock -ModuleName ConnectHelpers Connect-ExchangeOnline {}
         }
         It 'When connecting interactively to <Endpoint> endpoint, connects to Exchange Online' {
             Connect-EXOHelper -M365Environment $Endpoint
-            Should -Invoke -CommandName Connect-ExchangeOnline -Times 1
+            Should -Invoke -ModuleName ConnectHelpers -CommandName Connect-ExchangeOnline -Times 1
         }
     }
 }
