@@ -10,6 +10,7 @@ Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "$($ProviderPath)/Provid
 InModuleScope -ModuleName ExportEXOProvider {
     Describe -Tag 'ExportEXOProvider' -Name "Export-EXOProvider" {
         BeforeAll {
+            Mock Import-Module {}
             class MockCommandTracker {
                 [string[]]$SuccessfulCommands = @()
                 [string[]]$UnSuccessfulCommands = @()
