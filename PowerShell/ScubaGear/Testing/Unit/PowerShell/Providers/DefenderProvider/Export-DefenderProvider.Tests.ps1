@@ -5,7 +5,7 @@
 
 $ProviderPath = "../../../../../Modules/Providers"
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "$($ProviderPath)/ExportDefenderProvider.psm1") -Function Export-DefenderProvider -Force
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "$($ProviderPath)/ProviderHelpers/CommandTracker.psm1") -Force
+#Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "$($ProviderPath)/ProviderHelpers/CommandTracker.psm1") -Force
 
 InModuleScope -ModuleName ExportDefenderProvider {
     Describe -Tag 'ExportDefenderProvider' -Name "Export-DefenderProvider" {
@@ -110,6 +110,7 @@ InModuleScope -ModuleName ExportDefenderProvider {
                     return $this.SuccessfulCommands
                 }
             }
+            Mock Import-Module {}
             function Get-CommandTracker {}
             Mock -ModuleName ExportDefenderProvider Get-CommandTracker {
                 return [MockCommandTracker]::New()
