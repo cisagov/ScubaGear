@@ -6,7 +6,7 @@ InModuleScope ExportTeamsProvider {
         BeforeAll {
             # empty stub required for mocked cmdlets called directly in the provider
             function Get-CsTenant {}
-            Mock -ModuleName ExportTeamsProvider Get-CsTenant -MockWith {
+            Mock -ModuleName ExportTeamsProvider Get-CsTenant {
                 return [pscustomobject]@{
                     VerifiedDomains = @(
                         @{

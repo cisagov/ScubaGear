@@ -6,7 +6,7 @@ InModuleScope ExportPowerPlatformProvider {
         BeforeAll {
             # empty stub required for mocked cmdlets called directly in the provider
             function Get-TenantDetailsFromGraph {}
-            Mock -ModuleName ExportPowerPlatformProvider Get-TenantDetailsFromGraph -MockWith {
+            Mock -ModuleName ExportPowerPlatformProvider Get-TenantDetailsFromGraph {
                 return [pscustomobject]@{
                     Domains = @(
                         @{

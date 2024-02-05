@@ -79,7 +79,7 @@ InModuleScope Orchestrator {
                     BoundParameters = @{}
                 }
                 function Connect-Tenant {}
-                Mock -ModuleName Orchestrator Connect-Tenant -MockWith {@()}
+                Mock -ModuleName Orchestrator Connect-Tenant {@()}
             }
             It 'does not authenticate' {
                 $ConnectParams += @{

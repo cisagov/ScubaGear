@@ -115,15 +115,15 @@ InModuleScope -ModuleName ExportDefenderProvider {
                 return [MockCommandTracker]::New()
             }
             function Connect-EXOHelper {}
-            Mock -ModuleName ExportDefenderProvider Connect-EXOHelper -MockWith {}
+            Mock -ModuleName ExportDefenderProvider Connect-EXOHelper {}
             function Connect-DefenderHelper {}
-            Mock -ModuleName ExportDefenderProvider Connect-DefenderHelper -MockWith {}
+            Mock -ModuleName ExportDefenderProvider Connect-DefenderHelper {}
             function Get-OrganizationConfig {}
-            Mock -ModuleName ExportDefenderProvider Get-OrganizationConfig -MockWith { [pscustomobject]@{
+            Mock -ModuleName ExportDefenderProvider Get-OrganizationConfig { [pscustomobject]@{
                     "mockkey" = "mockvalue";
                 } }
             function Get-SafeAttachmentPolicy {}
-            Mock -ModuleName ExportDefenderProvider Get-SafeAttachmentPolicy -MockWith {}
+            Mock -ModuleName ExportDefenderProvider Get-SafeAttachmentPolicy {}
             function Test-SCuBAValidProviderJson {
                 param (
                     [string]

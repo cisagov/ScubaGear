@@ -88,9 +88,9 @@ InModuleScope -ModuleName ExportPowerPlatformProvider {
                 return [MockCommandTracker]::New()
             }
             function Get-DlpPolicy {}
-            Mock -ModuleName ExportPowerPlatformProvider Get-DlpPolicy -MockWith {}
+            Mock -ModuleName ExportPowerPlatformProvider Get-DlpPolicy {}
             function Get-PowerAppTenantIsolationPolicy {}
-            Mock -ModuleName ExportPowerPlatformProvider Get-PowerAppTenantIsolationPolicy -MockWith {}
+            Mock -ModuleName ExportPowerPlatformProvider Get-PowerAppTenantIsolationPolicy {}
             function Test-SCuBAValidProviderJson {
                 param (
                     [string]
