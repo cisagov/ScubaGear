@@ -17,5 +17,6 @@ jobs:
         if: ${{ !cancelled() }}
         shell: powershell
         run: |
+          Get-Module -ListAvailable Pester
           Get-Module -All
           Invoke-Pester -Output 'Detailed' -Path 'PowerShell/ScubaGear/Testing/Unit/PowerShell'
