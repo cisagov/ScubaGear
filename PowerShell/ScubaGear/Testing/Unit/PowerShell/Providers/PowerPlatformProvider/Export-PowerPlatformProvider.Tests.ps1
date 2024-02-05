@@ -10,6 +10,7 @@ Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "$($ProviderPath)/Provid
 InModuleScope -ModuleName ExportPowerPlatformProvider {
     Describe -Tag 'ExportPowerPlatformProvider' -Name "Export-PowerPlatformProvider" {
         BeforeAll {
+            Mock Import-Module {}
             class MockCommandTracker {
                 [string[]]$SuccessfulCommands = @()
                 [string[]]$UnSuccessfulCommands = @()
