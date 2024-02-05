@@ -5,10 +5,10 @@ BeforeDiscovery {
 
 InModuleScope ConnectHelpers {
     Describe -Tag 'Connection' -Name 'Connect-DefenderHelper' {
-        BeforeAll {
-            Mock -ModuleName ConnectHelpers Connect-IPPSSession {}
-        }
         context 'Without Service Principal'{
+            BeforeAll {
+                Mock -ModuleName ConnectHelpers Connect-IPPSSession {}
+            }
             It 'Invalid M365nvironment parameter' {
                 {Connect-DefenderHelper -M365Environment 'invalid_parameter'} | Should -Throw
             }

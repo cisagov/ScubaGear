@@ -17,5 +17,4 @@ jobs:
         if: ${{ !cancelled() }}
         shell: powershell
         run: |
-          Import-Module -Name Pester -MinimumVersion '5.5.0' 
           Invoke-Pester -Output 'Detailed' -Path 'PowerShell/ScubaGear/Testing/Unit/PowerShell'
