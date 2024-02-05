@@ -5,13 +5,10 @@ name: Lint Check for YAML
 # Run whenever YAML files are checked in
 on:
   push:
-    # paths:
-    #   - "**.yml"
-    #   - "**.yaml"
-  workflow_call:
     paths:
       - "**.yml"
       - "**.yaml"
+  workflow_call:
   workflow_dispatch:
 
 jobs:
