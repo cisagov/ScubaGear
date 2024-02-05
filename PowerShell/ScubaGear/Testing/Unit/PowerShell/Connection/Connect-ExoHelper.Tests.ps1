@@ -12,6 +12,7 @@ InModuleScope ConnectHelpers {
         @{Endpoint = 'dod'}
     ){
         BeforeAll {
+            function Connect-ExchangeOnline {throw 'this will be mocked'}
             Mock -ModuleName ConnectHelpers Connect-ExchangeOnline {}
         }
         It 'When connecting interactively to <Endpoint> endpoint, connects to Exchange Online' {
