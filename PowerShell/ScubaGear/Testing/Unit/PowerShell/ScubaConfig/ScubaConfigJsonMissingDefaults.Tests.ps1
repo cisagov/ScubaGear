@@ -20,6 +20,8 @@ InModuleScope ScubaConfig {
                 $ScubaConfigTestFile = Join-Path -Path $PSScriptRoot -ChildPath config_test.json
                 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'Result')]
                 $Result = [ScubaConfig]::GetInstance().LoadConfig($ScubaConfigTestFile)
+                function Get-ScubaDefault {throw 'this will be mocked'}
+                Mock -ModuleName Orchestrator Get-ScubaDefault {"."}
             }
             It 'Load valid config file'{
                 $Result | Should -Be $true

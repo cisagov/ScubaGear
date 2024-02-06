@@ -35,6 +35,8 @@ InModuleScope Orchestrator {
                 Mock -ModuleName Orchestrator Disconnect-SCuBATenant {
                     $script:TestSplat.Add('DisconnectOnExit', $DisconnectOnExit)
                 }
+                function Get-ScubaDefault {throw 'this will be mocked'}
+                Mock -ModuleName Orchestrator Get-ScubaDefault {"."}
                 Mock -CommandName New-Item {}
                 Mock -CommandName Copy-Item {}
             }

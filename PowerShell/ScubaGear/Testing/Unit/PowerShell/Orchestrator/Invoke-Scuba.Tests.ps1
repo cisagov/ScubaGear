@@ -19,6 +19,9 @@ InModuleScope Orchestrator {
             function Disconnect-SCuBATenant {}
             Mock -ModuleName Orchestrator Disconnect-SCuBATenant {}
 
+            function Get-ScubaDefault {throw 'this will be mocked'}
+            Mock -ModuleName Orchestrator Get-ScubaDefault {"."}
+
             Mock -CommandName New-Item {}
             Mock -CommandName Copy-Item {}
         }
