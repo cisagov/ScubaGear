@@ -61,9 +61,10 @@ jobs:
           {
             $product = $product.replace(',', ';')
             $productsAsList += '"'
-            $productsAsList += Out-String -InputObject $product
+            $productsAsList += $product
             $productsAsList += '",'
           }
+          $productsAsList += $productsAsList.Substring(0, $productsAsList.Length-1)
           $productsAsList += "]"
           echo products=$productsAsList >> $env:GITHUB_OUTPUT
           cat $env:GITHUB_OUTPUT
