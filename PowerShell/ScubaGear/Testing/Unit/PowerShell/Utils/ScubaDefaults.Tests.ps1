@@ -8,7 +8,7 @@ Describe "Verify Constants <Name>" -ForEach @(
     @{Name='BadName'; Expected=$false}
 ){
     It "Check for <Name>" {
-        $Result = Get-ScubaDefaults -Name $Name
+        $Result = Get-ScubaDefault -Name $Name
         $null -ne $Result | Should -Be $Expected -Because "value: $Results"
     }
 }
