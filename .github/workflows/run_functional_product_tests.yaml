@@ -51,7 +51,7 @@ jobs:
         env:
           TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
     outputs:
-      matrix: ${{ steps.generate-matrix.outputs.PRODUCTS }}
+      matrix: ${{ steps.generate-matrix.outputs.products }}
   product-tests:
     name: Product Tests
     runs-on: windows-latest
