@@ -61,8 +61,8 @@ jobs:
           {
             $productsAsList += $product
           }
-          echo $productsAsList
           echo PRODUCTS=$productsAsList >> $env:GITHUB_OUTPUT
+          cat $env:GITHUB_OUTPUT
         env:
           TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
     outputs:
