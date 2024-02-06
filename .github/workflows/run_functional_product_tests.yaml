@@ -9,7 +9,7 @@ on:
     - cron: "15 4 * * 0-4"
   push:
     branches:
-      - "824-finish-nightly-functional-tests"
+      - 824-finish-nightly-functional-tests
   workflow_dispatch:
 
 jobs:
@@ -61,7 +61,7 @@ jobs:
           $products = $params.split("|")
           foreach ($product in $products)
           {
-            productsAsList.append($product)
+            productsAsList += $product
           }
           echo PRODUCTS=$productsAsList >> $env:GITHUB_OUTPUT
         env:
