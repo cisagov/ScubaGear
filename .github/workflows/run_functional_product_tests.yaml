@@ -77,7 +77,8 @@ jobs:
       - build-matrix
     strategy:
       matrix:
-        product: ${{ needs.build-matrix.outputs.matrix }}
+        platform: [windows, ubuntu]
+        # product: ${{ needs.build-matrix.outputs.matrix }}
     steps:
       - run: |
           echo "hello"
