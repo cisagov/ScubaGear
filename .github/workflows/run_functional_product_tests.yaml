@@ -61,7 +61,7 @@ jobs:
           {
             $productsAsList += $product
           }
-          echo $productsAsList >> $env:GITHUB_OUTPUT
+          echo products=$productsAsList >> $env:GITHUB_OUTPUT
           cat $env:GITHUB_OUTPUT
         env:
           TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
@@ -76,11 +76,12 @@ jobs:
     needs: 
       - build-matrix
     strategy:
-      matrix: ${{ needs.build-matrix.outputs.matrix }}
+      matrix:
+        product: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
     steps:
       - run: |
           echo "hello"
-          # echo ${{ matrix }}
+          echo ${{ matrix.product }}
   #     - name: Checkout Repo
   #       uses: actions/checkout@v4
   #     - name: Setup for Scuba
