@@ -54,14 +54,17 @@ jobs:
           $params = $env:TestParams
           # Remove any extra spaces
           # $params = $params.replace(' ','')
-          $productsAsList = @()
+          $productsAsList = "["
           # Split into products
           $products = $params.split("|")
           foreach ($product in $products)
           {
             $product = $product.replace(',', ';')
+            $productsAsList += '"'
             $productsAsList += Out-String -InputObject $product
+            $productsAsList += '",'
           }
+          $productsAsList = "]"
           echo products=$productsAsList >> $env:GITHUB_OUTPUT
           cat $env:GITHUB_OUTPUT
         env:
