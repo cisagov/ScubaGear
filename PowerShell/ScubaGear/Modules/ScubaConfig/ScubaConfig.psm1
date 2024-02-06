@@ -1,4 +1,20 @@
 class ScubaConfig {
+    <#
+    .SYNOPSIS
+      This class stores Scuba config data loaded from a file.
+    .DESCRIPTION
+      This class is designed to function as a singleton. The singleton instance
+      is cached on the ScubaConfig type itself. In the context of tests, it may be
+      important to call `.ResetInstance` before and after tests as needed to
+      ensure any preexisting configs are not inadvertantly used for the test,
+      or left in place after the test is finished. The singleton will persist
+      for the life of the powershell session unless the ScubaConfig module is
+      removed. Note that `.LoadConfig` internally calls `.ResetInstance` to avoid
+      issues.
+    .EXAMPLE
+      $Config = [ScubaConfig]::GetInstance()
+      [ScubaConfig]::LoadConfig($SomePath)
+    #>
     hidden static [ScubaConfig]$_Instance = [ScubaConfig]::new()
     hidden static [Boolean]$_IsLoaded = $false
 
