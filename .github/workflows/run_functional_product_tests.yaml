@@ -64,7 +64,7 @@ jobs:
             $productsAsList += Out-String -InputObject $product
             $productsAsList += '",'
           }
-          $productsAsList = "]"
+          $productsAsList += "]"
           echo products=$productsAsList >> $env:GITHUB_OUTPUT
           cat $env:GITHUB_OUTPUT
         env:
