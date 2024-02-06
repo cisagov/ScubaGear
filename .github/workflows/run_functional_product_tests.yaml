@@ -42,7 +42,7 @@ jobs:
         shell: pwsh # -Password flag requires PS 6+
         env:
           PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
-      - name: Generate Matix
+      - name: Generate Matrix
         id: generate-matrix
         # The testing params are stored as a string in a CSV-like format.
         # Pipes separate products, and commas separate key/value pairs.
@@ -59,6 +59,7 @@ jobs:
           $products = $params.split("|")
           foreach ($product in $products)
           {
+            $product = $product.replace(',', ';')
             $productsAsList += $product
           }
           echo products=$productsAsList >> $env:GITHUB_OUTPUT
