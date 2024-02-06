@@ -136,20 +136,20 @@ test_SecureScore_Correct_V1 if {
             "User2": {
                 "DisplayName": "Test Name2",
                 "roles": [
-                    "Privileged Role Administrator",
+                    "Cloud Application Administrator",
                     "Global Administrator"
                 ]
             },
             "User3": {
                 "DisplayName": "Test Name3",
                 "roles": [
-                    "Privileged Role Administrator"
+                    "Application Administrator"
                 ]
             },
             "User4": {
                 "DisplayName": "Test Name4",
                 "roles": [
-                    "Privileged Role Administrator"
+                    "User Administrator"
                 ]
             },
             "User5": {
@@ -180,14 +180,14 @@ test_SecureScore_Incorrect_V1 if {
             "User2": {
                 "DisplayName": "Test Name2",
                 "roles": [
-                    "Privileged Role Administrator",
+                    "User Administrator",
                     "Global Administrator"
                 ]
             },
             "User3": {
                 "DisplayName": "Test Name3",
                 "roles": [
-                    "Privileged Role Administrator"
+                    "Application Administrator"
                 ]
             },
             "User4": {
@@ -211,14 +211,14 @@ test_SecureScore_Incorrect_V2 if {
             "User1": {
                 "DisplayName": "Test Name1",
                 "roles": [
-                    "Privileged Role Administrator",
+                    "User Administrator",
                     "Global Administrator"
                 ]
             },
             "User2": {
                 "DisplayName": "Test Name2",
                 "roles": [
-                    "Privileged Role Administrator",
+                    "Application Administrator",
                     "Global Administrator"
                 ]
             },
@@ -250,14 +250,14 @@ test_SecureScore_Incorrect_V3 if {
             "User2": {
                 "DisplayName": "Test Name2",
                 "roles": [
-                    "Privileged Role Administrator",
+                    "User Administrator",
                     "Global Administrator"
                 ]
             },
             "User3": {
                 "DisplayName": "Test Name2",
                 "roles": [
-                    "Privileged Role Administrator",
+                    "Hybrid Identity Administrator",
                     "Global Administrator"
                 ]
             }
@@ -265,6 +265,74 @@ test_SecureScore_Incorrect_V3 if {
     }
 
     ReportDetailStr := "Requirement not met: All privileged users are Global Admin"
+
+    TestResult("MS.AAD.7.2v1", Output, ReportDetailStr, false) == true
+}
+
+# Incorrect because the total number of global admins is greater than eight
+test_SecureScore_Incorrect_V4 if {
+    Output := aad.tests with input as {
+        "privileged_users": {
+            "User1": {
+                "DisplayName": "Test Name1",
+                "roles": [
+                    "Privileged Role Administrator",
+                    "Global Administrator"
+                ]
+            },
+            "User2": {
+                "DisplayName": "Test Name2",
+                "roles": [
+                    "Exchange Administrator",
+                    "Global Administrator"
+                ]
+            },
+            "User3": {
+                "DisplayName": "Test Name3",
+                "roles": [
+                    "Global Administrator"
+                ]
+            },
+            "User4": {
+                "DisplayName": "Test Name4",
+                "roles": [
+                    "Global Administrator"
+                ]
+            },
+            "User5": {
+                "DisplayName": "Test Name5",
+                "roles": [
+                    "Global Administrator"
+                ]
+            },
+            "User6": {
+                "DisplayName": "Test Name6",
+                "roles": [
+                    "Global Administrator"
+                ]
+            },
+            "User7": {
+                "DisplayName": "Test Name7",
+                "roles": [
+                    "Global Administrator"
+                ]
+            },
+            "User8": {
+                "DisplayName": "Test Name8",
+                "roles": [
+                    "Global Administrator"
+                ]
+            },
+            "User9": {
+                "DisplayName": "Test Name9",
+                "roles": [
+                    "Global Administrator"
+                ]
+            }
+        }
+    }
+
+    ReportDetailStr := "Requirement not met: Policy MS.AAD.7.1 failed so score not computed"
 
     TestResult("MS.AAD.7.2v1", Output, ReportDetailStr, false) == true
 }
