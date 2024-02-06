@@ -60,7 +60,7 @@ jobs:
           foreach ($product in $products)
           {
             $product = $product.replace(',', ';')
-            $productsAsList += $product
+            $productsAsList += Out-String -InputObject $product
           }
           echo products=$productsAsList >> $env:GITHUB_OUTPUT
           cat $env:GITHUB_OUTPUT
