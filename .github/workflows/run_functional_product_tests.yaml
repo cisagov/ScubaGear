@@ -53,7 +53,7 @@ jobs:
           $thumbprint = "${{ steps.getthumbprint.outputs.THUMBPRINT }}"
           $params = $env:TestParams
           # Remove any extra spaces
-          $params = $params.replace(' ','')
+          # $params = $params.replace(' ','')
           $productsAsList = @()
           # Split into products
           $products = $params.split("|")
@@ -74,10 +74,10 @@ jobs:
       run:
         shell: powershell
     needs: 
-      - "build-matrix"
+      - build-matrix
     strategy:
       matrix:
-        product: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
+        product: ${{ needs.build-matrix.outputs.matrix }}
     steps:
       - run: |
           echo "hello"
