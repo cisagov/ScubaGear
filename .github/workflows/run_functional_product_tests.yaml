@@ -75,10 +75,10 @@ jobs:
     needs: ["build-matrix"]
     strategy:
       matrix:
-        number: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
+        product: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
     steps:
       - run: |
-          echo ${{ matrix }}
+          echo ${{ matrix.product }}
   #     - name: Checkout Repo
   #       uses: actions/checkout@v4
   #     - name: Setup for Scuba
