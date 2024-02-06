@@ -7,11 +7,14 @@ name: Test Product Functionality Nightly
 on:
   schedule:
     - cron: "15 4 * * 0-4"
+  push:
+    branches:
+      - "824-finish-nightly-functional-tests"
   workflow_dispatch:
 
 jobs:
-  product-tests:
-    name: Product Tests
+  build-matrix:
+    name: Build Matrix
     runs-on: windows-latest
     # This condition prevents duplicate runs.
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
@@ -64,20 +67,59 @@ jobs:
           $params = $env:TestParams
           # Remove any extra spaces
           $params = $params.replace(' ','')
+          $productsAsList = []
           # Split into products
           $products = $params.split("|")
           foreach ($product in $products)
           {
-            $paramsAsHashTable = @{}
-            # Split into pairs
-            $pairs = $product.split(",")
-            foreach ($pair in $pairs)
-            {
-              # Split the key from the value
-              $keyAndValue = $pair.split("=")
-              $paramsAsHashTable.Add($keyAndValue[0], $keyAndValue[1])
-            }
-            ./Testing/Functional/Products/Tests/CallProductTests.ps1 -params $paramsAsHashTable -thumbprint $thumbprint
+            productsAsList.append($product)
           }
+          echo PRODUCTS=$productsAsList >> $env:GITHUB_OUTPUT
         env:
           TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
+    outputs:
+      matrix: ${{ steps.generate-matrix.outputs.PRODUCTS }}
+  # product-tests:
+  #   name: Product Tests
+  #   runs-on: windows-latest
+  #   defaults:
+  #     run:
+  #       shell: powershell
+  #   steps:
+  #     - name: Checkout Repo
+  #       uses: actions/checkout@v4
+      
+  #     - name: Setup for Scuba
+  #       run: ./SetUp.ps1
+  #     - name: Install Selenium
+  #       run: Install-Module -Name Selenium
+  #     - name: Update Selenium
+  #       run: ./Testing/Functional/SmokeTest/UpdateSelenium.ps1
+  #     - name: Test Products
+  #       # The testing params are stored as a string in a CSV-like format.
+  #       # Pipes separate products, and commas separate key/value pairs.
+  #       # key1=value1,key2=value2|key3=value3,key4=value4...
+  #       # This job parses the keys and values and converts them to a hashtable.
+  #       run: |
+  #         # Read thumbprint from previous job.
+  #         $thumbprint = "${{ steps.getthumbprint.outputs.THUMBPRINT }}"
+  #         $params = $env:TestParams
+  #         # Remove any extra spaces
+  #         $params = $params.replace(' ','')
+  #         # Split into products
+  #         $products = $params.split("|")
+  #         foreach ($product in $products)
+  #         {
+  #           $paramsAsHashTable = @{}
+  #           # Split into pairs
+  #           $pairs = $product.split(",")
+  #           foreach ($pair in $pairs)
+  #           {
+  #             # Split the key from the value
+  #             $keyAndValue = $pair.split("=")
+  #             $paramsAsHashTable.Add($keyAndValue[0], $keyAndValue[1])
+  #           }
+  #           ./Testing/Functional/Products/Tests/CallProductTests.ps1 -params $paramsAsHashTable -thumbprint $thumbprint
+  #         }
+  #       env:
+  #         TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
