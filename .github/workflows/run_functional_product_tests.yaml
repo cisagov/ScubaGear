@@ -43,7 +43,7 @@ jobs:
             $productsAsList += $product
             $productsAsList += '",'
           }
-          $productsAsList += $productsAsList.Substring(0, $productsAsList.Length-1)
+          $productsAsList = $productsAsList.Substring(0, $productsAsList.Length-1)
           $productsAsList += "]"
           echo $productsAsList
           # echo products=$productsAsList >> $env:GITHUB_OUTPUT
