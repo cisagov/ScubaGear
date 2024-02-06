@@ -20,28 +20,7 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
-      - name: Create PFX
-        run: |
-          New-Item -ItemType file -Path ./key.txt
-          Set-Content -Path ./key.txt -Value $env:PfxBase64
-          certutil -decode ./key.txt ./key.pfx
-        env:
-          PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
-      - name: Import PFX
-        # Pipe to Out-Null to hide the thumbprint
-        run: Import-PfxCertificate -Password (ConvertTo-SecureString -String $env:PfxPassword -AsPlainText -Force) -CertStoreLocation Cert:\CurrentUser\My -FilePath ./key.pfx | Out-Null
-        env:
-          PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
-      - name: Get Thumbprint
-        id: getthumbprint
-        run: |
-          $x509 = Get-PfxCertificate -FilePath ./key.pfx -Password (ConvertTo-SecureString -String $env:PfxPassword -AsPlainText -Force)
-          $Thumbprint = $x509.ThumbPrint
-          # Pass thumbprint to later job.
-          echo THUMBPRINT=$Thumbprint >> $env:GITHUB_OUTPUT
-        shell: pwsh # -Password flag requires PS 6+
-        env:
-          PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
+
       - name: Generate Matrix
         id: generate-matrix
         # The testing params are stored as a string in a CSV-like format.
@@ -60,9 +39,12 @@ jobs:
           foreach ($product in $products)
           {
             $product = $product.replace(',', ';')
-            $productsAsList += '"'$product'",'
+            $productsAsList += '"'
+            $productsAsList += $product
+            $productsAsList += '",'
           }
-          $productsAsList += $productsAsList.Substring(0, $productsAsList.Length-1)']'
+          $productsAsList += $productsAsList.Substring(0, $productsAsList.Length-1)
+          $productsAsList += "]"
           echo $productsAsList
           # echo products=$productsAsList >> $env:GITHUB_OUTPUT
           # cat $env:GITHUB_OUTPUT
@@ -82,6 +64,28 @@ jobs:
       matrix:
         product: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
     steps:
+      # - name: Create PFX
+      #   run: |
+      #     New-Item -ItemType file -Path ./key.txt
+      #     Set-Content -Path ./key.txt -Value $env:PfxBase64
+      #     certutil -decode ./key.txt ./key.pfx
+      #   env:
+      #     PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
+      # - name: Import PFX
+      #   # Pipe to Out-Null to hide the thumbprint
+      #   run: Import-PfxCertificate -Password (ConvertTo-SecureString -String $env:PfxPassword -AsPlainText -Force) -CertStoreLocation Cert:\CurrentUser\My -FilePath ./key.pfx | Out-Null
+      #   env:
+      #     PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
+      # - name: Get Thumbprint
+      #   id: getthumbprint
+      #   run: |
+      #     $x509 = Get-PfxCertificate -FilePath ./key.pfx -Password (ConvertTo-SecureString -String $env:PfxPassword -AsPlainText -Force)
+      #     $Thumbprint = $x509.ThumbPrint
+      #     # Pass thumbprint to later job.
+      #     echo THUMBPRINT=$Thumbprint >> $env:GITHUB_OUTPUT
+      #   shell: pwsh # -Password flag requires PS 6+
+      #   env:
+      #     PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
       - run: |
           echo "hello"
           echo ${{ matrix.product }}
