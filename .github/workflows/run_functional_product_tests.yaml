@@ -40,10 +40,10 @@ jobs:
           {
             $product = $product.replace(',', ';')
             $productsAsList += '"'
-            $productsAsList += $product
+            $productsAsList += $product.Trim()
             $productsAsList += '",'
           }
-          $productsAsList = $productsAsList.Substring(0, $productsAsList.Length-1).Trim()
+          $productsAsList = $productsAsList.Substring(0, $productsAsList.Length-1)
           
           $productsAsList += ']'
           echo $productsAsList
