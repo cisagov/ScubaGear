@@ -59,7 +59,7 @@ class ScubaConfig {
         }
 
         if (-Not $this.Configuration.OPAPath){
-            $this.Configuration.OPAPath = (Join-Path -Path $PSScriptRoot -ChildPath "..\..\..\..")
+            $this.Configuration.OPAPath = Get-ScubaDefault -Name 'DefaultOPAPath'
         }
 
         if (-Not $this.Configuration.LogIn){

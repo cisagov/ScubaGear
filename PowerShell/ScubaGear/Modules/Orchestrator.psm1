@@ -128,7 +128,7 @@ function Invoke-SCuBA {
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateScript({Test-Path -PathType Container $_})]
         [string]
-        $OPAPath = (Join-Path -Path $env:USERPROFILE -ChildPath ".scubagear\Tools"),
+        $OPAPath = (Get-ScubaDefault -Name 'DefaultOPAPath'),
 
         [Parameter(Mandatory = $false, ParameterSetName = 'Configuration')]
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
