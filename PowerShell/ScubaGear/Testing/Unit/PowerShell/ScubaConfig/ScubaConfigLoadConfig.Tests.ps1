@@ -8,11 +8,11 @@ InModuleScope ScubaConfig {
 		# Load the first file and check the ProductNames value.
                 $file1 = Join-Path -Path $PSScriptRoot -ChildPath config_test_load_config1.json
                 $cfg.LoadConfig($file1)
-                $products1 = $cfg.Configuration.ProductNames | Should -Be 'teams'
+                $cfg.Configuration.ProductNames | Should -Be 'teams'
 		# Load the second file and verify that ProductNames has changed.
                 $file2 = Join-Path -Path $PSScriptRoot -ChildPath config_test_load_config2.json
                 $cfg.LoadConfig($file2)
-                $products1 = $cfg.Configuration.ProductNames | Should -Be 'exo'
+                $cfg.Configuration.ProductNames | Should -Be 'exo'
             }
             AfterAll {
                 [ScubaConfig]::ResetInstance()
