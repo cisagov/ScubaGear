@@ -22,13 +22,12 @@ class ScubaConfig {
         if (-Not (Test-Path -PathType Leaf $Path)){
             throw [System.IO.FileNotFoundException]"Failed to load: $Path"
         }
-        elseif ($false -eq [ScubaConfig]::_IsLoaded){
-            $Content = Get-Content -Raw -Path $Path
-            $this.Configuration = $Content | ConvertFrom-Yaml
+        [ScubaConfig]::ResetInstance()
+        $Content = Get-Content -Raw -Path $Path
+        $this.Configuration = $Content | ConvertFrom-Yaml
 
-            $this.SetParameterDefaults()
-            [ScubaConfig]::_IsLoaded = $true
-        }
+        $this.SetParameterDefaults()
+        [ScubaConfig]::_IsLoaded = $true
 
         return [ScubaConfig]::_IsLoaded
     }
