@@ -66,13 +66,19 @@ jobs:
           TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
     outputs:
       matrix: ${{ steps.generate-matrix.outputs.PRODUCTS }}
-  # product-tests:
-  #   name: Product Tests
-  #   runs-on: windows-latest
-  #   defaults:
-  #     run:
-  #       shell: powershell
-  #   steps:
+  product-tests:
+    name: Product Tests
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: powershell
+    needs: ["build-matrix"]
+    strategy:
+      matrix:
+        number: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
+    steps:
+      - run: |
+          echo ${{ matrix }}
   #     - name: Checkout Repo
   #       uses: actions/checkout@v4
   #     - name: Setup for Scuba
