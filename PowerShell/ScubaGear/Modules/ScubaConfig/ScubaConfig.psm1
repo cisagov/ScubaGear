@@ -38,7 +38,7 @@ class ScubaConfig {
     }
 
     hidden [Guid]$Uuid = [Guid]::NewGuid()
-    hidden [Object]$Configuration
+    hidden [hashtable]$Configuration
 
     hidden [void]SetParameterDefaults(){
         if (-Not $this.Configuration.ProductNames){
