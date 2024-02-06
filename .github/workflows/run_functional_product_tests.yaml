@@ -61,7 +61,7 @@ jobs:
           {
             $productsAsList += $product
           }
-          echo productsAsList
+          echo $productsAsList
           echo PRODUCTS=$productsAsList >> $env:GITHUB_OUTPUT
         env:
           TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
@@ -75,9 +75,9 @@ jobs:
         shell: powershell
     needs: 
       - "build-matrix"
-    # strategy:
-    #   matrix:
-    #     product: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
+    strategy:
+      matrix:
+        product: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
     steps:
       - run: |
           echo "hello"
