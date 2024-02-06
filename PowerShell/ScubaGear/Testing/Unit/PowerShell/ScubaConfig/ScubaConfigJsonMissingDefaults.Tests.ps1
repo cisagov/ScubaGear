@@ -2,6 +2,9 @@ using module '..\..\..\..\Modules\ScubaConfig\ScubaConfig.psm1'
 
 InModuleScope ScubaConfig {
     Describe -tag "Utils" -name 'ScubaConfigMissingDefaults' {
+        BeforeAll {
+            [ScubaConfig]::ResetInstance()
+        }
         Context 'General case'{
             It 'Get Instance without loading'{
                $Config1 = [ScubaConfig]::GetInstance()
@@ -16,12 +19,12 @@ InModuleScope ScubaConfig {
         }
         context 'JSON Configuration' {
             BeforeAll {
+                function Get-ScubaDefault {throw 'this will be mocked'}
+                Mock -ModuleName ScubaConfig Get-ScubaDefault {"."}
                 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'ScubaConfigTestFile')]
                 $ScubaConfigTestFile = Join-Path -Path $PSScriptRoot -ChildPath config_test.json
                 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'Result')]
                 $Result = [ScubaConfig]::GetInstance().LoadConfig($ScubaConfigTestFile)
-                function Get-ScubaDefault {throw 'this will be mocked'}
-                Mock -ModuleName Orchestrator Get-ScubaDefault {"."}
             }
             It 'Load valid config file'{
                 $Result | Should -Be $true
