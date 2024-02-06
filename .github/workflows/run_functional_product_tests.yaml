@@ -76,13 +76,11 @@ jobs:
     needs: 
       - build-matrix
     strategy:
-      matrix:
-        platform: [windows, ubuntu]
-        # product: ${{ needs.build-matrix.outputs.matrix }}
+      matrix: ${{ needs.build-matrix.outputs.matrix }}
     steps:
       - run: |
           echo "hello"
-          # echo ${{ matrix.product }}
+          # echo ${{ matrix }}
   #     - name: Checkout Repo
   #       uses: actions/checkout@v4
   #     - name: Setup for Scuba
