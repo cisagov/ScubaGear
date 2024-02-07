@@ -118,7 +118,7 @@ jobs:
             $keyAndValue = $pair.split("=")
             $key = $keyAndValue[0]
             $value = $keyAndValue[1]
-            if($key=="Alias"){
+            if($key -eq "Alias"){
               echo "Testing the following product $value"
             } else {
               $paramsAsHashTable.Add($key, $value)
