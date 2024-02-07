@@ -20,40 +20,42 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
-
       - name: Generate Matrix
         id: generate-matrix
         # The testing params are stored as a string in a CSV-like format.
         # Pipes separate products, and commas separate key/value pairs.
         # key1=value1,key2=value2|key3=value3,key4=value4...
-        # This job parses the keys and values and converts them to a hashtable.
+        # This job parses the key-value pairs and put them to an array
+        # that will be used as a matrix for testing each product variation.
         run: |
-          # Read thumbprint from previous job.
-          $thumbprint = "${{ steps.getthumbprint.outputs.THUMBPRINT }}"
           $params = $env:TestParams
-          # Remove any extra spaces
-          # $params = $params.replace(' ','')
+          # Powershell doesn't build arrays in the format that a matrix
+          # wants, so this builds it using a string instead.  It's ugly.
           $productsAsList = "["
           # Split into products
           $products = $params.split("|")
           foreach ($product in $products)
           {
+            # Since commas will separate products in the matrix,
+            # this will use semi-colons to separate key-value pairs.
+            # TODO: Change this in the secret and drop this next line.
             $product = $product.replace(',', ';')
             $productsAsList += '"'
+            # This trim is necessary because the final product ends with
+            # a newline that causes problems.
             $productsAsList += $product.Trim()
             $productsAsList += '",'
           }
           $productsAsList = $productsAsList.Substring(0, $productsAsList.Length-1)
-          
           $productsAsList += ']'
-          # echo $productsAsList
+          # Store the string "array" where it can be accessed as an output.
           echo products=$productsAsList >> $env:GITHUB_OUTPUT
         env:
           TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
     outputs:
       matrix: ${{ steps.generate-matrix.outputs.products }}
   product-tests:
-    name: Product Tests
+    name: Product Test
     runs-on: windows-latest
     defaults:
       run:
@@ -62,6 +64,10 @@ jobs:
       - build-matrix
     strategy:
       matrix:
+        # Each item in the matrix is one set of product parameters
+        # and thus should cause one step in this job.  This should
+        # make it easy to debug when a product is failing the 
+        # functional tests.
         product: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
     steps:
       # - name: Create PFX
@@ -86,41 +92,29 @@ jobs:
       #   shell: pwsh # -Password flag requires PS 6+
       #   env:
       #     PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
-      - run: |
-          echo "${{ matrix.product }}"
-  #     - name: Checkout Repo
-  #       uses: actions/checkout@v4
-  #     - name: Setup for Scuba
-  #       run: ./SetUp.ps1
-  #     - name: Install Selenium
-  #       run: Install-Module -Name Selenium
-  #     - name: Update Selenium
-  #       run: ./Testing/Functional/SmokeTest/UpdateSelenium.ps1
-  #     - name: Test Products
-  #       # The testing params are stored as a string in a CSV-like format.
-  #       # Pipes separate products, and commas separate key/value pairs.
-  #       # key1=value1,key2=value2|key3=value3,key4=value4...
-  #       # This job parses the keys and values and converts them to a hashtable.
-  #       run: |
-  #         # Read thumbprint from previous job.
-  #         $thumbprint = "${{ steps.getthumbprint.outputs.THUMBPRINT }}"
-  #         $params = $env:TestParams
-  #         # Remove any extra spaces
-  #         $params = $params.replace(' ','')
-  #         # Split into products
-  #         $products = $params.split("|")
-  #         foreach ($product in $products)
-  #         {
-  #           $paramsAsHashTable = @{}
-  #           # Split into pairs
-  #           $pairs = $product.split(",")
-  #           foreach ($pair in $pairs)
-  #           {
-  #             # Split the key from the value
-  #             $keyAndValue = $pair.split("=")
-  #             $paramsAsHashTable.Add($keyAndValue[0], $keyAndValue[1])
-  #           }
-  #           ./Testing/Functional/Products/Tests/CallProductTests.ps1 -params $paramsAsHashTable -thumbprint $thumbprint
-  #         }
-  #       env:
-  #         TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
+      # - name: Checkout Repo
+      #   uses: actions/checkout@v4
+      # - name: Setup for Scuba
+      #   run: ./SetUp.ps1
+      # - name: Install Selenium
+      #   run: Install-Module -Name Selenium
+      # - name: Update Selenium
+      #   run: ./Testing/Functional/SmokeTest/UpdateSelenium.ps1
+      - name: Test Product
+        # This job parses the keys and values in the matrx array
+        # and converts them to a hashtable.
+        run: |
+          # Read thumbprint from previous job.
+          # $thumbprint = "${{ steps.getthumbprint.outputs.THUMBPRINT }}"
+          $params = "${{ matrix.product }}"
+          echo "Testing $params"
+          $paramsAsHashTable = @{}
+          # Split into pairs
+          $pairs = $product.split(";")  # Because I replaced , with ; in matrix
+          foreach ($pair in $pairs)
+          {
+            # Split the key from the value
+            $keyAndValue = $pair.split("=")
+            $paramsAsHashTable.Add($keyAndValue[0], $keyAndValue[1])
+          }
+          # ./Testing/Functional/Products/Tests/CallProductTests.ps1 -params $paramsAsHashTable -thumbprint $thumbprint
