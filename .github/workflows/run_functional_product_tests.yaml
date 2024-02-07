@@ -89,7 +89,7 @@ jobs:
         env:
           PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
     outputs:
-      thumbprint: ${{ steps.generate-matrix.outputs.thumbprint }}
+      thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
   # Use ScubaGear to test each service.
   # This job runs once per param combination in the matrix.
   test-products:
