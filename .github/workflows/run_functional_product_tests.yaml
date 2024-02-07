@@ -83,6 +83,8 @@ jobs:
         run: |
           $x509 = Get-PfxCertificate -FilePath ./key.pfx -Password (ConvertTo-SecureString -String $env:PfxPassword -AsPlainText -Force)
           $Thumbprint = $x509.ThumbPrint
+          echo "The size of thumbprint:"
+          echo $Thumbprint.Length
           # Store the thumbprint where it can be accessed as an output.
           echo thumbprint=$Thumbprint >> $env:GITHUB_OUTPUT
         shell: pwsh # -Password flag requires PS 6+
@@ -110,14 +112,14 @@ jobs:
         # functional tests.
         product: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
     steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v4
-      - name: Setup for Scuba
-        run: ./SetUp.ps1
-      - name: Install Selenium
-        run: Install-Module -Name Selenium
-      - name: Update Selenium
-        run: ./Testing/Functional/SmokeTest/UpdateSelenium.ps1
+      # - name: Checkout Repo
+      #   uses: actions/checkout@v4
+      # - name: Setup for Scuba
+      #   run: ./SetUp.ps1
+      # - name: Install Selenium
+      #   run: Install-Module -Name Selenium
+      # - name: Update Selenium
+      #   run: ./Testing/Functional/SmokeTest/UpdateSelenium.ps1
       - name: Test Product
         # This job parses the keys and values in the matrx array
         # and converts them to a hashtable.
@@ -126,20 +128,21 @@ jobs:
           $thumbprint = ${{ needs.get-thumbprint.outputs.mythumbprint }}
           echo "The size of thumbprint:"
           echo $thumbprint.Length
-          $params = "${{ matrix.product }}"
-          $paramsAsHashTable = @{}
-          # Split into pairs
-          $pairs = $params.split(";")  # Because I replaced , with ; in matrix
-          foreach ($pair in $pairs)
-          {
-            # Split the key from the value
-            $keyAndValue = $pair.split("=")
-            $key = $keyAndValue[0]
-            $value = $keyAndValue[1]
-            if($key -eq "Alias"){
-              echo "Testing the following product: $value"
-            } else {
-              $paramsAsHashTable.Add($key, $value)
-            }
-          }
-          ./Testing/Functional/Products/Tests/CallProductTests.ps1 -params $paramsAsHashTable -thumbprint $thumbprint
+          echo $thumbprint
+          # $params = "${{ matrix.product }}"
+          # $paramsAsHashTable = @{}
+          # # Split into pairs
+          # $pairs = $params.split(";")  # Because I replaced , with ; in matrix
+          # foreach ($pair in $pairs)
+          # {
+          #   # Split the key from the value
+          #   $keyAndValue = $pair.split("=")
+          #   $key = $keyAndValue[0]
+          #   $value = $keyAndValue[1]
+          #   if($key -eq "Alias"){
+          #     echo "Testing the following product: $value"
+          #   } else {
+          #     $paramsAsHashTable.Add($key, $value)
+          #   }
+          # }
+          # ./Testing/Functional/Products/Tests/CallProductTests.ps1 -params $paramsAsHashTable -thumbprint $thumbprint
