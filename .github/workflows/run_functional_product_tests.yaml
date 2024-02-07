@@ -123,7 +123,7 @@ jobs:
         # and converts them to a hashtable.
         run: |
           # Read thumbprint from previous job.
-          $thumbprint = "${{ needs.get-thumbprint.outputs.mythumbprint }}"
+          $thumbprint = ${{ needs.get-thumbprint.outputs.mythumbprint }}
           echo "The size of thumbprint:"
           echo $thumbprint.Length
           $params = "${{ matrix.product }}"
