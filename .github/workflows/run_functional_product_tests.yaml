@@ -110,7 +110,7 @@ jobs:
           echo "Testing $params"
           $paramsAsHashTable = @{}
           # Split into pairs
-          $pairs = $product.split(";")  # Because I replaced , with ; in matrix
+          $pairs = $params.split(";")  # Because I replaced , with ; in matrix
           foreach ($pair in $pairs)
           {
             # Split the key from the value
