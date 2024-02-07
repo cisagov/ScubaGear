@@ -72,7 +72,6 @@ jobs:
           New-Item -ItemType file -Path ./key.txt
           Set-Content -Path ./key.txt -Value $env:PfxBase64
           certutil -decode ./key.txt ./key.pfx
-          Get-ChildItem -Path .
         env:
           PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
       - name: Import PFX
@@ -86,7 +85,7 @@ jobs:
           $Thumbprint = $x509.ThumbPrint
           # Store the thumbprint where it can be accessed as an output.
           echo "size of thumbprint is "
-          echo $Thumbprint.Lenth
+          echo $Thumbprint.Length
           echo thumbprint=$Thumbprint >> $env:GITHUB_OUTPUT
         shell: pwsh # -Password flag requires PS 6+
         env:
