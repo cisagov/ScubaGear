@@ -67,7 +67,6 @@ jobs:
         shell: powershell
     needs:
       - build-matrix
-      - get-thumbprint
     strategy:
       fail-fast: false
       matrix:
