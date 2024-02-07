@@ -119,25 +119,25 @@ jobs:
       - name: Update Selenium
         run: ./Testing/Functional/SmokeTest/UpdateSelenium.ps1
       - name: Test Product
-        # This job parses the keys and values in the matrx array
-        # and converts them to a hashtable.
-        run: |
-          # Read thumbprint from previous job.
-          $thumbprint = ${{ needs.get-thumbprint.outputs.thumbprint) }}
-          $params = "${{ matrix.product }}"
-          $paramsAsHashTable = @{}
-          # Split into pairs
-          $pairs = $params.split(";")  # Because I replaced , with ; in matrix
-          foreach ($pair in $pairs)
-          {
-            # Split the key from the value
-            $keyAndValue = $pair.split("=")
-            $key = $keyAndValue[0]
-            $value = $keyAndValue[1]
-            if($key -eq "Alias"){
-              echo "Testing the following product $value"
-            } else {
-              $paramsAsHashTable.Add($key, $value)
+          # This job parses the keys and values in the matrx array
+          # and converts them to a hashtable.
+          run: |
+            # Read thumbprint from previous job.
+            $thumbprint = ${{ needs.get-thumbprint.outputs.thumbprint) }}
+            $params = "${{ matrix.product }}"
+            $paramsAsHashTable = @{}
+            # Split into pairs
+            $pairs = $params.split(";")  # Because I replaced , with ; in matrix
+            foreach ($pair in $pairs)
+            {
+              # Split the key from the value
+              $keyAndValue = $pair.split("=")
+              $key = $keyAndValue[0]
+              $value = $keyAndValue[1]
+              if($key -eq "Alias"){
+                echo "Testing the following product $value"
+              } else {
+                $paramsAsHashTable.Add($key, $value)
+              }
             }
-          }
-          ./Testing/Functional/Products/Tests/CallProductTests.ps1 -params $paramsAsHashTable -thumbprint $thumbprint
+            ./Testing/Functional/Products/Tests/CallProductTests.ps1 -params $paramsAsHashTable -thumbprint $thumbprint
