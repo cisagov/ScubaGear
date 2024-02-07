@@ -82,10 +82,8 @@ class ScubaConfig {
     }
 
     static [void]ResetInstance(){
-        if ([ScubaConfig]::_IsLoaded){
-            [ScubaConfig]::_Instance.ClearConfiguration()
-            [ScubaConfig]::_IsLoaded = $false
-        }
+        [ScubaConfig]::_Instance.ClearConfiguration()
+        [ScubaConfig]::_IsLoaded = $false
 
         return
     }
