@@ -534,22 +534,40 @@ TestPlan:
         ExpectedResult: true
 
   - PolicyId: MS.AAD.5.3v1
-    TestDriver: RunCached
+    TestDriver: RunScuba
     Tests:
       - TestDescription: MS.AAD.5.3v1 Non-Compliant case - No Admin Consent workflow configured
         Preconditions:
-          - Command: UpdateProviderExport
+          - Command: UpdateDirectorySettingByName
             Splat:
-              updates:
-                admin_consent_policies[0].IsEnabled: false
+              DisplayName: Consent Policy Settings
+              Updates:
+                BodyParameter:
+                  Values:
+                    # Policy Template requires specific parameters to be set in PATCH request
+                    - Name: BlockUserConsentForRiskyApps
+                      Value: true
+                    - Name: EnableGroupSpecificConsent
+                      Value: true
+                    - Name: EnableAdminConsentRequests
+                      Value: false
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.AAD.5.3v1 Compliant case - Admin Consent workflow is configured
         Preconditions:
-          - Command: UpdateProviderExport
+          - Command: UpdateDirectorySettingByName
             Splat:
-              updates:
-                admin_consent_policies[0].IsEnabled: true
+              DisplayName: Consent Policy Settings
+              Updates:
+                BodyParameter:
+                  Values:
+                    # Policy Template requires specific parameters to be set in PATCH request
+                    - Name: BlockUserConsentForRiskyApps
+                      Value: true
+                    - Name: EnableGroupSpecificConsent
+                      Value: true
+                    - Name: EnableAdminConsentRequests
+                      Value: true
         Postconditions: []
         ExpectedResult: true
 

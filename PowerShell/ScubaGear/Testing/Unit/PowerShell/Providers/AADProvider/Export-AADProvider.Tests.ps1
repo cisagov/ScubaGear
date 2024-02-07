@@ -63,11 +63,7 @@ InModuleScope -ModuleName ExportAADProvider {
                                 $this.SuccessfulCommands += $Command
                                 return [pscustomobject]@{}
                             }
-                            "Get-MgBetaPolicyAdminConsentRequestPolicy" {
-                                $this.SuccessfulCommands += $Command
-                                return [pscustomobject]@{}
-                            }
-                            "Get-MgBetaPolicyAuthenticationMethodPolicy" {
+                             "Get-MgBetaPolicyAuthenticationMethodPolicy" {
                                 $this.SuccessfulCommands += $Command
                                 return [pscustomobject]@{}
                             }

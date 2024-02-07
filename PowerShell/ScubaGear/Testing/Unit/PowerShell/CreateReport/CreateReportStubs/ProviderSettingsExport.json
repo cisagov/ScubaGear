@@ -11860,7 +11860,6 @@
     "Get-MgBetaPolicyAuthorizationPolicy",
     "Get-MgBetaSecuritySecureScore",
     "Get-MgBetaDirectorySetting",
-    "Get-MgBetaPolicyAdminConsentRequestPolicy",
     "Get-MgBetaPolicyAuthenticationMethodPolicy"
 ],
     "aad_unsuccessful_commands": [

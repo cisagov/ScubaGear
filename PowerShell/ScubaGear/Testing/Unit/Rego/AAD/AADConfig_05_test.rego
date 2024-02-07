@@ -140,10 +140,15 @@ test_PermissionGrantPolicyIdsAssignedToDefaultUserRole_Incorrect_V2 if {
 #--
 test_IsEnabled_Correct if {
     Output := aad.tests with input as {
-        "admin_consent_policies": [
+        "directory_settings": [
             {
-                "IsEnabled": true,
-                "Id": "policy ID"
+                "DisplayName": "Setting display name",
+                "Values": [
+                    {
+                        "Name":  "EnableAdminConsentRequests",
+                        "Value":  "true"
+                    }
+                ]
             }
         ]
     }
@@ -151,12 +156,35 @@ test_IsEnabled_Correct if {
     TestResult("MS.AAD.5.3v1", Output, PASS, true) == true
 }
 
+test_IsEnabled_Incorrect_Missing if {
+    Output := aad.tests with input as {
+        "directory_settings": [
+            {
+                "DisplayName": "Setting display name",
+                "Values": [
+                    {
+                        "Name":  "EnableGroupSpecificConsent",
+                        "Value":  "false"
+                    }
+                ]
+            }
+        ]
+    }
+
+    TestResult("MS.AAD.5.3v1", Output, FAIL, false) == true
+}
+
 test_IsEnabled_Incorrect if {
     Output := aad.tests with input as {
-        "admin_consent_policies": [
+        "directory_settings": [
             {
-                "IsEnabled": false,
-                "Id": null
+                "DisplayName": "Setting display name",
+                "Values": [
+                    {
+                        "Name":  "EnableAdminConsentRequests",
+                        "Value":  "false"
+                    }
+                ]
             }
         ]
     }

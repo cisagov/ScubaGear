@@ -102,11 +102,8 @@ function Export-AADProvider {
     # 5.1, 5.2, 8.1 & 8.3
     $AuthZPolicies = ConvertTo-Json @($Tracker.TryCommand("Get-MgBetaPolicyAuthorizationPolicy"))
 
-    # 5.4
+    # 5.3, 5.4
     $DirectorySettings = ConvertTo-Json -Depth 10 @($Tracker.TryCommand("Get-MgBetaDirectorySetting"))
-
-    # 5.3
-    $AdminConsentReqPolicies = ConvertTo-Json @($Tracker.TryCommand("Get-MgBetaPolicyAdminConsentRequestPolicy"))
 
     # Read the properties and relationships of an authentication method policy
     $AuthenticationMethodPolicy = ConvertTo-Json @($Tracker.TryCommand("Get-MgBetaPolicyAuthenticationMethodPolicy"))
@@ -122,7 +119,6 @@ function Export-AADProvider {
     "conditional_access_policies": $AllPolicies,
     "cap_table_data": $CapTableData,
     "authorization_policies": $AuthZPolicies,
-    "admin_consent_policies": $AdminConsentReqPolicies,
     "privileged_users": $PrivilegedUsers,
     "privileged_roles": $PrivilegedRoles,
     "service_plans": $ServicePlans,
