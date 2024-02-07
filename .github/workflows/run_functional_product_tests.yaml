@@ -72,6 +72,7 @@ jobs:
           New-Item -ItemType file -Path ./key.txt
           Set-Content -Path ./key.txt -Value $env:PfxBase64
           certutil -decode ./key.txt ./key.pfx
+          ls -al
         env:
           PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
       - name: Import PFX
