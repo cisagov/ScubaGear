@@ -80,6 +80,7 @@ jobs:
         env:
           PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
       - name: Get Thumbprint
+        id: get-thumbprint
         run: |
           $x509 = Get-PfxCertificate -FilePath ./key.pfx -Password (ConvertTo-SecureString -String $env:PfxPassword -AsPlainText -Force)
           $Thumbprint = $x509.ThumbPrint
@@ -128,7 +129,6 @@ jobs:
           $thumbprint = ${{ needs.get-thumbprint.outputs.mythumbprint }}
           echo "The size of thumbprint:"
           echo $thumbprint.Length
-          echo $thumbprint
           # $params = "${{ matrix.product }}"
           # $paramsAsHashTable = @{}
           # # Split into pairs
