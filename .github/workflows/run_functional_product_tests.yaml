@@ -84,6 +84,8 @@ jobs:
           $x509 = Get-PfxCertificate -FilePath ./key.pfx -Password (ConvertTo-SecureString -String $env:PfxPassword -AsPlainText -Force)
           $Thumbprint = $x509.ThumbPrint
           # Store the thumbprint where it can be accessed as an output.
+          echo "size of thumbprint is "
+          echo $Thumbprint.Lenth
           echo thumbprint=$Thumbprint >> $env:GITHUB_OUTPUT
         shell: pwsh # -Password flag requires PS 6+
         env:
