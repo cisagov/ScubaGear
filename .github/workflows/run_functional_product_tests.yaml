@@ -11,6 +11,7 @@ on:
   workflow_dispatch:
 
 jobs:
+  # Build a matrix of product param combinations for testing.
   build-matrix:
     name: Build Matrix
     runs-on: windows-latest
@@ -25,8 +26,8 @@ jobs:
         # The testing params are stored as a string in a CSV-like format.
         # Pipes separate products, and commas separate key/value pairs.
         # key1=value1,key2=value2|key3=value3,key4=value4...
-        # This job parses the key-value pairs and put them to an array
-        # that will be used as a matrix for testing each product variation.
+        # This job parses out the key-value pairs and puts them in an array
+        # that will be used as a matrix for testing each product combination.
         run: |
           $params = $env:TestParams
           # Powershell doesn't build arrays in the format that a matrix
@@ -38,7 +39,6 @@ jobs:
           {
             # Since commas will separate products in the matrix,
             # this will use semi-colons to separate key-value pairs.
-            # TODO: Change this in the secret and drop this next line.
             $product = $product.replace(',', ';')
             $productsAsList += '"'
             # This trim is necessary because the final product ends with
@@ -54,24 +54,19 @@ jobs:
           TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
     outputs:
       matrix: ${{ steps.generate-matrix.outputs.products }}
-      fakename: fakename
-  product-tests:
-    name: Test ${{ needs.build-matrix.outputs.fakename }}
+      # The purpose of this title is simply to mask the params in the 
+      # test job names.
+      title: Product
+  # Retrieve the thumbprint used for the service principal for auth'ing each service.
+  get-thumbprint:
+    name: Get Thumbprint
     runs-on: windows-latest
     defaults:
       run:
         shell: powershell
-    needs:
-      - build-matrix
-    strategy:
-      fail-fast: false
-      matrix:
-        # Each item in the matrix is one set of product parameters
-        # and thus should cause one step in this job.  This should
-        # make it easy to debug when a product is failing the
-        # functional tests.
-        product: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
     steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
       - name: Create PFX
         run: |
           New-Item -ItemType file -Path ./key.txt
@@ -85,15 +80,36 @@ jobs:
         env:
           PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
       - name: Get Thumbprint
-        id: getthumbprint
         run: |
           $x509 = Get-PfxCertificate -FilePath ./key.pfx -Password (ConvertTo-SecureString -String $env:PfxPassword -AsPlainText -Force)
           $Thumbprint = $x509.ThumbPrint
-          # Pass thumbprint to later job.
-          echo THUMBPRINT=$Thumbprint >> $env:GITHUB_OUTPUT
+          # Store the thumbprint where it can be accessed as an output.
+          echo thumbprint=$Thumbprint >> $env:GITHUB_OUTPUT
         shell: pwsh # -Password flag requires PS 6+
         env:
           PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
+    outputs:
+      thumbprint: ${{ steps.generate-matrix.outputs.thumbprint }}
+  # Use ScubaGear to test each service.
+  # This job runs once per param combination in the matrix.
+  test-products:
+    name: Test ${{ needs.build-matrix.outputs.title }}
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: powershell
+    needs:
+      - build-matrix
+      - get-thumbprint
+    strategy:
+      fail-fast: false
+      matrix:
+        # Each item in the matrix is one set of product parameters
+        # and thus should cause one step in this job.  This should
+        # make it easy to debug when a product is failing the
+        # functional tests.
+        product: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
+    steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
       - name: Setup for Scuba
@@ -107,7 +123,7 @@ jobs:
         # and converts them to a hashtable.
         run: |
           # Read thumbprint from previous job.
-          $thumbprint = "${{ steps.getthumbprint.outputs.THUMBPRINT }}"
+          $thumbprint = ${{ needs.get-thumbprint.outputs.thumbprint) }}
           $params = "${{ matrix.product }}"
           $paramsAsHashTable = @{}
           # Split into pairs
