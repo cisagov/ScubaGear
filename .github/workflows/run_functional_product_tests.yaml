@@ -87,7 +87,8 @@ jobs:
       #   env:
       #     PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
       - run: |
-          ${{ matrix.product }}
+          $product = ${{ matrix.product }}
+          echo $product
   #     - name: Checkout Repo
   #       uses: actions/checkout@v4
   #     - name: Setup for Scuba
