@@ -124,6 +124,8 @@ jobs:
         run: |
           # Read thumbprint from previous job.
           $thumbprint = "${{ needs.get-thumbprint.outputs.mythumbprint }}"
+          echo "The size of thumbprint:"
+          echo $thumbprint.Length
           $params = "${{ matrix.product }}"
           $paramsAsHashTable = @{}
           # Split into pairs
