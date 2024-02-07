@@ -124,5 +124,4 @@ jobs:
               $paramsAsHashTable.Add($key, $value)
             }
           }
-          
           ./Testing/Functional/Products/Tests/CallProductTests.ps1 -params $paramsAsHashTable -thumbprint $thumbprint
