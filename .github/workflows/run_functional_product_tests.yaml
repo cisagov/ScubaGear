@@ -63,6 +63,7 @@ jobs:
     needs:
       - build-matrix
     strategy:
+      fail-fast: false
       matrix:
         # Each item in the matrix is one set of product parameters
         # and thus should cause one step in this job.  This should
