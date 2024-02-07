@@ -54,7 +54,7 @@ jobs:
           TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
     outputs:
       matrix: ${{ steps.generate-matrix.outputs.products }}
-      # The purpose of this title is simply to mask the params in the 
+      # The purpose of this title is simply to mask the params in the
       # test job names.
       title: Product
   # Retrieve the thumbprint used for the service principal for auth'ing each service.
