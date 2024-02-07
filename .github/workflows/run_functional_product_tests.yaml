@@ -84,14 +84,12 @@ jobs:
           $x509 = Get-PfxCertificate -FilePath ./key.pfx -Password (ConvertTo-SecureString -String $env:PfxPassword -AsPlainText -Force)
           $Thumbprint = $x509.ThumbPrint
           # Store the thumbprint where it can be accessed as an output.
-          echo "size of thumbprint is "
-          echo $Thumbprint.Length
           echo thumbprint=$Thumbprint >> $env:GITHUB_OUTPUT
         shell: pwsh # -Password flag requires PS 6+
         env:
           PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
     outputs:
-      thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
+      mythumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
   # Use ScubaGear to test each service.
   # This job runs once per param combination in the matrix.
   test-products:
@@ -125,7 +123,7 @@ jobs:
         # and converts them to a hashtable.
         run: |
           # Read thumbprint from previous job.
-          $thumbprint = "${{ needs.get-thumbprint.outputs.thumbprint }}"
+          $thumbprint = "${{ needs.get-thumbprint.outputs.mythumbprint }}"
           $params = "${{ matrix.product }}"
           $paramsAsHashTable = @{}
           # Split into pairs
