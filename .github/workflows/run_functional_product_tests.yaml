@@ -54,8 +54,9 @@ jobs:
           TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
     outputs:
       matrix: ${{ steps.generate-matrix.outputs.products }}
+      fakename: fakename
   product-tests:
-    name: Test
+    name: Test ${{ needs.build-matrix.outputs.fakename }}
     runs-on: windows-latest
     defaults:
       run:
@@ -115,8 +116,13 @@ jobs:
           {
             # Split the key from the value
             $keyAndValue = $pair.split("=")
-            $paramsAsHashTable.Add($keyAndValue[0], $keyAndValue[1])
+            $key = $keyAndValue[0]
+            $value = $keyAndValue[1]
+            if($key=="Alias"){
+              echo "Testing the following product $value"
+            } else {
+              $paramsAsHashTable.Add($key, $value)
+            }
           }
-          echo "Testing the following product parameters:"
-          $paramsAsHashTable
+          
           ./Testing/Functional/Products/Tests/CallProductTests.ps1 -params $paramsAsHashTable -thumbprint $thumbprint
