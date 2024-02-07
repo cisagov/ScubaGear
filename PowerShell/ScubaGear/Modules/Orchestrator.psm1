@@ -233,7 +233,7 @@ function Invoke-SCuBA {
 
         # Transform ProductNames into list of all products if it contains wildcard
         if ($ProductNames.Contains('*')){
-            $PSBoundParameters['ProductNames'] = "aad", "defender", "exo", "powerplatform", "sharepoint", "teams"
+            $ProductNames = $PSBoundParameters['ProductNames'] = "aad", "defender", "exo", "powerplatform", "sharepoint", "teams"
             Write-Debug "Setting ProductName to all products because of wildcard"
         }
 
