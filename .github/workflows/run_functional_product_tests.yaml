@@ -60,46 +60,46 @@ jobs:
     defaults:
       run:
         shell: powershell
-    needs: 
+    needs:
       - build-matrix
     strategy:
       matrix:
         # Each item in the matrix is one set of product parameters
         # and thus should cause one step in this job.  This should
-        # make it easy to debug when a product is failing the 
+        # make it easy to debug when a product is failing the
         # functional tests.
         product: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
     steps:
-      # - name: Create PFX
-      #   run: |
-      #     New-Item -ItemType file -Path ./key.txt
-      #     Set-Content -Path ./key.txt -Value $env:PfxBase64
-      #     certutil -decode ./key.txt ./key.pfx
-      #   env:
-      #     PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
-      # - name: Import PFX
-      #   # Pipe to Out-Null to hide the thumbprint
-      #   run: Import-PfxCertificate -Password (ConvertTo-SecureString -String $env:PfxPassword -AsPlainText -Force) -CertStoreLocation Cert:\CurrentUser\My -FilePath ./key.pfx | Out-Null
-      #   env:
-      #     PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
-      # - name: Get Thumbprint
-      #   id: getthumbprint
-      #   run: |
-      #     $x509 = Get-PfxCertificate -FilePath ./key.pfx -Password (ConvertTo-SecureString -String $env:PfxPassword -AsPlainText -Force)
-      #     $Thumbprint = $x509.ThumbPrint
-      #     # Pass thumbprint to later job.
-      #     echo THUMBPRINT=$Thumbprint >> $env:GITHUB_OUTPUT
-      #   shell: pwsh # -Password flag requires PS 6+
-      #   env:
-      #     PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
-      # - name: Checkout Repo
-      #   uses: actions/checkout@v4
-      # - name: Setup for Scuba
-      #   run: ./SetUp.ps1
-      # - name: Install Selenium
-      #   run: Install-Module -Name Selenium
-      # - name: Update Selenium
-      #   run: ./Testing/Functional/SmokeTest/UpdateSelenium.ps1
+      - name: Create PFX
+        run: |
+          New-Item -ItemType file -Path ./key.txt
+          Set-Content -Path ./key.txt -Value $env:PfxBase64
+          certutil -decode ./key.txt ./key.pfx
+        env:
+          PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
+      - name: Import PFX
+        # Pipe to Out-Null to hide the thumbprint
+        run: Import-PfxCertificate -Password (ConvertTo-SecureString -String $env:PfxPassword -AsPlainText -Force) -CertStoreLocation Cert:\CurrentUser\My -FilePath ./key.pfx | Out-Null
+        env:
+          PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
+      - name: Get Thumbprint
+        id: getthumbprint
+        run: |
+          $x509 = Get-PfxCertificate -FilePath ./key.pfx -Password (ConvertTo-SecureString -String $env:PfxPassword -AsPlainText -Force)
+          $Thumbprint = $x509.ThumbPrint
+          # Pass thumbprint to later job.
+          echo THUMBPRINT=$Thumbprint >> $env:GITHUB_OUTPUT
+        shell: pwsh # -Password flag requires PS 6+
+        env:
+          PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+      - name: Setup for Scuba
+        run: ./SetUp.ps1
+      - name: Install Selenium
+        run: Install-Module -Name Selenium
+      - name: Update Selenium
+        run: ./Testing/Functional/SmokeTest/UpdateSelenium.ps1
       - name: Test Product
         # This job parses the keys and values in the matrx array
         # and converts them to a hashtable.
@@ -107,7 +107,6 @@ jobs:
           # Read thumbprint from previous job.
           # $thumbprint = "${{ steps.getthumbprint.outputs.THUMBPRINT }}"
           $params = "${{ matrix.product }}"
-          echo "Testing $params"
           $paramsAsHashTable = @{}
           # Split into pairs
           $pairs = $params.split(";")  # Because I replaced , with ; in matrix
@@ -117,6 +116,6 @@ jobs:
             $keyAndValue = $pair.split("=")
             $paramsAsHashTable.Add($keyAndValue[0], $keyAndValue[1])
           }
-          echo "The hashtable is:"
+          echo "Testing the following product parameters:"
           $paramsAsHashTable
-          # ./Testing/Functional/Products/Tests/CallProductTests.ps1 -params $paramsAsHashTable -thumbprint $thumbprint
+          ./Testing/Functional/Products/Tests/CallProductTests.ps1 -params $paramsAsHashTable -thumbprint $thumbprint
