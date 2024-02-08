@@ -1,11 +1,4 @@
-# Add vlaues to the hash to make available as defaults
-if (-not $ScubaDefaults) {
-    Set-Variable -Name 'ScubaDefaults' -Option Constant -Force -Value @{
-        DefaultOPAPath = (Join-Path -Path $env:USERPROFILE -ChildPath ".scubagear\Tools")
-    }
-}
-
-function Get-ScubaDefault {
+function global:Get-ScubaDefault {
     <#
     .SYNOPSIS
     A function to provide Scuba specific default values
@@ -22,5 +15,11 @@ function Get-ScubaDefault {
         $Name
     )
 
+    # Add vlaues to the hash to make available as defaults
+    if (-not $ScubaDefaults) {
+        Set-Variable -Name 'ScubaDefaults' -Option Constant -Scope Global -Force -Value @{
+            DefaultOPAPath = (Join-Path -Path $env:USERPROFILE -ChildPath ".scubagear\Tools")
+        }
+    }
     $ScubaDefaults[$Name]
 }
