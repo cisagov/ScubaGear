@@ -11,6 +11,7 @@ import data.utils.defender.SensitiveAccountsConfig
 import data.utils.defender.SensitiveAccountsSetting
 import data.utils.defender.ImpersonationProtection
 import data.utils.defender.ImpersonationProtectionConfig
+import data.utils.defender.ImpersonationProtectionTenantDomains
 import data.utils.defender.ApplyLicenseWarning
 
 
@@ -293,7 +294,7 @@ tests contains {
     FilterKey := "EnableTargetedDomainsProtection"
     AccountKey := "TargetedDomainsToProtect"
     ActionKey := "TargetedDomainProtectionAction"
-    ProtectedConfig := ImpersonationProtectionConfig("MS.DEFENDER.2.2v1", "AgencyDomains")
+    ProtectedConfig := ImpersonationProtectionConfig("MS.DEFENDER.2.2v1", "AgencyDomains") | ImpersonationProtectionTenantDomains
     StrictIP := ImpersonationProtection(
         Policies, "Strict Preset Security Policy",
         ProtectedConfig, FilterKey, AccountKey, ActionKey

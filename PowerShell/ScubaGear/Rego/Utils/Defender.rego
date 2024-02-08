@@ -136,10 +136,9 @@ SensitiveAccounts(SensitiveAccountsSetting, SensitiveAccountsConfig) := true if 
 # Get enabled policy that matches the string & key value
 ImpersonationProtectionSetting(Policies, IdentityString, KeyValue) := Policy if {
     Policy := [
-    Policy |
-        some Policy in Policies
-        regex.match(IdentityString, Policy.Identity) == true
-        Policy.Enabled == true
+        Policy | some Policy in Policies;
+        regex.match(IdentityString, Policy.Identity) == true;
+        Policy.Enabled == true;
         Policy[KeyValue] == true
     ][0]
 } else := set()
@@ -151,6 +150,11 @@ ImpersonationProtectionConfig(PolicyID, AccountKey) := IncludedAccounts if {
         lower(trim_space(x)) | some x in SensitiveAccounts[AccountKey];
         x != null
     }
+} else := set()
+
+# Get the domains from the tenant
+ImpersonationProtectionTenantDomains := IncludedAccounts if {
+    IncludedAccounts := {lower(trim_space(x.domain)) | some x in input.spf_records}
 } else := set()
 
 # Check impersonation protection is set for specified policy & accounts

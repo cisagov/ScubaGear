@@ -346,6 +346,96 @@ test_AgencyDomains_Correct_V1 if {
                 "EnableTargetedDomainsProtection": true,
                 "TargetedDomainsToProtect": [
                     "random.mail.example.com",
+                    "random.example.com",
+                    "random.other.mail.example.com"
+                ],
+                "TargetedDomainProtectionAction": "Quarantine"
+            },
+            {
+                "Identity": "Strict Preset Security Policy1659535429826",
+                "Enabled": true,
+                "EnableTargetedDomainsProtection": true,
+                "TargetedDomainsToProtect": [
+                    "random.mail.example.com",
+                    "random.example.com",
+                    "random.other.mail.example.com"
+                ],
+                "TargetedDomainProtectionAction": "Quarantine"
+            }
+        ],
+        "spf_records": [
+            {
+                "domain":  "random.other.mail.example.com",
+            }
+        ],
+        "scuba_config": {
+            "Defender": {
+                "MS.DEFENDER.2.2v1": {
+                    "AgencyDomains": [
+                        "random.mail.example.com",
+                        "random.example.com"
+                    ]
+                }
+            }
+        }
+    }
+
+    TestResult("MS.DEFENDER.2.2v1", Output, PASS, true) == true
+}
+
+test_AgencyDomains_Correct_V2 if {
+    Output := defender.tests with input as {
+        "anti_phish_policies": [
+            {
+                "Identity": "Standard Preset Security Policy1659535429826",
+                "Enabled": true,
+                "EnableTargetedDomainsProtection": true,
+                "TargetedDomainsToProtect": [
+                    "random.mail.example.com",
+                    "random.example.com"
+                ],
+                "TargetedDomainProtectionAction": "Quarantine"
+            },
+            {
+                "Identity": "Strict Preset Security Policy1659535429826",
+                "Enabled": true,
+                "EnableTargetedDomainsProtection": true,
+                "TargetedDomainsToProtect": [
+                    "random.mail.example.com",
+                    "random.example.com"
+                ],
+                "TargetedDomainProtectionAction": "Quarantine"
+            }
+        ],
+        "spf_records": [
+            {
+                "domain":  null,
+            }
+        ],
+        "scuba_config": {
+            "Defender": {
+                "MS.DEFENDER.2.2v1": {
+                    "AgencyDomains": [
+                        "random.mail.example.com",
+                        "random.example.com"
+                    ]
+                }
+            }
+        }
+    }
+
+    TestResult("MS.DEFENDER.2.2v1", Output, PASS, true) == true
+}
+
+test_AgencyDomains_Correct_V3 if {
+    Output := defender.tests with input as {
+        "anti_phish_policies": [
+            {
+                "Identity": "Standard Preset Security Policy1659535429826",
+                "Enabled": true,
+                "EnableTargetedDomainsProtection": true,
+                "TargetedDomainsToProtect": [
+                    "random.mail.example.com",
                     "random.example.com"
                 ],
                 "TargetedDomainProtectionAction": "Quarantine"
@@ -376,7 +466,82 @@ test_AgencyDomains_Correct_V1 if {
     TestResult("MS.DEFENDER.2.2v1", Output, PASS, true) == true
 }
 
-test_AgencyDomains_Correct_V2 if {
+test_AgencyDomains_Correct_V4 if {
+    Output := defender.tests with input as {
+        "anti_phish_policies": [
+            {
+                "Identity": "Standard Preset Security Policy1659535429826",
+                "Enabled": true,
+                "EnableTargetedDomainsProtection": true,
+                "TargetedDomainsToProtect": [
+                    "random.mail.example.com",
+                    "random.example.com",
+                    "random.other.mail.example.com"
+                ],
+                "TargetedDomainProtectionAction": "Quarantine"
+            },
+            {
+                "Identity": "Strict Preset Security Policy1659535429826",
+                "Enabled": true,
+                "EnableTargetedDomainsProtection": true,
+                "TargetedDomainsToProtect": [
+                    "random.mail.example.com",
+                    "random.example.com",
+                    "random.other.mail.example.com"
+                ],
+                "TargetedDomainProtectionAction": "Quarantine"
+            }
+        ],
+        "spf_records": [
+            {
+                "domain":  "random.other.mail.example.com",
+            }
+        ]
+    }
+
+    TestResult("MS.DEFENDER.2.2v1", Output, PASS, true) == true
+}
+
+test_AgencyDomains_Correct_V5 if {
+    Output := defender.tests with input as {
+        "anti_phish_policies": [
+            {
+                "Identity": "Standard Preset Security Policy1659535429826",
+                "Enabled": true,
+                "EnableTargetedDomainsProtection": true,
+                "TargetedDomainsToProtect": [
+                    "random.mail.example.com",
+                    "random.example.com",
+                    "random.other.mail.example.com"
+                ],
+                "TargetedDomainProtectionAction": "Quarantine"
+            },
+            {
+                "Identity": "Strict Preset Security Policy1659535429826",
+                "Enabled": true,
+                "EnableTargetedDomainsProtection": true,
+                "TargetedDomainsToProtect": [
+                    "random.mail.example.com",
+                    "random.example.com",
+                    "random.other.mail.example.com"
+                ],
+                "TargetedDomainProtectionAction": "Quarantine"
+            }
+        ],
+        "spf_records": [
+            {
+                "domain":  "random.other.mail.example.com",
+            },
+            {
+                "domain":  "random.mail.example.com",
+            }
+        ]
+    }
+
+    TestResult("MS.DEFENDER.2.2v1", Output, PASS, true) == true
+}
+
+test_AgencyDomains_Correct_V6 if {
     Output := defender.tests with input as {
         "anti_phish_policies": [
             {
@@ -681,6 +846,262 @@ test_AgencyDomains_Incorrect_V8 if {
                 "MS.DEFENDER.2.2v1": {}
             }
         }
+    }
+
+    ReportDetailString := concat(" ", [
+        "No agency domains defined for impersonation protection assessment.",
+        "See configuration file documentation for details on how to define."
+    ])
+    TestResult("MS.DEFENDER.2.2v1", Output, ReportDetailString, false) == true
+}
+
+test_AgencyDomains_Incorrect_V9 if {
+    Output := defender.tests with input as {
+        "anti_phish_policies": [
+            {
+                "Identity": "Strict Preset Security Policy1659535429826",
+                "Enabled": true,
+                "EnableTargetedDomainsProtection": true,
+                "TargetedDomainsToProtect": [
+                    "random.mail.example.com",
+                    "random.example.com"
+                ],
+                "TargetedDomainProtectionAction": "Quarantine"
+            }
+        ],
+    "spf_records": [
+            {
+                "domain":  "random.mail.example.com",
+            },
+            {
+                "domain":  "random.example.com",
+            }
+        ]
+    }
+
+    ReportDetailString := "Not all agency domains are included for targeted protection in Standard policy."
+    TestResult("MS.DEFENDER.2.2v1", Output, ReportDetailString, false) == true
+}
+
+test_AgencyDomains_Incorrect_V10 if {
+    Output := defender.tests with input as {
+        "anti_phish_policies": [
+            {
+                "Identity": "Standard Preset Security Policy1659535429826",
+                "Enabled": true,
+                "EnableTargetedDomainsProtection": true,
+                "TargetedDomainsToProtect": [
+                    "random.mail.example.com",
+                    "random.example.com"
+                ],
+                "TargetedDomainProtectionAction": "Quarantine"
+            }
+        ],
+    "spf_records": [
+            {
+                "domain":  "random.mail.example.com",
+            },
+            {
+                "domain":  "random.example.com",
+            }
+        ]
+    }
+
+    ReportDetailString := "Not all agency domains are included for targeted protection in Strict policy."
+    TestResult("MS.DEFENDER.2.2v1", Output, ReportDetailString, false) == true
+}
+
+test_AgencyDomains_Incorrect_V11 if {
+    Output := defender.tests with input as {
+        "anti_phish_policies": [
+            {
+                "Identity": "Some Preset Security Policy1659535429826",
+                "Enabled": true,
+                "EnableTargetedDomainsProtection": true,
+                "TargetedDomainsToProtect": [
+                    "random.mail.example.com",
+                    "random.example.com"
+                ],
+                "TargetedDomainProtectionAction": "Quarantine"
+            }
+        ],
+    "spf_records": [
+            {
+                "domain":  "random.mail.example.com",
+            },
+            {
+                "domain":  "random.example.com",
+            }
+        ]
+    }
+
+    ReportDetailString := "Not all agency domains are included for targeted protection in Strict or Standard policy."
+    TestResult("MS.DEFENDER.2.2v1", Output, ReportDetailString, false) == true
+}
+
+test_AgencyDomains_Incorrect_V12 if {
+    Output := defender.tests with input as {
+        "anti_phish_policies": [
+            {
+                "Identity": "Standard Preset Security Policy1659535429826",
+                "Enabled": false,
+                "EnableTargetedDomainsProtection": true,
+                "TargetedDomainsToProtect": [
+                    "random.mail.example.com",
+                    "random.example.com"
+                ],
+                "TargetedDomainProtectionAction": "Quarantine"
+            },
+            {
+                "Identity": "Strict Preset Security Policy1659535429826",
+                "Enabled": true,
+                "EnableTargetedDomainsProtection": true,
+                "TargetedDomainsToProtect": [
+                    "random.mail.example.com",
+                    "random.example.com"
+                ],
+                "TargetedDomainProtectionAction": "Quarantine"
+            }
+        ],
+    "spf_records": [
+            {
+                "domain":  "random.mail.example.com",
+            },
+            {
+                "domain":  "random.example.com",
+            }
+        ]
+    }
+
+    ReportDetailString := "Not all agency domains are included for targeted protection in Standard policy."
+    TestResult("MS.DEFENDER.2.2v1", Output, ReportDetailString, false) == true
+}
+
+test_AgencyDomains_Incorrect_V13 if {
+    Output := defender.tests with input as {
+        "anti_phish_policies": [
+            {
+                "Identity": "Standard Preset Security Policy1659535429826",
+                "Enabled": true,
+                "EnableTargetedDomainsProtection": false,
+                "TargetedDomainsToProtect": [
+                    "random.mail.example.com",
+                    "random.example.com"
+                ],
+                "TargetedDomainProtectionAction": "Quarantine"
+            },
+            {
+                "Identity": "Strict Preset Security Policy1659535429826",
+                "Enabled": true,
+                "EnableTargetedDomainsProtection": true,
+                "TargetedDomainsToProtect": [
+                    "random.mail.example.com",
+                    "random.example.com"
+                ],
+                "TargetedDomainProtectionAction": "Quarantine"
+            }
+        ],
+    "spf_records": [
+            {
+                "domain":  "random.mail.example.com",
+            },
+            {
+                "domain":  "random.example.com",
+            }
+        ]
+    }
+
+    ReportDetailString := "Not all agency domains are included for targeted protection in Standard policy."
+    TestResult("MS.DEFENDER.2.2v1", Output, ReportDetailString, false) == true
+}
+
+test_AgencyDomains_Incorrect_V14 if {
+    Output := defender.tests with input as {
+        "anti_phish_policies": [
+            {
+                "Identity": "Standard Preset Security Policy1659535429826",
+                "Enabled": true,
+                "EnableTargetedDomainsProtection": true,
+                "TargetedDomainsToProtect": [
+                    "random.mail.example.com",
+                    "random.example.com"
+                ],
+                "TargetedDomainProtectionAction": "Quarantine"
+            },
+            {
+                "Identity": "Strict Preset Security Policy1659535429826",
+                "Enabled": true,
+                "EnableTargetedDomainsProtection": true,
+                "TargetedDomainsToProtect": [
+                    "random.mail.example.com"
+                ],
+                "TargetedDomainProtectionAction": "Quarantine"
+            }
+        ],
+    "spf_records": [
+            {
+                "domain":  "random.mail.example.com",
+            },
+            {
+                "domain":  "random.example.com",
+            }
+        ]
+    }
+
+    ReportDetailString := "Not all agency domains are included for targeted protection in Strict policy."
+    TestResult("MS.DEFENDER.2.2v1", Output, ReportDetailString, false) == true
+}
+
+test_AgencyDomains_Incorrect_V15 if {
+    Output := defender.tests with input as {
+        "anti_phish_policies": [
+            {
+                "Identity": "Standard Preset Security Policy1659535429826",
+                "Enabled": true,
+                "EnableTargetedDomainsProtection": true,
+                "TargetedDomainsToProtect": [
+                    "random.mail.example.com",
+                    "random.example.com"
+                ],
+                "TargetedDomainProtectionAction": "Quarantine"
+            },
+            {
+                "Identity": "Strict Preset Security Policy1659535429826",
+                "Enabled": true,
+                "EnableTargetedDomainsProtection": true,
+                "TargetedDomainsToProtect": [
+                    "random.mail.example.com",
+                    "random.example.com"
+                ],
+                "TargetedDomainProtectionAction": "Quarantine"
+            }
+        ],
+    "spf_records": [ ]
+    }
+
+    ReportDetailString := "Not all agency domains are included for targeted protection in Strict or Standard policy."
+    TestResult("MS.DEFENDER.2.2v1", Output, ReportDetailString, false) == true
+}
+
+test_AgencyDomains_Incorrect_V16 if {
+    Output := defender.tests with input as {
+        "anti_phish_policies": [
+            {
+                "Identity": "Standard Preset Security Policy1659535429826",
+                "Enabled": true,
+                "EnableTargetedDomainsProtection": true,
+                "TargetedDomainsToProtect": null,
+                "TargetedDomainProtectionAction": "Quarantine"
+            },
+            {
+                "Identity": "Strict Preset Security Policy1659535429826",
+                "Enabled": true,
+                "EnableTargetedDomainsProtection": true,
+                "TargetedDomainsToProtect": null,
+                "TargetedDomainProtectionAction": "Quarantine"
+            }
+        ],
+    "spf_records": [ ]
     }
 
     ReportDetailString := concat(" ", [
