@@ -864,7 +864,7 @@ TestPlan:
                       - Global Administrator
                       - Exchange Administrator
                     OnPremisesImmutableId: null
-                    36b4d5c2-71c9-4644-8728-74e3a8324d83:
+                  36b4d5c2-71c9-4644-8728-74e3a8324d83:
                     DisplayName: Test User3
                     roles:
                       - User Administrator
