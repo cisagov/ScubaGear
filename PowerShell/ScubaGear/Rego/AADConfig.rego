@@ -2,6 +2,7 @@ package aad
 import future.keywords
 import data.utils.report.NotCheckedDetails
 import data.utils.report.ReportDetailsBoolean
+import data.utils.report.ReportDetailsString
 import data.utils.key.IsEmptyContainer
 import data.utils.key.Contains
 import data.utils.key.Count
@@ -280,6 +281,11 @@ tests contains {
 # MS.AAD.3.4v1
 #--
 
+PolicyMigrationIsComplete := Status if {
+    some Policy in input.authentication_method
+    Status := Policy.PolicyMigrationState == "migrationComplete"
+}
+
 # At this time we are unable to test for X because of NEW POLICY
 tests contains {
     "PolicyId": "MS.AAD.3.4v1",
@@ -298,15 +304,33 @@ tests contains {
 # MS.AAD.3.5v1
 #--
 
-# At this time we are unable to test for SMS/Voice settings due to lack of API to validate
-# Awaiting API changes and feature updates from Microsoft for automated checking
+GoodAuthenticationMethodConfigurations contains {
+    "Id": Configuration.Id,
+    "State": Configuration.State
+} if {
+    some Item in input.authentication_method
+    some Configuration in Item.AuthenticationMethodConfigurations
+    Configuration.Id in ["Sms", "Voice", "Email"]
+    Configuration.State == "disabled"
+}
+
 tests contains {
     "PolicyId": "MS.AAD.3.5v1",
-    "Criticality": "Shall/Not-Implemented",
-    "Commandlet": [],
+    "Criticality": "Shall",
+    "Commandlet": ["Get-MgBetaPolicyAuthenticationMethodPolicy"],
     "ActualValue": [],
-    "ReportDetails": NotCheckedDetails("MS.AAD.3.5v1"),
-    "RequirementMet": false
+    "ReportDetails": ReportDetailsString(Status, InfoMessage),
+    "RequirementMet": Status
+} if {
+    InfoMessage := "Authentication Methods Manage Migration must complete to assess."
+    input.authentication_method[_].PolicyMigrationState == "migrationComplete"
+    GoodAuthenticationMethodConfigurations
+    print(GoodAuthenticationMethodConfigurations)
+    print(PolicyMigrationIsComplete)
+    print("Countof methods: ", count(GoodAuthenticationMethodConfigurations))
+    Conditions := [PolicyMigrationIsComplete == true, count(GoodAuthenticationMethodConfigurations) == 3]
+    print("Count of conditions: ", count(FilterArray(Conditions, true)))
+    Status := count(FilterArray(Conditions, true)) == 2
 }
 #--
 
