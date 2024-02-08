@@ -441,7 +441,7 @@ Group owners SHALL NOT be allowed to consent to applications.
 
 2. Then in **Azure Active Directory** under **Manage**, select **Enterprise Applications.**
 
-3. Select **Admin consent settings**.
+3. Under **Security**, select **Consent and permissions**. Then select **User Consent Settings**.
 
 4. Under **Admin consent requests** > **Users can request admin consent to apps they are unable to consent to** select **Yes**.
 
