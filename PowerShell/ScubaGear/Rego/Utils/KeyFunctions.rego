@@ -58,7 +58,7 @@ ConvertToSetWithKey(Items, Key) := NewSet if {
 # Basic test that has anticipated string for Report Details
 TestResult(PolicyId, Output, ReportDetailString, RequirementMet) := true if {
     RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-
+    print("Rule Output: ",RuleOutput[0])
     count(RuleOutput) == 1
     RuleOutput[0].RequirementMet == RequirementMet
     RuleOutput[0].ReportDetails == ReportDetailString

@@ -106,7 +106,7 @@ function Export-AADProvider {
     $DirectorySettings = ConvertTo-Json -Depth 10 @($Tracker.TryCommand("Get-MgBetaDirectorySetting"))
 
     # Read the properties and relationships of an authentication method policy
-    $AuthenticationMethodPolicy = ConvertTo-Json @($Tracker.TryCommand("Get-MgBetaPolicyAuthenticationMethodPolicy"))
+    $AuthenticationMethodPolicy = ConvertTo-Json @($Tracker.TryCommand("Get-MgBetaPolicyAuthenticationMethodPolicy")) -Depth 5
 
     # 6.1
     $DomainSettings = ConvertTo-Json @($Tracker.TryCommand("Get-MgBetaDomain"))

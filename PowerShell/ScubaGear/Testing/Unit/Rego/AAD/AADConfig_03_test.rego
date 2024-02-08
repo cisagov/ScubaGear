@@ -1667,13 +1667,59 @@ test_Migrated_Incorrect if {
 #
 # Policy MS.AAD.3.5v1
 #--
+test_NotImplemented_Incorrect_Sms if {
+
+    Output := aad.tests with input as {
+        "authentication_method": [
+            {
+                "PolicyMigrationState": "migrationComplete",
+                "AuthenticationMethodConfigurations":  [
+                    {
+                        "Id": "Sms",
+                        "State": "enabled"
+                    },
+                    {
+                        "Id":  "Voice",
+                        "State":  "disabled"
+                    },
+                    {
+                        "Id":  "Email",
+                        "State": "disabled"
+                    }
+                ]
+            }
+        ]
+    }
+
+    ReportDetails := "Authentication Methods Manage Migration must complete to assess."
+    TestResult("MS.AAD.3.5v1", Output, ReportDetails, false) == true
+}
+
 test_NotImplemented_Correct_V4 if {
-    PolicyId := "MS.AAD.3.5v1"
 
-    Output := aad.tests with input as { }
+    Output := aad.tests with input as {
+        "authentication_method": [
+            {
+                "PolicyMigrationState": "migrationComplete",
+                "AuthenticationMethodConfigurations":  [
+                    {
+                        "Id": "Sms",
+                        "State": "disabled"
+                    },
+                    {
+                        "Id":  "Voice",
+                        "State":  "disabled"
+                    },
+                    {
+                        "Id":  "Email",
+                        "State": "disabled"
+                    }
+                ]
+            }
+        ]
+    }
 
-    ReportDetailStr := NotCheckedDetails(PolicyId)
-    TestResult(PolicyId, Output, ReportDetailStr, false) == true
+    TestResult("MS.AAD.3.5v1", Output, PASS, true) == true
 }
 #--
 
