@@ -43,6 +43,11 @@ NotCheckedDetails(PolicyId) := sprintf(
     [PolicyLink(PolicyId)]
 )
 
+# Note: Reason must include %v to reference policy in document.
+CheckedSkippedDetails(PolicyId, Reason) := sprintf(
+    concat(" ", [Reason]), [PolicyLink(PolicyId)]
+)
+
 # 3rd Party Report Details method
 DefenderMirrorDetails(PolicyId) := sprintf(
     concat(" ", [

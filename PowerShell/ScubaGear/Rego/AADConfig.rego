@@ -1,6 +1,7 @@
 package aad
 import future.keywords
 import data.utils.report.NotCheckedDetails
+import data.utils.report.CheckedSkippedDetails
 import data.utils.report.ReportDetailsBoolean
 import data.utils.report.ReportDetailsString
 import data.utils.key.IsEmptyContainer
@@ -315,21 +316,30 @@ GoodAuthenticationMethodConfigurations contains {
 }
 
 tests contains {
+    "PolicyId": PolicyId,
+    "Criticality": "Shall/Not-Implemented",
+    "Commandlet": ["Get-MgBetaPolicyAuthenticationMethodPolicy"],
+    "ActualValue": [],
+    "ReportDetails": CheckedSkippedDetails("MS.AAD.3.4v1", Reason),
+    "RequirementMet": false
+} if {
+    PolicyId := "MS.AAD.3.5v1"
+    Reason := "This policy is only applicable if the tenant has their Manage Migration feature set to Migration Complete. See %v for more info"
+    PolicyMigrationIsComplete != true
+}
+
+tests contains {
     "PolicyId": "MS.AAD.3.5v1",
     "Criticality": "Shall",
     "Commandlet": ["Get-MgBetaPolicyAuthenticationMethodPolicy"],
     "ActualValue": [],
-    "ReportDetails": ReportDetailsString(Status, InfoMessage),
+    "ReportDetails": ReportDetailsString(Status, ErrorMessage),
     "RequirementMet": Status
 } if {
-    InfoMessage := "Authentication Methods Manage Migration must complete to assess."
-    input.authentication_method[_].PolicyMigrationState == "migrationComplete"
+    ErrorMessage := "Sms, Voice, and Email authentication must be disabled."
+    PolicyMigrationIsComplete == true
     GoodAuthenticationMethodConfigurations
-    print(GoodAuthenticationMethodConfigurations)
-    print(PolicyMigrationIsComplete)
-    print("Countof methods: ", count(GoodAuthenticationMethodConfigurations))
     Conditions := [PolicyMigrationIsComplete == true, count(GoodAuthenticationMethodConfigurations) == 3]
-    print("Count of conditions: ", count(FilterArray(Conditions, true)))
     Status := count(FilterArray(Conditions, true)) == 2
 }
 #--
