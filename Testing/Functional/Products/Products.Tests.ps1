@@ -362,7 +362,7 @@ Describe "Policy Checks for <ProductName>"{
                                     }
                                     elseif ($true -eq $ExpectedResult) {
                                         $RowData[2].text | Should -BeLikeExactly "Pass" -Because "expected policy to pass. [$Msg]"
-                                        $RowData[4].GetAttribute("innerHTML") | FromInnerHtml | Should -BeExactly $PolicyResultObj.ReportDetails
+                                        IsEquivalence -First $RowData[4].GetAttribute("innerHTML") -Second $PolicyResultObj.ReportDetails | Should -BeTrue
                                     }
                                     elseif ($null -ne $ExpectedResult ) {
                                         if ('Shall' -eq $RowData[3].text){
@@ -374,8 +374,7 @@ Describe "Policy Checks for <ProductName>"{
                                         else {
                                             $RowData[2].text | Should -BeLikeExactly "Unknown" -Because "unexpected criticality. [$Msg]"
                                         }
-
-                                        $RowData[4].GetAttribute("innerHTML") | FromInnerHtml | Should -BeExactly $PolicyResultObj.ReportDetails
+                                        IsEquivalence -First $RowData[4].GetAttribute("innerHTML") -Second $PolicyResultObj.ReportDetails | Should -BeTrue
                                     }
                                     else {
                                         $false | Should -BeTrue -Because "policy should be custom, not checked, or have and expected result. [$Msg]"
