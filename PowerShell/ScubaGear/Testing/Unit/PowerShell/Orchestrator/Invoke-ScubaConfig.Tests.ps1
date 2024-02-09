@@ -99,6 +99,31 @@ InModuleScope Orchestrator {
                     $script:TestSplat[$Parameter] | Should -BeExactly $Value -Because "got $($script:TestSplat[$Parameter])"
             }
         }
+
+        Describe -Tag 'Orchestrator' -Name 'Invoke-Scuba with command line ProductNames wild card override' {
+            BeforeAll {
+                SetupMocks
+                Invoke-SCuBA `
+                  -ProductNames "*" `
+                  -ConfigFilePath (Join-Path -Path $PSScriptRoot -ChildPath "orchestrator_config_test.yaml")
+            }
+
+            It "Verify parameter, ProductNames, with wildcard CLI override"{
+                $script:TestSplat['ProductNames'] | Should -BeExactly @('aad', 'defender', 'exo', 'powerplatform', 'sharepoint', 'teams') -Because "got $($script:TestSplat['ProductNames'])"
+            }
+        }
+
+        Describe -Tag 'Orchestrator' -Name 'Invoke-Scuba with config file ProductNames wild card' {
+            BeforeAll {
+                SetupMocks
+                Invoke-SCuBA `
+                  -ConfigFilePath (Join-Path -Path $PSScriptRoot -ChildPath "product_wildcard_config_test.yaml")
+            }
+
+            It "Verify parameter, ProductNames, reflects all products"{
+                $script:TestSplat['ProductNames'] | Should -BeExactly @('aad', 'defender', 'exo', 'powerplatform', 'sharepoint', 'teams') -Because "got $($script:TestSplat['ProductNames'])"
+            }
+        }
     }
 }
 AfterAll {

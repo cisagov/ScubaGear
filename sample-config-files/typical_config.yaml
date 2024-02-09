@@ -5,4 +5,4 @@ ProductNames:
   # - defender
   - aad
   # - sharepoint
-M365Environment: commercial
+M365Environment: gcc

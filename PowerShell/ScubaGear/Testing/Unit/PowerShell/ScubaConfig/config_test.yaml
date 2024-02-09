@@ -5,7 +5,7 @@ ProductNames:
   - defender
   - aad
   - sharepoint
-  - onedrive
+  - powerplatform
 M365Environment: commercial
 OPAPath: .
 LogIn: true
