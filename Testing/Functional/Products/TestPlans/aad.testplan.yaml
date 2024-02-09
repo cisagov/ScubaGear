@@ -234,7 +234,7 @@ TestPlan:
           - Command: UpdateProviderExport
             Splat:
               updates:
-                authentication_method[0].PolicyMigrationState: preMigration 
+                authentication_method[0].PolicyMigrationState: preMigration
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.AAD.3.5v1 Non-compliant case - Sms enabled
@@ -242,14 +242,14 @@ TestPlan:
           - Command: UpdateProviderExport
             Splat:
               updates:
-                authentication_method[0].PolicyMigrationState: migrationComplete 
+                authentication_method[0].PolicyMigrationState: migrationComplete
                 authentication_method[0].AuthenticationMethodConfigurations:
                   - Id: Sms
                     State: enabled
                   - Id: Voice
                     State: disabled
                   - Id: Email
-                    State: disabled  
+                    State: disabled
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.AAD.3.5v1 Non-compliant case - Voice enabled
@@ -257,14 +257,14 @@ TestPlan:
           - Command: UpdateProviderExport
             Splat:
               updates:
-                authentication_method[0].PolicyMigrationState: migrationComplete 
+                authentication_method[0].PolicyMigrationState: migrationComplete
                 authentication_method[0].AuthenticationMethodConfigurations:
                   - Id: Sms
                     State: disabled
                   - Id: Voice
                     State: enabled
                   - Id: Email
-                    State: disabled  
+                    State: disabled
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.AAD.3.5v1 Non-compliant case - Email enabled
@@ -272,14 +272,14 @@ TestPlan:
           - Command: UpdateProviderExport
             Splat:
               updates:
-                authentication_method[0].PolicyMigrationState: migrationComplete 
+                authentication_method[0].PolicyMigrationState: migrationComplete
                 authentication_method[0].AuthenticationMethodConfigurations:
                   - Id: Sms
                     State: disabled
                   - Id: Voice
                     State: disabled
                   - Id: Email
-                    State: enabled  
+                    State: enabled
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.AAD.3.5v1 Compliant case
@@ -287,14 +287,14 @@ TestPlan:
           - Command: UpdateProviderExport
             Splat:
               updates:
-                authentication_method[0].PolicyMigrationState: migrationComplete 
+                authentication_method[0].PolicyMigrationState: migrationComplete
                 authentication_method[0].AuthenticationMethodConfigurations:
                   - Id: Sms
                     State: disabled
                   - Id: Voice
                     State: disabled
                   - Id: Email
-                    State: disabled  
+                    State: disabled
         Postconditions: []
         ExpectedResult: true
 

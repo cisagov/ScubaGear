@@ -15,14 +15,14 @@ function IsEquivalence{
       $Second
   )
   process{
-    $First = $First -Replace '<br>', '<br/>' 
+    $First = $First -Replace '<br>', '<br/>'
     $First = $First -Replace '&amp;', '&'
     Write-Debug " First: $First"
     Write-Debug "Second: $Second"
     0 -eq [String]::Compare(
-      $First, 
-      $Second, 
-      [System.Globalization.CultureInfo]::InvariantCulture, 
+      $First,
+      $Second,
+      [System.Globalization.CultureInfo]::InvariantCulture,
       [System.Globalization.CompareOptions]::IgnoreSymbols
     )
   }
