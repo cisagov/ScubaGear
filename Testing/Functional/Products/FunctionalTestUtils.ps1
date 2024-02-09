@@ -1,24 +1,32 @@
 # Helper functions for functional test
-function FromInnerHtml{
-    <#
-    .SYNOPSIS
-      Private helper function to convert Inner HTML values format to match expected values format
-  #>
-    param(
-        [Parameter(Mandatory = $true, ValueFromPipeline=$true)]
-        [ValidateNotNullOrEmpty()]
-        [string]
-        $InnerHtml
+function IsEquivalence{
+  <#
+  .SYNOPSIS
+    Private helper function to compare two string for functional equivalence
+#>
+  param(
+      [Parameter(Mandatory = $true)]
+      [ValidateNotNullOrEmpty()]
+      [string]
+      $First,
+      [Parameter(Mandatory = $true)]
+      [ValidateNotNullOrEmpty()]
+      [string]
+      $Second
+  )
+  process{
+    $First = $First -Replace '<br>', '<br/>' 
+    $First = $First -Replace '&amp;', '&'
+    Write-Debug " First: $First"
+    Write-Debug "Second: $Second"
+    0 -eq [String]::Compare(
+      $First, 
+      $Second, 
+      [System.Globalization.CultureInfo]::InvariantCulture, 
+      [System.Globalization.CompareOptions]::IgnoreSymbols
     )
-    process{
-        #$NewLine = [System.Environment]::NewLine
-        $OutString = $InnerHtml -Replace '<br>', '<br/>'
-        $OutString = $OutString -Replace "<a href=""", "<a href='"
-        $OutString = $OutString -Replace """>", "'>"
-        $OutString
-    }
+  }
 }
-
 function Set-NestedMemberValue {
   <#
     .SYNOPSIS
