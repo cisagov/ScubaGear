@@ -541,15 +541,32 @@ TestPlan:
           - Command: UpdateProviderExport
             Splat:
               updates:
-                admin_consent_policies[0].IsEnabled: false
+                directory_settings[0].DisplayName: Consent Policy Settings
+                directory_settings[0].Values:
+                  - Name: EnableAdminConsentRequests
+                    Value: ""
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.AAD.5.3v1 Compliant case - Admin Consent workflow is configured
+      - TestDescription: MS.AAD.5.3v1 Non-Compliant case - No Admin Consent workflow configured false
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
               updates:
-                admin_consent_policies[0].IsEnabled: true
+                directory_settings[0].DisplayName: Consent Policy Settings
+                directory_settings[0].Values:
+                  - Name: EnableAdminConsentRequests
+                    Value: "false"
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.AAD.5.3v1 Compliant case - Admin Consent workflow is configured true
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                directory_settings[0].DisplayName: Consent Policy Settings
+                directory_settings[0].Values:
+                  - Name: EnableAdminConsentRequests
+                    Value: "true"
         Postconditions: []
         ExpectedResult: true
 

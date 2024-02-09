@@ -521,31 +521,51 @@ tests contains {
 # MS.AAD.5.3v1
 #--
 
-# Save the policy Id of any not enabled
-BadConsentPolicies contains Policy.Id if {
-    some Policy in input.admin_consent_policies
-    Policy.IsEnabled == false
+# For specific setting, save the value & group.
+AllAdminConsentSettings contains {
+    "SettingsGroup": SettingGroup.DisplayName,
+    "Name": Setting.Name,
+    "Value": Setting.Value
+} if {
+    some SettingGroup in input.directory_settings
+    some Setting in SettingGroup.Values
+    Setting.Name == "EnableAdminConsentRequests"
 }
 
-# Get all policies
-AllConsentPolicies contains {
-    "PolicyId": Policy.Id,
-    "IsEnabled": Policy.IsEnabled
+# Save all settings that have a value of false
+GoodAdminConsentSettings contains {
+    "SettingsGroup": Setting.SettingsGroup,
+    "Name": Setting.Name,
+    "Value": Setting.Value
 } if {
-    some Policy in input.admin_consent_policies
+    some Setting in AllAdminConsentSettings
+    lower(Setting.Value) == "true"
+}
+
+# Save all settings that have a value of true
+BadAdminConsentSettings contains {
+    "SettingsGroup": Setting.SettingsGroup,
+    "Name": Setting.Name,
+    "Value": Setting.Value
+} if {
+    some Setting in AllAdminConsentSettings
+    lower(Setting.Value) == "false"
 }
 
 # If there is a policy that is not enabled, fail
 tests contains {
     "PolicyId": "MS.AAD.5.3v1",
     "Criticality": "Shall",
-    "Commandlet": ["Get-MgBetaPolicyAdminConsentRequestPolicy"],
-    "ActualValue": {"all_consent_policies": AllConsentPolicies},
+    "Commandlet": ["Get-MgBetaDirectorySetting"],
+    "ActualValue": {"all_admin_consent_policies": AllAdminConsentSettings},
     "ReportDetails": ReportDetailsBoolean(Status),
     "RequirementMet": Status
 } if {
-    BadPolicies := BadConsentPolicies
-    Status := count(BadPolicies) == 0
+    Conditions := [
+        count(BadAdminConsentSettings) == 0,
+        count(GoodAdminConsentSettings) > 0
+    ]
+    Status := count(FilterArray(Conditions, false)) == 0
 }
 #--
 
