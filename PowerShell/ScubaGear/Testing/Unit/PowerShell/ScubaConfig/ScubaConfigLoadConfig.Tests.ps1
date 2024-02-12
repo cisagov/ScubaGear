@@ -3,6 +3,10 @@ using module '..\..\..\..\Modules\ScubaConfig\ScubaConfig.psm1'
 InModuleScope ScubaConfig {
     Describe -tag "Utils" -name 'ScubaConfigLoadConfig' {
         context 'Handling repeated LoadConfig invocations' {
+            BeforeAll {
+                function Get-ScubaDefault {throw 'this will be mocked'}
+                Mock -ModuleName ScubaConfig Get-ScubaDefault {"."}
+            }
             It 'Load valid config file followed by another'{
                 $cfg = [ScubaConfig]::GetInstance()
 		# Load the first file and check the ProductNames value.
