@@ -17,6 +17,13 @@ class ScubaConfig {
     #>
     hidden static [ScubaConfig]$_Instance = [ScubaConfig]::new()
     hidden static [Boolean]$_IsLoaded = $false
+    hidden static [hashtable]$ScubaDefaults = @{
+        DefaultOPAPath = (Join-Path -Path $env:USERPROFILE -ChildPath ".scubagear\Tools")
+    }
+
+    static [object]ScubaDefault ([string]$Name){
+        return [ScubaConfig]::ScubaDefaults[$Name]
+    }
 
     [Boolean]LoadConfig([System.IO.FileInfo]$Path){
         if (-Not (Test-Path -PathType Leaf $Path)){
@@ -59,7 +66,7 @@ class ScubaConfig {
         }
 
         if (-Not $this.Configuration.OPAPath){
-            $this.Configuration.OPAPath = Get-ScubaDefault -Name 'DefaultOPAPath'
+            $this.Configuration.OPAPath = [ScubaConfig]::ScubaDefault('DefaultOPAPath')
         }
 
         if (-Not $this.Configuration.LogIn){

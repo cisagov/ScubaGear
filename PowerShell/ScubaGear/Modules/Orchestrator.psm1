@@ -1,6 +1,5 @@
 using module 'ScubaConfig\ScubaConfig.psm1'
 
-
 function Invoke-SCuBA {
     <#
     .SYNOPSIS
@@ -128,7 +127,7 @@ function Invoke-SCuBA {
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateScript({Test-Path -PathType Container $_})]
         [string]
-        $OPAPath = (Get-ScubaDefault -Name 'DefaultOPAPath'),
+        $OPAPath = [ScubaConfig]::ScubaDefault('DefaultOPAPath'),
 
         [Parameter(Mandatory = $false, ParameterSetName = 'Configuration')]
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
