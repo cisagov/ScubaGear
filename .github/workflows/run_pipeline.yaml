@@ -10,61 +10,6 @@ on:
   pull_request:
   workflow_dispatch:
 
-# lint PS
-  #     - "**.ps1"
-  #     - "**.psm1"
-  #     - "**.psd1"
-  #     - "**.pssc"
-  #     - "**.psrc"
-  #     - "**.ps1xml"
-  #     - "**.cdxml"
-# syntax check
-# on:
-#   pull_request:
-#     types: [opened, reopened]
-#     branches:
-#       - "main"
-#   pull_request_review:
-#     types: [submitted]
-#   push:
-#     branches:
-#       - "main"
-#       - "*Baseline*"
-#       - "*FunctionalTest"
-#     paths:
-#       - "baselines/*.md"
-#       - ".github/workflows/run_markdown_check.yaml"
-
-# Powershell unit tests
-#  push:
-#     paths:
-#       - "**.ps1"
-#       - "**.psm1"
-#       - ".github/workflows/run_powershell_tests.yaml"
-#   pull_request:
-#     types: [opened, reopened]
-#     branches:
-#       - "main"
-#     paths:
-#       - "**.ps1"
-#       - "**.psm1"
-#   pull_request_review:
-#     types: [submitted]
-
-# OPA unit tests
-  # push:
-  #   paths:
-  #     - "**.rego"
-  #     - "**/run_opa_tests.yaml"
-  # pull_request:
-  #   types: [opened, reopened]
-  #   branches:
-  #     - "main"
-  #   paths:
-  #     - "**.rego"
-  # pull_request_review:
-  #   types: [submitted]
-
 jobs:
   test-files:
     name: Test for Changes
@@ -117,21 +62,17 @@ jobs:
     name: Syntax
     needs:
       - test-files
-      - lint-yaml
-      - lint-powershell
-    if: needs.test-files.outputs.markdown-changes == 'true' && ${{ !failure() }}
+    if: needs.test-files.outputs.markdown-changes == 'true'
     uses: cisagov/ScubaGear/.github/workflows/run_markdown_check.yaml@825-create-initial-software-dev-pipeline
   unit-powershell:
     name: Unit
     needs:
       - test-files
-      - syntax
-    if: needs.test-files.outputs.powershell-changes == 'true' && ${{ !failure() }}
+    if: needs.test-files.outputs.powershell-changes == 'true'
     uses: cisagov/ScubaGear/.github/workflows/run_powershell_tests.yaml@825-create-initial-software-dev-pipeline
   unit-opa:
     name: Unit
     needs:
       - test-files
-      - syntax
-    if: needs.test-files.outputs.rego-changes == 'true' && ${{ !failure() }}
+    if: needs.test-files.outputs.rego-changes == 'true'
     uses: cisagov/ScubaGear/.github/workflows/run_opa_tests.yaml@825-create-initial-software-dev-pipeline
