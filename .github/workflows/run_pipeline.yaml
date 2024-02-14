@@ -44,13 +44,13 @@ jobs:
       markdown-changes: ${{ steps.file-changes.outputs.markdown-files }}
       rego-changes: ${{ steps.file-changes.outputs.rego-files }}
   lint-yaml:
-    name: Lint
+    name: Lint1
     needs:
       - test-files
     if: needs.test-files.outputs.yaml-changes == 'true'
     uses: cisagov/ScubaGear/.github/workflows/run_linter_yaml.yaml@825-create-initial-software-dev-pipeline
   lint-powershell:
-    name: Lint
+    name: Lint2
     needs:
       - test-files
     if: needs.test-files.outputs.powershell-changes == 'true'
