@@ -23,20 +23,20 @@ jobs:
         with:
           filters: |
             yaml-files:
-              - "**.yml"
-              - "**.yaml"
+              - added|modified: "**.yml"
+              - added|modified: "**.yaml"
             powershell-files:
-              - "**.ps1"
-              - "**.psm1"
-              - "**.psd1"
-              - "**.pssc"
-              - "**.psrc"
-              - "**.ps1xml"
-              - "**.cdxml"
+              - added|modified: "**.ps1"
+              - added|modified: "**.psm1"
+              - added|modified: "**.psd1"
+              - added|modified: "**.pssc"
+              - added|modified: "**.psrc"
+              - added|modified: "**.ps1xml"
+              - added|modified: "**.cdxml"
             markdown-files:
-              - "**.md"
+              - added|modified: "**.md"
             rego-files:
-              - "**.rego"
+              - added|modified: "**.rego"
     outputs:
       yaml-changes: ${{ steps.file-changes.outputs.yaml-files }}
       powershell-changes: ${{ steps.file-changes.outputs.powershell-files }}
