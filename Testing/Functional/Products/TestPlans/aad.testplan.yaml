@@ -912,7 +912,7 @@ TestPlan:
         Postconditions: []
         ExpectedResult: true
 
-      - TestDescription: MS.AAD.7.2v1 Compliant case - Less number of Global Admins and other privileged users
+      - TestDescription: MS.AAD.7.2v1 Compliant case - Less number of Global Admins than other privileged users
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
