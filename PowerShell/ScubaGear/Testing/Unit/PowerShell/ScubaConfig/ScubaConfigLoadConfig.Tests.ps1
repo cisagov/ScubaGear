@@ -9,13 +9,21 @@ InModuleScope ScubaConfig {
             }
             It 'Load valid config file followed by another'{
                 $cfg = [ScubaConfig]::GetInstance()
-		# Load the first file and check the ProductNames value.
-                $file1 = Join-Path -Path $PSScriptRoot -ChildPath config_test_load_config1.json
-                $cfg.LoadConfig($file1)
+                # Load the first file and check the ProductNames value.
+                function global:ConvertFrom-Yaml {
+                    @{
+                        ProductNames=@('teams')
+                    }
+                }
+                [ScubaConfig]::GetInstance().LoadConfig($PSCommandPath) | Should -BeTrue
                 $cfg.Configuration.ProductNames | Should -Be 'teams'
-		# Load the second file and verify that ProductNames has changed.
-                $file2 = Join-Path -Path $PSScriptRoot -ChildPath config_test_load_config2.json
-                $cfg.LoadConfig($file2)
+                # Load the second file and verify that ProductNames has changed.
+                function global:ConvertFrom-Yaml {
+                    @{
+                        ProductNames=@('exo')
+                    }
+                }
+                [ScubaConfig]::GetInstance().LoadConfig($PSCommandPath) | Should -BeTrue
                 $cfg.Configuration.ProductNames | Should -Be 'exo'
             }
             AfterAll {

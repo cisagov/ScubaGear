@@ -18,18 +18,13 @@ InModuleScope ScubaConfig {
             }
         }
         context 'JSON Configuration' {
-            BeforeAll {
-                function Get-ScubaDefault {throw 'this will be mocked'}
-                Mock -ModuleName ScubaConfig Get-ScubaDefault {"."}
-                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'ScubaConfigTestFile')]
-                $ScubaConfigTestFile = Join-Path -Path $PSScriptRoot -ChildPath config_test.json
-                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'Result')]
-                $Result = [ScubaConfig]::GetInstance().LoadConfig($ScubaConfigTestFile)
-            }
             It 'Load valid config file'{
                 function global:ConvertFrom-Yaml {
                     @{
+                        ProductNames=@('aad')
+                        M365Environment='commercial'
                         AnObject=@{name='MyObjectName'}
+                        DisconnectOnExit = $false
                     }
                 }
                 [ScubaConfig]::ResetInstance()

@@ -65,6 +65,7 @@ class ScubaConfig {
     hidden [hashtable]$Configuration
 
     hidden [void]SetParameterDefaults(){
+        Write-Debug "Setting ScubaConfig default values."
         if (-Not $this.Configuration.ProductNames){
             $this.Configuration.ProductNames = [ScubaConfig]::ScubaDefault('DefaultProductNames')
         }
@@ -75,6 +76,7 @@ class ScubaConfig {
                 Write-Debug "Setting ProductNames to all products because of wildcard"
             }
             else{
+                Write-Debug "ProductNames provided - using as is."
                 $this.Configuration.ProductNames = $this.Configuration.ProductNames | Sort-Object
             }
         }

@@ -136,6 +136,22 @@ InModuleScope Orchestrator {
         Describe -Tag 'Orchestrator' -Name 'Invoke-Scuba with config file ProductNames wild card' {
             BeforeAll {
                 SetupMocks
+                function global:ConvertFrom-Yaml {
+                    @{
+                        ProductNames=@('aad', 'defender', 'exo', 'powerplatform', 'sharepoint', 'teams')
+                        M365Environment='commercial'
+                        OPAPath=$PSScriptRoot
+                        Login=$true
+                        OutPath=$PSScriptRoot
+                        OutFolderName='ScubaReports'
+                        OutProviderFileName='TenantSettingsExport'
+                        OutRegoFileName='ScubaTestResults'
+                        OutReportName='ScubaReports'
+                        Organization='sub.domain.com'
+                        AppID='7892dfe467aef9023be'
+                        CertificateThumbprint='8A673F1087453ABC894'
+                    }
+                }
                 Invoke-SCuBA `
                   -ConfigFilePath (Join-Path -Path $PSScriptRoot -ChildPath "product_wildcard_config_test.yaml")
             }
