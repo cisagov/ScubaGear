@@ -67,7 +67,7 @@ on:
 
 jobs:
   test-files:
-    name: Test Files
+    name: Test for Changes
     runs-on: ubuntu-latest
     outputs:
       yaml-changes: ${{ steps.file-changes.outputs.yaml-files }}
@@ -98,7 +98,7 @@ jobs:
             markdown-files:
               - "**.md"
               - ".github/workflows/run_markdown_check.yaml"
-            opa-changes:
+            rego-files:
               - "**.rego"
               - ".github/workflows/run_opa_tests.yaml"
   lint-yaml:
@@ -119,19 +119,19 @@ jobs:
       - test-files
       - lint-yaml
       - lint-powershell
-    if: needs.test-files.outputs.markdown-changes == 'true'
+    if: needs.test-files.outputs.markdown-changes == 'true' && ${{ !failure() }}
     uses: cisagov/ScubaGear/.github/workflows/run_markdown_check.yaml@825-create-initial-software-dev-pipeline
   unit-powershell:
     name: Unit
     needs:
       - test-files
       - syntax
-    if: needs.test-files.outputs.powershell-changes == 'true'
+    if: needs.test-files.outputs.powershell-changes == 'true' && ${{ !failure() }}
     uses: cisagov/ScubaGear/.github/workflows/run_powershell_tests.yaml@825-create-initial-software-dev-pipeline
   unit-opa:
     name: Unit
     needs:
       - test-files
       - syntax
-    if: needs.test-files.outputs.rego-changes == 'true'
+    if: needs.test-files.outputs.rego-changes == 'true' && ${{ !failure() }}
     uses: cisagov/ScubaGear/.github/workflows/run_opa_tests.yaml@825-create-initial-software-dev-pipeline
