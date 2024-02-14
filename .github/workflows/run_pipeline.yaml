@@ -21,7 +21,7 @@ jobs:
         uses: dorny/paths-filter@v3
         id: file-changes
         with:
-          base: HEAD
+          base: ${{ github.ref }}
           filters: |
             yaml-files:
               - added|modified: "**.yml"
