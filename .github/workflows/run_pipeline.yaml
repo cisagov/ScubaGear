@@ -33,14 +33,10 @@ jobs:
               - "**.psrc"
               - "**.ps1xml"
               - "**.cdxml"
-              # - ".github/workflows/run_linter_powershell.yaml"
-              # - ".github/workflows/run_powershell_tests.yaml"
             markdown-files:
               - "**.md"
-              # - ".github/workflows/run_markdown_check.yaml"
             rego-files:
               - "**.rego"
-              # - ".github/workflows/run_opa_tests.yaml"
     outputs:
       yaml-changes: ${{ steps.file-changes.outputs.yaml-files }}
       powershell-changes: ${{ steps.file-changes.outputs.powershell-files }}
