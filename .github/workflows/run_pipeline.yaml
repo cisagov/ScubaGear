@@ -10,22 +10,128 @@ on:
   pull_request:
   workflow_dispatch:
 
+# lint PS
+  #     - "**.ps1"
+  #     - "**.psm1"
+  #     - "**.psd1"
+  #     - "**.pssc"
+  #     - "**.psrc"
+  #     - "**.ps1xml"
+  #     - "**.cdxml"
+# syntax check
+# on:
+#   pull_request:
+#     types: [opened, reopened]
+#     branches:
+#       - "main"
+#   pull_request_review:
+#     types: [submitted]
+#   push:
+#     branches:
+#       - "main"
+#       - "*Baseline*"
+#       - "*FunctionalTest"
+#     paths:
+#       - "baselines/*.md"
+#       - ".github/workflows/run_markdown_check.yaml"
+
+# Powershell unit tests
+#  push:
+#     paths:
+#       - "**.ps1"
+#       - "**.psm1"
+#       - ".github/workflows/run_powershell_tests.yaml"
+#   pull_request:
+#     types: [opened, reopened]
+#     branches:
+#       - "main"
+#     paths:
+#       - "**.ps1"
+#       - "**.psm1"
+#   pull_request_review:
+#     types: [submitted]
+
+# OPA unit tests
+  # push:
+  #   paths:
+  #     - "**.rego"
+  #     - "**/run_opa_tests.yaml"
+  # pull_request:
+  #   types: [opened, reopened]
+  #   branches:
+  #     - "main"
+  #   paths:
+  #     - "**.rego"
+  # pull_request_review:
+  #   types: [submitted]
+
 jobs:
+  test-files:
+    name: Test Files
+    runs-on: ubuntu-latest
+    outputs:
+      yaml-changes: ${{ steps.file-changes.outputs.yaml-files }}
+      powershell-changes: ${{ steps.file-changes.outputs.powershell-files }}
+      markdown-changes: ${{ steps.file-changes.outputs.markdown-files }}
+      rego-changes: ${{ steps.file-changes.outputs.rego-files }}
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+      - name: Check for Changes
+        uses: dorny/paths-filter@v3
+        id: file-changes
+        with:
+          filters: |
+            yaml-files:
+              - "**.yml"
+              - "**.yaml"
+            powershell-files:
+              - "**.ps1"
+              - "**.psm1"
+              - "**.psd1"
+              - "**.pssc"
+              - "**.psrc"
+              - "**.ps1xml"
+              - "**.cdxml"
+              - ".github/workflows/run_linter_powershell.yaml"
+              - ".github/workflows/run_powershell_tests.yaml"
+            markdown-files:
+              - "**.md"
+              - ".github/workflows/run_markdown_check.yaml"
+            opa-changes:
+              - "**.rego"
+              - ".github/workflows/run_opa_tests.yaml"
   lint-yaml:
     name: Lint
+    needs:
+      - test-files
+    if: needs.test-files.outputs.yaml-changes == 'true'
     uses: cisagov/ScubaGear/.github/workflows/run_linter_yaml.yaml@825-create-initial-software-dev-pipeline
   lint-powershell:
     name: Lint
+    needs:
+      - test-files
+    if: needs.test-files.outputs.powershell-changes == 'true'
     uses: cisagov/ScubaGear/.github/workflows/run_linter_powershell.yaml@825-create-initial-software-dev-pipeline
   syntax:
     name: Syntax
+    needs:
+      - test-files
+      - lint-yaml
+      - lint-powershell
+    if: needs.test-files.outputs.markdown-changes == 'true'
     uses: cisagov/ScubaGear/.github/workflows/run_markdown_check.yaml@825-create-initial-software-dev-pipeline
-    needs: [lint-yaml, lint-powershell]
   unit-powershell:
     name: Unit
+    needs:
+      - test-files
+      - syntax
+    if: needs.test-files.outputs.powershell-changes == 'true'
     uses: cisagov/ScubaGear/.github/workflows/run_powershell_tests.yaml@825-create-initial-software-dev-pipeline
-    needs: syntax
   unit-opa:
     name: Unit
+    needs:
+      - test-files
+      - syntax
+    if: needs.test-files.outputs.rego-changes == 'true'
     uses: cisagov/ScubaGear/.github/workflows/run_opa_tests.yaml@825-create-initial-software-dev-pipeline
-    needs: syntax

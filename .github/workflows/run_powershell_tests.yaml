@@ -1,23 +1,11 @@
+# Purpose: Run unit tests for PowerShell
+
 name: Run PowerShell Tests
+
+# This is a reusable workflow called by the pipeline.
 on:
-  # Run tests on each commit, newly opened/reopened PR, and
-  # PR review submission (e.g. approval)
   workflow_call:
   workflow_dispatch:
-  push:
-    paths:
-      - "**.ps1"
-      - "**.psm1"
-      - ".github/workflows/run_powershell_tests.yaml"
-  pull_request:
-    types: [opened, reopened]
-    branches:
-      - "main"
-    paths:
-      - "**.ps1"
-      - "**.psm1"
-  pull_request_review:
-    types: [submitted]
 
 jobs:
   Run-PowerShell-Tests:

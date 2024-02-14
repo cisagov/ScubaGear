@@ -1,21 +1,11 @@
+# Purpose: Run unit tests for OPA
+
 name: Run OPA Tests
+
+# This is a reusable workflow called by the pipeline.
 on:
-  # Run tests on each commit, newly opened/reopened PR, and
-  # PR review submission (e.g. approval)
   workflow_call:
   workflow_dispatch:
-  push:
-    paths:
-      - "**.rego"
-      - "**/run_opa_tests.yaml"
-  pull_request:
-    types: [opened, reopened]
-    branches:
-      - "main"
-    paths:
-      - "**.rego"
-  pull_request_review:
-    types: [submitted]
 
 env:
   MODULE_ROOT: PowerShell/ScubaGear
