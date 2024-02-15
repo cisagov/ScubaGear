@@ -4,6 +4,7 @@ on:
     types: [opened, reopened]
     branches:
       - "main"
+      - "898-markdown-workflow-does-not-trigger-on-all-ie-md-changes"
   pull_request_review:
     types: [submitted]
   push:
