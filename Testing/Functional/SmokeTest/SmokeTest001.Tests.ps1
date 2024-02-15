@@ -79,5 +79,53 @@ Describe "Smoke Test: Generate Output" {
         ){
             Test-Path -Path "./$OutputFolder/$Item" -PathType $ItemType |
                 Should -Be $true
-        }    }
+        }
+    }
+    Context "Verify exported functions for ScubaGear module" {
+        BeforeAll{
+            [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'ScubaGearExportedFunctions',
+            Justification = 'Variable is used in another scope')]
+            $ScubaGearExportedFunctions = @(
+                'Disconnect-SCuBATenant',
+                'Invoke-RunCached',
+                'Invoke-SCuBA',
+                'Copy-ScubaBaselineDocument',
+                'Copy-ScubaSampleConfigFile',
+                'Copy-ScubaSampleReport'
+            )
+            [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'ExportedCommands',
+            Justification = 'Variable is used in another scope')]
+            $ExportedCommands = (Get-Module -Name ScubaGear).ExportedCommands
+        }
+        It "Is <_> exported?" -ForEach $ScubaGearExportedFunctions {
+            $ExportedCommands | Should -Contain $_
+        }
+    }
+    Context "Verify Copy* exported commands" -ForEach @(
+        @{Command='Copy-ScubaBaselineDocument'; CopiedFiles=@(
+            (Join-Path -Path $env:USERPROFILE -ChildPath "ScubaGear/aad.md"),
+            (Join-Path -Path $env:USERPROFILE -ChildPath "ScubaGear/defender.md"),
+            (Join-Path -Path $env:USERPROFILE -ChildPath "ScubaGear/exo.md"),
+            (Join-Path -Path $env:USERPROFILE -ChildPath "ScubaGear/powerbi.md"),
+            (Join-Path -Path $env:USERPROFILE -ChildPath "ScubaGear/powerplatform.md"),
+            (Join-Path -Path $env:USERPROFILE -ChildPath "ScubaGear/sharepoint.md"),
+            (Join-Path -Path $env:USERPROFILE -ChildPath "ScubaGear/teams.md")
+        )},
+        @{Command='Copy-ScubaSampleConfigFile'; CopiedFiles=@(
+            (Join-Path -Path $env:USERPROFILE -ChildPath "ScubaGear/samples/config-files/aad-config.yaml"),
+            (Join-Path -Path $env:USERPROFILE -ChildPath "ScubaGear/samples/config-files/defender-config.yaml"),
+            (Join-Path -Path $env:USERPROFILE -ChildPath "ScubaGear/samples/config-files/sample-config.json"),
+            (Join-Path -Path $env:USERPROFILE -ChildPath "ScubaGear/samples/config-files/sample-config.yaml")
+        )},
+        @{Command='Copy-ScubaSampleReport'; CopiedFiles=@(
+            (Join-Path -Path $env:USERPROFILE -ChildPath "ScubaGear/samples/reports/BaselineReports.html")
+        )}
+    ){
+        It "Validate call to <Command>" {
+            {& $Command -Force} | Should -Not -Throw
+        }
+        It "Validate <Command> copied file <_>" -ForEach $CopiedFiles {
+            Test-Path -Path $_ -PathType Leaf | Should -BeTrue
+        }
+    }
 }

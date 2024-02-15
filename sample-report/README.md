@@ -1,0 +1,1 @@
+The sample reports have been moved into the ScubaGear PowerShell module for easier distribution. The reports can now be found [here](../PowerShell/ScubaGear/Sample-Reports)
