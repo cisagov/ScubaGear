@@ -47,7 +47,7 @@ InModuleScope Connection {
             @{
                 ProductNames = "aad", "defender", "exo", "powerplatform", "sharepoint", "teams"
                 Services = @(
-                    'Connect-MgGraph', 
+                    'Connect-MgGraph',
                     'Connect-EXOHelper',
                     'Add-PowerAppsAccount',
                     'Connect-PnPOnline',
