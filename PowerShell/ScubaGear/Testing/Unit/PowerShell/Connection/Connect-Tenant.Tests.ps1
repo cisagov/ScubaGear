@@ -3,9 +3,9 @@ Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../../../../Modules/Con
 InModuleScope Connection {
     Describe -Tag 'Connection' -Name "Connect-Tenant" -ForEach @(
         @{Endpoint = 'commercial'}
-        # @{Endpoint = 'gcc'}
-        # @{Endpoint = 'gcchigh'}
-        # @{Endpoint = 'dod'}
+        @{Endpoint = 'gcc'}
+        @{Endpoint = 'gcchigh'}
+        @{Endpoint = 'dod'}
     ){
         BeforeAll {
             function Connect-MgGraph {throw 'this will be mocked'}
