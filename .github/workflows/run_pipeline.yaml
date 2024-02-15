@@ -41,7 +41,7 @@ jobs:
               - added|modified: "**.ps1xml"
               - added|modified: "**.cdxml"
             markdown-files:
-              - added|modified: "**.md"
+              - added|modified: "PowerShell/ScubaGear/baselines/*.md"
             rego-files:
               - added|modified: "**.rego"
     outputs:
@@ -54,28 +54,28 @@ jobs:
     needs:
       - test-files
     if: needs.test-files.outputs.yaml-changes == 'true'
-    uses: cisagov/ScubaGear/.github/workflows/run_linter_yaml.yaml@825-create-initial-software-dev-pipeline
+    uses: cisagov/ScubaGear/.github/workflows/run_linter_yaml.yaml@main
   lint-powershell:
     name: Lint2
     needs:
       - test-files
     if: needs.test-files.outputs.powershell-changes == 'true'
-    uses: cisagov/ScubaGear/.github/workflows/run_linter_powershell.yaml@825-create-initial-software-dev-pipeline
+    uses: cisagov/ScubaGear/.github/workflows/run_linter_powershell.yaml@main
   syntax:
     name: Syntax
     needs:
       - test-files
     if: needs.test-files.outputs.markdown-changes == 'true'
-    uses: cisagov/ScubaGear/.github/workflows/run_markdown_check.yaml@825-create-initial-software-dev-pipeline
+    uses: cisagov/ScubaGear/.github/workflows/run_markdown_check.yaml@main
   unit-powershell:
     name: Unit
     needs:
       - test-files
     if: needs.test-files.outputs.powershell-changes == 'true'
-    uses: cisagov/ScubaGear/.github/workflows/run_powershell_tests.yaml@825-create-initial-software-dev-pipeline
+    uses: cisagov/ScubaGear/.github/workflows/run_powershell_tests.yaml@main
   unit-opa:
     name: Unit
     needs:
       - test-files
     if: needs.test-files.outputs.rego-changes == 'true'
-    uses: cisagov/ScubaGear/.github/workflows/run_opa_tests.yaml@825-create-initial-software-dev-pipeline
+    uses: cisagov/ScubaGear/.github/workflows/run_opa_tests.yaml@main
