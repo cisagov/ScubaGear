@@ -12,7 +12,7 @@ on:
       - "*Baseline*"
       - "*FunctionalTest"
     paths:
-      - "baselines/*.md"
+      - "PowerShell/ScubaGear/baselines/*.md"
       - ".github/workflows/run_markdown_check.yaml"
 
 name: Markdown Check
