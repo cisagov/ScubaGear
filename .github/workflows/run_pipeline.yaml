@@ -47,7 +47,7 @@ jobs:
             rego-files:
               - added|modified: "**.rego"
     outputs:
-      yaml-changes: ${{ steps.file-changes.outputs.yaml-files }}
+      yaml-changes: ${{ steps.file-changes.outputs.yaml-files || inputs.doEverything }}
       powershell-changes: ${{ steps.file-changes.outputs.powershell-files }} || ${{ inputs.doEverything }}
       markdown-changes: ${{ steps.file-changes.outputs.markdown-files }} || ${{ inputs.doEverything }}
       rego-changes: ${{ steps.file-changes.outputs.rego-files }} || ${{ inputs.doEverything }}
