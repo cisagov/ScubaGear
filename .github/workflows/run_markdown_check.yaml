@@ -9,11 +9,11 @@ on:
   push:
     branches:
       - "main"
-      - "898-markdown-workflow-does-not-trigger-on-all-ie-md-changes"
       - "*Baseline*"
       - "*FunctionalTest"
     paths:
       - "PowerShell/ScubaGear/baselines/*.md"
+      - "baselines/*.md"
       - ".github/workflows/run_markdown_check.yaml"
 
 name: Markdown Check
