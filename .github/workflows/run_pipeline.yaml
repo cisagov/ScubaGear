@@ -9,6 +9,14 @@ on:
       - 825-create-initial-software-dev-pipeline
   pull_request:
   workflow_dispatch:
+    inputs:
+      # When set to true, it will run every step in the pipeline, regardless of
+      # what files have changed.
+      doEverything:
+        description: "Run every workflow in the pipeline."
+        required: false
+        type: boolean
+        default: true
 
 jobs:
   test-files:
@@ -39,10 +47,10 @@ jobs:
             rego-files:
               - added|modified: "**.rego"
     outputs:
-      yaml-changes: ${{ steps.file-changes.outputs.yaml-files }}
-      powershell-changes: ${{ steps.file-changes.outputs.powershell-files }}
-      markdown-changes: ${{ steps.file-changes.outputs.markdown-files }}
-      rego-changes: ${{ steps.file-changes.outputs.rego-files }}
+      yaml-changes: ${{ steps.file-changes.outputs.yaml-files }} || ${{ inputs.runQuickCheck }}
+      powershell-changes: ${{ steps.file-changes.outputs.powershell-files }} || ${{ inputs.runQuickCheck }}
+      markdown-changes: ${{ steps.file-changes.outputs.markdown-files }} || ${{ inputs.runQuickCheck }}
+      rego-changes: ${{ steps.file-changes.outputs.rego-files }} || ${{ inputs.runQuickCheck }}
   lint-yaml:
     name: Lint1
     needs:
