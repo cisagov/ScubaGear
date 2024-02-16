@@ -338,7 +338,6 @@ tests contains {
 } if {
     ErrorMessage := "Sms, Voice, and Email authentication must be disabled."
     PolicyMigrationIsComplete == true
-    GoodAuthenticationMethodConfigurations
     Conditions := [PolicyMigrationIsComplete == true, count(GoodAuthenticationMethodConfigurations) == 3]
     Status := count(FilterArray(Conditions, false)) == 0
 }
