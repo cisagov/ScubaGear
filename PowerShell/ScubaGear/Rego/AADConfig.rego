@@ -340,7 +340,7 @@ tests contains {
     PolicyMigrationIsComplete == true
     GoodAuthenticationMethodConfigurations
     Conditions := [PolicyMigrationIsComplete == true, count(GoodAuthenticationMethodConfigurations) == 3]
-    Status := count(FilterArray(Conditions, true)) == 2
+    Status := count(FilterArray(Conditions, false)) == 0
 }
 #--
 
