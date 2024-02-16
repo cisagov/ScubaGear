@@ -27,7 +27,7 @@ InModuleScope -ModuleName ExportEXOProvider {
                                 $this.SuccessfulCommands += $Command
                                 return [pscustomobject]@{}
                             }
-                            "Get-ScubaSpfRecords" {
+                            "Get-ScubaSpfRecord" {
                                 $this.SuccessfulCommands += $Command
                                 return [pscustomobject]@{}
                             }
@@ -35,11 +35,11 @@ InModuleScope -ModuleName ExportEXOProvider {
                                 $this.SuccessfulCommands += $Command
                                 return [pscustomobject]@{}
                             }
-                            "Get-ScubaDkimRecords" {
+                            "Get-ScubaDkimRecord" {
                                 $this.SuccessfulCommands += $Command
                                 return [pscustomobject]@{}
                             }
-                            "Get-ScubaDmarcRecords" {
+                            "Get-ScubaDmarcRecord" {
                                 $this.SuccessfulCommands += $Command
                                 return [pscustomobject]@{}
                             }

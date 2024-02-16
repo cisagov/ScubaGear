@@ -5,10 +5,14 @@
 
 $ProviderPath = "../../../../../Modules/Providers"
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "$($ProviderPath)/ExportDefenderProvider.psm1") -Function Export-DefenderProvider -Force
-#Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "$($ProviderPath)/ProviderHelpers/CommandTracker.psm1") -Force
 
 InModuleScope -ModuleName ExportDefenderProvider {
-    Describe -Tag 'ExportDefenderProvider' -Name "Export-DefenderProvider" {
+    Describe -Tag 'ExportDefenderProvider' -Name "Export-DefenderProvider" -ForEach @(
+        "commercial",
+        "gcc",
+        "gcchigh",
+        "dod"
+    ){
         BeforeAll {
             class MockCommandTracker {
                 [string[]]$SuccessfulCommands = @()
@@ -74,6 +78,10 @@ InModuleScope -ModuleName ExportDefenderProvider {
                                 $this.SuccessfulCommands += $Command
                                 return [pscustomobject]@{}
                             }
+                            "Get-ATPProtectionPolicyRule" {
+                                $this.SuccessfulCommands += $Command
+                                return [pscustomobject]@{}
+                            }
                             default {
                                 throw "ERROR you forgot to create a mock method for this cmdlet: $($Command)"
                             }
@@ -110,7 +118,7 @@ InModuleScope -ModuleName ExportDefenderProvider {
                     return $this.SuccessfulCommands
                 }
             }
-            Mock Import-Module {}
+            Mock -ModuleName ExportDefenderProvider Import-Module {}
             function Get-CommandTracker {}
             Mock -ModuleName ExportDefenderProvider Get-CommandTracker {
                 return [MockCommandTracker]::New()
@@ -125,6 +133,8 @@ InModuleScope -ModuleName ExportDefenderProvider {
                 } }
             function Get-SafeAttachmentPolicy {}
             Mock -ModuleName ExportDefenderProvider Get-SafeAttachmentPolicy {}
+            function Get-AtpPolicyForO365 {throw 'this will be mocked'}
+            Mock -ModuleName ExportDefenderProvider Get-AtpPolicyForO365 {}
             function Test-SCuBAValidProviderJson {
                 param (
                     [string]
@@ -142,27 +152,11 @@ InModuleScope -ModuleName ExportDefenderProvider {
                 $ValidJson
             }
         }
-        It "When called with -M365Environment 'commercial', returns valid JSON" {
-            $Json = Export-DefenderProvider -M365Environment 'commercial'
+        It "When called with -M365Environment '<_>', returns valid JSON" {
+            $Json = Export-DefenderProvider -M365Environment $_
             $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
             $ValidJson | Should -Be $true
         }
-        It "When called with -M365Environment 'gcc', returns valid JSON" {
-            $Json = Export-DefenderProvider -M365Environment 'gcc'
-            $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
-            $ValidJson | Should -Be $true
-        }
-        It "When called with -M365Environment 'gcchigh', returns valid JSON" {
-            $Json = Export-DefenderProvider -M365Environment 'gcchigh'
-            $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
-            $ValidJson | Should -Be $true
-        }
-        It "When called with -M365Environment 'dod', returns valid JSON" {
-            $Json = Export-DefenderProvider -M365Environment 'dod'
-            $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
-            $ValidJson | Should -Be $true
-        }
-
     }
 }
 AfterAll {
