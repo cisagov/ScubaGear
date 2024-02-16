@@ -11,6 +11,7 @@ default BASELINEVERSION := "main"
 
 BASELINEVERSION := input.module_version
 
+# regal ignore:line-length
 SCUBABASEURL := sprintf("https://github.com/cisagov/ScubaGear/blob/v%v/PowerShell/ScubaGear/baselines/", [BASELINEVERSION])
 
 ########################

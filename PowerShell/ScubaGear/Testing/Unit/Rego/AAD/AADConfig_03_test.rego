@@ -1776,6 +1776,7 @@ test_NotImplemented_Incorrect_Migration if {
         ]
     }
 
+    # regal ignore:line-length
     Reason := "This policy is only applicable if the tenant has their Manage Migration feature set to Migration Complete. See %v for more info"
     TestResult("MS.AAD.3.5v1", Output, CheckedSkippedDetails("MS.AAD.3.4v1", Reason), false) == true
 }

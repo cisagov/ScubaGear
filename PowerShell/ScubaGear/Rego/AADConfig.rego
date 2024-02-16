@@ -324,6 +324,7 @@ tests contains {
     "RequirementMet": false
 } if {
     PolicyId := "MS.AAD.3.5v1"
+    # regal ignore:line-length
     Reason := "This policy is only applicable if the tenant has their Manage Migration feature set to Migration Complete. See %v for more info"
     PolicyMigrationIsComplete != true
 }
