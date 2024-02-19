@@ -675,6 +675,13 @@ GlobalAdmins contains User.DisplayName if {
     "Global Administrator" in User.roles
 }
 
+#Set conditions under which this policy will pass
+default IsGlobalAdminCountGood := false
+IsGlobalAdminCountGood := true if {
+    count(GlobalAdmins) <= 8
+    count(GlobalAdmins) >= 2
+}
+
 # Pass if there are at least 2, but no more than 8
 # users with Global Admin role.
 tests contains {
@@ -686,25 +693,46 @@ tests contains {
     "RequirementMet": Status
 } if {
     DescriptionString := "global admin(s) found"
-    Conditions := [
-        count(GlobalAdmins) <= 8,
-        count(GlobalAdmins) >= 2
-    ]
-    Status := count(FilterArray(Conditions, false)) == 0
+    Status := IsGlobalAdminCountGood
 }
 #--
 
 # MS.AAD.7.2v1
 #--
 
-# At this time we are unable to test for 7.2v1
+# Save all users that don't have Global Admin role
+NotGlobalAdmins contains User.DisplayName if {
+    some User in input.privileged_users
+    not "Global Administrator" in User.roles
+}
+
+default GetScoreDescription := "All privileged users are Global Admin"
+GetScoreDescription := concat("", ["Least Privilege Score = ", Score, " (should be 1 or less)"]) if {
+    count(NotGlobalAdmins) > 0
+    RawRatio := sprintf("%v", [count(GlobalAdmins)/count(NotGlobalAdmins)])
+    CutOff := min([4, count(RawRatio)])
+    Score := substring(RawRatio, 0, CutOff)
+}
+
+# calculate least privilege score as ratio of priv users with global admin role to priv users without global admin role
+LeastPrivilegeScore := "Policy MS.AAD.7.1 failed so score not computed" if {
+    IsGlobalAdminCountGood == false
+} else := GetScoreDescription
+
+# Pass if 7.1 passed and Least Privilege Score < 1, fail if 7.1 failed or Least Privilege score is >= 1
 tests contains {
     "PolicyId": "MS.AAD.7.2v1",
-    "Criticality": "Shall/Not-Implemented",
-    "Commandlet": [],
-    "ActualValue": [],
-    "ReportDetails": NotCheckedDetails("MS.AAD.7.2v1"),
-    "RequirementMet": false
+    "Criticality" : "Shall",
+    "Commandlet" : ["Get-MgBetaSubscribedSku", "Get-PrivilegedUser"],
+    "ActualValue" : GlobalAdmins,
+    "ReportDetails" : concat(": ", [ReportDetailsBoolean(Status), LeastPrivilegeScore]),
+    "RequirementMet" : Status
+} if {
+    Conditions := [
+        IsGlobalAdminCountGood,
+        count(GlobalAdmins) <= count(NotGlobalAdmins)
+    ]
+    Status := count(FilterArray(Conditions, false)) == 0
 }
 #--
 

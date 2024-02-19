@@ -788,13 +788,170 @@ TestPlan:
         ExpectedResult: true
 
   - PolicyId: MS.AAD.7.2v1
-    TestDriver: RunScuba
+    TestDriver: RunCached
     Tests:
-      - TestDescription: MS.AAD.7.2v1 Not Checked
-        Preconditions: []
+      - TestDescription: MS.AAD.7.2v1 Non-Compliant case - Too many Global Admins
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                privileged_users:
+                  16b4d5c2-71c9-4644-8728-74e3a8324d81:
+                    DisplayName: Test User1
+                    roles:
+                      - Global Administrator
+                    OnPremisesImmutableId: null
+                  26b4d5c2-71c9-4644-8728-74e3a8324d82:
+                    DisplayName: Test User2
+                    roles:
+                      - Global Administrator
+                      - Exchange Administrator
+                    OnPremisesImmutableId: null
+                  36b4d5c2-71c9-4644-8728-74e3a8324d83:
+                    DisplayName: Test User3
+                    roles:
+                      - User Administrator
+                      - Global Administrator
+                    OnPremisesImmutableId: null
+                  46b4d5c2-71c9-4644-8728-74e3a8324d84:
+                    DisplayName: Test User4
+                    roles:
+                      - Hybrid Identity Administrator
+                      - Global Administrator
+                    OnPremisesImmutableId: null
+                  56b4d5c2-71c9-4644-8728-74e3a8324d85:
+                    DisplayName: Test User5
+                    roles:
+                      - Global Administrator
+                    OnPremisesImmutableId: null
+                  66b4d5c2-71c9-4644-8728-74e3a8324d86:
+                    DisplayName: Test User6
+                    roles:
+                      - Global Administrator
+                      - Sharepoint Administrator
+                    OnPremisesImmutableId: null
+                  76b4d5c2-71c9-4644-8728-74e3a8324d87:
+                    DisplayName: Test User7
+                    roles:
+                      - Global Administrator
+                    OnPremisesImmutableId: null
+                  86b4d5c2-71c9-4644-8728-74e3a8324d88:
+                    DisplayName: Test User8
+                    roles:
+                      - Global Administrator
+                    OnPremisesImmutableId: null
+                  96b4d5c2-71c9-4644-8728-74e3a8324d89:
+                    DisplayName: Test User9
+                    roles:
+                      - Global Administrator
+                    OnPremisesImmutableId: null
         Postconditions: []
-        IsNotChecked: true
         ExpectedResult: false
+      - TestDescription: MS.AAD.7.2v1 Non-Compliant case - More Global Admins than other privileged roles
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                privileged_users:
+                  16b4d5c2-71c9-4644-8728-74e3a8324d81:
+                    DisplayName: Test User1
+                    roles:
+                      - Global Administrator
+                    OnPremisesImmutableId: null
+                  26b4d5c2-71c9-4644-8728-74e3a8324d82:
+                    DisplayName: Test User2
+                    roles:
+                      - Global Administrator
+                      - Exchange Administrator
+                    OnPremisesImmutableId: null
+                  36b4d5c2-71c9-4644-8728-74e3a8324d83:
+                    DisplayName: Test User3
+                    roles:
+                      - User Administrator
+                    OnPremisesImmutableId: null
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.AAD.7.2v1 Compliant case - Equal number of Global Admins and other privileged users
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                privileged_users:
+                  16b4d5c2-71c9-4644-8728-74e3a8324d81:
+                    DisplayName: Test User1
+                    roles:
+                      - Global Administrator
+                    OnPremisesImmutableId: null
+                  26b4d5c2-71c9-4644-8728-74e3a8324d82:
+                    DisplayName: Test User2
+                    roles:
+                      - Global Administrator
+                      - Exchange Administrator
+                    OnPremisesImmutableId: null
+                  36b4d5c2-71c9-4644-8728-74e3a8324d83:
+                    DisplayName: Test User3
+                    roles:
+                      - User Administrator
+                      - Global Administrator
+                    OnPremisesImmutableId: null
+                  46b4d5c2-71c9-4644-8728-74e3a8324d84:
+                    DisplayName: Test User4
+                    roles:
+                      - Hybrid Identity Administrator
+                    OnPremisesImmutableId: null
+                  56b4d5c2-71c9-4644-8728-74e3a8324d85:
+                    DisplayName: Test User5
+                    roles:
+                      - User Administrator
+                    OnPremisesImmutableId: null
+                  66b4d5c2-71c9-4644-8728-74e3a8324d86:
+                    DisplayName: Test User6
+                    roles:
+                      - Sharepoint Administrator
+                    OnPremisesImmutableId: null
+        Postconditions: []
+        ExpectedResult: true
+
+      - TestDescription: MS.AAD.7.2v1 Compliant case - Less number of Global Admins than other privileged users
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                privileged_users:
+                  16b4d5c2-71c9-4644-8728-74e3a8324d81:
+                    DisplayName: Test User1
+                    roles:
+                      - Global Administrator
+                    OnPremisesImmutableId: null
+                  26b4d5c2-71c9-4644-8728-74e3a8324d82:
+                    DisplayName: Test User2
+                    roles:
+                      - Global Administrator
+                      - Exchange Administrator
+                    OnPremisesImmutableId: null
+                  36b4d5c2-71c9-4644-8728-74e3a8324d83:
+                    DisplayName: Test User3
+                    roles:
+                      - User Administrator
+                      - Exchange Administrator
+                    OnPremisesImmutableId: null
+                  46b4d5c2-71c9-4644-8728-74e3a8324d84:
+                    DisplayName: Test User4
+                    roles:
+                      - Hybrid Identity Administrator
+                    OnPremisesImmutableId: null
+                  56b4d5c2-71c9-4644-8728-74e3a8324d85:
+                    DisplayName: Test User5
+                    roles:
+                      - User Administrator
+                    OnPremisesImmutableId: null
+                  66b4d5c2-71c9-4644-8728-74e3a8324d86:
+                    DisplayName: Test User6
+                    roles:
+                      - Sharepoint Administrator
+                    OnPremisesImmutableId: null
+        Postconditions: []
+        ExpectedResult: true
 
   - PolicyId: MS.AAD.7.3v1
     TestDriver: RunCached

@@ -1,7 +1,6 @@
 package aad_test
 import future.keywords
 import data.aad
-import data.utils.report.NotCheckedDetails
 import data.utils.key.TestResult
 import data.utils.key.FAIL
 import data.utils.key.PASS
@@ -123,15 +122,220 @@ test_PrivilegedUsers_Incorrect_V2 if {
 #--
 # Policy MS.AAD.7.2v1
 #--
-test_NotImplemented_Correct if {
-    PolicyId := "MS.AAD.7.2v1"
+# Correct because the ratio of global admins to non global admins is less than 1
+test_SecureScore_Correct_V1 if {
+    Output := aad.tests with input as {
+        "privileged_users": {
+            "User1": {
+                "DisplayName": "Test Name1",
+                "roles": [
+                    "Privileged Role Administrator",
+                    "Global Administrator"
+                ]
+            },
+            "User2": {
+                "DisplayName": "Test Name2",
+                "roles": [
+                    "Cloud Application Administrator",
+                    "Global Administrator"
+                ]
+            },
+            "User3": {
+                "DisplayName": "Test Name3",
+                "roles": [
+                    "Application Administrator"
+                ]
+            },
+            "User4": {
+                "DisplayName": "Test Name4",
+                "roles": [
+                    "User Administrator"
+                ]
+            },
+            "User5": {
+                "DisplayName": "Test Name5",
+                "roles": [
+                    "Privileged Role Administrator"
+                ]
+            }
+        }
+    }
 
-    Output := aad.tests with input as { }
+    ReportDetailStr := "Requirement met: Least Privilege Score = 0.66 (should be 1 or less)"
 
-    ReportDetailString := NotCheckedDetails(PolicyId)
-    TestResult(PolicyId, Output, ReportDetailString, false) == true
+    TestResult("MS.AAD.7.2v1", Output, ReportDetailStr, true) == true
 }
-#--
+
+# Correct because the ratio of global admins to non global admins is equal to 1
+test_SecureScore_Incorrect_V1 if {
+    Output := aad.tests with input as {
+        "privileged_users": {
+            "User1": {
+                "DisplayName": "Test Name1",
+                "roles": [
+                    "Privileged Role Administrator",
+                    "Global Administrator"
+                ]
+            },
+            "User2": {
+                "DisplayName": "Test Name2",
+                "roles": [
+                    "User Administrator",
+                    "Global Administrator"
+                ]
+            },
+            "User3": {
+                "DisplayName": "Test Name3",
+                "roles": [
+                    "Application Administrator"
+                ]
+            },
+            "User4": {
+                "DisplayName": "Test Name4",
+                "roles": [
+                    "Privileged Role Administrator"
+                ]
+            }
+        }
+    }
+
+    ReportDetailStr := "Requirement met: Least Privilege Score = 1 (should be 1 or less)"
+
+    TestResult("MS.AAD.7.2v1", Output, ReportDetailStr, true) == true
+}
+
+# Incorrect because the ratio of global admins to non global admins is more than 1
+test_SecureScore_Incorrect_V2 if {
+    Output := aad.tests with input as {
+        "privileged_users": {
+            "User1": {
+                "DisplayName": "Test Name1",
+                "roles": [
+                    "User Administrator",
+                    "Global Administrator"
+                ]
+            },
+            "User2": {
+                "DisplayName": "Test Name2",
+                "roles": [
+                    "Application Administrator",
+                    "Global Administrator"
+                ]
+            },
+            "User3": {
+                "DisplayName": "Test Name2",
+                "roles": [
+                    "Privileged Role Administrator"
+                ]
+            }
+        }
+    }
+
+    ReportDetailStr := "Requirement not met: Least Privilege Score = 2 (should be 1 or less)"
+
+    TestResult("MS.AAD.7.2v1", Output, ReportDetailStr, false) == true
+}
+
+# Incorrect because the ratio of global admins to non global admins is undefined (all are global admins)
+test_SecureScore_Incorrect_V3 if {
+    Output := aad.tests with input as {
+        "privileged_users": {
+            "User1": {
+                "DisplayName": "Test Name1",
+                "roles": [
+                    "Privileged Role Administrator",
+                    "Global Administrator"
+                ]
+            },
+            "User2": {
+                "DisplayName": "Test Name2",
+                "roles": [
+                    "User Administrator",
+                    "Global Administrator"
+                ]
+            },
+            "User3": {
+                "DisplayName": "Test Name2",
+                "roles": [
+                    "Hybrid Identity Administrator",
+                    "Global Administrator"
+                ]
+            }
+        }
+    }
+
+    ReportDetailStr := "Requirement not met: All privileged users are Global Admin"
+
+    TestResult("MS.AAD.7.2v1", Output, ReportDetailStr, false) == true
+}
+
+# Incorrect because the total number of global admins is greater than eight
+test_SecureScore_Incorrect_V4 if {
+    Output := aad.tests with input as {
+        "privileged_users": {
+            "User1": {
+                "DisplayName": "Test Name1",
+                "roles": [
+                    "Privileged Role Administrator",
+                    "Global Administrator"
+                ]
+            },
+            "User2": {
+                "DisplayName": "Test Name2",
+                "roles": [
+                    "Exchange Administrator",
+                    "Global Administrator"
+                ]
+            },
+            "User3": {
+                "DisplayName": "Test Name3",
+                "roles": [
+                    "Global Administrator"
+                ]
+            },
+            "User4": {
+                "DisplayName": "Test Name4",
+                "roles": [
+                    "Global Administrator"
+                ]
+            },
+            "User5": {
+                "DisplayName": "Test Name5",
+                "roles": [
+                    "Global Administrator"
+                ]
+            },
+            "User6": {
+                "DisplayName": "Test Name6",
+                "roles": [
+                    "Global Administrator"
+                ]
+            },
+            "User7": {
+                "DisplayName": "Test Name7",
+                "roles": [
+                    "Global Administrator"
+                ]
+            },
+            "User8": {
+                "DisplayName": "Test Name8",
+                "roles": [
+                    "Global Administrator"
+                ]
+            },
+            "User9": {
+                "DisplayName": "Test Name9",
+                "roles": [
+                    "Global Administrator"
+                ]
+            }
+        }
+    }
+
+    ReportDetailStr := "Requirement not met: Policy MS.AAD.7.1 failed so score not computed"
+
+    TestResult("MS.AAD.7.2v1", Output, ReportDetailStr, false) == true
+}
 
 #--
 # Policy MS.AAD.7.3v1
