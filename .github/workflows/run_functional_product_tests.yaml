@@ -62,7 +62,7 @@ jobs:
   # Use ScubaGear to test each service.
   # This job runs once per param combination in the matrix.
   test-products:
-    name: Test ${{ needs.build-matrix.outputs.title }} - ${{ jobs.test-products.outputs.alias }}
+    name: Test ${{ jobs.test-products.outputs.alias }}
     runs-on: windows-latest
     defaults:
       run:
