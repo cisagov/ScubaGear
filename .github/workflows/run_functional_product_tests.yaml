@@ -7,7 +7,7 @@ name: Nightly Product Functional Tests
 on:
   push:
     branches:
-      - 824-finish-nightly-functional-tests
+      - "824-finish-nightly-functional-tests"
   schedule:
     - cron: "15 4 * * 0-4"
   workflow_dispatch:
@@ -129,7 +129,7 @@ jobs:
             {
               echo "Testing the following product: $value"
               echo ${{ github.jobs[github.job].name }}
-              ${{ github.jobs[github.job].name = $key }}
+              ${{ github.jobs[github.job].name }} = $key
               echo alias=$key >> $env:GITHUB_OUTPUT
             }
             else
