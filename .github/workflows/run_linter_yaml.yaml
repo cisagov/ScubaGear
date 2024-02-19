@@ -2,12 +2,9 @@
 
 name: Lint Check for YAML
 
-# Run whenever YAML files are checked in
+# This is a reusable workflow called by the pipeline.
 on:
-  push:
-    paths:
-      - "**.yml"
-      - "**.yaml"
+  workflow_call:
   workflow_dispatch:
 
 jobs:

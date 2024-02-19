@@ -1,21 +1,11 @@
-on:
-  workflow_dispatch:
-  pull_request:
-    types: [opened, reopened]
-    branches:
-      - "main"
-  pull_request_review:
-    types: [submitted]
-  push:
-    branches:
-      - "main"
-      - "*Baseline*"
-      - "*FunctionalTest"
-    paths:
-      - "baselines/*.md"
-      - ".github/workflows/run_markdown_check.yaml"
+# Purpose: Syntax checking for Markdown.
 
 name: Markdown Check
+
+# This is a reusable workflow called by the pipeline.
+on:
+  workflow_call:
+  workflow_dispatch:
 
 jobs:
   Run-Markdown-Check:
