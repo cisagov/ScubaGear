@@ -62,7 +62,7 @@ jobs:
   # Use ScubaGear to test each service.
   # This job runs once per param combination in the matrix.
   test-products:
-    name: Test ${{ jobs.test-products.outputs.alias }}
+    name: Test ${{ needs.build-matrix.outputs.title }}
     runs-on: windows-latest
     defaults:
       run:
@@ -128,6 +128,8 @@ jobs:
             if($key -eq "Alias")
             {
               echo "Testing the following product: $value"
+              echo ${{ github.jobs[github.job].name }}
+              ${{ github.jobs[github.job].name = $key }}
               echo alias=$key >> $env:GITHUB_OUTPUT
             }
             else
