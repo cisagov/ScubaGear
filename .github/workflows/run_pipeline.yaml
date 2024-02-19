@@ -50,13 +50,13 @@ jobs:
       markdown-changes: ${{ steps.file-changes.outputs.markdown-files || inputs.doEverything }}
       rego-changes: ${{ steps.file-changes.outputs.rego-files || inputs.doEverything }}
   lint-yaml:
-    name: Lint1
+    name: Lint
     needs:
       - test-files
     if: needs.test-files.outputs.yaml-changes == 'true'
     uses: ./.github/workflows/run_linter_yaml.yaml
   lint-powershell:
-    name: Lint2
+    name: Lint
     needs:
       - test-files
     if: needs.test-files.outputs.powershell-changes == 'true'
