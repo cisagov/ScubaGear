@@ -5,9 +5,6 @@ name: Nightly Product Functional Tests
 # Run this workflow at 12:15 am
 # on every Sun to Thr (b/c GMT -5)
 on:
-  push:
-    branches:
-      - 824-finish-nightly-functional-tests
   schedule:
     - cron: "15 4 * * 0-4"
   workflow_dispatch:
@@ -62,7 +59,7 @@ jobs:
   # Use ScubaGear to test each service.
   # This job runs once per param combination in the matrix.
   test-products:
-    name: Test ${{ needs.build-matrix.outputs.title }} - ${{ steps.test-product.outputs.alias }}
+    name: Test ${{ needs.build-matrix.outputs.title }}
     runs-on: windows-latest
     defaults:
       run:
