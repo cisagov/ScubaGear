@@ -54,28 +54,28 @@ jobs:
     needs:
       - test-files
     if: needs.test-files.outputs.yaml-changes == 'true'
-    uses: cisagov/ScubaGear/.github/workflows/run_linter_yaml.yaml@main
+    uses: ./.github/workflows/run_linter_yaml.yaml
   lint-powershell:
     name: Lint2
     needs:
       - test-files
     if: needs.test-files.outputs.powershell-changes == 'true'
-    uses: cisagov/ScubaGear/.github/workflows/run_linter_powershell.yaml@main
+    uses: ./.github/workflows/run_linter_powershell.yaml
   syntax:
     name: Syntax
     needs:
       - test-files
     if: needs.test-files.outputs.markdown-changes == 'true'
-    uses: cisagov/ScubaGear/.github/workflows/run_markdown_check.yaml@main
+    uses: ./.github/workflows/run_markdown_check.yaml
   unit-powershell:
     name: Unit
     needs:
       - test-files
     if: needs.test-files.outputs.powershell-changes == 'true'
-    uses: cisagov/ScubaGear/.github/workflows/run_powershell_tests.yaml@main
+    uses: ./.github/workflows/run_powershell_tests.yaml
   unit-opa:
     name: Unit
     needs:
       - test-files
     if: needs.test-files.outputs.rego-changes == 'true'
-    uses: cisagov/ScubaGear/.github/workflows/run_opa_tests.yaml@main
+    uses: ./.github/workflows/run_opa_tests.yaml
