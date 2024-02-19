@@ -59,7 +59,7 @@ jobs:
   # Use ScubaGear to test each service.
   # This job runs once per param combination in the matrix.
   test-products:
-    name: Test ${{ needs.build-matrix.outputs.title }}
+    name: Test ${{ needs.build-matrix.outputs.title }} - ${{ steps.test-product.outputs.alias }}
     runs-on: windows-latest
     defaults:
       run:
@@ -106,6 +106,7 @@ jobs:
       - name: Update Selenium
         run: ./Testing/Functional/SmokeTest/UpdateSelenium.ps1
       - name: Test Product
+        id: test-product
         # This job parses the keys and values in the matrx array
         # and converts them to a hashtable.
         run: |
@@ -124,6 +125,7 @@ jobs:
             if($key -eq "Alias")
             {
               echo "Testing the following product: $value"
+              echo alias=$key >> $env:GITHUB_OUTPUT
             }
             else
             {
@@ -131,3 +133,5 @@ jobs:
             }
           }
           ./Testing/Functional/Products/Tests/CallProductTests.ps1 -params $paramsAsHashTable -thumbprint $thumbprint
+    outputs:
+      alias: ${{ steps.test-product.outputs.alias }}
