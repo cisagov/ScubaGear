@@ -6,7 +6,7 @@
                            "Get-PrivilegedUser"
                        ],
         "Criticality":  "Shall",
-        "PolicyId":  "MS.AAD.7.3v1",
+        "PolicyId":  "MS.ENTRAID.7.3v1",
         "ReportDetails":  "5 admin(s) that are not cloud-only found:\u003cbr/\u003e",
         "RequirementMet":  false
     },
@@ -18,8 +18,8 @@
 
                        ],
         "Criticality":  "Shall/Not-Implemented",
-        "PolicyId":  "MS.AAD.3.5v1",
-        "ReportDetails":  "Not currently checked automatically. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/0.3.0/baselines/aad.md#msaad35v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
+        "PolicyId":  "MS.ENTRAID.3.5v1",
+        "ReportDetails":  "Not currently checked automatically. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/0.3.0/baselines/entraid.md#msentraid35v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
         "RequirementMet":  false
     },
     {
@@ -30,8 +30,8 @@
 
                        ],
         "Criticality":  "Shall/Not-Implemented",
-        "PolicyId":  "MS.AAD.4.1v1",
-        "ReportDetails":  "Not currently checked automatically. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/0.3.0/baselines/aad.md#msaad41v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
+        "PolicyId":  "MS.ENTRAID.4.1v1",
+        "ReportDetails":  "Not currently checked automatically. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/0.3.0/baselines/entraid.md#msentraid41v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
         "RequirementMet":  false
     },
     {
@@ -42,8 +42,8 @@
 
                        ],
         "Criticality":  "Shall/Not-Implemented",
-        "PolicyId":  "MS.AAD.6.1v1",
-        "ReportDetails":  "Not currently checked automatically. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/0.3.0/baselines/aad.md#msaad61v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
+        "PolicyId":  "MS.ENTRAID.6.1v1",
+        "ReportDetails":  "Not currently checked automatically. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/0.3.0/baselines/entraid.md#msentraid61v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
         "RequirementMet":  false
     },
     {
@@ -54,8 +54,8 @@
 
                        ],
         "Criticality":  "Should/Not-Implemented",
-        "PolicyId":  "MS.AAD.2.2v1",
-        "ReportDetails":  "Not currently checked automatically. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/0.3.0/baselines/aad.md#msaad22v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
+        "PolicyId":  "MS.ENTRAID.2.2v1",
+        "ReportDetails":  "Not currently checked automatically. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/0.3.0/baselines/entraid.md#msentraid22v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
         "RequirementMet":  false
     },
     {
@@ -66,8 +66,8 @@
 
                        ],
         "Criticality":  "Should/Not-Implemented",
-        "PolicyId":  "MS.AAD.3.3v1",
-        "ReportDetails":  "Not currently checked automatically. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/0.3.0/baselines/aad.md#msaad33v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
+        "PolicyId":  "MS.ENTRAID.3.3v1",
+        "ReportDetails":  "Not currently checked automatically. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/0.3.0/baselines/entraid.md#msentraid33v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
         "RequirementMet":  false
     },
     {
@@ -78,8 +78,8 @@
 
                        ],
         "Criticality":  "Should/Not-Implemented",
-        "PolicyId":  "MS.AAD.8.3v1",
-        "ReportDetails":  "Not currently checked automatically. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/0.3.0/baselines/aad.md#msaad83v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
+        "PolicyId":  "MS.ENTRAID.8.3v1",
+        "ReportDetails":  "Not currently checked automatically. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/0.3.0/baselines/entraid.md#msentraid83v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
         "RequirementMet":  false
     },
     {
@@ -90,7 +90,7 @@
                            "Get-MgBetaPolicyAuthenticationMethodPolicy"
                        ],
         "Criticality":  "Shall",
-        "PolicyId":  "MS.AAD.3.4v1",
+        "PolicyId":  "MS.ENTRAID.3.4v1",
         "ReportDetails":  "Requirement not met",
         "RequirementMet":  false
     },
@@ -113,7 +113,7 @@
                            "Get-MgBetaSecuritySecureScore"
                        ],
         "Criticality":  "Shall",
-        "PolicyId":  "MS.AAD.7.2v1",
+        "PolicyId":  "MS.ENTRAID.7.2v1",
         "ReportDetails":  "Requirement met",
         "RequirementMet":  true
     },
@@ -130,7 +130,7 @@
                            "Get-MgBetaPolicyAuthorizationPolicy"
                        ],
         "Criticality":  "Should",
-        "PolicyId":  "MS.AAD.8.2v1",
+        "PolicyId":  "MS.ENTRAID.8.2v1",
         "ReportDetails":  "Permission level set to \"adminsAndGuestInviters\" (authorizationPolicy)",
         "RequirementMet":  true
     },
@@ -147,7 +147,7 @@
                            "Get-MgBetaPolicyAuthorizationPolicy"
                        ],
         "Criticality":  "Shall",
-        "PolicyId":  "MS.AAD.5.1v1",
+        "PolicyId":  "MS.ENTRAID.5.1v1",
         "ReportDetails":  "0 authorization policies found that allow non-admin users to register third-party applications",
         "RequirementMet":  true
     },
@@ -164,7 +164,7 @@
                            "Get-MgBetaPolicyAdminConsentRequestPolicy"
                        ],
         "Criticality":  "Shall",
-        "PolicyId":  "MS.AAD.5.3v1",
+        "PolicyId":  "MS.ENTRAID.5.3v1",
         "ReportDetails":  "Requirement met",
         "RequirementMet":  true
     },
@@ -183,7 +183,7 @@
                            "Get-MgBetaPolicyAuthorizationPolicy"
                        ],
         "Criticality":  "Shall",
-        "PolicyId":  "MS.AAD.5.2v1",
+        "PolicyId":  "MS.ENTRAID.5.2v1",
         "ReportDetails":  "0 authorization policies found that allow non-admin users to consent to third-party applications",
         "RequirementMet":  true
     },
@@ -201,7 +201,7 @@
                            "Get-MgBetaPolicyAuthorizationPolicy"
                        ],
         "Criticality":  "Should",
-        "PolicyId":  "MS.AAD.8.1v1",
+        "PolicyId":  "MS.ENTRAID.8.1v1",
         "ReportDetails":  "Permission level set to \"Limited access\" (authorizationPolicy)",
         "RequirementMet":  true
     },
@@ -213,7 +213,7 @@
                            "Get-MgBetaIdentityConditionalAccessPolicy"
                        ],
         "Criticality":  "Shall",
-        "PolicyId":  "MS.AAD.1.1v1",
+        "PolicyId":  "MS.ENTRAID.1.1v1",
         "ReportDetails":  "0 conditional access policy(s) found that meet(s) all requirements. \u003ca href=\u0027#caps\u0027\u003eView all CA policies\u003c/a\u003e.",
         "RequirementMet":  false
     },
@@ -225,7 +225,7 @@
                            "Get-MgBetaIdentityConditionalAccessPolicy"
                        ],
         "Criticality":  "Shall",
-        "PolicyId":  "MS.AAD.2.1v1",
+        "PolicyId":  "MS.ENTRAID.2.1v1",
         "ReportDetails":  "0 conditional access policy(s) found that meet(s) all requirements. \u003ca href=\u0027#caps\u0027\u003eView all CA policies\u003c/a\u003e.",
         "RequirementMet":  false
     },
@@ -237,7 +237,7 @@
                            "Get-MgBetaIdentityConditionalAccessPolicy"
                        ],
         "Criticality":  "Shall",
-        "PolicyId":  "MS.AAD.3.1v1",
+        "PolicyId":  "MS.ENTRAID.3.1v1",
         "ReportDetails":  "0 conditional access policy(s) found that meet(s) all requirements. \u003ca href=\u0027#caps\u0027\u003eView all CA policies\u003c/a\u003e.",
         "RequirementMet":  false
     },
@@ -249,7 +249,7 @@
                            "Get-MgBetaIdentityConditionalAccessPolicy"
                        ],
         "Criticality":  "Shall",
-        "PolicyId":  "MS.AAD.3.2v1",
+        "PolicyId":  "MS.ENTRAID.3.2v1",
         "ReportDetails":  "0 conditional access policy(s) found that meet(s) all requirements. \u003ca href=\u0027#caps\u0027\u003eView all CA policies\u003c/a\u003e.",
         "RequirementMet":  false
     },
@@ -261,7 +261,7 @@
                            "Get-MgBetaIdentityConditionalAccessPolicy"
                        ],
         "Criticality":  "Should",
-        "PolicyId":  "MS.AAD.3.7v1",
+        "PolicyId":  "MS.ENTRAID.3.7v1",
         "ReportDetails":  "0 conditional access policy(s) found that meet(s) all requirements. \u003ca href=\u0027#caps\u0027\u003eView all CA policies\u003c/a\u003e.",
         "RequirementMet":  false
     },
@@ -273,7 +273,7 @@
                            "Get-MgBetaIdentityConditionalAccessPolicy"
                        ],
         "Criticality":  "Should",
-        "PolicyId":  "MS.AAD.3.8v1",
+        "PolicyId":  "MS.ENTRAID.3.8v1",
         "ReportDetails":  "0 conditional access policy(s) found that meet(s) all requirements. \u003ca href=\u0027#caps\u0027\u003eView all CA policies\u003c/a\u003e.",
         "RequirementMet":  false
     },
@@ -285,7 +285,7 @@
                            "Get-PrivilegedUser"
                        ],
         "Criticality":  "Shall",
-        "PolicyId":  "MS.AAD.7.1v1",
+        "PolicyId":  "MS.ENTRAID.7.1v1",
         "ReportDetails":  "15 global admin(s) found:\u003cbr/\u003eAddam Schroll, Alden Hilton - CTR, David Bui - CTR, David Evensky - CTR, Elijah Agbayani - CTR, Grant Brown - CTR, Grant Dasher - GOV - AZ, Jacob Davis - CTR, Nanda Katikaneni - CTR, Richard Mangual, Roger Mamika, Shanti Satyapal, Theodore Kolovos - CTR - AZ, Troy Stevens - CTR - AZ, Victor Echeverria - CTR",
         "RequirementMet":  false
     },
@@ -304,7 +304,7 @@
                            "Get-PrivilegedRole"
                        ],
         "Criticality":  "Shall",
-        "PolicyId":  "MS.AAD.7.4v1",
+        "PolicyId":  "MS.ENTRAID.7.4v1",
         "ReportDetails":  "7 role(s) that contain users with permanent active assignment:\u003cbr/\u003eApplication Administrator, Cloud Application Administrator, Exchange Administrator, Global Administrator, Privileged Role Administrator, SharePoint Administrator, User Administrator",
         "RequirementMet":  false
     },
@@ -323,7 +323,7 @@
                            "Get-PrivilegedRole"
                        ],
         "Criticality":  "Shall",
-        "PolicyId":  "MS.AAD.7.5v1",
+        "PolicyId":  "MS.ENTRAID.7.5v1",
         "ReportDetails":  "7 role(s) assigned to users outside of PIM:\u003cbr/\u003eApplication Administrator, Cloud Application Administrator, Exchange Administrator, Global Administrator, Privileged Role Administrator, SharePoint Administrator, User Administrator",
         "RequirementMet":  false
     },
@@ -340,7 +340,7 @@
                            "Get-PrivilegedRole"
                        ],
         "Criticality":  "Should",
-        "PolicyId":  "MS.AAD.7.6v1",
+        "PolicyId":  "MS.ENTRAID.7.6v1",
         "ReportDetails":  "Requirement met",
         "RequirementMet":  true
     },
@@ -358,7 +358,7 @@
                            "Get-PrivilegedRole"
                        ],
         "Criticality":  "Shall",
-        "PolicyId":  "MS.AAD.7.7v1",
+        "PolicyId":  "MS.ENTRAID.7.7v1",
         "ReportDetails":  "6 role(s) without notification e-mail configured for role assignments found:\u003cbr/\u003eCloud Application Administrator, Exchange Administrator, Global Administrator, Hybrid Identity Administrator, Privileged Role Administrator, SharePoint Administrator",
         "RequirementMet":  false
     },
@@ -375,7 +375,7 @@
                            "Get-PrivilegedRole"
                        ],
         "Criticality":  "Shall",
-        "PolicyId":  "MS.AAD.7.8v1",
+        "PolicyId":  "MS.ENTRAID.7.8v1",
         "ReportDetails":  "Requirement met",
         "RequirementMet":  true
     },
@@ -392,7 +392,7 @@
                            "Get-PrivilegedRole"
                        ],
         "Criticality":  "Should",
-        "PolicyId":  "MS.AAD.7.9v1",
+        "PolicyId":  "MS.ENTRAID.7.9v1",
         "ReportDetails":  "5 role(s) without notification e-mail configured for role activations found:\u003cbr/\u003eCloud Application Administrator, Exchange Administrator, Hybrid Identity Administrator, Privileged Role Administrator, SharePoint Administrator",
         "RequirementMet":  false
     },
@@ -404,7 +404,7 @@
                            "Get-MgBetaIdentityConditionalAccessPolicy"
                        ],
         "Criticality":  "Shall",
-        "PolicyId":  "MS.AAD.2.3v1",
+        "PolicyId":  "MS.ENTRAID.2.3v1",
         "ReportDetails":  "1 conditional access policy(s) found that meet(s) all requirements:\u003cbr/\u003eLive - High Risk Sign-ins SHALL be Blocked. \u003ca href=\u0027#caps\u0027\u003eView all CA policies\u003c/a\u003e.",
         "RequirementMet":  true
     },
@@ -418,7 +418,7 @@
                            "Get-MgBetaIdentityConditionalAccessPolicy"
                        ],
         "Criticality":  "Shall",
-        "PolicyId":  "MS.AAD.3.6v1",
+        "PolicyId":  "MS.ENTRAID.3.6v1",
         "ReportDetails":  "1 conditional access policy(s) found that meet(s) all requirements:\u003cbr/\u003eLive - MFA SHALL be required for Highly Privileged Roles. \u003ca href=\u0027#caps\u0027\u003eView all CA policies\u003c/a\u003e.",
         "RequirementMet":  true
     },
@@ -434,7 +434,7 @@
                            "Get-MgBetaDirectorySetting"
                        ],
         "Criticality":  "Shall",
-        "PolicyId":  "MS.AAD.5.4v1",
+        "PolicyId":  "MS.ENTRAID.5.4v1",
         "ReportDetails":  "Requirement met",
         "RequirementMet":  true
     },
@@ -2032,9 +2032,9 @@
                                     "DistinguishedName":  "CN=test365.agency.org,CN=Dkim Signing config,CN=Transport Settings,CN=Configuration,CN=agency.onmicrosoft.com,CN=ConfigurationUnits,DC=NAMPR09A006,DC=PROD,DC=OUTLOOK,DC=COM",
                                     "Domain":  "test365.agency.org",
                                     "Enabled":  true,
-                                    "ExchangeObjectId":  "e64ef9c1-9920-474d-aad3-b3d1b7cd606e",
+                                    "ExchangeObjectId":  "e64ef9c1-9920-474d-entraid3-b3d1b7cd606e",
                                     "ExchangeVersion":  "0.20 (15.0.0.0)",
-                                    "Guid":  "e64ef9c1-9920-474d-aad3-b3d1b7cd606e",
+                                    "Guid":  "e64ef9c1-9920-474d-entraid3-b3d1b7cd606e",
                                     "HeaderCanonicalization":  "Relaxed",
                                     "Id":  "test365.agency.org",
                                     "Identity":  "test365.agency.org",

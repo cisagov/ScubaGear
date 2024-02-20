@@ -752,7 +752,7 @@ Audit logs SHALL be maintained for at least the minimum duration dictated by OMB
 - _Last modified:_ June 2023
 - _Note_: Purview Audit (Premium) provides a default audit log retention policy,
           retaining Exchange Online, SharePoint Online, OneDrive for
-          Business, and Azure Active Directory audit records for one year.
+          Business, and Microsft Entra ID audit records for one year.
           Additional record types require custom audit retention policies.
           Agencies may also consider alternate storage locations and services
           to meet audit log retention needs.

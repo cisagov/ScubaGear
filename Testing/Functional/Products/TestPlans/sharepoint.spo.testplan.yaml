@@ -375,7 +375,7 @@ TestPlan:
   - PolicyId: MS.SHAREPOINT.4.1v1
     TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.AAD.4.1v1 Not Checked
+      - TestDescription: MS.ENTRAID.4.1v1 Not Checked
         Preconditions: []
         Postconditions: []
         IsNotChecked: true

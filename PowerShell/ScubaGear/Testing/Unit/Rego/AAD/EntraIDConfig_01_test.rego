@@ -1,14 +1,14 @@
-package aad_test
+package entraid_test
 import future.keywords
-import data.aad
+import data.entraid
 import data.utils.key.TestResult
 
 
 #
-# Policy MS.AAD.1.1v1
+# Policy MS.ENTRAID.1.1v1
 #--
 test_NoExclusionsConditions_Correct if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -46,11 +46,11 @@ test_NoExclusionsConditions_Correct if {
         "<br/>Test block Legacy Authentication. <a href='#caps'>View all CA policies</a>."
     ])
 
-    TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, true) == true
+    TestResult("MS.ENTRAID.1.1v1", Output, ReportDetailStr, true) == true
 }
 
 test_NoExclusionsIncludeApplications_Incorrect if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -84,11 +84,11 @@ test_NoExclusionsIncludeApplications_Incorrect if {
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.ENTRAID.1.1v1", Output, ReportDetailStr, false) == true
 }
 
 test_NoExclusionsIncludeUsers_Incorrect if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -122,11 +122,11 @@ test_NoExclusionsIncludeUsers_Incorrect if {
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.ENTRAID.1.1v1", Output, ReportDetailStr, false) == true
 }
 
 test_NoExclusionsExcludeUsers_Incorrect if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -162,11 +162,11 @@ test_NoExclusionsExcludeUsers_Incorrect if {
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.ENTRAID.1.1v1", Output, ReportDetailStr, false) == true
 }
 
 test_NoExclusionsExcludeGroups_Incorrect if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -202,11 +202,11 @@ test_NoExclusionsExcludeGroups_Incorrect if {
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.ENTRAID.1.1v1", Output, ReportDetailStr, false) == true
 }
 
 test_NoExclusionsClientAppTypes_Incorrect if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -239,11 +239,11 @@ test_NoExclusionsClientAppTypes_Incorrect if {
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.ENTRAID.1.1v1", Output, ReportDetailStr, false) == true
 }
 
 test_NoExclusionsBuiltInControls_Incorrect if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -275,11 +275,11 @@ test_NoExclusionsBuiltInControls_Incorrect if {
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.ENTRAID.1.1v1", Output, ReportDetailStr, false) == true
 }
 
 test_NoExclusionsState_Incorrect if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -313,12 +313,12 @@ test_NoExclusionsState_Incorrect if {
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.ENTRAID.1.1v1", Output, ReportDetailStr, false) == true
 }
 
 # tests for user exclusions and no group exclusions
 test_NoExclusionsExemptUsers_Correct if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -351,7 +351,7 @@ test_NoExclusionsExemptUsers_Correct if {
         ],
         "scuba_config": {
             "Aad": {
-                "MS.AAD.1.1v1": {
+                "MS.ENTRAID.1.1v1": {
                     "CapExclusions": {
                         "Users": [
                             "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"
@@ -368,11 +368,11 @@ test_NoExclusionsExemptUsers_Correct if {
         "<br/>Test block Legacy Authentication. <a href='#caps'>View all CA policies</a>."
     ])
 
-    TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, true) == true
+    TestResult("MS.ENTRAID.1.1v1", Output, ReportDetailStr, true) == true
 }
 
 test_UserExclusionsConditions_Correct if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -407,7 +407,7 @@ test_UserExclusionsConditions_Correct if {
         ],
         "scuba_config": {
             "Aad": {
-                "MS.AAD.1.1v1": {
+                "MS.ENTRAID.1.1v1": {
                     "CapExclusions": {
                         "Users": [
                             "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"
@@ -424,11 +424,11 @@ test_UserExclusionsConditions_Correct if {
         "<br/>Test block Legacy Authentication. <a href='#caps'>View all CA policies</a>."
     ])
 
-    TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, true) == true
+    TestResult("MS.ENTRAID.1.1v1", Output, ReportDetailStr, true) == true
 }
 
 test_MultiUserExclusionsConditions_Correct if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -464,7 +464,7 @@ test_MultiUserExclusionsConditions_Correct if {
         ],
         "scuba_config": {
             "Aad": {
-                "MS.AAD.1.1v1": {
+                "MS.ENTRAID.1.1v1": {
                     "CapExclusions": {
                         "Users": [
                             "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3",
@@ -482,11 +482,11 @@ test_MultiUserExclusionsConditions_Correct if {
         "<br/>Test block Legacy Authentication. <a href='#caps'>View all CA policies</a>."
     ])
 
-    TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, true) == true
+    TestResult("MS.ENTRAID.1.1v1", Output, ReportDetailStr, true) == true
 }
 
 test_UserExclusionNoExempt_Incorrect if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -522,11 +522,11 @@ test_UserExclusionNoExempt_Incorrect if {
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.ENTRAID.1.1v1", Output, ReportDetailStr, false) == true
 }
 
 test_UserExclusionsSingleExempt_Incorrect if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -562,7 +562,7 @@ test_UserExclusionsSingleExempt_Incorrect if {
         ],
         "scuba_config": {
             "Aad": {
-                "MS.AAD.1.1v1": {
+                "MS.ENTRAID.1.1v1": {
                     "CapExclusions": {
                         "Users": [
                             "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"
@@ -576,11 +576,11 @@ test_UserExclusionsSingleExempt_Incorrect if {
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.ENTRAID.1.1v1", Output, ReportDetailStr, false) == true
 }
 
 test_UserExclusionsNoExempt_Incorrect if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -615,7 +615,7 @@ test_UserExclusionsNoExempt_Incorrect if {
         ],
         "scuba_config": {
             "Aad": {
-                "MS.AAD.1.1v1": {
+                "MS.ENTRAID.1.1v1": {
                     "CapExclusions": {
                         "Users": [],
                         "Groups": []
@@ -627,11 +627,11 @@ test_UserExclusionsNoExempt_Incorrect if {
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.ENTRAID.1.1v1", Output, ReportDetailStr, false) == true
 }
 
 test_UserExclusionsIncludeApplications_Incorrect if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -665,7 +665,7 @@ test_UserExclusionsIncludeApplications_Incorrect if {
         ],
         "scuba_config": {
             "Aad": {
-                "MS.AAD.1.1v1": {
+                "MS.ENTRAID.1.1v1": {
                     "CapExclusions": {
                         "Users": [
                             "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"
@@ -679,11 +679,11 @@ test_UserExclusionsIncludeApplications_Incorrect if {
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.ENTRAID.1.1v1", Output, ReportDetailStr, false) == true
 }
 
 test_UserExclusionsIncludeUsers_Incorrect if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -717,7 +717,7 @@ test_UserExclusionsIncludeUsers_Incorrect if {
         ],
         "scuba_config": {
             "Aad": {
-                "MS.AAD.1.1v1": {
+                "MS.ENTRAID.1.1v1": {
                     "CapExclusions": {
                         "Users": [
                             "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"
@@ -731,11 +731,11 @@ test_UserExclusionsIncludeUsers_Incorrect if {
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.ENTRAID.1.1v1", Output, ReportDetailStr, false) == true
 }
 
 test_UserExclusionsExcludeGroups_Incorrect if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -771,7 +771,7 @@ test_UserExclusionsExcludeGroups_Incorrect if {
         ],
         "scuba_config": {
             "Aad": {
-                "MS.AAD.1.1v1": {
+                "MS.ENTRAID.1.1v1": {
                     "CapExclusions": {
                         "Users": [
                             "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"
@@ -785,11 +785,11 @@ test_UserExclusionsExcludeGroups_Incorrect if {
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.ENTRAID.1.1v1", Output, ReportDetailStr, false) == true
 }
 
 test_UserExclusionsClientAppTypes_Incorrect if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -822,7 +822,7 @@ test_UserExclusionsClientAppTypes_Incorrect if {
         ],
         "scuba_config": {
             "Aad": {
-                "MS.AAD.1.1v1": {
+                "MS.ENTRAID.1.1v1": {
                     "CapExclusions": {
                         "Users": [
                             "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"
@@ -836,11 +836,11 @@ test_UserExclusionsClientAppTypes_Incorrect if {
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.ENTRAID.1.1v1", Output, ReportDetailStr, false) == true
 }
 
 test_UserExclusionsBuiltInControls_Incorrect if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -872,7 +872,7 @@ test_UserExclusionsBuiltInControls_Incorrect if {
         ],
         "scuba_config": {
             "Aad": {
-                "MS.AAD.1.1v1": {
+                "MS.ENTRAID.1.1v1": {
                     "CapExclusions": {
                         "Users": [
                             "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"
@@ -886,11 +886,11 @@ test_UserExclusionsBuiltInControls_Incorrect if {
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.ENTRAID.1.1v1", Output, ReportDetailStr, false) == true
 }
 
 test_UserExclusionsState_Incorrect if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -924,7 +924,7 @@ test_UserExclusionsState_Incorrect if {
         ],
         "scuba_config": {
             "Aad": {
-                "MS.AAD.1.1v1": {
+                "MS.ENTRAID.1.1v1": {
                     "CapExclusions": {
                         "Users": [
                             "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"
@@ -938,12 +938,12 @@ test_UserExclusionsState_Incorrect if {
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.ENTRAID.1.1v1", Output, ReportDetailStr, false) == true
 }
 
 # tests for group exclusions and no user exclusions
 test_NoExclusionsExemptGroups_Correct if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -976,7 +976,7 @@ test_NoExclusionsExemptGroups_Correct if {
         ],
         "scuba_config": {
             "Aad": {
-                "MS.AAD.1.1v1": {
+                "MS.ENTRAID.1.1v1": {
                     "CapExclusions": {
                         "Users": [],
                         "Groups": [
@@ -993,11 +993,11 @@ test_NoExclusionsExemptGroups_Correct if {
         "<br/>Test block Legacy Authentication. <a href='#caps'>View all CA policies</a>."
     ])
 
-    TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, true) == true
+    TestResult("MS.ENTRAID.1.1v1", Output, ReportDetailStr, true) == true
 }
 
 test_GroupExclusionNoExempt_Incorrect if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -1032,7 +1032,7 @@ test_GroupExclusionNoExempt_Incorrect if {
         ],
         "scuba_config": {
             "Aad": {
-                "MS.AAD.1.1v1": {
+                "MS.ENTRAID.1.1v1": {
                     "CapExclusions": {
                         "Users": [],
                         "Groups": []
@@ -1044,11 +1044,11 @@ test_GroupExclusionNoExempt_Incorrect if {
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.ENTRAID.1.1v1", Output, ReportDetailStr, false) == true
 }
 
 test_GroupExclusionsNoExempt_Incorrect if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -1083,7 +1083,7 @@ test_GroupExclusionsNoExempt_Incorrect if {
         ],
         "scuba_config": {
             "Aad": {
-                "MS.AAD.1.1v1": {
+                "MS.ENTRAID.1.1v1": {
                     "CapExclusions": {
                         "Users": [],
                         "Groups": []
@@ -1095,11 +1095,11 @@ test_GroupExclusionsNoExempt_Incorrect if {
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.ENTRAID.1.1v1", Output, ReportDetailStr, false) == true
 }
 
 test_GroupExclusionsSingleExempt_Incorrect if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -1134,7 +1134,7 @@ test_GroupExclusionsSingleExempt_Incorrect if {
         ],
         "scuba_config": {
             "Aad": {
-                "MS.AAD.1.1v1": {
+                "MS.ENTRAID.1.1v1": {
                     "CapExclusions": {
                         "Users": [],
                         "Groups": [
@@ -1148,11 +1148,11 @@ test_GroupExclusionsSingleExempt_Incorrect if {
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.ENTRAID.1.1v1", Output, ReportDetailStr, false) == true
 }
 
 test_GroupExclusionConditions_Correct if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -1187,7 +1187,7 @@ test_GroupExclusionConditions_Correct if {
         ],
         "scuba_config": {
             "Aad": {
-                "MS.AAD.1.1v1": {
+                "MS.ENTRAID.1.1v1": {
                     "CapExclusions": {
                         "Users": [],
                         "Groups": [
@@ -1204,11 +1204,11 @@ test_GroupExclusionConditions_Correct if {
         "<br/>Test block Legacy Authentication. <a href='#caps'>View all CA policies</a>."
     ])
 
-    TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, true) == true
+    TestResult("MS.ENTRAID.1.1v1", Output, ReportDetailStr, true) == true
 }
 
 test_MultiGroupExclusionsConditions_Correct if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -1244,7 +1244,7 @@ test_MultiGroupExclusionsConditions_Correct if {
         ],
         "scuba_config": {
             "Aad": {
-                "MS.AAD.1.1v1": {
+                "MS.ENTRAID.1.1v1": {
                     "CapExclusions": {
                         "Users": [],
                         "Groups": [
@@ -1262,12 +1262,12 @@ test_MultiGroupExclusionsConditions_Correct if {
         "<br/>Test block Legacy Authentication. <a href='#caps'>View all CA policies</a>."
     ])
 
-    TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, true) == true
+    TestResult("MS.ENTRAID.1.1v1", Output, ReportDetailStr, true) == true
 }
 
 # tests when both group and user exclusions present
 test_UserGroupExclusionConditions_Correct if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -1304,7 +1304,7 @@ test_UserGroupExclusionConditions_Correct if {
         ],
         "scuba_config": {
             "Aad": {
-                "MS.AAD.1.1v1": {
+                "MS.ENTRAID.1.1v1": {
                     "CapExclusions": {
                         "Users": [
                             "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"
@@ -1323,11 +1323,11 @@ test_UserGroupExclusionConditions_Correct if {
         "<br/>Test block Legacy Authentication. <a href='#caps'>View all CA policies</a>."
     ])
 
-    TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, true) == true
+    TestResult("MS.ENTRAID.1.1v1", Output, ReportDetailStr, true) == true
 }
 
 test_UserGroupExclusionNoExempt_Incorrect if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -1366,11 +1366,11 @@ test_UserGroupExclusionNoExempt_Incorrect if {
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.ENTRAID.1.1v1", Output, ReportDetailStr, false) == true
 }
 
 test_UserGroupExclusionUserExemptOnly_Incorrect if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -1407,7 +1407,7 @@ test_UserGroupExclusionUserExemptOnly_Incorrect if {
         ],
         "scuba_config": {
             "Aad": {
-                "MS.AAD.1.1v1": {
+                "MS.ENTRAID.1.1v1": {
                     "CapExclusions": {
                         "Users": [
                             "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"
@@ -1421,11 +1421,11 @@ test_UserGroupExclusionUserExemptOnly_Incorrect if {
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.ENTRAID.1.1v1", Output, ReportDetailStr, false) == true
 }
 
 test_UserGroupExclusionGroupExemptOnly_Incorrect if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -1462,7 +1462,7 @@ test_UserGroupExclusionGroupExemptOnly_Incorrect if {
         ],
         "scuba_config": {
             "Aad": {
-                "MS.AAD.1.1v1": {
+                "MS.ENTRAID.1.1v1": {
                     "CapExclusions": {
                         "Users": [],
                         "Groups": [
@@ -1476,11 +1476,11 @@ test_UserGroupExclusionGroupExemptOnly_Incorrect if {
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.ENTRAID.1.1v1", Output, ReportDetailStr, false) == true
 }
 
 test_UserGroupExclusionTooFewUserExempts_Incorrect if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -1518,7 +1518,7 @@ test_UserGroupExclusionTooFewUserExempts_Incorrect if {
         ],
         "scuba_config": {
             "Aad": {
-                "MS.AAD.1.1v1": {
+                "MS.ENTRAID.1.1v1": {
                     "CapExclusions": {
                         "Users": [
                             "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"
@@ -1532,6 +1532,6 @@ test_UserGroupExclusionTooFewUserExempts_Incorrect if {
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.ENTRAID.1.1v1", Output, ReportDetailStr, false) == true
 }
 #--

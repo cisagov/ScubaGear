@@ -16,12 +16,12 @@ Developed by CISA, ScubaGear is an assessment tool that verifies a Microsoft 365
 - [Usage](#usage)
   - [Importing the module](#importing-the-module)
   - [Example 1: Run an assessment against all products (except PowerPlatform)](#example-1-run-an-assessment-against-all-products-except-powerplatform)
-  - [Example 2: Run an assessment against Azure Active Directory with custom report output location](#example-2-run-an-assessment-against-azure-active-directory-with-custom-report-output-location)
+  - [Example 2: Run an assessment against Microsft Entra ID with custom report output location](#example-2-run-an-assessment-against-azure-active-directory-with-custom-report-output-location)
   - [Example 3: Run assessments against multiple products](#example-3-run-assessments-against-multiple-products)
   - [Example 4: Run assessments non-interactively using an application service principal and authenticating via CertificateThumbprint](#example-4-run-assessments-non-interactively-using-an-application-service-principal-and-authenticating-via-certificatethumbprint)
   - [Parameter Definitions](#parameter-definitions)
   - [ScubaGear Configuration File Syntax and Examples](#scubagear-configuration-file-syntax-and-examples)
-  - [AAD Conditional Access Policy Exemptions](#aad-conditional-access-policy-exemptions)
+  - [ENTRAID Conditional Access Policy Exemptions](#entraid-conditional-access-policy-exemptions)
   - [Viewing the Report](#viewing-the-report)
 - [Required Permissions](#required-permissions)
   - [User Permissions](#user-permissions)
@@ -36,7 +36,7 @@ Developed by CISA, ScubaGear is an assessment tool that verifies a Microsoft 365
   - [Exchange Online maximum connections error](#exchange-online-maximum-connections-error)
   - [Power Platform errors](#power-platform-errors)
   - [Microsoft Graph Errors](#microsoft-graph-errors)
-    - [Infinite AAD Sign in Loop](#infinite-aad-sign-in-loop)
+    - [Infinite ENTRAID Sign in Loop](#infinite-entraid-sign-in-loop)
     - [Error `Connect-MgGraph : Key not valid for use in specified state.`](#error-connect-mggraph--key-not-valid-for-use-in-specified-state)
     - [Error `Could not load file or assembly 'Microsoft.Graph.Authentication'`](#error-could-not-load-file-or-assembly-microsoftgraphauthentication)
   - [Running the Tool Behind Some Proxies](#running-the-tool-behind-some-proxies)
@@ -98,7 +98,7 @@ On Windows clients, the default execution policy is `Restricted`. In this case, 
 Windows clients with an execution policy of `Unrestricted` generate a warning about running only trusted scripts when executing ScubaGear, even when the scripts and modules are signed. This is because the files contain an identifier showing they were downloaded from the Internet. These zone identifiers, informally referred to as [Mark of the Web restrictions](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_execution_policies?view=powershell-7.4#manage-signed-and-unsigned-scripts) can be removed by running `Unblock-File` on scripts and modules in the ScubaGear folder. Users should carefully consider use of `Unblock-File` and only run it on files they have vetted and deem trustworthy to execute on their system. See [here](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/unblock-file?view=powershell-5.1) for more information from Microsoft on the `Unblock-File` cmdlet.
 
 ## Usage
-ScubaGear can be invoked interactively or non-interactively. See [Required Permissions](#required-permissions) for the permissions needed to execute the tool in either mode. The interactive authentication mode will prompt the user for credentials via Microsoft's popup windows. Non-interactive mode is for invoking ScubaGear using an Azure AD application service principal and supports running the tool in automated scenarios such as pipelines or scheduled jobs. Examples 1-3 provide examples for running with interactive mode and example 4 provides an example for running in non-interactive mode.
+ScubaGear can be invoked interactively or non-interactively. See [Required Permissions](#required-permissions) for the permissions needed to execute the tool in either mode. The interactive authentication mode will prompt the user for credentials via Microsoft's popup windows. Non-interactive mode is for invoking ScubaGear using an Entra ID application service principal and supports running the tool in automated scenarios such as pipelines or scheduled jobs. Examples 1-3 provide examples for running with interactive mode and example 4 provides an example for running in non-interactive mode.
 
 ### Importing the module
 ScubaGear currently must be imported into each new PowerShell terminal session to execute.
@@ -113,13 +113,13 @@ Import-Module -Name .\PowerShell\ScubaGear # Imports the module into your sessio
 ```powershell
 Invoke-SCuBA
 ```
-### Example 2: Run an assessment against Azure Active Directory with custom report output location
+### Example 2: Run an assessment against Microsft Entra ID with custom report output location
 ```powershell
-Invoke-SCuBA -ProductNames aad -OutPath C:\Users\johndoe\reports
+Invoke-SCuBA -ProductNames entraid -OutPath C:\Users\johndoe\reports
 ```
 ### Example 3: Run assessments against multiple products
 ```powershell
-Invoke-SCuBA -ProductNames aad, sharepoint, teams
+Invoke-SCuBA -ProductNames entraid, sharepoint, teams
 ```
 ### Example 4: Run assessments non-interactively using an application service principal and authenticating via CertificateThumbprint
 ```powershell
@@ -132,19 +132,19 @@ Get-Help -Name Invoke-SCuBA -Full
 ```
 
 ### Parameter Definitions
-- **$ConfigFilePath** is an optional parameter that refers to the path to a configuration file that the tool parses for input parameters when executing ScubaGear. ScubaGear supports either a YAML or JSON formatted configuration file. A sample configuration file is included in [sample-config-files/aad-config.yaml](./sample-config-files/aad-config.yaml). The syntax defines:
+- **$ConfigFilePath** is an optional parameter that refers to the path to a configuration file that the tool parses for input parameters when executing ScubaGear. ScubaGear supports either a YAML or JSON formatted configuration file. A sample configuration file is included in [sample-config-files/entraid-config.yaml](./sample-config-files/entraid-config.yaml). The syntax defines:
   - Use of Pascal case convention for variable names consistent with parameters on the command line
   - A global namespace for values to be used across baselines and products (i.e., GlobalVars)
   - Per product namespace for values related to that specific product (i.e., Aad, SharePoint)
-  - Namespace for each policy item within a product for variables related only to one policy item (i.e., MS.AAD.2.1v1)
+  - Namespace for each policy item within a product for variables related only to one policy item (i.e., MS.ENTRAID.2.1v1)
   - Use of YAML anchors and aliases following Don't Repeat Yourself (DRY) principle for repeated values and sections
-    If a -ConfigFilePath is specified, default values will be used for parameters that are not added to the config file. These default values are shown in the full config file template to guide the user, but they can be omitted if desired. Other command line parameters can also be used with the -ConfigFilePath. This should reduce the number of config files needed. Examples might be: using `-M365Environment` to override `commercial` config value to `gcc`, switching the tenant being targeted, or supplying credential references so they do not need to be in the config file. Smaller config files can facilitate sharing among admins.  The config file path defaults to the same directory where the script is executed. `ConfigFilePath` accepts both absolute and relative file paths. The file can be used to specify command line parameters and policy-specific parameters used by the Azure Active Directory (AAD) and Defender product assessments. See [See ScubaGear Configuration File Syntax and Examples](#scubagear-configuration-file-syntax-and-examples) and [AAD Conditional Access Policy Exemptions](#aad-conditional-access-policy-exemptions) for more details.
+    If a -ConfigFilePath is specified, default values will be used for parameters that are not added to the config file. These default values are shown in the full config file template to guide the user, but they can be omitted if desired. Other command line parameters can also be used with the -ConfigFilePath. This should reduce the number of config files needed. Examples might be: using `-M365Environment` to override `commercial` config value to `gcc`, switching the tenant being targeted, or supplying credential references so they do not need to be in the config file. Smaller config files can facilitate sharing among admins.  The config file path defaults to the same directory where the script is executed. `ConfigFilePath` accepts both absolute and relative file paths. The file can be used to specify command line parameters and policy-specific parameters used by the Microsft Entra ID (ENTRAID) and Defender product assessments. See [See ScubaGear Configuration File Syntax and Examples](#scubagear-configuration-file-syntax-and-examples) and [ENTRAID Conditional Access Policy Exemptions](#entraid-conditional-access-policy-exemptions) for more details.
   
 
 - **$LogIn** is a `$true` or `$false` variable that if set to `$true` will prompt the user to provide credentials to establish a connection to the specified M365 products in the **$ProductNames** variable. For most use cases, leave this variable to be `$true`. A connection is established in the current PowerShell terminal session with the first authentication. To run another verification in the same PowerShell session,  set this variable to be `$false` to bypass the need to authenticate again in the same session. Defender will ask for authentication even if this variable is set to `$false`
 
-- **$ProductNames** is a list of one or more M365 shortened product names that the tool will assess when it is executed. Acceptable product name values are listed below. To assess Azure Active Directory you would enter the value **aad**. To assess Exchange Online you would enter **exo** and so forth.
-  - Azure Active Directory: **aad**
+- **$ProductNames** is a list of one or more M365 shortened product names that the tool will assess when it is executed. Acceptable product name values are listed below. To assess Microsft Entra ID you would enter the value **entraid**. To assess Exchange Online you would enter **exo** and so forth.
+  - Microsft Entra ID: **entraid**
   - Defender for Office 365: **defender**
   - Exchange Online: **exo**
   - Power Platform: **powerplatform**
@@ -198,7 +198,7 @@ ProductNames:
 - teams
 # - exo
 # - defender
-- aad
+- entraid
 # - sharepoint
 M365Environment: commercial
 ```
@@ -217,7 +217,7 @@ ProductNames:
 - teams
 # - exo
 # - defender
-- aad
+- entraid
 # - sharepoint
 M365Environment: commercial
 Organization: abcdef.example.com
@@ -237,7 +237,7 @@ ProductNames:
 - teams
 - exo
 - defender
-- aad
+- entraid
 - sharepoint
 M365Environment: commercial
 OPAPath: .
@@ -257,47 +257,47 @@ Command line invocation (no overrides )
 Invoke-SCuBA  -ConfigFilePath full_config.yaml
 ```
 
-### AAD Conditional Access Policy Exemptions
-The ScubaGear `-ConfigFilePath` command line option allows users to define custom variables for use in policy assessments against the AAD baseline. These custom variables are used to exempt specific user and group exclusions from conditional access policy checks that normally would not pass if exclusions are present. These parameters support operational use cases for having backup or "break glass" account exclusions to global user policies without failing best practices. Any exemptions and their risks should be carefully considered and documented as part of an organization's cybersecurity risk management program process and practices.
+### ENTRAID Conditional Access Policy Exemptions
+The ScubaGear `-ConfigFilePath` command line option allows users to define custom variables for use in policy assessments against the ENTRAID baseline. These custom variables are used to exempt specific user and group exclusions from conditional access policy checks that normally would not pass if exclusions are present. These parameters support operational use cases for having backup or "break glass" account exclusions to global user policies without failing best practices. Any exemptions and their risks should be carefully considered and documented as part of an organization's cybersecurity risk management program process and practices.
 
-**YAML AAD Configuration File Syntax and Examples**
+**YAML ENTRAID Configuration File Syntax and Examples**
 
-**Aad** defines the AAD specific variables to specify user, group, and role exclusions that are documented exemptions to select conditional access policies (CAP) in the AAD configuration policy baselines. Users, groups, and roles are specified by their respective Universally Unique Identifier (UUID) in the tenant. This variable set is only needed if the agency has documented CAP exemptions.
+**Aad** defines the ENTRAID specific variables to specify user, group, and role exclusions that are documented exemptions to select conditional access policies (CAP) in the ENTRAID configuration policy baselines. Users, groups, and roles are specified by their respective Universally Unique Identifier (UUID) in the tenant. This variable set is only needed if the agency has documented CAP exemptions.
 
 **CapExclusions** - Supports both a Users and Groups list with each entry representing the UUID of a user or group that is approved by the agency to be included in a conditional access policy assignment exclusion. Adding an entry to this variable will prevent ScubaGear from failing the policy assessment due to the presence of the users and groups in an exclusion.
 
 CapExclusions can be defined in the following policy namespaces:
 
-- MS.AAD.1.1v1
-- MS.AAD.2.1v1
-- MS.AAD.2.3v1
-- MS.AAD.3.1v1
-- MS.AAD.3.2v1
-- MS.AAD.3.3v1
-- MS.AAD.3.6v1
-- MS.AAD.3.7v1
-- MS.AAD.3.8v1
+- MS.ENTRAID.1.1v1
+- MS.ENTRAID.2.1v1
+- MS.ENTRAID.2.3v1
+- MS.ENTRAID.3.1v1
+- MS.ENTRAID.3.2v1
+- MS.ENTRAID.3.3v1
+- MS.ENTRAID.3.6v1
+- MS.ENTRAID.3.7v1
+- MS.ENTRAID.3.8v1
 
 **RoleExclusions** - Supports both a Users and Groups list with each entry representing the UUID of a user or group that is approved by the agency to be included in a role assignment. Adding an entry to this variable will prevent ScubaGear from failing the policy assessment due to the presence of a role assignment for those users and groups.
 
 RoleExclusions can be defined in the following policy namespaces:
 
-- MS.AAD.7.4v1
+- MS.ENTRAID.7.4v1
 
 The example below illustrates the syntax for defining user, group, and role exemptions to select policies. The syntax allows the use of a YAML anchor and alias to simplify formatting policies having the same documented exemptions. Items surrounded by chevrons are to be supplied by the user.
 
         Aad:
-          MS.AAD.1.1v1: &CommonExclusions
+          MS.ENTRAID.1.1v1: &CommonExclusions
             CapExclusions:
               Users:
                 - <Exempted User 1 UUID>
                 - <Exempted User 2 UUID>
               Groups:
                 - <Exempted Group 1 UUID>
-          MS.AAD.2.1v1:  *CommonExclusions
-          MS.AAD.2.3v1:  *CommonExclusions
-          MS.AAD.3.2v1:  *CommonExclusions
-          MS.AAD.7.4v1:
+          MS.ENTRAID.2.1v1:  *CommonExclusions
+          MS.ENTRAID.2.3v1:  *CommonExclusions
+          MS.ENTRAID.3.2v1:  *CommonExclusions
+          MS.ENTRAID.7.4v1:
             RoleExclusions:
               Users:
                 - <Exempted User 3 UUID>
@@ -309,8 +309,8 @@ The HTML report should open in your browser once the script completes. If it doe
 
 ## Required Permissions
 When executing the tool interactively, there are two types of permissions that are required:
-- User Permissions (which are associated with Azure AD roles assigned to a user)
-- Application Permissions (which are assigned to the MS Graph PowerShell application in Azure AD).
+- User Permissions (which are associated with Entra ID roles assigned to a user)
+- Application Permissions (which are assigned to the MS Graph PowerShell application in Entra ID).
 
 When executing the tool via app-only authentication a slightly different set of User and Application Permissions are required to be assigned directly to the Service Principal application.
 
@@ -321,7 +321,7 @@ The minimum user roles needed for each product are described in the table below.
 
 |   Product               |             Role                                                                    |
 |-------------------------|:-----------------------------------------------------------------------------------:|
-| Azure Active Directory  |  Global Reader                                                                      |
+| Microsft Entra ID  |  Global Reader                                                                      |
 | Defender for Office 365 |  Global Reader (or Exchange Administrator)                                                             |
 | Exchange Online         |  Global Reader (or Exchange Administrator)                                                             |
 | Power Platform          |  Power Platform Administrator with a "Power Apps for Office 365" license             |
@@ -332,14 +332,14 @@ The minimum user roles needed for each product are described in the table below.
 
 
 ### Microsoft Graph Powershell SDK permissions
-The Azure AD baseline requires the use of Microsoft Graph. The script will attempt to configure the required API permissions needed by the Microsoft Graph PowerShell module, if they have not already been configured in the target tenant.
+The Entra ID baseline requires the use of Microsoft Graph. The script will attempt to configure the required API permissions needed by the Microsoft Graph PowerShell module, if they have not already been configured in the target tenant.
 
-The process to configure the application permissions is sometimes referred to as the "application consent process" because an Administrator must "consent" for the Microsoft Graph PowerShell application to access the tenant and the necessary Graph APIs to extract the configuration data. Depending on the Azure AD roles assigned to the user running the tool and how the application consent settings are configured in the target tenant, the process may vary slightly. To understand the application consent process, read [this article](https://learn.microsoft.com/en-us/azure/active-directory/develop/application-consent-experience) from Microsoft.
+The process to configure the application permissions is sometimes referred to as the "application consent process" because an Administrator must "consent" for the Microsoft Graph PowerShell application to access the tenant and the necessary Graph APIs to extract the configuration data. Depending on the Entra ID roles assigned to the user running the tool and how the application consent settings are configured in the target tenant, the process may vary slightly. To understand the application consent process, read [this article](https://learn.microsoft.com/en-us/azure/active-directory/develop/application-consent-experience) from Microsoft.
 
-Microsoft Graph is used, because Azure AD PowerShell is being deprecated.
+Microsoft Graph is used, because Entra ID PowerShell is being deprecated.
 
 > [!NOTE]
-> Microsoft Graph PowerShell SDK appears as "unverified" on the AAD application consent screen. This is a [known issue](https://github.com/microsoftgraph/msgraph-sdk-powershell/issues/482).
+> Microsoft Graph PowerShell SDK appears as "unverified" on the ENTRAID application consent screen. This is a [known issue](https://github.com/microsoftgraph/msgraph-sdk-powershell/issues/482).
 
 The following API permissions are required for Microsoft Graph Powershell:
 
@@ -356,7 +356,7 @@ The minimum API permissions & user roles for each product that need to be assign
 
 | Product                  | API Permissions                                      | Role                             |
 |--------------------------|------------------------------------------------------|----------------------------------|
-| Azure Active Directory   | Directory.Read.All, GroupMember.Read.All,            |                                  |
+| Microsft Entra ID   | Directory.Read.All, GroupMember.Read.All,            |                                  |
 |                          | Organization.Read.All, Policy.Read.All,              |                                  |
 |                          | RoleManagement.Read.Directory, User.Read.All         |                                  |
 |                          | PrivilegedEligibilitySchedule.Read.AzureADGroup         |                                  |
@@ -399,7 +399,7 @@ The tool employs a three-step process:
 ### Executing against multiple tenants
 ScubaGear creates connections to several M365 services. If running against multiple tenants, it is necessary to disconnect those sessions.
 
-`Invoke-SCuBA` includes the `-DisconnectOnExit` parameter to disconnect each of connection upon exit.  To disconnect sessions after a run, use `Disconnect-SCuBATenant`. The cmdlet disconnects from Azure Active Directory (via MS Graph API), Defender, Exchange Online, Power Platform, SharePoint Online, and Microsoft Teams.
+`Invoke-SCuBA` includes the `-DisconnectOnExit` parameter to disconnect each of connection upon exit.  To disconnect sessions after a run, use `Disconnect-SCuBATenant`. The cmdlet disconnects from Microsft Entra ID (via MS Graph API), Defender, Exchange Online, Power Platform, SharePoint Online, and Microsoft Teams.
 
 ```powershell
 Disconnect-SCuBATenant
@@ -465,8 +465,8 @@ Invoke-ProviderList : Error with the PowerPlatform Provider. See the exception m
 
 ### Microsoft Graph Errors
 
-#### Infinite AAD Sign in Loop
-While running the tool, AAD sign in prompts sometimes get stuck in a loop. This is likely an issue with the connection to Microsoft Graph.
+#### Infinite ENTRAID Sign in Loop
+While running the tool, ENTRAID sign in prompts sometimes get stuck in a loop. This is likely an issue with the connection to Microsoft Graph.
 
 To fix the loop, run:
 ```powershell

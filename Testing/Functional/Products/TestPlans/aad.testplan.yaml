@@ -1,13 +1,13 @@
-ProductName: aad
+ProductName: entraid
 TestPlan:
-  - PolicyId: MS.AAD.1.1v1
+  - PolicyId: MS.ENTRAID.1.1v1
     TestDriver: RunCached
     Tests:
-      - TestDescription: MS.AAD.1.1v1 Non-Compliant case - missing client app type exchangeActiveSync
+      - TestDescription: MS.ENTRAID.1.1v1 Non-Compliant case - missing client app type exchangeActiveSync
         Preconditions:
           - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
-              displayName: MS.AAD.1.1v1 Legacy authentication SHALL be blocked
+              displayName: MS.ENTRAID.1.1v1 Legacy authentication SHALL be blocked
               updates:
                 state: enabled
                 Conditions:
@@ -28,11 +28,11 @@ TestPlan:
                     - block
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.AAD.1.1v1 Non-Compliant case - instead of blocking access, requires an approved application
+      - TestDescription: MS.ENTRAID.1.1v1 Non-Compliant case - instead of blocking access, requires an approved application
         Preconditions:
           - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
-              displayName: MS.AAD.1.1v1 Legacy authentication SHALL be blocked
+              displayName: MS.ENTRAID.1.1v1 Legacy authentication SHALL be blocked
               updates:
                 state: enabled
                 Conditions:
@@ -53,11 +53,11 @@ TestPlan:
                     - approvedApplication
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.AAD.1.1v1 Compliant case
+      - TestDescription: MS.ENTRAID.1.1v1 Compliant case
         Preconditions:
           - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
-              displayName: MS.AAD.1.1v1 Legacy authentication SHALL be blocked
+              displayName: MS.ENTRAID.1.1v1 Legacy authentication SHALL be blocked
               updates:
                 state: enabled
                 Conditions:
@@ -80,19 +80,19 @@ TestPlan:
         Postconditions: []
         ExpectedResult: true
 
-  - PolicyId: MS.AAD.2.2v1
+  - PolicyId: MS.ENTRAID.2.2v1
     TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.AAD.2.2v1 Not Checked
+      - TestDescription: MS.ENTRAID.2.2v1 Not Checked
         Preconditions: []
         Postconditions: []
         IsNotChecked: true
         ExpectedResult: false
 
-  - PolicyId: MS.AAD.3.1v1
+  - PolicyId: MS.ENTRAID.3.1v1
     TestDriver: RunCached
     Tests:
-      - TestDescription: MS.AAD.3.1v1 Non-Compliant case - Bad Authentication Strength included
+      - TestDescription: MS.ENTRAID.3.1v1 Non-Compliant case - Bad Authentication Strength included
         Preconditions:
           - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
@@ -118,7 +118,7 @@ TestPlan:
                 GrantControls.BuiltInControls: []
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.AAD.3.1v1 Compliant case - Phishing-resistant MFA enabled
+      - TestDescription: MS.ENTRAID.3.1v1 Compliant case - Phishing-resistant MFA enabled
         Preconditions:
           - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
@@ -143,30 +143,30 @@ TestPlan:
         Postconditions: []
         ExpectedResult: true
 
-  - PolicyId: MS.AAD.3.2v1
+  - PolicyId: MS.ENTRAID.3.2v1
     TestDriver: RunCached
     Tests:
-      - TestDescription: MS.AAD.3.2v1 Non-Compliant case - Report Only
+      - TestDescription: MS.ENTRAID.3.2v1 Non-Compliant case - Report Only
         ### This test disables the standard non-specific MFA policy from the tenant
         Preconditions:
           - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
-              displayName: MS.AAD.3.2v1 If phishing-resistant MFA has not been enforced, an alternative MFA method SHALL be enforced for all users
+              displayName: MS.ENTRAID.3.2v1 If phishing-resistant MFA has not been enforced, an alternative MFA method SHALL be enforced for all users
               updates:
                 State: enabledForReportingButNotEnforced
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.AAD.3.2v1 Compliant case - Non specific MFA method is enforced
+      - TestDescription: MS.ENTRAID.3.2v1 Compliant case - Non specific MFA method is enforced
         ### This test enables the standard non-specific MFA policy from the tenant - should already be enabled but just in case
         Preconditions:
           - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
-              displayName: MS.AAD.3.2v1 If phishing-resistant MFA has not been enforced, an alternative MFA method SHALL be enforced for all users
+              displayName: MS.ENTRAID.3.2v1 If phishing-resistant MFA has not been enforced, an alternative MFA method SHALL be enforced for all users
               updates:
                 State: enabled
         Postconditions: []
         ExpectedResult: true
-      - TestDescription: MS.AAD.3.2v1 Compliant case - Phishing-resistant MFA is enforced so automatically pass even when non-specific MFA is disabled
+      - TestDescription: MS.ENTRAID.3.2v1 Compliant case - Phishing-resistant MFA is enforced so automatically pass even when non-specific MFA is disabled
         ### This test creates a phishing-resistant MFA policy and disables the standard non-specific MFA policy from the tenant
         Preconditions:
           - Command: UpdateCachedConditionalAccessPolicyByName
@@ -191,25 +191,25 @@ TestPlan:
                   - "x509CertificateMultiFactor"
           - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
-              displayName: MS.AAD.3.2v1 If phishing-resistant MFA has not been enforced, an alternative MFA method SHALL be enforced for all users
+              displayName: MS.ENTRAID.3.2v1 If phishing-resistant MFA has not been enforced, an alternative MFA method SHALL be enforced for all users
               updates:
                 State: enabledForReportingButNotEnforced
         Postconditions: []
         ExpectedResult: true
 
-  - PolicyId: MS.AAD.3.3v1
+  - PolicyId: MS.ENTRAID.3.3v1
     TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.AAD.3.3v1 Not Checked
+      - TestDescription: MS.ENTRAID.3.3v1 Not Checked
         Preconditions: []
         Postconditions: []
         IsNotChecked: true
         ExpectedResult: false
 
-  - PolicyId: MS.AAD.3.4v1
+  - PolicyId: MS.ENTRAID.3.4v1
     TestDriver: RunCached
     Tests:
-      - TestDescription: MS.AAD.3.4v1 Non-Compliant case - preMigration
+      - TestDescription: MS.ENTRAID.3.4v1 Non-Compliant case - preMigration
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
@@ -217,7 +217,7 @@ TestPlan:
                 authentication_method[0].PolicyMigrationState: preMigration
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.AAD.3.4v1 Compliant case - Migration complete
+      - TestDescription: MS.ENTRAID.3.4v1 Compliant case - Migration complete
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
@@ -226,19 +226,19 @@ TestPlan:
         Postconditions: []
         ExpectedResult: true
 
-  - PolicyId: MS.AAD.3.5v1
+  - PolicyId: MS.ENTRAID.3.5v1
     TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.AAD.3.5v1 Not Checked
+      - TestDescription: MS.ENTRAID.3.5v1 Not Checked
         Preconditions: []
         Postconditions: []
         IsNotChecked: true
         ExpectedResult: false
 
-  - PolicyId: MS.AAD.3.6v1
+  - PolicyId: MS.ENTRAID.3.6v1
     TestDriver: RunCached
     Tests:
-      - TestDescription: MS.AAD.3.6v1 Non-Compliant case - Bad Authentication Strength included
+      - TestDescription: MS.ENTRAID.3.6v1 Non-Compliant case - Bad Authentication Strength included
         ### This test injects an authentication strength of password,sms which is non-compliant
         Preconditions:
           - Command: UpdateCachedConditionalAccessPolicyByName
@@ -272,7 +272,7 @@ TestPlan:
                   - "password,sms"
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.AAD.3.6v1 Compliant case
+      - TestDescription: MS.ENTRAID.3.6v1 Compliant case
         ### This test creates a phishing-resistant MFA policy and applies it to the required roles
         Preconditions:
           - Command: UpdateCachedConditionalAccessPolicyByName
@@ -306,10 +306,10 @@ TestPlan:
         Postconditions: []
         ExpectedResult: true
 
-  - PolicyId: MS.AAD.3.7v1
+  - PolicyId: MS.ENTRAID.3.7v1
     TestDriver: RunCached
     Tests:
-      - TestDescription: MS.AAD.3.7v1 Non-Compliant case - require both compliant and domain joined device only for specific user
+      - TestDescription: MS.ENTRAID.3.7v1 Non-Compliant case - require both compliant and domain joined device only for specific user
         Preconditions:
           - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
@@ -333,7 +333,7 @@ TestPlan:
                     ExcludeApplications: []
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.AAD.3.7v1 Compliant case - require both compliant and domain joined device for everyone
+      - TestDescription: MS.ENTRAID.3.7v1 Compliant case - require both compliant and domain joined device for everyone
         Preconditions:
           - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
@@ -357,7 +357,7 @@ TestPlan:
                     ExcludeApplications: []
         Postconditions: []
         ExpectedResult: true
-      - TestDescription: MS.AAD.3.7v1 Compliant case - only compliant Device required
+      - TestDescription: MS.ENTRAID.3.7v1 Compliant case - only compliant Device required
         Preconditions:
           - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
@@ -380,7 +380,7 @@ TestPlan:
                     ExcludeApplications: []
         Postconditions: []
         ExpectedResult: true
-      - TestDescription: MS.AAD.3.7v1 Compliant case - only domain Joined Device required
+      - TestDescription: MS.ENTRAID.3.7v1 Compliant case - only domain Joined Device required
         Preconditions:
           - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
@@ -403,7 +403,7 @@ TestPlan:
                     ExcludeApplications: []
         Postconditions: []
         ExpectedResult: true
-      - TestDescription: MS.AAD.3.7v1 Compliant case - compliant or domain joined device required
+      - TestDescription: MS.ENTRAID.3.7v1 Compliant case - compliant or domain joined device required
         Preconditions:
           - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
@@ -428,10 +428,10 @@ TestPlan:
         Postconditions: []
         ExpectedResult: true
 
-  - PolicyId: MS.AAD.3.8v1
+  - PolicyId: MS.ENTRAID.3.8v1
     TestDriver: RunCached
     Tests:
-      - TestDescription: MS.AAD.3.8v1 Non-Compliant case - Managed device to register MFA only for a specific user
+      - TestDescription: MS.ENTRAID.3.8v1 Non-Compliant case - Managed device to register MFA only for a specific user
         Preconditions:
           - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
@@ -456,7 +456,7 @@ TestPlan:
                     IncludeUserActions: ["urn:user:registersecurityinfo"]
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.AAD.3.8v1 Compliant case - Compliant or domain managed device to register MFA
+      - TestDescription: MS.ENTRAID.3.8v1 Compliant case - Compliant or domain managed device to register MFA
         Preconditions:
           - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
@@ -482,19 +482,19 @@ TestPlan:
         Postconditions: []
         ExpectedResult: true
 
-  - PolicyId: MS.AAD.4.1v1
+  - PolicyId: MS.ENTRAID.4.1v1
     TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.AAD.4.1v1 Not Checked
+      - TestDescription: MS.ENTRAID.4.1v1 Not Checked
         Preconditions: []
         Postconditions: []
         IsNotChecked: true
         ExpectedResult: false
 
-  - PolicyId: MS.AAD.5.1v1
+  - PolicyId: MS.ENTRAID.5.1v1
     TestDriver: RunCached
     Tests:
-      - TestDescription: MS.AAD.5.1v1 Non-Compliant case - Allow users to register apps
+      - TestDescription: MS.ENTRAID.5.1v1 Non-Compliant case - Allow users to register apps
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
@@ -502,7 +502,7 @@ TestPlan:
                 authorization_policies[0].DefaultUserRolePermissions.AllowedToCreateApps: true
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.AAD.5.1v1 Compliant case - Do NOT allow users to register apps
+      - TestDescription: MS.ENTRAID.5.1v1 Compliant case - Do NOT allow users to register apps
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
@@ -511,10 +511,10 @@ TestPlan:
         Postconditions: []
         ExpectedResult: true
 
-  - PolicyId: MS.AAD.5.2v1
+  - PolicyId: MS.ENTRAID.5.2v1
     TestDriver: RunCached
     Tests:
-      - TestDescription: MS.AAD.5.2v1 Non-Compliant case - Allow users to consent to apps
+      - TestDescription: MS.ENTRAID.5.2v1 Non-Compliant case - Allow users to consent to apps
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
@@ -523,7 +523,7 @@ TestPlan:
                   - ManagePermissionGrantsForSelf.microsoft-user-default-legacy
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.AAD.5.2v1 Compliant case - Do NOT allow users to consent to apps
+      - TestDescription: MS.ENTRAID.5.2v1 Compliant case - Do NOT allow users to consent to apps
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
@@ -533,10 +533,10 @@ TestPlan:
         Postconditions: []
         ExpectedResult: true
 
-  - PolicyId: MS.AAD.5.3v1
+  - PolicyId: MS.ENTRAID.5.3v1
     TestDriver: RunCached
     Tests:
-      - TestDescription: MS.AAD.5.3v1 Non-Compliant case - No Admin Consent workflow configured
+      - TestDescription: MS.ENTRAID.5.3v1 Non-Compliant case - No Admin Consent workflow configured
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
@@ -547,7 +547,7 @@ TestPlan:
                     Value: ""
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.AAD.5.3v1 Non-Compliant case - No Admin Consent workflow configured false
+      - TestDescription: MS.ENTRAID.5.3v1 Non-Compliant case - No Admin Consent workflow configured false
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
@@ -558,7 +558,7 @@ TestPlan:
                     Value: "false"
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.AAD.5.3v1 Compliant case - Admin Consent workflow is configured true
+      - TestDescription: MS.ENTRAID.5.3v1 Compliant case - Admin Consent workflow is configured true
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
@@ -570,10 +570,10 @@ TestPlan:
         Postconditions: []
         ExpectedResult: true
 
-  - PolicyId: MS.AAD.5.4v1
+  - PolicyId: MS.ENTRAID.5.4v1
     TestDriver: RunCached
     Tests:
-      - TestDescription: MS.AAD.5.4v1 Non-Compliant - Allow group owners to consent to apps
+      - TestDescription: MS.ENTRAID.5.4v1 Non-Compliant - Allow group owners to consent to apps
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
@@ -589,7 +589,7 @@ TestPlan:
                     Value: ""
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.AAD.5.4v1 Compliant - Do NOT allow group owners to consent to apps
+      - TestDescription: MS.ENTRAID.5.4v1 Compliant - Do NOT allow group owners to consent to apps
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
@@ -606,10 +606,10 @@ TestPlan:
         Postconditions: []
         ExpectedResult: true
 
-  - PolicyId: MS.AAD.6.1v1
+  - PolicyId: MS.ENTRAID.6.1v1
     TestDriver: RunCached
     Tests:
-      - TestDescription: MS.AAD.6.1v1 Compliant case - User passwords for all domains are set to not expire
+      - TestDescription: MS.ENTRAID.6.1v1 Compliant case - User passwords for all domains are set to not expire
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
@@ -626,7 +626,7 @@ TestPlan:
                     IsVerified: true
         Postconditions: []
         ExpectedResult: true
-      - TestDescription: MS.AAD.6.1v1 Non-Compliant case - User passwords for some domains are set to expire
+      - TestDescription: MS.ENTRAID.6.1v1 Non-Compliant case - User passwords for some domains are set to expire
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
@@ -643,7 +643,7 @@ TestPlan:
                     IsVerified: true
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.AAD.6.1v1 Compliant case - User passwords shall be verified
+      - TestDescription: MS.ENTRAID.6.1v1 Compliant case - User passwords shall be verified
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
@@ -661,10 +661,10 @@ TestPlan:
         Postconditions: []
         ExpectedResult: true
 
-  - PolicyId: MS.AAD.7.1v1
+  - PolicyId: MS.ENTRAID.7.1v1
     TestDriver: RunCached
     Tests:
-      - TestDescription: MS.AAD.7.1v1 Non-Compliant case - Too many Global Admins
+      - TestDescription: MS.ENTRAID.7.1v1 Non-Compliant case - Too many Global Admins
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
@@ -721,7 +721,7 @@ TestPlan:
                     OnPremisesImmutableId: null
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.AAD.7.1v1 Non-Compliant case - Too few Global Admins
+      - TestDescription: MS.ENTRAID.7.1v1 Non-Compliant case - Too few Global Admins
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
@@ -734,7 +734,7 @@ TestPlan:
                     OnPremisesImmutableId: null
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.AAD.7.1v1 Compliant case - Max number of Global Admins
+      - TestDescription: MS.ENTRAID.7.1v1 Compliant case - Max number of Global Admins
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
@@ -787,10 +787,10 @@ TestPlan:
         Postconditions: []
         ExpectedResult: true
 
-  - PolicyId: MS.AAD.7.2v1
+  - PolicyId: MS.ENTRAID.7.2v1
     TestDriver: RunCached
     Tests:
-      - TestDescription: MS.AAD.7.2v1 Non-Compliant case - Too many Global Admins
+      - TestDescription: MS.ENTRAID.7.2v1 Non-Compliant case - Too many Global Admins
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
@@ -847,7 +847,7 @@ TestPlan:
                     OnPremisesImmutableId: null
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.AAD.7.2v1 Non-Compliant case - More Global Admins than other privileged roles
+      - TestDescription: MS.ENTRAID.7.2v1 Non-Compliant case - More Global Admins than other privileged roles
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
@@ -871,7 +871,7 @@ TestPlan:
                     OnPremisesImmutableId: null
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.AAD.7.2v1 Compliant case - Equal number of Global Admins and other privileged users
+      - TestDescription: MS.ENTRAID.7.2v1 Compliant case - Equal number of Global Admins and other privileged users
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
@@ -912,7 +912,7 @@ TestPlan:
         Postconditions: []
         ExpectedResult: true
 
-      - TestDescription: MS.AAD.7.2v1 Compliant case - Less number of Global Admins than other privileged users
+      - TestDescription: MS.ENTRAID.7.2v1 Compliant case - Less number of Global Admins than other privileged users
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
@@ -953,10 +953,10 @@ TestPlan:
         Postconditions: []
         ExpectedResult: true
 
-  - PolicyId: MS.AAD.7.3v1
+  - PolicyId: MS.ENTRAID.7.3v1
     TestDriver: RunCached
     Tests:
-      - TestDescription: MS.AAD.7.3v1 Non-Compliant case - Three on-prem admins
+      - TestDescription: MS.ENTRAID.7.3v1 Non-Compliant case - Three on-prem admins
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
@@ -987,7 +987,7 @@ TestPlan:
                     OnPremisesImmutableId: null
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.AAD.7.3v1 Compliant case - No on-prem admins
+      - TestDescription: MS.ENTRAID.7.3v1 Compliant case - No on-prem admins
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
@@ -1013,10 +1013,10 @@ TestPlan:
         Postconditions: []
         ExpectedResult: true
 
-  - PolicyId: MS.AAD.8.1v1
+  - PolicyId: MS.ENTRAID.8.1v1
     TestDriver: RunCached
     Tests:
-      - TestDescription: MS.AAD.8.1v1 Non-Compliant - Guest users have the same access as members
+      - TestDescription: MS.ENTRAID.8.1v1 Non-Compliant - Guest users have the same access as members
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
@@ -1024,7 +1024,7 @@ TestPlan:
                 authorization_policies[0].GuestUserRoleId: "a0b1b346-4d3e-4e8b-98f8-753987be4970"
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.AAD.8.1v1 Compliant - Guest user access is restricted
+      - TestDescription: MS.ENTRAID.8.1v1 Compliant - Guest user access is restricted
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
@@ -1032,7 +1032,7 @@ TestPlan:
                 authorization_policies[0].GuestUserRoleId: "2af84b1e-32c8-42b7-82bc-daa82404023b"
         Postconditions: []
         ExpectedResult: true
-      - TestDescription: MS.AAD.8.1v1 Compliant - Guest users have limited access
+      - TestDescription: MS.ENTRAID.8.1v1 Compliant - Guest users have limited access
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
@@ -1041,10 +1041,10 @@ TestPlan:
         Postconditions: []
         ExpectedResult: true
 
-  - PolicyId: MS.AAD.8.2v1
+  - PolicyId: MS.ENTRAID.8.2v1
     TestDriver: RunCached
     Tests:
-      - TestDescription: MS.AAD.8.2v1 Non-Compliant - Anyone in the organization can invite guest users
+      - TestDescription: MS.ENTRAID.8.2v1 Non-Compliant - Anyone in the organization can invite guest users
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
@@ -1052,7 +1052,7 @@ TestPlan:
                 authorization_policies[0].AllowInvitesFrom: "everyone"
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.AAD.8.2v1 Compliant - Only users assigned to specific admin roles can invite guest users
+      - TestDescription: MS.ENTRAID.8.2v1 Compliant - Only users assigned to specific admin roles can invite guest users
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
@@ -1061,10 +1061,10 @@ TestPlan:
         Postconditions: []
         ExpectedResult: true
 
-  - PolicyId: MS.AAD.8.3v1
+  - PolicyId: MS.ENTRAID.8.3v1
     TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.AAD.8.3v1 Not Checked
+      - TestDescription: MS.ENTRAID.8.3v1 Not Checked
         Preconditions: []
         Postconditions: []
         IsNotChecked: true

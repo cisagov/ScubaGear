@@ -4,7 +4,7 @@
                 "date": "08/23/2023 12:23:24 Eastern Daylight Time",
                 "tenant_details": [
     {
-        "AADAdditionalData":  {
+        "ENTRAIDAdditionalData":  {
                                   "AssignedPlans":  [
                                                         {
                                                             "AssignedDateTime":  "/Date(1682823962000)/",
@@ -208,7 +208,7 @@
                                                             "AssignedDateTime":  "/Date(1666300551000)/",
                                                             "CapabilityStatus":  "Enabled",
                                                             "Service":  "exchange",
-                                                            "ServicePlanId":  "d1cbfb67-18a8-4792-b643-630b7f19aad1"
+                                                            "ServicePlanId":  "d1cbfb67-18a8-4792-b643-630b7f19entraid1"
                                                         },
                                                         {
                                                             "AssignedDateTime":  "/Date(1666300551000)/",
@@ -345,13 +345,13 @@
                                                         {
                                                             "AssignedDateTime":  "/Date(1666300529000)/",
                                                             "CapabilityStatus":  "Enabled",
-                                                            "Service":  "AADPremiumService",
+                                                            "Service":  "ENTRAIDPremiumService",
                                                             "ServicePlanId":  "eec0eb4f-6444-4f95-aba0-50c24d67f998"
                                                         },
                                                         {
                                                             "AssignedDateTime":  "/Date(1666300530000)/",
                                                             "CapabilityStatus":  "Enabled",
-                                                            "Service":  "AADPremiumService",
+                                                            "Service":  "ENTRAIDPremiumService",
                                                             "ServicePlanId":  "41781fb2-bc02-4b7c-bd55-b576c07bb09d"
                                                         },
                                                         {
@@ -755,7 +755,7 @@
                                                           }
                                                       ],
                                   "AdditionalProperties":  {
-                                                               "tenantType":  "AAD",
+                                                               "tenantType":  "ENTRAID",
                                                                "onPremisesSyncStatus":  [
                                                                                             "System.Collections.Generic.Dictionary`2[System.String,System.Object]"
                                                                                         ]
@@ -4091,7 +4091,7 @@
         "Conditions":  [
                            "Client apps included: all"
                        ],
-        "Block/Grant Access":  "Allow access but require device to be marked compliant, OR Hybrid Azure AD joined device",
+        "Block/Grant Access":  "Allow access but require device to be marked compliant, OR Hybrid Entra ID joined device",
         "Session Controls":  [
                                  "None"
                              ]
@@ -4194,7 +4194,7 @@
                            "Locations excluded: all trusted locations",
                            "Client apps included: all"
                        ],
-        "Block/Grant Access":  "Allow access but require device to be marked compliant, OR Hybrid Azure AD joined device",
+        "Block/Grant Access":  "Allow access but require device to be marked compliant, OR Hybrid Entra ID joined device",
         "Session Controls":  [
                                  "None"
                              ]
@@ -4252,7 +4252,7 @@
         "Conditions":  [
                            "Client apps included: all"
                        ],
-        "Block/Grant Access":  "Allow access but require device to be marked compliant, OR Hybrid Azure AD joined device",
+        "Block/Grant Access":  "Allow access but require device to be marked compliant, OR Hybrid Entra ID joined device",
         "Session Controls":  [
                                  "None"
                              ]
@@ -10140,7 +10140,7 @@
                                               },
                                 "PrincipalId":  "42dd60ea-57e9-47ea-8a43-a213d36a9cb0",
                                 "RoleAssignmentOriginId":  "uBph6InB6EaU4WAhOrH4FOpg3ULpV-pHikOiE9NqnLA-1",
-                                "RoleAssignmentScheduleId":  "b6624013-0364-471b-a861-00aad19e7415",
+                                "RoleAssignmentScheduleId":  "b6624013-0364-471b-a861-00entraid19e7415",
                                 "RoleDefinition":  {
                                                        "AllowedPrincipalTypes":  null,
                                                        "Description":  null,
@@ -11421,7 +11421,7 @@
     {
         "AppliesTo":  "User",
         "ProvisioningStatus":  "Success",
-        "ServicePlanId":  "d1cbfb67-18a8-4792-b643-630b7f19aad1",
+        "ServicePlanId":  "d1cbfb67-18a8-4792-b643-630b7f19entraid1",
         "ServicePlanName":  "EQUIVIO_ANALYTICS_GOV",
         "AdditionalProperties":  {
 
@@ -11692,7 +11692,7 @@
         "AppliesTo":  "User",
         "ProvisioningStatus":  "Success",
         "ServicePlanId":  "eec0eb4f-6444-4f95-aba0-50c24d67f998",
-        "ServicePlanName":  "AAD_PREMIUM_P2",
+        "ServicePlanName":  "ENTRAID_PREMIUM_P2",
         "AdditionalProperties":  {
 
                                  }
@@ -11701,7 +11701,7 @@
         "AppliesTo":  "User",
         "ProvisioningStatus":  "Success",
         "ServicePlanId":  "41781fb2-bc02-4b7c-bd55-b576c07bb09d",
-        "ServicePlanName":  "AAD_PREMIUM",
+        "ServicePlanName":  "ENTRAID_PREMIUM",
         "AdditionalProperties":  {
 
                                  }
@@ -11852,7 +11852,7 @@
                                         }
     }
 ],
-    "aad_successful_commands": [
+    "entraid_successful_commands": [
     "Get-MgBetaIdentityConditionalAccessPolicy",
     "Get-MgBetaSubscribedSku",
     "Get-PrivilegedUser",
@@ -11862,7 +11862,7 @@
     "Get-MgBetaDirectorySetting",
     "Get-MgBetaPolicyAuthenticationMethodPolicy"
 ],
-    "aad_unsuccessful_commands": [
+    "entraid_unsuccessful_commands": [
 
 ],    "protection_policy_rules": [
     {
@@ -15828,7 +15828,7 @@
         "ImmutableId":  "17d51759-88e1-40c1-8df3-20bcf2e43057",
         "Priority":  0,
         "Workload":  "AuditAlerting",
-        "Policy":  "ae6108c1-8814-4a00-bf93-22396aad4bd8",
+        "Policy":  "ae6108c1-8814-4a00-bf93-22396entraid4bd8",
         "Comment":  "This alert is triggered when someone in your organization becomes an Exchange admin or gets new Exchange admin permissions -V1.0.0.1",
         "Disabled":  false,
         "Mode":  "Enforce",
@@ -19345,10 +19345,10 @@
         "WhenCreated":  "/Date(1651689371000)/",
         "WhenChangedUTC":  "/Date(1653603321000)/",
         "WhenCreatedUTC":  "/Date(1651689371000)/",
-        "ExchangeObjectId":  "e64ef9c1-9920-474d-aad3-b3d1b7cd606e",
+        "ExchangeObjectId":  "e64ef9c1-9920-474d-entraid3-b3d1b7cd606e",
         "OrganizationalUnitRoot":  "agency.onmicrosoft.com",
         "OrganizationId":  "NAMPR09A006.PROD.OUTLOOK.COM/Microsoft Exchange Hosted Organizations/agency.onmicrosoft.com - NAMPR09A006.PROD.OUTLOOK.COM/ConfigurationUnits/agency.onmicrosoft.com/Configuration",
-        "Guid":  "e64ef9c1-9920-474d-aad3-b3d1b7cd606e",
+        "Guid":  "e64ef9c1-9920-474d-entraid3-b3d1b7cd606e",
         "OriginatingServer":  "MWHPR09A006DC07.NAMPR09A006.PROD.OUTLOOK.COM",
         "ObjectState":  "Unchanged"
     },
@@ -20507,7 +20507,7 @@
                                                                          },
                                                                          {
                                                                              "id":  "/providers/Microsoft.PowerApps/apis/shared_azuread",
-                                                                             "name":  "Azure AD",
+                                                                             "name":  "Entra ID",
                                                                              "type":  "Microsoft.PowerApps/apis"
                                                                          },
                                                                          {
@@ -21087,7 +21087,7 @@
                                                                          },
                                                                          {
                                                                              "id":  "/providers/Microsoft.PowerApps/apis/shared_webcontents",
-                                                                             "name":  "HTTP with Azure AD",
+                                                                             "name":  "HTTP with Entra ID",
                                                                              "type":  "Microsoft.PowerApps/apis"
                                                                          },
                                                                          {

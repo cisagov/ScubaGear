@@ -69,7 +69,7 @@ Describe "Smoke Test: Generate Output" {
             @{Item = 'TestResults.csv'; ItemType = 'Leaf'},
             @{Item = 'ProviderSettingsExport.json'; ItemType = 'Leaf'},
             @{Item = 'IndividualReports'; ItemType = 'Container'},
-            @{Item = 'IndividualReports/AADReport.html'; ItemType = 'Leaf'},
+            @{Item = 'IndividualReports/ENTRAIDReport.html'; ItemType = 'Leaf'},
             @{Item = 'IndividualReports/DefenderReport.html'; ItemType = 'Leaf'},
             @{Item = 'IndividualReports/EXOReport.html'; ItemType = 'Leaf'},
             @{Item = 'IndividualReports/PowerPlatformReport.html'; ItemType = 'Leaf'},
@@ -103,7 +103,7 @@ Describe "Smoke Test: Generate Output" {
     }
     Context "Verify Copy* exported commands" -ForEach @(
         @{Command='Copy-ScubaBaselineDocument'; CopiedFiles=@(
-            (Join-Path -Path $env:USERPROFILE -ChildPath "ScubaGear/aad.md"),
+            (Join-Path -Path $env:USERPROFILE -ChildPath "ScubaGear/entraid.md"),
             (Join-Path -Path $env:USERPROFILE -ChildPath "ScubaGear/defender.md"),
             (Join-Path -Path $env:USERPROFILE -ChildPath "ScubaGear/exo.md"),
             (Join-Path -Path $env:USERPROFILE -ChildPath "ScubaGear/powerbi.md"),
@@ -112,7 +112,7 @@ Describe "Smoke Test: Generate Output" {
             (Join-Path -Path $env:USERPROFILE -ChildPath "ScubaGear/teams.md")
         )},
         @{Command='Copy-ScubaSampleConfigFile'; CopiedFiles=@(
-            (Join-Path -Path $env:USERPROFILE -ChildPath "ScubaGear/samples/config-files/aad-config.yaml"),
+            (Join-Path -Path $env:USERPROFILE -ChildPath "ScubaGear/samples/config-files/entraid-config.yaml"),
             (Join-Path -Path $env:USERPROFILE -ChildPath "ScubaGear/samples/config-files/defender-config.yaml"),
             (Join-Path -Path $env:USERPROFILE -ChildPath "ScubaGear/samples/config-files/sample-config.json"),
             (Join-Path -Path $env:USERPROFILE -ChildPath "ScubaGear/samples/config-files/sample-config.yaml")

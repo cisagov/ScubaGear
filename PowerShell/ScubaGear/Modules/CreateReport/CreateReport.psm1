@@ -11,13 +11,13 @@ function New-Report {
     param (
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("Teams", "EXO", "Defender", "AAD", "PowerPlatform", "SharePoint", IgnoreCase = $false)]
+        [ValidateSet("Teams", "EXO", "Defender", "ENTRAID", "PowerPlatform", "SharePoint", IgnoreCase = $false)]
         [string]
         $BaselineName,
 
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("Microsoft Teams", "Exchange Online", "Microsoft 365 Defender", "Azure Active Directory", "Microsoft Power Platform", "SharePoint Online", IgnoreCase = $false)]
+        [ValidateSet("Microsoft Teams", "Exchange Online", "Microsoft 365 Defender", "Microsft Entra ID", "Microsoft Power Platform", "SharePoint Online", IgnoreCase = $false)]
         [string]
         $FullName,
 
@@ -173,7 +173,7 @@ function New-Report {
     }
 
     $Title = "$($FullName) Baseline Report"
-    $AADWarning = "<p> Note: Conditional Access (CA) Policy exclusions and additional policy conditions
+    $ENTRAIDWarning = "<p> Note: Conditional Access (CA) Policy exclusions and additional policy conditions
     may limit a policy's scope more narrowly than desired. Recommend reviewing matching policies
     against the baseline statement to ensure a match between intent and implementation. </p>"
     $NoWarning = "<p><br/></p>"
@@ -186,14 +186,14 @@ function New-Report {
     $BaselineURL = "<a href=`"$($ScubaGitHubUrl)/blob/v$($SettingsExport.module_version)/PowerShell/ScubaGear/baselines/$($BaselineName.ToLower()).md`" target=`"_blank`"><h3 style=`"width: 100px;`">Baseline Documents</h3></a>"
     $ReportHTML = $ReportHTML.Replace("{BASELINE_URL}", $BaselineURL)
 
-    # Handle AAD-specific reporting
-    if ($BaselineName -eq "aad") {
-        $ReportHTML = $ReportHTML.Replace("{AADWARNING}", $AADWarning)
+    # Handle ENTRAID-specific reporting
+    if ($BaselineName -eq "entraid") {
+        $ReportHTML = $ReportHTML.Replace("{ENTRAIDWARNING}", $ENTRAIDWarning)
         $ReportHTML = $ReportHTML.Replace("{CAPTABLES}", "")
         $CapJson = ConvertTo-Json $SettingsExport.cap_table_data
     }
     else {
-        $ReportHTML = $ReportHTML.Replace("{AADWARNING}", $NoWarning)
+        $ReportHTML = $ReportHTML.Replace("{ENTRAIDWARNING}", $NoWarning)
         $ReportHTML = $ReportHTML.Replace("{CAPTABLES}", "")
         $CapJson = "null"
     }
@@ -233,7 +233,7 @@ function Import-SecureBaseline{
     param (
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", 'powerbi', IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "defender", "entraid", "powerplatform", "sharepoint", 'powerbi', IgnoreCase = $false)]
         [string[]]
         $ProductNames,
         [Parameter(Mandatory = $false)]

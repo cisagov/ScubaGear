@@ -48,12 +48,12 @@ class ScubaConfig {
 
     hidden [void]SetParameterDefaults(){
         if (-Not $this.Configuration.ProductNames){
-            $this.Configuration.ProductNames = @("aad", "defender", "exo", "sharepoint", "teams")
+            $this.Configuration.ProductNames = @("entraid", "defender", "exo", "sharepoint", "teams")
         }
         else{
             # Transform ProductNames into list of all products if it contains wildcard
             if ($this.Configuration.ProductNames.Contains('*')){
-                $this.Configuration.ProductNames = "aad", "defender", "exo", "powerplatform", "sharepoint", "teams"
+                $this.Configuration.ProductNames = "entraid", "defender", "exo", "powerplatform", "sharepoint", "teams"
                 Write-Debug "Setting ProductNames to all products because of wildcard"
             }
             else{

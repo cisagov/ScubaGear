@@ -1,16 +1,16 @@
-package aad_test
+package entraid_test
 import future.keywords
-import data.aad
+import data.entraid
 import data.utils.key.TestResult
-import data.utils.aad.INT_MAX
+import data.utils.entraid.INT_MAX
 
 
 #
-# Policy MS.AAD.6.1v1
+# Policy MS.ENTRAID.6.1v1
 #--
 
 test_PasswordValidityPeriodInDays_Correct if {
-    Output := aad.tests with input as { 
+    Output := entraid.tests with input as { 
         "domain_settings" : [
             {
                 "Id" : "test.url.com",
@@ -31,11 +31,11 @@ test_PasswordValidityPeriodInDays_Correct if {
     }
 
     ReportDetailString := "Requirement met"
-    TestResult("MS.AAD.6.1v1", Output, ReportDetailString, true) == true
+    TestResult("MS.ENTRAID.6.1v1", Output, ReportDetailString, true) == true
 }
 
 test_PasswordValidityPeriodInDays_Incorrect if {
-    Output := aad.tests with input as { 
+    Output := entraid.tests with input as { 
         "domain_settings" : [
             {
                 "Id" : "test.url.com",
@@ -56,11 +56,11 @@ test_PasswordValidityPeriodInDays_Incorrect if {
     }
 
     ReportDetailString := "2 domain(s) failed:<br/>test.url.com, test1.url.com"
-    TestResult("MS.AAD.6.1v1", Output, ReportDetailString, false) == true
+    TestResult("MS.ENTRAID.6.1v1", Output, ReportDetailString, false) == true
 }
 
 test_IsVerified_Correct if {
-    Output := aad.tests with input as { 
+    Output := entraid.tests with input as { 
         "domain_settings" : [
             {
                 "Id" : "test.url.com",
@@ -81,6 +81,6 @@ test_IsVerified_Correct if {
     }
 
     ReportDetailString := "Requirement met"
-    TestResult("MS.AAD.6.1v1", Output, ReportDetailString, true) == true
+    TestResult("MS.ENTRAID.6.1v1", Output, ReportDetailString, true) == true
 }
 #--

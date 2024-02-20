@@ -13,7 +13,7 @@ function Connect-Tenant {
    [Parameter(ParameterSetName = 'Manual')]
    [Parameter(Mandatory = $true)]
    [ValidateNotNullOrEmpty()]
-   [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", IgnoreCase = $false)]
+   [ValidateSet("teams", "exo", "defender", "entraid", "powerplatform", "sharepoint", IgnoreCase = $false)]
    [string[]]
    $ProductNames,
 
@@ -36,7 +36,7 @@ function Connect-Tenant {
    # Prevent duplicate sign ins
    $EXOAuthRequired = $true
    $SPOAuthRequired = $true
-   $AADAuthRequired = $true
+   $ENTRAIDAuthRequired = $true
 
    $ProdAuthFailed = @()
 
@@ -54,7 +54,7 @@ function Connect-Tenant {
        Write-Progress @ProgressParams
        try {
            switch ($Product) {
-               "aad" {
+               "entraid" {
                    $GraphScopes = (
                        'User.Read.All',
                        'Policy.Read.All',
@@ -86,7 +86,7 @@ function Connect-Tenant {
                        }
                    }
                    Connect-MgGraph @GraphParams | Out-Null
-                   $AADAuthRequired = $false
+                   $ENTRAIDAuthRequired = $false
                }
                {($_ -eq "exo") -or ($_ -eq "defender")} {
                    if ($EXOAuthRequired) {
@@ -129,7 +129,7 @@ function Connect-Tenant {
                    Add-PowerAppsAccount @AddPowerAppsParams | Out-Null
                }
                "sharepoint" {
-                   if ($AADAuthRequired) {
+                   if ($ENTRAIDAuthRequired) {
                        $LimitedGraphParams = @{
                            'ErrorAction' = 'Stop';
                        }
@@ -149,7 +149,7 @@ function Connect-Tenant {
                            }
                        }
                        Connect-MgGraph @LimitedGraphParams | Out-Null
-                       $AADAuthRequired = $false
+                       $ENTRAIDAuthRequired = $false
                    }
                    if ($SPOAuthRequired) {
                        $InitialDomain = (Get-MgBetaOrganization).VerifiedDomains | Where-Object {$_.isInitial}
@@ -256,16 +256,16 @@ function Disconnect-SCuBATenant {
    .EXAMPLE
    Disconnect-SCuBATenant -ProductNames teams
    .EXAMPLE
-   Disconnect-SCuBATenant -ProductNames aad, exo
+   Disconnect-SCuBATenant -ProductNames entraid, exo
    .Functionality
    Public
    #>
    [CmdletBinding()]
    param(
-       [ValidateSet("aad", "defender", "exo","powerplatform", "sharepoint", "teams", IgnoreCase = $false)]
+       [ValidateSet("entraid", "defender", "exo","powerplatform", "sharepoint", "teams", IgnoreCase = $false)]
        [ValidateNotNullOrEmpty()]
        [string[]]
-       $ProductNames = @("aad", "defender", "exo", "powerplatform", "sharepoint", "teams")
+       $ProductNames = @("entraid", "defender", "exo", "powerplatform", "sharepoint", "teams")
    )
    $ErrorActionPreference = "SilentlyContinue"
 
@@ -278,7 +278,7 @@ function Disconnect-SCuBATenant {
            $Percent = $N*100/$Len
            Write-Progress -Activity "Disconnecting from each service" -Status "Disconnecting from $($Product); $($n) of $($Len) disconnected." -PercentComplete $Percent
            Write-Verbose "Disconnecting from $Product."
-           if (($Product -eq "aad") -or ($Product -eq "sharepoint")) {
+           if (($Product -eq "entraid") -or ($Product -eq "sharepoint")) {
                Disconnect-MgGraph -ErrorAction SilentlyContinue | Out-Null
 
                if($Product -eq "sharepoint") {

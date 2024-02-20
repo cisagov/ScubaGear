@@ -1,15 +1,15 @@
-package aad_test
+package entraid_test
 import future.keywords
-import data.aad
+import data.entraid
 import data.utils.report.NotCheckedDetails
 import data.utils.key.TestResult
 
 
 #
-# Policy MS.AAD.2.1v1
+# Policy MS.ENTRAID.2.1v1
 #--
 test_NoExclusionsConditions_Correct_V1 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -45,7 +45,7 @@ test_NoExclusionsConditions_Correct_V1 if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ]
@@ -56,11 +56,11 @@ test_NoExclusionsConditions_Correct_V1 if {
         "<br/>Test name. <a href='#caps'>View all CA policies</a>."
     ])
 
-    TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, true) == true
+    TestResult("MS.ENTRAID.2.1v1", Output, ReportDetailStr, true) == true
 }
 
 test_NoExclusionsExemptUsers_Correct_V1 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -96,13 +96,13 @@ test_NoExclusionsExemptUsers_Correct_V1 if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ],
         "scuba_config": {
             "Aad": {
-                "MS.AAD.2.1v1": {
+                "MS.ENTRAID.2.1v1": {
                     "CapExclusions": {
                         "Users": [
                             "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"
@@ -119,11 +119,11 @@ test_NoExclusionsExemptUsers_Correct_V1 if {
         "<br/>Test name. <a href='#caps'>View all CA policies</a>."
     ])
 
-    TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, true) == true
+    TestResult("MS.ENTRAID.2.1v1", Output, ReportDetailStr, true) == true
 }
 
 test_NoExclusionsExemptGroups_Correct_V1 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -159,13 +159,13 @@ test_NoExclusionsExemptGroups_Correct_V1 if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ],
         "scuba_config": {
             "Aad": {
-                "MS.AAD.2.1v1": {
+                "MS.ENTRAID.2.1v1": {
                     "CapExclusions": {
                         "Users": [],
                         "Groups": [
@@ -182,12 +182,12 @@ test_NoExclusionsExemptGroups_Correct_V1 if {
         "<br/>Test name. <a href='#caps'>View all CA policies</a>."
     ])
 
-    TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, true) == true
+    TestResult("MS.ENTRAID.2.1v1", Output, ReportDetailStr, true) == true
 }
 
 # User exclusions test
 test_UserExclusionNoExempt_Incorrect_V1 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -225,7 +225,7 @@ test_UserExclusionNoExempt_Incorrect_V1 if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ]
@@ -233,11 +233,11 @@ test_UserExclusionNoExempt_Incorrect_V1 if {
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.ENTRAID.2.1v1", Output, ReportDetailStr, false) == true
 }
 
 test_UserExclusionConditions_Correct_V1 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -275,13 +275,13 @@ test_UserExclusionConditions_Correct_V1 if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ],
         "scuba_config": {
             "Aad": {
-                "MS.AAD.2.1v1": {
+                "MS.ENTRAID.2.1v1": {
                     "CapExclusions": {
                         "Users": [
                             "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"
@@ -298,11 +298,11 @@ test_UserExclusionConditions_Correct_V1 if {
         "<br/>Test name. <a href='#caps'>View all CA policies</a>."
     ])
 
-    TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, true) == true
+    TestResult("MS.ENTRAID.2.1v1", Output, ReportDetailStr, true) == true
 }
 
 test_UserExclusionsNoExempt_Incorrect_V1 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -341,7 +341,7 @@ test_UserExclusionsNoExempt_Incorrect_V1 if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ]
@@ -349,11 +349,11 @@ test_UserExclusionsNoExempt_Incorrect_V1 if {
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.ENTRAID.2.1v1", Output, ReportDetailStr, false) == true
 }
 
 test_UserExclusionsSingleExempt_Incorrect_V1 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -392,13 +392,13 @@ test_UserExclusionsSingleExempt_Incorrect_V1 if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ],
         "scuba_config": {
             "Aad": {
-                "MS.AAD.2.1v1": {
+                "MS.ENTRAID.2.1v1": {
                     "CapExclusions": {
                         "Users": [
                             "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"
@@ -412,11 +412,11 @@ test_UserExclusionsSingleExempt_Incorrect_V1 if {
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.ENTRAID.2.1v1", Output, ReportDetailStr, false) == true
 }
 
 test_MultiUserExclusionsConditions_Correct_V1 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -455,13 +455,13 @@ test_MultiUserExclusionsConditions_Correct_V1 if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ],
         "scuba_config": {
             "Aad": {
-                "MS.AAD.2.1v1": {
+                "MS.ENTRAID.2.1v1": {
                     "CapExclusions": {
                         "Users": [
                             "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3",
@@ -479,12 +479,12 @@ test_MultiUserExclusionsConditions_Correct_V1 if {
         "<br/>Test name. <a href='#caps'>View all CA policies</a>."
     ])
 
-    TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, true) == true
+    TestResult("MS.ENTRAID.2.1v1", Output, ReportDetailStr, true) == true
 }
 
 # Group Exclusion tests #
 test_GroupExclusionNoExempt_Incorrect_V1 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -522,7 +522,7 @@ test_GroupExclusionNoExempt_Incorrect_V1 if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ]
@@ -530,11 +530,11 @@ test_GroupExclusionNoExempt_Incorrect_V1 if {
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.ENTRAID.2.1v1", Output, ReportDetailStr, false) == true
 }
 
 test_GroupExclusionsConditions_Correct_V1 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -572,13 +572,13 @@ test_GroupExclusionsConditions_Correct_V1 if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ],
         "scuba_config": {
             "Aad": {
-                "MS.AAD.2.1v1": {
+                "MS.ENTRAID.2.1v1": {
                     "CapExclusions": {
                         "Users": [],
                         "Groups": [
@@ -595,11 +595,11 @@ test_GroupExclusionsConditions_Correct_V1 if {
         "<br/>Test name. <a href='#caps'>View all CA policies</a>."
     ])
 
-    TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, true) == true
+    TestResult("MS.ENTRAID.2.1v1", Output, ReportDetailStr, true) == true
 }
 
 test_GroupExclusionsNoExempt_Incorrect_V1 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -638,7 +638,7 @@ test_GroupExclusionsNoExempt_Incorrect_V1 if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ]
@@ -646,11 +646,11 @@ test_GroupExclusionsNoExempt_Incorrect_V1 if {
 
     ReportDetailStr :=
     "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.ENTRAID.2.1v1", Output, ReportDetailStr, false) == true
 }
 
 test_GroupExclusionsSingleExempt_Incorrect_V1 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -689,13 +689,13 @@ test_GroupExclusionsSingleExempt_Incorrect_V1 if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ],
         "scuba_config": {
             "Aad": {
-                "MS.AAD.2.1v1": {
+                "MS.ENTRAID.2.1v1": {
                     "CapExclusions": {
                         "Users": [],
                         "Groups": [
@@ -709,11 +709,11 @@ test_GroupExclusionsSingleExempt_Incorrect_V1 if {
 
     ReportDetailStr :=
     "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.ENTRAID.2.1v1", Output, ReportDetailStr, false) == true
 }
 
 test_MultiGroupExclusionsConditions_Correct_V1 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -752,13 +752,13 @@ test_MultiGroupExclusionsConditions_Correct_V1 if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ],
         "scuba_config": {
             "Aad": {
-                "MS.AAD.2.1v1": {
+                "MS.ENTRAID.2.1v1": {
                     "CapExclusions": {
                         "Users": [],
                         "Groups": [
@@ -775,12 +775,12 @@ test_MultiGroupExclusionsConditions_Correct_V1 if {
         "1 conditional access policy(s) found that meet(s) all requirements:",
         "<br/>Test name. <a href='#caps'>View all CA policies</a>."
     ])
-    TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, true) == true
+    TestResult("MS.ENTRAID.2.1v1", Output, ReportDetailStr, true) == true
 }
 
 # User and group exclusions tests
 test_UserGroupExclusionConditions_Correct_V1 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -820,13 +820,13 @@ test_UserGroupExclusionConditions_Correct_V1 if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ],
         "scuba_config": {
             "Aad": {
-                "MS.AAD.2.1v1": {
+                "MS.ENTRAID.2.1v1": {
                     "CapExclusions": {
                         "Users": [
                             "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"
@@ -844,11 +844,11 @@ test_UserGroupExclusionConditions_Correct_V1 if {
         "1 conditional access policy(s) found that meet(s) all requirements:",
         "<br/>Test name. <a href='#caps'>View all CA policies</a>."
     ])
-    TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, true) == true
+    TestResult("MS.ENTRAID.2.1v1", Output, ReportDetailStr, true) == true
 }
 
 test_UserGroupExclusionNoExempt_Incorrect_V1 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -888,7 +888,7 @@ test_UserGroupExclusionNoExempt_Incorrect_V1 if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ]
@@ -896,11 +896,11 @@ test_UserGroupExclusionNoExempt_Incorrect_V1 if {
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.ENTRAID.2.1v1", Output, ReportDetailStr, false) == true
 }
 
 test_UserGroupExclusionUserExemptOnly_Incorrect_V1 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -940,13 +940,13 @@ test_UserGroupExclusionUserExemptOnly_Incorrect_V1 if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ],
         "scuba_config": {
             "Aad": {
-                "MS.AAD.2.1v1": {
+                "MS.ENTRAID.2.1v1": {
                     "CapExclusions": {
                         "Users": [
                             "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"
@@ -960,11 +960,11 @@ test_UserGroupExclusionUserExemptOnly_Incorrect_V1 if {
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.ENTRAID.2.1v1", Output, ReportDetailStr, false) == true
 }
 
 test_UserGroupExclusionGroupExemptOnly_Incorrect_V1 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -1004,13 +1004,13 @@ test_UserGroupExclusionGroupExemptOnly_Incorrect_V1 if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ],
         "scuba_config": {
             "Aad": {
-                "MS.AAD.2.1v1": {
+                "MS.ENTRAID.2.1v1": {
                     "CapExclusions": {
                         "Users": [],
                         "Groups": [
@@ -1024,11 +1024,11 @@ test_UserGroupExclusionGroupExemptOnly_Incorrect_V1 if {
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.ENTRAID.2.1v1", Output, ReportDetailStr, false) == true
 }
 
 test_UserGroupExclusionTooFewUserExempts_Incorrect_V1 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -1069,13 +1069,13 @@ test_UserGroupExclusionTooFewUserExempts_Incorrect_V1 if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ],
         "scuba_config": {
             "Aad": {
-                "MS.AAD.2.1v1": {
+                "MS.ENTRAID.2.1v1": {
                     "CapExclusions": {
                         "Users": [
                             "65fea286-22d3-42f9-b4ca-93a6f75817d4"
@@ -1091,12 +1091,12 @@ test_UserGroupExclusionTooFewUserExempts_Incorrect_V1 if {
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.ENTRAID.2.1v1", Output, ReportDetailStr, false) == true
 }
 
 # Other Conditions tests
 test_IncludeApplications_Incorrect_V1 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -1132,7 +1132,7 @@ test_IncludeApplications_Incorrect_V1 if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ]
@@ -1140,11 +1140,11 @@ test_IncludeApplications_Incorrect_V1 if {
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.ENTRAID.2.1v1", Output, ReportDetailStr, false) == true
 }
 
 test_IncludeUsers_Incorrect_V1 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -1180,7 +1180,7 @@ test_IncludeUsers_Incorrect_V1 if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ]
@@ -1188,11 +1188,11 @@ test_IncludeUsers_Incorrect_V1 if {
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.ENTRAID.2.1v1", Output, ReportDetailStr, false) == true
 }
 
 test_ExcludeUsers_Incorrect_V1 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -1230,7 +1230,7 @@ test_ExcludeUsers_Incorrect_V1 if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ]
@@ -1238,11 +1238,11 @@ test_ExcludeUsers_Incorrect_V1 if {
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.ENTRAID.2.1v1", Output, ReportDetailStr, false) == true
 }
 
 test_ExcludeGroups_Incorrect_V1 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -1280,7 +1280,7 @@ test_ExcludeGroups_Incorrect_V1 if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ]
@@ -1288,11 +1288,11 @@ test_ExcludeGroups_Incorrect_V1 if {
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.ENTRAID.2.1v1", Output, ReportDetailStr, false) == true
 }
 
 test_ExcludeRoles_Incorrect_V1 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -1330,7 +1330,7 @@ test_ExcludeRoles_Incorrect_V1 if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ]
@@ -1338,11 +1338,11 @@ test_ExcludeRoles_Incorrect_V1 if {
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.ENTRAID.2.1v1", Output, ReportDetailStr, false) == true
 }
 
 test_BuiltInControls_Incorrect_V1 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -1378,7 +1378,7 @@ test_BuiltInControls_Incorrect_V1 if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ]
@@ -1386,11 +1386,11 @@ test_BuiltInControls_Incorrect_V1 if {
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.ENTRAID.2.1v1", Output, ReportDetailStr, false) == true
 }
 
 test_State_Incorrect_V1 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -1426,7 +1426,7 @@ test_State_Incorrect_V1 if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ]
@@ -1434,11 +1434,11 @@ test_State_Incorrect_V1 if {
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.ENTRAID.2.1v1", Output, ReportDetailStr, false) == true
 }
 
 test_UserRiskLevels_Incorrect if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -1474,7 +1474,7 @@ test_UserRiskLevels_Incorrect if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ]
@@ -1482,11 +1482,11 @@ test_UserRiskLevels_Incorrect if {
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.ENTRAID.2.1v1", Output, ReportDetailStr, false) == true
 }
 
 test_ServicePlans_Incorrect if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -1526,17 +1526,17 @@ test_ServicePlans_Incorrect if {
 
     ReportDetailStr :=
         "**NOTE: Your tenant does not have a Microsoft Entra ID P2 license, which is required for this feature**"
-    TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.ENTRAID.2.1v1", Output, ReportDetailStr, false) == true
 }
 #--
 
 #
-# Policy MS.AAD.2.2v1
+# Policy MS.ENTRAID.2.2v1
 #--
 test_NotImplemented_Correct if {
-    PolicyId := "MS.AAD.2.2v1"
+    PolicyId := "MS.ENTRAID.2.2v1"
 
-    Output := aad.tests with input as { }
+    Output := entraid.tests with input as { }
 
     ReportDetailStr := NotCheckedDetails(PolicyId)
     TestResult(PolicyId, Output, ReportDetailStr, false) == true
@@ -1544,10 +1544,10 @@ test_NotImplemented_Correct if {
 #--
 
 #
-# Policy MS.AAD.2.3v1
+# Policy MS.ENTRAID.2.3v1
 #--
 test_NoExclusionsConditions_Correct_V2 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -1583,7 +1583,7 @@ test_NoExclusionsConditions_Correct_V2 if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ]
@@ -1594,11 +1594,11 @@ test_NoExclusionsConditions_Correct_V2 if {
         "<br/>Test name. <a href='#caps'>View all CA policies</a>."
     ])
 
-    TestResult("MS.AAD.2.3v1", Output, ReportDetailStr, true) == true
+    TestResult("MS.ENTRAID.2.3v1", Output, ReportDetailStr, true) == true
 }
 
 test_NoExclusionsExemptUsers_Correct_V2 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -1634,13 +1634,13 @@ test_NoExclusionsExemptUsers_Correct_V2 if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ],
         "scuba_config": {
             "Aad": {
-                "MS.AAD.2.3v1": {
+                "MS.ENTRAID.2.3v1": {
                     "CapExclusions": {
                         "Users": [
                             "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"
@@ -1657,11 +1657,11 @@ test_NoExclusionsExemptUsers_Correct_V2 if {
         "<br/>Test name. <a href='#caps'>View all CA policies</a>."
     ])
 
-    TestResult("MS.AAD.2.3v1", Output, ReportDetailStr, true) == true
+    TestResult("MS.ENTRAID.2.3v1", Output, ReportDetailStr, true) == true
 }
 
 test_NoExclusionsExemptGroups_Correct_V2 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -1697,13 +1697,13 @@ test_NoExclusionsExemptGroups_Correct_V2 if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ],
         "scuba_config": {
             "Aad": {
-                "MS.AAD.2.3v1": {
+                "MS.ENTRAID.2.3v1": {
                     "CapExclusions": {
                         "Users": [],
                         "Groups": [
@@ -1720,12 +1720,12 @@ test_NoExclusionsExemptGroups_Correct_V2 if {
         "<br/>Test name. <a href='#caps'>View all CA policies</a>."
     ])
 
-    TestResult("MS.AAD.2.3v1", Output, ReportDetailStr, true) == true
+    TestResult("MS.ENTRAID.2.3v1", Output, ReportDetailStr, true) == true
 }
 
 # User exclusions test
 test_UserExclusionNoExempt_Incorrect_V2 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -1763,7 +1763,7 @@ test_UserExclusionNoExempt_Incorrect_V2 if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ]
@@ -1771,11 +1771,11 @@ test_UserExclusionNoExempt_Incorrect_V2 if {
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.2.3v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.ENTRAID.2.3v1", Output, ReportDetailStr, false) == true
 }
 
 test_UserExclusionConditions_Correct_V2 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -1813,13 +1813,13 @@ test_UserExclusionConditions_Correct_V2 if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ],
         "scuba_config": {
             "Aad": {
-                "MS.AAD.2.3v1": {
+                "MS.ENTRAID.2.3v1": {
                     "CapExclusions": {
                         "Users": [
                             "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"
@@ -1836,11 +1836,11 @@ test_UserExclusionConditions_Correct_V2 if {
         "<br/>Test name. <a href='#caps'>View all CA policies</a>."
     ])
 
-    TestResult("MS.AAD.2.3v1", Output, ReportDetailStr, true) == true
+    TestResult("MS.ENTRAID.2.3v1", Output, ReportDetailStr, true) == true
 }
 
 test_UserExclusionsNoExempt_Incorrect_V2 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -1879,7 +1879,7 @@ test_UserExclusionsNoExempt_Incorrect_V2 if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ]
@@ -1887,11 +1887,11 @@ test_UserExclusionsNoExempt_Incorrect_V2 if {
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.2.3v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.ENTRAID.2.3v1", Output, ReportDetailStr, false) == true
 }
 
 test_UserExclusionsSingleExempt_Incorrect_V2 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -1930,13 +1930,13 @@ test_UserExclusionsSingleExempt_Incorrect_V2 if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ],
         "scuba_config": {
             "Aad": {
-                "MS.AAD.2.3v1": {
+                "MS.ENTRAID.2.3v1": {
                     "CapExclusions": {
                         "Users": [
                             "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"
@@ -1950,11 +1950,11 @@ test_UserExclusionsSingleExempt_Incorrect_V2 if {
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.2.3v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.ENTRAID.2.3v1", Output, ReportDetailStr, false) == true
 }
 
 test_MultiUserExclusionsConditions_Correct_V2 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -1993,13 +1993,13 @@ test_MultiUserExclusionsConditions_Correct_V2 if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ],
         "scuba_config": {
             "Aad": {
-                "MS.AAD.2.3v1": {
+                "MS.ENTRAID.2.3v1": {
                     "CapExclusions": {
                         "Users": [
                             "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3",
@@ -2017,12 +2017,12 @@ test_MultiUserExclusionsConditions_Correct_V2 if {
         "<br/>Test name. <a href='#caps'>View all CA policies</a>."
     ])
 
-    TestResult("MS.AAD.2.3v1", Output, ReportDetailStr, true) == true
+    TestResult("MS.ENTRAID.2.3v1", Output, ReportDetailStr, true) == true
 }
 
 # Group Exclusion tests
 test_GroupExclusionNoExempt_Incorrect_V2 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -2060,7 +2060,7 @@ test_GroupExclusionNoExempt_Incorrect_V2 if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ]
@@ -2068,11 +2068,11 @@ test_GroupExclusionNoExempt_Incorrect_V2 if {
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.2.3v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.ENTRAID.2.3v1", Output, ReportDetailStr, false) == true
 }
 
 test_GroupExclusionsConditions_Correct_V2 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -2110,13 +2110,13 @@ test_GroupExclusionsConditions_Correct_V2 if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ],
         "scuba_config": {
             "Aad": {
-                "MS.AAD.2.3v1": {
+                "MS.ENTRAID.2.3v1": {
                     "CapExclusions": {
                         "Users": [],
                         "Groups": [
@@ -2133,11 +2133,11 @@ test_GroupExclusionsConditions_Correct_V2 if {
         "<br/>Test name. <a href='#caps'>View all CA policies</a>."
     ])
 
-    TestResult("MS.AAD.2.3v1", Output, ReportDetailStr, true) == true
+    TestResult("MS.ENTRAID.2.3v1", Output, ReportDetailStr, true) == true
 }
 
 test_GroupExclusionsNoExempt_Incorrect_V2 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -2176,7 +2176,7 @@ test_GroupExclusionsNoExempt_Incorrect_V2 if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ]
@@ -2184,11 +2184,11 @@ test_GroupExclusionsNoExempt_Incorrect_V2 if {
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.2.3v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.ENTRAID.2.3v1", Output, ReportDetailStr, false) == true
 }
 
 test_GroupExclusionsSingleExempt_Incorrect_V2 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -2227,13 +2227,13 @@ test_GroupExclusionsSingleExempt_Incorrect_V2 if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ],
         "scuba_config": {
             "Aad": {
-                "MS.AAD.2.3v1": {
+                "MS.ENTRAID.2.3v1": {
                     "CapExclusions": {
                         "Users": [],
                         "Groups": [
@@ -2247,11 +2247,11 @@ test_GroupExclusionsSingleExempt_Incorrect_V2 if {
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.2.3v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.ENTRAID.2.3v1", Output, ReportDetailStr, false) == true
 }
 
 test_MultiGroupExclusionsConditions_Correct_V2 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -2290,13 +2290,13 @@ test_MultiGroupExclusionsConditions_Correct_V2 if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ],
         "scuba_config": {
             "Aad": {
-                "MS.AAD.2.3v1": {
+                "MS.ENTRAID.2.3v1": {
                     "CapExclusions": {
                         "Users": [],
                         "Groups": [
@@ -2314,12 +2314,12 @@ test_MultiGroupExclusionsConditions_Correct_V2 if {
         "<br/>Test name. <a href='#caps'>View all CA policies</a>."
     ])
 
-    TestResult("MS.AAD.2.3v1", Output, ReportDetailStr, true) == true
+    TestResult("MS.ENTRAID.2.3v1", Output, ReportDetailStr, true) == true
 }
 
 # User and group exclusions tests
 test_UserGroupExclusionConditions_Correct_V2 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -2359,13 +2359,13 @@ test_UserGroupExclusionConditions_Correct_V2 if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ],
         "scuba_config": {
             "Aad": {
-                "MS.AAD.2.3v1": {
+                "MS.ENTRAID.2.3v1": {
                     "CapExclusions": {
                         "Users": [
                             "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"
@@ -2384,11 +2384,11 @@ test_UserGroupExclusionConditions_Correct_V2 if {
         "<br/>Test name. <a href='#caps'>View all CA policies</a>."
     ])
 
-    TestResult("MS.AAD.2.3v1", Output, ReportDetailStr, true) == true
+    TestResult("MS.ENTRAID.2.3v1", Output, ReportDetailStr, true) == true
 }
 
 test_UserGroupExclusionNoExempt_Incorrect_V2 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -2428,7 +2428,7 @@ test_UserGroupExclusionNoExempt_Incorrect_V2 if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ]
@@ -2436,11 +2436,11 @@ test_UserGroupExclusionNoExempt_Incorrect_V2 if {
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.2.3v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.ENTRAID.2.3v1", Output, ReportDetailStr, false) == true
 }
 
 test_UserGroupExclusionUserExemptOnly_Incorrect_V2 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -2480,13 +2480,13 @@ test_UserGroupExclusionUserExemptOnly_Incorrect_V2 if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ],
         "scuba_config": {
             "Aad": {
-                "MS.AAD.2.3v1": {
+                "MS.ENTRAID.2.3v1": {
                     "CapExclusions": {
                         "Users": [
                             "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"
@@ -2500,11 +2500,11 @@ test_UserGroupExclusionUserExemptOnly_Incorrect_V2 if {
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.2.3v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.ENTRAID.2.3v1", Output, ReportDetailStr, false) == true
 }
 
 test_UserGroupExclusionGroupExemptOnly_Incorrect_V2 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -2544,13 +2544,13 @@ test_UserGroupExclusionGroupExemptOnly_Incorrect_V2 if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ],
         "scuba_config": {
             "Aad": {
-                "MS.AAD.2.3v1": {
+                "MS.ENTRAID.2.3v1": {
                     "CapExclusions": {
                         "Users": [],
                         "Groups": [
@@ -2564,11 +2564,11 @@ test_UserGroupExclusionGroupExemptOnly_Incorrect_V2 if {
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.2.3v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.ENTRAID.2.3v1", Output, ReportDetailStr, false) == true
 }
 
 test_UserGroupExclusionTooFewUserExempts_Incorrect_V2 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -2609,13 +2609,13 @@ test_UserGroupExclusionTooFewUserExempts_Incorrect_V2 if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ],
         "scuba_config": {
             "Aad": {
-                "MS.AAD.2.3v1": {
+                "MS.ENTRAID.2.3v1": {
                     "CapExclusions": {
                         "Users": [
                             "65fea286-22d3-42f9-b4ca-93a6f75817d4"
@@ -2631,12 +2631,12 @@ test_UserGroupExclusionTooFewUserExempts_Incorrect_V2 if {
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.2.3v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.ENTRAID.2.3v1", Output, ReportDetailStr, false) == true
 }
 
 # Other Conditions
 test_Conditions_Correct if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -2672,7 +2672,7 @@ test_Conditions_Correct if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ]
@@ -2683,11 +2683,11 @@ test_Conditions_Correct if {
         "<br/>Test name. <a href='#caps'>View all CA policies</a>."
     ])
 
-    TestResult("MS.AAD.2.3v1", Output, ReportDetailStr, true) == true
+    TestResult("MS.ENTRAID.2.3v1", Output, ReportDetailStr, true) == true
 }
 
 test_IncludeApplications_Incorrect_V2 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -2723,7 +2723,7 @@ test_IncludeApplications_Incorrect_V2 if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ]
@@ -2731,11 +2731,11 @@ test_IncludeApplications_Incorrect_V2 if {
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.2.3v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.ENTRAID.2.3v1", Output, ReportDetailStr, false) == true
 }
 
 test_IncludeUsers_Incorrect_V2 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -2771,7 +2771,7 @@ test_IncludeUsers_Incorrect_V2 if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ]
@@ -2779,11 +2779,11 @@ test_IncludeUsers_Incorrect_V2 if {
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.2.3v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.ENTRAID.2.3v1", Output, ReportDetailStr, false) == true
 }
 
 test_ExcludeUsers_Incorrect_V2 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -2821,7 +2821,7 @@ test_ExcludeUsers_Incorrect_V2 if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ]
@@ -2829,11 +2829,11 @@ test_ExcludeUsers_Incorrect_V2 if {
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.2.3v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.ENTRAID.2.3v1", Output, ReportDetailStr, false) == true
 }
 
 test_ExcludeGroups_Incorrect_V2 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -2871,7 +2871,7 @@ test_ExcludeGroups_Incorrect_V2 if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ]
@@ -2879,11 +2879,11 @@ test_ExcludeGroups_Incorrect_V2 if {
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.2.3v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.ENTRAID.2.3v1", Output, ReportDetailStr, false) == true
 }
 
 test_ExcludeRoles_Incorrect_V2 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -2921,7 +2921,7 @@ test_ExcludeRoles_Incorrect_V2 if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ]
@@ -2929,11 +2929,11 @@ test_ExcludeRoles_Incorrect_V2 if {
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.2.3v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.ENTRAID.2.3v1", Output, ReportDetailStr, false) == true
 }
 
 test_SignInRiskLevels_Incorrect if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -2969,7 +2969,7 @@ test_SignInRiskLevels_Incorrect if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ]
@@ -2977,11 +2977,11 @@ test_SignInRiskLevels_Incorrect if {
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.2.3v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.ENTRAID.2.3v1", Output, ReportDetailStr, false) == true
 }
 
 test_BuiltInControls_Incorrect_V2 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -3017,7 +3017,7 @@ test_BuiltInControls_Incorrect_V2 if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ]
@@ -3025,11 +3025,11 @@ test_BuiltInControls_Incorrect_V2 if {
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.2.3v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.ENTRAID.2.3v1", Output, ReportDetailStr, false) == true
 }
 
 test_State_Incorrect_V2 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "conditional_access_policies": [
             {
                 "Conditions": {
@@ -3065,7 +3065,7 @@ test_State_Incorrect_V2 if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ]
@@ -3073,6 +3073,6 @@ test_State_Incorrect_V2 if {
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.2.3v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.ENTRAID.2.3v1", Output, ReportDetailStr, false) == true
 }
 #--

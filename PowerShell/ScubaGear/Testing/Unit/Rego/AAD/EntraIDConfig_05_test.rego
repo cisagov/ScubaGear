@@ -1,16 +1,16 @@
-package aad_test
+package entraid_test
 import future.keywords
-import data.aad
+import data.entraid
 import data.utils.key.TestResult
 import data.utils.key.FAIL
 import data.utils.key.PASS
 
 
 #
-# Policy MS.AAD.5.1v1
+# Policy MS.ENTRAID.5.1v1
 #--
 test_AllowedToCreateApps_Correct if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "authorization_policies": [
             {
                 "DefaultUserRolePermissions": {
@@ -22,11 +22,11 @@ test_AllowedToCreateApps_Correct if {
     }
 
     ReportDetailStr := "0 authorization policies found that allow non-admin users to register third-party applications"
-    TestResult("MS.AAD.5.1v1", Output, ReportDetailStr, true) == true
+    TestResult("MS.ENTRAID.5.1v1", Output, ReportDetailStr, true) == true
 }
 
 test_AllowedToCreateApps_Incorrect_V1 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "authorization_policies": [
             {
                 "DefaultUserRolePermissions": {
@@ -42,11 +42,11 @@ test_AllowedToCreateApps_Incorrect_V1 if {
         "<br/>Bad policy"
     ])
 
-    TestResult("MS.AAD.5.1v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.ENTRAID.5.1v1", Output, ReportDetailStr, false) == true
 }
 
 test_AllowedToCreateApps_Incorrect_V2 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "authorization_policies": [
             {
                 "DefaultUserRolePermissions": {
@@ -68,15 +68,15 @@ test_AllowedToCreateApps_Incorrect_V2 if {
         "<br/>Bad policy"
     ])
 
-    TestResult("MS.AAD.5.1v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.ENTRAID.5.1v1", Output, ReportDetailStr, false) == true
 }
 #--
 
 #
-# Policy MS.AAD.5.2v1
+# Policy MS.ENTRAID.5.2v1
 #--
 test_PermissionGrantPolicyIdsAssignedToDefaultUserRole_Correct if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "authorization_policies": [
             {
                 "PermissionGrantPolicyIdsAssignedToDefaultUserRole": [],
@@ -87,11 +87,11 @@ test_PermissionGrantPolicyIdsAssignedToDefaultUserRole_Correct if {
 
     ReportDetailStr :=
         "0 authorization policies found that allow non-admin users to consent to third-party applications"
-    TestResult("MS.AAD.5.2v1", Output, ReportDetailStr, true) == true
+    TestResult("MS.ENTRAID.5.2v1", Output, ReportDetailStr, true) == true
 }
 
 test_PermissionGrantPolicyIdsAssignedToDefaultUserRole_Incorrect_V1 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "authorization_policies": [
             {
                 "PermissionGrantPolicyIdsAssignedToDefaultUserRole": [
@@ -107,11 +107,11 @@ test_PermissionGrantPolicyIdsAssignedToDefaultUserRole_Incorrect_V1 if {
         "<br/>authorizationPolicy"
     ])
 
-    TestResult("MS.AAD.5.2v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.ENTRAID.5.2v1", Output, ReportDetailStr, false) == true
 }
 
 test_PermissionGrantPolicyIdsAssignedToDefaultUserRole_Incorrect_V2 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "authorization_policies": [
             {
                 "PermissionGrantPolicyIdsAssignedToDefaultUserRole": [],
@@ -131,15 +131,15 @@ test_PermissionGrantPolicyIdsAssignedToDefaultUserRole_Incorrect_V2 if {
         "<br/>Bad policy"
     ])
 
-    TestResult("MS.AAD.5.2v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.ENTRAID.5.2v1", Output, ReportDetailStr, false) == true
 }
 #--
 
 #
-# Policy MS.AAD.5.3v1
+# Policy MS.ENTRAID.5.3v1
 #--
 test_IsEnabled_Correct if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "directory_settings": [
             {
                 "DisplayName": "Setting display name",
@@ -153,11 +153,11 @@ test_IsEnabled_Correct if {
         ]
     }
 
-    TestResult("MS.AAD.5.3v1", Output, PASS, true) == true
+    TestResult("MS.ENTRAID.5.3v1", Output, PASS, true) == true
 }
 
 test_IsEnabled_Incorrect_Missing if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "directory_settings": [
             {
                 "DisplayName": "Setting display name",
@@ -171,11 +171,11 @@ test_IsEnabled_Incorrect_Missing if {
         ]
     }
 
-    TestResult("MS.AAD.5.3v1", Output, FAIL, false) == true
+    TestResult("MS.ENTRAID.5.3v1", Output, FAIL, false) == true
 }
 
 test_IsEnabled_Incorrect if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "directory_settings": [
             {
                 "DisplayName": "Setting display name",
@@ -189,15 +189,15 @@ test_IsEnabled_Incorrect if {
         ]
     }
 
-    TestResult("MS.AAD.5.3v1", Output, FAIL, false) == true
+    TestResult("MS.ENTRAID.5.3v1", Output, FAIL, false) == true
 }
 #--
 
 #
-# Policy MS.AAD.5.4v1
+# Policy MS.ENTRAID.5.4v1
 #--
 test_Value_Correct_Lowercase if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "directory_settings": [
             {
                 "DisplayName": "Setting display name",
@@ -211,11 +211,11 @@ test_Value_Correct_Lowercase if {
         ]
     }
 
-    TestResult("MS.AAD.5.4v1", Output, PASS, true) == true
+    TestResult("MS.ENTRAID.5.4v1", Output, PASS, true) == true
 }
 
 test_Value_Correct_Uppercase if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "directory_settings": [
             {
                 "DisplayName": "Setting display name",
@@ -229,11 +229,11 @@ test_Value_Correct_Uppercase if {
         ]
     }
 
-    TestResult("MS.AAD.5.4v1", Output, PASS, true) == true
+    TestResult("MS.ENTRAID.5.4v1", Output, PASS, true) == true
 }
 
 test_Value_Incorrect_Lowercase if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "directory_settings": [
             {
                 "DisplayName": "Setting display name",
@@ -247,11 +247,11 @@ test_Value_Incorrect_Lowercase if {
         ]
     }
 
-    TestResult("MS.AAD.5.4v1", Output, FAIL, false) == true
+    TestResult("MS.ENTRAID.5.4v1", Output, FAIL, false) == true
 }
 
 test_Value_Incorrect_Uppercase if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "directory_settings": [
             {
                 "DisplayName": "Setting display name",
@@ -265,6 +265,6 @@ test_Value_Incorrect_Uppercase if {
         ]
     }
 
-    TestResult("MS.AAD.5.4v1", Output, FAIL, false) == true
+    TestResult("MS.ENTRAID.5.4v1", Output, FAIL, false) == true
 }
 #--

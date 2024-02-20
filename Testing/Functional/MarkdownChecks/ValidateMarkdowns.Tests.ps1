@@ -4,7 +4,7 @@ Import-Module $CreateReportModulePath -Force
 InModuleScope CreateReport {
 
     Describe -tag "Markdown" -name 'Check Secure Baseline Markdown document exists for <Product>' -ForEach @(
-        @{Product = "aad"; MarkdownFilePath = "baselines/aad.md"}
+        @{Product = "entraid"; MarkdownFilePath = "baselines/entraid.md"}
         @{Product = "defender"; MarkdownFilePath = "baselines/defender.md"}
         @{Product = "exo"; MarkdownFilePath = "baselines/exo.md"}
         @{Product = "powerbi"; MarkdownFilePath = "baselines/powerbi.md"}
@@ -21,7 +21,7 @@ InModuleScope CreateReport {
         }
     }
     Describe -tag "Markdown" -name 'Import secure baseline <Product>' -ForEach @(
-        @{Product = "aad"; GroupCount = 8; PolicyCount = 30}
+        @{Product = "entraid"; GroupCount = 8; PolicyCount = 30}
         @{Product = "defender"; GroupCount = 6; PolicyCount = 20}
         @{Product = "exo"; GroupCount = 17; PolicyCount = 37}
         @{Product = "powerbi"; GroupCount = 7; PolicyCount = 8}

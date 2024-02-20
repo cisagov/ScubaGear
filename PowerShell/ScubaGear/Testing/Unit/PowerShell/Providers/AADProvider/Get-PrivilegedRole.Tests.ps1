@@ -1,14 +1,14 @@
 $ProviderPath = '../../../../../Modules/Providers'
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "$($ProviderPath)/ExportAADProvider.psm1") -Function 'Get-PrivilegedRole' -Force
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "$($ProviderPath)/ExportENTRAIDProvider.psm1") -Function 'Get-PrivilegedRole' -Force
 
-InModuleScope ExportAADProvider {
+InModuleScope ExportENTRAIDProvider {
     BeforeAll {
-        Mock -ModuleName ExportAADProvider Get-MgBetaDirectoryRoleTemplate -MockWith {}
-        Mock -ModuleName ExportAADProvider Get-MgBetaPolicyRoleManagementPolicyAssignment -MockWith {}
-        Mock -ModuleName ExportAADProvider Get-MgBetaRoleManagementDirectoryRoleAssignmentScheduleInstance -MockWith {}
-        Mock -ModuleName ExportAADProvider Get-MgBetaPolicyRoleManagementPolicyRule -MockWith {}
+        Mock -ModuleName ExportENTRAIDProvider Get-MgBetaDirectoryRoleTemplate -MockWith {}
+        Mock -ModuleName ExportENTRAIDProvider Get-MgBetaPolicyRoleManagementPolicyAssignment -MockWith {}
+        Mock -ModuleName ExportENTRAIDProvider Get-MgBetaRoleManagementDirectoryRoleAssignmentScheduleInstance -MockWith {}
+        Mock -ModuleName ExportENTRAIDProvider Get-MgBetaPolicyRoleManagementPolicyRule -MockWith {}
     }
-    Describe -Tag 'AADProvider' -Name "Get-PrivilegedRole" {
+    Describe -Tag 'ENTRAIDProvider' -Name "Get-PrivilegedRole" {
         It "With no premimum license, returns a not null PowerShell object" {
             {Get-PrivilegedRole} | Should -Not -BeNullOrEmpty
         }
@@ -19,5 +19,5 @@ InModuleScope ExportAADProvider {
 }
 
 AfterAll {
-    Remove-Module ExportAADProvider -Force -ErrorAction SilentlyContinue
+    Remove-Module ExportENTRAIDProvider -Force -ErrorAction SilentlyContinue
 }

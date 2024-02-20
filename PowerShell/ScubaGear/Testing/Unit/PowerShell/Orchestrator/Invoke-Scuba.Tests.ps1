@@ -40,9 +40,9 @@ InModuleScope Orchestrator {
                 {Invoke-Scuba} | Should -Not -Throw
                 Should -Invoke -CommandName Invoke-ReportCreation -Exactly -Times 1 -ParameterFilter {$Quiet -eq $false}
             }
-            It 'Given -ProductNames aad should not throw' {
+            It 'Given -ProductNames entraid should not throw' {
                 $SplatParams += @{
-                    ProductNames = @("aad")
+                    ProductNames = @("entraid")
                 }
                 {Invoke-Scuba @SplatParams} | Should -Not -Throw
             }

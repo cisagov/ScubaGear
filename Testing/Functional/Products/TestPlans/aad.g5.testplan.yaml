@@ -1,13 +1,13 @@
-ProductName: aad
+ProductName: entraid
 TestPlan:
-  - PolicyId: MS.AAD.2.1v1
+  - PolicyId: MS.ENTRAID.2.1v1
     TestDriver: RunCached
     Tests:
-      - TestDescription: MS.AAD.2.1v1 Non-Compliant case - low risk users are blocked
+      - TestDescription: MS.ENTRAID.2.1v1 Non-Compliant case - low risk users are blocked
         Preconditions:
           - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
-              displayName: MS.AAD.2.1v1 Users detected as high risk SHALL be blocked
+              displayName: MS.ENTRAID.2.1v1 Users detected as high risk SHALL be blocked
               updates:
                 State: enabled
                 Conditions:
@@ -27,11 +27,11 @@ TestPlan:
                     - block
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.AAD.2.1v1 Compliant case - high risk users are blocked
+      - TestDescription: MS.ENTRAID.2.1v1 Compliant case - high risk users are blocked
         Preconditions:
           - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
-              displayName: MS.AAD.2.1v1 Users detected as high risk SHALL be blocked
+              displayName: MS.ENTRAID.2.1v1 Users detected as high risk SHALL be blocked
               updates:
                 State: enabled
                 Conditions:
@@ -52,14 +52,14 @@ TestPlan:
         Postconditions: []
         ExpectedResult: true
 
-  - PolicyId: MS.AAD.2.3v1
+  - PolicyId: MS.ENTRAID.2.3v1
     TestDriver: RunCached
     Tests:
-      - TestDescription: MS.AAD.2.3v1 Non-Compliant case - low risk sign ins are blocked
+      - TestDescription: MS.ENTRAID.2.3v1 Non-Compliant case - low risk sign ins are blocked
         Preconditions:
           - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
-              displayName: MS.AAD.2.3v1 Sign-ins detected as high risk SHALL be blocked
+              displayName: MS.ENTRAID.2.3v1 Sign-ins detected as high risk SHALL be blocked
               updates:
                 State: enabled
                 Conditions:
@@ -79,11 +79,11 @@ TestPlan:
                     - block
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.AAD.2.3v1 Compliant case - high risk sign ins are blocked
+      - TestDescription: MS.ENTRAID.2.3v1 Compliant case - high risk sign ins are blocked
         Preconditions:
           - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
-              displayName: MS.AAD.2.3v1 Sign-ins detected as high risk SHALL be blocked
+              displayName: MS.ENTRAID.2.3v1 Sign-ins detected as high risk SHALL be blocked
               updates:
                 State: enabled
                 Conditions:
@@ -104,10 +104,10 @@ TestPlan:
         Postconditions: []
         ExpectedResult: true
 
-  - PolicyId: MS.AAD.7.4v1
+  - PolicyId: MS.ENTRAID.7.4v1
     TestDriver: RunCached
     Tests:
-      - TestDescription: MS.AAD.7.4v1 Non-Compliant case - User with permanent active assignment
+      - TestDescription: MS.ENTRAID.7.4v1 Non-Compliant case - User with permanent active assignment
         #### This test case guarantees that at least one privileged role assignment has an EndDateTime of null
         Preconditions:
           - Command: UpdateProviderExport
@@ -116,7 +116,7 @@ TestPlan:
                 privileged_roles[0].Assignments[0].EndDateTime: null
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.AAD.7.4v1 Compliant case - No users with permanent assignment
+      - TestDescription: MS.ENTRAID.7.4v1 Compliant case - No users with permanent assignment
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
@@ -135,10 +135,10 @@ TestPlan:
         Postconditions: []
         ExpectedResult: true
 
-  - PolicyId: MS.AAD.7.5v1
+  - PolicyId: MS.ENTRAID.7.5v1
     TestDriver: RunCached
     Tests:
-      - TestDescription: MS.AAD.7.5v1 Non-Compliant case - User assigned outside of PIM
+      - TestDescription: MS.ENTRAID.7.5v1 Non-Compliant case - User assigned outside of PIM
         #### This test case guarantees that at least one privileged role assignment has an StartDateTime of null
         Preconditions:
           - Command: UpdateProviderExport
@@ -147,7 +147,7 @@ TestPlan:
                 privileged_roles[0].Assignments[0].StartDateTime: null
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.AAD.7.5v1 Compliant case - No users assigned outside of PIM
+      - TestDescription: MS.ENTRAID.7.5v1 Compliant case - No users assigned outside of PIM
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
@@ -168,10 +168,10 @@ TestPlan:
         Postconditions: []
         ExpectedResult: true
 
-  - PolicyId: MS.AAD.7.6v1
+  - PolicyId: MS.ENTRAID.7.6v1
     TestDriver: RunCached
     Tests:
-      - TestDescription: MS.AAD.7.6v1 Non-Compliant case - Global admin activation does not require approval
+      - TestDescription: MS.ENTRAID.7.6v1 Non-Compliant case - Global admin activation does not require approval
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
@@ -193,7 +193,7 @@ TestPlan:
                             isApprovalRequired: true
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.AAD.7.6v1 Compliant case - Global admin activation requires approval
+      - TestDescription: MS.ENTRAID.7.6v1 Compliant case - Global admin activation requires approval
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
@@ -216,10 +216,10 @@ TestPlan:
         Postconditions: []
         ExpectedResult: true
 
-  - PolicyId: MS.AAD.7.7v1
+  - PolicyId: MS.ENTRAID.7.7v1
     TestDriver: RunCached
     Tests:
-      - TestDescription: MS.AAD.7.7v1 Compliant case - Some roles with Eligible and Active assignments do NOT trigger an alert
+      - TestDescription: MS.ENTRAID.7.7v1 Compliant case - Some roles with Eligible and Active assignments do NOT trigger an alert
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
@@ -264,7 +264,7 @@ TestPlan:
                           notificationRecipients: ["test@example.org"]
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.AAD.7.7v1 Compliant case - Eligible and Active assignments trigger an alert
+      - TestDescription: MS.ENTRAID.7.7v1 Compliant case - Eligible and Active assignments trigger an alert
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
@@ -297,10 +297,10 @@ TestPlan:
         Postconditions: []
         ExpectedResult: true
 
-  - PolicyId: MS.AAD.7.8v1
+  - PolicyId: MS.ENTRAID.7.8v1
     TestDriver: RunCached
     Tests:
-      - TestDescription: MS.AAD.7.8v1 Non-Compliant case - activation of Global Administrator does NOT triggers an alert
+      - TestDescription: MS.ENTRAID.7.8v1 Non-Compliant case - activation of Global Administrator does NOT triggers an alert
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
@@ -323,7 +323,7 @@ TestPlan:
                             ["test@example.com", "jack@beanstalk.com"]
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.AAD.7.8v1 Compliant case - activation of Global Administrator triggers an alert
+      - TestDescription: MS.ENTRAID.7.8v1 Compliant case - activation of Global Administrator triggers an alert
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
@@ -347,10 +347,10 @@ TestPlan:
         Postconditions: []
         ExpectedResult: true
 
-  - PolicyId: MS.AAD.7.9v1
+  - PolicyId: MS.ENTRAID.7.9v1
     TestDriver: RunCached
     Tests:
-      - TestDescription: MS.AAD.7.9v1 Non-Compliant case - activation of other highly privileged roles do NOT trigger an alert
+      - TestDescription: MS.ENTRAID.7.9v1 Non-Compliant case - activation of other highly privileged roles do NOT trigger an alert
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
@@ -388,7 +388,7 @@ TestPlan:
                           notificationRecipients: []
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.AAD.7.9v1 Compliant case - activation of other highly privileged roles trigger an alert
+      - TestDescription: MS.ENTRAID.7.9v1 Compliant case - activation of other highly privileged roles trigger an alert
         Preconditions:
           - Command: UpdateProviderExport
             Splat:

@@ -8,9 +8,9 @@ function Invoke-SCuBA {
     This is the main function that runs the Providers, Rego, and Report creation all in one PowerShell script call.
     .Parameter ProductNames
     A list of one or more M365 shortened product names that the tool will assess when it is executed. Acceptable product name values are listed below.
-    To assess Azure Active Directory you would enter the value aad.
+    To assess Microsft Entra ID you would enter the value entraid.
     To assess Exchange Online you would enter exo and so forth.
-    - Azure Active Directory: aad
+    - Microsft Entra ID: entraid
     - Defender for Office 365: defender
     - Exchange Online: exo
     - MS Power Platform: powerplatform
@@ -81,7 +81,7 @@ function Invoke-SCuBA {
     .Example
     Invoke-SCuBA
     Run an assessment against by default a commercial M365 Tenant against the
-    Azure Active Directory, Exchange Online, Microsoft Defender, One Drive, SharePoint Online, and Microsoft Teams
+    Microsft Entra ID, Exchange Online, Microsoft Defender, One Drive, SharePoint Online, and Microsoft Teams
     security baselines. The output will stored in the current directory in a folder called M365BaselineConformaance_*.
     .Example
     Invoke-SCuBA -Version
@@ -90,16 +90,16 @@ function Invoke-SCuBA {
     Invoke-SCuBA -ConfigFilePath MyConfig.json
     This example uses the specified configuration file when executing SCuBAGear.
     .Example
-    Invoke-SCuBA -ProductNames aad, defender -OPAPath . -OutPath .
-    The example will run the tool against the Azure Active Directory, and Defender security
+    Invoke-SCuBA -ProductNames entraid, defender -OPAPath . -OutPath .
+    The example will run the tool against the Microsft Entra ID, and Defender security
     baselines.
     .Example
     Invoke-SCuBA -ProductNames * -M365Environment dod -OPAPath . -OutPath .
     This example will run the tool against all available security baselines with the
     'dod' teams endpoint.
     .Example
-    Invoke-SCuBA -ProductNames aad,exo -M365Environment gcc -OPAPath . -OutPath . -DisconnectOnExit
-    Run the tool against Azure Active Directory and Exchange Online security
+    Invoke-SCuBA -ProductNames entraid,exo -M365Environment gcc -OPAPath . -OutPath . -DisconnectOnExit
+    Run the tool against Microsft Entra ID and Exchange Online security
     baselines, disconnecting connections for those products when complete.
     .Example
     Invoke-SCuBA -ProductNames * -CertificateThumbprint <insert-thumbprint> -AppID <insert-appid> -Organization "tenant.onmicrosoft.com"
@@ -112,9 +112,9 @@ function Invoke-SCuBA {
         [Parameter(Mandatory = $false, ParameterSetName = 'Configuration')]
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "defender", "entraid", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
         [string[]]
-        $ProductNames = @("aad", "defender", "exo", "sharepoint", "teams"),
+        $ProductNames = @("entraid", "defender", "exo", "sharepoint", "teams"),
 
         [Parameter(Mandatory = $false, ParameterSetName = 'Configuration')]
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
@@ -232,7 +232,7 @@ function Invoke-SCuBA {
 
         # Transform ProductNames into list of all products if it contains wildcard
         if ($ProductNames.Contains('*')){
-            $ProductNames = $PSBoundParameters['ProductNames'] = "aad", "defender", "exo", "powerplatform", "sharepoint", "teams"
+            $ProductNames = $PSBoundParameters['ProductNames'] = "entraid", "defender", "exo", "powerplatform", "sharepoint", "teams"
             Write-Debug "Setting ProductName to all products because of wildcard"
         }
 
@@ -396,7 +396,7 @@ $ArgToProd = @{
     teams = "Teams";
     exo = "EXO";
     defender = "Defender";
-    aad = "AAD";
+    entraid = "ENTRAID";
     powerplatform = "PowerPlatform";
     sharepoint = "SharePoint";
 }
@@ -405,7 +405,7 @@ $ProdToFullName = @{
     Teams = "Microsoft Teams";
     EXO = "Exchange Online";
     Defender = "Microsoft 365 Defender";
-    AAD = "Azure Active Directory";
+    ENTRAID = "Microsft Entra ID";
     PowerPlatform = "Microsoft Power Platform";
     SharePoint = "SharePoint Online";
 }
@@ -440,7 +440,7 @@ function Invoke-ProviderList {
     param (
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "defender", "entraid", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
         [string[]]
         $ProductNames,
 
@@ -514,8 +514,8 @@ function Invoke-ProviderList {
                 try {
                     $RetVal = ""
                     switch ($Product) {
-                        "aad" {
-                            $RetVal = Export-AADProvider | Select-Object -Last 1
+                        "entraid" {
+                            $RetVal = Export-ENTRAIDProvider | Select-Object -Last 1
                         }
                         "exo" {
                             $RetVal = Export-EXOProvider | Select-Object -Last 1
@@ -606,7 +606,7 @@ function Invoke-RunRego {
     param(
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "defender", "entraid", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
         [string[]]
         $ProductNames,
 
@@ -749,7 +749,7 @@ function Invoke-ReportCreation {
     param(
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "defender", "entraid", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
         [string[]]
         $ProductNames,
 
@@ -931,7 +931,7 @@ function Get-TenantDetail {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory=$true)]
-        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "defender", "entraid", "powerplatform", "sharepoint", IgnoreCase = $false)]
         [ValidateNotNullOrEmpty()]
         [string[]]
         $ProductNames,
@@ -944,11 +944,11 @@ function Get-TenantDetail {
     )
 
     # organized by best tenant details information
-    if ($ProductNames.Contains("aad")) {
-        Get-AADTenantDetail
+    if ($ProductNames.Contains("entraid")) {
+        Get-ENTRAIDTenantDetail
     }
     elseif ($ProductNames.Contains("sharepoint")) {
-        Get-AADTenantDetail
+        Get-ENTRAIDTenantDetail
     }
     elseif ($ProductNames.Contains("teams")) {
         Get-TeamsTenantDetail -M365Environment $M365Environment
@@ -993,7 +993,7 @@ function Invoke-Connection {
 
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "defender", "entraid", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
         [string[]]
         $ProductNames,
 
@@ -1035,13 +1035,13 @@ function Compare-ProductList {
 
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "defender", "entraid", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
         [string[]]
         $ProductNames,
 
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "defender", "entraid", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
         [string[]]
         $ProductsFailed,
 
@@ -1144,7 +1144,7 @@ function Remove-Resources {
     Internal
     #>
     [CmdletBinding()]
-    $Providers = @("ExportPowerPlatform", "ExportEXOProvider", "ExportAADProvider",
+    $Providers = @("ExportPowerPlatform", "ExportEXOProvider", "ExportENTRAIDProvider",
     "ExportDefenderProvider", "ExportTeamsProvider", "ExportSharePointProvider")
     foreach ($Provider in $Providers) {
         Remove-Module $Provider -ErrorAction "SilentlyContinue"
@@ -1173,9 +1173,9 @@ function Invoke-RunCached {
     instead look in OutPath and run just the Rego verification and Report creation.
     .Parameter ProductNames
     A list of one or more M365 shortened product names that the tool will assess when it is executed. Acceptable product name values are listed below.
-    To assess Azure Active Directory you would enter the value aad.
+    To assess Microsft Entra ID you would enter the value entraid.
     To assess Exchange Online you would enter exo and so forth.
-    - Azure Active Directory: aad
+    - Microsft Entra ID: entraid
     - Defender for Office 365: defender
     - Exchange Online: exo
     - MS Power Platform: powerplatform
@@ -1234,14 +1234,14 @@ function Invoke-RunCached {
     .Example
     Invoke-RunCached
     Run an assessment against by default a commercial M365 Tenant against the
-    Azure Active Directory, Exchange Online, Microsoft Defender, One Drive, SharePoint Online, and Microsoft Teams
+    Microsft Entra ID, Exchange Online, Microsoft Defender, One Drive, SharePoint Online, and Microsoft Teams
     security baselines. The output will stored in the current directory in a folder called M365BaselineConformaance_*.
     .Example
     Invoke-RunCached -Version
     This example returns the version of SCuBAGear.
     .Example
-    Invoke-RunCached -ProductNames aad, defender -OPAPath . -OutPath .
-    The example will run the tool against the Azure Active Directory, and Defender security
+    Invoke-RunCached -ProductNames entraid, defender -OPAPath . -OutPath .
+    The example will run the tool against the Microsft Entra ID, and Defender security
     baselines.
     .Example
     Invoke-RunCached -ProductNames * -M365Environment dod -OPAPath . -OutPath .
@@ -1262,7 +1262,7 @@ function Invoke-RunCached {
 
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "defender", "entraid", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
         [string[]]
         $ProductNames = '*',
 
@@ -1345,7 +1345,7 @@ function Invoke-RunCached {
             }
 
             if ($ProductNames -eq '*'){
-                $ProductNames = "teams", "exo", "defender", "aad", "sharepoint", "powerplatform"
+                $ProductNames = "teams", "exo", "defender", "entraid", "sharepoint", "powerplatform"
             }
 
             # Create outpath if $Outpath does not exist

@@ -70,7 +70,7 @@ InModuleScope Orchestrator {
                 SetupMocks
                 Invoke-SCuBA `
                   -M365Environment "gcc" `
-                  -ProductNames "aad" `
+                  -ProductNames "entraid" `
                   -OPAPath $env:TEMP `
                   -LogIn:$false `
                   -OutPath $env:TEMP `
@@ -86,7 +86,7 @@ InModuleScope Orchestrator {
 
             It "Verify parameter ""<parameter>"" with value ""<value>""" -ForEach @(
                 @{ Parameter = "M365Environment";       Value = "gcc"                  },
-                @{ Parameter = "ProductNames";          Value = @("aad")               },
+                @{ Parameter = "ProductNames";          Value = @("entraid")               },
                 @{ Parameter = "OPAPath";               Value = $env:TEMP              },
                 @{ Parameter = "LogIn";                 Value = $false                 },
                 @{ Parameter = "OutPath";               Value = $env:TEMP              },
@@ -111,7 +111,7 @@ InModuleScope Orchestrator {
             }
 
             It "Verify parameter, ProductNames, with wildcard CLI override"{
-                $script:TestSplat['ProductNames'] | Should -BeExactly @('aad', 'defender', 'exo', 'powerplatform', 'sharepoint', 'teams') -Because "got $($script:TestSplat['ProductNames'])"
+                $script:TestSplat['ProductNames'] | Should -BeExactly @('entraid', 'defender', 'exo', 'powerplatform', 'sharepoint', 'teams') -Because "got $($script:TestSplat['ProductNames'])"
             }
         }
 
@@ -123,7 +123,7 @@ InModuleScope Orchestrator {
             }
 
             It "Verify parameter, ProductNames, reflects all products"{
-                $script:TestSplat['ProductNames'] | Should -BeExactly @('aad', 'defender', 'exo', 'powerplatform', 'sharepoint', 'teams') -Because "got $($script:TestSplat['ProductNames'])"
+                $script:TestSplat['ProductNames'] | Should -BeExactly @('entraid', 'defender', 'exo', 'powerplatform', 'sharepoint', 'teams') -Because "got $($script:TestSplat['ProductNames'])"
             }
         }
     }

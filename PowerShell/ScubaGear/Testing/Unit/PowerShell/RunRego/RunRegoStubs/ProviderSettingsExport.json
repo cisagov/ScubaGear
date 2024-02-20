@@ -4,7 +4,7 @@
         "date": "12/09/2022 13:26:11 Eastern Standard Time",
         "tenant_details": [
     {
-        "AADAdditionalData":  {
+        "ENTRAIDAdditionalData":  {
                                   "AssignedPlans":  [
                                                         {
                                                             "AssignedDateTime":  "/Date(1644483560000)/",
@@ -63,7 +63,7 @@
                                                         {
                                                             "AssignedDateTime":  "/Date(1644483552000)/",
                                                             "CapabilityStatus":  "Enabled",
-                                                            "Service":  "AADPremiumService",
+                                                            "Service":  "ENTRAIDPremiumService",
                                                             "ServicePlanId":  "eec0eb4f-6444-4f95-aba0-50c24d67f998"
                                                         },
                                                         {
@@ -249,7 +249,7 @@
                                                         {
                                                             "AssignedDateTime":  "/Date(1644483552000)/",
                                                             "CapabilityStatus":  "Enabled",
-                                                            "Service":  "AADPremiumService",
+                                                            "Service":  "ENTRAIDPremiumService",
                                                             "ServicePlanId":  "41781fb2-bc02-4b7c-bd55-b576c07bb09d"
                                                         },
                                                         {
@@ -682,7 +682,7 @@
                                                           }
                                                       ],
                                   "AdditionalProperties":  {
-                                                               "tenantType":  "AAD"
+                                                               "tenantType":  "ENTRAID"
                                                            }
                               },
         "TenantId":  "1162605a-1ac6-4670-b71f-004228799a80",
@@ -5099,7 +5099,7 @@
         "AppliesTo":  "User",
         "ProvisioningStatus":  "Success",
         "ServicePlanId":  "eec0eb4f-6444-4f95-aba0-50c24d67f998",
-        "ServicePlanName":  "AAD_PREMIUM_P2",
+        "ServicePlanName":  "ENTRAID_PREMIUM_P2",
         "AdditionalProperties":  {
 
                                  }
@@ -5108,7 +5108,7 @@
         "AppliesTo":  "User",
         "ProvisioningStatus":  "Success",
         "ServicePlanId":  "41781fb2-bc02-4b7c-bd55-b576c07bb09d",
-        "ServicePlanName":  "AAD_PREMIUM",
+        "ServicePlanName":  "ENTRAID_PREMIUM",
         "AdditionalProperties":  {
 
                                  }
@@ -7607,7 +7607,7 @@
         "ImmutableId":  "17d51759-88e1-40c1-8df3-20bcf2e43057",
         "Priority":  0,
         "Workload":  "AuditAlerting",
-        "Policy":  "ae6108c1-8814-4a00-bf93-22396aad4bd8",
+        "Policy":  "ae6108c1-8814-4a00-bf93-22396entraid4bd8",
         "Comment":  "This alert is triggered when someone in your organization becomes an Exchange admin or gets new Exchange admin permissions -V1.0.0.1",
         "Disabled":  false,
         "Mode":  "Enforce",

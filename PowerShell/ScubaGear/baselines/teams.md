@@ -31,10 +31,10 @@ the types of users are defined as follows:
 
 3.  **Business to Business (B2B) guest users**: External users who are
     formally invited to collaborate with the team and added to the
-    agency's Azure Active Directory (Azure AD) as guest users. These users
+    agency's Microsft Entra ID (Entra ID) as guest users. These users
     authenticate with their home organization/tenant and are granted
     access to the team by virtue of being listed as guest users on the
-    tenant's Azure AD.
+    tenant's Entra ID.
 
 4.  **Unmanaged users**: Users who are not members of any M365 tenant or
     organization (e.g., personal Microsoft accounts).

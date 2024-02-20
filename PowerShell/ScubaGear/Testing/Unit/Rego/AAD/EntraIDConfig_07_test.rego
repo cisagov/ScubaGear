@@ -1,16 +1,16 @@
-package aad_test
+package entraid_test
 import future.keywords
-import data.aad
+import data.entraid
 import data.utils.key.TestResult
 import data.utils.key.FAIL
 import data.utils.key.PASS
 
 
 #
-# Policy MS.AAD.7.1v1
+# Policy MS.ENTRAID.7.1v1
 #--
 test_PrivilegedUsers_Correct if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "privileged_users": {
             "User1": {
                 "DisplayName": "Test Name1",
@@ -29,11 +29,11 @@ test_PrivilegedUsers_Correct if {
     }
 
     ReportDetailString := "2 global admin(s) found:<br/>Test Name1, Test Name2"
-    TestResult("MS.AAD.7.1v1", Output, ReportDetailString, true) == true
+    TestResult("MS.ENTRAID.7.1v1", Output, ReportDetailString, true) == true
 }
 
 test_PrivilegedUsers_Incorrect_V1 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "privileged_users": {
             "User1": {
                 "DisplayName": "Test Name1",
@@ -46,11 +46,11 @@ test_PrivilegedUsers_Incorrect_V1 if {
     }
 
     ReportDetailString := "1 global admin(s) found:<br/>Test Name1"
-    TestResult("MS.AAD.7.1v1", Output, ReportDetailString, false) == true
+    TestResult("MS.ENTRAID.7.1v1", Output, ReportDetailString, false) == true
 }
 
 test_PrivilegedUsers_Incorrect_V2 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "privileged_users": {
             "User1": {
                 "DisplayName": "Test Name1",
@@ -115,16 +115,16 @@ test_PrivilegedUsers_Incorrect_V2 if {
         "Test Name4, Test Name5, Test Name6, Test Name7, Test Name8, Test Name9"
     ])
 
-    TestResult("MS.AAD.7.1v1", Output, ReportDetailString, false) == true
+    TestResult("MS.ENTRAID.7.1v1", Output, ReportDetailString, false) == true
 }
 #--
 
 #--
-# Policy MS.AAD.7.2v1
+# Policy MS.ENTRAID.7.2v1
 #--
 # Correct because the ratio of global admins to non global admins is less than 1
 test_SecureScore_Correct_V1 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "privileged_users": {
             "User1": {
                 "DisplayName": "Test Name1",
@@ -163,12 +163,12 @@ test_SecureScore_Correct_V1 if {
 
     ReportDetailStr := "Requirement met: Least Privilege Score = 0.66 (should be 1 or less)"
 
-    TestResult("MS.AAD.7.2v1", Output, ReportDetailStr, true) == true
+    TestResult("MS.ENTRAID.7.2v1", Output, ReportDetailStr, true) == true
 }
 
 # Correct because the ratio of global admins to non global admins is equal to 1
 test_SecureScore_Incorrect_V1 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "privileged_users": {
             "User1": {
                 "DisplayName": "Test Name1",
@@ -201,12 +201,12 @@ test_SecureScore_Incorrect_V1 if {
 
     ReportDetailStr := "Requirement met: Least Privilege Score = 1 (should be 1 or less)"
 
-    TestResult("MS.AAD.7.2v1", Output, ReportDetailStr, true) == true
+    TestResult("MS.ENTRAID.7.2v1", Output, ReportDetailStr, true) == true
 }
 
 # Incorrect because the ratio of global admins to non global admins is more than 1
 test_SecureScore_Incorrect_V2 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "privileged_users": {
             "User1": {
                 "DisplayName": "Test Name1",
@@ -233,12 +233,12 @@ test_SecureScore_Incorrect_V2 if {
 
     ReportDetailStr := "Requirement not met: Least Privilege Score = 2 (should be 1 or less)"
 
-    TestResult("MS.AAD.7.2v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.ENTRAID.7.2v1", Output, ReportDetailStr, false) == true
 }
 
 # Incorrect because the ratio of global admins to non global admins is undefined (all are global admins)
 test_SecureScore_Incorrect_V3 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "privileged_users": {
             "User1": {
                 "DisplayName": "Test Name1",
@@ -266,12 +266,12 @@ test_SecureScore_Incorrect_V3 if {
 
     ReportDetailStr := "Requirement not met: All privileged users are Global Admin"
 
-    TestResult("MS.AAD.7.2v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.ENTRAID.7.2v1", Output, ReportDetailStr, false) == true
 }
 
 # Incorrect because the total number of global admins is greater than eight
 test_SecureScore_Incorrect_V4 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "privileged_users": {
             "User1": {
                 "DisplayName": "Test Name1",
@@ -332,16 +332,16 @@ test_SecureScore_Incorrect_V4 if {
         }
     }
 
-    ReportDetailStr := "Requirement not met: Policy MS.AAD.7.1 failed so score not computed"
+    ReportDetailStr := "Requirement not met: Policy MS.ENTRAID.7.1 failed so score not computed"
 
-    TestResult("MS.AAD.7.2v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.ENTRAID.7.2v1", Output, ReportDetailStr, false) == true
 }
 
 #--
-# Policy MS.AAD.7.3v1
+# Policy MS.ENTRAID.7.3v1
 #--
 test_OnPremisesImmutableId_Correct if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "privileged_users": {
             "User1": {
                 "DisplayName": "Alice",
@@ -362,11 +362,11 @@ test_OnPremisesImmutableId_Correct if {
     }
 
     ReportDetailString := "0 admin(s) that are not cloud-only found"
-    TestResult("MS.AAD.7.3v1", Output, ReportDetailString, true) == true
+    TestResult("MS.ENTRAID.7.3v1", Output, ReportDetailString, true) == true
 }
 
 test_OnPremisesImmutableId_Incorrect_V1 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "privileged_users": {
             "User1": {
                 "DisplayName": "Alice",
@@ -380,11 +380,11 @@ test_OnPremisesImmutableId_Incorrect_V1 if {
     }
 
     ReportDetailString := "1 admin(s) that are not cloud-only found:<br/>Alice"
-    TestResult("MS.AAD.7.3v1", Output, ReportDetailString, false) == true
+    TestResult("MS.ENTRAID.7.3v1", Output, ReportDetailString, false) == true
 }
 
 test_OnPremisesImmutableId_Incorrect_V2 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "privileged_users": {
             "User1": {
                 "DisplayName": "Alice",
@@ -405,14 +405,14 @@ test_OnPremisesImmutableId_Incorrect_V2 if {
     }
 
     ReportDetailString := "1 admin(s) that are not cloud-only found:<br/>Alice"
-    TestResult("MS.AAD.7.3v1", Output, ReportDetailString, false) == true
+    TestResult("MS.ENTRAID.7.3v1", Output, ReportDetailString, false) == true
 }
 #--
 
-# Policy MS.AAD.7.4v1
+# Policy MS.ENTRAID.7.4v1
 #--
 test_AdditionalProperties_Correct_V1 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "privileged_roles": [
             {
                 "DisplayName": "Global Administrator",
@@ -430,18 +430,18 @@ test_AdditionalProperties_Correct_V1 if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ]
     }
 
     ReportDetailString := "0 role(s) that contain users with permanent active assignment"
-    TestResult("MS.AAD.7.4v1", Output, ReportDetailString, true) == true
+    TestResult("MS.ENTRAID.7.4v1", Output, ReportDetailString, true) == true
 }
 
 test_AdditionalProperties_Correct_V2 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "privileged_roles": [
             {
                 "DisplayName": "Global Administrator",
@@ -459,13 +459,13 @@ test_AdditionalProperties_Correct_V2 if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ],
         "scuba_config": {
             "Aad": {
-                "MS.AAD.7.4v1": {
+                "MS.ENTRAID.7.4v1": {
                     "RoleExclusions": {
                         "Users": [
                             "ae71e61c-f465-4db6-8d26-5f3e52bdd800"
@@ -478,11 +478,11 @@ test_AdditionalProperties_Correct_V2 if {
     }
 
     ReportDetailString := "0 role(s) that contain users with permanent active assignment"
-    TestResult("MS.AAD.7.4v1", Output, ReportDetailString, true) == true
+    TestResult("MS.ENTRAID.7.4v1", Output, ReportDetailString, true) == true
 }
 
 test_AdditionalProperties_Correct_V3 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "privileged_roles": [
             {
                 "DisplayName": "Global Administrator",
@@ -500,13 +500,13 @@ test_AdditionalProperties_Correct_V3 if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ],
         "scuba_config": {
             "Aad": {
-                "MS.AAD.7.4v1": {
+                "MS.ENTRAID.7.4v1": {
                     "RoleExclusions": {
                         "Users": [],
                         "Groups": [
@@ -519,11 +519,11 @@ test_AdditionalProperties_Correct_V3 if {
     }
 
     ReportDetailString := "0 role(s) that contain users with permanent active assignment"
-    TestResult("MS.AAD.7.4v1", Output, ReportDetailString, true) == true
+    TestResult("MS.ENTRAID.7.4v1", Output, ReportDetailString, true) == true
 }
 
 test_AdditionalProperties_LicenseMissing_V1 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "privileged_roles": [
             {
                 "DisplayName": "Global Administrator",
@@ -546,7 +546,7 @@ test_AdditionalProperties_LicenseMissing_V1 if {
         ],
         "scuba_config": {
             "Aad": {
-                "MS.AAD.7.4v1": {
+                "MS.ENTRAID.7.4v1": {
                     "RoleExclusions": {
                         "Users": [],
                         "Groups": [
@@ -560,11 +560,11 @@ test_AdditionalProperties_LicenseMissing_V1 if {
 
     ReportDetailString :=
         "**NOTE: Your tenant does not have a Microsoft Entra ID P2 license, which is required for this feature**"
-    TestResult("MS.AAD.7.4v1", Output, ReportDetailString, false) == true
+    TestResult("MS.ENTRAID.7.4v1", Output, ReportDetailString, false) == true
 }
 
 test_AdditionalProperties_Incorrect_V1 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "privileged_roles": [
             {
                 "DisplayName": "Global Administrator",
@@ -582,18 +582,18 @@ test_AdditionalProperties_Incorrect_V1 if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ]
     }
 
     ReportDetailString := "1 role(s) that contain users with permanent active assignment:<br/>Global Administrator"
-    TestResult("MS.AAD.7.4v1", Output, ReportDetailString, false) == true
+    TestResult("MS.ENTRAID.7.4v1", Output, ReportDetailString, false) == true
 }
 
 test_AdditionalProperties_Incorrect_V2 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "privileged_roles": [
             {
                 "DisplayName": "Global Administrator",
@@ -620,18 +620,18 @@ test_AdditionalProperties_Incorrect_V2 if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ]
     }
 
     ReportDetailString := "1 role(s) that contain users with permanent active assignment:<br/>Global Administrator"
-    TestResult("MS.AAD.7.4v1", Output, ReportDetailString, false) == true
+    TestResult("MS.ENTRAID.7.4v1", Output, ReportDetailString, false) == true
 }
 
 test_AdditionalProperties_Incorrect_V3 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "privileged_roles": [
             {
                 "DisplayName": "Global Administrator",
@@ -658,7 +658,7 @@ test_AdditionalProperties_Incorrect_V3 if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ]
@@ -669,11 +669,11 @@ test_AdditionalProperties_Incorrect_V3 if {
         "<br/>Application Administrator, Global Administrator"
     ])
 
-    TestResult("MS.AAD.7.4v1", Output, ReportDetailString, false) == true
+    TestResult("MS.ENTRAID.7.4v1", Output, ReportDetailString, false) == true
 }
 
 test_AdditionalProperties_Incorrect_V4 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "privileged_roles": [
             {
                 "DisplayName": "Global Administrator",
@@ -704,7 +704,7 @@ test_AdditionalProperties_Incorrect_V4 if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ]
@@ -715,11 +715,11 @@ test_AdditionalProperties_Incorrect_V4 if {
         "<br/>Application Administrator, Global Administrator"
     ])
 
-    TestResult("MS.AAD.7.4v1", Output, ReportDetailString, false) == true
+    TestResult("MS.ENTRAID.7.4v1", Output, ReportDetailString, false) == true
 }
 
 test_AdditionalProperties_Incorrect_V5 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "privileged_roles": [
             {
                 "DisplayName": "Global Administrator",
@@ -737,13 +737,13 @@ test_AdditionalProperties_Incorrect_V5 if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ],
         "scuba_config": {
             "Aad": {
-                "MS.AAD.7.4v1": {
+                "MS.ENTRAID.7.4v1": {
                     "RoleExclusions": {
                         "Users": [
                             "7b36d094-0211-400b-aabd-3793e9a30fc6"
@@ -756,11 +756,11 @@ test_AdditionalProperties_Incorrect_V5 if {
     }
 
     ReportDetailString := "1 role(s) that contain users with permanent active assignment:<br/>Global Administrator"
-    TestResult("MS.AAD.7.4v1", Output, ReportDetailString, false) == true
+    TestResult("MS.ENTRAID.7.4v1", Output, ReportDetailString, false) == true
 }
 
 test_AdditionalProperties_Incorrect_V6 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "privileged_roles": [
             {
                 "DisplayName": "Global Administrator",
@@ -787,13 +787,13 @@ test_AdditionalProperties_Incorrect_V6 if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ],
         "scuba_config": {
             "Aad": {
-                "MS.AAD.7.4v1": {
+                "MS.ENTRAID.7.4v1": {
                     "RoleExclusions": {
                         "Users": [
                             "7b36d094-0211-400b-aabd-3793e9a30fc6"
@@ -806,11 +806,11 @@ test_AdditionalProperties_Incorrect_V6 if {
     }
 
     ReportDetailString := "1 role(s) that contain users with permanent active assignment:<br/>Global Administrator"
-    TestResult("MS.AAD.7.4v1", Output, ReportDetailString, false) == true
+    TestResult("MS.ENTRAID.7.4v1", Output, ReportDetailString, false) == true
 }
 
 test_AdditionalProperties_Incorrect_V7 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "privileged_roles": [
             {
                 "DisplayName": "Global Administrator",
@@ -837,13 +837,13 @@ test_AdditionalProperties_Incorrect_V7 if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ],
         "scuba_config": {
             "Aad": {
-                "MS.AAD.7.4v1": {
+                "MS.ENTRAID.7.4v1": {
                     "RoleExclusions": {
                         "Users": [
                             "7b36d094-0211-400b-aabd-3793e9a30fc6"
@@ -860,11 +860,11 @@ test_AdditionalProperties_Incorrect_V7 if {
         "<br/>Application Administrator, Global Administrator"
     ])
 
-    TestResult("MS.AAD.7.4v1", Output, ReportDetailString, false) == true
+    TestResult("MS.ENTRAID.7.4v1", Output, ReportDetailString, false) == true
 }
 
 test_AdditionalProperties_Incorrect_V8 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "privileged_roles": [
             {
                 "DisplayName": "Global Administrator",
@@ -895,13 +895,13 @@ test_AdditionalProperties_Incorrect_V8 if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ],
         "scuba_config": {
             "Aad": {
-                "MS.AAD.7.4v1": {
+                "MS.ENTRAID.7.4v1": {
                     "RoleExclusions": {
                         "Users": [
                             "7b36d094-0211-400b-aabd-3793e9a30fc6"
@@ -918,11 +918,11 @@ test_AdditionalProperties_Incorrect_V8 if {
         "<br/>Application Administrator, Global Administrator"
     ])
 
-    TestResult("MS.AAD.7.4v1", Output, ReportDetailString, false) == true
+    TestResult("MS.ENTRAID.7.4v1", Output, ReportDetailString, false) == true
 }
 
 test_AdditionalProperties_Incorrect_V9 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "privileged_roles": [
             {
                 "DisplayName": "Global Administrator",
@@ -949,13 +949,13 @@ test_AdditionalProperties_Incorrect_V9 if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ],
         "scuba_config": {
             "Aad": {
-                "MS.AAD.7.4v1": {
+                "MS.ENTRAID.7.4v1": {
                     "RoleExclusions": {
                         "Users": [
                             "e54ac846-1f5a-4afe-aa69-273b42c3b0c1"
@@ -968,11 +968,11 @@ test_AdditionalProperties_Incorrect_V9 if {
     }
 
     ReportDetailString := "1 role(s) that contain users with permanent active assignment:<br/>Global Administrator"
-    TestResult("MS.AAD.7.4v1", Output, ReportDetailString, false) == true
+    TestResult("MS.ENTRAID.7.4v1", Output, ReportDetailString, false) == true
 }
 
 test_AdditionalProperties_Incorrect_V10 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "privileged_roles": [
             {
                 "DisplayName": "Global Administrator",
@@ -990,13 +990,13 @@ test_AdditionalProperties_Incorrect_V10 if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ],
         "scuba_config": {
             "Aad": {
-                "MS.AAD.7.4v1": {
+                "MS.ENTRAID.7.4v1": {
                     "RoleExclusions": {
                         "Users": [],
                         "Groups": [
@@ -1009,11 +1009,11 @@ test_AdditionalProperties_Incorrect_V10 if {
     }
 
     ReportDetailString := "1 role(s) that contain users with permanent active assignment:<br/>Global Administrator"
-    TestResult("MS.AAD.7.4v1", Output, ReportDetailString, false) == true
+    TestResult("MS.ENTRAID.7.4v1", Output, ReportDetailString, false) == true
 }
 
 test_AdditionalProperties_Incorrect_V11 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "privileged_roles": [
             {
                 "DisplayName": "Global Administrator",
@@ -1040,13 +1040,13 @@ test_AdditionalProperties_Incorrect_V11 if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ],
         "scuba_config": {
             "Aad": {
-                "MS.AAD.7.4v1": {
+                "MS.ENTRAID.7.4v1": {
                     "RoleExclusions": {
                         "Users": [],
                         "Groups": [
@@ -1059,11 +1059,11 @@ test_AdditionalProperties_Incorrect_V11 if {
     }
 
     ReportDetailString := "1 role(s) that contain users with permanent active assignment:<br/>Global Administrator"
-    TestResult("MS.AAD.7.4v1", Output, ReportDetailString, false) == true
+    TestResult("MS.ENTRAID.7.4v1", Output, ReportDetailString, false) == true
 }
 
 test_AdditionalProperties_Incorrect_V12 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "privileged_roles": [
             {
                 "DisplayName": "Global Administrator",
@@ -1090,13 +1090,13 @@ test_AdditionalProperties_Incorrect_V12 if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ],
         "scuba_config": {
             "Aad": {
-                "MS.AAD.7.4v1": {
+                "MS.ENTRAID.7.4v1": {
                     "RoleExclusions": {
                         "Users": [],
                         "Groups": [
@@ -1113,11 +1113,11 @@ test_AdditionalProperties_Incorrect_V12 if {
         "<br/>Application Administrator, Global Administrator"
     ])
 
-    TestResult("MS.AAD.7.4v1", Output, ReportDetailString, false) == true
+    TestResult("MS.ENTRAID.7.4v1", Output, ReportDetailString, false) == true
 }
 
 test_AdditionalProperties_Incorrect_V13 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "privileged_roles": [
             {
                 "DisplayName": "Global Administrator",
@@ -1148,13 +1148,13 @@ test_AdditionalProperties_Incorrect_V13 if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ],
         "scuba_config": {
             "Aad": {
-                "MS.AAD.7.4v1": {
+                "MS.ENTRAID.7.4v1": {
                     "RoleExclusions": {
                         "Users": [],
                         "Groups": [
@@ -1171,11 +1171,11 @@ test_AdditionalProperties_Incorrect_V13 if {
         "<br/>Application Administrator, Global Administrator"
     ])
 
-    TestResult("MS.AAD.7.4v1", Output, ReportDetailString, false) == true
+    TestResult("MS.ENTRAID.7.4v1", Output, ReportDetailString, false) == true
 }
 
 test_AdditionalProperties_Incorrect_V14 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "privileged_roles": [
             {
                 "DisplayName": "Global Administrator",
@@ -1202,13 +1202,13 @@ test_AdditionalProperties_Incorrect_V14 if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ],
         "scuba_config": {
             "Aad": {
-                "MS.AAD.7.4v1": {
+                "MS.ENTRAID.7.4v1": {
                     "RoleExclusions": {
                         "Users": [],
                         "Groups": [
@@ -1221,15 +1221,15 @@ test_AdditionalProperties_Incorrect_V14 if {
     }
 
     ReportDetailString := "1 role(s) that contain users with permanent active assignment:<br/>Global Administrator"
-    TestResult("MS.AAD.7.4v1", Output, ReportDetailString, false) == true
+    TestResult("MS.ENTRAID.7.4v1", Output, ReportDetailString, false) == true
 }
 #--
 
 #
-# Policy MS.AAD.7.5v1
+# Policy MS.ENTRAID.7.5v1
 #--
 test_Assignments_Correct if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "privileged_roles": [
             {
                 "DisplayName": "Global Administrator",
@@ -1255,18 +1255,18 @@ test_Assignments_Correct if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ]
     }
 
     ReportDetailString := "0 role(s) assigned to users outside of PIM"
-    TestResult("MS.AAD.7.5v1", Output, ReportDetailString, true) == true
+    TestResult("MS.ENTRAID.7.5v1", Output, ReportDetailString, true) == true
 }
 
 test_Assignments_Incorrect if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "privileged_roles": [
             {
                 "DisplayName": "Global Administrator",
@@ -1292,22 +1292,22 @@ test_Assignments_Incorrect if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ]
     }
 
     ReportDetailString := "1 role(s) assigned to users outside of PIM:<br/>Global Administrator"
-    TestResult("MS.AAD.7.5v1", Output, ReportDetailString, false) == true
+    TestResult("MS.ENTRAID.7.5v1", Output, ReportDetailString, false) == true
 }
 #--
 
 #
-# Policy MS.AAD.7.6v1
+# Policy MS.ENTRAID.7.6v1
 #--
 test_AdditionalProperties_Correct_V4 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "privileged_roles": [
             {
                 "DisplayName": "Global Administrator",
@@ -1329,17 +1329,17 @@ test_AdditionalProperties_Correct_V4 if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ]
     }
 
-    TestResult("MS.AAD.7.6v1", Output, PASS, true) == true
+    TestResult("MS.ENTRAID.7.6v1", Output, PASS, true) == true
 }
 
 test_AdditionalProperties_Correct_V5 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "privileged_roles": [
             {
                 "DisplayName": "Global Administrator",
@@ -1374,17 +1374,17 @@ test_AdditionalProperties_Correct_V5 if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ]
     }
 
-    TestResult("MS.AAD.7.6v1", Output, PASS, true) == true
+    TestResult("MS.ENTRAID.7.6v1", Output, PASS, true) == true
 }
 
 test_AdditionalProperties_Incorrect_V15 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "privileged_roles": [
             {
                 "DisplayName": "Global Administrator",
@@ -1406,21 +1406,21 @@ test_AdditionalProperties_Incorrect_V15 if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ]
     }
 
-    TestResult("MS.AAD.7.6v1", Output, FAIL, false) == true
+    TestResult("MS.ENTRAID.7.6v1", Output, FAIL, false) == true
 }
 #--
 
 #
-# Policy MS.AAD.7.7v1
+# Policy MS.ENTRAID.7.7v1
 #--
 test_notificationRecipients_Correct if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "privileged_roles": [
             {
                 "RoleTemplateId": "1D2EE3F0-90D3-4764-8AF8-BE81FE9D4D71",
@@ -1451,18 +1451,18 @@ test_notificationRecipients_Correct if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ]
     }
 
     ReportDetailString := "0 role(s) without notification e-mail configured for role assignments found"
-    TestResult("MS.AAD.7.7v1", Output, ReportDetailString, true) == true
+    TestResult("MS.ENTRAID.7.7v1", Output, ReportDetailString, true) == true
 }
 
 test_notificationRecipients_Incorrect_V1 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "privileged_roles": [
             {
                 "RoleTemplateId": "1D2EE3F0-90D3-4764-8AF8-BE81FE9D4D71",
@@ -1491,7 +1491,7 @@ test_notificationRecipients_Incorrect_V1 if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ]
@@ -1499,11 +1499,11 @@ test_notificationRecipients_Incorrect_V1 if {
 
     ReportDetailString :=
         "1 role(s) without notification e-mail configured for role assignments found:<br/>Global Administrator"
-    TestResult("MS.AAD.7.7v1", Output, ReportDetailString, false) == true
+    TestResult("MS.ENTRAID.7.7v1", Output, ReportDetailString, false) == true
 }
 
 test_notificationRecipients_Incorrect_V2 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "privileged_roles": [
             {
                 "RoleTemplateId": "1D2EE3F0-90D3-4764-8AF8-BE81FE9D4D71",
@@ -1532,7 +1532,7 @@ test_notificationRecipients_Incorrect_V2 if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ]
@@ -1540,11 +1540,11 @@ test_notificationRecipients_Incorrect_V2 if {
 
     ReportDetailString :=
         "1 role(s) without notification e-mail configured for role assignments found:<br/>Global Administrator"
-    TestResult("MS.AAD.7.7v1", Output, ReportDetailString, false) == true
+    TestResult("MS.ENTRAID.7.7v1", Output, ReportDetailString, false) == true
 }
 
 test_notificationRecipients_Incorrect_V3 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "privileged_roles": [
             {
                 "RoleTemplateId": "1D2EE3F0-90D3-4764-8AF8-BE81FE9D4D71",
@@ -1571,7 +1571,7 @@ test_notificationRecipients_Incorrect_V3 if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ]
@@ -1579,15 +1579,15 @@ test_notificationRecipients_Incorrect_V3 if {
 
     ReportDetailString :=
         "1 role(s) without notification e-mail configured for role assignments found:<br/>Global Administrator"
-    TestResult("MS.AAD.7.7v1", Output, ReportDetailString, false) == true
+    TestResult("MS.ENTRAID.7.7v1", Output, ReportDetailString, false) == true
 }
 #--
 
 #
-# Policy MS.AAD.7.8v1
+# Policy MS.ENTRAID.7.8v1
 #--
 test_Id_Correct_V1 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "privileged_roles": [
             {
                 "RoleTemplateId": "1D2EE3F0-90D3-4764-8AF8-BE81FE9D4D71",
@@ -1611,17 +1611,17 @@ test_Id_Correct_V1 if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ]
     }
 
-    TestResult("MS.AAD.7.8v1", Output, PASS, true) == true
+    TestResult("MS.ENTRAID.7.8v1", Output, PASS, true) == true
 }
 
 test_Id_Correct_V2 if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "privileged_roles": [
             {
                 "RoleTemplateId": "1D2EE3F0-90D3-4764-8AF8-BE81FE9D4D71",
@@ -1645,17 +1645,17 @@ test_Id_Correct_V2 if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ]
     }
 
-    TestResult("MS.AAD.7.8v1", Output, PASS, true) == true
+    TestResult("MS.ENTRAID.7.8v1", Output, PASS, true) == true
 }
 
 test_Id_Incorrect if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "privileged_roles": [
             {
                 "RoleTemplateId": "1D2EE3F0-90D3-4764-8AF8-BE81FE9D4D71",
@@ -1677,22 +1677,22 @@ test_Id_Incorrect if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ]
     }
 
-    TestResult("MS.AAD.7.8v1", Output, FAIL, false) == true
+    TestResult("MS.ENTRAID.7.8v1", Output, FAIL, false) == true
 }
 #--
 
 #
-# Policy MS.AAD.7.9v1
+# Policy MS.ENTRAID.7.9v1
 #--
 
 test_DisplayName_Correct if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "privileged_roles": [
             {
                 "RoleTemplateId": "1D2EE3F0-90D3-4764-8AF8-BE81FE9D4D71",
@@ -1714,18 +1714,18 @@ test_DisplayName_Correct if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ]
     }
 
     ReportDetailString := "0 role(s) without notification e-mail configured for role activations found"
-    TestResult("MS.AAD.7.9v1", Output, ReportDetailString, true) == true
+    TestResult("MS.ENTRAID.7.9v1", Output, ReportDetailString, true) == true
 }
 
 test_DisplayName_Incorrect if {
-    Output := aad.tests with input as {
+    Output := entraid.tests with input as {
         "privileged_roles": [
             {
                 "RoleTemplateId": "1D2EE3F0-90D3-4764-8AF8-BE81FE9D4D71",
@@ -1747,7 +1747,7 @@ test_DisplayName_Incorrect if {
                 "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
             },
             {
-                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanName": "ENTRAID_PREMIUM_P2",
                 "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
             }
         ]
@@ -1755,6 +1755,6 @@ test_DisplayName_Incorrect if {
 
     ReportDetailString :=
         "1 role(s) without notification e-mail configured for role activations found:<br/>Cloud Administrator"
-    TestResult("MS.AAD.7.9v1", Output, ReportDetailString, false) == true
+    TestResult("MS.ENTRAID.7.9v1", Output, ReportDetailString, false) == true
 }
 #--

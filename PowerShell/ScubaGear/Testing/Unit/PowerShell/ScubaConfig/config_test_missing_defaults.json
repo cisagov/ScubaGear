@@ -1,7 +1,7 @@
 {
     "Description": "JSON Configuration file for unit test in SCuBA",
     "ProductNames": [
-      "aad"
+      "entraid"
     ],
     "OPAPath":".",
     "LogIn":true,

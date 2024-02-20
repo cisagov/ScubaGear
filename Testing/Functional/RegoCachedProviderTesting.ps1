@@ -14,7 +14,7 @@
 param (
     [Parameter(Mandatory = $false)]
     [ValidateNotNullOrEmpty()]
-    [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", "onedrive", '*', IgnoreCase = $false)]
+    [ValidateSet("teams", "exo", "defender", "entraid", "powerplatform", "sharepoint", "onedrive", '*', IgnoreCase = $false)]
     [string[]]
     $ProductNames = '*', # The specific products that you want the tool to assess.
 

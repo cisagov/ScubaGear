@@ -1,10 +1,10 @@
 $ProviderPath = '../../../../../Modules/Providers'
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "$($ProviderPath)/ExportAADProvider.psm1") -Function 'Get-AADTenantDetail' -Force
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "$($ProviderPath)/ExportENTRAIDProvider.psm1") -Function 'Get-ENTRAIDTenantDetail' -Force
 
-InModuleScope ExportAADProvider {
+InModuleScope ExportENTRAIDProvider {
     BeforeAll {
         function Get-MgBetaOrganization {}
-        Mock -ModuleName ExportAADProvider Get-MgBetaOrganization -MockWith {
+        Mock -ModuleName ExportENTRAIDProvider Get-MgBetaOrganization -MockWith {
             return [pscustomobject]@{
                 DisplayName = "DisplayName";
                 Name = "DomainName";
@@ -26,9 +26,9 @@ InModuleScope ExportAADProvider {
             $ValidJson
         }
     }
-    Describe -Tag 'AADProvider' -Name "Get-AADTenantDetail" {
+    Describe -Tag 'ENTRAIDProvider' -Name "Get-ENTRAIDTenantDetail" {
         It "Returns valid JSON" {
-            $Json = Get-AADTenantDetail
+            $Json = Get-ENTRAIDTenantDetail
             $ValidJson = Test-SCuBAValidJson -Json $Json | Select-Object -Last 1
             $ValidJson | Should -Be $true
         }
@@ -36,5 +36,5 @@ InModuleScope ExportAADProvider {
 }
 
 AfterAll {
-    Remove-Module ExportAADProvider -Force -ErrorAction SilentlyContinue
+    Remove-Module ExportENTRAIDProvider -Force -ErrorAction SilentlyContinue
 }

@@ -14,9 +14,9 @@ InModuleScope Orchestrator {
                 function Connect-Tenant {}
                 Mock -ModuleName Orchestrator Connect-Tenant -MockWith {@()}
             }
-            It 'With -ProductNames "aad", connects to Microsoft Graph' {
+            It 'With -ProductNames "entraid", connects to Microsoft Graph' {
                 $ConnectParams += @{
-                    ProductNames = 'aad'
+                    ProductNames = 'entraid'
                 }
                 Invoke-Connection @ConnectParams
                 Should -Invoke -CommandName Connect-Tenant -Times 1 -Exactly
@@ -59,7 +59,7 @@ InModuleScope Orchestrator {
             }
             It 'authenticates to all products' {
                 $ConnectParams += @{
-                    ProductNames = @("aad", "defender", "exo", "powerplatform", "sharepoint", "teams")
+                    ProductNames = @("entraid", "defender", "exo", "powerplatform", "sharepoint", "teams")
                 }
                 $FailedAuthList = Invoke-Connection @ConnectParams
                 $FailedAuthList.Length | Should -Be 0
@@ -78,7 +78,7 @@ InModuleScope Orchestrator {
             }
             It 'does not authenticate' {
                 $ConnectParams += @{
-                    ProductNames = 'aad'
+                    ProductNames = 'entraid'
                 }
                 Invoke-Connection @ConnectParams
                 Should -Invoke -CommandName Connect-Tenant -Times 0 -Exactly

@@ -14,7 +14,7 @@
 $ExportProvider = $true
 
 $LogIn = $true # Set $true to authenticate yourself to a tenant or if you are already authenticated set to $false to avoid reauthentication
-$ProductNames = @("aad", "defender", "exo", "onedrive", "powerplatform", "sharepoint", "teams")
+$ProductNames = @("entraid", "defender", "exo", "onedrive", "powerplatform", "sharepoint", "teams")
 $M365Environment = "gcc"
 $OPAPath = "../" # Path to OPA Executable
 $OutPath = "../output" # output directory

@@ -1,5 +1,5 @@
 BeforeAll {
-    $ClassPath = (Join-Path -Path $PSScriptRoot -ChildPath "./../../../../../Modules/Providers/ProviderHelpers/AADConditionalAccessHelper.psm1")
+    $ClassPath = (Join-Path -Path $PSScriptRoot -ChildPath "./../../../../../Modules/Providers/ProviderHelpers/ENTRAIDConditionalAccessHelper.psm1")
     Import-Module $ClassPath
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'CapHelper')]
     $CapHelper = Get-CapTracker
@@ -447,7 +447,7 @@ Describe "GetAccessControls" {
             "approvedApplication", "compliantApplication", "passwordChange")
         $Cap.GrantControls.Operator = "AND"
         $Controls = $($CapHelper.GetAccessControls($Cap))
-        $Controls | Should -Be "Allow access but require multifactor authentication, device to be marked compliant, Hybrid Azure AD joined device, approved client app, app protection policy, AND password change"
+        $Controls | Should -Be "Allow access but require multifactor authentication, device to be marked compliant, Hybrid Entra ID joined device, approved client app, app protection policy, AND password change"
     }
 
     It "handles requiring multiple controls in OR mode" {
@@ -455,7 +455,7 @@ Describe "GetAccessControls" {
             "approvedApplication", "compliantApplication", "passwordChange")
         $Cap.GrantControls.Operator = "OR"
         $Controls = $($CapHelper.GetAccessControls($Cap))
-        $Controls | Should -Be "Allow access but require multifactor authentication, device to be marked compliant, Hybrid Azure AD joined device, approved client app, app protection policy, OR password change"
+        $Controls | Should -Be "Allow access but require multifactor authentication, device to be marked compliant, Hybrid Entra ID joined device, approved client app, app protection policy, OR password change"
     }
 
     It "handles using authentication strength (phishing resistant MFA)" {

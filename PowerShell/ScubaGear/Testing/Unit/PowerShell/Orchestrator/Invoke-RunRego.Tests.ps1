@@ -26,9 +26,9 @@ InModuleScope Orchestrator {
                     OutRegoFileName     = "TestResults"
                 }
             }
-            It 'With -ProductNames "aad", should not throw' {
+            It 'With -ProductNames "entraid", should not throw' {
                 $RunRegoParameters += @{
-                    ProductNames = @("aad")
+                    ProductNames = @("entraid")
                 }
                 { Invoke-RunRego @RunRegoParameters } | Should -Not -Throw
             }
@@ -64,7 +64,7 @@ InModuleScope Orchestrator {
             }
             It 'With all products, should not throw' {
                 $RunRegoParameters += @{
-                    ProductNames = @("aad", "defender", "exo", "powerplatform", "sharepoint", "teams")
+                    ProductNames = @("entraid", "defender", "exo", "powerplatform", "sharepoint", "teams")
                 }
                 { Invoke-RunRego @RunRegoParameters } | Should -Not -Throw
             }

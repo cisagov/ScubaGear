@@ -1,4 +1,4 @@
-package utils.aad
+package utils.entraid
 import future.keywords
 import data.utils.report.ArraySizeStr
 import data.utils.report.Description
@@ -27,7 +27,7 @@ CAPLINK := "<a href='#caps'>View all CA policies</a>."
 INT_MAX := 2147483647
 
 ########################################
-# Specific AAD Report Details Function #
+# Specific ENTRAID Report Details Function #
 ########################################
 
 # Function returns the string that indicates the number of fails & each item that fails.
@@ -70,7 +70,7 @@ ReportFullDetailsArray(Array, String) := Details if {
 
 Aad2P2Licenses contains ServicePlan.ServicePlanId if {
     some ServicePlan in input.service_plans
-    ServicePlan.ServicePlanName == "AAD_PREMIUM_P2"
+    ServicePlan.ServicePlanName == "ENTRAID_PREMIUM_P2"
 }
 
 # Returns license warning if license not present as results may be wrong,
@@ -142,7 +142,7 @@ GroupExclusionsFullyExempt(Policy, PolicyID) := true if {
 
 
 #########################
-# General AAD Functions #
+# General ENTRAID Functions #
 #########################
 
 # Return true if policy matches all conditions:
@@ -169,7 +169,7 @@ HasAcceptableMFA(Policy) := true if {
 
 
 ############################################################################
-# The report formatting functions below are for the MS.AAD.6.1v1 policy    #
+# The report formatting functions below are for the MS.ENTRAID.6.1v1 policy    #
 ############################################################################
 
 DomainReportDetails(Status, _, _) := Description if {

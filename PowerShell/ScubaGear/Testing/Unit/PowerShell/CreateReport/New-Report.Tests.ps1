@@ -15,7 +15,7 @@ InModuleScope CreateReport {
                 teams         = "Teams";
                 exo           = "EXO";
                 defender      = "Defender";
-                aad           = "AAD";
+                entraid           = "ENTRAID";
                 powerplatform = "PowerPlatform";
                 sharepoint    = "SharePoint";
             }
@@ -24,7 +24,7 @@ InModuleScope CreateReport {
                 Teams         = "Microsoft Teams";
                 EXO           = "Exchange Online";
                 Defender      = "Microsoft 365 Defender";
-                AAD           = "Azure Active Directory";
+                ENTRAID           = "Microsft Entra ID";
                 PowerPlatform = "Microsoft Power Platform";
                 SharePoint    = "SharePoint Online";
             }
@@ -41,7 +41,7 @@ InModuleScope CreateReport {
             }
         }
         It 'Creates a report for <Product>' -ForEach @(
-            @{Product = 'aad'; WarningCount = 0},
+            @{Product = 'entraid'; WarningCount = 0},
             @{Product = 'defender'; WarningCount = 9},
             @{Product = 'exo'; WarningCount = 0},
             @{Product = 'powerplatform'; WarningCount = 2},

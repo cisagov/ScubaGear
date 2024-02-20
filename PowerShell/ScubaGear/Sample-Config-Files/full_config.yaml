@@ -3,7 +3,7 @@ ProductNames:
   - teams
   - exo
   - defender
-  - aad
+  - entraid
   - sharepoint
 M365Environment: commercial
 OPAPath: .

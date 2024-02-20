@@ -1,4 +1,4 @@
-aad
+entraid
 defender
 exo
 onedrive

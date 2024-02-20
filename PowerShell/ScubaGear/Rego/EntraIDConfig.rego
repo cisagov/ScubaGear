@@ -1,4 +1,4 @@
-package aad
+package entraid
 import future.keywords
 import data.utils.report.NotCheckedDetails
 import data.utils.report.ReportDetailsBoolean
@@ -8,18 +8,18 @@ import data.utils.key.Count
 import data.utils.key.FilterArray
 import data.utils.key.ConvertToSetWithKey
 import data.utils.key.ConvertToSet
-import data.utils.aad.ReportFullDetailsArray
-import data.utils.aad.ReportDetailsArrayLicenseWarningCap
-import data.utils.aad.ReportDetailsArrayLicenseWarning
-import data.utils.aad.ReportDetailsBooleanLicenseWarning
-import data.utils.aad.UserExclusionsFullyExempt
-import data.utils.aad.GroupExclusionsFullyExempt
-import data.utils.aad.Aad2P2Licenses
-import data.utils.aad.HasAcceptableMFA
-import data.utils.aad.PolicyConditionsMatch
-import data.utils.aad.CAPLINK
-import data.utils.aad.DomainReportDetails
-import data.utils.aad.INT_MAX
+import data.utils.entraid.ReportFullDetailsArray
+import data.utils.entraid.ReportDetailsArrayLicenseWarningCap
+import data.utils.entraid.ReportDetailsArrayLicenseWarning
+import data.utils.entraid.ReportDetailsBooleanLicenseWarning
+import data.utils.entraid.UserExclusionsFullyExempt
+import data.utils.entraid.GroupExclusionsFullyExempt
+import data.utils.entraid.Aad2P2Licenses
+import data.utils.entraid.HasAcceptableMFA
+import data.utils.entraid.PolicyConditionsMatch
+import data.utils.entraid.CAPLINK
+import data.utils.entraid.DomainReportDetails
+import data.utils.entraid.INT_MAX
 
 
 #############
@@ -34,11 +34,11 @@ MEMBERUSER := "a0b1b346-4d3e-4e8b-98f8-753987be4970"
 
 
 ############
-# MS.AAD.1 #
+# MS.ENTRAID.1 #
 ############
 
 #
-# MS.AAD.1.1v1
+# MS.ENTRAID.1.1v1
 #--
 
 # If policy matches basic conditions, special conditions,
@@ -53,13 +53,13 @@ LegacyAuthentication contains CAPolicy.DisplayName if {
     "block" in CAPolicy.GrantControls.BuiltInControls
 
     # Only match policies with user and group exclusions if all exempted
-    UserExclusionsFullyExempt(CAPolicy, "MS.AAD.1.1v1") == true
-    GroupExclusionsFullyExempt(CAPolicy, "MS.AAD.1.1v1") == true
+    UserExclusionsFullyExempt(CAPolicy, "MS.ENTRAID.1.1v1") == true
+    GroupExclusionsFullyExempt(CAPolicy, "MS.ENTRAID.1.1v1") == true
 }
 
 # Pass if at least 1 policy meets all conditions
 tests contains {
-    "PolicyId": "MS.AAD.1.1v1",
+    "PolicyId": "MS.ENTRAID.1.1v1",
     "Criticality": "Shall",
     "Commandlet": ["Get-MgBetaIdentityConditionalAccessPolicy"],
     "ActualValue": LegacyAuthentication,
@@ -72,11 +72,11 @@ tests contains {
 #--
 
 ############
-# MS.AAD.2 #
+# MS.ENTRAID.2 #
 ############
 
 #
-# MS.AAD.2.1v1
+# MS.ENTRAID.2.1v1
 #--
 
 # If policy matches basic conditions, special conditions,
@@ -90,14 +90,14 @@ BlockHighRisk contains CAPolicy.DisplayName if {
     "block" in CAPolicy.GrantControls.BuiltInControls
 
     # Only match policies with user and group exclusions if all exempted
-    UserExclusionsFullyExempt(CAPolicy, "MS.AAD.2.1v1") == true
-    GroupExclusionsFullyExempt(CAPolicy, "MS.AAD.2.1v1") == true
+    UserExclusionsFullyExempt(CAPolicy, "MS.ENTRAID.2.1v1") == true
+    GroupExclusionsFullyExempt(CAPolicy, "MS.ENTRAID.2.1v1") == true
 }
 
 # Pass if at least 1 policy meets all conditions & has correct
 # licence.
 tests contains {
-    "PolicyId": "MS.AAD.2.1v1",
+    "PolicyId": "MS.ENTRAID.2.1v1",
     "Criticality": "Shall",
     "Commandlet": ["Get-MgBetaIdentityConditionalAccessPolicy"],
     "ActualValue": BlockHighRisk,
@@ -114,22 +114,22 @@ tests contains {
 #--
 
 #
-# MS.AAD.2.2v1
+# MS.ENTRAID.2.2v1
 #--
 
 # At this time we are unable to test for X because of Y
 tests contains {
-    "PolicyId": "MS.AAD.2.2v1",
+    "PolicyId": "MS.ENTRAID.2.2v1",
     "Criticality": "Should/Not-Implemented",
     "Commandlet": [],
     "ActualValue": [],
-    "ReportDetails": NotCheckedDetails("MS.AAD.2.2v1"),
+    "ReportDetails": NotCheckedDetails("MS.ENTRAID.2.2v1"),
     "RequirementMet": false
 }
 #--
 
 #
-# MS.AAD.2.3v1
+# MS.ENTRAID.2.3v1
 #--
 
 # If policy matches basic conditions, special conditions,
@@ -143,14 +143,14 @@ SignInBlocked contains CAPolicy.DisplayName if {
     "block" in CAPolicy.GrantControls.BuiltInControls
 
     # Only match policies with user and group exclusions if all exempted
-    UserExclusionsFullyExempt(CAPolicy, "MS.AAD.2.3v1") == true
-    GroupExclusionsFullyExempt(CAPolicy, "MS.AAD.2.3v1") == true
+    UserExclusionsFullyExempt(CAPolicy, "MS.ENTRAID.2.3v1") == true
+    GroupExclusionsFullyExempt(CAPolicy, "MS.ENTRAID.2.3v1") == true
 }
 
 # Pass if at least 1 policy meets all conditions & has correct
 # licence.
 tests contains {
-    "PolicyId": "MS.AAD.2.3v1",
+    "PolicyId": "MS.ENTRAID.2.3v1",
     "Criticality": "Shall",
     "Commandlet": ["Get-MgBetaIdentityConditionalAccessPolicy"],
     "ActualValue": SignInBlocked,
@@ -167,11 +167,11 @@ tests contains {
 #--
 
 ############
-# MS.AAD.3 #
+# MS.ENTRAID.3 #
 ############
 
 #
-# MS.AAD.3.1v1
+# MS.ENTRAID.3.1v1
 #--
 
 # If policy matches basic conditions, special conditions,
@@ -185,15 +185,15 @@ MFAPolicies contains CAPolicy.DisplayName if {
     CAPolicy.State == "enabled"
     count(CAPolicy.Conditions.Applications.ExcludeApplications) == 0
 
-    GroupExclusionsFullyExempt(CAPolicy, "MS.AAD.3.1v1") == true
-    UserExclusionsFullyExempt(CAPolicy, "MS.AAD.3.1v1") == true
+    GroupExclusionsFullyExempt(CAPolicy, "MS.ENTRAID.3.1v1") == true
+    UserExclusionsFullyExempt(CAPolicy, "MS.ENTRAID.3.1v1") == true
 
     HasAcceptableMFA(CAPolicy) == true
 }
 
 # Pass if at least 1 policy meets all conditions
 tests contains {
-    "PolicyId": "MS.AAD.3.1v1",
+    "PolicyId": "MS.ENTRAID.3.1v1",
     "Criticality": "Shall",
     "Commandlet": ["Get-MgBetaIdentityConditionalAccessPolicy"],
     "ActualValue": MFAPolicies,
@@ -206,7 +206,7 @@ tests contains {
 #--
 
 #
-# MS.AAD.3.2v1
+# MS.ENTRAID.3.2v1
 #--
 
 # Save all policy names if MFAPolicies exist
@@ -225,13 +225,13 @@ AlternativeMFA contains CAPolicy.DisplayName if {
     "mfa" in CAPolicy.GrantControls.BuiltInControls
 
     # Only match policies with user and group exclusions if all exempted
-    UserExclusionsFullyExempt(CAPolicy, "MS.AAD.3.2v1") == true
-    GroupExclusionsFullyExempt(CAPolicy, "MS.AAD.3.2v1") == true
+    UserExclusionsFullyExempt(CAPolicy, "MS.ENTRAID.3.2v1") == true
+    GroupExclusionsFullyExempt(CAPolicy, "MS.ENTRAID.3.2v1") == true
 }
 
 # Pass if at least 1 policy meets all conditions
 tests contains {
-    "PolicyId": "MS.AAD.3.2v1",
+    "PolicyId": "MS.ENTRAID.3.2v1",
     "Criticality": "Shall",
     "Commandlet": ["Get-MgBetaIdentityConditionalAccessPolicy"],
     "ActualValue": AlternativeMFA,
@@ -244,14 +244,14 @@ tests contains {
 #--
 
 #
-# MS.AAD.3.3v1
+# MS.ENTRAID.3.3v1
 #--
 
 # At this time we are unable to test for X because of NEW POLICY
 # If we have acceptable MFA then policy passes otherwise MS Authenticator need to be
 # enabled to pass. However, we can not currently check if MS Authenticator enabled
 tests contains {
-    "PolicyId": "MS.AAD.3.3v1",
+    "PolicyId": "MS.ENTRAID.3.3v1",
     "Criticality": "Shall",
     "Commandlet": ["Get-MgBetaIdentityConditionalAccessPolicy"],
     "ActualValue": MFAPolicies,
@@ -271,18 +271,18 @@ tests contains {
     "ReportDetails": NotCheckedDetails(PolicyId),
     "RequirementMet": false
 } if {
-    PolicyId := "MS.AAD.3.3v1"
+    PolicyId := "MS.ENTRAID.3.3v1"
     count(MFAPolicies) == 0
 }
 #--
 
 #
-# MS.AAD.3.4v1
+# MS.ENTRAID.3.4v1
 #--
 
 # At this time we are unable to test for X because of NEW POLICY
 tests contains {
-    "PolicyId": "MS.AAD.3.4v1",
+    "PolicyId": "MS.ENTRAID.3.4v1",
     "Criticality": "Shall",
     "Commandlet": ["Get-MgBetaPolicyAuthenticationMethodPolicy"],
     "ActualValue": [Policy.PolicyMigrationState],
@@ -295,23 +295,23 @@ tests contains {
 #--
 
 #
-# MS.AAD.3.5v1
+# MS.ENTRAID.3.5v1
 #--
 
 # At this time we are unable to test for SMS/Voice settings due to lack of API to validate
 # Awaiting API changes and feature updates from Microsoft for automated checking
 tests contains {
-    "PolicyId": "MS.AAD.3.5v1",
+    "PolicyId": "MS.ENTRAID.3.5v1",
     "Criticality": "Shall/Not-Implemented",
     "Commandlet": [],
     "ActualValue": [],
-    "ReportDetails": NotCheckedDetails("MS.AAD.3.5v1"),
+    "ReportDetails": NotCheckedDetails("MS.ENTRAID.3.5v1"),
     "RequirementMet": false
 }
 #--
 
 #
-# MS.AAD.3.6v1
+# MS.ENTRAID.3.6v1
 #--
 
 # First check if policy is enabled, then confirm that all
@@ -334,8 +334,8 @@ PhishingResistantMFA contains CAPolicy.DisplayName if {
     # Basic & special conditions
     Contains(CAPolicy.Conditions.Applications.IncludeApplications, "All") == true
     IsEmptyContainer(CAPolicy.Conditions.Applications.ExcludeApplications) == true
-    GroupExclusionsFullyExempt(CAPolicy, "MS.AAD.3.6v1") == true
-    UserExclusionsFullyExempt(CAPolicy, "MS.AAD.3.6v1") == true
+    GroupExclusionsFullyExempt(CAPolicy, "MS.ENTRAID.3.6v1") == true
+    UserExclusionsFullyExempt(CAPolicy, "MS.ENTRAID.3.6v1") == true
 
     # Policy has only acceptable MFA
     HasAcceptableMFA(CAPolicy) == true
@@ -343,7 +343,7 @@ PhishingResistantMFA contains CAPolicy.DisplayName if {
 
 # Pass if at least 1 policy meets all conditions
 tests contains {
-    "PolicyId": "MS.AAD.3.6v1",
+    "PolicyId": "MS.ENTRAID.3.6v1",
     "Criticality": "Shall",
     "Commandlet": ["Get-MgBetaSubscribedSku", "Get-PrivilegedRole", "Get-MgBetaIdentityConditionalAccessPolicy"],
     "ActualValue": PhishingResistantMFA,
@@ -356,7 +356,7 @@ tests contains {
 #--
 
 #
-# MS.AAD.3.7v1
+# MS.ENTRAID.3.7v1
 #--
 
 # If policy matches basic conditions, & needed strings
@@ -377,7 +377,7 @@ ManagedDeviceAuth contains CAPolicy.DisplayName if {
 
 # Pass if at least 1 policy meets all conditions
 tests contains {
-    "PolicyId": "MS.AAD.3.7v1",
+    "PolicyId": "MS.ENTRAID.3.7v1",
     "Criticality": "Should",
     "Commandlet": ["Get-MgBetaIdentityConditionalAccessPolicy"],
     "ActualValue": ManagedDeviceAuth,
@@ -390,7 +390,7 @@ tests contains {
 #--
 
 #
-# MS.AAD.3.8v1
+# MS.ENTRAID.3.8v1
 #--
 
 # If policy matches basic conditions, & needed strings
@@ -409,13 +409,13 @@ RequireManagedDeviceMFA contains CAPolicy.DisplayName if {
     count(FilterArray(Conditions, true)) > 0
 
     # Only match policies with user and group exclusions if all exempted
-    UserExclusionsFullyExempt(CAPolicy, "MS.AAD.3.8v1") == true
-    GroupExclusionsFullyExempt(CAPolicy, "MS.AAD.3.8v1") == true
+    UserExclusionsFullyExempt(CAPolicy, "MS.ENTRAID.3.8v1") == true
+    GroupExclusionsFullyExempt(CAPolicy, "MS.ENTRAID.3.8v1") == true
 }
 
 # Pass if at least 1 policy meets all conditions
 tests contains {
-    "PolicyId": "MS.AAD.3.8v1",
+    "PolicyId": "MS.ENTRAID.3.8v1",
     "Criticality": "Should",
     "Commandlet": ["Get-MgBetaIdentityConditionalAccessPolicy"],
     "ActualValue": RequireManagedDeviceMFA,
@@ -428,30 +428,30 @@ tests contains {
 #--
 
 ############
-# MS.AAD.4 #
+# MS.ENTRAID.4 #
 ############
 
 #
-# MS.AAD.4.1v1
+# MS.ENTRAID.4.1v1
 #--
 
 # At this time we are unable to test for log collection until we integrate Azure Powershell capabilities
 tests contains {
-    "PolicyId": "MS.AAD.4.1v1",
+    "PolicyId": "MS.ENTRAID.4.1v1",
     "Criticality": "Shall/Not-Implemented",
     "Commandlet": [],
     "ActualValue": [],
-    "ReportDetails": NotCheckedDetails("MS.AAD.4.1v1"),
+    "ReportDetails": NotCheckedDetails("MS.ENTRAID.4.1v1"),
     "RequirementMet": false
 }
 #--
 
 ############
-# MS.AAD.5 #
+# MS.ENTRAID.5 #
 ############
 
 #
-# MS.AAD.5.1v1
+# MS.ENTRAID.5.1v1
 #--
 
 # If allowed to create apps, save the policy id
@@ -470,7 +470,7 @@ AllAuthPoliciesAllowedCreate contains {
 
 # If there is a policy that allows user to create apps, fail
 tests contains {
-    "PolicyId": "MS.AAD.5.1v1",
+    "PolicyId": "MS.ENTRAID.5.1v1",
     "Criticality": "Shall",
     "Commandlet": ["Get-MgBetaPolicyAuthorizationPolicy"],
     "ActualValue": {"all_allowed_create_values": AllAuthPoliciesAllowedCreate},
@@ -484,7 +484,7 @@ tests contains {
 #--
 
 #
-# MS.AAD.5.2v1
+# MS.ENTRAID.5.2v1
 #--
 
 # Save the policy Id of any user allowed to consent to third
@@ -504,7 +504,7 @@ AllDefaultGrantPolicies contains {
 
 # If there is a policy that allows user to cconsent to third party apps, fail
 tests contains {
-    "PolicyId": "MS.AAD.5.2v1",
+    "PolicyId": "MS.ENTRAID.5.2v1",
     "Criticality": "Shall",
     "Commandlet": ["Get-MgBetaPolicyAuthorizationPolicy"],
     "ActualValue": {"all_grant_policy_values": AllDefaultGrantPolicies},
@@ -518,7 +518,7 @@ tests contains {
 #--
 
 #
-# MS.AAD.5.3v1
+# MS.ENTRAID.5.3v1
 #--
 
 # For specific setting, save the value & group.
@@ -554,7 +554,7 @@ BadAdminConsentSettings contains {
 
 # If there is a policy that is not enabled, fail
 tests contains {
-    "PolicyId": "MS.AAD.5.3v1",
+    "PolicyId": "MS.ENTRAID.5.3v1",
     "Criticality": "Shall",
     "Commandlet": ["Get-MgBetaDirectorySetting"],
     "ActualValue": {"all_admin_consent_policies": AllAdminConsentSettings},
@@ -570,7 +570,7 @@ tests contains {
 #--
 
 #
-# MS.AAD.5.4v1
+# MS.ENTRAID.5.4v1
 #--
 
 # For specific setting, save the value & group.
@@ -607,7 +607,7 @@ BadConsentSettings contains {
 # If there are no bad settings & more than 1
 # good setting, pass
 tests contains {
-    "PolicyId": "MS.AAD.5.4v1",
+    "PolicyId": "MS.ENTRAID.5.4v1",
     "Criticality": "Shall",
     "Commandlet": ["Get-MgBetaDirectorySetting"],
     "ActualValue": AllConsentSettings,
@@ -624,11 +624,11 @@ tests contains {
 
 
 ############
-# MS.AAD.6 #
+# MS.ENTRAID.6 #
 ############
 
 #
-# MS.AAD.6.1v1
+# MS.ENTRAID.6.1v1
 #--
 
 # User passwords are set to not expire if they equal INT_MAX
@@ -645,7 +645,7 @@ UserPasswordsSetToExpire contains Domain.Id if {
 }
 
 tests contains {
-    "PolicyId": "MS.AAD.6.1v1",
+    "PolicyId": "MS.ENTRAID.6.1v1",
     "Criticality": "Shall",
     "Commandlet": [ "Get-MgBetaDomain" ],
     "ActualValue": { UserPasswordsSetToExpire, UserPasswordsSetToNotExpire },
@@ -662,11 +662,11 @@ tests contains {
 
 
 ############
-# MS.AAD.7 #
+# MS.ENTRAID.7 #
 ############
 
 #
-# MS.AAD.7.1v1
+# MS.ENTRAID.7.1v1
 #--
 
 # Save all users that have the Global Admin role
@@ -685,7 +685,7 @@ IsGlobalAdminCountGood := true if {
 # Pass if there are at least 2, but no more than 8
 # users with Global Admin role.
 tests contains {
-    "PolicyId": "MS.AAD.7.1v1",
+    "PolicyId": "MS.ENTRAID.7.1v1",
     "Criticality": "Shall",
     "Commandlet": ["Get-MgBetaSubscribedSku", "Get-PrivilegedUser"],
     "ActualValue": GlobalAdmins,
@@ -697,7 +697,7 @@ tests contains {
 }
 #--
 
-# MS.AAD.7.2v1
+# MS.ENTRAID.7.2v1
 #--
 
 # Save all users that don't have Global Admin role
@@ -715,13 +715,13 @@ GetScoreDescription := concat("", ["Least Privilege Score = ", Score, " (should 
 }
 
 # calculate least privilege score as ratio of priv users with global admin role to priv users without global admin role
-LeastPrivilegeScore := "Policy MS.AAD.7.1 failed so score not computed" if {
+LeastPrivilegeScore := "Policy MS.ENTRAID.7.1 failed so score not computed" if {
     IsGlobalAdminCountGood == false
 } else := GetScoreDescription
 
 # Pass if 7.1 passed and Least Privilege Score < 1, fail if 7.1 failed or Least Privilege score is >= 1
 tests contains {
-    "PolicyId": "MS.AAD.7.2v1",
+    "PolicyId": "MS.ENTRAID.7.2v1",
     "Criticality" : "Shall",
     "Commandlet" : ["Get-MgBetaSubscribedSku", "Get-PrivilegedUser"],
     "ActualValue" : GlobalAdmins,
@@ -737,7 +737,7 @@ tests contains {
 #--
 
 #
-# MS.AAD.7.3v1
+# MS.ENTRAID.7.3v1
 #--
 
 # Save privileged users that do not have cloud
@@ -749,7 +749,7 @@ FederatedAdmins contains User.DisplayName if {
 
 # Pass if all privileged users have cloud only accounts
 tests contains {
-    "PolicyId": "MS.AAD.7.3v1",
+    "PolicyId": "MS.ENTRAID.7.3v1",
     "Criticality": "Shall",
     "Commandlet": ["Get-MgBetaSubscribedSku", "Get-PrivilegedUser"],
     "ActualValue": AdminNames,
@@ -763,7 +763,7 @@ tests contains {
 #--
 
 #
-# MS.AAD.7.4v1
+# MS.ENTRAID.7.4v1
 #--
 default PrivilegedRoleExclusions(_, _) := false
 
@@ -791,12 +791,12 @@ PrivilegedRoleExclusions(PrivilegedRole, PolicyID) := true if {
 # Save role name if there are rouge privileged roles
 PrivilegedRolesWithoutExpirationPeriod contains Role.DisplayName if {
     some Role in input.privileged_roles
-    PrivilegedRoleExclusions(Role, "MS.AAD.7.4v1") == true
+    PrivilegedRoleExclusions(Role, "MS.ENTRAID.7.4v1") == true
 }
 
 # If you have the correct license & no rouge roles with permenant assignment, pass
 tests contains {
-    "PolicyId": "MS.AAD.7.4v1",
+    "PolicyId": "MS.ENTRAID.7.4v1",
     "Criticality": "Shall",
     "Commandlet": ["Get-MgBetaSubscribedSku", "Get-PrivilegedRole"],
     "ActualValue": PrivilegedRolesWithoutExpirationPeriod,
@@ -812,7 +812,7 @@ tests contains {
 }
 
 #
-# MS.AAD.7.5v1
+# MS.ENTRAID.7.5v1
 #--
 
 # Get all privileged roles that do not have a start date
@@ -825,7 +825,7 @@ RolesAssignedOutsidePim contains Role.DisplayName if {
 
 # If you have the correct license & no roles without start date, pass
 tests contains {
-    "PolicyId": "MS.AAD.7.5v1",
+    "PolicyId": "MS.ENTRAID.7.5v1",
     "Criticality": "Shall",
     "Commandlet": ["Get-MgBetaSubscribedSku", "Get-PrivilegedRole"],
     "ActualValue": RolesAssignedOutsidePim,
@@ -842,7 +842,7 @@ tests contains {
 #--
 
 #
-# MS.AAD.7.6v1
+# MS.ENTRAID.7.6v1
 #--
 
 # Save role name if id is a specific string and approval is
@@ -859,7 +859,7 @@ RolesWithoutApprovalRequired contains Role.DisplayName if {
 # If you have the correct license & Global Administor
 # is not in RolesWithoutApprovalRequired, pass
 tests contains {
-    "PolicyId": "MS.AAD.7.6v1",
+    "PolicyId": "MS.ENTRAID.7.6v1",
     "Criticality": "Shall",
     "Commandlet": ["Get-MgBetaSubscribedSku", "Get-PrivilegedRole"],
     "ActualValue": RolesWithoutApprovalRequired,
@@ -875,7 +875,7 @@ tests contains {
 #--
 
 #
-# MS.AAD.7.7v1
+# MS.ENTRAID.7.7v1
 #--
 
 # Save role name if id is a specific string and no
@@ -903,7 +903,7 @@ RolesWithoutEligibleAssignmentAlerts contains Role.DisplayName if {
 # If you have the correct license & all roles have assignment
 # alerts, pass
 tests contains {
-    "PolicyId": "MS.AAD.7.7v1",
+    "PolicyId": "MS.ENTRAID.7.7v1",
     "Criticality": "Shall",
     "Commandlet": ["Get-MgBetaSubscribedSku", "Get-PrivilegedRole"],
     "ActualValue": RolesWithoutAssignmentAlerts,
@@ -921,7 +921,7 @@ tests contains {
 #--
 
 #
-# MS.AAD.7.8v1
+# MS.ENTRAID.7.8v1
 #--
 
 # Save role name if id is a specific string, notification
@@ -939,7 +939,7 @@ AdminsWithoutActivationAlert contains Role.DisplayName if {
 # If you have the correct license & Global Admin
 # has activation alert, pass
 tests contains {
-    "PolicyId": "MS.AAD.7.8v1",
+    "PolicyId": "MS.ENTRAID.7.8v1",
     "Criticality": "Shall",
     "Commandlet": ["Get-MgBetaSubscribedSku", "Get-PrivilegedRole"],
     "ActualValue": AdminsWithoutActivationAlert,
@@ -955,13 +955,13 @@ tests contains {
 #--
 
 #
-# MS.AAD.7.9v1
+# MS.ENTRAID.7.9v1
 #--
 
 # If there are no roles without activation alert &
 # correct license, pass
 tests contains {
-    "PolicyId": "MS.AAD.7.9v1",
+    "PolicyId": "MS.ENTRAID.7.9v1",
     "Criticality": "Should",
     "Commandlet": ["Get-MgBetaSubscribedSku", "Get-PrivilegedRole"],
     "ActualValue": NonGlobalAdminsWithoutActivationAlert,
@@ -979,11 +979,11 @@ tests contains {
 #--
 
 ############
-# MS.AAD.8 #
+# MS.ENTRAID.8 #
 ############
 
 #
-# MS.AAD.8.1v1
+# MS.ENTRAID.8.1v1
 #--
 
 # must hardcode the ID. See
@@ -1030,7 +1030,7 @@ RoleIdByPolicy contains concat("", ["\"", Level, "\"", " (", Policy.Id, ")"]) if
 
 # If no roles with bad roles, pass
 tests contains {
-    "PolicyId": "MS.AAD.8.1v1",
+    "PolicyId": "MS.ENTRAID.8.1v1",
     "Criticality": "Should",
     "Commandlet": ["Get-MgBetaPolicyAuthorizationPolicy"],
     "ActualValue": {"all_roleid_values": AllAuthPoliciesRoleIds},
@@ -1043,7 +1043,7 @@ tests contains {
 #--
 
 #
-# MS.AAD.8.2v1
+# MS.ENTRAID.8.2v1
 #--
 
 # Get all policies that allow invites from guests & admins
@@ -1067,7 +1067,7 @@ AllowInvitesByPolicy contains concat("", ["\"", Policy.AllowInvitesFrom, "\"", "
 
 # If no roles with bad invite setting, pass
 tests contains {
-    "PolicyId": "MS.AAD.8.2v1",
+    "PolicyId": "MS.ENTRAID.8.2v1",
     "Criticality": "Should",
     "Commandlet": ["Get-MgBetaPolicyAuthorizationPolicy"],
     "ActualValue": {"all_allow_invite_values": AllAuthPoliciesAllowInvites},
@@ -1080,16 +1080,16 @@ tests contains {
 #--
 
 #
-# MS.AAD.8.3v1
+# MS.ENTRAID.8.3v1
 #--
 
 # At this time we are unable to test for X because of Y
 tests contains {
-    "PolicyId": "MS.AAD.8.3v1",
+    "PolicyId": "MS.ENTRAID.8.3v1",
     "Criticality": "Should/Not-Implemented",
     "Commandlet": [],
     "ActualValue": [],
-    "ReportDetails": NotCheckedDetails("MS.AAD.8.3v1"),
+    "ReportDetails": NotCheckedDetails("MS.ENTRAID.8.3v1"),
     "RequirementMet": false
 }
 #--

@@ -37,13 +37,13 @@ InModuleScope Connection {
             }
         }
         It 'With Endpoint:  <Endpoint>; ProductNames: <ProductNames>' -ForEach @(
-            @{ProductNames = "aad"}
+            @{ProductNames = "entraid"}
             @{ProductNames = "defender"}
             @{ProductNames = "exo"}
             @{ProductNames = "powerplatform"}
             @{ProductNames = "sharepoint"}
             @{ProductNames = "teams"}
-            @{ProductNames = "aad", "defender", "exo", "powerplatform", "sharepoint", "teams"}
+            @{ProductNames = "entraid", "defender", "exo", "powerplatform", "sharepoint", "teams"}
 
         ){
             $FailedAuthList = Connect-Tenant -ProductNames $ProductNames -M365Environment $Endpoint

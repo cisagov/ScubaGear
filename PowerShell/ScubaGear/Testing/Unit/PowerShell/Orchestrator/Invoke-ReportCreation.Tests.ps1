@@ -36,7 +36,7 @@ InModuleScope Orchestrator {
             }
             It 'Do it quietly (Do not automatically show report)' {
                 $ProviderParameters += @{
-                    ProductNames = @("aad")
+                    ProductNames = @("entraid")
                 }
                 { Invoke-ReportCreation @ProviderParameters -Quiet} | Should -Not -Throw
                 Should -Invoke -CommandName Invoke-Item -Exactly -Times 0
@@ -44,15 +44,15 @@ InModuleScope Orchestrator {
             }
             It 'Show report' {
                 $ProviderParameters += @{
-                    ProductNames = @("aad")
+                    ProductNames = @("entraid")
                 }
                 { Invoke-ReportCreation @ProviderParameters} | Should -Not -Throw
                 Should -Invoke -CommandName Invoke-Item -Exactly -Times 1 -ParameterFilter {-Not [string]::IsNullOrEmpty($Path) }
                 $ProviderParameters.ProductNames = @()
             }
-            It 'With -ProductNames "aad", should not throw' {
+            It 'With -ProductNames "entraid", should not throw' {
                 $ProviderParameters += @{
-                    ProductNames = @("aad")
+                    ProductNames = @("entraid")
                 }
                 { Invoke-ReportCreation @ProviderParameters } | Should -Not -Throw
             }
@@ -88,7 +88,7 @@ InModuleScope Orchestrator {
             }
             It 'With all products, should not throw' {
                 $ProviderParameters += @{
-                    ProductNames = @("aad", "defender", "exo", "powerplatform", "sharepoint", "teams")
+                    ProductNames = @("entraid", "defender", "exo", "powerplatform", "sharepoint", "teams")
                 }
                 { Invoke-ReportCreation @ProviderParameters } | Should -Not -Throw
             }
@@ -109,7 +109,7 @@ InModuleScope Orchestrator {
             }
             It 'With all products, should not throw' {
                 $ProviderParameters += @{
-                    ProductNames = @("aad", "defender", "exo", "powerplatform", "sharepoint", "teams")
+                    ProductNames = @("entraid", "defender", "exo", "powerplatform", "sharepoint", "teams")
                 }
                 { Invoke-ReportCreation @ProviderParameters } | Should -Not -Throw
             }

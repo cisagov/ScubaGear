@@ -4,8 +4,8 @@ Import-Module (Join-Path -Path $PSScriptRoot -ChildPath $OrchestratorPath) -Func
 InModuleScope Orchestrator {
 Describe -Tag 'Orchestrator' -Name 'Invoke-ProviderList' {
     BeforeAll {
-        function Export-AADProvider {}
-        Mock -ModuleName Orchestrator Export-AADProvider {}
+        function Export-ENTRAIDProvider {}
+        Mock -ModuleName Orchestrator Export-ENTRAIDProvider {}
         function Export-EXOProvider {}
         Mock -ModuleName Orchestrator Export-EXOProvider {}
         function Export-DefenderProvider {}
@@ -36,9 +36,9 @@ Describe -Tag 'Orchestrator' -Name 'Invoke-ProviderList' {
                 BoundParameters = @{};
             }
         }
-        It 'With -ProductNames "aad", should not throw' {
+        It 'With -ProductNames "entraid", should not throw' {
             $ProviderParameters += @{
-                ProductNames = @("aad")
+                ProductNames = @("entraid")
             }
             {Invoke-ProviderList @ProviderParameters} | Should -Not -Throw
         }
@@ -74,7 +74,7 @@ Describe -Tag 'Orchestrator' -Name 'Invoke-ProviderList' {
         }
         It 'With all products, should not throw' {
             $ProviderParameters += @{
-                ProductNames = @("aad", "defender", "exo", "powerplatform", "sharepoint", "teams")
+                ProductNames = @("entraid", "defender", "exo", "powerplatform", "sharepoint", "teams")
             }
             {Invoke-ProviderList @ProviderParameters} | Should -Not -Throw
         }

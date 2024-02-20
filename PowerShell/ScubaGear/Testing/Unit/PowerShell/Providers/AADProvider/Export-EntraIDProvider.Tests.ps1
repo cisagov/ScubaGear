@@ -4,14 +4,14 @@
 #>
 
 $ProviderPath = '../../../../../Modules/Providers'
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "$($ProviderPath)/ExportAADProvider.psm1") -Function Export-AADProvider -Force
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "$($ProviderPath)/ExportENTRAIDProvider.psm1") -Function Export-ENTRAIDProvider -Force
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "$($ProviderPath)/ProviderHelpers/CommandTracker.psm1") -Force
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "$($ProviderPath)/ProviderHelpers/AADConditionalAccessHelper.psm1") -Force
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "$($ProviderPath)/ProviderHelpers/ENTRAIDConditionalAccessHelper.psm1") -Force
 
-InModuleScope -ModuleName ExportAADProvider {
-    Describe -Tag 'ExportAADProvider' -Name "Export-AADProvider" {
+InModuleScope -ModuleName ExportENTRAIDProvider {
+    Describe -Tag 'ExportENTRAIDProvider' -Name "Export-ENTRAIDProvider" {
         BeforeAll {
-            Mock -Module "ExportAADProvider" Get-MgBetaUserCount { 10 }
+            Mock -Module "ExportENTRAIDProvider" Get-MgBetaUserCount { 10 }
             class MockCommandTracker {
                 [string[]]$SuccessfulCommands = @()
                 [string[]]$UnSuccessfulCommands = @()
@@ -32,8 +32,8 @@ InModuleScope -ModuleName ExportAADProvider {
                                             ProvisioningStatus = 'Success'
                                         }
                                     )
-                                    ServicePlanName = 'AAD_PREMIUM_P2'
-                                    SkuPartNumber = 'AAD_Tester'
+                                    ServicePlanName = 'ENTRAID_PREMIUM_P2'
+                                    SkuPartNumber = 'ENTRAID_Tester'
                                     SkuId = '00000-00000-00000-00000'
                                     ConsumedUnits = 5
                                     PrepaidUnits = @{
@@ -108,7 +108,7 @@ InModuleScope -ModuleName ExportAADProvider {
                 }
             }
             function Get-CommandTracker {}
-            Mock -ModuleName 'ExportAADProvider' Get-CommandTracker {
+            Mock -ModuleName 'ExportENTRAIDProvider' Get-CommandTracker {
                 return [MockCommandTracker]::New()
             }
 
@@ -118,7 +118,7 @@ InModuleScope -ModuleName ExportAADProvider {
                 }
             }
             function Get-CapTracker {}
-            Mock -ModuleName 'ExportAADProvider' Get-CapTracker  -MockWith {
+            Mock -ModuleName 'ExportENTRAIDProvider' Get-CapTracker  -MockWith {
                 return [MockCapTracker]::New()
             }
 
@@ -139,15 +139,15 @@ InModuleScope -ModuleName ExportAADProvider {
                 $ValidJson
             }
         }
-        It "With a AAD P2 license, returns valid JSON" {
-                $Json = Export-AADProvider
+        It "With a ENTRAID P2 license, returns valid JSON" {
+                $Json = Export-ENTRAIDProvider
                 $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
                 $ValidJson | Should -Be $true
             }
     }
 }
 AfterAll {
-    Remove-Module ExportAADProvider -Force -ErrorAction 'SilentlyContinue'
+    Remove-Module ExportENTRAIDProvider -Force -ErrorAction 'SilentlyContinue'
     Remove-Module CommandTracker -Force -ErrorAction 'SilentlyContinue'
-    Remove-Module AADConditionalAccessHelper -Force -ErrorAction 'SilentlyContinue'
+    Remove-Module ENTRAIDConditionalAccessHelper -Force -ErrorAction 'SilentlyContinue'
 }

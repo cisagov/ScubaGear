@@ -29,9 +29,9 @@ InModuleScope Orchestrator {
                     M365Environment = 'commercial'
                 }
             }
-            It 'Given -ProductNames aad should not throw' {
+            It 'Given -ProductNames entraid should not throw' {
                 $SplatParams += @{
-                    ProductNames = @("aad")
+                    ProductNames = @("entraid")
                 }
                 {Invoke-RunCached @SplatParams} | Should -Not -Throw
             }
@@ -74,9 +74,9 @@ InModuleScope Orchestrator {
                     ExportProvider = $false
                 }
             }
-            It 'Given -ProductNames aad should not throw' {
+            It 'Given -ProductNames entraid should not throw' {
                 $SplatParams += @{
-                    ProductNames = @("aad")
+                    ProductNames = @("entraid")
                 }
                 {Invoke-RunCached @SplatParams} | Should -Not -Throw
             }

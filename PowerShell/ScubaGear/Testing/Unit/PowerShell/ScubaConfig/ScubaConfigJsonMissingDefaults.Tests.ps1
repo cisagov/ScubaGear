@@ -33,7 +33,7 @@ InModuleScope ScubaConfig {
                 [ScubaConfig]::GetInstance().Configuration.M365Environment | Should -Be 'commercial'
             }
             It 'Valid array parameter'{
-                [ScubaConfig]::GetInstance().Configuration.ProductNames | Should -Contain 'aad'
+                [ScubaConfig]::GetInstance().Configuration.ProductNames | Should -Contain 'entraid'
             }
             It 'Valid boolean parameter'{
                 [ScubaConfig]::GetInstance().Configuration.DisconnectOnExit | Should -Be $false

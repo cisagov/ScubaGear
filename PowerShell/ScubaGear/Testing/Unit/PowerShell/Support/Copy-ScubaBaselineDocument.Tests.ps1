@@ -6,7 +6,7 @@ InModuleScope Support {
             "teams",
             "exo",
             "defender",
-            "aad",
+            "entraid",
             "powerplatform",
             "sharepoint"
         )
@@ -35,19 +35,19 @@ InModuleScope Support {
             Get-Item -Path $ItemPath | Select-Object IsReadyOnly | Should -BeTrue
         }
         It "Call Copy-ScubaBaselineDocument already exists - Not Force update"{
-            $PreviousCreateTime = [System.DateTime](Get-Item -Path (Join-Path -Path $SecureBaselineCopyFolder -ChildPath 'aad.md')).CreationTime
+            $PreviousCreateTime = [System.DateTime](Get-Item -Path (Join-Path -Path $SecureBaselineCopyFolder -ChildPath 'entraid.md')).CreationTime
             Test-Path -Path $SecureBaselineCopyFolder -PathType Container | Should -BeTrue
             {Copy-ScubaBaselineDocument -Destination $SecureBaselineCopyFolder} |
                 Should -Throw -ExpectedMessage "Access to the path * is denied."
-            $CurrentCreateTime = [System.DateTime](Get-Item -Path (Join-Path -Path $SecureBaselineCopyFolder -ChildPath 'aad.md')).CreationTime
+            $CurrentCreateTime = [System.DateTime](Get-Item -Path (Join-Path -Path $SecureBaselineCopyFolder -ChildPath 'entraid.md')).CreationTime
             $PreviousCreateTime -eq $CurrentCreateTime | Should -BeTrue
         }
         It "Call Copy-ScubaBaselineDocument already exists -  Force Update"{
-            $PreviousCreateTime = [System.DateTime](Get-Item -Path (Join-Path -Path $SecureBaselineCopyFolder -ChildPath 'aad.md')).CreationTime
+            $PreviousCreateTime = [System.DateTime](Get-Item -Path (Join-Path -Path $SecureBaselineCopyFolder -ChildPath 'entraid.md')).CreationTime
             Test-Path -Path $SecureBaselineCopyFolder -PathType Container | Should -BeTrue
             {Copy-ScubaBaselineDocument -Destination $SecureBaselineCopyFolder -Force} |
                 Should -Not -Throw
-            $CurrentCreateTime = [System.DateTime](Get-Item -Path (Join-Path -Path $SecureBaselineCopyFolder -ChildPath 'aad.md')).CreationTime
+            $CurrentCreateTime = [System.DateTime](Get-Item -Path (Join-Path -Path $SecureBaselineCopyFolder -ChildPath 'entraid.md')).CreationTime
             ($CurrentCreateTime -ge $PreviousCreateTime) | Should -BeTrue -Because "$($CurrentCreateTime) vs $($PreviousCreateTime)"
         }
     }

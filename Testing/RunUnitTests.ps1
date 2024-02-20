@@ -5,7 +5,7 @@
     .DESCRIPTION
         This script executes the files with the format *ControlGroupName*Config_##_test.rego
         that are found within each products folder in the Testing\Unit\Rego directory. You can run
-        this script focusing only on one product or multiple such as aad, defender, exo, powerplatform, sharepoint, and teams.
+        this script focusing only on one product or multiple such as entraid, defender, exo, powerplatform, sharepoint, and teams.
 
     .EXAMPLE
         .\RunUnitTests.ps1
@@ -14,11 +14,11 @@
     .EXAMPLE
         .\RunUnitTests.ps1 -p teams,sharepoint
         Runs all tests for the specified products. Products must be specified with the -p parameter.
-        Valid product names are: aad, defender, exo, powerplatform, sharepoint, and teams.
+        Valid product names are: entraid, defender, exo, powerplatform, sharepoint, and teams.
 
     .EXAMPLE
-        .\RunUnitTests.ps1 -p aad -c 1
-        Will run the AADConfig_01_test.rego. When specifying a control group, only one product is able to be used
+        .\RunUnitTests.ps1 -p entraid -c 1
+        Will run the ENTRAIDConfig_01_test.rego. When specifying a control group, only one product is able to be used
         at a time.
 
     .EXAMPLE
@@ -31,7 +31,7 @@
 [CmdletBinding()]
 param (
     [Parameter()]
-    [ValidateSet('AAD','Defender','EXO','PowerPlatform','Sharepoint','Teams')]
+    [ValidateSet('ENTRAID','Defender','EXO','PowerPlatform','Sharepoint','Teams')]
     [string[]]$p = "",
     [Parameter()]
     [string[]]$c = "",
@@ -220,7 +220,7 @@ if ($v.IsPresent) {
     $Flag = "-v"
 }
 if($pEmpty -and $cEmpty -and $tEmpty) {
-    $p = @('AAD','Defender','EXO','PowerPlatform','Sharepoint','Teams')
+    $p = @('ENTRAID','Defender','EXO','PowerPlatform','Sharepoint','Teams')
     Invoke-Product -Flag $Flag
 }
 elseif((-not $pEmpty) -and (-not $cEmpty) -and (-not $tEmpty)) {

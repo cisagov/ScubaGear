@@ -1,14 +1,14 @@
 $ProviderPath = '../../../../../Modules/Providers'
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "$($ProviderPath)/ExportAADProvider.psm1") -Function 'Get-PrivilegedUser' -Force
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "$($ProviderPath)/ExportENTRAIDProvider.psm1") -Function 'Get-PrivilegedUser' -Force
 
-InModuleScope ExportAADProvider {
+InModuleScope ExportENTRAIDProvider {
     BeforeAll {
-        Mock -ModuleName ExportAADProvider Get-PrivilegedUser -MockWith {}
-        Mock -ModuleName ExportAADProvider Get-MgBetaDirectoryRoleMember -MockWith {}
-        Mock -ModuleName ExportAADProvider Get-MgBetaUser -MockWith {}
-        Mock -ModuleName ExportAADProvider Get-MgBetaGroupMember -MockWith {}
+        Mock -ModuleName ExportENTRAIDProvider Get-PrivilegedUser -MockWith {}
+        Mock -ModuleName ExportENTRAIDProvider Get-MgBetaDirectoryRoleMember -MockWith {}
+        Mock -ModuleName ExportENTRAIDProvider Get-MgBetaUser -MockWith {}
+        Mock -ModuleName ExportENTRAIDProvider Get-MgBetaGroupMember -MockWith {}
     }
-    Describe -Tag 'AADProvider' -Name "Get-PrivilegedUser" {
+    Describe -Tag 'ENTRAIDProvider' -Name "Get-PrivilegedUser" {
         It "With no premimum license, returns a not null PowerShell object" {
             {Get-PrivilegedUser} | Should -Not -BeNullOrEmpty
         }
@@ -19,5 +19,5 @@ InModuleScope ExportAADProvider {
 }
 
 AfterAll {
-    Remove-Module ExportAADProvider -Force -ErrorAction SilentlyContinue
+    Remove-Module ExportENTRAIDProvider -Force -ErrorAction SilentlyContinue
 }

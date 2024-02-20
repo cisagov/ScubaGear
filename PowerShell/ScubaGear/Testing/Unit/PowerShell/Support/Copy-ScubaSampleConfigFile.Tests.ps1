@@ -27,19 +27,19 @@ InModuleScope Support {
             Get-Item -Path $ItemPath | Select-Object IsReadyOnly | Should -BeTrue
         }
         It "Call Copy-ScubaSampleConfigFile already exists - Not Force update"{
-            $PreviousCreateTime = [System.DateTime](Get-Item -Path (Join-Path -Path $SampleConfigCopyFolder -ChildPath "aad-config.yaml")).CreationTime
+            $PreviousCreateTime = [System.DateTime](Get-Item -Path (Join-Path -Path $SampleConfigCopyFolder -ChildPath "entraid-config.yaml")).CreationTime
             Test-Path -Path $SampleConfigCopyFolder -PathType Container | Should -BeTrue
             {Copy-ScubaSampleConfigFile -Destination $SampleConfigCopyFolder} |
                 Should -Throw -ExpectedMessage "Scuba copy module files failed."
-            $CurrentCreateTime = [System.DateTime](Get-Item -Path (Join-Path -Path $SampleConfigCopyFolder -ChildPath "aad-config.yaml")).CreationTime
+            $CurrentCreateTime = [System.DateTime](Get-Item -Path (Join-Path -Path $SampleConfigCopyFolder -ChildPath "entraid-config.yaml")).CreationTime
             $PreviousCreateTime -eq $CurrentCreateTime | Should -BeTrue
         }
         It "Call Copy-ScubaSampleConfigFile already exists -  Force Update"{
-            $PreviousCreateTime = [System.DateTime](Get-Item -Path (Join-Path -Path $SampleConfigCopyFolder -ChildPath "aad-config.yaml")).CreationTime
+            $PreviousCreateTime = [System.DateTime](Get-Item -Path (Join-Path -Path $SampleConfigCopyFolder -ChildPath "entraid-config.yaml")).CreationTime
             Test-Path -Path $SampleConfigCopyFolder -PathType Container | Should -BeTrue
             {Copy-ScubaSampleConfigFile -Destination $SampleConfigCopyFolder -Force} |
                 Should -Not -Throw
-            $CurrentCreateTime = [System.DateTime](Get-Item -Path (Join-Path -Path $SampleConfigCopyFolder -ChildPath "aad-config.yaml")).CreationTime
+            $CurrentCreateTime = [System.DateTime](Get-Item -Path (Join-Path -Path $SampleConfigCopyFolder -ChildPath "entraid-config.yaml")).CreationTime
             ($CurrentCreateTime -ge $PreviousCreateTime) | Should -BeTrue -Because "$($CurrentCreateTime) vs $($PreviousCreateTime)"
         }
     }

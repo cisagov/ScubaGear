@@ -12,7 +12,7 @@ InModuleScope Connection {
             Mock -CommandName Write-Progress {}
         }
         It 'Disconnects from Microsoft Graph' {
-            Disconnect-SCuBATenant -ProductNames 'aad'
+            Disconnect-SCuBATenant -ProductNames 'entraid'
             Should -Invoke -CommandName Disconnect-MgGraph -Times 1 -Exactly
         }
         It 'Disconnects from Exchange Online' {

@@ -62,7 +62,7 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for $OrganizationN
 
     Context "Navigation to detailed reports" {
         It "Navigate to <Product> (<LinkText>) details" -ForEach @(
-            @{Product = "aad"; LinkText = "Azure Active Directory"}
+            @{Product = "entraid"; LinkText = "Microsft Entra ID"}
             @{Product = "defender"; LinkText = "Microsoft 365 Defender"}
             @{Product = "exo"; LinkText = "Exchange Online"}
             @{Product = "powerplatform"; LinkText = "Microsoft Power Platform"}
@@ -82,7 +82,7 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for $OrganizationN
             Open-SeUrl $script:url -Driver $Driver 2>$null
         }
         It "Check <Product> (<LinkText>) tables" -ForEach @(
-            @{Product = "aad"; LinkText = "Azure Active Directory"}
+            @{Product = "entraid"; LinkText = "Microsft Entra ID"}
             @{Product = "defender"; LinkText = "Microsoft 365 Defender"}
             @{Product = "exo"; LinkText = "Exchange Online"}
             @{Product = "powerplatform"; LinkText = "Microsoft Power Platform"}
@@ -110,7 +110,7 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for $OrganizationN
                     $Tenant = $TenantDataColumns[0].Text
                     $Tenant | Should -Be $OrganizationName -Because "Tenant is $Tenant"
                 }
-                # AAD detailed report has a Conditional Access Policy table
+                # ENTRAID detailed report has a Conditional Access Policy table
                 elseif ($Table.GetAttribute("class") -eq "caps_table"){
                     ForEach ($Row in $Rows){
                         $RowHeaders = Get-SeElement -Element $Row -By TagName 'th'

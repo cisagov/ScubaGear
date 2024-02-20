@@ -25,7 +25,7 @@
     .EXAMPLE
     Test using service principal
     $TestContainers = @()
-    $TestContainers += New-PesterContainer -Path "Testing/Functional/Products" -Data @{ Thumbprint = "04C04809CC43AF66D805399D09B69069041574B0"; TenantDomain = "y2zj1.onmicrosoft.com"; TenantDisplayName = "y2zj1"; AppId = "9947b06c-46a9-4ff2-80c8-27261e58868a"; ProductName = "aad"; M365Environment = "commercial" }
+    $TestContainers += New-PesterContainer -Path "Testing/Functional/Products" -Data @{ Thumbprint = "04C04809CC43AF66D805399D09B69069041574B0"; TenantDomain = "y2zj1.onmicrosoft.com"; TenantDisplayName = "y2zj1"; AppId = "9947b06c-46a9-4ff2-80c8-27261e58868a"; ProductName = "entraid"; M365Environment = "commercial" }
     Invoke-Pester -Container $TestContainers -Output Detailed
     .EXAMPLE
     $TestContainers = @()
@@ -33,13 +33,13 @@
     Invoke-Pester -Container $TestContainers -Output Detailed
     .EXAMPLE
     $TestContainers = @()
-    $TestContainers += New-PesterContainer -Path "Testing/Functional/Products" -Data @{ Thumbprint = "04C04809CC43AF66D805399D09B69069041574B0"; TenantDomain = "y2zj1.onmicrosoft.com"; TenantDisplayName = "y2zj1"; AppId = "9947b06c-46a9-4ff2-80c8-27261e58868a"; ProductName = "aad"; M365Environment = "commercial" }
+    $TestContainers += New-PesterContainer -Path "Testing/Functional/Products" -Data @{ Thumbprint = "04C04809CC43AF66D805399D09B69069041574B0"; TenantDomain = "y2zj1.onmicrosoft.com"; TenantDisplayName = "y2zj1"; AppId = "9947b06c-46a9-4ff2-80c8-27261e58868a"; ProductName = "entraid"; M365Environment = "commercial" }
     $PesterConfig = @{
         Run = @{
             Container = $TestContainers
         }
         Filter = @{
-            Tag = @("MS.AAD.5.4v1")
+            Tag = @("MS.ENTRAID.5.4v1")
         }
         Output = @{
             Verbosity = 'Detailed'
@@ -80,7 +80,7 @@ param (
     [Parameter(Mandatory = $true,  ParameterSetName = 'Auto')]
     [Parameter(Mandatory = $true, ParameterSetName = 'Manual')]
     [ValidateNotNullOrEmpty()]
-    [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", IgnoreCase = $false)]
+    [ValidateSet("teams", "exo", "defender", "entraid", "powerplatform", "sharepoint", IgnoreCase = $false)]
     [string]
     $ProductName,
     [Parameter(ParameterSetName = 'Auto')]
@@ -155,7 +155,7 @@ BeforeAll{
     # Shared Data for functional test
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'ProductDetails', Justification = 'False positive as rule does not scan child scopes')]
     $ProductDetails = @{
-        aad = "Azure Active Directory"
+        entraid = "Microsft Entra ID"
         defender = "Microsoft 365 Defender"
         exo = "Exchange Online"
         powerplatform = "Microsoft Power Platform"

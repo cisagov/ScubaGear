@@ -44,21 +44,21 @@ const colorRows = () => {
 }
 
 /**
- * For the conditional access policy table. For AAD only.
+ * For the conditional access policy table. For ENTRAID only.
  * The "" column is used for the nameless column that holds the
  * "Show more" / "Show less" buttons.
  */
 const capColNames = ["", "Name", "State", "Users", "Apps/Actions", "Conditions", "Block/Grant Access", "Session Controls"];
 
 /**
- * Creates the conditional access policy table at the end of the AAD report.
+ * Creates the conditional access policy table at the end of the ENTRAID report.
  * For all other reports (e.g., teams), this function does nothing.
  */
 const fillCAPTable = () => {
     if (caps === undefined || caps === null) {
-        /*  The CAP table is only displayed for the AAD baseline, but
+        /*  The CAP table is only displayed for the ENTRAID baseline, but
             this js file applies to all baselines. If caps is null,
-            then the current baseline is not AAD and we don't need to
+            then the current baseline is not ENTRAID and we don't need to
             do anything.
 
             Also, note that caps isn't declared in the static version of
@@ -143,8 +143,8 @@ const fillCAPTable = () => {
 }
 
 /**
- * Fills in the truncated version of the given cell of the AAD conditional
- * access policy table. For AAD only.
+ * Fills in the truncated version of the given cell of the ENTRAID conditional
+ * access policy table. For ENTRAID only.
  * @param {HTMLElement} td The specific td that will be populated.
  * @param {number} i The row number (0-indexed, not counting the header row).
  * @param {number} j The the column number (0-indexed).
@@ -190,7 +190,7 @@ const fillTruncatedCell = (td, i, j) => {
 
 /**
  * Fills in the row of the conditional access policy table indicated by the
- * event with the truncated version of the row. For AAD only.
+ * event with the truncated version of the row. For ENTRAID only.
  * @param {HTMLElement} event The target of the event.
  */
 const hideCAPRow = (event) => {
@@ -219,7 +219,7 @@ const hideCAPRow = (event) => {
 
 /**
  * Expands all rows of the conditional access policy table to the full version.
- * For AAD only.
+ * For ENTRAID only.
  */
 const expandAllCAPs = () => {
     try {
@@ -236,7 +236,7 @@ const expandAllCAPs = () => {
 
 /**
  * Shrinks all rows of the conditional access policy table to the truncated
- * version. For AAD only.
+ * version. For ENTRAID only.
  */
 const collapseAllCAPs = () => {
     try {
@@ -253,7 +253,7 @@ const collapseAllCAPs = () => {
 
 /**
  * Fills in the row of the conditional access policy table indicated by the
- * event with the full version of the row. For AAD only.
+ * event with the full version of the row. For ENTRAID only.
  * @param {HTMLElement} event The target of the event.
  */
 const expandCAPRow = (event) => {
