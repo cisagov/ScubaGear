@@ -216,7 +216,7 @@ ApplyLicenseWarningString(Status, String) := ReportDetailsString(Status, String)
 
 # If a defender license is not present, assume failure and
 # replace the message with the warning
-ApplyLicenseWarningString(Status,_) := concat(" ", [FAIL, LicenseWarning]) if {
+ApplyLicenseWarningString(_,_) := concat(" ", [FAIL, LicenseWarning]) if {
     input.defender_license == false
     LicenseWarning := concat(" ", [
         "**NOTE: Either you do not have sufficient permissions or",
