@@ -649,20 +649,17 @@ Exception cases:
 
 #### MS.AAD.7.6v1 Instructions
 
-1. It is recommended to create an Azure AD group named **Global Admin Activation Approvers** and assign the group to the Azure AD role **Privileged Role Administrators**. Members of this group will be able to approve requests from users to activate the Global Administrator role. Place administrators that are responsible for reviewing approval requests into the new group.
+1. In **Azure AD Privileged Identity Management (PIM)**, under **Manage**, select **Azure AD roles**.
 
-2. In **Azure AD Privileged Identity Management (PIM)**, under **Manage**, select **Azure AD roles**.
-
-3. Under **Manage**, select **Roles**.
+2. Under **Manage**, select **Roles**.
 
   1.  Select the **Global Administrator** role in the list.
   2.  Click **Settings**.
   3.  Click **Edit**.
   4.  Select the **Require approval to activate** option.
-  5.  Click **Select approvers** and select the group **Global Admin Activation Approvers**, and then click **Select**.
-  6.  Click **Update**.
+  5.  Click **Update**.
 
-4. Review the list of groups that are actively assigned to the **Global Administrator** role. If any of the groups are enrolled in PIM for Groups, then also apply the same configurations under step 3 above to each PIM group's **Member** settings.
+3. Review the list of groups that are actively assigned to the **Global Administrator** role. If any of the groups are enrolled in PIM for Groups, then also apply the same configurations under step 2 above to each PIM group's **Member** settings.
 
 #### MS.AAD.7.7v1 Instructions
 
