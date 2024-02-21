@@ -25,7 +25,7 @@
 				"CertificateB64": "-----BEGIN CERTIFICATE-----\r\nMIIK...A=\r\n-----END CERTIFICATE-----\r\n\r\n",
 				"AppId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
 				"M365Env": "gcc",
-				"CertificatePassword": "sample02secret"
+				"CertificatePassword": "sample02secret"  #gitleaks:allow
 			}
 		},
 		{
@@ -35,7 +35,7 @@
 				"CertificateB64": "-----BEGIN CERTIFICATE-----\r\nMIIK...A=\r\n-----END CERTIFICATE-----\r\n\r\n",
 				"AppId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
 				"M365Env": "commercial",
-				"CertificatePassword": "sample03secret"
+				"CertificatePassword": "sample03secret"  #gitleaks:allow
 			}
 		}
 	]
