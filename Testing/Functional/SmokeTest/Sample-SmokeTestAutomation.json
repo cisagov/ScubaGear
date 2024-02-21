@@ -15,7 +15,7 @@
 				"_comment5": "M365Enc maps to -M365Environment parameter of Invoke-SCuBA ",
 				"M365Env": "commercial",
 				"_comment6": "The password for the provided certificate, CertificateB64.",
-				"CertificatePassword": "sample01secret"  #gitleaks:allow
+				"CertificatePassword": ""  
 			}
 		},
 		{
