@@ -12,6 +12,7 @@ import data.utils.defender.SensitiveAccountsSetting
 import data.utils.defender.ImpersonationProtection
 import data.utils.defender.ImpersonationProtectionConfig
 import data.utils.defender.ApplyLicenseWarning
+import data.utils.defender.ApplyLicenseWarningString
 
 
 #################
@@ -226,6 +227,8 @@ tests contains {
 #--
 
 # General report details function for impersonation protection
+
+
 ImpersonationProtectionErrorMsg(false, true, AccountType) := Description if {
     String := concat(" ", ["Not all", AccountType])
     Description := concat(" ", [String, "are included for targeted protection in Strict policy."])
@@ -257,7 +260,7 @@ tests contains {
     "Criticality": "Should",
     "Commandlet": ["Get-AntiPhishPolicy"],
     "ActualValue": [StrictIP.Policy, StandardIP.Policy],
-    "ReportDetails": ReportDetailsString(Status, ErrorMessage),
+    "ReportDetails": ApplyLicenseWarningString(Status, ErrorMessage),
     "RequirementMet": Status
 } if {
     Policies := input.anti_phish_policies
@@ -289,7 +292,7 @@ tests contains {
     "Criticality": "Should",
     "Commandlet": ["Get-AntiPhishPolicy"],
     "ActualValue": [StrictIP.Policy, StandardIP.Policy],
-    "ReportDetails": ReportDetailsString(Status, ErrorMessage),
+    "ReportDetails": ApplyLicenseWarningString(Status, ErrorMessage),
     "RequirementMet": Status
 } if {
     Policies := input.anti_phish_policies
@@ -326,7 +329,7 @@ tests contains {
     "Criticality": "Should",
     "Commandlet": ["Get-AntiPhishPolicy"],
     "ActualValue": [StrictIP.Policy, StandardIP.Policy],
-    "ReportDetails": ReportDetailsString(Status, ErrorMessage),
+    "ReportDetails": ApplyLicenseWarningString(Status, ErrorMessage),
     "RequirementMet": Status
 } if {
     Policies := input.anti_phish_policies
@@ -480,7 +483,7 @@ tests contains {
     "Criticality": "Shall",
     "Commandlet": ["Get-DlpComplianceRule"],
     "ActualValue": Rules,
-    "ReportDetails": ReportDetailsString(Status, ErrorMessage),
+    "ReportDetails": ApplyLicenseWarningString(Status, ErrorMessage),
     "RequirementMet": Status
 } if {
     error_rule := "No matching rules found for:"
@@ -550,7 +553,7 @@ tests contains {
     "Criticality": "Should",
     "Commandlet": ["Get-DLPCompliancePolicy"],
     "ActualValue": Policies,
-    "ReportDetails": ReportDetailsString(Status, DefenderErrorMessage4_2),
+    "ReportDetails": ApplyLicenseWarningString(Status, DefenderErrorMessage4_2),
     "RequirementMet": Status
 } if {
     Conditions := [
@@ -599,7 +602,7 @@ tests contains {
     "Criticality": "Should",
     "Commandlet": ["Get-DlpComplianceRule"],
     "ActualValue": Rules,
-    "ReportDetails": ReportDetailsString(Status, DefenderErrorMessage4_3(Rules)),
+    "ReportDetails": ApplyLicenseWarningString(Status, DefenderErrorMessage4_3(Rules)),
     "RequirementMet": Status
 } if {
     Rules := SensitiveRulesNotBlocking
@@ -644,7 +647,7 @@ tests contains {
     "Criticality": "Should",
     "Commandlet": ["Get-DlpComplianceRule"],
     "ActualValue": Rules,
-    "ReportDetails": ReportDetailsString(Status, DefenderErrorMessage4_4(Rules)),
+    "ReportDetails": ApplyLicenseWarningString(Status, DefenderErrorMessage4_4(Rules)),
     "RequirementMet": Status
 } if {
     Rules := SensitiveRulesNotNotifying
