@@ -1,6 +1,7 @@
 package utils.defender
 import rego.v1
 import data.utils.report.ReportDetailsBoolean
+import data.utils.report.ReportDetailsString
 import data.utils.key.FAIL
 import data.utils.key.ConvertToSet
 import data.utils.key.FilterArray
@@ -200,5 +201,26 @@ ApplyLicenseWarning(_) := concat(" ", [FAIL, LicenseWarning]) if {
         "**NOTE: Either you do not have sufficient permissions or",
         "your tenant does not have a license for Microsoft Defender",
         "for Office 365 Plan 1, which is required for this feature.**"
+    ])
+}
+
+#################################################################################
+# Report Detail Functions for check that required Defender license #
+#################################################################################
+
+# If a defender license is present, don't apply the warning
+# and leave the message unchanged
+ApplyLicenseWarningString(Status, String) := ReportDetailsString(Status, String) if {
+    input.defender_license == true
+}
+
+# If a defender license is not present, assume failure and
+# replace the message with the warning
+ApplyLicenseWarningString(Status, String) := concat(" ", [FAIL, LicenseWarning]) if {
+    input.defender_license == false
+    LicenseWarning := concat(" ", [
+        "**NOTE: Either you do not have sufficient permissions or",
+        "your tenant does not have the required license(s) for Microsoft Defender",
+        "for this feature.**"
     ])
 }
