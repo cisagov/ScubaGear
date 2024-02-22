@@ -73,6 +73,7 @@ function Export-AADProvider {
         # Get-PrivilegedRole provides data for 2.14 - 2.16, policies that evaluate conditions related to Azure AD PIM
         if ($RequiredServicePlan){
             # If the tenant has the premium license then we want to also include PIM Eligible role assignments - otherwise we don't to avoid an API error
+            Write-Information "Calling Get-PrivilegedRole"
             $PrivilegedRoles = $Tracker.TryCommand("Get-PrivilegedRole", @{"TenantHasPremiumLicense"=$true})
         }
         else {
@@ -183,7 +184,7 @@ function Get-PrivilegedUser {
     )
 
     $PrivilegedUsers = @{}
-    $PrivilegedRoles = @("Global Administrator", "Privileged Role Administrator", "User Administrator", "SharePoint Administrator", "Exchange Administrator", "Hybrid identity administrator", "Application Administrator", "Cloud Application Administrator")
+    $PrivilegedRoles = [ScubaConfig]::ScubaDefault('DefaultPrivilegedRoles')
     # Get a list of the Id values for the privileged roles in the list above.
     # The Id value is passed to other cmdlets to construct a list of users assigned to privileged roles.
     $AADRoles = Get-MgBetaDirectoryRole -All -ErrorAction Stop | Where-Object { $_.DisplayName -in $PrivilegedRoles }
@@ -335,6 +336,85 @@ function Get-PrivilegedUser {
     $PrivilegedUsers
 }
 
+function FindRulesForPimGroupsRoles{
+    param (
+        $AADRoles,
+        $AllRoleAssignments
+    )
+
+    foreach ($RoleAssignment in $AllRoleAssignments){
+        $PrincipalId = $RoleAssignment.PrincipalId
+        ($MemberPolicyIds = Get-MgBetaPolicyRoleManagementPolicyAssignment -Filter "scopeId eq '$PrincipalId' and scopeType eq 'Group' and roleDefinitionId eq 'member'" |
+            Select-Object -Property PolicyId) *> $null
+
+        foreach ($MemberPolicyId in $MemberPolicyIds){
+            Write-Information "Member Policy Id: $($MemberPolicyId.PolicyId)"
+            $MemberPolicyRules = Get-MgBetaPolicyRoleManagementPolicyRule -UnifiedRoleManagementPolicyId $MemberPolicyId.PolicyId -All
+
+            Write-Information "Lookup role: $($RoleAssignment.RoleDefinitionId)"
+            $Role = $AADRoles | Where-Object RoleTemplateId -EQ $($RoleAssignment.RoleDefinitionId)
+            Write-Information "AADRoles: $($AADRoles | ConvertTo-Json -Depth 2)"
+            Write-Information "Found Role: $Role"
+
+            if ($Role){
+                Write-Information "Found role: $($Role.DisplayName)"
+
+                $RoleRules = $Role.psobject.Properties | Where-Object {$_.Name -eq 'Rules'}
+                if ($RoleRules){
+                    Write-Information "Appending rules for $($Role.DisplayName)"
+                    $Role.Rules += $MemberPolicyRules
+                }
+                else {
+                    Write-Information "Adding rules for $($Role.DisplayName)"
+                    $Role | Add-Member -Name "Rules" -Value $MemberPolicyRules -MemberType NoteProperty
+                }
+            }
+        }
+    }
+}
+
+function FindRulesForRoles{
+    param (
+        $AADRoles,
+        $AllRoleAssignments
+    )
+
+    # Get all the roles and policies (rules) assigned to them
+    $RolePolicyAssignments = Get-MgBetaPolicyRoleManagementPolicyAssignment -All -ErrorAction Stop -Filter "scopeId eq '/' and scopeType eq 'Directory'"
+
+    foreach ($Role in $AADRoles) {
+        $RolePolicies = @()
+        $RoleTemplateId = $Role.RoleTemplateId
+
+        # Get a list of the rules (aka policies) assigned to this role
+        $PolicyAssignment = $RolePolicyAssignments | Where-Object -Property RoleDefinitionId -eq -Value $RoleTemplateId
+
+        # Get the details of policy (rule)
+        if ($PolicyAssignment.length -eq 1) {
+            $RolePolicies = Get-MgBetaPolicyRoleManagementPolicyRule -All -ErrorAction Stop -UnifiedRoleManagementPolicyId $PolicyAssignment.PolicyId
+        }
+        elseif ($PolicyAssignment.length -gt 1) {
+            $RolePolicies = "Too many policies found"
+        }
+        else {
+            $RolePolicies = "No policies found"
+        }
+
+        # Get a list of the users / groups assigned to this role
+        $RoleAssignments = @($AllRoleAssignments | Where-Object { $_.RoleDefinitionId -eq $RoleTemplateId })
+
+        # Store the data that we retrieved in the Role object that will be returned from this function
+        $Role | Add-Member -Name "Assignments" -Value $RoleAssignments -MemberType NoteProperty
+
+        $RoleRules = $Role.psobject.Properties | Where-Object {$_.Name -eq 'Rules'}
+        if ($RoleRules){
+            $Role.Rules += $RolePolicies
+        }
+        else {
+            $Role | Add-Member -Name "Rules" -Value $RolePolicies -MemberType NoteProperty
+        }
+    }
+}
 function Get-PrivilegedRole {
     <#
     .Description
@@ -348,44 +428,19 @@ function Get-PrivilegedRole {
         $TenantHasPremiumLicense
     )
 
-    $PrivilegedRoles = @("Global Administrator", "Privileged Role Administrator", "User Administrator", "SharePoint Administrator", "Exchange Administrator", "Hybrid identity administrator", "Application Administrator", "Cloud Application Administrator")
+    Write-Information "Entering"
+    $PrivilegedRoles = [ScubaConfig]::ScubaDefault('DefaultPrivilegedRoles')
     # Get a list of the RoleTemplateId values for the privileged roles in the list above.
     # The RoleTemplateId value is passed to other cmdlets to retrieve role security policies and user assignments.
     $AADRoles = Get-MgBetaDirectoryRoleTemplate -All -ErrorAction Stop | Where-Object { $_.DisplayName -in $PrivilegedRoles } | Select-Object "DisplayName", @{Name='RoleTemplateId'; Expression={$_.Id}}
+    # Get ALL the roles and users actively assigned to them
+    $AllRoleAssignments = Get-MgBetaRoleManagementDirectoryRoleAssignmentScheduleInstance -All -ErrorAction Stop
 
+    Write-Information "Initial Rules: $($AADRoles | ConvertTo-Json -Depth 3)"
     # If the tenant has the premium license then you can access the PIM service to get the role configuration policies and the active role assigments
     if ($TenantHasPremiumLicense) {
-        # Get all the roles and policies (rules) assigned to them
-        $RolePolicyAssignments = Get-MgBetaPolicyRoleManagementPolicyAssignment -All -ErrorAction Stop -Filter "scopeId eq '/' and scopeType eq 'Directory'"
-
-        # Get ALL the roles and users actively assigned to them
-        $AllRoleAssignments = Get-MgBetaRoleManagementDirectoryRoleAssignmentScheduleInstance -All -ErrorAction Stop
-
-        foreach ($Role in $AADRoles) {
-            $RolePolicies = @()
-            $RoleTemplateId = $Role.RoleTemplateId
-
-            # Get a list of the rules (aka policies) assigned to this role
-            $PolicyAssignment = $RolePolicyAssignments | Where-Object -Property RoleDefinitionId -eq -Value $RoleTemplateId
-
-            # Get the details of policy (rule)
-            if ($PolicyAssignment.length -eq 1) {
-                $RolePolicies = Get-MgBetaPolicyRoleManagementPolicyRule -All -ErrorAction Stop -UnifiedRoleManagementPolicyId $PolicyAssignment.PolicyId
-            }
-            elseif ($PolicyAssignment.length -gt 1) {
-                $RolePolicies = "Too many policies found"
-            }
-            else {
-                $RolePolicies = "No policies found"
-            }
-
-            # Get a list of the users / groups assigned to this role
-            $RoleAssignments = @($AllRoleAssignments | Where-Object { $_.RoleDefinitionId -eq $RoleTemplateId })
-
-            # Store the data that we retrieved in the Role object that will be returned from this function
-            $Role | Add-Member -Name "Rules" -Value $RolePolicies -MemberType NoteProperty
-            $Role | Add-Member -Name "Assignments" -Value $RoleAssignments -MemberType NoteProperty
-        }
+        FindRulesForRoles -AADRoles $AADRoles -AllRoleAssignments $AllRoleAssignments
+        FindRulesForPimGroupsRoles -AADRoles $AADRoles -AllRoleAssignments $AllRoleAssignments
     }
 
     $AADRoles
