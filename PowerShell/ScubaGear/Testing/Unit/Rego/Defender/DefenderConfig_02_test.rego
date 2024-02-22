@@ -41,7 +41,7 @@ test_TargetedUsers_Correct_V1 if {
                     ]
                 }
             }
-        }
+        },
         "defender_license": true
     }
 
@@ -80,7 +80,7 @@ test_TargetedUsers_Correct_V2 if {
                     ]
                 }
             }
-        }
+        },
         "defender_license": true
     }
 
@@ -120,7 +120,7 @@ test_TargetedUsers_Correct_V3 if {
                     ]
                 }
             }
-        }
+        },
         "defender_license": true
     }
 
@@ -150,7 +150,7 @@ test_TargetedUsers_Incorrect_V1 if {
                     ]
                 }
             }
-        }
+        },
         "defender_license": true
     }
 
@@ -181,7 +181,7 @@ test_TargetedUsers_Incorrect_V2 if {
                     ]
                 }
             }
-        }
+        },
         "defender_license": true
     }
 
@@ -212,7 +212,7 @@ test_TargetedUsers_Incorrect_V3 if {
                     ]
                 }
             }
-        }
+        },
         "defender_license": true
     }
 
@@ -253,7 +253,7 @@ test_TargetedUsers_Incorrect_V4 if {
                     ]
                 }
             }
-        }
+        },
         "defender_license": true
     }
 
@@ -294,7 +294,7 @@ test_TargetedUsers_Incorrect_V5 if {
                     ]
                 }
             }
-        }
+        },
         "defender_license": true
     }
 
@@ -334,7 +334,7 @@ test_TargetedUsers_Incorrect_V6 if {
                     ]
                 }
             }
-        }
+        },
         "defender_license": true
     }
 
@@ -375,7 +375,7 @@ test_TargetedUsers_Incorrect_V7 if {
                     ]
                 }
             }
-        }
+        },
         "defender_license": false
     }
 
@@ -424,7 +424,7 @@ test_AgencyDomains_Correct_V1 if {
                     ]
                 }
             }
-        }
+        },
         "defender_license": true
     }
 
@@ -463,7 +463,7 @@ test_AgencyDomains_Correct_V2 if {
                     ]
                 }
             }
-        }
+        },
         "defender_license": true
     }
 
@@ -493,7 +493,7 @@ test_AgencyDomains_Incorrect_V1 if {
                     ]
                 }
             }
-        }
+        },
         "defender_license": true
     }
 
@@ -524,7 +524,7 @@ test_AgencyDomains_Incorrect_V2 if {
                     ]
                 }
             }
-        }
+        },
         "defender_license": true
     }
 
@@ -555,7 +555,7 @@ test_AgencyDomains_Incorrect_V3 if {
                     ]
                 }
             }
-        }
+        },
         "defender_license": true
     }
 
@@ -596,7 +596,7 @@ test_AgencyDomains_Incorrect_V4 if {
                     ]
                 }
             }
-        }
+        },
         "defender_license": true
     }
 
@@ -637,7 +637,7 @@ test_AgencyDomains_Incorrect_V5 if {
                     ]
                 }
             }
-        }
+        },
         "defender_license": true
     }
 
@@ -677,7 +677,7 @@ test_AgencyDomains_Incorrect_V6 if {
                     ]
                 }
             }
-        }
+        },
         "defender_license": true
     }
 
@@ -713,7 +713,7 @@ test_AgencyDomains_Incorrect_V7 if {
             "Defender": {
                 "MS.DEFENDER.2.2v1": {}
             }
-        }
+        },
         "defender_license": true
     }
 
@@ -743,7 +743,7 @@ test_AgencyDomains_Incorrect_V8 if {
             "Defender": {
                 "MS.DEFENDER.2.2v1": {}
             }
-        }
+        },
         "defender_license": true
     }
 
@@ -787,7 +787,7 @@ test_AgencyDomains_Incorrect_V9 if {
                     ]
                 }
             }
-        }
+        },
         "defender_license": false
     }
 
@@ -836,7 +836,7 @@ test_CustomDomains_Correct_V1 if {
                     ]
                 }
             }
-        }
+        },
         "defender_license": true
     }
 
@@ -875,7 +875,7 @@ test_CustomDomains_Correct_V2 if {
                     ]
                 }
             }
-        }
+        },
         "defender_license": true
     }
 
@@ -915,7 +915,7 @@ test_CustomDomains_Correct_V3 if {
                     ]
                 }
             }
-        }
+        },
         "defender_license": true
     }
 
@@ -944,7 +944,7 @@ test_CustomDomains_Correct_V4 if {
             "Defender": {
                 "MS.DEFENDER.2.3v1": {}
             }
-        }
+        },
         "defender_license": true
     }
 
@@ -974,7 +974,7 @@ test_CustomDomains_Incorrect_V1 if {
                     ]
                 }
             }
-        }
+        },
         "defender_license": true
     }
 
@@ -1005,7 +1005,7 @@ test_CustomDomains_Incorrect_V2 if {
                     ]
                 }
             }
-        }
+        },
         "defender_license": true
     }
 
@@ -1036,7 +1036,7 @@ test_CustomDomains_Incorrect_V3 if {
                     ]
                 }
             }
-        }
+        },
         "defender_license": true
     }
 
@@ -1077,7 +1077,7 @@ test_CustomDomains_Incorrect_V4 if {
                     ]
                 }
             }
-        }
+        },
         "defender_license": true
     }
 
@@ -1118,7 +1118,7 @@ test_CustomDomains_Incorrect_V5 if {
                     ]
                 }
             }
-        }
+        },
         "defender_license": true
     }
 
@@ -1158,7 +1158,7 @@ test_CustomDomains_Incorrect_V6 if {
                     ]
                 }
             }
-        }
+        },
         "defender_license": true
     }
 
@@ -1194,7 +1194,7 @@ test_CustomDomains_Incorrect_V7 if {
             "Defender": {
                 "MS.DEFENDER.2.3v1": {}
             }
-        }
+        },
         "defender_license": true
     }
 
@@ -1235,7 +1235,7 @@ test_CustomDomains_Incorrect_V8 if {
                     ]
                 }
             }
-        }
+        },
         "defender_license": false
     }
 
