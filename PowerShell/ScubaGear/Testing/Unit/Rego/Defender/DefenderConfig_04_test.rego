@@ -354,7 +354,7 @@ test_ContentContainsSensitiveInformation_Incorrect_V6 if {
 
 test_ContentContainsSensitiveInformation_Incorrect_V7 if {
     Output := defender.tests with input as {
-        "dlp_compliance_rules": [
+         "dlp_compliance_rules": [
             {
                 "ContentContainsSensitiveInformation": [
                     {
@@ -384,7 +384,7 @@ test_ContentContainsSensitiveInformation_Incorrect_V7 if {
         "dlp_compliance_policies": [
             {
                 "Name": "Default Office 365 DLP policy",
-                "Mode": "Enable",
+                "Mode": "TestWithNotifications",
                 "Enabled": true
             }
         ],
@@ -1098,6 +1098,7 @@ test_Locations_Incorrect_V8 if {
 
 test_Locations_Incorrect_V9 if {
     Output := defender.tests with input as {
+    Output := defender.tests with input as {
         "dlp_compliance_rules": [
             {
                 "ContentContainsSensitiveInformation": [
@@ -1144,7 +1145,7 @@ test_Locations_Incorrect_V9 if {
                 ],
                 "Workload": "Exchange, SharePoint, OneDriveForBusiness, Teams, EndpointDevices",
                 "Name": "Default Office 365 DLP policy",
-                "Mode": "Enable",
+                "Mode": "TestWithNotifications",
                 "Enabled": true
             }
         ],
@@ -1529,7 +1530,7 @@ test_BlockAccess_Incorrect_V7 if {
             {
                 "Name": "Default Office 365 DLP policy",
                 "Mode": "Enable",
-                "Enabled": true
+                "Enabled": false
             }
         ],
         "defender_license": false
@@ -1736,9 +1737,7 @@ test_NotifyUser_Incorrect_V3 if {
                 "ParentPolicyName": "Default Office 365 DLP policy",
                 "BlockAccess": true,
                 "BlockAccessScope": "All",
-                "NotifyUser": [
-                    "SiteAdmin"
-                ],
+                "NotifyUser": [],
                 "NotifyUserType": "NotSet",
                 "IsAdvancedRule": false
             }
