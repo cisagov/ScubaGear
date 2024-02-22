@@ -76,6 +76,28 @@ Context "Unit Test for ConfigureScubaGearModule" {
             $Version | Should -BeExactly "3.0.1"
         }
     }
+
+    Describe -Name 'Update manifest with prerelease' {
+        BeforeAll {
+            . (Join-Path -Path $PSScriptRoot -ChildPath '..\..\..\..\..\..\utils\DeployUtils.ps1')
+            $ModulePath = Join-Path -Path $PSScriptRoot -Child '..\..\..\..\'
+            if (Test-Path -Path "$env:TEMP\ScubaGear"){
+                Remove-Item -Force -Recurse "$env:TEMP\ScubaGear"
+            }
+            Copy-Item -Recurse -Path $ModulePath -Destination $env:TEMP -Force
+            ConfigureScubaGearModule -ModulePath "$env:TEMP\ScubaGear" -OverrideModuleVersion "3.0.1" -PrereleaseTag 'Alpha'
+            Import-LocalizedData -BaseDirectory "$env:TEMP\ScubaGear" -FileName ScubaGear.psd1 -BindingVariable UpdatedManifest
+        }
+        It 'Validate Manifest version info with prerelease' {
+            $Version = [version]$UpdatedManifest.ModuleVersion
+            $Version.Major | Should -BeExactly 3
+            $Version.Minor | Should -BeExactly 0
+            $Version.Build | Should -BeExactly 1
+            $Version.Revision | Should -BeExactly -1
+            $Version | Should -BeExactly "3.0.1"
+            $UpdatedManifest.PrivateData.PSData.Prerelease | Should -BeExactly 'Alpha'
+        }
+    }
     Describe -Name 'Update manifest Bad' {
         BeforeAll {
             . (Join-Path -Path $PSScriptRoot -ChildPath '..\..\..\..\..\..\utils\DeployUtils.ps1')

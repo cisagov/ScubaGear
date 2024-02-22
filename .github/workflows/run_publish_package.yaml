@@ -78,7 +78,36 @@ jobs:
           Invoke-Pester -Configuration $Config
       - name: Check Scuba Version
         run: |
-          repo/SetUp.ps1 -NoOPA
+          repo/SetUp.ps1 -NoOPA -SkipUpdate
           Install-Module -Name ScubaGear -SkipPublisherCheck
           Import-Module -Name ScubaGear
           Invoke-SCuBA -Version
+      - name: Sign and publish prerelease module to private gallery
+        uses: azure/powershell@v1
+        env:
+          KEY_VAULT_INFO: ${{ secrets.SCUBA_KEY_VAULT_DEV}}
+        with:
+          inlineScript: |
+            Write-Output "$(pwd)"
+            . repo/utils/DeployUtils.ps1
+            $KeyVaultInfo = ${env:KEY_VAULT_INFO} | ConvertFrom-Json
+            # Remove non-release files
+            Remove-Item -Recurse -Force repo -Include .git*
+            Publish-ScubaGearModule `
+              -AzureKeyVaultUrl $($KeyVaultInfo.KeyVault.URL) `
+              -CertificateName $($KeyVaultInfo.KeyVault.CertificateName) `
+              -ModulePath repo/PowerShell/ScubaGear `
+              -GalleryName $env:GalleryName `
+              -OverrideModuleVersion '9.9.9' `
+              -Prerelease 'alpha'
+          azPSVersion: "latest"
+      - name: Check Scuba Version
+        run: |
+          $ScubaModules = Find-Module -Name ScubaGear -AllVersions -AllowPrerelease
+          ($ScubaModules).Version
+          if ($ScubaModules.Count -eq 2) {
+            Exit 0
+          }
+          else {
+            Exit 1
+          }

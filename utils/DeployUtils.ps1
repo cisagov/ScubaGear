@@ -84,10 +84,22 @@ function Publish-ScubaGearModule{
         [Parameter(Mandatory=$false)]
         [AllowEmptyString()]
         [string]
-        $OverrideModuleVersion = ""
+        $OverrideModuleVersion = "",
+        [Parameter(Mandatory=$false)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $PrereleaseTag = ""
     )
 
-    $ModuleBuildPath = Build-ScubaModule -ModulePath $ModulePath -OverrideModuleVersion $OverrideModuleVersion
+    $BuildSplat = @{
+        ModulePath = $ModulePath
+        OverrideModuleVersion = $OverrideModuleVersion
+    }
+
+    if (-Not [string]::IsNullOrEmpty($PrereleaseTag)){
+        $BuildSplat.Add('PrereleaseTag', $PrereleaseTag)
+    }
+    $ModuleBuildPath = Build-ScubaModule @BuildSplat
 
     if (SignScubaGearModule -AzureKeyVaultUrl $AzureKeyVaultUrl -CertificateName $CertificateName -ModulePath $ModuleBuildPath){
         Publish-Module -Path $ModuleBuildPath -Repository $GalleryName
@@ -110,7 +122,11 @@ function Build-ScubaModule{
         [Parameter(Mandatory=$false)]
         [AllowEmptyString()]
         [string]
-        $OverrideModuleVersion = ""
+        $OverrideModuleVersion = "",
+        [Parameter(Mandatory=$false)]
+        [AllowEmptyString()]
+        [string]
+        $PrereleaseTag = ""
     )
     $Leaf = Split-Path -Path $ModulePath -Leaf
     $ModuleBuildPath = Join-Path -Path $env:TEMP -ChildPath $Leaf
@@ -120,7 +136,7 @@ function Build-ScubaModule{
     }
 
     Copy-Item $ModulePath -Destination $env:TEMP -Recurse
-    if (-not (ConfigureScubaGearModule -ModulePath $ModuleBuildPath -OverrideModuleVersion $OverrideModuleVersion)){
+    if (-not (ConfigureScubaGearModule -ModulePath $ModuleBuildPath -OverrideModuleVersion $OverrideModuleVersion -PrereleaseTag $PrereleaseTag)){
         Write-Error "Failed to configure scuba module for publishing."
     }
 
@@ -139,7 +155,11 @@ function ConfigureScubaGearModule{
         [Parameter(Mandatory=$false)]
         [AllowEmptyString()]
         [string]
-        $OverrideModuleVersion = ""
+        $OverrideModuleVersion = "",
+        [Parameter(Mandatory=$false)]
+        [AllowEmptyString()]
+        [string]
+        $PrereleaseTag = ""
     )
     #TODO: Add any module configuration needed (e.g., adjust Module Version)
 
@@ -158,6 +178,10 @@ function ConfigureScubaGearModule{
         ProjectUri = "https://github.com/cisagov/ScubaGear"
         LicenseUri = "https://github.com/cisagov/ScubaGear/blob/main/LICENSE"
         Tags = 'CISA', 'Microsoft 365', 'O365', 'Microsoft Entra Id', 'Configuration', 'Exchange', 'Report', 'Security', 'SharePoint', 'Defender', 'Teams', 'PowerPlatform', 'OneDrive'
+    }
+
+    if (-Not [string]::IsNullOrEmpty($PrereleaseTag)){
+        $ManifestUpdates.Add('Prerelease', $PrereleaseTag)
     }
 
     try {
