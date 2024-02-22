@@ -207,11 +207,17 @@ ApplyLicenseWarning(_) := concat(" ", [FAIL, LicenseWarning]) if {
 #################################################################################
 # Report Detail Functions for check that required Defender license #
 #################################################################################
-LicenseWarning :=
-    "**NOTE: Either you do not have sufficient permissions or your tenant does not have the required license(s) for Microsoft Defender for this feature.**"
-
 # If a defender license is present, don't apply the warning
 # and leave the message unchanged
 ApplyLicenseWarningString(Status, String) := ReportDetailsString(Status, String) if {
     input.defender_license == true
-} else := ReportDetailsString(false, LicenseWarning) 
+} 
+
+ApplyLicenseWarningString(_,_) := concat(" ", [FAIL, LicenseWarning]) if {
+    input.defender_license == false
+    LicenseWarning := concat(" ", [
+        "**NOTE: Either you do not have sufficient permissions or",
+        "your tenant does not have a license for Microsoft Defender",
+        "for Office 365 Plan 1, which is required for this feature.**"
+    ])
+}
