@@ -213,7 +213,7 @@ ApplyLicenseWarningString(Status, String) := ReportDetailsString(Status, String)
     input.defender_license == true
 } 
 
-ApplyLicenseWarningString(_,_) := concat(" ", [FAIL, LicenseWarning]) if {
+ApplyLicenseWarningString(Status,_) := concat(" ", [ReportDetailsBoolean(Status), LicenseWarning]) if {
     input.defender_license == false
     LicenseWarning := concat(" ", [
         "**NOTE: Either you do not have sufficient permissions or",
