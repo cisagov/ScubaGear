@@ -381,8 +381,8 @@ test_TargetedUsers_Incorrect_V7 if {
 
     ReportDetailString := concat(" ", [
         "Requirement not met **NOTE: Either you do not have sufficient permissions or",
-        "your tenant does not have a license for Microsoft Defender for Office 365 Plan 1,",
-        "which is required for this feature.**"
+        "your tenant does not have the required license(s) for Microsoft Defender",
+        "for this feature.**"
     ])
     TestResult("MS.DEFENDER.2.1v1", Output, ReportDetailString, false) == true
 }
@@ -791,8 +791,8 @@ test_AgencyDomains_Incorrect_V9 if {
         "defender_license": false
     }
 
-   ReportDetailString := concat(" ", [
-        "**NOTE: Either you do not have sufficient permissions or",
+    ReportDetailString := concat(" ", [
+        "Requirement not met **NOTE: Either you do not have sufficient permissions or",
         "your tenant does not have the required license(s) for Microsoft Defender",
         "for this feature.**"
     ])
@@ -1239,8 +1239,12 @@ test_CustomDomains_Incorrect_V8 if {
         "defender_license": false
     }
 
-    ReportDetailString := 
-        "**NOTE: Either you do not have sufficient permissions or your tenant does not have the required license(s) for Microsoft Defender for this feature.**"
+    ReportDetailString := concat(" ", [
+        "Requirement not met **NOTE: Either you do not have sufficient permissions or",
+        "your tenant does not have the required license(s) for Microsoft Defender",
+        "for this feature.**"
+    ])
     TestResult("MS.DEFENDER.2.3v1", Output, ReportDetailString, false) == true
+
 }
 #--
