@@ -1098,7 +1098,6 @@ test_Locations_Incorrect_V8 if {
 
 test_Locations_Incorrect_V9 if {
     Output := defender.tests with input as {
-    Output := defender.tests with input as {
         "dlp_compliance_rules": [
             {
                 "ContentContainsSensitiveInformation": [
