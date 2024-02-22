@@ -11,6 +11,7 @@ default BASELINEVERSION := "main"
 
 BASELINEVERSION := input.module_version
 
+# regal ignore:line-length
 SCUBABASEURL := sprintf("https://github.com/cisagov/ScubaGear/blob/v%v/PowerShell/ScubaGear/baselines/", [BASELINEVERSION])
 
 ########################
@@ -41,6 +42,11 @@ NotCheckedDetails(PolicyId) := sprintf(
     "See %v for instructions on manual check"
     ]),
     [PolicyLink(PolicyId)]
+)
+
+# Note: Reason must include %v to reference policy in document.
+CheckedSkippedDetails(PolicyId, Reason) := sprintf(
+    concat(" ", [Reason]), [PolicyLink(PolicyId)]
 )
 
 # 3rd Party Report Details method

@@ -209,7 +209,7 @@ TestPlan:
   - PolicyId: MS.AAD.3.4v1
     TestDriver: RunCached
     Tests:
-      - TestDescription: MS.AAD.3.4v1 Non-Compliant case - preMigration
+      - TestDescription: MS.AAD.3.4v1 Non-compliant case - preMigration
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
@@ -227,13 +227,76 @@ TestPlan:
         ExpectedResult: true
 
   - PolicyId: MS.AAD.3.5v1
-    TestDriver: RunScuba
+    TestDriver: RunCached
     Tests:
-      - TestDescription: MS.AAD.3.5v1 Not Checked
-        Preconditions: []
+      - TestDescription: MS.AAD.3.5v1 Non-compliant case - preMigration
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                authentication_method[0].PolicyMigrationState: preMigration
         Postconditions: []
-        IsNotChecked: true
         ExpectedResult: false
+      - TestDescription: MS.AAD.3.5v1 Non-compliant case - Sms enabled
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                authentication_method[0].PolicyMigrationState: migrationComplete
+                authentication_method[0].AuthenticationMethodConfigurations:
+                  - Id: Sms
+                    State: enabled
+                  - Id: Voice
+                    State: disabled
+                  - Id: Email
+                    State: disabled
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.AAD.3.5v1 Non-compliant case - Voice enabled
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                authentication_method[0].PolicyMigrationState: migrationComplete
+                authentication_method[0].AuthenticationMethodConfigurations:
+                  - Id: Sms
+                    State: disabled
+                  - Id: Voice
+                    State: enabled
+                  - Id: Email
+                    State: disabled
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.AAD.3.5v1 Non-compliant case - Email enabled
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                authentication_method[0].PolicyMigrationState: migrationComplete
+                authentication_method[0].AuthenticationMethodConfigurations:
+                  - Id: Sms
+                    State: disabled
+                  - Id: Voice
+                    State: disabled
+                  - Id: Email
+                    State: enabled
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.AAD.3.5v1 Compliant case
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                authentication_method[0].PolicyMigrationState: migrationComplete
+                authentication_method[0].AuthenticationMethodConfigurations:
+                  - Id: Sms
+                    State: disabled
+                  - Id: Voice
+                    State: disabled
+                  - Id: Email
+                    State: disabled
+        Postconditions: []
+        ExpectedResult: true
 
   - PolicyId: MS.AAD.3.6v1
     TestDriver: RunCached

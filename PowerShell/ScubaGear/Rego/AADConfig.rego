@@ -1,7 +1,9 @@
 package aad
 import future.keywords
 import data.utils.report.NotCheckedDetails
+import data.utils.report.CheckedSkippedDetails
 import data.utils.report.ReportDetailsBoolean
+import data.utils.report.ReportDetailsString
 import data.utils.key.IsEmptyContainer
 import data.utils.key.Contains
 import data.utils.key.Count
@@ -280,6 +282,11 @@ tests contains {
 # MS.AAD.3.4v1
 #--
 
+PolicyMigrationIsComplete := Status if {
+    some Policy in input.authentication_method
+    Status := Policy.PolicyMigrationState == "migrationComplete"
+}
+
 # At this time we are unable to test for X because of NEW POLICY
 tests contains {
     "PolicyId": "MS.AAD.3.4v1",
@@ -298,15 +305,42 @@ tests contains {
 # MS.AAD.3.5v1
 #--
 
-# At this time we are unable to test for SMS/Voice settings due to lack of API to validate
-# Awaiting API changes and feature updates from Microsoft for automated checking
+GoodAuthenticationMethodConfigurations contains {
+    "Id": Configuration.Id,
+    "State": Configuration.State
+} if {
+    some Item in input.authentication_method
+    some Configuration in Item.AuthenticationMethodConfigurations
+    Configuration.Id in ["Sms", "Voice", "Email"]
+    Configuration.State == "disabled"
+}
+
+tests contains {
+    "PolicyId": PolicyId,
+    "Criticality": "Shall",
+    "Commandlet": ["Get-MgBetaPolicyAuthenticationMethodPolicy"],
+    "ActualValue": [],
+    "ReportDetails": CheckedSkippedDetails("MS.AAD.3.4v1", Reason),
+    "RequirementMet": false
+} if {
+    PolicyId := "MS.AAD.3.5v1"
+    # regal ignore:line-length
+    Reason := "This policy is only applicable if the tenant has their Manage Migration feature set to Migration Complete. See %v for more info"
+    PolicyMigrationIsComplete != true
+}
+
 tests contains {
     "PolicyId": "MS.AAD.3.5v1",
-    "Criticality": "Shall/Not-Implemented",
-    "Commandlet": [],
+    "Criticality": "Shall",
+    "Commandlet": ["Get-MgBetaPolicyAuthenticationMethodPolicy"],
     "ActualValue": [],
-    "ReportDetails": NotCheckedDetails("MS.AAD.3.5v1"),
-    "RequirementMet": false
+    "ReportDetails": ReportDetailsString(Status, ErrorMessage),
+    "RequirementMet": Status
+} if {
+    ErrorMessage := "Sms, Voice, and Email authentication must be disabled."
+    PolicyMigrationIsComplete == true
+    Conditions := [PolicyMigrationIsComplete == true, count(GoodAuthenticationMethodConfigurations) == 3]
+    Status := count(FilterArray(Conditions, false)) == 0
 }
 #--
 

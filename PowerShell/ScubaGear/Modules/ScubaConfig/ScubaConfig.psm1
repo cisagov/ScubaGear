@@ -19,6 +19,15 @@ class ScubaConfig {
     hidden static [Boolean]$_IsLoaded = $false
     hidden static [hashtable]$ScubaDefaults = @{
         DefaultOPAPath = (Join-Path -Path $env:USERPROFILE -ChildPath ".scubagear\Tools")
+        DefaultPrivilegedRoles = @(
+            "Global Administrator",
+            "Privileged Role Administrator",
+            "User Administrator",
+            "SharePoint Administrator",
+            "Exchange Administrator",
+            "Hybrid Identity Administrator",
+            "Application Administrator",
+            "Cloud Application Administrator")
     }
 
     static [object]ScubaDefault ([string]$Name){

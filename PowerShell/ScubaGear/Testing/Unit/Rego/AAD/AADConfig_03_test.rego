@@ -2,6 +2,7 @@ package aad_test
 import future.keywords
 import data.aad
 import data.utils.report.NotCheckedDetails
+import data.utils.report.CheckedSkippedDetails
 import data.utils.key.TestResult
 import data.utils.key.TestResultContains
 import data.utils.key.FAIL
@@ -1667,13 +1668,144 @@ test_Migrated_Incorrect if {
 #
 # Policy MS.AAD.3.5v1
 #--
+test_NotImplemented_Incorrect_Sms if {
+
+    Output := aad.tests with input as {
+        "authentication_method": [
+            {
+                "PolicyMigrationState": "migrationComplete",
+                "AuthenticationMethodConfigurations":  [
+                    {
+                        "Id": "Sms",
+                        "State": "enabled"
+                    },
+                    {
+                        "Id":  "Voice",
+                        "State":  "disabled"
+                    },
+                    {
+                        "Id":  "Email",
+                        "State": "disabled"
+                    }
+                ]
+            }
+        ]
+    }
+
+    ReportDetails := "Sms, Voice, and Email authentication must be disabled."
+    TestResult("MS.AAD.3.5v1", Output, ReportDetails, false) == true
+}
+
+test_NotImplemented_Incorrect_Voice if {
+
+    Output := aad.tests with input as {
+        "authentication_method": [
+            {
+                "PolicyMigrationState": "migrationComplete",
+                "AuthenticationMethodConfigurations":  [
+                    {
+                        "Id": "Sms",
+                        "State": "disabled"
+                    },
+                    {
+                        "Id":  "Voice",
+                        "State":  "enabled"
+                    },
+                    {
+                        "Id":  "Email",
+                        "State": "disabled"
+                    }
+                ]
+            }
+        ]
+    }
+
+    ReportDetails := "Sms, Voice, and Email authentication must be disabled."
+    TestResult("MS.AAD.3.5v1", Output, ReportDetails, false) == true
+}
+
+test_NotImplemented_Incorrect_Email if {
+
+    Output := aad.tests with input as {
+        "authentication_method": [
+            {
+                "PolicyMigrationState": "migrationComplete",
+                "AuthenticationMethodConfigurations":  [
+                    {
+                        "Id": "Sms",
+                        "State": "disabled"
+                    },
+                    {
+                        "Id":  "Voice",
+                        "State":  "disabled"
+                    },
+                    {
+                        "Id":  "Email",
+                        "State": "enabled"
+                    }
+                ]
+            }
+        ]
+    }
+
+    ReportDetails := "Sms, Voice, and Email authentication must be disabled."
+    TestResult("MS.AAD.3.5v1", Output, ReportDetails, false) == true
+}
+
+test_NotImplemented_Incorrect_Migration if {
+
+    Output := aad.tests with input as {
+        "authentication_method": [
+            {
+                "PolicyMigrationState": "preMigration",
+                "AuthenticationMethodConfigurations":  [
+                    {
+                        "Id": "Sms",
+                        "State": "enabled"
+                    },
+                    {
+                        "Id":  "Voice",
+                        "State":  "disabled"
+                    },
+                    {
+                        "Id":  "Email",
+                        "State": "disabled"
+                    }
+                ]
+            }
+        ]
+    }
+
+    # regal ignore:line-length
+    Reason := "This policy is only applicable if the tenant has their Manage Migration feature set to Migration Complete. See %v for more info"
+    TestResult("MS.AAD.3.5v1", Output, CheckedSkippedDetails("MS.AAD.3.4v1", Reason), false) == true
+}
+
 test_NotImplemented_Correct_V4 if {
-    PolicyId := "MS.AAD.3.5v1"
 
-    Output := aad.tests with input as { }
+    Output := aad.tests with input as {
+        "authentication_method": [
+            {
+                "PolicyMigrationState": "migrationComplete",
+                "AuthenticationMethodConfigurations":  [
+                    {
+                        "Id": "Sms",
+                        "State": "disabled"
+                    },
+                    {
+                        "Id":  "Voice",
+                        "State":  "disabled"
+                    },
+                    {
+                        "Id":  "Email",
+                        "State": "disabled"
+                    }
+                ]
+            }
+        ]
+    }
 
-    ReportDetailStr := NotCheckedDetails(PolicyId)
-    TestResult(PolicyId, Output, ReportDetailStr, false) == true
+    TestResult("MS.AAD.3.5v1", Output, PASS, true) == true
 }
 #--
 
