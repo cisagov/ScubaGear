@@ -1716,7 +1716,7 @@ test_NotifyUser_Incorrect_V2 if {
     TestResult("MS.DEFENDER.4.4v1", Output, ReportDetailString, false) == true
 }
 
-test_NotifyUser_Correct_V1 if {
+test_NotifyUser_Incorrect_V3 if {
     Output := defender.tests with input as {
         "dlp_compliance_rules": [
             {
