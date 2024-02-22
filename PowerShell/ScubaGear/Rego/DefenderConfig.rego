@@ -13,6 +13,7 @@ import data.utils.defender.ImpersonationProtection
 import data.utils.defender.ImpersonationProtectionConfig
 import data.utils.defender.ApplyLicenseWarning
 import data.utils.defender.ApplyLicenseWarningString
+import data.utils.defender.DefenderLicense
 
 
 #################
