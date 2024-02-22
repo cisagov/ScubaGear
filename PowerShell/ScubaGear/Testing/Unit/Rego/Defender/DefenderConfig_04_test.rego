@@ -44,7 +44,8 @@ test_ContentContainsSensitiveInformation_Correct_V1 if {
                 "Mode": "Enable",
                 "Enabled": true
             }
-        ]
+        ],
+        "defender_license": true
     }
 
     TestResult("MS.DEFENDER.4.1v1", Output, PASS, true) == true
@@ -93,7 +94,8 @@ test_AdvancedRule_Correct_V2 if {
                 "Mode": "Enable",
                 "Enabled": true
             }
-        ]
+        ],
+        "defender_license": true
     }
 
     TestResult("MS.DEFENDER.4.1v1", Output, PASS, true) == true
@@ -131,7 +133,8 @@ test_ContentContainsSensitiveInformation_Incorrect_V1 if {
                 "Mode": "Enable",
                 "Enabled": true
             }
-        ]
+        ],
+        "defender_license": true
     }
 
     ReportDetailString := "No matching rules found for: U.S. Social Security Number (SSN)"
@@ -170,7 +173,8 @@ test_ContentContainsSensitiveInformation_Incorrect_V2 if {
                 "Mode": "Enable",
                 "Enabled": true
             }
-        ]
+        ],
+        "defender_license": true
     }
 
     ReportDetailString := "No matching rules found for: U.S. Individual Taxpayer Identification Number (ITIN)"
@@ -209,7 +213,8 @@ test_ContentContainsSensitiveInformation_Incorrect_V3 if {
                 "Mode": "Enable",
                 "Enabled": true
             }
-        ]
+        ],
+        "defender_license": true
     }
 
     ReportDetailString := "No matching rules found for: Credit Card Number"
@@ -241,7 +246,8 @@ test_ContentContainsSensitiveInformation_Incorrect_V4 if {
                 "Mode": "Enable",
                 "Enabled": true
             }
-        ]
+        ],
+        "defender_license": true
     }
 
     ReportDetailString := concat(" ", [
@@ -287,7 +293,8 @@ test_ContentContainsSensitiveInformation_Incorrect_V5 if {
                 "Mode": "Enable",
                 "Enabled": false
             }
-        ]
+        ],
+        "defender_license": true
     }
 
     ReportDetailString := concat(" ", [
@@ -333,7 +340,8 @@ test_ContentContainsSensitiveInformation_Incorrect_V6 if {
                 "Mode": "TestWithNotifications",
                 "Enabled": true
             }
-        ]
+        ],
+        "defender_license": true
     }
 
     ReportDetailString := concat(" ", [
@@ -341,6 +349,53 @@ test_ContentContainsSensitiveInformation_Incorrect_V6 if {
         "U.S. Individual Taxpayer Identification Number (ITIN), U.S. Social Security Number (SSN)"
     ])
 
+    TestResult("MS.DEFENDER.4.1v1", Output, ReportDetailString, false) == true
+}
+
+test_ContentContainsSensitiveInformation_Incorrect_V7 if {
+    Output := defender.tests with input as {
+        "dlp_compliance_rules": [
+            {
+                "ContentContainsSensitiveInformation": [
+                    {
+                        "name": "U.S. Social Security Number (SSN)"
+                    },
+                    {
+                        "name": "U.S. Individual Taxpayer Identification Number (ITIN)"
+                    },
+                    {
+                        "name": "Credit Card Number"
+                    }
+                ],
+                "Name": "Baseline Rule",
+                "Disabled": false,
+                "ParentPolicyName": "Default Office 365 DLP policy",
+                "BlockAccess": true,
+                "BlockAccessScope": "All",
+                "NotifyUser": [
+                    "SiteAdmin",
+                    "LastModifier",
+                    "Owner"
+                ],
+                "NotifyUserType": "NotSet",
+                "IsAdvancedRule": false
+            }
+        ],
+        "dlp_compliance_policies": [
+            {
+                "Name": "Default Office 365 DLP policy",
+                "Mode": "Enable",
+                "Enabled": true
+            }
+        ],
+        "defender_license": false
+    }
+
+    ReportDetailString := concat(" ", [
+        "Requirement not met **NOTE: Either you do not have sufficient permissions or",
+        "your tenant does not have the required license(s) for Microsoft Defender",
+        "for this feature.**"
+    ])
     TestResult("MS.DEFENDER.4.1v1", Output, ReportDetailString, false) == true
 }
 #--
@@ -399,7 +454,8 @@ test_Locations_Correct_V1 if {
                 "Mode": "Enable",
                 "Enabled": true
             }
-        ]
+        ],
+        "defender_license": true
     }
 
     TestResult("MS.DEFENDER.4.2v1", Output, PASS, true) == true
@@ -448,7 +504,8 @@ test_Locations_Correct_V2 if {
                 "Mode": "Enable",
                 "Enabled": true
             }
-        ]
+        ],
+        "defender_license": true
     }
 
     TestResult("MS.DEFENDER.4.2v1", Output, PASS, true) == true
@@ -552,7 +609,8 @@ test_Locations_Correct_V3 if {
                 "Mode": "Enable",
                 "Enabled": true
             }
-        ]
+        ],
+        "defender_license": true
     }
 
     TestResult("MS.DEFENDER.4.2v1", Output, PASS, true) == true
@@ -610,7 +668,8 @@ test_Locations_Incorrect_V1 if {
                 "Mode": "Enable",
                 "Enabled": true
             }
-        ]
+        ],
+        "defender_license": true
     }
 
     ReportDetailString := "No enabled policy found that applies to: Exchange"
@@ -669,7 +728,8 @@ test_Locations_Incorrect_V2 if {
                 "Mode": "Enable",
                 "Enabled": true
             }
-        ]
+        ],
+        "defender_license": true
     }
 
     ReportDetailString := "No enabled policy found that applies to: SharePoint"
@@ -728,7 +788,8 @@ test_Locations_Incorrect_V3 if {
                 "Mode": "Enable",
                 "Enabled": true
             }
-        ]
+        ],
+        "defender_license": true
     }
 
     ReportDetailString := "No enabled policy found that applies to: OneDrive"
@@ -787,7 +848,8 @@ test_Locations_Incorrect_V4 if {
                 "Mode": "Enable",
                 "Enabled": true
             }
-        ]
+        ],
+        "defender_license": true
     }
 
     ReportDetailString := "No enabled policy found that applies to: Teams"
@@ -846,7 +908,8 @@ test_Locations_Incorrect_V5 if {
                 "Mode": "Enable",
                 "Enabled": true
             }
-        ]
+        ],
+        "defender_license": true
     }
 
     ReportDetailString := "No enabled policy found that applies to: Devices"
@@ -905,7 +968,8 @@ test_Locations_Incorrect_V6 if {
                 "Mode": "Enable",
                 "Enabled": false
             }
-        ]
+        ],
+        "defender_license": true
     }
 
     ReportDetailString := "No DLP policy matching all types found for evaluation."
@@ -964,7 +1028,8 @@ test_Locations_Incorrect_V7 if {
                 "Mode": "Enable",
                 "Enabled": true
             }
-        ]
+        ],
+        "defender_license": true
     }
 
     ReportDetailString := "No DLP policy matching all types found for evaluation."
@@ -1023,10 +1088,74 @@ test_Locations_Incorrect_V8 if {
                 "Mode": "TestWithNotifications",
                 "Enabled": true
             }
-        ]
+        ],
+        "defender_license": true
     }
 
     ReportDetailString := "No DLP policy matching all types found for evaluation."
+    TestResult("MS.DEFENDER.4.2v1", Output, ReportDetailString, false) == true
+}
+
+test_Locations_Incorrect_V9 if {
+    Output := defender.tests with input as {
+        "dlp_compliance_rules": [
+            {
+                "ContentContainsSensitiveInformation": [
+                    {
+                        "name": "U.S. Individual Taxpayer Identification Number (ITIN)"
+                    },
+                    {
+                        "name": "Credit Card Number"
+                    },
+                    {
+                        "name": "U.S. Social Security Number (SSN)"
+                    }
+                ],
+                "Name": "Baseline Rule",
+                "Disabled": false,
+                "ParentPolicyName": "Default Office 365 DLP policy",
+                "BlockAccess": true,
+                "BlockAccessScope": "All",
+                "NotifyUser": [
+                    "SiteAdmin",
+                    "LastModifier",
+                    "Owner"
+                ],
+                "NotifyUserType": "NotSet",
+                "IsAdvancedRule": false
+            }
+        ],
+        "dlp_compliance_policies": [
+            {
+                "ExchangeLocation": [
+                    "All"
+                ],
+                "SharePointLocation": [
+                    "All"
+                ],
+                "TeamsLocation": [
+                    "All"
+                ],
+                "EndpointDlpLocation": [
+                    "All"
+                ],
+                "OneDriveLocation": [
+                    "All"
+                ],
+                "Workload": "Exchange, SharePoint, OneDriveForBusiness, Teams, EndpointDevices",
+                "Name": "Default Office 365 DLP policy",
+                "Mode": "Enable",
+                "Enabled": true
+            }
+        ],
+        "defender_license": false
+    }
+
+    ReportDetailString := concat(" ", [
+        "Requirement not met **NOTE: Either you do not have sufficient permissions or",
+        "your tenant does not have the required license(s) for Microsoft Defender",
+        "for this feature.**"
+    ])
     TestResult("MS.DEFENDER.4.2v1", Output, ReportDetailString, false) == true
 }
 #--
@@ -1071,7 +1200,8 @@ test_BlockAccess_Correct_V1 if {
                 "Mode": "Enable",
                 "Enabled": true
             }
-        ]
+        ],
+        "defender_license": true
     }
 
     TestResult("MS.DEFENDER.4.3v1", Output, PASS, true) == true
@@ -1113,7 +1243,8 @@ test_BlockAccess_Incorrect_V1 if {
                 "Mode": "Enable",
                 "Enabled": true
             }
-        ]
+        ],
+        "defender_license": true
     }
 
     ReportDetailString := concat(" ", [
@@ -1160,7 +1291,8 @@ test_BlockAccess_Incorrect_V2 if {
                 "Mode": "Enable",
                 "Enabled": true
             }
-        ]
+        ],
+        "defender_license": true
     }
 
     ReportDetailString := concat(" ", [
@@ -1207,7 +1339,8 @@ test_BlockAccess_Incorrect_V3 if {
                 "Mode": "TestWithNotifications",
                 "Enabled": true
             }
-        ]
+        ],
+        "defender_license": true
     }
 
     ReportDetailString := "No DLP policy matching all types found for evaluation."
@@ -1247,7 +1380,8 @@ test_BlockAccess_Incorrect_V4 if {
                 "Mode": "Enable",
                 "Enabled": true
             }
-        ]
+        ],
+        "defender_license": true
     }
 
     ReportDetailString := "No DLP policy matching all types found for evaluation."
@@ -1311,7 +1445,8 @@ test_BlockAccess_Incorrect_V5 if {
                 "Mode": "Enable",
                 "Enabled": true
             }
-        ]
+        ],
+        "defender_license": true
     }
 
     ReportDetailString := "No DLP policy matching all types found for evaluation."
@@ -1353,10 +1488,58 @@ test_BlockAccess_Incorrect_V6 if {
                 "Mode": "Enable",
                 "Enabled": false
             }
-        ]
+        ],
+        "defender_license": true
     }
 
     ReportDetailString := "No DLP policy matching all types found for evaluation."
+    TestResult("MS.DEFENDER.4.3v1", Output, ReportDetailString, false) == true
+}
+
+test_BlockAccess_Incorrect_V7 if {
+    Output := defender.tests with input as {
+        "dlp_compliance_rules": [
+            {
+                "ContentContainsSensitiveInformation": [
+                    {
+                        "name": "U.S. Social Security Number (SSN)"
+                    },
+                    {
+                        "name": "U.S. Individual Taxpayer Identification Number (ITIN)"
+                    },
+                    {
+                        "name": "Credit Card Number"
+                    }
+                ],
+                "Name": "Baseline Rule",
+                "Disabled": false,
+                "ParentPolicyName": "Default Office 365 DLP policy",
+                "BlockAccess": true,
+                "BlockAccessScope": "All",
+                "NotifyUser": [
+                    "SiteAdmin",
+                    "LastModifier",
+                    "Owner"
+                ],
+                "NotifyUserType": "NotSet",
+                "IsAdvancedRule": false
+            }
+        ],
+        "dlp_compliance_policies": [
+            {
+                "Name": "Default Office 365 DLP policy",
+                "Mode": "Enable",
+                "Enabled": true
+            }
+        ],
+        "defender_license": false
+    }
+
+    ReportDetailString := concat(" ", [
+        "Requirement not met **NOTE: Either you do not have sufficient permissions or",
+        "your tenant does not have the required license(s) for Microsoft Defender",
+        "for this feature.**"
+    ])
     TestResult("MS.DEFENDER.4.3v1", Output, ReportDetailString, false) == true
 }
 #--
@@ -1399,7 +1582,8 @@ test_NotifyUser_Correct_V1 if {
                 "Mode": "Enable",
                 "Enabled": true
             }
-        ]
+        ],
+        "defender_license": true
     }
 
     TestResult("MS.DEFENDER.4.4v1", Output, PASS, true) == true
@@ -1441,7 +1625,8 @@ test_NotifyUser_Correct_V2 if {
                 "Mode": "Enable",
                 "Enabled": true
             }
-        ]
+        ],
+        "defender_license": true
     }
 
     TestResult("MS.DEFENDER.4.4v1", Output, PASS, true) == true
@@ -1483,7 +1668,8 @@ test_NotifyUser_Incorrect_V1 if {
                 "Mode": "Disable",
                 "Enabled": false
             }
-        ]
+        ],
+        "defender_license": true
     }
 
     ReportDetailString := "No DLP policy matching all types found for evaluation."
@@ -1522,10 +1708,56 @@ test_NotifyUser_Incorrect_V2 if {
                 "Mode": "Enable",
                 "Enabled": true
             }
-        ]
+        ],
+        "defender_license": true
     }
 
     ReportDetailString := "1 rule(s) found that do(es) not notify at least one user: Baseline Rule"
+    TestResult("MS.DEFENDER.4.4v1", Output, ReportDetailString, false) == true
+}
+
+test_NotifyUser_Correct_V1 if {
+    Output := defender.tests with input as {
+        "dlp_compliance_rules": [
+            {
+                "ContentContainsSensitiveInformation": [
+                    {
+                        "name": "U.S. Social Security Number (SSN)"
+                    },
+                    {
+                        "name": "U.S. Individual Taxpayer Identification Number (ITIN)"
+                    },
+                    {
+                        "name": "Credit Card Number"
+                    }
+                ],
+                "Name": "Baseline Rule",
+                "Disabled": false,
+                "ParentPolicyName": "Default Office 365 DLP policy",
+                "BlockAccess": true,
+                "BlockAccessScope": "All",
+                "NotifyUser": [
+                    "SiteAdmin"
+                ],
+                "NotifyUserType": "NotSet",
+                "IsAdvancedRule": false
+            }
+        ],
+        "dlp_compliance_policies": [
+            {
+                "Name": "Default Office 365 DLP policy",
+                "Mode": "Enable",
+                "Enabled": true
+            }
+        ],
+        "defender_license": false
+    }
+
+    ReportDetailString := concat(" ", [
+        "Requirement not met **NOTE: Either you do not have sufficient permissions or",
+        "your tenant does not have the required license(s) for Microsoft Defender",
+        "for this feature.**"
+    ])
     TestResult("MS.DEFENDER.4.4v1", Output, ReportDetailString, false) == true
 }
 #--
