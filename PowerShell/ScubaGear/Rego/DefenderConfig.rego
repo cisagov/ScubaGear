@@ -308,6 +308,7 @@ tests contains {
     )
     ErrorMessage := ImpersonationProtectionErrorMsg(StrictIP.Result, StandardIP.Result, "agency domains")
     Conditions := [
+        DefenderLicense == true,
         StrictIP.Result == true,
         StandardIP.Result == true,
         count(ProtectedConfig) > 0
