@@ -399,9 +399,9 @@ ExampleArray contains OtherVar.name if {
 
 ## README Formatting
 This section is for standardizing how to format the README and it's table of contents (toc) for legibility.
-The formatting guidelines described below takes the VSCode [Markdown All in One](https://marketplace.visualstudio.com/items?itemName=yzhang.markdown-all-in-one) extension into account as the extension will auto-format the README for user. However, the extension is not required for ScubaGear development.
+The formatting guidelines described below takes the VSCode [Markdown All in One](https://marketplace.visualstudio.com/items?itemName=yzhang.markdown-all-in-one) extension into account. By default Markdown All in One will auto-format the README and table of contents for user. However, the extension is not required for ScubaGear development.
 
-To keep the table of contents in the README as a compact resource for users to.
+To keep the table of contents in the README as a compact resource for users.
 see the section they're looking for, please follow the guidelines below.
 
 ### Character Limit
