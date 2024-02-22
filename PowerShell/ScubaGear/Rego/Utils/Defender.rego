@@ -207,6 +207,10 @@ ApplyLicenseWarning(_) := concat(" ", [FAIL, LicenseWarning]) if {
 #################################################################################
 # Report Detail Functions for check that required Defender license #
 #################################################################################
+DefenderLicense := true if {
+    input.defender_license = true
+} else := false
+
 LicenseWarning :=
     "**NOTE: Either you do not have sufficient permissions or your tenant does not have the required license(s) for Microsoft Defender for this feature.**"
 
