@@ -391,11 +391,8 @@ test_ContentContainsSensitiveInformation_Incorrect_V7 if {
         "defender_license": false
     }
 
-    ReportDetailString := concat(" ", [
-        "**NOTE: Either you do not have sufficient permissions or",
-        "your tenant does not have the required license(s) for Microsoft Defender",
-        "for this feature.**"
-    ])
+    ReportDetailString := 
+        "**NOTE: Either you do not have sufficient permissions or your tenant does not have the required license(s) for Microsoft Defender for this feature.**"
     TestResult("MS.DEFENDER.4.1v1", Output, ReportDetailString, false) == true
 }
 #--
@@ -1151,11 +1148,8 @@ test_Locations_Incorrect_V9 if {
         "defender_license": false
     }
 
-    ReportDetailString := concat(" ", [
-        "**NOTE: Either you do not have sufficient permissions or",
-        "your tenant does not have the required license(s) for Microsoft Defender",
-        "for this feature.**"
-    ])
+    ReportDetailString := 
+        "**NOTE: Either you do not have sufficient permissions or your tenant does not have the required license(s) for Microsoft Defender for this feature.**"
     TestResult("MS.DEFENDER.4.2v1", Output, ReportDetailString, false) == true
 }
 #--
@@ -1535,11 +1529,8 @@ test_BlockAccess_Incorrect_V7 if {
         "defender_license": false
     }
 
-    ReportDetailString := concat(" ", [
-        "**NOTE: Either you do not have sufficient permissions or",
-        "your tenant does not have the required license(s) for Microsoft Defender",
-        "for this feature.**"
-    ])
+    ReportDetailString := 
+        "**NOTE: Either you do not have sufficient permissions or your tenant does not have the required license(s) for Microsoft Defender for this feature.**"
     TestResult("MS.DEFENDER.4.3v1", Output, ReportDetailString, false) == true
 }
 #--
@@ -1753,11 +1744,8 @@ test_NotifyUser_Incorrect_V3 if {
         "defender_license": false
     }
 
-    ReportDetailString := concat(" ", [
-        "**NOTE: Either you do not have sufficient permissions or",
-        "your tenant does not have the required license(s) for Microsoft Defender",
-        "for this feature.**"
-    ])
+    ReportDetailString := 
+        "**NOTE: Either you do not have sufficient permissions or your tenant does not have the required license(s) for Microsoft Defender for this feature.**"
     TestResult("MS.DEFENDER.4.4v1", Output, ReportDetailString, false) == true
 }
 #--
