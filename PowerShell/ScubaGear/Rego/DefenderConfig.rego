@@ -227,8 +227,6 @@ tests contains {
 #--
 
 # General report details function for impersonation protection
-
-
 ImpersonationProtectionErrorMsg(false, true, AccountType) := Description if {
     String := concat(" ", ["Not all", AccountType])
     Description := concat(" ", [String, "are included for targeted protection in Strict policy."])
