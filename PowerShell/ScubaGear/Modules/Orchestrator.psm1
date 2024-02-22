@@ -114,14 +114,14 @@ function Invoke-SCuBA {
         [ValidateNotNullOrEmpty()]
         [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
         [string[]]
-        $ProductNames = @("aad", "defender", "exo", "sharepoint", "teams"),
+        $ProductNames = [ScubaConfig]::ScubaDefault('DefaultProductNames'),
 
         [Parameter(Mandatory = $false, ParameterSetName = 'Configuration')]
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $false)]
         [ValidateNotNullOrEmpty()]
         [string]
-        $M365Environment = "commercial",
+        $M365Environment = [ScubaConfig]::ScubaDefault('DefaultM365Environment'),
 
         [Parameter(Mandatory = $false, ParameterSetName = 'Configuration')]
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
@@ -134,7 +134,7 @@ function Invoke-SCuBA {
         [ValidateNotNullOrEmpty()]
         [ValidateSet($true, $false)]
         [boolean]
-        $LogIn = $true,
+        $LogIn = [ScubaConfig]::ScubaDefault('DefaultLogIn'),
 
         [Parameter(Mandatory = $false, ParameterSetName = 'Configuration')]
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
@@ -169,31 +169,31 @@ function Invoke-SCuBA {
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
         [string]
-        $OutPath = '.',
+        $OutPath = [ScubaConfig]::ScubaDefault('DefaultOutPath'),
 
         [Parameter(Mandatory = $false, ParameterSetName = 'Configuration')]
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
         [string]
-        $OutFolderName = "M365BaselineConformance",
+        $OutFolderName = [ScubaConfig]::ScubaDefault('DefaultOutFolderName'),
 
         [Parameter(Mandatory = $false, ParameterSetName = 'Configuration')]
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
         [string]
-        $OutProviderFileName = "ProviderSettingsExport",
+        $OutProviderFileName = [ScubaConfig]::ScubaDefault('DefaultOutProviderFileName'),
 
         [Parameter(Mandatory = $false, ParameterSetName = 'Configuration')]
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
         [string]
-        $OutRegoFileName = "TestResults",
+        $OutRegoFileName = [ScubaConfig]::ScubaDefault('DefaultOutRegoFileName'),
 
         [Parameter(Mandatory = $false, ParameterSetName = 'Configuration')]
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
         [string]
-        $OutReportName = "BaselineReports",
+        $OutReportName = [ScubaConfig]::ScubaDefault('DefaultOutReportName'),
 
         [Parameter(Mandatory = $true, ParameterSetName = 'Configuration')]
         [ValidateNotNullOrEmpty()]
@@ -612,7 +612,7 @@ function Invoke-RunRego {
 
         [ValidateNotNullOrEmpty()]
         [string]
-        $OPAPath = (Join-Path -Path $env:USERPROFILE -ChildPath ".scubagear\Tools"),
+        $OPAPath = [ScubaConfig]::ScubaDefault('DefaultOPAPath'),
 
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
@@ -1264,25 +1264,25 @@ function Invoke-RunCached {
         [ValidateNotNullOrEmpty()]
         [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
         [string[]]
-        $ProductNames = '*',
+        $ProductNames = [ScubaConfig]::ScubaDefault('AllProductNames'),
 
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateSet("commercial", "gcc", "gcchigh", "dod")]
         [ValidateNotNullOrEmpty()]
         [string]
-        $M365Environment = "commercial",
+        $M365Environment = [ScubaConfig]::ScubaDefault('DefaultM365Environment'),
 
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateScript({Test-Path -PathType Container $_})]
         [ValidateNotNullOrEmpty()]
         [string]
-        $OPAPath = (Join-Path -Path $env:USERPROFILE -ChildPath ".scubagear\Tools"),
+        $OPAPath = [ScubaConfig]::ScubaDefault('DefaultOPAPath'),
 
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
         [ValidateSet($true, $false)]
         [boolean]
-        $LogIn = $true,
+        $LogIn = [ScubaConfig]::ScubaDefault('DefaultLogIn'),
 
         [Parameter(ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
@@ -1307,22 +1307,22 @@ function Invoke-RunCached {
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
         [string]
-        $OutPath = '.',
+        $OutPath = [ScubaConfig]::ScubaDefault('DefaultOutPath'),
 
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
         [string]
-        $OutProviderFileName = "ProviderSettingsExport",
+        $OutProviderFileName = [ScubaConfig]::ScubaDefault('DefaultOutProviderFileName'),
 
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
         [string]
-        $OutRegoFileName = "TestResults",
+        $OutRegoFileName = [ScubaConfig]::ScubaDefault('DefaultOutRegoFileName'),
 
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
         [string]
-        $OutReportName = "BaselineReports",
+        $OutReportName = [ScubaConfig]::ScubaDefault('DefaultOutReportName'),
 
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
