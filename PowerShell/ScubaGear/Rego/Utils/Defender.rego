@@ -217,7 +217,7 @@ ApplyLicenseWarningString(_,_) := concat(" ", [FAIL, LicenseWarning]) if {
     input.defender_license == false
     LicenseWarning := concat(" ", [
         "**NOTE: Either you do not have sufficient permissions or",
-        "your tenant does not have a license for Microsoft Defender",
-        "for Office 365 Plan 1, which is required for this feature.**"
+        "your tenant does not have the required license(s) for Microsoft Defender",
+        "for this feature.**"
     ])
 }
