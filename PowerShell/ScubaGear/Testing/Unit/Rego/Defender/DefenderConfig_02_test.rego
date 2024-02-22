@@ -360,8 +360,7 @@ test_TargetedUsers_Incorrect_V7 if {
                 "Enabled": true,
                 "EnableTargetedUserProtection": true,
                 "TargetedUsersToProtect": [
-                    "John Doe;jdoe@someemail.com",
-                    "Jane Doe;jadoe@someemail.com"
+                    "John Doe;jdoe@someemail.com"
                 ],
                 "TargetedUserProtectionAction": "Quarantine"
             }
@@ -761,34 +760,23 @@ test_AgencyDomains_Incorrect_V9 if {
                 "Identity": "Standard Preset Security Policy1659535429826",
                 "Enabled": true,
                 "EnableTargetedDomainsProtection": true,
-                "TargetedDomainsToProtect": [
-                    "random.mail.example.com",
-                    "random.example.com"
-                ],
+                "TargetedDomainsToProtect": null,
                 "TargetedDomainProtectionAction": "Quarantine"
             },
             {
                 "Identity": "Strict Preset Security Policy1659535429826",
                 "Enabled": true,
                 "EnableTargetedDomainsProtection": true,
-                "TargetedDomainsToProtect": [
-                    "random.mail.example.com",
-                    "random.example.com"
-                ],
+                "TargetedDomainsToProtect": null,
                 "TargetedDomainProtectionAction": "Quarantine"
             }
         ],
         "scuba_config": {
             "Defender": {
-                "MS.DEFENDER.2.2v1": {
-                    "AgencyDomains": [
-                        "random.mail.example.com",
-                        "random.example.com"
-                    ]
-                }
+                "MS.DEFENDER.2.2v1": {}
             }
         },
-        "defender_license": false
+    "defender_license": false
     }
 
     ReportDetailString := concat(" ", [
@@ -1228,12 +1216,7 @@ test_CustomDomains_Incorrect_V8 if {
         ],
         "scuba_config": {
             "Defender": {
-                "MS.DEFENDER.2.3v1": {
-                    "PartnerDomains": [
-                        "random.mail.example.com",
-                        "random.example.com"
-                    ]
-                }
+                "MS.DEFENDER.2.3v1": {}
             }
         },
         "defender_license": false
