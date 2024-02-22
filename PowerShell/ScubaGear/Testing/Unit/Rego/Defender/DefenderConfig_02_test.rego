@@ -744,8 +744,10 @@ test_AgencyDomains_Incorrect_V8 if {
         "defender_license": true
     }
 
-    ReportDetailString := 
-        "**NOTE: Either you do not have sufficient permissions or your tenant does not have the required license(s) for Microsoft Defender for this feature.**"
+    ReportDetailString := concat(" ", [
+        "No agency domains defined for impersonation protection assessment.",
+        "See configuration file documentation for details on how to define."
+    ])
     TestResult("MS.DEFENDER.2.2v1", Output, ReportDetailString, false) == true
 }
 
