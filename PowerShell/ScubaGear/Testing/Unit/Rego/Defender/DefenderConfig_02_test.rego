@@ -379,11 +379,8 @@ test_TargetedUsers_Incorrect_V7 if {
         "defender_license": false
     }
 
-   ReportDetailString := concat(" ", [
-        "**NOTE: Either you do not have sufficient permissions or",
-        "your tenant does not have the required license(s) for Microsoft Defender",
-        "for this feature.**"
-    ])
+    ReportDetailString := 
+        "**NOTE: Either you do not have sufficient permissions or your tenant does not have the required license(s) for Microsoft Defender for this feature.**"
     TestResult("MS.DEFENDER.2.1v1", Output, ReportDetailString, false) == true
 }
 #--
@@ -747,10 +744,8 @@ test_AgencyDomains_Incorrect_V8 if {
         "defender_license": true
     }
 
-    ReportDetailString := concat(" ", [
-        "No agency domains defined for impersonation protection assessment.",
-        "See configuration file documentation for details on how to define."
-    ])
+    ReportDetailString := 
+        "**NOTE: Either you do not have sufficient permissions or your tenant does not have the required license(s) for Microsoft Defender for this feature.**"
     TestResult("MS.DEFENDER.2.2v1", Output, ReportDetailString, false) == true
 }
 
@@ -1239,11 +1234,8 @@ test_CustomDomains_Incorrect_V8 if {
         "defender_license": false
     }
 
-   ReportDetailString := concat(" ", [
-        "**NOTE: Either you do not have sufficient permissions or",
-        "your tenant does not have the required license(s) for Microsoft Defender",
-        "for this feature.**"
-    ])
+    ReportDetailString := 
+        "**NOTE: Either you do not have sufficient permissions or your tenant does not have the required license(s) for Microsoft Defender for this feature.**"
     TestResult("MS.DEFENDER.2.3v1", Output, ReportDetailString, false) == true
 }
 #--
