@@ -380,7 +380,7 @@ test_TargetedUsers_Incorrect_V7 if {
     }
 
    ReportDetailString := concat(" ", [
-        "Requirement not met **NOTE: Either you do not have sufficient permissions or",
+        "**NOTE: Either you do not have sufficient permissions or",
         "your tenant does not have the required license(s) for Microsoft Defender",
         "for this feature.**"
     ])
@@ -792,7 +792,7 @@ test_AgencyDomains_Incorrect_V9 if {
     }
 
    ReportDetailString := concat(" ", [
-        "Requirement not met **NOTE: Either you do not have sufficient permissions or",
+        "**NOTE: Either you do not have sufficient permissions or",
         "your tenant does not have the required license(s) for Microsoft Defender",
         "for this feature.**"
     ])
@@ -1240,7 +1240,7 @@ test_CustomDomains_Incorrect_V8 if {
     }
 
    ReportDetailString := concat(" ", [
-        "Requirement not met **NOTE: Either you do not have sufficient permissions or",
+        "**NOTE: Either you do not have sufficient permissions or",
         "your tenant does not have the required license(s) for Microsoft Defender",
         "for this feature.**"
     ])
