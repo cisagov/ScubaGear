@@ -75,12 +75,12 @@ To install the module dependencies, open a new PowerShell 5.1 terminal and navig
 Then run:
 
 ```powershell
-.\SetUp.ps1 # Installs the required modules
+Import-Module -Name .\PowerShell\ScubaGear # Imports module and minimum required dependencies
 ```
 
 ### Download the Required OPA executable
 > [!IMPORTANT]
-> The `OPA.ps1` executable download script is called by default when running `SetUp.ps1`. `OPA.ps1` can also be run by itself to download the executable.
+> The `Install-OPA` cmdlet is called by default when running `Initialize-SCuBA`. The `Install-OPA` cmdlet can also be run by itself to download the executable.
 In the event of an unsuccessful download, users can manually download the OPA executable with the following steps:
 1. Go to OPA download site (https://www.openpolicyagent.org/docs/latest/#running-opa)
 2. Check the acceptable OPA version (Currently v0.61.0) for ScubaGear and select the corresponding version on top left of the website
@@ -417,7 +417,7 @@ https://docs.microsoft.com/en-us/powershell/exchange/exchange-online-powershell-
 Create Powershell Session is failed using OAuth
 ```
 
-If you see this error message it means that you are running a version of the ExchangeOnlineManagement PowerShell module less than Version 3.2. The automation relies on the Microsoft Security & Compliance PowerShell environment for Defender information. Security & Compliance PowerShell connections, unlike other services used by the ExchangeOnlineManagement module, once required basic authentication to be enabled. As of June 2023, Microsoft has [deprecated Remote PowerShell for Exchange Online and Security & Compliance PowerShell](https://techcommunity.microsoft.com/t5/exchange-team-blog/announcing-deprecation-of-remote-powershell-rps-protocol-in/ba-p/3695597). To resolve this error, you should run the `.\SetUp.ps1` script to install the latest ExchangeOnlineManagement module version.
+If you see this error message it means that you are running a version of the ExchangeOnlineManagement PowerShell module less than Version 3.2. The automation relies on the Microsoft Security & Compliance PowerShell environment for Defender information. Security & Compliance PowerShell connections, unlike other services used by the ExchangeOnlineManagement module, once required basic authentication to be enabled. As of June 2023, Microsoft has [deprecated Remote PowerShell for Exchange Online and Security & Compliance PowerShell](https://techcommunity.microsoft.com/t5/exchange-team-blog/announcing-deprecation-of-remote-powershell-rps-protocol-in/ba-p/3695597). To resolve this error, you should run the `Initialize-SCuBA` cmdlet to install the latest ExchangeOnlineManagement module version.
 
 ### Exchange Online maximum connections error
 If when running the tool against Exchange Online, you see the error below in the Powershell window, follow the instructions in this section.
@@ -485,7 +485,7 @@ After deleting the `.graph` folder in your home directory, re-run the tool and t
 
 #### Error `Could not load file or assembly 'Microsoft.Graph.Authentication'`
 
-This indicates that the authentication module is at a version level that conflicts with the MS Graph modules used by the tool. Follow the instructions in the Installation section and execute the Setup script again. This will ensure that the module versions get synchronized with dependencies and then execute the tool again.
+This indicates that the authentication module is at a version level that conflicts with the MS Graph modules used by the tool. Follow the instructions in the Installation section and execute the 'Initialize-SCuBA' cmdlet again. This will ensure that the module versions get synchronized with dependencies and then execute the tool again.
 
 
 ### Running the Tool Behind Some Proxies
@@ -530,7 +530,7 @@ Data gathered by the script includes:
   * JSON and CSV-formatted M365 baseline test results
 
 #### Removing installed modules
-ScubaGear requires a number of PowerShell modules to function. A user or developer, however, may wish to remove these PowerShell modules for testing or for cleanup after ScubaGear has been run.  The `UninstallModules.ps1` script will remove the latest version of the modules required by ScubaGear and installed by the associated `Setup.ps1` script. The script does not take any options and can be as follows:
+ScubaGear requires a number of PowerShell modules to function. A user or developer, however, may wish to remove these PowerShell modules for testing or for cleanup after ScubaGear has been run.  The `UninstallModules.ps1` script will remove the latest version of the modules required by ScubaGear and installed by the associated `Initialize-SCuBA` cmdlet. The script does not take any options and can be as follows:
 
 ```powershell
 .\UninstallModules.ps1

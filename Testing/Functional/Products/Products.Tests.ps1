@@ -271,7 +271,7 @@ Describe "Policy Checks for <ProductName>"{
             $PolicyResultObj = $IntermediateTestResults | Where-Object { $_.PolicyId -eq $PolicyId }
             $BaselineReports = Join-Path -Path $OutputFolder -ChildPath 'BaselineReports.html'
             $Url = (Get-Item $BaselineReports).FullName
-            $Driver = Start-SeChrome -Headless -Quiet -Arguments @('start-maximized', 'AcceptInsecureCertificates')
+            $Driver = Start-SeChrome -Headless -Quiet -Arguments @('start-maximized', 'AcceptInsecureCertificates') -Verbose
             Open-SeUrl $Url -Driver $Driver | Out-Null
         }
         Context "Execute test, <TestDescription>" -ForEach $Tests {

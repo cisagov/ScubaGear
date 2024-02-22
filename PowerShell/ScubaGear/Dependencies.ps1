@@ -16,7 +16,12 @@ if (!$ModuleList){
    throw "Required modules list is required."
 }
 
+$SupportModulesPath = Join-Path -Path $PSScriptRoot -ChildPath "Modules/Support/Support.psm1"
+Import-Module -Name $SupportModulesPath
+Initialize-SCuBA -SkipUpdate -NoOPA
+
 foreach ($Module in $ModuleList) {
+    Write-Debug "Evaluating module: $($Module.ModuleName)"
     $InstalledModuleVersions = Get-Module -ListAvailable -Name $($Module.ModuleName)
     $FoundAcceptableVersion = $false
 
@@ -32,7 +37,7 @@ foreach ($Module in $ModuleList) {
         throw [System.IO.FileNotFoundException] "No acceptable installed version found for module: $($Module.ModuleName)
         Required Min Version: $($Module.ModuleVersion) | Max Version: $($Module.MaximumVersion)
         Run Get-InstalledModule to see a list of currently installed modules
-        Run SetUp.ps1 or Install-Module $($Module.ModuleName) -Force -MaximumVersion $($Module.MaximumVersion) to install the latest acceptable version of $($Module.ModuleName)"
+        Run Install-Module $($Module.ModuleName) -Force -MaximumVersion $($Module.MaximumVersion) to install the latest acceptable version of $($Module.ModuleName)"
     }
 }
 

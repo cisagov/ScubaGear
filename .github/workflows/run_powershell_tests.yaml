@@ -17,5 +17,7 @@ jobs:
         if: "!cancelled()"
         shell: powershell
         run: |
-          ./SetUp.ps1
+          Import-Module -Name ./PowerShell/ScubaGear/ScubaGear.psd1
+          Initialize-SCuBA
+          Install-OPA
           Invoke-Pester -Output 'Detailed' -Path 'PowerShell/ScubaGear/Testing/Unit/PowerShell'

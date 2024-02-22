@@ -78,7 +78,6 @@ jobs:
           Invoke-Pester -Configuration $Config
       - name: Check Scuba Version
         run: |
-          repo/SetUp.ps1 -NoOPA -SkipUpdate
           Install-Module -Name ScubaGear -SkipPublisherCheck
           Import-Module -Name ScubaGear
           Invoke-SCuBA -Version
