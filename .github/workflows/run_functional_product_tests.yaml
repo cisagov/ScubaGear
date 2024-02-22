@@ -42,22 +42,21 @@ jobs:
         env:
           PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
 
-      - name: Install Selenium & Update Wed Drivers
+      - name: Install Selenium & Update Webdriver (an interface that allows for control of web brosers programmatically)
         run: |
           Install-Module -Name Selenium -Scope CurrentUser -Force
           Import-Module -Name Selenium
           ./Testing/Functional/SmokeTest/UpdateSelenium.ps1
-          Remove-Module -Name Selenium
+          Import-Module -Name .\PowerShell\ScubaGear\ScubaGear.psd1
+          Install-OPA
+          # Workaround for Selenium. Loading psm1 instead of psd1
+          Import-Module -Name (Get-Module -Name Selenium -ListAvailable).Path -Force
       - name: Test Products
         # The testing params are stored as a string in a CSV-like format.
         # Pipes separate products, and commas separate key/value pairs.
         # key1=value1,key2=value2|key3=value3,key4=value4...
         # This job parses the keys and values and converts them to a hashtable.
         run: |
-          Import-Module -Name .\PowerShell\ScubaGear\ScubaGear.psd1
-          Install-OPA
-          # Workaround for Selenium. Loading psm1 instead of psd1
-          Import-Module -Name (Get-Module -Name Selenium -ListAvailable).Path -Force
           # Read thumbprint from previous job.
           $thumbprint = "${{ steps.getthumbprint.outputs.THUMBPRINT }}"
           $params = $env:TestParams
