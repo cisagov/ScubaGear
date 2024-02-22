@@ -266,7 +266,6 @@ tests contains {
     AccountKey := "TargetedUsersToProtect"
     ActionKey := "TargetedUserProtectionAction"
     ProtectedConfig := ImpersonationProtectionConfig("MS.DEFENDER.2.1v1", "SensitiveUsers")
-    input.defender_license == true
     StrictIP := ImpersonationProtection(
         Policies, "Strict Preset Security Policy",
         ProtectedConfig, FilterKey, AccountKey, ActionKey
