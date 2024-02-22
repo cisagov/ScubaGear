@@ -217,4 +217,4 @@ LicenseWarning := concat(" ", [
 # and leave the message unchanged
 ApplyLicenseWarningString(Status, String) := ReportDetailsString(Status, String) if {
     input.defender_license == true
-} else : LicenseWarning
+} else := LicenseWarning
