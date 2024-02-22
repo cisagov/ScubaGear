@@ -361,7 +361,6 @@ least functionality. SMTP AUTH is required for POP3 and IMAP4 clients. As
 there are still legitimate uses for such clients, SMTP AUTH can be enabled on a
 per-mailbox basis when necessary.
 - _Last modified:_ June 2023
-- _Note:_ SMTP AUTH MAY be enabled on a per-mailbox basis as needed.
 
 ### Resources
 
@@ -388,18 +387,6 @@ To disable SMTP AUTH for the organization:
 2. On the left hand pane, select **Settings**; then from the settings list, select **Mail Flow**.
 
 3. Make sure the setting **Turn off SMTP AUTH protocol for your organization** is checked.
-
-(Optional) As an exception, to allow SMTP AUTH for a specific mailbox:
-
-1. Sign in to the **Microsoft 365 admin center** and go to **Users > Active users**.
-
-2. Select the user, and in the properties that appear, click the **Mail** tab.
-
-3. In the **Email apps** section, click **Manage email apps**.
-
-4. Make sure the setting **Authenticated SMTP** is checked to enable.
-
-5. When finished, click **Save changes**.
 
 ## 6. Calendar and Contact Sharing
 
