@@ -796,7 +796,7 @@ test_AgencyDomains_Incorrect_V9 if {
         "your tenant does not have the required license(s) for Microsoft Defender",
         "for this feature.**"
     ])
-    TestResult("MS.DEFENDER.2.1v1", Output, ReportDetailString, false) == true
+    TestResult("MS.DEFENDER.2.2v1", Output, ReportDetailString, false) == true
 }
 #--
 
@@ -1244,6 +1244,6 @@ test_CustomDomains_Incorrect_V8 if {
         "your tenant does not have the required license(s) for Microsoft Defender",
         "for this feature.**"
     ])
-    TestResult("MS.DEFENDER.2.1v1", Output, ReportDetailString, false) == true
+    TestResult("MS.DEFENDER.2.3v1", Output, ReportDetailString, false) == true
 }
 #--
