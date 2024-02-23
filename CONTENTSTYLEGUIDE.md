@@ -400,7 +400,7 @@ ExampleArray contains OtherVar.name if {
 ## README Formatting
 This section is for standardizing how to format the README and it's table of contents (toc) for legibility.
 The formatting guidelines described in the sections below take formatting syntax from the VSCode [Markdown All in One](https://marketplace.visualstudio.com/items?itemName=yzhang.markdown-all-in-one) extension into account. The extension is not required for ScubaGear development but is used as the basis of this guide.
-To keep the README as a consistently formatted and compact resource for users please follow the guidelines below.
+To keep the README as a consistently formatted and compact resource for users, please follow the guidelines below.
 
 ### Character Limit
 If the section header is at a level 2 or level 3 i.e.`## Getting Started` `### Download the Latest Release` keep the section header to at most around 55 characters.
