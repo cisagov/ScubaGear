@@ -399,10 +399,8 @@ ExampleArray contains OtherVar.name if {
 
 ## README Formatting
 This section is for standardizing how to format the README and it's table of contents (toc) for legibility.
-The formatting guidelines described below takes the VSCode [Markdown All in One](https://marketplace.visualstudio.com/items?itemName=yzhang.markdown-all-in-one) extension into account. By default Markdown All in One will auto-format the README and table of contents for user. However, the extension is not required for ScubaGear development.
-
-To keep the table of contents in the README as a compact resource for users.
-see the section they're looking for, please follow the guidelines below.
+The formatting guidelines described in the sections below take formatting syntax from the VSCode [Markdown All in One](https://marketplace.visualstudio.com/items?itemName=yzhang.markdown-all-in-one) extension into account. The extension is not required for ScubaGear development but is used as the basis of this guide.
+To keep the README as a consistently formatted and compact resource for users please follow the guidelines below.
 
 ### Character Limit
 If the section header is at a level 2 or level 3 i.e.`## Getting Started` `### Download the Latest Release` keep the section header to at most around 55 characters.
@@ -417,17 +415,15 @@ Add the ` <!-- omit in toc -->` comment to the `## Table of Contents` and `# Scu
  # ScubaGear <!-- omit in toc -->
 ```
 These sections are located above the table of contents and are thus unnecessary.
-The comment will prevent the Markdown All in One and perhaps extension from auto formatting the README.
-If your README extension or plugin allows so, add in a configuration item to also ignore auto inserting sections into the toc that have this comment.
+The comment will prevent the Markdown All in One extension from auto formatting the README with these headers.
+This should already be implemented in the current README but this guideline is to reinforce the decision.
 
-This should already be implemented in the current README but, this guideline is to reinforce the decision.
-
-### Omit the Section Headers Level 4 and Below
+### Omit the Section Headers Level 4+
 If the section header is a level 4+ header i.e `#### Power Platform App Registration` add a omit comment.
 
 **Example**
 ```
 #### Power Platform App Registration <!-- omit in toc -->
 ```
-This is to prevent the depth of the table of contents in the README from becoming too deep.
-Deeply nested sections disrupt legibility of the TOC and should be avoided.
+This is to prevent the depth of the table of contents in the README from becoming too deeply nested.
+Deeply nested sections disrupt legibility of the toc and should be avoided.
