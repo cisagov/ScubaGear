@@ -80,4 +80,4 @@ jobs:
     needs:
       - test-files
     if: needs.test-files.outputs.rego-changes == 'true'
-    uses: ./.github/workflows/unit_check_opa.yaml
+    uses: ./.github/workflows/unit_test_opa.yaml
