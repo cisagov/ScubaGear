@@ -56,28 +56,28 @@ jobs:
     needs:
       - test-files
     if: needs.test-files.outputs.yaml-changes == 'true'
-    uses: ./.github/workflows/run_linter_yaml.yaml
+    uses: ./.github/workflows/lint_yaml.yaml
   lint-powershell:
     name: Lint
     needs:
       - test-files
     if: needs.test-files.outputs.powershell-changes == 'true'
-    uses: ./.github/workflows/run_linter_powershell.yaml
+    uses: ./.github/workflows/lint_powershell.yaml
   syntax:
     name: Syntax
     needs:
       - test-files
     if: needs.test-files.outputs.markdown-changes == 'true'
-    uses: ./.github/workflows/run_markdown_check.yaml
+    uses: ./.github/workflows/syntax_check_markdown.yaml
   unit-powershell:
     name: Unit
     needs:
       - test-files
     if: needs.test-files.outputs.powershell-changes == 'true'
-    uses: ./.github/workflows/run_powershell_tests.yaml
+    uses: ./.github/workflows/unit_test_powershell.yaml
   unit-opa:
     name: Unit
     needs:
       - test-files
     if: needs.test-files.outputs.rego-changes == 'true'
-    uses: ./.github/workflows/run_opa_tests.yaml
+    uses: ./.github/workflows/unit_check_opa.yaml
