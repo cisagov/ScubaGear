@@ -1,7 +1,7 @@
 # Purpose:  Run the CI/CD pipeline that tests, packages, and publishes ScubaGear.
 # Note:  This pipeline is a work in progress.  At the moment, it is only doing linting, syntax checking, and unit testing.
 
-name: CI/CD Pipeline
+name: Run the CI/CD Pipeline
 
 on:
   push:
@@ -20,6 +20,8 @@ jobs:
   test-files:
     name: Test for Changes
     runs-on: ubuntu-latest
+    # This condition prevents duplicate runs.
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4

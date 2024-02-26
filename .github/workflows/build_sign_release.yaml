@@ -1,3 +1,7 @@
+# Purpose:  Build, sign, and check the current release
+
+name: Build and Sign Release
+
 on:
   workflow_dispatch:
     inputs:
@@ -15,10 +19,9 @@ on:
         type: boolean
         default: true
 
-name: Build and Sign Release
-
 jobs:
   build-and-deploy:
+    name: Build and Deploy
     runs-on: windows-latest
     environment: Development
     env:
@@ -26,6 +29,8 @@ jobs:
     permissions:
       id-token: write
       contents: write
+    # This condition prevents duplicate runs.
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
     steps:
       - name: Checkout
         uses: actions/checkout@v4
