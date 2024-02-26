@@ -15,10 +15,7 @@ Developed by CISA, ScubaGear is an assessment tool that verifies a Microsoft 365
   - [PowerShell Execution Policies](#powershell-execution-policies)
 - [Usage](#usage)
   - [Importing the module](#importing-the-module)
-  - [Example 1: Run an assessment against all products (except PowerPlatform)](#example-1-run-an-assessment-against-all-products-except-powerplatform)
-  - [Example 2: Run an assessment against Azure Active Directory with custom report output location](#example-2-run-an-assessment-against-azure-active-directory-with-custom-report-output-location)
-  - [Example 3: Run assessments against multiple products](#example-3-run-assessments-against-multiple-products)
-  - [Example 4: Run assessments non-interactively using an application service principal and authenticating via CertificateThumbprint](#example-4-run-assessments-non-interactively-using-an-application-service-principal-and-authenticating-via-certificatethumbprint)
+  - [Examples](#examples)
   - [Parameter Definitions](#parameter-definitions)
   - [ScubaGear Configuration File Syntax and Examples](#scubagear-configuration-file-syntax-and-examples)
   - [AAD Conditional Access Policy Exemptions](#aad-conditional-access-policy-exemptions)
@@ -27,7 +24,6 @@ Developed by CISA, ScubaGear is an assessment tool that verifies a Microsoft 365
   - [User Permissions](#user-permissions)
   - [Microsoft Graph Powershell SDK permissions](#microsoft-graph-powershell-sdk-permissions)
   - [Service Principal Application Permissions \& Setup](#service-principal-application-permissions--setup)
-    - [Power Platform App Registration](#power-platform-app-registration)
 - [Architecture](#architecture)
 - [Repository Organization](#repository-organization)
 - [Troubleshooting](#troubleshooting)
@@ -36,13 +32,8 @@ Developed by CISA, ScubaGear is an assessment tool that verifies a Microsoft 365
   - [Exchange Online maximum connections error](#exchange-online-maximum-connections-error)
   - [Power Platform errors](#power-platform-errors)
   - [Microsoft Graph Errors](#microsoft-graph-errors)
-    - [Infinite AAD Sign in Loop](#infinite-aad-sign-in-loop)
-    - [Error `Connect-MgGraph : Key not valid for use in specified state.`](#error-connect-mggraph--key-not-valid-for-use-in-specified-state)
-    - [Error `Could not load file or assembly 'Microsoft.Graph.Authentication'`](#error-could-not-load-file-or-assembly-microsoftgraphauthentication)
   - [Running the Tool Behind Some Proxies](#running-the-tool-behind-some-proxies)
   - [Utility Scripts](#utility-scripts)
-    - [ScubaGear Support](#scubagear-support)
-    - [Removing installed modules](#removing-installed-modules)
 - [Project License](#project-license)
 
 ## M365 Product License Assumptions
@@ -93,7 +84,7 @@ In the event of an unsuccessful download, users can manually download the OPA ex
 ### PowerShell Execution Policies
 Starting with release 0.3.0, ScubaGear is signed by a commonly trusted CA. On Windows Servers, the default [execution policy](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.security/set-executionpolicy?view=powershell-5.1) is `RemoteSigned`, which will allow ScubaGear to run after the publisher (CISA) is agreed to once.
 
-On Windows clients, the default execution policy is `Restricted`. In this case, `Set-ExecutionPolicy RemoteSigned` should be invoked to permit ScubaGear to run.  
+On Windows clients, the default execution policy is `Restricted`. In this case, `Set-ExecutionPolicy RemoteSigned` should be invoked to permit ScubaGear to run.
 
 Windows clients with an execution policy of `Unrestricted` generate a warning about running only trusted scripts when executing ScubaGear, even when the scripts and modules are signed. This is because the files contain an identifier showing they were downloaded from the Internet. These zone identifiers, informally referred to as [Mark of the Web restrictions](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_execution_policies?view=powershell-7.4#manage-signed-and-unsigned-scripts) can be removed by running `Unblock-File` on scripts and modules in the ScubaGear folder. Users should carefully consider use of `Unblock-File` and only run it on files they have vetted and deem trustworthy to execute on their system. See [here](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/unblock-file?view=powershell-5.1) for more information from Microsoft on the `Unblock-File` cmdlet.
 
@@ -109,19 +100,21 @@ Then run:
 Import-Module -Name .\PowerShell\ScubaGear # Imports the module into your session
 ```
 
-### Example 1: Run an assessment against all products (except PowerPlatform)
+### Examples
+
+#### Example 1: Run an assessment against all products (except PowerPlatform) <!-- omit in toc -->
 ```powershell
 Invoke-SCuBA
 ```
-### Example 2: Run an assessment against Azure Active Directory with custom report output location
+#### Example 2: Run an assessment against Azure Active Directory with custom report output location <!-- omit in toc -->
 ```powershell
 Invoke-SCuBA -ProductNames aad -OutPath C:\Users\johndoe\reports
 ```
-### Example 3: Run assessments against multiple products
+#### Example 3: Run assessments against multiple products <!-- omit in toc -->
 ```powershell
 Invoke-SCuBA -ProductNames aad, sharepoint, teams
 ```
-### Example 4: Run assessments non-interactively using an application service principal and authenticating via CertificateThumbprint
+#### Example 4: Run assessments non-interactively using an application service principal and authenticating via CertificateThumbprint <!-- omit in toc -->
 ```powershell
 Invoke-SCuBA -ProductNames * -CertificateThumbprint "<insert-thumbprint>" -AppID "<insert-appid>" -Organization tenant.onmicrosoft.com
 ```
@@ -139,7 +132,7 @@ Get-Help -Name Invoke-SCuBA -Full
   - Namespace for each policy item within a product for variables related only to one policy item (i.e., MS.AAD.2.1v1)
   - Use of YAML anchors and aliases following Don't Repeat Yourself (DRY) principle for repeated values and sections
     If a -ConfigFilePath is specified, default values will be used for parameters that are not added to the config file. These default values are shown in the full config file template to guide the user, but they can be omitted if desired. Other command line parameters can also be used with the -ConfigFilePath. This should reduce the number of config files needed. Examples might be: using `-M365Environment` to override `commercial` config value to `gcc`, switching the tenant being targeted, or supplying credential references so they do not need to be in the config file. Smaller config files can facilitate sharing among admins.  The config file path defaults to the same directory where the script is executed. `ConfigFilePath` accepts both absolute and relative file paths. The file can be used to specify command line parameters and policy-specific parameters used by the Azure Active Directory (AAD) and Defender product assessments. See [See ScubaGear Configuration File Syntax and Examples](#scubagear-configuration-file-syntax-and-examples) and [AAD Conditional Access Policy Exemptions](#aad-conditional-access-policy-exemptions) for more details.
-  
+
 
 - **$LogIn** is a `$true` or `$false` variable that if set to `$true` will prompt the user to provide credentials to establish a connection to the specified M365 products in the **$ProductNames** variable. For most use cases, leave this variable to be `$true`. A connection is established in the current PowerShell terminal session with the first authentication. To run another verification in the same PowerShell session,  set this variable to be `$false` to bypass the need to authenticate again in the same session. Defender will ask for authentication even if this variable is set to `$false`
 
@@ -182,7 +175,7 @@ Description: YAML Basic Config file ( one product )
 ProductNames: teams
 M365Environment: commercial
 ```
-Command line 
+Command line
 `Invoke-SCuBA -ConfigFilePath minimal_config.yaml`
 
 Command line with override of M365Environment
@@ -368,7 +361,7 @@ The minimum API permissions & user roles for each product that need to be assign
 
 This [video](https://www.youtube.com/watch?v=GyF8HV_35GA) provides a good tutorial for creating an application manually in the Azure Portal. Augment the API permissions and replace the role assignment instructions in the video with the permissions listed above.
 
-#### Power Platform App Registration
+#### Power Platform App Registration <!-- omit in toc -->
 For Power Platform, the application must be [manually registered to Power Platform via interactive authentication](https://learn.microsoft.com/en-us/power-platform/admin/powershell-create-service-principal#registering-an-admin-management-application) with a administrative account. See [Limitations of Service Principals](https://learn.microsoft.com/en-us/power-platform/admin/powershell-create-service-principal#limitations-of-service-principals) for how applications are treated within Power Platform.
 ```powershell
 Add-PowerAppsAccount -Endpoint prod -TenantID $tenantId # use -Endpoint usgov for gcc tenants
@@ -390,9 +383,11 @@ The tool employs a three-step process:
 
 ## Repository Organization
 - `PowerShell` contains the code used to export the configuration settings from the M365 tenant and orchestrate the entire process from export through evaluation to report. The main PowerShell module manifest `ScubaGear.psd1` is located in the `PowerShell/ScubaGear` folder.
-- `Rego` holds the `.rego` files. Each Rego file audits against the desired state for each product, per the SCuBA M365 secure configuration baseline documents.
+- `Rego`, located within the PowerShell/ScubaGear folder, holds the `.rego` files. The Open Policy Agent executable uses each Rego file to audit the desired state for each product, per the SCuBA M365 secure configuration baseline documents.
 - `baselines` contains the SCuBA M365 secure configuration baseline documents in Markdown format.
 - `Testing` contains code that is used during the development process to test ScubaGear's PowerShell and Rego code.
+- `sample-report` contains sample JSON and HTML report output of the ScubaGear tool. Right click on the `BaselineReports.html` to open the file in a browser of your choice to view the sample report.
+- `utils` contains an assorted array of helper scripts for ScubaGear usage and development. See [Utility Scripts](#utility-scripts) for detailed descriptions of scripts that can help with troubleshooting.
 
 ## Troubleshooting
 
@@ -465,7 +460,7 @@ Invoke-ProviderList : Error with the PowerPlatform Provider. See the exception m
 
 ### Microsoft Graph Errors
 
-#### Infinite AAD Sign in Loop
+#### Infinite AAD Sign in Loop <!-- omit in toc -->
 While running the tool, AAD sign in prompts sometimes get stuck in a loop. This is likely an issue with the connection to Microsoft Graph.
 
 To fix the loop, run:
@@ -474,7 +469,7 @@ Disconnect-MgGraph
 ```
 Then run the tool again.
 
-#### Error `Connect-MgGraph : Key not valid for use in specified state.`
+#### Error `Connect-MgGraph : Key not valid for use in specified state.` <!-- omit in toc -->
 
 This is due to a [bug](https://github.com/microsoftgraph/msgraph-sdk-powershell/issues/554) in the Microsoft Authentication Library.  The workaround is to delete broken configuration information by running this command (replace `{username}` with your username):
 
@@ -483,7 +478,7 @@ rm -r C:\Users\{username}\.graph
 ```
 After deleting the `.graph` folder in your home directory, re-run the tool and the error should disappear.
 
-#### Error `Could not load file or assembly 'Microsoft.Graph.Authentication'`
+#### Error `Could not load file or assembly 'Microsoft.Graph.Authentication'` <!-- omit in toc -->
 
 This indicates that the authentication module is at a version level that conflicts with the MS Graph modules used by the tool. Follow the instructions in the Installation section and execute the 'Initialize-SCuBA' cmdlet again. This will ensure that the module versions get synchronized with dependencies and then execute the tool again.
 
@@ -498,7 +493,7 @@ $Wcl.Proxy.Credentials=[System.Net.CredentialCache]::DefaultNetworkCredentials
 ### Utility Scripts
 The ScubaGear repository includes several utility scripts to help with troubleshooting and recovery from error conditions in the `utils` folder. These helper scripts are designed to assist developers and users when running into errors with the ScubaGear tool or local system environment. See the sections below for details on each script.
 
-#### ScubaGear Support
+#### ScubaGear Support <!-- omit in toc -->
 If a user receives errors and needs additional support diagnosing issues, the `ScubaGearSupport.ps1` script can be run to gather information about their system environment and previous tool output.
 The script gathers this information into a single ZIP formatted archive to allow for easy sharing with developers or other support staff to assist in troubleshooting. Since the script does gather report output, do keep in mind that the resulting archive may contain details about the associated M365 environment and its settings.
 
@@ -529,7 +524,7 @@ Data gathered by the script includes:
   * JSON-formatted M365 product configuration extracts
   * JSON and CSV-formatted M365 baseline test results
 
-#### Removing installed modules
+#### Removing installed modules <!-- omit in toc -->
 ScubaGear requires a number of PowerShell modules to function. A user or developer, however, may wish to remove these PowerShell modules for testing or for cleanup after ScubaGear has been run.  The `UninstallModules.ps1` script will remove the latest version of the modules required by ScubaGear and installed by the associated `Initialize-SCuBA` cmdlet. The script does not take any options and can be as follows:
 
 ```powershell

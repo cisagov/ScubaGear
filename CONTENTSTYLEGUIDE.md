@@ -396,3 +396,34 @@ ExampleArray contains OtherVar.name if {
 
 ## PowerShell
 [PoshCode's The PowerShell Best Practices and Style Guide](https://github.com/PoshCode/PowerShellPracticeAndStyle)
+
+## README Formatting
+This section is for standardizing how to format the README and it's table of contents (toc) for legibility.
+The formatting guidelines described in the sections below take formatting syntax from the VSCode [Markdown All in One](https://marketplace.visualstudio.com/items?itemName=yzhang.markdown-all-in-one) extension into account. The extension is not required for ScubaGear development but is used as the basis of this guide.
+To keep the README as a consistently formatted and compact resource for users, please follow the guidelines below.
+
+### Character Limit
+If the section header is at a level 2 or level 3 i.e.`## Getting Started` `### Download the Latest Release` keep the section header to at most around 55 characters.
+
+This is to limit text stretching in the toc in the README.
+
+### Omit the Section Headers Including and Above the Table of Contents
+Add the ` <!-- omit in toc -->` comment to the `## Table of Contents` and `# ScubaGear` headers.
+
+**Example**
+```
+ # ScubaGear <!-- omit in toc -->
+```
+These sections are located above the table of contents and are thus unnecessary.
+The comment will prevent the Markdown All in One extension from auto formatting the README with these headers.
+This should already be implemented in the current README but this guideline is to reinforce the decision.
+
+### Omit the Section Headers Level 4+
+If the section header is a level 4+ header i.e `#### Power Platform App Registration` add a omit comment.
+
+**Example**
+```
+#### Power Platform App Registration <!-- omit in toc -->
+```
+This is to prevent the depth of the table of contents in the README from becoming too deeply nested.
+Deeply nested sections disrupt legibility of the toc and should be avoided.
