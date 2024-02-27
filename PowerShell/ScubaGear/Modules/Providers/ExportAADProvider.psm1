@@ -108,7 +108,14 @@ function Export-AADProvider {
     $DirectorySettings = ConvertTo-Json -Depth 10 @($Tracker.TryCommand("Get-MgBetaDirectorySetting"))
 
     # Read the properties and relationships of an authentication method policy
-    $AuthenticationMethodPolicy = ConvertTo-Json @($Tracker.TryCommand("Get-MgBetaPolicyAuthenticationMethodPolicy")) -Depth 5
+    #$AuthenticationMethodPolicy = ConvertTo-Json @($Tracker.TryCommand("Get-MgBetaPolicyAuthenticationMethodPolicy")) -Depth 5
+
+    $AuthenticationMethodPolicyObject = $Tracker.TryCommand("Get-MgBetaPolicyAuthenticationMethodPolicy")
+    #step 1 - create the JSON needed for Rego 3.4
+    $AuthenticationMethodPolicy = ConvertTo-Json @($AuthenticationMethodPolicyObject)
+
+    #step 2 - create the JSON needed for Rego 3.3, 3.5
+    $AuthenticationMethodConfiguration = ConvertTo-Json @($AuthenticationMethodPolicyObject.AuthenticationMethodConfigurations) -Depth 20
 
     # 6.1
     $DomainSettings = ConvertTo-Json @($Tracker.TryCommand("Get-MgBetaDomain"))
@@ -125,7 +132,8 @@ function Export-AADProvider {
     "privileged_roles": $PrivilegedRoles,
     "service_plans": $ServicePlans,
     "directory_settings": $DirectorySettings,
-    "authentication_method": $AuthenticationMethodPolicy,
+    "authentication_method_policy": $AuthenticationMethodPolicy,
+    "authentication_method_configuration":  $AuthenticationMethodConfiguration,
     "domain_settings": $DomainSettings,
     "license_information": $LicenseInfo,
     "total_user_count": $UserCount,
