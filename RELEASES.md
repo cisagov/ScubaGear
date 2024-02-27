@@ -48,7 +48,9 @@ The checklist below is used by the development team when it prepares a new relea
 
 After running the `Build and Sign Release` workflow, a draft release will be visible to development team members for review and revision.  The checklist below is designed to ensure consistency in review and publishing of the release candidate as the final release. 
 
-- [ ] Update release notes to match expected format, including major new features, bug fixes, documentation improvements, and baseline updates Release notes should link to associated closed pull requests.
+- [ ] Update release notes manually
+  - Adjust default change format to use PR listing as `- #{{TITLE}} ##{{NUMBER}}`
+  - Regroup changes into sections: Major new features, Bug fixes, Documentation improvements, and Baseline updates
 - [ ] Make the release official and visible to public
   - Uncheck **Set as a pre-release**
   - Check **Set as latest release**
