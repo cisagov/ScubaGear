@@ -23,7 +23,7 @@ Note that ScubaGear versions and Secure Configuration Baseline (SCB) policy vers
 ## Release branches and tags ##
 
 ScubaGear major and minor releases are built directly from the main branch.  Branch protections prevent direct push to the main branch.  All changes require a pull request and associated review prior to merge. 
-When a new release is planned, the latest commit to be included is tagged with its release versions (e.g., vX.Y.Z).  Patch versions are created from a separate release branch named `release-X.Y.Z` and are branched from the latest release tag or previous patch release branch which they are patching. The patch release branch contains only the additional changes for the patch along with version bumps.
+When a new release is planned, the latest commit to be included is tagged with its release versions (e.g., vX.Y.Z).  Patch versions are created from a separate release branch named `release-X.Y.Z` and are branched from the latest release tag or previous patch release branch which they are patching. The patch release branch contains only the cherry picked commits that resolve an identified bug the patch release resolves along with version bumps.
 
 ## Preparing ScubaGear release candidate ##
 
