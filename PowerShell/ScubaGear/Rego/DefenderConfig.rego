@@ -546,7 +546,6 @@ tests contains {
     ErrorMessage := concat(" ", [error_policy, concat(", ", error_policies)])
     Conditions := [
         count(error_policies) == 0,
-        count(PoliciesWithFullProtection) > 0,
         input.defender_license == true
     ]
     Status := count(FilterArray(Conditions, false)) == 0
