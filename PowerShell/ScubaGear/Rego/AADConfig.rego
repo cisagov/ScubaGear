@@ -248,9 +248,40 @@ tests contains {
 # MS.AAD.3.3v1
 #--
 
-# At this time we are unable to test for X because of NEW POLICY
+# Save all policy names if MFAPolicies exist
+AuthenticatorMFA contains CAPolicy.DisplayName if {
+    some CAPolicy in input.conditional_access_policies
+    Count(MFAPolicies) > 0
+}
+
+# Microsoft Authenticator Method is Enabled if associated method configuration state is set to "enabled"
+GoodMSAuthenticatorMethodConfiguration contains {
+    "Id": Configuration.Id,
+    "State": Configuration.State
+} if {
+    some Item in input.authentication_method_policy
+    some Configuration in Item.AuthenticationMethodConfigurations
+    Configuration.Id == "MicrosoftAuthenticator"
+    Configuration.State == "enabled"
+}
+
+# If policy matches basic conditions, special conditions,
+# & all exclusions are intentional, save the policy name
+AuthenticatorMFA contains CAPolicy.DisplayName if {
+    some CAPolicy in input.conditional_access_policies
+
+    # Match all simple conditions
+    PolicyConditionsMatch(CAPolicy)
+    # Match if MS Authenticator is enabled and context information is selected
+    count(GoodMSAuthenticatorMethodConfiguration) == 1
+
+    # Only match policies with user and group exclusions if all exempted
+    UserExclusionsFullyExempt(CAPolicy, "MS.AAD.3.3v1") == true
+    GroupExclusionsFullyExempt(CAPolicy, "MS.AAD.3.3v1") == true
+}
+
 # If we have acceptable MFA then policy passes otherwise MS Authenticator need to be
-# enabled to pass. However, we can not currently check if MS Authenticator enabled
+# enabled to pass.
 tests contains {
     "PolicyId": "MS.AAD.3.3v1",
     "Criticality": "Shall",
@@ -282,7 +313,7 @@ tests contains {
 #--
 
 PolicyMigrationIsComplete := Status if {
-    some Policy in input.authentication_method
+    some Policy in input.authentication_method_policy
     Status := Policy.PolicyMigrationState == "migrationComplete"
 }
 
@@ -295,7 +326,7 @@ tests contains {
     "ReportDetails": ReportDetailsBoolean(Status),
     "RequirementMet": Status
 } if {
-    some Policy in input.authentication_method
+    some Policy in input.authentication_method_policy
     Status := Policy.PolicyMigrationState == "migrationComplete"
 }
 #--
@@ -308,7 +339,7 @@ GoodAuthenticationMethodConfigurations contains {
     "Id": Configuration.Id,
     "State": Configuration.State
 } if {
-    some Item in input.authentication_method
+    some Item in input.authentication_method_policy
     some Configuration in Item.AuthenticationMethodConfigurations
     Configuration.Id in ["Sms", "Voice", "Email"]
     Configuration.State == "disabled"
