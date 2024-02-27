@@ -917,7 +917,7 @@ test_Locations_Incorrect_V6 if {
         "defender_license": true
     }
 
-    ReportDetailString := "No enabled policy found that applies to: Exchange, SharePoint, OneDrive, Teams, Devices"
+    ReportDetailString := "No enabled policy found that applies to: Exchange SharePoint OneDrive Teams Devices"
     TestResult("MS.DEFENDER.4.2v1", Output, ReportDetailString, false) == true
 }
               
@@ -978,7 +978,7 @@ test_Locations_Incorrect_V7 if {
         "defender_license": true
     }
 
-    ReportDetailString := "No enabled policy found that applies to: Exchange, SharePoint, OneDrive, Teams, Devices"
+    ReportDetailString := "No enabled policy found that applies to: Exchange; SharePoint; OneDrive; Teams; Devices"
     TestResult("MS.DEFENDER.4.2v1", Output, ReportDetailString, false) == true
 }
 
