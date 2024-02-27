@@ -530,18 +530,6 @@ error_policies contains "Teams" if count(Policies.Teams) == 0
 
 error_policies contains "Devices" if count(Policies.Devices) == 0
 
-# Create the Report details message for policy
-DefenderErrorMessage4_2 := ErrorMessage if {
-    count(PoliciesWithFullProtection) > 0
-    error_policy := "No enabled policy found that applies to:"
-    ErrorMessage := concat(" ", [error_policy, concat(", ", error_policies)])
-}
-
-DefenderErrorMessage4_2 := ErrorMessage if {
-    count(PoliciesWithFullProtection) == 0
-    ErrorMessage := "No DLP policy matching all types found for evaluation."
-}
-
 # If error_policies contains any value, then some M365 product does not
 # have a policy protectig all sensitive content & check should fail.
 # Check should also fail if there are no policies that protect all sensitive
@@ -551,14 +539,16 @@ tests contains {
     "Criticality": "Should",
     "Commandlet": ["Get-DLPCompliancePolicy"],
     "ActualValue": Policies,
-    "ReportDetails": ApplyLicenseWarningString(Status, DefenderErrorMessage4_2),
+    "ReportDetails": ApplyLicenseWarningString(Status, ErrorMessage),
     "RequirementMet": Status
 } if {
+    error_policy := "No enabled policy found that applies to:"
+    ErrorMessage := concat(" ", [error_policy, concat(", ", error_policies)])
     Conditions := [
         count(error_policies) == 0,
-        count(PoliciesWithFullProtection) > 0,
+        input.defender_license == true
     ]
-    Status := count(FilterArray(Conditions, true)) == 2
+    Status := count(FilterArray(Conditions, false)) == 0
 }
 
 #
