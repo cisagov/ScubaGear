@@ -182,7 +182,7 @@ function New-Report {
     # Handle AAD-specific reporting
     if ($BaselineName -eq "aad") {
         $ReportHTML = $ReportHTML.Replace("{AADWARNING}", $AADWarning)
-       
+
         # Create an array of custom objects for each SKU
         $LicenseInfoArray = $SettingsExport.license_information | ForEach-Object {
             [pscustomobject]@{
