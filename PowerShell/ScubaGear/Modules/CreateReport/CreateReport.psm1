@@ -182,12 +182,26 @@ function New-Report {
     # Handle AAD-specific reporting
     if ($BaselineName -eq "aad") {
         $ReportHTML = $ReportHTML.Replace("{AADWARNING}", $AADWarning)
-        $ReportHTML = $ReportHTML.Replace("{CAPTABLES}", "")
+       
+        # Create an array of custom objects for each SKU
+        $LicenseInfoArray = $SettingsExport.license_information | ForEach-Object {
+            [pscustomobject]@{
+                "SKU Part Number" = $_.SkuPartNumber
+                "Used Licenses" = $_.ConsumedUnits
+                "Total Licenses" = $_.PrepaidUnits.Enabled
+            }
+        }
+        # Convert the custom objects to an HTML table
+        $LicenseTable = $LicenseInfoArray | ConvertTo-Html -As Table -Fragment
+
+        # Create a section header for the licensing information
+        $LicensingHTML = "<h2>Licensing Information</h2>" + $LicenseTable
+        $ReportHTML = $ReportHTML.Replace("{LICENSING_INFO}", $LicensingHTML)
         $CapJson = ConvertTo-Json $SettingsExport.cap_table_data
     }
     else {
         $ReportHTML = $ReportHTML.Replace("{AADWARNING}", $NoWarning)
-        $ReportHTML = $ReportHTML.Replace("{CAPTABLES}", "")
+        $ReportHTML = $ReportHTML.Replace("{LICENSING_INFO}", "")
         $CapJson = "null"
     }
 
