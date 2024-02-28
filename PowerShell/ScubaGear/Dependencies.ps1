@@ -3,6 +3,8 @@
     .SYNOPSIS
         This script verifies the required Powershell modules used by the
         assessment tool are installed.
+    .PARAMETER Force
+    This will cause all required dependencies to be installed and updated to latest.
     .DESCRIPTION
         Verifies a supported version of the modules required to support SCuBAGear are installed.
 #>
@@ -18,7 +20,8 @@ if (!$ModuleList){
 
 $SupportModulesPath = Join-Path -Path $PSScriptRoot -ChildPath "Modules/Support/Support.psm1"
 Import-Module -Name $SupportModulesPath
-Initialize-SCuBA -SkipUpdate -NoOPA
+
+$MissingModules = @()
 
 foreach ($Module in $ModuleList) {
     Write-Debug "Evaluating module: $($Module.ModuleName)"
@@ -34,13 +37,26 @@ foreach ($Module in $ModuleList) {
     }
 
     if (-not $FoundAcceptableVersion) {
-        throw [System.IO.FileNotFoundException] "No acceptable installed version found for module: $($Module.ModuleName)
-        Required Min Version: $($Module.ModuleVersion) | Max Version: $($Module.MaximumVersion)
-        Run Get-InstalledModule to see a list of currently installed modules
-        Run Install-Module $($Module.ModuleName) -Force -MaximumVersion $($Module.MaximumVersion) to install the latest acceptable version of $($Module.ModuleName)"
+        $MissingModules += $Module
     }
 }
 
+if ($MissingModules.Count -gt 0){
+    # Set preferences for writing messages
+    $PreferenceStack = New-Object -TypeName System.Collections.Stack
+    $PreferenceStack.Push($WarningPreference)
+    $WarningPreference = "Continue"
 
+    Write-Warning "
+    The required supporting PowerShell modules are not installed.
+    Run Initialize-SCuBA to install all required dependencies.
+    See Get-Help Initialize-SCuBA for more help."
 
+    Write-Debug "The following modules are not installed:"
+    foreach ($Module in $MissingModules){
+        Write-Debug "`t$($Module.ModuleName)"
+    }
+
+    $WarningPreference = $PreferenceStack.Pop()
+}
 
