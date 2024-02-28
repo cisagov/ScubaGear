@@ -1,8 +1,8 @@
 function New-Report {
      <#
     .Description
-    This function creates the individual HTML report using the TestResults.json.
-    Output will be stored as an HTML file in the InvidualReports folder in the OutPath Folder.
+    This function creates the individual HTML/json reports using the TestResults.json.
+    Output will be stored as HTML/json files in the InvidualReports folder in the OutPath Folder.
     The report Home page and link tree will be named BaselineReports.html
     .Functionality
     Internal
@@ -74,6 +74,12 @@ function New-Report {
         "Baseline Version" = $SettingsExport.baseline_version;
         "Module Version" = $SettingsExport.module_version
     }
+
+    # Json version of the product-specific report
+    $ReportJson = @{
+        "MetaData" = $MetaData
+        "Results" = @()
+    };
 
     $MetaDataTable = $MetaData | ConvertTo-HTML -Fragment
     $MetaDataTable = $MetaDataTable -replace '^(.*?)<table>','<table id="tenant-data" style = "text-align:center;">'
@@ -163,8 +169,22 @@ function New-Report {
         $GroupAnchor = New-MarkdownAnchor -GroupNumber $BaselineGroup.GroupNumber -GroupName $BaselineGroup.GroupName
         $MarkdownLink = "<a class='control_group' href=`"$($ScubaGitHubUrl)/blob/v$($SettingsExport.module_version)/PowerShell/ScubaGear/baselines/$($BaselineName.ToLower()).md$GroupAnchor`" target=`"_blank`">$Name</a>"
         $Fragments += $Fragment | ConvertTo-Html -PreContent "<h2>$Number $MarkdownLink</h2>" -Fragment
+        $ReportJson.Results += $Fragment
     }
 
+    # Craft the json report
+    $ReportJson.ReportSummary = $ReportSummary
+    $JsonFileName = Join-Path -Path $IndividualReportPath -ChildPath "$($BaselineName)Report.json"
+    $ReportJson = ConvertTo-Json @($ReportJson) -Depth 3
+
+    # ConvertTo-Json for some reason converts the <, >, and ' characters into unicode escape sequences.
+    # Convert those back to ASCII.
+    $ReportJson = $ReportJson.replace("\u003c", "<")
+    $ReportJson = $ReportJson.replace("\u003e", ">")
+    $ReportJson = $ReportJson.replace("\u0027", "'")
+    $ReportJson | Out-File $JsonFileName
+
+    # Finish building the html report
     $Title = "$($FullName) Baseline Report"
     $AADWarning = "<p> Note: Conditional Access (CA) Policy exclusions and additional policy conditions
     may limit a policy's scope more narrowly than desired. Recommend reviewing matching policies
