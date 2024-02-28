@@ -1,42 +1,42 @@
 {
-	"_comment": "All comments should be removed. Add a test tenant object to execute the smoke test against it.",
-	"TestTenants": [
-		{
-			"_comment": "The test tenant needs to provide the following info to support the smoke test.",
-			"TestTenant01": {
-				"_comment1": "DomainName maps to Organization parameter of Invoke-SCuBA",
-				"DomainName": "sample001.onmicrosoft.com",
-				"_comment2": "DisplayName is the Tenant Display Name as expected in the baseline report.",
-				"DisplayName": "Sample 001",
-				"_comment3": "A base 64 encoded PFX certiificate for a service principal.",
-				"CertificateB64": "-----BEGIN CERTIFICATE-----\r\nMIIK...A=\r\n-----END CERTIFICATE-----\r\n\r\n",
-				"_comment4": "AppId maps to AppId parameter of Invoke-SCuBA. The application ID of the application registration",
-				"AppId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
-				"_comment5": "M365Enc maps to -M365Environment parameter of Invoke-SCuBA ",
-				"M365Env": "commercial",
-				"_comment6": "The password for the provided certificate, CertificateB64.",
-				"CertificatePassword": "sample01secret"
-			}
-		},
-		{
-			"TestTenant002": {
-				"DomainName": "sample002.onmicrosoft.com",
-				"DisplayName": "Sample 002",
-				"CertificateB64": "-----BEGIN CERTIFICATE-----\r\nMIIK...A=\r\n-----END CERTIFICATE-----\r\n\r\n",
-				"AppId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
-				"M365Env": "gcc",
-				"CertificatePassword": "sample02secret"
-			}
-		},
-		{
-			"TestTenant003": {
-				"DomainName": "sample003.onmicrosoft.com",
-				"DisplayName": "Sample 003",
-				"CertificateB64": "-----BEGIN CERTIFICATE-----\r\nMIIK...A=\r\n-----END CERTIFICATE-----\r\n\r\n",
-				"AppId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
-				"M365Env": "commercial",
-				"CertificatePassword": "sample03secret"
-			}
-		}
-	]
+  "_comment": "All comments should be removed. Add a test tenant object to execute the smoke test against it.",
+  "TestTenants": [
+    {
+      "_comment": "The test tenant needs to provide the following info to support the smoke test.",
+      "TestTenant01": {
+        "_comment1": "DomainName maps to Organization parameter of Invoke-SCuBA",
+        "DomainName": "sample001.onmicrosoft.com",
+        "_comment2": "DisplayName is the Tenant Display Name as expected in the baseline report.",
+        "DisplayName": "Sample 001",
+        "_comment3": "A base 64 encoded PFX certiificate for a service principal.",
+        "CertificateB64": "-----BEGIN CERTIFICATE-----\r\nMIIK...A=\r\n-----END CERTIFICATE-----\r\n\r\n",
+        "_comment4": "AppId maps to AppId parameter of Invoke-SCuBA. The application ID of the application registration",
+        "AppId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+        "_comment5": "M365Enc maps to -M365Environment parameter of Invoke-SCuBA ",
+        "M365Env": "commercial",
+        "_comment6": "The password for the provided certificate, CertificateB64.",
+        "CertificatePassword": ""
+      }
+    },
+    {
+      "TestTenant002": {
+        "DomainName": "sample002.onmicrosoft.com",
+        "DisplayName": "Sample 002",
+        "CertificateB64": "-----BEGIN CERTIFICATE-----\r\nMIIK...A=\r\n-----END CERTIFICATE-----\r\n\r\n",
+        "AppId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+        "M365Env": "gcc",
+        "CertificatePassword": ""
+      }
+    },
+    {
+      "TestTenant003": {
+        "DomainName": "sample003.onmicrosoft.com",
+        "DisplayName": "Sample 003",
+        "CertificateB64": "-----BEGIN CERTIFICATE-----\r\nMIIK...A=\r\n-----END CERTIFICATE-----\r\n\r\n",
+        "AppId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+        "M365Env": "commercial",
+        "CertificatePassword": ""
+      }
+    }
+  ]
 }

@@ -28,9 +28,9 @@ import data.utils.aad.INT_MAX
 # Constants #
 #############
 
-RESTRICTEDACCESS := "2af84b1e-32c8-42b7-82bc-daa82404023b"
+RESTRICTEDACCESS := "2af84b1e-32c8-42b7-82bc-daa82404023b" #gitleaks:allow
 
-LIMITEDACCESS := "10dae51f-b6af-4016-8d66-8c2a99b929b3"
+LIMITEDACCESS := "10dae51f-b6af-4016-8d66-8c2a99b929b3" #gitleaks:allow
 
 MEMBERUSER := "a0b1b346-4d3e-4e8b-98f8-753987be4970"
 
