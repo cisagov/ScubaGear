@@ -3,9 +3,6 @@ import rego.v1
 import data.aad
 import data.utils.aad.P2WARNINGSTR
 import data.utils.key.TestResult
-import data.utils.key.FAIL
-import data.utils.key.PASS
-
 
 #
 # Policy MS.AAD.7.1v1
