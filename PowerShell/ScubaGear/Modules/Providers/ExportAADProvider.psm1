@@ -114,10 +114,14 @@ function Export-AADProvider {
     #step 1 - create the JSON needed for Rego 3.4
     $AuthenticationMethodPolicy = ConvertTo-Json @($AuthenticationMethodPolicyObject)
 
-    #step 2 - create the JSON needed for Rego 3.3, 3.5
-    $AuthenticationMethodConfiguration = ConvertTo-Json @($AuthenticationMethodPolicyObject.AuthenticationMethodConfigurations) -Depth 20
+    #step 2 - create the JSON needed for Rego 3.5
+    $AuthenticationMethodConfiguration = ConvertTo-Json @($AuthenticationMethodPolicyObject.AuthenticationMethodConfigurations) -Depth 5
 
-    # 6.1
+   #step 3 - create the JSON needed for Rego 3.3
+   #$SecureScore = ConvertTo-Json -Depth 2 @($SecureScoreResults.ControlScores | Where-Object {$_.ControlName -eq 'RoleOverlap'})
+   #$AuthenticationMethodFeatureSettings = ConvertTo-Json -Depth 2 @($AuthenticationMethodPolicyObject.AuthenticationMethodConfigurations | Where-Object { $_.Id -eq 'MicrosoftAuthenticator' }.AdditionalProperties["featureSettings"])
+   $AuthenticationMethodFeatureSettings = ConvertTo-Json -Depth 5 @($AuthenticationMethodPolicyObject.AuthenticationMethodConfigurations | Where-Object { $_.Id -eq 'MicrosoftAuthenticator' })
+   # 6.1
     $DomainSettings = ConvertTo-Json @($Tracker.TryCommand("Get-MgBetaDomain"))
 
     $SuccessfulCommands = ConvertTo-Json @($Tracker.GetSuccessfulCommands())
@@ -134,6 +138,7 @@ function Export-AADProvider {
     "directory_settings": $DirectorySettings,
     "authentication_method_policy": $AuthenticationMethodPolicy,
     "authentication_method_configuration":  $AuthenticationMethodConfiguration,
+    "authentication_method_feature_settings": $AuthenticationMethodFeatureSettings,
     "domain_settings": $DomainSettings,
     "license_information": $LicenseInfo,
     "total_user_count": $UserCount,
