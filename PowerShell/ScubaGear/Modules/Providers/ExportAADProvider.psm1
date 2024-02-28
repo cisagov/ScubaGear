@@ -424,7 +424,7 @@ function FindRulesForPimGroupsRoles{
                 if ($Role){
                     $RoleRules = $Role.psobject.Properties | Where-Object {$_.Name -eq 'Rules'}
                     if ($RoleRules){
-                        # Appending rules 
+                        # Appending rules
                         $Role.Rules += $MemberPolicyRules
                     }
                     else {
