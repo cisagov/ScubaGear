@@ -2,7 +2,6 @@ package aad_test
 import rego.v1
 import data.aad
 import data.utils.aad.P2WARNINGSTR
-import data.utils.aad.ReportDetailsArrayLicenseWarning
 import data.utils.key.TestResult
 import data.utils.key.FAIL
 import data.utils.key.PASS
