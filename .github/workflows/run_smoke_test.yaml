@@ -37,7 +37,7 @@ jobs:
           ##### Install all the dependencies
           Install-SmokeTestExternalDependencies
           Import-Module -Name .\PowerShell\ScubaGear\ScubaGear.psd1
-          Initialize-SCuBA -SkipUpdate
+          Initialize-SCuBA
 
           # Workaround for Selenium. Loading psm1 instead of psd1
           Import-Module -Name (Get-Module -Name Selenium -ListAvailable).Path -Force
