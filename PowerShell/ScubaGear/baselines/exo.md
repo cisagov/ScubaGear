@@ -357,9 +357,7 @@ SMTP AUTH SHALL be disabled.
 <!--Policy: MS.EXO.5.1v1; Criticality: SHALL -->
 - _Rationale:_ SMTP AUTH is not used or needed by modern email clients.
 Therefore, disabling it as the global default conforms to the principle of
-least functionality. SMTP AUTH is required for POP3 and IMAP4 clients. As
-there are still legitimate uses for such clients, SMTP AUTH can be enabled on a
-per-mailbox basis when necessary.
+least functionality.
 - _Last modified:_ June 2023
 
 ### Resources
