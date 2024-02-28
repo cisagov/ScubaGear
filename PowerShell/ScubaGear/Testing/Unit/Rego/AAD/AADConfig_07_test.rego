@@ -1,6 +1,8 @@
 package aad_test
 import rego.v1
 import data.aad
+import data.utils.aad.P2WARNINGSTR
+import data.utils.aad.ReportDetailsArrayLicenseWarning
 import data.utils.key.TestResult
 import data.utils.key.FAIL
 import data.utils.key.PASS
@@ -1314,6 +1316,8 @@ test_AdditionalProperties_Correct_V4 if {
                 "Rules": [
                     {
                         "Id": "Approval_EndUser_Assignment",
+                        "RuleSource":  "Global Administrator",
+                        "RuleSourceType":  "Directory Role",
                         "AdditionalProperties": {
                             "setting": {
                                 "isApprovalRequired": true
@@ -1335,7 +1339,8 @@ test_AdditionalProperties_Correct_V4 if {
         ]
     }
 
-    TestResult("MS.AAD.7.6v1", Output, PASS, true) == true
+    ReportDetailString := "0 role(s) or group(s) allowing without approval found"
+    TestResult("MS.AAD.7.6v1", Output, ReportDetailString, true) == true
 }
 
 test_AdditionalProperties_Correct_V5 if {
@@ -1346,6 +1351,8 @@ test_AdditionalProperties_Correct_V5 if {
                 "Rules": [
                     {
                         "Id": "Approval_EndUser_Assignment",
+                        "RuleSource":  "Global Administrator",
+                        "RuleSourceType":  "Directory Role",
                         "AdditionalProperties": {
                             "setting": {
                                 "isApprovalRequired": true
@@ -1380,7 +1387,8 @@ test_AdditionalProperties_Correct_V5 if {
         ]
     }
 
-    TestResult("MS.AAD.7.6v1", Output, PASS, true) == true
+    ReportDetailString := "0 role(s) or group(s) allowing without approval found"
+    TestResult("MS.AAD.7.6v1", Output, ReportDetailString, true) == true
 }
 
 test_AdditionalProperties_Incorrect_V15 if {
@@ -1391,6 +1399,8 @@ test_AdditionalProperties_Incorrect_V15 if {
                 "Rules": [
                     {
                         "Id": "Approval_EndUser_Assignment",
+                        "RuleSource":  "Global Administrator",
+                        "RuleSourceType":  "Directory Role",
                         "AdditionalProperties": {
                             "setting": {
                                 "isApprovalRequired": false
@@ -1412,7 +1422,88 @@ test_AdditionalProperties_Incorrect_V15 if {
         ]
     }
 
-    TestResult("MS.AAD.7.6v1", Output, FAIL, false) == true
+    ReportDetailString := "1 role(s) or group(s) allowing without approval found:<br/>Global Administrator(Directory Role)"
+    TestResult("MS.AAD.7.6v1", Output, ReportDetailString, false) == true
+}
+
+test_PIM_Group_Incorrect_V15 if {
+    Output := aad.tests with input as {
+        "privileged_roles": [
+            {
+                "DisplayName": "Global Administrator",
+                "Rules": [
+                    {
+                        "Id": "Approval_EndUser_Assignment",
+                        "RuleSource":  "Global Administrator",
+                        "RuleSourceType":  "Directory Role",
+                        "AdditionalProperties": {
+                            "setting": {
+                                "isApprovalRequired": true
+                            }
+                        }
+                    }
+                ]
+            },
+                        {
+                "DisplayName": "Global Administrator",
+                "Rules": [
+                    {
+                        "Id": "Approval_EndUser_Assignment",
+                        "RuleSource":  "My PIM GROUP",
+                        "RuleSourceType":  "PIM Group",
+                        "AdditionalProperties": {
+                            "setting": {
+                                "isApprovalRequired": false
+                            }
+                        }
+                    }
+                ]
+            }
+        ],
+        "service_plans": [
+            {
+                "ServicePlanName": "EXCHANGE_S_FOUNDATION",
+                "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
+            },
+            {
+                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
+            }
+        ]
+    }
+
+    ReportDetailString := "1 role(s) or group(s) allowing without approval found:<br/>My PIM GROUP(PIM Group)"
+    TestResult("MS.AAD.7.6v1", Output, ReportDetailString, false) == true
+}
+
+test_NoP2License_Incorrect if {
+    Output := aad.tests with input as {
+        "privileged_roles": [
+            {
+                "DisplayName": "Global Administrator",
+                "Rules": [
+                    {
+                        "Id": "Approval_EndUser_Assignment",
+                        "RuleSource":  "Global Administrator",
+                        "RuleSourceType":  "Directory Role",
+                        "AdditionalProperties": {
+                            "setting": {
+                                "isApprovalRequired": false
+                            }
+                        }
+                    }
+                ]
+            }
+        ],
+        "service_plans": [
+            {
+                "ServicePlanName": "EXCHANGE_S_FOUNDATION",
+                "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
+            }
+        ]
+    }
+
+    TestResult("MS.AAD.7.6v1", Output, P2WARNINGSTR, false) == true
 }
 #--
 
@@ -1428,6 +1519,8 @@ test_notificationRecipients_Correct if {
                 "Rules": [
                     {
                         "Id": "Notification_Admin_Admin_Assignment",
+                        "RuleSource":  "Global Administrator",
+                        "RuleSourceType":  "Directory Role",
                         "AdditionalProperties": {
                             "notificationRecipients": [
                                 "test@example.com"
@@ -1436,6 +1529,8 @@ test_notificationRecipients_Correct if {
                     },
                     {
                         "Id": "Notification_Admin_Admin_Eligibility",
+                        "RuleSource":  "Global Administrator",
+                        "RuleSourceType":  "Directory Role",
                         "AdditionalProperties": {
                             "notificationRecipients": [
                                 "test@example.com"
@@ -1457,7 +1552,7 @@ test_notificationRecipients_Correct if {
         ]
     }
 
-    ReportDetailString := "0 role(s) without notification e-mail configured for role assignments found"
+    ReportDetailString := "0 role(s) or group(s) without notification e-mail configured for role assignments found"
     TestResult("MS.AAD.7.7v1", Output, ReportDetailString, true) == true
 }
 
@@ -1470,12 +1565,16 @@ test_notificationRecipients_Incorrect_V1 if {
                 "Rules": [
                     {
                         "Id": "Notification_Admin_Admin_Assignment",
+                        "RuleSource":  "Global Administrator",
+                        "RuleSourceType":  "Directory Role",
                         "AdditionalProperties": {
                             "notificationRecipients": []
                         }
                     },
                     {
                         "Id": "Notification_Admin_Admin_Eligibility",
+                        "RuleSource":  "Global Administrator",
+                        "RuleSourceType":  "Directory Role",
                         "AdditionalProperties": {
                             "notificationRecipients": [
                                 "test@example.com"
@@ -1497,9 +1596,8 @@ test_notificationRecipients_Incorrect_V1 if {
         ]
     }
 
-    ReportDetailString :=
-        "1 role(s) without notification e-mail configured for role assignments found:<br/>Global Administrator"
-    TestResult("MS.AAD.7.7v1", Output, ReportDetailString, false) == true
+    DescriptionString := "1 role(s) or group(s) without notification e-mail configured for role assignments found:<br/>Global Administrator(Directory Role)"
+    TestResult("MS.AAD.7.7v1", Output, DescriptionString, false) == true
 }
 
 test_notificationRecipients_Incorrect_V2 if {
@@ -1511,6 +1609,8 @@ test_notificationRecipients_Incorrect_V2 if {
                 "Rules": [
                     {
                         "Id": "Notification_Admin_Admin_Assignment",
+                        "RuleSource":  "Global Administrator",
+                        "RuleSourceType":  "Directory Role",
                         "AdditionalProperties": {
                             "notificationRecipients": [
                                 "test@example.com"
@@ -1519,6 +1619,8 @@ test_notificationRecipients_Incorrect_V2 if {
                     },
                     {
                         "Id": "Notification_Admin_Admin_Eligibility",
+                        "RuleSource":  "Global Administrator",
+                        "RuleSourceType":  "Directory Role",
                         "AdditionalProperties": {
                             "notificationRecipients": []
                         }
@@ -1539,7 +1641,7 @@ test_notificationRecipients_Incorrect_V2 if {
     }
 
     ReportDetailString :=
-        "1 role(s) without notification e-mail configured for role assignments found:<br/>Global Administrator"
+        "1 role(s) or group(s) without notification e-mail configured for role assignments found:<br/>Global Administrator(Directory Role)"
     TestResult("MS.AAD.7.7v1", Output, ReportDetailString, false) == true
 }
 
@@ -1552,12 +1654,16 @@ test_notificationRecipients_Incorrect_V3 if {
                 "Rules": [
                     {
                         "Id": "Notification_Admin_Admin_Assignment",
+                        "RuleSource":  "Global Administrator",
+                        "RuleSourceType":  "Directory Role",
                         "AdditionalProperties": {
                             "notificationRecipients": []
                         }
                     },
                     {
                         "Id": "Notification_Admin_Admin_Eligibility",
+                        "RuleSource":  "Global Administrator",
+                        "RuleSourceType":  "Directory Role",
                         "AdditionalProperties": {
                             "notificationRecipients": []
                         }
@@ -1578,7 +1684,66 @@ test_notificationRecipients_Incorrect_V3 if {
     }
 
     ReportDetailString :=
-        "1 role(s) without notification e-mail configured for role assignments found:<br/>Global Administrator"
+        "1 role(s) or group(s) without notification e-mail configured for role assignments found:<br/>Global Administrator(Directory Role)"
+    TestResult("MS.AAD.7.7v1", Output, ReportDetailString, false) == true
+}
+
+test_notificationRecipients_PIM_Incorrect_V3 if {
+    Output := aad.tests with input as {
+        "privileged_roles": [
+            {
+                "RoleTemplateId": "1D2EE3F0-90D3-4764-8AF8-BE81FE9D4D71",
+                "DisplayName": "Global Administrator",
+                "Rules": [
+                    {
+                        "Id": "Notification_Admin_Admin_Assignment",
+                        "RuleSource":  "Global Administrator",
+                        "RuleSourceType":  "Directory Role",
+                        "AdditionalProperties": {
+                            "notificationRecipients": []
+                        }
+                    },
+                    {
+                        "Id": "Notification_Admin_Admin_Eligibility",
+                        "RuleSource":  "Global Administrator",
+                        "RuleSourceType":  "Directory Role",
+                        "AdditionalProperties": {
+                            "notificationRecipients": []
+                        }
+                    },
+                    {
+                        "Id": "Notification_Admin_Admin_Assignment",
+                        "RuleSource":  "My PIM GRoup",
+                        "RuleSourceType":  "PIM Group",
+                        "AdditionalProperties": {
+                            "notificationRecipients": []
+                        }
+                    },
+                    {
+                        "Id": "Notification_Admin_Admin_Eligibility",
+                        "RuleSource":  "My PIM GRoup",
+                        "RuleSourceType":  "PIM Group",
+                        "AdditionalProperties": {
+                            "notificationRecipients": []
+                        }
+                    }
+                ]
+            }
+        ],
+        "service_plans": [
+            {
+                "ServicePlanName": "EXCHANGE_S_FOUNDATION",
+                "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
+            },
+            {
+                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
+            }
+        ]
+    }
+
+    ReportDetailString :=
+        "2 role(s) or group(s) without notification e-mail configured for role assignments found:<br/>Global Administrator(Directory Role), My PIM GRoup(PIM Group)"
     TestResult("MS.AAD.7.7v1", Output, ReportDetailString, false) == true
 }
 #--
@@ -1595,6 +1760,8 @@ test_Id_Correct_V1 if {
                 "Rules": [
                     {
                         "Id": "Notification_Admin_EndUser_Assignment",
+                        "RuleSource":  "Global Administrator",
+                        "RuleSourceType":  "Directory Role",
                         "AdditionalProperties": {
                             "notificationType": "Email",
                             "notificationRecipients": [
@@ -1617,7 +1784,9 @@ test_Id_Correct_V1 if {
         ]
     }
 
-    TestResult("MS.AAD.7.8v1", Output, PASS, true) == true
+    ReportDetailString :=
+        "0 role(s) or group(s) without notification e-mail configured for Global Administrator activations found"
+    TestResult("MS.AAD.7.8v1", Output, ReportDetailString, true) == true
 }
 
 test_Id_Correct_V2 if {
@@ -1629,6 +1798,8 @@ test_Id_Correct_V2 if {
                 "Rules": [
                     {
                         "Id": "Notification_Admin_EndUser_Assignment",
+                        "RuleSource":  "Global Administrator",
+                        "RuleSourceType":  "Directory Role",
                         "AdditionalProperties": {
                             "notificationType": "",
                             "notificationRecipients": [
@@ -1651,10 +1822,12 @@ test_Id_Correct_V2 if {
         ]
     }
 
-    TestResult("MS.AAD.7.8v1", Output, PASS, true) == true
+    ReportDetailString :=
+        "0 role(s) or group(s) without notification e-mail configured for Global Administrator activations found"
+    TestResult("MS.AAD.7.8v1", Output, ReportDetailString, true) == true
 }
 
-test_Id_Incorrect if {
+test_Id_PIM_Correct_V2 if {
     Output := aad.tests with input as {
         "privileged_roles": [
             {
@@ -1663,9 +1836,24 @@ test_Id_Incorrect if {
                 "Rules": [
                     {
                         "Id": "Notification_Admin_EndUser_Assignment",
+                        "RuleSource":  "Global Administrator",
+                        "RuleSourceType":  "Directory Role",
                         "AdditionalProperties": {
-                            "notificationType": "Email",
-                            "notificationRecipients": []
+                            "notificationType": "",
+                            "notificationRecipients": [
+                                "test@example.com"
+                            ]
+                        }
+                    },
+                    {
+                        "Id": "Notification_Admin_EndUser_Assignment",
+                        "RuleSource":  "My PIM Group",
+                        "RuleSourceType":  "PIM Group",
+                        "AdditionalProperties": {
+                            "notificationType": "",
+                            "notificationRecipients": [
+                                "test@example.com"
+                            ]
                         }
                     }
                 ]
@@ -1683,15 +1871,12 @@ test_Id_Incorrect if {
         ]
     }
 
-    TestResult("MS.AAD.7.8v1", Output, FAIL, false) == true
+    ReportDetailString :=
+        "0 role(s) or group(s) without notification e-mail configured for Global Administrator activations found"
+    TestResult("MS.AAD.7.8v1", Output, ReportDetailString, true) == true
 }
-#--
 
-#
-# Policy MS.AAD.7.9v1
-#--
-
-test_DisplayName_Correct if {
+test_Id_PIM_Incorrect_V2 if {
     Output := aad.tests with input as {
         "privileged_roles": [
             {
@@ -1700,39 +1885,19 @@ test_DisplayName_Correct if {
                 "Rules": [
                     {
                         "Id": "Notification_Admin_EndUser_Assignment",
+                        "RuleSource":  "Global Administrator",
+                        "RuleSourceType":  "Directory Role",
                         "AdditionalProperties": {
                             "notificationType": "Email",
-                            "notificationRecipients": []
+                            "notificationRecipients": [
+                                "test@example.com"
+                            ]
                         }
-                    }
-                ]
-            }
-        ],
-        "service_plans": [
-            {
-                "ServicePlanName": "EXCHANGE_S_FOUNDATION",
-                "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
-            },
-            {
-                "ServicePlanName": "AAD_PREMIUM_P2",
-                "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
-            }
-        ]
-    }
-
-    ReportDetailString := "0 role(s) without notification e-mail configured for role activations found"
-    TestResult("MS.AAD.7.9v1", Output, ReportDetailString, true) == true
-}
-
-test_DisplayName_Incorrect if {
-    Output := aad.tests with input as {
-        "privileged_roles": [
-            {
-                "RoleTemplateId": "1D2EE3F0-90D3-4764-8AF8-BE81FE9D4D71",
-                "DisplayName": "Cloud Administrator",
-                "Rules": [
+                    },
                     {
                         "Id": "Notification_Admin_EndUser_Assignment",
+                        "RuleSource":  "My PIM Group",
+                        "RuleSourceType":  "PIM Group",
                         "AdditionalProperties": {
                             "notificationType": "Email",
                             "notificationRecipients": []
@@ -1754,7 +1919,225 @@ test_DisplayName_Incorrect if {
     }
 
     ReportDetailString :=
-        "1 role(s) without notification e-mail configured for role activations found:<br/>Cloud Administrator"
+        "1 role(s) or group(s) without notification e-mail configured for Global Administrator activations found:<br/>My PIM Group(PIM Group)"
+    TestResult("MS.AAD.7.8v1", Output, ReportDetailString, false) == true
+}
+
+test_Id_Incorrect if {
+    Output := aad.tests with input as {
+        "privileged_roles": [
+            {
+                "RoleTemplateId": "1D2EE3F0-90D3-4764-8AF8-BE81FE9D4D71",
+                "DisplayName": "Global Administrator",
+                "Rules": [
+                    {
+                        "Id": "Notification_Admin_EndUser_Assignment",
+                        "RuleSource":  "Global Administrator",
+                        "RuleSourceType":  "Directory Role",
+                        "AdditionalProperties": {
+                            "notificationType": "Email",
+                            "notificationRecipients": []
+                        }
+                    }
+                ]
+            }
+        ],
+        "service_plans": [
+            {
+                "ServicePlanName": "EXCHANGE_S_FOUNDATION",
+                "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
+            },
+            {
+                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
+            }
+        ]
+    }
+
+    ReportDetailString :=
+        "1 role(s) or group(s) without notification e-mail configured for Global Administrator activations found:<br/>Global Administrator(Directory Role)"
+    TestResult("MS.AAD.7.8v1", Output, ReportDetailString, false) == true
+}
+#--
+
+#
+# Policy MS.AAD.7.9v1
+#--
+
+test_DisplayName_Correct if {
+    Output := aad.tests with input as {
+        "privileged_roles": [
+            {
+                "RoleTemplateId": "1D2EE3F0-90D3-4764-8AF8-BE81FE9D4D71",
+                "DisplayName": "Global Administrator",
+                "Rules": [
+                    {
+                        "Id": "Cloud Administrator",
+                        "RuleSource":  "Cloud Administrator",
+                        "RuleSourceType":  "Directory Role",
+                        "AdditionalProperties": {
+                            "notificationType": "Email",
+                            "notificationRecipients": [
+                                "test@example.com"
+                            ]
+                        }
+                    }
+                ]
+            }
+        ],
+        "service_plans": [
+            {
+                "ServicePlanName": "EXCHANGE_S_FOUNDATION",
+                "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
+            },
+            {
+                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
+            }
+        ]
+    }
+
+    ReportDetailString :=
+        "0 role(s) or group(s) without notification e-mail configured for role activations found"
+    TestResult("MS.AAD.7.9v1", Output, ReportDetailString, true) == true
+}
+
+test_DisplayName_PIM_Correct if {
+    Output := aad.tests with input as {
+        "privileged_roles": [
+            {
+                "RoleTemplateId": "1D2EE3F0-90D3-4764-8AF8-BE81FE9D4D71",
+                "DisplayName": "Cloud Administrator",
+                "Rules": [
+                    {
+                        "Id": "Cloud Administrator",
+                        "RuleSource":  "Cloud Administrator",
+                        "RuleSourceType":  "Directory Role",
+                        "AdditionalProperties": {
+                            "notificationType": "Email",
+                            "notificationRecipients": [
+                                "test@example.com"
+                            ]
+                        }
+                    }
+                ]
+            },
+            {
+                "RoleTemplateId": "1D2EE3F0-90D3-4764-8AF8-BE81FE9D4D71",
+                "DisplayName": "Global Administrator",
+                "Rules": [
+                    {
+                        "Id": "Cloud Administrator",
+                        "RuleSource":  "MY PIM Group",
+                        "RuleSourceType":  "PIM Group",
+                        "AdditionalProperties": {
+                            "notificationType": "Email",
+                            "notificationRecipients": [
+                                "test@example.com"
+                            ]
+                        }
+                    }
+                ]
+            }
+        ],
+        "service_plans": [
+            {
+                "ServicePlanName": "EXCHANGE_S_FOUNDATION",
+                "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
+            },
+            {
+                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
+            }
+        ]
+    }
+
+    ReportDetailString :=
+        "0 role(s) or group(s) without notification e-mail configured for role activations found"
+    TestResult("MS.AAD.7.9v1", Output, ReportDetailString, true) == true
+}
+
+
+test_DisplayName_Incorrect if {
+    Output := aad.tests with input as {
+        "privileged_roles": [
+            {
+                "RoleTemplateId": "1D2EE3F0-90D3-4764-8AF8-BE81FE9D4D71",
+                "DisplayName": "Cloud Administrator",
+                "Rules": [
+                    {
+                        "Id": "Notification_Admin_EndUser_Assignment",
+                        "RuleSource":  "Cloud Administrator",
+                        "RuleSourceType":  "Directory Role",
+                        "AdditionalProperties": {
+                            "notificationType": "Email",
+                            "notificationRecipients": []
+                        }
+                    }
+                ]
+            }
+        ],
+        "service_plans": [
+            {
+                "ServicePlanName": "EXCHANGE_S_FOUNDATION",
+                "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
+            },
+            {
+                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
+            }
+        ]
+    }
+
+    ReportDetailString :=
+        "1 role(s) or group(s) without notification e-mail configured for role activations found:<br/>Cloud Administrator(Directory Role)"
+    TestResult("MS.AAD.7.9v1", Output, ReportDetailString, false) == true
+}
+
+test_DisplayName_PIM_Incorrect if {
+    Output := aad.tests with input as {
+        "privileged_roles": [
+            {
+                "RoleTemplateId": "1D2EE3F0-90D3-4764-8AF8-BE81FE9D4D71",
+                "DisplayName": "Cloud Administrator",
+                "Rules": [
+                    {
+                        "Id": "Notification_Admin_EndUser_Assignment",
+                        "RuleSource":  "Cloud Administrator",
+                        "RuleSourceType":  "Directory Role",
+                        "AdditionalProperties": {
+                            "notificationType": "Email",
+                            "notificationRecipients": []
+                        }
+                    },
+                    {
+                        "Id": "Notification_Admin_EndUser_Assignment",
+                        "RuleSource":  "MyPIM Group",
+                        "RuleSourceType":  "PIM Group",
+                        "AdditionalProperties": {
+                            "notificationType": "Email",
+                            "notificationRecipients": [
+                                "test@example.com"
+                            ]
+                        }
+                    }
+                ]
+            }
+        ],
+        "service_plans": [
+            {
+                "ServicePlanName": "EXCHANGE_S_FOUNDATION",
+                "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
+            },
+            {
+                "ServicePlanName": "AAD_PREMIUM_P2",
+                "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
+            }
+        ]
+    }
+
+    ReportDetailString :=
+        "1 role(s) or group(s) without notification e-mail configured for role activations found:<br/>Cloud Administrator(Directory Role)"
     TestResult("MS.AAD.7.9v1", Output, ReportDetailString, false) == true
 }
 #--

@@ -73,7 +73,6 @@ function Export-AADProvider {
         # Get-PrivilegedRole provides data for 2.14 - 2.16, policies that evaluate conditions related to Azure AD PIM
         if ($RequiredServicePlan){
             # If the tenant has the premium license then we want to also include PIM Eligible role assignments - otherwise we don't to avoid an API error
-            Write-Information "Calling Get-PrivilegedRole"
             $PrivilegedRoles = $Tracker.TryCommand("Get-PrivilegedRole", @{"TenantHasPremiumLicense"=$true})
         }
         else {
@@ -336,37 +335,83 @@ function Get-PrivilegedUser {
     $PrivilegedUsers
 }
 
+function AddRuleSource{
+    <#
+        .NOTES
+        Internal helper function to add a source to policy rule for reporting purposes.
+        Source should be either PIM Group Name or Role Name
+    #>
+    param(
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $Source,
+
+        [Parameter(Mandatory=$false)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $SourceType = "Directory Role",
+
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [array]
+        $Rules
+    )
+
+    foreach ($Rule in $Rules){
+        $Rule | Add-Member -Name "RuleSource" -Value $Source -MemberType NoteProperty
+        $Rule | Add-Member -Name "RuleSourceType" -Value $SourceType -MemberType NoteProperty
+    }
+}
+
 function FindRulesForPimGroupsRoles{
     param (
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [array]
         $AADRoles,
+
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [array]
         $AllRoleAssignments
     )
 
     foreach ($RoleAssignment in $AllRoleAssignments){
-        $PrincipalId = $RoleAssignment.PrincipalId
-        ($MemberPolicyIds = Get-MgBetaPolicyRoleManagementPolicyAssignment -Filter "scopeId eq '$PrincipalId' and scopeType eq 'Group' and roleDefinitionId eq 'member'" |
-            Select-Object -Property PolicyId) *> $null
 
-        foreach ($MemberPolicyId in $MemberPolicyIds){
-            Write-Information "Member Policy Id: $($MemberPolicyId.PolicyId)"
-            $MemberPolicyRules = Get-MgBetaPolicyRoleManagementPolicyRule -UnifiedRoleManagementPolicyId $MemberPolicyId.PolicyId -All
+        # AllRoleAssignments contain non-privileged roles as well. Check if this is a privileged role
+        $Role = $AADRoles | Where-Object RoleTemplateId -EQ $($RoleAssignment.RoleDefinitionId)
 
-            Write-Information "Lookup role: $($RoleAssignment.RoleDefinitionId)"
-            $Role = $AADRoles | Where-Object RoleTemplateId -EQ $($RoleAssignment.RoleDefinitionId)
-            Write-Information "AADRoles: $($AADRoles | ConvertTo-Json -Depth 2)"
-            Write-Information "Found Role: $Role"
+        if ($Role){
 
-            if ($Role){
-                Write-Information "Found role: $($Role.DisplayName)"
+            $PrincipalId = $RoleAssignment.PrincipalId
 
-                $RoleRules = $Role.psobject.Properties | Where-Object {$_.Name -eq 'Rules'}
-                if ($RoleRules){
-                    Write-Information "Appending rules for $($Role.DisplayName)"
-                    $Role.Rules += $MemberPolicyRules
-                }
-                else {
-                    Write-Information "Adding rules for $($Role.DisplayName)"
-                    $Role | Add-Member -Name "Rules" -Value $MemberPolicyRules -MemberType NoteProperty
+            # Need a way to determine if regular or PIM group.
+            ($GroupEligibilitySchedule = Get-MgBetaIdentityGovernancePrivilegedAccessGroupEligibilitySchedule -Filter "groupId eq '$PrincipalId'") *> $null
+            if ($GroupEligibilitySchedule.Count -eq 0){
+                continue
+            }
+
+            # Get policy assignments to member (not owner) role in PIM Group
+            ($MemberPolicyIds = Get-MgBetaPolicyRoleManagementPolicyAssignment -Filter "scopeId eq '$PrincipalId' and scopeType eq 'Group' and roleDefinitionId eq 'member'" |
+                Select-Object -Property PolicyId) *> $null
+
+            foreach ($MemberPolicyId in $MemberPolicyIds){
+
+                $MemberPolicyRules = Get-MgBetaPolicyRoleManagementPolicyRule -UnifiedRoleManagementPolicyId $MemberPolicyId.PolicyId -All
+                $SourceGroup = Get-MgBetaGroup -Filter "id eq '$PrincipalId' " | Select-Object -Property DisplayName
+                AddRuleSource -Source $SourceGroup.DisplayName -SourceType "PIM Group" -Rules $MemberPolicyRules
+
+                if ($Role){
+                    $RoleRules = $Role.psobject.Properties | Where-Object {$_.Name -eq 'Rules'}
+                    if ($RoleRules){
+                        # Appending rules 
+                        $Role.Rules += $MemberPolicyRules
+                    }
+                    else {
+                        # Adding rules
+                        $Role | Add-Member -Name "Rules" -Value $MemberPolicyRules -MemberType NoteProperty
+                    }
                 }
             }
         }
@@ -375,7 +420,14 @@ function FindRulesForPimGroupsRoles{
 
 function FindRulesForRoles{
     param (
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [array]
         $AADRoles,
+
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [array]
         $AllRoleAssignments
     )
 
@@ -407,6 +459,8 @@ function FindRulesForRoles{
         $Role | Add-Member -Name "Assignments" -Value $RoleAssignments -MemberType NoteProperty
 
         $RoleRules = $Role.psobject.Properties | Where-Object {$_.Name -eq 'Rules'}
+        AddRuleSource -Source $Role.DisplayName  -SourceType "Directory Role" -Rules $RolePolicies
+
         if ($RoleRules){
             $Role.Rules += $RolePolicies
         }
@@ -428,7 +482,6 @@ function Get-PrivilegedRole {
         $TenantHasPremiumLicense
     )
 
-    Write-Information "Entering"
     $PrivilegedRoles = [ScubaConfig]::ScubaDefault('DefaultPrivilegedRoles')
     # Get a list of the RoleTemplateId values for the privileged roles in the list above.
     # The RoleTemplateId value is passed to other cmdlets to retrieve role security policies and user assignments.
@@ -436,7 +489,6 @@ function Get-PrivilegedRole {
     # Get ALL the roles and users actively assigned to them
     $AllRoleAssignments = Get-MgBetaRoleManagementDirectoryRoleAssignmentScheduleInstance -All -ErrorAction Stop
 
-    Write-Information "Initial Rules: $($AADRoles | ConvertTo-Json -Depth 3)"
     # If the tenant has the premium license then you can access the PIM service to get the role configuration policies and the active role assigments
     if ($TenantHasPremiumLicense) {
         FindRulesForRoles -AADRoles $AADRoles -AllRoleAssignments $AllRoleAssignments
