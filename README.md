@@ -10,8 +10,6 @@ Developed by CISA, ScubaGear is an assessment tool that verifies a Microsoft 365
 - [M365 Product License Assumptions](#m365-product-license-assumptions)
 - [Getting Started](#getting-started)
   - [Download the Latest Release](#download-the-latest-release)
-  - [Installing the Required PowerShell Modules](#installing-the-required-powershell-modules)
-  - [Download the Required OPA executable](#download-the-required-opa-executable)
   - [PowerShell Execution Policies](#powershell-execution-policies)
 - [Usage](#usage)
   - [Importing the module](#importing-the-module)
@@ -57,30 +55,6 @@ To download ScubaGear:
 2. Click `ScubaGear-v1-1-1.zip` (or latest version) to download the release.
 3. Extract the folder in the zip file.
 
-### Installing the Required PowerShell Modules
-> [!NOTE]
->  Only PowerShell 5.1 is currently supported. PowerShell 7 may work, but has not been tested. Full PowerShell 7 support will be added in a future release.
-
-To install the module dependencies, open a new PowerShell 5.1 terminal and navigate to the repository folder.
-
-Then run:
-
-```powershell
-Import-Module -Name .\PowerShell\ScubaGear # Imports module and minimum required dependencies
-```
-
-### Download the Required OPA executable
-> [!IMPORTANT]
-> The `Install-OPA` cmdlet is called by default when running `Initialize-SCuBA`. The `Install-OPA` cmdlet can also be run by itself to download the executable.
-In the event of an unsuccessful download, users can manually download the OPA executable with the following steps:
-1. Go to OPA download site (https://www.openpolicyagent.org/docs/latest/#running-opa)
-2. Check the acceptable OPA version (Currently v0.61.0) for ScubaGear and select the corresponding version on top left of the website
-3. Navigate to the menu on left side of the screen: Introduction - Running OPA - Download OPA
-4. Locate the downloaded file, add the file to the root directory of this repository, open PowerShell, and use the following command to check the downloaded OPA version
-```powershell
-.\opa_windows_amd64.exe version
-```
-
 ### PowerShell Execution Policies
 Starting with release 0.3.0, ScubaGear is signed by a commonly trusted CA. On Windows Servers, the default [execution policy](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.security/set-executionpolicy?view=powershell-5.1) is `RemoteSigned`, which will allow ScubaGear to run after the publisher (CISA) is agreed to once.
 
@@ -92,6 +66,9 @@ Windows clients with an execution policy of `Unrestricted` generate a warning ab
 ScubaGear can be invoked interactively or non-interactively. See [Required Permissions](#required-permissions) for the permissions needed to execute the tool in either mode. The interactive authentication mode will prompt the user for credentials via Microsoft's popup windows. Non-interactive mode is for invoking ScubaGear using an Azure AD application service principal and supports running the tool in automated scenarios such as pipelines or scheduled jobs. Examples 1-3 provide examples for running with interactive mode and example 4 provides an example for running in non-interactive mode.
 
 ### Importing the module
+> [!NOTE]
+>  Only PowerShell 5.1 is currently supported. PowerShell 7 may work, but has not been tested. Full PowerShell 7 support will be added in a future release.
+
 ScubaGear currently must be imported into each new PowerShell terminal session to execute.
 To import the module, navigate to the repository folder in a PowerShell 5.1 terminal.
 
@@ -100,6 +77,30 @@ Then run:
 Import-Module -Name .\PowerShell\ScubaGear # Imports the module into your session
 ```
 
+If you receive a warning that _The required supporting PowerShell modules are not installed._
+
+Then run:
+
+```powershell
+Initialize-SCuBA # Imports module and minimum required dependencies
+```
+
+For additional help on __Initialize-SCuBA__ run:
+
+```powershell
+Get-Help Initialize-SCuBA
+```
+
+> [!IMPORTANT]
+> The `Install-OPA` cmdlet is called by default when running `Initialize-SCuBA`. The `Install-OPA` cmdlet can also be run by itself to download the executable.
+In the event of an unsuccessful download, users can manually download the OPA executable with the following steps:
+1. Go to OPA download site (https://www.openpolicyagent.org/docs/latest/#running-opa)
+2. Check the acceptable OPA version (Currently v0.61.0) for ScubaGear and select the corresponding version on top left of the website
+3. Navigate to the menu on left side of the screen: Introduction - Running OPA - Download OPA
+4. Locate the downloaded file, add the file to your desired location (default is ~\\.scubagear\Tools), open PowerShell, and use the following command to check the downloaded OPA version
+```powershell
+.\opa_windows_amd64.exe version
+```
 ### Examples
 
 #### Example 1: Run an assessment against all products (except PowerPlatform) <!-- omit in toc -->
