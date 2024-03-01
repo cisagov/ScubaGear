@@ -48,7 +48,7 @@ if ($MissingModules.Count -gt 0){
     $WarningPreference = "Continue"
 
     Write-Warning "
-    The required supporting PowerShell modules are not installed.
+    The required supporting PowerShell modules are not installed with a supported version.
     Run Initialize-SCuBA to install all required dependencies.
     See Get-Help Initialize-SCuBA for more help."
 
