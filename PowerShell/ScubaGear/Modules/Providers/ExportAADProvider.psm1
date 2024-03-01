@@ -110,17 +110,29 @@ function Export-AADProvider {
     # Read the properties and relationships of an authentication method policy
     #$AuthenticationMethodPolicy = ConvertTo-Json @($Tracker.TryCommand("Get-MgBetaPolicyAuthenticationMethodPolicy")) -Depth 5
 
-    $AuthenticationMethodPolicyObject = $Tracker.TryCommand("Get-MgBetaPolicyAuthenticationMethodPolicy")
+  #  $AuthenticationMethodPolicyObject = $Tracker.TryCommand("Get-MgBetaPolicyAuthenticationMethodPolicy")
     #step 1 - create the JSON needed for Rego 3.4
-    $AuthenticationMethodPolicy = ConvertTo-Json @($AuthenticationMethodPolicyObject)
+   # $AuthenticationMethodPolicy = ConvertTo-Json @($AuthenticationMethodPolicyObject)
 
     #step 2 - create the JSON needed for Rego 3.5
-    $AuthenticationMethodConfiguration = ConvertTo-Json @($AuthenticationMethodPolicyObject.AuthenticationMethodConfigurations) -Depth 5
+  #  $AuthenticationMethodConfiguration = ConvertTo-Json @($AuthenticationMethodPolicyObject.AuthenticationMethodConfigurations) -Depth 5
 
    #step 3 - create the JSON needed for Rego 3.3
    #$SecureScore = ConvertTo-Json -Depth 2 @($SecureScoreResults.ControlScores | Where-Object {$_.ControlName -eq 'RoleOverlap'})
    #$AuthenticationMethodFeatureSettings = ConvertTo-Json -Depth 2 @($AuthenticationMethodPolicyObject.AuthenticationMethodConfigurations | Where-Object { $_.Id -eq 'MicrosoftAuthenticator' }.AdditionalProperties["featureSettings"])
-   $AuthenticationMethodFeatureSettings = ConvertTo-Json -Depth 5 @($AuthenticationMethodPolicyObject.AuthenticationMethodConfigurations | Where-Object { $_.Id -eq 'MicrosoftAuthenticator' })
+  # $AuthenticationMethodFeatureSettings = ConvertTo-Json -Depth 5 @($AuthenticationMethodPolicyObject.AuthenticationMethodConfigurations | Where-Object { $_.Id -eq 'MicrosoftAuthenticator' })
+
+    $AuthenticationMethodPolicy = $Tracker.TryCommand("Get-MgBetaPolicyAuthenticationMethodPolicy")
+    $AuthenticationMethodConfiguration = $AuthenticationMethodPolicy.AuthenticationMethodConfigurations
+    $AuthenticationMethodFeatureSettings = @($AuthenticationMethodPolicy.AuthenticationMethodConfigurations | Where-Object { $_.Id -eq 'MicrosoftAuthenticator' })
+
+    $authentication_method = @{
+               authentication_method_policy = $AuthenticationMethodPolicy
+               authentication_method_configuration = $AuthenticationMethodConfiguration
+               authentication_method_feature_settings = $AuthenticationMethodFeatureSettings
+}
+    $AuthenticationMethod = ConvertTo-Json  -Depth 10 @($authentication_method)
+
    # 6.1
     $DomainSettings = ConvertTo-Json @($Tracker.TryCommand("Get-MgBetaDomain"))
 
@@ -136,9 +148,7 @@ function Export-AADProvider {
     "privileged_roles": $PrivilegedRoles,
     "service_plans": $ServicePlans,
     "directory_settings": $DirectorySettings,
-    "authentication_method_policy": $AuthenticationMethodPolicy,
-    "authentication_method_configuration":  $AuthenticationMethodConfiguration,
-    "authentication_method_feature_settings": $AuthenticationMethodFeatureSettings,
+    “authentication_method”: $AuthenticationMethod,
     "domain_settings": $DomainSettings,
     "license_information": $LicenseInfo,
     "total_user_count": $UserCount,
@@ -149,6 +159,9 @@ function Export-AADProvider {
     $json
 }
 
+    #"authentication_method_policy": $AuthenticationMethodPolicy,
+    #"authentication_method_configuration":  $AuthenticationMethodConfiguration,
+    #"authentication_method_feature_settings": $AuthenticationMethodFeatureSettings,
 function Get-AADTenantDetail {
     <#
     .Description
