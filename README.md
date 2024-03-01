@@ -77,19 +77,10 @@ Then run:
 Import-Module -Name .\PowerShell\ScubaGear # Imports the module into your session
 ```
 
-If you receive a warning that _The required supporting PowerShell modules are not installed._
-
-Then run:
+If you receive a warning that _The required supporting PowerShell modules are not installed_, run the following cmdlet:
 
 ```powershell
 Initialize-SCuBA # Imports module and minimum required dependencies
-```
-
-For additional help on __Initialize-SCuBA__ run:
-
-```powershell
-Get-Help Initialize-SCuBA
-```
 
 > [!IMPORTANT]
 > The `Install-OPA` cmdlet is called by default when running `Initialize-SCuBA`. The `Install-OPA` cmdlet can also be run by itself to download the executable.
