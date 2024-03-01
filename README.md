@@ -81,7 +81,7 @@ If you receive a warning that _The required supporting PowerShell modules are no
 
 ```powershell
 Initialize-SCuBA # Imports module and minimum required dependencies
-
+```
 > [!IMPORTANT]
 > The `Install-OPA` cmdlet is called by default when running `Initialize-SCuBA`. The `Install-OPA` cmdlet can also be run by itself to download the executable.
 In the event of an unsuccessful download, users can manually download the OPA executable with the following steps:
