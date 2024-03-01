@@ -1,6 +1,6 @@
-# Purpose:  Build, sign, and check the current release
+# Purpose:  Build, sign, and check a draft release
 
-name: Build and Sign Release
+name: Build and Draft Release
 
 on:
   workflow_dispatch:
