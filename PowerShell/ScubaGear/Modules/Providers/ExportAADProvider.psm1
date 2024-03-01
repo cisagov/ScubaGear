@@ -440,7 +440,7 @@ function Get-PrivilegedRole {
     # If the tenant has the premium license then you can access the PIM service to get the role configuration policies and the active role assigments
     if ($TenantHasPremiumLicense) {
         FindRulesForRoles -AADRoles $AADRoles -AllRoleAssignments $AllRoleAssignments
-        FindRulesForPimGroupsRoles -AADRoles $AADRoles -AllRoleAssignments $AllRoleAssignments
+        #FindRulesForPimGroupsRoles -AADRoles $AADRoles -AllRoleAssignments $AllRoleAssignments
     }
 
     $AADRoles
