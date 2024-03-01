@@ -587,7 +587,7 @@ tests contains {
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests contains {
     "PolicyId": "MS.TEAMS.6.2v1",
-    "Criticality": "Should/3rd Party",
+    "Criticality": "Shall/3rd Party",
     "Commandlet": [],
     "ActualValue": [],
     "ReportDetails": DefenderMirrorDetails("MS.TEAMS.6.2v1"),
