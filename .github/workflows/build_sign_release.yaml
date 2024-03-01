@@ -20,8 +20,8 @@ on:
         default: true
 
 jobs:
-  build-and-deploy:
-    name: Build and Deploy
+  build-and-draft:
+    name: Build and Draft Release
     runs-on: windows-latest
     environment: Development
     env:
