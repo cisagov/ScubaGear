@@ -84,6 +84,12 @@ function Generate-Config {
     #>
     [CmdletBinding(DefaultParameterSetName='Report')]
     param (
+
+        [Parameter(Mandatory = $false)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $Description = "YAML configuration file with default description", #(Join-Path -Path $env:USERPROFILE -ChildPath ".scubagear\Tools"),
+
         [Parameter(Mandatory = $false)]
         [ValidateNotNullOrEmpty()]
         [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
@@ -105,16 +111,116 @@ function Generate-Config {
         [ValidateNotNullOrEmpty()]
         [ValidateSet($true, $false)]
         [boolean]
-        $LogIn = $true
+        $LogIn = $true,
+        
+        [Parameter(Mandatory = $false)]
+        [ValidateNotNullOrEmpty()]
+        [ValidateSet($true, $false)]
+        [boolean]
+        $DisconnectOnExit = $false,
+
+        
+        [Parameter(Mandatory = $false)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $OutPath = '.',
+
+        [Parameter(Mandatory = $false)] 
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $AppID,
+
+        [Parameter(Mandatory = $false)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $CertificateThumbprint,
+
+        [Parameter(Mandatory = $false)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $Organization,
+
+        [Parameter(Mandatory = $false)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $OutFolderName = "M365BaselineConformance",
+
+        [Parameter(Mandatory = $false)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $OutProviderFileName = "ProviderSettingsExport",
+
+        [Parameter(Mandatory = $false)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $OutRegoFileName = "TestResults",
+
+        [Parameter(Mandatory = $false)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $OutReportName = "BaselineReports"
+
+        #[Parameter(Mandatory = $false)]
+        #[ValidateNotNullOrEmpty()]
+        #[switch]
+        #$DarkMode,
+
+        #[Parameter(Mandatory = $false)]
+        #[switch]
+        #$Quiet
     )
+
     write-host "Hello World!"
     
-    $config = @{}
+    #$config = @{}
+    $config = New-Object ([System.Collections.specialized.OrderedDictionary])
 
     ($MyInvocation.MyCommand.Parameters ).Keys | %{
         $val = (Get-Variable -Name $_ -EA SilentlyContinue).Value
         if( $val.length -gt 0 ) {
-            $config[$_] = $val
+            #$config[$_] = $val
+            $config.add($_, $val)
+        }
+    }
+    $capExclusionNamespace = @(
+        "MS.AAD.1.1v1",
+        "MS.AAD.2.1v1",
+        "MS.AAD.2.3v1",
+        "MS.AAD.3.1v1",
+        "MS.AAD.3.2v1",
+        "MS.AAD.3.3v1",
+        "MS.AAD.3.6v1",
+        "MS.AAD.3.7v1",
+        "MS.AAD.3.8v1"
+        )
+    $roleExclusionNamespace = "MS.AAD.7.4v1"
+
+
+    
+    $aadTemplate = New-Object ([System.Collections.specialized.OrderedDictionary])
+    $aadCapExclusions = New-Object ([System.Collections.specialized.OrderedDictionary])
+    $aadRoleExclusions = New-Object ([System.Collections.specialized.OrderedDictionary])
+    
+    $aadCapExclusions = @{ CapExclusions = @{} }
+    $aadCapExclusions["CapExclusions"].add("Users", @(""))
+    $aadCapExclusions["CapExclusions"].add("Groups", @(""))
+    $aadRoleExclusions = @{ RoleExclusions = @{} }
+    $aadRoleExclusions["RoleExclusions"].add("Users", @(""))
+    $aadRoleExclusions["RoleExclusions"].add("Groups", @(""))
+
+    foreach ($cap in $capExclusionNamespace){
+        $aadTemplate.add($cap, $aadCapExclusions)
+    }
+
+    $aadTemplate.add($roleExclusionNamespace, $aadRoleExclusions)
+    
+    $products = (Get-Variable -Name ProductNames -EA SilentlyContinue).Value
+    foreach ($product in $products){
+        switch ($product){
+            "aad" {
+                $config.add("Aad", $aadTemplate)
+                }
+            "defender" {;break}
         }
     }
     convertto-yaml $config
