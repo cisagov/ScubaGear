@@ -143,7 +143,7 @@ jobs:
               $value = $keyAndValue[1]
               if($key.ToLower() -eq "alias")
               {
-                $alias = $keyAndValue
+                $alias = $value
               }
               elseif($key.ToLower() -eq "tenantdomain")
               {
