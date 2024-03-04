@@ -187,8 +187,10 @@ jobs:
               $paramsAsHashTable.Add($appidKeyAndValue[0], $appidKeyAndValue[1])
               $paramsAsHashTable.Add($productnameKeyAndValue[0], $productnameKeyAndValue[1])
               if($variantKeyAndValue[0] -ne "")
-              $paramsAsHashTable.Add($variantKeyAndValue[0], $variantKeyAndValue[1])
-              $paramsAsHashTable.Add($m365KeyAndValue[0], $m365KeyAndValue[1])
+              {
+                $paramsAsHashTable.Add($variantKeyAndValue[0], $variantKeyAndValue[1])
+              }
+              $paramsAsHas hTable.Add($m365KeyAndValue[0], $m365KeyAndValue[1])
               echo $domainKeyAndValue[1]
               echo $displayKeyAndValue[1]
               echo $appidKeyAndValue[1]
