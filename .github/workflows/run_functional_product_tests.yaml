@@ -169,16 +169,16 @@ jobs:
             if($alias -eq "${{ matrix.product }}")
             {
               echo "Testing the following product..."
-              $paramsAsHashTable.Add($domain)
               echo $domain
-              $paramsAsHashTable.Add($display)
               echo $display
-              $paramsAsHashTable.Add($appid)
               echo $appid
-              $paramsAsHashTable.Add($productname)
               echo $productname
-              $paramsAsHashTable.Add($m365)
               echo $m365
+              $paramsAsHashTable.Add($domain)
+              $paramsAsHashTable.Add($display)
+              $paramsAsHashTable.Add($appid)
+              $paramsAsHashTable.Add($productname)
+              $paramsAsHashTable.Add($m365)
               ./Testing/Functional/Products/Tests/CallProductTests.ps1 -params $paramsAsHashTable -thumbprint $thumbprint
             }
           }
