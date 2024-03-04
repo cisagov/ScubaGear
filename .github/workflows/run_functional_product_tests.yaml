@@ -191,12 +191,6 @@ jobs:
                 $paramsAsHashTable.Add($variantKeyAndValue[0], $variantKeyAndValue[1])
               }
               $paramsAsHashTable.Add($m365KeyAndValue[0], $m365KeyAndValue[1])
-              echo $domainKeyAndValue[1]
-              echo $displayKeyAndValue[1]
-              echo $appidKeyAndValue[1]
-              echo $productnameKeyAndValue[1]
-              echo $variantKeyAndValue[1]
-              echo $m365KeyAndValue[1]
               # Test the product
               ./Testing/Functional/Products/Tests/CallProductTests.ps1 -params $paramsAsHashTable -thumbprint $thumbprint
             }
