@@ -131,6 +131,7 @@ jobs:
             [String]$display = ""
             [String]$appid = ""
             [String]$productname = ""
+            [String]$variant = ""
             [String]$m365 = ""
             $paramsAsHashTable = @{}
             $attributes = $product.split(",")
@@ -160,6 +161,10 @@ jobs:
               {
                 $productname = $value
               }
+              elseif($key.ToLower() -eq "variant")
+              {
+                $variant = $value
+              }
               elseif($key.ToLower() -eq "m365environment")
               {
                 $m365 = $value
@@ -169,11 +174,6 @@ jobs:
             if($alias -eq "${{ matrix.product }}")
             {
               echo "Testing the following product..."
-              echo $domain
-              echo $display
-              echo $appid
-              echo $productname
-              echo $m365
               $paramsAsHashTable.Add($domain)
               $paramsAsHashTable.Add($display)
               $paramsAsHashTable.Add($appid)
