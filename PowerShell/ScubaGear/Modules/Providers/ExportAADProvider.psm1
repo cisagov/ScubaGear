@@ -108,24 +108,12 @@ function Export-AADProvider {
     $DirectorySettings = ConvertTo-Json -Depth 10 @($Tracker.TryCommand("Get-MgBetaDirectorySetting"))
 
     # Read the properties and relationships of an authentication method policy
-    #$AuthenticationMethodPolicy = ConvertTo-Json @($Tracker.TryCommand("Get-MgBetaPolicyAuthenticationMethodPolicy")) -Depth 5
-
-  #  $AuthenticationMethodPolicyObject = $Tracker.TryCommand("Get-MgBetaPolicyAuthenticationMethodPolicy")
-    #step 1 - create the JSON needed for Rego 3.4
-   # $AuthenticationMethodPolicy = ConvertTo-Json @($AuthenticationMethodPolicyObject)
-
-    #step 2 - create the JSON needed for Rego 3.5
-  #  $AuthenticationMethodConfiguration = ConvertTo-Json @($AuthenticationMethodPolicyObject.AuthenticationMethodConfigurations) -Depth 5
-
-   #step 3 - create the JSON needed for Rego 3.3
-   #$SecureScore = ConvertTo-Json -Depth 2 @($SecureScoreResults.ControlScores | Where-Object {$_.ControlName -eq 'RoleOverlap'})
-   #$AuthenticationMethodFeatureSettings = ConvertTo-Json -Depth 2 @($AuthenticationMethodPolicyObject.AuthenticationMethodConfigurations | Where-Object { $_.Id -eq 'MicrosoftAuthenticator' }.AdditionalProperties["featureSettings"])
-  # $AuthenticationMethodFeatureSettings = ConvertTo-Json -Depth 5 @($AuthenticationMethodPolicyObject.AuthenticationMethodConfigurations | Where-Object { $_.Id -eq 'MicrosoftAuthenticator' })
-
+    #Create the JSON needed for Rego 3.4
     $AuthenticationMethodPolicy = $Tracker.TryCommand("Get-MgBetaPolicyAuthenticationMethodPolicy")
+    #Create the JSON needed for Rego 3.3 and 3.5
     $AuthenticationMethodConfiguration = $AuthenticationMethodPolicy.AuthenticationMethodConfigurations
     $AuthenticationMethodFeatureSettings = @($AuthenticationMethodPolicy.AuthenticationMethodConfigurations | Where-Object { $_.Id -eq 'MicrosoftAuthenticator' })
-
+    #Combine the authentication method policy properties
     $authentication_method = @{
                authentication_method_policy = $AuthenticationMethodPolicy
                authentication_method_configuration = $AuthenticationMethodConfiguration
@@ -148,7 +136,7 @@ function Export-AADProvider {
     "privileged_roles": $PrivilegedRoles,
     "service_plans": $ServicePlans,
     "directory_settings": $DirectorySettings,
-    “authentication_method”: $AuthenticationMethod,
+    "authentication_method": $AuthenticationMethod,
     "domain_settings": $DomainSettings,
     "license_information": $LicenseInfo,
     "total_user_count": $UserCount,
