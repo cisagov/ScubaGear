@@ -184,7 +184,10 @@ jobs:
           . repo/utils/DeployUtils.ps1
           # Remove non-release files
           Remove-Item -Recurse -Force repo -Include .git*
-          $ApiKey = az keyvault secret show --id '${{ needs.ReleasePrep.outputs.KeyVaultUrl }}secrets/ScubaGear-PSGAllery-API-Key' --query value -o tsv
+          $ApiKey = az keyvault secret show --id '${{ needs.ReleasePrep.outputs.KeyVaultUrl }}/secrets/ScubaGear-PSGAllery-API-Key' --query value -o tsv
+          if (-Not $ApiKey){
+            Write-Error "Failer to retrieve API key"
+          }
           $PublishSplat = @{
             AzureKeyVaultUrl = '${{ needs.ReleasePrep.outputs.KeyVaultUrl }}'
             CertificateName = '${{ needs.ReleasePrep.outputs.KeyVaultCertificateName }}'
