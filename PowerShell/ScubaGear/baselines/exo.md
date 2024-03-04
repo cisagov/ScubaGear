@@ -366,10 +366,6 @@ least functionality.
   Exchange Online \| Microsoft
   Learn](https://learn.microsoft.com/en-us/exchange/clients-and-mobile-in-exchange-online/authenticated-client-smtp-submission)
 
-- [Use the Microsoft 365 admin center to enable or disable SMTP AUTH on
-  specific mailboxes \| Microsoft
-  Learn](https://learn.microsoft.com/en-us/exchange/clients-and-mobile-in-exchange-online/authenticated-client-smtp-submission#use-the-microsoft-365-admin-center-to-enable-or-disable-smtp-auth-on-specific-mailboxes)
-
 ### License Requirements
 
 - N/A
