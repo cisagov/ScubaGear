@@ -170,10 +170,15 @@ jobs:
             {
               echo "Testing the following product..."
               $paramsAsHashTable.Add($domain)
+              if ($domain.Length -gt 2) { echo $domain.Substring(0,2) }
               $paramsAsHashTable.Add($display)
+              if ($display.Length -gt 2) { echo $display.Substring(0,2) }
               $paramsAsHashTable.Add($appid)
+              if ($appid.Length -gt 2) { echo $appid.Substring(0,2) }
               $paramsAsHashTable.Add($productname)
+              if ($productname.Length -gt 2) { echo $productname.Substring(0,2) }
               $paramsAsHashTable.Add($m365)
+              if ($m365.Length -gt 2) { echo $m365.Substring(0,2) }
               ./Testing/Functional/Products/Tests/CallProductTests.ps1 -params $paramsAsHashTable -thumbprint $thumbprint
             }
           }
