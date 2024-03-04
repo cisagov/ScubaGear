@@ -143,42 +143,52 @@ jobs:
               $value = $keyAndValue[1]
               if($key.ToLower() -eq "alias")
               {
-                $alias = $value
+                $alias = $keyAndValue
               }
               elseif($key.ToLower() -eq "tenantdomain")
               {
-                $domain = $value
+                $domain = $keyAndValue
               }
               elseif($key.ToLower() -eq "tenantdisplayname")
               {
-                $display = $value
+                $display = $keyAndValue
               }
               elseif($key.ToLower() -eq "appid")
               {
-                $appid = $value
+                $appid = $keyAndValue
               }
               elseif($key.ToLower() -eq "productname")
               {
-                $productname = $value
+                $productname = $keyAndValue
               }
               elseif($key.ToLower() -eq "variant")
               {
-                $variant = $value
+                $variant = $keyAndValue
               }
               elseif($key.ToLower() -eq "m365environment")
               {
-                $m365 = $value
+                $m365 = $keyAndValue
               }
             }
             echo "Alias is: $alias"
             if($alias -eq "${{ matrix.product }}")
             {
               echo "Testing the following product..."
-              $paramsAsHashTable.Add($domain)
-              $paramsAsHashTable.Add($display)
-              $paramsAsHashTable.Add($appid)
-              $paramsAsHashTable.Add($productname)
-              $paramsAsHashTable.Add($m365)
+              # Split out the key and value for each parameter
+              $domainKeyAndValue = $domain.split("=")
+              $displayKeyAndValue = $display.split("=")
+              $appidKeyAndValue = $appid.split("=")
+              $productnameKeyAndValue = $productname.split("=")
+              $variantKeyAndValue = $variant.split("=")
+              $m365KeyAndValue =$m365.split("=")
+              # Add both to the hash table
+              $paramsAsHashTable.Add($domainKeyAndValue[0], $domainKeyAndValue[1])
+              $paramsAsHashTable.Add($displayKeyAndValue[0], $displayKeyAndValue[1])
+              $paramsAsHashTable.Add($appidKeyAndValue[0], $appidKeyAndValue[1])
+              $paramsAsHashTable.Add($productnameKeyAndValue[0], $productnameKeyAndValue[1])
+              $paramsAsHashTable.Add($variantKeyAndValue[0], $variantKeyAndValue[1])
+              $paramsAsHashTable.Add($m365KeyAndValue[0], $m365KeyAndValue[1])
+              # Test the product
               ./Testing/Functional/Products/Tests/CallProductTests.ps1 -params $paramsAsHashTable -thumbprint $thumbprint
             }
           }
