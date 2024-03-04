@@ -190,12 +190,13 @@ function ConfigureScubaGearModule{
         $ModuleVersion = "$CurrentModuleVersion.$TimeStamp"
     }
 
+    # Tags cannot contain spaces
     $ManifestUpdates = @{
         Path = $ManifestPath
         ModuleVersion = $ModuleVersion
         ProjectUri = "https://github.com/cisagov/ScubaGear"
         LicenseUri = "https://github.com/cisagov/ScubaGear/blob/main/LICENSE"
-        Tags = 'CISA', 'Microsoft 365', 'O365', 'Microsoft Entra Id', 'Configuration', 'Exchange', 'Report', 'Security', 'SharePoint', 'Defender', 'Teams', 'PowerPlatform', 'OneDrive'
+        Tags = 'CISA', 'O365', 'AAD', 'Configuration', 'Exchange', 'Report', 'Security', 'SharePoint', 'Defender', 'Teams', 'PowerPlatform', 'OneDrive'
     }
 
     if (-Not [string]::IsNullOrEmpty($PrereleaseTag)){
