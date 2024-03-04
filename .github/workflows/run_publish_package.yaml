@@ -198,7 +198,6 @@ jobs:
           Publish-ScubaGearModule @PublishSplat
       - name: Check Scuba Version
         run: |
-          repo/SetUp.ps1 -NoOPA
           Install-Module -Name ScubaGear
           Import-Module -Name ScubaGear
           Invoke-SCuBA -Version
