@@ -147,27 +147,27 @@ jobs:
               }
               elseif($key.ToLower() -eq "tenantdomain")
               {
-                $domain = $keyAndValue
+                $domain = $attribute
               }
               elseif($key.ToLower() -eq "tenantdisplayname")
               {
-                $display = $keyAndValue
+                $display = $attribute
               }
               elseif($key.ToLower() -eq "appid")
               {
-                $appid = $keyAndValue
+                $appid = $attribute
               }
               elseif($key.ToLower() -eq "productname")
               {
-                $productname = $keyAndValue
+                $productname = $attribute
               }
               elseif($key.ToLower() -eq "variant")
               {
-                $variant = $keyAndValue
+                $variant = $attribute
               }
               elseif($key.ToLower() -eq "m365environment")
               {
-                $m365 = $keyAndValue
+                $m365 = $attribute
               }
             }
             echo "Alias is: $alias"
