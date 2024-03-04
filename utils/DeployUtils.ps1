@@ -95,6 +95,8 @@ function Publish-ScubaGearModule{
         [AllowEmptyString()]
         [string]
         $OverrideModuleVersion = "",
+        [Parameter(ParameterSetName = 'PublicGallery')]
+        [Parameter(ParameterSetName = 'PrivateGallery')]
         [Parameter(Mandatory=$false)]
         [AllowEmptyString()]
         [string]

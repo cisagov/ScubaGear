@@ -193,7 +193,7 @@ jobs:
             NuGetApiKey = $ApiKey
           }
           if ('true' -eq '${{ inputs.IsPrerelease }}'){
-            $PublishSplat.Add('PreleaseTag', '${{ inputs.PrereleaseTag }}')
+            $PublishSplat.Add('PrereleaseTag', '${{ inputs.PrereleaseTag }}')
           }
           if (-Not [string]::IsNullOrEmpty('${{ inputs.OverrideModuleVersion }}')){
             $PublishSplat.Add('OverrideModuleVersion', '${{ inputs.OverrideModuleVersion }}')
