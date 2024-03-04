@@ -170,9 +170,11 @@ jobs:
             {
               echo "Testing the following product..."
               $paramsAsHashTable.Add($domain)
+              echo $domain
               $paramsAsHashTable.Add($display)
               echo $display
               $paramsAsHashTable.Add($appid)
+              echo $appid
               $paramsAsHashTable.Add($productname)
               echo $productname
               $paramsAsHashTable.Add($m365)
