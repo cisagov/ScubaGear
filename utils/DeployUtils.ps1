@@ -116,7 +116,7 @@ function Publish-ScubaGearModule{
             Repository = $GalleryName
         }
 
-        if ($PublicGallery){
+        if ($GalleryName -eq 'PSGallery'){
             $PublishSplat.Add('NuGetApiKey', $NuGetApiKey)
         }
 
