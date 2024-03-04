@@ -313,7 +313,11 @@ tests contains {
 #--
 
 PolicyMigrationIsComplete := Status if {
-    some Policy in input.authentication_method_policy
+    #some Policy in input.authentication_method_policy
+    #Status := Policy.PolicyMigrationState == "migrationComplete"
+    some Setting in input.authentication_method
+    some Policy in Setting.authentication_method_policy
+    print(Policy.PolicyMigrationState)
     Status := Policy.PolicyMigrationState == "migrationComplete"
 }
 
@@ -326,7 +330,8 @@ tests contains {
     "ReportDetails": ReportDetailsBoolean(Status),
     "RequirementMet": Status
 } if {
-    some Policy in input.authentication_method_policy
+    some Setting in input.authentication_method
+    some Policy in Setting.authentication_method_policy
     Status := Policy.PolicyMigrationState == "migrationComplete"
 }
 #--
@@ -339,7 +344,10 @@ GoodAuthenticationMethodConfigurations contains {
     "Id": Configuration.Id,
     "State": Configuration.State
 } if {
-    some Item in input.authentication_method_policy
+    #some Item in input.authentication_method_policy
+    #some Configuration in Item.AuthenticationMethodConfigurations
+    some Setting in input.authentication_method
+    some Item in Setting.authentication_method_policy
     some Configuration in Item.AuthenticationMethodConfigurations
     Configuration.Id in ["Sms", "Voice", "Email"]
     Configuration.State == "disabled"
