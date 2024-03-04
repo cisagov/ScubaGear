@@ -95,6 +95,10 @@ function Publish-ScubaGearModule{
         [AllowEmptyString()]
         [string]
         $OverrideModuleVersion = "",
+        [Parameter(Mandatory=$false)]
+        [AllowEmptyString()]
+        [string]
+        $PrereleaseTag = "",
         [Parameter(ParameterSetName = 'PublicGallery')]
         [Parameter(Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
@@ -102,7 +106,7 @@ function Publish-ScubaGearModule{
         $NuGetApiKey
     )
 
-    $ModuleBuildPath = Build-ScubaModule -ModulePath $ModulePath -OverrideModuleVersion $OverrideModuleVersion
+    $ModuleBuildPath = Build-ScubaModule -ModulePath $ModulePath -OverrideModuleVersion $OverrideModuleVersion -PrereleaseTag $PrereleaseTag
 
     if (SignScubaGearModule -AzureKeyVaultUrl $AzureKeyVaultUrl -CertificateName $CertificateName -ModulePath $ModuleBuildPath){
         $PublishSplat = @{
