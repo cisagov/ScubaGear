@@ -171,17 +171,12 @@ jobs:
               echo "Testing the following product..."
               $paramsAsHashTable.Add($domain)
               $paramsAsHashTable.Add($display)
-              $d = $display.Substring(0,2)
-              echo $d
+              echo $display
               $paramsAsHashTable.Add($appid)
-              $a = $appid.Substring(0,2)
-              echo $a 
               $paramsAsHashTable.Add($productname)
-              $p = $productname.Substring(0,2)
-              echo $p
+              echo $productname
               $paramsAsHashTable.Add($m365)
-              $m = $m365.Substring(0,2)
-              echo $m
+              echo $m365
               ./Testing/Functional/Products/Tests/CallProductTests.ps1 -params $paramsAsHashTable -thumbprint $thumbprint
             }
           }
