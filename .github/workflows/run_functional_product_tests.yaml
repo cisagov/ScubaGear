@@ -170,15 +170,18 @@ jobs:
             {
               echo "Testing the following product..."
               $paramsAsHashTable.Add($domain)
-              echo $domain.Substring(0,2)
               $paramsAsHashTable.Add($display)
-              echo $display.Substring(0,2)
+              $d = $display.Substring(0,2)
+              echo $d
               $paramsAsHashTable.Add($appid)
-              echo $appid.Substring(0,2)
+              $a = $appid.Substring(0,2)
+              echo $a 
               $paramsAsHashTable.Add($productname)
-              $productname.Substring(0,2)
+              $p = $productname.Substring(0,2)
+              echo $p
               $paramsAsHashTable.Add($m365)
-              echo $m365.Substring(0,2)
+              $m = $m365.Substring(0,2)
+              echo $m
               ./Testing/Functional/Products/Tests/CallProductTests.ps1 -params $paramsAsHashTable -thumbprint $thumbprint
             }
           }
