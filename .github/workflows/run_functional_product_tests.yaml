@@ -188,12 +188,12 @@ jobs:
               $paramsAsHashTable.Add($productnameKeyAndValue[0], $productnameKeyAndValue[1])
               $paramsAsHashTable.Add($variantKeyAndValue[0], $variantKeyAndValue[1])
               $paramsAsHashTable.Add($m365KeyAndValue[0], $m365KeyAndValue[1])
-              echo "pn"
-              echo $productnameKeyAndValue
-              echo "ky"
+              echo $domainKeyAndValue[0]
+              echo $displayKeyAndValue[0]
+              echo $appidKeyAndValue[0]
               echo $productnameKeyAndValue[0]
-              echo "vl"
-              echo $productnameKeyAndValue[1]
+              echo $variantKeyAndValue[0]
+              echo $m365KeyAndValue[0]
               # Test the product
               ./Testing/Functional/Products/Tests/CallProductTests.ps1 -params $paramsAsHashTable -thumbprint $thumbprint
             }
