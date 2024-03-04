@@ -95,12 +95,12 @@ jobs:
         env:
           PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
       - name: Get Thumbprint
-        id: getthumbprint
+        id: get-thumbprint
         run: |
           $x509 = Get-PfxCertificate -FilePath ./key.pfx -Password (ConvertTo-SecureString -String $env:PfxPassword -AsPlainText -Force)
           $Thumbprint = $x509.ThumbPrint
           # Pass thumbprint to later job.
-          echo THUMBPRINT=$Thumbprint >> $env:GITHUB_OUTPUT
+          echo thumbprint=$Thumbprint >> $env:GITHUB_OUTPUT
         shell: pwsh # -Password flag requires PS 6+
         env:
           PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
