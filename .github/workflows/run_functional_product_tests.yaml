@@ -169,6 +169,8 @@ jobs:
             if($alias -eq "${{ matrix.product }}")
             {
               echo "Testing the following product..."
+              echo "365"
+              echo $m365
               $paramsAsHashTable.Add($domain)
               if ($domain.Length -gt 2) { echo $domain.Substring(0,2) }
               $paramsAsHashTable.Add($display)
