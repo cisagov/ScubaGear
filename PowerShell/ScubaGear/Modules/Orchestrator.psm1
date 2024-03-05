@@ -66,6 +66,9 @@ function Invoke-SCuBA {
     .Parameter OutReportName
     The name of the main html file page created in the folder created in OutPath.
     Defaults to "BaselineReports".
+    .Parameter OutJsonFileName
+    The name of the main json created in the folder created in OutPath.
+    Defaults to "ScubaResults".
     .Parameter DisconnectOnExit
     Set switch to disconnect all active connections on exit from ScubaGear (default: $false)
     .Parameter ConfigFilePath
@@ -194,6 +197,12 @@ function Invoke-SCuBA {
         [ValidateNotNullOrEmpty()]
         [string]
         $OutReportName = [ScubaConfig]::ScubaDefault('DefaultOutReportName'),
+
+        [Parameter(Mandatory = $false, ParameterSetName = 'Configuration')]
+        [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $OutJsonFileName = [ScubaConfig]::ScubaDefault('DefaultOutJsonFileName'),
 
         [Parameter(Mandatory = $true, ParameterSetName = 'Configuration')]
         [ValidateNotNullOrEmpty()]
@@ -377,6 +386,17 @@ function Invoke-SCuBA {
                 'Quiet' = $Quiet
             }
             Invoke-ReportCreation @ReportParams
+
+            # Craft the complete json version of the output
+            $JsonParams = @{
+                'ProductNames' = $ScubaConfig.ProductNames;
+                'OutFolderPath' = $OutFolderPath;
+                'OutProviderFileName' = $ScubaConfig.OutProviderFileName;
+                'TenantDetails' = $TenantDetails;
+                'ModuleVersion' = $ModuleVersion;
+                'OutJsonFileName' = $ScubaConfig.OutJsonFileName;
+            }
+            Merge-JsonOutput @JsonParams
         }
         finally {
             if ($ScubaConfig.DisconnectOnExit) {
@@ -409,6 +429,8 @@ $ProdToFullName = @{
     PowerPlatform = "Microsoft Power Platform";
     SharePoint = "SharePoint Online";
 }
+
+$IndividualReportFolderName = "IndividualReports"
 
 function Get-FileEncoding{
     <#
@@ -735,6 +757,111 @@ function Pluralize {
     }
 }
 
+function Merge-JsonOutput {
+    <#
+    .Description
+    This function packages all the json output created into a single json file.
+    .Functionality
+    Internal
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
+        [string[]]
+        $ProductNames,
+
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $OutFolderPath,
+
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $OutProviderFileName,
+
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [object]
+        $TenantDetails,
+
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $ModuleVersion,
+
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $OutJsonFileName
+    )
+    process {
+        try {
+            # Extract the metadata
+            $Results = [pscustomobject]@{}
+            $Summary = [pscustomobject]@{}
+            $MetaData = [pscustomobject]@{
+                "TenantId" = $TenantDetails.TenantId;
+                "DisplayName" = $TenantDetails.DisplayName;
+                "DomainName" = $TenantDetails.DomainName;
+                "Product" = "M365";
+                "Module" = "ScubaGear";
+                "ModuleVersion" = $ModuleVersion;
+            }
+
+            # Aggregate the report results and summaries
+            $IndividualReportPath = Join-Path -Path $OutFolderPath $IndividualReportFolderName -ErrorAction 'Stop'
+            foreach ($Product in $ProductNames) {
+                $BaselineName = $ArgToProd[$Product]
+                $FileName = Join-Path $IndividualReportPath "$($BaselineName)Report.json"
+                $IndividualResults = Get-Content $FileName | ConvertFrom-Json
+                $Results | Add-Member -NotePropertyName $BaselineName `
+                    -NotePropertyValue $IndividualResults.Results
+
+                # The date is listed under the metadata, no need to include it in the summary as well
+                $IndividualResults.ReportSummary.PSObject.Properties.Remove('Date')
+
+                $Summary | Add-Member -NotePropertyName $BaselineName `
+                    -NotePropertyValue $IndividualResults.ReportSummary
+            }
+
+            # Load the raw provider output
+            $SettingsFileName = Join-Path -Path $OutFolderPath -ChildPath "$($OutProviderFileName).json"
+            $SettingsExport =  Get-Content $SettingsFileName -Raw
+
+            # Convert the output a json string
+            $MetaData = ConvertTo-Json $MetaData
+            $Results = ConvertTo-Json $Results -Depth 3
+            $Summary = ConvertTo-Json $Summary -Depth 3
+            $ReportJson = @"
+{
+    "MetaData": $MetaData,
+    "Summary": $Summary,
+    "Results": $Results,
+    "Raw": $SettingsExport
+}
+"@
+
+            # ConvertTo-Json for some reason converts the <, >, and ' characters into unicode escape sequences.
+            # Convert those back to ASCII.
+            $ReportJson = $ReportJson.replace("\u003c", "<")
+            $ReportJson = $ReportJson.replace("\u003e", ">")
+            $ReportJson = $ReportJson.replace("\u0027", "'")
+
+            # Save the file
+            $JsonFileName = Join-Path -Path $OutFolderPath "$($OutJsonFileName).json" -ErrorAction 'Stop'
+            $ReportJson | Out-File $JsonFileName
+        }
+        catch {
+            $MergeJsonErrorMessage = "Fatal Error involving the Json reports aggregation. `
+            Ending ScubaGear execution. See the exception message for more details: $($_)"
+            throw $MergeJsonErrorMessage
+        }
+    }
+}
+
 function Invoke-ReportCreation {
     <#
     .Description
@@ -798,7 +925,6 @@ function Invoke-ReportCreation {
             $N = 0
             $Len = $ProductNames.Length
             $Fragment = @()
-            $IndividualReportFolderName = "IndividualReports"
             $IndividualReportPath = Join-Path -Path $OutFolderPath -ChildPath $IndividualReportFolderName
             New-Item -Path $IndividualReportPath -ItemType "Directory" -ErrorAction "SilentlyContinue" | Out-Null
 
@@ -1229,6 +1355,9 @@ function Invoke-RunCached {
     .Parameter OutReportName
     The name of the main html file page created in the folder created in OutPath.
     Defaults to "BaselineReports".
+    .Parameter OutJsonFileName
+    The name of the main json created in the folder created in OutPath.
+    Defaults to "ScubaResults".
     .Parameter DarkMode
     Set switch to enable report dark mode by default.
     .Example
@@ -1326,6 +1455,11 @@ function Invoke-RunCached {
 
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
+        [string]
+        $OutJsonFileName = [ScubaConfig]::ScubaDefault('DefaultOutJsonFileName'),
+
+        [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
+        [ValidateNotNullOrEmpty()]
         [ValidateSet($true, $false)]
         [switch]
         $Quiet,
@@ -1417,6 +1551,17 @@ function Invoke-RunCached {
             }
             Invoke-RunRego @RegoParams
             Invoke-ReportCreation @ReportParams
+
+            # Craft the complete json version of the output
+            $JsonParams = @{
+                'ProductNames' = $ProductNames;
+                'OutFolderPath' = $OutFolderPath;
+                'OutProviderFileName' = $OutProviderFileName;
+                'TenantDetails' = $TenantDetails;
+                'ModuleVersion' = $ModuleVersion;
+                'OutJsonFileName' = $OutJsonFileName;
+            }
+            Merge-JsonOutput @JsonParams
         }
     }
 
