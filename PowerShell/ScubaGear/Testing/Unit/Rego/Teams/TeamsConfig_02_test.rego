@@ -1,5 +1,5 @@
 package teams_test
-import future.keywords
+import rego.v1
 import data.teams
 import data.utils.key.TestResult
 import data.utils.key.PASS

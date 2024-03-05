@@ -1,5 +1,5 @@
 package teams
-import future.keywords
+import rego.v1
 import data.utils.report.ReportDetailsBoolean
 import data.utils.report.DefenderMirrorDetails
 import data.utils.report.ReportDetailsArray

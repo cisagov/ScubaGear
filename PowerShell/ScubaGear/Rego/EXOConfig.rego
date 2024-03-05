@@ -1,5 +1,5 @@
 package exo
-import future.keywords
+import rego.v1
 import data.utils.report.NotCheckedDetails
 import data.utils.report.DefenderMirrorDetails
 import data.utils.report.ArraySizeStr

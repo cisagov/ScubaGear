@@ -1,5 +1,5 @@
 package teams_test
-import future.keywords
+import rego.v1
 import data.teams
 import data.utils.report.DefenderMirrorDetails
 import data.utils.key.TestResult

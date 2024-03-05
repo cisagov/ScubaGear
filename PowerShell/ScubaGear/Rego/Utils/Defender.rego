@@ -1,5 +1,5 @@
 package utils.defender
-import future.keywords
+import rego.v1
 import data.utils.report.ReportDetailsBoolean
 import data.utils.key.FAIL
 import data.utils.key.ConvertToSet

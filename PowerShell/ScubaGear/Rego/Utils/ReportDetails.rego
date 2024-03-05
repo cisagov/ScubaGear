@@ -1,5 +1,5 @@
 package utils.report
-import future.keywords
+import rego.v1
 import data.utils.key.PASS
 
 

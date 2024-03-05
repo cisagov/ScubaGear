@@ -1,5 +1,5 @@
 package exo_test
-import future.keywords
+import rego.v1
 import data.exo
 import data.utils.report.NotCheckedDetails
 import data.utils.key.TestResult
