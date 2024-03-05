@@ -22445,6 +22445,31 @@
         "Identity":  "Tag:Default"
     }
 ],
+    "license_information": [
+    {
+        "SkuId":  "f30db892-07e9-47e9-837c-80727f46fd3d",
+        "SkuPartNumber":  "FLOW_FREE",
+        "ConsumedUnits":  3,
+        "PrepaidUnits":  {
+                            "Enabled":  10000,
+                            "LockedOut":  0,
+                            "Suspended":  0,
+                            "Warning":  0
+                        }
+    },
+    {
+        "SkuId":  "c42b9cae-ea4f-4ab7-9717-81576235ccac",
+        "SkuPartNumber":  "DEVELOPERPACK_E5",
+        "ConsumedUnits":  22,
+        "PrepaidUnits":  {
+                            "Enabled":  25,
+                            "LockedOut":  0,
+                            "Suspended":  0,
+                            "Warning":  0
+                        }
+    }
+],
+    "total_user_count": 51,
     "teams_successful_commands": [
     "Get-CsTenant",
     "Get-CsTeamsMeetingPolicy",
