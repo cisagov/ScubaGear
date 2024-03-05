@@ -33,11 +33,14 @@ ReportDetails1_1(false, false) := "Standard and Strict preset policies are both 
 
 # Parse through all items in Policies, if item identity is the one
 # we want & state is enabled, save item. Return number of items saved.
-GetEnabledPolicies(Policies, Identity) if count([Policy |
-    some Policy in Policies
-    Policy.Identity == Identity
-    Policy.State == "Enabled"
-]) > 0
+#default GetEnabledPolicies := false
+GetEnabledPolicies(Policies, Identity) := true if
+    count([Policy |
+        some Policy in Policies
+        Policy.Identity == Identity
+        Policy.State == "Enabled"
+    ]) > 0
+else := false
 
 # For this one you need to check both:
 # - Get-EOPProtectionPolicyRule
@@ -96,13 +99,14 @@ tests contains {
 # Parse through all items in Policies, if item identity is the one
 # we want & Users (SentTo) + Groups (SentToMemberOf) + Domains (RecipientDomainIs) are null,
 # save item. Return number of items saved.
-AllRecipient(Policies, Identity) if count([Policy |
+AllRecipient(Policies, Identity) := true if count([Policy |
     some Policy in Policies
-    Policy.Identity == Identity
-    Policy.SentTo == null
-    Policy.SentToMemberOf == null
-    Policy.RecipientDomainIs == null
-]) > 0
+        Policy.Identity == Identity
+        Policy.SentTo == null
+        Policy.SentToMemberOf == null
+        Policy.RecipientDomainIs == null
+    ]) > 0
+else := false
 
 # If "Apply protection to" is set to "All recipients":
 # - The policy will be included in the list output by
