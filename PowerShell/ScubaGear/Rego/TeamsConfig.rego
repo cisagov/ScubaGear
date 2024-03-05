@@ -433,11 +433,11 @@ IsUSGovTenantRegion := true if {
 }
 
 # Create descriptive report string based on what passed variables equal
-ReportDetails4_1(true, _) := "N/A: Feature is unavailable in GCC environments" if {}
+ReportDetails4_1(true, _) := "N/A: Feature is unavailable in GCC environments"
 
-ReportDetails4_1(false, true) := PASS if {}
+ReportDetails4_1(false, true) := PASS
 
-ReportDetails4_1(false, false) := FAIL if {}
+ReportDetails4_1(false, false) := FAIL
 
 # As long as either:
 #     1) Get-CsTeamsClientConfiguration reports email integration is disabled or

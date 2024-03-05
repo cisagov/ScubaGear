@@ -23,13 +23,13 @@ import data.utils.defender.ApplyLicenseWarning
 #--
 
 # Return string based on boolean result of Standard & Strict conditions
-ReportDetails1_1(true, true) := PASS if {}
+ReportDetails1_1(true, true) := PASS
 
-ReportDetails1_1(false, true) := "Standard preset policy is disabled" if {}
+ReportDetails1_1(false, true) := "Standard preset policy is disabled"
 
-ReportDetails1_1(true, false) := "Strict preset policy is disabled" if {}
+ReportDetails1_1(true, false) := "Strict preset policy is disabled"
 
-ReportDetails1_1(false, false) := "Standard and Strict preset policies are both disabled" if {}
+ReportDetails1_1(false, false) := "Standard and Strict preset policies are both disabled"
 
 # Parse through all items in Policies, if item identity is the one
 # we want & state is enabled, save item. Return number of items saved.

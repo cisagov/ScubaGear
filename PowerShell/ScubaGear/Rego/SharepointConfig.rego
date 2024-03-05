@@ -283,22 +283,22 @@ tests contains {
 # Create Repot Detatils string based on File link type & Folder link type
 PERMISSIONSTRING := "are not limited to view for Anyone"
 
-FileAndFolderPermission(1, 1) := PASS if {}
+FileAndFolderPermission(1, 1) := PASS
 
 FileAndFolderPermission(2, 2) := concat(": ", [
         FAIL,
         concat(" ", ["both files and folders", PERMISSIONSTRING])
-    ]) if {}
+    ])
 
 FileAndFolderPermission(1, 2) := concat(": ", [
         FAIL,
         concat(" ", ["folders", PERMISSIONSTRING])
-    ]) if {}
+    ])
 
 FileAndFolderPermission(2, 1) := concat(": ", [
         FAIL,
         concat(" ", ["files", PERMISSIONSTRING])
-    ]) if {}
+    ])
 
 # Both link types must be 2 & OneDrive_PnP_Flag must be false for policy to pass
 tests contains {

@@ -69,18 +69,18 @@ ReportDetailsBoolean(true) := "Requirement met"
 ReportDetailsBoolean(false) := "Requirement not met"
 
 # Returns specified string if Status is false (good for error msg)
-ReportDetailsString(true, _) := PASS if {}
+ReportDetailsString(true, _) := PASS
 
-ReportDetailsString(false, String) := String if {}
+ReportDetailsString(false, String) := String
 
 # Returns string constructed from array if Status is false (good for error msg)
-ReportDetailsArray(true, _, _) := PASS if {}
+ReportDetailsArray(true, _, _) := PASS
 
 ReportDetailsArray(false, Array, String) := Description([
     ArraySizeStr(Array),
     String,
     concat(", ", Array)
-]) if {}
+])
 
 
 ################################################
