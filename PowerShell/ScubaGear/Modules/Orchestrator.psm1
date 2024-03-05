@@ -259,6 +259,7 @@ function Invoke-SCuBA {
                 'OutProviderFileName' = $OutProviderFileName
                 'OutRegoFileName' = $OutRegoFileName
                 'OutReportName' = $OutReportName
+                'OutJsonFileName' = $OutJsonFileName
             }
 
             $ScubaConfig = New-Object -Type PSObject -Property $ProvidedParameters
