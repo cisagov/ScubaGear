@@ -33,7 +33,7 @@ ReportDetails1_1(false, false) := "Standard and Strict preset policies are both 
 
 # Parse through all items in Policies, if item identity is the one
 # we want & state is enabled, save item. Return number of items saved.
-GetEnabledPolicies(Policies, Identity) := count([Policy |
+GetEnabledPolicies(Policies, Identity) if count([Policy |
     some Policy in Policies
     Policy.Identity == Identity
     Policy.State == "Enabled"
@@ -96,7 +96,7 @@ tests contains {
 # Parse through all items in Policies, if item identity is the one
 # we want & Users (SentTo) + Groups (SentToMemberOf) + Domains (RecipientDomainIs) are null,
 # save item. Return number of items saved.
-AllRecipient(Policies, Identity) := count([Policy |
+AllRecipient(Policies, Identity) if count([Policy |
     some Policy in Policies
     Policy.Identity == Identity
     Policy.SentTo == null
