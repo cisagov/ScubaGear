@@ -221,3 +221,12 @@ ApplyLicenseWarningString(Status,_) := concat(" ", [ReportDetailsBoolean(Status)
         "for Office 365 Plan 1 or Plan 2, which is required for this feature.**"
     ])
 }
+
+DLPLicenseWarningString(Status,_) := concat(" ", [ReportDetailsBoolean(Status), LicenseWarning]) if {
+    input.defender_license == false
+    LicenseWarning := concat(" ", [
+        "**NOTE: Either you do not have sufficient permissions or",
+        "your tenant does not have a license for Microsoft Defender",
+        "for DLP for Teams or DLP for Endpoint, which is required for this feature.**"
+    ])
+}
