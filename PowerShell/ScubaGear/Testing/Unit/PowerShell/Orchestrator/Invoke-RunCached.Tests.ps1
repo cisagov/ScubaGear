@@ -16,6 +16,8 @@ InModuleScope Orchestrator {
             Mock -ModuleName Orchestrator Invoke-RunRego {}
             function Invoke-ReportCreation {}
             Mock -ModuleName Orchestrator Invoke-ReportCreation {}
+            function Merge-JsonOutput {}
+            Mock -ModuleName Orchestrator Merge-JsonOutput {}
             function Disconnect-SCuBATenant {}
             Mock -ModuleName Orchestrator Disconnect-SCuBATenant
 
