@@ -111,7 +111,9 @@ function Initialize-SCuBA {
     # Start a stopwatch to time module installation elapsed time
     $Stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
 
-    $RequiredModulesPath = Join-Path -Path $PSScriptRoot -ChildPath "PowerShell\ScubaGear\RequiredVersions.ps1"
+    # Need to determine where module is so we can get required versions info
+    $ModuleBaseDir = Join-Path -Path (Get-Module ScubaGear).Path -ChildPath ..
+    $RequiredModulesPath = Join-Path -Path $ModuleBaseDir -ChildPath "..\..\RequiredVersions.ps1"
     if (Test-Path -Path $RequiredModulesPath) {
         . $RequiredModulesPath
     }
