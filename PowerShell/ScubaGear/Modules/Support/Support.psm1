@@ -178,8 +178,7 @@ function Initialize-SCuBA {
     }
     else {
         try {
-            $ScriptDir = Split-Path -Path $MyInvocation.MyCommand.Definition -Parent
-            . $ScriptDir\OPA.ps1 -name $OPAExe -version $ExpectedVersion -os $OperatingSystem -ScubaParentDirectory $ScubaParentDirectory
+            Install-OPA -OPAExe $OPAExe -ExpectedVersion $ExpectedVersion -OperatingSystem $OperatingSystem -ScubaParentDirectory $ScubaParentDirectory
         }
         catch {
             $Error[0] | Format-List -Property * -Force | Out-Host
