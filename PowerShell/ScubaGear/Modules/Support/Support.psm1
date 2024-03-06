@@ -114,8 +114,11 @@ function Initialize-SCuBA {
     # Need to determine where module is so we can get required versions info
     $ModuleBaseDir = Split-Path -Path (Get-Module ScubaGear).Path -Parent
     $RequiredModulesPath = Join-Path -Path $ModuleBaseDir -ChildPath "RequiredVersions.ps1"
-    if (Test-Path -Path $RequiredModulesPath) {
+    if (Test-Path -Path $RequiredModulesPath -Leaf) {
         . $RequiredModulesPath
+    }
+    else {
+        throw "Unable to location RequiredVersions.ps1 at $RequiredModulesPath"
     }
 
     if ($ModuleList) {
