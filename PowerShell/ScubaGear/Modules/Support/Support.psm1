@@ -112,8 +112,8 @@ function Initialize-SCuBA {
     $Stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
 
     # Need to determine where module is so we can get required versions info
-    $ModuleBaseDir = Join-Path -Path (Get-Module ScubaGear).Path -ChildPath ..
-    $RequiredModulesPath = Join-Path -Path $ModuleBaseDir -ChildPath "..\..\RequiredVersions.ps1"
+    $ModuleBaseDir = Split-Path -Path (Get-Module ScubaGear).Path -Parent
+    $RequiredModulesPath = Join-Path -Path $ModuleBaseDir -ChildPath "RequiredVersions.ps1"
     if (Test-Path -Path $RequiredModulesPath) {
         . $RequiredModulesPath
     }
