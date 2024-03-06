@@ -112,7 +112,8 @@ function Export-AADProvider {
     $AuthenticationMethodPolicy = $Tracker.TryCommand("Get-MgBetaPolicyAuthenticationMethodPolicy")
     #Create the JSON needed for Rego 3.3 and 3.5
     $AuthenticationMethodConfiguration = $AuthenticationMethodPolicy.AuthenticationMethodConfigurations
-    $AuthenticationMethodFeatureSettings = @($AuthenticationMethodPolicy.AuthenticationMethodConfigurations | Where-Object { $_.Id -eq 'MicrosoftAuthenticator' })
+    #$AuthenticationMethodFeatureSettings = @($AuthenticationMethodPolicy.AuthenticationMethodConfigurations | Where-Object { $_.Id -eq 'MicrosoftAuthenticator' })
+    $AuthenticationMethodFeatureSettings = @($AuthenticationMethodPolicy.AuthenticationMethodConfigurations | Where-Object { $_.Id})
     #Combine the authentication method policy properties
     $authentication_method = @{
                authentication_method_policy = $AuthenticationMethodPolicy
