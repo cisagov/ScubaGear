@@ -111,7 +111,8 @@ jobs:
           Install-Module -Name Selenium -Scope CurrentUser -Force
           Import-Module -Name Selenium
           ./Testing/Functional/SmokeTest/UpdateSelenium.ps1
-          Import-Module -Name .\PowerShell\ScubaGear\ScubaGear.psd1
+          # Import-Module -Name .\PowerShell\ScubaGear\ScubaGear.psd1
+          Import-Module -Name .\PowerShell\ScubaGear
           Initialize-SCuBA
           # Workaround for Selenium. Loading psm1 instead of psd1
           Import-Module -Name (Get-Module -Name Selenium -ListAvailable).Path -Force
