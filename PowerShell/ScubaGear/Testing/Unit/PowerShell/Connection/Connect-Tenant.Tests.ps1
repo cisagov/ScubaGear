@@ -12,12 +12,13 @@ InModuleScope Connection {
             function Connect-MgGraph {throw 'this will be mocked'}
             Mock Connect-MgGraph -MockWith {}
             function Connect-PnPOnline {throw 'this will be mocked'}
+            function Connect-PnPOnline {throw 'this will be mocked'}
             Mock Connect-PnPOnline -MockWith {}
             function Connect-SPOService {throw 'this will be mocked'}
             Mock Connect-SPOService -MockWith {}
             function Connect-MicrosoftTeams{throw 'this will be mocked'}
             Mock Connect-MicrosoftTeams -MockWith {}
-            function Add-PowerAppsAccount {throw 'this will be mocked'}
+            function Add-PowerAppsAccount{throw 'this will be mocked'}
             Mock Add-PowerAppsAccount -MockWith {}
             function Connect-EXOHelper {throw 'this will be mocked'}
             Mock -ModuleName Connection Connect-EXOHelper -MockWith {}
