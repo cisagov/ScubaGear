@@ -33,7 +33,7 @@ InModuleScope Orchestrator {
                     $script:TestSplat.Add('OutReportName', $ScubaConfig.OutReportName)
                 }
                 Mock -ModuleName Orchestrator Merge-JsonOutput {
-                    $script:TestSplat.Add('OutJsonFileName', $ScubaConfig.OutJsonFileName)                
+                    $script:TestSplat.Add('OutJsonFileName', $ScubaConfig.OutJsonFileName)
                 }
                 Mock -ModuleName Orchestrator Disconnect-SCuBATenant {
                     $script:TestSplat.Add('DisconnectOnExit', $DisconnectOnExit)
