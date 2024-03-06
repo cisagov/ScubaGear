@@ -1,23 +1,30 @@
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../../../../Modules/Connection/Connection.psm1") -Function 'Disconnect-SCuBATenant' -Force
+BeforeDiscovery {
+    $ModuleRootPath = Join-Path -Path $PSScriptRoot -ChildPath '..\..\..\..\Modules\Connection' -Resolve
+    Import-Module (Join-Path -Path $ModuleRootPath -ChildPath 'Connection.psm1') -Function 'Disconnect-SCuBATenant' -Force
+}
 
 InModuleScope Connection {
     Describe -Tag 'Connection' -Name 'Disconnect-SCuBATenant' {
         BeforeAll {
-            Mock Disconnect-MgGraph -MockWith {}
-            Mock Disconnect-ExchangeOnline -MockWith {}
-            Mock Disconnect-SPOService -MockWith {}
-            Mock Disconnect-PnPOnline -MockWith {}
-            Mock Remove-PowerAppsAccount -MockWith {}
-            Mock Disconnect-MicrosoftTeams -MockWith {}
+            function Disconnect-MgGraph {throw 'this will be mocked'}
+            Mock -ModuleName Connection Disconnect-MgGraph {}
+            function Disconnect-ExchangeOnline {throw 'this will be mocked'}
+            Mock -ModuleName Connection Disconnect-ExchangeOnline {}
+            function Disconnect-SPOService {throw 'this will be mocked'}
+            Mock -ModuleName Connection Disconnect-SPOService {}
+            function Remove-PowerAppsAccount {throw 'this will be mocked'}
+            Mock  -ModuleName Connection Remove-PowerAppsAccount {}
+            function Disconnect-MicrosoftTeams {throw 'this will be mocked'}
+            Mock  -ModuleName Connection Disconnect-MicrosoftTeams {}
             Mock -CommandName Write-Progress {}
         }
         It 'Disconnects from Microsoft Graph' {
             Disconnect-SCuBATenant -ProductNames 'aad'
-            Should -Invoke -CommandName Disconnect-MgGraph -Times 1 -Exactly
+            Should -Invoke -ModuleName Connection -CommandName Disconnect-MgGraph -Times 1 -Exactly
         }
         It 'Disconnects from Exchange Online' {
             Disconnect-SCuBATenant -ProductNames 'exo'
-            Should -Invoke -CommandName Disconnect-ExchangeOnline -Times 1 -Exactly
+            Should -Invoke -ModuleName Connection -CommandName Disconnect-ExchangeOnline -Times 1 -Exactly
         }
         It 'Disconnects from Defender (Exchange Online and Security & Compliance)' {
             {Disconnect-SCuBATenant -ProductNames 'defender'} | Should -Not -Throw

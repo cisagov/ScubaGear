@@ -14,10 +14,7 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v4
       - name: Run Pester Tests
-        if: "!cancelled()"
+        if: ${{ !cancelled() }}
         shell: powershell
         run: |
-          Import-Module -Name ./PowerShell/ScubaGear/ScubaGear.psd1
-          Initialize-SCuBA
-          Install-OPA
           Invoke-Pester -Output 'Detailed' -Path 'PowerShell/ScubaGear/Testing/Unit/PowerShell'
