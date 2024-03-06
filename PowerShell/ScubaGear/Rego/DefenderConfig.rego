@@ -33,7 +33,6 @@ ReportDetails1_1(false, false) := "Standard and Strict preset policies are both 
 
 # Parse through all items in Policies, if item identity is the one
 # we want & state is enabled, save item. Return number of items saved.
-#default GetEnabledPolicies := false
 GetEnabledPolicies(Policies, Identity) := true if
     count([Policy |
         some Policy in Policies
