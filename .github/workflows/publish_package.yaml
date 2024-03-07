@@ -107,7 +107,7 @@ jobs:
           azPSVersion: "latest"
       - name: Check Scuba Version
         run: |
-          $ScubaModules = Find-Module -Name ScubaGear -AllVersions -AllowPrerelease
+          $ScubaModules = Find-Module -Name ScubaGear -AllVersions -AllowPrerelease -Repository $env:GalleryName
           ($ScubaModules).Version
           if ($ScubaModules.Count -eq 2) {
             Exit 0
