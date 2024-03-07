@@ -153,6 +153,7 @@ Most of the `Invoke-SCuBA` cmdlet parameters can be placed into a configuration 
 - Version
 - DarkMode
 - Quiet
+- MergeJson
 
 Each authentication parameter must be supplied either the command line or in the config file if a non-interactive login is supplied.  An authentication parameter may be present in both, but the command line will always take precedence. The parameters can be split between the config file and the command line.
 
