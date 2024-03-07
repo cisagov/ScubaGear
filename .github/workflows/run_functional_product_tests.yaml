@@ -121,7 +121,7 @@ jobs:
         run: |
           # Read thumbprint from previous step.
           $thumbprint = "${{ steps.get-thumbprint.outputs.thumbprint }}"
-          echo "Product is: ${{ matrix.product }}"
+          echo "Product alias is: ${{ matrix.product }}"
           $params = $env:TestParams
           # Split into products
           $products = $params.split("|")
@@ -171,10 +171,8 @@ jobs:
                 $m365 = $attribute
               }
             }
-            echo "Alias is: $alias"
             if($alias -eq "${{ matrix.product }}")
             {
-              echo "Testing the following product..."
               # Split out the key and value for each parameter
               $domainKeyAndValue = $domain.split("=")
               $displayKeyAndValue = $display.split("=")
