@@ -1,3 +1,5 @@
+# Purpose:  Publish the package to a private gallery
+
 name: Publish Package
 
 on:
@@ -14,12 +16,15 @@ env:
   ModuleName: ScubaGear
 
 jobs:
-  Publish-Private-Package:
+  private-package:
+    name: Private Package Publish
     runs-on: windows-latest
     environment: Development
     permissions:
       id-token: write
       contents: write
+    # This condition prevents duplicate runs.
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
     defaults:
       run:
         shell: powershell

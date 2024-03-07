@@ -1,6 +1,6 @@
 # Purpose: Run unit tests for OPA
 
-name: Run OPA Tests
+name: Unit Test OPA
 
 # This is a reusable workflow called by the pipeline.
 on:
@@ -10,8 +10,11 @@ on:
 env:
   MODULE_ROOT: PowerShell/ScubaGear
 jobs:
-  Run-OPA-Tests:
+  opa-tests:
+    name: OPA Unit Tests
     runs-on: ubuntu-latest
+    # This condition prevents duplicate runs.
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4
