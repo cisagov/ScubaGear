@@ -1,7 +1,7 @@
 # Purpose:  Run the CI/CD pipeline that tests, packages, and publishes ScubaGear.
 # Note:  This pipeline is a work in progress.  At the moment, it is only doing linting, syntax checking, and unit testing.
 
-name: CI/CD Pipeline
+name: Run the CI/CD Pipeline
 
 on:
   push:
@@ -20,6 +20,8 @@ jobs:
   test-files:
     name: Test for Changes
     runs-on: ubuntu-latest
+    # This condition prevents duplicate runs.
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
@@ -54,28 +56,28 @@ jobs:
     needs:
       - test-files
     if: needs.test-files.outputs.yaml-changes == 'true'
-    uses: ./.github/workflows/run_linter_yaml.yaml
+    uses: ./.github/workflows/lint_yaml.yaml
   lint-powershell:
     name: Lint
     needs:
       - test-files
     if: needs.test-files.outputs.powershell-changes == 'true'
-    uses: ./.github/workflows/run_linter_powershell.yaml
+    uses: ./.github/workflows/lint_powershell.yaml
   syntax:
     name: Syntax
     needs:
       - test-files
     if: needs.test-files.outputs.markdown-changes == 'true'
-    uses: ./.github/workflows/run_markdown_check.yaml
+    uses: ./.github/workflows/syntax_check_markdown.yaml
   unit-powershell:
     name: Unit
     needs:
       - test-files
     if: needs.test-files.outputs.powershell-changes == 'true'
-    uses: ./.github/workflows/run_powershell_tests.yaml
+    uses: ./.github/workflows/unit_test_powershell.yaml
   unit-opa:
     name: Unit
     needs:
       - test-files
     if: needs.test-files.outputs.rego-changes == 'true'
-    uses: ./.github/workflows/run_opa_tests.yaml
+    uses: ./.github/workflows/unit_test_opa.yaml
