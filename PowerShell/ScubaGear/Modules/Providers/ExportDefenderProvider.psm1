@@ -13,7 +13,7 @@ function Export-DefenderProvider {
         [ValidateNotNullOrEmpty()]
         [string]
         $M365Environment,
- 
+
         [Parameter(Mandatory = $false)]
         [ValidateNotNullOrEmpty()]
         [hashtable]
@@ -22,15 +22,15 @@ function Export-DefenderProvider {
     $ParentPath = Split-Path $PSScriptRoot -Parent
     $ConnectionFolderPath = Join-Path -Path $ParentPath -ChildPath "Connection"
     Import-Module (Join-Path -Path $ConnectionFolderPath -ChildPath "ConnectHelpers.psm1")
- 
+
     $HelperFolderPath = Join-Path -Path $PSScriptRoot -ChildPath "ProviderHelpers"
     Import-Module (Join-Path -Path $HelperFolderPath -ChildPath "CommandTracker.psm1")
     $Tracker = Get-CommandTracker
- 
+
     # Manually importing the module name here to bypass cmdlet name conflicts
     # There are conflicting PowerShell Cmdlet names in EXO and Power Platform
     Import-Module ExchangeOnlineManagement
- 
+
     # Sign in for the Defender Provider if not connected
     $ExchangeConnected = Get-Command Get-OrganizationConfig -ErrorAction SilentlyContinue
     if(-not $ExchangeConnected) {
@@ -47,12 +47,12 @@ function Export-DefenderProvider {
             Write-Error "Error connecting to ExchangeOnline. $($_)"
         }
     }
- 
+
     # Regular Exchange i.e non IPPSSession cmdlets
     $AdminAuditLogConfig = ConvertTo-Json @($Tracker.TryCommand("Get-AdminAuditLogConfig"))
     $ProtectionPolicyRule = ConvertTo-Json @($Tracker.TryCommand("Get-EOPProtectionPolicyRule"))
     $AntiPhishPolicy = ConvertTo-Json @($Tracker.TryCommand("Get-AntiPhishPolicy"))
- 
+
     # Test if Defender specific commands are available. If the tenant does
     # not have a defender license (plan 1 or plan 2), the following
     # commandlets will fail with "The term [Cmdlet name] is not recognized
@@ -69,7 +69,7 @@ function Export-DefenderProvider {
         $ATPPolicy = ConvertTo-Json @()
         $ATPProtectionPolicyRule = ConvertTo-Json @()
         $DefenderLicense = ConvertTo-Json $false
- 
+
         # While it is counter-intuitive to add this both to SuccessfulCommands
         # and UnSuccessfulCommands, this is a unique error case that is
         # handled within the Rego.
@@ -78,14 +78,14 @@ function Export-DefenderProvider {
         $Tracker.AddSuccessfulCommand("Get-ATPProtectionPolicyRule")
         $Tracker.AddUnSuccessfulCommand("Get-ATPProtectionPolicyRule")
     }
- 
+
     # Connect to Security & Compliance
     $IPPSConnected = $false
     try {
         $DefenderHelperParams = @{
             M365Environment = $M365Environment;
         }
- 
+
         if ($ServicePrincipalParams) {
             $DefenderHelperParams += @{ServicePrincipalParams = $ServicePrincipalParams}
         }
@@ -105,11 +105,11 @@ function Export-DefenderProvider {
             $ProtectionAlert = ConvertTo-Json @($Tracker.TryCommand("Get-ProtectionAlert"))
             $DLPComplianceRules = @($Tracker.TryCommand("Get-DlpComplianceRule"))
             $DLPLicense = ConvertTo-Json $true
- 
+
         # Powershell is inconsistent with how it saves lists to json.
         # This loop ensures that the format of ContentContainsSensitiveInformation
         # will *always* be a list.
- 
+
             foreach($Rule in $DLPComplianceRules) {
                 if ($Rule.Count -gt 0) {
                     $Rule.ContentContainsSensitiveInformation = @($Rule.ContentContainsSensitiveInformation)
@@ -130,7 +130,7 @@ function Export-DefenderProvider {
             $Tracker.AddSuccessfulCommand("Get-ProtectionAlert")
             $DLPLicense = ConvertTo-Json $false
         }
- 
+
         # We need to specify the depth because the data contains some
         # nested tables.
         $DLPComplianceRules = ConvertTo-Json -Depth 3 $DLPComplianceRules
@@ -141,10 +141,10 @@ function Export-DefenderProvider {
         $ProtectionAlert = ConvertTo-Json @()
         $DLPComplianceRules = ConvertTo-Json @()
     }
- 
+
     $SuccessfulCommands = ConvertTo-Json @($Tracker.GetSuccessfulCommands())
     $UnSuccessfulCommands = ConvertTo-Json @($Tracker.GetUnSuccessfulCommands())
- 
+
     # Note the spacing and the last comma in the json is important
     $json = @"
     "protection_policy_rules": $ProtectionPolicyRule,
@@ -160,6 +160,6 @@ function Export-DefenderProvider {
     "defender_successful_commands": $SuccessfulCommands,
     "defender_unsuccessful_commands": $UnSuccessfulCommands,
 "@
- 
+
     $json
 }
