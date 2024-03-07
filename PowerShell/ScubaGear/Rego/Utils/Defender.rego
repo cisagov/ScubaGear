@@ -223,7 +223,7 @@ ApplyLicenseWarningString(Status,_) := concat(" ", [ReportDetailsBoolean(Status)
 }
 
 DLPLicenseWarningString(Status,_) := concat(" ", [ReportDetailsBoolean(Status), LicenseWarning]) if {
-    input.defender_license == false
+    input.dlp_license == false
     LicenseWarning := concat(" ", [
         "**NOTE: Either you do not have sufficient permissions or",
         "your tenant does not have a license for Microsoft Defender",
