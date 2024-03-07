@@ -66,9 +66,12 @@ function Invoke-SCuBA {
     .Parameter OutReportName
     The name of the main html file page created in the folder created in OutPath.
     Defaults to "BaselineReports".
+    .Parameter MergeJson
+    Set switch to merge all json output into a single file and delete the individual files
+    after merging.
     .Parameter OutJsonFileName
-    The name of the main json created in the folder created in OutPath.
-    Defaults to "ScubaResults".
+    If MergeJson is set, the name of the consolidated json created in the folder
+    created in OutPath. Defaults to "ScubaResults".
     .Parameter DisconnectOnExit
     Set switch to disconnect all active connections on exit from ScubaGear (default: $false)
     .Parameter ConfigFilePath
@@ -201,6 +204,12 @@ function Invoke-SCuBA {
         [Parameter(Mandatory = $false, ParameterSetName = 'Configuration')]
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
+        [switch]
+        $MergeJson,
+
+        [Parameter(Mandatory = $false, ParameterSetName = 'Configuration')]
+        [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
+        [ValidateNotNullOrEmpty()]
         [string]
         $OutJsonFileName = [ScubaConfig]::ScubaDefault('DefaultOutJsonFileName'),
 
@@ -259,6 +268,7 @@ function Invoke-SCuBA {
                 'OutProviderFileName' = $OutProviderFileName
                 'OutRegoFileName' = $OutRegoFileName
                 'OutReportName' = $OutReportName
+                'MergeJson' = $MergeJson
                 'OutJsonFileName' = $OutJsonFileName
             }
 
@@ -388,16 +398,18 @@ function Invoke-SCuBA {
             }
             Invoke-ReportCreation @ReportParams
 
-            # Craft the complete json version of the output
-            $JsonParams = @{
-                'ProductNames' = $ScubaConfig.ProductNames;
-                'OutFolderPath' = $OutFolderPath;
-                'OutProviderFileName' = $ScubaConfig.OutProviderFileName;
-                'TenantDetails' = $TenantDetails;
-                'ModuleVersion' = $ModuleVersion;
-                'OutJsonFileName' = $ScubaConfig.OutJsonFileName;
+            if ($MergeJson) {
+                # Craft the complete json version of the output
+                $JsonParams = @{
+                    'ProductNames' = $ScubaConfig.ProductNames;
+                    'OutFolderPath' = $OutFolderPath;
+                    'OutProviderFileName' = $ScubaConfig.OutProviderFileName;
+                    'TenantDetails' = $TenantDetails;
+                    'ModuleVersion' = $ModuleVersion;
+                    'OutJsonFileName' = $ScubaConfig.OutJsonFileName;
+                }
+                Merge-JsonOutput @JsonParams
             }
-            Merge-JsonOutput @JsonParams
         }
         finally {
             if ($ScubaConfig.DisconnectOnExit) {
@@ -812,11 +824,15 @@ function Merge-JsonOutput {
                 "ModuleVersion" = $ModuleVersion;
             }
 
+            # Files to delete at the end if no errors are encountered
+            $DeletionList = @()
+
             # Aggregate the report results and summaries
             $IndividualReportPath = Join-Path -Path $OutFolderPath $IndividualReportFolderName -ErrorAction 'Stop'
             foreach ($Product in $ProductNames) {
                 $BaselineName = $ArgToProd[$Product]
                 $FileName = Join-Path $IndividualReportPath "$($BaselineName)Report.json"
+                $DeletionList += $FileName
                 $IndividualResults = Get-Content $FileName | ConvertFrom-Json
                 $Results | Add-Member -NotePropertyName $BaselineName `
                     -NotePropertyValue $IndividualResults.Results
@@ -830,6 +846,7 @@ function Merge-JsonOutput {
 
             # Load the raw provider output
             $SettingsFileName = Join-Path -Path $OutFolderPath -ChildPath "$($OutProviderFileName).json"
+            $DeletionList += $SettingsFileName
             $SettingsExport =  Get-Content $SettingsFileName -Raw
 
             # Convert the output a json string
@@ -854,6 +871,11 @@ function Merge-JsonOutput {
             # Save the file
             $JsonFileName = Join-Path -Path $OutFolderPath "$($OutJsonFileName).json" -ErrorAction 'Stop'
             $ReportJson | Out-File $JsonFileName
+
+            # Delete the now redundant files
+            foreach ($File in $DeletionList) {
+                Remove-Item $File
+            }
         }
         catch {
             $MergeJsonErrorMessage = "Fatal Error involving the Json reports aggregation. `
@@ -1356,9 +1378,12 @@ function Invoke-RunCached {
     .Parameter OutReportName
     The name of the main html file page created in the folder created in OutPath.
     Defaults to "BaselineReports".
+    .Parameter MergeJson
+    Set switch to merge all json output into a single file and delete the individual files
+    after merging.
     .Parameter OutJsonFileName
-    The name of the main json created in the folder created in OutPath.
-    Defaults to "ScubaResults".
+    If MergeJson is set, the name of the consolidated json created in the folder
+    created in OutPath. Defaults to "ScubaResults".
     .Parameter DarkMode
     Set switch to enable report dark mode by default.
     .Example
@@ -1453,6 +1478,11 @@ function Invoke-RunCached {
         [ValidateNotNullOrEmpty()]
         [string]
         $OutReportName = [ScubaConfig]::ScubaDefault('DefaultOutReportName'),
+
+        [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
+        [ValidateNotNullOrEmpty()]
+        [switch]
+        $MergeJson,
 
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
@@ -1553,16 +1583,18 @@ function Invoke-RunCached {
             Invoke-RunRego @RegoParams
             Invoke-ReportCreation @ReportParams
 
-            # Craft the complete json version of the output
-            $JsonParams = @{
-                'ProductNames' = $ProductNames;
-                'OutFolderPath' = $OutFolderPath;
-                'OutProviderFileName' = $OutProviderFileName;
-                'TenantDetails' = $TenantDetails;
-                'ModuleVersion' = $ModuleVersion;
-                'OutJsonFileName' = $OutJsonFileName;
+            if ($MergeJson) {
+                # Craft the complete json version of the output
+                $JsonParams = @{
+                    'ProductNames' = $ProductNames;
+                    'OutFolderPath' = $OutFolderPath;
+                    'OutProviderFileName' = $OutProviderFileName;
+                    'TenantDetails' = $TenantDetails;
+                    'ModuleVersion' = $ModuleVersion;
+                    'OutJsonFileName' = $OutJsonFileName;
+                }
+                Merge-JsonOutput @JsonParams
             }
-            Merge-JsonOutput @JsonParams
         }
     }
 

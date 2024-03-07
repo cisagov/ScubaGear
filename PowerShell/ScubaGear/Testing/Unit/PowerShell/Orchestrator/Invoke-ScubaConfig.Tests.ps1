@@ -65,7 +65,8 @@ InModuleScope Orchestrator {
                     }
                 }
                 [ScubaConfig]::ResetInstance()
-                Invoke-SCuBA -ConfigFilePath (Join-Path -Path $PSScriptRoot -ChildPath "orchestrator_config_test.yaml")
+                Invoke-SCuBA -ConfigFilePath (Join-Path -Path $PSScriptRoot -ChildPath "orchestrator_config_test.yaml")`
+                    -MergeJson
             }
 
             It "Verify parameter ""<parameter>"" with value ""<value>""" -ForEach @(
@@ -99,6 +100,7 @@ InModuleScope Orchestrator {
                   -OutFolderName "MyReports" `
                   -OutProviderFileName "MySettingsExport" `
                   -OutRegoFileName "RegoResults" `
+                  -MergeJson:$true `
                   -OutReportName "MyReport" `
                   -OutJsonFileName "JsonResults" `
                   -Organization "good.four.us" `
