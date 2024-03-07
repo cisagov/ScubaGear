@@ -118,7 +118,7 @@ function Initialize-SCuBA {
         ($RequiredModulesPath = Join-Path -Path $ModuleParentDir -ChildPath 'RequiredVersions.ps1') *> $null
         . $RequiredModulesPath
     }
-    catch{
+    catch {
         throw "Unable to find RequiredVersions.ps1 in expected directory:`n`t$ModuleParentDir"
     }
 
