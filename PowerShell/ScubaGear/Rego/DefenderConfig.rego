@@ -559,7 +559,7 @@ tests contains {
     ErrorMessage := concat(" ", [has_policy, concat(", ", has_policies), error_policy, concat(", ", error_policies)])
     Conditions := [
         count(error_policies) == 0,
-        input.defender_license == true
+        input.dlp_license == true
     ]
     Status := count(FilterArray(Conditions, false)) == 0
 }
