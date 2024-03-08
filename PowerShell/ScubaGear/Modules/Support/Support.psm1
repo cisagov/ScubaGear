@@ -1,3 +1,5 @@
+using module '..\ScubaConfig\ScubaConfig.psm1'
+
 function Copy-ScubaBaselineDocument {
     <#
     .SYNOPSIS
@@ -73,7 +75,7 @@ function Initialize-SCuBA {
         [Parameter(Mandatory = $false, HelpMessage = 'The version of OPA Rego to be downloaded, must be in "x.x.x" format')]
         [Alias('version')]
         [string]
-        $ExpectedVersion = '0.59.0',
+        $ExpectedVersion = [ScubaConfig]::ScubaDefault('DefaultOPAVersion'),
 
         [Parameter(Mandatory = $false, HelpMessage = 'The operating system the program is running on')]
         [ValidateSet('Windows','MacOS','Linux')]
@@ -215,7 +217,7 @@ function Install-OPA {
         [Parameter(Mandatory = $false, HelpMessage = 'The version of OPA Rego to be downloaded, must be in "x.x.x" format')]
         [Alias('version')]
         [string]
-        $ExpectedVersion = '0.61.0',
+        $ExpectedVersion = [ScubaConfig]::ScubaDefault('DefaultOPAVersion'),
 
         [Parameter(Mandatory = $false, HelpMessage = 'The file name that the opa executable is to be saved as')]
         [Alias('name')]
@@ -235,7 +237,7 @@ function Install-OPA {
     )
 
     # Constants
-    $ACCEPTABLEVERSIONS = '0.59.0', '0.60.0', '0.61.0'
+    $ACCEPTABLEVERSIONS = '0.59.0', '0.60.0', [ScubaConfig]::ScubaDefault('DefaultOPAVersion')
     $FILENAME = @{ Windows = "opa_windows_amd64.exe"; MacOS = "opa_darwin_amd64"; Linux = "opa_linux_amd64_static"}
 
     # Set prefernces for writing messages
