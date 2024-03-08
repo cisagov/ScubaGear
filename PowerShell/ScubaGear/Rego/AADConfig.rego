@@ -901,7 +901,7 @@ tests contains {
     "ReportDetails": ReportDetailsArrayLicenseWarning(RolesWithoutApprovalRequired, DescriptionString),
     "RequirementMet": Status
 } if {
-    DescriptionString := "role(s) or group(s) allowing without approval found"
+    DescriptionString := "role(s) or group(s) allowing activation without approval found"
     Conditions := [
         count(Aad2P2Licenses) > 0,
         count(RolesWithoutApprovalRequired) == 0
