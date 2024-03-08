@@ -364,6 +364,26 @@ function AddRuleSource{
     }
 }
 
+class GroupType{
+    static [hashtable]$CheckedGroups = @{}
+}
+
+function IsPimGroup{
+    param(
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $GroupId
+    )
+
+    If ($null -eq [GroupType]::CheckedGroups[$GroupId]){
+        ($GroupEligibilitySchedule = Get-MgBetaIdentityGovernancePrivilegedAccessGroupEligibilitySchedule -Filter "groupId eq '$PrincipalId'") *> $null
+        [GroupType]::CheckedGroups.Add($GroupId, $GroupEligibilitySchedule.Count -eq 0)
+    }
+
+    [GroupType]::CheckedGroups[$GroupId]
+}
+
 function FindRulesForPimGroupsRoles{
     param (
         [Parameter(Mandatory=$true)]
@@ -387,8 +407,7 @@ function FindRulesForPimGroupsRoles{
             $PrincipalId = $RoleAssignment.PrincipalId
 
             # Need a way to determine if regular or PIM group.
-            ($GroupEligibilitySchedule = Get-MgBetaIdentityGovernancePrivilegedAccessGroupEligibilitySchedule -Filter "groupId eq '$PrincipalId'") *> $null
-            if ($GroupEligibilitySchedule.Count -eq 0){
+            if (-Not (IsPimGroup -GroupId $PrincipalId)){
                 continue
             }
 
@@ -486,11 +505,12 @@ function Get-PrivilegedRole {
     # Get a list of the RoleTemplateId values for the privileged roles in the list above.
     # The RoleTemplateId value is passed to other cmdlets to retrieve role security policies and user assignments.
     $AADRoles = Get-MgBetaDirectoryRoleTemplate -All -ErrorAction Stop | Where-Object { $_.DisplayName -in $PrivilegedRoles } | Select-Object "DisplayName", @{Name='RoleTemplateId'; Expression={$_.Id}}
-    # Get ALL the roles and users actively assigned to them
-    $AllRoleAssignments = Get-MgBetaRoleManagementDirectoryRoleAssignmentScheduleInstance -All -ErrorAction Stop
 
     # If the tenant has the premium license then you can access the PIM service to get the role configuration policies and the active role assigments
     if ($TenantHasPremiumLicense) {
+        # Get ALL the roles and users actively assigned to them
+        $AllRoleAssignments = Get-MgBetaRoleManagementDirectoryRoleAssignmentScheduleInstance -All -ErrorAction Stop
+
         FindRulesForRoles -AADRoles $AADRoles -AllRoleAssignments $AllRoleAssignments
         FindRulesForPimGroupsRoles -AADRoles $AADRoles -AllRoleAssignments $AllRoleAssignments
     }
