@@ -1,26 +1,84 @@
 # Purpose: Run the product functional tests every night
 
-name: Test Product Functionality Nightly
+# The testing params are stored as a string in a CSV-like format.
+# Pipes separate products, and commas separate key/value pairs.
+# key1=value1,key2=value2|key3=value3,key4=value4...
+
+name: Nightly Product Functional Tests
 
 # Run this workflow at 12:15 am
 # on every Sun to Thr (b/c GMT -5)
 on:
+  push:
   schedule:
     - cron: "15 4 * * 0-4"
-  push:
-    branches:
-      - "824-finish-nightly-functional-tests"
   workflow_dispatch:
 
 jobs:
+  # Build a matrix of aliases for testing.
   build-matrix:
     name: Build Matrix
     runs-on: windows-latest
-    # This condition prevents duplicate runs.
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
     defaults:
       run:
         shell: powershell
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        # This job parses out the aliases and puts them in an array
+        # that will be used as a matrix for testing each product combination.
+      - name: Generate Matrix
+        id: generate-matrix
+        run: |
+          $params = $env:TestParams
+          # Powershell doesn't build arrays in the format that a matrix
+          # wants, so this builds it using a string instead.  It's ugly.
+          $aliases = "["
+          # Split into products
+          $products = $params.split("|")
+          foreach ($product in $products)
+          {
+            $attributes = $product.split(",")
+            foreach ($attribute in $attributes)
+            {
+              # Split the key from the value
+              $keyAndValue = $attribute.split("=")
+              $key = $keyAndValue[0]
+              $value = $keyAndValue[1]
+              if($key.ToLower() -eq "alias")
+              {
+                echo "Testing the following alias: $value"
+                $aliases += '"'
+                $aliases += $value.Trim()
+                $aliases += '",'
+              }
+            }
+          }
+          $aliases = $aliases.Substring(0, $aliases.Length-1)
+          $aliases += "]"
+          echo $aliases
+          echo aliases=$aliases >> $env:GITHUB_OUTPUT
+        env:
+          TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS_DEV }}
+    outputs:
+      aliases: ${{ steps.generate-matrix.outputs.aliases }}
+  # Use ScubaGear to test each service.
+  # This job runs once per alias in the matrix.
+  test-products:
+    name: Test
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: powershell
+    needs:
+      - build-matrix
+    strategy:
+      fail-fast: false
+      matrix:
+        # Each item in the matrix is one alias and thus should cause
+        # one step in this job.  This should make it easier to debug
+        # when a product is failing the functional tests.
+        product: ${{ fromJson(needs.build-matrix.outputs.aliases) }}
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
@@ -37,89 +95,104 @@ jobs:
         env:
           PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
       - name: Get Thumbprint
-        id: getthumbprint
+        id: get-thumbprint
         run: |
           $x509 = Get-PfxCertificate -FilePath ./key.pfx -Password (ConvertTo-SecureString -String $env:PfxPassword -AsPlainText -Force)
           $Thumbprint = $x509.ThumbPrint
           # Pass thumbprint to later job.
-          echo THUMBPRINT=$Thumbprint >> $env:GITHUB_OUTPUT
+          echo thumbprint=$Thumbprint >> $env:GITHUB_OUTPUT
         shell: pwsh # -Password flag requires PS 6+
         env:
           PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
-
-      - name: Install Selenium & Update Webdriver (an interface that allows for control of web brosers programmatically)
+      # Selenium is an interface that allows for
+      # the programmatic control of web browsers
+      - name: Install Selenium & Update Webdriver
         run: |
           Install-Module -Name Selenium -Scope CurrentUser -Force
           Import-Module -Name Selenium
           ./Testing/Functional/SmokeTest/UpdateSelenium.ps1
-          Import-Module -Name .\PowerShell\ScubaGear\ScubaGear.psd1
+          # Import-Module -Name .\PowerShell\ScubaGear\ScubaGear.psd1
+          Import-Module -Name .\PowerShell\ScubaGear
           Initialize-SCuBA
           # Workaround for Selenium. Loading psm1 instead of psd1
           Import-Module -Name (Get-Module -Name Selenium -ListAvailable).Path -Force
-      - name: Test Products
-        # The testing params are stored as a string in a CSV-like format.
-        # Pipes separate products, and commas separate key/value pairs.
-        # key1=value1,key2=value2|key3=value3,key4=value4...
-        # This job parses the keys and values and converts them to a hashtable.
+      - name: Test Product
+        id: test-product
         run: |
-          # Read thumbprint from previous job.
-          $thumbprint = "${{ steps.getthumbprint.outputs.THUMBPRINT }}"
+          # Read thumbprint from previous step.
+          $thumbprint = "${{ steps.get-thumbprint.outputs.thumbprint }}"
+          echo "Product alias is: ${{ matrix.product }}"
           $params = $env:TestParams
-          # Remove any extra spaces
-          $params = $params.replace(' ','')
-          $productsAsList = []
           # Split into products
           $products = $params.split("|")
           foreach ($product in $products)
           {
-            productsAsList.append($product)
+            [String]$alias = ""
+            [String]$domain = ""
+            [String]$display = ""
+            [String]$appid = ""
+            [String]$productname = ""
+            [String]$variant = ""
+            [String]$m365 = ""
+            $paramsAsHashTable = @{}
+            $attributes = $product.split(",")
+            foreach ($attribute in $attributes)
+            {
+              # Split the key from the value
+              $keyAndValue = $attribute.split("=")
+              $key = $keyAndValue[0]
+              $value = $keyAndValue[1]
+              if($key.ToLower() -eq "alias")
+              {
+                $alias = $value
+              }
+              elseif($key.ToLower() -eq "tenantdomain")
+              {
+                $domain = $attribute
+              }
+              elseif($key.ToLower() -eq "tenantdisplayname")
+              {
+                $display = $attribute
+              }
+              elseif($key.ToLower() -eq "appid")
+              {
+                $appid = $attribute
+              }
+              elseif($key.ToLower() -eq "productname")
+              {
+                $productname = $attribute
+              }
+              elseif($key.ToLower() -eq "variant")
+              {
+                $variant = $attribute
+              }
+              elseif($key.ToLower() -eq "m365environment")
+              {
+                $m365 = $attribute
+              }
+            }
+            if($alias -eq "${{ matrix.product }}")
+            {
+              # Split out the key and value for each parameter
+              $domainKeyAndValue = $domain.split("=")
+              $displayKeyAndValue = $display.split("=")
+              $appidKeyAndValue = $appid.split("=")
+              $productnameKeyAndValue = $productname.split("=")
+              $variantKeyAndValue = $variant.split("=")
+              $m365KeyAndValue =$m365.split("=")
+              # Add both to the hash table
+              $paramsAsHashTable.Add($domainKeyAndValue[0], $domainKeyAndValue[1])
+              $paramsAsHashTable.Add($displayKeyAndValue[0], $displayKeyAndValue[1])
+              $paramsAsHashTable.Add($appidKeyAndValue[0], $appidKeyAndValue[1])
+              $paramsAsHashTable.Add($productnameKeyAndValue[0], $productnameKeyAndValue[1])
+              if($variantKeyAndValue[0] -ne "")
+              {
+                $paramsAsHashTable.Add($variantKeyAndValue[0], $variantKeyAndValue[1])
+              }
+              $paramsAsHashTable.Add($m365KeyAndValue[0], $m365KeyAndValue[1])
+              # Test the product
+              ./Testing/Functional/Products/Tests/CallProductTests.ps1 -params $paramsAsHashTable -thumbprint $thumbprint
+            }
           }
-          echo PRODUCTS=$productsAsList >> $env:GITHUB_OUTPUT
         env:
-          TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
-    outputs:
-      matrix: ${{ steps.generate-matrix.outputs.PRODUCTS }}
-  # product-tests:
-  #   name: Product Tests
-  #   runs-on: windows-latest
-  #   defaults:
-  #     run:
-  #       shell: powershell
-  #   steps:
-  #     - name: Checkout Repo
-  #       uses: actions/checkout@v4
-      
-  #     - name: Setup for Scuba
-  #       run: ./SetUp.ps1
-  #     - name: Install Selenium
-  #       run: Install-Module -Name Selenium
-  #     - name: Update Selenium
-  #       run: ./Testing/Functional/SmokeTest/UpdateSelenium.ps1
-  #     - name: Test Products
-  #       # The testing params are stored as a string in a CSV-like format.
-  #       # Pipes separate products, and commas separate key/value pairs.
-  #       # key1=value1,key2=value2|key3=value3,key4=value4...
-  #       # This job parses the keys and values and converts them to a hashtable.
-  #       run: |
-  #         # Read thumbprint from previous job.
-  #         $thumbprint = "${{ steps.getthumbprint.outputs.THUMBPRINT }}"
-  #         $params = $env:TestParams
-  #         # Remove any extra spaces
-  #         $params = $params.replace(' ','')
-  #         # Split into products
-  #         $products = $params.split("|")
-  #         foreach ($product in $products)
-  #         {
-  #           $paramsAsHashTable = @{}
-  #           # Split into pairs
-  #           $pairs = $product.split(",")
-  #           foreach ($pair in $pairs)
-  #           {
-  #             # Split the key from the value
-  #             $keyAndValue = $pair.split("=")
-  #             $paramsAsHashTable.Add($keyAndValue[0], $keyAndValue[1])
-  #           }
-  #           ./Testing/Functional/Products/Tests/CallProductTests.ps1 -params $paramsAsHashTable -thumbprint $thumbprint
-  #         }
-  #       env:
-  #         TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
+          TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS_DEV }}
