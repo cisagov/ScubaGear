@@ -75,10 +75,6 @@ function Generate-Config {
     parameters. Additional parameters and variables not available on the
     command line can also be included in the file that will be provided to the
     tool for use in specific tests.
-    ;;;.Parameter DarkMode
-    ;;;Set switch to enable report dark mode by default.
-    ;;;.Parameter Quiet
-    ;;;Do not launch external browser for report.
     .Functionality
     Public
     #>
@@ -119,7 +115,6 @@ function Generate-Config {
         [boolean]
         $DisconnectOnExit = $false,
 
-        
         [Parameter(Mandatory = $false)]
         [ValidateNotNullOrEmpty()]
         [string]
@@ -159,20 +154,8 @@ function Generate-Config {
         [ValidateNotNullOrEmpty()]
         [string]
         $OutReportName = "BaselineReports"
-
-        #[Parameter(Mandatory = $false)]
-        #[ValidateNotNullOrEmpty()]
-        #[switch]
-        #$DarkMode,
-
-        #[Parameter(Mandatory = $false)]
-        #[switch]
-        #$Quiet
     )
 
-    write-host "Hello World!"
-    
-    #$config = @{}
     $config = New-Object ([System.Collections.specialized.OrderedDictionary])
 
     ($MyInvocation.MyCommand.Parameters ).Keys | %{
@@ -206,11 +189,11 @@ function Generate-Config {
 
     $partnerDomainImpersonationProtectionNamespace = "MS.DEFENDER.2.3v1"
 
-    
+ 
     $aadTemplate = New-Object ([System.Collections.specialized.OrderedDictionary])
     $aadCapExclusions = New-Object ([System.Collections.specialized.OrderedDictionary])
     $aadRoleExclusions = New-Object ([System.Collections.specialized.OrderedDictionary])
-    
+ 
     $defenderTemplate = New-Object ([System.Collections.specialized.OrderedDictionary])
     $defenderCommonSensitiveAccountFilter = New-Object ([System.Collections.specialized.OrderedDictionary])
     $defenderUserImpersonationProtection = New-Object ([System.Collections.specialized.OrderedDictionary])
@@ -218,11 +201,11 @@ function Generate-Config {
     $defenderPartnerDomainImpersonationProtection = New-Object ([System.Collections.specialized.OrderedDictionary])
 
 
-    
+
     $aadCapExclusions = @{ CapExclusions = @{} }
     $aadCapExclusions["CapExclusions"].add("Users", @(""))
     $aadCapExclusions["CapExclusions"].add("Groups", @(""))
-    
+
     $aadRoleExclusions = @{ RoleExclusions = @{} }
     $aadRoleExclusions["RoleExclusions"].add("Users", @(""))
     $aadRoleExclusions["RoleExclusions"].add("Groups", @(""))
@@ -232,7 +215,7 @@ function Generate-Config {
     }
 
     $aadTemplate.add($roleExclusionNamespace, $aadRoleExclusions)
-    
+
     $defenderCommonSensitiveAccountFilter = @{ SensitiveAccounts = @{} }
     $defenderCommonSensitiveAccountFilter['SensitiveAccounts'].add("IncludedUsers", @(""))
     $defenderCommonSensitiveAccountFilter['SensitiveAccounts'].add("IncludedGroups", @(""))
