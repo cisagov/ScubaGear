@@ -11,7 +11,10 @@
 
 $RequiredModulesPath = Join-Path -Path $PSScriptRoot -ChildPath "RequiredVersions.ps1"
 if (Test-Path -Path $RequiredModulesPath){
-  . $RequiredModulesPath
+    . $RequiredModulesPath
+}
+else {
+    Write-Error "Unable to find required modules path at $RequiredModulesPath"
 }
 
 if (!$ModuleList){
