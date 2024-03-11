@@ -820,8 +820,8 @@ function Merge-JsonOutput {
                 "DisplayName" = $TenantDetails.DisplayName;
                 "DomainName" = $TenantDetails.DomainName;
                 "Product" = "M365";
-                "Module" = "ScubaGear";
-                "ModuleVersion" = $ModuleVersion;
+                "Tool" = "ScubaGear";
+                "ToolVersion" = $ModuleVersion;
             }
 
             # Files to delete at the end if no errors are encountered
