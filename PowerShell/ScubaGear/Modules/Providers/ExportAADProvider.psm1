@@ -377,7 +377,7 @@ function IsPimGroup{
     )
 
     If ($null -eq [GroupType]::CheckedGroups[$GroupId]){
-        ($GroupEligibilitySchedule = Get-MgBetaIdentityGovernancePrivilegedAccessGroupEligibilitySchedule -Filter "groupId eq '$PrincipalId'") *> $null
+        ($GroupEligibilitySchedule = Get-MgBetaIdentityGovernancePrivilegedAccessGroupEligibilitySchedule -Filter "groupId eq '$GroupId'") *> $null
         [GroupType]::CheckedGroups.Add($GroupId, $GroupEligibilitySchedule.Count -eq 0)
     }
 
