@@ -11,11 +11,11 @@ on:
 jobs:
   module-version-bump:
     runs-on: windows-latest
-    env: 
+    env:
       NEW_VERSION_NUMBER: ${{ inputs.newVersionNumber }}
     permissions:
       contents: write
-      pull-requests: write 
+      pull-requests: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -26,20 +26,20 @@ jobs:
         run: |
           #
           # Replace ScubaGear module version in the manifest.
-          # 
+          #
           $ManifestPath = '.\PowerShell\ScubaGear\ScubaGear.psd1'
           $VersionRegex = "\'\d+\.\d+\.\d+\'"
           $PreviousVersion = ''
           (Get-Content -Path $ManifestPath) | ForEach-Object {
             $ModuleVersionRegex = $_ -match "ModuleVersion = $($VersionRegex)"
-            if ($ModuleVersionRegex) { 
+            if ($ModuleVersionRegex) {
                 $_ -match $VersionRegex
                 $PreviousVersion = $matches[0] -replace "'", ""
                 $_ -replace $VersionRegex, '${env:NEW_VERSION_NUMBER}'
-            } 
-           else {
+            }
+            else {
               $_
-             }
+            }
           } | Set-Content -Path $ManifestPath
 
           #
@@ -51,20 +51,20 @@ jobs:
           $ZipVerReplace = "ScubaGear-v${env:NEW_VERSION_NUMBER}" -replace '\.', '-'
           $ZipVerReplace = $ZipVerReplace + '.zip'
           (Get-Content -Path $READMEPath) | ForEach-Object {
-             $BadgeVerMatch = $_ -match $BadgeRegex
-             $ZipVerMatch = $_ -match $ZipRegex
-             if ($BadgeVerMatch) {
-                $_ -replace $BadgeRegex, "ScubaGear-v${env:NEW_VERSION_NUMBER}"
-             } 
-             elseif ($ZipVerMatch) {
-                   $_ -replace $ZipRegex, $ZipVerReplace
-             }
-             else {
-                   $_
-             }
+            $BadgeVerMatch = $_ -match $BadgeRegex
+            $ZipVerMatch = $_ -match $ZipRegex
+            if ($BadgeVerMatch) {
+              $_ -replace $BadgeRegex, "ScubaGear-v${env:NEW_VERSION_NUMBER}"
+            }
+            elseif ($ZipVerMatch) {
+              $_ -replace $ZipRegex, $ZipVerReplace
+            }
+            else {
+              $_
+            }
           } | Set-Content -Path $READMEPath
 
-          # 
+          #
           # Create the PR body
           #
           $PRTemplatePath = '.\.github\pull_request_template.md'
@@ -73,7 +73,7 @@ jobs:
           $Motivation = '<!-- Why is this change required\? -->'
           $Testing = '<!-- see how your change affects other areas of the code, etc. -->'
           $RemoveHeader = '# <!-- Use the title to describe PR changes in the imperative mood --> #'
-          
+
           $NewDescription = "- This PR was create by a GitHub Action to bump ScubaGear's module version in the manifest and the README.`n - Please fill out the rest of the template that the Action did not cover. `n"
           $NewMotivation = "- Bump ScubaGear's module version to v${env:NEW_VERSION_NUMBER} before the next release`n"
           $NewTesting = "- A human should still check if the version bumping was successful by running ScubaGear.`n"
@@ -86,23 +86,23 @@ jobs:
             $RemoveHeaderRegex = $_ -match $RemoveHeader # removes unneeded new line
             if ($DescriptionRegex) {
                   $_ -replace $Description, $NewDescription
-            } 
+            }
             elseif ($MotivationRegex) {
                   $_ -replace $Motivation, $NewMotivation
-            } 
+            }
             elseif ($TestingRegex) {
                 $_ -replace $Testing, $NewTesting
             }
             elseif ($RemoveHeaderRegex) {
-               $_ -replace $RemoveHeader, ""
+              $_ -replace $RemoveHeader, ""
             }
             else {
-                   $_ + "`n"
-                 }
+              $_ + "`n"
+            }
           }
-          
+
           # Create the PR
-          $ScubaGearVersionBumpBranch = "scubagear-version-bump-${env:NEW_VERSION_NUMBER}" 
+          $ScubaGearVersionBumpBranch = "scubagear-version-bump-${env:NEW_VERSION_NUMBER}"
           git config --global user.email "action@github.com"
           git config --global user.name "GitHub Action"
           git checkout -b $ScubaGearVersionBumpBranch
