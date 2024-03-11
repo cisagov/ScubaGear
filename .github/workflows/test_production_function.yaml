@@ -59,7 +59,7 @@ jobs:
           echo $aliases
           echo aliases=$aliases >> $env:GITHUB_OUTPUT
         env:
-          TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS_DEV }}
+          TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
     outputs:
       aliases: ${{ steps.generate-matrix.outputs.aliases }}
   # Use ScubaGear to test each service.
@@ -195,4 +195,4 @@ jobs:
             }
           }
         env:
-          TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS_DEV }}
+          TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
