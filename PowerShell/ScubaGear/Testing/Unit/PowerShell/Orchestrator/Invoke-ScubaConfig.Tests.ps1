@@ -32,6 +32,9 @@ InModuleScope Orchestrator {
                     $script:TestSplat.Add('OutFolderName', $ScubaConfig.OutFolderName)
                     $script:TestSplat.Add('OutReportName', $ScubaConfig.OutReportName)
                 }
+                Mock -ModuleName Orchestrator Merge-JsonOutput {
+                    $script:TestSplat.Add('OutJsonFileName', $ScubaConfig.OutJsonFileName)
+                }
                 function Disconnect-SCuBATenant {
                     $script:TestSplat.Add('DisconnectOnExit', $DisconnectOnExit)
                 }
@@ -62,7 +65,8 @@ InModuleScope Orchestrator {
                     }
                 }
                 [ScubaConfig]::ResetInstance()
-                Invoke-SCuBA -ConfigFilePath (Join-Path -Path $PSScriptRoot -ChildPath "orchestrator_config_test.yaml")
+                Invoke-SCuBA -ConfigFilePath (Join-Path -Path $PSScriptRoot -ChildPath "orchestrator_config_test.yaml")`
+                    -MergeJson
             }
 
             It "Verify parameter ""<parameter>"" with value ""<value>""" -ForEach @(
@@ -75,6 +79,7 @@ InModuleScope Orchestrator {
                 @{ Parameter = "OutProviderFileName";   Value = "TenantSettingsExport" },
                 @{ Parameter = "OutRegoFileName";       Value = "ScubaTestResults"     },
                 @{ Parameter = "OutReportName";         Value = "ScubaReports"         },
+                @{ Parameter = "OutJsonFileName";       Value = "ScubaResults"         },
                 @{ Parameter = "Organization";          Value = "sub.domain.com"       },
                 @{ Parameter = "AppID";                 Value = "7892dfe467aef9023be"  },
                 @{ Parameter = "CertificateThumbprint"; Value = "8A673F1087453ABC894"  }
@@ -95,7 +100,9 @@ InModuleScope Orchestrator {
                   -OutFolderName "MyReports" `
                   -OutProviderFileName "MySettingsExport" `
                   -OutRegoFileName "RegoResults" `
+                  -MergeJson:$true `
                   -OutReportName "MyReport" `
+                  -OutJsonFileName "JsonResults" `
                   -Organization "good.four.us" `
                   -AppID "1212121212121212121" `
                   -CertificateThumbprint "AB123456789ABCDEF01" `
@@ -112,6 +119,7 @@ InModuleScope Orchestrator {
                 @{ Parameter = "OutProviderFileName";   Value = "MySettingsExport"     },
                 @{ Parameter = "OutRegoFileName";       Value = "RegoResults"          },
                 @{ Parameter = "OutReportName";         Value = "MyReport"             },
+                @{ Parameter = "OutJsonFileName";       Value = "JsonResults"          },
                 @{ Parameter = "Organization";          Value = "good.four.us"         },
                 @{ Parameter = "AppID";                 Value = "1212121212121212121"  },
                 @{ Parameter = "CertificateThumbprint"; Value = "AB123456789ABCDEF01"  }
