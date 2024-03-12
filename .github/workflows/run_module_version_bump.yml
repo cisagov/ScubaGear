@@ -33,9 +33,9 @@ jobs:
           (Get-Content -Path $ManifestPath) | ForEach-Object {
             $ModuleVersionRegex = $_ -match "ModuleVersion = $($VersionRegex)"
             if ($ModuleVersionRegex) {
-                $_ -match $VersionRegex
+                $_ -match $VersionRegex | Out-Null
                 $PreviousVersion = $matches[0] -replace "'", ""
-                $_ -replace $VersionRegex, '${env:NEW_VERSION_NUMBER}'
+                $_ -replace $VersionRegex, "'${env:NEW_VERSION_NUMBER}'"
             }
             else {
               $_
