@@ -78,7 +78,6 @@ jobs:
           $NewMotivation = "- Bump ScubaGear's module version to v${env:NEW_VERSION_NUMBER} before the next release`n"
           $NewTesting = "- A human should still check if the version bumping was successful by running ScubaGear.`n"
 
-          $Body = "This is a test body fear me"
           $PRTemplateContent = (Get-Content -Path $PRTemplatePath) | ForEach-Object {
             $DescriptionRegex = $_ -match $Description
             $MotivationRegex = $_ -match $Motivation
