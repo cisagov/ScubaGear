@@ -1,5 +1,5 @@
 package aad
-import future.keywords
+import rego.v1
 import data.utils.report.NotCheckedDetails
 import data.utils.report.CheckedSkippedDetails
 import data.utils.report.ReportDetailsBoolean

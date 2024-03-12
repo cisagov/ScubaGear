@@ -1,5 +1,5 @@
 package utils.aad
-import future.keywords
+import rego.v1
 import data.utils.report.ArraySizeStr
 import data.utils.report.Description
 import data.utils.key.IsEmptyContainer

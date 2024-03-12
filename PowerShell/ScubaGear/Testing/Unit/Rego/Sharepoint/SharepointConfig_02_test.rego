@@ -1,5 +1,5 @@
 package sharepoint_test
-import future.keywords
+import rego.v1
 import data.sharepoint
 import data.utils.key.TestResult
 import data.utils.key.FAIL

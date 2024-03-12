@@ -1,5 +1,5 @@
 package defender
-import future.keywords
+import rego.v1
 import data.utils.report.NotCheckedDetails
 import data.utils.report.ReportDetailsBoolean
 import data.utils.report.ReportDetailsString
@@ -23,21 +23,23 @@ import data.utils.defender.ApplyLicenseWarning
 #--
 
 # Return string based on boolean result of Standard & Strict conditions
-ReportDetails1_1(true, true) := PASS if {}
+ReportDetails1_1(true, true) := PASS
 
-ReportDetails1_1(false, true) := "Standard preset policy is disabled" if {}
+ReportDetails1_1(false, true) := "Standard preset policy is disabled"
 
-ReportDetails1_1(true, false) := "Strict preset policy is disabled" if {}
+ReportDetails1_1(true, false) := "Strict preset policy is disabled"
 
-ReportDetails1_1(false, false) := "Standard and Strict preset policies are both disabled" if {}
+ReportDetails1_1(false, false) := "Standard and Strict preset policies are both disabled"
 
 # Parse through all items in Policies, if item identity is the one
 # we want & state is enabled, save item. Return number of items saved.
-GetEnabledPolicies(Policies, Identity) := count([Policy |
-    some Policy in Policies
-    Policy.Identity == Identity
-    Policy.State == "Enabled"
-]) > 0
+GetEnabledPolicies(Policies, Identity) := true if
+    count([Policy |
+        some Policy in Policies
+        Policy.Identity == Identity
+        Policy.State == "Enabled"
+    ]) > 0
+else := false
 
 # For this one you need to check both:
 # - Get-EOPProtectionPolicyRule
@@ -96,13 +98,14 @@ tests contains {
 # Parse through all items in Policies, if item identity is the one
 # we want & Users (SentTo) + Groups (SentToMemberOf) + Domains (RecipientDomainIs) are null,
 # save item. Return number of items saved.
-AllRecipient(Policies, Identity) := count([Policy |
+AllRecipient(Policies, Identity) := true if count([Policy |
     some Policy in Policies
-    Policy.Identity == Identity
-    Policy.SentTo == null
-    Policy.SentToMemberOf == null
-    Policy.RecipientDomainIs == null
-]) > 0
+        Policy.Identity == Identity
+        Policy.SentTo == null
+        Policy.SentToMemberOf == null
+        Policy.RecipientDomainIs == null
+    ]) > 0
+else := false
 
 # If "Apply protection to" is set to "All recipients":
 # - The policy will be included in the list output by

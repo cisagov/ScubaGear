@@ -38,6 +38,7 @@ class ScubaConfig {
             "Hybrid Identity Administrator",
             "Application Administrator",
             "Cloud Application Administrator")
+        DefaultOPAVersion = '0.61.0'
     }
 
     static [object]ScubaDefault ([string]$Name){
