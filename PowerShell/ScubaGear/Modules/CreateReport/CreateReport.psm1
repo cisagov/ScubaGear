@@ -186,8 +186,8 @@ function New-Report {
         # Create an array of custom objects for each SKU
         $LicenseInfoArray = $SettingsExport.license_information | ForEach-Object {
             [pscustomobject]@{
-                "SKU Part Number" = $_.SkuPartNumber
-                "Used Licenses" = $_.ConsumedUnits
+                "License SKU Identifier" = $_.SkuPartNumber
+                "Licenses in Use" = $_.ConsumedUnits
                 "Total Licenses" = $_.PrepaidUnits.Enabled
             }
         }
@@ -195,7 +195,7 @@ function New-Report {
         $LicenseTable = $LicenseInfoArray | ConvertTo-Html -As Table -Fragment
 
         # Create a section header for the licensing information
-        $LicensingHTML = "<h2>Licensing Information</h2>" + $LicenseTable
+        $LicensingHTML = "<h2>Tenant Licensing Information</h2>" + $LicenseTable
         $ReportHTML = $ReportHTML.Replace("{LICENSING_INFO}", $LicensingHTML)
         $CapJson = ConvertTo-Json $SettingsExport.cap_table_data
     }
