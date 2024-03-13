@@ -203,6 +203,9 @@ function Get-PrivilegedUser {
                 if (-Not $PrivilegedUsers.ContainsKey($User.Id)) {
                     $AADUser = Get-MgBetaUser -ErrorAction Stop -UserId $User.Id
                     $PrivilegedUsers[$AADUser.Id] = @{"DisplayName"=$AADUser.DisplayName; "OnPremisesImmutableId"=$AADUser.OnPremisesImmutableId; "roles"=@()}
+
+                    # Add user to cache that reduces unnecessary processing when iterating PIM Groups in the IsPimGroup function
+                    [GroupTypeCache]::AddNongroup($User.Id)
                 }
                 # If the current role has not already been added to the user's roles array then add the role
                 if ($PrivilegedUsers[$User.Id].roles -notcontains $Role.DisplayName) {
@@ -223,6 +226,9 @@ function Get-PrivilegedUser {
                         if (-Not $PrivilegedUsers.ContainsKey($GroupMember.Id)) {
                             $AADUser = Get-MgBetaUser -ErrorAction Stop -UserId $GroupMember.Id
                             $PrivilegedUsers[$AADUser.Id] = @{"DisplayName"=$AADUser.DisplayName; "OnPremisesImmutableId"=$AADUser.OnPremisesImmutableId; "roles"=@()}
+
+                            # Add user to cache that reduces unnecessary processing when iterating PIM Groups in the IsPimGroup function
+                            [GroupTypeCache]::AddNongroup($GroupMember.Id)
                         }
                         # If the current role has not already been added to the user's roles array then add the role
                         if ($PrivilegedUsers[$GroupMember.Id].roles -notcontains $Role.DisplayName) {
@@ -280,9 +286,6 @@ function Get-PrivilegedUser {
                     if ($PrivilegedUsers[$UserObjectId].roles -notcontains $Role.DisplayName) {
                         $PrivilegedUsers[$UserObjectId].roles += $Role.DisplayName
                     }
-
-                    # At this point we know $UserObjectId is not a group so set cache for processing privileged roles associated with PIM Groups
-                    [GroupTypeCache]::AddNongroup($UserObjectId)
                 }
                 # Catch the specific error which indicates Get-MgBetaUser does not find the user, therefore it is a group
                 catch {
