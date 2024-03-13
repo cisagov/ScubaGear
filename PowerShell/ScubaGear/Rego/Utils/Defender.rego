@@ -222,6 +222,10 @@ ApplyLicenseWarningString(Status,_) := concat(" ", [ReportDetailsBoolean(Status)
     ])
 }
 
+DLPLicenseWarningString(Status, String) := ReportDetailsString(Status, String) if {
+    input.dlp_license == true
+}
+
 DLPLicenseWarningString(Status,_) := concat(" ", [ReportDetailsBoolean(Status), LicenseWarning]) if {
     input.dlp_license == false
     LicenseWarning := concat(" ", [
