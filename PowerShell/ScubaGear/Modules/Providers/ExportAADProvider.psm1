@@ -280,6 +280,9 @@ function Get-PrivilegedUser {
                     if ($PrivilegedUsers[$UserObjectId].roles -notcontains $Role.DisplayName) {
                         $PrivilegedUsers[$UserObjectId].roles += $Role.DisplayName
                     }
+
+                    # At this point we know $UserObjectId is not a group so set cache for processing privileged roles associated with PIM Groups
+                    [GroupTypeCache]::AddNongroup($UserObjectId)
                 }
                 # Catch the specific error which indicates Get-MgBetaUser does not find the user, therefore it is a group
                 catch {
@@ -364,8 +367,11 @@ function AddRuleSource{
     }
 }
 
-class GroupType{
+class GroupTypeCache{
     static [hashtable]$CheckedGroups = @{}
+    static [void]AddNongroup([string]$Id){
+        [GroupTypeCache]::CheckedGroups[$id] = $false
+    }
 }
 
 function IsPimGroup{
@@ -376,12 +382,12 @@ function IsPimGroup{
         $GroupId
     )
 
-    If ($null -eq [GroupType]::CheckedGroups[$GroupId]){
+    If ($null -eq [GroupTypeCache]::CheckedGroups[$GroupId]){
         ($GroupEligibilitySchedule = Get-MgBetaIdentityGovernancePrivilegedAccessGroupEligibilitySchedule -Filter "groupId eq '$GroupId'") *> $null
-        [GroupType]::CheckedGroups.Add($GroupId, $GroupEligibilitySchedule.Count -eq 0)
+        [GroupTypeCache]::CheckedGroups.Add($GroupId, $GroupEligibilitySchedule.Count -eq 0)
     }
 
-    [GroupType]::CheckedGroups[$GroupId]
+    [GroupTypeCache]::CheckedGroups[$GroupId]
 }
 
 function FindRulesForPimGroupsRoles{
@@ -514,6 +520,9 @@ function Get-PrivilegedRole {
         FindRulesForRoles -AADRoles $AADRoles -AllRoleAssignments $AllRoleAssignments
         FindRulesForPimGroupsRoles -AADRoles $AADRoles -AllRoleAssignments $AllRoleAssignments
     }
+
+    # We are clearing cached values used to identify groups vs non-groups (i.e. user, service principal)
+    [GroupTypeCache]::CheckedGroups.Clear()
 
     $AADRoles
 }
