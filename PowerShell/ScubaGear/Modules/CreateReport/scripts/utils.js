@@ -51,3 +51,49 @@ const toggleDarkMode = () => {
         setDarkMode('false');
     }
 }
+
+/**
+ * For each table present in a report, the function adds scope attributes for columns and rows. 
+ */
+const applyScopeAttributes = () => {
+    try {
+        const tables = document.querySelectorAll("table");
+        for(let i = 0; i < tables.length; i++) {
+            // each table has two children, <colgroup> and <tbody>
+            let tbody = tables[i].querySelector("tbody");
+            if(!tbody) throw new Error(
+                `Invalid HTML structure, <table id='${tables[i].getAttribute("id")}'> does not have a <tbody> tag.`
+            );
+            
+            /**
+             * the first <tr> in <tbody> represents columns. Label each nested <th> as scope="col"
+             * 
+             * second <tr> + ... are the rows
+             * for each <tr>, the first <td> should be labeled as scope="row", leave the rest
+             */
+            let cols, rows;
+            if(tbody.children && tbody.children.length > 1) {
+                cols = tbody.children[0].querySelectorAll("th");
+                for(let th = 0; th < cols.length; th++) {
+                    cols[th].setAttribute("scope", "col");
+                }
+
+                // change location of scope="row" if necessary (may have to adjust for structure of license info?)
+                let trIdx = (tables[i].classList.contains("caps_table")) ? 1 : 0;
+
+                // skip column <tr>; for each remaining <tr> set the scope 
+                rows = tbody.children;
+                for(let tr = 1; tr < rows.length; tr++) {
+                    rows[tr].querySelectorAll("td")[trIdx].setAttribute("scope", "row");
+                }
+            }
+            else throw new Error(
+                `Unable to apply scope attributes to columns/rows, 
+                <tbody> of <table id='${tables[i].getAttribute("id")}'> does not contain children or has no rows.`
+            );
+        }
+    }
+    catch (error) {
+        console.error(`Error in applyScopeAttributes, ${error}`);
+    }
+}
