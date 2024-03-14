@@ -151,11 +151,6 @@ agency, facilitating phishing attacks. Publishing an SPF policy for each agency 
 
 ### Implementation
 
-#### MS.EXO.2.1v1 Instructions
-Identify any approved senders specific to your agency.
-Additionally, see [External DNS records required for SPF](https://learn.microsoft.com/en-us/microsoft-365/enterprise/external-domain-name-system-records?view=o365-worldwide#external-dns-records-required-for-spf) for
-inclusions required for Microsoft to send email on behalf of your domain.
-
 #### MS.EXO.2.2v1 Instructions
 SPF is not configured through the Exchange admin center, but rather via
 DNS records hosted by the agency's domain. Thus, the exact steps needed
