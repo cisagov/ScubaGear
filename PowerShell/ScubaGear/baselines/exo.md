@@ -118,7 +118,7 @@ points.
 ### Policies
 
 #### MS.EXO.2.2v1
-An SPF policy SHALL be published for each domain, designating only these addresses as approved senders.
+An SPF policy SHALL be published for each domain that fails all non-approved senders.
 
 <!--Policy: MS.EXO.2.2v1; Criticality: SHALL -->
 - _Rationale:_ An adversary may modify the `FROM` field
