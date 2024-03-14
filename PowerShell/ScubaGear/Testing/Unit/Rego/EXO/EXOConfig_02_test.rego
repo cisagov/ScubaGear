@@ -139,6 +139,22 @@ test_Rdata_Multiple_Correct_V2 if {
     TestResult("MS.EXO.2.1v1", Output, PASS, true) == true
 }
 
+test_Rdata_Multiple_Correct_V3 if {
+    # Test SPF redirect
+    PolicyId := "MS.EXO.2.1v1"
+    Output := exo.tests with input as {
+        "spf_records": [
+            {
+                "domain": "test1.name",
+                "rdata": ["v=spf1 redirect=_spf.example.com"]
+            }
+        ],
+        "domains": ["test1.name"]
+    }
+
+    TestResult("MS.EXO.2.1v1", Output, PASS, true) == true
+}
+
 test_Rdata_Multiple_Incorrect if {
     Output := exo.tests with input as {
         "spf_records": [
