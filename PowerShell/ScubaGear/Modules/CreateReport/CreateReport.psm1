@@ -170,6 +170,9 @@ function New-Report {
         $MarkdownLink = "<a class='control_group' href=`"$($ScubaGitHubUrl)/blob/v$($SettingsExport.module_version)/PowerShell/ScubaGear/baselines/$($BaselineName.ToLower()).md$GroupAnchor`" target=`"_blank`">$Name</a>"
         $Fragments += $Fragment | ConvertTo-Html -PreContent "<h2>$Number $MarkdownLink</h2>" -Fragment
         $ReportJson.Results += $Fragment
+
+        # Regex will filter out any <table> tags without an id attribute (replace new fragments only, not <table> tags which have already been modified)
+        $Fragments = $Fragments -replace ".*(<table(?![^>]+id)*>)", "<table class='policy-data' id='$Number' style = 'text-align:center;'>"
     }
 
     # Craft the json report
