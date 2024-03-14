@@ -54,21 +54,6 @@ tests contains {
 # MS.EXO.2.1v1
 #--
 
-# At this time we are unable to test for approved IP addresses for sending mail
-tests contains {
-    "PolicyId": "MS.EXO.2.1v1",
-    "Criticality": "Shall/Not-Implemented",
-    "Commandlet": [],
-    "ActualValue": [],
-    "ReportDetails": NotCheckedDetails("MS.EXO.2.1v1"),
-    "RequirementMet": false
-}
-#--
-
-#
-# MS.EXO.2.2v1
-#--
-
 # Loop through domain DNS responses & loop through the policies associated
 # with the domain. Save the records that start with string "v=spf1". If
 # records does not exist, save domain name in DomainsWithoutSpf array.
@@ -79,7 +64,7 @@ DomainsWithoutSpf contains DNSResponse.domain if {
 }
 
 tests contains {
-    "PolicyId": "MS.EXO.2.2v1",
+    "PolicyId": "MS.EXO.2.1v1",
     "Criticality": "Shall",
     "Commandlet": ["Get-ScubaSpfRecord", "Get-AcceptedDomain"],
     "ActualValue": Domains,
