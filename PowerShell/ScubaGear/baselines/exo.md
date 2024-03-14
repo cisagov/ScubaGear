@@ -117,13 +117,6 @@ points.
 
 ### Policies
 
-#### MS.EXO.2.1v1
-A list of approved IP addresses for sending mail SHALL be maintained.
-
-<!--Policy: MS.EXO.2.1v1; Criticality: SHALL -->
-- _Rationale:_ Failing to maintain an accurate list of authorized IP addresses may result in spoofed email messages or failure to deliver legitimate messages when SPF is enabled. Maintaining such a list helps ensure that unauthorized servers sending spoofed messages can be detected, and permits message delivery from legitimate senders.
-- _Last modified:_ June 2023
-
 #### MS.EXO.2.2v1
 An SPF policy SHALL be published for each domain, designating only these addresses as approved senders.
 
