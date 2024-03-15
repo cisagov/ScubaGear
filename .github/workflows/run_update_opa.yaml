@@ -3,7 +3,7 @@ name: Update OPA executable version if necessary
 # Run this workflow M-F at 2:11 a.m UTC 10:11 p.m Eastern Daylight Time
 on:
     schedule:
-    - cron: "11 2 * * 1-5"
+        - cron: "11 2 * * 1-5"
     workflow_dispatch:
 
 jobs:
@@ -72,7 +72,7 @@ jobs:
                 echo updaterequired=$UpdateRequired >> $env:GITHUB_OUTPUT
                 echo currentopaversion=$CurrentOPAVersion >> $env:GITHUB_OUTPUT
 
-                # Note that git-ls will always fail with exit code 1 when the branch does not exist. 
+                # Note that git-ls will always fail with exit code 1 when the branch does not exist.
                 # Setting exit 0 (success) at the end of this workflow to prevent that error
                 exit 0
 
@@ -151,7 +151,7 @@ jobs:
               run: |
                 $LatestOPAVersion = "${{ steps.determine-update-required.outputs.latestopaversion }}"
                 $CurrentOPAVersion = "${{ steps.determine-update-required.outputs.currentopaversion }}"
-                $OPAVersionBumpBranch = "${{ steps.determine-update-required.outputs.opaversionbumpbranch }}" 
+                $OPAVersionBumpBranch = "${{ steps.determine-update-required.outputs.opaversionbumpbranch }}"
 
                 #
                 # Create the PR Body
