@@ -62,7 +62,7 @@ jobs:
                     Write-Output "OPA version update required."
                 }
                 else {
-                    Write-Output "OPA version update is not required. Update branch already exists or OPA version already up to date."
+                    Write-Output "OPA version update is not required. Update branch already exists or OPA version is already up to date."
                 }
                 Write-Output "Current ScubaGear default OPA Version: v$($CurrentOPAVersion) Latest OPA version: v$($LatestOPAVersion)"
 
