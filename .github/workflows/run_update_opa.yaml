@@ -1,0 +1,198 @@
+name: Update OPA executable version if necessary
+
+# Run this workflow M-F at 2:11 a.m UTC 10:11 p.m Eastern Daylight Time
+on:
+    schedule:
+    - cron: "11 2 * * 1-5"
+    workflow_dispatch:
+
+jobs:
+    update-opa-dependency:
+        runs-on: windows-latest
+        permissions:
+            contents: write
+            pull-requests: write
+        env:
+            GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Determine if OPA update is required
+              id: determine-update-required
+              continue-on-error: true
+              shell: powershell
+              run: |
+                $UpdateRequired = $false
+                $LatestOPAVersion = Invoke-RestMethod -Uri "https://api.github.com/repos/open-policy-agent/opa/releases/latest" | Select-Object -ExpandProperty tag_name
+                $LatestOPAVersion = $LatestOPAVersion -replace "v", ""
+
+                # Check if there is already an update branch
+                $OPAVersionBumpBranch = "opa-version-bump-$($LatestOPAVersion)"
+                $Temp = git ls-remote --exit-code --heads origin $OPAVersionBumpBranch
+                $OPAVersionBranchExists = $false
+                if ($LASTEXITCODE -eq 0) {
+                    $OPAVersionBranchExists = $true
+                }
+
+                # Check if our current OPA version is outdated
+                $OPAVersionPath = '.\PowerShell\ScubaGear\Modules\Support\Support.psm1'
+                $OPAVerRegex = "\'\d+\.\d+\.\d+\'"
+                $ExpectedVersionPattern = "ExpectedVersion = $OPAVerRegex"
+                $SupportModule = Get-Content $OPAVersionPath -Raw
+
+                # Find our current OPA version using some dirty string
+                # manipulation
+                $ScubaConfigPath = '.\PowerShell\ScubaGear\Modules\ScubaConfig\ScubaConfig.psm1'
+                $OPAVerRegex = "\'\d+\.\d+\.\d+\'"
+                $DefaultVersionPattern = "DefaultOPAVersion = $OPAVerRegex"
+                $ScubaConfigModule = Get-Content $ScubaConfigPath -Raw
+                $CurrentOPAVersion = '0.0.0'
+                if ($ScubaConfigModule -match $DefaultVersionPattern) {
+                    $CurrentOPAVersion = ($Matches[0] -split "=")[1] -replace " ", ""
+                    $CurrentOPAVersion = $CurrentOPAVersion -replace "'", ""
+                }
+
+                if (($LatestOPAVersion -gt $CurrentOPAVersion) -and (-not $OPAVersionBranchExists)) {
+                    $UpdateRequired = $true
+                }
+
+
+                if ($UpdateRequired) {
+                    Write-Output "OPA version update required."
+                }
+                else {
+                    Write-Output "OPA version update is not required. Update branch already exists or OPA version already up to date."
+                }
+                Write-Output "Current ScubaGear default OPA Version: v$($CurrentOPAVersion) Latest OPA version: v$($LatestOPAVersion)"
+
+                # pass variables to the next steps
+                echo latestopaversion=$LatestOPAVersion >> $env:GITHUB_OUTPUT
+                echo opaversionbumpbranch=$OPAVersionBumpBranch >> $env:GITHUB_OUTPUT
+                echo updaterequired=$UpdateRequired >> $env:GITHUB_OUTPUT
+                echo currentopaversion=$CurrentOPAVersion >> $env:GITHUB_OUTPUT
+
+                # Note that git-ls will always fail with exit code 1 when the branch does not exist. 
+                # Setting exit 0 (success) at the end of this workflow to prevent that error
+                exit 0
+
+            - name: Update OPA version in ScubaGear
+              id: update-opa-version
+              if: steps.determine-update-required.outputs.updaterequired == 'true'
+              run: |
+                $LatestOPAVersion = "${{ steps.determine-update-required.outputs.latestopaversion }}"
+                $CurrentOPAVersion = "${{ steps.determine-update-required.outputs.currentopaversion }}"
+
+                # Replace Default version in Config Module
+                $ScubaConfigPath = '.\PowerShell\ScubaGear\Modules\ScubaConfig\ScubaConfig.psm1'
+                $OPAVerRegex = "\'\d+\.\d+\.\d+\'"
+                $DefaultVersionPattern = "DefaultOPAVersion = $OPAVerRegex"
+                $ScubaConfigModule = Get-Content $ScubaConfigPath -Raw
+                if ($ScubaConfigModule -match $DefaultVersionPattern) {
+                    $Content = $ScubaConfigModule -replace $DefaultVersionPattern, "DefaultOPAVersion = '$LatestOPAVersion'"
+                    Set-Content -Path $ScubaConfigPath -Value $Content -NoNewline
+                }
+                else {
+                    throw "Fatal Error: Couldn't find the default OPA version in the ScubaConfig."
+                }
+
+                # Update Acceptable Versions in Support Module
+                $SupportModulePath = '.\PowerShell\ScubaGear\Modules\Support\Support.psm1'
+                $MAXIMUM_VER_PER_LINE = 4 # Handle long lines of acceptable versions
+                $END_VERSIONS_COMMENT = "# End Versions" # EOL comment in the PowerShell file
+                $EndAcceptableVerRegex = ".*$END_VERSIONS_COMMENT"
+                $DefaultOPAVersionVar = "[ScubaConfig]::ScubaDefault('DefaultOPAVersion')"
+
+                (Get-Content -Path $SupportModulePath) | ForEach-Object {
+                    $EndAcceptableVarMatch = $_ -match $EndAcceptableVerRegex
+                    if ($EndAcceptableVarMatch) {
+                        $VersionsLength = ($_ -split ",").length
+
+                        # Split the line if we reach our version limit per line
+                        # in the the file. This is to prevent long lines.
+                        if ($VersionsLength -gt $MAXIMUM_VER_PER_LINE) {
+                            # Splitting lines; Current and latest OPA Version will start on the next line
+                            $VersionsArr = $_ -split ","
+                            # Create a new line
+                            # Then add the new version on the next line
+                            ($VersionsArr[0..($VersionsArr.Length-2)] -join ",") + ","
+                            "    '$CurrentOPAVersion', $DefaultOPAVersionVar $END_VERSIONS_COMMENT" # 4 space indentation
+                        }
+                        else {
+                            # No Splitting lines; Appending new Current OPA version to acceptable version
+                            $VersionsArr = $_ -split ","
+                            $NewVersions = ($VersionsArr[0..($VersionsArr.Length-2)] -join ",")
+                            $NewVersions + ", '$CurrentOPAVersion'" + ", $DefaultOPAVersionVar $END_VERSIONS_COMMENT"
+                        }
+                    }
+                    else {
+                        $_
+                    }
+                } | Set-Content $SupportModulePath
+
+                #
+                # Replace latest supported OPA version in the README
+                #
+                $READMEPath = '.\README.md'
+                $LatestOPAVerRegex = ".*OPA version \(Currently v\d+\.\d+\.\d+\)"
+                $READMEContent = Get-Content -Path $READMEPath -Raw
+                Set-Content -Path $READMEPath -Value $Content
+                if ($READMEContent -match $LatestOPAVerRegex) {
+                    Write-Output "OPA versioning found in the README. Replacing"
+                    $NewContent = $READMEContent -replace $LatestOPAVerRegex, "2. Look for the latest OPA version (Currently v$LatestOPAVersion)"
+                    Set-Content -Path $READMEPath -Value $NewContent -NoNewline
+                }
+                else {
+                    Write-Output "No OPA versioning was found in the README. Check to see if something changed."
+                }
+
+            - name: Create the OPA update PR
+              if: steps.determine-update-required.outputs.updaterequired == 'true'
+              run: |
+                $LatestOPAVersion = "${{ steps.determine-update-required.outputs.latestopaversion }}"
+                $CurrentOPAVersion = "${{ steps.determine-update-required.outputs.currentopaversion }}"
+                $OPAVersionBumpBranch = "${{ steps.determine-update-required.outputs.opaversionbumpbranch }}" 
+
+                #
+                # Create the PR Body
+                #
+                $PRTemplatePath = '.\.github\pull_request_template.md'
+
+                $Description = '<!-- Describe the "what" of your changes in detail. -->'
+                $Motivation = '<!-- Why is this change required\? -->'
+                $Testing = '<!-- see how your change affects other areas of the code, etc. -->'
+                $RemoveHeader = '# <!-- Use the title to describe PR changes in the imperative mood --> #'
+
+                $NewDescription = "- This PR was create by a GitHub Action to bump ScubaGear's Open Policy Agent (OPA) executable version dependency.`n - Please fill out the rest of the template that the Action did not cover. `n"
+                $NewMotivation = "- Bump to the latest OPA version v$($LatestOPAVersion) `n"
+                $NewTesting = "- Currently a human should still check if bumping the OPA version affects ScubaGear.`n"
+
+                $Body = "This is a test body fear me"
+                $PRTemplateContent = (Get-Content -Path $PRTemplatePath) | ForEach-Object {
+                    $DescriptionRegex = $_ -match $Description
+                    $MotivationRegex = $_ -match $Motivation
+                    $TestingRegex = $_ -match $Testing
+                    $RemoveHeaderRegex = $_ -match $RemoveHeader # removes unneeded new line
+                    if ($DescriptionRegex) {
+                        $_ -replace $Description, $NewDescription
+                    }
+                    elseif ($MotivationRegex) {
+                        $_ -replace $Motivation, $NewMotivation
+                    }
+                    elseif ($TestingRegex) {
+                        $_ -replace $Testing, $NewTesting
+                    }
+                    elseif ($RemoveHeaderRegex) {
+                    $_ -replace $RemoveHeader, ""
+                    }
+                    else {
+                        $_ + "`n"
+                        }
+                }
+                git config --global user.email "action@github.com"
+                git config --global user.name "GitHub Action"
+                git checkout -b "$($OPAVersionBumpBranch)"
+                git add .
+                git commit -m "Bump OPA version from v$($CurrentOPAVersion) to  v$($LatestOPAVersion)"
+                git push origin $OPAVersionBumpBranch
+                gh pr create -B main -H $OPAVersionBumpBranch --title "Bump OPA version from v$($CurrentOPAVersion) to v$($LatestOPAVersion)" --body "${PRTemplateContent}" --label "version bump"
