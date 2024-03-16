@@ -378,7 +378,7 @@ PhishingResistantMFA contains CAPolicy.DisplayName if {
 tests contains {
     "PolicyId": "MS.AAD.3.6v1",
     "Criticality": "Shall",
-    "Commandlet": ["Get-MgBetaSubscribedSku", "Get-PrivilegedRole", "Get-MgBetaIdentityConditionalAccessPolicy"],
+    "Commandlet": ["Get-MgBetaIdentityConditionalAccessPolicy"],
     "ActualValue": PhishingResistantMFA,
     "ReportDetails": concat(". ", [ReportFullDetailsArray(PhishingResistantMFA, DescriptionString), CAPLINK]),
     "RequirementMet": Status
