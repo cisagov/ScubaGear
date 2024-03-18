@@ -9,7 +9,6 @@ name: Nightly Product Functional Tests
 # Run this workflow at 12:15 am
 # on every Sun to Thr (b/c GMT -5)
 on:
-  push:
   schedule:
     - cron: "15 4 * * 0-4"
   workflow_dispatch:
