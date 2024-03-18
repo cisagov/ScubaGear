@@ -163,7 +163,7 @@ jobs:
                 $Testing = '<!-- see how your change affects other areas of the code, etc. -->'
                 $RemoveHeader = '# <!-- Use the title to describe PR changes in the imperative mood --> #'
 
-                $NewDescription = "- This PR was create by a GitHub Action to bump ScubaGear's Open Policy Agent (OPA) executable version dependency.`n - Please fill out the rest of the template that the Action did not cover. `n"
+                $NewDescription = "- This pull request was created by a GitHub Action to bump ScubaGear's Open Policy Agent (OPA) executable version dependency.`n - Please fill out the rest of the template that the Action did not cover. `n"
                 $NewMotivation = "- Bump to the latest OPA version v$($LatestOPAVersion) `n"
                 $NewTesting = "- Currently a human should still check if bumping the OPA version affects ScubaGear.`n"
 
