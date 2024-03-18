@@ -65,44 +65,62 @@ function Publish-ScubaGearModule{
     Optional module version.  If provided it will use as module version. Otherwise, the current version from the manifest with a revision number is added instead.
     #>
     param (
+        [Parameter(ParameterSetName = 'PublicGallery')]
+        [Parameter(ParameterSetName = 'PrivateGallery')]
         [Parameter(Mandatory=$true)]
         [ValidateScript({[uri]::IsWellFormedUriString($_, 'Absolute') -and ([uri] $_).Scheme -in 'https'})]
         [System.Uri]
         $AzureKeyVaultUrl,
+        [Parameter(ParameterSetName = 'PublicGallery')]
+        [Parameter(ParameterSetName = 'PrivateGallery')]
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [string]
         $CertificateName,
+        [Parameter(ParameterSetName = 'PublicGallery')]
+        [Parameter(ParameterSetName = 'PrivateGallery')]
         [Parameter(Mandatory=$true)]
         [ValidateScript({Test-Path -Path $_ -PathType Container})]
         [string]
         $ModulePath,
+        [Parameter(ParameterSetName = 'PublicGallery')]
+        [Parameter(ParameterSetName = 'PrivateGallery')]
         [Parameter(Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
         [string]
         $GalleryName = 'PrivateScubaGearGallery',
+        [Parameter(ParameterSetName = 'PublicGallery')]
+        [Parameter(ParameterSetName = 'PrivateGallery')]
         [Parameter(Mandatory=$false)]
         [AllowEmptyString()]
         [string]
         $OverrideModuleVersion = "",
+        [Parameter(ParameterSetName = 'PublicGallery')]
+        [Parameter(ParameterSetName = 'PrivateGallery')]
+        [Parameter(Mandatory=$false)]
+        [AllowEmptyString()]
+        [string]
+        $PrereleaseTag = "",
+        [Parameter(ParameterSetName = 'PublicGallery')]
         [Parameter(Mandatory=$false)]
         [ValidateNotNullOrEmpty()]
         [string]
-        $PrereleaseTag = ""
+        $NuGetApiKey
     )
 
-    $BuildSplat = @{
-        ModulePath = $ModulePath
-        OverrideModuleVersion = $OverrideModuleVersion
-    }
-
-    if (-Not [string]::IsNullOrEmpty($PrereleaseTag)){
-        $BuildSplat.Add('PrereleaseTag', $PrereleaseTag)
-    }
-    $ModuleBuildPath = Build-ScubaModule @BuildSplat
+    $ModuleBuildPath = Build-ScubaModule -ModulePath $ModulePath -OverrideModuleVersion $OverrideModuleVersion -PrereleaseTag $PrereleaseTag
 
     if (SignScubaGearModule -AzureKeyVaultUrl $AzureKeyVaultUrl -CertificateName $CertificateName -ModulePath $ModuleBuildPath){
-        Publish-Module -Path $ModuleBuildPath -Repository $GalleryName
+        $PublishSplat = @{
+            Path = $ModuleBuildPath
+            Repository = $GalleryName
+        }
+
+        if ($GalleryName -eq 'PSGallery'){
+            $PublishSplat.Add('NuGetApiKey', $NuGetApiKey)
+        }
+
+        Publish-Module @PublishSplat
     }
     else {
         Write-Error "Failed to sign module."
@@ -172,12 +190,13 @@ function ConfigureScubaGearModule{
         $ModuleVersion = "$CurrentModuleVersion.$TimeStamp"
     }
 
+    # Tags cannot contain spaces
     $ManifestUpdates = @{
         Path = $ManifestPath
         ModuleVersion = $ModuleVersion
         ProjectUri = "https://github.com/cisagov/ScubaGear"
         LicenseUri = "https://github.com/cisagov/ScubaGear/blob/main/LICENSE"
-        Tags = 'CISA', 'Microsoft 365', 'O365', 'Microsoft Entra Id', 'Configuration', 'Exchange', 'Report', 'Security', 'SharePoint', 'Defender', 'Teams', 'PowerPlatform', 'OneDrive'
+        Tags = 'CISA', 'O365', 'M365', 'AzureAD', 'Configuration', 'Exchange', 'Report', 'Security', 'SharePoint', 'Defender', 'Teams', 'PowerPlatform', 'OneDrive'
     }
 
     if (-Not [string]::IsNullOrEmpty($PrereleaseTag)){
