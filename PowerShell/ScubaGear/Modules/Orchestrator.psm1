@@ -583,7 +583,7 @@ function Invoke-ProviderList {
             $ProviderJSON = $ProviderJSON.TrimEnd(",")
             $TimeZone = ""
             $CurrentDate = Get-Date -ErrorAction 'Stop'
-            $UTCTimestamp = $CurrentDate.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
+            $UTCTimestamp = $CurrentDate.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss.fffZ")
             $GetTimeZone = Get-TimeZone -ErrorAction 'Stop'
             if (($CurrentDate).IsDaylightSavingTime()) {
                 $TimeZone = ($GetTimeZone).DaylightName
