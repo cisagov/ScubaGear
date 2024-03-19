@@ -410,7 +410,7 @@ function GetConfigurationsForPimGroups{
             else {
                 continue
             }
-            
+
             # Get all the configuration rules for the current PIM group - get member not owner configs
             $PolicyAssignment = Get-MgBetaPolicyRoleManagementPolicyAssignment -All -ErrorAction Stop -Filter "scopeId eq '$PrincipalId' and scopeType eq 'Group' and roleDefinitionId eq 'member'" |
                 Select-Object -Property PolicyId
