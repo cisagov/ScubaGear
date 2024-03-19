@@ -222,7 +222,7 @@ TestPlan:
                           setting:
                             isApprovalRequired: true
         Postconditions: []
-        ExpectedResult: false        
+        ExpectedResult: false
       - TestDescription: MS.AAD.7.6v1 Compliant case - Global admin activation requires approval (role)
         Preconditions:
           - Command: UpdateProviderExport
