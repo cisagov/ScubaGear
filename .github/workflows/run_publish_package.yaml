@@ -56,7 +56,8 @@ jobs:
   # smoke test.
   Publish-Private-Package:
     if: github.event.schedule == '23 0 * * *'
-    needs: [ extract-secrets ]
+    needs:
+      - extract-secrets
     runs-on: windows-latest
     environment: Development
     permissions:
@@ -154,7 +155,8 @@ jobs:
   publish-to-psgallery:
     name: Publish to PSGallery
     if: github.event_name == 'workflow_dispatch'
-    needs: [ extract-secrets ]
+    needs:
+      - extract-secrets
     runs-on: windows-latest
     environment: Development
     permissions:
