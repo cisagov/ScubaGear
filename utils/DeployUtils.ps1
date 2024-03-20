@@ -221,6 +221,8 @@ function ConfigureScubaGearModule{
     Write-Warning $ManifestPath
     Write-Warning "ModuleVersion"
     Write-Warning $ModuleVersion
+    Write-Warning "PrereleaseTag"
+    Write-Warning $PrereleaseTag
 
     try 
     {
