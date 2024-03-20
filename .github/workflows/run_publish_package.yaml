@@ -96,8 +96,8 @@ jobs:
             Remove-Item -Recurse -Force repo -Include .git*
             # TODO use parameters here, like line 194 below
             Publish-ScubaGearModule `
-              -AzureKeyVaultUrl ${{ needs.ReleasePrep.outputs.KeyVaultUrl}} `
-              -CertificateName ${{ needs.ReleasePrep.outputs.KeyVaultCertificateName}} `
+              -AzureKeyVaultUrl ${{ needs.extract-secrets.outputs.KeyVaultUrl}} `
+              -CertificateName ${{ needs.extract-secrets.outputs.KeyVaultCertificateName}} `
               -ModulePath repo/PowerShell/ScubaGear `
               -GalleryName $env:GalleryName
           azPSVersion: "latest"
