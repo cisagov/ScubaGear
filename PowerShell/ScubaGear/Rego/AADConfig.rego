@@ -309,8 +309,6 @@ tests contains {
 } if {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
     Conditions := [count(AuthenticatorMFA) > 0, MSAuthenticationMethodIsGood == true, MSAuthenticationMethodIsDisabled == true]
-    print("MSAuthisGood:", MSAuthenticationMethodIsGood)
-    print("MSAUthisDisabled:", MSAuthenticationMethodIsDisabled)
 
     Status := count(FilterArray(Conditions, false)) > 0
 }

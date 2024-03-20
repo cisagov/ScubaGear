@@ -1584,7 +1584,7 @@ test_State_Incorrect_V1 if {
 #
 # Policy MS.AAD.3.3v1
 #--
-test_3_1_passes_and_satisfies_3_3 if{
+test_3_1_passes_and_satisfies_3_3 if {
     Output := aad.tests with input as {
         "conditional_access_policies": [
             {
@@ -1615,6 +1615,50 @@ test_3_1_passes_and_satisfies_3_3 if{
                 },
                 "State": "enabled",
                 "DisplayName": "Test Policy"
+            },
+            {
+                "Conditions": {
+                    "Applications": {
+                        "IncludeApplications": [
+                            "All"
+                        ]
+                    },
+                    "Users": {
+                        "IncludeUsers": [
+                            "All"
+                        ],
+                        "ExcludeUsers": [],
+                        "ExcludeGroups": [],
+                        "ExcludeRoles": []
+                    }
+                },
+                "GrantControls": {
+                    "BuiltInControls": [
+                        ""
+                    ]
+                },
+                "State": "enabled",
+                "DisplayName": "Test name"
+            }
+        ],
+        "authentication_method": [
+            {
+                "authentication_method_feature_settings": [
+                    {
+                        "AdditionalProperties": {
+                        }
+                    }
+                ],
+                "authentication_method_policy": [
+                    {
+                        "AuthenticationMethodConfigurations": [
+                            {
+                                "Id":  "",
+                                "State":  ""
+                            }
+                        ]
+                      }
+                ]
             }
         ]
     }
@@ -1627,14 +1671,94 @@ test_3_1_passes_and_satisfies_3_3 if{
     TestResult("MS.AAD.3.3v1", Output, ReportDetailStr, true) == true
 }
 
-test_NotImplemented_Correct_V2 if {
-    PolicyId := "MS.AAD.3.3v1"
+test_3_1_Fails_3_3_Passes_Correct if {
+    Output := aad.tests with input as {
+        "conditional_access_policies": [
+            {
+                "Conditions": {
+                    "Applications": {
+                        "IncludeApplications": [
+                            "All"
+                        ],
+                        "ExcludeApplications": []
+                    },
+                    "Users": {
+                        "IncludeUsers": [
+                            "All"
+                        ],
+                        "ExcludeUsers": [],
+                        "ExcludeGroups": [],
+                        "ExcludeRoles": []
+                    }
+                },
+                "GrantControls": {
+                    "AuthenticationStrength": {
+                        "AllowedCombinations": [
+                            "windowsHelloForBusiness",
+                            "fido2",
+                            "x509CertificateMultiFactor",
+                            "SuperStrength"
+                        ]
+                    }
+                },
+                "State": "enabled",
+                "DisplayName": "Test name"
+            },
+            {
+                "Conditions": {
+                    "Applications": {
+                        "IncludeApplications": [
+                            "All"
+                        ]
+                    },
+                    "Users": {
+                        "IncludeUsers": [
+                            "All"
+                        ],
+                        "ExcludeUsers": [],
+                        "ExcludeGroups": [],
+                        "ExcludeRoles": []
+                    }
+                },
+                "GrantControls": {
+                    "BuiltInControls": [
+                        "mfa"
+                    ]
+                },
+                "State": "enabled",
+                "DisplayName": "Test name"
+            }
+        ],
+        "authentication_method": [
+            {
+                "authentication_method_feature_settings": [
+                    {
+                        "AdditionalProperties": {
+                        }
+                    }
+                ],
+                "authentication_method_policy": [
+                    {
+                        "AuthenticationMethodConfigurations": [
+                            {
+                                "Id":  "",
+                                "State":  ""
+                            }
+                        ]
+                      }
+                ]
+            }
+        ]
+    }
 
-    Output := aad.tests with input as { }
+    ReportDetailStr := concat("", [
+        "1 conditional access policy(s) found that meet(s) all requirements:",
+        "<br/>Test name. <a href='#caps'>View all CA policies</a>."
+    ])
 
-    ReportDetailStr := NotCheckedDetails(PolicyId)
-    TestResult(PolicyId, Output, ReportDetailStr, false) == true
+    TestResult("MS.AAD.3.3v1", Output, ReportDetailStr, true) == true
 }
+
 #--
 
 #
@@ -1644,7 +1768,11 @@ test_Migrated_Correct if {
     Output := aad.tests with input as {
         "authentication_method": [
             {
-                "PolicyMigrationState": "migrationComplete"
+                "authentication_method_policy": [
+                    {
+                     "PolicyMigrationState": "migrationComplete"
+                      }
+                ]
             }
         ]
     }
@@ -1656,7 +1784,11 @@ test_Migrated_Incorrect if {
     Output := aad.tests with input as {
         "authentication_method": [
             {
-                "PolicyMigrationState": "preMigration"
+                "authentication_method_policy": [
+                    {
+                    "PolicyMigrationState": "preMigration"
+                    }
+                ]
             }
         ]
     }
@@ -1673,19 +1805,24 @@ test_NotImplemented_Incorrect_Sms if {
     Output := aad.tests with input as {
         "authentication_method": [
             {
-                "PolicyMigrationState": "migrationComplete",
-                "AuthenticationMethodConfigurations":  [
-                    {
-                        "Id": "Sms",
-                        "State": "enabled"
-                    },
-                    {
-                        "Id":  "Voice",
-                        "State":  "disabled"
-                    },
-                    {
-                        "Id":  "Email",
-                        "State": "disabled"
+                    "authentication_method_policy": [
+                        {
+                            "PolicyMigrationState": "migrationComplete",
+
+                            "AuthenticationMethodConfigurations":  [
+                            {
+                                "Id": "Sms",
+                                "State": "enabled"
+                            },
+                            {
+                                "Id":  "Voice",
+                                "State":  "disabled"
+                            },
+                            {
+                                "Id":  "Email",
+                                "State": "disabled"
+                            }
+                        ]
                     }
                 ]
             }
@@ -1701,19 +1838,23 @@ test_NotImplemented_Incorrect_Voice if {
     Output := aad.tests with input as {
         "authentication_method": [
             {
-                "PolicyMigrationState": "migrationComplete",
-                "AuthenticationMethodConfigurations":  [
+                "authentication_method_policy": [
                     {
-                        "Id": "Sms",
-                        "State": "disabled"
-                    },
-                    {
-                        "Id":  "Voice",
-                        "State":  "enabled"
-                    },
-                    {
-                        "Id":  "Email",
-                        "State": "disabled"
+                        "PolicyMigrationState": "migrationComplete",
+                        "AuthenticationMethodConfigurations":  [
+                            {
+                                "Id": "Sms",
+                                "State": "disabled"
+                            },
+                            {
+                                "Id":  "Voice",
+                                "State":  "enabled"
+                            },
+                            {
+                                "Id":  "Email",
+                                "State": "disabled"
+                            }
+                        ]
                     }
                 ]
             }
@@ -1729,19 +1870,23 @@ test_NotImplemented_Incorrect_Email if {
     Output := aad.tests with input as {
         "authentication_method": [
             {
-                "PolicyMigrationState": "migrationComplete",
-                "AuthenticationMethodConfigurations":  [
+                "authentication_method_policy": [
                     {
-                        "Id": "Sms",
-                        "State": "disabled"
-                    },
-                    {
-                        "Id":  "Voice",
-                        "State":  "disabled"
-                    },
-                    {
-                        "Id":  "Email",
-                        "State": "enabled"
+                        "PolicyMigrationState": "migrationComplete",
+                        "AuthenticationMethodConfigurations":  [
+                            {
+                                "Id": "Sms",
+                                "State": "disabled"
+                            },
+                            {
+                                "Id":  "Voice",
+                                "State":  "disabled"
+                            },
+                            {
+                                "Id":  "Email",
+                                "State": "enabled"
+                            }
+                        ]
                     }
                 ]
             }
@@ -1757,19 +1902,23 @@ test_NotImplemented_Incorrect_Migration if {
     Output := aad.tests with input as {
         "authentication_method": [
             {
-                "PolicyMigrationState": "preMigration",
-                "AuthenticationMethodConfigurations":  [
+                "authentication_method_policy": [
                     {
-                        "Id": "Sms",
-                        "State": "enabled"
-                    },
-                    {
-                        "Id":  "Voice",
-                        "State":  "disabled"
-                    },
-                    {
-                        "Id":  "Email",
-                        "State": "disabled"
+                        "PolicyMigrationState": "preMigration",
+                        "AuthenticationMethodConfigurations":  [
+                            {
+                                "Id": "Sms",
+                                "State": "enabled"
+                            },
+                            {
+                                "Id":  "Voice",
+                                "State":  "disabled"
+                            },
+                            {
+                                "Id":  "Email",
+                                "State": "disabled"
+                            }
+                        ]
                     }
                 ]
             }
@@ -1786,19 +1935,23 @@ test_NotImplemented_Correct_V4 if {
     Output := aad.tests with input as {
         "authentication_method": [
             {
-                "PolicyMigrationState": "migrationComplete",
-                "AuthenticationMethodConfigurations":  [
+                "authentication_method_policy": [
                     {
-                        "Id": "Sms",
-                        "State": "disabled"
-                    },
-                    {
-                        "Id":  "Voice",
-                        "State":  "disabled"
-                    },
-                    {
-                        "Id":  "Email",
-                        "State": "disabled"
+                        "PolicyMigrationState": "migrationComplete",
+                        "AuthenticationMethodConfigurations":  [
+                            {
+                                "Id": "Sms",
+                                "State": "disabled"
+                            },
+                            {
+                                "Id":  "Voice",
+                                "State":  "disabled"
+                            },
+                            {
+                                "Id":  "Email",
+                                "State": "disabled"
+                            }
+                        ]
                     }
                 ]
             }
