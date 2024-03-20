@@ -332,6 +332,9 @@ Describe "Policy Checks for <ProductName>"{
                             }
                         }
                     }
+                    elseif ($Table.GetProperty("id") -eq "license-info"){
+                        #Currently empty to determine if necessary and what to test in section
+                    }
                     else {
                         # Control report tables
                         ForEach ($Row in $Rows){
