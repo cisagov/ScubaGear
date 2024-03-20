@@ -28,7 +28,9 @@ env:
   ModuleName: ScubaGear
 
 jobs:
-  ReleasePrep:
+  extract-secrets:
+    name: Extract Secrets
+    id: extract-secrets
     runs-on: windows-latest
     environment: Development
     permissions:
@@ -55,7 +57,7 @@ jobs:
   # smoke test.
   Publish-Private-Package:
     if: github.event.schedule == '23 0 * * *'
-    needs: [ReleasePrep]
+    needs: [ extract-secrets ]
     runs-on: windows-latest
     environment: Development
     permissions:
@@ -153,7 +155,7 @@ jobs:
   publish-to-psgallery:
     name: Publish to PSGallery
     if: github.event_name == 'workflow_dispatch'
-    needs: [ReleasePrep]
+    needs: [ extract-secrets ]
     runs-on: windows-latest
     environment: Development
     permissions:
