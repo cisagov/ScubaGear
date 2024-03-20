@@ -201,18 +201,26 @@ function ConfigureScubaGearModule{
     }
 
     # Tags cannot contain spaces
+    Write-Warning "Regressed the tags..."
     $ManifestUpdates = @{
         Path = $ManifestPath
         ModuleVersion = $ModuleVersion
         ProjectUri = "https://github.com/cisagov/ScubaGear"
         LicenseUri = "https://github.com/cisagov/ScubaGear/blob/main/LICENSE"
-        Tags = 'CISA', 'O365', 'M365', 'AzureAD', 'Configuration', 'Exchange', 'Report', 'Security', 'SharePoint', 'Defender', 'Teams', 'PowerPlatform', 'OneDrive'
+        # Tags = 'CISA', 'O365', 'M365', 'AzureAD', 'Configuration', 'Exchange', 'Report', 'Security', 'SharePoint', 'Defender', 'Teams', 'PowerPlatform', 'OneDrive'     
+        # Test:  is the bug in the tags?
+        Tags = 'CISA', 'O365', 'AAD', 'Configuration', 'Exchange', 'Report', 'Security', 'SharePoint', 'Defender', 'Teams', 'PowerPlatform', 'OneDrive'
     }
 
     if (-Not [string]::IsNullOrEmpty($PrereleaseTag))
     {
         $ManifestUpdates.Add('Prerelease', $PrereleaseTag)
     }
+
+    Write-Warning "ManifestPath"
+    Write-Warning $ManifestPath
+    Write-Warning "ModuleVersion"
+    Write-Warning $ModuleVersion
 
     try 
     {
@@ -228,7 +236,6 @@ function ConfigureScubaGearModule{
     catch
     {
         Write-Warning "Warning: Manifest error:"
-        Write-Debug "Debug: Manifest error:"
         Write-Error $Result
         Write-Error "Manifest is not valid"
         $Result = $null
