@@ -216,15 +216,19 @@ function ConfigureScubaGearModule{
 
     try 
     {
+        Write-Warning "Upating manifest..."
         Update-ModuleManifest @ManifestUpdates
-        $CurrentErrorActionPreference = $ErrorActionPreference
-        $ErrorActionPreference = "SilentlyContinue"
+        # $CurrentErrorActionPreference = $ErrorActionPreference
+        # $ErrorActionPreference = "SilentlyContinue"
+        Write-Warning "Testing manifest..."
         $Result = Test-ModuleManifest -Path $ManifestPath
-        $ErrorActionPreference = $CurrentErrorActionPreference
+        # $ErrorActionPreference = $CurrentErrorActionPreference
+        Write-Warning "Done updating and testing..."
     }
-    catch 
+    catch
     {
-        Write-Debug "Manifest error:"
+        Write-Warning "Warning: Manifest error:"
+        Write-Debug "Debug: Manifest error:"
         Write-Error $Result
         Write-Error "Manifest is not valid"
         $Result = $null
