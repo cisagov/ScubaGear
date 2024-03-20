@@ -213,7 +213,7 @@ function New-Report {
         }
         # Convert the custom objects to an HTML table
         $LicenseTable = $LicenseInfoArray | ConvertTo-Html -As Table -Fragment
-        
+
         # Create a section header for the licensing information
         $LicensingHTML = "<h2>Tenant Licensing Information</h2>" + $LicenseTable
 
