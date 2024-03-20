@@ -204,7 +204,7 @@ jobs:
           if (-Not [string]::IsNullOrEmpty('${{ inputs.OverrideModuleVersion }}')){
             $PublishSplat.Add('OverrideModuleVersion', '${{ inputs.OverrideModuleVersion }}')
           }
-          Publish-ScubaGearModule @PublishSplat
+          # Publish-ScubaGearModule @PublishSplat
       - name: Check Scuba Version
         run: |
           Install-Module -Name ScubaGear
