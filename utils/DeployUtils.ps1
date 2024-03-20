@@ -57,12 +57,20 @@ function Publish-ScubaGearModule{
     <#
     .Description
     Publish ScubaGear module to private package repository
+    .Parameter AzureKeyVaultUrl
+    The URL of the key vault with the code signing certificate
+    .Parameter CertificateName
+    The name of the code signing certificate
     .Parameter ModulePath
     Path to module root directory
     .Parameter GalleryName
     Name of the private package repository (i.e., gallery)
     .Parameter OverrideModuleVersion
     Optional module version.  If provided it will use as module version. Otherwise, the current version from the manifest with a revision number is added instead.
+    .Parameter PrereleaseTag
+    The identifier that will be used in place of a version to identify the module in the gallery
+    .Parameter NuGetApiKey
+    Specifies the API key that you want to use to publish a module to the online gallery. 
     #>
     param (
         [Parameter(ParameterSetName = 'PublicGallery')]
@@ -110,17 +118,17 @@ function Publish-ScubaGearModule{
 
     $ModuleBuildPath = Build-ScubaModule -ModulePath $ModulePath -OverrideModuleVersion $OverrideModuleVersion -PrereleaseTag $PrereleaseTag
 
-    if (SignScubaGearModule -AzureKeyVaultUrl $AzureKeyVaultUrl -CertificateName $CertificateName -ModulePath $ModuleBuildPath){
-        $PublishSplat = @{
+    if (SignScubaGearModule -AzureKeyVaultUrl $AzureKeyVaultUrl -CertificateName $CertificateName -ModulePath $ModuleBuildPath)
+    {
+        $Parameters = @{
             Path = $ModuleBuildPath
             Repository = $GalleryName
         }
-
         if ($GalleryName -eq 'PSGallery'){
-            $PublishSplat.Add('NuGetApiKey', $NuGetApiKey)
+            $Parameters.Add('NuGetApiKey', $NuGetApiKey)
         }
 
-        Publish-Module @PublishSplat
+        Publish-Module @Parameters
     }
     else {
         Write-Error "Failed to sign module."
@@ -154,7 +162,8 @@ function Build-ScubaModule{
     }
 
     Copy-Item $ModulePath -Destination $env:TEMP -Recurse
-    if (-not (ConfigureScubaGearModule -ModulePath $ModuleBuildPath -OverrideModuleVersion $OverrideModuleVersion -PrereleaseTag $PrereleaseTag)){
+    if (-not (ConfigureScubaGearModule -ModulePath $ModuleBuildPath -OverrideModuleVersion $OverrideModuleVersion -PrereleaseTag $PrereleaseTag))
+    {
         Write-Error "Failed to configure scuba module for publishing."
     }
 
@@ -184,7 +193,8 @@ function ConfigureScubaGearModule{
     $ManifestPath = Join-Path -Path $ModulePath -ChildPath "ScubaGear.psd1"
     $ModuleVersion = $OverrideModuleVersion
 
-    if ([string]::IsNullOrEmpty($OverrideModuleVersion)){
+    if ([string]::IsNullOrEmpty($OverrideModuleVersion))
+    {
         $CurrentModuleVersion = (Import-PowerShellDataFile $ManifestPath).ModuleVersion
         $TimeStamp = [int32](Get-Date -UFormat %s)
         $ModuleVersion = "$CurrentModuleVersion.$TimeStamp"
@@ -199,18 +209,23 @@ function ConfigureScubaGearModule{
         Tags = 'CISA', 'O365', 'M365', 'AzureAD', 'Configuration', 'Exchange', 'Report', 'Security', 'SharePoint', 'Defender', 'Teams', 'PowerPlatform', 'OneDrive'
     }
 
-    if (-Not [string]::IsNullOrEmpty($PrereleaseTag)){
+    if (-Not [string]::IsNullOrEmpty($PrereleaseTag))
+    {
         $ManifestUpdates.Add('Prerelease', $PrereleaseTag)
     }
 
-    try {
+    try 
+    {
         Update-ModuleManifest @ManifestUpdates
         $CurrentErrorActionPreference = $ErrorActionPreference
         $ErrorActionPreference = "SilentlyContinue"
         $Result = Test-ModuleManifest -Path $ManifestPath
         $ErrorActionPreference = $CurrentErrorActionPreference
     }
-    catch {
+    catch 
+    {
+        Write-Debug "Manifest error:"
+        Write-Error $Result
         Write-Error "Manifest is not valid"
         $Result = $null
     }
@@ -329,7 +344,6 @@ function SignScubaGearModule{
         [ValidateScript({[uri]::IsWellFormedUriString($_, 'Absolute') -and ([uri] $_).Scheme -in 'http','https'})]
         $TimeStampServer = 'http://timestamp.digicert.com'
     )
-
 
     # Digitally sign scripts, manifest, and modules
     $FileList = CreateFileList -SourcePath $ModulePath -Extensions "*.ps1","*.psm1","*.psd1"

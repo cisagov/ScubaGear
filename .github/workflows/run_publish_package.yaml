@@ -92,6 +92,7 @@ jobs:
             . repo/utils/DeployUtils.ps1
             # Remove non-release files
             Remove-Item -Recurse -Force repo -Include .git*
+            # TODO use parameters here, like line 194 below
             Publish-ScubaGearModule `
               -AzureKeyVaultUrl ${{ needs.ReleasePrep.outputs.KeyVaultUrl}} `
               -CertificateName ${{ needs.ReleasePrep.outputs.KeyVaultCertificateName}} `
@@ -187,24 +188,27 @@ jobs:
           Remove-Item -Recurse -Force repo -Include .git*
           # Extract the API key used to publish to PSGallery
           $ApiKey = az keyvault secret show --id '${{ needs.ReleasePrep.outputs.KeyVaultUrl }}/secrets/ScubaGear-PSGAllery-API-Key' --query value -o tsv
-          if (-Not $ApiKey){
+          if (-Not $ApiKey)
+          {
             Write-Error "Failed to retrieve API key"
           }
-          Write-Error "Test - this should stop the workflow.  Does it?"
-          $PublishSplat = @{
+          $Parameters = @{
             AzureKeyVaultUrl = '${{ needs.ReleasePrep.outputs.KeyVaultUrl }}'
             CertificateName = '${{ needs.ReleasePrep.outputs.KeyVaultCertificateName }}'
             ModulePath = 'repo/PowerShell/ScubaGear'
             GalleryName = 'PSGallery'
             NuGetApiKey = $ApiKey
           }
-          if ('true' -eq '${{ inputs.IsPrerelease }}'){
-            $PublishSplat.Add('PrereleaseTag', '${{ inputs.PrereleaseTag }}')
+          if ('true' -eq '${{ inputs.IsPrerelease }}')
+          {
+            $Parameters.Add('PrereleaseTag', '${{ inputs.PrereleaseTag }}')
           }
-          if (-Not [string]::IsNullOrEmpty('${{ inputs.OverrideModuleVersion }}')){
-            $PublishSplat.Add('OverrideModuleVersion', '${{ inputs.OverrideModuleVersion }}')
+          if (-Not [string]::IsNullOrEmpty('${{ inputs.OverrideModuleVersion }}'))
+          {
+            $Parameters.Add('OverrideModuleVersion', '${{ inputs.OverrideModuleVersion }}')
           }
-          # Publish-ScubaGearModule @PublishSplat
+          # This publishes to PSGallery.
+          Publish-ScubaGearModule @Parameters
       - name: Check Scuba Version
         run: |
           Install-Module -Name ScubaGear
