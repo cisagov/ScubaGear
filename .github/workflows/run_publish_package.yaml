@@ -190,14 +190,14 @@ jobs:
           # Remove non-release files
           Remove-Item -Recurse -Force repo -Include .git*
           # Extract the API key used to publish to PSGallery
-          $ApiKey = az keyvault secret show --id '${{ needs.ReleasePrep.outputs.KeyVaultUrl }}/secrets/ScubaGear-PSGAllery-API-Key' --query value -o tsv
+          $ApiKey = az keyvault secret show --id '${{ needs.extract-secrets.outputs.KeyVaultUrl }}/secrets/ScubaGear-PSGAllery-API-Key' --query value -o tsv
           if (-Not $ApiKey)
           {
             Write-Error "Failed to retrieve API key"
           }
           $Parameters = @{
-            AzureKeyVaultUrl = '${{ needs.ReleasePrep.outputs.KeyVaultUrl }}'
-            CertificateName = '${{ needs.ReleasePrep.outputs.KeyVaultCertificateName }}'
+            AzureKeyVaultUrl = '${{ needs.extract-secrets.outputs.KeyVaultUrl }}'
+            CertificateName = '${{ needs.extract-secrets.outputs.KeyVaultCertificateName }}'
             ModulePath = 'repo/PowerShell/ScubaGear'
             GalleryName = 'PSGallery'
             NuGetApiKey = $ApiKey
