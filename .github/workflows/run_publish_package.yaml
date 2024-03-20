@@ -50,7 +50,9 @@ jobs:
           echo "KeyVaultCertificateName=$($KeyVaultInfo.KeyVault.CertificateName)" >> $env:GITHUB_OUTPUT
         id: "key_vault_info"
 
-
+  # Publish nightly to a a private gallery just to make
+  # sure that the code can be published.  This is like a
+  # smoke test.
   Publish-Private-Package:
     if: github.event.schedule == '23 0 * * *'
     needs: [ReleasePrep]
@@ -146,7 +148,9 @@ jobs:
             Exit 1
           }
 
-  Publish-To-PSGallery:
+  # Publish on demand to the real gallery (PSGallery).
+  publish-to-psgallery:
+    name: Publish to PSGallery
     if: github.event_name == 'workflow_dispatch'
     needs: [ReleasePrep]
     runs-on: windows-latest
@@ -158,15 +162,16 @@ jobs:
       run:
         shell: powershell
     steps:
-      - name: Install Azure Signing Tool
-        run: |
-          dotnet --version
-          dotnet tool install --global AzureSignTool --version 4.0.1
       - name: Checkout
         uses: actions/checkout@v4
         with:
           path: repo
-      - name: OIDC Login to Azure Public Cloud with AzPowershell (enableAzPSSession true)
+      - name: Install Azure Signing Tool
+        run: |
+          dotnet --version
+          dotnet tool install --global AzureSignTool --version 4.0.1
+      # OIDC Login to Azure Public Cloud with AzPowershell (enableAzPSSession true)
+      - name: Login to Azure
         uses: azure/login@v1
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
@@ -175,13 +180,17 @@ jobs:
           enable-AzPSSession: true
       - name: Sign and publish module to PSGallery
         run: |
+          # Source the deploy utilities so the functions in it
+          # can be called.
           . repo/utils/DeployUtils.ps1
           # Remove non-release files
           Remove-Item -Recurse -Force repo -Include .git*
+          # Extract the API key used to publish to PSGallery
           $ApiKey = az keyvault secret show --id '${{ needs.ReleasePrep.outputs.KeyVaultUrl }}/secrets/ScubaGear-PSGAllery-API-Key' --query value -o tsv
           if (-Not $ApiKey){
-            Write-Error "Failer to retrieve API key"
+            Write-Error "Failed to retrieve API key"
           }
+          Write-Error "Test - this should stop the workflow.  Does it?"
           $PublishSplat = @{
             AzureKeyVaultUrl = '${{ needs.ReleasePrep.outputs.KeyVaultUrl }}'
             CertificateName = '${{ needs.ReleasePrep.outputs.KeyVaultCertificateName }}'
