@@ -30,7 +30,6 @@ env:
 jobs:
   extract-secrets:
     name: Extract Secrets
-    id: extract-secrets
     runs-on: windows-latest
     environment: Development
     permissions:
