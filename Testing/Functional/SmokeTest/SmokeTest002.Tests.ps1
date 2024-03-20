@@ -163,6 +163,9 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for $OrganizationN
                         }
                     }
                 }
+                elseif ($Table.GetProperty("id") -eq "license-info"){
+                    #Currently empty to determine if necessary and what to test in section
+                }
                 # Default is normal policy results table
                 else {
                     # Control report tables
