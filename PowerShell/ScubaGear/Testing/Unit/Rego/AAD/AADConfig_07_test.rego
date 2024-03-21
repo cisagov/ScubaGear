@@ -1335,7 +1335,7 @@ test_AdditionalProperties_Correct_V4 if {
         ]
     }
 
-    ReportDetailString := "0 role(s) or group(s) allowing without approval found"
+    ReportDetailString := "0 role(s) or group(s) allowing activation without approval found"
     TestResult("MS.AAD.7.6v1", Output, ReportDetailString, true) == true
 }
 
@@ -1383,7 +1383,7 @@ test_AdditionalProperties_Correct_V5 if {
         ]
     }
 
-    ReportDetailString := "0 role(s) or group(s) allowing without approval found"
+    ReportDetailString := "0 role(s) or group(s) allowing activation without approval found"
     TestResult("MS.AAD.7.6v1", Output, ReportDetailString, true) == true
 }
 
@@ -1418,7 +1418,7 @@ test_AdditionalProperties_Incorrect_V15 if {
         ]
     }
 
-    ReportDetailString := "1 role(s) or group(s) allowing without approval found:<br/>Global Administrator(Directory Role)"
+    ReportDetailString := "1 role(s) or group(s) allowing activation without approval found:<br/>Global Administrator(Directory Role)"
     TestResult("MS.AAD.7.6v1", Output, ReportDetailString, false) == true
 }
 
@@ -1468,7 +1468,7 @@ test_PIM_Group_Incorrect_V15 if {
         ]
     }
 
-    ReportDetailString := "1 role(s) or group(s) allowing without approval found:<br/>My PIM GROUP(PIM Group)"
+    ReportDetailString := "1 role(s) or group(s) allowing activation without approval found:<br/>My PIM GROUP(PIM Group)"
     TestResult("MS.AAD.7.6v1", Output, ReportDetailString, false) == true
 }
 
