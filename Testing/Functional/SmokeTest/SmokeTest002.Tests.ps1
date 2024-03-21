@@ -163,6 +163,22 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for $OrganizationN
                         }
                     }
                 }
+                elseif ($Table.GetProperty("id") -eq "license-info"){
+
+                    # Iterate through each row in the table ensuring there are 3 columns
+                    foreach ($Row in $Rows) {
+                        $RowHeaders = Get-SeElement -Element $Row -By TagName 'th'
+                        $RowData = Get-SeElement -Element $Row -By TagName 'td'
+
+                        if ($RowHeaders.Count -gt 0){
+                            $RowHeaders.Count | Should -BeExactly 3
+                        }
+
+                        if ($RowData.Count -gt 0){
+                            $RowData.Count | Should -BeExactly 3
+                        }
+                    }
+                }
                 # Default is normal policy results table
                 else {
                     # Control report tables
