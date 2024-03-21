@@ -731,75 +731,89 @@ function New-Config {
         [Parameter(Mandatory = $false)]
         [ValidateNotNullOrEmpty()]
         [string]
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'Description')]
         $Description = "YAML configuration file with default description", #(Join-Path -Path $env:USERPROFILE -ChildPath ".scubagear\Tools"),
 
         [Parameter(Mandatory = $false)]
         [ValidateNotNullOrEmpty()]
         [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
         [string[]]
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'ProductNames')]
         $ProductNames = @("aad", "defender", "exo", "sharepoint", "teams"),
 
         [Parameter(Mandatory = $false)]
         [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $false)]
         [ValidateNotNullOrEmpty()]
         [string]
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'M365Environment')]
         $M365Environment = "commercial",
 
         [Parameter(Mandatory = $false)]
         [ValidateScript({Test-Path -PathType Container $_})]
         [string]
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'OPAPath')]
         $OPAPath = ".", #(Join-Path -Path $env:USERPROFILE -ChildPath ".scubagear\Tools"),
 
         [Parameter(Mandatory = $false)]
         [ValidateNotNullOrEmpty()]
         [ValidateSet($true, $false)]
         [boolean]
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'Login')]
         $LogIn = $true,
 
         [Parameter(Mandatory = $false)]
         [ValidateNotNullOrEmpty()]
         [ValidateSet($true, $false)]
         [boolean]
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'DisconnectOnExit')]
         $DisconnectOnExit = $false,
 
         [Parameter(Mandatory = $false)]
         [ValidateNotNullOrEmpty()]
         [string]
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'OutPath')]
         $OutPath = '.',
 
         [Parameter(Mandatory = $false)]
         [ValidateNotNullOrEmpty()]
         [string]
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'AppID')]
         $AppID,
 
         [Parameter(Mandatory = $false)]
         [ValidateNotNullOrEmpty()]
         [string]
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'CertificatThumbprint')]
         $CertificateThumbprint,
 
         [Parameter(Mandatory = $false)]
         [ValidateNotNullOrEmpty()]
         [string]
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'Organization')]
         $Organization,
 
         [Parameter(Mandatory = $false)]
         [ValidateNotNullOrEmpty()]
         [string]
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'OutFolderName')]
         $OutFolderName = "M365BaselineConformance",
 
         [Parameter(Mandatory = $false)]
         [ValidateNotNullOrEmpty()]
         [string]
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'OutProviderFileName')]
         $OutProviderFileName = "ProviderSettingsExport",
 
         [Parameter(Mandatory = $false)]
         [ValidateNotNullOrEmpty()]
         [string]
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'OutRegoFileName')]
         $OutRegoFileName = "TestResults",
 
         [Parameter(Mandatory = $false)]
         [ValidateNotNullOrEmpty()]
         [string]
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'OutReportName')]
         $OutReportName = "BaselineReports"
     )
 
