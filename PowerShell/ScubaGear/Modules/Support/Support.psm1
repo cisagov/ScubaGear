@@ -755,7 +755,7 @@ function New-Config {
         [ValidateSet($true, $false)]
         [boolean]
         $LogIn = $true,
-        
+
         [Parameter(Mandatory = $false)]
         [ValidateNotNullOrEmpty()]
         [ValidateSet($true, $false)]
@@ -767,7 +767,7 @@ function New-Config {
         [string]
         $OutPath = '.',
 
-        [Parameter(Mandatory = $false)] 
+        [Parameter(Mandatory = $false)]
         [ValidateNotNullOrEmpty()]
         [string]
         $AppID,
@@ -803,16 +803,16 @@ function New-Config {
         $OutReportName = "BaselineReports"
     )
 
-    $config = New-Object ([System.Collections.specialized.OrderedDictionary])
+    $Config = New-Object ([System.Collections.specialized.OrderedDictionary])
 
-    ($MyInvocation.MyCommand.Parameters ).Keys | %{
-        $val = (Get-Variable -Name $_ -EA SilentlyContinue).Value
-        if( $val.length -gt 0 ) {
+    ($MyInvocation.MyCommand.Parameters ).Keys | ForEach-Object{
+        $Val = (Get-Variable -Name $_ -EA SilentlyContinue).Value
+        if( $Val.length -gt 0 ) {
             #$config[$_] = $val
-            $config.add($_, $val)
+            $Config.add($_, $Val)
         }
     }
-    $capExclusionNamespace = @(
+    $CapExclusionNamespace = @(
         "MS.AAD.1.1v1",
         "MS.AAD.2.1v1",
         "MS.AAD.2.3v1",
@@ -823,74 +823,74 @@ function New-Config {
         "MS.AAD.3.7v1",
         "MS.AAD.3.8v1"
         )
-    $roleExclusionNamespace = "MS.AAD.7.4v1"
-    
-    $commonSensitiveAccountFilterNamespace = @(
+    $RoleExclusionNamespace = "MS.AAD.7.4v1"
+
+    $CommonSensitiveAccountFilterNamespace = @(
         "MS.DEFENDER.1.4v1",
         "MS.DEFENDER.1.5v1"
         )
 
-    $userImpersonationProtectionNamespace = "MS.DEFENDER.2.1v1"
+    $UserImpersonationProtectionNamespace = "MS.DEFENDER.2.1v1"
 
-    $agencyDomainImpersonationProtectionNamespace = "MS.DEFENDER.2.2v1"
+    $AgencyDomainImpersonationProtectionNamespace = "MS.DEFENDER.2.2v1"
 
-    $partnerDomainImpersonationProtectionNamespace = "MS.DEFENDER.2.3v1"
-
- 
-    $aadTemplate = New-Object ([System.Collections.specialized.OrderedDictionary])
-    $aadCapExclusions = New-Object ([System.Collections.specialized.OrderedDictionary])
-    $aadRoleExclusions = New-Object ([System.Collections.specialized.OrderedDictionary])
- 
-    $defenderTemplate = New-Object ([System.Collections.specialized.OrderedDictionary])
-    $defenderCommonSensitiveAccountFilter = New-Object ([System.Collections.specialized.OrderedDictionary])
-    $defenderUserImpersonationProtection = New-Object ([System.Collections.specialized.OrderedDictionary])
-    $defenderAgencyDomainImpersonationProtection = New-Object ([System.Collections.specialized.OrderedDictionary])
-    $defenderPartnerDomainImpersonationProtection = New-Object ([System.Collections.specialized.OrderedDictionary])
+    $PartnerDomainImpersonationProtectionNamespace = "MS.DEFENDER.2.3v1"
 
 
+    $AadTemplate = New-Object ([System.Collections.specialized.OrderedDictionary])
+    $AadCapExclusions = New-Object ([System.Collections.specialized.OrderedDictionary])
+    $AadRoleExclusions = New-Object ([System.Collections.specialized.OrderedDictionary])
 
-    $aadCapExclusions = @{ CapExclusions = @{} }
-    $aadCapExclusions["CapExclusions"].add("Users", @(""))
-    $aadCapExclusions["CapExclusions"].add("Groups", @(""))
+    $DefenderTemplate = New-Object ([System.Collections.specialized.OrderedDictionary])
+    $DefenderCommonSensitiveAccountFilter = New-Object ([System.Collections.specialized.OrderedDictionary])
+    #$defenderUserImpersonationProtection = New-Object ([System.Collections.specialized.OrderedDictionary])
+    #$defenderAgencyDomainImpersonationProtection = New-Object ([System.Collections.specialized.OrderedDictionary])
+    #$defenderPartnerDomainImpersonationProtection = New-Object ([System.Collections.specialized.OrderedDictionary])
 
-    $aadRoleExclusions = @{ RoleExclusions = @{} }
-    $aadRoleExclusions["RoleExclusions"].add("Users", @(""))
-    $aadRoleExclusions["RoleExclusions"].add("Groups", @(""))
 
-    foreach ($cap in $capExclusionNamespace){
-        $aadTemplate.add($cap, $aadCapExclusions)
+
+    $AadCapExclusions = @{ CapExclusions = @{} }
+    $AadCapExclusions["CapExclusions"].add("Users", @(""))
+    $AadCapExclusions["CapExclusions"].add("Groups", @(""))
+
+    $AadRoleExclusions = @{ RoleExclusions = @{} }
+    $AadRoleExclusions["RoleExclusions"].add("Users", @(""))
+    $AadRoleExclusions["RoleExclusions"].add("Groups", @(""))
+
+    foreach ($Cap in $CapExclusionNamespace){
+        $AadTemplate.add($Cap, $AadCapExclusions)
     }
 
-    $aadTemplate.add($roleExclusionNamespace, $aadRoleExclusions)
+    $AadTemplate.add($RoleExclusionNamespace, $AadRoleExclusions)
 
-    $defenderCommonSensitiveAccountFilter = @{ SensitiveAccounts = @{} }
-    $defenderCommonSensitiveAccountFilter['SensitiveAccounts'].add("IncludedUsers", @(""))
-    $defenderCommonSensitiveAccountFilter['SensitiveAccounts'].add("IncludedGroups", @(""))
-    $defenderCommonSensitiveAccountFilter['SensitiveAccounts'].add("IncludedDomains", @(""))
-    $defenderCommonSensitiveAccountFilter['SensitiveAccounts'].add("ExcludedUsers", @(""))
-    $defenderCommonSensitiveAccountFilter['SensitiveAccounts'].add("ExcludedGroups", @(""))
-    $defenderCommonSensitiveAccountFilter['SensitiveAccounts'].add("ExcludedDomains", @(""))
+    $DefenderCommonSensitiveAccountFilter = @{ SensitiveAccounts = @{} }
+    $DefenderCommonSensitiveAccountFilter['SensitiveAccounts'].add("IncludedUsers", @(""))
+    $DefenderCommonSensitiveAccountFilter['SensitiveAccounts'].add("IncludedGroups", @(""))
+    $DefenderCommonSensitiveAccountFilter['SensitiveAccounts'].add("IncludedDomains", @(""))
+    $DefenderCommonSensitiveAccountFilter['SensitiveAccounts'].add("ExcludedUsers", @(""))
+    $DefenderCommonSensitiveAccountFilter['SensitiveAccounts'].add("ExcludedGroups", @(""))
+    $DefenderCommonSensitiveAccountFilter['SensitiveAccounts'].add("ExcludedDomains", @(""))
 
-    foreach ($filter in $commonSensitiveAccountFilterNamespace){
-        $defenderTemplate.add($filter, $defenderCommonSensitiveAccountFilter)
+    foreach ($Filter in $CommonSensitiveAccountFilterNamespace){
+        $DefenderTemplate.add($Filter, $DefenderCommonSensitiveAccountFilter)
     }
 
-    $defenderTemplate.add($userImpersonationProtectionNamespace, @{ SensitiveUsers = @("") })
-    $defenderTemplate.add($agencyDomainImpersonationProtectionNamespace, @{ AgencyDomains = @("") })
-    $defenderTemplate.add($partnerDomainImpersonationProtectionNamespace, @{ PartnerDomains = @("") })
+    $DefenderTemplate.add($UserImpersonationProtectionNamespace, @{ SensitiveUsers = @("") })
+    $DefenderTemplate.add($AgencyDomainImpersonationProtectionNamespace, @{ AgencyDomains = @("") })
+    $DefenderTemplate.add($PartnerDomainImpersonationProtectionNamespace, @{ PartnerDomains = @("") })
 
-    $products = (Get-Variable -Name ProductNames -EA SilentlyContinue).Value
-    foreach ($product in $products){
-        switch ($product){
+    $Products = (Get-Variable -Name ProductNames -EA SilentlyContinue).Value
+    foreach ($Product in $Products){
+        switch ($Product){
             "aad" {
-                $config.add("Aad", $aadTemplate)
+                $config.add("Aad", $AadTemplate)
                 }
             "defender" {
-                $config.add("Defender", $defenderTemplate)
+                $config.add("Defender", $DefenderTemplate)
                 }
         }
     }
-    convertto-yaml $config | set-content "SampleConfig.yaml"
+    convertto-yaml $Config | set-content "SampleConfig.yaml"
 }
 
 Export-ModuleMember -Function @(
