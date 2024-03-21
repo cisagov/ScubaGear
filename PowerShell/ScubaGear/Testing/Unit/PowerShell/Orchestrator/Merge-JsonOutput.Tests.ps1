@@ -6,6 +6,7 @@ InModuleScope Orchestrator {
         BeforeAll {
             Mock -CommandName Join-Path { "." }
             Mock -CommandName Out-File {}
+            Mock -CommandName Set-Content {}
             Mock -CommandName Remove-Item {}
             Mock -CommandName Get-Content { "" }
             Mock -CommandName ConvertFrom-Json { @{

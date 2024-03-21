@@ -875,7 +875,7 @@ function Merge-JsonOutput {
 
             # Save the file
             $JsonFileName = Join-Path -Path $OutFolderPath "$($OutJsonFileName).json" -ErrorAction 'Stop'
-            $ReportJson | Out-File $JsonFileName
+            $ReportJson | Set-Content -Path $JsonFileName -Encoding $(Get-FileEncoding) -ErrorAction 'Stop'
 
             # Delete the now redundant files
             foreach ($File in $DeletionList) {
