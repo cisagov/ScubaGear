@@ -213,24 +213,26 @@ function ConfigureScubaGearModule {
         $ManifestUpdates.Add('Prerelease', $PrereleaseTag)
     }
 
-    Write-Warning "ManifestPath"
-    Write-Warning $ManifestPath
-    Write-Warning $ManifestPath.GetType()
-    Write-Warning "ModuleVersion"
-    Write-Warning $ModuleVersion
-    Write-Warning $ModuleVersion.GetType()
-    Write-Warning "ProjectUri"
-    Write-Warning $ProjectUri
-    Write-Warning $ProjectUri.GetType()
-    Write-Warning "LicenseUri"
-    Write-Warning $LicenseUri
-    Write-Warning $LicenseUri.GetType()
-    Write-Warning "Tags"
-    Write-Warning [string]$Tags
-    Write-Warning $Tags.GetType()
-    Write-Warning "PrereleaseTag"
-    Write-Warning $PrereleaseTag
-    Write-Warning $PrereleaseTag.GetType()
+    # Write-Warning "ManifestPath"
+    # Write-Warning $ManifestPath
+    # Write-Warning $ManifestPath.GetType()
+    # Write-Warning "ModuleVersion"
+    # Write-Warning $ModuleVersion
+    # Write-Warning $ModuleVersion.GetType()
+    # Write-Warning "ProjectUri"
+    # Write-Warning $ProjectUri
+    # Write-Warning $ProjectUri.GetType()
+    # Write-Warning "LicenseUri"
+    # Write-Warning $LicenseUri
+    # Write-Warning $LicenseUri.GetType()
+    # Write-Warning "Tags"
+    # Write-Warning [string]$Tags
+    # Write-Warning $Tags.GetType()
+    # Write-Warning "PrereleaseTag"
+    # Write-Warning $PrereleaseTag
+    # Write-Warning $PrereleaseTag.GetType()
+
+    Get-Content $ManifestPath    
 
     try {
         Write-Warning "Upating manifest..."
