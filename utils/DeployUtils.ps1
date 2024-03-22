@@ -200,16 +200,18 @@ function ConfigureScubaGearModule{
         $ModuleVersion = "$CurrentModuleVersion.$TimeStamp"
     }
 
+    ProjectUri = "https://github.com/cisagov/ScubaGear"
+    LicenseUri = "https://github.com/cisagov/ScubaGear/blob/main/LICENSE"
+    Tags = 'CISA', 'O365', 'M365', 'AzureAD', 'Configuration', 'Exchange', 'Report', 'Security', 'SharePoint', 'Defender', 'Teams', 'PowerPlatform', 'OneDrive'     
+
     # Tags cannot contain spaces
     Write-Warning "Regressed the tags..."
     $ManifestUpdates = @{
         Path = $ManifestPath
         ModuleVersion = $ModuleVersion
-        ProjectUri = "https://github.com/cisagov/ScubaGear"
-        LicenseUri = "https://github.com/cisagov/ScubaGear/blob/main/LICENSE"
-        # Tags = 'CISA', 'O365', 'M365', 'AzureAD', 'Configuration', 'Exchange', 'Report', 'Security', 'SharePoint', 'Defender', 'Teams', 'PowerPlatform', 'OneDrive'     
-        # Test:  is the bug in the tags?
-        Tags = 'CISA', 'O365', 'AAD', 'Configuration', 'Exchange', 'Report', 'Security', 'SharePoint', 'Defender', 'Teams', 'PowerPlatform', 'OneDrive'
+        ProjectUri = $ProjectUri
+        LicenseUri = $LicenseUri
+        Tags = $Tags
     }
 
     if (-Not [string]::IsNullOrEmpty($PrereleaseTag))
@@ -219,10 +221,22 @@ function ConfigureScubaGearModule{
 
     Write-Warning "ManifestPath"
     Write-Warning $ManifestPath
+    Write-Warning $ManifestPath.GetType()
     Write-Warning "ModuleVersion"
     Write-Warning $ModuleVersion
+    Write-Warning $ModuleVersion.GetType()
+    Write-Warning "ProjectUri"
+    Write-Warning $ProjectUri
+    Write-Warning $ProjectUri.GetType()
+    Write-Warning "LicenseUri"
+    Write-Warning $LicenseUri
+    Write-Warning $LicenseUri.GetType()
+    Write-Warning "Tags"
+    Write-Warning $Tags
+    Write-Warning $Tags.GetType()
     Write-Warning "PrereleaseTag"
     Write-Warning $PrereleaseTag
+    Write-Warning $PrereleaseTag.GetType()
 
     try 
     {
