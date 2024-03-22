@@ -200,7 +200,7 @@ function ConfigureScubaGearModule {
     $ProjectUri = "https://github.com/cisagov/ScubaGear"
     $LicenseUri = "https://github.com/cisagov/ScubaGear/blob/main/LICENSE"
     # Tags cannot contain spaces
-    $Tags = 'CISA', 'O365', 'M365', 'AzureAD', 'Configuration', 'Exchange', 'Report', 'Security', 'SharePoint', 'Defender', 'Teams', 'PowerPlatform', 'OneDrive'
+    $Tags = @('CISA', 'O365', 'M365', 'AzureAD', 'Configuration', 'Exchange', 'Report', 'Security', 'SharePoint', 'Defender', 'Teams', 'PowerPlatform', 'OneDrive')
     
     $ManifestUpdates = @{
         Path          = $ManifestPath
@@ -226,7 +226,7 @@ function ConfigureScubaGearModule {
     Write-Warning $LicenseUri
     Write-Warning $LicenseUri.GetType()
     Write-Warning "Tags"
-    Write-Warning $Tags
+    Write-Warning [string]$Tags
     Write-Warning $Tags.GetType()
     Write-Warning "PrereleaseTag"
     Write-Warning $PrereleaseTag
