@@ -200,8 +200,8 @@ function ConfigureScubaGearModule{
         $ModuleVersion = "$CurrentModuleVersion.$TimeStamp"
     }
 
-    ProjectUri = "https://github.com/cisagov/ScubaGear"
-    LicenseUri = "https://github.com/cisagov/ScubaGear/blob/main/LICENSE"
+    $ProjectUri = "https://github.com/cisagov/ScubaGear"
+    $LicenseUri = "https://github.com/cisagov/ScubaGear/blob/main/LICENSE"
     Tags = 'CISA', 'O365', 'M365', 'AzureAD', 'Configuration', 'Exchange', 'Report', 'Security', 'SharePoint', 'Defender', 'Teams', 'PowerPlatform', 'OneDrive'     
 
     # Tags cannot contain spaces
