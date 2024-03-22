@@ -213,8 +213,8 @@ function ConfigureScubaGearModule {
         $ManifestUpdates.Add('Prerelease', $PrereleaseTag)
     }
 
-    # Write-Warning "ManifestPath"
-    # Write-Warning $ManifestPath
+    Write-Warning "ManifestPath"
+    Write-Warning $ManifestPath
     # Write-Warning $ManifestPath.GetType()
     # Write-Warning "ModuleVersion"
     # Write-Warning $ModuleVersion
@@ -231,7 +231,7 @@ function ConfigureScubaGearModule {
     # Write-Warning "PrereleaseTag"
     # Write-Warning $PrereleaseTag
     # Write-Warning $PrereleaseTag.GetType()
-
+    Get-ChildItem C:\Users\RUNNER~1\AppData\Local\Temp\ScubaGear
     Get-Content $ManifestPath    
 
     try {
