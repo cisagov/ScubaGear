@@ -199,10 +199,9 @@ function ConfigureScubaGearModule {
 
     $ProjectUri = "https://github.com/cisagov/ScubaGear"
     $LicenseUri = "https://github.com/cisagov/ScubaGear/blob/main/LICENSE"
-    $Tags = @('CISA', 'O365', 'M365', 'AzureAD', 'Configuration', 'Exchange', 'Report', 'Security', 'SharePoint', 'Defender', 'Teams', 'PowerPlatform', 'OneDrive')
-
     # Tags cannot contain spaces
-    Write-Warning "Regressed the tags..."
+    $Tags = 'CISA', 'O365', 'M365', 'AzureAD', 'Configuration', 'Exchange', 'Report', 'Security', 'SharePoint', 'Defender', 'Teams', 'PowerPlatform', 'OneDrive'
+    
     $ManifestUpdates = @{
         Path          = $ManifestPath
         ModuleVersion = $ModuleVersion
