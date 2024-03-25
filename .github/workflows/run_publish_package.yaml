@@ -223,7 +223,7 @@ jobs:
           Write-Host '${{ inputs.PrereleaseTag }}'
 
           Write-Host "Hard-coded"
-          Install-Module -Name ScubaGear -AllowPrerelease -RequiredVersion 0.0.2-alpha4    
+          Install-Module -Name ScubaGear -AllowPrerelease -RequiredVersion 0.0.2-alpha4 -Force   
           # if ('true' -eq '${{ inputs.IsPrerelease }}')
           # {
           #   $Version = '${{ inputs.OverrideModuleVersion }}' + '${{ inputs.PrereleaseTag }}'
