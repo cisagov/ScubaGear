@@ -802,6 +802,11 @@ function New-Config {
         [ValidateNotNullOrEmpty()]
         [string]
         $OutReportName = "BaselineReports"
+        
+        [Parameter(Mandatory = $false)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $ConfigLocation = "./"
     )
 
     $Config = New-Object ([System.Collections.specialized.OrderedDictionary])
@@ -892,7 +897,7 @@ function New-Config {
                 }
         }
     }
-    convertto-yaml $Config | set-content "SampleConfig.yaml"
+    convertto-yaml $Config | set-content "$($ConfigLocation)/SampleConfig.yaml"
 }
 
 Export-ModuleMember -Function @(
