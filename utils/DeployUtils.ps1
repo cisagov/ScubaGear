@@ -244,7 +244,7 @@ function ConfigureScubaGearModule {
     }
 
     Write-Warning "The manifest updates are:"
-    Write-Warning Convert-String -Example $ManifestUpdates
+    Write-Warning $ManifestUpdates
 
     try {
         Write-Warning "Upating manifest..."
