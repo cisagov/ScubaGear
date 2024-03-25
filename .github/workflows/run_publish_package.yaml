@@ -103,6 +103,7 @@ jobs:
               ModulePath = 'repo/PowerShell/ScubaGear'
               GalleryName = $env:GalleryName
             }
+            $Parameters
             Publish-ScubaGearModule $Parameters
           azPSVersion: "latest"
       - name: Test Module Publish
