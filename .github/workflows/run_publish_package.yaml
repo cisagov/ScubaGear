@@ -219,6 +219,10 @@ jobs:
           {
             Install-Module -Name ScubaGear -AllowPrerelease  
           }
+          if ('true' -eq '${{ inputs.IsPrerelease }}' -and -Not [string]::IsNullOrEmpty('${{ inputs.OverrideModuleVersion }}'))
+          {
+            Install-Module -Name ScubaGear -AllowPrerelease -RequiredVersion ${{ inputs.OverrideModuleVersion }}
+          }
           else
           {
             Install-Module -Name ScubaGear
