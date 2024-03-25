@@ -235,5 +235,5 @@ jobs:
           #   Write-Host "Installing latest version"
           #   Install-Module -Name ScubaGear
           # }
-          Import-Module -Name ScubaGear
+          # Import-Module -Name ScubaGear
           Invoke-SCuBA -Version
