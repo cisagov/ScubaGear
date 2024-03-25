@@ -217,14 +217,17 @@ jobs:
         run: |
           if ('true' -eq '${{ inputs.IsPrerelease }}')
           {
+            Write-Host "Installing as prerelease"
             Install-Module -Name ScubaGear -AllowPrerelease  
           }
           if ('true' -eq '${{ inputs.IsPrerelease }}' -and -Not [string]::IsNullOrEmpty('${{ inputs.OverrideModuleVersion }}'))
           {
+            Write-Host "Installing as prerelease with required version"
             Install-Module -Name ScubaGear -AllowPrerelease -RequiredVersion ${{ inputs.OverrideModuleVersion }}
           }
           else
           {
+            Write-Host "Installing latest version"
             Install-Module -Name ScubaGear
           }
           Import-Module -Name ScubaGear
