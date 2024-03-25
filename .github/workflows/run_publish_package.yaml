@@ -222,16 +222,18 @@ jobs:
           Write-Host "Prerelease Tag"
           Write-Host '${{ inputs.PrereleaseTag }}'
 
-          if ('true' -eq '${{ inputs.IsPrerelease }}')
-          {
-            $Version = '${{ inputs.OverrideModuleVersion }}' + '${{ inputs.PrereleaseTag }}'
-            Write-Host "Installing as prerelease with required version: " + $version
-            Install-Module -Name ScubaGear -AllowPrerelease -RequiredVersion $version
-          }
-          else
-          {
-            Write-Host "Installing latest version"
-            Install-Module -Name ScubaGear
-          }
+          Write-Host "Hard-coded"
+          Install-Module -Name ScubaGear -AllowPrerelease -RequiredVersion 0.0.2-alpha4    
+          # if ('true' -eq '${{ inputs.IsPrerelease }}')
+          # {
+          #   $Version = '${{ inputs.OverrideModuleVersion }}' + '${{ inputs.PrereleaseTag }}'
+          #   Write-Host "Installing as prerelease with required version: " + $version
+          #   Install-Module -Name ScubaGear -AllowPrerelease -RequiredVersion $version
+          # }
+          # else
+          # {
+          #   Write-Host "Installing latest version"
+          #   Install-Module -Name ScubaGear
+          # }
           Import-Module -Name ScubaGear
           Invoke-SCuBA -Version
