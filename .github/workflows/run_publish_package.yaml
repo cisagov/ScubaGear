@@ -212,7 +212,8 @@ jobs:
           }
           # This publishes to PSGallery.
           Publish-ScubaGearModule @Parameters
-      - name: Check Scuba Version
+      # This is a manual test that writes the version to the console
+      - name: Print the Scuba Version
         run: |
           if ('true' -eq '${{ inputs.IsPrerelease }}')
           {
