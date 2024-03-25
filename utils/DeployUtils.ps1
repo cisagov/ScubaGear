@@ -188,6 +188,18 @@ function ConfigureScubaGearModule {
     )
     #TODO: Add any module configuration needed (e.g., adjust Module Version)
 
+    # Test:  Create new file
+    try
+    {
+        $TestPath = Join-Path -Path $ModulePath -ChildPath "test.txt"
+        New-Item -Path $TestPath -ItemType File
+    }
+    catch
+    {
+        Write-Warning "Could not create test file"
+        Write-Warning $_.ScriptStackTrace
+    }
+
     # Verify that the module path folder exists
     if (Test-Path -Path $ModulePath) 
     {
@@ -244,9 +256,10 @@ function ConfigureScubaGearModule {
     }
 
     Write-Warning "The manifest updates are:"
-    Write-Warning $ManifestUpdates
+    $ManifestUpdates
 
-    try {
+    try 
+    {
         Write-Warning "Upating manifest..."
         Update-ModuleManifest @ManifestUpdates
         # $CurrentErrorActionPreference = $ErrorActionPreference
@@ -256,10 +269,13 @@ function ConfigureScubaGearModule {
         # $ErrorActionPreference = $CurrentErrorActionPreference
         Write-Warning "Done updating and testing..."
     }
-    catch {
+    catch 
+    {
         Write-Warning "Warning: Manifest error:"
+        Write-Warning $_.ScriptStackTrace
+        Write-Warning $_.Exception
+        Write-Warning $_.ErrorDetails. 
         Write-Error $Result
-        Write-Error "Manifest is not valid"
         $Result = $null
     }
 
