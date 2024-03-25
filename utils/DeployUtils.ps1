@@ -188,12 +188,22 @@ function ConfigureScubaGearModule {
     )
     #TODO: Add any module configuration needed (e.g., adjust Module Version)
 
+    # Verify that the module path folder exists
+    if (Test-Path -Path $ModulePath) 
+    {
+        Write-Warning "The module dir exists at " + $ModulePath
+    }
+    else
+    {
+        Write-Error "The module dir does not exist at " + $ModulePath
+    }
+
     $ManifestPath = Join-Path -Path $ModulePath -ChildPath "ScubaGear.psd1"
     
     # Verify that the manifest file exists
     if (Test-Path -Path $ManifestPath) 
     {
-        Write-Warning "The manifiest file exists."
+        Write-Warning "The manifest file exists at " + $ManifestPath
     }
     else
     {
@@ -207,6 +217,8 @@ function ConfigureScubaGearModule {
         $TimeStamp = [int32](Get-Date -UFormat %s)
         $ModuleVersion = "$CurrentModuleVersion.$TimeStamp"
     }
+
+    Write-Warning "The module version is " + $ModuleVersion
 
     $ProjectUri = "https://github.com/cisagov/ScubaGear"
     $LicenseUri = "https://github.com/cisagov/ScubaGear/blob/main/LICENSE"
@@ -224,31 +236,8 @@ function ConfigureScubaGearModule {
         $ManifestUpdates.Add('Prerelease', $PrereleaseTag)
     }
 
-    Write-Warning "--- Module Path ---"
-    Write-Warning $ModulePath
-    Get-ChildItem $ModulePath
-    Write-Warning "--- Manifest Path ---"
-    Write-Warning $ManifestPath
-    Get-ChildItem 'C:\Users\RUNNER~1\AppData\Local\Temp\ScubaGear'
-    Get-Content $ManifestPath  
-    
-    # Write-Warning $ManifestPath.GetType()
-    # Write-Warning "ModuleVersion"
-    # Write-Warning $ModuleVersion
-    # Write-Warning $ModuleVersion.GetType()
-    # Write-Warning "ProjectUri"
-    # Write-Warning $ProjectUri
-    # Write-Warning $ProjectUri.GetType()
-    # Write-Warning "LicenseUri"
-    # Write-Warning $LicenseUri
-    # Write-Warning $LicenseUri.GetType()
-    # Write-Warning "Tags"
-    # Write-Warning [string]$Tags
-    # Write-Warning $Tags.GetType()
-    # Write-Warning "PrereleaseTag"
-    # Write-Warning $PrereleaseTag
-    # Write-Warning $PrereleaseTag.GetType()
-      
+    Write-Warning "The manifest updates are:"
+    Write-Warning $hash.Values | Out-string
 
     try {
         Write-Warning "Upating manifest..."
