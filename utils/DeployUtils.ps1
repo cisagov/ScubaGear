@@ -189,6 +189,17 @@ function ConfigureScubaGearModule {
     #TODO: Add any module configuration needed (e.g., adjust Module Version)
 
     $ManifestPath = Join-Path -Path $ModulePath -ChildPath "ScubaGear.psd1"
+    
+    # Verify that the manifest file exists
+    if (Test-Path -Path $ManifestPath) 
+    {
+        Write-Warning "The manifiest file exists."
+    }
+    else
+    {
+        Write-Error "The manifest file does not exist at " + $ManifestPath
+    }
+
     $ModuleVersion = $OverrideModuleVersion
 
     if ([string]::IsNullOrEmpty($OverrideModuleVersion)) {
