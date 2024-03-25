@@ -215,6 +215,13 @@ jobs:
       # This is a manual test that writes the version to the console
       - name: Print the Scuba Version
         run: |
+          Write-Host "IsPrerelease"
+          Write-Host '${{ inputs.IsPrerelease }}'
+          Write-Host "OverrideModuleVersion"
+          Write-Host '${{ inputs.OverrideModuleVersion }}'
+          Write-Host "Prerelease Tag"
+          Write-Host '${{ inputs.PrereleaseTag }}'
+
           if ('true' -eq '${{ inputs.IsPrerelease }}')
           {
             Write-Host "Installing as prerelease"
@@ -222,9 +229,9 @@ jobs:
           }
           if ('true' -eq '${{ inputs.IsPrerelease }}' -and -Not [string]::IsNullOrEmpty('${{ inputs.OverrideModuleVersion }}'))
           {
-            Write-Host "Installing as prerelease with required version:"
-            Write-Host ${{ inputs.OverrideModuleVersion }}
-            Install-Module -Name ScubaGear -AllowPrerelease -RequiredVersion ${{ inputs.OverrideModuleVersion }}
+            $Version = '${{ inputs.OverrideModuleVersion }}' + '${{ inputs.PrereleaseTag }}'
+            Write-Host "Installing as prerelease with required version: " + $version
+            Install-Module -Name ScubaGear -AllowPrerelease -RequiredVersion $version
           }
           else
           {
