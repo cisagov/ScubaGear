@@ -222,7 +222,8 @@ jobs:
           }
           if ('true' -eq '${{ inputs.IsPrerelease }}' -and -Not [string]::IsNullOrEmpty('${{ inputs.OverrideModuleVersion }}'))
           {
-            Write-Host "Installing as prerelease with required version"
+            Write-Host "Installing as prerelease with required version:"
+            Write-Host ${{ inputs.OverrideModuleVersion }}
             Install-Module -Name ScubaGear -AllowPrerelease -RequiredVersion ${{ inputs.OverrideModuleVersion }}
           }
           else
