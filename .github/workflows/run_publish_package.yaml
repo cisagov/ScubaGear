@@ -34,7 +34,7 @@ jobs:
     environment: Development
     permissions:
       id-token: write
-      contents: write
+      contents: write   
     defaults:
       run:
         shell: powershell
@@ -214,6 +214,13 @@ jobs:
           Publish-ScubaGearModule @Parameters
       - name: Check Scuba Version
         run: |
-          Install-Module -Name ScubaGear
+          if ('true' -eq '${{ inputs.IsPrerelease }}')
+          {
+            Install-Module -Name ScubaGear -AllowPrerelease  
+          }
+          else
+          {
+            Install-Module -Name ScubaGear
+          }
           Import-Module -Name ScubaGear
           Invoke-SCuBA -Version
