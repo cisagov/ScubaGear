@@ -354,7 +354,7 @@ GoodAuthenticationMethodConfigurations contains {
 
 tests contains {
     "PolicyId": PolicyId,
-    "Criticality": "Shall",
+    "Criticality": "Shall/Not-Implemented",
     "Commandlet": ["Get-MgBetaPolicyAuthenticationMethodPolicy"],
     "ActualValue": [],
     "ReportDetails": CheckedSkippedDetails("MS.AAD.3.4v1", Reason),
