@@ -98,13 +98,13 @@ function Publish-ScubaGearModule {
         [string]
         $GalleryName = 'PrivateScubaGearGallery',
         [Parameter(ParameterSetName = 'PublicGallery')]
-        [Parameter(ParameterSetName = 'PrivateGallery')]
+        # [Parameter(ParameterSetName = 'PrivateGallery')]
         [Parameter(Mandatory = $false)]
         [AllowEmptyString()]
         [string]
         $OverrideModuleVersion = "",
         [Parameter(ParameterSetName = 'PublicGallery')]
-        [Parameter(ParameterSetName = 'PrivateGallery')]
+        # [Parameter(ParameterSetName = 'PrivateGallery')]
         [Parameter(Mandatory = $false)]
         [AllowEmptyString()]
         [string]

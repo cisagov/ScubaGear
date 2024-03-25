@@ -68,35 +68,35 @@ jobs:
       run:
         shell: powershell
     steps:
-      - name: Install Azure Signing Tool
-        run: |
-          dotnet --version
-          dotnet tool install --global AzureSignTool --version 4.0.1
       - name: Checkout
         uses: actions/checkout@v4
         with:
           path: repo
-      - name: OIDC Login to Azure Public Cloud with AzPowershell (enableAzPSSession true)
+      - name: Install Azure Signing Tool
+        run: |
+          dotnet --version
+          dotnet tool install --global AzureSignTool --version 4.0.1
+      # OIDC Login to Azure Public Cloud with AzPowershell (enableAzPSSession true)
+      - name: Login to Azure
         uses: azure/login@v1
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           enable-AzPSSession: true
-      - name: Create temporary private gallery
+      - name: Create Private Gallery
         run: |
           cd repo
           . utils/DeployUtils.ps1
           New-PrivateGallery -GalleryName $env:GalleryName -Trusted
-      - name: Sign and publish module to private gallery
+      - name: Sign and Publish Module
         uses: azure/powershell@v1
         with:
           inlineScript: |
+            # Source the deploy utilities so the functions in it can be called.
             . repo/utils/DeployUtils.ps1
             # Remove non-release files
             Remove-Item -Recurse -Force repo -Include .git*
-            Write-Host "The gallery name is: "
-            Write-Host $env:GalleryName
             $Parameters = @{
               AzureKeyVaultUrl = '${{ needs.extract-secrets.outputs.KeyVaultUrl }}'
               CertificateName = '${{ needs.extract-secrets.outputs.KeyVaultCertificateName }}'
@@ -104,6 +104,7 @@ jobs:
               GalleryName = $env:GalleryName
             }
             $Parameters
+            # This publishes to a private gallery.
             Publish-ScubaGearModule $Parameters
           azPSVersion: "latest"
       - name: Test Module Publish
@@ -121,31 +122,31 @@ jobs:
           }
           $Config = New-PesterConfiguration -Hashtable $PesterConfig
           Invoke-Pester -Configuration $Config
-      - name: Check Scuba Version
+      - name: Print Scuba Version
         run: |
           Install-Module -Name ScubaGear -SkipPublisherCheck
-          Import-Module -Name ScubaGear
+          # Import-Module -Name ScubaGear
           Invoke-SCuBA -Version
-      - name: Sign and publish prerelease module to private gallery
-        uses: azure/powershell@v1
-        env:
-          KEY_VAULT_INFO: ${{ secrets.SCUBA_KEY_VAULT_DEV}}
-        with:
-          inlineScript: |
-            Write-Output "$(pwd)"
-            . repo/utils/DeployUtils.ps1
-            $KeyVaultInfo = ${env:KEY_VAULT_INFO} | ConvertFrom-Json
-            # Remove non-release files
-            Remove-Item -Recurse -Force repo -Include .git*
-            Publish-ScubaGearModule `
-              -AzureKeyVaultUrl $($KeyVaultInfo.KeyVault.URL) `
-              -CertificateName $($KeyVaultInfo.KeyVault.CertificateName) `
-              -ModulePath repo/PowerShell/ScubaGear `
-              -GalleryName $env:GalleryName `
-              -OverrideModuleVersion '9.9.9' `
-              -Prerelease 'alpha'
-          azPSVersion: "latest"
-      - name: Check Scuba Version
+      # - name: Sign and publish prerelease module to private gallery
+      #   uses: azure/powershell@v1
+      #   env:
+      #     KEY_VAULT_INFO: ${{ secrets.SCUBA_KEY_VAULT_DEV}}
+      #   with:
+      #     inlineScript: |
+      #       Write-Output "$(pwd)"
+      #       . repo/utils/DeployUtils.ps1
+      #       $KeyVaultInfo = ${env:KEY_VAULT_INFO} | ConvertFrom-Json
+      #       # Remove non-release files
+      #       Remove-Item -Recurse -Force repo -Include .git*
+      #       Publish-ScubaGearModule `
+      #         -AzureKeyVaultUrl $($KeyVaultInfo.KeyVault.URL) `
+      #         -CertificateName $($KeyVaultInfo.KeyVault.CertificateName) `
+      #         -ModulePath repo/PowerShell/ScubaGear `
+      #         -GalleryName $env:GalleryName `
+      #         -OverrideModuleVersion '9.9.9' `
+      #         -Prerelease 'alpha'
+      #     azPSVersion: "latest"
+      # - name: Check Scuba Version
         run: |
           $ScubaModules = Find-Module -Name ScubaGear -AllVersions -AllowPrerelease
           ($ScubaModules).Version
@@ -189,8 +190,7 @@ jobs:
           enable-AzPSSession: true
       - name: Sign and Publish Module
         run: |
-          # Source the deploy utilities so the functions in it
-          # can be called.
+          # Source the deploy utilities so the functions in it can be called.
           . repo/utils/DeployUtils.ps1
           # Remove non-release files
           Remove-Item -Recurse -Force repo -Include .git*
@@ -218,7 +218,7 @@ jobs:
           # This publishes to PSGallery.
           Publish-ScubaGearModule @Parameters
       # This is a manual test that writes the version to the console
-      - name: Print the Scuba Version
+      - name: Print Scuba Version
         run: |
           if ('true' -eq '${{ inputs.IsPrerelease }}')
           {
