@@ -147,15 +147,15 @@ jobs:
       #         -Prerelease 'alpha'
       #     azPSVersion: "latest"
       # - name: Check Scuba Version
-        run: |
-          $ScubaModules = Find-Module -Name ScubaGear -AllVersions -AllowPrerelease
-          ($ScubaModules).Version
-          if ($ScubaModules.Count -eq 2) {
-            Exit 0
-          }
-          else {
-            Exit 1
-          }
+        # run: |
+        #   $ScubaModules = Find-Module -Name ScubaGear -AllVersions -AllowPrerelease
+        #   ($ScubaModules).Version
+        #   if ($ScubaModules.Count -eq 2) {
+        #     Exit 0
+        #   }
+        #   else {
+        #     Exit 1
+        #   }
 
   # Publish on demand to the real gallery (PSGallery).
   publish-to-psgallery:
