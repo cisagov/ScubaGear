@@ -1335,7 +1335,7 @@ test_AdditionalProperties_Correct_V4 if {
         ]
     }
 
-    ReportDetailString := "0 role(s) or group(s) allowing without approval found"
+    ReportDetailString := "0 role(s) or group(s) allowing activation without approval found"
     TestResult("MS.AAD.7.6v1", Output, ReportDetailString, true) == true
 }
 
@@ -1383,7 +1383,7 @@ test_AdditionalProperties_Correct_V5 if {
         ]
     }
 
-    ReportDetailString := "0 role(s) or group(s) allowing without approval found"
+    ReportDetailString := "0 role(s) or group(s) allowing activation without approval found"
     TestResult("MS.AAD.7.6v1", Output, ReportDetailString, true) == true
 }
 
@@ -1418,7 +1418,11 @@ test_AdditionalProperties_Incorrect_V15 if {
         ]
     }
 
-    ReportDetailString := "1 role(s) or group(s) allowing without approval found:<br/>Global Administrator(Directory Role)"
+    ReportDetailString := concat("", [
+        "1 role(s) or group(s) allowing activation without approval found:",
+        "<br/>Global Administrator(Directory Role)"
+    ])
+
     TestResult("MS.AAD.7.6v1", Output, ReportDetailString, false) == true
 }
 
@@ -1468,7 +1472,11 @@ test_PIM_Group_Incorrect_V15 if {
         ]
     }
 
-    ReportDetailString := "1 role(s) or group(s) allowing without approval found:<br/>My PIM GROUP(PIM Group)"
+    ReportDetailString := concat("", [
+        "1 role(s) or group(s) allowing activation without approval found:",
+        "<br/>My PIM GROUP(PIM Group)"
+    ])
+
     TestResult("MS.AAD.7.6v1", Output, ReportDetailString, false) == true
 }
 
@@ -1592,7 +1600,11 @@ test_notificationRecipients_Incorrect_V1 if {
         ]
     }
 
-    DescriptionString := "1 role(s) or group(s) without notification e-mail configured for role assignments found:<br/>Global Administrator(Directory Role)"
+    DescriptionString := concat("", [
+        "1 role(s) or group(s) without notification e-mail configured for role assignments found:",
+        "<br/>Global Administrator(Directory Role)"
+    ])
+
     TestResult("MS.AAD.7.7v1", Output, DescriptionString, false) == true
 }
 
@@ -1636,8 +1648,11 @@ test_notificationRecipients_Incorrect_V2 if {
         ]
     }
 
-    ReportDetailString :=
-        "1 role(s) or group(s) without notification e-mail configured for role assignments found:<br/>Global Administrator(Directory Role)"
+    ReportDetailString := concat("", [
+        "1 role(s) or group(s) without notification e-mail configured for role assignments found:",
+        "<br/>Global Administrator(Directory Role)"
+    ])
+
     TestResult("MS.AAD.7.7v1", Output, ReportDetailString, false) == true
 }
 
@@ -1679,8 +1694,11 @@ test_notificationRecipients_Incorrect_V3 if {
         ]
     }
 
-    ReportDetailString :=
-        "1 role(s) or group(s) without notification e-mail configured for role assignments found:<br/>Global Administrator(Directory Role)"
+    ReportDetailString := concat("", [
+        "1 role(s) or group(s) without notification e-mail configured for role assignments found:",
+        "<br/>Global Administrator(Directory Role)"
+    ])
+
     TestResult("MS.AAD.7.7v1", Output, ReportDetailString, false) == true
 }
 
@@ -1738,8 +1756,11 @@ test_notificationRecipients_PIM_Incorrect_V3 if {
         ]
     }
 
-    ReportDetailString :=
-        "2 role(s) or group(s) without notification e-mail configured for role assignments found:<br/>Global Administrator(Directory Role), My PIM GRoup(PIM Group)"
+    ReportDetailString := concat("", [
+        "2 role(s) or group(s) without notification e-mail configured for role assignments found:",
+        "<br/>Global Administrator(Directory Role), My PIM GRoup(PIM Group)"
+    ])
+
     TestResult("MS.AAD.7.7v1", Output, ReportDetailString, false) == true
 }
 #--
@@ -1914,8 +1935,11 @@ test_Id_PIM_Incorrect_V2 if {
         ]
     }
 
-    ReportDetailString :=
-        "1 role(s) or group(s) without notification e-mail configured for Global Administrator activations found:<br/>My PIM Group(PIM Group)"
+    ReportDetailString := concat("", [
+        "1 role(s) or group(s) without notification e-mail configured for Global Administrator activations found:",
+        "<br/>My PIM Group(PIM Group)"
+    ])
+
     TestResult("MS.AAD.7.8v1", Output, ReportDetailString, false) == true
 }
 
@@ -1950,8 +1974,11 @@ test_Id_Incorrect if {
         ]
     }
 
-    ReportDetailString :=
-        "1 role(s) or group(s) without notification e-mail configured for Global Administrator activations found:<br/>Global Administrator(Directory Role)"
+    ReportDetailString := concat("", [
+        "1 role(s) or group(s) without notification e-mail configured for Global Administrator activations found:",
+        "<br/>Global Administrator(Directory Role)"
+    ])
+
     TestResult("MS.AAD.7.8v1", Output, ReportDetailString, false) == true
 }
 #--
@@ -2085,8 +2112,11 @@ test_DisplayName_Incorrect if {
         ]
     }
 
-    ReportDetailString :=
-        "1 role(s) or group(s) without notification e-mail configured for role activations found:<br/>Cloud Administrator(Directory Role)"
+    ReportDetailString := concat("", [
+        "1 role(s) or group(s) without notification e-mail configured for role activations found:",
+        "<br/>Cloud Administrator(Directory Role)"
+    ])
+
     TestResult("MS.AAD.7.9v1", Output, ReportDetailString, false) == true
 }
 
@@ -2132,8 +2162,11 @@ test_DisplayName_PIM_Incorrect if {
         ]
     }
 
-    ReportDetailString :=
-        "1 role(s) or group(s) without notification e-mail configured for role activations found:<br/>Cloud Administrator(Directory Role)"
+    ReportDetailString := concat("", [
+        "1 role(s) or group(s) without notification e-mail configured for role activations found:",
+        "<br/>Cloud Administrator(Directory Role)"
+    ])
+
     TestResult("MS.AAD.7.9v1", Output, ReportDetailString, false) == true
 }
 #--
