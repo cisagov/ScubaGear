@@ -188,26 +188,12 @@ function ConfigureScubaGearModule {
     )
     #TODO: Add any module configuration needed (e.g., adjust Module Version)
 
-    # Test:  Create new file
-    try
-    {
-        $TestPath = Join-Path -Path $ModulePath -ChildPath "test.txt"
-        New-Item -Path $TestPath -ItemType File
-    }
-    catch
-    {
-        Write-Warning "Could not create test file"
-        Write-Warning $_.ScriptStackTrace
-    }
-
     # Verify that the module path folder exists
-    if (Test-Path -Path $ModulePath) 
-    {
+    if (Test-Path -Path $ModulePath) {
         Write-Warning "The module dir exists at "
         Write-Warning $ModulePath
     }
-    else
-    {
+    else {
         Write-Warning "The module dir does not exist at "
         Write-Warning $ModulePath
         Write-Error "Failing..."
@@ -216,13 +202,11 @@ function ConfigureScubaGearModule {
     $ManifestPath = Join-Path -Path $ModulePath -ChildPath "ScubaGear.psd1"
     
     # Verify that the manifest file exists
-    if (Test-Path -Path $ManifestPath) 
-    {
+    if (Test-Path -Path $ManifestPath) {
         Write-Warning "The manifest file exists at "
         Write-Warning $ManifestPath
     }
-    else
-    {
+    else {
         Write-Warning "The manifest file does not exist at " 
         Write-Warning $ManifestPath
         Write-Error "Failing..."
@@ -258,8 +242,7 @@ function ConfigureScubaGearModule {
     Write-Warning "The manifest updates are:"
     $ManifestUpdates
 
-    try 
-    {
+    try {
         Write-Warning "Upating manifest..."
         Update-ModuleManifest @ManifestUpdates
         # $CurrentErrorActionPreference = $ErrorActionPreference
@@ -269,12 +252,11 @@ function ConfigureScubaGearModule {
         # $ErrorActionPreference = $CurrentErrorActionPreference
         Write-Warning "Done updating and testing..."
     }
-    catch 
-    {
+    catch {
         Write-Warning "Warning: Manifest error:"
         Write-Warning $_.ScriptStackTrace
         Write-Warning $_.Exception
-        Write-Warning $_.ErrorDetails. 
+        Write-Warning $_.ErrorDetails
         Write-Error $Result
         $Result = $null
     }
