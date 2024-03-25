@@ -726,6 +726,7 @@ function New-Config {
     Public
     #>
     [CmdletBinding(DefaultParameterSetName='Report')]
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', '')]
     param (
 
         [Parameter(Mandatory = $false)]
