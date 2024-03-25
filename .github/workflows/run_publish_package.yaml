@@ -105,7 +105,7 @@ jobs:
             }
             $Parameters
             # This publishes to a private gallery.
-            Publish-ScubaGearModule $Parameters
+            Publish-ScubaGearModule @Parameters
           azPSVersion: "latest"
       - name: Test Module Publish
         run: |
