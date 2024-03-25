@@ -826,6 +826,7 @@ function New-Config {
             $Config.add($_, $Val)
         }
     }
+
     $CapExclusionNamespace = @(
         "MS.AAD.1.1v1",
         "MS.AAD.2.1v1",
