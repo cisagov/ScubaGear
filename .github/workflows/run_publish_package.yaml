@@ -54,8 +54,9 @@ jobs:
   # Publish nightly to a a private gallery just to make
   # sure that the code can be published.  This is like a
   # smoke test.
-  Publish-Private-Package:
-    if: github.event.schedule == '23 0 * * *'
+  publish-to-private:
+    name: Publish to Private Gallery
+    # if: github.event.schedule == '23 0 * * *'
     needs:
       - extract-secrets
     runs-on: windows-latest
@@ -94,12 +95,15 @@ jobs:
             . repo/utils/DeployUtils.ps1
             # Remove non-release files
             Remove-Item -Recurse -Force repo -Include .git*
-            # TODO use parameters here, like line 194 below
-            Publish-ScubaGearModule `
-              -AzureKeyVaultUrl ${{ needs.extract-secrets.outputs.KeyVaultUrl}} `
-              -CertificateName ${{ needs.extract-secrets.outputs.KeyVaultCertificateName}} `
-              -ModulePath repo/PowerShell/ScubaGear `
-              -GalleryName $env:GalleryName
+            Write-Host "The gallery name is: "
+            Write-Host $env:GalleryName
+            $Parameters = @{
+              AzureKeyVaultUrl = '${{ needs.extract-secrets.outputs.KeyVaultUrl }}'
+              CertificateName = '${{ needs.extract-secrets.outputs.KeyVaultCertificateName }}'
+              ModulePath = 'repo/PowerShell/ScubaGear'
+              GalleryName = $env:GalleryName
+            }
+            Publish-ScubaGearModule $Parameters
           azPSVersion: "latest"
       - name: Test Module Publish
         run: |
@@ -166,74 +170,65 @@ jobs:
       run:
         shell: powershell
     steps:
-      # - name: Checkout
-      #   uses: actions/checkout@v4
-      #   with:
-      #     path: repo
-      # - name: Install Azure Signing Tool
-      #   run: |
-      #     dotnet --version
-      #     dotnet tool install --global AzureSignTool --version 4.0.1
-      # # OIDC Login to Azure Public Cloud with AzPowershell (enableAzPSSession true)
-      # - name: Login to Azure
-      #   uses: azure/login@v1
-      #   with:
-      #     client-id: ${{ secrets.AZURE_CLIENT_ID }}
-      #     tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-      #     subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      #     enable-AzPSSession: true
-      # - name: Sign and Publish Module
-      #   run: |
-      #     # Source the deploy utilities so the functions in it
-      #     # can be called.
-      #     . repo/utils/DeployUtils.ps1
-      #     # Remove non-release files
-      #     Remove-Item -Recurse -Force repo -Include .git*
-      #     # Extract the API key used to publish to PSGallery
-      #     $ApiKey = az keyvault secret show --id '${{ needs.extract-secrets.outputs.KeyVaultUrl }}/secrets/ScubaGear-PSGAllery-API-Key' --query value -o tsv
-      #     if (-Not $ApiKey)
-      #     {
-      #       Write-Error "Failed to retrieve API key"
-      #     }
-      #     $Parameters = @{
-      #       AzureKeyVaultUrl = '${{ needs.extract-secrets.outputs.KeyVaultUrl }}'
-      #       CertificateName = '${{ needs.extract-secrets.outputs.KeyVaultCertificateName }}'
-      #       ModulePath = 'repo/PowerShell/ScubaGear'
-      #       GalleryName = 'PSGallery'
-      #       NuGetApiKey = $ApiKey
-      #     }
-      #     if ('true' -eq '${{ inputs.IsPrerelease }}')
-      #     {
-      #       $Parameters.Add('PrereleaseTag', '${{ inputs.PrereleaseTag }}')
-      #     }
-      #     if (-Not [string]::IsNullOrEmpty('${{ inputs.OverrideModuleVersion }}'))
-      #     {
-      #       $Parameters.Add('OverrideModuleVersion', '${{ inputs.OverrideModuleVersion }}')
-      #     }
-      #     # This publishes to PSGallery.
-      #     Publish-ScubaGearModule @Parameters
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: repo
+      - name: Install Azure Signing Tool
+        run: |
+          dotnet --version
+          dotnet tool install --global AzureSignTool --version 4.0.1
+      # OIDC Login to Azure Public Cloud with AzPowershell (enableAzPSSession true)
+      - name: Login to Azure
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          enable-AzPSSession: true
+      - name: Sign and Publish Module
+        run: |
+          # Source the deploy utilities so the functions in it
+          # can be called.
+          . repo/utils/DeployUtils.ps1
+          # Remove non-release files
+          Remove-Item -Recurse -Force repo -Include .git*
+          # Extract the API key used to publish to PSGallery
+          $ApiKey = az keyvault secret show --id '${{ needs.extract-secrets.outputs.KeyVaultUrl }}/secrets/ScubaGear-PSGAllery-API-Key' --query value -o tsv
+          if (-Not $ApiKey)
+          {
+            Write-Error "Failed to retrieve API key"
+          }
+          $Parameters = @{
+            AzureKeyVaultUrl = '${{ needs.extract-secrets.outputs.KeyVaultUrl }}'
+            CertificateName = '${{ needs.extract-secrets.outputs.KeyVaultCertificateName }}'
+            ModulePath = 'repo/PowerShell/ScubaGear'
+            GalleryName = 'PSGallery'
+            NuGetApiKey = $ApiKey
+          }
+          if ('true' -eq '${{ inputs.IsPrerelease }}')
+          {
+            $Parameters.Add('PrereleaseTag', '${{ inputs.PrereleaseTag }}')
+          }
+          if (-Not [string]::IsNullOrEmpty('${{ inputs.OverrideModuleVersion }}'))
+          {
+            $Parameters.Add('OverrideModuleVersion', '${{ inputs.OverrideModuleVersion }}')
+          }
+          # This publishes to PSGallery.
+          Publish-ScubaGearModule @Parameters
       # This is a manual test that writes the version to the console
       - name: Print the Scuba Version
         run: |
-          Write-Host "IsPrerelease"
-          Write-Host '${{ inputs.IsPrerelease }}'
-          Write-Host "OverrideModuleVersion"
-          Write-Host '${{ inputs.OverrideModuleVersion }}'
-          Write-Host "Prerelease Tag"
-          Write-Host '${{ inputs.PrereleaseTag }}'
-
-          Write-Host "Hard-coded"
-          Install-Module -Name ScubaGear -AllowPrerelease -RequiredVersion 0.0.2-alpha4 -Force   
-          # if ('true' -eq '${{ inputs.IsPrerelease }}')
-          # {
-          #   $Version = '${{ inputs.OverrideModuleVersion }}' + '${{ inputs.PrereleaseTag }}'
-          #   Write-Host "Installing as prerelease with required version: " + $version
-          #   Install-Module -Name ScubaGear -AllowPrerelease -RequiredVersion $version
-          # }
-          # else
-          # {
-          #   Write-Host "Installing latest version"
-          #   Install-Module -Name ScubaGear
-          # }
+          if ('true' -eq '${{ inputs.IsPrerelease }}')
+          {
+            $Version = '${{ inputs.OverrideModuleVersion }}' + '${{ inputs.PrereleaseTag }}'
+            Write-Host "Installing as prerelease with required version: " + $version
+            Install-Module -Name ScubaGear -AllowPrerelease -RequiredVersion $version
+          }
+          else
+          {
+            Write-Host "Installing latest version"
+            Install-Module -Name ScubaGear
+          }
           # Import-Module -Name ScubaGear
           Invoke-SCuBA -Version

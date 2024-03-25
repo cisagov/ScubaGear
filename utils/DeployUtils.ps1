@@ -115,8 +115,10 @@ function Publish-ScubaGearModule {
         [string]
         $NuGetApiKey
     )
-
+    Write-Host "Publishing ScubaGear module..."
     $ModuleBuildPath = Build-ScubaModule -ModulePath $ModulePath -OverrideModuleVersion $OverrideModuleVersion -PrereleaseTag $PrereleaseTag
+
+    Write-Host "The module build path is " + $ModuleBuildPath
 
     if (SignScubaGearModule -AzureKeyVaultUrl $AzureKeyVaultUrl -CertificateName $CertificateName -ModulePath $ModuleBuildPath) {
         $Parameters = @{
@@ -375,6 +377,8 @@ function SignScubaGearModule {
         [ValidateScript({ [uri]::IsWellFormedUriString($_, 'Absolute') -and ([uri] $_).Scheme -in 'http', 'https' })]
         $TimeStampServer = 'http://timestamp.digicert.com'
     )
+
+    Write-Host "Signing ScubaGear module..."
 
     # Digitally sign scripts, manifest, and modules
     $FileList = CreateFileList -SourcePath $ModulePath -Extensions "*.ps1", "*.psm1", "*.psd1"
