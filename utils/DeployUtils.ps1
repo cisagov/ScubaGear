@@ -191,11 +191,14 @@ function ConfigureScubaGearModule {
     # Verify that the module path folder exists
     if (Test-Path -Path $ModulePath) 
     {
-        Write-Warning "The module dir exists at " + Convert-String -Example $ModulePath
+        Write-Warning "The module dir exists at "
+        Write-Warning $ModulePath
     }
     else
     {
-        Write-Error "The module dir does not exist at " + Convert-String -Example $ModulePath
+        Write-Warning "The module dir does not exist at "
+        Write-Warning $ModulePath
+        Write-Error "Failing..."
     }
 
     $ManifestPath = Join-Path -Path $ModulePath -ChildPath "ScubaGear.psd1"
@@ -203,11 +206,14 @@ function ConfigureScubaGearModule {
     # Verify that the manifest file exists
     if (Test-Path -Path $ManifestPath) 
     {
-        Write-Warning "The manifest file exists at " + Convert-String -Example $ManifestPath
+        Write-Warning "The manifest file exists at "
+        Write-Warning $ManifestPath
     }
     else
     {
-        Write-Error "The manifest file does not exist at " + Convert-String -Example $ManifestPath
+        Write-Warning "The manifest file does not exist at " 
+        Write-Warning $ManifestPath
+        Write-Error "Failing..."
     }
 
     $ModuleVersion = $OverrideModuleVersion
@@ -218,7 +224,8 @@ function ConfigureScubaGearModule {
         $ModuleVersion = "$CurrentModuleVersion.$TimeStamp"
     }
 
-    Write-Warning "The module version is " + Convert-String -Example $ModuleVersion
+    Write-Warning "The module version is " 
+    Write-Warning $ModuleVersion
 
     $ProjectUri = "https://github.com/cisagov/ScubaGear"
     $LicenseUri = "https://github.com/cisagov/ScubaGear/blob/main/LICENSE"
