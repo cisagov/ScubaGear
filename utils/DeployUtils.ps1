@@ -72,40 +72,40 @@ function Publish-ScubaGearModule {
     .Parameter NuGetApiKey
     Specifies the API key that you want to use to publish a module to the online gallery. 
     #>
-    [CmdletBinding(DefaultParameterSetName = 'PrivateGallery')]
+    # [CmdletBinding(DefaultParameterSetName = 'PrivateGallery')]
     param (
-        [Parameter(ParameterSetName = 'PublicGallery')]
-        [Parameter(ParameterSetName = 'PrivateGallery')]
+        # [Parameter(ParameterSetName = 'PublicGallery')]
+        # [Parameter(ParameterSetName = 'PrivateGallery')]
         [Parameter(Mandatory = $true)]
         [ValidateScript({ [uri]::IsWellFormedUriString($_, 'Absolute') -and ([uri] $_).Scheme -in 'https' })]
         [System.Uri]
         $AzureKeyVaultUrl,
-        [Parameter(ParameterSetName = 'PublicGallery')]
-        [Parameter(ParameterSetName = 'PrivateGallery')]
+        # [Parameter(ParameterSetName = 'PublicGallery')]
+        # [Parameter(ParameterSetName = 'PrivateGallery')]
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [string]
         $CertificateName,
-        [Parameter(ParameterSetName = 'PublicGallery')]
-        [Parameter(ParameterSetName = 'PrivateGallery')]
+        # [Parameter(ParameterSetName = 'PublicGallery')]
+        # [Parameter(ParameterSetName = 'PrivateGallery')]
         [Parameter(Mandatory = $true)]
         [ValidateScript({ Test-Path -Path $_ -PathType Container })]
         [string]
         $ModulePath,
-        [Parameter(ParameterSetName = 'PublicGallery')]
-        [Parameter(ParameterSetName = 'PrivateGallery')]
+        # [Parameter(ParameterSetName = 'PublicGallery')]
+        # [Parameter(ParameterSetName = 'PrivateGallery')]
         [Parameter(Mandatory = $false)]
         [ValidateNotNullOrEmpty()]
         [string]
         $GalleryName = 'PrivateScubaGearGallery',
-        [Parameter(ParameterSetName = 'PublicGallery')]
-        [Parameter(ParameterSetName = 'PrivateGallery')]
+        # [Parameter(ParameterSetName = 'PublicGallery')]
+        # [Parameter(ParameterSetName = 'PrivateGallery')]
         [Parameter(Mandatory = $false)]
         [AllowEmptyString()]
         [string]
         $OverrideModuleVersion = "",
-        [Parameter(ParameterSetName = 'PublicGallery')]
-        [Parameter(ParameterSetName = 'PrivateGallery')]
+        # [Parameter(ParameterSetName = 'PublicGallery')]
+        # [Parameter(ParameterSetName = 'PrivateGallery')]
         [Parameter(Mandatory = $false)]
         [AllowEmptyString()]
         [string]
