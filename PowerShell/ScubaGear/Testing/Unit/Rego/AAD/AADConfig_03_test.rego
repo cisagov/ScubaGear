@@ -1780,7 +1780,7 @@ test_Migrated_Correct if {
     TestResult("MS.AAD.3.4v1", Output, PASS, true) == true
 }
 
-test_Migrated_Incorrect if {
+test_preMigrated_Incorrect if {
     Output := aad.tests with input as {
         "authentication_method": [
             {
@@ -1795,12 +1795,28 @@ test_Migrated_Incorrect if {
 
     TestResult("MS.AAD.3.4v1", Output, FAIL, false) == true
 }
+
+test_migrateInProgress_Incorrect if {
+    Output := aad.tests with input as {
+        "authentication_method": [
+            {
+                "authentication_method_policy": [
+                    {
+                    "PolicyMigrationState": "migrationInProgress"
+                    }
+                ]
+            }
+        ]
+    }
+
+    TestResult("MS.AAD.3.4v1", Output, FAIL, false) == true
+}
 #--
 
 #
 # Policy MS.AAD.3.5v1
 #--
-test_NotImplemented_Incorrect_Sms if {
+test_SmsEnabled_Incorrect if {
 
     Output := aad.tests with input as {
         "authentication_method": [
@@ -1833,7 +1849,7 @@ test_NotImplemented_Incorrect_Sms if {
     TestResult("MS.AAD.3.5v1", Output, ReportDetails, false) == true
 }
 
-test_NotImplemented_Incorrect_Voice if {
+test_VoiceEnabled_Incorrect if {
 
     Output := aad.tests with input as {
         "authentication_method": [
@@ -1865,7 +1881,7 @@ test_NotImplemented_Incorrect_Voice if {
     TestResult("MS.AAD.3.5v1", Output, ReportDetails, false) == true
 }
 
-test_NotImplemented_Incorrect_Email if {
+test_EmailEnabled_Incorrect if {
 
     Output := aad.tests with input as {
         "authentication_method": [
@@ -1897,7 +1913,7 @@ test_NotImplemented_Incorrect_Email if {
     TestResult("MS.AAD.3.5v1", Output, ReportDetails, false) == true
 }
 
-test_NotImplemented_Incorrect_Migration if {
+test_PreMigration_NotImplemented if {
 
     Output := aad.tests with input as {
         "authentication_method": [
@@ -1930,7 +1946,7 @@ test_NotImplemented_Incorrect_Migration if {
     TestResult("MS.AAD.3.5v1", Output, CheckedSkippedDetails("MS.AAD.3.4v1", Reason), false) == true
 }
 
-test_NotImplemented_Correct_V4 if {
+test_MigrationComplete_Correct if {
 
     Output := aad.tests with input as {
         "authentication_method": [
