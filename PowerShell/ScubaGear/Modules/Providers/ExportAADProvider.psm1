@@ -107,20 +107,23 @@ function Export-AADProvider {
     # 5.3, 5.4
     $DirectorySettings = ConvertTo-Json -Depth 10 @($Tracker.TryCommand("Get-MgBetaDirectorySetting"))
 
-    # Read the properties and relationships of an authentication method policy
-    #Create the JSON needed for Rego 3.4
+    ##### This block of code below supports 3.3, 3.4, 3.5
     $AuthenticationMethodPolicy = $Tracker.TryCommand("Get-MgBetaPolicyAuthenticationMethodPolicy")
-    #Create the JSON needed for Rego 3.3 and 3.5
-    $AuthenticationMethodConfiguration = $AuthenticationMethodPolicy.AuthenticationMethodConfigurations
-    #$AuthenticationMethodFeatureSettings = @($AuthenticationMethodPolicy.AuthenticationMethodConfigurations | Where-Object { $_.Id -eq 'MicrosoftAuthenticator' })
+
     $AuthenticationMethodFeatureSettings = @($AuthenticationMethodPolicy.AuthenticationMethodConfigurations | Where-Object { $_.Id})
-    #Combine the authentication method policy properties
-    $authentication_method = @{
-               authentication_method_policy = $AuthenticationMethodPolicy
-               authentication_method_configuration = $AuthenticationMethodConfiguration
-               authentication_method_feature_settings = $AuthenticationMethodFeatureSettings
-}
-    $AuthenticationMethod = ConvertTo-Json  -Depth 10 @($authentication_method)
+
+    # Exclude the AuthenticationMethodConfigurations so we do not duplicate it in the JSON
+    $AuthenticationMethodPolicy = Get-MgBetaPolicyAuthenticationMethodPolicy | ForEach-Object {
+        $_ | Select-Object * -ExcludeProperty AuthenticationMethodConfigurations
+    }
+
+    $AuthenticationMethodObjects = @{
+        authentication_method_policy = $AuthenticationMethodPolicy
+        authentication_method_feature_settings = $AuthenticationMethodFeatureSettings
+    }
+
+    $AuthenticationMethod = ConvertTo-Json -Depth 10 @($AuthenticationMethodObjects)
+    ##### End block
 
    # 6.1
     $DomainSettings = ConvertTo-Json @($Tracker.TryCommand("Get-MgBetaDomain"))

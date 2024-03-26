@@ -319,21 +319,21 @@ tests contains {
 
 PolicyMigrationIsComplete := Status if {
     some Setting in input.authentication_method
-    some Policy in Setting.authentication_method_policy
-    Status := Policy.PolicyMigrationState == "migrationComplete"
+    PolicyMigrationState := Setting.authentication_method_policy.PolicyMigrationState
+    Status := PolicyMigrationState == "migrationComplete"
 }
 
 tests contains {
     "PolicyId": "MS.AAD.3.4v1",
     "Criticality": "Shall",
     "Commandlet": ["Get-MgBetaPolicyAuthenticationMethodPolicy"],
-    "ActualValue": [Policy.PolicyMigrationState],
+    "ActualValue": [PolicyMigrationState],
     "ReportDetails": ReportDetailsBoolean(Status),
     "RequirementMet": Status
 } if {
     some Setting in input.authentication_method
-    some Policy in Setting.authentication_method_policy
-    Status := Policy.PolicyMigrationState == "migrationComplete"
+    PolicyMigrationState := Setting.authentication_method_policy.PolicyMigrationState
+    Status := PolicyMigrationState == "migrationComplete"
 }
 #--
 
@@ -346,8 +346,7 @@ GoodAuthenticationMethodConfigurations contains {
     "State": Configuration.State
 } if {
     some Setting in input.authentication_method
-    some Item in Setting.authentication_method_policy
-    some Configuration in Item.AuthenticationMethodConfigurations
+    some Configuration in Setting.authentication_method_feature_settings
     Configuration.Id in ["Sms", "Voice", "Email"]
     Configuration.State == "disabled"
 }
