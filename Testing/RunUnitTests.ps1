@@ -194,7 +194,7 @@ function Invoke-TestName {
 
                 if ($Match){
                     Write-Output "`nTesting $Test"
-                    ..\opa_windows_amd64.exe test $RegoPolicyPath .\$($Filename.Fullname) -r $Test $Flag
+                    & $OPAExe test $RegoPolicyPath .\$($Filename.Fullname) -r $Test $Flag
                 }
                 else{
                     Write-Warning "`nNOT FOUND: $Test in $Filename"
