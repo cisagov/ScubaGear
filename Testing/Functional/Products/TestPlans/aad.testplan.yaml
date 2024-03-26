@@ -214,7 +214,7 @@ TestPlan:
           - Command: UpdateProviderExport
             Splat:
               updates:
-                authentication_method[0].authentication_method_policy[0].PolicyMigrationState: preMigration
+                authentication_method[0].authentication_method_policy.PolicyMigrationState: preMigration
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.AAD.3.4v1 Compliant case - Migration complete
@@ -222,7 +222,7 @@ TestPlan:
           - Command: UpdateProviderExport
             Splat:
               updates:
-                authentication_method[0].authentication_method_policy[0].PolicyMigrationState: migrationComplete
+                authentication_method[0].authentication_method_policy.PolicyMigrationState: migrationComplete
         Postconditions: []
         ExpectedResult: true
 
@@ -234,8 +234,8 @@ TestPlan:
           - Command: UpdateProviderExport
             Splat:
               updates:
-                authentication_method[0].authentication_method_policy[0].PolicyMigrationState: preMigration
-                authentication_method[0].authentication_method_policy[0].AuthenticationMethodConfigurations:
+                authentication_method[0].authentication_method_policy.PolicyMigrationState: preMigration
+                authentication_method[0].authentication_method_feature_settings:
                   - Id: Sms
                     State: disabled
                   - Id: Voice
@@ -250,8 +250,8 @@ TestPlan:
           - Command: UpdateProviderExport
             Splat:
               updates:
-                authentication_method[0].authentication_method_policy[0].PolicyMigrationState: migrationComplete
-                authentication_method[0].authentication_method_policy[0].AuthenticationMethodConfigurations:
+                authentication_method[0].authentication_method_policy.PolicyMigrationState: migrationComplete
+                authentication_method[0].authentication_method_feature_settings:
                   - Id: Sms
                     State: enabled
                   - Id: Voice
@@ -265,8 +265,8 @@ TestPlan:
           - Command: UpdateProviderExport
             Splat:
               updates:
-                authentication_method[0].authentication_method_policy[0].PolicyMigrationState: migrationComplete
-                authentication_method[0].authentication_method_policy[0].AuthenticationMethodConfigurations:
+                authentication_method[0].authentication_method_policy.PolicyMigrationState: migrationComplete
+                authentication_method[0].authentication_method_feature_settings:
                   - Id: Sms
                     State: disabled
                   - Id: Voice
@@ -280,8 +280,8 @@ TestPlan:
           - Command: UpdateProviderExport
             Splat:
               updates:
-                authentication_method[0].authentication_method_policy[0].PolicyMigrationState: migrationComplete
-                authentication_method[0].authentication_method_policy[0].AuthenticationMethodConfigurations:
+                authentication_method[0].authentication_method_policy.PolicyMigrationState: migrationComplete
+                authentication_method[0].authentication_method_feature_settings:
                   - Id: Sms
                     State: disabled
                   - Id: Voice
@@ -295,8 +295,8 @@ TestPlan:
           - Command: UpdateProviderExport
             Splat:
               updates:
-                authentication_method[0].authentication_method_policy[0].PolicyMigrationState: migrationComplete
-                authentication_method[0].authentication_method_policy[0].AuthenticationMethodConfigurations:
+                authentication_method[0].authentication_method_policy.PolicyMigrationState: migrationComplete
+                authentication_method[0].authentication_method_feature_settings:
                   - Id: Sms
                     State: disabled
                   - Id: Voice

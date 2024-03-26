@@ -1768,11 +1768,9 @@ test_Migrated_Correct if {
     Output := aad.tests with input as {
         "authentication_method": [
             {
-                "authentication_method_policy": [
-                    {
-                     "PolicyMigrationState": "migrationComplete"
-                      }
-                ]
+                "authentication_method_policy": {
+                        "PolicyMigrationState": "migrationComplete"
+                }
             }
         ]
     }
@@ -1784,11 +1782,9 @@ test_preMigrated_Incorrect if {
     Output := aad.tests with input as {
         "authentication_method": [
             {
-                "authentication_method_policy": [
-                    {
-                    "PolicyMigrationState": "preMigration"
-                    }
-                ]
+                "authentication_method_policy": {
+                        "PolicyMigrationState": "preMigration"
+                }
             }
         ]
     }
@@ -1800,11 +1796,9 @@ test_migrateInProgress_Incorrect if {
     Output := aad.tests with input as {
         "authentication_method": [
             {
-                "authentication_method_policy": [
-                    {
-                    "PolicyMigrationState": "migrationInProgress"
-                    }
-                ]
+                "authentication_method_policy": {
+                        "PolicyMigrationState": "migrationInProgress"
+                }
             }
         ]
     }
@@ -1821,11 +1815,7 @@ test_SmsEnabled_Incorrect if {
     Output := aad.tests with input as {
         "authentication_method": [
             {
-                    "authentication_method_policy": [
-                        {
-                            "PolicyMigrationState": "migrationComplete",
-
-                            "AuthenticationMethodConfigurations":  [
+                "authentication_method_feature_settings": [
                             {
                                 "Id": "Sms",
                                 "State": "enabled"
@@ -1838,9 +1828,11 @@ test_SmsEnabled_Incorrect if {
                                 "Id":  "Email",
                                 "State": "disabled"
                             }
-                        ]
-                    }
-                ]
+                ],
+
+                "authentication_method_policy": {
+                        "PolicyMigrationState": "migrationComplete"
+                }
             }
         ]
     }
@@ -1854,10 +1846,7 @@ test_VoiceEnabled_Incorrect if {
     Output := aad.tests with input as {
         "authentication_method": [
             {
-                "authentication_method_policy": [
-                    {
-                        "PolicyMigrationState": "migrationComplete",
-                        "AuthenticationMethodConfigurations":  [
+                "authentication_method_feature_settings": [
                             {
                                 "Id": "Sms",
                                 "State": "disabled"
@@ -1870,9 +1859,11 @@ test_VoiceEnabled_Incorrect if {
                                 "Id":  "Email",
                                 "State": "disabled"
                             }
-                        ]
-                    }
-                ]
+                ],
+
+                "authentication_method_policy": {
+                        "PolicyMigrationState": "migrationComplete"
+                }
             }
         ]
     }
@@ -1886,10 +1877,7 @@ test_EmailEnabled_Incorrect if {
     Output := aad.tests with input as {
         "authentication_method": [
             {
-                "authentication_method_policy": [
-                    {
-                        "PolicyMigrationState": "migrationComplete",
-                        "AuthenticationMethodConfigurations":  [
+                "authentication_method_feature_settings": [
                             {
                                 "Id": "Sms",
                                 "State": "disabled"
@@ -1902,9 +1890,11 @@ test_EmailEnabled_Incorrect if {
                                 "Id":  "Email",
                                 "State": "enabled"
                             }
-                        ]
-                    }
-                ]
+                ],
+
+                "authentication_method_policy": {
+                        "PolicyMigrationState": "migrationComplete"
+                }
             }
         ]
     }
@@ -1918,10 +1908,7 @@ test_PreMigration_NotImplemented if {
     Output := aad.tests with input as {
         "authentication_method": [
             {
-                "authentication_method_policy": [
-                    {
-                        "PolicyMigrationState": "preMigration",
-                        "AuthenticationMethodConfigurations":  [
+                "authentication_method_feature_settings": [
                             {
                                 "Id": "Sms",
                                 "State": "enabled"
@@ -1934,9 +1921,11 @@ test_PreMigration_NotImplemented if {
                                 "Id":  "Email",
                                 "State": "disabled"
                             }
-                        ]
-                    }
-                ]
+                ],
+
+                "authentication_method_policy": {
+                        "PolicyMigrationState": "preMigration"
+                }
             }
         ]
     }
@@ -1951,10 +1940,7 @@ test_MigrationComplete_Correct if {
     Output := aad.tests with input as {
         "authentication_method": [
             {
-                "authentication_method_policy": [
-                    {
-                        "PolicyMigrationState": "migrationComplete",
-                        "AuthenticationMethodConfigurations":  [
+                "authentication_method_feature_settings": [
                             {
                                 "Id": "Sms",
                                 "State": "disabled"
@@ -1967,9 +1953,11 @@ test_MigrationComplete_Correct if {
                                 "Id":  "Email",
                                 "State": "disabled"
                             }
-                        ]
-                    }
-                ]
+                ],
+
+                "authentication_method_policy": {
+                        "PolicyMigrationState": "migrationComplete"
+                }
             }
         ]
     }
