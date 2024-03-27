@@ -11,6 +11,7 @@ InModuleScope 'RunRego' {
     ){
         BeforeAll {
             Mock -ModuleName RunRego Invoke-ExternalCmd {return 0}
+            Mock -CommandName Test-Path {$true}
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'RegoParams')]
             $RegoParams = @{
                 'InputFile' = Join-Path -Path $PSScriptRoot -ChildPath "./RunRegoStubs/ProviderSettingsExport.json";
