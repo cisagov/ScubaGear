@@ -439,19 +439,19 @@ Group owners SHALL NOT be allowed to consent to applications.
 
 1.  In **Azure Active Directory** create a new Azure AD Group that contains admin users responsible for reviewing and adjudicating application consent requests. Group members will be notified when users request consent for new applications.
 
-2. Then in **Azure Active Directory** under **Manage**, select **Enterprise Applications.**
+2. Then in **Azure Active Directory** under **Applications**, select **Enterprise Applications.**
 
-3. Under **Security**, select **Consent and permissions**. Then select **User Consent Settings**.
+3. Under **Security**, select **Consent and permissions**. Then select **Admin consent settings**.
 
 4. Under **Admin consent requests** > **Users can request admin consent to apps they are unable to consent to** select **Yes**.
 
-5. Under **Who can review admin consent requests**, select the group responsible for reviewing and adjudicating app requests (created in step one above).
+5. Under **Who can review admin consent requests**, select **+ Add groups** and select the group responsible for reviewing and adjudicating app requests (created in step one above).
 
 6. Click **Save**.
 
 #### MS.AAD.5.4v1 Instructions
 
-1.  In **Azure Active Directory** under **Manage**, select **Enterprise Applications.**
+1.  In **Azure Active Directory** under **Applications**, select **Enterprise Applications.**
 
 2. Under **Security**, select **Consent and permissions.** Then select **User Consent Settings.**
 
