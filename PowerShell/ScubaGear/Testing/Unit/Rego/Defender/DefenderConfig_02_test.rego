@@ -41,7 +41,8 @@ test_TargetedUsers_Correct_V1 if {
                     ]
                 }
             }
-        }
+        },
+        "defender_license": true
     }
 
     TestResult("MS.DEFENDER.2.1v1", Output, PASS, true) == true
@@ -79,7 +80,8 @@ test_TargetedUsers_Correct_V2 if {
                     ]
                 }
             }
-        }
+        },
+        "defender_license": true
     }
 
     TestResult("MS.DEFENDER.2.1v1", Output, PASS, true) == true
@@ -118,7 +120,8 @@ test_TargetedUsers_Correct_V3 if {
                     ]
                 }
             }
-        }
+        },
+        "defender_license": true
     }
 
     TestResult("MS.DEFENDER.2.1v1", Output, PASS, true) == true
@@ -147,7 +150,8 @@ test_TargetedUsers_Incorrect_V1 if {
                     ]
                 }
             }
-        }
+        },
+        "defender_license": true
     }
 
     ReportDetailString := "Not all sensitive users are included for targeted protection in Standard policy."
@@ -177,7 +181,8 @@ test_TargetedUsers_Incorrect_V2 if {
                     ]
                 }
             }
-        }
+        },
+        "defender_license": true
     }
 
     ReportDetailString := "Not all sensitive users are included for targeted protection in Strict policy."
@@ -207,7 +212,8 @@ test_TargetedUsers_Incorrect_V3 if {
                     ]
                 }
             }
-        }
+        },
+        "defender_license": true
     }
 
     ReportDetailString := "Not all sensitive users are included for targeted protection in Strict or Standard policy."
@@ -247,7 +253,8 @@ test_TargetedUsers_Incorrect_V4 if {
                     ]
                 }
             }
-        }
+        },
+        "defender_license": true
     }
 
     ReportDetailString := "Not all sensitive users are included for targeted protection in Standard policy."
@@ -287,7 +294,8 @@ test_TargetedUsers_Incorrect_V5 if {
                     ]
                 }
             }
-        }
+        },
+        "defender_license": true
     }
 
     ReportDetailString := "Not all sensitive users are included for targeted protection in Standard policy."
@@ -326,10 +334,55 @@ test_TargetedUsers_Incorrect_V6 if {
                     ]
                 }
             }
-        }
+        },
+        "defender_license": true
     }
 
     ReportDetailString := "Not all sensitive users are included for targeted protection in Strict policy."
+    TestResult("MS.DEFENDER.2.1v1", Output, ReportDetailString, false) == true
+}
+
+test_TargetedUsers_Incorrect_V7 if {
+    Output := defender.tests with input as {
+        "anti_phish_policies": [
+            {
+                "Identity": "Standard Preset Security Policy1659535429826",
+                "Enabled": true,
+                "EnableTargetedUserProtection": true,
+                "TargetedUsersToProtect": [
+                    "John Doe;jdoe@someemail.com",
+                    "Jane Doe;jadoe@someemail.com"
+                ],
+                "TargetedUserProtectionAction": "Quarantine"
+            },
+            {
+                "Identity": "Strict Preset Security Policy1659535429826",
+                "Enabled": true,
+                "EnableTargetedUserProtection": true,
+                "TargetedUsersToProtect": [
+                    "John Doe;jdoe@someemail.com"
+                ],
+                "TargetedUserProtectionAction": "Quarantine"
+            }
+        ],
+        "scuba_config": {
+            "Defender": {
+                "MS.DEFENDER.2.1v1": {
+                    "SensitiveUsers": [
+                        "John Doe;jdoe@someemail.com",
+                        "Jane Doe;jadoe@someemail.com"
+                    ]
+                }
+            }
+        },
+        "defender_license": false
+    }
+
+    ReportDetailString := concat(" ", [
+        "Requirement not met **NOTE: Either you do not have sufficient permissions or",
+        "your tenant does not have a license for Microsoft Defender",
+        "for Office 365 Plan 1 or Plan 2, which is required for this feature.**"
+    ])
     TestResult("MS.DEFENDER.2.1v1", Output, ReportDetailString, false) == true
 }
 #--
@@ -370,7 +423,8 @@ test_AgencyDomains_Correct_V1 if {
                     ]
                 }
             }
-        }
+        },
+        "defender_license": true
     }
 
     TestResult("MS.DEFENDER.2.2v1", Output, PASS, true) == true
@@ -408,7 +462,8 @@ test_AgencyDomains_Correct_V2 if {
                     ]
                 }
             }
-        }
+        },
+        "defender_license": true
     }
 
     TestResult("MS.DEFENDER.2.2v1", Output, PASS, true) == true
@@ -437,7 +492,8 @@ test_AgencyDomains_Incorrect_V1 if {
                     ]
                 }
             }
-        }
+        },
+        "defender_license": true
     }
 
     ReportDetailString := "Not all agency domains are included for targeted protection in Standard policy."
@@ -467,7 +523,8 @@ test_AgencyDomains_Incorrect_V2 if {
                     ]
                 }
             }
-        }
+        },
+        "defender_license": true
     }
 
     ReportDetailString := "Not all agency domains are included for targeted protection in Strict policy."
@@ -497,7 +554,8 @@ test_AgencyDomains_Incorrect_V3 if {
                     ]
                 }
             }
-        }
+        },
+        "defender_license": true
     }
 
     ReportDetailString := "Not all agency domains are included for targeted protection in Strict or Standard policy."
@@ -537,7 +595,8 @@ test_AgencyDomains_Incorrect_V4 if {
                     ]
                 }
             }
-        }
+        },
+        "defender_license": true
     }
 
     ReportDetailString := "Not all agency domains are included for targeted protection in Standard policy."
@@ -577,7 +636,8 @@ test_AgencyDomains_Incorrect_V5 if {
                     ]
                 }
             }
-        }
+        },
+        "defender_license": true
     }
 
     ReportDetailString := "Not all agency domains are included for targeted protection in Standard policy."
@@ -616,7 +676,8 @@ test_AgencyDomains_Incorrect_V6 if {
                     ]
                 }
             }
-        }
+        },
+        "defender_license": true
     }
 
     ReportDetailString := "Not all agency domains are included for targeted protection in Strict policy."
@@ -651,7 +712,8 @@ test_AgencyDomains_Incorrect_V7 if {
             "Defender": {
                 "MS.DEFENDER.2.2v1": {}
             }
-        }
+        },
+        "defender_license": true
     }
 
     ReportDetailString := "Not all agency domains are included for targeted protection in Strict or Standard policy."
@@ -680,12 +742,47 @@ test_AgencyDomains_Incorrect_V8 if {
             "Defender": {
                 "MS.DEFENDER.2.2v1": {}
             }
-        }
+        },
+        "defender_license": true
     }
 
     ReportDetailString := concat(" ", [
         "No agency domains defined for impersonation protection assessment.",
         "See configuration file documentation for details on how to define."
+    ])
+    TestResult("MS.DEFENDER.2.2v1", Output, ReportDetailString, false) == true
+}
+
+test_AgencyDomains_Incorrect_V9 if {
+    Output := defender.tests with input as {
+        "anti_phish_policies": [
+            {
+                "Identity": "Standard Preset Security Policy1659535429826",
+                "Enabled": true,
+                "EnableTargetedDomainsProtection": true,
+                "TargetedDomainsToProtect": null,
+                "TargetedDomainProtectionAction": "Quarantine"
+            },
+            {
+                "Identity": "Strict Preset Security Policy1659535429826",
+                "Enabled": true,
+                "EnableTargetedDomainsProtection": true,
+                "TargetedDomainsToProtect": null,
+                "TargetedDomainProtectionAction": "Quarantine"
+            }
+        ],
+        "scuba_config": {
+            "Defender": {
+                "MS.DEFENDER.2.2v1": {}
+            }
+        },
+    "defender_license": false
+    }
+
+    ReportDetailString := concat(" ", [
+        "Requirement not met **NOTE: Either you do not have sufficient permissions or",
+        "your tenant does not have a license for Microsoft Defender",
+        "for Office 365 Plan 1 or Plan 2, which is required for this feature.**"
     ])
     TestResult("MS.DEFENDER.2.2v1", Output, ReportDetailString, false) == true
 }
@@ -727,7 +824,8 @@ test_CustomDomains_Correct_V1 if {
                     ]
                 }
             }
-        }
+        },
+        "defender_license": true
     }
 
     TestResult("MS.DEFENDER.2.3v1", Output, PASS, true) == true
@@ -765,7 +863,8 @@ test_CustomDomains_Correct_V2 if {
                     ]
                 }
             }
-        }
+        },
+        "defender_license": true
     }
 
     TestResult("MS.DEFENDER.2.3v1", Output, PASS, true) == true
@@ -804,7 +903,8 @@ test_CustomDomains_Correct_V3 if {
                     ]
                 }
             }
-        }
+        },
+        "defender_license": true
     }
 
     TestResult("MS.DEFENDER.2.3v1", Output, PASS, true) == true
@@ -832,7 +932,8 @@ test_CustomDomains_Correct_V4 if {
             "Defender": {
                 "MS.DEFENDER.2.3v1": {}
             }
-        }
+        },
+        "defender_license": true
     }
 
     TestResult("MS.DEFENDER.2.3v1", Output, PASS, true) == true
@@ -861,7 +962,8 @@ test_CustomDomains_Incorrect_V1 if {
                     ]
                 }
             }
-        }
+        },
+        "defender_license": true
     }
 
     ReportDetailString := "Not all partner domains are included for targeted protection in Standard policy."
@@ -891,7 +993,8 @@ test_CustomDomains_Incorrect_V2 if {
                     ]
                 }
             }
-        }
+        },
+        "defender_license": true
     }
 
     ReportDetailString := "Not all partner domains are included for targeted protection in Strict policy."
@@ -921,7 +1024,8 @@ test_CustomDomains_Incorrect_V3 if {
                     ]
                 }
             }
-        }
+        },
+        "defender_license": true
     }
 
     ReportDetailString := "Not all partner domains are included for targeted protection in Strict or Standard policy."
@@ -961,7 +1065,8 @@ test_CustomDomains_Incorrect_V4 if {
                     ]
                 }
             }
-        }
+        },
+        "defender_license": true
     }
 
     ReportDetailString := "Not all partner domains are included for targeted protection in Standard policy."
@@ -1001,7 +1106,8 @@ test_CustomDomains_Incorrect_V5 if {
                     ]
                 }
             }
-        }
+        },
+        "defender_license": true
     }
 
     ReportDetailString := "Not all partner domains are included for targeted protection in Standard policy."
@@ -1040,7 +1146,8 @@ test_CustomDomains_Incorrect_V6 if {
                     ]
                 }
             }
-        }
+        },
+        "defender_license": true
     }
 
     ReportDetailString := "Not all partner domains are included for targeted protection in Strict policy."
@@ -1075,10 +1182,52 @@ test_CustomDomains_Incorrect_V7 if {
             "Defender": {
                 "MS.DEFENDER.2.3v1": {}
             }
-        }
+        },
+        "defender_license": true
     }
 
     ReportDetailString := "Not all partner domains are included for targeted protection in Strict or Standard policy."
     TestResult("MS.DEFENDER.2.3v1", Output, ReportDetailString, false) == true
+}
+
+test_CustomDomains_Incorrect_V8 if {
+    Output := defender.tests with input as {
+        "anti_phish_policies": [
+            {
+                "Identity": "Standard Preset Security Policy1659535429826",
+                "Enabled": true,
+                "EnableTargetedDomainsProtection": true,
+                "TargetedDomainsToProtect": [
+                    "random.mail.example.com",
+                    "random.example.com"
+                ],
+                "TargetedDomainProtectionAction": "Quarantine"
+            },
+            {
+                "Identity": "Strict Preset Security Policy1659535429826",
+                "Enabled": true,
+                "EnableTargetedDomainsProtection": true,
+                "TargetedDomainsToProtect": [
+                    "random.mail.example.com",
+                    "random.example.com"
+                ],
+                "TargetedDomainProtectionAction": "Quarantine"
+            }
+        ],
+        "scuba_config": {
+            "Defender": {
+                "MS.DEFENDER.2.3v1": {}
+            }
+        },
+        "defender_license": false
+    }
+
+    ReportDetailString := concat(" ", [
+        "Requirement not met **NOTE: Either you do not have sufficient permissions or",
+        "your tenant does not have a license for Microsoft Defender",
+        "for Office 365 Plan 1 or Plan 2, which is required for this feature.**"
+    ])
+    TestResult("MS.DEFENDER.2.3v1", Output, ReportDetailString, false) == true
+
 }
 #--

@@ -12,6 +12,8 @@ import data.utils.defender.SensitiveAccountsSetting
 import data.utils.defender.ImpersonationProtection
 import data.utils.defender.ImpersonationProtectionConfig
 import data.utils.defender.ApplyLicenseWarning
+import data.utils.defender.ApplyLicenseWarningString
+import data.utils.defender.DLPLicenseWarningString
 
 
 #################
@@ -257,7 +259,7 @@ tests contains {
     "Criticality": "Should",
     "Commandlet": ["Get-AntiPhishPolicy"],
     "ActualValue": [StrictIP.Policy, StandardIP.Policy],
-    "ReportDetails": ReportDetailsString(Status, ErrorMessage),
+    "ReportDetails": ApplyLicenseWarningString(Status, ErrorMessage),
     "RequirementMet": Status
 } if {
     Policies := input.anti_phish_policies
@@ -289,7 +291,7 @@ tests contains {
     "Criticality": "Should",
     "Commandlet": ["Get-AntiPhishPolicy"],
     "ActualValue": [StrictIP.Policy, StandardIP.Policy],
-    "ReportDetails": ReportDetailsString(Status, ErrorMessage),
+    "ReportDetails": ApplyLicenseWarningString(Status, ErrorMessage),
     "RequirementMet": Status
 } if {
     Policies := input.anti_phish_policies
@@ -326,7 +328,7 @@ tests contains {
     "Criticality": "Should",
     "Commandlet": ["Get-AntiPhishPolicy"],
     "ActualValue": [StrictIP.Policy, StandardIP.Policy],
-    "ReportDetails": ReportDetailsString(Status, ErrorMessage),
+    "ReportDetails": ApplyLicenseWarningString(Status, ErrorMessage),
     "RequirementMet": Status
 } if {
     Policies := input.anti_phish_policies
@@ -480,7 +482,7 @@ tests contains {
     "Criticality": "Shall",
     "Commandlet": ["Get-DlpComplianceRule"],
     "ActualValue": Rules,
-    "ReportDetails": ReportDetailsString(Status, ErrorMessage),
+    "ReportDetails": DLPLicenseWarningString(Status, ErrorMessage),
     "RequirementMet": Status
 } if {
     error_rule := "No matching rules found for:"
@@ -529,17 +531,16 @@ error_policies contains "Teams" if count(Policies.Teams) == 0
 
 error_policies contains "Devices" if count(Policies.Devices) == 0
 
-# Create the Report details message for policy
-DefenderErrorMessage4_2 := ErrorMessage if {
-    count(PoliciesWithFullProtection) > 0
-    error_policy := "No enabled policy found that applies to:"
-    ErrorMessage := concat(" ", [error_policy, concat(", ", error_policies)])
-}
+# Show matching policies
+has_policies contains "Exchange" if count(Policies.Exchange) > 0
 
-DefenderErrorMessage4_2 := ErrorMessage if {
-    count(PoliciesWithFullProtection) == 0
-    ErrorMessage := "No DLP policy matching all types found for evaluation."
-}
+has_policies contains "SharePoint" if count(Policies.SharePoint) > 0
+
+has_policies contains "OneDrive" if count(Policies.OneDrive) > 0
+
+has_policies contains "Teams" if count(Policies.Teams) > 0
+
+has_policies contains "Devices" if count(Policies.Devices) > 0
 
 # If error_policies contains any value, then some M365 product does not
 # have a policy protectig all sensitive content & check should fail.
@@ -550,14 +551,17 @@ tests contains {
     "Criticality": "Should",
     "Commandlet": ["Get-DLPCompliancePolicy"],
     "ActualValue": Policies,
-    "ReportDetails": ReportDetailsString(Status, DefenderErrorMessage4_2),
+    "ReportDetails": DLPLicenseWarningString(Status, ErrorMessage),
     "RequirementMet": Status
 } if {
+    error_policy := ", however, policy missing:"
+    has_policy := "Policy location(s) matches with 4.1:"
+    ErrorMessage := concat(" ", [has_policy, concat(", ", has_policies), error_policy, concat(", ", error_policies)])
     Conditions := [
         count(error_policies) == 0,
-        count(PoliciesWithFullProtection) > 0,
+        input.dlp_license == true
     ]
-    Status := count(FilterArray(Conditions, true)) == 2
+    Status := count(FilterArray(Conditions, false)) == 0
 }
 
 #
@@ -599,7 +603,7 @@ tests contains {
     "Criticality": "Should",
     "Commandlet": ["Get-DlpComplianceRule"],
     "ActualValue": Rules,
-    "ReportDetails": ReportDetailsString(Status, DefenderErrorMessage4_3(Rules)),
+    "ReportDetails": DLPLicenseWarningString(Status, DefenderErrorMessage4_3(Rules)),
     "RequirementMet": Status
 } if {
     Rules := SensitiveRulesNotBlocking
@@ -644,7 +648,7 @@ tests contains {
     "Criticality": "Should",
     "Commandlet": ["Get-DlpComplianceRule"],
     "ActualValue": Rules,
-    "ReportDetails": ReportDetailsString(Status, DefenderErrorMessage4_4(Rules)),
+    "ReportDetails": DLPLicenseWarningString(Status, DefenderErrorMessage4_4(Rules)),
     "RequirementMet": Status
 } if {
     Rules := SensitiveRulesNotNotifying

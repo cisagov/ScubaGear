@@ -1,6 +1,7 @@
 package utils.defender
 import rego.v1
 import data.utils.report.ReportDetailsBoolean
+import data.utils.report.ReportDetailsString
 import data.utils.key.FAIL
 import data.utils.key.ConvertToSet
 import data.utils.key.FilterArray
@@ -200,5 +201,36 @@ ApplyLicenseWarning(_) := concat(" ", [FAIL, LicenseWarning]) if {
         "**NOTE: Either you do not have sufficient permissions or",
         "your tenant does not have a license for Microsoft Defender",
         "for Office 365 Plan 1, which is required for this feature.**"
+    ])
+}
+
+#################################################################################
+# Report Detail Functions for check that required Defender license #
+#################################################################################
+# If a defender license is present, don't apply the warning
+# and leave the message unchanged
+ApplyLicenseWarningString(Status, String) := ReportDetailsString(Status, String) if {
+    input.defender_license == true
+} 
+
+ApplyLicenseWarningString(Status,_) := concat(" ", [ReportDetailsBoolean(Status), LicenseWarning]) if {
+    input.defender_license == false
+    LicenseWarning := concat(" ", [
+        "**NOTE: Either you do not have sufficient permissions or",
+        "your tenant does not have a license for Microsoft Defender",
+        "for Office 365 Plan 1 or Plan 2, which is required for this feature.**"
+    ])
+}
+
+DLPLicenseWarningString(Status, String) := ReportDetailsString(Status, String) if {
+    input.dlp_license == true
+}
+
+DLPLicenseWarningString(Status,_) := concat(" ", [ReportDetailsBoolean(Status), LicenseWarning]) if {
+    input.dlp_license == false
+    LicenseWarning := concat(" ", [
+        "**NOTE: Either you do not have sufficient permissions or",
+        "your tenant does not have a license for Microsoft Defender",
+        "for DLP for Teams or DLP for Endpoint, which is required for this feature.**"
     ])
 }
