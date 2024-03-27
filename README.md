@@ -86,7 +86,7 @@ Initialize-SCuBA # Installs the minimum required dependencies
 > The `Install-OPA` cmdlet is called by default when running `Initialize-SCuBA`. The `Install-OPA` cmdlet can also be run by itself to download the executable.
 In the event of an unsuccessful download, users can manually download the OPA executable with the following steps:
 1. Go to OPA download site (https://www.openpolicyagent.org/docs/latest/#running-opa)
-2. Check the acceptable OPA version (Currently v0.61.0) for ScubaGear and select the corresponding version on top left of the website
+2. Look for the latest OPA version (Currently v0.61.0) for ScubaGear and select the corresponding version on top left of the website
 3. Navigate to the menu on left side of the screen: Introduction - Running OPA - Download OPA
 4. Locate the downloaded file, add the file to your desired location (default is ~\\.scubagear\Tools), open PowerShell, and use the following command to check the downloaded OPA version
 ```powershell
