@@ -21,7 +21,7 @@ class ScubaConfig {
     hidden static [ScubaConfig]$_Instance = [ScubaConfig]::new()
     hidden static [Boolean]$_IsLoaded = $false
     hidden static [hashtable]$ScubaDefaults = @{
-        DefaultOPAPath =   if (Test-Path $OPAExePath) {$OPAToolsPath} else {$PWD | Select-Object -ExpandProperty Path};
+        DefaultOPAPath = if (Test-Path $OPAExePath) {$OPAToolsPath} else {$PWD | Select-Object -ExpandProperty Path};
         DefaultProductNames = @("aad", "defender", "exo", "sharepoint", "teams")
         AllProductNames = @("aad", "defender", "exo", "powerplatform", "sharepoint", "teams")
         DefaultM365Environment = "commercial"
@@ -165,5 +165,4 @@ class ScubaConfig {
     static [ScubaConfig]GetInstance(){
         return [ScubaConfig]::_Instance
     }
-
 }
