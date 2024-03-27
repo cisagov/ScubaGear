@@ -248,55 +248,92 @@ tests contains {
 # MS.AAD.3.3v1
 #--
 
-# At this time we are unable to test for X because of NEW POLICY
-# If we have acceptable MFA then policy passes otherwise MS Authenticator need to be
-# enabled to pass. However, we can not currently check if MS Authenticator enabled
+# Save all policy names if MFAPolicies exist
+AuthenticatorMFA contains CAPolicy.DisplayName if {
+    some CAPolicy in input.conditional_access_policies
+    Count(MFAPolicies) > 0
+}
+
+# Microsoft Authenticator Method is good if associated method configuration state is set to "enabled" and state and location are set to "enabled" and all users
+MSAuthenticationMethodIsGood := Status if {
+    some Setting in input.authentication_method
+    some Item in Setting.authentication_method_feature_settings
+    Item.Id == "MicrosoftAuthenticator"
+
+    some Property in Item.AdditionalProperties
+
+    AppId := Property.displayAppInformationRequiredState.includeTarget.id
+    AppState := Property.displayAppInformationRequiredState.state
+    LocationId := Property.displayLocationInformationRequiredState.includeTarget.id
+    LocationState := Property.displayLocationInformationRequiredState.state
+
+    Conditions := [AppId == "all_users", AppState == "enabled", LocationId == "all_users", LocationState == "enabled"]
+    Status := count(FilterArray(Conditions, false)) == 0
+}
+
+MSAuthenticationMethodIsDisabled := Status if {
+    some Setting in input.authentication_method
+    some Item in Setting.authentication_method_policy
+    some Configuration in Item.AuthenticationMethodConfigurations
+
+    Conditions := [Configuration.Id == "MicrosoftAuthenticator", Configuration.State == "disabled"]
+    Status := count(FilterArray(Conditions, false)) == 0
+}
+# If policy matches basic conditions, special conditions,
+# & all exclusions are intentional, save the policy name
+AuthenticatorMFA contains CAPolicy.DisplayName if {
+    some CAPolicy in input.conditional_access_policies
+
+    # Match all simple conditions
+    PolicyConditionsMatch(CAPolicy)
+    "mfa" in CAPolicy.GrantControls.BuiltInControls
+    # Match if MS Authenticator is enabled and context information is selected
+    #Match if at least one of the auth methods are non-microsoft or the ms authen context information meets the requirements
+
+
+    # Only match policies with user and group exclusions if all exempted
+    UserExclusionsFullyExempt(CAPolicy, "MS.AAD.3.3v1") == true
+    GroupExclusionsFullyExempt(CAPolicy, "MS.AAD.3.3v1") == true
+}
+
+# If we have acceptable MFA then policy passes
+# If we have acceptable MFA and MS Authenticator is disabled the policy still passes
+# If we have acceptable MFA and MS Authenticator is enabled, location and context must be enabled for all users to pass.
 tests contains {
-    "PolicyId": "MS.AAD.3.3v1",
+   "PolicyId": "MS.AAD.3.3v1",
     "Criticality": "Shall",
     "Commandlet": ["Get-MgBetaIdentityConditionalAccessPolicy"],
-    "ActualValue": MFAPolicies,
-    "ReportDetails": concat(". ", [ReportFullDetailsArray(MFAPolicies, DescriptionString), CAPLINK]),
+    "ActualValue": AuthenticatorMFA,
+    "ReportDetails": concat(". ", [ReportFullDetailsArray(AuthenticatorMFA, DescriptionString), CAPLINK]),
     "RequirementMet": Status
 } if {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
-    Status := count(MFAPolicies) > 0
-    count(MFAPolicies) > 0
-}
+    Conditions := [count(AuthenticatorMFA) > 0, MSAuthenticationMethodIsGood == true, MSAuthenticationMethodIsDisabled == true]
 
-tests contains {
-    "PolicyId": PolicyId,
-    "Criticality": "Shall/Not-Implemented",
-    "Commandlet": [],
-    "ActualValue": [],
-    "ReportDetails": NotCheckedDetails(PolicyId),
-    "RequirementMet": false
-} if {
-    PolicyId := "MS.AAD.3.3v1"
-    count(MFAPolicies) == 0
+    Status := count(FilterArray(Conditions, true)) > 1
 }
-#--
 
 #
 # MS.AAD.3.4v1
 #--
 
 PolicyMigrationIsComplete := Status if {
-    some Policy in input.authentication_method
-    Status := Policy.PolicyMigrationState == "migrationComplete"
+    some Setting in input.authentication_method
+    PolicyMigrationState := Setting.authentication_method_policy.PolicyMigrationState
+    Status := PolicyMigrationState == "migrationComplete"
 }
 
-# At this time we are unable to test for X because of NEW POLICY
 tests contains {
     "PolicyId": "MS.AAD.3.4v1",
     "Criticality": "Shall",
     "Commandlet": ["Get-MgBetaPolicyAuthenticationMethodPolicy"],
-    "ActualValue": [Policy.PolicyMigrationState],
+    "ActualValue": [PolicyMigrationState],
     "ReportDetails": ReportDetailsBoolean(Status),
     "RequirementMet": Status
 } if {
-    some Policy in input.authentication_method
-    Status := Policy.PolicyMigrationState == "migrationComplete"
+    some Setting in input.authentication_method
+    PolicyMigrationState := Setting.authentication_method_policy.PolicyMigrationState
+    Status := PolicyMigrationState == "migrationComplete"
 }
 #--
 
@@ -308,15 +345,15 @@ GoodAuthenticationMethodConfigurations contains {
     "Id": Configuration.Id,
     "State": Configuration.State
 } if {
-    some Item in input.authentication_method
-    some Configuration in Item.AuthenticationMethodConfigurations
+    some Setting in input.authentication_method
+    some Configuration in Setting.authentication_method_feature_settings
     Configuration.Id in ["Sms", "Voice", "Email"]
     Configuration.State == "disabled"
 }
 
 tests contains {
     "PolicyId": PolicyId,
-    "Criticality": "Shall",
+    "Criticality": "Shall/Not-Implemented",
     "Commandlet": ["Get-MgBetaPolicyAuthenticationMethodPolicy"],
     "ActualValue": [],
     "ReportDetails": CheckedSkippedDetails("MS.AAD.3.4v1", Reason),
