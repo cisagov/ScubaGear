@@ -172,7 +172,7 @@ function New-Report {
         $ReportJson.Results += $Fragment
 
         # Regex will filter out any <table> tags without an id attribute (replace new fragments only, not <table> tags which have already been modified)
-        $Fragments = $Fragments -replace ".*(<table(?![^>]+id)*>)", "<table class='policy-data' id='$Number' style = 'text-align:center;'>"
+        $Fragments = $Fragments -replace ".*(<table(?![^>]+id)*>)", "<table class='policy-data' id='$Number'>"
     }
 
     # Craft the json report
