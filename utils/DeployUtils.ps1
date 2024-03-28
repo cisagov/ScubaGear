@@ -104,8 +104,8 @@ function Publish-ScubaGearModule {
     )
 
     Write-Output "Publishing ScubaGear module..."
+    
     $ModuleBuildPath = Build-ScubaModule -ModulePath $ModulePath -OverrideModuleVersion $OverrideModuleVersion -PrereleaseTag $PrereleaseTag
-
     Write-Output "The module build path is "
     Write-Output $ModuleBuildPath
 
@@ -117,7 +117,6 @@ function Publish-ScubaGearModule {
         if ($GalleryName -eq 'PSGallery') {
             $Parameters.Add('NuGetApiKey', $NuGetApiKey)
         }
-
         Publish-Module @Parameters
     }
     else {
@@ -340,10 +339,8 @@ function SignScubaGearModule {
     module to be published to PSGallery.
     https://learn.microsoft.com/en-us/powershell/gallery/concepts/publishing-guidelines?view=powershellget-3.x show
     general guidance.
-
     There is anecdotal evidence to sign all PowerShell artifacts (ps1, psm1, and pdsd1) in additional to a signed catalog For example,
     Microsoft.PowerApps.PowerShell (v1.0.34) and see both *.psd1 and *.psm1 files are signed and a catalog provided.
-
     There are a number of Non-authoritive references such as below showing all ps1, psm1, and psd1 being signed first then cataloged.
     https://github.com/dell/OpenManage-PowerShell-Modules/blob/main/Sign-Module.ps1
     #>
