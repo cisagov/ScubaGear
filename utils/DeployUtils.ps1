@@ -102,6 +102,7 @@ function Publish-ScubaGearModule {
         [string]
         $NuGetApiKey
     )
+    Write-Debug "DEBUG TEST"
     Write-Host "Publishing ScubaGear module..."
     $ModuleBuildPath = Build-ScubaModule -ModulePath $ModulePath -OverrideModuleVersion $OverrideModuleVersion -PrereleaseTag $PrereleaseTag
 
