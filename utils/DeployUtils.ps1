@@ -311,7 +311,7 @@ function CallAzureSignTool {
         '-ifl', $FileList
     )
 
-    Write-Host "Calling AzureSignTool: $SignArguments"
+    Write-Output "Calling AzureSignTool: $SignArguments"
 
     $ToolPath = (Get-Command AzureSignTool).Path
     & $ToolPath $SignArguments
@@ -360,7 +360,7 @@ function SignScubaGearModule {
         $TimeStampServer = 'http://timestamp.digicert.com'
     )
 
-    Write-Host "Signing ScubaGear module..."
+    Write-Output "Signing ScubaGear module..."
 
     # Digitally sign scripts, manifest, and modules
     $FileList = CreateFileList -SourcePath $ModulePath -Extensions "*.ps1", "*.psm1", "*.psd1"
