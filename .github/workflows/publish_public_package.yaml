@@ -20,7 +20,7 @@ on:
         type: string
   push:
     paths:
-      - ".github/workflows/run_publish_package.yaml"
+      - ".github/workflows/publish_public_package.yaml"
       - "utils/DeployUtils.ps1"
 
 jobs:
