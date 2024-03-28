@@ -72,7 +72,6 @@ function Publish-ScubaGearModule {
     .Parameter NuGetApiKey
     Specifies the API key that you want to use to publish a module to the online gallery. 
     #>
-    # [CmdletBinding(DefaultParameterSetName = 'PrivateGallery')]
     param (
         # [Parameter(ParameterSetName = 'PublicGallery')]
         # [Parameter(ParameterSetName = 'PrivateGallery')]
