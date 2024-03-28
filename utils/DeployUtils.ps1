@@ -271,10 +271,10 @@ function CreateFileList {
     if ($Extensions.Count -gt 0) {
         $FileNames += Get-ChildItem -Recurse -Path $SourcePath -Include $Extensions
     }
-    Write-Output "Found $($FileNames.Count) files to sign"
+    Write-Debug "Found $($FileNames.Count) files to sign"
     $FileList = New-TemporaryFile
     $FileNames.FullName | Out-File -FilePath $($FileList.FullName) -Encoding utf8 -Force
-    Write-Output "Files: $(Get-Content $FileList)"
+    Write-Debug "Files: $(Get-Content $FileList)"
     return $FileList.FullName
 }
 
