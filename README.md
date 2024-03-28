@@ -1,7 +1,7 @@
 # ScubaGear <!-- omit in toc -->
 <p>
         <a href="https://github.com/cisagov/ScubaGear/releases" alt="ScubaGear version #">
-        <img src="https://img.shields.io/badge/ScubaGear-v1.1.1-%2328B953?labelColor=%23005288" /></a>
+        <img src="https://img.shields.io/badge/ScubaGear-v1.2.0-%2328B953?labelColor=%23005288" /></a>
 </p>
 
 Developed by CISA, ScubaGear is an assessment tool that verifies a Microsoft 365 (M365) tenant’s configuration conforms to the policies described in the Secure Cloud Business Applications ([SCuBA](https://cisa.gov/scuba)) Security Configuration Baseline [documents](https://github.com/cisagov/ScubaGear/tree/main/baselines).
@@ -52,7 +52,7 @@ If a tenant does not have the licenses listed above, the report will display a n
 To download ScubaGear:
 
 1. Click [here](https://github.com/cisagov/ScubaGear/releases/latest) to see the latest release.
-2. Click `ScubaGear-v1-1-1.zip` (or latest version) to download the release.
+2. Click `ScubaGear-v1-2-0.zip` (or latest version) to download the release.
 3. Extract the folder in the zip file.
 
 ### PowerShell Execution Policies
