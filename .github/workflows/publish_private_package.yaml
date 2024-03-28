@@ -72,7 +72,6 @@ jobs:
               ModulePath = 'repo/PowerShell/ScubaGear'
               GalleryName = $env:GalleryName
             }
-            $Parameters
             # This publishes to a private gallery.
             Publish-ScubaGearModule @Parameters
           azPSVersion: "latest"
