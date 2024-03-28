@@ -88,8 +88,8 @@ jobs:
           #     $Parameters.Add('OverrideModuleVersion', '${{ inputs.OverrideModuleVersion }}')
           #   }
           # Temporarily hard-coding inputs b/c workflow dispatch.
-          $Parameters.Add('PrereleaseTag', '0.0.2')
-          $Parameters.Add('OverrideModuleVersion', '-alpha10')
+          $Parameters.Add('PrereleaseTag', '-alpha10')
+          $Parameters.Add('OverrideModuleVersion', '0.0.2')
           # This publishes to PSGallery.
           Publish-ScubaGearModule @Parameters
       # This is a manual test that writes the version to the console
