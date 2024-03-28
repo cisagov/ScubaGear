@@ -102,12 +102,12 @@ function Publish-ScubaGearModule {
         [string]
         $NuGetApiKey
     )
-    Write-Output "OUTPUT TEST"
-    Write-Host "Publishing ScubaGear module..."
+    
+    Write-Output "Publishing ScubaGear module..."
     $ModuleBuildPath = Build-ScubaModule -ModulePath $ModulePath -OverrideModuleVersion $OverrideModuleVersion -PrereleaseTag $PrereleaseTag
 
-    Write-Host "The module build path is "
-    Write-Host $ModuleBuildPath
+    Write-Output "The module build path is "
+    Write-Output $ModuleBuildPath
     
     if (SignScubaGearModule -AzureKeyVaultUrl $AzureKeyVaultUrl -CertificateName $CertificateName -ModulePath $ModuleBuildPath) {
         $Parameters = @{
@@ -181,8 +181,8 @@ function ConfigureScubaGearModule {
 
     # Verify that the module path folder exists
     if (Test-Path -Path $ModulePath) {
-        Write-Host "The module dir exists at "
-        Write-Host $ModulePath
+        Write-Output "The module dir exists at "
+        Write-Output $ModulePath
     }
     else {
         Write-Warning "The module dir does not exist at "
