@@ -102,13 +102,13 @@ function Publish-ScubaGearModule {
         [string]
         $NuGetApiKey
     )
-    Write-Output "OUTPUT TEST"
-    Write-Host "Publishing ScubaGear module..."
+
+    Write-Output "Publishing ScubaGear module..."
     $ModuleBuildPath = Build-ScubaModule -ModulePath $ModulePath -OverrideModuleVersion $OverrideModuleVersion -PrereleaseTag $PrereleaseTag
 
-    Write-Host "The module build path is "
-    Write-Host $ModuleBuildPath
-    
+    Write-Output "The module build path is "
+    Write-Output $ModuleBuildPath
+
     if (SignScubaGearModule -AzureKeyVaultUrl $AzureKeyVaultUrl -CertificateName $CertificateName -ModulePath $ModuleBuildPath) {
         $Parameters = @{
             Path       = $ModuleBuildPath
@@ -181,8 +181,8 @@ function ConfigureScubaGearModule {
 
     # Verify that the module path folder exists
     if (Test-Path -Path $ModulePath) {
-        Write-Host "The module dir exists at "
-        Write-Host $ModulePath
+        Write-Output "The module dir exists at "
+        Write-Output $ModulePath
     }
     else {
         Write-Warning "The module dir does not exist at "
@@ -194,8 +194,8 @@ function ConfigureScubaGearModule {
 
     # Verify that the manifest file exists
     if (Test-Path -Path $ManifestPath) {
-        Write-Host "The manifest file exists at "
-        Write-Host $ManifestPath
+        Write-Output "The manifest file exists at "
+        Write-Output $ManifestPath
     }
     else {
         Write-Warning "The manifest file does not exist at "
@@ -211,8 +211,8 @@ function ConfigureScubaGearModule {
         $ModuleVersion = "$CurrentModuleVersion.$TimeStamp"
     }
 
-    Write-Host "The module version is "
-    Write-Host $ModuleVersion
+    Write-Output "The module version is "
+    Write-Output $ModuleVersion
 
     $ProjectUri = "https://github.com/cisagov/ScubaGear"
     $LicenseUri = "https://github.com/cisagov/ScubaGear/blob/main/LICENSE"
@@ -230,7 +230,7 @@ function ConfigureScubaGearModule {
         $ManifestUpdates.Add('Prerelease', $PrereleaseTag)
     }
 
-    Write-Host "The manifest updates are:"
+    Write-Output "The manifest updates are:"
     $ManifestUpdates
 
     try {
@@ -274,11 +274,11 @@ function CreateFileList {
         $FileNames += Get-ChildItem -Recurse -Path $SourcePath -Include $Extensions
     }
 
-    Write-Host "Found $($FileNames.Count) files to sign"
+    Write-Output "Found $($FileNames.Count) files to sign"
 
     $FileList = New-TemporaryFile
     $FileNames.FullName | Out-File -FilePath $($FileList.FullName) -Encoding utf8 -Force
-    Write-Host "Files: $(Get-Content $FileList)"
+    Write-Output "Files: $(Get-Content $FileList)"
     return $FileList.FullName
 }
 
@@ -315,7 +315,7 @@ function CallAzureSignTool {
         '-ifl', $FileList
     )
 
-    Write-Host "Calling AzureSignTool: $SignArguments"
+    Write-Output "Calling AzureSignTool: $SignArguments"
 
     $ToolPath = (Get-Command AzureSignTool).Path
     & $ToolPath $SignArguments
@@ -364,7 +364,7 @@ function SignScubaGearModule {
         $TimeStampServer = 'http://timestamp.digicert.com'
     )
 
-    Write-Host "Signing ScubaGear module..."
+    Write-Output "Signing ScubaGear module..."
 
     # Digitally sign scripts, manifest, and modules
     $FileList = CreateFileList -SourcePath $ModulePath -Extensions "*.ps1", "*.psm1", "*.psd1"
