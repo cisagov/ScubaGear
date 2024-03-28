@@ -169,7 +169,13 @@ function New-Report {
         $GroupAnchor = New-MarkdownAnchor -GroupNumber $BaselineGroup.GroupNumber -GroupName $BaselineGroup.GroupName
         $MarkdownLink = "<a class='control_group' href=`"$($ScubaGitHubUrl)/blob/v$($SettingsExport.module_version)/PowerShell/ScubaGear/baselines/$($BaselineName.ToLower()).md$GroupAnchor`" target=`"_blank`">$Name</a>"
         $Fragments += $Fragment | ConvertTo-Html -PreContent "<h2>$Number $MarkdownLink</h2>" -Fragment
-        $ReportJson.Results += $Fragment
+
+        # Package
+        $ReportJson.Results += [pscustomobject]@{
+            GroupName = $BaselineGroup.GroupName;
+            GroupNumber = $BaselineGroup.GroupNumber;
+            Controls = $Fragment;
+        }
 
         # Regex will filter out any <table> tags without an id attribute (replace new fragments only, not <table> tags which have already been modified)
         $Fragments = $Fragments -replace ".*(<table(?![^>]+id)*>)", "<table class='policy-data' id='$Number'>"
@@ -178,7 +184,8 @@ function New-Report {
     # Craft the json report
     $ReportJson.ReportSummary = $ReportSummary
     $JsonFileName = Join-Path -Path $IndividualReportPath -ChildPath "$($BaselineName)Report.json"
-    $ReportJson = ConvertTo-Json @($ReportJson) -Depth 3
+    #
+    $ReportJson = ConvertTo-Json @($ReportJson) -Depth 5
 
     # ConvertTo-Json for some reason converts the <, >, and ' characters into unicode escape sequences.
     # Convert those back to ASCII.

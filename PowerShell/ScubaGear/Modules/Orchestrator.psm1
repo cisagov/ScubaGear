@@ -844,6 +844,7 @@ function Merge-JsonOutput {
                 $FileName = Join-Path $IndividualReportPath "$($BaselineName)Report.json"
                 $DeletionList += $FileName
                 $IndividualResults = Get-Content $FileName | ConvertFrom-Json
+
                 $Results | Add-Member -NotePropertyName $BaselineName `
                     -NotePropertyValue $IndividualResults.Results
 
@@ -856,7 +857,7 @@ function Merge-JsonOutput {
 
             # Convert the output a json string
             $MetaData = ConvertTo-Json $MetaData
-            $Results = ConvertTo-Json $Results -Depth 3
+            $Results = ConvertTo-Json $Results -Depth 5
             $Summary = ConvertTo-Json $Summary -Depth 3
             $ReportJson = @"
 {
