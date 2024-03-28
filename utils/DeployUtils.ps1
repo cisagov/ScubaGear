@@ -70,7 +70,7 @@ function Publish-ScubaGearModule {
     .Parameter PrereleaseTag
     The identifier that will be used in place of a version to identify the module in the gallery
     .Parameter NuGetApiKey
-    Specifies the API key that you want to use to publish a module to the online gallery. 
+    Specifies the API key that you want to use to publish a module to the online gallery.
     #>
     param (
         [Parameter(Mandatory = $true)]
@@ -102,12 +102,13 @@ function Publish-ScubaGearModule {
         [string]
         $NuGetApiKey
     )
-    Write-Debug "DEBUG TEST"
+    Write-Output "OUTPUT TEST"
     Write-Host "Publishing ScubaGear module..."
     $ModuleBuildPath = Build-ScubaModule -ModulePath $ModulePath -OverrideModuleVersion $OverrideModuleVersion -PrereleaseTag $PrereleaseTag
 
-    Write-Host "The module build path is " + $ModuleBuildPath
-
+    Write-Host "The module build path is "
+    Write-Host $ModuleBuildPath
+    
     if (SignScubaGearModule -AzureKeyVaultUrl $AzureKeyVaultUrl -CertificateName $CertificateName -ModulePath $ModuleBuildPath) {
         $Parameters = @{
             Path       = $ModuleBuildPath
@@ -190,14 +191,14 @@ function ConfigureScubaGearModule {
     }
 
     $ManifestPath = Join-Path -Path $ModulePath -ChildPath "ScubaGear.psd1"
-    
+
     # Verify that the manifest file exists
     if (Test-Path -Path $ManifestPath) {
         Write-Host "The manifest file exists at "
         Write-Host $ManifestPath
     }
     else {
-        Write-Warning "The manifest file does not exist at " 
+        Write-Warning "The manifest file does not exist at "
         Write-Warning $ManifestPath
         Write-Error "Failing..."
     }
@@ -210,14 +211,14 @@ function ConfigureScubaGearModule {
         $ModuleVersion = "$CurrentModuleVersion.$TimeStamp"
     }
 
-    Write-Host "The module version is " 
+    Write-Host "The module version is "
     Write-Host $ModuleVersion
 
     $ProjectUri = "https://github.com/cisagov/ScubaGear"
     $LicenseUri = "https://github.com/cisagov/ScubaGear/blob/main/LICENSE"
     # Tags cannot contain spaces
     $Tags = 'CISA', 'O365', 'M365', 'AzureAD', 'Configuration', 'Exchange', 'Report', 'Security', 'SharePoint', 'Defender', 'Teams', 'PowerPlatform', 'OneDrive'
-    
+
     $ManifestUpdates = @{
         Path          = $ManifestPath
         ModuleVersion = $ModuleVersion
