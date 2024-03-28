@@ -3,7 +3,21 @@ Import-Module (Join-Path -Path $PSScriptRoot -ChildPath '../../../../Modules/Sup
 InModuleScope Support {
     Describe -Tag Support -Name 'New-Config' {
         BeforeAll {
+
+			[Flags()]
+			enum SerializationOptions {
+				None = 0
+				Roundtrip = 1
+				DisableAliases = 2
+				EmitDefaults = 4
+				JsonCompatible = 8
+				DefaultToStaticType = 16
+				WithIndentedSequences = 32
+			}
+
             Mock -CommandName Write-Warning {}
+
+            Mock -CommandName ConvertTo-Yaml { $args[0] }
 
             $TestPath = New-Item -Path (Join-Path -Path "TestDrive:" -ChildPath "SampleConfig") -Name "CreateSampleConfigFolder" -ItemType Directory
 
