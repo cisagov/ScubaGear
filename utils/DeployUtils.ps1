@@ -194,8 +194,8 @@ function ConfigureScubaGearModule {
 
     # Verify that the manifest file exists
     if (Test-Path -Path $ManifestPath) {
-        Write-Host "The manifest file exists at "
-        Write-Host $ManifestPath
+        Write-Output "The manifest file exists at "
+        Write-Output $ManifestPath
     }
     else {
         Write-Warning "The manifest file does not exist at "
@@ -211,8 +211,8 @@ function ConfigureScubaGearModule {
         $ModuleVersion = "$CurrentModuleVersion.$TimeStamp"
     }
 
-    Write-Host "The module version is "
-    Write-Host $ModuleVersion
+    Write-Output "The module version is "
+    Write-Output $ModuleVersion
 
     $ProjectUri = "https://github.com/cisagov/ScubaGear"
     $LicenseUri = "https://github.com/cisagov/ScubaGear/blob/main/LICENSE"
@@ -267,18 +267,14 @@ function CreateFileList {
         [array]
         $Extensions = @()
     )
-
     $FileNames = @()
-
     if ($Extensions.Count -gt 0) {
         $FileNames += Get-ChildItem -Recurse -Path $SourcePath -Include $Extensions
     }
-
-    Write-Host "Found $($FileNames.Count) files to sign"
-
+    Write-Output "Found $($FileNames.Count) files to sign"
     $FileList = New-TemporaryFile
     $FileNames.FullName | Out-File -FilePath $($FileList.FullName) -Encoding utf8 -Force
-    Write-Host "Files: $(Get-Content $FileList)"
+    Write-Output "Files: $(Get-Content $FileList)"
     return $FileList.FullName
 }
 
