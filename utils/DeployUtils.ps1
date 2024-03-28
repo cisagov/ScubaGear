@@ -214,7 +214,9 @@ function ConfigureScubaGearModule {
         $ModuleVersion = "$CurrentModuleVersion.$TimeStamp"
     }
 
-    Write-Host "The module version is "
+    Write-Information "The prerelease tag is"
+    Write-Information $PrereleaseTag
+    Write-Host "The module version is"
     Write-Host $ModuleVersion
 
     $ProjectUri = "https://github.com/cisagov/ScubaGear"
