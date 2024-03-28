@@ -144,7 +144,7 @@ function Build-ScubaModule {
         [string]
         $PrereleaseTag = ""
     )
-    Write-Output "Building ScubaGear module..."
+    Write-Host "Building ScubaGear module..."
 
     $Leaf = Split-Path -Path $ModulePath -Leaf
     $ModuleBuildPath = Join-Path -Path $env:TEMP -ChildPath $Leaf
@@ -179,13 +179,13 @@ function ConfigureScubaGearModule {
         [string]
         $PrereleaseTag = ""
     )
-    Write-Output "Configuring ScubaGear module..."
+    Write-Host "Configuring ScubaGear module..."
     #TODO: Add any module configuration needed (e.g., adjust Module Version)
 
     # Verify that the module path folder exists
     if (Test-Path -Path $ModulePath) {
-        Write-Output "The module dir exists at "
-        Write-Output $ModulePath
+        Write-Host "The module dir exists at "
+        Write-Host $ModulePath
     }
     else {
         Write-Warning "The module dir does not exist at "
@@ -197,8 +197,8 @@ function ConfigureScubaGearModule {
 
     # Verify that the manifest file exists
     if (Test-Path -Path $ManifestPath) {
-        Write-Output "The manifest file exists at "
-        Write-Output $ManifestPath
+        Write-Host "The manifest file exists at "
+        Write-Host $ManifestPath
     }
     else {
         Write-Warning "The manifest file does not exist at "
@@ -214,8 +214,8 @@ function ConfigureScubaGearModule {
         $ModuleVersion = "$CurrentModuleVersion.$TimeStamp"
     }
 
-    Write-Output "The module version is "
-    Write-Output $ModuleVersion
+    Write-Host "The module version is "
+    Write-Host $ModuleVersion
 
     $ProjectUri = "https://github.com/cisagov/ScubaGear"
     $LicenseUri = "https://github.com/cisagov/ScubaGear/blob/main/LICENSE"
@@ -233,7 +233,7 @@ function ConfigureScubaGearModule {
         $ManifestUpdates.Add('Prerelease', $PrereleaseTag)
     }
 
-    Write-Output "The manifest updates are:"
+    Write-Host "The manifest updates are:"
     $ManifestUpdates
 
     try {
