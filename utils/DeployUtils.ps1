@@ -236,7 +236,7 @@ function ConfigureScubaGearModule {
     }
 
     Write-Host "The manifest updates are:"
-    $ManifestUpdates
+    $ManifestUpdates | ConvertTo-Json -Compress
 
     try {
         Update-ModuleManifest @ManifestUpdates
