@@ -144,6 +144,8 @@ function Build-ScubaModule {
         [string]
         $PrereleaseTag = ""
     )
+    Write-Output "Building ScubaGear module..."
+
     $Leaf = Split-Path -Path $ModulePath -Leaf
     $ModuleBuildPath = Join-Path -Path $env:TEMP -ChildPath $Leaf
 
@@ -177,6 +179,7 @@ function ConfigureScubaGearModule {
         [string]
         $PrereleaseTag = ""
     )
+    Write-Output "Configuring ScubaGear module..."
     #TODO: Add any module configuration needed (e.g., adjust Module Version)
 
     # Verify that the module path folder exists
