@@ -95,16 +95,21 @@ jobs:
       # This is a manual test that writes the version to the console
       - name: Print Scuba Version
         run: |
-          if ('true' -eq '${{ inputs.IsPrerelease }}')
-          {
-            $Version = '${{ inputs.OverrideModuleVersion }}' + '${{ inputs.PrereleaseTag }}'
-            Write-Host "Installing as prerelease with required version: " + $version
-            Install-Module -Name ScubaGear -AllowPrerelease -RequiredVersion $version
-          }
-          else
-          {
-            Write-Host "Installing latest version"
-            Install-Module -Name ScubaGear
-          }
+          #   if ('true' -eq '${{ inputs.IsPrerelease }}')
+          #   {
+          #     $Version = '${{ inputs.OverrideModuleVersion }}' + '${{ inputs.PrereleaseTag }}'
+          #     Write-Host "Installing as prerelease with required version: " + $version
+          #     Install-Module -Name ScubaGear -AllowPrerelease -RequiredVersion $version
+          #   }
+          #   else
+          #   {
+          #     Write-Host "Installing latest version"
+          #     Install-Module -Name ScubaGear
+          #   }
+          # Temporarily hard-coding inputs b/c workflow dispatch.
+          $Version = '${{ inputs.OverrideModuleVersion }}' + '${{ inputs.PrereleaseTag }}'
+          Write-Host "Installing as prerelease with required version: " + $version
+          Install-Module -Name ScubaGear -AllowPrerelease -RequiredVersion $version
+
           # Import-Module -Name ScubaGear
           Invoke-SCuBA -Version
