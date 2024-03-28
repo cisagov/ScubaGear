@@ -823,7 +823,7 @@ function Merge-JsonOutput {
             $SettingsExport =  Get-Content $SettingsExportPath -Raw
             $TimestampZulu = $(ConvertFrom-Json $SettingsExport).timestamp_zulu
 
-            # Get a list of the fullnames of each product
+            # Get a list and abbreviation mapping of the products assessed
             $FullNames = @()
             $ProductAbbreviationMapping = @{}
             foreach ($ProductName in $ProductNames) {
