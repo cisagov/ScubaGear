@@ -801,8 +801,8 @@ function New-Config {
         [Parameter(Mandatory = $false)]
         [ValidateNotNullOrEmpty()]
         [string]
-        $OutReportName = "BaselineReports"
-        
+        $OutReportName = "BaselineReports",
+
         [Parameter(Mandatory = $false)]
         [ValidateNotNullOrEmpty()]
         [string]
