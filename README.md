@@ -177,7 +177,7 @@ Invoke-SCuBA -M365Environment gcc -ConfigFilePath minimal_config.yaml
 ```
 
 **Typical Use** : config file `typical_config.yaml`
-Typical use includes multiple products, specified as a list, and an M365 environment variable. Note that additional product values are commented out and will not be included, but are retained in the config file to easily add them back later.
+Typical use includes multiple products, specified as a list, and an M365 environment variable. Note that additional product values are commented out and will not be included, but are retained in the config file to easily add them back later. ScubaGear's Support module also has functionality to generate an empty sample config file. Runnning the `New-Config` Cmdlet will generate a full sample config called `SampleConfig.yaml` that can be filled out based on the guidance below. Also parameters can be passed to the `New-Config` Cmdlet to change values inside the sample config.
 ```
 Description: YAML Typical Config ( multiple products )
 ProductNames:
