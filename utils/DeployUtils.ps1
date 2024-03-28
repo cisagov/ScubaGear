@@ -235,9 +235,6 @@ function ConfigureScubaGearModule {
         $ManifestUpdates.Add('Prerelease', $PrereleaseTag)
     }
 
-    Write-Host "The manifest updates are:"
-    $ManifestUpdates | ConvertTo-Json -Compress
-
     try {
         Update-ModuleManifest @ManifestUpdates
         # $CurrentErrorActionPreference = $ErrorActionPreference
