@@ -823,6 +823,15 @@ function Merge-JsonOutput {
             $SettingsExport =  Get-Content $SettingsExportPath -Raw
             $TimestampZulu = $(ConvertFrom-Json $SettingsExport).timestamp_zulu
 
+            # Get a list of the fullnames of each product
+            $FullNames = @()
+            $ProductAbbreviationMapping = @{}
+            foreach ($ProductName in $ProductNames) {
+                $BaselineName = $ArgToProd[$ProductName]
+                $FullNames += $ProdToFullName[$BaselineName]
+                $ProductAbbreviationMapping[$ProdToFullName[$BaselineName]] = $BaselineName
+            }
+
             # Extract the metadata
             $Results = [pscustomobject]@{}
             $Summary = [pscustomobject]@{}
@@ -830,7 +839,9 @@ function Merge-JsonOutput {
                 "TenantId" = $TenantDetails.TenantId;
                 "DisplayName" = $TenantDetails.DisplayName;
                 "DomainName" = $TenantDetails.DomainName;
-                "Product" = "M365";
+                "ProductSuite" = "Microsoft 365";
+                "ProductsAssessed" = $FullNames;
+                "ProductAbbreviationMapping" = $ProductAbbreviationMapping
                 "Tool" = "ScubaGear";
                 "ToolVersion" = $ModuleVersion;
                 "TimestampZulu" = $TimestampZulu;
@@ -856,7 +867,7 @@ function Merge-JsonOutput {
             }
 
             # Convert the output a json string
-            $MetaData = ConvertTo-Json $MetaData
+            $MetaData = ConvertTo-Json $MetaData -Depth 3
             $Results = ConvertTo-Json $Results -Depth 5
             $Summary = ConvertTo-Json $Summary -Depth 3
             $ReportJson = @"
