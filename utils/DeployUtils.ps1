@@ -73,43 +73,30 @@ function Publish-ScubaGearModule {
     Specifies the API key that you want to use to publish a module to the online gallery. 
     #>
     param (
-        # [Parameter(ParameterSetName = 'PublicGallery')]
-        # [Parameter(ParameterSetName = 'PrivateGallery')]
         [Parameter(Mandatory = $true)]
         [ValidateScript({ [uri]::IsWellFormedUriString($_, 'Absolute') -and ([uri] $_).Scheme -in 'https' })]
         [System.Uri]
         $AzureKeyVaultUrl,
-        # [Parameter(ParameterSetName = 'PublicGallery')]
-        # [Parameter(ParameterSetName = 'PrivateGallery')]
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [string]
         $CertificateName,
-        # [Parameter(ParameterSetName = 'PublicGallery')]
-        # [Parameter(ParameterSetName = 'PrivateGallery')]
         [Parameter(Mandatory = $true)]
         [ValidateScript({ Test-Path -Path $_ -PathType Container })]
         [string]
         $ModulePath,
-        # [Parameter(ParameterSetName = 'PublicGallery')]
-        # [Parameter(ParameterSetName = 'PrivateGallery')]
         [Parameter(Mandatory = $false)]
         [ValidateNotNullOrEmpty()]
         [string]
         $GalleryName = 'PrivateScubaGearGallery',
-        # [Parameter(ParameterSetName = 'PublicGallery')]
-        # [Parameter(ParameterSetName = 'PrivateGallery')]
         [Parameter(Mandatory = $false)]
         [AllowEmptyString()]
         [string]
         $OverrideModuleVersion = "",
-        # [Parameter(ParameterSetName = 'PublicGallery')]
-        # [Parameter(ParameterSetName = 'PrivateGallery')]
         [Parameter(Mandatory = $false)]
         [AllowEmptyString()]
         [string]
         $PrereleaseTag = "",
-        # [Parameter(ParameterSetName = 'PublicGallery')]
         [Parameter(Mandatory = $false)]
         [ValidateNotNullOrEmpty()]
         [string]
@@ -192,8 +179,8 @@ function ConfigureScubaGearModule {
 
     # Verify that the module path folder exists
     if (Test-Path -Path $ModulePath) {
-        Write-Warning "The module dir exists at "
-        Write-Warning $ModulePath
+        Write-Host "The module dir exists at "
+        Write-Host $ModulePath
     }
     else {
         Write-Warning "The module dir does not exist at "
@@ -205,8 +192,8 @@ function ConfigureScubaGearModule {
     
     # Verify that the manifest file exists
     if (Test-Path -Path $ManifestPath) {
-        Write-Warning "The manifest file exists at "
-        Write-Warning $ManifestPath
+        Write-Host "The manifest file exists at "
+        Write-Host $ManifestPath
     }
     else {
         Write-Warning "The manifest file does not exist at " 
@@ -222,8 +209,8 @@ function ConfigureScubaGearModule {
         $ModuleVersion = "$CurrentModuleVersion.$TimeStamp"
     }
 
-    Write-Warning "The module version is " 
-    Write-Warning $ModuleVersion
+    Write-Host "The module version is " 
+    Write-Host $ModuleVersion
 
     $ProjectUri = "https://github.com/cisagov/ScubaGear"
     $LicenseUri = "https://github.com/cisagov/ScubaGear/blob/main/LICENSE"
@@ -241,18 +228,15 @@ function ConfigureScubaGearModule {
         $ManifestUpdates.Add('Prerelease', $PrereleaseTag)
     }
 
-    Write-Warning "The manifest updates are:"
+    Write-Host "The manifest updates are:"
     $ManifestUpdates
 
     try {
-        Write-Warning "Upating manifest..."
         Update-ModuleManifest @ManifestUpdates
         # $CurrentErrorActionPreference = $ErrorActionPreference
         # $ErrorActionPreference = "SilentlyContinue"
-        Write-Warning "Testing manifest..."
         $Result = Test-ModuleManifest -Path $ManifestPath
         # $ErrorActionPreference = $CurrentErrorActionPreference
-        Write-Warning "Done updating and testing..."
     }
     catch {
         Write-Warning "Warning: Manifest error:"
@@ -288,11 +272,11 @@ function CreateFileList {
         $FileNames += Get-ChildItem -Recurse -Path $SourcePath -Include $Extensions
     }
 
-    Write-Debug "Found $($FileNames.Count) files to sign"
+    Write-Host "Found $($FileNames.Count) files to sign"
 
     $FileList = New-TemporaryFile
     $FileNames.FullName | Out-File -FilePath $($FileList.FullName) -Encoding utf8 -Force
-    Write-Debug "Files: $(Get-Content $FileList)"
+    Write-Host "Files: $(Get-Content $FileList)"
     return $FileList.FullName
 }
 
@@ -329,7 +313,7 @@ function CallAzureSignTool {
         '-ifl', $FileList
     )
 
-    Write-Debug "Calling AzureSignTool: $SignArguments"
+    Write-Host "Calling AzureSignTool: $SignArguments"
 
     $ToolPath = (Get-Command AzureSignTool).Path
     & $ToolPath $SignArguments
@@ -424,13 +408,11 @@ function IsRegistered {
 
     Write-Debug "Looking for $RepoName local repository"
     $Registered = $false
-
     try {
         $Registered = (Get-PSRepository).Name -contains $RepoName
     }
     catch {
         Write-Error "Failed to check IsRegistered: $_"
     }
-
     return $Registered
 }

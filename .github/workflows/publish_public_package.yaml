@@ -27,7 +27,7 @@ jobs:
   publish:
     name: Publish to PSGallery
     runs-on: windows-latest
-    # environment: Development
+    environment: Development
     permissions:
       id-token: write
       contents: write
