@@ -17,7 +17,7 @@ InModuleScope Support {
 
             Mock -CommandName Write-Warning {}
 
-            Mock -ModuleName Support -CommandName ConvertTo-Yaml { $args[0] }
+            Mock -CommandName ConvertTo-Yaml { $args[0] }
             function ConvertTo-Yaml {throw 'this will be mocked'}
 
             $TestPath = New-Item -Path (Join-Path -Path "TestDrive:" -ChildPath "SampleConfig") -Name "CreateSampleConfigFolder" -ItemType Directory
