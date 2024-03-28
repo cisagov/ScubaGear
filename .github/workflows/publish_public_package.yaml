@@ -88,7 +88,7 @@ jobs:
           #     $Parameters.Add('OverrideModuleVersion', '${{ inputs.OverrideModuleVersion }}')
           #   }
           # Temporarily hard-coding inputs b/c workflow dispatch.
-          $Parameters.Add('PrereleaseTag', '-alpha8')
+          $Parameters.Add('PrereleaseTag', '-alpha9')
           $Parameters.Add('OverrideModuleVersion', '0.0.2')
           # This publishes to PSGallery.
           Publish-ScubaGearModule @Parameters
@@ -98,8 +98,8 @@ jobs:
           #   if ('true' -eq '${{ inputs.IsPrerelease }}')
           #   {
           #     $Version = '${{ inputs.OverrideModuleVersion }}' + '${{ inputs.PrereleaseTag }}'
-          #     Write-Host "Installing as prerelease with required version: " + $version
-          #     Install-Module -Name ScubaGear -AllowPrerelease -RequiredVersion $version
+          #     Write-Host "Installing as prerelease with required version: " + $Version
+          #     Install-Module -Name ScubaGear -AllowPrerelease -RequiredVersion $Version
           #   }
           #   else
           #   {
@@ -107,9 +107,8 @@ jobs:
           #     Install-Module -Name ScubaGear
           #   }
           # Temporarily hard-coding inputs b/c workflow dispatch.
-          $Version = '${{ inputs.OverrideModuleVersion }}' + '${{ inputs.PrereleaseTag }}'
-          Write-Host "Installing as prerelease with required version: " + $version
-          Install-Module -Name ScubaGear -AllowPrerelease -RequiredVersion $version
-
-          # Import-Module -Name ScubaGear
+          $Version = '0.0.2-alpha9'
+          Write-Host "Installing as prerelease with required version: " + $Version
+          Install-Module -Name ScubaGear -AllowPrerelease -RequiredVersion $Version
+          Import-Module -Name ScubaGear
           Invoke-SCuBA -Version
