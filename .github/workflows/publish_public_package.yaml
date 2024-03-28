@@ -110,5 +110,5 @@ jobs:
           $Version = '0.0.2-alpha9'
           Write-Host "Installing as prerelease with required version: " + $Version
           Install-Module -Name ScubaGear -AllowPrerelease -RequiredVersion $Version
-          Import-Module -Name ScubaGear
+          Import-Module -Name ScubaGear -RequiredVersion $Version
           Invoke-SCuBA -Version
