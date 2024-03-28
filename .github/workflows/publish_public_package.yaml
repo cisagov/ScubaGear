@@ -88,8 +88,8 @@ jobs:
           #     $Parameters.Add('OverrideModuleVersion', '${{ inputs.OverrideModuleVersion }}')
           #   }
           # Temporarily hard-coding inputs b/c workflow dispatch.
-          $Parameters.Add('PrereleaseTag', '-alpha10')
-          $Parameters.Add('OverrideModuleVersion', '0.0.2')
+          $Parameters.Add('PrereleaseTag', '-alpha01')
+          $Parameters.Add('OverrideModuleVersion', '0.0.3')
           # This publishes to PSGallery.
           Publish-ScubaGearModule @Parameters
       # This is a manual test that writes the version to the console
@@ -107,7 +107,7 @@ jobs:
           #     Install-Module -Name ScubaGear
           #   }
           # Temporarily hard-coding inputs b/c workflow dispatch.
-          $Version = '0.0.2-alpha10'
+          $Version = '0.0.3-alpha01'
           Write-Host "Installing as prerelease with required version: " + $Version
           Install-Module -Name ScubaGear -AllowPrerelease -RequiredVersion $Version
           Import-Module -Name ScubaGear -RequiredVersion $Version
