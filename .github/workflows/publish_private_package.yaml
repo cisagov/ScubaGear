@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
   push:
     paths:
-      - ".github/workflows/run_publish_package.yaml"
+      - ".github/workflows/publish_private_package.yaml"
       - "utils/DeployUtils.ps1"
 
 env:
