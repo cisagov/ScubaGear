@@ -20,7 +20,7 @@ jobs:
   publish:
     name: Publish to Private Gallery
     runs-on: windows-latest
-    # environment: Development
+    environment: Development
     permissions:
       id-token: write
       contents: write
