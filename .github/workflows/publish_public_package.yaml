@@ -107,7 +107,7 @@ jobs:
           #     Install-Module -Name ScubaGear
           #   }
           # Temporarily hard-coding inputs b/c workflow dispatch.
-          $Version = '0.0.3-alpha01'
+          $Version = '0.0.3'
           Write-Host "Installing as prerelease with required version: " + $Version
           Install-Module -Name ScubaGear -AllowPrerelease -RequiredVersion $Version
           Import-Module -Name ScubaGear -RequiredVersion $Version
