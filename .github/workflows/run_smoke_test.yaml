@@ -50,7 +50,7 @@ jobs:
           # ScubaGear currently requires the provisioning of a certificate for using a ServicePrinicpal, rather than
           # using Workload Identity Federation, which would ordinarily be preferred for calling Microsoft APIs from
           # GitHub actions.
-          $AUTOMATION_CREDS = $env:SCUBA_GITHUB_AUTOMATION_CREDS | ConvertFrom-Json
+          $AUTOMATION_CREDS = $env:SCUBA_GITHUB_AUTOMATION_TEDTEST | ConvertFrom-Json
           $TestTenants = $AUTOMATION_CREDS.TestTenants
           Write-Output "Identified $($TestTenants.Count) Test Tenants"
 
