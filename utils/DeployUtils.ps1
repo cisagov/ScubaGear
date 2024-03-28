@@ -102,13 +102,13 @@ function Publish-ScubaGearModule {
         [string]
         $NuGetApiKey
     )
-    
+
     Write-Output "Publishing ScubaGear module..."
     $ModuleBuildPath = Build-ScubaModule -ModulePath $ModulePath -OverrideModuleVersion $OverrideModuleVersion -PrereleaseTag $PrereleaseTag
 
     Write-Output "The module build path is "
     Write-Output $ModuleBuildPath
-    
+
     if (SignScubaGearModule -AzureKeyVaultUrl $AzureKeyVaultUrl -CertificateName $CertificateName -ModulePath $ModuleBuildPath) {
         $Parameters = @{
             Path       = $ModuleBuildPath
@@ -230,7 +230,7 @@ function ConfigureScubaGearModule {
         $ManifestUpdates.Add('Prerelease', $PrereleaseTag)
     }
 
-    Write-Host "The manifest updates are:"
+    Write-Output "The manifest updates are:"
     $ManifestUpdates
 
     try {
