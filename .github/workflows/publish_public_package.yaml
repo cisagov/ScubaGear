@@ -79,14 +79,17 @@ jobs:
             GalleryName = 'PSGallery'
             NuGetApiKey = $ApiKey
           }
-          if ('true' -eq '${{ inputs.IsPrerelease }}')
-          {
-            $Parameters.Add('PrereleaseTag', '${{ inputs.PrereleaseTag }}')
-          }
-          if (-Not [string]::IsNullOrEmpty('${{ inputs.OverrideModuleVersion }}'))
-          {
-            $Parameters.Add('OverrideModuleVersion', '${{ inputs.OverrideModuleVersion }}')
-          }
+            #   if ('true' -eq '${{ inputs.IsPrerelease }}')
+          #   {
+          #     $Parameters.Add('PrereleaseTag', '${{ inputs.PrereleaseTag }}')
+          #   }
+          #   if (-Not [string]::IsNullOrEmpty('${{ inputs.OverrideModuleVersion }}'))
+          #   {
+          #     $Parameters.Add('OverrideModuleVersion', '${{ inputs.OverrideModuleVersion }}')
+          #   }
+          # Temporarily hard-coding inputs b/c workflow dispatch.
+          $Parameters.Add('PrereleaseTag', '0.0.2')
+          $Parameters.Add('OverrideModuleVersion', 'alpha10')
           # This publishes to PSGallery.
           Publish-ScubaGearModule @Parameters
       # This is a manual test that writes the version to the console
