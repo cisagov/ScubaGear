@@ -245,10 +245,8 @@ function ConfigureScubaGearModule {
         Write-Warning $_.ScriptStackTrace
         Write-Warning $_.Exception
         Write-Warning $_.ErrorDetails
-        Write-Warning "The result is: "
-        Write-Warning $Result
-        # $Result = $null
-        return $False
+        Write-Error $Result
+        $Result = $null
     }
 
     return $null -ne $Result
