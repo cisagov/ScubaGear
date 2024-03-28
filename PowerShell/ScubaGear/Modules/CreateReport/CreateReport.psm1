@@ -170,7 +170,7 @@ function New-Report {
         $MarkdownLink = "<a class='control_group' href=`"$($ScubaGitHubUrl)/blob/v$($SettingsExport.module_version)/PowerShell/ScubaGear/baselines/$($BaselineName.ToLower()).md$GroupAnchor`" target=`"_blank`">$Name</a>"
         $Fragments += $Fragment | ConvertTo-Html -PreContent "<h2>$Number $MarkdownLink</h2>" -Fragment
 
-        # Package HTML Report into Report JSON by Policy Group
+        # Package Assessment Report into Report JSON by Policy Group
         $ReportJson.Results += [pscustomobject]@{
             GroupName = $BaselineGroup.GroupName;
             GroupNumber = $BaselineGroup.GroupNumber;
