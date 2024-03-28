@@ -102,13 +102,13 @@ function Publish-ScubaGearModule {
         [string]
         $NuGetApiKey
     )
-
-    Write-Output "Publishing ScubaGear module..."
-    
+    Write-Output "OUTPUT TEST"
+    Write-Host "Publishing ScubaGear module..."
     $ModuleBuildPath = Build-ScubaModule -ModulePath $ModulePath -OverrideModuleVersion $OverrideModuleVersion -PrereleaseTag $PrereleaseTag
-    Write-Output "The module build path is "
-    Write-Output $ModuleBuildPath
 
+    Write-Host "The module build path is "
+    Write-Host $ModuleBuildPath
+    
     if (SignScubaGearModule -AzureKeyVaultUrl $AzureKeyVaultUrl -CertificateName $CertificateName -ModulePath $ModuleBuildPath) {
         $Parameters = @{
             Path       = $ModuleBuildPath
@@ -117,6 +117,7 @@ function Publish-ScubaGearModule {
         if ($GalleryName -eq 'PSGallery') {
             $Parameters.Add('NuGetApiKey', $NuGetApiKey)
         }
+
         Publish-Module @Parameters
     }
     else {
@@ -180,8 +181,8 @@ function ConfigureScubaGearModule {
 
     # Verify that the module path folder exists
     if (Test-Path -Path $ModulePath) {
-        Write-Output "The module dir exists at "
-        Write-Output $ModulePath
+        Write-Host "The module dir exists at "
+        Write-Host $ModulePath
     }
     else {
         Write-Warning "The module dir does not exist at "
@@ -193,8 +194,8 @@ function ConfigureScubaGearModule {
 
     # Verify that the manifest file exists
     if (Test-Path -Path $ManifestPath) {
-        Write-Output "The manifest file exists at "
-        Write-Output $ManifestPath
+        Write-Host "The manifest file exists at "
+        Write-Host $ManifestPath
     }
     else {
         Write-Warning "The manifest file does not exist at "
@@ -210,8 +211,8 @@ function ConfigureScubaGearModule {
         $ModuleVersion = "$CurrentModuleVersion.$TimeStamp"
     }
 
-    Write-Output "The module version is "
-    Write-Output $ModuleVersion
+    Write-Host "The module version is "
+    Write-Host $ModuleVersion
 
     $ProjectUri = "https://github.com/cisagov/ScubaGear"
     $LicenseUri = "https://github.com/cisagov/ScubaGear/blob/main/LICENSE"
@@ -229,7 +230,7 @@ function ConfigureScubaGearModule {
         $ManifestUpdates.Add('Prerelease', $PrereleaseTag)
     }
 
-    Write-Output "The manifest updates are:"
+    Write-Host "The manifest updates are:"
     $ManifestUpdates
 
     try {
@@ -273,11 +274,11 @@ function CreateFileList {
         $FileNames += Get-ChildItem -Recurse -Path $SourcePath -Include $Extensions
     }
 
-    Write-Output "Found $($FileNames.Count) files to sign"
+    Write-Host "Found $($FileNames.Count) files to sign"
 
     $FileList = New-TemporaryFile
     $FileNames.FullName | Out-File -FilePath $($FileList.FullName) -Encoding utf8 -Force
-    Write-Output "Files: $(Get-Content $FileList)"
+    Write-Host "Files: $(Get-Content $FileList)"
     return $FileList.FullName
 }
 
@@ -314,7 +315,7 @@ function CallAzureSignTool {
         '-ifl', $FileList
     )
 
-    Write-Output "Calling AzureSignTool: $SignArguments"
+    Write-Host "Calling AzureSignTool: $SignArguments"
 
     $ToolPath = (Get-Command AzureSignTool).Path
     & $ToolPath $SignArguments
@@ -339,8 +340,10 @@ function SignScubaGearModule {
     module to be published to PSGallery.
     https://learn.microsoft.com/en-us/powershell/gallery/concepts/publishing-guidelines?view=powershellget-3.x show
     general guidance.
+
     There is anecdotal evidence to sign all PowerShell artifacts (ps1, psm1, and pdsd1) in additional to a signed catalog For example,
     Microsoft.PowerApps.PowerShell (v1.0.34) and see both *.psd1 and *.psm1 files are signed and a catalog provided.
+
     There are a number of Non-authoritive references such as below showing all ps1, psm1, and psd1 being signed first then cataloged.
     https://github.com/dell/OpenManage-PowerShell-Modules/blob/main/Sign-Module.ps1
     #>
@@ -361,7 +364,7 @@ function SignScubaGearModule {
         $TimeStampServer = 'http://timestamp.digicert.com'
     )
 
-    Write-Output "Signing ScubaGear module..."
+    Write-Host "Signing ScubaGear module..."
 
     # Digitally sign scripts, manifest, and modules
     $FileList = CreateFileList -SourcePath $ModulePath -Extensions "*.ps1", "*.psm1", "*.psd1"
