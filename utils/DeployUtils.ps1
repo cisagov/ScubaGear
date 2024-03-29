@@ -236,7 +236,10 @@ function ConfigureScubaGearModule {
     }
 
     try {
+        $CurrentErrorActionPreference = $ErrorActionPreference
+        $ErrorActionPreference = "SilentlyContinue"
         Update-ModuleManifest @ManifestUpdates
+        $ErrorActionPreference = $CurrentErrorActionPreference
     }
     catch {
         Write-Warning "Error: cannot update module manifest:"
