@@ -25,59 +25,59 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
-      - name: Check for Changes
-        uses: dorny/paths-filter@v3
-        id: file-changes
-        with:
-          base: ${{ github.ref }}
-          filters: |
-            yaml-files:
-              - added|modified: "**.yml"
-              - added|modified: "**.yaml"
-            powershell-files:
-              - added|modified: "**.ps1"
-              - added|modified: "**.psm1"
-              - added|modified: "**.psd1"
-              - added|modified: "**.pssc"
-              - added|modified: "**.psrc"
-              - added|modified: "**.ps1xml"
-              - added|modified: "**.cdxml"
-            markdown-files:
-              - added|modified: "PowerShell/ScubaGear/baselines/*.md"
-            rego-files:
-              - added|modified: "**.rego"
-    outputs:
-      yaml-changes: ${{ steps.file-changes.outputs.yaml-files || inputs.doEverything }}
-      powershell-changes: ${{ steps.file-changes.outputs.powershell-files || inputs.doEverything }}
-      markdown-changes: ${{ steps.file-changes.outputs.markdown-files || inputs.doEverything }}
-      rego-changes: ${{ steps.file-changes.outputs.rego-files || inputs.doEverything }}
+    #   - name: Check for Changes
+    #     uses: dorny/paths-filter@v3
+    #     id: file-changes
+    #     with:
+    #       base: ${{ github.ref }}
+    #       filters: |
+    #         yaml-files:
+    #           - added|modified: "**.yml"
+    #           - added|modified: "**.yaml"
+    #         powershell-files:
+    #           - added|modified: "**.ps1"
+    #           - added|modified: "**.psm1"
+    #           - added|modified: "**.psd1"
+    #           - added|modified: "**.pssc"
+    #           - added|modified: "**.psrc"
+    #           - added|modified: "**.ps1xml"
+    #           - added|modified: "**.cdxml"
+    #         markdown-files:
+    #           - added|modified: "PowerShell/ScubaGear/baselines/*.md"
+    #         rego-files:
+    #           - added|modified: "**.rego"
+    # outputs:
+    #   yaml-changes: ${{ steps.file-changes.outputs.yaml-files || inputs.doEverything }}
+    #   powershell-changes: ${{ steps.file-changes.outputs.powershell-files || inputs.doEverything }}
+    #   markdown-changes: ${{ steps.file-changes.outputs.markdown-files || inputs.doEverything }}
+    #   rego-changes: ${{ steps.file-changes.outputs.rego-files || inputs.doEverything }}
   lint-yaml:
     name: Lint
-    needs:
-      - test-files
-    if: needs.test-files.outputs.yaml-changes == 'true'
+    # needs:
+    #   - test-files
+    # if: needs.test-files.outputs.yaml-changes == 'true'
     uses: ./.github/workflows/lint_yaml.yaml
   lint-powershell:
     name: Lint
-    needs:
-      - test-files
-    if: needs.test-files.outputs.powershell-changes == 'true'
+    # needs:
+    #   - test-files
+    # if: needs.test-files.outputs.powershell-changes == 'true'
     uses: ./.github/workflows/lint_powershell.yaml
   syntax:
     name: Syntax
-    needs:
-      - test-files
-    if: needs.test-files.outputs.markdown-changes == 'true'
+    # needs:
+    #   - test-files
+    # if: needs.test-files.outputs.markdown-changes == 'true'
     uses: ./.github/workflows/syntax_check_markdown.yaml
   unit-powershell:
     name: Unit
-    needs:
-      - test-files
-    if: needs.test-files.outputs.powershell-changes == 'true'
+    # needs:
+    #   - test-files
+    # if: needs.test-files.outputs.powershell-changes == 'true'
     uses: ./.github/workflows/unit_test_powershell.yaml
   unit-opa:
     name: Unit
-    needs:
-      - test-files
-    if: needs.test-files.outputs.rego-changes == 'true'
+    # needs:
+    #   - test-files
+    # if: needs.test-files.outputs.rego-changes == 'true'
     uses: ./.github/workflows/unit_test_opa.yaml
