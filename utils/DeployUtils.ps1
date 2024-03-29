@@ -244,8 +244,8 @@ function ConfigureScubaGearModule {
         Write-Warning $_.ScriptStackTrace
         Write-Warning "Exception:"
         Write-Warning $_.Exception
-        Write-Warning "Error Details:"
-        Write-Warning $_.ErrorDetails
+        # Write-Warning "Error Details:"
+        # Write-Warning $_.ErrorDetails
         Write-Error "Failed to update module manifest"
         $Result = $null
     }
