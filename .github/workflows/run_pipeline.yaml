@@ -7,77 +7,25 @@ on:
   push:
   pull_request:
   workflow_dispatch:
-    inputs:
-      # When set to true, it will run every step in the pipeline, regardless of
-      # what files have changed.
-      doEverything:
-        description: "Run every workflow in the pipeline."
-        required: false
-        type: boolean
-        default: true
 
 jobs:
-  test-files:
-    name: Test for Changes
-    runs-on: ubuntu-latest
-    # This condition prevents duplicate runs.
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
-    steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v4
-    #   - name: Check for Changes
-    #     uses: dorny/paths-filter@v3
-    #     id: file-changes
-    #     with:
-    #       base: ${{ github.ref }}
-    #       filters: |
-    #         yaml-files:
-    #           - added|modified: "**.yml"
-    #           - added|modified: "**.yaml"
-    #         powershell-files:
-    #           - added|modified: "**.ps1"
-    #           - added|modified: "**.psm1"
-    #           - added|modified: "**.psd1"
-    #           - added|modified: "**.pssc"
-    #           - added|modified: "**.psrc"
-    #           - added|modified: "**.ps1xml"
-    #           - added|modified: "**.cdxml"
-    #         markdown-files:
-    #           - added|modified: "PowerShell/ScubaGear/baselines/*.md"
-    #         rego-files:
-    #           - added|modified: "**.rego"
-    # outputs:
-    #   yaml-changes: ${{ steps.file-changes.outputs.yaml-files || inputs.doEverything }}
-    #   powershell-changes: ${{ steps.file-changes.outputs.powershell-files || inputs.doEverything }}
-    #   markdown-changes: ${{ steps.file-changes.outputs.markdown-files || inputs.doEverything }}
-    #   rego-changes: ${{ steps.file-changes.outputs.rego-files || inputs.doEverything }}
   lint-yaml:
     name: Lint
-    # needs:
-    #   - test-files
-    # if: needs.test-files.outputs.yaml-changes == 'true'
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
     uses: ./.github/workflows/lint_yaml.yaml
   lint-powershell:
     name: Lint
-    # needs:
-    #   - test-files
-    # if: needs.test-files.outputs.powershell-changes == 'true'
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
     uses: ./.github/workflows/lint_powershell.yaml
   syntax:
     name: Syntax
-    # needs:
-    #   - test-files
-    # if: needs.test-files.outputs.markdown-changes == 'true'
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
     uses: ./.github/workflows/syntax_check_markdown.yaml
   unit-powershell:
     name: Unit
-    # needs:
-    #   - test-files
-    # if: needs.test-files.outputs.powershell-changes == 'true'
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
     uses: ./.github/workflows/unit_test_powershell.yaml
   unit-opa:
     name: Unit
-    # needs:
-    #   - test-files
-    # if: needs.test-files.outputs.rego-changes == 'true'
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
     uses: ./.github/workflows/unit_test_opa.yaml

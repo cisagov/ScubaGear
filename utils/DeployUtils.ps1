@@ -247,16 +247,13 @@ function ConfigureScubaGearModule {
         Write-Warning $_.ScriptStackTrace
         Write-Warning "Exception:"
         Write-Warning $_.Exception
-        # Write-Warning "Error Details:"
-        # Write-Warning $_.ErrorDetails
         Write-Error "Failed to update module manifest"
-        # $Result = $null
         return $False
     }
     try {
         $CurrentErrorActionPreference = $ErrorActionPreference
         $ErrorActionPreference = "SilentlyContinue"
-        $Result = Test-ModuleManifest -Path $ManifestPath
+        Test-ModuleManifest -Path $ManifestPath
         $ErrorActionPreference = $CurrentErrorActionPreference
     }
     catch {
@@ -265,14 +262,11 @@ function ConfigureScubaGearModule {
         Write-Warning $_.ScriptStackTrace
         Write-Warning "Exception:"
         Write-Warning $_.Exception
-        Write-Warning "Error Details:"
-        Write-Warning $_.ErrorDetails
         Write-Error "Failed to test module manifest"
-        # $Result = $null
         return $False
     }
 
-    # return $null -ne $Result
+    # True indicates that the updating and testing were successful.
     return $True
 }
 
