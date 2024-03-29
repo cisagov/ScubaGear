@@ -249,7 +249,8 @@ function ConfigureScubaGearModule {
         Write-Warning $_.Exception
         Write-Warning "Error Details:"
         Write-Warning $_.ErrorDetails
-        $Result = $null
+        # $Result = $null
+        return $False
     }
     try {
         $CurrentErrorActionPreference = $ErrorActionPreference
