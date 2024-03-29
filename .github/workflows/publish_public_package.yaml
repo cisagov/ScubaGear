@@ -87,7 +87,7 @@ jobs:
           # {
           #   $Parameters.Add('OverrideModuleVersion', '${{ inputs.OverrideModuleVersion }}')
           # }
-          $Parameters.Add('PrereleaseTag', '-alpha01')
+          $Parameters.Add('PrereleaseTag', '-alpha02')
           $Parameters.Add('OverrideModuleVersion', '1.3.0')
           # This publishes to PSGallery.
           Publish-ScubaGearModule @Parameters

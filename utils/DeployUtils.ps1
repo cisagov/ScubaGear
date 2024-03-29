@@ -248,7 +248,6 @@ function ConfigureScubaGearModule {
         Write-Warning $_.ErrorDetails
         $Result = $null
     }
-
     try {
         $CurrentErrorActionPreference = $ErrorActionPreference
         $ErrorActionPreference = "SilentlyContinue"
