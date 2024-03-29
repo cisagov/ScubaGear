@@ -237,17 +237,32 @@ function ConfigureScubaGearModule {
 
     try {
         Update-ModuleManifest @ManifestUpdates
-        # $CurrentErrorActionPreference = $ErrorActionPreference
-        # $ErrorActionPreference = "SilentlyContinue"
-        $Result = Test-ModuleManifest -Path $ManifestPath
-        # $ErrorActionPreference = $CurrentErrorActionPreference
     }
     catch {
-        Write-Warning "Warning: Manifest error:"
+        Write-Warning "Error: cannot update module manifest:"
+        Write-Warning "Stacktrace:"
         Write-Warning $_.ScriptStackTrace
+        Write-Warning "Exception:"
         Write-Warning $_.Exception
+        Write-Warning "Error Details:"
         Write-Warning $_.ErrorDetails
-        Write-Error $Result
+        $Result = $null
+    }
+
+    try {
+        $CurrentErrorActionPreference = $ErrorActionPreference
+        $ErrorActionPreference = "SilentlyContinue"
+        $Result = Test-ModuleManifest -Path $ManifestPath
+        $ErrorActionPreference = $CurrentErrorActionPreference
+    }
+    catch {
+        Write-Warning "Warning: Cannot test module manifest:"
+        Write-Warning "Stacktrace:"
+        Write-Warning $_.ScriptStackTrace
+        Write-Warning "Exception:"
+        Write-Warning $_.Exception
+        Write-Warning "Error Details:"
+        Write-Warning $_.ErrorDetails
         $Result = $null
     }
 
