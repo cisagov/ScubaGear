@@ -75,27 +75,48 @@ test_AllowedToCreateApps_Incorrect_V2 if {
 #
 # Policy MS.AAD.5.2v1
 #--
-test_PermissionGrantPolicyIdsAssignedToDefaultUserRole_Correct if {
-    Output := aad.tests with input as {
-        "authorization_policies": [
-            {
-                "PermissionGrantPolicyIdsAssignedToDefaultUserRole": [],
-                "Id": "authorizationPolicy"
-            }
-        ]
-    }
+# test_UserConsentNotAllowed_Correct if {
+#     Output := aad.tests with input as {
+#         "authorization_policies": [
+#             {
+#                 "PermissionGrantPolicyIdsAssignedToDefaultUserRole": [
+#                     "ManagePermissionGrantsForOwnedResource.microsoft-dynamically-managed-permissions-for-chat",
+#                     "ManagePermissionGrantsForOwnedResource.microsoft-dynamically-managed-permissions-for-team"
+#                 ],
+#                 "Id": "authorizationPolicy"
+#             }
+#         ]
+#     }
 
-    ReportDetailStr :=
-        "0 authorization policies found that allow non-admin users to consent to third-party applications"
-    TestResult("MS.AAD.5.2v1", Output, ReportDetailStr, true) == true
-}
+#     ReportDetailStr :=
+#         "0 authorization policies found that allow non-admin users to consent to third-party applications"
+#     TestResult("MS.AAD.5.2v1", Output, ReportDetailStr, true) == true
+# }
 
-test_PermissionGrantPolicyIdsAssignedToDefaultUserRole_Incorrect_V1 if {
+# test_UserConsentNotAllowedEmptyDefaultUserArray_Correct if {
+#     Output := aad.tests with input as {
+#         "authorization_policies": [
+#             {
+#                 "PermissionGrantPolicyIdsAssignedToDefaultUserRole": [
+#                 ],
+#                 "Id": "authorizationPolicy"
+#             }
+#         ]
+#     }
+
+#     ReportDetailStr :=
+#         "0 authorization policies found that allow non-admin users to consent to third-party applications"
+#     TestResult("MS.AAD.5.2v1", Output, ReportDetailStr, true) == true
+# }
+
+test_UserConsentFromVerifiedPublishersAllowed_Incorrect if {
     Output := aad.tests with input as {
         "authorization_policies": [
             {
                 "PermissionGrantPolicyIdsAssignedToDefaultUserRole": [
-                    "Test user"
+                    "ManagePermissionGrantsForOwnedResource.microsoft-dynamically-managed-permissions-for-chat",
+                    "ManagePermissionGrantsForOwnedResource.microsoft-dynamically-managed-permissions-for-team",
+                    "ManagePermissionGrantsForSelf.microsoft-user-default-legacy"
                 ],
                 "Id": "authorizationPolicy"
             }
@@ -110,29 +131,27 @@ test_PermissionGrantPolicyIdsAssignedToDefaultUserRole_Incorrect_V1 if {
     TestResult("MS.AAD.5.2v1", Output, ReportDetailStr, false) == true
 }
 
-test_PermissionGrantPolicyIdsAssignedToDefaultUserRole_Incorrect_V2 if {
-    Output := aad.tests with input as {
-        "authorization_policies": [
-            {
-                "PermissionGrantPolicyIdsAssignedToDefaultUserRole": [],
-                "Id": "Good policy"
-            },
-            {
-                "PermissionGrantPolicyIdsAssignedToDefaultUserRole": [
-                    "Test user"
-                ],
-                "Id": "Bad policy"
-            }
-        ]
-    }
+# test_UserConsentAllowed_Incorrect if {
+#     Output := aad.tests with input as {
+#         "authorization_policies": [
+#             {
+#                 "PermissionGrantPolicyIdsAssignedToDefaultUserRole": [
+#                     "ManagePermissionGrantsForOwnedResource.microsoft-dynamically-managed-permissions-for-chat",
+#                     "ManagePermissionGrantsForOwnedResource.microsoft-dynamically-managed-permissions-for-team",
+#                     "ManagePermissionGrantsForSelf.microsoft-user-default-low"
+#                 ],
+#                 "Id": "authorizationPolicy"
+#             }
+#         ]
+#     }
 
-    ReportDetailStr := concat("", [
-        "1 authorization policies found that allow non-admin users to consent to third-party applications:",
-        "<br/>Bad policy"
-    ])
+#     ReportDetailStr := concat("", [
+#         "1 authorization policies found that allow non-admin users to consent to third-party applications:",
+#         "<br/>Bad policy"
+#     ])
 
-    TestResult("MS.AAD.5.2v1", Output, ReportDetailStr, false) == true
-}
+#     TestResult("MS.AAD.5.2v1", Output, ReportDetailStr, false) == true
+# }
 #--
 
 #

@@ -34,16 +34,25 @@ INT_MAX := 2147483647
 # If the number of items is greater than our REPORTARRAYMAXCOUNT, the item list is
 # truncated for readability purposes.
 ReportFullDetailsArray(Array, String) := Description([ArraySizeStr(Array), String]) if {
+    print(Array)
+    print(count(Array))
     count(Array) == 0
+    print(Description([ArraySizeStr(Array), String]))
+    print()
 }
 
 ReportFullDetailsArray(Array, String) := Details if {
+    print(Array)
+    print(count(Array))
     count(Array) > 0
     count(Array) <= REPORTARRAYMAXCOUNT
+    # print("got here in 2nd function")
     Details := Description([
         ArraySizeStr(Array),
         concat(":<br/>", [String, concat(", ", Array)])
     ])
+    print("got breakpoint2 in 2nd function")
+    print(Details)
 }
 
 ReportFullDetailsArray(Array, String) := Details if {
