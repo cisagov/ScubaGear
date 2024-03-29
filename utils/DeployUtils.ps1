@@ -250,7 +250,8 @@ function ConfigureScubaGearModule {
         # Write-Warning "Error Details:"
         # Write-Warning $_.ErrorDetails
         Write-Error "Failed to update module manifest"
-        $Result = $null
+        # $Result = $null
+        return $False
     }
     try {
         $CurrentErrorActionPreference = $ErrorActionPreference
@@ -267,10 +268,12 @@ function ConfigureScubaGearModule {
         Write-Warning "Error Details:"
         Write-Warning $_.ErrorDetails
         Write-Error "Failed to test module manifest"
-        $Result = $null
+        # $Result = $null
+        return $False
     }
 
-    return $null -ne $Result
+    # return $null -ne $Result
+    return $True
 }
 
 function CreateFileList {
