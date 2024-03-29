@@ -87,21 +87,19 @@ jobs:
           # {
           #   $Parameters.Add('OverrideModuleVersion', '${{ inputs.OverrideModuleVersion }}')
           # }
-          $Parameters.Add('PrereleaseTag', '-alpha03')
-          $Parameters.Add('OverrideModuleVersion', '1.3.0')
           # This publishes to PSGallery.
           Publish-ScubaGearModule @Parameters
       # This is a manual test that simply writes the version to the console
-      # - name: Print Scuba Version
-      #   run: |
-      #     if ('true' -eq '${{ inputs.IsPrerelease }}')
-      #     {
-      #       $Version = '${{ inputs.OverrideModuleVersion }}' + '${{ inputs.PrereleaseTag }}'
-      #       Write-Host "Checking for prerelease with required version: " + $Version
-      #       Find-Module -Name ScubaGear -RequiredVersion $Version -AllowPrerelease
-      #     }
-      #     else
-      #     {
-      #       Write-Host "Installing latest version"
-      #       Find-Module -Name ScubaGear
-      #     }
+      - name: Print Scuba Version
+        run: |
+          if ('true' -eq '${{ inputs.IsPrerelease }}')
+          {
+            $Version = '${{ inputs.OverrideModuleVersion }}' + '${{ inputs.PrereleaseTag }}'
+            Write-Host "Checking for prerelease with required version: " + $Version
+            Find-Module -Name ScubaGear -RequiredVersion $Version -AllowPrerelease
+          }
+          else
+          {
+            Write-Host "Installing latest version"
+            Find-Module -Name ScubaGear
+          }
