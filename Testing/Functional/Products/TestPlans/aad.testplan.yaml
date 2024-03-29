@@ -577,22 +577,45 @@ TestPlan:
   - PolicyId: MS.AAD.5.2v1
     TestDriver: RunCached
     Tests:
-      - TestDescription: MS.AAD.5.2v1 Non-Compliant case - Allow users to consent to apps
+      - TestDescription: MS.AAD.5.2v1 Non-Compliant case - Allow user to consent to apps
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
               updates:
                 authorization_policies[0].PermissionGrantPolicyIdsAssignedToDefaultUserRole:
                   - ManagePermissionGrantsForSelf.microsoft-user-default-legacy
+                  - ManagePermissionGrantsForOwnedResource.microsoft-dynamically-managed-permissions-for-chat
+                  - ManagePermissionGrantsForOwnedResource.microsoft-dynamically-managed-permissions-for-team
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.AAD.5.2v1 Compliant case - Do NOT allow users to consent to apps
+      - TestDescription: MS.AAD.5.2v1 Non-Compliant case - Allow user to consent to verified apps
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                authorization_policies[0].PermissionGrantPolicyIdsAssignedToDefaultUserRole:
+                  - ManagePermissionGrantsForSelf.microsoft-user-default-low
+                  - ManagePermissionGrantsForOwnedResource.microsoft-dynamically-managed-permissions-for-chat
+                  - ManagePermissionGrantsForOwnedResource.microsoft-dynamically-managed-permissions-for-team
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.AAD.5.2v1 Compliant case - Do NOT allow users to consent to apps - empty grant policy
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
               updates:
                 authorization_policies[0].PermissionGrantPolicyIdsAssignedToDefaultUserRole:
                   []
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.AAD.5.2v1 Compliant case - Do NOT allow users to consent to apps - chat teams grant policy
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                authorization_policies[0].PermissionGrantPolicyIdsAssignedToDefaultUserRole:
+                  - ManagePermissionGrantsForOwnedResource.microsoft-dynamically-managed-permissions-for-chat
+                  - ManagePermissionGrantsForOwnedResource.microsoft-dynamically-managed-permissions-for-team
         Postconditions: []
         ExpectedResult: true
 
