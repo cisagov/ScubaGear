@@ -18,10 +18,11 @@ on:
         description: "The prerelease tag: [0-9A-Za-z]+"
         required: false
         type: string
-  push:
-    paths:
-      - ".github/workflows/publish_public_package.yaml"
-      - "utils/DeployUtils.ps1"
+  # for testing
+  # push:
+  #   paths:
+  #     - ".github/workflows/publish_public_package.yaml"
+  #     - "utils/DeployUtils.ps1"
 
 jobs:
   publish:
