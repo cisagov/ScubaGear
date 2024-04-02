@@ -520,14 +520,18 @@ tests contains {
 # MS.AAD.5.2v1
 #--
 
-# Save the policy Id of any user allowed to consent to third
-# party applications
+# Return the Id if non-compliant user consent policies
 BadDefaultGrantPolicies contains Policy.Id if {
     some Policy in input.authorization_policies
-    count(Policy.PermissionGrantPolicyIdsAssignedToDefaultUserRole) != 0
+    "ManagePermissionGrantsForSelf.microsoft-user-default-legacy" in Policy.PermissionGrantPolicyIdsAssignedToDefaultUserRole
 }
 
-# Get all policy Ids
+BadDefaultGrantPolicies contains Policy.Id if {
+    some Policy in input.authorization_policies
+    "ManagePermissionGrantsForSelf.microsoft-user-default-low" in Policy.PermissionGrantPolicyIdsAssignedToDefaultUserRole
+}
+
+# Return all policy Ids
 AllDefaultGrantPolicies contains {
     "DefaultUser_DefaultGrantPolicy": Policy.PermissionGrantPolicyIdsAssignedToDefaultUserRole,
     "PolicyId": Policy.Id
@@ -535,7 +539,7 @@ AllDefaultGrantPolicies contains {
     some Policy in input.authorization_policies
 }
 
-# If there is a policy that allows user to cconsent to third party apps, fail
+# If there is a policy that allows user to consent to third party apps, fail
 tests contains {
     "PolicyId": "MS.AAD.5.2v1",
     "Criticality": "Shall",

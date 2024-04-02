@@ -156,7 +156,7 @@ function Invoke-ControlGroupItem {
 
             elseif(Test-Path -Path $Filename.Fullname -PathType Leaf) {
                 Write-Output "`nTesting Control Group $ControlGroup"
-                ..\opa_windows_amd64.exe test $RegoPolicyPath .\$($Filename.Fullname) $Flag
+                & $OPAExe test $RegoPolicyPath .\$($Filename.Fullname) $Flag
             }
             else {
                 Get-ErrorMsg FileIOError, $Filename
