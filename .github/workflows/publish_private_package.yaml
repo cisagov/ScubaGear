@@ -8,10 +8,11 @@ on:
   schedule:
     - cron: "23 0 * * *" # Execute each day at 00:23 UTC
   workflow_dispatch:
-  push:
-    paths:
-      - ".github/workflows/publish_private_package.yaml"
-      - "utils/DeployUtils.ps1"
+  # for testing
+  # push:
+  #   paths:
+  #     - ".github/workflows/publish_private_package.yaml"
+  #     - "utils/DeployUtils.ps1"
 
 env:
   GalleryName: PrivateScubaGearGallery
