@@ -130,6 +130,7 @@ function Build-ScubaModule {
     .NOTES
     Internal helper function
     #>
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingWriteHost', '')]
     param (
         [Parameter(Mandatory = $true)]
         [ValidateScript({ Test-Path -Path $_ -PathType Container })]
@@ -166,6 +167,7 @@ function ConfigureScubaGearModule {
     .NOTES
     Internal helper function
     #>
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingWriteHost', '')]
     param (
         [Parameter(Mandatory = $true)]
         [ValidateScript({ Test-Path -Path $_ -PathType Container })]
