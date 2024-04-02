@@ -1633,8 +1633,63 @@ test_PhishingMFAEnforced_NotApplicable if {
         ]
     }
 
-    ReportDetailStr := "This policy is only applicable if phishing-resistant MFA is not enforced and MS Authenticator is enabled"
-    TestResult("MS.AAD.3.3v1", Output, ReportDetailStr, false) == true
+    PolicyId := "MS.AAD.3.3v1"
+    ReportDetailStr := "This policy is only applicable if phishing-resistant MFA is not enforced and MS Authenticator is enabled. See %v for more info"
+    TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailStr), false) == true
+}
+
+test_PhishingMFAEnforced_MicrosoftAuthDisabled_NotApplicable if {
+    Output := aad.tests with input as {
+        "conditional_access_policies": [
+            {
+                "Conditions": {
+                    "Applications": {
+                        "IncludeApplications": [
+                            "All"
+                        ],
+                        "ExcludeApplications": []
+                    },
+                    "Users": {
+                        "IncludeUsers": [
+                            "All"
+                        ],
+                        "ExcludeUsers": [],
+                        "ExcludeGroups": [],
+                        "ExcludeRoles": []
+                    }
+                },
+                "GrantControls": {
+                    "AuthenticationStrength": {
+                        "AllowedCombinations": [
+                            "windowsHelloForBusiness",
+                            "fido2",
+                            "x509CertificateMultiFactor"
+                        ]
+                    }
+                },
+                "State": "enabled",
+                "DisplayName": "Phishing Resistant MFA Enforced"
+            }
+        ],
+        "authentication_method": [
+            {
+                "authentication_method_feature_settings": [
+                    {
+                        "Id":  "MicrosoftAuthenticator",
+                        "State": "disabled"
+                    },
+                    {
+                        "Id":  "Email",
+                        "State": "enabled"
+                    }
+                ]
+            }
+        ]
+    }
+
+    PolicyId := "MS.AAD.3.3v1"
+    ReportDetailStr := "This policy is only applicable if phishing-resistant MFA is not enforced and MS Authenticator is enabled. See %v for more info"
+    TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailStr), false) == true
 }
 
 test_PhishingMFANotEnforced_AuthenticatorNotEnabled_NotApplicable if {
@@ -1682,8 +1737,9 @@ test_PhishingMFANotEnforced_AuthenticatorNotEnabled_NotApplicable if {
         ]
     }
 
-    ReportDetailStr := "This policy is only applicable if phishing-resistant MFA is not enforced and MS Authenticator is enabled"
-    TestResult("MS.AAD.3.3v1", Output, ReportDetailStr, false) == true
+    PolicyId := "MS.AAD.3.3v1"
+    ReportDetailStr := "This policy is only applicable if phishing-resistant MFA is not enforced and MS Authenticator is enabled. See %v for more info"
+    TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailStr), false) == true
 }
 
 test_PhishingMFANotEnforced_AuthenticatorEnabled_Correct if {
@@ -1932,6 +1988,94 @@ test_PhishingMFANotEnforced_AuthenticatorEnabled_GeolocationDisabled_Incorrect i
                                 {
                                     "targetType":  "group",
                                     "id":  "all_users",
+                                    "isRegistrationRequired":  false,
+                                    "authenticationMode":  "any"
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "Id":  "Email",
+                        "State": "enabled"
+                    }
+                ]
+            }
+        ]
+    }
+
+    TestResult("MS.AAD.3.3v1", Output, FAIL, false) == true
+}
+
+test_PhishingMFANotEnforced_AuthenticatorEnabled_includeTargetsNotAll_Incorrect if {
+    Output := aad.tests with input as {
+        "conditional_access_policies": [
+            {
+                "Conditions": {
+                    "Applications": {
+                        "IncludeApplications": [
+                            "All"
+                        ],
+                        "ExcludeApplications": []
+                    },
+                    "Users": {
+                        "IncludeUsers": [
+                            "All"
+                        ],
+                        "ExcludeUsers": [],
+                        "ExcludeGroups": [],
+                        "ExcludeRoles": []
+                    }
+                },
+                "GrantControls": {
+                    "BuiltInControls": [
+                        "mfa"
+                    ]
+                },
+                "State": "enabled",
+                "DisplayName": "Vanilla MFA Enforced - not phishing-resistant"
+            }
+        ],
+        "authentication_method": [
+            {
+                "authentication_method_feature_settings": [
+                    {
+                        "ExcludeTargets":  [
+
+                                            ],
+                        "Id":  "MicrosoftAuthenticator",
+                        "State":  "enabled",
+                        "AdditionalProperties":  {
+                            "@odata.type":  "#microsoft.graph.microsoftAuthenticatorAuthenticationMethodConfiguration",
+                            "isSoftwareOathEnabled":  false,
+                            "featureSettings":  {
+                                "displayAppInformationRequiredState":  {
+                                    "state":  "enabled",
+                                    "includeTarget":  {
+                                                            "targetType":  "group",
+                                                            "id":  "all_users"
+                                                        },
+                                    "excludeTarget":  {
+                                                            "targetType":  "group",
+                                                            "id":  "00000000-0000-0000-0000-000000000000"
+                                                        }
+                                },
+                                "displayLocationInformationRequiredState":  {
+                                    "state":  "enabled",
+                                    "includeTarget":  {
+                                                            "targetType":  "group",
+                                                            "id":  "all_users"
+                                                        },
+                                    "excludeTarget":  {
+                                                            "targetType":  "group",
+                                                            "id":  "00000000-0000-0000-0000-000000000000"
+                                                        }
+                                }
+                            },
+                            "includeTargets@odata.context":  "https://graph.microsoft.com/beta/$metadata#policies/authenticationMethodsPolicy/authenticationMethodConfigurations(\u0027MicrosoftAuthenticator\u0027)/microsoft.graph.microsoftAuthenticatorAuthenticationMethodConfiguration/includeTargets",
+                            "includeTargets":  [
+                                {
+                                    "targetType":  "group",
+                                    "id":  "not_all_users",
                                     "isRegistrationRequired":  false,
                                     "authenticationMode":  "any"
                                 }

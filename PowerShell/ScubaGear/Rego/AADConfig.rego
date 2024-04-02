@@ -248,69 +248,67 @@ tests contains {
 # MS.AAD.3.3v1
 #--
 
-# Save all policy names if MFAPolicies exist
-AuthenticatorMFA contains CAPolicy.DisplayName if {
-    some CAPolicy in input.conditional_access_policies
-    Count(MFAPolicies) > 0
+MSAuth := auth_setting if {
+    some auth_method in input.authentication_method
+    some auth_setting in auth_method.authentication_method_feature_settings
+
+    auth_setting.Id == "MicrosoftAuthenticator"
 }
 
-# Microsoft Authenticator Method is good if associated method configuration state is set to "enabled" and state and location are set to "enabled" and all users
-MSAuthenticationMethodIsGood := Status if {
-    some Setting in input.authentication_method
-    some Item in Setting.authentication_method_feature_settings
-    Item.Id == "MicrosoftAuthenticator"
-
-    some Property in Item.AdditionalProperties
-
-    AppId := Property.displayAppInformationRequiredState.includeTarget.id
-    AppState := Property.displayAppInformationRequiredState.state
-    LocationId := Property.displayLocationInformationRequiredState.includeTarget.id
-    LocationState := Property.displayLocationInformationRequiredState.state
-
-    Conditions := [AppId == "all_users", AppState == "enabled", LocationId == "all_users", LocationState == "enabled"]
-    Status := count(FilterArray(Conditions, false)) == 0
+default MSAuthDisabled := false
+MSAuthDisabled := true if {
+    MSAuth.State == "disabled"
 }
 
-MSAuthenticationMethodIsDisabled := Status if {
-    some Setting in input.authentication_method
-    some Item in Setting.authentication_method_policy
-    some Configuration in Item.AuthenticationMethodConfigurations
+default MSAuthEnabled := false
+MSAuthEnabled := true if {
+    MSAuth.State == "enabled"
 
-    Conditions := [Configuration.Id == "MicrosoftAuthenticator", Configuration.State == "disabled"]
-    Status := count(FilterArray(Conditions, false)) == 0
-}
-# If policy matches basic conditions, special conditions,
-# & all exclusions are intentional, save the policy name
-AuthenticatorMFA contains CAPolicy.DisplayName if {
-    some CAPolicy in input.conditional_access_policies
+    Settings := MSAuth.AdditionalProperties.featureSettings
+    Settings.displayAppInformationRequiredState.state == "enabled"
+    Settings.displayLocationInformationRequiredState.state == "enabled"
 
-    # Match all simple conditions
-    PolicyConditionsMatch(CAPolicy)
-    "mfa" in CAPolicy.GrantControls.BuiltInControls
-    # Match if MS Authenticator is enabled and context information is selected
-    #Match if at least one of the auth methods are non-microsoft or the ms authen context information meets the requirements
-
-
-    # Only match policies with user and group exclusions if all exempted
-    UserExclusionsFullyExempt(CAPolicy, "MS.AAD.3.3v1") == true
-    GroupExclusionsFullyExempt(CAPolicy, "MS.AAD.3.3v1") == true
+    some target in MSAuth.AdditionalProperties.includeTargets
+    target.id == "all_users"
 }
 
-# If we have acceptable MFA then policy passes
-# If we have acceptable MFA and MS Authenticator is disabled the policy still passes
-# If we have acceptable MFA and MS Authenticator is enabled, location and context must be enabled for all users to pass.
+default not_applicable := false
+not_applicable := true if {
+    count(MFAPolicies) > 0
+}
+
+not_applicable := true if {
+    count(MFAPolicies) == 0
+    MSAuthDisabled == true
+}
+
+# If we have acceptable MFA then policy passes OR  MS Authenticator is disabled the policy is not applicable
 tests contains {
-   "PolicyId": "MS.AAD.3.3v1",
+    "PolicyId": PolicyId,
+    "Criticality": "Shall/Not-Implemented",
+    "Commandlet": ["Get-MgBetaPolicyAuthenticationMethodPolicy"],
+    "ActualValue": [],
+    "ReportDetails": CheckedSkippedDetails(PolicyId, Reason),
+    "RequirementMet": false
+} if {
+    PolicyId := "MS.AAD.3.3v1"
+    # regal ignore:line-length
+    Reason := "This policy is only applicable if phishing-resistant MFA is not enforced and MS Authenticator is enabled. See %v for more info"
+    not_applicable == true
+}
+
+# If we don't have acceptable MFA and MS Authenticator is enabled, location and context must be enabled for all users to pass.
+tests contains {
+    "PolicyId": "MS.AAD.3.3v1",
     "Criticality": "Shall",
-    "Commandlet": ["Get-MgBetaIdentityConditionalAccessPolicy"],
-    "ActualValue": AuthenticatorMFA,
-    "ReportDetails": concat(". ", [ReportFullDetailsArray(AuthenticatorMFA, DescriptionString), CAPLINK]),
+    "Commandlet": ["Get-MgBetaPolicyAuthenticationMethodPolicy"],
+    "ActualValue": MSAuth,
+    "ReportDetails": ReportDetailsBoolean(Status),
     "RequirementMet": Status
 } if {
-    DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
-    Conditions := [count(AuthenticatorMFA) > 0, MSAuthenticationMethodIsGood == true, MSAuthenticationMethodIsDisabled == true]
+    not_applicable == false
 
-    Status := count(FilterArray(Conditions, true)) > 1
+    Status := MSAuthEnabled == true
 }
 
 #
