@@ -87,12 +87,12 @@ jobs:
           Set-Content -Path ./key.txt -Value $env:PfxBase64
           certutil -decode ./key.txt ./key.pfx
         env:
-          PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
+          PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX_TEDTEST }}
       - name: Import PFX
         # Pipe to Out-Null to hide the thumbprint
         run: Import-PfxCertificate -Password (ConvertTo-SecureString -String $env:PfxPassword -AsPlainText -Force) -CertStoreLocation Cert:\CurrentUser\My -FilePath ./key.pfx | Out-Null
         env:
-          PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
+          PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW_TEDTEST }}
       - name: Get Thumbprint
         id: get-thumbprint
         run: |
@@ -102,7 +102,7 @@ jobs:
           echo thumbprint=$Thumbprint >> $env:GITHUB_OUTPUT
         shell: pwsh # -Password flag requires PS 6+
         env:
-          PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
+          PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW_TEDTEST }}
       # Selenium is an interface that allows for
       # the programmatic control of web browsers
       - name: Install Selenium & Update Webdriver
