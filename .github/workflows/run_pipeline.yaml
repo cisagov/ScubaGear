@@ -11,21 +11,19 @@ on:
 jobs:
   lint-yaml:
     name: Lint
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
     uses: ./.github/workflows/lint_yaml.yaml
   lint-powershell:
     name: Lint
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
     uses: ./.github/workflows/lint_powershell.yaml
+  scan-secret:
+    name: Security
+    uses: ./.github/workflows/run_secret_scan.yaml
   syntax:
     name: Syntax
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
     uses: ./.github/workflows/syntax_check_markdown.yaml
   unit-powershell:
     name: Unit
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
     uses: ./.github/workflows/unit_test_powershell.yaml
   unit-opa:
     name: Unit
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
     uses: ./.github/workflows/unit_test_opa.yaml
