@@ -19,19 +19,7 @@
                        ],
         "Criticality":  "Shall/Not-Implemented",
         "PolicyId":  "MS.AAD.3.3v1",
-        "ReportDetails":  "Not currently checked automatically. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.0.0/baselines/aad.md#msaad33v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
-        "RequirementMet":  false
-    },
-    {
-        "ActualValue":  [
-
-                        ],
-        "Commandlet":  [
-
-                       ],
-        "Criticality":  "Shall/Not-Implemented",
-        "PolicyId":  "MS.AAD.3.5v1",
-        "ReportDetails":  "Not currently checked automatically. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.0.0/baselines/aad.md#msaad35v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
+        "ReportDetails":  "This product does not currently have the capability to check compliance for this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.2.0/PowerShell/ScubaGear/baselines/aad.md#msaad33v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
         "RequirementMet":  false
     },
     {
@@ -43,31 +31,7 @@
                        ],
         "Criticality":  "Shall/Not-Implemented",
         "PolicyId":  "MS.AAD.4.1v1",
-        "ReportDetails":  "Not currently checked automatically. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.0.0/baselines/aad.md#msaad41v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
-        "RequirementMet":  false
-    },
-    {
-        "ActualValue":  [
-
-                        ],
-        "Commandlet":  [
-
-                       ],
-        "Criticality":  "Shall/Not-Implemented",
-        "PolicyId":  "MS.AAD.6.1v1",
-        "ReportDetails":  "Not currently checked automatically. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.0.0/baselines/aad.md#msaad61v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
-        "RequirementMet":  false
-    },
-    {
-        "ActualValue":  [
-
-                        ],
-        "Commandlet":  [
-
-                       ],
-        "Criticality":  "Shall/Not-Implemented",
-        "PolicyId":  "MS.AAD.7.2v1",
-        "ReportDetails":  "Not currently checked automatically. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.0.0/baselines/aad.md#msaad72v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
+        "ReportDetails":  "This product does not currently have the capability to check compliance for this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.2.0/PowerShell/ScubaGear/baselines/aad.md#msaad41v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
         "RequirementMet":  false
     },
     {
@@ -79,7 +43,7 @@
                        ],
         "Criticality":  "Should/Not-Implemented",
         "PolicyId":  "MS.AAD.2.2v1",
-        "ReportDetails":  "Not currently checked automatically. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.0.0/baselines/aad.md#msaad22v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
+        "ReportDetails":  "This product does not currently have the capability to check compliance for this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.2.0/PowerShell/ScubaGear/baselines/aad.md#msaad22v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
         "RequirementMet":  false
     },
     {
@@ -91,20 +55,50 @@
                        ],
         "Criticality":  "Should/Not-Implemented",
         "PolicyId":  "MS.AAD.8.3v1",
-        "ReportDetails":  "Not currently checked automatically. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.0.0/baselines/aad.md#msaad83v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
+        "ReportDetails":  "This product does not currently have the capability to check compliance for this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.2.0/PowerShell/ScubaGear/baselines/aad.md#msaad83v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
         "RequirementMet":  false
     },
     {
         "ActualValue":  [
-                            "migrationComplete"
+
+                        ],
+        "Commandlet":  [
+                           "Get-MgBetaPolicyAuthenticationMethodPolicy"
+                       ],
+        "Criticality":  "Shall",
+        "PolicyId":  "MS.AAD.3.5v1",
+        "ReportDetails":  "This policy is only applicable if the tenant has their Manage Migration feature set to Migration Complete. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.2.0/PowerShell/ScubaGear/baselines/aad.md#msaad34v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for more info",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+                            "preMigration"
                         ],
         "Commandlet":  [
                            "Get-MgBetaPolicyAuthenticationMethodPolicy"
                        ],
         "Criticality":  "Shall",
         "PolicyId":  "MS.AAD.3.4v1",
-        "ReportDetails":  "Requirement met",
-        "RequirementMet":  true
+        "ReportDetails":  "Requirement not met",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  {
+                            "all_admin_consent_policies":  [
+                                                               {
+                                                                   "Name":  "EnableAdminConsentRequests",
+                                                                   "SettingsGroup":  "Consent Policy Settings",
+                                                                   "Value":  "false"
+                                                               }
+                                                           ]
+                        },
+        "Commandlet":  [
+                           "Get-MgBetaDirectorySetting"
+                       ],
+        "Criticality":  "Shall",
+        "PolicyId":  "MS.AAD.5.3v1",
+        "ReportDetails":  "Requirement not met",
+        "RequirementMet":  false
     },
     {
         "ActualValue":  {
@@ -142,26 +136,11 @@
     },
     {
         "ActualValue":  {
-                            "all_consent_policies":  [
-                                                         {
-                                                             "IsEnabled":  false,
-                                                             "PolicyId":  null
-                                                         }
-                                                     ]
-                        },
-        "Commandlet":  [
-                           "Get-MgBetaPolicyAdminConsentRequestPolicy"
-                       ],
-        "Criticality":  "Shall",
-        "PolicyId":  "MS.AAD.5.3v1",
-        "ReportDetails":  "Requirement not met",
-        "RequirementMet":  false
-    },
-    {
-        "ActualValue":  {
                             "all_grant_policy_values":  [
                                                             {
                                                                 "DefaultUser_DefaultGrantPolicy":  [
+                                                                                                       "ManagePermissionGrantsForOwnedResource.microsoft-dynamically-managed-permissions-for-chat",
+                                                                                                       "ManagePermissionGrantsForOwnedResource.microsoft-dynamically-managed-permissions-for-team",
                                                                                                        "ManagePermissionGrantsForSelf.microsoft-user-default-legacy"
                                                                                                    ],
                                                                 "PolicyId":  "authorizationPolicy"
@@ -213,6 +192,18 @@
         "Commandlet":  [
                            "Get-MgBetaIdentityConditionalAccessPolicy"
                        ],
+        "Criticality":  "Shall",
+        "PolicyId":  "MS.AAD.3.6v1",
+        "ReportDetails":  "0 conditional access policy(s) found that meet(s) all requirements. \u003ca href=\u0027#caps\u0027\u003eView all CA policies\u003c/a\u003e.",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-MgBetaIdentityConditionalAccessPolicy"
+                       ],
         "Criticality":  "Should",
         "PolicyId":  "MS.AAD.3.7v1",
         "ReportDetails":  "0 conditional access policy(s) found that meet(s) all requirements. \u003ca href=\u0027#caps\u0027\u003eView all CA policies\u003c/a\u003e.",
@@ -236,40 +227,18 @@
                         ],
         "Commandlet":  [
                            "Get-MgBetaSubscribedSku",
-                           "Get-PrivilegedRole",
-                           "Get-MgBetaIdentityConditionalAccessPolicy"
-                       ],
-        "Criticality":  "Shall",
-        "PolicyId":  "MS.AAD.3.6v1",
-        "ReportDetails":  "0 conditional access policy(s) found that meet(s) all requirements. \u003ca href=\u0027#caps\u0027\u003eView all CA policies\u003c/a\u003e.",
-        "RequirementMet":  false
-    },
-    {
-        "ActualValue":  [
-                            "Application Administrator",
-                            "Cloud Application Administrator",
-                            "Exchange Administrator",
-                            "Global Administrator",
-                            "Hybrid Identity Administrator",
-                            "Privileged Role Administrator",
-                            "SharePoint Administrator"
-                        ],
-        "Commandlet":  [
-                           "Get-MgBetaSubscribedSku",
                            "Get-PrivilegedRole"
                        ],
         "Criticality":  "Shall",
-        "PolicyId":  "MS.AAD.7.5v1",
-        "ReportDetails":  "7 role(s) assigned to users outside of PIM:\u003cbr/\u003eApplication Administrator, Cloud Application Administrator, Exchange Administrator, Global Administrator, Hybrid Identity Administrator, Privileged Role Administrator, SharePoint Administrator",
-        "RequirementMet":  false
+        "PolicyId":  "MS.AAD.7.8v1",
+        "ReportDetails":  "0 role(s) or group(s) without notification e-mail configured for Global Administrator activations found",
+        "RequirementMet":  true
     },
     {
         "ActualValue":  [
                             "Application Administrator",
-                            "Cloud Application Administrator",
                             "Exchange Administrator",
                             "Global Administrator",
-                            "Hybrid Identity Administrator",
                             "Privileged Role Administrator",
                             "SharePoint Administrator",
                             "User Administrator"
@@ -280,16 +249,65 @@
                        ],
         "Criticality":  "Shall",
         "PolicyId":  "MS.AAD.7.4v1",
-        "ReportDetails":  "8 role(s) that contain users with permanent active assignment:\u003cbr/\u003eApplication Administrator, Cloud Application Administrator, Exchange Administrator, Global Administrator, Hybrid Identity Administrator, Privileged Role Administrator, SharePoint Administrator, User Administrator",
+        "ReportDetails":  "6 role(s) that contain users with permanent active assignment:\u003cbr/\u003eApplication Administrator, Exchange Administrator, Global Administrator, Privileged Role Administrator, SharePoint Administrator, User Administrator",
         "RequirementMet":  false
     },
     {
         "ActualValue":  [
                             "Application Administrator",
-                            "Cloud Application Administrator",
-                            "Hybrid Identity Administrator",
+                            "Global Administrator",
                             "Privileged Role Administrator",
-                            "SharePoint Administrator"
+                            "User Administrator"
+                        ],
+        "Commandlet":  [
+                           "Get-MgBetaSubscribedSku",
+                           "Get-PrivilegedRole"
+                       ],
+        "Criticality":  "Shall",
+        "PolicyId":  "MS.AAD.7.5v1",
+        "ReportDetails":  "4 role(s) assigned to users outside of PIM:\u003cbr/\u003eApplication Administrator, Global Administrator, Privileged Role Administrator, User Administrator",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+                            "Cloud Application Administrator(Directory Role)",
+                            "Exchange Administrator(Directory Role)",
+                            "Global Administrator(Directory Role)",
+                            "Hybrid Identity Administrator(Directory Role)",
+                            "PIM Test Group(PIM Group)",
+                            "Privileged Role Administrator(Directory Role)",
+                            "SharePoint Administrator(Directory Role)"
+                        ],
+        "Commandlet":  [
+                           "Get-MgBetaSubscribedSku",
+                           "Get-PrivilegedRole"
+                       ],
+        "Criticality":  "Shall",
+        "PolicyId":  "MS.AAD.7.7v1",
+        "ReportDetails":  "7 role(s) or group(s) without notification e-mail configured for role assignments found:\u003cbr/\u003eCloud Application Administrator(Directory Role), Exchange Administrator(Directory Role), Global Administrator(Directory Role), Hybrid Identity Administrator(Directory Role), PIM Test Group(PIM Group), Privileged Role Administrator(Directory Role), SharePoint Administrator(Directory Role)",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+                            "Cloud Application Administrator(Directory Role)",
+                            "Exchange Administrator(Directory Role)",
+                            "Hybrid Identity Administrator(Directory Role)",
+                            "PIM Test Group(PIM Group)",
+                            "Privileged Role Administrator(Directory Role)",
+                            "SharePoint Administrator(Directory Role)"
+                        ],
+        "Commandlet":  [
+                           "Get-MgBetaSubscribedSku",
+                           "Get-PrivilegedRole"
+                       ],
+        "Criticality":  "Should",
+        "PolicyId":  "MS.AAD.7.9v1",
+        "ReportDetails":  "6 role(s) or group(s) without notification e-mail configured for role activations found:\u003cbr/\u003eCloud Application Administrator(Directory Role), Exchange Administrator(Directory Role), Hybrid Identity Administrator(Directory Role), PIM Test Group(PIM Group), Privileged Role Administrator(Directory Role), SharePoint Administrator(Directory Role)",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+                            "Global Administrator(Directory Role)"
                         ],
         "Commandlet":  [
                            "Get-MgBetaSubscribedSku",
@@ -297,8 +315,8 @@
                        ],
         "Criticality":  "Shall",
         "PolicyId":  "MS.AAD.7.6v1",
-        "ReportDetails":  "Requirement met",
-        "RequirementMet":  true
+        "ReportDetails":  "1 role(s) or group(s) allowing activation without approval found:\u003cbr/\u003eGlobal Administrator(Directory Role)",
+        "RequirementMet":  false
     },
     {
         "ActualValue":  [
@@ -313,6 +331,20 @@
         "PolicyId":  "MS.AAD.7.1v1",
         "ReportDetails":  "2 global admin(s) found:\u003cbr/\u003eJane Doe, John Public",
         "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+                            "Jane Doe",
+                            "John Public"
+                        ],
+        "Commandlet":  [
+                           "Get-MgBetaSubscribedSku",
+                           "Get-PrivilegedUser"
+                       ],
+        "Criticality":  "Shall",
+        "PolicyId":  "MS.AAD.7.2v1",
+        "ReportDetails":  "Requirement not met: Least Privilege Score = 2 (should be 1 or less)",
+        "RequirementMet":  false
     },
     {
         "ActualValue":  [
@@ -364,50 +396,10 @@
     },
     {
         "ActualValue":  [
-                            "Privileged Role Administrator"
-                        ],
-        "Commandlet":  [
-                           "Get-MgBetaSubscribedSku",
-                           "Get-PrivilegedRole"
-                       ],
-        "Criticality":  "Shall",
-        "PolicyId":  "MS.AAD.7.8v1",
-        "ReportDetails":  "Requirement met",
-        "RequirementMet":  true
-    },
-    {
-        "ActualValue":  [
-                            "Privileged Role Administrator"
-                        ],
-        "Commandlet":  [
-                           "Get-MgBetaSubscribedSku",
-                           "Get-PrivilegedRole"
-                       ],
-        "Criticality":  "Should",
-        "PolicyId":  "MS.AAD.7.9v1",
-        "ReportDetails":  "1 role(s) without notification e-mail configured for role activations found:\u003cbr/\u003ePrivileged Role Administrator",
-        "RequirementMet":  false
-    },
-    {
-        "ActualValue":  [
-                            "Privileged Role Administrator",
-                            "User Administrator"
-                        ],
-        "Commandlet":  [
-                           "Get-MgBetaSubscribedSku",
-                           "Get-PrivilegedRole"
-                       ],
-        "Criticality":  "Shall",
-        "PolicyId":  "MS.AAD.7.7v1",
-        "ReportDetails":  "2 role(s) without notification e-mail configured for role assignments found:\u003cbr/\u003ePrivileged Role Administrator, User Administrator",
-        "RequirementMet":  false
-    },
-    {
-        "ActualValue":  [
                             {
                                 "Name":  "EnableGroupSpecificConsent",
                                 "SettingsGroup":  "Consent Policy Settings",
-                                "Value":  "true"
+                                "Value":  "false"
                             }
                         ],
         "Commandlet":  [
@@ -415,8 +407,25 @@
                        ],
         "Criticality":  "Shall",
         "PolicyId":  "MS.AAD.5.4v1",
-        "ReportDetails":  "Requirement not met",
-        "RequirementMet":  false
+        "ReportDetails":  "Requirement met",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+                            [
+
+                            ],
+                            [
+                                "tqhjy.onmicrosoft.com"
+                            ]
+                        ],
+        "Commandlet":  [
+                           "Get-MgBetaDomain"
+                       ],
+        "Criticality":  "Shall",
+        "PolicyId":  "MS.AAD.6.1v1",
+        "ReportDetails":  "Requirement met",
+        "RequirementMet":  true
     },
     {
         "ActualValue":  [
@@ -427,7 +436,7 @@
                        ],
         "Criticality":  "Shall/Not-Implemented",
         "PolicyId":  "MS.DEFENDER.6.2v1",
-        "ReportDetails":  "Not currently checked automatically. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.0.0/baselines/defender.md#msdefender62v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
+        "ReportDetails":  "This product does not currently have the capability to check compliance for this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.2.0/PowerShell/ScubaGear/baselines/defender.md#msdefender62v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
         "RequirementMet":  false
     },
     {
@@ -439,7 +448,7 @@
                        ],
         "Criticality":  "Shall/Not-Implemented",
         "PolicyId":  "MS.DEFENDER.6.3v1",
-        "ReportDetails":  "Not currently checked automatically. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.0.0/baselines/defender.md#msdefender63v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
+        "ReportDetails":  "This product does not currently have the capability to check compliance for this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.2.0/PowerShell/ScubaGear/baselines/defender.md#msdefender63v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
         "RequirementMet":  false
     },
     {
@@ -451,7 +460,7 @@
                        ],
         "Criticality":  "Should/Not-Implemented",
         "PolicyId":  "MS.DEFENDER.4.5v1",
-        "ReportDetails":  "Not currently checked automatically. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.0.0/baselines/defender.md#msdefender45v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
+        "ReportDetails":  "This product does not currently have the capability to check compliance for this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.2.0/PowerShell/ScubaGear/baselines/defender.md#msdefender45v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
         "RequirementMet":  false
     },
     {
@@ -463,7 +472,7 @@
                        ],
         "Criticality":  "Should/Not-Implemented",
         "PolicyId":  "MS.DEFENDER.4.6v1",
-        "ReportDetails":  "Not currently checked automatically. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.0.0/baselines/defender.md#msdefender46v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
+        "ReportDetails":  "This product does not currently have the capability to check compliance for this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.2.0/PowerShell/ScubaGear/baselines/defender.md#msdefender46v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
         "RequirementMet":  false
     },
     {
@@ -475,7 +484,7 @@
                        ],
         "Criticality":  "Should/Not-Implemented",
         "PolicyId":  "MS.DEFENDER.5.2v1",
-        "ReportDetails":  "Not currently checked automatically. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.0.0/baselines/defender.md#msdefender52v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
+        "ReportDetails":  "This product does not currently have the capability to check compliance for this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.2.0/PowerShell/ScubaGear/baselines/defender.md#msdefender52v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
         "RequirementMet":  false
     },
     {
@@ -568,17 +577,16 @@
     {
         "ActualValue":  {
                             "Credit_Card":  [
-                                                "items containing ITIN and SSN",
-                                                "protection rule 4"
+                                                "CreditCardsOnly",
+                                                "Baseline Rule",
+                                                "Missing_ITIN_Has_UKPassports"
                                             ],
                             "ITIN":  [
-                                         "items containing ITIN and SSN",
-                                         "protection rule 2",
-                                         "protection rule 4"
+                                         "Baseline Rule"
                                      ],
                             "SSN":  [
-                                        "items containing ITIN and SSN",
-                                        "protection rule 4"
+                                        "Baseline Rule",
+                                        "Missing_ITIN_Has_UKPassports"
                                     ]
                         },
         "Commandlet":  [
@@ -600,14 +608,7 @@
                                                                    "All"
                                                                ],
                                                  "Name":  "Default Office 365 DLP policy",
-                                                 "Workload":  "Exchange, SharePoint, OneDriveForBusiness, Teams"
-                                             },
-                                             {
-                                                 "Locations":  [
-                                                                   "All"
-                                                               ],
-                                                 "Name":  "ted policy 2",
-                                                 "Workload":  "Exchange, SharePoint, OneDriveForBusiness"
+                                                 "Workload":  "Exchange, SharePoint, OneDriveForBusiness, Teams, OnPremisesScanner"
                                              }
                                          ],
                             "OneDrive":  [
@@ -616,14 +617,7 @@
                                                                    "All"
                                                                ],
                                                  "Name":  "Default Office 365 DLP policy",
-                                                 "Workload":  "Exchange, SharePoint, OneDriveForBusiness, Teams"
-                                             },
-                                             {
-                                                 "Locations":  [
-                                                                   "All"
-                                                               ],
-                                                 "Name":  "ted policy 2",
-                                                 "Workload":  "Exchange, SharePoint, OneDriveForBusiness"
+                                                 "Workload":  "Exchange, SharePoint, OneDriveForBusiness, Teams, OnPremisesScanner"
                                              }
                                          ],
                             "SharePoint":  [
@@ -632,14 +626,7 @@
                                                                      "All"
                                                                  ],
                                                    "Name":  "Default Office 365 DLP policy",
-                                                   "Workload":  "Exchange, SharePoint, OneDriveForBusiness, Teams"
-                                               },
-                                               {
-                                                   "Locations":  [
-                                                                     "All"
-                                                                 ],
-                                                   "Name":  "ted policy 2",
-                                                   "Workload":  "Exchange, SharePoint, OneDriveForBusiness"
+                                                   "Workload":  "Exchange, SharePoint, OneDriveForBusiness, Teams, OnPremisesScanner"
                                                }
                                            ],
                             "Teams":  [
@@ -648,7 +635,7 @@
                                                                 "All"
                                                             ],
                                               "Name":  "Default Office 365 DLP policy",
-                                              "Workload":  "Exchange, SharePoint, OneDriveForBusiness, Teams"
+                                              "Workload":  "Exchange, SharePoint, OneDriveForBusiness, Teams, OnPremisesScanner"
                                           }
                                       ]
                         },
@@ -688,19 +675,6 @@
     },
     {
         "ActualValue":  {
-                            "StandardSetToAll":  false,
-                            "StrictSetToAll":  false
-                        },
-        "Commandlet":  [
-                           "Get-EOPProtectionPolicyRule"
-                       ],
-        "Criticality":  "Shall",
-        "PolicyId":  "MS.DEFENDER.1.2v1",
-        "ReportDetails":  "Requirement not met",
-        "RequirementMet":  false
-    },
-    {
-        "ActualValue":  {
                             "StandardSetToAll":  true,
                             "StrictSetToAll":  false
                         },
@@ -709,6 +683,19 @@
                        ],
         "Criticality":  "Shall",
         "PolicyId":  "MS.DEFENDER.1.3v1",
+        "ReportDetails":  "Requirement met",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  {
+                            "StandardSetToAll":  true,
+                            "StrictSetToAll":  false
+                        },
+        "Commandlet":  [
+                           "Get-EOPProtectionPolicyRule"
+                       ],
+        "Criticality":  "Shall",
+        "PolicyId":  "MS.DEFENDER.1.2v1",
         "ReportDetails":  "Requirement met",
         "RequirementMet":  true
     },
@@ -729,36 +716,36 @@
 
                         ],
         "Commandlet":  [
-                           "Get-ProtectionAlert"
+                           "Get-DlpComplianceRule"
                        ],
-        "Criticality":  "Shall",
-        "PolicyId":  "MS.DEFENDER.5.1v1",
+        "Criticality":  "Should",
+        "PolicyId":  "MS.DEFENDER.4.3v1",
         "ReportDetails":  "Requirement met",
         "RequirementMet":  true
     },
     {
         "ActualValue":  [
-                            "protection rule 4"
-                        ],
-        "Commandlet":  [
-                           "Get-DlpComplianceRule"
-                       ],
-        "Criticality":  "Should",
-        "PolicyId":  "MS.DEFENDER.4.3v1",
-        "ReportDetails":  "1 rule(s) found that do(es) not block access or associated policy not set to enforce block action: protection rule 4",
-        "RequirementMet":  false
-    },
-    {
-        "ActualValue":  [
-                            "protection rule 4"
+
                         ],
         "Commandlet":  [
                            "Get-DlpComplianceRule"
                        ],
         "Criticality":  "Should",
         "PolicyId":  "MS.DEFENDER.4.4v1",
-        "ReportDetails":  "1 rule(s) found that do(es) not notify at least one user: protection rule 4",
-        "RequirementMet":  false
+        "ReportDetails":  "Requirement met",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-ProtectionAlert"
+                       ],
+        "Criticality":  "Shall",
+        "PolicyId":  "MS.DEFENDER.5.1v1",
+        "ReportDetails":  "Requirement met",
+        "RequirementMet":  true
     },
     {
         "ActualValue":  [
@@ -784,7 +771,7 @@
                        ],
         "Criticality":  "Shall/3rd Party",
         "PolicyId":  "MS.EXO.10.1v1",
-        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. Use a 3rd party assessment tool or manually review to ensure compliance. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.0.0/baselines/exo.md#msexo101v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check. If you are using Defender for Office 365 to implement this policy, ensure that you are running ScubaGear with defender included in the ProductNames parameter for an automated check. Then, review the corresponding Defender for Office 365 policy that fulfills the requirements of this EXO policy.",
+        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manually review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure that when running ScubaGear defender is in the ProductNames parameter. Then, manually review the corresponding Defender for Office 365 policy that fulfills the requirements of this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.2.0/PowerShell/ScubaGear/baselines/exo.md#msexo101v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check.",
         "RequirementMet":  false
     },
     {
@@ -796,7 +783,7 @@
                        ],
         "Criticality":  "Shall/3rd Party",
         "PolicyId":  "MS.EXO.10.2v1",
-        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. Use a 3rd party assessment tool or manually review to ensure compliance. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.0.0/baselines/exo.md#msexo102v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check. If you are using Defender for Office 365 to implement this policy, ensure that you are running ScubaGear with defender included in the ProductNames parameter for an automated check. Then, review the corresponding Defender for Office 365 policy that fulfills the requirements of this EXO policy.",
+        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manually review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure that when running ScubaGear defender is in the ProductNames parameter. Then, manually review the corresponding Defender for Office 365 policy that fulfills the requirements of this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.2.0/PowerShell/ScubaGear/baselines/exo.md#msexo102v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check.",
         "RequirementMet":  false
     },
     {
@@ -808,7 +795,7 @@
                        ],
         "Criticality":  "Shall/3rd Party",
         "PolicyId":  "MS.EXO.14.1v1",
-        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. Use a 3rd party assessment tool or manually review to ensure compliance. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.0.0/baselines/exo.md#msexo141v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check. If you are using Defender for Office 365 to implement this policy, ensure that you are running ScubaGear with defender included in the ProductNames parameter for an automated check. Then, review the corresponding Defender for Office 365 policy that fulfills the requirements of this EXO policy.",
+        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manually review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure that when running ScubaGear defender is in the ProductNames parameter. Then, manually review the corresponding Defender for Office 365 policy that fulfills the requirements of this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.2.0/PowerShell/ScubaGear/baselines/exo.md#msexo141v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check.",
         "RequirementMet":  false
     },
     {
@@ -820,7 +807,7 @@
                        ],
         "Criticality":  "Shall/3rd Party",
         "PolicyId":  "MS.EXO.14.2v1",
-        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. Use a 3rd party assessment tool or manually review to ensure compliance. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.0.0/baselines/exo.md#msexo142v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check. If you are using Defender for Office 365 to implement this policy, ensure that you are running ScubaGear with defender included in the ProductNames parameter for an automated check. Then, review the corresponding Defender for Office 365 policy that fulfills the requirements of this EXO policy.",
+        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manually review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure that when running ScubaGear defender is in the ProductNames parameter. Then, manually review the corresponding Defender for Office 365 policy that fulfills the requirements of this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.2.0/PowerShell/ScubaGear/baselines/exo.md#msexo142v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check.",
         "RequirementMet":  false
     },
     {
@@ -832,7 +819,7 @@
                        ],
         "Criticality":  "Shall/3rd Party",
         "PolicyId":  "MS.EXO.14.3v1",
-        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. Use a 3rd party assessment tool or manually review to ensure compliance. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.0.0/baselines/exo.md#msexo143v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check. If you are using Defender for Office 365 to implement this policy, ensure that you are running ScubaGear with defender included in the ProductNames parameter for an automated check. Then, review the corresponding Defender for Office 365 policy that fulfills the requirements of this EXO policy.",
+        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manually review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure that when running ScubaGear defender is in the ProductNames parameter. Then, manually review the corresponding Defender for Office 365 policy that fulfills the requirements of this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.2.0/PowerShell/ScubaGear/baselines/exo.md#msexo143v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check.",
         "RequirementMet":  false
     },
     {
@@ -844,7 +831,7 @@
                        ],
         "Criticality":  "Shall/3rd Party",
         "PolicyId":  "MS.EXO.16.1v1",
-        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. Use a 3rd party assessment tool or manually review to ensure compliance. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.0.0/baselines/exo.md#msexo161v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check. If you are using Defender for Office 365 to implement this policy, ensure that you are running ScubaGear with defender included in the ProductNames parameter for an automated check. Then, review the corresponding Defender for Office 365 policy that fulfills the requirements of this EXO policy.",
+        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manually review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure that when running ScubaGear defender is in the ProductNames parameter. Then, manually review the corresponding Defender for Office 365 policy that fulfills the requirements of this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.2.0/PowerShell/ScubaGear/baselines/exo.md#msexo161v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check.",
         "RequirementMet":  false
     },
     {
@@ -856,7 +843,7 @@
                        ],
         "Criticality":  "Shall/3rd Party",
         "PolicyId":  "MS.EXO.17.1v1",
-        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. Use a 3rd party assessment tool or manually review to ensure compliance. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.0.0/baselines/exo.md#msexo171v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check. If you are using Defender for Office 365 to implement this policy, ensure that you are running ScubaGear with defender included in the ProductNames parameter for an automated check. Then, review the corresponding Defender for Office 365 policy that fulfills the requirements of this EXO policy.",
+        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manually review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure that when running ScubaGear defender is in the ProductNames parameter. Then, manually review the corresponding Defender for Office 365 policy that fulfills the requirements of this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.2.0/PowerShell/ScubaGear/baselines/exo.md#msexo171v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check.",
         "RequirementMet":  false
     },
     {
@@ -868,7 +855,7 @@
                        ],
         "Criticality":  "Shall/3rd Party",
         "PolicyId":  "MS.EXO.17.2v1",
-        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. Use a 3rd party assessment tool or manually review to ensure compliance. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.0.0/baselines/exo.md#msexo172v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check. If you are using Defender for Office 365 to implement this policy, ensure that you are running ScubaGear with defender included in the ProductNames parameter for an automated check. Then, review the corresponding Defender for Office 365 policy that fulfills the requirements of this EXO policy.",
+        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manually review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure that when running ScubaGear defender is in the ProductNames parameter. Then, manually review the corresponding Defender for Office 365 policy that fulfills the requirements of this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.2.0/PowerShell/ScubaGear/baselines/exo.md#msexo172v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check.",
         "RequirementMet":  false
     },
     {
@@ -880,7 +867,7 @@
                        ],
         "Criticality":  "Shall/3rd Party",
         "PolicyId":  "MS.EXO.17.3v1",
-        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. Use a 3rd party assessment tool or manually review to ensure compliance. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.0.0/baselines/exo.md#msexo173v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check. If you are using Defender for Office 365 to implement this policy, ensure that you are running ScubaGear with defender included in the ProductNames parameter for an automated check. Then, review the corresponding Defender for Office 365 policy that fulfills the requirements of this EXO policy.",
+        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manually review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure that when running ScubaGear defender is in the ProductNames parameter. Then, manually review the corresponding Defender for Office 365 policy that fulfills the requirements of this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.2.0/PowerShell/ScubaGear/baselines/exo.md#msexo173v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check.",
         "RequirementMet":  false
     },
     {
@@ -892,7 +879,7 @@
                        ],
         "Criticality":  "Shall/3rd Party",
         "PolicyId":  "MS.EXO.8.1v1",
-        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. Use a 3rd party assessment tool or manually review to ensure compliance. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.0.0/baselines/exo.md#msexo81v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check. If you are using Defender for Office 365 to implement this policy, ensure that you are running ScubaGear with defender included in the ProductNames parameter for an automated check. Then, review the corresponding Defender for Office 365 policy that fulfills the requirements of this EXO policy.",
+        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manually review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure that when running ScubaGear defender is in the ProductNames parameter. Then, manually review the corresponding Defender for Office 365 policy that fulfills the requirements of this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.2.0/PowerShell/ScubaGear/baselines/exo.md#msexo81v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check.",
         "RequirementMet":  false
     },
     {
@@ -904,7 +891,7 @@
                        ],
         "Criticality":  "Shall/3rd Party",
         "PolicyId":  "MS.EXO.8.2v1",
-        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. Use a 3rd party assessment tool or manually review to ensure compliance. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.0.0/baselines/exo.md#msexo82v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check. If you are using Defender for Office 365 to implement this policy, ensure that you are running ScubaGear with defender included in the ProductNames parameter for an automated check. Then, review the corresponding Defender for Office 365 policy that fulfills the requirements of this EXO policy.",
+        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manually review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure that when running ScubaGear defender is in the ProductNames parameter. Then, manually review the corresponding Defender for Office 365 policy that fulfills the requirements of this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.2.0/PowerShell/ScubaGear/baselines/exo.md#msexo82v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check.",
         "RequirementMet":  false
     },
     {
@@ -916,7 +903,7 @@
                        ],
         "Criticality":  "Shall/3rd Party",
         "PolicyId":  "MS.EXO.9.1v1",
-        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. Use a 3rd party assessment tool or manually review to ensure compliance. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.0.0/baselines/exo.md#msexo91v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check. If you are using Defender for Office 365 to implement this policy, ensure that you are running ScubaGear with defender included in the ProductNames parameter for an automated check. Then, review the corresponding Defender for Office 365 policy that fulfills the requirements of this EXO policy.",
+        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manually review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure that when running ScubaGear defender is in the ProductNames parameter. Then, manually review the corresponding Defender for Office 365 policy that fulfills the requirements of this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.2.0/PowerShell/ScubaGear/baselines/exo.md#msexo91v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check.",
         "RequirementMet":  false
     },
     {
@@ -928,7 +915,7 @@
                        ],
         "Criticality":  "Shall/3rd Party",
         "PolicyId":  "MS.EXO.9.3v1",
-        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. Use a 3rd party assessment tool or manually review to ensure compliance. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.0.0/baselines/exo.md#msexo93v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check. If you are using Defender for Office 365 to implement this policy, ensure that you are running ScubaGear with defender included in the ProductNames parameter for an automated check. Then, review the corresponding Defender for Office 365 policy that fulfills the requirements of this EXO policy.",
+        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manually review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure that when running ScubaGear defender is in the ProductNames parameter. Then, manually review the corresponding Defender for Office 365 policy that fulfills the requirements of this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.2.0/PowerShell/ScubaGear/baselines/exo.md#msexo93v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check.",
         "RequirementMet":  false
     },
     {
@@ -940,7 +927,7 @@
                        ],
         "Criticality":  "Shall/Not-Implemented",
         "PolicyId":  "MS.EXO.2.1v1",
-        "ReportDetails":  "Not currently checked automatically. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.0.0/baselines/exo.md#msexo21v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
+        "ReportDetails":  "This product does not currently have the capability to check compliance for this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.2.0/PowerShell/ScubaGear/baselines/exo.md#msexo21v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
         "RequirementMet":  false
     },
     {
@@ -952,7 +939,7 @@
                        ],
         "Criticality":  "Should/3rd Party",
         "PolicyId":  "MS.EXO.10.3v1",
-        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. Use a 3rd party assessment tool or manually review to ensure compliance. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.0.0/baselines/exo.md#msexo103v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check. If you are using Defender for Office 365 to implement this policy, ensure that you are running ScubaGear with defender included in the ProductNames parameter for an automated check. Then, review the corresponding Defender for Office 365 policy that fulfills the requirements of this EXO policy.",
+        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manually review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure that when running ScubaGear defender is in the ProductNames parameter. Then, manually review the corresponding Defender for Office 365 policy that fulfills the requirements of this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.2.0/PowerShell/ScubaGear/baselines/exo.md#msexo103v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check.",
         "RequirementMet":  false
     },
     {
@@ -964,7 +951,7 @@
                        ],
         "Criticality":  "Should/3rd Party",
         "PolicyId":  "MS.EXO.11.1v1",
-        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. Use a 3rd party assessment tool or manually review to ensure compliance. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.0.0/baselines/exo.md#msexo111v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check. If you are using Defender for Office 365 to implement this policy, ensure that you are running ScubaGear with defender included in the ProductNames parameter for an automated check. Then, review the corresponding Defender for Office 365 policy that fulfills the requirements of this EXO policy.",
+        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manually review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure that when running ScubaGear defender is in the ProductNames parameter. Then, manually review the corresponding Defender for Office 365 policy that fulfills the requirements of this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.2.0/PowerShell/ScubaGear/baselines/exo.md#msexo111v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check.",
         "RequirementMet":  false
     },
     {
@@ -976,7 +963,7 @@
                        ],
         "Criticality":  "Should/3rd Party",
         "PolicyId":  "MS.EXO.11.2v1",
-        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. Use a 3rd party assessment tool or manually review to ensure compliance. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.0.0/baselines/exo.md#msexo112v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check. If you are using Defender for Office 365 to implement this policy, ensure that you are running ScubaGear with defender included in the ProductNames parameter for an automated check. Then, review the corresponding Defender for Office 365 policy that fulfills the requirements of this EXO policy.",
+        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manually review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure that when running ScubaGear defender is in the ProductNames parameter. Then, manually review the corresponding Defender for Office 365 policy that fulfills the requirements of this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.2.0/PowerShell/ScubaGear/baselines/exo.md#msexo112v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check.",
         "RequirementMet":  false
     },
     {
@@ -988,7 +975,7 @@
                        ],
         "Criticality":  "Should/3rd Party",
         "PolicyId":  "MS.EXO.11.3v1",
-        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. Use a 3rd party assessment tool or manually review to ensure compliance. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.0.0/baselines/exo.md#msexo113v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check. If you are using Defender for Office 365 to implement this policy, ensure that you are running ScubaGear with defender included in the ProductNames parameter for an automated check. Then, review the corresponding Defender for Office 365 policy that fulfills the requirements of this EXO policy.",
+        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manually review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure that when running ScubaGear defender is in the ProductNames parameter. Then, manually review the corresponding Defender for Office 365 policy that fulfills the requirements of this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.2.0/PowerShell/ScubaGear/baselines/exo.md#msexo113v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check.",
         "RequirementMet":  false
     },
     {
@@ -1000,7 +987,7 @@
                        ],
         "Criticality":  "Should/3rd Party",
         "PolicyId":  "MS.EXO.15.1v1",
-        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. Use a 3rd party assessment tool or manually review to ensure compliance. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.0.0/baselines/exo.md#msexo151v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check. If you are using Defender for Office 365 to implement this policy, ensure that you are running ScubaGear with defender included in the ProductNames parameter for an automated check. Then, review the corresponding Defender for Office 365 policy that fulfills the requirements of this EXO policy.",
+        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manually review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure that when running ScubaGear defender is in the ProductNames parameter. Then, manually review the corresponding Defender for Office 365 policy that fulfills the requirements of this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.2.0/PowerShell/ScubaGear/baselines/exo.md#msexo151v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check.",
         "RequirementMet":  false
     },
     {
@@ -1012,7 +999,7 @@
                        ],
         "Criticality":  "Should/3rd Party",
         "PolicyId":  "MS.EXO.15.2v1",
-        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. Use a 3rd party assessment tool or manually review to ensure compliance. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.0.0/baselines/exo.md#msexo152v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check. If you are using Defender for Office 365 to implement this policy, ensure that you are running ScubaGear with defender included in the ProductNames parameter for an automated check. Then, review the corresponding Defender for Office 365 policy that fulfills the requirements of this EXO policy.",
+        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manually review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure that when running ScubaGear defender is in the ProductNames parameter. Then, manually review the corresponding Defender for Office 365 policy that fulfills the requirements of this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.2.0/PowerShell/ScubaGear/baselines/exo.md#msexo152v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check.",
         "RequirementMet":  false
     },
     {
@@ -1024,7 +1011,7 @@
                        ],
         "Criticality":  "Should/3rd Party",
         "PolicyId":  "MS.EXO.15.3v1",
-        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. Use a 3rd party assessment tool or manually review to ensure compliance. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.0.0/baselines/exo.md#msexo153v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check. If you are using Defender for Office 365 to implement this policy, ensure that you are running ScubaGear with defender included in the ProductNames parameter for an automated check. Then, review the corresponding Defender for Office 365 policy that fulfills the requirements of this EXO policy.",
+        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manually review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure that when running ScubaGear defender is in the ProductNames parameter. Then, manually review the corresponding Defender for Office 365 policy that fulfills the requirements of this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.2.0/PowerShell/ScubaGear/baselines/exo.md#msexo153v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check.",
         "RequirementMet":  false
     },
     {
@@ -1036,7 +1023,7 @@
                        ],
         "Criticality":  "Should/3rd Party",
         "PolicyId":  "MS.EXO.16.2v1",
-        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. Use a 3rd party assessment tool or manually review to ensure compliance. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.0.0/baselines/exo.md#msexo162v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check. If you are using Defender for Office 365 to implement this policy, ensure that you are running ScubaGear with defender included in the ProductNames parameter for an automated check. Then, review the corresponding Defender for Office 365 policy that fulfills the requirements of this EXO policy.",
+        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manually review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure that when running ScubaGear defender is in the ProductNames parameter. Then, manually review the corresponding Defender for Office 365 policy that fulfills the requirements of this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.2.0/PowerShell/ScubaGear/baselines/exo.md#msexo162v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check.",
         "RequirementMet":  false
     },
     {
@@ -1048,13 +1035,11 @@
                        ],
         "Criticality":  "Should/3rd Party",
         "PolicyId":  "MS.EXO.9.2v1",
-        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. Use a 3rd party assessment tool or manually review to ensure compliance. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.0.0/baselines/exo.md#msexo92v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check. If you are using Defender for Office 365 to implement this policy, ensure that you are running ScubaGear with defender included in the ProductNames parameter for an automated check. Then, review the corresponding Defender for Office 365 policy that fulfills the requirements of this EXO policy.",
+        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manually review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure that when running ScubaGear defender is in the ProductNames parameter. Then, manually review the corresponding Defender for Office 365 policy that fulfills the requirements of this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.2.0/PowerShell/ScubaGear/baselines/exo.md#msexo92v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check.",
         "RequirementMet":  false
     },
     {
         "ActualValue":  [
-                            "InOrganization",
-                            null,
                             "NotInOrganization"
                         ],
         "Commandlet":  [
@@ -1072,16 +1057,12 @@
                                     "domain":  "tqhjy.onmicrosoft.com",
                                     "log":  [
                                                 "@{query_method=traditional; query_name=selector1._domainkey.tqhjy.onmicrosoft.com; query_result=Query returned NXDomain}",
-                                                "@{query_method=DoH; query_name=selector1._domainkey.tqhjy.onmicrosoft.com; query_result=Query resulted in exception, WebCmdletWebResponseException,Microsoft.PowerShell.Commands.InvokeWebRequestCommand}",
-                                                "@{query_method=DoH; query_name=selector1._domainkey.tqhjy.onmicrosoft.com; query_result=Query resulted in exception, WebCmdletWebResponseException,Microsoft.PowerShell.Commands.InvokeWebRequestCommand}",
                                                 "@{query_method=traditional; query_name=selector2._domainkey.tqhjy.onmicrosoft.com; query_result=Query returned NXDomain}",
-                                                "@{query_method=DoH; query_name=selector2._domainkey.tqhjy.onmicrosoft.com; query_result=Query resulted in exception, WebCmdletWebResponseException,Microsoft.PowerShell.Commands.InvokeWebRequestCommand}",
-                                                "@{query_method=DoH; query_name=selector2._domainkey.tqhjy.onmicrosoft.com; query_result=Query resulted in exception, WebCmdletWebResponseException,Microsoft.PowerShell.Commands.InvokeWebRequestCommand}",
-                                                "@{query_method=traditional; query_name=selector1-tqhjy-onmicrosoft-com._domainkey.tqhjy.onmicrosoft.com; query_result=Query returned 2 txt records}"
+                                                "@{query_method=traditional; query_name=selector1-example-mail-onmicrosoft-com._domainkey.tqhjy.onmicrosoft.com; query_result=Query returned NXDomain}",
+                                                "@{query_method=traditional; query_name=selector2-example-mail-onmicrosoft-com._domainkey.tqhjy.onmicrosoft.com; query_result=Query returned NXDomain}"
                                             ],
                                     "rdata":  [
-                                                  "v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAn/z5b0VYtWAnksnJLIo1HiKP5j0sTa93y6eIe7eRn3EfCMfnw4f0Ew6wmX/2NIsszvF0XG0mkdffCVsUa5WnzDvfhR5fkSMqGI/I4JaR+b8qHdNToVesTbk/kFv+j41TcxWgJw1j4Xeo6URJG6qx1ujh6zshr21/frskm/tq7Qlp7LpQn1uiHDO2g1If9tlvK",
-                                                  "RxOzxMV8ldzIjU4MKsLlUDLIj/LjezemQXiPsZqrMOe0Kqs3Tusv6IoWKaQpiiooIhsH+0fI2JXyjJu7623jOIAuDtl7YHdR6cC7umMq44tAgEL9Uf8IHv02FoM0B3nSIzs9ier9X4E0/exampleQIDAQAB;"
+
                                               ]
                                 }
                             ],
@@ -1090,12 +1071,12 @@
                                     "AdminDisplayName":  "",
                                     "Algorithm":  "RsaSHA256",
                                     "BodyCanonicalization":  "Relaxed",
-                                    "DistinguishedName":  "CN=tqhjy.onmicrosoft.com,CN=Dkim Signing config,CN=Transport Settings,CN=Configuration,CN=tqhjy.onmicrosoft.com,CN=ConfigurationUnits,DC=NAMPR10A008,DC=PROD,DC=OUTLOOK,DC=COM",
+                                    "DistinguishedName":  "CN=tqhjy.onmicrosoft.com,CN=Dkim Signing config,CN=Transport Settings,CN=Configuration,CN=tqhjy.onmicrosoft.com,CN=ConfigurationUnits,DC=NAMPR09A006,DC=PROD,DC=OUTLOOK,DC=COM",
                                     "Domain":  "tqhjy.onmicrosoft.com",
                                     "Enabled":  true,
-                                    "ExchangeObjectId":  "fb79c5bd-5649-4eb7-b427-75269be69fbc",
+                                    "ExchangeObjectId":  "ea1866b3-b7fa-4dbe-b9c9-48087391a536",
                                     "ExchangeVersion":  "0.20 (15.0.0.0)",
-                                    "Guid":  "fb79c5bd-5649-4eb7-b427-75269be69fbc",
+                                    "Guid":  "476371c0-bf15-4101-84a7-a3a03b4266f1",
                                     "HeaderCanonicalization":  "Relaxed",
                                     "Id":  "tqhjy.onmicrosoft.com",
                                     "Identity":  "tqhjy.onmicrosoft.com",
@@ -1103,45 +1084,45 @@
                                     "IncludeSignatureCreationTime":  true,
                                     "IsDefault":  true,
                                     "IsValid":  true,
-                                    "KeyCreationTime":  "/Date(1695667530411)/",
-                                    "LastChecked":  "/Date(1695667844265)/",
+                                    "KeyCreationTime":  "Date(1653603718610)",
+                                    "LastChecked":  "Date(1653603718610)",
                                     "Name":  "tqhjy.onmicrosoft.com",
                                     "NumberOfBytesToSign":  "All",
-                                    "ObjectCategory":  "NAMPR10A008.PROD.OUTLOOK.COM/Configuration/Schema/ms-Exch-Hosted-Content-Filter-Config",
+                                    "ObjectCategory":  "NAMPR09A006.PROD.OUTLOOK.COM/Configuration/Schema/ms-Exch-Hosted-Content-Filter-Config",
                                     "ObjectClass":  [
                                                         "top",
                                                         "msExchHostedContentFilterConfig"
                                                     ],
                                     "ObjectState":  "Unchanged",
-                                    "OrganizationId":  "NAMPR10A008.PROD.OUTLOOK.COM/Microsoft Exchange Hosted Organizations/tqhjy.onmicrosoft.com - NAMPR10A008.PROD.OUTLOOK.COM/ConfigurationUnits/tqhjy.onmicrosoft.com/Configuration",
+                                    "OrganizationId":  "NAMPR09A006.PROD.OUTLOOK.COM/Microsoft Exchange Hosted Organizations/tqhjy.onmicrosoft.com - NAMPR09A006.PROD.OUTLOOK.COM/ConfigurationUnits/tqhjy.onmicrosoft.com/Configuration",
                                     "OrganizationalUnitRoot":  "tqhjy.onmicrosoft.com",
-                                    "OriginatingServer":  "CY4PR10A08DC001.NAMPR10A008.PROD.OUTLOOK.COM",
-                                    "RotateOnDate":  "/Date(1695667530411)/",
+                                    "OriginatingServer":  "DM5PR09A006DC10.NAMPR09A006.PROD.OUTLOOK.COM",
+                                    "RotateOnDate":  "Date(1653949318610)",
                                     "Selector1CNAME":  "selector1-tqhjy-onmicrosoft-com._domainkey.tqhjy.onmicrosoft.com",
                                     "Selector1KeySize":  2048,
                                     "Selector1PublicKey":  "v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAn/z5b0VYtWAnksnJLIo1HiKP5j0sTa93y6eIe7eRn3EfCMfnw4f0Ew6wmX/2NIsszvF0XG0mkdffCVsUa5WnzDvfhR5fkSMqGI/I4JaR+b8qHdNToVesTbk/kFv+j41TcxWgJw1j4Xeo6URJG6qx1ujh6zshr21/frskm/tq7Qlp7LpQn1uiHDO2g1If9tlvKRxOzxMV8ldzIjU4MKsLlUDLIj/LjezemQXiPsZqrMOe0Kqs3Tusv6IoWKaQpiiooIhsH+0fI2JXyjJu7623jOIAuDtl7YHdR6cC7umMq44tAgEL9Uf8IHv02FoM0B3nSIzs9ier9X4E0/exampleQIDAQAB;",
                                     "Selector2CNAME":  "selector2-tqhjy-onmicrosoft-com._domainkey.tqhjy.onmicrosoft.com",
                                     "Selector2KeySize":  2048,
                                     "Selector2PublicKey":  "v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyVK8DFIgYjps1Ckt4UjOQiBMqpb9G1WiwIci61Amx0sQzZTD8xb8rRSboEm89e5WRChcpZe7FN7XveJtbWYHmp4+e4niN5wGHaDt7NoCdTQ6dgRdyPa0d4Yf8si1uYYu7iC4LkQMI/zSLAQAQWEEHKqqJPHoAAbyKEuj8vynlWGsCAaprqOjyPqciy4YfcYd5ZISmpY5yJ/FNIrc2FeZjSPb65XzYMtgTbP9xC7lK6kGnBJDKqHaccXhVyvkl39AX4VkMzuVTlZbr120T+zMFDLNCJeNMBabl8JcrL0OYRule+75C3bPO4u/cZ1TmAGknX7apzvavEK2ByexampleQIDAQAB;",
-                                    "SelectorAfterRotateOnDate":  "selector1",
-                                    "SelectorBeforeRotateOnDate":  "selector2",
+                                    "SelectorAfterRotateOnDate":  "selector2",
+                                    "SelectorBeforeRotateOnDate":  "selector1",
                                     "Status":  "Valid",
-                                    "WhenChanged":  "/Date(1695667854000)/",
-                                    "WhenChangedUTC":  "/Date(1695667854000)/",
-                                    "WhenCreated":  "/Date(1695667530000)/",
-                                    "WhenCreatedUTC":  "/Date(1695667530000)/"
+                                    "WhenChanged":  "Date(1653603732000)",
+                                    "WhenChangedUTC":  "Date(1653603732000)",
+                                    "WhenCreated":  "Date(1619484596000)",
+                                    "WhenCreatedUTC":  "Date(1619484596000)"
                                 }
                             ]
                         ],
         "Commandlet":  [
                            "Get-DkimSigningConfig",
-                           "Get-ScubaDkimRecords",
+                           "Get-ScubaDkimRecord",
                            "Get-AcceptedDomain"
                        ],
         "Criticality":  "Should",
         "PolicyId":  "MS.EXO.3.1v1",
-        "ReportDetails":  "Requirement met",
-        "RequirementMet":  true
+        "ReportDetails":  "1 agency domain(s) found in violation: tqhjy.onmicrosoft.com",
+        "RequirementMet":  false
     },
     {
         "ActualValue":  [
@@ -1150,19 +1131,18 @@
                                 "AdminDisplayName":  "",
                                 "AgentGeneratedMessageLoopDetectionInSmtpEnabled":  true,
                                 "AgentGeneratedMessageLoopDetectionInSubmissionEnabled":  true,
-                                "AllowLegacyTLSClients":  false,
+                                "AllowLegacyTLSClients":  null,
                                 "AnonymousSenderToRecipientRatePerHour":  1800,
                                 "AttributionRejectBeforeMServRequest":  false,
                                 "AttributionRejectConsumerMessages":  false,
                                 "ClearCategories":  true,
                                 "ConvertDisclaimerWrapperToEml":  false,
                                 "ConvertReportToMessage":  false,
-                                "CurrentTransportSystemState":  "Green",
                                 "DSNConversionMode":  "PreserveDSNBody",
                                 "DiagnosticsAggregationServicePort":  9710,
-                                "DistinguishedName":  "CN=Transport Settings,CN=Configuration,CN=tqhjy.onmicrosoft.com,CN=ConfigurationUnits,DC=NAMPR10A008,DC=PROD,DC=OUTLOOK,DC=COM",
+                                "DistinguishedName":  "CN=Transport Settings,CN=Configuration,CN=tqhjy.onmicrosoft.com,CN=ConfigurationUnits,DC=NAMPR09A006,DC=PROD,DC=OUTLOOK,DC=COM",
                                 "EnableExternalHTTPMailDelivery":  false,
-                                "ExchangeObjectId":  "b4f29764-fa61-4718-ac8d-29e1ad3007b9",
+                                "ExchangeObjectId":  "7ef195bd-4f88-46bc-97e6-db6c7665321b",
                                 "ExchangeVersion":  "0.1 (8.0.535.0)",
                                 "ExternalDelayDsnEnabled":  true,
                                 "ExternalDsnDefaultLanguage":  null,
@@ -1174,7 +1154,7 @@
                                 "GenerateCopyOfDSNFor":  [
 
                                                          ],
-                                "Guid":  "b4f29764-fa61-4718-ac8d-29e1ad3007b9",
+                                "Guid":  "01d25010-40a8-4d0a-9419-fb1d775b4d16",
                                 "HeaderPromotionModeSetting":  "NoCreate",
                                 "HygieneSuite":  "Premium",
                                 "Id":  "Transport Settings",
@@ -1192,7 +1172,7 @@
                                 "JournalArchivingEnabled":  false,
                                 "JournalMessageExpirationDays":  0,
                                 "JournalReportDLMemberSubstitutionEnabled":  false,
-                                "JournalingReportNdrTo":  "u003cu003e",
+                                "JournalingReportNdrTo":  "\u003c\u003e",
                                 "LegacyArchiveJournalingEnabled":  false,
                                 "LegacyArchiveLiveJournalingEnabled":  false,
                                 "LegacyJournalingMigrationEnabled":  false,
@@ -1206,7 +1186,7 @@
                                 "MessageExpiration":  "1.00:00:00",
                                 "MigrationEnabled":  true,
                                 "Name":  "Transport Settings",
-                                "ObjectCategory":  "NAMPR10A008.PROD.OUTLOOK.COM/Configuration/Schema/ms-Exch-Transport-Settings",
+                                "ObjectCategory":  "NAMPR09A006.PROD.OUTLOOK.COM/Configuration/Schema/ms-Exch-Transport-Settings",
                                 "ObjectClass":  [
                                                     "top",
                                                     "container",
@@ -1215,9 +1195,9 @@
                                 "ObjectState":  "Unchanged",
                                 "OpenDomainRoutingEnabled":  false,
                                 "OrganizationFederatedMailbox":  "FederatedEmail.4c1f4d8b-8179-4148-93bf-00a95fa1e042@tqhjy.onmicrosoft.com",
-                                "OrganizationId":  "NAMPR10A008.PROD.OUTLOOK.COM/Microsoft Exchange Hosted Organizations/tqhjy.onmicrosoft.com - NAMPR10A008.PROD.OUTLOOK.COM/ConfigurationUnits/tqhjy.onmicrosoft.com/Configuration",
+                                "OrganizationId":  "NAMPR09A006.PROD.OUTLOOK.COM/Microsoft Exchange Hosted Organizations/tqhjy.onmicrosoft.com - NAMPR09A006.PROD.OUTLOOK.COM/ConfigurationUnits/tqhjy.onmicrosoft.com/Configuration",
                                 "OrganizationalUnitRoot":  "tqhjy.onmicrosoft.com",
-                                "OriginatingServer":  "CY4PR10A08DC001.NAMPR10A008.PROD.OUTLOOK.COM",
+                                "OriginatingServer":  "DM5PR09A006DC10.NAMPR09A006.PROD.OUTLOOK.COM",
                                 "OtherWellKnownObjects":  [
 
                                                           ],
@@ -1265,13 +1245,12 @@
                                                                    },
                                 "TransportRuleRegexValidationTimeout":  "00:00:00.3000000",
                                 "TransportRuleSizeLimit":  "8 KB (8,192 bytes)",
-                                "TransportSystemState":  "",
                                 "VerifySecureSubmitEnabled":  false,
                                 "VoicemailJournalingEnabled":  true,
-                                "WhenChanged":  "/Date(1698263512000)/",
-                                "WhenChangedUTC":  "/Date(1698263512000)/",
-                                "WhenCreated":  "/Date(1643059670000)/",
-                                "WhenCreatedUTC":  "/Date(1643059670000)/",
+                                "WhenChanged":  "Date(1712118761000)",
+                                "WhenChangedUTC":  "Date(1712118761000)",
+                                "WhenCreated":  "Date(1619484398000)",
+                                "WhenCreatedUTC":  "Date(1619484398000)",
                                 "Xexch50Enabled":  true
                             }
                         ],
@@ -1288,31 +1267,31 @@
                             {
                                 "AdminDisplayName":  "",
                                 "Default":  true,
-                                "DistinguishedName":  "CN=Default Sharing Policy,CN=Federation,CN=Configuration,CN=tqhjy.onmicrosoft.com,CN=ConfigurationUnits,DC=NAMPR10A008,DC=PROD,DC=OUTLOOK,DC=COM",
+                                "DistinguishedName":  "CN=Default Sharing Policy,CN=Federation,CN=Configuration,CN=tqhjy.onmicrosoft.com,CN=ConfigurationUnits,DC=NAMPR09A006,DC=PROD,DC=OUTLOOK,DC=COM",
                                 "Domains":  [
-                                                "ted.com:CalendarSharingFreeBusyReviewer"
+                                                "Anonymous:0"
                                             ],
-                                "Enabled":  true,
-                                "ExchangeObjectId":  "2f1ca8cf-5ba5-45e3-b73a-1405ff552a2e",
+                                "Enabled":  false,
+                                "ExchangeObjectId":  "2d52a1ae-4c17-42e0-925e-919b2bf68a18",
                                 "ExchangeVersion":  "0.10 (14.0.100.0)",
-                                "Guid":  "2f1ca8cf-5ba5-45e3-b73a-1405ff552a2e",
+                                "Guid":  "137df5c0-4fe4-49bb-923c-e2bdfd89f448",
                                 "Id":  "Default Sharing Policy",
                                 "Identity":  "Default Sharing Policy",
                                 "IsValid":  true,
                                 "Name":  "Default Sharing Policy",
-                                "ObjectCategory":  "NAMPR10A008.PROD.OUTLOOK.COM/Configuration/Schema/ms-Exch-Sharing-Policy",
+                                "ObjectCategory":  "NAMPR09A006.PROD.OUTLOOK.COM/Configuration/Schema/ms-Exch-Sharing-Policy",
                                 "ObjectClass":  [
                                                     "top",
                                                     "msExchSharingPolicy"
                                                 ],
                                 "ObjectState":  "Changed",
-                                "OrganizationId":  "NAMPR10A008.PROD.OUTLOOK.COM/Microsoft Exchange Hosted Organizations/tqhjy.onmicrosoft.com - NAMPR10A008.PROD.OUTLOOK.COM/ConfigurationUnits/tqhjy.onmicrosoft.com/Configuration",
+                                "OrganizationId":  "NAMPR09A006.PROD.OUTLOOK.COM/Microsoft Exchange Hosted Organizations/tqhjy.onmicrosoft.com - NAMPR09A006.PROD.OUTLOOK.COM/ConfigurationUnits/tqhjy.onmicrosoft.com/Configuration",
                                 "OrganizationalUnitRoot":  "tqhjy.onmicrosoft.com",
-                                "OriginatingServer":  "CY4PR10A08DC001.NAMPR10A008.PROD.OUTLOOK.COM",
-                                "WhenChanged":  "/Date(1698263628000)/",
-                                "WhenChangedUTC":  "/Date(1698263628000)/",
-                                "WhenCreated":  "/Date(1645650752000)/",
-                                "WhenCreatedUTC":  "/Date(1645650752000)/"
+                                "OriginatingServer":  "DM5PR09A006DC10.NAMPR09A006.PROD.OUTLOOK.COM",
+                                "WhenChanged":  "Date(1691164284000)",
+                                "WhenChangedUTC":  "Date(1691164284000)",
+                                "WhenCreated":  "Date(1619484547000)",
+                                "WhenCreatedUTC":  "Date(1619484547000)"
                             }
                         ],
         "Commandlet":  [
@@ -1328,31 +1307,31 @@
                             {
                                 "AdminDisplayName":  "",
                                 "Default":  true,
-                                "DistinguishedName":  "CN=Default Sharing Policy,CN=Federation,CN=Configuration,CN=tqhjy.onmicrosoft.com,CN=ConfigurationUnits,DC=NAMPR10A008,DC=PROD,DC=OUTLOOK,DC=COM",
+                                "DistinguishedName":  "CN=Default Sharing Policy,CN=Federation,CN=Configuration,CN=tqhjy.onmicrosoft.com,CN=ConfigurationUnits,DC=NAMPR09A006,DC=PROD,DC=OUTLOOK,DC=COM",
                                 "Domains":  [
-                                                "ted.com:CalendarSharingFreeBusyReviewer"
+                                                "Anonymous:0"
                                             ],
-                                "Enabled":  true,
-                                "ExchangeObjectId":  "2f1ca8cf-5ba5-45e3-b73a-1405ff552a2e",
+                                "Enabled":  false,
+                                "ExchangeObjectId":  "2d52a1ae-4c17-42e0-925e-919b2bf68a18",
                                 "ExchangeVersion":  "0.10 (14.0.100.0)",
-                                "Guid":  "2f1ca8cf-5ba5-45e3-b73a-1405ff552a2e",
+                                "Guid":  "137df5c0-4fe4-49bb-923c-e2bdfd89f448",
                                 "Id":  "Default Sharing Policy",
                                 "Identity":  "Default Sharing Policy",
                                 "IsValid":  true,
                                 "Name":  "Default Sharing Policy",
-                                "ObjectCategory":  "NAMPR10A008.PROD.OUTLOOK.COM/Configuration/Schema/ms-Exch-Sharing-Policy",
+                                "ObjectCategory":  "NAMPR09A006.PROD.OUTLOOK.COM/Configuration/Schema/ms-Exch-Sharing-Policy",
                                 "ObjectClass":  [
                                                     "top",
                                                     "msExchSharingPolicy"
                                                 ],
                                 "ObjectState":  "Changed",
-                                "OrganizationId":  "NAMPR10A008.PROD.OUTLOOK.COM/Microsoft Exchange Hosted Organizations/tqhjy.onmicrosoft.com - NAMPR10A008.PROD.OUTLOOK.COM/ConfigurationUnits/tqhjy.onmicrosoft.com/Configuration",
+                                "OrganizationId":  "NAMPR09A006.PROD.OUTLOOK.COM/Microsoft Exchange Hosted Organizations/tqhjy.onmicrosoft.com - NAMPR09A006.PROD.OUTLOOK.COM/ConfigurationUnits/tqhjy.onmicrosoft.com/Configuration",
                                 "OrganizationalUnitRoot":  "tqhjy.onmicrosoft.com",
-                                "OriginatingServer":  "CY4PR10A08DC001.NAMPR10A008.PROD.OUTLOOK.COM",
-                                "WhenChanged":  "/Date(1698263628000)/",
-                                "WhenChangedUTC":  "/Date(1698263628000)/",
-                                "WhenCreated":  "/Date(1645650752000)/",
-                                "WhenCreatedUTC":  "/Date(1645650752000)/"
+                                "OriginatingServer":  "DM5PR09A006DC10.NAMPR09A006.PROD.OUTLOOK.COM",
+                                "WhenChanged":  "Date(1691164284000)",
+                                "WhenChangedUTC":  "Date(1691164284000)",
+                                "WhenCreated":  "Date(1619484547000)",
+                                "WhenCreatedUTC":  "Date(1619484547000)"
                             }
                         ],
         "Commandlet":  [
@@ -1368,11 +1347,11 @@
                             {
                                 "AdminDisplayName":  "",
                                 "DirectoryBasedEdgeBlockMode":  "Default",
-                                "DistinguishedName":  "CN=Default,CN=Hosted Connection Filter,CN=Transport Settings,CN=Configuration,CN=tqhjy.onmicrosoft.com,CN=ConfigurationUnits,DC=NAMPR10A008,DC=PROD,DC=OUTLOOK,DC=COM",
+                                "DistinguishedName":  "CN=Default,CN=Hosted Connection Filter,CN=Transport Settings,CN=Configuration,CN=tqhjy.onmicrosoft.com,CN=ConfigurationUnits,DC=NAMPR09A006,DC=PROD,DC=OUTLOOK,DC=COM",
                                 "EnableSafeList":  false,
-                                "ExchangeObjectId":  "3843aef3-f3bd-49c1-a674-4d6741ac11b6",
+                                "ExchangeObjectId":  "7021b7cf-b9fa-4280-94ff-fba468dbb0ab",
                                 "ExchangeVersion":  "0.20 (15.0.0.0)",
-                                "Guid":  "3843aef3-f3bd-49c1-a674-4d6741ac11b6",
+                                "Guid":  "ddb99cb3-211b-47ee-bc9c-86e6c8d0e692",
                                 "IPAllowList":  [
 
                                                 ],
@@ -1384,19 +1363,19 @@
                                 "IsDefault":  true,
                                 "IsValid":  true,
                                 "Name":  "Default",
-                                "ObjectCategory":  "NAMPR10A008.PROD.OUTLOOK.COM/Configuration/Schema/ms-Exch-Hosted-Connection-Filter-Policy",
+                                "ObjectCategory":  "NAMPR09A006.PROD.OUTLOOK.COM/Configuration/Schema/ms-Exch-Hosted-Connection-Filter-Policy",
                                 "ObjectClass":  [
                                                     "top",
                                                     "msExchHostedConnectionFilterPolicy"
                                                 ],
                                 "ObjectState":  "Unchanged",
-                                "OrganizationId":  "NAMPR10A008.PROD.OUTLOOK.COM/Microsoft Exchange Hosted Organizations/tqhjy.onmicrosoft.com - NAMPR10A008.PROD.OUTLOOK.COM/ConfigurationUnits/tqhjy.onmicrosoft.com/Configuration",
+                                "OrganizationId":  "NAMPR09A006.PROD.OUTLOOK.COM/Microsoft Exchange Hosted Organizations/tqhjy.onmicrosoft.com - NAMPR09A006.PROD.OUTLOOK.COM/ConfigurationUnits/tqhjy.onmicrosoft.com/Configuration",
                                 "OrganizationalUnitRoot":  "tqhjy.onmicrosoft.com",
-                                "OriginatingServer":  "CY4PR10A08DC001.NAMPR10A008.PROD.OUTLOOK.COM",
-                                "WhenChanged":  "/Date(1698264567000)/",
-                                "WhenChangedUTC":  "/Date(1698264567000)/",
-                                "WhenCreated":  "/Date(1645650828000)/",
-                                "WhenCreatedUTC":  "/Date(1645650828000)/"
+                                "OriginatingServer":  "DM5PR09A006DC10.NAMPR09A006.PROD.OUTLOOK.COM",
+                                "WhenChanged":  "Date(1712119159000)",
+                                "WhenChangedUTC":  "Date(1712119159000)",
+                                "WhenCreated":  "Date(1619484586000)",
+                                "WhenCreatedUTC":  "Date(1619484586000)"
                             }
                         ],
         "Commandlet":  [
@@ -1412,11 +1391,11 @@
                             {
                                 "AdminDisplayName":  "",
                                 "DirectoryBasedEdgeBlockMode":  "Default",
-                                "DistinguishedName":  "CN=Default,CN=Hosted Connection Filter,CN=Transport Settings,CN=Configuration,CN=tqhjy.onmicrosoft.com,CN=ConfigurationUnits,DC=NAMPR10A008,DC=PROD,DC=OUTLOOK,DC=COM",
+                                "DistinguishedName":  "CN=Default,CN=Hosted Connection Filter,CN=Transport Settings,CN=Configuration,CN=tqhjy.onmicrosoft.com,CN=ConfigurationUnits,DC=NAMPR09A006,DC=PROD,DC=OUTLOOK,DC=COM",
                                 "EnableSafeList":  false,
-                                "ExchangeObjectId":  "3843aef3-f3bd-49c1-a674-4d6741ac11b6",
+                                "ExchangeObjectId":  "7021b7cf-b9fa-4280-94ff-fba468dbb0ab",
                                 "ExchangeVersion":  "0.20 (15.0.0.0)",
-                                "Guid":  "3843aef3-f3bd-49c1-a674-4d6741ac11b6",
+                                "Guid":  "ddb99cb3-211b-47ee-bc9c-86e6c8d0e692",
                                 "IPAllowList":  [
 
                                                 ],
@@ -1428,19 +1407,19 @@
                                 "IsDefault":  true,
                                 "IsValid":  true,
                                 "Name":  "Default",
-                                "ObjectCategory":  "NAMPR10A008.PROD.OUTLOOK.COM/Configuration/Schema/ms-Exch-Hosted-Connection-Filter-Policy",
+                                "ObjectCategory":  "NAMPR09A006.PROD.OUTLOOK.COM/Configuration/Schema/ms-Exch-Hosted-Connection-Filter-Policy",
                                 "ObjectClass":  [
                                                     "top",
                                                     "msExchHostedConnectionFilterPolicy"
                                                 ],
                                 "ObjectState":  "Unchanged",
-                                "OrganizationId":  "NAMPR10A008.PROD.OUTLOOK.COM/Microsoft Exchange Hosted Organizations/tqhjy.onmicrosoft.com - NAMPR10A008.PROD.OUTLOOK.COM/ConfigurationUnits/tqhjy.onmicrosoft.com/Configuration",
+                                "OrganizationId":  "NAMPR09A006.PROD.OUTLOOK.COM/Microsoft Exchange Hosted Organizations/tqhjy.onmicrosoft.com - NAMPR09A006.PROD.OUTLOOK.COM/ConfigurationUnits/tqhjy.onmicrosoft.com/Configuration",
                                 "OrganizationalUnitRoot":  "tqhjy.onmicrosoft.com",
-                                "OriginatingServer":  "CY4PR10A08DC001.NAMPR10A008.PROD.OUTLOOK.COM",
-                                "WhenChanged":  "/Date(1698264567000)/",
-                                "WhenChangedUTC":  "/Date(1698264567000)/",
-                                "WhenCreated":  "/Date(1645650828000)/",
-                                "WhenCreatedUTC":  "/Date(1645650828000)/"
+                                "OriginatingServer":  "DM5PR09A006DC10.NAMPR09A006.PROD.OUTLOOK.COM",
+                                "WhenChanged":  "Date(1712119159000)",
+                                "WhenChangedUTC":  "Date(1712119159000)",
+                                "WhenCreated":  "Date(1619484586000)",
+                                "WhenCreatedUTC":  "Date(1619484586000)"
                             }
                         ],
         "Commandlet":  [
@@ -1475,22 +1454,27 @@
                                             {
                                                 "query_method":  "traditional",
                                                 "query_name":  "_dmarc.tqhjy.onmicrosoft.com",
-                                                "query_result":  "Query returned 1 txt records"
+                                                "query_result":  "Query returned NXDomain"
+                                            },
+                                            {
+                                                "query_method":  "traditional",
+                                                "query_name":  "_dmarc.onmicrosoft.com",
+                                                "query_result":  "Query returned NXDomain"
                                             }
                                         ],
                                 "rdata":  [
-                                              "v=DMARC1; p=reject; pct=100; rua=mailto:reports@dmarc.cyber.dhs.gov, mailto:reports@example.com; ruf=mailto:reports@example.com"
+
                                           ]
                             }
                         ],
         "Commandlet":  [
-                           "Get-ScubaDmarcRecords",
+                           "Get-ScubaDmarcRecord",
                            "Get-AcceptedDomain"
                        ],
         "Criticality":  "Shall",
         "PolicyId":  "MS.EXO.4.1v1",
-        "ReportDetails":  "Requirement met",
-        "RequirementMet":  true
+        "ReportDetails":  "1 agency domain(s) found in violation: tqhjy.onmicrosoft.com",
+        "RequirementMet":  false
     },
     {
         "ActualValue":  [
@@ -1500,22 +1484,27 @@
                                             {
                                                 "query_method":  "traditional",
                                                 "query_name":  "_dmarc.tqhjy.onmicrosoft.com",
-                                                "query_result":  "Query returned 1 txt records"
+                                                "query_result":  "Query returned NXDomain"
+                                            },
+                                            {
+                                                "query_method":  "traditional",
+                                                "query_name":  "_dmarc.onmicrosoft.com",
+                                                "query_result":  "Query returned NXDomain"
                                             }
                                         ],
                                 "rdata":  [
-                                              "v=DMARC1; p=reject; pct=100; rua=mailto:reports@dmarc.cyber.dhs.gov, mailto:reports@example.com; ruf=mailto:reports@example.com"
+
                                           ]
                             }
                         ],
         "Commandlet":  [
-                           "Get-ScubaDmarcRecords",
+                           "Get-ScubaDmarcRecord",
                            "Get-AcceptedDomain"
                        ],
         "Criticality":  "Shall",
         "PolicyId":  "MS.EXO.4.2v1",
-        "ReportDetails":  "Requirement met",
-        "RequirementMet":  true
+        "ReportDetails":  "1 agency domain(s) found in violation: tqhjy.onmicrosoft.com",
+        "RequirementMet":  false
     },
     {
         "ActualValue":  [
@@ -1525,22 +1514,27 @@
                                             {
                                                 "query_method":  "traditional",
                                                 "query_name":  "_dmarc.tqhjy.onmicrosoft.com",
-                                                "query_result":  "Query returned 1 txt records"
+                                                "query_result":  "Query returned NXDomain"
+                                            },
+                                            {
+                                                "query_method":  "traditional",
+                                                "query_name":  "_dmarc.onmicrosoft.com",
+                                                "query_result":  "Query returned NXDomain"
                                             }
                                         ],
                                 "rdata":  [
-                                              "v=DMARC1; p=reject; pct=100; rua=mailto:reports@dmarc.cyber.dhs.gov, mailto:reports@example.com; ruf=mailto:reports@example.com"
+
                                           ]
                             }
                         ],
         "Commandlet":  [
-                           "Get-ScubaDmarcRecords",
+                           "Get-ScubaDmarcRecord",
                            "Get-AcceptedDomain"
                        ],
         "Criticality":  "Shall",
         "PolicyId":  "MS.EXO.4.3v1",
-        "ReportDetails":  "Requirement met",
-        "RequirementMet":  true
+        "ReportDetails":  "1 agency domain(s) found in violation: tqhjy.onmicrosoft.com",
+        "RequirementMet":  false
     },
     {
         "ActualValue":  [
@@ -1550,22 +1544,27 @@
                                             {
                                                 "query_method":  "traditional",
                                                 "query_name":  "_dmarc.tqhjy.onmicrosoft.com",
-                                                "query_result":  "Query returned 1 txt records"
+                                                "query_result":  "Query returned NXDomain"
+                                            },
+                                            {
+                                                "query_method":  "traditional",
+                                                "query_name":  "_dmarc.onmicrosoft.com",
+                                                "query_result":  "Query returned NXDomain"
                                             }
                                         ],
                                 "rdata":  [
-                                              "v=DMARC1; p=reject; pct=100; rua=mailto:reports@dmarc.cyber.dhs.gov, mailto:reports@example.com; ruf=mailto:reports@example.com"
+
                                           ]
                             }
                         ],
         "Commandlet":  [
-                           "Get-ScubaDmarcRecords",
+                           "Get-ScubaDmarcRecord",
                            "Get-AcceptedDomain"
                        ],
         "Criticality":  "Should",
         "PolicyId":  "MS.EXO.4.4v1",
-        "ReportDetails":  "Requirement met",
-        "RequirementMet":  true
+        "ReportDetails":  "1 agency domain(s) found in violation: tqhjy.onmicrosoft.com",
+        "RequirementMet":  false
     },
     {
         "ActualValue":  [
@@ -1584,7 +1583,7 @@
 
                         ],
         "Commandlet":  [
-                           "Get-ScubaSpfRecords",
+                           "Get-ScubaSpfRecord",
                            "Get-AcceptedDomain"
                        ],
         "Criticality":  "Shall",
@@ -1641,7 +1640,7 @@
                        ],
         "Criticality":  "Shall/Not-Implemented",
         "PolicyId":  "MS.POWERPLATFORM.4.1v1",
-        "ReportDetails":  "Not currently checked automatically. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.0.0/baselines/powerplatform.md#mspowerplatform41v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
+        "ReportDetails":  "This product does not currently have the capability to check compliance for this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.2.0/PowerShell/ScubaGear/baselines/powerplatform.md#mspowerplatform41v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
         "RequirementMet":  false
     },
     {
@@ -1653,7 +1652,7 @@
                        ],
         "Criticality":  "Should/Not-Implemented",
         "PolicyId":  "MS.POWERPLATFORM.3.2v1",
-        "ReportDetails":  "Not currently checked automatically. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.0.0/baselines/powerplatform.md#mspowerplatform32v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
+        "ReportDetails":  "This product does not currently have the capability to check compliance for this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.2.0/PowerShell/ScubaGear/baselines/powerplatform.md#mspowerplatform32v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
         "RequirementMet":  false
     },
     {
@@ -1702,14 +1701,38 @@
 
                        ],
         "Criticality":  "Shall/Not-Implemented",
+        "PolicyId":  "MS.SHAREPOINT.1.2v1",
+        "ReportDetails":  "This product does not currently have the capability to check compliance for this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.2.0/PowerShell/ScubaGear/baselines/sharepoint.md#mssharepoint12v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+
+                       ],
+        "Criticality":  "Shall/Not-Implemented",
+        "PolicyId":  "MS.SHAREPOINT.3.2v1",
+        "ReportDetails":  "This product does not currently have the capability to check compliance for this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.2.0/PowerShell/ScubaGear/baselines/sharepoint.md#mssharepoint32v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+
+                       ],
+        "Criticality":  "Shall/Not-Implemented",
         "PolicyId":  "MS.SHAREPOINT.4.1v1",
-        "ReportDetails":  "Not currently checked automatically. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.0.0/baselines/sharepoint.md#mssharepoint41v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
+        "ReportDetails":  "This product does not currently have the capability to check compliance for this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.2.0/PowerShell/ScubaGear/baselines/sharepoint.md#mssharepoint41v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
         "RequirementMet":  false
     },
     {
         "ActualValue":  [
                             true,
-                            1
+                            0
                         ],
         "Commandlet":  [
                            "Get-SPOTenant",
@@ -1722,8 +1745,36 @@
     },
     {
         "ActualValue":  [
+                            0
+                        ],
+        "Commandlet":  [
+                           "Get-SPOTenant",
+                           "Get-PnPTenant"
+                       ],
+        "Criticality":  "Shall",
+        "PolicyId":  "MS.SHAREPOINT.1.1v1",
+        "ReportDetails":  "Requirement met",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
                             0,
-                            1
+                            true,
+                            30
+                        ],
+        "Commandlet":  [
+                           "Get-SPOTenant",
+                           "Get-PnPTenant"
+                       ],
+        "Criticality":  "Shall",
+        "PolicyId":  "MS.SHAREPOINT.3.3v1",
+        "ReportDetails":  "Requirement met",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+                            0,
+                            0
                         ],
         "Commandlet":  [
                            "Get-SPOTenant",
@@ -1731,8 +1782,22 @@
                        ],
         "Criticality":  "Shall",
         "PolicyId":  "MS.SHAREPOINT.1.3v1",
-        "ReportDetails":  "Requirement not met: Note that we currently only check for approved external domains. Approved security groups are currently not being checked, see the baseline policy for instructions on a manual check",
-        "RequirementMet":  false
+        "ReportDetails":  "Requirement met: external sharing is set to Only People In Organization",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+                            0,
+                            30
+                        ],
+        "Commandlet":  [
+                           "Get-SPOTenant",
+                           "Get-PnPTenant"
+                       ],
+        "Criticality":  "Shall",
+        "PolicyId":  "MS.SHAREPOINT.3.1v1",
+        "ReportDetails":  "Requirement met",
+        "RequirementMet":  true
     },
     {
         "ActualValue":  [
@@ -1744,62 +1809,6 @@
                        ],
         "Criticality":  "Shall",
         "PolicyId":  "MS.SHAREPOINT.2.2v1",
-        "ReportDetails":  "Requirement met",
-        "RequirementMet":  true
-    },
-    {
-        "ActualValue":  [
-                            1
-                        ],
-        "Commandlet":  [
-                           "Get-SPOTenant",
-                           "Get-PnPTenant"
-                       ],
-        "Criticality":  "Should",
-        "PolicyId":  "MS.SHAREPOINT.1.1v1",
-        "ReportDetails":  "Requirement not met",
-        "RequirementMet":  false
-    },
-    {
-        "ActualValue":  [
-                            1,
-                            true,
-                            30
-                        ],
-        "Commandlet":  [
-                           "Get-SPOTenant",
-                           "Get-PnPTenant"
-                       ],
-        "Criticality":  "Should",
-        "PolicyId":  "MS.SHAREPOINT.3.3v1",
-        "ReportDetails":  "Requirement met",
-        "RequirementMet":  true
-    },
-    {
-        "ActualValue":  [
-                            1,
-                            1
-                        ],
-        "Commandlet":  [
-                           "Get-SPOTenant",
-                           "Get-PnPTenant"
-                       ],
-        "Criticality":  "Should",
-        "PolicyId":  "MS.SHAREPOINT.3.2v1",
-        "ReportDetails":  "Requirement met",
-        "RequirementMet":  true
-    },
-    {
-        "ActualValue":  [
-                            1,
-                            30
-                        ],
-        "Commandlet":  [
-                           "Get-SPOTenant",
-                           "Get-PnPTenant"
-                       ],
-        "Criticality":  "Should",
-        "PolicyId":  "MS.SHAREPOINT.3.1v1",
         "ReportDetails":  "Requirement met",
         "RequirementMet":  true
     },
@@ -1828,19 +1837,6 @@
         "PolicyId":  "MS.SHAREPOINT.2.1v1",
         "ReportDetails":  "Requirement not met",
         "RequirementMet":  false
-    },
-    {
-        "ActualValue":  [
-                            3
-                        ],
-        "Commandlet":  [
-                           "Get-SPOTenant",
-                           "Get-PnPTenant"
-                       ],
-        "Criticality":  "Should",
-        "PolicyId":  "MS.SHAREPOINT.1.2v1",
-        "ReportDetails":  "Requirement met",
-        "RequirementMet":  true
     },
     {
         "ActualValue":  false,
@@ -1881,7 +1877,7 @@
                        ],
         "Criticality":  "Shall/3rd Party",
         "PolicyId":  "MS.TEAMS.6.1v1",
-        "ReportDetails":  "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of ScubaGear. Otherwise, use a 3rd party tool OR manually check",
+        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manually review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure that when running ScubaGear defender is in the ProductNames parameter. Then, manually review the corresponding Defender for Office 365 policy that fulfills the requirements of this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.2.0/PowerShell/ScubaGear/baselines/teams.md#msteams61v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check.",
         "RequirementMet":  false
     },
     {
@@ -1891,9 +1887,9 @@
         "Commandlet":  [
 
                        ],
-        "Criticality":  "Should/3rd Party",
+        "Criticality":  "Shall/3rd Party",
         "PolicyId":  "MS.TEAMS.6.2v1",
-        "ReportDetails":  "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of ScubaGear. Otherwise, use a 3rd party tool OR manually check",
+        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manually review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure that when running ScubaGear defender is in the ProductNames parameter. Then, manually review the corresponding Defender for Office 365 policy that fulfills the requirements of this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.2.0/PowerShell/ScubaGear/baselines/teams.md#msteams62v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check.",
         "RequirementMet":  false
     },
     {
@@ -1905,7 +1901,7 @@
                        ],
         "Criticality":  "Should/3rd Party",
         "PolicyId":  "MS.TEAMS.7.1v1",
-        "ReportDetails":  "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of ScubaGear. Otherwise, use a 3rd party tool OR manually check",
+        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manually review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure that when running ScubaGear defender is in the ProductNames parameter. Then, manually review the corresponding Defender for Office 365 policy that fulfills the requirements of this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.2.0/PowerShell/ScubaGear/baselines/teams.md#msteams71v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check.",
         "RequirementMet":  false
     },
     {
@@ -1917,7 +1913,7 @@
                        ],
         "Criticality":  "Should/3rd Party",
         "PolicyId":  "MS.TEAMS.7.2v1",
-        "ReportDetails":  "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of ScubaGear. Otherwise, use a 3rd party tool OR manually check",
+        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manually review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure that when running ScubaGear defender is in the ProductNames parameter. Then, manually review the corresponding Defender for Office 365 policy that fulfills the requirements of this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.2.0/PowerShell/ScubaGear/baselines/teams.md#msteams72v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check.",
         "RequirementMet":  false
     },
     {
@@ -1929,7 +1925,7 @@
                        ],
         "Criticality":  "Should/3rd Party",
         "PolicyId":  "MS.TEAMS.8.1v1",
-        "ReportDetails":  "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of ScubaGear. Otherwise, use a 3rd party tool OR manually check",
+        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manually review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure that when running ScubaGear defender is in the ProductNames parameter. Then, manually review the corresponding Defender for Office 365 policy that fulfills the requirements of this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.2.0/PowerShell/ScubaGear/baselines/teams.md#msteams81v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check.",
         "RequirementMet":  false
     },
     {
@@ -1941,7 +1937,7 @@
                        ],
         "Criticality":  "Should/3rd Party",
         "PolicyId":  "MS.TEAMS.8.2v1",
-        "ReportDetails":  "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of ScubaGear. Otherwise, use a 3rd party tool OR manually check",
+        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manually review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure that when running ScubaGear defender is in the ProductNames parameter. Then, manually review the corresponding Defender for Office 365 policy that fulfills the requirements of this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.2.0/PowerShell/ScubaGear/baselines/teams.md#msteams82v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check.",
         "RequirementMet":  false
     },
     {
@@ -1959,22 +1955,25 @@
     },
     {
         "ActualValue":  {
-                            "AssignedPlans":  "MCOProfessional, Teams, MCOEV",
+                            "AssignedPlans":  "MCOEV, Teams_GCC, MCOProfessional, MCOMEETADD",
                             "ClientConfig":  [
                                                  {
-                                                     "AllowBox":  false,
-                                                     "AllowDropBox":  false,
-                                                     "AllowEgnyte":  false,
+                                                     "AllowBox":  true,
+                                                     "AllowDropBox":  true,
+                                                     "AllowEgnyte":  true,
                                                      "AllowEmailIntoChannel":  false,
-                                                     "AllowGoogleDrive":  false,
+                                                     "AllowGoogleDrive":  true,
                                                      "AllowGuestUser":  true,
                                                      "AllowOrganizationTab":  true,
-                                                     "AllowResourceAccountSendMessage":  false,
+                                                     "AllowResourceAccountSendMessage":  true,
                                                      "AllowRoleBasedChatPermissions":  false,
                                                      "AllowScopedPeopleSearchandAccess":  false,
-                                                     "AllowShareFile":  false,
+                                                     "AllowShareFile":  true,
                                                      "AllowSkypeBusinessInterop":  true,
-                                                     "ContentPin":  "AlwaysRequired",
+                                                     "ConfigMetadata":  {
+                                                                            "Authority":  "Tenant"
+                                                                        },
+                                                     "ContentPin":  "RequiredOutsideScheduleMeeting",
                                                      "DataSource":  null,
                                                      "Identity":  "Global",
                                                      "Key":  {
@@ -1984,7 +1983,7 @@
                                                                  "ScopeClass":  "Global",
                                                                  "XmlRoot":  "name={urn:schema:Microsoft.Rtc.Management.ScopeFramework.2008}AnchoredXmlKey"
                                                              },
-                                                     "ResourceAccountContentAccess":  "FullAccess",
+                                                     "ResourceAccountContentAccess":  "NoAccess",
                                                      "RestrictedSenderList":  null
                                                  }
                                              ]
@@ -1995,7 +1994,7 @@
                        ],
         "Criticality":  "Shall",
         "PolicyId":  "MS.TEAMS.4.1v1",
-        "ReportDetails":  "Requirement met",
+        "ReportDetails":  "N/A: Feature is unavailable in GCC environments",
         "RequirementMet":  true
     },
     {
