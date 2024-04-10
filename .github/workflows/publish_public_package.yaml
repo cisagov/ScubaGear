@@ -1,0 +1,106 @@
+# Purpose: Publish on demand to the real gallery (PSGallery).
+
+name: Publish Public Package
+
+on:
+  workflow_dispatch:
+    inputs:
+      OverrideModuleVersion:
+        description: "Override the version of the release. Restricted to SemVer 1.0 - 3 segments"
+        required: false
+        type: string
+      IsPrerelease:
+        description: "Is this a prerelease"
+        required: false
+        type: boolean
+        default: false
+      PrereleaseTag:
+        description: "The prerelease tag: (-)?[0-9A-Za-z]+ (e.g. -alpha1, -rc2, b1234)"
+        required: false
+        type: string
+  # for testing
+  # push:
+  #   paths:
+  #     - ".github/workflows/publish_public_package.yaml"
+  #     - "utils/DeployUtils.ps1"
+
+jobs:
+  publish:
+    name: Publish to PSGallery
+    runs-on: windows-latest
+    environment: Development
+    permissions:
+      id-token: write
+      contents: write
+    defaults:
+      run:
+        shell: powershell
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: repo
+      - name: Install Azure Signing Tool
+        run: |
+          dotnet --version
+          dotnet tool install --global AzureSignTool --version 4.0.1
+      # OIDC Login to Azure Public Cloud with AzPowershell (enableAzPSSession true)
+      - name: Login to Azure
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          enable-AzPSSession: true
+      - name: Get Key Vault info
+        id: key-vault-info
+        env:
+          KEY_VAULT_INFO: ${{ secrets.SCUBA_KEY_VAULT_PROD}}
+        run: |
+          $KeyVaultInfo = ${env:KEY_VAULT_INFO} | ConvertFrom-Json
+          echo "KeyVaultUrl=$($KeyVaultInfo.KeyVault.URL)" >> $env:GITHUB_OUTPUT
+          echo "KeyVaultCertificateName=$($KeyVaultInfo.KeyVault.CertificateName)" >> $env:GITHUB_OUTPUT
+      - name: Sign and Publish Module
+        run: |
+          # Source the deploy utilities so the functions in it can be called.
+          . repo/utils/DeployUtils.ps1
+          # Remove non-release files
+          Remove-Item -Recurse -Force repo -Include .git*
+          # Extract the API key used to publish to PSGallery
+          $ApiKey = az keyvault secret show --id '${{ steps.key-vault-info.outputs.KeyVaultUrl }}/secrets/ScubaGear-PSGAllery-API-Key' --query value -o tsv
+          if (-Not $ApiKey)
+          {
+            Write-Error "Failed to retrieve API key"
+          }
+          # Setup the parameters
+          $Parameters = @{
+            AzureKeyVaultUrl = '${{ steps.key-vault-info.outputs.KeyVaultUrl }}'
+            CertificateName = '${{ steps.key-vault-info.outputs.KeyVaultCertificateName }}'
+            ModulePath = 'repo/PowerShell/ScubaGear'
+            GalleryName = 'PSGallery'
+            NuGetApiKey = $ApiKey
+          }
+          # if ('true' -eq '${{ inputs.IsPrerelease }}')
+          # {
+          #   $Parameters.Add('PrereleaseTag', '${{ inputs.PrereleaseTag }}')
+          # }
+          # if (-Not [string]::IsNullOrEmpty('${{ inputs.OverrideModuleVersion }}'))
+          # {
+          #   $Parameters.Add('OverrideModuleVersion', '${{ inputs.OverrideModuleVersion }}')
+          # }
+          # This publishes to PSGallery.
+          Publish-ScubaGearModule @Parameters
+      # This is a manual test that simply writes the version to the console
+      - name: Print Scuba Version
+        run: |
+          if ('true' -eq '${{ inputs.IsPrerelease }}')
+          {
+            $Version = '${{ inputs.OverrideModuleVersion }}' + '${{ inputs.PrereleaseTag }}'
+            Write-Host "Checking for prerelease with required version: " + $Version
+            Find-Module -Name ScubaGear -RequiredVersion $Version -AllowPrerelease
+          }
+          else
+          {
+            Write-Host "Installing latest version"
+            Find-Module -Name ScubaGear
+          }
