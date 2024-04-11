@@ -349,16 +349,23 @@ tests contains {
 # MS.AAD.3.5v1
 #--
 
-GoodAuthenticationMethodConfigurations contains {
+# Returns all the config states for the methods Sms, Voice, Email
+LowSecurityAuthMethods contains {
     "Id": Configuration.Id,
     "State": Configuration.State
 } if {
     some Setting in input.authentication_method
     some Configuration in Setting.authentication_method_feature_settings
     Configuration.Id in ["Sms", "Voice", "Email"]
-    Configuration.State == "disabled"
 }
 
+# Returns true only when all the low security auth methods are disabled per the policy
+default LowSecurityAuthMethodsDisabled := false
+LowSecurityAuthMethodsDisabled := true if {
+    every Config in LowSecurityAuthMethods { Config.State == "disabled" }
+}
+
+# First test is for N/A case
 tests contains {
     "PolicyId": PolicyId,
     "Criticality": "Shall/Not-Implemented",
@@ -373,18 +380,18 @@ tests contains {
     AuthenticationPolicyMigrationIsComplete != true
 }
 
+# If policy is not N/A then we check that the configuration matches the baseline
 tests contains {
     "PolicyId": "MS.AAD.3.5v1",
     "Criticality": "Shall",
     "Commandlet": ["Get-MgBetaPolicyAuthenticationMethodPolicy"],
-    "ActualValue": [],
+    "ActualValue": [LowSecurityAuthMethods],
     "ReportDetails": ReportDetailsString(Status, ErrorMessage),
     "RequirementMet": Status
 } if {
     ErrorMessage := "Sms, Voice, and Email authentication must be disabled."
     AuthenticationPolicyMigrationIsComplete == true
-    Conditions := [AuthenticationPolicyMigrationIsComplete == true, count(GoodAuthenticationMethodConfigurations) == 3]
-    Status := count(FilterArray(Conditions, false)) == 0
+    Status := LowSecurityAuthMethodsDisabled
 }
 #--
 

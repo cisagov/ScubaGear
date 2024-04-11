@@ -2233,7 +2233,7 @@ test_PolicyMigrationState_migrationInProgress_Incorrect if {
 #
 # Policy MS.AAD.3.5v1
 #--
-test_SmsEnabled_Incorrect if {
+test_LowSecurityAuthMethods_SmsEnabled_Incorrect if {
 
     Output := aad.tests with input as {
         "authentication_method": [
@@ -2264,7 +2264,7 @@ test_SmsEnabled_Incorrect if {
     TestResult("MS.AAD.3.5v1", Output, ReportDetails, false) == true
 }
 
-test_VoiceEnabled_Incorrect if {
+test_LowSecurityAuthMethods_VoiceEnabled_Incorrect if {
 
     Output := aad.tests with input as {
         "authentication_method": [
@@ -2295,7 +2295,7 @@ test_VoiceEnabled_Incorrect if {
     TestResult("MS.AAD.3.5v1", Output, ReportDetails, false) == true
 }
 
-test_EmailEnabled_Incorrect if {
+test_LowSecurityAuthMethods_EmailEnabled_Incorrect if {
 
     Output := aad.tests with input as {
         "authentication_method": [
@@ -2326,7 +2326,69 @@ test_EmailEnabled_Incorrect if {
     TestResult("MS.AAD.3.5v1", Output, ReportDetails, false) == true
 }
 
-test_PreMigration_NotImplemented if {
+test_LowSecurityAuthMethods_TwoMethodsEnabled_Incorrect if {
+
+    Output := aad.tests with input as {
+        "authentication_method": [
+            {
+                "authentication_method_feature_settings": [
+                            {
+                                "Id": "Sms",
+                                "State": "enabled"
+                            },
+                            {
+                                "Id":  "Voice",
+                                "State":  "enabled"
+                            },
+                            {
+                                "Id":  "Email",
+                                "State": "disabled"
+                            }
+                ],
+
+                "authentication_method_policy": {
+                        "PolicyMigrationState": "migrationComplete"
+                }
+            }
+        ]
+    }
+
+    ReportDetails := "Sms, Voice, and Email authentication must be disabled."
+    TestResult("MS.AAD.3.5v1", Output, ReportDetails, false) == true
+}
+
+test_LowSecurityAuthMethods_AllMethodsEnabled_Incorrect if {
+
+    Output := aad.tests with input as {
+        "authentication_method": [
+            {
+                "authentication_method_feature_settings": [
+                            {
+                                "Id": "Sms",
+                                "State": "enabled"
+                            },
+                            {
+                                "Id":  "Voice",
+                                "State":  "enabled"
+                            },
+                            {
+                                "Id":  "Email",
+                                "State": "enabled"
+                            }
+                ],
+
+                "authentication_method_policy": {
+                        "PolicyMigrationState": "migrationComplete"
+                }
+            }
+        ]
+    }
+
+    ReportDetails := "Sms, Voice, and Email authentication must be disabled."
+    TestResult("MS.AAD.3.5v1", Output, ReportDetails, false) == true
+}
+
+test_LowSecurityAuthMethods_PreMigration_NotImplemented if {
 
     Output := aad.tests with input as {
         "authentication_method": [
@@ -2358,7 +2420,7 @@ test_PreMigration_NotImplemented if {
     TestResult("MS.AAD.3.5v1", Output, CheckedSkippedDetails("MS.AAD.3.4v1", Reason), false) == true
 }
 
-test_MigrationComplete_Correct if {
+test_LowSecurityAuthMethods_MigrationComplete_Correct if {
 
     Output := aad.tests with input as {
         "authentication_method": [
