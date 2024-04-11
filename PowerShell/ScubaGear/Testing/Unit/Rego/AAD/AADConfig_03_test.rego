@@ -2187,7 +2187,7 @@ test_PhishingMFANotEnforced_AuthenticatorEnabled_includeTargetsNotAll_Incorrect 
 #
 # Policy MS.AAD.3.4v1
 #--
-test_Migrated_Correct if {
+test_PolicyMigrationState_Correct if {
     Output := aad.tests with input as {
         "authentication_method": [
             {
@@ -2201,7 +2201,7 @@ test_Migrated_Correct if {
     TestResult("MS.AAD.3.4v1", Output, PASS, true) == true
 }
 
-test_preMigrated_Incorrect if {
+test_PolicyMigrationState_preMigration_Incorrect if {
     Output := aad.tests with input as {
         "authentication_method": [
             {
@@ -2215,7 +2215,7 @@ test_preMigrated_Incorrect if {
     TestResult("MS.AAD.3.4v1", Output, FAIL, false) == true
 }
 
-test_migrateInProgress_Incorrect if {
+test_PolicyMigrationState_migrationInProgress_Incorrect if {
     Output := aad.tests with input as {
         "authentication_method": [
             {

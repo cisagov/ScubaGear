@@ -248,7 +248,7 @@ tests contains {
 # MS.AAD.3.3v1
 #--
 
-# MSAuth: Returns the MS Authenticator configuration settings
+# Returns the MS Authenticator configuration settings
 MSAuth := auth_setting if {
     some auth_method in input.authentication_method
     some auth_setting in auth_method.authentication_method_feature_settings
@@ -256,13 +256,13 @@ MSAuth := auth_setting if {
     auth_setting.Id == "MicrosoftAuthenticator"
 }
 
-# MSAuthEnabled: Returns true if MS Authenticator is enabled, false if it is not
+# Returns true if MS Authenticator is enabled, false if it is not
 default MSAuthEnabled := false
 MSAuthEnabled := true if {
     MSAuth.State == "enabled"
 }
 
-# MSAuthProperlyConfigured: Returns true if MS Authenticator is configured per the baseline, false if it is not
+# Returns true if MS Authenticator is configured per the baseline, false if it is not
 default MSAuthProperlyConfigured := false
 MSAuthProperlyConfigured := true if {
     MSAuth.State == "enabled"
@@ -278,12 +278,12 @@ MSAuthProperlyConfigured := true if {
 }
 
 default AAD_3_3_Not_Applicable := false
-# AAD_3_3_Not_Applicable: Returns true no matter what if phishing-resistant MFA is being enforced
+# Returns true no matter what if phishing-resistant MFA is being enforced
 AAD_3_3_Not_Applicable := true if {
     count(MFAPolicies) > 0
 }
 
-# AAD_3_3_Not_Applicable: Returns true if phishing-resistant MFA is not being enforced but MS Auth is disabled
+# Returns true if phishing-resistant MFA is not being enforced but MS Auth is disabled
 AAD_3_3_Not_Applicable := true if {
     count(MFAPolicies) == 0
     MSAuthEnabled == false
@@ -322,23 +322,26 @@ tests contains {
 # MS.AAD.3.4v1
 #--
 
-PolicyMigrationIsComplete := Status if {
+# Returns the auth policy migration state object
+AuthenticationPolicyMigrationState := PolicyMigrationState if {
     some Setting in input.authentication_method
     PolicyMigrationState := Setting.authentication_method_policy.PolicyMigrationState
-    Status := PolicyMigrationState == "migrationComplete"
+}
+
+# Returns true if the tenant has completed their authpolicy migration
+AuthenticationPolicyMigrationIsComplete := Status if {
+    Status := AuthenticationPolicyMigrationState == "migrationComplete"
 }
 
 tests contains {
     "PolicyId": "MS.AAD.3.4v1",
     "Criticality": "Shall",
     "Commandlet": ["Get-MgBetaPolicyAuthenticationMethodPolicy"],
-    "ActualValue": [PolicyMigrationState],
+    "ActualValue": [AuthenticationPolicyMigrationState],
     "ReportDetails": ReportDetailsBoolean(Status),
     "RequirementMet": Status
 } if {
-    some Setting in input.authentication_method
-    PolicyMigrationState := Setting.authentication_method_policy.PolicyMigrationState
-    Status := PolicyMigrationState == "migrationComplete"
+    Status := AuthenticationPolicyMigrationIsComplete
 }
 #--
 
@@ -367,7 +370,7 @@ tests contains {
     PolicyId := "MS.AAD.3.5v1"
     # regal ignore:line-length
     Reason := "This policy is only applicable if the tenant has their Manage Migration feature set to Migration Complete. See %v for more info"
-    PolicyMigrationIsComplete != true
+    AuthenticationPolicyMigrationIsComplete != true
 }
 
 tests contains {
@@ -379,8 +382,8 @@ tests contains {
     "RequirementMet": Status
 } if {
     ErrorMessage := "Sms, Voice, and Email authentication must be disabled."
-    PolicyMigrationIsComplete == true
-    Conditions := [PolicyMigrationIsComplete == true, count(GoodAuthenticationMethodConfigurations) == 3]
+    AuthenticationPolicyMigrationIsComplete == true
+    Conditions := [AuthenticationPolicyMigrationIsComplete == true, count(GoodAuthenticationMethodConfigurations) == 3]
     Status := count(FilterArray(Conditions, false)) == 0
 }
 #--
