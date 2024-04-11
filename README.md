@@ -4,7 +4,9 @@
         <img src="https://img.shields.io/badge/ScubaGear-v1.2.0-%2328B953?labelColor=%23005288" /></a>
 </p>
 
-Developed by CISA, ScubaGear is an assessment tool that verifies a Microsoft 365 (M365) tenant’s configuration conforms to the policies described in the Secure Cloud Business Applications ([SCuBA](https://cisa.gov/scuba)) Security Configuration Baseline [documents](https://github.com/cisagov/ScubaGear/tree/main/baselines).
+Developed by CISA, ScubaGear is an assessment tool that verifiesthat  a Microsoft 365 (M365) tenant’s configuration conforms to the policies described in the Secure Cloud Business Applications ([SCuBA](https://cisa.gov/scuba)) Security Configuration Baseline [documents](https://cisagov.github.io/ScubaGear/baselines).
+
+> **NOTE**: This documentation can be read using [GitHub Pages](https://cisagov.github.io/ScubaGear).
 
 ## Table of Contents <!-- omit in toc -->
 - [M365 Product License Assumptions](#m365-product-license-assumptions)
@@ -43,8 +45,7 @@ Some of the policy checks in the baseline rely on the following licenses which a
 
 If a tenant does not have the licenses listed above, the report will display a non-compliant output for those policies.
 
-> [!NOTE]
-> DOD endpoints are included, but have not been tested. Please open an issue if you encounter bugs.
+> **NOTE**: DOD endpoints are included, but have not been tested. Please open an issue if you encounter bugs.
 
 ## Getting Started
 
@@ -66,8 +67,7 @@ Windows clients with an execution policy of `Unrestricted` generate a warning ab
 ScubaGear can be invoked interactively or non-interactively. See [Required Permissions](#required-permissions) for the permissions needed to execute the tool in either mode. The interactive authentication mode will prompt the user for credentials via Microsoft's popup windows. Non-interactive mode is for invoking ScubaGear using an Azure AD application service principal and supports running the tool in automated scenarios such as pipelines or scheduled jobs. Examples 1-3 provide examples for running with interactive mode and example 4 provides an example for running in non-interactive mode.
 
 ### Importing the module
-> [!NOTE]
->  Only PowerShell 5.1 is currently supported. PowerShell 7 may work, but has not been tested. Full PowerShell 7 support will be added in a future release.
+> **NOTE**: Only PowerShell 5.1 is currently supported. PowerShell 7 may work, but has not been tested. Full PowerShell 7 support will be added in a future release.
 
 ScubaGear currently must be imported into each new PowerShell terminal session to execute.
 To import the module, navigate to the repository folder in a PowerShell 5.1 terminal.
@@ -82,36 +82,56 @@ If you receive a warning that _The required supporting PowerShell modules are no
 ```powershell
 Initialize-SCuBA # Installs the minimum required dependencies
 ```
-> [!IMPORTANT]
-> The `Install-OPA` cmdlet is called by default when running `Initialize-SCuBA`. The `Install-OPA` cmdlet can also be run by itself to download the executable.
+
+> **IMPORTANT**: The `Install-OPA` cmdlet is called by default when running `Initialize-SCuBA`. 
+
+The `Install-OPA` cmdlet can also be run by itself to download the executable.
 In the event of an unsuccessful download, users can manually download the OPA executable with the following steps:
-1. Go to OPA download site (https://www.openpolicyagent.org/docs/latest/#running-opa)
-2. Check the acceptable OPA version (Currently v0.61.0) for ScubaGear and select the corresponding version on top left of the website
+1. Go to [OPA download site](https://www.openpolicyagent.org/docs/latest/#running-opa).
+2. Check the acceptable OPA version (Currently v0.61.0) for ScubaGear and select the corresponding version on top left of the website.
 3. Navigate to the menu on left side of the screen: Introduction - Running OPA - Download OPA
-4. Locate the downloaded file, add the file to your desired location (default is ~\\.scubagear\Tools), open PowerShell, and use the following command to check the downloaded OPA version
+4. Locate the downloaded file, add the file to your desired location (default is ~\\.scubagear\Tools), open PowerShell, and use the following command to check the downloaded OPA version:
+
 ```powershell
 .\opa_windows_amd64.exe version
 ```
+
 ### Examples
 
-#### Example 1: Run an assessment against all products (except PowerPlatform) <!-- omit in toc -->
+#### Example 1
+
+Run an assessment against all products (except PowerPlatform) <!-- omit in toc -->
+
 ```powershell
 Invoke-SCuBA
 ```
-#### Example 2: Run an assessment against Azure Active Directory with custom report output location <!-- omit in toc -->
+
+#### Example 2
+
+Run an assessment against Azure Active Directory with custom report output location <!-- omit in toc -->
+
 ```powershell
 Invoke-SCuBA -ProductNames aad -OutPath C:\Users\johndoe\reports
 ```
-#### Example 3: Run assessments against multiple products <!-- omit in toc -->
+
+#### Example 3: 
+
+Run assessments against multiple products <!-- omit in toc -->
+
 ```powershell
 Invoke-SCuBA -ProductNames aad, sharepoint, teams
 ```
-#### Example 4: Run assessments non-interactively using an application service principal and authenticating via CertificateThumbprint <!-- omit in toc -->
+
+#### Example 4: 
+
+Run assessments non-interactively using an application service principal and authenticating via CertificateThumbprint <!-- omit in toc -->
+
 ```powershell
 Invoke-SCuBA -ProductNames * -CertificateThumbprint "<insert-thumbprint>" -AppID "<insert-appid>" -Organization tenant.onmicrosoft.com
 ```
 
 To view more examples and see detailed help run:
+
 ```powershell
 Get-Help -Name Invoke-SCuBA -Full
 ```
@@ -248,7 +268,7 @@ The ScubaGear `-ConfigFilePath` command line option allows users to define custo
 
 **YAML AAD Configuration File Syntax and Examples**
 
-**Aad** defines the AAD specific variables to specify user, group, and role exclusions that are documented exemptions to select conditional access policies (CAP) in the AAD configuration policy baselines. Users, groups, and roles are specified by their respective Universally Unique Identifier (UUID) in the tenant. This variable set is only needed if the agency has documented CAP exemptions.
+**AAD** - Defines the AAD specific variables to specify user, group, and role exclusions that are documented exemptions to select conditional access policies (CAP) in the AAD configuration policy baselines. Users, groups, and roles are specified by their respective Universally Unique Identifier (UUID) in the tenant. This variable set is only needed if the agency has documented CAP exemptions.
 
 **CapExclusions** - Supports both a Users and Groups list with each entry representing the UUID of a user or group that is approved by the agency to be included in a conditional access policy assignment exclusion. Adding an entry to this variable will prevent ScubaGear from failing the policy assessment due to the presence of the users and groups in an exclusion.
 
@@ -323,8 +343,7 @@ The process to configure the application permissions is sometimes referred to as
 
 Microsoft Graph is used, because Azure AD PowerShell is being deprecated.
 
-> [!NOTE]
-> Microsoft Graph PowerShell SDK appears as "unverified" on the AAD application consent screen. This is a [known issue](https://github.com/microsoftgraph/msgraph-sdk-powershell/issues/482).
+> **NOTE**: Microsoft Graph PowerShell SDK appears as "unverified" on the AAD application consent screen. This is a [known issue](https://github.com/microsoftgraph/msgraph-sdk-powershell/issues/482).
 
 The following API permissions are required for Microsoft Graph Powershell:
 
@@ -395,7 +414,8 @@ ScubaGear creates connections to several M365 services. If running against multi
 ```powershell
 Disconnect-SCuBATenant
 ```
-> The cmdlet will attempt to disconnect from all services regardless of current session state.  Only connections established within the current PowerShell session will be disconnected and removed.  Services that are already disconnected will not generate an error.
+
+The cmdlet will attempt to disconnect from all services regardless of current session state.  Only connections established within the current PowerShell session will be disconnected and removed.  Services that are already disconnected will not generate an error.
 
 ### Errors connecting to Defender
 If when running the tool against Defender (via ExchangeOnlineManagement PowerShell Module), you may see the connection error "Create Powershell Session is failed using OAuth" in the Powershell window, follow the instructions in this section. An example of the full error message is provided below.
@@ -527,7 +547,8 @@ ScubaGear requires a number of PowerShell modules to function. A user or develop
 .\UninstallModules.ps1
 ```
 
->PowerShellGet 2.x has a known issue uninstalling modules installed on a OneDrive path that may result in an "Access to the cloud file is denied" error.  Installing PSGet 3.0, currently in beta, will allow the script to successfully uninstall such modules or you can remove the modules files from OneDrive manually.
+PowerShellGet 2.x has a known issue uninstalling modules installed on a OneDrive path that may result in an "Access to the cloud file is denied" error.  Installing PSGet 3.0, currently in beta, will allow the script to successfully uninstall such modules or you can remove the modules files from OneDrive manually.
 
 ## Project License
+
 Unless otherwise noted, this project is distributed under the Creative Commons Zero license. With developer approval, contributions may be submitted with an alternate compatible license. If accepted, those contributions will be listed herein with the appropriate license.
