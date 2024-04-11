@@ -5,6 +5,7 @@ name: Publish Public Package
 on:
   workflow_dispatch:
     inputs:
+      # checkov:skip=CKV_GHA_7:Manual inputs are desired.
       OverrideModuleVersion:
         description: "Override the version of the release. Restricted to SemVer 1.0 - 3 segments"
         required: false

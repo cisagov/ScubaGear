@@ -15986,7 +15986,6 @@
     },
     {
       "domain": "agency.onmicrosoft.com",
-      "//": "checkov:skip=CKV_SECRET_3:This is not an Azure Storage Account access key.",
       "rdata": [
         "v=spf1 include:spf.protection.outlook.com -all",
         "checkov:skip=CKV_SECRET_3:This is not an Azure Storage Account access key.",

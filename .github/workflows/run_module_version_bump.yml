@@ -3,6 +3,7 @@ name: Module Version Bump
 on:
   workflow_dispatch:
     inputs:
+      # checkov:skip=CKV_GHA_7:Manual inputs are desired.
       newVersionNumber:
         description: "New Version number (e.g., 1.2.4)"
         required: true
