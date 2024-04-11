@@ -5,6 +5,7 @@ name: Build and Draft Release
 on:
   workflow_dispatch:
     inputs:
+      # checkov:skip=CKV_GHA_7:Manual inputs are desired.
       releaseName:
         description: "Release Name"
         required: true
