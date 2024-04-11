@@ -9,6 +9,8 @@ on:
         required: true
         type: string
 
+permissions: read-all
+
 jobs:
   module-version-bump:
     runs-on: windows-latest

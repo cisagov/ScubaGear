@@ -2,11 +2,13 @@
 
 name: Check Security
 
+# This is a reusable workflow called by the pipeline.
 on:
   push: # temp
-  pull_request:
   workflow_call:
   workflow_dispatch:
+
+permissions: read-all
 
 jobs:
   check-security:

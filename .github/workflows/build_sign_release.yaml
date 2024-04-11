@@ -20,6 +20,8 @@ on:
         type: boolean
         default: true
 
+permissions: read-all
+
 jobs:
   build-and-draft:
     name: Build and Draft Release

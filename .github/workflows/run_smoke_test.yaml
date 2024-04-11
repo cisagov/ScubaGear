@@ -18,6 +18,8 @@ on:
       - "main"
       - "*smoke*"
 
+permissions: read-all
+
 jobs:
   smoke-tests:
     name: Smoke Tests

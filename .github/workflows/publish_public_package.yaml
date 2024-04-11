@@ -25,6 +25,8 @@ on:
   #     - ".github/workflows/publish_public_package.yaml"
   #     - "utils/DeployUtils.ps1"
 
+permissions: read-all
+
 jobs:
   publish:
     name: Publish to PSGallery

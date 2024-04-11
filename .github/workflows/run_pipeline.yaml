@@ -8,6 +8,8 @@ on:
   pull_request:
   workflow_dispatch:
 
+permissions: read-all
+
 jobs:
   lint-yaml:
     name: Lint

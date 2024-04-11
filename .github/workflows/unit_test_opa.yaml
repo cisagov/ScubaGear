@@ -7,8 +7,11 @@ on:
   workflow_call:
   workflow_dispatch:
 
+permissions: read-all
+
 env:
   MODULE_ROOT: PowerShell/ScubaGear
+
 jobs:
   opa-tests:
     name: OPA Unit Tests
