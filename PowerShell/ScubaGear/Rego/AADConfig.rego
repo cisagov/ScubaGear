@@ -248,6 +248,7 @@ tests contains {
 # MS.AAD.3.3v1
 #--
 
+# MSAuth: Returns the MS Authenticator configuration settings
 MSAuth := auth_setting if {
     some auth_method in input.authentication_method
     some auth_setting in auth_method.authentication_method_feature_settings
@@ -255,34 +256,40 @@ MSAuth := auth_setting if {
     auth_setting.Id == "MicrosoftAuthenticator"
 }
 
-default MSAuthDisabled := false
-MSAuthDisabled := true if {
-    MSAuth.State == "disabled"
-}
-
+# MSAuthEnabled: Returns true if MS Authenticator is enabled, false if it is not
 default MSAuthEnabled := false
 MSAuthEnabled := true if {
     MSAuth.State == "enabled"
+}
 
+# MSAuthProperlyConfigured: Returns true if MS Authenticator is configured per the baseline, false if it is not
+default MSAuthProperlyConfigured := false
+MSAuthProperlyConfigured := true if {
+    MSAuth.State == "enabled"
+
+    # Make sure that MS Auth shows the app name and geographic location
     Settings := MSAuth.AdditionalProperties.featureSettings
     Settings.displayAppInformationRequiredState.state == "enabled"
     Settings.displayLocationInformationRequiredState.state == "enabled"
 
+    # Make sure that the configuration applies to all users
     some target in MSAuth.AdditionalProperties.includeTargets
     target.id == "all_users"
 }
 
-default not_applicable := false
-not_applicable := true if {
+default AAD_3_3_Not_Applicable := false
+# AAD_3_3_Not_Applicable: Returns true no matter what if phishing-resistant MFA is being enforced
+AAD_3_3_Not_Applicable := true if {
     count(MFAPolicies) > 0
 }
 
-not_applicable := true if {
+# AAD_3_3_Not_Applicable: Returns true if phishing-resistant MFA is not being enforced but MS Auth is disabled
+AAD_3_3_Not_Applicable := true if {
     count(MFAPolicies) == 0
-    MSAuthDisabled == true
+    MSAuthEnabled == false
 }
 
-# If we have acceptable MFA then policy passes OR  MS Authenticator is disabled the policy is not applicable
+# First test is for N/A case
 tests contains {
     "PolicyId": PolicyId,
     "Criticality": "Shall/Not-Implemented",
@@ -294,10 +301,10 @@ tests contains {
     PolicyId := "MS.AAD.3.3v1"
     # regal ignore:line-length
     Reason := "This policy is only applicable if phishing-resistant MFA is not enforced and MS Authenticator is enabled. See %v for more info"
-    not_applicable == true
+    AAD_3_3_Not_Applicable == true
 }
 
-# If we don't have acceptable MFA and MS Authenticator is enabled, location and context must be enabled for all users to pass.
+# If policy is not N/A then we check that the configuration matches the baseline
 tests contains {
     "PolicyId": "MS.AAD.3.3v1",
     "Criticality": "Shall",
@@ -306,9 +313,9 @@ tests contains {
     "ReportDetails": ReportDetailsBoolean(Status),
     "RequirementMet": Status
 } if {
-    not_applicable == false
+    AAD_3_3_Not_Applicable == false
 
-    Status := MSAuthEnabled == true
+    Status := MSAuthProperlyConfigured == true
 }
 
 #
