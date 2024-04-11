@@ -15989,6 +15989,7 @@
       "//": "checkov:skip=CKV_SECRET_3:This is not an Azure Storage Account access key.",
       "rdata": [
         "v=spf1 include:spf.protection.outlook.com -all",
+        "checkov:skip=CKV_SECRET_3:This is not an Azure Storage Account access key.",
         "mscid=d/1e071KOhkmP8Aanr5sNgUqyTBrvrMx5nKSswPxu5ZsqL0bdAgVo3m7f5VYu+inbKA5YviUPzz/SxNS0ploJQ=="
       ],
       "log": [
