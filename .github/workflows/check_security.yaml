@@ -1,0 +1,26 @@
+# Purpose: Run a static analysis code checker against the repo.
+
+name: Check Security
+
+on:
+  push: # temp
+  pull_request:
+  workflow_call:
+  workflow_dispatch:
+
+jobs:
+  check-security:
+    name: MegaLint Checkov
+    runs-on: ubuntu-latest
+    # This condition prevents duplicate runs.
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+      - name: Setup Config File
+        run: cp Testing/Linting/MegaLinter/.mega-linter-security.yml .mega-linter.yml
+      - name: Check Security
+        uses: oxsecurity/megalinter/flavors/security@latest
