@@ -178,7 +178,7 @@ tests contains {
 # If policy matches basic conditions, special conditions,
 # all exclusions are intentional, & none but acceptable MFA
 # are allowed, save the policy name
-MFAPolicies contains CAPolicy.DisplayName if {
+PhishingResistantMFAPolicies contains CAPolicy.DisplayName if {
     some CAPolicy in input.conditional_access_policies
 
     "All" in CAPolicy.Conditions.Users.IncludeUsers
@@ -197,12 +197,12 @@ tests contains {
     "PolicyId": "MS.AAD.3.1v1",
     "Criticality": "Shall",
     "Commandlet": ["Get-MgBetaIdentityConditionalAccessPolicy"],
-    "ActualValue": MFAPolicies,
-    "ReportDetails": concat(". ", [ReportFullDetailsArray(MFAPolicies, DescriptionString), CAPLINK]),
+    "ActualValue": PhishingResistantMFAPolicies,
+    "ReportDetails": concat(". ", [ReportFullDetailsArray(PhishingResistantMFAPolicies, DescriptionString), CAPLINK]),
     "RequirementMet": Status
 } if {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
-    Status := count(MFAPolicies) > 0
+    Status := count(PhishingResistantMFAPolicies) > 0
 }
 #--
 
@@ -210,10 +210,10 @@ tests contains {
 # MS.AAD.3.2v1
 #--
 
-# Save all policy names if MFAPolicies exist
+# Save all policy names if PhishingResistantMFAPolicies exist
 AlternativeMFA contains CAPolicy.DisplayName if {
     some CAPolicy in input.conditional_access_policies
-    Count(MFAPolicies) > 0
+    Count(PhishingResistantMFAPolicies) > 0
 }
 
 # If policy matches basic conditions, special conditions,
@@ -280,12 +280,12 @@ MSAuthProperlyConfigured := true if {
 default AAD_3_3_Not_Applicable := false
 # Returns true no matter what if phishing-resistant MFA is being enforced
 AAD_3_3_Not_Applicable := true if {
-    count(MFAPolicies) > 0
+    count(PhishingResistantMFAPolicies) > 0
 }
 
 # Returns true if phishing-resistant MFA is not being enforced but MS Auth is disabled
 AAD_3_3_Not_Applicable := true if {
-    count(MFAPolicies) == 0
+    count(PhishingResistantMFAPolicies) == 0
     MSAuthEnabled == false
 }
 
