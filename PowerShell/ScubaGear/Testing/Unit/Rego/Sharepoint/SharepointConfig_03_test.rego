@@ -10,6 +10,8 @@ import data.utils.key.PASS
 # Policy MS.SHAREPOINT.3.1v1
 #--
 test_ExternalUserExpireInDays_Correct_V1 if {
+    # Test if the Sharepoint external sharing slider is set to "Only people in your organization".
+    # The result must be N/A because the policy is not applicable unless external sharing is set to "Anyone".
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
@@ -61,7 +63,22 @@ test_ExternalUserExpireInDays_Correct_V4 if {
     TestResult("MS.SHAREPOINT.3.1v1", Output, PASS, true) == true
 }
 
-test_ExternalUserExpireInDays_Incorrect if {
+test_ExternalUserSharingCapability_Correct_V1 if {
+    # Test if the Sharepoint external sharing slider is set to "Only people in your organization".
+    # The result must be N/A because the policy is not applicable unless external sharing is set to "Anyone".
+    Output := sharepoint.tests with input as {
+        "SPO_tenant": [
+            {
+                "SharingCapability": 0,
+                "RequireAnonymousLinksExpireInDays": 30
+            }
+        ]
+    }
+
+    TestResult("MS.SHAREPOINT.3.1v1", Output, PASS, false) == true
+}
+
+test_ExternalUserExpireInDays_Incorrect_V1 if {
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {

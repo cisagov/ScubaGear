@@ -221,6 +221,15 @@ tests contains {
 #
 # MS.SHAREPOINT.3.1v1
 #--
+SharepointSliderSettings(Value) := "ONLY_PEOPLE_IN_ORG" if {
+    Value == 0
+} else := "NEW_AND_EXISTING_GUESTS" if {
+    Value == 1
+} else := "ANYONE" if {
+    Value == 2
+} else := "EXISTING_GUESTS" if {
+    Value == 3
+} else := Value
 
 # If SharingCapability is set to Only People In Organization
 # OR Existing Guests, the policy should pass.
