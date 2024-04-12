@@ -72,5 +72,4 @@ TestPlan:
       - TestDescription: MS.DEFENDER.3.1v1 Non-compliant - No defender license
         Preconditions: []
         Postconditions: []
-        IsNotChecked: true
         ExpectedResult: false

@@ -384,6 +384,132 @@ TestPlan:
         Postconditions: []
         ExpectedResult: true
 
+  - PolicyId: MS.DEFENDER.2.1v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.DEFENDER.2.1v1 Non-compliant - Sensitive user not listed
+        ConfigFileName: MismatchedUser.yaml
+        Preconditions:
+          # yamllint disable-line rule:line-length
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedUsersToProtect $null}'
+          # yamllint disable-line rule:line-length
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedUsersToProtect $null}'
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.2.1v1 Non-compliant - Sensitive user partial coverage
+        ConfigFileName: MatchedUser.yaml
+        Preconditions:
+          # yamllint disable-line rule:line-length
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedUsersToProtect "AgencyUserGlobalReader;AgencyUserGlobalReader@y2zj1.onmicrosoft.com"}'
+          # yamllint disable-line rule:line-length
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedUsersToProtect $null}'
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.2.1v1 Compliant - All Listed sensitive users (mix-cased) are protected
+        ConfigFileName: MatchedWithMixedCase.yaml
+        Preconditions:
+          # yamllint disable-line rule:line-length
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedUsersToProtect "AgencyUserGlobalReader;AgencyUserGlobalReader@y2zj1.onmicrosoft.com"}'
+          # yamllint disable-line rule:line-length
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedUsersToProtect "AgencyUserGlobalReader;AgencyUserGlobalReader@y2zj1.onmicrosoft.com"}'
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.DEFENDER.2.1v1 Compliant - All Listed sensitive users are protected
+        ConfigFileName: MatchedUser.yaml
+        Preconditions:
+          # yamllint disable-line rule:line-length
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedUsersToProtect "AgencyUserGlobalReader;AgencyUserGlobalReader@y2zj1.onmicrosoft.com"}'
+          # yamllint disable-line rule:line-length
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedUsersToProtect "AgencyUserGlobalReader;AgencyUserGlobalReader@y2zj1.onmicrosoft.com"}'
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.DEFENDER.2.1v1 Compliant - No sensitive users identified but all users covered
+        Preconditions:
+          # yamllint disable-line rule:line-length
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedUsersToProtect $null}'
+          # yamllint disable-line rule:line-length
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedUsersToProtect $null}'
+        Postconditions: []
+        ExpectedResult: true
+
+  - PolicyId: MS.DEFENDER.2.2v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.DEFENDER.2.2v1 Non-compliant - Agency domain not listed
+        ConfigFileName: AgencyDomainList.yaml
+        Preconditions:
+          # yamllint disable-line rule:line-length
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect $null}'
+          # yamllint disable-line rule:line-length
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect $null}'
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.2.2v1 Non-compliant - Agency domain partial coverage
+        ConfigFileName: AgencyDomainList.yaml
+        Preconditions:
+          # yamllint disable-line rule:line-length
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect "goodguys.com"}'
+          # yamllint disable-line rule:line-length
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect $null}'
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.2.2v1 Non-compliant - All domains No list
+        Preconditions:
+          # yamllint disable-line rule:line-length
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect $null}'
+          # yamllint disable-line rule:line-length
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect $null}'
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.2.2v1 Compliant - All Listed are protected
+        ConfigFileName: AgencyDomainList.yaml
+        Preconditions:
+          # yamllint disable-line rule:line-length
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect "goodguys.com"}'
+          # yamllint disable-line rule:line-length
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect "goodguys.com"}'
+        Postconditions: []
+        ExpectedResult: true
+
+  - PolicyId: MS.DEFENDER.2.3v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.DEFENDER.2.3v1 Non-compliant - Agency domain not listed
+        ConfigFileName: PartnerDomainList.yaml
+        Preconditions:
+          # yamllint disable-line rule:line-length
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect $null}'
+          # yamllint disable-line rule:line-length
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect $null}'
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.2.3v1 Non-compliant - Agency domain partial coverage
+        ConfigFileName: PartnerDomainList.yaml
+        Preconditions:
+          # yamllint disable-line rule:line-length
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect "goodparnter.com"}'
+          # yamllint disable-line rule:line-length
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect $null}'
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.2.3v1 Compliant - All domains No list of domains in config
+        Preconditions:
+          # yamllint disable-line rule:line-length
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect @{}}'
+          # yamllint disable-line rule:line-length
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect @{}}'
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.DEFENDER.2.3v1 Compliant - All Listed are protected
+        ConfigFileName: PartnerDomainList.yaml
+        Preconditions:
+          # yamllint disable-line rule:line-length
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect "goodparnter.com"}'
+          # yamllint disable-line rule:line-length
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect "goodparnter.com"}'
+        Postconditions: []
+        ExpectedResult: true
+
   - PolicyId: MS.DEFENDER.3.1v1
     TestDriver: RunScuba
     Tests:
