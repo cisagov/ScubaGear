@@ -1,6 +1,7 @@
 package sharepoint
 import rego.v1
 import data.utils.report.NotCheckedDetails
+import data.utils.report.CheckedSkippedDetails
 import data.utils.report.ReportDetailsBoolean
 import data.utils.report.ReportDetailsString
 import data.utils.key.FilterArray
@@ -14,10 +15,12 @@ import data.utils.key.PASS
 
 # Values in json for slider sharepoint/onedrive sharing settings
 ONLYPEOPLEINORG := 0
+ONLY_PEOPLE_IN_ORG := 0
 
 EXISTINGGUESTS := 3
+EXISTING_GUESTS := 3
 
-NEWANDEXISTINGGUESTS := 1
+NEW_AND_EXISTING_GUESTS := 1
 
 ANYONE := 2
 
@@ -221,68 +224,103 @@ tests contains {
 #
 # MS.SHAREPOINT.3.1v1
 #--
-SharepointSliderSettings(Value) := "ONLY_PEOPLE_IN_ORG" if {
-    Value == 0
-} else := "NEW_AND_EXISTING_GUESTS" if {
-    Value == 1
-} else := "ANYONE" if {
-    Value == 2
-} else := "EXISTING_GUESTS" if {
-    Value == 3
-} else := Value
 
-# If SharingCapability is set to Only People In Organization
-# OR Existing Guests, the policy should pass.
-ExternalUserExpireInDays(TenantPolicy) := ["", true] if {
+SharingCapability := Setting if {
+    some tenant in input.SPO_tenant
+    Setting := tenant.SharingCapability
+}
+
+default PolicyNotApplicable3_1 := false
+PolicyNotApplicable3_1 := true if {
     Conditions := [
-        TenantPolicy.SharingCapability == ONLYPEOPLEINORG,
-        TenantPolicy.SharingCapability == EXISTINGGUESTS
+        SharingCapability == ONLY_PEOPLE_IN_ORG,
+        SharingCapability == EXISTING_GUESTS,
+        SharingCapability == NEW_AND_EXISTING_GUESTS
     ]
     count(FilterArray(Conditions, true)) == 1
 }
 
-# If SharingCapability is set to New and Existing Guests
-# OR Anyone, AND anonymous links are set to expire
-# in 30 days or less, the policy should pass, else fail.
-# The error message is concatanated by 2 steps to insert the
-# result of ReportBoolean in front, & the setting in the middle.
-SHARINGCAPABILITY := "New and Existing Guests" if
-    # regal ignore:prefer-some-in-iteration
-    input.SPO_tenant[_].SharingCapability == NEWANDEXISTINGGUESTS
+# Test for N/A case
+# This policy is only applicable if external sharing is set to "Anyone"
+tests contains {
+    "PolicyId": "MS.SHAREPOINT.3.1v1",
+    "Criticality": "Shall/Not-Implemented",
+    "Commandlet": ["Get-SPOTenant"],
+    "ActualValue": [],
+    "ReportDetails": CheckedSkippedDetails(PolicyId, Reason),
+    "RequirementMet": false
+} if {
+    PolicyId := "MS.SHAREPOINT.3.1v1"
+    Reason := "This policy is only applicable if External Sharing is set to Anybody. See %v for more info"
 
-SHARINGCAPABILITY := "Anyone" if
-    # regal ignore:prefer-some-in-iteration
-    input.SPO_tenant[_].SharingCapability == ANYONE
-
-ERRSTRING := concat(" ", [
-    "External Sharing is set to",
-    SHARINGCAPABILITY,
-    "and expiration date is not 30 days or less"
-    ])
-
-ExternalUserExpireInDays(TenantPolicy) := [concat(": ", [FAIL, ERRSTRING]), Status] if {
-    Conditions := [
-        TenantPolicy.SharingCapability == NEWANDEXISTINGGUESTS,
-        TenantPolicy.SharingCapability == ANYONE
-    ]
-    count(FilterArray(Conditions, true)) > 0
-    Status := TenantPolicy.RequireAnonymousLinksExpireInDays <= 30
+    PolicyNotApplicable3_1 == true
 }
 
 tests contains {
     "PolicyId": "MS.SHAREPOINT.3.1v1",
     "Criticality": "Shall",
-    "Commandlet": ["Get-SPOTenant", "Get-PnPTenant"],
-    "ActualValue": [
-        TenantPolicy.SharingCapability,
-        TenantPolicy.RequireAnonymousLinksExpireInDays
-    ],
-    "ReportDetails": ReportDetailsString(Status, ErrMsg),
+    "Commandlet": ["Get-SPOTenant"],
+    "ActualValue": [],
+    "ReportDetails": ReportDetailsBoolean(Status),
     "RequirementMet": Status
 } if {
-    some TenantPolicy in input.SPO_tenant
-    [ErrMsg, Status] := ExternalUserExpireInDays(TenantPolicy)
+    PolicyNotApplicable3_1 == false
+    Status := true
 }
+#--
+
+# If SharingCapability is set to Only People In Organization
+# OR Existing Guests, the policy should pass.
+#ExternalUserExpireInDays(TenantPolicy) := ["", true] if {
+#    Conditions := [
+#        TenantPolicy.SharingCapability == ONLYPEOPLEINORG,
+#        TenantPolicy.SharingCapability == EXISTINGGUESTS
+#    ]
+#    count(FilterArray(Conditions, true)) == 1
+#}
+#
+## If SharingCapability is set to New and Existing Guests
+## OR Anyone, AND anonymous links are set to expire
+## in 30 days or less, the policy should pass, else fail.
+## The error message is concatanated by 2 steps to insert the
+## result of ReportBoolean in front, & the setting in the middle.
+#SHARINGCAPABILITY := "New and Existing Guests" if
+#    # regal ignore:prefer-some-in-iteration
+#    input.SPO_tenant[_].SharingCapability == NEWANDEXISTINGGUESTS
+#
+#SHARINGCAPABILITY := "Anyone" if
+#    # regal ignore:prefer-some-in-iteration
+#    input.SPO_tenant[_].SharingCapability == ANYONE
+#
+#ERRSTRING := concat(" ", [
+#    "External Sharing is set to",
+#    SHARINGCAPABILITY,
+#    "and expiration date is not 30 days or less"
+#    ])
+#
+#ExternalUserExpireInDays(TenantPolicy) := [concat(": ", [FAIL, ERRSTRING]), Status] if {
+#    Conditions := [
+#        TenantPolicy.SharingCapability == NEWANDEXISTINGGUESTS,
+#        TenantPolicy.SharingCapability == ANYONE
+#    ]
+#    count(FilterArray(Conditions, true)) > 0
+#    Status := TenantPolicy.RequireAnonymousLinksExpireInDays <= 30
+#}
+#
+#tests contains {
+#    "PolicyId": "MS.SHAREPOINT.3.1v1",
+#    "Criticality": "Shall",
+#    "Commandlet": ["Get-SPOTenant", "Get-PnPTenant"],
+#    "ActualValue": [
+#        TenantPolicy.SharingCapability,
+#        TenantPolicy.RequireAnonymousLinksExpireInDays
+#    ],
+#    "ReportDetails": ReportDetailsString(Status, ErrMsg),
+#    "RequirementMet": Status
+#} if {
+#    some TenantPolicy in input.SPO_tenant
+#    [ErrMsg, Status] := ExternalUserExpireInDays(TenantPolicy)
+#}
 #--
 
 #

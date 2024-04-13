@@ -2,6 +2,7 @@ package sharepoint_test
 import rego.v1
 import data.sharepoint
 import data.utils.report.NotCheckedDetails
+import data.utils.report.CheckedSkippedDetails
 import data.utils.key.TestResult
 import data.utils.key.PASS
 
@@ -21,10 +22,61 @@ test_ExternalUserExpireInDays_Correct_V1 if {
         ]
     }
 
-    TestResult("MS.SHAREPOINT.3.1v1", Output, PASS, true) == true
+    PolicyId := "MS.SHAREPOINT.3.1v1"
+    ReportDetailsString := "This policy is only applicable if External Sharing is set to Anybody. See %v for more info"
+    TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailsString), false) == true
 }
 
 test_ExternalUserExpireInDays_Correct_V2 if {
+    # Test if the Sharepoint external sharing slider is set to "Existing guests".
+    # The result must be N/A because the policy is not applicable unless external sharing is set to "Anyone".
+    Output := sharepoint.tests with input as {
+        "SPO_tenant": [
+            {
+                "SharingCapability": 3,
+                "RequireAnonymousLinksExpireInDays": 30
+            }
+        ]
+    }
+
+    PolicyId := "MS.SHAREPOINT.3.1v1"
+    ReportDetailsString := "This policy is only applicable if External Sharing is set to Anybody. See %v for more info"
+    TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailsString), false) == true
+}
+
+test_ExternalUserExpireInDays_Correct_V3 if {
+    # Test if the Sharepoint external sharing slider is set to "New and existing guests".
+    # The result must be N/A because the policy is not applicable unless external sharing is set to "Anyone".
+    Output := sharepoint.tests with input as {
+        "SPO_tenant": [
+            {
+                "SharingCapability": 1,
+                "RequireAnonymousLinksExpireInDays": 30
+            }
+        ]
+    }
+
+    PolicyId := "MS.SHAREPOINT.3.1v1"
+    ReportDetailsString := "This policy is only applicable if External Sharing is set to Anybody. See %v for more info"
+    TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailsString), false) == true
+}
+
+test_ExternalUserExpireInDays_Correct_V4 if {
+    # Test if the Sharepoint external sharing slider is set to "Anybody".
+    # If true, then evaluate the value for expiration days.
+    Output := sharepoint.tests with input as {
+        "SPO_tenant": [
+            {
+                "SharingCapability": 2,
+                "RequireAnonymousLinksExpireInDays": 30
+            }
+        ]
+    }
+
+    TestResult("MS.SHAREPOINT.3.1v1", Output, PASS, true) == true
+}
+
+test_ExternalUserExpireInDays_Correct_V5 if {
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
@@ -37,7 +89,7 @@ test_ExternalUserExpireInDays_Correct_V2 if {
     TestResult("MS.SHAREPOINT.3.1v1", Output, PASS, true) == true
 }
 
-test_ExternalUserExpireInDays_Correct_V3 if {
+test_ExternalUserExpireInDays_Correct_V6 if {
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
@@ -50,7 +102,7 @@ test_ExternalUserExpireInDays_Correct_V3 if {
     TestResult("MS.SHAREPOINT.3.1v1", Output, PASS, true) == true
 }
 
-test_ExternalUserExpireInDays_Correct_V4 if {
+test_ExternalUserExpireInDays_Correct_V7 if {
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
@@ -61,21 +113,6 @@ test_ExternalUserExpireInDays_Correct_V4 if {
     }
 
     TestResult("MS.SHAREPOINT.3.1v1", Output, PASS, true) == true
-}
-
-test_ExternalUserSharingCapability_Correct_V1 if {
-    # Test if the Sharepoint external sharing slider is set to "Only people in your organization".
-    # The result must be N/A because the policy is not applicable unless external sharing is set to "Anyone".
-    Output := sharepoint.tests with input as {
-        "SPO_tenant": [
-            {
-                "SharingCapability": 0,
-                "RequireAnonymousLinksExpireInDays": 30
-            }
-        ]
-    }
-
-    TestResult("MS.SHAREPOINT.3.1v1", Output, PASS, false) == true
 }
 
 test_ExternalUserExpireInDays_Incorrect_V1 if {
