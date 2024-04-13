@@ -225,6 +225,16 @@ tests contains {
 # MS.SHAREPOINT.3.1v1
 #--
 
+SliderSettings(Value) := "Only people in your organization" if {
+    Value == 0
+} else := "New and existing guests" if {
+    Value == 1
+} else := "Anyone" if {
+    Value == 2
+} else := "Existing guests" if {
+    Value == 3
+} else := Value
+
 SharingCapability := Setting if {
     some tenant in input.SPO_tenant
     Setting := tenant.SharingCapability
@@ -251,7 +261,14 @@ tests contains {
     "RequirementMet": false
 } if {
     PolicyId := "MS.SHAREPOINT.3.1v1"
-    Reason := "This policy is only applicable if External Sharing is set to Anybody. See %v for more info"
+    Reason := concat(" ", [
+        concat("", [
+            "External Sharing is set to ",
+            SliderSettings(SharingCapability),
+            "."
+        ]),
+        "This policy is only applicable if External Sharing is set to Anyone. See %v for more info"
+    ])
 
     PolicyNotApplicable3_1 == true
 }
@@ -260,12 +277,16 @@ tests contains {
     "PolicyId": "MS.SHAREPOINT.3.1v1",
     "Criticality": "Shall",
     "Commandlet": ["Get-SPOTenant"],
-    "ActualValue": [],
-    "ReportDetails": ReportDetailsBoolean(Status),
+    "ActualValue": [SharingCapability, tenant.RequireAnonymousLinksExpireInDays],
+    "ReportDetails": ReportDetailsString(Status, ErrMsg),
     "RequirementMet": Status
 } if {
     PolicyNotApplicable3_1 == false
-    Status := true
+    SharingCapability == ANYONE
+
+    some tenant in input.SPO_tenant
+    Status := tenant.RequireAnonymousLinksExpireInDays <= 30
+    ErrMsg := "Anyone links expiration date is not set to 30 days or less"
 }
 #--
 
