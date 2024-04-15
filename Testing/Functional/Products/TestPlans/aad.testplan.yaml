@@ -198,13 +198,53 @@ TestPlan:
         ExpectedResult: true
 
   - PolicyId: MS.AAD.3.3v1
-    TestDriver: RunScuba
+    TestDriver: RunCached
     Tests:
-      - TestDescription: MS.AAD.3.3v1 Not Checked
-        Preconditions: []
+      # - TestDescription: MS.AAD.3.3v1 Not-applicable case - PhishingMFA Enforced MS Auth Enabled
+      #   Preconditions:
+      #     - Command: UpdateCachedConditionalAccessPolicyByName
+      #       Splat:
+      #         displayName: Automated Test 1 - DO NOT MODIFY
+      #         updates:
+      #           State: enabled
+      #           Conditions:
+      #             Users:
+      #               IncludeUsers: ["All"]
+      #               ExcludeUsers: []
+      #               IncludeGroups: []
+      #               ExcludeGroups: []
+      #               IncludeRoles: []
+      #               ExcludeRoles: []
+      #             Applications:
+      #               IncludeApplications: ["All"]
+      #               ExcludeApplications: []
+      #           GrantControls.AuthenticationStrength.AllowedCombinations:
+      #             - "windowsHelloForBusiness"
+      #             - "fido2"
+      #             - "x509CertificateMultiFactor"
+      #     - Command: UpdateProviderExport
+      #       Splat:
+      #         updates:
+      #           authentication_method[0].authentication_method_feature_settings:
+      #             - Id: MicrosoftAuthenticator
+      #               State: enabled
+      #   Postconditions: []
+      #   IsNotChecked: true
+      #   ExpectedResult: false
+      - TestDescription: MS.AAD.3.3v1 Compliant case - PhishingMFA not Enforced MS Auth Configured Correctly
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                authentication_method[0].authentication_method_feature_settings:
+                  - Id: MicrosoftAuthenticator
+                    State: enabled
+                  - AdditionalProperties.featureSettings:
+                    - displayAppInformationRequiredState.state: enabled
+                    - displayLocationInformationRequiredState.state: enabled
+                  - AdditionalProperties.includeTargets[0].id: "all_users"
         Postconditions: []
-        IsNotChecked: true
-        ExpectedResult: false
+        ExpectedResult: true
 
   - PolicyId: MS.AAD.3.4v1
     TestDriver: RunCached
