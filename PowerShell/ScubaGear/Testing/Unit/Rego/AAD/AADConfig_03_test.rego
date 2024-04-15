@@ -1692,7 +1692,7 @@ test_PhishingMFAEnforced_MicrosoftAuthDisabled_NotApplicable if {
     TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailStr), false) == true
 }
 
-test_PhishingMFANotEnforced_AuthenticatorNotEnabled_NotApplicable if {
+test_PhishingMFANotEnforced_MicrosoftAuthDisabled_NotApplicable if {
     Output := aad.tests with input as {
         "conditional_access_policies": [
             {
@@ -1742,7 +1742,7 @@ test_PhishingMFANotEnforced_AuthenticatorNotEnabled_NotApplicable if {
     TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailStr), false) == true
 }
 
-test_PhishingMFANotEnforced_AuthenticatorEnabled_Correct if {
+test_PhishingMFANotEnforced_MicrosoftAuthEnabled_Correct if {
     Output := aad.tests with input as {
         "conditional_access_policies": [
             {
@@ -1830,7 +1830,7 @@ test_PhishingMFANotEnforced_AuthenticatorEnabled_Correct if {
     TestResult("MS.AAD.3.3v1", Output, PASS, true) == true
 }
 
-test_PhishingMFANotEnforced_AuthenticatorEnabled_AppnameDisabled_Incorrect if {
+test_PhishingMFANotEnforced_MicrosoftAuthEnabled_AppnameDisabled_Incorrect if {
     Output := aad.tests with input as {
         "conditional_access_policies": [
             {
@@ -1918,7 +1918,7 @@ test_PhishingMFANotEnforced_AuthenticatorEnabled_AppnameDisabled_Incorrect if {
     TestResult("MS.AAD.3.3v1", Output, FAIL, false) == true
 }
 
-test_PhishingMFANotEnforced_AuthenticatorEnabled_GeolocationDisabled_Incorrect if {
+test_PhishingMFANotEnforced_MicrosoftAuthEnabled_GeolocationDisabled_Incorrect if {
     Output := aad.tests with input as {
         "conditional_access_policies": [
             {
@@ -2006,7 +2006,7 @@ test_PhishingMFANotEnforced_AuthenticatorEnabled_GeolocationDisabled_Incorrect i
     TestResult("MS.AAD.3.3v1", Output, FAIL, false) == true
 }
 
-test_PhishingMFANotEnforced_AuthenticatorEnabled_AppNameDisabled_GeolocationDisabled_Incorrect if {
+test_PhishingMFANotEnforced_MicrosoftAuthEnabled_AppNameDisabled_GeolocationDisabled_Incorrect if {
     Output := aad.tests with input as {
         "conditional_access_policies": [
             {
@@ -2094,7 +2094,7 @@ test_PhishingMFANotEnforced_AuthenticatorEnabled_AppNameDisabled_GeolocationDisa
     TestResult("MS.AAD.3.3v1", Output, FAIL, false) == true
 }
 
-test_PhishingMFANotEnforced_AuthenticatorEnabled_includeTargetsNotAll_Incorrect if {
+test_PhishingMFANotEnforced_MicrosoftAuthEnabled_includeTargetsNotAll_Incorrect if {
     Output := aad.tests with input as {
         "conditional_access_policies": [
             {

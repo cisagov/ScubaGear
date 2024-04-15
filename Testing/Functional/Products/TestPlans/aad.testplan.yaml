@@ -200,38 +200,65 @@ TestPlan:
   - PolicyId: MS.AAD.3.3v1
     TestDriver: RunCached
     Tests:
-      # - TestDescription: MS.AAD.3.3v1 Not-applicable case - PhishingMFA Enforced MS Auth Enabled
-      #   Preconditions:
-      #     - Command: UpdateCachedConditionalAccessPolicyByName
-      #       Splat:
-      #         displayName: Automated Test 1 - DO NOT MODIFY
-      #         updates:
-      #           State: enabled
-      #           Conditions:
-      #             Users:
-      #               IncludeUsers: ["All"]
-      #               ExcludeUsers: []
-      #               IncludeGroups: []
-      #               ExcludeGroups: []
-      #               IncludeRoles: []
-      #               ExcludeRoles: []
-      #             Applications:
-      #               IncludeApplications: ["All"]
-      #               ExcludeApplications: []
-      #           GrantControls.AuthenticationStrength.AllowedCombinations:
-      #             - "windowsHelloForBusiness"
-      #             - "fido2"
-      #             - "x509CertificateMultiFactor"
-      #     - Command: UpdateProviderExport
-      #       Splat:
-      #         updates:
-      #           authentication_method[0].authentication_method_feature_settings:
-      #             - Id: MicrosoftAuthenticator
-      #               State: enabled
-      #   Postconditions: []
-      #   IsNotChecked: true
-      #   ExpectedResult: false
-      - TestDescription: MS.AAD.3.3v1 Compliant case - PhishingMFA not Enforced MS Auth Configured Correctly
+      - TestDescription: MS.AAD.3.3v1 Not-applicable case - PhishingMFA Enforced MS Auth Enabled
+        Preconditions:
+          - Command: UpdateCachedConditionalAccessPolicyByName
+            Splat:
+              displayName: Automated Test 1 - DO NOT MODIFY
+              updates:
+                State: enabled
+                Conditions:
+                  Users:
+                    IncludeUsers: ["All"]
+                    ExcludeUsers: []
+                    IncludeGroups: []
+                    ExcludeGroups: []
+                    IncludeRoles: []
+                    ExcludeRoles: []
+                  Applications:
+                    IncludeApplications: ["All"]
+                    ExcludeApplications: []
+                GrantControls.AuthenticationStrength.AllowedCombinations:
+                  - "windowsHelloForBusiness"
+                  - "fido2"
+                  - "x509CertificateMultiFactor"
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                authentication_method[0].authentication_method_feature_settings:
+                  - Id: MicrosoftAuthenticator
+                    State: enabled
+                    AdditionalProperties:
+                      featureSettings:
+                        displayAppInformationRequiredState:
+                          state: disabled
+                        displayLocationInformationRequiredState:
+                          state: disabled
+                      includeTargets:
+                        - id: "all_users"
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false
+      - TestDescription: MS.AAD.3.3v1 Not-applicable case - PhishingMFA Not Enforced MS Auth Disabled
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                authentication_method[0].authentication_method_feature_settings:
+                  - Id: MicrosoftAuthenticator
+                    State: disabled
+                    AdditionalProperties:
+                      featureSettings:
+                        displayAppInformationRequiredState:
+                          state: disabled
+                        displayLocationInformationRequiredState:
+                          state: disabled
+                      includeTargets:
+                        - id: "all_users"
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false
+      - TestDescription: MS.AAD.3.3v1 Non-Compliant case - MS Auth App name and Geolocation disabled
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
@@ -239,10 +266,32 @@ TestPlan:
                 authentication_method[0].authentication_method_feature_settings:
                   - Id: MicrosoftAuthenticator
                     State: enabled
-                  - AdditionalProperties.featureSettings:
-                    - displayAppInformationRequiredState.state: enabled
-                    - displayLocationInformationRequiredState.state: enabled
-                  - AdditionalProperties.includeTargets[0].id: "all_users"
+                    AdditionalProperties:
+                      featureSettings:
+                        displayAppInformationRequiredState:
+                          state: disabled
+                        displayLocationInformationRequiredState:
+                          state: disabled
+                      includeTargets:
+                        - id: "all_users"
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.AAD.3.3v1 Compliant case - MS Auth Configured Correctly
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                authentication_method[0].authentication_method_feature_settings:
+                  - Id: MicrosoftAuthenticator
+                    State: enabled
+                    AdditionalProperties:
+                      featureSettings:
+                        displayAppInformationRequiredState:
+                          state: enabled
+                        displayLocationInformationRequiredState:
+                          state: enabled
+                      includeTargets:
+                        - id: "all_users"
         Postconditions: []
         ExpectedResult: true
 
