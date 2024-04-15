@@ -16,10 +16,6 @@ Developed by CISA, ScubaGear is an assessment tool that verifies that a Microsof
 - [Usage](#usage)
   - [Importing the module](#importing-the-module)
   - [Examples](#examples)
-    - [Example 1](#example-1)
-    - [Example 2](#example-2)
-    - [Example 3](#example-3)
-    - [Example 4](#example-4)
   - [Parameter Definitions](#parameter-definitions)
   - [ScubaGear Configuration File Syntax and Examples](#scubagear-configuration-file-syntax-and-examples)
   - [AAD Conditional Access Policy Exemptions](#aad-conditional-access-policy-exemptions)
@@ -102,7 +98,7 @@ In the event of an unsuccessful download, users can manually download the OPA ex
 
 ### Examples
 
-#### Example 1
+#### Example 1 <!-- omit in toc -->
 
 Run an assessment against all products (except PowerPlatform):
 
@@ -110,7 +106,7 @@ Run an assessment against all products (except PowerPlatform):
 Invoke-SCuBA
 ```
 
-#### Example 2
+#### Example 2 <!-- omit in toc -->
 
 Run an assessment against Azure Active Directory with custom report output location:
 
@@ -118,7 +114,7 @@ Run an assessment against Azure Active Directory with custom report output locat
 Invoke-SCuBA -ProductNames aad -OutPath C:\Users\johndoe\reports
 ```
 
-#### Example 3
+#### Example 3 <!-- omit in toc -->
 
 Run assessments against multiple products:
 
@@ -126,7 +122,7 @@ Run assessments against multiple products:
 Invoke-SCuBA -ProductNames aad, sharepoint, teams
 ```
 
-#### Example 4
+#### Example 4 <!-- omit in toc -->
 
 Run assessments non-interactively using an application service principal and authenticating via CertificateThumbprint:
 
