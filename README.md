@@ -16,6 +16,10 @@ Developed by CISA, ScubaGear is an assessment tool that verifies that a Microsof
 - [Usage](#usage)
   - [Importing the module](#importing-the-module)
   - [Examples](#examples)
+    - [Example 1](#example-1)
+    - [Example 2](#example-2)
+    - [Example 3](#example-3)
+    - [Example 4](#example-4)
   - [Parameter Definitions](#parameter-definitions)
   - [ScubaGear Configuration File Syntax and Examples](#scubagear-configuration-file-syntax-and-examples)
   - [AAD Conditional Access Policy Exemptions](#aad-conditional-access-policy-exemptions)
@@ -83,13 +87,12 @@ If you receive a warning that _The required supporting PowerShell modules are no
 Initialize-SCuBA # Installs the minimum required dependencies
 ```
 
-> **IMPORTANT**: The `Install-OPA` cmdlet is called by default when running `Initialize-SCuBA`. 
+> **IMPORTANT**: The `Install-OPA` cmdlet is called by default when running `Initialize-SCuBA`.
 
 The `Install-OPA` cmdlet can also be run by itself to download the executable.
 In the event of an unsuccessful download, users can manually download the OPA executable with the following steps:
-
-1. Go to [OPA download site](https://www.openpolicyagent.org/docs/latest/#running-opa).
-2. Check the acceptable OPA version (Currently v0.61.0) for ScubaGear and select the corresponding version on top left of the website.
+1. Go to OPA download site (https://www.openpolicyagent.org/docs/latest/#running-opa)
+2. Look for the latest OPA version (Currently v0.63.0) for ScubaGear and select the corresponding version on top left of the website.
 3. Navigate to the menu on left side of the screen: Introduction - Running OPA - Download OPA
 4. Locate the downloaded file, add the file to your desired location (default is ~\\.scubagear\Tools), open PowerShell, and use the following command to check the downloaded OPA version:
 
