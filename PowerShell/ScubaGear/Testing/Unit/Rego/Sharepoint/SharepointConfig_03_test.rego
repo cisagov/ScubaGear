@@ -85,7 +85,7 @@ test_ExternalUserExpireInDays_Correct_V4 if {
     TestResult("MS.SHAREPOINT.3.1v1", Output, PASS, true) == true
 }
 
-test_ExternalUserExpireInDays_Correct_V7 if {
+test_ExternalUserExpireInDays_Correct_V5 if {
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
@@ -108,8 +108,11 @@ test_ExternalUserExpireInDays_Incorrect_V1 if {
         ]
     }
 
-    ReportDetailString := "Anyone links expiration date is not set to 30 days or less"
-    TestResult("MS.SHAREPOINT.3.1v1", Output, ReportDetailString, false) == true
+    ReportDetailsString := concat(" ", [
+        "Requirement not met:",
+        "External Sharing is set to Anyone and expiration date is not set to 30 days or less."
+    ])
+    TestResult("MS.SHAREPOINT.3.1v1", Output, ReportDetailsString, false) == true
 }
 
 test_ExternalUserExpireInDays_Incorrect_V2 if {
@@ -122,8 +125,11 @@ test_ExternalUserExpireInDays_Incorrect_V2 if {
         ]
     }
 
-    ReportDetailString := "Anyone links expiration date is not set to 30 days or less"
-    TestResult("MS.SHAREPOINT.3.1v1", Output, ReportDetailString, false) == true
+    ReportDetailsString := concat(" ", [
+        "Requirement not met:",
+        "External Sharing is set to Anyone and expiration date is not set to 30 days or less."
+    ])
+    TestResult("MS.SHAREPOINT.3.1v1", Output, ReportDetailsString, false) == true
 }
 #--
 

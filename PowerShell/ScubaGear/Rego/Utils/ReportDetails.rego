@@ -30,7 +30,7 @@ PolicyLink(PolicyId) := sprintf(
     [SCUBABASEURL, PolicyProduct(PolicyId), PolicyAnchor(PolicyId)]
 )
 
-
+ 
 ###############################
 # Generic Reporting Functions #
 ###############################

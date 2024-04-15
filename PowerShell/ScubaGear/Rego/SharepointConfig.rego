@@ -15,13 +15,12 @@ import data.utils.key.PASS
 
 # Values in json for slider sharepoint/onedrive sharing settings
 ONLYPEOPLEINORG := 0
-ONLY_PEOPLE_IN_ORG := 0
-
 EXISTINGGUESTS := 3
+
+# Suggest renaming constants for readability
+ONLY_PEOPLE_IN_ORG := 0
 EXISTING_GUESTS := 3
-
 NEW_AND_EXISTING_GUESTS := 1
-
 ANYONE := 2
 
 
@@ -250,6 +249,20 @@ PolicyNotApplicable3_1 := true if {
     count(FilterArray(Conditions, true)) == 1
 }
 
+ErrStr := concat(" ", [
+    "External Sharing is set to",
+    SliderSettings(SharingCapability),
+    "and expiration date is not set to 30 days or less."
+])
+
+ExternalUserExpireInDays(tenant) := [concat(": ", [FAIL, ErrStr]), false] if {
+    tenant.RequireAnonymousLinksExpireInDays > 30
+}
+
+ExternalUserExpireInDays(tenant) := [PASS, true] if {
+    tenant.RequireAnonymousLinksExpireInDays <= 30
+}
+
 # Test for N/A case
 # This policy is only applicable if external sharing is set to "Anyone"
 tests contains {
@@ -269,7 +282,6 @@ tests contains {
         ]),
         "This policy is only applicable if External Sharing is set to Anyone. See %v for more info"
     ])
-
     PolicyNotApplicable3_1 == true
 }
 
@@ -277,16 +289,17 @@ tests contains {
     "PolicyId": "MS.SHAREPOINT.3.1v1",
     "Criticality": "Shall",
     "Commandlet": ["Get-SPOTenant"],
-    "ActualValue": [SharingCapability, tenant.RequireAnonymousLinksExpireInDays],
+    "ActualValue": [
+        SharingCapability, 
+        tenant.RequireAnonymousLinksExpireInDays
+    ],
     "ReportDetails": ReportDetailsString(Status, ErrMsg),
     "RequirementMet": Status
 } if {
     PolicyNotApplicable3_1 == false
     SharingCapability == ANYONE
-
     some tenant in input.SPO_tenant
-    Status := tenant.RequireAnonymousLinksExpireInDays <= 30
-    ErrMsg := "Anyone links expiration date is not set to 30 days or less"
+    [ErrMsg, Status] = ExternalUserExpireInDays(tenant)
 }
 #--
 
