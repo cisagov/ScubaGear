@@ -329,9 +329,7 @@ AuthenticationPolicyMigrationState := PolicyMigrationState if {
 }
 
 # Returns true if the tenant has completed their authpolicy migration
-AuthenticationPolicyMigrationIsComplete := Status if {
-    Status := AuthenticationPolicyMigrationState == "migrationComplete"
-}
+AuthenticationPolicyMigrationIsComplete := AuthenticationPolicyMigrationState == "migrationComplete"
 
 tests contains {
     "PolicyId": "MS.AAD.3.4v1",
