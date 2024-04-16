@@ -190,7 +190,7 @@ TestPlan:
   - PolicyId: MS.SHAREPOINT.3.1v1
     TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.SHAREPOINT.3.1v1 Non-compliant - SharingCapability = ExternalUserAndGuestSharing; RequireAnonymousLinksExpireInDays > 30
+      - TestDescription: MS.SHAREPOINT.3.1v1 Non-compliant - SharingCapability = ExternalUserAndGuestSharing (Anyone); RequireAnonymousLinksExpireInDays > 30
         Preconditions:
           - Command: Set-SPOTenant
             Splat:
@@ -199,7 +199,7 @@ TestPlan:
               SharingCapability: ExternalUserAndGuestSharing
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.SHAREPOINT.3.1v1 Compliant - SharingCapability = ExternalUserAndGuestSharing; RequireAnonymousLinksExpireInDays < 30
+      - TestDescription: MS.SHAREPOINT.3.1v1 Compliant - SharingCapability = ExternalUserAndGuestSharing (Anyone); RequireAnonymousLinksExpireInDays < 30
         Preconditions:
           - Command: Set-SPOTenant
             Splat:
@@ -208,7 +208,7 @@ TestPlan:
               SharingCapability: ExternalUserAndGuestSharing
         Postconditions: []
         ExpectedResult: true
-      - TestDescription: MS.SHAREPOINT.3.1v1 Compliant - SharingCapability = ExternalUserAndGuestSharing; RequireAnonymousLinksExpireInDays = 30
+      - TestDescription: MS.SHAREPOINT.3.1v1 Compliant - SharingCapability = ExternalUserAndGuestSharing (Anyone); RequireAnonymousLinksExpireInDays = 30
         Preconditions:
           - Command: Set-SPOTenant
             Splat:
@@ -217,28 +217,37 @@ TestPlan:
               SharingCapability: ExternalUserAndGuestSharing
         Postconditions: []
         ExpectedResult: true
-      - TestDescription: MS.SHAREPOINT.3.1v1 Compliant - SharingCapability = ExternalUserSharingOnly; RequireAnonymousLinksExpireInDays = 30
-        ToDo: Check if support anonymous access
+
+      - TestDescription: MS.SHAREPOINT.3.1v1 Non-Compliant - SharingCapability = ExternalUserSharingOnly (New and existing guests); RequireAnonymousLinksExpireInDays = 30
         Preconditions:
           - Command: Set-SPOTenant
             Splat:
+              RequireAnonymousLinksExpireInDays: 30
+              DefaultSharingLinkType: AnonymousAccess
               SharingCapability: ExternalUserSharingOnly
         Postconditions: []
-        ExpectedResult: true
-      - TestDescription: MS.SHAREPOINT.3.1v1 Compliant - SharingCapability = ExistingExternalUserSharingOnly
+        IsNotChecked: true
+        ExpectedResult: false
+      - TestDescription: MS.SHAREPOINT.3.1v1 Non-Compliant - SharingCapability = ExistingExternalUserSharingOnly (Existing guests); RequireAnonymousLinksExpireInDays = 30
         Preconditions:
           - Command: Set-SPOTenant
             Splat:
+              RequireAnonymousLinksExpireInDays: 30
+              DefaultSharingLinkType: AnonymousAccess
               SharingCapability: ExistingExternalUserSharingOnly
         Postconditions: []
-        ExpectedResult: true
-      - TestDescription: MS.SHAREPOINT.3.1v1 Compliant - SharingCapability = Disabled
+        IsNotChecked: true
+        ExpectedResult: false
+      - TestDescription: MS.SHAREPOINT.3.1v1 Non-Compliant - SharingCapability = Disabled (Only people in your organization); RequireAnonymousLinksExpireInDays = 30
         Preconditions:
           - Command: Set-SPOTenant
             Splat:
+              RequireAnonymousLinksExpireInDays: 30
+              DefaultSharingLinkType: AnonymousAccess
               SharingCapability: Disabled
         Postconditions: []
-        ExpectedResult: true
+        IsNotChecked: true
+        ExpectedResult: false
 
   - PolicyId: MS.SHAREPOINT.3.2v1
     TestDriver: RunScuba
