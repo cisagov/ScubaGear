@@ -83,13 +83,13 @@ If you receive a warning that _The required supporting PowerShell modules are no
 Initialize-SCuBA # Installs the minimum required dependencies
 ```
 
-> **IMPORTANT**: The `Install-OPA` cmdlet is called by default when running `Initialize-SCuBA`. 
+> **IMPORTANT**: The `Install-OPA` cmdlet is called by default when running `Initialize-SCuBA`.
 
 The `Install-OPA` cmdlet can also be run by itself to download the executable.
 In the event of an unsuccessful download, users can manually download the OPA executable with the following steps:
 
-1. Go to [OPA download site](https://www.openpolicyagent.org/docs/latest/#running-opa).
-2. Check the acceptable OPA version (Currently v0.61.0) for ScubaGear and select the corresponding version on top left of the website.
+1. Go to the [OPA download site](https://www.openpolicyagent.org/docs/latest/#running-opa).
+2. Look for the latest OPA version (Currently v0.63.0) for ScubaGear and select the corresponding version on top left of the website.
 3. Navigate to the menu on left side of the screen: Introduction - Running OPA - Download OPA
 4. Locate the downloaded file, add the file to your desired location (default is ~\\.scubagear\Tools), open PowerShell, and use the following command to check the downloaded OPA version:
 
@@ -99,7 +99,7 @@ In the event of an unsuccessful download, users can manually download the OPA ex
 
 ### Examples
 
-#### Example 1
+#### Example 1 <!-- omit in toc -->
 
 Run an assessment against all products (except PowerPlatform):
 
@@ -107,7 +107,7 @@ Run an assessment against all products (except PowerPlatform):
 Invoke-SCuBA
 ```
 
-#### Example 2
+#### Example 2 <!-- omit in toc -->
 
 Run an assessment against Azure Active Directory with custom report output location:
 
@@ -115,7 +115,7 @@ Run an assessment against Azure Active Directory with custom report output locat
 Invoke-SCuBA -ProductNames aad -OutPath C:\Users\johndoe\reports
 ```
 
-#### Example 3
+#### Example 3 <!-- omit in toc -->
 
 Run assessments against multiple products:
 
@@ -123,7 +123,7 @@ Run assessments against multiple products:
 Invoke-SCuBA -ProductNames aad, sharepoint, teams
 ```
 
-#### Example 4
+#### Example 4 <!-- omit in toc -->
 
 Run assessments non-interactively using an application service principal and authenticating via CertificateThumbprint:
 
