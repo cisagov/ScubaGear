@@ -108,12 +108,12 @@ function Export-AADProvider {
     $DirectorySettings = ConvertTo-Json -Depth 10 @($Tracker.TryCommand("Get-MgBetaDirectorySetting"))
 
     ##### This block of code below supports 3.3, 3.4, 3.5
-    $AuthenticationMethodPolicy = $Tracker.TryCommand("Get-MgBetaPolicyAuthenticationMethodPolicy")
+    $AuthenticationMethodPolicyRootObject = $Tracker.TryCommand("Get-MgBetaPolicyAuthenticationMethodPolicy")
 
-    $AuthenticationMethodFeatureSettings = @($AuthenticationMethodPolicy.AuthenticationMethodConfigurations | Where-Object { $_.Id})
+    $AuthenticationMethodFeatureSettings = @($AuthenticationMethodPolicyRootObject.AuthenticationMethodConfigurations | Where-Object { $_.Id})
 
     # Exclude the AuthenticationMethodConfigurations so we do not duplicate it in the JSON
-    $AuthenticationMethodPolicy = Get-MgBetaPolicyAuthenticationMethodPolicy | ForEach-Object {
+    $AuthenticationMethodPolicy = $AuthenticationMethodPolicyRootObject | ForEach-Object {
         $_ | Select-Object * -ExcludeProperty AuthenticationMethodConfigurations
     }
 
