@@ -18,11 +18,10 @@ ONLYPEOPLEINORG := 0
 EXISTINGGUESTS := 3
 
 # Suggest renaming constants for readability
-ONLY_PEOPLE_IN_ORG := 0
-EXISTING_GUESTS := 3
-NEW_AND_EXISTING_GUESTS := 1
-ANYONE := 2
-
+ONLY_PEOPLE_IN_ORG := 0      # "Disabled" in functional tests
+EXISTING_GUESTS := 3         # "ExistingExternalUserSharingOnly" in functional tests 
+NEW_AND_EXISTING_GUESTS := 1 # "ExternalUserSharingOnly" in functional tests 
+ANYONE := 2                  # "ExternalUserandGuestSharing" in functional tests 
 
 ###################
 # MS.SHAREPOINT.1 #
@@ -239,6 +238,7 @@ SharingCapability := Setting if {
     Setting := tenant.SharingCapability
 }
 
+# This policy is only applicable if external sharing is set to "Anyone"
 default PolicyNotApplicable3_1 := false
 PolicyNotApplicable3_1 := true if {
     Conditions := [
@@ -255,16 +255,17 @@ ErrStr := concat(" ", [
     "and expiration date is not set to 30 days or less."
 ])
 
-ExternalUserExpireInDays(tenant) := [concat(": ", [FAIL, ErrStr]), false] if {
+# Non-compliant case
+ExternalUserLinksExpireInDays(tenant) := [concat(": ", [FAIL, ErrStr]), false] if {
     tenant.RequireAnonymousLinksExpireInDays > 30
 }
 
-ExternalUserExpireInDays(tenant) := [PASS, true] if {
+# Policy is compliant if expiration days for Anyone links is set to 30 days or less
+ExternalUserLinksExpireInDays(tenant) := [PASS, true] if {
     tenant.RequireAnonymousLinksExpireInDays <= 30
 }
 
 # Test for N/A case
-# This policy is only applicable if external sharing is set to "Anyone"
 tests contains {
     "PolicyId": "MS.SHAREPOINT.3.1v1",
     "Criticality": "Shall/Not-Implemented",
@@ -285,6 +286,7 @@ tests contains {
     PolicyNotApplicable3_1 == true
 }
 
+# Standard test to compare against baseline
 tests contains {
     "PolicyId": "MS.SHAREPOINT.3.1v1",
     "Criticality": "Shall",
@@ -299,63 +301,10 @@ tests contains {
     PolicyNotApplicable3_1 == false
     SharingCapability == ANYONE
     some tenant in input.SPO_tenant
-    [ErrMsg, Status] = ExternalUserExpireInDays(tenant)
+    [ErrMsg, Status] = ExternalUserLinksExpireInDays(tenant)
 }
 #--
 
-# If SharingCapability is set to Only People In Organization
-# OR Existing Guests, the policy should pass.
-#ExternalUserExpireInDays(TenantPolicy) := ["", true] if {
-#    Conditions := [
-#        TenantPolicy.SharingCapability == ONLYPEOPLEINORG,
-#        TenantPolicy.SharingCapability == EXISTINGGUESTS
-#    ]
-#    count(FilterArray(Conditions, true)) == 1
-#}
-#
-## If SharingCapability is set to New and Existing Guests
-## OR Anyone, AND anonymous links are set to expire
-## in 30 days or less, the policy should pass, else fail.
-## The error message is concatanated by 2 steps to insert the
-## result of ReportBoolean in front, & the setting in the middle.
-#SHARINGCAPABILITY := "New and Existing Guests" if
-#    # regal ignore:prefer-some-in-iteration
-#    input.SPO_tenant[_].SharingCapability == NEWANDEXISTINGGUESTS
-#
-#SHARINGCAPABILITY := "Anyone" if
-#    # regal ignore:prefer-some-in-iteration
-#    input.SPO_tenant[_].SharingCapability == ANYONE
-#
-#ERRSTRING := concat(" ", [
-#    "External Sharing is set to",
-#    SHARINGCAPABILITY,
-#    "and expiration date is not 30 days or less"
-#    ])
-#
-#ExternalUserExpireInDays(TenantPolicy) := [concat(": ", [FAIL, ERRSTRING]), Status] if {
-#    Conditions := [
-#        TenantPolicy.SharingCapability == NEWANDEXISTINGGUESTS,
-#        TenantPolicy.SharingCapability == ANYONE
-#    ]
-#    count(FilterArray(Conditions, true)) > 0
-#    Status := TenantPolicy.RequireAnonymousLinksExpireInDays <= 30
-#}
-#
-#tests contains {
-#    "PolicyId": "MS.SHAREPOINT.3.1v1",
-#    "Criticality": "Shall",
-#    "Commandlet": ["Get-SPOTenant", "Get-PnPTenant"],
-#    "ActualValue": [
-#        TenantPolicy.SharingCapability,
-#        TenantPolicy.RequireAnonymousLinksExpireInDays
-#    ],
-#    "ReportDetails": ReportDetailsString(Status, ErrMsg),
-#    "RequirementMet": Status
-#} if {
-#    some TenantPolicy in input.SPO_tenant
-#    [ErrMsg, Status] := ExternalUserExpireInDays(TenantPolicy)
-#}
-#--
 
 #
 # MS.SHAREPOINT.3.2v1
