@@ -239,15 +239,9 @@ SharingCapability := Setting if {
 }
 
 # This policy is only applicable if external sharing is set to "Anyone"
-default PolicyNotApplicable3_1 := false
-PolicyNotApplicable3_1 := true if {
-    Conditions := [
-        SharingCapability == ONLY_PEOPLE_IN_ORG,
-        SharingCapability == EXISTING_GUESTS,
-        SharingCapability == NEW_AND_EXISTING_GUESTS
-    ]
-    count(FilterArray(Conditions, true)) == 1
-}
+PolicyNotApplicable_Group3(Conditions) := true if {
+    SharingCapability in Conditions
+} else := false
 
 ErrStr := concat(" ", [
     "External Sharing is set to",
@@ -283,7 +277,11 @@ tests contains {
         ]),
         "This policy is only applicable if External Sharing is set to Anyone. See %v for more info"
     ])
-    PolicyNotApplicable3_1 == true
+    PolicyNotApplicable_Group3([
+        ONLY_PEOPLE_IN_ORG, 
+        EXISTING_GUESTS, 
+        NEW_AND_EXISTING_GUESTS
+    ]) == true
 }
 
 # Standard test to compare against baseline
@@ -298,7 +296,11 @@ tests contains {
     "ReportDetails": ReportDetailsString(Status, ErrMsg),
     "RequirementMet": Status
 } if {
-    PolicyNotApplicable3_1 == false
+    PolicyNotApplicable_Group3([
+        ONLY_PEOPLE_IN_ORG, 
+        EXISTING_GUESTS, 
+        NEW_AND_EXISTING_GUESTS
+    ]) == false
     SharingCapability == ANYONE
     some tenant in input.SPO_tenant
     [ErrMsg, Status] = ExternalUserLinksExpireInDays(tenant)

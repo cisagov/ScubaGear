@@ -10,7 +10,7 @@ import data.utils.key.PASS
 #
 # Policy MS.SHAREPOINT.3.1v1
 #--
-test_SharingCapability_RequireAnonymousLinksExpireInDays_NotApplicable_V1 if {
+test_SharingCapability_LinkExpirationInvalid_NotApplicable_V1 if {
     # Test if the Sharepoint external sharing slider is set to "Only people in your organization".
     # The result must be N/A because the policy is not applicable unless external sharing is set to "Anyone".
     Output := sharepoint.tests with input as {
@@ -30,7 +30,7 @@ test_SharingCapability_RequireAnonymousLinksExpireInDays_NotApplicable_V1 if {
     TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailsString), false) == true
 }
 
-test_SharingCapability_RequireAnonymousLinksExpireInDays_NotApplicable_V2 if {
+test_SharingCapability_LinkExpirationInvalid_NotApplicable_V2 if {
     # Test if the Sharepoint external sharing slider is set to "Existing guests".
     # The result must be N/A because the policy is not applicable unless external sharing is set to "Anyone".
     Output := sharepoint.tests with input as {
@@ -50,7 +50,7 @@ test_SharingCapability_RequireAnonymousLinksExpireInDays_NotApplicable_V2 if {
     TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailsString), false) == true
 }
 
-test_SharingCapability_RequireAnonymousLinksExpireInDays_NotApplicable_V3 if {
+test_SharingCapability_LinkExpirationInvalid_NotApplicable_V3 if {
     # Test if the Sharepoint external sharing slider is set to "New and existing guests".
     # The result must be N/A because the policy is not applicable unless external sharing is set to "Anyone".
     Output := sharepoint.tests with input as {
@@ -70,7 +70,7 @@ test_SharingCapability_RequireAnonymousLinksExpireInDays_NotApplicable_V3 if {
     TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailsString), false) == true
 }
 
-test_SharingCapability_RequireAnonymousLinksExpireInDays_Correct_V4 if {
+test_SharingCapability_LinkExpirationValid_Correct_V4 if {
     # Test if the Sharepoint external sharing slider is set to "Anyone".
     # If true, then evaluate the value for expiration days.
     Output := sharepoint.tests with input as {
@@ -85,7 +85,7 @@ test_SharingCapability_RequireAnonymousLinksExpireInDays_Correct_V4 if {
     TestResult("MS.SHAREPOINT.3.1v1", Output, PASS, true) == true
 }
 
-test_SharingCapability_RequireAnonymousLinksExpireInDays_Correct_V5 if {
+test_SharingCapability_LinkExpirationValid_Correct_V5 if {
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
@@ -98,7 +98,7 @@ test_SharingCapability_RequireAnonymousLinksExpireInDays_Correct_V5 if {
     TestResult("MS.SHAREPOINT.3.1v1", Output, PASS, true) == true
 }
 
-test_SharingCapability_RequireAnonymousLinksExpireInDays_Incorrect_V6 if {
+test_SharingCapability_LinkExpirationInvalid_Incorrect_V6 if {
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
