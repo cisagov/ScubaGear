@@ -312,25 +312,50 @@ tests contains {
 # MS.SHAREPOINT.3.2v1
 #--
 
-# Create Repot Detatils string based on File link type & Folder link type
-PERMISSIONSTRING := "are not limited to view for Anyone"
+# Create Report Details string based on File link type & Folder link type
+PERMISSION_STRING := "are not limited to view for Anyone"
 
-FileAndFolderPermission(1, 1) := PASS
+FileAndFolderLinkPermission(1, 1) := PASS
 
-FileAndFolderPermission(2, 2) := concat(": ", [
-        FAIL,
-        concat(" ", ["both files and folders", PERMISSIONSTRING])
+FileAndFolderLinkPermission(2, 2) := concat(": ", [
+    FAIL,
+    concat(" ", ["both files and folders", PERMISSION_STRING])  
+])
+
+FileAndFolderLinkPermission(1, 2) := concat(": ", [
+    FAIL,
+    concat(" ", ["folders", PERMISSION_STRING])
+])
+
+FileAndFolderLinkPermission(2, 1) := concat(": ", [
+    FAIL,
+    concat(" ", ["files", PERMISSION_STRING])
+])
+
+# Test for N/A case
+tests contains {
+    "PolicyId": "MS.SHAREPOINT.3.2v1",
+    "Criticality": "Shall/Not-Implemented",
+    "Commandlet": ["Get-SPOTenant", "Get-PnPTenant"],
+    "ActualValue": [],
+    "ReportDetails": CheckedSkippedDetails(PolicyId, Reason),
+    "RequirementMet": false
+} if {
+    PolicyId := "MS.SHAREPOINT.3.2v1"
+    Reason := concat(" ", [
+        concat("", [
+            "External Sharing is set to ",
+            SliderSettings(SharingCapability),
+            "."
+        ]),
+        "This policy is only applicable if External Sharing is set to Anyone. See %v for more info"
     ])
-
-FileAndFolderPermission(1, 2) := concat(": ", [
-        FAIL,
-        concat(" ", ["folders", PERMISSIONSTRING])
-    ])
-
-FileAndFolderPermission(2, 1) := concat(": ", [
-        FAIL,
-        concat(" ", ["files", PERMISSIONSTRING])
-    ])
+    PolicyNotApplicable_Group3([
+        ONLY_PEOPLE_IN_ORG, 
+        EXISTING_GUESTS, 
+        NEW_AND_EXISTING_GUESTS
+    ]) == true
+}
 
 # Both link types must be 2 & OneDrive_PnP_Flag must be false for policy to pass
 tests contains {
@@ -338,9 +363,16 @@ tests contains {
     "Criticality": "Shall",
     "Commandlet": ["Get-SPOTenant", "Get-PnPTenant"],
     "ActualValue": [FileLinkType, FolderLinkType],
-    "ReportDetails": FileAndFolderPermission(FileLinkType, FolderLinkType),
+    "ReportDetails": FileAndFolderLinkPermission(FileLinkType, FolderLinkType),
     "RequirementMet": Status
 } if {
+    PolicyNotApplicable_Group3([
+        ONLY_PEOPLE_IN_ORG, 
+        EXISTING_GUESTS, 
+        NEW_AND_EXISTING_GUESTS
+    ]) == false
+    SharingCapability == ANYONE
+    
     some TenantPolicy in input.SPO_tenant
     FileLinkType := TenantPolicy.FileAnonymousLinkType
     FolderLinkType := TenantPolicy.FolderAnonymousLinkType
