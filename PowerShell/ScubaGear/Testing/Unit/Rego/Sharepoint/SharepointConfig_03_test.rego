@@ -124,7 +124,8 @@ test_File_Folder_AnonymousLinkType_Correct if {
         "SPO_tenant": [
             {
                 "FileAnonymousLinkType": 1,
-                "FolderAnonymousLinkType": 1
+                "FolderAnonymousLinkType": 1,
+                "SharingCapability": 2
             }
         ],
         "OneDrive_PnP_Flag": false
@@ -138,7 +139,8 @@ test_File_Folder_AnonymousLinkType_Incorrect if {
         "SPO_tenant": [
             {
                 "FileAnonymousLinkType": 2,
-                "FolderAnonymousLinkType": 2
+                "FolderAnonymousLinkType": 2,
+                "SharingCapability": 2
             }
         ],
         "OneDrive_PnP_Flag": false
@@ -153,7 +155,8 @@ test_Folder_AnonymousLinkType_Incorrect if {
         "SPO_tenant": [
             {
                 "FileAnonymousLinkType": 1,
-                "FolderAnonymousLinkType": 2
+                "FolderAnonymousLinkType": 2,
+                "SharingCapability": 2
             }
         ],
         "OneDrive_PnP_Flag": false
@@ -168,7 +171,8 @@ test_File_AnonymousLinkType_Incorrect if {
         "SPO_tenant": [
             {
                 "FileAnonymousLinkType": 2,
-                "FolderAnonymousLinkType": 1
+                "FolderAnonymousLinkType": 1,
+                "SharingCapability": 2
             }
         ],
         "OneDrive_PnP_Flag": false
@@ -257,11 +261,11 @@ test_File_Folder_AnonymousLinkType_SharingCapability_NewExistingGuests_NotApplic
 #
 # Policy MS.SHAREPOINT.3.3v1
 #--
-test_SharingCapability_Correct if {
+test_EmailAttestationReAuthDays_SharingCapability_ExistingGuests_Correct if {
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
-                "SharingCapability": 0,
+                "SharingCapability": 3,
                 "EmailAttestationRequired": true,
                 "EmailAttestationReAuthDays": 30
             }
@@ -271,11 +275,25 @@ test_SharingCapability_Correct if {
     TestResult("MS.SHAREPOINT.3.3v1", Output, PASS, true) == true
 }
 
-test_SharingCapability_Correct_V4 if {
+test_EmailAttestationReAuthDays_SharingCapability_NewExistingGuests_Correct if {
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
                 "SharingCapability": 1,
+                "EmailAttestationRequired": true,
+                "EmailAttestationReAuthDays": 30
+            }
+        ]
+    }
+
+    TestResult("MS.SHAREPOINT.3.3v1", Output, PASS, true) == true
+}
+
+test_EmailAttestationReAuthDays_SharingCapability_Anyone_Correct if {
+    Output := sharepoint.tests with input as {
+        "SPO_tenant": [
+            {
+                "SharingCapability": 2,
                 "EmailAttestationRequired": true,
                 "EmailAttestationReAuthDays": 30
             }
@@ -299,7 +317,7 @@ test_EmailAttestationReAuthDays_Correct if {
     TestResult("MS.SHAREPOINT.3.3v1", Output, PASS, true) == true
 }
 
-test_Multi_Incorrect_V1 if {
+test_EmailAttestationReAuthDays_Incorrect_V1 if {
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
@@ -316,22 +334,7 @@ test_Multi_Incorrect_V1 if {
     TestResult("MS.SHAREPOINT.3.3v1", Output, ReportDetailString, false) == true
 }
 
-test_EmailAttestationRequired_Incorrect_V2 if {
-    Output := sharepoint.tests with input as {
-        "SPO_tenant": [
-            {
-                "SharingCapability": 1,
-                "EmailAttestationRequired": false,
-                "EmailAttestationReAuthDays": 29
-            }
-        ]
-    }
-
-    ReportDetailString := "Requirement not met: Expiration timer for 'People who use a verification code' NOT enabled"
-    TestResult("MS.SHAREPOINT.3.3v1", Output, ReportDetailString, false) == true
-}
-
-test_EmailAttestationReAuthDays_Incorrect_V3 if {
+test_EmailAttestationReAuthDays_Incorrect_V2 if {
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
@@ -346,5 +349,39 @@ test_EmailAttestationReAuthDays_Incorrect_V3 if {
         "Requirement not met: Expiration timer for 'People who use a verification code' NOT set to 30 days"
 
     TestResult("MS.SHAREPOINT.3.3v1", Output, ReportDetailString, false) == true
+}
+
+test_EmailAttestationRequired_Incorrect if {
+    Output := sharepoint.tests with input as {
+        "SPO_tenant": [
+            {
+                "SharingCapability": 1,
+                "EmailAttestationRequired": false,
+                "EmailAttestationReAuthDays": 29
+            }
+        ]
+    }
+
+    ReportDetailString := "Requirement not met: Expiration timer for 'People who use a verification code' NOT enabled"
+    TestResult("MS.SHAREPOINT.3.3v1", Output, ReportDetailString, false) == true
+}
+
+test_EmailAttestationReAuthDays_SharingCapability_OnlyPeopleInOrg_NotApplicable if {
+    Output := sharepoint.tests with input as {
+        "SPO_tenant": [
+            {
+                "SharingCapability": 0,
+                "EmailAttestationRequired": true,
+                "EmailAttestationReAuthDays": 29
+            }
+        ]
+    }
+
+    PolicyId := "MS.SHAREPOINT.3.3v1"
+    ReportDetailsString := concat(" ", [
+        "External Sharing is set to Only people in your organization.",
+        "This policy is only applicable if External Sharing is set to Anyone, New and existing guests, or Existing guests. See %v for more info"
+    ])
+    TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailsString), false) == true
 }
 #--

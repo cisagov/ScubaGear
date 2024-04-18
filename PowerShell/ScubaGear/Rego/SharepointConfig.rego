@@ -241,7 +241,6 @@ SharingCapability := Setting if {
 # This policy is only applicable if external sharing is set to "Anyone"
 PolicyNotApplicable_Group3(Conditions) := true if {
     SharingCapability in Conditions
-    SharingCapability != ANYONE
 } else := false
 
 ErrStr := concat(" ", [
@@ -302,6 +301,7 @@ tests contains {
         EXISTING_GUESTS, 
         NEW_AND_EXISTING_GUESTS
     ]) == false
+    SharingCapability == ANYONE
 
     some tenant in input.SPO_tenant
     [ErrMsg, Status] = ExternalUserLinksExpireInDays(tenant)
@@ -372,7 +372,7 @@ tests contains {
         EXISTING_GUESTS, 
         NEW_AND_EXISTING_GUESTS
     ]) == false
-    
+    SharingCapability == ANYONE
 
     some TenantPolicy in input.SPO_tenant
     FileLinkType := TenantPolicy.FileAnonymousLinkType
@@ -402,45 +402,87 @@ tests contains {
 # MS.SHAREPOINT.3.3v1
 #--
 
-VERIFICATIONSTRING := "Expiration timer for 'People who use a verification code' NOT"
+VERIFICATION_STRING := "Expiration timer for 'People who use a verification code' NOT"
 
 # If Sharing set to Only People In Org, pass
-ExpirationTimersVerificationCode(TenantPolicy) := ["", true] if {
-    TenantPolicy.SharingCapability == ONLYPEOPLEINORG
-}
+#ExpirationTimersVerificationCode(TenantPolicy) := ["", true] if {
+#    TenantPolicy.SharingCapability == ONLYPEOPLEINORG
+#}
 
 # If Sharing NOT set to Only People In Org, reathentication enabled,
 # & reauth sent to <= 30 days, pass
-ExpirationTimersVerificationCode(TenantPolicy) := ["", true] if {
-    TenantPolicy.SharingCapability != ONLYPEOPLEINORG
-    TenantPolicy.EmailAttestationRequired == true
-    TenantPolicy.EmailAttestationReAuthDays <= 30
-}
+#ExpirationTimersVerificationCode(tenant) := [PASS, true] if {
+#    #TenantPolicy.SharingCapability != ONLYPEOPLEINORG
+#    tenant.EmailAttestationRequired == true
+#    tenant.EmailAttestationReAuthDays <= 30
+#}
 
 # If Sharing NOT set to Only People In Org & reathentication disbled,
 # fail
-ExpirationTimersVerificationCode(TenantPolicy) := [ErrMsg, false] if {
-    TenantPolicy.SharingCapability != ONLYPEOPLEINORG
-    TenantPolicy.EmailAttestationRequired == false
-    TenantPolicy.EmailAttestationReAuthDays <= 30
-    ErrMsg := concat(": ", [FAIL, concat(" ", [VERIFICATIONSTRING, "enabled"])])
-}
+#ExpirationTimersVerificationCode(tenant) := [ErrMsg, false] if {
+#    #TenantPolicy.SharingCapability != ONLYPEOPLEINORG
+#    tenant.EmailAttestationRequired == false
+#    tenant.EmailAttestationReAuthDays <= 30
+#    ErrMsg := concat(": ", [FAIL, concat(" ", [VERIFICATION_STRING, "enabled"])])
+#}
 
 # If Sharing NOT set to Only People In Org & reauth sent to > 30 days, fail
-ExpirationTimersVerificationCode(TenantPolicy) := [ErrMsg, false] if {
-    TenantPolicy.SharingCapability != ONLYPEOPLEINORG
-    TenantPolicy.EmailAttestationRequired == true
-    TenantPolicy.EmailAttestationReAuthDays > 30
-    ErrMsg := concat(": ", [FAIL, concat(" ", [VERIFICATIONSTRING, "set to 30 days"])])
-}
+#ExpirationTimersVerificationCode(tenant) := [ErrMsg, false] if {
+#    #TenantPolicy.SharingCapability != ONLYPEOPLEINORG
+#    tenant.EmailAttestationRequired == true
+#    tenant.EmailAttestationReAuthDays > 30
+#    ErrMsg := concat(": ", [FAIL, concat(" ", [VERIFICATION_STRING, "set to 30 days"])])
+#}
 
 # If Sharing NOT set to Only People In Org, reathentication disabled,
 # & reauth sent to > 30 days, fail
-ExpirationTimersVerificationCode(TenantPolicy) := [ErrMsg, false] if {
-    TenantPolicy.SharingCapability != ONLYPEOPLEINORG
-    TenantPolicy.EmailAttestationRequired == false
-    TenantPolicy.EmailAttestationReAuthDays > 30
-    ErrMsg := concat(": ", [FAIL, concat(" ", [VERIFICATIONSTRING, "enabled and set to >30 days"])])
+#ExpirationTimersVerificationCode(tenant) := [ErrMsg, false] if {
+#    #TenantPolicy.SharingCapability != ONLYPEOPLEINORG
+#    tenant.EmailAttestationRequired == false
+#    tenant.EmailAttestationReAuthDays > 30
+#    ErrMsg := concat(": ", [FAIL, concat(" ", [VERIFICATION_STRING, "enabled and set to >30 days"])])
+#}
+
+VerificationCodeReAuthExpiration(tenant) := [PASS, true] if {
+    tenant.EmailAttestationRequired == true
+    tenant.EmailAttestationReAuthDays <= 30
+} else := [ErrStr, false] if {
+    tenant.EmailAttestationRequired == false
+    tenant.EmailAttestationReAuthDays <= 30
+    ErrMsg := concat(": ", [FAIL, concat(" ", [VERIFICATION_STRING, "enabled"])])
+} else := [ErrStr, false] if {
+    tenant.EmailAttestationRequired == true
+    tenant.EmailAttestationReAuthDays > 30
+    ErrMsg := concat(": ", [FAIL, concat(" ", [VERIFICATION_STRING, "set to 30 days or less"])])
+} else := [ErrStr, false] if {
+    tenant.EmailAttestationRequired == false
+    tenant.EmailAttestationReAuthDays > 30
+    ErrMsg := concat(": ", [FAIL, concat(" ", [VERIFICATION_STRING, "enabled and set to 30 days or more"])])
+}
+
+# Test for N/A case
+tests contains {
+    "PolicyId": "MS.SHAREPOINT.3.3v1",
+    "Criticality": "Shall/Not-Implemented",
+    "Commandlet": ["Get-SPOTenant", "Get-PnPTenant"],
+    "ActualValue": [],
+    "ReportDetails": CheckedSkippedDetails(PolicyId, Reason),
+    "RequirementMet": false
+} if {
+    PolicyId := "MS.SHAREPOINT.3.3v1"
+    Reason := concat(" ", [
+        concat("", [
+            "External Sharing is set to ",
+            SliderSettings(SharingCapability),
+            "."
+        ]),
+        "This policy is only applicable if External Sharing is set to Anyone, New and existing guests, or Existing guests. See %v for more info"
+    ])
+    PolicyNotApplicable_Group3([
+        ONLY_PEOPLE_IN_ORG, 
+        EXISTING_GUESTS, 
+        NEW_AND_EXISTING_GUESTS
+    ]) == true
 }
 
 tests contains {
@@ -448,15 +490,21 @@ tests contains {
     "Criticality": "Shall",
     "Commandlet": ["Get-SPOTenant", "Get-PnPTenant"],
     "ActualValue": [
-        TenantPolicy.SharingCapability,
-        TenantPolicy.EmailAttestationRequired,
-        TenantPolicy.EmailAttestationReAuthDays
+        SharingCapability,
+        tenant.EmailAttestationRequired,
+        tenant.EmailAttestationReAuthDays
     ],
     "ReportDetails": ReportDetailsString(Status, ErrMsg),
     "RequirementMet": Status
 } if {
-    some TenantPolicy in input.SPO_tenant
-    [ErrMsg, Status] := ExpirationTimersVerificationCode(TenantPolicy)
+    PolicyNotApplicable_Group3([
+        ONLY_PEOPLE_IN_ORG, 
+        EXISTING_GUESTS
+    ]) == false
+    SharingCapability in [ANYONE, NEW_AND_EXISTING_GUESTS]
+
+    some tenant in input.SPO_tenant
+    [ErrMsg, Status] := VerificationCodeReAuthExpiration(tenant)
 }
 #--
 
