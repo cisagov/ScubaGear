@@ -402,47 +402,11 @@ tests contains {
 # MS.SHAREPOINT.3.3v1
 #--
 
-VERIFICATION_STRING := "Expiration timer for 'People who use a verification code' NOT"
+VERIFICATION_STRING := "Expiration time for 'People who use a verification code' NOT"
 
-# If Sharing set to Only People In Org, pass
-#ExpirationTimersVerificationCode(TenantPolicy) := ["", true] if {
-#    TenantPolicy.SharingCapability == ONLYPEOPLEINORG
-#}
-
-# If Sharing NOT set to Only People In Org, reathentication enabled,
-# & reauth sent to <= 30 days, pass
-#ExpirationTimersVerificationCode(tenant) := [PASS, true] if {
-#    #TenantPolicy.SharingCapability != ONLYPEOPLEINORG
-#    tenant.EmailAttestationRequired == true
-#    tenant.EmailAttestationReAuthDays <= 30
-#}
-
-# If Sharing NOT set to Only People In Org & reathentication disbled,
-# fail
-#ExpirationTimersVerificationCode(tenant) := [ErrMsg, false] if {
-#    #TenantPolicy.SharingCapability != ONLYPEOPLEINORG
-#    tenant.EmailAttestationRequired == false
-#    tenant.EmailAttestationReAuthDays <= 30
-#    ErrMsg := concat(": ", [FAIL, concat(" ", [VERIFICATION_STRING, "enabled"])])
-#}
-
-# If Sharing NOT set to Only People In Org & reauth sent to > 30 days, fail
-#ExpirationTimersVerificationCode(tenant) := [ErrMsg, false] if {
-#    #TenantPolicy.SharingCapability != ONLYPEOPLEINORG
-#    tenant.EmailAttestationRequired == true
-#    tenant.EmailAttestationReAuthDays > 30
-#    ErrMsg := concat(": ", [FAIL, concat(" ", [VERIFICATION_STRING, "set to 30 days"])])
-#}
-
-# If Sharing NOT set to Only People In Org, reathentication disabled,
-# & reauth sent to > 30 days, fail
-#ExpirationTimersVerificationCode(tenant) := [ErrMsg, false] if {
-#    #TenantPolicy.SharingCapability != ONLYPEOPLEINORG
-#    tenant.EmailAttestationRequired == false
-#    tenant.EmailAttestationReAuthDays > 30
-#    ErrMsg := concat(": ", [FAIL, concat(" ", [VERIFICATION_STRING, "enabled and set to >30 days"])])
-#}
-
+# PolicyNotApplicable_Group3 handles the correct SharingCapability setting.
+# This ruleset only checks if verification code reauthentication is enabled,
+# and if the verification time is valid (less than or equal to 30 days)
 VerificationCodeReAuthExpiration(tenant) := [PASS, true] if {
     tenant.EmailAttestationRequired == true
     tenant.EmailAttestationReAuthDays <= 30

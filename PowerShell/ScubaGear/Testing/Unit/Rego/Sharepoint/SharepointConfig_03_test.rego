@@ -328,10 +328,10 @@ test_EmailAttestationReAuthDays_Incorrect_V1 if {
         ]
     }
 
-    ReportDetailString :=
-        "Requirement not met: Expiration timer for 'People who use a verification code' NOT enabled and set to >30 days"
+    ReportDetailsString :=
+        "Requirement not met: Expiration time for 'People who use a verification code' NOT enabled and set to 30 days or more"
 
-    TestResult("MS.SHAREPOINT.3.3v1", Output, ReportDetailString, false) == true
+    TestResult("MS.SHAREPOINT.3.3v1", Output, ReportDetailsString, false) == true
 }
 
 test_EmailAttestationReAuthDays_Incorrect_V2 if {
@@ -346,7 +346,7 @@ test_EmailAttestationReAuthDays_Incorrect_V2 if {
     }
 
     ReportDetailString :=
-        "Requirement not met: Expiration timer for 'People who use a verification code' NOT set to 30 days"
+        "Requirement not met: Expiration time for 'People who use a verification code' NOT set to 30 days or less"
 
     TestResult("MS.SHAREPOINT.3.3v1", Output, ReportDetailString, false) == true
 }
@@ -362,7 +362,7 @@ test_EmailAttestationRequired_Incorrect if {
         ]
     }
 
-    ReportDetailString := "Requirement not met: Expiration timer for 'People who use a verification code' NOT enabled"
+    ReportDetailString := "Requirement not met: Expiration time for 'People who use a verification code' NOT enabled"
     TestResult("MS.SHAREPOINT.3.3v1", Output, ReportDetailString, false) == true
 }
 
