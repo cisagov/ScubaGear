@@ -449,15 +449,15 @@ VerificationCodeReAuthExpiration(tenant) := [PASS, true] if {
 } else := [ErrStr, false] if {
     tenant.EmailAttestationRequired == false
     tenant.EmailAttestationReAuthDays <= 30
-    ErrMsg := concat(": ", [FAIL, concat(" ", [VERIFICATION_STRING, "enabled"])])
+    ErrStr := concat(": ", [FAIL, concat(" ", [VERIFICATION_STRING, "enabled"])])
 } else := [ErrStr, false] if {
     tenant.EmailAttestationRequired == true
     tenant.EmailAttestationReAuthDays > 30
-    ErrMsg := concat(": ", [FAIL, concat(" ", [VERIFICATION_STRING, "set to 30 days or less"])])
+    ErrStr := concat(": ", [FAIL, concat(" ", [VERIFICATION_STRING, "set to 30 days or less"])])
 } else := [ErrStr, false] if {
     tenant.EmailAttestationRequired == false
     tenant.EmailAttestationReAuthDays > 30
-    ErrMsg := concat(": ", [FAIL, concat(" ", [VERIFICATION_STRING, "enabled and set to 30 days or more"])])
+    ErrStr := concat(": ", [FAIL, concat(" ", [VERIFICATION_STRING, "enabled and set to 30 days or more"])])
 }
 
 # Test for N/A case
@@ -478,11 +478,7 @@ tests contains {
         ]),
         "This policy is only applicable if External Sharing is set to Anyone, New and existing guests, or Existing guests. See %v for more info"
     ])
-    PolicyNotApplicable_Group3([
-        ONLY_PEOPLE_IN_ORG, 
-        EXISTING_GUESTS, 
-        NEW_AND_EXISTING_GUESTS
-    ]) == true
+    PolicyNotApplicable_Group3([ONLY_PEOPLE_IN_ORG]) == true
 }
 
 tests contains {
@@ -497,11 +493,8 @@ tests contains {
     "ReportDetails": ReportDetailsString(Status, ErrMsg),
     "RequirementMet": Status
 } if {
-    PolicyNotApplicable_Group3([
-        ONLY_PEOPLE_IN_ORG, 
-        EXISTING_GUESTS
-    ]) == false
-    SharingCapability in [ANYONE, NEW_AND_EXISTING_GUESTS]
+    PolicyNotApplicable_Group3([ONLY_PEOPLE_IN_ORG]) == false
+    SharingCapability in [ANYONE, NEW_AND_EXISTING_GUESTS, EXISTING_GUESTS]
 
     some tenant in input.SPO_tenant
     [ErrMsg, Status] := VerificationCodeReAuthExpiration(tenant)
