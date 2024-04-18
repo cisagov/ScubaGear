@@ -241,6 +241,7 @@ SharingCapability := Setting if {
 # This policy is only applicable if external sharing is set to "Anyone"
 PolicyNotApplicable_Group3(Conditions) := true if {
     SharingCapability in Conditions
+    SharingCapability != ANYONE
 } else := false
 
 ErrStr := concat(" ", [
@@ -301,7 +302,7 @@ tests contains {
         EXISTING_GUESTS, 
         NEW_AND_EXISTING_GUESTS
     ]) == false
-    SharingCapability == ANYONE
+
     some tenant in input.SPO_tenant
     [ErrMsg, Status] = ExternalUserLinksExpireInDays(tenant)
 }
@@ -371,8 +372,8 @@ tests contains {
         EXISTING_GUESTS, 
         NEW_AND_EXISTING_GUESTS
     ]) == false
-    SharingCapability == ANYONE
     
+
     some TenantPolicy in input.SPO_tenant
     FileLinkType := TenantPolicy.FileAnonymousLinkType
     FolderLinkType := TenantPolicy.FolderAnonymousLinkType
