@@ -23,6 +23,50 @@ EXISTING_GUESTS := 3         # "ExistingExternalUserSharingOnly" in functional t
 NEW_AND_EXISTING_GUESTS := 1 # "ExternalUserSharingOnly" in functional tests 
 ANYONE := 2                  # "ExternalUserandGuestSharing" in functional tests 
 
+######################################
+# External sharing support functions #
+######################################
+
+SliderSettings(Value) := "Only people in your organization" if {
+    Value == 0
+} else := "New and existing guests" if {
+    Value == 1
+} else := "Anyone" if {
+    Value == 2
+} else := "Existing guests" if {
+    Value == 3
+} else := Value
+
+SharingCapability := Setting if {
+    some tenant in input.SPO_tenant
+    Setting := tenant.SharingCapability
+}
+
+CheckSharingCapability(InvalidConditions) := true if {
+    SharingCapability in InvalidConditions
+} else := false
+
+
+PolicyNotApplicable_Group3(Conditions) := true if {
+    SharingCapability in Conditions
+} else := false
+
+# "This policy is only applicable if External Sharing is set to Anyone. See %v for more info"
+
+CheckPolicyNotApplicable(InvalidConditions, DetailStr) := [Reason, true] if {
+    Reason := concat(" ", [
+        concat("", [
+            "External Sharing is set to ",
+            SliderSettings(SharingCapability),
+            "."
+        ]),
+        DetailStr
+    ])
+
+    CheckSharingCapability(InvalidConditions) == true
+} else := false
+
+
 ###################
 # MS.SHAREPOINT.1 #
 ###################
@@ -223,26 +267,6 @@ tests contains {
 # MS.SHAREPOINT.3.1v1
 #--
 
-SliderSettings(Value) := "Only people in your organization" if {
-    Value == 0
-} else := "New and existing guests" if {
-    Value == 1
-} else := "Anyone" if {
-    Value == 2
-} else := "Existing guests" if {
-    Value == 3
-} else := Value
-
-SharingCapability := Setting if {
-    some tenant in input.SPO_tenant
-    Setting := tenant.SharingCapability
-}
-
-# This policy is only applicable if external sharing is set to "Anyone"
-PolicyNotApplicable_Group3(Conditions) := true if {
-    SharingCapability in Conditions
-} else := false
-
 ErrStr := concat(" ", [
     "External Sharing is set to",
     SliderSettings(SharingCapability),
@@ -269,22 +293,15 @@ tests contains {
     "RequirementMet": false
 } if {
     PolicyId := "MS.SHAREPOINT.3.1v1"
-    Reason := concat(" ", [
-        concat("", [
-            "External Sharing is set to ",
-            SliderSettings(SharingCapability),
-            "."
-        ]),
+    [Reason, Result] := CheckPolicyNotApplicable(
+        [ONLY_PEOPLE_IN_ORG, EXISTING_GUESTS, NEW_AND_EXISTING_GUESTS],
         "This policy is only applicable if External Sharing is set to Anyone. See %v for more info"
-    ])
-    PolicyNotApplicable_Group3([
-        ONLY_PEOPLE_IN_ORG, 
-        EXISTING_GUESTS, 
-        NEW_AND_EXISTING_GUESTS
-    ]) == true
+    )
+    Result == true
 }
 
 # Standard test to compare against baseline
+# This policy is only applicable if external sharing is set to "Anyone"
 tests contains {
     "PolicyId": "MS.SHAREPOINT.3.1v1",
     "Criticality": "Shall",
@@ -296,11 +313,7 @@ tests contains {
     "ReportDetails": ReportDetailsString(Status, ErrMsg),
     "RequirementMet": Status
 } if {
-    PolicyNotApplicable_Group3([
-        ONLY_PEOPLE_IN_ORG, 
-        EXISTING_GUESTS, 
-        NEW_AND_EXISTING_GUESTS
-    ]) == false
+    CheckPolicyNotApplicable([ONLY_PEOPLE_IN_ORG, EXISTING_GUESTS, NEW_AND_EXISTING_GUESTS], "") == false
     SharingCapability == ANYONE
 
     some tenant in input.SPO_tenant
@@ -343,21 +356,14 @@ tests contains {
     "RequirementMet": false
 } if {
     PolicyId := "MS.SHAREPOINT.3.2v1"
-    Reason := concat(" ", [
-        concat("", [
-            "External Sharing is set to ",
-            SliderSettings(SharingCapability),
-            "."
-        ]),
+    [Reason, Result] := CheckPolicyNotApplicable(
+        [ONLY_PEOPLE_IN_ORG, EXISTING_GUESTS, NEW_AND_EXISTING_GUESTS],
         "This policy is only applicable if External Sharing is set to Anyone. See %v for more info"
-    ])
-    PolicyNotApplicable_Group3([
-        ONLY_PEOPLE_IN_ORG, 
-        EXISTING_GUESTS, 
-        NEW_AND_EXISTING_GUESTS
-    ]) == true
+    )
+    Result == true
 }
 
+# This policy is only applicable if external sharing is set to "Anyone"
 # Both link types must be 2 & OneDrive_PnP_Flag must be false for policy to pass
 tests contains {
     "PolicyId": "MS.SHAREPOINT.3.2v1",
@@ -367,11 +373,7 @@ tests contains {
     "ReportDetails": FileAndFolderLinkPermission(FileLinkType, FolderLinkType),
     "RequirementMet": Status
 } if {
-    PolicyNotApplicable_Group3([
-        ONLY_PEOPLE_IN_ORG, 
-        EXISTING_GUESTS, 
-        NEW_AND_EXISTING_GUESTS
-    ]) == false
+    CheckPolicyNotApplicable([ONLY_PEOPLE_IN_ORG, EXISTING_GUESTS, NEW_AND_EXISTING_GUESTS], "") == false
     SharingCapability == ANYONE
 
     some TenantPolicy in input.SPO_tenant
@@ -422,7 +424,7 @@ VerificationCodeReAuthExpiration(tenant) := [PASS, true] if {
     tenant.EmailAttestationRequired == false
     tenant.EmailAttestationReAuthDays > 30
     ErrStr := concat(": ", [FAIL, concat(" ", [VERIFICATION_STRING, "enabled and set to 30 days or more"])])
-}
+} else := [FAIL, false]
 
 # Test for N/A case
 tests contains {
@@ -434,17 +436,15 @@ tests contains {
     "RequirementMet": false
 } if {
     PolicyId := "MS.SHAREPOINT.3.3v1"
-    Reason := concat(" ", [
-        concat("", [
-            "External Sharing is set to ",
-            SliderSettings(SharingCapability),
-            "."
-        ]),
+    [Reason, Result] := CheckPolicyNotApplicable(
+        [ONLY_PEOPLE_IN_ORG],
         "This policy is only applicable if External Sharing is set to Anyone, New and existing guests, or Existing guests. See %v for more info"
-    ])
-    PolicyNotApplicable_Group3([ONLY_PEOPLE_IN_ORG]) == true
+    )
+    Result == true
 }
 
+# This policy is only applicable if external sharing is set to "Anyone", 
+# "New and existing guests", or "Existing guests"
 tests contains {
     "PolicyId": "MS.SHAREPOINT.3.3v1",
     "Criticality": "Shall",
@@ -457,7 +457,7 @@ tests contains {
     "ReportDetails": ReportDetailsString(Status, ErrMsg),
     "RequirementMet": Status
 } if {
-    PolicyNotApplicable_Group3([ONLY_PEOPLE_IN_ORG]) == false
+    CheckPolicyNotApplicable([ONLY_PEOPLE_IN_ORG], "") == false
     SharingCapability in [ANYONE, NEW_AND_EXISTING_GUESTS, EXISTING_GUESTS]
 
     some tenant in input.SPO_tenant
