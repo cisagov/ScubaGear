@@ -253,9 +253,9 @@ TestPlan:
     TestDriver: RunScuba
     Tests:
       - TestDescription: MS.SHAREPOINT.3.2v1 Compliant FileAnonymousLinkType = View; FolderAnonymousLinkType = View
-        Preconditions: 
+        Preconditions:
           - Command: Set-SPOTenant
-            Splat: 
+            Splat:
               SharingCapability: ExternalUserAndGuestSharing
               FileAnonymousLinkType: View
               FolderAnonymousLinkType: View
