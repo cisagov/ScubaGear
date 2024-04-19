@@ -259,7 +259,6 @@ TestPlan:
               SharingCapability: ExternalUserAndGuestSharing
               FileAnonymousLinkType: View
               FolderAnonymousLinkType: View
-              DefaultSharingLinkType: AnonymousAccess
         Postconditions: []
         ExpectedResult: true
       - TestDescription: MS.SHAREPOINT.3.2v1 Non-compliant FileAnonymousLinkType = Edit; FolderAnonymousLinkType = Edit

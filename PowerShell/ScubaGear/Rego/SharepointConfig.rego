@@ -359,7 +359,7 @@ tests contains {
 }
 
 # This policy is only applicable if external sharing is set to "Anyone"
-# Both link types must be 2 & OneDrive_PnP_Flag must be false for policy to pass
+# Both link types must be 1 & OneDrive_PnP_Flag must be false for policy to pass
 tests contains {
     "PolicyId": "MS.SHAREPOINT.3.2v1",
     "Criticality": "Shall",
@@ -376,10 +376,10 @@ tests contains {
     FolderLinkType := TenantPolicy.FolderAnonymousLinkType
     input.OneDrive_PnP_Flag == false
     Conditions := [
-        FileLinkType == 2,
-        FolderLinkType == 2
+        FileLinkType == 1,
+        FolderLinkType == 1
     ]
-    Status := count(FilterArray(Conditions, true)) == 0
+    Status := count(FilterArray(Conditions, true)) == 2
 }
 
 tests contains {
