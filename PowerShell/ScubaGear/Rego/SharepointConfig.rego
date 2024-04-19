@@ -21,7 +21,7 @@ EXISTINGGUESTS := 3
 ONLY_PEOPLE_IN_ORG := 0      # "Disabled" in functional tests
 EXISTING_GUESTS := 3         # "ExistingExternalUserSharingOnly" in functional tests 
 NEW_AND_EXISTING_GUESTS := 1 # "ExternalUserSharingOnly" in functional tests 
-ANYONE := 2                  # "ExternalUserandGuestSharing" in functional tests 
+ANYONE := 2                  # "ExternalUserAndGuestSharing" in functional tests 
 
 ######################################
 # External sharing support functions #
@@ -44,11 +44,6 @@ SharingCapability := Setting if {
 
 CheckSharingCapability(InvalidConditions) := true if {
     SharingCapability in InvalidConditions
-} else := false
-
-
-PolicyNotApplicable_Group3(Conditions) := true if {
-    SharingCapability in Conditions
 } else := false
 
 # "This policy is only applicable if External Sharing is set to Anyone. See %v for more info"
@@ -396,6 +391,8 @@ tests contains {
     "RequirementMet": false
 } if {
     PolicyId := "MS.SHAREPOINT.3.2v1"
+    CheckPolicyNotApplicable([ONLY_PEOPLE_IN_ORG, EXISTING_GUESTS, NEW_AND_EXISTING_GUESTS], "") == false
+    SharingCapability == ANYONE
     input.OneDrive_PnP_Flag == true
 }
 #--
@@ -437,8 +434,8 @@ tests contains {
 } if {
     PolicyId := "MS.SHAREPOINT.3.3v1"
     [Reason, Result] := CheckPolicyNotApplicable(
-        [ONLY_PEOPLE_IN_ORG],
-        "This policy is only applicable if External Sharing is set to Anyone, New and existing guests, or Existing guests. See %v for more info"
+        [ONLY_PEOPLE_IN_ORG, EXISTING_GUESTS],
+        "This policy is only applicable if External Sharing is set to Anyone or New and existing guests. See %v for more info"
     )
     Result == true
 }
@@ -457,8 +454,8 @@ tests contains {
     "ReportDetails": ReportDetailsString(Status, ErrMsg),
     "RequirementMet": Status
 } if {
-    CheckPolicyNotApplicable([ONLY_PEOPLE_IN_ORG], "") == false
-    SharingCapability in [ANYONE, NEW_AND_EXISTING_GUESTS, EXISTING_GUESTS]
+    CheckPolicyNotApplicable([ONLY_PEOPLE_IN_ORG, EXISTING_GUESTS], "") == false
+    SharingCapability in [ANYONE, NEW_AND_EXISTING_GUESTS]
 
     some tenant in input.SPO_tenant
     [ErrMsg, Status] := VerificationCodeReAuthExpiration(tenant)

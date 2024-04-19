@@ -189,7 +189,8 @@ test_AnonymousLinkType_UsingServicePrincipal if {
         "SPO_tenant": [
             {
                 "FileAnonymousLinkType": 2,
-                "FolderAnonymousLinkType": 1
+                "FolderAnonymousLinkType": 1,
+                "SharingCapability": 2
             }
         ],
         "OneDrive_PnP_Flag": true
@@ -261,20 +262,6 @@ test_File_Folder_AnonymousLinkType_SharingCapability_NewExistingGuests_NotApplic
 #
 # Policy MS.SHAREPOINT.3.3v1
 #--
-test_EmailAttestationReAuthDays_SharingCapability_ExistingGuests_Correct if {
-    Output := sharepoint.tests with input as {
-        "SPO_tenant": [
-            {
-                "SharingCapability": 3,
-                "EmailAttestationRequired": true,
-                "EmailAttestationReAuthDays": 30
-            }
-        ]
-    }
-
-    TestResult("MS.SHAREPOINT.3.3v1", Output, PASS, true) == true
-}
-
 test_EmailAttestationReAuthDays_SharingCapability_NewExistingGuests_Correct if {
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
@@ -380,7 +367,26 @@ test_EmailAttestationReAuthDays_SharingCapability_OnlyPeopleInOrg_NotApplicable 
     PolicyId := "MS.SHAREPOINT.3.3v1"
     ReportDetailsString := concat(" ", [
         "External Sharing is set to Only people in your organization.",
-        "This policy is only applicable if External Sharing is set to Anyone, New and existing guests, or Existing guests. See %v for more info"
+        "This policy is only applicable if External Sharing is set to Anyone or New and existing guests. See %v for more info"
+    ])
+    TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailsString), false) == true
+}
+
+test_EmailAttestationReAuthDays_SharingCapability_ExistingGuests_NotApplicable if {
+    Output := sharepoint.tests with input as {
+        "SPO_tenant": [
+            {
+                "SharingCapability": 3,
+                "EmailAttestationRequired": true,
+                "EmailAttestationReAuthDays": 29
+            }
+        ]
+    }
+
+    PolicyId := "MS.SHAREPOINT.3.3v1"
+    ReportDetailsString := concat(" ", [
+        "External Sharing is set to Existing guests.",
+        "This policy is only applicable if External Sharing is set to Anyone or New and existing guests. See %v for more info"
     ])
     TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailsString), false) == true
 }
