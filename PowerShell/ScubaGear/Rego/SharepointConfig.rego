@@ -159,9 +159,24 @@ Domainlist(TenantPolicy) := concat(": ", [FAIL, NOTESTRING]) if {
     TenantPolicy.SharingDomainRestrictionMode != 1
 }
 
-# If SharingCapability is set to Only People In Organization
-# OR Sharing Domain Restriction Mode is enabled,
-# the policy should pass.
+# Test for N/A case
+tests contains {
+    "PolicyId": "MS.SHAREPOINT.1.3v1",
+    "Criticality": "Shall/Not-Implemented",
+    "Commandlet": ["Get-SPOTenant", "Get-PnPTenant"],
+    "ActualValue": [],
+    "ReportDetails": CheckedSkippedDetails(PolicyId, Reason),
+    "RequirementMet": false
+} if {
+    PolicyId := "MS.SHAREPOINT.1.3v1"
+    [Reason, Result] := CheckPolicyNotApplicable(
+        [ONLY_PEOPLE_IN_ORG],
+        "This policy is only applicable if External Sharing is set to any value other than Only People in your organization. See %v for more info"
+    )
+    Result == true
+}
+
+# If Sharing Domain Restriction Mode is enabled, the policy should pass.
 tests contains {
     "PolicyId": "MS.SHAREPOINT.1.3v1",
     "Criticality": "Shall",
@@ -173,11 +188,11 @@ tests contains {
     "ReportDetails": Domainlist(TenantPolicy),
     "RequirementMet": Status
 } if {
+    CheckPolicyNotApplicable([ONLY_PEOPLE_IN_ORG], "") == false
+    SharingCapability in [ANYONE, NEW_AND_EXISTING_GUESTS, EXISTING_GUESTS]
+
     some TenantPolicy in input.SPO_tenant
-    Conditions := [
-        TenantPolicy.SharingCapability == ONLYPEOPLEINORG,
-        TenantPolicy.SharingDomainRestrictionMode == 1
-    ]
+    Conditions := [TenantPolicy.SharingDomainRestrictionMode == 1]
     Status := count(FilterArray(Conditions, true)) == 1
 }
 #--
