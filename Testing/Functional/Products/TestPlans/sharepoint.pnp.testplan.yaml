@@ -233,7 +233,7 @@ TestPlan:
   - PolicyId: MS.SHAREPOINT.3.3v1
     TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.SHAREPOINT.3.3v1 Non-compliant - SharingCapability = ExistingExternalUserSharingOnly; EmailAttestationRequired = false; EmailAttestationReAuthDays = 30
+      - TestDescription: MS.SHAREPOINT.3.3v1 Non-Applicable - SharingCapability = ExistingExternalUserSharingOnly (Existing guests); EmailAttestationRequired = false; EmailAttestationReAuthDays = 30
         Preconditions:
           - Command: Set-PnPTenant
             Splat:
@@ -241,8 +241,9 @@ TestPlan:
               EmailAttestationRequired: false
               EmailAttestationReAuthDays: 30
         Postconditions: []
+        IsNotChecked: true
         ExpectedResult: false
-      - TestDescription: MS.SHAREPOINT.3.3v1 Non-compliant - SharingCapability = ExternalUserSharingOnly; EmailAttestationRequired = false; EmailAttestationReAuthDays = 30
+      - TestDescription: MS.SHAREPOINT.3.3v1 Non-compliant - SharingCapability = ExternalUserSharingOnly (New and existing guests); EmailAttestationRequired = false; EmailAttestationReAuthDays = 30
         Preconditions:
           - Command: Set-PnPTenant
             Splat:
@@ -251,7 +252,7 @@ TestPlan:
               EmailAttestationReAuthDays: 30
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.SHAREPOINT.3.3v1 Non-compliant - SharingCapability = ExternalUserAndGuestSharing; EmailAttestationRequired = false; EmailAttestationReAuthDays = 30
+      - TestDescription: MS.SHAREPOINT.3.3v1 Non-compliant - SharingCapability = ExternalUserAndGuestSharing (Anyone); EmailAttestationRequired = false; EmailAttestationReAuthDays = 30
         Preconditions:
           - Command: Set-PnPTenant
             Splat:
@@ -260,7 +261,7 @@ TestPlan:
               EmailAttestationReAuthDays: 30
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.SHAREPOINT.3.3v1 Non-compliant - SharingCapability = ExistingExternalUserSharingOnly; EmailAttestationRequired = true; EmailAttestationReAuthDays > 30
+      - TestDescription: MS.SHAREPOINT.3.3v1 Non-Applicable - SharingCapability = ExistingExternalUserSharingOnly (Existing guests); EmailAttestationRequired = true; EmailAttestationReAuthDays > 30
         Preconditions:
           - Command: Set-PnPTenant
             Splat:
@@ -268,8 +269,9 @@ TestPlan:
               EmailAttestationRequired: true
               EmailAttestationReAuthDays: 31
         Postconditions: []
+        IsNotChecked: true
         ExpectedResult: false
-      - TestDescription: MS.SHAREPOINT.3.3v1 Non-compliant - SharingCapability = ExternalUserSharingOnly; EmailAttestationRequired = true; EmailAttestationReAuthDays > 30
+      - TestDescription: MS.SHAREPOINT.3.3v1 Non-compliant - SharingCapability = ExternalUserSharingOnly (New and existing guests); EmailAttestationRequired = true; EmailAttestationReAuthDays > 30
         Preconditions:
           - Command: Set-PnPTenant
             Splat:
@@ -278,7 +280,7 @@ TestPlan:
               EmailAttestationReAuthDays: 31
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.SHAREPOINT.3.3v1 Non-compliant - SharingCapability = ExternalUserAndGuestSharing; EmailAttestationRequired = true; EmailAttestationReAuthDays > 30
+      - TestDescription: MS.SHAREPOINT.3.3v1 Non-compliant - SharingCapability = ExternalUserAndGuestSharing (Anyone); EmailAttestationRequired = true; EmailAttestationReAuthDays > 30
         Preconditions:
           - Command: Set-PnPTenant
             Splat:
@@ -287,7 +289,7 @@ TestPlan:
               EmailAttestationReAuthDays: 31
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.SHAREPOINT.3.3v1 Compliant - SharingCapability = ExistingExternalUserSharingOnly; EmailAttestationRequired = true; EmailAttestationReAuthDays = 30
+      - TestDescription: MS.SHAREPOINT.3.3v1 Non-Applicable - SharingCapability = ExistingExternalUserSharingOnly (Existing guests); EmailAttestationRequired = true; EmailAttestationReAuthDays = 30
         Preconditions:
           - Command: Set-PnPTenant
             Splat:
@@ -295,8 +297,9 @@ TestPlan:
               EmailAttestationRequired: true
               EmailAttestationReAuthDays: 30
         Postconditions: []
-        ExpectedResult: true
-      - TestDescription: MS.SHAREPOINT.3.3v1 Compliant - SharingCapability = ExternalUserSharingOnly; EmailAttestationRequired = true; EmailAttestationReAuthDays = 30
+        IsNotChecked: true
+        ExpectedResult: false
+      - TestDescription: MS.SHAREPOINT.3.3v1 Compliant - SharingCapability = ExternalUserSharingOnly (New and existing guests); EmailAttestationRequired = true; EmailAttestationReAuthDays = 30
         Preconditions:
           - Command: Set-PnPTenant
             Splat:
@@ -305,7 +308,7 @@ TestPlan:
               EmailAttestationReAuthDays: 30
         Postconditions: []
         ExpectedResult: true
-      - TestDescription: MS.SHAREPOINT.3.3v1 Compliant - SharingCapability = ExternalUserAndGuestSharing; EmailAttestationRequired = true; EmailAttestationReAuthDays = 30
+      - TestDescription: MS.SHAREPOINT.3.3v1 Compliant - SharingCapability = ExternalUserAndGuestSharing (Anyone); EmailAttestationRequired = true; EmailAttestationReAuthDays = 30
         Preconditions:
           - Command: Set-PnPTenant
             Splat:
@@ -314,13 +317,16 @@ TestPlan:
               EmailAttestationReAuthDays: 30
         Postconditions: []
         ExpectedResult: true
-      - TestDescription: MS.SHAREPOINT.3.3v1 Compliant - SharingCapability = Disabled
+      - TestDescription: MS.SHAREPOINT.3.3v1 Non-Applicable - SharingCapability = Disabled (Only people in organization)
         Preconditions:
           - Command: Set-PnPTenant
             Splat:
               SharingCapability: Disabled
+              EmailAttestationRequired: true
+              EmailAttestationReAuthDays: 29
         Postconditions: []
-        ExpectedResult: true
+        IsNotChecked: true
+        ExpectedResult: false
 
   - PolicyId: MS.SHAREPOINT.4.1v1
     TestDriver: RunScuba
