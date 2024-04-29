@@ -35,7 +35,7 @@ function Invoke-Rego {
         $Cmd = Join-Path -Path $OPAPath -ChildPath $OPAFileName  -ErrorAction 'Stop'
 
         # Set backup execution path to be current directory if ScubaTools path fails
-        if (-not (Test-Path $Cmd)) {
+        if (-not (Test-Path $Cmd -PathType Leaf)) {
             $Cmd = Join-Path -Path (Get-Location | Select-Object -ExpandProperty Path) -ChildPath $OPAFileName -ErrorAction 'Stop'
         }
 
