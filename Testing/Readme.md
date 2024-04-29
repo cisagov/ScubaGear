@@ -296,10 +296,16 @@ To resolve this, first kill any ChromeDriver.exe processes running by using the 
 Then execute the commands below to update the Selenium Chrome driver.
 
 ```
-import-module Selenium
-
 .\Testing\Functional\SmokeTest\UpdateSelenium.ps1
 ```
+Sometimes the UpdateSelenium script has a problem getting rid of an older chromedriver.exe even if you think you have killed any running processes named chromedriver.exe. You might receive the error "Cannot remove item. Access to the path ...\chromedriver.exe is denied" as in the screenshot above. In that case you should follow the steps below:
+
+- Open the path shown in the error message in Explorer (e.g. C:\Users\tkolovos\Documents\WindowsPowerShell\Modules\Selenium\3.0.1\assemblies)
+- Rename the file to chromedriver.exe.bak
+- Check the running processes in Task Manager for instances of a process named "chromedriver.exe.bak" and kill any that are shown
+- Delete the file chromedriver.exe.bak from the drive
+- Run the UpdateSelenium script again
+
 
 ### Service principal authentication issue ###
 
