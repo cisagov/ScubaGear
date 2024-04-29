@@ -2,1536 +2,631 @@ package aad_test
 import rego.v1
 import data.aad
 import data.utils.key.TestResult
+import data.test.assert
 
 
 #
 # Policy MS.AAD.1.1v1
 #--
 test_NoExclusionsConditions_Correct if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ]
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ],
-                        "ExcludeUsers": [],
-                        "ExcludeGroups": [],
-                        "ExcludeRoles": []
-                    },
-                    "ClientAppTypes": [
-                        "other",
-                        "exchangeActiveSync"
-                    ]
-                },
-                "GrantControls": {
-                    "BuiltInControls": [
-                        "block"
-                    ]
-                },
-                "State": "enabled",
-                "DisplayName": "Test block Legacy Authentication"
-            }
-        ]
-    }
+    Output := aad.tests with input as AADConfig
 
     ReportDetailStr := concat("", [
         "1 conditional access policy(s) found that meet(s) all requirements:",
         "<br/>Test block Legacy Authentication. <a href='#caps'>View all CA policies</a>."
     ])
 
-    TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, true) == true
+    TestOutput := TestResult("MS.AAD.1.1v1", Output, true)
+    TestOutput.Result == true
+    print("** Checking ReportDetails **")
+    assert.equals(ReportDetailStr, TestOutput.Test.ReportDetails)
 }
 
 test_NoExclusionsIncludeApplications_Incorrect if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "Office365"
-                        ]
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ],
-                        "ExcludeUsers": [],
-                        "ExcludeGroups": []
-                    },
-                    "ClientAppTypes": [
-                        "other",
-                        "exchangeActiveSync"
-                    ]
-                },
-                "GrantControls": {
-                    "BuiltInControls": [
-                        "block"
-                    ]
-                },
-                "State": "enabled",
-                "DisplayName": "Test block Legacy Authentication"
-            }
-        ]
-    }
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "Conditions/Applications/IncludeApplications",
+                "value": ["Office365"]}])
+
+    Output := aad.tests with input as AADConfig
+                        with input.conditional_access_policies as [CAP]
+
+
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, false) == true
+
+    TestOutput := TestResult("MS.AAD.1.1v1", Output, false)
+    TestOutput.Result == true
+    print("** Checking ReportDetails **")
+    assert.equals(ReportDetailStr, TestOutput.Test.ReportDetails)
 }
 
 test_NoExclusionsIncludeUsers_Incorrect if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ]
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"
-                        ],
-                        "ExcludeUsers": [],
-                        "ExcludeGroups": []
-                    },
-                    "ClientAppTypes": [
-                        "other",
-                        "exchangeActiveSync"
-                    ]
-                },
-                "GrantControls": {
-                    "BuiltInControls": [
-                        "block"
-                    ]
-                },
-                "State": "enabled",
-                "DisplayName": "Test block Legacy Authentication"
-            }
-        ]
-    }
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "Conditions/Users/IncludeUsers",
+                "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]}])
+
+    Output := aad.tests with input as AADConfig
+                        with input.conditional_access_policies as [CAP]
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, false) == true
+
+    TestOutput := TestResult("MS.AAD.1.1v1", Output, false)
+    TestOutput.Result == true
+    print("** Checking ReportDetails **")
+    assert.equals(ReportDetailStr, TestOutput.Test.ReportDetails)
 }
 
 test_NoExclusionsExcludeUsers_Incorrect if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ]
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ],
-                        "ExcludeUsers": [
-                            "49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"
-                        ],
-                        "ExcludeGroups": []
-                    },
-                    "ClientAppTypes": [
-                        "other",
-                        "exchangeActiveSync"
-                    ]
-                },
-                "GrantControls": {
-                    "BuiltInControls": [
-                        "block"
-                    ]
-                },
-                "State": "enabled",
-                "DisplayName": "Test block Legacy Authentication"
-            }
-        ]
-    }
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "Conditions/Users/ExcludeUsers",
+                "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]}])
+
+    Output := aad.tests with input as AADConfig
+                        with input.conditional_access_policies as [CAP]
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, false) == true
+
+    TestOutput := TestResult("MS.AAD.1.1v1", Output, false)
+    TestOutput.Result == true
+    print("** Checking ReportDetails **")
+    assert.equals(ReportDetailStr, TestOutput.Test.ReportDetails)
 }
 
 test_NoExclusionsExcludeGroups_Incorrect if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ]
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ],
-                        "ExcludeUsers": [],
-                        "ExcludeGroups": [
-                            "49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"
-                        ]
-                    },
-                    "ClientAppTypes": [
-                        "other",
-                        "exchangeActiveSync"
-                    ]
-                },
-                "GrantControls": {
-                    "BuiltInControls": [
-                        "block"
-                    ]
-                },
-                "State": "enabled",
-                "DisplayName": "Test block Legacy Authentication"
-            }
-        ]
-    }
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "Conditions/Users/ExcludeGroups",
+                "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]}])
+
+    Output := aad.tests with input as AADConfig
+                        with input.conditional_access_policies as [CAP]
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, false) == true
+
+    TestOutput := TestResult("MS.AAD.1.1v1", Output, false)
+    TestOutput.Result == true
+    print("** Checking ReportDetails **")
+    assert.equals(ReportDetailStr, TestOutput.Test.ReportDetails)
 }
 
 test_NoExclusionsClientAppTypes_Incorrect if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ]
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ],
-                        "ExcludeUsers": [],
-                        "ExcludeGroups": []
-                    },
-                    "ClientAppTypes": [
-                        ""
-                    ]
-                },
-                "GrantControls": {
-                    "BuiltInControls": [
-                        "block"
-                    ]
-                },
-                "State": "enabled",
-                "DisplayName": "Test block Legacy Authentication"
-            }
-        ]
-    }
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "Conditions/ClientAppTypes",
+                "value": [""]}])
+
+    Output := aad.tests with input as AADConfig
+                        with input.conditional_access_policies as [CAP]
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, false) == true
+
+    TestOutput := TestResult("MS.AAD.1.1v1", Output, false)
+    TestOutput.Result == true
+    print("** Checking ReportDetails **")
+    assert.equals(ReportDetailStr, TestOutput.Test.ReportDetails)
 }
 
 test_NoExclusionsBuiltInControls_Incorrect if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ]
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ],
-                        "ExcludeUsers": [],
-                        "ExcludeGroups": []
-                    },
-                    "ClientAppTypes": [
-                        "other",
-                        "exchangeActiveSync"
-                    ]
-                },
-                "GrantControls": {
-                    "BuiltInControls": null
-                },
-                "State": "enabled",
-                "DisplayName": "Test block Legacy Authentication"
-            }
-        ]
-    }
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "GrantControls/BuiltInControls",
+                "value": []}])
+
+    Output := aad.tests with input as AADConfig
+                        with input.conditional_access_policies as [CAP]
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, false) == true
+
+    TestOutput := TestResult("MS.AAD.1.1v1", Output, false)
+    TestOutput.Result == true
+    print("** Checking ReportDetails **")
+    assert.equals(ReportDetailStr, TestOutput.Test.ReportDetails)
 }
 
 test_NoExclusionsState_Incorrect if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ]
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ],
-                        "ExcludeUsers": [],
-                        "ExcludeGroups": []
-                    },
-                    "ClientAppTypes": [
-                        "other",
-                        "exchangeActiveSync"
-                    ]
-                },
-                "GrantControls": {
-                    "BuiltInControls": [
-                        "block"
-                    ]
-                },
-                "State": "disabled",
-                "DisplayName": "Test block Legacy Authentication"
-            }
-        ]
-    }
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "State",
+                "value": "disabled"}])
+
+    Output := aad.tests with input as AADConfig
+                        with input.conditional_access_policies as [CAP]
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, false) == true
+
+    TestOutput := TestResult("MS.AAD.1.1v1", Output, false)
+    TestOutput.Result == true
+    print("** Checking ReportDetails **")
+    assert.equals(ReportDetailStr, TestOutput.Test.ReportDetails)
 }
 
 # tests for user exclusions and no group exclusions
 test_NoExclusionsExemptUsers_Correct if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ]
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ],
-                        "ExcludeUsers": [],
-                        "ExcludeGroups": [],
-                        "ExcludeRoles": []
-                    },
-                    "ClientAppTypes": [
-                        "other",
-                        "exchangeActiveSync"
-                    ]
-                },
-                "GrantControls": {
-                    "BuiltInControls": [
-                        "block"
-                    ]
-                },
-                "State": "enabled",
-                "DisplayName": "Test block Legacy Authentication"
-            }
-        ],
-        "scuba_config": {
-            "Aad": {
-                "MS.AAD.1.1v1": {
-                    "CapExclusions": {
-                        "Users": [
-                            "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"
-                        ],
-                        "Groups": []
-                    }
-                }
-            }
-        }
-    }
+    Output := aad.tests with input as AADConfig
+                        with input.scuba_config as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.1.1v1"].CapExclusions.Users as ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]
 
     ReportDetailStr := concat("", [
         "1 conditional access policy(s) found that meet(s) all requirements:",
         "<br/>Test block Legacy Authentication. <a href='#caps'>View all CA policies</a>."
     ])
 
-    TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, true) == true
+    TestOutput := TestResult("MS.AAD.1.1v1", Output, true)
+    TestOutput.Result == true
+    print("** Checking ReportDetails **")
+    assert.equals(ReportDetailStr, TestOutput.Test.ReportDetails)
 }
 
 test_UserExclusionsConditions_Correct if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ]
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ],
-                        "ExcludeUsers": [
-                            "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"
-                        ],
-                        "ExcludeGroups": [],
-                        "ExcludeRoles": []
-                    },
-                    "ClientAppTypes": [
-                        "other",
-                        "exchangeActiveSync"
-                    ]
-                },
-                "GrantControls": {
-                    "BuiltInControls": [
-                        "block"
-                    ]
-                },
-                "State": "enabled",
-                "DisplayName": "Test block Legacy Authentication"
-            }
-        ],
-        "scuba_config": {
-            "Aad": {
-                "MS.AAD.1.1v1": {
-                    "CapExclusions": {
-                        "Users": [
-                            "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"
-                        ],
-                        "Groups": []
-                    }
-                }
-            }
-        }
-    }
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "Conditions/Users/ExcludeUsers",
+                "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]}])
+
+    Output := aad.tests with input as AADConfig
+                        with input.conditional_access_policies as [CAP]
+                        with input.scuba_config as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.1.1v1"].CapExclusions.Users as ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]
 
     ReportDetailStr := concat("", [
         "1 conditional access policy(s) found that meet(s) all requirements:",
         "<br/>Test block Legacy Authentication. <a href='#caps'>View all CA policies</a>."
     ])
 
-    TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, true) == true
+    TestOutput := TestResult("MS.AAD.1.1v1", Output, true)
+    TestOutput.Result == true
+    print("** Checking ReportDetails **")
+    assert.equals(ReportDetailStr, TestOutput.Test.ReportDetails)
 }
 
 test_MultiUserExclusionsConditions_Correct if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "Conditions/Users/ExcludeUsers",
+                "value": [
+                        "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3",
+                        "df269963-a081-4315-b7de-172755221504"
+                        ]}])
+
+    Output := aad.tests with input as AADConfig
+                        with input.conditional_access_policies as [CAP]
+                        with input.scuba_config as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.1.1v1"].CapExclusions.Users as [
+                            "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3",
+                            "df269963-a081-4315-b7de-172755221504"
                         ]
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ],
-                        "ExcludeUsers": [
-                            "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3",
-                            "df269963-a081-4315-b7de-172755221504"
-                        ],
-                        "ExcludeGroups": [],
-                        "ExcludeRoles": []
-                    },
-                    "ClientAppTypes": [
-                        "other",
-                        "exchangeActiveSync"
-                    ]
-                },
-                "GrantControls": {
-                    "BuiltInControls": [
-                        "block"
-                    ]
-                },
-                "State": "enabled",
-                "DisplayName": "Test block Legacy Authentication"
-            }
-        ],
-        "scuba_config": {
-            "Aad": {
-                "MS.AAD.1.1v1": {
-                    "CapExclusions": {
-                        "Users": [
-                            "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3",
-                            "df269963-a081-4315-b7de-172755221504"
-                        ],
-                        "Groups": []
-                    }
-                }
-            }
-        }
-    }
 
     ReportDetailStr := concat("", [
         "1 conditional access policy(s) found that meet(s) all requirements:",
         "<br/>Test block Legacy Authentication. <a href='#caps'>View all CA policies</a>."
     ])
 
-    TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, true) == true
+    TestOutput := TestResult("MS.AAD.1.1v1", Output, true)
+    TestOutput.Result == true
+    print("** Checking ReportDetails **")
+    assert.equals(ReportDetailStr, TestOutput.Test.ReportDetails)
 }
 
 test_UserExclusionNoExempt_Incorrect if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ]
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ],
-                        "ExcludeUsers": [
-                            "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"
-                        ],
-                        "ExcludeGroups": []
-                    },
-                    "ClientAppTypes": [
-                        "other",
-                        "exchangeActiveSync"
-                    ]
-                },
-                "GrantControls": {
-                    "BuiltInControls": [
-                        "block"
-                    ]
-                },
-                "State": "enabled",
-                "DisplayName": "Test block Legacy Authentication"
-            }
-        ]
-    }
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "Conditions/Users/ExcludeUsers",
+                "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]}])
+
+    Output := aad.tests with input as AADConfig
+                        with input.conditional_access_policies as [CAP]
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, false) == true
+
+    TestOutput := TestResult("MS.AAD.1.1v1", Output, false)
+    TestOutput.Result == true
+    print("** Checking ReportDetails **")
+    assert.equals(ReportDetailStr, TestOutput.Test.ReportDetails)
 }
 
 test_UserExclusionsSingleExempt_Incorrect if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ]
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ],
-                        "ExcludeUsers": [
-                            "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3",
-                            "df269963-a081-4315-b7de-172755221504"
-                        ],
-                        "ExcludeGroups": [],
-                        "ExcludeRoles": []
-                    },
-                    "ClientAppTypes": [
-                        "other",
-                        "exchangeActiveSync"
-                    ]
-                },
-                "GrantControls": {
-                    "BuiltInControls": [
-                        "block"
-                    ]
-                },
-                "State": "enabled",
-                "DisplayName": "Test block Legacy Authentication"
-            }
-        ],
-        "scuba_config": {
-            "Aad": {
-                "MS.AAD.1.1v1": {
-                    "CapExclusions": {
-                        "Users": [
-                            "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"
-                        ],
-                        "Groups": []
-                    }
-                }
-            }
-        }
-    }
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "Conditions/Users/ExcludeUsers",
+                "value": [
+                        "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3",
+                        "df269963-a081-4315-b7de-172755221504"
+                        ]}])
+
+    Output := aad.tests with input as AADConfig
+                        with input.conditional_access_policies as [CAP]
+                        with input.scuba_config as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.1.1v1"].CapExclusions.Users as ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, false) == true
+
+    TestOutput := TestResult("MS.AAD.1.1v1", Output, false)
+    TestOutput.Result == true
+    print("** Checking ReportDetails **")
+    assert.equals(ReportDetailStr, TestOutput.Test.ReportDetails)
 }
 
 test_UserExclusionsNoExempt_Incorrect if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ]
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ],
-                        "ExcludeUsers": [
-                            "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3",
-                            "df269963-a081-4315-b7de-172755221504"
-                        ],
-                        "ExcludeGroups": []
-                    },
-                    "ClientAppTypes": [
-                        "other",
-                        "exchangeActiveSync"
-                    ]
-                },
-                "GrantControls": {
-                    "BuiltInControls": [
-                        "block"
-                    ]
-                },
-                "State": "enabled",
-                "DisplayName": "Test block Legacy Authentication"
-            }
-        ],
-        "scuba_config": {
-            "Aad": {
-                "MS.AAD.1.1v1": {
-                    "CapExclusions": {
-                        "Users": [],
-                        "Groups": []
-                    }
-                }
-            }
-        }
-    }
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "Conditions/Users/ExcludeUsers",
+                "value": [
+                        "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3",
+                        "df269963-a081-4315-b7de-172755221504"
+                        ]}])
+
+    Output := aad.tests with input as AADConfig
+                        with input.conditional_access_policies as [CAP]
+                        with input.scuba_config as ScubaConfig
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, false) == true
+
+    TestOutput := TestResult("MS.AAD.1.1v1", Output, false)
+    TestOutput.Result == true
+    print("** Checking ReportDetails **")
+    assert.equals(ReportDetailStr, TestOutput.Test.ReportDetails)
 }
 
 test_UserExclusionsIncludeApplications_Incorrect if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "Office365"
-                        ]
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ],
-                        "ExcludeUsers": [
-                            "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"
-                        ],
-                        "ExcludeGroups": []
-                    },
-                    "ClientAppTypes": [
-                        "other",
-                        "exchangeActiveSync"
-                    ]
-                },
-                "GrantControls": {
-                    "BuiltInControls": [
-                        "block"
-                    ]
-                },
-                "State": "enabled",
-                "DisplayName": "Test block Legacy Authentication"
-            }
-        ],
-        "scuba_config": {
-            "Aad": {
-                "MS.AAD.1.1v1": {
-                    "CapExclusions": {
-                        "Users": [
-                            "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"
-                        ],
-                        "Groups": []
-                    }
-                }
-            }
-        }
-    }
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "Conditions/Applications/IncludeApplications",
+                "value": ["Office365"]},
+                {"op": "add", "path": "Conditions/Users/ExcludeUsers",
+                "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]}])
+
+    Output := aad.tests with input as AADConfig
+                        with input.conditional_access_policies as [CAP]
+                        with input.scuba_config as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.1.1v1"].CapExclusions.Users as ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, false) == true
+
+    TestOutput := TestResult("MS.AAD.1.1v1", Output, false)
+    TestOutput.Result == true
+    print("** Checking ReportDetails **")
+    assert.equals(ReportDetailStr, TestOutput.Test.ReportDetails)
 }
 
 test_UserExclusionsIncludeUsers_Incorrect if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ]
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"
-                        ],
-                        "ExcludeUsers": [
-                            "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"
-                        ],
-                        "ExcludeGroups": []
-                    },
-                    "ClientAppTypes": [
-                        "other",
-                        "exchangeActiveSync"
-                    ]
-                },
-                "GrantControls": {
-                    "BuiltInControls": [
-                        "block"
-                    ]
-                },
-                "State": "enabled",
-                "DisplayName": "Test block Legacy Authentication"
-            }
-        ],
-        "scuba_config": {
-            "Aad": {
-                "MS.AAD.1.1v1": {
-                    "CapExclusions": {
-                        "Users": [
-                            "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"
-                        ],
-                        "Groups": []
-                    }
-                }
-            }
-        }
-    }
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "Conditions/Users/IncludeUsers",
+                "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]},
+                {"op": "add", "path": "Conditions/Users/ExcludeUsers",
+                "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]}])
+
+    Output := aad.tests with input as AADConfig
+                        with input.conditional_access_policies as [CAP]
+                        with input.scuba_config as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.1.1v1"].CapExclusions.Users as ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, false) == true
+
+    TestOutput := TestResult("MS.AAD.1.1v1", Output, false)
+    TestOutput.Result == true
+    print("** Checking ReportDetails **")
+    assert.equals(ReportDetailStr, TestOutput.Test.ReportDetails)
 }
 
 test_UserExclusionsExcludeGroups_Incorrect if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ]
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ],
-                        "ExcludeUsers": [
-                            "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"
-                        ],
-                        "ExcludeGroups": [
-                            "49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"
-                        ]
-                    },
-                    "ClientAppTypes": [
-                        "other",
-                        "exchangeActiveSync"
-                    ]
-                },
-                "GrantControls": {
-                    "BuiltInControls": [
-                        "block"
-                    ]
-                },
-                "State": "enabled",
-                "DisplayName": "Test block Legacy Authentication"
-            }
-        ],
-        "scuba_config": {
-            "Aad": {
-                "MS.AAD.1.1v1": {
-                    "CapExclusions": {
-                        "Users": [
-                            "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"
-                        ],
-                        "Groups": []
-                    }
-                }
-            }
-        }
-    }
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "Conditions/Users/ExcludeUsers",
+                "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]},
+                {"op": "add", "path": "Conditions/Users/ExcludeGroups",
+                "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]}])
+
+    Output := aad.tests with input as AADConfig
+                        with input.conditional_access_policies as [CAP]
+                        with input.scuba_config as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.1.1v1"].CapExclusions.Users as ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, false) == true
+
+    TestOutput := TestResult("MS.AAD.1.1v1", Output, false)
+    TestOutput.Result == true
+    print("** Checking ReportDetails **")
+    assert.equals(ReportDetailStr, TestOutput.Test.ReportDetails)
 }
 
 test_UserExclusionsClientAppTypes_Incorrect if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ]
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ],
-                        "ExcludeUsers": [
-                            "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"
-                        ],
-                        "ExcludeGroups": []
-                    },
-                    "ClientAppTypes": [
-                        ""
-                    ]
-                },
-                "GrantControls": {
-                    "BuiltInControls": [
-                        "block"
-                    ]
-                },
-                "State": "enabled",
-                "DisplayName": "Test block Legacy Authentication"
-            }
-        ],
-        "scuba_config": {
-            "Aad": {
-                "MS.AAD.1.1v1": {
-                    "CapExclusions": {
-                        "Users": [
-                            "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"
-                        ],
-                        "Groups": []
-                    }
-                }
-            }
-        }
-    }
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "Conditions/Users/ExcludeUsers",
+                "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]},
+                {"op": "add", "path": "Conditions/ClientAppTypes",
+                "value": [""]}])
+
+    Output := aad.tests with input as AADConfig
+                        with input.conditional_access_policies as [CAP]
+                        with input.scuba_config as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.1.1v1"].CapExclusions.Users as ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, false) == true
+
+    TestOutput := TestResult("MS.AAD.1.1v1", Output, false)
+    TestOutput.Result == true
+    print("** Checking ReportDetails **")
+    assert.equals(ReportDetailStr, TestOutput.Test.ReportDetails)
 }
 
 test_UserExclusionsBuiltInControls_Incorrect if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ]
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ],
-                        "ExcludeUsers": [
-                            "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"
-                        ],
-                        "ExcludeGroups": []
-                    },
-                    "ClientAppTypes": [
-                        "other",
-                        "exchangeActiveSync"
-                    ]
-                },
-                "GrantControls": {
-                    "BuiltInControls": null
-                },
-                "State": "enabled",
-                "DisplayName": "Test block Legacy Authentication"
-            }
-        ],
-        "scuba_config": {
-            "Aad": {
-                "MS.AAD.1.1v1": {
-                    "CapExclusions": {
-                        "Users": [
-                            "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"
-                        ],
-                        "Groups": []
-                    }
-                }
-            }
-        }
-    }
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "Conditions/Users/ExcludeUsers",
+                "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]},
+                {"op": "add", "path": "GrantControls/BuiltInControls",
+                "value": []}])
+
+    Output := aad.tests with input as AADConfig
+                        with input.conditional_access_policies as [CAP]
+                        with input.scuba_config as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.1.1v1"].CapExclusions.Users as ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, false) == true
+
+    TestOutput := TestResult("MS.AAD.1.1v1", Output, false)
+    TestOutput.Result == true
+    print("** Checking ReportDetails **")
+    assert.equals(ReportDetailStr, TestOutput.Test.ReportDetails)
 }
 
 test_UserExclusionsState_Incorrect if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ]
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ],
-                        "ExcludeUsers": [
-                            "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"
-                        ],
-                        "ExcludeGroups": []
-                    },
-                    "ClientAppTypes": [
-                        "other",
-                        "exchangeActiveSync"
-                    ]
-                },
-                "GrantControls": {
-                    "BuiltInControls": [
-                        "block"
-                    ]
-                },
-                "State": "disabled",
-                "DisplayName": "Test block Legacy Authentication"
-            }
-        ],
-        "scuba_config": {
-            "Aad": {
-                "MS.AAD.1.1v1": {
-                    "CapExclusions": {
-                        "Users": [
-                            "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"
-                        ],
-                        "Groups": []
-                    }
-                }
-            }
-        }
-    }
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "Conditions/Users/ExcludeUsers",
+                "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]},
+                {"op": "add", "path": "State",
+                "value": "disabled"}])
+
+    Output := aad.tests with input as AADConfig
+                        with input.conditional_access_policies as [CAP]
+                        with input.scuba_config as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.1.1v1"].CapExclusions.Users as ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, false) == true
+
+    TestOutput := TestResult("MS.AAD.1.1v1", Output, false)
+    TestOutput.Result == true
+    print("** Checking ReportDetails **")
+    assert.equals(ReportDetailStr, TestOutput.Test.ReportDetails)
 }
 
 # tests for group exclusions and no user exclusions
 test_NoExclusionsExemptGroups_Correct if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ]
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ],
-                        "ExcludeUsers": [],
-                        "ExcludeGroups": [],
-                        "ExcludeRoles": []
-                    },
-                    "ClientAppTypes": [
-                        "other",
-                        "exchangeActiveSync"
-                    ]
-                },
-                "GrantControls": {
-                    "BuiltInControls": [
-                        "block"
-                    ]
-                },
-                "State": "enabled",
-                "DisplayName": "Test block Legacy Authentication"
-            }
-        ],
-        "scuba_config": {
-            "Aad": {
-                "MS.AAD.1.1v1": {
-                    "CapExclusions": {
-                        "Users": [],
-                        "Groups": [
-                            "49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"
-                        ]
-                    }
-                }
-            }
-        }
-    }
+    Output := aad.tests with input as AADConfig
+                        with input.scuba_config as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.1.1v1"].CapExclusions.Groups as ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]
 
     ReportDetailStr := concat("", [
         "1 conditional access policy(s) found that meet(s) all requirements:",
         "<br/>Test block Legacy Authentication. <a href='#caps'>View all CA policies</a>."
     ])
 
-    TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, true) == true
+    TestOutput := TestResult("MS.AAD.1.1v1", Output, true)
+    TestOutput.Result == true
+    print("** Checking ReportDetails **")
+    assert.equals(ReportDetailStr, TestOutput.Test.ReportDetails)
 }
 
 test_GroupExclusionNoExempt_Incorrect if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ]
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ],
-                        "ExcludeUsers": [],
-                        "ExcludeGroups": [
-                            "49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"
-                        ],
-                        "ExcludeRoles": []
-                    },
-                    "ClientAppTypes": [
-                        "other",
-                        "exchangeActiveSync"
-                    ]
-                },
-                "GrantControls": {
-                    "BuiltInControls": [
-                        "block"
-                    ]
-                },
-                "State": "enabled",
-                "DisplayName": "Test block Legacy Authentication"
-            }
-        ],
-        "scuba_config": {
-            "Aad": {
-                "MS.AAD.1.1v1": {
-                    "CapExclusions": {
-                        "Users": [],
-                        "Groups": []
-                    }
-                }
-            }
-        }
-    }
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "Conditions/Users/ExcludeGroups",
+                "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]}])
+
+    Output := aad.tests with input as AADConfig
+                        with input.conditional_access_policies as [CAP]
+                        with input.scuba_config as ScubaConfig
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, false) == true
+
+    TestOutput := TestResult("MS.AAD.1.1v1", Output, false)
+    TestOutput.Result == true
+    print("** Checking ReportDetails **")
+    assert.equals(ReportDetailStr, TestOutput.Test.ReportDetails)
 }
 
 test_GroupExclusionsNoExempt_Incorrect if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ]
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ],
-                        "ExcludeUsers": [],
-                        "ExcludeGroups": [
-                            "49b4dcdf-1f90-41a5-9dd7-5e7c3609b423",
-                            "65fea286-22d3-42f9-b4ca-93a6f75817d4"
-                        ]
-                    },
-                    "ClientAppTypes": [
-                        "other",
-                        "exchangeActiveSync"
-                    ]
-                },
-                "GrantControls": {
-                    "BuiltInControls": [
-                        "block"
-                    ]
-                },
-                "State": "enabled",
-                "DisplayName": "Test block Legacy Authentication"
-            }
-        ],
-        "scuba_config": {
-            "Aad": {
-                "MS.AAD.1.1v1": {
-                    "CapExclusions": {
-                        "Users": [],
-                        "Groups": []
-                    }
-                }
-            }
-        }
-    }
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "Conditions/Users/ExcludeGroups",
+                "value": [
+                        "49b4dcdf-1f90-41a5-9dd7-5e7c3609b423",
+                        "65fea286-22d3-42f9-b4ca-93a6f75817d4"
+                        ]}])
+
+    Output := aad.tests with input as AADConfig
+                        with input.conditional_access_policies as [CAP]
+                        with input.scuba_config as ScubaConfig
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, false) == true
+
+    TestOutput := TestResult("MS.AAD.1.1v1", Output, false)
+    TestOutput.Result == true
+    print("** Checking ReportDetails **")
+    assert.equals(ReportDetailStr, TestOutput.Test.ReportDetails)
 }
 
 test_GroupExclusionsSingleExempt_Incorrect if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ]
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ],
-                        "ExcludeUsers": [],
-                        "ExcludeGroups": [
-                            "49b4dcdf-1f90-41a5-9dd7-5e7c3609b423",
-                            "65fea286-22d3-42f9-b4ca-93a6f75817d4"
-                        ]
-                    },
-                    "ClientAppTypes": [
-                        "other",
-                        "exchangeActiveSync"
-                    ]
-                },
-                "GrantControls": {
-                    "BuiltInControls": [
-                        "block"
-                    ]
-                },
-                "State": "enabled",
-                "DisplayName": "Test block Legacy Authentication"
-            }
-        ],
-        "scuba_config": {
-            "Aad": {
-                "MS.AAD.1.1v1": {
-                    "CapExclusions": {
-                        "Users": [],
-                        "Groups": [
-                            "49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"
-                        ]
-                    }
-                }
-            }
-        }
-    }
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "Conditions/Users/ExcludeGroups",
+                "value": [
+                        "49b4dcdf-1f90-41a5-9dd7-5e7c3609b423",
+                        "65fea286-22d3-42f9-b4ca-93a6f75817d4"
+                        ]}])
+
+    Output := aad.tests with input as AADConfig
+                        with input.conditional_access_policies as [CAP]
+                        with input.scuba_config as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.1.1v1"].CapExclusions.Groups as ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, false) == true
+
+    TestOutput := TestResult("MS.AAD.1.1v1", Output, false)
+    TestOutput.Result == true
+    print("** Checking ReportDetails **")
+    assert.equals(ReportDetailStr, TestOutput.Test.ReportDetails)
 }
 
 test_GroupExclusionConditions_Correct if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ]
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ],
-                        "ExcludeUsers": [],
-                        "ExcludeGroups": [
-                            "49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"
-                        ],
-                        "ExcludeRoles": []
-                    },
-                    "ClientAppTypes": [
-                        "other",
-                        "exchangeActiveSync"
-                    ]
-                },
-                "GrantControls": {
-                    "BuiltInControls": [
-                        "block"
-                    ]
-                },
-                "State": "enabled",
-                "DisplayName": "Test block Legacy Authentication"
-            }
-        ],
-        "scuba_config": {
-            "Aad": {
-                "MS.AAD.1.1v1": {
-                    "CapExclusions": {
-                        "Users": [],
-                        "Groups": [
-                            "49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"
-                        ]
-                    }
-                }
-            }
-        }
-    }
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "Conditions/Users/ExcludeGroups",
+                "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]}])
+
+    Output := aad.tests with input as AADConfig
+                        with input.conditional_access_policies as [CAP]
+                        with input.scuba_config as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.1.1v1"].CapExclusions.Groups as ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]
 
     ReportDetailStr := concat("", [
         "1 conditional access policy(s) found that meet(s) all requirements:",
         "<br/>Test block Legacy Authentication. <a href='#caps'>View all CA policies</a>."
     ])
 
-    TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, true) == true
+    TestOutput := TestResult("MS.AAD.1.1v1", Output, true)
+    TestOutput.Result == true
+    print("** Checking ReportDetails **")
+    assert.equals(ReportDetailStr, TestOutput.Test.ReportDetails)
 }
 
 test_MultiGroupExclusionsConditions_Correct if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ]
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ],
-                        "ExcludeUsers": [],
-                        "ExcludeGroups": [
-                            "49b4dcdf-1f90-41a5-9dd7-5e7c3609b423",
-                            "65fea286-22d3-42f9-b4ca-93a6f75817d4"
-                        ],
-                        "ExcludeRoles": []
-                    },
-                    "ClientAppTypes": [
-                        "other",
-                        "exchangeActiveSync"
-                    ]
-                },
-                "GrantControls": {
-                    "BuiltInControls": [
-                        "block"
-                    ]
-                },
-                "State": "enabled",
-                "DisplayName": "Test block Legacy Authentication"
-            }
-        ],
-        "scuba_config": {
-            "Aad": {
-                "MS.AAD.1.1v1": {
-                    "CapExclusions": {
-                        "Users": [],
-                        "Groups": [
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "Conditions/Users/ExcludeGroups",
+                "value": [
+                        "49b4dcdf-1f90-41a5-9dd7-5e7c3609b423",
+                        "65fea286-22d3-42f9-b4ca-93a6f75817d4"
+                        ]}])
+
+    Output := aad.tests with input as AADConfig
+                        with input.conditional_access_policies as [CAP]
+                        with input.scuba_config as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.1.1v1"].CapExclusions.Groups as [
                             "49b4dcdf-1f90-41a5-9dd7-5e7c3609b423",
                             "65fea286-22d3-42f9-b4ca-93a6f75817d4"
                         ]
-                    }
-                }
-            }
-        }
-    }
 
     ReportDetailStr := concat("", [
         "1 conditional access policy(s) found that meet(s) all requirements:",
         "<br/>Test block Legacy Authentication. <a href='#caps'>View all CA policies</a>."
     ])
 
-    TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, true) == true
+    TestOutput := TestResult("MS.AAD.1.1v1", Output, true)
+    TestOutput.Result == true
+    print("** Checking ReportDetails **")
+    assert.equals(ReportDetailStr, TestOutput.Test.ReportDetails)
 }
 
 # tests when both group and user exclusions present
 test_UserGroupExclusionConditions_Correct if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ]
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ],
-                        "ExcludeUsers": [
-                            "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"
-                        ],
-                        "ExcludeGroups": [
-                            "49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"
-                        ],
-                        "ExcludeRoles": []
-                    },
-                    "ClientAppTypes": [
-                        "other",
-                        "exchangeActiveSync"
-                    ]
-                },
-                "GrantControls": {
-                    "BuiltInControls": [
-                        "block"
-                    ]
-                },
-                "State": "enabled",
-                "DisplayName": "Test block Legacy Authentication"
-            }
-        ],
-        "scuba_config": {
-            "Aad": {
-                "MS.AAD.1.1v1": {
-                    "CapExclusions": {
-                        "Users": [
-                            "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"
-                        ],
-                        "Groups": [
-                            "49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"
-                        ]
-                    }
-                }
-            }
-        }
-    }
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "Conditions/Users/ExcludeUsers",
+                "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]},
+                {"op": "add", "path": "Conditions/Users/ExcludeGroups",
+                "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]}])
+
+    Output := aad.tests with input as AADConfig
+                        with input.conditional_access_policies as [CAP]
+                        with input.scuba_config as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.1.1v1"].CapExclusions.Groups as ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]
+                        with input.scuba_config.Aad["MS.AAD.1.1v1"].CapExclusions.Users as ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]
 
     ReportDetailStr := concat("", [
         "1 conditional access policy(s) found that meet(s) all requirements:",
         "<br/>Test block Legacy Authentication. <a href='#caps'>View all CA policies</a>."
     ])
 
-    TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, true) == true
+    TestOutput := TestResult("MS.AAD.1.1v1", Output, true)
+    TestOutput.Result == true
+    print("** Checking ReportDetails **")
+    assert.equals(ReportDetailStr, TestOutput.Test.ReportDetails)
 }
 
 test_UserGroupExclusionNoExempt_Incorrect if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ]
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ],
-                        "ExcludeUsers": [
-                            "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"
-                        ],
-                        "ExcludeGroups": [
-                            "49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"
-                        ],
-                        "ExcludeRoles": []
-                    },
-                    "ClientAppTypes": [
-                        "other",
-                        "exchangeActiveSync"
-                    ]
-                },
-                "GrantControls": {
-                    "BuiltInControls": [
-                        "block"
-                    ]
-                },
-                "State": "enabled",
-                "DisplayName": "Test block Legacy Authentication"
-            }
-        ]
-    }
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "Conditions/Users/ExcludeUsers",
+                "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]},
+                {"op": "add", "path": "Conditions/Users/ExcludeGroups",
+                "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]}])
+
+    Output := aad.tests with input as AADConfig
+                        with input.conditional_access_policies as [CAP]
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, false) == true
+
+    TestOutput := TestResult("MS.AAD.1.1v1", Output, false)
+    TestOutput.Result == true
+    print("** Checking ReportDetails **")
+    assert.equals(ReportDetailStr, TestOutput.Test.ReportDetails)
 }
 
 test_UserGroupExclusionUserExemptOnly_Incorrect if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ]
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ],
-                        "ExcludeUsers": [
-                            "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"
-                        ],
-                        "ExcludeGroups": [
-                            "49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"
-                        ],
-                        "ExcludeRoles": []
-                    },
-                    "ClientAppTypes": [
-                        "other",
-                        "exchangeActiveSync"
-                    ]
-                },
-                "GrantControls": {
-                    "BuiltInControls": [
-                        "block"
-                    ]
-                },
-                "State": "enabled",
-                "DisplayName": "Test block Legacy Authentication"
-            }
-        ],
-        "scuba_config": {
-            "Aad": {
-                "MS.AAD.1.1v1": {
-                    "CapExclusions": {
-                        "Users": [
-                            "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"
-                        ],
-                        "Groups": []
-                    }
-                }
-            }
-        }
-    }
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "Conditions/Users/ExcludeUsers",
+                "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]},
+                {"op": "add", "path": "Conditions/Users/ExcludeGroups",
+                "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]}])
+
+    Output := aad.tests with input as AADConfig
+                        with input.conditional_access_policies as [CAP]
+                        with input.scuba_config as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.1.1v1"].CapExclusions.Users as ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, false) == true
+
+    TestOutput := TestResult("MS.AAD.1.1v1", Output, false)
+    TestOutput.Result == true
+    print("** Checking ReportDetails **")
+    assert.equals(ReportDetailStr, TestOutput.Test.ReportDetails)
 }
 
 test_UserGroupExclusionGroupExemptOnly_Incorrect if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ]
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ],
-                        "ExcludeUsers": [
-                            "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"
-                        ],
-                        "ExcludeGroups": [
-                            "49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"
-                        ],
-                        "ExcludeRoles": []
-                    },
-                    "ClientAppTypes": [
-                        "other",
-                        "exchangeActiveSync"
-                    ]
-                },
-                "GrantControls": {
-                    "BuiltInControls": [
-                        "block"
-                    ]
-                },
-                "State": "enabled",
-                "DisplayName": "Test block Legacy Authentication"
-            }
-        ],
-        "scuba_config": {
-            "Aad": {
-                "MS.AAD.1.1v1": {
-                    "CapExclusions": {
-                        "Users": [],
-                        "Groups": [
-                            "49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"
-                        ]
-                    }
-                }
-            }
-        }
-    }
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "Conditions/Users/ExcludeUsers",
+                "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]},
+                {"op": "add", "path": "Conditions/Users/ExcludeGroups",
+                "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]}])
+
+    Output := aad.tests with input as AADConfig
+                        with input.conditional_access_policies as [CAP]
+                        with input.scuba_config as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.1.1v1"].CapExclusions.Groups as ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, false) == true
+
+    TestOutput := TestResult("MS.AAD.1.1v1", Output, false)
+    TestOutput.Result == true
+    print("** Checking ReportDetails **")
+    assert.equals(ReportDetailStr, TestOutput.Test.ReportDetails)
 }
 
 test_UserGroupExclusionTooFewUserExempts_Incorrect if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ]
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ],
-                        "ExcludeUsers": [
-                            "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3",
-                            "df269963-a081-4315-b7de-172755221504"
-                        ],
-                        "ExcludeGroups": [
-                            "49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"
-                        ],
-                        "ExcludeRoles": []
-                    },
-                    "ClientAppTypes": [
-                        "other",
-                        "exchangeActiveSync"
-                    ]
-                },
-                "GrantControls": {
-                    "BuiltInControls": [
-                        "block"
-                    ]
-                },
-                "State": "enabled",
-                "DisplayName": "Test block Legacy Authentication"
-            }
-        ],
-        "scuba_config": {
-            "Aad": {
-                "MS.AAD.1.1v1": {
-                    "CapExclusions": {
-                        "Users": [
-                            "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"
-                        ],
-                        "Groups": []
-                    }
-                }
-            }
-        }
-    }
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "Conditions/Users/ExcludeUsers",
+                "value": [
+                        "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3",
+                        "df269963-a081-4315-b7de-172755221504"
+                        ]},
+                {"op": "add", "path": "Conditions/Users/ExcludeGroups",
+                "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]}])
+
+    Output := aad.tests with input as AADConfig
+                        with input.conditional_access_policies as [CAP]
+                        with input.scuba_config as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.1.1v1"].CapExclusions.Users as ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, false) == true
+
+    TestOutput := TestResult("MS.AAD.1.1v1", Output, false)
+    TestOutput.Result == true
+    print("** Checking ReportDetails **")
+    assert.equals(ReportDetailStr, TestOutput.Test.ReportDetails)
 }
 #--
