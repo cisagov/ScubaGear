@@ -64,6 +64,7 @@ if ($RunAsInstalled){
 }
 
 $RegoUnitTestPath = Join-Path -Path $RootPath -ChildPath "Testing\Unit\Rego"
+$UtilFilename = Get-ChildItem $RegoUnitTestPath | Where-Object {$_.Name -like "TestAssertions*" }
 $RegoPolicyPath = Join-Path -Path $RootPath -ChildPath "Rego"
 
 function Get-ErrorMsg {
@@ -149,6 +150,8 @@ function Invoke-ControlGroupItem {
             $ControlGroup = $Result[1]
             $Filename = Get-ChildItem $(Join-Path -Path $RegoUnitTestPath -ChildPath $Product) |
             Where-Object {$_.Name -like "*$ControlGroup*" }
+            $ConfigFilename = Get-ChildItem $(Join-Path -Path $RegoUnitTestPath -ChildPath $Product) |
+            Where-Object {$_.Name -like "*BaseConfig*" }
 
             if ($null -eq $Filename){
                 Write-Warning "`nNOT FOUND: Control Group $c does not exist in the $Product directory"
@@ -156,7 +159,7 @@ function Invoke-ControlGroupItem {
 
             elseif(Test-Path -Path $Filename.Fullname -PathType Leaf) {
                 Write-Output "`nTesting Control Group $ControlGroup"
-                & $OPAExe test $RegoPolicyPath .\$($Filename.Fullname) $Flag
+                & $OPAExe test $RegoPolicyPath .\$($Filename.Fullname) .\$($ConfigFilename.Fullname) .\$($UtilFilename.Fullname) $Flag
             }
             else {
                 Get-ErrorMsg FileIOError, $Filename
@@ -185,6 +188,8 @@ function Invoke-TestName {
         $ControlGroup = $Result[1]
         $Filename = Get-ChildItem $(Join-Path -Path $RegoUnitTestPath -ChildPath $Product) |
         Where-Object {$_.Name -like "*$ControlGroup*" }
+        $ConfigFilename = Get-ChildItem $(Join-Path -Path $RegoUnitTestPath -ChildPath $Product) |
+            Where-Object {$_.Name -like "*BaseConfig*" }
 
         if(Test-Path -Path $Filename.Fullname -PathType Leaf) {
             Write-Output "`n==== Testing $Product Control Group $ControlGroup ===="
@@ -194,7 +199,7 @@ function Invoke-TestName {
 
                 if ($Match){
                     Write-Output "`nTesting $Test"
-                    & $OPAExe test $RegoPolicyPath .\$($Filename.Fullname) -r $Test $Flag
+                    & $OPAExe test $RegoPolicyPath .\$($Filename.Fullname) .\$($ConfigFilename.Fullname) .\$($UtilFilename.Fullname) -r $Test $Flag
                 }
                 else{
                     Write-Warning "`nNOT FOUND: $Test in $Filename"

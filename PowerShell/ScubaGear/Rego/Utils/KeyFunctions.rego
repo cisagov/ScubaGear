@@ -1,6 +1,7 @@
 package utils.key
 import rego.v1
 import data.utils.report.ReportDetailsBoolean
+import data.test.assert
 
 
 #############
@@ -56,21 +57,25 @@ ConvertToSetWithKey(Items, Key) := NewSet if {
 ###########
 
 # Basic test that has anticipated string for Report Details
-TestResult(PolicyId, Output, ReportDetailString, RequirementMet) := true if {
+TestResult(PolicyId, Output, RequirementMet) := {"Result": true, "Test": RuleOutput[0]}  if {
     RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == RequirementMet
-    RuleOutput[0].ReportDetails == ReportDetailString
-} else := false
+
+    print("** Checking if only one test result **")
+    assert.not_empty(RuleOutput)
+    assert.equals(1, count(RuleOutput))
+    print("** Checking RequirementMet **")
+    assert.equals(RequirementMet, RuleOutput[0].RequirementMet)
+} else := [false, set()]
 
 # Test that has multiple strings with an unknown order for Report Details
 TestResultContains(PolicyId, Output, ReportDetailArrayStrings, RequirementMet) := true if {
     RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
-    count(RuleOutput) == 1
-    RuleOutput[0].RequirementMet == RequirementMet
+    assert.not_empty(RuleOutput)
+    assert.equals(count(RuleOutput), 1)
+    assert.equals(RuleOutput[0].RequirementMet, RequirementMet)
     Conditions :=  [
-        (contains(RuleOutput[0].ReportDetails, String) == true) |
+        (assert.does_contains(RuleOutput[0].ReportDetails, String)) |
         some String in ReportDetailArrayStrings
     ]
     count(FilterArray(Conditions, false)) == 0
