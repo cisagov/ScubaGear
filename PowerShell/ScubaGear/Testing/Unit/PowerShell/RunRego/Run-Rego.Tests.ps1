@@ -1,7 +1,7 @@
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath '../../../../Modules/RunRego')
 
 InModuleScope 'RunRego' {
-    Describe -Tag 'RunRego' -Name 'Invoke-Rego' -ForEach @(
+    Describe -Tag 'RunRego' -Name 'Invoke-Rego Success' -ForEach @(
         @{Product = 'aad'; Arg = 'AAD'},
         @{Product = 'defender'; Arg = 'Defender'},
         @{Product = 'exo'; Arg = 'EXO'},
@@ -14,17 +14,35 @@ InModuleScope 'RunRego' {
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'RegoParams')]
             $RegoParams = @{
                 'InputFile' = Join-Path -Path $PSScriptRoot -ChildPath "./RunRegoStubs/ProviderSettingsExport.json";
-                'OPAPath'   = Join-Path -Path $env:USERPROFILE -ChildPath ".scubagear/Tools";
             }
         }
         It 'Runs the <Arg> Rego on a Provider JSON and returns a TestResults object' {
             $RegoParams += @{
                 'RegoFile'    = Join-Path -Path $PSScriptRoot -ChildPath "../../../../Rego/$($Arg)Config.rego";
                 'PackageName' = $Product;
+                'OPAPath'   = Join-Path -Path $env:USERPROFILE -ChildPath ".scubagear/Tools";
             }
             Invoke-Rego @RegoParams | Should -Not -Be $null
         }
+        It 'Runs the <Arg> Rego on a Provider JSON and fails due to missing OPA executable' {
+            $RegoParams += @{
+                'RegoFile'    = Join-Path -Path $PSScriptRoot -ChildPath "../../../../Rego/$($Arg)Config.rego";
+                'PackageName' = $Product;
+                'OPAPath'   = './'
+            }
+            Invoke-Rego @RegoParams | Should -Throw
+        }
     }
+    # Describe -Tag 'RunRego' -Name 'Invoke-Rego Fail' -ForEach @(
+    #     @{Product = 'aad'; Arg = 'AAD'},
+    #     @{Product = 'defender'; Arg = 'Defender'},
+    #     @{Product = 'exo'; Arg = 'EXO'},
+    #     @{Product = 'powerplatform'; Arg = 'PowerPlatform'},
+    #     @{Product = 'sharepoint'; Arg = 'SharePoint'},
+    #     @{Product = 'teams'; Arg = 'Teams'}
+    # ){
+
+    # }
 }
 
 AfterAll {
