@@ -146,9 +146,10 @@ test_SharingDomainRestrictionMode_SharingCapability_OnlyPeopleInOrg_NotApplicabl
 
     PolicyId := "MS.SHAREPOINT.1.3v1"
     ReportDetailsString := concat(" ", [
-        "External Sharing is set to Only people in your organization.",
-        "This policy is only applicable if External Sharing is set to any value other than Only People in your organization. See %v for more info"
-    ])
+        "This policy is only applicable if External Sharing",
+        "is set to any value other than Only People in your organization.",
+        "See %v for more info"
+        ])
     TestResult("MS.SHAREPOINT.1.3v1", Output, CheckedSkippedDetails(PolicyId, ReportDetailsString), false) == true
 }
 

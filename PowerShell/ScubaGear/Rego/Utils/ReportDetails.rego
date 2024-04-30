@@ -1,6 +1,7 @@
 package utils.report
 import rego.v1
 import data.utils.key.PASS
+import data.utils.key.FAIL
 
 
 #############
@@ -30,7 +31,6 @@ PolicyLink(PolicyId) := sprintf(
     [SCUBABASEURL, PolicyProduct(PolicyId), PolicyAnchor(PolicyId)]
 )
 
- 
 ###############################
 # Generic Reporting Functions #
 ###############################
@@ -67,6 +67,11 @@ DefenderMirrorDetails(PolicyId) := sprintf(
 ReportDetailsBoolean(true) := "Requirement met"
 
 ReportDetailsBoolean(false) := "Requirement not met"
+
+# Reporting methods passed Status and appends warning
+ReportDetailsBooleanWarning(true, Warning) := concat(": ", [PASS, Warning])
+
+ReportDetailsBooleanWarning(false, Warning) := concat(": ", [FAIL, Warning])
 
 # Returns specified string if Status is false (good for error msg)
 ReportDetailsString(true, _) := PASS
