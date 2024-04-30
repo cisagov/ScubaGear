@@ -113,7 +113,17 @@ TestPlan:
           - Command: UpdateProviderExport
             Splat:
               Updates:
-                privileged_roles[0].Assignments[0].EndDateTime: null
+                privileged_roles:
+                  - DisplayName: Global Administrator
+                    RoleTemplateId: "62e90394-69f5-4237-9190-012177145e10"
+                    Assignments:
+                      - EndDateTime: "/Date(1672947244397)/"
+                        PrincipalId: "ae71e61c-f465-4db6-8d26-5f3e52bdd800"
+                  - DisplayName: User Administrator
+                    RoleTemplateId: "fe930be7-5e62-47db-91af-98c3a49a38b1"
+                    Assignments:
+                      - EndDateTime: null
+                        PrincipalId: "ce71e61c-f465-4db6-8d26-5f3e52bdd801"
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.AAD.7.4v1 Compliant case - No users with permanent assignment
@@ -144,7 +154,18 @@ TestPlan:
           - Command: UpdateProviderExport
             Splat:
               Updates:
-                privileged_roles[0].Assignments[0].StartDateTime: null
+                privileged_roles:
+                  - DisplayName: Global Administrator
+                    RoleTemplateId: "62e90394-69f5-4237-9190-012177145e10"
+                    Assignments:
+                      - StartDateTime: "/Date(1672947244397)/"
+                        PrincipalId: "ae71e61c-f465-4db6-8d26-5f3e52bdd800"
+                    Rules: []
+                  - DisplayName: User Administrator
+                    RoleTemplateId: "fe930be7-5e62-47db-91af-98c3a49a38b1"
+                    Assignments:
+                      - StartDateTime: null
+                        PrincipalId: "ce71e61c-f465-4db6-8d26-5f3e52bdd801"
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.AAD.7.5v1 Compliant case - No users assigned outside of PIM
