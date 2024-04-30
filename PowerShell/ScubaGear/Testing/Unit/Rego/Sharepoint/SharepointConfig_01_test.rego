@@ -147,10 +147,10 @@ test_SharingDomainRestrictionMode_SharingCapability_OnlyPeopleInOrg_NotApplicabl
     PolicyId := "MS.SHAREPOINT.1.3v1"
     ReportDetailsString := concat(" ", [
         "This policy is only applicable if External Sharing",
-        "is set to any value other than Only People in your organization.",
+        "is set to any value other than Only People In Your Organization.",
         "See %v for more info"
         ])
-    TestResult("MS.SHAREPOINT.1.3v1", Output, CheckedSkippedDetails(PolicyId, ReportDetailsString), false) == true
+    TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailsString), false) == true
 }
 
 test_SharingDomainRestrictionMode_SharingCapability_Anyone_Correct if {
@@ -242,7 +242,7 @@ test_SameAccount_NotApplicable_V1 if {
     PolicyId := "MS.SHAREPOINT.1.4v1"
     ReportDetailsString := concat(" ", [
         "This policy is only applicable if External Sharing",
-        "is set to any value other than Only People in your organization.",
+        "is set to any value other than Only People In Your Organization.",
         "See %v for more info"
         ])
     TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailsString), false) == true
@@ -261,7 +261,7 @@ test_SameAccount_NotApplicable_V2 if {
     PolicyId := "MS.SHAREPOINT.1.4v1"
     ReportDetailsString := concat(" ", [
         "This policy is only applicable if External Sharing",
-        "is set to any value other than Only People in your organization.",
+        "is set to any value other than Only People In Your Organization.",
         "See %v for more info"
         ])
     TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailsString), false) == true

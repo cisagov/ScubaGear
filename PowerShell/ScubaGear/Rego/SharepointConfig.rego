@@ -24,13 +24,13 @@ ANYONE := 2                 # "ExternalUserAndGuestSharing" in functional tests
 # External sharing support functions #
 ######################################
 
-SliderSettings(0) := "Only people in your organization"
+SliderSettings(0) := "Only People In Your Organization"
 
-SliderSettings(1) := "New and existing guests"
+SliderSettings(1) := "New and Existing Guests"
 
 SliderSettings(2) := "Anyone"
 
-SliderSettings(3) := "Existing guests"
+SliderSettings(3) := "Existing Guests"
 
 SliderSettings(Value) := "Unknown" if not Value in [0, 1, 2, 3]
 
@@ -39,6 +39,19 @@ Tenant := input.SPO_tenant[0] if {
 }
 
 SharingCapability := Tenant.SharingCapability
+
+SharingString := concat("", [
+    "External Sharing is set to ",
+    SliderSettings(SharingCapability),
+    "."
+])
+
+NAString(SharingSetting) := concat("", [
+        "This policy is only applicable if External Sharing is set to any value other than ",
+        SharingSetting,
+        ". ",
+        "See %v for more info"
+    ])
 
 
 ###################
@@ -146,11 +159,7 @@ tests contains {
 } if {
     SharingCapability == ONLYPEOPLEINORG
     PolicyId := "MS.SHAREPOINT.1.3v1"
-    Reason := concat(" ", [
-        "This policy is only applicable if External Sharing",
-        "is set to any value other than Only People in your organization.",
-        "See %v for more info"
-        ])
+    Reason := NAString(SliderSettings(0))
 }
 #--
 
@@ -186,11 +195,7 @@ tests contains {
 } if {
     SharingCapability == ONLYPEOPLEINORG
     PolicyId := "MS.SHAREPOINT.1.4v1"
-    Reason := concat(" ", [
-        "This policy is only applicable if External Sharing",
-        "is set to any value other than Only People in your organization.",
-        "See %v for more info"
-        ])
+    Reason := NAString(SliderSettings(0))
 }
 #--
 
@@ -246,6 +251,7 @@ tests contains {
 #--
 
 ErrStr := concat(" ", [
+    "Requirement not met:",
     "External Sharing is set to",
     SliderSettings(SharingCapability),
     "and expiration date is not set to 30 days or less."
@@ -279,7 +285,7 @@ tests contains {
 } if {
     PolicyId := "MS.SHAREPOINT.3.1v1"
     SharingCapability != ANYONE
-    Reason := "This policy is only applicable if External Sharing is set to Anyone. See %v for more info"
+    Reason := NAString(SliderSettings(2))
 }
 #--
 
@@ -342,7 +348,7 @@ tests contains {
     PolicyId := "MS.SHAREPOINT.3.2v1"
     input.OneDrive_PnP_Flag == false
     SharingCapability != ANYONE
-    Reason := "This policy is only applicable if External Sharing is set to Anyone. See %v for more info"
+    Reason := NAString(SliderSettings(2))
 }
 
 tests contains {
@@ -385,7 +391,7 @@ VerificationCodeReAuthExpiration(tenant) := [PASS, true] if {
 } else := [FAIL, false]
 
 # This policy is only applicable if external sharing is set to "Anyone",
-# "New and existing guests", or "Existing guests"
+# or "New and existing guests"
 tests contains {
     "PolicyId": "MS.SHAREPOINT.3.3v1",
     "Criticality": "Shall",
@@ -398,7 +404,7 @@ tests contains {
     "ReportDetails": ReportDetailsString(Status, ErrMsg),
     "RequirementMet": Status
 } if {
-    SharingCapability != ONLYPEOPLEINORG
+    SharingCapability in [ANYONE, NEWANDEXISTINGGUESTS]
 
     [ErrMsg, Status] := VerificationCodeReAuthExpiration(Tenant)
 }
@@ -413,9 +419,11 @@ tests contains {
     "RequirementMet": false
 } if {
     PolicyId := "MS.SHAREPOINT.3.3v1"
-    SharingCapability == ONLYPEOPLEINORG
-    Reason :=
-        "This policy is only applicable if External Sharing is set to Anyone or New and existing guests. See %v for more info"
+    not SharingCapability in [ANYONE, NEWANDEXISTINGGUESTS]
+    Reason := concat(" ", [
+        SharingString,
+        NAString(concat(" ", [SliderSettings(0), "or", SliderSettings(3)]))
+        ])
 }
 #--
 

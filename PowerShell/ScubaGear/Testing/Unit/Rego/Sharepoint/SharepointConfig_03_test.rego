@@ -11,8 +11,6 @@ import data.utils.key.PASS
 # Policy MS.SHAREPOINT.3.1v1
 #--
 test_SharingCapability_Anyone_LinkExpirationValid_Correct_V1 if {
-    # Test if the Sharepoint external sharing slider is set to "Anyone".
-    # If true, then evaluate the value for expiration days.
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
@@ -50,14 +48,16 @@ test_SharingCapability_Anyone_LinkExpirationInvalid_Incorrect if {
 
     ReportDetailsString := concat(" ", [
         "Requirement not met:",
-        "External Sharing is set to Anyone and expiration date is not set to 30 days or less."
+        "External Sharing is set to",
+        "Anyone",
+        "and expiration date is not set to 30 days or less."
     ])
     TestResult("MS.SHAREPOINT.3.1v1", Output, ReportDetailsString, false) == true
 }
 
+# Test if the Sharepoint external sharing slider is set to "Only people in your organization".
+# The result must be N/A because the policy is not applicable unless external sharing is set to "Anyone".
 test_SharingCapability_OnlyPeopleInOrg_NotApplicable if {
-    # Test if the Sharepoint external sharing slider is set to "Only people in your organization".
-    # The result must be N/A because the policy is not applicable unless external sharing is set to "Anyone".
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
@@ -69,15 +69,15 @@ test_SharingCapability_OnlyPeopleInOrg_NotApplicable if {
 
     PolicyId := "MS.SHAREPOINT.3.1v1"
     ReportDetailsString := concat(" ", [
-        "External Sharing is set to Only people in your organization.",
-        "This policy is only applicable if External Sharing is set to Anyone. See %v for more info"
+        "This policy is only applicable if External Sharing is set to any value other than Anyone.",
+        "See %v for more info"
     ])
     TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailsString), false) == true
 }
 
+# Test if the Sharepoint external sharing slider is set to "Existing guests".
+# The result must be N/A because the policy is not applicable unless external sharing is set to "Anyone".
 test_SharingCapability_ExistingGuests_NotApplicable if {
-    # Test if the Sharepoint external sharing slider is set to "Existing guests".
-    # The result must be N/A because the policy is not applicable unless external sharing is set to "Anyone".
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
@@ -89,15 +89,15 @@ test_SharingCapability_ExistingGuests_NotApplicable if {
 
     PolicyId := "MS.SHAREPOINT.3.1v1"
     ReportDetailsString := concat(" ", [
-        "External Sharing is set to Existing guests.",
-        "This policy is only applicable if External Sharing is set to Anyone. See %v for more info"
+        "This policy is only applicable if External Sharing is set to any value other than Anyone.",
+        "See %v for more info"
     ])
     TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailsString), false) == true
 }
 
+# Test if the Sharepoint external sharing slider is set to "New and existing guests".
+# The result must be N/A because the policy is not applicable unless external sharing is set to "Anyone".
 test_SharingCapability_NewExistingGuests_NotApplicable if {
-    # Test if the Sharepoint external sharing slider is set to "New and existing guests".
-    # The result must be N/A because the policy is not applicable unless external sharing is set to "Anyone".
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
@@ -109,8 +109,8 @@ test_SharingCapability_NewExistingGuests_NotApplicable if {
 
     PolicyId := "MS.SHAREPOINT.3.1v1"
     ReportDetailsString := concat(" ", [
-        "External Sharing is set to New and existing guests.",
-        "This policy is only applicable if External Sharing is set to Anyone. See %v for more info"
+        "This policy is only applicable if External Sharing is set to any value other than Anyone.",
+        "See %v for more info"
     ])
     TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailsString), false) == true
 }
@@ -213,8 +213,8 @@ test_File_Folder_AnonymousLinkType_SharingCapability_OnlyPeopleInOrg_NotApplicab
 
     PolicyId := "MS.SHAREPOINT.3.2v1"
     ReportDetailsString := concat(" ", [
-        "External Sharing is set to Only people in your organization.",
-        "This policy is only applicable if External Sharing is set to Anyone. See %v for more info"
+        "This policy is only applicable if External Sharing is set to any value other than Anyone.",
+        "See %v for more info"
     ])
     TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailsString), false) == true
 }
@@ -233,8 +233,8 @@ test_File_Folder_AnonymousLinkType_SharingCapability_ExistingGuests_NotApplicabl
 
     PolicyId := "MS.SHAREPOINT.3.2v1"
     ReportDetailsString := concat(" ", [
-        "External Sharing is set to Existing guests.",
-        "This policy is only applicable if External Sharing is set to Anyone. See %v for more info"
+        "This policy is only applicable if External Sharing is set to any value other than Anyone.",
+        "See %v for more info"
     ])
     TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailsString), false) == true
 }
@@ -253,8 +253,8 @@ test_File_Folder_AnonymousLinkType_SharingCapability_NewExistingGuests_NotApplic
 
     PolicyId := "MS.SHAREPOINT.3.2v1"
     ReportDetailsString := concat(" ", [
-        "External Sharing is set to New and existing guests.",
-        "This policy is only applicable if External Sharing is set to Anyone. See %v for more info"
+        "This policy is only applicable if External Sharing is set to any value other than Anyone.",
+        "See %v for more info"
     ])
     TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailsString), false) == true
 }
@@ -366,8 +366,9 @@ test_EmailAttestationReAuthDays_SharingCapability_OnlyPeopleInOrg_NotApplicable 
 
     PolicyId := "MS.SHAREPOINT.3.3v1"
     ReportDetailsString := concat(" ", [
-        "External Sharing is set to Only people in your organization.",
-        "This policy is only applicable if External Sharing is set to Anyone or New and existing guests. See %v for more info"
+        "External Sharing is set to Only People In Your Organization.",
+        "This policy is only applicable if External Sharing is set to any value other than Only People In Your Organization",
+        "or Existing Guests. See %v for more info"
     ])
     TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailsString), false) == true
 }
@@ -385,8 +386,9 @@ test_EmailAttestationReAuthDays_SharingCapability_ExistingGuests_NotApplicable i
 
     PolicyId := "MS.SHAREPOINT.3.3v1"
     ReportDetailsString := concat(" ", [
-        "External Sharing is set to Existing guests.",
-        "This policy is only applicable if External Sharing is set to Anyone or New and existing guests. See %v for more info"
+        "External Sharing is set to Existing Guests.",
+        "This policy is only applicable if External Sharing is set to any value other than Only People In Your Organization",
+        "or Existing Guests. See %v for more info"
     ])
     TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailsString), false) == true
 }
