@@ -229,7 +229,7 @@ test_SharingDomainRestrictionMode_SharingCapability_NewExistingGuests_Incorrect 
 #
 # Policy MS.SHAREPOINT.1.4v1
 #--
-test_SameAccount_Correct_V1 if {
+test_SameAccount_NotApplicable_V1 if {
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
@@ -239,10 +239,16 @@ test_SameAccount_Correct_V1 if {
         ]
     }
 
-    TestResult("MS.SHAREPOINT.1.4v1", Output, PASS, true) == true
+    PolicyId := "MS.SHAREPOINT.1.4v1"
+    ReportDetailsString := concat(" ", [
+        "This policy is only applicable if External Sharing",
+        "is set to any value other than Only People in your organization.",
+        "See %v for more info"
+        ])
+    TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailsString), false) == true
 }
 
-test_SameAccount_Correct_V3 if {
+test_SameAccount_NotApplicable_V2 if {
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
@@ -252,10 +258,16 @@ test_SameAccount_Correct_V3 if {
         ]
     }
 
-    TestResult("MS.SHAREPOINT.1.4v1", Output, PASS, true) == true
+    PolicyId := "MS.SHAREPOINT.1.4v1"
+    ReportDetailsString := concat(" ", [
+        "This policy is only applicable if External Sharing",
+        "is set to any value other than Only People in your organization.",
+        "See %v for more info"
+        ])
+    TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailsString), false) == true
 }
 
-test_SameAccount_Correct_V2 if {
+test_SameAccount_Correct_V1 if {
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {

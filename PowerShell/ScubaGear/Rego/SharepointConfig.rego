@@ -172,11 +172,25 @@ tests contains {
     "ReportDetails": ReportDetailsBoolean(Status),
     "RequirementMet": Status
 } if {
-    Conditions := [
-        SharingCapability == ONLYPEOPLEINORG,
-        Tenant.RequireAcceptingAccountMatchInvitedAccount == true
-    ]
-    Status := count(FilterArray(Conditions, true)) >= 1
+    SharingCapability != ONLYPEOPLEINORG
+    Status := Tenant.RequireAcceptingAccountMatchInvitedAccount == true
+}
+
+tests contains {
+    "PolicyId": PolicyId,
+    "Criticality": "Shall/Not-Implemented",
+    "Commandlet": ["Get-SPOTenant", "Get-PnPTenant"],
+    "ActualValue": [],
+    "ReportDetails": CheckedSkippedDetails(PolicyId, Reason),
+    "RequirementMet": false
+} if {
+    SharingCapability == ONLYPEOPLEINORG
+    PolicyId := "MS.SHAREPOINT.1.4v1"
+    Reason := concat(" ", [
+        "This policy is only applicable if External Sharing",
+        "is set to any value other than Only People in your organization.",
+        "See %v for more info"
+        ])
 }
 #--
 
