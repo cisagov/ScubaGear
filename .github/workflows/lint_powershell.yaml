@@ -21,15 +21,15 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
-      # - name: Setup Config File
-      #   run: cp Testing/Linting/MegaLinter/.mega-linter-powershell.yml .mega-linter.yml
-      # - name: Setup PSScriptAnalyzer settings
-      #   run: cp Testing/Linting/MegaLinter/.powershell-psscriptanalyzer.psd1 .powershell-psscriptanalyzer.psd1
-      # - name: Lint PowerShell
-      #   uses: oxsecurity/megalinter/flavors/dotnet@latest
+        # - name: Setup Config File
+        #   run: cp Testing/Linting/MegaLinter/.mega-linter-powershell.yml .mega-linter.yml
+        # - name: Setup PSScriptAnalyzer settings
+        #   run: cp Testing/Linting/MegaLinter/.powershell-psscriptanalyzer.psd1 .powershell-psscriptanalyzer.psd1
+        # - name: Lint PowerShell
+        #   uses: oxsecurity/megalinter/flavors/dotnet@latest
       - name: Run PSScriptAnalyzer
         uses: microsoft/psscriptanalyzer-action@v1.0
         with:
           path: .\
-          recurse: true 
+          recurse: true
           output: results.sarif
