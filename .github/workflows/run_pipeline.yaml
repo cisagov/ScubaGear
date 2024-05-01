@@ -19,9 +19,15 @@ jobs:
     uses: ./.github/workflows/lint_powershell.yaml
   scan-secret:
     name: Security
+    needs:
+     - lint-yaml
+     - lint-powershell
     uses: ./.github/workflows/run_secret_scan.yaml
   check-security:
     name: Security
+    needs:
+     - lint-yaml
+     - lint-powershell
     uses: ./.github/workflows/check_security.yaml
   syntax-markdown:
     name: Syntax
