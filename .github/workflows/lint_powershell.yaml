@@ -35,3 +35,5 @@ jobs:
           includeDefaultRules: true 
           recurse: true
           # output: results.sarif
+      - name: Show Results
+        run: Get-Content -Path ./results.sarif
