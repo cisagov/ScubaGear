@@ -18,7 +18,7 @@ jobs:
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
     defaults:
       run:
-        shell: bash
+        shell: powershell
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
@@ -32,8 +32,8 @@ jobs:
         uses: microsoft/psscriptanalyzer-action@v1.0
         with:
           path: ./PowerShell
-          includeDefaultRules: true 
+          includeDefaultRules: true
           recurse: true
-          # output: results.sarif
+          output: results.sarif
       - name: Show Results
-        run: Get-Content -Path ./results.sarif
+        run: Get-Content -path ./results.sarif
