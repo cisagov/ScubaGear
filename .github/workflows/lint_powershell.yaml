@@ -12,7 +12,8 @@ permissions: read-all
 jobs:
   powershell-lint-check:
     name: MegaLint PowerShell Check
-    runs-on: ubuntu-latest
+    # runs-on: ubuntu-latest
+    runs-on: windows-latest
     # This condition prevents duplicate runs.
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
     defaults:
@@ -30,6 +31,6 @@ jobs:
       - name: Run PSScriptAnalyzer
         uses: microsoft/psscriptanalyzer-action@v1.0
         with:
-          path: .\
+          path: ./
           recurse: true
           output: results.sarif
