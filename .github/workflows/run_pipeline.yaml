@@ -20,7 +20,10 @@ jobs:
   scan-secret:
     name: Security
     uses: ./.github/workflows/run_secret_scan.yaml
-  syntax:
+  check-security:
+    name: Security
+    uses: ./.github/workflows/check_security.yaml
+  syntax-markdown:
     name: Syntax
     uses: ./.github/workflows/syntax_check_markdown.yaml
   unit-powershell:
