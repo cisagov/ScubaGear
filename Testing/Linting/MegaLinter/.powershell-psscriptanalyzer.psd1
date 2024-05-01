@@ -2,7 +2,7 @@
 @{
     Severity     = @('Error', 'Warning', 'Information')
     ExcludeRules = @(
-        'PSUseSingularNouns',
+        # 'PSUseSingularNouns',
         'PSUseShouldProcessForStateChangingFunctions',
         'PSUseOutputTypeCorrectly'
     )
