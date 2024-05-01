@@ -32,5 +32,6 @@ jobs:
         uses: microsoft/psscriptanalyzer-action@v1.0
         with:
           path: ./PowerShell
+          includeDefaultRules: true 
           recurse: true
-          output: results.sarif
+          # output: results.sarif
