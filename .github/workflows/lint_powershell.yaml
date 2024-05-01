@@ -31,4 +31,4 @@ jobs:
       - name: Run PSScriptAnalyzer on PowerShell Scripts
         shell: pwsh
         run: |
-          Invoke-ScriptAnalyzer -Path ./ -Recurse -Severity Error -EnableExit
+          Invoke-ScriptAnalyzer -Path ./ -Recurse -Severity Warning -EnableExit
