@@ -16,9 +16,9 @@ jobs:
     runs-on: windows-latest
     # This condition prevents duplicate runs.
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
-    # defaults:
-    #   run:
-    #     shell: powershell
+    defaults:
+      run:
+        shell: pwsh
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
@@ -29,6 +29,5 @@ jobs:
         # - name: Lint PowerShell
         #   uses: oxsecurity/megalinter/flavors/dotnet@latest
       - name: Run PSScriptAnalyzer on PowerShell Scripts
-        shell: pwsh
         run: |
           Invoke-ScriptAnalyzer -Path ./ -Recurse -Severity Warning -EnableExit

@@ -1,6 +1,6 @@
 #Requires -Version 5.1
 
-function Create-PrivateGallery {
+function New-PrivateGallery {
     <#
     .Description
     Creates a new private package repository (i.e., gallery) on local file system
