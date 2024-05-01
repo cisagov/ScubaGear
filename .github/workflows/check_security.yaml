@@ -4,7 +4,6 @@ name: Check Security
 
 # This is a reusable workflow called by the pipeline.
 on:
-  push: # temp
   workflow_call:
   workflow_dispatch:
 
