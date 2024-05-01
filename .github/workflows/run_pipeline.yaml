@@ -19,22 +19,32 @@ jobs:
     uses: ./.github/workflows/lint_powershell.yaml
   scan-secret:
     name: Security
+    if: always()
     needs:
-     - lint-yaml
-     - lint-powershell
+      - lint-yaml
+      - lint-powershell
     uses: ./.github/workflows/run_secret_scan.yaml
   check-security:
     name: Security
+    if: always()
     needs:
-     - lint-yaml
-     - lint-powershell
+      - lint-yaml
+      - lint-powershell
     uses: ./.github/workflows/check_security.yaml
   syntax-markdown:
     name: Syntax
+    if: always()
+    needs:
+      - scan-secret
+      - check-security
     uses: ./.github/workflows/syntax_check_markdown.yaml
   unit-powershell:
     name: Unit
+    needs:
+      - syntax-markdown
     uses: ./.github/workflows/unit_test_powershell.yaml
   unit-opa:
     name: Unit
+    needs:
+      - syntax-markdown
     uses: ./.github/workflows/unit_test_opa.yaml
