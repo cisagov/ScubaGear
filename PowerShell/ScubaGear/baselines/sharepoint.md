@@ -197,7 +197,7 @@ Expiration days for Anyone links SHALL be set to 30 days or less.
 #### MS.SHAREPOINT.3.2v1
 The allowable file and folder permissions for links SHALL be set to View only.
 
-<!--Policy: MS.SHAREPOINT.3.1v1; Criticality: SHALL -->
+<!--Policy: MS.SHAREPOINT.3.2v1; Criticality: SHALL -->
 - _Rationale:_ Unauthorized changes to files can be made if permissions allow editing by anyone.  By restricting permissions on links to **View** only, administrators prevent anonymous file changes.
 - _Last modified:_ June 2023
 - _Note:_ This policy is only applicable if the external sharing slider on the admin center sharing page is set to **Anyone**.
@@ -205,7 +205,7 @@ The allowable file and folder permissions for links SHALL be set to View only.
 #### MS.SHAREPOINT.3.3v1
 Reauthentication days for people who use a verification code SHALL be set to 30 days or less.
 
-<!--Policy: MS.SHAREPOINT.3.1v1; Criticality: SHALL -->
+<!--Policy: MS.SHAREPOINT.3.3v1; Criticality: SHALL -->
 - _Rationale:_ A verification code may be given out to provide access to information for a short period of time. By setting expiration timers for verification code access, administrators prevent  unintended sustained access to information.
 - _Last modified:_ June 2023
 - _Note:_ This policy is only applicable if the external sharing slider on the admin center sharing page is set to **Anyone** or **New and existing guests**.
