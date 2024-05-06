@@ -224,6 +224,42 @@ test_SharingDomainRestrictionMode_SharingCapability_NewExistingGuests_Incorrect 
     ])
     TestResult("MS.SHAREPOINT.1.3v1", Output, ReportDetailString, false) == true
 }
+
+test_SharingDomainRestrictionMode_SharingCapability_ExistingGuests_Incorrect if {
+    Output := sharepoint.tests with input as {
+        "SPO_tenant": [
+            {
+                "SharingCapability": 3,
+                "SharingDomainRestrictionMode": 0
+            }
+        ]
+    }
+
+    ReportDetailString := concat(" ", [
+        "Requirement not met: Note that we currently only check for approved external domains.",
+        "Approved security groups are currently not being checked,",
+        "see the baseline policy for instructions on a manual check."
+    ])
+    TestResult("MS.SHAREPOINT.1.3v1", Output, ReportDetailString, false) == true
+}
+
+test_SharingDomainRestrictionMode_SharingCapability_Anyone_Incorrect if {
+    Output := sharepoint.tests with input as {
+        "SPO_tenant": [
+            {
+                "SharingCapability": 2,
+                "SharingDomainRestrictionMode": 0
+            }
+        ]
+    }
+
+    ReportDetailString := concat(" ", [
+        "Requirement not met: Note that we currently only check for approved external domains.",
+        "Approved security groups are currently not being checked,",
+        "see the baseline policy for instructions on a manual check."
+    ])
+    TestResult("MS.SHAREPOINT.1.3v1", Output, ReportDetailString, false) == true
+}
 #--
 
 #
