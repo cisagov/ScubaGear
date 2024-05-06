@@ -206,7 +206,6 @@ TestPlan:
           - Command: Set-PnPTenant
             Splat:
               RequireAnonymousLinksExpireInDays: 31
-              DefaultSharingLinkType: AnonymousAccess
               SharingCapability: ExternalUserAndGuestSharing
         Postconditions: []
         ExpectedResult: false
@@ -215,7 +214,6 @@ TestPlan:
           - Command: Set-PnPTenant
             Splat:
               RequireAnonymousLinksExpireInDays: 7
-              DefaultSharingLinkType: AnonymousAccess
               SharingCapability: ExternalUserAndGuestSharing
         Postconditions: []
         ExpectedResult: true
@@ -224,7 +222,6 @@ TestPlan:
           - Command: Set-PnPTenant
             Splat:
               RequireAnonymousLinksExpireInDays: 30
-              DefaultSharingLinkType: AnonymousAccess
               SharingCapability: ExternalUserAndGuestSharing
         Postconditions: []
         ExpectedResult: true
@@ -233,7 +230,6 @@ TestPlan:
           - Command: Set-PnPTenant
             Splat:
               RequireAnonymousLinksExpireInDays: 30
-              DefaultSharingLinkType: AnonymousAccess
               SharingCapability: ExternalUserSharingOnly
         Postconditions: []
         IsNotChecked: true
@@ -243,7 +239,6 @@ TestPlan:
           - Command: Set-PnPTenant
             Splat:
               RequireAnonymousLinksExpireInDays: 30
-              DefaultSharingLinkType: AnonymousAccess
               SharingCapability: ExistingExternalUserSharingOnly
         Postconditions: []
         IsNotChecked: true
@@ -253,7 +248,6 @@ TestPlan:
           - Command: Set-PnPTenant
             Splat:
               RequireAnonymousLinksExpireInDays: 30
-              DefaultSharingLinkType: AnonymousAccess
               SharingCapability: Disabled
         Postconditions: []
         IsNotChecked: true
@@ -263,7 +257,6 @@ TestPlan:
           - Command: Set-PnPTenant
             Splat:
               RequireAnonymousLinksExpireInDays: 30
-              DefaultSharingLinkType: AnonymousAccess
               SharingCapability: ExternalUserSharingOnly
         Postconditions: []
         IsNotChecked: true
@@ -273,7 +266,6 @@ TestPlan:
           - Command: Set-PnPTenant
             Splat:
               RequireAnonymousLinksExpireInDays: 30
-              DefaultSharingLinkType: AnonymousAccess
               SharingCapability: ExistingExternalUserSharingOnly
         Postconditions: []
         IsNotChecked: true
@@ -283,7 +275,6 @@ TestPlan:
           - Command: Set-PnPTenant
             Splat:
               RequireAnonymousLinksExpireInDays: 30
-              DefaultSharingLinkType: AnonymousAccess
               SharingCapability: Disabled
         Postconditions: []
         IsNotChecked: true
