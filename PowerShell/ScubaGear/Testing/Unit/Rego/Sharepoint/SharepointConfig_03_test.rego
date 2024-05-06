@@ -57,7 +57,7 @@ test_SharingCapability_Anyone_LinkExpirationInvalid_Incorrect if {
 
 # Test if the Sharepoint external sharing slider is set to "Only people in your organization".
 # The result must be N/A because the policy is not applicable unless external sharing is set to "Anyone".
-test_SharingCapability_OnlyPeopleInOrg_NotApplicable if {
+test_SharingCapability_OnlyPeopleInOrg_NotApplicable_V1 if {
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
@@ -77,7 +77,7 @@ test_SharingCapability_OnlyPeopleInOrg_NotApplicable if {
 
 # Test if the Sharepoint external sharing slider is set to "Existing guests".
 # The result must be N/A because the policy is not applicable unless external sharing is set to "Anyone".
-test_SharingCapability_ExistingGuests_NotApplicable if {
+test_SharingCapability_ExistingGuests_NotApplicable_V1 if {
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
@@ -97,12 +97,72 @@ test_SharingCapability_ExistingGuests_NotApplicable if {
 
 # Test if the Sharepoint external sharing slider is set to "New and existing guests".
 # The result must be N/A because the policy is not applicable unless external sharing is set to "Anyone".
-test_SharingCapability_NewExistingGuests_NotApplicable if {
+test_SharingCapability_NewExistingGuests_NotApplicable_V1 if {
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
                 "SharingCapability": 1,
                 "RequireAnonymousLinksExpireInDays": 31
+            }
+        ]
+    }
+
+    PolicyId := "MS.SHAREPOINT.3.1v1"
+    ReportDetailsString := concat(" ", [
+        "This policy is only applicable if External Sharing is set to any value other than Anyone.",
+        "See %v for more info"
+    ])
+    TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailsString), false) == true
+}
+
+# Test if the Sharepoint external sharing slider is set to "Only people in your organization".
+# The result must be N/A because the policy is not applicable unless external sharing is set to "Anyone".
+test_SharingCapability_OnlyPeopleInOrg_NotApplicable_V2 if {
+    Output := sharepoint.tests with input as {
+        "SPO_tenant": [
+            {
+                "SharingCapability": 0,
+                "RequireAnonymousLinksExpireInDays": 29
+            }
+        ]
+    }
+
+    PolicyId := "MS.SHAREPOINT.3.1v1"
+    ReportDetailsString := concat(" ", [
+        "This policy is only applicable if External Sharing is set to any value other than Anyone.",
+        "See %v for more info"
+    ])
+    TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailsString), false) == true
+}
+
+# Test if the Sharepoint external sharing slider is set to "Existing guests".
+# The result must be N/A because the policy is not applicable unless external sharing is set to "Anyone".
+test_SharingCapability_ExistingGuests_NotApplicable_V2 if {
+    Output := sharepoint.tests with input as {
+        "SPO_tenant": [
+            {
+                "SharingCapability": 3,
+                "RequireAnonymousLinksExpireInDays": 29
+            }
+        ]
+    }
+
+    PolicyId := "MS.SHAREPOINT.3.1v1"
+    ReportDetailsString := concat(" ", [
+        "This policy is only applicable if External Sharing is set to any value other than Anyone.",
+        "See %v for more info"
+    ])
+    TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailsString), false) == true
+}
+
+# Test if the Sharepoint external sharing slider is set to "New and existing guests".
+# The result must be N/A because the policy is not applicable unless external sharing is set to "Anyone".
+test_SharingCapability_NewExistingGuests_NotApplicable_V2 if {
+    Output := sharepoint.tests with input as {
+        "SPO_tenant": [
+            {
+                "SharingCapability": 1,
+                "RequireAnonymousLinksExpireInDays": 29
             }
         ]
     }
