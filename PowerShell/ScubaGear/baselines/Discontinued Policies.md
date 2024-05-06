@@ -7,16 +7,9 @@ The CISA SCuBA SCBs for M365 help secure federal information assets stored withi
 
 The information in this document is provided "as is" for INFORMATIONAL PURPOSES ONLY. CISA does not endorse any commercial product or service, including any subjects of analysis. Any reference to specific commercial entities or commercial products, processes, or services by service mark, trademark, manufacturer, or otherwise does not constitute or imply endorsement, recommendation, or favoritism by CISA. This document does not address, ensure compliance with, or supersede any law, regulation, or other authority. Entities are responsible for complying with any recordkeeping, privacy, and other laws that may apply to the use of technology. This document is not intended to, and does not, create any right or benefit for anyone against the United States, its departments, agencies, or entities, its officers, employees, or agents, or any other person.
 
-This document records
+This document tracks policies that have been discontinued from the security configuration baselines.
 
 > This document is marked TLP:CLEAR. Recipients may share this information without restriction. Information is subject to standard copyright rules. For more information on the Traffic Light Protocol, see https://www.cisa.gov/tlp.
-
-## License Compliance and Copyright 
-Portions of this document are adapted from documents in Microsoft's [M365](https://github.com/MicrosoftDocs/microsoft-365-docs/blob/public/LICENSE) and [
-  Azure](https://github.com/MicrosoftDocs/azure-docs/blob/main/LICENSE) GitHub repositories. The respective documents are subject to copyright and are adapted under the terms of the Creative Commons Attribution 4.0 International license. Source documents are linked throughout this document. The United States government has adapted selections of these documents to develop innovative and scalable configuration standards to strengthen the security of widely used cloud-based software services.
-
-## Assumptions
-The **License Requirements** sections of this document assume the organization is using an [M365 E3](https://www.microsoft.com/en-us/microsoft-365/compare-microsoft-365-enterprise-plans) or [G3](https://www.microsoft.com/en-us/microsoft-365/government) license level at a minimum. Therefore, only licenses not included in E3/G3 are listed.
 
 ## Key Terminology
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [RFC 2119](https://datatracker.ietf.org/doc/html/rfc2119).
@@ -44,6 +37,30 @@ the types of users are defined as follows:
     users (i.e., users who are not logged in to any Microsoft or
     organization account, such as dial-in users[^1]).
 
-# Baseline Policies
+# Azure Active Directory / Entra ID
 
-## 1. Meeting Policies
+## Discontinued Policies 
+
+# Defender
+
+## Discontinued Policies 
+
+
+# Exchange Online
+
+## Discontinued Policies 
+
+
+# Power BI
+
+## Discontinued Policies 
+
+
+# PowerPlatform
+
+## Discontinued Policies 
+
+
+# SharePoint Online
+
+## Discontinued Policies 
