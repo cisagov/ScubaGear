@@ -39,16 +39,19 @@ the types of users are defined as follows:
 
 # Azure Active Directory / Entra ID
 
-## Discontinued Policies 
+### Discontinued Policies 
+
+N/A
 
 # Defender
 
-## Discontinued Policies 
+### Discontinued Policies 
 
+N/A
 
 # Exchange Online
 
-## Discontinued Policies 
+### Discontinued Policies 
 MS.EXO.2.1v1
 A list of approved IP addresses for sending mail SHALL be maintained.
 - _Modified Date:_ May 2024
@@ -57,14 +60,19 @@ A list of approved IP addresses for sending mail SHALL be maintained.
 
 # Power BI
 
-## Discontinued Policies 
+### Discontinued Policies 
+
+N/A
 
 
 # PowerPlatform
 
-## Discontinued Policies 
+### Discontinued Policies 
 
+N/A
 
 # SharePoint Online
 
-## Discontinued Policies 
+### Discontinued Policies 
+
+N/A
