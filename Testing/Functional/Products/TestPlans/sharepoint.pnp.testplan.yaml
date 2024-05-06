@@ -183,14 +183,14 @@ TestPlan:
   - PolicyId: MS.SHAREPOINT.2.2v1
     TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.SHAREPOINT.2.2v1 Non-compliant - DefaultSharingLinkType = Edit
+      - TestDescription: MS.SHAREPOINT.2.2v1 Non-compliant - DefaultLinkPermission = Edit
         Preconditions:
           - Command: Set-PnPTenant
             Splat:
               DefaultLinkPermission: Edit
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.SHAREPOINT.2.2v1 Compliant - DefaultSharingLinkType = View
+      - TestDescription: MS.SHAREPOINT.2.2v1 Compliant - DefaultLinkPermission = View
         Preconditions:
           - Command: Set-PnPTenant
             Splat:
