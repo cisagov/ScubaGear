@@ -222,7 +222,7 @@ function New-Report {
             $SkuID = $_.SkuId
             # Find the corresponding product name
             $matchingRow = $csvData | Where-Object { $_.GUID -eq $SkuID } | Select-Object -First 1
-            $productName = ""
+            $productName = "Unknown SKU Name"
             if ($matchingRow) {
                 $productName = $matchingRow.'Product_Display_Name'
             }
