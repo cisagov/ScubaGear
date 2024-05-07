@@ -213,10 +213,10 @@ function New-Report {
 
     # Handle AAD-specific reporting
     if ($BaselineName -eq "aad") {
-        
+
         # Load the CSV file
         $csvData = Import-Csv -Path "Product Names for Licensing.csv"
-        
+
         $LicenseInfoArray = $SettingsExport.license_information | ForEach-Object {
 
             $SkuID = $_.SkuId
