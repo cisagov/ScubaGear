@@ -54,7 +54,7 @@ N/A
 ### Discontinued Policies 
 MS.EXO.2.1v1
 A list of approved IP addresses for sending mail SHALL be maintained.
-- _Discontinue Date:_ May 2024
+- _Discontinue date:_ May 2024
 - _Last used in Baseline:_ exo.md v1
 - _Discontinue Rationale:_ MS.EXO.2.1v1 is not a security configuration that can be audited and acts as a step in implementation of policy MS.EXO.2.2. Having the list of approved IPs will be added as a part of implementation of policy MS.EXO.2.2 and removed as a policy in the baseline.
 
