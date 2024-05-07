@@ -3,7 +3,7 @@ function Export-AADProvider {
     .Description
     Gets the Azure Active Directory (AAD) settings that are relevant
     to the SCuBA AAD baselines using a subset of the modules under the
-    overall Microsoft Graph PowerShell Module
+    overall Microsoft Graph PowerShell Module 
     .Functionality
     Internal
     #>
