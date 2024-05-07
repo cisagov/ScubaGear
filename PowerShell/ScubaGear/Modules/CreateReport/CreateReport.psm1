@@ -213,8 +213,22 @@ function New-Report {
 
     # Handle AAD-specific reporting
     if ($BaselineName -eq "aad") {
+        
+        # Load the CSV file
+        $csvData = Import-Csv -Path "Product Names for Licensing.csv"
+        
         $LicenseInfoArray = $SettingsExport.license_information | ForEach-Object {
+
+            $SkuID = $_.SkuId
+            # Find the corresponding product name
+            $matchingRow = $csvData | Where-Object { $_.GUID -eq $SkuID } | Select-Object -First 1
+            $productName = ""
+            if ($matchingRow) {
+                $productName = $matchingRow.'Product_Display_Name'
+            }
+            # Create a custom object with relevant properties
             [pscustomobject]@{
+                "Product Name" = $productName
                 "License SKU Identifier" = $_.SkuPartNumber
                 "Licenses in Use" = $_.ConsumedUnits
                 "Total Licenses" = $_.PrepaidUnits.Enabled
