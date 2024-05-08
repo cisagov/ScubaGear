@@ -1,9 +1,58 @@
+$GraphEndpoints = @{
+    "Get-MgBetaIdentityConditionalAccessPolicy" = "https://graph.microsoft.com/beta/identity/conditionalAccess/policies"
+    "Get-MgBetaSubscribedSku" = "https://graph.microsoft.com/beta/subscribedSkus"
+    "Get-MgBetaDirectoryRole" = "https://graph.microsoft.com/beta/directoryRoles"
+    "Get-MgBetaDirectoryRoleMembers" = "https://graph.microsoft.com/beta/directoryRoles/{0}/members"
+    "Get-MgBetaRoleManagementDirectoryRoleEligibilityScheduleInstance" = "https://graph.microsoft.com/beta/roleManagement/directory/roleEligibilityScheduleInstances"
+    "Get-MgBetaRoleManagementDirectoryRoleAssignmentScheduleInstance" = "https://graph.microsoft.com/beta/roleManagement/directory/roleAssignmentScheduleInstances"
+    "Get-MgBetaIdentityGovernancePrivilegedAccessGroupEligibilityScheduleInstance" = "https://graph.microsoft.com/beta/identityGovernance/privilegedAccess/group/eligibilityScheduleInstances"
+    "Get-MgBetaPrivilegedAccessResource" = "https://graph.microsoft.com/beta/privilegedAccess/aadGroups/resources"
+    "Get-MgBetaPolicyAuthorizationPolicy" = "https://graph.microsoft.com/beta/policies/authorizationPolicy"
+    "Get-MgBetaDirectorySetting" = "https://graph.microsoft.com/beta/settings"
+    "Get-MgBetaPolicyAuthenticationMethodPolicy" = "https://graph.microsoft.com/beta/policies/authenticationMethodsPolicy"
+    "Get-MgBetaDomain" = "https://graph.microsoft.com/beta/domains"
+    "Get-MgBetaOrganization" = "https://graph.microsoft.com/beta/organization"
+    "Get-MgBetaUser" = "https://graph.microsoft.com/beta/users" 
+    "Get-MgBetaPolicyRoleManagementPolicyAssignment"  = "https://graph.microsoft.com/beta/policies/roleManagementPolicyAssignments"
+}
+
+function Invoke-GraphDirectly {
+    param (
+      [Parameter(Mandatory)][string]$commandlet,
+      [System.Collections.Hashtable]$queryParams
+    )
+    Write-Debug "Replacing Cmdlet: $commandlet"
+    $endpoint = $GraphEndpoints[$commandlet]
+    if ($queryParams) {
+        <#
+          If query params are passed in, we need to augment the endpoint URI to include the params. Paperwork below. 
+          We can't use string formatting easily because the graph API expects parameters
+          that are prefixed with the dollar symbol. Maybe someone smarter than me can figure that out.
+        #>
+        $q = [System.Web.HttpUtility]::ParseQueryString([string]::Empty)
+        foreach ($item in $queryParams.GetEnumerator()) {
+            $q.Add($item.Key, $item.Value)
+        }
+        $uri = [System.UriBuilder]$endpoint
+        $uri.Query = $q.ToString()
+        $endpoint = $uri.ToString()
+    }
+    Write-Debug "Graph Api direct: $endpoint"
+    # try {
+        $resp = Invoke-MgGraphRequest -Uri $endpoint -UserAgent 'ScubaGear'
+    # }
+    # catch {
+    #     write-host "Spoof-Commandlet error occured: $($_.Exception)"
+    # }
+    return $resp.Value
+}
+
 function Export-AADProvider {
     <#
     .Description
     Gets the Azure Active Directory (AAD) settings that are relevant
     to the SCuBA AAD baselines using a subset of the modules under the
-    overall Microsoft Graph PowerShell Module 
+    overall Microsoft Graph PowerShell Module
     .Functionality
     Internal
     #>
@@ -255,7 +304,9 @@ function Get-PrivilegedUser {
                 # If the premium license for PIM is there, process the users that are "member" of the PIM group as Eligible
                 if ($TenantHasPremiumLicense) {
                     # Get the users that are assigned to the PIM group as Eligible members
-                    $PIMGroupMembers = Get-MgBetaIdentityGovernancePrivilegedAccessGroupEligibilityScheduleInstance -All -ErrorAction Stop -Filter "groupId eq '$GroupId'"
+                    # $PIMGroupMembers = Get-MgBetaIdentityGovernancePrivilegedAccessGroupEligibilityScheduleInstance -All -ErrorAction Stop -Filter "groupId eq '$GroupId'"
+                    $pimGroupArgs = @{"commandlet" = "Get-MgBetaIdentityGovernancePrivilegedAccessGroupEligibilityScheduleInstance"; "queryParams" = @{'$filter' = "groupId eq '$GroupId'"}}
+                    $PIMGroupMembers = Invoke-GraphDirectly @pimGroupArgs
                     foreach ($GroupMember in $PIMGroupMembers) {
                         # If the user is not a member of the PIM group (i.e. they are an owner) then skip them
                         if ($GroupMember.AccessId -ne "member") { continue }
@@ -279,7 +330,8 @@ function Get-PrivilegedUser {
     # Process the Eligible role assignments if the premium license for PIM is there
     if ($TenantHasPremiumLicense) {
         # Get a list of all the users and groups that have Eligible assignments
-        $AllPIMRoleAssignments = Get-MgBetaRoleManagementDirectoryRoleEligibilityScheduleInstance -All -ErrorAction Stop
+        # $AllPIMRoleAssignments = Get-MgBetaRoleManagementDirectoryRoleEligibilityScheduleInstance -All -ErrorAction Stop
+        $AllPIMRoleAssignments = Invoke-GraphDirectly("Get-MgBetaRoleManagementDirectoryRoleEligibilityScheduleInstance")
 
         # Add to the list of privileged users based on Eligible assignments
         foreach ($Role in $AADRoles) {
@@ -332,7 +384,9 @@ function Get-PrivilegedUser {
                     }
 
                     # Get the users that are assigned to the PIM group as Eligible members
-                    $PIMGroupMembers = Get-MgBetaIdentityGovernancePrivilegedAccessGroupEligibilityScheduleInstance -All -ErrorAction Stop -Filter "groupId eq '$UserObjectId'"
+                    # $PIMGroupMembers = Get-MgBetaIdentityGovernancePrivilegedAccessGroupEligibilityScheduleInstance -All -ErrorAction Stop -Filter "groupId eq '$UserObjectId'"
+                    $pimGroupArgs = @{"commandlet" = "Get-MgBetaIdentityGovernancePrivilegedAccessGroupEligibilityScheduleInstance"; "queryParams" = @{'$filter' = "groupId eq '$UserObjectId'"}}
+                    $PIMGroupMembers = Invoke-GraphDirectly @pimGroupArgs
                     foreach ($GroupMember in $PIMGroupMembers) {
                         # If the user is not a member of the PIM group (i.e. they are an owner) then skip them
                         if ($GroupMember.AccessId -ne "member") { continue }
@@ -404,7 +458,9 @@ function GetConfigurationsForPimGroups{
     )
 
     # Get a list of the groups that are enrolled in PIM - we want to ignore the others
-    $PIMGroups = Get-MgBetaPrivilegedAccessResource -All -ErrorAction Stop -PrivilegedAccessId aadGroups
+    # $PIMGroups = Get-MgBetaPrivilegedAccessResource -All -ErrorAction Stop -PrivilegedAccessId aadGroups
+    $pimGroupArgs = @{"commandlet" = "Get-MgBetaPrivilegedAccessResource"; "queryParams" = @{'$PrivilegedAccessId' = "aadGroups"}}
+    $PIMGroups = Invoke-GraphDirectly @pimGroupArgs
 
     foreach ($RoleAssignment in $AllRoleAssignments){
 
@@ -523,7 +579,8 @@ function Get-PrivilegedRole {
         [GroupTypeCache]::CheckedGroups.Clear()
 
         # Get ALL the roles and users actively assigned to them
-        $AllRoleAssignments = Get-MgBetaRoleManagementDirectoryRoleAssignmentScheduleInstance -All -ErrorAction Stop
+        # $AllRoleAssignments = Get-MgBetaRoleManagementDirectoryRoleAssignmentScheduleInstance -All -ErrorAction Stop
+        $AllRoleAssignments = Invoke-GraphDirectly("Get-MgBetaRoleManagementDirectoryRoleAssignmentScheduleInstance")
 
         # Each of the helper functions below add configuration settings (aka rules) to the role hashtable.
         # Get the PIM configurations for the roles
