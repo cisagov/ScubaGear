@@ -2,6 +2,7 @@ package sharepoint_test
 import rego.v1
 import data.sharepoint
 import data.utils.report.NotCheckedDetails
+import data.utils.report.CheckedSkippedDetails
 import data.utils.key.TestResult
 import data.utils.key.PASS
 
@@ -9,101 +10,182 @@ import data.utils.key.PASS
 #
 # Policy MS.SHAREPOINT.3.1v1
 #--
-test_ExternalUserExpireInDays_Correct_V1 if {
+test_SharingCapability_Anyone_LinkExpirationValid_Correct_V1 if {
+    Output := sharepoint.tests with input as {
+        "SPO_tenant": [
+            {
+                "SharingCapability": 2,
+                "RequireAnonymousLinksExpireInDays": 30
+            }
+        ]
+    }
+
+    TestResult("MS.SHAREPOINT.3.1v1", Output, PASS, true) == true
+}
+
+test_SharingCapability_Anyone_LinkExpirationValid_Correct_V2 if {
+    Output := sharepoint.tests with input as {
+        "SPO_tenant": [
+            {
+                "SharingCapability": 2,
+                "RequireAnonymousLinksExpireInDays": 29
+            }
+        ]
+    }
+
+    TestResult("MS.SHAREPOINT.3.1v1", Output, PASS, true) == true
+}
+
+test_SharingCapability_Anyone_LinkExpirationInvalid_Incorrect if {
+    Output := sharepoint.tests with input as {
+        "SPO_tenant": [
+            {
+                "SharingCapability": 2,
+                "RequireAnonymousLinksExpireInDays": 31
+            }
+        ]
+    }
+
+    ReportDetailsString := concat(" ", [
+        "Requirement not met:",
+        "External Sharing is set to",
+        "Anyone",
+        "and expiration date is not set to 30 days or less."
+    ])
+    TestResult("MS.SHAREPOINT.3.1v1", Output, ReportDetailsString, false) == true
+}
+
+# Test if the Sharepoint external sharing slider is set to "Only people in your organization".
+# The result must be N/A because the policy is not applicable unless external sharing is set to "Anyone".
+test_SharingCapability_OnlyPeopleInOrg_NotApplicable_V1 if {
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
                 "SharingCapability": 0,
-                "RequireAnonymousLinksExpireInDays": 30
+                "RequireAnonymousLinksExpireInDays": 31
             }
         ]
     }
 
-    TestResult("MS.SHAREPOINT.3.1v1", Output, PASS, true) == true
+    PolicyId := "MS.SHAREPOINT.3.1v1"
+    ReportDetailsString := concat(" ", [
+        "This policy is only applicable if External Sharing is set to any value other than Anyone.",
+        "See %v for more info"
+    ])
+    TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailsString), false) == true
 }
 
-test_ExternalUserExpireInDays_Correct_V2 if {
+# Test if the Sharepoint external sharing slider is set to "Existing guests".
+# The result must be N/A because the policy is not applicable unless external sharing is set to "Anyone".
+test_SharingCapability_ExistingGuests_NotApplicable_V1 if {
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
                 "SharingCapability": 3,
-                "RequireAnonymousLinksExpireInDays": 30
-            }
-        ]
-    }
-
-    TestResult("MS.SHAREPOINT.3.1v1", Output, PASS, true) == true
-}
-
-test_ExternalUserExpireInDays_Correct_V3 if {
-    Output := sharepoint.tests with input as {
-        "SPO_tenant": [
-            {
-                "SharingCapability": 1,
-                "RequireAnonymousLinksExpireInDays": 29
-            }
-        ]
-    }
-
-    TestResult("MS.SHAREPOINT.3.1v1", Output, PASS, true) == true
-}
-
-test_ExternalUserExpireInDays_Correct_V4 if {
-    Output := sharepoint.tests with input as {
-        "SPO_tenant": [
-            {
-                "SharingCapability": 2,
-                "RequireAnonymousLinksExpireInDays": 29
-            }
-        ]
-    }
-
-    TestResult("MS.SHAREPOINT.3.1v1", Output, PASS, true) == true
-}
-
-test_ExternalUserExpireInDays_Incorrect if {
-    Output := sharepoint.tests with input as {
-        "SPO_tenant": [
-            {
-                "SharingCapability": 1,
                 "RequireAnonymousLinksExpireInDays": 31
             }
         ]
     }
 
-    ReportDetailString := concat(" ", [
-        "Requirement not met: External Sharing is set to New",
-        "and Existing Guests and expiration date is not 30 days or less"
+    PolicyId := "MS.SHAREPOINT.3.1v1"
+    ReportDetailsString := concat(" ", [
+        "This policy is only applicable if External Sharing is set to any value other than Anyone.",
+        "See %v for more info"
     ])
-    TestResult("MS.SHAREPOINT.3.1v1", Output, ReportDetailString, false) == true
+    TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailsString), false) == true
 }
 
-test_ExternalUserExpireInDays_Incorrect_V2 if {
+# Test if the Sharepoint external sharing slider is set to "New and existing guests".
+# The result must be N/A because the policy is not applicable unless external sharing is set to "Anyone".
+test_SharingCapability_NewExistingGuests_NotApplicable_V1 if {
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
-                "SharingCapability": 2,
+                "SharingCapability": 1,
                 "RequireAnonymousLinksExpireInDays": 31
             }
         ]
     }
 
-    ReportDetailString :=
-        "Requirement not met: External Sharing is set to Anyone and expiration date is not 30 days or less"
+    PolicyId := "MS.SHAREPOINT.3.1v1"
+    ReportDetailsString := concat(" ", [
+        "This policy is only applicable if External Sharing is set to any value other than Anyone.",
+        "See %v for more info"
+    ])
+    TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailsString), false) == true
+}
 
-    TestResult("MS.SHAREPOINT.3.1v1", Output, ReportDetailString, false) == true
+# Test if the Sharepoint external sharing slider is set to "Only people in your organization".
+# The result must be N/A because the policy is not applicable unless external sharing is set to "Anyone".
+test_SharingCapability_OnlyPeopleInOrg_NotApplicable_V2 if {
+    Output := sharepoint.tests with input as {
+        "SPO_tenant": [
+            {
+                "SharingCapability": 0,
+                "RequireAnonymousLinksExpireInDays": 29
+            }
+        ]
+    }
+
+    PolicyId := "MS.SHAREPOINT.3.1v1"
+    ReportDetailsString := concat(" ", [
+        "This policy is only applicable if External Sharing is set to any value other than Anyone.",
+        "See %v for more info"
+    ])
+    TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailsString), false) == true
+}
+
+# Test if the Sharepoint external sharing slider is set to "Existing guests".
+# The result must be N/A because the policy is not applicable unless external sharing is set to "Anyone".
+test_SharingCapability_ExistingGuests_NotApplicable_V2 if {
+    Output := sharepoint.tests with input as {
+        "SPO_tenant": [
+            {
+                "SharingCapability": 3,
+                "RequireAnonymousLinksExpireInDays": 29
+            }
+        ]
+    }
+
+    PolicyId := "MS.SHAREPOINT.3.1v1"
+    ReportDetailsString := concat(" ", [
+        "This policy is only applicable if External Sharing is set to any value other than Anyone.",
+        "See %v for more info"
+    ])
+    TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailsString), false) == true
+}
+
+# Test if the Sharepoint external sharing slider is set to "New and existing guests".
+# The result must be N/A because the policy is not applicable unless external sharing is set to "Anyone".
+test_SharingCapability_NewExistingGuests_NotApplicable_V2 if {
+    Output := sharepoint.tests with input as {
+        "SPO_tenant": [
+            {
+                "SharingCapability": 1,
+                "RequireAnonymousLinksExpireInDays": 29
+            }
+        ]
+    }
+
+    PolicyId := "MS.SHAREPOINT.3.1v1"
+    ReportDetailsString := concat(" ", [
+        "This policy is only applicable if External Sharing is set to any value other than Anyone.",
+        "See %v for more info"
+    ])
+    TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailsString), false) == true
 }
 #--
 
 #
 # Policy MS.SHAREPOINT.3.2v1
 #--
-test_AnonymousLinkType_Correct if {
+test_File_Folder_AnonymousLinkType_Correct if {
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
                 "FileAnonymousLinkType": 1,
-                "FolderAnonymousLinkType": 1
+                "FolderAnonymousLinkType": 1,
+                "SharingCapability": 2
             }
         ],
         "OneDrive_PnP_Flag": false
@@ -112,12 +194,13 @@ test_AnonymousLinkType_Correct if {
     TestResult("MS.SHAREPOINT.3.2v1", Output, PASS, true) == true
 }
 
-test_AnonymousLinkType_Incorrect_V1 if {
+test_File_Folder_AnonymousLinkType_Incorrect if {
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
                 "FileAnonymousLinkType": 2,
-                "FolderAnonymousLinkType": 2
+                "FolderAnonymousLinkType": 2,
+                "SharingCapability": 2
             }
         ],
         "OneDrive_PnP_Flag": false
@@ -127,12 +210,13 @@ test_AnonymousLinkType_Incorrect_V1 if {
     TestResult("MS.SHAREPOINT.3.2v1", Output, ReportDetailString, false) == true
 }
 
-test_AnonymousLinkType_Incorrect_V2 if {
+test_Folder_AnonymousLinkType_Incorrect if {
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
                 "FileAnonymousLinkType": 1,
-                "FolderAnonymousLinkType": 2
+                "FolderAnonymousLinkType": 2,
+                "SharingCapability": 2
             }
         ],
         "OneDrive_PnP_Flag": false
@@ -142,12 +226,13 @@ test_AnonymousLinkType_Incorrect_V2 if {
     TestResult("MS.SHAREPOINT.3.2v1", Output, ReportDetailString, false) == true
 }
 
-test_AnonymousLinkType_Incorrect_V3 if {
+test_File_AnonymousLinkType_Incorrect if {
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
                 "FileAnonymousLinkType": 2,
-                "FolderAnonymousLinkType": 1
+                "FolderAnonymousLinkType": 1,
+                "SharingCapability": 2
             }
         ],
         "OneDrive_PnP_Flag": false
@@ -157,14 +242,15 @@ test_AnonymousLinkType_Incorrect_V3 if {
     TestResult("MS.SHAREPOINT.3.2v1", Output, ReportDetailString, false) == true
 }
 
-test_UsingServicePrincipal if {
+test_AnonymousLinkType_UsingServicePrincipal if {
     PolicyId := "MS.SHAREPOINT.3.2v1"
 
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
                 "FileAnonymousLinkType": 2,
-                "FolderAnonymousLinkType": 1
+                "FolderAnonymousLinkType": 1,
+                "SharingCapability": 2
             }
         ],
         "OneDrive_PnP_Flag": true
@@ -173,14 +259,74 @@ test_UsingServicePrincipal if {
     TestResult(PolicyId, Output, NotCheckedDetails(PolicyId), false) == true
 }
 
-#
-# Policy MS.SHAREPOINT.3.3v1
-#--
-test_SharingCapability_Correct if {
+test_File_Folder_AnonymousLinkType_SharingCapability_OnlyPeopleInOrg_NotApplicable if {
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
-                "SharingCapability": 0,
+                "FileAnonymousLinkType": 2,
+                "FolderAnonymousLinkType": 2,
+                "SharingCapability": 0
+            }
+        ],
+        "OneDrive_PnP_Flag": false
+    }
+
+    PolicyId := "MS.SHAREPOINT.3.2v1"
+    ReportDetailsString := concat(" ", [
+        "This policy is only applicable if External Sharing is set to any value other than Anyone.",
+        "See %v for more info"
+    ])
+    TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailsString), false) == true
+}
+
+test_File_Folder_AnonymousLinkType_SharingCapability_ExistingGuests_NotApplicable if {
+    Output := sharepoint.tests with input as {
+        "SPO_tenant": [
+            {
+                "FileAnonymousLinkType": 2,
+                "FolderAnonymousLinkType": 2,
+                "SharingCapability": 3
+            }
+        ],
+        "OneDrive_PnP_Flag": false
+    }
+
+    PolicyId := "MS.SHAREPOINT.3.2v1"
+    ReportDetailsString := concat(" ", [
+        "This policy is only applicable if External Sharing is set to any value other than Anyone.",
+        "See %v for more info"
+    ])
+    TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailsString), false) == true
+}
+
+test_File_Folder_AnonymousLinkType_SharingCapability_NewExistingGuests_NotApplicable if {
+    Output := sharepoint.tests with input as {
+        "SPO_tenant": [
+            {
+                "FileAnonymousLinkType": 2,
+                "FolderAnonymousLinkType": 2,
+                "SharingCapability": 1
+            }
+        ],
+        "OneDrive_PnP_Flag": false
+    }
+
+    PolicyId := "MS.SHAREPOINT.3.2v1"
+    ReportDetailsString := concat(" ", [
+        "This policy is only applicable if External Sharing is set to any value other than Anyone.",
+        "See %v for more info"
+    ])
+    TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailsString), false) == true
+}
+
+#
+# Policy MS.SHAREPOINT.3.3v1
+#--
+test_EmailAttestationReAuthDays_SharingCapability_NewExistingGuests_Correct if {
+    Output := sharepoint.tests with input as {
+        "SPO_tenant": [
+            {
+                "SharingCapability": 1,
                 "EmailAttestationRequired": true,
                 "EmailAttestationReAuthDays": 30
             }
@@ -190,11 +336,11 @@ test_SharingCapability_Correct if {
     TestResult("MS.SHAREPOINT.3.3v1", Output, PASS, true) == true
 }
 
-test_SharingCapability_Correct_V4 if {
+test_EmailAttestationReAuthDays_SharingCapability_Anyone_Correct if {
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
-                "SharingCapability": 1,
+                "SharingCapability": 2,
                 "EmailAttestationRequired": true,
                 "EmailAttestationReAuthDays": 30
             }
@@ -218,7 +364,7 @@ test_EmailAttestationReAuthDays_Correct if {
     TestResult("MS.SHAREPOINT.3.3v1", Output, PASS, true) == true
 }
 
-test_Multi_Incorrect_V1 if {
+test_EmailAttestationReAuthDays_Incorrect_V1 if {
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
@@ -229,28 +375,13 @@ test_Multi_Incorrect_V1 if {
         ]
     }
 
-    ReportDetailString :=
-        "Requirement not met: Expiration timer for 'People who use a verification code' NOT enabled and set to >30 days"
+    ReportDetailsString :=
+        "Requirement not met: Expiration time for 'People who use a verification code' NOT enabled and set to 30 days or more"
 
-    TestResult("MS.SHAREPOINT.3.3v1", Output, ReportDetailString, false) == true
+    TestResult("MS.SHAREPOINT.3.3v1", Output, ReportDetailsString, false) == true
 }
 
-test_EmailAttestationRequired_Incorrect_V2 if {
-    Output := sharepoint.tests with input as {
-        "SPO_tenant": [
-            {
-                "SharingCapability": 1,
-                "EmailAttestationRequired": false,
-                "EmailAttestationReAuthDays": 29
-            }
-        ]
-    }
-
-    ReportDetailString := "Requirement not met: Expiration timer for 'People who use a verification code' NOT enabled"
-    TestResult("MS.SHAREPOINT.3.3v1", Output, ReportDetailString, false) == true
-}
-
-test_EmailAttestationReAuthDays_Incorrect_V3 if {
+test_EmailAttestationReAuthDays_Incorrect_V2 if {
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
@@ -262,8 +393,63 @@ test_EmailAttestationReAuthDays_Incorrect_V3 if {
     }
 
     ReportDetailString :=
-        "Requirement not met: Expiration timer for 'People who use a verification code' NOT set to 30 days"
+        "Requirement not met: Expiration time for 'People who use a verification code' NOT set to 30 days or less"
 
     TestResult("MS.SHAREPOINT.3.3v1", Output, ReportDetailString, false) == true
+}
+
+test_EmailAttestationRequired_Incorrect if {
+    Output := sharepoint.tests with input as {
+        "SPO_tenant": [
+            {
+                "SharingCapability": 1,
+                "EmailAttestationRequired": false,
+                "EmailAttestationReAuthDays": 29
+            }
+        ]
+    }
+
+    ReportDetailString := "Requirement not met: Expiration time for 'People who use a verification code' NOT enabled"
+    TestResult("MS.SHAREPOINT.3.3v1", Output, ReportDetailString, false) == true
+}
+
+test_EmailAttestationReAuthDays_SharingCapability_OnlyPeopleInOrg_NotApplicable if {
+    Output := sharepoint.tests with input as {
+        "SPO_tenant": [
+            {
+                "SharingCapability": 0,
+                "EmailAttestationRequired": true,
+                "EmailAttestationReAuthDays": 29
+            }
+        ]
+    }
+
+    PolicyId := "MS.SHAREPOINT.3.3v1"
+    ReportDetailsString := concat(" ", [
+        "External Sharing is set to Only People In Your Organization.",
+        "This policy is only applicable if External Sharing is set to any value other than Only People In Your Organization",
+        "or Existing Guests. See %v for more info"
+    ])
+    TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailsString), false) == true
+}
+
+test_EmailAttestationReAuthDays_SharingCapability_ExistingGuests_NotApplicable if {
+    Output := sharepoint.tests with input as {
+        "SPO_tenant": [
+            {
+                "SharingCapability": 3,
+                "EmailAttestationRequired": true,
+                "EmailAttestationReAuthDays": 29
+            }
+        ]
+    }
+
+    PolicyId := "MS.SHAREPOINT.3.3v1"
+    ReportDetailsString := concat(" ", [
+        "External Sharing is set to Existing Guests.",
+        "This policy is only applicable if External Sharing is set to any value other than Only People In Your Organization",
+        "or Existing Guests. See %v for more info"
+    ])
+    TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailsString), false) == true
 }
 #--

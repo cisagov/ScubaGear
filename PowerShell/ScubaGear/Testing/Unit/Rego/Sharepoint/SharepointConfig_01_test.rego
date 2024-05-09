@@ -2,6 +2,7 @@ package sharepoint_test
 import rego.v1
 import data.sharepoint
 import data.utils.report.NotCheckedDetails
+import data.utils.report.CheckedSkippedDetails
 import data.utils.key.TestResult
 import data.utils.key.FAIL
 import data.utils.key.PASS
@@ -133,7 +134,7 @@ test_OneDriveSharingCapability_Incorrect_V2 if {
 #
 # Policy MS.SHAREPOINT.1.3v1
 #--
-test_SharingDomainRestrictionMode_Correct_V1 if {
+test_SharingDomainRestrictionMode_SharingCapability_OnlyPeopleInOrg_NotApplicable if {
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
@@ -143,11 +144,34 @@ test_SharingDomainRestrictionMode_Correct_V1 if {
         ]
     }
 
-    ReportDetailString := "Requirement met: external sharing is set to Only People In Organization"
+    PolicyId := "MS.SHAREPOINT.1.3v1"
+    ReportDetailsString := concat(" ", [
+        "This policy is only applicable if External Sharing",
+        "is set to any value other than Only People In Your Organization.",
+        "See %v for more info"
+        ])
+    TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailsString), false) == true
+}
+
+test_SharingDomainRestrictionMode_SharingCapability_Anyone_Correct if {
+    Output := sharepoint.tests with input as {
+        "SPO_tenant": [
+            {
+                "SharingCapability": 2,
+                "SharingDomainRestrictionMode": 1
+            }
+        ]
+    }
+
+    ReportDetailString := concat(" ", [
+        "Requirement met: Note that we currently only check for approved external domains.",
+        "Approved security groups are currently not being checked,",
+        "see the baseline policy for instructions on a manual check."
+    ])
     TestResult("MS.SHAREPOINT.1.3v1", Output, ReportDetailString, true) == true
 }
 
-test_SharingDomainRestrictionMode_Correct_V2 if {
+test_SharingDomainRestrictionMode_SharingCapability_NewExistingGuests_Correct if {
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
@@ -165,11 +189,65 @@ test_SharingDomainRestrictionMode_Correct_V2 if {
     TestResult("MS.SHAREPOINT.1.3v1", Output, ReportDetailString, true) == true
 }
 
-test_SharingDomainRestrictionMode_Incorrect if {
+test_SharingDomainRestrictionMode_SharingCapability_ExistingGuests_Correct if {
+    Output := sharepoint.tests with input as {
+        "SPO_tenant": [
+            {
+                "SharingCapability": 3,
+                "SharingDomainRestrictionMode": 1
+            }
+        ]
+    }
+
+    ReportDetailString := concat(" ", [
+        "Requirement met: Note that we currently only check for approved external domains.",
+        "Approved security groups are currently not being checked,",
+        "see the baseline policy for instructions on a manual check."
+    ])
+    TestResult("MS.SHAREPOINT.1.3v1", Output, ReportDetailString, true) == true
+}
+
+test_SharingDomainRestrictionMode_SharingCapability_NewExistingGuests_Incorrect if {
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
                 "SharingCapability": 1,
+                "SharingDomainRestrictionMode": 0
+            }
+        ]
+    }
+
+    ReportDetailString := concat(" ", [
+        "Requirement not met: Note that we currently only check for approved external domains.",
+        "Approved security groups are currently not being checked,",
+        "see the baseline policy for instructions on a manual check."
+    ])
+    TestResult("MS.SHAREPOINT.1.3v1", Output, ReportDetailString, false) == true
+}
+
+test_SharingDomainRestrictionMode_SharingCapability_ExistingGuests_Incorrect if {
+    Output := sharepoint.tests with input as {
+        "SPO_tenant": [
+            {
+                "SharingCapability": 3,
+                "SharingDomainRestrictionMode": 0
+            }
+        ]
+    }
+
+    ReportDetailString := concat(" ", [
+        "Requirement not met: Note that we currently only check for approved external domains.",
+        "Approved security groups are currently not being checked,",
+        "see the baseline policy for instructions on a manual check."
+    ])
+    TestResult("MS.SHAREPOINT.1.3v1", Output, ReportDetailString, false) == true
+}
+
+test_SharingDomainRestrictionMode_SharingCapability_Anyone_Incorrect if {
+    Output := sharepoint.tests with input as {
+        "SPO_tenant": [
+            {
+                "SharingCapability": 2,
                 "SharingDomainRestrictionMode": 0
             }
         ]
@@ -187,7 +265,7 @@ test_SharingDomainRestrictionMode_Incorrect if {
 #
 # Policy MS.SHAREPOINT.1.4v1
 #--
-test_SameAccount_Correct_V1 if {
+test_SameAccount_NotApplicable_V1 if {
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
@@ -197,10 +275,16 @@ test_SameAccount_Correct_V1 if {
         ]
     }
 
-    TestResult("MS.SHAREPOINT.1.4v1", Output, PASS, true) == true
+    PolicyId := "MS.SHAREPOINT.1.4v1"
+    ReportDetailsString := concat(" ", [
+        "This policy is only applicable if External Sharing",
+        "is set to any value other than Only People In Your Organization.",
+        "See %v for more info"
+        ])
+    TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailsString), false) == true
 }
 
-test_SameAccount_Correct_V3 if {
+test_SameAccount_NotApplicable_V2 if {
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
@@ -210,10 +294,16 @@ test_SameAccount_Correct_V3 if {
         ]
     }
 
-    TestResult("MS.SHAREPOINT.1.4v1", Output, PASS, true) == true
+    PolicyId := "MS.SHAREPOINT.1.4v1"
+    ReportDetailsString := concat(" ", [
+        "This policy is only applicable if External Sharing",
+        "is set to any value other than Only People In Your Organization.",
+        "See %v for more info"
+        ])
+    TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailsString), false) == true
 }
 
-test_SameAccount_Correct_V2 if {
+test_SameAccount_Correct_V1 if {
     Output := sharepoint.tests with input as {
         "SPO_tenant": [
             {
