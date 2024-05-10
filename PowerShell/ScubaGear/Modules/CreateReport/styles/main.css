@@ -324,3 +324,13 @@ a.control_group:active {
     color: var(--link-color);
     text-decoration: none;
 }
+
+
+.chevron {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: none;
+    color: inherit; 
+    border: none;
+}

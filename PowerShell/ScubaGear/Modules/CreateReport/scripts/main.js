@@ -129,14 +129,26 @@ const fillCAPTable = () => {
                 tr.appendChild(td);
             }
 
+            //console.log(tr[i][1]);
+
+            // Create chevron icon in the DOM 
             let img = document.createElement("img");
             img.setAttribute('src', 'images/angle-right-solid.svg');
-            img.setAttribute('alt', 'Show more');
-            img.setAttribute('title', 'Show more');
+            img.setAttribute('alt', 'Show more info for the ... policy');
+            img.setAttribute('title', 'Expand the details shown');
             img.style.width = '10px';
-            img.rowNumber = i;
-            img.addEventListener("click", expandCAPRow);
-            tr.querySelectorAll('td')[0].appendChild(img);
+            //img.rowNumber = i;
+
+            // For accessibility purposes append the above image as a child of a button
+            let expandRowButton = document.createElement("button");
+            expandRowButton.title = "Show more info for the ... policy";
+            expandRowButton.classList.add("chevron");
+            expandRowButton.addEventListener("click", expandCAPRow);
+            expandRowButton.rowNumber = i;
+            expandRowButton.appendChild(img);
+
+            // Add the button to the table body
+            tr.querySelectorAll('td')[0].appendChild(expandRowButton);
             tbody.appendChild(tr);
         }
     }
@@ -177,6 +189,7 @@ const fillTruncatedCell = (td, i, j) => {
             td.innerHTML = content;
         }
 
+        // Other location where this needs to be tabbable
         if (truncated) {
             let span = document.createElement("span");
             span.appendChild(document.createTextNode("..."));
@@ -262,9 +275,13 @@ const collapseAllCAPs = () => {
  */
 const expandCAPRow = (event) => {
     try {
+        console.log(event);
+        console.log(event.currentTarget);
         let i = event.currentTarget.rowNumber;
+        console.log(i);
         let tr = document.querySelector("#caps tr:nth-of-type(" + (i+2).toString() + ")"); /*i+2
         because nth-of-type is indexed from 1 and to account for the header row */
+        console.log(tr);
         for (let j = 0; j < capColNames.length; j++) {
             let td = tr.querySelector("td:nth-of-type(" + (j+1).toString() + ")");
             fillTruncatedCell(td, i, j);
@@ -276,9 +293,19 @@ const expandCAPRow = (event) => {
                 img.setAttribute('alt', 'Show less');
                 img.setAttribute('title', 'Show less');
                 img.style.width = '14px';
-                img.rowNumber = i;
-                img.addEventListener("click", hideCAPRow);
-                tr.querySelectorAll('td')[0].appendChild(img);
+                //img.rowNumber = i;
+                //img.addEventListener("click", hideCAPRow);
+                //tr.querySelectorAll('td')[0].appendChild(img);
+
+                // For accessibility purposes append the above image as a child of a button
+                let expandRowButton = document.createElement("button");
+                expandRowButton.title = "Show more info for the ... policy";
+                expandRowButton.classList.add("chevron");
+                expandRowButton.addEventListener("click", hideCAPRow);
+                expandRowButton.rowNumber = i;
+                expandRowButton.appendChild(img);
+                tr.querySelectorAll('td')[0].appendChild(expandRowButton);
+                
             }
             else if (caps[i][capColNames[j]].constructor === Array && caps[i][capColNames[j]].length > 1) {
                 let ul = document.createElement("ul");
