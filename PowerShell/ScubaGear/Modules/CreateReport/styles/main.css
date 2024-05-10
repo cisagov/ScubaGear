@@ -248,6 +248,13 @@ th.conditions {
     height: 0;
 }
 
+.switch input:focus,
+.switch input:focus:active,
+.switch input:focus + .slider {
+    outline: 2px solid var(--text-color);
+    border-radius: var(--toggle-height);
+}
+
 /* The slider */
 .slider {
     position: absolute;
