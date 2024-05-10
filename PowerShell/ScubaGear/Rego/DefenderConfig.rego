@@ -573,7 +573,7 @@ DefenderErrorMessage4_2(PresentLocations) := ErrorMessage if {
 
     ResultsFile := concat("", [
         input.scuba_config.OutPath, "/",
-        input.scuba_config.OutProviderFileName,
+        input.scuba_config.OutRegoFileName,
         ".json"
     ])
     LocationsAppliedMsg := "DLP custom policy applied to the following locations: "
@@ -598,7 +598,7 @@ DefenderErrorMessage4_2(PresentLocations) := ErrorMessage if {
     count(PresentLocations) == 0
     ResultsFile := concat("", [
         input.scuba_config.OutPath, "/",
-        input.scuba_config.OutProviderFileName,
+        input.scuba_config.OutRegoFileName,
         ".json"
     ])
     LocationsMissingMsg := "Custom policy protecting sensitive info types NOT applied to: "
