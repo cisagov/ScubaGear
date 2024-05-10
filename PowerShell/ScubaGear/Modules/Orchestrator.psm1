@@ -550,7 +550,7 @@ function Invoke-ProviderList {
                     $RetVal = ""
                     switch ($Product) {
                         "aad" {
-                            $RetVal = Export-AADProvider | Select-Object -Last 1
+                            $RetVal = Export-AADProvider -M365Environment $M365Environment | Select-Object -Last 1
                         }
                         "exo" {
                             $RetVal = Export-EXOProvider | Select-Object -Last 1
