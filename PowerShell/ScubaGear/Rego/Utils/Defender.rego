@@ -1,10 +1,21 @@
 package utils.defender
-import rego.v1
+
+import data.utils.key.ConvertToSet
+import data.utils.key.FAIL
+import data.utils.key.FilterArray
 import data.utils.report.ReportDetailsBoolean
 import data.utils.report.ReportDetailsString
-import data.utils.key.FAIL
-import data.utils.key.ConvertToSet
-import data.utils.key.FilterArray
+import rego.v1
+
+#############
+# Constants #
+#############
+
+DEFLICENSEWARNSTR := concat(" ", [
+    "**NOTE: Either you do not have sufficient permissions or",
+    "your tenant does not have a license for Microsoft Defender",
+    "for Office 365 Plan 1 or Plan 2, which is required for this feature.**"
+])
 
 ##########################################
 # User/Group Exclusion support functions #
@@ -47,8 +58,9 @@ SensitiveAccountsSetting(Policies) := {
     "Policy": Policy
 } if {
     Policy := [
-        Policy | some Policy in Policies;
-        Policy.Identity == "Strict Preset Security Policy";
+    Policy |
+        some Policy in Policies
+        Policy.Identity == "Strict Preset Security Policy"
         Policy.State == "Enabled"
     ][0]
     IncludedUsers := ConvertToSet(Policy.SentTo)
@@ -99,7 +111,7 @@ SensitiveAccounts(SensitiveAccountsSetting, SensitiveAccountsConfig) := false if
 
 ### Case 4 ###
 # When settings and config are present, do they match?
-SensitiveAccounts(SensitiveAccountsSetting, SensitiveAccountsConfig) := true if {
+SensitiveAccounts(SensitiveAccountsSetting, SensitiveAccountsConfig) if {
     count(SensitiveAccountsSetting.Policy) > 0
 
     # Policy filter includes one or more conditions or exclusions
@@ -149,7 +161,8 @@ ImpersonationProtectionSetting(Policies, IdentityString, KeyValue) := Policy if 
 ImpersonationProtectionConfig(PolicyID, AccountKey) := IncludedAccounts if {
     SensitiveAccounts := input.scuba_config.Defender[PolicyID]
     IncludedAccounts := {
-        lower(trim_space(x)) | some x in SensitiveAccounts[AccountKey];
+    lower(trim_space(x)) |
+        some x in SensitiveAccounts[AccountKey]
         x != null
     }
 } else := set()
@@ -195,13 +208,8 @@ ApplyLicenseWarning(Status) := ReportDetailsBoolean(Status) if {
 
 # If a defender license is not present, assume failure and
 # replace the message with the warning
-ApplyLicenseWarning(_) := concat(" ", [FAIL, LicenseWarning]) if {
+ApplyLicenseWarning(_) := concat(" ", [FAIL, DEFLICENSEWARNSTR]) if {
     input.defender_license == false
-    LicenseWarning := concat(" ", [
-        "**NOTE: Either you do not have sufficient permissions or",
-        "your tenant does not have a license for Microsoft Defender",
-        "for Office 365 Plan 1, which is required for this feature.**"
-    ])
 }
 
 #################################################################################
@@ -211,26 +219,12 @@ ApplyLicenseWarning(_) := concat(" ", [FAIL, LicenseWarning]) if {
 # and leave the message unchanged
 ApplyLicenseWarningString(Status, String) := ReportDetailsString(Status, String) if {
     input.defender_license == true
-} 
+}
 
-ApplyLicenseWarningString(Status,_) := concat(" ", [ReportDetailsBoolean(Status), LicenseWarning]) if {
+ApplyLicenseWarningString(_, _) := concat(" ", [FAIL, DEFLICENSEWARNSTR]) if {
     input.defender_license == false
-    LicenseWarning := concat(" ", [
-        "**NOTE: Either you do not have sufficient permissions or",
-        "your tenant does not have a license for Microsoft Defender",
-        "for Office 365 Plan 1 or Plan 2, which is required for this feature.**"
-    ])
 }
 
 DLPLicenseWarningString(Status, String) := ReportDetailsString(Status, String) if {
     input.dlp_license == true
-}
-
-DLPLicenseWarningString(Status,_) := concat(" ", [ReportDetailsBoolean(Status), LicenseWarning]) if {
-    input.dlp_license == false
-    LicenseWarning := concat(" ", [
-        "**NOTE: Either you do not have sufficient permissions or",
-        "your tenant does not have a license for Microsoft Defender",
-        "for DLP for Teams or DLP for Endpoint, which is required for this feature.**"
-    ])
 }
