@@ -84,13 +84,13 @@ const fillCAPTable = () => {
 
         let expandAll = document.createElement("button");
         expandAll.appendChild(document.createTextNode("&#x2b; Expand all"));
-        expandAll.title = "Expand all";
+        expandAll.title = "Expands all rows in the conditional access policy table below";
         expandAll.addEventListener("click", expandAllCAPs);
         buttons.appendChild(expandAll);
 
         let collapseAll = document.createElement("button");
         collapseAll.appendChild(document.createTextNode("&minus; Collapse all"));
-        collapseAll.title = "Collapse all";
+        collapseAll.title = "Collapses all rows in the conditional access policy table below";
         collapseAll.addEventListener("click", collapseAllCAPs);
         buttons.appendChild(collapseAll);
 
