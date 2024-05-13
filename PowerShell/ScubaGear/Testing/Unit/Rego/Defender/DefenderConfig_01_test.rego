@@ -413,7 +413,15 @@ test_SensitiveEOP_Correct_V3 if {
             "Exceptions": null,
             "State": "Enabled"
         }],
-        "scuba_config": {"Defender": {"MS.DEFENDER.1.4v1": {"SensitiveAccounts": {"IncludedUsers": ["johndoe@random.example.com"]}}}},
+        "scuba_config": {
+            "Defender": {
+                "MS.DEFENDER.1.4v1": {
+                    "SensitiveAccounts": {
+                        "IncludedUsers": ["johndoe@random.example.com"]
+                    }
+                }
+            }
+        },
         "defender_license": true
     }
 
@@ -1196,7 +1204,15 @@ test_SensitiveATP_Correct_V3 if {
             "Exceptions": null,
             "State": "Enabled"
         }],
-        "scuba_config": {"Defender": {"MS.DEFENDER.1.5v1": {"SensitiveAccounts": {"IncludedUsers": ["johndoe@random.example.com"]}}}},
+        "scuba_config": {
+            "Defender": {
+                "MS.DEFENDER.1.5v1": {
+                    "SensitiveAccounts": {
+                        "IncludedUsers": ["johndoe@random.example.com"]
+                    }
+                }
+            }
+        },
         "defender_license": true
     }
 
@@ -1244,7 +1260,15 @@ test_SensitiveATP_Correct_V5 if {
             "Exceptions": ["Rules.Tasks"],
             "State": "Enabled"
         }],
-        "scuba_config": {"Defender": {"MS.DEFENDER.1.5v1": {"SensitiveAccounts": {"ExcludedUsers": ["johndoe@random.example.com"]}}}},
+        "scuba_config": {
+            "Defender": {
+                "MS.DEFENDER.1.5v1": {
+                    "SensitiveAccounts": {
+                        "ExcludedUsers": ["johndoe@random.example.com"]
+                    }
+                }
+            }
+        },
         "defender_license": true
     }
 
@@ -1388,7 +1412,15 @@ test_SensitiveATP_Correct_V11 if {
             "Exceptions": null,
             "State": "Enabled"
         }],
-        "scuba_config": {"Defender": {"MS.DEFENDER.1.5v1": {"SensitiveAccounts": {"IncludedDomains": ["random.mail.example.com"]}}}},
+        "scuba_config": {
+            "Defender": {
+                "MS.DEFENDER.1.5v1": {
+                    "SensitiveAccounts": {
+                        "IncludedDomains": ["random.mail.example.com"]
+                    }
+                }
+            }
+        },
         "defender_license": true
     }
 
@@ -1436,7 +1468,15 @@ test_SensitiveATP_Correct_V13 if {
             "Exceptions": ["Rules.Tasks"],
             "State": "Enabled"
         }],
-        "scuba_config": {"Defender": {"MS.DEFENDER.1.5v1": {"SensitiveAccounts": {"ExcludedDomains": ["random.mail.example.com"]}}}},
+        "scuba_config": {
+            "Defender": {
+                "MS.DEFENDER.1.5v1": {
+                    "SensitiveAccounts": {
+                        "ExcludedDomains": ["random.mail.example.com"]
+                    }
+                }
+            }
+        },
         "defender_license": true
     }
 

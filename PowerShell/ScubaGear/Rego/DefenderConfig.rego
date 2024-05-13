@@ -577,14 +577,12 @@ ResultsFilePath := Path if {
 # Return results file path when only file name is defined
 ResultsFilePath := Path if {
     not input.scuba_config.OutputPath
-    input.scuba_config.OutRegoFileName
     Filename := input.scuba_config.OutRegoFileName
     Path := concat("", ["./", Filename,".json"])
 }
 
 # Return results file path when only file path is defined
 ResultsFilePath := Path if {
-    input.scuba_config.OutputPath
     not input.scuba_config.OutRegoFileName
     FilePath := input.scuba_config.OutputPath
     Path := concat("", [FilePath, "/TestResults",".json"])

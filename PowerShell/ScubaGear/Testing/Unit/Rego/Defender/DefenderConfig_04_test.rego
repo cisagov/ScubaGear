@@ -1117,6 +1117,7 @@ test_BlockAccess_Incorrect_V5 if {
                 "IsAdvancedRule": false
             },
             {
+                # regal ignore:line-length
                 "ContentContainsSensitiveInformation": [{"name": "U.S. Individual Taxpayer Identification Number (ITIN)"}],
                 "Name": "Baseline Rule2",
                 "Disabled": false,
