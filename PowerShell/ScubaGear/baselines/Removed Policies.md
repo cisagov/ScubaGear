@@ -1,7 +1,7 @@
 **`TLP:CLEAR`**
-# Discontinued CISA M365 Security Configuration Baseline Policies
+# Removed CISA M365 Security Configuration Baseline Policies
 
-This document tracks policies that have been discontinued from the security configuration baselines.
+This document tracks policies that have been removed from the security configuration baselines.
 
 The Secure Cloud Business Applications (SCuBA) project run by the Cybersecurity and Infrastructure Security Agency (CISA) provides guidance and capabilities to secure federal civilian executive branch (FCEB) agencies' cloud business application environments and protect federal information that is created, accessed, shared, and stored in those environments.
 
@@ -18,48 +18,47 @@ Additional terminology in this document specific to their respective SCBs are to
 
 1. [AAD](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/baselines/aad.md#key-terminology)
 2. [Defender](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/baselines/defender.md#key-terminology)
-3. [Exo](https://github.com/cisagov/ScubaGear/blob/1016-create-template-markdown-for-discontinued-policy-ids-for-m365-gws/PowerShell/ScubaGear/baselines/exo.md#key-terminology)
+3. [Exo](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/baselines/exo.md#key-terminology)
 4. [Power BI](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/baselines/powerbi.md#key-terminology)
-5. [PowerPlatform](https://github.com/cisagov/ScubaGear/blob/1016-create-template-markdown-for-discontinued-policy-ids-for-m365-gws/PowerShell/ScubaGear/baselines/powerplatform.md#key-terminology)
-6. [SharePoint](https://github.com/cisagov/ScubaGear/blob/1016-create-template-markdown-for-discontinued-policy-ids-for-m365-gws/PowerShell/ScubaGear/baselines/sharepoint.md#key-terminology)
-7. [Teams](https://github.com/cisagov/ScubaGear/blob/1016-create-template-markdown-for-discontinued-policy-ids-for-m365-gws/PowerShell/ScubaGear/baselines/teams.md#key-terminology)
+5. [PowerPlatform](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/baselines/powerplatform.md#key-terminology)
+6. [SharePoint](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/baselines/sharepoint.md#key-terminology)
+7. [Teams](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/baselines/teams.md#key-terminology)
 
 # Azure Active Directory / Entra ID
 
-### Discontinued Policies 
+### Removed Policies 
 
 N/A
 
 # Defender
 
-### Discontinued Policies 
+### Removed Policies 
 
 N/A
 
 # Exchange Online
 
-### Discontinued Policies 
+### Removed Policies 
 MS.EXO.2.1v1
 A list of approved IP addresses for sending mail SHALL be maintained.
-- _Discontinue date:_ May 2024
-- _Last used in Baseline:_ exo.md v1
-- _Discontinue Rationale:_ MS.EXO.2.1v1 is not a security configuration that can be audited and acts as a step in implementation of policy MS.EXO.2.2. Having the list of approved IPs will be added as a part of implementation of policy MS.EXO.2.2 and removed as a policy in the baseline.
+- _Removal date:_ May 2024
+- _Removal rationale:_ MS.EXO.2.1v1 is not a security configuration that can be audited and acts as a step in implementation of policy MS.EXO.2.2. Having the list of approved IPs will be added as a part of implementation of policy MS.EXO.2.2 and removed as a policy in the baseline.
 
 # Power BI
 
-### Discontinued Policies 
+### Removed Policies 
 
 N/A
 
 
 # PowerPlatform
 
-### Discontinued Policies 
+### Removed Policies 
 
 N/A
 
 # SharePoint Online
 
-### Discontinued Policies 
+### Removed Policies 
 
 N/A
