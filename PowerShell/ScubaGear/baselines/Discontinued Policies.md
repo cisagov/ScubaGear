@@ -14,28 +14,15 @@ This document tracks policies that have been discontinued from the security conf
 ## Key Terminology
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [RFC 2119](https://datatracker.ietf.org/doc/html/rfc2119).
 
-Access to Teams can be controlled by the user type. In this baseline,
-the types of users are defined as follows:
+Additional terminology in this document specific to their respective SCBs are to be interpreted as described in the following:
 
-1.  **Internal users**: Members of the agency's M365 tenant.
-
-2.  **External users**: Members of a different M365 tenant.
-
-3.  **Business to Business (B2B) guest users**: External users who are
-    formally invited to collaborate with the team and added to the
-    agency's Azure Active Directory (Azure AD) as guest users. These users
-    authenticate with their home organization/tenant and are granted
-    access to the team by virtue of being listed as guest users on the
-    tenant's Azure AD.
-
-4.  **Unmanaged users**: Users who are not members of any M365 tenant or
-    organization (e.g., personal Microsoft accounts).
-
-5.  **Anonymous users**: Teams users joining calls who are not
-    authenticated through the agency's tenant; these users include unmanaged
-    users, external users (except for B2B guests), and true anonymous
-    users (i.e., users who are not logged in to any Microsoft or
-    organization account, such as dial-in users[^1]).
+1. [AAD](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/baselines/aad.md#key-terminology)
+2. [Defender](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/baselines/defender.md#key-terminology)
+3. [Exo](https://github.com/cisagov/ScubaGear/blob/1016-create-template-markdown-for-discontinued-policy-ids-for-m365-gws/PowerShell/ScubaGear/baselines/exo.md#key-terminology)
+4. [Power BI](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/baselines/powerbi.md#key-terminology)
+5. [PowerPlatform](https://github.com/cisagov/ScubaGear/blob/1016-create-template-markdown-for-discontinued-policy-ids-for-m365-gws/PowerShell/ScubaGear/baselines/powerplatform.md#key-terminology)
+6. [SharePoint](https://github.com/cisagov/ScubaGear/blob/1016-create-template-markdown-for-discontinued-policy-ids-for-m365-gws/PowerShell/ScubaGear/baselines/sharepoint.md#key-terminology)
+7. [Teams](https://github.com/cisagov/ScubaGear/blob/1016-create-template-markdown-for-discontinued-policy-ids-for-m365-gws/PowerShell/ScubaGear/baselines/teams.md#key-terminology)
 
 # Azure Active Directory / Entra ID
 
