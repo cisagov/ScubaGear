@@ -567,22 +567,51 @@ DLPLicenseWarning4_2(AbsentLocations) := LicenseWarning if {
     )
 }
 
-# DLP policy contains at least one required location
-DefenderErrorMessage4_2(PresentLocations) := ErrorMessage if {
-    count(PresentLocations) != 0
+# Return results file path when no custom config defined
+ResultsFilePath := Path if {
+    not input.scuba_config.OutputPath
+    not input.scuba_config.OutRegoFileName
+    Path := "./TestResults.json"
+}
 
-    ResultsFile := concat("", [
+# Return results file path when only file name is defined
+ResultsFilePath := Path if {
+    not input.scuba_config.OutputPath
+    input.scuba_config.OutRegoFileName
+    Filename := input.scuba_config.OutRegoFileName
+    Path := concat("", ["./", Filename,".json"])
+}
+
+# Return results file path when only file path is defined
+ResultsFilePath := Path if {
+    input.scuba_config.OutputPath
+    not input.scuba_config.OutRegoFileName
+    FilePath := input.scuba_config.OutputPath
+    Path := concat("", [FilePath, "/TestResults",".json"])
+}
+
+# Return results file path when custom config defined
+ResultsFilePath := Path if {
+    input.scuba_config.OutputPath
+    input.scuba_config.OutputRegoFileName
+    Path := concat("", [
         input.scuba_config.OutPath, "/",
         input.scuba_config.OutRegoFileName,
         ".json"
     ])
+}
+
+# DLP policy contains at least one required location
+DefenderErrorMessage4_2(PresentLocations) := ErrorMessage if {
+    count(PresentLocations) != 0
+
     LocationsAppliedMsg := "DLP custom policy applied to the following locations: "
     LocationsMissingMsg := ". Custom policy protecting sensitive info types NOT applied to: "
     LicenseNotice := DLPLicenseWarning4_2(MissingLocations)
 
     FullPolicyDetailsMsg := concat("", [
         " For full policy details, see the ActualValue field in the results file: ",
-        ResultsFile
+        ResultsFilePath
     ])
     ErrorMessage := concat("", [
         LocationsAppliedMsg, concat(", ", PresentLocations),
@@ -596,17 +625,13 @@ DefenderErrorMessage4_2(PresentLocations) := ErrorMessage if {
 # Matching DLP policy does not contain any of the required locations
 DefenderErrorMessage4_2(PresentLocations) := ErrorMessage if {
     count(PresentLocations) == 0
-    ResultsFile := concat("", [
-        input.scuba_config.OutPath, "/",
-        input.scuba_config.OutRegoFileName,
-        ".json"
-    ])
+
     LocationsMissingMsg := "Custom policy protecting sensitive info types NOT applied to: "
     LicenseNotice := DLPLicenseWarning4_2(MissingLocations)
 
     FullPolicyDetailsMsg := concat("", [
         " For full policy details, see the ActualValue field in the results file: ",
-        ResultsFile
+        ResultsFilePath
     ])
     ErrorMessage := concat("", [
         LocationsMissingMsg, concat(", ", MissingLocations),
