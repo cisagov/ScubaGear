@@ -42,3 +42,27 @@ test_3rdParty_Correct_V3 if {
     TestResult(PolicyId, Output, ReportDetailString, false) == true
 }
 #--
+
+#
+# Policy MS.EXO.9.4v1
+#--
+test_3rdParty_Correct_V3 if {
+    PolicyId := "MS.EXO.9.4v1"
+    Output := exo.tests with input as { }
+
+    ReportDetailString := DefenderMirrorDetails(PolicyId)
+    TestResult(PolicyId, Output, ReportDetailString, false) == true
+}
+#--
+
+#
+# Policy MS.EXO.9.5v1
+#--
+test_3rdParty_Correct_V5 if {
+    PolicyId := "MS.EXO.9.5v1"
+    Output := exo.tests with input as { }
+
+    ReportDetailString := DefenderMirrorDetails(PolicyId)
+    TestResult(PolicyId, Output, ReportDetailString, false) == true
+}
+#--

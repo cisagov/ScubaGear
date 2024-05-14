@@ -460,6 +460,35 @@ tests contains {
 }
 #--
 
+#
+# MS.EXO.8.3v1
+#--
+
+# At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
+tests contains {
+    "PolicyId": "MS.EXO.8.3v1",
+    "Criticality": "Should/3rd Party",
+    "Commandlet": [],
+    "ActualValue": [],
+    "ReportDetails": DefenderMirrorDetails("MS.EXO.8.3v1"),
+    "RequirementMet": false
+}
+#--
+
+#
+# MS.EXO.8.4v1
+#--
+
+# At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
+tests contains {
+    "PolicyId": "MS.EXO.8.4v1",
+    "Criticality": "Shall/3rd Party",
+    "Commandlet": [],
+    "ActualValue": [],
+    "ReportDetails": DefenderMirrorDetails("MS.EXO.8.4v1"),
+    "RequirementMet": false
+}
+#--
 
 ############
 # MS.EXO.9 #
@@ -506,6 +535,36 @@ tests contains {
     "Commandlet": [],
     "ActualValue": [],
     "ReportDetails": DefenderMirrorDetails("MS.EXO.9.3v1"),
+    "RequirementMet": false
+}
+#--
+
+#
+# MS.EXO.9.4v1
+#--
+
+# At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
+tests contains {
+    "PolicyId": "MS.EXO.9.4v1",
+    "Criticality": "Should/3rd Party",
+    "Commandlet": [],
+    "ActualValue": [],
+    "ReportDetails": DefenderMirrorDetails("MS.EXO.9.4v1"),
+    "RequirementMet": false
+}
+#--
+
+#
+# MS.EXO.9.5v1
+#--
+
+# At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
+tests contains {
+    "PolicyId": "MS.EXO.9.5v1",
+    "Criticality": "Should/3rd Party",
+    "Commandlet": [],
+    "ActualValue": [],
+    "ReportDetails": DefenderMirrorDetails("MS.EXO.9.5v1"),
     "RequirementMet": false
 }
 #--

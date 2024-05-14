@@ -317,6 +317,24 @@ TestPlan:
         IsCustomImplementation: true
         ExpectedResult: false
 
+  - PolicyId: MS.EXO.8.3v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.EXO.8.3v1 Custom Implementation
+        Preconditions: []
+        Postconditions: []
+        IsCustomImplementation: true
+        ExpectedResult: false
+
+  - PolicyId: MS.EXO.8.4v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.EXO.8.4v1 Custom Implementation
+        Preconditions: []
+        Postconditions: []
+        IsCustomImplementation: true
+        ExpectedResult: false
+
   - PolicyId: MS.EXO.9.1v1
     TestDriver: RunScuba
     Tests:
@@ -336,6 +354,24 @@ TestPlan:
         ExpectedResult: false
 
   - PolicyId: MS.EXO.9.3v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.EXO.9.3v1 Custom Implementation
+        Preconditions: []
+        Postconditions: []
+        IsCustomImplementation: true
+        ExpectedResult: false
+
+  - PolicyId: MS.EXO.9.4v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.EXO.9.3v1 Custom Implementation
+        Preconditions: []
+        Postconditions: []
+        IsCustomImplementation: true
+        ExpectedResult: false
+
+  - PolicyId: MS.EXO.9.5v1
     TestDriver: RunScuba
     Tests:
       - TestDescription: MS.EXO.9.3v1 Custom Implementation
