@@ -365,7 +365,7 @@ TestPlan:
   - PolicyId: MS.EXO.9.4v1
     TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.EXO.9.3v1 Custom Implementation
+      - TestDescription: MS.EXO.9.4v1 Custom Implementation
         Preconditions: []
         Postconditions: []
         IsCustomImplementation: true
@@ -374,7 +374,7 @@ TestPlan:
   - PolicyId: MS.EXO.9.5v1
     TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.EXO.9.3v1 Custom Implementation
+      - TestDescription: MS.EXO.9.5v1 Custom Implementation
         Preconditions: []
         Postconditions: []
         IsCustomImplementation: true
