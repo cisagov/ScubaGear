@@ -57,15 +57,19 @@ ConvertToSetWithKey(Items, Key) := NewSet if {
 ###########
 
 # Basic test that has anticipated string for Report Details
-TestResult(PolicyId, Output, RequirementMet) := {"Result": true, "Test": RuleOutput[0]}  if {
+TestResult(PolicyId, Output, ReportDetailStr, Status) := true  if {
     RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
-    print("** Checking if only one test result **")
+    print("\n** Checking if only one test result **")
     assert.not_empty(RuleOutput)
     assert.equals(1, count(RuleOutput))
+
     print("** Checking RequirementMet **")
-    assert.equals(RequirementMet, RuleOutput[0].RequirementMet)
-} else := [false, set()]
+    assert.equals(Status, RuleOutput[0].RequirementMet)
+
+    print("** Checking ReportDetails **")
+    assert.equals(ReportDetailStr, RuleOutput[0].ReportDetails)
+} else := false
 
 # Test that has multiple strings with an unknown order for Report Details
 TestResultContains(PolicyId, Output, ReportDetailArrayStrings, RequirementMet) := true if {
