@@ -2,7 +2,6 @@ package aad_test
 import rego.v1
 import data.aad
 import data.utils.key.TestResult
-import data.test.assert
 
 
 #
