@@ -9,177 +9,40 @@ import data.utils.key.TestResult
 # Policy MS.AAD.2.1v1
 #--
 test_NoExclusionsConditions_Correct_V1 if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ]
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ],
-                        "ExcludeUsers": [],
-                        "ExcludeGroups": [],
-                        "ExcludeRoles": []
-                    },
-                    "UserRiskLevels": [
-                        "high"
-                    ]
-                },
-                "GrantControls": {
-                    "BuiltInControls": [
-                        "block"
-                    ]
-                },
-                "State": "enabled",
-                "DisplayName": "Test name"
-            }
-        ],
-        "service_plans": [
-            {
-                "ServicePlanName": "EXCHANGE_S_FOUNDATION",
-                "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
-            },
-            {
-                "ServicePlanName": "AAD_PREMIUM_P2",
-                "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
-            }
-        ]
-    }
+    Output := aad.tests with input.conditional_access_policies as [ConditionalAccessPolicies]
+                        with input.service_plans as ServicePlans
 
     ReportDetailStr := concat("", [
         "1 conditional access policy(s) found that meet(s) all requirements:",
-        "<br/>Test name. <a href='#caps'>View all CA policies</a>."
+        "<br/>Test block Legacy Authentication. <a href='#caps'>View all CA policies</a>."
     ])
 
     TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, true) == true
 }
 
 test_NoExclusionsExemptUsers_Correct_V1 if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ]
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ],
-                        "ExcludeUsers": [],
-                        "ExcludeGroups": [],
-                        "ExcludeRoles": []
-                    },
-                    "UserRiskLevels": [
-                        "high"
-                    ]
-                },
-                "GrantControls": {
-                    "BuiltInControls": [
-                        "block"
-                    ]
-                },
-                "State": "enabled",
-                "DisplayName": "Test name"
-            }
-        ],
-        "service_plans": [
-            {
-                "ServicePlanName": "EXCHANGE_S_FOUNDATION",
-                "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
-            },
-            {
-                "ServicePlanName": "AAD_PREMIUM_P2",
-                "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
-            }
-        ],
-        "scuba_config": {
-            "Aad": {
-                "MS.AAD.2.1v1": {
-                    "CapExclusions": {
-                        "Users": [
-                            "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"
-                        ],
-                        "Groups": []
-                    }
-                }
-            }
-        }
-    }
+    Output := aad.tests with input.conditional_access_policies as [ConditionalAccessPolicies]
+                        with input.service_plans as ServicePlans
+                        with input.scuba_config.Aad["MS.AAD.2.1v1"] as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.2.1v1"].CapExclusions.Users as ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]
 
     ReportDetailStr := concat("", [
         "1 conditional access policy(s) found that meet(s) all requirements:",
-        "<br/>Test name. <a href='#caps'>View all CA policies</a>."
+        "<br/>Test block Legacy Authentication. <a href='#caps'>View all CA policies</a>."
     ])
 
     TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, true) == true
 }
 
 test_NoExclusionsExemptGroups_Correct_V1 if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ]
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ],
-                        "ExcludeUsers": [],
-                        "ExcludeGroups": [],
-                        "ExcludeRoles": []
-                    },
-                    "UserRiskLevels": [
-                        "high"
-                    ]
-                },
-                "GrantControls": {
-                    "BuiltInControls": [
-                        "block"
-                    ]
-                },
-                "State": "enabled",
-                "DisplayName": "Test name"
-            }
-        ],
-        "service_plans": [
-            {
-                "ServicePlanName": "EXCHANGE_S_FOUNDATION",
-                "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
-            },
-            {
-                "ServicePlanName": "AAD_PREMIUM_P2",
-                "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
-            }
-        ],
-        "scuba_config": {
-            "Aad": {
-                "MS.AAD.2.1v1": {
-                    "CapExclusions": {
-                        "Users": [],
-                        "Groups": [
-                            "49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"
-                        ]
-                    }
-                }
-            }
-        }
-    }
+    Output := aad.tests with input.conditional_access_policies as [ConditionalAccessPolicies]
+                        with input.service_plans as ServicePlans
+                        with input.scuba_config.Aad["MS.AAD.2.1v1"] as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.2.1v1"].CapExclusions.Groups as ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]
 
     ReportDetailStr := concat("", [
         "1 conditional access policy(s) found that meet(s) all requirements:",
-        "<br/>Test name. <a href='#caps'>View all CA policies</a>."
+        "<br/>Test block Legacy Authentication. <a href='#caps'>View all CA policies</a>."
     ])
 
     TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, true) == true
@@ -187,49 +50,12 @@ test_NoExclusionsExemptGroups_Correct_V1 if {
 
 # User exclusions test
 test_UserExclusionNoExempt_Incorrect_V1 if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ]
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ],
-                        "ExcludeUsers": [
-                            "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"
-                        ],
-                        "ExcludeGroups": [],
-                        "ExcludeRoles": []
-                    },
-                    "UserRiskLevels": [
-                        "high"
-                    ]
-                },
-                "GrantControls": {
-                    "BuiltInControls": [
-                        "block"
-                    ]
-                },
-                "State": "enabled",
-                "DisplayName": "Test name"
-            }
-        ],
-        "service_plans": [
-            {
-                "ServicePlanName": "EXCHANGE_S_FOUNDATION",
-                "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
-            },
-            {
-                "ServicePlanName": "AAD_PREMIUM_P2",
-                "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
-            }
-        ]
-    }
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "Conditions/Users/ExcludeUsers",
+                "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+                        with input.service_plans as ServicePlans
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
@@ -237,115 +63,33 @@ test_UserExclusionNoExempt_Incorrect_V1 if {
 }
 
 test_UserExclusionConditions_Correct_V1 if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ]
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ],
-                        "ExcludeUsers": [
-                            "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"
-                        ],
-                        "ExcludeGroups": [],
-                        "ExcludeRoles": []
-                    },
-                    "UserRiskLevels": [
-                        "high"
-                    ]
-                },
-                "GrantControls": {
-                    "BuiltInControls": [
-                        "block"
-                    ]
-                },
-                "State": "enabled",
-                "DisplayName": "Test name"
-            }
-        ],
-        "service_plans": [
-            {
-                "ServicePlanName": "EXCHANGE_S_FOUNDATION",
-                "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
-            },
-            {
-                "ServicePlanName": "AAD_PREMIUM_P2",
-                "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
-            }
-        ],
-        "scuba_config": {
-            "Aad": {
-                "MS.AAD.2.1v1": {
-                    "CapExclusions": {
-                        "Users": [
-                            "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"
-                        ],
-                        "Groups": []
-                    }
-                }
-            }
-        }
-    }
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "Conditions/Users/ExcludeUsers",
+                "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+                        with input.service_plans as ServicePlans
+                        with input.scuba_config.Aad["MS.AAD.2.1v1"] as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.2.1v1"].CapExclusions.Users as ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]
 
     ReportDetailStr := concat("", [
         "1 conditional access policy(s) found that meet(s) all requirements:",
-        "<br/>Test name. <a href='#caps'>View all CA policies</a>."
+        "<br/>Test block Legacy Authentication. <a href='#caps'>View all CA policies</a>."
     ])
 
     TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, true) == true
 }
 
 test_UserExclusionsNoExempt_Incorrect_V1 if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ]
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ],
-                        "ExcludeUsers": [
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "Conditions/Users/ExcludeUsers",
+                "value": [
                             "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3",
                             "65fea286-22d3-42f9-b4ca-93a6f75817d4"
-                        ],
-                        "ExcludeGroups": [],
-                        "ExcludeRoles": []
-                    },
-                    "UserRiskLevels": [
-                        "high"
-                    ]
-                },
-                "GrantControls": {
-                    "BuiltInControls": [
-                        "block"
-                    ]
-                },
-                "State": "enabled",
-                "DisplayName": "Test name"
-            }
-        ],
-        "service_plans": [
-            {
-                "ServicePlanName": "EXCHANGE_S_FOUNDATION",
-                "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
-            },
-            {
-                "ServicePlanName": "AAD_PREMIUM_P2",
-                "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
-            }
-        ]
-    }
+                        ]}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+                        with input.service_plans as ServicePlans
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
@@ -353,62 +97,17 @@ test_UserExclusionsNoExempt_Incorrect_V1 if {
 }
 
 test_UserExclusionsSingleExempt_Incorrect_V1 if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ]
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ],
-                        "ExcludeUsers": [
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "Conditions/Users/ExcludeUsers",
+                "value": [
                             "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3",
                             "65fea286-22d3-42f9-b4ca-93a6f75817d4"
-                        ],
-                        "ExcludeGroups": [],
-                        "ExcludeRoles": []
-                    },
-                    "UserRiskLevels": [
-                        "high"
-                    ]
-                },
-                "GrantControls": {
-                    "BuiltInControls": [
-                        "block"
-                    ]
-                },
-                "State": "enabled",
-                "DisplayName": "Test name"
-            }
-        ],
-        "service_plans": [
-            {
-                "ServicePlanName": "EXCHANGE_S_FOUNDATION",
-                "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
-            },
-            {
-                "ServicePlanName": "AAD_PREMIUM_P2",
-                "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
-            }
-        ],
-        "scuba_config": {
-            "Aad": {
-                "MS.AAD.2.1v1": {
-                    "CapExclusions": {
-                        "Users": [
-                            "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"
-                        ],
-                        "Groups": []
-                    }
-                }
-            }
-        }
-    }
+                        ]}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+                        with input.service_plans as ServicePlans
+                        with input.scuba_config.Aad["MS.AAD.2.1v1"] as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.2.1v1"].CapExclusions.Users as ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
@@ -416,67 +115,24 @@ test_UserExclusionsSingleExempt_Incorrect_V1 if {
 }
 
 test_MultiUserExclusionsConditions_Correct_V1 if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "Conditions/Users/ExcludeUsers",
+                "value": [
+                            "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3",
+                            "65fea286-22d3-42f9-b4ca-93a6f75817d4"
+                        ]}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+                        with input.service_plans as ServicePlans
+                        with input.scuba_config.Aad["MS.AAD.2.1v1"] as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.2.1v1"].CapExclusions.Users as [
+                            "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3",
+                            "65fea286-22d3-42f9-b4ca-93a6f75817d4"
                         ]
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ],
-                        "ExcludeUsers": [
-                            "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3",
-                            "65fea286-22d3-42f9-b4ca-93a6f75817d4"
-                        ],
-                        "ExcludeGroups": [],
-                        "ExcludeRoles": []
-                    },
-                    "UserRiskLevels": [
-                        "high"
-                    ]
-                },
-                "GrantControls": {
-                    "BuiltInControls": [
-                        "block"
-                    ]
-                },
-                "State": "enabled",
-                "DisplayName": "Test name"
-            }
-        ],
-        "service_plans": [
-            {
-                "ServicePlanName": "EXCHANGE_S_FOUNDATION",
-                "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
-            },
-            {
-                "ServicePlanName": "AAD_PREMIUM_P2",
-                "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
-            }
-        ],
-        "scuba_config": {
-            "Aad": {
-                "MS.AAD.2.1v1": {
-                    "CapExclusions": {
-                        "Users": [
-                            "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3",
-                            "65fea286-22d3-42f9-b4ca-93a6f75817d4"
-                        ],
-                        "Groups": []
-                    }
-                }
-            }
-        }
-    }
 
     ReportDetailStr := concat("", [
         "1 conditional access policy(s) found that meet(s) all requirements:",
-        "<br/>Test name. <a href='#caps'>View all CA policies</a>."
+        "<br/>Test block Legacy Authentication. <a href='#caps'>View all CA policies</a>."
     ])
 
     TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, true) == true
@@ -484,49 +140,12 @@ test_MultiUserExclusionsConditions_Correct_V1 if {
 
 # Group Exclusion tests #
 test_GroupExclusionNoExempt_Incorrect_V1 if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ]
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ],
-                        "ExcludeUsers": [],
-                        "ExcludeGroups": [
-                            "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"
-                        ],
-                        "ExcludeRoles": []
-                    },
-                    "UserRiskLevels": [
-                        "high"
-                    ]
-                },
-                "GrantControls": {
-                    "BuiltInControls": [
-                        "block"
-                    ]
-                },
-                "State": "enabled",
-                "DisplayName": "Test name"
-            }
-        ],
-        "service_plans": [
-            {
-                "ServicePlanName": "EXCHANGE_S_FOUNDATION",
-                "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
-            },
-            {
-                "ServicePlanName": "AAD_PREMIUM_P2",
-                "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
-            }
-        ]
-    }
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "Conditions/Users/ExcludeGroups",
+                "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+                        with input.service_plans as ServicePlans
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
@@ -534,115 +153,33 @@ test_GroupExclusionNoExempt_Incorrect_V1 if {
 }
 
 test_GroupExclusionsConditions_Correct_V1 if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ]
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ],
-                        "ExcludeUsers": [],
-                        "ExcludeGroups": [
-                            "49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"
-                        ],
-                        "ExcludeRoles": []
-                    },
-                    "UserRiskLevels": [
-                        "high"
-                    ]
-                },
-                "GrantControls": {
-                    "BuiltInControls": [
-                        "block"
-                    ]
-                },
-                "State": "enabled",
-                "DisplayName": "Test name"
-            }
-        ],
-        "service_plans": [
-            {
-                "ServicePlanName": "EXCHANGE_S_FOUNDATION",
-                "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
-            },
-            {
-                "ServicePlanName": "AAD_PREMIUM_P2",
-                "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
-            }
-        ],
-        "scuba_config": {
-            "Aad": {
-                "MS.AAD.2.1v1": {
-                    "CapExclusions": {
-                        "Users": [],
-                        "Groups": [
-                            "49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"
-                        ]
-                    }
-                }
-            }
-        }
-    }
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "Conditions/Users/ExcludeGroups",
+                "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+                        with input.service_plans as ServicePlans
+                        with input.scuba_config.Aad["MS.AAD.2.1v1"] as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.2.1v1"].CapExclusions.Groups as ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]
 
     ReportDetailStr := concat("", [
         "1 conditional access policy(s) found that meet(s) all requirements:",
-        "<br/>Test name. <a href='#caps'>View all CA policies</a>."
+        "<br/>Test block Legacy Authentication. <a href='#caps'>View all CA policies</a>."
     ])
 
     TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, true) == true
 }
 
 test_GroupExclusionsNoExempt_Incorrect_V1 if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ]
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ],
-                        "ExcludeUsers": [],
-                        "ExcludeGroups": [
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "Conditions/Users/ExcludeGroups",
+                "value": [
                             "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3",
                             "65fea286-22d3-42f9-b4ca-93a6f75817d4"
-                        ],
-                        "ExcludeRoles": []
-                    },
-                    "UserRiskLevels": [
-                        "high"
-                    ]
-                },
-                "GrantControls": {
-                    "BuiltInControls": [
-                        "block"
-                    ]
-                },
-                "State": "enabled",
-                "DisplayName": "Test name"
-            }
-        ],
-        "service_plans": [
-            {
-                "ServicePlanName": "EXCHANGE_S_FOUNDATION",
-                "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
-            },
-            {
-                "ServicePlanName": "AAD_PREMIUM_P2",
-                "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
-            }
-        ]
-    }
+                        ]}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+                        with input.service_plans as ServicePlans
 
     ReportDetailStr :=
     "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
@@ -650,62 +187,17 @@ test_GroupExclusionsNoExempt_Incorrect_V1 if {
 }
 
 test_GroupExclusionsSingleExempt_Incorrect_V1 if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ]
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ],
-                        "ExcludeUsers": [],
-                        "ExcludeGroups": [
-                            "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3",
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "Conditions/Users/ExcludeGroups",
+                "value": [
+                            "49b4dcdf-1f90-41a5-9dd7-5e7c3609b423",
                             "65fea286-22d3-42f9-b4ca-93a6f75817d4"
-                        ],
-                        "ExcludeRoles": []
-                    },
-                    "UserRiskLevels": [
-                        "high"
-                    ]
-                },
-                "GrantControls": {
-                    "BuiltInControls": [
-                        "block"
-                    ]
-                },
-                "State": "enabled",
-                "DisplayName": "Test name"
-            }
-        ],
-        "service_plans": [
-            {
-                "ServicePlanName": "EXCHANGE_S_FOUNDATION",
-                "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
-            },
-            {
-                "ServicePlanName": "AAD_PREMIUM_P2",
-                "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
-            }
-        ],
-        "scuba_config": {
-            "Aad": {
-                "MS.AAD.2.1v1": {
-                    "CapExclusions": {
-                        "Users": [],
-                        "Groups": [
-                            "49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"
-                        ]
-                    }
-                }
-            }
-        }
-    }
+                        ]}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+                        with input.service_plans as ServicePlans
+                        with input.scuba_config.Aad["MS.AAD.2.1v1"] as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.2.1v1"].CapExclusions.Groups as ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]
 
     ReportDetailStr :=
     "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
@@ -713,186 +205,58 @@ test_GroupExclusionsSingleExempt_Incorrect_V1 if {
 }
 
 test_MultiGroupExclusionsConditions_Correct_V1 if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ]
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ],
-                        "ExcludeUsers": [],
-                        "ExcludeGroups": [
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "Conditions/Users/ExcludeGroups",
+                "value": [
                             "49b4dcdf-1f90-41a5-9dd7-5e7c3609b423",
                             "65fea286-22d3-42f9-b4ca-93a6f75817d4"
-                        ],
-                        "ExcludeRoles": []
-                    },
-                    "UserRiskLevels": [
-                        "high"
-                    ]
-                },
-                "GrantControls": {
-                    "BuiltInControls": [
-                        "block"
-                    ]
-                },
-                "State": "enabled",
-                "DisplayName": "Test name"
-            }
-        ],
-        "service_plans": [
-            {
-                "ServicePlanName": "EXCHANGE_S_FOUNDATION",
-                "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
-            },
-            {
-                "ServicePlanName": "AAD_PREMIUM_P2",
-                "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
-            }
-        ],
-        "scuba_config": {
-            "Aad": {
-                "MS.AAD.2.1v1": {
-                    "CapExclusions": {
-                        "Users": [],
-                        "Groups": [
+                        ]}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+                        with input.service_plans as ServicePlans
+                        with input.scuba_config.Aad["MS.AAD.2.1v1"] as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.2.1v1"].CapExclusions.Groups as [
                             "49b4dcdf-1f90-41a5-9dd7-5e7c3609b423",
                             "65fea286-22d3-42f9-b4ca-93a6f75817d4"
                         ]
-                    }
-                }
-            }
-        }
-    }
 
     ReportDetailStr := concat("", [
         "1 conditional access policy(s) found that meet(s) all requirements:",
-        "<br/>Test name. <a href='#caps'>View all CA policies</a>."
+        "<br/>Test block Legacy Authentication. <a href='#caps'>View all CA policies</a>."
     ])
     TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, true) == true
 }
 
 # User and group exclusions tests
 test_UserGroupExclusionConditions_Correct_V1 if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ]
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ],
-                        "ExcludeUsers": [
-                            "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"
-                        ],
-                        "ExcludeGroups": [
-                            "49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"
-                        ],
-                        "ExcludeRoles": []
-                    },
-                    "UserRiskLevels": [
-                        "high"
-                    ]
-                },
-                "GrantControls": {
-                    "BuiltInControls": [
-                        "block"
-                    ]
-                },
-                "State": "enabled",
-                "DisplayName": "Test name"
-            }
-        ],
-        "service_plans": [
-            {
-                "ServicePlanName": "EXCHANGE_S_FOUNDATION",
-                "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
-            },
-            {
-                "ServicePlanName": "AAD_PREMIUM_P2",
-                "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
-            }
-        ],
-        "scuba_config": {
-            "Aad": {
-                "MS.AAD.2.1v1": {
-                    "CapExclusions": {
-                        "Users": [
-                            "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"
-                        ],
-                        "Groups": [
-                            "49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"
-                        ]
-                    }
-                }
-            }
-        }
-    }
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "Conditions/Users/ExcludeUsers",
+                "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]},
+                {"op": "add", "path": "Conditions/Users/ExcludeGroups",
+                "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+                        with input.service_plans as ServicePlans
+                        with input.scuba_config.Aad["MS.AAD.2.1v1"] as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.2.1v1"].CapExclusions.Users as ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]
+                        with input.scuba_config.Aad["MS.AAD.2.1v1"].CapExclusions.Groups as ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]
 
     ReportDetailStr := concat("", [
         "1 conditional access policy(s) found that meet(s) all requirements:",
-        "<br/>Test name. <a href='#caps'>View all CA policies</a>."
+        "<br/>Test block Legacy Authentication. <a href='#caps'>View all CA policies</a>."
     ])
     TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, true) == true
 }
 
 test_UserGroupExclusionNoExempt_Incorrect_V1 if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ]
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ],
-                        "ExcludeUsers": [
-                            "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"
-                        ],
-                        "ExcludeGroups": [
-                            "49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"
-                        ],
-                        "ExcludeRoles": []
-                    },
-                    "UserRiskLevels": [
-                        "high"
-                    ]
-                },
-                "GrantControls": {
-                    "BuiltInControls": [
-                        "block"
-                    ]
-                },
-                "State": "enabled",
-                "DisplayName": "Test name"
-            }
-        ],
-        "service_plans": [
-            {
-                "ServicePlanName": "EXCHANGE_S_FOUNDATION",
-                "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
-            },
-            {
-                "ServicePlanName": "AAD_PREMIUM_P2",
-                "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
-            }
-        ]
-    }
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "Conditions/Users/ExcludeUsers",
+                "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]},
+                {"op": "add", "path": "Conditions/Users/ExcludeGroups",
+                "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+                        with input.service_plans as ServicePlans
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
@@ -900,63 +264,16 @@ test_UserGroupExclusionNoExempt_Incorrect_V1 if {
 }
 
 test_UserGroupExclusionUserExemptOnly_Incorrect_V1 if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ]
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ],
-                        "ExcludeUsers": [
-                            "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"
-                        ],
-                        "ExcludeGroups": [
-                            "49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"
-                        ],
-                        "ExcludeRoles": []
-                    },
-                    "UserRiskLevels": [
-                        "high"
-                    ]
-                },
-                "GrantControls": {
-                    "BuiltInControls": [
-                        "block"
-                    ]
-                },
-                "State": "enabled",
-                "DisplayName": "Test name"
-            }
-        ],
-        "service_plans": [
-            {
-                "ServicePlanName": "EXCHANGE_S_FOUNDATION",
-                "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
-            },
-            {
-                "ServicePlanName": "AAD_PREMIUM_P2",
-                "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
-            }
-        ],
-        "scuba_config": {
-            "Aad": {
-                "MS.AAD.2.1v1": {
-                    "CapExclusions": {
-                        "Users": [
-                            "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"
-                        ],
-                        "Groups": []
-                    }
-                }
-            }
-        }
-    }
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "Conditions/Users/ExcludeUsers",
+                "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]},
+                {"op": "add", "path": "Conditions/Users/ExcludeGroups",
+                "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+                        with input.service_plans as ServicePlans
+                        with input.scuba_config.Aad["MS.AAD.2.1v1"] as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.2.1v1"].CapExclusions.Users as ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
@@ -964,63 +281,16 @@ test_UserGroupExclusionUserExemptOnly_Incorrect_V1 if {
 }
 
 test_UserGroupExclusionGroupExemptOnly_Incorrect_V1 if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ]
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ],
-                        "ExcludeUsers": [
-                            "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"
-                        ],
-                        "ExcludeGroups": [
-                            "49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"
-                        ],
-                        "ExcludeRoles": []
-                    },
-                    "UserRiskLevels": [
-                        "high"
-                    ]
-                },
-                "GrantControls": {
-                    "BuiltInControls": [
-                        "block"
-                    ]
-                },
-                "State": "enabled",
-                "DisplayName": "Test name"
-            }
-        ],
-        "service_plans": [
-            {
-                "ServicePlanName": "EXCHANGE_S_FOUNDATION",
-                "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
-            },
-            {
-                "ServicePlanName": "AAD_PREMIUM_P2",
-                "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
-            }
-        ],
-        "scuba_config": {
-            "Aad": {
-                "MS.AAD.2.1v1": {
-                    "CapExclusions": {
-                        "Users": [],
-                        "Groups": [
-                            "49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"
-                        ]
-                    }
-                }
-            }
-        }
-    }
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "Conditions/Users/ExcludeUsers",
+                "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]},
+                {"op": "add", "path": "Conditions/Users/ExcludeGroups",
+                "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+                        with input.service_plans as ServicePlans
+                        with input.scuba_config.Aad["MS.AAD.2.1v1"] as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.2.1v1"].CapExclusions.Groups as ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
@@ -1028,66 +298,20 @@ test_UserGroupExclusionGroupExemptOnly_Incorrect_V1 if {
 }
 
 test_UserGroupExclusionTooFewUserExempts_Incorrect_V1 if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ]
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ],
-                        "ExcludeUsers": [
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "Conditions/Users/ExcludeUsers",
+                "value": [
                             "49b4dcdf-1f90-41a5-9dd7-5e7c3609b423",
                             "65fea286-22d3-42f9-b4ca-93a6f75817d4"
-                        ],
-                        "ExcludeGroups": [
-                            "49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"
-                        ],
-                        "ExcludeRoles": []
-                    },
-                    "UserRiskLevels": [
-                        "high"
-                    ]
-                },
-                "GrantControls": {
-                    "BuiltInControls": [
-                        "block"
-                    ]
-                },
-                "State": "enabled",
-                "DisplayName": "Test name"
-            }
-        ],
-        "service_plans": [
-            {
-                "ServicePlanName": "EXCHANGE_S_FOUNDATION",
-                "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
-            },
-            {
-                "ServicePlanName": "AAD_PREMIUM_P2",
-                "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
-            }
-        ],
-        "scuba_config": {
-            "Aad": {
-                "MS.AAD.2.1v1": {
-                    "CapExclusions": {
-                        "Users": [
-                            "65fea286-22d3-42f9-b4ca-93a6f75817d4"
-                        ],
-                        "Groups": [
-                            "49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"
-                        ]
-                    }
-                }
-            }
-        }
-    }
+                        ]},
+                {"op": "add", "path": "Conditions/Users/ExcludeGroups",
+                "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+                        with input.service_plans as ServicePlans
+                        with input.scuba_config.Aad["MS.AAD.2.1v1"] as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.2.1v1"].CapExclusions.Users as ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]
+                        with input.scuba_config.Aad["MS.AAD.2.1v1"].CapExclusions.Groups as ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
@@ -1096,47 +320,12 @@ test_UserGroupExclusionTooFewUserExempts_Incorrect_V1 if {
 
 # Other Conditions tests
 test_IncludeApplications_Incorrect_V1 if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "Office365"
-                        ]
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ],
-                        "ExcludeUsers": [],
-                        "ExcludeGroups": [],
-                        "ExcludeRoles": []
-                    },
-                    "UserRiskLevels": [
-                        "high"
-                    ]
-                },
-                "GrantControls": {
-                    "BuiltInControls": [
-                        "block"
-                    ]
-                },
-                "State": "enabled",
-                "DisplayName": "Test name"
-            }
-        ],
-        "service_plans": [
-            {
-                "ServicePlanName": "EXCHANGE_S_FOUNDATION",
-                "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
-            },
-            {
-                "ServicePlanName": "AAD_PREMIUM_P2",
-                "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
-            }
-        ]
-    }
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "Conditions/Applications/IncludeApplications",
+                "value": ["Office365"]}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+                        with input.service_plans as ServicePlans
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
@@ -1144,47 +333,12 @@ test_IncludeApplications_Incorrect_V1 if {
 }
 
 test_IncludeUsers_Incorrect_V1 if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ]
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"
-                        ],
-                        "ExcludeUsers": [],
-                        "ExcludeGroups": [],
-                        "ExcludeRoles": []
-                    },
-                    "UserRiskLevels": [
-                        "high"
-                    ]
-                },
-                "GrantControls": {
-                    "BuiltInControls": [
-                        "block"
-                    ]
-                },
-                "State": "enabled",
-                "DisplayName": "Test name"
-            }
-        ],
-        "service_plans": [
-            {
-                "ServicePlanName": "EXCHANGE_S_FOUNDATION",
-                "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
-            },
-            {
-                "ServicePlanName": "AAD_PREMIUM_P2",
-                "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
-            }
-        ]
-    }
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "Conditions/Users/IncludeUsers",
+                "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+                        with input.service_plans as ServicePlans
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
