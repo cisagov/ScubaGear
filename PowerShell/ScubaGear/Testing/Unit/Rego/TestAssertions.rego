@@ -11,16 +11,18 @@ import rego.v1
 # description: Assert expected is equal to result
 equals(expected, result) if {
     expected == result
+    print("PASS: expected equals '", _quote_str(expected), "'\n")
 } else := false if {
-    print("FAIL: expected equals '", _quote_str(expected), "', got '", result, "'")
+    print("FAIL: expected equals '", _quote_str(expected), "', got '", result, "'\n")
 }
 
 # METADATA
 # description: Assert expected is not equal to result
 not_equals(expected, result) if {
     expected != result
+    print("PASS: expected not equals '", _quote_str(expected), "'\n")
 } else := false if {
-    print("FAIL: expected not equals '", _quote_str(expected), "', got '", result, "'")
+    print("FAIL: expected not equals '", _quote_str(expected), "', got '", result, "'\n")
 }
 
 # METADATA
@@ -29,9 +31,10 @@ all_equals(coll, value) if {
     every item in coll {
         item == value
     }
+    print("PASS: expected all items to have value '", _append_comma(value), "'\n")
 } else := false if {
     exceptions := [item | some item in coll; item != value]
-    print("FAIL: expected all items to have value '", _append_comma(value), "', failed for '", exceptions, "'")
+    print("FAIL: expected all items to have value '", _append_comma(value), "', failed for '", exceptions, "'\n")
 }
 
 # METADATA
@@ -40,39 +43,44 @@ none_equals(coll, value) if {
     every item in coll {
         item != value
     }
+    print("PASS: expected no items to have value '", _append_comma(value), "'\n")
 } else := false if {
     exceptions := [item | some item in coll; item == value]
-    print("FAIL: expected no items to have value '", _append_comma(value), "', failed for '", exceptions, "'")
+    print("FAIL: expected no items to have value '", _append_comma(value), "', failed for '", exceptions, "'\n")
 }
 
 # METADATA
 # description: Assert item is in coll
 has(item, coll) if {
     item in coll
+    print("PASS: expected", type_name(item), _quote_str(item), "in", type_name(coll), "\n")
 } else := false if {
-    print("FAIL: expected", type_name(item), _quote_str(item), "in", type_name(coll), "got '", coll, "'")
+    print("FAIL: expected", type_name(item), _quote_str(item), "in", type_name(coll), "got '", coll, "'\n")
 }
 
 # METADATA
 # description: Assert item is not in coll
 not_has(item, coll) if {
     not item in coll
+    print("PASS: did not expect", type_name(item), _quote_str(item), "in", type_name(coll), "\n")
 } else := false if {
-    print("FAIL: did not expect", type_name(item), _quote_str(item), "in", type_name(coll), "got '", coll, "'")
+    print("FAIL: did not expect", type_name(item), _quote_str(item), "in", type_name(coll), "got '", coll, "'\n")
 }
 
 # METADATA
 # description: Assert provided collection is empty
 empty(coll) if {
     count(coll) == 0
+    print("PASS: expected empty", type_name(coll), "\n")
 } else := false if {
-    print("FAIL: expected empty", type_name(coll), "got '", coll, "'")
+    print("FAIL: expected empty", type_name(coll), "got '", coll, "'\n")
 }
 
 # METADATA
 # description: Assert provided collection is not empty
 not_empty(coll) if {
     count(coll) != 0
+    print("PASS: expected not empty", type_name(coll))
 } else := false if {
     print("FAIL: expected not empty", type_name(coll))
 }
@@ -81,32 +89,36 @@ not_empty(coll) if {
 # description: Assert string starts with search
 starts_with(str, search) if {
     startswith(str, search)
+    print("PASS: expected '", _quote_str(str), "' to start with '", _quote_str(search), "'\n")
 } else := false if {
-    print("FAIL: expected '", _quote_str(str), "' to start with '", _quote_str(search), "'")
+    print("FAIL: expected '", _quote_str(str), "' to start with '", _quote_str(search), "'\n")
 }
 
 # METADATA
 # description: Assert string ends with search
 ends_with(str, search) if {
     endswith(str, search)
+    print("PASS: expected '", _quote_str(str), "' to end with '", _quote_str(search), "'\n")
 } else := false if {
-    print("FAIL: expected '", _quote_str(str), "' to end with '", _quote_str(search), "'")
+    print("FAIL: expected '", _quote_str(str), "' to end with '", _quote_str(search), "'\n")
 }
 
 # METADATA
 # description: Assert string starts with search
 does_contains(str, search) if {
     contains(str, search)
+    print("PASS: expected '", _quote_str(str), "' to contain '", _quote_str(search), "'\n")
 } else := false if {
-    print("FAIL: expected '", _quote_str(str), "' to contain '", _quote_str(search), "'")
+    print("FAIL: expected '", _quote_str(str), "' to contain '", _quote_str(search), "'\n")
 }
 
 # METADATA
 # description: Assert string ends with search
 not_contains(str, search) if {
     not contains(str, search)
+    print("PASS: expected '", _quote_str(str), "' to not contain '", _quote_str(search), "'\n")
 } else := false if {
-    print("FAIL: expected '", _quote_str(str), "' to not contain '", _quote_str(search), "'")
+    print("FAIL: expected '", _quote_str(str), "' to not contain '", _quote_str(search), "'\n")
 }
 
 # METADATA
@@ -115,9 +127,10 @@ all_starts_with(coll, search) if {
     every str in coll {
         startswith(str, search)
     }
+    print("PASS: expected all strings to start with '", _append_comma(search), "'\n")
 } else := false if {
     exceptions := [str | some str in coll; not startswith(str, search)]
-    print("FAIL: expected all strings to start with '", _append_comma(search), "' failed for '", exceptions, "'")
+    print("FAIL: expected all strings to start with '", _append_comma(search), "' failed for '", exceptions, "'\n")
 }
 
 # METADATA
@@ -126,9 +139,10 @@ all_ends_with(coll, search) if {
     every str in coll {
         endswith(str, search)
     }
+    print("PASS: expected all strings to end with '", _append_comma(search), "'\n")
 } else := false if {
     exceptions := [str | some str in coll; not endswith(str, search)]
-    print("FAIL: expected all strings to end with '", _append_comma(search), "' failed for '", exceptions, "'")
+    print("FAIL: expected all strings to end with '", _append_comma(search), "' failed for '", exceptions, "'\n")
 }
 
 # METADATA
@@ -137,9 +151,10 @@ none_starts_with(coll, search) if {
     every str in coll {
         not startswith(str, search)
     }
+    print("PASS: expected no strings to start with '", _append_comma(search), "'\n")
 } else := false if {
     exceptions := [str | some str in coll; startswith(str, search)]
-    print("FAIL: expected no strings to start with '", _append_comma(search), "' failed for '", exceptions, "'")
+    print("FAIL: expected no strings to start with '", _append_comma(search), "' failed for '", exceptions, "'\n")
 }
 
 # METADATA
@@ -148,9 +163,10 @@ none_ends_with(coll, search) if {
     every str in coll {
         not endswith(str, search)
     }
+    print("PASS: expected no strings to end with '", _append_comma(search), "'\n")
 } else := false if {
     exceptions := [str | some str in coll; endswith(str, search)]
-    print("FAIL: expected no strings to end with '", _append_comma(search), "' failed for '", exceptions, "'")
+    print("FAIL: expected no strings to end with '", _append_comma(search), "' failed for '", exceptions, "'\n")
 }
 
 # METADATA
