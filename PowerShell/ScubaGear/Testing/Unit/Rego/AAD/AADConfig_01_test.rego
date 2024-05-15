@@ -38,8 +38,7 @@ test_NoExclusionsIncludeUsers_Incorrect if {
                 [{"op": "add", "path": "Conditions/Users/IncludeUsers",
                 "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]}])
 
-    Output := aad.tests with input.conditional_access_policies as [ConditionalAccessPolicies]
-                        with input.conditional_access_policies as [CAP]
+    Output := aad.tests with input.conditional_access_policies as [CAP]
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
@@ -52,8 +51,7 @@ test_NoExclusionsExcludeUsers_Incorrect if {
                 [{"op": "add", "path": "Conditions/Users/ExcludeUsers",
                 "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]}])
 
-    Output := aad.tests with input.conditional_access_policies as [ConditionalAccessPolicies]
-                        with input.conditional_access_policies as [CAP]
+    Output := aad.tests with input.conditional_access_policies as [CAP]
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
@@ -66,8 +64,7 @@ test_NoExclusionsExcludeGroups_Incorrect if {
                 [{"op": "add", "path": "Conditions/Users/ExcludeGroups",
                 "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]}])
 
-    Output := aad.tests with input.conditional_access_policies as [ConditionalAccessPolicies]
-                        with input.conditional_access_policies as [CAP]
+    Output := aad.tests with input.conditional_access_policies as [CAP]
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
@@ -80,8 +77,7 @@ test_NoExclusionsClientAppTypes_Incorrect if {
                 [{"op": "add", "path": "Conditions/ClientAppTypes",
                 "value": [""]}])
 
-    Output := aad.tests with input.conditional_access_policies as [ConditionalAccessPolicies]
-                        with input.conditional_access_policies as [CAP]
+    Output := aad.tests with input.conditional_access_policies as [CAP]
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
@@ -94,8 +90,7 @@ test_NoExclusionsBuiltInControls_Incorrect if {
                 [{"op": "add", "path": "GrantControls/BuiltInControls",
                 "value": []}])
 
-    Output := aad.tests with input.conditional_access_policies as [ConditionalAccessPolicies]
-                        with input.conditional_access_policies as [CAP]
+    Output := aad.tests with input.conditional_access_policies as [CAP]
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
@@ -108,8 +103,7 @@ test_NoExclusionsState_Incorrect if {
                 [{"op": "add", "path": "State",
                 "value": "disabled"}])
 
-    Output := aad.tests with input.conditional_access_policies as [ConditionalAccessPolicies]
-                        with input.conditional_access_policies as [CAP]
+    Output := aad.tests with input.conditional_access_policies as [CAP]
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
@@ -136,8 +130,7 @@ test_UserExclusionsConditions_Correct if {
                 [{"op": "add", "path": "Conditions/Users/ExcludeUsers",
                 "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]}])
 
-    Output := aad.tests with input.conditional_access_policies as [ConditionalAccessPolicies]
-                        with input.conditional_access_policies as [CAP]
+    Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.scuba_config.Aad["MS.AAD.1.1v1"] as ScubaConfig
                         with input.scuba_config.Aad["MS.AAD.1.1v1"].CapExclusions.Users as ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]
 
@@ -157,8 +150,7 @@ test_MultiUserExclusionsConditions_Correct if {
                         "df269963-a081-4315-b7de-172755221504"
                         ]}])
 
-    Output := aad.tests with input.conditional_access_policies as [ConditionalAccessPolicies]
-                        with input.conditional_access_policies as [CAP]
+    Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.scuba_config.Aad["MS.AAD.1.1v1"] as ScubaConfig
                         with input.scuba_config.Aad["MS.AAD.1.1v1"].CapExclusions.Users as [
                             "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3",
@@ -178,8 +170,7 @@ test_UserExclusionNoExempt_Incorrect if {
                 [{"op": "add", "path": "Conditions/Users/ExcludeUsers",
                 "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]}])
 
-    Output := aad.tests with input.conditional_access_policies as [ConditionalAccessPolicies]
-                        with input.conditional_access_policies as [CAP]
+    Output := aad.tests with input.conditional_access_policies as [CAP]
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
@@ -195,8 +186,7 @@ test_UserExclusionsSingleExempt_Incorrect if {
                         "df269963-a081-4315-b7de-172755221504"
                         ]}])
 
-    Output := aad.tests with input.conditional_access_policies as [ConditionalAccessPolicies]
-                        with input.conditional_access_policies as [CAP]
+    Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.scuba_config.Aad["MS.AAD.1.1v1"] as ScubaConfig
                         with input.scuba_config.Aad["MS.AAD.1.1v1"].CapExclusions.Users as ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]
 
@@ -214,8 +204,7 @@ test_UserExclusionsNoExempt_Incorrect if {
                         "df269963-a081-4315-b7de-172755221504"
                         ]}])
 
-    Output := aad.tests with input.conditional_access_policies as [ConditionalAccessPolicies]
-                        with input.conditional_access_policies as [CAP]
+    Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.scuba_config.Aad["MS.AAD.1.1v1"] as ScubaConfig
 
     ReportDetailStr :=
@@ -231,8 +220,7 @@ test_UserExclusionsIncludeApplications_Incorrect if {
                 {"op": "add", "path": "Conditions/Users/ExcludeUsers",
                 "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]}])
 
-    Output := aad.tests with input.conditional_access_policies as [ConditionalAccessPolicies]
-                        with input.conditional_access_policies as [CAP]
+    Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.scuba_config.Aad["MS.AAD.1.1v1"] as ScubaConfig
                         with input.scuba_config.Aad["MS.AAD.1.1v1"].CapExclusions.Users as ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]
 
@@ -249,8 +237,7 @@ test_UserExclusionsIncludeUsers_Incorrect if {
                 {"op": "add", "path": "Conditions/Users/ExcludeUsers",
                 "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]}])
 
-    Output := aad.tests with input.conditional_access_policies as [ConditionalAccessPolicies]
-                        with input.conditional_access_policies as [CAP]
+    Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.scuba_config.Aad["MS.AAD.1.1v1"] as ScubaConfig
                         with input.scuba_config.Aad["MS.AAD.1.1v1"].CapExclusions.Users as ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]
 
@@ -267,8 +254,7 @@ test_UserExclusionsExcludeGroups_Incorrect if {
                 {"op": "add", "path": "Conditions/Users/ExcludeGroups",
                 "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]}])
 
-    Output := aad.tests with input.conditional_access_policies as [ConditionalAccessPolicies]
-                        with input.conditional_access_policies as [CAP]
+    Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.scuba_config.Aad["MS.AAD.1.1v1"] as ScubaConfig
                         with input.scuba_config.Aad["MS.AAD.1.1v1"].CapExclusions.Users as ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]
 
@@ -285,8 +271,7 @@ test_UserExclusionsClientAppTypes_Incorrect if {
                 {"op": "add", "path": "Conditions/ClientAppTypes",
                 "value": [""]}])
 
-    Output := aad.tests with input.conditional_access_policies as [ConditionalAccessPolicies]
-                        with input.conditional_access_policies as [CAP]
+    Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.scuba_config.Aad["MS.AAD.1.1v1"] as ScubaConfig
                         with input.scuba_config.Aad["MS.AAD.1.1v1"].CapExclusions.Users as ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]
 
@@ -303,8 +288,7 @@ test_UserExclusionsBuiltInControls_Incorrect if {
                 {"op": "add", "path": "GrantControls/BuiltInControls",
                 "value": []}])
 
-    Output := aad.tests with input.conditional_access_policies as [ConditionalAccessPolicies]
-                        with input.conditional_access_policies as [CAP]
+    Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.scuba_config.Aad["MS.AAD.1.1v1"] as ScubaConfig
                         with input.scuba_config.Aad["MS.AAD.1.1v1"].CapExclusions.Users as ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]
 
@@ -321,8 +305,7 @@ test_UserExclusionsState_Incorrect if {
                 {"op": "add", "path": "State",
                 "value": "disabled"}])
 
-    Output := aad.tests with input.conditional_access_policies as [ConditionalAccessPolicies]
-                        with input.conditional_access_policies as [CAP]
+    Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.scuba_config.Aad["MS.AAD.1.1v1"] as ScubaConfig
                         with input.scuba_config.Aad["MS.AAD.1.1v1"].CapExclusions.Users as ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]
 
@@ -351,8 +334,7 @@ test_GroupExclusionNoExempt_Incorrect if {
                 [{"op": "add", "path": "Conditions/Users/ExcludeGroups",
                 "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]}])
 
-    Output := aad.tests with input.conditional_access_policies as [ConditionalAccessPolicies]
-                        with input.conditional_access_policies as [CAP]
+    Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.scuba_config.Aad["MS.AAD.1.1v1"] as ScubaConfig
 
     ReportDetailStr :=
@@ -369,8 +351,7 @@ test_GroupExclusionsNoExempt_Incorrect if {
                         "65fea286-22d3-42f9-b4ca-93a6f75817d4"
                         ]}])
 
-    Output := aad.tests with input.conditional_access_policies as [ConditionalAccessPolicies]
-                        with input.conditional_access_policies as [CAP]
+    Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.scuba_config.Aad["MS.AAD.1.1v1"] as ScubaConfig
 
     ReportDetailStr :=
@@ -387,8 +368,7 @@ test_GroupExclusionsSingleExempt_Incorrect if {
                         "65fea286-22d3-42f9-b4ca-93a6f75817d4"
                         ]}])
 
-    Output := aad.tests with input.conditional_access_policies as [ConditionalAccessPolicies]
-                        with input.conditional_access_policies as [CAP]
+    Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.scuba_config.Aad["MS.AAD.1.1v1"] as ScubaConfig
                         with input.scuba_config.Aad["MS.AAD.1.1v1"].CapExclusions.Groups as ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]
 
@@ -403,8 +383,7 @@ test_GroupExclusionConditions_Correct if {
                 [{"op": "add", "path": "Conditions/Users/ExcludeGroups",
                 "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]}])
 
-    Output := aad.tests with input.conditional_access_policies as [ConditionalAccessPolicies]
-                        with input.conditional_access_policies as [CAP]
+    Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.scuba_config.Aad["MS.AAD.1.1v1"] as ScubaConfig
                         with input.scuba_config.Aad["MS.AAD.1.1v1"].CapExclusions.Groups as ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]
 
@@ -424,8 +403,7 @@ test_MultiGroupExclusionsConditions_Correct if {
                         "65fea286-22d3-42f9-b4ca-93a6f75817d4"
                         ]}])
 
-    Output := aad.tests with input.conditional_access_policies as [ConditionalAccessPolicies]
-                        with input.conditional_access_policies as [CAP]
+    Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.scuba_config.Aad["MS.AAD.1.1v1"] as ScubaConfig
                         with input.scuba_config.Aad["MS.AAD.1.1v1"].CapExclusions.Groups as [
                             "49b4dcdf-1f90-41a5-9dd7-5e7c3609b423",
@@ -448,8 +426,7 @@ test_UserGroupExclusionConditions_Correct if {
                 {"op": "add", "path": "Conditions/Users/ExcludeGroups",
                 "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]}])
 
-    Output := aad.tests with input.conditional_access_policies as [ConditionalAccessPolicies]
-                        with input.conditional_access_policies as [CAP]
+    Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.scuba_config.Aad["MS.AAD.1.1v1"] as ScubaConfig
                         with input.scuba_config.Aad["MS.AAD.1.1v1"].CapExclusions.Groups as ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]
                         with input.scuba_config.Aad["MS.AAD.1.1v1"].CapExclusions.Users as ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]
@@ -469,8 +446,7 @@ test_UserGroupExclusionNoExempt_Incorrect if {
                 {"op": "add", "path": "Conditions/Users/ExcludeGroups",
                 "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]}])
 
-    Output := aad.tests with input.conditional_access_policies as [ConditionalAccessPolicies]
-                        with input.conditional_access_policies as [CAP]
+    Output := aad.tests with input.conditional_access_policies as [CAP]
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
@@ -485,8 +461,7 @@ test_UserGroupExclusionUserExemptOnly_Incorrect if {
                 {"op": "add", "path": "Conditions/Users/ExcludeGroups",
                 "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]}])
 
-    Output := aad.tests with input.conditional_access_policies as [ConditionalAccessPolicies]
-                        with input.conditional_access_policies as [CAP]
+    Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.scuba_config.Aad["MS.AAD.1.1v1"] as ScubaConfig
                         with input.scuba_config.Aad["MS.AAD.1.1v1"].CapExclusions.Users as ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]
 
@@ -503,8 +478,7 @@ test_UserGroupExclusionGroupExemptOnly_Incorrect if {
                 {"op": "add", "path": "Conditions/Users/ExcludeGroups",
                 "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]}])
 
-    Output := aad.tests with input.conditional_access_policies as [ConditionalAccessPolicies]
-                        with input.conditional_access_policies as [CAP]
+    Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.scuba_config.Aad["MS.AAD.1.1v1"] as ScubaConfig
                         with input.scuba_config.Aad["MS.AAD.1.1v1"].CapExclusions.Groups as ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]
 
@@ -524,8 +498,7 @@ test_UserGroupExclusionTooFewUserExempts_Incorrect if {
                 {"op": "add", "path": "Conditions/Users/ExcludeGroups",
                 "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]}])
 
-    Output := aad.tests with input.conditional_access_policies as [ConditionalAccessPolicies]
-                        with input.conditional_access_policies as [CAP]
+    Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.scuba_config.Aad["MS.AAD.1.1v1"] as ScubaConfig
                         with input.scuba_config.Aad["MS.AAD.1.1v1"].CapExclusions.Users as ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]
 
