@@ -69,6 +69,11 @@ external domains prevents this technique when the adversary is
 external to the organization but does not impede legitimate
 internal forwarding.
 - _Last modified:_ June 2023
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1567:Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)
+  - [T1048:Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)
+  - [T1566.001:Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
+
 
 ### Resources
 
@@ -127,6 +132,10 @@ An SPF policy SHALL be published for each domain, designating only these address
 of an email such that it appears to be a legitimate email sent by an
 agency, facilitating phishing attacks. Publishing an SPF policy for each agency domain mitigates forged `FROM` fields by providing a means for recipients to detect emails spoofed in this way.  SPF is required for FCEB departments and agencies by Binding Operational Directive (BOD) 18-01, "Enhance Email and Web Security".
 - _Last modified:_ June 2023
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1656:Impersonation](https://attack.mitre.org/techniques/T1656/)
+  - [T1566:Phishing](https://attack.mitre.org/techniques/T1566/)
+
 
 ### Resources
 
@@ -197,6 +206,10 @@ of an email such that it appears to be a legitimate email sent by an
 agency, facilitating phishing attacks. Enabling DKIM is another means for
 recipients to detect spoofed emails and verify the integrity of email content.
 - _Last modified:_ June 2023
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1598:Phishing for Information](https://attack.mitre.org/techniques/T1598/)
+  - [T1656:Impersonation](https://attack.mitre.org/techniques/T1656/)
+  - [T1566:Phishing](https://attack.mitre.org/techniques/T1566/)
 
 ### Resources
 
@@ -245,6 +258,10 @@ may improperly handle SPF and DKIM failures, possibly enabling spoofed
 emails to reach end users' mailboxes. Publishing DMARC records at the
 second-level domain protects the second-level domains and all subdomains.
 - _Last modified:_ June 2023
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1598:Phishing for Information](https://attack.mitre.org/techniques/T1598/)
+  - [T1656:Impersonation](https://attack.mitre.org/techniques/T1656/)
+  - [T1566:Phishing](https://attack.mitre.org/techniques/T1566/)
 
 #### MS.EXO.4.2v1
 The DMARC message rejection option SHALL be p=reject.
@@ -254,6 +271,10 @@ The DMARC message rejection option SHALL be p=reject.
 reject provides the strongest protection. Reject is the level of protection
 required by BOD 18-01 for FCEB departments and agencies.
 - _Last modified:_ June 2023
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1598:Phishing for Information](https://attack.mitre.org/techniques/T1598/)
+  - [T1656:Impersonation](https://attack.mitre.org/techniques/T1656/)
+  - [T1566:Phishing](https://attack.mitre.org/techniques/T1566/)
 
 #### MS.EXO.4.3v1
 The DMARC point of contact for aggregate reports SHALL include `reports@dmarc.cyber.dhs.gov`.
@@ -265,6 +286,8 @@ Including <reports@dmarc.cyber.dhs.gov> as a point of contact for these reports 
 - _Last modified:_ June 2023
 - _Note:_ Only federal, executive branch, departments and agencies should
           include this email address in their DMARC record.
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1562:Impair Defenses](https://attack.mitre.org/techniques/T1562/)
 
 #### MS.EXO.4.4v1
 An agency point of contact SHOULD be included for aggregate and failure reports.
@@ -275,6 +298,8 @@ owners. DMARC provides a mechanism to receive reports of spoofing attempts.
 Including an agency point of contact gives the agency insight into attempts
 to spoof their domains.
 - _Last modified:_ June 2023
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1562:Impair Defenses](https://attack.mitre.org/techniques/T1562/)
 
 ### Resources
 
@@ -415,6 +440,10 @@ Contact folders SHALL NOT be shared with all domains.
 for specific legitimate use as needed.
 - _Last modified:_ June 2023
 - _Note:_ Contact folders MAY be shared with specific domains.
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1567:Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)
+  - [T1048:Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)
+
 
 #### MS.EXO.6.2v1
 Calendar details SHALL NOT be shared with all domains.
@@ -424,6 +453,9 @@ Calendar details SHALL NOT be shared with all domains.
 for legitimate use as needed.
 - _Last modified:_ June 2023
 - _Note:_ Calendar details MAY be shared with specific domains.
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1567:Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)
+  - [T1048:Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)
 
 ### Resources
 
@@ -554,6 +586,10 @@ A DLP solution SHALL be used. The selected DLP solution SHOULD offer services co
 <!--Policy: MS.EXO.8.1v1; Criticality: SHALL -->
 - _Rationale:_ Users may inadvertently disclose sensitive information to unauthorized individuals. A capable DLP solution should detect the presence of sensitive information in Exchange Online and block access to authorized entities.
 - _Last modified:_ June 2023
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1567:Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)
+  - [T1048:Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)
+  - [T1530:Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)
 
 #### MS.EXO.8.2v1
 The DLP solution SHALL protect personally identifiable information (PII) and sensitive information, as defined by the agency. At a minimum, sharing credit card numbers, Taxpayer Identification Numbers (TIN), and Social Security numbers (SSN) via email SHALL be restricted.
@@ -561,6 +597,11 @@ The DLP solution SHALL protect personally identifiable information (PII) and sen
 <!--Policy: MS.EXO.8.2v1; Criticality: SHALL -->
 - _Rationale:_ Users may inadvertently share sensitive information with others who should not have access to it. Data loss prevention policies provide a way for agencies to detect and prevent unauthorized disclosures.
 - _Last modified:_ June 2023
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1567:Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)
+  - [T1048:Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)
+  - [T1213.002:Sharepoint](https://attack.mitre.org/techniques/T1213/002/)
+  - [T1530:Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)
 
 ### Resources
 
@@ -606,6 +647,9 @@ than email; the dangers of allowing them to be sent over email outweigh
 any potential benefits. Filtering email attachments based on file types can
 prevent spread of malware distributed via click-to-run email attachments.
 - _Last modified:_ June 2023
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1566:Phishing](https://attack.mitre.org/techniques/T1566/)
+  - [T1566.001:Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
 
 #### MS.EXO.9.2v1
 The attachment filter SHOULD attempt to determine the true file type and assess the file extension.
@@ -613,6 +657,11 @@ The attachment filter SHOULD attempt to determine the true file type and assess 
 <!--Policy: MS.EXO.9.2v1; Criticality: SHOULD -->
 - _Rationale:_ Users can change a file extension at the end of a file name (e.g., notepad.exe to notepad.txt) to obscure the actual file type. Verifying the file type and checking that this matches the designated file extension can help detect instances where the file extension was changed.
 - _Last modified:_ June 2023
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1036:Masquerading](https://attack.mitre.org/techniques/T1036/)
+  - [T1036.006:Space after Filename](https://attack.mitre.org/techniques/T1036/006/)
+  - [T1036.007:Double File Extension](https://attack.mitre.org/techniques/T1036/007/)
+  - [T1036.008:Masquerade File Type](https://attack.mitre.org/techniques/T1036/008/)
 
 #### MS.EXO.9.3v1
 Disallowed file types SHALL be determined and set. At a minimum, click-to-run files SHOULD be blocked (e.g., .exe, .cmd, and .vbe).
@@ -623,6 +672,9 @@ though other file types can contain malicious content as well. As such,
 determining the full list of file types to block is left to each
 organization, to be made in accordance with their risk tolerance.
 - _Last modified:_ June 2023
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1566:Phishing](https://attack.mitre.org/techniques/T1566/)
+  - [T1566.001:Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
 
 ### Resources
 
@@ -684,6 +736,9 @@ Emails SHALL be scanned for malware.
 In many cases, malware can be detected through scanning, reducing
 the risk for end users.
 - _Last modified:_ June 2023
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1566:Phishing](https://attack.mitre.org/techniques/T1566/)
+  - [T1566.001:Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
 
 #### MS.EXO.10.2v1
 Emails identified as containing malware SHALL be quarantined or dropped.
@@ -693,6 +748,8 @@ Emails identified as containing malware SHALL be quarantined or dropped.
 Preventing emails with known malware from reaching user mailboxes helps ensure
 users cannot interact with those emails.
 - _Last modified:_ June 2023
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1566.001:Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
 
 #### MS.EXO.10.3v1
 Email scanning SHALL be capable of reviewing emails after delivery.
@@ -700,6 +757,8 @@ Email scanning SHALL be capable of reviewing emails after delivery.
 <!--Policy: MS.EXO.10.3v1; Criticality: SHALL -->
 - _Rationale:_ As known malware signatures are updated, it is possible for an email to be retroactively identified as containing malware after delivery. By scanning emails, the number of malware-infected in users' mailboxes can be reduced.
 - _Last modified:_ June 2023
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1566.001:Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
 
 ### Resources
 
@@ -772,6 +831,9 @@ if the `FROM` address is nearly indistinguishable from that of a known entity.
 By automatically identifying senders who appear to be impersonating known
 senders, the risk of a successful phishing attempt can be reduced.
 - _Last modified:_ June 2023
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1566:Phishing](https://attack.mitre.org/techniques/T1566/)
+  - [T1656:Impersonation](https://attack.mitre.org/techniques/T1656/)
 
 #### MS.EXO.11.2v1
 User warnings, comparable to the user safety tips included with EOP, SHOULD be displayed.
@@ -782,6 +844,9 @@ unusual characters in the `FROM` address or identifying a first-time sender.
 User warnings can handle these tasks, reducing the burden on end users and the risk of
 successful phishing attempts.
 - _Last modified:_ June 2023
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1566:Phishing](https://attack.mitre.org/techniques/T1566/)
+  - [T1656:Impersonation](https://attack.mitre.org/techniques/T1656/)
 
 #### MS.EXO.11.3v1
 The phishing protection solution SHOULD include an AI-based phishing detection tool comparable to EOP Mailbox Intelligence.
@@ -789,6 +854,9 @@ The phishing protection solution SHOULD include an AI-based phishing detection t
 <!--Policy: MS.EXO.11.3v1; Criticality: SHOULD -->
 - _Rationale:_ Phishing attacks can result in unauthorized data disclosure and unauthorized access. Using AI-based phishing detection tools to improve the detection rate of phishing attempts helps reduce the risk of successful phishing attacks.
 - _Last modified:_ June 2023
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1566:Phishing](https://attack.mitre.org/techniques/T1566/)
+  - [T1656:Impersonation](https://attack.mitre.org/techniques/T1656/)
 
 ### Resources
 
@@ -934,7 +1002,13 @@ Mailbox auditing SHALL be enabled.
 <!--Policy: MS.EXO.13.1v1; Criticality: SHALL -->
 - _Rationale:_ Exchange Online user accounts can be compromised or misused. Enabling mailbox auditing provides a valuable source of information to detect and respond to mailbox misuse.
 - _Last modified:_ June 2023
-
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1070.008:Clear Mailbox Data](https://attack.mitre.org/techniques/T1070/008/)
+  - [T1098.002:Additional Email Delegate Permissions](https://attack.mitre.org/techniques/T1098/002/)
+  - [T1562.008:Disable or Modify Cloud Logs](https://attack.mitre.org/techniques/T1562.008/)
+  - [T1586.002:Email Accounts](https://attack.mitre.org/techniques/T1586.002/)
+  - [T1564.008:Email Hiding Rules](https://attack.mitre.org/techniques/T1564.008/)
+    
 ### Resources
 
 - [Manage mailbox auditing in Office 365 \| Microsoft
@@ -999,6 +1073,8 @@ A spam filter SHALL be enabled. The filtering solution selected SHOULD offer ser
 <!--Policy: MS.EXO.14.1v1; Criticality: SHALL -->
 - _Rationale:_ Spam is a constant threat as junk mail can reduce user productivity, fill up mailboxes unnecessarily, and in some cases include malicious links or attachments. Filtering out spam reduces user workload burden, prevents junk mail congestion, and reduces potentially malicious content exposure.
 - _Last modified:_ June 2023
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1566:Phishing](https://attack.mitre.org/techniques/T1566/)
 
 #### MS.EXO.14.2v1
 Spam and high confidence spam SHALL be moved to either the junk email folder or the quarantine folder.
@@ -1007,6 +1083,8 @@ Spam and high confidence spam SHALL be moved to either the junk email folder or 
 - _Rationale:_ Spam is a constant threat as junk mail can reduce user productivity, fill up mailboxes unnecessarily, and in some cases include malicious links or attachments.
 Moving spam messages to a separate junk or quarantine folder helps users filter out spam while still giving them the ability to review messages, as needed, in case a message is filtered incorrectly.
 - _Last modified:_ June 2023
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1566:Phishing](https://attack.mitre.org/techniques/T1566/)
 
 #### MS.EXO.14.3v1
 Allowed domains SHALL NOT be added to inbound anti-spam protection policies.
@@ -1019,6 +1097,8 @@ a common domain like office.com, however, provides for a large number of
 potentially unknown users to bypass spam protections.
 - _Last modified:_ June 2023
 - _Note:_ Allowed senders MAY be added.
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1566:Phishing](https://attack.mitre.org/techniques/T1566/)
 
 ### Resources
 
@@ -1092,6 +1172,8 @@ URL comparison with a block-list SHOULD be enabled.
 <!--Policy: MS.EXO.15.1v1; Criticality: SHOULD -->
 - _Rationale:_ Users may be directed to malicious websites via links in email. Blocking access to known, malicious URLs can prevent users from accessing known malicious websites.
 - _Last modified:_ June 2023
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1566.002:Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
 
 #### MS.EXO.15.2v1
 Direct download links SHOULD be scanned for malware.
@@ -1101,6 +1183,8 @@ Direct download links SHOULD be scanned for malware.
 Scanning direct download links in real-time for known malware and blocking access can prevent
 users from infecting their devices.
 - _Last modified:_ June 2023
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1566.002:Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
 
 #### MS.EXO.15.3v1
 User click tracking SHOULD be enabled.
@@ -1108,6 +1192,8 @@ User click tracking SHOULD be enabled.
 <!--Policy: MS.EXO.15.3v1; Criticality: SHOULD -->
 - _Rationale:_ Users may click on malicious links in emails, leading to compromise or unauthorized data disclosure. Enabling user click tracking lets agencies know if a malicious link may have been visited after the fact to help tailor a response to a potential incident.
 - _Last modified:_ June 2023
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1566.002:Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
 
 ### Resources
 
@@ -1187,6 +1273,11 @@ At a minimum, the following alerts SHALL be enabled:
   to alert administrators to events listed above draws attention to them
   to help minimize impact to users and the agency.
 - _Last modified:_ June 2023
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1078.004:Cloud Accounts](https://attack.mitre.org/techniques/T1078/004/)
+  - [T1562:Impair Defenses](https://attack.mitre.org/techniques/T1562/)
+  - [T1566.002:Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
+  - [T1562.006:Indicator Blocking](https://attack.mitre.org/techniques/T1562/006/)
 
 #### MS.EXO.16.2v1
 The alerts SHOULD be sent to a monitored address or incorporated into a security information and event management (SIEM) system.
@@ -1198,6 +1289,8 @@ The alerts SHOULD be sent to a monitored address or incorporated into a security
   malicious events are acted upon in a timely manner to limit overall
   impact.
 - _Last modified:_ June 2023
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1562.006:Indicator Blocking](https://attack.mitre.org/techniques/T1562/006/)
 
 ### Resources
 
@@ -1264,6 +1357,8 @@ actions. Furthermore, Microsoft Purview Audit (Standard) is required for
 government agencies by OMB M-21-31 (referred to therein by its former
 name, Unified Audit Logs).
 - _Last modified:_ June 2023
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1562.008:Disable or Modify Cloud Logs](https://attack.mitre.org/techniques/T1562/008/)
 
 #### MS.EXO.17.2v1
 Microsoft Purview Audit (Premium) logging SHALL be enabled.
@@ -1280,6 +1375,9 @@ Furthermore, it is required for government agencies by OMB M-21-13 (referred to 
           Audit (Standard) subscribers. After rollout of changes are complete,
           Purview (Standard) may be sufficient for agencies to meet basic
           logging requirements.
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1562.008:Disable or Modify Cloud Logs](https://attack.mitre.org/techniques/T1562/008/)
+
 
 #### MS.EXO.17.3v1
 Audit logs SHALL be maintained for at least the minimum duration dictated by OMB M-21-31 (Appendix C).
