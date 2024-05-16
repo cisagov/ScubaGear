@@ -1096,6 +1096,14 @@ implementation steps for
 [enabling preset security policies](./defender.md#msdefender12v1), which do not
 include any allowed sender domains by default.
 
+#### MS.EXO.14.4v1 Instructions
+
+Any product meeting the requirements outlined in this baseline policy may be
+used. If the agency uses Microsoft Defender, see the following
+implementation steps for
+[enabling preset security policies](./defender.md#msdefender12v1), which
+include spam filtering.
+
 ## 15. Link Protection
 
 Several technologies exist for protecting users from malicious links
