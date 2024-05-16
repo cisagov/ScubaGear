@@ -761,16 +761,16 @@ tests contains {
 #############
 
 #
-# MS.EXO.14.1v1
+# MS.EXO.14.1v2
 #--
 
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests contains {
-    "PolicyId": "MS.EXO.14.1v1",
+    "PolicyId": "MS.EXO.14.1v2",
     "Criticality": "Shall/3rd Party",
     "Commandlet": [],
     "ActualValue": [],
-    "ReportDetails": DefenderMirrorDetails("MS.EXO.14.1v1"),
+    "ReportDetails": DefenderMirrorDetails("MS.EXO.14.1v2"),
     "RequirementMet": false
 }
 #--

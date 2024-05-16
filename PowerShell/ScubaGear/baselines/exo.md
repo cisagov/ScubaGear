@@ -1027,10 +1027,10 @@ Baseline for Defender for Office 365.
 
 ### Policies
 
-#### MS.EXO.14.1v1
+#### MS.EXO.14.1v2
 A spam filter SHALL be enabled. The filtering solution selected SHOULD offer services comparable to the native spam filtering offered by Microsoft.
 
-<!--Policy: MS.EXO.14.1v1; Criticality: SHALL -->
+<!--Policy: MS.EXO.14.1v2; Criticality: SHALL -->
 - _Rationale:_ Spam is a constant threat as junk mail can reduce user productivity, fill up mailboxes unnecessarily, and in some cases include malicious links or attachments. Filtering out spam reduces user workload burden, prevents junk mail congestion, and reduces potentially malicious content exposure.
 - _Last modified:_ June 2023
 
@@ -1071,7 +1071,7 @@ If a third-party party filtering solution is used, the solution SHOULD offer ser
 
 ### Implementation
 
-#### MS.EXO.14.1v1 Instructions
+#### MS.EXO.14.1v2 Instructions
 
 Any product meeting the requirements outlined in this baseline policy may be
 used. If the agency uses Microsoft Defender, see the following

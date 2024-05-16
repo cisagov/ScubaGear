@@ -480,10 +480,10 @@ TestPlan:
         Postconditions: []
         ExpectedResult: true
 
-  - PolicyId: MS.EXO.14.1v1
+  - PolicyId: MS.EXO.14.1v2
     TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.EXO.14.1v1 Custom Implementation
+      - TestDescription: MS.EXO.14.1v2 Custom Implementation
         Preconditions: []
         Postconditions: []
         IsCustomImplementation: true
@@ -507,7 +507,7 @@ TestPlan:
         IsCustomImplementation: true
         ExpectedResult: false
 
-  - PolicyId: MS.EXO.14.1v1
+  - PolicyId: MS.EXO.14.1v2
     TestDriver: RunScuba
     Tests:
       - TestDescription: MS.EXO.14.4v1 Custom Implementation
