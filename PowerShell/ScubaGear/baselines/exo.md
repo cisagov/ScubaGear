@@ -1054,6 +1054,13 @@ potentially unknown users to bypass spam protections.
 - _Last modified:_ June 2023
 - _Note:_ Allowed senders MAY be added.
 
+#### MS.EXO.14.4v1
+If a third-party party filtering solution is used, the solution SHOULD offer services comparable to the native spam filtering offered by Microsoft.
+
+<!--Policy: MS.EXO.14.4v1; Criticality: SHOULD -->
+- _Rationale:_ Spam is a constant threat as junk mail can reduce user productivity, fill up mailboxes unnecessarily, and in some cases include malicious links or attachments. Filtering out spam reduces user workload burden, prevents junk mail congestion, and reduces potentially malicious content exposure.
+- _Last modified:_ June 2023
+
 ### Resources
 
 - None

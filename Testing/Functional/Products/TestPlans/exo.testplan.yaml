@@ -507,6 +507,15 @@ TestPlan:
         IsCustomImplementation: true
         ExpectedResult: false
 
+  - PolicyId: MS.EXO.14.1v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.EXO.14.4v1 Custom Implementation
+        Preconditions: []
+        Postconditions: []
+        IsCustomImplementation: true
+        ExpectedResult: false
+
   - PolicyId: MS.EXO.15.1v1
     TestDriver: RunScuba
     Tests:
