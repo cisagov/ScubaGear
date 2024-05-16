@@ -1032,7 +1032,7 @@ A spam filter SHALL be enabled.
 
 <!--Policy: MS.EXO.14.1v2; Criticality: SHALL -->
 - _Rationale:_ Spam is a constant threat as junk mail can reduce user productivity, fill up mailboxes unnecessarily, and in some cases include malicious links or attachments. Filtering out spam reduces user workload burden, prevents junk mail congestion, and reduces potentially malicious content exposure.
-- _Last modified:_ June 2023
+- _Last modified:_ May 2024
 
 #### MS.EXO.14.2v1
 Spam and high confidence spam SHALL be moved to either the junk email folder or the quarantine folder.
@@ -1059,7 +1059,7 @@ If a third-party party filtering solution is used, the solution SHOULD offer ser
 
 <!--Policy: MS.EXO.14.4v1; Criticality: SHOULD -->
 - _Rationale:_ Spam is a constant threat as junk mail can reduce user productivity, fill up mailboxes unnecessarily, and in some cases include malicious links or attachments. Filtering out spam reduces user workload burden, prevents junk mail congestion, and reduces potentially malicious content exposure.
-- _Last modified:_ June 2023
+- _Last modified:_ May 2024
 
 ### Resources
 
