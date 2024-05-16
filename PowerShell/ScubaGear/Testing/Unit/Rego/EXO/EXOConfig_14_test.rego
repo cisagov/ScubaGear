@@ -47,7 +47,7 @@ test_3rdParty_Correct_V3 if {
 #
 # Policy MS.EXO.14.4v1
 #--
-test_3rdParty_Correct_V1 if {
+test_3rdParty_Correct_V4 if {
     PolicyId := "MS.EXO.14.4v1"
 
     Output := exo.tests with input as { }
