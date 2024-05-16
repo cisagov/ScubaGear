@@ -2,6 +2,7 @@ package defender_test
 
 import data.defender
 import data.utils.defender.DEFLICENSEWARNSTR
+import data.utils.defender.DLPLICENSEWARNSTR
 import data.utils.key.FAIL
 import data.utils.key.PASS
 import data.utils.key.TestResult
@@ -287,6 +288,16 @@ test_ContentContainsSensitiveInformation_Incorrect_V6 if {
         "U.S. Individual Taxpayer Identification Number (ITIN), U.S. Social Security Number (SSN)"
     ])
 
+    TestResult("MS.DEFENDER.4.1v1", Output, ReportDetailString, false) == true
+}
+
+test_NoDLPLicense_Incorrect_V1 if {
+    Output := defender.tests with input as {
+        "defender_license": false,
+        "dlp_license": false
+    }
+
+    ReportDetailString := concat(" ", [FAIL, DLPLICENSEWARNSTR])
     TestResult("MS.DEFENDER.4.1v1", Output, ReportDetailString, false) == true
 }
 
@@ -861,49 +872,13 @@ test_Locations_Incorrect_V8 if {
     TestResult("MS.DEFENDER.4.2v1", Output, ReportDetailString, false) == true
 }
 
-# Policy exists but set to TestWithNotifications rather than Enable, no defender license
-test_Locations_Incorrect_V9 if {
+test_NoDLPLicense_Incorrect_V1 if {
     Output := defender.tests with input as {
-        "scuba_config": {
-            "OutPath": ".",
-            "OutRegoFileName": "TestResults"
-        },
-        "dlp_compliance_rules": [{
-            "ContentContainsSensitiveInformation": [
-                {"name": "U.S. Individual Taxpayer Identification Number (ITIN)"},
-                {"name": "Credit Card Number"},
-                {"name": "U.S. Social Security Number (SSN)"}
-            ],
-            "Name": "Baseline Rule",
-            "Disabled": false,
-            "ParentPolicyName": "Default Office 365 DLP policy",
-            "BlockAccess": true,
-            "BlockAccessScope": "All",
-            "NotifyUser": [
-                "SiteAdmin",
-                "LastModifier",
-                "Owner"
-            ],
-            "NotifyUserType": "NotSet",
-            "IsAdvancedRule": false
-        }],
-        "dlp_compliance_policies": [{
-            "ExchangeLocation": ["All"],
-            "SharePointLocation": ["All"],
-            "TeamsLocation": ["All"],
-            "EndpointDlpLocation": ["All"],
-            "OneDriveLocation": ["All"],
-            "Workload": "Exchange, SharePoint, OneDriveForBusiness, Teams, EndpointDevices",
-            "Name": "Default Office 365 DLP policy",
-            "Mode": "TestWithNotifications",
-            "Enabled": true
-        }],
         "defender_license": false,
-        "dlp_license": true
+        "dlp_license": false
     }
 
-    ReportDetailString := concat(" ", [FAIL, DEFLICENSEWARNSTR])
-
+    ReportDetailString := concat(" ", [FAIL, DLPLICENSEWARNSTR])
     TestResult("MS.DEFENDER.4.2v1", Output, ReportDetailString, false) == true
 }
 
@@ -1187,6 +1162,16 @@ test_BlockAccess_Incorrect_V6 if {
     TestResult("MS.DEFENDER.4.3v1", Output, ReportDetailString, false) == true
 }
 
+test_NoDLPLicense_Incorrect_V1 if {
+    Output := defender.tests with input as {
+        "defender_license": false,
+        "dlp_license": false
+    }
+
+    ReportDetailString := concat(" ", [FAIL, DLPLICENSEWARNSTR])
+    TestResult("MS.DEFENDER.4.3v1", Output, ReportDetailString, false) == true
+}
+
 #--
 
 #
@@ -1320,6 +1305,16 @@ test_NotifyUser_Incorrect_V2 if {
     }
 
     ReportDetailString := "1 rule(s) found that do(es) not notify at least one user: Baseline Rule"
+    TestResult("MS.DEFENDER.4.4v1", Output, ReportDetailString, false) == true
+}
+
+test_NoDLPLicense_Incorrect_V1 if {
+    Output := defender.tests with input as {
+        "defender_license": false,
+        "dlp_license": false
+    }
+
+    ReportDetailString := concat(" ", [FAIL, DLPLICENSEWARNSTR])
     TestResult("MS.DEFENDER.4.4v1", Output, ReportDetailString, false) == true
 }
 
