@@ -85,7 +85,7 @@ InModuleScope Orchestrator {
             }
             It 'Should only run each baseline once if provider names contains duplicates' {
                 {Invoke-Scuba -ProductNames aad,aad} | Should -Not -Throw
-		Assert-MockCalled Invoke-ReportCreation -ParameterFilter {$ProductNames -eq 'aad'}
+                Should -Invoke Invoke-ReportCreation -ParameterFilter {$ProductNames -eq 'aad'}
             }
         }
         Context 'Service Principal provided'{
