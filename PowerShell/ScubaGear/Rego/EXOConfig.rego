@@ -431,31 +431,31 @@ tests contains {
 ############
 
 #
-# MS.EXO.8.1v1
+# MS.EXO.8.1v2
 #--
 
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests contains {
-    "PolicyId": "MS.EXO.8.1v1",
+    "PolicyId": "MS.EXO.8.1v2",
     "Criticality": "Shall/3rd Party",
     "Commandlet": [],
     "ActualValue": [],
-    "ReportDetails": DefenderMirrorDetails("MS.EXO.8.1v1"),
+    "ReportDetails": DefenderMirrorDetails("MS.EXO.8.1v2"),
     "RequirementMet": false
 }
 #--
 
 #
-# MS.EXO.8.2v1
+# MS.EXO.8.2v2
 #--
 
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests contains {
-    "PolicyId": "MS.EXO.8.2v1",
+    "PolicyId": "MS.EXO.8.2v2",
     "Criticality": "Shall/3rd Party",
     "Commandlet": [],
     "ActualValue": [],
-    "ReportDetails": DefenderMirrorDetails("MS.EXO.8.2v1"),
+    "ReportDetails": DefenderMirrorDetails("MS.EXO.8.2v2"),
     "RequirementMet": false
 }
 #--
@@ -495,16 +495,16 @@ tests contains {
 ############
 
 #
-# MS.EXO.9.1v1
+# MS.EXO.9.1v2
 #--
 
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests contains {
-    "PolicyId": "MS.EXO.9.1v1",
+    "PolicyId": "MS.EXO.9.1v2",
     "Criticality": "Shall/3rd Party",
     "Commandlet": [],
     "ActualValue": [],
-    "ReportDetails": DefenderMirrorDetails("MS.EXO.9.1v1"),
+    "ReportDetails": DefenderMirrorDetails("MS.EXO.9.1v2"),
     "RequirementMet": false
 }
 #--
@@ -525,16 +525,16 @@ tests contains {
 #--
 
 #
-# MS.EXO.9.3v1
+# MS.EXO.9.3v2
 #--
 
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests contains {
-    "PolicyId": "MS.EXO.9.3v1",
+    "PolicyId": "MS.EXO.9.3v2",
     "Criticality": "Shall/3rd Party",
     "Commandlet": [],
     "ActualValue": [],
-    "ReportDetails": DefenderMirrorDetails("MS.EXO.9.3v1"),
+    "ReportDetails": DefenderMirrorDetails("MS.EXO.9.3v2"),
     "RequirementMet": false
 }
 #--

@@ -299,19 +299,19 @@ TestPlan:
           - Command: 'Get-TransportRule | Where {$_.Identity -eq "FunctionalTest External sender warning"} | Remove-TransportRule -Confirm:$false'
         ExpectedResult: true
 
-  - PolicyId: MS.EXO.8.1v1
+  - PolicyId: MS.EXO.8.1v2
     TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.EXO.8.1v1 Custom Implementation
+      - TestDescription: MS.EXO.8.1v2 Custom Implementation
         Preconditions: []
         Postconditions: []
         IsCustomImplementation: true
         ExpectedResult: false
 
-  - PolicyId: MS.EXO.8.2v1
+  - PolicyId: MS.EXO.8.2v2
     TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.EXO.8.2v1 Custom Implementation
+      - TestDescription: MS.EXO.8.2v2 Custom Implementation
         Preconditions: []
         Postconditions: []
         IsCustomImplementation: true
@@ -335,10 +335,10 @@ TestPlan:
         IsCustomImplementation: true
         ExpectedResult: false
 
-  - PolicyId: MS.EXO.9.1v1
+  - PolicyId: MS.EXO.9.1v2
     TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.EXO.9.1v1 Custom Implementation
+      - TestDescription: MS.EXO.9.1v2 Custom Implementation
         Preconditions: []
         Postconditions: []
         IsCustomImplementation: true
@@ -353,10 +353,10 @@ TestPlan:
         IsCustomImplementation: true
         ExpectedResult: false
 
-  - PolicyId: MS.EXO.9.3v1
+  - PolicyId: MS.EXO.9.3v2
     TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.EXO.9.3v1 Custom Implementation
+      - TestDescription: MS.EXO.9.3v2 Custom Implementation
         Preconditions: []
         Postconditions: []
         IsCustomImplementation: true

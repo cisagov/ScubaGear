@@ -529,17 +529,17 @@ required, guidance for configuring Microsoft's DLP solution can be found in the 
 
 ### Policies
 
-#### MS.EXO.8.1v1
+#### MS.EXO.8.1v2
 A DLP solution SHALL be used.
 
-<!--Policy: MS.EXO.8.1v1; Criticality: SHALL -->
+<!--Policy: MS.EXO.8.1v2; Criticality: SHALL -->
 - _Rationale:_ Users may inadvertently disclose sensitive information to unauthorized individuals. A DLP solution can detect the presence of sensitive information in Exchange Online and block access to all but authorized entities.
 - _Last modified:_ May 2024
 
-#### MS.EXO.8.2v1
+#### MS.EXO.8.2v2
 The DLP solution SHALL protect personally identifiable information (PII) and sensitive information, as defined by the agency.
 
-<!--Policy: MS.EXO.8.2v1; Criticality: SHALL -->
+<!--Policy: MS.EXO.8.2v2; Criticality: SHALL -->
 - _Rationale:_ Users may inadvertently share sensitive information with others who should not have access to it. Data loss prevention policies provide a way for agencies to detect and prevent unauthorized disclosures.
 - _Last modified:_ May 2024
 
@@ -567,10 +567,10 @@ At a minimum, the DLP solution SHALL restrict sharing credit card numbers, Taxpa
 
 ### Implementation
 
-#### MS.EXO.8.1v1 Instructions
+#### MS.EXO.8.1v2 Instructions
 Any product meeting the requirements outlined in this baseline policy may be used. If the agency uses Microsoft Defender, see the following implementation steps for [DLP](./defender.md#implementation-3) for additional guidance.
 
-#### MS.EXO.8.2v1 Instructions
+#### MS.EXO.8.2v2 Instructions
 Any product meeting the requirements outlined in this baseline policy may be used. If the agency uses Microsoft Defender, see the following implementation steps for [protecting PII](./defender.md#msdefender41v1-instructions) for additional guidance.
 
 #### MS.EXO.8.3v1 Instructions
@@ -597,10 +597,10 @@ Microsoft Defender can be found in the follow section of the CISA M365 Security 
 
 ### Policies
 
-#### MS.EXO.9.1v1
+#### MS.EXO.9.1v2
 Emails SHALL be filtered by attachment file types.
 
-<!--Policy: MS.EXO.9.1v1; Criticality: SHALL -->
+<!--Policy: MS.EXO.9.1v2; Criticality: SHALL -->
 - _Rationale:_ Malicious attachments often take the form of click-to-run files.
 Sharing high risk file types, when necessary, is better left to a means other
 than email; the dangers of allowing them to be sent over email outweigh
@@ -615,10 +615,10 @@ The attachment filter SHOULD attempt to determine the true file type and assess 
 - _Rationale:_ Users can change a file extension at the end of a file name (e.g., notepad.exe to notepad.txt) to obscure the actual file type. Verifying the file type and checking that this matches the designated file extension can help detect instances where the file extension was changed.
 - _Last modified:_ June 2023
 
-#### MS.EXO.9.3v1
+#### MS.EXO.9.3v2
 Disallowed file types SHALL be determined and enforced.
 
-<!--Policy: MS.EXO.9.3v1; Criticality: SHALL -->
+<!--Policy: MS.EXO.9.3v2; Criticality: SHALL -->
 - _Rationale:_ Malicious attachments often take the form of click-to-run files,
 though other file types can contain malicious content as well. As such,
 determining the full list of file types to block is left to each
@@ -654,7 +654,7 @@ Blocking a list of common executable files helps mitigate the risk of adversaria
 
 ### Implementation
 
-#### MS.EXO.9.1v1 Instructions
+#### MS.EXO.9.1v2 Instructions
 Any product meeting the requirements outlined in this baseline policy may be
 used. If the agency uses Microsoft Defender, see the following
 implementation steps for
@@ -668,7 +668,7 @@ implementation steps for
 [enabling preset security policies](./defender.md#implementation), which
 attempt to determine the true file type and assess the file extension.
 
-#### MS.EXO.9.3v1 Instructions
+#### MS.EXO.9.3v2 Instructions
 Any product meeting the requirements outlined in this baseline policy may be
 used. If the agency uses Microsoft Defender, see the following
 implementation steps for
