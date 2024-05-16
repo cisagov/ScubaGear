@@ -236,6 +236,6 @@ DLPLicenseWarningString(Status, String) := ReportDetailsString(Status, String) i
     input.dlp_license == true
 }
 
-DLPLicenseWarningString(Status, String) := concat(" ", [FAIL, DLPLICENSEWARNSTR]) if {
+DLPLicenseWarningString(_, _) := concat(" ", [FAIL, DLPLICENSEWARNSTR]) if {
     input.dlp_license == false
 }
