@@ -326,7 +326,7 @@ a.control_group:active {
 }
 
 
-.chevron {
+.chevron, .truncated-dots {
     display: flex;
     justify-content: center;
     align-items: center;

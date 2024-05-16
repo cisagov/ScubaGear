@@ -139,7 +139,7 @@ const fillCAPTable = () => {
             img.style.width = '10px';
             //img.rowNumber = i;
 
-            // For accessibility purposes append the above image as a child of a button
+            // For accessibility append the above image as a child of a button
             let expandRowButton = document.createElement("button");
             expandRowButton.title = "Show more info for the ... policy";
             expandRowButton.classList.add("chevron");
@@ -194,9 +194,20 @@ const fillTruncatedCell = (td, i, j) => {
             let span = document.createElement("span");
             span.appendChild(document.createTextNode("..."));
             span.title = "Show more";
-            span.rowNumber = i;
-            span.addEventListener("click", expandCAPRow);
-            td.appendChild(span);
+            //span.rowNumber = i;
+            //span.addEventListener("click", expandCAPRow);
+            //td.appendChild(span);
+
+            let expandRowButton = document.createElement("button");
+            expandRowButton.title = "Show more info for the ... policy";
+            expandRowButton.classList.add("truncated-dots");
+            expandRowButton.addEventListener("click", expandCAPRow);
+            expandRowButton.rowNumber = i;
+            expandRowButton.appendChild(span);
+
+            
+            //tr.querySelectorAll('td')[0].appendChild(expandRowButton);
+            td.appendChild(expandRowButton);
         }
     }
     catch (error) {
@@ -224,9 +235,17 @@ const hideCAPRow = (event) => {
         img.style.width = '10px';
         img.setAttribute('alt', 'Show more');
         img.setAttribute('title', 'Show more');
-        img.rowNumber = i;
-        img.addEventListener("click", expandCAPRow);
-        tr.querySelectorAll('td')[0].appendChild(img);
+        //img.rowNumber = i;
+        //img.addEventListener("click", expandCAPRow);
+        //tr.querySelectorAll('td')[0].appendChild(img);
+
+        let expandRowButton = document.createElement("button");
+        expandRowButton.title = "Show more info for the ... policy";
+        expandRowButton.classList.add("chevron");
+        expandRowButton.addEventListener("click", expandCAPRow);
+        expandRowButton.rowNumber = i;
+        expandRowButton.appendChild(img);
+        tr.querySelectorAll('td')[0].appendChild(expandRowButton);
     }
     catch (error) {
         console.error("Error in hideCAPRow");
@@ -240,14 +259,13 @@ const hideCAPRow = (event) => {
  */
 const expandAllCAPs = () => {
     try {
-        let buttons = document.querySelectorAll("img[src*='angle-right-solid.svg']");
+        let buttons = document.querySelectorAll("chevron");
         for (let i = 0; i < buttons.length; i++) {
             buttons[i].click();
         }
     }
     catch (error) {
-        console.error("Error in expandAllCAPs");
-        console.error(error);
+        console.error(`Error in expandAllCAPs`, error);
     }
 }
 
@@ -257,14 +275,13 @@ const expandAllCAPs = () => {
  */
 const collapseAllCAPs = () => {
     try {
-        let buttons = document.querySelectorAll("img[src*='angle-down-solid.svg']");
+        let buttons = document.querySelectorAll("chevron");
         for (let i = 0; i < buttons.length; i++) {
             buttons[i].click();
         }
     }
     catch (error) {
-        console.error("Error in collapseAllCAPs");
-        console.error(error);
+        console.error(`Error in collapseAllCAPs`, error);
     }
 }
 
