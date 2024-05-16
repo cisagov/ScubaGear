@@ -1,10 +1,7 @@
-Description: YAML Configuration file with dummy authentication parameters
+Description: YAML Configuration file with dummy authentication parameters, deomnstrates format of what the authentication parameters should look like for your tenant
 ProductNames:
   - teams
-  # - exo
-  # - defender
   - aad
-  # - sharepoint
 M365Environment: commercial
 Organization: abcdef.example.com
 AppID: 0123456789abcdef01234566789abcde

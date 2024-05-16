@@ -1,4 +1,6 @@
-Description: YAML Typical Configuration File ( multiple products )
+Description: | 
+  YAML Typical Configuration File ( multiple products )
+  Some names are commented out but for completeness are left in to show all product options
 ProductNames:
   - teams
   # - exo
