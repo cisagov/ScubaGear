@@ -616,7 +616,7 @@ The attachment filter SHOULD attempt to determine the true file type and assess 
 - _Last modified:_ June 2023
 
 #### MS.EXO.9.3v1
-Disallowed file types SHALL be determined and set. At a minimum, click-to-run files SHOULD be blocked (e.g., .exe, .cmd, and .vbe).
+Disallowed file types SHALL be determined and enforced.
 
 <!--Policy: MS.EXO.9.3v1; Criticality: SHALL -->
 - _Rationale:_ Malicious attachments often take the form of click-to-run files,
