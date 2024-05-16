@@ -19,6 +19,9 @@ ConditionalAccessPolicies := {
         "UserRiskLevels": [
             "high"
         ],
+        "SignInRiskLevels": [
+            "high"
+        ],
         "ClientAppTypes": [
             "other",
             "exchangeActiveSync"
