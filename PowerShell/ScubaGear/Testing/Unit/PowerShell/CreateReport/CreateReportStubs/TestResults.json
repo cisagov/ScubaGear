@@ -1621,7 +1621,19 @@
 
                        ],
         "Criticality":  "Shall/3rd Party",
-        "PolicyId":  "MS.EXO.14.1v1",
+        "PolicyId":  "MS.EXO.14.1v2",
+        "ReportDetails":  "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+
+                       ],
+        "Criticality":  "Shall/3rd Party",
+        "PolicyId":  "MS.EXO.14.4v1",
         "ReportDetails":  "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
         "RequirementMet":  false
     },
@@ -1705,7 +1717,7 @@
 
                        ],
         "Criticality":  "Shall/3rd Party",
-        "PolicyId":  "MS.EXO.8.1v1",
+        "PolicyId":  "MS.EXO.8.1v2",
         "ReportDetails":  "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
         "RequirementMet":  false
     },
@@ -1717,7 +1729,7 @@
 
                        ],
         "Criticality":  "Shall/3rd Party",
-        "PolicyId":  "MS.EXO.8.2v1",
+        "PolicyId":  "MS.EXO.8.2v2",
         "ReportDetails":  "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
         "RequirementMet":  false
     },
@@ -1753,7 +1765,7 @@
 
                        ],
         "Criticality":  "Shall/3rd Party",
-        "PolicyId":  "MS.EXO.9.1v1",
+        "PolicyId":  "MS.EXO.9.1v2",
         "ReportDetails":  "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
         "RequirementMet":  false
     },
@@ -1765,7 +1777,7 @@
 
                        ],
         "Criticality":  "Shall/3rd Party",
-        "PolicyId":  "MS.EXO.9.3v1",
+        "PolicyId":  "MS.EXO.9.3v2",
         "ReportDetails":  "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
         "RequirementMet":  false
     },
