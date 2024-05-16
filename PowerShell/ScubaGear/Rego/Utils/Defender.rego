@@ -17,6 +17,13 @@ DEFLICENSEWARNSTR := concat(" ", [
     "for Office 365 Plan 1 or Plan 2, which is required for this feature.**"
 ])
 
+DLPLICENSEWARNSTR := concat(" ", [
+    "**NOTE: Either you do not have sufficient permissions or",
+    "your tenant does not have a license for Microsoft Purview",
+    "Data Loss Prevention, which is required for this feature.",
+    "This feature is included in E3/G3/E5/G5 licenses.**"
+])
+
 ##########################################
 # User/Group Exclusion support functions #
 ##########################################
@@ -227,4 +234,8 @@ ApplyLicenseWarningString(_, _) := concat(" ", [FAIL, DEFLICENSEWARNSTR]) if {
 
 DLPLicenseWarningString(Status, String) := ReportDetailsString(Status, String) if {
     input.dlp_license == true
+}
+
+DLPLicenseWarningString(Status, String) := concat(" ", [FAIL, DLPLICENSEWARNSTR]) if {
+    input.dlp_license == false
 }
