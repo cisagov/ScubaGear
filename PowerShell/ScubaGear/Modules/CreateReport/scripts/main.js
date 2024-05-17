@@ -129,19 +129,15 @@ const fillCAPTable = () => {
                 tr.appendChild(td);
             }
 
-            //console.log(tr[i][1]);
-
             // Create chevron icon in the DOM 
             let img = document.createElement("img");
             img.setAttribute('src', 'images/angle-right-solid.svg');
-            img.setAttribute('alt', 'Show more info for the ... policy');
-            img.setAttribute('title', 'Expand the details shown');
+            img.setAttribute('alt', `Chevron arrow pointing right`);
             img.style.width = '10px';
-            //img.rowNumber = i;
 
             // For accessibility append the above image as a child of a button
             let expandRowButton = document.createElement("button");
-            expandRowButton.title = "Show more info for the ... policy";
+            expandRowButton.title = `Show more info for the ${tr.children[1].innerText} policy`;
             expandRowButton.classList.add("chevron");
             expandRowButton.addEventListener("click", expandCAPRow);
             expandRowButton.rowNumber = i;
@@ -188,25 +184,18 @@ const fillTruncatedCell = (td, i, j) => {
         else {
             td.innerHTML = content;
         }
-
+        
         // Other location where this needs to be tabbable
         if (truncated) {
             let span = document.createElement("span");
             span.appendChild(document.createTextNode("..."));
-            span.title = "Show more";
-            //span.rowNumber = i;
-            //span.addEventListener("click", expandCAPRow);
-            //td.appendChild(span);
 
             let expandRowButton = document.createElement("button");
-            expandRowButton.title = "Show more info for the ... policy";
+            expandRowButton.title = `Three dots that expands row ${i + 1} of the CAP table`;
             expandRowButton.classList.add("truncated-dots");
             expandRowButton.addEventListener("click", expandCAPRow);
             expandRowButton.rowNumber = i;
             expandRowButton.appendChild(span);
-
-            
-            //tr.querySelectorAll('td')[0].appendChild(expandRowButton);
             td.appendChild(expandRowButton);
         }
     }
@@ -232,15 +221,11 @@ const hideCAPRow = (event) => {
         }
         let img = document.createElement("img");
         img.setAttribute('src', 'images/angle-right-solid.svg');
+        img.setAttribute('alt', `Chevron arrow pointing right`);
         img.style.width = '10px';
-        img.setAttribute('alt', 'Show more');
-        img.setAttribute('title', 'Show more');
-        //img.rowNumber = i;
-        //img.addEventListener("click", expandCAPRow);
-        //tr.querySelectorAll('td')[0].appendChild(img);
 
         let expandRowButton = document.createElement("button");
-        expandRowButton.title = "Show more info for the ... policy";
+        expandRowButton.title = `Show more info for the ${tr.children[1].innerText} policy`;
         expandRowButton.classList.add("chevron");
         expandRowButton.addEventListener("click", expandCAPRow);
         expandRowButton.rowNumber = i;
@@ -307,16 +292,12 @@ const expandCAPRow = (event) => {
                 td.innerHTML = "";
                 let img = document.createElement("img");
                 img.setAttribute('src', 'images/angle-down-solid.svg');
-                img.setAttribute('alt', 'Show less');
-                img.setAttribute('title', 'Show less');
+                img.setAttribute('alt', `Chevron arrow pointing down`);
                 img.style.width = '14px';
-                //img.rowNumber = i;
-                //img.addEventListener("click", hideCAPRow);
-                //tr.querySelectorAll('td')[0].appendChild(img);
 
-                // For accessibility purposes append the above image as a child of a button
+                // For accessibility append the above image as a child of a button
                 let expandRowButton = document.createElement("button");
-                expandRowButton.title = "Show more info for the ... policy";
+                expandRowButton.title = `Show less info for the ${tr.children[1].innerText} policy`;
                 expandRowButton.classList.add("chevron");
                 expandRowButton.addEventListener("click", hideCAPRow);
                 expandRowButton.rowNumber = i;
