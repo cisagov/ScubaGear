@@ -53,3 +53,28 @@ ServicePlans := [
         "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
     }
 ]
+
+AuthorizationPolicies := {
+    "DefaultUserRolePermissions": {
+        "AllowedToCreateApps": false
+    },
+    "PermissionGrantPolicyIdsAssignedToDefaultUserRole": [
+        "ManagePermissionGrantsForOwnedResource.microsoft-dynamically-managed-permissions-for-chat",
+        "ManagePermissionGrantsForOwnedResource.microsoft-dynamically-managed-permissions-for-team"
+    ],
+    "Id": "authorizationPolicy"
+}
+
+DirectorySettings := {
+    "DisplayName": "Setting display name",
+    "Values": [
+        {
+            "Name":  "EnableAdminConsentRequests",
+            "Value":  "true"
+        },
+        {
+            "Name": "EnableGroupSpecificConsent",
+            "Value": "false"
+        }
+    ]
+}
