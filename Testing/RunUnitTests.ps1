@@ -94,6 +94,9 @@ function Get-ErrorMsg {
         FileIOError {
             Write-Output "ERROR: '$($Flag[1])' not found`n"
         }
+        ControlGroupItemNumber {
+            Write-Output "Error: Unrecognized control group"
+        }
         Default {
             Write-Output "ERROR: Unknown`n"
         }
