@@ -63,6 +63,8 @@ AuthorizationPolicies := {
         "ManagePermissionGrantsForOwnedResource.microsoft-dynamically-managed-permissions-for-chat",
         "ManagePermissionGrantsForOwnedResource.microsoft-dynamically-managed-permissions-for-team"
     ],
+    "GuestUserRoleId": "2af84b1e-32c8-42b7-82bc-daa82404023b",
+    "AllowInvitesFrom" : "adminsAndGuestInviters",
     "Id": "authorizationPolicy"
 }
 
