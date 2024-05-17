@@ -11,18 +11,18 @@ import rego.v1
 # description: Assert expected is equal to result
 equals(expected, result) if {
     expected == result
-    print("PASS: expected equals '", _quote_str(expected), "'\n")
+    print("PASS: expected equals '", expected, "'\n")
 } else := false if {
-    print("FAIL: expected equals '", _quote_str(expected), "', got '", result, "'\n")
+    print("FAIL: expected equals '", expected, "', got '", result, "'\n")
 }
 
 # METADATA
 # description: Assert expected is not equal to result
 not_equals(expected, result) if {
     expected != result
-    print("PASS: expected not equals '", _quote_str(expected), "'\n")
+    print("PASS: expected not equals '", expected, "'\n")
 } else := false if {
-    print("FAIL: expected not equals '", _quote_str(expected), "', got '", result, "'\n")
+    print("FAIL: expected not equals '", expected, "', got '", result, "'\n")
 }
 
 # METADATA
