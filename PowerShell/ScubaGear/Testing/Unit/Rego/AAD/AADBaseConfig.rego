@@ -1,5 +1,6 @@
 package aad_test
 import rego.v1
+import data.utils.aad.INT_MAX
 
 ConditionalAccessPolicies := {
     "Conditions": {
@@ -78,3 +79,21 @@ DirectorySettings := {
         }
     ]
 }
+
+DomainSettings := [
+    {
+        "Id" : "test.url.com",
+        "PasswordValidityPeriodInDays" : INT_MAX,
+        "IsVerified" : true
+    },
+    {
+        "Id" : "test1.url.com",
+        "PasswordValidityPeriodInDays" : INT_MAX,
+        "IsVerified" : true
+    },
+    {
+        "Id" : "test2.url.com",
+        "PasswordValidityPeriodInDays" : INT_MAX,
+        "IsVerified" : true
+    }
+]
