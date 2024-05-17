@@ -776,47 +776,12 @@ test_Conditions_Correct if {
 }
 
 test_IncludeApplications_Incorrect_V2 if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "Office365"
-                        ]
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ],
-                        "ExcludeUsers": [],
-                        "ExcludeGroups": [],
-                        "ExcludeRoles": []
-                    },
-                    "SignInRiskLevels": [
-                        "high"
-                    ]
-                },
-                "GrantControls": {
-                    "BuiltInControls": [
-                        "block"
-                    ]
-                },
-                "State": "enabled",
-                "DisplayName": "Test name"
-            }
-        ],
-        "service_plans": [
-            {
-                "ServicePlanName": "EXCHANGE_S_FOUNDATION",
-                "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
-            },
-            {
-                "ServicePlanName": "AAD_PREMIUM_P2",
-                "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
-            }
-        ]
-    }
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "Conditions/Applications/IncludeApplications",
+                "value": ["Office365"]}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+                        with input.service_plans as ServicePlans
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
@@ -824,47 +789,12 @@ test_IncludeApplications_Incorrect_V2 if {
 }
 
 test_IncludeUsers_Incorrect_V2 if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ]
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "8bc7c6ee-39a2-42a5-a31b-f77fb51db652"
-                        ],
-                        "ExcludeUsers": [],
-                        "ExcludeGroups": [],
-                        "ExcludeRoles": []
-                    },
-                    "SignInRiskLevels": [
-                        "high"
-                    ]
-                },
-                "GrantControls": {
-                    "BuiltInControls": [
-                        "block"
-                    ]
-                },
-                "State": "enabled",
-                "DisplayName": "Test name"
-            }
-        ],
-        "service_plans": [
-            {
-                "ServicePlanName": "EXCHANGE_S_FOUNDATION",
-                "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
-            },
-            {
-                "ServicePlanName": "AAD_PREMIUM_P2",
-                "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
-            }
-        ]
-    }
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "Conditions/Users/IncludeUsers",
+                "value": ["8bc7c6ee-39a2-42a5-a31b-f77fb51db652"]}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+                        with input.service_plans as ServicePlans
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
@@ -872,49 +802,12 @@ test_IncludeUsers_Incorrect_V2 if {
 }
 
 test_ExcludeUsers_Incorrect_V2 if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ]
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ],
-                        "ExcludeUsers": [
-                            "8bc7c6ee-39a2-42a5-a31b-f77fb51db652"
-                        ],
-                        "ExcludeGroups": [],
-                        "ExcludeRoles": []
-                    },
-                    "SignInRiskLevels": [
-                        "high"
-                    ]
-                },
-                "GrantControls": {
-                    "BuiltInControls": [
-                        "block"
-                    ]
-                },
-                "State": "enabled",
-                "DisplayName": "Test name"
-            }
-        ],
-        "service_plans": [
-            {
-                "ServicePlanName": "EXCHANGE_S_FOUNDATION",
-                "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
-            },
-            {
-                "ServicePlanName": "AAD_PREMIUM_P2",
-                "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
-            }
-        ]
-    }
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "Conditions/Users/ExcludeUsers",
+                "value": ["8bc7c6ee-39a2-42a5-a31b-f77fb51db652"]}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+                        with input.service_plans as ServicePlans
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
@@ -922,49 +815,12 @@ test_ExcludeUsers_Incorrect_V2 if {
 }
 
 test_ExcludeGroups_Incorrect_V2 if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ]
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ],
-                        "ExcludeUsers": [],
-                        "ExcludeGroups": [
-                            "8bc7c6ee-39a2-42a5-a31b-f77fb51db652"
-                        ],
-                        "ExcludeRoles": []
-                    },
-                    "SignInRiskLevels": [
-                        "high"
-                    ]
-                },
-                "GrantControls": {
-                    "BuiltInControls": [
-                        "block"
-                    ]
-                },
-                "State": "enabled",
-                "DisplayName": "Test name"
-            }
-        ],
-        "service_plans": [
-            {
-                "ServicePlanName": "EXCHANGE_S_FOUNDATION",
-                "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
-            },
-            {
-                "ServicePlanName": "AAD_PREMIUM_P2",
-                "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
-            }
-        ]
-    }
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "Conditions/Users/ExcludeGroups",
+                "value": ["8bc7c6ee-39a2-42a5-a31b-f77fb51db652"]}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+                        with input.service_plans as ServicePlans
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
@@ -972,49 +828,12 @@ test_ExcludeGroups_Incorrect_V2 if {
 }
 
 test_ExcludeRoles_Incorrect_V2 if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ]
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ],
-                        "ExcludeUsers": [],
-                        "ExcludeGroups": [],
-                        "ExcludeRoles": [
-                            "8bc7c6ee-39a2-42a5-a31b-f77fb51db652"
-                        ]
-                    },
-                    "SignInRiskLevels": [
-                        "high"
-                    ]
-                },
-                "GrantControls": {
-                    "BuiltInControls": [
-                        "block"
-                    ]
-                },
-                "State": "enabled",
-                "DisplayName": "Test name"
-            }
-        ],
-        "service_plans": [
-            {
-                "ServicePlanName": "EXCHANGE_S_FOUNDATION",
-                "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
-            },
-            {
-                "ServicePlanName": "AAD_PREMIUM_P2",
-                "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
-            }
-        ]
-    }
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "Conditions/Users/ExcludeRoles",
+                "value": ["8bc7c6ee-39a2-42a5-a31b-f77fb51db652"]}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+                        with input.service_plans as ServicePlans
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
@@ -1022,47 +841,12 @@ test_ExcludeRoles_Incorrect_V2 if {
 }
 
 test_SignInRiskLevels_Incorrect if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ]
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ],
-                        "ExcludeUsers": [],
-                        "ExcludeGroups": [],
-                        "ExcludeRoles": []
-                    },
-                    "SignInRiskLevels": [
-                        ""
-                    ]
-                },
-                "GrantControls": {
-                    "BuiltInControls": [
-                        "block"
-                    ]
-                },
-                "State": "enabled",
-                "DisplayName": "Test name"
-            }
-        ],
-        "service_plans": [
-            {
-                "ServicePlanName": "EXCHANGE_S_FOUNDATION",
-                "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
-            },
-            {
-                "ServicePlanName": "AAD_PREMIUM_P2",
-                "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
-            }
-        ]
-    }
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "Conditions/SignInRiskLevels",
+                "value": [""]}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+                        with input.service_plans as ServicePlans
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
@@ -1070,47 +854,12 @@ test_SignInRiskLevels_Incorrect if {
 }
 
 test_BuiltInControls_Incorrect_V2 if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ]
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ],
-                        "ExcludeUsers": [],
-                        "ExcludeGroups": [],
-                        "ExcludeRoles": []
-                    },
-                    "SignInRiskLevels": [
-                        "high"
-                    ]
-                },
-                "GrantControls": {
-                    "BuiltInControls": [
-                        ""
-                    ]
-                },
-                "State": "enabled",
-                "DisplayName": "Test name"
-            }
-        ],
-        "service_plans": [
-            {
-                "ServicePlanName": "EXCHANGE_S_FOUNDATION",
-                "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
-            },
-            {
-                "ServicePlanName": "AAD_PREMIUM_P2",
-                "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
-            }
-        ]
-    }
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "GrantControls/BuiltInControls",
+                "value": [""]}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+                        with input.service_plans as ServicePlans
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
@@ -1118,47 +867,12 @@ test_BuiltInControls_Incorrect_V2 if {
 }
 
 test_State_Incorrect_V2 if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ]
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ],
-                        "ExcludeUsers": [],
-                        "ExcludeGroups": [],
-                        "ExcludeRoles": []
-                    },
-                    "SignInRiskLevels": [
-                        "high"
-                    ]
-                },
-                "GrantControls": {
-                    "BuiltInControls": [
-                        "block"
-                    ]
-                },
-                "State": "disabled",
-                "DisplayName": "Test name"
-            }
-        ],
-        "service_plans": [
-            {
-                "ServicePlanName": "EXCHANGE_S_FOUNDATION",
-                "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
-            },
-            {
-                "ServicePlanName": "AAD_PREMIUM_P2",
-                "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
-            }
-        ]
-    }
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "State",
+                "value": ["disabled"]}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+                        with input.service_plans as ServicePlans
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
