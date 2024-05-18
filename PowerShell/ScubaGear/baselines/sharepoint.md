@@ -35,6 +35,10 @@ External sharing for SharePoint SHALL be limited to Existing guests or Only Peop
 <!--Policy: MS.SHAREPOINT.1.1v1; Criticality: SHALL -->
 - _Rationale:_ Sharing information outside the organization via SharePoint increases the risk of unauthorized access. By limiting external sharing, administrators decrease the risk of access to information.
 - _Last modified:_ June 2023
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1048:Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)
+  - [T1213.002:Sharepoint](https://attack.mitre.org/techniques/T1213/002/)
+  - [T1213:Data from Information Repositories](https://attack.mitre.org/techniques/T1213/)
 
 #### MS.SHAREPOINT.1.2v1
 External sharing for OneDrive SHALL be limited to Existing guests or Only People in your organization.
@@ -42,6 +46,10 @@ External sharing for OneDrive SHALL be limited to Existing guests or Only People
 <!--Policy: MS.SHAREPOINT.1.2v1; Criticality: SHALL -->
 - _Rationale:_ Sharing files outside the organization via OneDrive increases the risk of unauthorized access. By limiting external sharing, administrators decrease the risk of unauthorized unauthorized access to information.
 - _Last modified:_ June 2023
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1048:Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)
+  - [T1213.002:Sharepoint](https://attack.mitre.org/techniques/T1213/002/)
+  - [T1530:Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)
 
 #### MS.SHAREPOINT.1.3v1
 External sharing SHALL be restricted to approved external domains and/or users in approved security groups per interagency collaboration needs.
@@ -50,6 +58,10 @@ External sharing SHALL be restricted to approved external domains and/or users i
 - _Rationale:_ By limiting sharing to domains or approved security groups used for interagency collaboration purposes, administrators help prevent sharing with unknown organizations and individuals.
 - _Last modified:_ June 2023
 - _Note:_ This policy is only applicable if the external sharing slider on the admin page is set to any value other than **Only People in your organization**.
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1048:Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)
+  - [T1213.002:Sharepoint](https://attack.mitre.org/techniques/T1213/002/)
+  - [T1530:Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)
 
 #### MS.SHAREPOINT.1.4v1
 Guest access SHALL be limited to the email the invitation was sent to.
@@ -58,6 +70,10 @@ Guest access SHALL be limited to the email the invitation was sent to.
 - _Rationale:_ Email invitations allow external guests to access shared information. By requiring guests to sign in using the same account where the invite was sent, administrators help ensure only the intended guest can use the invite.
 - _Last modified:_ June 2023
 - _Note:_ This policy is only applicable if the external sharing slider on the admin page is set to any value other than **Only People in your organization**.
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1048:Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)
+  - [T1213.002:Sharepoint](https://attack.mitre.org/techniques/T1213/002/)
+  - [T1530:Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)
 
 ### Resources
 
@@ -140,6 +156,10 @@ File and folder default sharing scope SHALL be set to Specific people (only the 
 <!--Policy: MS.SHAREPOINT.2.1v1; Criticality: SHALL -->
 - _Rationale:_ By making the default sharing the most restrictive, administrators prevent accidentally sharing information too broadly.
 - _Last modified:_ June 2023
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1048:Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)
+  - [T1213.002:Sharepoint](https://attack.mitre.org/techniques/T1213/002/)
+  - [T1565.001:Stored Data Manipulation](https://attack.mitre.org/techniques/T1565/001/)
 
 #### MS.SHAREPOINT.2.2v1
 File and folder default sharing permissions SHALL be set to View.
@@ -147,6 +167,9 @@ File and folder default sharing permissions SHALL be set to View.
 <!--Policy: MS.SHAREPOINT.2.2v1; Criticality: SHALL -->
 - _Rationale:_ Edit access to files and folders could allow a user to make unauthorized changes.  By restricting default permissions to **View**, administrators prevent unintended or malicious modification.
 - _Last modified:_ June 2023
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1080:Taint Shared Content](https://attack.mitre.org/techniques/T1080/)
+  - [T1565.001:Stored Data Manipulation](https://attack.mitre.org/techniques/T1565/001/)
 
 ### Resources
 
@@ -193,6 +216,10 @@ Expiration days for Anyone links SHALL be set to 30 days or less.
 - _Rationale:_ Links may be used to provide access to information for a short period of time. Without expiration, however, access is indefinite. By setting expiration timers for links, administrators prevent unintended sustained access to information.
 - _Last modified:_ June 2023
 - _Note:_ This policy is only applicable if the external sharing slider on the admin center sharing page is set to **Anyone**.
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1048:Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)
+  - [T1213.002:Sharepoint](https://attack.mitre.org/techniques/T1213/002/)
+  - [T1530:Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)
 
 #### MS.SHAREPOINT.3.2v1
 The allowable file and folder permissions for links SHALL be set to View only.
@@ -201,6 +228,9 @@ The allowable file and folder permissions for links SHALL be set to View only.
 - _Rationale:_ Unauthorized changes to files can be made if permissions allow editing by anyone.  By restricting permissions on links to **View** only, administrators prevent anonymous file changes.
 - _Last modified:_ June 2023
 - _Note:_ This policy is only applicable if the external sharing slider on the admin center sharing page is set to **Anyone**.
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1080:Taint Shared Content](https://attack.mitre.org/techniques/T1080/)
+  - [T1565.001:Stored Data Manipulation](https://attack.mitre.org/techniques/T1565/001/)
 
 #### MS.SHAREPOINT.3.3v1
 Reauthentication days for people who use a verification code SHALL be set to 30 days or less.
@@ -209,6 +239,9 @@ Reauthentication days for people who use a verification code SHALL be set to 30 
 - _Rationale:_ A verification code may be given out to provide access to information for a short period of time. By setting expiration timers for verification code access, administrators prevent  unintended sustained access to information.
 - _Last modified:_ June 2023
 - _Note:_ This policy is only applicable if the external sharing slider on the admin center sharing page is set to **Anyone** or **New and existing guests**.
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1080:Taint Shared Content](https://attack.mitre.org/techniques/T1080/)
+  - [T1565.001:Stored Data Manipulation](https://attack.mitre.org/techniques/T1565/001/)
 
 ### License Requirements
 
@@ -277,6 +310,10 @@ Users SHALL be prevented from running custom scripts on personal sites (aka OneD
 <!--Policy: MS.SHAREPOINT.4.1v1; Criticality: SHALL -->
 - _Rationale:_ Scripts in OneDrive folders run in the context of user visiting the site and have access to everything users can access. By preventing custom scripts on personal sites, administrators block a path for potentially malicious code execution.
 - _Last modified:_ June 2023
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1027:Obfuscated Files or Information](https://attack.mitre.org/techniques/T1027/)
+  - [T1059:Command and Scripting Interpreter](https://attack.mitre.org/techniques/T1059/)
+  - [T1059.009:Cloud API](https://attack.mitre.org/techniques/T1059/009/)
 
 #### MS.SHAREPOINT.4.2v1
 Users SHALL be prevented from running custom scripts on self-service created sites.
@@ -284,6 +321,9 @@ Users SHALL be prevented from running custom scripts on self-service created sit
 <!--Policy: MS.SHAREPOINT.4.2v1; Criticality: SHALL -->
 - _Rationale:_ Scripts on SharePoint sites run in the context of users visiting the site and therefore provide access to everything users can access. By preventing custom scripts on self-service created sites, administrators block a path for potentially malicious code execution.
 - _Last modified:_ June 2023
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1059:Command and Scripting Interpreter](https://attack.mitre.org/techniques/T1059/)
+  - [T1059.009:Cloud API](https://attack.mitre.org/techniques/T1059/009/)
 
 ### Resources
 
