@@ -38,8 +38,7 @@ const colorRows = () => {
             }
         }
         catch (error) {
-            console.error(`Error in colorRows, i = ${i}`);
-            console.error(error);
+            console.error(`Error in colorRows, i = ${i}`, error);
         }
     }
 }
@@ -135,22 +134,19 @@ const fillCAPTable = () => {
             img.setAttribute('alt', `Chevron arrow pointing right`);
             img.style.width = '10px';
 
-            // For accessibility append the above image as a child of a button
+            //Append the above image as a child 
             let expandRowButton = document.createElement("button");
             expandRowButton.title = `Show more info for the ${tr.children[1].innerText} policy`;
             expandRowButton.classList.add("chevron");
             expandRowButton.addEventListener("click", expandCAPRow);
             expandRowButton.rowNumber = i;
             expandRowButton.appendChild(img);
-
-            // Add the button to the table body
             tr.querySelectorAll('td')[0].appendChild(expandRowButton);
             tbody.appendChild(tr);
         }
     }
     catch (error) {
-        console.error("Error in fillCAPTable");
-        console.error(error);
+        console.error(`Error in fillCAPTable`, error);
     }
 }
 
@@ -184,24 +180,22 @@ const fillTruncatedCell = (td, i, j) => {
         else {
             td.innerHTML = content;
         }
-        
-        // Other location where this needs to be tabbable
+    
         if (truncated) {
             let span = document.createElement("span");
             span.appendChild(document.createTextNode("..."));
 
-            let expandRowButton = document.createElement("button");
-            expandRowButton.title = `Three dots that expands row ${i + 1} of the CAP table`;
-            expandRowButton.classList.add("truncated-dots");
-            expandRowButton.addEventListener("click", expandCAPRow);
-            expandRowButton.rowNumber = i;
-            expandRowButton.appendChild(span);
-            td.appendChild(expandRowButton);
+            let threeDotsButton = document.createElement("button");
+            threeDotsButton.title = `Three dots that expands row ${i + 1} of the CAP table`;
+            threeDotsButton.classList.add("truncated-dots");
+            threeDotsButton.addEventListener("click", expandCAPRow);
+            threeDotsButton.rowNumber = i;
+            threeDotsButton.appendChild(span);
+            td.appendChild(threeDotsButton);
         }
     }
     catch (error) {
-        console.error(`Error in fillTruncatedCell, i = ${i}, j = ${j}`);
-        console.error(error);
+        console.error(`Error in fillTruncatedCell, i = ${i}, j = ${j}`, error);
     }
 }
 
@@ -233,8 +227,7 @@ const hideCAPRow = (event) => {
         tr.querySelectorAll('td')[0].appendChild(expandRowButton);
     }
     catch (error) {
-        console.error("Error in hideCAPRow");
-        console.error(error);
+        console.error(`Error in hideCAPRow`, error);
     }
 }
 
@@ -244,9 +237,9 @@ const hideCAPRow = (event) => {
  */
 const expandAllCAPs = () => {
     try {
-        let buttons = document.querySelectorAll("chevron");
+        let buttons = document.querySelectorAll("img[src*='angle-right-solid.svg']");
         for (let i = 0; i < buttons.length; i++) {
-            buttons[i].click();
+            buttons[i].parentNode.click();
         }
     }
     catch (error) {
@@ -260,9 +253,9 @@ const expandAllCAPs = () => {
  */
 const collapseAllCAPs = () => {
     try {
-        let buttons = document.querySelectorAll("chevron");
+        let buttons = document.querySelectorAll("img[src*='angle-down-solid.svg']");
         for (let i = 0; i < buttons.length; i++) {
-            buttons[i].click();
+            buttons[i].parentNode.click();
         }
     }
     catch (error) {
@@ -277,13 +270,9 @@ const collapseAllCAPs = () => {
  */
 const expandCAPRow = (event) => {
     try {
-        console.log(event);
-        console.log(event.currentTarget);
         let i = event.currentTarget.rowNumber;
-        console.log(i);
         let tr = document.querySelector("#caps tr:nth-of-type(" + (i+2).toString() + ")"); /*i+2
         because nth-of-type is indexed from 1 and to account for the header row */
-        console.log(tr);
         for (let j = 0; j < capColNames.length; j++) {
             let td = tr.querySelector("td:nth-of-type(" + (j+1).toString() + ")");
             fillTruncatedCell(td, i, j);
@@ -295,15 +284,14 @@ const expandCAPRow = (event) => {
                 img.setAttribute('alt', `Chevron arrow pointing down`);
                 img.style.width = '14px';
 
-                // For accessibility append the above image as a child of a button
-                let expandRowButton = document.createElement("button");
-                expandRowButton.title = `Show less info for the ${tr.children[1].innerText} policy`;
-                expandRowButton.classList.add("chevron");
-                expandRowButton.addEventListener("click", hideCAPRow);
-                expandRowButton.rowNumber = i;
-                expandRowButton.appendChild(img);
-                tr.querySelectorAll('td')[0].appendChild(expandRowButton);
-                
+                // For accessibility append the above image as a child 
+                let collapseRowButton = document.createElement("button");
+                collapseRowButton.title = `Show less info for the ${tr.children[1].innerText} policy`;
+                collapseRowButton.classList.add("chevron");
+                collapseRowButton.addEventListener("click", hideCAPRow);
+                collapseRowButton.rowNumber = i;
+                collapseRowButton.appendChild(img);
+                tr.querySelectorAll('td')[0].appendChild(collapseRowButton);
             }
             else if (caps[i][capColNames[j]].constructor === Array && caps[i][capColNames[j]].length > 1) {
                 let ul = document.createElement("ul");
@@ -320,12 +308,11 @@ const expandCAPRow = (event) => {
         }
     }
     catch (error) {
-        console.error("Error in expandCAPRow");
-        console.error(error);
+        console.error(`Error in expandCAPRow`, error);
     }
 }
 
-window.addEventListener('DOMContentLoaded', (event) => {
+window.addEventListener('DOMContentLoaded', () => {
     colorRows();
     fillCAPTable();
     applyScopeAttributes();
