@@ -1,6 +1,6 @@
 # Config file for Mega-Linter
-# PowerShell
+# Checkov
 
 ENABLE_LINTERS:
-  - POWERSHELL_POWERSHELL
+  - REPOSITORY_CHECKOV
 LOG_LEVEL: ERROR

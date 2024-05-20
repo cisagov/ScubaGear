@@ -14,6 +14,8 @@ on:
   #     - ".github/workflows/publish_private_package.yaml"
   #     - "utils/DeployUtils.ps1"
 
+permissions: read-all
+
 env:
   GalleryName: PrivateScubaGearGallery
 
