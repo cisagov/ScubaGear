@@ -12,122 +12,40 @@ import data.utils.key.PASS
 # Policy MS.AAD.3.1v1
 #--
 test_PhishingResistantAllMFA_Correct if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ],
-                        "ExcludeApplications": []
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ],
-                        "ExcludeUsers": [],
-                        "ExcludeGroups": [],
-                        "ExcludeRoles": []
-                    }
-                },
-                "GrantControls": {
-                    "AuthenticationStrength": {
-                        "AllowedCombinations": [
-                            "windowsHelloForBusiness",
-                            "fido2",
-                            "x509CertificateMultiFactor"
-                        ]
-                    }
-                },
-                "State": "enabled",
-                "DisplayName": "Test name"
-            }
-        ]
-    }
+    Output := aad.tests with input.conditional_access_policies as [ConditionalAccessPolicies]
 
     ReportDetailStr := concat("", [
         "1 conditional access policy(s) found that meet(s) all requirements:",
-        "<br/>Test name. <a href='#caps'>View all CA policies</a>."
+        "<br/>Test block Legacy Authentication. <a href='#caps'>View all CA policies</a>."
     ])
 
     TestResult("MS.AAD.3.1v1", Output, ReportDetailStr, true) == true
 }
 
 test_PhishingResistantSingleMFA_Correct if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ],
-                        "ExcludeApplications": []
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ],
-                        "ExcludeUsers": [],
-                        "ExcludeGroups": [],
-                        "ExcludeRoles": []
-                    }
-                },
-                "GrantControls": {
-                    "AuthenticationStrength": {
-                        "AllowedCombinations": [
-                            "x509CertificateMultiFactor"
-                        ]
-                    }
-                },
-                "State": "enabled",
-                "DisplayName": "Test name"
-            }
-        ]
-    }
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "GrantControls/AuthenticationStrength/AllowedCombinations",
+                "value": ["x509CertificateMultiFactor"]}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
 
     ReportDetailStr := concat("", [
         "1 conditional access policy(s) found that meet(s) all requirements:",
-        "<br/>Test name. <a href='#caps'>View all CA policies</a>."
+        "<br/>Test block Legacy Authentication. <a href='#caps'>View all CA policies</a>."
     ])
 
     TestResult("MS.AAD.3.1v1", Output, ReportDetailStr, true) == true
 }
 
 test_PhishingResistantExtraMFA_Incorrect if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ],
-                        "ExcludeApplications": []
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ],
-                        "ExcludeUsers": [],
-                        "ExcludeGroups": [],
-                        "ExcludeRoles": []
-                    }
-                },
-                "GrantControls": {
-                    "AuthenticationStrength": {
-                        "AllowedCombinations": [
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "GrantControls/AuthenticationStrength/AllowedCombinations",
+                "value": [
                             "x509CertificateMultiFactor",
                             "SuperStrength"
-                        ]
-                    }
-                },
-                "State": "enabled",
-                "DisplayName": "Test name"
-            }
-        ]
-    }
+                        ]}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
@@ -135,35 +53,11 @@ test_PhishingResistantExtraMFA_Incorrect if {
 }
 
 test_PhishingResistantNoneMFA_Incorrect if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ],
-                        "ExcludeApplications": []
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ],
-                        "ExcludeUsers": [],
-                        "ExcludeGroups": [],
-                        "ExcludeRoles": []
-                    }
-                },
-                "GrantControls": {
-                    "AuthenticationStrength": {
-                        "AllowedCombinations": null
-                    }
-                },
-                "State": "enabled",
-                "DisplayName": "Test name"
-            }
-        ]
-    }
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "GrantControls/AuthenticationStrength/AllowedCombinations",
+                "value": null}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
@@ -171,41 +65,11 @@ test_PhishingResistantNoneMFA_Incorrect if {
 }
 
 test_PhishingResistantMFAExcludeApp_Incorrect if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ],
-                        "ExcludeApplications": [
-                            "Some App"
-                        ]
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ],
-                        "ExcludeUsers": [],
-                        "ExcludeGroups": [],
-                        "ExcludeRoles": []
-                    }
-                },
-                "GrantControls": {
-                    "AuthenticationStrength": {
-                        "AllowedCombinations": [
-                            "windowsHelloForBusiness",
-                            "fido2",
-                            "x509CertificateMultiFactor"
-                        ]
-                    }
-                },
-                "State": "enabled",
-                "DisplayName": "Test name"
-            }
-        ]
-    }
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "Conditions/Applications/ExcludeApplications",
+                "value": ["Some App"]}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
@@ -213,41 +77,11 @@ test_PhishingResistantMFAExcludeApp_Incorrect if {
 }
 
 test_PhishingResistantMFAExcludeUser_Incorrect if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ],
-                        "ExcludeApplications": []
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ],
-                        "ExcludeUsers": [
-                            "me"
-                        ],
-                        "ExcludeGroups": [],
-                        "ExcludeRoles": []
-                    }
-                },
-                "GrantControls": {
-                    "AuthenticationStrength": {
-                        "AllowedCombinations": [
-                            "windowsHelloForBusiness",
-                            "fido2",
-                            "x509CertificateMultiFactor"
-                        ]
-                    }
-                },
-                "State": "enabled",
-                "DisplayName": "Test name"
-            }
-        ]
-    }
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "Conditions/Users/ExcludeUsers",
+                "value": ["me"]}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
@@ -255,41 +89,11 @@ test_PhishingResistantMFAExcludeUser_Incorrect if {
 }
 
 test_PhishingResistantMFAExcludeGroup_Incorrect if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ],
-                        "ExcludeApplications": []
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ],
-                        "ExcludeUsers": [],
-                        "ExcludeGroups": [
-                            "some"
-                        ],
-                        "ExcludeRoles": []
-                    }
-                },
-                "GrantControls": {
-                    "AuthenticationStrength": {
-                        "AllowedCombinations": [
-                            "windowsHelloForBusiness",
-                            "fido2",
-                            "x509CertificateMultiFactor"
-                        ]
-                    }
-                },
-                "State": "enabled",
-                "DisplayName": "Test name"
-            }
-        ]
-    }
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "Conditions/Users/ExcludeGroups",
+                "value": ["some"]}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
@@ -301,105 +105,35 @@ test_PhishingResistantMFAExcludeGroup_Incorrect if {
 # Policy MS.AAD.3.2v1
 #--
 test_NoExclusionsConditions_Correct if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ]
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ],
-                        "ExcludeUsers": [],
-                        "ExcludeGroups": [],
-                        "ExcludeRoles": []
-                    }
-                },
-                "GrantControls": {
-                    "BuiltInControls": [
-                        "mfa"
-                    ]
-                },
-                "State": "enabled",
-                "DisplayName": "Test name"
-            }
-        ]
-    }
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "GrantControls/BuiltInControls",
+                "value": ["mfa"]}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
 
     ReportDetailStr := concat("", [
         "1 conditional access policy(s) found that meet(s) all requirements:",
-        "<br/>Test name. <a href='#caps'>View all CA policies</a>."
+        "<br/>Test block Legacy Authentication. <a href='#caps'>View all CA policies</a>."
     ])
 
     TestResult("MS.AAD.3.2v1", Output, ReportDetailStr, true) == true
 }
 
-test_3_1_Passes_3_2_Fails_Correct if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ],
-                        "ExcludeApplications": []
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ],
-                        "ExcludeUsers": [],
-                        "ExcludeGroups": [],
-                        "ExcludeRoles": []
-                    }
-                },
-                "GrantControls": {
-                    "AuthenticationStrength": {
-                        "AllowedCombinations": [
-                            "windowsHelloForBusiness",
-                            "fido2",
-                            "x509CertificateMultiFactor"
-                        ]
-                    }
-                },
-                "State": "enabled",
-                "DisplayName": "Test name"
-            },
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ]
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ],
-                        "ExcludeUsers": [],
-                        "ExcludeGroups": [],
-                        "ExcludeRoles": []
-                    }
-                },
-                "GrantControls": {
-                    "BuiltInControls": [
-                        ""
-                    ]
-                },
-                "State": "enabled",
-                "DisplayName": "Test name"
-            }
-        ]
-    }
+todo_test_3_1_Passes_3_2_Fails_Correct if {
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "DisplayName",
+                "value": "Bad Test Policy"},
+                {"op": "remove", "path": "GrantControls/BuiltInControls"}])
+    CAP2 := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "GrantControls/BuiltInControls",
+                "value": [""]},
+                {"op": "remove", "path": "GrantControls/AuthenticationStrength"}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP, CAP2]
 
     ReportDetailStr := concat("", [
         "1 conditional access policy(s) found that meet(s) all requirements:",
-        "<br/>Test name. <a href='#caps'>View all CA policies</a>."
+        "<br/>Test block Legacy Authentication. <a href='#caps'>View all CA policies</a>."
     ])
 
     TestResult("MS.AAD.3.2v1", Output, ReportDetailStr, true) == true
@@ -1584,53 +1318,8 @@ test_State_Incorrect_V1 if {
 # Policy MS.AAD.3.3v1
 #--
 test_PhishingMFAEnforced_MicrosoftAuthEnabled_NotApplicable if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ],
-                        "ExcludeApplications": []
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ],
-                        "ExcludeUsers": [],
-                        "ExcludeGroups": [],
-                        "ExcludeRoles": []
-                    }
-                },
-                "GrantControls": {
-                    "AuthenticationStrength": {
-                        "AllowedCombinations": [
-                            "windowsHelloForBusiness",
-                            "fido2",
-                            "x509CertificateMultiFactor"
-                        ]
-                    }
-                },
-                "State": "enabled",
-                "DisplayName": "Phishing Resistant MFA Enforced"
-            }
-        ],
-        "authentication_method": [
-            {
-                "authentication_method_feature_settings": [
-                    {
-                        "Id":  "MicrosoftAuthenticator",
-                        "State": "enabled"
-                    },
-                    {
-                        "Id":  "Email",
-                        "State": "enabled"
-                    }
-                ]
-            }
-        ]
-    }
+    Output := aad.tests with input.conditional_access_policies as [ConditionalAccessPolicies]
+                        with input.authentication_method as [AuthenticationMethod]
 
     PolicyId := "MS.AAD.3.3v1"
     ReportDetailStr := "This policy is only applicable if phishing-resistant MFA is not enforced and MS Authenticator is enabled. See %v for more info"
@@ -1638,53 +1327,12 @@ test_PhishingMFAEnforced_MicrosoftAuthEnabled_NotApplicable if {
 }
 
 test_PhishingMFAEnforced_MicrosoftAuthDisabled_NotApplicable if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ],
-                        "ExcludeApplications": []
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ],
-                        "ExcludeUsers": [],
-                        "ExcludeGroups": [],
-                        "ExcludeRoles": []
-                    }
-                },
-                "GrantControls": {
-                    "AuthenticationStrength": {
-                        "AllowedCombinations": [
-                            "windowsHelloForBusiness",
-                            "fido2",
-                            "x509CertificateMultiFactor"
-                        ]
-                    }
-                },
-                "State": "enabled",
-                "DisplayName": "Phishing Resistant MFA Enforced"
-            }
-        ],
-        "authentication_method": [
-            {
-                "authentication_method_feature_settings": [
-                    {
-                        "Id":  "MicrosoftAuthenticator",
-                        "State": "disabled"
-                    },
-                    {
-                        "Id":  "Email",
-                        "State": "enabled"
-                    }
-                ]
-            }
-        ]
-    }
+    Auth := json.patch(AuthenticationMethod,
+                [{"op": "add", "path": "authentication_method_feature_settings/0/State",
+                "value": "disabled"}])
+
+    Output := aad.tests with input.conditional_access_policies as [ConditionalAccessPolicies]
+                        with input.authentication_method as [Auth]
 
     PolicyId := "MS.AAD.3.3v1"
     ReportDetailStr := "This policy is only applicable if phishing-resistant MFA is not enforced and MS Authenticator is enabled. See %v for more info"
@@ -1692,139 +1340,28 @@ test_PhishingMFAEnforced_MicrosoftAuthDisabled_NotApplicable if {
 }
 
 test_PhishingMFANotEnforced_MicrosoftAuthDisabled_NotApplicable if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ],
-                        "ExcludeApplications": []
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ],
-                        "ExcludeUsers": [],
-                        "ExcludeGroups": [],
-                        "ExcludeRoles": []
-                    }
-                },
-                "GrantControls": {
-                    "BuiltInControls": [
-                        "mfa"
-                    ]
-                },
-                "State": "enabled",
-                "DisplayName": "Vanilla MFA Enforced - not phishing-resistant"
-            }
-        ],
-        "authentication_method": [
-            {
-                "authentication_method_feature_settings": [
-                    {
-                        "Id":  "MicrosoftAuthenticator",
-                        "State": "disabled"
-                    },
-                    {
-                        "Id":  "Email",
-                        "State": "enabled"
-                    }
-                ]
-            }
-        ]
-    }
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "GrantControls/BuiltInControls",
+                "value": ["mfa"]}])
+    Auth := json.patch(AuthenticationMethod,
+                [{"op": "add", "path": "authentication_method_feature_settings/0/State",
+                "value": "disabled"}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+                        with input.authentication_method as [Auth]
 
     PolicyId := "MS.AAD.3.3v1"
     ReportDetailStr := "This policy is only applicable if phishing-resistant MFA is not enforced and MS Authenticator is enabled. See %v for more info"
     TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailStr), false) == true
 }
 
-test_PhishingMFANotEnforced_MicrosoftAuthEnabled_Correct if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ],
-                        "ExcludeApplications": []
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ],
-                        "ExcludeUsers": [],
-                        "ExcludeGroups": [],
-                        "ExcludeRoles": []
-                    }
-                },
-                "GrantControls": {
-                    "BuiltInControls": [
-                        "mfa"
-                    ]
-                },
-                "State": "enabled",
-                "DisplayName": "Vanilla MFA Enforced - not phishing-resistant"
-            }
-        ],
-        "authentication_method": [
-            {
-                "authentication_method_feature_settings": [
-                    {
-                        "ExcludeTargets":  [
+todo_test_PhishingMFANotEnforced_MicrosoftAuthEnabled_Correct if {
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "GrantControls/BuiltInControls",
+                "value": ["mfa"]}])
 
-                                            ],
-                        "Id":  "MicrosoftAuthenticator",
-                        "State":  "enabled",
-                        "AdditionalProperties":  {
-                            "@odata.type":  "#microsoft.graph.microsoftAuthenticatorAuthenticationMethodConfiguration",
-                            "isSoftwareOathEnabled":  false,
-                            "featureSettings":  {
-                                "displayAppInformationRequiredState":  {
-                                    "state":  "enabled",
-                                    "includeTarget":  {
-                                                            "targetType":  "group",
-                                                            "id":  "all_users"
-                                                        },
-                                    "excludeTarget":  {
-                                                            "targetType":  "group",
-                                                            "id":  "00000000-0000-0000-0000-000000000000"
-                                                        }
-                                },
-                                "displayLocationInformationRequiredState":  {
-                                    "state":  "enabled",
-                                    "includeTarget":  {
-                                                            "targetType":  "group",
-                                                            "id":  "all_users"
-                                                        },
-                                    "excludeTarget":  {
-                                                            "targetType":  "group",
-                                                            "id":  "00000000-0000-0000-0000-000000000000"
-                                                        }
-                                }
-                            },
-                            "includeTargets@odata.context":  "https://graph.microsoft.com/beta/$metadata#policies/authenticationMethodsPolicy/authenticationMethodConfigurations(\u0027MicrosoftAuthenticator\u0027)/microsoft.graph.microsoftAuthenticatorAuthenticationMethodConfiguration/includeTargets",
-                            "includeTargets":  [
-                                {
-                                    "targetType":  "group",
-                                    "id":  "all_users",
-                                    "isRegistrationRequired":  false,
-                                    "authenticationMode":  "any"
-                                }
-                            ]
-                        }
-                    },
-                    {
-                        "Id":  "Email",
-                        "State": "enabled"
-                    }
-                ]
-            }
-        ]
-    }
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+                        with input.authentication_method as [AuthenticationMethod]
 
     TestResult("MS.AAD.3.3v1", Output, PASS, true) == true
 }
@@ -2187,43 +1724,27 @@ test_PhishingMFANotEnforced_MicrosoftAuthEnabled_includeTargetsNotAll_Incorrect 
 # Policy MS.AAD.3.4v1
 #--
 test_PolicyMigrationState_Correct if {
-    Output := aad.tests with input as {
-        "authentication_method": [
-            {
-                "authentication_method_policy": {
-                        "PolicyMigrationState": "migrationComplete"
-                }
-            }
-        ]
-    }
+    Output := aad.tests with input.authentication_method as [AuthenticationMethod]
 
     TestResult("MS.AAD.3.4v1", Output, PASS, true) == true
 }
 
 test_PolicyMigrationState_preMigration_Incorrect if {
-    Output := aad.tests with input as {
-        "authentication_method": [
-            {
-                "authentication_method_policy": {
-                        "PolicyMigrationState": "preMigration"
-                }
-            }
-        ]
-    }
+    Auth := json.patch(AuthenticationMethod,
+                [{"op": "add", "path": "authentication_method_policy/PolicyMigrationState",
+                "value": "preMigration"}])
+
+    Output := aad.tests with input.authentication_method as [Auth]
 
     TestResult("MS.AAD.3.4v1", Output, FAIL, false) == true
 }
 
 test_PolicyMigrationState_migrationInProgress_Incorrect if {
-    Output := aad.tests with input as {
-        "authentication_method": [
-            {
-                "authentication_method_policy": {
-                        "PolicyMigrationState": "migrationInProgress"
-                }
-            }
-        ]
-    }
+    Auth := json.patch(AuthenticationMethod,
+                [{"op": "add", "path": "authentication_method_policy/PolicyMigrationState",
+                "value": "migrationInProgress"}])
+
+    Output := aad.tests with input.authentication_method as [Auth]
 
     TestResult("MS.AAD.3.4v1", Output, FAIL, false) == true
 }
@@ -2233,186 +1754,72 @@ test_PolicyMigrationState_migrationInProgress_Incorrect if {
 # Policy MS.AAD.3.5v1
 #--
 test_LowSecurityAuthMethods_SmsEnabled_Incorrect if {
+    Auth := json.patch(AuthenticationMethod,
+                [{"op": "add", "path": "authentication_method_feature_settings/1/State",
+                "value": "enabled"}])
 
-    Output := aad.tests with input as {
-        "authentication_method": [
-            {
-                "authentication_method_feature_settings": [
-                            {
-                                "Id": "Sms",
-                                "State": "enabled"
-                            },
-                            {
-                                "Id":  "Voice",
-                                "State":  "disabled"
-                            },
-                            {
-                                "Id":  "Email",
-                                "State": "disabled"
-                            }
-                ],
-
-                "authentication_method_policy": {
-                        "PolicyMigrationState": "migrationComplete"
-                }
-            }
-        ]
-    }
+    Output := aad.tests with input.authentication_method as [Auth]
 
     ReportDetails := "Sms, Voice, and Email authentication must be disabled."
     TestResult("MS.AAD.3.5v1", Output, ReportDetails, false) == true
 }
 
 test_LowSecurityAuthMethods_VoiceEnabled_Incorrect if {
+    Auth := json.patch(AuthenticationMethod,
+                [{"op": "add", "path": "authentication_method_feature_settings/2/State",
+                "value": "enabled"}])
 
-    Output := aad.tests with input as {
-        "authentication_method": [
-            {
-                "authentication_method_feature_settings": [
-                            {
-                                "Id": "Sms",
-                                "State": "disabled"
-                            },
-                            {
-                                "Id":  "Voice",
-                                "State":  "enabled"
-                            },
-                            {
-                                "Id":  "Email",
-                                "State": "disabled"
-                            }
-                ],
-
-                "authentication_method_policy": {
-                        "PolicyMigrationState": "migrationComplete"
-                }
-            }
-        ]
-    }
+    Output := aad.tests with input.authentication_method as [Auth]
 
     ReportDetails := "Sms, Voice, and Email authentication must be disabled."
     TestResult("MS.AAD.3.5v1", Output, ReportDetails, false) == true
 }
 
 test_LowSecurityAuthMethods_EmailEnabled_Incorrect if {
+    Auth := json.patch(AuthenticationMethod,
+                [{"op": "add", "path": "authentication_method_feature_settings/3/State",
+                "value": "enabled"}])
 
-    Output := aad.tests with input as {
-        "authentication_method": [
-            {
-                "authentication_method_feature_settings": [
-                            {
-                                "Id": "Sms",
-                                "State": "disabled"
-                            },
-                            {
-                                "Id":  "Voice",
-                                "State":  "disabled"
-                            },
-                            {
-                                "Id":  "Email",
-                                "State": "enabled"
-                            }
-                ],
-
-                "authentication_method_policy": {
-                        "PolicyMigrationState": "migrationComplete"
-                }
-            }
-        ]
-    }
+    Output := aad.tests with input.authentication_method as [Auth]
 
     ReportDetails := "Sms, Voice, and Email authentication must be disabled."
     TestResult("MS.AAD.3.5v1", Output, ReportDetails, false) == true
 }
 
 test_LowSecurityAuthMethods_TwoMethodsEnabled_Incorrect if {
+    Auth := json.patch(AuthenticationMethod,
+                [{"op": "add", "path": "authentication_method_feature_settings/1/State",
+                "value": "enabled"},
+                {"op": "add", "path": "authentication_method_feature_settings/2/State",
+                "value": "enabled"}])
 
-    Output := aad.tests with input as {
-        "authentication_method": [
-            {
-                "authentication_method_feature_settings": [
-                            {
-                                "Id": "Sms",
-                                "State": "enabled"
-                            },
-                            {
-                                "Id":  "Voice",
-                                "State":  "enabled"
-                            },
-                            {
-                                "Id":  "Email",
-                                "State": "disabled"
-                            }
-                ],
-
-                "authentication_method_policy": {
-                        "PolicyMigrationState": "migrationComplete"
-                }
-            }
-        ]
-    }
+    Output := aad.tests with input.authentication_method as [Auth]
 
     ReportDetails := "Sms, Voice, and Email authentication must be disabled."
     TestResult("MS.AAD.3.5v1", Output, ReportDetails, false) == true
 }
 
 test_LowSecurityAuthMethods_AllMethodsEnabled_Incorrect if {
+    Auth := json.patch(AuthenticationMethod,
+                [{"op": "add", "path": "authentication_method_feature_settings/1/State",
+                "value": "enabled"},
+                {"op": "add", "path": "authentication_method_feature_settings/2/State",
+                "value": "enabled"},
+                {"op": "add", "path": "authentication_method_feature_settings/3/State",
+                "value": "enabled"}])
 
-    Output := aad.tests with input as {
-        "authentication_method": [
-            {
-                "authentication_method_feature_settings": [
-                            {
-                                "Id": "Sms",
-                                "State": "enabled"
-                            },
-                            {
-                                "Id":  "Voice",
-                                "State":  "enabled"
-                            },
-                            {
-                                "Id":  "Email",
-                                "State": "enabled"
-                            }
-                ],
-
-                "authentication_method_policy": {
-                        "PolicyMigrationState": "migrationComplete"
-                }
-            }
-        ]
-    }
+    Output := aad.tests with input.authentication_method as [Auth]
 
     ReportDetails := "Sms, Voice, and Email authentication must be disabled."
     TestResult("MS.AAD.3.5v1", Output, ReportDetails, false) == true
 }
 
 test_LowSecurityAuthMethods_PreMigration_NotImplemented if {
+    Auth := json.patch(AuthenticationMethod,
+                [{"op": "add", "path": "authentication_method_policy/PolicyMigrationState",
+                "value": "preMigration"}])
 
-    Output := aad.tests with input as {
-        "authentication_method": [
-            {
-                "authentication_method_feature_settings": [
-                            {
-                                "Id": "Sms",
-                                "State": "enabled"
-                            },
-                            {
-                                "Id":  "Voice",
-                                "State":  "disabled"
-                            },
-                            {
-                                "Id":  "Email",
-                                "State": "disabled"
-                            }
-                ],
-
-                "authentication_method_policy": {
-                        "PolicyMigrationState": "preMigration"
-                }
-            }
-        ]
-    }
+    Output := aad.tests with input.authentication_method as [Auth]
 
     # regal ignore:line-length
     Reason := "This policy is only applicable if the tenant has their Manage Migration feature set to Migration Complete. See %v for more info"
@@ -2420,31 +1827,7 @@ test_LowSecurityAuthMethods_PreMigration_NotImplemented if {
 }
 
 test_LowSecurityAuthMethods_MigrationComplete_Correct if {
-
-    Output := aad.tests with input as {
-        "authentication_method": [
-            {
-                "authentication_method_feature_settings": [
-                            {
-                                "Id": "Sms",
-                                "State": "disabled"
-                            },
-                            {
-                                "Id":  "Voice",
-                                "State":  "disabled"
-                            },
-                            {
-                                "Id":  "Email",
-                                "State": "disabled"
-                            }
-                ],
-
-                "authentication_method_policy": {
-                        "PolicyMigrationState": "migrationComplete"
-                }
-            }
-        ]
-    }
+    Output := aad.tests with input.authentication_method as [AuthenticationMethod]
 
     TestResult("MS.AAD.3.5v1", Output, PASS, true) == true
 }
@@ -2454,296 +1837,117 @@ test_LowSecurityAuthMethods_MigrationComplete_Correct if {
 # Policy MS.AAD.3.6v1
 #--
 test_ConditionalAccessPolicies_Correct_all_strengths if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ],
-                        "ExcludeApplications": []
-                    },
-                    "Users": {
-                        "IncludeRoles": [
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "Conditions/Users/IncludeRoles",
+                "value": [
                             "Role1",
                             "Role2"
-                        ],
-                        "ExcludeRoles": []
-                    }
-                },
-                "GrantControls": {
-                    "AuthenticationStrength": {
-                        "AllowedCombinations": [
-                            "windowsHelloForBusiness",
-                            "fido2",
-                            "x509CertificateMultiFactor"
-                        ]
-                    }
-                },
-                "State": "enabled",
-                "DisplayName": "MFA required for all highly Privileged Roles Policy"
-            }
-        ],
-        "privileged_roles": [
-            {
-                "RoleTemplateId": "Role1",
-                "DisplayName": "Global Administrator"
-            },
-            {
-                "RoleTemplateId": "Role2",
-                "DisplayName": "Privileged Role Administrator"
-            }
-        ]
-    }
+                        ]}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+                        with input.privileged_roles as PrivilegedRoles
 
     ReportDetailStr := concat("", [
         "1 conditional access policy(s) found that meet(s) all requirements:",
-        "<br/>MFA required for all highly Privileged Roles Policy. <a href='#caps'>View all CA policies</a>."
+        "<br/>Test block Legacy Authentication. <a href='#caps'>View all CA policies</a>."
     ])
 
     TestResult("MS.AAD.3.6v1", Output, ReportDetailStr, true) == true
 }
 
 test_ConditionalAccessPolicies_Correct_windowsHelloForBusiness_only if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ],
-                        "ExcludeApplications": []
-                    },
-                    "Users": {
-                        "IncludeRoles": [
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "Conditions/Users/IncludeRoles",
+                "value": [
                             "Role1",
                             "Role2"
-                        ],
-                        "ExcludeRoles": []
-                    }
-                },
-                "GrantControls": {
-                    "AuthenticationStrength": {
-                        "AllowedCombinations": [
-                            "windowsHelloForBusiness"
-                        ]
-                    }
-                },
-                "State": "enabled",
-                "DisplayName": "MFA required for all highly Privileged Roles Policy"
-            }
-        ],
-        "privileged_roles": [
-            {
-                "RoleTemplateId": "Role1",
-                "DisplayName": "Global Administrator"
-            },
-            {
-                "RoleTemplateId": "Role2",
-                "DisplayName": "Privileged Role Administrator"
-            }
-        ]
-    }
+                        ]},
+                {"op": "add", "path": "GrantControls/AuthenticationStrength/AllowedCombinations",
+                "value": ["windowsHelloForBusiness"]}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+                        with input.privileged_roles as PrivilegedRoles
 
     ReportDetailStr := concat("", [
         "1 conditional access policy(s) found that meet(s) all requirements:",
-        "<br/>MFA required for all highly Privileged Roles Policy. <a href='#caps'>View all CA policies</a>."
+        "<br/>Test block Legacy Authentication. <a href='#caps'>View all CA policies</a>."
     ])
 
     TestResult("MS.AAD.3.6v1", Output, ReportDetailStr, true) == true
 }
 
 test_ConditionalAccessPolicies_Correct_fido2_only if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ],
-                        "ExcludeApplications": []
-                    },
-                    "Users": {
-                        "IncludeRoles": [
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "Conditions/Users/IncludeRoles",
+                "value": [
                             "Role1",
                             "Role2"
-                        ],
-                        "ExcludeRoles": []
-                    }
-                },
-                "GrantControls": {
-                    "AuthenticationStrength": {
-                        "AllowedCombinations": [
-                            "fido2"
-                        ]
-                    }
-                },
-                "State": "enabled",
-                "DisplayName": "MFA required for all highly Privileged Roles Policy"
-            }
-        ],
-        "privileged_roles": [
-            {
-                "RoleTemplateId": "Role1",
-                "DisplayName": "Global Administrator"
-            },
-            {
-                "RoleTemplateId": "Role2",
-                "DisplayName": "Privileged Role Administrator"
-            }
-        ]
-    }
+                        ]},
+                {"op": "add", "path": "GrantControls/AuthenticationStrength/AllowedCombinations",
+                "value": ["fido2"]}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+                        with input.privileged_roles as PrivilegedRoles
 
     ReportDetailStr := concat("", [
         "1 conditional access policy(s) found that meet(s) all requirements:",
-        "<br/>MFA required for all highly Privileged Roles Policy. <a href='#caps'>View all CA policies</a>."
+        "<br/>Test block Legacy Authentication. <a href='#caps'>View all CA policies</a>."
     ])
 
     TestResult("MS.AAD.3.6v1", Output, ReportDetailStr, true) == true
 }
 
 test_ConditionalAccessPolicies_Correct_x509_only if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ],
-                        "ExcludeApplications": []
-                    },
-                    "Users": {
-                        "IncludeRoles": [
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "Conditions/Users/IncludeRoles",
+                "value": [
                             "Role1",
                             "Role2"
-                        ],
-                        "ExcludeRoles": []
-                    }
-                },
-                "GrantControls": {
-                    "AuthenticationStrength": {
-                        "AllowedCombinations": [
-                            "x509CertificateMultiFactor"
-                        ]
-                    }
-                },
-                "State": "enabled",
-                "DisplayName": "MFA required for all highly Privileged Roles Policy"
-            }
-        ],
-        "privileged_roles": [
-            {
-                "RoleTemplateId": "Role1",
-                "DisplayName": "Global Administrator"
-            },
-            {
-                "RoleTemplateId": "Role2",
-                "DisplayName": "Privileged Role Administrator"
-            }
-        ]
-    }
+                        ]},
+                {"op": "add", "path": "GrantControls/AuthenticationStrength/AllowedCombinations",
+                "value": ["x509CertificateMultiFactor"]}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+                        with input.privileged_roles as PrivilegedRoles
 
     ReportDetailStr := concat("", [
         "1 conditional access policy(s) found that meet(s) all requirements:",
-        "<br/>MFA required for all highly Privileged Roles Policy. <a href='#caps'>View all CA policies</a>."
+        "<br/>Test block Legacy Authentication. <a href='#caps'>View all CA policies</a>."
     ])
 
     TestResult("MS.AAD.3.6v1", Output, ReportDetailStr, true) == true
 }
 
 test_ConditionalAccessPolicies_Incorrect_not_all_apps if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [],
-                        "ExcludeApplications": []
-                    },
-                    "Users": {
-                        "IncludeRoles": [
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "Conditions/Users/IncludeRoles",
+                "value": [
                             "Role1",
                             "Role2"
-                        ],
-                        "ExcludeRoles": []
-                    }
-                },
-                "GrantControls": {
-                    "AuthenticationStrength": {
-                        "AllowedCombinations": [
-                            "windowsHelloForBusiness",
-                            "fido2",
-                            "x509CertificateMultiFactor"
-                        ]
-                    }
-                },
-                "State": "enabled",
-                "DisplayName": "MFA required for all highly Privileged Roles Policy"
-            }
-        ],
-        "privileged_roles": [
-            {
-                "RoleTemplateId": "Role1",
-                "DisplayName": "Global Administrator"
-            },
-            {
-                "RoleTemplateId": "Role2",
-                "DisplayName": "Privileged Role Administrator"
-            }
-        ]
-    }
+                        ]},
+                {"op": "add", "path": "Conditions/Applications/IncludeApplications",
+                "value": []}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+                        with input.privileged_roles as PrivilegedRoles
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
     TestResult("MS.AAD.3.6v1", Output, ReportDetailStr, false) == true
 }
 
-test_BuiltInControls_Incorrect_No_Authentication_Strenght if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ],
-                        "ExcludeApplications": []
-                    },
-                    "Users": {
-                        "IncludeRoles": [
+test_BuiltInControls_Incorrect_No_Authentication_Strength if {
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "Conditions/Users/IncludeRoles",
+                "value": [
                             "Role1",
                             "Role2"
-                        ],
-                        "ExcludeRoles": []
-                    }
-                },
-                "GrantControls": {
-                    "AuthenticationStrength": {
-                        "AllowedCombinations": null
-                    },
-                    "BuiltInControls": [
-                        ""
-                    ]
-                },
-                "State": "enabled",
-                "DisplayName": "MFA required for all highly Privileged Roles Policy"
-            }
-        ],
-        "privileged_roles": [
-            {
-                "RoleTemplateId": "Role1",
-                "DisplayName": "Global Administrator"
-            },
-            {
-                "RoleTemplateId": "Role2",
-                "DisplayName": "Privileged Role Administrator"
-            }
-        ]
-    }
+                        ]},
+                {"op": "add", "path": "GrantControls/AuthenticationStrength/AllowedCombinations",
+                "value": null}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+                        with input.privileged_roles as PrivilegedRoles
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
@@ -2751,48 +1955,17 @@ test_BuiltInControls_Incorrect_No_Authentication_Strenght if {
 }
 
 test_ConditionalAccessPolicies_Incorrect_disabled if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ],
-                        "ExcludeApplications": []
-                    },
-                    "Users": {
-                        "IncludeRoles": [
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "Conditions/Users/IncludeRoles",
+                "value": [
                             "Role1",
                             "Role2"
-                        ],
-                        "ExcludeRoles": []
-                    }
-                },
-                "GrantControls": {
-                    "AuthenticationStrength": {
-                        "AllowedCombinations": [
-                            "windowsHelloForBusiness",
-                            "fido2",
-                            "x509CertificateMultiFactor"
-                        ]
-                    }
-                },
-                "State": "disabled",
-                "DisplayName": "MFA required for all highly Privileged Roles Policy"
-            }
-        ],
-        "privileged_roles": [
-            {
-                "RoleTemplateId": "Role1",
-                "DisplayName": "Global Administrator"
-            },
-            {
-                "RoleTemplateId": "Role2",
-                "DisplayName": "Privileged Role Administrator"
-            }
-        ]
-    }
+                        ]},
+                {"op": "add", "path": "State",
+                "value": "disabled"}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+                        with input.privileged_roles as PrivilegedRoles
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
@@ -2800,47 +1973,14 @@ test_ConditionalAccessPolicies_Incorrect_disabled if {
 }
 
 test_ConditionalAccessPolicies_Incorrect_Covered_Roles if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ],
-                        "ExcludeApplications": []
-                    },
-                    "Users": {
-                        "IncludeRoles": [
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "Conditions/Users/IncludeRoles",
+                "value": [
                             "Role1"
-                        ],
-                        "ExcludeRoles": []
-                    }
-                },
-                "GrantControls": {
-                    "AuthenticationStrength": {
-                        "AllowedCombinations": [
-                            "windowsHelloForBusiness",
-                            "fido2",
-                            "x509CertificateMultiFactor"
-                        ]
-                    }
-                },
-                "State": "enabled",
-                "DisplayName": "MFA required for all highly Privileged Roles Policy"
-            }
-        ],
-        "privileged_roles": [
-            {
-                "RoleTemplateId": "Role1",
-                "DisplayName": "Global Administrator"
-            },
-            {
-                "RoleTemplateId": "Role2",
-                "DisplayName": "Privileged Role Administrator"
-            }
-        ]
-    }
+                        ]}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+                        with input.privileged_roles as PrivilegedRoles
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
@@ -2848,43 +1988,15 @@ test_ConditionalAccessPolicies_Incorrect_Covered_Roles if {
 }
 
 test_ConditionalAccessPolicies_Incorrect_Wrong_Roles if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ],
-                        "ExcludeApplications": []
-                    },
-                    "Users": {
-                        "IncludeRoles": [
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "Conditions/Users/IncludeRoles",
+                "value": [
                             "Role1"
-                        ],
-                        "ExcludeRoles": []
-                    }
-                },
-                "GrantControls": {
-                    "AuthenticationStrength": {
-                        "AllowedCombinations": [
-                            "windowsHelloForBusiness",
-                            "fido2",
-                            "x509CertificateMultiFactor"
-                        ]
-                    }
-                },
-                "State": "enabled",
-                "DisplayName": "MFA required for all highly Privileged Roles Policy"
-            }
-        ],
-        "privileged_roles": [
-            {
-                "RoleTemplateId": "Role2",
-                "DisplayName": "Privileged Role Administrator"
-            }
-        ]
-    }
+                        ]}])
+    Roles := json.patch(PrivilegedRoles, [{"op": "remove", "path": "0"}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+                        with input.privileged_roles as Roles
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
@@ -2892,50 +2004,19 @@ test_ConditionalAccessPolicies_Incorrect_Wrong_Roles if {
 }
 
 test_ExcludeRoles_Incorrect_V2 if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ],
-                        "ExcludeApplications": []
-                    },
-                    "Users": {
-                        "IncludeRoles": [
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "Conditions/Users/IncludeRoles",
+                "value": [
                             "Role1",
                             "Role2"
-                        ],
-                        "ExcludeRoles": [
+                        ]},
+                {"op": "add", "path": "Conditions/Users/ExcludeRoles",
+                "value": [
                             "Role1"
-                        ]
-                    }
-                },
-                "GrantControls": {
-                    "AuthenticationStrength": {
-                        "AllowedCombinations": [
-                            "windowsHelloForBusiness",
-                            "fido2",
-                            "x509CertificateMultiFactor"
-                        ]
-                    }
-                },
-                "State": "enabled",
-                "DisplayName": "MFA required for all highly Privileged Roles Policy"
-            }
-        ],
-        "privileged_roles": [
-            {
-                "RoleTemplateId": "Role1",
-                "DisplayName": "Global Administrator"
-            },
-            {
-                "RoleTemplateId": "Role2",
-                "DisplayName": "Privileged Role Administrator"
-            }
-        ]
-    }
+                        ]}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+                        with input.privileged_roles as PrivilegedRoles
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
@@ -2947,101 +2028,43 @@ test_ExcludeRoles_Incorrect_V2 if {
 # Policy MS.AAD.3.7v1
 #--
 test_ConditionalAccessPolicies_Correct_V3 if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ]
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ]
-                    }
-                },
-                "GrantControls": {
-                    "BuiltInControls": [
-                        "domainJoinedDevice"
-                    ]
-                },
-                "State": "enabled",
-                "DisplayName": "AD Joined Device Authentication Policy"
-            }
-        ]
-    }
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "GrantControls/BuiltInControls",
+                "value": ["domainJoinedDevice"]}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
 
     ReportDetailStr := concat("", [
         "1 conditional access policy(s) found that meet(s) all requirements:",
-        "<br/>AD Joined Device Authentication Policy. <a href='#caps'>View all CA policies</a>."
+        "<br/>Test block Legacy Authentication. <a href='#caps'>View all CA policies</a>."
     ])
 
     TestResult("MS.AAD.3.7v1", Output, ReportDetailStr, true) == true
 }
 
 test_BuiltInControls_Correct if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ]
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ]
-                    }
-                },
-                "GrantControls": {
-                    "BuiltInControls": [
-                        "compliantDevice"
-                    ]
-                },
-                "State": "enabled",
-                "DisplayName": "AD Joined Device Authentication Policy"
-            }
-        ]
-    }
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "GrantControls/BuiltInControls",
+                "value": ["compliantDevice"]}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
 
     ReportDetailStr := concat("", [
         "1 conditional access policy(s) found that meet(s) all requirements:",
-        "<br/>AD Joined Device Authentication Policy. <a href='#caps'>View all CA policies</a>."
+        "<br/>Test block Legacy Authentication. <a href='#caps'>View all CA policies</a>."
     ])
 
     TestResult("MS.AAD.3.7v1", Output, ReportDetailStr, true) == true
 }
 
 test_IncludeApplications_Incorrect_V3 if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            ""
-                        ]
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ]
-                    }
-                },
-                "GrantControls": {
-                    "BuiltInControls": [
-                        "compliantDevice"
-                    ]
-                },
-                "State": "enabled",
-                "DisplayName": "AD Joined Device Authentication Policy"
-            }
-        ]
-    }
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "Conditions/Applications/IncludeApplications",
+                "value": [""]},
+                {"op": "add", "path": "GrantControls/BuiltInControls",
+                "value": ["compliantDevice"]}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
@@ -3049,31 +2072,13 @@ test_IncludeApplications_Incorrect_V3 if {
 }
 
 test_IncludeUsers_Incorrect_V2 if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ]
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            ""
-                        ]
-                    }
-                },
-                "GrantControls": {
-                    "BuiltInControls": [
-                        "compliantDevice"
-                    ]
-                },
-                "State": "enabled",
-                "DisplayName": "AD Joined Device Authentication Policy"
-            }
-        ]
-    }
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "Conditions/Users/IncludeUsers",
+                "value": [""]},
+                {"op": "add", "path": "GrantControls/BuiltInControls",
+                "value": ["compliantDevice"]}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
@@ -3081,31 +2086,11 @@ test_IncludeUsers_Incorrect_V2 if {
 }
 
 test_BuiltInControls_Incorrect_V3 if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ]
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ]
-                    }
-                },
-                "GrantControls": {
-                    "BuiltInControls": [
-                        ""
-                    ]
-                },
-                "State": "enabled",
-                "DisplayName": "AD Joined Device Authentication Policy"
-            }
-        ]
-    }
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "GrantControls/BuiltInControls",
+                "value": [""]}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
@@ -3113,31 +2098,11 @@ test_BuiltInControls_Incorrect_V3 if {
 }
 
 test_State_Incorrect_V3 if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ]
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ]
-                    }
-                },
-                "GrantControls": {
-                    "BuiltInControls": [
-                        "compliantDevice"
-                    ]
-                },
-                "State": "disabled",
-                "DisplayName": "AD Joined Device Authentication Policy"
-            }
-        ]
-    }
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "State",
+                "value": "disabled"}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
@@ -3149,182 +2114,68 @@ test_State_Incorrect_V3 if {
 # Policy MS.AAD.3.8v1
 #--
 test_Correct_V1 if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ],
-                        "IncludeUserActions": [
-                            "urn:user:registersecurityinfo"
-                        ]
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ]
-                    }
-                },
-                "GrantControls": {
-                    "BuiltInControls": [
-                        "compliantDevice",
-                        "domainJoinedDevice"
-                    ]
-                },
-                "State": "enabled",
-                "DisplayName": "Managed Device Required for MFA Registration"
-            }
-        ]
-    }
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "GrantControls/BuiltInControls",
+                "value": [
+                    "compliantDevice",
+                    "domainJoinedDevice"
+                ]}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
 
     ReportDetailArrayStrs := ["conditional access policy(s) found that meet(s) all requirements:"]
     TestResultContains("MS.AAD.3.8v1", Output, ReportDetailArrayStrs, true) == true
 }
 
 test_ExcludeUserCorrect_V1 if {
-    Output := aad.tests with input as {
-        "scuba_config": {
-            "Aad": {
-                "MS.AAD.3.8v1": {
-                    "CapExclusions": {
-                        "Users": [
-                            "SpecialPerson"
-                        ]
-                    }
-                }
-            }
-        },
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ],
-                        "IncludeUserActions": [
-                            "urn:user:registersecurityinfo"
-                        ]
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ],
-                        "ExcludeUsers": [
-                            "SpecialPerson"
-                        ]
-                    }
-                },
-                "GrantControls": {
-                    "BuiltInControls": [
-                        "compliantDevice",
-                        "domainJoinedDevice"
-                    ]
-                },
-                "State": "enabled",
-                "DisplayName": "Managed Device Required for MFA Registration"
-            }
-        ]
-    }
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "GrantControls/BuiltInControls",
+                "value": [
+                    "compliantDevice",
+                    "domainJoinedDevice"
+                ]},
+                {"op": "add", "path": "Conditions/Users/ExcludeUsers",
+                "value": ["SpecialPerson"]}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+                        with input.scuba_config.Aad["MS.AAD.3.8v1"] as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.3.8v1"].CapExclusions.Users as ["SpecialPerson"]
 
     ReportDetailArrayStrs := ["conditional access policy(s) found that meet(s) all requirements:"]
     TestResultContains("MS.AAD.3.8v1", Output, ReportDetailArrayStrs, true) == true
 }
 
 test_ExcludeGroup_Correct_V1 if {
-    Output := aad.tests with input as {
-        "scuba_config": {
-            "Aad": {
-                "MS.AAD.3.8v1": {
-                    "CapExclusions": {
-                        "Groups": [
-                            "SpecialGroup"
-                        ]
-                    }
-                }
-            }
-        },
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ],
-                        "IncludeUserActions": [
-                            "urn:user:registersecurityinfo"
-                        ]
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ],
-                        "ExcludeGroups": [
-                            "SpecialGroup"
-                        ]
-                    }
-                },
-                "GrantControls": {
-                    "BuiltInControls": [
-                        "compliantDevice",
-                        "domainJoinedDevice"
-                    ]
-                },
-                "State": "enabled",
-                "DisplayName": "Managed Device Required for MFA Registration"
-            }
-        ]
-    }
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "GrantControls/BuiltInControls",
+                "value": [
+                    "compliantDevice",
+                    "domainJoinedDevice"
+                ]},
+                {"op": "add", "path": "Conditions/Users/ExcludeGroups",
+                "value": ["SpecialGroup"]}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+                        with input.scuba_config.Aad["MS.AAD.3.8v1"] as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.3.8v1"].CapExclusions.Groups as ["SpecialGroup"]
 
     ReportDetailArrayStrs := ["conditional access policy(s) found that meet(s) all requirements:"]
     TestResultContains("MS.AAD.3.8v1", Output, ReportDetailArrayStrs, true) == true
 }
 
 test_ExcludeUserIncorrect_V1 if {
-    Output := aad.tests with input as {
-        "scuba_config": {
-            "Aad": {
-                "MS.AAD.3.8v1": {
-                    "CapExclusions": {
-                        "Users": [
-                            "NotSpecialUser"
-                        ]
-                    }
-                }
-            }
-        },
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ],
-                        "IncludeUserActions": [
-                            "urn:user:registersecurityinfo"
-                        ]
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ],
-                        "ExcludeUsers": [
-                            "SpecialUser"
-                        ]
-                    }
-                },
-                "GrantControls": {
-                    "BuiltInControls": [
-                        "compliantDevice",
-                        "domainJoinedDevice"
-                    ]
-                },
-                "State": "enabled",
-                "DisplayName": "Managed Device Required for MFA Registration"
-            }
-        ]
-    }
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "GrantControls/BuiltInControls",
+                "value": [
+                    "compliantDevice",
+                    "domainJoinedDevice"
+                ]},
+                {"op": "add", "path": "Conditions/Users/ExcludeUsers",
+                "value": ["SpecialPerson"]}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+                        with input.scuba_config.Aad["MS.AAD.3.8v1"] as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.3.8v1"].CapExclusions.Users as ["NotSpecialPerson"]
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
@@ -3332,49 +2183,18 @@ test_ExcludeUserIncorrect_V1 if {
 }
 
 test_ExcludeGroupIncorrect_V1 if {
-    Output := aad.tests with input as {
-        "scuba_config": {
-            "Aad": {
-                "MS.AAD.3.8v1": {
-                    "CapExclusions": {
-                        "Groups": [
-                            "SpecialGroup"
-                        ]
-                    }
-                }
-            }
-        },
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ],
-                        "IncludeUserActions": [
-                            "urn:user:registersecurityinfo"
-                        ]
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ],
-                        "ExcludeGroups": [
-                            "NotSpecialGroup"
-                        ]
-                    }
-                },
-                "GrantControls": {
-                    "BuiltInControls": [
-                        "compliantDevice",
-                        "domainJoinedDevice"
-                    ]
-                },
-                "State": "enabled",
-                "DisplayName": "Managed Device Required for MFA Registration"
-            }
-        ]
-    }
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "GrantControls/BuiltInControls",
+                "value": [
+                    "compliantDevice",
+                    "domainJoinedDevice"
+                ]},
+                {"op": "add", "path": "Conditions/Users/ExcludeGroups",
+                "value": ["SpecialGroup"]}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+                        with input.scuba_config.Aad["MS.AAD.3.8v1"] as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.3.8v1"].CapExclusions.Groups as ["NotSpecialGroup"]
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
@@ -3382,35 +2202,16 @@ test_ExcludeGroupIncorrect_V1 if {
 }
 
 test_InCorrect_ReportOnly if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ],
-                        "IncludeUserActions": [
-                            "urn:user:registersecurityinfo"
-                        ]
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ]
-                    }
-                },
-                "GrantControls": {
-                    "BuiltInControls": [
-                        "compliantDevice",
-                        "domainJoinedDevice"
-                    ]
-                },
-                "State": "enabledForReportingButNotEnforced",
-                "DisplayName": "Managed Device Required for MFA Registration"
-            }
-        ]
-    }
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "GrantControls/BuiltInControls",
+                "value": [
+                    "compliantDevice",
+                    "domainJoinedDevice"
+                ]},
+                {"op": "add", "path": "State",
+                "value": "enabledForReportingButNotEnforced"}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
@@ -3418,100 +2219,33 @@ test_InCorrect_ReportOnly if {
 }
 
 test_Correct_OnlyCompliantDevice if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ],
-                        "IncludeUserActions": [
-                            "urn:user:registersecurityinfo"
-                        ]
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ]
-                    }
-                },
-                "GrantControls": {
-                    "BuiltInControls": [
-                        "compliantDevice"
-                    ]
-                },
-                "State": "enabled",
-                "DisplayName": "Managed Device Required for MFA Registration"
-            }
-        ]
-    }
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "GrantControls/BuiltInControls",
+                "value": ["compliantDevice"]}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
 
     ReportDetailArrayStrs := ["conditional access policy(s) found that meet(s) all requirements:"]
     TestResultContains("MS.AAD.3.8v1", Output, ReportDetailArrayStrs, true) == true
 }
 
 test_Correct_OnlyDomainJoinedDevice if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ],
-                        "IncludeUserActions": [
-                            "urn:user:registersecurityinfo"
-                        ]
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ]
-                    }
-                },
-                "GrantControls": {
-                    "BuiltInControls": [
-                        "domainJoinedDevice"
-                    ]
-                },
-                "State": "enabled",
-                "DisplayName": "Managed Device Required for MFA Registration"
-            }
-        ]
-    }
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "GrantControls/BuiltInControls",
+                "value": ["domainJoinedDevice"]}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
 
     ReportDetailArrayStrs := ["conditional access policy(s) found that meet(s) all requirements:"]
     TestResultContains("MS.AAD.3.8v1", Output, ReportDetailArrayStrs, true) == true
 }
 
 test_Incorrect_EmptyGrantControls if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": [
-            {
-                "Conditions": {
-                    "Applications": {
-                        "IncludeApplications": [
-                            "All"
-                        ],
-                        "IncludeUserActions": [
-                            "urn:user:registersecurityinfo"
-                        ]
-                    },
-                    "Users": {
-                        "IncludeUsers": [
-                            "All"
-                        ]
-                    }
-                },
-                "GrantControls": {
-                    "BuiltInControls": []
-                },
-                "State": "enabled",
-                "DisplayName": "Managed Device Required for MFA Registration"
-            }
-        ]
-    }
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "GrantControls/BuiltInControls",
+                "value": []}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
@@ -3519,9 +2253,7 @@ test_Incorrect_EmptyGrantControls if {
 }
 
 test_InCorrect_No_Policy if {
-    Output := aad.tests with input as {
-        "conditional_access_policies": []
-    }
+    Output := aad.tests with input.conditional_access_policies as []
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."

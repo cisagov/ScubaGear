@@ -7,6 +7,10 @@ ConditionalAccessPolicies := {
         "Applications": {
             "IncludeApplications": [
                 "All"
+            ],
+            "ExcludeApplications": [],
+            "IncludeUserActions": [
+                "urn:user:registersecurityinfo"
             ]
         },
         "Users": {
@@ -31,7 +35,14 @@ ConditionalAccessPolicies := {
     "GrantControls": {
         "BuiltInControls": [
             "block"
-        ]
+        ],
+        "AuthenticationStrength": {
+            "AllowedCombinations": [
+                "windowsHelloForBusiness",
+                "fido2",
+                "x509CertificateMultiFactor"
+            ]
+        }
     },
     "State": "enabled",
     "DisplayName": "Test block Legacy Authentication"
@@ -97,5 +108,78 @@ DomainSettings := [
         "Id" : "test2.url.com",
         "PasswordValidityPeriodInDays" : INT_MAX,
         "IsVerified" : true
+    }
+]
+
+AuthenticationMethod := {
+    "authentication_method_policy": {
+        "PolicyMigrationState": "migrationComplete"
+    },
+    "authentication_method_feature_settings": [
+        {
+            "Id":  "MicrosoftAuthenticator",
+            "State": "enabled",
+            "ExcludeTargets":  [],
+            "AdditionalProperties":  {
+                "@odata.type":  "#microsoft.graph.microsoftAuthenticatorAuthenticationMethodConfiguration",
+                "isSoftwareOathEnabled":  false,
+                "featureSettings":  {
+                    "displayAppInformationRequiredState":  {
+                        "state":  "enabled",
+                        "includeTarget":  {
+                            "targetType":  "group",
+                            "id":  "all_users"
+                        },
+                        "excludeTarget":  {
+                            "targetType":  "group",
+                            "id":  "00000000-0000-0000-0000-000000000000"
+                        }
+                    },
+                    "displayLocationInformationRequiredState":  {
+                        "state":  "enabled",
+                        "includeTarget":  {
+                            "targetType":  "group",
+                            "id":  "all_users"
+                        },
+                        "excludeTarget":  {
+                            "targetType":  "group",
+                            "id":  "00000000-0000-0000-0000-000000000000"
+                        }
+                    }
+                },
+                "includeTargets@odata.context":  "https://graph.microsoft.com/beta/$metadata#policies/authenticationMethodsPolicy/authenticationMethodConfigurations(\u0027MicrosoftAuthenticator\u0027)/microsoft.graph.microsoftAuthenticatorAuthenticationMethodConfiguration/includeTargets",
+                "includeTargets":  [
+                    {
+                        "targetType":  "group",
+                        "id":  "all_users",
+                        "isRegistrationRequired":  false,
+                        "authenticationMode":  "any"
+                    }
+                ]
+            }
+        },
+        {
+            "Id": "Sms",
+            "State": "disabled"
+        },
+        {
+            "Id":  "Voice",
+            "State":  "disabled"
+        },
+        {
+            "Id":  "Email",
+            "State": "disabled"
+        }
+    ]
+}
+
+PrivilegedRoles := [
+    {
+        "RoleTemplateId": "Role1",
+        "DisplayName": "Global Administrator"
+    },
+    {
+        "RoleTemplateId": "Role2",
+        "DisplayName": "Privileged Role Administrator"
     }
 ]
