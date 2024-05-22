@@ -215,7 +215,8 @@ function New-Report {
     if ($BaselineName -eq "aad") {
 
         # Load the CSV file
-        $csvData = Import-Csv -Path "Product Names for Licensing.csv"
+        $csvPath = Join-Path -Path $PSScriptRoot -ChildPath "MicrosoftLicenseToProductNameMappings.csv"
+        $csvData = Import-Csv -Path $csvPath
 
         $LicenseInfoArray = $SettingsExport.license_information | ForEach-Object {
 
