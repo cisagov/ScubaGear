@@ -159,6 +159,7 @@ const fillCAPTable = () => {
  */
 const fillTruncatedCell = (td, i, j) => {
     try {
+        console.log(td, i, j);
         const charLimit = 50;
         let content = "";
         let truncated = false;
@@ -180,6 +181,13 @@ const fillTruncatedCell = (td, i, j) => {
         else {
             td.innerHTML = content;
         }
+
+        // Don't apply truncated cell to "Name" column 
+        if (j === 1) {
+            td.innerHTML = content;
+            truncated = false;
+        }
+
     
         if (truncated) {
             let span = document.createElement("span");
