@@ -1233,7 +1233,7 @@ test_Assignments_Correct if {
                 "DisplayName": "Global Administrator",
                 "Assignments": [
                     {
-                        "StartDateTime": "/Date(1660328610000)/"
+                        "startDateTime": "/Date(1660328610000)/"
                     }
                 ],
                 "Rules": [
@@ -1270,7 +1270,7 @@ test_Assignments_Incorrect if {
                 "DisplayName": "Global Administrator",
                 "Assignments": [
                     {
-                        "StartDateTime": null
+                        "startDateTime": null
                     }
                 ],
                 "Rules": [

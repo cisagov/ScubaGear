@@ -149,7 +149,7 @@ TestPlan:
     TestDriver: RunCached
     Tests:
       - TestDescription: MS.AAD.7.5v1 Non-Compliant case - User assigned outside of PIM
-        #### This test case guarantees that at least one privileged role assignment has an StartDateTime of null
+        #### This test case guarantees that at least one privileged role assignment has an startDateTime of null
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
@@ -158,13 +158,13 @@ TestPlan:
                   - DisplayName: Global Administrator
                     RoleTemplateId: "62e90394-69f5-4237-9190-012177145e10"
                     Assignments:
-                      - StartDateTime: "/Date(1672947244397)/"
+                      - startDateTime: "/Date(1672947244397)/"
                         PrincipalId: "ae71e61c-f465-4db6-8d26-5f3e52bdd800"
                     Rules: []
                   - DisplayName: User Administrator
                     RoleTemplateId: "fe930be7-5e62-47db-91af-98c3a49a38b1"
                     Assignments:
-                      - StartDateTime: null
+                      - startDateTime: null
                         PrincipalId: "ce71e61c-f465-4db6-8d26-5f3e52bdd801"
         Postconditions: []
         ExpectedResult: false
@@ -177,13 +177,13 @@ TestPlan:
                   - DisplayName: Global Administrator
                     RoleTemplateId: "62e90394-69f5-4237-9190-012177145e10"
                     Assignments:
-                      - StartDateTime: "/Date(1672947244397)/"
+                      - startDateTime: "/Date(1672947244397)/"
                         PrincipalId: "ae71e61c-f465-4db6-8d26-5f3e52bdd800"
                     Rules: []
                   - DisplayName: User Administrator
                     RoleTemplateId: "fe930be7-5e62-47db-91af-98c3a49a38b1"
                     Assignments:
-                      - StartDateTime: "/Date(1672947244397)/"
+                      - startDateTime: "/Date(1672947244397)/"
                         PrincipalId: "ce71e61c-f465-4db6-8d26-5f3e52bdd801"
                     Rules: []
         Postconditions: []
