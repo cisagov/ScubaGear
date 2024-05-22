@@ -170,7 +170,7 @@ function Export-AADProvider {
 
     # Checking to ensure command runs successfully
     $UserCount = $Tracker.TryCommand("Get-MgBetaUserCount", @{"ConsistencyLevel"='eventual'})
-
+    $UserCount = $UserCount[0]
     if(-Not $UserCount -is [int]) {
         $UserCount = "NaN"
     }
