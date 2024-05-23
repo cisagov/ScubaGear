@@ -1,19 +1,23 @@
 main {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
     height: 100vh;
-    padding-bottom: 0px;
+    padding-bottom: 0em;
 }
 
 footer {
     position: absolute;
-    bottom: 5px;
+    bottom: 0.313em;
     text-align: center;
     width: 100%;
 }
 
 .summary {
     display: inline-block;
-    padding: 5px;
-    border-radius: 5px;
+    padding: 0.313em;
+    border-radius: 0.313em;
     min-width: 140px;
     text-align: center;
 }
