@@ -176,10 +176,34 @@ AuthenticationMethod := {
 PrivilegedRoles := [
     {
         "RoleTemplateId": "Role1",
-        "DisplayName": "Global Administrator"
+        "DisplayName": "Global Administrator",
+        "Assignments": [
+            {
+                "EndDateTime": "/Date(1691006065170)/",
+                "PrincipalId": "ae71e61c-f465-4db6-8d26-5f3e52bdd800"
+            }
+        ]
     },
     {
         "RoleTemplateId": "Role2",
         "DisplayName": "Privileged Role Administrator"
     }
 ]
+
+PrivilegedUsers := {
+    "User1": {
+        "DisplayName": "Test Name 1",
+        "OnPremisesImmutableId": null,
+        "roles": [
+            "Privileged Role Administrator",
+            "Global Administrator"
+        ]
+    },
+    "User2": {
+        "DisplayName": "Test Name 2",
+        "OnPremisesImmutableId": null,
+        "roles": [
+            "Global Administrator"
+        ]
+    }
+}
