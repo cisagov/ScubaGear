@@ -249,74 +249,32 @@ tests contains {
 # MS.AAD.3.3v1
 #--
 
-# Returns the MS Authenticator configuration settings
-MSAuth := auth_setting if {
-    some auth_method in input.authentication_method
-    some auth_setting in auth_method.authentication_method_feature_settings
-
-    auth_setting.Id == "MicrosoftAuthenticator"
-}
-
-# Returns true if MS Authenticator is enabled, false if it is not
-default MSAuthEnabled := false
-MSAuthEnabled := true if {
-    MSAuth.State == "enabled"
-}
-
-# Returns true if MS Authenticator is configured per the baseline, false if it is not
-default MSAuthProperlyConfigured := false
-MSAuthProperlyConfigured := true if {
-    MSAuth.State == "enabled"
-
-    # Make sure that MS Auth shows the app name and geographic location
-    Settings := MSAuth.AdditionalProperties.featureSettings
-    Settings.displayAppInformationRequiredState.state == "enabled"
-    Settings.displayLocationInformationRequiredState.state == "enabled"
-
-    # Make sure that the configuration applies to all users
-    some target in MSAuth.AdditionalProperties.includeTargets
-    target.id == "all_users"
-}
-
-default AAD_3_3_Not_Applicable := false
-# Returns true no matter what if phishing-resistant MFA is being enforced
-AAD_3_3_Not_Applicable := true if {
-    count(PhishingResistantMFAPolicies) > 0
-}
-
-# Returns true if phishing-resistant MFA is not being enforced but MS Auth is disabled
-AAD_3_3_Not_Applicable := true if {
-    count(PhishingResistantMFAPolicies) == 0
-    MSAuthEnabled == false
-}
-
-# First test is for N/A case
-tests contains {
-    "PolicyId": PolicyId,
-    "Criticality": "Shall/Not-Implemented",
-    "Commandlet": ["Get-MgBetaPolicyAuthenticationMethodPolicy"],
-    "ActualValue": [],
-    "ReportDetails": CheckedSkippedDetails(PolicyId, Reason),
-    "RequirementMet": false
-} if {
-    PolicyId := "MS.AAD.3.3v1"
-    # regal ignore:line-length
-    Reason := "This policy is only applicable if phishing-resistant MFA is not enforced and MS Authenticator is enabled. See %v for more info"
-    AAD_3_3_Not_Applicable == true
-}
-
-# If policy is not N/A then we check that the configuration matches the baseline
+# At this time we are unable to test for X because of NEW POLICY
+# If we have acceptable MFA then policy passes otherwise MS Authenticator need to be
+# enabled to pass. However, we can not currently check if MS Authenticator enabled
 tests contains {
     "PolicyId": "MS.AAD.3.3v1",
     "Criticality": "Shall",
-    "Commandlet": ["Get-MgBetaPolicyAuthenticationMethodPolicy"],
-    "ActualValue": MSAuth,
-    "ReportDetails": ReportDetailsBoolean(Status),
+    "Commandlet": ["Get-MgBetaIdentityConditionalAccessPolicy"],
+    "ActualValue": MFAPolicies,
+    "ReportDetails": concat(". ", [ReportFullDetailsArray(MFAPolicies, DescriptionString), CAPLINK]),
     "RequirementMet": Status
 } if {
-    AAD_3_3_Not_Applicable == false
+    DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
+    Status := count(MFAPolicies) > 0
+    count(MFAPolicies) > 0
+}
 
-    Status := MSAuthProperlyConfigured == true
+tests contains {
+    "PolicyId": PolicyId,
+    "Criticality": "Shall/Not-Implemented",
+    "Commandlet": [],
+    "ActualValue": [],
+    "ReportDetails": NotCheckedDetails(PolicyId),
+    "RequirementMet": false
+} if {
+    PolicyId := "MS.AAD.3.3v1"
+    count(MFAPolicies) == 0
 }
 
 #
