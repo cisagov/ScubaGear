@@ -20,7 +20,7 @@ import data.utils.key.PASS
 # is true. If so, save the policy Identity to the MeetingsAllowingExternalControl list.
 MeetingsAllowingExternalControl contains Policy.Identity if {
     some Policy in input.meeting_policies
-    Policy.AllowExternalParticipantGiveRequestControl == true
+    Policy.allowExternalParticipantGiveRequestControl == true
 }
 
 # Pass if MeetingsAllowingExternalControl does not have any policies saved.
@@ -98,7 +98,7 @@ tests contains {
     "ReportDetails": ReportDetails1_3(Policy),
     "RequirementMet": Status
 } if {
-    some Policy in input.meeting_policies
+    some Policy in input.meeting_policie
 
     # This control specifically states that non-global policies MAY be different,
     # so filter for the global policy only
@@ -183,7 +183,7 @@ tests contains {
     "RequirementMet": Status
 } if {
     Policies := MeetingsAllowingPSTNBypass
-    String := "meeting policy(ies) found that allow everyone or dial-in users to bypass lobby:"
+    String := "meeting policy(ies) found that allow everyone or dial-in users to bypass lobby: "
     Status := count(Policies) == 0
 }
 

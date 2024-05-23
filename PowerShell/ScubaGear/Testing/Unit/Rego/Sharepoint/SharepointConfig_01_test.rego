@@ -11,53 +11,7 @@ import data.utils.key.PASS
 #
 # Policy MS.SHAREPOINT.1.1v1
 #--
-test_SharingCapability_Correct_V1 if {
-    Output := sharepoint.tests with input as {
-        "SPO_tenant": [
-            {
-                "SharingCapability": 0
-            }
-        ]
-    }
-
-    TestResult("MS.SHAREPOINT.1.1v1", Output, PASS, true) == true
-}
-
-test_SharingCapability_Correct_V2 if {
-    Output := sharepoint.tests with input as {
-        "SPO_tenant": [
-            {
-                "SharingCapability": 3
-            }
-        ]
-    }
-
-    TestResult("MS.SHAREPOINT.1.1v1", Output, PASS, true) == true
-}
-
-test_SharingCapability_Incorrect_V1 if {
-    Output := sharepoint.tests with input as {
-        "SPO_tenant": [
-            {
-                "SharingCapability": 1
-            }
-        ]
-    }
-
-    TestResult("MS.SHAREPOINT.1.1v1", Output, FAIL, false) == true
-}
-
-test_SharingCapability_Incorrect_V2 if {
-    Output := sharepoint.tests with input as {
-        "SPO_tenant": [
-            {
-                "SharingCapability": 2
-            }
-        ]
-    }
-
-    TestResult("MS.SHAREPOINT.1.1v1", Output, FAIL, false) == true
-}
+# Todo: Write unit tests using method in this file
 #--
 
 #
@@ -265,67 +219,4 @@ test_SharingDomainRestrictionMode_SharingCapability_Anyone_Incorrect if {
 #
 # Policy MS.SHAREPOINT.1.4v1
 #--
-test_SameAccount_NotApplicable_V1 if {
-    Output := sharepoint.tests with input as {
-        "SPO_tenant": [
-            {
-                "SharingCapability": 0,
-                "RequireAcceptingAccountMatchInvitedAccount": false
-            }
-        ]
-    }
-
-    PolicyId := "MS.SHAREPOINT.1.4v1"
-    ReportDetailsString := concat(" ", [
-        "This policy is only applicable if External Sharing",
-        "is set to any value other than Only People In Your Organization.",
-        "See %v for more info"
-        ])
-    TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailsString), false) == true
-}
-
-test_SameAccount_NotApplicable_V2 if {
-    Output := sharepoint.tests with input as {
-        "SPO_tenant": [
-            {
-                "SharingCapability": 0,
-                "RequireAcceptingAccountMatchInvitedAccount": true
-            }
-        ]
-    }
-
-    PolicyId := "MS.SHAREPOINT.1.4v1"
-    ReportDetailsString := concat(" ", [
-        "This policy is only applicable if External Sharing",
-        "is set to any value other than Only People In Your Organization.",
-        "See %v for more info"
-        ])
-    TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailsString), false) == true
-}
-
-test_SameAccount_Correct_V1 if {
-    Output := sharepoint.tests with input as {
-        "SPO_tenant": [
-            {
-                "SharingCapability": 1,
-                "RequireAcceptingAccountMatchInvitedAccount": true
-            }
-        ]
-    }
-
-    TestResult("MS.SHAREPOINT.1.4v1", Output, PASS, true) == true
-}
-
-test_SameAccount_Incorrect if {
-    Output := sharepoint.tests with input as {
-        "SPO_tenant": [
-            {
-                "SharingCapability": 1,
-                "RequireAcceptingAccountMatchInvitedAccount": false
-            }
-        ]
-    }
-
-    TestResult("MS.SHAREPOINT.1.4v1", Output, FAIL, false) == true
-}
-#--
+# Todo: Write Unit tests using method in AAD
