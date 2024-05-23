@@ -252,6 +252,10 @@ tests contains {
 # At this time we are unable to test for X because of NEW POLICY
 # If we have acceptable MFA then policy passes otherwise MS Authenticator need to be
 # enabled to pass. However, we can not currently check if MS Authenticator enabled
+MFAPolicies := [] if {
+    true
+}
+
 tests contains {
     "PolicyId": "MS.AAD.3.3v1",
     "Criticality": "Shall",
