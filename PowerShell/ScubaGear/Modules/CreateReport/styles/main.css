@@ -51,7 +51,7 @@ body {
 
 table {
     width: 1000px;
-    margin: 3.125em;
+    margin: 0.5em 3.125em 3em 3.125em;
     font-size: 0.8125em;
     font-family: Arial, Helvetica, sans-serif;
     border-collapse: collapse;
@@ -124,6 +124,10 @@ table, th, td {
 }
 
 main {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
     background-color: var(--background-primary);
     width: 1100px;
     margin: auto;

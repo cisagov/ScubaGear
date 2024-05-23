@@ -225,6 +225,8 @@ function New-Report {
         # Convert the custom objects to an HTML table
         $LicenseTable = $LicenseInfoArray | ConvertTo-Html -As Table -Fragment
         $LicenseTable = $LicenseTable -replace '^(.*?)<table>','<table id="license-info" style = "text-align:center;">'
+
+        # Create a section header for the licensing information
         $LicensingHTML = "<h2>Tenant Licensing Information</h2>" + $LicenseTable
 
         $ReportHTML = $ReportHTML.Replace("{AADWARNING}", $AADWarning)

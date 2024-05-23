@@ -159,7 +159,6 @@ const fillCAPTable = () => {
  */
 const fillTruncatedCell = (td, i, j) => {
     try {
-        console.log(td, i, j);
         const charLimit = 50;
         let content = "";
         let truncated = false;
