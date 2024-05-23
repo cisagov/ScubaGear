@@ -398,7 +398,6 @@ SensitiveContent := [
 # Parse through array & save the name (e.x. "Credit Card Number")
 # Return all saved names in basic rules
 InfoTypeMatches(Rule) := ContentTypes if {
-    Rule.IsAdvancedRule == false
     ContentTypes := {Content.name | some Content in Rule.ContentContainsSensitiveInformation}
 }
 
@@ -410,7 +409,6 @@ InfoTypeMatches(Rule) := ContentTypes if {
 # sensitive content & save the names that are found
 # Return all saved names
 InfoTypeMatches(Rule) := ContentTypes if {
-    Rule.IsAdvancedRule == true
     RuleText := replace(replace(Rule.AdvancedRule, "rn", ""), "'", "\"")
 
     # Split string to keep line length intact

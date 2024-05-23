@@ -116,7 +116,7 @@ function Invoke-Product {
     foreach($Product in $p) {
         Write-Output "`n==== Testing $Product ===="
         $Directory = Join-Path -Path $RegoUnitTestPath -ChildPath $Product
-        & $OPAExe test $RegoPolicyPath $Directory $Flag
+        & $OPAExe test $RegoPolicyPath $Directory .\$($UtilFilename.Fullname) $Flag
     }
     Write-Output ""
 }
