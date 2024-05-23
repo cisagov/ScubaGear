@@ -533,7 +533,7 @@ required, guidance for configuring Microsoft's DLP solution can be found in the 
 A DLP solution SHALL be used.
 
 <!--Policy: MS.EXO.8.1v2; Criticality: SHALL -->
-- _Rationale:_ Users may inadvertently disclose sensitive information to unauthorized individuals. A DLP solution can detect the presence of sensitive information in Exchange Online and block access to all but authorized entities.
+- _Rationale:_ Users may inadvertently disclose sensitive information to unauthorized individuals. A DLP solution may detect the presence of sensitive information in Exchange Online and block access to unauthorized entities.
 - _Last modified:_ May 2024
 
 #### MS.EXO.8.2v2
