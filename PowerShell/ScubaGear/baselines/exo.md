@@ -547,7 +547,7 @@ The DLP solution SHALL protect personally identifiable information (PII) and sen
 The selected DLP solution SHOULD offer services comparable to the native DLP solution offered by Microsoft.
 
 <!--Policy: MS.EXO.8.3v1; Criticality: SHOULD -->
-- _Rationale:_ Any alternative DLP solution should be able detect sensitive information in Exchange Online and block access to unauthorized entities.
+- _Rationale:_ Any alternative DLP solution should be able to detect sensitive information in Exchange Online and block access to unauthorized entities.
 - _Last modified:_ May 2024
 
 #### MS.EXO.8.4v1
