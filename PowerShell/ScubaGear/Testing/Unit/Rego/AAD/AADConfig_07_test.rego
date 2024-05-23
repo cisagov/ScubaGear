@@ -8,109 +8,35 @@ import data.utils.key.TestResult
 # Policy MS.AAD.7.1v1
 #--
 test_PrivilegedUsers_Correct if {
-    Output := aad.tests with input as {
-        "privileged_users": {
-            "User1": {
-                "DisplayName": "Test Name1",
-                "roles": [
-                    "Privileged Role Administrator",
-                    "Global Administrator"
-                ]
-            },
-            "User2": {
-                "DisplayName": "Test Name2",
-                "roles": [
-                    "Global Administrator"
-                ]
-            }
-        }
-    }
+    Output := aad.tests with input.privileged_users as PrivilegedUsers
 
-    ReportDetailString := "2 global admin(s) found:<br/>Test Name1, Test Name2"
+    ReportDetailString := "2 global admin(s) found:<br/>Test Name 1, Test Name 2"
     TestResult("MS.AAD.7.1v1", Output, ReportDetailString, true) == true
 }
 
 test_PrivilegedUsers_Incorrect_V1 if {
-    Output := aad.tests with input as {
-        "privileged_users": {
-            "User1": {
-                "DisplayName": "Test Name1",
-                "roles": [
-                    "Privileged Role Administrator",
-                    "Global Administrator"
-                ]
-            }
-        }
-    }
+    Users := json.patch(PrivilegedUsers,
+                [{"op": "remove", "path": "User2",}])
 
-    ReportDetailString := "1 global admin(s) found:<br/>Test Name1"
+    Output := aad.tests with input.privileged_users as Users
+
+    ReportDetailString := "1 global admin(s) found:<br/>Test Name 1"
     TestResult("MS.AAD.7.1v1", Output, ReportDetailString, false) == true
 }
 
 test_PrivilegedUsers_Incorrect_V2 if {
-    Output := aad.tests with input as {
-        "privileged_users": {
-            "User1": {
-                "DisplayName": "Test Name1",
-                "roles": [
-                    "Privileged Role Administrator",
-                    "Global Administrator"
-                ]
-            },
-            "User2": {
-                "DisplayName": "Test Name2",
-                "roles": [
-                    "Global Administrator"
-                ]
-            },
-            "User3": {
-                "DisplayName": "Test Name3",
-                "roles": [
-                    "Global Administrator"
-                ]
-            },
-            "User4": {
-                "DisplayName": "Test Name4",
-                "roles": [
-                    "Global Administrator"
-                ]
-            },
-            "User5": {
-                "DisplayName": "Test Name5",
-                "roles": [
-                    "Global Administrator"
-                ]
-            },
-            "User6": {
-                "DisplayName": "Test Name6",
-                "roles": [
-                    "Global Administrator"
-                ]
-            },
-            "User7": {
-                "DisplayName": "Test Name7",
-                "roles": [
-                    "Global Administrator"
-                ]
-            },
-            "User8": {
-                "DisplayName": "Test Name8",
-                "roles": [
-                    "Global Administrator"
-                ]
-            },
-            "User9": {
-                "DisplayName": "Test Name9",
-                "roles": [
-                    "Global Administrator"
-                ]
-            }
-        }
-    }
+    Output := aad.tests with input.privileged_users as PrivilegedUsers
+                        with input.privileged_users.User3 as {"DisplayName": "Test Name 3", "roles": ["Global Administrator"]}
+                        with input.privileged_users.User4 as {"DisplayName": "Test Name 4", "roles": ["Global Administrator"]}
+                        with input.privileged_users.User5 as {"DisplayName": "Test Name 5", "roles": ["Global Administrator"]}
+                        with input.privileged_users.User6 as {"DisplayName": "Test Name 6", "roles": ["Global Administrator"]}
+                        with input.privileged_users.User7 as {"DisplayName": "Test Name 7", "roles": ["Global Administrator"]}
+                        with input.privileged_users.User8 as {"DisplayName": "Test Name 8", "roles": ["Global Administrator"]}
+                        with input.privileged_users.User9 as {"DisplayName": "Test Name 9", "roles": ["Global Administrator"]}
 
     ReportDetailString := concat(" ", [
-        "9 global admin(s) found:<br/>Test Name1, Test Name2, Test Name3,",
-        "Test Name4, Test Name5, Test Name6, Test Name7, Test Name8, Test Name9"
+        "9 global admin(s) found:<br/>Test Name 1, Test Name 2, Test Name 3,",
+        "Test Name 4, Test Name 5, Test Name 6, Test Name 7, Test Name 8, Test Name 9"
     ])
 
     TestResult("MS.AAD.7.1v1", Output, ReportDetailString, false) == true
@@ -122,42 +48,10 @@ test_PrivilegedUsers_Incorrect_V2 if {
 #--
 # Correct because the ratio of global admins to non global admins is less than 1
 test_SecureScore_Correct_V1 if {
-    Output := aad.tests with input as {
-        "privileged_users": {
-            "User1": {
-                "DisplayName": "Test Name1",
-                "roles": [
-                    "Privileged Role Administrator",
-                    "Global Administrator"
-                ]
-            },
-            "User2": {
-                "DisplayName": "Test Name2",
-                "roles": [
-                    "Cloud Application Administrator",
-                    "Global Administrator"
-                ]
-            },
-            "User3": {
-                "DisplayName": "Test Name3",
-                "roles": [
-                    "Application Administrator"
-                ]
-            },
-            "User4": {
-                "DisplayName": "Test Name4",
-                "roles": [
-                    "User Administrator"
-                ]
-            },
-            "User5": {
-                "DisplayName": "Test Name5",
-                "roles": [
-                    "Privileged Role Administrator"
-                ]
-            }
-        }
-    }
+    Output := aad.tests with input.privileged_users as PrivilegedUsers
+                        with input.privileged_users.User3 as {"DisplayName": "Test Name 3", "roles": ["Application Administrator"]}
+                        with input.privileged_users.User4 as {"DisplayName": "Test Name 4", "roles": ["User Administrator"]}
+                        with input.privileged_users.User5 as {"DisplayName": "Test Name 5", "roles": ["Privileged Role Administrator"]}
 
     ReportDetailStr := "Requirement met: Least Privilege Score = 0.66 (should be 1 or less)"
 
@@ -166,36 +60,12 @@ test_SecureScore_Correct_V1 if {
 
 # Correct because the ratio of global admins to non global admins is equal to 1
 test_SecureScore_Incorrect_V1 if {
-    Output := aad.tests with input as {
-        "privileged_users": {
-            "User1": {
-                "DisplayName": "Test Name1",
-                "roles": [
-                    "Privileged Role Administrator",
-                    "Global Administrator"
-                ]
-            },
-            "User2": {
-                "DisplayName": "Test Name2",
-                "roles": [
-                    "User Administrator",
-                    "Global Administrator"
-                ]
-            },
-            "User3": {
-                "DisplayName": "Test Name3",
-                "roles": [
-                    "Application Administrator"
-                ]
-            },
-            "User4": {
-                "DisplayName": "Test Name4",
-                "roles": [
-                    "Privileged Role Administrator"
-                ]
-            }
-        }
-    }
+    Users := json.patch(PrivilegedUsers,
+                [{"op": "add", "path": "User2/roles/0", "value": "User Administrator"}])
+
+    Output := aad.tests with input.privileged_users as Users
+                        with input.privileged_users.User3 as {"DisplayName": "Test Name 3", "roles": ["Application Administrator"]}
+                        with input.privileged_users.User4 as {"DisplayName": "Test Name 4", "roles": ["Privileged Role Administrator"]}
 
     ReportDetailStr := "Requirement met: Least Privilege Score = 1 (should be 1 or less)"
 
@@ -204,30 +74,15 @@ test_SecureScore_Incorrect_V1 if {
 
 # Incorrect because the ratio of global admins to non global admins is more than 1
 test_SecureScore_Incorrect_V2 if {
-    Output := aad.tests with input as {
-        "privileged_users": {
-            "User1": {
-                "DisplayName": "Test Name1",
-                "roles": [
+    Users := json.patch(PrivilegedUsers,
+                [{"op": "add", "path": "User2/roles/0", "value": "Application Administrator"},
+                {"op": "add", "path": "User1/roles", "value": [
                     "User Administrator",
                     "Global Administrator"
-                ]
-            },
-            "User2": {
-                "DisplayName": "Test Name2",
-                "roles": [
-                    "Application Administrator",
-                    "Global Administrator"
-                ]
-            },
-            "User3": {
-                "DisplayName": "Test Name2",
-                "roles": [
-                    "Privileged Role Administrator"
-                ]
-            }
-        }
-    }
+                ]}])
+
+    Output := aad.tests with input.privileged_users as Users
+                        with input.privileged_users.User3 as {"DisplayName": "Test Name 3", "roles": ["Privileged Role Administrator"]}
 
     ReportDetailStr := "Requirement not met: Least Privilege Score = 2 (should be 1 or less)"
 
@@ -236,31 +91,14 @@ test_SecureScore_Incorrect_V2 if {
 
 # Incorrect because the ratio of global admins to non global admins is undefined (all are global admins)
 test_SecureScore_Incorrect_V3 if {
-    Output := aad.tests with input as {
-        "privileged_users": {
-            "User1": {
-                "DisplayName": "Test Name1",
-                "roles": [
-                    "Privileged Role Administrator",
-                    "Global Administrator"
-                ]
-            },
-            "User2": {
-                "DisplayName": "Test Name2",
-                "roles": [
-                    "User Administrator",
-                    "Global Administrator"
-                ]
-            },
-            "User3": {
-                "DisplayName": "Test Name2",
-                "roles": [
-                    "Hybrid Identity Administrator",
-                    "Global Administrator"
-                ]
-            }
-        }
-    }
+    Users := json.patch(PrivilegedUsers,
+                [{"op": "add", "path": "User2/roles/0", "value": "User Administrator"}])
+
+    Output := aad.tests with input.privileged_users as Users
+                        with input.privileged_users.User3 as {"DisplayName": "Test Name 3", "roles": [
+                                                                                                "Hybrid Identity Administrator",
+                                                                                                "Global Administrator"
+                                                                                            ]}
 
     ReportDetailStr := "Requirement not met: All privileged users are Global Admin"
 
@@ -269,66 +107,17 @@ test_SecureScore_Incorrect_V3 if {
 
 # Incorrect because the total number of global admins is greater than eight
 test_SecureScore_Incorrect_V4 if {
-    Output := aad.tests with input as {
-        "privileged_users": {
-            "User1": {
-                "DisplayName": "Test Name1",
-                "roles": [
-                    "Privileged Role Administrator",
-                    "Global Administrator"
-                ]
-            },
-            "User2": {
-                "DisplayName": "Test Name2",
-                "roles": [
-                    "Exchange Administrator",
-                    "Global Administrator"
-                ]
-            },
-            "User3": {
-                "DisplayName": "Test Name3",
-                "roles": [
-                    "Global Administrator"
-                ]
-            },
-            "User4": {
-                "DisplayName": "Test Name4",
-                "roles": [
-                    "Global Administrator"
-                ]
-            },
-            "User5": {
-                "DisplayName": "Test Name5",
-                "roles": [
-                    "Global Administrator"
-                ]
-            },
-            "User6": {
-                "DisplayName": "Test Name6",
-                "roles": [
-                    "Global Administrator"
-                ]
-            },
-            "User7": {
-                "DisplayName": "Test Name7",
-                "roles": [
-                    "Global Administrator"
-                ]
-            },
-            "User8": {
-                "DisplayName": "Test Name8",
-                "roles": [
-                    "Global Administrator"
-                ]
-            },
-            "User9": {
-                "DisplayName": "Test Name9",
-                "roles": [
-                    "Global Administrator"
-                ]
-            }
-        }
-    }
+    Users := json.patch(PrivilegedUsers,
+                [{"op": "add", "path": "User2/roles/0", "value": "Exchange Administrator"}])
+
+    Output := aad.tests with input.privileged_users as Users
+                        with input.privileged_users.User3 as {"DisplayName": "Test Name 3", "roles": ["Global Administrator"]}
+                        with input.privileged_users.User4 as {"DisplayName": "Test Name 4", "roles": ["Global Administrator"]}
+                        with input.privileged_users.User5 as {"DisplayName": "Test Name 5", "roles": ["Global Administrator"]}
+                        with input.privileged_users.User6 as {"DisplayName": "Test Name 6", "roles": ["Global Administrator"]}
+                        with input.privileged_users.User7 as {"DisplayName": "Test Name 7", "roles": ["Global Administrator"]}
+                        with input.privileged_users.User8 as {"DisplayName": "Test Name 8", "roles": ["Global Administrator"]}
+                        with input.privileged_users.User9 as {"DisplayName": "Test Name 9", "roles": ["Global Administrator"]}
 
     ReportDetailStr := "Requirement not met: Policy MS.AAD.7.1 failed so score not computed"
 
@@ -339,70 +128,30 @@ test_SecureScore_Incorrect_V4 if {
 # Policy MS.AAD.7.3v1
 #--
 test_OnPremisesImmutableId_Correct if {
-    Output := aad.tests with input as {
-        "privileged_users": {
-            "User1": {
-                "DisplayName": "Alice",
-                "OnPremisesImmutableId": null,
-                "roles": [
-                    "Privileged Role Administrator",
-                    "Global Administrator"
-                ]
-            },
-            "User2": {
-                "DisplayName": "Bob",
-                "OnPremisesImmutableId": null,
-                "roles": [
-                    "Global Administrator"
-                ]
-            }
-        }
-    }
+    Output := aad.tests with input.privileged_users as PrivilegedUsers
 
     ReportDetailString := "0 admin(s) that are not cloud-only found"
     TestResult("MS.AAD.7.3v1", Output, ReportDetailString, true) == true
 }
 
 test_OnPremisesImmutableId_Incorrect_V1 if {
-    Output := aad.tests with input as {
-        "privileged_users": {
-            "User1": {
-                "DisplayName": "Alice",
-                "OnPremisesImmutableId": "HelloWorld",
-                "roles": [
-                    "Privileged Role Administrator",
-                    "Global Administrator"
-                ]
-            }
-        }
-    }
+    Users := json.patch(PrivilegedUsers,
+                [{"op": "add", "path": "User1/OnPremisesImmutableId", "value": "HelloWorld"}])
 
-    ReportDetailString := "1 admin(s) that are not cloud-only found:<br/>Alice"
+    Output := aad.tests with input.privileged_users as Users
+
+    ReportDetailString := "1 admin(s) that are not cloud-only found:<br/>Test Name 1"
     TestResult("MS.AAD.7.3v1", Output, ReportDetailString, false) == true
 }
 
 test_OnPremisesImmutableId_Incorrect_V2 if {
-    Output := aad.tests with input as {
-        "privileged_users": {
-            "User1": {
-                "DisplayName": "Alice",
-                "OnPremisesImmutableId": "HelloWorld",
-                "roles": [
-                    "Privileged Role Administrator",
-                    "Global Administrator"
-                ]
-            },
-            "User2": {
-                "DisplayName": "Bob",
-                "OnPremisesImmutableId": null,
-                "roles": [
-                    "Global Administrator"
-                ]
-            }
-        }
-    }
+    Users := json.patch(PrivilegedUsers,
+                [{"op": "add", "path": "User1/OnPremisesImmutableId", "value": "HelloWorld"},
+                {"op": "add", "path": "User2/OnPremisesImmutableId", "value": null}])
 
-    ReportDetailString := "1 admin(s) that are not cloud-only found:<br/>Alice"
+    Output := aad.tests with input.privileged_users as Users
+
+    ReportDetailString := "1 admin(s) that are not cloud-only found:<br/>Test Name 1"
     TestResult("MS.AAD.7.3v1", Output, ReportDetailString, false) == true
 }
 #--
@@ -410,29 +159,8 @@ test_OnPremisesImmutableId_Incorrect_V2 if {
 # Policy MS.AAD.7.4v1
 #--
 test_AdditionalProperties_Correct_V1 if {
-    Output := aad.tests with input as {
-        "privileged_roles": [
-            {
-                "DisplayName": "Global Administrator",
-                "Assignments": [
-                    {
-                        "EndDateTime": "/Date(1691006065170)/",
-                        "PrincipalId": "ae71e61c-f465-4db6-8d26-5f3e52bdd800"
-                    }
-                ]
-            }
-        ],
-        "service_plans": [
-            {
-                "ServicePlanName": "EXCHANGE_S_FOUNDATION",
-                "ServicePlanId": "31a0d5b2-13d0-494f-8e42-1e9c550a1b24"
-            },
-            {
-                "ServicePlanName": "AAD_PREMIUM_P2",
-                "ServicePlanId": "c7d91867-e1ce-4402-8d4f-22188b44b6c2"
-            }
-        ]
-    }
+    Output := aad.tests with input.privileged_roles as PrivilegedRoles
+                        with input.service_plans as ServicePlans
 
     ReportDetailString := "0 role(s) that contain users with permanent active assignment"
     TestResult("MS.AAD.7.4v1", Output, ReportDetailString, true) == true
