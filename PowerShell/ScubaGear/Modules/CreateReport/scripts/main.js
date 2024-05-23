@@ -68,7 +68,7 @@ const fillCAPTable = () => {
        return;
     }
     try {
-        let capDiv = document.createElement("div");
+        let capDiv = document.createElement("section");
         capDiv.setAttribute("id", "caps");
         document.querySelector("main").appendChild(capDiv);
 

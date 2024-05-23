@@ -18,9 +18,9 @@
     --unvisited-link-color: #0092CC;
     --text-color: black;
     --border-color: black;
-    --toggle-height: 25px;
-    --toggle-width: 46px;
-    --toggle-radius: 18px;
+    --toggle-height: 1.563em;
+    --toggle-width: 2.875em;
+    --toggle-radius: 1.125em;
 }
 
 html[data-theme='dark'] {
@@ -50,11 +50,11 @@ body {
 }
 
 table {
-    margin: auto;
+    width: 1000px;
+    margin: 3.125em;
     font-size: 0.8125em;
     font-family: Arial, Helvetica, sans-serif;
     border-collapse: collapse;
-    width: 1000px;
 }
 
 h3 {
@@ -144,21 +144,14 @@ h2 {
     font-family: Arial, Helvetica, sans-serif;
     color: var(--header-color);
     font-size: 1em;
-    margin-top: 50px;
 }
 
 img {
     width: 100px;
 }
 
-#caps {
-    width: 1000px;
-    margin: auto;
-    margin-top: 50px;
-}
-
 #caps h2 {
-    margin-top: 10px;
+    margin-top: 3.125em;
 }
 
 #caps tr:nth-child(even){
@@ -197,15 +190,11 @@ img {
     display: flex;
     width: 200px;
     justify-content: space-between;
-    margin-bottom: 5px;
+    margin: 0.313em 3.125em;
 }
 
 button {
     cursor: pointer;
-}
-
-table.caps_table {
-    width: 100%
 }
 
 th.state {
