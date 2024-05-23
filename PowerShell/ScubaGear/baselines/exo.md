@@ -551,7 +551,7 @@ The selected DLP solution SHOULD offer services comparable to the native DLP sol
 - _Last modified:_ May 2024
 
 #### MS.EXO.8.4v1
-At a minimum, the DLP solution SHALL restrict sharing credit card numbers, Taxpayer Identification Numbers (TIN), and Social Security numbers (SSN) via email.
+At a minimum, the DLP solution SHALL restrict sharing credit card numbers, U.S. Individual Taxpayer Identification Numbers (ITIN), and U.S. Social Security numbers (SSN) via email.
 
 <!--Policy: MS.EXO.8.4v1; Criticality: SHALL -->
 - _Rationale:_ Users may inadvertently share sensitive information with others who should not have access to it. Data loss prevention policies provide a way for agencies to detect and prevent unauthorized disclosures.
