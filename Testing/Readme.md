@@ -1,6 +1,7 @@
 # ScubaGear Functional Testing Automation <!-- omit in toc --> #
+ScubaGear repository consists of an automation suite to help test the functionality of the ScubaGear tool itself. The test automation is geared towards contributors who want to execute functional test orchestrator as part of their development/testing activity.
 
-This document outlines the ScubaGear software test automation and its usage. The document also contains instructions for adding new functional tests to existing automation suite.
+This README outlines the ScubaGear software test automation and its usage. The document also contains instructions for adding new functional tests to existing automation suite.
 
 ## Table of Contents <!-- omit in toc --> ##
 
@@ -21,8 +22,11 @@ This document outlines the ScubaGear software test automation and its usage. The
     - [Adding new functional test - Example #2](#adding-new-functional-test---example-2)
   - [Nightly Functional Tests](#nightly-functional-tests)
   - [Troubleshooting](#troubleshooting)
+    - [Issues with installing Pester](#issues-with-installing-pester)
+    - [Iusses with Selenium](#iusses-with-selenium)
     - [Chrome browser version issue](#chrome-browser-version-issue)
     - [Service principal authentication issue](#service-principal-authentication-issue)
+    - [Additional resources for admins](#additional-resources-for-admins)
 
 ## Functional Testing Prerequisites ##
 
@@ -283,15 +287,52 @@ Product functional tests are being run for multiple product-tenant combinations.
 
 ## Troubleshooting ##
 
+### Issues with installing Pester
+If the Pester module is pre-installed and pre-loaded on your system, you may see following message when you attempt to install it:
+
+```
+WARNING: The version '5.5.0' of module 'Pester' is currently in use. Retry the operation after closing the
+applications.
+```
+
+To Resolve above issue, try the following:
+- Close the PowerShell session
+- Open Task Manager to find any background instances of PowerShell and close them all 
+- Uninstall all versions of Pester using following command
+```
+Uninstall-Module -Name Pester -Force -AllVersions
+```  
+- The above commands should uninstall previous versions of Pester. Now open a new PowerShell window to install Pester.
+- If you continue to see issues with Pester installation, use the following command to find the location of previously installed version of Pester and remove it by other means.
+  ```
+  (GetInstalledModule -Name Pester).InstalledLocation
+  ```
+- Best practice is to install Pester and other modules as a non-admin user with either 'Current User' or 'AllUsers' scope. When modules are installed with 'AllUsers' scope, they are installed to the ``` $env:ProgramFiles\PowerShell\Modules``` location. The 'CurrentUser' scope installs modules to ``` $HOME\Documents\PowerShell\Modules``` location. 
+
+### Iusses with Selenium
+We have seen issues with Selenium where test orchestrator would not run and produce random errors. If you have seen issues where error messages does not match with any other items in this troubleshooting section, try uninstalling and re-installing Selenium using following commands:
+```
+uninstall-module Selenium
+install-module Selenium
+./Testing/Functional/SmokeTest/UpdateSelenium.ps1
+```
+
+
+
 ### Chrome browser version issue ###
 
 If the Chrome browser on your system has been updated since you setup the Selenium environment, you may receive an error message like below:
 
 ![Chrome browser version](/images/chrome-version.png)
 
-To resolve this, first kill any ChromeDriver.exe processes running by using the Task Manager. If you do not successfully kill that process you might receive an error message such as the one below.
+To resolve this, first kill any ChromeDriver.exe processes running by using the Task Manager. Note that ChromeDriver.exe processes can be hidden under the PowerShell app process and may not be visible in the main process list of Task Manager. Expand PowerShell app processes as shown in the image below to check for any hidden ChromeDriver processes - if you find any, kill them all.
+
+![Chrome browser processes](/images/chrome-process-kill2.png)
+
+If you do not successfully kill that process you might receive an error message such as the one below.
 
 ![Chrome browser processes](/images/chrome-process-kill.png)
+
 
 Then execute the commands below to update the Selenium Chrome driver.
 
@@ -313,3 +354,9 @@ If you are trying to run the test orchestrator as a service principal and your c
 
 ![service-principal-error](/images/service-principal.png)
 
+### Additional resources for admins
+The following resources are for M365 tenant admins to provide additional information on setting up the infrastructure (service principals, user provisioning, etc.). 
+
+- [How to setup the permissions required to execute the automated functional test orchestrator](https://github.com/cisagov/ScubaGear/issues/589)
+
+- [How to setup a tenant with the necessary AAD conditional access policies to run the Automated Functional Test Orchestrator](https://github.com/cisagov/ScubaGear/issues/591) 
