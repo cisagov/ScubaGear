@@ -12,7 +12,7 @@ $GraphEndpoints = @{
     "Get-MgBetaPolicyAuthenticationMethodPolicy" = "https://graph.microsoft.com/beta/policies/authenticationMethodsPolicy"
     "Get-MgBetaDomain" = "https://graph.microsoft.com/beta/domains"
     "Get-MgBetaOrganization" = "https://graph.microsoft.com/beta/organization"
-    "Get-MgBetaUser" = "https://graph.microsoft.com/beta/users" 
+    "Get-MgBetaUser" = "https://graph.microsoft.com/beta/users"
     "Get-MgBetaPolicyRoleManagementPolicyAssignment"  = "https://graph.microsoft.com/beta/policies/roleManagementPolicyAssignments"
 }
 
@@ -42,7 +42,7 @@ function Invoke-GraphDirectly {
 
     if ($queryParams) {
         <#
-          If query params are passed in, we need to augment the endpoint URI to include the params. Paperwork below. 
+          If query params are passed in, we need to augment the endpoint URI to include the params. Paperwork below.
           We can't use string formatting easily because the graph API expects parameters
           that are prefixed with the dollar symbol. Maybe someone smarter than me can figure that out.
         #>
@@ -335,7 +335,7 @@ function Get-PrivilegedUser {
                     # Get the users that are assigned to the PIM group as Eligible members
                     # $PIMGroupMembers = Get-MgBetaIdentityGovernancePrivilegedAccessGroupEligibilityScheduleInstance -All -ErrorAction Stop -Filter "groupId eq '$GroupId'"
                     $graphArgs = @{
-                        "commandlet" = "Get-MgBetaIdentityGovernancePrivilegedAccessGroupEligibilityScheduleInstance" 
+                        "commandlet" = "Get-MgBetaIdentityGovernancePrivilegedAccessGroupEligibilityScheduleInstance"
                         "queryParams" = @{'$filter' = "groupId eq '$GroupId'"}
                         "M365Environment" = $M365Environment }
                     $PIMGroupMembers = Invoke-GraphDirectly @graphArgs
@@ -364,7 +364,7 @@ function Get-PrivilegedUser {
         # Get a list of all the users and groups that have Eligible assignments
         # $AllPIMRoleAssignments = Get-MgBetaRoleManagementDirectoryRoleEligibilityScheduleInstance -All -ErrorAction Stop
         $graphArgs = @{
-            "commandlet" = "Get-MgBetaRoleManagementDirectoryRoleEligibilityScheduleInstance" 
+            "commandlet" = "Get-MgBetaRoleManagementDirectoryRoleEligibilityScheduleInstance"
             "M365Environment" = $M365Environment }
         $AllPIMRoleAssignments = Invoke-GraphDirectly @graphArgs
 
@@ -623,7 +623,7 @@ function Get-PrivilegedRole {
         # Get ALL the roles and users actively assigned to them
         # $AllRoleAssignments = Get-MgBetaRoleManagementDirectoryRoleAssignmentScheduleInstance -All -ErrorAction Stop
         $graphArgs = @{
-            "commandlet" = "Get-MgBetaRoleManagementDirectoryRoleAssignmentScheduleInstance" 
+            "commandlet" = "Get-MgBetaRoleManagementDirectoryRoleAssignmentScheduleInstance"
             "M365Environment" = $M365Environment }
         $AllRoleAssignments = Invoke-GraphDirectly @graphArgs
 
