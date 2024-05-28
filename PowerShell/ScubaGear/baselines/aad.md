@@ -427,7 +427,7 @@ Group owners SHALL NOT be allowed to consent to applications.
 
 #### MS.AAD.5.2v1 Instructions
 
-1.  In **Azure Active Directory** under **Manage**, select **Enterprise Applications.**
+1.  In **Azure Active Directory** under **Applications**, select **Enterprise Applications.**
 
 2. Under **Security**, select **Consent and permissions.** Then select **User Consent Settings.**
 
