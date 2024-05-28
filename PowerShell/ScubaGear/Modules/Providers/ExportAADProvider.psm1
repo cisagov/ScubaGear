@@ -55,7 +55,7 @@ function Invoke-GraphDirectly {
         $endpoint = $uri.ToString()
     }
     Write-Debug "Graph Api direct: $endpoint"
- 
+
     # try {
         $resp = Invoke-MgGraphRequest -Uri $endpoint -UserAgent 'ScubaGear'
     # }
