@@ -175,7 +175,7 @@ function New-Report {
         $ReportJson.Results += [pscustomobject]@{
             GroupName = $BaselineGroup.GroupName;
             GroupNumber = $BaselineGroup.GroupNumber;
-            GroupReference = $URL;
+            GroupReferenceURL = $URL;
             Controls = $Fragment;
         }
 
