@@ -1,33 +1,31 @@
-# ScubaGear Functional Testing Automation <!-- omit in toc --> #
+# ScubaGear Functional Testing Automation <!-- omit in toc --> 
 ScubaGear repository consists of an automation suite to help test the functionality of the ScubaGear tool itself. The test automation is geared towards contributors who want to execute functional test orchestrator as part of their development/testing activity.
 
 This README outlines the ScubaGear software test automation and its usage. The document also contains instructions for adding new functional tests to existing automation suite.
 
-## Table of Contents <!-- omit in toc --> ##
+## Table of Contents <!-- omit in toc --> 
 
-- [ScubaGear Functional Testing Automation ](#scubagear-functional-testing-automation-)
-  - [Table of Contents ](#table-of-contents-)
-  - [Functional Testing Prerequisites](#functional-testing-prerequisites)
-    - [Windows System with Chrome](#windows-system-with-chrome)
-    - [Pester](#pester)
-    - [Selenium](#selenium)
-    - [Service Principal Account](#service-principal-account)
-      - [Generating client certificate on the test system](#generating-client-certificate-on-the-test-system)
-  - [Functional Testing Structure](#functional-testing-structure)
-    - [Functional test orchestrator](#functional-test-orchestrator)
-    - [Product test plans](#product-test-plans)
-  - [Functional Testing Usage](#functional-testing-usage)
-    - [Test Usage Example](#test-usage-example)
-  - [Adding New Functional Tests](#adding-new-functional-tests)
-    - [Adding new functional test - Example #1](#adding-new-functional-test---example-1)
-    - [Adding new functional test - Example #2](#adding-new-functional-test---example-2)
-  - [Nightly Functional Tests](#nightly-functional-tests)
-  - [Troubleshooting](#troubleshooting)
-    - [Issues with installing Pester](#issues-with-installing-pester)
-    - [Iusses with Selenium](#iusses-with-selenium)
-    - [Chrome browser version issue](#chrome-browser-version-issue)
-    - [Service principal authentication issue](#service-principal-authentication-issue)
-    - [Additional resources for admins](#additional-resources-for-admins)
+- [Functional Testing Prerequisites](#functional-testing-prerequisites)
+  - [Windows System with Chrome](#windows-system-with-chrome)
+  - [Pester](#pester)
+  - [Selenium](#selenium)
+  - [Service Principal Account](#service-principal-account)
+    - [Generating client certificate on the test system](#generating-client-certificate-on-the-test-system)
+- [Functional Testing Structure](#functional-testing-structure)
+  - [Functional test orchestrator](#functional-test-orchestrator)
+  - [Product test plans](#product-test-plans)
+- [Functional Testing Usage](#functional-testing-usage)
+  - [Test Usage Example](#test-usage-example)
+- [Adding New Functional Tests](#adding-new-functional-tests)
+  - [Adding new functional test - Example #1](#adding-new-functional-test---example-1)
+  - [Adding new functional test - Example #2](#adding-new-functional-test---example-2)
+- [Nightly Functional Tests](#nightly-functional-tests)
+- [Troubleshooting](#troubleshooting)
+  - [Issues with installing Pester](#issues-with-installing-pester)
+  - [Iusses with Selenium](#iusses-with-selenium)
+  - [Chrome browser version issue](#chrome-browser-version-issue)
+  - [Service principal authentication issue](#service-principal-authentication-issue)
+  - [Additional resources for admins](#additional-resources-for-admins)
 
 ## Functional Testing Prerequisites ##
 
@@ -63,9 +61,9 @@ Automation also needs to update Selenium and install latest Chrome driver, to do
 
 ### Service Principal Account ###
 
-Functional testing of ScubaGear can be executed in two modes: interactive mode, using your personal tenant credentials, and non-interactive service principal and certificate thumbprint. ScubaGear developer and testing team members are provided with credentials for each test tenant that can be used for interactive mode testing. 
+Functional testing of ScubaGear can be executed in two modes: interactive mode, using your personal tenant credentials, and non-interactive mode, using a service principal and certificate thumbprint. ScubaGear developer and testing team members are provided with credentials for each test tenant that can be used for interactive mode testing. 
 
-In addition, they should also be setup to use the "ScubaGear Functional Test Orchestrator" service principal app.  To do this, provide your end-system certificate and thumbprint to the tenant Global Administrator. The Global Administrator will provide you with an AppID that would be needed in subsequent test execution steps. 
+In addition, they should also be setup to use the "ScubaGear Functional Test Orchestrator" service principal app.  To do this, provide your end-system certificate and thumbprint to the tenant Global Administrator. The Global Administrator will provide you with an AppID that will be needed in subsequent test execution steps. 
 
 #### Generating client certificate on the test system
 In order to use functional testing service principal, your test system need to be setup with a client certificate. Use the following powershell script to generate client certificate:
@@ -103,9 +101,9 @@ Functional test orchestrator (`/Testing/Functional/Products/Products.tests.ps1`)
 
 ### Product test plans ###
 
-Each of the ScubaGear supported products should have one or more test plans. Each test plan is defined as a YAML file and consists of multiple test cases for each secure configuration policy. Test cases are defined for both non-compliant and compliant use cases. The objective of functional testing is to test every possible non-compliant/compliant configuration for a policy and ensure that ScubaGear is correctly identifying it as a policy failure/pass. 
+Each of the ScubaGear supported products should have one or more test plans. Each test plan is defined by a YAML file and consists of multiple test cases for each secure configuration policy. Test cases are defined for both non-compliant and compliant use cases. The objective of functional testing is to test every possible non-compliant/compliant configuration for a policy and ensure that ScubaGear is correctly identifying it as a policy failure/pass. 
 
-The development team for each product are responsible for maintaining these test plans and ensuring that they are accurate and complete. Note that each product has at least one test plan associated with it. There can be multiple test plans for a product; these additional test plans are used to capture unique configurations based on tenant type and/or PowerShell variant. To differentiate among the test plans, they use the following naming convention:
+The development teams for each product are responsible for maintaining these test plans and ensuring that they are accurate and complete. Note that each product has at least one test plan associated with it. There can be multiple test plans for a product; these additional test plans are used to capture unique configurations based on tenant type and/or PowerShell variant. To differentiate among the test plans, they use the following naming convention:
 ```
 product.<variant>.testplan.yaml
 ```
