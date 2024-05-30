@@ -140,7 +140,7 @@ h1 {
     font-family: Arial, Helvetica, sans-serif;
     color: var(--header-color);
     margin-top: 0.625em;
-    margin-bottom: 1.25em;
+    margin-bottom: 0.5em;
 }
 
 h2 {
