@@ -164,6 +164,8 @@ function New-Report {
             }
         }
 
+        # Build the markdown links for each policy table, append as a child inside header tags
+        # Example: "AAD-1 Legacy Authentication"
         $Number = $BaselineName.ToUpper() + '-' + $BaselineGroup.GroupNumber
         $Name = $BaselineGroup.GroupName
         $GroupAnchor = New-MarkdownAnchor -GroupNumber $BaselineGroup.GroupNumber -GroupName $BaselineGroup.GroupName
@@ -201,7 +203,7 @@ function New-Report {
     Please reference <a href=`"$($ScubaGitHubUrl)/blob/v$($SettingsExport.module_version)#aad-conditional-access-policy-exemptions`" target=`"_blank`">this section in the README file</a>
     file for a list of the policies that accept exclusions and the instructions for setting up exclusions in the configuration file.
     <i>Exclusions can introduce grave risks to your system and must be managed carefully.</i>"
-    $NoWarning = "<p><br/></p>"
+    $NoWarning = "<br/>"
     Add-Type -AssemblyName System.Web
 
     $ReporterPath = $PSScriptRoot
