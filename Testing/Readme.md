@@ -31,7 +31,7 @@ This README outlines the ScubaGear software test automation and its usage. The d
 
 ## Functional Testing Prerequisites ##
 
-Running ScubaGear functional test automation require Windows compute or VM end system. This development system should be setup with Pester, Selenium, Chrome and PowerShell 5.1. The repository provides a few utility scripts to install and update these prerequisite components.
+Running the ScubaGear functional test automation requires a Windows computer or VM. This development system should be setup with Pester, Selenium, Chrome and PowerShell 5.1. The repository provides a few utility scripts to install and update these prerequisite components.
 
 ### Windows System with Chrome ###
 
