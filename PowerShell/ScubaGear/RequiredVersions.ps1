@@ -8,7 +8,7 @@ $ModuleList = @(
     @{
         ModuleName = 'ExchangeOnlineManagement' # includes Defender
         ModuleVersion = [version] '3.2.0'
-        MaximumVersion = [version] '3.99.99999'
+        MaximumVersion = [version] '3.4.99999'
     },
     @{
         ModuleName = 'Microsoft.Online.SharePoint.PowerShell' # includes OneDrive
