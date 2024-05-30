@@ -12,6 +12,7 @@ This README outlines the ScubaGear software test automation and its usage. The d
     - [Pester](#pester)
     - [Selenium](#selenium)
     - [Service Principal Account](#service-principal-account)
+      - [Generating client certificate on the test system](#generating-client-certificate-on-the-test-system)
   - [Functional Testing Structure](#functional-testing-structure)
     - [Functional test orchestrator](#functional-test-orchestrator)
     - [Product test plans](#product-test-plans)
@@ -62,6 +63,25 @@ Functional testing of ScubaGear can be executed in two modes: interactive mode u
 
 In addition, they should also setup to use the "ScubaGear Functional Test Orchestrator" service principal App.  To do this, provide your end-system certificate and thumbprint to the tenant Global Administrator. The Global Administrator will provide you with an AppID that would be needed in subsequent test execution steps. 
 
+#### Generating client certificate on the test system
+In order to use functional testing service principal, your test system need to be setup with a client certificate. Use the following powershell script to generate client certificate:
+```
+$CertName = "ScubaServicePrincipal"
+$CertParams = @{
+    Subject = $CertName
+    KeySpec = "KeyExchange"
+    CertStoreLocation = "Cert:\CurrentUser\My"
+}
+
+$MyCert = New-SelfSignedCertificate @CertParams
+Write-Output $MyCert
+
+
+########## Exporting the cert public key (this is so you can upload the file to the Azure AD application as a credential)
+Export-Certificate -Cert $MyCert -Type CERT -FilePath .\ScubaServicePrincipal.cer
+```
+Once the certificate is created, provide it to the tenant administrator to align it with functional testing application. 
+
 ## Functional Testing Structure ##
 
 ScubaGear functional testing suite has two main components: Orchestrator and Product test plans.
@@ -91,18 +111,43 @@ The optional variant can have values like: g5, e5, gcc, pnp, spo, e# etc. These 
 
 ## Functional Testing Usage ##
 
-Complete the functional testing prerequisites provided in an earlier section and have the test system setup for running functional test automation suite. Then define the Pester Test Container parameters provided in the "Data" definition as below:
+Complete the functional testing prerequisites provided in an earlier section and have the test system setup for running functional test automation suite. Then create a test execution utility script called "RunFunctionalTest.ps1" in a folder named FunctionalTesting that is at the same level in your directory tree as ScubaGear as shown below.
+
+A sample RunFunctionalTest.ps1 is provided below - this can be copied and customized for your testing.
+```
+$TestContainers = @()
+
+$TestContainers += New-PesterContainer -Path "Testing/Functional/Products" -Data @{ TenantDomain = "MyG5tenant.onmicrosoft.com"; TenantDisplayName = "My G5 tenant"; ProductName = "aad"; M365Environment = "gcc" }
+
+$PesterConfig = @{
+	Run = @{
+		Container = $TestContainers
+	}
+	Output = @{
+		Verbosity = 'Detailed'
+	}
+}
+
+$Config = New-PesterConfiguration -Hashtable $PesterConfig 
+
+Invoke-Pester -Configuration $Config
+```
+
+The main construct of the RunFunctionalTest.ps1 script is the Pester Test Container. For your specific testing, define the Pester Test Container parameters provided in the "Data" definition as below:
 
 ```
-$TestContainers += New-PesterContainer -Path "Testing/Functional/Products" -Data @{  Thumbprint = "860E4A6E79BEE660E07440444AC9DBA690690B95"; TenantDomain = "MyE5Tenant.onmicrosoft.com"; TenantDisplayName = "MyE5Tenant"; AppId = "dbaaaaaa-1ff0-493f-be3d-03d9babcabcab"; ProductName = "aad"; M365Environment = "commercial" }
+$TestContainers += New-PesterContainer -Path "Testing/Functional/Products" -Data @{  Variant ="g3"; Thumbprint = "860E4A6E79BEE660E07440444AC9DBA690690B95"; TenantDomain = "MyE5Tenant.onmicrosoft.com"; TenantDisplayName = "MyE5Tenant"; AppId = "dbaaaaaa-1ff0-493f-be3d-03d9babcabcab"; ProductName = "aad"; M365Environment = "commercial" }
 ```
-Define the values in -Data to match your tenant and service principal details. Also ensure that targeted product and M365 Environment type are correctly matched for the given tenant type. The above example will run the aad.testplan.yaml on the provided commercial tenant in the service principal mode. 
+To customize your functional testing, define the values for various parameters in -Data using following parameter definitions and explanations:
+- Thumbprint: this parameter is required to use the functional test orchestrator in service principal mode. The value should match the thumbprint of a local client certificate installed on your test machine. 
+- TenantDomain: FQDN of the test tenant, viz. MyTenant.onmicrosoft.com 
+- TenantDisplayName: The display name tag of the tenant.
+- AppID: The Application ID of the service principal obtained from the test tenant. The AAD application portal will have this unique application id for the functional testing service principal.
+- ProductName: Name of the ScubaGear product that is being tested for functionality. Viz. aad, exo, teams etc. 
+- M365Environment: The M365Environment variable: commercial, gcc, gcchigh. Ensure that targeted M365 Environment type is correctly matched for the given test tenant. 
+- (Optionsal) Variant: For testing the ScubaGear product on a specific variant, provide the variant parameter. Ensure that this optional parameter value matches with product's test plans. For example AAD product has a g3 tenant specific test plan named as "aad.g3.testplan". By providing the "g3" value for the variant, you can run the g3 specific test plan in addition to the default AAD test plan. 
 
-For testing AAD on a specific variant as well, provide the variant parameter in the -Data, as below:
 
-```
-$TestContainers += New-PesterContainer -Path "Testing/Functional/Products" -Data @{ Variant = "g3"; Thumbprint = "860E4A6E79BEE660E07440444AC9DBA690690B95"; TenantDomain = "MyG3Tenant.onmicrosoft.com"; TenantDisplayName = "MyG3Tenant"; AppId = "dbaaaaaa-1ff0-493f-be3d-03d9babcabcab"; ProductName = "aad"; M365Environment = "gcc" }
-```
 
 
 ### Test Usage Example
@@ -149,7 +194,7 @@ Invoke-Pester -Configuration $Config
 
 ```
 
-AAD functional testing in service principal mode by filtering specific test cases:
+AAD functional testing for specific test cases: when developing or if you are testing pull requests you may need to execute just a single baseline policy in the respective YAML test plan file. To do that you will add Pester filter tags to the PesterConfig parameter. See an example to execute the policy MS.AAD.2.1v1 test cases below
 ```
 $TestContainers = @()
 
@@ -173,6 +218,8 @@ Invoke-Pester -Configuration $Config
 ```
 
 
+
+
 ## Adding New Functional Tests ##
 
 Whenever there is a code change to ScubaGear - the development team should assess if the changes requires a new functional test. If so, test cases should be added to appropriate product test plan; if needed, add a new test plan. For code changes related to existing policies, if the update exposes additional configuration options - new test cases should be added for each new non-compliant and complaint configuration options. For code changes related to new policies or new features, test cases should be added for each possible non-complaint and complaint configuration option. The non-complaint test cases should be added first followed by the complaint test case. This is to ensure that at the end of the functional test run, the test tenant is left in a complaint state. See example section below for additional guidance. 
@@ -181,8 +228,8 @@ The checklist below should be used by the development team when it adds a new fe
 
 - [ ] Ensure all Non-Complaint configuration options for the affected policy are tested.
 - [ ] Ensure all Complaint configuration options for the affected policy are tested.
-- [ ] Ensure that any changes to HTML report output are tested.
-- [ ] Validate that all new functional tests pass on CI for the branch before creating the PR
+- [ ] Ensure all Not Applicable test cases for the affected policy are tested.
+- [ ] Validate that all new functional tests pass against the feature branch before creating the PR (developers can potentially use GitHub functional test actions to run against their branch).
 
 
 ### Adding new functional test - Example #1 ###
@@ -274,7 +321,7 @@ Automated functional test case for non-complaint and complaint config options:
 
 ## Nightly Functional Tests ##
 
-Product functional tests are being run for multiple product-tenant combinations. Development team should check the successful completion of these runs for any regressions. Currently the following "product / tenant / other variant" combinations are run by a cron job:
+Product functional tests are being run nightly/weekly for multiple product-tenant combinations. Development team should work with operational team to debug any issues found during nightly and/or weekly functional tests. Currently the following "product / tenant / other variant" combinations are run by a cron job:
 - AAD - G3
 - AAD - G5
 - AAD - E5
@@ -355,8 +402,9 @@ If you are trying to run the test orchestrator as a service principal and your c
 ![service-principal-error](/images/service-principal.png)
 
 ### Additional resources for admins
-The following resources are for M365 tenant admins to provide additional information on setting up the infrastructure (service principals, user provisioning, etc.). 
+The following resources are for M365 tenant admins to provide additional information on setting up the infrastructure (service principals, user provisioning, etc.) for functional testing of ScubaGear. 
 
 - [How to setup the permissions required to execute the automated functional test orchestrator](https://github.com/cisagov/ScubaGear/issues/589)
 
 - [How to setup a tenant with the necessary AAD conditional access policies to run the Automated Functional Test Orchestrator](https://github.com/cisagov/ScubaGear/issues/591) 
+
