@@ -175,7 +175,7 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for $OrganizationN
                         }
 
                         if ($RowData.Count -gt 0){
-                            $RowData.Count | Should -BeExactly 3
+                            $RowData.Count | Should -BeExactly 4
                         }
                     }
                 }
