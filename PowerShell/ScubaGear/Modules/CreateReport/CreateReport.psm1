@@ -195,9 +195,10 @@ function New-Report {
 
     # Finish building the html report
     $Title = "$($FullName) Baseline Report"
-    $AADWarning = "<p> Note: Conditional Access (CA) Policy exclusions and additional policy conditions
-    may limit a policy's scope more narrowly than desired. Recommend reviewing matching policies
-    against the baseline statement to ensure a match between intent and implementation. </p>"
+    $AADWarning = "Exclusions must only be used if they are approved within an organization's security risk acceptance process.
+    Please reference <a href=`"$($ScubaGitHubUrl)/blob/v$($SettingsExport.module_version)#aad-conditional-access-policy-exemptions`" target=`"_blank`">this section in the README file</a>
+    file for a list of the policies that accept exclusions and the instructions for setting up exclusions in the configuration file.
+    <i>Exclusions can introduce grave risks to your system and must be managed carefully.</i>"
     $NoWarning = "<p><br/></p>"
     Add-Type -AssemblyName System.Web
 
