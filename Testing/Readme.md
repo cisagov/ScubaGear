@@ -51,7 +51,11 @@ Install-Module -Name Pester -Force -SkipPublisherCheck
 
 "Selenium is an open source umbrella project for a range of tools and libraries aimed at supporting browser automation." ([Wikipedia](https://en.wikipedia.org/wiki/Selenium_(software)))
 
-On your Windows development system, Install Selenium by running following utility script provided in the repo:
+On your Windows development system, Install Selenium by running:
+```
+Install-Module Selenium
+```
+Automation also needs to update Selenium and install latest Chrome driver, to do that, run the following utility script provided in the repo:
 
 ```
 ./Testing/Functional/SmokeTest/UpdateSelenium.ps1
@@ -111,9 +115,9 @@ The optional variant can have values like: g5, e5, gcc, pnp, spo, e# etc. These 
 
 ## Functional Testing Usage ##
 
-Complete the functional testing prerequisites provided in an earlier section and have the test system setup for running functional test automation suite. Then create a test execution utility script called "RunFunctionalTest.ps1" in a folder named FunctionalTesting that is at the same level in your directory tree as ScubaGear as shown below.
+Complete the functional testing prerequisites provided in an earlier section and have the test system setup for running functional test automation suite. Then functional test orchestrator can be executed using a utility script called "RunFunctionalTest.ps1" as shown below: 
 
-A sample RunFunctionalTest.ps1 is provided below - this can be copied and customized for your testing.
+
 ```
 $TestContainers = @()
 
@@ -132,19 +136,22 @@ $Config = New-PesterConfiguration -Hashtable $PesterConfig
 
 Invoke-Pester -Configuration $Config
 ```
+Copy the above utility script and save it into a file named "RunFunctionalTest.ps1" on your system. Save this file in a folder named FunctionalTesting that is at the same level in your directory tree as ScubaGear as shown below.
+
 
 The main construct of the RunFunctionalTest.ps1 script is the Pester Test Container. For your specific testing, define the Pester Test Container parameters provided in the "Data" definition as below:
 
 ```
-$TestContainers += New-PesterContainer -Path "Testing/Functional/Products" -Data @{  Variant ="g3"; Thumbprint = "860E4A6E79BEE660E07440444AC9DBA690690B95"; TenantDomain = "MyE5Tenant.onmicrosoft.com"; TenantDisplayName = "MyE5Tenant"; AppId = "dbaaaaaa-1ff0-493f-be3d-03d9babcabcab"; ProductName = "aad"; M365Environment = "commercial" }
+$TestContainers += New-PesterContainer 
+  -Path "Testing/Functional/Products" -Data @{  Variant ="g3"; Thumbprint = "860E4A6E79BEE660E07440444AC9DBA690690B95"; TenantDomain = "MyE5Tenant.onmicrosoft.com"; TenantDisplayName = "MyE5Tenant"; AppId = "dbaaaaaa-1ff0-493f-be3d-03d9babcabcab"; ProductName = "aad"; M365Environment = "commercial" }
 ```
 To customize your functional testing, define the values for various parameters in -Data using following parameter definitions and explanations:
-- Thumbprint: this parameter is required to use the functional test orchestrator in service principal mode. The value should match the thumbprint of a local client certificate installed on your test machine. 
-- TenantDomain: FQDN of the test tenant, viz. MyTenant.onmicrosoft.com 
-- TenantDisplayName: The display name tag of the tenant.
+- Thumbprint: this parameter is required to use the functional test orchestrator in service principal mode. The value should match the thumbprint of a local client certificate installed on your test machine. If there is no Thumbprint parameter value in the execution file, tests will be run in interactive mode.  
+- TenantDomain: FQDN of the test tenant. Modify the TenantDomain value based on test domain (viz. MyTenant.onmicrosoft.com).
+- TenantDisplayName: The display name tag of the tenant. Modify the TenantDisplayName value to the display name of your target tenant (refer to the Scuba M365 Tenants Metadata.docx file in Slack)
 - AppID: The Application ID of the service principal obtained from the test tenant. The AAD application portal will have this unique application id for the functional testing service principal.
-- ProductName: Name of the ScubaGear product that is being tested for functionality. Viz. aad, exo, teams etc. 
-- M365Environment: The M365Environment variable: commercial, gcc, gcchigh. Ensure that targeted M365 Environment type is correctly matched for the given test tenant. 
+- ProductName: Name of the ScubaGear product that is being tested for functionality. Modify the ProductName value to the desired product (Viz. aad, exo, teams etc.)
+- M365Environment: The M365Environment variable: commercial, gcc, gcchigh - refer to the ScubaGear README for all possible values. Ensure that targeted M365 Environment type is correctly matched for the given test tenant. 
 - (Optionsal) Variant: For testing the ScubaGear product on a specific variant, provide the variant parameter. Ensure that this optional parameter value matches with product's test plans. For example AAD product has a g3 tenant specific test plan named as "aad.g3.testplan". By providing the "g3" value for the variant, you can run the g3 specific test plan in addition to the default AAD test plan. 
 
 
@@ -152,7 +159,21 @@ To customize your functional testing, define the values for various parameters i
 
 ### Test Usage Example
 
-AAD functional testing in interactive mode with all-tenant YAML file:
+AAD functional testing:
+
+Here are the instructions for running the functional test orchestrator with the AAD test plan YAML files.
+
+
+Note: Several of the test cases in the AAD functional test plan associated with conditional access rely on some dependencies in the tenant that you must setup ahead of time. Tenant global administrator should be able to set this up.
+
+AAD product has three test plans using respective YAML files
+- All tenants - You will execute the aad.testplan.yaml tests against all tenants regardless of tenant type.
+- G5/E5 tenants - You will also execute the aad.g5.testplan.yaml but only if the tenant is G5/E5.
+- G3/E3 tenants - You will also execute the aad.g3.testplan.yaml but only if the tenant is G3/E3.
+
+
+
+The example below shows AAD product testing in interactive mode with all-tenant YAML file:
 ```
 $TestContainers = @()
 
@@ -194,7 +215,7 @@ Invoke-Pester -Configuration $Config
 
 ```
 
-AAD functional testing for specific test cases: when developing or if you are testing pull requests you may need to execute just a single baseline policy in the respective YAML test plan file. To do that you will add Pester filter tags to the PesterConfig parameter. See an example to execute the policy MS.AAD.2.1v1 test cases below
+AAD functional testing for specific test cases: when developing or if you are testing pull requests you may need to execute just a single baseline policy in the respective YAML test plan file. To do that you will add Pester filter tags to the PesterConfig parameter. See an example to execute the policy MS.AAD.2.1v1 test cases below - the example is to run the test using a service principal. 
 ```
 $TestContainers = @()
 
