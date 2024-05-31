@@ -56,13 +56,6 @@ function Export-AADProvider {
     Internal
     #>
 
-    [CmdletBinding()]
-    param (
-        [ValidateNotNullOrEmpty()]
-        [string]
-        $M365Environment
-    )
-
     Import-Module $PSScriptRoot/ProviderHelpers/CommandTracker.psm1
     $Tracker = Get-CommandTracker
 
@@ -111,10 +104,10 @@ function Export-AADProvider {
         # Get-PrivilegedUser provides a list of privileged users and their role assignments. Used for 2.11 and 2.12
         if ($RequiredServicePlan) {
             # If the tenant has the premium license then we want to also include PIM Eligible role assignments - otherwise we don't to avoid an API error
-            $PrivilegedUsers = $Tracker.TryCommand("Get-PrivilegedUser", @{"TenantHasPremiumLicense"=$true; "M365Environment"=$M365Environment})
+            $PrivilegedUsers = $Tracker.TryCommand("Get-PrivilegedUser", @{"TenantHasPremiumLicense"=$true})
         }
         else{
-            $PrivilegedUsers = $Tracker.TryCommand("Get-PrivilegedUser", @{"TenantHasPremiumLicense"=$false; "M365Environment"=$M365Environment})
+            $PrivilegedUsers = $Tracker.TryCommand("Get-PrivilegedUser", @{"TenantHasPremiumLicense"=$false})
         }
         $PrivilegedUsers = $PrivilegedUsers | ConvertTo-Json
         # The above Converto-Json call doesn't need to have the input wrapped in an
@@ -133,10 +126,10 @@ function Export-AADProvider {
         # Get-PrivilegedRole provides data for 2.14 - 2.16, policies that evaluate conditions related to Azure AD PIM
         if ($RequiredServicePlan){
             # If the tenant has the premium license then we want to also include PIM Eligible role assignments - otherwise we don't to avoid an API error
-            $PrivilegedRoles = $Tracker.TryCommand("Get-PrivilegedRole", @{"TenantHasPremiumLicense"=$true; "M365Environment"=$M365Environment})
+            $PrivilegedRoles = $Tracker.TryCommand("Get-PrivilegedRole", @{"TenantHasPremiumLicense"=$true})
         }
         else {
-            $PrivilegedRoles = $Tracker.TryCommand("Get-PrivilegedRole", @{"TenantHasPremiumLicense"=$false; "M365Environment"=$M365Environment})
+            $PrivilegedRoles = $Tracker.TryCommand("Get-PrivilegedRole", @{"TenantHasPremiumLicense"=$false})
         }
         $PrivilegedRoles = ConvertTo-Json -Depth 10 @($PrivilegedRoles) # Depth required to get policy rule object details
     }
@@ -254,11 +247,7 @@ function Get-PrivilegedUser {
     param (
         [ValidateNotNullOrEmpty()]
         [switch]
-        $TenantHasPremiumLicense,
-
-        [ValidateNotNullOrEmpty()]
-        [string]
-        $M365Environment
+        $TenantHasPremiumLicense
     )
 
     # A hashtable of privileged users
@@ -318,7 +307,7 @@ function Get-PrivilegedUser {
                     $graphArgs = @{
                         "commandlet" = "Get-MgBetaIdentityGovernancePrivilegedAccessGroupEligibilityScheduleInstance"
                         "queryParams" = @{'$filter' = "groupId eq '$GroupId'"}
-                        "M365Environment" = $M365Environment }
+                    }
                     $PIMGroupMembers = Invoke-GraphDirectly @graphArgs
                     foreach ($GroupMember in $PIMGroupMembers) {
                         # If the user is not a member of the PIM group (i.e. they are an owner) then skip them
@@ -346,7 +335,7 @@ function Get-PrivilegedUser {
         # $AllPIMRoleAssignments = Get-MgBetaRoleManagementDirectoryRoleEligibilityScheduleInstance -All -ErrorAction Stop
         $graphArgs = @{
             "commandlet" = "Get-MgBetaRoleManagementDirectoryRoleEligibilityScheduleInstance"
-            "M365Environment" = $M365Environment }
+        }
         $AllPIMRoleAssignments = Invoke-GraphDirectly @graphArgs
 
         # Add to the list of privileged users based on Eligible assignments
@@ -404,7 +393,7 @@ function Get-PrivilegedUser {
                     $graphArgs = @{
                         "commandlet" = "Get-MgBetaIdentityGovernancePrivilegedAccessGroupEligibilityScheduleInstance"
                         "queryParams" = @{'$filter' = "groupId eq '$UserObjectId'"}
-                        "M365Environment" = $M365Environment}
+                    }
                     $PIMGroupMembers = Invoke-GraphDirectly @graphArgs
                     foreach ($GroupMember in $PIMGroupMembers) {
                         # If the user is not a member of the PIM group (i.e. they are an owner) then skip them
@@ -468,11 +457,7 @@ function GetConfigurationsForPimGroups{
 
         [ValidateNotNullOrEmpty()]
         [array]
-        $AllRoleAssignments,
-
-        [ValidateNotNullOrEmpty()]
-        [string]
-        $M365Environment
+        $AllRoleAssignments
     )
 
     # Get a list of the groups that are enrolled in PIM - we want to ignore the others
@@ -480,7 +465,7 @@ function GetConfigurationsForPimGroups{
     $graphArgs = @{
         "commandlet" = "Get-MgBetaPrivilegedAccessResource"
         "queryParams" = @{'$PrivilegedAccessId' = "aadGroups"}
-        "M365Environment" = $M365Environment }
+    }
     $PIMGroups = Invoke-GraphDirectly @graphArgs
 
     foreach ($RoleAssignment in $AllRoleAssignments){
@@ -584,11 +569,7 @@ function Get-PrivilegedRole {
     param (
         [ValidateNotNullOrEmpty()]
         [switch]
-        $TenantHasPremiumLicense,
-
-        [ValidateNotNullOrEmpty()]
-        [string]
-        $M365Environment
+        $TenantHasPremiumLicense
     )
 
     $PrivilegedRoles = [ScubaConfig]::ScubaDefault('DefaultPrivilegedRoles')
@@ -605,14 +586,14 @@ function Get-PrivilegedRole {
         # $AllRoleAssignments = Get-MgBetaRoleManagementDirectoryRoleAssignmentScheduleInstance -All -ErrorAction Stop
         $graphArgs = @{
             "commandlet" = "Get-MgBetaRoleManagementDirectoryRoleAssignmentScheduleInstance"
-            "M365Environment" = $M365Environment }
+        }
         $AllRoleAssignments = Invoke-GraphDirectly @graphArgs
 
         # Each of the helper functions below add configuration settings (aka rules) to the role hashtable.
         # Get the PIM configurations for the roles
         GetConfigurationsForRoles -PrivilegedRoleHashtable $PrivilegedRoleHashtable -AllRoleAssignments $AllRoleAssignments
         # Get the PIM configurations for the groups
-        GetConfigurationsForPimGroups -PrivilegedRoleHashtable $PrivilegedRoleHashtable -AllRoleAssignments $AllRoleAssignments -M365Environment $M365Environment
+        GetConfigurationsForPimGroups -PrivilegedRoleHashtable $PrivilegedRoleHashtable -AllRoleAssignments $AllRoleAssignments
     }
 
     # Return the hashtable
