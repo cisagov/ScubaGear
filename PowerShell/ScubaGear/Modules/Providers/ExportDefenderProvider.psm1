@@ -100,7 +100,7 @@ function Export-DefenderProvider {
         $Tracker.AddUnSuccessfulCommand("Get-ProtectionAlert")
     }
     if ($IPPSConnected) {
-        if(Get-Command Get-DlpCompliancePolicy -ErrorAction SilentlyContinue){
+        if (Get-Command Get-DlpCompliancePolicy -ErrorAction SilentlyContinue) {
             $DLPCompliancePolicy = ConvertTo-Json @($Tracker.TryCommand("Get-DlpCompliancePolicy"))
             $ProtectionAlert = ConvertTo-Json @($Tracker.TryCommand("Get-ProtectionAlert"))
             $DLPComplianceRules = @($Tracker.TryCommand("Get-DlpComplianceRule"))
