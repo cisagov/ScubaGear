@@ -14,22 +14,15 @@ function Invoke-GraphDirectly {
         [string]
         $commandlet,
 
-        [ValidateNotNullOrEmpty()]
-        [string]
-        $M365Environment,
-
         [System.Collections.Hashtable]
         $queryParams
     )
 
     Write-Debug "Replacing Cmdlet: $commandlet"
-    $endpoint = $GraphEndpoints[$commandlet]
-    # GCC high and DoD have slightly different endpoint URLs
-    if (($M365Environment -eq "gcchigh") -or ($M365Environment -eq "dod")) {
-        $endpoint = $endpoint.Replace(".com", ".us")
-    }
-    if ($M365Environment -eq "dod") {
-        $endpoint = $endpoint.Replace("graph", "dod-graph")
+    try {
+        $endpoint = $GraphEndpoints[$commandlet]
+    } catch {
+        Write-Error "The commandlet $commandlet can't be used with the Invoke-GraphDirectly function yet."
     }
 
     if ($queryParams) {
