@@ -35,18 +35,14 @@ function Invoke-GraphDirectly {
         foreach ($item in $queryParams.GetEnumerator()) {
             $q.Add($item.Key, $item.Value)
         }
+        $endpoint = "https://example.com" + $endpoint
         $uri = [System.UriBuilder]$endpoint
         $uri.Query = $q.ToString()
-        $endpoint = $uri.ToString()
+        $endpoint = $uri.Path + $uri.Query
     }
     Write-Debug "Graph Api direct: $endpoint"
 
-    # try {
-        $resp = Invoke-MgGraphRequest -Uri $endpoint -UserAgent 'ScubaGear'
-    # }
-    # catch {
-    #     write-host "Spoof-Commandlet error occured: $($_.Exception)"
-    # }
+    $resp = Invoke-MgGraphRequest -Uri $endpoint -UserAgent 'ScubaGear'
     return $resp.Value
 }
 
