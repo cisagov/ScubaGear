@@ -156,7 +156,7 @@ function Export-DefenderProvider {
     "admin_audit_log_config": $AdminAuditLogConfig,
     "atp_policy_for_o365": $ATPPolicy,
     "defender_license": $DefenderLicense,
-    "dlp_license": $DLPLicense,
+    "defender_dlp_license": $DLPLicense,
     "defender_successful_commands": $SuccessfulCommands,
     "defender_unsuccessful_commands": $UnSuccessfulCommands,
 "@

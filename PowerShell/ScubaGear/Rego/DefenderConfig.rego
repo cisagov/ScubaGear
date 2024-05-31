@@ -656,7 +656,7 @@ tests contains {
 
     Conditions := [
         count(MissingLocations) == 0,
-        input.dlp_license == true
+        input.defender_dlp_license == true
     ]
 
     ErrorMessage := DefenderErrorMessage4_2(PresentLocations)

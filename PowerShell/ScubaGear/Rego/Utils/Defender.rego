@@ -233,9 +233,9 @@ ApplyLicenseWarningString(_, _) := concat(" ", [FAIL, DEFLICENSEWARNSTR]) if {
 }
 
 DLPLicenseWarningString(Status, String) := ReportDetailsString(Status, String) if {
-    input.dlp_license == true
+    input.defender_dlp_license == true
 }
 
 DLPLicenseWarningString(_, _) := concat(" ", [FAIL, DLPLICENSEWARNSTR]) if {
-    input.dlp_license == false
+    input.defender_dlp_license == false
 }

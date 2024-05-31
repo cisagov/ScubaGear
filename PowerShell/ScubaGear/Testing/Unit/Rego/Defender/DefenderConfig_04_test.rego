@@ -38,7 +38,7 @@ test_ContentContainsSensitiveInformation_Correct_V1 if {
             "Enabled": true
         }],
         "defender_license": true,
-        "dlp_license": true
+        "defender_dlp_license": true
     }
 
     TestResult("MS.DEFENDER.4.1v1", Output, PASS, true) == true
@@ -75,7 +75,7 @@ test_AdvancedRule_Correct_V2 if {
             "Enabled": true
         }],
         "defender_license": true,
-        "dlp_license": true
+        "defender_dlp_license": true
     }
 
     TestResult("MS.DEFENDER.4.1v1", Output, PASS, true) == true
@@ -107,7 +107,7 @@ test_ContentContainsSensitiveInformation_Incorrect_V1 if {
             "Enabled": true
         }],
         "defender_license": true,
-        "dlp_license": true
+        "defender_dlp_license": true
     }
 
     ReportDetailString := "No matching rules found for: U.S. Social Security Number (SSN)"
@@ -140,7 +140,7 @@ test_ContentContainsSensitiveInformation_Incorrect_V2 if {
             "Enabled": true
         }],
         "defender_license": true,
-        "dlp_license": true
+        "defender_dlp_license": true
     }
 
     ReportDetailString := "No matching rules found for: U.S. Individual Taxpayer Identification Number (ITIN)"
@@ -173,7 +173,7 @@ test_ContentContainsSensitiveInformation_Incorrect_V3 if {
             "Enabled": true
         }],
         "defender_license": true,
-        "dlp_license": true
+        "defender_dlp_license": true
     }
 
     ReportDetailString := "No matching rules found for: Credit Card Number"
@@ -203,7 +203,7 @@ test_ContentContainsSensitiveInformation_Incorrect_V4 if {
             "Enabled": true
         }],
         "defender_license": true,
-        "dlp_license": true
+        "defender_dlp_license": true
     }
 
     ReportDetailString := concat(" ", [
@@ -241,7 +241,7 @@ test_ContentContainsSensitiveInformation_Incorrect_V5 if {
             "Enabled": false
         }],
         "defender_license": true,
-        "dlp_license": true
+        "defender_dlp_license": true
     }
 
     ReportDetailString := concat(" ", [
@@ -279,7 +279,7 @@ test_ContentContainsSensitiveInformation_Incorrect_V6 if {
             "Enabled": true
         }],
         "defender_license": true,
-        "dlp_license": true
+        "defender_dlp_license": true
     }
 
     ReportDetailString := concat(" ", [
@@ -293,7 +293,7 @@ test_ContentContainsSensitiveInformation_Incorrect_V6 if {
 test_NoDLPLicense_Incorrect_V1 if {
     Output := defender.tests with input as {
         "defender_license": false,
-        "dlp_license": false
+        "defender_dlp_license": false
     }
 
     ReportDetailString := concat(" ", [FAIL, DLPLICENSEWARNSTR])
@@ -342,7 +342,7 @@ test_Locations_Correct_V1 if {
             "Enabled": true
         }],
         "defender_license": true,
-        "dlp_license": true
+        "defender_dlp_license": true
     }
 
     TestResult("MS.DEFENDER.4.2v1", Output, PASS, true) == true
@@ -383,7 +383,7 @@ test_Locations_Correct_V2 if {
             "Enabled": true
         }],
         "defender_license": true,
-        "dlp_license": true
+        "defender_dlp_license": true
     }
 
     TestResult("MS.DEFENDER.4.2v1", Output, PASS, true) == true
@@ -461,7 +461,7 @@ test_Locations_Correct_V3 if {
             }
         ],
         "defender_license": true,
-        "dlp_license": true
+        "defender_dlp_license": true
     }
 
     TestResult("MS.DEFENDER.4.2v1", Output, PASS, true) == true
@@ -505,7 +505,7 @@ test_Locations_Incorrect_V1 if {
             "Enabled": true
         }],
         "defender_license": true,
-        "dlp_license": true
+        "defender_dlp_license": true
     }
 
     ReportDetailString := concat("", [
@@ -555,7 +555,7 @@ test_Locations_Incorrect_V2 if {
             "Enabled": true
         }],
         "defender_license": true,
-        "dlp_license": true
+        "defender_dlp_license": true
     }
 
     ReportDetailString := concat("", [
@@ -605,7 +605,7 @@ test_Locations_Incorrect_V3 if {
             "Enabled": true
         }],
         "defender_license": true,
-        "dlp_license": true
+        "defender_dlp_license": true
     }
 
     ReportDetailString := concat("", [
@@ -655,7 +655,7 @@ test_Locations_Incorrect_V4 if {
             "Enabled": true
         }],
         "defender_license": true,
-        "dlp_license": true
+        "defender_dlp_license": true
     }
 
     ReportDetailString := concat("", [
@@ -706,7 +706,7 @@ test_Locations_Incorrect_V5 if {
             "Enabled": true
         }],
         "defender_license": true,
-        "dlp_license": true
+        "defender_dlp_license": true
     }
 
     ReportDetailString := concat("", [
@@ -757,7 +757,7 @@ test_Locations_Incorrect_V6 if {
             "Enabled": false
         }],
         "defender_license": true,
-        "dlp_license": true
+        "defender_dlp_license": true
     }
 
     ReportDetailString := concat("", [
@@ -807,7 +807,7 @@ test_Locations_Incorrect_V7 if {
             "Enabled": true
         }],
         "defender_license": true,
-        "dlp_license": true
+        "defender_dlp_license": true
     }
 
     ReportDetailString := concat("", [
@@ -858,7 +858,7 @@ test_Locations_Incorrect_V8 if {
             "Enabled": true
         }],
         "defender_license": true,
-        "dlp_license": true
+        "defender_dlp_license": true
     }
 
     ReportDetailString := concat("", [
@@ -874,7 +874,7 @@ test_Locations_Incorrect_V8 if {
 test_NoDLPLicense_Incorrect_V1 if {
     Output := defender.tests with input as {
         "defender_license": false,
-        "dlp_license": false
+        "defender_dlp_license": false
     }
 
     ReportDetailString := concat(" ", [FAIL, DLPLICENSEWARNSTR])
@@ -915,7 +915,7 @@ test_BlockAccess_Correct_V1 if {
             "Enabled": true
         }],
         "defender_license": true,
-        "dlp_license": true
+        "defender_dlp_license": true
     }
 
     TestResult("MS.DEFENDER.4.3v1", Output, PASS, true) == true
@@ -949,7 +949,7 @@ test_BlockAccess_Incorrect_V1 if {
             "Enabled": true
         }],
         "defender_license": true,
-        "dlp_license": true
+        "defender_dlp_license": true
     }
 
     ReportDetailString := concat(" ", [
@@ -988,7 +988,7 @@ test_BlockAccess_Incorrect_V2 if {
             "Enabled": true
         }],
         "defender_license": true,
-        "dlp_license": true
+        "defender_dlp_license": true
     }
 
     ReportDetailString := concat(" ", [
@@ -1027,7 +1027,7 @@ test_BlockAccess_Incorrect_V3 if {
             "Enabled": true
         }],
         "defender_license": true,
-        "dlp_license": true
+        "defender_dlp_license": true
     }
 
     ReportDetailString := "No DLP policy matching all types found for evaluation."
@@ -1061,7 +1061,7 @@ test_BlockAccess_Incorrect_V4 if {
             "Enabled": true
         }],
         "defender_license": true,
-        "dlp_license": true
+        "defender_dlp_license": true
     }
 
     ReportDetailString := "No DLP policy matching all types found for evaluation."
@@ -1120,7 +1120,7 @@ test_BlockAccess_Incorrect_V5 if {
             }
         ],
         "defender_license": true,
-        "dlp_license": true
+        "defender_dlp_license": true
     }
 
     ReportDetailString := "No DLP policy matching all types found for evaluation."
@@ -1154,7 +1154,7 @@ test_BlockAccess_Incorrect_V6 if {
             "Enabled": false
         }],
         "defender_license": true,
-        "dlp_license": true
+        "defender_dlp_license": true
     }
 
     ReportDetailString := "No DLP policy matching all types found for evaluation."
@@ -1164,7 +1164,7 @@ test_BlockAccess_Incorrect_V6 if {
 test_NoDLPLicense_Incorrect_V1 if {
     Output := defender.tests with input as {
         "defender_license": false,
-        "dlp_license": false
+        "defender_dlp_license": false
     }
 
     ReportDetailString := concat(" ", [FAIL, DLPLICENSEWARNSTR])
@@ -1201,7 +1201,7 @@ test_NotifyUser_Correct_V1 if {
             "Enabled": true
         }],
         "defender_license": true,
-        "dlp_license": true
+        "defender_dlp_license": true
     }
 
     TestResult("MS.DEFENDER.4.4v1", Output, PASS, true) == true
@@ -1235,7 +1235,7 @@ test_NotifyUser_Correct_V2 if {
             "Enabled": true
         }],
         "defender_license": true,
-        "dlp_license": true
+        "defender_dlp_license": true
     }
 
     TestResult("MS.DEFENDER.4.4v1", Output, PASS, true) == true
@@ -1269,7 +1269,7 @@ test_NotifyUser_Incorrect_V1 if {
             "Enabled": false
         }],
         "defender_license": true,
-        "dlp_license": true
+        "defender_dlp_license": true
     }
 
     ReportDetailString := "No DLP policy matching all types found for evaluation."
@@ -1300,7 +1300,7 @@ test_NotifyUser_Incorrect_V2 if {
             "Enabled": true
         }],
         "defender_license": true,
-        "dlp_license": true
+        "defender_dlp_license": true
     }
 
     ReportDetailString := "1 rule(s) found that do(es) not notify at least one user: Baseline Rule"
@@ -1310,7 +1310,7 @@ test_NotifyUser_Incorrect_V2 if {
 test_NoDLPLicense_Incorrect_V1 if {
     Output := defender.tests with input as {
         "defender_license": false,
-        "dlp_license": false
+        "defender_dlp_license": false
     }
 
     ReportDetailString := concat(" ", [FAIL, DLPLICENSEWARNSTR])
