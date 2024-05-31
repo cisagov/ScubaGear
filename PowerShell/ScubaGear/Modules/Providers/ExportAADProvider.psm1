@@ -1,19 +1,11 @@
+# Many of the commandlets can be replaced with direct API access, but we are starting the transition with the ones
+# below because they have slow imports that affect performance more than the others. Some commandlets are fast
+# and there is no obvoius performance advantage to using the API beyond maybe batching.
 $GraphEndpoints = @{
-    "Get-MgBetaIdentityConditionalAccessPolicy" = "https://graph.microsoft.com/beta/identity/conditionalAccess/policies"
-    "Get-MgBetaSubscribedSku" = "https://graph.microsoft.com/beta/subscribedSkus"
-    "Get-MgBetaDirectoryRole" = "https://graph.microsoft.com/beta/directoryRoles"
-    "Get-MgBetaDirectoryRoleMembers" = "https://graph.microsoft.com/beta/directoryRoles/{0}/members"
-    "Get-MgBetaRoleManagementDirectoryRoleEligibilityScheduleInstance" = "https://graph.microsoft.com/beta/roleManagement/directory/roleEligibilityScheduleInstances"
-    "Get-MgBetaRoleManagementDirectoryRoleAssignmentScheduleInstance" = "https://graph.microsoft.com/beta/roleManagement/directory/roleAssignmentScheduleInstances"
-    "Get-MgBetaIdentityGovernancePrivilegedAccessGroupEligibilityScheduleInstance" = "https://graph.microsoft.com/beta/identityGovernance/privilegedAccess/group/eligibilityScheduleInstances"
-    "Get-MgBetaPrivilegedAccessResource" = "https://graph.microsoft.com/beta/privilegedAccess/aadGroups/resources"
-    "Get-MgBetaPolicyAuthorizationPolicy" = "https://graph.microsoft.com/beta/policies/authorizationPolicy"
-    "Get-MgBetaDirectorySetting" = "https://graph.microsoft.com/beta/settings"
-    "Get-MgBetaPolicyAuthenticationMethodPolicy" = "https://graph.microsoft.com/beta/policies/authenticationMethodsPolicy"
-    "Get-MgBetaDomain" = "https://graph.microsoft.com/beta/domains"
-    "Get-MgBetaOrganization" = "https://graph.microsoft.com/beta/organization"
-    "Get-MgBetaUser" = "https://graph.microsoft.com/beta/users"
-    "Get-MgBetaPolicyRoleManagementPolicyAssignment"  = "https://graph.microsoft.com/beta/policies/roleManagementPolicyAssignments"
+    "Get-MgBetaRoleManagementDirectoryRoleEligibilityScheduleInstance" = "/beta/roleManagement/directory/roleEligibilityScheduleInstances"
+    "Get-MgBetaRoleManagementDirectoryRoleAssignmentScheduleInstance" = "/beta/roleManagement/directory/roleAssignmentScheduleInstances"
+    "Get-MgBetaIdentityGovernancePrivilegedAccessGroupEligibilityScheduleInstance" = "/beta/identityGovernance/privilegedAccess/group/eligibilityScheduleInstances"
+    "Get-MgBetaPrivilegedAccessResource" = "/beta/privilegedAccess/aadGroups/resources"
 }
 
 function Invoke-GraphDirectly {
