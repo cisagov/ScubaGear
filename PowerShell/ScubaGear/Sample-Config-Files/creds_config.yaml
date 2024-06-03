@@ -1,4 +1,7 @@
-Description: YAML Configuration file with dummy authentication parameters, deomnstrates format of what the authentication parameters should look like for your tenant
+Description: |
+  YAML Configuration file with dummy authentication parameters, deomnstrates format of what the authentication parameters should look like for your tenant
+  This example includes the following design choices for illustrative purposes:
+  - Use of Pascal case convention for varible names
 ProductNames:
   - teams
   - aad

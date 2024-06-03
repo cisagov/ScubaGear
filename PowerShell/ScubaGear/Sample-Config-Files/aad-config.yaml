@@ -42,6 +42,8 @@ Aad:
   MS.AAD.2.3v1: *CommonExclusions
   MS.AAD.3.1v1: *CommonExclusions
   MS.AAD.3.2v1: *CommonExclusions
+  MS.AAD.3.6v1: *CommonExclusions
+  MS.AAD.3.8v1: *CommonExclusions
   MS.AAD.7.4v1: &CommonRoleExclusions
     RoleExclusions:
       Users:
