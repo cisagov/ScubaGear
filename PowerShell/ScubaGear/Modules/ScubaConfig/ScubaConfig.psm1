@@ -79,7 +79,7 @@ class ScubaConfig {
             }
             else{
                 Write-Debug "ProductNames provided - using as is."
-                $this.Configuration.ProductNames = $this.Configuration.ProductNames | Sort-Object
+                $this.Configuration.ProductNames = $this.Configuration.ProductNames | Sort-Object -Unique
             }
         }
 

@@ -100,18 +100,35 @@ function Export-DefenderProvider {
         $Tracker.AddUnSuccessfulCommand("Get-ProtectionAlert")
     }
     if ($IPPSConnected) {
-        $DLPCompliancePolicy = ConvertTo-Json @($Tracker.TryCommand("Get-DlpCompliancePolicy"))
-        $ProtectionAlert = ConvertTo-Json @($Tracker.TryCommand("Get-ProtectionAlert"))
-        $DLPComplianceRules = @($Tracker.TryCommand("Get-DlpComplianceRule"))
+        if (Get-Command Get-DlpCompliancePolicy -ErrorAction SilentlyContinue) {
+            $DLPCompliancePolicy = ConvertTo-Json @($Tracker.TryCommand("Get-DlpCompliancePolicy"))
+            $ProtectionAlert = ConvertTo-Json @($Tracker.TryCommand("Get-ProtectionAlert"))
+            $DLPComplianceRules = @($Tracker.TryCommand("Get-DlpComplianceRule"))
+            $DLPLicense = ConvertTo-Json $true
 
         # Powershell is inconsistent with how it saves lists to json.
         # This loop ensures that the format of ContentContainsSensitiveInformation
         # will *always* be a list.
 
-        foreach($Rule in $DLPComplianceRules) {
-            if ($Rule.Count -gt 0) {
-                $Rule.ContentContainsSensitiveInformation = @($Rule.ContentContainsSensitiveInformation)
+            foreach($Rule in $DLPComplianceRules) {
+                if ($Rule.Count -gt 0) {
+                    $Rule.ContentContainsSensitiveInformation = @($Rule.ContentContainsSensitiveInformation)
+                }
             }
+        }
+        else {
+            Write-Warning "Defender for DLP license not available in tenant. Omitting the following commands: Get-DlpCompliancePolicy, Get-DlpComplianceRule, and Get-ProtectionAlert."
+            $DLPCompliancePolicy = ConvertTo-Json @()
+            $DLPComplianceRules = ConvertTo-Json @()
+            $ProtectionAlert = ConvertTo-Json @()
+            $DLPComplianceRules = ConvertTo-Json @()
+            $Tracker.AddUnSuccessfulCommand("Get-DlpCompliancePolicy")
+            $Tracker.AddUnSuccessfulCommand("Get-DlpComplianceRule")
+            $Tracker.AddUnSuccessfulCommand("Get-ProtectionAlert")
+            $Tracker.AddSuccessfulCommand("Get-DlpCompliancePolicy")
+            $Tracker.AddSuccessfulCommand("Get-DlpComplianceRule")
+            $Tracker.AddSuccessfulCommand("Get-ProtectionAlert")
+            $DLPLicense = ConvertTo-Json $false
         }
 
         # We need to specify the depth because the data contains some
@@ -139,6 +156,7 @@ function Export-DefenderProvider {
     "admin_audit_log_config": $AdminAuditLogConfig,
     "atp_policy_for_o365": $ATPPolicy,
     "defender_license": $DefenderLicense,
+    "defender_dlp_license": $DLPLicense,
     "defender_successful_commands": $SuccessfulCommands,
     "defender_unsuccessful_commands": $UnSuccessfulCommands,
 "@
