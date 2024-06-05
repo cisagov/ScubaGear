@@ -3,7 +3,7 @@
 The recommended way to install ScubaGear is from [PSGallery](psgallery.md), but it can also be downloaded from GitHub:
 
 1. Go to the [releases page](https://github.com/cisagov/ScubaGear/releases) and find the latest release.
-2. Under the `Assets` header, click `ScubaGear-v1-2-0.zip`to download the zip file.
+2. Under the `Assets` header, click `ScubaGear-v1-3-0.zip`to download the zip file.
 3. Extract the zip file into the folder of your choice.
 
 Once ScubaGear has been downloaded, the required [dependencies](../prerequisites/dependencies.md) can be installed.
