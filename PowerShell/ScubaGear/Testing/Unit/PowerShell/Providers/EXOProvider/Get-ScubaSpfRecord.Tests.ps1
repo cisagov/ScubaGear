@@ -21,7 +21,7 @@ InModuleScope 'ExportEXOProvider' {
                 Should -Invoke -CommandName Write-Warning -Exactly -Times 0
                 $Response.rdata -Contains "v=spf1..." | Should -Be $true
             }
-    
+
             It "Resolves multiple domain names" {
                 $Response = Get-ScubaSpfRecord -Domains @(@{"DomainName" = "example.com"},
                     @{"DomainName" = "example.com"})
