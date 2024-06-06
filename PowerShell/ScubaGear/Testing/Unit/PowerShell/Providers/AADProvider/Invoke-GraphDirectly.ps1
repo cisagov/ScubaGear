@@ -4,7 +4,6 @@ Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "$($ProviderPath)/Export
 InModuleScope ExportAADProvider {
     Describe -Tag 'AADProvider' -Name "Invoke-GraphDirectly" {
         BeforeAll {
-            #function Invoke-MgGraphRequest {return @{Value = @{cowsound = "moo"}}
             Mock -ModuleName ExportAADProvider Invoke-MgGraphRequest {return @{Value = @{cowsound = "moo"}}}
         }
 
