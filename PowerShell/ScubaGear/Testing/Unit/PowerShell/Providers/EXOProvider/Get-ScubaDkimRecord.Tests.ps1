@@ -1,5 +1,6 @@
 $ProviderPath = "../../../../../Modules/Providers"
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "$($ProviderPath)/ExportEXOProvider.psm1") -Function Get-ScubaDkimRecords -Force
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "$($ProviderPath)/ExportEXOProvider.psm1") `
+    -Function Get-ScubaDkimRecords -Force
 
 InModuleScope 'ExportEXOProvider' {
     Describe -Tag 'ExportEXOProvider' -Name "Get-ScubaDkimRecord" {
