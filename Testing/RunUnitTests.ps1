@@ -34,21 +34,26 @@ param (
     [ValidateSet('AAD','Defender','EXO','PowerPlatform','Sharepoint','Teams')]
     [Alias('p')]
     [string[]]$Products = '*',
+
     [Parameter(Mandatory=$false)]
     [ValidateNotNullOrEmpty()]
     [Alias('c')]
     [string[]]$ControlGroups = '*',
+
     [Parameter(Mandatory=$false)]
     [ValidateNotNullOrEmpty()]
     [Alias('t')]
     [string[]]$Tests = "*",
+
     [Parameter(Mandatory=$false)]
     [Alias('v')]
     [switch]$Ver,
+
     [Parameter(Mandatory=$false)]
     [ValidateScript({Test-Path -Path $_ -PathType Container})]
     [string]
     $ScubaParentDirectory = $env:USERPROFILE,
+
     [Parameter(Mandatory=$false)]
     [switch]
     $RunAsInstalled
@@ -76,8 +81,11 @@ $RegoPolicyPath = Join-Path -Path $RootPath -ChildPath "Rego"
 function Get-ErrorMsg {
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory)]
-        [string]$ErrorCode
+        [Parameter(Mandatory=$true)]
+        [string]$ErrorCode,
+
+        [Parameter(Mandatory=$false)]
+        [string[]]$Arguments
     )
 
     $FontColor = $host.ui.RawUI.ForegroundColor
@@ -102,10 +110,7 @@ function Get-ErrorMsg {
             Write-Output "Must be an integer (1, 2, 3, ...) or control group syntax (01, 02, 03..09, 10, ...)`n"
         }
         FileIOError {
-            Write-Output "ERROR: '$($Flag[1])' not found`n"
-        }
-        ControlGroupItemNumber {
-            Write-Output "Error: Unrecognized control group"
+            Write-Output "ERROR: '$($Arguments[0])' not found`n"
         }
         Default {
             Write-Output "ERROR: Unknown`n"
@@ -116,7 +121,7 @@ function Get-ErrorMsg {
     exit
 }
 
-function Invoke-Product {
+function Invoke-Products {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory=$true)]
@@ -129,11 +134,130 @@ function Invoke-Product {
     )
 
     foreach($Product in $Products) {
-        Write-Output "`n==== Testing $Product ===="
-        $ConfigFilename = (Get-ChildItem $(Join-Path -Path $RegoUnitTestPath -ChildPath $Product) |
-            Where-Object {$_.Name -like "*BaseConfig*" }).FullName
+        Write-Output "`n======== Testing $Product ========"
         $Directory = Join-Path -Path $RegoUnitTestPath -ChildPath $Product
-        & $OPAExe test $RegoPolicyPath $Directory .\$ConfigFilename .\$UtilFilename $Flag
+        $ConfigFilename = Get-ChildItem $(Join-Path -Path $RegoUnitTestPath -ChildPath $Product) |
+            Where-Object {$_.Name -like "*BaseConfig*" }
+        if ($ConfigFilename.length -eq 0) {
+            & $OPAExe test $RegoPolicyPath $Directory .\$UtilFilename $Flag
+        } else {
+            & $OPAExe test $RegoPolicyPath $Directory .\$($ConfigFilename.FullName) .\$UtilFilename $Flag
+        }
+    }
+    Write-Output ""
+}
+
+function Get-ControlGroup {
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory=$true)]
+        [string] $ControlGroup
+    )
+
+    $Tens = @('01','02','03','04','05','06','07','08','09')
+    if(($ControlGroup -match "^\d+$") -or ($ControlGroup -in $Tens)) {
+        if ([int]$ControlGroup -lt 10) {
+            $ControlGroup = $Tens[[int]$ControlGroup-1]
+        }
+        return $true, $ControlGroup
+    }
+    return $false
+}
+
+function Invoke-ControlGroups {
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory=$true)]
+        [AllowEmptyString()]
+        [string]$Flag,
+
+        [Parameter(Mandatory=$true)]
+        [ValidateSet('AAD','Defender','EXO','PowerPlatform','Sharepoint','Teams')]
+        [string]$Product,
+
+        [Parameter(Mandatory=$true)]
+        [string[]]$ControlGroups
+    )
+
+    Write-Output "`n======== Testing $Product ========"
+    $ConfigFilename = Get-ChildItem $(Join-Path -Path $RegoUnitTestPath -ChildPath $Product) |
+        Where-Object {$_.Name -like "*BaseConfig*" }
+    foreach($ControlGroup in $ControlGroups) {
+        $GroupNum = Get-ControlGroup $ControlGroup
+        if ($GroupNum[0]) {
+            $UnitTestFile = Get-ChildItem $(Join-Path -Path $RegoUnitTestPath -ChildPath $Product) |
+            Where-Object {$_.Name -like "*$($GroupNum[1])*" }
+            if ($UnitTestFile.length -eq 0){
+                Write-Warning "`nNOT FOUND: Control Group $ControlGroup does not exist in the $Product directory"
+            }
+
+            elseif(Test-Path -Path $UnitTestFile.Fullname -PathType Leaf) {
+                Write-Output "# Testing Control Group $($GroupNum[1])"
+                if ($ConfigFilename.length -eq 0) {
+                    & $OPAExe test $RegoPolicyPath .\$($UnitTestFile.Fullname) .\$UtilFilename $Flag
+                } else {
+                    & $OPAExe test $RegoPolicyPath .\$($UnitTestFile.Fullname) .\$($ConfigFilename.FullName) .\$UtilFilename $Flag
+                }
+                Write-Output "" | Out-Host
+            }
+            else {
+                Get-ErrorMsg -ErrorCode FileIOError -Arguments @($UnitTestFile)
+            }
+        }
+        else {
+            Write-Warning "`nNOT FOUND: Control Group $ControlGroup is not recognized as a number"
+        }
+    }
+    Write-Output ""
+}
+
+function Invoke-SpecificTests {
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory=$true)]
+        [AllowEmptyString()]
+        [string]$Flag,
+
+        [Parameter(Mandatory=$true)]
+        [ValidateSet('AAD','Defender','EXO','PowerPlatform','Sharepoint','Teams')]
+        [string]$Product,
+
+        [Parameter(Mandatory=$true)]
+        [string]$ControlGroup,
+
+        [Parameter(Mandatory=$true)]
+        [string[]]$IndividualTests
+    )
+
+    Write-Output "`n======== Testing $Product ========"
+    $ConfigFilename = Get-ChildItem $(Join-Path -Path $RegoUnitTestPath -ChildPath $Product) |
+        Where-Object {$_.Name -like "*BaseConfig*" }
+    $GroupNum = Get-ControlGroup $ControlGroup
+    if ($GroupNum[0]) {
+        $UnitTestFile = Get-ChildItem $(Join-Path -Path $RegoUnitTestPath -ChildPath $Product) |
+        Where-Object {$_.Name -like "*$($GroupNum[1])*" }
+        if ($UnitTestFile.length -eq 0){
+            Write-Warning "`nNOT FOUND: Control Group $ControlGroup does not exist in the $Product directory"
+        }
+
+        elseif(Test-Path -Path $UnitTestFile.Fullname -PathType Leaf) {
+            Write-Output "# Testing Control Group $($GroupNum[1])"
+            foreach($Test in $IndividualTests) {
+                Write-Output "## Testing $Test"
+                if ($ConfigFilename.length -eq 0) {
+                    & $OPAExe test $RegoPolicyPath .\$($UnitTestFile.Fullname) .\$UtilFilename -r $Test $Flag
+                } else {
+                    & $OPAExe test $RegoPolicyPath .\$($UnitTestFile.Fullname) .\$($ConfigFilename.FullName) .\$UtilFilename -r $Test $Flag
+                }
+                Write-Output "" | Out-Host
+            }
+        }
+        else {
+            Get-ErrorMsg -ErrorCode FileIOError -Arguments @($UnitTestFile)
+        }
+    }
+    else {
+        Write-Warning "`nNOT FOUND: Control Group $ControlGroup is not recognized as a number"
     }
     Write-Output ""
 }
@@ -143,27 +267,27 @@ $cEmpty = $ControlGroups[0] -eq "*"
 $tEmpty = $Tests[0] -eq "*"
 $Flag = ""
 
-if ($v.IsPresent) {
+if ($Ver.IsPresent) {
     $Flag = "-v"
 }
 if($pEmpty) {
-    Invoke-Product -Flag $Flag -Products @('AAD','Defender','EXO','PowerPlatform','Sharepoint','Teams')
+    Invoke-Products -Flag $Flag -Products @('AAD','Defender','EXO','PowerPlatform','Sharepoint','Teams')
 }
 elseif((-not $pEmpty) -and (-not $cEmpty) -and (-not $tEmpty)) {
     if (($Products.Count -gt 1) -or ($ControlGroups.Count -gt 1)) {
         Write-Output "**WARNING** can only take 1 argument for each: Products & Control Groups item`n...Running test for $($Products[0]) and $($ControlGroups[0]) only"
     }
 
-    Invoke-TestName -Flag $Flag -Product $Products[0] -ControlGroup $ControlGroups[0]
+    Invoke-SpecificTests -Flag $Flag -Product $Products[0] -ControlGroup $ControlGroups[0] -IndividualTests $Tests
 }
 elseif((-not $pEmpty) -and (-not $cEmpty) -and $tEmpty) {
     if ($Products.Count -gt 1) {
         Write-Output "**WARNING** can only take 1 argument for Products`n...Running test for $($Products[0]) only"
     }
-    Invoke-ControlGroupItem -Flag $Flag -Product $Products[0] -ControlGroup $ControlGroups
+    Invoke-ControlGroups -Flag $Flag -Product $Products[0] -ControlGroup $ControlGroups
 }
 elseif((-not $pEmpty) -and $cEmpty -and $tEmpty) {
-    Invoke-Product -Flag $Flag -Product $Products
+    Invoke-Products -Flag $Flag -Product $Products
 }
 elseif($pEmpty -or $cEmpty -and (-not $tEmpty)) {
     Get-ErrorMsg TestNameFlagMissingInfo
