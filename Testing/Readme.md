@@ -411,7 +411,7 @@ Sometimes the UpdateSelenium script has a problem getting rid of an older chrome
 
 ### Service principal authentication issue ###
 
-If you are trying to run the test orchestrator as a service principal and your client certificate has NOT been uploaded into the Azure AD registered applications Certificates and Secrets page, you may receive an error similar to the one below (this is specific to the AAD product - other products may give slightly different errors). Contact the system admin to upload your certificate file.
+If you are trying to run the test orchestrator as a service principal and your client certificate has NOT been uploaded into the Azure AD registered applications Certificates and Secrets page, you may receive an error similar to the one below (this is specific to the AAD product; other products may give slightly different errors). Contact the system admin to upload your certificate file.
 
 ![service-principal-error](/images/service-principal.png)
 
