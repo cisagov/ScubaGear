@@ -49,7 +49,7 @@ InModuleScope 'ExportEXOProvider' {
                 $Response.rdata -Contains "v=DMARC1..." | Should -Be $true
             }
         }
-        Context "When the DMARC record is unavailable the full domain" {
+        Context "When the DMARC record is unavailable at the full domain" {
             BeforeAll {
                 Mock -CommandName Invoke-RobustDnsTxt {
                     Mock -CommandName Invoke-RobustDnsTxt {
