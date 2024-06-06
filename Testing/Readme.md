@@ -386,7 +386,7 @@ If the Chrome browser on your system has been updated since you setup the Seleni
 
 ![Chrome browser version](/images/chrome-version.png)
 
-To resolve this, first kill any ChromeDriver.exe processes running by using the Task Manager. Note that ChromeDriver.exe processes can be hidden under the PowerShell app process and may not be visible in the main process list of Task Manager. Expand PowerShell app processes as shown in the image below to check for any hidden ChromeDriver processes - if you find any, kill them all.
+To resolve this, first kill any ChromeDriver.exe processes running by using the Task Manager. Note that ChromeDriver.exe processes can be hidden under the PowerShell app process and may not be visible in the main process list of Task Manager. Expand PowerShell app processes as shown in the image below to check for any hidden ChromeDriver processes, and if you find any, kill them all.
 
 ![Chrome browser processes](/images/chrome-process-kill2.png)
 
@@ -395,14 +395,14 @@ If you do not successfully kill that process you might receive an error message 
 ![Chrome browser processes](/images/chrome-process-kill.png)
 
 
-Then execute the commands below to update the Selenium and Chrome driver.
+Execute the commands below to update the Selenium and Chrome driver.
 
 ```
 .\Testing\Functional\SmokeTest\UpdateSelenium.ps1
 ```
-Sometimes the UpdateSelenium script has a problem getting rid of an older chromedriver.exe, even if you think you have killed any running processes named 'chromedriver.exe'. You might receive the error "Cannot remove item. Access to the path ...\chromedriver.exe is denied", as in the screenshot above. In that case you should follow the steps below:
+Sometimes the UpdateSelenium script has a problem getting rid of an older chromedriver.exe, even if you think you have killed any running processes named 'chromedriver.exe'. You might receive the error `Cannot remove item. Access to the path ...\chromedriver.exe is denied`, as shown in the screenshot above. In that case, you should follow the steps below:
 
-- Open the path shown in the error message in Explorer (e.g. 'C:\Users\tkolovos\Documents\WindowsPowerShell\Modules\Selenium\3.0.1\assemblies')
+- Open the path shown in the error message in Explorer (e.g. `C:\Users\username\Documents\WindowsPowerShell\Modules\Selenium\3.0.1\assemblies`)
 - Rename the file to chromedriver.exe.bak
 - Check the running processes in Task Manager for instances of a process named "chromedriver.exe.bak" and kill any that are shown
 - Delete the file chromedriver.exe.bak from the drive
@@ -411,7 +411,7 @@ Sometimes the UpdateSelenium script has a problem getting rid of an older chrome
 
 ### Service principal authentication issue ###
 
-If you are trying to run the test orchestrator as a service principal and your client certificate has NOT been uploaded into the Azure AD registered applications Certificates and Secrets page, you may receive an error similar to the one below (this is specific to the AAD product - other products may give slightly different errors). Contact the system admin to upload your certificate file.
+If you are trying to run the test orchestrator as a service principal and your client certificate has NOT been uploaded into the Azure AD registered applications Certificates and Secrets page, you may receive an error similar to the one below (this is specific to the AAD product; other products may give slightly different errors). Contact the system admin to upload your certificate file.
 
 ![service-principal-error](/images/service-principal.png)
 

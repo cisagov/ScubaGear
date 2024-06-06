@@ -1,0 +1,395 @@
+# ScubaGear Parameters
+
+The `Invoke-SCuBA` cmdlet has several command-line parameters, which are described below.
+
+> **Note**: Some parameters can also be specified in a [configuration file](configuration.md). If specified in both, command-line parameters have precedence over the config file. 
+
+> **Note**: Parameters use the Pascal case convention , and their names are consistent with those in the configuration file.
+
+## AppID
+
+**AppID** is the application ID of the service principal that is used during non-interactive mode authentication.
+
+| Parameter   | Value  |
+|-------------|--------|
+| Optional    | Yes    |
+| Datatype    | String |
+| Default     | n/a    |
+| Config File | Yes    |  
+
+Here is an example using `-AppID`:
+
+```powershell
+# Authenticate with a service principal
+Invoke-SCuBA -ProductNames teams `
+  -CertificateThumbprint fedcba9876543210fedcba9876543210fedcba98 `
+  -AppID abcdef0123456789abcde01234566789 `
+  -Organization contoso.onmicrosoft.com
+```
+
+> **Note**: AppID, CertificateThumbprint, and Organization are part of a parameter set used for authentication; if one is specified, all three must be specified.  
+
+## CertificateThumbprint
+
+**CertificateThumbprint** is the thumbprint of the certificate that is used for non-interactive mode authentication. The underlying PowerShell modules retrieve the certificate from the user's certificate store.
+
+| Parameter   | Value  |
+|-------------|--------|
+| Optional    | Yes    |
+| Datatype    | String |
+| Default     | n/a    |
+| Config File | Yes    |  
+
+Here is an example using `-CertificateThumbprint`:
+
+```powershell
+# Authenticate with a service principal
+Invoke-SCuBA -ProductNames teams `
+  -CertificateThumbprint fedcba9876543210fedcba9876543210fedcba98 `
+  -AppID abcdef0123456789abcde01234566789 `
+  -Organization contoso.onmicrosoft.com
+```
+
+> **Note**: AppID, CertificateThumbprint, and Organization are part of a parameter set used for authentication; if one is specified, all three must be specified.  
+
+## ConfigFilePath
+
+**ConfigFilePath** is the path of a [configuration file](configuration.md) that ScubaGear parses for input parameters. 
+
+| Parameter   | Value                                 |
+|-------------|---------------------------------------|
+| Optional    | Yes                                   |
+| Datatype    | String                                |
+| Default     | Directory where ScubaGear is executed |
+| Config File | No                                    |
+
+Here's an example using `-ConfigFilePath`:
+
+```powershell
+# Set the inputs using a configuration file
+Invoke-SCuBA -ProductNames teams `
+  -ConfigFilePath C:\users\<username>\Documents\scuba\config.json
+```
+
+If `-ConfigFilePath` is specified, default values will be used for any parameters that are not added to the config file. These default values are shown in the [full config file](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/Sample-Config-Files/full_config.yaml).  
+
+More information about the configuration file can be found on the [configuration page](configuration.md).
+
+> **Note**: Path can be absolute or relative.
+
+## DarkMode
+
+**DarkMode** enables the HTML report to have a dark mode look.
+
+| Parameter   | Value  |
+|-------------|--------|
+| Optional    | Yes    |
+| Datatype    | Switch |
+| Default     | n/a    |
+| Config File | No     |  
+
+```powershell
+# View HTML report in dark mode
+Invoke-SCuBA -ProductNames teams `
+  -DarkMode
+```
+
+## DisconnectOnExit
+
+**DisconnectOnExit** deletes the authentication tokens from your local machine that were used to connect to the Microsoft APIs; this will for you to re-authenticate the next time you run ScubaGear. The name of this parameter is a misnomer.
+
+| Parameter   | Value  |
+|-------------|--------|
+| Optional    | Yes    |
+| Datatype    | Switch |
+| Default     | n/a    |
+| Config File | Yes    |  
+
+```powershell
+# Delete the auth token
+Invoke-SCuBA -ProductNames teams `
+  -DisconnectOnExit
+```
+
+## LogIn
+
+**LogIn** enforces or bypasses authentication. If `$true`, ScubaGear will prompt the user to provide credentials to establish a connection to the specified M365 products in the `ProductNames` variable. If `$false`, it will use the previously issued authentication token, if it has not expired.
+
+| Parameter   | Value   |
+|-------------|---------|
+| Optional    | Yes     |
+| Datatype    | Boolean |
+| Default     | `$true` |
+| Config File | Yes     |
+
+This variable should typically be `$true`, as a connection is established in the current PowerShell terminal session with the first authentication. If another verification is run in the same PowerShell session, then this variable can be set to false to bypass a second authenticate. 
+
+```powershell
+# Reuse previous authentication
+Invoke-SCuBA -ProductNames teams `
+  -LogIn $false
+```
+
+> **Note**: Defender will ask for authentication even if this variable is set to false.
+
+## M365Environment
+
+**M365Environment** is used to authenticate to the various M365 commercial/government environments.
+
+| Parameter   | Value        |
+|-------------|--------------|
+| Optional    | Yes          |
+| Datatype    | String       |
+| Default     | `commercial` |
+| Config File | Yes          |  
+
+> **Note**: This parameter is required if authenticating to Power Platform. It is also required if executing the tool against GCC High or DoD tenants.
+
+```powershell
+# Assess a government commercial account
+Invoke-SCuBA -ProductNames teams `
+  -M365Environment gcc
+```
+
+The list of acceptable values are:
+
+| Tenant                          | Value      |
+|---------------------------------|------------|
+| Non-government tenants          | commercial |
+| Government cloud tenants        | gcc        |
+| Government cloud tenants (high) | gcchigh    |
+| Department of Defense tenants   | dod        |
+
+## MergeJson
+
+**MergeJson** combines the JSON files (named `TeamsReport.json`) in the `IndividualReports` folder together with the `ProviderSettingsExport.json` into an uber JSON file. These  files are deleted, though the combined report, `TestResults.json` is not deleted.
+
+| Parameter   | Value  |
+|-------------|--------|
+| Optional    | Yes    |
+| Datatype    | Switch |
+| Default     | n/a    |
+| Config File | No     |  
+
+```powershell
+# Delete the JSON files
+Invoke-SCuBA -ProductNames teams `
+  -MergeJson
+```
+
+## OPAPath
+
+**OPAPath** is the location of the folder that contains the Open Policy Agent (OPA) policy engine executable file. The executable must be named `opa_windows_amd64.exe`. For most cases, this parameter should not be used.
+
+| Parameter   | Value                                  |
+|-------------|----------------------------------------|
+| Optional    | Yes                                    |
+| Datatype    | String                                 |
+| Default     | `C:\Users\<username>\.scubagear\Tools` |
+| Config File | Yes                                    |
+
+```powershell
+# Change the directory that contains the OPA exe
+Invoke-SCuBA -ProductNames teams `
+  -OPAPath "C:\Users\<username>\Downloads"
+```
+
+> **Note**: Path can be absolute or relative.
+
+## Organization
+
+**Organization** is the organization that's used in non-interactive mode authentication.  It is of the form `contoso.onmicrosoft.com`.
+
+| Parameter   | Value  |
+|-------------|--------|
+| Optional    | Yes    |
+| Datatype    | String |
+| Default     | n/a    |
+| Config File | Yes    |  
+
+Here is an example using Organization:
+
+```powershell
+# Authenticate with a service principal
+Invoke-SCuBA -ProductNames teams `
+  -CertificateThumbprint fedcba9876543210fedcba9876543210fedcba98 `
+  -AppID abcdef0123456789abcde01234566789 `
+  -Organization contoso.onmicrosoft.com
+```
+
+> **Note**: AppID, CertificateThumbprint, and Organization are part of a parameter set used for authentication; if one is specified, all three must be specified.  
+
+## OutFolderName
+
+**OutFolderName** is the first half of the name of the folder where the [report files](../execution/reports.md) will be created. The second half is a timedate stamp. The location of this folder is determined by the [OutPath](#outpath) parameter. 
+
+| Parameter   | Value                     |
+|-------------|---------------------------|
+| Optional    | Yes                       |
+| Datatype    | String                    |
+| Default     | `M365BaselineConformance` |
+| Config File | Yes                       |  
+
+```powershell
+# Put the results in the testing folder
+Invoke-SCuBA -ProductNames teams `
+  -OutFolderName testing
+```
+
+## OutJsonFileName
+
+**OutJsonFileName** renames the uber JSON file that is created if the [MergeJson](#mergejson) parameter is used. This should only be the base file name, as the extension `.json` will automatically be added. 
+
+| Parameter   | Value              |
+|-------------|--------------------|
+| Optional    | Yes                |
+| Datatype    | String             |
+| Default     | `ScubaResults.json` |
+| Config File | No                 |  
+
+> **Note**: This parameter does not work if the `-MergeJson` parameter is not present.
+
+```powershell
+# Put the results in the testing folder
+Invoke-SCuBA -ProductNames teams `
+  -OutJsonFileName myresults `
+  -MergeJson
+```
+
+## OutPath
+
+**OutPath** is the folder path where the [report files](../execution/reports.md) will be created. The folder will be created if it does not exist.
+
+| Parameter   | Value                                      |
+|-------------|--------------------------------------------|
+| Optional    | Yes                                        |
+| Datatype    | String                                     |
+| Default     | `M365BaselineConformance` with a timestamp |
+| Config File | Yes                                        |
+
+```powershell
+# Put the results in the testing folder
+Invoke-SCuBA -ProductNames teams `
+  -OutPath myresults
+```
+
+> **Note**: Path can be absolute or relative.
+
+## OutProviderFileName
+
+**OutProviderFileName** is the name the JSON file that contains all of the information that ScubaGear extracted from the products. 
+
+| Parameter   | Value                    |
+|-------------|--------------------------|
+| Optional    | Yes                      |
+| Datatype    | String                   |
+| Default     | `ProviderSettingsExport` |
+| Config File | Yes                      |  
+
+```powershell
+# Put the results in the testing folder
+Invoke-SCuBA -ProductNames teams `
+  -OutProviderFileName mysettings
+```
+
+> **Note**: ScubaGear will automatically add the `.json` to this filename.
+
+## OutRegoFileName
+
+**OutRegoFileName** is the name of the test results file in JSON and CSV that are created in the output folder.
+
+| Parameter   | Value         |
+|-------------|---------------|
+| Optional    | Yes           |
+| Datatype    | String        |
+| Default     | `TestResults` |
+| Config File | Yes           |  
+
+```powershell
+# Put the results in the testing folder
+Invoke-SCuBA -ProductNames teams `
+  -OutRegoFileName mytestresults
+```
+
+> **Note**: ScubaGear will automatically add the `.csv` and the `.json` respectively to these filenames.
+
+## OutReportName
+
+**OutReportName** is the name of the HTML file that is a summary of the detailed reports created in the output folder.
+
+| Parameter   | Value             |
+|-------------|-------------------|
+| Optional    | Yes               |
+| Datatype    | String            |
+| Default     | `BaselineReports` |
+| Config File | Yes               |  
+
+```powershell
+# Put the results in the testing folder
+Invoke-SCuBA -ProductNames teams `
+  -OutReportName myreport
+```
+
+> **Note**: ScubaGear will automatically add the `.html` to this filename.
+
+## ProductNames
+
+**ProductNames** provides one or more M365 shortened product names that ScubaGear will assess.
+
+| Parameter   | Value                                             |
+|-------------|---------------------------------------------------|
+| Optional    | Yes                                               |
+| Datatype    | List of Strings                                   |
+| Default     | ["aad", "defender", "exo", "sharepoint", "teams"] |
+| Config File | Yes                                               |  
+
+The list of acceptable values are:
+
+| Product                                      | Product Name |
+|----------------------------------------------|--------------|
+| Entra ID                                     | aad          |
+| Defender for Office 365                      | defender     |
+| Exchange Online                              | exo          |
+| Power Platform                               | powerplatform|
+| SharePoint Online and OneDrive for Business  | sharepoint   |
+| Microsoft Teams                              | teams        |
+
+```powershell
+# Assess two products
+Invoke-SCuBA -ProductNames teams, exo
+```
+
+>**Note**: Product names are separated by commas.
+
+## Quiet
+
+**Quiet** prevents the HTML report will not be opened in an external web browser.
+
+| Parameter   | Value  |
+|-------------|--------|
+| Optional    | Yes    |
+| Datatype    | Switch |
+| Default     | n/a    |
+| Config File | No     |  
+
+```powershell
+# Do not open the browser
+Invoke-SCuBA -ProductNames teams `
+  -Quiet
+```
+
+## Version
+
+**Version** writes the current ScubaGear version to the console.  ScubaGear will not be run.  When the `Version` parameter is used, no other parameters should be included.
+
+| Parameter   | Value  |
+|-------------|--------|
+| Optional    | Yes    |
+| Datatype    | Switch |
+| Default     | n/a    |
+| Config File | No     |  
+
+```powershell
+# Check the version
+Invoke-SCuBA -Version
+```
