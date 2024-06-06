@@ -1,0 +1,34 @@
+Description: |
+  SCuBAGear YAML Configuration file with custom variables
+  This configuration shows a standard SCuBAGear set of parameters to run
+  but also includes examples of configuring specific policies to be ignored
+  by ScubaGear baseline. Any ignored policies should be carefully considered
+  and documented as part of an organization's cybersecurity risk management
+  program process and practices.
+ProductNames:
+  - exo
+M365Environment: commercial
+OPAPath: .
+LogIn: true
+DisconnectOnExit: false
+OutPath: .
+OutFolderName: M365BaselineConformance
+OutProviderFileName: ProviderSettingsExport
+OutRegoFileName: TestResults
+OutReportName: BaselineReports
+Exo:
+  MS.EXO.4.3v1:
+    Ignore: true
+    IgnoreRationale:
+      "This policy is not applicable to our company as it only applies
+      to federal, executive branch, departments and agencies."
+Defender:
+  MS.DEFENDER.2.1v1:
+    Ignore: true
+    IgnoreRationale: "Phishing protections provided by a third-party service."
+  MS.DEFENDER.2.2v1:
+    Ignore: true
+    IgnoreRationale: "Phishing protections provided by a third-party service."
+  MS.DEFENDER.2.3v1:
+    Ignore: true
+    IgnoreRationale: "Phishing protections provided by a third-party service."
