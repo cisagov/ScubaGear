@@ -395,7 +395,7 @@ If you do not successfully kill that process you might receive an error message 
 ![Chrome browser processes](/images/chrome-process-kill.png)
 
 
-Then execute the commands below to update the Selenium and Chrome driver.
+Execute the commands below to update the Selenium and Chrome driver.
 
 ```
 .\Testing\Functional\SmokeTest\UpdateSelenium.ps1
