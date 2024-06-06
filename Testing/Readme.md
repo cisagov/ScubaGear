@@ -113,7 +113,7 @@ The optional variant can have values like: `g5`, `e5`, `gcc`, `pnp`, `spo`, `e#`
 
 ## Functional Testing Usage ##
 
-After setting up the prerequisites, define the Pester test container parameters a test execution utility script called "RunFunctionalTest.ps1" as shown below: 
+After setting up the prerequisites, define the Pester test container parameters in a test execution utility script called "RunFunctionalTest.ps1" as shown below: 
 
 
 ```
@@ -135,6 +135,7 @@ $Config = New-PesterConfiguration -Hashtable $PesterConfig
 Invoke-Pester -Configuration $Config
 ```
 Copy the above utility script and save it into a file named "RunFunctionalTest.ps1" on your system. Save this file in a folder named FunctionalTesting that is at the same level in your directory tree as ScubaGear as shown below.
+![Functional testing folder location](/images/FunctionalTestingFolder.png)
 
 
 The main construct of the RunFunctionalTest.ps1 script is the Pester Test Container. For your specific testing, define the Pester Test Container parameters provided in the `Data` definition as below:
@@ -360,9 +361,9 @@ To Resolve above issue, try the following:
 - Close the PowerShell session
 - Open Task Manager to find any background instances of PowerShell and close them all 
 - Uninstall all versions of Pester using following command
-```
-    Uninstall-Module -Name Pester -Force -AllVersions
-```  
+  ```
+  Uninstall-Module -Name Pester -Force -AllVersions
+  ```  
 - The above commands should uninstall previous versions of Pester. Now open a new PowerShell window to install Pester.
 - If you continue to see issues with Pester installation, use the following command to find the location of previously installed version of Pester and remove it by other means.
   ```
