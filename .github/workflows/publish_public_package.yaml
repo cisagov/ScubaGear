@@ -20,10 +20,10 @@ on:
         required: false
         type: string
   # for testing
-  # push:
-  #   paths:
-  #     - ".github/workflows/publish_public_package.yaml"
-  #     - "utils/DeployUtils.ps1"
+  push:
+    paths:
+      - ".github/workflows/publish_public_package.yaml"
+      - "utils/DeployUtils.ps1"
 
 permissions: read-all
 
