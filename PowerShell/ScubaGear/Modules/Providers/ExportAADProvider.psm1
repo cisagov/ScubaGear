@@ -35,10 +35,9 @@ function Invoke-GraphDirectly {
         foreach ($item in $queryParams.GetEnumerator()) {
             $q.Add($item.Key, $item.Value)
         }
-        $endpoint = "https://example.com" + $endpoint
-        $uri = [System.UriBuilder]$endpoint
+        $uri = [System.UriBuilder]::new("", "", 443, $endpoint)
         $uri.Query = $q.ToString()
-        $endpoint = $uri.Path + $uri.Query
+        $endpoint = $uri.ToString()
     }
     Write-Debug "Graph Api direct: $endpoint"
 
