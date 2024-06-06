@@ -29,7 +29,7 @@ This README outlines the ScubaGear software test automation and its usage. The d
 
 ## Functional Testing Prerequisites ##
 
-Running the ScubaGear functional test automation requires a Windows computer or VM. This development system should be setup with Pester, Selenium, Chrome and PowerShell 5.1. The repository provides a few utility scripts to install and update these prerequisite components.
+Running the ScubaGear functional test automation requires a Windows computer or VM. This development system should be setup with Pester, Selenium, Chrome and PowerShell 5. The repository provides a few utility scripts to install and update these prerequisite components.
 
 ### Windows System with Chrome ###
 
@@ -39,7 +39,7 @@ Functional testing needs to be run on a Windows system with the Chrome browser i
 
 "Pester is a testing and mocking framework for PowerShell." ([Pester Quick Start](https://pester.dev/docs/quick-start))
 
-On your Windows development system, install an updated Pester module by running the following command as an administrator:
+On your Windows development system, install an updated Pester module by running the following command from the root of the ScubaGear directory (viz. C:\UserN\ScubaGear\\):
 
 ```
 Install-Module -Name Pester -Force -SkipPublisherCheck
@@ -222,13 +222,13 @@ $TestContainers = @()
 $TestContainers += New-PesterContainer -Path "Testing/Functional/Products" -Data @{ Thumbprint = "D17F58D66DC5750EF78F25FF04CCE88DE730BCA6"; AppId = "1947b06c-46a9-4ff2-80c8-27261e58868b"; TenantDomain = "MyG5tenant.onmicrosoft.com"; TenantDisplayName = "My G5 tenant"; ProductName = "aad"; M365Environment = "gcc" }
 
 $PesterConfig = @{
-	Run = @{
+  Run = @{
 		Container = $TestContainers
 	}
   Filter = @{
 	 	Tag = @("MS.AAD.2.1v1")
 	}
-	Output = @{
+  Output = @{
 		Verbosity = 'Detailed'
 	}
 }
@@ -361,7 +361,7 @@ To Resolve above issue, try the following:
 - Open Task Manager to find any background instances of PowerShell and close them all 
 - Uninstall all versions of Pester using following command
 ```
-Uninstall-Module -Name Pester -Force -AllVersions
+    Uninstall-Module -Name Pester -Force -AllVersions
 ```  
 - The above commands should uninstall previous versions of Pester. Now open a new PowerShell window to install Pester.
 - If you continue to see issues with Pester installation, use the following command to find the location of previously installed version of Pester and remove it by other means.
