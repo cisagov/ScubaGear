@@ -386,7 +386,7 @@ If the Chrome browser on your system has been updated since you setup the Seleni
 
 ![Chrome browser version](/images/chrome-version.png)
 
-To resolve this, first kill any ChromeDriver.exe processes running by using the Task Manager. Note that ChromeDriver.exe processes can be hidden under the PowerShell app process and may not be visible in the main process list of Task Manager. Expand PowerShell app processes as shown in the image below to check for any hidden ChromeDriver processes - if you find any, kill them all.
+To resolve this, first kill any ChromeDriver.exe processes running by using the Task Manager. Note that ChromeDriver.exe processes can be hidden under the PowerShell app process and may not be visible in the main process list of Task Manager. Expand PowerShell app processes as shown in the image below to check for any hidden ChromeDriver processes, and if you find any, kill them all.
 
 ![Chrome browser processes](/images/chrome-process-kill2.png)
 
