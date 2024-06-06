@@ -608,12 +608,17 @@ test_PhishingMFANotEnforced_MicrosoftAuthDisabled_NotApplicable if {
     TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailStr), false) == true
 }
 
-todo_test_PhishingMFANotEnforced_MicrosoftAuthEnabled_Correct if {
+test_PhishingMFANotEnforced_MicrosoftAuthEnabled_Correct if {
     CAP := json.patch(ConditionalAccessPolicies,
-                [{"op": "add", "path": "GrantControls/BuiltInControls", "value": ["mfa"]}])
+                [{"op": "add", "path": "GrantControls/BuiltInControls", "value": ["mfa"]},
+                {"op": "remove", "path": "GrantControls/AuthenticationStrength"}])
+    Auth := json.patch(AuthenticationMethod,
+                [{"op": "add", "path": "authentication_method_feature_settings/3/State", "value": "enabled"},
+                {"op": "remove", "path": "authentication_method_feature_settings/2"},
+                {"op": "remove", "path": "authentication_method_feature_settings/1"}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
-                        with input.authentication_method as [AuthenticationMethod]
+                        with input.authentication_method as [Auth]
 
     TestResult("MS.AAD.3.3v1", Output, PASS, true) == true
 }
@@ -624,9 +629,9 @@ test_PhishingMFANotEnforced_MicrosoftAuthEnabled_AppnameDisabled_Incorrect if {
                 {"op": "remove", "path": "GrantControls/AuthenticationStrength"}])
     Auth := json.patch(AuthenticationMethod,
                 [{"op": "add", "path": "authentication_method_feature_settings/3/State", "value": "enabled"},
-                {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayAppInformationRequiredState/state", "value": "disabled"},
+                {"op": "remove", "path": "authentication_method_feature_settings/2"},
                 {"op": "remove", "path": "authentication_method_feature_settings/1"},
-                {"op": "remove", "path": "authentication_method_feature_settings/2"}])
+                {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayAppInformationRequiredState/state", "value": "disabled"}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.authentication_method as [Auth]
@@ -640,9 +645,9 @@ test_PhishingMFANotEnforced_MicrosoftAuthEnabled_GeolocationDisabled_Incorrect i
                 {"op": "remove", "path": "GrantControls/AuthenticationStrength"}])
     Auth := json.patch(AuthenticationMethod,
                 [{"op": "add", "path": "authentication_method_feature_settings/3/State", "value": "enabled"},
-                {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/state", "value": "disabled"},
+                {"op": "remove", "path": "authentication_method_feature_settings/2"},
                 {"op": "remove", "path": "authentication_method_feature_settings/1"},
-                {"op": "remove", "path": "authentication_method_feature_settings/2"}])
+                {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/state", "value": "disabled"}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.authentication_method as [Auth]
@@ -656,10 +661,10 @@ test_PhishingMFANotEnforced_MicrosoftAuthEnabled_AppNameDisabled_GeolocationDisa
                 {"op": "remove", "path": "GrantControls/AuthenticationStrength"}])
     Auth := json.patch(AuthenticationMethod,
                 [{"op": "add", "path": "authentication_method_feature_settings/3/State", "value": "enabled"},
-                {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayAppInformationRequiredState/state", "value": "disabled"},
-                {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/state", "value": "disabled"},
+                {"op": "remove", "path": "authentication_method_feature_settings/2"},
                 {"op": "remove", "path": "authentication_method_feature_settings/1"},
-                {"op": "remove", "path": "authentication_method_feature_settings/2"}])
+                {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayAppInformationRequiredState/state", "value": "disabled"},
+                {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/state", "value": "disabled"}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.authentication_method as [Auth]
@@ -673,9 +678,9 @@ test_PhishingMFANotEnforced_MicrosoftAuthEnabled_includeTargetsNotAll_Incorrect 
                 {"op": "remove", "path": "GrantControls/AuthenticationStrength"}])
     Auth := json.patch(AuthenticationMethod,
                 [{"op": "add", "path": "authentication_method_feature_settings/3/State", "value": "enabled"},
-                {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/includeTargets/0/id", "value": "not_all_users"},
+                {"op": "remove", "path": "authentication_method_feature_settings/2"},
                 {"op": "remove", "path": "authentication_method_feature_settings/1"},
-                {"op": "remove", "path": "authentication_method_feature_settings/2"}])
+                {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/includeTargets/0/id", "value": "not_all_users"}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.authentication_method as [Auth]
