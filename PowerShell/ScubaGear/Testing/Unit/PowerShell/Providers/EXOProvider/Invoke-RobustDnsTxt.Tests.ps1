@@ -26,6 +26,19 @@ InModuleScope 'ExportEXOProvider' {
                 $Response.HighConfidence | Should -Be $true
             }
 
+            It "Handles NXDOMAIN" {
+                Mock -CommandName Resolve-DnsName {
+                    throw "DNS_ERROR_RCODE_NAME_ERROR,Microsoft.DnsClient.Commands.ResolveDnsName"
+                }
+                Mock -CommandName Invoke-WebRequest {}
+                Mock -CommandName ConvertFrom-Json {}
+                $Response = Invoke-RobustDnsTxt -Qname "example.com"
+                Should -Invoke -CommandName Resolve-DnsName -Exactly -Times 1
+                Should -Invoke -CommandName Invoke-WebRequest -Exactly -Times 0
+                $Response.Answers.Length | Should -Be 0
+                $Response.HighConfidence | Should -Be $true
+            }
+
             It "Tries over DoH if traditional DNS is unavailable" {
                 Mock -CommandName Resolve-DnsName { throw "Some error" }
                 $DohResponseHeaders = @(
@@ -98,6 +111,23 @@ InModuleScope 'ExportEXOProvider' {
                 Should -Invoke -CommandName Invoke-WebRequest -Exactly -Times 1
                 $Response.Answers -Contains "v=spf1 include:spf.protection.outlook.com -all" | Should -Be $true
                 $Response.HighConfidence | Should -Be $true
+            }
+
+            It "Indicates low confidence if traditional DNS gives an empty answer and DoH unavailable" {
+                Mock -CommandName Resolve-DnsName { @(
+                    @{
+                        "Strings" = @("");
+                        "Section" = "Authority"
+                    }
+                    )
+                }
+                Mock -CommandName ConvertFrom-Json {}
+                Mock -CommandName Invoke-WebRequest { throw "some error" }
+                $Response = Invoke-RobustDnsTxt -Qname "example.com" -MaxTries 2
+                Should -Invoke -CommandName Resolve-DnsName -Exactly -Times 1
+                Should -Invoke -CommandName Invoke-WebRequest -Exactly -Times 2
+                $Response.Answers.Length | Should -Be 0
+                $Response.HighConfidence | Should -Be $false
             }
         }
     }
