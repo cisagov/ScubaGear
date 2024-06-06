@@ -41,7 +41,7 @@ jobs:
           dotnet tool install --global AzureSignTool --version 4.0.1
       # OIDC Login to Azure Public Cloud with AzPowershell (enableAzPSSession true)
       - name: Login to Azure
-        uses: azure/login@v1
+        uses: azure/login@v2
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
