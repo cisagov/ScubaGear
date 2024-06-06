@@ -16,8 +16,9 @@ InModuleScope 'ExportEXOProvider' {
                 }
                 else {}
             }
-            { Select-DohServer } | Should -Not -Throw
+            $Server = Select-DohServer
             Should -Invoke -CommandName Invoke-WebRequest -Exactly -Times 2
+            $Server | Should -Be "[2606:4700:4700::1111]"
         }
         It "Returns null if no servers work" {
             Mock -CommandName Invoke-WebRequest { throw "some error" }
