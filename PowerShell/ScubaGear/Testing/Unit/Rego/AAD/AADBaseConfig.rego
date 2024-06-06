@@ -52,6 +52,10 @@ ScubaConfig := {
             "CapExclusions": {
                 "Users": [],
                 "Groups": []
+            },
+            "RoleExclusions": {
+                "Users": [],
+                "Groups": []
             }
         }
 
@@ -179,14 +183,67 @@ PrivilegedRoles := [
         "DisplayName": "Global Administrator",
         "Assignments": [
             {
+                "StartDateTime": "/Date(1660328610000)/",
                 "EndDateTime": "/Date(1691006065170)/",
                 "PrincipalId": "ae71e61c-f465-4db6-8d26-5f3e52bdd800"
+            }
+        ],
+        "Rules": [
+            {
+                "Id": "Expiration_Admin_Assignment",
+                "RuleSource": "Global Administrator",
+                "RuleSourceType": "Directory Role",
+                "AdditionalProperties": {
+                    "isExpirationRequired": true,
+                    "maximumDuration": "P30D",
+                    "setting": {
+                        "isApprovalRequired": true
+                    },
+                    "notificationType": "Email",
+                    "notificationRecipients": [
+                        "test@example.com"
+                    ]
+                }
+            },
+            {
+                "Id": "Notification_Admin_Admin_Eligibility",
+                "RuleSource":  "Global Administrator",
+                "RuleSourceType":  "Directory Role",
+                "AdditionalProperties": {
+                    "notificationType": "Email",
+                    "notificationRecipients": [
+                        "test@example.com"
+                    ]
+                }
             }
         ]
     },
     {
         "RoleTemplateId": "Role2",
-        "DisplayName": "Privileged Role Administrator"
+        "DisplayName": "Privileged Role Administrator",
+        "Assignments": [
+            {
+                "EndDateTime": "/Date(1691006065170)/",
+                "PrincipalId": "e54ac846-1f5a-4afe-aa69-273b42c3b0c1"
+            }
+        ],
+        "Rules": [
+            {
+                "Id": "Expiration_Admin_Assignment",
+                "RuleSource": "Global Administrator",
+                "RuleSourceType": "Directory Role",
+                "AdditionalProperties": {
+                    "isExpirationRequired": true,
+                    "maximumDuration": "P30D",
+                    "setting": {
+                        "isApprovalRequired": true
+                    },
+                    "notificationRecipients": [
+                        "test@example.com"
+                    ]
+                }
+            }
+        ]
     }
 ]
 
