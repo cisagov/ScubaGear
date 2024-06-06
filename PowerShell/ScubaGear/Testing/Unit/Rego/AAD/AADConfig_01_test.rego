@@ -12,7 +12,7 @@ test_NoExclusionsConditions_Correct if {
 
     ReportDetailStr := concat("", [
         "1 conditional access policy(s) found that meet(s) all requirements:",
-        "<br/>Test block Legacy Authentication. <a href='#caps'>View all CA policies</a>."
+        "<br/>Test Policy. <a href='#caps'>View all CA policies</a>."
     ])
 
     TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, true) == true
@@ -119,7 +119,7 @@ test_NoExclusionsExemptUsers_Correct if {
 
     ReportDetailStr := concat("", [
         "1 conditional access policy(s) found that meet(s) all requirements:",
-        "<br/>Test block Legacy Authentication. <a href='#caps'>View all CA policies</a>."
+        "<br/>Test Policy. <a href='#caps'>View all CA policies</a>."
     ])
 
     TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, true) == true
@@ -136,7 +136,7 @@ test_UserExclusionsConditions_Correct if {
 
     ReportDetailStr := concat("", [
         "1 conditional access policy(s) found that meet(s) all requirements:",
-        "<br/>Test block Legacy Authentication. <a href='#caps'>View all CA policies</a>."
+        "<br/>Test Policy. <a href='#caps'>View all CA policies</a>."
     ])
 
     TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, true) == true
@@ -159,7 +159,7 @@ test_MultiUserExclusionsConditions_Correct if {
 
     ReportDetailStr := concat("", [
         "1 conditional access policy(s) found that meet(s) all requirements:",
-        "<br/>Test block Legacy Authentication. <a href='#caps'>View all CA policies</a>."
+        "<br/>Test Policy. <a href='#caps'>View all CA policies</a>."
     ])
 
     TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, true) == true
@@ -323,7 +323,7 @@ test_NoExclusionsExemptGroups_Correct if {
 
     ReportDetailStr := concat("", [
         "1 conditional access policy(s) found that meet(s) all requirements:",
-        "<br/>Test block Legacy Authentication. <a href='#caps'>View all CA policies</a>."
+        "<br/>Test Policy. <a href='#caps'>View all CA policies</a>."
     ])
 
     TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, true) == true
@@ -389,7 +389,7 @@ test_GroupExclusionConditions_Correct if {
 
     ReportDetailStr := concat("", [
         "1 conditional access policy(s) found that meet(s) all requirements:",
-        "<br/>Test block Legacy Authentication. <a href='#caps'>View all CA policies</a>."
+        "<br/>Test Policy. <a href='#caps'>View all CA policies</a>."
     ])
 
     TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, true) == true
@@ -412,7 +412,7 @@ test_MultiGroupExclusionsConditions_Correct if {
 
     ReportDetailStr := concat("", [
         "1 conditional access policy(s) found that meet(s) all requirements:",
-        "<br/>Test block Legacy Authentication. <a href='#caps'>View all CA policies</a>."
+        "<br/>Test Policy. <a href='#caps'>View all CA policies</a>."
     ])
 
     TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, true) == true
@@ -433,7 +433,7 @@ test_UserGroupExclusionConditions_Correct if {
 
     ReportDetailStr := concat("", [
         "1 conditional access policy(s) found that meet(s) all requirements:",
-        "<br/>Test block Legacy Authentication. <a href='#caps'>View all CA policies</a>."
+        "<br/>Test Policy. <a href='#caps'>View all CA policies</a>."
     ])
 
     TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, true) == true

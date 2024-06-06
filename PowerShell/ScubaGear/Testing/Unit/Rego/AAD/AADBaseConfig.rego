@@ -45,7 +45,7 @@ ConditionalAccessPolicies := {
         }
     },
     "State": "enabled",
-    "DisplayName": "Test block Legacy Authentication"
+    "DisplayName": "Test Policy"
 }
 
 ScubaConfig := {
