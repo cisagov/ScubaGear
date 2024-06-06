@@ -16,7 +16,7 @@ on:
         type: boolean
         default: false
       PrereleaseTag:
-        description: "The prerelease tag: (-)?[0-9A-Za-z]+ (e.g. -alpha1, -rc2, b1234)"
+        description: "The prerelease tag: [0-9A-Za-z]+ (e.g. alpha1, rc2, test04)"
         required: false
         type: string
   # for testing
@@ -98,11 +98,11 @@ jobs:
           # This publishes to PSGallery.
           Publish-ScubaGearModule @Parameters
       # This is a manual test that simply writes the version to the console
-      - name: Print Scuba Version
+      - name: Test Scuba Version
         run: |
           if ('true' -eq '${{ inputs.IsPrerelease }}')
           {
-            $Version = '${{ inputs.OverrideModuleVersion }}' + '${{ inputs.PrereleaseTag }}'
+            $Version = '${{ inputs.OverrideModuleVersion }}' + '-' + '${{ inputs.PrereleaseTag }}'
             Write-Host "Checking for prerelease with required version: " + $Version
             Find-Module -Name ScubaGear -RequiredVersion $Version -AllowPrerelease
           }
