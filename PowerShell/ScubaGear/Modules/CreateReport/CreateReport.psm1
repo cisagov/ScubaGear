@@ -101,6 +101,27 @@ function New-Report {
             $Test = $TestResults | Where-Object -Property PolicyId -eq $Control.Id
 
             if ($null -ne $Test){
+                $Skip = $false
+                if (Test-Contains $SettingsExport.scuba_config $BaselineName) {
+                    if (Test-Contains $SettingsExport.scuba_config.$BaselineName "IgnorePolicy") {
+                        if (Test-Contains $SettingsExport.scuba_config.$BaselineName.IgnorePolicy $Control.Id) {
+                            $Skip = $true
+                        }
+                    }
+                }
+                if ($Skip) {
+                    $ReportSummary.Passes += 1
+                    $SkipRationale = $SettingsExport.scuba_config.$BaselineName.IgnorePolicy.$($Control.Id)
+                    $Fragment += [pscustomobject]@{
+                        "Control ID"=$Control.Id
+                        "Requirement"=$Control.Value
+                        "Result"= "Skipped"
+                        "Criticality"= $Test.Criticality
+                        "Details"= "Test skipped by user. Rationale: `"$($SkipRationale)`""
+                    }
+                    continue
+                }
+
                 $MissingCommands = $Test.Commandlet | Where-Object {$SettingsExport."$($BaselineName)_successful_commands" -notcontains $_}
 
                 if ($MissingCommands.Count -gt 0) {
@@ -275,6 +296,28 @@ function New-Report {
     [System.Web.HttpUtility]::HtmlDecode($ReportHTML) | Out-File $FileName
 
     $ReportSummary
+}
+
+function Test-Contains {
+    <#
+    .Description
+    Tests if a custom PowerShell object contains a given key.
+    .Functionality
+    Internal
+    #>
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [PSCustomObject]
+        $Object,
+        
+        [Parameter(Mandatory = $false)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $Key
+    )
+    $Object.psobject.properties.name -Contains $Key
 }
 
 function Import-SecureBaseline{

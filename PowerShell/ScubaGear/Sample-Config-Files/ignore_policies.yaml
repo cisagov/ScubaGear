@@ -7,6 +7,8 @@ Description: |
   program process and practices.
 ProductNames:
   - exo
+  - teams
+  - defender
 M365Environment: commercial
 OPAPath: .
 LogIn: true
@@ -17,18 +19,37 @@ OutProviderFileName: ProviderSettingsExport
 OutRegoFileName: TestResults
 OutReportName: BaselineReports
 Exo:
-  MS.EXO.4.3v1:
-    Ignore: true
-    IgnoreRationale:
-      "This policy is not applicable to our company as it only applies
-      to federal, executive branch, departments and agencies."
-Defender:
-  MS.DEFENDER.2.1v1:
-    Ignore: true
-    IgnoreRationale: "Phishing protections provided by a third-party service."
-  MS.DEFENDER.2.2v1:
-    Ignore: true
-    IgnoreRationale: "Phishing protections provided by a third-party service."
-  MS.DEFENDER.2.3v1:
-    Ignore: true
-    IgnoreRationale: "Phishing protections provided by a third-party service."
+  IgnorePolicy:
+    MS.EXO.4.3v1: "This policy is not applicable to our company as it only applies
+        to federal, executive branch, departments and agencies." # Assuming this config file corresponds to a private
+        # company, not a gov entity
+    MS.EXO.8.1v1: &DefenderRationale "Service provided via Microsoft M365 Defender."
+    MS.EXO.8.2v1: *DefenderRationale
+    MS.EXO.9.1v1: *DefenderRationale
+    MS.EXO.9.2v1: *DefenderRationale
+    MS.EXO.9.3v1: *DefenderRationale
+    MS.EXO.10.1v1: *DefenderRationale
+    MS.EXO.10.2v1: *DefenderRationale
+    MS.EXO.10.3v1: *DefenderRationale
+    MS.EXO.11.1v1: *DefenderRationale
+    MS.EXO.11.2v1: *DefenderRationale
+    MS.EXO.11.3v1: *DefenderRationale
+    MS.EXO.14.1v1: *DefenderRationale
+    MS.EXO.14.2v1: *DefenderRationale
+    MS.EXO.14.3v1: *DefenderRationale
+    MS.EXO.15.1v1: *DefenderRationale
+    MS.EXO.15.2v1: *DefenderRationale
+    MS.EXO.15.3v1: *DefenderRationale
+    MS.EXO.16.1v1: *DefenderRationale
+    MS.EXO.16.2v1: *DefenderRationale
+    MS.EXO.17.1v1: *DefenderRationale
+    MS.EXO.17.2v1: *DefenderRationale
+    MS.EXO.17.3v1: *DefenderRationale
+Teams:
+  IgnorePolicy:
+    MS.TEAMS.6.1v1: *DefenderRationale
+    MS.TEAMS.6.2v1: *DefenderRationale
+    MS.TEAMS.7.1v1: *DefenderRationale
+    MS.TEAMS.7.2v1: *DefenderRationale
+    MS.TEAMS.8.1v1: *DefenderRationale
+    MS.TEAMS.8.2v1: *DefenderRationale
