@@ -302,7 +302,6 @@ function Get-PrivilegedUser {
                 # If the premium license for PIM is there, process the users that are "member" of the PIM group as Eligible
                 if ($TenantHasPremiumLicense) {
                     # Get the users that are assigned to the PIM group as Eligible members
-                    # $PIMGroupMembers = Get-MgBetaIdentityGovernancePrivilegedAccessGroupEligibilityScheduleInstance -All -ErrorAction Stop -Filter "groupId eq '$GroupId'"
                     $graphArgs = @{
                         "commandlet" = "Get-MgBetaIdentityGovernancePrivilegedAccessGroupEligibilityScheduleInstance"
                         "queryParams" = @{'$filter' = "groupId eq '$GroupId'"}
@@ -331,7 +330,6 @@ function Get-PrivilegedUser {
     # Process the Eligible role assignments if the premium license for PIM is there
     if ($TenantHasPremiumLicense) {
         # Get a list of all the users and groups that have Eligible assignments
-        # $AllPIMRoleAssignments = Get-MgBetaRoleManagementDirectoryRoleEligibilityScheduleInstance -All -ErrorAction Stop
         $graphArgs = @{
             "commandlet" = "Get-MgBetaRoleManagementDirectoryRoleEligibilityScheduleInstance"
         }
@@ -388,7 +386,6 @@ function Get-PrivilegedUser {
                     }
 
                     # Get the users that are assigned to the PIM group as Eligible members
-                    # $PIMGroupMembers = Get-MgBetaIdentityGovernancePrivilegedAccessGroupEligibilityScheduleInstance -All -ErrorAction Stop -Filter "groupId eq '$UserObjectId'"
                     $graphArgs = @{
                         "commandlet" = "Get-MgBetaIdentityGovernancePrivilegedAccessGroupEligibilityScheduleInstance"
                         "queryParams" = @{'$filter' = "groupId eq '$UserObjectId'"}
@@ -460,7 +457,6 @@ function GetConfigurationsForPimGroups{
     )
 
     # Get a list of the groups that are enrolled in PIM - we want to ignore the others
-    # $PIMGroups = Get-MgBetaPrivilegedAccessResource -All -ErrorAction Stop -PrivilegedAccessId aadGroups
     $graphArgs = @{
         "commandlet" = "Get-MgBetaPrivilegedAccessResource"
         "queryParams" = @{'$PrivilegedAccessId' = "aadGroups"}
@@ -582,7 +578,6 @@ function Get-PrivilegedRole {
         [GroupTypeCache]::CheckedGroups.Clear()
 
         # Get ALL the roles and users actively assigned to them
-        # $AllRoleAssignments = Get-MgBetaRoleManagementDirectoryRoleAssignmentScheduleInstance -All -ErrorAction Stop
         $graphArgs = @{
             "commandlet" = "Get-MgBetaRoleManagementDirectoryRoleAssignmentScheduleInstance"
         }
