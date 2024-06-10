@@ -86,8 +86,10 @@ jobs:
           }
           if ('true' -eq '${{ inputs.IsPrerelease }}')
           {
-            Write-Host "Adding IsPrerelease"
+            Write-Host "WH: Adding IsPrerelease"
             Write-Host ${{ inputs.IsPrerelease }}
+            Write-Verbose "WV: Adding IsPrerelease"
+            Write-Verbose ${{ inputs.IsPrerelease }}
             $Parameters.Add('PrereleaseTag', '${{ inputs.PrereleaseTag }}')
           }
           if (-Not [string]::IsNullOrEmpty('${{ inputs.OverrideModuleVersion }}'))
@@ -104,7 +106,8 @@ jobs:
           if ('true' -eq '${{ inputs.IsPrerelease }}')
           {
             $Version = '${{ inputs.OverrideModuleVersion }}' + '-' + '${{ inputs.PrereleaseTag }}'
-            Write-Host "Checking for prerelease with required version: " + $Version
+            Write-Host "WH: Checking for prerelease with required version: " + $Version
+            Write-Verbose "WV: Checking for prerelease with required version: " + $Version
             Find-Module -Name ScubaGear -RequiredVersion $Version -AllowPrerelease
           }
           else
