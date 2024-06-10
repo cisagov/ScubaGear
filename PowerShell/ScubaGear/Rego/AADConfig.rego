@@ -457,6 +457,10 @@ ManagedDeviceAuth contains CAPolicy.DisplayName if {
         "domainJoinedDevice" in CAPolicy.GrantControls.BuiltInControls,
     ]
     count(FilterArray(Conditions, true)) > 0
+
+    # Only match policies with user and group exclusions if all exempted
+    UserExclusionsFullyExempt(CAPolicy, "MS.AAD.3.7v1") == true
+    GroupExclusionsFullyExempt(CAPolicy, "MS.AAD.3.7v1") == true
 }
 
 # Pass if at least 1 policy meets all conditions
