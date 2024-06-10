@@ -1006,7 +1006,7 @@ function Invoke-ReportCreation {
                 $LinkClassName = '"individual_reports"' # uses no escape characters
                 $Link = "<a class=$($LinkClassName) href='$($LinkPath)'>$($FullName)</a>"
                 if ($Report.Skips -gt 0) {
-                    $PassesSummary = "<div class='summary pass'>$($Report.Passes) passed / $($Report.Passes) skipped</div>"
+                    $PassesSummary = "<div class='summary pass'>$($Report.Passes) passed / $($Report.Skips) skipped</div>"
                 }
                 else {
                     $PassesSummary = "<div class='summary pass'>$($Report.Passes) tests passed</div>"
