@@ -784,7 +784,7 @@ GlobalAdmins contains User.DisplayName if {
     "Global Administrator" in User.roles
 }
 
-#Set conditions under which this policy will pass
+# Set conditions under which this policy will pass
 default IsGlobalAdminCountGood := false
 IsGlobalAdminCountGood := true if {
     count(GlobalAdmins) <= 8
