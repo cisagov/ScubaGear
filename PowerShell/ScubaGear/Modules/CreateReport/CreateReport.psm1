@@ -113,12 +113,19 @@ function New-Report {
                 if ($Skip) {
                     $ReportSummary.Skips += 1
                     $SkipRationale = $SettingsExport.scuba_config.$BaselineName.IgnorePolicy.$($Control.Id)
+                    if ([string]::IsNullOrEmpty($SkipRationale)) {
+                        Write-Warning "Config file indicates skipping $($Control.Id), but no rationale provided."
+                        $SkipRationale = "Rationale not provided."
+                    }
+                    else {
+                        $SkipRationale = "`"$($SkipRationale)`""
+                    }
                     $Fragment += [pscustomobject]@{
                         "Control ID"=$Control.Id
                         "Requirement"=$Control.Value
                         "Result"= "Skipped"
                         "Criticality"= $Test.Criticality
-                        "Details"= "Test skipped by user. Rationale: `"$($SkipRationale)`""
+                        "Details"= "Test skipped by user. $($SkipRationale)"
                     }
                     continue
                 }
@@ -312,7 +319,7 @@ function Test-Contains {
         [ValidateNotNullOrEmpty()]
         [PSCustomObject]
         $Object,
-        
+
         [Parameter(Mandatory = $false)]
         [ValidateNotNullOrEmpty()]
         [string]
