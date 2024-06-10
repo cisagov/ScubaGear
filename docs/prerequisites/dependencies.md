@@ -13,7 +13,7 @@ Initialize-SCuBA
 
 ## OPA Installation
 
-Normally, the `Initialize-SCuBA` cmdlet installs OPA.  This can be verified by looking for the OPA executable file in `C:\Users\<username>\.scubagear\Tools`.  If it failed to do so, or you set a parameter to prevent it from doing so, you can install OPA separately.
+Normally, the `Initialize-SCuBA` cmdlet installs OPA.  This can be verified by looking for the OPA executable file in `C:\Users\johndoe\.scubagear\Tools`.  If it failed to do so, or you set a parameter to prevent it from doing so, you can install OPA separately.
 
 Try this cmdlet first:
 

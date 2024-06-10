@@ -19,7 +19,7 @@ This error can be seen when running ScubaGear. It is due to a [bug](https://gith
 
 ```powershell
 # Delete folder with Graph tokens and configuration info.
-rm -r C:\Users\<username>\.graph
+rm -r C:\Users\johndoe\.graph
 ```
 
 After deleting the `.graph` folder in your home directory, re-run ScubaGear, and the error should disappear.

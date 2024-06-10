@@ -33,7 +33,7 @@ To assess one product, use the `-ProductNames` flag with a product name:
 Invoke-SCuBA -ProductNames teams
 ```
 
-The complete list of all product names can be found on the [parameters](../configuration/parameters.md#product-names) page.
+The complete list of all product names can be found on the [parameters](../configuration/parameters.md#productnames) page.
 
 ### Multiple Products
 

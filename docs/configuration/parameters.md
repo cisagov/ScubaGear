@@ -4,7 +4,7 @@ The `Invoke-SCuBA` cmdlet has several command-line parameters, which are describ
 
 > **Note**: Some parameters can also be specified in a [configuration file](configuration.md). If specified in both, command-line parameters have precedence over the config file. 
 
-> **Note**: Parameters use the Pascal case convention , and their names are consistent with those in the configuration file.
+> **Note**: Parameters use the Pascal case convention, and their names are consistent with those in the configuration file.
 
 ## AppID
 

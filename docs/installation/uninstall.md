@@ -20,7 +20,7 @@ Uninstall-Module -Name ScubaGear
 
 ```powershell
 # Delete .scubagear folder
-Remove-Item C:\Users\<username>\.scubagear
+Remove-Item C:\Users\johndoe\.scubagear
 ```
 
 * If ScubaGear was [downloaded from GitHub](github.md), delete the ScubaGear folder that was extracted from the zip file.

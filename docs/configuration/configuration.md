@@ -32,7 +32,7 @@ Invoke-SCuBA `
 
 ### Typical Use
 
-The [typical use](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/Sample-Config-Files/typical_config.yaml) example config file includes multiple products specified as a list and an M365 environment. Additional product values are commented out and will not be included, but are retained in the config file to easily add them back later. 
+The [typical use](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/Sample-Config-Files/typical_config.yaml) example config file includes multiple products specified as a list and an M365 environment. Additional product values are commented out and will not be included in the testing, but they are retained in the config file to easily add them back later.
 
 ScubaGear can be invoked with this config file:
 
