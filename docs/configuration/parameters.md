@@ -363,7 +363,7 @@ Invoke-SCuBA -ProductNames teams, exo
 
 ## Quiet
 
-**Quiet** prevents the HTML report will not be opened in an external web browser.
+**Quiet** prevents the HTML report from being opened in an external web browser.
 
 | Parameter   | Value  |
 |-------------|--------|
