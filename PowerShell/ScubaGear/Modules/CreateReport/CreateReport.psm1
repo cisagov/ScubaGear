@@ -88,6 +88,7 @@ function New-Report {
         "Warnings" = 0;
         "Failures" = 0;
         "Passes" = 0;
+        "Skips" = 0;
         "Manual" = 0;
         "Errors" = 0;
         "Date" = $SettingsExport.date;
@@ -110,7 +111,7 @@ function New-Report {
                     }
                 }
                 if ($Skip) {
-                    $ReportSummary.Passes += 1
+                    $ReportSummary.Skips += 1
                     $SkipRationale = $SettingsExport.scuba_config.$BaselineName.IgnorePolicy.$($Control.Id)
                     $Fragment += [pscustomobject]@{
                         "Control ID"=$Control.Id

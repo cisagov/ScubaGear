@@ -1005,8 +1005,12 @@ function Invoke-ReportCreation {
                 $LinkPath = "$($IndividualReportFolderName)/$($BaselineName)Report.html"
                 $LinkClassName = '"individual_reports"' # uses no escape characters
                 $Link = "<a class=$($LinkClassName) href='$($LinkPath)'>$($FullName)</a>"
-
-                $PassesSummary = "<div class='summary pass'>$($Report.Passes) tests passed</div>"
+                if ($Report.Skips -gt 0) {
+                    $PassesSummary = "<div class='summary pass'>$($Report.Passes) passed / $($Report.Passes) skipped</div>"
+                }
+                else {
+                    $PassesSummary = "<div class='summary pass'>$($Report.Passes) tests passed</div>"
+                }
                 $WarningsSummary = "<div class='summary'></div>"
                 $FailuresSummary = "<div class='summary'></div>"
                 $BaselineURL = "<a href= `"https://github.com/cisagov/ScubaGear/blob/v$($ModuleVersion)/baselines`" target=`"_blank`"><h3 style=`"width: 100px;`">Baseline Documents</h3></a>"
