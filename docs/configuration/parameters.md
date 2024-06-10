@@ -162,7 +162,7 @@ The list of acceptable values are:
 
 ## MergeJson
 
-**MergeJson** combines the JSON files (named `TeamsReport.json`) in the `IndividualReports` folder together with the `ProviderSettingsExport.json` into an uber JSON file. These  files are deleted, though the combined report, `TestResults.json` is not deleted.
+**MergeJson** combines the individual JSON files (named `TeamsReport.json`) in the `IndividualReports` folder together with the `ProviderSettingsExport.json` into an uber JSON file named `ScubaResults.json`. The individual files are deleted.
 
 | Parameter   | Value  |
 |-------------|--------|
