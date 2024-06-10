@@ -32,6 +32,6 @@ jobs:
       - name: Setup Regal
         uses: StyraInc/setup-regal@v1.0.0
         with:
-          version: v0.18.0
+          version: v0.23.1
       - name: Run Regal Lint
         run: regal lint --format github ${{ env.MODULE_ROOT }}/Rego ${{ env.MODULE_ROOT }}/Testing

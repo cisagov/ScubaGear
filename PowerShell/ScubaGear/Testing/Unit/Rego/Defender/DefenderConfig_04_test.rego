@@ -290,7 +290,7 @@ test_ContentContainsSensitiveInformation_Incorrect_V6 if {
     TestResult("MS.DEFENDER.4.1v1", Output, ReportDetailString, false) == true
 }
 
-test_NoDLPLicense_Incorrect_V1 if {
+test_NoDLPLicense_Incorrect_4_1_V1 if {
     Output := defender.tests with input as {
         "defender_license": false,
         "defender_dlp_license": false
@@ -871,7 +871,7 @@ test_Locations_Incorrect_V8 if {
     TestResult("MS.DEFENDER.4.2v1", Output, ReportDetailString, false) == true
 }
 
-test_NoDLPLicense_Incorrect_V1 if {
+test_NoDLPLicense_Incorrect_4_2_V1 if {
     Output := defender.tests with input as {
         "defender_license": false,
         "defender_dlp_license": false
@@ -1161,7 +1161,7 @@ test_BlockAccess_Incorrect_V6 if {
     TestResult("MS.DEFENDER.4.3v1", Output, ReportDetailString, false) == true
 }
 
-test_NoDLPLicense_Incorrect_V1 if {
+test_NoDLPLicense_Incorrect_4_3_V1 if {
     Output := defender.tests with input as {
         "defender_license": false,
         "defender_dlp_license": false
@@ -1307,7 +1307,7 @@ test_NotifyUser_Incorrect_V2 if {
     TestResult("MS.DEFENDER.4.4v1", Output, ReportDetailString, false) == true
 }
 
-test_NoDLPLicense_Incorrect_V1 if {
+test_NoDLPLicense_Incorrect_4_4_V1 if {
     Output := defender.tests with input as {
         "defender_license": false,
         "defender_dlp_license": false
