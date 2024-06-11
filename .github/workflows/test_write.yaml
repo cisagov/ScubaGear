@@ -25,5 +25,5 @@ jobs:
           Write-Progress "Progess"
           Write-Verbose "Verbose"
           Write-Warning "Warning"
-          Write-Error "Error"
+          # Write-Error "Error"
           Write-Host "Does this print after error?"
