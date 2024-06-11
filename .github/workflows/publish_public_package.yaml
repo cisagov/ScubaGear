@@ -104,7 +104,7 @@ jobs:
           if ('true' -eq '${{ inputs.IsPrerelease }}')
           {
             $Version = '${{ inputs.OverrideModuleVersion }}' + '-' + '${{ inputs.PrereleaseTag }}'
-            Write-Output "Checking for prerelease with required version: " + $Version
+            Write-Output "Checking for prerelease with required version: $Version" 
             Find-Module -Name ScubaGear -RequiredVersion $Version -AllowPrerelease
           }
           else
