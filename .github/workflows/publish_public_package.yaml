@@ -86,14 +86,14 @@ jobs:
           }
           if ('true' -eq '${{ inputs.IsPrerelease }}')
           {
-            Write-Host "Adding IsPrerelease"
-            Write-Host ${{ inputs.IsPrerelease }}
+            Write-Output "Adding IsPrerelease"
+            Write-Output ${{ inputs.IsPrerelease }}
             $Parameters.Add('PrereleaseTag', '${{ inputs.PrereleaseTag }}')
           }
           if (-Not [string]::IsNullOrEmpty('${{ inputs.OverrideModuleVersion }}'))
           {
-            Write-Host "Adding OverrideModuleVersion"
-            Write-Host ${{ inputs.OverrideModuleVersion }}
+            Write-Output "Adding OverrideModuleVersion"
+            Write-Output ${{ inputs.OverrideModuleVersion }}
             $Parameters.Add('OverrideModuleVersion', '${{ inputs.OverrideModuleVersion }}')
           }
           # This publishes to PSGallery.
@@ -104,11 +104,11 @@ jobs:
           if ('true' -eq '${{ inputs.IsPrerelease }}')
           {
             $Version = '${{ inputs.OverrideModuleVersion }}' + '-' + '${{ inputs.PrereleaseTag }}'
-            Write-Host "Checking for prerelease with required version: " + $Version
+            Write-Output "Checking for prerelease with required version: " + $Version
             Find-Module -Name ScubaGear -RequiredVersion $Version -AllowPrerelease
           }
           else
           {
-            Write-Host "Installing latest version"
+            Write-Output "Installing latest version"
             Find-Module -Name ScubaGear
           }
