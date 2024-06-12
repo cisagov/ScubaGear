@@ -1,0 +1,1 @@
+Disconnect-SCuBATenant [[-ProductNames] <string[]>] [<CommonParameters>]
