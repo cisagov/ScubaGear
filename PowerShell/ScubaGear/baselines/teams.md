@@ -71,7 +71,8 @@ Anonymous users SHALL NOT be enabled to start meetings.
 - _Last modified:_ July 2023
 - _Note:_ This policy applies to the Global (Org-wide default) meeting policy, and custom meeting policies if they exist.
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1078.001:Default Accounts](https://attack.mitre.org/techniques/T1078/001/)
+  - [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)
+    - [T1078.001: Default Accounts](https://attack.mitre.org/techniques/T1078/001/)
 
 #### MS.TEAMS.1.3v1
 Anonymous users and dial-in callers SHOULD NOT be admitted automatically.
@@ -257,8 +258,9 @@ External access for users SHALL only be enabled on a per-domain basis.
 - _Rationale:_ The default configuration allows members to communicate with all external users with similar access permissions. This unrestricted access can lead to data breaches and other security threats. This policy provides protection against threats posed by unrestricted access by allowing communication with only trusted domains.  
 - _Last modified:_ July 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1199:Trusted Relationship](https://attack.mitre.org/techniques/T1199/)
-  - [T1204.001:Malicious Link](https://attack.mitre.org/techniques/T1204/001/)
+  - [T1199: Trusted Relationship](https://attack.mitre.org/techniques/T1199/)
+  - [T1204: User Execution](https://attack.mitre.org/techniques/T1204/)
+    - [T1204.001: Malicious Link](https://attack.mitre.org/techniques/T1204/001/)
 
 #### MS.TEAMS.2.2v1
 Unmanaged users SHALL NOT be enabled to initiate contact with internal users.
@@ -267,7 +269,8 @@ Unmanaged users SHALL NOT be enabled to initiate contact with internal users.
 - _Rationale:_ Allowing contact from unmanaged users can expose users to email and contact address harvesting. This policy provides protection against this type of harvesting. 
 - _Last modified:_ July 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1204.001:Malicious Link](https://attack.mitre.org/techniques/T1204/001/)
+  - [T1204: User Execution](https://attack.mitre.org/techniques/T1204/)
+    - [T1204.001: Malicious Link](https://attack.mitre.org/techniques/T1204/001/)
 
 #### MS.TEAMS.2.3v1
 Internal users SHOULD NOT be enabled to initiate contact with unmanaged users.
@@ -277,7 +280,8 @@ Internal users SHOULD NOT be enabled to initiate contact with unmanaged users.
 - _Last modified:_ July 2023
 - _Note:_ This policy is not applicable to Government Community Cloud (GCC), GCC High, and Department of Defense (DoD) tenants.  
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1204.002:Malicious File](https://attack.mitre.org/techniques/T1204/002/)
+  - [T1204: User Execution](https://attack.mitre.org/techniques/T1204/)
+    - [T1204.001: Malicious Link](https://attack.mitre.org/techniques/T1204/001/)
 
 ### Resources
 
@@ -366,7 +370,7 @@ Contact with Skype users SHALL be blocked.
 - _Rationale:_ Microsoft is officially retiring all forms of Skype as listed above. Allowing contact with Skype users puts agency users at additional security risk.  By blocking contact with Skype users an agency limits access to security threats utilizing the vulnerabilities of the Skype product.
 - _Last modified:_ July 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1567:Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)
+  - [T1567: Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)
 
 ### Resources
 
@@ -405,8 +409,9 @@ Teams email integration SHALL be disabled.
 - _Last modified:_ July 2023
 - _Note:_ Teams email integration is not available in GCC, GCC High, or DoD regions.
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1204.001:Malicious Link](https://attack.mitre.org/techniques/T1204/001/)
-  - [T1204.002:Malicious File](https://attack.mitre.org/techniques/T1204/002/)
+  - [T1204: User Execution](https://attack.mitre.org/techniques/T1204/)
+    - [T1204.001: Malicious Link](https://attack.mitre.org/techniques/T1204/001/)
+    - [T1204.002: Malicious File](https://attack.mitre.org/techniques/T1204/002/)
 
 ### Resources
 
@@ -450,7 +455,7 @@ Agencies SHOULD only allow installation of Microsoft apps approved by the agency
 - _Last modified:_ July 2023
 - _Note:_ This policy applies to the Global (Org-wide default) policy, all custom policies, and the org-wide app settings. Custom policies MAY be created to allow more flexibility for specific users.
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1195:Supply Chain Compromise](https://attack.mitre.org/techniques/T1195/)
+  - [T1195: Supply Chain Compromise](https://attack.mitre.org/techniques/T1195/)
 
 #### MS.TEAMS.5.2v1
 Agencies SHOULD only allow installation of third-party apps approved by the agency.
@@ -460,8 +465,8 @@ Agencies SHOULD only allow installation of third-party apps approved by the agen
 - _Last modified:_ July 2023
 - _Note:_ This policy applies to the Global (Org-wide default) policy, all custom policies if they exist, and the org-wide settings. Custom policies MAY be created to allow more flexibility for specific users. Third-party apps are not available in GCC, GCC High, or DoD regions.
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1195:Supply Chain Compromise](https://attack.mitre.org/techniques/T1195/)
-  - [T1528:Steal Application Access Token](https://attack.mitre.org/techniques/T1528/)
+  - [T1195: Supply Chain Compromise](https://attack.mitre.org/techniques/T1195/)
+  - [T1528: Steal Application Access Token](https://attack.mitre.org/techniques/T1528/)
 
 #### MS.TEAMS.5.3v1
 Agencies SHOULD only allow installation of custom apps approved by the agency.
@@ -471,8 +476,8 @@ Agencies SHOULD only allow installation of custom apps approved by the agency.
 - _Last modified:_ July 2023
 - _Note:_ This policy applies to the Global (Org-wide default) policy, all custom policies if they exist, and the org-wide settings. Custom policies MAY be created to allow more flexibility for specific users. Custom apps are not available in GCC, GCC High, or DoD regions.
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1195:Supply Chain Compromise](https://attack.mitre.org/techniques/T1195/)
-  - [T1528:Steal Application Access Token](https://attack.mitre.org/techniques/T1528/)
+  - [T1195: Supply Chain Compromise](https://attack.mitre.org/techniques/T1195/)
+  - [T1528: Steal Application Access Token](https://attack.mitre.org/techniques/T1528/)
 
 ### Resources
 
@@ -577,8 +582,8 @@ A DLP solution SHALL be enabled. The selected DLP solution SHOULD offer services
 - _Rationale:_ Teams users may inadvertently disclose sensitive information to unauthorized individuals. Data loss prevention policies provide a way for agencies to detect and prevent unauthorized disclosures.
 - _Last modified:_ July 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1213:Data from Information Repositories](https://attack.mitre.org/techniques/T1213/)
-  - [T1530:Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)
+  - [T1213: Data from Information Repositories](https://attack.mitre.org/techniques/T1213/)
+  - [T1530: Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)
 
 #### MS.TEAMS.6.2v1
 The DLP solution SHALL protect personally identifiable information (PII)
@@ -589,8 +594,8 @@ and Social Security numbers (SSNs) via email SHALL be restricted.
 - _Rationale:_ Teams users may inadvertently share sensitive information with others who should not have access to it. Data loss prevention policies provide a way for agencies to detect and prevent unauthorized sharing of sensitive information. 
 - _Last modified:_ July 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1213:Data from Information Repositories](https://attack.mitre.org/techniques/T1213/)
-  - [T1530:Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)
+  - [T1213: Data from Information Repositories](https://attack.mitre.org/techniques/T1213/)
+  - [T1530: Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)
 
 ### Resources
 
@@ -633,7 +638,8 @@ Attachments included with Teams messages SHOULD be scanned for malware.
 - _Rationale:_ Teams can be used as a mechanism for delivering malware. In many cases, malware can be detected through scanning, reducing the risk for end users.
 - _Last modified:_ July 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1566.001:Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
+  - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
+    - [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
 
 #### MS.TEAMS.7.2v1
 Users SHOULD be prevented from opening or downloading files detected as malware.
@@ -642,7 +648,9 @@ Users SHOULD be prevented from opening or downloading files detected as malware.
 - _Rationale:_ Teams can be used as a mechanism for delivering malware. In many cases, malware can be detected through scanning, reducing the risk for end users.
 - _Last modified:_ July 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1204.002:Malicious File](https://attack.mitre.org/techniques/T1204/002/)
+  - [T1204: User Execution](https://attack.mitre.org/techniques/T1204/)
+    - [T1204.002: Malicious File](https://attack.mitre.org/techniques/T1204/002/)
+
 
 ### Resources
 
@@ -704,9 +712,11 @@ URL comparison with a blocklist SHOULD be enabled.
 - _Rationale:_ Users may be directed to malicious websites via links in Teams. Blocking access to known malicious URLs can help prevent users from accessing known malicious websites.
 - _Last modified:_ July 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1204.001:Malicious Link](https://attack.mitre.org/techniques/T1204/001/)
-  - [T1204.002:Malicious File](https://attack.mitre.org/techniques/T1204/002/)
-  - [T1566.002:Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
+  - [T1204: User Execution](https://attack.mitre.org/techniques/T1204/)
+    - [T1204.001: Malicious Link](https://attack.mitre.org/techniques/T1204/001/)
+    - [T1204.002: Malicious File](https://attack.mitre.org/techniques/T1204/002/)
+  - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
+    - [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
   - [T1189:Drive-by Compromise](https://attack.mitre.org/techniques/T1189/)
 
 #### MS.TEAMS.8.2v1
@@ -716,9 +726,11 @@ User click tracking SHOULD be enabled.
 - _Rationale:_ Users may click on malicious links in Teams, leading to compromise or authorized data disclosure. Enabling user click tracking lets agencies know if a malicious link may have been visited after the fact to help tailor a response to a potential incident.
 - _Last modified:_ July 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1204.001:Malicious Link](https://attack.mitre.org/techniques/T1204/001/)
-  - [T1204.002:Malicious File](https://attack.mitre.org/techniques/T1204/002/)
-  - [T1566.002:Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
+  - [T1204: User Execution](https://attack.mitre.org/techniques/T1204/)
+    - [T1204.001: Malicious Link](https://attack.mitre.org/techniques/T1204/001/)
+    - [T1204.002: Malicious File](https://attack.mitre.org/techniques/T1204/002/)
+  - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
+    - [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
   - [T1189:Drive-by Compromise](https://attack.mitre.org/techniques/T1189/)
 
 ### Resources
