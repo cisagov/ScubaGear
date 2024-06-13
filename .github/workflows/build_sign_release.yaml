@@ -5,6 +5,7 @@ name: Build and Draft Release
 on:
   workflow_dispatch:
     inputs:
+      # checkov:skip=CKV_GHA_7:Manual inputs are desired.
       releaseName:
         description: "Release Name"
         required: true
@@ -18,6 +19,8 @@ on:
         required: false
         type: boolean
         default: true
+
+permissions: read-all
 
 jobs:
   build-and-draft:
@@ -37,7 +40,7 @@ jobs:
         with:
           path: repo
       - name: OIDC Login to Azure Public Cloud with AzPowershell (enableAzPSSession true)
-        uses: azure/login@v1
+        uses: azure/login@v2
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}

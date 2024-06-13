@@ -1,21 +1,23 @@
 # Purpose: Publish on demand to the real gallery (PSGallery).
+# Note: If the published package is pre-release, then all 3 of the manual inputs, the module version, the pre-release boolean, and the tag, should be entered.
 
 name: Publish Public Package
 
 on:
   workflow_dispatch:
     inputs:
+      # checkov:skip=CKV_GHA_7:Manual inputs are desired.
       OverrideModuleVersion:
-        description: "Override the version of the release. Restricted to SemVer 1.0 - 3 segments"
+        description: "Always enter the release version in semantic version format, Major.Minor.Patch (e.g., 1.3.0):"
         required: false
         type: string
       IsPrerelease:
-        description: "Is this a prerelease"
+        description: "If pre-release, check here:"
         required: false
         type: boolean
         default: false
       PrereleaseTag:
-        description: "The prerelease tag: (-)?[0-9A-Za-z]+ (e.g. -alpha1, -rc2, b1234)"
+        description: "If pre-release, enter prerelease tag in [0-9A-Za-z]+ format (e.g., alpha1, rc2, test04):"
         required: false
         type: string
   # for testing
@@ -23,6 +25,8 @@ on:
   #   paths:
   #     - ".github/workflows/publish_public_package.yaml"
   #     - "utils/DeployUtils.ps1"
+
+permissions: read-all
 
 jobs:
   publish:
@@ -46,7 +50,7 @@ jobs:
           dotnet tool install --global AzureSignTool --version 4.0.1
       # OIDC Login to Azure Public Cloud with AzPowershell (enableAzPSSession true)
       - name: Login to Azure
-        uses: azure/login@v1
+        uses: azure/login@v2
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
@@ -80,27 +84,31 @@ jobs:
             GalleryName = 'PSGallery'
             NuGetApiKey = $ApiKey
           }
-          # if ('true' -eq '${{ inputs.IsPrerelease }}')
-          # {
-          #   $Parameters.Add('PrereleaseTag', '${{ inputs.PrereleaseTag }}')
-          # }
-          # if (-Not [string]::IsNullOrEmpty('${{ inputs.OverrideModuleVersion }}'))
-          # {
-          #   $Parameters.Add('OverrideModuleVersion', '${{ inputs.OverrideModuleVersion }}')
-          # }
+          if ('true' -eq '${{ inputs.IsPrerelease }}')
+          {
+            Write-Output "Adding IsPrerelease"
+            Write-Output ${{ inputs.IsPrerelease }}
+            $Parameters.Add('PrereleaseTag', '${{ inputs.PrereleaseTag }}')
+          }
+          if (-Not [string]::IsNullOrEmpty('${{ inputs.OverrideModuleVersion }}'))
+          {
+            Write-Output "Adding OverrideModuleVersion"
+            Write-Output ${{ inputs.OverrideModuleVersion }}
+            $Parameters.Add('OverrideModuleVersion', '${{ inputs.OverrideModuleVersion }}')
+          }
           # This publishes to PSGallery.
           Publish-ScubaGearModule @Parameters
       # This is a manual test that simply writes the version to the console
-      - name: Print Scuba Version
+      - name: Test Scuba Version
         run: |
           if ('true' -eq '${{ inputs.IsPrerelease }}')
           {
-            $Version = '${{ inputs.OverrideModuleVersion }}' + '${{ inputs.PrereleaseTag }}'
-            Write-Host "Checking for prerelease with required version: " + $Version
+            $Version = '${{ inputs.OverrideModuleVersion }}' + '-' + '${{ inputs.PrereleaseTag }}'
+            Write-Output "Checking for prerelease with required version: $Version"
             Find-Module -Name ScubaGear -RequiredVersion $Version -AllowPrerelease
           }
           else
           {
-            Write-Host "Installing latest version"
+            Write-Output "Installing latest version"
             Find-Module -Name ScubaGear
           }

@@ -55,21 +55,46 @@ TestPlan:
   - PolicyId: MS.DEFENDER.1.3v1
     TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.DEFENDER.1.3v1 Non-compliant - No defender license
+      - TestDescription: MS.DEFENDER.1.3v1 Non-compliant - No Defender for O365 license
         Preconditions: []
         Postconditions: []
         ExpectedResult: false
   - PolicyId: MS.DEFENDER.1.5v1
     TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.DEFENDER.1.5v1 Non-compliant - No defender license
+      - TestDescription: MS.DEFENDER.1.5v1 Non-compliant - No Defender for O365 license
         Preconditions: []
         Postconditions: []
         ExpectedResult: false
+
+  - PolicyId: MS.DEFENDER.2.1v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.DEFENDER.2.1v1 Non-compliant - No Defender for O365 license
+        Preconditions: []
+        Postconditions: []
+        ExpectedResult: false
+
+  - PolicyId: MS.DEFENDER.2.2v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.DEFENDER.2.2v1 Non-compliant - No Defender for O365 license
+        Preconditions: []
+        Postconditions: []
+        ExpectedResult: false
+
+  - PolicyId: MS.DEFENDER.2.3v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.DEFENDER.2.3v1 Non-compliant - No Defender for O365 license
+        Preconditions: []
+        Postconditions: []
+        ExpectedResult: false
+
   - PolicyId: MS.DEFENDER.3.1v1
     TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.DEFENDER.3.1v1 Non-compliant - No defender license
+      - TestDescription: MS.DEFENDER.3.1v1 Non-compliant - No Defender for O365 license
         Preconditions: []
         Postconditions: []
         ExpectedResult: false

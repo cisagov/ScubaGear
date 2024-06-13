@@ -6,6 +6,8 @@ on:
         - cron: "11 2 * * 1-5"
     workflow_dispatch:
 
+permissions: read-all
+
 jobs:
     update-opa-dependency:
         runs-on: windows-latest

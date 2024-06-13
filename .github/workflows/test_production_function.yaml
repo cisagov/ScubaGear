@@ -13,6 +13,8 @@ on:
     - cron: "15 4 * * 0-4"
   workflow_dispatch:
 
+permissions: read-all
+
 jobs:
   # Build a matrix of aliases for testing.
   build-matrix:
