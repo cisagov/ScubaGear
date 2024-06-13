@@ -68,10 +68,11 @@ Legacy authentication SHALL be blocked.
 - _Last modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
   - [T1110: Brute Force](https://attack.mitre.org/techniques/T1110/)
-  - [T1110.001: Password Guessing](https://attack.mitre.org/techniques/T1110/001/)
-  - [T1110.002: Password Cracking](https://attack.mitre.org/techniques/T1110/002/)
-  - [T1110.003: Password Spraying](https://attack.mitre.org/techniques/T1110/003/)
-  - [T1078.004: Cloud Accounts](https://attack.mitre.org/techniques/T078/004/)
+    - [T1110.001: Password Guessing](https://attack.mitre.org/techniques/T1110/001/)
+    - [T1110.002: Password Cracking](https://attack.mitre.org/techniques/T1110/002/)
+    - [T1110.003: Password Spraying](https://attack.mitre.org/techniques/T1110/003/)
+  - [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)
+    - [T1078.004: Cloud Accounts](https://attack.mitre.org/techniques/T078/004/)
 
 ### Resources
 
@@ -108,7 +109,8 @@ Users detected as high risk SHALL be blocked.
 - _Last modified:_ June 2023
 - _Note:_ Users identified as high risk by Azure AD Identity Protection can be blocked from accessing the system via an Azure AD Conditional Access policy. A high-risk user will be blocked until an administrator remediates their account.
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1078.004: Cloud Accounts](https://attack.mitre.org/techniques/T078/004/)
+  - [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)
+    - [T1078.004: Cloud Accounts](https://attack.mitre.org/techniques/T078/004/)
 
 #### MS.AAD.2.2v1
 A notification SHOULD be sent to the administrator when high-risk users are detected.
@@ -117,8 +119,8 @@ A notification SHOULD be sent to the administrator when high-risk users are dete
 - _Rationale:_ Notification enables the admin to monitor the event and remediate the risk. This helps the organization proactively respond to cyber intrusions as they occur.
 - _Last modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1078.004: Cloud Accounts](https://attack.mitre.org/techniques/T078/004/)
-
+  - [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)
+    - [T1078.004: Cloud Accounts](https://attack.mitre.org/techniques/T078/004/)
 
 #### MS.AAD.2.3v1
 Sign-ins detected as high risk SHALL be blocked.
@@ -127,7 +129,8 @@ Sign-ins detected as high risk SHALL be blocked.
 - _Rationale:_ This prevents compromised accounts from accessing the tenant.
 - _Last modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1078.004: Cloud Accounts](https://attack.mitre.org/techniques/T078/004/)
+  - [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)
+    - [T1078.004: Cloud Accounts](https://attack.mitre.org/techniques/T078/004/)
 
 ### Resources
 
@@ -198,10 +201,9 @@ If on-premises PIV authentication and federation to Azure AD is used, [enforce P
 - _Rationale:_ Weaker forms of MFA do not protect against sophisticated phishing attacks. By enforcing methods resistant to phishing, those risks are minimized.
 - _Last modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1566.002:Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
-  - [T1566.001:Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
-  - [T1566:Phishing](https://attack.mitre.org/techniques/T1566/)
-
+  - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
+    - [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
+    - [T1566.002: Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
 
 #### MS.AAD.3.2v1
 If phishing-resistant MFA has not been enforced, an alternative MFA method SHALL be enforced for all users.
@@ -211,11 +213,11 @@ If phishing-resistant MFA has not been enforced, an alternative MFA method SHALL
 - _Last modified:_ June 2023
 - _Note:_ If a conditional access policy has been created enforcing phishing-resistant MFA, then this policy is not necessary. This policy does not dictate the specific MFA method.
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1110.001:Password Guessing](https://attack.mitre.org/techniques/T1110/001/)
-  - [T1110.002:Password Cracking](https://attack.mitre.org/techniques/T1110/002/)
-  - [T1110.003:Password Spraying](https://attack.mitre.org/techniques/T1110/003/)
-  - [T1110:Brute Force](https://attack.mitre.org/techniques/T1110/)
-
+  - [T1110: Brute Force](https://attack.mitre.org/techniques/T1110/)
+    - [T1110.001: Password Guessing](https://attack.mitre.org/techniques/T1110/001/)
+    - [T1110.002: Password Cracking](https://attack.mitre.org/techniques/T1110/002/)
+    - [T1110.003: Password Spraying](https://attack.mitre.org/techniques/T1110/003/)
+    
 #### MS.AAD.3.3v1
 If phishing-resistant MFA has not been enforced and Microsoft Authenticator is enabled, it SHALL be configured to show login context information.
 
@@ -223,10 +225,10 @@ If phishing-resistant MFA has not been enforced and Microsoft Authenticator is e
 - _Rationale:_ This stopgap security policy helps protect the tenant when phishing-resistant MFA has not been enforced and Microsoft Authenticator is used. This policy helps improve the security of Microsoft Authenticator by showing user context information, which helps reduce MFA phishing compromises.
 - _Last modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1110.001:Password Guessing](https://attack.mitre.org/techniques/T1110/001/)
-  - [T1110.002:Password Cracking](https://attack.mitre.org/techniques/T1110/002/)
-  - [T1110.003:Password Spraying](https://attack.mitre.org/techniques/T1110/003/)
-  - [T1110:Brute Force](https://attack.mitre.org/techniques/T1110/)
+  - [T1110: Brute Force](https://attack.mitre.org/techniques/T1110/)
+    - [T1110.001: Password Guessing](https://attack.mitre.org/techniques/T1110/001/)
+    - [T1110.002: Password Cracking](https://attack.mitre.org/techniques/T1110/002/)
+    - [T1110.003: Password Spraying](https://attack.mitre.org/techniques/T1110/003/)
 
 
 #### MS.AAD.3.4v1
@@ -244,10 +246,9 @@ The authentication methods SMS, Voice Call, and Email One-Time Passcode (OTP) SH
 - _Last modified:_ June 2023
 - _Note:_ This policy is only applicable if the tenant has their Manage Migration feature set to Migration Complete.
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1566.002:Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
-  - [T1621:Multi-Factor Authentication Request Generation](https://attack.mitre.org/techniques/T1621/)
-
-
+  - [T1621: Multi-Factor Authentication Request Generation](https://attack.mitre.org/techniques/T1621/)
+  - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
+    - [T1566.002: Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
 
 #### MS.AAD.3.6v1
 Phishing-resistant MFA SHALL be required for highly privileged roles.
@@ -257,10 +258,11 @@ Phishing-resistant MFA SHALL be required for highly privileged roles.
 - _Last modified:_ June 2023
 - _Note:_ Refer to the Highly Privileged Roles section at the top of this document for a reference list of roles considered highly privileged.
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1566.002:Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
-  - [T1566.001:Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
-  - [T1566:Phishing](https://attack.mitre.org/techniques/T1566/)
-  - [T1078.004:Cloud Accounts](https://attack.mitre.org/techniques/T1078/004/)
+  - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
+    - [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
+    - [T1566.002: Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
+  - [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)
+    - [T1078.004: Cloud Accounts](https://attack.mitre.org/techniques/T078/004/)
 
 #### MS.AAD.3.7v1
 Managed devices SHOULD be required for authentication.
@@ -269,8 +271,8 @@ Managed devices SHOULD be required for authentication.
 - _Rationale:_ The security risk of an adversary authenticating to the tenant from their own device is reduced by requiring a managed device to authenticate. Managed devices are under the provisioning and control of the agency. [OMB-22-09](https://www.whitehouse.gov/wp-content/uploads/2022/01/M-22-09.pdf) states, "When authorizing users to access resources, agencies must consider at least one device-level signal alongside identity information about the authenticated user."
 - _Last modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1078.004:Cloud Accounts](https://attack.mitre.org/techniques/T1078/004/)
-
+  - [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)
+    - [T1078.004: Cloud Accounts](https://attack.mitre.org/techniques/T078/004/)
 
 #### MS.AAD.3.8v1
 Managed Devices SHOULD be required to register MFA.
@@ -279,8 +281,10 @@ Managed Devices SHOULD be required to register MFA.
 - _Rationale:_ Reduce risk of an adversary using stolen user credentials and then registering their own MFA device to access the tenant by requiring a managed device provisioned and controlled by the agency to perform registration actions. This prevents the adversary from using their own unmanaged device to perform the registration.
 - _Last modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1078.004:Cloud Accounts](https://attack.mitre.org/techniques/T1078/004/)
-  - [T1098.005:Device Registration](https://attack.mitre.org/techniques/T1098.005/)
+  - [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)
+    - [T1078.004: Cloud Accounts](https://attack.mitre.org/techniques/T078/004/)
+  - [T1098: Account Manipulation](https://attack.mitre.org/techniques/T1098/)
+    - [T1098.005:Device Registration](https://attack.mitre.org/techniques/T1098/005/)
 
 ### Resources
 
@@ -395,8 +399,8 @@ Security logs SHALL be sent to the agency's security operations center for monit
 - _Note:_ The following logs (configured in Azure AD diagnostic settings), are required: `AuditLogs, SignInLogs, RiskyUsers, UserRiskEvents, NonInteractiveUserSignInLogs, ServicePrincipalSignInLogs, ADFSSignInLogs, RiskyServicePrincipals, ServicePrincipalRiskEvents, EnrichedOffice365AuditLogs, MicrosoftGraphActivityLogs`. If managed identities are used for Azure resources, also send the `ManagedIdentitySignInLogs` log type. If the Azure AD Provisioning Service is used to provision users to software-as-a-service (SaaS) apps or other systems, also send the `ProvisioningLogs` log type.
 - _Note:_ Agencies can benefit from security detection capabilities offered by the CISA Cloud Log Aggregation Warehouse (CLAW) system. Agencies are urged to send the logs to CLAW. Contact CISA at cyberliason@cisa.dhs.gov to request integration instructions.
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1562.008:Disable or Modify Cloud Logs](https://attack.mitre.org/techniques/T1562/008/)
-
+  - [T1562: Impair Defenses](https://attack.mitre.org/techniques/T1562/)
+    - [T1562.008: Disable or Modify Cloud Logs](https://attack.mitre.org/techniques/T1562/008/)
 
 ### Resources
 
@@ -428,8 +432,9 @@ Only administrators SHALL be allowed to register applications.
 - _Rationale:_ Application access for the tenant presents a heightened security risk compared to interactive user access because applications are typically not subject to critical security protections, such as MFA policies. Reduce risk of unauthorized users installing malicious applications into the tenant by ensuring that only specific privileged users can register applications.
 - _Last modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1098.001:Additional Cloud Credentials](https://attack.mitre.org/techniques/T1098/001/)
-  - [T1098.003:Additional Cloud Roles](https://attack.mitre.org/techniques/T1098/003/)
+  - [T1098: Account Manipulation](https://attack.mitre.org/techniques/T1098/)
+    - [T1098.001: Additional Cloud Credentials](https://attack.mitre.org/techniques/T1098/001/)
+    - [T1098.003: Additional Cloud Roles](https://attack.mitre.org/techniques/T1098/003/)
 
 #### MS.AAD.5.2v1
 Only administrators SHALL be allowed to consent to applications.
@@ -438,8 +443,9 @@ Only administrators SHALL be allowed to consent to applications.
 - _Rationale:_ Limiting applications consent to only specific privileged users reduces risk of users giving insecure applications access to their data via [consent grant attacks](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/detect-and-remediate-illicit-consent-grants?view=o365-worldwide).
 - _Last modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1098.001:Additional Cloud Credentials](https://attack.mitre.org/techniques/T1098/001/)
-  - [T1098.003:Additional Cloud Roles](https://attack.mitre.org/techniques/T1098/003/)
+  - [T1098: Account Manipulation](https://attack.mitre.org/techniques/T1098/)
+    - [T1098.001: Additional Cloud Credentials](https://attack.mitre.org/techniques/T1098/001/)
+    - [T1098.003: Additional Cloud Roles](https://attack.mitre.org/techniques/T1098/003/)
 
 #### MS.AAD.5.3v1
 An admin consent workflow SHALL be configured for applications.
@@ -448,8 +454,9 @@ An admin consent workflow SHALL be configured for applications.
 - _Rationale:_ Configuring an admin consent workflow reduces the risk of the previous policy by setting up a process for users to securely request access to applications necessary for business purposes. Administrators have the opportunity to review the permissions requested by new applications and approve or deny access based on a risk assessment.
 - _Last modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1098.001:Additional Cloud Credentials](https://attack.mitre.org/techniques/T1098/001/)
-  - [T1098.003:Additional Cloud Roles](https://attack.mitre.org/techniques/T1098/003/)
+  - [T1098: Account Manipulation](https://attack.mitre.org/techniques/T1098/)
+    - [T1098.001: Additional Cloud Credentials](https://attack.mitre.org/techniques/T1098/001/)
+    - [T1098.003: Additional Cloud Roles](https://attack.mitre.org/techniques/T1098/003/)
 
 #### MS.AAD.5.4v1
 Group owners SHALL NOT be allowed to consent to applications.
@@ -458,8 +465,9 @@ Group owners SHALL NOT be allowed to consent to applications.
 - _Rationale:_ In M365, group owners and team owners can consent to applications accessing data in the tenant. By requiring consent requests to go through an approval workflow, risk of exposure to malicious applications is reduced.
 - _Last modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1098.001:Additional Cloud Credentials](https://attack.mitre.org/techniques/T1098/001/)
-  - [T1098.003:Additional Cloud Roles](https://attack.mitre.org/techniques/T1098/003/)
+  - [T1098: Account Manipulation](https://attack.mitre.org/techniques/T1098/)
+    - [T1098.001: Additional Cloud Credentials](https://attack.mitre.org/techniques/T1098/001/)
+    - [T1098.003: Additional Cloud Roles](https://attack.mitre.org/techniques/T1098/003/)
 
 ### Resources
 
@@ -563,8 +571,8 @@ A minimum of two users and a maximum of eight users SHALL be provisioned with th
 - _Rationale:_  The Global Administrator role provides unfettered access to the tenant. Limiting the number of users with this level of access makes tenant compromise more challenging. Microsoft recommends fewer than five users in the Global Administrator role. However, additional user accounts, up to eight, may be necessary to support emergency access and some operational scenarios.
 - _Last modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1098.003:Additional Cloud Roles](https://attack.mitre.org/techniques/T1098/003/)
-
+  - [T1098: Account Manipulation](https://attack.mitre.org/techniques/T1098/)
+    - [T1098.003: Additional Cloud Roles](https://attack.mitre.org/techniques/T1098/003/)
 
 #### MS.AAD.7.2v1
 Privileged users SHALL be provisioned with finer-grained roles instead of Global Administrator.
@@ -573,12 +581,11 @@ Privileged users SHALL be provisioned with finer-grained roles instead of Global
 - _Rationale:_ Many privileged administrative users do not need unfettered access to the tenant to perform their duties. By assigning them to roles based on least privilege, the risks associated with having their accounts compromised are reduced.
 - _Last modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1098:Account Manipulation](https://attack.mitre.org/techniques/T1098/)
-  - [T1098.003:Additional Cloud Roles](https://attack.mitre.org/techniques/T1098/003/)
-  - [T1651:Cloud Administration Command](https://attack.mitre.org/techniques/T1651/)
-  - [T1136.003:Cloud Account](https://attack.mitre.org/techniques/T1136/003/)
-  - [T1136:Create Account](https://attack.mitre.org/techniques/T1136/)
-
+  - [T1098: Account Manipulation](https://attack.mitre.org/techniques/T1098/)
+    - [T1098.003: Additional Cloud Roles](https://attack.mitre.org/techniques/T1098/003/)
+  - [T1651: Cloud Administration Command](https://attack.mitre.org/techniques/T1651/)
+  - [T1136: Create Account](https://attack.mitre.org/techniques/T1136/)
+    - [T1136.003: Cloud Account](https://attack.mitre.org/techniques/T1136/003/)
 
 #### MS.AAD.7.3v1
 Privileged users SHALL be provisioned cloud-only accounts separate from an on-premises directory or other federated identity providers.
@@ -587,8 +594,8 @@ Privileged users SHALL be provisioned cloud-only accounts separate from an on-pr
 - _Rationale:_ By provisioning cloud-only Azure AD user accounts to privileged users, the risks associated with a compromise of on-premises federation infrastructure are reduced. It is more challenging for the adversary to pivot from the compromised environment to the cloud with privileged access.
 - _Last modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1556.007:Hybrid Identity](https://attack.mitre.org/techniques/T1556/007/)
-
+  - [T1556: Modify Authentication Process](https://attack.mitre.org/techniques/T1556/)
+    - [T1556.007:Hybrid Identity](https://attack.mitre.org/techniques/T1556/007/)
 
 #### MS.AAD.7.4v1
 Permanent active role assignments SHALL NOT be allowed for highly privileged roles.
@@ -600,7 +607,8 @@ Permanent active role assignments SHALL NOT be allowed for highly privileged rol
   - Emergency access accounts that need perpetual access to the tenant in the rare event of system degradation or other scenarios.
   - Some types of service accounts that require a user account with privileged roles; since these accounts are used by software programs, they cannot perform role activation.
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1098.003:Additional Cloud Roles](https://attack.mitre.org/techniques/T1098/003/)
+  - [T1098: Account Manipulation](https://attack.mitre.org/techniques/T1098/)
+    - [T1098.003: Additional Cloud Roles](https://attack.mitre.org/techniques/T1098/003/)
 
 #### MS.AAD.7.5v1
 Provisioning users to highly privileged roles SHALL NOT occur outside of a PAM system.
@@ -618,7 +626,8 @@ Activation of the Global Administrator role SHALL require approval.
 - _Rationale:_ Requiring approval for a user to activate Global Administrator, which provides unfettered access, makes it more challenging for an attacker to compromise the tenant with stolen credentials and it provides visibility of activities indicating a compromise is taking place.
 - _Last modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1098.003:Additional Cloud Roles](https://attack.mitre.org/techniques/T1098/003/)
+  - [T1098: Account Manipulation](https://attack.mitre.org/techniques/T1098/)
+    - [T1098.003: Additional Cloud Roles](https://attack.mitre.org/techniques/T1098/003/)
 
 #### MS.AAD.7.7v1
 Eligible and Active highly privileged role assignments SHALL trigger an alert.
@@ -627,7 +636,8 @@ Eligible and Active highly privileged role assignments SHALL trigger an alert.
 - _Rationale:_ Closely monitor assignment of the highest privileged roles for signs of compromise. Send assignment alerts to enable the security monitoring team to detect compromise attempts.
 - _Last modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1098.003:Additional Cloud Roles](https://attack.mitre.org/techniques/T1098/003/)
+  - [T1098: Account Manipulation](https://attack.mitre.org/techniques/T1098/)
+    - [T1098.003: Additional Cloud Roles](https://attack.mitre.org/techniques/T1098/003/)
 
 #### MS.AAD.7.8v1
 User activation of the Global Administrator role SHALL trigger an alert.
@@ -637,7 +647,8 @@ User activation of the Global Administrator role SHALL trigger an alert.
 - _Last modified:_ June 2023
 - _Note:_ It is recommended to prioritize user activation of Global Administrator as one of the most important events to monitor and respond to.
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1098.003:Additional Cloud Roles](https://attack.mitre.org/techniques/T1098/003/)
+  - [T1098: Account Manipulation](https://attack.mitre.org/techniques/T1098/)
+    - [T1098.003: Additional Cloud Roles](https://attack.mitre.org/techniques/T1098/003/)
 
 #### MS.AAD.7.9v1
 User activation of other highly privileged roles SHOULD trigger an alert.
@@ -646,9 +657,10 @@ User activation of other highly privileged roles SHOULD trigger an alert.
 - _Rationale:_ Closely monitor activation of high-risk roles for signs of compromise. Send activation alerts to enable the security monitoring team to detect compromise attempts. In some environments, activating privileged roles can generate a significant number of alerts.
 - _Last modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1098.003:Additional Cloud Roles](https://attack.mitre.org/techniques/T1098/003/)
+  - [T1098: Account Manipulation](https://attack.mitre.org/techniques/T1098/)
+    - [T1098.003: Additional Cloud Roles](https://attack.mitre.org/techniques/T1098/003/)
   - [T1136:Create Account](https://attack.mitre.org/techniques/T1136/)
-  - [T1136.003:Cloud Account](https://attack.mitre.org/techniques/T1136/003/)
+    - [T1136.003:Cloud Account](https://attack.mitre.org/techniques/T1136/003/)
 
 
 ### Resources
@@ -802,6 +814,11 @@ Guest users SHOULD have limited or restricted access to Azure AD directory objec
 <!--Policy: MS.AAD.8.1v1; Criticality: SHOULD -->
 - _Rationale:_ Limiting the amount of object information available to guest users in the tenant, reduces malicious reconnaissance exposure, should a guest account become compromised or be created by an adversary.
 - _Last modified:_ June 2023
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1087: Account Discovery](https://attack.mitre.org/techniques/T1087/)
+    - [T1087.003: Email Account](https://attack.mitre.org/techniques/T1087/003/)
+    - [T1087.004: Cloud Account](https://attack.mitre.org/techniques/T1087/004/)
+  - [T1526:Cloud Service Discovery](https://attack.mitre.org/techniques/T1526/)
 
 #### MS.AAD.8.2v1
 Only users with the Guest Inviter role SHOULD be able to invite guest users.
@@ -809,6 +826,9 @@ Only users with the Guest Inviter role SHOULD be able to invite guest users.
 <!--Policy: MS.AAD.8.2v1; Criticality: SHOULD -->
 - _Rationale:_ By only allowing an authorized group of individuals to invite external users to create accounts in the tenant, an agency can enforce a guest user account approval process, reducing the risk of unauthorized account creation.
 - _Last modified:_ June 2023
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1098: Account Manipulation](https://attack.mitre.org/techniques/T1098/)
+    - [T1098.003: Additional Cloud Roles](https://attack.mitre.org/techniques/T1098/003/)
 
 #### MS.AAD.8.3v1
 Guest invites SHOULD only be allowed to specific external domains that have been authorized by the agency for legitimate business purposes.
@@ -816,6 +836,9 @@ Guest invites SHOULD only be allowed to specific external domains that have been
 <!--Policy: MS.AAD.8.3v1; Criticality: SHOULD -->
 - _Rationale:_ Limiting which domains can be invited to create guest accounts in the tenant helps reduce the risk of users from unauthorized external organizations getting access.
 - _Last modified:_ June 2023
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)
+    - [T1078.001: Default Accounts](https://attack.mitre.org/techniques/T1078/001/)
 
 ### Resources
 
