@@ -79,10 +79,10 @@ The standard and strict preset security policies SHALL be enabled.
 - _Rationale:_ Defender includes a large number of features and settings to protect users against threats. Using the preset security policies, administrators can help ensure all new and existing users automatically have secure defaults applied.
 - _Last modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1566:Phishing](https://attack.mitre.org/techniques/T1566/)
-  - [T1566.001:Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
-  - [T1566.002:Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
-  - [T1566.003:Spearphishing via Service](https://attack.mitre.org/techniques/T1566/003/)
+  - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
+    - [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
+    - [T1566.002: Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
+    - [T1566.003: Spearphishing via Service](https://attack.mitre.org/techniques/T1566/003/)
 
 
 #### MS.DEFENDER.1.2v1
@@ -96,10 +96,10 @@ All users SHALL be added to Exchange Online Protection in either the standard or
     by [MS.DEFENDER.1.1v1](#msdefender11v1) for protections to be applied.
   - Specific user accounts, except for sensitive accounts, MAY be exempt from the preset policies, provided they are added to one or more custom policies offering comparable protection. These users might need flexibility not offered by the preset policies. Their accounts should be added to a custom policy conforming, as closely as possible to the settings used by the preset policies. See the **Resources** section for more details on configuring policies.
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1566:Phishing](https://attack.mitre.org/techniques/T1566/)
-  - [T1566.001:Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
-  - [T1566.002:Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
-  - [T1566.003:Spearphishing via Service](https://attack.mitre.org/techniques/T1566/003/)
+  - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
+    - [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
+    - [T1566.002: Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
+    - [T1566.003: Spearphishing via Service](https://attack.mitre.org/techniques/T1566/003/)
 
 #### MS.DEFENDER.1.3v1
 All users SHALL be added to Defender for Office 365 protection in either the standard or strict preset security policy.
@@ -112,10 +112,10 @@ All users SHALL be added to Defender for Office 365 protection in either the sta
     by [MS.DEFENDER.1.1v1](#msdefender11v1) for protections to be applied.
   - Specific user accounts, except for sensitive accounts, MAY be exempt from the preset policies, provided they are added to one or more custom policies offering comparable protection. These users might need flexibility not offered by the preset policies. Their accounts should be added to a custom policy conforming as closely as possible to the settings used by the preset policies. See the **Resources** section for more details on configuring policies.
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1566:Phishing](https://attack.mitre.org/techniques/T1566/)
-  - [T1566.001:Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
-  - [T1566.002:Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
-  - [T1566.003:Spearphishing via Service](https://attack.mitre.org/techniques/T1566/003/)
+  - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
+    - [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
+    - [T1566.002: Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
+    - [T1566.003: Spearphishing via Service](https://attack.mitre.org/techniques/T1566/003/)
 
 #### MS.DEFENDER.1.4v1
 Sensitive accounts SHALL be added to Exchange Online Protection in the strict preset security policy.
@@ -126,9 +126,9 @@ Sensitive accounts SHALL be added to Exchange Online Protection in the strict pr
 - _Note:_ The strict preset security policy must be enabled to protect
           sensitive accounts.
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1566:Phishing](https://attack.mitre.org/techniques/T1566/)
-  - [T1566.001:Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
-  - [T1566.002:Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
+  - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
+    - [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
+    - [T1566.002: Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
 
 #### MS.DEFENDER.1.5v1
 Sensitive accounts SHALL be added to Defender for Office 365 protection in the strict preset security policy.
@@ -139,9 +139,9 @@ Sensitive accounts SHALL be added to Defender for Office 365 protection in the s
 - _Note:_ The strict preset security policy must be enabled to protect
           sensitive accounts.
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1566:Phishing](https://attack.mitre.org/techniques/T1566/)
-  - [T1566.001:Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
-  - [T1566.002:Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
+  - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
+    - [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
+    - [T1566.002: Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
 
 ### Resources
 
@@ -251,10 +251,10 @@ User impersonation protection SHOULD be enabled for sensitive accounts in both t
 - _Note:_ The standard and strict preset security policies must be enabled to
           protect accounts.
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1566:Phishing](https://attack.mitre.org/techniques/T1566/)
-  - [T1566.001:Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
-  - [T1566.002:Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
-  - [T1656:Impersonation](https://attack.mitre.org/techniques/T1656/)
+  - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
+    - [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
+    - [T1566.002: Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
+  - [T1656: Impersonation](https://attack.mitre.org/techniques/T1656/)
 
 #### MS.DEFENDER.2.2v1
 Domain impersonation protection SHOULD be enabled for domains owned by the agency in both the standard and strict preset policies.
@@ -265,9 +265,10 @@ Domain impersonation protection SHOULD be enabled for domains owned by the agenc
 - _Note:_ The standard and strict preset security policies must be enabled to
           protect agency domains.
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1566.001:Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
-  - [T1566.002:Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
-  - [T1656:Impersonation](https://attack.mitre.org/techniques/T1656/)
+  - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
+    - [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
+    - [T1566.002: Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
+  - [T1656: Impersonation](https://attack.mitre.org/techniques/T1656/)
 
 #### MS.DEFENDER.2.3v1
 Domain impersonation protection SHOULD be added for important partners in both the standard and strict preset policies.
@@ -278,10 +279,10 @@ Domain impersonation protection SHOULD be added for important partners in both t
 - _Note:_ The standard and strict preset security policies must be enabled to
           protect partner domains.
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1566:Phishing](https://attack.mitre.org/techniques/T1566/)
-  - [T1566.001:Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
-  - [T1566.002:Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
-  - [T1656:Impersonation](https://attack.mitre.org/techniques/T1656/)
+  - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
+    - [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
+    - [T1566.002: Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
+  - [T1656: Impersonation](https://attack.mitre.org/techniques/T1656/)
 
 ### Resources
 
@@ -370,10 +371,11 @@ Safe attachments SHOULD be enabled for SharePoint, OneDrive, and Microsoft Teams
 - _Rationale:_ Clicking malicious links makes users vulnerable to attacks, and this danger is not limited to links in emails. Other Microsoft products, such as Microsoft Teams, can be used to present users with malicious links. As such, it is important to protect users on these other Microsoft products as well.
 - _Last modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1566.001:Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
-  - [T1204.001:Malicious Link](https://attack.mitre.org/techniques/T1204/001/)
-  - [T1204.002:Malicious File](https://attack.mitre.org/techniques/T1204/002/)
-
+  - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
+    - [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
+  - [T1204.001: User Execution](https://attack.mitre.org/techniques/T1204/)
+    - [T1204.001: Malicious Link](https://attack.mitre.org/techniques/T1204/001/)
+    - [T1204.002: Malicious File](https://attack.mitre.org/techniques/T1204/002/)
 
 ### Resources
 
@@ -435,9 +437,9 @@ A custom policy SHALL be configured to protect PII and sensitive information, as
                unauthorized disclosures.
 - _Last modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1567:Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)
-  - [T1530:Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)
-  - [T1213:Data from Information Repositories](https://attack.mitre.org/techniques/T1213/)
+  - [T1567 :Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)
+  - [T1530: Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)
+  - [T1213: Data from Information Repositories](https://attack.mitre.org/techniques/T1213/)
 
 #### MS.DEFENDER.4.2v1
 The custom policy SHOULD be applied to Exchange, OneDrive, SharePoint, Teams chat, and Devices.
@@ -450,10 +452,10 @@ The custom policy SHOULD be applied to Exchange, OneDrive, SharePoint, Teams cha
 - _Note:_ The custom policy referenced here is the same policy
           configured in [MS.DEFENDER.4.1v1](#msdefender41v1).
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1567:Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)
-  - [T1530:Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)
-  - [T1213:Data from Information Repositories](https://attack.mitre.org/techniques/T1213/)
-  - [T1213.002:Sharepoint](https://attack.mitre.org/techniques/T1213.002/)
+  - [T1567: Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)
+  - [T1530: Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)
+  - [T1213: Data from Information Repositories](https://attack.mitre.org/techniques/T1213/)
+    - [T1213.002: Sharepoint](https://attack.mitre.org/techniques/T1213.002/)
 
 #### MS.DEFENDER.4.3v1
 The action for the custom policy SHOULD be set to block sharing sensitive information with everyone.
@@ -494,9 +496,9 @@ A list of apps that are restricted from accessing files protected by DLP policy 
                to sensitive information on endpoints using Defender.
 - _Last modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1565:Data Manipulation](https://attack.mitre.org/techniques/T1565/)
-  - [T1485:Data Destruction](https://attack.mitre.org/techniques/T1485/)
-  - [T1530:Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)
+  - [T1565: Data Manipulation](https://attack.mitre.org/techniques/T1565/)
+  - [T1485: Data Destruction](https://attack.mitre.org/techniques/T1485/)
+  - [T1530: Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)
 
 #### MS.DEFENDER.4.6v1
 The custom policy SHOULD include an action to block access to sensitive
@@ -517,10 +519,10 @@ information by restricted apps and unwanted Bluetooth applications.
     to the agency tenant. Otherwise, the option to block restricted apps will
     not be available.
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1565:Data Manipulation](https://attack.mitre.org/techniques/T1565/)
-  - [T1485:Data Destruction](https://attack.mitre.org/techniques/T1485/)
-  - [T1530:Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)
-  - [T1486:Data Encrypted for Impact](https://attack.mitre.org/techniques/T1486/)
+  - [T1565: Data Manipulation](https://attack.mitre.org/techniques/T1565/)
+  - [T1485: Data Destruction](https://attack.mitre.org/techniques/T1485/)
+  - [T1530: Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)
+  - [T1486: Data Encrypted for Impact](https://attack.mitre.org/techniques/T1486/)
 
 ### Resources
 
@@ -712,8 +714,8 @@ At a minimum, the alerts required by the CISA M365 Security Configuration Baseli
 - _Rationale:_ Potentially malicious or service-impacting events may go undetected without a means of detecting these events. Setting up a mechanism to alert administrators to the list of events linked above draws attention to them to minimize any impact to users and the agency.
 - _Last modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1562:Impair Defenses](https://attack.mitre.org/techniques/T1562/)
-  - [T1562.006:Indicator Blocking](https://attack.mitre.org/techniques/T1562.006/)
+  - [T1562: Impair Defenses](https://attack.mitre.org/techniques/T1562/)
+    - [T1562.006: Indicator Blocking](https://attack.mitre.org/techniques/T1562/006/)
 
 #### MS.DEFENDER.5.2v1
 The alerts SHOULD be sent to a monitored address or incorporated into a SIEM.
@@ -722,8 +724,8 @@ The alerts SHOULD be sent to a monitored address or incorporated into a SIEM.
 - _Rationale:_ Suspicious or malicious events, if not resolved promptly, may have a greater impact to users and the agency. Sending alerts to a monitored email address or Security Information and Event Management (SIEM) system helps ensure events are acted upon in a timely manner to limit overall impact.
 - _Last modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1562:Impair Defenses](https://attack.mitre.org/techniques/T1562/)
-  - [T1562.006:Indicator Blocking](https://attack.mitre.org/techniques/T1562.006/)
+  - [T1562: Impair Defenses](https://attack.mitre.org/techniques/T1562/)
+    - [T1562.006: Indicator Blocking](https://attack.mitre.org/techniques/T1562/006/)
 
 ### Resources
 
@@ -804,7 +806,8 @@ Microsoft Purview Audit (Standard) logging SHALL be enabled.
 - _Rationale:_ Responding to incidents without detailed information about activities that took place slows response actions. Enabling Microsoft Purview Audit (Standard) helps ensure agencies have visibility into user actions. Furthermore, enabling the unified audit log is required for government agencies by OMB M-21-31 (referred to therein by its former name, Unified Audit Logs).
 - _Last modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1562.008:Disable or Modify Cloud Logs](https://attack.mitre.org/techniques/T1562/008/)
+  - [T1562: Impair Defenses](https://attack.mitre.org/techniques/T1562/)
+    - [T1562.008: Disable or Modify Cloud Logs](https://attack.mitre.org/techniques/T1562/008/)
 
 
 #### MS.DEFENDER.6.2v1
@@ -820,7 +823,7 @@ Microsoft Purview Audit (Premium) logging SHALL be enabled for ALL users.
           Purview (Standard) may be sufficient for agencies to meet basic
           logging requirements.
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1070:Indicator Removal](https://attack.mitre.org/techniques/T1070/)
+  - [T1070: Indicator Removal](https://attack.mitre.org/techniques/T1070/)
 
 #### MS.DEFENDER.6.3v1
 Audit logs SHALL be maintained for at least the minimum duration dictated by OMB M-21-31.
@@ -835,7 +838,7 @@ Audit logs SHALL be maintained for at least the minimum duration dictated by OMB
           Agencies may also consider alternate storage locations and services
           to meet audit log retention needs.
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1070:Indicator Removal](https://attack.mitre.org/techniques/T1070/)
+  - [T1070: Indicator Removal](https://attack.mitre.org/techniques/T1070/)
 
 
 ### Resources
