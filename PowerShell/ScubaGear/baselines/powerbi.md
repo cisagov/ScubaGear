@@ -68,7 +68,7 @@ The Publish to Web feature SHOULD be disabled unless the agency mission requires
 - _Rationale:_ A publicly accessible web URL can be accessed by everyone, including malicious actors. This policy limits information available on the public web that is not specifically allowed to be published.
 - _Last modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1530:Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)
+  - [T1530: Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)
 
 ### Resources
 
@@ -106,10 +106,11 @@ Guest user access to the Power BI tenant SHOULD be disabled unless the agency mi
 - _Rationale:_ Disabling external access to Power BI helps keep guest users from accessing potentially risky data and application programming interfaces (APIs). If an agency needs to allow guest access, this can be limited to users in specific security groups to curb risk.
 - _Last modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1485:Data Destruction](https://attack.mitre.org/techniques/T1485/)
-  - [T1565.001:Stored Data Manipulation](https://attack.mitre.org/techniques/T1565/001/)
-  - [T1078:Valid Accounts](https://attack.mitre.org/techniques/T1078/)
-  - [T1078.001:Default Accounts](https://attack.mitre.org/techniques/T1078/001/)
+  - [T1485: Data Destruction](https://attack.mitre.org/techniques/T1485/)
+  - [T1565: Data Manipulation](https://attack.mitre.org/techniques/T1565/)
+    - [T1565.001: Stored Data Manipulation](https://attack.mitre.org/techniques/T1565/001/)
+  - [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)
+    - [T1078.001: Default Accounts](https://attack.mitre.org/techniques/T1078/001/)
 
 ### Resources
 
@@ -166,11 +167,12 @@ The Invite external users to your organization feature SHOULD be disabled unless
 > Note:
 > If this feature is disabled, existing guest users in the tenant continue to have access to Power BI items they already had access to and continue to be listed in user picker experiences. After it is disabled, an external user who is not already a guest user cannot be added to the tenant through Power BI.
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1485:Data Destruction](https://attack.mitre.org/techniques/T1485/)
-  - [T1565.001:Stored Data Manipulation](https://attack.mitre.org/techniques/T1565/001/)
-  - [T1078:Valid Accounts](https://attack.mitre.org/techniques/T1078/)
-  - [T1078.004:Cloud Accounts](https://attack.mitre.org/techniques/T1078/004/)
-  - [T1199:Trusted Relationship](https://attack.mitre.org/techniques/T1199/)
+  - [T1485: Data Destruction](https://attack.mitre.org/techniques/T1485/)
+  - [T1565: Data Manipulation](https://attack.mitre.org/techniques/T1565/)
+    - [T1565.001: Stored Data Manipulation](https://attack.mitre.org/techniques/T1565/001/)
+  - [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)
+    - [T1078.001: Default Accounts](https://attack.mitre.org/techniques/T1078/001/)
+  - [T1199: Trusted Relationship](https://attack.mitre.org/techniques/T1199/)
 
 ### Resources
 
@@ -233,8 +235,8 @@ Service principals with access to APIs SHOULD be restricted to specific security
 - _Rationale:_ With unrestricted service principals, unwanted access to APIs is possible. Allowing service principals through security groups, and only where necessary, mitigates this risk.
 - _Last modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1059:Command and Scripting Interpreter](https://attack.mitre.org/techniques/T1059/)
-  - [T1059.009:Cloud API](https://attack.mitre.org/techniques/T1059/009/)
+  - [T1059: Command and Scripting Interpreter](https://attack.mitre.org/techniques/T1059/)
+    - [T1059.009: Cloud API](https://attack.mitre.org/techniques/T1059/009/)
 
 #### MS.POWERBI.4.2v1
 Service principals creating and using profiles SHOULD be restricted to specific security groups.
@@ -243,7 +245,8 @@ Service principals creating and using profiles SHOULD be restricted to specific 
 - _Rationale:_ With unrestricted service principals creating/using profiles, there is risk of an unauthorized user using a profile with more permissions than they have. Allowing service principals through security groups will mitigate that risk.
 - _Last modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1098.003:Additional Cloud Roles](https://attack.mitre.org/techniques/T1098/003/)
+  - [T1098: Account Manipulation](https://attack.mitre.org/techniques/T1098/)
+    - [T1098.003: Additional Cloud Roles](https://attack.mitre.org/techniques/T1098/003/)
 
 ### Resources
 
@@ -320,9 +323,9 @@ ResourceKey-based authentication SHOULD be blocked unless a specific use case (e
 - _Rationale:_ If resource keys are allowed, someone can move data without Azure AD OAuth bearer token, causing possibly malicious or junk data to be stored. Disabling resource keys reduces risk that an unauthorized individual will make changes.
 - _Last modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1134:Access Token Manipulation](https://attack.mitre.org/techniques/T1134/)
-  - [T1134.001:Token Impersonation/Theft](https://attack.mitre.org/techniques/T1134/001/)
-  - [T1134.003:Make and Impersonate Token](https://attack.mitre.org/techniques/T1134/003/)
+  - [T1134: Access Token Manipulation](https://attack.mitre.org/techniques/T1134/)
+    - [T1134.001: Token Impersonation/Theft](https://attack.mitre.org/techniques/T1134/001/)
+    - [T1134.003: Make and Impersonate Token](https://attack.mitre.org/techniques/T1134/003/)
 
 
 ### Resources
@@ -368,10 +371,10 @@ Python and R interactions SHOULD be disabled.
 - _Rationale:_ External code poses a security and privacy risk as there is no good way to regulate what is done with the data or integrations. Disabling this will reduce the risk of a data leak or malicious actor.
 - _Last modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1059:Command and Scripting Interpreter](https://attack.mitre.org/techniques/T1059/)
-  - [T1059.009:Cloud API](https://attack.mitre.org/techniques/T1059/009/)
-  - [T1048:Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)
-  - [T1567:Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)
+  - [T1059: Command and Scripting Interpreter](https://attack.mitre.org/techniques/T1059/)
+    - [T1059.009: Cloud API](https://attack.mitre.org/techniques/T1059/009/)
+  - [T1048: Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)
+  - [T1567: Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)
 
 ### Resources
 
