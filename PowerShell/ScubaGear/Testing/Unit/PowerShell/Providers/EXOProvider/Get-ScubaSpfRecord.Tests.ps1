@@ -16,6 +16,7 @@ InModuleScope 'ExportEXOProvider' {
                 }
             }
             It "Resolves 1 domain name" {
+                # Test basic functionality
                 $Response = Get-ScubaSpfRecord -Domains @(@{"DomainName" = "example.com"})
                 Should -Invoke -CommandName Invoke-RobustDnsTxt -Exactly -Times 1
                 Should -Invoke -CommandName Write-Warning -Exactly -Times 0
@@ -23,6 +24,7 @@ InModuleScope 'ExportEXOProvider' {
             }
 
             It "Resolves multiple domain names" {
+                # Test to ensure function will loop over the domain names provided in the -Domains argument.
                 $Response = Get-ScubaSpfRecord -Domains @(@{"DomainName" = "example.com"},
                     @{"DomainName" = "example.com"})
                 Should -Invoke -CommandName Invoke-RobustDnsTxt -Exactly -Times 2
@@ -42,6 +44,8 @@ InModuleScope 'ExportEXOProvider' {
                 }
             }
             It "Prints a warning" {
+                # If Invoke-RobustDnsTxt returns a low confidence answer, Get-ScubaSpfRecord should print a
+                # warning.
                 $Response = Get-ScubaSpfRecord -Domains @(@{"DomainName" = "example.com"})
                 Should -Invoke -CommandName Invoke-RobustDnsTxt -Exactly -Times 1
                 Should -Invoke -CommandName Write-Warning -Exactly -Times 1

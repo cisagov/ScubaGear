@@ -9,6 +9,7 @@ InModuleScope 'ExportEXOProvider' {
         }
         Context 'When resolving a domain name' {
             It "Returns correct response when traditional DNS works" {
+                # Test where Resolve-DnsName works first try
                 Mock -CommandName Resolve-DnsName {
                     @(
                         @{
@@ -27,6 +28,7 @@ InModuleScope 'ExportEXOProvider' {
             }
 
             It "Handles NXDOMAIN" {
+                # Test where Resolve-DnsName returns NXDOMAIN
                 Mock -CommandName Resolve-DnsName {
                     throw "DNS_ERROR_RCODE_NAME_ERROR,Microsoft.DnsClient.Commands.ResolveDnsName"
                 }
@@ -40,6 +42,8 @@ InModuleScope 'ExportEXOProvider' {
             }
 
             It "Tries over DoH if traditional DNS is unavailable" {
+                # Test where Resolve-DnsName throws an exception. In this case, Invoke-RobustDnsTxt should try
+                # again over DoH
                 Mock -CommandName Resolve-DnsName { throw "Some error" }
                 $DohResponseHeaders = @(
                     "HTTP/1.1 200 OK",
@@ -74,6 +78,11 @@ InModuleScope 'ExportEXOProvider' {
             }
 
             It "Tries over DoH if traditional DNS gives an empty answer" {
+                # Test where Resolve-DnsName doesn't throw an exception but also doesn't return an answer.
+                # Invoke-RobustDnsTxt should try again over DoH in that this. For context, there are some
+                # cases where Resolve-DnsName won't throw an exception but won't actually return an answer.
+                # For example, in some cases where the answer can't be using the local resolver but trying
+                # over a public resolve will reveal the answer.
                 Mock -CommandName Resolve-DnsName { @(
                     @{
                         "Strings" = @("");
@@ -114,6 +123,10 @@ InModuleScope 'ExportEXOProvider' {
             }
 
             It "Indicates low confidence if traditional DNS gives an empty answer and DoH unavailable" {
+                # There are some cases where Resolve-DnsName won't throw an exception but won't actually
+                # return an answer, but where trying over a public DNS resolver reveals the answer
+                # However, many systems block DoH. If Resolve-DnsName returns an empty answer and DoH
+                # fails, Invoke-RobustDnsTxt should indicate that the answer is not high-confidence.
                 Mock -CommandName Resolve-DnsName { @(
                     @{
                         "Strings" = @("");
