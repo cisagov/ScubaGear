@@ -1,0 +1,29 @@
+# Purpose: Run the linter against YAML files
+
+name: Lint Check for YAML
+
+# This is a reusable workflow called by the pipeline.
+on:
+  workflow_call:
+  workflow_dispatch:
+
+permissions: read-all
+
+jobs:
+  yaml-lint-check:
+    name: MegaLint YAML Check
+    runs-on: ubuntu-latest
+    # This condition prevents duplicate runs.
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+      - name: Setup Config File
+        run: cp Testing/Linting/MegaLinter/.mega-linter-yaml.yml .mega-linter.yml
+      - name: Setup Lint File
+        run: cp Testing/Linting/MegaLinter/.yamllint.yml .yamllint.yml
+      - name: Lint YAML
+        uses: oxsecurity/megalinter/flavors/ci_light@latest

@@ -11,3 +11,4 @@ rules:
   # Don't bother me with these rules
   document-start: disable
   truthy: disable
+  comments-indentation: disable

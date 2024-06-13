@@ -1,12 +1,12 @@
-$OrchestratorPath = '../../../../Modules/Orchestrator.psm1'
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath $OrchestratorPath) -Force
+using module '..\..\..\..\Modules\ScubaConfig\ScubaConfig.psm1'
+BeforeDiscovery {
+    $ModuleRootPath = Join-Path -Path $PSScriptRoot -ChildPath '..\..\..\..\Modules'
+    Import-Module (Join-Path -Path $ModuleRootPath -ChildPath 'Orchestrator.psm1') -Force
+}
 
 InModuleScope Orchestrator {
     Context  "Parameter override test"{
         BeforeAll{
-            $ConnectionPath = '../../../../Modules/Connection/Connection.psm1'
-            Import-Module (Join-Path -Path $PSScriptRoot -ChildPath $ConnectionPath) -Function Disconnect-SCuBATenant -Force
-
             function SetupMocks{
                 $script:TestSplat = @{}
                 Mock -ModuleName Orchestrator Remove-Resources {}
@@ -32,7 +32,10 @@ InModuleScope Orchestrator {
                     $script:TestSplat.Add('OutFolderName', $ScubaConfig.OutFolderName)
                     $script:TestSplat.Add('OutReportName', $ScubaConfig.OutReportName)
                 }
-                Mock -ModuleName Orchestrator Disconnect-SCuBATenant {
+                Mock -ModuleName Orchestrator Merge-JsonOutput {
+                    $script:TestSplat.Add('OutJsonFileName', $ScubaConfig.OutJsonFileName)
+                }
+                function Disconnect-SCuBATenant {
                     $script:TestSplat.Add('DisconnectOnExit', $DisconnectOnExit)
                 }
                 function Get-ScubaDefault {throw 'this will be mocked'}
@@ -45,19 +48,38 @@ InModuleScope Orchestrator {
         Describe -Tag 'Orchestrator' -Name 'Invoke-Scuba config with no command line override' {
             BeforeAll {
                 SetupMocks
-                Invoke-SCuBA -ConfigFilePath (Join-Path -Path $PSScriptRoot -ChildPath "orchestrator_config_test.yaml")
+                function global:ConvertFrom-Yaml {
+                    @{
+                        ProductNames=,"teams"
+                        M365Environment='commercial'
+                        OPAPath=$PSScriptRoot
+                        Login=$true
+                        OutPath=$PSScriptRoot
+                        OutFolderName='ScubaReports'
+                        OutProviderFileName='TenantSettingsExport'
+                        OutRegoFileName='ScubaTestResults'
+                        OutReportName='ScubaReports'
+                        Organization='sub.domain.com'
+                        AppID='7892dfe467aef9023be'
+                        CertificateThumbprint='8A673F1087453ABC894'
+                    }
+                }
+                [ScubaConfig]::ResetInstance()
+                Invoke-SCuBA -ConfigFilePath (Join-Path -Path $PSScriptRoot -ChildPath "orchestrator_config_test.yaml")`
+                    -MergeJson
             }
 
             It "Verify parameter ""<parameter>"" with value ""<value>""" -ForEach @(
                 @{ Parameter = "M365Environment";       Value = "commercial"           },
                 @{ Parameter = "ProductNames";          Value = @("teams")             },
-                @{ Parameter = "OPAPath";               Value = "."                    },
+                @{ Parameter = "OPAPath";               Value = $PSScriptRoot          },
                 @{ Parameter = "LogIn";                 Value = $true                  },
-                @{ Parameter = "OutPath";               Value = ".."                   },
+                @{ Parameter = "OutPath";               Value = $PSScriptRoot          },
                 @{ Parameter = "OutFolderName";         Value = "ScubaReports"         },
                 @{ Parameter = "OutProviderFileName";   Value = "TenantSettingsExport" },
                 @{ Parameter = "OutRegoFileName";       Value = "ScubaTestResults"     },
                 @{ Parameter = "OutReportName";         Value = "ScubaReports"         },
+                @{ Parameter = "OutJsonFileName";       Value = "ScubaResults"         },
                 @{ Parameter = "Organization";          Value = "sub.domain.com"       },
                 @{ Parameter = "AppID";                 Value = "7892dfe467aef9023be"  },
                 @{ Parameter = "CertificateThumbprint"; Value = "8A673F1087453ABC894"  }
@@ -68,6 +90,7 @@ InModuleScope Orchestrator {
         Describe -Tag 'Orchestrator' -Name 'Invoke-Scuba config with command line override' {
             BeforeAll {
                 SetupMocks
+                [ScubaConfig]::ResetInstance()
                 Invoke-SCuBA `
                   -M365Environment "gcc" `
                   -ProductNames "aad" `
@@ -77,7 +100,9 @@ InModuleScope Orchestrator {
                   -OutFolderName "MyReports" `
                   -OutProviderFileName "MySettingsExport" `
                   -OutRegoFileName "RegoResults" `
+                  -MergeJson:$true `
                   -OutReportName "MyReport" `
+                  -OutJsonFileName "JsonResults" `
                   -Organization "good.four.us" `
                   -AppID "1212121212121212121" `
                   -CertificateThumbprint "AB123456789ABCDEF01" `
@@ -94,6 +119,7 @@ InModuleScope Orchestrator {
                 @{ Parameter = "OutProviderFileName";   Value = "MySettingsExport"     },
                 @{ Parameter = "OutRegoFileName";       Value = "RegoResults"          },
                 @{ Parameter = "OutReportName";         Value = "MyReport"             },
+                @{ Parameter = "OutJsonFileName";       Value = "JsonResults"          },
                 @{ Parameter = "Organization";          Value = "good.four.us"         },
                 @{ Parameter = "AppID";                 Value = "1212121212121212121"  },
                 @{ Parameter = "CertificateThumbprint"; Value = "AB123456789ABCDEF01"  }
@@ -118,6 +144,22 @@ InModuleScope Orchestrator {
         Describe -Tag 'Orchestrator' -Name 'Invoke-Scuba with config file ProductNames wild card' {
             BeforeAll {
                 SetupMocks
+                function global:ConvertFrom-Yaml {
+                    @{
+                        ProductNames=@('aad', 'defender', 'exo', 'powerplatform', 'sharepoint', 'teams')
+                        M365Environment='commercial'
+                        OPAPath=$PSScriptRoot
+                        Login=$true
+                        OutPath=$PSScriptRoot
+                        OutFolderName='ScubaReports'
+                        OutProviderFileName='TenantSettingsExport'
+                        OutRegoFileName='ScubaTestResults'
+                        OutReportName='ScubaReports'
+                        Organization='sub.domain.com'
+                        AppID='7892dfe467aef9023be'
+                        CertificateThumbprint='8A673F1087453ABC894'
+                    }
+                }
                 Invoke-SCuBA `
                   -ConfigFilePath (Join-Path -Path $PSScriptRoot -ChildPath "product_wildcard_config_test.yaml")
             }
@@ -130,5 +172,4 @@ InModuleScope Orchestrator {
 }
 AfterAll {
     Remove-Module Orchestrator -ErrorAction SilentlyContinue
-    Remove-Module Connection -ErrorAction SilentlyContinue
 }

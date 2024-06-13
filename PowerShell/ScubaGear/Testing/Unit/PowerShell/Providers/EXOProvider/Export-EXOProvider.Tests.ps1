@@ -10,6 +10,7 @@ Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "$($ProviderPath)/Provid
 InModuleScope -ModuleName ExportEXOProvider {
     Describe -Tag 'ExportEXOProvider' -Name "Export-EXOProvider" {
         BeforeAll {
+            Mock Import-Module {}
             class MockCommandTracker {
                 [string[]]$SuccessfulCommands = @()
                 [string[]]$UnSuccessfulCommands = @()
@@ -26,7 +27,7 @@ InModuleScope -ModuleName ExportEXOProvider {
                                 $this.SuccessfulCommands += $Command
                                 return [pscustomobject]@{}
                             }
-                            "Get-ScubaSpfRecords" {
+                            "Get-ScubaSpfRecord" {
                                 $this.SuccessfulCommands += $Command
                                 return [pscustomobject]@{}
                             }
@@ -34,11 +35,11 @@ InModuleScope -ModuleName ExportEXOProvider {
                                 $this.SuccessfulCommands += $Command
                                 return [pscustomobject]@{}
                             }
-                            "Get-ScubaDkimRecords" {
+                            "Get-ScubaDkimRecord" {
                                 $this.SuccessfulCommands += $Command
                                 return [pscustomobject]@{}
                             }
-                            "Get-ScubaDmarcRecords" {
+                            "Get-ScubaDmarcRecord" {
                                 $this.SuccessfulCommands += $Command
                                 return [pscustomobject]@{}
                             }

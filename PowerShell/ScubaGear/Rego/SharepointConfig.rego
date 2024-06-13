@@ -1,7 +1,9 @@
 package sharepoint
-import future.keywords
+import rego.v1
 import data.utils.report.NotCheckedDetails
+import data.utils.report.CheckedSkippedDetails
 import data.utils.report.ReportDetailsBoolean
+import data.utils.report.ReportDetailsBooleanWarning
 import data.utils.report.ReportDetailsString
 import data.utils.key.FilterArray
 import data.utils.key.FAIL
@@ -13,13 +15,43 @@ import data.utils.key.PASS
 #############
 
 # Values in json for slider sharepoint/onedrive sharing settings
-ONLYPEOPLEINORG := 0
+ONLYPEOPLEINORG := 0        # "Disabled" in functional tests
+EXISTINGGUESTS := 3         # "ExistingExternalUserSharingOnly" in functional tests
+NEWANDEXISTINGGUESTS := 1   # "ExternalUserSharingOnly" in functional tests
+ANYONE := 2                 # "ExternalUserAndGuestSharing" in functional tests
 
-EXISTINGGUESTS := 3
+######################################
+# External sharing support functions #
+######################################
 
-NEWANDEXISTINGGUESTS := 1
+SliderSettings(0) := "Only People In Your Organization"
 
-ANYONE := 2
+SliderSettings(1) := "New and Existing Guests"
+
+SliderSettings(2) := "Anyone"
+
+SliderSettings(3) := "Existing Guests"
+
+SliderSettings(Value) := "Unknown" if not Value in [0, 1, 2, 3]
+
+Tenant := input.SPO_tenant[0] if {
+    count(input.SPO_tenant) == 1
+}
+
+SharingCapability := Tenant.SharingCapability
+
+SharingString := concat("", [
+    "External Sharing is set to ",
+    SliderSettings(SharingCapability),
+    "."
+])
+
+NAString(SharingSetting) := concat("", [
+        "This policy is only applicable if External Sharing is set to any value other than ",
+        SharingSetting,
+        ". ",
+        "See %v for more info"
+    ])
 
 
 ###################
@@ -34,14 +66,12 @@ ANYONE := 2
 # OR Existing Guests, the policy should pass.
 tests contains {
     "PolicyId": "MS.SHAREPOINT.1.1v1",
-    "Criticality": "Should",
+    "Criticality": "Shall",
     "Commandlet": ["Get-SPOTenant", "Get-PnPTenant"],
     "ActualValue": [SharingCapability],
     "ReportDetails": ReportDetailsBoolean(Status),
     "RequirementMet": Status
 } if {
-    some TenantPolicy in input.SPO_tenant
-    SharingCapability := TenantPolicy.SharingCapability
     Conditions := [
         SharingCapability == ONLYPEOPLEINORG,
         SharingCapability == EXISTINGGUESTS
@@ -58,15 +88,14 @@ tests contains {
 # OR Existing Guests, the policy should pass.
 tests contains {
     "PolicyId": "MS.SHAREPOINT.1.2v1",
-    "Criticality": "Should",
+    "Criticality": "Shall",
     "Commandlet": ["Get-SPOTenant", "Get-PnPTenant"],
     "ActualValue": [OneDriveSharingCapability],
     "ReportDetails": ReportDetailsBoolean(Status),
     "RequirementMet": Status
 } if {
-    some TenantPolicy in input.SPO_tenant
-    OneDriveSharingCapability := TenantPolicy.OneDriveSharingCapability
     input.OneDrive_PnP_Flag == false
+    OneDriveSharingCapability := Tenant.OneDriveSharingCapability
     Conditions := [
         OneDriveSharingCapability == ONLYPEOPLEINORG,
         OneDriveSharingCapability == EXISTINGGUESTS
@@ -76,7 +105,7 @@ tests contains {
 
 tests contains {
     "PolicyId": PolicyId,
-    "Criticality": "Should/Not-Implemented",
+    "Criticality": "Shall/Not-Implemented",
     "Commandlet": [],
     "ActualValue": [],
     "ReportDetails": NotCheckedDetails(PolicyId),
@@ -104,41 +133,33 @@ NoteArray := [
 ]
 NOTESTRING := concat(" ", NoteArray)
 
-Domainlist(TenantPolicy) := Description if {
-    TenantPolicy.SharingCapability == ONLYPEOPLEINORG
-    Description := "Requirement met: external sharing is set to Only People In Organization"
-}
-
-Domainlist(TenantPolicy) := concat(": ", [PASS, NOTESTRING]) if {
-    TenantPolicy.SharingCapability != ONLYPEOPLEINORG
-    TenantPolicy.SharingDomainRestrictionMode == 1
-}
-
-Domainlist(TenantPolicy) := concat(": ", [FAIL, NOTESTRING]) if {
-    TenantPolicy.SharingCapability != ONLYPEOPLEINORG
-    TenantPolicy.SharingDomainRestrictionMode != 1
-}
-
-# If SharingCapability is set to Only People In Organization
-# OR Sharing Domain Restriction Mode is enabled,
-# the policy should pass.
+# If Sharing Domain Restriction Mode is enabled, the policy should pass.
 tests contains {
     "PolicyId": "MS.SHAREPOINT.1.3v1",
     "Criticality": "Shall",
     "Commandlet": ["Get-SPOTenant", "Get-PnPTenant"],
     "ActualValue": [
-        TenantPolicy.SharingDomainRestrictionMode,
-        TenantPolicy.SharingCapability
+        Tenant.SharingDomainRestrictionMode,
+        SharingCapability
     ],
-    "ReportDetails": Domainlist(TenantPolicy),
+    "ReportDetails": ReportDetailsBooleanWarning(Status, NOTESTRING),
     "RequirementMet": Status
 } if {
-    some TenantPolicy in input.SPO_tenant
-    Conditions := [
-        TenantPolicy.SharingCapability == ONLYPEOPLEINORG,
-        TenantPolicy.SharingDomainRestrictionMode == 1
-    ]
-    Status := count(FilterArray(Conditions, true)) == 1
+    SharingCapability != ONLYPEOPLEINORG
+    Status := Tenant.SharingDomainRestrictionMode == 1
+}
+
+tests contains {
+    "PolicyId": PolicyId,
+    "Criticality": "Shall/Not-Implemented",
+    "Commandlet": ["Get-SPOTenant", "Get-PnPTenant"],
+    "ActualValue": [],
+    "ReportDetails": CheckedSkippedDetails(PolicyId, Reason),
+    "RequirementMet": false
+} if {
+    SharingCapability == ONLYPEOPLEINORG
+    PolicyId := "MS.SHAREPOINT.1.3v1"
+    Reason := NAString(SliderSettings(0))
 }
 #--
 
@@ -154,18 +175,27 @@ tests contains {
     "Criticality": "Shall",
     "Commandlet": ["Get-SPOTenant", "Get-PnPTenant"],
     "ActualValue": [
-        TenantPolicy.RequireAcceptingAccountMatchInvitedAccount,
-        TenantPolicy.SharingCapability
+        Tenant.RequireAcceptingAccountMatchInvitedAccount,
+        SharingCapability
     ],
     "ReportDetails": ReportDetailsBoolean(Status),
     "RequirementMet": Status
 } if {
-    some TenantPolicy in input.SPO_tenant
-    Conditions := [
-        TenantPolicy.SharingCapability == ONLYPEOPLEINORG,
-        TenantPolicy.RequireAcceptingAccountMatchInvitedAccount == true
-    ]
-    Status := count(FilterArray(Conditions, true)) >= 1
+    SharingCapability != ONLYPEOPLEINORG
+    Status := Tenant.RequireAcceptingAccountMatchInvitedAccount == true
+}
+
+tests contains {
+    "PolicyId": PolicyId,
+    "Criticality": "Shall/Not-Implemented",
+    "Commandlet": ["Get-SPOTenant", "Get-PnPTenant"],
+    "ActualValue": [],
+    "ReportDetails": CheckedSkippedDetails(PolicyId, Reason),
+    "RequirementMet": false
+} if {
+    SharingCapability == ONLYPEOPLEINORG
+    PolicyId := "MS.SHAREPOINT.1.4v1"
+    Reason := NAString(SliderSettings(0))
 }
 #--
 
@@ -184,12 +214,11 @@ tests contains {
     "PolicyId": "MS.SHAREPOINT.2.1v1",
     "Criticality": "Shall",
     "Commandlet": ["Get-SPOTenant", "Get-PnPTenant"],
-    "ActualValue": [TenantPolicy.DefaultSharingLinkType],
+    "ActualValue": [Tenant.DefaultSharingLinkType],
     "ReportDetails": ReportDetailsBoolean(Status),
     "RequirementMet": Status
 } if {
-    some TenantPolicy in input.SPO_tenant
-    Status := TenantPolicy.DefaultSharingLinkType == 1
+    Status := Tenant.DefaultSharingLinkType == 1
 }
 #--
 
@@ -205,12 +234,11 @@ tests contains {
     "PolicyId": "MS.SHAREPOINT.2.2v1",
     "Criticality": "Shall",
     "Commandlet": ["Get-SPOTenant", "Get-PnPTenant"],
-    "ActualValue": [TenantPolicy.DefaultLinkPermission],
+    "ActualValue": [Tenant.DefaultLinkPermission],
     "ReportDetails": ReportDetailsBoolean(Status),
     "RequirementMet": Status
 } if {
-    some TenantPolicy in input.SPO_tenant
-    Status := TenantPolicy.DefaultLinkPermission == 1
+    Status := Tenant.DefaultLinkPermission == 1
 }
 #--
 
@@ -222,107 +250,110 @@ tests contains {
 # MS.SHAREPOINT.3.1v1
 #--
 
-# If SharingCapability is set to Only People In Organization
-# OR Existing Guests, the policy should pass.
-ExternalUserExpireInDays(TenantPolicy) := ["", true] if {
-    Conditions := [
-        TenantPolicy.SharingCapability == ONLYPEOPLEINORG,
-        TenantPolicy.SharingCapability == EXISTINGGUESTS
-    ]
-    count(FilterArray(Conditions, true)) == 1
-}
-
-# If SharingCapability is set to New and Existing Guests
-# OR Anyone, AND anonymous links are set to expire
-# in 30 days or less, the policy should pass, else fail.
-# The error message is concatanated by 2 steps to insert the
-# result of ReportBoolean in front, & the setting in the middle.
-SHARINGCAPABILITY := "New and Existing Guests" if
-    # regal ignore:prefer-some-in-iteration
-    input.SPO_tenant[_].SharingCapability == NEWANDEXISTINGGUESTS
-
-SHARINGCAPABILITY := "Anyone" if
-    # regal ignore:prefer-some-in-iteration
-    input.SPO_tenant[_].SharingCapability == ANYONE
-
-ERRSTRING := concat(" ", [
+ErrStr := concat(" ", [
+    "Requirement not met:",
     "External Sharing is set to",
-    SHARINGCAPABILITY,
-    "and expiration date is not 30 days or less"
-    ])
+    SliderSettings(SharingCapability),
+    "and expiration date is not set to 30 days or less."
+])
 
-ExternalUserExpireInDays(TenantPolicy) := [concat(": ", [FAIL, ERRSTRING]), Status] if {
-    Conditions := [
-        TenantPolicy.SharingCapability == NEWANDEXISTINGGUESTS,
-        TenantPolicy.SharingCapability == ANYONE
-    ]
-    count(FilterArray(Conditions, true)) > 0
-    Status := TenantPolicy.RequireAnonymousLinksExpireInDays <= 30
-}
-
+# Standard test to compare against baseline
+# This policy is only applicable if external sharing is set to "Anyone"
 tests contains {
     "PolicyId": "MS.SHAREPOINT.3.1v1",
-    "Criticality": "Should",
-    "Commandlet": ["Get-SPOTenant", "Get-PnPTenant"],
+    "Criticality": "Shall",
+    "Commandlet": ["Get-SPOTenant"],
     "ActualValue": [
-        TenantPolicy.SharingCapability,
-        TenantPolicy.RequireAnonymousLinksExpireInDays
+        SharingCapability,
+        Tenant.RequireAnonymousLinksExpireInDays
     ],
-    "ReportDetails": ReportDetailsString(Status, ErrMsg),
+    "ReportDetails": ReportDetailsString(Status, ErrStr),
     "RequirementMet": Status
 } if {
-    some TenantPolicy in input.SPO_tenant
-    [ErrMsg, Status] := ExternalUserExpireInDays(TenantPolicy)
+    SharingCapability == ANYONE
+    Status := Tenant.RequireAnonymousLinksExpireInDays <= 30
+}
+
+# Test for N/A case
+tests contains {
+    "PolicyId": PolicyId,
+    "Criticality": "Shall/Not-Implemented",
+    "Commandlet": ["Get-SPOTenant"],
+    "ActualValue": [],
+    "ReportDetails": CheckedSkippedDetails(PolicyId, Reason),
+    "RequirementMet": false
+} if {
+    PolicyId := "MS.SHAREPOINT.3.1v1"
+    SharingCapability != ANYONE
+    Reason := NAString(SliderSettings(2))
 }
 #--
+
 
 #
 # MS.SHAREPOINT.3.2v1
 #--
 
-# Create Repot Detatils string based on File link type & Folder link type
-PERMISSIONSTRING := "are not limited to view for Anyone"
+# Create Report Details string based on File link type & Folder link type
+PERMISSION_STRING := "are not limited to view for Anyone"
 
-FileAndFolderPermission(1, 1) := PASS if {}
+FileAndFolderLinkPermission(1, 1) := PASS
 
-FileAndFolderPermission(2, 2) := concat(": ", [
-        FAIL,
-        concat(" ", ["both files and folders", PERMISSIONSTRING])
-    ]) if {}
+FileAndFolderLinkPermission(2, 2) := concat(": ", [
+    FAIL,
+    concat(" ", ["both files and folders", PERMISSION_STRING])
+])
 
-FileAndFolderPermission(1, 2) := concat(": ", [
-        FAIL,
-        concat(" ", ["folders", PERMISSIONSTRING])
-    ]) if {}
+FileAndFolderLinkPermission(1, 2) := concat(": ", [
+    FAIL,
+    concat(" ", ["folders", PERMISSION_STRING])
+])
 
-FileAndFolderPermission(2, 1) := concat(": ", [
-        FAIL,
-        concat(" ", ["files", PERMISSIONSTRING])
-    ]) if {}
+FileAndFolderLinkPermission(2, 1) := concat(": ", [
+    FAIL,
+    concat(" ", ["files", PERMISSION_STRING])
+])
 
-# Both link types must be 2 & OneDrive_PnP_Flag must be false for policy to pass
+# This policy is only applicable if external sharing is set to "Anyone"
+# Both link types must be 1 & OneDrive_PnP_Flag must be false for policy to pass
 tests contains {
     "PolicyId": "MS.SHAREPOINT.3.2v1",
-    "Criticality": "Should",
+    "Criticality": "Shall",
     "Commandlet": ["Get-SPOTenant", "Get-PnPTenant"],
     "ActualValue": [FileLinkType, FolderLinkType],
-    "ReportDetails": FileAndFolderPermission(FileLinkType, FolderLinkType),
+    "ReportDetails": FileAndFolderLinkPermission(FileLinkType, FolderLinkType),
     "RequirementMet": Status
 } if {
-    some TenantPolicy in input.SPO_tenant
-    FileLinkType := TenantPolicy.FileAnonymousLinkType
-    FolderLinkType := TenantPolicy.FolderAnonymousLinkType
     input.OneDrive_PnP_Flag == false
+    SharingCapability == ANYONE
+
+    FileLinkType := Tenant.FileAnonymousLinkType
+    FolderLinkType := Tenant.FolderAnonymousLinkType
     Conditions := [
-        FileLinkType == 2,
-        FolderLinkType == 2
+        FileLinkType == 1,
+        FolderLinkType == 1
     ]
-    Status := count(FilterArray(Conditions, true)) == 0
+    Status := count(FilterArray(Conditions, true)) == 2
+}
+
+# Test for N/A case
+tests contains {
+    "PolicyId": PolicyId,
+    "Criticality": "Shall/Not-Implemented",
+    "Commandlet": ["Get-SPOTenant", "Get-PnPTenant"],
+    "ActualValue": [],
+    "ReportDetails": CheckedSkippedDetails(PolicyId, Reason),
+    "RequirementMet": false
+} if {
+    PolicyId := "MS.SHAREPOINT.3.2v1"
+    input.OneDrive_PnP_Flag == false
+    SharingCapability != ANYONE
+    Reason := NAString(SliderSettings(2))
 }
 
 tests contains {
     "PolicyId": PolicyId,
-    "Criticality": "Should/Not-Implemented",
+    "Criticality": "Shall/Not-Implemented",
     "Commandlet": [],
     "ActualValue": [],
     "ReportDetails": NotCheckedDetails(PolicyId),
@@ -337,61 +368,62 @@ tests contains {
 # MS.SHAREPOINT.3.3v1
 #--
 
-VERIFICATIONSTRING := "Expiration timer for 'People who use a verification code' NOT"
+VERIFICATION_STRING := "Expiration time for 'People who use a verification code' NOT"
 
-# If Sharing set to Only People In Org, pass
-ExpirationTimersVerificationCode(TenantPolicy) := ["", true] if {
-    TenantPolicy.SharingCapability == ONLYPEOPLEINORG
-}
+# PolicyNotApplicable_Group3 handles the correct SharingCapability setting.
+# This ruleset only checks if verification code reauthentication is enabled,
+# and if the verification time is valid (less than or equal to 30 days)
+VerificationCodeReAuthExpiration(tenant) := [PASS, true] if {
+    tenant.EmailAttestationRequired == true
+    tenant.EmailAttestationReAuthDays <= 30
+} else := [ErrStr, false] if {
+    tenant.EmailAttestationRequired == false
+    tenant.EmailAttestationReAuthDays <= 30
+    ErrStr := concat(": ", [FAIL, concat(" ", [VERIFICATION_STRING, "enabled"])])
+} else := [ErrStr, false] if {
+    tenant.EmailAttestationRequired == true
+    tenant.EmailAttestationReAuthDays > 30
+    ErrStr := concat(": ", [FAIL, concat(" ", [VERIFICATION_STRING, "set to 30 days or less"])])
+} else := [ErrStr, false] if {
+    tenant.EmailAttestationRequired == false
+    tenant.EmailAttestationReAuthDays > 30
+    ErrStr := concat(": ", [FAIL, concat(" ", [VERIFICATION_STRING, "enabled and set to 30 days or more"])])
+} else := [FAIL, false]
 
-# If Sharing NOT set to Only People In Org, reathentication enabled,
-# & reauth sent to <= 30 days, pass
-ExpirationTimersVerificationCode(TenantPolicy) := ["", true] if {
-    TenantPolicy.SharingCapability != ONLYPEOPLEINORG
-    TenantPolicy.EmailAttestationRequired == true
-    TenantPolicy.EmailAttestationReAuthDays <= 30
-}
-
-# If Sharing NOT set to Only People In Org & reathentication disbled,
-# fail
-ExpirationTimersVerificationCode(TenantPolicy) := [ErrMsg, false] if {
-    TenantPolicy.SharingCapability != ONLYPEOPLEINORG
-    TenantPolicy.EmailAttestationRequired == false
-    TenantPolicy.EmailAttestationReAuthDays <= 30
-    ErrMsg := concat(": ", [FAIL, concat(" ", [VERIFICATIONSTRING, "enabled"])])
-}
-
-# If Sharing NOT set to Only People In Org & reauth sent to > 30 days, fail
-ExpirationTimersVerificationCode(TenantPolicy) := [ErrMsg, false] if {
-    TenantPolicy.SharingCapability != ONLYPEOPLEINORG
-    TenantPolicy.EmailAttestationRequired == true
-    TenantPolicy.EmailAttestationReAuthDays > 30
-    ErrMsg := concat(": ", [FAIL, concat(" ", [VERIFICATIONSTRING, "set to 30 days"])])
-}
-
-# If Sharing NOT set to Only People In Org, reathentication disabled,
-# & reauth sent to > 30 days, fail
-ExpirationTimersVerificationCode(TenantPolicy) := [ErrMsg, false] if {
-    TenantPolicy.SharingCapability != ONLYPEOPLEINORG
-    TenantPolicy.EmailAttestationRequired == false
-    TenantPolicy.EmailAttestationReAuthDays > 30
-    ErrMsg := concat(": ", [FAIL, concat(" ", [VERIFICATIONSTRING, "enabled and set to >30 days"])])
-}
-
+# This policy is only applicable if external sharing is set to "Anyone",
+# or "New and existing guests"
 tests contains {
     "PolicyId": "MS.SHAREPOINT.3.3v1",
-    "Criticality": "Should",
+    "Criticality": "Shall",
     "Commandlet": ["Get-SPOTenant", "Get-PnPTenant"],
     "ActualValue": [
-        TenantPolicy.SharingCapability,
-        TenantPolicy.EmailAttestationRequired,
-        TenantPolicy.EmailAttestationReAuthDays
+        SharingCapability,
+        Tenant.EmailAttestationRequired,
+        Tenant.EmailAttestationReAuthDays
     ],
     "ReportDetails": ReportDetailsString(Status, ErrMsg),
     "RequirementMet": Status
 } if {
-    some TenantPolicy in input.SPO_tenant
-    [ErrMsg, Status] := ExpirationTimersVerificationCode(TenantPolicy)
+    SharingCapability in [ANYONE, NEWANDEXISTINGGUESTS]
+
+    [ErrMsg, Status] := VerificationCodeReAuthExpiration(Tenant)
+}
+
+# Test for N/A case
+tests contains {
+    "PolicyId": "MS.SHAREPOINT.3.3v1",
+    "Criticality": "Shall/Not-Implemented",
+    "Commandlet": ["Get-SPOTenant", "Get-PnPTenant"],
+    "ActualValue": [],
+    "ReportDetails": CheckedSkippedDetails(PolicyId, Reason),
+    "RequirementMet": false
+} if {
+    PolicyId := "MS.SHAREPOINT.3.3v1"
+    not SharingCapability in [ANYONE, NEWANDEXISTINGGUESTS]
+    Reason := concat(" ", [
+        SharingString,
+        NAString(concat(" ", [SliderSettings(0), "or", SliderSettings(3)]))
+        ])
 }
 #--
 

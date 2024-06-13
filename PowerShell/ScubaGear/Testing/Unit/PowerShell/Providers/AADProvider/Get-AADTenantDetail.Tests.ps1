@@ -4,7 +4,7 @@ Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "$($ProviderPath)/Export
 InModuleScope ExportAADProvider {
     BeforeAll {
         function Get-MgBetaOrganization {}
-        Mock -ModuleName ExportAADProvider Get-MgBetaOrganization -MockWith {
+        Mock -ModuleName ExportAADProvider Get-MgBetaOrganization {
             return [pscustomobject]@{
                 DisplayName = "DisplayName";
                 Name = "DomainName";

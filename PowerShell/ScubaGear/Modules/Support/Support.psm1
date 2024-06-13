@@ -1,3 +1,5 @@
+using module '..\ScubaConfig\ScubaConfig.psm1'
+
 function Copy-ScubaBaselineDocument {
     <#
     .SYNOPSIS
@@ -73,7 +75,7 @@ function Initialize-SCuBA {
         [Parameter(Mandatory = $false, HelpMessage = 'The version of OPA Rego to be downloaded, must be in "x.x.x" format')]
         [Alias('version')]
         [string]
-        $ExpectedVersion = '0.59.0',
+        $ExpectedVersion = [ScubaConfig]::ScubaDefault('DefaultOPAVersion'),
 
         [Parameter(Mandatory = $false, HelpMessage = 'The operating system the program is running on')]
         [ValidateSet('Windows','MacOS','Linux')]
@@ -111,9 +113,14 @@ function Initialize-SCuBA {
     # Start a stopwatch to time module installation elapsed time
     $Stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
 
-    $RequiredModulesPath = Join-Path -Path $PSScriptRoot -ChildPath "PowerShell\ScubaGear\RequiredVersions.ps1"
-    if (Test-Path -Path $RequiredModulesPath) {
+    # Need to determine where module is so we can get required versions info
+    $ModuleParentDir = Split-Path -Path (Get-Module ScubaGear).Path -Parent
+    try {
+        ($RequiredModulesPath = Join-Path -Path $ModuleParentDir -ChildPath 'RequiredVersions.ps1') *> $null
         . $RequiredModulesPath
+    }
+    catch {
+        throw "Unable to find RequiredVersions.ps1 in expected directory:`n`t$ModuleParentDir"
     }
 
     if ($ModuleList) {
@@ -178,8 +185,7 @@ function Initialize-SCuBA {
     }
     else {
         try {
-            $ScriptDir = Split-Path -Path $MyInvocation.MyCommand.Definition -Parent
-            . $ScriptDir\OPA.ps1 -name $OPAExe -version $ExpectedVersion -os $OperatingSystem -ScubaParentDirectory $ScubaParentDirectory
+            Install-OPA -OPAExe $OPAExe -ExpectedVersion $ExpectedVersion -OperatingSystem $OperatingSystem -ScubaParentDirectory $ScubaParentDirectory
         }
         catch {
             $Error[0] | Format-List -Property * -Force | Out-Host
@@ -210,7 +216,7 @@ function Install-OPA {
         [Parameter(Mandatory = $false, HelpMessage = 'The version of OPA Rego to be downloaded, must be in "x.x.x" format')]
         [Alias('version')]
         [string]
-        $ExpectedVersion = '0.59.0',
+        $ExpectedVersion = [ScubaConfig]::ScubaDefault('DefaultOPAVersion'),
 
         [Parameter(Mandatory = $false, HelpMessage = 'The file name that the opa executable is to be saved as')]
         [Alias('name')]
@@ -230,8 +236,8 @@ function Install-OPA {
     )
 
     # Constants
-    $ACCEPTABLEVERSIONS = '0.42.1','0.42.2','0.43.1','0.44.0','0.45.0','0.46.3','0.47.4','0.48.0','0.49.2','0.50.2',
-    '0.51.0','0.52.0','0.53.1','0.54.0','0.55.0','0.56.0','0.57.1','0.58.0','0.59.0'
+    $ACCEPTABLEVERSIONS = '0.59.0', '0.60.0', '0.61.0',
+    '0.62.1', '0.63.0', [ScubaConfig]::ScubaDefault('DefaultOPAVersion') # End Versions
     $FILENAME = @{ Windows = "opa_windows_amd64.exe"; MacOS = "opa_darwin_amd64"; Linux = "opa_linux_amd64_static"}
 
     # Set prefernces for writing messages
@@ -643,11 +649,264 @@ function Copy-ScubaModuleFile {
     }
 }
 
+function New-Config {
+    <#
+    .SYNOPSIS
+    Generate a config file for the ScubaGear tool
+    .Description
+    Using provided user input generate a config file to run ScubaGear tailored to the end user
+    .Parameter ProductNames
+    A list of one or more M365 shortened product names that the tool will assess when it is executed. Acceptable product name values are listed below.
+    To assess Azure Active Directory you would enter the value aad.
+    To assess Exchange Online you would enter exo and so forth.
+    - Azure Active Directory: aad
+    - Defender for Office 365: defender
+    - Exchange Online: exo
+    - MS Power Platform: powerplatform
+    - SharePoint Online: sharepoint
+    - MS Teams: teams.
+    Use '*' to run all baselines.
+    .Parameter M365Environment
+    This parameter is used to authenticate to the different commercial/government environments.
+    Valid values include "commercial", "gcc", "gcchigh", or "dod".
+    - For M365 tenants with E3/E5 licenses enter the value **"commercial"**.
+    - For M365 Government Commercial Cloud tenants with G3/G5 licenses enter the value **"gcc"**.
+    - For M365 Government Commercial Cloud High tenants enter the value **"gcchigh"**.
+    - For M365 Department of Defense tenants enter the value **"dod"**.
+    Default value is 'commercial'.
+    .Parameter OPAPath
+    The folder location of the OPA Rego executable file.
+    The OPA Rego executable embedded with this project is located in the project's root folder.
+    If you want to execute the tool using a version of OPA Rego located in another folder,
+    then customize the variable value with the full path to the alternative OPA Rego exe file.
+    .Parameter LogIn
+    A `$true` or `$false` variable that if set to `$true`
+    will prompt you to provide credentials if you want to establish a connection
+    to the specified M365 products in the **$ProductNames** variable.
+    For most use cases, leave this variable to be `$true`.
+    A connection is established in the current PowerShell terminal session with the first authentication.
+    If you want to run another verification in the same PowerShell session simply set
+    this variable to be `$false` to bypass the reauthenticating in the same session. Default is $true.
+    Note: defender will ask for authentication even if this variable is set to `$false`
+    ;;;.Parameter Version
+    ;;;Will output the current ScubaGear version to the terminal without running this cmdlet.
+    .Parameter AppID
+    The application ID of the service principal that's used during certificate based
+    authentication. A valid value is the GUID of the application ID (service principal).
+    .Parameter CertificateThumbprint
+    The thumbprint value specifies the certificate that's used for certificate base authentication.
+    The underlying PowerShell modules retrieve the certificate from the user's certificate store.
+    As such, a copy of the certificate must be located there.
+    .Parameter Organization
+    Specify the organization that's used in certificate based authentication.
+    Use the tenant's tenantname.onmicrosoft.com domain for the parameter value.
+    .Parameter OutPath
+    The folder path where both the output JSON and the HTML report will be created.
+    The folder will be created if it does not exist. Defaults to current directory.
+    .Parameter OutFolderName
+    The name of the folder in OutPath where both the output JSON and the HTML report will be created.
+    Defaults to "M365BaselineConformance". The client's local timestamp will be appended.
+    .Parameter OutProviderFileName
+    The name of the Provider output JSON created in the folder created in OutPath.
+    Defaults to "ProviderSettingsExport".
+    .Parameter OutRegoFileName
+    The name of the Rego output JSON and CSV created in the folder created in OutPath.
+    Defaults to "TestResults".
+    .Parameter OutReportName
+    The name of the main html file page created in the folder created in OutPath.
+    Defaults to "BaselineReports".
+    .Parameter DisconnectOnExit
+    Set switch to disconnect all active connections on exit from ScubaGear (default: $false)
+    .Parameter ConfigFilePath
+    Local file path to a JSON or YAML formatted configuration file.
+    Configuration file parameters can be used in place of command-line
+    parameters. Additional parameters and variables not available on the
+    command line can also be included in the file that will be provided to the
+    tool for use in specific tests.
+    .Functionality
+    Public
+    #>
+    [CmdletBinding(DefaultParameterSetName='Report')]
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', '')]
+    param (
+
+        [Parameter(Mandatory = $false)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $Description = "YAML configuration file with default description", #(Join-Path -Path $env:USERPROFILE -ChildPath ".scubagear\Tools"),
+
+        [Parameter(Mandatory = $false)]
+        [ValidateNotNullOrEmpty()]
+        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
+        [string[]]
+        $ProductNames = @("aad", "defender", "exo", "sharepoint", "teams"),
+
+        [Parameter(Mandatory = $false)]
+        [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $false)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $M365Environment = "commercial",
+
+        [Parameter(Mandatory = $false)]
+        [ValidateScript({Test-Path -PathType Container $_})]
+        [string]
+        $OPAPath = ".", #(Join-Path -Path $env:USERPROFILE -ChildPath ".scubagear\Tools"),
+
+        [Parameter(Mandatory = $false)]
+        [ValidateNotNullOrEmpty()]
+        [ValidateSet($true, $false)]
+        [boolean]
+        $LogIn = $true,
+
+        [Parameter(Mandatory = $false)]
+        [ValidateNotNullOrEmpty()]
+        [ValidateSet($true, $false)]
+        [boolean]
+        $DisconnectOnExit = $false,
+
+        [Parameter(Mandatory = $false)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $OutPath = '.',
+
+        [Parameter(Mandatory = $false)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $AppID,
+
+        [Parameter(Mandatory = $false)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $CertificateThumbprint,
+
+        [Parameter(Mandatory = $false)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $Organization,
+
+        [Parameter(Mandatory = $false)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $OutFolderName = "M365BaselineConformance",
+
+        [Parameter(Mandatory = $false)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $OutProviderFileName = "ProviderSettingsExport",
+
+        [Parameter(Mandatory = $false)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $OutRegoFileName = "TestResults",
+
+        [Parameter(Mandatory = $false)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $OutReportName = "BaselineReports",
+
+        [Parameter(Mandatory = $false)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $ConfigLocation = "./"
+    )
+
+    $Config = New-Object ([System.Collections.specialized.OrderedDictionary])
+
+    ($MyInvocation.MyCommand.Parameters ).Keys | ForEach-Object{
+        $Val = (Get-Variable -Name $_ -EA SilentlyContinue).Value
+        if( $Val.length -gt 0 ) {
+            #$config[$_] = $val
+            $Config.add($_, $Val)
+        }
+    }
+
+    $CapExclusionNamespace = @(
+        "MS.AAD.1.1v1",
+        "MS.AAD.2.1v1",
+        "MS.AAD.2.3v1",
+        "MS.AAD.3.1v1",
+        "MS.AAD.3.2v1",
+        "MS.AAD.3.3v1",
+        "MS.AAD.3.6v1",
+        "MS.AAD.3.7v1",
+        "MS.AAD.3.8v1"
+        )
+    $RoleExclusionNamespace = "MS.AAD.7.4v1"
+
+    $CommonSensitiveAccountFilterNamespace = @(
+        "MS.DEFENDER.1.4v1",
+        "MS.DEFENDER.1.5v1"
+        )
+
+    $UserImpersonationProtectionNamespace = "MS.DEFENDER.2.1v1"
+
+    $AgencyDomainImpersonationProtectionNamespace = "MS.DEFENDER.2.2v1"
+
+    $PartnerDomainImpersonationProtectionNamespace = "MS.DEFENDER.2.3v1"
+
+
+    $AadTemplate = New-Object ([System.Collections.specialized.OrderedDictionary])
+    $AadCapExclusions = New-Object ([System.Collections.specialized.OrderedDictionary])
+    $AadRoleExclusions = New-Object ([System.Collections.specialized.OrderedDictionary])
+
+    $DefenderTemplate = New-Object ([System.Collections.specialized.OrderedDictionary])
+    $DefenderCommonSensitiveAccountFilter = New-Object ([System.Collections.specialized.OrderedDictionary])
+    #$defenderUserImpersonationProtection = New-Object ([System.Collections.specialized.OrderedDictionary])
+    #$defenderAgencyDomainImpersonationProtection = New-Object ([System.Collections.specialized.OrderedDictionary])
+    #$defenderPartnerDomainImpersonationProtection = New-Object ([System.Collections.specialized.OrderedDictionary])
+
+
+
+    $AadCapExclusions = @{ CapExclusions = @{} }
+    $AadCapExclusions["CapExclusions"].add("Users", @(""))
+    $AadCapExclusions["CapExclusions"].add("Groups", @(""))
+
+    $AadRoleExclusions = @{ RoleExclusions = @{} }
+    $AadRoleExclusions["RoleExclusions"].add("Users", @(""))
+    $AadRoleExclusions["RoleExclusions"].add("Groups", @(""))
+
+    foreach ($Cap in $CapExclusionNamespace){
+        $AadTemplate.add($Cap, $AadCapExclusions)
+    }
+
+    $AadTemplate.add($RoleExclusionNamespace, $AadRoleExclusions)
+
+    $DefenderCommonSensitiveAccountFilter = @{ SensitiveAccounts = @{} }
+    $DefenderCommonSensitiveAccountFilter['SensitiveAccounts'].add("IncludedUsers", @(""))
+    $DefenderCommonSensitiveAccountFilter['SensitiveAccounts'].add("IncludedGroups", @(""))
+    $DefenderCommonSensitiveAccountFilter['SensitiveAccounts'].add("IncludedDomains", @(""))
+    $DefenderCommonSensitiveAccountFilter['SensitiveAccounts'].add("ExcludedUsers", @(""))
+    $DefenderCommonSensitiveAccountFilter['SensitiveAccounts'].add("ExcludedGroups", @(""))
+    $DefenderCommonSensitiveAccountFilter['SensitiveAccounts'].add("ExcludedDomains", @(""))
+
+    foreach ($Filter in $CommonSensitiveAccountFilterNamespace){
+        $DefenderTemplate.add($Filter, $DefenderCommonSensitiveAccountFilter)
+    }
+
+    $DefenderTemplate.add($UserImpersonationProtectionNamespace, @{ SensitiveUsers = @("") })
+    $DefenderTemplate.add($AgencyDomainImpersonationProtectionNamespace, @{ AgencyDomains = @("") })
+    $DefenderTemplate.add($PartnerDomainImpersonationProtectionNamespace, @{ PartnerDomains = @("") })
+
+    $Products = (Get-Variable -Name ProductNames -EA SilentlyContinue).Value
+    foreach ($Product in $Products){
+        switch ($Product){
+            "aad" {
+                $config.add("Aad", $AadTemplate)
+                }
+            "defender" {
+                $config.add("Defender", $DefenderTemplate)
+                }
+        }
+    }
+    convertto-yaml $Config | set-content "$($ConfigLocation)/SampleConfig.yaml"
+}
+
 Export-ModuleMember -Function @(
     'Copy-ScubaBaselineDocument',
     'Install-OPA',
     'Initialize-SCuBA',
     'Debug-SCuBA',
     'Copy-ScubaSampleReport',
-    'Copy-ScubaSampleConfigFile'
+    'Copy-ScubaSampleConfigFile',
+    'New-Config'
 )

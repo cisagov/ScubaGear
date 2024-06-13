@@ -1,5 +1,5 @@
 package aad_test
-import future.keywords
+import rego.v1
 import data.aad
 import data.utils.key.TestResult
 import data.utils.aad.INT_MAX

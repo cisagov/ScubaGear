@@ -1,0 +1,29 @@
+# Purpose: Run the linter against the PowerShell code
+
+name: Lint Check for PowerShell
+
+# This is a reusable workflow called by the pipeline.
+on:
+  workflow_call:
+  workflow_dispatch:
+
+permissions: read-all
+
+jobs:
+  powershell-lint-check:
+    name: MegaLint PowerShell Check
+    # runs-on: ubuntu-latest
+    runs-on: windows-latest
+    # This condition prevents duplicate runs.
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+      - name: Setup PSScriptAnalyzer settings
+        run: cp Testing/Linting/MegaLinter/.powershell-psscriptanalyzer.psd1 .powershell-psscriptanalyzer.psd1
+      - name: Run PSScriptAnalyzer on PowerShell Scripts
+        run: |
+          Invoke-ScriptAnalyzer -Path ./ -Recurse -Severity Warning -EnableExit -Profile .powershell-psscriptanalyzer.psd1

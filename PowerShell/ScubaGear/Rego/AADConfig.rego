@@ -1,5 +1,5 @@
 package aad
-import future.keywords
+import rego.v1
 import data.utils.report.NotCheckedDetails
 import data.utils.report.CheckedSkippedDetails
 import data.utils.report.ReportDetailsBoolean
@@ -13,7 +13,6 @@ import data.utils.key.ConvertToSet
 import data.utils.aad.ReportFullDetailsArray
 import data.utils.aad.ReportDetailsArrayLicenseWarningCap
 import data.utils.aad.ReportDetailsArrayLicenseWarning
-import data.utils.aad.ReportDetailsBooleanLicenseWarning
 import data.utils.aad.UserExclusionsFullyExempt
 import data.utils.aad.GroupExclusionsFullyExempt
 import data.utils.aad.Aad2P2Licenses
@@ -28,9 +27,9 @@ import data.utils.aad.INT_MAX
 # Constants #
 #############
 
-RESTRICTEDACCESS := "2af84b1e-32c8-42b7-82bc-daa82404023b"
+RESTRICTEDACCESS := "2af84b1e-32c8-42b7-82bc-daa82404023b" #gitleaks:allow
 
-LIMITEDACCESS := "10dae51f-b6af-4016-8d66-8c2a99b929b3"
+LIMITEDACCESS := "10dae51f-b6af-4016-8d66-8c2a99b929b3" #gitleaks:allow
 
 MEMBERUSER := "a0b1b346-4d3e-4e8b-98f8-753987be4970"
 
@@ -179,7 +178,7 @@ tests contains {
 # If policy matches basic conditions, special conditions,
 # all exclusions are intentional, & none but acceptable MFA
 # are allowed, save the policy name
-MFAPolicies contains CAPolicy.DisplayName if {
+PhishingResistantMFAPolicies contains CAPolicy.DisplayName if {
     some CAPolicy in input.conditional_access_policies
 
     "All" in CAPolicy.Conditions.Users.IncludeUsers
@@ -198,12 +197,12 @@ tests contains {
     "PolicyId": "MS.AAD.3.1v1",
     "Criticality": "Shall",
     "Commandlet": ["Get-MgBetaIdentityConditionalAccessPolicy"],
-    "ActualValue": MFAPolicies,
-    "ReportDetails": concat(". ", [ReportFullDetailsArray(MFAPolicies, DescriptionString), CAPLINK]),
+    "ActualValue": PhishingResistantMFAPolicies,
+    "ReportDetails": concat(". ", [ReportFullDetailsArray(PhishingResistantMFAPolicies, DescriptionString), CAPLINK]),
     "RequirementMet": Status
 } if {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
-    Status := count(MFAPolicies) > 0
+    Status := count(PhishingResistantMFAPolicies) > 0
 }
 #--
 
@@ -211,10 +210,10 @@ tests contains {
 # MS.AAD.3.2v1
 #--
 
-# Save all policy names if MFAPolicies exist
+# Save all policy names if PhishingResistantMFAPolicies exist
 AlternativeMFA contains CAPolicy.DisplayName if {
     some CAPolicy in input.conditional_access_policies
-    Count(MFAPolicies) > 0
+    Count(PhishingResistantMFAPolicies) > 0
 }
 
 # If policy matches basic conditions, special conditions,
@@ -249,55 +248,99 @@ tests contains {
 # MS.AAD.3.3v1
 #--
 
-# At this time we are unable to test for X because of NEW POLICY
-# If we have acceptable MFA then policy passes otherwise MS Authenticator need to be
-# enabled to pass. However, we can not currently check if MS Authenticator enabled
-tests contains {
-    "PolicyId": "MS.AAD.3.3v1",
-    "Criticality": "Shall",
-    "Commandlet": ["Get-MgBetaIdentityConditionalAccessPolicy"],
-    "ActualValue": MFAPolicies,
-    "ReportDetails": concat(". ", [ReportFullDetailsArray(MFAPolicies, DescriptionString), CAPLINK]),
-    "RequirementMet": Status
-} if {
-    DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
-    Status := count(MFAPolicies) > 0
-    count(MFAPolicies) > 0
+# Returns the MS Authenticator configuration settings
+MSAuth := auth_setting if {
+    some auth_method in input.authentication_method
+    some auth_setting in auth_method.authentication_method_feature_settings
+
+    auth_setting.Id == "MicrosoftAuthenticator"
 }
 
+# Returns true if MS Authenticator is enabled, false if it is not
+default MSAuthEnabled := false
+MSAuthEnabled := true if {
+    MSAuth.State == "enabled"
+}
+
+# Returns true if MS Authenticator is configured per the baseline, false if it is not
+default MSAuthProperlyConfigured := false
+MSAuthProperlyConfigured := true if {
+    MSAuth.State == "enabled"
+
+    # Make sure that MS Auth shows the app name and geographic location
+    Settings := MSAuth.AdditionalProperties.featureSettings
+    Settings.displayAppInformationRequiredState.state == "enabled"
+    Settings.displayLocationInformationRequiredState.state == "enabled"
+
+    # Make sure that the configuration applies to all users
+    some target in MSAuth.AdditionalProperties.includeTargets
+    target.id == "all_users"
+}
+
+default AAD_3_3_Not_Applicable := false
+# Returns true no matter what if phishing-resistant MFA is being enforced
+AAD_3_3_Not_Applicable := true if {
+    count(PhishingResistantMFAPolicies) > 0
+}
+
+# Returns true if phishing-resistant MFA is not being enforced but MS Auth is disabled
+AAD_3_3_Not_Applicable := true if {
+    count(PhishingResistantMFAPolicies) == 0
+    MSAuthEnabled == false
+}
+
+# First test is for N/A case
 tests contains {
     "PolicyId": PolicyId,
     "Criticality": "Shall/Not-Implemented",
-    "Commandlet": [],
+    "Commandlet": ["Get-MgBetaPolicyAuthenticationMethodPolicy"],
     "ActualValue": [],
-    "ReportDetails": NotCheckedDetails(PolicyId),
+    "ReportDetails": CheckedSkippedDetails(PolicyId, Reason),
     "RequirementMet": false
 } if {
     PolicyId := "MS.AAD.3.3v1"
-    count(MFAPolicies) == 0
+    # regal ignore:line-length
+    Reason := "This policy is only applicable if phishing-resistant MFA is not enforced and MS Authenticator is enabled. See %v for more info"
+    AAD_3_3_Not_Applicable == true
 }
-#--
+
+# If policy is not N/A then we check that the configuration matches the baseline
+tests contains {
+    "PolicyId": "MS.AAD.3.3v1",
+    "Criticality": "Shall",
+    "Commandlet": ["Get-MgBetaPolicyAuthenticationMethodPolicy"],
+    "ActualValue": MSAuth,
+    "ReportDetails": ReportDetailsBoolean(Status),
+    "RequirementMet": Status
+} if {
+    AAD_3_3_Not_Applicable == false
+
+    Status := MSAuthProperlyConfigured == true
+}
 
 #
 # MS.AAD.3.4v1
 #--
 
-PolicyMigrationIsComplete := Status if {
-    some Policy in input.authentication_method
-    Status := Policy.PolicyMigrationState == "migrationComplete"
+# Returns the auth policy migration state object
+AuthenticationPolicyMigrationState := PolicyMigrationState if {
+    some Setting in input.authentication_method
+    PolicyMigrationState := Setting.authentication_method_policy.PolicyMigrationState
 }
 
-# At this time we are unable to test for X because of NEW POLICY
+# Returns true if the tenant has completed their authpolicy migration
+default AuthenticationPolicyMigrationIsComplete := false
+AuthenticationPolicyMigrationIsComplete if AuthenticationPolicyMigrationState == "migrationComplete"
+
 tests contains {
     "PolicyId": "MS.AAD.3.4v1",
     "Criticality": "Shall",
     "Commandlet": ["Get-MgBetaPolicyAuthenticationMethodPolicy"],
-    "ActualValue": [Policy.PolicyMigrationState],
+    "ActualValue": [AuthenticationPolicyMigrationState],
     "ReportDetails": ReportDetailsBoolean(Status),
     "RequirementMet": Status
 } if {
-    some Policy in input.authentication_method
-    Status := Policy.PolicyMigrationState == "migrationComplete"
+    Status := AuthenticationPolicyMigrationIsComplete
 }
 #--
 
@@ -305,19 +348,26 @@ tests contains {
 # MS.AAD.3.5v1
 #--
 
-GoodAuthenticationMethodConfigurations contains {
+# Returns all the config states for the methods Sms, Voice, Email
+LowSecurityAuthMethods contains {
     "Id": Configuration.Id,
     "State": Configuration.State
 } if {
-    some Item in input.authentication_method
-    some Configuration in Item.AuthenticationMethodConfigurations
+    some Setting in input.authentication_method
+    some Configuration in Setting.authentication_method_feature_settings
     Configuration.Id in ["Sms", "Voice", "Email"]
-    Configuration.State == "disabled"
 }
 
+# Returns true only when all the low security auth methods are disabled per the policy
+default LowSecurityAuthMethodsDisabled := false
+LowSecurityAuthMethodsDisabled := true if {
+    every Config in LowSecurityAuthMethods { Config.State == "disabled" }
+}
+
+# First test is for N/A case
 tests contains {
     "PolicyId": PolicyId,
-    "Criticality": "Shall",
+    "Criticality": "Shall/Not-Implemented",
     "Commandlet": ["Get-MgBetaPolicyAuthenticationMethodPolicy"],
     "ActualValue": [],
     "ReportDetails": CheckedSkippedDetails("MS.AAD.3.4v1", Reason),
@@ -326,21 +376,21 @@ tests contains {
     PolicyId := "MS.AAD.3.5v1"
     # regal ignore:line-length
     Reason := "This policy is only applicable if the tenant has their Manage Migration feature set to Migration Complete. See %v for more info"
-    PolicyMigrationIsComplete != true
+    AuthenticationPolicyMigrationIsComplete != true
 }
 
+# If policy is not N/A then we check that the configuration matches the baseline
 tests contains {
     "PolicyId": "MS.AAD.3.5v1",
     "Criticality": "Shall",
     "Commandlet": ["Get-MgBetaPolicyAuthenticationMethodPolicy"],
-    "ActualValue": [],
+    "ActualValue": [LowSecurityAuthMethods],
     "ReportDetails": ReportDetailsString(Status, ErrorMessage),
     "RequirementMet": Status
 } if {
     ErrorMessage := "Sms, Voice, and Email authentication must be disabled."
-    PolicyMigrationIsComplete == true
-    Conditions := [PolicyMigrationIsComplete == true, count(GoodAuthenticationMethodConfigurations) == 3]
-    Status := count(FilterArray(Conditions, false)) == 0
+    AuthenticationPolicyMigrationIsComplete == true
+    Status := LowSecurityAuthMethodsDisabled
 }
 #--
 
@@ -379,7 +429,7 @@ PhishingResistantMFA contains CAPolicy.DisplayName if {
 tests contains {
     "PolicyId": "MS.AAD.3.6v1",
     "Criticality": "Shall",
-    "Commandlet": ["Get-MgBetaSubscribedSku", "Get-PrivilegedRole", "Get-MgBetaIdentityConditionalAccessPolicy"],
+    "Commandlet": ["Get-MgBetaIdentityConditionalAccessPolicy"],
     "ActualValue": PhishingResistantMFA,
     "ReportDetails": concat(". ", [ReportFullDetailsArray(PhishingResistantMFA, DescriptionString), CAPLINK]),
     "RequirementMet": Status
@@ -521,14 +571,18 @@ tests contains {
 # MS.AAD.5.2v1
 #--
 
-# Save the policy Id of any user allowed to consent to third
-# party applications
+# Return the Id if non-compliant user consent policies
 BadDefaultGrantPolicies contains Policy.Id if {
     some Policy in input.authorization_policies
-    count(Policy.PermissionGrantPolicyIdsAssignedToDefaultUserRole) != 0
+    "ManagePermissionGrantsForSelf.microsoft-user-default-legacy" in Policy.PermissionGrantPolicyIdsAssignedToDefaultUserRole
 }
 
-# Get all policy Ids
+BadDefaultGrantPolicies contains Policy.Id if {
+    some Policy in input.authorization_policies
+    "ManagePermissionGrantsForSelf.microsoft-user-default-low" in Policy.PermissionGrantPolicyIdsAssignedToDefaultUserRole
+}
+
+# Return all policy Ids
 AllDefaultGrantPolicies contains {
     "DefaultUser_DefaultGrantPolicy": Policy.PermissionGrantPolicyIdsAssignedToDefaultUserRole,
     "PolicyId": Policy.Id
@@ -536,7 +590,7 @@ AllDefaultGrantPolicies contains {
     some Policy in input.authorization_policies
 }
 
-# If there is a policy that allows user to cconsent to third party apps, fail
+# If there is a policy that allows user to consent to third party apps, fail
 tests contains {
     "PolicyId": "MS.AAD.5.2v1",
     "Criticality": "Shall",
@@ -881,10 +935,12 @@ tests contains {
 
 # Save role name if id is a specific string and approval is
 # not required.
-RolesWithoutApprovalRequired contains Role.DisplayName if {
+RolesWithoutApprovalRequired contains Offender if {
     some Role in input.privileged_roles
     some Rule in Role.Rules
 
+    Offender := sprintf("%v(%v)", [Rule.RuleSource, Rule.RuleSourceType])
+    Role.DisplayName == "Global Administrator"
     # Filter: only include policies that meet all the requirements
     Rule.Id == "Approval_EndUser_Assignment"
     Rule.AdditionalProperties.setting.isApprovalRequired == false
@@ -897,12 +953,13 @@ tests contains {
     "Criticality": "Shall",
     "Commandlet": ["Get-MgBetaSubscribedSku", "Get-PrivilegedRole"],
     "ActualValue": RolesWithoutApprovalRequired,
-    "ReportDetails": ReportDetailsBooleanLicenseWarning(Status),
+    "ReportDetails": ReportDetailsArrayLicenseWarning(RolesWithoutApprovalRequired, DescriptionString),
     "RequirementMet": Status
 } if {
+    DescriptionString := "role(s) or group(s) allowing activation without approval found"
     Conditions := [
         count(Aad2P2Licenses) > 0,
-        ("Global Administrator" in RolesWithoutApprovalRequired) == false
+        count(RolesWithoutApprovalRequired) == 0
     ]
     Status := count(FilterArray(Conditions, false)) == 0
 }
@@ -914,10 +971,11 @@ tests contains {
 
 # Save role name if id is a specific string and no
 # notification recipients.
-RolesWithoutActiveAssignmentAlerts contains Role.DisplayName if {
+RolesWithoutActiveAssignmentAlerts contains Offender if {
     some Role in input.privileged_roles
     some Rule in Role.Rules
 
+    Offender := sprintf("%v(%v)", [Rule.RuleSource, Rule.RuleSourceType])
     # Filter: only include policies that meet all the requirements
     Rule.Id == "Notification_Admin_Admin_Assignment"
     count(Rule.AdditionalProperties.notificationRecipients) == 0
@@ -925,10 +983,11 @@ RolesWithoutActiveAssignmentAlerts contains Role.DisplayName if {
 
 # Save role name if id is a specific string and no
 # notification recipients.
-RolesWithoutEligibleAssignmentAlerts contains Role.DisplayName if {
+RolesWithoutEligibleAssignmentAlerts contains Offender if {
     some Role in input.privileged_roles
     some Rule in Role.Rules
 
+    Offender := sprintf("%v(%v)", [Rule.RuleSource, Rule.RuleSourceType])
     # Filter: only include policies that meet all the requirements
     Rule.Id == "Notification_Admin_Admin_Eligibility"
     count(Rule.AdditionalProperties.notificationRecipients) == 0
@@ -944,7 +1003,7 @@ tests contains {
     "ReportDetails": ReportDetailsArrayLicenseWarning(RolesWithoutAssignmentAlerts, DescriptionString),
     "RequirementMet": Status
 } if {
-    DescriptionString := "role(s) without notification e-mail configured for role assignments found"
+    DescriptionString := "role(s) or group(s) without notification e-mail configured for role assignments found"
     RolesWithoutAssignmentAlerts := RolesWithoutActiveAssignmentAlerts | RolesWithoutEligibleAssignmentAlerts
     Conditions := [
         count(Aad2P2Licenses) > 0,
@@ -960,10 +1019,12 @@ tests contains {
 
 # Save role name if id is a specific string, notification
 # type is a specific string, & no notification recipients.
-AdminsWithoutActivationAlert contains Role.DisplayName if {
+GlobalAdminsWithoutActivationAlert contains Offender if {
     some Role in input.privileged_roles
     some Rule in Role.Rules
 
+    Offender := sprintf("%v(%v)", [Rule.RuleSource, Rule.RuleSourceType])
+    Role.DisplayName == "Global Administrator"
     # Filter: only include policies that meet all the requirements
     Rule.Id == "Notification_Admin_EndUser_Assignment"
     Rule.AdditionalProperties.notificationType == "Email"
@@ -976,13 +1037,14 @@ tests contains {
     "PolicyId": "MS.AAD.7.8v1",
     "Criticality": "Shall",
     "Commandlet": ["Get-MgBetaSubscribedSku", "Get-PrivilegedRole"],
-    "ActualValue": AdminsWithoutActivationAlert,
-    "ReportDetails": ReportDetailsBooleanLicenseWarning(Status),
+    "ActualValue": GlobalAdminsWithoutActivationAlert,
+    "ReportDetails": ReportDetailsArrayLicenseWarning(GlobalAdminsWithoutActivationAlert, DescriptionString),
     "RequirementMet": Status
 } if {
+    DescriptionString := "role(s) or group(s) without notification e-mail configured for Global Administrator activations found"
     Conditions := [
         count(Aad2P2Licenses) > 0,
-        ("Global Administrator" in AdminsWithoutActivationAlert) == false
+        count(GlobalAdminsWithoutActivationAlert) == 0
     ]
     Status := count(FilterArray(Conditions, false)) == 0
 }
@@ -992,21 +1054,32 @@ tests contains {
 # MS.AAD.7.9v1
 #--
 
+OtherAdminsWithoutActivationAlert contains Offender if {
+    some Role in input.privileged_roles
+    some Rule in Role.Rules
+
+    Offender := sprintf("%v(%v)", [Rule.RuleSource, Rule.RuleSourceType])
+    not Role.DisplayName == "Global Administrator"
+    # Filter: only include policies that meet all the requirements
+    Rule.Id == "Notification_Admin_EndUser_Assignment"
+    Rule.AdditionalProperties.notificationType == "Email"
+    count(Rule.AdditionalProperties.notificationRecipients) == 0
+}
+
 # If there are no roles without activation alert &
 # correct license, pass
 tests contains {
     "PolicyId": "MS.AAD.7.9v1",
     "Criticality": "Should",
     "Commandlet": ["Get-MgBetaSubscribedSku", "Get-PrivilegedRole"],
-    "ActualValue": NonGlobalAdminsWithoutActivationAlert,
-    "ReportDetails": ReportDetailsArrayLicenseWarning(NonGlobalAdminsWithoutActivationAlert, DescriptionString),
+    "ActualValue": OtherAdminsWithoutActivationAlert,
+    "ReportDetails": ReportDetailsArrayLicenseWarning(OtherAdminsWithoutActivationAlert, DescriptionString),
     "RequirementMet": Status
 } if {
-    DescriptionString := "role(s) without notification e-mail configured for role activations found"
-    NonGlobalAdminsWithoutActivationAlert = AdminsWithoutActivationAlert - {"Global Administrator"}
+    DescriptionString := "role(s) or group(s) without notification e-mail configured for role activations found"
     Conditions := [
         count(Aad2P2Licenses) > 0,
-        count(NonGlobalAdminsWithoutActivationAlert) == 0
+        count(OtherAdminsWithoutActivationAlert) == 0
     ]
     Status := count(FilterArray(Conditions, false)) == 0
 }

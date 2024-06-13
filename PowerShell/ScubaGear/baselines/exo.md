@@ -382,21 +382,14 @@ SMTP AUTH SHALL be disabled.
 <!--Policy: MS.EXO.5.1v1; Criticality: SHALL -->
 - _Rationale:_ SMTP AUTH is not used or needed by modern email clients.
 Therefore, disabling it as the global default conforms to the principle of
-least functionality. SMTP AUTH is required for POP3 and IMAP4 clients. As
-there are still legitimate uses for such clients, SMTP AUTH can be enabled on a
-per-mailbox basis when necessary.
+least functionality.
 - _Last modified:_ June 2023
-- _Note:_ SMTP AUTH MAY be enabled on a per-mailbox basis as needed.
 
 ### Resources
 
 - [Enable or disable authenticated client SMTP submission (SMTP AUTH) in
   Exchange Online \| Microsoft
   Learn](https://learn.microsoft.com/en-us/exchange/clients-and-mobile-in-exchange-online/authenticated-client-smtp-submission)
-
-- [Use the Microsoft 365 admin center to enable or disable SMTP AUTH on
-  specific mailboxes \| Microsoft
-  Learn](https://learn.microsoft.com/en-us/exchange/clients-and-mobile-in-exchange-online/authenticated-client-smtp-submission#use-the-microsoft-365-admin-center-to-enable-or-disable-smtp-auth-on-specific-mailboxes)
 
 ### License Requirements
 
@@ -413,18 +406,6 @@ To disable SMTP AUTH for the organization:
 2. On the left hand pane, select **Settings**; then from the settings list, select **Mail Flow**.
 
 3. Make sure the setting **Turn off SMTP AUTH protocol for your organization** is checked.
-
-(Optional) As an exception, to allow SMTP AUTH for a specific mailbox:
-
-1. Sign in to the **Microsoft 365 admin center** and go to **Users > Active users**.
-
-2. Select the user, and in the properties that appear, click the **Mail** tab.
-
-3. In the **Email apps** section, click **Manage email apps**.
-
-4. Make sure the setting **Authenticated SMTP** is checked to enable.
-
-5. When finished, click **Save changes**.
 
 ## 6. Calendar and Contact Sharing
 

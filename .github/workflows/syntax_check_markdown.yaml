@@ -1,0 +1,29 @@
+# Purpose: Run the syntax checks for Markdown.
+
+name: Syntax Checks for Markdown
+
+# This is a reusable workflow called by the pipeline.
+on:
+  workflow_call:
+  workflow_dispatch:
+
+permissions: read-all
+
+jobs:
+  markdown-check:
+    name: Markdown Syntax Checks
+    runs-on: windows-latest
+    # This condition prevents duplicate runs.
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
+    defaults:
+      run:
+        shell: powershell
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repo code
+        uses: actions/checkout@v4
+      - name: Execute markdown checks
+        run: |
+          $PSVersionTable
+          Invoke-Pester PowerShell\ScubaGear\Testing\Unit\PowerShell\CreateReport -Output Detailed

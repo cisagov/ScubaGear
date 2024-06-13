@@ -107,6 +107,7 @@ Context "Unit Test for ConfigureScubaGearModule" {
             }
             Copy-Item -Recurse -Path $ModulePath -Destination $env:TEMP -Force
             $ManifestPath = Join-Path -Path $env:TEMP -ChildPath 'ScubaGear\ScubaGear.psd1' -Resolve
+            # 99.1 is an intentionally invalid number
             Get-Content "$ModulePath\ScubaGear.psd1" | ForEach-Object { $_ -replace '5.1', '99.1' } | Set-Content $ManifestPath
             Mock -CommandName Write-Error {}
         }

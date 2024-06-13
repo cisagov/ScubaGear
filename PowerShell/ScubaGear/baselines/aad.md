@@ -507,19 +507,19 @@ Group owners SHALL NOT be allowed to consent to applications.
 
 1.  In **Azure Active Directory** create a new Azure AD Group that contains admin users responsible for reviewing and adjudicating application consent requests. Group members will be notified when users request consent for new applications.
 
-2. Then in **Azure Active Directory** under **Manage**, select **Enterprise Applications.**
+2. Then in **Azure Active Directory** under **Applications**, select **Enterprise Applications.**
 
-3. Under **Security**, select **Consent and permissions**. Then select **User Consent Settings**.
+3. Under **Security**, select **Consent and permissions**. Then select **Admin consent settings**.
 
 4. Under **Admin consent requests** > **Users can request admin consent to apps they are unable to consent to** select **Yes**.
 
-5. Under **Who can review admin consent requests**, select the group responsible for reviewing and adjudicating app requests (created in step one above).
+5. Under **Who can review admin consent requests**, select **+ Add groups** and select the group responsible for reviewing and adjudicating app requests (created in step one above).
 
 6. Click **Save**.
 
 #### MS.AAD.5.4v1 Instructions
 
-1.  In **Azure Active Directory** under **Manage**, select **Enterprise Applications.**
+1.  In **Azure Active Directory** under **Applications**, select **Enterprise Applications.**
 
 2. Under **Security**, select **Consent and permissions.** Then select **User Consent Settings.**
 
@@ -749,22 +749,17 @@ Exception cases:
 
 #### MS.AAD.7.6v1 Instructions
 
-1. In **Azure Active Directory** create a new group named **Privileged Escalation Approvers**. This group will contain users that will receive role activation approval requests and approve or deny them.
+1. In **Azure AD Privileged Identity Management (PIM)**, under **Manage**, select **Azure AD roles**.
 
-2. Assign this new group to the Azure AD role **Privileged Role Administrators**. This permission allows users in this group to adjudicate role activation approval requests.
-
-3. Assign the users responsible for reviewing approval requests to the new **Privileged Escalation Approvers** group via the [PIM for Groups feature](https://learn.microsoft.com/en-us/entra/id-governance/privileged-identity-management/concept-pim-for-groups).
-
-4. In **Azure AD Privileged Identity Management (PIM)**, under **Manage**, select **Azure AD roles**.
-
-5. Under **Manage**, select **Roles**.
+2. Under **Manage**, select **Roles**.
 
   1.  Select the **Global Administrator** role in the list.
   2.  Click **Settings**.
   3.  Click **Edit**.
   4.  Select the **Require approval to activate** option.
-  5.  Click **Select approvers** and select the group **Privileged Escalation Approvers**, and then click **Select**.
-  6.  Click **Update**.
+  5.  Click **Update**.
+
+3. Review the list of groups that are actively assigned to the **Global Administrator** role. If any of the groups are enrolled in PIM for Groups, then also apply the same configurations under step 2 above to each PIM group's **Member** settings.
 
 #### MS.AAD.7.7v1 Instructions
 
@@ -784,6 +779,8 @@ Exception cases:
 
 8. Click **Update**.
 
+9. For each of the highly privileged roles, if they have any PIM groups actively assigned to them, then also apply the same configurations per the steps above to each PIM group's **Member** settings.
+
 #### MS.AAD.7.8v1 Instructions
 
 1. In **Azure AD Privileged Identity Management (PIM)**, under **Manage**, select **Azure AD roles.**
@@ -800,9 +797,13 @@ Exception cases:
 
 7. Click **Update**.
 
+8. If the Global Administrator role has any PIM groups actively assigned to it, then also apply the same configurations per the steps above to each PIM group's **Member** settings.
+
 #### MS.AAD.7.9v1 Instructions
 
  1. Follow the same instructions as MS.AAD.7.8v1 for each of the highly privileged roles (other than Global Administrator) but enter a security monitoring mailbox different from the one used to monitor Global Administrator activations.
+
+ 2. For each of the highly privileged roles, if they have any PIM groups actively assigned to them, then also apply the same configurations per step 1 to each PIM group's **Member** settings.
 
 ## 8. Guest User Access
 

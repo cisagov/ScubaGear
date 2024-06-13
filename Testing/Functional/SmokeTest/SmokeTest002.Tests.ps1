@@ -109,6 +109,24 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for $OrganizationN
                     $TenantDataColumns = Get-SeElement -Target $Rows[1] -By TagName "td"
                     $Tenant = $TenantDataColumns[0].Text
                     $Tenant | Should -Be $OrganizationName -Because "Tenant is $Tenant"
+
+                    $RowHeaders = Get-SeElement -Element $Rows[0] -By TagName 'th'
+
+                    ForEach ($Header in $RowHeaders){
+                        $Header.GetAttribute("scope") | Should -Be "col" -Because 'Each <th> tag must have a scope attribute set to "col"'
+                    }
+
+                    For ($i = 1; $i -lt $Rows.length; $i++){
+                        $RowData = Get-SeElement -Element $Rows[$i] -By TagName 'td'
+                        For($j = 0; $j -lt $RowData.length; $j++){
+                            if($j -eq 0){
+                                $RowData[$j].GetAttribute("scope") | Should -Be "row" -Because "There should only be one scope attribute set for each data row"
+                            }
+                            else{
+                                $RowData[$j].GetAttribute("scope") | Should -Not -Be "row"
+                            }
+                        }
+                    }
                 }
                 # AAD detailed report has a Conditional Access Policy table
                 elseif ($Table.GetAttribute("class") -eq "caps_table"){
@@ -126,6 +144,38 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for $OrganizationN
 
                         if ($RowData.Count -gt 0){
                             $RowData.Count | Should -BeExactly 8
+                        }
+                    }
+
+                    ForEach ($Header in $RowHeaders){
+                        $Header.GetAttribute("scope") | Should -Be "col" -Because 'Each <th> tag must have a scope attribute set to "col"'
+                    }
+
+                    For ($i = 1; $i -lt $Rows.length; $i++){
+                        $RowData = Get-SeElement -Element $Rows[$i] -By TagName 'td'
+                        For($j = 0; $j -lt $RowData.length; $j++){
+                            if($j -eq 1){
+                                $RowData[$j].GetAttribute("scope") | Should -Be "row" -Because "There should only be one scope attribute set for each data row"
+                            }
+                            else{
+                                $RowData[$j].GetAttribute("scope") | Should -Not -Be "row"
+                            }
+                        }
+                    }
+                }
+                elseif ($Table.GetProperty("id") -eq "license-info"){
+
+                    # Iterate through each row in the table ensuring there are 3 columns
+                    foreach ($Row in $Rows) {
+                        $RowHeaders = Get-SeElement -Element $Row -By TagName 'th'
+                        $RowData = Get-SeElement -Element $Row -By TagName 'td'
+
+                        if ($RowHeaders.Count -gt 0){
+                            $RowHeaders.Count | Should -BeExactly 4
+                        }
+
+                        if ($RowData.Count -gt 0){
+                            $RowData.Count | Should -BeExactly 4
                         }
                     }
                 }
@@ -146,6 +196,22 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for $OrganizationN
                         if ($RowData.Count -gt 0){
                             $RowData.Count | Should -BeExactly 5
                             $RowData[2].text | Should -Not -BeLikeExactly "Error - Test results missing" -Because "All policies should have implementations: $($RowData[0].text)"
+                        }
+                    }
+
+                    ForEach ($Header in $RowHeaders){
+                        $Header.GetAttribute("scope") | Should -Be "col" -Because 'Each <th> tag must have a scope attribute set to "col"'
+                    }
+
+                    For ($i = 1; $i -lt $Rows.length; $i++){
+                        $RowData = Get-SeElement -Element $Rows[$i] -By TagName 'td'
+                        For($j = 0; $j -lt $RowData.length; $j++){
+                            if($j -eq 0){
+                                $RowData[$j].GetAttribute("scope") | Should -Be "row" -Because "There should only be one scope attribute set for each data row"
+                            }
+                            else{
+                                $RowData[$j].GetAttribute("scope") | Should -Not -Be "row"
+                            }
                         }
                     }
                 }

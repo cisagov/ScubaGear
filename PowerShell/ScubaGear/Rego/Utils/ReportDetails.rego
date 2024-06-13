@@ -1,6 +1,7 @@
 package utils.report
-import future.keywords
+import rego.v1
 import data.utils.key.PASS
+import data.utils.key.FAIL
 
 
 #############
@@ -29,7 +30,6 @@ PolicyLink(PolicyId) := sprintf(
     "<a href=\"%v%v.md%v\" target=\"_blank\">Secure Configuration Baseline policy</a>",
     [SCUBABASEURL, PolicyProduct(PolicyId), PolicyAnchor(PolicyId)]
 )
-
 
 ###############################
 # Generic Reporting Functions #
@@ -68,19 +68,24 @@ ReportDetailsBoolean(true) := "Requirement met"
 
 ReportDetailsBoolean(false) := "Requirement not met"
 
-# Returns specified string if Status is false (good for error msg)
-ReportDetailsString(true, _) := PASS if {}
+# Reporting methods passed Status and appends warning
+ReportDetailsBooleanWarning(true, Warning) := concat(": ", [PASS, Warning])
 
-ReportDetailsString(false, String) := String if {}
+ReportDetailsBooleanWarning(false, Warning) := concat(": ", [FAIL, Warning])
+
+# Returns specified string if Status is false (good for error msg)
+ReportDetailsString(true, _) := PASS
+
+ReportDetailsString(false, String) := String
 
 # Returns string constructed from array if Status is false (good for error msg)
-ReportDetailsArray(true, _, _) := PASS if {}
+ReportDetailsArray(true, _, _) := PASS
 
 ReportDetailsArray(false, Array, String) := Description([
     ArraySizeStr(Array),
     String,
     concat(", ", Array)
-]) if {}
+])
 
 
 ################################################

@@ -1,5 +1,5 @@
 package defender_test
-import future.keywords
+import rego.v1
 import data.defender
 import data.utils.report.NotCheckedDetails
 import data.utils.key.TestResult

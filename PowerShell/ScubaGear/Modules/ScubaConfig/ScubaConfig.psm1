@@ -28,6 +28,7 @@ class ScubaConfig {
         DefaultOutProviderFileName = "ProviderSettingsExport"
         DefaultOutRegoFileName = "TestResults"
         DefaultOutReportName = "BaselineReports"
+        DefaultOutJsonFileName = "ScubaResults"
         DefaultPrivilegedRoles = @(
             "Global Administrator",
             "Privileged Role Administrator",
@@ -37,6 +38,7 @@ class ScubaConfig {
             "Hybrid Identity Administrator",
             "Application Administrator",
             "Cloud Application Administrator")
+        DefaultOPAVersion = '0.64.1'
     }
 
     static [object]ScubaDefault ([string]$Name){
@@ -65,6 +67,7 @@ class ScubaConfig {
     hidden [hashtable]$Configuration
 
     hidden [void]SetParameterDefaults(){
+        Write-Debug "Setting ScubaConfig default values."
         if (-Not $this.Configuration.ProductNames){
             $this.Configuration.ProductNames = [ScubaConfig]::ScubaDefault('DefaultProductNames')
         }
@@ -75,7 +78,8 @@ class ScubaConfig {
                 Write-Debug "Setting ProductNames to all products because of wildcard"
             }
             else{
-                $this.Configuration.ProductNames = $this.Configuration.ProductNames | Sort-Object
+                Write-Debug "ProductNames provided - using as is."
+                $this.Configuration.ProductNames = $this.Configuration.ProductNames | Sort-Object -Unique
             }
         }
 
@@ -113,6 +117,10 @@ class ScubaConfig {
 
         if (-Not $this.Configuration.OutReportName){
             $this.Configuration.OutReportName = [ScubaConfig]::ScubaDefault('DefaultOutReportName')
+        }
+
+        if (-Not $this.Configuration.OutJsonFileName){
+            $this.Configuration.OutJsonFileName = [ScubaConfig]::ScubaDefault('DefaultOutJsonFileName')
         }
 
         return

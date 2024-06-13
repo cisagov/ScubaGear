@@ -1,0 +1,114 @@
+# Purpose: Publish on demand to the real gallery (PSGallery).
+# Note: If the published package is pre-release, then all 3 of the manual inputs, the module version, the pre-release boolean, and the tag, should be entered.
+
+name: Publish Public Package
+
+on:
+  workflow_dispatch:
+    inputs:
+      # checkov:skip=CKV_GHA_7:Manual inputs are desired.
+      OverrideModuleVersion:
+        description: "Always enter the release version in semantic version format, Major.Minor.Patch (e.g., 1.3.0):"
+        required: false
+        type: string
+      IsPrerelease:
+        description: "If pre-release, check here:"
+        required: false
+        type: boolean
+        default: false
+      PrereleaseTag:
+        description: "If pre-release, enter prerelease tag in [0-9A-Za-z]+ format (e.g., alpha1, rc2, test04):"
+        required: false
+        type: string
+  # for testing
+  # push:
+  #   paths:
+  #     - ".github/workflows/publish_public_package.yaml"
+  #     - "utils/DeployUtils.ps1"
+
+permissions: read-all
+
+jobs:
+  publish:
+    name: Publish to PSGallery
+    runs-on: windows-latest
+    environment: Development
+    permissions:
+      id-token: write
+      contents: write
+    defaults:
+      run:
+        shell: powershell
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: repo
+      - name: Install Azure Signing Tool
+        run: |
+          dotnet --version
+          dotnet tool install --global AzureSignTool --version 4.0.1
+      # OIDC Login to Azure Public Cloud with AzPowershell (enableAzPSSession true)
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          enable-AzPSSession: true
+      - name: Get Key Vault info
+        id: key-vault-info
+        env:
+          KEY_VAULT_INFO: ${{ secrets.SCUBA_KEY_VAULT_PROD}}
+        run: |
+          $KeyVaultInfo = ${env:KEY_VAULT_INFO} | ConvertFrom-Json
+          echo "KeyVaultUrl=$($KeyVaultInfo.KeyVault.URL)" >> $env:GITHUB_OUTPUT
+          echo "KeyVaultCertificateName=$($KeyVaultInfo.KeyVault.CertificateName)" >> $env:GITHUB_OUTPUT
+      - name: Sign and Publish Module
+        run: |
+          # Source the deploy utilities so the functions in it can be called.
+          . repo/utils/DeployUtils.ps1
+          # Remove non-release files
+          Remove-Item -Recurse -Force repo -Include .git*
+          # Extract the API key used to publish to PSGallery
+          $ApiKey = az keyvault secret show --id '${{ steps.key-vault-info.outputs.KeyVaultUrl }}/secrets/ScubaGear-PSGAllery-API-Key' --query value -o tsv
+          if (-Not $ApiKey)
+          {
+            Write-Error "Failed to retrieve API key"
+          }
+          # Setup the parameters
+          $Parameters = @{
+            AzureKeyVaultUrl = '${{ steps.key-vault-info.outputs.KeyVaultUrl }}'
+            CertificateName = '${{ steps.key-vault-info.outputs.KeyVaultCertificateName }}'
+            ModulePath = 'repo/PowerShell/ScubaGear'
+            GalleryName = 'PSGallery'
+            NuGetApiKey = $ApiKey
+          }
+          if ('true' -eq '${{ inputs.IsPrerelease }}')
+          {
+            Write-Output "Adding IsPrerelease"
+            Write-Output ${{ inputs.IsPrerelease }}
+            $Parameters.Add('PrereleaseTag', '${{ inputs.PrereleaseTag }}')
+          }
+          if (-Not [string]::IsNullOrEmpty('${{ inputs.OverrideModuleVersion }}'))
+          {
+            Write-Output "Adding OverrideModuleVersion"
+            Write-Output ${{ inputs.OverrideModuleVersion }}
+            $Parameters.Add('OverrideModuleVersion', '${{ inputs.OverrideModuleVersion }}')
+          }
+          # This publishes to PSGallery.
+          Publish-ScubaGearModule @Parameters
+      # This is a manual test that simply writes the version to the console
+      - name: Test Scuba Version
+        run: |
+          if ('true' -eq '${{ inputs.IsPrerelease }}')
+          {
+            $Version = '${{ inputs.OverrideModuleVersion }}' + '-' + '${{ inputs.PrereleaseTag }}'
+            Write-Output "Checking for prerelease with required version: $Version"
+            Find-Module -Name ScubaGear -RequiredVersion $Version -AllowPrerelease
+          }
+          else
+          {
+            Write-Output "Installing latest version"
+            Find-Module -Name ScubaGear
+          }

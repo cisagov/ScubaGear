@@ -1,5 +1,8 @@
-$OrchestratorPath = '../../../../Modules/Orchestrator.psm1'
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath $OrchestratorPath) -Function 'Connect-Tenant' -Force
+BeforeDiscovery {
+    $ModuleRootPath = Join-Path -Path $PSScriptRoot -ChildPath '..\..\..\..\Modules'
+    Import-Module (Join-Path -Path $ModuleRootPath -ChildPath 'Orchestrator.psm1') -Force
+    Import-Module (Join-Path -Path $ModuleRootPath -ChildPath "Connection\Connection.psm1") -Force
+}
 
 InModuleScope Orchestrator {
     Describe -Tag 'Orchestrator' -Name 'Invoke-Connection' {
@@ -11,14 +14,16 @@ InModuleScope Orchestrator {
                     M365Environment = "commercial"
                     BoundParameters = @{}
                 }
+
                 function Connect-Tenant {}
-                Mock -ModuleName Orchestrator Connect-Tenant -MockWith {@()}
+                Mock Connect-Tenant{@()}
+
             }
             It 'With -ProductNames "aad", connects to Microsoft Graph' {
                 $ConnectParams += @{
                     ProductNames = 'aad'
                 }
-                Invoke-Connection @ConnectParams
+                Invoke-Connection @ConnectParams |
                 Should -Invoke -CommandName Connect-Tenant -Times 1 -Exactly
                 $FailedAuthList.Length | Should -Be 0
             }
@@ -74,7 +79,7 @@ InModuleScope Orchestrator {
                     BoundParameters = @{}
                 }
                 function Connect-Tenant {}
-                Mock -ModuleName Orchestrator Connect-Tenant -MockWith {@()}
+                Mock -ModuleName Orchestrator Connect-Tenant {@()}
             }
             It 'does not authenticate' {
                 $ConnectParams += @{

@@ -45,7 +45,7 @@ TestPlan:
   - PolicyId: MS.SHAREPOINT.1.3v1
     TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.SHAREPOINT.1.3v1 Non-compliant - SharingCapability Not Disabled SharingDomainRestrictionMode = BlockList
+      - TestDescription: MS.SHAREPOINT.1.3v1 Non-compliant - SharingCapability = ExternalUserSharingOnly (New and existing guests); SharingDomainRestrictionMode = BlockList
         Preconditions:
           - Command: Set-PnPTenant
             Splat:
@@ -54,7 +54,7 @@ TestPlan:
               SharingBlockedDomainList: nefarious.com evil.is.us
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.SHAREPOINT.1.3v1 Compliant -  SharingCapability Not Disabled SharingDomainRestrictionMode = AllowList
+      - TestDescription: MS.SHAREPOINT.1.3v1 Compliant -  SharingCapability = ExternalUserSharingOnly (New and existing guests); SharingDomainRestrictionMode = AllowList
         Preconditions:
           - Command: Set-PnPTenant
             Splat:
@@ -63,19 +63,39 @@ TestPlan:
               SharingAllowedDomainList: good.org admirable.us
         Postconditions: []
         ExpectedResult: true
-      - TestDescription: MS.SHAREPOINT.1.3v1 Compliant - SharingCapability = Disabled
+      - TestDescription: MS.SHAREPOINT.1.3v1 Compliant -  SharingCapability = ExternalUserAndGuestSharing (Anyone); SharingDomainRestrictionMode = AllowList
+        Preconditions:
+          - Command: Set-PnPTenant
+            Splat:
+              SharingCapability: ExternalUserAndGuestSharing
+              SharingDomainRestrictionMode: AllowList
+              SharingAllowedDomainList: good.org admirable.us
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.SHAREPOINT.1.3v1 Non-Applicable - SharingCapability = Disabled (Only people in organization);
         Preconditions:
           - Command: Set-PnPTenant
             Splat:
               SharingCapability: Disabled
               SharingDomainRestrictionMode: None
         Postconditions: []
-        ExpectedResult: true
+        IsNotChecked: true
+        ExpectedResult: false
+      - TestDescription: MS.SHAREPOINT.1.3v1 Non-Applicable - SharingCapability = Disabled (Only people in organization); SharingDomainRestrictionMode = AllowList
+        Preconditions:
+          - Command: Set-PnPTenant
+            Splat:
+              SharingCapability: Disabled
+              SharingDomainRestrictionMode: AllowList
+              SharingAllowedDomainList: good.org admirable.us
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false
 
   - PolicyId: MS.SHAREPOINT.1.4v1
     TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.SHAREPOINT.1.4v1 Non-compliant - SharingCapability Not Disabled RequireAcceptingAccountMatchInvitedAccount = false
+      - TestDescription: MS.SHAREPOINT.1.4v1 Non-compliant - SharingCapability = ExternalUserSharingOnly (New and existing guests); RequireAcceptingAccountMatchInvitedAccount = false
         Preconditions:
           - Command: Set-PnPTenant
             Splat:
@@ -83,23 +103,23 @@ TestPlan:
               RequireAcceptingAccountMatchInvitedAccount: false
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.SHAREPOINT.1.4v1 Compliant - SharingCapability Disabled RequireAcceptingAccountMatchInvitedAccount = false
+      - TestDescription: MS.SHAREPOINT.1.4v1 Compliant - SharingCapability = ExternalUserAndGuestSharing (Anyone); RequireAcceptingAccountMatchInvitedAccount = true
         Preconditions:
           - Command: Set-PnPTenant
             Splat:
-              SharingCapability: Disabled
-              RequireAcceptingAccountMatchInvitedAccount: false
-        Postconditions: []
-        ExpectedResult: true
-      - TestDescription: MS.SHAREPOINT.1.4v1 Compliant - SharingCapability Disabled RequireAcceptingAccountMatchInvitedAccount = true
-        Preconditions:
-          - Command: Set-PnPTenant
-            Splat:
-              SharingCapability: Disabled
+              SharingCapability: ExternalUserAndGuestSharing
               RequireAcceptingAccountMatchInvitedAccount: true
         Postconditions: []
         ExpectedResult: true
-      - TestDescription: MS.SHAREPOINT.1.4v1 Compliant - SharingCapability Not Disabled RequireAcceptingAccountMatchInvitedAccount = true
+      - TestDescription: MS.SHAREPOINT.1.4v1 Compliant - SharingCapability = ExistingExternalUserSharingOnly (Existing guests); RequireAcceptingAccountMatchInvitedAccount = true
+        Preconditions:
+          - Command: Set-PnPTenant
+            Splat:
+              SharingCapability: ExistingExternalUserSharingOnly
+              RequireAcceptingAccountMatchInvitedAccount: true
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.SHAREPOINT.1.4v1 Compliant - SharingCapability = ExternalUserSharingOnly (New and existing guests); RequireAcceptingAccountMatchInvitedAccount = true
         Preconditions:
           - Command: Set-PnPTenant
             Splat:
@@ -107,6 +127,24 @@ TestPlan:
               RequireAcceptingAccountMatchInvitedAccount: true
         Postconditions: []
         ExpectedResult: true
+      - TestDescription: MS.SHAREPOINT.1.4v1 Non-Applicable - SharingCapability = Disabled (Only people in organization); RequireAcceptingAccountMatchInvitedAccount = true
+        Preconditions:
+          - Command: Set-PnPTenant
+            Splat:
+              SharingCapability: Disabled
+              RequireAcceptingAccountMatchInvitedAccount: true
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false
+      - TestDescription: MS.SHAREPOINT.1.4v1 Non-Applicable - SharingCapability = Disabled (Only people in organization); RequireAcceptingAccountMatchInvitedAccount = false
+        Preconditions:
+          - Command: Set-PnPTenant
+            Splat:
+              SharingCapability: Disabled
+              RequireAcceptingAccountMatchInvitedAccount: false
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false
 
   - PolicyId: MS.SHAREPOINT.2.1v1
     TestDriver: RunScuba
@@ -145,14 +183,14 @@ TestPlan:
   - PolicyId: MS.SHAREPOINT.2.2v1
     TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.SHAREPOINT.2.2v1 Non-compliant - DefaultSharingLinkType = Edit
+      - TestDescription: MS.SHAREPOINT.2.2v1 Non-compliant - DefaultLinkPermission = Edit
         Preconditions:
           - Command: Set-PnPTenant
             Splat:
               DefaultLinkPermission: Edit
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.SHAREPOINT.2.2v1 Compliant - DefaultSharingLinkType = View
+      - TestDescription: MS.SHAREPOINT.2.2v1 Compliant - DefaultLinkPermission = View
         Preconditions:
           - Command: Set-PnPTenant
             Splat:
@@ -168,50 +206,79 @@ TestPlan:
           - Command: Set-PnPTenant
             Splat:
               RequireAnonymousLinksExpireInDays: 31
-              DefaultSharingLinkType: AnonymousAccess
               SharingCapability: ExternalUserAndGuestSharing
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.SHAREPOINT.3.1v1 Compliant - SharingCapability = ExternalUserAndGuestSharing; RequireAnonymousLinksExpireInDays < 30
+      - TestDescription: MS.SHAREPOINT.3.1v1 Compliant - SharingCapability = ExternalUserAndGuestSharing (Anyone); RequireAnonymousLinksExpireInDays < 30
         Preconditions:
           - Command: Set-PnPTenant
             Splat:
               RequireAnonymousLinksExpireInDays: 7
-              DefaultSharingLinkType: AnonymousAccess
               SharingCapability: ExternalUserAndGuestSharing
         Postconditions: []
         ExpectedResult: true
-      - TestDescription: MS.SHAREPOINT.3.1v1 Compliant - SharingCapability = ExternalUserAndGuestSharing; RequireAnonymousLinksExpireInDays = 30
+      - TestDescription: MS.SHAREPOINT.3.1v1 Compliant - SharingCapability = ExternalUserAndGuestSharing (Anyone); RequireAnonymousLinksExpireInDays = 30
         Preconditions:
           - Command: Set-PnPTenant
             Splat:
               RequireAnonymousLinksExpireInDays: 30
-              DefaultSharingLinkType: AnonymousAccess
               SharingCapability: ExternalUserAndGuestSharing
         Postconditions: []
         ExpectedResult: true
-      - TestDescription: MS.SHAREPOINT.3.1v1 Compliant - SharingCapability = ExternalUserSharingOnly; RequireAnonymousLinksExpireInDays = 30
-        ToDo: Check if support anonymous access
+      - TestDescription: MS.SHAREPOINT.3.1v1 Non-Compliant - SharingCapability = ExternalUserSharingOnly (New and existing guests); RequireAnonymousLinksExpireInDays = 30
         Preconditions:
           - Command: Set-PnPTenant
             Splat:
+              RequireAnonymousLinksExpireInDays: 30
               SharingCapability: ExternalUserSharingOnly
         Postconditions: []
-        ExpectedResult: true
-      - TestDescription: MS.SHAREPOINT.3.1v1 Compliant - SharingCapability = ExistingExternalUserSharingOnly
+        IsNotChecked: true
+        ExpectedResult: false
+      - TestDescription: MS.SHAREPOINT.3.1v1 Non-Compliant - SharingCapability = ExistingExternalUserSharingOnly (Existing guests); RequireAnonymousLinksExpireInDays = 30
         Preconditions:
           - Command: Set-PnPTenant
             Splat:
+              RequireAnonymousLinksExpireInDays: 30
               SharingCapability: ExistingExternalUserSharingOnly
         Postconditions: []
-        ExpectedResult: true
-      - TestDescription: MS.SHAREPOINT.3.1v1 Compliant - SharingCapability = Disabled
+        IsNotChecked: true
+        ExpectedResult: false
+      - TestDescription: MS.SHAREPOINT.3.1v1 Non-Compliant - SharingCapability = Disabled (Only people in your organization); RequireAnonymousLinksExpireInDays = 30
         Preconditions:
           - Command: Set-PnPTenant
             Splat:
+              RequireAnonymousLinksExpireInDays: 30
               SharingCapability: Disabled
         Postconditions: []
-        ExpectedResult: true
+        IsNotChecked: true
+        ExpectedResult: false
+      - TestDescription: MS.SHAREPOINT.3.1v1 Non-Applicable - SharingCapability = ExternalUserSharingOnly (New and existing guests); RequireAnonymousLinksExpireInDays = 30
+        Preconditions:
+          - Command: Set-PnPTenant
+            Splat:
+              RequireAnonymousLinksExpireInDays: 30
+              SharingCapability: ExternalUserSharingOnly
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false
+      - TestDescription: MS.SHAREPOINT.3.1v1 Non-Applicable - SharingCapability = ExistingExternalUserSharingOnly (Existing guests); RequireAnonymousLinksExpireInDays = 30
+        Preconditions:
+          - Command: Set-PnPTenant
+            Splat:
+              RequireAnonymousLinksExpireInDays: 30
+              SharingCapability: ExistingExternalUserSharingOnly
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false
+      - TestDescription: MS.SHAREPOINT.3.1v1 Non-Applicable - SharingCapability = Disabled (Only people in your organization); RequireAnonymousLinksExpireInDays = 30
+        Preconditions:
+          - Command: Set-PnPTenant
+            Splat:
+              RequireAnonymousLinksExpireInDays: 30
+              SharingCapability: Disabled
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false
 
   - PolicyId: MS.SHAREPOINT.3.2v1
     TestDriver: RunScuba
@@ -225,7 +292,7 @@ TestPlan:
   - PolicyId: MS.SHAREPOINT.3.3v1
     TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.SHAREPOINT.3.3v1 Non-compliant - SharingCapability = ExistingExternalUserSharingOnly; EmailAttestationRequired = false; EmailAttestationReAuthDays = 30
+      - TestDescription: MS.SHAREPOINT.3.3v1 Non-Applicable - SharingCapability = ExistingExternalUserSharingOnly (Existing guests); EmailAttestationRequired = false; EmailAttestationReAuthDays = 30
         Preconditions:
           - Command: Set-PnPTenant
             Splat:
@@ -233,8 +300,9 @@ TestPlan:
               EmailAttestationRequired: false
               EmailAttestationReAuthDays: 30
         Postconditions: []
+        IsNotChecked: true
         ExpectedResult: false
-      - TestDescription: MS.SHAREPOINT.3.3v1 Non-compliant - SharingCapability = ExternalUserSharingOnly; EmailAttestationRequired = false; EmailAttestationReAuthDays = 30
+      - TestDescription: MS.SHAREPOINT.3.3v1 Non-compliant - SharingCapability = ExternalUserSharingOnly (New and existing guests); EmailAttestationRequired = false; EmailAttestationReAuthDays = 30
         Preconditions:
           - Command: Set-PnPTenant
             Splat:
@@ -243,7 +311,7 @@ TestPlan:
               EmailAttestationReAuthDays: 30
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.SHAREPOINT.3.3v1 Non-compliant - SharingCapability = ExternalUserAndGuestSharing; EmailAttestationRequired = false; EmailAttestationReAuthDays = 30
+      - TestDescription: MS.SHAREPOINT.3.3v1 Non-compliant - SharingCapability = ExternalUserAndGuestSharing (Anyone); EmailAttestationRequired = false; EmailAttestationReAuthDays = 30
         Preconditions:
           - Command: Set-PnPTenant
             Splat:
@@ -252,7 +320,7 @@ TestPlan:
               EmailAttestationReAuthDays: 30
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.SHAREPOINT.3.3v1 Non-compliant - SharingCapability = ExistingExternalUserSharingOnly; EmailAttestationRequired = true; EmailAttestationReAuthDays > 30
+      - TestDescription: MS.SHAREPOINT.3.3v1 Non-Applicable - SharingCapability = ExistingExternalUserSharingOnly (Existing guests); EmailAttestationRequired = true; EmailAttestationReAuthDays > 30
         Preconditions:
           - Command: Set-PnPTenant
             Splat:
@@ -260,8 +328,9 @@ TestPlan:
               EmailAttestationRequired: true
               EmailAttestationReAuthDays: 31
         Postconditions: []
+        IsNotChecked: true
         ExpectedResult: false
-      - TestDescription: MS.SHAREPOINT.3.3v1 Non-compliant - SharingCapability = ExternalUserSharingOnly; EmailAttestationRequired = true; EmailAttestationReAuthDays > 30
+      - TestDescription: MS.SHAREPOINT.3.3v1 Non-compliant - SharingCapability = ExternalUserSharingOnly (New and existing guests); EmailAttestationRequired = true; EmailAttestationReAuthDays > 30
         Preconditions:
           - Command: Set-PnPTenant
             Splat:
@@ -270,7 +339,7 @@ TestPlan:
               EmailAttestationReAuthDays: 31
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.SHAREPOINT.3.3v1 Non-compliant - SharingCapability = ExternalUserAndGuestSharing; EmailAttestationRequired = true; EmailAttestationReAuthDays > 30
+      - TestDescription: MS.SHAREPOINT.3.3v1 Non-compliant - SharingCapability = ExternalUserAndGuestSharing (Anyone); EmailAttestationRequired = true; EmailAttestationReAuthDays > 30
         Preconditions:
           - Command: Set-PnPTenant
             Splat:
@@ -279,7 +348,7 @@ TestPlan:
               EmailAttestationReAuthDays: 31
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.SHAREPOINT.3.3v1 Compliant - SharingCapability = ExistingExternalUserSharingOnly; EmailAttestationRequired = true; EmailAttestationReAuthDays = 30
+      - TestDescription: MS.SHAREPOINT.3.3v1 Non-Applicable - SharingCapability = ExistingExternalUserSharingOnly (Existing guests); EmailAttestationRequired = true; EmailAttestationReAuthDays = 30
         Preconditions:
           - Command: Set-PnPTenant
             Splat:
@@ -287,8 +356,9 @@ TestPlan:
               EmailAttestationRequired: true
               EmailAttestationReAuthDays: 30
         Postconditions: []
-        ExpectedResult: true
-      - TestDescription: MS.SHAREPOINT.3.3v1 Compliant - SharingCapability = ExternalUserSharingOnly; EmailAttestationRequired = true; EmailAttestationReAuthDays = 30
+        IsNotChecked: true
+        ExpectedResult: false
+      - TestDescription: MS.SHAREPOINT.3.3v1 Compliant - SharingCapability = ExternalUserSharingOnly (New and existing guests); EmailAttestationRequired = true; EmailAttestationReAuthDays = 30
         Preconditions:
           - Command: Set-PnPTenant
             Splat:
@@ -297,7 +367,7 @@ TestPlan:
               EmailAttestationReAuthDays: 30
         Postconditions: []
         ExpectedResult: true
-      - TestDescription: MS.SHAREPOINT.3.3v1 Compliant - SharingCapability = ExternalUserAndGuestSharing; EmailAttestationRequired = true; EmailAttestationReAuthDays = 30
+      - TestDescription: MS.SHAREPOINT.3.3v1 Compliant - SharingCapability = ExternalUserAndGuestSharing (Anyone); EmailAttestationRequired = true; EmailAttestationReAuthDays = 30
         Preconditions:
           - Command: Set-PnPTenant
             Splat:
@@ -306,13 +376,16 @@ TestPlan:
               EmailAttestationReAuthDays: 30
         Postconditions: []
         ExpectedResult: true
-      - TestDescription: MS.SHAREPOINT.3.3v1 Compliant - SharingCapability = Disabled
+      - TestDescription: MS.SHAREPOINT.3.3v1 Non-Applicable - SharingCapability = Disabled (Only people in organization)
         Preconditions:
           - Command: Set-PnPTenant
             Splat:
               SharingCapability: Disabled
+              EmailAttestationRequired: true
+              EmailAttestationReAuthDays: 29
         Postconditions: []
-        ExpectedResult: true
+        IsNotChecked: true
+        ExpectedResult: false
 
   - PolicyId: MS.SHAREPOINT.4.1v1
     TestDriver: RunScuba

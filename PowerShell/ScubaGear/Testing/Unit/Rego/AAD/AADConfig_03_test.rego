@@ -1,7 +1,6 @@
 package aad_test
-import future.keywords
+import rego.v1
 import data.aad
-import data.utils.report.NotCheckedDetails
 import data.utils.report.CheckedSkippedDetails
 import data.utils.key.TestResult
 import data.utils.key.TestResultContains
@@ -1584,7 +1583,7 @@ test_State_Incorrect_V1 if {
 #
 # Policy MS.AAD.3.3v1
 #--
-test_3_1_passes_and_satisfies_3_3 if{
+test_PhishingMFAEnforced_MicrosoftAuthEnabled_NotApplicable if {
     Output := aad.tests with input as {
         "conditional_access_policies": [
             {
@@ -1614,37 +1613,586 @@ test_3_1_passes_and_satisfies_3_3 if{
                     }
                 },
                 "State": "enabled",
-                "DisplayName": "Test Policy"
+                "DisplayName": "Phishing Resistant MFA Enforced"
+            }
+        ],
+        "authentication_method": [
+            {
+                "authentication_method_feature_settings": [
+                    {
+                        "Id":  "MicrosoftAuthenticator",
+                        "State": "enabled"
+                    },
+                    {
+                        "Id":  "Email",
+                        "State": "enabled"
+                    }
+                ]
             }
         ]
     }
 
-    ReportDetailStr := concat("", [
-        "1 conditional access policy(s) found that meet(s) all requirements:",
-        "<br/>Test Policy. <a href='#caps'>View all CA policies</a>."
-    ])
-
-    TestResult("MS.AAD.3.3v1", Output, ReportDetailStr, true) == true
-}
-
-test_NotImplemented_Correct_V2 if {
     PolicyId := "MS.AAD.3.3v1"
-
-    Output := aad.tests with input as { }
-
-    ReportDetailStr := NotCheckedDetails(PolicyId)
-    TestResult(PolicyId, Output, ReportDetailStr, false) == true
+    ReportDetailStr := "This policy is only applicable if phishing-resistant MFA is not enforced and MS Authenticator is enabled. See %v for more info"
+    TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailStr), false) == true
 }
+
+test_PhishingMFAEnforced_MicrosoftAuthDisabled_NotApplicable if {
+    Output := aad.tests with input as {
+        "conditional_access_policies": [
+            {
+                "Conditions": {
+                    "Applications": {
+                        "IncludeApplications": [
+                            "All"
+                        ],
+                        "ExcludeApplications": []
+                    },
+                    "Users": {
+                        "IncludeUsers": [
+                            "All"
+                        ],
+                        "ExcludeUsers": [],
+                        "ExcludeGroups": [],
+                        "ExcludeRoles": []
+                    }
+                },
+                "GrantControls": {
+                    "AuthenticationStrength": {
+                        "AllowedCombinations": [
+                            "windowsHelloForBusiness",
+                            "fido2",
+                            "x509CertificateMultiFactor"
+                        ]
+                    }
+                },
+                "State": "enabled",
+                "DisplayName": "Phishing Resistant MFA Enforced"
+            }
+        ],
+        "authentication_method": [
+            {
+                "authentication_method_feature_settings": [
+                    {
+                        "Id":  "MicrosoftAuthenticator",
+                        "State": "disabled"
+                    },
+                    {
+                        "Id":  "Email",
+                        "State": "enabled"
+                    }
+                ]
+            }
+        ]
+    }
+
+    PolicyId := "MS.AAD.3.3v1"
+    ReportDetailStr := "This policy is only applicable if phishing-resistant MFA is not enforced and MS Authenticator is enabled. See %v for more info"
+    TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailStr), false) == true
+}
+
+test_PhishingMFANotEnforced_MicrosoftAuthDisabled_NotApplicable if {
+    Output := aad.tests with input as {
+        "conditional_access_policies": [
+            {
+                "Conditions": {
+                    "Applications": {
+                        "IncludeApplications": [
+                            "All"
+                        ],
+                        "ExcludeApplications": []
+                    },
+                    "Users": {
+                        "IncludeUsers": [
+                            "All"
+                        ],
+                        "ExcludeUsers": [],
+                        "ExcludeGroups": [],
+                        "ExcludeRoles": []
+                    }
+                },
+                "GrantControls": {
+                    "BuiltInControls": [
+                        "mfa"
+                    ]
+                },
+                "State": "enabled",
+                "DisplayName": "Vanilla MFA Enforced - not phishing-resistant"
+            }
+        ],
+        "authentication_method": [
+            {
+                "authentication_method_feature_settings": [
+                    {
+                        "Id":  "MicrosoftAuthenticator",
+                        "State": "disabled"
+                    },
+                    {
+                        "Id":  "Email",
+                        "State": "enabled"
+                    }
+                ]
+            }
+        ]
+    }
+
+    PolicyId := "MS.AAD.3.3v1"
+    ReportDetailStr := "This policy is only applicable if phishing-resistant MFA is not enforced and MS Authenticator is enabled. See %v for more info"
+    TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailStr), false) == true
+}
+
+test_PhishingMFANotEnforced_MicrosoftAuthEnabled_Correct if {
+    Output := aad.tests with input as {
+        "conditional_access_policies": [
+            {
+                "Conditions": {
+                    "Applications": {
+                        "IncludeApplications": [
+                            "All"
+                        ],
+                        "ExcludeApplications": []
+                    },
+                    "Users": {
+                        "IncludeUsers": [
+                            "All"
+                        ],
+                        "ExcludeUsers": [],
+                        "ExcludeGroups": [],
+                        "ExcludeRoles": []
+                    }
+                },
+                "GrantControls": {
+                    "BuiltInControls": [
+                        "mfa"
+                    ]
+                },
+                "State": "enabled",
+                "DisplayName": "Vanilla MFA Enforced - not phishing-resistant"
+            }
+        ],
+        "authentication_method": [
+            {
+                "authentication_method_feature_settings": [
+                    {
+                        "ExcludeTargets":  [
+
+                                            ],
+                        "Id":  "MicrosoftAuthenticator",
+                        "State":  "enabled",
+                        "AdditionalProperties":  {
+                            "@odata.type":  "#microsoft.graph.microsoftAuthenticatorAuthenticationMethodConfiguration",
+                            "isSoftwareOathEnabled":  false,
+                            "featureSettings":  {
+                                "displayAppInformationRequiredState":  {
+                                    "state":  "enabled",
+                                    "includeTarget":  {
+                                                            "targetType":  "group",
+                                                            "id":  "all_users"
+                                                        },
+                                    "excludeTarget":  {
+                                                            "targetType":  "group",
+                                                            "id":  "00000000-0000-0000-0000-000000000000"
+                                                        }
+                                },
+                                "displayLocationInformationRequiredState":  {
+                                    "state":  "enabled",
+                                    "includeTarget":  {
+                                                            "targetType":  "group",
+                                                            "id":  "all_users"
+                                                        },
+                                    "excludeTarget":  {
+                                                            "targetType":  "group",
+                                                            "id":  "00000000-0000-0000-0000-000000000000"
+                                                        }
+                                }
+                            },
+                            "includeTargets@odata.context":  "https://graph.microsoft.com/beta/$metadata#policies/authenticationMethodsPolicy/authenticationMethodConfigurations(\u0027MicrosoftAuthenticator\u0027)/microsoft.graph.microsoftAuthenticatorAuthenticationMethodConfiguration/includeTargets",
+                            "includeTargets":  [
+                                {
+                                    "targetType":  "group",
+                                    "id":  "all_users",
+                                    "isRegistrationRequired":  false,
+                                    "authenticationMode":  "any"
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "Id":  "Email",
+                        "State": "enabled"
+                    }
+                ]
+            }
+        ]
+    }
+
+    TestResult("MS.AAD.3.3v1", Output, PASS, true) == true
+}
+
+test_PhishingMFANotEnforced_MicrosoftAuthEnabled_AppnameDisabled_Incorrect if {
+    Output := aad.tests with input as {
+        "conditional_access_policies": [
+            {
+                "Conditions": {
+                    "Applications": {
+                        "IncludeApplications": [
+                            "All"
+                        ],
+                        "ExcludeApplications": []
+                    },
+                    "Users": {
+                        "IncludeUsers": [
+                            "All"
+                        ],
+                        "ExcludeUsers": [],
+                        "ExcludeGroups": [],
+                        "ExcludeRoles": []
+                    }
+                },
+                "GrantControls": {
+                    "BuiltInControls": [
+                        "mfa"
+                    ]
+                },
+                "State": "enabled",
+                "DisplayName": "Vanilla MFA Enforced - not phishing-resistant"
+            }
+        ],
+        "authentication_method": [
+            {
+                "authentication_method_feature_settings": [
+                    {
+                        "ExcludeTargets":  [
+
+                                            ],
+                        "Id":  "MicrosoftAuthenticator",
+                        "State":  "enabled",
+                        "AdditionalProperties":  {
+                            "@odata.type":  "#microsoft.graph.microsoftAuthenticatorAuthenticationMethodConfiguration",
+                            "isSoftwareOathEnabled":  false,
+                            "featureSettings":  {
+                                "displayAppInformationRequiredState":  {
+                                    "state":  "disabled",
+                                    "includeTarget":  {
+                                                            "targetType":  "group",
+                                                            "id":  "all_users"
+                                                        },
+                                    "excludeTarget":  {
+                                                            "targetType":  "group",
+                                                            "id":  "00000000-0000-0000-0000-000000000000"
+                                                        }
+                                },
+                                "displayLocationInformationRequiredState":  {
+                                    "state":  "enabled",
+                                    "includeTarget":  {
+                                                            "targetType":  "group",
+                                                            "id":  "all_users"
+                                                        },
+                                    "excludeTarget":  {
+                                                            "targetType":  "group",
+                                                            "id":  "00000000-0000-0000-0000-000000000000"
+                                                        }
+                                }
+                            },
+                            "includeTargets@odata.context":  "https://graph.microsoft.com/beta/$metadata#policies/authenticationMethodsPolicy/authenticationMethodConfigurations(\u0027MicrosoftAuthenticator\u0027)/microsoft.graph.microsoftAuthenticatorAuthenticationMethodConfiguration/includeTargets",
+                            "includeTargets":  [
+                                {
+                                    "targetType":  "group",
+                                    "id":  "all_users",
+                                    "isRegistrationRequired":  false,
+                                    "authenticationMode":  "any"
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "Id":  "Email",
+                        "State": "enabled"
+                    }
+                ]
+            }
+        ]
+    }
+
+    TestResult("MS.AAD.3.3v1", Output, FAIL, false) == true
+}
+
+test_PhishingMFANotEnforced_MicrosoftAuthEnabled_GeolocationDisabled_Incorrect if {
+    Output := aad.tests with input as {
+        "conditional_access_policies": [
+            {
+                "Conditions": {
+                    "Applications": {
+                        "IncludeApplications": [
+                            "All"
+                        ],
+                        "ExcludeApplications": []
+                    },
+                    "Users": {
+                        "IncludeUsers": [
+                            "All"
+                        ],
+                        "ExcludeUsers": [],
+                        "ExcludeGroups": [],
+                        "ExcludeRoles": []
+                    }
+                },
+                "GrantControls": {
+                    "BuiltInControls": [
+                        "mfa"
+                    ]
+                },
+                "State": "enabled",
+                "DisplayName": "Vanilla MFA Enforced - not phishing-resistant"
+            }
+        ],
+        "authentication_method": [
+            {
+                "authentication_method_feature_settings": [
+                    {
+                        "ExcludeTargets":  [
+
+                                            ],
+                        "Id":  "MicrosoftAuthenticator",
+                        "State":  "enabled",
+                        "AdditionalProperties":  {
+                            "@odata.type":  "#microsoft.graph.microsoftAuthenticatorAuthenticationMethodConfiguration",
+                            "isSoftwareOathEnabled":  false,
+                            "featureSettings":  {
+                                "displayAppInformationRequiredState":  {
+                                    "state":  "enabled",
+                                    "includeTarget":  {
+                                                            "targetType":  "group",
+                                                            "id":  "all_users"
+                                                        },
+                                    "excludeTarget":  {
+                                                            "targetType":  "group",
+                                                            "id":  "00000000-0000-0000-0000-000000000000"
+                                                        }
+                                },
+                                "displayLocationInformationRequiredState":  {
+                                    "state":  "disabled",
+                                    "includeTarget":  {
+                                                            "targetType":  "group",
+                                                            "id":  "all_users"
+                                                        },
+                                    "excludeTarget":  {
+                                                            "targetType":  "group",
+                                                            "id":  "00000000-0000-0000-0000-000000000000"
+                                                        }
+                                }
+                            },
+                            "includeTargets@odata.context":  "https://graph.microsoft.com/beta/$metadata#policies/authenticationMethodsPolicy/authenticationMethodConfigurations(\u0027MicrosoftAuthenticator\u0027)/microsoft.graph.microsoftAuthenticatorAuthenticationMethodConfiguration/includeTargets",
+                            "includeTargets":  [
+                                {
+                                    "targetType":  "group",
+                                    "id":  "all_users",
+                                    "isRegistrationRequired":  false,
+                                    "authenticationMode":  "any"
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "Id":  "Email",
+                        "State": "enabled"
+                    }
+                ]
+            }
+        ]
+    }
+
+    TestResult("MS.AAD.3.3v1", Output, FAIL, false) == true
+}
+
+test_PhishingMFANotEnforced_MicrosoftAuthEnabled_AppNameDisabled_GeolocationDisabled_Incorrect if {
+    Output := aad.tests with input as {
+        "conditional_access_policies": [
+            {
+                "Conditions": {
+                    "Applications": {
+                        "IncludeApplications": [
+                            "All"
+                        ],
+                        "ExcludeApplications": []
+                    },
+                    "Users": {
+                        "IncludeUsers": [
+                            "All"
+                        ],
+                        "ExcludeUsers": [],
+                        "ExcludeGroups": [],
+                        "ExcludeRoles": []
+                    }
+                },
+                "GrantControls": {
+                    "BuiltInControls": [
+                        "mfa"
+                    ]
+                },
+                "State": "enabled",
+                "DisplayName": "Vanilla MFA Enforced - not phishing-resistant"
+            }
+        ],
+        "authentication_method": [
+            {
+                "authentication_method_feature_settings": [
+                    {
+                        "ExcludeTargets":  [
+
+                                            ],
+                        "Id":  "MicrosoftAuthenticator",
+                        "State":  "enabled",
+                        "AdditionalProperties":  {
+                            "@odata.type":  "#microsoft.graph.microsoftAuthenticatorAuthenticationMethodConfiguration",
+                            "isSoftwareOathEnabled":  false,
+                            "featureSettings":  {
+                                "displayAppInformationRequiredState":  {
+                                    "state":  "disabled",
+                                    "includeTarget":  {
+                                                            "targetType":  "group",
+                                                            "id":  "all_users"
+                                                        },
+                                    "excludeTarget":  {
+                                                            "targetType":  "group",
+                                                            "id":  "00000000-0000-0000-0000-000000000000"
+                                                        }
+                                },
+                                "displayLocationInformationRequiredState":  {
+                                    "state":  "disabled",
+                                    "includeTarget":  {
+                                                            "targetType":  "group",
+                                                            "id":  "all_users"
+                                                        },
+                                    "excludeTarget":  {
+                                                            "targetType":  "group",
+                                                            "id":  "00000000-0000-0000-0000-000000000000"
+                                                        }
+                                }
+                            },
+                            "includeTargets@odata.context":  "https://graph.microsoft.com/beta/$metadata#policies/authenticationMethodsPolicy/authenticationMethodConfigurations(\u0027MicrosoftAuthenticator\u0027)/microsoft.graph.microsoftAuthenticatorAuthenticationMethodConfiguration/includeTargets",
+                            "includeTargets":  [
+                                {
+                                    "targetType":  "group",
+                                    "id":  "all_users",
+                                    "isRegistrationRequired":  false,
+                                    "authenticationMode":  "any"
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "Id":  "Email",
+                        "State": "enabled"
+                    }
+                ]
+            }
+        ]
+    }
+
+    TestResult("MS.AAD.3.3v1", Output, FAIL, false) == true
+}
+
+test_PhishingMFANotEnforced_MicrosoftAuthEnabled_includeTargetsNotAll_Incorrect if {
+    Output := aad.tests with input as {
+        "conditional_access_policies": [
+            {
+                "Conditions": {
+                    "Applications": {
+                        "IncludeApplications": [
+                            "All"
+                        ],
+                        "ExcludeApplications": []
+                    },
+                    "Users": {
+                        "IncludeUsers": [
+                            "All"
+                        ],
+                        "ExcludeUsers": [],
+                        "ExcludeGroups": [],
+                        "ExcludeRoles": []
+                    }
+                },
+                "GrantControls": {
+                    "BuiltInControls": [
+                        "mfa"
+                    ]
+                },
+                "State": "enabled",
+                "DisplayName": "Vanilla MFA Enforced - not phishing-resistant"
+            }
+        ],
+        "authentication_method": [
+            {
+                "authentication_method_feature_settings": [
+                    {
+                        "ExcludeTargets":  [
+
+                                            ],
+                        "Id":  "MicrosoftAuthenticator",
+                        "State":  "enabled",
+                        "AdditionalProperties":  {
+                            "@odata.type":  "#microsoft.graph.microsoftAuthenticatorAuthenticationMethodConfiguration",
+                            "isSoftwareOathEnabled":  false,
+                            "featureSettings":  {
+                                "displayAppInformationRequiredState":  {
+                                    "state":  "enabled",
+                                    "includeTarget":  {
+                                                            "targetType":  "group",
+                                                            "id":  "all_users"
+                                                        },
+                                    "excludeTarget":  {
+                                                            "targetType":  "group",
+                                                            "id":  "00000000-0000-0000-0000-000000000000"
+                                                        }
+                                },
+                                "displayLocationInformationRequiredState":  {
+                                    "state":  "enabled",
+                                    "includeTarget":  {
+                                                            "targetType":  "group",
+                                                            "id":  "all_users"
+                                                        },
+                                    "excludeTarget":  {
+                                                            "targetType":  "group",
+                                                            "id":  "00000000-0000-0000-0000-000000000000"
+                                                        }
+                                }
+                            },
+                            "includeTargets@odata.context":  "https://graph.microsoft.com/beta/$metadata#policies/authenticationMethodsPolicy/authenticationMethodConfigurations(\u0027MicrosoftAuthenticator\u0027)/microsoft.graph.microsoftAuthenticatorAuthenticationMethodConfiguration/includeTargets",
+                            "includeTargets":  [
+                                {
+                                    "targetType":  "group",
+                                    "id":  "not_all_users",
+                                    "isRegistrationRequired":  false,
+                                    "authenticationMode":  "any"
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "Id":  "Email",
+                        "State": "enabled"
+                    }
+                ]
+            }
+        ]
+    }
+
+    TestResult("MS.AAD.3.3v1", Output, FAIL, false) == true
+}
+
 #--
 
 #
 # Policy MS.AAD.3.4v1
 #--
-test_Migrated_Correct if {
+test_PolicyMigrationState_Correct if {
     Output := aad.tests with input as {
         "authentication_method": [
             {
-                "PolicyMigrationState": "migrationComplete"
+                "authentication_method_policy": {
+                        "PolicyMigrationState": "migrationComplete"
+                }
             }
         ]
     }
@@ -1652,11 +2200,27 @@ test_Migrated_Correct if {
     TestResult("MS.AAD.3.4v1", Output, PASS, true) == true
 }
 
-test_Migrated_Incorrect if {
+test_PolicyMigrationState_preMigration_Incorrect if {
     Output := aad.tests with input as {
         "authentication_method": [
             {
-                "PolicyMigrationState": "preMigration"
+                "authentication_method_policy": {
+                        "PolicyMigrationState": "preMigration"
+                }
+            }
+        ]
+    }
+
+    TestResult("MS.AAD.3.4v1", Output, FAIL, false) == true
+}
+
+test_PolicyMigrationState_migrationInProgress_Incorrect if {
+    Output := aad.tests with input as {
+        "authentication_method": [
+            {
+                "authentication_method_policy": {
+                        "PolicyMigrationState": "migrationInProgress"
+                }
             }
         ]
     }
@@ -1668,26 +2232,29 @@ test_Migrated_Incorrect if {
 #
 # Policy MS.AAD.3.5v1
 #--
-test_NotImplemented_Incorrect_Sms if {
+test_LowSecurityAuthMethods_SmsEnabled_Incorrect if {
 
     Output := aad.tests with input as {
         "authentication_method": [
             {
-                "PolicyMigrationState": "migrationComplete",
-                "AuthenticationMethodConfigurations":  [
-                    {
-                        "Id": "Sms",
-                        "State": "enabled"
-                    },
-                    {
-                        "Id":  "Voice",
-                        "State":  "disabled"
-                    },
-                    {
-                        "Id":  "Email",
-                        "State": "disabled"
-                    }
-                ]
+                "authentication_method_feature_settings": [
+                            {
+                                "Id": "Sms",
+                                "State": "enabled"
+                            },
+                            {
+                                "Id":  "Voice",
+                                "State":  "disabled"
+                            },
+                            {
+                                "Id":  "Email",
+                                "State": "disabled"
+                            }
+                ],
+
+                "authentication_method_policy": {
+                        "PolicyMigrationState": "migrationComplete"
+                }
             }
         ]
     }
@@ -1696,26 +2263,29 @@ test_NotImplemented_Incorrect_Sms if {
     TestResult("MS.AAD.3.5v1", Output, ReportDetails, false) == true
 }
 
-test_NotImplemented_Incorrect_Voice if {
+test_LowSecurityAuthMethods_VoiceEnabled_Incorrect if {
 
     Output := aad.tests with input as {
         "authentication_method": [
             {
-                "PolicyMigrationState": "migrationComplete",
-                "AuthenticationMethodConfigurations":  [
-                    {
-                        "Id": "Sms",
-                        "State": "disabled"
-                    },
-                    {
-                        "Id":  "Voice",
-                        "State":  "enabled"
-                    },
-                    {
-                        "Id":  "Email",
-                        "State": "disabled"
-                    }
-                ]
+                "authentication_method_feature_settings": [
+                            {
+                                "Id": "Sms",
+                                "State": "disabled"
+                            },
+                            {
+                                "Id":  "Voice",
+                                "State":  "enabled"
+                            },
+                            {
+                                "Id":  "Email",
+                                "State": "disabled"
+                            }
+                ],
+
+                "authentication_method_policy": {
+                        "PolicyMigrationState": "migrationComplete"
+                }
             }
         ]
     }
@@ -1724,26 +2294,29 @@ test_NotImplemented_Incorrect_Voice if {
     TestResult("MS.AAD.3.5v1", Output, ReportDetails, false) == true
 }
 
-test_NotImplemented_Incorrect_Email if {
+test_LowSecurityAuthMethods_EmailEnabled_Incorrect if {
 
     Output := aad.tests with input as {
         "authentication_method": [
             {
-                "PolicyMigrationState": "migrationComplete",
-                "AuthenticationMethodConfigurations":  [
-                    {
-                        "Id": "Sms",
-                        "State": "disabled"
-                    },
-                    {
-                        "Id":  "Voice",
-                        "State":  "disabled"
-                    },
-                    {
-                        "Id":  "Email",
-                        "State": "enabled"
-                    }
-                ]
+                "authentication_method_feature_settings": [
+                            {
+                                "Id": "Sms",
+                                "State": "disabled"
+                            },
+                            {
+                                "Id":  "Voice",
+                                "State":  "disabled"
+                            },
+                            {
+                                "Id":  "Email",
+                                "State": "enabled"
+                            }
+                ],
+
+                "authentication_method_policy": {
+                        "PolicyMigrationState": "migrationComplete"
+                }
             }
         ]
     }
@@ -1752,26 +2325,91 @@ test_NotImplemented_Incorrect_Email if {
     TestResult("MS.AAD.3.5v1", Output, ReportDetails, false) == true
 }
 
-test_NotImplemented_Incorrect_Migration if {
+test_LowSecurityAuthMethods_TwoMethodsEnabled_Incorrect if {
 
     Output := aad.tests with input as {
         "authentication_method": [
             {
-                "PolicyMigrationState": "preMigration",
-                "AuthenticationMethodConfigurations":  [
-                    {
-                        "Id": "Sms",
-                        "State": "enabled"
-                    },
-                    {
-                        "Id":  "Voice",
-                        "State":  "disabled"
-                    },
-                    {
-                        "Id":  "Email",
-                        "State": "disabled"
-                    }
-                ]
+                "authentication_method_feature_settings": [
+                            {
+                                "Id": "Sms",
+                                "State": "enabled"
+                            },
+                            {
+                                "Id":  "Voice",
+                                "State":  "enabled"
+                            },
+                            {
+                                "Id":  "Email",
+                                "State": "disabled"
+                            }
+                ],
+
+                "authentication_method_policy": {
+                        "PolicyMigrationState": "migrationComplete"
+                }
+            }
+        ]
+    }
+
+    ReportDetails := "Sms, Voice, and Email authentication must be disabled."
+    TestResult("MS.AAD.3.5v1", Output, ReportDetails, false) == true
+}
+
+test_LowSecurityAuthMethods_AllMethodsEnabled_Incorrect if {
+
+    Output := aad.tests with input as {
+        "authentication_method": [
+            {
+                "authentication_method_feature_settings": [
+                            {
+                                "Id": "Sms",
+                                "State": "enabled"
+                            },
+                            {
+                                "Id":  "Voice",
+                                "State":  "enabled"
+                            },
+                            {
+                                "Id":  "Email",
+                                "State": "enabled"
+                            }
+                ],
+
+                "authentication_method_policy": {
+                        "PolicyMigrationState": "migrationComplete"
+                }
+            }
+        ]
+    }
+
+    ReportDetails := "Sms, Voice, and Email authentication must be disabled."
+    TestResult("MS.AAD.3.5v1", Output, ReportDetails, false) == true
+}
+
+test_LowSecurityAuthMethods_PreMigration_NotImplemented if {
+
+    Output := aad.tests with input as {
+        "authentication_method": [
+            {
+                "authentication_method_feature_settings": [
+                            {
+                                "Id": "Sms",
+                                "State": "enabled"
+                            },
+                            {
+                                "Id":  "Voice",
+                                "State":  "disabled"
+                            },
+                            {
+                                "Id":  "Email",
+                                "State": "disabled"
+                            }
+                ],
+
+                "authentication_method_policy": {
+                        "PolicyMigrationState": "preMigration"
+                }
             }
         ]
     }
@@ -1781,26 +2419,29 @@ test_NotImplemented_Incorrect_Migration if {
     TestResult("MS.AAD.3.5v1", Output, CheckedSkippedDetails("MS.AAD.3.4v1", Reason), false) == true
 }
 
-test_NotImplemented_Correct_V4 if {
+test_LowSecurityAuthMethods_MigrationComplete_Correct if {
 
     Output := aad.tests with input as {
         "authentication_method": [
             {
-                "PolicyMigrationState": "migrationComplete",
-                "AuthenticationMethodConfigurations":  [
-                    {
-                        "Id": "Sms",
-                        "State": "disabled"
-                    },
-                    {
-                        "Id":  "Voice",
-                        "State":  "disabled"
-                    },
-                    {
-                        "Id":  "Email",
-                        "State": "disabled"
-                    }
-                ]
+                "authentication_method_feature_settings": [
+                            {
+                                "Id": "Sms",
+                                "State": "disabled"
+                            },
+                            {
+                                "Id":  "Voice",
+                                "State":  "disabled"
+                            },
+                            {
+                                "Id":  "Email",
+                                "State": "disabled"
+                            }
+                ],
+
+                "authentication_method_policy": {
+                        "PolicyMigrationState": "migrationComplete"
+                }
             }
         ]
     }

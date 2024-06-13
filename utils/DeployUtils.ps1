@@ -16,11 +16,11 @@ function New-PrivateGallery {
     #>
     [CmdletBinding(SupportsShouldProcess)]
     param (
-        [Parameter(Mandatory=$false)]
-        [ValidateScript({Test-Path -Path $_ -IsValid})]
+        [Parameter(Mandatory = $false)]
+        [ValidateScript({ Test-Path -Path $_ -IsValid })]
         [string]
         $GalleryRootPath = $env:TEMP,
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatory = $false)]
         [ValidateNotNullOrEmpty()]
         [string]
         $GalleryName = 'PrivateScubaGearGallery',
@@ -29,21 +29,21 @@ function New-PrivateGallery {
     )
 
     $GalleryPath = Join-Path -Path $GalleryRootPath -ChildPath $GalleryName
-    if (Test-Path $GalleryPath){
+    if (Test-Path $GalleryPath) {
         Write-Debug "Removing private gallery at $GalleryPath"
         Remove-Item -Recursive -Force $GalleryPath
     }
 
     New-Item -Path $GalleryPath -ItemType Directory
 
-    if (-not (IsRegistered -RepoName $GalleryName)){
+    if (-not (IsRegistered -RepoName $GalleryName)) {
         Write-Debug "Attempting to register $GalleryName repository"
 
         $Splat = @{
-            Name = $GalleryName
-            SourceLocation = $GalleryPath
-            PublishLocation = $GalleryPath
-            InstallationPolicy = if ($Trusted) {'Trusted'} else {'Untrusted'}
+            Name               = $GalleryName
+            SourceLocation     = $GalleryPath
+            PublishLocation    = $GalleryPath
+            InstallationPolicy = if ($Trusted) { 'Trusted' } else { 'Untrusted' }
         }
 
         Register-PSRepository @Splat
@@ -53,221 +53,290 @@ function New-PrivateGallery {
     }
 }
 
-function Publish-ScubaGearModule{
+function Publish-ScubaGearModule {
     <#
     .Description
     Publish ScubaGear module to private package repository
+    .Parameter AzureKeyVaultUrl
+    The URL of the key vault with the code signing certificate
+    .Parameter CertificateName
+    The name of the code signing certificate
     .Parameter ModulePath
     Path to module root directory
     .Parameter GalleryName
     Name of the private package repository (i.e., gallery)
     .Parameter OverrideModuleVersion
     Optional module version.  If provided it will use as module version. Otherwise, the current version from the manifest with a revision number is added instead.
+    .Parameter PrereleaseTag
+    The identifier that will be used in place of a version to identify the module in the gallery
+    .Parameter NuGetApiKey
+    Specifies the API key that you want to use to publish a module to the online gallery.
     #>
     param (
-        [Parameter(Mandatory=$true)]
-        [ValidateScript({[uri]::IsWellFormedUriString($_, 'Absolute') -and ([uri] $_).Scheme -in 'https'})]
+        [Parameter(Mandatory = $true)]
+        [ValidateScript({ [uri]::IsWellFormedUriString($_, 'Absolute') -and ([uri] $_).Scheme -in 'https' })]
         [System.Uri]
         $AzureKeyVaultUrl,
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [string]
         $CertificateName,
-        [Parameter(Mandatory=$true)]
-        [ValidateScript({Test-Path -Path $_ -PathType Container})]
+        [Parameter(Mandatory = $true)]
+        [ValidateScript({ Test-Path -Path $_ -PathType Container })]
         [string]
         $ModulePath,
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatory = $false)]
         [ValidateNotNullOrEmpty()]
         [string]
         $GalleryName = 'PrivateScubaGearGallery',
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatory = $false)]
         [AllowEmptyString()]
         [string]
         $OverrideModuleVersion = "",
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatory = $false)]
+        [AllowEmptyString()]
+        [string]
+        $PrereleaseTag = "",
+        [Parameter(Mandatory = $false)]
         [ValidateNotNullOrEmpty()]
         [string]
-        $PrereleaseTag = ""
+        $NuGetApiKey
     )
 
-    $BuildSplat = @{
-        ModulePath = $ModulePath
-        OverrideModuleVersion = $OverrideModuleVersion
-    }
+    Write-Output "Publishing ScubaGear module..."
+    $ModuleBuildPath = Build-ScubaModule -ModulePath $ModulePath -OverrideModuleVersion $OverrideModuleVersion -PrereleaseTag $PrereleaseTag
 
-    if (-Not [string]::IsNullOrEmpty($PrereleaseTag)){
-        $BuildSplat.Add('PrereleaseTag', $PrereleaseTag)
-    }
-    $ModuleBuildPath = Build-ScubaModule @BuildSplat
+    Write-Output "The module build path is "
+    Write-Output $ModuleBuildPath
 
-    if (SignScubaGearModule -AzureKeyVaultUrl $AzureKeyVaultUrl -CertificateName $CertificateName -ModulePath $ModuleBuildPath){
-        Publish-Module -Path $ModuleBuildPath -Repository $GalleryName
+    if (SignScubaGearModule -AzureKeyVaultUrl $AzureKeyVaultUrl -CertificateName $CertificateName -ModulePath $ModuleBuildPath) {
+        $Parameters = @{
+            Path       = $ModuleBuildPath
+            Repository = $GalleryName
+        }
+        if ($GalleryName -eq 'PSGallery') {
+            $Parameters.Add('NuGetApiKey', $NuGetApiKey)
+        }
+
+        Publish-Module @Parameters
     }
     else {
         Write-Error "Failed to sign module."
     }
 }
 
-function Build-ScubaModule{
+function Build-ScubaModule {
     <#
     .NOTES
     Internal helper function
     #>
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingWriteHost', '')]
     param (
-        [Parameter(Mandatory=$true)]
-        [ValidateScript({Test-Path -Path $_ -PathType Container})]
+        [Parameter(Mandatory = $true)]
+        [ValidateScript({ Test-Path -Path $_ -PathType Container })]
         [string]
         $ModulePath,
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatory = $false)]
         [AllowEmptyString()]
         [string]
         $OverrideModuleVersion = "",
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatory = $false)]
         [AllowEmptyString()]
         [string]
         $PrereleaseTag = ""
     )
+    Write-Host "Building ScubaGear module..."
+
     $Leaf = Split-Path -Path $ModulePath -Leaf
     $ModuleBuildPath = Join-Path -Path $env:TEMP -ChildPath $Leaf
 
-    if (Test-Path -Path $ModuleBuildPath -PathType Container){
+    if (Test-Path -Path $ModuleBuildPath -PathType Container) {
         Remove-Item -Recurse -Force $ModuleBuildPath
     }
 
     Copy-Item $ModulePath -Destination $env:TEMP -Recurse
-    if (-not (ConfigureScubaGearModule -ModulePath $ModuleBuildPath -OverrideModuleVersion $OverrideModuleVersion -PrereleaseTag $PrereleaseTag)){
+    if (-not (ConfigureScubaGearModule -ModulePath $ModuleBuildPath -OverrideModuleVersion $OverrideModuleVersion -PrereleaseTag $PrereleaseTag)) {
         Write-Error "Failed to configure scuba module for publishing."
     }
 
     return $ModuleBuildPath
 }
 
-function ConfigureScubaGearModule{
+function ConfigureScubaGearModule {
     <#
     .NOTES
     Internal helper function
     #>
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingWriteHost', '')]
     param (
-        [Parameter(Mandatory=$true)]
-        [ValidateScript({Test-Path -Path $_ -PathType Container})]
+        [Parameter(Mandatory = $true)]
+        [ValidateScript({ Test-Path -Path $_ -PathType Container })]
         $ModulePath,
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatory = $false)]
         [AllowEmptyString()]
         [string]
         $OverrideModuleVersion = "",
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatory = $false)]
         [AllowEmptyString()]
         [string]
         $PrereleaseTag = ""
     )
+    Write-Host "Configuring ScubaGear module..."
     #TODO: Add any module configuration needed (e.g., adjust Module Version)
 
+    # Verify that the module path folder exists
+    if (Test-Path -Path $ModulePath) {
+        Write-Host "The module dir exists at "
+        Write-Host $ModulePath
+    }
+    else {
+        Write-Warning "The module dir does not exist at "
+        Write-Warning $ModulePath
+        Write-Error "Failing..."
+    }
+
     $ManifestPath = Join-Path -Path $ModulePath -ChildPath "ScubaGear.psd1"
+
+    # Verify that the manifest file exists
+    if (Test-Path -Path $ManifestPath) {
+        Write-Host "The manifest file exists at "
+        Write-Host $ManifestPath
+    }
+    else {
+        Write-Warning "The manifest file does not exist at "
+        Write-Warning $ManifestPath
+        Write-Error "Failing..."
+    }
+
     $ModuleVersion = $OverrideModuleVersion
 
-    if ([string]::IsNullOrEmpty($OverrideModuleVersion)){
+    if ([string]::IsNullOrEmpty($OverrideModuleVersion)) {
         $CurrentModuleVersion = (Import-PowerShellDataFile $ManifestPath).ModuleVersion
         $TimeStamp = [int32](Get-Date -UFormat %s)
         $ModuleVersion = "$CurrentModuleVersion.$TimeStamp"
     }
 
-    $ManifestUpdates = @{
-        Path = $ManifestPath
-        ModuleVersion = $ModuleVersion
-        ProjectUri = "https://github.com/cisagov/ScubaGear"
-        LicenseUri = "https://github.com/cisagov/ScubaGear/blob/main/LICENSE"
-        Tags = 'CISA', 'Microsoft 365', 'O365', 'Microsoft Entra Id', 'Configuration', 'Exchange', 'Report', 'Security', 'SharePoint', 'Defender', 'Teams', 'PowerPlatform', 'OneDrive'
-    }
+    Write-Host "The prerelease tag is"
+    Write-Host $PrereleaseTag
+    Write-Host "The module version is"
+    Write-Host $ModuleVersion
 
-    if (-Not [string]::IsNullOrEmpty($PrereleaseTag)){
+    $ProjectUri = "https://github.com/cisagov/ScubaGear"
+    $LicenseUri = "https://github.com/cisagov/ScubaGear/blob/main/LICENSE"
+    # Tags cannot contain spaces
+    $Tags = 'CISA', 'O365', 'M365', 'AzureAD', 'Configuration', 'Exchange', 'Report', 'Security', 'SharePoint', 'Defender', 'Teams', 'PowerPlatform', 'OneDrive'
+
+    $ManifestUpdates = @{
+        Path          = $ManifestPath
+        ModuleVersion = $ModuleVersion
+        ProjectUri    = $ProjectUri
+        LicenseUri    = $LicenseUri
+        Tags          = $Tags
+    }
+    if (-Not [string]::IsNullOrEmpty($PrereleaseTag)) {
         $ManifestUpdates.Add('Prerelease', $PrereleaseTag)
     }
 
     try {
-        Update-ModuleManifest @ManifestUpdates
         $CurrentErrorActionPreference = $ErrorActionPreference
         $ErrorActionPreference = "SilentlyContinue"
-        $Result = Test-ModuleManifest -Path $ManifestPath
+        Update-ModuleManifest @ManifestUpdates
         $ErrorActionPreference = $CurrentErrorActionPreference
     }
     catch {
-        Write-Error "Manifest is not valid"
-        $Result = $null
+        Write-Warning "Error: Cannot update module manifest:"
+        Write-Warning "Stacktrace:"
+        Write-Warning $_.ScriptStackTrace
+        Write-Warning "Exception:"
+        Write-Warning $_.Exception
+        Write-Error "Failed to update module manifest"
+        return $False
+    }
+    try {
+        $CurrentErrorActionPreference = $ErrorActionPreference
+        $ErrorActionPreference = "SilentlyContinue"
+        Test-ModuleManifest -Path $ManifestPath
+        $ErrorActionPreference = $CurrentErrorActionPreference
+    }
+    catch {
+        Write-Warning "Warning: Cannot test module manifest:"
+        Write-Warning "Stacktrace:"
+        Write-Warning $_.ScriptStackTrace
+        Write-Warning "Exception:"
+        Write-Warning $_.Exception
+        Write-Error "Failed to test module manifest"
+        return $False
     }
 
-    return $null -ne $Result
+    # True indicates that the updating and testing were successful.
+    return $True
 }
 
-function CreateFileList{
+function CreateFileList {
     <#
     .NOTES
     Internal function
     #>
     param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [string]
         $SourcePath,
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatory = $false)]
         [AllowEmptyCollection()]
         [array]
         $Extensions = @()
     )
-
     $FileNames = @()
-
-    if ($Extensions.Count -gt 0){
+    if ($Extensions.Count -gt 0) {
         $FileNames += Get-ChildItem -Recurse -Path $SourcePath -Include $Extensions
     }
-
     Write-Debug "Found $($FileNames.Count) files to sign"
-
     $FileList = New-TemporaryFile
     $FileNames.FullName | Out-File -FilePath $($FileList.FullName) -Encoding utf8 -Force
     Write-Debug "Files: $(Get-Content $FileList)"
     return $FileList.FullName
 }
 
-function CallAzureSignTool{
+function CallAzureSignTool {
     <#
     .NOTES
     Internal function
     #>
     param (
-        [Parameter(Mandatory=$true)]
-        [ValidateScript({[uri]::IsWellFormedUriString($_, 'Absolute') -and ([uri] $_).Scheme -in 'https'})]
+        [Parameter(Mandatory = $true)]
+        [ValidateScript({ [uri]::IsWellFormedUriString($_, 'Absolute') -and ([uri] $_).Scheme -in 'https' })]
         [System.Uri]
         $AzureKeyVaultUrl,
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [string]
         $CertificateName,
-        [Parameter(Mandatory=$false)]
-        [ValidateScript({[uri]::IsWellFormedUriString($_, 'Absolute') -and ([uri] $_).Scheme -in 'http','https'})]
+        [Parameter(Mandatory = $false)]
+        [ValidateScript({ [uri]::IsWellFormedUriString($_, 'Absolute') -and ([uri] $_).Scheme -in 'http', 'https' })]
         $TimeStampServer = 'http://timestamp.digicert.com',
-        [Parameter(Mandatory=$true)]
-        [ValidateScript({Test-Path -Path $_ -PathType Leaf})]
+        [Parameter(Mandatory = $true)]
+        [ValidateScript({ Test-Path -Path $_ -PathType Leaf })]
         $FileList
     )
 
     $SignArguments = @(
         'sign',
         '-coe',
-        '-fd',"sha256",
+        '-fd', "sha256",
         '-tr', $TimeStampServer,
-        '-kvu',$AzureKeyVaultUrl,
-        '-kvc',$CertificateName,
+        '-kvu', $AzureKeyVaultUrl,
+        '-kvc', $CertificateName,
         '-kvm'
-        '-ifl',$FileList
+        '-ifl', $FileList
     )
 
-    Write-Debug "Calling AzureSignTool: $SignArguments"
+    Write-Output "Calling AzureSignTool: $SignArguments"
 
     $ToolPath = (Get-Command AzureSignTool).Path
     & $ToolPath $SignArguments
 }
-function SignScubaGearModule{
+function SignScubaGearModule {
     <#
     .SYNOPSIS
     Code sign the specified module
@@ -295,36 +364,37 @@ function SignScubaGearModule{
     https://github.com/dell/OpenManage-PowerShell-Modules/blob/main/Sign-Module.ps1
     #>
     param (
-        [Parameter(Mandatory=$true)]
-        [ValidateScript({[uri]::IsWellFormedUriString($_, 'Absolute') -and ([uri] $_).Scheme -in 'https'})]
+        [Parameter(Mandatory = $true)]
+        [ValidateScript({ [uri]::IsWellFormedUriString($_, 'Absolute') -and ([uri] $_).Scheme -in 'https' })]
         [System.Uri]
         $AzureKeyVaultUrl,
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [string]
         $CertificateName,
-        [Parameter(Mandatory=$true)]
-        [ValidateScript({Test-Path -Path $_ -PathType Container})]
+        [Parameter(Mandatory = $true)]
+        [ValidateScript({ Test-Path -Path $_ -PathType Container })]
         $ModulePath,
-        [Parameter(Mandatory=$false)]
-        [ValidateScript({[uri]::IsWellFormedUriString($_, 'Absolute') -and ([uri] $_).Scheme -in 'http','https'})]
+        [Parameter(Mandatory = $false)]
+        [ValidateScript({ [uri]::IsWellFormedUriString($_, 'Absolute') -and ([uri] $_).Scheme -in 'http', 'https' })]
         $TimeStampServer = 'http://timestamp.digicert.com'
     )
 
+    Write-Output "Signing ScubaGear module..."
 
     # Digitally sign scripts, manifest, and modules
-    $FileList = CreateFileList -SourcePath $ModulePath -Extensions "*.ps1","*.psm1","*.psd1"
+    $FileList = CreateFileList -SourcePath $ModulePath -Extensions "*.ps1", "*.psm1", "*.psd1"
     CallAzureSignTool `
-      -AzureKeyVaultUrl $AzureKeyVaultUrl `
-      -CertificateName $CertificateName `
-      -TimeStampServer $TimeStampServer `
-      -FileList $FileList
+        -AzureKeyVaultUrl $AzureKeyVaultUrl `
+        -CertificateName $CertificateName `
+        -TimeStampServer $TimeStampServer `
+        -FileList $FileList
 
     # Create and sign catalog
     $CatalogFileName = 'ScubaGear.cat'
     $CatalogPath = Join-Path -Path $ModulePath -ChildPath $CatalogFileName
 
-    if (Test-Path -Path $CatalogPath -PathType Leaf){
+    if (Test-Path -Path $CatalogPath -PathType Leaf) {
         Remove-Item -Path $CatalogPath -Force
     }
 
@@ -333,22 +403,22 @@ function SignScubaGearModule{
     $CatalogPath.FullName | Out-File -FilePath $CatalogList -Encoding utf8 -Force
 
     CallAzureSignTool `
-      -AzureKeyVaultUrl $AzureKeyVaultUrl `
-      -CertificateName $CertificateName `
-      -TimeStampServer $TimeStampServer `
-      -FileList $CatalogList
+        -AzureKeyVaultUrl $AzureKeyVaultUrl `
+        -CertificateName $CertificateName `
+        -TimeStampServer $TimeStampServer `
+        -FileList $CatalogList
 
     $TestResult = Test-FileCatalog -CatalogFilePath $CatalogPath
     return 'Valid' -eq $TestResult
 }
 
-function IsRegistered{
+function IsRegistered {
     <#
     .NOTES
     Internal helper function
     #>
     param (
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatory = $false)]
         [ValidateNotNullOrEmpty()]
         [string]
         $RepoName = 'PrivateScubaGearGallery'
@@ -356,13 +426,11 @@ function IsRegistered{
 
     Write-Debug "Looking for $RepoName local repository"
     $Registered = $false
-
-    try{
+    try {
         $Registered = (Get-PSRepository).Name -contains $RepoName
     }
     catch {
         Write-Error "Failed to check IsRegistered: $_"
     }
-
     return $Registered
 }

@@ -2,7 +2,8 @@
  * Adds the red, green, yellow, and gray coloring to the individual report pages.
  */
 const colorRows = () => {
-    let rows = document.querySelectorAll('tr');
+    //Adjusted the querySelector to only use the rows which have policy data within them instead of every table in report
+    let rows = document.querySelectorAll('.policy-data tr');
     const requirementCol = 1;
     const statusCol = 2;
     const criticalityCol = 3;
@@ -37,8 +38,7 @@ const colorRows = () => {
             }
         }
         catch (error) {
-            console.error(`Error in colorRows, i = ${i}`);
-            console.error(error);
+            console.error(`Error in colorRows, i = ${i}`, error);
         }
     }
 }
@@ -68,7 +68,7 @@ const fillCAPTable = () => {
        return;
     }
     try {
-        let capDiv = document.createElement("div");
+        let capDiv = document.createElement("section");
         capDiv.setAttribute("id", "caps");
         document.querySelector("main").appendChild(capDiv);
 
@@ -83,19 +83,22 @@ const fillCAPTable = () => {
 
         let expandAll = document.createElement("button");
         expandAll.appendChild(document.createTextNode("&#x2b; Expand all"));
-        expandAll.title = "Expand all";
+        expandAll.title = "Expands all rows in the conditional access policy table below";
         expandAll.addEventListener("click", expandAllCAPs);
         buttons.appendChild(expandAll);
 
         let collapseAll = document.createElement("button");
         collapseAll.appendChild(document.createTextNode("&minus; Collapse all"));
-        collapseAll.title = "Collapse all";
+        collapseAll.title = "Collapses all rows in the conditional access policy table below";
         collapseAll.addEventListener("click", collapseAllCAPs);
         buttons.appendChild(collapseAll);
 
         let table = document.createElement("table");
         table.setAttribute("class", "caps_table");
         capDiv.appendChild(table);
+
+        let tbody = document.createElement("tbody");
+        table.appendChild(tbody);
 
         let header = document.createElement("tr");
         for (let i = 0; i < capColNames.length; i++) {
@@ -115,7 +118,7 @@ const fillCAPTable = () => {
             th.innerHTML = capColNames[i];
             header.appendChild(th);
         }
-        table.appendChild(header);
+        tbody.appendChild(header);
 
         for (let i = 0; i < caps.length; i++) {
             let tr = document.createElement("tr");
@@ -125,20 +128,25 @@ const fillCAPTable = () => {
                 tr.appendChild(td);
             }
 
+            // Create chevron icon in the DOM 
             let img = document.createElement("img");
             img.setAttribute('src', 'images/angle-right-solid.svg');
-            img.setAttribute('alt', 'Show more');
-            img.setAttribute('title', 'Show more');
+            img.setAttribute('alt', `Chevron arrow pointing right`);
             img.style.width = '10px';
-            img.rowNumber = i;
-            img.addEventListener("click", expandCAPRow);
-            tr.querySelectorAll('td')[0].appendChild(img);
-            table.appendChild(tr);
+
+            //Append the above image as a child 
+            let expandRowButton = document.createElement("button");
+            expandRowButton.title = `Show more info for the ${tr.children[1].innerText} policy`;
+            expandRowButton.classList.add("chevron");
+            expandRowButton.addEventListener("click", expandCAPRow);
+            expandRowButton.rowNumber = i;
+            expandRowButton.appendChild(img);
+            tr.querySelectorAll('td')[0].appendChild(expandRowButton);
+            tbody.appendChild(tr);
         }
     }
     catch (error) {
-        console.error("Error in fillCAPTable");
-        console.error(error);
+        console.error(`Error in fillCAPTable`, error);
     }
 }
 
@@ -173,18 +181,28 @@ const fillTruncatedCell = (td, i, j) => {
             td.innerHTML = content;
         }
 
+        // Don't apply truncated cell to "Name" column 
+        if (j === 1) {
+            td.innerHTML = content;
+            truncated = false;
+        }
+
+    
         if (truncated) {
             let span = document.createElement("span");
             span.appendChild(document.createTextNode("..."));
-            span.title = "Show more";
-            span.rowNumber = i;
-            span.addEventListener("click", expandCAPRow);
-            td.appendChild(span);
+
+            let threeDotsButton = document.createElement("button");
+            threeDotsButton.title = `Three dots that expands row ${i + 1} of the CAP table`;
+            threeDotsButton.classList.add("truncated-dots");
+            threeDotsButton.addEventListener("click", expandCAPRow);
+            threeDotsButton.rowNumber = i;
+            threeDotsButton.appendChild(span);
+            td.appendChild(threeDotsButton);
         }
     }
     catch (error) {
-        console.error(`Error in fillTruncatedCell, i = ${i}, j = ${j}`);
-        console.error(error);
+        console.error(`Error in fillTruncatedCell, i = ${i}, j = ${j}`, error);
     }
 }
 
@@ -204,16 +222,19 @@ const hideCAPRow = (event) => {
         }
         let img = document.createElement("img");
         img.setAttribute('src', 'images/angle-right-solid.svg');
+        img.setAttribute('alt', `Chevron arrow pointing right`);
         img.style.width = '10px';
-        img.setAttribute('alt', 'Show more');
-        img.setAttribute('title', 'Show more');
-        img.rowNumber = i;
-        img.addEventListener("click", expandCAPRow);
-        tr.querySelectorAll('td')[0].appendChild(img);
+
+        let expandRowButton = document.createElement("button");
+        expandRowButton.title = `Show more info for the ${tr.children[1].innerText} policy`;
+        expandRowButton.classList.add("chevron");
+        expandRowButton.addEventListener("click", expandCAPRow);
+        expandRowButton.rowNumber = i;
+        expandRowButton.appendChild(img);
+        tr.querySelectorAll('td')[0].appendChild(expandRowButton);
     }
     catch (error) {
-        console.error("Error in hideCAPRow");
-        console.error(error);
+        console.error(`Error in hideCAPRow`, error);
     }
 }
 
@@ -225,12 +246,11 @@ const expandAllCAPs = () => {
     try {
         let buttons = document.querySelectorAll("img[src*='angle-right-solid.svg']");
         for (let i = 0; i < buttons.length; i++) {
-            buttons[i].click();
+            buttons[i].parentNode.click();
         }
     }
     catch (error) {
-        console.error("Error in expandAllCAPs");
-        console.error(error);
+        console.error(`Error in expandAllCAPs`, error);
     }
 }
 
@@ -242,12 +262,11 @@ const collapseAllCAPs = () => {
     try {
         let buttons = document.querySelectorAll("img[src*='angle-down-solid.svg']");
         for (let i = 0; i < buttons.length; i++) {
-            buttons[i].click();
+            buttons[i].parentNode.click();
         }
     }
     catch (error) {
-        console.error("Error in collapseAllCAPs");
-        console.error(error);
+        console.error(`Error in collapseAllCAPs`, error);
     }
 }
 
@@ -269,12 +288,17 @@ const expandCAPRow = (event) => {
                 td.innerHTML = "";
                 let img = document.createElement("img");
                 img.setAttribute('src', 'images/angle-down-solid.svg');
-                img.setAttribute('alt', 'Show less');
-                img.setAttribute('title', 'Show less');
+                img.setAttribute('alt', `Chevron arrow pointing down`);
                 img.style.width = '14px';
-                img.rowNumber = i;
-                img.addEventListener("click", hideCAPRow);
-                tr.querySelectorAll('td')[0].appendChild(img);
+
+                // For accessibility append the above image as a child 
+                let collapseRowButton = document.createElement("button");
+                collapseRowButton.title = `Show less info for the ${tr.children[1].innerText} policy`;
+                collapseRowButton.classList.add("chevron");
+                collapseRowButton.addEventListener("click", hideCAPRow);
+                collapseRowButton.rowNumber = i;
+                collapseRowButton.appendChild(img);
+                tr.querySelectorAll('td')[0].appendChild(collapseRowButton);
             }
             else if (caps[i][capColNames[j]].constructor === Array && caps[i][capColNames[j]].length > 1) {
                 let ul = document.createElement("ul");
@@ -291,13 +315,13 @@ const expandCAPRow = (event) => {
         }
     }
     catch (error) {
-        console.error("Error in expandCAPRow");
-        console.error(error);
+        console.error(`Error in expandCAPRow`, error);
     }
 }
 
-window.addEventListener('DOMContentLoaded', (event) => {
+window.addEventListener('DOMContentLoaded', () => {
     colorRows();
     fillCAPTable();
+    applyScopeAttributes();
     mountDarkMode("Individual Report");
 });

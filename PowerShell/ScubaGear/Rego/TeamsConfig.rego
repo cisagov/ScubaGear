@@ -1,5 +1,5 @@
 package teams
-import future.keywords
+import rego.v1
 import data.utils.report.ReportDetailsBoolean
 import data.utils.report.DefenderMirrorDetails
 import data.utils.report.ReportDetailsArray
@@ -433,11 +433,11 @@ IsUSGovTenantRegion := true if {
 }
 
 # Create descriptive report string based on what passed variables equal
-ReportDetails4_1(true, _) := "N/A: Feature is unavailable in GCC environments" if {}
+ReportDetails4_1(true, _) := "N/A: Feature is unavailable in GCC environments"
 
-ReportDetails4_1(false, true) := PASS if {}
+ReportDetails4_1(false, true) := PASS
 
-ReportDetails4_1(false, false) := FAIL if {}
+ReportDetails4_1(false, false) := FAIL
 
 # As long as either:
 #     1) Get-CsTeamsClientConfiguration reports email integration is disabled or
@@ -587,7 +587,7 @@ tests contains {
 # At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
 tests contains {
     "PolicyId": "MS.TEAMS.6.2v1",
-    "Criticality": "Should/3rd Party",
+    "Criticality": "Shall/3rd Party",
     "Commandlet": [],
     "ActualValue": [],
     "ReportDetails": DefenderMirrorDetails("MS.TEAMS.6.2v1"),

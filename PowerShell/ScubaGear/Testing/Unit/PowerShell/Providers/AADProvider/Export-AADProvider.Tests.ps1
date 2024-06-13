@@ -11,7 +11,7 @@ Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "$($ProviderPath)/Provid
 InModuleScope -ModuleName ExportAADProvider {
     Describe -Tag 'ExportAADProvider' -Name "Export-AADProvider" {
         BeforeAll {
-            Mock -Module "ExportAADProvider" Get-MgBetaUserCount { 10 }
+            function Get-MgBetaUserCount { 10 }
             class MockCommandTracker {
                 [string[]]$SuccessfulCommands = @()
                 [string[]]$UnSuccessfulCommands = @()
@@ -118,7 +118,7 @@ InModuleScope -ModuleName ExportAADProvider {
                 }
             }
             function Get-CapTracker {}
-            Mock -ModuleName 'ExportAADProvider' Get-CapTracker  -MockWith {
+            Mock -ModuleName 'ExportAADProvider' Get-CapTracker  {
                 return [MockCapTracker]::New()
             }
 

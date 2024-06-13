@@ -6,17 +6,17 @@ InModuleScope Orchestrator {
         BeforeAll {
             Mock -ModuleName Orchestrator Remove-Resources {}
             Mock -ModuleName Orchestrator Import-Resources {}
-            function Invoke-Connection {}
             Mock -ModuleName Orchestrator Invoke-Connection { @() }
-            function Get-TenantDetail {}
+            function Get-TenantDetail {throw 'this will be mocked'}
             Mock -ModuleName Orchestrator Get-TenantDetail { '{"DisplayName": "displayName"}' }
-            function Invoke-ProviderList {}
+            function Invoke-ProviderList {throw 'this will be mocked'}
             Mock -ModuleName Orchestrator Invoke-ProviderList {}
-            function Invoke-RunRego {}
+            function Invoke-RunRego {throw 'this will be mocked'}
             Mock -ModuleName Orchestrator Invoke-RunRego {}
 
             Mock -ModuleName Orchestrator Invoke-ReportCreation {}
-            function Disconnect-SCuBATenant {}
+            Mock -ModuleName Orchestrator Merge-JsonOutput {}
+            function Disconnect-SCuBATenant {throw 'this will be mocked'}
             Mock -ModuleName Orchestrator Disconnect-SCuBATenant {}
 
             function Get-ScubaDefault {throw 'this will be mocked'}
@@ -82,6 +82,33 @@ InModuleScope Orchestrator {
                     DisconnectOnExit = $true
                 }
                 {Invoke-Scuba @SplatParams} | Should -Not -Throw
+            }
+            It 'Should only run each baseline once if provider names contains duplicates' {
+                {Invoke-Scuba -ProductNames aad,aad} | Should -Not -Throw
+                Should -Invoke Invoke-ReportCreation -ParameterFilter {$ProductNames -eq 'aad'}
+            }
+        }
+        Context 'Service Principal provided'{
+            It 'All items given as not null or empty'{
+                $SplatParams += @{
+                    AppID = "a"
+                    CertificateThumbprint = "b"
+                    Organization = "c"
+                }
+                {Invoke-Scuba @SplatParams} | Should -Not -Throw
+                Should -Invoke -CommandName Invoke-Connection -Exactly -Times 1 -ParameterFilter {$BoundParameters['AppID'] -eq $SplatParams['AppId']}
+            }
+            It 'Items given as empty string'{
+                $SplatParams += @{
+                    AppID = ""
+                }
+                {Invoke-Scuba @SplatParams} | Should -Throw
+            }
+            It 'Items given as null'{
+                $SplatParams += @{
+                    AppID = $null
+                }
+                {Invoke-Scuba @SplatParams} | Should -Throw
             }
         }
         Context 'When checking module version' {

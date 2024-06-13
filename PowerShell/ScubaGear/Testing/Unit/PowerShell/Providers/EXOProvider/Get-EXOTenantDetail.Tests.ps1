@@ -7,7 +7,7 @@ InModuleScope ExportEXOProvider {
             # empty stub required for mocked cmdlets called directly in the provider
             function Get-OrganizationConfig {}
 
-            Mock -ModuleName ExportEXOProvider Get-OrganizationConfig -MockWith {
+            Mock -ModuleName ExportEXOProvider Get-OrganizationConfig {
                 return [pscustomobject]@{
                     Name = "name";
                     DisplayName = "DisplayName";

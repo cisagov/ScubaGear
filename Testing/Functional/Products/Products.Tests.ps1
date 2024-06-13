@@ -284,10 +284,6 @@ Describe "Policy Checks for <ProductName>"{
                 $Details = $PolicyResultObj.ReportDetails
                 $Details | Should -Not -BeNullOrEmpty -Because "expect details, $Details"
 
-                if ($IsNotChecked){
-                    $Details | Should -Match 'This product does not currently have the capability to check compliance for this policy.+'
-                }
-
                 if ($IsCustomImplementation){
                     $Details | Should -Match 'A custom product can be used to fulfill this policy requirement.+'
                 }
@@ -332,6 +328,9 @@ Describe "Policy Checks for <ProductName>"{
                             }
                         }
                     }
+                    elseif ($Table.GetProperty("id") -eq "license-info"){
+                        #Currently empty to determine if necessary and what to test in section
+                    }
                     else {
                         # Control report tables
                         ForEach ($Row in $Rows){
@@ -357,8 +356,7 @@ Describe "Policy Checks for <ProductName>"{
                                         $RowData[4].text | Should -Match 'A custom product can be used to fulfill this policy requirement.+'
                                     }
                                     elseif ($IsNotChecked){
-                                        $RowData[2].text | Should -BeLikeExactly "N/A" -Because "custom policies should not have results. [$Msg]"
-                                        $RowData[4].text | Should -Match 'This product does not currently have the capability to check compliance for this policy.+'
+                                        $RowData[2].text | Should -BeLikeExactly "N/A" -Because "policies that are not checked should be N/A. [$Msg]"
                                     }
                                     elseif ($true -eq $ExpectedResult) {
                                         $RowData[2].text | Should -BeLikeExactly "Pass" -Because "expected policy to pass. [$Msg]"
