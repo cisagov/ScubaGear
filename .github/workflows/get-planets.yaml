@@ -16,11 +16,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          path: repo
       - name: Call Planet Module
         run: |
-          Import-Module (Join-Path -Path 'repo/utils/workflow' -ChildPath 'Get-Planet.psm1') -Function Get-Planet -Force
+          Import-Module -Name Planets .utils/workflow/Get-Planet.psm1
           # List the planets
           $allPlanets = Get-Planet
           Write-Output $allPlanets
