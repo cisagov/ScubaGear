@@ -107,16 +107,24 @@ jobs:
           PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
       # Selenium is an interface that allows for
       # the programmatic control of web browsers
-      - name: Install Selenium & Update Webdriver
+      # - name: Install Selenium & Update Webdriver
+      #   run: |
+      #     Install-Module -Name Selenium -Scope CurrentUser -Force
+      #     Import-Module -Name Selenium
+      #     ./Testing/Functional/SmokeTest/UpdateSelenium.ps1
+      #     # Import-Module -Name .\PowerShell\ScubaGear\ScubaGear.psd1
+      #     Import-Module -Name .\PowerShell\ScubaGear
+      #     Initialize-SCuBA
+      #     # Workaround for Selenium. Loading psm1 instead of psd1
+      #     Import-Module -Name (Get-Module -Name Selenium -ListAvailable).Path -Force
+      - name: Install Selenium
         run: |
-          Install-Module -Name Selenium -Scope CurrentUser -Force
-          Import-Module -Name Selenium
-          ./Testing/Functional/SmokeTest/UpdateSelenium.ps1
-          # Import-Module -Name .\PowerShell\ScubaGear\ScubaGear.psd1
-          Import-Module -Name .\PowerShell\ScubaGear
-          Initialize-SCuBA
-          # Workaround for Selenium. Loading psm1 instead of psd1
-          Import-Module -Name (Get-Module -Name Selenium -ListAvailable).Path -Force
+          Import-Module -Name .\utils\workflow\Prepare-ScubaGear
+          Install-Selenium
+      - name: Setup ScubaGear
+        run: |
+          Import-Module -Name .\utils\workflow\Prepare-ScubaGear
+          Setup-ScubaGear
       - name: Test Product
         id: test-product
         run: |
