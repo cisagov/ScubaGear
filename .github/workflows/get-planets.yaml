@@ -20,8 +20,7 @@ jobs:
           path: repo
       - name: Call Planet Module
         run: |
-          # Source planet module
-          . repo/utils/workflow/Get-Planet.psm1
+          Import-Module (Join-Path -Path 'repo/utils/workflow' -ChildPath 'Get-Planet.psm1') -Function Get-Planet -Force
           # List the planets
           $allPlanets = Get-Planet
           Write-Output $allPlanets
