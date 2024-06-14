@@ -123,8 +123,8 @@ jobs:
           Install-Selenium
       - name: Setup ScubaGear
         run: |
-          Import-Module -Name .\utils\workflow\Setup-ScubaGear
-          Setup-ScubaGear
+          Import-Module -Name .\utils\workflow\Initialize-ScubaGear
+          Initialize-ScubaGear
       - name: Test Product
         id: test-product
         run: |
