@@ -7,14 +7,7 @@ function Install-Selenium
   Import-Module -Name (Get-Module -Name Selenium -ListAvailable).Path -Force
 }
 
-function Setup-ScubaGear
-{
-  Import-Module -Name .\PowerShell\ScubaGear
-  Initialize-SCuBA
-}
-
 Export-ModuleMember -Function
 {
-  'Install-Selenium',
-  'Setup-ScubaGear'
+  'Install-Selenium'
 }
