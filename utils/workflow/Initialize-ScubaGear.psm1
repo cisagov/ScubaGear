@@ -5,5 +5,5 @@ function Initialize-ScubaGear
 }
 
 Export-ModuleMember -Function @(
-  'Setup-ScubaGear'
+  'Initialize-ScubaGear'
 )
