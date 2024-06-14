@@ -40,7 +40,7 @@ If that fails, you can manually download the OPA executable.
 
 * On the main portion of the screen, find the paragraph in the blue box that begins with "Windows users can obtain the OPA executable from here" and click the link in "here" to download the executable.
 
-* Locate the downloaded executable file and move it to `C:\Users\<username>\.scubagear\Tools`, creating the `Tools` folder if it does not already exist.
+* Locate the downloaded executable file and move it to `C:\Users\johndoe\.scubagear\Tools`, creating the `Tools` folder if it does not already exist.
 
 To verify that OPA is working, use the following command to check the version:
 

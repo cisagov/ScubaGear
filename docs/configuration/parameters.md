@@ -68,7 +68,7 @@ Here's an example using `-ConfigFilePath`:
 ```powershell
 # Set the inputs using a configuration file
 Invoke-SCuBA -ProductNames teams `
-  -ConfigFilePath C:\users\<username>\Documents\scuba\config.json
+  -ConfigFilePath C:\users\johndoe\Documents\scuba\config.json
 ```
 
 If `-ConfigFilePath` is specified, default values will be used for any parameters that are not added to the config file. These default values are shown in the [full config file](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/Sample-Config-Files/full_config.yaml).  
@@ -89,7 +89,7 @@ More information about the configuration file can be found on the [configuration
 | Config File | No     |  
 
 ```powershell
-# View HTML report in dark mode
+# View the HTML report in dark mode
 Invoke-SCuBA -ProductNames teams `
   -DarkMode
 ```
@@ -106,7 +106,7 @@ Invoke-SCuBA -ProductNames teams `
 | Config File | Yes    |  
 
 ```powershell
-# Delete the auth token
+# Delete the auth tokens
 Invoke-SCuBA -ProductNames teams `
   -DisconnectOnExit
 ```
@@ -162,7 +162,7 @@ The list of acceptable values are:
 
 ## MergeJson
 
-**MergeJson** combines the individual JSON files (named `TeamsReport.json`) in the `IndividualReports` folder together with the `ProviderSettingsExport.json` into an uber JSON file named `ScubaResults.json`. The individual files are deleted.
+**MergeJson** combines the individual JSON files (named `TeamsReport.json`) in the `IndividualReports` folder together with the `ProviderSettingsExport.json` into an uber JSON file named `ScubaResults.json`. The individual JSON files are deleted.
 
 | Parameter   | Value  |
 |-------------|--------|
@@ -172,7 +172,7 @@ The list of acceptable values are:
 | Config File | No     |  
 
 ```powershell
-# Delete the JSON files
+# Create a merged JSON file
 Invoke-SCuBA -ProductNames teams `
   -MergeJson
 ```
@@ -185,13 +185,13 @@ Invoke-SCuBA -ProductNames teams `
 |-------------|----------------------------------------|
 | Optional    | Yes                                    |
 | Datatype    | String                                 |
-| Default     | `C:\Users\<username>\.scubagear\Tools` |
+| Default     | `C:\Users\johndoe\.scubagear\Tools` |
 | Config File | Yes                                    |
 
 ```powershell
 # Change the directory that contains the OPA exe
 Invoke-SCuBA -ProductNames teams `
-  -OPAPath "C:\Users\<username>\Downloads"
+  -OPAPath "C:\Users\johndoe\Downloads"
 ```
 
 > **Note**: Path can be absolute or relative.
@@ -231,7 +231,7 @@ Invoke-SCuBA -ProductNames teams `
 | Config File | Yes                       |  
 
 ```powershell
-# Put the results in the testing folder
+# Change the output folder
 Invoke-SCuBA -ProductNames teams `
   -OutFolderName testing
 ```
@@ -250,7 +250,7 @@ Invoke-SCuBA -ProductNames teams `
 > **Note**: This parameter does not work if the `-MergeJson` parameter is not present.
 
 ```powershell
-# Put the results in the testing folder
+# Change the output JSON file
 Invoke-SCuBA -ProductNames teams `
   -OutJsonFileName myresults `
   -MergeJson
@@ -268,7 +268,7 @@ Invoke-SCuBA -ProductNames teams `
 | Config File | Yes                                        |
 
 ```powershell
-# Put the results in the testing folder
+# Change the output path
 Invoke-SCuBA -ProductNames teams `
   -OutPath myresults
 ```
@@ -287,7 +287,7 @@ Invoke-SCuBA -ProductNames teams `
 | Config File | Yes                      |  
 
 ```powershell
-# Put the results in the testing folder
+# Change the provider settings file
 Invoke-SCuBA -ProductNames teams `
   -OutProviderFileName mysettings
 ```
@@ -306,7 +306,7 @@ Invoke-SCuBA -ProductNames teams `
 | Config File | Yes           |  
 
 ```powershell
-# Put the results in the testing folder
+# Change the rego file
 Invoke-SCuBA -ProductNames teams `
   -OutRegoFileName mytestresults
 ```
@@ -325,7 +325,7 @@ Invoke-SCuBA -ProductNames teams `
 | Config File | Yes               |  
 
 ```powershell
-# Put the results in the testing folder
+# Change the HTML report file
 Invoke-SCuBA -ProductNames teams `
   -OutReportName myreport
 ```
