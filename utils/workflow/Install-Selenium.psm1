@@ -7,7 +7,6 @@ function Install-Selenium
   Import-Module -Name (Get-Module -Name Selenium -ListAvailable).Path -Force
 }
 
-Export-ModuleMember -Function
-{
+Export-ModuleMember -Function @(
   'Install-Selenium'
-}
+)

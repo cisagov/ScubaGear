@@ -4,7 +4,6 @@ function Setup-ScubaGear
   Initialize-SCuBA
 }
 
-Export-ModuleMember -Function
-{
+Export-ModuleMember -Function @(
   'Setup-ScubaGear'
-}
+)
