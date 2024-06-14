@@ -1,0 +1,23 @@
+name: Unit Test Get Planets
+
+on:
+  push:
+  workflow_dispatch:
+
+permissions: read-all
+
+jobs:
+  set-pattern:
+    name: Unit Test Get Planets
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: powershell
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+      - name: Run Pester Tests
+        run: |
+          # This should run all workflow unit tests
+          Invoke-Pester -Output 'Detailed' -Path 'Testing/workflow'
+

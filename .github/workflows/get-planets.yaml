@@ -1,0 +1,23 @@
+name: Get Planets
+
+on:
+  push:
+  workflow_dispatch:
+
+permissions: read-all
+
+jobs:
+  set-pattern:
+    name: Get Planets
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: powershell
+    steps:
+      - name: Call Planet Module
+        run: |
+          # Source planet module
+          . repo/utils/workflow/Get-Planet.psm1
+          # List the planets
+          $allPlanets = Get-Planet
+          Write-Output $allPlanets
