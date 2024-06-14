@@ -2964,8 +2964,11 @@ test_ConditionalAccessPolicies_Correct_V3 if {
                 },
                 "GrantControls": {
                     "BuiltInControls": [
+                        "compliantDevice",
                         "domainJoinedDevice"
-                    ]
+                    ],
+
+                    "Operator": "OR"
                 },
                 "State": "enabled",
                 "DisplayName": "AD Joined Device Authentication Policy"
@@ -2999,8 +3002,11 @@ test_BuiltInControls_Correct if {
                 },
                 "GrantControls": {
                     "BuiltInControls": [
-                        "compliantDevice"
-                    ]
+                        "compliantDevice",
+                        "domainJoinedDevice"
+                    ],
+
+                    "Operator": "OR"
                 },
                 "State": "enabled",
                 "DisplayName": "AD Joined Device Authentication Policy"
@@ -3014,6 +3020,205 @@ test_BuiltInControls_Correct if {
     ])
 
     TestResult("MS.AAD.3.7v1", Output, ReportDetailStr, true) == true
+}
+
+test_ExcludeUserCorrect_V1 if {
+    Output := aad.tests with input as {
+        "scuba_config": {
+            "Aad": {
+                "MS.AAD.3.7v1": {
+                    "CapExclusions": {
+                        "Users": [
+                            "SpecialPerson"
+                        ]
+                    }
+                }
+            }
+        },
+        "conditional_access_policies": [
+            {
+                "Conditions": {
+                    "Applications": {
+                        "IncludeApplications": [
+                            "All"
+                        ]
+                    },
+                    "Users": {
+                        "IncludeUsers": [
+                            "All"
+                        ],
+                        "ExcludeUsers": [
+                            "SpecialPerson"
+                        ]
+                    }
+                },
+                "GrantControls": {
+                    "BuiltInControls": [
+                        "compliantDevice",
+                        "domainJoinedDevice"
+                    ],
+
+                    "Operator": "OR"
+                },
+                "State": "enabled",
+                "DisplayName": "AD Joined Device Authentication Policy"
+            }
+        ]
+    }
+
+    ReportDetailStr := concat("", [
+        "1 conditional access policy(s) found that meet(s) all requirements:",
+        "<br/>AD Joined Device Authentication Policy. <a href='#caps'>View all CA policies</a>."
+    ])
+    TestResultContains("MS.AAD.3.7v1", Output, ReportDetailArrayStrs, true) == true
+}
+
+test_ExcludeGroup_Correct_V1 if {
+    Output := aad.tests with input as {
+        "scuba_config": {
+            "Aad": {
+                "MS.AAD.3.7v1": {
+                    "CapExclusions": {
+                        "Groups": [
+                            "SpecialGroup"
+                        ]
+                    }
+                }
+            }
+        },
+        "conditional_access_policies": [
+            {
+                "Conditions": {
+                    "Applications": {
+                        "IncludeApplications": [
+                            "All"
+                        ]
+                    },
+                    "Users": {
+                        "IncludeUsers": [
+                            "All"
+                        ],
+                        "ExcludeGroups": [
+                            "SpecialGroup"
+                        ]
+                    }
+                },
+                "GrantControls": {
+                    "BuiltInControls": [
+                        "compliantDevice",
+                        "domainJoinedDevice"
+                    ],
+                    
+                    "Operator": "OR"
+                },
+                "State": "enabled",
+                "DisplayName": "AD Joined Device Authentication Policy"
+            }
+        ]
+    }
+
+    ReportDetailStr := concat("", [
+        "1 conditional access policy(s) found that meet(s) all requirements:",
+        "<br/>AD Joined Device Authentication Policy. <a href='#caps'>View all CA policies</a>."
+    ])
+    TestResultContains("MS.AAD.3.7v1", Output, ReportDetailArrayStrs, true) == true
+}
+
+test_ExcludeUserIncorrect_V1 if {
+    Output := aad.tests with input as {
+        "scuba_config": {
+            "Aad": {
+                "MS.AAD.3.7v1": {
+                    "CapExclusions": {
+                        "Users": [
+                            "NotSpecialUser"
+                        ]
+                    }
+                }
+            }
+        },
+        "conditional_access_policies": [
+            {
+                "Conditions": {
+                    "Applications": {
+                        "IncludeApplications": [
+                            "All"
+                        ]
+                    },
+                    "Users": {
+                        "IncludeUsers": [
+                            "All"
+                        ],
+                        "ExcludeUsers": [
+                            "SpecialUser"
+                        ]
+                    }
+                },
+                "GrantControls": {
+                    "BuiltInControls": [
+                        "compliantDevice",
+                        "domainJoinedDevice"
+                    ],
+
+                    "Operator": "OR"
+                },
+                "State": "enabled",
+                "DisplayName":  "AD Joined Device Authentication Policy"
+            }
+        ]
+    }
+
+    ReportDetailStr :=
+        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    TestResult("MS.AAD.3.7v1", Output, ReportDetailStr, false) == true
+}
+
+test_ExcludeGroupIncorrect_V1 if {
+    Output := aad.tests with input as {
+        "scuba_config": {
+            "Aad": {
+                "MS.AAD.3.7v1": {
+                    "CapExclusions": {
+                        "Groups": [
+                            "SpecialGroup"
+                        ]
+                    }
+                }
+            }
+        },
+        "conditional_access_policies": [
+            {
+                "Conditions": {
+                    "Applications": {
+                        "IncludeApplications": [
+                            "All"
+                        ]
+                    },
+                    "Users": {
+                        "IncludeUsers": [
+                            "All"
+                        ],
+                        "ExcludeGroups": [
+                            "NotSpecialGroup"
+                        ]
+                    }
+                },
+                "GrantControls": {
+                    "BuiltInControls": [
+                        "compliantDevice",
+                        "domainJoinedDevice"
+                    ],
+                    "Operator": "OR"
+                },
+                "State": "enabled",
+                "DisplayName": "AD Joined Device Authentication Policy"
+            }
+        ]
+    }
+
+    ReportDetailStr :=
+        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    TestResult("MS.AAD.3.7v1", Output, ReportDetailStr, false) == true
 }
 
 test_IncludeApplications_Incorrect_V3 if {
@@ -3034,8 +3239,11 @@ test_IncludeApplications_Incorrect_V3 if {
                 },
                 "GrantControls": {
                     "BuiltInControls": [
-                        "compliantDevice"
-                    ]
+                        "compliantDevice",
+                        "domainJoinedDevice"
+                    ],
+
+                    "Operator": "OR"
                 },
                 "State": "enabled",
                 "DisplayName": "AD Joined Device Authentication Policy"
@@ -3066,8 +3274,11 @@ test_IncludeUsers_Incorrect_V2 if {
                 },
                 "GrantControls": {
                     "BuiltInControls": [
-                        "compliantDevice"
-                    ]
+                        "compliantDevice",
+                        "domainJoinedDevice"
+                    ],
+
+                    "Operator": "OR"
                 },
                 "State": "enabled",
                 "DisplayName": "AD Joined Device Authentication Policy"
@@ -3130,8 +3341,11 @@ test_State_Incorrect_V3 if {
                 },
                 "GrantControls": {
                     "BuiltInControls": [
-                        "compliantDevice"
-                    ]
+                        "compliantDevice",
+                        "domainJoinedDevice"
+                    ],
+
+                    "Operator": "OR"
                 },
                 "State": "disabled",
                 "DisplayName": "AD Joined Device Authentication Policy"
@@ -3183,7 +3397,7 @@ test_Correct_V1 if {
     TestResultContains("MS.AAD.3.8v1", Output, ReportDetailArrayStrs, true) == true
 }
 
-test_ExcludeUserCorrect_V1 if {
+test_ExcludeUserCorrect_V2 if {
     Output := aad.tests with input as {
         "scuba_config": {
             "Aad": {
@@ -3232,7 +3446,7 @@ test_ExcludeUserCorrect_V1 if {
     TestResultContains("MS.AAD.3.8v1", Output, ReportDetailArrayStrs, true) == true
 }
 
-test_ExcludeGroup_Correct_V1 if {
+test_ExcludeGroup_Correct_V2 if {
     Output := aad.tests with input as {
         "scuba_config": {
             "Aad": {
@@ -3281,7 +3495,7 @@ test_ExcludeGroup_Correct_V1 if {
     TestResultContains("MS.AAD.3.8v1", Output, ReportDetailArrayStrs, true) == true
 }
 
-test_ExcludeUserIncorrect_V1 if {
+test_ExcludeUserIncorrect_V2 if {
     Output := aad.tests with input as {
         "scuba_config": {
             "Aad": {
@@ -3331,7 +3545,7 @@ test_ExcludeUserIncorrect_V1 if {
     TestResult("MS.AAD.3.8v1", Output, ReportDetailStr, false) == true
 }
 
-test_ExcludeGroupIncorrect_V1 if {
+test_ExcludeGroupIncorrect_V2 if {
     Output := aad.tests with input as {
         "scuba_config": {
             "Aad": {
