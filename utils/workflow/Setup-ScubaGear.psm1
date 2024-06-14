@@ -1,4 +1,4 @@
-function Setup-ScubaGear
+function Initialize-ScubaGear
 {
   Import-Module -Name .\PowerShell\ScubaGear
   Initialize-SCuBA
