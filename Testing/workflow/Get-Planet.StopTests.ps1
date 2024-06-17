@@ -6,7 +6,7 @@ BeforeDiscovery {
 Describe 'Get-Planet' {
   It 'Display the planets' {
     $allPlanets = Get-Planet
-    Write-Host $allPlanets
+    Write-Debug $allPlanets
   }
   It 'Given no parameters, it lists all 8 planets' {
     $allPlanets = Get-Planet

@@ -4,12 +4,11 @@ BeforeDiscovery {
 }
 
 Describe 'Initialize-Scuba' {
-  BeforeAll {
+  It 'Teams should be installed' {
+    Write-Host "This is the evil write-host."
     Write-Output "This is write-output."
     Write-Information "This is write-info."
     Write-Debug "This is write-debug."
-  }
-  It 'Teams should be installed' {
     Get-Module -ListAvailable -Name 'MicrosoftTeams' | Should -BeTrue
   }
   It 'ExchangeOnlineManagement should be installed' {
