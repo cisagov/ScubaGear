@@ -3,7 +3,6 @@ function Install-SeleniumForTesting
   Write-Output 'Installing Selenium for testing...'
   Install-Module -Name Selenium -Scope CurrentUser -Force
   Import-Module -Name Selenium
-  Get-Location
   $RepoRootPath = Join-Path -Path $PSScriptRoot -ChildPath '..\..' -Resolve
   Join-Path -Path $RepoRootPath -ChildPath 'Testing/Functional/SmokeTest/UpdateSelenium.ps1'
   # Workaround for Selenium. Loading psm1 instead of psd1

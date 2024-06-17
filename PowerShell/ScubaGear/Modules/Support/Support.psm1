@@ -94,6 +94,7 @@ function Initialize-SCuBA {
         $ScubaParentDirectory = $env:USERPROFILE
     )
 
+    Write-Output 'Initializing ScubaGear...'
     # Set preferences for writing messages
     $PreferenceStack = New-Object -TypeName System.Collections.Stack
     $PreferenceStack.Push($DebugPreference)
@@ -114,7 +115,10 @@ function Initialize-SCuBA {
     $Stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
 
     # Need to determine where module is so we can get required versions info
+    Write-Output 'Setting up module parent dir...'
     $ModuleParentDir = Split-Path -Path (Get-Module ScubaGear).Path -Parent
+    Write-Output 'Module paretn dir:'
+    Write-Output $ModuleParentDir
     try {
         ($RequiredModulesPath = Join-Path -Path $ModuleParentDir -ChildPath 'RequiredVersions.ps1') *> $null
         . $RequiredModulesPath
