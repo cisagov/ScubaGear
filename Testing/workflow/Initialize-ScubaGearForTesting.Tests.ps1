@@ -1,10 +1,33 @@
-BeforeDiscovery {
+BeforeDiscovery 
+{
+  # Install the required modules
   Import-Module -Name .\utils\workflow\Initialize-ScubaGearForTesting
   Initialize-ScubaGearForTesting
+  # Get the list of required modules
+  try 
+  {
+    ($RequiredModulesPath = Join-Path -Path $ModuleParentDir -ChildPath 'RequiredVersions.ps1') *> $null
+    . $RequiredModulesPath
+  }
+  catch 
+  {
+    throw "Unable to find RequiredVersions.ps1 in expected directory:`n`t$ModuleParentDir"
+  }
+  if ($ModuleList) 
+  {
+    Write-Information "Found list of modules"
+  }
+  else 
+  {
+    Write-Information "Did NOT find list of modules"
+  }
 }
 
-Describe 'Initialize-Scuba' {
-  It 'Teams should be installed' {
+Describe 'Initialize-Scuba'
+{
+  # Test the list of required modules
+  It 'Teams should be installed' 
+  {
     Get-Module -ListAvailable -Name 'MicrosoftTeams' | Should -BeTrue
   }
   It 'ExchangeOnlineManagement should be installed' {
