@@ -28,7 +28,7 @@
   # }
 # }
 
-BeforeDiscovery -ScriptBlock 
+BeforeAll
 {
   Write-Output 'This is the other BD.'
 }
