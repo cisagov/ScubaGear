@@ -5,13 +5,9 @@ BeforeDiscovery {
 
 Describe 'Initialize-Scuba' {
   # Get the list of required modules
-  Write-Debug 'debug'
-  Write-Output 'output'
-  Write-Progress 'progress'
-  Write-Verbose 'verbose'
-  Write-Warning 'warning'
-  Write-Host 'Current Location'
-  Get-Location
+  Write-Warning 'Current Location'
+  $CurrentLocation = (Get-Location).Path
+  Write-Warning $CurrentLocation
   It 'Teams should be installed' {
     Get-Module -ListAvailable -Name 'MicrosoftTeams' | Should -BeTrue
   }
