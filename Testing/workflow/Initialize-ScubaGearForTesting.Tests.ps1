@@ -4,6 +4,7 @@ BeforeDiscovery
   Import-Module -Name .\utils\workflow\Initialize-ScubaGearForTesting
   Initialize-ScubaGearForTesting
   # Get the list of required modules
+  $ModuleParentDir = Split-Path -Path (Get-Module ScubaGear).Path -Parent
   try 
   {
     ($RequiredModulesPath = Join-Path -Path $ModuleParentDir -ChildPath 'RequiredVersions.ps1') *> $null
