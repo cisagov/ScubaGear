@@ -18,9 +18,9 @@ Describe 'Initialize-Scuba' {
     Write-Warning 'Did NOT find list of modules'
   }
   foreach ($Module in $ModuleList) {
-    $ModuleName = $Module.ModuleName
-    Write-Warning $ModuleName
-    It $ModuleName {
+    It 'This module should be installed.' {
+      $ModuleName = $Module.ModuleName
+      Write-Warning $ModuleName
       Get-Module -ListAvailable -Name $ModuleName | Should -BeTrue
     }
   }
