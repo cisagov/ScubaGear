@@ -115,17 +115,10 @@ function Initialize-SCuBA {
     $Stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
 
     # Need to determine where module is so we can get required versions info
-    Write-Information 'Setting up module parent dir...'
     $CurrentLocation = Get-Location
-    Write-Information 'Current location:'
-    Write-Information $CurrentLocation
     Write-Information 'Importing module...'
-    Import-Module (Join-Path -Path $CurrentLocation -ChildPath 'PowerShell/ScubaGear') -Function Initialize-Scuba
-    Write-Information 'Getting ScubaGear...'
-    Get-Module ScubaGear -ListAvailable    
+    Import-Module (Join-Path -Path $CurrentLocation -ChildPath 'PowerShell/ScubaGear') -Function Initialize-Scuba   
     $ModuleParentDir = Split-Path -Path (Get-Module ScubaGear).Path -Parent
-    Write-Information 'Module parent dir:'
-    Write-Information $ModuleParentDir
     try {
         ($RequiredModulesPath = Join-Path -Path $ModuleParentDir -ChildPath 'RequiredVersions.ps1') *> $null
         . $RequiredModulesPath
@@ -189,6 +182,13 @@ function Initialize-SCuBA {
                 $MaxInstalledVersion = (Get-Module -ListAvailable -Name $ModuleName | Sort-Object Version -Descending | Select-Object Version -First 1).Version
             Write-Information -MessageData "Installed the latest acceptable version of ${ModuleName}: ${MaxInstalledVersion}."
         }
+    }
+
+    if (Get-Module -ListAvailable -Name 'MicrosoftTeams') {
+        Write-Information "Module exists"
+    } 
+    else {
+        Write-Information "Module does not exist"
     }
 
     if ($NoOPA -eq $true) {
