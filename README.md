@@ -1,10 +1,8 @@
 ![CISA Logo](/docs/images/cisa.png)
 
-<p>
-  <a href="https://github.com/cisagov/ScubaGear/releases" alt="ScubaGear version #">
-    <img src="https://img.shields.io/badge/ScubaGear-v1.3.0-%2328B953?labelColor=%23005288" />
-  </a>
-</p>
+[![GitHub Release][github-release-img]][release]
+[![GitHub Downloads][github-downloads-img]][release]
+[![PSGallery Downloads][powershell-gallery-downloads-img]][powershell-gallery]
 
 ScubaGear is an assessment tool that verifies that a Microsoft 365 (M365) tenant’s configuration conforms to the policies described in the Secure Cloud Business Applications ([SCuBA](https://cisa.gov/scuba)) Security Configuration Baseline [documents](/baselines/README.md).
 
@@ -99,3 +97,9 @@ The following sections should be read in order.
 ## Project License
 
 Unless otherwise noted, this project is distributed under the Creative Commons Zero license. With developer approval, contributions may be submitted with an alternate compatible license. If accepted, those contributions will be listed herein with the appropriate license.
+
+[release]: https://github.com/cisagov/ScubaGear/releases
+[powershell-gallery]: https://www.powershellgallery.com/packages/ScubaGear
+[github-release-img]: https://img.shields.io/github/v/release/cisagov/ScubaGear?label=ScubaGear
+[github-downloads-img]: https://img.shields.io/github/downloads/cisagov/ScubaGear/total?logo=github
+[powershell-gallery-downloads-img]: https://img.shields.io/powershellgallery/dt/ScubaGear?logo=powershell
