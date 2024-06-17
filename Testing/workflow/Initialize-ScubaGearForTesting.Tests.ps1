@@ -20,7 +20,7 @@ Describe 'Initialize-Scuba' {
   foreach ($Module in $ModuleList) {
     $ModuleName = $Module.ModuleName
     Write-Warning $ModuleName
-    It '$ModuleName should be installed' {
+    It $ModuleName {
       Get-Module -ListAvailable -Name $ModuleName | Should -BeTrue
     }
   }
