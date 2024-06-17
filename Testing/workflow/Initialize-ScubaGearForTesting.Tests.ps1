@@ -5,14 +5,13 @@ BeforeDiscovery {
 
 Describe 'Initialize-Scuba' {
   # Get the list of required modules
-  $ModuleParentDir = Split-Path -Path (Get-Module ScubaGear).Path -Parent
-  Write-Host 'Module parent dir:'
-  Write-Host $ModuleParentDir
   Write-Debug 'debug'
   Write-Output 'output'
   Write-Progress 'progress'
   Write-Verbose 'verbose'
   Write-Warning 'warning'
+  Write-Host 'Current Location'
+  Get-Location
   It 'Teams should be installed' {
     Get-Module -ListAvailable -Name 'MicrosoftTeams' | Should -BeTrue
   }
