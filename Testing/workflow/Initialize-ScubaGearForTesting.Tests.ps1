@@ -5,14 +5,18 @@ BeforeDiscovery
   Initialize-ScubaGearForTesting
   # Get the list of required modules
   $ModuleParentDir = Split-Path -Path (Get-Module ScubaGear).Path -Parent
+  Write-Output 'Module parent dir:'
+  Write-Output $ModuleParentDir
   try 
   {
-    ($RequiredModulesPath = Join-Path -Path $ModuleParentDir -ChildPath 'RequiredVersions.ps1') *> $null
+    $RequiredModulesPath = Join-Path -Path $ModuleParentDir -ChildPath 'RequiredVersions.ps1' -Resolve
+    Write-Output 'Required modules path:'
+    Write-Output $RequiredModulesPath
     . $RequiredModulesPath
   }
   catch 
   {
-    throw "Unable to find RequiredVersions.ps1 in expected directory:`n`t$ModuleParentDir"
+    throw "Unable to find RequiredVersions.ps1"
   }
   if ($ModuleList) 
   {
