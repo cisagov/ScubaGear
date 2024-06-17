@@ -1,4 +1,4 @@
-name: Unit Test Planets
+name: Unit Test Workflow
 
 on:
   push:
