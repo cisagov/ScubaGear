@@ -3,35 +3,7 @@ BeforeDiscovery {
   Initialize-ScubaGearForTesting
 }
 
-# BeforeAll {
-#   Write-Output "This is the before all."
-  # Get the list of required modules
-  # $ModuleParentDir = Split-Path -Path (Get-Module ScubaGear).Path -Parent
-  # Write-Output 'Module parent dir:'
-  # Write-Output $ModuleParentDir
-  # try 
-  # {
-  #   $RequiredModulesPath = Join-Path -Path $ModuleParentDir -ChildPath 'RequiredVersions.ps1' -Resolve
-  #   Write-Output 'Required modules path:'
-  #   Write-Output $RequiredModulesPath
-  #   . $RequiredModulesPath
-  # }
-  # catch 
-  # {
-  #   throw "Unable to find RequiredVersions.ps1"
-  # }
-  # if ($ModuleList) 
-  # {
-  #   Write-Information "Found list of modules"
-  # }
-  # else 
-  # {
-  #   Write-Information "Did NOT find list of modules"
-  # }
-# }
-
-Describe 'Initialize-Scuba'
-{
+Describe 'Initialize-Scuba' {
   It 'Teams should be installed' {
     Get-Module -ListAvailable -Name 'MicrosoftTeams' | Should -BeTrue
   }
