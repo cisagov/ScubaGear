@@ -1,8 +1,10 @@
-# BeforeDiscovery 
-# {
-  # Install the required modules
-  # Import-Module -Name .\utils\workflow\Initialize-ScubaGearForTesting
-  # Initialize-ScubaGearForTesting
+BeforeDiscovery {
+  Import-Module -Name .\utils\workflow\Initialize-ScubaGearForTesting
+  Initialize-ScubaGearForTesting
+}
+
+BeforeAll {
+  Write-Output 'This is the before all.'
   # Get the list of required modules
   # $ModuleParentDir = Split-Path -Path (Get-Module ScubaGear).Path -Parent
   # Write-Output 'Module parent dir:'
@@ -26,16 +28,10 @@
   # {
   #   Write-Information "Did NOT find list of modules"
   # }
-# }
-
-BeforeAll
-{
-  Write-Output 'This is the other BD.'
 }
 
 Describe 'Initialize-Scuba'
 {
-  # Test the list of required modules
   It 'Teams should be installed' 
   {
     Get-Module -ListAvailable -Name 'MicrosoftTeams' | Should -BeTrue
