@@ -119,6 +119,14 @@ function Initialize-SCuBA {
 
     # Need to determine where module is so we can get required versions info
     Write-Output 'Setting up module parent dir...'
+    $CurrentLocation = Get-Location
+    Write-Output 'Current location:'
+    Write-Output $CurrentLocation
+    $ScubaGearFolder = Join-Path -Path $CurrentLocation -ChildPath '..\..'
+    Write-Output 'SG folder:'
+    Write-Output $ScubaGearFolder
+    Write-Output 'Importing module...'
+    Import-Module (Join-Path -Path $ScubaGearFolder -ChildPath 'ScubaGear') -Function Initialize-Scuba
     Write-Output 'Getting ScubaGear...'
     Get-Module ScubaGear -ListAvailable    
     $ModuleParentDir = Split-Path -Path (Get-Module ScubaGear).Path -Parent

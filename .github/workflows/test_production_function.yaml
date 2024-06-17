@@ -15,7 +15,7 @@ on:
   # For debugging only
   push:
     paths:
-      - '.github/workflows/test_production_function.yaml'
+      - ".github/workflows/test_production_function.yaml"
 
 permissions: read-all
 
