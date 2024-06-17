@@ -3,6 +3,12 @@ BeforeDiscovery {
   Initialize-ScubaGearForTesting
 }
 
+BeforeAll {
+  Write-Output "This is write-output."
+  Write-Information "This is write-info."
+  Write-Debug "This is write-debug."
+}
+
 Describe 'Initialize-Scuba' {
   It 'Teams should be installed' {
     Get-Module -ListAvailable -Name 'MicrosoftTeams' | Should -BeTrue
