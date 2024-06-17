@@ -114,24 +114,21 @@ function Initialize-SCuBA {
     # Start a stopwatch to time module installation elapsed time
     $Stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
 
-    Write-Output 'Importing ScubaGear...'
-    Import-Module -Name '..\..\ScubaGear' -Function Initialize-Scuba
-
     # Need to determine where module is so we can get required versions info
-    Write-Output 'Setting up module parent dir...'
+    Write-Information 'Setting up module parent dir...'
     $CurrentLocation = Get-Location
-    Write-Output 'Current location:'
-    Write-Output $CurrentLocation
+    Write-Information 'Current location:'
+    Write-Information $CurrentLocation
     $ScubaGearFolder = Join-Path -Path $CurrentLocation -ChildPath '..\..'
-    Write-Output 'SG folder:'
-    Write-Output $ScubaGearFolder
-    Write-Output 'Importing module...'
+    Write-Information 'SG folder:'
+    Write-Information $ScubaGearFolder
+    Write-Information 'Importing module...'
     Import-Module (Join-Path -Path $ScubaGearFolder -ChildPath 'ScubaGear') -Function Initialize-Scuba
-    Write-Output 'Getting ScubaGear...'
+    Write-Information 'Getting ScubaGear...'
     Get-Module ScubaGear -ListAvailable    
     $ModuleParentDir = Split-Path -Path (Get-Module ScubaGear).Path -Parent
-    Write-Output 'Module parent dir:'
-    Write-Output $ModuleParentDir
+    Write-Information 'Module parent dir:'
+    Write-Information $ModuleParentDir
     try {
         ($RequiredModulesPath = Join-Path -Path $ModuleParentDir -ChildPath 'RequiredVersions.ps1') *> $null
         . $RequiredModulesPath
