@@ -1,8 +1,8 @@
-BeforeDiscovery 
-{
+# BeforeDiscovery 
+# {
   # Install the required modules
-  Import-Module -Name .\utils\workflow\Initialize-ScubaGearForTesting
-  Initialize-ScubaGearForTesting
+  # Import-Module -Name .\utils\workflow\Initialize-ScubaGearForTesting
+  # Initialize-ScubaGearForTesting
   # Get the list of required modules
   # $ModuleParentDir = Split-Path -Path (Get-Module ScubaGear).Path -Parent
   # Write-Output 'Module parent dir:'
@@ -26,7 +26,7 @@ BeforeDiscovery
   # {
   #   Write-Information "Did NOT find list of modules"
   # }
-}
+# }
 
 BeforeDiscovery -ScriptBlock 
 {
