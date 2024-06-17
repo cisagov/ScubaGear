@@ -4,7 +4,7 @@ BeforeDiscovery {
 }
 
 BeforeAll {
-  Write-Output 'This is the before all.'
+  Write-Output "This is the before all."
   # Get the list of required modules
   # $ModuleParentDir = Split-Path -Path (Get-Module ScubaGear).Path -Parent
   # Write-Output 'Module parent dir:'
@@ -32,8 +32,7 @@ BeforeAll {
 
 Describe 'Initialize-Scuba'
 {
-  It 'Teams should be installed' 
-  {
+  It 'Teams should be installed' {
     Get-Module -ListAvailable -Name 'MicrosoftTeams' | Should -BeTrue
   }
   It 'ExchangeOnlineManagement should be installed' {
