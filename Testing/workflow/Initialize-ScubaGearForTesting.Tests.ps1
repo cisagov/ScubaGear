@@ -3,8 +3,8 @@ BeforeDiscovery {
   Initialize-ScubaGearForTesting
 }
 
-BeforeAll {
-  Write-Output "This is the before all."
+# BeforeAll {
+#   Write-Output "This is the before all."
   # Get the list of required modules
   # $ModuleParentDir = Split-Path -Path (Get-Module ScubaGear).Path -Parent
   # Write-Output 'Module parent dir:'
@@ -28,7 +28,7 @@ BeforeAll {
   # {
   #   Write-Information "Did NOT find list of modules"
   # }
-}
+# }
 
 Describe 'Initialize-Scuba'
 {
