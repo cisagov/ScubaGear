@@ -1,4 +1,4 @@
-name: Unit Test Get Planets
+name: Unit Test Workflow
 
 on:
   push:
@@ -7,8 +7,8 @@ on:
 permissions: read-all
 
 jobs:
-  set-pattern:
-    name: Unit Test Get Planets
+  unit-test:
+    name: Unit Test
     runs-on: windows-latest
     defaults:
       run:

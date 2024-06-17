@@ -184,13 +184,6 @@ function Initialize-SCuBA {
         }
     }
 
-    if (Get-Module -ListAvailable -Name 'MicrosoftTeams') {
-        Write-Information "Module exists"
-    } 
-    else {
-        Write-Information "Module does not exist"
-    }
-
     if ($NoOPA -eq $true) {
         Write-Debug "Skipping Download for OPA.`n"
     }
