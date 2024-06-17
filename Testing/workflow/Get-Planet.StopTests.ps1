@@ -4,7 +4,8 @@ BeforeDiscovery {
 }
 
 BeforeAll {
-  Write-Host "This is before all."
+  Write-Output "This is write-output."
+  Write-Information "This is write-info."
 }
 
 Describe 'Get-Planet' {
