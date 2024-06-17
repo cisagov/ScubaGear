@@ -3,6 +3,10 @@ BeforeDiscovery {
   Import-Module (Join-Path -Path $ModuleRootPath -ChildPath 'Get-Planet.psm1') -Function Get-Planet -Force
 }
 
+BeforeAll {
+  Write-Host "This is before all."
+}
+
 Describe 'Get-Planet' {
   It 'Display the planets' {
     $allPlanets = Get-Planet
