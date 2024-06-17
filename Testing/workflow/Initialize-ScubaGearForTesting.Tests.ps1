@@ -4,10 +4,23 @@ BeforeDiscovery {
 }
 
 Describe 'Initialize-Scuba' {
-  # Get the list of required modules
-  Write-Warning 'Current Location'
-  $CurrentLocation = (Get-Location).Path
-  Write-Warning $CurrentLocation
+  Write-Warning 'Getting required modules...'
+  try 
+  {
+    . PowerShell\ScubaGear\RequiredVersions.ps1
+  }
+  catch 
+  {
+    throw "Unable to find RequiredVersions.ps1"
+  }
+  if ($ModuleList) 
+  {
+    Write-Warning 'Found list of modules'
+  }
+  else 
+  {
+    Write-Warning 'Did NOT find list of modules'
+  }
   It 'Teams should be installed' {
     Get-Module -ListAvailable -Name 'MicrosoftTeams' | Should -BeTrue
   }
