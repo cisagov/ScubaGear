@@ -114,6 +114,9 @@ function Initialize-SCuBA {
     # Start a stopwatch to time module installation elapsed time
     $Stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
 
+    Write-Output 'Importing ScubaGear...'
+    Import-Module -Name '..\..\ScubaGear' -Function Initialize-Scuba
+
     # Need to determine where module is so we can get required versions info
     Write-Output 'Setting up module parent dir...'
     Write-Output 'Getting ScubaGear...'
