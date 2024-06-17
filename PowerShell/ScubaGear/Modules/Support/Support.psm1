@@ -116,8 +116,10 @@ function Initialize-SCuBA {
 
     # Need to determine where module is so we can get required versions info
     Write-Output 'Setting up module parent dir...'
+    Write-Output 'The ScubaGear path is'
+    Write-Output (Get-Module ScubaGear).Path
     $ModuleParentDir = Split-Path -Path (Get-Module ScubaGear).Path -Parent
-    Write-Output 'Module paretn dir:'
+    Write-Output 'Module parent dir:'
     Write-Output $ModuleParentDir
     try {
         ($RequiredModulesPath = Join-Path -Path $ModuleParentDir -ChildPath 'RequiredVersions.ps1') *> $null
