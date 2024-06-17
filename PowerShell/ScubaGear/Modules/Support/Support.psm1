@@ -120,7 +120,7 @@ function Initialize-SCuBA {
     Write-Information 'Current location:'
     Write-Information $CurrentLocation
     Write-Information 'Importing module...'
-    Import-Module './PowerShell/ScubaGear' -Function Initialize-Scuba
+    Import-Module (Join-Path -Path $CurrentLocation -ChildPath 'PowerShell/ScubaGear') -Function Initialize-Scuba
     Write-Information 'Getting ScubaGear...'
     Get-Module ScubaGear -ListAvailable    
     $ModuleParentDir = Split-Path -Path (Get-Module ScubaGear).Path -Parent
