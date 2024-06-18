@@ -26,7 +26,7 @@ ScubaGear uses a three-step process:
 
 ## Getting Started
 
-To install ScubaGear from [PSGallery](https://www.powershellgallery.com/packages/ScubaGear), open a PowerShell 5 terminal and install the module:
+To install ScubaGear from [PSGallery](https://www.powershellgallery.com/packages/ScubaGear), open a PowerShell 5 terminal on a Windows computer and install the module:
 
 ```powershell
 # Install ScubaGear
