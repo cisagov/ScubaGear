@@ -594,8 +594,6 @@ this purpose, guidance for configuring the Common Attachment Filter in
 Microsoft Defender can be found in the follow section of the CISA M365 Security Configuration Baseline for Defender for Office 365.
 
 - [Preset Security Policies \| CISA M365 Security Configuration Baseline for Defender for Office 365](./defender.md#1-preset-security-profiles)
-- [Common attachments filter in anti-malware policies \| Microsoft Learn](https://learn.microsoft.com/en-us/defender-office-365/anti-malware-protection-about#common-attachments-filter-in-anti-malware-policies)
-
 
 ### Policies
 
@@ -648,7 +646,7 @@ Blocking a list of common executable files helps mitigate the risk of adversaria
 
 ### Resources
 
-- None
+- [Common attachments filter in anti-malware policies \| Microsoft Learn](https://learn.microsoft.com/en-us/defender-office-365/anti-malware-protection-about#common-attachments-filter-in-anti-malware-policies)
 
 ### License Requirements
 
