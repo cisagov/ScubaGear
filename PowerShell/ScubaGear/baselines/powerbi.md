@@ -421,7 +421,7 @@ Sensitivity labels SHOULD be enabled for Power BI and employed for sensitive dat
 - _Rationale:_ A document without sensitivity labels may be opened unknowingly, potentially exposing data to someone who is not supposed to have access to it. This policy will help organize and classify data, making it easier to keep data out of the wrong hands.
 - _Last modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1048:Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)
+  - [T1048: Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)
   - [T1567: Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)
   - [T1213.002: Sharepoint](https://attack.mitre.org/techniques/T1213/002/)
   - [T1213: Data from Information Repositories](https://attack.mitre.org/techniques/T1213/)
