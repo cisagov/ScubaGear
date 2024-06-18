@@ -617,7 +617,7 @@ Provisioning users to highly privileged roles SHALL NOT occur outside of a PAM s
 - _Rationale:_ Provisioning users to privileged roles within a PAM system enables enforcement of numerous privileged access policies and monitoring. If privileged users are assigned directly to roles in the M365 admin center or via PowerShell outside of the context of a PAM system, a significant set of critical security capabilities are bypassed.
 - _Last modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1651:Cloud Administration Command](https://attack.mitre.org/techniques/T1651/)
+  - [T1651: Cloud Administration Command](https://attack.mitre.org/techniques/T1651/)
 
 #### MS.AAD.7.6v1
 Activation of the Global Administrator role SHALL require approval.
