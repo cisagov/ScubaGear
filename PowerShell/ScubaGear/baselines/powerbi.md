@@ -422,7 +422,7 @@ Sensitivity labels SHOULD be enabled for Power BI and employed for sensitive dat
 - _Last modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
   - [T1048:Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)
-  - [T1567:Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)
+  - [T1567: Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)
   - [T1213.002:Sharepoint](https://attack.mitre.org/techniques/T1213/002/)
   - [T1213:Data from Information Repositories](https://attack.mitre.org/techniques/T1213/)
   - [T1530:Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)
