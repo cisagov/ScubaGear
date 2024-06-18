@@ -659,7 +659,7 @@ User activation of other highly privileged roles SHOULD trigger an alert.
 - _MITRE ATT&CK TTP Mapping:_
   - [T1098: Account Manipulation](https://attack.mitre.org/techniques/T1098/)
     - [T1098.003: Additional Cloud Roles](https://attack.mitre.org/techniques/T1098/003/)
-  - [T1136:Create Account](https://attack.mitre.org/techniques/T1136/)
+  - [T1136: Create Account](https://attack.mitre.org/techniques/T1136/)
     - [T1136.003: Cloud Account](https://attack.mitre.org/techniques/T1136/003/)
 
 
