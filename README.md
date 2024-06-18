@@ -108,7 +108,7 @@ Unless otherwise noted, this project is distributed under the Creative Commons Z
 [github-cicd-workflow]: https://github.com/cisagov/ScubaGear/actions/workflows/run_pipeline.yaml
 [github-issues]: https://github.com/cisagov/ScubaGear/issues
 [github-license-img]: https://img.shields.io/github/license/cisagov/ScubaGear
-[github-release-img]: https://img.shields.io/github/v/release/cisagov/ScubaGear?label=ScubaGear&logo=github
+[github-release-img]: https://img.shields.io/github/v/release/cisagov/ScubaGear?label=GitHub&logo=github
 [psgallery-release-img]: https://img.shields.io/powershellgallery/v/ScubaGear?logo=powershell&label=PSGallery
 [github-cicd-workflow-img]: https://img.shields.io/github/actions/workflow/status/cisagov/ScubaGear/run_pipeline.yaml?logo=github
 [github-downloads-img]: https://img.shields.io/github/downloads/cisagov/ScubaGear/total?logo=github
