@@ -717,7 +717,7 @@ URL comparison with a blocklist SHOULD be enabled.
     - [T1204.002: Malicious File](https://attack.mitre.org/techniques/T1204/002/)
   - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
     - [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
-  - [T1189:Drive-by Compromise](https://attack.mitre.org/techniques/T1189/)
+  - [T1189: Drive-by Compromise](https://attack.mitre.org/techniques/T1189/)
 
 #### MS.TEAMS.8.2v1
 User click tracking SHOULD be enabled.
