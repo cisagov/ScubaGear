@@ -284,7 +284,7 @@ Managed Devices SHOULD be required to register MFA.
   - [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)
     - [T1078.004: Cloud Accounts](https://attack.mitre.org/techniques/T078/004/)
   - [T1098: Account Manipulation](https://attack.mitre.org/techniques/T1098/)
-    - [T1098.005:Device Registration](https://attack.mitre.org/techniques/T1098/005/)
+    - [T1098.005: Device Registration](https://attack.mitre.org/techniques/T1098/005/)
 
 ### Resources
 
