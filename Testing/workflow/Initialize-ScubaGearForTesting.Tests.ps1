@@ -19,12 +19,13 @@ Describe 'Initialize-Scuba' {
   }
   foreach ($Module in $ModuleList) {
     $ModuleName = $Module.ModuleName
-    Write-Warning 'The module name is ' $ModuleName
+    Write-Warning $ModuleName.GetType().fullname
+    Write-Warning 'The module name is ' + $ModuleName
     It 'This module should be installed.' {
       Get-Module -ListAvailable -Name $ModuleName | Should -BeTrue
     }
   }
-  # It 'Teams should be installed' {
+  # It 'MicrosoftTeams should be installed' {
   #   Get-Module -ListAvailable -Name 'MicrosoftTeams' | Should -BeTrue
   # }
   # It 'ExchangeOnlineManagement should be installed' {
