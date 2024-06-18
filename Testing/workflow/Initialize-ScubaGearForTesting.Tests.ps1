@@ -12,13 +12,13 @@ catch {
   throw "Unable to find RequiredVersions.ps1"
 }
 if ($ModuleList) {
-  Write-Warning 'Found list of modules'
+  Write-Warning 'Found list of modules!'
 }
 else {
-  Write-Warning 'Did NOT find list of modules'
+  Write-Warning 'Did NOT find list of modules!!'
 }
 
-Describe "Check for installed PowerShell modules" {
+Describe "Check for PowerShell modules" {
   foreach ($Module in $ModuleList) {
     $global:ModuleName = $Module.ModuleName
     It "Module $global:moduleName should be installed" {
