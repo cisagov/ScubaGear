@@ -594,6 +594,8 @@ this purpose, guidance for configuring the Common Attachment Filter in
 Microsoft Defender can be found in the follow section of the CISA M365 Security Configuration Baseline for Defender for Office 365.
 
 - [Preset Security Policies \| CISA M365 Security Configuration Baseline for Defender for Office 365](./defender.md#1-preset-security-profiles)
+- [Common attachments filter in anti-malware policies \| Microsoft Learn](https://learn.microsoft.com/en-us/defender-office-365/anti-malware-protection-about#common-attachments-filter-in-anti-malware-policies)
+
 
 ### Policies
 
@@ -1063,7 +1065,7 @@ If a third-party party filtering solution is used, the solution SHOULD offer ser
 
 ### Resources
 
-- None
+- [Configure anti-spam policies in EOP \| Microsoft Learn](https://learn.microsoft.com/en-us/defender-office-365/anti-spam-policies-configure?view=o365-worldwide)
 
 ### License Requirements
 
