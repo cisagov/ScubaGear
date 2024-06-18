@@ -3057,6 +3057,7 @@ test_ExcludeUserCorrect_V1 if {
                         "compliantDevice",
                         "domainJoinedDevice"
                     ],
+
                     "Operator": "OR"
                 },
                 "State": "enabled",
