@@ -3,7 +3,7 @@ BeforeDiscovery {
   Initialize-ScubaGearForTesting
 }
 
-Describe 'Initialize-Scuba' {
+Describe 'Check for installed modules' {
   Write-Warning 'Getting required modules...'
   try {
     . PowerShell\ScubaGear\RequiredVersions.ps1
@@ -19,8 +19,12 @@ Describe 'Initialize-Scuba' {
   }
   foreach ($Module in $ModuleList) {
     $ModuleName = $Module.ModuleName
-    It "$ModuleName should be installed." {
-      Get-Module -ListAvailable -Name "$(ModuleName)" | Should -BeTrue
+    # It "$ModuleName should be installed." {
+    #   Get-Module -ListAvailable -Name "$(ModuleName)" | Should -BeTrue
+    # }
+    It "Module $ModuleName should be installed" {
+        $module = Get-Module -ListAvailable -Name $ModuleName
+        $module | Should -Not -BeNullOrEmpty
     }
   }
   # It 'MicrosoftTeams should be installed' {
