@@ -1,12 +1,12 @@
 ![CISA Logo](/docs/images/cisa.png)
 
-[![GitHub License][github-license-img]][license]
 [![GitHub Release][github-release-img]][release]
 [![PSGallery Release][psgallery-release-img]][psgallery]
 [![GitHub CICD Workflow][github-cicd-workflow-img]][github-cicd-workflow]
-[![GitHub Issues][github-issues-img]][github-issues]
+[![GitHub License][github-license-img]][license]
 [![GitHub Downloads][github-downloads-img]][release]
 [![PSGallery Downloads][psgallery-downloads-img]][psgallery]
+[![GitHub Issues][github-issues-img]][github-issues]
 
 ScubaGear is an assessment tool that verifies that a Microsoft 365 (M365) tenant’s configuration conforms to the policies described in the Secure Cloud Business Applications ([SCuBA](https://cisa.gov/scuba)) Security Configuration Baseline [documents](/baselines/README.md).
 
