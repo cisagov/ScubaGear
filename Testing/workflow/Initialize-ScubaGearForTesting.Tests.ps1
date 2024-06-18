@@ -5,9 +5,9 @@ BeforeDiscovery {
 
 $moduleName = 'MicrosoftTeams'
 
-Describe "Check for installed PowerShell module" {
-    It "Module $moduleName should be installed" {
-        $module = Get-Module -ListAvailable -Name $moduleName
-        $module | Should -Not -BeNullOrEmpty
-    }
+Describe "Check for installed PowerShell modules" {
+  It "Module $moduleName should be installed" {
+      $module = Get-Module -ListAvailable -Name 'MicrosoftTeams'
+      $module | Should -Not -BeNullOrEmpty
+  }
 }
