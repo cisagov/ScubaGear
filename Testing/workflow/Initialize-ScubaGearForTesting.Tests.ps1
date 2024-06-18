@@ -20,8 +20,8 @@ Describe 'Initialize-Scuba' {
   foreach ($Module in $ModuleList) {
     $ModuleName = $Module.ModuleName
     Write-Warning "The module name is $ModuleName."
-    It 'This module should be installed.' {
-      Get-Module -ListAvailable -Name $ModuleName | Should -BeTrue
+    It "$ModuleName should be installed." {
+      Get-Module -ListAvailable -Name "$ModuleName" | Should -BeTrue
     }
   }
   # It 'MicrosoftTeams should be installed' {
