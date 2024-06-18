@@ -595,7 +595,7 @@ Privileged users SHALL be provisioned cloud-only accounts separate from an on-pr
 - _Last modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
   - [T1556: Modify Authentication Process](https://attack.mitre.org/techniques/T1556/)
-    - [T1556.007:Hybrid Identity](https://attack.mitre.org/techniques/T1556/007/)
+    - [T1556.007: Hybrid Identity](https://attack.mitre.org/techniques/T1556/007/)
 
 #### MS.AAD.7.4v1
 Permanent active role assignments SHALL NOT be allowed for highly privileged roles.
