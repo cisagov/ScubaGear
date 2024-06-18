@@ -1,3 +1,7 @@
+# The purpose of this test is to verify that the required
+# PS modules were installed.
+
+# Suppress PSSA warnings here at the root of the test file.
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '')]
 param()
 
