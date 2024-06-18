@@ -989,7 +989,7 @@ Mailbox auditing SHALL be enabled.
   - [T1070: Indicator Removal](https://attack.mitre.org/techniques/T1070/)
     - [T1070.008: Clear Mailbox Data](https://attack.mitre.org/techniques/T1070/008/)
   - [T1098: Account Manipulation](https://attack.mitre.org/techniques/T1098/)
-    - [T1098.002:Additional Email Delegate Permissions](https://attack.mitre.org/techniques/T1098/002/)
+    - [T1098.002: Additional Email Delegate Permissions](https://attack.mitre.org/techniques/T1098/002/)
   - [T1562: Impair Defenses](https://attack.mitre.org/techniques/T1562/)
     - [T1562.008: Disable or Modify Cloud Logs](https://attack.mitre.org/techniques/T1562/008/)
   - [T1586: Compromise Accounts](https://attack.mitre.org/techniques/T1586/)
