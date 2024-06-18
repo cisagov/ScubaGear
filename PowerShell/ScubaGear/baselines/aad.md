@@ -819,7 +819,7 @@ Guest users SHOULD have limited or restricted access to Azure AD directory objec
   - [T1087: Account Discovery](https://attack.mitre.org/techniques/T1087/)
     - [T1087.003: Email Account](https://attack.mitre.org/techniques/T1087/003/)
     - [T1087.004: Cloud Account](https://attack.mitre.org/techniques/T1087/004/)
-  - [T1526:Cloud Service Discovery](https://attack.mitre.org/techniques/T1526/)
+  - [T1526: Cloud Service Discovery](https://attack.mitre.org/techniques/T1526/)
 
 #### MS.AAD.8.2v1
 Only users with the Guest Inviter role SHOULD be able to invite guest users.
