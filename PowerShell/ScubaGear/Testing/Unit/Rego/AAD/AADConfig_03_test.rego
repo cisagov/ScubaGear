@@ -3070,7 +3070,7 @@ test_ExcludeUserCorrect_V1 if {
         "1 conditional access policy(s) found that meet(s) all requirements:",
         "<br/>AD Joined Device Authentication Policy. <a href='#caps'>View all CA policies</a>."
     ])
-    TestResultContains("MS.AAD.3.7v1", Output, ReportDetailArrayStrs, true) == true
+    TestResultContains("MS.AAD.3.7v1", Output, ReportDetailStr, true) == true
 }
 
 test_ExcludeGroup_Correct_V1 if {
@@ -3121,7 +3121,7 @@ test_ExcludeGroup_Correct_V1 if {
         "1 conditional access policy(s) found that meet(s) all requirements:",
         "<br/>AD Joined Device Authentication Policy. <a href='#caps'>View all CA policies</a>."
     ])
-    TestResultContains("MS.AAD.3.7v1", Output, ReportDetailArrayStrs, true) == true
+    TestResultContains("MS.AAD.3.7v1", Output, ReportDetailStr, true) == true
 }
 
 test_ExcludeUserIncorrect_V1 if {
