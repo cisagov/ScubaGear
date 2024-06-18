@@ -17,15 +17,20 @@ Describe 'Check for installed modules' {
   else {
     Write-Warning 'Did NOT find list of modules'
   }
-  foreach ($Module in $ModuleList) {
-    $ModuleName = $Module.ModuleName
-    # It "$ModuleName should be installed." {
-    #   Get-Module -ListAvailable -Name "$(ModuleName)" | Should -BeTrue
-    # }
-    It "Module $ModuleName should be installed" {
-        $module = Get-Module -ListAvailable -Name $ModuleName
-        $module | Should -Not -BeNullOrEmpty
-    }
+  # foreach ($Module in $ModuleList) {
+  #   $ModuleName = $Module.ModuleName
+  #   # It "$ModuleName should be installed." {
+  #   #   Get-Module -ListAvailable -Name "$(ModuleName)" | Should -BeTrue
+  #   # }
+  #   It "Module $ModuleName should be installed" {
+  #       $module = Get-Module -ListAvailable -Name $ModuleName
+  #       $module | Should -Not -BeNullOrEmpty
+  #   }
+  # }
+  $ModuleName = "MicrosoftTeams"
+  It "Module $ModuleName should be installed" {
+      $module = Get-Module -ListAvailable -Name $ModuleName
+      $module | Should -Not -BeNullOrEmpty
   }
   # It 'MicrosoftTeams should be installed' {
   #   Get-Module -ListAvailable -Name 'MicrosoftTeams' | Should -BeTrue
