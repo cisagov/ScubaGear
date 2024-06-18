@@ -20,8 +20,11 @@ else {
 
 Describe "Check for PowerShell modules" {
   foreach ($Module in $ModuleList) {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '')]
     $global:ModuleName = $Module.ModuleName
+    
     It "Module $global:moduleName should be installed" {
+      [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '')]
       $module = Get-Module -ListAvailable -Name $global:ModuleName
       $module | Should -Not -BeNullOrEmpty
     }
