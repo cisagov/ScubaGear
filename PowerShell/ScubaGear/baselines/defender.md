@@ -437,7 +437,7 @@ A custom policy SHALL be configured to protect PII and sensitive information, as
                unauthorized disclosures.
 - _Last modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1567 :Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)
+  - [T1567: Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)
   - [T1530: Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)
   - [T1213: Data from Information Repositories](https://attack.mitre.org/techniques/T1213/)
 
