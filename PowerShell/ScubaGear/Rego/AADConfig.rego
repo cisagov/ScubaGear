@@ -449,7 +449,7 @@ ManagedDeviceAuth contains CAPolicy.DisplayName if {
     some CAPolicy in input.conditional_access_policies
 
     # Match all simple conditions
-    #PolicyConditionsMatch(CAPolicy) == true
+    PolicyConditionsMatch(CAPolicy) == true
 
     Conditions := [
         "compliantDevice" in CAPolicy.GrantControls.BuiltInControls,
@@ -457,6 +457,7 @@ ManagedDeviceAuth contains CAPolicy.DisplayName if {
         "OR" in CAPolicy.GrantControls.Operator,
 
     ]
+    write-host(count(FilterArray(Conditions, true)))
     count(FilterArray(Conditions, true)) == 3
 
 
