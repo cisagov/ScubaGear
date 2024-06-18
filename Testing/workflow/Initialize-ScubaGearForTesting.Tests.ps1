@@ -3,11 +3,11 @@ BeforeDiscovery {
   Initialize-ScubaGearForTesting
 }
 
-$moduleName = 'MicrosoftTeams'
+$global:moduleName = 'MicrosoftTeams'
 
 Describe "Check for installed PowerShell modules" {
-  It "Module $moduleName should be installed" {
-      $module = Get-Module -ListAvailable -Name 'MicrosoftTeams'
-      $module | Should -Not -BeNullOrEmpty
+  It "Module $global:moduleName should be installed" {
+    $module = Get-Module -ListAvailable -Name $global:moduleName
+    $module | Should -Not -BeNullOrEmpty
   }
 }
