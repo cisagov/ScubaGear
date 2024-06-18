@@ -469,7 +469,7 @@ The action for the custom policy SHOULD be set to block sharing sensitive inform
           configured in [MS.DEFENDER.4.1v1](#msdefender41v1).
 - _MITRE ATT&CK TTP Mapping:_
   - [T1567: Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)
-  - [T1530:Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)
+  - [T1530: Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)
   - [T1213:Data from Information Repositories](https://attack.mitre.org/techniques/T1213/)
 
 #### MS.DEFENDER.4.4v1
